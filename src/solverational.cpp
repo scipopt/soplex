@@ -597,7 +597,7 @@ namespace soplex
 
          if( primalScale > 0 )
          {
-            primalScale = Rational(1) / primalScale;
+            primalScale = 1 / primalScale;
             if( primalScale > maxScale )
                primalScale = maxScale;
          }
@@ -617,7 +617,7 @@ namespace soplex
 
          if( dualScale > 0 )
          {
-            dualScale = Rational(1) / dualScale;
+            dualScale = 1 / dualScale;
             if( dualScale > maxScale )
                dualScale = maxScale;
          }
@@ -846,10 +846,10 @@ namespace soplex
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
          // zero if basic; otherwise 0 or 1
-         error = !(tau >= Rational(1) || tau < realParam(SoPlex::FEASTOL));
+         error = !(tau >= 1 || tau < realParam(SoPlex::FEASTOL));
          assert(!error);
 
-         hasUnboundedRay = (tau >= Rational(1));
+         hasUnboundedRay = (tau >= 1);
 
          sol._hasDual = false;
          if( !hasUnboundedRay )
@@ -922,8 +922,8 @@ namespace soplex
             assert(tau >= -realParam(SoPlex::FEASTOL));
             assert(tau <= 1.0 + realParam(SoPlex::FEASTOL));
 
-            error = (tau < -realParam(SoPlex::FEASTOL) || tau > Rational(1) + realParam(SoPlex::FEASTOL));
-            withDualFarkas = (tau < Rational(1)); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
+            error = (tau < -realParam(SoPlex::FEASTOL) || tau > 1 + realParam(SoPlex::FEASTOL));
+            withDualFarkas = (tau < 1); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
 
             if( withDualFarkas )
             {
@@ -1508,14 +1508,14 @@ namespace soplex
       // adjust solution and basis
       if( unbounded )
       {
-         assert(sol._primal[numOrigCols] >= Rational(1));
+         assert(sol._primal[numOrigCols] >= 1);
 
          sol._hasPrimal = false;
          sol._hasPrimalRay = true;
          sol._hasDual = false;
          sol._hasDualFarkas = false;
 
-         if( sol._primal[numOrigCols] != Rational(1) )
+         if( sol._primal[numOrigCols] != 1 )
             sol._primal /= sol._primal[numOrigCols];
 
          sol._primalRay = sol._primal;
@@ -1609,13 +1609,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( lowerRational(c) > Rational(0) )
+         if( lowerRational(c) > 0 )
          {
             shiftedSide -= (colVectorRational(c) * lowerRational(c));
             _rationalLP->changeBounds(c, 0, double(upperRational(c)) < double(realParam(SoPlex::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
          }
-         else if( upperRational(c) < Rational(0) )
+         else if( upperRational(c) < 0 )
          {
             shiftedSide -= (colVectorRational(c) * upperRational(c));
             _rationalLP->changeBounds(c, double(lowerRational(c)) > double(-realParam(SoPlex::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
@@ -1671,7 +1671,7 @@ namespace soplex
       if( infeasible )
       {
          assert(sol._hasDual);
-         assert(sol._primal[numOrigCols] < Rational(1));
+         assert(sol._primal[numOrigCols] < 1);
 
          sol._hasPrimal = false;
          sol._hasPrimalRay = false;
@@ -1685,13 +1685,13 @@ namespace soplex
       }
       else if( sol._hasPrimal )
       {
-         assert(sol._primal[numOrigCols] >= Rational(1));
+         assert(sol._primal[numOrigCols] >= 1);
 
          sol._hasPrimalRay = false;
          sol._hasDual = false;
          sol._hasDualFarkas = false;
 
-         if( sol._primal[numOrigCols] != Rational(1) )
+         if( sol._primal[numOrigCols] != 1 )
             sol._primal /= sol._primal[numOrigCols];
 
          sol._primal.reDim(numOrigCols);
@@ -1706,11 +1706,11 @@ namespace soplex
       // unshift primal space and restore objective coefficients
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
-         assert(double(upperRational(c)) >= double(realParam(SoPlex::INFTY)) || double(lowerRational(c)) <= double(-realParam(SoPlex::INFTY))
+         assert(upperRational(c) >= realParam(SoPlex::INFTY) || lowerRational(c) <= -realParam(SoPlex::INFTY)
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
 
          _rationalLP->changeBounds(c, _feasLower[c], _feasUpper[c]);
-         _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
+         _realLP->changeBounds(c, Real(lowerRational(c)), Real(upperRational(c)));
 
          _rationalLP->changeObj(c, _feasObj[c]);
          _realLP->changeObj(c, Real(_feasObj[c]));
@@ -1797,7 +1797,7 @@ namespace soplex
       for( int r = 0; r < numRows; r++ )
       {
          ytransA += y[r] * _rationalLP->rowVector(r);
-         ytransb += y[r] * (y[r] > Rational(0) ? lhs[r] : rhs[r]);
+         ytransb += y[r] * (y[r] > 0 ? lhs[r] : rhs[r]);
       }
 
       // if we work on the feasibility problem, we ignore the last column
@@ -1815,14 +1815,14 @@ namespace soplex
       {
          const Rational& minusRedCost = ytransA[c];
 
-         if( minusRedCost > Rational(0) )
+         if( minusRedCost > 0 )
          {
             if( double(upper[c]) < double(realParam(SoPlex::INFTY)) )
                temp += minusRedCost * upper[c];
             else
                isTempFinite = false;
          }
-         else if( minusRedCost < Rational(0) )
+         else if( minusRedCost < 0 )
          {
             if( double(lower[c]) > double(-realParam(SoPlex::INFTY)) )
                temp += minusRedCost * lower[c];
@@ -1846,17 +1846,17 @@ namespace soplex
       ytransA.setup();
 
       // if ytransb is negative, try to make it zero by including a positive lower bound or a negative upper bound
-      if( ytransb < Rational(0) )
+      if( ytransb < 0 )
       {
          for( int c = 0; c < numCols; c++ )
          {
-            if( lower[c] > Rational(0) )
+            if( lower[c] > 0 )
             {
                ytransA.setValue(c, ytransA[c] - ytransb / lower[c]);
                ytransb = 0;
                break;
             }
-            else if( upper[c] < Rational(0) )
+            else if( upper[c] < 0 )
             {
                ytransA.setValue(c, ytransA[c] - ytransb / upper[c]);
                ytransb = 0;
@@ -1867,7 +1867,7 @@ namespace soplex
 
       // if ytransb is still zero then the zero solution is inside the bounds and cannot be cut off by the Farkas
       // constraint; in this case, we cannot compute a Farkas box
-      if( ytransb < Rational(0) )
+      if( ytransb < 0 )
       {
          MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (1)\n" );
          return;
@@ -1880,7 +1880,7 @@ namespace soplex
          temp += abs(ytransA.value(n));
 
       // if the one norm is zero then ytransA is zero the Farkas proof should have been verified above
-      assert(temp != Rational(0));
+      assert(temp != 0);
 
       // initialize variables in loop: size of Farkas box B, flag whether B has been increased, and number of current
       // nonzero in ytransA
@@ -1890,7 +1890,7 @@ namespace soplex
 
       // loop through nonzeros of ytransA
       MSG_DEBUG( spxout << "B = " << rationalToString(B) << "\n" );
-      assert(ytransb >= Rational(0));
+      assert(ytransb >= 0);
 
       while( true )
       {
@@ -1910,26 +1910,26 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < Rational(0) && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex::INFTY)) )
+         if( minusRedCost < 0 && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * lower[colIdx];
             temp += minusRedCost;
 
-            assert(ytransb >= Rational(0));
-            assert(temp >= Rational(0));
-            assert(temp == Rational(0) || ytransb / temp > B);
+            assert(ytransb >= 0);
+            assert(temp >= 0);
+            assert(temp == 0 || ytransb / temp > B);
 
             // if ytransA and ytransb are zero, we have 0^T x >= 0 and cannot compute a Farkas box
-            if( temp == Rational(0) && ytransb == Rational(0) )
+            if( temp == 0 && ytransb == 0 )
             {
                MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n" );
                return;
             }
             // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
-            else if( temp == Rational(0) )
+            else if( temp == 0 )
             {
-               assert(ytransb > Rational(0));
+               assert(ytransb > 0);
                MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (2)\n" );
                return;
             }
@@ -1943,26 +1943,26 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > Rational(0) && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex::INFTY)) )
+         else if( minusRedCost > 0 && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex::INFTY)) )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * upper[colIdx];
             temp -= minusRedCost;
 
-            assert(ytransb >= Rational(0));
-            assert(temp >= Rational(0));
-            assert(temp == Rational(0) || ytransb / temp > B);
+            assert(ytransb >= 0);
+            assert(temp >= 0);
+            assert(temp == 0 || ytransb / temp > B);
 
             // if ytransA and ytransb are zero, we have 0^T x >= 0 and cannot compute a Farkas box
-            if( temp == Rational(0) && ytransb == Rational(0) )
+            if( temp == 0 && ytransb == 0 )
             {
                MSG_INFO1( spxout << "Approximate Farkas proof to weak.  Could not compute Farkas box. (2)\n" );
                return;
             }
             // if ytransb is positive and ytransA is zero, we have 0^T x > 0, proving infeasibility
-            else if( temp == Rational(0) )
+            else if( temp == 0 )
             {
-               assert(ytransb > Rational(0));
+               assert(ytransb > 0);
                MSG_INFO1( spxout << "Farkas infeasibility proof verified exactly. (2)\n" );
                return;
             }
@@ -1975,7 +1975,7 @@ namespace soplex
             success = true;
          }
          // the multiplier is zero, we can ignore the bound constraints on this variable
-         else if( minusRedCost == Rational(0) )
+         else if( minusRedCost == 0 )
             ytransA.clearNum(n);
          // currently this bound cannot be used to increase B; we will check it again in the next round, because B might
          // have increased by then
@@ -1983,7 +1983,7 @@ namespace soplex
             n++;
       }
 
-      if( B > Rational(0) )
+      if( B > 0 )
       {
          MSG_INFO1( spxout << "Computed Farkas box: provably no feasible solutions with components less than "
             << rationalToString(B) << " in absolute value.\n" );
