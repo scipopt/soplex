@@ -552,7 +552,7 @@ namespace soplex
             if( minRounds < 0 )
             {
                MSG_INFO1( spxout << "Tolerances reached.\n" );
-               return;
+               break;
             }
             else
             {
@@ -564,7 +564,7 @@ namespace soplex
          if( _isSolveStopped() )
          {
             stopped = true;
-            return;
+            break;
          }
 
          // check progress
