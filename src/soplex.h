@@ -1202,7 +1202,8 @@ private:
    DVectorRational _unboundedLhs;
    DVectorRational _unboundedRhs;
    DVectorRational _feasObj;
-   DVectorRational _feasSide;
+   DVectorRational _feasLhs;
+   DVectorRational _feasRhs;
    DVectorRational _feasLower;
    DVectorRational _feasUpper;
    int _beforeLiftRows;

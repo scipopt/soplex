@@ -872,11 +872,6 @@ namespace soplex
       bool success = false;
       error = false;
 
-      // introduce slack variables to transform inequality constraints into equations if this has not been done, because
-      // we still need to implement this method to inequalities
-      if( !boolParam(SoPlex::EQTRANS) )
-         _transformEquality();
-
 #if 0
       // if the problem has been found to be infeasible and an approximate Farkas proof is available, we compute a
       // scaled unit box around the origin that provably contains no feasible solution; this currently only works for
@@ -952,10 +947,6 @@ namespace soplex
 
       // restore problem
       _untransformFeasibility(sol, withDualFarkas);
-
-      // restore original problem
-      if( !boolParam(SoPlex::EQTRANS) )
-         _untransformEquality(sol);
    }
 
 
@@ -1595,14 +1586,15 @@ namespace soplex
       _feasObj.reDim(numColsRational());
       _rationalLP->getObj(_feasObj);
 
-      // store right-hand side and bounds
-      _feasSide = rhsRational();
+      // store sides and bounds
+      _feasLhs = lhsRational();
+      _feasRhs = rhsRational();
       _feasLower = lowerRational();
       _feasUpper = upperRational();
 
       // set objective coefficients to zero; shift primal space such as to guarantee that the zero solution is within
       // the bounds
-      DVectorRational shiftedSide(rhsRational());
+      DSVectorRational shiftVector;
 
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
@@ -1611,35 +1603,110 @@ namespace soplex
 
          if( lowerRational(c) > 0 )
          {
-            shiftedSide -= (colVectorRational(c) * lowerRational(c));
-            _rationalLP->changeBounds(c, 0, double(upperRational(c)) < double(realParam(SoPlex::INFTY)) ? upperRational(c) - lowerRational(c) : upperRational(c));
-            _realLP->changeBounds(c, 0.0, (Real)upperRational(c));
+            const SVectorRational& colVector = colVectorRational(c);
+
+            for( int i = 0; i < colVector.size(); i++ )
+            {
+               Rational shiftValue = colVector.value(i) * lowerRational(c);
+               int r = colVector.index(i);
+
+               if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+               {
+                  _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
+                  _realLP->changeLhs(r, Real(lhsRational(r)));
+               }
+
+               if( rhsRational(r) < realParam(SoPlex::INFTY) )
+               {
+                  _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
+                  _realLP->changeRhs(r, Real(rhsRational(r)));
+               }
+            }
+
+            _rationalLP->changeBounds(c, 0, upperRational(c) < realParam(SoPlex::INFTY) ? upperRational(c) - lowerRational(c) : upperRational(c));
+            _realLP->changeBounds(c, 0.0, Real(upperRational(c)));
          }
          else if( upperRational(c) < 0 )
          {
-            shiftedSide -= (colVectorRational(c) * upperRational(c));
-            _rationalLP->changeBounds(c, double(lowerRational(c)) > double(-realParam(SoPlex::INFTY)) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
-            _realLP->changeBounds(c, (Real)lowerRational(c), 0.0);
+            const SVectorRational& colVector = colVectorRational(c);
+
+            for( int i = 0; i < colVector.size(); i++ )
+            {
+               Rational shiftValue = colVector.value(i) * upperRational(c);
+               int r = colVector.index(i);
+
+               if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+               {
+                  _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
+                  _realLP->changeLhs(r, Real(lhsRational(r)));
+               }
+
+               if( rhsRational(r) < realParam(SoPlex::INFTY) )
+               {
+                  _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
+                  _realLP->changeRhs(r, Real(rhsRational(r)));
+               }
+            }
+
+            _rationalLP->changeBounds(c, lowerRational(c) > -realParam(SoPlex::INFTY) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
+            _realLP->changeBounds(c, Real(lowerRational(c)), 0.0);
          }
          else
          {
-            _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
+            _realLP->changeBounds(c, Real(lowerRational(c)), Real(upperRational(c)));
          }
 
          assert(lowerReal(c) <= upperReal(c));
       }
 
-      // homogenize right-hand side
-      SPxColId id;
-      shiftedSide *= -1;
-      _rationalLP->addCol(id, LPColRational(-1, DSVectorRational(shiftedSide), 1, 0));
-      _realLP->addCol(id, LPColReal(-1.0, DSVectorReal(shiftedSide), 1.0, 0.0));
+      // homogenize sides
+      DSVectorRational tauColVector;
 
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
-         _rationalLP->changeRange(r, 0, 0);
-         _realLP->changeRange(r, 0.0, 0.0);
+         if( lhsRational(r) > 0 )
+         {
+            tauColVector.add(r, lhsRational(r));
+            if( rhsRational(r) < realParam(SoPlex::INFTY) )
+            {
+               _rationalLP->changeRange(r, 0, rhsRational(r) - lhsRational(r));
+               _realLP->changeRange(r, 0.0, Real(rhsRational(r)));
+            }
+            else
+            {
+               _rationalLP->changeLhs(r, 0);
+               _realLP->changeLhs(r, 0.0);
+            }
+         }
+         else if( rhsRational(r) < 0 )
+         {
+            tauColVector.add(r, rhsRational(r));
+            if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+            {
+               _rationalLP->changeRange(r, lhsRational(r) - rhsRational(r), 0);
+               _realLP->changeRange(r, Real(lhsRational(r)), 0.0);
+            }
+            else
+            {
+               _rationalLP->changeRhs(r, 0);
+               _realLP->changeRhs(r, 0.0);
+            }
+         }
+
+         assert(rhsReal(r) <= rhsReal(r));
       }
+
+      ///@todo exploit this case by returning without LP solving
+      if( tauColVector.size() == 0 )
+      {
+         MSG_INFO3( spxout << "LP is trivially feasible.\n" );
+      }
+
+      // add artificial column
+      SPxColId id;
+      tauColVector *= -1;
+      _rationalLP->addCol(id, LPColRational(-1, tauColVector, 1, 0));
+      _realLP->addCol(id, LPColReal(-1.0, DSVectorReal(tauColVector), 1.0, 0.0));
 
       // adjust basis
       if( _hasBasis )
@@ -1703,6 +1770,18 @@ namespace soplex
       else
          _hasBasis = false;
 
+      // restore right-hand side
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         assert(rhsRational(r) >= realParam(SoPlex::INFTY) || lhsRational(r) <= -realParam(SoPlex::INFTY)
+            || _feasLhs[r] - lhsRational(r) == _feasRhs[r] - rhsRational(r));
+
+         _rationalLP->changeRange(r, _feasLhs[r], _feasRhs[r]);
+         _realLP->changeRange(r, Real(lhsRational(r)), Real(rhsRational(r)));
+
+         assert(lhsReal(r) <= rhsReal(r));
+      }
+
       // unshift primal space and restore objective coefficients
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
@@ -1717,11 +1796,6 @@ namespace soplex
 
          assert(lowerReal(c) <= upperReal(c));
       }
-
-      // restore right-hand side
-      DVectorReal feasSideReal(_feasSide);
-      _rationalLP->changeRange(_feasSide, _feasSide);
-      _realLP->changeRange(feasSideReal, feasSideReal);
 
       // remove last column
       _rationalLP->removeCol(numOrigCols);
@@ -1776,8 +1850,8 @@ namespace soplex
 
       const VectorRational& lower = transformed ? _feasLower : lowerRational();
       const VectorRational& upper = transformed ? _feasUpper : upperRational();
-      const VectorRational& lhs = transformed ? _feasSide : lhsRational();
-      const VectorRational& rhs = transformed ? _feasSide : rhsRational();
+      const VectorRational& lhs = transformed ? _feasLhs : lhsRational();
+      const VectorRational& rhs = transformed ? _feasRhs : rhsRational();
       const VectorRational& y = sol._dualFarkas;
 
       const int numRows = numRowsRational();
