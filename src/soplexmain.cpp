@@ -30,6 +30,15 @@
 #include "spxgithash.h"
 #include "timer.h"
 
+#ifdef SOPLEX_WITH_EG
+extern "C" {
+#include "EGlib.h"
+}
+#else
+#define EGlpNumStart() {}
+#define EGlpNumClear() {}
+#endif
+
 using namespace soplex;
 
 // prints usage and command line options
@@ -241,6 +250,10 @@ void checkSolution(SoPlex& soplex)
 /// runs SoPlex command line
 int main(int argc, char* argv[])
 {
+   ///@todo the EGlib version info should be printed after the SoPlex version info
+   // initialize EGlib's GMP memory management before any rational numbers are created
+   EGlpNumStart();
+
    SoPlex* soplex;
    NameSet rownames;
    NameSet colnames;
@@ -695,8 +708,14 @@ int main(int argc, char* argv[])
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
 
  TERMINATE:
+   // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
+   // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
+   // spx_alloc() and freed here; disabling the list memory is crucial
    soplex->~SoPlex();
    spx_free(soplex);
+   Rational::disableListMem();
+   EGlpNumClear();
+
    return returnValue;
 }
 #else

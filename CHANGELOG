@@ -5,9 +5,11 @@ Developer version
 
 performance:
 - iterative refinement for ranged rows, making the transformation to equality form unnecessary
+- more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
+- new make option EG={true,false} to build with EGlib
 
 
 

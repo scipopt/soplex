@@ -59,6 +59,7 @@ LEGACY		=	false
 
 GMP		=	true
 ZLIB		=	true
+EG			=	false
 
 COMP		=	gnu
 CXX		=	g++
@@ -363,6 +364,15 @@ CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
 
+EGDEP	:=	$(SRCDIR)/depend.eg
+EGSRC	:=	$(shell cat $(EGDEP))
+ifeq ($(EG),true)
+ifeq ($(LEGACY),false)
+CPPFLAGS		+=	-DSOPLEX_WITH_EG -Ilib/eginc
+LDFLAGS		+=	lib/EGlib.a
+endif
+endif
+
 #-----------------------------------------------------------------------------
 # Rules
 #-----------------------------------------------------------------------------
@@ -527,6 +537,7 @@ depend:
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_WITH_EG" $(SRCDIR)/*` >$(EGDEP)
 		@echo `grep -l "SOPLEX_LEGACY" $(SRCDIR)/*` >$(LEGACYDEP)
 		@echo `grep -l "DISABLE_VERBOSITY" $(SRCDIR)/*` >$(PARASCIPDEP)
 
@@ -546,7 +557,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -560,6 +571,9 @@ ifneq ($(GMP),$(LAST_GMP))
 endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
+endif
+ifneq ($(EG),$(LAST_EG))
+		@-touch $(EGSRC)
 endif
 ifneq ($(PARASCIP),$(LAST_PARASCIP))
 		@-touch $(PARASCIPSRC)
@@ -589,6 +603,7 @@ endif
 		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
+		@echo "LAST_EG=$(EG)" >> $(LASTSETTINGS)
 		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
 		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
@@ -610,6 +625,11 @@ ifneq ($(ZLIB),false)
 		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
 endif
 endif
+ifneq ($(EG),true)
+ifneq ($(EG),false)
+		$(error invalid EG flag selected: EG=$(EG). Possible options are: true false)
+endif
+endif
 ifneq ($(PARASCIP),true)
 ifneq ($(PARASCIP),false)
 		$(error invalid PARASCIP flag selected: PARASCIP=$(PARASCIP). Possible options are: true false)
@@ -628,6 +648,9 @@ ifeq ($(ZLIB),true)
 endif
 ifeq ($(GMP),true)
 		@echo "build failed with GMP=true: if GMP is not available, try building with GMP=false"
+endif
+ifeq ($(EG),true)
+		@echo "build failed with EG=true: if EGlib is not available, try building with EG=false"
 endif
 
 # --- EOF ---------------------------------------------------------------------
