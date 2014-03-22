@@ -241,7 +241,7 @@ void checkSolution(SoPlex& soplex)
 /// runs SoPlex command line
 int main(int argc, char* argv[])
 {
-   SoPlex soplex;
+   SoPlex* soplex;
    NameSet rownames;
    NameSet colnames;
    Timer readingTimer;
@@ -258,7 +258,13 @@ int main(int argc, char* argv[])
    bool displayStatistics = false;
    bool checkSol = false;
 
-   soplex.printVersion();
+   int returnValue = 0;
+
+   soplex = 0;
+   spx_alloc(soplex);
+   new (soplex) SoPlex();
+
+   soplex->printVersion();
    MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 
    try
@@ -267,7 +273,8 @@ int main(int argc, char* argv[])
       if( argc <= 1 )
       {
          printUsage(argv, 0);
-         return 1;
+         returnValue = 1;
+         goto TERMINATE;
       }
 
       // read arguments from command line
@@ -284,9 +291,9 @@ int main(int argc, char* argv[])
          if( option[0] != '-' || option[1] == '\0'
             || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'y' || option[1] == 'q' || option[1] == 'c')) )
          {
-            freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
             printUsage(argv, optidx);
-            return 1;
+            returnValue = 1;
+            goto TERMINATE_FREESTRINGS;
          }
 
          switch( option[1] )
@@ -320,11 +327,11 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[8];
                      loadsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
-                     if( !soplex.loadSettingsFile(loadsetname) )
+                     if( !soplex->loadSettingsFile(loadsetname) )
                      {
-                        freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                         printUsage(argv, optidx);
-                        return 1;
+                        returnValue = 1;
+                        goto TERMINATE_FREESTRINGS;
                      }
                      else
                      {
@@ -354,127 +361,127 @@ int main(int argc, char* argv[])
                // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
                else if( strncmp(option, "readmode=", 9) == 0 )
                {
-                  if( !soplex.setIntParam(SoPlex::READMODE, option[9] - '0') )
+                  if( !soplex->setIntParam(SoPlex::READMODE, option[9] - '0') )
                   {
-                     freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                      printUsage(argv, optidx);
-                     return 1;
+                     returnValue = 1;
+                     goto TERMINATE_FREESTRINGS;
                   }
                }
                // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
                else if( strncmp(option, "solvemode=", 10) == 0 )
                {
-                  if( !soplex.setIntParam(SoPlex::SOLVEMODE, option[10] - '0') )
+                  if( !soplex->setIntParam(SoPlex::SOLVEMODE, option[10] - '0') )
                   {
-                     freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                      printUsage(argv, optidx);
-                     return 1;
+                     returnValue = 1;
+                     goto TERMINATE_FREESTRINGS;
                   }
                   // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
                   // the rational LP is kept after reading
-                  else if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
-                     && soplex.intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+                  else if( soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
+                     && soplex->intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
                   {
-                     soplex.setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+                     soplex->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
                   }
                }
                // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
-               else if( !soplex.parseSettingsString(option) )
+               else if( !soplex->parseSettingsString(option) )
                {
-                  freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                   printUsage(argv, optidx);
-                  return 1;
+                  returnValue = 1;
+                  goto TERMINATE_FREESTRINGS;
                }
                break;
             }
 
          case 't' :
             // -t<s> : set time limit to <s> seconds
-            if( !soplex.setRealParam(SoPlex::TIMELIMIT, atoi(&option[2])) )
+            if( !soplex->setRealParam(SoPlex::TIMELIMIT, atoi(&option[2])) )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'i' :
             // -i<n> : set iteration limit to <n>
-            if( !soplex.setIntParam(SoPlex::ITERLIMIT, atoi(&option[2])) )
+            if( !soplex->setIntParam(SoPlex::ITERLIMIT, atoi(&option[2])) )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'f' :
             // -f<eps> : set primal feasibility tolerance to <eps>
-            if( !soplex.setRealParam(SoPlex::FEASTOL, atof(&option[2])) )
+            if( !soplex->setRealParam(SoPlex::FEASTOL, atof(&option[2])) )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'o' :
             // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
-            if( !soplex.setRealParam(SoPlex::OPTTOL, atof(&option[2])) )
+            if( !soplex->setRealParam(SoPlex::OPTTOL, atof(&option[2])) )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 's' :
             // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
-            if( !soplex.setIntParam(SoPlex::SIMPLIFIER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex::SIMPLIFIER, option[2] - '0') )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'g' :
             // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)
-            if( !soplex.setIntParam(SoPlex::SCALER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex::SCALER, option[2] - '0') )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'p' :
             // -p<value> : choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
-            if( !soplex.setIntParam(SoPlex::PRICER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex::PRICER, option[2] - '0') )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'r' :
             // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
-            if( !soplex.setIntParam(SoPlex::RATIOTESTER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex::RATIOTESTER, option[2] - '0') )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
          case 'v' :
             // -v<level> : set verbosity to <level> (0 - error, 3 - normal, 5 - high)
-            if( !soplex.setIntParam(SoPlex::VERBOSITY, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex::VERBOSITY, option[2] - '0') )
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
             break;
 
@@ -501,36 +508,36 @@ int main(int argc, char* argv[])
             //lint -fallthrough
          default :
             {
-               freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
                printUsage(argv, optidx);
-               return 1;
+               returnValue = 1;
+               goto TERMINATE_FREESTRINGS;
             }
          }
       }
 
-      MSG_INFO1( soplex.printUserSettings(); )
+      MSG_INFO1( soplex->printUserSettings(); )
 
       // no LP file was given and no settings files are written
       if( optidx >= argc && savesetname == 0 && diffsetname == 0 )
       {
-         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
          printUsage(argv, 0);
-         return 1;
+         returnValue = 1;
+         goto TERMINATE_FREESTRINGS;
       }
 
       // ensure that syncmode is not manual
-      if( soplex.intParam(SoPlex::SYNCMODE) == SoPlex::SYNCMODE_MANUAL )
+      if( soplex->intParam(SoPlex::SYNCMODE) == SoPlex::SYNCMODE_MANUAL )
       {
          MSG_ERROR( spxout << "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n" );
-         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         return 1;
+         returnValue = 1;
+         goto TERMINATE_FREESTRINGS;
       }
 
       // save settings files
       if( savesetname != 0 )
       {
          MSG_INFO1( spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
-         if( !soplex.saveSettingsFile(savesetname, false) )
+         if( !soplex->saveSettingsFile(savesetname, false) )
          {
             MSG_ERROR( spxout << "Error writing parameters to file <" << savesetname << ">\n" );
          }
@@ -538,7 +545,7 @@ int main(int argc, char* argv[])
       if( diffsetname != 0 )
       {
          MSG_INFO1( spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
-         if( !soplex.saveSettingsFile(diffsetname, true) )
+         if( !soplex->saveSettingsFile(diffsetname, true) )
          {
             MSG_ERROR( spxout << "Error writing modified parameters to file <" << diffsetname << ">\n" );
          }
@@ -551,9 +558,7 @@ int main(int argc, char* argv[])
          {
             MSG_INFO1( spxout << "\n" );
          }
-
-         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         return 0;
+         goto TERMINATE_FREESTRINGS;
       }
 
       // measure time for reading LP file and basis file
@@ -561,34 +566,34 @@ int main(int argc, char* argv[])
 
       // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
       // the rational LP is kept after reading
-      if( soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
-         && soplex.intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+      if( soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
+         && soplex->intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
       {
-         soplex.setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+         soplex->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
       }
 
       // read LP from input file
       lpfilename = argv[optidx];
       MSG_INFO1( spxout << "Reading "
-         << (soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL ? "(real)" : "(rational)")
+         << (soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL ? "(real)" : "(rational)")
          << " LP file <" << lpfilename << "> . . .\n" );
 
-      if( !soplex.readFile(lpfilename, &rownames, &colnames) )
+      if( !soplex->readFile(lpfilename, &rownames, &colnames) )
       {
          MSG_ERROR( spxout << "Error while reading file <" << lpfilename << ">.\n" );
-         freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-         return 1;
+         returnValue = 1;
+         goto TERMINATE_FREESTRINGS;
       }
 
       // read basis file if specified
       if( readbasname != 0 )
       {
          MSG_INFO1( spxout << "Reading basis file <" << readbasname << "> . . . " );
-         if( !soplex.readBasisFile(readbasname, &rownames, &colnames) )
+         if( !soplex->readBasisFile(readbasname, &rownames, &colnames) )
          {
             MSG_ERROR( spxout << "Error while reading file <" << readbasname << ">.\n" );
-            freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-            return 1;
+            returnValue = 1;
+            goto TERMINATE_FREESTRINGS;
          }
       }
 
@@ -600,20 +605,20 @@ int main(int argc, char* argv[])
          << std::scientific << std::setprecision(int(prec))
          << " seconds.\n\n" );
 
-      MSG_INFO1( spxout << "LP has " << soplex.numRowsReal() << " rows "
-         << soplex.numColsReal() << " columns and " << soplex.numNonzerosReal() << " nonzeros.\n\n" );
+      MSG_INFO1( spxout << "LP has " << soplex->numRowsReal() << " rows "
+         << soplex->numColsReal() << " columns and " << soplex->numNonzerosReal() << " nonzeros.\n\n" );
 
       // solve the LP
-      soplex.solve();
+      soplex->solve();
 
       // print solution, check solution, and display statistics
       if( printPrimal )
       {
-         DVector primal(soplex.numColsReal());
-         if( soplex.getPrimalReal(primal) )
+         DVector primal(soplex->numColsReal());
+         if( soplex->getPrimalReal(primal) )
          {
             MSG_INFO1( spxout << "\nPrimal solution (name, value):\n"; )
-            for( int i = 0; i < soplex.numColsReal(); ++i )
+            for( int i = 0; i < soplex->numColsReal(); ++i )
             {
                if ( isNotZero( primal[i] ) )
                   MSG_INFO1( spxout << colnames[i] << "\t"
@@ -631,11 +636,11 @@ int main(int argc, char* argv[])
 
       if( printDual )
       {
-         DVector dual(soplex.numRowsReal());
-         if( soplex.getDualReal(dual) )
+         DVector dual(soplex->numRowsReal());
+         if( soplex->getDualReal(dual) )
          {
             MSG_INFO1( spxout << "\nDual multipliers (name, value):\n"; )
-            for( int i = 0; i < soplex.numRowsReal(); ++i )
+            for( int i = 0; i < soplex->numRowsReal(); ++i )
             {
                if ( isNotZero( dual[i] ) )
                   MSG_INFO1( spxout << rownames[i] << "\t"
@@ -652,26 +657,26 @@ int main(int argc, char* argv[])
       }
 
       if( checkSol )
-         checkSolution(soplex);
+         checkSolution(*soplex);
 
       if( displayStatistics )
       {
          MSG_INFO1( spxout << "Statistics\n==========\n\n" );
-         soplex.printStatistics(spxout.getStream(SPxOut::INFO1));
+         soplex->printStatistics(spxout.getStream(SPxOut::INFO1));
       }
 
       // write basis file if specified
       if( writebasname != 0 )
       {
-         if( !soplex.hasBasis() )
+         if( !soplex->hasBasis() )
          {
             MSG_WARNING( spxout << "No basis information available.  Could not write file <" << writebasname << ">\n\n" );
          }
-         else if( !soplex.writeBasisFile(writebasname, &rownames, &colnames) )
+         else if( !soplex->writeBasisFile(writebasname, &rownames, &colnames) )
          {
             MSG_ERROR( spxout << "Error while writing file <" << writebasname << ">.\n\n" );
-            freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-            return 1;
+            returnValue = 1;
+            goto TERMINATE_FREESTRINGS;
          }
          else
          {
@@ -682,12 +687,17 @@ int main(int argc, char* argv[])
    catch( SPxException& x )
    {
       MSG_ERROR( spxout << "Exception caught: " << x.what() << "\n" );
-      freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-      return 1;
+      returnValue = 1;
+      goto TERMINATE_FREESTRINGS;
    }
 
+ TERMINATE_FREESTRINGS:
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-   return 0;
+
+ TERMINATE:
+   soplex->~SoPlex();
+   spx_free(soplex);
+   return returnValue;
 }
 #else
 #include <assert.h>
