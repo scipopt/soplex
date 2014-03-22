@@ -339,6 +339,7 @@ BINSRC		=	$(addprefix $(SRCDIR)/,$(BINOBJ:.o=.cpp))
 EXAMPLESRC	=	$(addprefix $(SRCDIR)/,$(EXAMPLEOBJ:.o=.cpp))
 LIBSRC		=	$(addprefix $(SRCDIR)/,$(LIBOBJ:.o=.cpp))
 LIBSRCHEADER	=	$(addprefix $(SRCDIR)/,$(LIBHEADER))
+ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC) $(LIBSRCHEADER)
 
 #-----------------------------------------------------------------------------
 # External Libraries
@@ -525,10 +526,10 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		@echo `grep -l "SOPLEX_WITH_GMP" $(SRCDIR)/*` >$(GMPDEP)
-		@echo `grep -l "SOPLEX_WITH_ZLIB" $(SRCDIR)/*` >$(ZLIBDEP)
-		@echo `grep -l "SOPLEX_LEGACY" $(SRCDIR)/*` >$(LEGACYDEP)
-		@echo `grep -l "DISABLE_VERBOSITY" $(SRCDIR)/*` >$(PARASCIPDEP)
+		@echo `grep -l "SOPLEX_WITH_GMP" $(ALLSRC)` >$(GMPDEP)
+		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
+		@echo `grep -l "SOPLEX_LEGACY" $(ALLSRC)` >$(LEGACYDEP)
+		@echo `grep -l "DISABLE_VERBOSITY" $(ALLSRC)` >$(PARASCIPDEP)
 
 -include	$(DEPEND)
 
