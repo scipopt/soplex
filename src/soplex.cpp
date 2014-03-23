@@ -133,7 +133,7 @@ namespace soplex
             // should LP be transformed to equality form before a rational solve?
             _boolParamName[SoPlex::EQTRANS] = "eqtrans";
             _boolParamDescription[SoPlex::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
-            _boolParamDefault[SoPlex::EQTRANS] = true;
+            _boolParamDefault[SoPlex::EQTRANS] = false;
 
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
