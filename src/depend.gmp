@@ -1,1 +1,1 @@
-src/rational.cpp src/rational.h src/soplex.cpp src/soplexmain.cpp
+src/soplexmain.cpp src/rational.cpp src/soplex.cpp src/rational.h

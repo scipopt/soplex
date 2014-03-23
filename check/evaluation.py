@@ -183,8 +183,7 @@ if check_solu:
                 if value in ['infeasible', 'unbounded']:
                     if not instances[name]['status'] == value:
                         instances[name]['status'] = 'fail'
-                elif instances[name]['value'] == 'optimal':
-                    if (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
+                elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
                         instances[name]['status'] = 'inconsistent'
     solufile.close()
 
@@ -199,6 +198,7 @@ infeasible = sum(1 for name in instances if instances[name]['status'] == 'infeas
 unbounded = sum(1 for name in instances if instances[name]['status'] == 'unbounded')
 optimal = sum(1 for name in instances if instances[name]['status'] == 'optimal')
 aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
+inconsistents = sum(1 for name in instances if instances[name]['status'] == 'inconsistent')
 
 length = []
 
@@ -223,7 +223,7 @@ for name in sorted(instances):
 
 print
 print 'Results (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
-print '{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,fails,aborts)
+print '{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts)
 
 # try to check for missing files
 check_test = False
