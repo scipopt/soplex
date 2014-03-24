@@ -30,7 +30,7 @@
 #include "spxgithash.h"
 #include "timer.h"
 
-#ifdef SOPLEX_WITH_EG
+#ifdef SOPLEX_WITH_EGLIB
 extern "C" {
 #include "EGlib.h"
 }

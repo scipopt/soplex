@@ -16,6 +16,21 @@
 #@file    Makefile
 #@brief   SoPlex Makefile
 #@author  Thorsten Koch
+#@author  Ambros Gleixner
+
+#-----------------------------------------------------------------------------
+# paths variables
+#-----------------------------------------------------------------------------
+
+# define to be able to locate library files
+ifeq ($(OSTYPE),mingw)
+SPXDIR		=	./
+else
+SPXDIR		=	$(realpath .)
+endif
+
+INSTALLDIR	=
+
 
 #-----------------------------------------------------------------------------
 # detect host architecture
@@ -44,22 +59,23 @@ LIMIT		=  #
 SETTINGS	=	default
 TIME		=	3600
 RESDIR		=	results
+MAKESOFTLINKS	=	true
+SOFTLINKS	=
+LINKSINFO	=
 
-#these variables are needed for cluster runs
+# these variables are needed for cluster runs
 MEM		=	2000
 CONTINUE	=	false
 
-INSTALLDIR	=	#
-
-#will this be compiled for PARASCIP? (disables output because it uses global variables)
+# will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	=	false
 
-#will this be compiled with the 1.x interface
+# will this be compiled with the 1.x interface?
 LEGACY		=	false
 
 GMP		=	true
 ZLIB		=	true
-EG			=	false
+EGLIB		=	false
 
 COMP		=	gnu
 CXX		=	g++
@@ -77,6 +93,8 @@ AR_o		=
 RANLIB		=	ranlib
 DOXY		=	doxygen
 VALGRIND	=	valgrind
+
+READ		=	read -e
 LN_s		=	ln -s
 
 LIBBUILD	=	$(AR)
@@ -242,6 +260,7 @@ REPOSIT		=	# template repository, explicitly empty  #spxproof.o
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
+LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX).$(EGLIB)
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
 SPXGITHASHFILE	=	$(SRCDIR)/git_hash.cpp
@@ -351,7 +370,7 @@ GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
 ifeq ($(LEGACY),false)
 CPPFLAGS	+=	-DSOPLEX_WITH_GMP
-LDFLAGS		+=	-lgmp
+LDFLAGS		+=	-lgmp # todo: move this as GMP_LDFLAGS to submakefiles
 endif
 endif
 
@@ -365,12 +384,14 @@ CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
 endif
 
-EGDEP	:=	$(SRCDIR)/depend.eg
-EGSRC	:=	$(shell cat $(EGDEP))
-ifeq ($(EG),true)
+EGLIBDEP	:=	$(SRCDIR)/depend.eglib
+EGLIBSRC	:=	$(shell cat $(EGLIBDEP))
+ifeq ($(EGLIB),true)
 ifeq ($(LEGACY),false)
-CPPFLAGS		+=	-DSOPLEX_WITH_EG -Ilib/eginc
-LDFLAGS		+=	lib/EGlib.a
+CPPFLAGS	+=	-DSOPLEX_WITH_EGLIB -I$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/include
+LDFLAGS		+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a
+SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
+LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)./lib/EGlib.a\" should exist.\n"
 endif
 endif
 
@@ -389,6 +410,11 @@ all:		makelibfile
 
 .PHONY: preprocess
 preprocess:	checkdefines
+		@$(SHELL) -ec 'if test ! -e $(LINKSMARKERFILE) ; \
+			then \
+				echo "-> generating necessary links" ; \
+				$(MAKE) -j1 $(LINKSMARKERFILE) ; \
+			fi'
 		@-$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
@@ -538,7 +564,7 @@ depend:
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(ALLSRC)` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
-		@echo `grep -l "SOPLEX_WITH_EG" $(ALLSRC)` >$(EGDEP)
+		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
 		@echo `grep -l "SOPLEX_LEGACY" $(ALLSRC)` >$(LEGACYDEP)
 		@echo `grep -l "DISABLE_VERBOSITY" $(ALLSRC)` >$(PARASCIPDEP)
 
@@ -558,7 +584,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -573,8 +599,8 @@ endif
 ifneq ($(ZLIB),$(LAST_ZLIB))
 		@-touch $(ZLIBSRC)
 endif
-ifneq ($(EG),$(LAST_EG))
-		@-touch $(EGSRC)
+ifneq ($(EGLIB),$(LAST_EGLIB))
+		@-touch $(EGLIBSRC)
 endif
 ifneq ($(PARASCIP),$(LAST_PARASCIP))
 		@-touch $(PARASCIPSRC)
@@ -604,7 +630,7 @@ endif
 		@echo "LAST_SPXGITHASH=$(SPXGITHASH)" >> $(LASTSETTINGS)
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_EG=$(EG)" >> $(LASTSETTINGS)
+		@echo "LAST_EGLIB=$(EGLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
 		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
@@ -613,6 +639,61 @@ endif
 		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRARFLAGS=$(USRARFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRDFLAGS=$(USRDFLAGS)" >> $(LASTSETTINGS)
+
+$(LINKSMARKERFILE):
+		@$(MAKE) links
+
+.PHONY: links
+links:		| $(LIBDIR) echosoftlinks $(SOFTLINKS)
+		@rm -f $(LINKSMARKERFILE)
+		@echo "this is only a marker" > $(LINKSMARKERFILE)
+
+.PHONY: echosoftlinks
+echosoftlinks:
+		@echo
+		@echo "- Current settings: OSTYPE=$(OSTYPE) ARCH=$(ARCH) COMP=$(COMP) SUFFIX=$(LINKLIBSUFFIX) EGLIB=$(EGLIB)"
+		@echo
+		@echo "* SoPlex needs some softlinks to external programs."
+		@echo "* Please insert the paths to the corresponding directories/libraries below."
+		@echo "* The links will be installed in the 'lib' directory."
+		@echo "* For more information and if you experience problems see the INSTALL file."
+		@echo
+		@echo -e $(LINKSINFO)
+
+.PHONY: $(SOFTLINKS)
+$(SOFTLINKS):
+ifeq ($(MAKESOFTLINKS), true)
+		@$(SHELL) -ec 'if test ! -e $@ ; \
+			then \
+				DIRNAME=`dirname $@` ; \
+				BASENAMEA=`basename $@ .$(STATICLIBEXT)` ; \
+				BASENAMESO=`basename $@ .$(SHAREDLIBEXT)` ; \
+				echo ; \
+				echo "- preparing missing soft-link \"$@\":" ; \
+				if test -e $$DIRNAME/$$BASENAMEA.$(SHAREDLIBEXT) ; \
+				then \
+					echo "* this soft-link is not necessarily needed since \"$$DIRNAME/$$BASENAMEA.$(SHAREDLIBEXT)\" already exists - press return to skip" ; \
+				fi ; \
+				if test -e $$DIRNAME/$$BASENAMESO.$(STATICLIBEXT) ; \
+				then \
+					echo "* this soft-link is not necessarily needed since \"$$DIRNAME/$$BASENAMESO.$(STATICLIBEXT)\" already exists - press return to skip" ; \
+				fi ; \
+				echo "> Enter soft-link target file or directory for \"$@\" (return if not needed): " ; \
+				echo -n "> " ; \
+				cd $$DIRNAME ; \
+				eval $(READ) TARGET ; \
+				cd $(SPXDIR) ; \
+				if test "$$TARGET" != "" ; \
+				then \
+					echo "-> creating softlink \"$@\" -> \"$$TARGET\"" ; \
+					rm -f $@ ; \
+					$(LN_s) $$TARGET $@ ; \
+				else \
+					echo "* skipped creation of softlink \"$@\". Call \"make links\" if needed later." ; \
+				fi ; \
+				echo ; \
+			fi'
+endif
 
 .PHONY: checkdefines
 checkdefines:
@@ -626,9 +707,9 @@ ifneq ($(ZLIB),false)
 		$(error invalid ZLIB flag selected: ZLIB=$(ZLIB). Possible options are: true false)
 endif
 endif
-ifneq ($(EG),true)
-ifneq ($(EG),false)
-		$(error invalid EG flag selected: EG=$(EG). Possible options are: true false)
+ifneq ($(EGLIB),true)
+ifneq ($(EGLIB),false)
+		$(error invalid EGLIB flag selected: EGLIB=$(EGLIB). Possible options are: true false)
 endif
 endif
 ifneq ($(PARASCIP),true)
@@ -650,8 +731,8 @@ endif
 ifeq ($(GMP),true)
 		@echo "build failed with GMP=true: if GMP is not available, try building with GMP=false"
 endif
-ifeq ($(EG),true)
-		@echo "build failed with EG=true: if EGlib is not available, try building with EG=false"
+ifeq ($(EGLIB),true)
+		@echo "build failed with EGLIB=true: if EGlib is not available, try building with EGLIB=false"
 endif
 
 # --- EOF ---------------------------------------------------------------------
