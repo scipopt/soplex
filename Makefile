@@ -410,11 +410,13 @@ all:		makelibfile
 
 .PHONY: preprocess
 preprocess:	checkdefines
+ifneq ($(SOFTLINKS),)
 		@$(SHELL) -ec 'if test ! -e $(LINKSMARKERFILE) ; \
 			then \
 				echo "-> generating necessary links" ; \
 				$(MAKE) -j1 $(LINKSMARKERFILE) ; \
 			fi'
+endif
 		@-$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
