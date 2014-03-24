@@ -391,7 +391,7 @@ ifeq ($(LEGACY),false)
 CPPFLAGS	+=	-DSOPLEX_WITH_EGLIB -I$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/include
 LDFLAGS		+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a
 SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
-LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)./lib/EGlib.a\" should exist.\n"
+LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a\" should exist.\n"
 endif
 endif
 
