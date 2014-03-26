@@ -239,7 +239,7 @@ namespace soplex
             _intParamDescription[SoPlex::RATIOTESTER] = "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)";
             _intParamLower[SoPlex::RATIOTESTER] = 0;
             _intParamUpper[SoPlex::RATIOTESTER] = 3;
-            _intParamDefault[SoPlex::RATIOTESTER] = SoPlex::RATIOTESTER_FAST;
+            _intParamDefault[SoPlex::RATIOTESTER] = SoPlex::RATIOTESTER_BOUNDFLIPPING;
 
             // mode for synchronizing real and rational LP
             _intParamName[SoPlex::SYNCMODE] = "syncmode";

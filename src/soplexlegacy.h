@@ -26,7 +26,7 @@
 #include "spxscaler.h"
 #include "spxsimplifier.h"
 #include "spxsteeppr.h"
-#include "spxfastrt.h"
+#include "spxboundflippingrt.h"
 #include "spxfileio.h"
 #include "spxweightst.h"
 #include "slufactor.h"

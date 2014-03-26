@@ -1082,8 +1082,8 @@ void print_usage_and_exit( const char* const argv[] )
       "Simplifier:  Scaler:           Starter:    Pricer:        Ratiotester:\n"
       " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
       " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
-      "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast*\n"
-      "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping\n"
+      "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast\n"
+      "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping*\n"
       "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
       "                                            -p5 Weight\n"
       "                                            -p6 SteepExactSetup\n"
@@ -1815,7 +1815,7 @@ int main(int argc, char* argv[])
       NameSet                   colnames;
       int                       starting       = 0;
       int                       pricing        = 4;
-      int                       ratiotest      = 2;
+      int                       ratiotest      = 3;
       int                       scaling        = 2;
       int                       simplifying    = 1;
       int                       iterlimit      = -1;

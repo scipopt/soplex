@@ -10,6 +10,7 @@ performance:
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
 - new make option EG={true,false} to build with EGlib
+- bound flipping is now enabled by default
 
 
 

@@ -31,7 +31,7 @@ SoPlexLegacy::SoPlexLegacy(SPxSolver::Type p_type, SPxSolver::Representation p_r
    , m_freeSimplifier(false)
 {
    m_solver.setSolver(&m_slu);
-   m_solver.setTester(new SPxFastRT(), true);
+   m_solver.setTester(new SPxBoundFlippingRT(), true);
    m_solver.setPricer(new SPxSteepPR(), true);
    m_solver.setStarter(0);
 
