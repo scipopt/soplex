@@ -2171,15 +2171,6 @@ namespace soplex
          _solveRational();
 
          // restore real LP in order to ensure that we use the same rounding
-         assert(_isRealLPLoaded);
-         if( _hasBasis )
-         {
-            assert(_solver.basis().status() > SPxBasis::NO_PROBLEM);
-            _basisStatusRows.reSize(_solver.nRows());
-            _basisStatusCols.reSize(_solver.nCols());
-            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-         }
-
          _solver.loadLP(realLP);
 
          if( _hasBasis )
