@@ -1938,8 +1938,8 @@ namespace soplex
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
                   // store basis for original problem
-                  _basisStatusRows.reSize(numRowsReal());
-                  _basisStatusCols.reSize(numColsReal());
+                  basisStatusRows.reSize(numRowsReal());
+                  basisStatusCols.reSize(numColsReal());
                   _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                   primal = _simplifier->unsimplifiedPrimal();
@@ -1959,8 +1959,8 @@ namespace soplex
                   }
 
                   // get basis of transformed problem
-                  _basisStatusRows.reSize(_solver.nRows());
-                  _basisStatusCols.reSize(_solver.nCols());
+                  basisStatusRows.reSize(_solver.nRows());
+                  basisStatusCols.reSize(_solver.nCols());
                   _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
                }
                break;
@@ -1986,8 +1986,8 @@ namespace soplex
                   _scaler->unscaleDual(dual);
 
                // if the original problem is not in the solver because of scaling, we also need to store the basis
-               _basisStatusRows.reSize(_solver.nRows());
-               _basisStatusCols.reSize(_solver.nCols());
+               basisStatusRows.reSize(_solver.nRows());
+               basisStatusCols.reSize(_solver.nCols());
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                break;
