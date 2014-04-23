@@ -135,6 +135,11 @@ namespace soplex
             _boolParamDescription[SoPlex::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
             _boolParamDefault[SoPlex::EQTRANS] = false;
 
+            // should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
+            _boolParamName[SoPlex::TESTDUALINF] = "testdualinf";
+            _boolParamDescription[SoPlex::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
+            _boolParamDefault[SoPlex::TESTDUALINF] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4013,6 +4018,8 @@ namespace soplex
       case LIFTING:
          break;
       case EQTRANS:
+         break;
+      case TESTDUALINF:
          break;
       default:
          return false;

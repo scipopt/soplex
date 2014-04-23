@@ -207,6 +207,43 @@ namespace soplex
                break;
             }
 
+            if( infeasible && boolParam(SoPlex::TESTDUALINF) )
+            {
+               SolRational solUnbounded;
+
+               _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stopped, error);
+
+               assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
+               assert(!solUnbounded.hasPrimalRay() || hasUnboundedRay);
+
+               if( error )
+               {
+                  MSG_INFO1( spxout << "Error while testing for dual infeasibility.\n" );
+                  _status = SPxSolver::ERROR;
+                  _restoreBasis();
+                  break;
+               }
+
+               if( hasUnboundedRay )
+               {
+                  MSG_INFO1( spxout << "Dual infeasible.  Primal unbounded ray available.\n" );
+                  _solRational._primalRay = solUnbounded._primalRay;
+                  _solRational._hasPrimalRay = true;
+               }
+               else if( solUnbounded._hasDual )
+               {
+                  MSG_INFO1( spxout << "Dual feasible.  Storing dual multipliers.\n" );
+                  _solRational._dual = solUnbounded._dual;
+                  _solRational._redCost = solUnbounded._redCost;
+                  _solRational._hasDual = true;
+               }
+               else
+               {
+                  assert(false);
+                  MSG_INFO1( spxout << "Not dual infeasible.\n" );
+               }
+            }
+
             _restoreBasis();
 
             if( infeasible )
@@ -846,7 +883,7 @@ namespace soplex
       }
       else
       {
-         Rational tau = sol._primal[numColsRational() - 1];
+         const Rational& tau = sol._primal[numColsRational() - 1];
 
          MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
 
@@ -859,10 +896,6 @@ namespace soplex
          assert(!error);
 
          hasUnboundedRay = (tau >= 1);
-
-         sol._hasDual = false;
-         if( !hasUnboundedRay )
-            sol._hasPrimal = false;
       }
 
       // restore problem
@@ -1504,19 +1537,20 @@ namespace soplex
 
       int numOrigCols = numColsRational() - 1;
       int numOrigRows = numRowsRational() - 1;
+      const Rational& tau = sol._primal[numOrigCols];
 
       // adjust solution and basis
       if( unbounded )
       {
-         assert(sol._primal[numOrigCols] >= 1);
+         assert(tau >= Rational(1));
 
          sol._hasPrimal = false;
          sol._hasPrimalRay = true;
          sol._hasDual = false;
          sol._hasDualFarkas = false;
 
-         if( sol._primal[numOrigCols] != 1 )
-            sol._primal /= sol._primal[numOrigCols];
+         if( tau != 1 )
+            sol._primal /= tau;
 
          sol._primalRay = sol._primal;
          sol._primalRay.reDim(numOrigCols);
@@ -1524,6 +1558,25 @@ namespace soplex
          _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver::BASIC && _basisStatusRows[numOrigRows] == SPxSolver::BASIC);
          _basisStatusCols.reSize(numOrigCols);
          _basisStatusCols.reSize(numOrigRows);
+      }
+      else if( boolParam(SoPlex::TESTDUALINF) && tau < realParam(SoPlex::FEASTOL) )
+      {
+         const Rational& alpha = sol._dual[numOrigRows];
+
+         assert(sol._hasDual);
+         assert(alpha <= -1 + realParam(SoPlex::FEASTOL));
+
+         sol._hasPrimal = false;
+         sol._hasPrimalRay = false;
+         sol._hasDualFarkas = false;
+
+         if( alpha != -1 )
+         {
+            sol._dual /= -alpha;
+            sol._redCost /= -alpha;
+         }
+         sol._dual.reDim(numOrigRows);
+         sol._redCost.reDim(numOrigCols);
       }
       else
       {

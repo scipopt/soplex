@@ -29,6 +29,7 @@ performance:
 
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
+- new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false

@@ -704,8 +704,11 @@ public:
       /// should LP be transformed to equality form before a rational solve?
       EQTRANS = 1,
 
+      /// should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
+      TESTDUALINF = 2,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 2
+      BOOLPARAM_COUNT = 3
    } BoolParam;
 
    /// integer parameters
