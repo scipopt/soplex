@@ -854,8 +854,8 @@ namespace soplex
          assert(tau >= -realParam(SoPlex::FEASTOL));
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
-         // zero if basic; otherwise 0 or 1
-         error = !(tau >= 1 || tau < realParam(SoPlex::FEASTOL));
+         // zero if basic; otherwise at its upper bound 1
+         error = !(tau >= Rational(1) || tau < realParam(SoPlex::FEASTOL));
          assert(!error);
 
          hasUnboundedRay = (tau >= 1);
@@ -1455,8 +1455,8 @@ namespace soplex
       _rationalLP->changeObj(numOrigCols, -1);
       _realLP->changeObj(numOrigCols, -1.0);
 
-      _rationalLP->changeBounds(numOrigCols, 0, 1);
-      _realLP->changeBounds(numOrigCols, 0.0, 1.0);
+      _rationalLP->changeBounds(numOrigCols, -realParam(SoPlex::INFTY), 1);
+      _realLP->changeBounds(numOrigCols, -realParam(SoPlex::INFTY), 1.0);
 
       // set objective coefficients to zero and adjust bounds for problem variables
       for( int c = numColsRational() - 2; c >= 0; c-- )
