@@ -186,9 +186,9 @@ namespace soplex
             // refinement limit (-1 if unlimited)
             _intParamName[SoPlex::REFLIMIT] = "reflimit";
             _intParamDescription[SoPlex::REFLIMIT] = "refinement limit (-1 - no limit)";
-            _intParamLower[SoPlex::REFLIMIT] = 100;
+            _intParamLower[SoPlex::REFLIMIT] = -1;
             _intParamUpper[SoPlex::REFLIMIT] = INT_MAX;
-            _intParamDefault[SoPlex::REFLIMIT] = -1;
+            _intParamDefault[SoPlex::REFLIMIT] = 100;
 
             // stalling refinement limit (-1 if unlimited)
             _intParamName[SoPlex::STALLREFLIMIT] = "stallreflimit";
@@ -2154,6 +2154,25 @@ namespace soplex
       if( intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
              && GE(realParam(SoPlex::FEASTOL), 1e-9) && GE(realParam(SoPlex::OPTTOL), 1e-9)) )
       {
+         // ensure that tolerances are reasonable for the floating-point solver
+         if( realParam(SoPlex::FEASTOL) < _currentSettings->_realParamLower[SoPlex::FPFEASTOL] )
+         {
+            MSG_WARNING( spxout << "Cannot call floating-point solver with feasibility tolerance below "
+               << _currentSettings->_realParamLower[SoPlex::FPFEASTOL] << " - relaxing tolerance\n");
+            _solver.setFeastol(_currentSettings->_realParamLower[SoPlex::FPFEASTOL]);
+         }
+         else
+            _solver.setFeastol(realParam(SoPlex::FEASTOL));
+
+         if( realParam(SoPlex::OPTTOL) < _currentSettings->_realParamLower[SoPlex::FPOPTTOL] )
+         {
+            MSG_WARNING( spxout << "Cannot call floating-point solver with optimality tolerance below "
+               << _currentSettings->_realParamLower[SoPlex::FPOPTTOL] << " - relaxing tolerance\n");
+            _solver.setOpttol(_currentSettings->_realParamLower[SoPlex::FPOPTTOL]);
+         }
+         else
+            _solver.setOpttol(realParam(SoPlex::OPTTOL));
+
          _solveReal();
       }
       else if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -4310,14 +4329,12 @@ namespace soplex
 
       switch( param )
       {
-      // primal feasibility tolerance
+      // primal feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::FEASTOL:
-         _solver.setFeastol(value);
          break;
 
-      // dual feasibility tolerance
+      // dual feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::OPTTOL:
-         _solver.setOpttol(value);
          break;
 
       // general zero tolerance

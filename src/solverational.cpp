@@ -931,8 +931,8 @@ namespace soplex
 
       do
       {
-         // perform iterative refinement with minRounds = 1
-         _performOptIRStable(sol, false, false, 1, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+         // perform iterative refinement
+         _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
          // the feasibility problem should always be solved to optimality
          if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
