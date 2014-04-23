@@ -1206,6 +1206,9 @@ private:
    DVectorRational _feasRhs;
    DVectorRational _feasLower;
    DVectorRational _feasUpper;
+   DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
+   DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
+   bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
 
@@ -1405,6 +1408,12 @@ private:
 
    /// undoes lifting
    void _project(SolRational& sol);
+
+   /// store basis
+   void _storeBasis();
+
+   /// restore basis
+   void _restoreBasis();
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync

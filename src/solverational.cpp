@@ -85,6 +85,7 @@ namespace soplex
 
       _statistics->preprocessingTime.stop();
 
+      _storedBasis = false;
       do
       {
          bool primalFeasible = false;
@@ -146,6 +147,7 @@ namespace soplex
 
             _performFeasIRStable(_solRational, infeasible, stopped, error);
 
+            ///@todo this should be stored already earlier, possible switch use solRational above and solFeas here
             if( hasUnboundedRay )
             {
                _solRational._primalRay = solUnbounded._primalRay;
@@ -184,12 +186,15 @@ namespace soplex
          // case: infeasibility detected
          else if( infeasible && !infeasibilityNotCertified )
          {
+            _storeBasis();
+
             _performFeasIRStable(_solRational, infeasible, stopped, error);
 
             if( error )
             {
                MSG_INFO1( spxout << "Error while testing for infeasibility.\n" );
                _status = SPxSolver::ERROR;
+               _restoreBasis();
                break;
             }
 
@@ -198,9 +203,13 @@ namespace soplex
             if( stopped )
             {
                _status = SPxSolver::ABORT_TIME;
+               _restoreBasis();
                break;
             }
-            else if( infeasible )
+
+            _restoreBasis();
+
+            if( infeasible )
             {
                MSG_INFO1( spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
                _status = SPxSolver::INFEASIBLE;
@@ -1520,6 +1529,8 @@ namespace soplex
       {
          sol.invalidate();
          _hasBasis = false;
+         _basisStatusCols.reSize(numOrigCols);
+         _basisStatusCols.reSize(numOrigRows);
       }
 
       // restore objective function
@@ -1563,6 +1574,37 @@ namespace soplex
 
       // stop timing
       _statistics->transformTime.stop();
+   }
+
+
+
+   /// store basis
+   void SoPlex::_storeBasis()
+   {
+      assert(!_storedBasis);
+
+      if( _hasBasis )
+      {
+         _storedBasis = true;
+         _storedBasisStatusCols = _basisStatusCols;
+         _storedBasisStatusRows = _basisStatusRows;
+      }
+      else
+         _storedBasis = false;
+   }
+
+
+
+   /// restore basis
+   void SoPlex::_restoreBasis()
+   {
+      if( _storedBasis )
+      {
+         _hasBasis = true;
+         _basisStatusCols = _storedBasisStatusCols;
+         _basisStatusRows = _storedBasisStatusRows;
+         _storedBasis = false;
+      }
    }
 
 
@@ -1768,7 +1810,10 @@ namespace soplex
          _basisStatusCols.reSize(numOrigCols);
       }
       else
+      {
          _hasBasis = false;
+         _basisStatusCols.reSize(numOrigCols);
+      }
 
       // restore right-hand side
       for( int r = numRowsRational() - 1; r >= 0; r-- )

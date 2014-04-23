@@ -17,6 +17,9 @@ interface & parameters:
 Bugfix version
 ==============
 
+features:
+- restore basis of original LP after performing iterative refinement on feasibility LP
+
 performance:
 - more efficient memory allocation of elements of class Rational (can be deactivated at compile time by defining
   SOPLEX_NOLISTMEM or by Rational::disableListMem() at run time)
