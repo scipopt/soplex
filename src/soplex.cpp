@@ -176,7 +176,7 @@ namespace soplex
             // refinement limit (-1 if unlimited)
             _intParamName[SoPlex::REFLIMIT] = "reflimit";
             _intParamDescription[SoPlex::REFLIMIT] = "refinement limit (-1 - no limit)";
-            _intParamLower[SoPlex::REFLIMIT] = 100;
+            _intParamLower[SoPlex::REFLIMIT] = -1;
             _intParamUpper[SoPlex::REFLIMIT] = INT_MAX;
             _intParamDefault[SoPlex::REFLIMIT] = -1;
 
