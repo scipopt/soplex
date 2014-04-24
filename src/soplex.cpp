@@ -4109,6 +4109,18 @@ namespace soplex
             return false;
          break;
 
+      // refinement limit (-1 if unlimited)
+      case SoPlex::REFLIMIT:
+         if( value < -1 )
+            return false;
+         break;
+
+      // stalling refinement limit (-1 if unlimited)
+      case SoPlex::STALLREFLIMIT:
+         if( value < -1 )
+            return false;
+         break;
+
       // display frequency
       case SoPlex::DISPLAYFREQ:
          if( value <= 0 )
