@@ -841,10 +841,6 @@ namespace soplex
          sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
          sol._dualObjVal = sol._primalObjVal;
       }
-
-      // reset tolerances in floating-point solver
-      _solver.setFeastol(realParam(SoPlex::FEASTOL));
-      _solver.setOpttol(realParam(SoPlex::OPTTOL));
    }
 
 
