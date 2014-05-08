@@ -482,19 +482,21 @@ namespace soplex
             modLower[c] = lowerRational(c);
 
             if( modLower[c] > -realParam(SoPlex::INFTY) )
+            {
                modLower[c] -= sol._primal[c];
-
-            if( modLower[c] > boundsViolation )
-               boundsViolation = modLower[c];
+               if( modLower[c] > boundsViolation )
+                  boundsViolation = modLower[c];
+            }
 
             // upper bound
             modUpper[c] = upperRational(c);
 
             if( modUpper[c] < realParam(SoPlex::INFTY) )
+            {
                modUpper[c] -= sol._primal[c];
-
-            if( modUpper[c] < -boundsViolation )
-               boundsViolation = -modUpper[c];
+               if( modUpper[c] < -boundsViolation )
+                  boundsViolation = -modUpper[c];
+            }
          }
 
          // compute violation of sides
@@ -504,21 +506,21 @@ namespace soplex
          {
             // left-hand side
             modLhs[r] = lhsRational(r);
-
             if( modLhs[r] > -realParam(SoPlex::INFTY) )
+            {
                modLhs[r] -= sol._slacks[r];
-
-            if( modLhs[r] > sideViolation )
-               sideViolation = modLhs[r];
+               if( modLhs[r] > sideViolation )
+                  sideViolation = modLhs[r];
+            }
 
             // right-hand side
             modRhs[r] = rhsRational(r);
-
             if( modRhs[r] < realParam(SoPlex::INFTY) )
+            {
                modRhs[r] -= sol._slacks[r];
-
-            if( modRhs[r] < -sideViolation )
-               sideViolation = -modRhs[r];
+               if( modRhs[r] < -sideViolation )
+                  sideViolation = -modRhs[r];
+            }
          }
 
          // compute reduced costs and reduced cost violation
