@@ -458,8 +458,8 @@ namespace soplex
       }
 
       // initial scaling factors are one
-      primalScale = 1;
-      dualScale = 1;
+      primalScale = Rational::POSONE;
+      dualScale = Rational::POSONE;
 
       // control progress
       Real bestViolation = realParam(SoPlex::INFTY);
@@ -655,8 +655,16 @@ namespace soplex
 
          if( primalScale < 1 )
             primalScale = 1;
+         else
+         {
+            MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
-         MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
+            // perform primal and dual scaling
+            modLower *= primalScale;
+            modUpper *= primalScale;
+            modLhs *= primalScale;
+            modRhs *= primalScale;
+         }
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
          maxScale = dualScale;
@@ -676,15 +684,13 @@ namespace soplex
 
          if( dualScale < 1 )
             dualScale = 1;
+         else
+         {
+            MSG_INFO2( spxout << "Scaling dual by " << rationalToString(dualScale) << ".\n" );
 
-         MSG_INFO2( spxout << "Scaling dual by " << rationalToString(dualScale) << ".\n" );
-
-         // perform primal and dual scaling
-         modLower *= primalScale;
-         modUpper *= primalScale;
-         modLhs *= primalScale;
-         modRhs *= primalScale;
-         modObj *= dualScale;
+            // perform dual scaling
+            modObj *= dualScale;
+         }
 
          // apply scaled bounds, side, and objective function
          _solver.changeBounds(DVectorReal(modLower), DVectorReal(modUpper));
@@ -753,7 +759,12 @@ namespace soplex
          numAdjustedBounds = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
-            sol._primal[c] += Rational(primalReal[c]) / primalScale;
+            if( primalReal[c] == 1.0 )
+               sol._primal[c] += Rational::POSONE / primalScale;
+            else if( primalReal[c] == -1.0 )
+               sol._primal[c] += Rational::NEGONE / primalScale;
+            else if( primalReal[c] != 0.0 )
+               sol._primal[c] += Rational(primalReal[c]) / primalScale;
 
             // force values of nonbasic variables to bounds
             SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
@@ -812,7 +823,8 @@ namespace soplex
                }
             }
 
-            sol._dual[r] += Rational(dualReal[r]) / dualScale;
+            if( dualReal[r] != 0.0 )
+               sol._dual[r] += Rational(dualReal[r]) / dualScale;
 
             if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
                || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
@@ -842,7 +854,8 @@ namespace soplex
       assert(sol._hasPrimal == sol._hasDual);
       if( sol._hasPrimal )
       {
-         sol._primalObjVal = (sol._primal * _rationalLP->maxObj()) * -1;
+         sol._primalObjVal = sol._primal * _rationalLP->maxObj();
+         sol._primalObjVal *= -1;
          sol._dualObjVal = sol._primalObjVal;
       }
    }
