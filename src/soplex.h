@@ -1157,6 +1157,12 @@ private:
 
    Settings* _currentSettings;
 
+   Rational _rationalPosInfty;
+   Rational _rationalNegInfty;
+   Rational _rationalFeastol;
+   Rational _rationalOpttol;
+   Rational _rationalMaxscaleincr;
+
    //@}
 
 

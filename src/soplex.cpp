@@ -514,6 +514,7 @@ namespace soplex
       spx_alloc(_currentSettings);
       _currentSettings = new (_currentSettings) Settings();
       setSettings(*_currentSettings, true, true);
+
       _lastSolveMode = intParam(SoPlex::SOLVEMODE);
 
       assert(_isConsistent());
@@ -2591,9 +2592,19 @@ namespace soplex
       assert(OBJSENSE_MINIMIZE == -1);
 
       if( status() == SPxSolver::UNBOUNDED )
-         return Rational(realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE));
+      {
+         if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MAXIMIZE )
+            return _rationalPosInfty;
+         else
+            return _rationalNegInfty;
+      }
       else if( status() == SPxSolver::INFEASIBLE )
-         return Rational(-realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE));
+      {
+         if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MAXIMIZE )
+            return _rationalNegInfty;
+         else
+            return _rationalPosInfty;
+      }
       else if( hasPrimal() )
       {
          _syncRationalSolution();
@@ -2605,7 +2616,7 @@ namespace soplex
          return _solRational._dualObjVal;
       }
       else
-         return 0;
+         return Rational::ZERO;
    }
 
 
@@ -4343,10 +4354,12 @@ namespace soplex
       {
       // primal feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::FEASTOL:
+         _rationalFeastol = value;
          break;
 
       // dual feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::OPTTOL:
+         _rationalOpttol = value;
          break;
 
       // general zero tolerance
@@ -4371,6 +4384,8 @@ namespace soplex
 
       // infinity threshold
       case SoPlex::INFTY:
+         _rationalPosInfty = value;
+         _rationalNegInfty = -value;
          break;
 
       // time limit in seconds (INFTY if unlimited)
@@ -4395,6 +4410,7 @@ namespace soplex
 
       // maximum increase of scaling factors between refinements
       case SoPlex::MAXSCALEINCR:
+         _rationalMaxscaleincr = value;
          break;
 
       // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
@@ -5199,8 +5215,8 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->rhs().dim(); i++ )
             {
-               if( (GE(_realLP->rhs()[i], realParam(SoPlex::INFTY)) != (_rationalLP->rhs()[i] >= realParam(SoPlex::INFTY)))
-                  || (LT(_realLP->rhs()[i], realParam(SoPlex::INFTY)) && _rationalLP->rhs()[i] < realParam(SoPlex::INFTY)
+               if( (GE(_realLP->rhs()[i], realParam(SoPlex::INFTY)) != (_rationalLP->rhs()[i] >= _rationalPosInfty))
+                  || (LT(_realLP->rhs()[i], realParam(SoPlex::INFTY)) && _rationalLP->rhs()[i] < _rationalPosInfty
                      && !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i])) )
                {
                   if( !quiet )
@@ -5224,8 +5240,8 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->lhs().dim(); i++ )
             {
-               if( (LE(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lhs()[i] <= -realParam(SoPlex::INFTY)))
-                  || (GT(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lhs()[i] > realParam(SoPlex::INFTY)
+               if( (LE(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lhs()[i] <= _rationalNegInfty))
+                  || (GT(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lhs()[i] > _rationalNegInfty
                      && !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i])) )
                {
                   if( !quiet )
@@ -5272,8 +5288,8 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->upper().dim(); i++ )
             {
-               if( (GE(_realLP->upper()[i], realParam(SoPlex::INFTY)) != (_rationalLP->upper()[i] >= realParam(SoPlex::INFTY)))
-                  || (LT(_realLP->upper()[i], realParam(SoPlex::INFTY)) && _rationalLP->upper()[i] < realParam(SoPlex::INFTY)
+               if( (GE(_realLP->upper()[i], realParam(SoPlex::INFTY)) != (_rationalLP->upper()[i] >= _rationalPosInfty))
+                  || (LT(_realLP->upper()[i], realParam(SoPlex::INFTY)) && _rationalLP->upper()[i] < _rationalPosInfty
                      && !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i])) )
                {
                   if( !quiet )
@@ -5297,8 +5313,8 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->lower().dim(); i++ )
             {
-               if( (LE(_realLP->lower()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lower()[i] <= -realParam(SoPlex::INFTY)))
-                  || (GT(_realLP->lower()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lower()[i] > realParam(SoPlex::INFTY)
+               if( (LE(_realLP->lower()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lower()[i] <= _rationalNegInfty))
+                  || (GT(_realLP->lower()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lower()[i] > _rationalNegInfty
                      && !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i])) )
                {
                   if( !quiet )

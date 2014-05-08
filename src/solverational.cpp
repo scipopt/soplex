@@ -593,8 +593,8 @@ namespace soplex
             << "Max. reduced cost violation = " << rationalToString(redCostViolation) << "\n" );
 
          // terminate if tolerances are satisfied
-         primalFeasible = (boundsViolation <= realParam(SoPlex::FEASTOL) && sideViolation <= realParam(SoPlex::FEASTOL));
-         dualFeasible = (redCostViolation <= realParam(SoPlex::OPTTOL));
+         primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
+         dualFeasible = (redCostViolation <= _rationalOpttol);
          if( primalFeasible && dualFeasible )
          {
             if( minRounds < 0 )
@@ -638,7 +638,8 @@ namespace soplex
          // start refinement
 
          // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = primalScale * Rational(realParam(SoPlex::MAXSCALEINCR));
+         maxScale = primalScale;
+         maxScale *= _rationalMaxscaleincr;
 
          primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
          assert(primalScale >= 0);
@@ -658,7 +659,8 @@ namespace soplex
          MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = dualScale * Rational(realParam(SoPlex::MAXSCALEINCR));
+         maxScale = dualScale;
+         maxScale *= _rationalMaxscaleincr;
 
          dualScale = redCostViolation;
          assert(dualScale >= 0);
@@ -890,7 +892,7 @@ namespace soplex
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
          // zero if basic; otherwise at its upper bound 1
-         error = !(tau >= Rational(1) || tau < realParam(SoPlex::FEASTOL));
+         error = !(tau >= Rational::POSONE || tau < _rationalFeastol);
          assert(!error);
 
          hasUnboundedRay = (tau >= 1);
@@ -957,8 +959,8 @@ namespace soplex
             assert(tau >= -realParam(SoPlex::FEASTOL));
             assert(tau <= 1.0 + realParam(SoPlex::FEASTOL));
 
-            error = (tau < -realParam(SoPlex::FEASTOL) || tau > 1 + realParam(SoPlex::FEASTOL));
-            withDualFarkas = (tau < 1); ///@todo shouldn't this use a tolerance? like (tau < 1-eps)? or even (tau <1/2)?
+            error = (tau < -_rationalFeastol || tau > Rational::POSONE + _rationalFeastol);
+            withDualFarkas = (tau < Rational::POSONE);
 
             if( withDualFarkas )
             {
@@ -1205,7 +1207,7 @@ namespace soplex
 
       for( int i = _beforeLiftCols; i < numColsRational() && sol._hasDual; i++ )
       {
-         if( abs(maxValue * sol._redCost[i]) > realParam(SoPlex::OPTTOL) )
+         if( abs(maxValue * sol._redCost[i]) > _rationalOpttol )
          {
             MSG_INFO1( spxout << "Warning: lost dual solution during project phase.\n" );
             sol._hasDual = false;
@@ -1540,7 +1542,7 @@ namespace soplex
       // adjust solution and basis
       if( unbounded )
       {
-         assert(tau >= Rational(1));
+         assert(tau >= Rational::POSONE);
 
          sol._hasPrimal = false;
          sol._hasPrimalRay = true;
@@ -1557,12 +1559,12 @@ namespace soplex
          _basisStatusCols.reSize(numOrigCols);
          _basisStatusCols.reSize(numOrigRows);
       }
-      else if( boolParam(SoPlex::TESTDUALINF) && tau < realParam(SoPlex::FEASTOL) )
+      else if( boolParam(SoPlex::TESTDUALINF) && tau < _rationalFeastol )
       {
          const Rational& alpha = sol._dual[numOrigRows];
 
          assert(sol._hasDual);
-         assert(alpha <= -1 + realParam(SoPlex::FEASTOL));
+         assert(alpha <= _rationalFeastol - Rational::POSONE);
 
          sol._hasPrimal = false;
          sol._hasPrimalRay = false;
