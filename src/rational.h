@@ -141,49 +141,49 @@ namespace soplex
       Rational operator+(const Rational& r) const;
 
       /// addition assignment operator
-      Rational operator+=(const Rational& r) const;
+      Rational operator+=(const Rational& r);
 
       /// addition operator for doubles
       Rational operator+(const double& r) const;
 
       /// addition assignment operator  for doubles
-      Rational operator+=(const double& r) const;
+      Rational operator+=(const double& r);
 
       /// subtraction operator
       Rational operator-(const Rational& r) const;
 
       /// subtraction assignment operator
-      Rational operator-=(const Rational& r) const;
+      Rational operator-=(const Rational& r);
 
       /// subtraction operator for doubles
       Rational operator-(const double& r) const;
 
       /// subtraction assignment operator for doubles
-      Rational operator-=(const double& r) const;
+      Rational operator-=(const double& r);
 
       /// multiplication operator
       Rational operator*(const Rational& r) const;
 
       /// multiplication assignment operator operator
-      Rational operator*=(const Rational& r) const;
+      Rational operator*=(const Rational& r);
 
       /// multiplication operator for doubles
       Rational operator*(const double& r) const;
 
       /// multiplication assignment operator for doubles
-      Rational operator*=(const double& r) const;
+      Rational operator*=(const double& r);
 
       /// division operator
       Rational operator/(const Rational& r) const;
 
       /// division assignment operator
-      Rational operator/=(const Rational& r) const;
+      Rational operator/=(const Rational& r);
 
       /// division operator for doubles
       Rational operator/(const double& r) const;
 
       /// division assignment operator for doubles
-      Rational operator/=(const double& r) const;
+      Rational operator/=(const double& r);
 
       //@}
 

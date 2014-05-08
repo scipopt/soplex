@@ -532,7 +532,7 @@ Rational Rational::operator+(const Rational& r) const
 
 
 /// addition assignment operator
-Rational Rational::operator+=(const Rational& r) const
+Rational Rational::operator+=(const Rational& r)
 {
    mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
    return *this;
@@ -551,7 +551,7 @@ Rational Rational::operator+(const double& d) const
 
 
 /// addition assignment operator for doubles
-Rational Rational::operator+=(const double& d) const
+Rational Rational::operator+=(const double& d)
 {
    mpq_t doubleval;
    mpq_init(doubleval);
@@ -574,7 +574,7 @@ Rational Rational::operator-(const Rational& r) const
 
 
 /// subtraction assignment operator
-Rational Rational::operator-=(const Rational& r) const
+Rational Rational::operator-=(const Rational& r)
 {
    mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
    return *this;
@@ -593,7 +593,7 @@ Rational Rational::operator-(const double& d) const
 
 
 /// subtraction assignment operator for doubles
-Rational Rational::operator-=(const double& d) const
+Rational Rational::operator-=(const double& d)
 {
    mpq_t doubleval;
    mpq_init(doubleval);
@@ -616,7 +616,7 @@ Rational Rational::operator*(const Rational& r) const
 
 
 /// multiplication assignment operator
-Rational Rational::operator*=(const Rational& r) const
+Rational Rational::operator*=(const Rational& r)
 {
    mpq_mul(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
    return *this;
@@ -635,7 +635,7 @@ Rational Rational::operator*(const double& d) const
 
 
 /// multiplication assignment operator for doubles
-Rational Rational::operator*=(const double& d) const
+Rational Rational::operator*=(const double& d)
 {
    mpq_t doubleval;
    mpq_init(doubleval);
@@ -658,7 +658,7 @@ Rational Rational::operator/(const Rational& r) const
 
 
 /// division assignment operator
-Rational Rational::operator/=(const Rational& r) const
+Rational Rational::operator/=(const Rational& r)
 {
    mpq_div(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
    return *this;
@@ -677,7 +677,7 @@ Rational Rational::operator/(const double& d) const
 
 
 /// division assignment operator for doubles
-Rational Rational::operator/=(const double& d) const
+Rational Rational::operator/=(const double& d)
 {
    mpq_t doubleval;
    mpq_init(doubleval);
@@ -1634,7 +1634,7 @@ Rational Rational::operator+(const Rational& r) const
 
 
 /// addition assignment operator
-Rational Rational::operator+=(const Rational& r) const
+Rational Rational::operator+=(const Rational& r)
 {
    this->dpointer->privatevalue += r.dpointer->privatevalue;
    return *this;
@@ -1653,7 +1653,7 @@ Rational Rational::operator+(const double& d) const
 
 
 /// addition assignment operator for doubles
-Rational Rational::operator+=(const double& d) const
+Rational Rational::operator+=(const double& d)
 {
    this->dpointer->privatevalue += d;
    return *this;
@@ -1672,7 +1672,7 @@ Rational Rational::operator-(const Rational& r) const
 
 
 /// subtraction assignment operator
-Rational Rational::operator-=(const Rational& r) const
+Rational Rational::operator-=(const Rational& r)
 {
    this->dpointer->privatevalue -= r.dpointer->privatevalue;
    return *this;
@@ -1691,7 +1691,7 @@ Rational Rational::operator-(const double& d) const
 
 
 /// subtraction assignment operator for doubles
-Rational Rational::operator-=(const double& d) const
+Rational Rational::operator-=(const double& d)
 {
    this->dpointer->privatevalue -= d;
    return *this;
@@ -1710,7 +1710,7 @@ Rational Rational::operator*(const Rational& r) const
 
 
 /// multiplication assignment operator
-Rational Rational::operator*=(const Rational& r) const
+Rational Rational::operator*=(const Rational& r)
 {
    this->dpointer->privatevalue *= r.dpointer->privatevalue;
    return *this;
@@ -1729,7 +1729,7 @@ Rational Rational::operator*(const double& d) const
 
 
 /// multiplication assignment operator for doubles
-Rational Rational::operator*=(const double& d) const
+Rational Rational::operator*=(const double& d)
 {
    this->dpointer->privatevalue *= d;
    return *this;
@@ -1748,7 +1748,7 @@ Rational Rational::operator/(const Rational& r) const
 
 
 /// division assignment operator
-Rational Rational::operator/=(const Rational& r) const
+Rational Rational::operator/=(const Rational& r)
 {
    this->dpointer->privatevalue /= r.dpointer->privatevalue;
    return *this;
@@ -1767,7 +1767,7 @@ Rational Rational::operator/(const double& d) const
 
 
 /// division assignment operator for doubles
-Rational Rational::operator/=(const double& d) const
+Rational Rational::operator/=(const double& d)
 {
    this->dpointer->privatevalue /= d;
    return *this;
