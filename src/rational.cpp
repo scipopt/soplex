@@ -40,7 +40,10 @@
 
 namespace soplex
 {
-/// list of unused Private objects
+#ifdef SOPLEX_WITH_GMP
+
+/// list of unused Private objects; note that this cannot be used if SOPLEX_WITH_GMP is not defined, since then the
+/// Private class has no member next() and prev()
 IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 
@@ -54,7 +57,6 @@ bool Rational::useListMem = true;
 
 
 
-#ifdef SOPLEX_WITH_GMP
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
