@@ -185,6 +185,9 @@ namespace soplex
       /// division assignment operator for doubles
       Rational operator/=(const double& r);
 
+      /// inversion
+      Rational& invert();
+
       //@}
 
 

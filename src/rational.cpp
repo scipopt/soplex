@@ -689,6 +689,15 @@ Rational Rational::operator/=(const double& d)
 
 
 
+/// inversion
+Rational& Rational::invert()
+{
+   mpq_inv(this->dpointer->privatevalue, this->dpointer->privatevalue);
+   return *this;
+}
+
+
+
 /// checks if d is the closest possible double
 bool Rational::isNextTo(const double& d)
 {
@@ -1770,6 +1779,15 @@ Rational Rational::operator/(const double& d) const
 Rational Rational::operator/=(const double& d)
 {
    this->dpointer->privatevalue /= d;
+   return *this;
+}
+
+
+
+/// inversion
+Rational& Rational::invert()
+{
+   this->dpointer->privatevalue = 1.0 / this->dpointer->privatevalue;
    return *this;
 }
 

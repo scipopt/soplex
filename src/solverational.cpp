@@ -646,7 +646,7 @@ namespace soplex
 
          if( primalScale > 0 )
          {
-            primalScale = 1 / primalScale;
+            primalScale.invert();
             if( primalScale > maxScale )
                primalScale = maxScale;
          }
@@ -667,7 +667,7 @@ namespace soplex
 
          if( dualScale > 0 )
          {
-            dualScale = 1 / dualScale;
+            dualScale.invert();
             if( dualScale > maxScale )
                dualScale = maxScale;
          }
