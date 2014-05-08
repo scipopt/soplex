@@ -1183,13 +1183,18 @@ bool operator>=(const Rational& r, const Rational& s)
 /// equality operator for Rational and double
 bool operator==(const Rational& r, const double& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, s);
-   res = (mpq_equal(r.dpointer->privatevalue, exactDouble) != 0);
-   mpq_clear(exactDouble);
-   return res;
+   if( s == 0.0 )
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) == 0);
+#else
+      return (mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+#endif
+   else if( s == 1.0 )
+      return (mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0);
+   else if( s == -1.0 )
+      return (mpq_equal(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0);
+   else
+      return (r == Rational(s));
 }
 
 
@@ -1197,13 +1202,18 @@ bool operator==(const Rational& r, const double& s)
 /// inequality operator for Rational and double
 bool operator!=(const Rational& r, const double& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, s);
-   res = (mpq_equal(r.dpointer->privatevalue, exactDouble) == 0);
-   mpq_clear(exactDouble);
-   return res;
+   if( s == 0.0 )
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) != 0);
+#else
+      return (mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) == 0);
+#endif
+   else if( s == 1.0 )
+      return (mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) == 0);
+   else if( s == -1.0 )
+      return (mpq_equal(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0);
+   else
+      return (r != Rational(s));
 }
 
 
@@ -1211,13 +1221,18 @@ bool operator!=(const Rational& r, const double& s)
 /// less than operator for Rational and double
 bool operator<(const Rational& r, const double& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, s);
-   res = (mpq_cmp(r.dpointer->privatevalue, exactDouble) < 0);
-   mpq_clear(exactDouble);
-   return res;
+   if( s == 0.0 )
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) == -1);
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) < 0);
+#endif
+   else if( s == 1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) < 0);
+   else if( s == -1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) < 0);
+   else
+      return (r < Rational(s));
 }
 
 
@@ -1225,13 +1240,18 @@ bool operator<(const Rational& r, const double& s)
 /// less than or equal to operator for Rational and double
 bool operator<=(const Rational& r, const double& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, s);
-   res = (mpq_cmp(r.dpointer->privatevalue, exactDouble) <= 0);
-   mpq_clear(exactDouble);
-   return res;
+   if( s == 0.0 )
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) <= 0);
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) <= 0);
+#endif
+   else if( s == 1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) <= 0);
+   else if( s == -1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) <= 0);
+   else
+      return (r <= Rational(s));
 }
 
 
@@ -1239,13 +1259,18 @@ bool operator<=(const Rational& r, const double& s)
 /// greater than operator for Rational and double
 bool operator>(const Rational& r, const double& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, s);
-   res = (mpq_cmp(r.dpointer->privatevalue, exactDouble) > 0);
-   mpq_clear(exactDouble);
-   return res;
+   if( s == 0.0 )
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) == 1);
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) > 0);
+#endif
+   else if( s == 1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) > 0);
+   else if( s == -1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) > 0);
+   else
+      return (r > Rational(s));
 }
 
 
@@ -1253,13 +1278,18 @@ bool operator>(const Rational& r, const double& s)
 /// greater than or equal to operator for Rational and double
 bool operator>=(const Rational& r, const double& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, s);
-   res = (mpq_cmp(r.dpointer->privatevalue, exactDouble) >= 0);
-   mpq_clear(exactDouble);
-   return res;
+   if( s == 0.0 )
+#ifdef SOPLEX_PERFALT_1
+      return (mpq_sgn(r.dpointer->privatevalue) >= 0);
+#else
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) >= 0);
+#endif
+   else if( s == 1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) >= 0);
+   else if( s == -1.0 )
+      return (mpq_cmp(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) >= 0);
+   else
+      return (r >= Rational(s));
 }
 
 
@@ -1267,13 +1297,7 @@ bool operator>=(const Rational& r, const double& s)
 /// equality operator for double and Rational
 bool operator==(const double& r, const Rational& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, r);
-   res = (mpq_equal(exactDouble, s.dpointer->privatevalue) != 0);
-   mpq_clear(exactDouble);
-   return res;
+   return (s == r);
 }
 
 
@@ -1281,13 +1305,7 @@ bool operator==(const double& r, const Rational& s)
 /// inequality operator double and Rational
 bool operator!=(const double& r, const Rational& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, r);
-   res = (mpq_equal(exactDouble, s.dpointer->privatevalue) == 0);
-   mpq_clear(exactDouble);
-   return res;
+   return (s != r);
 }
 
 
@@ -1295,13 +1313,7 @@ bool operator!=(const double& r, const Rational& s)
 /// less than operator double and Rational
 bool operator<(const double& r, const Rational& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, r);
-   res = (mpq_cmp(exactDouble, s.dpointer->privatevalue) < 0);
-   mpq_clear(exactDouble);
-   return res;
+   return (s > r);
 }
 
 
@@ -1309,13 +1321,7 @@ bool operator<(const double& r, const Rational& s)
 /// less than or equal to operator double and Rational
 bool operator<=(const double& r, const Rational& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, r);
-   res = (mpq_cmp(exactDouble, s.dpointer->privatevalue) <= 0);
-   mpq_clear(exactDouble);
-   return res;
+   return (s >= r);
 }
 
 
@@ -1323,13 +1329,7 @@ bool operator<=(const double& r, const Rational& s)
 /// greater than operator double and Rational
 bool operator>(const double& r, const Rational& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, r);
-   res = (mpq_cmp(exactDouble, s.dpointer->privatevalue) > 0);
-   mpq_clear(exactDouble);
-   return res;
+   return (s < r);
 }
 
 
@@ -1337,13 +1337,7 @@ bool operator>(const double& r, const Rational& s)
 /// greater than or equal to operator double and Rational
 bool operator>=(const double& r, const Rational& s)
 {
-   bool res;
-   mpq_t exactDouble;
-   mpq_init(exactDouble);
-   mpq_set_d(exactDouble, r);
-   res = (mpq_cmp(exactDouble, s.dpointer->privatevalue) >= 0);
-   mpq_clear(exactDouble);
-   return res;
+   return (s <= r);
 }
 
 
