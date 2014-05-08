@@ -53,6 +53,16 @@ namespace soplex
 
    public:
 
+      //**@name Static variables for special rational values */
+      //@{
+
+      static const Rational ZERO;
+      static const Rational POSONE;
+      static const Rational NEGONE;
+
+      //@}
+
+
       //**@name Construction and destruction */
       //@{
 

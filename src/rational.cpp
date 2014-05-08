@@ -40,6 +40,22 @@
 
 namespace soplex
 {
+
+/// rational zero
+const Rational Rational::ZERO(0);
+
+
+
+/// rational plus one
+const Rational Rational::POSONE(1);
+
+
+
+/// rational minus one
+const Rational Rational::NEGONE(-1);
+
+
+
 #ifdef SOPLEX_WITH_GMP
 
 /// list of unused Private objects; note that this cannot be used if SOPLEX_WITH_GMP is not defined, since then the
@@ -54,7 +70,6 @@ bool Rational::useListMem = false;
 #else
 bool Rational::useListMem = true;
 #endif
-
 
 
 
