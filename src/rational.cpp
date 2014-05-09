@@ -42,17 +42,17 @@ namespace soplex
 {
 
 /// rational zero
-const Rational Rational::ZERO(0);
+const Rational Rational::ZERO(0, true);
 
 
 
 /// rational plus one
-const Rational Rational::POSONE(1);
+const Rational Rational::POSONE(1, true);
 
 
 
 /// rational minus one
-const Rational Rational::NEGONE(-1);
+const Rational Rational::NEGONE(-1, true);
 
 
 
@@ -107,7 +107,16 @@ public:
       , thenext(0)
    {
       mpq_init(privatevalue);
-      mpq_set_d(privatevalue, double(r));
+      if( r == (long double)(1.0) )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      if( r == (long double)(-1.0) )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( r == (long double)(0.0) )
+      {
+         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+      else
+         mpq_set_d(privatevalue, double(r));
    }
 
    /// constructor from double
@@ -116,7 +125,16 @@ public:
       , thenext(0)
    {
       mpq_init(privatevalue);
-      mpq_set_d(privatevalue, r);
+      if( r == 1.0 )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      if( r == -1.0 )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( r == 0.0 )
+      {
+         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+      else
+         mpq_set_d(privatevalue, r);
    }
 
    /// constructor from int
@@ -125,7 +143,16 @@ public:
       , thenext(0)
    {
       mpq_init(privatevalue);
-      mpq_set_d(privatevalue, i);
+      if( i == 1 )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      if( i == -1 )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( i == 0 )
+      {
+         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+      else
+         mpq_set_si(privatevalue, i, 1);
    }
 
    /// constructor from mpq_t
@@ -155,7 +182,15 @@ public:
    Private& operator=(const long double& r)
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      mpq_set_d(this->privatevalue, double(r));
+      if( r == (long double)(1.0) )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      if( r == (long double)(-1.0) )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( r == (long double)(0.0) )
+         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      else
+         mpq_set_d(this->privatevalue, double(r));
+
       return *this;
    }
 
@@ -163,7 +198,15 @@ public:
    Private& operator=(const double& r)
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      mpq_set_d(this->privatevalue, r);
+      if( r == 1.0 )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      if( r == -1.0 )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( r == 0.0 )
+         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      else
+         mpq_set_d(privatevalue, r);
+
       return *this;
    }
 
@@ -171,7 +214,15 @@ public:
    Private& operator=(const int& i)
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      mpq_set_d(this->privatevalue, i);
+      if( i == 1 )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      if( i == -1 )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( i == 0 )
+         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      else
+         mpq_set_si(privatevalue, i, 1);
+
       return *this;
    }
 
@@ -207,6 +258,20 @@ public:
       return thenext;
    }
 };
+
+
+
+/// special constructor only for initializing static rational variables; this is necessary since we need a constructor
+/// for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
+Rational::Rational(const int& i, const bool& dummy)
+{
+   dpointer = 0;
+   spx_alloc(dpointer);
+   new (dpointer) Private();
+   mpq_set_si(dpointer->privatevalue, i, 1);
+
+   assert(dpointer != 0);
+}
 
 
 
@@ -1565,6 +1630,18 @@ public:
       return *this;
    }
 };
+
+
+
+/// special constructor only for initializing static rational variables; this is necessary since we need a constructor
+/// for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
+Rational::Rational(const int& i, const bool& dummy)
+{
+   // if SOPLEX_WITH_GMP is not defined we don't need anything special here
+   dpointer = 0;
+   spx_alloc(dpointer);
+   dpointer = new (dpointer) Private(i);
+}
 
 
 

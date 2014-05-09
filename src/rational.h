@@ -51,6 +51,10 @@ namespace soplex
       static IdList< Private > unusedPrivateList;
       static bool useListMem;
 
+      /// special constructor only for initializing static rational variables; this is necessary since we need a
+      /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
+      Rational(const int& i, const bool& dummy);
+
    public:
 
       //**@name Static variables for special rational values */
