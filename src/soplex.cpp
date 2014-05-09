@@ -3151,7 +3151,7 @@ namespace soplex
    }
 
    /// computes row r of basis inverse; returns true on success
-   bool SoPlex::getBasisInverseRowReal(int r, Real* coef)
+   bool SoPlex::getBasisInverseRowReal(int r, Real* coef, int* inds, int* ninds)
    {
       assert(r >= 0);
       assert(r < numRowsReal());
@@ -3169,6 +3169,7 @@ namespace soplex
       // has, since the REPRESENTATION parameter of this class might be set to automatic
       if( _solver.rep() == SPxSolver::COLUMN )
       {
+         int idx;
          SSVectorReal x(numRowsReal());
          try
          {
@@ -3180,8 +3181,26 @@ namespace soplex
             return false;
          }
          // copy sparse data to dense result vector based on coef array
-         VectorReal y(numRowsReal(), coef);
-         y = x;
+         if( ninds != NULL && inds != NULL )
+         {
+            // during solving SoPlex may have destroyed the sparsity structure so we need to restore it
+            x.setup();
+            *ninds = x.size();
+            for( int i = 0; i < *ninds; ++i )
+            {
+               idx = x.index(i);
+               coef[idx] = x[idx];
+               // set sparsity pattern of coef array
+               inds[i] = idx;
+            }
+         }
+         else
+         {
+            VectorReal y(numRowsReal(), coef);
+            y = x;
+            if( ninds != NULL )
+               *ninds = -1;
+         }
       }
       else
       {
@@ -3262,6 +3281,10 @@ namespace soplex
             coef[index] = 1.0;
          }
 
+         // @todo implement returning of sparsity information like in column wise case
+         if( ninds != NULL)
+            *ninds = -1;
+
          // free memory
          spx_free(bind);
       }
@@ -3272,7 +3295,7 @@ namespace soplex
 
 
    /// computes column c of basis inverse; returns true on success
-   bool SoPlex::getBasisInverseColReal(int c, Real* coef)
+   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds)
    {
       assert(c >= 0);
       assert(c < numRowsReal());
@@ -3290,6 +3313,7 @@ namespace soplex
       // has, since the REPRESENTATION parameter of this class might be set to automatic
       if( _solver.rep() == SPxSolver::COLUMN )
       {
+         int idx;
          SSVectorReal x(numColsReal());
          try
          {
@@ -3301,8 +3325,26 @@ namespace soplex
             return false;
          }
          // copy sparse data to dense result vector based on coef array
-         VectorReal y(numColsReal(), coef);
-         y = x;
+         if( ninds != NULL && inds != NULL )
+         {
+            // SoPlex may have destroyed the sparsity structure so we need to restore it
+            x.setup();
+            *ninds = x.size();
+            for( int i = 0; i < *ninds; ++i )
+            {
+               idx = x.index(i);
+               coef[idx] = x[idx];
+               // set sparsity pattern of coef array
+               inds[i] = idx;
+            }
+         }
+         else
+         {
+            VectorReal y(numColsReal(), coef);
+            y = x;
+            if( ninds != NULL )
+               *ninds = -1;
+         }
       }
       else
       {
@@ -3382,6 +3424,10 @@ namespace soplex
             assert(coef[index] == 0.0);
             coef[index] = 1.0;
          }
+
+         // @todo implement returning of sparsity information like in column wise case
+         if( ninds != NULL)
+            *ninds = -1;
 
          // free memory
          spx_free(bind);
