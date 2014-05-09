@@ -543,9 +543,14 @@ Rational& Rational::operator+=(const Rational& r)
 /// addition operator for doubles
 Rational Rational::operator+(const double& d) const
 {
-   Rational retval(d);
-   mpq_add(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
-   return retval;
+   if( d == 0.0 )
+      return *this;
+   else
+   {
+      Rational retval(d);
+      mpq_add(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+      return retval;
+   }
 }
 
 
@@ -553,11 +558,16 @@ Rational Rational::operator+(const double& d) const
 /// addition assignment operator for doubles
 Rational& Rational::operator+=(const double& d)
 {
-   mpq_t doubleval;
-   mpq_init(doubleval);
-   mpq_set_d(doubleval, d);
-   mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, doubleval);
-   mpq_clear(doubleval);
+   if( d == 1.0 )
+      return (*this += Rational::POSONE);
+   else if( d == -1.0 )
+      return (*this += Rational::NEGONE);
+   else if( d != 0.0 )
+   {
+      Rational retval(d);
+      mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+   }
+
    return *this;
 }
 
@@ -585,9 +595,14 @@ Rational& Rational::operator-=(const Rational& r)
 /// subtraction operator for doubles
 Rational Rational::operator-(const double& d) const
 {
-   Rational retval(d);
-   mpq_sub(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
-   return retval;
+   if( d == 0.0 )
+      return *this;
+   else
+   {
+      Rational retval(d);
+      mpq_sub(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+      return retval;
+   }
 }
 
 
@@ -595,11 +610,17 @@ Rational Rational::operator-(const double& d) const
 /// subtraction assignment operator for doubles
 Rational& Rational::operator-=(const double& d)
 {
-   mpq_t doubleval;
-   mpq_init(doubleval);
-   mpq_set_d(doubleval, d);
-   mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, doubleval);
-   mpq_clear(doubleval);
+
+   if( d == 1.0 )
+      return (*this -= Rational::POSONE);
+   else if( d == -1.0 )
+      return (*this -= Rational::NEGONE);
+   else if( d != 0.0 )
+   {
+      Rational retval(d);
+      mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+   }
+
    return *this;
 }
 
@@ -627,9 +648,22 @@ Rational& Rational::operator*=(const Rational& r)
 /// multiplication operator for doubles
 Rational Rational::operator*(const double& d) const
 {
-   Rational retval(d);
-   mpq_mul(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
-   return retval;
+   if( d == 0.0 )
+      return Rational::ZERO;
+   else if( d == 1.0 )
+      return *this;
+   else if( d == -1.0 )
+   {
+      Rational retval;
+      mpq_neg(retval.dpointer->privatevalue, this->dpointer->privatevalue);
+      return retval;
+   }
+   else
+   {
+      Rational retval(d);
+      mpq_mul(retval.dpointer->privatevalue, retval.dpointer->privatevalue, this->dpointer->privatevalue);
+      return retval;
+   }
 }
 
 
@@ -637,12 +671,17 @@ Rational Rational::operator*(const double& d) const
 /// multiplication assignment operator for doubles
 Rational& Rational::operator*=(const double& d)
 {
-   mpq_t doubleval;
-   mpq_init(doubleval);
-   mpq_set_d(doubleval, d);
-   mpq_mul(this->dpointer->privatevalue, this->dpointer->privatevalue, doubleval);
-   mpq_clear(doubleval);
-   return *this;
+   if( d == 0.0 )
+      return (*this = Rational::ZERO);
+   else if( d == 1.0 )
+      return *this;
+   else if( d == -1.0 )
+   {
+      mpq_neg(this->dpointer->privatevalue, this->dpointer->privatevalue);
+      return *this;
+   }
+   else
+      return (*this *= Rational(d));
 }
 
 
@@ -669,9 +708,16 @@ Rational& Rational::operator/=(const Rational& r)
 /// division operator for doubles
 Rational Rational::operator/(const double& d) const
 {
-   Rational retval(d);
-   mpq_div(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
-   return retval;
+   if( d == 1.0 )
+      return *this;
+   else if( d == -1.0 )
+      return -(*this);
+   else
+   {
+      Rational retval(d);
+      mpq_div(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+      return retval;
+   }
 }
 
 
@@ -679,12 +725,15 @@ Rational Rational::operator/(const double& d) const
 /// division assignment operator for doubles
 Rational& Rational::operator/=(const double& d)
 {
-   mpq_t doubleval;
-   mpq_init(doubleval);
-   mpq_set_d(doubleval, d);
-   mpq_div(this->dpointer->privatevalue, this->dpointer->privatevalue, doubleval);
-   mpq_clear(doubleval);
-   return *this;
+   if( d == 1.0 )
+      return *this;
+   else if( d == -1.0 )
+   {
+      mpq_neg(this->dpointer->privatevalue, this->dpointer->privatevalue);
+      return *this;
+   }
+   else
+      return (*this /= Rational(d));
 }
 
 
@@ -1354,9 +1403,7 @@ bool operator>=(const double& r, const Rational& s)
 /// addition operator for double and Rational
 Rational operator+(const double& d, const Rational& r)
 {
-   Rational retval(d);
-   mpq_add(retval.dpointer->privatevalue, retval.dpointer->privatevalue, r.dpointer->privatevalue);
-   return retval;
+   return (r + d);
 }
 
 
@@ -1364,9 +1411,10 @@ Rational operator+(const double& d, const Rational& r)
 /// subtraction operator for double and Rational
 Rational operator-(const double& d, const Rational& r)
 {
-   Rational retval(d);
-   mpq_sub(retval.dpointer->privatevalue, retval.dpointer->privatevalue, r.dpointer->privatevalue);
-   return retval;
+   Rational res(r);
+   mpq_neg(res.dpointer->privatevalue, res.dpointer->privatevalue);
+   res += d;
+   return res;
 }
 
 
@@ -1374,9 +1422,18 @@ Rational operator-(const double& d, const Rational& r)
 /// multiplication operator for double and Rational
 Rational operator*(const double& d, const Rational& r)
 {
-   Rational retval(d);
-   mpq_mul(retval.dpointer->privatevalue, retval.dpointer->privatevalue, r.dpointer->privatevalue);
-   return retval;
+   if( d == 0.0 )
+      return Rational::ZERO;
+   else if( d == 1.0 )
+      return r;
+   else if( d == -1.0 )
+      return -r;
+   else
+   {
+      Rational retval(d);
+      mpq_mul(retval.dpointer->privatevalue, retval.dpointer->privatevalue, r.dpointer->privatevalue);
+      return retval;
+   }
 }
 
 
@@ -1384,9 +1441,27 @@ Rational operator*(const double& d, const Rational& r)
 /// division operator for double and Rational
 Rational operator/(const double& d, const Rational& r)
 {
-   Rational retval(d);
-   mpq_div(retval.dpointer->privatevalue, retval.dpointer->privatevalue, r.dpointer->privatevalue);
-   return retval;
+   if( d == 0.0 )
+      return Rational::ZERO;
+   else if( d == 1.0 )
+   {
+      Rational retval(r);
+      retval.invert();
+      return retval;
+   }
+   else if( d == -1.0 )
+   {
+      Rational retval(r);
+      retval.invert();
+      mpq_neg(retval.dpointer->privatevalue, retval.dpointer->privatevalue);
+      return retval;
+   }
+   else
+   {
+      Rational retval(d);
+      mpq_div(retval.dpointer->privatevalue, retval.dpointer->privatevalue, r.dpointer->privatevalue);
+      return retval;
+   }
 }
 
 
