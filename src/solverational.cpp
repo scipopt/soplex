@@ -620,7 +620,9 @@ namespace soplex
          }
 
          // check progress
-         Rational sumMaxViolation = boundsViolation + sideViolation + redCostViolation;
+         Rational sumMaxViolation(boundsViolation);
+         sumMaxViolation += sideViolation;
+         sumMaxViolation += redCostViolation;
          if( double(sumMaxViolation) > double(0.9 * bestViolation) )
          {
             MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
@@ -969,7 +971,7 @@ namespace soplex
          // else we should have either a refined Farkas proof or an approximate feasible solution to the original
          else
          {
-            Rational tau = sol._primal[numColsRational() - 1];
+            const Rational& tau = sol._primal[numColsRational() - 1];
 
             MSG_DEBUG( spxout << "tau = " << tau << " (roughly " << rationalToString(tau) << ")\n" );
 
@@ -1045,7 +1047,7 @@ namespace soplex
          // go through nonzero entries of the column
          for( int k = colVector.size() - 1; k >= 0; k-- )
          {
-            Rational value = colVector.value(k);
+            const Rational& value = colVector.value(k);
 
             if( abs(value) > maxValue )
             {
@@ -1088,7 +1090,8 @@ namespace soplex
                _realLP->changeElement(rowIndex, i, 0.0);
 
                // add nonzero divided by maxValue to new column
-               Rational newValue = value / maxValue;
+               Rational newValue(value);
+               newValue /= maxValue;
                _rationalLP->changeElement(rowIndex, liftingColumnIndex, newValue);
                _realLP->changeElement(rowIndex, liftingColumnIndex, Real(newValue));
             }
@@ -1111,7 +1114,7 @@ namespace soplex
          // go through nonzero entries of the column
          for( int k = colVector.size() - 1; k >= 0; k-- )
          {
-            Rational value = colVector.value(k);
+            const Rational& value = colVector.value(k);
 
             if( abs(value) < minValue )
             {
@@ -1154,7 +1157,8 @@ namespace soplex
                _realLP->changeElement(rowIndex, i, 0.0);
 
                // add nonzero divided by maxValue to new column
-               Rational newValue = value / minValue;
+               Rational newValue(value);
+               newValue /= minValue;
                _rationalLP->changeElement(rowIndex, liftingColumnIndex, newValue);
                _realLP->changeElement(rowIndex, liftingColumnIndex, Real(newValue));
             }
@@ -1714,10 +1718,11 @@ namespace soplex
          if( lowerRational(c) > 0 )
          {
             const SVectorRational& colVector = colVectorRational(c);
+            Rational shiftValue;
 
             for( int i = 0; i < colVector.size(); i++ )
             {
-               Rational shiftValue = colVector.value(i) * lowerRational(c);
+               shiftValue = colVector.value(i) * lowerRational(c);
                int r = colVector.index(i);
 
                if( lhsRational(r) > -realParam(SoPlex::INFTY) )
@@ -1739,10 +1744,11 @@ namespace soplex
          else if( upperRational(c) < 0 )
          {
             const SVectorRational& colVector = colVectorRational(c);
+            Rational shiftValue;
 
             for( int i = 0; i < colVector.size(); i++ )
             {
-               Rational shiftValue = colVector.value(i) * upperRational(c);
+               shiftValue = colVector.value(i) * upperRational(c);
                int r = colVector.index(i);
 
                if( lhsRational(r) > -realParam(SoPlex::INFTY) )
