@@ -1210,11 +1210,17 @@ private:
    DVectorRational _unboundedUpper;
    DVectorRational _unboundedLhs;
    DVectorRational _unboundedRhs;
+   DSVectorRational _tauColVector;
    DVectorRational _feasObj;
    DVectorRational _feasLhs;
    DVectorRational _feasRhs;
    DVectorRational _feasLower;
    DVectorRational _feasUpper;
+   DVectorRational _modLower;
+   DVectorRational _modUpper;
+   DVectorRational _modLhs;
+   DVectorRational _modRhs;
+   DVectorRational _modObj;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
    bool _storedBasis;

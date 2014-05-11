@@ -339,11 +339,12 @@ namespace soplex
       // declare vectors and variables
       SPxSolver::Status result = SPxSolver::UNKNOWN;
 
-      DVectorRational modLower(numColsRational());
-      DVectorRational modUpper(numColsRational());
-      DVectorRational modLhs(numRowsRational());
-      DVectorRational modRhs(numRowsRational());
-      DVectorRational modObj(numColsRational());
+      _modLower.reDim(numColsRational(), false);
+      _modUpper.reDim(numColsRational(), false);
+      _modLhs.reDim(numRowsRational(), false);
+      _modRhs.reDim(numRowsRational(), false);
+      _modObj.reDim(numColsRational(), false);
+
       DVectorReal primalReal(numColsRational());
       DVectorReal dualReal(numRowsRational());
 
@@ -482,23 +483,23 @@ namespace soplex
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             // lower bound
-            modLower[c] = lowerRational(c);
+            _modLower[c] = lowerRational(c);
 
-            if( modLower[c] > -realParam(SoPlex::INFTY) )
+            if( _modLower[c] > -realParam(SoPlex::INFTY) )
             {
-               modLower[c] -= sol._primal[c];
-               if( modLower[c] > boundsViolation )
-                  boundsViolation = modLower[c];
+               _modLower[c] -= sol._primal[c];
+               if( _modLower[c] > boundsViolation )
+                  boundsViolation = _modLower[c];
             }
 
             // upper bound
-            modUpper[c] = upperRational(c);
+            _modUpper[c] = upperRational(c);
 
-            if( modUpper[c] < realParam(SoPlex::INFTY) )
+            if( _modUpper[c] < realParam(SoPlex::INFTY) )
             {
-               modUpper[c] -= sol._primal[c];
-               if( modUpper[c] < -boundsViolation )
-                  boundsViolation = -modUpper[c];
+               _modUpper[c] -= sol._primal[c];
+               if( _modUpper[c] < -boundsViolation )
+                  boundsViolation = -_modUpper[c];
             }
          }
 
@@ -508,21 +509,21 @@ namespace soplex
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             // left-hand side
-            modLhs[r] = lhsRational(r);
-            if( modLhs[r] > -realParam(SoPlex::INFTY) )
+            _modLhs[r] = lhsRational(r);
+            if( _modLhs[r] > -realParam(SoPlex::INFTY) )
             {
-               modLhs[r] -= sol._slacks[r];
-               if( modLhs[r] > sideViolation )
-                  sideViolation = modLhs[r];
+               _modLhs[r] -= sol._slacks[r];
+               if( _modLhs[r] > sideViolation )
+                  sideViolation = _modLhs[r];
             }
 
             // right-hand side
-            modRhs[r] = rhsRational(r);
-            if( modRhs[r] < realParam(SoPlex::INFTY) )
+            _modRhs[r] = rhsRational(r);
+            if( _modRhs[r] < realParam(SoPlex::INFTY) )
             {
-               modRhs[r] -= sol._slacks[r];
-               if( modRhs[r] < -sideViolation )
-                  sideViolation = -modRhs[r];
+               _modRhs[r] -= sol._slacks[r];
+               if( _modRhs[r] < -sideViolation )
+                  sideViolation = -_modRhs[r];
             }
          }
 
@@ -543,7 +544,7 @@ namespace soplex
          }
 
          // compute modified objective function
-         modObj = sol._redCost;
+         _modObj = sol._redCost;
 
          // fix inequality constraints if this has not lead to an infeasibility during the last floating-point solve
          if( restrictInequalities )
@@ -563,12 +564,12 @@ namespace soplex
                   if( basisStatusRow == SPxSolver::ON_LOWER )
                   {
                      assert(sol._dual[r] > 0);
-                     modRhs[r] = modLhs[r];
+                     _modRhs[r] = _modLhs[r];
                   }
                   else
                   {
                      assert(sol._dual[r] < 0);
-                     modLhs[r] = modRhs[r];
+                     _modLhs[r] = _modRhs[r];
                   }
 
                   // do not change the basis status to FIXED, since this would invalidate the basis for the original LP
@@ -663,10 +664,10 @@ namespace soplex
             MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
             // perform primal and dual scaling
-            modLower *= primalScale;
-            modUpper *= primalScale;
-            modLhs *= primalScale;
-            modRhs *= primalScale;
+            _modLower *= primalScale;
+            _modUpper *= primalScale;
+            _modLhs *= primalScale;
+            _modRhs *= primalScale;
          }
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
@@ -692,13 +693,13 @@ namespace soplex
             MSG_INFO2( spxout << "Scaling dual by " << rationalToString(dualScale) << ".\n" );
 
             // perform dual scaling
-            modObj *= dualScale;
+            _modObj *= dualScale;
          }
 
          // apply scaled bounds, side, and objective function
-         _solver.changeBounds(DVectorReal(modLower), DVectorReal(modUpper));
-         _solver.changeRange(DVectorReal(modLhs), DVectorReal(modRhs));
-         _solver.changeObj(DVectorReal(modObj));
+         _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
+         _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
+         _solver.changeObj(DVectorReal(_modObj));
 
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
 
@@ -807,12 +808,12 @@ namespace soplex
          {
             SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
 
-            assert(lhsRational(r) != rhsRational(r) || modLhs[r] == modRhs[r]);
+            assert(lhsRational(r) != rhsRational(r) || _modLhs[r] == _modRhs[r]);
 
             if( lhsRational(r) != rhsRational(r) )
             {
-               assert(sol._dual[r] == 0 || modLhs[r] == modRhs[r]);
-               assert(sol._dual[r] != 0 || modLhs[r] != modRhs[r]);
+               assert(sol._dual[r] == 0 || _modLhs[r] == _modRhs[r]);
+               assert(sol._dual[r] != 0 || _modLhs[r] != _modRhs[r]);
 
                // the inequality was fixed to the left-hand side
                if( sol._dual[r] > 0 && (basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED) )
@@ -1705,8 +1706,6 @@ namespace soplex
 
       // set objective coefficients to zero; shift primal space such as to guarantee that the zero solution is within
       // the bounds
-      DSVectorRational shiftVector;
-
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
          _rationalLP->changeObj(c, 0);
@@ -1771,13 +1770,12 @@ namespace soplex
       }
 
       // homogenize sides
-      DSVectorRational tauColVector;
-
+      _tauColVector.clear();
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
          if( lhsRational(r) > 0 )
          {
-            tauColVector.add(r, lhsRational(r));
+            _tauColVector.add(r, lhsRational(r));
             if( rhsRational(r) < realParam(SoPlex::INFTY) )
             {
                _rationalLP->changeRange(r, 0, rhsRational(r) - lhsRational(r));
@@ -1791,7 +1789,7 @@ namespace soplex
          }
          else if( rhsRational(r) < 0 )
          {
-            tauColVector.add(r, rhsRational(r));
+            _tauColVector.add(r, rhsRational(r));
             if( lhsRational(r) > -realParam(SoPlex::INFTY) )
             {
                _rationalLP->changeRange(r, lhsRational(r) - rhsRational(r), 0);
@@ -1808,16 +1806,16 @@ namespace soplex
       }
 
       ///@todo exploit this case by returning without LP solving
-      if( tauColVector.size() == 0 )
+      if( _tauColVector.size() == 0 )
       {
          MSG_INFO3( spxout << "LP is trivially feasible.\n" );
       }
 
       // add artificial column
       SPxColId id;
-      tauColVector *= -1;
-      _rationalLP->addCol(id, LPColRational(-1, tauColVector, 1, 0));
-      _realLP->addCol(id, LPColReal(-1.0, DSVectorReal(tauColVector), 1.0, 0.0));
+      _tauColVector *= -1;
+      _rationalLP->addCol(id, LPColRational(-1, _tauColVector, 1, 0));
+      _realLP->addCol(id, LPColReal(-1.0, DSVectorReal(_tauColVector), 1.0, 0.0));
 
       // adjust basis
       if( _hasBasis )
