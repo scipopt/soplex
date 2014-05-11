@@ -246,15 +246,18 @@ public:
    }
 
    /// Resets \ref soplex::DVectorBase "DVectorBase"'s dimension to \p newdim.
-   void reDim(int newdim)
+   void reDim(int newdim, const bool setZero = true )
    {
       assert(memsize >= 0);
 
       if( newdim > memsize )
          reSize(int(newdim + 0.2 * memsize));
 
-      for( int i = VectorBase<R>::dimen; i < newdim; i++ )
-         mem[i] = 0;
+      if( setZero )
+      {
+         for( int i = VectorBase<R>::dimen; i < newdim; i++ )
+            mem[i] = 0;
+      }
 
       VectorBase<R>::dimen = newdim;
    }

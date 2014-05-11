@@ -1134,37 +1134,51 @@ public:
       offset = o;
    }
 
-   /// Computes activity of the rows for a given primal vector.
-   /// @throw SPxInternalCodeException if dimension of primal vector does not match number of columns
-   virtual void computePrimalActivity(const VectorBase<R>& primal, DVectorBase<R>& activity) const
+   /// Computes activity of the rows for a given primal vector; activity does not need to be zero
+   /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
+   ///        dimension of the activity vector does not match the number of rows
+   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity) const
    {
       if( primal.dim() != nCols() )
       {
          throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
       }
 
-      activity.reDim(nRows());
+      if( activity.dim() != nRows() )
+      {
+         throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+      }
 
-      activity.clear();
+      if( nCols() <= 0 )
+         activity.clear();
+      else
+         activity = primal[0] * colVector(0);
 
-      for( int c = 0; c < nCols(); c++ )
+      for( int c = 1; c < nCols(); c++ )
          activity.multAdd(primal[c], colVector(c));
    }
 
-   /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A.
-   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows
-   virtual void computeDualActivity(const VectorBase<R>& dual, DVectorBase<R>& activity) const
+   /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
+   ///        the activity vector does not match the number of columns
+   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity) const
    {
       if( dual.dim() != nRows() )
       {
-         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing activity has wrong dimension");
+         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
       }
 
-      activity.reDim(nCols());
+      if( activity.dim() != nCols() )
+      {
+         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      }
 
-      activity.clear();
+      if( nRows() <= 0 )
+         activity.clear();
+      else
+         activity = dual[0] * rowVector(0);
 
-      for( int r = 0; r < nRows(); r++ )
+      for( int r = 1; r < nRows(); r++ )
          activity.multAdd(dual[r], rowVector(r));
    }
 

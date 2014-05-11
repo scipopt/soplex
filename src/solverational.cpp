@@ -392,9 +392,12 @@ namespace soplex
          return;
       }
 
-      // store floating-point solution of original LP as current rational solution
+      // store floating-point solution of original LP as current rational solution and ensure that solution vectors have
+      // right dimension
       sol._primal = primalReal;
+      sol._slacks.reDim(numRowsRational(), false);
       sol._dual = dualReal;
+      sol._redCost.reDim(numColsRational(), false);
       sol._hasPrimal = true;
       sol._hasDual = true;
       _hasBasis = true;
@@ -1921,7 +1924,7 @@ namespace soplex
 #ifndef NDEBUG
       if( sol._hasPrimal )
       {
-         DVectorRational activity;
+         DVectorRational activity(numRowsRational());
          _rationalLP->computePrimalActivity(sol._primal, activity);
          assert(sol._slacks == activity);
       }
