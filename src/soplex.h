@@ -1197,6 +1197,12 @@ private:
 
    bool _isRealLPLoaded;
 
+   DVectorReal _manualLower;
+   DVectorReal _manualUpper;
+   DVectorReal _manualLhs;
+   DVectorReal _manualRhs;
+   DVectorReal _manualObj;
+
    //@}
 
 

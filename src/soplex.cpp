@@ -2190,13 +2190,27 @@ namespace soplex
 #endif
 
          // store current real LP
-         SPxLPReal realLP(*_realLP);
+         _manualLower = _realLP->lower();
+         _manualUpper = _realLP->upper();
+         _manualLhs = _realLP->lhs();
+         _manualRhs = _realLP->rhs();
+         _realLP->getObj(_manualObj);
 
          // call rational LP solving with iterative refinement
          _solveRational();
 
          // restore real LP in order to ensure that we use the same rounding
-         _solver.loadLP(realLP);
+         _realLP->changeLower(_manualLower);
+         _realLP->changeUpper(_manualUpper);
+         _realLP->changeLhs(_manualLhs);
+         _realLP->changeRhs(_manualRhs);
+         _realLP->changeObj(_manualObj);
+
+#ifdef ENABLE_ADDITIONAL_CHECKS
+         assert(areLPsInSync(true, true, false));
+#else
+         assert(areLPsInSync(true, false, false));
+#endif
 
          if( _hasBasis )
          {
