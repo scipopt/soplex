@@ -534,7 +534,7 @@ namespace soplex
          redCostViolation = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
-            SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
+            const SPxSolver::VarStatus& basisStatusCol = _basisStatusCols[c];
 
             if( basisStatusCol != SPxSolver::ON_UPPER && basisStatusCol != SPxSolver::FIXED && sol._redCost[c] < -redCostViolation )
                redCostViolation = -sol._redCost[c];
