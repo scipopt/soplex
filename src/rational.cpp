@@ -117,7 +117,7 @@ public:
       mpq_init(privatevalue);
       if( r == (long double)(1.0) )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      if( r == (long double)(-1.0) )
+      else if( r == (long double)(-1.0) )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
       else if( r == (long double)(0.0) )
       {
@@ -135,7 +135,7 @@ public:
       mpq_init(privatevalue);
       if( r == 1.0 )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      if( r == -1.0 )
+      else if( r == -1.0 )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
       else if( r == 0.0 )
       {
@@ -153,7 +153,7 @@ public:
       mpq_init(privatevalue);
       if( i == 1 )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      if( i == -1 )
+      else if( i == -1 )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
       else if( i == 0 )
       {
@@ -192,7 +192,7 @@ public:
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       if( r == (long double)(1.0) )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      if( r == (long double)(-1.0) )
+      else if( r == (long double)(-1.0) )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
       else if( r == (long double)(0.0) )
          mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
@@ -208,7 +208,7 @@ public:
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       if( r == 1.0 )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      if( r == -1.0 )
+      else if( r == -1.0 )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
       else if( r == 0.0 )
          mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
@@ -224,7 +224,7 @@ public:
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       if( i == 1 )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
-      if( i == -1 )
+      else if( i == -1 )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
       else if( i == 0 )
          mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
