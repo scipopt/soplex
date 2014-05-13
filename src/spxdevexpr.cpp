@@ -476,6 +476,9 @@ SPxId SPxDevexPR::selectEnterX(Real tol)
    best = 0;
    bestCo = 0;
 
+   // avoid uninitialized value later on in entered4X()
+   last = 1.0;
+
    if( thesolver->hyperPricingEnter && !refined )
    {
       if( bestPrices.size() < 2 || thesolver->basis().lastUpdate() == 0 )
