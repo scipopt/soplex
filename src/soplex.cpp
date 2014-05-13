@@ -2189,6 +2189,16 @@ namespace soplex
          assert(areLPsInSync(true, false, false));
 #endif
 
+#ifdef SOPLEX_MANUAL_ALT
+         // store current real LP
+         SPxLPReal realLP(*_realLP);
+
+         // call rational LP solving with iterative refinement
+         _solveRational();
+
+         // restore real LP in order to ensure that we use the same rounding
+         _solver.loadLP(realLP);
+#else
          // store current real LP
          _manualLower = _realLP->lower();
          _manualUpper = _realLP->upper();
@@ -2205,6 +2215,7 @@ namespace soplex
          _realLP->changeLhs(_manualLhs);
          _realLP->changeRhs(_manualRhs);
          _realLP->changeObj(_manualObj);
+#endif
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
          assert(areLPsInSync(true, true, false));
