@@ -70,8 +70,6 @@ private:
    int selectLeaveSparse(Real feastol);
    /// implementation of hyper sparse pricing in the leaving Simplex
    int selectLeaveHyper(Real feastol);
-   /// internal implementation of SPxPricer::left4()
-   void left4X(int n, const SPxId& id, int start, int incr);
    /// build up vector of pricing values for later use
    SPxId buildBestPriceVectorEnterDim(Real& best, Real feastol);
    SPxId buildBestPriceVectorEnterCoDim(Real& best, Real feastol);
@@ -89,8 +87,6 @@ private:
    SPxId selectEnterHyperDim(Real& best, Real feastol);
    /// implementation of hyper sparse pricing in the entering Simplex
    SPxId selectEnterHyperCoDim(Real& best, Real feastol);
-   /// internal implementation of SPxPricer::entered4()
-   void entered4X(SPxId id, int n, int start1, int incr1, int start2, int incr2);
    //@}
 
 public:

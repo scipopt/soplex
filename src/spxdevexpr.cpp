@@ -308,13 +308,7 @@ int SPxDevexPR::selectLeaveHyper(Real feastol)
    return bstI;
 }
 
-
 void SPxDevexPR::left4(int n, SPxId id)
-{
-   left4X(n, id, 0, 1);
-}
-
-void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
 {
    if (id.isValid())
    {
@@ -335,7 +329,7 @@ void SPxDevexPR::left4X(int n, const SPxId& id, int start, int incr)
       //  Update #coPenalty# vector
       const IdxSet& rhoIdx = thesolver->fVec().idx();
       int len = thesolver->fVec().idx().size();
-      for (i = len - 1 - start; i >= 0; i -= incr)
+      for (i = len - 1; i >= 0; --i)
       {
          j = rhoIdx.index(i);
          x = rhoVec[j] * rhoVec[j] * beta_q;
@@ -806,17 +800,11 @@ SPxId SPxDevexPR::selectEnterDenseCoDim(Real& best, Real feastol, int start, int
 }
 
 
-void SPxDevexPR::entered4(SPxId id, int n)
-{
-   entered4X(id, n, 0, 1, 0, 1);
-}
-
 /**@todo suspicious: the pricer should be informed, that variable id 
     has entered the basis at position n, but the id is not used here 
     (this is true for all pricers)
 */
-void SPxDevexPR::entered4X(SPxId /*id*/, int n,
-   int start1, int incr1, int start2, int incr2)
+void SPxDevexPR::entered4(SPxId /*id*/, int n)
 {
    if (n >= 0 && n < thesolver->dim())
    {
@@ -832,7 +820,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
 
       xi_p = xi_p * xi_p * last;
 
-      for (j = coPidx.size() - 1 - start1; j >= 0; j -= incr1)
+      for (j = coPidx.size() - 1; j >= 0; --j)
       {
          i = coPidx.index(j);
          coPenalty[i] += xi_p * coPvec[i] * coPvec[i];
@@ -843,7 +831,7 @@ void SPxDevexPR::entered4X(SPxId /*id*/, int n,
          }
       }
 
-      for (j = pIdx.size() - 1 - start2; j >= 0; j -= incr2)
+      for (j = pIdx.size() - 1; j >= 0; --j)
       {
          i = pIdx.index(j);
          penalty[i] += xi_p * pVec[i] * pVec[i];
