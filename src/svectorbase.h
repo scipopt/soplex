@@ -42,7 +42,7 @@ public:
    template < class S >
    Nonzero<R>& operator=(const Nonzero<S>& vec)
    {
-      val = R(vec.val);
+      val = vec.val;
       idx = vec.idx;
       return *this;
    }
@@ -60,6 +60,19 @@ public:
    {
    }
 };
+
+
+
+// specialized assignment operator
+template <>
+template < class S >
+   Nonzero<Real>& Nonzero<Real>::operator=(const Nonzero<S>& vec)
+{
+   val = Real(vec.val);
+   idx = vec.idx;
+   return *this;
+}
+
 
 /**@brief   Sparse vectors.
  * @ingroup Algebra
@@ -389,7 +402,7 @@ public:
    /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
    {
-      R maxi = R(0);
+      R maxi = 0;
 
       for( int i = size() - 1; i >= 0; --i )
       {
@@ -397,7 +410,7 @@ public:
             maxi = abs(m_elem[i].val);
       }
 
-      assert(maxi >= R(0));
+      assert(maxi >= 0);
 
       return maxi;
    }
@@ -413,7 +426,7 @@ public:
             mini = abs(m_elem[i].val);
       }
 
-      assert(mini >= R(0));
+      assert(mini >= 0);
 
       return mini;
    }
@@ -427,7 +440,7 @@ public:
    /// Squared norm.
    R length2() const
    {
-      R x = R(0);
+      R x = 0;
       int n = size();
       const Nonzero<R>* e = m_elem;
 
@@ -446,7 +459,7 @@ public:
       int n = size();
       Nonzero<R>* e = m_elem;
 
-      assert(x != R(0));
+      assert(x != 0);
 
       while( n-- )
       {
@@ -464,7 +477,7 @@ public:
    template < class S >
    R operator*(const SVectorBase<S>& w) const
    {
-      R x = R(0);
+      R x = 0;
       int i = 0;
       int j = 0;
       Element* e = m_elem;
@@ -476,7 +489,7 @@ public:
       {
          if( e->idx == wj.idx )
          {
-            x += e->val * R(wj.val);
+            x += e->val * wj.val;
             e++;
             i++;
             j++;
@@ -629,7 +642,7 @@ public:
             for( int j = 0; j < i; ++j )
             {
                // allow trailing zeros
-               if( m_elem[i].idx == m_elem[j].idx && m_elem[i].val != R(0) )
+               if( m_elem[i].idx == m_elem[j].idx && m_elem[i].val != 0 )
                   return MSGinconsistent("SVectorBase");
             }
          }
@@ -641,6 +654,46 @@ public:
 
    //@}
 };
+
+
+
+/// specialization for inner product for sparse vectors
+template <>
+template < class S >
+Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
+{
+   Real x = 0;
+   int i = 0;
+   int j = 0;
+   SVectorBase<Real>::Element* e = m_elem;
+   typename SVectorBase<S>::Element wj = w.element(j);
+   int n = size();
+   int m = w.size();
+
+   for( ; i < n || j < m; ++i, ++j )
+   {
+      if( e->idx == wj.idx )
+      {
+         x += e->val * Real(wj.val);
+         e++;
+         i++;
+         j++;
+         wj = w.element(j);
+      }
+      else if( e->idx < wj.idx )
+      {
+         e++;
+         i++;
+      }
+      else
+      {
+         j++;
+         wj = w.element(j);
+      }
+   }
+
+   return x;
+}
 
 } // namespace soplex
 #endif // _SVECTORBASE_H_

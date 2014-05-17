@@ -97,12 +97,12 @@ public:
 
       spx_alloc(mem, memsize);
 
-      ///@todo improve efficiency by using copy constructor here instead of assignment below
-      for( int i = 0; i < memsize; i++ )
+      for( int i = 0; i < VectorBase<R>::dimen; i++ )
+         new (&(mem[i])) R(old[i]);
+      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
          new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
-      *this = old;
 
       assert(isConsistent());
    }
@@ -120,12 +120,12 @@ public:
 
       spx_alloc(mem, memsize);
 
-      ///@todo improve efficiency by using copy constructor here instead of assignment below
-      for( int i = 0; i < memsize; i++ )
+      for( int i = 0; i < VectorBase<R>::dimen; i++ )
+         new (&(mem[i])) R(old[i]);
+      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
          new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
-      *this = old;
 
       assert(isConsistent());
    }
@@ -141,12 +141,12 @@ public:
 
       spx_alloc(mem, memsize);
 
-      ///@todo improve efficiency by using copy constructor here instead of assignment below
-      for( int i = 0; i < memsize; i++ )
+      for( int i = 0; i < VectorBase<R>::dimen; i++ )
+         new (&(mem[i])) R(old[i]);
+      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
          new (&(mem[i])) R();
 
       VectorBase<R>::val = mem;
-      *this = old;
 
       assert(isConsistent());
    }

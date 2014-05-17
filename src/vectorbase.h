@@ -115,7 +115,7 @@ public:
          assert(dim() == vec.dim());
 
          for( int i = 0; i < dimen; i++ )
-            val[i] = R(vec[i]);
+            val[i] = vec[i];
 
          assert(isConsistent());
       }
@@ -283,7 +283,7 @@ public:
    template < class S >
    VectorBase<R>& operator/=(S x)
    {
-      assert(x != R(0));
+      assert(x != 0);
 
       for( int i = 0; i < dim(); i++ )
          val[i] /= x;
@@ -326,7 +326,7 @@ public:
             maxi = x;
       }
 
-      assert(maxi >= R(0));
+      assert(maxi >= 0);
 
       return maxi;
    }
@@ -347,7 +347,7 @@ public:
             mini = x;
       }
 
-      assert(mini >= R(0));
+      assert(mini >= 0);
 
       return mini;
    }
@@ -452,6 +452,27 @@ VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
 
       assert(isConsistent());
    }
+   return *this;
+}
+
+
+
+/// Assignment operator (specialization for Real).
+template <>
+template <>
+inline
+VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Rational>& vec)
+{
+   if( (VectorBase<Rational>*)this != &vec )
+   {
+      assert(dim() == vec.dim());
+
+      for( int i = 0; i < dimen; i++ )
+         val[i] = Real(vec[i]);
+
+      assert(isConsistent());
+   }
+
    return *this;
 }
 
