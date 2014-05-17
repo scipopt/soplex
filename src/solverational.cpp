@@ -1726,7 +1726,8 @@ namespace soplex
 
             for( int i = 0; i < colVector.size(); i++ )
             {
-               shiftValue = colVector.value(i) * lowerRational(c);
+               shiftValue = colVector.value(i);
+               shiftValue *= lowerRational(c);
                int r = colVector.index(i);
 
                if( lhsRational(r) > _rationalNegInfty )
@@ -1752,7 +1753,8 @@ namespace soplex
 
             for( int i = 0; i < colVector.size(); i++ )
             {
-               shiftValue = colVector.value(i) * upperRational(c);
+               shiftValue = colVector.value(i);
+               shiftValue *= upperRational(c);
                int r = colVector.index(i);
 
                if( lhsRational(r) > _rationalNegInfty )
