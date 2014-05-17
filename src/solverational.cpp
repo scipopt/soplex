@@ -485,7 +485,7 @@ namespace soplex
             // lower bound
             _modLower[c] = lowerRational(c);
 
-            if( _modLower[c] > -realParam(SoPlex::INFTY) )
+            if( _modLower[c] > _rationalNegInfty )
             {
                _modLower[c] -= sol._primal[c];
                if( _modLower[c] > boundsViolation )
@@ -495,7 +495,7 @@ namespace soplex
             // upper bound
             _modUpper[c] = upperRational(c);
 
-            if( _modUpper[c] < realParam(SoPlex::INFTY) )
+            if( _modUpper[c] < _rationalPosInfty )
             {
                _modUpper[c] -= sol._primal[c];
                if( _modUpper[c] < -boundsViolation )
@@ -510,7 +510,7 @@ namespace soplex
          {
             // left-hand side
             _modLhs[r] = lhsRational(r);
-            if( _modLhs[r] > -realParam(SoPlex::INFTY) )
+            if( _modLhs[r] > _rationalNegInfty )
             {
                _modLhs[r] -= sol._slacks[r];
                if( _modLhs[r] > sideViolation )
@@ -519,7 +519,7 @@ namespace soplex
 
             // right-hand side
             _modRhs[r] = rhsRational(r);
-            if( _modRhs[r] < realParam(SoPlex::INFTY) )
+            if( _modRhs[r] < _rationalPosInfty )
             {
                _modRhs[r] -= sol._slacks[r];
                if( _modRhs[r] < -sideViolation )
@@ -1070,7 +1070,7 @@ namespace soplex
                   assert(liftingColumnIndex == numColsRational() - 1);
                   assert(liftingColumnIndex == numColsReal() - 1);
 
-                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
+                  _rationalLP->changeBounds(liftingColumnIndex, _rationalNegInfty, _rationalPosInfty);
                   _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
 
                   liftingRowVector.clear();
@@ -1137,7 +1137,7 @@ namespace soplex
                   assert(liftingColumnIndex == numColsRational() - 1);
                   assert(liftingColumnIndex == numColsReal() - 1);
 
-                  _rationalLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
+                  _rationalLP->changeBounds(liftingColumnIndex, _rationalNegInfty, _rationalPosInfty);
                   _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlex::INFTY), realParam(SoPlex::INFTY));
 
                   liftingRowVector.clear();
@@ -1481,13 +1481,13 @@ namespace soplex
       // make right-hand side zero
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
-         if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+         if( lhsRational(r) > _rationalNegInfty )
          {
             _rationalLP->changeLhs(r, 0);
             _realLP->changeLhs(r, 0.0);
          }
 
-         if( rhsRational(r) < realParam(SoPlex::INFTY) )
+         if( rhsRational(r) < _rationalPosInfty )
          {
             _rationalLP->changeRhs(r, 0);
             _realLP->changeRhs(r, 0.0);
@@ -1509,7 +1509,7 @@ namespace soplex
       _rationalLP->changeObj(numOrigCols, -1);
       _realLP->changeObj(numOrigCols, -1.0);
 
-      _rationalLP->changeBounds(numOrigCols, -realParam(SoPlex::INFTY), 1);
+      _rationalLP->changeBounds(numOrigCols, _rationalNegInfty, 1);
       _realLP->changeBounds(numOrigCols, -realParam(SoPlex::INFTY), 1.0);
 
       // set objective coefficients to zero and adjust bounds for problem variables
@@ -1518,13 +1518,13 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( lowerRational(c) > -realParam(SoPlex::INFTY) )
+         if( lowerRational(c) > _rationalNegInfty )
          {
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
 
-         if( upperRational(c) < realParam(SoPlex::INFTY) )
+         if( upperRational(c) < _rationalPosInfty )
          {
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
@@ -1725,20 +1725,20 @@ namespace soplex
                shiftValue = colVector.value(i) * lowerRational(c);
                int r = colVector.index(i);
 
-               if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+               if( lhsRational(r) > _rationalNegInfty )
                {
                   _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
                   _realLP->changeLhs(r, Real(lhsRational(r)));
                }
 
-               if( rhsRational(r) < realParam(SoPlex::INFTY) )
+               if( rhsRational(r) < _rationalPosInfty )
                {
                   _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
                   _realLP->changeRhs(r, Real(rhsRational(r)));
                }
             }
 
-            _rationalLP->changeBounds(c, 0, upperRational(c) < realParam(SoPlex::INFTY) ? upperRational(c) - lowerRational(c) : upperRational(c));
+            _rationalLP->changeBounds(c, 0, upperRational(c) < _rationalPosInfty ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, Real(upperRational(c)));
          }
          else if( upperRational(c) < 0 )
@@ -1751,20 +1751,20 @@ namespace soplex
                shiftValue = colVector.value(i) * upperRational(c);
                int r = colVector.index(i);
 
-               if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+               if( lhsRational(r) > _rationalNegInfty )
                {
                   _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
                   _realLP->changeLhs(r, Real(lhsRational(r)));
                }
 
-               if( rhsRational(r) < realParam(SoPlex::INFTY) )
+               if( rhsRational(r) < _rationalPosInfty )
                {
                   _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
                   _realLP->changeRhs(r, Real(rhsRational(r)));
                }
             }
 
-            _rationalLP->changeBounds(c, lowerRational(c) > -realParam(SoPlex::INFTY) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
+            _rationalLP->changeBounds(c, lowerRational(c) > _rationalNegInfty ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, Real(lowerRational(c)), 0.0);
          }
          else
@@ -1782,7 +1782,7 @@ namespace soplex
          if( lhsRational(r) > 0 )
          {
             _tauColVector.add(r, lhsRational(r));
-            if( rhsRational(r) < realParam(SoPlex::INFTY) )
+            if( rhsRational(r) < _rationalPosInfty )
             {
                _rationalLP->changeRange(r, 0, rhsRational(r) - lhsRational(r));
                _realLP->changeRange(r, 0.0, Real(rhsRational(r)));
@@ -1796,7 +1796,7 @@ namespace soplex
          else if( rhsRational(r) < 0 )
          {
             _tauColVector.add(r, rhsRational(r));
-            if( lhsRational(r) > -realParam(SoPlex::INFTY) )
+            if( lhsRational(r) > _rationalNegInfty )
             {
                _rationalLP->changeRange(r, lhsRational(r) - rhsRational(r), 0);
                _realLP->changeRange(r, Real(lhsRational(r)), 0.0);
@@ -1891,7 +1891,7 @@ namespace soplex
       // restore right-hand side
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
-         assert(rhsRational(r) >= realParam(SoPlex::INFTY) || lhsRational(r) <= -realParam(SoPlex::INFTY)
+         assert(rhsRational(r) >= _rationalPosInfty || lhsRational(r) <= _rationalNegInfty
             || _feasLhs[r] - lhsRational(r) == _feasRhs[r] - rhsRational(r));
 
          _rationalLP->changeRange(r, _feasLhs[r], _feasRhs[r]);
@@ -1903,7 +1903,7 @@ namespace soplex
       // unshift primal space and restore objective coefficients
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
-         assert(upperRational(c) >= realParam(SoPlex::INFTY) || lowerRational(c) <= -realParam(SoPlex::INFTY)
+         assert(upperRational(c) >= _rationalPosInfty || lowerRational(c) <= _rationalNegInfty
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
 
          _rationalLP->changeBounds(c, _feasLower[c], _feasUpper[c]);
@@ -2009,14 +2009,14 @@ namespace soplex
 
          if( minusRedCost > 0 )
          {
-            if( double(upper[c]) < double(realParam(SoPlex::INFTY)) )
+            if( upper[c] < _rationalPosInfty )
                temp += minusRedCost * upper[c];
             else
                isTempFinite = false;
          }
          else if( minusRedCost < 0 )
          {
-            if( double(lower[c]) > double(-realParam(SoPlex::INFTY)) )
+            if( lower[c] > _rationalNegInfty )
                temp += minusRedCost * lower[c];
             else
                isTempFinite = false;
@@ -2102,7 +2102,7 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < 0 && lower[colIdx] > -B && double(lower[colIdx]) > double(-realParam(SoPlex::INFTY)) )
+         if( minusRedCost < 0 && lower[colIdx] > -B && lower[colIdx] > _rationalNegInfty )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * lower[colIdx];
@@ -2135,7 +2135,7 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > 0 && upper[colIdx] < B && double(upper[colIdx]) < double(realParam(SoPlex::INFTY)) )
+         else if( minusRedCost > 0 && upper[colIdx] < B && upper[colIdx] < _rationalPosInfty )
          {
             ytransA.clearNum(n);
             ytransb -= minusRedCost * upper[colIdx];
