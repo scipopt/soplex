@@ -45,6 +45,9 @@
 /// turn on checking rationals for zero, posone, negone in arithmetic multiplication and division operators
 // #define SOPLEX_PERFALT_2b
 
+/// turn on checking rationals for zero, posone, negone before conversion to double and long double
+// #define SOPLEX_PERFALT_3
+
 
 namespace soplex
 {
@@ -581,6 +584,19 @@ Rational& Rational::operator=(const mpq_t &q)
 /// typecasts Rational to double (allows only explicit typecast)
 Rational::operator double() const
 {
+#ifdef SOPLEX_PERFALT_3
+#ifdef SOPLEX_PERFALT_1
+   if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+#else
+   if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+#endif
+      return 0.0;
+   else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+      return 1.0;
+   else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+      return -1.0;
+#endif
+
    return mpq_get_d(this->dpointer->privatevalue);
 }
 
@@ -589,6 +605,19 @@ Rational::operator double() const
 /// typecasts Rational to long double (allows only explicit typecast)
 Rational::operator long double() const
 {
+#ifdef SOPLEX_PERFALT_3
+#ifdef SOPLEX_PERFALT_1
+   if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+#else
+   if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+#endif
+      return 0.0;
+   else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+      return 1.0;
+   else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+      return -1.0;
+#endif
+
    return (long double)mpq_get_d(this->dpointer->privatevalue);
 }
 
