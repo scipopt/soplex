@@ -466,7 +466,9 @@ namespace soplex
       dualScale = Rational::POSONE;
 
       // control progress
-      Real bestViolation = realParam(SoPlex::INFTY);
+      Rational sumMaxViolation;
+      Rational bestViolation = _rationalPosInfty;
+      const Rational violationImprovementFactor = 0.9;
       int numFailedRefinements = 0;
       bool restrictInequalities = true;
 
@@ -575,6 +577,8 @@ namespace soplex
                   // do not change the basis status to FIXED, since this would invalidate the basis for the original LP
                }
             }
+
+            MSG_INFO1( spxout << "Restricted tight rows and columns.\n" );
          }
 #ifndef NDEBUG
          else
@@ -620,17 +624,17 @@ namespace soplex
          }
 
          // check progress
-         Rational sumMaxViolation(boundsViolation);
+         sumMaxViolation = boundsViolation;
          sumMaxViolation += sideViolation;
          sumMaxViolation += redCostViolation;
-         if( double(sumMaxViolation) > double(0.9 * bestViolation) )
+         bestViolation *= violationImprovementFactor;
+         if( sumMaxViolation > bestViolation )
          {
             MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
             numFailedRefinements++;
          }
-
-         if( double(sumMaxViolation) < double(bestViolation) )
-            bestViolation = Real(sumMaxViolation);
+         else
+            bestViolation = sumMaxViolation;
 
          if( numFailedRefinements >= 15 )
          {
