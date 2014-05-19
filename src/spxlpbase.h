@@ -1149,13 +1149,25 @@ public:
          throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
       }
 
-      if( nCols() <= 0 )
-         activity.clear();
-      else
-         activity = primal[0] * colVector(0);
+      int c;
+      for( c = 0; c < nCols() && primal[c] == 0; c++ )
+         ;
 
-      for( int c = 1; c < nCols(); c++ )
-         activity.multAdd(primal[c], colVector(c));
+      if( c >= nCols() )
+      {
+         activity.clear();
+         return;
+      }
+
+      activity = colVector(c);
+      activity *= primal[c];
+      c++;
+
+      for( ; c < nCols(); c++ )
+      {
+         if( primal[c] != 0 )
+            activity.multAdd(primal[c], colVector(c));
+      }
    }
 
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
@@ -1173,13 +1185,25 @@ public:
          throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
       }
 
-      if( nRows() <= 0 )
-         activity.clear();
-      else
-         activity = dual[0] * rowVector(0);
+      int r;
+      for( r = 0; r < nRows() && dual[r] == 0; r++ )
+         ;
 
-      for( int r = 1; r < nRows(); r++ )
-         activity.multAdd(dual[r], rowVector(r));
+      if( r >= nRows() )
+      {
+         activity.clear();
+         return;
+      }
+
+      activity = rowVector(r);
+      activity *= dual[r];
+      r++;
+
+      for( ; r < nRows(); r++ )
+      {
+         if( dual[r] != 0 )
+            activity.multAdd(dual[r], rowVector(r));
+      }
    }
 
    //@}
