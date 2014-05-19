@@ -192,6 +192,15 @@ namespace soplex
       /// add product of two rationals
       Rational& addProduct(const Rational& r, const Rational& s);
 
+      /// subtract product of two rationals
+      Rational& subProduct(const Rational& r, const Rational& s);
+
+      /// add quotient of two rationals, r divided by s
+      Rational& addQuotient(const Rational& r, const Rational& s);
+
+      /// subtract quotient of two rationals, r divided by s
+      Rational& subQuotient(const Rational& r, const Rational& s);
+
       /// inversion
       Rational& invert();
 
