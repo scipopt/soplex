@@ -189,6 +189,9 @@ namespace soplex
       /// division assignment operator for doubles
       Rational& operator/=(const double& r);
 
+      /// add product of two rationals
+      Rational& addProduct(const Rational& r, const Rational& s);
+
       /// inversion
       Rational& invert();
 

@@ -993,6 +993,51 @@ Rational& Rational::operator/=(const double& d)
 
 
 
+/// add product of two rationals
+Rational& Rational::addProduct(const Rational& r, const Rational& s)
+{
+#ifdef SOPLEX_PERFALT_2b
+#ifdef SOPLEX_PERFALT_1
+   if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return *this;
+   else if( mpq_equal(s.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return *this;
+#else
+   if( mpq_sgn(r.dpointer->privatevalue) == 0 )
+      return *this;
+   else if( mpq_sgn(s.dpointer->privatevalue) == 0 )
+      return *this;
+#endif
+   else if( mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+   {
+      mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, s.dpointer->privatevalue);
+      return *this;
+   }
+   else if( mpq_equal(s.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+   {
+      mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
+      return *this;
+   }
+   else if( mpq_equal(r.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+   {
+      mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, s.dpointer->privatevalue);
+      return *this;
+   }
+   else if( mpq_equal(s.dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+   {
+      mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
+      return *this;
+   }
+#endif
+
+   Rational product(r);
+   mpq_mul(product.dpointer->privatevalue, product.dpointer->privatevalue, s.dpointer->privatevalue);
+   mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, product.dpointer->privatevalue);
+   return *this;
+}
+
+
+
 /// inversion
 Rational& Rational::invert()
 {
@@ -2121,6 +2166,15 @@ Rational Rational::operator/(const double& d) const
 Rational& Rational::operator/=(const double& d)
 {
    this->dpointer->privatevalue /= d;
+   return *this;
+}
+
+
+
+/// add product of two rationals
+Rational& Rational::addProduct(const Rational& r, const Rational& s)
+{
+   this->dpointer->privatevalue += r.dpointer->privatevalue * s.dpointer->privatevalue;
    return *this;
 }
 
