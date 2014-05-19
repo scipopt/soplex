@@ -1137,7 +1137,7 @@ public:
    /// Computes activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows
-   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity) const
+   virtual void computePrimalActivity(VectorBase<R>& primal, VectorBase<R>& activity) const
    {
       if( primal.dim() != nCols() )
       {
@@ -1161,7 +1161,7 @@ public:
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns
-   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity) const
+   virtual void computeDualActivity(VectorBase<R>& dual, VectorBase<R>& activity) const
    {
       if( dual.dim() != nRows() )
       {
