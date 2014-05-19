@@ -2204,6 +2204,7 @@ namespace soplex
          _manualUpper = _realLP->upper();
          _manualLhs = _realLP->lhs();
          _manualRhs = _realLP->rhs();
+         _manualObj.reDim(_realLP->nCols());
          _realLP->getObj(_manualObj);
 
          // call rational LP solving with iterative refinement
