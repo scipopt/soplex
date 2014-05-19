@@ -770,11 +770,11 @@ namespace soplex
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             if( primalReal[c] == 1.0 )
-               sol._primal[c] += Rational::POSONE / primalScale;
+               sol._primal[c].addQuotient(Rational::POSONE, primalScale);
             else if( primalReal[c] == -1.0 )
-               sol._primal[c] += Rational::NEGONE / primalScale;
+               sol._primal[c].addQuotient(Rational::NEGONE, primalScale);
             else if( primalReal[c] != 0.0 )
-               sol._primal[c] += Rational(primalReal[c]) / primalScale;
+               sol._primal[c].addQuotient(primalReal[c], primalScale);
 
             // force values of nonbasic variables to bounds
             SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
@@ -834,7 +834,7 @@ namespace soplex
             }
 
             if( dualReal[r] != 0.0 )
-               sol._dual[r] += Rational(dualReal[r]) / dualScale;
+               sol._dual[r].addQuotient(dualReal[r], dualScale);
 
             if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
                || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
@@ -2016,14 +2016,14 @@ namespace soplex
          if( minusRedCost > 0 )
          {
             if( upper[c] < _rationalPosInfty )
-               temp += minusRedCost * upper[c];
+               temp.addProduct(minusRedCost, upper[c]);
             else
                isTempFinite = false;
          }
          else if( minusRedCost < 0 )
          {
             if( lower[c] > _rationalNegInfty )
-               temp += minusRedCost * lower[c];
+               temp.addProduct(minusRedCost, lower[c]);
             else
                isTempFinite = false;
          }
@@ -2111,7 +2111,7 @@ namespace soplex
          if( minusRedCost < 0 && lower[colIdx] > -B && lower[colIdx] > _rationalNegInfty )
          {
             ytransA.clearNum(n);
-            ytransb -= minusRedCost * lower[colIdx];
+            ytransb.subProduct(minusRedCost, lower[colIdx]);
             temp += minusRedCost;
 
             assert(ytransb >= 0);
@@ -2144,7 +2144,7 @@ namespace soplex
          else if( minusRedCost > 0 && upper[colIdx] < B && upper[colIdx] < _rationalPosInfty )
          {
             ytransA.clearNum(n);
-            ytransb -= minusRedCost * upper[colIdx];
+            ytransb.subProduct(minusRedCost, upper[colIdx]);
             temp -= minusRedCost;
 
             assert(ytransb >= 0);
