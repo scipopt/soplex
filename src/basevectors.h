@@ -29,6 +29,9 @@
 #include "dsvectorbase.h"
 #include "svsetbase.h"
 
+// specialized multAdd() for rationals
+// #define SOPLEX_PERFALT_10
+
 namespace soplex
 {
 
@@ -261,7 +264,7 @@ R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
 template < class R >
 template < class S, class T >
 inline
-VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
+VectorBase<R>& VectorBase<R>::multAdd(const S& x, const SVectorBase<T>& vec)
 {
    for( int i = vec.size() - 1; i >= 0; --i )
    {
@@ -274,11 +277,30 @@ VectorBase<R>& VectorBase<R>::multAdd(S x, const SVectorBase<T>& vec)
 
 
 
+#ifdef SOPLEX_PERFALT_10
+/// Addition of scaled vector, specialization for rationals
+template <>
+template <>
+inline
+VectorBase<Rational>& VectorBase<Rational>::multAdd(const Rational& x, const SVectorBase<Rational>& vec)
+{
+   for( int i = vec.size() - 1; i >= 0; --i )
+   {
+      assert(vec.index(i) < dim());
+      val[vec.index(i)].addProduct(x, vec.value(i));
+   }
+
+   return *this;
+}
+#endif
+
+
+
 /// Addition of scaled vector.
 template < class R >
 template < class S, class T >
 inline
-VectorBase<R>& VectorBase<R>::multAdd(S x, const SSVectorBase<T>& vec)
+VectorBase<R>& VectorBase<R>::multAdd(const S& x, const SSVectorBase<T>& vec)
 {
    assert(vec.dim() <= dim());
 

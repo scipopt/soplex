@@ -366,7 +366,7 @@ public:
 
    /// Addition of scaled vector.
    template < class S, class T >
-   VectorBase<R>& multAdd(S x, const VectorBase<T>& vec)
+   VectorBase<R>& multAdd(const S& x, const VectorBase<T>& vec)
    {
       assert(vec.dim() == dimen);
 
@@ -378,11 +378,11 @@ public:
 
    /// Addition of scaled vector.
    template < class S, class T >
-   VectorBase<R>& multAdd(S x, const SVectorBase<T>& vec);
+   VectorBase<R>& multAdd(const S& x, const SVectorBase<T>& vec);
 
    /// Addition of scaled vector.
    template < class S, class T >
-   VectorBase<R>& multAdd(S x, const SSVectorBase<T>& vec);
+   VectorBase<R>& multAdd(const S& x, const SSVectorBase<T>& vec);
 
    //@}
 
