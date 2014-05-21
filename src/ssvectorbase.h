@@ -27,8 +27,6 @@
 #include "idxset.h"
 #include "spxalloc.h"
 
-#define MARKER   1e-100
-
 namespace soplex
 {
 template < class R > class SVectorBase;
