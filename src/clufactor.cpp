@@ -27,7 +27,7 @@ namespace soplex
 /* This number is used to decide wether a value is zero
  * or was explicitly set to zero.
  */
-#define MARKER     1e-100
+#define SOPLEX_FACTOR_MARKER     1e-100
 
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
@@ -1021,7 +1021,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
                y -= x * rval[j];
 
-               p_work[jj] = y + (( y == 0 ) ? MARKER : 0.0 );
+               p_work[jj] = y + (( y == 0 ) ? SOPLEX_FACTOR_MARKER : 0.0 );
             }
          }
 
@@ -4236,7 +4236,7 @@ int CLUFactor::solveUpdateLeft( Real eps, Real* vec, int* nonz, int n )
       else
       {
          y -= x;
-         vec[k] = ( y != 0 ) ? y : MARKER;
+         vec[k] = ( y != 0 ) ? y : SOPLEX_FACTOR_MARKER;
       }
    }
 
@@ -4373,7 +4373,7 @@ int CLUFactor::solveUleft( Real eps,
             else
             {
                y -= x * ( *val++ );
-               rhs[j] = ( y != 0 ) ? y : MARKER;
+               rhs[j] = ( y != 0 ) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4449,7 +4449,7 @@ void CLUFactor::solveUleftNoNZ( Real eps, Real* vec,
             else
             {
                y -= x * ( *val++ );
-               rhs[j] = ( y != 0 ) ? y : MARKER;
+               rhs[j] = ( y != 0 ) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4500,7 +4500,7 @@ int CLUFactor::solveLleftForest( Real eps, Real* vec, int* nonz, int n )
             else
             {
                y -= x * ( *val++ );
-               vec[m] = ( y != 0 ) ? y : MARKER;
+               vec[m] = ( y != 0 ) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4624,7 +4624,7 @@ int CLUFactor::solveLleft( Real eps, Real* vec, int* nonz, int rn )
             else
             {
                y -= x * *val++;
-               vec[m] = ( y != 0 ) ? y : MARKER;
+               vec[m] = ( y != 0 ) ? y : SOPLEX_FACTOR_MARKER;
             }
          }
       }
@@ -4738,7 +4738,7 @@ int CLUFactor::vSolveLright( Real* vec, int* ridx, int rn, Real eps )
             ridx[rn] = n = *idx++;
             rn += ( vec[n] == 0 ) ? 1 : 0;
             vec[n] -= x * ( *val++ );
-            vec[n] += ( vec[n] == 0 ) ? MARKER : 0;
+            vec[n] += ( vec[n] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
          }
       }
    }
@@ -4764,7 +4764,7 @@ int CLUFactor::vSolveLright( Real* vec, int* ridx, int rn, Real eps )
 
          rn += ( vec[j] == 0 ) ? 1 : 0;
          vec[j] -= x;
-         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
+         vec[j] += ( vec[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
       }
    }
 
@@ -4817,8 +4817,8 @@ void CLUFactor::vSolveLright2(
                rn2 += ( y2 == 0 ) ? 1 : 0;
                y -= x * ( *val );
                y2 -= x2 * ( *val++ );
-               vec[n] = y + ( y == 0 ? MARKER : 0 );
-               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+               vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+               vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
             }
          }
          else
@@ -4830,7 +4830,7 @@ void CLUFactor::vSolveLright2(
                y = vec[n];
                rn += ( y == 0 ) ? 1 : 0;
                y -= x * ( *val++ );
-               vec[n] = y + ( y == 0 ? MARKER : 0 );
+               vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
             }
          }
       }
@@ -4848,7 +4848,7 @@ void CLUFactor::vSolveLright2(
                y2 = vec2[n];
                rn2 += ( y2 == 0 ) ? 1 : 0;
                y2 -= x2 * ( *val++ );
-               vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+               vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
             }
          }
    }
@@ -4877,8 +4877,8 @@ void CLUFactor::vSolveLright2(
          rn2 += ( vec2[j] == 0 ) ? 1 : 0;
          vec[j] -= x;
          vec2[j] -= x2;
-         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
-         vec2[j] += ( vec2[j] == 0 ) ? MARKER : 0;
+         vec[j] += ( vec[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+         vec2[j] += ( vec2[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
       }
    }
 
@@ -4943,9 +4943,9 @@ void CLUFactor::vSolveLright3(
                   y -= x * ( *val );
                   y2 -= x2 * ( *val );
                   y3 -= x3 * ( *val++ );
-                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
             else
@@ -4961,8 +4961,8 @@ void CLUFactor::vSolveLright3(
                   rn2 += ( y2 == 0 ) ? 1 : 0;
                   y -= x * ( *val );
                   y2 -= x2 * ( *val++ );
-                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
          }
@@ -4980,8 +4980,8 @@ void CLUFactor::vSolveLright3(
                   rn3 += ( y3 == 0 ) ? 1 : 0;
                   y -= x * ( *val );
                   y3 -= x3 * ( *val++ );
-                  vec[n] = y + ( y == 0 ? MARKER : 0 );
-                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
             else
@@ -4994,7 +4994,7 @@ void CLUFactor::vSolveLright3(
                   y = vec[n];
                   rn += ( y == 0 ) ? 1 : 0;
                   y -= x * ( *val++ );
-                  vec[n] = y + ( y == 0 ? MARKER : 0 );
+                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
       }
@@ -5018,8 +5018,8 @@ void CLUFactor::vSolveLright3(
                   rn3 += ( y3 == 0 ) ? 1 : 0;
                   y2 -= x2 * ( *val );
                   y3 -= x3 * ( *val++ );
-                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
-                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
             else
@@ -5032,7 +5032,7 @@ void CLUFactor::vSolveLright3(
                   y2 = vec2[n];
                   rn2 += ( y2 == 0 ) ? 1 : 0;
                   y2 -= x2 * ( *val++ );
-                  vec2[n] = y2 + ( y2 == 0 ? MARKER : 0 );
+                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
          }
@@ -5051,7 +5051,7 @@ void CLUFactor::vSolveLright3(
                   y3 = vec3[n];
                   rn3 += ( y3 == 0 ) ? 1 : 0;
                   y3 -= x3 * ( *val++ );
-                  vec3[n] = y3 + ( y3 == 0 ? MARKER : 0 );
+                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
                }
             }
    }
@@ -5083,9 +5083,9 @@ void CLUFactor::vSolveLright3(
          vec[j] -= x;
          vec2[j] -= x2;
          vec3[j] -= x3;
-         vec[j] += ( vec[j] == 0 ) ? MARKER : 0;
-         vec2[j] += ( vec2[j] == 0 ) ? MARKER : 0;
-         vec3[j] += ( vec3[j] == 0 ) ? MARKER : 0;
+         vec[j] += ( vec[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+         vec2[j] += ( vec2[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+         vec3[j] += ( vec3[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
       }
    }
 
@@ -5161,7 +5161,7 @@ int CLUFactor::vSolveUright( Real* vec, int* vidx,
             else
             {
                y -= x * ( *val++ );
-               y += ( y == 0 ) ? MARKER : 0;
+               y += ( y == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -5296,7 +5296,7 @@ void CLUFactor::vSolveUrightNoNZ( Real* vec,
             else
             {
                y -= x * ( *val++ );
-               y += ( y == 0 ) ? MARKER : 0;
+               y += ( y == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
                rhs[k] = y;
             }
          }
@@ -5393,7 +5393,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y2 -= x2 * ( *val );
-                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
+                  rhs2[k] = ( y2 != 0 ) ? y2 : SOPLEX_FACTOR_MARKER;
                }
 
                y = rhs[k];
@@ -5411,7 +5411,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y -= x * ( *val++ );
-                  y += ( y == 0 ) ? MARKER : 0;
+                  y += ( y == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -5437,7 +5437,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y -= x * ( *val++ );
-                  y += ( y == 0 ) ? MARKER : 0;
+                  y += ( y == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
                   rhs[k] = y;
                }
             }
@@ -5472,7 +5472,7 @@ int CLUFactor::vSolveUright2(
                else
                {
                   y2 -= x2 * ( *val++ );
-                  rhs2[k] = ( y2 != 0 ) ? y2 : MARKER;
+                  rhs2[k] = ( y2 != 0 ) ? y2 : SOPLEX_FACTOR_MARKER;
                }
             }
          }
@@ -5586,7 +5586,7 @@ int CLUFactor::vSolveUpdateRight( Real* vec, int* ridx, int n, Real eps )
             y = vec[m];
             n += ( y == 0 ) ? 1 : 0;
             y = y - x * ( *val++ );
-            vec[m] = ( y != 0 ) ? y : MARKER;
+            vec[m] = ( y != 0 ) ? y : SOPLEX_FACTOR_MARKER;
          }
       }
    }

@@ -32,6 +32,8 @@
 // specialized multAdd() for rationals
 // #define SOPLEX_PERFALT_10
 
+#define SOPLEX_VECTOR_MARKER   1e-100
+
 namespace soplex
 {
 
@@ -418,7 +420,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
             else
             {
                adjust = true;
-               v[j] = MARKER;
+               v[j] = SOPLEX_VECTOR_MARKER;
             }
          }
          else
@@ -623,21 +625,21 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
             R oldval  = VectorBase<R>::val[elt.idx];
 
             // An old value of exactly 0 means the position is still unused.
-            // It will be used now (either by a new nonzero or by a MARKER),
+            // It will be used now (either by a new nonzero or by a SOPLEX_VECTOR_MARKER),
             // so increase the counter. If oldval != 0, we just
             // change an existing NZ-element, so don't increase the counter.
             if( oldval == 0 )
                ++nonzero_idx;
 
             // Add the current product x[i] * A[i][j]; if oldval was
-            // MARKER before, it does not hurt because MARKER is really small.
+            // SOPLEX_VECTOR_MARKER before, it does not hurt because SOPLEX_VECTOR_MARKER is really small.
             oldval += xi * elt.val;
 
             // If the new value is exactly 0, mark the index as used
             // by setting a value which is nearly 0; otherwise, store
             // the value. Values below epsilon will be removed later.
             if( oldval == 0 )
-               VectorBase<R>::val[elt.idx] = MARKER;
+               VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
             else
                VectorBase<R>::val[elt.idx] = oldval;
          }
