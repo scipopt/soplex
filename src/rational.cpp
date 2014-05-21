@@ -1184,7 +1184,7 @@ bool Rational::isNextTo(const double& d)
 
 
 /// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
-bool Rational::isAdjacentTo(const double& d)
+bool Rational::isAdjacentTo(const double& d) const
 {
    double x = mpq_get_d(this->dpointer->privatevalue);
    double a;
@@ -2332,7 +2332,7 @@ bool Rational::isNextTo(const double& d)
 
 
 /// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
-bool Rational::isAdjacentTo(const double& d)
+bool Rational::isAdjacentTo(const double& d) const
 {
    return (double(this->dpointer->privatevalue) == d);
 }

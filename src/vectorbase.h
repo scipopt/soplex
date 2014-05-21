@@ -184,7 +184,7 @@ public:
    }
 
    /// Return \p n 'th value.
-   R operator[](int n) const
+   const R& operator[](int n) const
    {
       assert(n >= 0 && n < dimen);
       return val[n];

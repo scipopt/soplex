@@ -214,7 +214,7 @@ namespace soplex
       bool isNextTo(const double& d);
 
       /// checks if \p d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
-      bool isAdjacentTo(const double& d);
+      bool isAdjacentTo(const double& d) const;
 
       //@}
 
