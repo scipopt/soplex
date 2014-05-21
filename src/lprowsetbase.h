@@ -101,7 +101,7 @@ public:
    }
 
    /// Returns the lhs of the \p i 'th LPRowBase.
-   R lhs(int i) const
+   const R& lhs(int i) const
    {
       return left[i];
    }
@@ -113,7 +113,7 @@ public:
    }
 
    /// Returns the lhs of the LPRowBase with DataKey \p k in LPRowSetBase.
-   R lhs(const DataKey& k) const
+   const R& lhs(const DataKey& k) const
    {
       return left[number(k)];
    }
@@ -137,7 +137,7 @@ public:
    }
 
    /// Returns the rhs of the \p i 'th LPRowBase.
-   R rhs(int i) const
+   const R& rhs(int i) const
    {
       return right[i];
    }
@@ -149,7 +149,7 @@ public:
    }
 
    /// Returns the rhs of the LPRowBase with DataKey \p k in LPRowSetBase.
-   R rhs(const DataKey& k) const
+   const R& rhs(const DataKey& k) const
    {
       return right[number(k)];
    }

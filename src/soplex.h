@@ -216,13 +216,13 @@ public:
    const VectorRational& rhsRational() const;
 
    /// returns right-hand side of row \p i
-   Rational rhsRational(int i) const;
+   const Rational& rhsRational(int i) const;
 
    /// returns left-hand side vector
    const VectorRational& lhsRational() const;
 
    /// returns left-hand side of row \p i
-   Rational lhsRational(int i) const;
+   const Rational& lhsRational(int i) const;
 
    /// returns inequality type of row \p i
    LPRowRational::Type rowTypeRational(int i) const;
@@ -240,13 +240,13 @@ public:
    const VectorRational& upperRational() const;
 
    /// returns upper bound of column \p i
-   Rational upperRational(int i) const;
+   const Rational& upperRational(int i) const;
 
    /// returns lower bound vector
    const VectorRational& lowerRational() const;
 
    /// returns lower bound of column \p i
-   Rational lowerRational(int i) const;
+   const Rational& lowerRational(int i) const;
 
    /// gets objective function vector
    void getObjRational(VectorRational& obj) const;
@@ -260,7 +260,7 @@ public:
 
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
-   Rational maxObjRational(int i) const;
+   const Rational& maxObjRational(int i) const;
 
    //@}
 

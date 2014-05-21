@@ -212,13 +212,13 @@ public:
    }
 
    ///
-   R rhs(int i) const
+   const R& rhs(int i) const
    {
       return LPRowSetBase<R>::rhs(i);
    }
 
    /// Returns right hand side of row with identifier \p id.
-   R rhs(const SPxRowId& id) const
+   const R& rhs(const SPxRowId& id) const
    {
       return LPRowSetBase<R>::rhs(id);
    }
@@ -230,13 +230,13 @@ public:
    }
 
    ///
-   R lhs(int i) const
+   const R& lhs(int i) const
    {
       return LPRowSetBase<R>::lhs(i);
    }
 
    /// Returns left hand side of row with identifier \p id.
-   R lhs(const SPxRowId& id) const
+   const R& lhs(const SPxRowId& id) const
    {
       return LPRowSetBase<R>::lhs(id);
    }
@@ -328,13 +328,13 @@ public:
    }
 
    /// Returns objective value of column \p i for maximization problem.
-   R maxObj(int i) const
+   const R& maxObj(int i) const
    {
       return LPColSetBase<R>::maxObj(i);
    }
 
    /// Returns objective value of column with identifier \p id for maximization problem.
-   R maxObj(const SPxColId& id) const
+   const R& maxObj(const SPxColId& id) const
    {
       return LPColSetBase<R>::maxObj(id);
    }
@@ -346,13 +346,13 @@ public:
    }
 
    /// Returns upper bound of column \p i.
-   R upper(int i) const
+   const R& upper(int i) const
    {
       return LPColSetBase<R>::upper(i);
    }
 
    /// Returns upper bound of column with identifier \p id.
-   R upper(const SPxColId& id) const
+   const R& upper(const SPxColId& id) const
    {
       return LPColSetBase<R>::upper(id);
    }
@@ -364,13 +364,13 @@ public:
    }
 
    /// Returns lower bound of column \p i.
-   R lower(int i) const
+   const R& lower(int i) const
    {
       return LPColSetBase<R>::lower(i);
    }
 
    /// Returns lower bound of column with identifier \p id.
-   R lower(const SPxColId& id) const
+   const R& lower(const SPxColId& id) const
    {
       return LPColSetBase<R>::lower(id);
    }
@@ -382,7 +382,7 @@ public:
    }
 
    /// Returns the objective function value offset
-   R objOffset() const
+   const R& objOffset() const
    {
       return offset;
    }

@@ -260,7 +260,7 @@ public:
    }
 
    /// Value of \p n 'th nonzero.
-   R value(int n) const
+   const R& value(int n) const
    {
       assert(n >= 0);
       assert(n < size());

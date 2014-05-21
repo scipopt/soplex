@@ -960,7 +960,7 @@ namespace soplex
 
 
    /// returns right-hand side of row \p i
-   Rational SoPlex::rhsRational(int i) const
+   const Rational& SoPlex::rhsRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->rhs(i);
@@ -978,7 +978,7 @@ namespace soplex
 
 
    /// returns left-hand side of row \p i
-   Rational SoPlex::lhsRational(int i) const
+   const Rational& SoPlex::lhsRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->lhs(i);
@@ -1032,7 +1032,7 @@ namespace soplex
 
 
    /// returns upper bound of column \p i
-   Rational SoPlex::upperRational(int i) const
+   const Rational& SoPlex::upperRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->upper(i);
@@ -1050,7 +1050,7 @@ namespace soplex
 
 
    /// returns lower bound of column \p i
-   Rational SoPlex::lowerRational(int i) const
+   const Rational& SoPlex::lowerRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->lower(i);
@@ -1088,7 +1088,7 @@ namespace soplex
 
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
-   Rational SoPlex::maxObjRational(int i) const
+   const Rational& SoPlex::maxObjRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->maxObj(i);

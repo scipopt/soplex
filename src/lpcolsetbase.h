@@ -101,7 +101,7 @@ public:
    }
 
    ///
-   R maxObj(int i) const
+   const R& maxObj(int i) const
    {
       return object[i];
    }
@@ -113,7 +113,7 @@ public:
    }
 
    ///
-   R maxObj(const DataKey& k) const
+   const R& maxObj(const DataKey& k) const
    {
       return object[number(k)];
    }
@@ -137,7 +137,7 @@ public:
    }
 
    ///
-   R lower(int i) const
+   const R& lower(int i) const
    {
       return low[i];
    }
@@ -149,7 +149,7 @@ public:
    }
 
    ///
-   R lower(const DataKey& k) const
+   const R& lower(const DataKey& k) const
    {
       return low[number(k)];
    }
@@ -173,7 +173,7 @@ public:
    }
 
    ///
-   R upper(int i) const
+   const R& upper(int i) const
    {
       return up[i];
    }
@@ -185,7 +185,7 @@ public:
    }
 
    ///
-   R upper(const DataKey& k) const
+   const R& upper(const DataKey& k) const
    {
       return up[number(k)];
    }
