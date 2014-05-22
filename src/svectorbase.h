@@ -454,7 +454,7 @@ public:
    }
 
    /// Scaling.
-   SVectorBase<R>& operator*=(R x)
+   SVectorBase<R>& operator*=(const R& x)
    {
       int n = size();
       Nonzero<R>* e = m_elem;

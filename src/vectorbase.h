@@ -269,7 +269,7 @@ public:
 
    /// Scaling.
    template < class S >
-   VectorBase<R>& operator*=(S x)
+   VectorBase<R>& operator*=(const S& x)
    {
       assert(dim() == dimen);
 
@@ -281,7 +281,7 @@ public:
 
    /// Division.
    template < class S >
-   VectorBase<R>& operator/=(S x)
+   VectorBase<R>& operator/=(const S& x)
    {
       assert(x != 0);
 
