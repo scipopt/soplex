@@ -1022,7 +1022,7 @@ namespace soplex
             }
          }
       }
-      while(!error && !success);
+      while(!error && !success && !stopped);
 
       // restore problem
       _untransformFeasibility(sol, withDualFarkas);
