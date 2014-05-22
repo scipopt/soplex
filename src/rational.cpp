@@ -48,6 +48,8 @@
 /// turn on checking rationals for zero, posone, negone before conversion to double and long double
 // #define SOPLEX_PERFALT_3
 
+/// turn on checking for equality before assigning in operator=()
+// #define SOPLEX_PERFALT_4
 
 namespace soplex
 {
@@ -539,6 +541,11 @@ void Rational::disableListMem()
 /// assignment operator
 Rational& Rational::operator=(const Rational &r)
 {
+#ifdef SOPLEX_PERFALT_4
+   if( mpq_equal(this->dpointer->privatevalue, r.dpointer->privatevalue) != 0 )
+      return *this;
+#endif
+
    *(this->dpointer) = *(r.dpointer);
    return *this;
 }
