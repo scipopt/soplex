@@ -719,10 +719,24 @@ namespace soplex
             if( result != SPxSolver::OPTIMAL )
             {
                restrictInequalities = false;
+
                for( int r = numRowsRational() - 1; r >= 0; r-- )
                {
                   if( lhsRational(r) != rhsRational(r) )
+                  {
+                     if( _basisStatusRows[r] == SPxSolver::FIXED )
+                        _basisStatusRows[r] = (sol._dual[r] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
                      sol._dual[r] = 0;
+                  }
+               }
+
+               for( int c = numColsRational() - 1; c >= 0; c-- )
+               {
+                  if( lowerRational(c) != upperRational(c) )
+                  {
+                     if( _basisStatusCols[c] == SPxSolver::FIXED )
+                        _basisStatusCols[c] = (sol._redCost[c] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
+                  }
                }
 
                continue;
