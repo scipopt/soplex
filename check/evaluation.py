@@ -183,8 +183,10 @@ if check_solu:
                 if value in ['infeasible', 'unbounded']:
                     if not instances[name]['status'] == value:
                         instances[name]['status'] = 'fail'
+                if value == 'unknown':
+                    instances[name]['status'] = 'not verified'
                 elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
-                        instances[name]['status'] = 'inconsistent'
+                    instances[name]['status'] = 'inconsistent'
     solufile.close()
 
 # save dictionary to file later use in compare script
