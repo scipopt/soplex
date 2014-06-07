@@ -185,7 +185,7 @@ if check_solu:
                         instances[name]['status'] = 'fail'
                 if value == 'unknown':
                     instances[name]['status'] = 'not verified'
-                elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value)) > tolerance:
+                elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value),tolerance) > tolerance:
                     instances[name]['status'] = 'inconsistent'
     solufile.close()
 
