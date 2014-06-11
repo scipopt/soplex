@@ -758,8 +758,9 @@ namespace soplex
          // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
 
-         ///@todo maybe compute 1 / primalScale once above and use in this for loop
          int primalSize = 0;
+         Rational primalScaleInverse = primalScale;
+         primalScaleInverse.invert();
          _primalDiff.clear();
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
@@ -818,16 +819,14 @@ namespace soplex
                {
                   int i = _primalDiff.size();
                   _primalDiff.add(c);
-                  _primalDiff.value(i) = primalScale;
-                  _primalDiff.value(i).invert();
+                  _primalDiff.value(i) = primalScaleInverse;
                   sol._primal[c] += _primalDiff.value(i);
                }
                else if( primalReal[c] == -1.0 )
                {
                   int i = _primalDiff.size();
                   _primalDiff.add(c);
-                  _primalDiff.value(i) = primalScale;
-                  _primalDiff.value(i).invert();
+                  _primalDiff.value(i) = primalScaleInverse;
                   _primalDiff.value(i) *= -1;
                   sol._primal[c] += _primalDiff.value(i);
                }
@@ -836,7 +835,7 @@ namespace soplex
                   int i = _primalDiff.size();
                   _primalDiff.add(c);
                   _primalDiff.value(i) = primalReal[c];
-                  _primalDiff.value(i) /= primalScale;
+                  _primalDiff.value(i) *= primalScaleInverse;
                   sol._primal[c] += _primalDiff.value(i);
                }
             }
