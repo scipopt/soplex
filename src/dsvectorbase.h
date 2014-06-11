@@ -221,10 +221,17 @@ public:
    }
 
    /// Append one nonzero \p (i,v).
-   void add(int i, R v)
+   void add(int i, const R& v)
    {
       makeMem(1);
       SVectorBase<R>::add(i, v);
+   }
+
+   /// Append one uninitialized nonzero.
+   void add(int i)
+   {
+      makeMem(1);
+      SVectorBase<R>::add(i);
    }
 
    /// Append \p n nonzeros.

@@ -421,6 +421,7 @@ namespace soplex
          else
             sol._primal[c] = primalReal[c];
       }
+      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
 
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
@@ -485,7 +486,6 @@ namespace soplex
          }
 
          // compute violation of sides
-         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
          sideViolation = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
@@ -758,7 +758,9 @@ namespace soplex
          // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
 
-         int numCorrectedPrimals = 0;
+         ///@todo maybe compute 1 / primalScale once above and use in this for loop
+         int primalSize = 0;
+         _primalDiff.clear();
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             // force values of nonbasic variables to bounds
@@ -768,16 +770,22 @@ namespace soplex
             {
                if( sol._primal[c] != lowerRational(c) )
                {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = lowerRational(c);
+                  _primalDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = lowerRational(c);
-                  numCorrectedPrimals++;
                }
             }
             else if( basisStatusCol == SPxSolver::ON_UPPER )
             {
                if( sol._primal[c] != upperRational(c) )
                {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = upperRational(c);
+                  _primalDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = upperRational(c);
-                  numCorrectedPrimals++;
                }
             }
             else if( basisStatusCol == SPxSolver::FIXED )
@@ -786,37 +794,69 @@ namespace soplex
 
                if( sol._primal[c] != lowerRational(c) )
                {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = lowerRational(c);
+                  _primalDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = lowerRational(c);
-                  numCorrectedPrimals++;
                }
             }
             else if( basisStatusCol == SPxSolver::ZERO )
             {
                if( sol._primal[c] != 0 )
                {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = sol._primal[c];
+                  _primalDiff.value(i) *= -1;
                   sol._primal[c] = 0;
-                  numCorrectedPrimals++;
                }
             }
             else
             {
                if( primalReal[c] == 1.0 )
                {
-                  sol._primal[c].addQuotient(Rational::POSONE, primalScale);
-                  numCorrectedPrimals++;
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = primalScale;
+                  _primalDiff.value(i).invert();
+                  sol._primal[c] += _primalDiff.value(i);
                }
                else if( primalReal[c] == -1.0 )
                {
-                  sol._primal[c].addQuotient(Rational::NEGONE, primalScale);
-                  numCorrectedPrimals++;
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = primalScale;
+                  _primalDiff.value(i).invert();
+                  _primalDiff.value(i) *= -1;
+                  sol._primal[c] += _primalDiff.value(i);
                }
                else if( primalReal[c] != 0.0 )
                {
-                  sol._primal[c].addQuotient(primalReal[c], primalScale);
-                  numCorrectedPrimals++;
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = primalReal[c];
+                  _primalDiff.value(i) /= primalScale;
+                  sol._primal[c] += _primalDiff.value(i);
                }
             }
+
+            if( sol._primal[c] != 0 )
+               primalSize++;
          }
+
+         if( _primalDiff.size() < primalSize )
+            _rationalLP->updatePrimalActivity(_primalDiff, sol._slacks);
+         else
+            _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
+
+#ifndef NDEBUG
+         {
+            DVectorRational activity(numRowsRational());
+            _rationalLP->computePrimalActivity(sol._primal, activity);
+            assert(sol._slacks == activity);
+         }
+#endif
 
          // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );
@@ -877,9 +917,9 @@ namespace soplex
             }
          }
 
-         if( numCorrectedPrimals + numCorrectedDuals > 0 )
+         if( _primalDiff.size() + numCorrectedDuals > 0 )
          {
-            MSG_INFO2( spxout << "Corrected " << numCorrectedPrimals << " primal variables and " << numCorrectedDuals << " dual values.\n" );
+            MSG_INFO2( spxout << "Corrected " << _primalDiff.size() << " primal variables and " << numCorrectedDuals << " dual values.\n" );
          }
 
          // refinement was successful; try with fixed inequalities during next run

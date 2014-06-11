@@ -1227,6 +1227,7 @@ private:
    DVectorRational _modLhs;
    DVectorRational _modRhs;
    DVectorRational _modObj;
+   DSVectorRational _primalDiff;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
    bool _storedBasis;

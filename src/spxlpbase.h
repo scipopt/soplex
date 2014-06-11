@@ -1170,6 +1170,24 @@ public:
       }
    }
 
+   /// Updates activity of the rows for a given primal vector; activity does not need to be zero
+   /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
+   ///        dimension of the activity vector does not match the number of rows
+   virtual void updatePrimalActivity(const SVectorBase<R>& primal, VectorBase<R>& activity) const
+   {
+      if( activity.dim() != nRows() )
+      {
+         throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+      }
+
+      for( int i = primal.size() - 1; i >= 0; i-- )
+      {
+         assert(primal.index(i) >= 0);
+         assert(primal.index(i) < nCols());
+         activity.multAdd(primal.value(i), colVector(primal.index(i)));
+      }
+   }
+
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns

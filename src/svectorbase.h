@@ -269,7 +269,7 @@ public:
    }
 
    /// Append one nonzero \p (i,v).
-   void add(int i, R v)
+   void add(int i, const R& v)
    {
       assert(m_elem != 0);
       assert(size() < max());
@@ -278,6 +278,20 @@ public:
 
       m_elem[n].idx = i;
       m_elem[n].val = v;
+      set_size( n + 1 );
+
+      assert(size() <= max());
+   }
+
+   /// Append one uninitialized nonzero.
+   void add(int i)
+   {
+      assert(m_elem != 0);
+      assert(size() < max());
+
+      int n = size();
+
+      m_elem[n].idx = i;
       set_size( n + 1 );
 
       assert(size() <= max());
