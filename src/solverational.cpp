@@ -1596,7 +1596,7 @@ namespace soplex
 
          _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver::BASIC && _basisStatusRows[numOrigRows] == SPxSolver::BASIC);
          _basisStatusCols.reSize(numOrigCols);
-         _basisStatusCols.reSize(numOrigRows);
+         _basisStatusRows.reSize(numOrigRows);
       }
       else if( boolParam(SoPlex::TESTDUALINF) && tau < _rationalFeastol )
       {
