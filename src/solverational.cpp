@@ -394,71 +394,50 @@ namespace soplex
       }
 
       // store floating-point solution of original LP as current rational solution and ensure that solution vectors have
-      // right dimension
-      sol._primal = primalReal;
+      // right dimension; ensure that solution is aligned with basis
+      sol._primal.reDim(numColsRational(), false);
       sol._slacks.reDim(numRowsRational(), false);
-      sol._dual = dualReal;
+      sol._dual.reDim(numRowsRational(), false);
       sol._redCost.reDim(numColsRational(), false);
       sol._hasPrimal = true;
       sol._hasDual = true;
       _hasBasis = true;
 
-      // align primal solution with basis
-      int numAdjustedBounds = 0;
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
          SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
 
-         if( basisStatusCol == SPxSolver::ON_LOWER && sol._primal[c] != lowerRational(c) )
-         {
+         if( basisStatusCol == SPxSolver::ON_LOWER )
             sol._primal[c] = lowerRational(c);
-            numAdjustedBounds++;
-         }
-         else if( basisStatusCol == SPxSolver::ON_UPPER && sol._primal[c] != upperRational(c) )
-         {
+         else if( basisStatusCol == SPxSolver::ON_UPPER )
             sol._primal[c] = upperRational(c);
-            numAdjustedBounds++;
-         }
          else if( basisStatusCol == SPxSolver::FIXED )
          {
             assert(lowerRational(c) == upperRational(c));
-
-            if( sol._primal[c] != lowerRational(c) )
-            {
-               sol._primal[c] = lowerRational(c);
-               numAdjustedBounds++;
-            }
+            sol._primal[c] = lowerRational(c);
          }
-         else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
-         {
+         else if( basisStatusCol == SPxSolver::ZERO )
             sol._primal[c] = 0;
-            numAdjustedBounds++;
-         }
+         else
+            sol._primal[c] = primalReal[c];
       }
 
-      // align dual solution with basis
-      int numAdjustedDuals = 0;
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
          SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
 
-         if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
-            || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
-            || (basisStatusRow == SPxSolver::ZERO && sol._dual[r] != 0)
-            || (basisStatusRow == SPxSolver::BASIC && sol._dual[r] != 0) )
+         if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC
+            || (basisStatusRow == SPxSolver::ON_LOWER && dualReal[r] < 0)
+            || (basisStatusRow == SPxSolver::ON_UPPER && dualReal[r] > 0) )
          {
             sol._dual[r] = 0;
-            numAdjustedDuals++;
          }
-         else if( basisStatusRow == SPxSolver::FIXED )
+         else
          {
-            assert(lhsRational(r) == rhsRational(r));
+            sol._dual[r] = dualReal[r];
          }
-      }
 
-      if( numAdjustedBounds + numAdjustedDuals > 0 )
-      {
-         MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
+         assert(basisStatusRow != SPxSolver::FIXED || lhsRational(r) == rhsRational(r));
       }
 
       // initial scaling factors are one
@@ -769,8 +748,7 @@ namespace soplex
             unbounded = true;
             return;
          case SPxSolver::ABORT_TIME:
-         case SPxSolver::ABORT_ITER:
-            stopped = true;
+         case SPxSolver::ABORT_ITER: stopped = true;
             return;
          default:
             error = true;
@@ -780,28 +758,27 @@ namespace soplex
          // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
 
-         numAdjustedBounds = 0;
+         int numCorrectedPrimals = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
-            if( primalReal[c] == 1.0 )
-               sol._primal[c].addQuotient(Rational::POSONE, primalScale);
-            else if( primalReal[c] == -1.0 )
-               sol._primal[c].addQuotient(Rational::NEGONE, primalScale);
-            else if( primalReal[c] != 0.0 )
-               sol._primal[c].addQuotient(primalReal[c], primalScale);
-
             // force values of nonbasic variables to bounds
             SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
 
-            if( basisStatusCol == SPxSolver::ON_LOWER && sol._primal[c] != lowerRational(c) )
+            if( basisStatusCol == SPxSolver::ON_LOWER )
             {
-               sol._primal[c] = lowerRational(c);
-               numAdjustedBounds++;
+               if( sol._primal[c] != lowerRational(c) )
+               {
+                  sol._primal[c] = lowerRational(c);
+                  numCorrectedPrimals++;
+               }
             }
-            else if( basisStatusCol == SPxSolver::ON_UPPER && sol._primal[c] != upperRational(c) )
+            else if( basisStatusCol == SPxSolver::ON_UPPER )
             {
-               sol._primal[c] = upperRational(c);
-               numAdjustedBounds++;
+               if( sol._primal[c] != upperRational(c) )
+               {
+                  sol._primal[c] = upperRational(c);
+                  numCorrectedPrimals++;
+               }
             }
             else if( basisStatusCol == SPxSolver::FIXED )
             {
@@ -810,20 +787,41 @@ namespace soplex
                if( sol._primal[c] != lowerRational(c) )
                {
                   sol._primal[c] = lowerRational(c);
-                  numAdjustedBounds++;
+                  numCorrectedPrimals++;
                }
             }
-            else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
+            else if( basisStatusCol == SPxSolver::ZERO )
             {
-               sol._primal[c] = 0;
-               numAdjustedBounds++;
+               if( sol._primal[c] != 0 )
+               {
+                  sol._primal[c] = 0;
+                  numCorrectedPrimals++;
+               }
+            }
+            else
+            {
+               if( primalReal[c] == 1.0 )
+               {
+                  sol._primal[c].addQuotient(Rational::POSONE, primalScale);
+                  numCorrectedPrimals++;
+               }
+               else if( primalReal[c] == -1.0 )
+               {
+                  sol._primal[c].addQuotient(Rational::NEGONE, primalScale);
+                  numCorrectedPrimals++;
+               }
+               else if( primalReal[c] != 0.0 )
+               {
+                  sol._primal[c].addQuotient(primalReal[c], primalScale);
+                  numCorrectedPrimals++;
+               }
             }
          }
 
          // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );
 
-         numAdjustedDuals = 0;
+         int numCorrectedDuals = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
@@ -847,26 +845,41 @@ namespace soplex
                }
             }
 
-            if( dualReal[r] != 0.0 )
-               sol._dual[r].addQuotient(dualReal[r], dualScale);
-
-            if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
-               || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
-               || (basisStatusRow == SPxSolver::ZERO && sol._dual[r] != 0)
-               || (basisStatusRow == SPxSolver::BASIC && sol._dual[r] != 0) )
+            if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC )
             {
-               sol._dual[r] = 0;
-               numAdjustedDuals++;
+               if( sol._dual[r] != 0 )
+               {
+                  sol._dual[r] = 0;
+                  numCorrectedDuals++;
+               }
             }
-            else if( basisStatusRow == SPxSolver::FIXED )
+            else
             {
-               assert(lhsRational(r) == rhsRational(r));
+               if( dualReal[r] != 0.0 )
+               {
+                  sol._dual[r].addQuotient(dualReal[r], dualScale);
+
+                  if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
+                     || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0) )
+                  {
+                     sol._dual[r] = 0;
+                     numCorrectedDuals++;
+                  }
+               }
+               else
+               {
+                  // if the dual is not changed, its sign should have been corrected already in the previous iteration
+                  assert(basisStatusRow != SPxSolver::ON_LOWER || sol._dual[r] >= 0);
+                  assert(basisStatusRow != SPxSolver::ON_UPPER || sol._dual[r] <= 0);
+               }
+
+               assert(basisStatusRow != SPxSolver::FIXED || lhsRational(r) == rhsRational(r));
             }
          }
 
-         if( numAdjustedBounds + numAdjustedDuals > 0 )
+         if( numCorrectedPrimals + numCorrectedDuals > 0 )
          {
-            MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
+            MSG_INFO2( spxout << "Corrected " << numCorrectedPrimals << " primal variables and " << numCorrectedDuals << " dual values.\n" );
          }
 
          // refinement was successful; try with fixed inequalities during next run
