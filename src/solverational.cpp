@@ -844,18 +844,20 @@ namespace soplex
                primalSize++;
          }
 
+         // update or recompute slacks depending on which looks faster
          if( _primalDiff.size() < primalSize )
-            _rationalLP->updatePrimalActivity(_primalDiff, sol._slacks);
+         {
+            _rationalLP->addPrimalActivity(_primalDiff, sol._slacks);
+#ifndef NDEBUG
+            {
+               DVectorRational activity(numRowsRational());
+               _rationalLP->computePrimalActivity(sol._primal, activity);
+               assert(sol._slacks == activity);
+            }
+#endif
+         }
          else
             _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-
-#ifndef NDEBUG
-         {
-            DVectorRational activity(numRowsRational());
-            _rationalLP->computePrimalActivity(sol._primal, activity);
-            assert(sol._slacks == activity);
-         }
-#endif
 
          // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );

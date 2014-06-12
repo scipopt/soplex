@@ -1173,7 +1173,7 @@ public:
    /// Updates activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows
-   virtual void updatePrimalActivity(const SVectorBase<R>& primal, VectorBase<R>& activity) const
+   virtual void addPrimalActivity(const SVectorBase<R>& primal, VectorBase<R>& activity) const
    {
       if( activity.dim() != nRows() )
       {
