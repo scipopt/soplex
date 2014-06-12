@@ -4174,7 +4174,7 @@ namespace soplex
 
       // type of LU update
       case SoPlex::FACTOR_UPDATE_TYPE:
-         if( value != SoPlex::FACTOR_UPDATE_TYPE_ETA || value != SoPlex::FACTOR_UPDATE_TYPE_FT )
+         if( value != SoPlex::FACTOR_UPDATE_TYPE_ETA && value != SoPlex::FACTOR_UPDATE_TYPE_FT )
             return false;
          _slufactor.setUtype(value == SoPlex::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
          break;
