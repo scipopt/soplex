@@ -311,6 +311,23 @@ VectorBase<Rational>& VectorBase<Rational>::multAdd(const Rational& x, const SVe
 
    return *this;
 }
+
+
+
+/// Subtraction of scaled vector, specialization for rationals
+template <>
+template <>
+inline
+VectorBase<Rational>& VectorBase<Rational>::multSub(const Rational& x, const SVectorBase<Rational>& vec)
+{
+   for( int i = vec.size() - 1; i >= 0; --i )
+   {
+      assert(vec.index(i) < dim());
+      val[vec.index(i)].subProduct(x, vec.value(i));
+   }
+
+   return *this;
+}
 #endif
 
 
