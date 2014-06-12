@@ -195,12 +195,12 @@ public:
    Private& operator=(const long double& r)
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      if( r == (long double)(1.0) )
+      if( r == (long double)(0.0) )
+         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      else if( r == (long double)(1.0) )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
       else if( r == (long double)(-1.0) )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      else if( r == (long double)(0.0) )
-         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
       else
          mpq_set_d(this->privatevalue, double(r));
 
@@ -211,12 +211,12 @@ public:
    Private& operator=(const double& r)
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      if( r == 1.0 )
+      if( r == 0.0 )
+         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      else if( r == 1.0 )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
       else if( r == -1.0 )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      else if( r == 0.0 )
-         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
       else
          mpq_set_d(privatevalue, r);
 
@@ -227,12 +227,12 @@ public:
    Private& operator=(const int& i)
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
-      if( i == 1 )
+      if( i == 0 )
+         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      else if( i == 1 )
          mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
       else if( i == -1 )
          mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
-      else if( i == 0 )
-         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
       else
          mpq_set_si(privatevalue, i, 1);
 
@@ -661,9 +661,13 @@ Rational& Rational::operator+=(const Rational& r)
 #ifdef SOPLEX_PERFALT_1
    if( mpq_sgn(r.dpointer->privatevalue) == 0 )
       return *this;
+   else if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+      return (*this = r);
 #else
    if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
       return *this;
+   else if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return (*this = r);
 #endif
 #endif
 
@@ -680,6 +684,16 @@ Rational Rational::operator+(const double& d) const
       return *this;
    else
    {
+#ifdef SOPLEX_PERFALT_2a
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return d;
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return d;
+#endif
+#endif
+
       Rational retval(d);
       mpq_add(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
       return retval;
@@ -697,6 +711,16 @@ Rational& Rational::operator+=(const double& d)
       return (*this += Rational::NEGONE);
    else if( d != 0.0 )
    {
+#ifdef SOPLEX_PERFALT_2a
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return (*this = d);
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return (*this = d);
+#endif
+#endif
+
       Rational retval(d);
       mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
    }
@@ -737,9 +761,13 @@ Rational& Rational::operator-=(const Rational& r)
 #ifdef SOPLEX_PERFALT_1
    if( mpq_sgn(r.dpointer->privatevalue) == 0 )
       return *this;
+   else if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+      return (*this = -r);
 #else
    if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
       return *this;
+   else if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return (*this = -r);
 #endif
 #endif
 
@@ -756,6 +784,16 @@ Rational Rational::operator-(const double& d) const
       return *this;
    else
    {
+#ifdef SOPLEX_PERFALT_2a
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return -d;
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return -d;
+#endif
+#endif
+
       Rational retval(d);
       mpq_sub(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
       return retval;
@@ -774,6 +812,16 @@ Rational& Rational::operator-=(const double& d)
       return (*this -= Rational::NEGONE);
    else if( d != 0.0 )
    {
+#ifdef SOPLEX_PERFALT_2a
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return (*this = -d);
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return (*this = -d);
+#endif
+#endif
+
       Rational retval(d);
       mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
    }
@@ -867,6 +915,20 @@ Rational Rational::operator*(const double& d) const
    }
    else
    {
+#ifdef SOPLEX_PERFALT_2b
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return Rational::ZERO;
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return Rational::ZERO;
+#endif
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+         return d;
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+         return -d;
+#endif
+
       Rational retval(d);
       mpq_mul(retval.dpointer->privatevalue, retval.dpointer->privatevalue, this->dpointer->privatevalue);
       return retval;
@@ -888,7 +950,29 @@ Rational& Rational::operator*=(const double& d)
       return *this;
    }
    else
-      return (*this *= Rational(d));
+   {
+#ifdef SOPLEX_PERFALT_2b
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return *this;
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return *this;
+#endif
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+         return (*this = d);
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+      {
+         *this = d;
+         mpq_neg(this->dpointer->privatevalue, this->dpointer->privatevalue);
+         return *this;
+      }
+#endif
+
+      Rational retval(d);
+      mpq_mul(this->dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+      return *this;
+   }
 }
 
 
@@ -976,6 +1060,29 @@ Rational Rational::operator/(const double& d) const
       return -(*this);
    else
    {
+#ifdef SOPLEX_PERFALT_2b
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return Rational::ZERO;
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return Rational::ZERO;
+#endif
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+      {
+         Rational retval(d);
+         retval.invert();
+         return retval;
+      }
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+      {
+         Rational retval(d);
+         retval.invert();
+         mpq_neg(retval.dpointer->privatevalue, retval.dpointer->privatevalue);
+         return retval;
+      }
+#endif
+
       Rational retval(d);
       mpq_div(retval.dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
       return retval;
@@ -995,7 +1102,33 @@ Rational& Rational::operator/=(const double& d)
       return *this;
    }
    else
-      return (*this /= Rational(d));
+   {
+#ifdef SOPLEX_PERFALT_2b
+#ifdef SOPLEX_PERFALT_1
+      if( mpq_sgn(this->dpointer->privatevalue) == 0 )
+         return *this;
+#else
+      if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+         return *this;
+#endif
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+      {
+         *this = d;
+         this->invert();
+         return *this;
+      }
+      else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
+      {
+         *this = -d;
+         this->invert();
+         return *this;
+      }
+#endif
+
+      Rational retval(d);
+      mpq_div(this->dpointer->privatevalue, this->dpointer->privatevalue, retval.dpointer->privatevalue);
+      return *this;
+   }
 }
 
 
@@ -1004,18 +1137,7 @@ Rational& Rational::operator/=(const double& d)
 Rational& Rational::addProduct(const Rational& r, const Rational& s)
 {
 #ifdef SOPLEX_PERFALT_2b
-#ifdef SOPLEX_PERFALT_1
-   if( mpq_sgn(r.dpointer->privatevalue) == 0 )
-      return *this;
-   else if( mpq_sgn(s.dpointer->privatevalue) == 0 )
-      return *this;
-#else
-   if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
-      return *this;
-   else if( mpq_equal(s.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
-      return *this;
-#endif
-   else if( mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+   if( mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
    {
       mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, s.dpointer->privatevalue);
       return *this;
@@ -1035,6 +1157,19 @@ Rational& Rational::addProduct(const Rational& r, const Rational& s)
       mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
       return *this;
    }
+#if 0 // currently, SoPlex calls this method only with nonzero r and s, hence we do not check this case
+#ifdef SOPLEX_PERFALT_1
+   else if( mpq_sgn(r.dpointer->privatevalue) == 0 )
+      return *this;
+   else if( mpq_sgn(s.dpointer->privatevalue) == 0 )
+      return *this;
+#else
+   else if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return *this;
+   else if( mpq_equal(s.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return *this;
+#endif
+#endif
 #endif
 
    Rational product(r);
@@ -1049,17 +1184,6 @@ Rational& Rational::addProduct(const Rational& r, const Rational& s)
 Rational& Rational::subProduct(const Rational& r, const Rational& s)
 {
 #ifdef SOPLEX_PERFALT_2b
-#ifdef SOPLEX_PERFALT_1
-   if( mpq_sgn(r.dpointer->privatevalue) == 0 )
-      return *this;
-   else if( mpq_sgn(s.dpointer->privatevalue) == 0 )
-      return *this;
-#else
-   if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
-      return *this;
-   else if( mpq_equal(s.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
-      return *this;
-#endif
    else if( mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
    {
       mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, s.dpointer->privatevalue);
@@ -1080,6 +1204,19 @@ Rational& Rational::subProduct(const Rational& r, const Rational& s)
       mpq_add(this->dpointer->privatevalue, this->dpointer->privatevalue, r.dpointer->privatevalue);
       return *this;
    }
+#if 0 // currently, SoPlex calls this method only with nonzero r and s, hence we do not check this case
+#ifdef SOPLEX_PERFALT_1
+   if( mpq_sgn(r.dpointer->privatevalue) == 0 )
+      return *this;
+   else if( mpq_sgn(s.dpointer->privatevalue) == 0 )
+      return *this;
+#else
+   if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return *this;
+   else if( mpq_equal(s.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
+      return *this;
+#endif
+#endif
 #endif
 
    Rational product(r);
