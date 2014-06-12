@@ -279,6 +279,23 @@ VectorBase<R>& VectorBase<R>::multAdd(const S& x, const SVectorBase<T>& vec)
 
 
 
+/// Subtraction of scaled vector.
+template < class R >
+template < class S, class T >
+inline
+VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
+{
+   for( int i = vec.size() - 1; i >= 0; --i )
+   {
+      assert(vec.index(i) < dim());
+      val[vec.index(i)] -= x * vec.value(i);
+   }
+
+   return *this;
+}
+
+
+
 #ifdef SOPLEX_PERFALT_10
 /// Addition of scaled vector, specialization for rationals
 template <>

@@ -423,6 +423,7 @@ namespace soplex
       }
       _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
 
+      int dualSize = 0;
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
          SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
@@ -436,10 +437,18 @@ namespace soplex
          else
          {
             sol._dual[r] = dualReal[r];
+            if( dualReal[r] != 0.0 )
+               dualSize++;
          }
 
          assert(basisStatusRow != SPxSolver::FIXED || lhsRational(r) == rhsRational(r));
       }
+      // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
+      // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
+      // afterwards
+      sol._redCost = _rationalLP->maxObj();
+      sol._redCost *= -1;
+      _rationalLP->subDualActivity(sol._dual, sol._redCost);
 
       // initial scaling factors are one
       primalScale = Rational::POSONE;
@@ -509,9 +518,6 @@ namespace soplex
          }
 
          // compute reduced costs and reduced cost violation
-         _rationalLP->computeDualActivity(sol._dual, sol._redCost);
-         sol._redCost += _rationalLP->maxObj();
-         sol._redCost *= -1;
          redCostViolation = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
@@ -699,13 +705,23 @@ namespace soplex
             {
                restrictInequalities = false;
 
+               _dualDiff.clear();
                for( int r = numRowsRational() - 1; r >= 0; r-- )
                {
                   if( lhsRational(r) != rhsRational(r) )
                   {
                      if( _basisStatusRows[r] == SPxSolver::FIXED )
                         _basisStatusRows[r] = (sol._dual[r] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
-                     sol._dual[r] = 0;
+
+                     if( sol._dual[r] != 0 )
+                     {
+                        int i = _dualDiff.size();
+                        _dualDiff.add(r);
+                        _dualDiff.value(i) = sol._dual[r];
+                        sol._dual[r] = 0;
+                        dualSize--;
+                        assert(dualSize >= 0);
+                     }
                   }
                }
 
@@ -716,6 +732,29 @@ namespace soplex
                      if( _basisStatusCols[c] == SPxSolver::FIXED )
                         _basisStatusCols[c] = (sol._redCost[c] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
                   }
+               }
+
+               // update or recompute reduced cost values depending on which looks faster; adding one to the length of
+               // the dual vector accounts for the objective function vector
+               if( _dualDiff.size() < dualSize + 1 )
+               {
+                  _rationalLP->addDualActivity(_dualDiff, sol._redCost);
+#ifndef NDEBUG
+                  {
+                     DVectorRational activity(_rationalLP->maxObj());
+                     activity *= -1;
+                     _rationalLP->subDualActivity(sol._dual, activity);
+                  }
+#endif
+               }
+               else
+               {
+                  // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
+                  // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
+                  // afterwards
+                  sol._redCost = _rationalLP->maxObj();
+                  sol._redCost *= -1;
+                  _rationalLP->subDualActivity(sol._dual, sol._redCost);
                }
 
                continue;
@@ -862,7 +901,11 @@ namespace soplex
          // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );
 
-         int numCorrectedDuals = 0;
+         Rational dualScaleInverseNeg = dualScale;
+         dualScaleInverseNeg.invert();
+         dualScaleInverseNeg *= -1;
+         _dualDiff.clear();
+         dualSize = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
@@ -890,37 +933,74 @@ namespace soplex
             {
                if( sol._dual[r] != 0 )
                {
+                  int i = _dualDiff.size();
+                  _dualDiff.add(r);
+                  _dualDiff.value(i) = sol._dual[r];
                   sol._dual[r] = 0;
-                  numCorrectedDuals++;
                }
             }
             else
             {
                if( dualReal[r] != 0.0 )
                {
-                  sol._dual[r].addQuotient(dualReal[r], dualScale);
+                  int i = _dualDiff.size();
+                  _dualDiff.add(r);
+                  _dualDiff.value(i) = dualReal[r];
+                  _dualDiff.value(i) *= dualScaleInverseNeg;
+                  sol._dual[r] -= _dualDiff.value(i);
 
                   if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
                      || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0) )
                   {
+                     _dualDiff.value(i) += sol._dual[r];
                      sol._dual[r] = 0;
-                     numCorrectedDuals++;
                   }
+                  // we do not check whether the dual value is nonzero, because it probably is; this gives us an
+                  // overestimation of the number of nonzeros in the dual solution
+                  else
+                     dualSize++;
                }
                else
                {
                   // if the dual is not changed, its sign should have been corrected already in the previous iteration
                   assert(basisStatusRow != SPxSolver::ON_LOWER || sol._dual[r] >= 0);
                   assert(basisStatusRow != SPxSolver::ON_UPPER || sol._dual[r] <= 0);
+
+                  // we do not check whether the dual value is nonzero, because it probably is; this gives us an
+                  // overestimation of the number of nonzeros in the dual solution
+                  dualSize++;
                }
 
                assert(basisStatusRow != SPxSolver::FIXED || lhsRational(r) == rhsRational(r));
             }
          }
 
-         if( _primalDiff.size() + numCorrectedDuals > 0 )
+         // update or recompute reduced cost values depending on which looks faster; adding one to the length of the
+         // dual vector accounts for the objective function vector
+         if( _dualDiff.size() < dualSize + 1 )
          {
-            MSG_INFO2( spxout << "Corrected " << _primalDiff.size() << " primal variables and " << numCorrectedDuals << " dual values.\n" );
+            _rationalLP->addDualActivity(_dualDiff, sol._redCost);
+#ifndef NDEBUG
+            {
+               DVectorRational activity(_rationalLP->maxObj());
+               activity *= -1;
+               _rationalLP->subDualActivity(sol._dual, activity);
+            }
+#endif
+         }
+         else
+         {
+            // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
+            // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
+            // afterwards
+            sol._redCost = _rationalLP->maxObj();
+            sol._redCost *= -1;
+            _rationalLP->subDualActivity(sol._dual, sol._redCost);
+         }
+
+         if( _primalDiff.size() + _dualDiff.size() > 0 )
+         {
+            MSG_INFO2( spxout << "Corrected " << _primalDiff.size() << " primal variables and " << _dualDiff.size() << " dual values.\n" );
          }
 
          // refinement was successful; try with fixed inequalities during next run

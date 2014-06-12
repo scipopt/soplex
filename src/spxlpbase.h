@@ -1224,6 +1224,46 @@ public:
       }
    }
 
+   /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
+   ///        the activity vector does not match the number of columns
+   virtual void addDualActivity(const SVectorBase<R>& dual, VectorBase<R>& activity) const
+   {
+      if( activity.dim() != nCols() )
+      {
+         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      }
+
+      for( int i = dual.size() - 1; i >= 0; i-- )
+      {
+         assert(dual.index(i) >= 0);
+         assert(dual.index(i) < nRows());
+         activity.multAdd(dual.value(i), rowVector(dual.index(i)));
+      }
+   }
+
+   /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
+   ///        the activity vector does not match the number of columns
+   virtual void subDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity) const
+   {
+      if( dual.dim() != nRows() )
+      {
+         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+      }
+
+      if( activity.dim() != nCols() )
+      {
+         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      }
+
+      for( int r = 0; r < nRows(); r++ )
+      {
+         if( dual[r] != 0 )
+            activity.multSub(dual[r], rowVector(r));
+      }
+   }
+
    //@}
 
    // ------------------------------------------------------------------------------------------------------------------
