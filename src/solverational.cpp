@@ -464,60 +464,63 @@ namespace soplex
       // refinement loop
       do
       {
-         // decrement minRounds counter
-         minRounds--;
-
-         MSG_DEBUG( spxout << "Computing violations.\n" );
-
-         // compute violation of bounds
-         boundsViolation = 0;
-         for( int c = numColsRational() - 1; c >= 0; c-- )
+         if( restrictInequalities )
          {
-            // lower bound
-            _modLower[c] = lowerRational(c);
+            // decrement minRounds counter
+            minRounds--;
 
-            if( _modLower[c] > _rationalNegInfty )
+            MSG_DEBUG( spxout << "Computing violations.\n" );
+
+            // compute violation of bounds
+            boundsViolation = 0;
+            for( int c = numColsRational() - 1; c >= 0; c-- )
             {
-               _modLower[c] -= sol._primal[c];
-               if( _modLower[c] > boundsViolation )
-                  boundsViolation = _modLower[c];
+               // lower bound
+               _modLower[c] = lowerRational(c);
+
+               if( _modLower[c] > _rationalNegInfty )
+               {
+                  _modLower[c] -= sol._primal[c];
+                  if( _modLower[c] > boundsViolation )
+                     boundsViolation = _modLower[c];
+               }
+
+               // upper bound
+               _modUpper[c] = upperRational(c);
+
+               if( _modUpper[c] < _rationalPosInfty )
+               {
+                  _modUpper[c] -= sol._primal[c];
+                  if( _modUpper[c] < -boundsViolation )
+                     boundsViolation = -_modUpper[c];
+               }
             }
 
-            // upper bound
-            _modUpper[c] = upperRational(c);
-
-            if( _modUpper[c] < _rationalPosInfty )
+            // compute violation of sides
+            sideViolation = 0;
+            for( int r = numRowsRational() - 1; r >= 0; r-- )
             {
-               _modUpper[c] -= sol._primal[c];
-               if( _modUpper[c] < -boundsViolation )
-                  boundsViolation = -_modUpper[c];
+               // left-hand side
+               _modLhs[r] = lhsRational(r);
+               if( _modLhs[r] > _rationalNegInfty )
+               {
+                  _modLhs[r] -= sol._slacks[r];
+                  if( _modLhs[r] > sideViolation )
+                     sideViolation = _modLhs[r];
+               }
+
+               // right-hand side
+               _modRhs[r] = rhsRational(r);
+               if( _modRhs[r] < _rationalPosInfty )
+               {
+                  _modRhs[r] -= sol._slacks[r];
+                  if( _modRhs[r] < -sideViolation )
+                     sideViolation = -_modRhs[r];
+               }
             }
          }
 
-         // compute violation of sides
-         sideViolation = 0;
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
-         {
-            // left-hand side
-            _modLhs[r] = lhsRational(r);
-            if( _modLhs[r] > _rationalNegInfty )
-            {
-               _modLhs[r] -= sol._slacks[r];
-               if( _modLhs[r] > sideViolation )
-                  sideViolation = _modLhs[r];
-            }
-
-            // right-hand side
-            _modRhs[r] = rhsRational(r);
-            if( _modRhs[r] < _rationalPosInfty )
-            {
-               _modRhs[r] -= sol._slacks[r];
-               if( _modRhs[r] < -sideViolation )
-                  sideViolation = -_modRhs[r];
-            }
-         }
-
-         // compute reduced costs and reduced cost violation
+         // compute reduced cost violation
          redCostViolation = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
@@ -529,8 +532,6 @@ namespace soplex
             if( basisStatusCol != SPxSolver::ON_LOWER && basisStatusCol != SPxSolver::FIXED && sol._redCost[c] > redCostViolation )
                redCostViolation = sol._redCost[c];
          }
-
-         // compute modified objective function
          _modObj = sol._redCost;
 
          // fix inequality constraints if this has not lead to an infeasibility during the last floating-point solve
@@ -632,33 +633,40 @@ namespace soplex
 
          // start refinement
 
-         // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = primalScale;
-         maxScale *= _rationalMaxscaleincr;
-
-         primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
-         assert(primalScale >= 0);
-
-         if( primalScale > 0 )
+         if( restrictInequalities )
          {
-            primalScale.invert();
-            if( primalScale > maxScale )
+            // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
+            maxScale = primalScale;
+            maxScale *= _rationalMaxscaleincr;
+
+            primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
+            assert(primalScale >= 0);
+
+            if( primalScale > 0 )
+            {
+               primalScale.invert();
+               if( primalScale > maxScale )
+                  primalScale = maxScale;
+            }
+            else
                primalScale = maxScale;
-         }
-         else
-            primalScale = maxScale;
 
-         if( primalScale < 1 )
-            primalScale = 1;
-         else
-         {
-            MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
+            if( primalScale < 1 )
+               primalScale = 1;
+            else
+            {
+               MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
-            // perform primal and dual scaling
-            _modLower *= primalScale;
-            _modUpper *= primalScale;
-            _modLhs *= primalScale;
-            _modRhs *= primalScale;
+               // perform primal and dual scaling
+               _modLower *= primalScale;
+               _modUpper *= primalScale;
+               _modLhs *= primalScale;
+               _modRhs *= primalScale;
+            }
+
+            // apply scaled bounds and sides
+            _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
+            _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
          }
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
@@ -687,9 +695,7 @@ namespace soplex
             _modObj *= dualScale;
          }
 
-         // apply scaled bounds, side, and objective function
-         _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
-         _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
+         // apply scaled objective function
          _solver.changeObj(DVectorReal(_modObj));
 
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
