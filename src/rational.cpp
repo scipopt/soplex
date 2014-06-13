@@ -630,6 +630,22 @@ Rational::operator long double() const
 
 
 
+/// provides read-only access to underlying mpq_t
+const mpq_t* Rational::getMpqPtr() const
+{
+   return &(this->dpointer->privatevalue);
+}
+
+
+
+/// provides read-only access to underlying mpq_t
+const mpq_t& Rational::getMpqRef() const
+{
+   return this->dpointer->privatevalue;
+}
+
+
+
 /// addition operator
 Rational Rational::operator+(const Rational& r) const
 {

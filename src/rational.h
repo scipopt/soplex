@@ -135,6 +135,13 @@ namespace soplex
       /// typecasts Rational to long double (only allows explicit typecasting)
       explicit operator long double() const;
 
+#ifdef SOPLEX_WITH_GMP
+      /// provides read-only access to underlying mpq_t
+      const mpq_t* getMpqPtr() const;
+
+      /// provides read-only access to underlying mpq_t
+      const mpq_t& getMpqRef() const;
+#endif
       //@}
 
 
