@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
+columns = ['name','rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -61,11 +61,14 @@ for idx, outline in enumerate(outlines):
             instancename = instancename + '.' + linesplit[i]
         length = len(instancename)
         if length > namelength:
-            instancename = instancename[length-namelength-2:length-2]
+            shortname = instancename[0:namelength/2-1] + '~' + instancename[length-namelength/2:]
+        else:
+            shortname = instancename
 
         # initialize new data set
         instances[instancename] = {}
         instances[instancename]['status'] = 'abort'
+        instances[instancename]['name'] = shortname
         # wait for statistics block
         stats = False
     elif outline.startswith('SoPlex version'):
@@ -203,8 +206,7 @@ aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
 inconsistents = sum(1 for name in instances if instances[name]['status'] == 'inconsistent')
 
 length = []
-
-output = 'name'.ljust(namelength)
+output = ''
 # calculate maximum width of each column
 for i,c in enumerate(columns):
     length.append(len(c))
@@ -218,7 +220,7 @@ print '-'*len(output)
 
 # print data for all instances with the computed length
 for name in sorted(instances):
-    output = name.ljust(namelength)
+    output = ''
     for i,c in enumerate(columns):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print output
@@ -248,9 +250,6 @@ if check_test:
         instancename = linesplit[0]
         for i in range(1, len(linesplit)-1):
             instancename = instancename + '.' + linesplit[i]
-        length = len(instancename)
-        if length > namelength:
-            instancename = instancename[length-namelength-2:length-2]
         if not instancename in instances:
             if not printedMissing:
                 print
