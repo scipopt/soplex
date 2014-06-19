@@ -298,6 +298,31 @@ public:
       add(k, plhs, prowVector, prhs);
    }
 
+   /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to LPRowSetBase.
+   template < class S >
+   void add(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
+   {
+      DataKey k;
+      add(k, lhsValue, rowValues, rowIndices, rowSize, rhsValue);
+   }
+
+   /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to
+   /// LPRowSetBase, with DataKey \p key.
+   template < class S >
+   void add(DataKey& newkey, const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
+   {
+      SVSetBase<R>::add(newkey, rowValues, rowIndices, rowSize);
+
+      if( num() > left.dim() )
+      {
+         left.reDim(num());
+         right.reDim(num());
+      }
+
+      left[num() - 1] = *lhsValue;
+      right[num() - 1] = *rhsValue;
+   }
+
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to
    /// LPRowSetBase, with DataKey \p key.
    void add(DataKey& newkey, R newlhs, const SVectorBase<R>& newrowVector, R newrhs)

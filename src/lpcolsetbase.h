@@ -343,6 +343,13 @@ public:
       SVSetBase<R>::add2(colVector_w(i), n, idx, val);
    }
 
+   /// Adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th colVector.
+   template < class S >
+   void add2(int i, int n, const int idx[], const S val[])
+   {
+      SVSetBase<R>::add2(colVector_w(i), n, idx, val);
+   }
+
    ///
    SVectorBase<R>& create(int pnonzeros = 0, R pobj = 1, R plw = 0, R pupp = 1)
    {

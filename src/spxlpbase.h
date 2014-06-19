@@ -431,6 +431,43 @@ public:
       doAddRow(row);
    }
 
+   ///
+   virtual void addRow(const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue)
+   {
+      doAddRow(lhsValue, rowVec, rhsValue);
+   }
+
+   ///
+   template < class S >
+   void addRow(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
+   {
+      int idx = nRows();
+      int oldColNumber = nCols();
+
+      LPRowSetBase<R>::add(lhsValue, rowValues, rowIndices, rowSize, rhsValue);
+
+      // now insert nonzeros to column file also
+      for( int j = rowSize - 1; j >= 0; --j )
+      {
+         const S& val = rowValues[j];
+         int i = rowIndices[j];
+
+         // create new columns if required
+         if( i >= nCols() )
+         {
+            LPColBase<R> empty;
+            for( int k = nCols(); k <= i; ++k )
+               LPColSetBase<R>::add(empty);
+         }
+
+         assert(i < nCols());
+         LPColSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedRows(1);
+      addedCols(nCols() - oldColNumber);
+   }
+
    /// Adds \p row to LPRowSetBase.
    virtual void addRow(SPxRowId& id, const LPRowBase<R>& row)
    {
@@ -948,7 +985,6 @@ public:
    /// Changes left hand side vector for constraints to \p newLhs.
    virtual void changeLhs(const VectorBase<R>& newLhs)
    {
-
       assert(lhs().dim() == newLhs.dim());
       LPRowSetBase<R>::lhs_w() = newLhs;
       assert(isConsistent());
@@ -957,8 +993,15 @@ public:
    /// Changes \p i 'th left hand side value to \p newLhs.
    virtual void changeLhs(int i, const R& newLhs)
    {
-
       LPRowSetBase<R>::lhs_w(i) = newLhs;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th left hand side value to \p newLhs.
+   template < class S >
+   void changeLhs(int i, const S* newLhs)
+   {
+      LPRowSetBase<R>::lhs_w(i) = *newLhs;
       assert(isConsistent());
    }
 
@@ -971,7 +1014,6 @@ public:
    /// Changes right hand side vector for constraints to \p newRhs.
    virtual void changeRhs(const VectorBase<R>& newRhs)
    {
-
       assert(rhs().dim() == newRhs.dim());
       LPRowSetBase<R>::rhs_w() = newRhs;
       assert(isConsistent());
@@ -980,7 +1022,6 @@ public:
    /// Changes \p i 'th right hand side value to \p newRhs.
    virtual void changeRhs(int i, const R& newRhs)
    {
-
       LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
    }
@@ -1170,6 +1211,24 @@ public:
       }
    }
 
+   /// Updates activity of the rows for a given primal vector; activity does not need to be zero
+   /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
+   ///        dimension of the activity vector does not match the number of rows
+   virtual void addPrimalActivity(const SVectorBase<R>& primal, VectorBase<R>& activity) const
+   {
+      if( activity.dim() != nRows() )
+      {
+         throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+      }
+
+      for( int i = primal.size() - 1; i >= 0; i-- )
+      {
+         assert(primal.index(i) >= 0);
+         assert(primal.index(i) < nCols());
+         activity.multAdd(primal.value(i), colVector(primal.index(i)));
+      }
+   }
+
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns
@@ -1203,6 +1262,46 @@ public:
       {
          if( dual[r] != 0 )
             activity.multAdd(dual[r], rowVector(r));
+      }
+   }
+
+   /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
+   ///        the activity vector does not match the number of columns
+   virtual void addDualActivity(const SVectorBase<R>& dual, VectorBase<R>& activity) const
+   {
+      if( activity.dim() != nCols() )
+      {
+         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      }
+
+      for( int i = dual.size() - 1; i >= 0; i-- )
+      {
+         assert(dual.index(i) >= 0);
+         assert(dual.index(i) < nRows());
+         activity.multAdd(dual.value(i), rowVector(dual.index(i)));
+      }
+   }
+
+   /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
+   /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
+   ///        the activity vector does not match the number of columns
+   virtual void subDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity) const
+   {
+      if( dual.dim() != nRows() )
+      {
+         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+      }
+
+      if( activity.dim() != nCols() )
+      {
+         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+      }
+
+      for( int r = 0; r < nRows(); r++ )
+      {
+         if( dual[r] != 0 )
+            activity.multSub(dual[r], rowVector(r));
       }
    }
 
@@ -1510,6 +1609,36 @@ private:
       {
          R val = vec.value(j);
          int i = vec.index(j);
+
+         // create new columns if required
+         if( i >= nCols() )
+         {
+            LPColBase<R> empty;
+            for( int k = nCols(); k <= i; ++k )
+               LPColSetBase<R>::add(empty);
+         }
+
+         assert(i < nCols());
+         LPColSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedRows(1);
+      addedCols(nCols() - oldColNumber);
+   }
+
+   ///
+   void doAddRow (const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue)
+   {
+      int idx = nRows();
+      int oldColNumber = nCols();
+
+      LPRowSetBase<R>::add(lhsValue, rowVec, rhsValue);
+
+      // now insert nonzeros to column file also
+      for( int j = rowVec.size() - 1; j >= 0; --j )
+      {
+         R val = rowVec.value(j);
+         int i = rowVec.index(j);
 
          // create new columns if required
          if( i >= nCols() )

@@ -310,6 +310,23 @@ public:
       *new_svec = svec;
    }
 
+   /// Adds \p svec to SVSetBase.
+   /** Adds SVectorBase \p svec to the %set. This includes copying its nonzeros to the sets nonzero memory and creating
+    *  an additional SVectorBase entry in vector memory. If neccessary, the memory blocks are enlarged appropriately.
+    *
+    *  @return \p nkey contains the DataKey, that the SVSetBase has assosicated to the new SVectorBase.
+    */
+   template < class S >
+   void add(DataKey& nkey, const S* rowValues, const int* rowIndices, int rowSize)
+   {
+      // create empty vector
+      ensurePSVec(1);
+      SVectorBase<R>* new_svec = create(nkey, rowSize);
+
+      // assign values
+      new_svec->assignArray(rowValues, rowIndices, rowSize);
+   }
+
    /// Adds all \p n SVectorBase%s in the array \p svec to the %set.
    /** @pre \p svec must hold at least \p n entries.
     */
@@ -516,6 +533,19 @@ public:
     * @pre \p svec must be an SVectorBase of the SVSetBase.
     */
    void add2(SVectorBase<R> &svec, int n, const int idx[], const R val[])
+   {
+      xtend(svec, svec.size() + n);
+      svec.add(n, idx, val);
+   }
+
+   /// Adds \p n nonzeros to \p svec of this SVSetBase.
+   /** Adds \p n nonzeros to SVectorBase \p svec in the SVSetBase. If \p svec is not large enough to hold the additional
+    *  nonzeros, it will be automatically enlarged within the %set.
+    *
+    * @pre \p svec must be an SVectorBase of the SVSetBase.
+    */
+   template < class S >
+   void add2(SVectorBase<R> &svec, int n, const int idx[], const S val[])
    {
       xtend(svec, svec.size() + n);
       svec.add(n, idx, val);

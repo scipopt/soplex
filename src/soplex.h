@@ -378,6 +378,11 @@ public:
    /// adds a single row
    void addRowRational(const LPRowRational& lprow);
 
+#ifdef SOPLEX_WITH_GMP
+   /// adds a single row
+   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, int rowSize, const mpq_t* rhs);
+#endif
+
    /// adds multiple rows
    void addRowsRational(const LPRowSetRational& lprowset);
 
@@ -396,8 +401,18 @@ public:
    /// changes left-hand side of row \p i to \p lhs
    void changeLhsRational(int i, const Rational& lhs);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes left-hand side of row \p i to \p lhs
+   void changeLhsRational(int i, const mpq_t* lhs);
+#endif
+
    /// changes right-hand side vector to \p rhs
    void changeRhsRational(const VectorRational& rhs);
+
+#ifdef SOPLEX_WITH_GMP
+   /// changes right-hand side vector to \p rhs
+   void changeRhsRational(const mpq_t* rhs, int rhsSize);
+#endif
 
    /// changes right-hand side of row \p i to \p rhs
    void changeRhsRational(int i, const Rational& rhs);
@@ -1227,6 +1242,8 @@ private:
    DVectorRational _modLhs;
    DVectorRational _modRhs;
    DVectorRational _modObj;
+   DSVectorRational _primalDiff;
+   DSVectorRational _dualDiff;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
    bool _storedBasis;
@@ -1281,6 +1298,9 @@ private:
 
    /// adds a single row to the real LP and adjusts basis
    void _addRowReal(const LPRowReal& lprow);
+
+   /// adds a single row to the real LP and adjusts basis
+   void _addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
 
    /// adds multiple rows to the real LP and adjusts basis
    void _addRowsReal(const LPRowSetReal& lprowset);

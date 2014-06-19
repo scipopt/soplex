@@ -394,72 +394,61 @@ namespace soplex
       }
 
       // store floating-point solution of original LP as current rational solution and ensure that solution vectors have
-      // right dimension
-      sol._primal = primalReal;
+      // right dimension; ensure that solution is aligned with basis
+      sol._primal.reDim(numColsRational(), false);
       sol._slacks.reDim(numRowsRational(), false);
-      sol._dual = dualReal;
+      sol._dual.reDim(numRowsRational(), false);
       sol._redCost.reDim(numColsRational(), false);
       sol._hasPrimal = true;
       sol._hasDual = true;
       _hasBasis = true;
 
-      // align primal solution with basis
-      int numAdjustedBounds = 0;
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
          SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
 
-         if( basisStatusCol == SPxSolver::ON_LOWER && sol._primal[c] != lowerRational(c) )
-         {
+         if( basisStatusCol == SPxSolver::ON_LOWER )
             sol._primal[c] = lowerRational(c);
-            numAdjustedBounds++;
-         }
-         else if( basisStatusCol == SPxSolver::ON_UPPER && sol._primal[c] != upperRational(c) )
-         {
+         else if( basisStatusCol == SPxSolver::ON_UPPER )
             sol._primal[c] = upperRational(c);
-            numAdjustedBounds++;
-         }
          else if( basisStatusCol == SPxSolver::FIXED )
          {
             assert(lowerRational(c) == upperRational(c));
-
-            if( sol._primal[c] != lowerRational(c) )
-            {
-               sol._primal[c] = lowerRational(c);
-               numAdjustedBounds++;
-            }
+            sol._primal[c] = lowerRational(c);
          }
-         else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
-         {
+         else if( basisStatusCol == SPxSolver::ZERO )
             sol._primal[c] = 0;
-            numAdjustedBounds++;
-         }
+         else
+            sol._primal[c] = primalReal[c];
       }
+      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
 
-      // align dual solution with basis
-      int numAdjustedDuals = 0;
+      int dualSize = 0;
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
          SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
 
-         if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
-            || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
-            || (basisStatusRow == SPxSolver::ZERO && sol._dual[r] != 0)
-            || (basisStatusRow == SPxSolver::BASIC && sol._dual[r] != 0) )
+         if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC
+            || (basisStatusRow == SPxSolver::ON_LOWER && dualReal[r] < 0)
+            || (basisStatusRow == SPxSolver::ON_UPPER && dualReal[r] > 0) )
          {
             sol._dual[r] = 0;
-            numAdjustedDuals++;
          }
-         else if( basisStatusRow == SPxSolver::FIXED )
+         else
          {
-            assert(lhsRational(r) == rhsRational(r));
+            sol._dual[r] = dualReal[r];
+            if( dualReal[r] != 0.0 )
+               dualSize++;
          }
-      }
 
-      if( numAdjustedBounds + numAdjustedDuals > 0 )
-      {
-         MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
+         assert(basisStatusRow != SPxSolver::FIXED || lhsRational(r) == rhsRational(r));
       }
+      // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
+      // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
+      // afterwards
+      sol._redCost = _rationalLP->maxObj();
+      sol._redCost *= -1;
+      _rationalLP->subDualActivity(sol._dual, sol._redCost);
 
       // initial scaling factors are one
       primalScale = Rational::POSONE;
@@ -475,64 +464,63 @@ namespace soplex
       // refinement loop
       do
       {
-         // decrement minRounds counter
-         minRounds--;
-
-         MSG_DEBUG( spxout << "Computing violations.\n" );
-
-         // compute violation of bounds
-         boundsViolation = 0;
-         for( int c = numColsRational() - 1; c >= 0; c-- )
+         if( restrictInequalities )
          {
-            // lower bound
-            _modLower[c] = lowerRational(c);
+            // decrement minRounds counter
+            minRounds--;
 
-            if( _modLower[c] > _rationalNegInfty )
+            MSG_DEBUG( spxout << "Computing violations.\n" );
+
+            // compute violation of bounds
+            boundsViolation = 0;
+            for( int c = numColsRational() - 1; c >= 0; c-- )
             {
-               _modLower[c] -= sol._primal[c];
-               if( _modLower[c] > boundsViolation )
-                  boundsViolation = _modLower[c];
+               // lower bound
+               _modLower[c] = lowerRational(c);
+
+               if( _modLower[c] > _rationalNegInfty )
+               {
+                  _modLower[c] -= sol._primal[c];
+                  if( _modLower[c] > boundsViolation )
+                     boundsViolation = _modLower[c];
+               }
+
+               // upper bound
+               _modUpper[c] = upperRational(c);
+
+               if( _modUpper[c] < _rationalPosInfty )
+               {
+                  _modUpper[c] -= sol._primal[c];
+                  if( _modUpper[c] < -boundsViolation )
+                     boundsViolation = -_modUpper[c];
+               }
             }
 
-            // upper bound
-            _modUpper[c] = upperRational(c);
-
-            if( _modUpper[c] < _rationalPosInfty )
+            // compute violation of sides
+            sideViolation = 0;
+            for( int r = numRowsRational() - 1; r >= 0; r-- )
             {
-               _modUpper[c] -= sol._primal[c];
-               if( _modUpper[c] < -boundsViolation )
-                  boundsViolation = -_modUpper[c];
+               // left-hand side
+               _modLhs[r] = lhsRational(r);
+               if( _modLhs[r] > _rationalNegInfty )
+               {
+                  _modLhs[r] -= sol._slacks[r];
+                  if( _modLhs[r] > sideViolation )
+                     sideViolation = _modLhs[r];
+               }
+
+               // right-hand side
+               _modRhs[r] = rhsRational(r);
+               if( _modRhs[r] < _rationalPosInfty )
+               {
+                  _modRhs[r] -= sol._slacks[r];
+                  if( _modRhs[r] < -sideViolation )
+                     sideViolation = -_modRhs[r];
+               }
             }
          }
 
-         // compute violation of sides
-         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-         sideViolation = 0;
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
-         {
-            // left-hand side
-            _modLhs[r] = lhsRational(r);
-            if( _modLhs[r] > _rationalNegInfty )
-            {
-               _modLhs[r] -= sol._slacks[r];
-               if( _modLhs[r] > sideViolation )
-                  sideViolation = _modLhs[r];
-            }
-
-            // right-hand side
-            _modRhs[r] = rhsRational(r);
-            if( _modRhs[r] < _rationalPosInfty )
-            {
-               _modRhs[r] -= sol._slacks[r];
-               if( _modRhs[r] < -sideViolation )
-                  sideViolation = -_modRhs[r];
-            }
-         }
-
-         // compute reduced costs and reduced cost violation
-         _rationalLP->computeDualActivity(sol._dual, sol._redCost);
-         sol._redCost += _rationalLP->maxObj();
-         sol._redCost *= -1;
+         // compute reduced cost violation
          redCostViolation = 0;
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
@@ -544,8 +532,6 @@ namespace soplex
             if( basisStatusCol != SPxSolver::ON_LOWER && basisStatusCol != SPxSolver::FIXED && sol._redCost[c] > redCostViolation )
                redCostViolation = sol._redCost[c];
          }
-
-         // compute modified objective function
          _modObj = sol._redCost;
 
          // fix inequality constraints if this has not lead to an infeasibility during the last floating-point solve
@@ -647,33 +633,40 @@ namespace soplex
 
          // start refinement
 
-         // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
-         maxScale = primalScale;
-         maxScale *= _rationalMaxscaleincr;
-
-         primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
-         assert(primalScale >= 0);
-
-         if( primalScale > 0 )
+         if( restrictInequalities )
          {
-            primalScale.invert();
-            if( primalScale > maxScale )
+            // compute primal scaling factor; limit increase in scaling by tolerance used in floating point solve
+            maxScale = primalScale;
+            maxScale *= _rationalMaxscaleincr;
+
+            primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
+            assert(primalScale >= 0);
+
+            if( primalScale > 0 )
+            {
+               primalScale.invert();
+               if( primalScale > maxScale )
+                  primalScale = maxScale;
+            }
+            else
                primalScale = maxScale;
-         }
-         else
-            primalScale = maxScale;
 
-         if( primalScale < 1 )
-            primalScale = 1;
-         else
-         {
-            MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
+            if( primalScale < 1 )
+               primalScale = 1;
+            else
+            {
+               MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
-            // perform primal and dual scaling
-            _modLower *= primalScale;
-            _modUpper *= primalScale;
-            _modLhs *= primalScale;
-            _modRhs *= primalScale;
+               // perform primal and dual scaling
+               _modLower *= primalScale;
+               _modUpper *= primalScale;
+               _modLhs *= primalScale;
+               _modRhs *= primalScale;
+            }
+
+            // apply scaled bounds and sides
+            _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
+            _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
          }
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
@@ -702,9 +695,7 @@ namespace soplex
             _modObj *= dualScale;
          }
 
-         // apply scaled bounds, side, and objective function
-         _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
-         _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
+         // apply scaled objective function
          _solver.changeObj(DVectorReal(_modObj));
 
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
@@ -720,13 +711,23 @@ namespace soplex
             {
                restrictInequalities = false;
 
+               _dualDiff.clear();
                for( int r = numRowsRational() - 1; r >= 0; r-- )
                {
                   if( lhsRational(r) != rhsRational(r) )
                   {
                      if( _basisStatusRows[r] == SPxSolver::FIXED )
                         _basisStatusRows[r] = (sol._dual[r] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
-                     sol._dual[r] = 0;
+
+                     if( sol._dual[r] != 0 )
+                     {
+                        int i = _dualDiff.size();
+                        _dualDiff.add(r);
+                        _dualDiff.value(i) = sol._dual[r];
+                        sol._dual[r] = 0;
+                        dualSize--;
+                        assert(dualSize >= 0);
+                     }
                   }
                }
 
@@ -737,6 +738,29 @@ namespace soplex
                      if( _basisStatusCols[c] == SPxSolver::FIXED )
                         _basisStatusCols[c] = (sol._redCost[c] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
                   }
+               }
+
+               // update or recompute reduced cost values depending on which looks faster; adding one to the length of
+               // the dual vector accounts for the objective function vector
+               if( _dualDiff.size() < dualSize + 1 )
+               {
+                  _rationalLP->addDualActivity(_dualDiff, sol._redCost);
+#ifndef NDEBUG
+                  {
+                     DVectorRational activity(_rationalLP->maxObj());
+                     activity *= -1;
+                     _rationalLP->subDualActivity(sol._dual, activity);
+                  }
+#endif
+               }
+               else
+               {
+                  // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
+                  // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
+                  // afterwards
+                  sol._redCost = _rationalLP->maxObj();
+                  sol._redCost *= -1;
+                  _rationalLP->subDualActivity(sol._dual, sol._redCost);
                }
 
                continue;
@@ -769,8 +793,7 @@ namespace soplex
             unbounded = true;
             return;
          case SPxSolver::ABORT_TIME:
-         case SPxSolver::ABORT_ITER:
-            stopped = true;
+         case SPxSolver::ABORT_ITER: stopped = true;
             return;
          default:
             error = true;
@@ -780,28 +803,36 @@ namespace soplex
          // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
 
-         numAdjustedBounds = 0;
+         int primalSize = 0;
+         Rational primalScaleInverse = primalScale;
+         primalScaleInverse.invert();
+         _primalDiff.clear();
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
-            if( primalReal[c] == 1.0 )
-               sol._primal[c].addQuotient(Rational::POSONE, primalScale);
-            else if( primalReal[c] == -1.0 )
-               sol._primal[c].addQuotient(Rational::NEGONE, primalScale);
-            else if( primalReal[c] != 0.0 )
-               sol._primal[c].addQuotient(primalReal[c], primalScale);
-
             // force values of nonbasic variables to bounds
             SPxSolver::VarStatus basisStatusCol = _basisStatusCols[c];
 
-            if( basisStatusCol == SPxSolver::ON_LOWER && sol._primal[c] != lowerRational(c) )
+            if( basisStatusCol == SPxSolver::ON_LOWER )
             {
-               sol._primal[c] = lowerRational(c);
-               numAdjustedBounds++;
+               if( sol._primal[c] != lowerRational(c) )
+               {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = lowerRational(c);
+                  _primalDiff.value(i) -= sol._primal[c];
+                  sol._primal[c] = lowerRational(c);
+               }
             }
-            else if( basisStatusCol == SPxSolver::ON_UPPER && sol._primal[c] != upperRational(c) )
+            else if( basisStatusCol == SPxSolver::ON_UPPER )
             {
-               sol._primal[c] = upperRational(c);
-               numAdjustedBounds++;
+               if( sol._primal[c] != upperRational(c) )
+               {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = upperRational(c);
+                  _primalDiff.value(i) -= sol._primal[c];
+                  sol._primal[c] = upperRational(c);
+               }
             }
             else if( basisStatusCol == SPxSolver::FIXED )
             {
@@ -809,21 +840,78 @@ namespace soplex
 
                if( sol._primal[c] != lowerRational(c) )
                {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = lowerRational(c);
+                  _primalDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = lowerRational(c);
-                  numAdjustedBounds++;
                }
             }
-            else if( basisStatusCol == SPxSolver::ZERO && sol._primal[c] != 0 )
+            else if( basisStatusCol == SPxSolver::ZERO )
             {
-               sol._primal[c] = 0;
-               numAdjustedBounds++;
+               if( sol._primal[c] != 0 )
+               {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = sol._primal[c];
+                  _primalDiff.value(i) *= -1;
+                  sol._primal[c] = 0;
+               }
             }
+            else
+            {
+               if( primalReal[c] == 1.0 )
+               {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = primalScaleInverse;
+                  sol._primal[c] += _primalDiff.value(i);
+               }
+               else if( primalReal[c] == -1.0 )
+               {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = primalScaleInverse;
+                  _primalDiff.value(i) *= -1;
+                  sol._primal[c] += _primalDiff.value(i);
+               }
+               else if( primalReal[c] != 0.0 )
+               {
+                  int i = _primalDiff.size();
+                  _primalDiff.add(c);
+                  _primalDiff.value(i) = primalReal[c];
+                  _primalDiff.value(i) *= primalScaleInverse;
+                  sol._primal[c] += _primalDiff.value(i);
+               }
+            }
+
+            if( sol._primal[c] != 0 )
+               primalSize++;
          }
+
+         // update or recompute slacks depending on which looks faster
+         if( _primalDiff.size() < primalSize )
+         {
+            _rationalLP->addPrimalActivity(_primalDiff, sol._slacks);
+#ifndef NDEBUG
+            {
+               DVectorRational activity(numRowsRational());
+               _rationalLP->computePrimalActivity(sol._primal, activity);
+               assert(sol._slacks == activity);
+            }
+#endif
+         }
+         else
+            _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
 
          // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );
 
-         numAdjustedDuals = 0;
+         Rational dualScaleInverseNeg = dualScale;
+         dualScaleInverseNeg.invert();
+         dualScaleInverseNeg *= -1;
+         _dualDiff.clear();
+         dualSize = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
@@ -847,26 +935,78 @@ namespace soplex
                }
             }
 
-            if( dualReal[r] != 0.0 )
-               sol._dual[r].addQuotient(dualReal[r], dualScale);
-
-            if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
-               || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0)
-               || (basisStatusRow == SPxSolver::ZERO && sol._dual[r] != 0)
-               || (basisStatusRow == SPxSolver::BASIC && sol._dual[r] != 0) )
+            if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC )
             {
-               sol._dual[r] = 0;
-               numAdjustedDuals++;
+               if( sol._dual[r] != 0 )
+               {
+                  int i = _dualDiff.size();
+                  _dualDiff.add(r);
+                  _dualDiff.value(i) = sol._dual[r];
+                  sol._dual[r] = 0;
+               }
             }
-            else if( basisStatusRow == SPxSolver::FIXED )
+            else
             {
-               assert(lhsRational(r) == rhsRational(r));
+               if( dualReal[r] != 0.0 )
+               {
+                  int i = _dualDiff.size();
+                  _dualDiff.add(r);
+                  _dualDiff.value(i) = dualReal[r];
+                  _dualDiff.value(i) *= dualScaleInverseNeg;
+                  sol._dual[r] -= _dualDiff.value(i);
+
+                  if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
+                     || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0) )
+                  {
+                     _dualDiff.value(i) += sol._dual[r];
+                     sol._dual[r] = 0;
+                  }
+                  // we do not check whether the dual value is nonzero, because it probably is; this gives us an
+                  // overestimation of the number of nonzeros in the dual solution
+                  else
+                     dualSize++;
+               }
+               else
+               {
+                  // if the dual is not changed, its sign should have been corrected already in the previous iteration
+                  assert(basisStatusRow != SPxSolver::ON_LOWER || sol._dual[r] >= 0);
+                  assert(basisStatusRow != SPxSolver::ON_UPPER || sol._dual[r] <= 0);
+
+                  // we do not check whether the dual value is nonzero, because it probably is; this gives us an
+                  // overestimation of the number of nonzeros in the dual solution
+                  dualSize++;
+               }
+
+               assert(basisStatusRow != SPxSolver::FIXED || lhsRational(r) == rhsRational(r));
             }
          }
 
-         if( numAdjustedBounds + numAdjustedDuals > 0 )
+         // update or recompute reduced cost values depending on which looks faster; adding one to the length of the
+         // dual vector accounts for the objective function vector
+         if( _dualDiff.size() < dualSize + 1 )
          {
-            MSG_INFO2( spxout << "Adjusted " << numAdjustedBounds << " nonbasic variables to bounds and " << numAdjustedDuals << " duals to zero.\n" );
+            _rationalLP->addDualActivity(_dualDiff, sol._redCost);
+#ifndef NDEBUG
+            {
+               DVectorRational activity(_rationalLP->maxObj());
+               activity *= -1;
+               _rationalLP->subDualActivity(sol._dual, activity);
+            }
+#endif
+         }
+         else
+         {
+            // we assume that the objective function vector has less nonzeros than the reduced cost vector, and so multiplying
+            // with -1 first and subtracting the dual activity should be faster than adding the dual activity and negating
+            // afterwards
+            sol._redCost = _rationalLP->maxObj();
+            sol._redCost *= -1;
+            _rationalLP->subDualActivity(sol._dual, sol._redCost);
+         }
+
+         if( _primalDiff.size() + _dualDiff.size() > 0 )
+         {
+            MSG_INFO2( spxout << "Corrected " << _primalDiff.size() << " primal variables and " << _dualDiff.size() << " dual values.\n" );
          }
 
          // refinement was successful; try with fixed inequalities during next run
@@ -1022,7 +1162,7 @@ namespace soplex
             }
          }
       }
-      while(!error && !success);
+      while(!error && !success && !stopped);
 
       // restore problem
       _untransformFeasibility(sol, withDualFarkas);
@@ -1596,7 +1736,7 @@ namespace soplex
 
          _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver::BASIC && _basisStatusRows[numOrigRows] == SPxSolver::BASIC);
          _basisStatusCols.reSize(numOrigCols);
-         _basisStatusCols.reSize(numOrigRows);
+         _basisStatusRows.reSize(numOrigRows);
       }
       else if( boolParam(SoPlex::TESTDUALINF) && tau < _rationalFeastol )
       {

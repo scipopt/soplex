@@ -269,7 +269,7 @@ public:
    }
 
    /// Append one nonzero \p (i,v).
-   void add(int i, R v)
+   void add(int i, const R& v)
    {
       assert(m_elem != 0);
       assert(size() < max());
@@ -283,6 +283,20 @@ public:
       assert(size() <= max());
    }
 
+   /// Append one uninitialized nonzero.
+   void add(int i)
+   {
+      assert(m_elem != 0);
+      assert(size() < max());
+
+      int n = size();
+
+      m_elem[n].idx = i;
+      set_size( n + 1 );
+
+      assert(size() <= max());
+   }
+
    /// Append nonzeros of \p sv.
    void add(const SVectorBase& sv)
    {
@@ -291,6 +305,26 @@ public:
 
    /// Append \p n nonzeros.
    void add(int n, const int i[], const R v[])
+   {
+      assert(n + size() <= max());
+
+      if( n <= 0 )
+         return;
+
+      Nonzero<R>* e = m_elem + size();
+
+      set_size( size() + n );
+      while( n-- )
+      {
+         e->idx = *i++;
+         e->val = *v++;
+         e++;
+      }
+   }
+
+   /// Append \p n nonzeros.
+   template < class S >
+   void add(int n, const int i[], const S v[])
    {
       assert(n + size() <= max());
 
@@ -574,6 +608,24 @@ public:
 
          set_size(sv.size());
       }
+
+      return *this;
+   }
+
+   /// Assignment operator.
+   template < class S >
+   SVectorBase<R>& assignArray(const S* rowValues, const int* rowIndices, int rowSize)
+   {
+      assert(max() >= rowSize);
+
+      int i;
+      for( i = 0; i < rowSize && i < max(); i++ )
+      {
+         m_elem[i].val = rowValues[i];
+         m_elem[i].idx = rowIndices[i];
+      }
+
+      set_size(i);
 
       return *this;
    }

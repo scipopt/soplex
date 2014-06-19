@@ -1596,6 +1596,27 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// adds a single row
+   void SoPlex::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, int rowSize, const mpq_t* rhs)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->addRow(lhs, rowValues, rowIndices, rowSize, rhs);
+
+      int i = numRowsRational() - 1;
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _addRowReal(Real(lhsRational(i)), DSVectorReal(_rationalLP->rowVector(i)), Real(rhsRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// adds multiple rows
    void SoPlex::addRowsRational(const LPRowSetRational& lprowset)
    {
@@ -1704,6 +1725,26 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes left-hand side of row \p i to \p lhs
+   void SoPlex::changeLhsRational(int i, const mpq_t* lhs)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeLhs(i, lhs);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeLhsReal(i, Real(lhsRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// changes right-hand side vector to \p rhs
    void SoPlex::changeRhsRational(const VectorRational& rhs)
    {
@@ -1719,6 +1760,27 @@ namespace soplex
 
       _invalidateSolution();
    }
+
+
+
+#ifdef SOPLEX_WITH_GMP
+   /// changes right-hand side vector to \p rhs
+   void SoPlex::changeRhsRational(const mpq_t* rhs, int rhsSize)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      for( int i = 0; i < rhsSize; i++ )
+         _rationalLP->changeRhs(i, rhs[i]);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRhsReal(DVectorReal(rhsRational()));
+
+      _invalidateSolution();
+   }
+#endif
 
 
 
@@ -5739,6 +5801,21 @@ namespace soplex
       assert(_realLP != 0);
 
       _realLP->addRow(lprow);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+         _basisStatusRows.append(SPxSolver::BASIC);
+   }
+
+
+
+   /// adds a single row to the real LP and adjusts basis
+   void SoPlex::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs)
+   {
+      assert(_realLP != 0);
+
+      _realLP->addRow(lhs, lprow, rhs);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);

@@ -380,6 +380,10 @@ public:
    template < class S, class T >
    VectorBase<R>& multAdd(const S& x, const SVectorBase<T>& vec);
 
+   /// Subtraction of scaled vector.
+   template < class S, class T >
+   VectorBase<R>& multSub(const S& x, const SVectorBase<T>& vec);
+
    /// Addition of scaled vector.
    template < class S, class T >
    VectorBase<R>& multAdd(const S& x, const SSVectorBase<T>& vec);
