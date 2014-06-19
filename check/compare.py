@@ -106,7 +106,11 @@ for s in settings:
 aborts = ''
 for s in settings:
     for i in instances:
-        if results[s][i]['status'] == 'abort' or i in ignore:
+        if i not in results[s]:
+            aborts = aborts + i + '\n'
+            instances.remove(i)
+            del results[default][i]
+        elif results[s][i]['status'] == 'abort' or i in ignore:
             aborts = aborts + i + '\n'
             instances.remove(i)
             del results[s][i]
