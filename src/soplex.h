@@ -1206,6 +1206,7 @@ private:
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
    SPxLPReal* _realLP;
+   SPxLPIds* _idsLP;
    SPxSimplifier* _simplifier;
    SPxScaler* _scaler;
    SPxStarter* _starter;
@@ -1536,6 +1537,33 @@ private:
 
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
    void _storeSolutionReal();
+
+   //@}
+
+
+   //**@name Private solving methods implemented in solveids.cpp */
+   //@{
+
+   /// solves LP using the improved dual simplex
+   void _solveImprovedDualSimplex();
+
+   /// forms the reduced problem
+   void _formIdsReducedProblem();
+
+   /// solves the reduced problem
+   void _solveIdsReducedProblem();
+
+   /// forms the complementary problem
+   void _formIdsComplementaryProblem();
+
+   /// solves the complementary problem
+   void _solveIdsComplementaryProblem();
+
+   /// preforms ratio test to update the dual solutions
+   void _performIdsRatioTest();
+
+   /// update the reduced problem with additional columns and rows
+   void updateIdsReducedProblem();
 
    //@}
 };

@@ -34,6 +34,7 @@ namespace soplex
 {
 typedef SPxLPBase< Real > SPxLP;
 typedef SPxLPBase< Real > SPxLPReal;
+typedef SPxLPBase< Real > SPxLPIds;
 typedef SPxLPBase< Rational > SPxLPRational;
 } // namespace soplex
 #endif // _SPXLP_H_
