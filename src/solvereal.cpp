@@ -206,7 +206,9 @@ namespace soplex
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
       if( _simplifier != 0 )
       {
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL));
+         // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
+         bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
+         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
          _solver.changeObjOffset(_simplifier->getObjoffset());
       }
 
