@@ -1053,20 +1053,20 @@ namespace soplex
       // perform iterative refinement
       _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
+      // stopped due to some limit
+      if( stopped )
+      {
+         sol.invalidate();
+         hasUnboundedRay = false;
+         error = false;
+      }
       // the unbounded problem should always be solved to optimality
-      if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
+      else if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
       {
          sol.invalidate();
          hasUnboundedRay = false;
          stopped = false;
          error = true;
-      }
-      // or stopped due to some limit
-      else if( stopped )
-      {
-         sol.invalidate();
-         hasUnboundedRay = false;
-         error = false;
       }
       else
       {
@@ -1121,20 +1121,20 @@ namespace soplex
          // perform iterative refinement
          _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
 
+         // stopped due to some limit
+         if( stopped )
+         {
+            sol.invalidate();
+            withDualFarkas = false;
+            error = false;
+         }
          // the feasibility problem should always be solved to optimality
-         if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
+         else if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
          {
             sol.invalidate();
             withDualFarkas = false;
             stopped = false;
             error = true;
-         }
-         // or stopped due to some limit
-         else if( stopped )
-         {
-            sol.invalidate();
-            withDualFarkas = false;
-            error = false;
          }
          // else we should have either a refined Farkas proof or an approximate feasible solution to the original
          else
