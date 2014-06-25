@@ -2694,7 +2694,10 @@ namespace soplex
             MSG_INFO1( spxout << "Switching ratio test." << std::endl );
 
             _solver.setType(_solver.type() == SPxSolver::LEAVE ? SPxSolver::ENTER : SPxSolver::LEAVE);
-            _solver.setTester(_solver.ratiotester() != (SPxRatioTester*)&_ratiotesterTextbook ? (SPxRatioTester*)&_ratiotesterTextbook : (SPxRatioTester*)&_ratiotesterFast);
+            if( _solver.ratiotester() != (SPxRatioTester*)&_ratiotesterTextbook )
+               setIntParam(SoPlex::RATIOTESTER, RATIOTESTER_TEXTBOOK);
+            else
+               setIntParam(SoPlex::RATIOTESTER, RATIOTESTER_FAST);
             switchedRatiotester = true;
             solvedFromScratch = false;
             continue;
@@ -2705,7 +2708,10 @@ namespace soplex
             MSG_INFO1( spxout << "Switching pricer." << std::endl );
 
             _solver.setType(_solver.type() == SPxSolver::LEAVE ? SPxSolver::ENTER : SPxSolver::LEAVE);
-            _solver.setPricer(_solver.pricer() != (SPxPricer*)&_pricerDevex ? (SPxPricer*)&_pricerDevex : (SPxPricer*)&_pricerSteep);
+            if( _solver.pricer() != (SPxPricer*)&_pricerDevex )
+               setIntParam(SoPlex::PRICER, PRICER_DEVEX);
+            else
+               setIntParam(SoPlex::PRICER, PRICER_STEEP);
             switchedPricer = true;
             solvedFromScratch = false;
             continue;
