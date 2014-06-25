@@ -51,6 +51,12 @@
 /// turn on checking for equality before assigning in operator=()
 // #define SOPLEX_PERFALT_4
 
+/// turn on checking whether assignment in assignment operators is redundant for 0
+// #define SOPLEX_PERFALT_5a
+
+/// turn on checking whether assignment in assignment operators is redundant for +1 and -1
+// #define SOPLEX_PERFALT_5b
+
 namespace soplex
 {
 
@@ -201,11 +207,30 @@ public:
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       if( r == (long double)(0.0) )
-         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5a
+#ifdef SOPLEX_PERFALT_1
+         if( mpq_sgn(privatevalue) != 0 )
+#else
+         if( mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0 )
+#endif
+#endif
+            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      }
       else if( r == (long double)(1.0) )
-         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      }
       else if( r == (long double)(-1.0) )
-         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      }
       else
          mpq_set_d(this->privatevalue, double(r));
 
@@ -217,11 +242,30 @@ public:
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       if( r == 0.0 )
-         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5a
+#ifdef SOPLEX_PERFALT_1
+         if( mpq_sgn(privatevalue) != 0 )
+#else
+         if( mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0 )
+#endif
+#endif
+            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      }
       else if( r == 1.0 )
-         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      }
       else if( r == -1.0 )
-         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      }
       else
          mpq_set_d(privatevalue, r);
 
@@ -233,11 +277,30 @@ public:
    {
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       if( i == 0 )
-         mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5a
+#ifdef SOPLEX_PERFALT_1
+         if( mpq_sgn(privatevalue) != 0 )
+#else
+         if( mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0 )
+#endif
+#endif
+            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      }
       else if( i == 1 )
-         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      }
       else if( i == -1 )
-         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      }
       else
          mpq_set_si(privatevalue, i, 1);
 
