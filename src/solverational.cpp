@@ -499,28 +499,29 @@ namespace soplex
                      boundsViolation = -_modUpper[c];
                }
             }
+         }
 
-            // compute violation of sides
-            sideViolation = 0;
-            for( int r = numRowsRational() - 1; r >= 0; r-- )
+         ///@todo we only need to recompute the ones that were restricted and are now unrestricted
+         // compute violation of sides
+         sideViolation = 0;
+         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         {
+            // left-hand side
+            _modLhs[r] = lhsRational(r);
+            if( _modLhs[r] > _rationalNegInfty )
             {
-               // left-hand side
-               _modLhs[r] = lhsRational(r);
-               if( _modLhs[r] > _rationalNegInfty )
-               {
-                  _modLhs[r] -= sol._slacks[r];
-                  if( _modLhs[r] > sideViolation )
-                     sideViolation = _modLhs[r];
-               }
+               _modLhs[r] -= sol._slacks[r];
+               if( _modLhs[r] > sideViolation )
+                  sideViolation = _modLhs[r];
+            }
 
-               // right-hand side
-               _modRhs[r] = rhsRational(r);
-               if( _modRhs[r] < _rationalPosInfty )
-               {
-                  _modRhs[r] -= sol._slacks[r];
-                  if( _modRhs[r] < -sideViolation )
-                     sideViolation = -_modRhs[r];
-               }
+            // right-hand side
+            _modRhs[r] = rhsRational(r);
+            if( _modRhs[r] < _rationalPosInfty )
+            {
+               _modRhs[r] -= sol._slacks[r];
+               if( _modRhs[r] < -sideViolation )
+                  sideViolation = -_modRhs[r];
             }
          }
 
