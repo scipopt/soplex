@@ -783,12 +783,20 @@ Rational& Rational::operator-=(const Rational& r)
    if( mpq_sgn(r.dpointer->privatevalue) == 0 )
       return *this;
    else if( mpq_sgn(this->dpointer->privatevalue) == 0 )
-      return (*this = -r);
+   {
+      *this = r;
+      *this *= -1;
+      return *this;
+   }
 #else
    if( mpq_equal(r.dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
       return *this;
    else if( mpq_equal(this->dpointer->privatevalue, Rational::ZERO.dpointer->privatevalue) != 0 )
-      return (*this = -r);
+   {
+      *this = r;
+      *this *= -1;
+      return *this;
+   }
 #endif
 #endif
 
