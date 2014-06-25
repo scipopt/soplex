@@ -461,6 +461,10 @@ namespace soplex
       int numFailedRefinements = 0;
       bool restrictInequalities = true;
 
+      // store basis status in case solving modified problem failed
+      DataArray< SPxSolver::VarStatus > basisStatusRowsFirst;
+      DataArray< SPxSolver::VarStatus > basisStatusColsFirst;
+
       // refinement loop
       do
       {
@@ -706,10 +710,16 @@ namespace soplex
          // solve modified problem
          if( restrictInequalities )
          {
+            // store basis status in case solving modified problem failed
+            basisStatusRowsFirst = _basisStatusRows;
+            basisStatusColsFirst = _basisStatusCols;
+
             result = _solveRealStable(acceptUnbounded, true, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
             if( result != SPxSolver::OPTIMAL )
             {
                restrictInequalities = false;
+               _basisStatusRows = basisStatusRowsFirst;
+               _basisStatusCols = basisStatusColsFirst;
 
                _dualDiff.clear();
                for( int r = numRowsRational() - 1; r >= 0; r-- )
