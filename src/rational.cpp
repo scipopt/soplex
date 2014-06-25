@@ -186,6 +186,11 @@ public:
    /// assignment operator
    Private& operator=(const Private& p)
    {
+#ifdef SOPLEX_PERFALT_4
+      if( mpq_equal(this->privatevalue, p.privatevalue) != 0 )
+         return *this;
+#endif
+
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       mpq_set(this->privatevalue, p.privatevalue);
       return *this;
@@ -242,6 +247,11 @@ public:
    /// assignment operator from mpq_t
    Private& operator=(const mpq_t& q)
    {
+#ifdef SOPLEX_PERFALT_4
+   if( mpq_equal(this->privatevalue, q) != 0 )
+      return *this;
+#endif
+
       // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
       mpq_set(this->privatevalue, q);
       return *this;
@@ -541,11 +551,6 @@ void Rational::disableListMem()
 /// assignment operator
 Rational& Rational::operator=(const Rational &r)
 {
-#ifdef SOPLEX_PERFALT_4
-   if( mpq_equal(this->dpointer->privatevalue, r.dpointer->privatevalue) != 0 )
-      return *this;
-#endif
-
    *(this->dpointer) = *(r.dpointer);
    return *this;
 }
