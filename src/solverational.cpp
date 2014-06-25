@@ -2578,7 +2578,7 @@ namespace soplex
 
       setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
 
-      while( !_isSolveStopped() )
+      while( true )
       {
          assert(!increasedMarkowitz || GE(_slufactor.markowitz(), 0.9));
 
@@ -2589,6 +2589,9 @@ namespace soplex
             || (result == SPxSolver::UNBOUNDED && acceptUnbounded);
 
          if( solved )
+            break;
+
+         if( _isSolveStopped() )
             break;
 
          if( initialSolve )
