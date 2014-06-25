@@ -491,5 +491,26 @@ void VectorBase<Real>::clear()
       memset(val, 0, (unsigned int)dimen * sizeof(Real));
 }
 
+
+
+/// Inner product.
+template<>
+inline
+Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
+{
+   assert(vec.dim() == dimen);
+
+   if( dimen <= 0 || vec.dim() <= 0 )
+      return 0;
+
+   Rational x = val[0];
+   x *= vec.val[0];
+
+   for( int i = 1; i < dimen && i < vec.dim(); i++ )
+      x.addProduct(val[i], vec.val[i]);
+
+   return x;
+}
+
 } // namespace soplex
 #endif // _VECTORBASE_H_
