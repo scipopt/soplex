@@ -459,13 +459,14 @@ namespace soplex
       Rational bestViolation = _rationalPosInfty;
       const Rational violationImprovementFactor = 0.9;
       int numFailedRefinements = 0;
-      bool restrictInequalities = true;
 
       // store basis status in case solving modified problem failed
       DataArray< SPxSolver::VarStatus > basisStatusRowsFirst;
       DataArray< SPxSolver::VarStatus > basisStatusColsFirst;
 
       // refinement loop
+      const int maxDimRational = numColsRational() > numRowsRational() ? numColsRational() : numRowsRational();
+      bool restrictInequalities = true;
       do
       {
          if( restrictInequalities )
@@ -722,7 +723,7 @@ namespace soplex
                _basisStatusRows = basisStatusRowsFirst;
                _basisStatusCols = basisStatusColsFirst;
 
-               _dualDiff.clear();
+               _primalDualDiff.clear();
                for( int r = numRowsRational() - 1; r >= 0; r-- )
                {
                   if( lhsRational(r) != rhsRational(r) )
@@ -732,9 +733,10 @@ namespace soplex
 
                      if( sol._dual[r] != 0 )
                      {
-                        int i = _dualDiff.size();
-                        _dualDiff.add(r);
-                        _dualDiff.value(i) = sol._dual[r];
+                        int i = _primalDualDiff.size();
+                        _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                        _primalDualDiff.add(r);
+                        _primalDualDiff.value(i) = sol._dual[r];
                         sol._dual[r] = 0;
                         dualSize--;
                         assert(dualSize >= 0);
@@ -753,9 +755,9 @@ namespace soplex
 
                // update or recompute reduced cost values depending on which looks faster; adding one to the length of
                // the dual vector accounts for the objective function vector
-               if( _dualDiff.size() < dualSize + 1 )
+               if( _primalDualDiff.size() < dualSize + 1 )
                {
-                  _rationalLP->addDualActivity(_dualDiff, sol._redCost);
+                  _rationalLP->addDualActivity(_primalDualDiff, sol._redCost);
 #ifndef NDEBUG
                   {
                      DVectorRational activity(_rationalLP->maxObj());
@@ -817,7 +819,7 @@ namespace soplex
          int primalSize = 0;
          Rational primalScaleInverse = primalScale;
          primalScaleInverse.invert();
-         _primalDiff.clear();
+         _primalDualDiff.clear();
          for( int c = numColsRational() - 1; c >= 0; c-- )
          {
             // force values of nonbasic variables to bounds
@@ -827,10 +829,11 @@ namespace soplex
             {
                if( sol._primal[c] != lowerRational(c) )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = lowerRational(c);
-                  _primalDiff.value(i) -= sol._primal[c];
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = lowerRational(c);
+                  _primalDualDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = lowerRational(c);
                }
             }
@@ -838,10 +841,11 @@ namespace soplex
             {
                if( sol._primal[c] != upperRational(c) )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = upperRational(c);
-                  _primalDiff.value(i) -= sol._primal[c];
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = upperRational(c);
+                  _primalDualDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = upperRational(c);
                }
             }
@@ -851,10 +855,11 @@ namespace soplex
 
                if( sol._primal[c] != lowerRational(c) )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = lowerRational(c);
-                  _primalDiff.value(i) -= sol._primal[c];
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = lowerRational(c);
+                  _primalDualDiff.value(i) -= sol._primal[c];
                   sol._primal[c] = lowerRational(c);
                }
             }
@@ -862,10 +867,11 @@ namespace soplex
             {
                if( sol._primal[c] != 0 )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = sol._primal[c];
-                  _primalDiff.value(i) *= -1;
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = sol._primal[c];
+                  _primalDualDiff.value(i) *= -1;
                   sol._primal[c] = 0;
                }
             }
@@ -873,26 +879,29 @@ namespace soplex
             {
                if( primalReal[c] == 1.0 )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = primalScaleInverse;
-                  sol._primal[c] += _primalDiff.value(i);
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = primalScaleInverse;
+                  sol._primal[c] += _primalDualDiff.value(i);
                }
                else if( primalReal[c] == -1.0 )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = primalScaleInverse;
-                  _primalDiff.value(i) *= -1;
-                  sol._primal[c] += _primalDiff.value(i);
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = primalScaleInverse;
+                  _primalDualDiff.value(i) *= -1;
+                  sol._primal[c] += _primalDualDiff.value(i);
                }
                else if( primalReal[c] != 0.0 )
                {
-                  int i = _primalDiff.size();
-                  _primalDiff.add(c);
-                  _primalDiff.value(i) = primalReal[c];
-                  _primalDiff.value(i) *= primalScaleInverse;
-                  sol._primal[c] += _primalDiff.value(i);
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(c);
+                  _primalDualDiff.value(i) = primalReal[c];
+                  _primalDualDiff.value(i) *= primalScaleInverse;
+                  sol._primal[c] += _primalDualDiff.value(i);
                }
             }
 
@@ -901,9 +910,9 @@ namespace soplex
          }
 
          // update or recompute slacks depending on which looks faster
-         if( _primalDiff.size() < primalSize )
+         if( _primalDualDiff.size() < primalSize )
          {
-            _rationalLP->addPrimalActivity(_primalDiff, sol._slacks);
+            _rationalLP->addPrimalActivity(_primalDualDiff, sol._slacks);
 #ifndef NDEBUG
             {
                DVectorRational activity(numRowsRational());
@@ -914,6 +923,7 @@ namespace soplex
          }
          else
             _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
+         const int numCorrectedPrimals = _primalDualDiff.size();
 
          // correct dual solution and align with basis
          MSG_DEBUG( spxout << "Correcting dual solution.\n" );
@@ -921,7 +931,7 @@ namespace soplex
          Rational dualScaleInverseNeg = dualScale;
          dualScaleInverseNeg.invert();
          dualScaleInverseNeg *= -1;
-         _dualDiff.clear();
+         _primalDualDiff.clear();
          dualSize = 0;
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
@@ -950,9 +960,10 @@ namespace soplex
             {
                if( sol._dual[r] != 0 )
                {
-                  int i = _dualDiff.size();
-                  _dualDiff.add(r);
-                  _dualDiff.value(i) = sol._dual[r];
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(r);
+                  _primalDualDiff.value(i) = sol._dual[r];
                   sol._dual[r] = 0;
                }
             }
@@ -960,16 +971,17 @@ namespace soplex
             {
                if( dualReal[r] != 0.0 )
                {
-                  int i = _dualDiff.size();
-                  _dualDiff.add(r);
-                  _dualDiff.value(i) = dualReal[r];
-                  _dualDiff.value(i) *= dualScaleInverseNeg;
-                  sol._dual[r] -= _dualDiff.value(i);
+                  int i = _primalDualDiff.size();
+                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
+                  _primalDualDiff.add(r);
+                  _primalDualDiff.value(i) = dualReal[r];
+                  _primalDualDiff.value(i) *= dualScaleInverseNeg;
+                  sol._dual[r] -= _primalDualDiff.value(i);
 
                   if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
                      || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0) )
                   {
-                     _dualDiff.value(i) += sol._dual[r];
+                     _primalDualDiff.value(i) += sol._dual[r];
                      sol._dual[r] = 0;
                   }
                   // we do not check whether the dual value is nonzero, because it probably is; this gives us an
@@ -994,9 +1006,9 @@ namespace soplex
 
          // update or recompute reduced cost values depending on which looks faster; adding one to the length of the
          // dual vector accounts for the objective function vector
-         if( _dualDiff.size() < dualSize + 1 )
+         if( _primalDualDiff.size() < dualSize + 1 )
          {
-            _rationalLP->addDualActivity(_dualDiff, sol._redCost);
+            _rationalLP->addDualActivity(_primalDualDiff, sol._redCost);
 #ifndef NDEBUG
             {
                DVectorRational activity(_rationalLP->maxObj());
@@ -1014,10 +1026,11 @@ namespace soplex
             sol._redCost *= -1;
             _rationalLP->subDualActivity(sol._dual, sol._redCost);
          }
+         const int numCorrectedDuals = _primalDualDiff.size();
 
-         if( _primalDiff.size() + _dualDiff.size() > 0 )
+         if( numCorrectedPrimals + numCorrectedDuals > 0 )
          {
-            MSG_INFO2( spxout << "Corrected " << _primalDiff.size() << " primal variables and " << _dualDiff.size() << " dual values.\n" );
+            MSG_INFO2( spxout << "Corrected " << numCorrectedPrimals << " primal variables and " << numCorrectedDuals << " dual values.\n" );
          }
 
          // refinement was successful; try with fixed inequalities during next run

@@ -5501,6 +5501,16 @@ namespace soplex
 
 
 
+   /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
+   void SoPlex::_ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const
+   {
+      assert(newmax > vec.size());
+      if( vec.size() >= vec.max() )
+         vec.setMax(newmax);
+   }
+
+
+
    /// creates a permutation for removing rows/columns from an array of indices
    void SoPlex::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
    {

@@ -1242,8 +1242,7 @@ private:
    DVectorRational _modLhs;
    DVectorRational _modRhs;
    DVectorRational _modObj;
-   DSVectorRational _primalDiff;
-   DSVectorRational _dualDiff;
+   DSVectorRational _primalDualDiff;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
    bool _storedBasis;
@@ -1274,6 +1273,9 @@ private:
 
    //**@name Constant helper methods */
    //@{
+
+   /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
+   void _ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const;
 
    /// creates a permutation for removing rows/columns from an array of indices
    void _idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
