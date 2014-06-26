@@ -481,23 +481,41 @@ namespace soplex
             for( int c = numColsRational() - 1; c >= 0; c-- )
             {
                // lower bound
-               _modLower[c] = lowerRational(c);
-
-               if( _modLower[c] > _rationalNegInfty )
+               if( lowerRational(c) == 0 )
                {
-                  _modLower[c] -= sol._primal[c];
+                  _modLower[c] = sol._primal[c];
+                  _modLower[c] *= -1;
                   if( _modLower[c] > boundsViolation )
                      boundsViolation = _modLower[c];
                }
+               else
+               {
+                  _modLower[c] = lowerRational(c);
+                  if( _modLower[c] > _rationalNegInfty )
+                  {
+                     _modLower[c] -= sol._primal[c];
+                     if( _modLower[c] > boundsViolation )
+                        boundsViolation = _modLower[c];
+                  }
+               }
 
                // upper bound
-               _modUpper[c] = upperRational(c);
-
-               if( _modUpper[c] < _rationalPosInfty )
+               if( upperRational(c) == 0 )
                {
-                  _modUpper[c] -= sol._primal[c];
+                  _modUpper[c] = sol._primal[c];
+                  _modUpper[c] *= -1;
                   if( _modUpper[c] < -boundsViolation )
                      boundsViolation = -_modUpper[c];
+               }
+               else
+               {
+                  _modUpper[c] = upperRational(c);
+                  if( _modUpper[c] < _rationalPosInfty )
+                  {
+                     _modUpper[c] -= sol._primal[c];
+                     if( _modUpper[c] < -boundsViolation )
+                        boundsViolation = -_modUpper[c];
+                  }
                }
             }
          }
@@ -508,21 +526,41 @@ namespace soplex
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             // left-hand side
-            _modLhs[r] = lhsRational(r);
-            if( _modLhs[r] > _rationalNegInfty )
+            if( lhsRational(r) == 0 )
             {
-               _modLhs[r] -= sol._slacks[r];
+               _modLhs[r] = sol._slacks[r];
+               _modLhs[r] *= -1;
                if( _modLhs[r] > sideViolation )
                   sideViolation = _modLhs[r];
             }
+            else
+            {
+               _modLhs[r] = lhsRational(r);
+               if( _modLhs[r] > _rationalNegInfty )
+               {
+                  _modLhs[r] -= sol._slacks[r];
+                  if( _modLhs[r] > sideViolation )
+                     sideViolation = _modLhs[r];
+               }
+            }
 
             // right-hand side
-            _modRhs[r] = rhsRational(r);
-            if( _modRhs[r] < _rationalPosInfty )
+            if( rhsRational(r) == 0 )
             {
-               _modRhs[r] -= sol._slacks[r];
+               _modRhs[r] = sol._slacks[r];
+               _modRhs[r] *= -1;
                if( _modRhs[r] < -sideViolation )
                   sideViolation = -_modRhs[r];
+            }
+            else
+            {
+               _modRhs[r] = rhsRational(r);
+               if( _modRhs[r] < _rationalPosInfty )
+               {
+                  _modRhs[r] -= sol._slacks[r];
+                  if( _modRhs[r] < -sideViolation )
+                     sideViolation = -_modRhs[r];
+               }
             }
          }
 
