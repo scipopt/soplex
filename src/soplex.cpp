@@ -5793,6 +5793,35 @@ namespace soplex
 
 
 
+   /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
+   SoPlex::RangeType SoPlex::_switchRangeType(const SoPlex::RangeType& rangeType) const
+   {
+      if( rangeType == RANGETYPE_LOWER )
+         return RANGETYPE_UPPER;
+      else if( rangeType == RANGETYPE_UPPER )
+         return RANGETYPE_LOWER;
+      else
+         return rangeType;
+   }
+
+
+
+   /// checks whether RangeType corresponds to finite lower bound
+   bool SoPlex::_lowerFinite(const RangeType& rangeType) const
+   {
+      return (rangeType == RANGETYPE_LOWER || rangeType == RANGETYPE_BOXED || rangeType == RANGETYPE_FIXED);
+   }
+
+
+
+   /// checks whether RangeType corresponds to finite upper bound
+   bool SoPlex::_upperFinite(const RangeType& rangeType) const
+   {
+      return (rangeType == RANGETYPE_UPPER || rangeType == RANGETYPE_BOXED || rangeType == RANGETYPE_FIXED);
+   }
+
+
+
    /// adds a single row to the real LP and adjusts basis
    void SoPlex::_addRowReal(const LPRowReal& lprow)
    {

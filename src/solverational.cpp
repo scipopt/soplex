@@ -491,7 +491,8 @@ namespace soplex
                else
                {
                   _modLower[c] = lowerRational(c);
-                  if( _modLower[c] > _rationalNegInfty )
+                  assert((_modLower[c] > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
+                  if( _lowerFinite(_colTypes[c]) )
                   {
                      _modLower[c] -= sol._primal[c];
                      if( _modLower[c] > boundsViolation )
@@ -510,7 +511,8 @@ namespace soplex
                else
                {
                   _modUpper[c] = upperRational(c);
-                  if( _modUpper[c] < _rationalPosInfty )
+                  assert((_modUpper[c] < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+                  if( _upperFinite(_colTypes[c]) )
                   {
                      _modUpper[c] -= sol._primal[c];
                      if( _modUpper[c] < -boundsViolation )
@@ -536,7 +538,8 @@ namespace soplex
             else
             {
                _modLhs[r] = lhsRational(r);
-               if( _modLhs[r] > _rationalNegInfty )
+               assert((_modLhs[r] > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+               if( _lowerFinite(_rowTypes[r]) )
                {
                   _modLhs[r] -= sol._slacks[r];
                   if( _modLhs[r] > sideViolation )
@@ -555,7 +558,8 @@ namespace soplex
             else
             {
                _modRhs[r] = rhsRational(r);
-               if( _modRhs[r] < _rationalPosInfty )
+               assert((_modRhs[r] < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+               if( _upperFinite(_rowTypes[r]) )
                {
                   _modRhs[r] -= sol._slacks[r];
                   if( _modRhs[r] < -sideViolation )
@@ -1524,6 +1528,8 @@ namespace soplex
             _slackCols.add(0.0, -rhsRational(i), DSVectorRational(UnitVector(i)), -lhsRational(i));
             _rationalLP->changeRange(i, 0.0, 0.0);
             _realLP->changeRange(i, 0.0, 0.0);
+            _colTypes.append(_switchRangeType(_rowTypes[i]));
+            _rowTypes[i] = RANGETYPE_FIXED;
          }
       }
 
@@ -1652,10 +1658,12 @@ namespace soplex
          int row = _slackCols.colVector(i).index(0);
 
          _rationalLP->changeRange(row, -upperRational(col), -lowerRational(col));
+         _rowTypes[row] = _switchRangeType(_colTypes[col]);
       }
 
       _rationalLP->removeColRange(numOrigCols, numCols - 1);
       _realLP->removeColRange(numOrigCols, numCols - 1);
+      _colTypes.reSize(numOrigCols);
 
       // restore bounds and objective coefficients in real LP
       for( int c = numColsRational() - 1; c >= 0; c-- )
@@ -1703,13 +1711,15 @@ namespace soplex
       // make right-hand side zero
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
-         if( lhsRational(r) > _rationalNegInfty )
+         assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+         if( _lowerFinite(_rowTypes[r]) )
          {
             _rationalLP->changeLhs(r, 0);
             _realLP->changeLhs(r, 0.0);
          }
 
-         if( rhsRational(r) < _rationalPosInfty )
+         assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+         if( _upperFinite(_rowTypes[r]) )
          {
             _rationalLP->changeRhs(r, 0);
             _realLP->changeRhs(r, 0.0);
@@ -1724,6 +1734,7 @@ namespace soplex
       obj.add(numOrigCols, 1);
       _rationalLP->addRow(LPRowRational(0, obj, 0));
       _realLP->addRow(LPRowReal(0, DSVectorReal(obj), 0));
+      _rowTypes.append(RANGETYPE_FIXED);
 
       assert(numColsRational() == numOrigCols + 1);
 
@@ -1733,6 +1744,7 @@ namespace soplex
 
       _rationalLP->changeBounds(numOrigCols, _rationalNegInfty, 1);
       _realLP->changeBounds(numOrigCols, -realParam(SoPlex::INFTY), 1.0);
+      _colTypes.append(RANGETYPE_UPPER);
 
       // set objective coefficients to zero and adjust bounds for problem variables
       for( int c = numColsRational() - 2; c >= 0; c-- )
@@ -1740,13 +1752,15 @@ namespace soplex
          _rationalLP->changeObj(c, 0);
          _realLP->changeObj(c, 0.0);
 
-         if( lowerRational(c) > _rationalNegInfty )
+         assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
+         if( _lowerFinite(_colTypes[c]) )
          {
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
 
-         if( upperRational(c) < _rationalPosInfty )
+         assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+         if( _upperFinite(_colTypes[c]) )
          {
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
@@ -1844,9 +1858,11 @@ namespace soplex
       // remove objective function constraint and auxiliary variable
       _rationalLP->removeRow(numOrigRows);
       _realLP->removeRow(numOrigRows);
+      _rowTypes.reSize(numOrigRows);
 
       _rationalLP->removeCol(numOrigCols);
       _realLP->removeCol(numOrigCols);
+      _colTypes.reSize(numOrigCols);
 
       // restore sides and bounds
       DVectorReal vectorReal(_unboundedLhs);
@@ -1864,6 +1880,19 @@ namespace soplex
       vectorReal = _unboundedUpper;
       _rationalLP->changeUpper(_unboundedUpper);
       _realLP->changeUpper(vectorReal);
+
+#ifndef NDEBUG
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+         assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+      }
+      for( int c = numColsRational() - 1; c >= 0; c-- )
+      {
+         assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
+         assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+      }
+#endif
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
@@ -1948,20 +1977,23 @@ namespace soplex
                shiftValue *= lowerRational(c);
                int r = colVector.index(i);
 
-               if( lhsRational(r) > _rationalNegInfty )
+               assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+               if( _lowerFinite(_rowTypes[r]) )
                {
                   _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
                   _realLP->changeLhs(r, Real(lhsRational(r)));
                }
 
-               if( rhsRational(r) < _rationalPosInfty )
+               assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+               if( _upperFinite(_rowTypes[r]) )
                {
                   _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
                   _realLP->changeRhs(r, Real(rhsRational(r)));
                }
             }
 
-            _rationalLP->changeBounds(c, 0, upperRational(c) < _rationalPosInfty ? upperRational(c) - lowerRational(c) : upperRational(c));
+            assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+            _rationalLP->changeBounds(c, 0, _upperFinite(_colTypes[c]) ? upperRational(c) - lowerRational(c) : upperRational(c));
             _realLP->changeBounds(c, 0.0, Real(upperRational(c)));
          }
          else if( upperRational(c) < 0 )
@@ -1975,20 +2007,23 @@ namespace soplex
                shiftValue *= upperRational(c);
                int r = colVector.index(i);
 
-               if( lhsRational(r) > _rationalNegInfty )
+               assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+               if( _lowerFinite(_rowTypes[r]) )
                {
                   _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
                   _realLP->changeLhs(r, Real(lhsRational(r)));
                }
 
-               if( rhsRational(r) < _rationalPosInfty )
+               assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+               if( _upperFinite(_rowTypes[r]) )
                {
                   _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
                   _realLP->changeRhs(r, Real(rhsRational(r)));
                }
             }
 
-            _rationalLP->changeBounds(c, lowerRational(c) > _rationalNegInfty ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
+            assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
+            _rationalLP->changeBounds(c, _lowerFinite(_colTypes[c]) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
             _realLP->changeBounds(c, Real(lowerRational(c)), 0.0);
          }
          else
@@ -2006,7 +2041,8 @@ namespace soplex
          if( lhsRational(r) > 0 )
          {
             _tauColVector.add(r, lhsRational(r));
-            if( rhsRational(r) < _rationalPosInfty )
+            assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+            if( _upperFinite(_rowTypes[r]) )
             {
                _rationalLP->changeRange(r, 0, rhsRational(r) - lhsRational(r));
                _realLP->changeRange(r, 0.0, Real(rhsRational(r)));
@@ -2020,7 +2056,8 @@ namespace soplex
          else if( rhsRational(r) < 0 )
          {
             _tauColVector.add(r, rhsRational(r));
-            if( lhsRational(r) > _rationalNegInfty )
+            assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+            if( _lowerFinite(_rowTypes[r]) )
             {
                _rationalLP->changeRange(r, lhsRational(r) - rhsRational(r), 0);
                _realLP->changeRange(r, Real(lhsRational(r)), 0.0);
@@ -2046,6 +2083,7 @@ namespace soplex
       _tauColVector *= -1;
       _rationalLP->addCol(id, LPColRational(-1, _tauColVector, 1, 0));
       _realLP->addCol(id, LPColReal(-1.0, DSVectorReal(_tauColVector), 1.0, 0.0));
+      _colTypes.append(RANGETYPE_BOXED);
 
       // adjust basis
       if( _hasBasis )
@@ -2142,6 +2180,7 @@ namespace soplex
       // remove last column
       _rationalLP->removeCol(numOrigCols);
       _realLP->removeCol(numOrigCols);
+      _colTypes.reSize(numOrigCols);
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterUntransFeas.lp", 0, 0, 0) );
@@ -2233,14 +2272,16 @@ namespace soplex
 
          if( minusRedCost > 0 )
          {
-            if( upper[c] < _rationalPosInfty )
+            assert((upper[c] < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+            if( _upperFinite(_colTypes[c]) )
                temp.addProduct(minusRedCost, upper[c]);
             else
                isTempFinite = false;
          }
          else if( minusRedCost < 0 )
          {
-            if( lower[c] > _rationalNegInfty )
+            assert((lower[c] > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
+            if( _lowerFinite(_colTypes[c]) )
                temp.addProduct(minusRedCost, lower[c]);
             else
                isTempFinite = false;
@@ -2326,7 +2367,9 @@ namespace soplex
 
          // if the multiplier is positive we inspect the lower bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         if( minusRedCost < 0 && lower[colIdx] > -B && lower[colIdx] > _rationalNegInfty )
+         assert((upper[colIdx] < _rationalPosInfty) == _upperFinite(_colTypes[colIdx]));
+         assert((lower[colIdx] > _rationalNegInfty) == _lowerFinite(_colTypes[colIdx]));
+         if( minusRedCost < 0 && lower[colIdx] > -B && _lowerFinite(_colTypes[colIdx]) )
          {
             ytransA.clearNum(n);
             ytransb.subProduct(minusRedCost, lower[colIdx]);
@@ -2359,7 +2402,7 @@ namespace soplex
          }
          // if the multiplier is negative we inspect the upper bound: if it is finite and within the Farkas box, we can
          // increase B by including it in the Farkas proof
-         else if( minusRedCost > 0 && upper[colIdx] < B && upper[colIdx] < _rationalPosInfty )
+         else if( minusRedCost > 0 && upper[colIdx] < B && _upperFinite(_colTypes[colIdx]) )
          {
             ytransA.clearNum(n);
             ytransb.subProduct(minusRedCost, upper[colIdx]);

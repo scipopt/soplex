@@ -1317,6 +1317,15 @@ private:
    /// determines RangeType from rational bounds
    RangeType _rangeTypeRational(const Rational& lower, const Rational& upper) const;
 
+   /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
+   RangeType _switchRangeType(const RangeType& rangeType) const;
+
+   /// checks whether RangeType corresponds to finite lower bound
+   bool _lowerFinite(const RangeType& rangeType) const;
+
+   /// checks whether RangeType corresponds to finite upper bound
+   bool _upperFinite(const RangeType& rangeType) const;
+
    //@}
 
 
