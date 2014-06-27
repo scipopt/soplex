@@ -1311,9 +1311,6 @@ private:
    /// should solving process be stopped?
    bool _isSolveStopped() const;
 
-   /// parses one line in a settings file and returns true on success; note that the string is modified
-   bool _parseSettingsLine(char* line, const int lineNumber);
-
    /// determines RangeType from real bounds
    RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
 
@@ -1461,6 +1458,9 @@ private:
 
    /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    void _syncRationalSolution();
+
+   /// parses one line in a settings file and returns true on success; note that the string is modified
+   bool _parseSettingsLine(char* line, const int lineNumber);
 
    //@}
 

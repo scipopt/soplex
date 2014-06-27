@@ -5743,234 +5743,6 @@ namespace soplex
 
 
 
-   /// parses one line in a settings file and returns true on success; note that the string is modified
-   bool SoPlex::_parseSettingsLine(char* line, const int lineNumber)
-   {
-      assert(line != 0);
-
-      // find the start of the parameter type
-      while( *line == ' ' || *line == '\t' || *line == '\r' )
-         line++;
-      if( *line == '\0' || *line == '\n' || *line == '#' )
-         return true;
-      char* paramTypeString = line;
-
-      // find the end of the parameter type
-      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != ':' )
-         line++;
-      if( *line == ':' )
-      {
-         *line = '\0';
-         line++;
-      }
-      else
-      {
-         *line = '\0';
-         line++;
-
-         // search for the ':' char in the line
-         while( *line == ' ' || *line == '\t' || *line == '\r' )
-            line++;
-         if( *line != ':' )
-         {
-            MSG_ERROR( spxout << "Error parsing settings file: no ':' separating parameter type and name in line " << lineNumber << ".\n" );
-            return false;
-         }
-         line++;
-      }
-
-      // find the start of the parameter name
-      while( *line == ' ' || *line == '\t' || *line == '\r' )
-         line++;
-      if( *line == '\0' || *line == '\n' || *line == '#' )
-      {
-         MSG_ERROR( spxout << "Error parsing settings file: no parameter name in line " << lineNumber << ".\n");
-         return false;
-      }
-      char* paramName = line;
-
-      // find the end of the parameter name
-      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != '=' )
-         line++;
-      if( *line == '=' )
-      {
-         *line = '\0';
-         line++;
-      }
-      else
-      {
-         *line = '\0';
-         line++;
-
-         // search for the '=' char in the line
-         while( *line == ' ' || *line == '\t' || *line == '\r' )
-            line++;
-         if( *line != '=' )
-         {
-            MSG_ERROR( spxout << "Error parsing settings file: no '=' after parameter name in line " << lineNumber << ".\n" );
-            return false;
-         }
-         line++;
-      }
-
-      // find the start of the parameter value string
-      while( *line == ' ' || *line == '\t' || *line == '\r' )
-         line++;
-      if( *line == '\0' || *line == '\n' || *line == '#' )
-      {
-         MSG_ERROR( spxout << "Error parsing settings file: no parameter value in line " << lineNumber << ".\n");
-         return false;
-      }
-      char* paramValueString = line;
-
-      // find the end of the parameter value string
-      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' )
-         line++;
-      if( *line != '\0' )
-      {
-         // check, if the rest of the line is clean
-         *line = '\0';
-         line++;
-         while( *line == ' ' || *line == '\t' || *line == '\r' )
-            line++;
-         if( *line != '\0' && *line != '\n' && *line != '#' )
-         {
-            MSG_ERROR( spxout << "Error parsing settings file: additional character '" << *line << "' after parameter value in line " << lineNumber << ".\n" );
-            return false;
-         }
-      }
-
-      // check whether we have a bool parameter
-      if( strncmp(paramTypeString, "bool", 4) == 0 )
-      {
-         for( int param = 0; ; param++ )
-         {
-            if( param >= SoPlex::BOOLPARAM_COUNT )
-            {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
-               return false;
-            }
-            else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-            {
-               if( strncasecmp(paramValueString, "true", 4) == 0
-                  || strncasecmp(paramValueString, "TRUE", 4) == 0
-                  || strncasecmp(paramValueString, "t", 4) == 0
-                  || strncasecmp(paramValueString, "T", 4) == 0
-                  || strtol(paramValueString, NULL, 4) == 1 )
-               {
-                  setBoolParam((SoPlex::BoolParam)param, true);
-                  break;
-               }
-               else if( strncasecmp(paramValueString, "false", 5) == 0
-                  || strncasecmp(paramValueString, "FALSE", 5) == 0
-                  || strncasecmp(paramValueString, "f", 5) == 0
-                  || strncasecmp(paramValueString, "F", 5) == 0
-                  || strtol(paramValueString, NULL, 5) == 0 )
-               {
-                  setBoolParam((SoPlex::BoolParam)param, false);
-                  break;
-               }
-               else
-               {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for bool parameter <" << paramName << "> in line " << lineNumber << ".\n" );
-                  return false;
-               }
-            }
-         }
-
-         return true;
-      }
-
-      // check whether we have an integer parameter
-      if( strncmp(paramTypeString, "int", 3) == 0 )
-      {
-         for( int param = 0; ; param++ )
-         {
-            if( param >= SoPlex::INTPARAM_COUNT )
-            {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
-               return false;
-            }
-            else if( strncmp(paramName, _currentSettings->_intParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-            {
-               int value;
-
-               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value) )
-                  break;
-               else
-               {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for int parameter <" << paramName << "> in line " << lineNumber << ".\n" );
-                  return false;
-               }
-            }
-         }
-
-         return true;
-      }
-
-      // check whether we have a real parameter
-      if( strncmp(paramTypeString, "real", 4) == 0 )
-      {
-         for( int param = 0; ; param++ )
-         {
-            if( param >= SoPlex::REALPARAM_COUNT )
-            {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
-               return false;
-            }
-            else if( strncmp(paramName, _currentSettings->_realParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-            {
-               Real value;
-
-               if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex::RealParam)param, value) )
-                  break;
-               else
-               {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for real parameter <" << paramName << "> in line " << lineNumber << ".\n" );
-                  return false;
-               }
-            }
-         }
-
-         return true;
-      }
-
-#ifdef SOPLEX_WITH_RATIONALPARAM
-      // check whether we have a rational parameter
-      if( strncmp(paramTypeString, "rational", 8) == 0 )
-      {
-         for( int param = 0; ; param++ )
-         {
-            if( param >= SoPlex::RATIONALPARAM_COUNT )
-            {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
-               return false;
-            }
-            else if( strncmp(paramName, _currentSettings->_rationalParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-            {
-               Rational value;
-
-               if( readStringRational(paramValueString, value) && setRationalParam((SoPlex::RationalParam)param, value) )
-                  break;
-               else
-               {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for rational parameter <" << paramName << "> in line " << lineNumber << ".\n" );
-                  return false;
-               }
-            }
-         }
-
-         return true;
-      }
-#endif
-
-      MSG_ERROR( spxout << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
-
-      return false;
-   }
-
-
-
    /// determines RangeType from real bounds
    SoPlex::RangeType SoPlex::_rangeTypeReal(const Real& lower, const Real& upper) const
    {
@@ -6902,6 +6674,234 @@ namespace soplex
          _solRational = _solReal;
          _hasSolRational = true;
       }
+   }
+
+
+
+   /// parses one line in a settings file and returns true on success; note that the string is modified
+   bool SoPlex::_parseSettingsLine(char* line, const int lineNumber)
+   {
+      assert(line != 0);
+
+      // find the start of the parameter type
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+         line++;
+      if( *line == '\0' || *line == '\n' || *line == '#' )
+         return true;
+      char* paramTypeString = line;
+
+      // find the end of the parameter type
+      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != ':' )
+         line++;
+      if( *line == ':' )
+      {
+         *line = '\0';
+         line++;
+      }
+      else
+      {
+         *line = '\0';
+         line++;
+
+         // search for the ':' char in the line
+         while( *line == ' ' || *line == '\t' || *line == '\r' )
+            line++;
+         if( *line != ':' )
+         {
+            MSG_ERROR( spxout << "Error parsing settings file: no ':' separating parameter type and name in line " << lineNumber << ".\n" );
+            return false;
+         }
+         line++;
+      }
+
+      // find the start of the parameter name
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+         line++;
+      if( *line == '\0' || *line == '\n' || *line == '#' )
+      {
+         MSG_ERROR( spxout << "Error parsing settings file: no parameter name in line " << lineNumber << ".\n");
+         return false;
+      }
+      char* paramName = line;
+
+      // find the end of the parameter name
+      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != '=' )
+         line++;
+      if( *line == '=' )
+      {
+         *line = '\0';
+         line++;
+      }
+      else
+      {
+         *line = '\0';
+         line++;
+
+         // search for the '=' char in the line
+         while( *line == ' ' || *line == '\t' || *line == '\r' )
+            line++;
+         if( *line != '=' )
+         {
+            MSG_ERROR( spxout << "Error parsing settings file: no '=' after parameter name in line " << lineNumber << ".\n" );
+            return false;
+         }
+         line++;
+      }
+
+      // find the start of the parameter value string
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+         line++;
+      if( *line == '\0' || *line == '\n' || *line == '#' )
+      {
+         MSG_ERROR( spxout << "Error parsing settings file: no parameter value in line " << lineNumber << ".\n");
+         return false;
+      }
+      char* paramValueString = line;
+
+      // find the end of the parameter value string
+      while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' )
+         line++;
+      if( *line != '\0' )
+      {
+         // check, if the rest of the line is clean
+         *line = '\0';
+         line++;
+         while( *line == ' ' || *line == '\t' || *line == '\r' )
+            line++;
+         if( *line != '\0' && *line != '\n' && *line != '#' )
+         {
+            MSG_ERROR( spxout << "Error parsing settings file: additional character '" << *line << "' after parameter value in line " << lineNumber << ".\n" );
+            return false;
+         }
+      }
+
+      // check whether we have a bool parameter
+      if( strncmp(paramTypeString, "bool", 4) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex::BOOLPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               if( strncasecmp(paramValueString, "true", 4) == 0
+                  || strncasecmp(paramValueString, "TRUE", 4) == 0
+                  || strncasecmp(paramValueString, "t", 4) == 0
+                  || strncasecmp(paramValueString, "T", 4) == 0
+                  || strtol(paramValueString, NULL, 4) == 1 )
+               {
+                  setBoolParam((SoPlex::BoolParam)param, true);
+                  break;
+               }
+               else if( strncasecmp(paramValueString, "false", 5) == 0
+                  || strncasecmp(paramValueString, "FALSE", 5) == 0
+                  || strncasecmp(paramValueString, "f", 5) == 0
+                  || strncasecmp(paramValueString, "F", 5) == 0
+                  || strtol(paramValueString, NULL, 5) == 0 )
+               {
+                  setBoolParam((SoPlex::BoolParam)param, false);
+                  break;
+               }
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for bool parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      // check whether we have an integer parameter
+      if( strncmp(paramTypeString, "int", 3) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex::INTPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_intParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               int value;
+
+               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value) )
+                  break;
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for int parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+      // check whether we have a real parameter
+      if( strncmp(paramTypeString, "real", 4) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex::REALPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_realParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               Real value;
+
+               if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex::RealParam)param, value) )
+                  break;
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for real parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      // check whether we have a rational parameter
+      if( strncmp(paramTypeString, "rational", 8) == 0 )
+      {
+         for( int param = 0; ; param++ )
+         {
+            if( param >= SoPlex::RATIONALPARAM_COUNT )
+            {
+               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               return false;
+            }
+            else if( strncmp(paramName, _currentSettings->_rationalParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+               Rational value;
+
+               if( readStringRational(paramValueString, value) && setRationalParam((SoPlex::RationalParam)param, value) )
+                  break;
+               else
+               {
+                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for rational parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  return false;
+               }
+            }
+         }
+
+         return true;
+      }
+#endif
+
+      MSG_ERROR( spxout << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+
+      return false;
    }
 } // namespace soplex
 #endif
