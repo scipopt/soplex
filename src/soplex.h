@@ -1249,6 +1249,28 @@ private:
    int _beforeLiftRows;
    int _beforeLiftCols;
 
+   /// type of bounds and sides
+   typedef enum
+   {
+      /// both bounds are infinite
+      RANGETYPE_FREE = 0,
+
+      /// lower bound is finite, upper bound is infinite
+      RANGETYPE_LOWER = 1,
+
+      /// upper bound is finite, lower bound is infinite
+      RANGETYPE_UPPER = 2,
+
+      /// lower and upper bound finite, but different
+      RANGETYPE_BOXED = 3,
+
+      /// lower bound equals upper bound
+      RANGETYPE_FIXED = 4,
+   } RangeType;
+
+   DataArray< RangeType > _colTypes;
+   DataArray< RangeType > _rowTypes;
+
    //@}
 
 
@@ -1291,6 +1313,12 @@ private:
 
    /// parses one line in a settings file and returns true on success; note that the string is modified
    bool _parseSettingsLine(char* line, const int lineNumber);
+
+   /// determines RangeType from real bounds
+   RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
+
+   /// determines RangeType from rational bounds
+   RangeType _rangeTypeRational(const Rational& lower, const Rational& upper) const;
 
    //@}
 
@@ -1415,6 +1443,12 @@ private:
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
    bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+
+   /// recomputes range types from scratch using real LP
+   void _recomputeRangeTypesReal();
+
+   /// recomputes range types from scratch using rational LP
+   void _recomputeRangeTypesRational();
 
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
    void _syncLPReal(bool time = true);

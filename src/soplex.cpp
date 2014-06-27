@@ -1104,7 +1104,10 @@ namespace soplex
       _addRowReal(lprow);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
-        _rationalLP->addRow(lprow);
+      {
+         _rationalLP->addRow(lprow);
+         _rowTypes.append(_rangeTypeReal(lprow.lhs(), lprow.rhs()));
+      }
 
       _invalidateSolution();
    }
@@ -1119,7 +1122,11 @@ namespace soplex
       _addRowsReal(lprowset);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->addRows(lprowset);
+         for( int i = 0; i < lprowset.num(); i++ )
+            _rowTypes.append(_rangeTypeReal(lprowset.lhs(i), lprowset.rhs(i)));
+      }
 
       _invalidateSolution();
    }
@@ -1134,7 +1141,10 @@ namespace soplex
       _addColReal(lpcol);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->addCol(lpcol);
+         _colTypes.append(_rangeTypeReal(lpcol.lower(), lpcol.upper()));
+      }
 
       _invalidateSolution();
    }
@@ -1149,7 +1159,11 @@ namespace soplex
       _addColsReal(lpcolset);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->addCols(lpcolset);
+         for( int i = 0; i < lpcolset.num(); i++ )
+            _colTypes.append(_rangeTypeReal(lpcolset.lower(i), lpcolset.upper(i)));
+      }
 
       _invalidateSolution();
    }
@@ -1164,7 +1178,10 @@ namespace soplex
       _changeRowReal(i, lprow);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeRow(i, lprow);
+         _rowTypes[i] = _rangeTypeReal(lprow.lhs(), lprow.rhs());
+      }
 
       _invalidateSolution();
    }
@@ -1179,7 +1196,11 @@ namespace soplex
       _changeLhsReal(lhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeLhs(DVectorRational(lhs));
+         for( int i = 0; i < numRowsRational(); i++ )
+            _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
 
       _invalidateSolution();
    }
@@ -1194,7 +1215,10 @@ namespace soplex
       _changeLhsReal(i, lhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeLhs(i, lhs);
+         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
 
       _invalidateSolution();
    }
@@ -1209,7 +1233,11 @@ namespace soplex
       _changeRhsReal(rhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeRhs(DVectorRational(rhs));
+         for( int i = 0; i < numRowsRational(); i++ )
+            _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
 
       _invalidateSolution();
    }
@@ -1224,7 +1252,10 @@ namespace soplex
       _changeRhsReal(i, rhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeRhs(i, rhs);
+         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
 
       _invalidateSolution();
    }
@@ -1239,7 +1270,11 @@ namespace soplex
       _changeRangeReal(lhs, rhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeRange(DVectorRational(lhs), DVectorRational(rhs));
+         for( int i = 0; i < numRowsRational(); i++ )
+            _rowTypes[i] = _rangeTypeReal(lhs[i], rhs[i]);
+      }
 
       _invalidateSolution();
    }
@@ -1254,7 +1289,10 @@ namespace soplex
       _changeRangeReal(i,lhs, rhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeRange(i, lhs, rhs);
+         _rowTypes[i] = _rangeTypeReal(lhs, rhs);
+      }
 
       _invalidateSolution();
    }
@@ -1269,7 +1307,10 @@ namespace soplex
       _changeColReal(i, lpcol);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeCol(i, lpcol);
+         _colTypes[i] = _rangeTypeReal(lpcol.lower(), lpcol.upper());
+      }
 
       _invalidateSolution();
    }
@@ -1284,7 +1325,12 @@ namespace soplex
       _changeLowerReal(lower);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeLower(DVectorRational(lower));
+         for( int i = 0; i < numColsRational(); i++ )
+            _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
+
 
       _invalidateSolution();
    }
@@ -1299,7 +1345,10 @@ namespace soplex
       _changeLowerReal(i, lower);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeLower(i, lower);
+         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
 
       _invalidateSolution();
    }
@@ -1314,7 +1363,11 @@ namespace soplex
       _changeUpperReal(upper);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeUpper(DVectorRational(upper));
+         for( int i = 0; i < numColsRational(); i++ )
+            _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
 
       _invalidateSolution();
    }
@@ -1329,7 +1382,10 @@ namespace soplex
       _changeUpperReal(i, upper);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeUpper(i, upper);
+         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
 
       _invalidateSolution();
    }
@@ -1344,7 +1400,11 @@ namespace soplex
       _changeBoundsReal(lower, upper);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeBounds(DVectorRational(lower), DVectorRational(upper));
+         for( int i = 0; i < numColsRational(); i++ )
+            _colTypes[i] = _rangeTypeReal(lower[i], upper[i]);
+      }
 
       _invalidateSolution();
    }
@@ -1359,8 +1419,10 @@ namespace soplex
       _changeBoundsReal(i, lower, upper);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->changeBounds(i, lower, upper);
-
+         _colTypes[i] = _rangeTypeReal(lower, upper);
+      }
       _invalidateSolution();
    }
 
@@ -1419,7 +1481,12 @@ namespace soplex
       _removeRowReal(i);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->removeRow(i);
+         _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+         _rowTypes.reSize(_rationalLP->nRows());
+         assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+      }
 
       _invalidateSolution();
    }
@@ -1433,10 +1500,23 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      const int oldsize = numRowsReal();
       _removeRowsReal(perm);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->removeRows(perm);
+         for( int i = 0; i < oldsize; i++ )
+         {
+            if( perm[i] >= 0 )
+               _rowTypes[perm[i]] = _rowTypes[i];
+         }
+         _rowTypes.reSize(_rationalLP->nRows());
+         for( int i = 0; i < numRowsRational(); i++ )
+         {
+            assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+         }
+      }
 
       _invalidateSolution();
    }
@@ -1489,7 +1569,12 @@ namespace soplex
       _removeColReal(i);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->removeCol(i);
+         _colTypes[i] = _colTypes[_rationalLP->nCols()];
+         _colTypes.reSize(_rationalLP->nCols());
+         assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+      }
 
       _invalidateSolution();
    }
@@ -1503,10 +1588,23 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      const int oldsize = numColsReal();
       _removeColsReal(perm);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->removeCols(perm);
+         for( int i = 0; i < oldsize; i++ )
+         {
+            if( perm[i] >= 0 )
+               _colTypes[perm[i]] = _colTypes[i];
+         }
+         _colTypes.reSize(_rationalLP->nCols());
+         for( int i = 0; i < numColsRational(); i++ )
+         {
+            assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+         }
+      }
 
       _invalidateSolution();
    }
@@ -1560,7 +1658,11 @@ namespace soplex
       _hasBasis = false;
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
          _rationalLP->clear();
+         _rowTypes.clear();
+         _colTypes.clear();
+      }
 
       _invalidateSolution();
    }
@@ -1587,6 +1689,7 @@ namespace soplex
          return;
 
       _rationalLP->addRow(lprow);
+      _rowTypes.append(_rangeTypeRational(lprow.lhs(), lprow.rhs()));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowReal(lprow);
@@ -1606,8 +1709,9 @@ namespace soplex
          return;
 
       _rationalLP->addRow(lhs, rowValues, rowIndices, rowSize, rhs);
-
       int i = numRowsRational() - 1;
+      _rowTypes.append(_rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i)));
+
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowReal(Real(lhsRational(i)), DSVectorReal(_rationalLP->rowVector(i)), Real(rhsRational(i)));
 
@@ -1626,6 +1730,8 @@ namespace soplex
          return;
 
       _rationalLP->addRows(lprowset);
+      for( int i = 0; i < lprowset.num(); i++ )
+         _rowTypes.append(_rangeTypeRational(lprowset.lhs(i), lprowset.rhs(i)));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowsReal(lprowset);
@@ -1644,6 +1750,7 @@ namespace soplex
          return;
 
       _rationalLP->addCol(lpcol);
+      _colTypes.append(_rangeTypeRational(lpcol.lower(), lpcol.upper()));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addColReal(lpcol);
@@ -1662,6 +1769,8 @@ namespace soplex
          return;
 
       _rationalLP->addCols(lpcolset);
+      for( int i = 0; i < lpcolset.num(); i++ )
+         _colTypes.append(_rangeTypeRational(lpcolset.lower(i), lpcolset.upper(i)));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addColsReal(lpcolset);
@@ -1680,6 +1789,7 @@ namespace soplex
          return;
 
       _rationalLP->changeRow(i, lprow);
+      _rowTypes[i] = _rangeTypeRational(lprow.lhs(), lprow.rhs());
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRowReal(i, lprow);
@@ -1698,6 +1808,8 @@ namespace soplex
          return;
 
       _rationalLP->changeLhs(lhs);
+      for( int i = 0; i < numRowsRational(); i++ )
+         _rowTypes[i] = _rangeTypeRational(lhs[i], _rationalLP->rhs(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeLhsReal(DVectorReal(lhs));
@@ -1716,6 +1828,7 @@ namespace soplex
          return;
 
       _rationalLP->changeLhs(i, lhs);
+      _rowTypes[i] = _rangeTypeRational(lhs, _rationalLP->rhs(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeLhsReal(i, Real(lhs));
@@ -1735,6 +1848,7 @@ namespace soplex
          return;
 
       _rationalLP->changeLhs(i, lhs);
+      _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeLhsReal(i, Real(lhsRational(i)));
@@ -1754,6 +1868,8 @@ namespace soplex
          return;
 
       _rationalLP->changeRhs(rhs);
+      for( int i = 0; i < numRowsRational(); i++ )
+         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), rhs[i]);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRhsReal(DVectorReal(rhs));
@@ -1773,7 +1889,10 @@ namespace soplex
          return;
 
       for( int i = 0; i < rhsSize; i++ )
+      {
          _rationalLP->changeRhs(i, rhs[i]);
+         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRhsReal(DVectorReal(rhsRational()));
@@ -1793,6 +1912,7 @@ namespace soplex
          return;
 
       _rationalLP->changeRhs(i, rhs);
+      _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), rhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRhsReal(i, Real(rhs));
@@ -1811,6 +1931,8 @@ namespace soplex
          return;
 
       _rationalLP->changeRange(lhs, rhs);
+      for( int i = 0; i < numRowsRational(); i++ )
+         _rowTypes[i] = _rangeTypeRational(lhs[i], rhs[i]);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRangeReal(DVectorReal(lhs), DVectorReal(rhs));
@@ -1829,6 +1951,7 @@ namespace soplex
          return;
 
       _rationalLP->changeRange(i, lhs, rhs);
+      _rowTypes[i] = _rangeTypeRational(lhs, rhs);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRangeReal(i, Real(lhs), Real(rhs));
@@ -1847,6 +1970,7 @@ namespace soplex
          return;
 
       _rationalLP->changeCol(i, lpcol);
+      _rowTypes[i] = _rangeTypeRational(lpcol.lower(), lpcol.upper());
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeColReal(i, lpcol);
@@ -1865,6 +1989,8 @@ namespace soplex
          return;
 
       _rationalLP->changeLower(lower);
+      for( int i = 0; i < numColsRational(); i++ )
+         _colTypes[i] = _rangeTypeRational(lower[i], _rationalLP->upper(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeLowerReal(DVectorReal(lower));
@@ -1883,6 +2009,7 @@ namespace soplex
          return;
 
       _rationalLP->changeLower(i, lower);
+      _colTypes[i] = _rangeTypeRational(lower, _rationalLP->upper(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeLowerReal(i, Real(lower));
@@ -1901,6 +2028,8 @@ namespace soplex
          return;
 
       _rationalLP->changeUpper(upper);
+      for( int i = 0; i < numColsRational(); i++ )
+         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), upper[i]);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeUpperReal(DVectorReal(upper));
@@ -1919,6 +2048,7 @@ namespace soplex
          return;
 
       _rationalLP->changeUpper(i, upper);
+      _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), upper);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeUpperReal(i, Real(upper));
@@ -1937,6 +2067,8 @@ namespace soplex
          return;
 
       _rationalLP->changeBounds(lower, upper);
+      for( int i = 0; i < numColsRational(); i++ )
+         _colTypes[i] = _rangeTypeRational(lower[i], upper[i]);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeBoundsReal(DVectorReal(lower), DVectorReal(upper));
@@ -1955,6 +2087,7 @@ namespace soplex
          return;
 
       _rationalLP->changeBounds(i, lower, upper);
+      _colTypes[i] = _rangeTypeRational(lower, upper);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeBoundsReal(i, Real(lower), Real(upper));
@@ -2027,6 +2160,9 @@ namespace soplex
          return;
 
       _rationalLP->removeRow(i);
+      _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+      _rowTypes.reSize(_rationalLP->nRows());
+      assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _removeRowReal(i);
@@ -2046,7 +2182,19 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
          return;
 
+      const int oldsize = numRowsRational();
       _rationalLP->removeRows(perm);
+      for( int i = 0; i < oldsize; i++ )
+      {
+         if( perm[i] >= 0 )
+            _rowTypes[perm[i]] = _rowTypes[i];
+      }
+      _rowTypes.reSize(_rationalLP->nRows());
+      for( int i = 0; i < numRowsRational(); i++ )
+      {
+         assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+      }
+
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _removeRowsReal(perm);
@@ -2103,6 +2251,9 @@ namespace soplex
          return;
 
       _rationalLP->removeCol(i);
+      _colTypes[i] = _colTypes[_rationalLP->nCols()];
+      _colTypes.reSize(_rationalLP->nCols());
+      assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _removeColReal(i);
@@ -2122,7 +2273,18 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
          return;
 
+      const int oldsize = numColsRational();
       _rationalLP->removeCols(perm);
+      for( int i = 0; i < oldsize; i++ )
+      {
+         if( perm[i] >= 0 )
+            _colTypes[perm[i]] = _colTypes[i];
+      }
+      _colTypes.reSize(_rationalLP->nCols());
+      for( int i = 0; i < numColsRational(); i++ )
+      {
+         assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+      }
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _removeColsReal(perm);
@@ -2179,6 +2341,8 @@ namespace soplex
          return;
 
       _rationalLP->clear();
+      _rowTypes.clear();
+      _colTypes.clear();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
@@ -4520,6 +4684,8 @@ namespace soplex
       case SoPlex::INFTY:
          _rationalPosInfty = value;
          _rationalNegInfty = -value;
+         if( intParam(SoPlex::SYNCMODE) != SYNCMODE_ONLYREAL )
+            _recomputeRangeTypesRational();
          break;
 
       // time limit in seconds (INFTY if unlimited)
@@ -5805,6 +5971,56 @@ namespace soplex
 
 
 
+   /// determines RangeType from real bounds
+   SoPlex::RangeType SoPlex::_rangeTypeReal(const Real& lower, const Real& upper) const
+   {
+      assert(lower <= upper);
+
+      if( lower <= -infinity )
+      {
+         if( upper >= infinity )
+            return RANGETYPE_FREE;
+         else
+            return RANGETYPE_UPPER;
+      }
+      else
+      {
+         if( upper >= infinity )
+            return RANGETYPE_LOWER;
+         else if( lower == upper )
+            return RANGETYPE_FIXED;
+         else
+            return RANGETYPE_BOXED;
+      }
+   }
+
+
+
+   /// determines RangeType from rational bounds
+   SoPlex::RangeType SoPlex::_rangeTypeRational(const Rational& lower, const Rational& upper) const
+   {
+      assert(lower <= upper);
+
+      if( lower <= _rationalNegInfty )
+      {
+         if( upper >= _rationalPosInfty )
+            return RANGETYPE_FREE;
+         else
+            return RANGETYPE_UPPER;
+      }
+      else
+      {
+         if( upper >= _rationalPosInfty )
+            return RANGETYPE_LOWER;
+         else if( lower == upper )
+            return RANGETYPE_FIXED;
+         else
+            return RANGETYPE_BOXED;
+      }
+   }
+
+
+
    /// adds a single row to the real LP and adjusts basis
    void SoPlex::_addRowReal(const LPRowReal& lprow)
    {
@@ -6576,6 +6792,8 @@ namespace soplex
 
       if( success )
       {
+         _recomputeRangeTypesRational();
+
          // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
          // and not to reading time
          if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
@@ -6592,6 +6810,32 @@ namespace soplex
          clearLPRational();
 
       return success;
+   }
+
+
+
+   /// recomputes range types from scratch using real LP
+   void SoPlex::_recomputeRangeTypesReal()
+   {
+      _rowTypes.reSize(numRowsReal());
+      for( int i = 0; i < numRowsReal(); i++ )
+         _rowTypes[i] = _rangeTypeReal(_realLP->lhs(i), _realLP->rhs(i));
+      _colTypes.reSize(numColsReal());
+      for( int i = 0; i < numColsReal(); i++ )
+         _colTypes[i] = _rangeTypeReal(_realLP->lower(i), _realLP->upper(i));
+   }
+
+
+
+   /// recomputes range types from scratch using rational LP
+   void SoPlex::_recomputeRangeTypesRational()
+   {
+      _rowTypes.reSize(numRowsRational());
+      for( int i = 0; i < numRowsRational(); i++ )
+         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      _colTypes.reSize(numColsRational());
+      for( int i = 0; i < numColsRational(); i++ )
+         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
    }
 
 
@@ -6629,6 +6873,7 @@ namespace soplex
       // copy LP
       _ensureRationalLP();
       *_rationalLP = *_realLP;
+      _recomputeRangeTypesReal();
 
       // stop timing
       if( time )
