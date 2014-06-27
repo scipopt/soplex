@@ -701,17 +701,19 @@ namespace soplex
             {
                MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
-               // perform primal and dual scaling
+               // perform bounds scaling
                _modLower *= primalScale;
                _modUpper *= primalScale;
-               _modLhs *= primalScale;
-               _modRhs *= primalScale;
             }
 
-            // apply scaled bounds and sides
+            // apply scaled bounds
             _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
-            _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
          }
+
+         // apply scaled sides
+         _modLhs *= primalScale;
+         _modRhs *= primalScale;
+         _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
          maxScale = dualScale;
