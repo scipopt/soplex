@@ -1276,7 +1276,7 @@ Rational& Rational::addProduct(const Rational& r, const Rational& s)
 Rational& Rational::subProduct(const Rational& r, const Rational& s)
 {
 #ifdef SOPLEX_PERFALT_2b
-   else if( mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
+   if( mpq_equal(r.dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
    {
       mpq_sub(this->dpointer->privatevalue, this->dpointer->privatevalue, s.dpointer->privatevalue);
       return *this;
