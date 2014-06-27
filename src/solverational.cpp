@@ -2623,6 +2623,7 @@ namespace soplex
       bool switchedRatiotester = false;
       bool switchedPricer = false;
 
+      Real markowitz = _slufactor.markowitz();
       int ratiotester = intParam(SoPlex::RATIOTESTER);
       int pricer = intParam(SoPlex::PRICER);
       int simplifier = intParam(SoPlex::SIMPLIFIER);
@@ -2776,6 +2777,7 @@ namespace soplex
 
       _solver.setFeastol(realParam(SoPlex::FPFEASTOL));
       _solver.setOpttol(realParam(SoPlex::FPOPTTOL));
+      _slufactor.setMarkowitz(markowitz);
 
       setIntParam(SoPlex::RATIOTESTER, ratiotester);
       setIntParam(SoPlex::PRICER, pricer);
