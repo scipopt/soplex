@@ -6517,14 +6517,15 @@ namespace soplex
 
       // read
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
-      setIntParam(SoPlex::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
-      _realLP->changeObjOffset(0.0);
 
       // stop timing
       _statistics->readingTime.stop();
 
       if( success )
       {
+         setIntParam(SoPlex::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
+         _realLP->changeObjOffset(0.0);
+
          // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
          // and not to reading time
          if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
@@ -6556,14 +6557,14 @@ namespace soplex
       // read
       _ensureRationalLP();
       bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
-      setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
-      _rationalLP->changeObjOffset(0);
 
       // stop timing
       _statistics->readingTime.stop();
 
       if( success )
       {
+         setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
+         _rationalLP->changeObjOffset(0);
          _recomputeRangeTypesRational();
 
          // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
