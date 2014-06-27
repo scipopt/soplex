@@ -593,7 +593,8 @@ namespace soplex
                assert(basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED || sol._dual[r] >= 0);
                assert(basisStatusRow == SPxSolver::ON_LOWER || basisStatusRow == SPxSolver::FIXED || sol._dual[r] <= 0);
 
-               if( sol._dual[r] != 0 && lhsRational(r) != rhsRational(r) )
+               assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+               if( sol._dual[r] != 0 && _rowTypes[r] != RANGETYPE_FIXED )
                {
                   assert(basisStatusRow == SPxSolver::ON_LOWER || basisStatusRow == SPxSolver::ON_UPPER);
 
@@ -770,7 +771,8 @@ namespace soplex
                _primalDualDiff.clear();
                for( int r = numRowsRational() - 1; r >= 0; r-- )
                {
-                  if( lhsRational(r) != rhsRational(r) )
+                  assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+                  if( _rowTypes[r] != RANGETYPE_FIXED )
                   {
                      if( _basisStatusRows[r] == SPxSolver::FIXED )
                         _basisStatusRows[r] = (sol._dual[r] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
@@ -790,7 +792,8 @@ namespace soplex
 
                for( int c = numColsRational() - 1; c >= 0; c-- )
                {
-                  if( lowerRational(c) != upperRational(c) )
+                  assert((lowerRational(c) == upperRational(c)) == (_colTypes[c] == RANGETYPE_FIXED));
+                  if( _colTypes[c] != RANGETYPE_FIXED )
                   {
                      if( _basisStatusCols[c] == SPxSolver::FIXED )
                         _basisStatusCols[c] = (sol._redCost[c] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
@@ -982,8 +985,8 @@ namespace soplex
             SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
 
             assert(lhsRational(r) != rhsRational(r) || _modLhs[r] == _modRhs[r]);
-
-            if( lhsRational(r) != rhsRational(r) )
+            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+            if( _rowTypes[r] != RANGETYPE_FIXED )
             {
                assert(sol._dual[r] == 0 || _modLhs[r] == _modRhs[r]);
                assert(sol._dual[r] != 0 || _modLhs[r] != _modRhs[r]);
@@ -1523,7 +1526,8 @@ namespace soplex
       // add artificial slack variables to convert inequality to equality constraints
       for( int i = 0; i < numRowsRational(); i++ )
       {
-         if( lhsRational(i) != rhsRational(i) )
+         assert((lhsRational(i) == rhsRational(i)) == (_rowTypes[i] == RANGETYPE_FIXED));
+         if( _rowTypes[i] != RANGETYPE_FIXED )
          {
             _slackCols.add(0.0, -rhsRational(i), DSVectorRational(UnitVector(i)), -lhsRational(i));
             _rationalLP->changeRange(i, 0.0, 0.0);
