@@ -19,6 +19,7 @@
 
 #include "soplex.h"
 #include "statistics.h"
+#include "slufactor_rational.h"
 
 namespace soplex
 {
@@ -1093,6 +1094,12 @@ namespace soplex
          sol._primalObjVal *= -1;
          sol._dualObjVal = sol._primalObjVal;
       }
+
+      if( _hasBasis && primalFeasible && dualFeasible )
+      {
+         MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
+         _factorizeColumnRational(_basisStatusRows, _basisStatusCols);
+      }
    }
 
 
@@ -1529,7 +1536,7 @@ namespace soplex
          assert((lhsRational(i) == rhsRational(i)) == (_rowTypes[i] == RANGETYPE_FIXED));
          if( _rowTypes[i] != RANGETYPE_FIXED )
          {
-            _slackCols.add(0.0, -rhsRational(i), DSVectorRational(UnitVector(i)), -lhsRational(i));
+            _slackCols.add(0.0, -rhsRational(i), *_unitVectorRational(i), -lhsRational(i));
             _rationalLP->changeRange(i, 0.0, 0.0);
             _realLP->changeRange(i, 0.0, 0.0);
             _colTypes.append(_switchRangeType(_rowTypes[i]));
@@ -2835,5 +2842,48 @@ namespace soplex
 
       return result;
    }
+
+
+
+   /// factorizes rational basis matrix in column representation
+   void SoPlex::_factorizeColumnRational(DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   {
+      SLUFactorRational linsolver;
+      const int matrixdim = numRowsRational();
+      DataArray< const SVectorRational* > matrix(matrixdim);
+      int j = 0;
+
+      assert(basisStatusCols.size() == numColsRational());
+      assert(basisStatusRows.size() == numRowsRational());
+
+      for( int i = 0; i < basisStatusCols.size() && j < matrixdim; i++ )
+      {
+         if( basisStatusCols[i] == SPxSolver::BASIC )
+         {
+            matrix[j] = &colVectorRational(i);
+            j++;
+         }
+      }
+      // const int numBasicCols = j;
+
+      for( int i = 0; i < basisStatusRows.size() && j < matrixdim; i++ )
+      {
+         if( basisStatusRows[i] == SPxSolver::BASIC )
+         {
+            matrix[j] = _unitVectorRational(i);
+            j++;
+         }
+      }
+      // const int numBasicRows = j - numBasicCols;
+
+      if( j != matrixdim )
+      {
+         MSG_ERROR( spxout << "Basis inconsistent.\n" );
+         return;
+      }
+
+      linsolver.load(matrix.get_ptr(), matrixdim);
+   }
+
 } // namespace soplex
 #endif

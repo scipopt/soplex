@@ -27,6 +27,7 @@
 #include "ssvectorbase.h"
 #include "svectorbase.h"
 #include "dsvectorbase.h"
+#include "unitvectorbase.h"
 #include "svsetbase.h"
 
 // specialized multAdd() for rationals

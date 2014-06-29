@@ -219,10 +219,13 @@ CLUFactorRational::Temp::Temp()
 
 void CLUFactorRational::Temp::init( int p_dim )
 {
+   if( p_dim != 0)
+   {
    spx_realloc( s_max,  p_dim );
    spx_realloc( s_cact, p_dim );
    spx_realloc( s_mark, p_dim );
    stage = 0;
+   }
 }
 
 void CLUFactorRational::Temp::clear()
@@ -267,7 +270,7 @@ void CLUFactorRational::initPerm()
 void CLUFactorRational::setPivot( const int p_stage,
                           const int p_col,
                           const int p_row,
-                          const Rational val )
+                          const Rational& val )
 {
    assert( row.perm[p_row] < 0 );
    assert( col.perm[p_col] < 0 );
@@ -292,7 +295,7 @@ void CLUFactorRational::packRows()
    Dring *ring, *list;
 
    int *l_ridx = u.row.idx;
-   Rational *l_rval = u.row.val;
+   DVectorRational& l_rval = u.row.val;
    int *l_rlen = u.row.len;
    int *l_rmax = u.row.max;
    int *l_rbeg = u.row.start;
@@ -407,18 +410,18 @@ void CLUFactorRational::remaxRow( int p_row, int len )
    {
       int delta = len - u.row.max[p_row];
 
-      if ( delta > u.row.size - u.row.used )
+      if ( delta > u.row.val.dim() - u.row.used )
       {
          packRows();
          delta = len - u.row.max[p_row];  // packRows() changes u.row.max[] !
 
-         if ( u.row.size < rowMemMult * u.row.used + len )
+         if ( u.row.val.dim() < rowMemMult * u.row.used + len )
             minRowMem( 2 * u.row.used + len );
 
          /* minRowMem(rowMemMult * u.row.used + len); */
       }
 
-      assert( delta <= u.row.size - u.row.used
+      assert( delta <= u.row.val.dim() - u.row.used
 
               && "ERROR: could not allocate memory for row file" );
 
@@ -428,21 +431,21 @@ void CLUFactorRational::remaxRow( int p_row, int len )
    else                        /* row must be moved to end of row file */
    {
       int i, j, k;
-      int *idx;
-      Rational *val;
+      int *idx = u.row.idx;
+      DVectorRational& val = u.row.val;
       Dring *ring;
 
-      if ( len > u.row.size - u.row.used )
+      if ( len > u.row.val.dim() - u.row.used )
       {
          packRows();
 
-         if ( u.row.size < rowMemMult * u.row.used + len )
+         if ( u.row.val.dim() < rowMemMult * u.row.used + len )
             minRowMem( 2 * u.row.used + len );
 
          /* minRowMem(rowMemMult * u.row.used + len);*/
       }
 
-      assert( len <= u.row.size - u.row.used
+      assert( len <= u.row.val.dim() - u.row.used
 
               && "ERROR: could not allocate memory for row file" );
 
@@ -457,9 +460,6 @@ void CLUFactorRational::remaxRow( int p_row, int len )
       removeDR( u.row.elem[p_row] );
       ring = u.row.list.prev;
       init2DR( u.row.elem[p_row], *ring );
-
-      idx = u.row.idx;
-      val = u.row.val;
 
       for ( ; i < k; ++i, ++j )
       {
@@ -712,7 +712,7 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
    int *clen = u.col.len;
    int *cbeg = u.col.start;
 
-   Rational *rval = u.row.val;
+   DVectorRational& rval = u.row.val;
    int *ridx = u.row.idx;
    int *rmax = u.row.max;
    int *rlen = u.row.len;
@@ -2065,7 +2065,7 @@ void CLUFactorRational::eliminateColSingletons()
 /*
  * No singletons available: Select pivot elements.
  */
-void CLUFactorRational::selectPivots( Rational threshold )
+void CLUFactorRational::selectPivots( const Rational& threshold )
 {
    int ii;
    int i;
@@ -2516,7 +2516,7 @@ void CLUFactorRational::eliminatePivot( int prow, int pos )
 /*
  *      Factorize nucleus.
  */
-void CLUFactorRational::eliminateNucleus( const Rational threshold )
+void CLUFactorRational::eliminateNucleus( const Rational& threshold )
 {
    int r, c;
    CLUFactorRational::Pring *pivot;
@@ -2757,8 +2757,10 @@ void CLUFactorRational::setupRowVals()
 
 /*****************************************************************************/
 
-void CLUFactorRational::factor( const SVectorRational** vec,         ///< Array of column vector pointers
-                                 Rational                threshold )  ///< pivoting threshold
+void CLUFactorRational::factor(
+   const SVectorRational** vec,         ///< Array of column vector pointers
+   const Rational& threshold            ///< pivoting threshold
+   )
 {
 
    factorTime.start();
@@ -2866,13 +2868,12 @@ void CLUFactorRational::dump() const
  */
 void CLUFactorRational::minRowMem( int size )
 {
-
-   if ( u.row.size < size )
+   if ( u.row.val.dim() < size )
    {
-      u.row.size = size;
-      spx_realloc( u.row.val, size );
+      u.row.val.reDim(size);
       spx_realloc( u.row.idx, size );
    }
+   assert(u.row.val.dim() == size);
 }
 
 /*****************************************************************************/
@@ -3683,13 +3684,13 @@ void CLUFactorRational::solveUleft2( Rational* p_work1, Rational* vec1, Rational
    int i, k, r, c;
    int *rorig, *corig;
    int *ridx, *rlen, *rbeg, *idx;
-   Rational *rval, *val;
+   Rational *val;
 
    rorig = row.orig;
    corig = col.orig;
 
    ridx = u.row.idx;
-   rval = u.row.val;
+   DVectorRational& rval = u.row.val;
    rlen = u.row.len;
    rbeg = u.row.start;
 
@@ -4235,7 +4236,7 @@ int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
    int i, j, k, n, r, c;
    int *rorig, *corig, *cperm;
    int *ridx, *rlen, *rbeg, *idx;
-   Rational *rval, *val;
+   Rational *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -4249,7 +4250,7 @@ int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
 
    ridx = u.row.idx;
 
-   rval = u.row.val;
+   DVectorRational& rval = u.row.val;
 
    rlen = u.row.len;
 
@@ -4274,7 +4275,7 @@ int CLUFactorRational::solveUleft( Rational* vec, int* vecidx,
          x *= diag[r];
          vec[r] = x;
          k = rbeg[r];
-         assert( k >= 0 && k < u.row.size );
+         assert( k >= 0 && k < u.row.val.dim() );
          idx = &ridx[k];
          val = &rval[k];
 
@@ -4314,7 +4315,7 @@ void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsid
    int i, j, k, r, c;
    int *rorig, *corig, *cperm;
    int *ridx, *rlen, *rbeg, *idx;
-   Rational *rval, *val;
+   Rational *val;
 
    rorig = row.orig;
    corig = col.orig;
@@ -4328,7 +4329,7 @@ void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsid
 
    ridx = u.row.idx;
 
-   rval = u.row.val;
+   DVectorRational& rval = u.row.val;
 
    rlen = u.row.len;
 
@@ -4350,7 +4351,7 @@ void CLUFactorRational::solveUleftNoNZ( Rational* vec, Rational* rhs, int* rhsid
          x *= diag[r];
          vec[r] = x;
          k = rbeg[r];
-         assert( k >= 0 && k < u.row.size );
+         assert( k >= 0 && k < u.row.val.dim() );
          idx = &ridx[k];
          val = &rval[k];
 

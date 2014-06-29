@@ -198,6 +198,7 @@ LIBHEADER	=	array.h \
 			svsetbase.h \
 			svset.h \
 			timer.h \
+			unitvectorbase.h \
 			unitvector.h \
 			updatevector.h \
 			vectorbase.h \
@@ -257,7 +258,6 @@ LIBOBJ		= 	changesoplex.o \
 			spxwritestate.o \
 			statistics.o \
 			timer.o \
-			unitvector.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o

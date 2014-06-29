@@ -493,6 +493,7 @@ namespace soplex
       , _scaler(0)
       , _starter(0)
       , _rationalLP(0)
+      , _unitMatrixRational(0)
       , _status(SPxSolver::UNKNOWN)
       , _hasBasis(false)
       , _hasSolReal(false)
@@ -655,6 +656,16 @@ namespace soplex
       {
          _rationalLP->~SPxLPRational();
          spx_free(_rationalLP);
+      }
+
+      // free unit vectors
+      for( int i = 0; i < _unitMatrixRational.size(); i++ )
+      {
+         if( _unitMatrixRational[i] != 0 )
+         {
+            _unitMatrixRational[i]->~UnitVectorRational();
+            spx_free(_unitMatrixRational[i]);
+         }
       }
    }
 
@@ -3494,7 +3505,7 @@ namespace soplex
             assert(!_solver.isColBasic(index));
 
             // get unit vector
-            rhs = UnitVector(index);
+            rhs = UnitVectorReal(index);
          }
 
          // solve system "y B = rhs", where B is the row basis matrix
@@ -3638,7 +3649,7 @@ namespace soplex
             assert(!_solver.isColBasic(index));
 
             // get unit vector
-            rhs = UnitVector(index);
+            rhs = UnitVectorReal(index);
          }
 
          // solve system "y B = rhs", where B is the row basis matrix
@@ -6704,6 +6715,29 @@ namespace soplex
          _solRational = _solReal;
          _hasSolRational = true;
       }
+   }
+
+
+
+   /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+   const UnitVectorRational* SoPlex::_unitVectorRational(const int i)
+   {
+      assert(i >= 0);
+
+      if( i < 0 )
+         return 0;
+      else if( i >= _unitMatrixRational.size() )
+         _unitMatrixRational.append(i + 1 - _unitMatrixRational.size(), (UnitVectorRational*)0);
+      assert(i < _unitMatrixRational.size());
+
+      if( _unitMatrixRational[i] == 0 )
+      {
+         spx_alloc(_unitMatrixRational[i]);
+         new (_unitMatrixRational[i]) UnitVectorRational(i);
+      }
+      assert(_unitMatrixRational[i] != 0);
+
+      return _unitMatrixRational[i];
    }
 
 

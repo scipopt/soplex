@@ -1245,6 +1245,7 @@ private:
    DSVectorRational _primalDualDiff;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
+   DataArray< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
@@ -1468,6 +1469,9 @@ private:
    /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    void _syncRationalSolution();
 
+   /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+   const UnitVectorRational* _unitVectorRational(const int i);
+
    /// parses one line in a settings file and returns true on success; note that the string is modified
    bool _parseSettingsLine(char* line, const int lineNumber);
 
@@ -1560,6 +1564,9 @@ private:
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols);
+
+   /// factorizes rational basis matrix in column representation
+   void _factorizeColumnRational(DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
 
    //@}
 

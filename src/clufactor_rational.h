@@ -24,6 +24,7 @@
 #include "timer.h"
 #include "svector.h"
 #include "rational.h"
+#include "basevectors.h"
 
 #define WITH_L_ROWS 1
 
@@ -117,10 +118,9 @@ protected:
                                indices in the order they appear
                                in the row file                      */
          Dring* elem;        ///< %Array of ring elements.
-         int    size;        ///< size of arrays val and idx
          int    used;        ///< used entries of arrays idx and val
-         Rational* val;      ///< hold nonzero values
-         int*   idx;         ///< hold column indices of nonzeros
+         DVectorRational val;      ///< hold nonzero values
+         int*   idx;         ///< array of length val.dim() to hold column indices of nonzeros in val
          int*   start;       ///< starting positions in val and idx
          int*   len;         ///< used nonzeros per row vectors
          int*   max;         /*!< \brief maximum available nonzeros per row:
@@ -193,7 +193,7 @@ protected:
    Perm    col;               ///< column permutation matrices
 
    L       l;                 ///< L matrix
-   Rational*  diag;           ///< Array of pivot elements
+   DVectorRational diag;      ///< Array of pivot elements
    U       u;                 ///< U matrix
 
    Rational*   work;          ///< Working array: must always be left as 0!
@@ -302,7 +302,7 @@ private:
    ///
    void minLMem(int size);
    ///
-   void setPivot(const int p_stage, const int p_col, const int p_row, const Rational val);
+   void setPivot(const int p_stage, const int p_col, const int p_row, const Rational& val);
    ///
    void colSingletons();
    ///
@@ -323,14 +323,14 @@ private:
    ///
    void eliminateColSingletons();
    ///
-   void selectPivots(Rational threshold);
+   void selectPivots(const Rational& threshold);
    ///
    int updateRow(int r, int lv, int prow, int pcol, Rational pval);
 
    ///
    void eliminatePivot(int prow, int pos);
    ///
-   void eliminateNucleus(Rational threshold);
+   void eliminateNucleus(const Rational& threshold);
    ///
    void minRowMem(int size);
    ///
@@ -458,7 +458,7 @@ protected:
 
    ///
    void factor(const SVectorRational** vec,   ///< Array of column vector pointers
-               Rational threshold);           ///< pivoting threshold
+               const Rational& threshold);           ///< pivoting threshold
    //@}
 
    //----------------------------------------
