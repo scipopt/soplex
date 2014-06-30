@@ -3883,10 +3883,10 @@ namespace soplex
    std::string SoPlex::statisticString() const
    {
       std::stringstream s;
-      s  << "Factorizations     : " << std::setw(10) << _statistics->luFactorizations << std::endl
-         << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(2) << _statistics->luFactorizationTime << std::endl
-         << "Solves             : " << std::setw(10) << _statistics->luSolves << std::endl
-         << "  Time spent       : " << std::setw(10) << _statistics->luSolveTime << std::endl
+      s  << "Factorizations     : " << std::setw(10) << _statistics->luFactorizationsReal << std::endl
+         << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(2) << _statistics->luFactorizationTimeReal << std::endl
+         << "Solves             : " << std::setw(10) << _statistics->luSolvesReal << std::endl
+         << "  Time spent       : " << std::setw(10) << _statistics->luSolveTimeReal << std::endl
          << "Solution time      : " << std::setw(10) << std::fixed << std::setprecision(2) << solveTime() << std::endl
          << "Iterations         : " << std::setw(10) << numIterations() << std::endl;
 
@@ -6546,10 +6546,10 @@ namespace soplex
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
       _statistics->boundflips += _solver.boundFlips();
-      _statistics->luFactorizationTime += _slufactor.getFactorTime();
-      _statistics->luSolveTime += _slufactor.getSolveTime();
-      _statistics->luFactorizations += _slufactor.getFactorCount();
-      _statistics->luSolves += _slufactor.getSolveCount();
+      _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
+      _statistics->luSolveTimeReal += _slufactor.getSolveTime();
+      _statistics->luFactorizationsReal += _slufactor.getFactorCount();
+      _statistics->luSolvesReal += _slufactor.getSolveCount();
       _slufactor.resetCounters();
    }
 

@@ -62,14 +62,18 @@ namespace soplex
       Timer simplexTime; ///< simplex time
       Timer syncTime; ///< time for synchronization between real and rational LP (included in solving time)
       Timer transformTime; ///< time for transforming LPs (included in solving time)
-      Real luFactorizationTime; ///< time for factorizing bases matrices
-      Real luSolveTime; ///< time for solving linear systems
+      Timer rationalTime; ///< time for rational LP solving (included in solving time)
+      Real luFactorizationTimeReal; ///< time for factorizing bases matrices in real precision
+      Real luSolveTimeReal; ///< time for solving linear systems in real precision
+      Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision
+      Real luSolveTimeRational; ///< time for solving linear systems in rational precision
       int iterations; ///< number of iterations/pivots
       int iterationsPrimal; ///< number of iterations with Primal
       int iterationsFromBasis; ///< number of iterations from Basis
       int boundflips; ///< number of dual bound flips
-      int luFactorizations; ///< number of basis matrix factorizations
-      int luSolves; ///< number of (forward and backward) solves with basis matrix
+      int luFactorizationsReal; ///< number of basis matrix factorizations in real precision
+      int luSolvesReal; ///< number of (forward and backward) solves with basis matrix in real precision
+      int luFactorizationsRational; ///< number of basis matrix factorizations in rational precision
       int refinements; ///< number of refinement steps
       int stallRefinements; ///< number of refinement steps without subsequent pivots
 
