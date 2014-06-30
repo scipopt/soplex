@@ -461,7 +461,7 @@ void SLUFactor::clear()
    if(l.rperm)
       spx_free(l.rperm);
 
-   if (l.val)
+   if(u.row.val)
       spx_free(u.row.val);
    if(u.row.idx)
       spx_free(u.row.idx);
