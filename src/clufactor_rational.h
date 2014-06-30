@@ -82,7 +82,7 @@ protected:
    {
    public:
       int*    s_mark;       ///< marker
-      Rational*  s_max;     ///< maximum absolute value per row (or -1)
+      DVectorRational s_max;     ///< maximum absolute value per row (or -1)
       int*    s_cact;       ///< lengths of columns of active submatrix
       int     stage;        ///< stage of the structure
       Pring   pivots;       ///< ring of selected pivot rows
@@ -138,7 +138,7 @@ protected:
          int    size;        ///< size of array idx
          int    used;        ///< used entries of array idx
          int*   idx;         ///< hold row indices of nonzeros
-         Rational* val;      /*!< \brief hold nonzero values: this is only initialized
+         DVectorRational val;      /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
                                 updates.                            */
          int*   start;       ///< starting positions in val and idx
@@ -153,9 +153,8 @@ protected:
    /// Data structures for saving the working matrix and L factor.
    struct L
    {
-      int    size;          ///< size of arrays val and idx
-      Rational* val;        ///< values of L vectors
-      int*   idx;           ///< indices of L vectors
+      DVectorRational val;  ///< values of L vectors
+      int*   idx;           ///< array of size val.dim() storing indices of L vectors
       int    startSize;     ///< size of array start
       int    firstUpdate;   ///< number of first update L vector
       int    firstUnused;   ///< number of first unused L vector
@@ -167,7 +166,7 @@ protected:
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-      Rational* rval;       ///< values of rows of L
+      DVectorRational rval; ///< values of rows of L
       int*   ridx;          ///< indices of rows of L
       int*   rbeg;          ///< start of rows in rval and ridx
       int*   rorig;         ///< original row permutation

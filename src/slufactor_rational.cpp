@@ -444,11 +444,9 @@ void SLUFactorRational::clear()
    forest.clear();
 
    u.col.size    = 100;
-   l.size        = 100;
    l.startSize   = 100;
 
-   if (l.rval)
-      spx_free(l.rval);
+   l.rval.reDim(0);
    if(l.ridx)
       spx_free(l.ridx);
    if(l.rbeg)
@@ -458,13 +456,10 @@ void SLUFactorRational::clear()
    if(l.rperm)
       spx_free(l.rperm);
 
-   if (l.val)
    if(u.row.idx)
       spx_free(u.row.idx);
    if(u.col.idx)
       spx_free(u.col.idx);
-   if(l.val)
-      spx_free(l.val);
    if(l.idx)
       spx_free(l.idx);
    if(l.start)
@@ -480,8 +475,8 @@ void SLUFactorRational::clear()
       spx_alloc(u.row.idx, u.row.val.dim());
       spx_alloc(u.col.idx, u.col.size);
 
-      spx_alloc(l.val,   l.size);
-      spx_alloc(l.idx,   l.size);
+      l.val.reDim(100);
+      spx_alloc(l.idx,   l.val.dim());
       spx_alloc(l.start, l.startSize);
       spx_alloc(l.row,   l.startSize);
    }
@@ -572,14 +567,7 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
    spx_alloc(u.col.start, thedim + 1);
    spx_alloc(u.col.len,   thedim + 1);
    spx_alloc(u.col.max,   thedim + 1);
-
-   if (old.u.col.val != 0)
-   {
-      spx_alloc(u.col.val, u.col.size);
-      memcpy(u.col.val, old.u.col.val, (unsigned int)u.col.size * sizeof(*u.col.val));
-   }
-   else
-      u.col.val = 0;
+   u.col.val = old.u.col.val;
 
    memcpy(u.col.elem,  old.u.col.elem,  (unsigned int)thedim       * sizeof(*u.col.elem));
    memcpy(u.col.idx,   old.u.col.idx,   (unsigned int)u.col.size   * sizeof(*u.col.idx));
@@ -608,23 +596,21 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
    /* Setup L
     */
-   l.size        = old.l.size;
    l.startSize   = old.l.startSize;
    l.firstUpdate = old.l.firstUpdate;
    l.firstUnused = old.l.firstUnused;
    l.updateType  = old.l.updateType;
 
-   spx_alloc(l.val,   l.size);
-   spx_alloc(l.idx,   l.size);
+   l.val = old.l.val;
+   spx_alloc(l.idx,   l.val.dim());
    spx_alloc(l.start, l.startSize);
    spx_alloc(l.row,   l.startSize);
 
-   memcpy(l.val,   old.l.val,   (unsigned int)l.size      * sizeof(*l.val));
-   memcpy(l.idx,   old.l.idx,   (unsigned int)l.size      * sizeof(*l.idx));
+   memcpy(l.idx,   old.l.idx,   (unsigned int)l.val.dim() * sizeof(*l.idx));
    memcpy(l.start, old.l.start, (unsigned int)l.startSize * sizeof(*l.start));
    memcpy(l.row,   old.l.row,   (unsigned int)l.startSize * sizeof(*l.row));
 
-   if (old.l.rval != 0)
+   if (l.rval.dim() != 0)
    {
       assert(old.l.ridx  != 0);
       assert(old.l.rbeg  != 0);
@@ -633,13 +619,12 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
 
       int memsize = l.start[l.firstUpdate];
 
-      spx_alloc(l.rval,  memsize);
+      l.rval= old.l.rval;
       spx_alloc(l.ridx,  memsize);
       spx_alloc(l.rbeg,  thedim + 1);
       spx_alloc(l.rorig, thedim);
       spx_alloc(l.rperm, thedim);
 
-      memcpy(l.rval,  old.l.rval,  (unsigned int)memsize     * sizeof(*l.rval));
       memcpy(l.ridx,  old.l.ridx,  (unsigned int)memsize     * sizeof(*l.ridx));
       memcpy(l.rbeg,  old.l.rbeg, (unsigned int)(thedim + 1) * sizeof(*l.rbeg));
       memcpy(l.rorig, old.l.rorig, (unsigned int)thedim      * sizeof(*l.rorig));
@@ -652,7 +637,7 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
       assert(old.l.rorig == 0);
       assert(old.l.rperm == 0);
 
-      l.rval  = 0;
+      l.rval.reDim(0);
       l.ridx  = 0;
       l.rbeg  = 0;
       l.rorig = 0;
@@ -676,7 +661,6 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
    assert(u.col.len   != 0);
    assert(u.col.max   != 0);
 
-   assert(l.val   != 0);
    assert(l.idx   != 0);
    assert(l.start != 0);
    assert(l.row   != 0);
@@ -734,12 +718,9 @@ SLUFactorRational::SLUFactorRational()
    u.col.start = 0;
    u.col.len   = 0;
    u.col.max   = 0;
-   u.col.val   = 0;
-   l.val       = 0;
    l.idx       = 0;
    l.start     = 0;
    l.row       = 0;
-   l.rval      = 0;
    l.ridx      = 0;
    l.rbeg      = 0;
    l.rorig     = 0;
@@ -777,17 +758,15 @@ SLUFactorRational::SLUFactorRational()
       spx_alloc(u.col.start, thedim + 1);
       spx_alloc(u.col.len,   thedim + 1);
       spx_alloc(u.col.max,   thedim + 1);
-      u.col.val = 0;
+      u.col.val.reDim(0);
 
       u.col.list.idx      = thedim;
       u.col.start[thedim] = 0;
       u.col.max[thedim]   = 0;
       u.col.len[thedim]   = 0;
 
-      l.size = 1;
-
-      spx_alloc(l.val, l.size);
-      spx_alloc(l.idx, l.size);
+      l.val.reDim(1);
+      spx_alloc(l.idx, l.val.dim());
 
       l.startSize   = 1;
       l.firstUpdate = 0;
@@ -802,7 +781,7 @@ SLUFactorRational::SLUFactorRational()
       throw x;
    }
 
-   l.rval  = 0;
+   l.rval.reDim(0);
    l.ridx  = 0;
    l.rbeg  = 0;
    l.rorig = 0;
@@ -830,7 +809,6 @@ SLUFactorRational::SLUFactorRational()
    assert(u.col.len   != 0);
    assert(u.col.max   != 0);
 
-   assert(l.val   != 0);
    assert(l.idx   != 0);
    assert(l.start != 0);
    assert(l.row   != 0);
@@ -860,12 +838,9 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    u.col.start = 0;
    u.col.len   = 0;
    u.col.max   = 0;
-   u.col.val   = 0;
-   l.val       = 0;
    l.idx       = 0;
    l.start     = 0;
    l.row       = 0;
-   l.rval      = 0;
    l.ridx      = 0;
    l.rbeg      = 0;
    l.rorig     = 0;
@@ -901,16 +876,15 @@ void SLUFactorRational::freeAll()
    if(u.col.start) spx_free(u.col.start);
    if(u.col.len) spx_free(u.col.len);
    if(u.col.max) spx_free(u.col.max);
-   if(l.val) spx_free(l.val);
    if(l.idx) spx_free(l.idx);
    if(l.start) spx_free(l.start);
    if(l.row) spx_free(l.row);
 
    diag.reDim(0);
+   u.col.val.reDim(0);
+   l.val.reDim(0);
 
- if (u.col.val) spx_free(u.col.val);
-
-   if (l.rval) spx_free(l.rval);
+   l.rval.reDim(0);
    if(l.ridx) spx_free(l.ridx);
    if(l.rbeg) spx_free(l.rbeg);
    if(l.rorig) spx_free(l.rorig);
