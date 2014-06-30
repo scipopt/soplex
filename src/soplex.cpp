@@ -140,6 +140,11 @@ namespace soplex
             _boolParamDescription[SoPlex::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
             _boolParamDefault[SoPlex::TESTDUALINF] = false;
 
+            // should a rational factorization be performed after iterative refinement?
+            _boolParamName[SoPlex::RATFAC] = "ratfac";
+            _boolParamDescription[SoPlex::RATFAC] = "should a rational factorization be performed after iterative refinement?";
+            _boolParamDefault[SoPlex::RATFAC] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4369,6 +4374,8 @@ namespace soplex
       case EQTRANS:
          break;
       case TESTDUALINF:
+         break;
+      case RATFAC:
          break;
       default:
          return false;

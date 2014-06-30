@@ -1086,6 +1086,24 @@ namespace soplex
       }
       while( true );
 
+      // correct basis status for restricted inequalities
+      if( _hasBasis )
+      {
+         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         {
+            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+            if( _rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolver::FIXED )
+               _basisStatusRows[r] = (sol._dual[r] >= 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER);
+         }
+      }
+
+      // try rational factorization
+      if( boolParam(SoPlex::RATFAC) && _hasBasis && primalFeasible && dualFeasible )
+      {
+         MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
+         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols);
+      }
+
       // compute objective function values
       assert(sol._hasPrimal == sol._hasDual);
       if( sol._hasPrimal )
@@ -1093,12 +1111,6 @@ namespace soplex
          sol._primalObjVal = sol._primal * _rationalLP->maxObj();
          sol._primalObjVal *= -1;
          sol._dualObjVal = sol._primalObjVal;
-      }
-
-      if( _hasBasis && primalFeasible && dualFeasible )
-      {
-         MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
-         _factorizeColumnRational(_basisStatusRows, _basisStatusCols);
       }
    }
 
@@ -2846,43 +2858,224 @@ namespace soplex
 
 
    /// factorizes rational basis matrix in column representation
-   void SoPlex::_factorizeColumnRational(DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
    {
       SLUFactorRational linsolver;
       const int matrixdim = numRowsRational();
       DataArray< const SVectorRational* > matrix(matrixdim);
-      int j = 0;
+
+      DVectorRational basicPrimalRhs(matrixdim);
+      DVectorRational basicDualRhs(matrixdim);
 
       assert(basisStatusCols.size() == numColsRational());
       assert(basisStatusRows.size() == numRowsRational());
 
-      for( int i = 0; i < basisStatusCols.size() && j < matrixdim; i++ )
+      int j = 0;
+      for( int i = 0; i < basisStatusRows.size(); i++ )
       {
-         if( basisStatusCols[i] == SPxSolver::BASIC )
+         if( basisStatusRows[i] == SPxSolver::BASIC && j < matrixdim )
          {
-            matrix[j] = &colVectorRational(i);
-            j++;
-         }
-      }
-      // const int numBasicCols = j;
-
-      for( int i = 0; i < basisStatusRows.size() && j < matrixdim; i++ )
-      {
-         if( basisStatusRows[i] == SPxSolver::BASIC )
-         {
+            basicPrimalRhs[i] = 0;
+            basicDualRhs[j] = 0;
             matrix[j] = _unitVectorRational(i);
             j++;
          }
+         else if( basisStatusRows[i] == SPxSolver::ON_LOWER )
+            basicPrimalRhs[i] = lhsRational(i);
+         else if( basisStatusRows[i] == SPxSolver::ON_UPPER )
+            basicPrimalRhs[i] = rhsRational(i);
+         else if( basisStatusRows[i] == SPxSolver::ZERO )
+            basicPrimalRhs[i] = 0;
+         else if( basisStatusRows[i] == SPxSolver::FIXED )
+         {
+            assert(lhsRational(i) == rhsRational(i));
+            basicPrimalRhs[i] = lhsRational(i);
+         }
+         else if( basisStatusRows[i] == SPxSolver::UNDEFINED )
+         {
+            MSG_ERROR( spxout << "Undefined basis status of row in rational factorization.\n" );
+            return;
+         }
+         else
+         {
+            assert(basisStatusRows[i] == SPxSolver::BASIC);
+            MSG_ERROR( spxout << "Too many basic rows in rational factorization.\n" );
+            return;
+         }
       }
-      // const int numBasicRows = j - numBasicCols;
+      const int numBasicRows = j;
+
+      for( int i = 0; i < basisStatusCols.size(); i++ )
+      {
+         if( basisStatusCols[i] == SPxSolver::BASIC && j < matrixdim )
+         {
+            getObjRational(i, basicDualRhs[j]);
+            matrix[j] = &colVectorRational(i);
+            j++;
+         }
+         else if( basisStatusCols[i] == SPxSolver::ON_LOWER )
+            basicPrimalRhs.multAdd(-lowerRational(i), colVectorRational(i));
+         else if( basisStatusCols[i] == SPxSolver::ON_UPPER )
+            basicPrimalRhs.multAdd(-upperRational(i), colVectorRational(i));
+         else if( basisStatusCols[i] == SPxSolver::ZERO )
+         {}
+         else if( basisStatusCols[i] == SPxSolver::FIXED )
+         {
+            assert(lowerRational(i) == upperRational(i));
+            basicPrimalRhs.multAdd(-lowerRational(i), colVectorRational(i));
+         }
+         else if( basisStatusCols[i] == SPxSolver::UNDEFINED )
+         {
+            MSG_ERROR( spxout << "Undefined basis status of column in rational factorization.\n" );
+            return;
+         }
+         else
+         {
+            assert(basisStatusCols[i] == SPxSolver::BASIC);
+            MSG_ERROR( spxout << "Too many basic columns in rational factorization.\n" );
+            return;
+         }
+      }
 
       if( j != matrixdim )
       {
-         MSG_ERROR( spxout << "Basis inconsistent.\n" );
+         MSG_ERROR( spxout << "Too few basic entries in rational factorization.\n" );
          return;
       }
 
+      // load rational basis matrix
       linsolver.load(matrix.get_ptr(), matrixdim);
+
+      // solve for primal solution
+      DVectorRational basicPrimal(matrixdim);
+      linsolver.solveRight(basicPrimal, basicPrimalRhs);
+
+      // check bound violation on basic rows and columns
+      j = 0;
+      bool primalFeasible = true;
+      for( int i = 0; i < basisStatusRows.size() && primalFeasible; i++ )
+      {
+         if( basisStatusRows[i] == SPxSolver::BASIC )
+         {
+            assert(j < matrixdim);
+            primalFeasible = (-basicPrimal[j] >= lhsRational(i) && -basicPrimal[j] <= rhsRational(i));
+            j++;
+         }
+      }
+      for( int i = 0; i < basisStatusCols.size() && primalFeasible; i++ )
+      {
+         if( basisStatusCols[i] == SPxSolver::BASIC )
+         {
+            assert(j < matrixdim);
+            primalFeasible = (basicPrimal[j] >= lowerRational(i) && basicPrimal[j] <= upperRational(i));
+            j++;
+         }
+      }
+      MSG_INFO1( spxout << "Primal solution" << (primalFeasible ? " " : " not ") << "feasible!\n" );
+
+      // solve for dual solution
+      DVectorRational basicDual(matrixdim);
+      linsolver.solveLeft(basicDual, basicDualRhs);
+
+      // check reduced cost violation on nonbasic rows and columns
+      bool dualFeasible = true;
+      for( int i = 0; i < basisStatusRows.size() && dualFeasible; i++ )
+      {
+         assert(basisStatusRows[i] != SPxSolver::BASIC || basicDual[i] == 0);
+         if( basisStatusRows[i] == SPxSolver::BASIC || basisStatusRows[i] == SPxSolver::FIXED )
+            continue;
+         else if( basicDual[i] < 0 )
+         {
+            dualFeasible = (basisStatusRows[i] == SPxSolver::ON_UPPER
+               || (basisStatusRows[i] == SPxSolver::ZERO && rhsRational(i) == 0));
+         }
+         else if( basicDual[i] > 0 )
+         {
+            dualFeasible = (basisStatusRows[i] == SPxSolver::ON_LOWER
+               || (basisStatusRows[i] == SPxSolver::ZERO && lhsRational(i) == 0));
+         }
+      }
+      DVectorRational redCost(numColsRational());
+      for( int i = 0; i < basisStatusCols.size() && dualFeasible; i++ )
+      {
+         assert(basisStatusCols[i] != SPxSolver::BASIC || basicDual * colVectorRational(i) == objRational(i));
+         if( basisStatusCols[i] == SPxSolver::BASIC || basisStatusCols[i] == SPxSolver::FIXED )
+            continue;
+         else
+         {
+            redCost[i] = basicDual * colVectorRational(i);
+            redCost[i] += maxObjRational(i);
+            redCost[i] *= -1;
+            if( redCost[i] < 0 )
+            {
+               dualFeasible = (basisStatusCols[i] == SPxSolver::ON_UPPER
+                  || (basisStatusCols[i] == SPxSolver::ZERO && upperRational(i) == 0));
+            }
+            else if( redCost[i] > 0 )
+            {
+               dualFeasible = (basisStatusCols[i] == SPxSolver::ON_LOWER
+                  || (basisStatusCols[i] == SPxSolver::ZERO && lowerRational(i) == 0));
+            }
+         }
+      }
+      MSG_INFO1( spxout << "Dual solution" << (dualFeasible ? " " : " not ") << "feasible!\n" );
+
+      // store solution
+      if( primalFeasible && dualFeasible )
+      {
+         _hasBasis = true;
+         if( &basisStatusRows != &_basisStatusRows )
+            _basisStatusRows = basisStatusRows;
+         if( &basisStatusCols != &_basisStatusCols )
+            _basisStatusCols = basisStatusCols;
+
+         sol._primal.reDim(numColsRational());
+         j = numBasicRows;
+         for( int i = 0; i < basisStatusCols.size(); i++ )
+         {
+            if( basisStatusCols[i] == SPxSolver::BASIC )
+            {
+               assert(j < matrixdim);
+               sol._primal[i] = basicPrimal[j];
+               j++;
+            }
+            else if( basisStatusCols[i] == SPxSolver::ON_LOWER )
+               sol._primal[i] = lowerRational(i);
+            else if( basisStatusCols[i] == SPxSolver::ON_UPPER )
+               sol._primal[i] = upperRational(i);
+            else if( basisStatusCols[i] == SPxSolver::ZERO )
+               sol._primal[i] = 0;
+            else if( basisStatusCols[i] == SPxSolver::FIXED )
+            {
+               assert(lowerRational(i) == upperRational(i));
+               sol._primal[i] = lowerRational(i);
+            }
+            else
+            {
+               assert(basisStatusCols[i] == SPxSolver::UNDEFINED);
+               MSG_ERROR( spxout << "Undefined basis status of column in rational factorization.\n" );
+               return;
+            }
+         }
+         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
+         sol._hasPrimal = true;
+
+         sol._dual = basicDual;
+         for( int i = 0; i < numColsRational(); i++ )
+         {
+            if( basisStatusCols[i] == SPxSolver::BASIC )
+               sol._redCost[i] = 0;
+            else if( basisStatusCols[i] == SPxSolver::FIXED )
+            {
+               sol._redCost[i] = basicDual * colVectorRational(i);
+               sol._redCost[i] += maxObjRational(i);
+               sol._redCost[i] *= -1;
+            }
+            else
+               sol._redCost[i] = redCost[i];
+         }
+         sol._hasDual = true;
+      }
    }
 
 } // namespace soplex

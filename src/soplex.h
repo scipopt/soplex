@@ -725,8 +725,11 @@ public:
       /// should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
       TESTDUALINF = 2,
 
+      /// should a rational factorization be performed after iterative refinement?
+      RATFAC = 3,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 3
+      BOOLPARAM_COUNT = 4
    } BoolParam;
 
    /// integer parameters
@@ -1569,7 +1572,7 @@ private:
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols);
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
 
    //@}
 
