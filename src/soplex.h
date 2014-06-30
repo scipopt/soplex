@@ -251,6 +251,9 @@ public:
    /// gets objective function vector
    void getObjRational(VectorRational& obj) const;
 
+   /// gets objective value of column \p i
+   void getObjRational(int i, Rational& obj) const;
+
    /// returns objective value of column \p i
    Rational objRational(int i) const;
 

@@ -1078,6 +1078,16 @@ namespace soplex
 
 
 
+   /// gets objective value of column \p i
+   void SoPlex::getObjRational(int i, Rational& obj) const
+   {
+      obj = maxObjRational(i);
+      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
+         obj *= -1;
+   }
+
+
+
    /// returns objective value of column \p i
    Rational SoPlex::objRational(int i) const
    {
