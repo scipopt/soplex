@@ -122,16 +122,23 @@ public:
    }
 
    /// sets minimum Markowitz threshold.
-   void setMarkowitz(Rational m)
+   void setMarkowitz(const Rational& m)
    {
       if( m < 0.01 )
-         m = 0.01;
-
-      if( m > 0.99 )
-         m = 0.99;
-
-      minThreshold = m;
-      lastThreshold = m;
+      {
+         minThreshold = 0.01;
+         lastThreshold = 0.01;
+      }
+      else if( m > 0.99 )
+      {
+         minThreshold = 0.99;
+         lastThreshold = 0.99;
+      }
+      else
+      {
+         minThreshold = m;
+         lastThreshold = m;
+      }
    }
 
    /// returns Markowitz threshold.

@@ -324,7 +324,7 @@ private:
    ///
    void selectPivots(const Rational& threshold);
    ///
-   int updateRow(int r, int lv, int prow, int pcol, Rational pval);
+   int updateRow(int r, int lv, int prow, int pcol, const Rational& pval);
 
    ///
    void eliminatePivot(int prow, int pos);
@@ -344,19 +344,6 @@ private:
    void remaxRow(int p_row, int len);
    ///
    int makeLvec(int p_len, int p_row);
-   ///
-   /*@luca helper functions */
-   void mpqOneSubX(Rational result, Rational x);
-   ///
-   void mpqCmpAbsSet(Rational value, Rational maxabs);
-   ///
-   void mpqAddProd(Rational value, Rational x, Rational y);
-   ///
-   void mpqAddProdInc(Rational value, Rational x, Rational y);
-   ///
-   void mpqSubProd(Rational value, Rational x, Rational y);
-   ///
-   void mpqSubProdInc(Rational value, Rational x, Rational y);
    //@}
 
    //----------------------------------------

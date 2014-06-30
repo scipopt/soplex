@@ -2275,7 +2275,7 @@ int CLUFactorRational::updateRow( int r,
                           int lv,
                           int prow,
                           int pcol,
-                          Rational pval )
+                          const Rational& pval )
 {
    int fill;
    Rational x, lx;
