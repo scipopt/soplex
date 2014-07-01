@@ -2004,6 +2004,8 @@ namespace soplex
 
       // set objective coefficients to zero; shift primal space such as to guarantee that the zero solution is within
       // the bounds
+      Rational shiftValue;
+      Rational shiftValue2;
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
          _rationalLP->changeObj(c, 0);
@@ -2012,7 +2014,6 @@ namespace soplex
          if( lowerRational(c) > 0 )
          {
             const SVectorRational& colVector = colVectorRational(c);
-            Rational shiftValue;
 
             for( int i = 0; i < colVector.size(); i++ )
             {
@@ -2021,17 +2022,33 @@ namespace soplex
                int r = colVector.index(i);
 
                assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
-               if( _lowerFinite(_rowTypes[r]) )
-               {
-                  _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
-                  _realLP->changeLhs(r, Real(lhsRational(r)));
-               }
-
                assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
-               if( _upperFinite(_rowTypes[r]) )
+
+               if( _lowerFinite(_rowTypes[r]) && _upperFinite(_rowTypes[r]) )
                {
-                  _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
-                  _realLP->changeRhs(r, Real(rhsRational(r)));
+                  shiftValue2 = lhsRational(r);
+                  shiftValue2 -= shiftValue;
+                  _rationalLP->changeLhs(r, shiftValue2);
+                  _realLP->changeLhs(r, Real(shiftValue2));
+
+                  shiftValue -= rhsRational(r);
+                  shiftValue *= -1;
+                  _rationalLP->changeRhs(r, shiftValue);
+                  _realLP->changeRhs(r, Real(shiftValue));
+               }
+               else if( _lowerFinite(_rowTypes[r]) )
+               {
+                  shiftValue -= lhsRational(r);
+                  shiftValue *= -1;
+                  _rationalLP->changeLhs(r, shiftValue);
+                  _realLP->changeLhs(r, Real(shiftValue));
+               }
+               else if( _upperFinite(_rowTypes[r]) )
+               {
+                  shiftValue -= rhsRational(r);
+                  shiftValue *= -1;
+                  _rationalLP->changeRhs(r, shiftValue);
+                  _realLP->changeRhs(r, Real(shiftValue));
                }
             }
 
@@ -2042,7 +2059,6 @@ namespace soplex
          else if( upperRational(c) < 0 )
          {
             const SVectorRational& colVector = colVectorRational(c);
-            Rational shiftValue;
 
             for( int i = 0; i < colVector.size(); i++ )
             {
@@ -2051,17 +2067,33 @@ namespace soplex
                int r = colVector.index(i);
 
                assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
-               if( _lowerFinite(_rowTypes[r]) )
-               {
-                  _rationalLP->changeLhs(r, lhsRational(r) - shiftValue);
-                  _realLP->changeLhs(r, Real(lhsRational(r)));
-               }
-
                assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
-               if( _upperFinite(_rowTypes[r]) )
+
+               if( _lowerFinite(_rowTypes[r]) && _upperFinite(_rowTypes[r]) )
                {
-                  _rationalLP->changeRhs(r, rhsRational(r) - shiftValue);
-                  _realLP->changeRhs(r, Real(rhsRational(r)));
+                  shiftValue2 = lhsRational(r);
+                  shiftValue2 -= shiftValue;
+                  _rationalLP->changeLhs(r, shiftValue2);
+                  _realLP->changeLhs(r, Real(shiftValue2));
+
+                  shiftValue -= rhsRational(r);
+                  shiftValue *= -1;
+                  _rationalLP->changeRhs(r, shiftValue);
+                  _realLP->changeRhs(r, Real(shiftValue));
+               }
+               else if( _lowerFinite(_rowTypes[r]) )
+               {
+                  shiftValue -= lhsRational(r);
+                  shiftValue *= -1;
+                  _rationalLP->changeLhs(r, shiftValue);
+                  _realLP->changeLhs(r, Real(shiftValue));
+               }
+               else if( _upperFinite(_rowTypes[r]) )
+               {
+                  shiftValue -= rhsRational(r);
+                  shiftValue *= -1;
+                  _rationalLP->changeRhs(r, shiftValue);
+                  _realLP->changeRhs(r, Real(shiftValue));
                }
             }
 
