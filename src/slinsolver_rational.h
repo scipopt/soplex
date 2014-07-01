@@ -61,7 +61,9 @@ public:
       /// No matrix has yet been loaded.
       UNLOADED = 4,
       /// An error has occurred.
-      ERROR    = 8
+      ERROR    = 8,
+      /// The time limit has been hit
+      TIME     = 16
    };
    //@}
 

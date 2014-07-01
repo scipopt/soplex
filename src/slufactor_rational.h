@@ -221,6 +221,11 @@ public:
    {
       return factorTime.userTime();
    }
+   /// set time limit on factorization
+   void setFactorTimeLimit(const Real limit)
+   {
+      factorTimeLimit = limit;
+   }
    /// reset FactorTime
    void resetFactorTime()
    {

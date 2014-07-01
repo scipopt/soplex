@@ -2529,12 +2529,28 @@ void CLUFactorRational::eliminateNucleus( const Rational& threshold )
 #endif
 
       if ( temp.pivot_rowNZ[1].next != &( temp.pivot_rowNZ[1] ) )
+      {
+         if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
+         {
+            stat = SLinSolverRational::TIME;
+            return;
+         }
+
          /* row singleton available */
          eliminateRowSingletons();
+      }
       else
          if ( temp.pivot_colNZ[1].next != &( temp.pivot_colNZ[1] ) )
+         {
+            if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
+            {
+               stat = SLinSolverRational::TIME;
+               return;
+            }
+
             /* column singleton available */
             eliminateColSingletons();
+         }
          else
          {
             initDR( temp.pivots );
@@ -2546,6 +2562,12 @@ void CLUFactorRational::eliminateNucleus( const Rational& threshold )
             for ( pivot = temp.pivots.next; pivot != &temp.pivots;
                   pivot = pivot->next )
             {
+               if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
+               {
+                  stat = SLinSolverRational::TIME;
+                  return;
+               }
+
                eliminatePivot( pivot->idx, pivot->pos );
             }
          }
@@ -2759,12 +2781,24 @@ void CLUFactorRational::factor(
    if ( stat )
       goto TERMINATE;
 
+   if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
+   {
+      stat = SLinSolverRational::TIME;
+      goto TERMINATE;
+   }
+
    //   initMaxabs = initMaxabs;
 
    colSingletons();
 
    if ( stat != SLinSolverRational::OK )
       goto TERMINATE;
+
+   if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
+   {
+      stat = SLinSolverRational::TIME;
+      goto TERMINATE;
+   }
 
    rowSingletons();
 
@@ -2773,6 +2807,12 @@ void CLUFactorRational::factor(
 
    if ( temp.stage < thedim )
    {
+      if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
+      {
+         stat = SLinSolverRational::TIME;
+         goto TERMINATE;
+      }
+
       initFactorRings();
       eliminateNucleus( threshold );
       freeFactorRings();

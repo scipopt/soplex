@@ -199,6 +199,7 @@ protected:
 
    Timer   factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
+   Real    factorTimeLimit;   ///< Time limit on factorization
    //@}
 
 private:

@@ -493,7 +493,6 @@ void SLUFactorRational::clear()
  */
 void SLUFactorRational::assign(const SLUFactorRational& old)
 {
-
    // slufactor_rational
    uptype        = old.uptype;
    minThreshold  = old.minThreshold;
@@ -509,6 +508,9 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
    rowMemMult    = old.rowMemMult;
    colMemMult    = old.colMemMult;
    lMemMult      = old.lMemMult;
+   factorCount   = old.factorCount;
+   factorTime    = old.factorTime;
+   factorTimeLimit = old.factorTimeLimit;
 
    spx_alloc(row.perm, thedim);
    spx_alloc(row.orig, thedim);
@@ -790,6 +792,7 @@ SLUFactorRational::SLUFactorRational()
    SLUFactorRational::clear(); // clear() is virtual
 
    factorCount = 0;
+   factorTimeLimit = -1.0;
    solveCount  = 0;
 
    assert(row.perm != 0);

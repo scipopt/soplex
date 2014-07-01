@@ -1112,7 +1112,9 @@ namespace soplex
       if( boolParam(SoPlex::RATFAC) && _hasBasis && primalFeasible && dualFeasible )
       {
          MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
-         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols);
+         bool factorPrimalFeasible;
+         bool factorDualFeasible;
+         _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, factorPrimalFeasible, factorDualFeasible, stopped, error);
       }
 
       // compute objective function values
@@ -2872,24 +2874,26 @@ namespace soplex
 
 
    /// factorizes rational basis matrix in column representation
-   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, bool& stopped, bool& error)
    {
       // start rational solving time
       _statistics->rationalTime.start();
 
+      primalFeasible = true;
+      dualFeasible = true;
+      stopped = false;
+      error = false;
+
       SLUFactorRational linsolver;
       const int matrixdim = numRowsRational();
       DataArray< const SVectorRational* > matrix(matrixdim);
+      int numBasicRows;
 
       DVectorRational basicPrimalRhs(matrixdim);
       DVectorRational basicDualRhs(matrixdim);
       DVectorRational basicPrimal(matrixdim);
       DVectorRational basicDual(matrixdim);
       DVectorRational redCost(numColsRational());
-
-      int numBasicRows;
-      bool primalFeasible = true;
-      bool dualFeasible = true;
 
       assert(basisStatusCols.size() == numColsRational());
       assert(basisStatusRows.size() == numRowsRational());
@@ -2918,12 +2922,14 @@ namespace soplex
          else if( basisStatusRows[i] == SPxSolver::UNDEFINED )
          {
             MSG_ERROR( spxout << "Undefined basis status of row in rational factorization.\n" );
+            error = true;
             goto TERMINATE;
          }
          else
          {
             assert(basisStatusRows[i] == SPxSolver::BASIC);
             MSG_ERROR( spxout << "Too many basic rows in rational factorization.\n" );
+            error = true;
             goto TERMINATE;
          }
       }
@@ -2951,12 +2957,14 @@ namespace soplex
          else if( basisStatusCols[i] == SPxSolver::UNDEFINED )
          {
             MSG_ERROR( spxout << "Undefined basis status of column in rational factorization.\n" );
+            error = true;
             goto TERMINATE;
          }
          else
          {
             assert(basisStatusCols[i] == SPxSolver::BASIC);
             MSG_ERROR( spxout << "Too many basic columns in rational factorization.\n" );
+            error = true;
             goto TERMINATE;
          }
       }
@@ -2964,14 +2972,37 @@ namespace soplex
       if( j != matrixdim )
       {
          MSG_ERROR( spxout << "Too few basic entries in rational factorization.\n" );
+         error = true;
          goto TERMINATE;
       }
 
       // load rational basis matrix
+      if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
+         linsolver.setFactorTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+      else
+         linsolver.setFactorTimeLimit(-1.0);
       linsolver.load(matrix.get_ptr(), matrixdim);
+
+      if( linsolver.status() == SLinSolverRational::TIME )
+      {
+         stopped = true;
+         return;
+      }
+      else if( linsolver.status() != SLinSolverRational::OK )
+      {
+         MSG_ERROR( spxout << "Error performing rational LU factorization.\n" );
+         error = true;
+         return;
+      }
 
       // solve for primal solution
       linsolver.solveRight(basicPrimal, basicPrimalRhs);
+
+      if( _isSolveStopped() )
+      {
+         stopped = true;
+         return;
+      }
 
       // check bound violation on basic rows and columns
       j = 0;
@@ -2997,6 +3028,12 @@ namespace soplex
 
       // solve for dual solution
       linsolver.solveLeft(basicDual, basicDualRhs);
+
+      if( _isSolveStopped() )
+      {
+         stopped = true;
+         return;
+      }
 
       // check reduced cost violation on nonbasic rows and columns
       for( int i = 0; i < basisStatusRows.size() && dualFeasible; i++ )
@@ -3079,6 +3116,7 @@ namespace soplex
             {
                assert(basisStatusCols[i] == SPxSolver::UNDEFINED);
                MSG_ERROR( spxout << "Undefined basis status of column in rational factorization.\n" );
+               error = true;
                goto TERMINATE;
             }
          }

@@ -1572,7 +1572,7 @@ private:
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols);
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, bool& stopped, bool& error);
 
    //@}
 
