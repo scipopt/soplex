@@ -2053,8 +2053,21 @@ namespace soplex
             }
 
             assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
-            _rationalLP->changeBounds(c, 0, _upperFinite(_colTypes[c]) ? upperRational(c) - lowerRational(c) : upperRational(c));
-            _realLP->changeBounds(c, 0.0, Real(upperRational(c)));
+            if( _upperFinite(_colTypes[c]) )
+            {
+               _rationalLP->changeBounds(c, 0, upperRational(c) - lowerRational(c));
+               _realLP->changeBounds(c, 0.0, Real(upperRational(c)));
+            }
+            else if( _realLP->upper(c) < realParam(SoPlex::INFTY) )
+            {
+               _rationalLP->changeLower(c, 0);
+               _realLP->changeBounds(c, 0.0, realParam(SoPlex::INFTY));
+            }
+            else
+            {
+               _rationalLP->changeLower(c, 0);
+               _realLP->changeLower(c, 0.0);
+            }
          }
          else if( upperRational(c) < 0 )
          {
@@ -2098,12 +2111,32 @@ namespace soplex
             }
 
             assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
-            _rationalLP->changeBounds(c, _lowerFinite(_colTypes[c]) ? lowerRational(c) - upperRational(c) : lowerRational(c), 0);
-            _realLP->changeBounds(c, Real(lowerRational(c)), 0.0);
+            if( _lowerFinite(_colTypes[c]) )
+            {
+               _rationalLP->changeBounds(c, lowerRational(c) - upperRational(c), 0);
+               _realLP->changeBounds(c, Real(lowerRational(c)), 0.0);
+            }
+            else if( _realLP->lower(c) > -realParam(SoPlex::INFTY) )
+            {
+               _rationalLP->changeUpper(c, 0);
+               _realLP->changeBounds(c, -realParam(SoPlex::INFTY), 0.0);
+            }
+            else
+            {
+               _rationalLP->changeUpper(c, 0);
+               _realLP->changeUpper(c, 0.0);
+            }
          }
          else
          {
-            _realLP->changeBounds(c, Real(lowerRational(c)), Real(upperRational(c)));
+            if( _lowerFinite(_colTypes[c]) )
+               _realLP->changeLower(c, Real(lowerRational(c)));
+            else if( _realLP->lower(c) > -realParam(SoPlex::INFTY) )
+               _realLP->changeLower(c, -realParam(SoPlex::INFTY));
+            if( _upperFinite(_colTypes[c]) )
+               _realLP->changeUpper(c, Real(upperRational(c)));
+            else if( _realLP->upper(c) < realParam(SoPlex::INFTY) )
+               _realLP->changeUpper(c, realParam(SoPlex::INFTY));
          }
 
          assert(lowerReal(c) <= upperReal(c));
@@ -2126,6 +2159,8 @@ namespace soplex
             {
                _rationalLP->changeLhs(r, 0);
                _realLP->changeLhs(r, 0.0);
+               if( _realLP->rhs(r) < realParam(SoPlex::INFTY) )
+                  _realLP->changeRhs(r, realParam(SoPlex::INFTY));
             }
          }
          else if( rhsRational(r) < 0 )
@@ -2141,7 +2176,20 @@ namespace soplex
             {
                _rationalLP->changeRhs(r, 0);
                _realLP->changeRhs(r, 0.0);
+               if( _realLP->lhs(r) > -realParam(SoPlex::INFTY) )
+                  _realLP->changeLhs(r, -realParam(SoPlex::INFTY));
             }
+         }
+         else
+         {
+            if( _lowerFinite(_rowTypes[r]) )
+               _realLP->changeLhs(r, Real(lhsRational(r)));
+            else if( _realLP->lhs(r) > -realParam(SoPlex::INFTY) )
+               _realLP->changeLhs(r, -realParam(SoPlex::INFTY));
+            if( _upperFinite(_rowTypes[r]) )
+               _realLP->changeRhs(r, Real(rhsRational(r)));
+            else if( _realLP->rhs(r) < realParam(SoPlex::INFTY) )
+               _realLP->changeRhs(r, realParam(SoPlex::INFTY));
          }
 
          assert(rhsReal(r) <= rhsReal(r));
