@@ -993,32 +993,9 @@ SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[
    u.col.max[thedim]   = 0;
    u.col.len[thedim]   = 0;
 
-   for (;;)
-   {
-      ///@todo if the factorization fails with stat = SINGULAR, distinuish between proven singularity (e.g., because of
-      ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
-      ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
-      stat = OK;
-      factor(matrix, lastThreshold);
+   stat = OK;
+   factor(matrix, lastThreshold);
 
-      // finish if the factorization is stable
-      if (stability() >= minStability)
-         break;
-
-      // otherwise, we increase the Markowitz threshold
-      Rational x = lastThreshold;
-      lastThreshold = betterThreshold(lastThreshold);
-
-      // until it doesn't change anymore at its maximum value
-      if ( x == lastThreshold )
-         break;
-
-      // we relax the stability requirement
-      minStability /= 2.0;
-
-      MSG_INFO3( spxout << "ISLUFA01 refactorizing with increased Markowitz threshold: "
-                        << lastThreshold << std::endl; )
-   }
    MSG_DEBUG( spxout << "DSLUFA02 threshold = " << lastThreshold
                      << "\tstability = " << stability()
                      << "\tminStability = " << minStability << std::endl; )
