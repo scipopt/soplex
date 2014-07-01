@@ -904,9 +904,9 @@ static Rational betterThreshold( Rational th )
 {
    assert(th < 1);
 
-   if ( th < 0.1 )
+   if ( 10 * th < 1 )
       th *= 10;
-   else if ( th < 0.9 )
+   else if ( 10 * th < 8 )
       th = (th + 1) / 2;
    else if ( th < 0.999 )
       th = 0.99999;
