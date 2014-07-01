@@ -1115,6 +1115,10 @@ namespace soplex
          bool factorPrimalFeasible;
          bool factorDualFeasible;
          _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, factorPrimalFeasible, factorDualFeasible, stopped, error);
+         if( stopped )
+         {
+            MSG_INFO1( spxout << "Stopped rational factorization.\n" );
+         }
       }
 
       // compute objective function values
@@ -2978,10 +2982,15 @@ namespace soplex
 
       // load rational basis matrix
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setFactorTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
       else
-         linsolver.setFactorTimeLimit(-1.0);
+         linsolver.setTimeLimit(-1.0);
       linsolver.load(matrix.get_ptr(), matrixdim);
+
+      // record statistics
+      _statistics->luFactorizationTimeRational += linsolver.getFactorTime();
+      _statistics->luFactorizationsRational += linsolver.getFactorCount();
+      linsolver.resetCounters();
 
       if( linsolver.status() == SLinSolverRational::TIME )
       {
@@ -2996,7 +3005,15 @@ namespace soplex
       }
 
       // solve for primal solution
+      if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
+         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+      else
+         linsolver.setTimeLimit(-1.0);
       linsolver.solveRight(basicPrimal, basicPrimalRhs);
+
+      // record statistics
+      _statistics->luSolveTimeRational += linsolver.getSolveTime();
+      linsolver.resetCounters();
 
       if( _isSolveStopped() )
       {
@@ -3027,7 +3044,15 @@ namespace soplex
       MSG_INFO2( spxout << "Primal solution" << (primalFeasible ? " " : " not ") << "feasible!\n" );
 
       // solve for dual solution
+      if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
+         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+      else
+         linsolver.setTimeLimit(-1.0);
       linsolver.solveLeft(basicDual, basicDualRhs);
+
+      // record statistics
+      _statistics->luSolveTimeRational += linsolver.getSolveTime();
+      linsolver.resetCounters();
 
       if( _isSolveStopped() )
       {
@@ -3075,12 +3100,6 @@ namespace soplex
          }
       }
       MSG_INFO2( spxout << "Dual solution" << (dualFeasible ? " " : " not ") << "feasible!\n" );
-
-      // record statistics
-      _statistics->luFactorizationTimeRational += linsolver.getFactorTime();
-      _statistics->luSolveTimeRational += linsolver.getSolveTime();
-      _statistics->luFactorizationsRational += linsolver.getFactorCount();
-      linsolver.resetCounters();
 
       // store solution
       if( primalFeasible && dualFeasible )

@@ -510,7 +510,7 @@ void SLUFactorRational::assign(const SLUFactorRational& old)
    lMemMult      = old.lMemMult;
    factorCount   = old.factorCount;
    factorTime    = old.factorTime;
-   factorTimeLimit = old.factorTimeLimit;
+   timeLimit     = old.timeLimit;
 
    spx_alloc(row.perm, thedim);
    spx_alloc(row.orig, thedim);
@@ -792,7 +792,7 @@ SLUFactorRational::SLUFactorRational()
    SLUFactorRational::clear(); // clear() is virtual
 
    factorCount = 0;
-   factorTimeLimit = -1.0;
+   timeLimit = -1.0;
    solveCount  = 0;
 
    assert(row.perm != 0);

@@ -199,7 +199,7 @@ protected:
 
    Timer   factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
-   Real    factorTimeLimit;   ///< Time limit on factorization
+   Real    timeLimit;         ///< Time limit on factorization or solves
    //@}
 
 private:
@@ -221,7 +221,7 @@ private:
    */
    //@{
    ///
-   void solveUright(Rational* wrk, Rational* vec) const;
+   void solveUright(Rational* wrk, Rational* vec);
    ///
    int  solveUrightEps(Rational* vec, int* nonz, Rational* rhs);
    ///
@@ -245,7 +245,7 @@ private:
    ///
    int solveLleftForest(Rational* vec, int* /* nonz */);
    ///
-   void solveLleft(Rational* vec) const;
+   void solveLleft(Rational* vec);
    ///
    int solveLleftEps(Rational* vec, int* nonz);
    ///
@@ -345,6 +345,17 @@ private:
    void remaxRow(int p_row, int len);
    ///
    int makeLvec(int p_len, int p_row);
+   ///
+   bool timeLimitReached()
+   {
+      if( timeLimit >= 0.0 && factorTime.userTime() >= timeLimit )
+      {
+         stat = SLinSolverRational::TIME;
+         return true;
+      }
+      else
+         return false;
+   }
    //@}
 
    //----------------------------------------

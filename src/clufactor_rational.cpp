@@ -2530,11 +2530,8 @@ void CLUFactorRational::eliminateNucleus( const Rational& threshold )
 
       if ( temp.pivot_rowNZ[1].next != &( temp.pivot_rowNZ[1] ) )
       {
-         if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
-         {
-            stat = SLinSolverRational::TIME;
+         if( timeLimitReached() )
             return;
-         }
 
          /* row singleton available */
          eliminateRowSingletons();
@@ -2542,11 +2539,8 @@ void CLUFactorRational::eliminateNucleus( const Rational& threshold )
       else
          if ( temp.pivot_colNZ[1].next != &( temp.pivot_colNZ[1] ) )
          {
-            if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
-            {
-               stat = SLinSolverRational::TIME;
+            if( timeLimitReached() )
                return;
-            }
 
             /* column singleton available */
             eliminateColSingletons();
@@ -2562,11 +2556,8 @@ void CLUFactorRational::eliminateNucleus( const Rational& threshold )
             for ( pivot = temp.pivots.next; pivot != &temp.pivots;
                   pivot = pivot->next )
             {
-               if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
-               {
-                  stat = SLinSolverRational::TIME;
+               if( timeLimitReached() )
                   return;
-               }
 
                eliminatePivot( pivot->idx, pivot->pos );
             }
@@ -2781,11 +2772,8 @@ void CLUFactorRational::factor(
    if ( stat )
       goto TERMINATE;
 
-   if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
-   {
-      stat = SLinSolverRational::TIME;
+   if( timeLimitReached() )
       goto TERMINATE;
-   }
 
    //   initMaxabs = initMaxabs;
 
@@ -2794,11 +2782,8 @@ void CLUFactorRational::factor(
    if ( stat != SLinSolverRational::OK )
       goto TERMINATE;
 
-   if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
-   {
-      stat = SLinSolverRational::TIME;
+   if( timeLimitReached() )
       goto TERMINATE;
-   }
 
    rowSingletons();
 
@@ -2807,11 +2792,8 @@ void CLUFactorRational::factor(
 
    if ( temp.stage < thedim )
    {
-      if( factorTimeLimit >= 0.0 && factorTime.userTime() >= factorTimeLimit )
-      {
-         stat = SLinSolverRational::TIME;
+      if( timeLimitReached() )
          goto TERMINATE;
-      }
 
       initFactorRings();
       eliminateNucleus( threshold );
@@ -3099,7 +3081,7 @@ bool CLUFactorRational::isConsistent() const
    return true;
 }
 
-void CLUFactorRational::solveUright( Rational* wrk, Rational* vec ) const
+void CLUFactorRational::solveUright( Rational* wrk, Rational* vec )
 {
 
    for ( int i = thedim - 1; i >= 0; i-- )
@@ -3113,6 +3095,9 @@ void CLUFactorRational::solveUright( Rational* wrk, Rational* vec ) const
       if ( x != 0 )
          //if (isNotZero(x))
       {
+         if( timeLimitReached() )
+            return;
+
          for ( int j = u.col.start[c]; j < u.col.start[c] + u.col.len[c]; j++ )
             vec[u.col.idx[j]] -= x * u.col.val[j];
       }
@@ -3321,6 +3306,9 @@ void CLUFactorRational::solveLright( Rational* vec )
    {
       if (( x = vec[lrow[i]] ) != 0 )
       {
+         if( timeLimitReached() )
+            return;
+
          MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
 
          k = lbeg[i];
@@ -3647,6 +3635,9 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
 
       if ( x != 0 )
       {
+         if( timeLimitReached() )
+            return;
+
          //         ASSERT_WARN( "WSOLVE03", fabs( diag[r] ) < 1e40 );
 
          x        *= diag[r];
@@ -3919,6 +3910,9 @@ int CLUFactorRational::solveLleftForest( Rational* vec, int* /* nonz */ )
    {
       if (( x = vec[lrow[i]] ) != 0 )
       {
+         if( timeLimitReached() )
+            return 0;
+
          k = lbeg[i];
          val = &lval[k];
          idx = &lidx[k];
@@ -3931,7 +3925,7 @@ int CLUFactorRational::solveLleftForest( Rational* vec, int* /* nonz */ )
    return 0;
 }
 
-void CLUFactorRational::solveLleft( Rational* vec ) const
+void CLUFactorRational::solveLleft( Rational* vec )
 {
 
 #ifndef WITH_L_ROWS
@@ -3944,6 +3938,9 @@ void CLUFactorRational::solveLleft( Rational* vec ) const
 
    for ( int i = l.firstUpdate - 1; i >= 0; --i )
    {
+      if( timeLimitReached() )
+         return;
+
       int k = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
@@ -3963,6 +3960,9 @@ void CLUFactorRational::solveLleft( Rational* vec ) const
 
       if ( x != 0 )
       {
+         if( timeLimitReached() )
+            return;
+
          for ( int k = l.rbeg[r]; k < l.rbeg[r + 1]; k++ )
          {
             int j = l.ridx[k];
