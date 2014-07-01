@@ -116,13 +116,15 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['minabsval'] = float(outlines[idx+15].split()[4])
             instances[instancename]['maxabsval'] = float(outlines[idx+16].split()[4])
 
-        elif outline.startswith('Iterations'):
-            instances[instancename]['iters'] = int(outline.split()[2])
-            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
-            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
-            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
-            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
-            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+        elif outline.startswith('Violation'):
+            primviol = outlines[idx+2].split()[3]
+            dualviol = outlines[idx+3].split()[3]
+            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
+                instances[instancename]['primalviol'] = float(primviol)
+                instances[instancename]['dualviol'] = float(dualviol)
+            else:
+                instances[instancename]['primalviol'] = '-'
+                instances[instancename]['dualviol'] = '-'
 
         elif outline.startswith('Total time'):
             instances[instancename]['time'] = float(outline.split()[3])
@@ -138,15 +140,14 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['refinements'] = int(outline.split()[2])
             instances[instancename]['stalling'] = int(outlines[idx+1].split()[2])
 
-        elif outline.startswith('Violation'):
-            primviol = outlines[idx+2].split()[3]
-            dualviol = outlines[idx+3].split()[3]
-            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
-                instances[instancename]['primalviol'] = float(primviol)
-                instances[instancename]['dualviol'] = float(dualviol)
-            else:
-                instances[instancename]['primalviol'] = '-'
-                instances[instancename]['dualviol'] = '-'
+        elif outline.startswith('Iterations'):
+            instances[instancename]['iters'] = int(outline.split()[2])
+            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
+            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
+            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
+            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
+            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+            instances[instancename]['speed'] = round(float(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
 
         elif outline.startswith('LU factorizations'):
             instances[instancename]['lufacts'] = int(outline.split()[3])
