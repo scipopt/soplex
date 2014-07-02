@@ -929,6 +929,14 @@ public:
       assert(isConsistent());
    }
 
+   /// changes \p i 'th lower bound to \p newLower.
+   template < class S >
+   void changeLower(int i, const S* newLower)
+   {
+      LPColSetBase<R>::lower_w(i) = *newLower;
+      assert(isConsistent());
+   }
+
    /// changes lower bound of column with identifier \p id to \p newLower.
    virtual void changeLower(SPxColId id, const R& newLower)
    {
@@ -949,6 +957,14 @@ public:
    {
 
       LPColSetBase<R>::upper_w(i) = newUpper;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th upper bound to \p newUpper.
+   template < class S >
+   void changeUpper(int i, const S* newUpper)
+   {
+      LPColSetBase<R>::upper_w(i) = *newUpper;
       assert(isConsistent());
    }
 

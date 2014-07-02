@@ -1912,6 +1912,26 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes lower bound of column i to \p lower
+   void SoPlex::changeLowerRational(int i, const mpq_t* lower)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeLower(i, lower);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeLowerReal(i, Real(lowerRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// changes vector of upper bounds to \p upper
    void SoPlex::changeUpperRational(const VectorRational& upper)
    {
@@ -1945,6 +1965,26 @@ namespace soplex
 
       _invalidateSolution();
    }
+
+
+
+#ifdef SOPLEX_WITH_GMP
+   /// changes upper bound of column i to \p upper
+   void SoPlex::changeUpperRational(int i, const mpq_t* upper)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeUpper(i, upper);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeUpperReal(i, Real(upperRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
 
 
 

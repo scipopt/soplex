@@ -437,11 +437,21 @@ public:
    /// changes lower bound of column i to \p lower
    void changeLowerRational(int i, const Rational& lower);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes lower bound of column i to \p lower
+   void changeLowerRational(int i, const mpq_t* lower);
+#endif
+
    /// changes vector of upper bounds to \p upper
    void changeUpperRational(const VectorRational& upper);
 
    /// changes \p i 'th upper bound to \p upper
    void changeUpperRational(int i, const Rational& upper);
+
+#ifdef SOPLEX_WITH_GMP
+   /// changes upper bound of column i to \p upper
+   void changeUpperRational(int i, const mpq_t* upper);
+#endif
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsRational(const VectorRational& lower, const VectorRational& upper);
