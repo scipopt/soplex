@@ -906,6 +906,16 @@ public:
       assert(isConsistent());
    }
 
+   /// changes \p i 'th objective vector element to \p newVal.
+   template < class S >
+   void changeObj(int i, const S* newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = *newVal;
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w(i) *= -1;
+      assert(isConsistent());
+   }
+
    /// Changes objective value of column with identifier \p id to \p newVal.
    virtual void changeObj(SPxColId id, const R& newVal)
    {

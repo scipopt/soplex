@@ -470,6 +470,11 @@ public:
    /// changes objective coefficient of column i to \p obj
    void changeObjRational(int i, const Rational& obj);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes objective coefficient of column i to \p obj
+   void changeObjRational(int i, const mpq_t* obj);
+#endif
+
    /// changes matrix entry in row \p i and column \p j to \p val
    void changeElementRational(int i, int j, const Rational& val);
 

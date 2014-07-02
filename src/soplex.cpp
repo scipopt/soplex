@@ -2080,6 +2080,26 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes objective coefficient of column i to \p obj
+   void SoPlex::changeObjRational(int i, const mpq_t* obj)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeObj(i, obj);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _realLP->changeObj(i, Real(objRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// changes matrix entry in row \p i and column \p j to \p val
    void SoPlex::changeElementRational(int i, int j, const Rational& val)
    {
