@@ -1272,7 +1272,7 @@ private:
       RANGETYPE_BOXED = 3,
 
       /// lower bound equals upper bound
-      RANGETYPE_FIXED = 4,
+      RANGETYPE_FIXED = 4
    } RangeType;
 
    DataArray< RangeType > _colTypes;

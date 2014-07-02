@@ -707,25 +707,81 @@ namespace soplex
             else
                primalScale = maxScale;
 
-            if( primalScale < 1 )
-               primalScale = 1;
+            // apply scaled bounds
+            if( primalScale <= 1 )
+            {
+               if( primalScale < 1 )
+                  primalScale = 1;
+               for( int c = numColsRational() - 1; c >= 0; c-- )
+               {
+                  assert(_lowerFinite(_colTypes[c]) || _solver.lower(c) <= -realParam(SoPlex::INFTY));
+                  assert(_upperFinite(_colTypes[c]) || _solver.upper(c) >= realParam(SoPlex::INFTY));
+                  if( _lowerFinite(_colTypes[c]) )
+                     _solver.changeLower(c, Real(_modLower[c]));
+                  if( _upperFinite(_colTypes[c]) )
+                     _solver.changeUpper(c, Real(_modUpper[c]));
+               }
+            }
             else
             {
                MSG_INFO2( spxout << "Scaling primal by " << rationalToString(primalScale) << ".\n" );
 
-               // perform bounds scaling
-               _modLower *= primalScale;
-               _modUpper *= primalScale;
+               for( int c = numColsRational() - 1; c >= 0; c-- )
+               {
+                  assert(_lowerFinite(_colTypes[c]) || _solver.lower(c) <= -realParam(SoPlex::INFTY));
+                  assert(_upperFinite(_colTypes[c]) || _solver.upper(c) >= realParam(SoPlex::INFTY));
+                  if( _lowerFinite(_colTypes[c]) )
+                  {
+                     _modLower[c] *= primalScale;
+                     _solver.changeLower(c, Real(_modLower[c]));
+                  }
+                  if( _upperFinite(_colTypes[c]) )
+                  {
+                     _modUpper[c] *= primalScale;
+                     _solver.changeUpper(c, Real(_modUpper[c]));
+                  }
+               }
             }
-
-            // apply scaled bounds
-            _solver.changeBounds(DVectorReal(_modLower), DVectorReal(_modUpper));
          }
 
          // apply scaled sides
-         _modLhs *= primalScale;
-         _modRhs *= primalScale;
-         _solver.changeRange(DVectorReal(_modLhs), DVectorReal(_modRhs));
+         assert(primalScale >= 1);
+         if( primalScale == 1 )
+         {
+            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            {
+               bool restricted = restrictInequalities && (sol._dual[r] != 0);
+               if( restricted || _lowerFinite(_rowTypes[r]) )
+                  _solver.changeLhs(r, Real(_modLhs[r]));
+               else if( _solver.lhs(r) > -realParam(SoPlex::INFTY) )
+                  _solver.changeLhs(r, -realParam(SoPlex::INFTY));
+               if( restricted || _upperFinite(_rowTypes[r]) )
+                  _solver.changeRhs(r, Real(_modRhs[r]));
+               else if( _solver.rhs(r) < realParam(SoPlex::INFTY) )
+                  _solver.changeRhs(r, realParam(SoPlex::INFTY));
+            }
+         }
+         else
+         {
+            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            {
+               bool restricted = restrictInequalities && (sol._dual[r] != 0);
+               if( restricted || _lowerFinite(_rowTypes[r]) )
+               {
+                  _modLhs[r] *= primalScale;
+                  _solver.changeLhs(r, Real(_modLhs[r]));
+               }
+               else if( _solver.lhs(r) > -realParam(SoPlex::INFTY) )
+                  _solver.changeLhs(r, -realParam(SoPlex::INFTY));
+               if( restricted || _upperFinite(_rowTypes[r]) )
+               {
+                  _modRhs[r] *= primalScale;
+                  _solver.changeRhs(r, Real(_modRhs[r]));
+               }
+               else if( _solver.rhs(r) < realParam(SoPlex::INFTY) )
+                  _solver.changeRhs(r, realParam(SoPlex::INFTY));
+            }
+         }
 
          // compute dual scaling factor; limit increase in scaling by tolerance used in floating point solve
          maxScale = dualScale;
