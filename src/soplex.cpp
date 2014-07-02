@@ -2024,6 +2024,26 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes bounds of column \p i to \p lower and \p upper
+   void SoPlex::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeBounds(i, lower, upper);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeBoundsReal(i, Real(lowerRational(i)), Real(upperRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// changes objective function vector to \p obj
    void SoPlex::changeObjRational(const VectorRational& obj)
    {

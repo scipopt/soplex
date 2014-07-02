@@ -992,6 +992,15 @@ public:
       assert(isConsistent());
    }
 
+   /// Changes bounds of column \p i to \p newLower and \p newUpper.
+   template < class S >
+   void changeBounds(int i, const S* newLower, const S* newUpper)
+   {
+      LPColSetBase<R>::lower_w(i) = *newLower;
+      LPColSetBase<R>::upper_w(i) = *newUpper;
+      assert(isConsistent());
+   }
+
    /// Changes bounds of column with identifier \p id.
    virtual void changeBounds(SPxColId id, const R& newLower, const R& newUpper)
    {

@@ -459,6 +459,11 @@ public:
    /// changes bounds of column \p i to \p lower and \p upper
    void changeBoundsRational(int i, const Rational& lower, const Rational& upper);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes bounds of column \p i to \p lower and \p upper
+   void changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper);
+#endif
+
    /// changes objective function vector to \p obj
    void changeObjRational(const VectorRational& obj);
 
