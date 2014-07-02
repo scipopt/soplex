@@ -1745,11 +1745,27 @@ namespace soplex
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeTransUnbounded.lp", 0, 0, 0) );
 
-      // store right-hand side and bounds
-      _unboundedLhs = _rationalLP->lhs();
-      _unboundedRhs = _rationalLP->rhs();
-      _unboundedLower = _rationalLP->lower();
-      _unboundedUpper = _rationalLP->upper();
+      // store bounds
+      _unboundedLower.reDim(numColsRational());
+      _unboundedUpper.reDim(numColsRational());
+      for( int c = numColsRational() - 1; c >= 0; c-- )
+      {
+         if( _lowerFinite(_colTypes[c]) )
+            _unboundedLower[c] = lowerRational(c);
+         if( _upperFinite(_colTypes[c]) )
+            _unboundedUpper[c] = upperRational(c);
+      }
+
+      // store sides
+      _unboundedLhs.reDim(numRowsRational());
+      _unboundedRhs.reDim(numRowsRational());
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         if( _lowerFinite(_rowTypes[r]) )
+            _unboundedLhs[r] = lhsRational(r);
+         if( _upperFinite(_rowTypes[r]) )
+            _unboundedRhs[r] = rhsRational(r);
+      }
 
       // make right-hand side zero
       for( int r = numRowsRational() - 1; r >= 0; r-- )
@@ -1894,17 +1910,12 @@ namespace soplex
          _basisStatusCols.reSize(numOrigRows);
       }
 
-      // restore objective function
+      // recover objective function
       const SVectorRational& rowVector = _rationalLP->rowVector(numOrigRows);
       DVectorRational objCoefs(numOrigCols + 1);
-
       objCoefs.clear();
       for( int i = rowVector.size() - 1; i >= 0; i-- )
          objCoefs[rowVector.index(i)] = rowVector.value(i);
-
-      DVectorReal objCoefsReal(objCoefs);
-      _rationalLP->changeObj(objCoefs);
-      _realLP->changeObj(objCoefsReal);
 
       // remove objective function constraint and auxiliary variable
       _rationalLP->removeRow(numOrigRows);
@@ -1915,35 +1926,43 @@ namespace soplex
       _realLP->removeCol(numOrigCols);
       _colTypes.reSize(numOrigCols);
 
-      // restore sides and bounds
-      DVectorReal vectorReal(_unboundedLhs);
-      _rationalLP->changeLhs(_unboundedLhs);
-      _realLP->changeLhs(vectorReal);
-
-      vectorReal = _unboundedRhs;
-      _rationalLP->changeRhs(_unboundedRhs);
-      _realLP->changeRhs(vectorReal);
-
-      vectorReal = _unboundedLower;
-      _rationalLP->changeLower(_unboundedLower);
-      _realLP->changeLower(vectorReal);
-
-      vectorReal = _unboundedUpper;
-      _rationalLP->changeUpper(_unboundedUpper);
-      _realLP->changeUpper(vectorReal);
-
-#ifndef NDEBUG
+      // restore objective, sides and bounds
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
+         if( _lowerFinite(_rowTypes[r]) )
+         {
+            _rationalLP->changeLhs(r, _unboundedLhs[r]);
+            _realLP->changeLhs(r, Real(_unboundedLhs[r]));
+         }
+         if( _upperFinite(_rowTypes[r]) )
+         {
+            _rationalLP->changeRhs(r, _unboundedRhs[r]);
+            _realLP->changeRhs(r, Real(_unboundedRhs[r]));
+         }
          assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
          assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+         assert((lhsReal(r) > -realParam(SoPlex::INFTY)) == _lowerFinite(_rowTypes[r]));
+         assert((rhsReal(r) < realParam(SoPlex::INFTY)) == _upperFinite(_rowTypes[r]));
       }
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
+         _rationalLP->changeObj(c, objCoefs[c]);
+         _realLP->changeObj(c, Real(objCoefs[c]));
+         if( _lowerFinite(_colTypes[c]) )
+         {
+            _rationalLP->changeLower(c, _unboundedLower[c]);
+            _realLP->changeLower(c, Real(_unboundedLower[c]));
+         }
+         if( _upperFinite(_colTypes[c]) )
+         {
+            _rationalLP->changeUpper(c, _unboundedUpper[c]);
+            _realLP->changeUpper(c, Real(_unboundedUpper[c]));
+         }
          assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
          assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+         assert((lowerReal(c) > -realParam(SoPlex::INFTY)) == _lowerFinite(_colTypes[c]));
+         assert((upperReal(c) < realParam(SoPlex::INFTY)) == _upperFinite(_colTypes[c]));
       }
-#endif
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
