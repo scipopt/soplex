@@ -1760,6 +1760,8 @@ namespace soplex
             _rationalLP->changeLhs(r, 0);
             _realLP->changeLhs(r, 0.0);
          }
+         else if( _realLP->lhs(r) > -realParam(SoPlex::INFTY) )
+            _realLP->changeLhs(r, -realParam(SoPlex::INFTY));
 
          assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
          if( _upperFinite(_rowTypes[r]) )
@@ -1767,6 +1769,8 @@ namespace soplex
             _rationalLP->changeRhs(r, 0);
             _realLP->changeRhs(r, 0.0);
          }
+         else if( _realLP->rhs(r) < realParam(SoPlex::INFTY) )
+            _realLP->changeRhs(r, realParam(SoPlex::INFTY));
       }
 
       // transform objective function to constraint and add auxiliary variable
@@ -1801,6 +1805,8 @@ namespace soplex
             _rationalLP->changeLower(c, 0);
             _realLP->changeLower(c, 0.0);
          }
+         else if( _realLP->lower(c) > -realParam(SoPlex::INFTY) )
+            _realLP->changeLower(c, -realParam(SoPlex::INFTY));
 
          assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
          if( _upperFinite(_colTypes[c]) )
@@ -1808,6 +1814,8 @@ namespace soplex
             _rationalLP->changeUpper(c, 0);
             _realLP->changeUpper(c, 0.0);
          }
+         else if( _realLP->upper(c) < realParam(SoPlex::INFTY) )
+            _realLP->changeUpper(c, realParam(SoPlex::INFTY));
       }
 
       // adjust basis
