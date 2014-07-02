@@ -1838,6 +1838,26 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes left-hand side of row \p i to \p lhs
+   void SoPlex::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeRange(i, lhs, rhs);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeRangeReal(i, Real(lhsRational(i)), Real(rhsRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// replaces column \p i with \p lpcol
    void SoPlex::changeColRational(int i, const LPColRational& lpcol)
    {

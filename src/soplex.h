@@ -423,6 +423,11 @@ public:
    /// changes left- and right-hand side of row \p i
    void changeRangeRational(int i, const Rational& lhs, const Rational& rhs);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes left- and right-hand side of row \p i
+   void changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs);
+#endif
+
    /// replaces column \p i with \p lpcol
    void changeColRational(int i, const LPColRational& lpcol);
 

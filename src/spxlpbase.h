@@ -1050,6 +1050,15 @@ public:
       assert(isConsistent());
    }
 
+   /// Changes left and right hand side of row \p i.
+   template < class S >
+   void changeRange(int i, const S* newLhs, const S* newRhs)
+   {
+      LPRowSetBase<R>::lhs_w(i) = *newLhs;
+      LPRowSetBase<R>::rhs_w(i) = *newRhs;
+      assert(isConsistent());
+   }
+
    /// Changes left and right hand side of row with identifier \p id.
    virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs)
    {
