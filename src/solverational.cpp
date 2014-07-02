@@ -2401,14 +2401,35 @@ namespace soplex
       }
 
       // unshift primal space and restore objective coefficients
+      Rational shiftValue;
       for( int c = numOrigCols - 1; c >= 0; c-- )
       {
+         bool shifted = (_lowerFinite(_colTypes[c]) && _feasLower[c] > 0) || (_upperFinite(_colTypes[c]) && _feasUpper[c] < 0);
+         assert(shifted || !_lowerFinite(_colTypes[c]) || _feasLower[c] == lowerRational(c));
+         assert(shifted || !_upperFinite(_colTypes[c]) || _feasUpper[c] == upperRational(c));
          assert(upperRational(c) >= _rationalPosInfty || lowerRational(c) <= _rationalNegInfty
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
 
+         if( shifted )
+         {
+            if( _lowerFinite(_colTypes[c]) )
+            {
+               shiftValue = _feasLower[c];
+               shiftValue -= lowerRational(c);
+            }
+            else if( _upperFinite(_colTypes[c]) )
+            {
+               shiftValue = _feasUpper[c];
+               shiftValue -= upperRational(c);
+            }
+            sol._primal[c] += shiftValue;
+            sol._slacks.multAdd(shiftValue, _rationalLP->colVector(c));
+         }
+
          if( _lowerFinite(_colTypes[c]) )
          {
-            _rationalLP->changeLower(c, _feasLower[c]);
+            if( shifted )
+               _rationalLP->changeLower(c, _feasLower[c]);
             _realLP->changeLower(c, Real(_feasLower[c]));
          }
          else if( _realLP->lower(c) > -realParam(SoPlex::INFTY) )
@@ -2418,7 +2439,8 @@ namespace soplex
 
          if( _upperFinite(_colTypes[c]) )
          {
-            _rationalLP->changeUpper(c, _feasUpper[c]);
+            if( shifted )
+               _rationalLP->changeUpper(c, _feasUpper[c]);
             _realLP->changeUpper(c, Real(upperRational(c)));
          }
          else if( _realLP->upper(c) < realParam(SoPlex::INFTY) )
