@@ -488,19 +488,19 @@ namespace soplex
             for( int c = numColsRational() - 1; c >= 0; c-- )
             {
                // lower bound
-               if( lowerRational(c) == 0 )
+               assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
+               if( _lowerFinite(_colTypes[c]) )
                {
-                  _modLower[c] = sol._primal[c];
-                  _modLower[c] *= -1;
-                  if( _modLower[c] > boundsViolation )
-                     boundsViolation = _modLower[c];
-               }
-               else
-               {
-                  _modLower[c] = lowerRational(c);
-                  assert((_modLower[c] > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
-                  if( _lowerFinite(_colTypes[c]) )
+                  if( lowerRational(c) == 0 )
                   {
+                     _modLower[c] = sol._primal[c];
+                     _modLower[c] *= -1;
+                     if( _modLower[c] > boundsViolation )
+                        boundsViolation = _modLower[c];
+                  }
+                  else
+                  {
+                     _modLower[c] = lowerRational(c);
                      _modLower[c] -= sol._primal[c];
                      if( _modLower[c] > boundsViolation )
                         boundsViolation = _modLower[c];
@@ -508,19 +508,19 @@ namespace soplex
                }
 
                // upper bound
-               if( upperRational(c) == 0 )
+               assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
+               if( _upperFinite(_colTypes[c]) )
                {
-                  _modUpper[c] = sol._primal[c];
-                  _modUpper[c] *= -1;
-                  if( _modUpper[c] < -boundsViolation )
-                     boundsViolation = -_modUpper[c];
-               }
-               else
-               {
-                  _modUpper[c] = upperRational(c);
-                  assert((_modUpper[c] < _rationalPosInfty) == _upperFinite(_colTypes[c]));
-                  if( _upperFinite(_colTypes[c]) )
+                  if( upperRational(c) == 0 )
                   {
+                     _modUpper[c] = sol._primal[c];
+                     _modUpper[c] *= -1;
+                     if( _modUpper[c] < -boundsViolation )
+                        boundsViolation = -_modUpper[c];
+                  }
+                  else
+                  {
+                     _modUpper[c] = upperRational(c);
                      _modUpper[c] -= sol._primal[c];
                      if( _modUpper[c] < -boundsViolation )
                         boundsViolation = -_modUpper[c];
@@ -535,19 +535,19 @@ namespace soplex
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             // left-hand side
-            if( lhsRational(r) == 0 )
+            assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
+            if( _lowerFinite(_rowTypes[r]) )
             {
-               _modLhs[r] = sol._slacks[r];
-               _modLhs[r] *= -1;
-               if( _modLhs[r] > sideViolation )
-                  sideViolation = _modLhs[r];
-            }
-            else
-            {
-               _modLhs[r] = lhsRational(r);
-               assert((_modLhs[r] > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
-               if( _lowerFinite(_rowTypes[r]) )
+               if( lhsRational(r) == 0 )
                {
+                  _modLhs[r] = sol._slacks[r];
+                  _modLhs[r] *= -1;
+                  if( _modLhs[r] > sideViolation )
+                     sideViolation = _modLhs[r];
+               }
+               else
+               {
+                  _modLhs[r] = lhsRational(r);
                   _modLhs[r] -= sol._slacks[r];
                   if( _modLhs[r] > sideViolation )
                      sideViolation = _modLhs[r];
@@ -555,19 +555,19 @@ namespace soplex
             }
 
             // right-hand side
-            if( rhsRational(r) == 0 )
+            assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
+            if( _upperFinite(_rowTypes[r]) )
             {
-               _modRhs[r] = sol._slacks[r];
-               _modRhs[r] *= -1;
-               if( _modRhs[r] < -sideViolation )
-                  sideViolation = -_modRhs[r];
-            }
-            else
-            {
-               _modRhs[r] = rhsRational(r);
-               assert((_modRhs[r] < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
-               if( _upperFinite(_rowTypes[r]) )
+               if( rhsRational(r) == 0 )
                {
+                  _modRhs[r] = sol._slacks[r];
+                  _modRhs[r] *= -1;
+                  if( _modRhs[r] < -sideViolation )
+                     sideViolation = -_modRhs[r];
+               }
+               else
+               {
+                  _modRhs[r] = rhsRational(r);
                   _modRhs[r] -= sol._slacks[r];
                   if( _modRhs[r] < -sideViolation )
                      sideViolation = -_modRhs[r];
@@ -1057,7 +1057,6 @@ namespace soplex
             if( _rowTypes[r] != RANGETYPE_FIXED )
             {
                assert(sol._dual[r] == 0 || _modLhs[r] == _modRhs[r]);
-               assert(sol._dual[r] != 0 || _modLhs[r] != _modRhs[r]);
 
                // the inequality was fixed to the left-hand side
                if( sol._dual[r] > 0 && (basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED) )
