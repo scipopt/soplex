@@ -1200,6 +1200,35 @@ public:
       assert(isConsistent());
    }
 
+   /// Changes LP element (\p i, \p j) to \p val.
+   template < class S >
+   void changeElement(int i, int j, const S* val)
+   {
+      SVectorBase<R>& row = rowVector_w(i);
+      SVectorBase<R>& col = colVector_w(j);
+
+      if( mpq_get_d(*val) != R(0) )
+      {
+         if( row.number(j) >= 0 )
+         {
+            row.value(row.number(j)) = *val;
+            col.value(col.number(i)) = *val;
+         }
+         else
+         {
+            LPRowSetBase<R>::add2(i, 1, &j, val);
+            LPColSetBase<R>::add2(j, 1, &i, val);
+         }
+      }
+      else if( row.number(j) >= 0 )
+      {
+         row.remove(row.number(j));
+         col.remove(col.number(i));
+      }
+
+      assert(isConsistent());
+   }
+
    /// Changes LP element identified by (\p rid, \p cid) to \p val.
    virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val)
    {

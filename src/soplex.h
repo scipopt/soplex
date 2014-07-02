@@ -478,6 +478,11 @@ public:
    /// changes matrix entry in row \p i and column \p j to \p val
    void changeElementRational(int i, int j, const Rational& val);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes matrix entry in row \p i and column \p j to \p val
+   void changeElementRational(int i, int j, const mpq_t* val);
+#endif
+
    /// removes row \p i
    void removeRowRational(int i);
 

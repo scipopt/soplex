@@ -2117,6 +2117,24 @@ namespace soplex
    }
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes matrix entry in row \p i and column \p j to \p val
+   void SoPlex::changeElementRational(int i, int j, const mpq_t* val)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->changeElement(i, j, val);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _changeElementReal(i, j, mpq_get_d(*val));
+
+      _invalidateSolution();
+   }
+#endif
+
 
    /// removes row \p i
    void SoPlex::removeRowRational(int i)
