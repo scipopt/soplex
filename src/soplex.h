@@ -251,6 +251,9 @@ public:
    /// gets objective function vector
    void getObjRational(VectorRational& obj) const;
 
+   /// gets objective value of column \p i
+   void getObjRational(int i, Rational& obj) const;
+
    /// returns objective value of column \p i
    Rational objRational(int i) const;
 
@@ -757,8 +760,11 @@ public:
       /// should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
       TESTDUALINF = 2,
 
+      /// should a rational factorization be performed after iterative refinement?
+      RATFAC = 3,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 3
+      BOOLPARAM_COUNT = 4
    } BoolParam;
 
    /// integer parameters
@@ -1277,13 +1283,35 @@ private:
    DVectorRational _modLhs;
    DVectorRational _modRhs;
    DVectorRational _modObj;
-   DSVectorRational _primalDiff;
-   DSVectorRational _dualDiff;
+   DSVectorRational _primalDualDiff;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
+   DataArray< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
+
+   /// type of bounds and sides
+   typedef enum
+   {
+      /// both bounds are infinite
+      RANGETYPE_FREE = 0,
+
+      /// lower bound is finite, upper bound is infinite
+      RANGETYPE_LOWER = 1,
+
+      /// upper bound is finite, lower bound is infinite
+      RANGETYPE_UPPER = 2,
+
+      /// lower and upper bound finite, but different
+      RANGETYPE_BOXED = 3,
+
+      /// lower bound equals upper bound
+      RANGETYPE_FIXED = 4
+   } RangeType;
+
+   DataArray< RangeType > _colTypes;
+   DataArray< RangeType > _rowTypes;
 
    //@}
 
@@ -1310,6 +1338,9 @@ private:
    //**@name Constant helper methods */
    //@{
 
+   /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
+   void _ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const;
+
    /// creates a permutation for removing rows/columns from an array of indices
    void _idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
 
@@ -1322,8 +1353,20 @@ private:
    /// should solving process be stopped?
    bool _isSolveStopped() const;
 
-   /// parses one line in a settings file and returns true on success; note that the string is modified
-   bool _parseSettingsLine(char* line, const int lineNumber);
+   /// determines RangeType from real bounds
+   RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
+
+   /// determines RangeType from rational bounds
+   RangeType _rangeTypeRational(const Rational& lower, const Rational& upper) const;
+
+   /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
+   RangeType _switchRangeType(const RangeType& rangeType) const;
+
+   /// checks whether RangeType corresponds to finite lower bound
+   bool _lowerFinite(const RangeType& rangeType) const;
+
+   /// checks whether RangeType corresponds to finite upper bound
+   bool _upperFinite(const RangeType& rangeType) const;
 
    //@}
 
@@ -1452,6 +1495,12 @@ private:
    /// integer variables if desired
    bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
+   /// recomputes range types from scratch using real LP
+   void _recomputeRangeTypesReal();
+
+   /// recomputes range types from scratch using rational LP
+   void _recomputeRangeTypesRational();
+
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
    void _syncLPReal(bool time = true);
 
@@ -1463,6 +1512,12 @@ private:
 
    /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    void _syncRationalSolution();
+
+   /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+   const UnitVectorRational* _unitVectorRational(const int i);
+
+   /// parses one line in a settings file and returns true on success; note that the string is modified
+   bool _parseSettingsLine(char* line, const int lineNumber);
 
    //@}
 
@@ -1553,6 +1608,9 @@ private:
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols);
+
+   /// factorizes rational basis matrix in column representation
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, bool& stopped, bool& error);
 
    //@}
 

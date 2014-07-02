@@ -160,6 +160,12 @@ namespace soplex
       /// addition assignment operator  for doubles
       Rational& operator+=(const double& r);
 
+      /// addition operator for ints
+      Rational operator+(const int& r) const;
+
+      /// addition assignment operator  for ints
+      Rational& operator+=(const int& r);
+
       /// subtraction operator
       Rational operator-(const Rational& r) const;
 
@@ -171,6 +177,12 @@ namespace soplex
 
       /// subtraction assignment operator for doubles
       Rational& operator-=(const double& r);
+
+      /// subtraction operator for ints
+      Rational operator-(const int& r) const;
+
+      /// subtraction assignment operator for ints
+      Rational& operator-=(const int& r);
 
       /// multiplication operator
       Rational operator*(const Rational& r) const;
@@ -184,6 +196,12 @@ namespace soplex
       /// multiplication assignment operator for doubles
       Rational& operator*=(const double& r);
 
+      /// multiplication operator for ints
+      Rational operator*(const int& r) const;
+
+      /// multiplication assignment operator for ints
+      Rational& operator*=(const int& r);
+
       /// division operator
       Rational operator/(const Rational& r) const;
 
@@ -195,6 +213,12 @@ namespace soplex
 
       /// division assignment operator for doubles
       Rational& operator/=(const double& r);
+
+      /// division operator for ints
+      Rational operator/(const int& r) const;
+
+      /// division assignment operator for ints
+      Rational& operator/=(const int& r);
 
       /// add product of two rationals
       Rational& addProduct(const Rational& r, const Rational& s);
@@ -271,6 +295,25 @@ namespace soplex
       friend Rational operator*(const double& d, const Rational& r);
       friend Rational operator/(const double& d, const Rational& r);
 
+      friend bool operator!=(const Rational& r, const int& s);
+      friend bool operator==(const Rational& r, const int& s);
+      friend bool operator<(const Rational& r, const int& s);
+      friend bool operator<=(const Rational& r, const int& s);
+      friend bool operator>(const Rational& r, const int& s);
+      friend bool operator>=(const Rational& r, const int& s);
+
+      friend bool operator!=(const int& r, const Rational& s);
+      friend bool operator==(const int& r, const Rational& s);
+      friend bool operator<(const int& r, const Rational& s);
+      friend bool operator<=(const int& r, const Rational& s);
+      friend bool operator>(const int& r, const Rational& s);
+      friend bool operator>=(const int& r, const Rational& s);
+
+      friend Rational operator+(const int& d, const Rational& r);
+      friend Rational operator-(const int& d, const Rational& r);
+      friend Rational operator*(const int& d, const Rational& r);
+      friend Rational operator/(const int& d, const Rational& r);
+
       friend Rational abs(const Rational& r);
       friend int sign(const Rational& r);
       friend Rational operator-(const Rational& q);
@@ -309,8 +352,6 @@ namespace soplex
    /// greater than or equal to operator
    bool operator>=(const Rational& r, const Rational& s);
 
-
-
    /// equality operator for Rational and double
    bool operator==(const Rational& r, const double& s);
 
@@ -328,8 +369,6 @@ namespace soplex
 
    /// greater than or equal to operator for Rational and double
    bool operator>=(const Rational& r, const double& s);
-
-
 
    /// equality operator for double and Rational
    bool operator==(const double& r, const Rational& s);
@@ -349,6 +388,42 @@ namespace soplex
    /// greater than or equal to operator for double and Rational
    bool operator>=(const double& r, const Rational& s);
 
+   /// equality operator for Rational and int
+   bool operator==(const Rational& r, const int& s);
+
+   /// inequality operator for Rational and int
+   bool operator!=(const Rational& r, const int& s);
+
+   /// less than operator for Rational and int
+   bool operator<(const Rational& r, const int& s);
+
+   /// less than or equal to operator for Rational and int
+   bool operator<=(const Rational& r, const int& s);
+
+   /// greater than operator for Rational and int
+   bool operator>(const Rational& r, const int& s);
+
+   /// greater than or equal to operator for Rational and int
+   bool operator>=(const Rational& r, const int& s);
+
+   /// equality operator for int and Rational
+   bool operator==(const int& r, const Rational& s);
+
+   /// inequality operator for int and Rational
+   bool operator!=(const int& r, const Rational& s);
+
+   /// less than operator for int and Rational
+   bool operator<(const int& r, const Rational& s);
+
+   /// less than or equal to operator for int and Rational
+   bool operator<=(const int& r, const Rational& s);
+
+   /// greater than operator for int and Rational
+   bool operator>(const int& r, const Rational& s);
+
+   /// greater than or equal to operator for int and Rational
+   bool operator>=(const int& r, const Rational& s);
+
    //@}
 
 
@@ -366,6 +441,18 @@ namespace soplex
 
    /// addition operator for double and Rational
    Rational operator+(const double& d, const Rational& r);
+
+   /// addition operator for int and Rational
+   Rational operator+(const int& d, const Rational& r);
+
+   /// addition operator for int and Rational
+   Rational operator+(const int& d, const Rational& r);
+
+   /// addition operator for int and Rational
+   Rational operator+(const int& d, const Rational& r);
+
+   /// addition operator for int and Rational
+   Rational operator+(const int& d, const Rational& r);
 
    /// absolute function
    Rational abs(const Rational& r);

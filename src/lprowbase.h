@@ -64,8 +64,8 @@ public:
    /**@name Types */
    //@{
 
-   /// (In)Equality of an LP row.
-   /** #LPRowBase%s may be of one of the above Types. This datatype may be used for constructing new #LPRowBase%s in the
+   /// (In)Equality type of an LP row.
+   /** #LPRowBase%s may be of one of the following Types. This datatype may be used for constructing new #LPRowBase%s in the
     *  regular form.
     */
    enum Type

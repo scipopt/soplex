@@ -149,6 +149,22 @@ public:
    {
       assert(ticks_per_sec > 0);
    }
+   /// copy constructor
+   Timer(const Timer& old)
+      : status(old.status), uAccount(old.uAccount), sAccount(old.sAccount), rAccount(old.rAccount)
+   {
+      assert(ticks_per_sec > 0);
+   }
+   /// assignment operator
+   Timer& operator=(const Timer& old)
+   {
+      assert(ticks_per_sec > 0);
+      status = old.status;
+      uAccount = old.uAccount;
+      sAccount = old.sAccount;
+      rAccount = old.rAccount;
+      return *this;
+   }
    //@}
 
    //------------------------------------

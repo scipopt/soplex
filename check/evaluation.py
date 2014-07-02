@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
+columns = ['name','rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -61,11 +61,14 @@ for idx, outline in enumerate(outlines):
             instancename = instancename + '.' + linesplit[i]
         length = len(instancename)
         if length > namelength:
-            instancename = instancename[length-namelength-2:length-2]
+            shortname = instancename[0:namelength/2-1] + '~' + instancename[length-namelength/2:]
+        else:
+            shortname = instancename
 
         # initialize new data set
         instances[instancename] = {}
         instances[instancename]['status'] = 'abort'
+        instances[instancename]['name'] = shortname
         # wait for statistics block
         stats = False
     elif outline.startswith('SoPlex version'):
@@ -113,13 +116,15 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['minabsval'] = float(outlines[idx+15].split()[4])
             instances[instancename]['maxabsval'] = float(outlines[idx+16].split()[4])
 
-        elif outline.startswith('Iterations'):
-            instances[instancename]['iters'] = int(outline.split()[2])
-            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
-            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
-            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
-            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
-            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+        elif outline.startswith('Violation'):
+            primviol = outlines[idx+2].split()[3]
+            dualviol = outlines[idx+3].split()[3]
+            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
+                instances[instancename]['primalviol'] = float(primviol)
+                instances[instancename]['dualviol'] = float(dualviol)
+            else:
+                instances[instancename]['primalviol'] = '-'
+                instances[instancename]['dualviol'] = '-'
 
         elif outline.startswith('Total time'):
             instances[instancename]['time'] = float(outline.split()[3])
@@ -135,15 +140,14 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['refinements'] = int(outline.split()[2])
             instances[instancename]['stalling'] = int(outlines[idx+1].split()[2])
 
-        elif outline.startswith('Violation'):
-            primviol = outlines[idx+2].split()[3]
-            dualviol = outlines[idx+3].split()[3]
-            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
-                instances[instancename]['primalviol'] = float(primviol)
-                instances[instancename]['dualviol'] = float(dualviol)
-            else:
-                instances[instancename]['primalviol'] = '-'
-                instances[instancename]['dualviol'] = '-'
+        elif outline.startswith('Iterations'):
+            instances[instancename]['iters'] = int(outline.split()[2])
+            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
+            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
+            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
+            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
+            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+            instances[instancename]['speed'] = round(float(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
 
         elif outline.startswith('LU factorizations'):
             instances[instancename]['lufacts'] = int(outline.split()[3])
@@ -203,8 +207,7 @@ aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
 inconsistents = sum(1 for name in instances if instances[name]['status'] == 'inconsistent')
 
 length = []
-
-output = 'name'.ljust(namelength)
+output = ''
 # calculate maximum width of each column
 for i,c in enumerate(columns):
     length.append(len(c))
@@ -218,7 +221,7 @@ print '-'*len(output)
 
 # print data for all instances with the computed length
 for name in sorted(instances):
-    output = name.ljust(namelength)
+    output = ''
     for i,c in enumerate(columns):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print output
@@ -248,9 +251,6 @@ if check_test:
         instancename = linesplit[0]
         for i in range(1, len(linesplit)-1):
             instancename = instancename + '.' + linesplit[i]
-        length = len(instancename)
-        if length > namelength:
-            instancename = instancename[length-namelength-2:length-2]
         if not instancename in instances:
             if not printedMissing:
                 print

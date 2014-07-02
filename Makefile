@@ -120,6 +120,7 @@ LIBHEADER	=	array.h \
 			basevectors.h \
 			classarray.h \
 			clufactor.h \
+			clufactor_rational.h \
 			cring.h \
 			dataarray.h \
 			datahashtable.h \
@@ -148,7 +149,9 @@ LIBHEADER	=	array.h \
 			random.h \
 			rational.h \
 			slinsolver.h \
+			slinsolver_rational.h \
 			slufactor.h \
+			slufactor_rational.h \
 			solbase.h \
 			sol.h \
 			soplex.h \
@@ -195,12 +198,14 @@ LIBHEADER	=	array.h \
 			svsetbase.h \
 			svset.h \
 			timer.h \
+			unitvectorbase.h \
 			unitvector.h \
 			updatevector.h \
 			vectorbase.h \
 			vector.h
 LIBOBJ		= 	changesoplex.o \
 			clufactor.o \
+			clufactor_rational.o \
 			didxset.o \
 			enter.o \
 			gzstream.o \
@@ -210,6 +215,7 @@ LIBOBJ		= 	changesoplex.o \
 			nameset.o \
 			rational.o \
 			slufactor.o \
+			slufactor_rational.o \
 			solverational.o \
 			solvereal.o \
 			soplex.o \
@@ -252,7 +258,6 @@ LIBOBJ		= 	changesoplex.o \
 			spxwritestate.o \
 			statistics.o \
 			timer.o \
-			unitvector.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o

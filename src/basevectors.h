@@ -27,6 +27,7 @@
 #include "ssvectorbase.h"
 #include "svectorbase.h"
 #include "dsvectorbase.h"
+#include "unitvectorbase.h"
 #include "svsetbase.h"
 
 // specialized multAdd() for rationals
@@ -828,6 +829,40 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
       else
       {
          VectorBase<R>::val[k] = v;
+         idx[num++] = k;
+      }
+   }
+
+   setupStatus = true;
+
+   assert(isConsistent());
+
+   return *this;
+}
+
+
+
+/// Assigns only the elements of \p rhs.
+template <  >
+template <  >
+inline
+SSVectorBase<Rational>& SSVectorBase<Rational>::assign(const SVectorBase<Rational>& rhs)
+{
+   assert(rhs.dim() <= VectorBase<Rational>::dim());
+
+   int s = rhs.size();
+   num = 0;
+
+   for( int i = 0; i < s; ++i )
+   {
+      int k = rhs.index(i);
+      const Rational& v = rhs.value(i);
+
+      if( v == 0 )
+         VectorBase<Rational>::val[k] = 0;
+      else
+      {
+         VectorBase<Rational>::val[k] = v;
          idx[num++] = k;
       }
    }
