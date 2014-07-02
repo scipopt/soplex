@@ -389,6 +389,11 @@ public:
    /// adds a single column
    void addColRational(const LPColRational& lpcol);
 
+#ifdef SOPLEX_WITH_GMP
+   /// adds a single column
+   void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, int colSize, const mpq_t* upper);
+#endif
+
    /// adds multiple columns
    void addColsRational(const LPColSetRational& lpcolset);
 
@@ -1337,6 +1342,9 @@ private:
 
    /// adds a single column to the real LP and adjusts basis
    void _addColReal(const LPColReal& lpcol);
+
+   /// adds a single column to the real LP and adjusts basis
+   void _addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
 
    /// adds multiple columns to the real LP and adjusts basis
    void _addColsReal(const LPColSetReal& lpcolset);

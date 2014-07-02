@@ -497,6 +497,43 @@ public:
       doAddCol(col);
    }
 
+   ///
+   virtual void addCol(const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   {
+      doAddCol(objValue, lowerValue, colVec, upperValue);
+   }
+
+   ///
+   template < class S >
+   void addCol(const S* objValue, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   {
+      int idx = nCols();
+      int oldRowNumber = nRows();
+
+      LPColSetBase<R>::add(objValue, lowerValue, colValues, colIndices, colSize, upperValue);
+
+      // now insert nonzeros to column file also
+      for( int j = colSize - 1; j >= 0; --j )
+      {
+         const S& val = colValues[j];
+         int i = colIndices[j];
+
+         // create new rows if required
+         if( i >= nRows() )
+         {
+            LPRowBase<R> empty;
+            for( int k = nRows(); k <= i; ++k )
+               LPRowSetBase<R>::add(empty);
+         }
+
+         assert(i < nRows());
+         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
+   }
+
    /// Adds \p col to LPColSetVBase.
    virtual void addCol(SPxColId& id, const LPColBase<R>& col)
    {
@@ -1832,6 +1869,36 @@ private:
       {
          R val = vec.value(j);
          int i = vec.index(j);
+
+         // create new rows if required
+         if( i >= nRows() )
+         {
+            LPRowBase<R> empty;
+            for( int k = nRows(); k <= i; ++k )
+               LPRowSetBase<R>::add(empty);
+         }
+
+         assert(i < nRows());
+         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
+   }
+
+   ///
+   void doAddCol (const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   {
+      int idx = nCols();
+      int oldRowNumber = nRows();
+
+      LPColSetBase<R>::add(objValue, lowerValue, colVec, upperValue);
+
+      // now insert nonzeros to row file also
+      for( int j = colVec.size() - 1; j >= 0; --j )
+      {
+         R val = colVec.value(j);
+         int i = colVec.index(j);
 
          // create new rows if required
          if( i >= nRows() )

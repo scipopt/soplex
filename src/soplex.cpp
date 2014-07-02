@@ -1653,6 +1653,28 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// adds a single column
+   void SoPlex::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, int colSize, const mpq_t* upper)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->addCol(obj, lower, colValues, colIndices, colSize, upper);
+
+      int i = numColsRational() - 1;
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+         _addColReal(Real(maxObjRational(i)) * (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+            Real(lowerRational(i)), DSVectorReal(_rationalLP->colVector(i)), Real(upperRational(i)));
+
+      _invalidateSolution();
+   }
+#endif
+
+
+
    /// adds multiple columns
    void SoPlex::addColsRational(const LPColSetRational& lpcolset)
    {
@@ -5975,6 +5997,21 @@ namespace soplex
          else
             _basisStatusCols.append(SPxSolver::ZERO);
       }
+   }
+
+
+
+   /// adds a single column to the real LP and adjusts basis
+   void SoPlex::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper)
+   {
+      assert(_realLP != 0);
+
+      _realLP->addCol(obj, lower, lpcol, upper);
+
+      if( _isRealLPLoaded )
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      else if( _hasBasis )
+         _basisStatusRows.append(SPxSolver::BASIC);
    }
 
 

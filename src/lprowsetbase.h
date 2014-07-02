@@ -394,6 +394,13 @@ public:
       SVSetBase<R>::add2(rowVector_w(i), n, idx, val);
    }
 
+   /// Adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th colVector.
+   template < class S >
+   void add2(int i, int n, const int idx[], const S val[])
+   {
+      SVSetBase<R>::add2(rowVector_w(i), n, idx, val);
+   }
+
    /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
    SVectorBase<R>& create(int pnonzeros = 0, R plhs = 0, R prhs = 1)
    {

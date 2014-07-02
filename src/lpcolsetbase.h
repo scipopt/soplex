@@ -286,6 +286,31 @@ public:
       object[num() - 1] = obj;
    }
 
+   /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to LPColSetBase.
+   template < class S >
+   void add(const S* obj, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   {
+      DataKey k;
+      add(k, obj, lowerValue, colValues, colIndices, colSize, upperValue);
+   }
+
+   /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to
+   /// LPColSetBase, with DataKey \p key.
+   template < class S >
+   void add(DataKey& newkey, const S* obj, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   {
+      SVSetBase<R>::add(newkey, colValues, colIndices, colSize);
+
+      if( num() > low.dim() )
+      {
+         low.reDim(num());
+         up.reDim(num());
+      }
+
+      low[num() - 1] = *lowerValue;
+      up[num() - 1] = *upperValue;
+   }
+
    ///
    void add(const LPColSetBase<R>& newset)
    {
