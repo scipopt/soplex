@@ -186,7 +186,7 @@ if check_solu:
                 # check solution status
                 if value in ['infeasible', 'unbounded']:
                     if not instances[name]['status'] == value:
-                        instances[name]['status'] = 'fail'
+                        instances[name]['status'] = 'inconsistent'
                 elif value == 'unknown':
                     instances[name]['status'] = 'not verified'
                 elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value),tolerance) > tolerance:
