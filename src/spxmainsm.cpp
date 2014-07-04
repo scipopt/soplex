@@ -1348,7 +1348,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
          {
             Real aij = fabs(col.value(i));
 
-            if (isZero(aij, epsZero()) || isZero(aij * absBnd, tol))
+            if (isZero(aij * absBnd, tol))
             {
                SVector& row = lp.rowVector_w(col.index(i));
 
