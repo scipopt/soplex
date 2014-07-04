@@ -818,6 +818,7 @@ namespace soplex
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
          // solve modified problem
+         int prevIterations = _statistics->iterations;
          if( restrictInequalities )
          {
             // store basis status in case solving modified problem failed
@@ -899,7 +900,7 @@ namespace soplex
 
          // count refinements and remember whether we moved to a new basis
          _statistics->refinements++;
-         if( _solver.iterations() == 0 )
+         if( _statistics->iterations > prevIterations )
             _statistics->stallRefinements++;
 
          // evaluate result; if modified problem was not solved to optimality, stop refinement
