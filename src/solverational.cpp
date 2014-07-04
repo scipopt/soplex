@@ -2954,8 +2954,6 @@ namespace soplex
       int simplifier = intParam(SoPlex::SIMPLIFIER);
       int scaler = intParam(SoPlex::SCALER);
 
-      setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
-
       while( true )
       {
          assert(!increasedMarkowitz || GE(_slufactor.markowitz(), 0.9));
