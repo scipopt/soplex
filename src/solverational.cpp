@@ -2741,11 +2741,13 @@ namespace soplex
 
       SPxSolver::Status result = SPxSolver::UNKNOWN;
 
-#ifdef SOPLEX_MANUAL_ALT
+#ifndef SOPLEX_MANUAL_ALT
       if( fromscratch || !_hasBasis )
          _enableSimplifierAndScaler();
       else
          _disableSimplifierAndScaler();
+#else
+      _disableSimplifierAndScaler();
 #endif
 
       // start timing

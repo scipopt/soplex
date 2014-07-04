@@ -2581,7 +2581,7 @@ namespace soplex
          assert(areLPsInSync(true, false, false));
 #endif
 
-#ifdef SOPLEX_MANUAL_ALT
+#ifndef SOPLEX_MANUAL_ALT
          // store current real LP
          SPxLPReal realLP(*_realLP);
 
