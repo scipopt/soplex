@@ -193,7 +193,7 @@ public:
    virtual SPxSolver::VarStatus getBasisColStatus(int) const = 0;
 
    /// get optimal basis.
-   virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[]) const = 0;
+   virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[], const int rowsSize = -1, const int colsSize = -1) const = 0;
 
    /// get objective offset.
    virtual Real getObjoffset() const

@@ -1777,7 +1777,7 @@ public:
    VarStatus getBasisColStatus( int col ) const;
 
    /// get current basis, and return solver status.
-   Status getBasis(VarStatus rows[], VarStatus cols[]) const;
+   Status getBasis(VarStatus rows[], VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const;
 
    /// gets basis status
    SPxBasis::SPxStatus getBasisStatus() const

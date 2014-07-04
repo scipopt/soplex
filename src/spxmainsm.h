@@ -1254,9 +1254,11 @@ public:
       return m_cBasisStat[j];
    }
    /// get optimal basis.
-   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const
    {
       assert(m_postsolved);
+      assert(rowsSize < 0 || rowsSize >= m_rBasisStat.size());
+      assert(colsSize < 0 || colsSize >= m_cBasisStat.size());
 
       for(int i = 0; i < m_rBasisStat.size(); ++i)
          rows[i] = m_rBasisStat[i];

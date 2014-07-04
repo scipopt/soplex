@@ -120,7 +120,7 @@ namespace soplex
             assert(_basisStatusRows.size() == _solver.nRows());
             assert(_basisStatusCols.size() == _solver.nCols());
 
-            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
             _hasBasis = true;
          }
          else
@@ -274,13 +274,13 @@ namespace soplex
             }
 
             // get basis of transformed problem
-            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
          }
 
          try
          {
             _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-            _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+            _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
             _hasBasis = true;
          }
          catch( SPxException E )
@@ -301,7 +301,7 @@ namespace soplex
          assert(_basisStatusRows.size() == _solver.nRows());
          assert(_basisStatusCols.size() == _solver.nCols());
 
-         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
          _hasBasis = true;
       }
 

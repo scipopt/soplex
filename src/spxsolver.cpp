@@ -1516,10 +1516,13 @@ SPxSolver::VarStatus SPxSolver::getBasisColStatus( int col ) const
    return basisStatusToVarStatus( desc().colStatus( col ) );
 }
 
-SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[]) const
+SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
 {
    const SPxBasis::Desc& d = desc();
    int i;
+
+   assert(rowsSize < 0 || rowsSize >= nRows());
+   assert(colsSize < 0 || colsSize >= nCols());
 
    if (col)
       for (i = nCols() - 1; i >= 0; --i)

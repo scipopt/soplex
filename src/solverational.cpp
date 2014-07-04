@@ -52,7 +52,7 @@ namespace soplex
       {
          _basisStatusRows.reSize(numRowsReal());
          _basisStatusCols.reSize(numColsReal());
-         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
       }
 
       // deactivate objective limit in floating-point solver
@@ -2842,16 +2842,16 @@ namespace soplex
                      // get basis of transformed problem
                      _basisStatusRows.reSize(_solver.nRows());
                      _basisStatusCols.reSize(_solver.nCols());
-                     _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+                     _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
                   }
 
                   ///@todo catch exception
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
                   // store basis for original problem
-                  basisStatusRows.reSize(numRowsReal());
-                  basisStatusCols.reSize(numColsReal());
-                  _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+                  basisStatusRows.reSize(numRowsRational());
+                  basisStatusCols.reSize(numColsRational());
+                  _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
 
                   primal = _simplifier->unsimplifiedPrimal();
                   dual = _simplifier->unsimplifiedDual();
@@ -2872,7 +2872,7 @@ namespace soplex
                   // get basis of transformed problem
                   basisStatusRows.reSize(_solver.nRows());
                   basisStatusCols.reSize(_solver.nCols());
-                  _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+                  _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
                }
                break;
 
@@ -2899,7 +2899,7 @@ namespace soplex
                // if the original problem is not in the solver because of scaling, we also need to store the basis
                basisStatusRows.reSize(_solver.nRows());
                basisStatusCols.reSize(_solver.nCols());
-               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
+               _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
 
                break;
 
