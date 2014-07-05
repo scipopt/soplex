@@ -510,7 +510,13 @@ public:
       int idx = nCols();
       int oldRowNumber = nRows();
 
-      LPColSetBase<R>::add(objValue, lowerValue, colValues, colIndices, colSize, upperValue);
+      if( colSize != 0 )
+         LPColSetBase<R>::add(objValue, lowerValue, colValues, colIndices, colSize, upperValue);
+      else
+      {
+         LPColBase<R> emptycol;
+         LPColSetBase<R>::add(emptycol);
+      }
 
       // now insert nonzeros to column file also
       for( int j = colSize - 1; j >= 0; --j )
