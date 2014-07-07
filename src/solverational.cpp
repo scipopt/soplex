@@ -921,6 +921,27 @@ namespace soplex
          if( _statistics->iterations <= prevIterations )
             _statistics->stallRefinements++;
 
+         // correct fixed basis statuses of restricted rows
+         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         {
+            SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
+
+            assert(lhsRational(r) != rhsRational(r) || _modLhs[r] == _modRhs[r]);
+            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
+            if( _rowTypes[r] != RANGETYPE_FIXED )
+            {
+               assert(sol._dual[r] == 0 || _modLhs[r] == _modRhs[r]);
+
+               // the inequality was fixed to the left-hand side
+               if( sol._dual[r] > 0 && basisStatusRow == SPxSolver::FIXED )
+                  basisStatusRow = SPxSolver::ON_LOWER;
+               // the inequality was fixed to the right-hand side
+               else if( sol._dual[r] < 0 && basisStatusRow == SPxSolver::FIXED )
+                  basisStatusRow = SPxSolver::ON_UPPER;
+               assert(basisStatusRow != SPxSolver::FIXED);
+            }
+         }
+
          // evaluate result; if modified problem was not solved to optimality, stop refinement
          switch( result )
          {
@@ -1070,24 +1091,6 @@ namespace soplex
          for( int r = numRowsRational() - 1; r >= 0; r-- )
          {
             SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
-
-            assert(lhsRational(r) != rhsRational(r) || _modLhs[r] == _modRhs[r]);
-            assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-            if( _rowTypes[r] != RANGETYPE_FIXED )
-            {
-               assert(sol._dual[r] == 0 || _modLhs[r] == _modRhs[r]);
-
-               // the inequality was fixed to the left-hand side
-               if( sol._dual[r] > 0 && (basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED) )
-               {
-                  basisStatusRow = SPxSolver::ON_LOWER;
-               }
-               // the inequality was fixed to the right-hand side
-               else if( sol._dual[r] < 0 && (basisStatusRow == SPxSolver::ON_UPPER || basisStatusRow == SPxSolver::FIXED) )
-               {
-                  basisStatusRow = SPxSolver::ON_UPPER;
-               }
-            }
 
             if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC )
             {
