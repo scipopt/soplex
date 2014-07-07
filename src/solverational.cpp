@@ -371,7 +371,7 @@ namespace soplex
       }
 
       _statistics->rationalTime.stop();
-      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+      result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols, _hasBasis);
 
       // evaluate result
       switch( result )
@@ -408,7 +408,6 @@ namespace soplex
       sol._redCost.reDim(numColsRational(), false);
       sol._hasPrimal = true;
       sol._hasDual = true;
-      _hasBasis = true;
 
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
@@ -815,24 +814,36 @@ namespace soplex
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
 
          // load basis
-         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         if( _hasBasis )
+         {
+            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+            _hasBasis = _solver.basis().status() > SPxBasis::NO_PROBLEM;
+         }
 
          // solve modified problem
          int prevIterations = _statistics->iterations;
          if( restrictInequalities )
          {
             // store basis status in case solving modified problem failed
-            basisStatusRowsFirst = _basisStatusRows;
-            basisStatusColsFirst = _basisStatusCols;
+            bool hadBasis = _hasBasis;
+            if( _hasBasis )
+            {
+               basisStatusRowsFirst = _basisStatusRows;
+               basisStatusColsFirst = _basisStatusCols;
+            }
 
             _statistics->rationalTime.stop();
-            result = _solveRealStable(acceptUnbounded, true, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+            result = _solveRealStable(acceptUnbounded, true, primalReal, dualReal, _basisStatusRows, _basisStatusCols, _hasBasis);
 
             if( result != SPxSolver::OPTIMAL )
             {
                restrictInequalities = false;
-               _basisStatusRows = basisStatusRowsFirst;
-               _basisStatusCols = basisStatusColsFirst;
+               if( hadBasis )
+               {
+                  _basisStatusRows = basisStatusRowsFirst;
+                  _basisStatusCols = basisStatusColsFirst;
+                  _hasBasis = true;
+               }
 
                _primalDualDiff.clear();
                for( int r = numRowsRational() - 1; r >= 0; r-- )
@@ -895,7 +906,7 @@ namespace soplex
          else
          {
             _statistics->rationalTime.stop();
-            result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+            result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols, _hasBasis);
          }
 
          // count refinements and remember whether we moved to a new basis
@@ -2730,7 +2741,7 @@ namespace soplex
 
 
    /// solves real LP during iterative refinement
-   SPxSolver::Status SoPlex::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   SPxSolver::Status SoPlex::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis)
    {
       assert(_isConsistent());
 
@@ -2764,6 +2775,7 @@ namespace soplex
       // stop timing
       _statistics->syncTime.stop();
 
+      returnedBasis = false;
       try
       {
          // apply problem simplification
@@ -2840,18 +2852,19 @@ namespace soplex
                      }
 
                      // get basis of transformed problem
-                     _basisStatusRows.reSize(_solver.nRows());
-                     _basisStatusCols.reSize(_solver.nCols());
-                     _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
+                     basisStatusRows.reSize(_solver.nRows());
+                     basisStatusCols.reSize(_solver.nCols());
+                     _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
                   }
 
                   ///@todo catch exception
-                  _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+                  _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                   // store basis for original problem
                   basisStatusRows.reSize(numRowsRational());
                   basisStatusCols.reSize(numColsRational());
                   _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
+                  returnedBasis = true;
 
                   primal = _simplifier->unsimplifiedPrimal();
                   dual = _simplifier->unsimplifiedDual();
@@ -2873,6 +2886,7 @@ namespace soplex
                   basisStatusRows.reSize(_solver.nRows());
                   basisStatusCols.reSize(_solver.nCols());
                   _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
+                  returnedBasis = true;
                }
                break;
 
@@ -2900,13 +2914,12 @@ namespace soplex
                basisStatusRows.reSize(_solver.nRows());
                basisStatusCols.reSize(_solver.nCols());
                _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
-
+               returnedBasis = true;
                break;
 
             case SPxSolver::INForUNBD:
             case SPxSolver::SINGULAR:
             default:
-               _hasBasis = false;
                break;
             }
          }
@@ -2932,7 +2945,7 @@ namespace soplex
 
 
    /// solves real LP with recovery mechanism
-   SPxSolver::Status SoPlex::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols)
+   SPxSolver::Status SoPlex::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis)
    {
       SPxSolver::Status result = SPxSolver::UNKNOWN;
 
@@ -2958,7 +2971,7 @@ namespace soplex
       {
          assert(!increasedMarkowitz || GE(_slufactor.markowitz(), 0.9));
 
-         result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols);
+         result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols, returnedBasis);
 
          solved = (result == SPxSolver::OPTIMAL)
             || (result == SPxSolver::INFEASIBLE && acceptInfeasible)

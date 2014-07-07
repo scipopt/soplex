@@ -1602,12 +1602,12 @@ private:
    /// solves real LP during iterative refinement
    SPxSolver::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
                                            DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                           DataArray< SPxSolver::VarStatus >& basisStatusCols);
+                                           DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// solves real LP with recovery mechanism
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                      DataArray< SPxSolver::VarStatus >& basisStatusCols);
+                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, bool& stopped, bool& error);
