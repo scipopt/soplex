@@ -591,6 +591,7 @@ namespace soplex
          // fix inequality constraints if this has not lead to an infeasibility during the last floating-point solve
          if( restrictInequalities )
          {
+            bool restricted = false;
             for( int r = numRowsRational() - 1; r >= 0; r-- )
             {
                SPxSolver::VarStatus basisStatusRow = _basisStatusRows[r];
@@ -614,12 +615,16 @@ namespace soplex
                      assert(sol._dual[r] < 0);
                      _modLhs[r] = _modRhs[r];
                   }
+                  restricted = true;
 
                   // do not change the basis status to FIXED, since this would invalidate the basis for the original LP
                }
             }
 
-            MSG_INFO1( spxout << "Restricted tight rows and columns.\n" );
+            if( restricted )
+            {
+               MSG_INFO1( spxout << "Restricted tight rows and columns.\n" );
+            }
          }
 #ifndef NDEBUG
          else
