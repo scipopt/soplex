@@ -700,6 +700,8 @@ namespace soplex
             maxScale *= _rationalMaxscaleincr;
 
             primalScale = boundsViolation > sideViolation ? boundsViolation : sideViolation;
+            if( primalScale < redCostViolation )
+               primalScale = redCostViolation;
             assert(primalScale >= 0);
 
             if( primalScale > 0 )
