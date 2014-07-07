@@ -136,7 +136,7 @@ void checkSolutionReal(SoPlex& soplex)
       {
          MSG_INFO1(
             Real maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = maxviol < soplex.realParam(SoPlex::FEASTOL);
+            bool feasible = (maxviol <= soplex.realParam(SoPlex::FEASTOL));
             spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << maxviol << ").\n"
             );
       }
@@ -160,7 +160,7 @@ void checkSolutionReal(SoPlex& soplex)
       {
          MSG_INFO1(
             Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = maxviol < soplex.realParam(SoPlex::OPTTOL);
+            bool feasible = (maxviol <= soplex.realParam(SoPlex::OPTTOL));
             spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << maxviol << ").\n"
             );
       }
@@ -190,7 +190,7 @@ void checkSolutionRational(SoPlex& soplex)
       {
          MSG_INFO1(
             Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = maxviol < soplex.realParam(SoPlex::FEASTOL);
+            bool feasible = (maxviol <= soplex.realParam(SoPlex::FEASTOL));
             spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << maxviol << ").\n"
             );
       }
@@ -214,7 +214,7 @@ void checkSolutionRational(SoPlex& soplex)
       {
          MSG_INFO1(
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = maxviol < soplex.realParam(SoPlex::OPTTOL);
+            bool feasible = (maxviol <= soplex.realParam(SoPlex::OPTTOL));
             spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << maxviol << ").\n"
             );
       }
