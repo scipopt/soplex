@@ -2941,6 +2941,26 @@ namespace soplex
                break;
 
             case SPxSolver::ABORT_CYCLING:
+               if( _simplifier == 0 && boolParam(SoPlex::ACCEPTCYCLING) )
+               {
+                  _solver.getPrimal(primal);
+                  _solver.getDual(dual);
+
+                  // unscale vectors
+                  if( _scaler != 0 )
+                  {
+                     _scaler->unscalePrimal(primal);
+                     _scaler->unscaleDual(dual);
+                  }
+
+                  // get basis of transformed problem
+                  basisStatusRows.reSize(_solver.nRows());
+                  basisStatusCols.reSize(_solver.nCols());
+                  _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
+                  returnedBasis = true;
+                  result = SPxSolver::OPTIMAL;
+                  break;
+               }
             case SPxSolver::ABORT_TIME:
             case SPxSolver::ABORT_ITER:
             case SPxSolver::ABORT_VALUE:

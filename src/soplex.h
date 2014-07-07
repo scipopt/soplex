@@ -763,8 +763,11 @@ public:
       /// should a rational factorization be performed after iterative refinement?
       RATFAC = 3,
 
+      /// should cycling solutions be accepted during iterative refinement?
+      ACCEPTCYCLING = 4,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 4
+      BOOLPARAM_COUNT = 5
    } BoolParam;
 
    /// integer parameters

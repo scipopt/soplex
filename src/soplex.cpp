@@ -145,6 +145,11 @@ namespace soplex
             _boolParamDescription[SoPlex::RATFAC] = "should a rational factorization be performed after iterative refinement?";
             _boolParamDefault[SoPlex::RATFAC] = false;
 
+            // should cycling solutions be accepted during iterative refinement?
+            _boolParamName[SoPlex::ACCEPTCYCLING] = "acceptcycling";
+            _boolParamDescription[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
+            _boolParamDefault[SoPlex::ACCEPTCYCLING] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4516,6 +4521,8 @@ namespace soplex
       case TESTDUALINF:
          break;
       case RATFAC:
+         break;
+      case ACCEPTCYCLING:
          break;
       default:
          return false;
