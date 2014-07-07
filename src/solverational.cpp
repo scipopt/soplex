@@ -3201,8 +3201,8 @@ namespace soplex
       // start rational solving time
       _statistics->rationalTime.start();
 
-      primalFeasible = true;
-      dualFeasible = true;
+      primalFeasible = false;
+      dualFeasible = false;
       stopped = false;
       error = false;
 
@@ -3419,7 +3419,7 @@ namespace soplex
 
       // check reduced cost violation on nonbasic rows and columns
       dualViolation = 0;
-      primalFeasible = true;
+      dualFeasible = true;
       for( int i = 0; i < basisStatusRows.size(); i++ )
       {
          assert(basisStatusRows[i] != SPxSolver::BASIC || basicDual[i] == 0);
@@ -3541,6 +3541,7 @@ namespace soplex
    TERMINATE:
       // stop rational solving time
       _statistics->rationalTime.stop();
+      return;
    }
 
 } // namespace soplex
