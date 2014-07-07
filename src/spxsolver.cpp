@@ -842,6 +842,7 @@ SPxSolver::SPxSolver(
    , freePricer (false)
    , freeRatioTester (false)
    , freeStarter (false)
+   , displayLine (0)
    , displayFreq (200)
    , sparsePricingFactor(SPARSITYFACTOR)
    , unitVecs (0)

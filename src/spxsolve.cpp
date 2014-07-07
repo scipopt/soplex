@@ -225,8 +225,11 @@ SPxSolver::Status SPxSolver::solve()
             theratiotester->setDelta(entertol());
          }
 
+         printDisplayLine(true);
          do
          {
+            printDisplayLine();
+
             enterId = thepricer->selectEnter();
 
             if (!enterId.isValid() && instableEnterId.isValid() && lastUpdate() == 0)
@@ -537,8 +540,11 @@ SPxSolver::Status SPxSolver::solve()
             theratiotester->setDelta(leavetol());
          }
 
+         printDisplayLine(true);
          do
          {
+            printDisplayLine();
+
             leaveNum = thepricer->selectLeave();
 
             if (leaveNum < 0 && instableLeaveNum >= 0 && lastUpdate() == 0)
@@ -990,6 +996,7 @@ SPxSolver::Status SPxSolver::solve()
      ? enterCount
      : leaveCount;
 
+   printDisplayLine(true);
    return status();
 }
 
@@ -1063,19 +1070,16 @@ void SPxSolver::testVecs()
    }
 }
 
-bool SPxSolver::terminate()
-{
-#ifdef ENABLE_ADDITIONAL_CHECKS
-   if (SPxBasis::status() > SPxBasis::SINGULAR)
-      testVecs();
-#endif
 
+/// print display line of flying table
+void SPxSolver::printDisplayLine(const bool force)
+{
    MSG_INFO1(
-      if( iteration() % (displayFreq*30) == 0 )
+      if( displayLine % (displayFreq*30) == 0 )
       {
          spxout << "type |   time |   iters | facts |  shift   |    value\n";
       }
-      if( iteration() % displayFreq == 0 )
+      if( force || (displayLine % displayFreq == 0) )
       {
          (type() == LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
          spxout << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
@@ -1086,10 +1090,19 @@ bool SPxSolver::terminate()
          << std::setprecision(8) << value() + objOffset()
          << std::endl;
       }
+      displayLine++;
    );
+}
+
+
+bool SPxSolver::terminate()
+{
+#ifdef ENABLE_ADDITIONAL_CHECKS
+   if (SPxBasis::status() > SPxBasis::SINGULAR)
+      testVecs();
+#endif
 
    int redo = dim();
-
    if (redo < 1000)
       redo = 1000;
 

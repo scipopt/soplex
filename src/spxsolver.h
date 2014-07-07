@@ -257,6 +257,7 @@ private:
    bool           instableEnter;
    Real           instableEnterVal;
 
+   int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
    //@}
@@ -600,6 +601,9 @@ public:
    /// get dual farkas proof of infeasibility.
    ///  @throw SPxStatusException if no problem loaded
    virtual Status getDualfarkas (Vector& vector) const;
+
+   /// print display line of flying table
+   virtual void printDisplayLine(const bool force = false);
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
