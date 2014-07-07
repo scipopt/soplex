@@ -682,13 +682,6 @@ namespace soplex
          else
             bestViolation = sumMaxViolation;
 
-         if( numFailedRefinements >= 15 )
-         {
-            MSG_INFO1( spxout << "Giving up after 15 refinements without significantly increased precision.\n" );
-            error = true;
-            return;
-         }
-
          ///@todo try rational reconstruction at geometric frequency
 
          // start refinement
