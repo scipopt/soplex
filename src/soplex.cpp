@@ -380,7 +380,7 @@ namespace soplex
             _realParamDescription[SoPlex::MAXSCALEINCR] = "maximum increase of scaling factors between refinements";
             _realParamLower[SoPlex::MAXSCALEINCR] = 1.0;
             _realParamUpper[SoPlex::MAXSCALEINCR] = DEFAULT_INFINITY;
-            _realParamDefault[SoPlex::MAXSCALEINCR] = 1e12;
+            _realParamDefault[SoPlex::MAXSCALEINCR] = DEFAULT_INFINITY;
 
             // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
             _realParamName[SoPlex::LIFTMINVAL] = "liftminval";
