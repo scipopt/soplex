@@ -918,7 +918,7 @@ namespace soplex
 
          // count refinements and remember whether we moved to a new basis
          _statistics->refinements++;
-         if( _statistics->iterations > prevIterations )
+         if( _statistics->iterations <= prevIterations )
             _statistics->stallRefinements++;
 
          // evaluate result; if modified problem was not solved to optimality, stop refinement
