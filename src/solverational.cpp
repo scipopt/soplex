@@ -1512,8 +1512,9 @@ namespace soplex
          assert((lhsRational(i) == rhsRational(i)) == (_rowTypes[i] == RANGETYPE_FIXED));
          if( _rowTypes[i] != RANGETYPE_FIXED )
          {
-            _slackCols.add(0.0, -rhsRational(i), *_unitVectorRational(i), -lhsRational(i));
-            _rationalLP->changeRange(i, 0.0, 0.0);
+            _slackCols.add(Rational::ZERO, -rhsRational(i), *_unitVectorRational(i), -lhsRational(i));
+            ///@todo KATI check whether we need to change sides at all
+            _rationalLP->changeRange(i, Rational::ZERO, Rational::ZERO);
             _realLP->changeRange(i, 0.0, 0.0);
             _colTypes.append(_switchRangeType(_rowTypes[i]));
             _rowTypes[i] = RANGETYPE_FIXED;
@@ -1644,6 +1645,7 @@ namespace soplex
          int col = numOrigCols + i;
          int row = _slackCols.colVector(i).index(0);
 
+         ///@todo KATI check whether we need to change sides at all
          _rationalLP->changeRange(row, -upperRational(col), -lowerRational(col));
          _rowTypes[row] = _switchRangeType(_colTypes[col]);
       }
@@ -1652,6 +1654,7 @@ namespace soplex
       _realLP->removeColRange(numOrigCols, numCols - 1);
       _colTypes.reSize(numOrigCols);
 
+      ///@todo KATI restore real LP in SoPlex::solve() and not here
       // restore bounds and objective coefficients in real LP
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
