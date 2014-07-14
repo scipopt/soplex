@@ -133,7 +133,7 @@ namespace soplex
             // should LP be transformed to equality form before a rational solve?
             _boolParamName[SoPlex::EQTRANS] = "eqtrans";
             _boolParamDescription[SoPlex::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
-            _boolParamDefault[SoPlex::EQTRANS] = false;
+            _boolParamDefault[SoPlex::EQTRANS] = true;
 
             // should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
             _boolParamName[SoPlex::TESTDUALINF] = "testdualinf";
