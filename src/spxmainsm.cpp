@@ -437,7 +437,7 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
    r[m_j] = val;
 
    // basis:
-   if(EQrel(m_lower, m_upper))
+   if( m_lower == m_upper )
    {
       assert(EQrel(m_lower, m_val));
 
@@ -663,7 +663,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
    {
-      if (EQrel(m_lower, m_upper))
+      if ( m_lower == m_upper )
       {
          x[m_j]       = m_lower;
          cStatus[m_j] = SPxSolver::FIXED;
@@ -683,7 +683,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    }
    else if (rStatus[m_i] == SPxSolver::ON_UPPER)
    {
-      if (EQrel(m_lower, m_upper))
+      if ( m_lower == m_upper )
       {
          x[m_j]       = m_lower;
          cStatus[m_j] = SPxSolver::FIXED;
@@ -713,12 +713,12 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       if (GErel(m_lower, lo, eps()) && m_lower > -infinity)
       {
          x[m_j]       = m_lower;
-         cStatus[m_j] = EQrel(m_lower, m_upper) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+         cStatus[m_j] = (m_lower == m_upper) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
       }
       else if (LErel(m_upper, up, eps()) && m_upper < infinity)
       {
          x[m_j]       = m_upper;
-         cStatus[m_j] = EQrel(m_lower, m_upper) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+         cStatus[m_j] = (m_lower == m_upper) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
       }
       else if (lo > -infinity)
       {
@@ -1033,12 +1033,12 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
       if (m_scale > 0)
       {
          x[m_j]       = m_loJ;
-         cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+         cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
       }
       else
       {
          x[m_j]       = m_upJ;
-         cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+         cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
       }
    }
    else if (cStatus[m_k] == SPxSolver::ON_UPPER)
@@ -1048,12 +1048,12 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
       if (m_scale > 0)
       {
          x[m_j]       = m_upJ;
-         cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+         cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
       }
       else
       {
          x[m_j]       = m_loJ;
-         cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+         cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
       }
    }
    else if (cStatus[m_k] == SPxSolver::FIXED)
@@ -1071,7 +1071,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
       assert(LErel(m_loK, 0.0));
       assert(GErel(m_upK, 0.0));
 
-      if (isZero(m_loK) && isZero(m_upK))
+      if (isZero(m_loK) && isZero(m_upK) && m_loK == m_upK)
          cStatus[m_k] = SPxSolver::FIXED;
       else if (isZero(m_loK))
          cStatus[m_k] = SPxSolver::ON_LOWER;
@@ -1083,7 +1083,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
          throw SPxInternalCodeException("XMAISM05 This should never happen.");
 
       x[m_j] = 0.0;
-      if (isZero(m_loJ) && isZero(m_upJ))
+      if (isZero(m_loJ) && isZero(m_upJ) && m_loJ == m_upJ)
          cStatus[m_j] = SPxSolver::FIXED;
       else if (isZero(m_loJ))
          cStatus[m_j] = SPxSolver::ON_LOWER;
@@ -1122,32 +1122,32 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
          if( GErel(x[m_k], m_upK + m_scale * m_upJ) )
          {
             assert(m_upJ < infinity);
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
             x[m_j] = m_upJ;
             x[m_k] -= m_scale * x[m_j];
          }
          else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
          {
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
             x[m_j] = m_upJ;
             x[m_k] -= m_scale * x[m_j];
          }
          else if( GErel(x[m_k], m_upK + m_scale * m_loJ) && m_upK < infinity )
          {
-            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            cStatus[m_k] = (m_loK == m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
             x[m_k] = m_upK;
             cStatus[m_j] = SPxSolver::BASIC;
             x[m_j] = z2 * scale2 / m_scale;
          }
          else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
          {
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
             x[m_j] = m_loJ;
             x[m_k] -= m_scale * x[m_j];
          }
          else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loK > -infinity )
          {
-            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            cStatus[m_k] = (m_loK == m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
             x[m_k] = m_loK;
             cStatus[m_j] = SPxSolver::BASIC;
             x[m_j] = z1 * scale1 / m_scale;
@@ -1155,7 +1155,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
          else if( LTrel(x[m_k], m_loK + m_scale * m_loJ) )
          {
             assert(m_loJ > -infinity);
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
             x[m_j] = m_loJ;
             x[m_k] -= m_scale * x[m_j];
          }
@@ -1171,32 +1171,32 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
          if( GErel(x[m_k], m_upK + m_scale * m_loJ) )
          {
             assert(m_loJ > -infinity);
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
             x[m_j] = m_loJ;
             x[m_k] -= m_scale * x[m_j];
          }
          else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
          {
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
             x[m_j] = m_loJ;
             x[m_k] -= m_scale * x[m_j];
          }
          else if( GErel(x[m_k], m_upK + m_scale * m_upJ) && m_upK < infinity )
          {
-            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            cStatus[m_k] = (m_loK == m_upK) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
             x[m_k] = m_upK;
             cStatus[m_j] = SPxSolver::BASIC;
             x[m_j] = z2 * scale2 / m_scale;
          }
          else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
          {
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
             x[m_j] = m_upJ;
             x[m_k] -= m_scale * x[m_j];
          }
          else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_loK > -infinity )
          {
-            cStatus[m_k] = EQrel(m_loK, m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
+            cStatus[m_k] = (m_loK == m_upK) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
             x[m_k] = m_loK;
             cStatus[m_j] = SPxSolver::BASIC;
             x[m_j] = z1 * scale1 / m_scale;
@@ -1204,7 +1204,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
          else if( LTrel(x[m_k], m_loK + m_scale * m_upJ) )
          {
             assert(m_upJ < infinity);
-            cStatus[m_j] = EQrel(m_loJ, m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
             x[m_j] = m_upJ;
             x[m_k] -= m_scale * x[m_j];
          }
@@ -3109,7 +3109,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          for(int l = 0; l < dupRows[k].size(); ++l)
          {
             int i = dupRows[k].index(l);
-            isLhsEqualRhs[l] = EQrel(lp.lhs(i), lp.rhs(i), PostStep::eps());
+            isLhsEqualRhs[l] = (lp.lhs(i) == lp.rhs(i));
 
             ASSERT_WARN( "WMAISM54", isNotZero(scale[i], epsZero()) );
 

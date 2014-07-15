@@ -666,7 +666,7 @@ private:
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lRhs(slackVal)
          , m_onLhs(slackVal == lp.lhs(_i))
-         , m_eqCons(EQrel(lp.lhs(_i), lp.rhs(_i)))
+         , m_eqCons(lp.lhs(_i) == lp.rhs(_i))
          , m_row(lp.rowVector(_i))
       {
          assert(m_row[m_j] != 0.0);
@@ -742,7 +742,7 @@ private:
          , m_k(_k)
          , m_i(_i)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
-         , m_jFixed(EQrel(lp.lower(_j), lp.upper(_j)))
+         , m_jFixed(lp.lower(_j) == lp.upper(_j))
          , m_jObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_kObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_k) : -lp.obj(_k))
          , m_aij(lp.colVector(_j).value(0))
