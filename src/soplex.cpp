@@ -408,6 +408,13 @@ namespace soplex
             _realParamUpper[SoPlex::SPARSITY_THRESHOLD] = 1.0;
             _realParamDefault[SoPlex::SPARSITY_THRESHOLD] = 0.6;
 
+            // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
+            _realParamName[SoPlex::REPRESENTATION_SWITCH] = "representation_switch";
+            _realParamDescription[SoPlex::REPRESENTATION_SWITCH] = "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode";
+            _realParamLower[SoPlex::REPRESENTATION_SWITCH] = 0.0;
+            _realParamUpper[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+
             _defaultsAndBoundsInitialized = true;
          }
 
@@ -4898,6 +4905,10 @@ namespace soplex
       case SoPlex::SPARSITY_THRESHOLD:
          break;
 
+      // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
+      case SoPlex::REPRESENTATION_SWITCH:
+         break;
+
       default:
          return false;
       }
@@ -6663,14 +6674,14 @@ namespace soplex
 
       // set correct representation
       if( (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_COLUMN
-            || (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_AUTO && _solver.nCols() > _solver.nRows()))
-            && _solver.rep() != SPxSolver::COLUMN )
+            || (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex::REPRESENTATION_SWITCH) >= (_solver.nRows() + 1)))
+         && _solver.rep() != SPxSolver::COLUMN )
       {
          _solver.setRep(SPxSolver::COLUMN);
       }
       else if( (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_ROW
-            || (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_AUTO && _solver.nCols() < _solver.nRows()))
-            && _solver.rep() != SPxSolver::ROW )
+            || (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)))
+         &&_solver.rep() != SPxSolver::ROW )
       {
          _solver.setRep(SPxSolver::ROW);
       }

@@ -1098,8 +1098,11 @@ public:
       /// sparse pricing threshold (\#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
       SPARSITY_THRESHOLD = 15,
 
+      /// threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
+      REPRESENTATION_SWITCH = 16,
+
       /// number of real parameters
-      REALPARAM_COUNT = 16
+      REALPARAM_COUNT = 17
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
