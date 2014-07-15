@@ -441,6 +441,11 @@ public:
    template < class S >
    void addRow(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
    {
+      assert(lhsValue != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rhsValue != 0);
+
       int idx = nRows();
       int oldColNumber = nCols();
 

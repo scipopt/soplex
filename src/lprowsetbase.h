@@ -302,6 +302,11 @@ public:
    template < class S >
    void add(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
    {
+      assert(lhsValue != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rhsValue != 0);
+
       DataKey k;
       add(k, lhsValue, rowValues, rowIndices, rowSize, rhsValue);
    }
@@ -311,6 +316,11 @@ public:
    template < class S >
    void add(DataKey& newkey, const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
    {
+      assert(lhsValue != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rhsValue != 0);
+
       SVSetBase<R>::add(newkey, rowValues, rowIndices, rowSize);
 
       if( num() > left.dim() )
