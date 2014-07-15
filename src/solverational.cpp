@@ -1732,8 +1732,12 @@ namespace soplex
          if( _rowTypes[i] != RANGETYPE_FIXED )
          {
             _slackCols.add(Rational::ZERO, -rhsRational(i), *_unitVectorRational(i), -lhsRational(i));
-            ///@todo KATI check whether we need to change sides at all
-            _rationalLP->changeRange(i, Rational::ZERO, Rational::ZERO);
+            if( _rationalLP->lhs(i) != 0 )
+               _rationalLP->changeLhs(i, Rational::ZERO);
+            if( _rationalLP->rhs(i) != 0 )
+               _rationalLP->changeRhs(i, Rational::ZERO);
+            assert(_rationalLP->lhs(i) == 0);
+            assert(_rationalLP->rhs(i) == 0);
             _realLP->changeRange(i, 0.0, 0.0);
             _colTypes.append(_switchRangeType(_rowTypes[i]));
             _rowTypes[i] = RANGETYPE_FIXED;
@@ -1864,8 +1868,12 @@ namespace soplex
          int col = numOrigCols + i;
          int row = _slackCols.colVector(i).index(0);
 
-         ///@todo KATI check whether we need to change sides at all
-         _rationalLP->changeRange(row, -upperRational(col), -lowerRational(col));
+         if( upperRational(col) != 0 )
+            _rationalLP->changeLhs(row, -upperRational(col));
+         if( lowerRational(col) != 0 )
+            _rationalLP->changeRhs(row, -lowerRational(col));
+         assert(_rationalLP->lhs(col) == -upperRational(col));
+         assert(_rationalLP->rhs(col) == -lowerRational(col));
          _rowTypes[row] = _switchRangeType(_colTypes[col]);
       }
 
