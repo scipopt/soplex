@@ -779,7 +779,7 @@ public:
       /// type of computational form, i.e., column or row representation
       REPRESENTATION = 1,
 
-      /// type of algorithm, i.e., enter or leave
+      /// type of algorithm, i.e., primal or dual
       ALGORITHM = 2,
 
       /// type of LU update
@@ -863,11 +863,11 @@ public:
    /// values for parameter ALGORITHM
    enum
    {
-      /// entering algorithm, i.e., primal simplex for column and dual simplex for row representation
-      ALGORITHM_ENTER = 0,
+      /// primal simplex algorithm, i.e., entering for column and leaving for row representation
+      ALGORITHM_PRIMAL = 0,
 
-      /// leaving algorithm, i.e., dual simplex for column and primal simplex for row representation
-      ALGORITHM_LEAVE = 1
+      /// dual simplex algorithm, i.e., leaving for column and entering for row representation
+      ALGORITHM_DUAL = 1
    };
 
    /// values for parameter FACTOR_UPDATE_TYPE

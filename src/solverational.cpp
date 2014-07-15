@@ -3073,6 +3073,7 @@ namespace soplex
       int pricer = intParam(SoPlex::PRICER);
       int simplifier = intParam(SoPlex::SIMPLIFIER);
       int scaler = intParam(SoPlex::SCALER);
+      int type = intParam(SoPlex::ALGORITHM);
 
       while( true )
       {
@@ -3167,7 +3168,7 @@ namespace soplex
          {
             MSG_INFO1( spxout << "Relaxing tolerances." << std::endl );
 
-            _solver.setType(_solver.rep() == SPxSolver::COLUMN ? SPxSolver::ENTER : SPxSolver::LEAVE);
+            setIntParam(SoPlex::ALGORITHM, SoPlex::ALGORITHM_PRIMAL);
             _solver.setDelta((_solver.feastol() * 1e3 > 1e-3) ? 1e-3 : (_solver.feastol() * 1e3));
             relaxedTolerances = _solver.feastol() >= 1e-3;
             solvedFromScratch = false;
@@ -3178,12 +3179,14 @@ namespace soplex
          {
             MSG_INFO1( spxout << "Tightening tolerances." << std::endl );
 
-            _solver.setType(_solver.rep() == SPxSolver::COLUMN ? SPxSolver::LEAVE : SPxSolver::ENTER);
+            setIntParam(SoPlex::ALGORITHM, SoPlex::ALGORITHM_DUAL);
             _solver.setDelta(_solver.feastol() * 1e-3 < 1e-9 ? 1e-9 : _solver.feastol() * 1e-3);
             tightenedTolerances = _solver.feastol() <= 1e-9;
             solvedFromScratch = false;
             continue;
          }
+
+         setIntParam(SoPlex::ALGORITHM, type);
 
          if( !switchedRatiotester )
          {
@@ -3226,6 +3229,7 @@ namespace soplex
       setIntParam(SoPlex::PRICER, pricer);
       setIntParam(SoPlex::SIMPLIFIER, simplifier);
       setIntParam(SoPlex::SCALER, scaler);
+      setIntParam(SoPlex::ALGORITHM, type);
 
       return result;
    }

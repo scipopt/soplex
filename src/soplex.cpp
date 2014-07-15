@@ -164,12 +164,12 @@ namespace soplex
             _intParamUpper[SoPlex::REPRESENTATION] = 2;
             _intParamDefault[SoPlex::REPRESENTATION] = SoPlex::REPRESENTATION_AUTO;
 
-            // type of algorithm, i.e., enter or leave
+            // type of algorithm, i.e., primal or dual
             _intParamName[SoPlex::ALGORITHM] = "algorithm";
-            _intParamDescription[SoPlex::ALGORITHM] = "type of algorithm (0 - enter, 1 - leave)";
+            _intParamDescription[SoPlex::ALGORITHM] = "type of algorithm (0 - primal, 1 - dual)";
             _intParamLower[SoPlex::ALGORITHM] = 0;
             _intParamUpper[SoPlex::ALGORITHM] = 1;
-            _intParamDefault[SoPlex::ALGORITHM] = SoPlex::ALGORITHM_LEAVE;
+            _intParamDefault[SoPlex::ALGORITHM] = SoPlex::ALGORITHM_DUAL;
 
             // type of LU update
             _intParamName[SoPlex::FACTOR_UPDATE_TYPE] = "factor_update_type";
@@ -4566,11 +4566,9 @@ namespace soplex
             return false;
          break;
 
-      // type of algorithm, i.e., enter or leave
+      // type of algorithm, i.e., primal or dual
       case SoPlex::ALGORITHM:
-         if( value != SoPlex::ALGORITHM_ENTER && value != SoPlex::ALGORITHM_LEAVE )
-            return false;
-         _solver.setType(value == SoPlex::ALGORITHM_ENTER ? SPxSolver::ENTER : SPxSolver::LEAVE);
+         // decide upon entering/leaving at solve time depending on representation
          break;
 
       // type of LU update
@@ -6675,6 +6673,20 @@ namespace soplex
             && _solver.rep() != SPxSolver::ROW )
       {
          _solver.setRep(SPxSolver::ROW);
+      }
+
+      // set correct type
+      if( ((intParam(ALGORITHM) == SoPlex::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver::COLUMN)
+            || (intParam(ALGORITHM) == SoPlex::ALGORITHM_DUAL && _solver.rep() == SPxSolver::ROW))
+         && _solver.type() != SPxSolver::ENTER )
+      {
+         _solver.setType(SPxSolver::ENTER);
+      }
+      else if( ((intParam(ALGORITHM) == SoPlex::ALGORITHM_DUAL && _solver.rep() == SPxSolver::COLUMN)
+            || (intParam(ALGORITHM) == SoPlex::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver::ROW))
+         && _solver.type() != SPxSolver::LEAVE )
+      {
+         _solver.setType(SPxSolver::LEAVE);
       }
 
       // set pricing modes
