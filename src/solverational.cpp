@@ -2464,7 +2464,10 @@ namespace soplex
          sol._hasDualFarkas = false;
 
          if( sol._primal[numOrigCols] != 1 )
+         {
             sol._primal /= sol._primal[numOrigCols];
+            sol._slacks /= sol._primal[numOrigCols];
+         }
 
          sol._primal.reDim(numOrigCols);
          sol._slacks -= _rationalLP->colVector(numOrigCols);
