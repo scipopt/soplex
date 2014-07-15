@@ -1261,6 +1261,7 @@ private:
    DVectorReal _manualLhs;
    DVectorReal _manualRhs;
    DVectorReal _manualObj;
+   SPxLPReal _manualRealLP;
 
    //@}
 
@@ -1551,6 +1552,12 @@ private:
 
    /// restore basis
    void _restoreBasis();
+
+   /// stores objective, bounds, and sides of real LP
+   void _storeLPReal();
+
+   /// restores objective, bounds, and sides of real LP
+   void _restoreLPReal();
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync

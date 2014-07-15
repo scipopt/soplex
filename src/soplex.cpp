@@ -2596,7 +2596,7 @@ namespace soplex
          // restore real LP in order to ensure that we use the same rounding
          _solver.loadLP(realLP);
 #else
-         // store current real LP
+         // store objective, bounds, and sides of real LP
          _manualLower = _realLP->lower();
          _manualUpper = _realLP->upper();
          _manualLhs = _realLP->lhs();
@@ -2607,7 +2607,7 @@ namespace soplex
          // call rational LP solving with iterative refinement
          _solveRational();
 
-         // restore real LP in order to ensure that we use the same rounding
+         // restore objective, bounds, and sides of real LP to ensure we use the same rounding
          _realLP->changeLower(_manualLower);
          _realLP->changeUpper(_manualUpper);
          _realLP->changeLhs(_manualLhs);

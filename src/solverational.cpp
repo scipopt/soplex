@@ -55,6 +55,9 @@ namespace soplex
          _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
       }
 
+      // store objective, bounds, and sides of real LP in case they will be modified during iterative refinement
+      _storeLPReal();
+
       // deactivate objective limit in floating-point solver
       if( realParam(SoPlex::OBJLIMIT_LOWER) > -realParam(SoPlex::INFTY) || realParam(SoPlex::OBJLIMIT_UPPER) < realParam(SoPlex::INFTY) )
       {
@@ -307,6 +310,9 @@ namespace soplex
          _solRational._primalObjVal *= -1;
          _solRational._dualObjVal *= -1;
       }
+
+      // restore objective, bounds, and sides of real LP in case they have been modified during iterative refinement
+      _restoreLPReal();
 
       // since the real LP is loaded in the solver, we need to also pass the basis information to the solver if
       // available
@@ -1664,6 +1670,47 @@ namespace soplex
 
 
 
+   /// stores objective, bounds, and sides of real LP
+   void SoPlex::_storeLPReal()
+   {
+#ifndef SOPLEX_MANUAL_ALT
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_MANUAL )
+      {
+         _manualRealLP = *_realLP;
+         return;
+      }
+#endif
+
+      _manualLower = _realLP->lower();
+      _manualUpper = _realLP->upper();
+      _manualLhs = _realLP->lhs();
+      _manualRhs = _realLP->rhs();
+      _manualObj.reDim(_realLP->nCols());
+      _realLP->getObj(_manualObj);
+   }
+
+
+
+   /// restores objective, bounds, and sides of real LP
+   void SoPlex::_restoreLPReal()
+   {
+#ifndef SOPLEX_MANUAL_ALT
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_MANUAL )
+      {
+         _solver.loadLP(_manualRealLP);
+         return;
+      }
+#endif
+
+      _realLP->changeLower(_manualLower);
+      _realLP->changeUpper(_manualUpper);
+      _realLP->changeLhs(_manualLhs);
+      _realLP->changeRhs(_manualRhs);
+      _realLP->changeObj(_manualObj);
+   }
+
+
+
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync
    void SoPlex::_transformEquality()
@@ -1826,19 +1873,7 @@ namespace soplex
       _realLP->removeColRange(numOrigCols, numCols - 1);
       _colTypes.reSize(numOrigCols);
 
-      ///@todo KATI restore real LP in SoPlex::solve() and not here
-      // restore bounds and objective coefficients in real LP
-      for( int c = numColsRational() - 1; c >= 0; c-- )
-      {
-         _realLP->changeBounds(c, (Real)lowerRational(c), (Real)upperRational(c));
-         _realLP->changeObj(c, (Real)objRational(c));
-      }
-
-      // restore sides in real LP
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
-      {
-         _realLP->changeRange(r, (Real)lhsRational(r), (Real)rhsRational(r));
-      }
+      // objective, bounds, and sides of real LP are restored only after _solveRational()
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterUntransEqu.lp", 0, 0, 0) );
