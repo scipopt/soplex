@@ -1808,8 +1808,9 @@ namespace soplex
          return;
 
       _rationalLP->addCol(obj, lower, colValues, colIndices, colSize, upper);
-
       int i = numColsRational() - 1;
+      _colTypes.append(_rangeTypeRational(lowerRational(i), upperRational(i)));
+
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addColReal(Real(maxObjRational(i)) * (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
             Real(lowerRational(i)), DSVectorReal(_rationalLP->colVector(i)), Real(upperRational(i)));
@@ -2031,6 +2032,7 @@ namespace soplex
          return;
 
       _rationalLP->changeRange(i, lhs, rhs);
+      _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRangeReal(i, Real(lhsRational(i)), Real(rhsRational(i)));
@@ -2109,6 +2111,7 @@ namespace soplex
          return;
 
       _rationalLP->changeLower(i, lower);
+      _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeLowerReal(i, Real(lowerRational(i)));
@@ -2168,6 +2171,7 @@ namespace soplex
          return;
 
       _rationalLP->changeUpper(i, upper);
+      _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeUpperReal(i, Real(upperRational(i)));
@@ -2227,6 +2231,7 @@ namespace soplex
          return;
 
       _rationalLP->changeBounds(i, lower, upper);
+      _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeBoundsReal(i, Real(lowerRational(i)), Real(upperRational(i)));
