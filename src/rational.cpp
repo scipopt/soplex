@@ -1311,7 +1311,7 @@ Rational& Rational::operator/=(const Rational& r)
    else if( mpq_equal(this->dpointer->privatevalue, Rational::POSONE.dpointer->privatevalue) != 0 )
    {
       mpq_inv(this->dpointer->privatevalue, r.dpointer->privatevalue);
-      return *this = r;
+      return *this;
    }
    else if( mpq_equal(this->dpointer->privatevalue, Rational::NEGONE.dpointer->privatevalue) != 0 )
    {
