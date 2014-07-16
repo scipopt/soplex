@@ -2465,8 +2465,10 @@ namespace soplex
 
          if( sol._primal[numOrigCols] != 1 )
          {
-            sol._primal /= sol._primal[numOrigCols];
             sol._slacks /= sol._primal[numOrigCols];
+            for( int i = 0; i < numOrigCols; i++ )
+               sol._primal[i] /= sol._primal[numOrigCols];
+            sol._primal[numOrigCols] = 1;
          }
 
          sol._primal.reDim(numOrigCols);
