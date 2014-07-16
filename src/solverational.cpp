@@ -1695,19 +1695,53 @@ namespace soplex
    /// restores objective, bounds, and sides of real LP
    void SoPlex::_restoreLPReal()
    {
-#ifndef SOPLEX_MANUAL_ALT
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_MANUAL )
       {
+#ifndef SOPLEX_MANUAL_ALT
          _solver.loadLP(_manualRealLP);
-         return;
-      }
+#else
+         _realLP->changeLower(_manualLower);
+         _realLP->changeUpper(_manualUpper);
+         _realLP->changeLhs(_manualLhs);
+         _realLP->changeRhs(_manualRhs);
+         _realLP->changeObj(_manualObj);
 #endif
 
-      _realLP->changeLower(_manualLower);
-      _realLP->changeUpper(_manualUpper);
-      _realLP->changeLhs(_manualLhs);
-      _realLP->changeRhs(_manualRhs);
-      _realLP->changeObj(_manualObj);
+         if( _hasBasis )
+         {
+            // in manual sync mode, if the right-hand side of an equality constraint is not floating-point
+            // representable, the user might have constructed the constraint in the real LP by rounding down the
+            // left-hand side and rounding up the right-hand side; if the basis status is fixed, we need to adjust it
+            for( int i = 0; i < _solver.nRows(); i++ )
+            {
+               if( _basisStatusRows[i] == SPxSolver::FIXED && _solver.lhs(i) != _solver.rhs(i) )
+               {
+                  assert(_solver.rhs(i) == nextafter(_solver.lhs(i), infinity));
+                  if( _hasSolRational && _solRational.hasDual()
+                     && ((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE && _solRational._dual[i] > 0)
+                        || (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE && _solRational._dual[i] < 0)) )
+                  {
+                     _basisStatusRows[i] = SPxSolver::ON_UPPER;
+                  }
+                  else
+                  {
+                     _basisStatusRows[i] = SPxSolver::ON_LOWER;
+                  }
+               }
+            }
+
+            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         }
+         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
+      }
+      else
+      {
+         _realLP->changeLower(_manualLower);
+         _realLP->changeUpper(_manualUpper);
+         _realLP->changeLhs(_manualLhs);
+         _realLP->changeRhs(_manualRhs);
+         _realLP->changeObj(_manualObj);
+      }
    }
 
 
