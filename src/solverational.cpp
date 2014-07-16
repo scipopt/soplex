@@ -1872,8 +1872,8 @@ namespace soplex
             _rationalLP->changeLhs(row, -upperRational(col));
          if( lowerRational(col) != 0 )
             _rationalLP->changeRhs(row, -lowerRational(col));
-         assert(_rationalLP->lhs(col) == -upperRational(col));
-         assert(_rationalLP->rhs(col) == -lowerRational(col));
+         assert(_rationalLP->lhs(row) == -upperRational(col));
+         assert(_rationalLP->rhs(row) == -lowerRational(col));
          _rowTypes[row] = _switchRangeType(_colTypes[col]);
       }
 
