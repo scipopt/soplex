@@ -3292,6 +3292,26 @@ namespace soplex
 
 
 
+#ifdef SOPLEX_WITH_GMP
+   /// gets the primal solution vector if available; returns true on success
+   bool SoPlex::getPrimalRational(mpq_t* vector, const int size)
+   {
+      assert(size >= numColsRational());
+
+      if( hasPrimal() )
+      {
+         _syncRationalSolution();
+         for( int i = 0; i < numColsRational(); i++ )
+            mpq_set(vector[i], _solRational._primal[i].getMpqRef());
+         return true;
+      }
+      else
+         return false;
+   }
+#endif
+
+
+
    /// is an advanced starting basis available?
    bool SoPlex::hasBasis() const
    {
