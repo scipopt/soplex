@@ -319,12 +319,16 @@ public:
    template < class S >
    void add(DataKey& nkey, const S* rowValues, const int* rowIndices, int rowSize)
    {
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+
       // create empty vector
       ensurePSVec(1);
       SVectorBase<R>* new_svec = create(nkey, rowSize);
 
       // assign values
-      new_svec->assignArray(rowValues, rowIndices, rowSize);
+      if( rowSize > 0 )
+         new_svec->assignArray(rowValues, rowIndices, rowSize);
    }
 
    /// Adds all \p n SVectorBase%s in the array \p svec to the %set.

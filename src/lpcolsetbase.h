@@ -297,7 +297,7 @@ public:
    /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to
    /// LPColSetBase, with DataKey \p key.
    template < class S >
-   void add(DataKey& newkey, const S* obj, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   void add(DataKey& newkey, const S* objValue, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
    {
       SVSetBase<R>::add(newkey, colValues, colIndices, colSize);
 
@@ -305,10 +305,12 @@ public:
       {
          low.reDim(num());
          up.reDim(num());
+         object.reDim(num());
       }
 
       low[num() - 1] = *lowerValue;
       up[num() - 1] = *upperValue;
+      object[num() - 1] = *objValue;
    }
 
    ///

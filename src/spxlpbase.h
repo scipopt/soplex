@@ -515,13 +515,9 @@ public:
       int idx = nCols();
       int oldRowNumber = nRows();
 
-      if( colSize != 0 )
-         LPColSetBase<R>::add(objValue, lowerValue, colValues, colIndices, colSize, upperValue);
-      else
-      {
-         LPColBase<R> emptycol;
-         LPColSetBase<R>::add(emptycol);
-      }
+      LPColSetBase<R>::add(objValue, lowerValue, colValues, colIndices, colSize, upperValue);
+      if( thesense != MAXIMIZE )
+         LPColSetBase<R>::maxObj_w(idx) *= -1;
 
       // now insert nonzeros to column file also
       for( int j = colSize - 1; j >= 0; --j )
@@ -1873,7 +1869,8 @@ private:
       const SVectorBase<R>& vec = col.colVector();
 
       LPColSetBase<R>::add(col);
-      LPColSetBase<R>::maxObj_w(idx) *= thesense;
+      if( thesense != MAXIMIZE )
+         LPColSetBase<R>::maxObj_w(idx) *= -1;
 
       // now insert nonzeros to row file also
       for( int j = vec.size() - 1; j >= 0; --j )
@@ -1904,6 +1901,8 @@ private:
       int oldRowNumber = nRows();
 
       LPColSetBase<R>::add(objValue, lowerValue, colVec, upperValue);
+      if( thesense != MAXIMIZE )
+         LPColSetBase<R>::maxObj_w(idx) *= -1;
 
       // now insert nonzeros to row file also
       for( int j = colVec.size() - 1; j >= 0; --j )
