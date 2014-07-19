@@ -1164,7 +1164,7 @@ namespace soplex
             }
             else
             {
-               if( dualReal[r] != 0.0 )
+               if( dualReal[r] != 0 )
                {
                   int i = _primalDualDiff.size();
                   _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);

@@ -98,7 +98,7 @@ static bool LPFisFree(const char* s)
 
 
 /// Read the next number and advance \p pos.
-/** If only a sign is encountered, the number is assumed to be \c sign * 1.0.  This routine will not catch malformatted
+/** If only a sign is encountered, the number is assumed to be \c sign * 1.  This routine will not catch malformatted
  *  numbers like .e10 !
  */
 static Rational LPFreadValue(char*& pos, const int lineno = -1)
@@ -108,7 +108,7 @@ static Rational LPFreadValue(char*& pos, const int lineno = -1)
    char        tmp[LPF_MAX_LINE_LEN];
    const char* s = pos;
    char*       t;
-   Rational        value = 1.0;
+   Rational        value = 1;
    bool        has_digits = false;
    bool        has_emptyexponent = false;
    bool        has_dot = false;
@@ -185,7 +185,7 @@ static Rational LPFreadValue(char*& pos, const int lineno = -1)
    }
 
    if( !has_digits )
-      value = (*pos == '-') ? -1.0 : 1.0;
+      value = (*pos == '-') ? -1 : 1;
    else
    {
       for( t = tmp; pos != s; pos++ )
@@ -387,7 +387,7 @@ static Rational LPFreadInfinity(char*& pos)
 {
    assert(LPFisInfinity(pos));
 
-   Rational sense = (*pos == '-') ? -1.0 : 1.0;
+   Rational sense = (*pos == '-') ? -1 : 1;
 
    (void) LPFhasKeyword(++pos, "inf[inity]");
 
@@ -435,7 +435,7 @@ bool SPxLPBase<Rational>::readLPF(
    LPRowBase<Rational> row;                  ///< last assembled row.
    DSVectorBase<Rational> vec;               ///< last assembled vector (from row).
 
-   Rational val = 1.0;
+   Rational val = 1;
    int colidx;
    int sense = 0;
 
@@ -547,7 +547,7 @@ bool SPxLPBase<Rational>::readLPF(
             // multiplication with -1 for minimization is done below
             vec.clear();
             have_value = true;
-            val = 1.0;
+            val = 1;
             section = CONSTRAINTS;
          }
       }
@@ -557,7 +557,7 @@ bool SPxLPBase<Rational>::readLPF(
               || LPFhasKeyword(pos, "s[.][    ]t[.]")) )
       {
          have_value = true;
-         val = 1.0;
+         val = 1;
       }
       else
       {
@@ -589,7 +589,7 @@ bool SPxLPBase<Rational>::readLPF(
                goto syntax_error;
 
             have_value = true;
-            val = 1.0;
+            val = 1;
          }
       }
 
@@ -648,7 +648,7 @@ bool SPxLPBase<Rational>::readLPF(
          case OBJECTIVE:
             if( LPFisValue(pos) )
             {
-               Rational pre_sign = 1.0;
+               Rational pre_sign = 1;
 
                /* Already having here a value could only result from being the first number in a constraint, or a sign
                 * '+' or '-' as last token on the previous line.
@@ -678,7 +678,7 @@ bool SPxLPBase<Rational>::readLPF(
          case CONSTRAINTS:
             if( LPFisValue(pos) )
             {
-               Rational pre_sign = 1.0;
+               Rational pre_sign = 1;
 
                /* Already having here a value could only result from being the first number in a constraint, or a sign
                 * '+' or '-' as last token on the previous line.
@@ -728,7 +728,7 @@ bool SPxLPBase<Rational>::readLPF(
                      rnames->add(name);
                   }
                   have_value = true;
-                  val = 1.0;
+                  val = 1;
                   sense = 0;
                   pos = 0;
                   // next line
@@ -744,7 +744,7 @@ bool SPxLPBase<Rational>::readLPF(
                {
                   colidx = LPFreadColName(pos, cnames, cset, &emptycol);
 
-                  if( val != 0.0 )
+                  if( val != 0 )
                   {
                      // Do we have this index already in the row?
                      int n = vec.number(colidx);
@@ -759,7 +759,7 @@ bool SPxLPBase<Rational>::readLPF(
 
                         val += vec.value(n);
 
-                        if( val == 0.0 )
+                        if( val == 0 )
                            vec.remove(n);
                         else
                            vec.value(n) = val;
@@ -777,7 +777,7 @@ bool SPxLPBase<Rational>::readLPF(
                else
                {
                   // We have a row like c1: <= 5 with no variables. We can not handle 10 <= 5; issue a syntax error.
-                  if( val != 1.0 )
+                  if( val != 1 )
                      goto syntax_error;
 
                   // If the next thing is not the sense we give up also.
@@ -877,13 +877,13 @@ bool SPxLPBase<Rational>::readLPF(
             {
                if( section == BINARIES )
                {
-		  if( cset.lower(colidx) < 0.0 )
+		  if( cset.lower(colidx) < 0 )
 		  {
-		     cset.lower_w(colidx) = 0.0;
+		     cset.lower_w(colidx) = 0;
 		  }
-		  if( cset.upper(colidx) > 1.0 )
+		  if( cset.upper(colidx) > 1 )
 		  {
-		     cset.upper_w(colidx) = 1.0;
+		     cset.upper_w(colidx) = 1;
 		  }
                }
 
@@ -1070,16 +1070,16 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rn
          switch( *mps.field1() )
          {
          case 'G':
-            row.setLhs(0.0);
+            row.setLhs(0);
             row.setRhs(infinity);
             break;
          case 'E':
-            row.setLhs(0.0);
-            row.setRhs(0.0);
+            row.setLhs(0);
+            row.setRhs(0);
             break;
          case 'L':
             row.setLhs(-infinity);
-            row.setRhs(0.0);
+            row.setRhs(0);
             break;
          default:
             mps.syntaxError();
@@ -1106,7 +1106,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
    LPColBase<Rational> col(rset.num());
    DSVectorBase<Rational> vec;
 
-   col.setObj(0.0);
+   col.setObj(0);
    vec.clear();
 
    while( mps.readLine() )
@@ -1145,8 +1145,8 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          colname[MPSInput::MAX_LINE_LEN-1] = '\0';
          cnames.add(colname);
          vec.clear();
-         col.setObj(0.0);
-         col.setLower(0.0);
+         col.setObj(0);
+         col.setLower(0);
          col.setUpper(infinity);
 
          if( mps.isInteger() )
@@ -1157,7 +1157,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
                intvars->addIdx(cnames.number(colname));
 
             // for Integer variable the default bounds are 0/1
-            col.setUpper(1.0);
+            col.setUpper(1);
          }
       }
 
@@ -1173,7 +1173,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
       {
          if( (idx = rnames.number(mps.field2())) < 0 )
             mps.entryIgnored("Column", mps.field1(), "row", mps.field2());
-         else if( val != 0.0 )
+         else if( val != 0 )
             vec.add(idx, val);
       }
 
@@ -1192,7 +1192,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          {
             if( (idx = rnames.number(mps.field4())) < 0 )
                mps.entryIgnored("Column", mps.field1(), "row", mps.field4());
-            else if( val != 0.0 )
+            else if( val != 0 )
                vec.add(idx, val);
          }
       }
@@ -1475,7 +1475,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
          else
          {
             if( mps.field4() == 0 )
-               val = 0.0;
+               val = 0;
             else
             {
                if( !val.readString(mps.field4()) )
@@ -1519,8 +1519,8 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
                break;
                // Ilog extension (Binary)
             case 'B':
-               cset.lower_w(idx) = 0.0;
-               cset.upper_w(idx) = 1.0;
+               cset.lower_w(idx) = 0;
+               cset.upper_w(idx) = 1;
 
                if( intvars != 0 )
                   intvars->addIdx(idx);
@@ -2005,9 +2005,9 @@ static void MPSwriteRecord(
    const char*    indicator,
    const char*    name,
    const char*    name1  = 0,
-   const Rational value1 = 0.0,
+   const Rational value1 = 0,
    const char*    name2  = 0,
-   const Rational value2 = 0.0
+   const Rational value2 = 0
    )
 {
    char buf[81];
@@ -2173,18 +2173,18 @@ void SPxLPBase<Rational>::writeMPS(
    i = 0;
    while( i < nRows() )
    {
-      Rational rhsval1 = 0.0;
-      Rational rhsval2 = 0.0;
+      Rational rhsval1 = 0;
+      Rational rhsval2 = 0;
 
       for( ; i < nRows(); i++ )
-         if( (rhsval1 = MPSgetRHS(lhs(i), rhs(i))) != 0.0 )
+         if( (rhsval1 = MPSgetRHS(lhs(i), rhs(i))) != 0 )
             break;
 
       if( i < nRows() )
       {
          for( k = i + 1; k < nRows(); k++ )
          {
-            if( (rhsval2 = MPSgetRHS(lhs(k), rhs(k))) != 0.0 )
+            if( (rhsval2 = MPSgetRHS(lhs(k), rhs(k))) != 0 )
                break;
          }
 
@@ -2239,7 +2239,7 @@ void SPxLPBase<Rational>::writeMPS(
          continue;
       }
 
-      if( lower(i) != 0.0 )
+      if( lower(i) != 0 )
       {
          if( double(lower(i)) > -double(infinity) )
             MPSwriteRecord(p_output, "LO", "BOUND", getColName(*this, i, p_cnames, name1), lower(i));
@@ -2249,7 +2249,7 @@ void SPxLPBase<Rational>::writeMPS(
 
       if( has_intvars && (p_intvars->number(i) >= 0) )
       {
-         // Integer variables have default upper bound 1.0, but we should write
+         // Integer variables have default upper bound 1, but we should write
          // it nevertheless since CPLEX seems to assume infinity otherwise.
          MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
       }
