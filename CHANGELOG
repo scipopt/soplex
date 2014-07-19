@@ -15,6 +15,7 @@ interface & parameters:
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
+- deactivate SOPLEX_DEBUG flag in header files if defined externally
 
 
 Bugfix version

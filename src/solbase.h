@@ -20,6 +20,12 @@
 #ifndef _SOLBASE_H_
 #define _SOLBASE_H_
 
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define ___SOPLEX_DEBUG
+#undef SOPLEX_DEBUG
+#endif
+
 #include <assert.h>
 #include <string.h>
 #include <math.h>
@@ -220,4 +226,12 @@ private:
    }
 };
 } // namespace soplex
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef ___SOPLEX_DEBUG
+#define SOPLEX_DEBUG
+#undef ___SOPLEX_DEBUG
+#endif
+
 #endif // _SOLBASE_H_

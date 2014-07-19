@@ -20,6 +20,12 @@
 #ifndef _BASEVECTORS_H_
 #define _BASEVECTORS_H_
 
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define ___SOPLEX_DEBUG
+#undef SOPLEX_DEBUG
+#endif
+
 #include "spxdefines.h"
 #include "rational.h"
 #include "vectorbase.h"
@@ -1341,5 +1347,12 @@ std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
    return os;
 }
 }
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef ___SOPLEX_DEBUG
+#define SOPLEX_DEBUG
+#undef ___SOPLEX_DEBUG
+#endif
 
 #endif // _BASEVECTORS_H_
