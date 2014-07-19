@@ -13,8 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-//#define DEBUGGING 1
-
 /* Updating the Basis for Leaving Variables
  */
 #include <assert.h>

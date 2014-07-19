@@ -13,8 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// #define DEBUGGING
-
 #include <assert.h>
 #include "spxdefines.h"
 #include "spxboundflippingrt.h"

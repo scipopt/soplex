@@ -13,8 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-//#define DEBUGGING 1
-
 #include <iostream>
 
 #include "spxdefines.h"
@@ -24,7 +22,7 @@
 
 namespace soplex
 {
- 
+
 SPxBasis::Desc::Desc(const SPxSolver& base)
 {
    reSize(base.nRows(), base.nCols());

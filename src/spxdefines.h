@@ -21,7 +21,7 @@
  * \ref soplex::SPxOut::INFO2 "INFO2", and
  * \ref soplex::SPxOut::INFO3 "INFO3" are set.
  * If \c NDEBUG is not defined, the code within \#TRACE is used.
- * If \c DEBUGGING is defined, the code within
+ * If \c SOPLEX_DEBUG is defined, the code within
  * \ref soplex::SPxOut::DEBUG "DEBUG" is also used.
  *
  * If \c WITH_LONG_DOUBLE is defined, all Real numbers are of type
@@ -112,12 +112,12 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 
 #define MSGinconsistent(name) msginconsistent(name, __FILE__, __LINE__)
 
-#if defined(DEBUGGING)
+#if defined(SOPLEX_DEBUG)
 // print output in any case, regardless of Param::verbose():
 #define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::DEBUG, x ) }
 #else
 #define MSG_DEBUG(x) /**/
-#endif //!DEBUGGING
+#endif //!SOPLEX_DEBUG
 
 
 /*-----------------------------------------------------------------------------

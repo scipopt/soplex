@@ -16,7 +16,6 @@
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
  */
-//#define DEBUGGING 1             // Setting this generates a lot of output
 
 #include <assert.h>
 #include <ctype.h>

@@ -13,8 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// #define DEBUGGING 1
-
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
 #include <assert.h>

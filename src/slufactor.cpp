@@ -18,9 +18,7 @@
  *       This should be properly integrated and demangled.
  * @todo Does is make sense, to call x.clear() when next x.altValues()
  *       is called.
- *       
  */
-//#define DEBUGGING 1
 
 #include <assert.h>
 #include <sstream>
@@ -32,7 +30,7 @@
 #include "spxout.h"
 #include "exceptions.h"
 
-#ifdef DEBUGGING
+#ifdef SOPLEX_DEBUG
 #include <stdio.h>
 #endif
 

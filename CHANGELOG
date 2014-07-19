@@ -13,6 +13,8 @@ interface & parameters:
 - new make option EG={true,false} to build with EGlib
 - bound flipping is now enabled by default
 
+code quality:
+- change flag DEBUGGING to SOPLEX_DEBUG
 
 
 Bugfix version

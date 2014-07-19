@@ -55,13 +55,13 @@ static void enQueueMax( int* heap, int* size, int elem )
 
    heap[j] = elem;
 
-#ifdef DEBUGGING
+#ifdef SOPLEX_DEBUG
 // no NDEBUG define, since this block is really expensive
    for ( i = 1; i < *size; ++i )
       for ( j = 0; j < i; ++j )
          assert( heap[i] != heap[j] );
 
-#endif  /* DEBUGGING */
+#endif  /* SOPLEX_DEBUG */
 }
 
 static int deQueueMax( int* heap, int* size )
@@ -139,13 +139,13 @@ static void enQueueMin( int* heap, int* size, int elem )
 
    heap[j] = elem;
 
-#ifdef DEBUGGING
+#ifdef SOPLEX_DEBUG
 // no NDEBUG define, since this block is really expensive
    for ( i = 1; i < *size; ++i )
       for ( j = 0; j < i; ++j )
          assert( heap[i] != heap[j] );
 
-#endif  /* DEBUGGING */
+#endif  /* SOPLEX_DEBUG */
 }
 
 static int deQueueMin( int* heap, int* size )
