@@ -423,9 +423,11 @@ public:
 
       if( thestatus != stat )
       {
+#ifdef SOPLEX_DEBUG
          MSG_DEBUG( spxout << "DBSTAT01 SPxBasis::setStatus(): status: "
                     << int(thestatus) << " (" << thestatus << ") -> "
                     << int(stat) << " (" << stat << ")" << std::endl; )
+#endif
 
          thestatus = stat;
          if( stat == NO_PROBLEM )
