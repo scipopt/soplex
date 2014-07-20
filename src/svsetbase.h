@@ -22,7 +22,7 @@
 
 /* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
 #ifdef SOPLEX_DEBUG
-#define ___SOPLEX_DEBUG
+#define SOPLEX_DEBUG_SVSETBASE
 #undef SOPLEX_DEBUG
 #endif
 
@@ -1046,9 +1046,9 @@ public:
 
 /* reset the SOPLEX_DEBUG flag to its original value */
 #undef SOPLEX_DEBUG
-#ifdef ___SOPLEX_DEBUG
+#ifdef SOPLEX_DEBUG_SVSETBASE
 #define SOPLEX_DEBUG
-#undef ___SOPLEX_DEBUG
+#undef SOPLEX_DEBUG_SVSETBASE
 #endif
 
 #endif // _SVSETBASE_H_
