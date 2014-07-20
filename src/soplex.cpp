@@ -3197,34 +3197,58 @@ namespace soplex
       {
          SPxSolver::VarStatus colStatus = basisColStatus(c);
 
+         if( _colTypes[c] == RANGETYPE_FIXED )
+         {
+            assert(lowerRational(c) == upperRational(c));
+            continue;
+         }
+
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
             if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(-redcost[c]) << "\n" );
                   maxviol = -redcost[c];
+               }
             }
             if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(redcost[c]) << "\n" );
                   maxviol = redcost[c];
+               }
             }
          }
          else
          {
+            if( _colTypes[c] == RANGETYPE_FIXED )
+            {
+               assert(lowerRational(c) == upperRational(c));
+               continue;
+            }
+
             if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(redcost[c]) << "\n" );
                   maxviol = redcost[c];
+               }
             }
             if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(-redcost[c]) << "\n" );
                   maxviol = -redcost[c];
+               }
             }
          }
       }
@@ -3257,32 +3281,56 @@ namespace soplex
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
+            if( _rowTypes[r] == RANGETYPE_FIXED )
+            {
+               assert(lhsRational(r) == rhsRational(r));
+               continue;
+            }
+
             if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(-dual[r]) << "\n" );
                   maxviol = -dual[r];
+               }
             }
             if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(dual[r]) << "\n" );
                   maxviol = dual[r];
+               }
             }
          }
          else
          {
+            if( _rowTypes[r] == RANGETYPE_FIXED )
+            {
+               assert(lhsRational(r) == rhsRational(r));
+               continue;
+            }
+
             if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(dual[r]) << "\n" );
                   maxviol = dual[r];
+               }
             }
             if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
+               {
+                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(-dual[r]) << "\n" );
                   maxviol = -dual[r];
+               }
             }
          }
       }
