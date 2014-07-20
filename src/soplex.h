@@ -634,6 +634,21 @@ public:
 #ifdef SOPLEX_WITH_GMP
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalRational(mpq_t* vector, const int size);
+
+   /// gets the vector of slack values if available; returns true on success
+   bool getSlacksRational(mpq_t* vector, const int size);
+
+   /// gets the primal ray if LP is unbounded; returns true on success
+   bool getPrimalRayRational(mpq_t* vector, const int size);
+
+   /// gets the dual solution vector if available; returns true on success
+   bool getDualRational(mpq_t* vector, const int size);
+
+   /// gets the vector of reduced cost values if available; returns true on success
+   bool getRedCostRational(mpq_t* vector, const int size);
+
+   /// gets the Farkas proof if LP is infeasible; returns true on success
+   bool getDualFarkasRational(mpq_t* vector, const int size);
 #endif
    //@}
 

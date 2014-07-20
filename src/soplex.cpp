@@ -3308,6 +3308,95 @@ namespace soplex
       else
          return false;
    }
+
+
+   /// gets the vector of slack values if available; returns true on success
+   bool SoPlex::getSlacksRational(mpq_t* vector, const int size)
+   {
+      assert(size >= numRowsRational());
+
+      if( hasPrimal() )
+      {
+         _syncRationalSolution();
+         for( int i = 0; i < numRowsRational(); i++ )
+            mpq_set(vector[i], _solRational._slacks[i].getMpqRef());
+         return true;
+      }
+      else
+         return false;
+   }
+
+
+
+   /// gets the primal ray if LP is unbounded; returns true on success
+   bool SoPlex::getPrimalRayRational(mpq_t* vector, const int size)
+   {
+      assert(size >= numColsRational());
+
+      if( hasPrimalRay() )
+      {
+         _syncRationalSolution();
+         for( int i = 0; i < numColsRational(); i++ )
+            mpq_set(vector[i], _solRational._primalRay[i].getMpqRef());
+         return true;
+      }
+      else
+         return false;
+   }
+
+
+
+   /// gets the dual solution vector if available; returns true on success
+   bool SoPlex::getDualRational(mpq_t* vector, const int size)
+   {
+      assert(size >= numRowsRational());
+
+      if( hasDual() )
+      {
+         _syncRationalSolution();
+         for( int i = 0; i < numRowsRational(); i++ )
+            mpq_set(vector[i], _solRational._dual[i].getMpqRef());
+         return true;
+      }
+      else
+         return false;
+   }
+
+
+
+   /// gets the vector of reduced cost values if available; returns true on success
+   bool SoPlex::getRedCostRational(mpq_t* vector, const int size)
+   {
+      assert(size >= numColsRational());
+
+      if( hasDual() )
+      {
+         _syncRationalSolution();
+         for( int i = 0; i < numColsRational(); i++ )
+            mpq_set(vector[i], _solRational._redCost[i].getMpqRef());
+         return true;
+      }
+      else
+         return false;
+   }
+
+
+
+   /// gets the Farkas proof if LP is infeasible; returns true on success
+   bool SoPlex::getDualFarkasRational(mpq_t* vector, const int size)
+   {
+      assert(size >= numRowsRational());
+
+      if( hasDualFarkas() )
+      {
+         _syncRationalSolution();
+         for( int i = 0; i < numRowsRational(); i++ )
+            mpq_set(vector[i], _solRational._dualFarkas[i].getMpqRef());
+         return true;
+      }
+      else
+         return false;
+   }
 #endif
 
 
