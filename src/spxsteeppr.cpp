@@ -478,7 +478,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
-                                << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
+                                << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * prefPtr[idx];
          }
@@ -520,7 +520,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
             MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
-                                << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
+                                << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * prefPtr[idx];
          }
