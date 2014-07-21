@@ -846,6 +846,9 @@ namespace soplex
          else
             dualScale = maxScale;
 
+         if( dualScale > primalScale )
+            dualScale = primalScale;
+
          if( dualScale < 1 )
             dualScale = 1;
          else
