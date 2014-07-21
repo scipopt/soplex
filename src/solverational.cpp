@@ -1737,8 +1737,8 @@ namespace soplex
             }
 
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+            _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
          }
-         _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       }
       else
       {
