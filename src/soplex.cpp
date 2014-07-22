@@ -1739,7 +1739,7 @@ namespace soplex
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single row
-   void SoPlex::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, int rowSize, const mpq_t* rhs)
+   void SoPlex::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs)
    {
       assert(_rationalLP != 0);
 
@@ -1752,6 +1752,31 @@ namespace soplex
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowReal(Real(lhsRational(i)), DSVectorReal(_rationalLP->rowVector(i)), Real(rhsRational(i)));
+
+      _invalidateSolution();
+   }
+
+
+
+   /// adds a set of rows
+   void SoPlex::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->addRows(lhs, rowValues, rowIndices, rowStarts, rowLengths, numRows, numValues, rhs);
+      for( int i = numRowsRational() - numRows; i < numRowsRational(); i++ )
+         _rowTypes.append(_rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i)));
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
+         LPRowSetReal lprowset;
+         for( int i = numRowsRational() - numRows; i < numRowsRational(); i++ )
+            lprowset.add(Real(lhsRational(i)), DSVectorReal(_rationalLP->rowVector(i)), Real(rhsRational(i)));
+         _addRowsReal(lprowset);
+      }
 
       _invalidateSolution();
    }
@@ -1800,7 +1825,7 @@ namespace soplex
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single column
-   void SoPlex::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, int colSize, const mpq_t* upper)
+   void SoPlex::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper)
    {
       assert(_rationalLP != 0);
 

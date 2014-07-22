@@ -492,6 +492,91 @@ public:
       doAddRows(pset);
    }
 
+   ///
+   template < class S >
+   void addRows(const S* lhsValues, const S* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const S* rhsValues)
+   {
+      assert(lhsValues != 0);
+      assert(numValues <= 0 || rowValues != 0);
+      assert(numValues <= 0 || rowIndices != 0);
+      assert(numValues <= 0 || rowStarts != 0);
+      assert(numValues <= 0 || rowLengths != 0);
+      assert(rhsValues != 0);
+
+      int i, j, k, idx;
+      SVectorBase<R>* col;
+      DataArray < int > newCols(nCols());
+      int oldRowNumber = nRows();
+      int oldColNumber = nCols();
+
+      LPRowSetBase<R>::memRemax(oldRowNumber + numRows);
+      for( i = 0; i < numRows; i++ )
+      {
+         assert(numValues <= 0 || rowStarts[i] + rowLengths[i] <= numValues);
+         if( numValues <= 0 )
+            LPRowSetBase<R>::add(&(lhsValues[i]), (S*)0, (int*)0, 0, &(rhsValues[i]));
+         else
+            LPRowSetBase<R>::add(&(lhsValues[i]), &(rowValues[rowStarts[i]]), &(rowIndices[rowStarts[i]]), rowLengths[i], &(rhsValues[i]));
+      }
+
+      assert(LPRowSetBase<R>::isConsistent());
+      assert(LPColSetBase<R>::isConsistent());
+
+      // count additional nonzeros per column
+      for( i = nCols() - 1; i >= 0; --i )
+         newCols[i] = 0;
+      for( i = numValues - 1; i >= 0; --i )
+      {
+         ///@todo implement the addition of new columns as in doAddRows()
+         assert(rowIndices[i] >= 0);
+         assert(rowIndices[i] < oldColNumber);
+         newCols[rowIndices[i]]++;
+      }
+
+      // extend columns as required (backward because of memory efficiency reasons)
+      for( i = nCols() - 1; i >= 0; --i )
+      {
+         if( newCols[i] > 0 )
+         {
+            int len = newCols[i] + colVector(i).size();
+            LPColSetBase<R>::xtend(i, len);
+
+            /* preset the sizes: beware that this can irritate a consistency check call from xtend(). We need to set the
+             * sizes here, because a possible garbage collection called from xtend might destroy the sizes again. */
+            colVector_w(i).set_size( len );
+         }
+      }
+
+      // insert new elements to column file
+      for( i = nRows() - 1; i >= oldRowNumber; --i )
+      {
+         const SVectorBase<R>& vec = rowVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            k = vec.index(j);
+            col = &colVector_w(k);
+            idx = col->size() - newCols[k];
+            assert(newCols[k] > 0);
+            assert(idx >= 0);
+            newCols[k]--;
+            col->index(idx) = i;
+            col->value(idx) = vec.value(j);
+         }
+      }
+
+#ifndef NDEBUG
+      for( i = 0; i < nCols(); ++i )
+         assert( newCols[i] == 0 );
+#endif
+
+      assert(SPxLPBase<R>::isConsistent());
+
+      assert( numRows == nRows() - oldRowNumber );
+      addedRows( nRows() - oldRowNumber );
+      addedCols( nCols() - oldColNumber );
+   }
+
    /// adds all LPRowBase%s of \p pset to LPRowSetBase.
    virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set)
    {

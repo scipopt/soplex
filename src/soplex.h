@@ -383,7 +383,10 @@ public:
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single row
-   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, int rowSize, const mpq_t* rhs);
+   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs);
+
+   /// adds a set of rows
+   void addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs);
 #endif
 
    /// adds multiple rows
@@ -394,7 +397,7 @@ public:
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single column
-   void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, int colSize, const mpq_t* upper);
+   void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper);
 #endif
 
    /// adds multiple columns
