@@ -1308,6 +1308,179 @@ public:
    //@}
 
    // ------------------------------------------------------------------------------------------------------------------
+   /**@name Construction of dual problem */
+   //@{
+
+   /// Building the dual problem from a given LP
+   virtual void buildDualProblem(SPxLPBase* dualLP)
+   {
+      LPRowSetBase<R> dualrows(nCols());
+      LPColSetBase<R> dualcols;
+      DSVectorBase<R> col(1);
+
+      for( int i = 0; i < nCols(); ++i )
+      {
+         if( lower(i) == R(-infinity) && upper(i) == R(infinity) ) // unrestricted variables
+            dualrows.create(0, R(obj(i)), R(obj(i)));
+         else if( lower(i) == R(-infinity) ) // no lower bound is set, indicating a <= 0 variable
+         {
+            if( upper(i) == 0 ) // standard bound variable
+            {
+               if( spxSense() == MINIMIZE )
+                  dualrows.create(0, R(obj(i)), R(infinity));
+               else
+                  dualrows.create(0, R(-infinity), R(obj(i)));
+            }
+            else // additional upper bound on the variable
+            {
+               col.add(i, R(1.0));
+               if( spxSense() == MINIMIZE )
+               {
+                  dualrows.create(0, R(obj(i)), R(infinity));
+                  dualcols.add(upper(i), R(-infinity), col, R(0.0));
+               }
+               else
+               {
+                  dualrows.create(0, R(-infinity), R(obj(i)));
+                  dualcols.add(upper(i), R(0.0), col, R(infinity));
+               }
+               col.clear();
+            }
+         }
+         else if( upper(i) == R(infinity) ) // no upper bound set, indicating a >= 0 variable
+         {
+            if( lower(i) == 0 ) // standard bound variable
+            {
+               if( spxSense() == MINIMIZE )
+                  dualrows.create(0, R(-infinity), R(obj(i)));
+               else
+                  dualrows.create(0, R(obj(i)), R(infinity));
+            }
+            else // additional lower bound on the variable
+            {
+               col.add(i, R(1.0));
+               if( spxSense() == MINIMIZE )
+               {
+                  dualrows.create(0, R(-infinity), R(obj(i)));
+                  dualcols.add(lower(i), R(0.0), col, R(infinity));
+               }
+               else
+               {
+                  dualrows.create(0, R(obj(i)), R(infinity));
+                  dualcols.add(lower(i), R(-infinity), col, R(0.0));
+               }
+               col.clear();
+            }
+         }
+         else // a bounded variable
+         {
+            if( lower(i) == 0 ) // variable bounded between 0 and upper(i)
+            {
+               col.add(i, R(1.0));
+               if( spxSense() == MINIMIZE )
+               {
+                  dualrows.create(0, R(-infinity), R(obj(i)));
+                  dualcols.add(upper(i), R(-infinity), col, R(0.0));
+               }
+               else
+               {
+                  dualrows.create(0, R(obj(i)), R(infinity));
+                  dualcols.add(upper(i), R(0.0), col, R(infinity));
+               }
+               col.clear();
+            }
+            else if( upper(i) == 0 ) // variable bounded between lower(i) and 0
+            {
+               col.add(i, R(1.0));
+               if( spxSense() == MINIMIZE )
+               {
+                  dualrows.create(0, R(obj(i)), R(infinity));
+                  dualcols.add(lower(i), R(0.0), col, R(infinity));
+               }
+               else
+               {
+                  dualrows.create(0, R(-infinity), R(obj(i)));
+                  dualcols.add(lower(i), R(-infinity), col, R(0.0));
+               }
+               col.clear();
+            }
+            else // variable bounded between lower(i) and upper(i)
+            {
+               dualrows.create(0, R(obj(i)), R(obj(i)));
+
+               col.add(i, R(1.0));
+               if( spxSense() == MINIMIZE )
+               {
+                  dualcols.add(lower(i), R(0.0), col, R(infinity));
+                  dualcols.add(upper(i), R(-infinity), col, R(0.0));
+               }
+               else
+               {
+                  dualcols.add(lower(i), R(-infinity), col, R(0.0));
+                  dualcols.add(upper(i), R(0.0), col, R(infinity));
+               }
+               col.clear();
+            }
+         }
+      }
+
+      // adding the empty rows to the dual LP
+      dualLP->addRows(dualrows);
+
+
+      // iterating over each of the rows to create dual columns
+      for( int i = 0; i < nRows(); ++i )
+      {
+         // checking the type of the row
+         switch( rowType(i) )
+         {
+            case LPRowBase<R>::RANGE: // range constraint, requires the addition of two dual variables
+               if( spxSense() == MINIMIZE )
+               {
+                  dualcols.add(lhs(i), R(0.0), rowVector(i), R(infinity));
+                  dualcols.add(rhs(i), R(-infinity), rowVector(i), R(0.0));
+               }
+               else
+               {
+                  dualcols.add(lhs(i), R(-infinity), rowVector(i), R(0.0));
+                  dualcols.add(rhs(i), R(0.0), rowVector(i), R(infinity));
+               }
+               break;
+
+            case LPRowBase<R>::GREATER_EQUAL: // >= constraint
+               if( spxSense() == MINIMIZE )
+                  dualcols.add(lhs(i), R(0.0), rowVector(i), R(infinity));
+               else
+                  dualcols.add(lhs(i), R(-infinity), rowVector(i), R(0.0));
+               break;
+
+            case LPRowBase<R>::LESS_EQUAL: // <= constriant
+               if( spxSense() == MINIMIZE )
+                  dualcols.add(rhs(i), R(-infinity), rowVector(i), R(0.0));
+               else
+                  dualcols.add(rhs(i), R(0.0), rowVector(i), R(infinity));
+               break;
+
+            default: //Equality constraint
+                  dualcols.add(rhs(i), R(-infinity), rowVector(i), R(infinity));
+               break;
+         }
+      }
+
+      // adding the filled columns to the dual LP
+      dualLP->addCols(dualcols);
+
+      // setting the sense of the dual LP
+      if( spxSense() == MINIMIZE )
+         dualLP->thesense = MAXIMIZE;
+      else
+         dualLP->thesense = MINIMIZE;
+   }
+
+   //@}
+
+
+   // ------------------------------------------------------------------------------------------------------------------
    /**@name Miscellaneous */
    //@{
 
