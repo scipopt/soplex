@@ -1842,6 +1842,32 @@ namespace soplex
 
       _invalidateSolution();
    }
+
+
+
+   /// adds a set of columns
+   void SoPlex::addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper)
+   {
+      assert(_rationalLP != 0);
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
+         return;
+
+      _rationalLP->addCols(obj, lower, colValues, colIndices, colStarts, colLengths, numCols, numValues, upper);
+      for( int i = numColsRational() - numCols; i < numColsRational(); i++ )
+         _colTypes.append(_rangeTypeRational(lowerRational(i), upperRational(i)));
+
+      if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
+      {
+         LPColSetReal lpcolset;
+         for( int i = numColsRational() - numCols; i < numColsRational(); i++ )
+            lpcolset.add(Real(maxObjRational(i)) * (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+               Real(lowerRational(i)), DSVectorReal(_rationalLP->colVector(i)), Real(upperRational(i)));
+         _addColsReal(lpcolset);
+      }
+
+      _invalidateSolution();
+   }
 #endif
 
 

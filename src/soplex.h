@@ -398,6 +398,9 @@ public:
 #ifdef SOPLEX_WITH_GMP
    /// adds a single column
    void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper);
+
+   /// adds a set of columns
+   void addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper);
 #endif
 
    /// adds multiple columns
