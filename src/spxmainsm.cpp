@@ -657,7 +657,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       up = 0.0;
 
    assert(LErel(lo, up));
-   ASSERT_WARN( "WMAISM01", isNotZero(aij) );
+   ASSERT_WARN( "WMAISM01", isNotZero(aij, 1.0 / infinity) );
 
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
    {
@@ -1629,7 +1629,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          Real aij = row.value(k);
          int  j   = row.index(k);
 
-         ASSERT_WARN( "WMAISM11", isNotZero(aij) );
+         ASSERT_WARN( "WMAISM11", isNotZero(aij, 1.0 / infinity) );
 
          if (aij > 0.0)
          {
@@ -1669,7 +1669,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             redundantLower = false;
             redundantUpper = false;
 
-            ASSERT_WARN( "WMAISM12", isNotZero(aij) );
+            ASSERT_WARN( "WMAISM12", isNotZero(aij, 1.0 / infinity) );
 
             if (aij > 0.0)
             {
@@ -2027,7 +2027,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
 
-            ASSERT_WARN( "WMAISM25", isNotZero(aij, epsZero()) );
+            ASSERT_WARN( "WMAISM25", isNotZero(aij, 1.0 /infinity) );
 
             if (aij > 0.0)
                lp.changeLower(j, lp.upper(j));
@@ -2070,7 +2070,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             lowers[k] = lp.lower(j);
             uppers[k] = lp.upper(j);
 
-            ASSERT_WARN( "WMAISM27", isNotZero(aij, epsZero()) );
+            ASSERT_WARN( "WMAISM27", isNotZero(aij, 1.0 / infinity) );
 
             if (aij > 0.0)
                lp.changeUpper(j, lp.lower(j));
@@ -2226,7 +2226,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             int i = col.index(k);
 
             // warn since this unhandled case may slip through unnoticed otherwise
-            ASSERT_WARN( "WMAISM31", isNotZero(col.value(k), epsZero()) );
+            ASSERT_WARN( "WMAISM31", isNotZero(col.value(k), 1.0 / infinity) );
 
             if (col.value(k) > 0.0)
             {
@@ -2468,7 +2468,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             else
                throw SPxInternalCodeException("XMAISM11 This should never happen.");
 
-            ASSERT_WARN( "WMAISM39", isNotZero(aik, epsZero()) );
+            ASSERT_WARN( "WMAISM39", isNotZero(aik, 1.0 / infinity) );
 
             Real lo, up;
             Real oldLower = lp.lower(k);
@@ -2696,7 +2696,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          int  i   = lp.colVector(j).index(0);
          Real aij = lp.colVector(j).value(0);
 
-         ASSERT_WARN( "WMAISM44", isNotZero(aij, epsZero()) );
+         ASSERT_WARN( "WMAISM44", isNotZero(aij, 1.0 / infinity) );
 
          Real bound = lp.maxObj(j) / aij;
 
@@ -2732,7 +2732,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          Real aij = col.value(k);
          int  i   = col.index(k);
 
-         ASSERT_WARN( "WMAISM45", isNotZero(aij, epsZero()) );
+         ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
 
          if (aij > 0)
          {
@@ -2969,7 +2969,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
             Real aij = col.value(k);
             int  i   = col.index(k);
 
-            ASSERT_WARN( "WMAISM52", isNotZero(aij, epsZero()) );
+            ASSERT_WARN( "WMAISM52", isNotZero(aij, 1.0 / infinity) );
 
             if (scale[i] == 0.0)
                scale[i] = aij;
@@ -3109,7 +3109,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
             int i = dupRows[k].index(l);
             isLhsEqualRhs[l] = (lp.lhs(i) == lp.rhs(i));
 
-            ASSERT_WARN( "WMAISM54", isNotZero(scale[i], epsZero()) );
+            ASSERT_WARN( "WMAISM54", isNotZero(scale[i], 1.0 / infinity) );
 
             if (rowIdx == -1)
             {
@@ -3300,7 +3300,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
             Real aij = row.value(k);
             int  j   = row.index(k);
 
-            ASSERT_WARN( "WMAISM57", isNotZero(aij, epsZero()) );
+            ASSERT_WARN( "WMAISM57", isNotZero(aij, 1.0 / infinity) );
 
             if (scale[j] == 0.0)
                scale[j] = aij;
