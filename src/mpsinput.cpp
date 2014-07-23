@@ -70,7 +70,7 @@ bool MPSInput::readLine()
       // Read until we have a not comment line.
       do
       {
-         if( !m_input.getline(m_buf, sizeof(m_buf)).good() )
+         if( !m_input.getline(m_buf, sizeof(m_buf)).good() && !m_input.eof() )
             return false;
         m_lineno++;
 

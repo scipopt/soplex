@@ -15,6 +15,7 @@ interface:
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
+- fix MPS reader for files without blank line at EOF
 
 
 
