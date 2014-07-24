@@ -661,6 +661,7 @@ public:
       DataArray < int > newRows(nRows());
       int oldColNumber = nCols();
       int oldRowNumber = nRows();
+      idx = nCols();
 
       LPColSetBase<R>::memRemax(oldColNumber + numCols);
       for( i = 0; i < numCols; i++ )
@@ -670,6 +671,9 @@ public:
             LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), (S*)0, (int*)0, 0, &(upperValues[i]));
          else
             LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), &(colValues[colStarts[i]]), &(colIndices[colStarts[i]]), colLengths[i], &(upperValues[i]));
+
+         if( thesense != MAXIMIZE )
+            LPColSetBase<R>::maxObj_w(idx + i) *= -1;
       }
 
       assert(LPColSetBase<R>::isConsistent());
