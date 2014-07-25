@@ -525,12 +525,18 @@ public:
       // count additional nonzeros per column
       for( i = nCols() - 1; i >= 0; --i )
          newCols[i] = 0;
-      for( i = numValues - 1; i >= 0; --i )
+      if( numValues > 0 )
       {
-         ///@todo implement the addition of new columns as in doAddRows()
-         assert(rowIndices[i] >= 0);
-         assert(rowIndices[i] < oldColNumber);
-         newCols[rowIndices[i]]++;
+         for( i = 0; i < numRows; i++ )
+         {
+            for( j = rowStarts[i]; j < rowStarts[i] + rowLengths[i]; j++ )
+            {
+               ///@todo implement the addition of new columns as in doAddRows()
+               assert(rowIndices[j] >= 0);
+               assert(rowIndices[j] < oldColNumber);
+               newCols[rowIndices[j]]++;
+            }
+         }
       }
 
       // extend columns as required (backward because of memory efficiency reasons)
