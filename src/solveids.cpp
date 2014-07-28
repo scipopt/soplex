@@ -35,6 +35,13 @@ namespace soplex
    {
       assert(_hasBasis == true);
       assert(_solver.rep() == SPxSolver::ROW);
+      assert(_isRealLPLoaded == true);
+
+      DVector reducedLPDualVector;
+      DVector compLPPrimalVector;
+
+
+      _loadedLP = IDS_REALLPLOADED;
 
       // start timing
       _statistics->solvingTime.start();
@@ -44,118 +51,320 @@ namespace soplex
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
 
+      // creating copies of the original problem that will be manipulated to form the reduced and complementary
+      // problems.
+      _createIdsReducedAndComplementaryProblems();
+
       // creating the initial reduced problem from the basis information
       _formIdsReducedProblem();
 
+      for( int i = 0; i < 1; i++ )
+      {
+         // solve the reduced problem
+         assert(_loadedLP == IDS_REDLPLOADED);
+         _solver.solve();
+         // get the dual solutions from the reduced problem
+         reducedLPDualVector.reSize(_solver.nRows());
+         _solver.getDual(reducedLPDualVector);
+
+         // create the complementary problem using the solution to the reduced problem
+         _formIdsComplementaryProblem();
+
+         // solve the complementary problem
+         assert(_loadedLP == IDS_COMPLPLOADED);
+         _solver.solve();
+         // get the primal solutions from the complementary problem
+         compLPPrimalVector.reSize(_solver.nCols());
+         _solver.getPrimal(compLPPrimalVector);
+
+         // update the reduced problem
+         _idsCompLP = &_solver;
+         _solver.loadLP(*_idsRedLP);
+         _loadedLP = IDS_REDLPLOADED;
+         _updateIdsReducedProblem(reducedLPDualVector, compLPPrimalVector);
+      }
 
       // stop timing
       _statistics->solvingTime.stop();
    }
 
+   /// creating copies of the original problem that will be manipulated to form the reduced and complementary problems
+   void SoPlex::_createIdsReducedAndComplementaryProblems()
+   {
+      // the reduced problem is formed from the current problem
+      // So, we copy the _solver to the _realLP and work on the _solver
+      // NOTE: there is no need to preprocess because we always have a starting basis.
+      _realLP = 0;
+      spx_alloc(_realLP);
+      _realLP = new (_realLP) SPxLPIds(_solver);
+      _loadedLP = IDS_REDLPLOADED;
+
+      // allocating memory for the reduced problem rows flag array
+      _idsReducedProbRows = 0;
+      spx_alloc(_idsReducedProbRows, numRowsReal());
+
+      // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
+      // a positive reduced cost.
+      _idsCompLP = 0;
+      spx_alloc(_idsCompLP);
+      _idsCompLP = new (_idsCompLP) SPxLPIds(_solver);
+   }
+   
+
    /// forms the reduced problem
    void SoPlex::_formIdsReducedProblem()
    {
+      assert(_loadedLP == IDS_REDLPLOADED);
       int* bind = 0;
       int* nonposind = 0;
       int* compatind = 0;
+      int* rowsforremoval = 0;
+      int* colsforremoval = 0;
       int nnonposind = 0;
       int ncompatind = 0;
-
-
-      // the improved dual simplex modifies the LP to form a reduced problem and complementary problem. To achieve this
-      // it is necessary to copy the current LP and then perform the modifications on the copy.
-      // copying the current LP information
-      _idsLP = 0;
-      spx_alloc(_idsLP);
-      _idsLP = new (_idsLP) SPxLPIds(_solver);
 
 
       // get thie indices of the rows with positive dual multipliers and columns with positive reduced costs.
       spx_alloc(bind, numColsReal());
       spx_alloc(nonposind, numColsReal());
-      _getNonPositiveDualMultiplierInds(nonposind, bind, &nnonposind);
+      spx_alloc(colsforremoval, numColsReal());
+      _getNonPositiveDualMultiplierInds(nonposind, bind, colsforremoval, &nnonposind);
 
 
       // get the compatible columns from the constraint matrix w.r.t the current basis matrix
       spx_alloc(compatind, numRowsReal());
-      _getCompatibleColumns(nonposind, compatind, nnonposind, &ncompatind);
+      spx_alloc(rowsforremoval, numRowsReal());
+      _getCompatibleColumns(nonposind, compatind, rowsforremoval, nnonposind, &ncompatind);
 
 
+      // delete rows and columns from the LP to form the reduced problem
+      _deleteRowsAndColumnsReducedProblem(nonposind, rowsforremoval);
+
+      // freeing allocated memory
+      spx_free(rowsforremoval);
+      spx_free(compatind);
+      spx_free(colsforremoval);
+      spx_free(nonposind);
+      spx_free(bind);
    }
 
-   void SoPlex::_getNonPositiveDualMultiplierInds(int* nonposind, int* bind, int* nnonposind) const
+   /// forms the complementary problem
+   void SoPlex::_formIdsComplementaryProblem()
    {
-      nnonposind = 0;
+      int* bind = 0;
+      int* nonposind = 0;
+      int* colsforremoval = 0;
+      int nnonposind = 0;
+
+      // get the indices of the rows with positive dual multipliers and columns with positive reduced costs.
+      spx_alloc(bind, numColsReal());
+      spx_alloc(nonposind, numColsReal());
+      spx_alloc(colsforremoval, numColsReal());
+      _getNonPositiveDualMultiplierInds(nonposind, bind, colsforremoval, &nnonposind);
+
+
+      // delete rows and columns from the LP to form the reduced problem
+      _deleteAndUpdateRowsComplementaryProblem(nonposind, nnonposind);
+
+      // initialising the arrays to store the row id's from the primal and the col id's from the dual
+      _idsPrimalRowIDs.reSize(2*_idsCompLP->nRows());
+      _idsDualColIDs.reSize(2*_idsCompLP->nRows());
+      _nPrimalRows = 0;
+      _nDualCols = 0;
+
+      // convert complementary problem to dual problem
+      SPxLPIds* compDualLP = 0;
+      spx_alloc(compDualLP);
+      compDualLP = new (compDualLP) SPxLPIds();
+      _idsCompLP->buildDualProblem(compDualLP, _idsPrimalRowIDs.get_ptr(), _idsDualColIDs.get_ptr(), &_nPrimalRows, &_nDualCols);
+
+      _idsPrimalRowIDs.reSize(_nPrimalRows);
+      _idsDualColIDs.reSize(_nDualCols);
+
+      _idsCompLP = compDualLP;
+
+      assert(_loadedLP == IDS_REDLPLOADED);
+      _idsRedLP = &_solver;
+      _solver.loadLP(*_idsCompLP);
+      _loadedLP = IDS_COMPLPLOADED;
+
+      // freeing allocated memory
+      spx_free(compDualLP);
+      spx_free(colsforremoval);
+      spx_free(nonposind);
+      spx_free(bind);
+   }
+
+   /// updates the reduced problem with additional rows using the solution to the complementary problem
+   void SoPlex::_updateIdsReducedProblem(DVector dualVector, DVector compPrimalVector)
+   {
+      assert(_loadedLP == IDS_REDLPLOADED);
+
+      LPRowSet updaterows;
+
+      Real maxDualRatio = infinity;
+
+      for( int i = 0; i < _nPrimalRows; i++ )
+      {
+         Real reducedProbDual = 0;
+         Real compProbPrimal = 0;
+         Real dualRatio = 0;
+         if( _idsReducedProbRows[_realLP->number(SPxRowId(_idsPrimalRowIDs[i]))] )
+         {
+            // retreiving the reduced problem dual solutions and the complementary problem primal solutions
+            reducedProbDual = dualVector[_solver.number(SPxRowId(_idsPrimalRowIDs[i]))]; // this is y
+            compProbPrimal = compPrimalVector[_idsCompLP->number(SPxColId(_idsDualColIDs[i]))]; // this is u
+
+            // the translation of the complementary primal problem to the dual some rows resulted in two columns.
+            if( i < _nPrimalRows - 1 && 
+                  _realLP->number(SPxRowId(_idsPrimalRowIDs[i])) == _realLP->number(SPxRowId(_idsPrimalRowIDs[i + 1])) )
+            {
+               i++;
+               // @todo make sure that this is just a simple sum
+               compProbPrimal += compPrimalVector[_idsCompLP->number(SPxColId(_idsDualColIDs[i]))]; // this is u
+            }
+
+            // updating the ratio
+            if( compProbPrimal <= 0 )
+               dualRatio = infinity;
+            else
+               dualRatio = reducedProbDual/compProbPrimal;
+
+            if( dualRatio < maxDualRatio )
+               maxDualRatio = dualRatio;
+         }
+      }
+
+      for( int i = 0; i < _nPrimalRows; i++ )
+      {
+         LPRowReal rowtoadd;
+         Real compProbPrimal = 0;
+         if( !_idsReducedProbRows[_realLP->number(SPxRowId(_idsPrimalRowIDs[i]))] )
+         {
+            // retreiving the complementary problem primal solutions
+            compProbPrimal = compPrimalVector[_idsCompLP->number(SPxColId(_idsDualColIDs[i]))]; // this is u
+
+            // the translation of the complementary primal problem to the dual some rows resulted in two columns.
+            if( i < _nPrimalRows - 1 && 
+                  _realLP->number(SPxRowId(_idsPrimalRowIDs[i])) == _realLP->number(SPxRowId(_idsPrimalRowIDs[i + 1])) )
+            {
+               i++;
+               // @todo make sure that this is just a simple sum
+               compProbPrimal += compPrimalVector[_idsCompLP->number(SPxColId(_idsDualColIDs[i]))]; // this is u
+            }
+
+            // add row to the reduced problem the computed dual is positive
+            if( compProbPrimal*maxDualRatio > 0 )
+            {
+               _realLP->getRow(_realLP->number(SPxRowId(_idsPrimalRowIDs[i])), rowtoadd);
+               updaterows.add(rowtoadd);
+               _idsReducedProbRows[_realLP->number(SPxRowId(_idsPrimalRowIDs[i]))] = true;
+            }
+         }
+      }
+
+      _solver.addRows(updaterows);
+   }
+
+
+   // This function assumes that the basis is in the row form. 
+   // @todo extend this to the case when the basis is in the column form.
+   void SoPlex::_getNonPositiveDualMultiplierInds(int* nonposind, int* bind, int* colsforremoval, int* nnonposind) const
+   {
+      assert(_loadedLP == IDS_REDLPLOADED);
+      bool delCol;
+
+      *nnonposind = 0;
 
       // iterating over all columns in the basis matrix
       // this identifies the basis indices and the indicies that are positive.
-      for( int i = 0; i < numColsReal(); ++i )
+      for( int i = 0; i < numColsReal(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
       {
-         if( baseId(i).isSPxRowId() )
+         delCol = false;
+         // @todo I have questions about my implementation of this function. I don't think that I am getting the right
+         // information. Additionally, in getCompatibleColumns the information may not be used correctly.
+         if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
          {
-            bind[i] = -1 - number(SPxRowId(baseId(i)));
+            bind[i] = -1 - _realLP->number(SPxRowId(_solver.basis().baseId(i))); // getting the corresponding row
+                                                                                   // for the original LP.
 
             //@todo need to check this regarding min and max problems
-            if( fVec()[i] <= 0 )
+            if( _solver.fVec()[i] <= 0 )
             {
-               nonposind[k] = bind[i];
-               nnonposind++;
+               nonposind[*nnonposind] = bind[i];
+               (*nnonposind)++;
+
+               delCol = true;
             }
          }
-         else if( baseId(i).isSPxColId() )
+         else if( _solver.basis().baseId(i).isSPxColId() )  // get the column id's for the columns in the basis
          {
-            bind[i] = number(SPxColId(baseId(i)));
+            bind[i] = _realLP->number(SPxColId(_solver.basis().baseId(i)));
 
-            if (spxSense() == SPxLP::MINIMIZE)
+            if (_solver.spxSense() == SPxLP::MINIMIZE)
             {
                //@todo need to check this regarding min and max problems
-               if( -fVec()[i] <= 0 )
+               if( -_solver.fVec()[i] <= 0 )
                {
-                  nonposind[k] = bind[i];
-                  nnonposind++;
+                  nonposind[*nnonposind] = bind[i];
+                  (*nnonposind)++;
+
+                  delCol = true;
                }
             }
             else
             {
                //@todo need to check this regarding min and max problems
-               if( fVec()[i] <= 0 )
+               if( _solver.fVec()[i] <= 0 )
                {
-                  nonposind[k] = bind[i];
-                  nnonposind++;
+                  nonposind[*nnonposind] = bind[i];
+                  (*nnonposind)++;
+
+                  delCol = true;
                }
             }
          }
+
+         // setting an array to identify the columns to be removed from the LP to form the reduced problem
+         if( delCol )
+            colsforremoval[i] = -1;
+         else
+            colsforremoval[i] = i;
       }
    }
 
 
    /// retrieves the compatible columns from the constraint matrix
-   void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int nnonposind, int* ncompatind)
+   void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int nnonposind,
+         int* ncompatind)
    {
       bool compatible;
       SSVector y(numColsReal());
 
-      ncompatind  = 0;
+      *ncompatind  = 0;
 
       for( int i = 0; i < numRowsReal(); ++i )
       {
+         rowsforremoval[i] = i;
+         _idsReducedProbRows[i] = true;
+
          // the rhs of this calculation are the rows of the constraint matrix
          // so we are solving y B = A_{i,.}
          try
          {
-            _solver.basis().solve(y, _solver.thevectors[i]);
+            _solver.basis().solve(y, _solver.vector(i));
          }
          catch( SPxException E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
-            return false;
          }
 
          compatible = true;
          // a compatible row is given by zeros in all columns related to the nonpositive indices
          for( int j = 0; j < nnonposind; ++j )
          {
-            if( y[nnonposind[j]] != 0 )
+            // @todo really need to check this part of the code. Run through this with Ambros or Matthias.
+            if( y[nonposind[j]] != 0 )
             {
                compatible = false;
                break;
@@ -164,37 +373,114 @@ namespace soplex
 
          if( compatible )
          {
-            compatid[k] = i;
-            ncompatind++;
+            compatind[*ncompatind] = i;
+            (*ncompatind)++;
+         }
+         else
+         {
+            // setting an array to identify the rows to be removed from the LP to form the reduced problem
+            rowsforremoval[i] = -1;
+            _idsReducedProbRows[i] = false;
          }
       }
+   }
+ 
+   // @todo need to put in a check similar to _isRealLPLoaded for the ids LP.
+   void SoPlex::_deleteRowsAndColumnsReducedProblem(int* rowsforremoval, int* colsforremoval)
+   {
+      assert(_solver != 0);
 
+      _solver.removeRows(rowsforremoval);
+      _solver.removeCols(colsforremoval);
+
+
+      // removing rows from the solver LP
+      if( _hasBasis )
+      {
+         for( int i = numRowsReal() - 1; i >= 0 && _hasBasis; i-- )
+         {
+            if( rowsforremoval[i] < 0 && _basisStatusRows[i] != SPxSolver::BASIC )
+               _hasBasis = false;
+            else if( rowsforremoval[i] >= 0 && rowsforremoval[i] != i )
+            {
+               assert(rowsforremoval[i] < numRowsReal());
+               assert(rowsforremoval[rowsforremoval[i]] < 0);
+
+               _basisStatusRows[rowsforremoval[i]] = _basisStatusRows[i];
+            }
+         }
+
+         if( _hasBasis )
+            _basisStatusRows.reSize(numRowsReal());
+
+         // removing columns from the solver LP
+         if( _hasBasis )
+         {
+            for( int i = numColsReal() - 1; i >= 0 && _hasBasis; i-- )
+            {
+               if( colsforremoval[i] < 0 && _basisStatusCols[i] == SPxSolver::BASIC )
+                  _hasBasis = false;
+               else if( colsforremoval[i] >= 0 && colsforremoval[i] != i )
+               {
+                  assert(colsforremoval[i] < numColsReal());
+                  assert(colsforremoval[colsforremoval[i]] < 0);
+
+                  _basisStatusCols[colsforremoval[i]] = _basisStatusCols[i];
+               }
+            }
+
+            if( _hasBasis )
+               _basisStatusCols.reSize(numColsReal());
+         }
+
+      }
    }
 
-
-   /// checks result of the solving process and solves again without preprocessing if necessary
-   void SoPlex::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
+   /// removing rows from the complementary problem.
+   // the rows that are removed from idsCompLP are the rows from the reduced problem that have a non-positive dual
+   // multiplier in the optimal solution.
+   void SoPlex::_deleteAndUpdateRowsComplementaryProblem(int* nonposind, int nnonposind)
    {
-      if( simplificationStatus == SPxSimplifier::INFEASIBLE )
-         _status = SPxSolver::INFEASIBLE;
-      else if( simplificationStatus == SPxSimplifier::DUAL_INFEASIBLE )
-         _status = SPxSolver::INForUNBD;
-      else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
-         _status = SPxSolver::UNBOUNDED;
-      else if( simplificationStatus == SPxSimplifier::VANISHED )
-         _status = SPxSolver::OPTIMAL;
-      else if( simplificationStatus == SPxSimplifier::OKAY )
-         _status = _solver.status();
+      assert( _idsCompLP != 0 );
 
+      int* perm = 0;
+      spx_alloc(perm, numRowsReal());
+
+      _idsCompLP->removeRows(nonposind, nnonposind, perm);
+
+      for( int i = 0; i < numRowsReal(); i++ )
+      {
+         if( _idsReducedProbRows[i] && perm[i] >= 0 )
+         {
+            // it is assumed that a ranged constraint will be at it lower bound for a minimisation problem and its upper
+            // bound for a maximisation problem.
+            // @todo this is incorrect. The setting of the bounds will depend on the type of constraint. It is possible
+            // that a <= constraint can be at its bound in a minimisation problem, hence it will require the equality to
+            // be set to the rhs.
+            // @todo ask Ambros about the constraint type. Is it set by the user or Soplex, and does it get reset when
+            // constraints are changed.
+            if (_solver.spxSense() == SPxLP::MINIMIZE)
+               _changeRhsReal(i, lhsReal(i));
+            else
+               _changeLhsReal(i, rhsReal(i));
+         }
+      }
+   }
+
+   // @todo update this function and related comments. It has only been hacked together.
+   /// checks result of the solving process and solves again without preprocessing if necessary
+   // @todo need to evaluate the solution to ensure that it is solved to optimality and then we are able to perform the
+   // next steps in the algorithm.
+   void SoPlex::_evaluateSolutionIDS()
+   {
       // process result
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
          if( !_isRealLPLoaded )
          {
-            MSG_INFO1( spxout << " --- transforming basis into original space" << std::endl; )
-            _solver.changeObjOffset(0.0);
-            _resolveWithoutPreprocessing(simplificationStatus);
+            MSG_INFO1( spxout << " --- updating the basis partitioning" << std::endl; )
+            // Need to solve the complementary problem
             return;
          }
          else
@@ -204,35 +490,21 @@ namespace soplex
       case SPxSolver::UNBOUNDED:
       case SPxSolver::INFEASIBLE:
       case SPxSolver::INForUNBD:
-         // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
+      case SPxSolver::SINGULAR:
+      case SPxSolver::ABORT_CYCLING:
+         // when solving the reduced problem it should not be possible that the problem is infeasible or unbounded. This
+         // result is a check to make sure that the partitioning is correct.
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
-            _preprocessAndSolveReal(false);
+            // in this situation the original problem should be solved again.
+            _solver.changeObjOffset(0.0); // NOTE: What is this????
+            // build in some recourse to quit the IDS if the reduced problem is infeasible or unbounded
             return;
          }
          else
             _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
          break;
 
-      case SPxSolver::SINGULAR:
-         // if preprocessing was applied, try to run again without to avoid singularity
-         if( !_isRealLPLoaded )
-         {
-            _solver.changeObjOffset(0.0);
-            _preprocessAndSolveReal(false);
-            return;
-         }
-         break;
-
-      case SPxSolver::ABORT_CYCLING:
-         // if preprocessing was applied, try to run again without to avoid cycling
-         if( !_isRealLPLoaded )
-         {
-            _solver.changeObjOffset(0.0);
-            _preprocessAndSolveReal(false);
-            return;
-         }
          // else fallthrough
       case SPxSolver::ABORT_TIME:
       case SPxSolver::ABORT_ITER:
@@ -263,251 +535,5 @@ namespace soplex
       }
    }
 
-
-
-   /// solves real LP with/without preprocessing
-   void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
-   {
-      _statistics->preprocessingTime.start();
-
-      if( applyPreprocessing )
-      {
-         _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex::INFTY));
-      }
-      else
-      {
-         _disableSimplifierAndScaler();
-         ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::INFTY));
-      }
-
-      applyPreprocessing = (_simplifier != 0 || _scaler != 0);
-
-      if( _isRealLPLoaded )
-      {
-         assert(_realLP == &_solver);
-
-         // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
-         // if preprocessing is turned on
-         if( applyPreprocessing )
-         {
-            _realLP = 0;
-            spx_alloc(_realLP);
-            _realLP = new (_realLP) SPxLPReal(_solver);
-            _isRealLPLoaded = false;
-         }
-      }
-      else
-      {
-         assert(_realLP != &_solver);
-
-         // ensure that the solver has the original problem
-         _solver.loadLP(*_realLP);
-
-         // load basis if available
-         if( _hasBasis )
-         {
-            assert(_basisStatusRows.size() == numRowsReal());
-            assert(_basisStatusCols.size() == numColsReal());
-
-            ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
-            ///      entries); fix either in SPxSolver or in SPxBasis
-            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-         }
-
-         // if there is no preprocessing, then the original and the transformed problem are identical and it is more
-         // memory-efficient to keep only the problem in the solver
-         if( !applyPreprocessing )
-         {
-            _realLP->~SPxLPReal();
-            spx_free(_realLP);
-            _realLP = &_solver;
-            _isRealLPLoaded = true;
-         }
-      }
-
-      // assert that we have two problems if and only if we apply preprocessing
-      assert(_realLP == &_solver || applyPreprocessing);
-      assert(_realLP != &_solver || !applyPreprocessing);
-
-      // apply problem simplification
-      SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
-      if( _simplifier != 0 )
-      {
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL));
-         _solver.changeObjOffset(_simplifier->getObjoffset());
-      }
-
-      _statistics->preprocessingTime.stop();
-
-      // run the simplex method if problem has not been solved by the simplifier
-      if( simplificationStatus == SPxSimplifier::OKAY )
-      {
-         if( _scaler != 0 )
-            _scaler->scale(_solver);
-
-         _solveRealLPAndRecordStatistics();
-      }
-
-      // check the result and run again without preprocessing if necessary
-      _evaluateSolutionReal(simplificationStatus);
-   }
-
-
-
-   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void SoPlex::_resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus)
-   {
-      assert(!_isRealLPLoaded);
-      assert(_simplifier != 0 || _scaler != 0);
-      assert(simplificationStatus == SPxSimplifier::VANISHED
-         || (simplificationStatus == SPxSimplifier::OKAY && _solver.status() == SPxSolver::OPTIMAL));
-
-      // if simplifier is active and LP is solved in presolving or to optimality, then we unsimplify to get the basis
-      if( _simplifier != 0 )
-      {
-         assert(!_simplifier->isUnsimplified());
-
-         bool vanished = simplificationStatus == SPxSimplifier::VANISHED;
-
-         // get solution vectors for transformed problem
-         DVectorReal primal(vanished ? 0 : _solver.nCols());
-         DVectorReal slacks(vanished ? 0 : _solver.nRows());
-         DVectorReal dual(vanished ? 0 : _solver.nRows());
-         DVectorReal redCost(vanished ? 0 : _solver.nCols());
-
-         _basisStatusRows.reSize(numRowsReal());
-         _basisStatusCols.reSize(numColsReal());
-         assert(vanished || _basisStatusRows.size() >= _solver.nRows());
-         assert(vanished || _basisStatusCols.size() >= _solver.nCols());
-
-         if( !vanished )
-         {
-            assert(_solver.status() == SPxSolver::OPTIMAL);
-
-            _solver.getPrimal(primal);
-            _solver.getSlacks(slacks);
-            _solver.getDual(dual);
-            _solver.getRedCost(redCost);
-
-            // unscale vectors
-            if( _scaler != 0 )
-            {
-               _scaler->unscalePrimal(primal);
-               _scaler->unscaleSlacks(slacks);
-               _scaler->unscaleDual(dual);
-               _scaler->unscaleRedCost(redCost);
-            }
-
-            // get basis of transformed problem
-            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-         }
-
-         try
-         {
-            _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-            _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-            _hasBasis = true;
-         }
-         catch( SPxException E )
-         {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
-         }
-         catch( ... )
-         {
-            MSG_ERROR( spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
-            _status = SPxSolver::ERROR;
-         }
-      }
-      // if the original problem is not in the solver because of scaling, we also need to store the basis
-      else if( _scaler != 0 )
-      {
-         _basisStatusRows.reSize(numRowsReal());
-         _basisStatusCols.reSize(numColsReal());
-         assert(_basisStatusRows.size() == _solver.nRows());
-         assert(_basisStatusCols.size() == _solver.nCols());
-
-         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
-         _hasBasis = true;
-      }
-
-      // resolve the original problem
-      _preprocessAndSolveReal(false);
-      return;
-   }
-
-
-
-   /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
-   void SoPlex::_storeSolutionReal()
-   {
-      assert(status() != SPxSolver::OPTIMAL || _isRealLPLoaded);
-
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::UNBOUNDED || status() == SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() == SPxBasis::UNBOUNDED || _solver.basis().status() == SPxBasis::NO_PROBLEM || status() != SPxSolver::UNBOUNDED);
-
-      _solReal._hasPrimal = (status() == SPxSolver::OPTIMAL
-         || ((_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED)
-            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
-      if( _solReal._hasPrimal )
-      {
-         _solReal._primal.reDim(_solver.nCols());
-         _solReal._slacks.reDim(_solver.nRows());
-         _solver.getPrimal(_solReal._primal);
-         _solver.getSlacks(_solReal._slacks);
-         _solReal._primalObjVal = _solver.objValue();
-      }
-
-      _solReal._hasPrimalRay = (status() == SPxSolver::UNBOUNDED && _isRealLPLoaded);
-      if( _solReal._hasPrimalRay )
-      {
-         _solReal._primalRay.reDim(_solver.nCols());
-         _solver.getPrimalray(_solReal._primalRay);
-      }
-
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::ERROR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis::DUAL || status() != SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis::INFEASIBLE || status() == SPxSolver::INFEASIBLE);
-      assert(_solver.basis().status() == SPxBasis::INFEASIBLE || _solver.basis().status() == SPxBasis::NO_PROBLEM || status() != SPxSolver::INFEASIBLE);
-
-      _solReal._hasDual = (status() == SPxSolver::OPTIMAL
-         || ((_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE)
-            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
-      if( _solReal._hasDual )
-      {
-         _solReal._dual.reDim(_solver.nRows());
-         _solReal._redCost.reDim(_solver.nCols());
-         _solver.getDual(_solReal._dual);
-         _solver.getRedCost(_solReal._redCost);
-         _solReal._dualObjVal = ( _solReal._hasPrimal ? _solReal._primalObjVal : _solver.objValue() );
-      }
-
-      _solReal._hasDualFarkas = (status() == SPxSolver::INFEASIBLE && _isRealLPLoaded);
-      if( _solReal._hasDualFarkas )
-      {
-         _solReal._dualFarkas.reDim(_solver.nRows());
-         _solver.getDualfarkas(_solReal._dualFarkas);
-      }
-
-      _hasSolReal = true;
-   }
 } // namespace soplex
 #endif

@@ -1205,13 +1205,15 @@ private:
    SPxFastRT _ratiotesterFast;
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
-   SPxLPReal* _realLP;
-   SPxLPIds* _idsLP;
+   SPxLPReal* _realLP; // the real LP is also used as the original LP for the improved dual simplex
+   SPxLPIds* _idsRedLP; // the reduced problem LP for the improved dual simplex
+   SPxLPIds* _idsCompLP; // the complementary problem LP for the improved dual simplex
    SPxSimplifier* _simplifier;
    SPxScaler* _scaler;
    SPxStarter* _starter;
 
-   bool _isRealLPLoaded;
+   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
+                         // are performed on the original LP.
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
@@ -1250,6 +1252,34 @@ private:
    bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
+
+   //@}
+
+
+   //**@name Data for the Improved Dual Simplex */
+   //@{
+
+   typedef enum
+   {
+      // the real (original) LP is loaded in the _solver variable
+      IDS_REALLPLOADED = 0,
+
+      // the reduced problem lp is loaded in the _solver variable
+      IDS_REDLPLOADED = 1,
+
+      // the complementary problem is loaded in the _solver variable
+      IDS_COMPLPLOADED = 2
+   } idsSolverStatus;
+
+   bool* _idsReducedProbRows; // flag to indicate the inclusion of a row in the reduced problem.
+   int* _idsRowStatus;
+   int* _idsColStatus;
+   DataArray < SPxRowId > _idsPrimalRowIDs; // the primal row IDs from the original problem
+   DataArray < SPxColId > _idsDualColIDs; // the dual row IDs from the complementary problem
+   int _nPrimalRows; // the number of rows original problem rows included in the complementary problem
+   int _nDualCols; // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
+
+   idsSolverStatus _loadedLP;
 
    //@}
 
@@ -1547,6 +1577,9 @@ private:
    /// solves LP using the improved dual simplex
    void _solveImprovedDualSimplex();
 
+   /// creating copies of the original problem that will be manipulated to form the reduced and complementary problems
+   void _createIdsReducedAndComplementaryProblems();
+
    /// forms the reduced problem
    void _formIdsReducedProblem();
 
@@ -1556,6 +1589,21 @@ private:
    /// forms the complementary problem
    void _formIdsComplementaryProblem();
 
+   // This function assumes that the basis is in the row form. 
+   void _getNonPositiveDualMultiplierInds(int* nonposind, int* bind, int* colsforremoval, int* nnonposind) const;
+
+   /// retrieves the compatible columns from the constraint matrix
+   void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int nnonposind, int* ncompatind);
+
+   /// deletes rows and columns from the reduced problem
+   void _deleteRowsAndColumnsReducedProblem(int* rowsforremoval, int* colsforremoval);
+
+   /// removing rows from the complementary problem.
+   void _deleteAndUpdateRowsComplementaryProblem(int* nonposind, int nnonposind);
+
+   /// evaluates the solution of the reduced problem for the IDS
+   void _evaluateSolutionIDS();
+
    /// solves the complementary problem
    void _solveIdsComplementaryProblem();
 
@@ -1563,7 +1611,7 @@ private:
    void _performIdsRatioTest();
 
    /// update the reduced problem with additional columns and rows
-   void updateIdsReducedProblem();
+   void _updateIdsReducedProblem(DVector dualVector, DVector compPrimalVector);
 
    //@}
 };
