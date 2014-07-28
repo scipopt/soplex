@@ -1312,11 +1312,27 @@ public:
    //@{
 
    /// Building the dual problem from a given LP
-   virtual void buildDualProblem(SPxLPBase* dualLP)
+   // primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
+   // dualCols must have the identical size to the primal rows.
+   virtual void buildDualProblem(SPxLPBase* dualLP, SPxRowId primalRowIds[] = 0, SPxColId dualColIds[] = 0,
+         int* nprimalrows = 0, int* ndualcols = 0)
    {
+      if( primalRowIds == 0 || dualColIds == 0 )
+      {
+         DataArray < SPxRowId > primalrowids(2*nRows());
+         DataArray < SPxColId > dualcolids(2*nRows());
+         int numprimalrows = 0;
+         int numdualcols = 0;
+
+         buildDualProblem(dualLP, primalrowids.get_ptr(), dualcolids.get_ptr(), &numprimalrows, &numdualcols);
+         return;
+      }
+
       LPRowSetBase<R> dualrows(nCols());
       LPColSetBase<R> dualcols;
       DSVectorBase<R> col(1);
+
+      int primalrowsidx = 0;
 
       for( int i = 0; i < nCols(); ++i )
       {
@@ -1435,19 +1451,33 @@ public:
          switch( rowType(i) )
          {
             case LPRowBase<R>::RANGE: // range constraint, requires the addition of two dual variables
+               assert( rowType(i) == LPRowBase<R>::RANGE );
                if( spxSense() == MINIMIZE )
                {
+                  primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+                  primalrowsidx++;
                   dualcols.add(lhs(i), R(0.0), rowVector(i), R(infinity));
+
+                  primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+                  primalrowsidx++;
                   dualcols.add(rhs(i), R(-infinity), rowVector(i), R(0.0));
                }
                else
                {
+                  primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+                  primalrowsidx++;
                   dualcols.add(lhs(i), R(-infinity), rowVector(i), R(0.0));
+
+                  primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+                  primalrowsidx++;
                   dualcols.add(rhs(i), R(0.0), rowVector(i), R(infinity));
                }
                break;
 
             case LPRowBase<R>::GREATER_EQUAL: // >= constraint
+               assert( rowType(i) == LPRowBase<R>::GREATER_EQUAL );
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
                if( spxSense() == MINIMIZE )
                   dualcols.add(lhs(i), R(0.0), rowVector(i), R(infinity));
                else
@@ -1455,6 +1485,9 @@ public:
                break;
 
             case LPRowBase<R>::LESS_EQUAL: // <= constriant
+               assert( rowType(i) == LPRowBase<R>::LESS_EQUAL );
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
                if( spxSense() == MINIMIZE )
                   dualcols.add(rhs(i), R(-infinity), rowVector(i), R(0.0));
                else
@@ -1462,13 +1495,24 @@ public:
                break;
 
             default: //Equality constraint
-                  dualcols.add(rhs(i), R(-infinity), rowVector(i), R(infinity));
+               assert( rowType(i) == LPRowBase<R>::EQUAL );
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
+               dualcols.add(rhs(i), R(-infinity), rowVector(i), R(infinity));
                break;
          }
       }
 
       // adding the filled columns to the dual LP
       dualLP->addCols(dualcols);
+
+      // setting the dual column ids for the related primal rows.
+      // this assumes that the columns are added in sequential order.
+      for( int i = 0; i < primalrowsidx; i++ )
+         dualColIds[i] = dualLP->cId(i);
+
+      (*nprimalrows) = primalrowsidx;
+      (*ndualcols) = primalrowsidx;
 
       // setting the sense of the dual LP
       if( spxSense() == MINIMIZE )
