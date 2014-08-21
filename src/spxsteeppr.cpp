@@ -71,17 +71,20 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    {
       if( thesolver->sparsePricingEnter )
       {
+         bestPrices.clear();
          bestPrices.setMax(thesolver->dim());
          prices.reMax(thesolver->dim());
       }
       if( thesolver->sparsePricingEnterCo )
       {
+         bestPricesCo.clear();
          bestPricesCo.setMax(thesolver->coDim());
          pricesCo.reMax(thesolver->coDim());
       }
    }
    if( type == SPxSolver::LEAVE && thesolver->sparsePricingLeave && thesolver->hyperPricingLeave )
    {
+      bestPrices.clear();
       bestPrices.setMax(thesolver->dim());
       prices.reMax(thesolver->dim());
    }
