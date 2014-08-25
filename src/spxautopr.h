@@ -65,10 +65,15 @@ public:
    SPxAutoPR(const SPxAutoPR& old )
       : SPxPricer(old)
       , switchIters(old.switchIters)
-      , activepricer(old.activepricer)
       , devex(old.devex)
       , steep(old.steep)
-   {}
+   {
+      assert(old.activepricer == &old.devex || old.activepricer == &old.steep);
+      if( old.activepricer == &old.devex )
+         activepricer = &devex;
+      else
+         activepricer = &steep;
+   }
    /// assignment operator
    SPxAutoPR& operator=( const SPxAutoPR& rhs)
    {
@@ -76,9 +81,14 @@ public:
       {
          SPxPricer::operator=(rhs);
          switchIters = rhs.switchIters;
-         activepricer = rhs.activepricer;
          devex = rhs.devex;
          steep = rhs.steep;
+
+         assert(rhs.activepricer == &rhs.devex || rhs.activepricer == &rhs.steep);
+         if( rhs.activepricer == &rhs.devex )
+            activepricer = &devex;
+         else
+            activepricer = &steep;
       }
 
       return *this;
