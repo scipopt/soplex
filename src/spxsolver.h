@@ -170,6 +170,18 @@ public:
       PARTIAL  
    };
 
+   /// Improved dual simplex status
+   /** The improved dual simplex requires a starting basis to perform the problem partitioning. This flag sets the
+    * status of the improved dual simplex to indicate whether the starting basis must be found or not.
+    */
+   enum IdsStatus
+   {
+      /// Starting basis has not been found yet
+      FINDSTARTBASIS = 0,
+      /// Starting basis has been found and the simplex can be executed as normal
+      DONTFINDSTARTBASIS = 1
+   };
+
    enum VarStatus
    {
       ON_UPPER,      ///< variable set to its upper bound.
@@ -259,6 +271,7 @@ private:
 
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
+   bool           getStartingIdsBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    //@}
 
 protected:
@@ -459,6 +472,8 @@ public:
    void setType(Type tp);
    /// set \ref soplex::SPxSolver::FULL "FULL" or \ref soplex::SPxSolver::PARTIAL "PARTIAL" pricing.
    void setPricing(Pricing pr);
+   /// turn on or off the improved dual simplex.
+   void setIdsStatus(IdsStatus ids_stat);
 
    /// reload LP.
    virtual void reLoad();
@@ -1798,6 +1813,11 @@ public:
          m_status = UNKNOWN;
       SPxBasis::setStatus( stat );
    }
+
+   /// get level of dual degeneracy
+   // this function is used for the improved dual simplex
+   Real getDegeneracyLevel();
+
    /// reset cumulative time counter to zero.
    void resetCumulativeTime()
    {

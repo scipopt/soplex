@@ -418,6 +418,14 @@ void SPxSolver::setPricing(Pricing pr)
    }
 }
 
+void SPxSolver::setIdsStatus(IdsStatus ids_stat)
+{
+   if( ids_stat == FINDSTARTBASIS )
+      getStartingIdsBasis = true;
+   else
+      getStartingIdsBasis = false;
+}
+
 /*
     The following method resizes all vectors and arrays of |SoPlex|
     (excluding inherited vectors).
@@ -844,6 +852,7 @@ SPxSolver::SPxSolver(
    , freeStarter (false)
    , displayFreq (200)
    , sparsePricingFactor(SPARSITYFACTOR)
+   , getStartingIdsBasis(false)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -927,6 +936,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       instableEnter = base.instableEnter;
       displayFreq = base.displayFreq;
       sparsePricingFactor = base.sparsePricingFactor;
+      getStartingIdsBasis = base.getStartingIdsBasis;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -1602,6 +1612,26 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
       ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
 
    loadBasis(ds);
+}
+
+Real SPxSolver::getDegeneracyLevel()
+{
+   int numDegenerateRows = 0;
+   Real degeneracyLevel = 0;
+
+   // iterating over all columns in the basis matrix
+   // this identifies the basis indices and those that have a zero dual multiplier (rows) or zero reduced cost (cols).
+   for( int i = 0; i < nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
+   {
+      // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
+      // reduced costs. This requirement is regardless of the objective sense.
+      if( isZero(fVec()[i]) )
+         numDegenerateRows++;
+   }
+
+   degeneracyLevel = Real(numDegenerateRows)/nCols();
+
+   return degeneracyLevel;
 }
 
 //

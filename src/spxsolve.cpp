@@ -496,6 +496,8 @@ SPxSolver::Status SPxSolver::solve()
             init();
             thepricer->setType(type());
             theratiotester->setType(type());
+
+            printf("Switching to LEAVE\n");
          }
       }
       else
@@ -797,6 +799,8 @@ SPxSolver::Status SPxSolver::solve()
             init();
             thepricer->setType(type());
             theratiotester->setType(type());
+
+            printf("Switching to ENTER\n");
          }
       }
       assert(m_status != SINGULAR);
@@ -1196,6 +1200,21 @@ bool SPxSolver::terminate()
          }
       }
    }
+
+   // the improved dual simplex requires a starting basis
+   // if the flag getStartingIdsBasis is set to true the simplex will terminate when a dual basis is found
+   if( getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL )// && iteration() % 100 == 0 )
+   {
+      Real degeneracyLevel = 0;
+      degeneracyLevel = getDegeneracyLevel();
+      printf("%d Degeneracy Level: %f\n", iteration(), degeneracyLevel);
+      if( degeneracyLevel < 0.8 && degeneracyLevel > 0.2 && iteration() > nRows()*0.2 )
+      {
+         m_status = UNKNOWN;
+         return true;
+      }
+   }
+
 
    return false;
 }

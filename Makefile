@@ -210,6 +210,7 @@ LIBOBJ		= 	changesoplex.o \
 			nameset.o \
 			rational.o \
 			slufactor.o \
+			solveids.o \
 			solverational.o \
 			solvereal.o \
 			soplex.o \

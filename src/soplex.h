@@ -722,8 +722,12 @@ public:
       /// should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
       TESTDUALINF = 2,
 
+      /// should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
+      // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
+      USEIMPROVEDDUALSIMPLEX = 3,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 3
+      BOOLPARAM_COUNT = 4
    } BoolParam;
 
    /// integer parameters
@@ -1206,6 +1210,7 @@ private:
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
    SPxLPReal* _realLP; // the real LP is also used as the original LP for the improved dual simplex
+   // @todo remove the _ideRedLP and _idsCompLP
    SPxLPIds* _idsRedLP; // the reduced problem LP for the improved dual simplex
    SPxLPIds* _idsCompLP; // the complementary problem LP for the improved dual simplex
    SPxSimplifier* _simplifier;
@@ -1270,6 +1275,12 @@ private:
       // the complementary problem is loaded in the _solver variable
       IDS_COMPLPLOADED = 2
    } idsSolverStatus;
+
+   SPxSolver _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
+                          // the LP for the reduced and complementary problem in the one solver variable. The reduced
+                          // problem will be stored in _solver and the complementary problem will be stored in
+                          // _compSolver.
+
 
    bool* _idsReducedProbRows; // flag to indicate the inclusion of a row in the reduced problem.
    int* _idsRowStatus;
@@ -1596,10 +1607,14 @@ private:
    void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int nnonposind, int* ncompatind);
 
    /// deletes rows and columns from the reduced problem
-   void _deleteRowsAndColumnsReducedProblem(int* rowsforremoval, int* colsforremoval);
+   void _deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval);
+
+   /// computes the rows to remove from the complementary problem
+   void _getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval, int* nrowsforremoval,
+         int nnonposind);
 
    /// removing rows from the complementary problem.
-   void _deleteAndUpdateRowsComplementaryProblem(int* nonposind, int nnonposind);
+   void _deleteAndUpdateRowsComplementaryProblem(int* rowsforremoval, int nrowsforremoval);
 
    /// evaluates the solution of the reduced problem for the IDS
    void _evaluateSolutionIDS();

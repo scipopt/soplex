@@ -140,6 +140,12 @@ namespace soplex
             _boolParamDescription[SoPlex::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
             _boolParamDefault[SoPlex::TESTDUALINF] = false;
 
+            // should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
+            // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
+            _boolParamName[SoPlex::USEIMPROVEDDUALSIMPLEX] = "improveddualsimplex";
+            _boolParamDescription[SoPlex::USEIMPROVEDDUALSIMPLEX] = "should the improved dual simplex be used to solve the LP?";
+            _boolParamDefault[SoPlex::USEIMPROVEDDUALSIMPLEX] = true;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -2213,8 +2219,17 @@ namespace soplex
       // the solution is no longer valid
       _invalidateSolution();
 
+      // if the improved dual simplex flag is set to true
+      if ( boolParam(SoPlex::USEIMPROVEDDUALSIMPLEX) )
+      {
+         setIntParam(SoPlex::SOLVEMODE, SOLVEMODE_REAL);
+         setIntParam(SoPlex::REPRESENTATION, REPRESENTATION_ROW);
+         setIntParam(SoPlex::ALGORITHM, ALGORITHM_ENTER);
+
+         _solveImprovedDualSimplex();
+      }
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-      if( intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
+      else if( intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
              && GE(realParam(SoPlex::FEASTOL), 1e-9) && GE(realParam(SoPlex::OPTTOL), 1e-9)) )
       {
          // ensure that tolerances are reasonable for the floating-point solver
