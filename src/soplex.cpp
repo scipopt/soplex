@@ -3254,6 +3254,11 @@ namespace soplex
             continue;
          }
 
+         assert(colStatus != SPxSolver::ON_LOWER || _solRational._primal[c] == lowerRational(c));
+         assert(colStatus != SPxSolver::ON_UPPER || _solRational._primal[c] == upperRational(c));
+         assert(colStatus != SPxSolver::FIXED || _solRational._primal[c] == lowerRational(c));
+         assert(colStatus != SPxSolver::FIXED || _solRational._primal[c] == upperRational(c));
+
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
             if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
@@ -3277,12 +3282,6 @@ namespace soplex
          }
          else
          {
-            if( _colTypes[c] == RANGETYPE_FIXED )
-            {
-               assert(lowerRational(c) == upperRational(c));
-               continue;
-            }
-
             if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
@@ -3331,14 +3330,19 @@ namespace soplex
          SPxSolver::VarStatus rowStatus = basisRowStatus(r);
          assert(rowStatus != SPxSolver::UNDEFINED);
 
+         if( _rowTypes[r] == RANGETYPE_FIXED )
+         {
+            assert(lhsRational(r) == rhsRational(r));
+            continue;
+         }
+
+         assert(rowStatus != SPxSolver::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+         assert(rowStatus != SPxSolver::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+         assert(rowStatus != SPxSolver::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+         assert(rowStatus != SPxSolver::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( _rowTypes[r] == RANGETYPE_FIXED )
-            {
-               assert(lhsRational(r) == rhsRational(r));
-               continue;
-            }
-
             if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
@@ -3368,12 +3372,6 @@ namespace soplex
          }
          else
          {
-            if( _rowTypes[r] == RANGETYPE_FIXED )
-            {
-               assert(lhsRational(r) == rhsRational(r));
-               continue;
-            }
-
             if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
