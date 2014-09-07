@@ -2575,8 +2575,11 @@ namespace soplex
                shiftValue = _feasUpper[c];
                shiftValue -= upperRational(c);
             }
-            sol._primal[c] += shiftValue;
-            sol._slacks.multAdd(shiftValue, _rationalLP->colVector(c));
+            if( sol._hasPrimal )
+            {
+               sol._primal[c] += shiftValue;
+               sol._slacks.multAdd(shiftValue, _rationalLP->colVector(c));
+            }
          }
 
          if( _lowerFinite(_colTypes[c]) )
