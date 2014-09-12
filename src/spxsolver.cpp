@@ -1614,7 +1614,7 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
    loadBasis(ds);
 }
 
-Real SPxSolver::getDegeneracyLevel()
+Real SPxSolver::getDegeneracyLevel(Vector feasvec)
 {
    int numDegenerateRows = 0;
    Real degeneracyLevel = 0;

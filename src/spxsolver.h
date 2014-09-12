@@ -1816,7 +1816,7 @@ public:
 
    /// get level of dual degeneracy
    // this function is used for the improved dual simplex
-   Real getDegeneracyLevel();
+   Real getDegeneracyLevel(Vector feasvec);
 
    /// reset cumulative time counter to zero.
    void resetCumulativeTime()

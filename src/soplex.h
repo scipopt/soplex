@@ -1282,13 +1282,19 @@ private:
                           // _compSolver.
 
 
-   bool* _idsReducedProbRows; // flag to indicate the inclusion of a row in the reduced problem.
+   DVector _idsFeasVector;       // feasibility vector calculated using unshifted bounds.
+   SPxColId _compSlackColId;     // column id of the complementary problem slack column.
+   SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
+   bool* _idsReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
    int* _idsRowStatus;
    int* _idsColStatus;
-   DataArray < SPxRowId > _idsPrimalRowIDs; // the primal row IDs from the original problem
-   DataArray < SPxColId > _idsDualColIDs; // the dual row IDs from the complementary problem
-   int _nPrimalRows; // the number of rows original problem rows included in the complementary problem
-   int _nDualCols; // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
+   DataArray < SPxRowId > _idsReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
+   DataArray < SPxRowId > _idsPrimalRowIDs;        // the primal row IDs from the original problem
+   DataArray < SPxRowId > _idsElimPrimalRowIDs;    // the primal row IDs eliminated in the complementary problem
+   DataArray < SPxColId > _idsDualColIDs;          // the dual row IDs from the complementary problem
+   int _nPrimalRows;       // the number of rows original problem rows included in the complementary problem
+   int _nElimPrimalRows;   // the number of primal rows from the original problem eliminated from the complementary prob
+   int _nDualCols;         // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
 
    idsSolverStatus _loadedLP;
 
@@ -1600,8 +1606,9 @@ private:
    /// forms the complementary problem
    void _formIdsComplementaryProblem();
 
-   // This function assumes that the basis is in the row form. 
-   void _getNonPositiveDualMultiplierInds(int* nonposind, int* bind, int* colsforremoval, int* nnonposind) const;
+   // This function assumes that the basis is in the row form.
+   void _getNonPositiveDualMultiplierInds(Vector feasVector, int* nonposind, int* bind, int* colsforremoval,
+         int* nnonposind) const;
 
    /// retrieves the compatible columns from the constraint matrix
    void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int nnonposind, int* ncompatind);
@@ -1614,7 +1621,7 @@ private:
          int nnonposind);
 
    /// removing rows from the complementary problem.
-   void _deleteAndUpdateRowsComplementaryProblem(int* rowsforremoval, int nrowsforremoval);
+   void _deleteAndUpdateRowsComplementaryProblem();
 
    /// evaluates the solution of the reduced problem for the IDS
    void _evaluateSolutionIDS();
@@ -1627,6 +1634,15 @@ private:
 
    /// update the reduced problem with additional columns and rows
    void _updateIdsReducedProblem(DVector dualVector, DVector compPrimalVector);
+
+   /// update the dual complementary problem with additional columns and rows
+   void _updateIdsComplementaryProblem(DVector dualVector);
+
+   /// checking the optimality of the original problem.
+   void _checkOriginalProblemOptimality();
+
+   /// updating the slack column coefficients to adjust for equality constraints
+   void _updateComplementarySlackColCoeff();
 
    //@}
 };
