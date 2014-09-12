@@ -150,7 +150,7 @@ public:
 
       /// move \p n elements in memory from insert position \p i to the back
       if( j > i )
-         memmove(&(data[i+n]), &(data[i]), (unsigned int) (j - i));
+         memmove(&(data[i+n]), &(data[i]), (unsigned int) (j - i) * sizeof(T));
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
