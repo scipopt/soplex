@@ -478,7 +478,7 @@ void SLUFactorRational::clear()
       spx_alloc(l.start, l.startSize);
       spx_alloc(l.row,   l.startSize);
    }
-   catch(SPxMemoryException& x)
+   catch(const SPxMemoryException& x)
    {
       freeAll();
       throw x;
@@ -684,7 +684,7 @@ SLUFactorRational& SLUFactorRational::operator=(const SLUFactorRational& old)
       {
          assign(old);
       }
-      catch(SPxMemoryException& x)
+      catch(const SPxMemoryException& x)
       {
          freeAll();
          throw x;
@@ -775,7 +775,7 @@ SLUFactorRational::SLUFactorRational()
       spx_alloc(l.start, l.startSize);
       spx_alloc(l.row,   l.startSize);
    }
-   catch(SPxMemoryException& x)
+   catch(const SPxMemoryException& x)
    {
       freeAll();
       throw x;
@@ -851,7 +851,7 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    {
       assign(old);
    }
-   catch(SPxMemoryException& x)
+   catch(const SPxMemoryException& x)
    {
       freeAll();
       throw x;

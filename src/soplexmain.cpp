@@ -697,7 +697,7 @@ int main(int argc, char* argv[])
          }
       }
    }
-   catch( SPxException& x )
+   catch( const SPxException& x )
    {
       MSG_ERROR( spxout << "Exception caught: " << x.what() << "\n" );
       returnValue = 1;
@@ -2026,7 +2026,8 @@ int main(int argc, char* argv[])
 
       return 0;
    }
-   catch(SPxException& x) {
+   catch( const SPxException& x )
+   {
       std::cout << "exception caught : " << x.what() << std::endl;
       delete [] basisname;
       if (simplifier)

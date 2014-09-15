@@ -3764,7 +3764,7 @@ namespace soplex
          {
             _solver.basis().coSolve(x, _solver.unitVector(r));
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
@@ -3839,7 +3839,7 @@ namespace soplex
          {
             _solver.basis().solve(y, rhs);
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
@@ -3908,7 +3908,7 @@ namespace soplex
          {
             _solver.basis().solve(x, _solver.unitVector(c));
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
@@ -3983,7 +3983,7 @@ namespace soplex
          {
             _solver.basis().coSolve(y, rhs);
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
@@ -4051,7 +4051,7 @@ namespace soplex
          {
             _solver.basis().solve(x, v);
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
             return false;
@@ -4092,7 +4092,7 @@ namespace soplex
          {
             _solver.basis().coSolve(y, rowrhs);
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
             return false;
@@ -6874,9 +6874,10 @@ namespace soplex
       {
          _solver.solve();
       }
-      catch( SPxException E )
+      catch( const SPxException& E )
       {
          MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving real LP.\n" );
+         _status = SPxSolver::ERROR;
       }
       catch( ... )
       {

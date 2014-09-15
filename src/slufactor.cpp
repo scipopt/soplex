@@ -487,7 +487,7 @@ void SLUFactor::clear()
       spx_alloc(l.start, l.startSize);
       spx_alloc(l.row,   l.startSize);
    }
-   catch(SPxMemoryException& x)
+   catch(const SPxMemoryException& x)
    {
       freeAll();
       throw x;
@@ -708,7 +708,7 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
       {
          assign(old);
       }
-      catch(SPxMemoryException& x)
+      catch(const SPxMemoryException& x)
       {
          freeAll();
          throw x;
@@ -807,7 +807,7 @@ SLUFactor::SLUFactor()
       spx_alloc(l.start, l.startSize);
       spx_alloc(l.row,   l.startSize);
    }
-   catch(SPxMemoryException& x)
+   catch(const SPxMemoryException& x)
    {
       freeAll();
       throw x;
@@ -890,7 +890,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    {
       assign(old);
    }
-   catch(SPxMemoryException& x)
+   catch(const SPxMemoryException& x)
    {
       freeAll();
       throw x;

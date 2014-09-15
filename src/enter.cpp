@@ -1089,7 +1089,7 @@ bool SPxSolver::enter(SPxId& enterId)
       {
          getEnterVals2(leaveIdx, enterMax, leavebound);
       }
-      catch( SPxException F )
+      catch( const SPxException& F )
       {
          rejectEnter(enterId, enterTest, enterStat);
          change(-1, none, 0);

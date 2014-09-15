@@ -806,7 +806,7 @@ void SPxBasis::change(
             }
             // with a freshly factorized, regular basis, the update is unlikely to fail; if this happens nevertheless,
             // we have to invalidate the basis to have the statuses correct
-            catch( SPxException F )
+            catch( const SPxException& F )
             {
                MSG_INFO3( spxout << "IBASIS14 problems updating factorization; invalidating factorization"
                   << std::endl; )

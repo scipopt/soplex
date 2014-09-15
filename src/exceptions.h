@@ -54,7 +54,8 @@ namespace soplex
       /**@name Access / modification */
       //@{
       /// returns exception message
-      virtual std::string what() {
+      virtual const std::string what() const
+      {
          return msg;
       }
       //@}

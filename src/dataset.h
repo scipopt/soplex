@@ -532,7 +532,7 @@ public:
       {
          spx_alloc(thekey, themax);
       }
-      catch(SPxMemoryException& x)
+      catch(const SPxMemoryException& x)
       {
          spx_free(theitem);
          throw x;
@@ -558,7 +558,7 @@ public:
       {
          spx_alloc(thekey, themax);
       }
-      catch(SPxMemoryException& x)
+      catch(const SPxMemoryException& x)
       {
          spx_free(theitem);
          throw x;
