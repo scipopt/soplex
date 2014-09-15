@@ -870,7 +870,7 @@ bool SPxSolver::leave(int leaveIdx)
             {
                getLeaveVals2(leaveMax, enterId, enterBound, newUBbound, newLBbound, newCoPrhs);
             }
-            catch( SPxException F )
+            catch( const SPxException& F )
             {
                rejectLeave(leaveNum, leaveId, leaveStat);
                change(-1, none, 0);

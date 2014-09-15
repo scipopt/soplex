@@ -802,7 +802,7 @@ SPxSolver::Status SPxSolver::solve()
       assert(m_status != SINGULAR);
 
       }
-      catch( SPxException E )
+      catch( const SPxException& E )
       {
          // if we stopped due to a singular basis, we reload the original basis and try again with tighter
          // tolerance (only once)
@@ -836,7 +836,7 @@ SPxSolver::Status SPxSolver::solve()
                init();
                theratiotester->setType(type());
             }
-            catch( SPxException Ex )
+            catch( const SPxException& Ex )
             {
                MSG_INFO2( spxout << " --- reloaded basis singular, resetting original tolerances" << std::endl; )
 

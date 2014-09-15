@@ -773,7 +773,7 @@ void SoPlexLegacy::unsimplify() const
          m_solver.getBasis(rows, cols);
          m_simplifier->unsimplify(psp_x, psp_y, psp_s, psp_r, rows, cols);
       }
-      catch(std::bad_alloc& x)
+      catch( const SPxMemoryException& x)
       {
          spx_free(rows);
          spx_free(cols);

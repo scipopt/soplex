@@ -509,7 +509,7 @@ void SPxSolver::factorize()
    {
       SPxBasis::factorize();
    }
-   catch( SPxStatusException E )
+   catch( const SPxStatusException& E )
    {
       assert(SPxBasis::status() == SPxBasis::SINGULAR);
       m_status = SINGULAR;

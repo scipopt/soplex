@@ -281,7 +281,7 @@ namespace soplex
             _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
             _hasBasis = true;
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          }

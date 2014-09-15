@@ -52,8 +52,15 @@ inline void spx_alloc(T& p, int n = 1)
 
    if (n == 0)
       n = 1;
-   
-   p = reinterpret_cast<T>(malloc(sizeof(*p) * (unsigned int) n));
+
+   try
+   {
+      p = reinterpret_cast<T>(malloc(sizeof(*p) * (unsigned int) n));
+   }
+   catch( const std::bad_alloc& )
+   {
+      throw(SPxMemoryException("Error allocating memory"));
+   }
 
    if (0 == p)
    {
@@ -73,10 +80,20 @@ inline void spx_realloc(T& p, int n)
 {
    assert(n >= 0);
 
+   /* new pointer to not lose old one in case of problems */
+   T pp;
+
    if (n == 0)
       n = 1;
 
-   T pp = reinterpret_cast<T>(realloc(p, sizeof(*p) * (unsigned int) n));
+   try
+   {
+      pp = reinterpret_cast<T>(realloc(p, sizeof(*p) * (unsigned int) n));
+   }
+   catch( const std::bad_alloc& )
+   {
+      throw(SPxMemoryException("Error reallocating memory"));
+   }
 
    if (0 == pp)
    {

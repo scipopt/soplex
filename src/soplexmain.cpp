@@ -679,7 +679,7 @@ int main(int argc, char* argv[])
          }
       }
    }
-   catch( SPxException& x )
+   catch( const SPxException& x )
    {
       MSG_ERROR( spxout << "Exception caught: " << x.what() << "\n" );
       freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
@@ -1997,7 +1997,8 @@ int main(int argc, char* argv[])
 
       return 0;
    }
-   catch(SPxException& x) {
+   catch( const SPxException& x )
+   {
       std::cout << "exception caught : " << x.what() << std::endl;
       delete [] basisname;
       if (simplifier)

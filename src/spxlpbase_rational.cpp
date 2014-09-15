@@ -474,7 +474,7 @@ bool SPxLPBase<Rational>::readLPF(
          spx_alloc(rnames);
          rnames = new (rnames) NameSet();
       }
-      catch( std::bad_alloc& x )
+      catch( const SPxMemoryException& x )
       {
          if( !p_cnames )
          {
@@ -1584,7 +1584,7 @@ bool SPxLPBase<Rational>::readMPS(
          spx_alloc(rnames);
          rnames = new (rnames) NameSet();
       }
-      catch(std::bad_alloc& x)
+      catch( const SPxMemoryException& x )
       {
          if( !p_cnames )
          {
