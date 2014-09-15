@@ -152,8 +152,10 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
    Real val = m_obj;
 
    for(int k = 0; k < m_col.size(); ++k)
+   {
       if (m_col.index(k) != m_i)
          val -= m_col.value(k) * y[m_col.index(k)];
+   }
 
    Real newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
    Real newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
@@ -295,6 +297,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       rStatus[m_i] = SPxSolver::BASIC;
       y[m_i] = 0.0;
       r[m_j] = val;
+      break;
    default:
       break;
    }
@@ -403,7 +406,7 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
-       throw SPxInternalCodeException("XMAISM18 Dimension doesn't match after this step.");
+      throw SPxInternalCodeException("XMAISM18 Dimension doesn't match after this step.");
    }
 #endif
 }
@@ -497,12 +500,14 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
 
       for(int k = 0; k < m_rows.size(); ++k)
       {
-	 Real           val = 0.0;
-	 const SVector& row = m_rows[k];
+         Real           val = 0.0;
+         const SVector& row = m_rows[k];
 
          for(int l = 0; l < row.size(); ++l)
+         {
             if (row.index(l) != m_j)
-	       val += row.value(l) * x[row.index(l)];
+               val += row.value(l) * x[row.index(l)];
+         }
 
          Real scale = maxAbs(m_lRhs[k], val);
 
@@ -515,7 +520,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
             z = 0.0;
 
          Real up = z * scale / row[m_j];
-	 slack.add(k, val);
+         slack.add(k, val);
 
          if (up < minRowUp)
          {
@@ -538,12 +543,14 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
 
       for(int k = 0; k < m_rows.size(); ++k)
       {
-	 Real           val = 0.0;
+         Real val = 0.0;
          const SVector& row = m_rows[k];
 
          for(int l = 0; l < row.size(); ++l)
+         {
             if (row.index(l) != m_j)
                val += row.value(l) * x[row.index(l)];
+         }
 
          Real scale = maxAbs(m_lRhs[k], val);
 
@@ -556,7 +563,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
             z = 0.0;
 
          Real lo = z * scale / row[m_j];
-	 slack.add(k, val);
+         slack.add(k, val);
 
          if (lo > maxRowLo)
          {
@@ -591,7 +598,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
 
       else
       {
-	 cStatus[m_j] = SPxSolver::BASIC;
+         cStatus[m_j] = SPxSolver::BASIC;
          if (m_loFree)
             rStatus[m_col.index(k)] = (m_col.value(k) > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
          else
@@ -609,7 +616,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
-       throw SPxInternalCodeException("XMAISM20 Dimension doesn't match after this step.");
+      throw SPxInternalCodeException("XMAISM20 Dimension doesn't match after this step.");
    }
 #endif
 }
@@ -748,7 +755,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
-       throw SPxInternalCodeException("XMAISM21 Dimension doesn't match after this step.");
+      throw SPxInternalCodeException("XMAISM21 Dimension doesn't match after this step.");
    }
 #endif
 }
@@ -773,8 +780,10 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
    Real aij = m_row[m_j];
 
    for(int k = 0; k < m_row.size(); ++k)
+   {
       if (m_row.index(k) != m_j)
- 	 val += m_row.value(k) * x[m_row.index(k)];
+         val += m_row.value(k) * x[m_row.index(k)];
+   }
 
    Real scale = maxAbs(m_lRhs, val);
 
@@ -806,7 +815,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
-       throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
+      throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
    }
 #endif
 }
@@ -827,8 +836,10 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       Real aik  = m_col[m_i];
 
       for(int _k = 0; _k < m_col.size(); ++_k)
+      {
          if (m_col.index(_k) != m_i)
             val -= m_col.value(_k) * y[m_col.index(_k)];
+      }
 
       y[m_i] = val / aik;
       r[m_k] = 0.0;
@@ -872,7 +883,7 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
-       throw SPxInternalCodeException("XMAISM23 Dimension doesn't match after this step.");
+      throw SPxInternalCodeException("XMAISM23 Dimension doesn't match after this step.");
    }
 #endif
 }
@@ -899,8 +910,10 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
 
    // primal:
    for(int k = 0; k < m_scale.size(); ++k)
+   {
       if (m_scale.index(k) != m_i)
          s[m_scale.index(k)] = s[m_i] / m_scale.value(k);
+   }
 
    // dual & basis:
    bool haveSetBasis = false;
@@ -1448,7 +1461,7 @@ SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
 
       if (col.size() == 0)
       {
-	 MSG_INFO3( spxout << "IMAISM08 col " << j
+         MSG_INFO3( spxout << "IMAISM08 col " << j
                            << ": empty -> maxObj=" << lp.maxObj(j)
                            << " lower=" << lp.lower(j)
                            << " upper=" << lp.upper(j); )
@@ -1955,7 +1968,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          spx_alloc(FreeConstraintPSptr);
          m_hist.append(new (FreeConstraintPSptr) FreeConstraintPS(lp, i));
 
- 	 ++remRows;
+         ++remRows;
          remNzos += row.size();
          removeRow(lp, i);
 
@@ -2329,7 +2342,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                for(int k = 0; k < col.size(); ++k)
                {
                   int l   =  col.index(k);
-		  remNzos += lp.rowVector(l).size();
+                  remNzos += lp.rowVector(l).size();
                }
 
                ++m_stat[FREE_ZOBJ_COL];
@@ -2937,92 +2950,94 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    DataArray<int>    classSize(lp.nRows());        // size of each class
    DataArray<double> scale(lp.nRows());            // scaling factor for each row
    int*              idxMem = 0;
-
    try
    {
       spx_alloc(idxMem, lp.nRows());
+      IdxSet idxSet(lp.nRows(), idxMem);           // set of feasible indices for new pClass
+
+      // init
+      pClass[0]    = 0;
+      scale[0]     = 0.0;
+      classSize[0] = lp.nRows();
+
+      for(int i = 1; i < lp.nRows(); ++i)
+      {
+         pClass[i] = 0;
+         scale[i]  = 0.0;
+         classSize[i] = 0;
+         idxSet.addIdx(i);
+      }
+
+      // stores parallel classes with non-zero colum entry
+      Array<DSVector> classSet(lp.nRows());
+      Real oldVal;
+
+      // main loop
+      for(int j = 0; j < lp.nCols(); ++j)
+      {
+         const SVector& col = lp.colVector(j);
+
+         for(int k = 0; k < col.size(); ++k)
+         {
+            Real aij = col.value(k);
+            int  i   = col.index(k);
+
+            ASSERT_WARN( "WMAISM52", isNotZero(aij, 1.0 / infinity) );
+
+            if (scale[i] == 0.0)
+               scale[i] = aij;
+
+            classSet[pClass[i]].add(i, aij / scale[i]);
+            if (--classSize[pClass[i]] == 0)
+               idxSet.addIdx(pClass[i]);
+         }
+
+         // update each parallel class with non-zero column entry
+         for(int m = 0; m < col.size(); ++m)
+         {
+            int k = pClass[col.index(m)];
+
+            if (classSet[k].size() > 0)
+            {
+               // sort classSet[k] w.r.t. scaled column values
+               ElementCompare compare;
+
+               if (classSet[k].size() > 1)
+                  SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
+
+               // use new index first
+               int classIdx = idxSet.index(0);
+               idxSet.remove(0);
+
+               for(int l = 0; l < classSet[k].size(); ++l)
+               {
+                  if (l != 0 && NErel(classSet[k].value(l), oldVal, epsZero()))
+                  {
+                     classIdx = idxSet.index(0);
+                     idxSet.remove(0);
+                  }
+
+                  pClass[classSet[k].index(l)] = classIdx;
+                  ++classSize[classIdx];
+
+                  oldVal = classSet[k].value(l);
+               }
+
+               classSet[k].clear();
+            }
+         }
+      }
    }
-   catch( const SPxMemoryException& x )
+   catch(std::bad_alloc& x)
    {
       spx_free(idxMem);
       throw x;
    }
-
-   IdxSet idxSet(lp.nRows(), idxMem);           // set of feasible indices for new pClass
-
-   // init
-   pClass[0]    = 0;
-   scale[0]     = 0.0;
-   classSize[0] = lp.nRows();
-
-   for(int i = 1; i < lp.nRows(); ++i)
+   catch(SPxMemoryException& x)
    {
-      pClass[i] = 0;
-      scale[i]  = 0.0;
-      classSize[i] = 0;
-      idxSet.addIdx(i);
+      spx_free(idxMem);
+      throw x;
    }
-
-   // stores parallel classes with non-zero colum entry
-   Array<DSVector> classSet(lp.nRows());
-   Real oldVal;
-
-   // main loop
-   for(int j = 0; j < lp.nCols(); ++j)
-   {
-      const SVector& col = lp.colVector(j);
-
-      for(int k = 0; k < col.size(); ++k)
-      {
-         Real aij = col.value(k);
-         int  i   = col.index(k);
-
-         ASSERT_WARN( "WMAISM52", isNotZero(aij, 1.0 / infinity) );
-
-         if (scale[i] == 0.0)
-            scale[i] = aij;
-
-         classSet[pClass[i]].add(i, aij / scale[i]);
-         if (--classSize[pClass[i]] == 0)
-            idxSet.addIdx(pClass[i]);
-      }
-
-      // update each parallel class with non-zero column entry
-      for(int m = 0; m < col.size(); ++m)
-      {
-         int k = pClass[col.index(m)];
-
-         if (classSet[k].size() > 0)
-         {
-            // sort classSet[k] w.r.t. scaled column values
-            ElementCompare compare;
-
-            if (classSet[k].size() > 1)
-               SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
-
-            // use new index first
-            int classIdx = idxSet.index(0);
-            idxSet.remove(0);
-
-            for(int l = 0; l < classSet[k].size(); ++l)
-            {
-               if (l != 0 && NErel(classSet[k].value(l), oldVal, epsZero()))
-               {
-                  classIdx = idxSet.index(0);
-                  idxSet.remove(0);
-               }
-
-               pClass[classSet[k].index(l)] = classIdx;
-               ++classSize[classIdx];
-
-               oldVal = classSet[k].value(l);
-            }
-
-            classSet[k].clear();
-         }
-      }
-   }
-
    spx_free(idxMem);
 
    // arrange duplicate rows using bucket sort w.r.t. their pClass values
@@ -3265,92 +3280,95 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
    DataArray<int>    classSize(lp.nCols());       // size of each class
    DataArray<double> scale(lp.nCols());           // scaling factor for each column
    int*              idxMem = 0;
-
    try
    {
       spx_alloc(idxMem, lp.nCols());
+      IdxSet idxSet(lp.nCols(), idxMem);  // set of feasible indices for new pClass
+
+      // init
+      pClass[0]    = 0;
+      scale[0]     = 0.0;
+      classSize[0] = lp.nCols();
+
+      for(int j = 1; j < lp.nCols(); ++j)
+      {
+         pClass[j] = 0;
+         scale[j]  = 0.0;
+         classSize[j] = 0;
+         idxSet.addIdx(j);
+      }
+
+      // stores parallel classes with non-zero row entry
+      Array<DSVector> classSet(lp.nCols());
+
+      Real oldVal;
+
+      // main loop
+      for(int i = 0; i < lp.nRows(); ++i)
+      {
+         const SVector& row = lp.rowVector(i);
+
+         for(int k = 0; k < row.size(); ++k)
+         {
+            Real aij = row.value(k);
+            int  j   = row.index(k);
+
+            ASSERT_WARN( "WMAISM57", isNotZero(aij, 1.0 / infinity) );
+
+            if (scale[j] == 0.0)
+               scale[j] = aij;
+
+            classSet[pClass[j]].add(j, aij / scale[j]);
+            if (--classSize[pClass[j]] == 0)
+               idxSet.addIdx(pClass[j]);
+         }
+
+         // update each parallel class with non-zero row entry
+         for(int m = 0; m < row.size(); ++m)
+         {
+            int k = pClass[row.index(m)];
+
+            if (classSet[k].size() > 0)
+            {
+               // sort classSet[k] w.r.t. scaled row values
+               ElementCompare compare;
+
+               if (classSet[k].size() > 1)
+                  SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
+
+               // use new index first
+               int classIdx = idxSet.index(0);
+               idxSet.remove(0);
+
+               for(int l = 0; l < classSet[k].size(); ++l)
+               {
+                  if (l != 0 && NErel(classSet[k].value(l), oldVal, epsZero()))
+                  {
+                     // start new parallel class
+                     classIdx = idxSet.index(0);
+                     idxSet.remove(0);
+                  }
+
+                  pClass[classSet[k].index(l)] = classIdx;
+                  ++classSize[classIdx];
+
+                  oldVal = classSet[k].value(l);
+               }
+
+               classSet[k].clear();
+            }
+         }
+      }
    }
-   catch( const SPxMemoryException& x )
+   catch(std::bad_alloc& x)
    {
       spx_free(idxMem);
       throw x;
    }
-
-   IdxSet idxSet(lp.nCols(), idxMem);  // set of feasible indices for new pClass
-
-   // init
-   pClass[0]    = 0;
-   scale[0]     = 0.0;
-   classSize[0] = lp.nCols();
-
-   for(int j = 1; j < lp.nCols(); ++j)
+   catch(SPxMemoryException& x)
    {
-      pClass[j] = 0;
-      scale[j]  = 0.0;
-      classSize[j] = 0;
-      idxSet.addIdx(j);
-   }
-
-   // stores parallel classes with non-zero row entry
-   Array<DSVector> classSet(lp.nCols());
-
-   Real oldVal;
-
-   // main loop
-   for(int i = 0; i < lp.nRows(); ++i)
-   {
-      const SVector& row = lp.rowVector(i);
-
-      for(int k = 0; k < row.size(); ++k)
-      {
-         Real aij = row.value(k);
-         int  j   = row.index(k);
-
-         ASSERT_WARN( "WMAISM57", isNotZero(aij, 1.0 / infinity) );
-
-         if (scale[j] == 0.0)
-            scale[j] = aij;
-
-         classSet[pClass[j]].add(j, aij / scale[j]);
-         if (--classSize[pClass[j]] == 0)
-            idxSet.addIdx(pClass[j]);
-      }
-
-      // update each parallel class with non-zero row entry
-      for(int m = 0; m < row.size(); ++m)
-      {
-         int k = pClass[row.index(m)];
-
-         if (classSet[k].size() > 0)
-         {
-            // sort classSet[k] w.r.t. scaled row values
-            ElementCompare compare;
-
-            if (classSet[k].size() > 1)
-               SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
-
-            // use new index first
-            int classIdx = idxSet.index(0);
-            idxSet.remove(0);
-
-            for(int l = 0; l < classSet[k].size(); ++l)
-            {
-               if (l != 0 && NErel(classSet[k].value(l), oldVal, epsZero()))
-               {
-                  // start new parallel class
-                  classIdx = idxSet.index(0);
-                  idxSet.remove(0);
-               }
-
-               pClass[classSet[k].index(l)] = classIdx;
-               ++classSize[classIdx];
-
-               oldVal = classSet[k].value(l);
-            }
-
-            classSet[k].clear();
-         }
-      }
+      spx_free(idxMem);
+      throw x;
    }
 
    spx_free(idxMem);
@@ -3555,7 +3573,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                      }
                   }
                }
-            }
+	    }
          }
       }
    }

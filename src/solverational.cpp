@@ -3053,8 +3053,8 @@ namespace soplex
                   _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
                   returnedBasis = true;
                   result = SPxSolver::OPTIMAL;
-                  break;
                }
+               break;
             case SPxSolver::ABORT_TIME:
             case SPxSolver::ABORT_ITER:
             case SPxSolver::ABORT_VALUE:

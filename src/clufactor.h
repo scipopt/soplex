@@ -62,7 +62,11 @@ public:
       int    mkwtz;               ///< markowitz number of pivot 
 
       Pring() : next(0), prev(0)  ///< constructor
-      {}      
+      {
+         mkwtz = -1;
+         idx = -1;
+         pos = -1;
+      }
 
    private:
       Pring(const Pring&);             ///< blocked copy constructor

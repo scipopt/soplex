@@ -988,5 +988,7 @@ bool SPxSolver::leave(int leaveIdx)
          return true;
       }
    }
+   // only for correctness: the return value is ignored anyway
+   return false;
 }
 } // namespace soplex
