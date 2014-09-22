@@ -60,13 +60,14 @@ bool MPSInput::readLine()
    int   space;
    char* s;
    bool  is_marker;
+   bool  is_comment;
 
    do
    {
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
       is_marker = false;
    
-      // Read until we have a not comment line.
+      // Read until we have a non-empty, non-comment line.
       do
       {
          if( !m_input.getline(m_buf, sizeof(m_buf)).good() && !m_input.eof() )
@@ -75,17 +76,25 @@ bool MPSInput::readLine()
 
         MSG_DEBUG( spxout << "DMPSIN01 Line " << m_lineno
                           << " " << m_buf << std::endl; )
-      } 
-      while(*m_buf == '*');
 
-      /* Normalize line
-       */
+        /* check if comment line */
+        is_comment = true;
+        if( m_buf[0] == '*' )
+           continue;
+
+        /* normalize line and check if it is empty */
+        len = int(strlen(m_buf));
+        for( int i = 0; i < len; i++ )
+        {
+           if( m_buf[i] == '\t' || m_buf[i] == '\n' || m_buf[i] == '\r' )
+              m_buf[i] = BLANK;
+           else if( m_buf[i] != BLANK )
+              is_comment = false;
+        }
+      }
+      while( is_comment );
+
       len = int(strlen(m_buf));
-
-      for(int i = 0; i < len; i++)
-         if ((m_buf[i] == '\t') || (m_buf[i] == '\n') || (m_buf[i] == '\r'))
-            m_buf[i] = BLANK;
-      
       if (len < 80)
          clear_from(m_buf, len);
 

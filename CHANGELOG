@@ -17,6 +17,7 @@ interface & parameters:
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
+- allow empty lines in MPS files
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG

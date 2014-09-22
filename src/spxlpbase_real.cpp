@@ -891,8 +891,6 @@ syntax_error:
    if( p_rnames == 0 )
       spx_free(rnames);
 
-   MSG_DEBUG( spxout << "DLPFRD16\n" << *this; )
-
    return finished;
 }
 
@@ -1021,6 +1019,9 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Real>& rset, NameSet& rnames
 
          return;
       }
+
+      if( (mps.field1() == 0) || (mps.field2() == 0) )
+         break;
 
       if( *mps.field1() == 'N' )
       {
