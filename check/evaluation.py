@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['name','rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
+columns = ['name','rows','cols','primalviol','dualviol','iters','refinements','solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
