@@ -44,6 +44,7 @@ do
     OUTFILE=$DIR/$EVALFILE.out
     ERRFILE=$DIR/$EVALFILE.err
     RESFILE=$DIR/$EVALFILE.res
+    SETFILE=$DIR/$EVALFILE.set
 
     # check if the eval file exists; if this is the case construct the overall solution files
     if test -e $DIR/$EVALFILE.eval
@@ -91,6 +92,16 @@ do
                     rm -f $FILE
                 fi
             fi
+
+	         FILE=$i.set
+	         if test -e $FILE
+	         then
+	             cp $FILE $SETFILE
+	             if test "$REMOVE" = "1"
+	             then
+		              rm -f $FILE
+	             fi
+	         fi
 
         done
 
