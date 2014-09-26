@@ -14,6 +14,7 @@ interface & parameters:
 - new make option EG={true,false} to build with EGlib
 - bound flipping is now enabled by default
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
+- new command line option --writefile to save LP file as read by SoPlex
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier

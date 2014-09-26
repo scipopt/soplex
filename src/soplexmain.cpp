@@ -49,6 +49,7 @@ void printUsage(const char* const argv[], int idx)
       "general options:\n"
       "  --readbas=<basfile>    read starting basis from file\n"
       "  --writebas=<basfile>   write terminal basis to file\n"
+      "  --writefile=<lpfile>   write LP to file in LP or MPS format depending on extension\n"
       "  --<type>:<name>=<val>  change parameter value using syntax of settings file entries\n"
       "  --loadset=<setfile>    load parameters from settings file (overruled by command line parameters)\n"
       "  --saveset=<setfile>    save parameters to settings file\n"
@@ -263,6 +264,7 @@ int main(int argc, char* argv[])
    const char* lpfilename;
    char* readbasname = 0;
    char* writebasname = 0;
+   char* writefilename = 0;
    char* loadsetname = 0;
    char* savesetname = 0;
    char* diffsetname = 0;
@@ -331,6 +333,15 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[9];
                      writebasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                  }
+               }
+               // --writefile=<lpfile> : write LP to file
+               else if( strncmp(option, "writefile=", 10) == 0 )
+               {
+                  if( writefilename == 0 )
+                  {
+                     char* filename = &option[10];
+                     writefilename = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
                   }
                }
                // --loadset=<setfile> : load parameters from settings file
@@ -596,6 +607,21 @@ int main(int argc, char* argv[])
          MSG_ERROR( spxout << "Error while reading file <" << lpfilename << ">.\n" );
          returnValue = 1;
          goto TERMINATE_FREESTRINGS;
+      }
+
+      // write LP if specified
+      if( writefilename != 0 )
+      {
+         if( !soplex->writeFileReal(writefilename, &rownames, &colnames) )
+         {
+            MSG_ERROR( spxout << "Error while writing file <" << writefilename << ">.\n\n" );
+            returnValue = 1;
+            goto TERMINATE_FREESTRINGS;
+         }
+         else
+         {
+            MSG_INFO1( spxout << "Written LP to file <" << writefilename << ">.\n\n" );
+         }
       }
 
       // read basis file if specified
