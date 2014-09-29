@@ -13,6 +13,8 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#define WITH_WARNINGS
+
 #include <assert.h>
 
 #include "spxdefines.h"
