@@ -1424,6 +1424,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
 /// Process BOUNDS section.
 static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const NameSet& cnames, DIdxSet* intvars)
 {
+   DIdxSet oldbinvars;
    char bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int  idx;
    Rational val;
@@ -1483,21 +1484,29 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
                   MSG_WARNING( spxout <<"WMPSRD07 Warning: malformed rational value in MPS file\n" );
                }
             }
+
+            // ILOG extension (Integer Bound)
+            if( mps.field1()[1] == 'I' )
+            {
+               if( intvars != 0 )
+                  intvars->addIdx(idx);
+
+               // if the variable has appeared in the MARKER section of the COLUMNS section then its default bounds were
+               // set to 0,1; the first time it is declared integer we need to change to default bounds 0,infinity
+               if( oldbinvars.number(idx) < 0 )
+               {
+                  cset.upper_w(idx) = infinity;
+                  oldbinvars.addIdx(idx);
+               }
+            }
+
             switch( *mps.field1() )
             {
             case 'L':
                cset.lower_w(idx) = val;
-
-               // ILOG extension (Integer Lower Bound)
-               if( (intvars != 0) && (mps.field1()[1] == 'I') )
-                  intvars->addIdx(idx);
                break;
             case 'U':
                cset.upper_w(idx) = val;
-
-               // ILOG extension (Integer Upper Bound)
-               if( (intvars != 0) && (mps.field1()[1] == 'I') )
-                  intvars->addIdx(idx);
                break;
             case 'F':
                if( mps.field1()[1] == 'X' )
