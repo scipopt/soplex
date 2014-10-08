@@ -290,6 +290,20 @@ namespace soplex
       friend bool operator>(const double& r, const Rational& s);
       friend bool operator>=(const double& r, const Rational& s);
 
+      friend bool operator!=(const Rational& r, const long double& s);
+      friend bool operator==(const Rational& r, const long double& s);
+      friend bool operator<(const Rational& r, const long double& s);
+      friend bool operator<=(const Rational& r, const long double& s);
+      friend bool operator>(const Rational& r, const long double& s);
+      friend bool operator>=(const Rational& r, const long double& s);
+
+      friend bool operator!=(const long double& r, const Rational& s);
+      friend bool operator==(const long double& r, const Rational& s);
+      friend bool operator<(const long double& r, const Rational& s);
+      friend bool operator<=(const long double& r, const Rational& s);
+      friend bool operator>(const long double& r, const Rational& s);
+      friend bool operator>=(const long double& r, const Rational& s);
+
       friend Rational operator+(const double& d, const Rational& r);
       friend Rational operator-(const double& d, const Rational& r);
       friend Rational operator*(const double& d, const Rational& r);
@@ -387,6 +401,42 @@ namespace soplex
 
    /// greater than or equal to operator for double and Rational
    bool operator>=(const double& r, const Rational& s);
+
+   /// equality operator for Rational and long double
+   bool operator==(const Rational& r, const long double& s);
+
+   /// inequality operator for Rational and long double
+   bool operator!=(const Rational& r, const long double& s);
+
+   /// less than operator for Rational and long double
+   bool operator<(const Rational& r, const long double& s);
+
+   /// less than or equal to operator for Rational and long double
+   bool operator<=(const Rational& r, const long double& s);
+
+   /// greater than operator for Rational and long double
+   bool operator>(const Rational& r, const long double& s);
+
+   /// greater than or equal to operator for Rational and long double
+   bool operator>=(const Rational& r, const long double& s);
+
+   /// equality operator for long double and Rational
+   bool operator==(const long double& r, const Rational& s);
+
+   /// inequality operator for long double and Rational
+   bool operator!=(const long double& r, const Rational& s);
+
+   /// less than operator for long double and Rational
+   bool operator<(const long double& r, const Rational& s);
+
+   /// less than or equal to operator for long double and Rational
+   bool operator<=(const long double& r, const Rational& s);
+
+   /// greater than operator for long double and Rational
+   bool operator>(const long double& r, const Rational& s);
+
+   /// greater than or equal to operator for long double and Rational
+   bool operator>=(const long double& r, const Rational& s);
 
    /// equality operator for Rational and int
    bool operator==(const Rational& r, const int& s);
