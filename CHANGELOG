@@ -8,6 +8,7 @@ performance:
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
 - do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
 - faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
+- more efficient arithmetic in class Rational by checking special cases
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving

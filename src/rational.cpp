@@ -37,25 +37,25 @@
 #endif
 
 /// use mpq_sgn instead of mpq_equal to compare rationals with zero
-// #define SOPLEX_PERFALT_1
+#define SOPLEX_PERFALT_1
 
 /// turn on checking rationals for zero in arithmetic plus and minus operators
-// #define SOPLEX_PERFALT_2a
+#define SOPLEX_PERFALT_2a
 
 /// turn on checking rationals for zero, posone, negone in arithmetic multiplication and division operators
-// #define SOPLEX_PERFALT_2b
+#define SOPLEX_PERFALT_2b
 
 /// turn on checking rationals for zero, posone, negone before conversion to double and long double
-// #define SOPLEX_PERFALT_3
+#define SOPLEX_PERFALT_3
 
 /// turn on checking for equality before assigning in operator=()
-// #define SOPLEX_PERFALT_4
+#define SOPLEX_PERFALT_4
 
 /// turn on checking whether assignment in assignment operators is redundant for 0
-// #define SOPLEX_PERFALT_5a
+#define SOPLEX_PERFALT_5a
 
 /// turn on checking whether assignment in assignment operators is redundant for +1 and -1
-// #define SOPLEX_PERFALT_5b
+#define SOPLEX_PERFALT_5b
 
 namespace soplex
 {
