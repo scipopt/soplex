@@ -85,7 +85,7 @@ LP/meszaros/misc/co9.mps.gz
 LP/meszaros/misc/complex.mps.gz
 LP/plato/misc/cont11_l.mps.gz
 LP/plato/misc/cont11.mps.gz
-LP/plato/misc/cont1_l.mps.gz
+#LP/plato/misc/cont1_l.mps.gz
 LP/plato/misc/cont1.mps.gz
 LP/plato/misc/cont4.mps.gz
 IP/miplib2010/core2536-691.mps.gz
@@ -256,7 +256,7 @@ IP/miplib/gt2.mps.gz
 IP/miplib2010/hanoi5.mps.gz
 IP/coral/haprp.mps.gz
 IP/miplib2003/harp2.mps.gz
-IP/miplib2010/hawaiiv10-130.mps.gz
+#IP/miplib2010/hawaiiv10-130.mps.gz
 IP/miplib2010/ic97_potential.mps.gz
 LP/meszaros/misc/iiasa.mps.gz
 IP/miplib2010/iis-100-0-cov.mps.gz
@@ -754,10 +754,10 @@ LP/plato/misc/neos.mps.gz
 LP/netlib/nesm.mps.gz
 IP/miplib2003/net12.mps.gz
 IP/miplib2010/netdiversion.mps.gz
-LP/plato/network/netlarge1.mps.gz
+#LP/plato/network/netlarge1.mps.gz
 LP/plato/network/netlarge2.mps.gz
 LP/plato/network/netlarge3.mps.gz
-LP/plato/network/netlarge6.mps.gz
+#LP/plato/network/netlarge6.mps.gz
 IP/coral/newdano.mps.gz
 LP/meszaros/misc/nl.mps.gz
 IP/miplib2010/nobel-eu-DBE.mps.gz
@@ -765,7 +765,6 @@ IP/miplib2003/noswot.mps.gz
 IP/coral/npmv07.mps.gz
 IP/miplib2010/ns1111636.mps.gz
 IP/miplib2010/ns1116954.mps.gz
-IP/miplib2010/ns1158817.mps.gz
 IP/miplib2010/ns1208400.mps.gz
 IP/miplib2010/ns1456591.mps.gz
 IP/miplib2010/ns1606230.mps.gz
@@ -860,7 +859,7 @@ IP/miplib2010/p2m2p1m1p0n100.mps.gz
 LP/meszaros/misc/p6000.mps.gz
 IP/coral/p6b.mps.gz
 IP/miplib2010/p80x400b.mps.gz
-IP/miplib2010/pb-simp-nonunif.mps.gz
+#IP/miplib2010/pb-simp-nonunif.mps.gz
 LP/meszaros/misc/pcb1000.mps.gz
 LP/meszaros/misc/pcb3000.mps.gz
 LP/kennington/pds-02.mps.gz
@@ -1238,6 +1237,6 @@ LP/netlib/wood1p.mps.gz
 LP/netlib/woodw.mps.gz
 LP/meszaros/misc/world.mps.gz
 LP/meszaros/misc/zed.mps.gz
-IP/miplib2010/zib01.mps.gz
-IP/miplib2010/zib02.mps.gz
+#IP/miplib2010/zib01.mps.gz
+#IP/miplib2010/zib02.mps.gz
 IP/miplib2010/zib54-UUE.mps.gz
