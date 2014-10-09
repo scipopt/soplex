@@ -134,7 +134,8 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['simplextime'] = float(outlines[idx+4].split()[2])
             instances[instancename]['synctime'] = float(outlines[idx+5].split()[2])
             instances[instancename]['transformtime'] = float(outlines[idx+6].split()[2])
-            instances[instancename]['othertime'] = float(outlines[idx+7].split()[2])
+            instances[instancename]['rationaltime'] = float(outlines[idx+7].split()[2])
+            instances[instancename]['othertime'] = float(outlines[idx+8].split()[2])
 
         elif outline.startswith('Refinements'):
             instances[instancename]['refinements'] = int(outline.split()[2])
