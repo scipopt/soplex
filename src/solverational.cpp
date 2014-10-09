@@ -964,6 +964,8 @@ namespace soplex
          _statistics->refinements++;
          if( _statistics->iterations <= prevIterations )
             _statistics->stallRefinements++;
+         else
+            _statistics->pivotRefinements = _statistics->refinements;
 
          // correct fixed basis statuses of restricted rows
          for( int r = numRowsRational() - 1; r >= 0; r-- )
@@ -1279,8 +1281,14 @@ namespace soplex
       // invalidate solution
       sol.invalidate();
 
+      // remember current number of refinements
+      int oldRefinements = _statistics->refinements;
+
       // perform iterative refinement
       _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+
+      // update unbounded refinement counter
+      _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
 
       // stopped due to some limit
       if( stopped )
@@ -1347,8 +1355,14 @@ namespace soplex
 
       do
       {
+         // remember current number of refinements
+         int oldRefinements = _statistics->refinements;
+
          // perform iterative refinement
          _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+
+         // update feasible refinement counter
+         _statistics->feasRefinements += _statistics->refinements - oldRefinements;
 
          // stopped due to some limit
          if( stopped )

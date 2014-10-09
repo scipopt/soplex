@@ -56,6 +56,9 @@ namespace soplex
       luFactorizationsRational = 0;
       refinements = 0;
       stallRefinements = 0;
+      pivotRefinements = 0;
+      feasRefinements = 0;
+      unbdRefinements = 0;
    }
 
    /// prints statistics
@@ -90,7 +93,10 @@ namespace soplex
          os << " (" << 100*otherTime / solTime << "% of solving time)";
 
       os << "\nRefinements         : " << refinements << "\n"
-         << "  Stalling          : " << stallRefinements << "\n";
+         << "  Stalling          : " << stallRefinements << "\n"
+         << "  Pivoting          : " << pivotRefinements << "\n"
+         << "  Feasibility       : " << feasRefinements << "\n"
+         << "  Unboundedness     : " << unbdRefinements << "\n";
 
       os << "Iterations          : " << iterations << "\n"
          << "  From scratch      : " << iterations - iterationsFromBasis;
