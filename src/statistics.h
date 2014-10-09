@@ -71,7 +71,10 @@ namespace soplex
       int luFactorizations; ///< number of basis matrix factorizations
       int luSolves; ///< number of (forward and backward) solves with basis matrix
       int refinements; ///< number of refinement steps
-      int stallRefinements; ///< number of refinement steps without subsequent pivots
+      int stallRefinements; ///< number of refinement steps without pivots
+      int pivotRefinements; ///< number of refinement steps until final basis is reached
+      int feasRefinements; ///< number of refinement steps during infeasibility test
+      int unbdRefinements; ///< number of refinement steps during undboundedness test
 
       //@}
    };

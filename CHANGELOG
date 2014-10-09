@@ -12,6 +12,7 @@ performance:
 
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
+- more statistics on type of refinement rounds
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false

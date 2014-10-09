@@ -528,6 +528,8 @@ namespace soplex
          // remember whether we moved to a new basis
          if( _solver.iterations() == 0 )
             _statistics->stallRefinements++;
+         else
+            _statistics->pivotRefinements = _statistics->refinements;
 
          // evaluate result; if modified problem was not solved to optimality, stop refinement
          switch( result )
@@ -645,8 +647,14 @@ namespace soplex
       // invalidate solution
       sol.invalidate();
 
+      // remember current number of refinements
+      int oldRefinements = _statistics->refinements;
+
       // perform iterative refinement
       _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+
+      // update unbounded refinement counter
+      _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
 
       // the unbounded problem should always be solved to optimality
       if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
@@ -714,8 +722,14 @@ namespace soplex
 
       do
       {
+         // remember current number of refinements
+         int oldRefinements = _statistics->refinements;
+
          // perform iterative refinement
          _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+
+         // update feasible refinement counter
+         _statistics->feasRefinements += _statistics->refinements - oldRefinements;
 
          // the feasibility problem should always be solved to optimality
          if( error || unbounded || infeasible || !primalFeasible || !dualFeasible )
