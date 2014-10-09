@@ -371,21 +371,21 @@ namespace soplex
             _realParamDescription[SoPlex::FPFEASTOL] = "working tolerance for feasibility in floating-point solver during iterative refinement";
             _realParamLower[SoPlex::FPFEASTOL] = 1e-12;
             _realParamUpper[SoPlex::FPFEASTOL] = 1.0;
-            _realParamDefault[SoPlex::FPFEASTOL] = 1e-6;
+            _realParamDefault[SoPlex::FPFEASTOL] = 1e-9;
 
             // working tolerance for optimality in floating-point solver during iterative refinement
             _realParamName[SoPlex::FPOPTTOL] = "fpopttol";
             _realParamDescription[SoPlex::FPOPTTOL] = "working tolerance for optimality in floating-point solver during iterative refinement";
             _realParamLower[SoPlex::FPOPTTOL] = 1e-12;
             _realParamUpper[SoPlex::FPOPTTOL] = 1.0;
-            _realParamDefault[SoPlex::FPOPTTOL] = 1e-6;
+            _realParamDefault[SoPlex::FPOPTTOL] = 1e-9;
 
             // maximum increase of scaling factors between refinements
             _realParamName[SoPlex::MAXSCALEINCR] = "maxscaleincr";
             _realParamDescription[SoPlex::MAXSCALEINCR] = "maximum increase of scaling factors between refinements";
             _realParamLower[SoPlex::MAXSCALEINCR] = 1.0;
             _realParamUpper[SoPlex::MAXSCALEINCR] = DEFAULT_INFINITY;
-            _realParamDefault[SoPlex::MAXSCALEINCR] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::MAXSCALEINCR] = 1e25;
 
             // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
             _realParamName[SoPlex::LIFTMINVAL] = "liftminval";
