@@ -117,6 +117,7 @@ for s in settings:
 
 # check all settings for aborts or instances to ignore and remove them
 aborts = ''
+mintime = 0
 for s in settings:
     for i in instances:
         if i not in results[s]:
@@ -127,6 +128,8 @@ for s in settings:
             aborts = aborts + i + '\n'
             instances.remove(i)
             del results[s][i]
+        else:
+            results[s][i]['solvetime'] = max( mintime, results[s][i]['solvetime'] )
 
 # compute all the comparison factors
 for c in compareValues:
