@@ -86,7 +86,10 @@ namespace soplex
          _lift();
 
       // introduce slack variables to transform inequality constraints into equations
+      ///@todo implement handling of row objectives in Cplex interface
+#ifndef SOPLEX_WITH_CPX
       if( boolParam(SoPlex::EQTRANS) )
+#endif
          _transformEquality();
 
       // force column representation
@@ -298,7 +301,9 @@ namespace soplex
       setIntParam(SoPlex::REPRESENTATION, oldRepresentation);
 
       // restore original problem
+#ifndef SOPLEX_WITH_CPX
       if( boolParam(SoPlex::EQTRANS) )
+#endif
          _untransformEquality(_solRational);
 
       // undo lifting
