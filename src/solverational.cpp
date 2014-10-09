@@ -89,6 +89,11 @@ namespace soplex
       if( boolParam(SoPlex::EQTRANS) )
          _transformEquality();
 
+      // force column representation
+      ///@todo implement row objectives with row representation
+      int oldRepresentation = intParam(SoPlex::REPRESENTATION);
+      setIntParam(SoPlex::REPRESENTATION, SoPlex::REPRESENTATION_COLUMN);
+
       _storedBasis = false;
       do
       {
@@ -288,6 +293,9 @@ namespace soplex
 
       if( _status == SPxSolver::OPTIMAL || _status == SPxSolver::INFEASIBLE || _status == SPxSolver::UNBOUNDED )
          _hasSolRational = true;
+
+      // reset representation
+      setIntParam(SoPlex::REPRESENTATION, oldRepresentation);
 
       // restore original problem
       if( boolParam(SoPlex::EQTRANS) )
