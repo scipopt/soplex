@@ -83,6 +83,33 @@ do
                 echo Missing $i
             fi
 
+            FILE=$i.perplex.out
+            if test -e $FILE
+            then
+                echo           >> $OUTFILE
+                echo =perplex= >> $OUTFILE
+                cat $FILE >> $OUTFILE
+                if test "$REMOVE" = "1"
+                then
+                    rm -f $FILE
+                fi
+            fi
+
+            FILE=$i.qsoptex.out
+            if test -e $FILE
+            then
+                echo           >> $OUTFILE
+                echo =qsoptex= >> $OUTFILE
+                cat $FILE >> $OUTFILE
+                if test "$REMOVE" = "1"
+                then
+                    rm -f $FILE
+                fi
+            fi
+
+            echo         >> $OUTFILE
+            echo =ready= >> $OUTFILE
+
             FILE=$i.err
             if test -e $FILE
             then
@@ -103,6 +130,10 @@ do
 	             fi
 	         fi
 
+            if test "$REMOVE" = "1"
+            then
+                rm -f $i.bas
+            fi
         done
 
         if test "$REMOVE" = "1"

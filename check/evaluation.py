@@ -48,6 +48,7 @@ tolerance = 1e-6
 instances = {}
 stats = False
 printedIdentifier = False
+section = 'soplex'
 
 for idx, outline in enumerate(outlines):
     # print identifier
@@ -71,6 +72,57 @@ for idx, outline in enumerate(outlines):
         instances[instancename]['name'] = shortname
         # wait for statistics block
         stats = False
+
+    # invalidate instancename
+    elif outline.startswith('=ready='):
+        section = 'soplex'
+        instancename = ''
+
+    elif outline.startswith('=perplex='):
+        section = 'perplex'
+        stats = False
+        instances[instancename]['perplex'] = 'unknown'
+
+    elif outline.startswith('=qsoptex='):
+        section = 'qsoptex'
+        stats = False
+        instances[instancename]['qso:stat'] = 'unknown'
+        instances[instancename]['qso:lpval'] = '--'
+        instances[instancename]['qso:time'] = instances[instancename]['timelimit']
+        instances[instancename]['qso:prec'] = 64
+
+    elif section == 'perplex':
+        if outline.find('No such file or directory') >= 0:
+            instances[instancename]['perplex'] = 'readerror'
+        elif outline.startswith('Basis read'):
+            instances[instancename]['perplex'] = 'timeout'
+        elif outline.startswith('Solution is optimal'):
+            if instances[instancename]['perplex'] == 'dinfeas':
+                instances[instancename]['perplex'] = 'optimal'
+            elif instances[instancename]['perplex'] == 'pdinfeas' or instances[instancename]['perplex'] == 'timeout':
+                instances[instancename]['perplex'] = 'pinfeas'
+        elif outline.startswith('Solution is feasible'):
+            if instances[instancename]['perplex'] == 'pinfeas':
+                instances[instancename]['perplex'] = 'optimal'
+            elif instances[instancename]['perplex'] == 'pdinfeas' or instances[instancename]['perplex'] == 'timeout':
+                instances[instancename]['perplex'] = 'dinfeas'
+        elif outline.startswith('Solution is not ') and instances[instancename]['perplex'] == 'timeout':
+            instances[instancename]['perplex'] = 'pdinfeas'
+
+    elif section == 'qsoptex':
+        if outline.startswith('Time for SOLVER:'):
+            instances[instancename]['qso:time'] = float(outline.split()[-2])
+        elif outline.find('Problem Solved Exactly') >= 0:
+            instances[instancename]['qso:stat'] = 'optimal'
+        elif outline.find('Problem Is Infeasible') >= 0:
+            instances[instancename]['qso:stat'] = 'infeasible'
+        elif outline.startswith('@24') and instances[instancename]['qso:time'] >= instances[instancename]['timelimit']:
+            instances[instancename]['qso:stat'] = 'timeout'
+        elif outline.startswith('LP Value'):
+            instances[instancename]['qso:lpval'] = outline.split()[2].rstrip(',')
+        elif outline.find('Trying mpf with') >= 0:
+            instances[instancename]['qso:prec'] = max( int(outline.split()[3]), instances[instancename]['qso:prec'] )
+
     elif outline.startswith('SoPlex version'):
         instances[instancename]['hash'] = outline.split()[-1].rstrip(']')[0:9]
         if not printedIdentifier:
@@ -78,12 +130,11 @@ for idx, outline in enumerate(outlines):
             print
             print outline
 
-    # invalidate instancename
-    elif outline.startswith('=ready='):
-        instancename = ''
-
     elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
         instances[instancename]['status'] = 'fail'
+
+    elif outline.startswith('real:timelimit'):
+        instances[instancename]['timelimit'] = float(outline.split()[-1])
 
     elif outline.startswith('Statistics'):
         stats = True
