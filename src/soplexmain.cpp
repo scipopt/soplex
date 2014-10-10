@@ -67,7 +67,7 @@ void printUsage(const char* const argv[], int idx)
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
       "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
-      "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)\n"
+      "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3* - boundflipping)\n"
       "\n"
       "display options:\n"
       "  -v<level>              set verbosity to <level> (0 - error, 3 - normal, 5 - high)\n"
