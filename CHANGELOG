@@ -17,13 +17,13 @@ interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
 - new make option EG={true,false} to build with EGlib
 - bound flipping is now enabled by default
-- new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - new command line option --writefile to save LP file as read by SoPlex
-- fixed default bounds of integer variables in MPS reader
+- new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
 - allow empty lines in MPS files
+- fixed default bounds of integer variables in MPS reader
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
