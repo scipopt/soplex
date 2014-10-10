@@ -1169,7 +1169,7 @@ public:
 
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
-      LPColSetBase<R>::maxObj_w() *= R(spxSense() == MINIMIZE ? -1 : 1);
+      LPColSetBase<R>::maxObj_w() *= (spxSense() == MINIMIZE ? -1 : 1);
       assert(isConsistent());
    }
 
