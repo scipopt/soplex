@@ -226,7 +226,7 @@ void SPxBasis::loadDesc(const Desc& ds)
          thedesc.rowStatus(i) = dualRowStatus(i);
       else if (thedesc.rowStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
       {
-         if (theLP->SPxLP::lhs(i) > -infinity)
+         if (theLP->SPxLP::lhs(i) > -infinity && theLP->SPxLP::maxRowObj(i) < 0.0)
             thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
          else if (theLP->SPxLP::rhs(i) < infinity)
             thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;

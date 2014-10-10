@@ -1276,7 +1276,7 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
    if (rep() == ROW)
    {
       int i;
-      p_vector.clear ();
+      p_vector = maxRowObj();
       for (i = nCols() - 1; i >= 0; --i)
       {
          if (baseId(i).isSPxRowId())

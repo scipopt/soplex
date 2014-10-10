@@ -210,10 +210,10 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
 
    case SPxBasis::Desc::P_ON_UPPER:
       assert(rep() == COLUMN);
-      return (*theCoPvec)[i] - 0;             // slacks !
+      return (*theCoPvec)[i] - maxRowObj(i);             // slacks !
    case SPxBasis::Desc::P_ON_LOWER:
       assert(rep() == COLUMN);
-      return 0 - (*theCoPvec)[i];             // slacks !
+      return maxRowObj(i) - (*theCoPvec)[i];             // slacks !
 
    default:
       return 0;
@@ -565,7 +565,7 @@ void SPxSolver::getEnterVals
          enterVal = enterLB;
          enterMax = enterUB - enterLB;
          enterPric = (*theCoPvec)[enterIdx];
-         enterRO = 0;
+         enterRO = maxRowObj(enterIdx);
          if( enterUB >= infinity )
             ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_LOWER;
          else if( EQ( enterLB, enterUB ) )
@@ -580,7 +580,7 @@ void SPxSolver::getEnterVals
          enterVal = enterUB;
          enterMax = enterLB - enterUB;
          enterPric = (*theCoPvec)[enterIdx];
-         enterRO = 0;
+         enterRO = maxRowObj(enterIdx);
          if( enterLB <= -infinity )
             ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_UPPER;
          else if( EQ( enterLB, enterUB ) )
@@ -595,7 +595,7 @@ void SPxSolver::getEnterVals
 #else
          MSG_ERROR( spxout << "EENTER99 ERROR: not yet debugged!" << std::endl; )
          enterPric = (*theCoPvec)[enterIdx];
-         enterRO = 0;
+         enterRO = maxRowObj(enterIdx);
          ds.rowStatus(enterIdx) = SPxBasis::Desc::D_UNDEFINED;
 #endif
          break;

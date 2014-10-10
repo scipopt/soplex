@@ -605,7 +605,7 @@ void SPxSolver::unShift(void)
          {
             for (i = nRows(); i-- > 0;)
             {
-               t_up = t_low = 0;
+               t_up = t_low = maxRowObj(i);
                clearDualBounds(ds.rowStatus(i), t_up, t_low);
                if (!isBasic(ds.rowStatus(i)))
                {

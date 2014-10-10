@@ -97,7 +97,7 @@ void SPxSolver::localAddRows(int start)
          assert(rep() == ROW);
          for (int i = start; i < SPxLP::nRows(); ++i)
          {
-            theURbound[i] = theLRbound[i] = 0;
+            theURbound[i] = theLRbound[i] = maxRowObj(i);
             clearDualBounds(dualRowStatus(i),
                              theURbound[i], theLRbound[i]);
             (*thePvec)[i] = vector(i) * (*theCoPvec);
@@ -132,7 +132,7 @@ void SPxSolver::localAddRows(int start)
          int i;
          for (i = start; i < SPxLP::nRows(); ++i)
          {
-            theURbound[i] = theLRbound[i] = 0;
+            theURbound[i] = theLRbound[i] = maxRowObj(i);
             clearDualBounds(ds.rowStatus(i),
                              theURbound[i], theLRbound[i]);
             setLeaveBound4Row(i, i);
@@ -670,6 +670,26 @@ void SPxSolver::changeObj(int i, const Real& newVal)
 {
 
    SPxLP::changeObj(i, newVal);
+
+   /**@todo Factorization remains valid, we do not need a reDim()
+    *       pricing vectors should be recomputed.
+    */
+   unInit();
+}
+
+void SPxSolver::changeRowObj(const Vector& newObj)
+{
+   SPxLP::changeRowObj(newObj);
+
+   /**@todo Factorization remains valid, we do not need a reDim()
+    *       pricing vectors should be recomputed.
+    */
+   unInit();
+}
+
+void SPxSolver::changeRowObj(int i, const Real& newVal)
+{
+   SPxLP::changeRowObj(i, newVal);
 
    /**@todo Factorization remains valid, we do not need a reDim()
     *       pricing vectors should be recomputed.

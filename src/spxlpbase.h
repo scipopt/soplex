@@ -178,9 +178,9 @@ public:
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const
    {
-
       row.setLhs(lhs(i));
       row.setRhs(rhs(i));
+      row.setObj(rowObj(i));
       row.setRowVector(DSVectorBase<R>(rowVector(i)));
    }
 
@@ -196,7 +196,7 @@ public:
 
       set.clear();
       for( int i = start; i <= end; i++ )
-         set.add(lhs(i), rowVector(i), rhs(i));
+         set.add(lhs(i), rowVector(i), rhs(i), rowObj(i));
    }
 
    /// Gets row vector of row \p i.
@@ -245,6 +245,50 @@ public:
    const R& lhs(const SPxRowId& id) const
    {
       return LPRowSetBase<R>::lhs(id);
+   }
+
+   /// Gets row objective function vector.
+   void getRowObj(VectorBase<R>& prowobj) const
+   {
+      prowobj = LPRowSetBase<R>::obj();
+      if( spxSense() == MINIMIZE )
+         prowobj *= -1.0;
+   }
+
+   ///
+   R rowObj(int i) const
+   {
+      if( spxSense() == MINIMIZE )
+         return -maxRowObj(i);
+      else
+         return maxRowObj(i);
+   }
+
+   /// Returns row objective function value of row with identifier \p id.
+   R rowObj(const SPxRowId& id) const
+   {
+      if( spxSense() == MINIMIZE )
+         return -maxRowObj(id);
+      else
+         return maxRowObj(id);
+   }
+
+   ///
+   const VectorBase<R>& maxRowObj() const
+   {
+      return LPRowSetBase<R>::obj();
+   }
+
+   ///
+   const R& maxRowObj(int i) const
+   {
+      return LPRowSetBase<R>::obj(i);
+   }
+
+   /// Returns row objective function value of row with identifier \p id.
+   const R& maxRowObj(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::obj(id);
    }
 
    /// Returns the inequality type of the \p i'th LPRow.
@@ -1330,6 +1374,37 @@ public:
       changeRange(number(id), newLhs, newRhs);
    }
 
+   /// Changes row objective function vector to \p newRowObj.
+   virtual void changeRowObj(const VectorBase<R>& newRowObj)
+   {
+      assert(maxRowObj().dim() == newRowObj.dim());
+      LPRowSetBase<R>::obj_w() = newRowObj;
+      if( spxSense() == MINIMIZE )
+         LPRowSetBase<R>::obj_w() *= -1;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th row objective function value to \p newRowObj.
+   virtual void changeRowObj(int i, const R& newRowObj)
+   {
+      LPRowSetBase<R>::obj_w(i) = newRowObj;
+      if( spxSense() == MINIMIZE )
+         LPRowSetBase<R>::obj_w(i) *= -1;
+      assert(isConsistent());
+   }
+
+   /// Changes row objective function value for row with identifier \p id.
+   virtual void changeRowObj(SPxRowId id, const R& newRowObj)
+   {
+      changeRowObj(number(id), newRowObj);
+   }
+
+   /// Clears row objective function values for all rows
+   virtual void clearRowObjs()
+   {
+      LPRowSetBase<R>::obj_w().clear();
+   }
+
    /// Replaces \p i 'th row of LP with \p newRow.
    virtual void changeRow(int n, const LPRowBase<R>& newRow)
    {
@@ -1346,6 +1421,7 @@ public:
 
       changeLhs(n, newRow.lhs());
       changeRhs(n, newRow.rhs());
+      changeRowObj(n, newRow.obj());
 
       const SVectorBase<R>& newrow = newRow.rowVector();
       for( j = newrow.size() - 1; j >= 0; --j )
@@ -1469,7 +1545,10 @@ public:
    virtual void changeSense(SPxSense sns)
    {
       if( sns != thesense )
-         LPColSetBase<R>::maxObj_w() *= -1.0;
+      {
+         LPColSetBase<R>::maxObj_w() *= -1;
+         LPRowSetBase<R>::obj_w() *= -1;
+      }
       thesense = sns;
    }
 
@@ -1677,6 +1756,12 @@ protected:
    R& lhs_w(int i)
    {
       return LPRowSetBase<R>::lhs_w(i);
+   }
+
+   /// Returns objective function value of row \p i.
+   R& maxRowObj_w(int i)
+   {
+      return LPRowSetBase<R>::obj_w(i);
    }
 
    /// Returns objective value of column \p i for maximization problem.

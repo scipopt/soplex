@@ -54,6 +54,7 @@ private:
 
    R left;                 ///< left-hand side of the constraint
    R right;                ///< right-hand side of the constraint
+   R object;               ///< objective coefficient of corresponding slack variable s = vec times primal
    DSVectorBase<R> vec;    ///< the row vector
 
    //@}
@@ -84,14 +85,14 @@ public:
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
    explicit LPRowBase<R>(int defDim = 0)
-      : left(0), right(infinity), vec(defDim)
+      : left(0), right(infinity), object(0), vec(defDim)
    {
       assert(isConsistent());
    }
 
    /// Copy constructor.
    LPRowBase<R>(const LPRowBase<R>& row)
-      : left(row.left), right(row.right), vec(row.vec)
+      : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
    }
@@ -99,21 +100,21 @@ public:
    /// Copy constructor.
    template < class S >
    LPRowBase<R>(const LPRowBase<S>& row)
-      : left(row.left), right(row.right), vec(row.vec)
+      : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase with the given left-hand side, right-hand side and rowVector.
-   LPRowBase<R>(R p_lhs, const SVectorBase<R>& p_rowVector, R p_rhs)
-      : left(p_lhs), right(p_rhs), vec(p_rowVector)
+   LPRowBase<R>(const R& p_lhs, const SVectorBase<R>& p_rowVector, const R& p_rhs, const R& p_obj = 0)
+      : left(p_lhs), right(p_rhs), object(p_obj), vec(p_rowVector)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase from passed \p rowVector, \p type and \p value.
-   LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, R p_value)
-   : vec(p_rowVector)
+   LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
+      : object(p_obj), vec(p_rowVector)
    {
       switch( p_type )
       {
@@ -217,9 +218,21 @@ public:
    }
 
    /// Sets right-hand side value.
-   void setRhs(R p_right)
+   void setRhs(const R& p_right)
    {
       right = p_right;
+   }
+
+   /// Objective coefficient value.
+   R obj() const
+   {
+      return object;
+   }
+
+   /// Sets objective coefficient value.
+   void setObj(const R& p_obj)
+   {
+      object = p_obj;
    }
 
    /// Constraint row vector.

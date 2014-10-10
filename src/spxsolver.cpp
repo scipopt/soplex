@@ -678,6 +678,9 @@ Real SPxSolver::nonbasicValue() const
             case SPxBasis::Desc::P_ON_LOWER :
                val += theURbound[i] * SPxLP::lhs(i);
                break;
+            case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+               val += maxRowObj(i) * SPxLP::lhs(i);
+               break;
             default:
                break;
             }
@@ -699,6 +702,23 @@ Real SPxSolver::nonbasicValue() const
             case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
                assert(theLCbound[i] == theUCbound[i]);
                val += maxObj(i) * theLCbound[i];
+               break;
+            default:
+               break;
+            }
+         }
+         for (i = nRows() - 1; i >= 0; --i)
+         {
+            switch (ds.rowStatus(i))
+            {
+            case SPxBasis::Desc::P_ON_UPPER :
+               val += maxRowObj(i) * theLRbound[i];
+               break;
+            case SPxBasis::Desc::P_ON_LOWER :
+               val += maxRowObj(i) * theURbound[i];
+               break;
+            case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+               val += maxRowObj(i) * theURbound[i];
                break;
             default:
                break;
@@ -764,7 +784,7 @@ Real SPxSolver::value() const
    if (rep() == ROW)
    {
       if (type() == LEAVE)
-         x = SPxLP::spxSense() * (coPvec() * fRhs());
+         x = SPxLP::spxSense() * (coPvec() * fRhs()); // the contribution of maxRowObj() is missing
       else
          x = SPxLP::spxSense() * (nonbasicValue() + (coPvec() * fRhs()));
    }

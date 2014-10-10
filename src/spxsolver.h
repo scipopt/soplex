@@ -767,6 +767,21 @@ public:
       changeObj(number(p_id), p_newVal);
    }
    ///
+   virtual void changeRowObj(const Vector& newObj);
+   ///
+   virtual void changeRowObj(int i, const Real& newVal);
+   ///
+   virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal)
+   {
+      changeRowObj(number(p_id), p_newVal);
+   }
+   ///
+   virtual void clearRowObjs()
+   {
+      SPxLP::clearRowObjs();
+      unInit();
+   }
+   ///
    virtual void changeLower(const Vector& newLower);
    ///
    virtual void changeLower(int i, const Real& newLower);

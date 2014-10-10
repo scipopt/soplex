@@ -104,7 +104,44 @@ void SPxSolver::computeFrhs()
          *theFrhs += maxObj();
       }
       else
+      {
+         ///@todo put this into a separate method
          *theFrhs = maxObj();
+         const SPxBasis::Desc& ds = desc();
+         for (int i = 0; i < nRows(); ++i)
+         {
+            SPxBasis::Desc::Status stat = ds.rowStatus(i);
+
+            if (!isBasic(stat))
+            {
+               Real x;
+
+               switch (stat)
+               {
+               case SPxBasis::Desc::D_FREE :
+                  continue;
+
+               case SPxBasis::Desc::D_ON_UPPER :
+               case SPxBasis::Desc::D_ON_LOWER :
+               case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+                  x = maxRowObj(i);
+                  break;
+
+               default:
+                  MSG_ERROR( spxout << "ESVECS04 ERROR: "
+                     << "inconsistent basis must not happen!"
+                     << std::endl; )
+                     throw SPxInternalCodeException("XSVECS06 This should never happen.");
+               }
+               assert(x < infinity);
+               assert(x > -infinity);
+               // assert(x == 0.0);
+
+               if (x != 0.0)
+                  theFrhs->multAdd(x, vector(i));
+            }
+         }
+      }
    }
 }
 
@@ -315,7 +352,7 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
       // columnwise representation:
       // slacks must be left 0!
    default:
-      (*theCoPrhs)[i] = 0;
+      (*theCoPrhs)[i] = maxRowObj(n);
       break;
    }
 }
@@ -396,7 +433,7 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
       break;
 
    default:
-      (*theCoPrhs)[i] = 0;
+      (*theCoPrhs)[i] = maxRowObj(n);
       break;
    }
 }

@@ -111,8 +111,8 @@ void SPxSolver::setDualColBounds()
 
    for(i = 0; i < nRows(); ++i)
    {
-      theURbound[i] = 0.0;
-      theLRbound[i] = 0.0;
+      theURbound[i] = maxRowObj(i);
+      theLRbound[i] = maxRowObj(i);
 
       clearDualBounds(ds.rowStatus(i), theURbound[i], theLRbound[i]);
    }
@@ -234,10 +234,10 @@ void SPxSolver::setLeaveBound4Row(int i, int n)
    {
    case SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
-      theUBbound[i] = 0.0;
+      theUBbound[i] = -maxRowObj(n);
       break;
    case SPxBasis::Desc::P_ON_UPPER :
-      theLBbound[i] = 0.0;
+      theLBbound[i] = -maxRowObj(n);
       theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
@@ -245,8 +245,8 @@ void SPxSolver::setLeaveBound4Row(int i, int n)
       theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_FREE :
-      theLBbound[i] = 0.0;
-      theUBbound[i] = 0.0;
+      theLBbound[i] = -maxRowObj(n);
+      theUBbound[i] = -maxRowObj(n);
       break;
 
    default:

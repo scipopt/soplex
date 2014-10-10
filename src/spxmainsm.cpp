@@ -74,7 +74,48 @@ bool SPxMainSM::PostStep::checkBasisDim(DataArray<SPxSolver::VarStatus> rows,
       if(cols[cs] == SPxSolver::BASIC)
          numBasis++;
    }
+   assert(numBasis == nRows);
    return numBasis == nRows;
+}
+
+void SPxMainSM::RowObjPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
+                                          DataArray<SPxSolver::VarStatus>& cStatus,
+                                          DataArray<SPxSolver::VarStatus>& rStatus) const
+{
+   assert(isZero(s[m_i], 1e-9));
+   s[m_i] = -x[m_j];
+
+   assert(rStatus[m_i] != SPxSolver::UNDEFINED);
+   assert(cStatus[m_j] != SPxSolver::UNDEFINED);
+   assert(rStatus[m_i] != SPxSolver::BASIC || cStatus[m_j] != SPxSolver::BASIC);
+
+   MSG_DEBUG( spxout << "RowObjPS: removing slack column " << m_j << " (" << cStatus[m_j] << ") for row " << m_i << " (" << rStatus[m_i] << ").\n" );
+
+   if( rStatus[m_i] != SPxSolver::BASIC )
+   {
+      switch( cStatus[m_j] )
+      {
+      case SPxSolver::ON_UPPER:
+         rStatus[m_i] = SPxSolver::ON_LOWER;
+         break;
+      case SPxSolver::ON_LOWER:
+         rStatus[m_i] = SPxSolver::ON_UPPER;
+         break;
+      default:
+         rStatus[m_i] = cStatus[m_j];
+      }
+
+      // otherwise checkBasisDim() may fail
+      cStatus[m_j] = SPxSolver::ZERO;
+   }
+
+#ifdef CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+      assert(false);
+      throw SPxInternalCodeException("XMAISM15 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
@@ -95,7 +136,7 @@ void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DV
    s[m_i] = slack;
 
    // dual:
-   y[m_i] = 0.0;
+   y[m_i] = m_row_obj;
 
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
@@ -121,7 +162,7 @@ void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVe
    s[m_i] = 0.0;
 
    // dual:
-   y[m_i] = 0.0;
+   y[m_i] = m_row_obj;
 
    // basis:
    rStatus[m_i] = SPxSolver::BASIC;
@@ -167,7 +208,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       {
          // this row is totally redundant, has not changed bound of xj
          rStatus[m_i] = SPxSolver::BASIC;
-         y[m_i] = 0.0;
+         y[m_i] = m_row_obj;
       }
       else if(EQrel(newLo, newUp, eps()))
       {
@@ -178,7 +219,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
          {
             // xj has been fixed in other row
             rStatus[m_i] = SPxSolver::BASIC;
-            y[m_i] = 0.0;
+            y[m_i] = m_row_obj;
          }
          else if((EQrel(m_oldLo, x[m_j], eps()) && r[m_j] <= -eps())
                  || (EQrel(m_oldUp, x[m_j], eps()) && r[m_j] >= eps())
@@ -197,7 +238,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
 
             cStatus[m_j] = EQrel(m_oldLo, x[m_j], eps()) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
             rStatus[m_i] = SPxSolver::BASIC;
-            y[m_i] = 0.0;
+            y[m_i] = m_row_obj;
             r[m_j] = val;
          }
       }
@@ -220,7 +261,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
 
             cStatus[m_j] = SPxSolver::ON_UPPER;
             rStatus[m_i] = SPxSolver::BASIC;
-            y[m_i] = 0.0;
+            y[m_i] = m_row_obj;
             r[m_j] = val;
          }
       }
@@ -243,7 +284,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
 
             cStatus[m_j] = SPxSolver::ON_LOWER;
             rStatus[m_i] = SPxSolver::BASIC;
-            y[m_i] = 0.0;
+            y[m_i] = m_row_obj;
             r[m_j] = val;
          }
       }
@@ -251,19 +292,19 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       {
          // the variable is set to FIXED by other constraints, i.e., this singleton row is redundant
          rStatus[m_i] = SPxSolver::BASIC;
-         y[m_i] = 0.0;
+         y[m_i] = m_row_obj;
       }
       break;
    case SPxSolver::BASIC:
       rStatus[m_i] = SPxSolver::BASIC;
-      y[m_i] = 0.0;
+      y[m_i] = m_row_obj;
       r[m_j] = 0.0;
       break;
    case SPxSolver::ON_LOWER:
       if(EQrel(m_oldLo, x[m_j], eps())) // xj may stay on lower
       {
          rStatus[m_i] = SPxSolver::BASIC;
-         y[m_i] = 0.0;
+         y[m_i] = m_row_obj;
          r[m_j] = val;
       }
       else // if reduced costs are negative or old lower bound not equal to xj, we need to change xj into the basis
@@ -280,7 +321,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       if(EQrel(m_oldUp, x[m_j], eps())) // xj may stay on upper
       {
          rStatus[m_i] = SPxSolver::BASIC;
-         y[m_i] = 0.0;
+         y[m_i] = m_row_obj;
          r[m_j] = val;
       }
       else // if reduced costs are positive or old upper bound not equal to xj, we need to change xj into the basis
@@ -295,7 +336,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
       break;
    case SPxSolver::ZERO:
       rStatus[m_i] = SPxSolver::BASIC;
-      y[m_i] = 0.0;
+      y[m_i] = m_row_obj;
       r[m_j] = val;
       break;
    default:
@@ -400,7 +441,7 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
    else // slack in the basis
    {
       rStatus[m_i] = SPxSolver::BASIC;
-      y[m_i] = 0.0;
+      y[m_i] = m_rowobj;
    }
 
 #ifdef CHECK_BASIC_DIM
@@ -588,7 +629,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
    r[m_j] = 0.0;
 
    for(int k = 0; k < m_col.size(); ++k)
-      y[m_col.index(k)] = 0.0;
+      y[m_col.index(k)] = m_rowObj.value(k);
 
    // basis:
    for(int k = 0; k < m_col.size(); ++k)
@@ -926,7 +967,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
          // if the row with tightest lower and upper bound in the basic, every duplicate row should in basic
          // or basis status of row m_i has been set, this row should be in basis
       {
-         y[i]       = 0.0;
+         y[i]       = m_rowObj.value(k);
          rStatus[i] = SPxSolver::BASIC;
          continue;
       }
@@ -937,7 +978,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
       {
          // this row leads to the tightest lower or upper bound, slack should not be in the basis
          y[i]   = y[m_i] * m_scale.value(k);
-         y[m_i] = 0.0;
+         y[m_i] = m_i_rowObj;
 
          if(m_isLhsEqualRhs[k])
          {
@@ -961,7 +1002,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
       {
          // this row leads to the tightest lower bound, slack should not be in the basis
          y[i]   = y[m_i] * m_scale.value(k);
-         y[m_i] = 0.0;
+         y[m_i] = m_i_rowObj;
 
          rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
          if (i != m_i)
@@ -972,7 +1013,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
       {
          // this row leads to the tightest upper bound, slack should not be in the basis
          y[i]   = y[m_i] * m_scale.value(k);
-         y[m_i] = 0.0;
+         y[m_i] = m_i_rowObj;
 
          rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
          if (i != m_i)
@@ -982,7 +1023,7 @@ void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVect
       else if (i != m_i)
       {
          // this row does not lead to the tightest lower or upper bound, slack should be in the basis
-         y[i]       = 0.0;
+         y[i]       = m_rowObj.value(k);
          rStatus[i] = SPxSolver::BASIC;
       }
    }
@@ -1228,6 +1269,23 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 
    // dual:
    r[m_j] = m_scale * r[m_k];
+}
+
+void SPxMainSM::handleRowObjectives(SPxLP& lp)
+{
+   for( int i = lp.nRows() - 1; i >= 0; --i )
+   {
+      if( lp.maxRowObj(i) != 0.0 )
+      {
+         RowObjPS* RowObjPSptr = 0;
+         spx_alloc(RowObjPSptr);
+         m_hist.append(new (RowObjPSptr) RowObjPS(lp, i, lp.nCols()));
+         lp.addCol(lp.rowObj(i), -lp.rhs(i), UnitVector(i), -lp.lhs(i));
+         lp.changeRange(i, 0.0, 0.0);
+         lp.changeRowObj(i, 0.0);
+         m_addedcols++;
+      }
+   }
 }
 
 void SPxMainSM::handleExtremes(SPxLP& lp)
@@ -3740,19 +3798,6 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    int numRangedRows = 0;
    int numBoxedCols = 0;
 
-   m_prim.reDim(lp.nCols());
-   m_slack.reDim(lp.nRows());
-   m_dual.reDim(lp.nRows());
-   m_redCost.reDim(lp.nCols());
-
-   m_cBasisStat.reSize(lp.nCols());
-   m_rBasisStat.reSize(lp.nRows());
-
-   m_cIdx.reSize(lp.nCols());
-   m_rIdx.reSize(lp.nRows());
-
-   m_keepbounds = keepbounds;
-
    if(m_hist.size() > 0)
    {
       // delete pointers in old m_hist
@@ -3782,16 +3827,12 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    for(int i = 0; i < lp.nRows(); ++i)
    {
-      m_rIdx[i] = i;
-
       if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
          ++numRangedRows;
    }
 
    for(int j = 0; j < lp.nCols(); ++j)
    {
-      m_cIdx[j] = j;
-
       if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
          ++numBoxedCols;
    }
@@ -3805,6 +3846,26 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    for(int k = 0; k < m_stat.size(); ++k)
       m_stat[k] = 0;
+
+   m_addedcols = 0;
+   handleRowObjectives(lp);
+
+   m_prim.reDim(lp.nCols());
+   m_slack.reDim(lp.nRows());
+   m_dual.reDim(lp.nRows());
+   m_redCost.reDim(lp.nCols());
+   m_cBasisStat.reSize(lp.nCols());
+   m_rBasisStat.reSize(lp.nRows());
+   m_cIdx.reSize(lp.nCols());
+   m_rIdx.reSize(lp.nRows());
+
+   m_keepbounds = keepbounds;
+
+   for(int i = 0; i < lp.nRows(); ++i)
+      m_rIdx[i] = i;
+
+   for(int j = 0; j < lp.nCols(); ++j)
+      m_cIdx[j] = j;
 
    // round extreme values (set all values smaller than eps to zero and all values bigger than infinity/5 to infinity)
 #if EXTREMES
@@ -3846,6 +3907,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    if (m_result != OKAY)
       return m_result;
 
+   m_remCols -= m_addedcols;
+   m_remNzos -= m_addedcols;
    MSG_INFO1( spxout << "Simplifier removed "
                      << m_remRows << " rows, "
                      << m_remCols << " columns, "
@@ -3941,10 +4004,21 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    for(int k = m_hist.size()-1; k >= 0; --k)
    {
       MSG_DEBUG( spxout << "unsimplifying " << m_hist[k]->getName() << "\n" );
-      m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
+
+      try
+      {
+         m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
+      }
+      catch( ... )
+      {
+         MSG_INFO1( spxout << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ".\n" );
+         assert(false);
+         throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
+      }
 
       m_hist[k]->~PostStep();
       spx_free(m_hist[k]);
+      m_hist.reSize(k);
    }
 
    // for maximization problems, we have to switch signs of dual and reduced cost values back
@@ -3955,6 +4029,15 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
 
       for(int i = 0; i < m_dual.dim(); ++i)
          m_dual[i] = -m_dual[i];
+   }
+
+   if( m_addedcols > 0 )
+   {
+      assert(m_prim.dim() >= m_addedcols);
+      m_prim.reDim(m_prim.dim() - m_addedcols);
+      m_redCost.reDim(m_redCost.dim() - m_addedcols);
+      m_cBasisStat.reSize(m_cBasisStat.size() - m_addedcols);
+      m_cIdx.reSize(m_cIdx.size() - m_addedcols);
    }
 
 #ifdef CHECK_BASIC_DIM

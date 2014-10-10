@@ -3,6 +3,9 @@
 Developer version
 =================
 
+features:
+- support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
+
 performance:
 - iterative refinement for ranged rows, making the transformation to equality form unnecessary
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
