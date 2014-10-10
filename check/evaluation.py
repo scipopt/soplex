@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['name','rows','cols','primalviol','dualviol','iters','refinements','solvetime','value','status']
+columns = ['name','rows','cols','pviol','dviol','iters','refinements','solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -171,11 +171,11 @@ for idx, outline in enumerate(outlines):
             primviol = outlines[idx+2].split()[3]
             dualviol = outlines[idx+3].split()[3]
             if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
-                instances[instancename]['primalviol'] = float(primviol)
-                instances[instancename]['dualviol'] = float(dualviol)
+                instances[instancename]['pviol'] = float("{:.2e}".format(float(primviol)))
+                instances[instancename]['dviol'] = float("{:.2e}".format(float(dualviol)))
             else:
-                instances[instancename]['primalviol'] = '-'
-                instances[instancename]['dualviol'] = '-'
+                instances[instancename]['pviol'] = '-'
+                instances[instancename]['dviol'] = '-'
 
         elif outline.startswith('Total time'):
             instances[instancename]['time'] = float(outline.split()[3])
