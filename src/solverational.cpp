@@ -85,17 +85,20 @@ namespace soplex
       if( boolParam(SoPlex::LIFTING) )
          _lift();
 
-      // introduce slack variables to transform inequality constraints into equations
-      ///@todo implement handling of row objectives in Cplex interface
-#ifndef SOPLEX_WITH_CPX
-      if( boolParam(SoPlex::EQTRANS) )
-#endif
-         _transformEquality();
-
       // force column representation
       ///@todo implement row objectives with row representation
       int oldRepresentation = intParam(SoPlex::REPRESENTATION);
       setIntParam(SoPlex::REPRESENTATION, SoPlex::REPRESENTATION_COLUMN);
+
+      ///@todo implement handling of row objectives in Cplex interface
+#ifdef SOPLEX_WITH_CPX
+      int oldEqtrans = boolParam(SoPlex::EQTRANS);
+      setBoolParam(SoPlex::EQTRANS, true);
+#endif
+
+      // introduce slack variables to transform inequality constraints into equations
+      if( boolParam(SoPlex::EQTRANS) )
+         _transformEquality();
 
       _storedBasis = false;
       do
@@ -297,14 +300,16 @@ namespace soplex
       if( _status == SPxSolver::OPTIMAL || _status == SPxSolver::INFEASIBLE || _status == SPxSolver::UNBOUNDED )
          _hasSolRational = true;
 
+      // restore original problem
+      if( boolParam(SoPlex::EQTRANS) )
+         _untransformEquality(_solRational);
+
+#ifdef SOPLEX_WITH_CPX
+      setBoolParam(SoPlex::EQTRANS, oldEqtrans);
+#endif
+
       // reset representation
       setIntParam(SoPlex::REPRESENTATION, oldRepresentation);
-
-      // restore original problem
-#ifndef SOPLEX_WITH_CPX
-      if( boolParam(SoPlex::EQTRANS) )
-#endif
-         _untransformEquality(_solRational);
 
       // undo lifting
       if( boolParam(SoPlex::LIFTING) )
