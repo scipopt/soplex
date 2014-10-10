@@ -189,8 +189,11 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['othertime'] = float(outlines[idx+8].split()[2])
 
         elif outline.startswith('Refinements'):
-            instances[instancename]['refinements'] = int(outline.split()[2])
-            instances[instancename]['stalling'] = int(outlines[idx+1].split()[2])
+            instances[instancename]['refs'] = int(outline.split()[2])
+            instances[instancename]['stallrefs'] = int(outlines[idx+1].split()[2])
+            instances[instancename]['pivrefs'] = int(outlines[idx+2].split()[2])
+            instances[instancename]['feasrefs'] = int(outlines[idx+3].split()[2])
+            instances[instancename]['unbdrefs'] = int(outlines[idx+4].split()[2])
 
         elif outline.startswith('Iterations'):
             instances[instancename]['iters'] = int(outline.split()[2])
