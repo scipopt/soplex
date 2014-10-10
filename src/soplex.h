@@ -1645,7 +1645,7 @@ private:
    /// solves real LP with recovery mechanism
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis);
+                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, Rational& primalViolation, Rational& dualViolation, bool& stopped, bool& error);

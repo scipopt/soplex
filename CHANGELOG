@@ -7,7 +7,7 @@ features:
 - support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
 
 performance:
-- iterative refinement for ranged rows, making the transformation to equality form unnecessary
+- iterative refinement for ranged rows without introducing explicit slack variables
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
 - do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
 - faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
