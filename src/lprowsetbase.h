@@ -266,7 +266,7 @@ public:
    }
 
    /// Returns the value of the \p i'th LPRowBase.
-   R value(int i) const
+   const R& value(int i) const
    {
       if( rhs(i) < infinity )
          return rhs(i);
@@ -281,7 +281,7 @@ public:
    /** The \em value of a row depends on its type: if the inequality is of type "greater or equal", the value is the lhs
     *  of the row. Otherwise, the value is the rhs.
    */
-   R value(const DataKey& k) const
+   const R& value(const DataKey& k) const
    {
       return value(number(k));
    }

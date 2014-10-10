@@ -263,14 +263,14 @@ public:
    }
 
    ///
-   void add(R pobj, R plower, const SVectorBase<R>& pcolVector, R pupper)
+   void add(const R& pobj, const R& plower, const SVectorBase<R>& pcolVector, const R& pupper)
    {
       DataKey k;
       add(k, pobj, plower, pcolVector, pupper);
    }
 
    /// Adds LPColBase consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to LPColSetBase.
-   void add(DataKey& newkey, R obj, R newlower, const SVectorBase<R>& newcolVector, R newupper)
+   void add(DataKey& newkey, const R& obj, const R& newlower, const SVectorBase<R>& newcolVector, const R& newupper)
    {
       SVSetBase<R>::add(newkey, newcolVector);
 
@@ -378,14 +378,14 @@ public:
    }
 
    ///
-   SVectorBase<R>& create(int pnonzeros = 0, R pobj = 1, R plw = 0, R pupp = 1)
+   SVectorBase<R>& create(int pnonzeros = 0, const R& pobj = 1, const R& plw = 0, const R& pupp = 1)
    {
       DataKey k;
       return create(k, pnonzeros, pobj, plw, pupp);
    }
 
    /// Creates new LPColBase with specified arguments and returns a reference to its column vector.
-   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, R obj = 1, R newlow = 0, R newup = 1)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& obj = 1, const R& newlow = 0, const R& newup = 1)
    {
       if( num() + 1 > low.dim() )
       {

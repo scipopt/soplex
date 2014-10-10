@@ -206,7 +206,7 @@ public:
    }
 
    /// Sets left-hand side value.
-   void setLhs(R p_left)
+   void setLhs(const R& p_left)
    {
       left = p_left;
    }
