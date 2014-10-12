@@ -1898,9 +1898,20 @@ std::string rationalToString(const Rational& r, const bool asfloat)
       return sstream.str();
    else
    {
-      sstream.str("");
-      sstream << std::setprecision(20) << double(r);
-      return sstream.str();
+      mpf_t tmpFloat;
+      char tmpString[64];
+      FILE* tmpStream;
+
+      tmpStream = fmemopen(tmpString, 63, "w");
+      mpf_init2(tmpFloat, 256);
+      mpf_set_q(tmpFloat, r.dpointer->privatevalue);
+      mpf_out_str(tmpStream, 10, 32, tmpFloat);
+      mpf_clear(tmpFloat);
+
+      fflush(tmpStream);
+      std::string retString = std::string(tmpString);
+      fclose(tmpStream);
+      return retString;
    }
 
    ///@todo the following code creates a string of the form 1.333...e-06; this would be nice for human readable output,
