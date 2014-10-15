@@ -31,7 +31,9 @@ namespace soplex
 bool SPxSolver::writeState(
    const char*    filename,
    const NameSet* rowNames,
-   const NameSet* colNames ) const
+   const NameSet* colNames,
+   const bool cpxFormat
+   ) const
 {
 
    std::string ofname;
@@ -91,7 +93,7 @@ bool SPxSolver::writeState(
 
    // write basis
    ofname = std::string(filename) + ".bas";
-   return writeBasisFile(ofname.c_str(), rowNames, colNames);
+   return writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
 }
 
 } // namespace soplex

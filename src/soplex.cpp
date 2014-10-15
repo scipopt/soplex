@@ -4446,16 +4446,22 @@ namespace soplex
             if( !strcmp(mps.field1(), "XU") )
             {
                _basisStatusCols[c] = SPxSolver::BASIC;
-               _basisStatusRows[r] = (lhsReal(r) == rhsReal(r))
-                  ? SPxSolver::FIXED
-                  : SPxSolver::ON_UPPER;
+               if( _rowTypes[r] == SoPlex::RANGETYPE_LOWER )
+                  _basisStatusRows[r] = SPxSolver::ON_LOWER;
+               else if( _rowTypes[r] == SoPlex::RANGETYPE_FIXED )
+                  _basisStatusRows[r] = SPxSolver::FIXED;
+               else
+                  _basisStatusRows[r] = SPxSolver::ON_UPPER;
             }
             else if( !strcmp(mps.field1(), "XL") )
             {
                _basisStatusCols[c] = SPxSolver::BASIC;
-               _basisStatusRows[r] = (lhsReal(r) == rhsReal(r))
-                  ? SPxSolver::FIXED
-                  : SPxSolver::ON_LOWER;
+               if( _rowTypes[r] == SoPlex::RANGETYPE_UPPER )
+                  _basisStatusRows[r] = SPxSolver::ON_UPPER;
+               else if( _rowTypes[r] == SoPlex::RANGETYPE_FIXED )
+                  _basisStatusRows[r] = SPxSolver::FIXED;
+               else
+                  _basisStatusRows[r] = SPxSolver::ON_LOWER;
             }
             else if( !strcmp(mps.field1(), "UL") )
             {
@@ -4498,12 +4504,12 @@ namespace soplex
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool SoPlex::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
+   bool SoPlex::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
    {
       assert(filename != 0);
 
       if( _isRealLPLoaded )
-         return _solver.writeBasisFile(filename, rowNames, colNames);
+         return _solver.writeBasisFile(filename, rowNames, colNames, cpxFormat);
       else
       {
          std::ofstream file(filename);
@@ -4541,7 +4547,10 @@ namespace soplex
 
                assert(row != numRows);
 
-               file << (_basisStatusRows[row] == SPxSolver::ON_UPPER ? " XU " : " XL ");
+               if( _basisStatusRows[row] == SPxSolver::ON_UPPER && (!cpxFormat || _rowTypes[row] == SoPlex::RANGETYPE_BOXED) )
+                  file << " XU ";
+               else
+                  file << " XL ";
 
                file << std::setw(8);
                if( colNames != 0 && colNames->has(col) )
@@ -4593,7 +4602,7 @@ namespace soplex
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void SoPlex::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
+   void SoPlex::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
    {
       std::string ofname;
 
@@ -4607,14 +4616,14 @@ namespace soplex
 
       // write basis
       ofname = std::string(filename) + ".bas";
-      writeBasisFile(ofname.c_str(), rowNames, colNames);
+      writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
    }
 
 
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void SoPlex::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames) const
+   void SoPlex::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
    {
       std::string ofname;
 
@@ -4628,7 +4637,7 @@ namespace soplex
 
       // write basis
       ofname = std::string(filename) + ".bas";
-      writeBasisFile(ofname.c_str(), rowNames, colNames);
+      writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
    }
 
 

@@ -469,7 +469,9 @@ bool SPxBasis::readBasis(
          if (!strcmp(mps.field1(), "XU"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            if ( theLP->SPxLP::lhs(r) == theLP->SPxLP::rhs(r) )
+            if( theLP->LPRowSet::type(r) == LPRow::GREATER_EQUAL )
+               l_desc.rowstat[r] = Desc::P_ON_LOWER;
+            else if( theLP->LPRowSet::type(r) == LPRow::EQUAL )
                l_desc.rowstat[r] = Desc::P_FIXED;
             else
                l_desc.rowstat[r] = Desc::P_ON_UPPER;
@@ -477,7 +479,9 @@ bool SPxBasis::readBasis(
          else if (!strcmp(mps.field1(), "XL"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            if ( theLP->SPxLP::lhs(r) == theLP->SPxLP::rhs(r) )
+            if( theLP->LPRowSet::type(r) == LPRow::LESS_EQUAL )
+               l_desc.rowstat[r] = Desc::P_ON_UPPER;
+            else if( theLP->LPRowSet::type(r) == LPRow::EQUAL )
                l_desc.rowstat[r] = Desc::P_FIXED;
             else
                l_desc.rowstat[r] = Desc::P_ON_LOWER;
@@ -588,7 +592,8 @@ static const char* getColName(
 void SPxBasis::writeBasis(
    std::ostream&  os, 
    const NameSet* rowNames, 
-   const NameSet* colNames 
+   const NameSet* colNames,
+   const bool cpxFormat
    ) const
 {
    assert(theLP != 0);
@@ -619,8 +624,12 @@ void SPxBasis::writeBasis(
 
          assert( row != theLP->nRows() );
 
-         os << ( thedesc.rowStatus( row ) == Desc::P_ON_UPPER ? " XU " : " XL " )
-            << std::setw(8) << getColName(theLP, col, colNames, buf);
+         if( thedesc.rowStatus( row ) == Desc::P_ON_UPPER && (!cpxFormat || theLP->LPRowSet::type(row) == LPRow::RANGE) )
+            os << " XU ";
+         else
+            os << " XL ";
+
+         os << std::setw(8) << getColName(theLP, col, colNames, buf);
 
          /* break in two parts since buf is reused */
          os << "       " 

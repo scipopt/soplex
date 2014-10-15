@@ -757,15 +757,15 @@ public:
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+   void writeStateRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    //@}
 

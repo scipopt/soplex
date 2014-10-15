@@ -38,7 +38,8 @@ bool SPxSolver::readBasisFile(
 bool SPxSolver::writeBasisFile
    ( const char*    filename, 
      const NameSet* rowNames,
-     const NameSet* colNames ) const
+     const NameSet* colNames,
+     const bool cpxFormat ) const
 {
    std::ofstream file(filename);
 

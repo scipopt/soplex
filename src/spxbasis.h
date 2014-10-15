@@ -753,7 +753,7 @@ public:
     *  \c NULL, default names are used for the constraints and variables.
     */
    virtual void writeBasis(std::ostream& os, 
-      const NameSet* rownames, const NameSet* colnames) const;
+      const NameSet* rownames, const NameSet* colnames, const bool cpxFormat = false) const;
 
    virtual void printMatrix() const;
 

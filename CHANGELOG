@@ -20,11 +20,13 @@ interface & parameters:
 - new command line option --writefile to save LP file as read by SoPlex
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - improved printing of rationals in limited precision
+- added possibility to write basis file in original Cplex definition
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
 - allow empty lines in MPS files
 - fixed default bounds of integer variables in MPS reader
+- adjust basis status of nonbasic rows automatically to row type when reading basis file
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG

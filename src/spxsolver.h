@@ -479,7 +479,7 @@ public:
     *  variables.
     */
    virtual bool writeBasisFile(const char* filename, 
-      const NameSet* rowNames, const NameSet* colNames) const;
+      const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat = false) const;
 
    /** Write current LP, basis, and parameter settings.
     *  LP is written in MPS format to "\p filename".mps, basis is written in "\p filename".bas, and parameters
@@ -487,7 +487,7 @@ public:
     *  the constraints and variables.
     */
    virtual bool writeState(const char* filename, 
-      const NameSet* rowNames = NULL, const NameSet* colNames = NULL) const;
+      const NameSet* rowNames = NULL, const NameSet* colNames = NULL, const bool cpxFormat = false) const;
 
    //@}
 
