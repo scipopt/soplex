@@ -23,6 +23,7 @@ fi
 
 OUTFILE=$CLIENTTMPDIR/$BASENAME.qsoptex.out
 BASFILE=$SOLVERPATH/results/$BASENAME.bas
+QSOBASFILE=$SOLVERPATH/results/$BASENAME.qsoptex.bas
 
 # check if basis file exists
 if test ! -e $BASFILE
@@ -37,7 +38,8 @@ echo -----------------------------  >> $OUTFILE
 date                                >> $OUTFILE
 echo -----------------------------  >> $OUTFILE
 date +"@23 %s"                      >> $OUTFILE
-$EXECNAME -B $BASFILE $INSTANCE >> $OUTFILE 2>>$OUTFILE
+sed '/s/^ XU/ XL/g' $BASFILE > $QSOBASFILE
+$EXECNAME -B $QSOBASFILE $INSTANCE >> $OUTFILE 2>>$OUTFILE
 date +"@24 %s"                      >> $OUTFILE
 echo -----------------------------  >> $OUTFILE
 date                                >> $OUTFILE
