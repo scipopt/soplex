@@ -37,7 +37,7 @@
 #include "svsetbase.h"
 
 // specialized multAdd() for rationals
-// #define SOPLEX_PERFALT_10
+#define SOPLEX_PERFALT_10
 
 #define SOPLEX_VECTOR_MARKER   1e-100
 
