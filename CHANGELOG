@@ -19,6 +19,7 @@ interface & parameters:
 - bound flipping is now enabled by default
 - new command line option --writefile to save LP file as read by SoPlex
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
+- improved printing of rationals in limited precision
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier

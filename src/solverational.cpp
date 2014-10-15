@@ -720,6 +720,16 @@ namespace soplex
             << "Max. reduced cost violation = " << rationalToString(redCostViolation) << "\n"
             << "Max. dual violation = " << rationalToString(dualViolation) << "\n" );
 
+         MSG_DEBUG( spxout
+            << std::fixed << std::setprecision(2) << std::setw(10)
+            << "Progress table: "
+            << std::setw(10) << _statistics->refinements << " & "
+            << std::setw(10) << _statistics->iterations << " & "
+            << std::setw(10) << _statistics->solvingTime.userTime() << " & "
+            << std::setw(10) << _statistics->rationalTime.userTime() << " & "
+            << std::setw(10) << rationalToString(boundsViolation > sideViolation ? boundsViolation : sideViolation, 2) << " & "
+            << std::setw(10) << rationalToString(redCostViolation > dualViolation ? redCostViolation : dualViolation, 2) << "\n");
+
          // terminate if tolerances are satisfied
          primalFeasible = (boundsViolation <= _rationalFeastol && sideViolation <= _rationalFeastol);
          dualFeasible = (redCostViolation <= _rationalOpttol && dualViolation <= _rationalOpttol);

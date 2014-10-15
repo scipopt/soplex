@@ -1889,13 +1889,14 @@ bool Rational::readString(const char* s)
 
 
 /// convert rational number to string
-std::string rationalToString(const Rational& r, const bool asfloat)
+std::string rationalToString(const Rational& r, const int precision)
 {
-   std::stringstream sstream;
-
-   sstream << r;
-   if( !asfloat )
+   if( precision <= 0 )
+   {
+      std::stringstream sstream;
+      sstream << r;
       return sstream.str();
+   }
    else
    {
       mpf_t tmpFloat;
@@ -1905,7 +1906,7 @@ std::string rationalToString(const Rational& r, const bool asfloat)
       tmpStream = fmemopen(tmpString, 63, "w");
       mpf_init2(tmpFloat, 256);
       mpf_set_q(tmpFloat, r.dpointer->privatevalue);
-      mpf_out_str(tmpStream, 10, 32, tmpFloat);
+      mpf_out_str(tmpStream, 10, precision, tmpFloat);
       mpf_clear(tmpFloat);
 
       fflush(tmpStream);
@@ -1913,30 +1914,6 @@ std::string rationalToString(const Rational& r, const bool asfloat)
       fclose(tmpStream);
       return retString;
    }
-
-   ///@todo the following code creates a string of the form 1.333...e-06; this would be nice for human readable output,
-   ///      because it indicates that precision may have been lost, however, this cannot be parsed by our awk evaluation
-   ///      scripts; we should think about how this could be useful
-#if 0
-   sstream.str("");
-   sstream << mpf_class(r);
-   std::string origstring = sstream.str();
-   sstream.str("");
-
-   size_t epos = origstring.find("e");
-
-   sstream << origstring.substr(0, epos);
-
-   if( origstring.find(".") == std::string::npos )
-      sstream << ".0";
-
-   sstream << "...";
-
-   if( epos != std::string::npos )
-      sstream << origstring.substr(origstring.find("e"));
-
-   return sstream.str();
-#endif
 }
 
 
@@ -3260,10 +3237,10 @@ bool Rational::readString(const char* s)
 
 
 /// convert rational number to string
-std::string rationalToString(const Rational& r, const bool asfloat)
+std::string rationalToString(const Rational& r, const int precision)
 {
    std::stringstream sstream;
-   sstream << r;
+   sstream << std::setprecision(precision <= 0 ? 16 : precision) << r;
    return sstream.str();
 }
 

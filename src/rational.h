@@ -265,7 +265,7 @@ namespace soplex
       /// read Rational from string
       bool readString(const char* s);
 
-      friend std::string rationalToString(const Rational& r, const bool asfloat);
+      friend std::string rationalToString(const Rational& r, const int precision);
       friend bool readStringRational(const char* s, Rational& value);
       friend std::ostream& operator<<(std::ostream& os, const Rational& q);
 
@@ -334,7 +334,7 @@ namespace soplex
    };
 
    /// convert rational number to string
-   std::string rationalToString(const Rational& r, const bool asfloat = true);
+   std::string rationalToString(const Rational& r, const int precision = 32);
 
    /// read Rational from string
    bool readStringRational(const char* s, Rational& value);
