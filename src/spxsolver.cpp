@@ -312,6 +312,10 @@ void SPxSolver::init()
       if (SPxBasis::status() <= SPxBasis::NO_PROBLEM || solver() != this)
          SPxBasis::load(this);
       initialized = false;
+
+      avgtimeinterval = 1e-6;
+      nclckskips = 0;
+      nclckskipsleft = 0;
    }
    if (!matrixIsSetup)
       SPxBasis::loadDesc(desc());
@@ -1329,6 +1333,33 @@ int SPxSolver::terminationIter() const
 {
    return maxIters;
 }
+
+// returns whether current time limit is reached
+bool SPxSolver::isTimeLimitReached()
+{
+   if( maxTime < 0 || maxTime >= infinity )
+      return false;
+
+   Real currtime;
+
+   if( iterations() < 15 ||  nclckskipsleft <= 0 )
+   {
+      currtime = time();
+      if( currtime >= maxTime )
+         return true;
+
+      nclckskips = 10;
+      avgtimeinterval = currtime / (iterations() + 1.0);
+      if( maxTime - currtime / (100 * (avgtimeinterval + 1e-6) < nclckskips ) )
+         nclckskips = 0;
+      nclckskipsleft = nclckskips;
+   }
+   else
+      --nclckskipsleft;
+
+   return false;
+}
+
 
 /**@todo A first version for the termination value is
  *       implemented. Currently we check if no bound violations (shifting)
