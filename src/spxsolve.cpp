@@ -1157,12 +1157,12 @@ bool SPxSolver::terminate()
       return true;
    }
 
-   if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
+   if ( isTimeLimitReached() )
    {
       MSG_INFO2( spxout << " --- timelimit (" << maxTime
                         << ") reached" << std::endl; )
       m_status = ABORT_TIME;
-      return true;   
+      return true;
    }
 
    // objLimit is set and we are running DUAL:

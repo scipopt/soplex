@@ -190,14 +190,26 @@ public:
    /// get accounted user, system or real time.
    void getTimes( Real* userTime, Real* systemTime, Real* realTime) const;
 
+   /// get accounted user, system, or real time when ticks were updated last
+   void getLastTimes(Real* userTime, Real* systemTime, Real* realTime) const;
+
    /// return accounted user time.
    Real userTime() const;
+
+   /// return last user time accounted by timer without rechecking the clock
+   Real userTimeLast() const;
 
    /// return accounted system time.
    Real systemTime() const;
 
+   /// return last accounted system time without rechecking the clock
+   Real systemTimeLast() const;
+
    /// return accounted real time.
    Real realTime() const;
+
+   /// return accounted real time without rechecking the clock
+   Real realTimeLast() const;
 
    /// return resolution of timer as 1/seconds.
    long resolution() const { return ticks_per_sec; }

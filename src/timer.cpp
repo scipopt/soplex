@@ -75,7 +75,7 @@ void Timer::updateTicks() const
 // start timer, resume accounting user, system and real time.
 void Timer::start()
 {
-   // ignore start request if timer is runnning 
+   // ignore start request if timer is running
    if (status != RUNNING)
    {
       updateTicks();
@@ -103,8 +103,9 @@ Real Timer::stop()
    return ticks2sec(uAccount);
 }
 
-// get accounted user, system or real time.
-void Timer::getTimes(
+
+// get accounted user, system, or real time when ticks were updated last
+void Timer::getLastTimes(
    Real* uTime,
    Real* sTime,
    Real* rTime) const
@@ -120,8 +121,6 @@ void Timer::getTimes(
    }
    else
    {
-      updateTicks();
-
       if (uTime)
          *uTime = ticks2sec(uTicks + uAccount);
       if (sTime)
@@ -134,12 +133,36 @@ void Timer::getTimes(
    assert((rTime == 0) || (*rTime >= 0.0));
 }
 
+// get accounted user, system or real time.
+void Timer::getTimes(
+   Real* uTime,
+   Real* sTime,
+   Real* rTime) const
+{
+   if (status == RUNNING)
+   {
+      updateTicks();
+   }
+   getLastTimes(uTime, sTime, rTime);
+}
+
+
 // return user time accounted by timer
 Real Timer::userTime() const
 {
    Real uTime;
 
    getTimes(&uTime, 0, 0);
+
+   return uTime;
+}
+
+// return last user time accounted by timer without rechecking the clock
+Real Timer::userTimeLast() const
+{
+   Real uTime;
+
+   getLastTimes(&uTime, 0, 0);
 
    return uTime;
 }
@@ -154,13 +177,33 @@ Real Timer::systemTime() const
    return sTime;
 }
 
+// return system time accounted by timer without rechecking the clock
+Real Timer::systemTimeLast() const
+{
+   Real sTime;
+
+   getLastTimes(0, &sTime, 0);
+
+   return sTime;
+}
+
 // return real time accounted by timer
 Real Timer::realTime() const
 {
    Real rTime;
 
    getTimes(0, 0, &rTime);
-   
+
+   return rTime;
+}
+
+// return real time accounted by timer without rechecking the clock
+Real Timer::realTimeLast() const
+{
+   Real rTime;
+
+   getLastTimes(0, 0, &rTime);
+
    return rTime;
 }
 

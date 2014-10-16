@@ -39,6 +39,7 @@
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
                                            * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
                                            */
+#define MAXNCLCKSKIPS            32       /**< maximum number of clock skips (iterations without time measuring) */
 
 namespace soplex
 {
@@ -219,6 +220,9 @@ private:
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
+   Real           avgtimeinterval; ///< the average time between two calls to the terminate() function
+   int            nclckskipsleft; ///< remaining number of times the clock can be safely skipped
+   int            nclckskips;     ///< the current number of clock skips
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
@@ -1853,6 +1857,10 @@ public:
    {
       return theTime.userTime();
    }
+
+   /// returns whether current time limit is reached
+   bool isTimeLimitReached();
+
    /// cumulative time spent in all calls to method solve().
    Real cumulativeTime() const
    {
