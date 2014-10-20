@@ -187,7 +187,7 @@ private:
       unusedMem += change;
       numUnusedMemUpdates++;
 
-      if( unusedMem < 0 || unusedMem > memSize() || numUnusedMemUpdates >= 10000 )
+      if( unusedMem < 0 || unusedMem > memSize() || numUnusedMemUpdates >= 1000000 )
          countUnusedMem();
    }
 
