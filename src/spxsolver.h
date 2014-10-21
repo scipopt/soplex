@@ -40,7 +40,8 @@
                                            * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
                                            */
 #define MAXNCLCKSKIPS            32       /**< maximum number of clock skips (iterations without time measuring) */
-
+#define SAFETYFACTOR             1e-2     /**< the probability to skip the clock when the time limit has been reached */
+#define NINITCALLS               200      /**< the number of clock updates in isTimelimitReached() before clock skipping starts */
 namespace soplex
 {
 class SPxPricer;
@@ -220,9 +221,8 @@ private:
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
-   Real           avgtimeinterval; ///< the average time between two calls to the terminate() function
-   int            nclckskipsleft; ///< remaining number of times the clock can be safely skipped
-   int            nclckskips;     ///< the current number of clock skips
+   int            nClckSkipsLeft; ///< remaining number of times the clock can be safely skipped
+   long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
@@ -1600,6 +1600,7 @@ private:
    void computeFtest();
    /// update basis feasibility test vector.
    void updateFtest();
+
    //@}
 
    //------------------------------------
@@ -1638,7 +1639,11 @@ protected:
    {
       return initialized;
    }
-   /// unintialize data structures.
+
+   /// resets clock average statistics
+   void resetClockStats();
+
+   /// uninitialize data structures.
    virtual void unInit()
    {
       initialized = false;
@@ -1858,8 +1863,9 @@ public:
       return theTime.userTime();
    }
 
-   /// returns whether current time limit is reached
-   bool isTimeLimitReached();
+   /// returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
+   ///
+   bool isTimeLimitReached(const bool forceCheck = false);
 
    /// cumulative time spent in all calls to method solve().
    Real cumulativeTime() const

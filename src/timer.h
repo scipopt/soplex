@@ -100,7 +100,7 @@ private:
    /**@name Types */
    //@{
    /// status of the timer
-   enum  
+   enum
    {
       RESET,                   ///< reset
       STOPPED,                 ///< stopped

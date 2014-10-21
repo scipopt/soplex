@@ -69,6 +69,7 @@ void SPxSolver::loadLP(const SPxLP& lp)
    clear();
    unInit();
    unLoad();
+   resetClockStats();
    if (thepricer)
       thepricer->clear();
    if (theratiotester)
@@ -297,6 +298,13 @@ void SPxSolver::reinitializeVecs()
    assert((testBounds(), 1));
 }
 
+void SPxSolver::resetClockStats()
+{
+   nClckSkipsLeft = 0;
+   nCallsToTimelim = 0;
+   theCumulativeTime = 0.0;
+}
+
 void SPxSolver::init()
 {
 
@@ -310,10 +318,6 @@ void SPxSolver::init()
       if (SPxBasis::status() <= SPxBasis::NO_PROBLEM || solver() != this)
          SPxBasis::load(this);
       initialized = false;
-
-      avgtimeinterval = 1e-6;
-      nclckskips = 0;
-      nclckskipsleft = 0;
    }
    if (!matrixIsSetup)
       SPxBasis::loadDesc(desc());
@@ -851,6 +855,8 @@ SPxSolver::SPxSolver(
    , theCumulativeTime(0.0)
    , maxIters (-1)
    , maxTime (infinity)
+   , nClckSkipsLeft(0)
+   , nCallsToTimelim(0)
    , objLimit(infinity)
    , m_status(UNKNOWN)
    , theShift (0)
@@ -1094,6 +1100,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
    , maxTime(base.maxTime)
+   , nClckSkipsLeft(base.nClckSkipsLeft)
+   , nCallsToTimelim(base.nCallsToTimelim)
    , objLimit(base.objLimit)
    , m_status(base.m_status)
    , m_entertol(base.m_entertol)
@@ -1363,28 +1371,35 @@ int SPxSolver::terminationIter() const
    return maxIters;
 }
 
-// returns whether current time limit is reached
-bool SPxSolver::isTimeLimitReached()
+// returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
+bool SPxSolver::isTimeLimitReached(const bool forceCheck)
 {
+   // always update the number of calls, since the user might set a time limit later in the solving process
+   ++nCallsToTimelim;
+
+   // check if a time limit is actually set
    if( maxTime < 0 || maxTime >= infinity )
       return false;
 
-   Real currtime;
-
-   if( iterations() < 15 ||  nclckskipsleft <= 0 )
+   // check if the expensive system call to update the time should be skipped again
+   if( forceCheck || nCallsToTimelim < NINITCALLS ||  nClckSkipsLeft <= 0 )
    {
-      currtime = time();
+      Real currtime = time();
+
       if( currtime >= maxTime )
          return true;
 
-      nclckskips = 10;
-      avgtimeinterval = currtime / (iterations() + 1.0);
-      if( maxTime - currtime / (100 * (avgtimeinterval + 1e-6) < nclckskips ) )
-         nclckskips = 0;
-      nclckskipsleft = nclckskips;
+      // determine the number of times the clock can be skipped again.
+      int nClckSkips = MAXNCLCKSKIPS;
+      Real avgtimeinterval = (currtime + cumulativeTime()) / (Real)(nCallsToTimelim);
+
+      // it would not be safe to skip the clock so many times since we are approaching the time limit
+      if( SAFETYFACTOR * (maxTime - currtime) / (avgtimeinterval + 1e-6) < nClckSkips )
+         nClckSkips = 0;
+      nClckSkipsLeft = nClckSkips;
    }
    else
-      --nclckskipsleft;
+      --nClckSkipsLeft;
 
    return false;
 }
