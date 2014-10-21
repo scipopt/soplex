@@ -15,11 +15,11 @@
 
 #include <assert.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 
 #include <time.h>
 
-#else   // !_WIN32 
+#else   // !(_WIN32 || _WIN64)
 
 #include <sys/types.h>
 #include <sys/times.h>
@@ -27,7 +27,7 @@
 #include <limits.h>
 #include <unistd.h>
 
-#endif  // !_WIN32 
+#endif  // !(_WIN32 || _WIN64)
 
 #include "spxdefines.h"
 #include "timer.h"
@@ -52,12 +52,12 @@ const long Timer::ticks_per_sec = long(TIMES_TICKS_PER_SEC);
 // get actual user, system and real time from system 
 void Timer::updateTicks() const
 {
-#ifdef  _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 
    sTicks = 0;
    uTicks = rTicks = clock();
 
-#else   /* !_WIN32 */
+#else   /* !(_WIN32 || _WIN64) */
 
    struct tms now;
    clock_t    ret = times(&now);
@@ -69,7 +69,7 @@ void Timer::updateTicks() const
    sTicks = long(now.tms_stime);
    rTicks = long(ret);
 
-#endif  /* !_WIN32 */
+#endif  /* !(_WIN32 || _WIN64) */
 }
 
 // start timer, resume accounting user, system and real time.
