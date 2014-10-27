@@ -197,7 +197,7 @@ protected:
 
    Real*   work;              ///< Working array: must always be left as 0! 
 
-   Timer   factorTime;        ///< Time spent in factorizations
+   Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    //@}
 

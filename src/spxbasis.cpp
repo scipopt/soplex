@@ -772,12 +772,12 @@ void SPxBasis::change(
          try
          {
 #ifdef MEASUREUPDATETIME
-            totalUpdateTime.start();
+            theTime.start();
 #endif
             factor->change(i, *enterVec, eta);
             totalUpdateCount++;
 #ifdef MEASUREUPDATETIME
-            totalUpdateTime.stop();
+            theTime.stop();
 #endif
          }
          catch( ... )
@@ -786,7 +786,7 @@ void SPxBasis::change(
                << std::endl; )
 
 #ifdef MEASUREUPDATETIME
-            totalUpdateTime.stop();
+            theTime.stop();
 #endif
 
             // singularity was detected in update; we refactorize
@@ -798,12 +798,12 @@ void SPxBasis::change(
             try
             {
 #ifdef MEASUREUPDATETIME
-               totalUpdateTime.start();
+               theTime.start();
 #endif
                factor->change(i, *enterVec, eta);
                totalUpdateCount++;
 #ifdef MEASUREUPDATETIME
-               totalUpdateTime.stop();
+               theTime.stop();
 #endif
             }
             // with a freshly factorized, regular basis, the update is unlikely to fail; if this happens nevertheless,
@@ -814,7 +814,7 @@ void SPxBasis::change(
                   << std::endl; )
 
 #ifdef MEASUREUPDATETIME
-               totalUpdateTime.stop();
+               theTime.stop();
 #endif
 
                factorized = false;
@@ -1135,7 +1135,7 @@ bool SPxBasis::isConsistent() const
 #endif // CONSISTENCY_CHECKS
 }
 
-SPxBasis::SPxBasis()
+SPxBasis::SPxBasis(Timer::TYPE ttype)
    : theLP (0)
    , matrixIsSetup (false)
    , factor (0)
@@ -1144,13 +1144,16 @@ SPxBasis::SPxBasis()
    , nonzeroFactor(10.0)
    , fillFactor(5.0)
    , iterCount (0)
+   , theTime(0)
+   , timerType(ttype)
    , nzCount (1)
    , minStab(0.0)
    , thestatus (NO_PROBLEM)
    , freeSlinSolver(false)
 {
-
    // info: is not consistent at this moment, e.g. because theLP == 0
+
+   theTime = TimerFactory::createTimer(timerType);
 }
 
 /**@warning Do not change the LP object.
@@ -1169,6 +1172,8 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , nonzeroFactor(old.nonzeroFactor)
    , fillFactor(old.fillFactor)
    , iterCount(old.iterCount)
+   , theTime(old.theTime)
+   , timerType(old.timerType)
    , nzCount(old.nzCount)
    , lastFill(old.lastFill)
    , lastNzCount(old.lastNzCount)
@@ -1196,6 +1201,8 @@ SPxBasis::~SPxBasis()
       delete factor;
       factor = 0;
    }
+
+   spx_free(theTime);
 }
 
 

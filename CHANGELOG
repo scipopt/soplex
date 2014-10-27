@@ -13,13 +13,12 @@ performance:
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
 - more statistics on type of refinement rounds
+- type of timing can now be switched between (CPU time and wallclock time)
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
 - fix MPS reader for files without blank line at EOF
 - fix pointer of activepricer in copy constructor and assignment operator of auto pricer SPxAutoPR
-
-
 
 27 Feb 2014 - Release 2.0.0
 ===========================

@@ -26,6 +26,7 @@
 #include "spxstarter.h"
 #include "spxout.h"
 #include "exceptions.h"
+#include "timerfactory.h"
 
 namespace soplex
 {
@@ -831,9 +832,12 @@ void SPxSolver::hyperPricing(bool h)
 
 SPxSolver::SPxSolver(
    Type            p_type, 
-   Representation  p_rep )
+   Representation  p_rep,
+   Timer::TYPE     ttype)
    : theType (p_type)
    , thePricing(FULL)
+   , theTime(0)
+   , timerType(ttype)
    , theCumulativeTime(0.0)
    , maxIters (-1)
    , maxTime (infinity)
@@ -874,6 +878,7 @@ SPxSolver::SPxSolver(
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
 {
+   theTime = TimerFactory::createTimer(timerType);
 
    setDelta(DEFAULT_BND_VIOL);
 
@@ -907,6 +912,9 @@ SPxSolver::~SPxSolver()
       delete thestarter;
       thestarter = 0;
    }
+
+   // free timer
+   spx_free(theTime);
 }
 
 
@@ -1078,6 +1086,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
    , theTime(base.theTime)
+   , timerType(base.timerType)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
    , maxTime(base.maxTime)

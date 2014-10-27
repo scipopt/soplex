@@ -1095,8 +1095,8 @@ public:
    //**@name Constructors / destructors */
    //@{
    /// default constructor.
-   SPxMainSM()
-      : SPxSimplifier("MainSM")
+   SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
+      : SPxSimplifier("MainSM", ttype)
       , m_stat(15)
    {}
    /// copy constructor.

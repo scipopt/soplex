@@ -28,7 +28,7 @@
 
 #include "soplex.h"
 #include "spxgithash.h"
-#include "timer.h"
+#include "timerfactory.h"
 
 using namespace soplex;
 
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
    SoPlex soplex;
    NameSet rownames;
    NameSet colnames;
-   Timer readingTimer;
+   Timer* readingTime;
    int optidx;
 
    const char* lpfilename;
@@ -259,6 +259,8 @@ int main(int argc, char* argv[])
    bool checkSol = false;
 
    soplex.printVersion();
+   readingTime = TimerFactory::createTimer(Timer::USER_TIME);
+
    MSG_INFO1( spxout << "Copyright (c) 1996-2014 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
 
    try
@@ -557,7 +559,7 @@ int main(int argc, char* argv[])
       }
 
       // measure time for reading LP file and basis file
-      readingTimer.start();
+      readingTime->start();
 
       // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
       // the rational LP is kept after reading
@@ -592,11 +594,11 @@ int main(int argc, char* argv[])
          }
       }
 
-      readingTimer.stop();
+      readingTime->stop();
 
       MSG_INFO1( std::streamsize prec = spxout.precision();
          spxout << "Reading took "
-         << std::fixed << std::setprecision(2) << readingTimer.userTime()
+         << std::fixed << std::setprecision(2) << readingTime->time()
          << std::scientific << std::setprecision(int(prec))
          << " seconds.\n\n" );
 
@@ -688,6 +690,7 @@ int main(int argc, char* argv[])
 
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
    return 0;
+   spx_free(readingTime);
 }
 #else
 #include <assert.h>
@@ -1349,7 +1352,7 @@ void read_input_file(
    else
       MSG_INFO1( spxout << "\nLoading LP file " << filename << std::endl; )
 
-   Timer timer;
+   UserTimer timer;
    timer.start();
 
    if ( ! work.readFile(filename, &rownames, &colnames, 0) )
@@ -1372,7 +1375,7 @@ void read_input_file(
 	 << work.nNzos() << " nonzeros"
 	 << std::endl; )
 
-      MSG_INFO1( spxout << "IEXAMP41 LP reading time: " << timer.userTime() << std::endl; )
+      MSG_INFO1( spxout << "IEXAMP41 LP reading time: " << timer.time() << std::endl; )
    }
    else
    {
@@ -1384,7 +1387,7 @@ void read_input_file(
 
       MSG_INFO1(
 	 std::streamsize prec = spxout.precision();
-	 spxout << "LP reading time: " << std::fixed << std::setprecision(2) << timer.userTime();
+	 spxout << "LP reading time: " << std::fixed << std::setprecision(2) << timer.time();
 	 spxout << std::scientific << std::setprecision(int(prec)) << std::endl; )
    }
 }
@@ -1412,7 +1415,7 @@ void read_basis_file(
 static
 void solve_LP(MySoPlex& work)
 {
-   Timer timer;
+   UserTimer timer;
    timer.start();
 
    if ( checkMode )

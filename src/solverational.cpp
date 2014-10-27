@@ -30,8 +30,8 @@ namespace soplex
       bool unboundednessNotCertified = false;
 
       // start timing
-      _statistics->solvingTime.start();
-      _statistics->preprocessingTime.start();
+      _statistics->solvingTime->start();
+      _statistics->preprocessingTime->start();
 
       // remember that last solve was rational
       _lastSolveMode = SOLVEMODE_RATIONAL;
@@ -64,12 +64,13 @@ namespace soplex
 
       // introduce slack variables to transform inequality constraints into equations
       _transformEquality();
+      _statistics->preprocessingTime->stop();
 
       // apply lifting to reduce range of nonzero matrix coefficients
       if( boolParam(SoPlex::LIFTING) )
          _lift();
 
-      _statistics->preprocessingTime.stop();
+      _statistics->preprocessingTime->stop();
 
       do
       {
@@ -250,7 +251,7 @@ namespace soplex
       }
 
       // stop timing
-      _statistics->solvingTime.stop();
+      _statistics->solvingTime->stop();
    }
 
 
@@ -258,6 +259,7 @@ namespace soplex
    /// solves current problem with iterative refinement and recovery mechanism
    void SoPlex::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
    {
+      _statistics->rationalTime->start();
       primalFeasible = false;
       dualFeasible = false;
       infeasible = false;
@@ -298,6 +300,7 @@ namespace soplex
       }
 
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+      _statistics->rationalTime->stop();
 
       // evaluate result
       switch( result )
@@ -324,7 +327,7 @@ namespace soplex
          return;
       }
 
-      // store floating-point solution of original LP as current rational solution; make sure that the primal obj value
+      _statistics->rationalTime->start();
       // corresponds to a minimization problem
       sol._primal = primalReal;
       _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
@@ -524,6 +527,7 @@ namespace soplex
 
          // solve modified problem
          result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols);
+         _statistics->rationalTime->stop();
 
          // remember whether we moved to a new basis
          if( _solver.iterations() == 0 )
@@ -556,7 +560,7 @@ namespace soplex
             return;
          }
 
-         // correct primal solution
+         _statistics->rationalTime->start();
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
 
          int numAdjustedBounds = 0;
@@ -629,6 +633,7 @@ namespace soplex
       // reset tolerances in floating-point solver
       _solver.setFeastol(realParam(SoPlex::FEASTOL));
       _solver.setOpttol(realParam(SoPlex::OPTTOL));
+      _statistics->rationalTime->stop();
    }
 
 
@@ -796,7 +801,7 @@ namespace soplex
       MSG_DEBUG( spxout << "Reducing matrix coefficients by lifting.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       MSG_DEBUG( _realLP->writeFile("beforeLift.lp", 0, 0, 0) );
 
@@ -954,7 +959,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterLift.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
 
       if( numColsRational() > _beforeLiftCols || numRowsRational() > _beforeLiftRows )
       {
@@ -969,7 +974,7 @@ namespace soplex
    void SoPlex::_project(SolRational& sol)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeProject.lp", 0, 0, 0) );
@@ -1051,7 +1056,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterProject.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -1063,7 +1068,7 @@ namespace soplex
       MSG_DEBUG( spxout << "Transforming rows to equation form.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       MSG_DEBUG( _realLP->writeFile("beforeTransEqu.lp", 0, 0, 0) );
 
@@ -1129,7 +1134,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterTransEqu.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
 
       if( _slackCols.num() > 0 )
       {
@@ -1143,7 +1148,7 @@ namespace soplex
    void SoPlex::_untransformEquality(SolRational& sol)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeUntransEqu.lp", 0, 0, 0) );
@@ -1255,7 +1260,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterUntransEqu.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -1270,7 +1275,7 @@ namespace soplex
       MSG_INFO1( spxout << "Setting up LP to compute primal unbounded ray.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeTransUnbounded.lp", 0, 0, 0) );
@@ -1335,7 +1340,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterTransUnbounded.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -1344,7 +1349,7 @@ namespace soplex
    void SoPlex::_untransformUnbounded(SolRational& sol, bool unbounded)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeUntransUnbounded.lp", 0, 0, 0) );
@@ -1416,7 +1421,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -1431,7 +1436,7 @@ namespace soplex
       MSG_INFO1( spxout << "Setting up LP to test for feasibility.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeTransFeas.lp", 0, 0, 0) );
@@ -1496,7 +1501,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterTransFeas.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -1505,7 +1510,7 @@ namespace soplex
    void SoPlex::_untransformFeasibility(SolRational& sol, bool infeasible)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeUntransFeas.lp", 0, 0, 0) );
@@ -1576,7 +1581,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterUntransFeas.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
 
 #ifndef NDEBUG
       if( sol._hasPrimal )
@@ -1856,7 +1861,7 @@ namespace soplex
          _disableSimplifierAndScaler();
 
       // start timing
-      _statistics->syncTime.start();
+      _statistics->syncTime->start();
 
       // if preprocessing is applied, we need to restore the original LP at the end
       SPxLPRational* rationalLP = 0;
@@ -1867,7 +1872,7 @@ namespace soplex
       }
 
       // stop timing
-      _statistics->syncTime.stop();
+      _statistics->syncTime->stop();
 
       try
       {

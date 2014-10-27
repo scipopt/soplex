@@ -26,7 +26,7 @@ namespace soplex
    void SoPlex::_solveReal()
    {
       // start timing
-      _statistics->solvingTime.start();
+      _statistics->solvingTime->start();
 
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
@@ -37,7 +37,7 @@ namespace soplex
       _storeSolutionReal();
 
       // stop timing
-      _statistics->solvingTime.stop();
+      _statistics->solvingTime->stop();
    }
 
 
@@ -138,7 +138,7 @@ namespace soplex
    /// solves real LP with/without preprocessing
    void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
    {
-      _statistics->preprocessingTime.start();
+      _statistics->preprocessingTime->start();
 
       if( applyPreprocessing )
       {
@@ -210,7 +210,7 @@ namespace soplex
          _solver.changeObjOffset(_simplifier->getObjoffset());
       }
 
-      _statistics->preprocessingTime.stop();
+      _statistics->preprocessingTime->stop();
 
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )

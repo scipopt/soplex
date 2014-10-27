@@ -3706,8 +3706,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 {
 
    m_thesense = lp.spxSense();
-   m_timeUsed.reset();
-   m_timeUsed.start();
+   m_timeUsed->reset();
+   m_timeUsed->start();
 
    m_remRows = 0;
    m_remCols = 0;
@@ -3889,7 +3889,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
                      << std::endl; );
 
-   m_timeUsed.stop();
+   m_timeUsed->stop();
 
    return m_result;
 }

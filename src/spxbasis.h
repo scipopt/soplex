@@ -33,7 +33,7 @@
 #include "slinsolver.h"
 #include "nameset.h"
 #include "spxout.h"
-#include "timer.h"
+#include "timerfactory.h"
 
 //#define MEASUREUPDATETIME
 
@@ -377,8 +377,9 @@ protected:
    */
    int    iterCount;     ///< number of calls to change() since last manipulation
    int    updateCount;   ///< number of calls to change() since last factorize()
-   int    totalUpdateCount;///< number of updates
-   Timer  totalUpdateTime;///< time spent in updates
+   int    totalUpdateCount; ///< number of updates
+   Timer* theTime;  ///< time spent in updates
+   Timer::TYPE timerType;   ///< type of timer (user or wallclock)
    int    nzCount;       ///< number of nonzeros in basis matrix
    int    lastMem;       ///< memory needed after last fresh factorization
    Real   lastFill;      ///< fill ratio that occured during last factorization
@@ -805,7 +806,7 @@ public:
    /// time spent in updates
    Real getTotalUpdateTime() const
    {
-      return totalUpdateTime.userTime();
+      return theTime->time();
    }
    /// number of updates performed
    int getTotalUpdateCount() const
@@ -832,7 +833,7 @@ public:
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
-   SPxBasis();
+   SPxBasis(Timer::TYPE ttype = Timer::USER_TIME);
    /// copy constructor
    SPxBasis(const SPxBasis& old);
    /// assignment operator

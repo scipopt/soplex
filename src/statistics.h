@@ -33,13 +33,27 @@ namespace soplex
     */
    class SoPlex::Statistics
    {
+
    public:
 
       //**@name Construction, resetting, printing */
       //@{
 
       /// default constructor
-      Statistics();
+      Statistics(Timer::TYPE ttype = Timer::USER_TIME);
+
+      /// destructor
+      ~Statistics()
+      {
+         // we need to free all timers again (allocation happens in constructor)
+         spx_free(readingTime);
+         spx_free(solvingTime);
+         spx_free(preprocessingTime);
+         spx_free(simplexTime);
+         spx_free(syncTime);
+         spx_free(transformTime);
+         spx_free(rationalTime);
+      }
 
       /// clears all statistics
       void clearAllData();
@@ -56,14 +70,18 @@ namespace soplex
       //**@name Data */
       //@{
 
-      Timer readingTime; ///< reading time not included in solving time
-      Timer solvingTime; ///< solving time
-      Timer preprocessingTime; ///< preprocessing time
-      Timer simplexTime; ///< simplex time
-      Timer syncTime; ///< time for synchronization between real and rational LP (included in solving time)
-      Timer transformTime; ///< time for transforming LPs (included in solving time)
-      Real luFactorizationTime; ///< time for factorizing bases matrices
-      Real luSolveTime; ///< time for solving linear systems
+      Timer* readingTime; ///< reading time not included in solving time
+      Timer* solvingTime; ///< solving time
+      Timer* preprocessingTime; ///< preprocessing time
+      Timer* simplexTime; ///< simplex time
+      Timer* syncTime; ///< time for synchronization between real and rational LP (included in solving time)
+      Timer* transformTime; ///< time for transforming LPs (included in solving time)
+      Timer* rationalTime; ///< time for rational LP solving (included in solving time)
+      Timer::TYPE timerType; ///< type of timer (user or wallclock)
+
+      Real luSolveTime;
+      Real luFactorizationTime;
+
       int iterations; ///< number of iterations/pivots
       int iterationsPrimal; ///< number of iterations with Primal
       int iterationsFromBasis; ///< number of iterations from Basis

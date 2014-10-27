@@ -94,7 +94,7 @@ namespace soplex
 */
 class Timer
 {
-private:
+protected:
 
    //------------------------------------
    /**@name Types */
@@ -106,97 +106,70 @@ private:
       STOPPED,                 ///< stopped
       RUNNING                  ///< running
    } status;                   ///< timer status
+
    //@}
 
-   //------------------------------------
-   /**@name number of ticks per second */
-   //@{
-   static const long ticks_per_sec;  ///< ticks per secound, should be constant
-   //@}
-
-   //------------------------------------
-   /**@name Data */
-   //@{
-   long         uAccount;      ///< user time
-   long         sAccount;      ///< system time
-   long         rAccount;      ///< real time
-   mutable long uTicks;        ///< user ticks 
-   mutable long sTicks;        ///< system ticks
-   mutable long rTicks;        ///< real ticks 
-   //@}
-
-   //------------------------------------
-   /**@name Internal helpers */
-   //@{
-   /// convert ticks to secounds.
-   Real ticks2sec(long ticks) const
-   {
-      return (Real(ticks) * 1000.0 / Real(ticks_per_sec)) / 1000.0;
-   }
-
-   /// get actual user, system and real ticks from the system.
-   void updateTicks() const;
-   //@}
- 
 public:
+
+   //------------------------------------
+   /**@name Timers */
+   //@{
+   /// types of timers
+   enum
+   {
+      OFF = 0,
+      USER_TIME = 1,
+      WALLCLOCK_TIME = 2
+   } typedef TYPE;
+   //@}
 
    //------------------------------------
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   Timer() 
-      : status(RESET), uAccount(0), sAccount(0), rAccount(0)
+   Timer()
+      : status(RESET)
+   {}
+   /// copy constructor
+   Timer(const Timer& old)
+      : status(old.status)
+   {}
+   /// assignment operator
+   Timer& operator=(const Timer& old)
    {
-      assert(ticks_per_sec > 0);
+      status = old.status;
+      return *this;
    }
+   virtual ~Timer()
+   {}
    //@}
 
    //------------------------------------
    /**@name Control */
    //@{
    /// initialize timer, set timing accounts to zero.
-   void reset()
-   {
-      status   = RESET;
-      uAccount = rAccount = sAccount = 0;
-   }
+   virtual void reset() = 0;
 
    /// start timer, resume accounting user, system and real time.
-   void start();
+   virtual void start() = 0;
 
    /// stop timer, return accounted user time.
-   Real stop();
+   virtual Real stop() = 0;
+
+   /// return type of timer
+   virtual TYPE type() = 0;
    //@}
 
    //------------------------------------
    /**@name Access */
    //@{
-   /// get accounted user, system or real time.
-   void getTimes( Real* userTime, Real* systemTime, Real* realTime) const;
+   /// return accounted time.
 
-   /// get accounted user, system, or real time when ticks were updated last
-   void getLastTimes(Real* userTime, Real* systemTime, Real* realTime) const;
+   virtual Real time() const = 0;
 
-   /// return accounted user time.
-   Real userTime() const;
+   /// return last accounted time without rechecking the clock
+   virtual Real lastTime() const = 0;
 
-   /// return last user time accounted by timer without rechecking the clock
-   Real userTimeLast() const;
-
-   /// return accounted system time.
-   Real systemTime() const;
-
-   /// return last accounted system time without rechecking the clock
-   Real systemTimeLast() const;
-
-   /// return accounted real time.
-   Real realTime() const;
-
-   /// return accounted real time without rechecking the clock
-   Real realTimeLast() const;
-
-   /// return resolution of timer as 1/seconds.
-   long resolution() const { return ticks_per_sec; }
    //@}
 };
 } // namespace soplex

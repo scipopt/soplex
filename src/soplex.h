@@ -765,11 +765,14 @@ public:
       /// mode for a posteriori feasibility checks
       CHECKMODE = 18,
 
+      /// type of timer
+      TIMER = 19,
+
       /// mode for hyper sparse pricing
-      HYPER_PRICING = 19,
+      HYPER_PRICING = 20,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 20
+      INTPARAM_COUNT = 21
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -967,6 +970,19 @@ public:
 
       /// rational check
       CHECKMODE_RATIONAL = 2
+   };
+
+   /// values for parameter TIMER
+   enum
+   {
+      /// disable timing
+      TIMER_OFF = 0,
+
+      /// cpu or user time
+      TIMER_CPU = 1,
+
+      /// wallclock time
+      TIMER_WALLCLOCK = 2
    };
 
    /// values for parameter HYPER_PRICING

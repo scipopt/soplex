@@ -43,32 +43,32 @@ namespace soplex
 void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec = b;
    CLUFactor::solveRight(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solveRight(SSVector& x, const SVector& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec.assign(b);
    x.clear();
    CLUFactor::solveRight(x.altValues(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int m;
    int n;
@@ -100,7 +100,7 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    usetup = true;
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solve2right4update(
@@ -110,7 +110,7 @@ void SLUFactor::solve2right4update(
    SSVector&      rhs)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int  m;
    int  n;
@@ -149,7 +149,7 @@ void SLUFactor::solve2right4update(
       forest.forceSetup();
    }
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solve3right4update(
@@ -161,7 +161,7 @@ void SLUFactor::solve3right4update(
    SSVector&      rhs2)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int  m;
    int  n;
@@ -206,13 +206,13 @@ void SLUFactor::solve3right4update(
       forest.forceSetup();
    }
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec = b;
    ///@todo Why is x.clear() here used and not with solveRight() ?
@@ -220,13 +220,13 @@ void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
    CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    ssvec.assign(b);
 
@@ -247,7 +247,7 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solveLeft(
@@ -257,7 +257,7 @@ void SLUFactor::solveLeft(
    SSVector&      rhs2) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int   n;
    Real* svec = ssvec.altValues();
@@ -285,7 +285,7 @@ void SLUFactor::solveLeft(
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactor::solveLeft(
@@ -297,7 +297,7 @@ void SLUFactor::solveLeft(
    SSVector&      rhs3)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int   n;
    Real* svec = ssvec.altValues();
@@ -323,7 +323,7 @@ void SLUFactor::solveLeft(
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 Real SLUFactor::stability() const
@@ -729,6 +729,7 @@ SLUFactor::SLUFactor()
    , eta (1)
    , forest (1)
    , minThreshold (0.01)
+   , timerType(Timer::USER_TIME)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -761,6 +762,8 @@ SLUFactor::SLUFactor()
    thedim = 0;
    try
    {
+      solveTime = TimerFactory::createTimer(timerType);
+      factorTime = TimerFactory::createTimer(timerType);
       spx_alloc(row.perm, thedim);
       spx_alloc(row.orig, thedim);
       spx_alloc(col.perm, thedim);
@@ -933,6 +936,8 @@ void SLUFactor::freeAll()
    if(l.rorig) spx_free(l.rorig);
    if(l.rperm) spx_free(l.rperm);
   
+   spx_free(solveTime);
+   spx_free(factorTime);
 }
 
 SLUFactor::~SLUFactor()
