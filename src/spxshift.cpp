@@ -192,7 +192,19 @@ void SPxSolver::perturbMin(
       u = p_up[i];
       l = p_low[i];
 
-      if (x < epsilon())
+      // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
+      if( baseId(i).isSPxColId() )
+      {
+         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+            continue;
+      }
+      else
+      {
+         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+            continue;
+      }
+
+      if (x < -eps)
       {
          if (u != l && vec[i] >= u - eps)
          {
@@ -200,7 +212,7 @@ void SPxSolver::perturbMin(
             theShift += p_up[i] - u;
          }
       }
-      else if (x > epsilon())
+      else if (x > eps)
       {
          if (u != l && vec[i] <= l + eps)
          {
@@ -256,6 +268,19 @@ void SPxSolver::perturbMax(
       x = upd[i];
       u = p_up[i];
       l = p_low[i];
+
+      // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
+      if( baseId(i).isSPxColId() )
+      {
+         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+            continue;
+      }
+      else
+      {
+         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+            continue;
+      }
+
       if (x > eps)
       {
          if (u != l && vec[i] >= u - eps)
