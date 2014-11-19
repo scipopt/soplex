@@ -285,11 +285,11 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               MSG_WARNING( spxout << "WSVECS04 Frhs2: " << stat << " " 
+               MSG_WARNING( spxout << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
                                    << colfb[i] << " " << coufb[i]
                                    << " shouldn't be" << std::endl; )
             }
-            //assert(colfb[i] == coufb[i]);
+            assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
