@@ -57,16 +57,14 @@ bool SPxSolver::writeState(
       ofs << " 0";
    else if (!strcmp(pricer()->getName(), "Dantzig"))
       ofs << "1" << std::endl;
-   else if (!strcmp(pricer()->getName(), "Devex"))
-      ofs << "2" << std::endl;
    else if (!strcmp(pricer()->getName(), "ParMult"))
-      ofs << "3" << std::endl;
+      ofs << "2" << std::endl;
    else if (!strcmp(pricer()->getName(), "Devex"))
-      ofs << "4" << std::endl;
+      ofs << "3" << std::endl;
    else if (!strcmp(pricer()->getName(), "Steep"))
-      ofs << "5" << std::endl;
+      ofs << "4" << std::endl;
    else if (!strcmp(pricer()->getName(), "SteepEx"))
-      ofs << "6" << std::endl;
+      ofs << "5" << std::endl;
    ofs << "int:ratiotester = ";
    if (!strcmp(ratiotester()->getName(), "Default"))
       ofs << "0" << std::endl;
