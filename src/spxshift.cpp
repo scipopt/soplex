@@ -197,12 +197,12 @@ void SPxSolver::perturbMin(
       // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
       if( baseId(i).isSPxColId() )
       {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+         if( dualColStatus(number(baseId(i))) == SPxBasis::Desc::D_ON_BOTH )
             continue;
       }
       else
       {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+         if( dualRowStatus(number(baseId(i))) == SPxBasis::Desc::D_ON_BOTH )
             continue;
       }
 
@@ -274,12 +274,12 @@ void SPxSolver::perturbMax(
       // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
       if( baseId(i).isSPxColId() )
       {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+         if( dualColStatus(number(baseId(i))) == SPxBasis::Desc::D_ON_BOTH )
             continue;
       }
       else
       {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
+         if( dualRowStatus(number(baseId(i))) == SPxBasis::Desc::D_ON_BOTH )
             continue;
       }
 
