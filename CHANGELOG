@@ -20,6 +20,7 @@ fixed bugs:
 - fix MPS reader for files without blank line at EOF
 - fix pointer of activepricer in copy constructor and assignment operator of auto pricer SPxAutoPR
 - fix bug from uninitialized Farkas vector when simplifier detected infeasibility during iterative refinement
+- fix bug when perturbing fixed variables
 
 
 27 Feb 2014 - Release 2.0.0
