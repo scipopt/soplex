@@ -193,15 +193,9 @@ void SPxSolver::perturbMin(
       l = p_low[i];
 
       // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
-      if( baseId(i).isSPxColId() )
+      if( dualStatus(baseId(i)) == SPxBasis::Desc::D_ON_BOTH )
       {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
-            continue;
-      }
-      else
-      {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
-            continue;
+         continue;
       }
 
       if (x < -eps)
@@ -270,15 +264,9 @@ void SPxSolver::perturbMax(
       l = p_low[i];
 
       // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
-      if( baseId(i).isSPxColId() )
+      if( dualStatus(baseId(i)) == SPxBasis::Desc::D_ON_BOTH )
       {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
-            continue;
-      }
-      else
-      {
-         if( dualColStatus(i) == SPxBasis::Desc::D_ON_BOTH )
-            continue;
+         continue;
       }
 
       if (x > eps)
