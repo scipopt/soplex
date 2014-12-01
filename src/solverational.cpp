@@ -310,8 +310,15 @@ namespace soplex
          break;
       case SPxSolver::INFEASIBLE:
          MSG_INFO1( spxout << "Floating-point infeasible.\n" );
-         sol._dualFarkas = dualReal;
-         sol._hasDualFarkas = true;
+         // the floating-point solve returns a Farkas ray if and only if the simplifier was not used, which is exactly
+         // the case when a basis could be returned
+         if( _hasBasis )
+         {
+            sol._dualFarkas = dualReal;
+            sol._hasDualFarkas = true;
+         }
+         else
+            sol._hasDualFarkas = false;
          infeasible = true;
          return;
       case SPxSolver::UNBOUNDED:
