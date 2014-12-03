@@ -57,6 +57,7 @@ fixed bugs:
 - fix pointer of activepricer in copy constructor and assignment operator of auto pricer SPxAutoPR
 - fix bug from uninitialized Farkas vector when simplifier detected infeasibility during iterative refinement
 - fix bug when perturbing fixed variables
+- fix bug with incorrect index incrementation in sparse inner vector product
 
 
 

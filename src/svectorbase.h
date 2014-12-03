@@ -512,31 +512,39 @@ public:
    R operator*(const SVectorBase<S>& w) const
    {
       R x = 0;
+      int n = size();
+      int m = w.size();
+      if( n == 0 || m == 0 )
+         return x;
       int i = 0;
       int j = 0;
       Element* e = m_elem;
       typename SVectorBase<S>::Element wj = w.element(j);
-      int n = size();
-      int m = w.size();
 
-      for( ; i < n || j < m; ++i, ++j )
+      while( true )
       {
          if( e->idx == wj.idx )
          {
             x += e->val * wj.val;
-            e++;
             i++;
             j++;
+            if( i == n || j == m )
+              break;
+            e++;
             wj = w.element(j);
          }
          else if( e->idx < wj.idx )
          {
-            e++;
             i++;
+            if( i == n )
+              break;
+            e++;
          }
          else
          {
             j++;
+            if( j == m )
+              break;
             wj = w.element(j);
          }
       }
@@ -715,31 +723,39 @@ template < class S >
 Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
 {
    Real x = 0;
+   int n = size();
+   int m = w.size();
+   if( n == 0 || m == 0 )
+      return x;
    int i = 0;
    int j = 0;
    SVectorBase<Real>::Element* e = m_elem;
    typename SVectorBase<S>::Element wj = w.element(j);
-   int n = size();
-   int m = w.size();
 
-   for( ; i < n || j < m; ++i, ++j )
+   while( true )
    {
       if( e->idx == wj.idx )
       {
          x += e->val * Real(wj.val);
-         e++;
          i++;
          j++;
+         if( i == n || j == m )
+            break;
+         e++;
          wj = w.element(j);
       }
       else if( e->idx < wj.idx )
       {
-         e++;
          i++;
+         if( i == n )
+            break;
+         e++;
       }
       else
       {
          j++;
+         if( j == m )
+            break;
          wj = w.element(j);
       }
    }
