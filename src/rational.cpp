@@ -3044,6 +3044,25 @@ Rational& Rational::operator+=(const double& d)
 
 
 
+/// addition operator for ints
+Rational Rational::operator+(const int& d) const
+{
+   Rational retval = *this;
+   retval.dpointer->privatevalue += d;
+   return retval;
+}
+
+
+
+/// addition assignment operator for ints
+Rational& Rational::operator+=(const int& d)
+{
+   this->dpointer->privatevalue += d;
+   return *this;
+}
+
+
+
 /// subtraction operator
 Rational Rational::operator-(const Rational& r) const
 {
@@ -3075,6 +3094,25 @@ Rational Rational::operator-(const double& d) const
 
 /// subtraction assignment operator for doubles
 Rational& Rational::operator-=(const double& d)
+{
+   this->dpointer->privatevalue -= d;
+   return *this;
+}
+
+
+
+/// subtraction operator for ints
+Rational Rational::operator-(const int& d) const
+{
+   Rational retval = *this;
+   retval.dpointer->privatevalue -= d;
+   return retval;
+}
+
+
+
+/// subtraction assignment operator for ints
+Rational& Rational::operator-=(const int& d)
 {
    this->dpointer->privatevalue -= d;
    return *this;
@@ -3120,6 +3158,25 @@ Rational& Rational::operator*=(const double& d)
 
 
 
+/// multiplication operator for ints
+Rational Rational::operator*(const int& d) const
+{
+   Rational retval = *this;
+   retval.dpointer->privatevalue *= d;
+   return retval;
+}
+
+
+
+/// multiplication assignment operator for ints
+Rational& Rational::operator*=(const int& d)
+{
+   this->dpointer->privatevalue *= d;
+   return *this;
+}
+
+
+
 /// division operator
 Rational Rational::operator/(const Rational& r) const
 {
@@ -3153,6 +3210,25 @@ Rational Rational::operator/(const double& d) const
 Rational& Rational::operator/=(const double& d)
 {
    this->dpointer->privatevalue /= d;
+   return *this;
+}
+
+
+
+/// division operator for ints
+Rational Rational::operator/(const int& r) const
+{
+   Rational retval = *this;
+   retval.dpointer->privatevalue /= r;
+   return retval;
+}
+
+
+
+/// division assignment operator for ints
+Rational& Rational::operator/=(const int& r)
+{
+   this->dpointer->privatevalue /= r;
    return *this;
 }
 
@@ -3512,6 +3588,102 @@ bool operator>=(const long double& r, const Rational& s)
 
 
 
+/// equality operator for Rational and int
+bool operator==(const Rational& r, const int& s)
+{
+   return r.dpointer->privatevalue == s;
+}
+
+
+
+/// inequality operator for Rational and int
+bool operator!=(const Rational& r, const int& s)
+{
+   return r.dpointer->privatevalue != s;
+}
+
+
+
+/// less than operator for Rational and int
+bool operator<(const Rational& r, const int& s)
+{
+   return r.dpointer->privatevalue < s;
+}
+
+
+
+/// less than or equal to operator for Rational and int
+bool operator<=(const Rational& r, const int& s)
+{
+   return r.dpointer->privatevalue <= s;
+}
+
+
+
+/// greater than operator for Rational and int
+bool operator>(const Rational& r, const int& s)
+{
+   return r.dpointer->privatevalue > s;
+}
+
+
+
+/// greater than or equal to operator for Rational and int
+bool operator>=(const Rational& r, const int& s)
+{
+   return r.dpointer->privatevalue >= s;
+}
+
+
+
+/// equality operator for int and Rational
+bool operator==(const int& r, const Rational& s)
+{
+   return r == s.dpointer->privatevalue;
+}
+
+
+
+/// inequality operator for int and Rational
+bool operator!=(const int& r, const Rational& s)
+{
+   return r != s.dpointer->privatevalue;
+}
+
+
+
+/// less than operator for int and Rational
+bool operator<(const int& r, const Rational& s)
+{
+   return r < s.dpointer->privatevalue;
+}
+
+
+
+/// less than or equal to operator for int and Rational
+bool operator<=(const int& r, const Rational& s)
+{
+   return r <= s.dpointer->privatevalue;
+}
+
+
+
+/// greater than operator for int and Rational
+bool operator>(const int& r, const Rational& s)
+{
+   return r > s.dpointer->privatevalue;
+}
+
+
+
+/// greater than or equal to operator for int and Rational
+bool operator>=(const int& r, const Rational& s)
+{
+   return r >= s.dpointer->privatevalue;
+}
+
+
+
 /// addition operator for double and Rational
 Rational operator+(const double& d, const Rational& r)
 {
@@ -3548,6 +3720,38 @@ Rational operator/(const double& d, const Rational& r)
    Rational retval(d);
    retval.dpointer->privatevalue /= r.dpointer->privatevalue;
    return retval;
+}
+
+
+
+/// addition operator for int and Rational
+Rational operator+(const int& d, const Rational& r)
+{
+   return (r + d);
+}
+
+
+
+/// subtraction operator for int and Rational
+Rational operator-(const int& d, const Rational& r)
+{
+   return -(r - d);
+}
+
+
+
+/// multiplication operator for int and Rational
+Rational operator*(const int& d, const Rational& r)
+{
+   return (r * d);
+}
+
+
+
+/// division operator for int and Rational
+Rational operator/(const int& d, const Rational& r)
+{
+   return 1.0 / r;
 }
 
 
