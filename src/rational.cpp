@@ -40,11 +40,6 @@
 
 namespace soplex
 {
-/// list of unused Private objects
-IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
-
-
-
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
 bool Rational::useListMem = false;
@@ -55,6 +50,11 @@ bool Rational::useListMem = true;
 
 
 #ifdef SOPLEX_WITH_GMP
+
+/// list of unused Private objects
+IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+
+
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
