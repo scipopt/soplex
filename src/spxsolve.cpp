@@ -26,7 +26,6 @@
 #include "spxdefaultrt.h"
 #include "spxstarter.h"
 #include "spxout.h"
-#include "exceptions.h"
 
 #define MAXCYCLES 400
 #define MAXSTALLS 10000

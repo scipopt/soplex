@@ -25,7 +25,6 @@
 #include "spxratiotester.h"
 #include "spxstarter.h"
 #include "spxout.h"
-#include "exceptions.h"
 #include "timerfactory.h"
 
 namespace soplex

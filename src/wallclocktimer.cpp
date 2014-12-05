@@ -20,7 +20,6 @@
 #else
 #include <sys/times.h>
 #include <sys/time.h>
-#include <unistd.h>
 #endif
 #include <time.h>
 

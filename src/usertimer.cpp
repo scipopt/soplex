@@ -24,7 +24,6 @@
 #include <sys/types.h>
 #include <sys/times.h>
 //#include <sys/param.h>
-#include <limits.h>
 #include <unistd.h>
 
 #endif  // !(_WIN32 || _WIN64)

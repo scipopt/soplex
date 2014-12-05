@@ -21,7 +21,6 @@
 #include "spxbasis.h"
 #include "spxsolver.h"
 #include "spxout.h"
-#include "exceptions.h"
 
 namespace soplex
 {

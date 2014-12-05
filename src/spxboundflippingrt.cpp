@@ -26,7 +26,6 @@
 namespace soplex
 {
 
-#define MINSTAB          1e-5
 #define LOWSTAB          1e-10
 #define MAX_RELAX_COUNT  2
 #define LONGSTEP_FREQ    100

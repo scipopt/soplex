@@ -20,7 +20,6 @@
 #include "spxdefines.h"
 #include "spxbasis.h"
 #include "spxsolver.h"
-#include "exceptions.h"
 
 namespace soplex
 {
