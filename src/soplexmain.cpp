@@ -689,8 +689,8 @@ int main(int argc, char* argv[])
    }
 
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
-   return 0;
    spx_free(readingTime);
+   return 0;
 }
 #else
 #include <assert.h>
