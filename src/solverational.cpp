@@ -1041,6 +1041,8 @@ namespace soplex
                dualFeasible = true;
                break;
             }
+            else
+               factorSolAvailable = true;
          }
 
          // correct primal solution and align with basis
