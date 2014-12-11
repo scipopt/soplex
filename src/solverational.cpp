@@ -1446,7 +1446,7 @@ namespace soplex
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
          // zero if basic; otherwise at its upper bound 1
-         error = !(tau >= Rational::POSONE || tau < _rationalFeastol);
+         error = !(tau >= Rational::POSONE || tau <= _rationalFeastol);
          assert(!error);
 
          hasUnboundedRay = (tau >= 1);
