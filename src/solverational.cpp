@@ -3512,9 +3512,8 @@ namespace soplex
       {
          if( basisStatusCols[i] == SPxSolver::BASIC && j < matrixdim )
          {
-            getObjRational(i, basicDualRhs[j]);
-            if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
-               basicDualRhs[j] *= -1;
+            basicDualRhs[j] = maxObjRational(i);
+            basicDualRhs[j] *= -1;
             matrix[j] = &colVectorRational(i);
             j++;
          }
