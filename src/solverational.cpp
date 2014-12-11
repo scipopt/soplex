@@ -90,6 +90,10 @@ namespace soplex
       int oldRepresentation = intParam(SoPlex::REPRESENTATION);
       setIntParam(SoPlex::REPRESENTATION, SoPlex::REPRESENTATION_COLUMN);
 
+      // force ratio test (avoid bound flipping)
+      int oldRatiotester = intParam(SoPlex::RATIOTESTER);
+      setIntParam(SoPlex::RATIOTESTER, SoPlex::RATIOTESTER_FAST);
+
       ///@todo implement handling of row objectives in Cplex interface
 #ifdef SOPLEX_WITH_CPX
       int oldEqtrans = boolParam(SoPlex::EQTRANS);
@@ -308,8 +312,9 @@ namespace soplex
       setBoolParam(SoPlex::EQTRANS, oldEqtrans);
 #endif
 
-      // reset representation
+      // reset representation and ratio test
       setIntParam(SoPlex::REPRESENTATION, oldRepresentation);
+      setIntParam(SoPlex::RATIOTESTER, oldRatiotester);
 
       // undo lifting
       if( boolParam(SoPlex::LIFTING) )
