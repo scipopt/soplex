@@ -1028,6 +1028,11 @@ namespace soplex
             {
                MSG_INFO1( spxout << "Stopped rational factorization.\n" );
             }
+            else if( error )
+            {
+               // message was already printed; reset error flag and continue without factorization
+               error = false;
+            }
             else if( (factorSolPrimalFeasible || factorSolPrimalViolation <= _rationalFeastol) && (factorSolDualFeasible || factorSolDualViolation <= _rationalOpttol) )
             {
                MSG_INFO1( spxout << "Tolerances reached.\n" );
