@@ -291,6 +291,13 @@ namespace soplex
             _intParamUpper[SoPlex::HYPER_PRICING] = 2;
             _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_AUTO;
 
+            // minimum number of stalling refinements since last pivot to trigger rational factorization
+            _intParamName[SoPlex::RATFAC_MINSTALLS] = "ratfacminstalls";
+            _intParamDescription[SoPlex::RATFAC_MINSTALLS] = "minimum number of stalling refinements since last pivot to trigger rational factorization";
+            _intParamLower[SoPlex::RATFAC_MINSTALLS] = 0;
+            _intParamUpper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
+            _intParamDefault[SoPlex::RATFAC_MINSTALLS] = 2;
+
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
             _realParamDescription[SoPlex::FEASTOL] = "primal feasibility tolerance";
@@ -4986,6 +4993,12 @@ namespace soplex
          default:
             return false;
          }
+         break;
+
+      // minimum number of stalling refinements since last pivot to trigger rational factorization
+      case SoPlex::RATFAC_MINSTALLS:
+         if( value < 0 )
+            return false;
          break;
 
       default:

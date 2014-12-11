@@ -858,8 +858,11 @@ public:
       /// mode for hyper sparse pricing
       HYPER_PRICING = 19,
 
+      /// minimum number of stalling refinements since last pivot to trigger rational factorization
+      RATFAC_MINSTALLS = 20,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 20
+      INTPARAM_COUNT = 21
    } IntParam;
 
    /// values for parameter OBJSENSE

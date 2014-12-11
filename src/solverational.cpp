@@ -532,6 +532,7 @@ namespace soplex
       bool factorSolNewBasis = true;
       bool factorSolPrimalFeasible;
       bool factorSolDualFeasible;
+      int lastStallRefinements = 0;
       do
       {
          // decrement minRounds counter
@@ -990,10 +991,14 @@ namespace soplex
          // count refinements and remember whether we moved to a new basis
          _statistics->refinements++;
          if( _statistics->iterations <= prevIterations )
+         {
+            lastStallRefinements++;
             _statistics->stallRefinements++;
+         }
          else
          {
             factorSolNewBasis = true;
+            lastStallRefinements = 0;
             _statistics->pivotRefinements = _statistics->refinements;
          }
 
@@ -1027,7 +1032,7 @@ namespace soplex
 
          _statistics->rationalTime.start();
 
-         if( _statistics->iterations <= prevIterations && _hasBasis && factorSolNewBasis
+         if( lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS) && _hasBasis && factorSolNewBasis
             && (boolParam(SoPlex::RATFAC) || realParam(SoPlex::FEASTOL) <= 0.0 || realParam(SoPlex::OPTTOL) <= 0.0) )
          {
             MSG_INFO1( spxout << "Performing rational factorization . . .\n" );

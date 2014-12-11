@@ -21,6 +21,8 @@ interface & parameters:
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - improved printing of rationals in limited precision
 - added possibility to write basis file in original Cplex definition
+- new parameter int:ratfacminstalls for minimum number of stalling refinements since last pivot to trigger rational
+  factorization
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
