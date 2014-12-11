@@ -523,6 +523,7 @@ namespace soplex
       Rational factorSolPrimalViolation;
       Rational factorSolDualViolation;
       bool factorSolAvailable = false;
+      bool factorSolNewBasis = true;
       bool factorSolPrimalFeasible;
       bool factorSolDualFeasible;
       do
@@ -985,7 +986,10 @@ namespace soplex
          if( _statistics->iterations <= prevIterations )
             _statistics->stallRefinements++;
          else
+         {
+            factorSolNewBasis = true;
             _statistics->pivotRefinements = _statistics->refinements;
+         }
 
          // evaluate result; if modified problem was not solved to optimality, stop refinement
          switch( result )
@@ -1017,11 +1021,12 @@ namespace soplex
 
          _statistics->rationalTime.start();
 
-         if( _statistics->iterations <= prevIterations && _hasBasis
+         if( _statistics->iterations <= prevIterations && _hasBasis && factorSolNewBasis
             && (boolParam(SoPlex::RATFAC) || realParam(SoPlex::FEASTOL) <= 0.0 || realParam(SoPlex::OPTTOL) <= 0.0) )
          {
             MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
             _factorizeColumnRational(factorSol, _basisStatusRows, _basisStatusCols, factorSolPrimalFeasible, factorSolDualFeasible, factorSolPrimalViolation, factorSolDualViolation, stopped, error);
+            factorSolNewBasis = false;
             assert(!factorSolPrimalFeasible || factorSolPrimalViolation == 0);
             assert(!factorSolDualFeasible || factorSolDualViolation == 0);
             if( stopped )
