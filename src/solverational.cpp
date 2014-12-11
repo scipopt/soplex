@@ -67,6 +67,7 @@ namespace soplex
       _solver.setTerminationValue(realParam(SoPlex::INFTY));
 
       // transform LP to minimization problem
+      ///@todo revise: it seems like we invert the objective function twice
       if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
       {
          assert(_rationalLP->spxSense() == SPxLPRational::MAXIMIZE);
@@ -3512,6 +3513,8 @@ namespace soplex
          if( basisStatusCols[i] == SPxSolver::BASIC && j < matrixdim )
          {
             getObjRational(i, basicDualRhs[j]);
+            if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE )
+               basicDualRhs[j] *= -1;
             matrix[j] = &colVectorRational(i);
             j++;
          }
