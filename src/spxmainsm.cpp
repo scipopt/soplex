@@ -1700,7 +1700,10 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
          Real aij = row.value(k);
          int  j   = row.index(k);
 
-         ASSERT_WARN( "WMAISM11", isNotZero(aij, 1.0 / infinity) );
+         if( !isNotZero(aij, 1.0 / infinity) )
+         {
+            MSG_WARNING( spxout << "Warning: tiny nonzero coefficient " << aij << " in row " << i << "\n" );
+         }
 
          if (aij > 0.0)
          {
