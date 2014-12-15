@@ -2152,18 +2152,48 @@ void SPxLPBase<Real>::writeMPS(
 /// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
 ///       dualCols must have the identical size to the primal rows.
 template < >
-void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId dualColIds[],
-      int* nprimalrows, int* ndualcols)
+void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[],
+      SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols)
 {
    // Setting up the primalrowids and dualcolids arrays if not given as parameters
-   if( primalRowIds == 0 || dualColIds == 0 )
+   if( primalRowIds == 0 || primalColIds == 0 || dualRowIds == 0 || dualColIds == 0 )
    {
       DataArray < SPxRowId > primalrowids(2*nRows());
+      DataArray < SPxColId > primalcolids(2*nRows());
+      DataArray < SPxRowId > dualrowids(2*nRows());
       DataArray < SPxColId > dualcolids(2*nRows());
       int numprimalrows = 0;
+      int numprimalcols = 0;
+      int numdualrows = 0;
       int numdualcols = 0;
 
-      buildDualProblem(dualLP, primalrowids.get_ptr(), dualcolids.get_ptr(), &numprimalrows, &numdualcols);
+      buildDualProblem(dualLP, primalrowids.get_ptr(), primalcolids.get_ptr(), dualrowids.get_ptr(),
+            dualcolids.get_ptr(), &numprimalrows, &numprimalcols, &numdualrows, &numdualcols);
+
+      if( primalRowIds != 0 )
+      {
+         primalRowIds = primalrowids.get_ptr();
+         (*nprimalrows) = numprimalrows;
+      }
+
+      if( primalColIds != 0 )
+      {
+         primalColIds = primalcolids.get_ptr();
+         (*nprimalcols) = numprimalcols;
+      }
+
+      if( dualRowIds != 0 )
+      {
+         dualRowIds = dualrowids.get_ptr();
+         (*ndualrows) = numdualrows;
+      }
+
+      if( dualColIds != 0 )
+      {
+         dualColIds = dualcolids.get_ptr();
+         (*ndualcols) = numdualcols;
+      }
+
       return;
    }
 
@@ -2180,9 +2210,12 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
    int numAddedRows = 0;
    int numVarBoundCols = 0;
    int primalrowsidx = 0;
+   int primalcolsidx = 0;
 
    for( int i = 0; i < nCols(); ++i )
    {
+      primalColIds[primalcolsidx] = cId(i);
+      primalcolsidx++;
       if( lower(i) <= -infinity && upper(i) >= infinity ) // unrestricted variables
       {
          dualrows.create(0, obj(i), obj(i));
@@ -2320,6 +2353,14 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
    // adding the empty rows to the dual LP
    dualLP.addRows(dualrows);
 
+   // setting the dual row ids for the related primal cols.
+   // this assumes that the rows are added in sequential order.
+   printf("Number of primal indicies: %d\n", primalcolsidx);
+   for( int i = 0; i < primalcolsidx; i++ )
+      dualRowIds[i] = dualLP.rId(i);
+
+   (*nprimalcols) = primalcolsidx;
+   (*ndualrows) = primalcolsidx;
 
    // iterating over each of the rows to create dual columns
    for( int i = 0; i < nRows(); ++i )

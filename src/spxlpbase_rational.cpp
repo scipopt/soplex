@@ -2277,8 +2277,8 @@ void SPxLPBase<Rational>::writeMPS(
 /// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
 ///       dualCols must have the identical size to the primal rows.
 template < >
-void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[], SPxColId dualColIds[],
-      int* nprimalrows, int* ndualcols)
+void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[],
+      SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols)
 {
    assert(false);
    MSG_ERROR( spxout << "Method buildDualProblem() not implemented for Rational\n" );

@@ -1314,8 +1314,9 @@ public:
    /// Building the dual problem from a given LP
    /// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
    ///       dualCols must have the identical size to the primal rows.
-   virtual void buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[] = 0, SPxColId dualColIds[] = 0,
-         int* nprimalrows = 0, int* ndualcols = 0);
+   virtual void buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[] = 0, SPxColId primalColIds[] = 0,
+         SPxRowId dualRowIds[] = 0, SPxColId dualColIds[] = 0, int* nprimalrows = 0, int* nprimalcols = 0,
+         int* ndualrows = 0, int* ndualcols = 0);
 
    //@}
 
