@@ -100,7 +100,7 @@ public:
    SoPlex(const SoPlex& rhs);
 
    /// destructor
-   ~SoPlex();
+   virtual ~SoPlex();
 
    //@}
 
