@@ -1,7 +1,5 @@
-(maintain each list from top to bottom)
-
-Bugfix version
-==============
+18 Dec 2014 - Release 2.0.1
+===========================
 
 performance:
 - more efficient memory allocation of elements of class Rational (can be deactivated at compile time by defining
@@ -13,7 +11,7 @@ performance:
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
 - more statistics on type of refinement rounds
-- type of timing can now be switched between (CPU time and wallclock time)
+- type of timing can now be switched between CPU time and wallclock time
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
