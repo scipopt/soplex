@@ -1033,6 +1033,7 @@ namespace soplex
 
          _statistics->rationalTime.start();
 
+         // attempt rational reconstruction
          if( boolParam(SoPlex::RATREC) )
          {
             MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
@@ -1045,6 +1046,7 @@ namespace soplex
             }
          }
 
+         // solve basis systems exactly
          if( boolParam(SoPlex::RATFAC) && lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS)
             && _hasBasis && factorSolNewBasis )
          {
@@ -3830,6 +3832,10 @@ namespace soplex
       if( !sol.hasPrimal() || !sol.hasDual() )
          return success;
 
+      // start timing and increment statistics counter
+      _statistics->reconstructionTime.start();
+      _statistics->rationalReconstructions++;
+
       // reconstruct primal vector
       varbuffer.reDim((sol._primal).dim());
       sol.getPrimal(varbuffer);
@@ -3838,6 +3844,7 @@ namespace soplex
       if( !success )
       {
          MSG_INFO2( spxout << "Rational reconstruction of primal vector failed!\n" );
+         _statistics->reconstructionTime.stop();
          return success;
       }
 
@@ -3860,12 +3867,14 @@ namespace soplex
          if( _lowerFinite(_colTypes[c]) && varbuffer[c] < lowerRational(c) )
          {
             MSG_INFO2( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - varbuffer[c]) << "\n" );
+            _statistics->reconstructionTime.stop();
             return false;
          }
 
          if( _upperFinite(_colTypes[c]) && varbuffer[c] > upperRational(c) )
          {
             MSG_INFO2( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(varbuffer[c] - upperRational(c)) << "\n" );
+            _statistics->reconstructionTime.stop();
             return false;
          }
       }
@@ -3892,12 +3901,14 @@ namespace soplex
          if( _lowerFinite(_rowTypes[r]) && rowbuffer[r] < lhsRational(r) )
          {
             MSG_INFO2( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - rowbuffer[r]) << "\n" );
+            _statistics->reconstructionTime.stop();
             return false;
          }
 
          if( _upperFinite(_rowTypes[r]) && rowbuffer[r] > rhsRational(r) )
          {
             MSG_INFO2( spxout << "Rhs of row " << r << " violated by " << rationalToString(rowbuffer[r] - rhsRational(r)) << "\n" );
+            _statistics->reconstructionTime.stop();
             return false;
          }
       }
@@ -3915,6 +3926,7 @@ namespace soplex
       if( !success )
       {
          MSG_INFO2( spxout << "Rational reconstruction of dual vector failed!\n" );
+         _statistics->reconstructionTime.stop();
          return success;
       }
 
@@ -3935,6 +3947,7 @@ namespace soplex
                   << " and slack " << rationalToString(sol._slacks[r])
                   << " not at lhs " << rationalToString(lhsRational(r))
                   << "\n" );
+               _statistics->reconstructionTime.stop();
                return false;
             }
 
@@ -3955,6 +3968,7 @@ namespace soplex
                   << " and slack " << rationalToString(sol._slacks[r])
                   << " not at rhs " << rationalToString(rhsRational(r))
                   << "\n" );
+               _statistics->reconstructionTime.stop();
                return false;
             }
 
@@ -3990,6 +4004,7 @@ namespace soplex
                   << " and value " << rationalToString(sol._primal[c])
                   << " not at lower bound " << rationalToString(lowerRational(c))
                   << "\n" );
+               _statistics->reconstructionTime.stop();
                return false;
             }
 
@@ -4010,6 +4025,7 @@ namespace soplex
                   << " and value " << rationalToString(sol._primal[c])
                   << " not at upper bound " << rationalToString(upperRational(c))
                   << "\n" );
+               _statistics->reconstructionTime.stop();
                return false;
             }
 
@@ -4031,6 +4047,9 @@ namespace soplex
       {
          MSG_WARNING( spxout << "Warning: Reconstructed solution not basic.\n" );
       }
+
+      // stop timing
+      _statistics->reconstructionTime.stop();
 
       return success;
    }

@@ -43,11 +43,11 @@ namespace soplex
       syncTime.reset();
       transformTime.reset();
       rationalTime.reset();
+      reconstructionTime.reset();
       luFactorizationTimeReal = 0.0;
       luSolveTimeReal = 0.0;
       luFactorizationTimeRational = 0.0;
       luSolveTimeRational = 0.0;
-      rationalReconstructionTime = 0.0;
       iterations = 0;
       iterationsPrimal = 0;
       iterationsFromBasis = 0;
@@ -136,7 +136,7 @@ namespace soplex
          << "  Rat. solve time   : " << luSolveTimeRational << "\n";
 
       os << "Rat. reconstructions: " << rationalReconstructions << "\n"
-         << "  Rat. rec. time    : " << rationalReconstructionTime << "\n";
+         << "  Rat. rec. time    : " << reconstructionTime.userTime() << "\n";
    }
 } // namespace soplex
 #endif
