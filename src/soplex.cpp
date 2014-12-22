@@ -3273,7 +3273,7 @@ namespace soplex
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            if( colStatus != SPxSolver::ON_UPPER && _solRational._primal[c] != upperRational(c) && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
@@ -3282,7 +3282,7 @@ namespace soplex
                   maxviol = -redcost[c];
                }
             }
-            if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            if( colStatus != SPxSolver::ON_LOWER && _solRational._primal[c] != lowerRational(c) && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
@@ -3294,7 +3294,7 @@ namespace soplex
          }
          else
          {
-            if( colStatus != SPxSolver::ON_UPPER && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            if( colStatus != SPxSolver::ON_UPPER && _solRational._primal[c] != upperRational(c) && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
@@ -3303,7 +3303,7 @@ namespace soplex
                   maxviol = redcost[c];
                }
             }
-            if( colStatus != SPxSolver::ON_LOWER && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            if( colStatus != SPxSolver::ON_LOWER && _solRational._primal[c] != lowerRational(c) && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
@@ -3355,7 +3355,7 @@ namespace soplex
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
+            if( rowStatus != SPxSolver::ON_UPPER && _solRational._slacks[r] != rhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
@@ -3368,7 +3368,7 @@ namespace soplex
                   maxviol = -dual[r];
                }
             }
-            if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
+            if( rowStatus != SPxSolver::ON_LOWER && _solRational._slacks[r] != lhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
@@ -3384,7 +3384,7 @@ namespace soplex
          }
          else
          {
-            if( rowStatus != SPxSolver::ON_UPPER && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
+            if( rowStatus != SPxSolver::ON_UPPER && _solRational._slacks[r] != rhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
@@ -3397,7 +3397,7 @@ namespace soplex
                   maxviol = dual[r];
                }
             }
-            if( rowStatus != SPxSolver::ON_LOWER && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
+            if( rowStatus != SPxSolver::ON_LOWER && _solRational._slacks[r] != lhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
