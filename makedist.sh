@@ -24,7 +24,6 @@ tar -cvzhf $NAME.tgz \
 --exclude="*exercise_LP_changes.cpp" \
 --exclude="*/local/*" \
 --exclude="TODO" \
---exclude="src/ratrecon.*" \
 $NAME/COPYING \
 $NAME/INSTALL \
 $NAME/CHANGELOG \

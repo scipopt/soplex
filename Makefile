@@ -148,6 +148,7 @@ LIBHEADER	=	array.h \
 			nameset.h \
 			random.h \
 			rational.h \
+			ratrecon.h \
 			slinsolver.h \
 			slinsolver_rational.h \
 			slufactor.h \
@@ -214,6 +215,7 @@ LIBOBJ		= 	changesoplex.o \
 			mpsinput.o \
 			nameset.o \
 			rational.o \
+			ratrecon.o \
 			slufactor.o \
 			slufactor_rational.o \
 			solverational.o \

@@ -68,6 +68,7 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\mpsinput.obj \
 				$(LIBOBJDIR)\nameset.obj \
 				$(LIBOBJDIR)\rational.obj \
+				$(LIBOBJDIR)\ratrecon.obj \
 				$(LIBOBJDIR)\slufactor.obj \
 				$(LIBOBJDIR)\solverational.obj \
 				$(LIBOBJDIR)\solvereal.obj \
