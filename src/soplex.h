@@ -791,8 +791,11 @@ public:
       /// should cycling solutions be accepted during iterative refinement?
       ACCEPTCYCLING = 4,
 
+      /// apply rational reconstruction after each iterative refinement?
+      RATREC = 5,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 5
+      BOOLPARAM_COUNT = 6
    } BoolParam;
 
    /// integer parameters
@@ -1653,6 +1656,8 @@ private:
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, Rational& primalViolation, Rational& dualViolation, bool& stopped, bool& error);
 
+   /// attempts reational reconstruction of primal-dual solution
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error);
    //@}
 
 

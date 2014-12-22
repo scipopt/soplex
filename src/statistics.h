@@ -67,6 +67,7 @@ namespace soplex
       Real luSolveTimeReal; ///< time for solving linear systems in real precision
       Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision
       Real luSolveTimeRational; ///< time for solving linear systems in rational precision
+      Real rationalReconstructionTime; ///< time for rational reconstructions
       int iterations; ///< number of iterations/pivots
       int iterationsPrimal; ///< number of iterations with Primal
       int iterationsFromBasis; ///< number of iterations from Basis
@@ -74,6 +75,7 @@ namespace soplex
       int luFactorizationsReal; ///< number of basis matrix factorizations in real precision
       int luSolvesReal; ///< number of (forward and backward) solves with basis matrix in real precision
       int luFactorizationsRational; ///< number of basis matrix factorizations in rational precision
+      int rationalReconstructions; ///< number of rational reconstructions performed
       int refinements; ///< number of refinement steps
       int stallRefinements; ///< number of refinement steps without pivots
       int pivotRefinements; ///< number of refinement steps until final basis is reached

@@ -47,6 +47,7 @@ namespace soplex
       luSolveTimeReal = 0.0;
       luFactorizationTimeRational = 0.0;
       luSolveTimeRational = 0.0;
+      rationalReconstructionTime = 0.0;
       iterations = 0;
       iterationsPrimal = 0;
       iterationsFromBasis = 0;
@@ -54,6 +55,7 @@ namespace soplex
       luFactorizationsReal = 0;
       luSolvesReal = 0;
       luFactorizationsRational = 0;
+      rationalReconstructions = 0;
       refinements = 0;
       stallRefinements = 0;
       pivotRefinements = 0;
@@ -132,6 +134,9 @@ namespace soplex
       os << "Rat. factorizations : " << luFactorizationsRational << "\n"
          << "  Rat. factor. time : " << luFactorizationTimeRational << "\n"
          << "  Rat. solve time   : " << luSolveTimeRational << "\n";
+
+      os << "Rat. reconstructions: " << rationalReconstructions << "\n"
+         << "  Rat. rec. time    : " << rationalReconstructionTime << "\n";
    }
 } // namespace soplex
 #endif

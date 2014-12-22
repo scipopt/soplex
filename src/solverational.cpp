@@ -20,6 +20,7 @@
 #include "soplex.h"
 #include "statistics.h"
 #include "slufactor_rational.h"
+#include "ratrecon.h"
 
 namespace soplex
 {
@@ -1032,8 +1033,20 @@ namespace soplex
 
          _statistics->rationalTime.start();
 
-         if( lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS) && _hasBasis && factorSolNewBasis
-            && (boolParam(SoPlex::RATFAC) || realParam(SoPlex::FEASTOL) <= 0.0 || realParam(SoPlex::OPTTOL) <= 0.0) )
+         if( boolParam(SoPlex::RATREC) )
+         {
+            MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
+            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error) )
+            {
+               MSG_INFO1( spxout << "Tolerances reached.\n" );
+               primalFeasible = true;
+               dualFeasible = true;
+               break;
+            }
+         }
+
+         if( boolParam(SoPlex::RATFAC) && lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS)
+            && _hasBasis && factorSolNewBasis )
          {
             MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
             _factorizeColumnRational(factorSol, _basisStatusRows, _basisStatusCols, factorSolPrimalFeasible, factorSolDualFeasible, factorSolPrimalViolation, factorSolDualViolation, stopped, error);
@@ -3800,5 +3813,226 @@ namespace soplex
       return;
    }
 
+   /// attempts reational reconstruction of primal-dual solution
+   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error)
+   {
+      ///@todo store buffer and slackbuffer as working arrays in SoPlex class
+      DVectorRational varbuffer;
+      DVectorRational rowbuffer;
+      bool success;
+      bool isSolBasic;
+
+      error = false;
+      stopped = false;
+      success = false;
+      isSolBasic = true;
+
+      if( !sol.hasPrimal() || !sol.hasDual() )
+         return success;
+
+      // reconstruct primal vector
+      varbuffer.reDim((sol._primal).dim());
+      sol.getPrimal(varbuffer);
+
+      success = reconstructVector(varbuffer);
+      if( !success )
+      {
+         MSG_INFO2( spxout << "Rational reconstruction of primal vector failed!\n" );
+         return success;
+      }
+
+      MSG_INFO2( spxout << "Rational reconstruction of primal vector successful!\n" );
+
+      // check violation of bounds
+      for( int c = numColsRational() - 1; c >= 0; c-- )
+      {
+         // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
+         SPxSolver::VarStatus& basisStatusCol = _basisStatusCols[c];
+         if( (basisStatusCol == SPxSolver::FIXED && varbuffer[c] != lowerRational(c))
+            || (basisStatusCol == SPxSolver::ON_LOWER && varbuffer[c] != lowerRational(c))
+            || (basisStatusCol == SPxSolver::ON_UPPER && varbuffer[c] != upperRational(c))
+            || (basisStatusCol == SPxSolver::ZERO && varbuffer[c] != 0)
+            || (basisStatusCol == SPxSolver::UNDEFINED) )
+         {
+            isSolBasic = false;
+         }
+
+         if( _lowerFinite(_colTypes[c]) && varbuffer[c] < lowerRational(c) )
+         {
+            MSG_INFO2( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - varbuffer[c]) << "\n" );
+            return false;
+         }
+
+         if( _upperFinite(_colTypes[c]) && varbuffer[c] > upperRational(c) )
+         {
+            MSG_INFO2( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(varbuffer[c] - upperRational(c)) << "\n" );
+            return false;
+         }
+      }
+
+      // compute slacks
+      ///@todo we should compute them one by one so we can abort when encountering an infeasibility
+      rowbuffer.reDim(numRowsRational());
+      _rationalLP->computePrimalActivity(varbuffer, rowbuffer);
+
+      // check violation of sides
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
+         SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
+         if( (basisStatusRow == SPxSolver::FIXED && rowbuffer[r] != lhsRational(r))
+            || (basisStatusRow == SPxSolver::ON_LOWER && rowbuffer[r] != lhsRational(r))
+            || (basisStatusRow == SPxSolver::ON_UPPER && rowbuffer[r] != rhsRational(r))
+            || (basisStatusRow == SPxSolver::ZERO && rowbuffer[r] != 0)
+            || (basisStatusRow == SPxSolver::UNDEFINED) )
+         {
+            isSolBasic = false;
+         }
+
+         if( _lowerFinite(_rowTypes[r]) && rowbuffer[r] < lhsRational(r) )
+         {
+            MSG_INFO2( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - rowbuffer[r]) << "\n" );
+            return false;
+         }
+
+         if( _upperFinite(_rowTypes[r]) && rowbuffer[r] > rhsRational(r) )
+         {
+            MSG_INFO2( spxout << "Rhs of row " << r << " violated by " << rationalToString(rowbuffer[r] - rhsRational(r)) << "\n" );
+            return false;
+         }
+      }
+
+      // update primal solution
+      ///@todo only update when dual also feasible and complementary slack
+      sol._primal = varbuffer;
+      sol._slacks = rowbuffer;
+
+      // reconstruct dual vector
+      assert(rowbuffer.dim() == sol._dual.dim());
+      sol.getDual(rowbuffer);
+
+      success = reconstructVector(rowbuffer);
+      if( !success )
+      {
+         MSG_INFO2( spxout << "Rational reconstruction of dual vector failed!\n" );
+         return success;
+      }
+
+      MSG_INFO2( spxout << "Rational reconstruction of dual vector successful!\n" );
+
+      // check dual multipliers before reduced costs because this check is faster since it does not require the
+      // computation of reduced costs
+      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      {
+         int sig = sign(rowbuffer[r]);
+
+         if( sig > 0 )
+         {
+            if( !_lowerFinite(_rowTypes[r]) || sol._slacks[r] > lhsRational(r) )
+            {
+               MSG_DEBUG( spxout << "complementary slackness violated by row " << r
+                  << " with dual " << rationalToString(rowbuffer[r])
+                  << " and slack " << rationalToString(sol._slacks[r])
+                  << " not at lhs " << rationalToString(lhsRational(r))
+                  << "\n" );
+               return false;
+            }
+
+            if( _basisStatusRows[r] != SPxSolver::ON_LOWER && _basisStatusRows[r] != SPxSolver::FIXED )
+            {
+               if( _basisStatusRows[r] == SPxSolver::BASIC || _basisStatusRows[r] == SPxSolver::UNDEFINED )
+                  isSolBasic = false;
+               else
+                  _basisStatusRows[r] = SPxSolver::ON_LOWER;
+            }
+         }
+         else if( sig < 0 )
+         {
+            if( !_upperFinite(_rowTypes[r]) || sol._slacks[r] < rhsRational(r) )
+            {
+               MSG_DEBUG( spxout << "complementary slackness violated by row " << r
+                  << " with dual " << rationalToString(rowbuffer[r])
+                  << " and slack " << rationalToString(sol._slacks[r])
+                  << " not at rhs " << rationalToString(rhsRational(r))
+                  << "\n" );
+               return false;
+            }
+
+            if( _basisStatusRows[r] != SPxSolver::ON_UPPER && _basisStatusRows[r] != SPxSolver::FIXED )
+            {
+               if( _basisStatusRows[r] == SPxSolver::BASIC || _basisStatusRows[r] == SPxSolver::UNDEFINED )
+                  isSolBasic = false;
+               else
+                  _basisStatusRows[r] = SPxSolver::ON_UPPER;
+            }
+         }
+      }
+
+      // compute reduced cost vector; we assume that the objective function vector has less nonzeros than the reduced
+      // cost vector, and so multiplying with -1 first and subtracting the dual activity should be faster than adding
+      // the dual activity and negating afterwards
+      ///@todo we should compute them one by one so we can abort when encountering an infeasibility
+      varbuffer = _rationalLP->maxObj();
+      varbuffer *= -1;
+      _rationalLP->subDualActivity(rowbuffer, varbuffer);
+
+      // check reduced cost violation
+      for( int c = numColsRational() - 1; c >= 0; c-- )
+      {
+         int sig = sign(varbuffer[c]);
+
+         if( sig > 0 )
+         {
+            if( !_lowerFinite(_colTypes[c]) || sol._primal[c] > lowerRational(c) )
+            {
+               MSG_DEBUG( spxout << "complementary slackness violated by column " << c
+                  << " with reduced cost " << rationalToString(varbuffer[c])
+                  << " and value " << rationalToString(sol._primal[c])
+                  << " not at lower bound " << rationalToString(lowerRational(c))
+                  << "\n" );
+               return false;
+            }
+
+            if( _basisStatusCols[c] != SPxSolver::ON_LOWER && _basisStatusCols[c] != SPxSolver::FIXED )
+            {
+               if( _basisStatusCols[c] == SPxSolver::BASIC || _basisStatusCols[c] == SPxSolver::UNDEFINED )
+                  isSolBasic = false;
+               else
+                  _basisStatusCols[c] = SPxSolver::ON_LOWER;
+            }
+         }
+         else if( sig < 0 )
+         {
+            if( !_upperFinite(_colTypes[c]) || sol._primal[c] < upperRational(c) )
+            {
+               MSG_DEBUG( spxout << "complementary slackness violated by column " << c
+                  << " with reduced cost " << rationalToString(varbuffer[c])
+                  << " and value " << rationalToString(sol._primal[c])
+                  << " not at upper bound " << rationalToString(upperRational(c))
+                  << "\n" );
+               return false;
+            }
+
+            if( _basisStatusCols[c] != SPxSolver::ON_UPPER && _basisStatusCols[c] != SPxSolver::FIXED )
+            {
+               if( _basisStatusCols[c] == SPxSolver::BASIC || _basisStatusCols[c] == SPxSolver::UNDEFINED )
+                  isSolBasic = false;
+               else
+                  _basisStatusCols[c] = SPxSolver::ON_UPPER;
+            }
+         }
+      }
+
+      // update dual solution
+      sol._dual = rowbuffer;
+      sol._redCost = varbuffer;
+
+      if( !isSolBasic )
+      {
+         MSG_WARNING( spxout << "Warning: Reconstructed solution not basic.\n" );
+      }
+
+      return success;
+   }
 } // namespace soplex
 #endif

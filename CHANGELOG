@@ -5,6 +5,8 @@ Developer version
 
 features:
 - support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
+- rational solves with basis matrix based on a rational LU factorization
+- rational reconstruction routines during iterative refinement
 
 performance:
 - iterative refinement for ranged rows without introducing explicit slack variables
@@ -21,8 +23,11 @@ interface & parameters:
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - improved printing of rationals in limited precision
 - added possibility to write basis file in original Cplex definition
+- new parameter bool:ratfac to control whether rational factorization is attempted during iterative refinement
 - new parameter int:ratfacminstalls for minimum number of stalling refinements since last pivot to trigger rational
   factorization
+- new parameter bool:ratrec to control whether rational reconstruction is attempted during iterative refinement
+- new statistics section on rational reconstruction
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier

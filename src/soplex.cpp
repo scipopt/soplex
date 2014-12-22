@@ -150,6 +150,11 @@ namespace soplex
             _boolParamDescription[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
             _boolParamDefault[SoPlex::ACCEPTCYCLING] = false;
 
+            // apply rational reconstruction after each iterative refinement?
+            _boolParamName[SoPlex::RATREC] = "ratrec";
+            _boolParamDescription[SoPlex::RATREC] = "apply rational reconstruction after each iterative refinement?";
+            _boolParamDefault[SoPlex::RATREC] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4720,6 +4725,8 @@ namespace soplex
       case RATFAC:
          break;
       case ACCEPTCYCLING:
+         break;
+      case RATREC:
          break;
       default:
          return false;
