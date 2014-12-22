@@ -21,21 +21,20 @@
 #ifndef _RATRECON_H_
 #define _RATRECON_H_
 
-#include <math.h>
-#include <assert.h>
-#include <iostream>
-#include <string.h>
+#ifndef SOPLEX_LEGACY
 
+#include "spxdefines.h"
 #include "rational.h"
 #include "sol.h"
-#include "spxdefines.h"
 #include "basevectors.h"
-#include "gmp.h"
 
 namespace soplex
 {
-   bool reconstructSol(SolRational& solution);
-   bool reconstructVector(VectorBase<Rational>& input);
+   /** reconstruct a rational vector */
+   bool reconstructVector(VectorRational& input);
 
+   /** reconstruct a rational solution */
+   bool reconstructSol(SolRational& solution);
 } // namespace soplex
+#endif
 #endif // _RATRECON_H_
