@@ -23,6 +23,7 @@
 
 namespace soplex
 {
+#ifdef SOPLEX_WITH_GMP
    static void GMPqv_init(mpq_t* vect, int dim)
    {
       for( int i = 0; i < dim; i++ )
@@ -197,12 +198,14 @@ namespace soplex
 
       return rval;
    }
+#endif
 
 
 
    /** reconstruct a rational vector */
    bool reconstructVector(VectorRational& input)
    {
+#ifdef SOPLEX_WITH_GMP
       mpq_t* resvec; /* reconstructed vector storage */
       mpz_t* xnum; /* numerator of input vector */
       mpz_t denom; /* common denominator of input vector */
@@ -243,6 +246,9 @@ namespace soplex
       GMPqv_clear(resvec, dim);
 
       return rval;
+#else
+      return false;
+#endif
    }
 
 
