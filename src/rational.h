@@ -250,6 +250,15 @@ namespace soplex
       //@}
 
 
+      //**@name Methods for querying size */
+      //@{
+
+      /// Size in specified base (bit size for base 2)
+      int sizeInBase(const int base = 2) const;
+
+      //@}
+
+
       //**@name Static methods  */
       //@{
 
@@ -524,6 +533,12 @@ namespace soplex
 
    /// Negation.
    Rational operator-(const Rational& r);
+
+   /// Total size of rational vector.
+   int totalSizeRational(const Rational* vector, const int length, const int base = 2);
+
+   /// Size of least common multiple of denominators in rational vector.
+   int dlcmSizeRational(const Rational* vector, const int length, const int base = 2);
 
    //@}
 

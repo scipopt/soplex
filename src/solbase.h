@@ -125,6 +125,62 @@ public:
       return _hasDualFarkas;
    }
 
+   /// returns total size of primal solution
+   int totalSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += totalSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += totalSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns total size of dual solution
+   int totalSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += totalSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += totalSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
+   }
+
+   /// returns size of least common multiple of denominators in primal solution
+   int dlcmSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += dlcmSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += dlcmSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns  size of least common multiple of denominators in dual solution
+   int dlcmSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += dlcmSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += dlcmSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
+   }
+
    /// invalidate solution
    void invalidate()
    {

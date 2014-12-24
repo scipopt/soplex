@@ -3527,6 +3527,62 @@ namespace soplex
 
 
 
+   /// get size of primal solution
+   int SoPlex::totalSizePrimalRational(const int base)
+   {
+      if( hasPrimal() || hasPrimalRay() )
+      {
+         _syncRationalSolution();
+         return _solRational.totalSizePrimal(base);
+      }
+      else
+         return 0;
+   }
+
+
+
+   /// get size of dual solution
+   int SoPlex::totalSizeDualRational(const int base)
+   {
+      if( hasDual() || hasDualFarkas() )
+      {
+         _syncRationalSolution();
+         return _solRational.totalSizeDual(base);
+      }
+      else
+         return 0;
+   }
+
+
+
+   /// get size of least common multiple of denominators in primal solution
+   int SoPlex::dlcmSizePrimalRational(const int base)
+   {
+      if( hasPrimal() || hasPrimalRay() )
+      {
+         _syncRationalSolution();
+         return _solRational.dlcmSizePrimal(base);
+      }
+      else
+         return 0;
+   }
+
+
+
+   /// get size of least common multiple of denominators in dual solution
+   int SoPlex::dlcmSizeDualRational(const int base)
+   {
+      if( hasDual() || hasDualFarkas() )
+      {
+         _syncRationalSolution();
+         return _solRational.dlcmSizeDual(base);
+      }
+      else
+         return 0;
+   }
+
+
+
    /// is an advanced starting basis available?
    bool SoPlex::hasBasis() const
    {
@@ -5591,6 +5647,11 @@ namespace soplex
       {
          os << "Solution (rational) : \n"
             << "  Objective value   : " << rationalToString(objValueRational()) << "\n";
+         os << "Size (base 2/10)    : \n"
+            << "  Total primal      : " << totalSizePrimalRational() << " / " << totalSizePrimalRational(10) << "\n"
+            << "  Total dual        : " << totalSizeDualRational() << " / " << totalSizeDualRational(10) << "\n"
+            << "  DLCM primal       : " << dlcmSizePrimalRational() << " / " << dlcmSizePrimalRational(10) << "\n"
+            << "  DLCM dual         : " << dlcmSizeDualRational() << " / " << dlcmSizeDualRational(10) << "\n";
       }
       else
       {

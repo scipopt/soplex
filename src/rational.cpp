@@ -1720,6 +1720,15 @@ bool Rational::isAdjacentTo(const double& d) const
 
 
 
+/// Size in specified base (bit size for base 2)
+int Rational::sizeInBase(const int base) const
+{
+   return (int)mpz_sizeinbase(mpq_numref(this->dpointer->privatevalue), base)
+      + (int)mpz_sizeinbase(mpq_denref(this->dpointer->privatevalue), base);
+}
+
+
+
 /// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
 int Rational::precision()
 {
@@ -2781,6 +2790,46 @@ Rational operator-(const Rational& r)
 
 
 
+/// Total size of rational vector.
+int totalSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   int size = 0;
+
+   for( int i = 0; i < length; i++ )
+      size += vector[i].sizeInBase(base);
+
+   return size;
+}
+
+
+
+/// Size of least common multiple of denominators in rational vector.
+int dlcmSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   mpz_t lcm;
+
+   mpz_init_set_ui(lcm, 1);
+
+   for( int i = 0; i < length; i++ )
+      mpz_lcm(lcm, lcm, mpq_denref(vector[i].getMpqRef()));
+
+   int size = (int)mpz_sizeinbase(lcm, base);
+
+   mpz_clear(lcm);
+
+   return size;
+}
+
+
+
 #else
 
 
@@ -3295,6 +3344,15 @@ bool Rational::isAdjacentTo(const double& d) const
 
 
 
+/// Size in specified base (bit size for base 2)
+int Rational::sizeInBase(const int base) const
+{
+   ///@todo this is only correct for base 2
+   return precision();
+}
+
+
+
 /// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
 int Rational::precision()
 {
@@ -3784,6 +3842,38 @@ Rational operator-(const Rational& r)
    res.dpointer->privatevalue *= -1;
    return res;
 }
+
+
+
+/// Total size of rational vector.
+int totalSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   int size = 0;
+
+   for( int i = 0; i < length; i++ )
+      size += vector[i].sizeInBase(base);
+
+   return size;
+}
+
+
+
+/// Size of least common multiple of denominators in rational vector.
+int dlcmSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   return 0;
+}
+
+
+
 #endif // SOPLEX_WITH_GMP
 } // namespace soplex
 #endif

@@ -656,6 +656,19 @@ public:
    /// gets the Farkas proof if LP is infeasible; returns true on success
    bool getDualFarkasRational(mpq_t* vector, const int size);
 #endif
+
+   /// get size of primal solution
+   int totalSizePrimalRational(const int base = 2);
+
+   /// get size of dual solution
+   int totalSizeDualRational(const int base = 2);
+
+   /// get size of least common multiple of denominators in primal solution
+   int dlcmSizePrimalRational(const int base = 2);
+
+   /// get size of least common multiple of denominators in dual solution
+   int dlcmSizeDualRational(const int base = 2);
+
    //@}
 
 

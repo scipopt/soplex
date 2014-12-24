@@ -28,6 +28,7 @@ interface & parameters:
   factorization
 - new parameter bool:ratrec to control whether rational reconstruction is attempted during iterative refinement
 - new statistics section on rational reconstruction
+- new statistics section on size of rational solution in base 2 and base 10
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
