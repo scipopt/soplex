@@ -269,6 +269,12 @@ namespace soplex
       friend bool readStringRational(const char* s, Rational& value);
       friend std::ostream& operator<<(std::ostream& os, const Rational& q);
 
+      //@}
+
+
+      //**@name Friends */
+      //@{
+
       friend bool operator!=(const Rational& r, const Rational& s);
       friend bool operator==(const Rational& r, const Rational& s);
       friend bool operator<(const Rational& r, const Rational& s);
@@ -331,7 +337,13 @@ namespace soplex
       friend Rational abs(const Rational& r);
       friend int sign(const Rational& r);
       friend Rational operator-(const Rational& q);
+
+      //@}
    };
+
+
+   //**@name Parsing and printing */
+   //@{
 
    /// convert rational number to string
    std::string rationalToString(const Rational& r, const int precision = 32);
