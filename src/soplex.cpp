@@ -5585,7 +5585,7 @@ namespace soplex
       {
          os << std::scientific << std::setprecision(8)
             << "Solution (real)     : \n"
-            << "  Value             : " << objValueReal() << "\n";
+            << "  Objective Value   : " << objValueReal() << "\n";
       }
       else if( _lastSolveMode == SOLVEMODE_RATIONAL )
       {
