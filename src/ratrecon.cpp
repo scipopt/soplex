@@ -48,6 +48,15 @@ namespace soplex
          mpz_clear(vect[i]);
    }
 
+#ifdef SOPLEX_DEBUG
+   /** print integer to stream */
+   static std::ostream& operator<<(std::ostream& os, const mpz_t* number)
+   {
+      os << mpz_get_str(0, 10, *number);
+      return os;
+   }
+#endif
+
    /** this reconstruction routine will set x equal to the mpq vector where each component is the best rational
     *  approximation of xnum / denom with where the GCD of denominators of x is at most Dbound; it will return true on
     *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
@@ -77,6 +86,8 @@ namespace soplex
       mpz_set(Dbound, denom); /* this is the working bound on the denominator size */
       mpz_sqrt(Dbound, Dbound);
 
+      MSG_DEBUG( spxout << "reconstructing " << dim << " dimensional vector with denominator bound " << &Dbound << "\n" );
+
       /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
        * because they are floating point representable
        */
@@ -98,6 +109,8 @@ namespace soplex
 
       for( j = 0; j < dim; j++ )
       {
+         MSG_DEBUG( spxout << "  --> component " << j << " = " << &xnum[j] << " / denom\n" );
+
          /* if xnum =0 , then just leave x[j] as zero */
          if( mpz_sgn(xnum[j]) != 0 )
          {
@@ -168,6 +181,8 @@ namespace soplex
                   if( mpz_cmp(q[2], Dbound) > 0 )
                      done = 1;
                   cfcnt++;
+
+                  MSG_DEBUG( spxout << "  --> convergent = " << &p[2] << " / " << &q[2] << "\n" );
                }
 
                /* Assign the values */
@@ -176,8 +191,10 @@ namespace soplex
                mpq_canonicalize(x[j]);
                mpz_gcd(temp, gcd, mpq_denref(x[j]));
                mpz_mul(gcd, gcd, temp);
+
                if( mpz_cmp(gcd, Dbound) > 0 )
                {
+                  MSG_DEBUG( spxout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n" );
                   rval = false;
                   goto CLEANUP;
                }
