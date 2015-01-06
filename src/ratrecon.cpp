@@ -62,7 +62,7 @@ namespace soplex
     *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
     *  produce such a vector
     */
-   static int Reconstruct(mpq_t* x, mpz_t* xnum, mpz_t denom, int dim)
+   static int Reconstruct(mpq_t* x, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared)
    {
       bool rval = true;
       int j;
@@ -83,17 +83,22 @@ namespace soplex
       mpz_init(td);
       mpz_init(tn);
       mpz_init(Dbound);
+
+#if 1
+      mpz_set_q(Dbound, denomBoundSquared.getMpqRef()); /* this is the working bound on the denominator size */
+#else
       mpz_set(Dbound, denom); /* this is the working bound on the denominator size */
+#endif
+
       mpz_sqrt(Dbound, Dbound);
 
-      MSG_DEBUG( spxout << "reconstructing " << dim << " dimensional vector with denominator bound " << &Dbound << "\n" );
+      MSG_DEBUG( spxout << "reconstructing " << dim << " dimensional vector with denominator bound " << mpz_get_str(0, 10, Dbound) << "\n" );
 
       /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
        * because they are floating point representable
        */
       if( mpz_cmp_ui(Dbound,16777216) < 0 )
          mpz_set_ui(Dbound,16777216);
-
 
       /* The following represent a_i, the cont frac representation and p_i/q_i, the convergents */
       mpz_t a0;
@@ -182,7 +187,7 @@ namespace soplex
                      done = 1;
                   cfcnt++;
 
-                  MSG_DEBUG( spxout << "  --> convergent = " << &p[2] << " / " << &q[2] << "\n" );
+                  MSG_DEBUG( spxout << "  --> convergent denominator = " << &q[2] << "\n" );
                }
 
                /* Assign the values */
@@ -220,7 +225,7 @@ namespace soplex
 
 
    /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input)
+   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared)
    {
 #ifdef SOPLEX_WITH_GMP
       mpq_t* resvec; /* reconstructed vector storage */
@@ -250,7 +255,7 @@ namespace soplex
       }
 
       /* reconstruct */
-      rval = Reconstruct(resvec, xnum, denom, dim);
+      rval = Reconstruct(resvec, xnum, denom, dim, denomBoundSquared);
       if( rval )
       {
          /* if successful, assign original input to reconstructed vector */

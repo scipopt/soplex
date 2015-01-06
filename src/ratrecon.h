@@ -31,7 +31,7 @@
 namespace soplex
 {
    /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input);
+   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared);
 
    /** reconstruct a rational solution */
    bool reconstructSol(SolRational& solution);

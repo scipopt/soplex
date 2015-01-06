@@ -783,7 +783,19 @@ namespace soplex
          else
             bestViolation = sumMaxViolation;
 
-         ///@todo try rational reconstruction at geometric frequency
+         // attempt rational reconstruction
+         if( boolParam(SoPlex::RATREC) )
+         {
+            MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
+            sumMaxViolation.invert();
+            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, sumMaxViolation) )
+            {
+               MSG_INFO1( spxout << "Tolerances reached.\n" );
+               primalFeasible = true;
+               dualFeasible = true;
+               break;
+            }
+         }
 
          // start refinement
 
@@ -1032,19 +1044,6 @@ namespace soplex
          }
 
          _statistics->rationalTime.start();
-
-         // attempt rational reconstruction
-         if( boolParam(SoPlex::RATREC) )
-         {
-            MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
-            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error) )
-            {
-               MSG_INFO1( spxout << "Tolerances reached.\n" );
-               primalFeasible = true;
-               dualFeasible = true;
-               break;
-            }
-         }
 
          // solve basis systems exactly
          if( boolParam(SoPlex::RATFAC) && lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS)
@@ -3815,12 +3814,9 @@ namespace soplex
       return;
    }
 
-   /// attempts reational reconstruction of primal-dual solution
-   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error)
+   /// attempts rational reconstruction of primal-dual solution
+   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared)
    {
-      ///@todo store buffer and slackbuffer as working arrays in SoPlex class
-      DVectorRational varbuffer;
-      DVectorRational rowbuffer;
       bool success;
       bool isSolBasic;
 
@@ -3837,10 +3833,9 @@ namespace soplex
       _statistics->rationalReconstructions++;
 
       // reconstruct primal vector
-      varbuffer.reDim((sol._primal).dim());
-      sol.getPrimal(varbuffer);
+      _workSol._primal = sol._primal;
 
-      success = reconstructVector(varbuffer);
+      success = reconstructVector(_workSol._primal, denomBoundSquared);
       if( !success )
       {
          MSG_INFO2( spxout << "Rational reconstruction of primal vector failed!\n" );
@@ -3855,25 +3850,25 @@ namespace soplex
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
          SPxSolver::VarStatus& basisStatusCol = _basisStatusCols[c];
-         if( (basisStatusCol == SPxSolver::FIXED && varbuffer[c] != lowerRational(c))
-            || (basisStatusCol == SPxSolver::ON_LOWER && varbuffer[c] != lowerRational(c))
-            || (basisStatusCol == SPxSolver::ON_UPPER && varbuffer[c] != upperRational(c))
-            || (basisStatusCol == SPxSolver::ZERO && varbuffer[c] != 0)
+         if( (basisStatusCol == SPxSolver::FIXED && _workSol._primal[c] != lowerRational(c))
+            || (basisStatusCol == SPxSolver::ON_LOWER && _workSol._primal[c] != lowerRational(c))
+            || (basisStatusCol == SPxSolver::ON_UPPER && _workSol._primal[c] != upperRational(c))
+            || (basisStatusCol == SPxSolver::ZERO && _workSol._primal[c] != 0)
             || (basisStatusCol == SPxSolver::UNDEFINED) )
          {
             isSolBasic = false;
          }
 
-         if( _lowerFinite(_colTypes[c]) && varbuffer[c] < lowerRational(c) )
+         if( _lowerFinite(_colTypes[c]) && _workSol._primal[c] < lowerRational(c) )
          {
-            MSG_INFO2( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - varbuffer[c]) << "\n" );
+            MSG_INFO2( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - _workSol._primal[c]) << "\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
 
-         if( _upperFinite(_colTypes[c]) && varbuffer[c] > upperRational(c) )
+         if( _upperFinite(_colTypes[c]) && _workSol._primal[c] > upperRational(c) )
          {
-            MSG_INFO2( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(varbuffer[c] - upperRational(c)) << "\n" );
+            MSG_INFO2( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(_workSol._primal[c] - upperRational(c)) << "\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
@@ -3881,48 +3876,42 @@ namespace soplex
 
       // compute slacks
       ///@todo we should compute them one by one so we can abort when encountering an infeasibility
-      rowbuffer.reDim(numRowsRational());
-      _rationalLP->computePrimalActivity(varbuffer, rowbuffer);
+      _workSol._slacks.reDim(numRowsRational());
+      _rationalLP->computePrimalActivity(_workSol._primal, _workSol._slacks);
 
       // check violation of sides
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
          SPxSolver::VarStatus& basisStatusRow = _basisStatusRows[r];
-         if( (basisStatusRow == SPxSolver::FIXED && rowbuffer[r] != lhsRational(r))
-            || (basisStatusRow == SPxSolver::ON_LOWER && rowbuffer[r] != lhsRational(r))
-            || (basisStatusRow == SPxSolver::ON_UPPER && rowbuffer[r] != rhsRational(r))
-            || (basisStatusRow == SPxSolver::ZERO && rowbuffer[r] != 0)
+         if( (basisStatusRow == SPxSolver::FIXED && _workSol._slacks[r] != lhsRational(r))
+            || (basisStatusRow == SPxSolver::ON_LOWER && _workSol._slacks[r] != lhsRational(r))
+            || (basisStatusRow == SPxSolver::ON_UPPER && _workSol._slacks[r] != rhsRational(r))
+            || (basisStatusRow == SPxSolver::ZERO && _workSol._slacks[r] != 0)
             || (basisStatusRow == SPxSolver::UNDEFINED) )
          {
             isSolBasic = false;
          }
 
-         if( _lowerFinite(_rowTypes[r]) && rowbuffer[r] < lhsRational(r) )
+         if( _lowerFinite(_rowTypes[r]) && _workSol._slacks[r] < lhsRational(r) )
          {
-            MSG_INFO2( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - rowbuffer[r]) << "\n" );
+            MSG_INFO2( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - _workSol._slacks[r]) << "\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
 
-         if( _upperFinite(_rowTypes[r]) && rowbuffer[r] > rhsRational(r) )
+         if( _upperFinite(_rowTypes[r]) && _workSol._slacks[r] > rhsRational(r) )
          {
-            MSG_INFO2( spxout << "Rhs of row " << r << " violated by " << rationalToString(rowbuffer[r] - rhsRational(r)) << "\n" );
+            MSG_INFO2( spxout << "Rhs of row " << r << " violated by " << rationalToString(_workSol._slacks[r] - rhsRational(r)) << "\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
       }
 
-      // update primal solution
-      ///@todo only update when dual also feasible and complementary slack
-      sol._primal = varbuffer;
-      sol._slacks = rowbuffer;
-
       // reconstruct dual vector
-      assert(rowbuffer.dim() == sol._dual.dim());
-      sol.getDual(rowbuffer);
+      _workSol._dual = sol._dual;
 
-      success = reconstructVector(rowbuffer);
+      success = reconstructVector(_workSol._dual, denomBoundSquared);
       if( !success )
       {
          MSG_INFO2( spxout << "Rational reconstruction of dual vector failed!\n" );
@@ -3936,15 +3925,15 @@ namespace soplex
       // computation of reduced costs
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
-         int sig = sign(rowbuffer[r]);
+         int sig = sign(_workSol._dual[r]);
 
          if( sig > 0 )
          {
-            if( !_lowerFinite(_rowTypes[r]) || sol._slacks[r] > lhsRational(r) )
+            if( !_lowerFinite(_rowTypes[r]) || _workSol._slacks[r] > lhsRational(r) )
             {
                MSG_DEBUG( spxout << "complementary slackness violated by row " << r
-                  << " with dual " << rationalToString(rowbuffer[r])
-                  << " and slack " << rationalToString(sol._slacks[r])
+                  << " with dual " << rationalToString(_workSol._dual[r])
+                  << " and slack " << rationalToString(_workSol._slacks[r])
                   << " not at lhs " << rationalToString(lhsRational(r))
                   << "\n" );
                _statistics->reconstructionTime.stop();
@@ -3961,11 +3950,11 @@ namespace soplex
          }
          else if( sig < 0 )
          {
-            if( !_upperFinite(_rowTypes[r]) || sol._slacks[r] < rhsRational(r) )
+            if( !_upperFinite(_rowTypes[r]) || _workSol._slacks[r] < rhsRational(r) )
             {
                MSG_DEBUG( spxout << "complementary slackness violated by row " << r
-                  << " with dual " << rationalToString(rowbuffer[r])
-                  << " and slack " << rationalToString(sol._slacks[r])
+                  << " with dual " << rationalToString(_workSol._dual[r])
+                  << " and slack " << rationalToString(_workSol._slacks[r])
                   << " not at rhs " << rationalToString(rhsRational(r))
                   << "\n" );
                _statistics->reconstructionTime.stop();
@@ -3986,22 +3975,22 @@ namespace soplex
       // cost vector, and so multiplying with -1 first and subtracting the dual activity should be faster than adding
       // the dual activity and negating afterwards
       ///@todo we should compute them one by one so we can abort when encountering an infeasibility
-      varbuffer = _rationalLP->maxObj();
-      varbuffer *= -1;
-      _rationalLP->subDualActivity(rowbuffer, varbuffer);
+      _workSol._redCost = _rationalLP->maxObj();
+      _workSol._redCost *= -1;
+      _rationalLP->subDualActivity(_workSol._dual, _workSol._redCost);
 
       // check reduced cost violation
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
-         int sig = sign(varbuffer[c]);
+         int sig = sign(_workSol._redCost[c]);
 
          if( sig > 0 )
          {
-            if( !_lowerFinite(_colTypes[c]) || sol._primal[c] > lowerRational(c) )
+            if( !_lowerFinite(_colTypes[c]) || _workSol._primal[c] > lowerRational(c) )
             {
                MSG_DEBUG( spxout << "complementary slackness violated by column " << c
-                  << " with reduced cost " << rationalToString(varbuffer[c])
-                  << " and value " << rationalToString(sol._primal[c])
+                  << " with reduced cost " << rationalToString(_workSol._redCost[c])
+                  << " and value " << rationalToString(_workSol._primal[c])
                   << " not at lower bound " << rationalToString(lowerRational(c))
                   << "\n" );
                _statistics->reconstructionTime.stop();
@@ -4018,11 +4007,11 @@ namespace soplex
          }
          else if( sig < 0 )
          {
-            if( !_upperFinite(_colTypes[c]) || sol._primal[c] < upperRational(c) )
+            if( !_upperFinite(_colTypes[c]) || _workSol._primal[c] < upperRational(c) )
             {
                MSG_DEBUG( spxout << "complementary slackness violated by column " << c
-                  << " with reduced cost " << rationalToString(varbuffer[c])
-                  << " and value " << rationalToString(sol._primal[c])
+                  << " with reduced cost " << rationalToString(_workSol._redCost[c])
+                  << " and value " << rationalToString(_workSol._primal[c])
                   << " not at upper bound " << rationalToString(upperRational(c))
                   << "\n" );
                _statistics->reconstructionTime.stop();
@@ -4039,9 +4028,11 @@ namespace soplex
          }
       }
 
-      // update dual solution
-      sol._dual = rowbuffer;
-      sol._redCost = varbuffer;
+      // update solution
+      sol._primal = _workSol._primal;
+      sol._slacks = _workSol._slacks;
+      sol._dual = _workSol._dual;
+      sol._redCost = _workSol._redCost;
 
       if( !isSolBasic )
       {

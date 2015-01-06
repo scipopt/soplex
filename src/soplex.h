@@ -1378,6 +1378,7 @@ private:
 
    SolReal _solReal;
    SolRational _solRational;
+   SolRational _workSol;
 
    bool _hasBasis;
    bool _hasSolReal;
@@ -1669,8 +1670,8 @@ private:
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, Rational& primalViolation, Rational& dualViolation, bool& stopped, bool& error);
 
-   /// attempts reational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error);
+   /// attempts rational reconstruction of primal-dual solution
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared);
    //@}
 
 
