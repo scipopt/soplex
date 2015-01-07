@@ -806,7 +806,7 @@ namespace soplex
                dualFeasible = true;
                break;
             }
-            nextRatrecRefinement += int(_statistics->refinements * realParam(SoPlex::RATREC_FREQ)) + 1;
+            nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlex::RATREC_FREQ)) + 1;
             MSG_DEBUG( spxout << "Next rational reconstruction after refinement " << nextRatrecRefinement << ".\n" );
          }
 
