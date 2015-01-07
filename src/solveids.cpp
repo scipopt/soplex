@@ -31,8 +31,6 @@
  *
  * Ideally, this work will be extended such that the IDS can be executed using the column-form of the basis matrix. */
 
-//#define SOLVEIDS_DEBUG
-
 namespace soplex
 {
    /// solves LP using the improved dual simplex
@@ -105,7 +103,7 @@ namespace soplex
       _formIdsReducedProblem();
       _isRealLPLoaded = false;
 
-      for( int i = 0; i < 10; i++ )
+      for( int i = 0; i < 100; i++ )
       {
 #ifdef SOLVEIDS_DEBUG
       printf("Writing the reduced lp to a file\n");
@@ -150,12 +148,12 @@ namespace soplex
          // solve the complementary problem
          _compSolver.solve();
 #ifdef SOLVEIDS_DEBUG
-         printf("Objective Value: %f\n", _compSolver.objValue());
+         printf("Iteration %d Objective Value: %f\n", i, _compSolver.objValue());
 #endif
 
          // check the optimality of the original problem with the objective value of the complementary problem
-         if( GE(_compSolver.objValue(), 0.0, 1e-09) )
-            break;
+         //if( GE(_compSolver.objValue(), 0.0, 1e-09) || _compSolver.status() == SPxSolver::UNBOUNDED )
+            //break;
 
          // get the primal solutions from the complementary problem
          DVector compLPPrimalVector(_compSolver.nCols());
@@ -163,6 +161,14 @@ namespace soplex
 
          _updateIdsReducedProblem(reducedLPDualVector, reducedLPRedcostVector, compLPPrimalVector);
       }
+
+      SPxLPIds compDualLP;
+      _compSolver.buildDualProblem(compDualLP, _idsPrimalRowIDs.get_ptr(), _idsPrimalColIDs.get_ptr(),
+            _idsDualRowIDs.get_ptr(), _idsDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
+
+      _compSolver.loadLP(compDualLP);
+      printf("Writing the complementary lp to a file\n");
+      _compSolver.writeFile("complement.lp");
 
       // returning the sense to minimise
       if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -205,6 +211,7 @@ namespace soplex
       // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
       // a positive reduced cost.
       _compSolver = _solver;
+      _compSolver.setSolver(&_compSlufactor);
    }
 
 
@@ -263,8 +270,11 @@ namespace soplex
       spx_alloc(colsforremoval, numColsReal());
       _getNonPositiveDualMultiplierInds(_idsFeasVector, nonposind, bind, colsforremoval, &nnonposind);
 
+#ifdef SOLVEIDS_DEBUG
+      printf("colsforremoval\n");
       for( int i = 0; i < numColsReal(); i++ )
          printf("%d %d\n", i, colsforremoval[i]);
+#endif
 
       // get the compatible columns from the constraint matrix w.r.t the current basis matrix
 #ifdef SOLVEIDS_DEBUG
@@ -273,7 +283,7 @@ namespace soplex
 #endif
       spx_alloc(compatind, numRowsReal());
       spx_alloc(rowsforremoval, numRowsReal());
-      _getCompatibleColumns(nonposind, compatind, rowsforremoval, nnonposind, &ncompatind);
+      _getCompatibleColumns(nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind);
 
       // delete rows and columns from the LP to form the reduced problem
 #ifdef SOLVEIDS_DEBUG
@@ -308,14 +318,17 @@ namespace soplex
    {
       // delete rows and columns from the LP to form the reduced problem
       _nElimPrimalRows = 0;
-      _idsElimPrimalRowIDs.reSize(_solver.nRows());   // the number of eliminated rows is less than the number of rows
+      _idsElimPrimalRowIDs.reSize(_realLP->nRows());   // the number of eliminated rows is less than the number of rows
                                                       // in the reduced problem
+      _idsCompProbRowIDsIdx = 0;
+      _idsCompProbColIDsIdx = 0;
       spx_alloc(_idsCompProbRowIDsIdx, _realLP->nRows());
       spx_alloc(_idsCompProbColIDsIdx, _realLP->nCols());
       for( int i = 0; i < _realLP->nRows(); i++ )
          _idsCompProbRowIDsIdx[i] = -1;
 
       int* initFixedVars = 0;
+      _fixedOrigVars = 0;
       spx_alloc(initFixedVars, _realLP->nCols());
       spx_alloc(_fixedOrigVars, _realLP->nCols());
       for (int i = 0; i < _realLP->nCols(); i++)
@@ -325,13 +338,14 @@ namespace soplex
          _fixedOrigVars[i] = -2; // this must be set to a value differet from -1, 0, 1 to ensure the
                                  // _updateComplementaryFixedPrimalVars function updates all variables in the problem.
       }
+
       _deleteAndUpdateRowsComplementaryProblem(initFixedVars);
 
       // initialising the arrays to store the row id's from the primal and the col id's from the dual
-      _idsPrimalRowIDs.reSize(2*_compSolver.nRows());
-      _idsPrimalColIDs.reSize(2*_compSolver.nCols());
-      _idsDualRowIDs.reSize(2*_compSolver.nCols());
-      _idsDualColIDs.reSize(2*_compSolver.nRows());
+      _idsPrimalRowIDs.reSize(3*_compSolver.nRows());
+      _idsPrimalColIDs.reSize(3*_compSolver.nCols());
+      _idsDualRowIDs.reSize(3*_compSolver.nCols());
+      _idsDualColIDs.reSize(3*_compSolver.nRows());
       _nPrimalRows = 0;
       _nPrimalCols = 0;
       _nDualRows = 0;
@@ -357,11 +371,15 @@ namespace soplex
       }
 
       for( int i = 0; i < _nPrimalCols; i++ )
-         _idsCompProbColIDsIdx[_realLP->number(_idsPrimalColIDs[i])] = i;
+      {
+         if( _idsPrimalColIDs[i].getIdx() != _compSlackColId.getIdx() )
+            _idsCompProbColIDsIdx[_realLP->number(_idsPrimalColIDs[i])] = i;
+      }
 
       // retrieving the dual row id for the complementary slack column
       // there should be a one to one relationship between the number of primal columns and the number of dual rows.
       // hence, it should be possible to equate the dual row id to the related primal column.
+      assert(_nPrimalCols == _nDualRows);
       assert(_compSolver.nCols() == compDualLP.nRows());
       _compSlackDualRowId = compDualLP.rId(_compSolver.number(_compSlackColId));
 
@@ -392,6 +410,7 @@ namespace soplex
    /// updates the reduced problem with additional rows using the solution to the complementary problem
    void SoPlex::_updateIdsReducedProblem(DVector dualVector, DVector redcostVector, DVector compPrimalVector)
    {
+      printf("_updateIdsReducedProblem\n");
 
       Real maxDualRatio = infinity;
 
@@ -401,15 +420,13 @@ namespace soplex
          Real compProbPrimal = 0;
          Real dualRatio = 0;
          int rownumber = _realLP->number(SPxRowId(_idsPrimalRowIDs[i]));
-         printf("%d %d %d %d\n", i, _idsReducedProbRows[rownumber], _realLP->number(SPxRowId(_idsPrimalRowIDs[i])),
-               _compSolver.number(SPxColId(_idsDualColIDs[i])));
          if( _idsReducedProbRows[rownumber] )
          {
             // retreiving the reduced problem dual solutions and the complementary problem primal solutions
             reducedProbDual = dualVector[_solver.number(_idsReducedProbRowIDs[rownumber])]; // this is y
             compProbPrimal = compPrimalVector[_compSolver.number(SPxColId(_idsDualColIDs[i]))]; // this is u
 
-            printf("%d %d %f %f\n", i, _realLP->number(SPxRowId(_idsPrimalRowIDs[i])), reducedProbDual, compProbPrimal);
+            printf("%d %d. y=%f u=%f\n", i, _realLP->number(SPxRowId(_idsPrimalRowIDs[i])), reducedProbDual, compProbPrimal);
 
             // the translation of the complementary primal problem to the dual some rows resulted in two columns.
             if( i < _nPrimalRows - 1 &&
@@ -421,7 +438,7 @@ namespace soplex
             }
 
             // updating the ratio
-            if( compProbPrimal <= 0 )
+            if( LE(compProbPrimal, 0, 1e-10) )
                dualRatio = infinity;
             else
                dualRatio = reducedProbDual/compProbPrimal;
@@ -429,7 +446,16 @@ namespace soplex
             if( dualRatio < maxDualRatio )
                maxDualRatio = dualRatio;
          }
+         else
+         {
+            compProbPrimal = compPrimalVector[_compSolver.number(SPxColId(_idsDualColIDs[i]))]; // this is v
+
+            printf("%d %d. v=%f\n", i, _realLP->number(SPxRowId(_idsPrimalRowIDs[i])), compProbPrimal);
+         }
+
       }
+
+      printf("maxDualRatio: %f\n", maxDualRatio);
 
       for( int i = 0; i < _nPrimalCols; i++ )
       {
@@ -437,19 +463,22 @@ namespace soplex
          Real compProbPrimal = 0;
          Real dualRatio = 0;
          int colNumber = _realLP->number(SPxColId(_idsPrimalColIDs[i]));
-         if( _fixedOrigVars[colNumber] != 0 )
+         assert(colNumber >= 0 || (colNumber == -1 && _idsPrimalColIDs[i].getIdx() == _compSlackColId.getIdx()));
+         if( colNumber >= 0 && _fixedOrigVars[colNumber] != 0 )
          {
             assert(_fixedOrigVars[colNumber] == -1 || _fixedOrigVars[colNumber] == 1);
+            assert(_solver.number(_idsReducedProbColIDs[colNumber]) >= 0);
+            assert(_compSolver.number(_idsFixedVarDualIDs[colNumber]) >= 0);
 
-            reducedProbDual = redcostVector[_solver.number(_idsReducedProbColIDs[colNumber])]; // this is y
+            reducedProbDual = -1*redcostVector[_solver.number(_idsReducedProbColIDs[colNumber])]; // this is y
             compProbPrimal = compPrimalVector[_compSolver.number(_idsFixedVarDualIDs[colNumber])]; // this is u
 
-            printf("%d %d %f %f\n", i, colNumber, reducedProbDual, compProbPrimal);
+            printf("%d %d %d %f %f\n", i, colNumber, _fixedOrigVars[colNumber], reducedProbDual, compProbPrimal);
 
             assert(_realLP->number(SPxColId(_idsPrimalColIDs[i])) != _realLP->number(SPxColId(_idsPrimalColIDs[i + 1])));
 
             // updating the ratio
-            if( compProbPrimal <= 0 )
+            if( LE(compProbPrimal, 0, 1e-10) )
                dualRatio = infinity;
             else
                dualRatio = reducedProbDual/compProbPrimal;
@@ -458,6 +487,8 @@ namespace soplex
                maxDualRatio = dualRatio;
          }
       }
+
+      printf("maxDualRatio: %f\n", maxDualRatio);
 
       LPRowSet updaterows;
 
@@ -484,13 +515,28 @@ namespace soplex
                compProbPrimal += compPrimalVector[_compSolver.number(SPxColId(_idsDualColIDs[i]))]; // this is u
             }
 
+            printf("%d %d %f\n", i, _realLP->number(SPxRowId(_idsPrimalRowIDs[i])), compProbPrimal);
+
             // add row to the reduced problem the computed dual is positive
-            if( compProbPrimal*maxDualRatio > 0 )
+            // @todo Check whether this should be a >= or a strict >. This will have to be tested on degenerate
+            // instances.
+            //if( GT(compProbPrimal*maxDualRatio, 0, 1e-10) ||
+                  //(isZero(maxDualRatio, 1e-10) && GT(compProbPrimal, 0, 1e-10)) )
+            if( GT(compProbPrimal, 0, 1e-10) )
             {
+               printf("Adding rows!!!\n");
                LPColSet additionalcols;
                int* newcolidx = 0;
                int nnewcolidx = 0;
                spx_alloc(newcolidx, _realLP->nCols());
+
+               int* changeElementCol = 0;
+               int* changeElementRow = 0;
+               double* changeElementVal = 0;
+               int nChangeElement = 0;
+               spx_alloc(changeElementCol, _realLP->nCols());
+               spx_alloc(changeElementRow, _realLP->nCols());
+               spx_alloc(changeElementVal, _realLP->nCols());
 
                _realLP->getRow(_realLP->number(SPxRowId(_idsPrimalRowIDs[i])), origlprow);
                for( int j = 0; j < origlprow.rowVector().size(); j++ )
@@ -501,7 +547,8 @@ namespace soplex
                   int colnumber = origlprow.rowVector().index(j);
                   if( !_idsReducedProbCols[colnumber] )
                   {
-                     printf("(%d)\n", currnumcols);
+                     printf("(%d), %d obj: %f, lb: %f, ub: %f\n", currnumcols, colnumber, _realLP->maxObj(colnumber),
+                           _realLP->lower(colnumber), _realLP->upper(colnumber));
                      assert(!_idsReducedProbColIDs[colnumber].isValid());
                      additionalcols.create(1, _realLP->maxObj(colnumber), _realLP->lower(colnumber),
                            _realLP->upper(colnumber));
@@ -513,16 +560,21 @@ namespace soplex
                      newcolidx[nnewcolidx] = colnumber;
                      nnewcolidx++;
 
-#ifdef SOLVEIDS_DEBUG
                      // Checking the non-zeros of the column
                      LPColReal addedCol;
                      _realLP->getCol(colnumber, addedCol);
                      for( int k = 0; k < addedCol.colVector().size(); k++ )
                      {
                         if( _idsReducedProbRows[addedCol.colVector().index(k)] )
+                        {
                            printf("=========================================== Found extra entry!!!!\n");
+                           changeElementCol[nChangeElement] = currnumcols - 1;
+                           changeElementRow[nChangeElement] =
+                              _solver.number(_idsReducedProbRowIDs[addedCol.colVector().index(k)]);
+                           changeElementVal[nChangeElement] = addedCol.colVector().value(k);
+                           nChangeElement++;
+                        }
                      }
-#endif
                   }
                   else
                      rowtoaddVec.add(_solver.number(_idsReducedProbColIDs[origlprow.rowVector().index(j)]),
@@ -543,8 +595,14 @@ namespace soplex
                for( int j = 0; j < nnewcolidx; j++ )
                   _idsReducedProbColIDs[newcolidx[j]] = addedcolids[j];
 
+               for( int j = 0; j < nChangeElement; j++ )
+                  _solver.changeElement(changeElementRow[j], changeElementCol[j], changeElementVal[j]);
+
                // freeing allocated memory
                spx_free(addedcolids);
+               spx_free(changeElementVal);
+               spx_free(changeElementRow);
+               spx_free(changeElementCol);
                spx_free(newcolidx);
             }
          }
@@ -582,7 +640,7 @@ namespace soplex
       // this identifies the basis indices and the indicies that are positive.
       for( int i = 0; i < _solver.nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
       {
-         printf("%d %f ", i, feasVector[i]);
+         printf("%d %d %f ", i, _solver.number(_solver.basis().baseId(i)), feasVector[i]);
          _idsReducedProbCols[i] = true;
          _idsReducedProbColIDs[i].inValidate();
          delCol = false;
@@ -629,10 +687,13 @@ namespace soplex
          else
          {
             colsforremoval[i] = i;
+            _idsReducedProbColIDs[i] = SPxColId(_solver.cId(i));
+#if 0
             if( _solver.basis().baseId(i).isSPxColId() )
                _idsReducedProbColIDs[i] = SPxColId(_solver.basis().baseId(i));
             else
                _idsReducedProbCols[i] = false;
+#endif
          }
       }
       printf("\n");
@@ -641,8 +702,8 @@ namespace soplex
 
 
    /// retrieves the compatible columns from the constraint matrix
-   void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int nnonposind,
-         int* ncompatind)
+   void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
+         int nnonposind, int* ncompatind)
    {
       bool compatible;
       SSVector y(numColsReal());
@@ -685,6 +746,21 @@ namespace soplex
             (*ncompatind)++;
 
             _idsReducedProbRowIDs[i] = _solver.rowId(i);
+#if 1
+            // checking the columns contained in the removed row to ensure that all are removed.
+            LPRowReal lprow;
+            _realLP->getRow(i, lprow);
+            for( int j = 0; j < lprow.rowVector().size(); j++ )
+            {
+               // if a column not marked for removal exists in the row, the row remains.
+               if( colsforremoval[lprow.rowVector().index(j)] < 0 )
+               {
+                  colsforremoval[lprow.rowVector().index(j)] = lprow.rowVector().index(j);
+                  _idsReducedProbCols[lprow.rowVector().index(j)] = true;
+                  _idsReducedProbColIDs[lprow.rowVector().index(j)] = SPxColId(_realLP->cId(lprow.rowVector().index(j)));
+               }
+            }
+#endif
          }
          else
          {
@@ -700,6 +776,9 @@ namespace soplex
    // @todo need to put in a check similar to _isRealLPLoaded for the ids LP.
    void SoPlex::_deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval)
    {
+#ifdef SOLVEIDS_DEBUG
+      printf("_deleteRowsAndColumnsReducedProblem\n");
+#endif
       assert(_basisStatusRows.size() == numRowsReal());
       _solver.removeRows(rowsforremoval);
       _solver.removeCols(colsforremoval);
@@ -792,19 +871,28 @@ namespace soplex
          if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
          {
             printf("%d %f\n", _solver.number(SPxRowId(_solver.basis().baseId(i))), _solver.fVec()[i]);
-            if( isZero(_solver.fVec()[i], 1e-10) )
+            int rowNum = _solver.number(SPxRowId(_solver.basis().baseId(i)));
+            if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_FREE )
             {
+               assert(isZero(_solver.fVec()[i], 1e-10));
                _idsElimPrimalRowIDs[_nElimPrimalRows] = SPxRowId(_solver.basis().baseId(i));
                _nElimPrimalRows++;
                rowsforremoval[nrowsforremoval] = _realLP->number(SPxRowId(_solver.basis().baseId(i)));
                nrowsforremoval++;
             }
-            else if( GT(_solver.fVec()[i], 0.0) )
+            else if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_ON_UPPER )// 07.01.2014 check condition
+            {
+               assert(GT(_solver.fVec()[i], 0.0));
                _compSolver.changeLhs(SPxRowId(_solver.basis().baseId(i)),
                      _solver.rhs(SPxRowId(_solver.basis().baseId(i))));
-            else
+            }
+            else if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_ON_LOWER )
+            {
+               assert(LT(_solver.fVec()[i], 0.0));
                _compSolver.changeRhs(SPxRowId(_solver.basis().baseId(i)),
                      _solver.lhs(SPxRowId(_solver.basis().baseId(i))));
+            }
+            // NOTE: we are missing the equality constraints.
          }
          else
          {
@@ -889,7 +977,7 @@ namespace soplex
       int prevDualColIds = _nDualCols;
 
       for( int i = 0; i < _nPrimalRows; i++ )
-         printf("{%d,%d}(%d) ", _realLP->number(_idsPrimalRowIDs[i]), _solver.number(_idsPrimalRowIDs[i]),
+         printf("%d {%d,%d}(%d) ", i, _realLP->number(_idsPrimalRowIDs[i]), _solver.number(_idsPrimalRowIDs[i]),
                _idsReducedProbRows[_realLP->number(_idsPrimalRowIDs[i])]);
       printf("\n");
 
@@ -909,6 +997,7 @@ namespace soplex
              * This is not correct!!! The addition of rows does not take into account the different columns contained in
              * the complementary problem compared to the original problem.
              * MUST FIX!!!!!
+             * 07.01.2014 - I think that this is fixed. Still need to check.
              * =================================================
              */
             if( isNotZero(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])]) )
@@ -925,7 +1014,7 @@ namespace soplex
                   // the column of the new row may not exist in the current complementary problem.
                   // if the column does not exist, then it is necessary to create the column.
                   int colNumber = origlprow.rowVector().index(j);
-                  if( !_idsCompProbColIDsIdx[colNumber] == -1 )
+                  if( _idsCompProbColIDsIdx[colNumber] == -1 )
                   {
                      assert(!_idsReducedProbColIDs[colNumber].isValid());
                      _idsPrimalColIDs[_nPrimalCols] = _realLP->cId(colNumber);
@@ -966,7 +1055,9 @@ namespace soplex
                   addElimCols.add(_realLP->rhs(_idsElimPrimalRowIDs[i]), -infinity, coltoaddVec, infinity);
 
                   _idsPrimalRowIDs[_nPrimalRows] = _idsElimPrimalRowIDs[i];
-                  _idsCompProbRowIDsIdx[_realLP->number(SPxColId(_idsPrimalRowIDs[_nPrimalRows]))] = _nPrimalRows;
+                  printf("_nPrimalRows: %d, _realLP Row Num: %d\n", _nPrimalRows,
+                        _realLP->number(_idsPrimalRowIDs[_nPrimalRows]));
+                  _idsCompProbRowIDsIdx[_realLP->number(_idsPrimalRowIDs[_nPrimalRows])] = _nPrimalRows;
                   _nPrimalRows++;
 
                   _idsElimPrimalRowIDs.remove(i);
@@ -1029,7 +1120,7 @@ namespace soplex
                   && _realLP->number(_idsPrimalRowIDs[i]) == _realLP->number(_idsPrimalRowIDs[i+1]) )
             {
                colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_idsDualColIDs[i + 1]));
-               printf("Remove Col: %d\n", _compSolver.number(SPxColId(_idsDualColIDs[i + 1])));
+               printf("Remove Equality Col: %d\n", _compSolver.number(SPxColId(_idsDualColIDs[i + 1])));
                ncolsforremoval++;
 
                _idsPrimalRowIDs.remove(i + 1);
@@ -1040,6 +1131,7 @@ namespace soplex
                prevPrimalRowIds--;
             }
 
+            // ????? What happens if it is not basic?
             if( _solver.isBasic(_idsReducedProbRowIDs[rowNumber]) )
             {
                if( GT(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])], 0.0) )
@@ -1063,12 +1155,34 @@ namespace soplex
 
                   _idsElimPrimalRowIDs[_nElimPrimalRows] = _idsPrimalRowIDs[i];
                   _nElimPrimalRows++;
-                  _idsCompProbRowIDsIdx[_realLP->number(SPxColId(_idsPrimalRowIDs[i]))] = -1;
+                  _idsCompProbRowIDsIdx[_realLP->number(_idsPrimalRowIDs[i])] = -1;
                   _idsPrimalRowIDs.remove(i);
                   _nPrimalRows--;
                   _idsDualColIDs.remove(i);
                   _nDualCols--;
+
+                  i--;
+                  prevPrimalRowIds--;
                }
+            }
+            else // testing whether the removal of non-basic columns works.
+            {
+               colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_idsDualColIDs[i]));
+               printf("Remove Col: %d\n", _compSolver.number(SPxColId(_idsDualColIDs[i])));
+               ncolsforremoval++;
+
+               assert(_solver.number(_idsReducedProbRowIDs[rowNumber]) >= 0);
+
+               _idsElimPrimalRowIDs[_nElimPrimalRows] = _idsPrimalRowIDs[i];
+               _nElimPrimalRows++;
+               _idsCompProbRowIDsIdx[_realLP->number(_idsPrimalRowIDs[i])] = -1;
+               _idsPrimalRowIDs.remove(i);
+               _nPrimalRows--;
+               _idsDualColIDs.remove(i);
+               _nDualCols--;
+
+               i--;
+               prevPrimalRowIds--;
             }
          }
          else
@@ -1168,18 +1282,24 @@ namespace soplex
          if( !_idsReducedProbRows[rowNumber] && _realLP->rowType(_idsPrimalRowIDs[i]) == LPRowBase<Real>::EQUAL )
          {
             assert(_realLP->lhs(_idsPrimalRowIDs[i]) == _realLP->rhs(_idsPrimalRowIDs[i]));
-            _compSolver.changeLower(_idsDualColIDs[i], 0.0);
+            _compSolver.changeLower(_idsDualColIDs[i], 0.0);   // setting the lower bound of the dual column to zero.
 
             LPColBase<Real> addEqualityCol(-1.0*_realLP->rhs(_idsPrimalRowIDs[i]),
-                  -1.0*_compSolver.colVector(_idsDualColIDs[i]), infinity, 0.0);
+                  -1.0*_compSolver.colVector(_idsDualColIDs[i]), infinity, 0.0);    // adding a new column to the dual
 
             SPxColId newDualCol;
             _compSolver.addCol(newDualCol, addEqualityCol);
 
+            // inserting the row and col ids for the added column. This is to be next to the original column that has
+            // been duplicated.
+            printf("_nPrimalRows: %d, i: %d, _idsPrimalRowIDs.size: %d\n", _nPrimalRows, i, _idsPrimalRowIDs.size());
+            printf("_idsPrimalRowIDs[i].idx: %d\n", _idsPrimalRowIDs[i].getIdx());
+            printf("_idsPrimalRowIDs[i+1].idx: %d\n", _idsPrimalRowIDs[i+1].getIdx());
             _idsPrimalRowIDs.insert(i + 1, 1, _idsPrimalRowIDs[i]);
             _idsDualColIDs.insert(i + 1, 1, newDualCol);
             assert(_realLP->number(_idsPrimalRowIDs[i]) == _realLP->number(_idsPrimalRowIDs[i + 1]));
 
+            // updating the slack variable dual row.
             _compSolver.changeElement(_compSlackDualRowId, _idsDualColIDs[i], slackCoeff);
             _compSolver.changeElement(_compSlackDualRowId, _idsDualColIDs[i + 1], slackCoeff);
 
@@ -1195,20 +1315,26 @@ namespace soplex
    /// identify the dual columns related to the fixed variables
    void SoPlex::_identifyComplementaryFixedPrimalVars(int* currFixedVars)
    {
+      int numFixedVar = 0;
       for( int i = 0; i < _realLP->nCols(); i++ )
-         currFixedVars[i] = 0;
-
-      for( int i = 0; i < _solver.nCols(); i++ )
       {
-         if( _solver.basis().baseId(i).isSPxColId() )
+         currFixedVars[i] = 0;
+         printf("_idsReducedProbCols[%d]: %d, _idsCompProbColIDsIdx[%d]: %d\n", i, int(_idsReducedProbCols[i]),
+               i, _idsCompProbColIDsIdx[i]);
+         if( _idsReducedProbCols[i] && getOrigVarFixedDirection(_solver.number(_idsReducedProbColIDs[i])) )
+            printf("==================================================================\n");
+         if( _idsReducedProbCols[i] && _solver.isColBasic(_solver.number(_idsReducedProbColIDs[i])) )
          {
-            int colNumber = _realLP->number(SPxColId(_solver.basis().baseId(i)));
-            printf("Fixed Vars %d: %d ", colNumber, _fixedOrigVars[colNumber]);
+            printf("Fixed Vars %d: %d ", i, _fixedOrigVars[i]);
             // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
-            currFixedVars[colNumber] = getOrigVarFixedDirection(i);
-            printf("%d\n", currFixedVars[colNumber]);
+            currFixedVars[i] = getOrigVarFixedDirection(_solver.number(_idsReducedProbColIDs[i]));
+            printf("%d\n", currFixedVars[i]);
+
+            numFixedVar++;
          }
       }
+
+      printf("Number of fixed variables: %d\n", numFixedVar);
    }
 
 
@@ -1219,7 +1345,7 @@ namespace soplex
       SPxColId tempId;
       int ncolsforremoval = 0;
       int* colsforremoval = 0;
-      spx_alloc(colsforremoval, _realLP->nCols());
+      spx_alloc(colsforremoval, _realLP->nCols()*2);
       for( int i = 0; i < _realLP->nCols(); i++ )
       {
          if( _idsCompProbColIDsIdx[i] != -1 )//&& _fixedOrigVars[i] != currFixedVars[i] )
@@ -1295,7 +1421,7 @@ namespace soplex
          {
             if(true)//( _fixedOrigVars[i] != currFixedVars[i] )
             {
-               printf("_fixedOrigVars[%d]: %d\n", i, _fixedOrigVars[i]);
+               printf("_fixedOrigVars[%d]: %d, currFixedVars[%d]: %d\n", i, _fixedOrigVars[i], i, currFixedVars[i]);
                int idIndex = _idsCompProbColIDsIdx[i];
                assert(_compSolver.number(SPxRowId(_idsDualRowIDs[idIndex])) >= 0);
                col.add(_compSolver.number(SPxRowId(_idsDualRowIDs[idIndex])), 1.0);
@@ -1305,9 +1431,9 @@ namespace soplex
 
                   Real colObjCoeff = 0;
                   if( currFixedVars[i] == -1 )
-                     colObjCoeff = _solver.lower(SPxColId(_idsPrimalColIDs[idIndex]));
+                     colObjCoeff = _solver.lower(_idsReducedProbColIDs[i]);
                   else
-                     colObjCoeff = _solver.upper(SPxColId(_idsPrimalColIDs[idIndex]));
+                     colObjCoeff = _solver.upper(_idsReducedProbColIDs[i]);
 
                   fixedVarsDualCols.add(colObjCoeff, -infinity, col, infinity);
                   numFixedVars++;
@@ -1404,17 +1530,17 @@ namespace soplex
 
 
    /// determining which bound the primal variables will be fixed to.
-   int SoPlex::getOrigVarFixedDirection(int basisNum)
+   int SoPlex::getOrigVarFixedDirection(int colNum)
    {
       // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
-      if( GT(_solver.fVec()[basisNum], 0.0, 1e-10) )
+      if( _solver.basis().desc().colStatus(colNum) == SPxBasis::Desc::P_ON_UPPER )
       {
-         assert(_solver.upper(SPxColId(_solver.basis().baseId(basisNum))) < infinity);
+         assert(_solver.upper(colNum) < infinity);
          return 1;
       }
-      else if( LT(_solver.fVec()[basisNum], 0.0, 1e-10) )
+      else if( _solver.basis().desc().colStatus(colNum) == SPxBasis::Desc::P_ON_LOWER )
       {
-         assert(_solver.lower(SPxColId(_solver.basis().baseId(basisNum))) > -infinity);
+         assert(_solver.lower(colNum) > -infinity);
          return -1;
       }
 

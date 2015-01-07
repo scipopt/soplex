@@ -1280,6 +1280,7 @@ private:
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
                           // problem will be stored in _solver and the complementary problem will be stored in
                           // _compSolver.
+   SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
 
    DVector _idsFeasVector;       // feasibility vector calculated using unshifted bounds.
@@ -1623,7 +1624,8 @@ private:
          int* nnonposind);
 
    /// retrieves the compatible columns from the constraint matrix
-   void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int nnonposind, int* ncompatind);
+   void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval, int nnonposind,
+         int* ncompatind);
 
    /// deletes rows and columns from the reduced problem
    void _deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval);
@@ -1666,7 +1668,7 @@ private:
    void _updateComplementaryFixedPrimalVars(int* currFixedVars);
 
    /// determining which bound the primal variables will be fixed to.
-   int getOrigVarFixedDirection(int basisNum);
+   int getOrigVarFixedDirection(int colNum);
 
    //@}
 };
