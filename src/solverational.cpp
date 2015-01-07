@@ -3675,7 +3675,11 @@ namespace soplex
             j++;
          }
       }
-      MSG_INFO2( spxout << "Primal solution" << (primalFeasible ? " " : " not ") << "feasible!\n" );
+
+      if( !primalFeasible )
+      {
+         MSG_INFO1( spxout << "Rational solution primal infeasible.\n" );
+      }
 
       // solve for dual solution
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
@@ -3695,11 +3699,18 @@ namespace soplex
          return;
       }
 
-      // check reduced cost violation on nonbasic rows and columns
+      // check dual violation on nonbasic rows
       dualViolation = 0;
       dualFeasible = true;
       for( int i = 0; i < basisStatusRows.size(); i++ )
       {
+         if( _rowTypes[i] == RANGETYPE_FIXED
+            && (basisStatusRows[i] == SPxSolver::ON_LOWER || basisStatusRows[i] == SPxSolver::ON_UPPER) )
+         {
+            assert(lhsRational(i) == rhsRational(i));
+            basisStatusRows[i] = SPxSolver::FIXED;
+         }
+
          assert(basisStatusRows[i] != SPxSolver::BASIC || basicDual[i] == 0);
          if( basisStatusRows[i] == SPxSolver::BASIC || basisStatusRows[i] == SPxSolver::FIXED )
             continue;
@@ -3711,6 +3722,11 @@ namespace soplex
                violation = -basicDual[i];
                if( violation > dualViolation )
                   dualViolation = violation;
+               MSG_DEBUG( spxout << "negative dual multliplier for row " << i
+                  << " with dual " << rationalToString(basicDual[i])
+                  << " and status " << basisStatusRows[i]
+                  << " and [lhs,rhs] = [" << rationalToString(lhsRational(i)) << "," << rationalToString(rhsRational(i)) << "]"
+                  << "\n" );
             }
          }
          else if( basicDual[i] > 0 )
@@ -3720,12 +3736,26 @@ namespace soplex
                dualFeasible = false;
                if( basicDual[i] > dualViolation )
                   dualViolation = basicDual[i];
+               MSG_DEBUG( spxout << "positive dual multliplier for row " << i
+                  << " with dual " << rationalToString(basicDual[i])
+                  << " and status " << basisStatusRows[i]
+                  << " and [lhs,rhs] = [" << rationalToString(lhsRational(i)) << "," << rationalToString(rhsRational(i)) << "]"
+                  << "\n" );
             }
          }
       }
+
+      // check reduced cost violation on nonbasic columns
       sol._redCost.reDim(numColsRational());
       for( int i = 0; i < basisStatusCols.size(); i++ )
       {
+         if( _colTypes[i] == RANGETYPE_FIXED
+            && (basisStatusCols[i] == SPxSolver::ON_LOWER || basisStatusCols[i] == SPxSolver::ON_UPPER) )
+         {
+            assert(lowerRational(i) == upperRational(i));
+            basisStatusCols[i] = SPxSolver::FIXED;
+         }
+
          assert(basisStatusCols[i] != SPxSolver::BASIC || basicDual * colVectorRational(i) == objRational(i));
          if( basisStatusCols[i] == SPxSolver::BASIC || basisStatusCols[i] == SPxSolver::FIXED )
             continue;
@@ -3757,7 +3787,11 @@ namespace soplex
                sol._redCost[i] *= -1;
          }
       }
-      MSG_INFO2( spxout << "Dual solution" << (dualFeasible ? " " : " not ") << "feasible!\n" );
+
+      if( !dualFeasible )
+      {
+         MSG_INFO1( spxout << "Rational solution dual infeasible.\n" );
+      }
 
       // store solution
       if( primalFeasible && dualFeasible )
