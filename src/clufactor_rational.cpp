@@ -426,7 +426,6 @@ void CLUFactorRational::remaxRow( int p_row, int len )
    else                        /* row must be moved to end of row file */
    {
       int i, j, k;
-      int *idx = u.row.idx;
       DVectorRational& val = u.row.val;
       Dring *ring;
 
@@ -444,6 +443,7 @@ void CLUFactorRational::remaxRow( int p_row, int len )
 
               && "ERROR: could not allocate memory for row file" );
 
+      int *idx = u.row.idx;
       j = u.row.used;
       i = u.row.start[p_row];
       k = u.row.len[p_row] + i;
