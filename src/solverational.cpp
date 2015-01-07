@@ -534,6 +534,7 @@ namespace soplex
       bool factorSolPrimalFeasible;
       bool factorSolDualFeasible;
       int lastStallRefinements = 0;
+      int nextRatrecRefinement = 0;
       do
       {
          // decrement minRounds counter
@@ -783,8 +784,14 @@ namespace soplex
          else
             bestViolation = sumMaxViolation;
 
+         // decide whether to perform rational reconstruction and/or factorization
+         bool performRatfac = boolParam(SoPlex::RATFAC)
+            && lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS) && _hasBasis && factorSolNewBasis;
+         bool performRatrec = boolParam(SoPlex::RATREC)
+            && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
+
          // attempt rational reconstruction
-         if( boolParam(SoPlex::RATREC) )
+         if( performRatrec )
          {
             MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
             sumMaxViolation.invert();
@@ -795,6 +802,37 @@ namespace soplex
                dualFeasible = true;
                break;
             }
+            nextRatrecRefinement += int(_statistics->refinements * realParam(SoPlex::RATREC_FREQ)) + 1;
+            MSG_DEBUG( spxout << "Next rational reconstruction after refinement " << nextRatrecRefinement << ".\n" );
+         }
+
+         // solve basis systems exactly
+         if( performRatfac )
+         {
+            MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
+            _factorizeColumnRational(factorSol, _basisStatusRows, _basisStatusCols, factorSolPrimalFeasible, factorSolDualFeasible, factorSolPrimalViolation, factorSolDualViolation, stopped, error);
+            factorSolNewBasis = false;
+            assert(!factorSolPrimalFeasible || factorSolPrimalViolation == 0);
+            assert(!factorSolDualFeasible || factorSolDualViolation == 0);
+            if( stopped )
+            {
+               MSG_INFO1( spxout << "Stopped rational factorization.\n" );
+            }
+            else if( error )
+            {
+               // message was already printed; reset error flag and continue without factorization
+               error = false;
+            }
+            else if( (factorSolPrimalFeasible || factorSolPrimalViolation <= _rationalFeastol) && (factorSolDualFeasible || factorSolDualViolation <= _rationalOpttol) )
+            {
+               MSG_INFO1( spxout << "Tolerances reached.\n" );
+               sol = factorSol;
+               primalFeasible = true;
+               dualFeasible = true;
+               break;
+            }
+            else
+               factorSolAvailable = true;
          }
 
          // start refinement
@@ -1044,36 +1082,6 @@ namespace soplex
          }
 
          _statistics->rationalTime.start();
-
-         // solve basis systems exactly
-         if( boolParam(SoPlex::RATFAC) && lastStallRefinements >= intParam(SoPlex::RATFAC_MINSTALLS)
-            && _hasBasis && factorSolNewBasis )
-         {
-            MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
-            _factorizeColumnRational(factorSol, _basisStatusRows, _basisStatusCols, factorSolPrimalFeasible, factorSolDualFeasible, factorSolPrimalViolation, factorSolDualViolation, stopped, error);
-            factorSolNewBasis = false;
-            assert(!factorSolPrimalFeasible || factorSolPrimalViolation == 0);
-            assert(!factorSolDualFeasible || factorSolDualViolation == 0);
-            if( stopped )
-            {
-               MSG_INFO1( spxout << "Stopped rational factorization.\n" );
-            }
-            else if( error )
-            {
-               // message was already printed; reset error flag and continue without factorization
-               error = false;
-            }
-            else if( (factorSolPrimalFeasible || factorSolPrimalViolation <= _rationalFeastol) && (factorSolDualFeasible || factorSolDualViolation <= _rationalOpttol) )
-            {
-               MSG_INFO1( spxout << "Tolerances reached.\n" );
-               sol = factorSol;
-               primalFeasible = true;
-               dualFeasible = true;
-               break;
-            }
-            else
-               factorSolAvailable = true;
-         }
 
          // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
@@ -3838,12 +3846,12 @@ namespace soplex
       success = reconstructVector(_workSol._primal, denomBoundSquared);
       if( !success )
       {
-         MSG_INFO2( spxout << "Rational reconstruction of primal vector failed!\n" );
+         MSG_INFO1( spxout << "Rational reconstruction of primal solution failed.\n" );
          _statistics->reconstructionTime.stop();
          return success;
       }
 
-      MSG_INFO2( spxout << "Rational reconstruction of primal vector successful!\n" );
+      MSG_DEBUG( spxout << "Rational reconstruction of primal solution successful.\n" );
 
       // check violation of bounds
       for( int c = numColsRational() - 1; c >= 0; c-- )
@@ -3861,14 +3869,16 @@ namespace soplex
 
          if( _lowerFinite(_colTypes[c]) && _workSol._primal[c] < lowerRational(c) )
          {
-            MSG_INFO2( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - _workSol._primal[c]) << "\n" );
+            MSG_DEBUG( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - _workSol._primal[c]) << "\n" );
+            MSG_INFO1( spxout << "Reconstructed solution primal infeasible (1).\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
 
          if( _upperFinite(_colTypes[c]) && _workSol._primal[c] > upperRational(c) )
          {
-            MSG_INFO2( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(_workSol._primal[c] - upperRational(c)) << "\n" );
+            MSG_DEBUG( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(_workSol._primal[c] - upperRational(c)) << "\n" );
+            MSG_INFO1( spxout << "Reconstructed solution primal infeasible (2).\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
@@ -3895,14 +3905,16 @@ namespace soplex
 
          if( _lowerFinite(_rowTypes[r]) && _workSol._slacks[r] < lhsRational(r) )
          {
-            MSG_INFO2( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - _workSol._slacks[r]) << "\n" );
+            MSG_DEBUG( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - _workSol._slacks[r]) << "\n" );
+            MSG_INFO1( spxout << "Reconstructed solution primal infeasible (3).\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
 
          if( _upperFinite(_rowTypes[r]) && _workSol._slacks[r] > rhsRational(r) )
          {
-            MSG_INFO2( spxout << "Rhs of row " << r << " violated by " << rationalToString(_workSol._slacks[r] - rhsRational(r)) << "\n" );
+            MSG_DEBUG( spxout << "Rhs of row " << r << " violated by " << rationalToString(_workSol._slacks[r] - rhsRational(r)) << "\n" );
+            MSG_INFO1( spxout << "Reconstructed solution primal infeasible (4).\n" );
             _statistics->reconstructionTime.stop();
             return false;
          }
@@ -3914,12 +3926,12 @@ namespace soplex
       success = reconstructVector(_workSol._dual, denomBoundSquared);
       if( !success )
       {
-         MSG_INFO2( spxout << "Rational reconstruction of dual vector failed!\n" );
+         MSG_INFO1( spxout << "Rational reconstruction of dual solution failed.\n" );
          _statistics->reconstructionTime.stop();
          return success;
       }
 
-      MSG_INFO2( spxout << "Rational reconstruction of dual vector successful!\n" );
+      MSG_DEBUG( spxout << "Rational reconstruction of dual vector successful.\n" );
 
       // check dual multipliers before reduced costs because this check is faster since it does not require the
       // computation of reduced costs
@@ -3936,6 +3948,7 @@ namespace soplex
                   << " and slack " << rationalToString(_workSol._slacks[r])
                   << " not at lhs " << rationalToString(lhsRational(r))
                   << "\n" );
+               MSG_INFO1( spxout << "Reconstructed solution dual infeasible (1).\n" );
                _statistics->reconstructionTime.stop();
                return false;
             }
@@ -3957,6 +3970,7 @@ namespace soplex
                   << " and slack " << rationalToString(_workSol._slacks[r])
                   << " not at rhs " << rationalToString(rhsRational(r))
                   << "\n" );
+               MSG_INFO1( spxout << "Reconstructed solution dual infeasible (2).\n" );
                _statistics->reconstructionTime.stop();
                return false;
             }
@@ -3993,6 +4007,7 @@ namespace soplex
                   << " and value " << rationalToString(_workSol._primal[c])
                   << " not at lower bound " << rationalToString(lowerRational(c))
                   << "\n" );
+               MSG_INFO1( spxout << "Reconstructed solution dual infeasible (3).\n" );
                _statistics->reconstructionTime.stop();
                return false;
             }
@@ -4014,6 +4029,7 @@ namespace soplex
                   << " and value " << rationalToString(_workSol._primal[c])
                   << " not at upper bound " << rationalToString(upperRational(c))
                   << "\n" );
+               MSG_INFO1( spxout << "Reconstructed solution dual infeasible (4).\n" );
                _statistics->reconstructionTime.stop();
                return false;
             }

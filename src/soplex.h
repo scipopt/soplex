@@ -1145,8 +1145,11 @@ public:
       /// threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
       REPRESENTATION_SWITCH = 16,
 
+      /// geometric frequency at which to apply rational reconstruction
+      RATREC_FREQ = 17,
+
       /// number of real parameters
-      REALPARAM_COUNT = 17
+      REALPARAM_COUNT = 18
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM

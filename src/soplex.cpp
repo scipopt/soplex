@@ -297,7 +297,7 @@ namespace soplex
             _intParamDefault[SoPlex::HYPER_PRICING] = SoPlex::HYPER_PRICING_AUTO;
 
             // minimum number of stalling refinements since last pivot to trigger rational factorization
-            _intParamName[SoPlex::RATFAC_MINSTALLS] = "ratfacminstalls";
+            _intParamName[SoPlex::RATFAC_MINSTALLS] = "ratfac_minstalls";
             _intParamDescription[SoPlex::RATFAC_MINSTALLS] = "minimum number of stalling refinements since last pivot to trigger rational factorization";
             _intParamLower[SoPlex::RATFAC_MINSTALLS] = 0;
             _intParamUpper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
@@ -426,6 +426,13 @@ namespace soplex
             _realParamLower[SoPlex::REPRESENTATION_SWITCH] = 0.0;
             _realParamUpper[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+
+            // geometric frequency at which to apply rational reconstruction
+            _realParamName[SoPlex::RATREC_FREQ] = "ratrec_freq";
+            _realParamDescription[SoPlex::RATREC_FREQ] = "geometric frequency at which to apply rational reconstruction";
+            _realParamLower[SoPlex::RATREC_FREQ] = 1.0;
+            _realParamUpper[SoPlex::RATREC_FREQ] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::RATREC_FREQ] = 1.2;
 
             _defaultsAndBoundsInitialized = true;
          }
@@ -5166,6 +5173,10 @@ namespace soplex
 
       // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
       case SoPlex::REPRESENTATION_SWITCH:
+         break;
+
+      // geometric frequency at which to apply rational reconstruction
+      case SoPlex::RATREC_FREQ:
          break;
 
       default:

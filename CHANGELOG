@@ -24,11 +24,12 @@ interface & parameters:
 - improved printing of rationals in limited precision
 - added possibility to write basis file in original Cplex definition
 - new parameter bool:ratfac to control whether rational factorization is attempted during iterative refinement
-- new parameter int:ratfacminstalls for minimum number of stalling refinements since last pivot to trigger rational
+- new parameter int:ratfac_minstalls for minimum number of stalling refinements since last pivot to trigger rational
   factorization
 - new parameter bool:ratrec to control whether rational reconstruction is attempted during iterative refinement
 - new statistics section on rational reconstruction
 - new statistics section on size of rational solution in base 2 and base 10
+- new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
