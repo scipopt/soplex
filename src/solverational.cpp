@@ -644,13 +644,15 @@ namespace soplex
             }
 
             // replace corrected solution by solution from factorization if available and more precise
-            if( factorSolAvailable && factorSolPrimalViolation < boundsViolation && factorSolPrimalViolation < sideViolation )
+            if( factorSolAvailable && !recomputeViolations && factorSolPrimalViolation < boundsViolation && factorSolPrimalViolation < sideViolation )
             {
                MSG_INFO2( spxout << "Jumping to primal solution from factorization.\n"; )
                   sol._primal = factorSol._primal;
                sol._slacks = factorSol._slacks;
                recomputeViolations = true;
             }
+            else
+               recomputeViolations = false;
          }
          while( recomputeViolations );
 
@@ -718,13 +720,15 @@ namespace soplex
             _modObj = sol._redCost;
 
             // replace corrected solution by solution from factorization if available and more precise
-            if( factorSolAvailable && factorSolDualViolation < redCostViolation && factorSolDualViolation < dualViolation )
+            if( factorSolAvailable && !recomputeViolations && factorSolDualViolation < redCostViolation && factorSolDualViolation < dualViolation )
             {
                MSG_INFO2( spxout << "Jumping to dual solution from factorization.\n" );
                sol._dual = factorSol._dual;
                sol._redCost = factorSol._redCost;
                recomputeViolations = true;
             }
+            else
+               recomputeViolations = false;
          }
          while( recomputeViolations );
 
