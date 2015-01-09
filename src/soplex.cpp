@@ -155,6 +155,11 @@ namespace soplex
             _boolParamDescription[SoPlex::RATREC] = "apply rational reconstruction after each iterative refinement?";
             _boolParamDefault[SoPlex::RATREC] = false;
 
+            // round scaling factors for iterative refinement to powers of two?
+            _boolParamName[SoPlex::POWERSCALING] = "powerscaling";
+            _boolParamDescription[SoPlex::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
+            _boolParamDefault[SoPlex::POWERSCALING] = true;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4797,6 +4802,8 @@ namespace soplex
       case ACCEPTCYCLING:
          break;
       case RATREC:
+         break;
+      case POWERSCALING:
          break;
       default:
          return false;

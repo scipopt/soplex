@@ -235,6 +235,9 @@ namespace soplex
       /// inversion
       Rational& invert();
 
+      /// round up to next power of two
+      Rational& powRound();
+
       //@}
 
 

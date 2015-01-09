@@ -807,8 +807,11 @@ public:
       /// apply rational reconstruction after each iterative refinement?
       RATREC = 5,
 
+      /// round scaling factors for iterative refinement to powers of two?
+      POWERSCALING = 6,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 6
+      BOOLPARAM_COUNT = 7
    } BoolParam;
 
    /// integer parameters

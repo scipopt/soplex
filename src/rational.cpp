@@ -1657,6 +1657,37 @@ Rational& Rational::invert()
 
 
 
+/// round up to next power of two
+Rational& Rational::powRound()
+{
+   mpz_t roundval;
+
+   MSG_DEBUG( spxout << "rounding " << rationalToString(this->dpointer->privatevalue) << " to power of two" << "\n" );
+
+   mpz_init(roundval);
+   mpz_cdiv_q(roundval, mpq_numref(this->dpointer->privatevalue), mpq_denref(this->dpointer->privatevalue));
+   mpz_sub_ui(roundval, roundval, 1);
+
+   MSG_DEBUG( spxout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
+
+   size_t binlog = mpz_sizeinbase(roundval, 2);
+
+   MSG_DEBUG( spxout << "   --> 2^" << binlog << "\n" );
+
+   mpz_ui_pow_ui(roundval, 2, binlog);
+
+   MSG_DEBUG( spxout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
+
+   mpq_set_z(this->dpointer->privatevalue, roundval);
+   mpz_clear(roundval);
+
+   MSG_DEBUG( spxout << "   --> " << rationalToString(this->dpointer->privatevalue) << "\n" );
+
+   return *this;
+}
+
+
+
 /// checks if d is the closest possible double
 bool Rational::isNextTo(const double& d)
 {
@@ -3324,6 +3355,15 @@ Rational& Rational::subQuotient(const Rational& r, const Rational& s)
 Rational& Rational::invert()
 {
    this->dpointer->privatevalue = 1.0 / this->dpointer->privatevalue;
+   return *this;
+}
+
+
+
+/// round up to next power of two
+Rational& Rational::powRound()
+{
+   ///@todo implement
    return *this;
 }
 
