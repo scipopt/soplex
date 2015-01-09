@@ -1647,7 +1647,7 @@ private:
    void _performIdsRatioTest();
 
    /// update the reduced problem with additional columns and rows
-   void _updateIdsReducedProblem(DVector dualVector, DVector redcostVector, DVector compPrimalVector);
+   void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector);
 
    /// update the dual complementary problem with additional columns and rows
    void _updateIdsComplementaryProblem(DVector dualVector);
