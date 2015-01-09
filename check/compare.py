@@ -36,7 +36,7 @@ def updateGeoMean(new, mean, count, shift):
     assert mean > 0
     if shift == 0:
         shift = 0.0000001
-    return math.pow(float(mean), float(count)/float(count+1)) * math.pow(float(new)+shift, 1.0/float(count+1))
+    return math.pow(float(mean+shift), float(count-1)/float(count)) * math.pow(float(new)+shift, 1.0/float(count)) - shift
 
 # print header lines
 def printHeader():

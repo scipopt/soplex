@@ -24,7 +24,6 @@
 #include "spxdefaultrt.h"
 #include "spxstarter.h"
 #include "spxout.h"
-#include "exceptions.h"
 
 #define MAXCYCLES 400
 #define MAXSTALLS 10000
@@ -109,8 +108,8 @@ SPxSolver::Status SPxSolver::solve()
       m_status = NO_RATIOTESTER;
       throw SPxStatusException("XSOLVE04 No RatioTester loaded");
    }
-   theTime.reset();
-   theTime.start();
+   theTime->reset();
+   theTime->start();
 
    m_numCycle = 0;
    iterCount  = 0;
@@ -894,7 +893,7 @@ SPxSolver::Status SPxSolver::solve()
       theratiotester->setType(type());
    }
 
-   theTime.stop();
+   theTime->stop();
    theCumulativeTime += time();
 
    if (m_status == RUNNING)

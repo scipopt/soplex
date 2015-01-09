@@ -289,6 +289,13 @@ namespace soplex
             _intParamUpper[SoPlex::CHECKMODE] = 2;
             _intParamDefault[SoPlex::CHECKMODE] = SoPlex::CHECKMODE_AUTO;
 
+            // type of timing
+            _intParamName[SoPlex::TIMER] = "timer";
+            _intParamDescription[SoPlex::TIMER] = "type of timer (1 - cputime, aka. usertime, 2 - wallclock time, 0 - no timing)";
+            _intParamLower[SoPlex::TIMER] = 0;
+            _intParamUpper[SoPlex::TIMER] = 2;
+            _intParamDefault[SoPlex::TIMER] = SoPlex::TIMER_CPU;
+
             // mode for hyper sparse pricing
             _intParamName[SoPlex::HYPER_PRICING] = "hyperpricing";
             _intParamDescription[SoPlex::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
@@ -4275,7 +4282,7 @@ namespace soplex
    /// time spent in last call to solve
    Real SoPlex::solveTime() const
    {
-       return _statistics->solvingTime.userTime();
+       return _statistics->solvingTime->time();
    }
 
 
@@ -4395,7 +4402,7 @@ namespace soplex
       assert(_realLP != 0);
 
       // start timing
-      _statistics->readingTime.start();
+      _statistics->readingTime->start();
 
       // read
       if( !_isRealLPLoaded )
@@ -4412,7 +4419,7 @@ namespace soplex
       assert(_hasBasis == (_solver.basis().status() > SPxBasis::NO_PROBLEM));
 
       // stop timing
-      _statistics->readingTime.stop();
+      _statistics->readingTime->stop();
 
       return _hasBasis;
 #else
@@ -4420,7 +4427,7 @@ namespace soplex
       assert(filename != 0);
 
       // start timing
-      _statistics->readingTime.start();
+      _statistics->readingTime->start();
 
       // read
       spxifstream file(filename);
@@ -4569,7 +4576,7 @@ namespace soplex
       _hasBasis = !mps.hasError();
 
       // stop timing
-      _statistics->readingTime.stop();
+      _statistics->readingTime->stop();
 
       return _hasBasis;
 #endif
@@ -5052,6 +5059,24 @@ namespace soplex
          }
          break;
 
+      // type of timer
+      case SoPlex::TIMER:
+         switch( value )
+         {
+         case TIMER_OFF:
+            _solver.setTiming( Timer::OFF);
+            break;
+         case TIMER_CPU:
+            _solver.setTiming( Timer::USER_TIME );
+            break;
+         case TIMER_WALLCLOCK:
+            _solver.setTiming( Timer::WALLCLOCK_TIME);
+            break;
+         default:
+            return false;
+         }
+         break;
+
       // mode of hyper pricing
       case SoPlex::HYPER_PRICING:
          switch( value )
@@ -5366,7 +5391,7 @@ namespace soplex
       assert(filename != 0);
 
       // start timing
-      _statistics->readingTime.start();
+      _statistics->readingTime->start();
 
       MSG_INFO1( spxout << "Loading settings file <" << filename << "> . . .\n" );
 
@@ -5404,7 +5429,7 @@ namespace soplex
       }
 
       // stop timing
-      _statistics->readingTime.stop();
+      _statistics->readingTime->stop();
 
       return !readError && !parseError;
    }
@@ -5734,7 +5759,7 @@ namespace soplex
    void SoPlex::printShortStatistics(std::ostream& os)
    {
       printStatus(os, _status);
-      os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime.userTime() << "\n"
+      os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime->time() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
          << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
    }
@@ -6194,7 +6219,7 @@ namespace soplex
    {
       assert(_statistics != 0);
 
-      return (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime.userTime() >= realParam(TIMELIMIT))
+      return (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime->time() >= realParam(TIMELIMIT))
          || (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
          || (intParam(REFLIMIT) >= 0 && _statistics->refinements >= intParam(REFLIMIT))
          || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements >= intParam(STALLREFLIMIT));
@@ -6939,7 +6964,7 @@ namespace soplex
       if( intParam(SoPlex::ITERLIMIT) >= 0 )
          _solver.setTerminationIter(intParam(SoPlex::ITERLIMIT) - _statistics->iterations);
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         _solver.setTerminationTime(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+         _solver.setTerminationTime(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
 
       // ensure that tolerances are not too small
       if( _solver.feastol() < 1e-12 )
@@ -6985,7 +7010,7 @@ namespace soplex
          _solver.hyperPricing(false);
 
       // call floating-point solver and catch exceptions
-      _statistics->simplexTime.start();
+      _statistics->simplexTime->start();
       try
       {
          _solver.solve();
@@ -7000,7 +7025,7 @@ namespace soplex
          MSG_ERROR( spxout << "Caught unknown exception while solving real LP.\n" );
          _status = SPxSolver::ERROR;
       }
-      _statistics->simplexTime.stop();
+      _statistics->simplexTime->stop();
 
       // record statistics
       _statistics->iterations += _solver.iterations();
@@ -7031,13 +7056,13 @@ namespace soplex
       _hasBasis = false;
 
       // start timing
-      _statistics->readingTime.start();
+      _statistics->readingTime->start();
 
       // read
       bool success = _realLP->readFile(filename, rowNames, colNames, intVars);
 
       // stop timing
-      _statistics->readingTime.stop();
+      _statistics->readingTime->stop();
 
       if( success )
       {
@@ -7065,7 +7090,7 @@ namespace soplex
       _statistics->clearAllData();
 
       // start timing
-      _statistics->readingTime.start();
+      _statistics->readingTime->start();
 
       // update status
       _status = SPxSolver::UNKNOWN;
@@ -7077,7 +7102,7 @@ namespace soplex
       bool success = _rationalLP->readFile(filename, rowNames, colNames, intVars);
 
       // stop timing
-      _statistics->readingTime.stop();
+      _statistics->readingTime->stop();
 
       if( success )
       {
@@ -7136,7 +7161,7 @@ namespace soplex
    {
       // start timing
       if( time )
-         _statistics->syncTime.start();
+         _statistics->syncTime->start();
 
       // copy LP
       if( _isRealLPLoaded )
@@ -7149,7 +7174,7 @@ namespace soplex
 
       // stop timing
       if( time )
-         _statistics->syncTime.stop();
+         _statistics->syncTime->stop();
    }
 
 
@@ -7159,7 +7184,7 @@ namespace soplex
    {
       // start timing
       if( time )
-         _statistics->syncTime.start();
+         _statistics->syncTime->start();
 
       // copy LP
       _ensureRationalLP();
@@ -7168,7 +7193,7 @@ namespace soplex
 
       // stop timing
       if( time )
-         _statistics->syncTime.stop();
+         _statistics->syncTime->stop();
    }
 
 

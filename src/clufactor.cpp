@@ -2769,7 +2769,7 @@ void CLUFactor::factor( const SVector** vec,         ///< Array of column vector
                         Real            eps )         ///< epsilon for zero detection
 {
 
-   factorTime.start();
+   factorTime->start();
 
    stat = SLinSolver::OK;
 
@@ -2816,7 +2816,7 @@ TERMINATE:
       nzCnt = setupColVals();
    }
 
-   factorTime.stop();
+   factorTime->stop();
 
    factorCount++;
 }

@@ -33,13 +33,36 @@ namespace soplex
     */
    class SoPlex::Statistics
    {
+
    public:
 
       //**@name Construction, resetting, printing */
       //@{
 
       /// default constructor
-      Statistics();
+      Statistics(Timer::TYPE ttype = Timer::USER_TIME);
+
+      /// destructor
+      ~Statistics()
+      {
+         // we need to free all timers again (allocation happens in constructor)
+         readingTime->~Timer();
+         solvingTime->~Timer();
+         preprocessingTime->~Timer();
+         simplexTime->~Timer();
+         syncTime->~Timer();
+         transformTime->~Timer();
+         rationalTime->~Timer();
+         reconstructionTime->~Timer();
+         spx_free(readingTime);
+         spx_free(solvingTime);
+         spx_free(preprocessingTime);
+         spx_free(simplexTime);
+         spx_free(syncTime);
+         spx_free(transformTime);
+         spx_free(rationalTime);
+         spx_free(reconstructionTime);
+      }
 
       /// clears all statistics
       void clearAllData();
@@ -56,14 +79,15 @@ namespace soplex
       //**@name Data */
       //@{
 
-      Timer readingTime; ///< reading time not included in solving time
-      Timer solvingTime; ///< solving time
-      Timer preprocessingTime; ///< preprocessing time
-      Timer simplexTime; ///< simplex time
-      Timer syncTime; ///< time for synchronization between real and rational LP (included in solving time)
-      Timer transformTime; ///< time for transforming LPs (included in solving time)
-      Timer rationalTime; ///< time for rational LP solving (included in solving time)
-      Timer reconstructionTime; ///< time for rational reconstructions
+      Timer* readingTime; ///< reading time not included in solving time
+      Timer* solvingTime; ///< solving time
+      Timer* preprocessingTime; ///< preprocessing time
+      Timer* simplexTime; ///< simplex time
+      Timer* syncTime; ///< time for synchronization between real and rational LP (included in solving time)
+      Timer* transformTime; ///< time for transforming LPs (included in solving time)
+      Timer* rationalTime; ///< time for rational LP solving (included in solving time)
+      Timer* reconstructionTime; ///< time for rational reconstructions
+      Timer::TYPE timerType; ///< type of timer (user or wallclock)
       Real luFactorizationTimeReal; ///< time for factorizing bases matrices in real precision
       Real luSolveTimeReal; ///< time for solving linear systems in real precision
       Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision

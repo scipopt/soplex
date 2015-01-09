@@ -32,8 +32,8 @@ namespace soplex
       bool unboundednessNotCertified = false;
 
       // start timing
-      _statistics->solvingTime.start();
-      _statistics->preprocessingTime.start();
+      _statistics->solvingTime->start();
+      _statistics->preprocessingTime->start();
 
       // remember that last solve was rational
       _lastSolveMode = SOLVEMODE_RATIONAL;
@@ -81,7 +81,7 @@ namespace soplex
          _realLP->changeSense(SPxLPReal::MINIMIZE);
       }
 
-      _statistics->preprocessingTime.stop();
+      _statistics->preprocessingTime->stop();
 
       // apply lifting to reduce range of nonzero matrix coefficients
       if( boolParam(SoPlex::LIFTING) )
@@ -349,7 +349,7 @@ namespace soplex
       }
 
       // stop timing
-      _statistics->solvingTime.stop();
+      _statistics->solvingTime->stop();
    }
 
 
@@ -358,7 +358,7 @@ namespace soplex
    void SoPlex::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
    {
       // start rational solving timing
-      _statistics->rationalTime.start();
+      _statistics->rationalTime->start();
 
       primalFeasible = false;
       dualFeasible = false;
@@ -407,7 +407,7 @@ namespace soplex
          assert(_solver.maxRowObj(r) == 0.0);
       }
 
-      _statistics->rationalTime.stop();
+      _statistics->rationalTime->stop();
       result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols, _hasBasis);
 
       // evaluate result
@@ -442,7 +442,7 @@ namespace soplex
          return;
       }
 
-      _statistics->rationalTime.start();
+      _statistics->rationalTime->start();
 
       // store floating-point solution of original LP as current rational solution and ensure that solution vectors have
       // right dimension; ensure that solution is aligned with basis
@@ -746,8 +746,8 @@ namespace soplex
             << "Progress table: "
             << std::setw(10) << _statistics->refinements << " & "
             << std::setw(10) << _statistics->iterations << " & "
-            << std::setw(10) << _statistics->solvingTime.userTime() << " & "
-            << std::setw(10) << _statistics->rationalTime.userTime() << " & "
+            << std::setw(10) << _statistics->solvingTime->time() << " & "
+            << std::setw(10) << _statistics->rationalTime->time() << " & "
             << std::setw(10) << rationalToString(boundsViolation > sideViolation ? boundsViolation : sideViolation, 2) << " & "
             << std::setw(10) << rationalToString(redCostViolation > dualViolation ? redCostViolation : dualViolation, 2) << "\n");
 
@@ -1040,7 +1040,7 @@ namespace soplex
 
          // solve modified problem
          int prevIterations = _statistics->iterations;
-         _statistics->rationalTime.stop();
+         _statistics->rationalTime->stop();
          result = _solveRealStable(acceptUnbounded, acceptInfeasible, primalReal, dualReal, _basisStatusRows, _basisStatusCols, _hasBasis, primalScale > 1e20 || dualScale > 1e20);
 
          // count refinements and remember whether we moved to a new basis
@@ -1085,7 +1085,7 @@ namespace soplex
             return;
          }
 
-         _statistics->rationalTime.start();
+         _statistics->rationalTime->start();
 
          // correct primal solution and align with basis
          MSG_DEBUG( spxout << "Correcting primal solution.\n" );
@@ -1418,7 +1418,7 @@ namespace soplex
       _solver.clearRowObjs();
 
       // stop rational solving time
-      _statistics->rationalTime.stop();
+      _statistics->rationalTime->stop();
    }
 
 
@@ -1585,7 +1585,7 @@ namespace soplex
       MSG_DEBUG( spxout << "Reducing matrix coefficients by lifting.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       MSG_DEBUG( _realLP->writeFile("beforeLift.lp", 0, 0, 0) );
 
@@ -1745,7 +1745,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterLift.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
 
       if( numColsRational() > _beforeLiftCols || numRowsRational() > _beforeLiftRows )
       {
@@ -1760,7 +1760,7 @@ namespace soplex
    void SoPlex::_project(SolRational& sol)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeProject.lp", 0, 0, 0) );
@@ -1842,7 +1842,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterProject.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -1929,7 +1929,7 @@ namespace soplex
       MSG_DEBUG( spxout << "Transforming rows to equation form.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       MSG_DEBUG( _realLP->writeFile("beforeTransEqu.lp", 0, 0, 0) );
 
@@ -1990,7 +1990,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterTransEqu.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
 
       if( _slackCols.num() > 0 )
       {
@@ -2004,7 +2004,7 @@ namespace soplex
    void SoPlex::_untransformEquality(SolRational& sol)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeUntransEqu.lp", 0, 0, 0) );
@@ -2108,7 +2108,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterUntransEqu.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -2123,7 +2123,7 @@ namespace soplex
       MSG_INFO1( spxout << "Setting up LP to compute primal unbounded ray.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeTransUnbounded.lp", 0, 0, 0) );
@@ -2228,7 +2228,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterTransUnbounded.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -2237,7 +2237,7 @@ namespace soplex
    void SoPlex::_untransformUnbounded(SolRational& sol, bool unbounded)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeUntransUnbounded.lp", 0, 0, 0) );
@@ -2351,7 +2351,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -2397,7 +2397,7 @@ namespace soplex
       MSG_INFO1( spxout << "Setting up LP to test for feasibility.\n" );
 
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeTransFeas.lp", 0, 0, 0) );
@@ -2644,7 +2644,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterTransFeas.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
    }
 
 
@@ -2653,7 +2653,7 @@ namespace soplex
    void SoPlex::_untransformFeasibility(SolRational& sol, bool infeasible)
    {
       // start timing
-      _statistics->transformTime.start();
+      _statistics->transformTime->start();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("beforeUntransFeas.lp", 0, 0, 0) );
@@ -2799,7 +2799,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("afterUntransFeas.lp", 0, 0, 0) );
 
       // stop timing
-      _statistics->transformTime.stop();
+      _statistics->transformTime->stop();
 
 #ifndef NDEBUG
       if( sol._hasPrimal )
@@ -3086,7 +3086,7 @@ namespace soplex
 #endif
 
       // start timing
-      _statistics->syncTime.start();
+      _statistics->syncTime->start();
 
       // if preprocessing is applied, we need to restore the original LP at the end
       SPxLPRational* rationalLP = 0;
@@ -3097,7 +3097,7 @@ namespace soplex
       }
 
       // stop timing
-      _statistics->syncTime.stop();
+      _statistics->syncTime->stop();
 
       returnedBasis = false;
       try
@@ -3480,7 +3480,7 @@ namespace soplex
    void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, Rational& primalViolation, Rational& dualViolation, bool& stopped, bool& error)
    {
       // start rational solving time
-      _statistics->rationalTime.start();
+      _statistics->rationalTime->start();
 
       primalFeasible = false;
       dualFeasible = false;
@@ -3583,7 +3583,7 @@ namespace soplex
 
       // load rational basis matrix
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
       else
          linsolver.setTimeLimit(-1.0);
       linsolver.load(matrix.get_ptr(), matrixdim);
@@ -3608,7 +3608,7 @@ namespace soplex
 
       // solve for primal solution
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
       else
          linsolver.setTimeLimit(-1.0);
       linsolver.solveRight(basicPrimal, basicPrimalRhs);
@@ -3687,7 +3687,7 @@ namespace soplex
 
       // solve for dual solution
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime.userTime());
+         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
       else
          linsolver.setTimeLimit(-1.0);
       linsolver.solveLeft(basicDual, basicDualRhs);
@@ -3856,7 +3856,7 @@ namespace soplex
 
    TERMINATE:
       // stop rational solving time
-      _statistics->rationalTime.stop();
+      _statistics->rationalTime->stop();
       return;
    }
 
@@ -3875,7 +3875,7 @@ namespace soplex
          return success;
 
       // start timing and increment statistics counter
-      _statistics->reconstructionTime.start();
+      _statistics->reconstructionTime->start();
       _statistics->rationalReconstructions++;
 
       // reconstruct primal vector
@@ -3885,7 +3885,7 @@ namespace soplex
       if( !success )
       {
          MSG_INFO1( spxout << "Rational reconstruction of primal solution failed.\n" );
-         _statistics->reconstructionTime.stop();
+         _statistics->reconstructionTime->stop();
          return success;
       }
 
@@ -3909,7 +3909,7 @@ namespace soplex
          {
             MSG_DEBUG( spxout << "Lower bound of variable " << c << " violated by " << rationalToString(lowerRational(c) - _workSol._primal[c]) << "\n" );
             MSG_INFO1( spxout << "Reconstructed solution primal infeasible (1).\n" );
-            _statistics->reconstructionTime.stop();
+            _statistics->reconstructionTime->stop();
             return false;
          }
 
@@ -3917,7 +3917,7 @@ namespace soplex
          {
             MSG_DEBUG( spxout << "Upper bound of variable " << c << " violated by " << rationalToString(_workSol._primal[c] - upperRational(c)) << "\n" );
             MSG_INFO1( spxout << "Reconstructed solution primal infeasible (2).\n" );
-            _statistics->reconstructionTime.stop();
+            _statistics->reconstructionTime->stop();
             return false;
          }
       }
@@ -3945,7 +3945,7 @@ namespace soplex
          {
             MSG_DEBUG( spxout << "Lhs of row " << r << " violated by " << rationalToString(lhsRational(r) - _workSol._slacks[r]) << "\n" );
             MSG_INFO1( spxout << "Reconstructed solution primal infeasible (3).\n" );
-            _statistics->reconstructionTime.stop();
+            _statistics->reconstructionTime->stop();
             return false;
          }
 
@@ -3953,7 +3953,7 @@ namespace soplex
          {
             MSG_DEBUG( spxout << "Rhs of row " << r << " violated by " << rationalToString(_workSol._slacks[r] - rhsRational(r)) << "\n" );
             MSG_INFO1( spxout << "Reconstructed solution primal infeasible (4).\n" );
-            _statistics->reconstructionTime.stop();
+            _statistics->reconstructionTime->stop();
             return false;
          }
       }
@@ -3965,7 +3965,7 @@ namespace soplex
       if( !success )
       {
          MSG_INFO1( spxout << "Rational reconstruction of dual solution failed.\n" );
-         _statistics->reconstructionTime.stop();
+         _statistics->reconstructionTime->stop();
          return success;
       }
 
@@ -3987,7 +3987,7 @@ namespace soplex
                   << " not at lhs " << rationalToString(lhsRational(r))
                   << "\n" );
                MSG_INFO1( spxout << "Reconstructed solution dual infeasible (1).\n" );
-               _statistics->reconstructionTime.stop();
+               _statistics->reconstructionTime->stop();
                return false;
             }
 
@@ -4009,7 +4009,7 @@ namespace soplex
                   << " not at rhs " << rationalToString(rhsRational(r))
                   << "\n" );
                MSG_INFO1( spxout << "Reconstructed solution dual infeasible (2).\n" );
-               _statistics->reconstructionTime.stop();
+               _statistics->reconstructionTime->stop();
                return false;
             }
 
@@ -4046,7 +4046,7 @@ namespace soplex
                   << " not at lower bound " << rationalToString(lowerRational(c))
                   << "\n" );
                MSG_INFO1( spxout << "Reconstructed solution dual infeasible (3).\n" );
-               _statistics->reconstructionTime.stop();
+               _statistics->reconstructionTime->stop();
                return false;
             }
 
@@ -4068,7 +4068,7 @@ namespace soplex
                   << " not at upper bound " << rationalToString(upperRational(c))
                   << "\n" );
                MSG_INFO1( spxout << "Reconstructed solution dual infeasible (4).\n" );
-               _statistics->reconstructionTime.stop();
+               _statistics->reconstructionTime->stop();
                return false;
             }
 
@@ -4094,7 +4094,7 @@ namespace soplex
       }
 
       // stop timing
-      _statistics->reconstructionTime.stop();
+      _statistics->reconstructionTime->stop();
 
       return success;
    }

@@ -43,8 +43,8 @@ code quality:
 - deactivate SOPLEX_DEBUG flag in header files if defined externally
 
 
-Bugfix version
-==============
+18 Dec 2014 - Release 2.0.1
+===========================
 
 features:
 - restore basis of original LP after performing iterative refinement on feasibility LP
@@ -59,6 +59,7 @@ performance:
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
 - more statistics on type of refinement rounds
+- type of timing can now be switched between CPU time and wallclock time
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
@@ -67,8 +68,7 @@ fixed bugs:
 - fix bug from uninitialized Farkas vector when simplifier detected infeasibility during iterative refinement
 - fix bug when perturbing fixed variables
 - fix bug with incorrect index incrementation in sparse inner vector product
-
-
+- fix compiler error with class Rational::Private and GMP=false
 
 
 27 Feb 2014 - Release 2.0.0

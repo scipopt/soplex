@@ -18,32 +18,42 @@
 #include <assert.h>
 
 #include "statistics.h"
+#include "timerfactory.h"
 
 namespace soplex
 {
+
    /// default constructor
-   SoPlex::Statistics::Statistics()
+   SoPlex::Statistics::Statistics(Timer::TYPE ttype)
    {
+      readingTime = TimerFactory::createTimer(ttype);
+      solvingTime = TimerFactory::createTimer(ttype);
+      preprocessingTime = TimerFactory::createTimer(ttype);
+      simplexTime = TimerFactory::createTimer(ttype);
+      syncTime = TimerFactory::createTimer(ttype);
+      transformTime = TimerFactory::createTimer(ttype);
+      rationalTime = TimerFactory::createTimer(ttype);
+      reconstructionTime = TimerFactory::createTimer(ttype);
       clearAllData();
    }
 
    /// clears all statistics
    void SoPlex::Statistics::clearAllData()
    {
-      readingTime.reset();
+      readingTime->reset();
       clearSolvingData();
    }
 
    /// clears statistics on solving process
    void SoPlex::Statistics::clearSolvingData()
    {
-      solvingTime.reset();
-      preprocessingTime.reset();
-      simplexTime.reset();
-      syncTime.reset();
-      transformTime.reset();
-      rationalTime.reset();
-      reconstructionTime.reset();
+      solvingTime->reset();
+      preprocessingTime->reset();
+      simplexTime->reset();
+      syncTime->reset();
+      transformTime->reset();
+      rationalTime->reset();
+      reconstructionTime->reset();
       luFactorizationTimeReal = 0.0;
       luSolveTimeReal = 0.0;
       luFactorizationTimeRational = 0.0;
@@ -66,30 +76,30 @@ namespace soplex
    /// prints statistics
    void SoPlex::Statistics::print(std::ostream& os)
    {
-      Real solTime = solvingTime.userTime();
-      Real totTime = readingTime.userTime() + solTime;
-      Real otherTime = solTime - syncTime.userTime() - transformTime.userTime() - preprocessingTime.userTime() - simplexTime.userTime() - rationalTime.userTime();
+      Real solTime = solvingTime->time();
+      Real totTime = readingTime->time() + solTime;
+      Real otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() - simplexTime->time() - rationalTime->time();
 
       os << std::fixed << std::setprecision(2);
 
       os << "Total time          : " << totTime << "\n"
-         << "  Reading           : " << readingTime.userTime() << "\n"
+         << "  Reading           : " << readingTime->time() << "\n"
          << "  Solving           : " << solTime << "\n"
-         << "  Preprocessing     : " << preprocessingTime.userTime();
+         << "  Preprocessing     : " << preprocessingTime->time();
       if( solTime > 0 )
-         os << " (" << 100 * (preprocessingTime.userTime() / solTime) << "% of solving time)";
-      os << "\n  Simplex           : " << simplexTime.userTime();
+         os << " (" << 100 * (preprocessingTime->time() / solTime) << "% of solving time)";
+      os << "\n  Simplex           : " << simplexTime->time();
       if( solTime > 0 )
-         os << " (" << 100 * (simplexTime.userTime() / solTime) << "% of solving time)";
-      os << "\n  Synchronization   : " << syncTime.userTime();
+         os << " (" << 100 * (simplexTime->time() / solTime) << "% of solving time)";
+      os << "\n  Synchronization   : " << syncTime->time();
       if( solTime > 0 )
-         os << " (" << 100 * (syncTime.userTime() / solTime) << "% of solving time)";
-      os << "\n  Transformation    : " << transformTime.userTime();
+         os << " (" << 100 * (syncTime->time() / solTime) << "% of solving time)";
+      os << "\n  Transformation    : " << transformTime->time();
       if( solTime > 0 )
-         os << " (" << 100*transformTime.userTime() / solTime << "% of solving time)";
-      os << "\n  Rational          : " << rationalTime.userTime();
+         os << " (" << 100*transformTime->time() / solTime << "% of solving time)";
+      os << "\n  Rational          : " << rationalTime->time();
       if( solTime > 0 )
-         os << " (" << 100*rationalTime.userTime() / solTime << "% of solving time)";
+         os << " (" << 100*rationalTime->time() / solTime << "% of solving time)";
       os << "\n  Other             : " << otherTime;
       if( solTime > 0  )
          os << " (" << 100*otherTime / solTime << "% of solving time)";
@@ -136,7 +146,7 @@ namespace soplex
          << "  Rat. solve time   : " << luSolveTimeRational << "\n";
 
       os << "Rat. reconstructions: " << rationalReconstructions << "\n"
-         << "  Rat. rec. time    : " << reconstructionTime.userTime() << "\n";
+         << "  Rat. rec. time    : " << reconstructionTime->time() << "\n";
    }
 } // namespace soplex
 #endif

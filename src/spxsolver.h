@@ -26,6 +26,7 @@
 
 #include "spxdefines.h"
 #include "timer.h"
+#include "timerfactory.h"
 #include "spxlp.h"
 #include "spxbasis.h"
 #include "array.h"
@@ -217,7 +218,8 @@ private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
-   Timer          theTime;     ///< time spent in last call to method solve()
+   Timer*         theTime;     ///< time spent in last call to method solve()
+   Timer::TYPE    timerType;   ///< type of timer (user or wallclock)
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
@@ -264,6 +266,7 @@ private:
    int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
+
    //@}
 
 protected:
@@ -683,6 +686,19 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
+   /// set timing type
+   void setTiming(Timer::TYPE ttype)
+   {
+      theTime = TimerFactory::switchTimer(theTime, ttype);
+      timerType = ttype;
+   }
+   /// set timing type
+   Timer::TYPE getTiming()
+   {
+      assert(timerType == theTime->type());
+      return timerType;
+   }
+
    /// set display frequency
    void setDisplayFreq(int freq)
    {
@@ -1860,7 +1876,7 @@ public:
    /// time spent in last call to method solve().
    Real time() const
    {
-      return theTime.userTime();
+      return theTime->time();
    }
 
    /// returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
@@ -1946,7 +1962,8 @@ public:
    /// default constructor.
    explicit
    SPxSolver( Type            type  = LEAVE, 
-              Representation  rep   = ROW  );
+              Representation  rep   = ROW,
+              Timer::TYPE     ttype = Timer::USER_TIME);
    // virtual destructor
    virtual ~SPxSolver();
    //@}

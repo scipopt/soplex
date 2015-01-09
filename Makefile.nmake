@@ -111,7 +111,8 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\spxweightst.obj \
 				$(LIBOBJDIR)\spxwritestate.obj \
 				$(LIBOBJDIR)\statistics.obj \
-				$(LIBOBJDIR)\timer.obj \
+				$(LIBOBJDIR)\usertimer.obj \
+				$(LIBOBJDIR)\wallclocktimer.obj \
 				$(LIBOBJDIR)\unitvector.obj \
 				$(LIBOBJDIR)\updatevector.obj
 BINOBJ		=	$(BINOBJDIR)\soplexmain.obj

@@ -259,7 +259,8 @@ LIBOBJ		= 	changesoplex.o \
 			spxweightst.o \
 			spxwritestate.o \
 			statistics.o \
-			timer.o \
+			usertimer.o \
+			wallclocktimer.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o

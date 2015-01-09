@@ -42,32 +42,32 @@ namespace soplex
 void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec = b;
    CLUFactorRational::solveRight(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveRight(SSVectorRational& x, const SVectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec.assign(b);
    x.clear();
    CLUFactorRational::solveRight(x.altValues(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRational& b)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int m;
    int n;
@@ -99,7 +99,7 @@ void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRati
    usetup = true;
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solve2right4update(
@@ -109,7 +109,7 @@ void SLUFactorRational::solve2right4update(
    SSVectorRational&      rhs)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int  m;
    int  n;
@@ -148,7 +148,7 @@ void SLUFactorRational::solve2right4update(
       forest.forceSetup();
    }
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solve3right4update(
@@ -160,7 +160,7 @@ void SLUFactorRational::solve3right4update(
    SSVectorRational&      rhs2)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int  m;
    int  n;
@@ -203,13 +203,13 @@ void SLUFactorRational::solve3right4update(
       forest.forceSetup();
    }
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec = b;
    ///@todo Why is x.clear() here used and not with solveRight() ?
@@ -217,13 +217,13 @@ void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //
    CLUFactorRational::solveLeft(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    ssvec.assign(b);
 
@@ -244,7 +244,7 @@ void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b)
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(
@@ -254,7 +254,7 @@ void SLUFactorRational::solveLeft(
    SSVectorRational&      rhs2) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int   n;
    Rational* svec = ssvec.altValues();
@@ -282,7 +282,7 @@ void SLUFactorRational::solveLeft(
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(
@@ -294,7 +294,7 @@ void SLUFactorRational::solveLeft(
    SSVectorRational&      rhs3)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int   n;
    Rational* svec = ssvec.altValues();
@@ -320,7 +320,7 @@ void SLUFactorRational::solveLeft(
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 Rational SLUFactorRational::stability() const

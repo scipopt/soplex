@@ -2756,7 +2756,7 @@ void CLUFactorRational::factor(
 {
    MSG_DEBUG( spxout << "CLUFactorRational::factor()\n" );
 
-   factorTime.start();
+   factorTime->start();
 
    stat = SLinSolverRational::OK;
 
@@ -2812,7 +2812,7 @@ TERMINATE:
       nzCnt = setupColVals();
    }
 
-   factorTime.stop();
+   factorTime->stop();
 
    factorCount++;
 }

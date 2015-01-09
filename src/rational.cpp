@@ -79,10 +79,6 @@ const Rational Rational::NEGONE(-1, true);
 
 /// list of unused Private objects; note that this cannot be used if SOPLEX_WITH_GMP is not defined, since then the
 /// Private class has no member next() and prev()
-IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
-
-
-
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
 bool Rational::useListMem = false;
@@ -90,6 +86,11 @@ bool Rational::useListMem = false;
 bool Rational::useListMem = true;
 #endif
 
+
+
+
+/// list of unused Private objects
+IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 
 /// Defines the "Pimpl"-class Private

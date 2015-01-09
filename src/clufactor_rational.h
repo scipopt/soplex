@@ -197,7 +197,7 @@ protected:
 
    Rational*   work;          ///< Working array: must always be left as 0!
 
-   Timer   factorTime;        ///< Time spent in factorizations
+   Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    Real    timeLimit;         ///< Time limit on factorization or solves
    //@}
@@ -348,7 +348,7 @@ private:
    ///
    bool timeLimitReached()
    {
-      if( timeLimit >= 0.0 && factorTime.userTime() >= timeLimit )
+      if( timeLimit >= 0.0 && factorTime->time() >= timeLimit )
       {
          stat = SLinSolverRational::TIME;
          return true;

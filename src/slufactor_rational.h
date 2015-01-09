@@ -84,7 +84,7 @@ protected:
    /// minimum stability to achieve by setting threshold.
    Rational minStability;
    /// Time spent in solves
-   Timer   solveTime;
+   Timer*  solveTime;
    /// Number of solves
    int     solveCount;
    //@}
@@ -219,7 +219,7 @@ public:
    /// time spent in factorizations
    Real getFactorTime() const
    {
-      return factorTime.userTime();
+      return factorTime->time();
    }
    /// set time limit on factorization
    void setTimeLimit(const Real limit)
@@ -229,7 +229,7 @@ public:
    /// reset FactorTime
    void resetFactorTime()
    {
-      factorTime.reset();
+      factorTime->reset();
    }
    /// number of factorizations performed
    int getFactorCount() const
@@ -239,12 +239,12 @@ public:
    /// time spent in solves
    Real getSolveTime() const
    {
-      return solveTime.userTime();
+      return solveTime->time();
    }
    /// reset SolveTime
    void resetSolveTime()
    {
-      solveTime.reset();
+      solveTime->reset();
    }
    /// number of solves performed
    int getSolveCount() const
@@ -254,8 +254,8 @@ public:
    /// reset timers and counters
    void resetCounters()
    {
-      factorTime.reset();
-      solveTime.reset();
+      factorTime->reset();
+      solveTime->reset();
       factorCount = 0;
       solveCount = 0;
    }
