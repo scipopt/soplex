@@ -105,6 +105,19 @@ $(LIBOBJDIR)/nameset.o: src/nameset.cpp src/spxdefines.h src/nameset.h src/datas
  src/datakey.h src/datahashtable.h
 $(LIBOBJDIR)/rational.o: src/rational.cpp src/rational.h src/spxdefines.h src/idlist.h \
  src/islist.h src/spxalloc.h src/spxout.h src/exceptions.h
+$(LIBOBJDIR)/ratrecon.o: src/ratrecon.cpp src/spxdefines.h src/ratrecon.h \
+ src/rational.h src/idlist.h src/islist.h src/sol.h src/solbase.h \
+ src/basevectors.h src/vectorbase.h src/dvectorbase.h src/spxalloc.h \
+ src/spxout.h src/exceptions.h src/ssvectorbase.h src/idxset.h \
+ src/svectorbase.h src/dsvectorbase.h src/unitvectorbase.h \
+ src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
+ src/datakey.h src/spxsolver.h src/timer.h src/spxlp.h src/spxlpbase.h \
+ src/spxid.h src/lprowbase.h src/lpcolbase.h src/lprowsetbase.h \
+ src/lpcolsetbase.h src/nameset.h src/datahashtable.h src/didxset.h \
+ src/spxfileio.h src/gzstream.h src/vector.h src/svector.h src/svset.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/dsvector.h src/dvector.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/slufactor.o: src/slufactor.cpp src/spxdefines.h src/slufactor.h \
  src/dvector.h src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -143,7 +156,7 @@ $(LIBOBJDIR)/solverational.o: src/solverational.cpp src/soplex.h src/spxdefines.
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h src/statistics.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
- src/clufactor_rational.h
+ src/clufactor_rational.h src/ratrecon.h
 $(LIBOBJDIR)/solvereal.o: src/solvereal.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
