@@ -859,6 +859,9 @@ namespace soplex
          else
             primalScale = maxScale;
 
+         if( boolParam(SoPlex::POWERSCALING) )
+            primalScale.powRound();
+
          // apply scaled bounds
          if( primalScale <= 1 )
          {
@@ -967,6 +970,9 @@ namespace soplex
          }
          else
             dualScale = maxScale;
+
+         if( boolParam(SoPlex::POWERSCALING) )
+            dualScale.powRound();
 
          if( dualScale > primalScale )
             dualScale = primalScale;
