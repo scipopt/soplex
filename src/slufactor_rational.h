@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
+#include "timerfactory.h"
 #include "dvector.h"
 #include "slinsolver_rational.h"
 #include "clufactor_rational.h"
@@ -85,6 +86,7 @@ protected:
    Rational minStability;
    /// Time spent in solves
    Timer*  solveTime;
+   Timer::TYPE timerType;
    /// Number of solves
    int     solveCount;
    //@}

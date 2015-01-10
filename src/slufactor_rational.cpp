@@ -703,6 +703,7 @@ SLUFactorRational::SLUFactorRational()
    , eta (1)
    , forest (1)
    , minThreshold (0.01)
+   , timerType(Timer::USER_TIME)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -730,6 +731,8 @@ SLUFactorRational::SLUFactorRational()
    thedim = 0;
    try
    {
+      solveTime = TimerFactory::createTimer(timerType);
+      factorTime = TimerFactory::createTimer(timerType);
       spx_alloc(row.perm, thedim);
       spx_alloc(row.orig, thedim);
       spx_alloc(col.perm, thedim);
@@ -891,6 +894,8 @@ void SLUFactorRational::freeAll()
    if(l.rorig) spx_free(l.rorig);
    if(l.rperm) spx_free(l.rperm);
 
+   spx_free(solveTime);
+   spx_free(factorTime);
 }
 
 SLUFactorRational::~SLUFactorRational()
