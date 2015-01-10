@@ -1010,7 +1010,7 @@ namespace soplex
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
 
          // load basis
-         if( _hasBasis )
+         if( _hasBasis && (_slackCols.num() > 0 || _solver.basis().status() < SPxBasis::REGULAR) )
          {
             // ensure that artificial slack columns are basic and inequality constraints are nonbasic; otherwise we may
             // end up with dual violation on inequality constraints after removing the slack columns
@@ -1031,8 +1031,12 @@ namespace soplex
                }
             }
 
+            MSG_DEBUG( spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n"; _solver.basis().desc().dump() );
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+            MSG_DEBUG( spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n"; _solver.basis().desc().dump() );
+
             _hasBasis = _solver.basis().status() > SPxBasis::NO_PROBLEM;
+            MSG_DEBUG( spxout << "setting basis in solver " << (_hasBasis ? "successful" : "failed") << " (3)\n" );
          }
 
          // solve modified problem
@@ -3247,6 +3251,8 @@ namespace soplex
          _solver.loadLP((SPxLPReal)(*rationalLP));
          rationalLP->~SPxLPRational();
          spx_free(rationalLP);
+         if( _hasBasis )
+            _solver.setBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
       }
 
       return result;

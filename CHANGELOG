@@ -15,6 +15,7 @@ performance:
 - faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
 - more efficient arithmetic in class Rational by checking special cases
 - faster iterative refinement by using powers of two as scaling factors
+- reuse factorization during iterative refinement
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
