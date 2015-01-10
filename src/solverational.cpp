@@ -488,15 +488,6 @@ namespace soplex
          if( basisStatusRow == SPxSolver::FIXED )
             basisStatusRow = SPxSolver::ON_LOWER;
 
-#ifdef ADJUSTDUALS
-         if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC
-            || (basisStatusRow == SPxSolver::ON_LOWER && dualReal[r] < 0)
-            || (basisStatusRow == SPxSolver::ON_UPPER && dualReal[r] > 0) )
-         {
-            sol._dual[r] = 0;
-         }
-         else
-#endif
          {
             sol._dual[r] = dualReal[r];
             if( dualReal[r] != 0.0 )
@@ -1317,20 +1308,6 @@ namespace soplex
             if( basisStatusRow == SPxSolver::FIXED )
                basisStatusRow = SPxSolver::ON_LOWER;
 
-#ifdef ADJUSTDUALS
-            if( basisStatusRow == SPxSolver::ZERO || basisStatusRow == SPxSolver::BASIC )
-            {
-               if( sol._dual[r] != 0 )
-               {
-                  int i = _primalDualDiff.size();
-                  _ensureDSVectorRationalMemory(_primalDualDiff, maxDimRational);
-                  _primalDualDiff.add(r);
-                  _primalDualDiff.value(i) = sol._dual[r];
-                  sol._dual[r] = 0;
-               }
-            }
-            else
-#endif
             {
                if( dualReal[r] != 0 )
                {
@@ -1341,27 +1318,10 @@ namespace soplex
                   _primalDualDiff.value(i) *= dualScaleInverseNeg;
                   sol._dual[r] -= _primalDualDiff.value(i);
 
-#ifdef ADJUSTDUALS
-                  if( (basisStatusRow == SPxSolver::ON_LOWER && sol._dual[r] < 0)
-                     || (basisStatusRow == SPxSolver::ON_UPPER && sol._dual[r] > 0) )
-                  {
-                     _primalDualDiff.value(i) += sol._dual[r];
-                     sol._dual[r] = 0;
-                  }
-                  // we do not check whether the dual value is nonzero, because it probably is; this gives us an
-                  // overestimation of the number of nonzeros in the dual solution
-                  else
-#endif
-                     dualSize++;
+                  dualSize++;
                }
                else
                {
-#ifdef ADJUSTDUALS
-                  // if the dual is not changed, its sign should have been corrected already in the previous iteration
-                  assert(basisStatusRow != SPxSolver::ON_LOWER || sol._dual[r] >= 0);
-                  assert(basisStatusRow != SPxSolver::ON_UPPER || sol._dual[r] <= 0);
-#endif
-
                   // we do not check whether the dual value is nonzero, because it probably is; this gives us an
                   // overestimation of the number of nonzeros in the dual solution
                   dualSize++;
