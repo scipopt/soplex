@@ -3602,6 +3602,34 @@ namespace soplex
 
 
 
+   /// get size of largest denominator in primal solution
+   int SoPlex::dmaxSizePrimalRational(const int base)
+   {
+      if( hasPrimal() || hasPrimalRay() )
+      {
+         _syncRationalSolution();
+         return _solRational.dmaxSizePrimal(base);
+      }
+      else
+         return 0;
+   }
+
+
+
+   /// get size of largest denominator in dual solution
+   int SoPlex::dmaxSizeDualRational(const int base)
+   {
+      if( hasDual() || hasDualFarkas() )
+      {
+         _syncRationalSolution();
+         return _solRational.dmaxSizeDual(base);
+      }
+      else
+         return 0;
+   }
+
+
+
    /// is an advanced starting basis available?
    bool SoPlex::hasBasis() const
    {
@@ -5694,7 +5722,9 @@ namespace soplex
             << "  Total primal      : " << totalSizePrimalRational() << " / " << totalSizePrimalRational(10) << "\n"
             << "  Total dual        : " << totalSizeDualRational() << " / " << totalSizeDualRational(10) << "\n"
             << "  DLCM primal       : " << dlcmSizePrimalRational() << " / " << dlcmSizePrimalRational(10) << "\n"
-            << "  DLCM dual         : " << dlcmSizeDualRational() << " / " << dlcmSizeDualRational(10) << "\n";
+            << "  DLCM dual         : " << dlcmSizeDualRational() << " / " << dlcmSizeDualRational(10) << "\n"
+            << "  DMAX primal       : " << dmaxSizePrimalRational() << " / " << dmaxSizePrimalRational(10) << "\n"
+            << "  DMAX dual         : " << dmaxSizeDualRational() << " / " << dmaxSizeDualRational(10) << "\n";
       }
       else
       {

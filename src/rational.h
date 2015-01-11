@@ -543,6 +543,9 @@ namespace soplex
    /// Size of least common multiple of denominators in rational vector.
    int dlcmSizeRational(const Rational* vector, const int length, const int base = 2);
 
+   /// Size of largest denominator in rational vector.
+   int dmaxSizeRational(const Rational* vector, const int length, const int base = 2);
+
    //@}
 
 } // namespace soplex

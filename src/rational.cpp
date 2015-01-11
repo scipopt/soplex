@@ -2862,6 +2862,27 @@ int dlcmSizeRational(const Rational* vector, const int length, const int base)
 
 
 
+/// Size of largest denominator in rational vector.
+int dmaxSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   size_t dmax = 0;
+
+   for( int i = 0; i < length; i++ )
+   {
+      size_t dsize = mpz_sizeinbase(mpq_denref(vector[i].getMpqRef()), base);
+      if( dsize > dmax )
+         dmax = dsize;
+   }
+
+   return (int)dmax;
+}
+
+
+
 #else
 
 
@@ -3905,6 +3926,18 @@ int totalSizeRational(const Rational* vector, const int length, const int base)
 
 /// Size of least common multiple of denominators in rational vector.
 int dlcmSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   return 0;
+}
+
+
+
+/// Size of largest denominator in rational vector.
+int dmaxSizeRational(const Rational* vector, const int length, const int base)
 {
    assert(vector != 0);
    assert(length >= 0);

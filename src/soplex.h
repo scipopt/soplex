@@ -669,6 +669,12 @@ public:
    /// get size of least common multiple of denominators in dual solution
    int dlcmSizeDualRational(const int base = 2);
 
+   /// get size of largest denominator in primal solution
+   int dmaxSizePrimalRational(const int base = 2);
+
+   /// get size of largest denominator in dual solution
+   int dmaxSizeDualRational(const int base = 2);
+
    //@}
 
 

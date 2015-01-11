@@ -181,6 +181,34 @@ public:
       return size;
    }
 
+   /// returns size of largest denominator in primal solution
+   int dmaxSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += dmaxSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += dmaxSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns size of largest denominator in dual solution
+   int dmaxSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += dmaxSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += dmaxSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
+   }
+
    /// invalidate solution
    void invalidate()
    {
