@@ -70,6 +70,7 @@ namespace soplex
 
       /* denominator must be positive */
       assert(mpz_sgn(denom) > 0);
+      assert(denomBoundSquared > 0);
 
       mpz_t temp;
       mpz_t td;

@@ -16,6 +16,7 @@ performance:
 - more efficient arithmetic in class Rational by checking special cases
 - faster iterative refinement by using powers of two as scaling factors
 - reuse factorization during iterative refinement
+- no transformation of objective sense for rational solve
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
