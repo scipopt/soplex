@@ -991,11 +991,11 @@ namespace soplex
 
          MSG_INFO1( spxout << "Refined floating-point solve . . .\n" );
 
-         // load basis
-         if( _hasBasis && (_slackCols.num() > 0 || _solver.basis().status() < SPxBasis::REGULAR) )
+         // ensure that artificial slack columns are basic and inequality constraints are nonbasic; otherwise we may end
+         // up with dual violation on inequality constraints after removing the slack columns; do not change this in the
+         // floating-point solver, though, because the solver may require its original basis to detect optimality
+         if( _slackCols.num() > 0 && _hasBasis )
          {
-            // ensure that artificial slack columns are basic and inequality constraints are nonbasic; otherwise we may
-            // end up with dual violation on inequality constraints after removing the slack columns
             int numOrigCols = numColsRational() - _slackCols.num();
             assert(_slackCols.num() <= 0 || boolParam(SoPlex::EQTRANS));
             for( int i = 0; i < _slackCols.num(); i++ )
@@ -1012,7 +1012,11 @@ namespace soplex
                   _basisStatusCols[col] = SPxSolver::BASIC;
                }
             }
+         }
 
+         // load basis
+         if( _hasBasis && _solver.basis().status() < SPxBasis::REGULAR )
+         {
             MSG_DEBUG( spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n"; _solver.basis().desc().dump() );
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
             MSG_DEBUG( spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n"; _solver.basis().desc().dump() );
