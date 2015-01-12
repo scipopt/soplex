@@ -787,6 +787,15 @@ public:
       changeObj(number(p_id), p_newVal);
    }
    ///
+   virtual void changeMaxObj(const Vector& newObj);
+   ///
+   virtual void changeMaxObj(int i, const Real& newVal);
+   ///
+   virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal)
+   {
+      changeMaxObj(number(p_id), p_newVal);
+   }
+   ///
    virtual void changeRowObj(const Vector& newObj);
    ///
    virtual void changeRowObj(int i, const Real& newVal);

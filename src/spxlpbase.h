@@ -1169,14 +1169,17 @@ public:
 
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
-      LPColSetBase<R>::maxObj_w() *= (spxSense() == MINIMIZE ? -1 : 1);
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w() *= -1;
       assert(isConsistent());
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
    virtual void changeObj(int i, const R& newVal)
    {
-      LPColSetBase<R>::maxObj_w(i) = (spxSense() == MINIMIZE) ? -newVal : newVal;
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w(i) *= -1;
       assert(isConsistent());
    }
 
@@ -1194,6 +1197,35 @@ public:
    virtual void changeObj(SPxColId id, const R& newVal)
    {
       changeObj(number(id), newVal);
+   }
+
+   /// Changes objective vector to \p newObj.
+   virtual void changeMaxObj(const VectorBase<R>& newObj)
+   {
+      assert(maxObj().dim() == newObj.dim());
+      LPColSetBase<R>::maxObj_w() = newObj;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   virtual void changeMaxObj(int i, const R& newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   template < class S >
+   void changeMaxObj(int i, const S* newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = *newVal;
+      assert(isConsistent());
+   }
+
+   /// Changes objective value of column with identifier \p id to \p newVal.
+   virtual void changeMaxObj(SPxColId id, const R& newVal)
+   {
+      changeMaxObj(number(id), newVal);
    }
 
    /// Changes vector of lower bounds to \p newLower.

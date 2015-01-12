@@ -677,6 +677,28 @@ void SPxSolver::changeObj(int i, const Real& newVal)
    unInit();
 }
 
+void SPxSolver::changeMaxObj(const Vector& newObj)
+{
+
+   SPxLP::changeMaxObj(newObj);
+
+   /**@todo Factorization remains valid, we do not need a reDim()
+    *       pricing vectors should be recomputed.
+    */
+   unInit();
+}
+
+void SPxSolver::changeMaxObj(int i, const Real& newVal)
+{
+
+   SPxLP::changeMaxObj(i, newVal);
+
+   /**@todo Factorization remains valid, we do not need a reDim()
+    *       pricing vectors should be recomputed.
+    */
+   unInit();
+}
+
 void SPxSolver::changeRowObj(const Vector& newObj)
 {
    SPxLP::changeRowObj(newObj);
