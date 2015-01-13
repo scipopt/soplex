@@ -160,6 +160,11 @@ namespace soplex
             _boolParamDescription[SoPlex::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
             _boolParamDefault[SoPlex::POWERSCALING] = true;
 
+            // continue iterative refinement with exact basic solution if not optimal?
+            _boolParamName[SoPlex::RATFACJUMP] = "ratfacjump";
+            _boolParamDescription[SoPlex::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
+            _boolParamDefault[SoPlex::RATFACJUMP] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4832,6 +4837,8 @@ namespace soplex
       case RATREC:
          break;
       case POWERSCALING:
+         break;
+      case RATFACJUMP:
          break;
       default:
          return false;

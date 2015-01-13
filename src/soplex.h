@@ -816,8 +816,11 @@ public:
       /// round scaling factors for iterative refinement to powers of two?
       POWERSCALING = 6,
 
+      /// continue iterative refinement with exact basic solution if not optimal?
+      RATFACJUMP = 7,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 7
+      BOOLPARAM_COUNT = 8
    } BoolParam;
 
    /// integer parameters
@@ -1696,7 +1699,7 @@ private:
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
    bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared);

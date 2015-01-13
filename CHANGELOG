@@ -34,6 +34,7 @@ interface & parameters:
 - new statistics section on size of rational solution in base 2 and base 10
 - new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
 - new parameter bool:powerscaling for rounding scaling factors during iterative refinement to powers of two
+- new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
