@@ -19,7 +19,7 @@ echo "LASTYEAR = $LASTYEAR"
 
 DIRECTORIES=(check doc src tests extra)
 EXTENSIONS=(sh awk h c hpp cpp)
-EXTRAFILES=(Makefile INSTALL make/make.install make/make.detecthost)
+EXTRAFILES=(Makefile INSTALL make/make.install make/make.detecthost Makefile.nmake)
 
 for DIRECTORY in ${DIRECTORIES[@]}
 do
