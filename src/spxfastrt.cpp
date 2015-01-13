@@ -129,11 +129,12 @@ int SPxFastRT::maxDelta(
       for (idx += start; idx < last; idx += incr)
       {
          i = *idx;
-         x = upd[i];
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
          if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
             continue;
+
+         x = upd[i];
 
          if (x > epsilon)
          {
