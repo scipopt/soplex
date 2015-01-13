@@ -3426,11 +3426,16 @@ namespace soplex
       DataArray< const SVectorRational* > matrix(matrixdim);
       int numBasicRows;
 
-      DVectorRational basicPrimalRhs(matrixdim);
-      DVectorRational basicDualRhs(matrixdim);
-      DVectorRational basicPrimal(matrixdim);
-      DVectorRational basicDual(matrixdim);
-      DVectorRational redCost(numColsRational());
+      _workSol._primal.reDim(matrixdim);
+      _workSol._slacks.reDim(matrixdim);
+      _workSol._dual.reDim(matrixdim);
+      _workSol._redCost.reDim(numColsRational() > matrixdim ? numColsRational() : matrixdim);
+
+      DVectorRational& basicPrimalRhs = _workSol._slacks;
+      DVectorRational& basicDualRhs = _workSol._redCost;
+      DVectorRational& basicPrimal = _workSol._primal;
+      DVectorRational& basicDual = _workSol._dual;
+
       Rational violation;
       Rational primalViolation;
       Rational dualViolation;
@@ -3689,7 +3694,6 @@ namespace soplex
       }
 
       // check reduced cost violation on nonbasic columns
-      _workSol._redCost.reDim(numColsRational());
       for( int i = 0; i < basisStatusCols.size(); i++ )
       {
          if( _colTypes[i] == RANGETYPE_FIXED
