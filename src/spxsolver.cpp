@@ -58,6 +58,7 @@ void SPxSolver::reLoad()
    unInit();
    unLoad();
    theLP = this;
+   m_status = SPxSolver::UNKNOWN;
    if (thepricer)
       thepricer->clear();
    if (theratiotester)

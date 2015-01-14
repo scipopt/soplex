@@ -4301,9 +4301,8 @@ namespace soplex
    /// clears starting basis
    void SoPlex::clearBasis()
    {
-      if( _isRealLPLoaded )
-         _solver.reLoad();
-
+      _solver.reLoad();
+      _status = _solver.status();
       _hasBasis = false;
    }
 
