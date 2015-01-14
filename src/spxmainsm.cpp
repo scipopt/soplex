@@ -1433,7 +1433,13 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
             else
             {
                if (aij > maxVal)
-                  MSG_WARNING( spxout << "WMAISM05 Warning! Big value " << aij << std::endl; )
+               {
+                  MSG_WARNING( spxout << "WMAISM05 Warning! Big matrix coefficient " << aij << std::endl );
+               }
+               else if( isZero(aij, tol) )
+               {
+                  MSG_WARNING( spxout << "WMAISM06 Warning! Tiny matrix coefficient " << aij << std::endl );
+               }
 
                ++i;
             }
@@ -3051,7 +3057,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          Real aij = col.value(k);
          int  i   = col.index(k);
 
-         ASSERT_WARN( "WMAISM52", isNotZero(aij, epsZero()) );
          if (scale[i] == 0.0)
             scale[i] = aij;
 
@@ -3379,7 +3384,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
          Real aij = row.value(k);
          int  j   = row.index(k);
 
-         ASSERT_WARN( "WMAISM57", isNotZero(aij, epsZero()) );
          if (scale[j] == 0.0)
             scale[j] = aij;
 
