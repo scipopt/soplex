@@ -4040,6 +4040,7 @@ namespace soplex
       if( !isSolBasic )
       {
          MSG_WARNING( spxout << "Warning: Reconstructed solution not basic.\n" );
+         _hasBasis = false;
       }
 
       // stop timing
