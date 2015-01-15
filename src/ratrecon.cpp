@@ -24,18 +24,6 @@
 namespace soplex
 {
 #ifdef SOPLEX_WITH_GMP
-   static void GMPqv_init(mpq_t* vect, int dim)
-   {
-      for( int i = 0; i < dim; i++ )
-         mpq_init(vect[i]);
-   }
-
-   static void GMPqv_clear(mpq_t* vect, int dim)
-   {
-      for( int i=0;i < dim; i++ )
-         mpq_clear(vect[i]);
-   }
-
    static void GMPv_init(mpz_t* vect, int dim)
    {
       for( int i = 0; i < dim; i++ )
@@ -62,7 +50,7 @@ namespace soplex
     *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
     *  produce such a vector
     */
-   static int Reconstruct(mpq_t* x, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
+   static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
    {
       bool rval = true;
       int done = 0;
@@ -137,8 +125,8 @@ namespace soplex
             {
                MSG_DEBUG( spxout << "marker 1\n" );
 
-               mpq_set_num(x[j],tn);
-               mpq_set_den(x[j],td);
+               mpq_set_num(resvec[j].getMpqRef_w(),tn);
+               mpq_set_den(resvec[j].getMpqRef_w(),td);
                done=1;
             }
             else
@@ -203,10 +191,10 @@ namespace soplex
                }
 
                /* Assign the values */
-               mpq_set_num(x[j], p[1]);
-               mpq_set_den(x[j], q[1]);
-               mpq_canonicalize(x[j]);
-               mpz_gcd(temp, gcd, mpq_denref(x[j]));
+               mpq_set_num(resvec[j].getMpqRef_w(), p[1]);
+               mpq_set_den(resvec[j].getMpqRef_w(), q[1]);
+               mpq_canonicalize(resvec[j].getMpqRef_w());
+               mpz_gcd(temp, gcd, mpq_denref(resvec[j].getMpqRef()));
                mpz_mul(gcd, gcd, temp);
 
                if( mpz_cmp(gcd, Dbound) > 0 )
@@ -240,7 +228,6 @@ namespace soplex
    bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet)
    {
 #ifdef SOPLEX_WITH_GMP
-      mpq_t* resvec; /* reconstructed vector storage */
       mpz_t* xnum; /* numerator of input vector */
       mpz_t denom; /* common denominator of input vector */
       int rval = true;
@@ -249,9 +236,7 @@ namespace soplex
       dim = input.dim();
 
       /* convert vector to mpz format */
-      resvec = (mpq_t*) malloc(dim * sizeof(mpq_t));
       xnum = (mpz_t*) malloc(dim * sizeof(mpz_t));
-      GMPqv_init(resvec, dim);
       GMPv_init(xnum, dim);
       mpz_init_set_ui(denom, 1);
 
@@ -289,29 +274,10 @@ namespace soplex
       MSG_DEBUG( spxout << "LCM = " << mpz_get_str(0, 10, denom) << "\n" );
 
       /* reconstruct */
-      rval = Reconstruct(resvec, xnum, denom, dim, denomBoundSquared, indexSet);
-      if( rval )
-      {
-         /* if successful, assign original input to reconstructed vector */
-         if( indexSet == 0 )
-         {
-            for( int i = 0; i < dim; i++ )
-               input[i] = resvec[i];
-         }
-         else
-         {
-            for( int i = 0; i < indexSet->size(); i++ )
-            {
-               assert(indexSet->index(i) >= 0);
-               assert(indexSet->index(i) < input.dim());
-               input[indexSet->index(i)] = resvec[indexSet->index(i)];
-            }
-         }
-      }
+      rval = Reconstruct(input, xnum, denom, dim, denomBoundSquared, indexSet);
 
       mpz_clear(denom);
       GMPv_clear(xnum, dim);
-      GMPqv_clear(resvec, dim);
 
       return rval;
 #else
