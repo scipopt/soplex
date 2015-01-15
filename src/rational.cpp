@@ -715,6 +715,22 @@ const mpq_t& Rational::getMpqRef() const
 
 
 
+/// provides write access to underlying mpq_t; use with care
+mpq_t* Rational::getMpqPtr_w() const
+{
+   return &(this->dpointer->privatevalue);
+}
+
+
+
+/// provides write access to underlying mpq_t; use with care
+mpq_t& Rational::getMpqRef_w() const
+{
+   return this->dpointer->privatevalue;
+}
+
+
+
 /// addition operator
 Rational Rational::operator+(const Rational& r) const
 {
