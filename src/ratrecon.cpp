@@ -228,7 +228,7 @@ namespace soplex
    bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet)
    {
 #ifdef SOPLEX_WITH_GMP
-      mpz_t* xnum; /* numerator of input vector */
+      mpz_t* xnum = 0; /* numerator of input vector */
       mpz_t denom; /* common denominator of input vector */
       int rval = true;
       int dim;
@@ -236,7 +236,7 @@ namespace soplex
       dim = input.dim();
 
       /* convert vector to mpz format */
-      xnum = (mpz_t*) malloc(dim * sizeof(mpz_t));
+      spx_alloc(xnum, dim);
       GMPv_init(xnum, dim);
       mpz_init_set_ui(denom, 1);
 
@@ -278,6 +278,7 @@ namespace soplex
 
       mpz_clear(denom);
       GMPv_clear(xnum, dim);
+      spx_free(xnum);
 
       return rval;
 #else
