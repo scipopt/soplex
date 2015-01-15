@@ -135,14 +135,15 @@ $(LIBOBJDIR)/slufactor.o: src/slufactor.cpp src/spxdefines.h src/slufactor.h \
  src/datakey.h src/vector.h src/slinsolver.h src/svector.h src/ssvector.h \
  src/dsvector.h src/didxset.h src/clufactor.h src/cring.h
 $(LIBOBJDIR)/slufactor_rational.o: src/slufactor_rational.cpp src/spxdefines.h \
- src/slufactor_rational.h src/dvector.h src/basevectors.h src/rational.h \
+ src/slufactor_rational.h src/timerfactory.h src/spxalloc.h src/spxout.h \
+ src/exceptions.h src/notimer.h src/timer.h src/usertimer.h \
+ src/wallclocktimer.h src/dvector.h src/basevectors.h src/rational.h \
  src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
- src/spxalloc.h src/spxout.h src/exceptions.h src/ssvectorbase.h \
- src/idxset.h src/svectorbase.h src/dsvectorbase.h src/unitvectorbase.h \
- src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
- src/datakey.h src/vector.h src/slinsolver_rational.h src/svector.h \
- src/ssvector.h src/dsvector.h src/didxset.h src/clufactor_rational.h \
- src/timer.h src/cring.h
+ src/ssvectorbase.h src/idxset.h src/svectorbase.h src/dsvectorbase.h \
+ src/unitvectorbase.h src/svsetbase.h src/classarray.h src/dataset.h \
+ src/dataarray.h src/datakey.h src/vector.h src/slinsolver_rational.h \
+ src/svector.h src/ssvector.h src/dsvector.h src/didxset.h \
+ src/clufactor_rational.h src/cring.h
 $(LIBOBJDIR)/solverational.o: src/solverational.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
