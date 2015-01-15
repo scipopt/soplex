@@ -62,10 +62,9 @@ namespace soplex
     *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
     *  produce such a vector
     */
-   static int Reconstruct(mpq_t* x, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared)
+   static int Reconstruct(mpq_t* x, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
    {
       bool rval = true;
-      int j;
       int done = 0;
 
       /* denominator must be positive */
@@ -113,8 +112,13 @@ namespace soplex
       mpz_t q[3];
       GMPv_init(q, 3);
 
-      for( j = 0; j < dim; j++ )
+      for( int c = 0; (indexSet == 0 && c < dim) || (indexSet != 0 && c < indexSet->size()); c++ )
       {
+         int j = (indexSet == 0 ? c : indexSet->index(c));
+
+         assert(j >= 0);
+         assert(j < dim);
+
          MSG_DEBUG( spxout << "  --> component " << j << " = " << &xnum[j] << " / denom\n" );
 
          /* if xnum =0 , then just leave x[j] as zero */
@@ -131,12 +135,16 @@ namespace soplex
 
             if(mpz_cmp(td,Dbound)<=0)
             {
+               MSG_DEBUG( spxout << "marker 1\n" );
+
                mpq_set_num(x[j],tn);
                mpq_set_den(x[j],td);
                done=1;
             }
             else
             {
+               MSG_DEBUG( spxout << "marker 2\n" );
+
                mpz_set_ui(temp,1);
 
                mpz_fdiv_q(a0,tn,td);
@@ -159,7 +167,10 @@ namespace soplex
 
                /* if q is already big, skip loop */
                if( mpz_cmp(q[2],Dbound) > 0 )
+               {
+                  MSG_DEBUG( spxout << "marker 3\n" );
                   done = 1;
+               }
 
                int cfcnt = 2;
                while( !done && mpz_cmp_ui(td,0) )
@@ -226,7 +237,7 @@ namespace soplex
 
 
    /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared)
+   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet)
    {
 #ifdef SOPLEX_WITH_GMP
       mpq_t* resvec; /* reconstructed vector storage */
@@ -234,7 +245,6 @@ namespace soplex
       mpz_t denom; /* common denominator of input vector */
       int rval = true;
       int dim;
-      int i;
 
       dim = input.dim();
 
@@ -246,22 +256,57 @@ namespace soplex
       mpz_init_set_ui(denom, 1);
 
       /* find common denominator */
-      for( i = 0; i < dim; i++ )
-         mpz_lcm(denom, denom, mpq_denref(input[i].getMpqRef()));
-
-      for( i = 0; i < dim; i++ )
+      if( indexSet == 0 )
       {
-         mpz_mul(xnum[i], denom, mpq_numref(input[i].getMpqRef()));
-         mpz_divexact(xnum[i], xnum[i], mpq_denref(input[i].getMpqRef()));
+         for( int i = 0; i < dim; i++ )
+            mpz_lcm(denom, denom, mpq_denref(input[i].getMpqRef()));
+
+         for( int i = 0; i < dim; i++ )
+         {
+            mpz_mul(xnum[i], denom, mpq_numref(input[i].getMpqRef()));
+            mpz_divexact(xnum[i], xnum[i], mpq_denref(input[i].getMpqRef()));
+         }
+      }
+      else
+      {
+         for( int i = 0; i < indexSet->size(); i++ )
+         {
+            assert(indexSet->index(i) >= 0);
+            assert(indexSet->index(i) < input.dim());
+            mpz_lcm(denom, denom, mpq_denref(input[indexSet->index(i)].getMpqRef()));
+         }
+
+         for( int i = 0; i < indexSet->size(); i++ )
+         {
+            int k = indexSet->index(i);
+            assert(k >= 0);
+            assert(k < input.dim());
+            mpz_mul(xnum[k], denom, mpq_numref(input[k].getMpqRef()));
+            mpz_divexact(xnum[k], xnum[k], mpq_denref(input[k].getMpqRef()));
+         }
       }
 
+      MSG_DEBUG( spxout << "LCM = " << mpz_get_str(0, 10, denom) << "\n" );
+
       /* reconstruct */
-      rval = Reconstruct(resvec, xnum, denom, dim, denomBoundSquared);
+      rval = Reconstruct(resvec, xnum, denom, dim, denomBoundSquared, indexSet);
       if( rval )
       {
          /* if successful, assign original input to reconstructed vector */
-         for( i = 0; i < dim; i++ )
-            input[i] = resvec[i];
+         if( indexSet == 0 )
+         {
+            for( int i = 0; i < dim; i++ )
+               input[i] = resvec[i];
+         }
+         else
+         {
+            for( int i = 0; i < indexSet->size(); i++ )
+            {
+               assert(indexSet->index(i) >= 0);
+               assert(indexSet->index(i) < input.dim());
+               input[indexSet->index(i)] = resvec[indexSet->index(i)];
+            }
+         }
       }
 
       mpz_clear(denom);

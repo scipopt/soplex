@@ -3813,6 +3813,7 @@ namespace soplex
    {
       bool success;
       bool isSolBasic;
+      DIdxSet basicIndices(numColsRational());
 
       error = false;
       stopped = false;
@@ -3828,8 +3829,13 @@ namespace soplex
 
       // reconstruct primal vector
       _workSol._primal = sol._primal;
+      for( int j = 0; j < numColsRational(); ++j )
+      {
+         if( basisStatusCols[j] == SPxSolver::BASIC )
+            basicIndices.addIdx(j);
+      }
+      success = reconstructVector(_workSol._primal, denomBoundSquared, &basicIndices);
 
-      success = reconstructVector(_workSol._primal, denomBoundSquared);
       if( !success )
       {
          MSG_INFO1( spxout << "Rational reconstruction of primal solution failed.\n" );
