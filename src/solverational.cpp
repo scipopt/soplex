@@ -729,7 +729,7 @@ namespace soplex
             && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
 
          // attempt rational reconstruction
-         if( performRatrec )
+         if( performRatrec && sumMaxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
             sumMaxViolation.invert();
@@ -745,7 +745,7 @@ namespace soplex
          }
 
          // solve basis systems exactly
-         if( performRatfac )
+         if( performRatfac && sumMaxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
 
