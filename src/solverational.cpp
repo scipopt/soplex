@@ -3238,6 +3238,7 @@ namespace soplex
       bool switchedSimplifier = false;
       bool switchedRatiotester = false;
       bool switchedPricer = false;
+      bool turnedoffPre = false;
 
       Real markowitz = _slufactor.markowitz();
       int ratiotester = intParam(SoPlex::RATIOTESTER);
@@ -3270,6 +3271,25 @@ namespace soplex
             MSG_INFO1( spxout << "Numerical troubles during floating-point solve." << std::endl );
             initialSolve = false;
          }
+
+         if( !turnedoffPre
+            && (intParam(SoPlex::SIMPLIFIER) != SoPlex::SIMPLIFIER_OFF || intParam(SoPlex::SCALER) != SoPlex::SCALER_OFF) )
+         {
+            MSG_INFO1( spxout << "Turning off preprocessing." << std::endl );
+
+            turnedoffPre = true;
+
+            setIntParam(SoPlex::SCALER, SoPlex::SCALER_OFF);
+            setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
+
+            fromScratch = true;
+            _solver.reLoad();
+            solvedFromScratch = true;
+            continue;
+         }
+
+         setIntParam(SoPlex::SCALER, scaler);
+         setIntParam(SoPlex::SIMPLIFIER, simplifier);
 
          if( !increasedMarkowitz )
          {
