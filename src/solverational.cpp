@@ -732,8 +732,10 @@ namespace soplex
          if( performRatrec && sumMaxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
-            sumMaxViolation.invert();
-            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, sumMaxViolation) )
+
+            Rational primalDboundSquared = boundsViolation + sideViolation;
+            Rational dualDboundSquared = dualViolation + redCostViolation;
+            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, primalDboundSquared, dualDboundSquared) )
             {
                MSG_INFO1( spxout << "Tolerances reached.\n" );
                primalFeasible = true;
@@ -3829,7 +3831,7 @@ namespace soplex
    }
 
    /// attempts rational reconstruction of primal-dual solution
-   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared)
+   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, Rational& primalDboundSquared, Rational& dualDboundSquared)
    {
       bool success;
       bool isSolBasic;
@@ -3854,7 +3856,16 @@ namespace soplex
          if( basisStatusCols[j] == SPxSolver::BASIC )
             basicIndices.addIdx(j);
       }
-      success = reconstructVector(_workSol._primal, denomBoundSquared, &basicIndices);
+      if( primalDboundSquared > 0 )
+      {
+         primalDboundSquared.invert();
+         success = reconstructVector(_workSol._primal, primalDboundSquared, &basicIndices);
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Skipping primal rational reconstruction.\n" );
+         success = true;
+      }
 
       if( !success )
       {
@@ -3935,7 +3946,17 @@ namespace soplex
       // reconstruct dual vector
       _workSol._dual = sol._dual;
 
-      success = reconstructVector(_workSol._dual, denomBoundSquared);
+      if( dualDboundSquared > 0 )
+      {
+         dualDboundSquared.invert();
+         success = reconstructVector(_workSol._dual, dualDboundSquared);
+      }
+      else
+      {
+         MSG_INFO1( spxout << "Skipping dual rational reconstruction.\n" );
+         success = true;
+      }
+
       if( !success )
       {
          MSG_INFO1( spxout << "Rational reconstruction of dual solution failed.\n" );
