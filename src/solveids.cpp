@@ -104,7 +104,7 @@ namespace soplex
       _formIdsReducedProblem();
       _isRealLPLoaded = false;
 
-      for( int i = 0; i < 100; i++ )
+      for( int i = 0; i < 100000; i++ )
       {
 #ifdef SOLVEIDS_DEBUG
       printf("Writing the reduced lp to a file\n");
@@ -127,14 +127,30 @@ namespace soplex
          // get the dual solutions from the reduced problem
          DVector reducedLPDualVector(_solver.nRows());
          DVector reducedLPRedcostVector(_solver.nCols());
+         DVector reducedLPDualFarkas(_solver.nRows());
          _solver.getDual(reducedLPDualVector);
          _solver.getRedCost(reducedLPRedcostVector);
 
          for( int j = 0; j < _solver.nRows(); j++ )
          {
             if( !isZero(reducedLPDualVector[j]) )
-               printf("%d %f\n", j, reducedLPDualVector[j]);
+               printf("%d %f %f\n", j, reducedLPDualVector[j], reducedLPDualFarkas[j]);
          }
+
+         int colsAdded = 0;
+         if( _solver.status() == SPxSolver::INFEASIBLE )
+         {
+            _solver.getDualfarkas(reducedLPDualFarkas);
+            colsAdded = _updateIdsReducedProblemFarkas(reducedLPDualFarkas, false);
+         }
+         else
+            colsAdded = _updateIdsReducedProblemFarkas(reducedLPDualVector, true);
+
+
+         if( colsAdded )
+            continue;
+         else
+            break;
 
          if( i == 0 )
             _formIdsComplementaryProblem();  // create the complementary problem using
@@ -161,7 +177,7 @@ namespace soplex
          compPrimalLP.writeFile(buffer);
 
          // check the optimality of the original problem with the objective value of the complementary problem
-         //if( GE(_compSolver.objValue(), 0.0, 1e-09) || _compSolver.status() == SPxSolver::UNBOUNDED )
+         //if( GE(_compSolver.objValue(), 0.0, 1e-10) || _compSolver.status() == SPxSolver::UNBOUNDED )
             //break;
 
          // get the primal solutions from the complementary problem
@@ -535,10 +551,9 @@ namespace soplex
             //if( GT(compProbPrimal*maxDualRatio, 0, 1e-10) ||
                   //(isZero(maxDualRatio, 1e-10) && GT(compProbPrimal, 0, 1e-10)) )
             int compRowNum = _compSolver.number(SPxColId(_idsDualColIDs[i]));
-            if( GT(compProbPrimal, 0, 1e-10) || (isZero(objValue, 1e-10) &&
-                     _compSolver.basis().desc().rowStatus(compRowNum) != SPxBasis::Desc::P_ON_UPPER &&
-                     _compSolver.basis().desc().rowStatus(compRowNum) != SPxBasis::Desc::P_FIXED &&
-                     LT(_compSolver.rhs(compRowNum), infinity)) )
+            if( GT(compProbPrimal, 0, 1e-10) || (//isZero(objValue, 1e-10) &&
+                     _compSolver.basis().desc().rowStatus(compRowNum) > SPxBasis::Desc::D_FREE &&
+                     _compSolver.basis().desc().rowStatus(compRowNum) < SPxBasis::Desc::D_UNDEFINED) )
             {
                printf("Adding rows!!!\n");
                LPColSet additionalcols;
@@ -636,6 +651,142 @@ namespace soplex
       spx_free(addedrowids);
       spx_free(newrowidx);
    }
+
+
+
+
+   /// update the reduced problem based on the dual farkas ray
+   int SoPlex::_updateIdsReducedProblemFarkas(DVector duals, bool feasible)
+   {
+      int* colstoadd = 0;
+      int ncolstoadd = 0;
+      spx_alloc(colstoadd, _realLP->nCols());
+
+      // looping over all original columns to identify which can be added to the reduced problem
+      for( int i = 0; i < _realLP->nCols(); i++ )
+      {
+         if( !_idsReducedProbCols[i] )
+         {
+            // getting the column from the original lp to compute the reduced cost.
+            LPColReal origCol;
+            _realLP->getCol(i, origCol);
+
+            Real colReducedCost = 0;
+            Real mult = 1;
+            if( feasible )
+            {
+               colReducedCost = origCol.obj();
+               mult = -1;
+            }
+
+            // computing the reduced cost of the original column
+            for( int j = 0; j < origCol.colVector().size(); j++ )
+            {
+               // only interested in included rows. The row not in the reduced problem will have a dual of zero.
+               if( _idsReducedProbRows[origCol.colVector().index(j)] )
+               {
+                  int solverRowNum = _solver.number(_idsReducedProbRowIDs[origCol.colVector().index(j)]);
+
+                  colReducedCost += mult*duals[solverRowNum]*origCol.colVector().value(j);
+               }
+            }
+
+            printf("Column %d: Reduced Cost: %f\n", i, colReducedCost);
+            if( LT(colReducedCost, 0.0, 1e-10) )
+            {
+               colstoadd[ncolstoadd] = i;
+               ncolstoadd++;
+            }
+         }
+      }
+
+      printf("Num cols added: %d\n", ncolstoadd);
+
+
+      int currnumrows = _solver.nRows();
+
+      LPColSet additionalcols;
+      int* newcolidx = 0;
+      int nnewcolidx = 0;
+      spx_alloc(newcolidx, _realLP->nCols());
+
+      for( int i = 0; i < ncolstoadd; i++ )
+      {
+         int colNumber = colstoadd[i];
+
+         // getting the column from the original lp to compute the reduced cost.
+         LPColReal origCol;
+         _realLP->getCol(colNumber, origCol);
+
+         printf("Adding column %d\n", colNumber);
+         LPRowSet additionalrows;
+         int* newrowidx = 0;
+         int nnewrowidx = 0;
+         spx_alloc(newrowidx, _realLP->nRows());
+
+         DSVectorBase<Real> coltoaddVec(_realLP->nCols());
+         coltoaddVec.clear();
+
+         for( int j = 0; j < origCol.colVector().size(); j++ )
+         {
+            int rowNumber = origCol.colVector().index(j);
+            if( _idsReducedProbRows[rowNumber] )
+               coltoaddVec.add(_solver.number(_idsReducedProbRowIDs[rowNumber]), origCol.colVector().value(j));
+            else
+            {
+               printf("Adding row: %d\n", rowNumber);
+               additionalrows.create(1, _realLP->lhs(rowNumber), _realLP->rhs(rowNumber));
+
+               coltoaddVec.add(currnumrows, origCol.colVector().value(j));
+               _idsReducedProbRows[rowNumber] = true;
+               currnumrows++;
+
+               newrowidx[nnewrowidx] = rowNumber;
+               nnewrowidx++;
+
+#ifdef DEBUGGING
+               // there should not be any current columns in this row. This debugging check will verify this.
+               LPRowReal addedRow;
+               _realLP->getRow(rowNumber, addedRow);
+               for( int k = 0; k < addedRow.rowVector().size(); k++ )
+                  assert(!_idsReducedProbColIDs[addedRow.rowVector().index(k)].isValid());
+#endif
+            }
+         }
+
+         additionalcols.add(origCol.obj(), origCol.lower(), coltoaddVec, origCol.upper());
+
+         _idsReducedProbCols[colNumber] = true;
+         newcolidx[nnewcolidx] = colNumber;
+         nnewcolidx++;
+
+         SPxRowId* addedrowids = 0;
+         spx_alloc(addedrowids, nnewrowidx);
+         _solver.addRows(addedrowids, additionalrows);
+
+         for( int k = 0; k < nnewrowidx; k++ )
+            _idsReducedProbRowIDs[newrowidx[k]] = addedrowids[k];
+
+         // freeing allocated memory
+         spx_free(addedrowids);
+         spx_free(newrowidx);
+      }
+
+      SPxColId* addedcolids = 0;
+      spx_alloc(addedcolids, nnewcolidx);
+      _solver.addCols(addedcolids, additionalcols);
+
+      for( int j = 0; j < nnewcolidx; j++ )
+         _idsReducedProbColIDs[newcolidx[j]] = addedcolids[j];
+
+      // freeing allocated memory
+      spx_free(addedcolids);
+      spx_free(newcolidx);
+      spx_free(colstoadd);
+
+      return ncolstoadd;
+   }
+
 
 
 

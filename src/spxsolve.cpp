@@ -1208,7 +1208,7 @@ bool SPxSolver::terminate()
       Real degeneracyLevel = 0;
       degeneracyLevel = getDegeneracyLevel(fVec());
       printf("%d Degeneracy Level: %f\n", iteration(), degeneracyLevel);
-      if( (degeneracyLevel < 0.8 && degeneracyLevel > 0.1) || iteration() > nRows()*0.2 )
+      if( (degeneracyLevel < 0.8 && degeneracyLevel > 0.2) || iteration() > nRows()*0.2 )
       {
          m_status = UNKNOWN;
          return true;

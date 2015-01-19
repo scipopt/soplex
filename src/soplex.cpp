@@ -2219,7 +2219,6 @@ namespace soplex
 
       // the solution is no longer valid
       _invalidateSolution();
-      _solver.writeFile("starting.lp");
 
       // if the improved dual simplex flag is set to true
       if ( boolParam(SoPlex::USEIMPROVEDDUALSIMPLEX) )

@@ -1670,6 +1670,9 @@ private:
    /// determining which bound the primal variables will be fixed to.
    int getOrigVarFixedDirection(int colNum);
 
+   /// update the reduced problem based on the dual farkas ray
+   int _updateIdsReducedProblemFarkas(DVector duals, bool feasible);
+
    //@}
 };
 }
