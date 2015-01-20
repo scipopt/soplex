@@ -477,9 +477,11 @@ namespace soplex
       dualScale = Rational::POSONE;
 
       // control progress
-      Rational sumMaxViolation;
+      Rational maxViolation;
       Rational bestViolation = _rationalPosInfty;
       const Rational violationImprovementFactor = 0.9;
+      const Rational errorCorrectionFactor = 1.1;
+      Rational errorCorrection = 2;
       int numFailedRefinements = 0;
 
       // store basis status in case solving modified problem failed
@@ -709,18 +711,21 @@ namespace soplex
          }
 
          // check progress
-         sumMaxViolation = boundsViolation;
-         sumMaxViolation += sideViolation;
-         sumMaxViolation += redCostViolation;
-         sumMaxViolation += dualViolation;
+         maxViolation = boundsViolation;
+         if( sideViolation > maxViolation )
+            maxViolation = sideViolation;
+         if( redCostViolation > maxViolation )
+            maxViolation = redCostViolation;
+         if( dualViolation > maxViolation )
+            maxViolation = dualViolation;
          bestViolation *= violationImprovementFactor;
-         if( sumMaxViolation > bestViolation )
+         if( maxViolation > bestViolation )
          {
-            MSG_INFO2( spxout << "Refinement failed to reduce violation significantly.\n" );
+            MSG_INFO2( spxout << "Failed to reduce violation significantly.\n" );
             numFailedRefinements++;
          }
          else
-            bestViolation = sumMaxViolation;
+            bestViolation = maxViolation;
 
          // decide whether to perform rational reconstruction and/or factorization
          bool performRatfac = boolParam(SoPlex::RATFAC)
@@ -729,11 +734,14 @@ namespace soplex
             && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
 
          // attempt rational reconstruction
-         if( performRatrec )
+         errorCorrection *= errorCorrectionFactor;
+         if( performRatrec && maxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
-            sumMaxViolation.invert();
-            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, sumMaxViolation) )
+
+            maxViolation *= errorCorrection; // only used for sign check later
+            maxViolation.invert();
+            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, maxViolation) )
             {
                MSG_INFO1( spxout << "Tolerances reached.\n" );
                primalFeasible = true;
@@ -745,11 +753,14 @@ namespace soplex
          }
 
          // solve basis systems exactly
-         if( performRatfac )
+         if( performRatfac && maxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
-            _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stopped, error);
+
+            bool optimal;
+            _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, optimal);
             factorSolNewBasis = false;
+
             if( stopped )
             {
                MSG_INFO1( spxout << "Stopped rational factorization.\n" );
@@ -759,8 +770,16 @@ namespace soplex
                // message was already printed; reset error flag and continue without factorization
                error = false;
             }
-            else
+            else if( optimal )
             {
+               MSG_INFO1( spxout << "Tolerances reached.\n" );
+               primalFeasible = true;
+               dualFeasible = true;
+               break;
+            }
+            else if( boolParam(SoPlex::RATFACJUMP) )
+            {
+               MSG_INFO1( spxout << "Jumping to exact basic solution.\n" );
                minRounds++;
                continue;
             }
@@ -3227,6 +3246,7 @@ namespace soplex
       bool switchedSimplifier = false;
       bool switchedRatiotester = false;
       bool switchedPricer = false;
+      bool turnedoffPre = false;
 
       Real markowitz = _slufactor.markowitz();
       int ratiotester = intParam(SoPlex::RATIOTESTER);
@@ -3259,6 +3279,25 @@ namespace soplex
             MSG_INFO1( spxout << "Numerical troubles during floating-point solve." << std::endl );
             initialSolve = false;
          }
+
+         if( !turnedoffPre
+            && (intParam(SoPlex::SIMPLIFIER) != SoPlex::SIMPLIFIER_OFF || intParam(SoPlex::SCALER) != SoPlex::SCALER_OFF) )
+         {
+            MSG_INFO1( spxout << "Turning off preprocessing." << std::endl );
+
+            turnedoffPre = true;
+
+            setIntParam(SoPlex::SCALER, SoPlex::SCALER_OFF);
+            setIntParam(SoPlex::SIMPLIFIER, SoPlex::SIMPLIFIER_OFF);
+
+            fromScratch = true;
+            _solver.reLoad();
+            solvedFromScratch = true;
+            continue;
+         }
+
+         setIntParam(SoPlex::SCALER, scaler);
+         setIntParam(SoPlex::SIMPLIFIER, simplifier);
 
          if( !increasedMarkowitz )
          {
@@ -3400,25 +3439,36 @@ namespace soplex
 
 
    /// factorizes rational basis matrix in column representation
-   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error)
+   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, bool& optimal)
    {
       // start rational solving time
       _statistics->rationalTime->start();
 
       stopped = false;
       error = false;
+      optimal = false;
 
       SLUFactorRational linsolver;
+      const bool maximizing = (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE);
       const int matrixdim = numRowsRational();
       DataArray< const SVectorRational* > matrix(matrixdim);
       int numBasicRows;
 
-      DVectorRational basicPrimalRhs(matrixdim);
-      DVectorRational basicDualRhs(matrixdim);
-      DVectorRational basicPrimal(matrixdim);
-      DVectorRational basicDual(matrixdim);
-      DVectorRational redCost(numColsRational());
+      _workSol._primal.reDim(matrixdim);
+      _workSol._slacks.reDim(matrixdim);
+      _workSol._dual.reDim(matrixdim);
+      _workSol._redCost.reDim(numColsRational() > matrixdim ? numColsRational() : matrixdim);
+
+      DVectorRational& basicPrimalRhs = _workSol._slacks;
+      DVectorRational& basicDualRhs = _workSol._redCost;
+      DVectorRational& basicPrimal = _workSol._primal;
+      DVectorRational& basicDual = _workSol._dual;
+
       Rational violation;
+      Rational primalViolation;
+      Rational dualViolation;
+      bool primalFeasible = false;
+      bool dualFeasible = false;
 
       assert(basisStatusCols.size() == numColsRational());
       assert(basisStatusRows.size() == numRowsRational());
@@ -3544,6 +3594,67 @@ namespace soplex
          return;
       }
 
+      // check bound violation on basic rows and columns
+      j = 0;
+      primalViolation = 0;
+      primalFeasible = true;
+      for( int i = 0; i < basisStatusRows.size(); i++ )
+      {
+         if( basisStatusRows[i] == SPxSolver::BASIC )
+         {
+            assert(j < matrixdim);
+            violation = lhsRational(i);
+            violation += basicPrimal[j];
+            if( violation > primalViolation )
+            {
+               primalFeasible = false;
+               primalViolation = violation;
+            }
+            violation = rhsRational(i);
+            violation += basicPrimal[j];
+            violation *= -1;
+            if( violation > primalViolation )
+            {
+               primalFeasible = false;
+               primalViolation = violation;
+            }
+            j++;
+         }
+      }
+      for( int i = 0; i < basisStatusCols.size(); i++ )
+      {
+         if( basisStatusCols[i] == SPxSolver::BASIC )
+         {
+            assert(j < matrixdim);
+            if( basicPrimal[j] < lowerRational(i) )
+            {
+               violation = lowerRational(i);
+               violation -= basicPrimal[j];
+               if( violation > primalViolation )
+               {
+                  primalFeasible = false;
+                  primalViolation = violation;
+               }
+            }
+            if( basicPrimal[j] > upperRational(i) )
+            {
+               violation = basicPrimal[j];
+               violation -= upperRational(i);
+               if( violation > primalViolation )
+               {
+                  primalFeasible = false;
+                  primalViolation = violation;
+               }
+            }
+            j++;
+         }
+      }
+
+      if( !primalFeasible )
+      {
+         MSG_INFO1( spxout << "Rational solution primal infeasible.\n" );
+      }
+
       // solve for dual solution
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
          linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
@@ -3562,7 +3673,9 @@ namespace soplex
          return;
       }
 
-      // adjust basis status for fixed rows
+      // check dual violation on nonbasic rows
+      dualViolation = 0;
+      dualFeasible = true;
       for( int i = 0; i < basisStatusRows.size(); i++ )
       {
          if( _rowTypes[i] == RANGETYPE_FIXED
@@ -3571,10 +3684,44 @@ namespace soplex
             assert(lhsRational(i) == rhsRational(i));
             basisStatusRows[i] = SPxSolver::FIXED;
          }
+
+         assert(basisStatusRows[i] != SPxSolver::BASIC || basicDual[i] == 0);
+         if( basisStatusRows[i] == SPxSolver::BASIC || basisStatusRows[i] == SPxSolver::FIXED )
+            continue;
+         else if( basicDual[i] < 0 )
+         {
+            if( ((maximizing && basisStatusRows[i] != SPxSolver::ON_LOWER) || (!maximizing && basisStatusRows[i] != SPxSolver::ON_UPPER))
+               && (basisStatusRows[i] != SPxSolver::ZERO || rhsRational(i) != 0) )
+            {
+               dualFeasible = false;
+               violation = -basicDual[i];
+               if( violation > dualViolation )
+                  dualViolation = violation;
+               MSG_DEBUG( spxout << "negative dual multliplier for row " << i
+                  << " with dual " << rationalToString(basicDual[i])
+                  << " and status " << basisStatusRows[i]
+                  << " and [lhs,rhs] = [" << rationalToString(lhsRational(i)) << "," << rationalToString(rhsRational(i)) << "]"
+                  << "\n" );
+            }
+         }
+         else if( basicDual[i] > 0 )
+         {
+            if( ((maximizing && basisStatusRows[i] != SPxSolver::ON_UPPER) || (!maximizing && basisStatusRows[i] != SPxSolver::ON_LOWER))
+               && (basisStatusRows[i] != SPxSolver::ZERO || lhsRational(i) == 0) )
+            {
+               dualFeasible = false;
+               if( basicDual[i] > dualViolation )
+                  dualViolation = basicDual[i];
+               MSG_DEBUG( spxout << "positive dual multliplier for row " << i
+                  << " with dual " << rationalToString(basicDual[i])
+                  << " and status " << basisStatusRows[i]
+                  << " and [lhs,rhs] = [" << rationalToString(lhsRational(i)) << "," << rationalToString(rhsRational(i)) << "]"
+                  << "\n" );
+            }
+         }
       }
 
-      // adjust basis status for fixed columns
-      sol._redCost.reDim(numColsRational());
+      // check reduced cost violation on nonbasic columns
       for( int i = 0; i < basisStatusCols.size(); i++ )
       {
          if( _colTypes[i] == RANGETYPE_FIXED
@@ -3582,62 +3729,106 @@ namespace soplex
          {
             assert(lowerRational(i) == upperRational(i));
             basisStatusCols[i] = SPxSolver::FIXED;
-          }
+         }
+
+         assert(basisStatusCols[i] != SPxSolver::BASIC || basicDual * colVectorRational(i) == objRational(i));
+         if( basisStatusCols[i] == SPxSolver::BASIC || basisStatusCols[i] == SPxSolver::FIXED )
+            continue;
+         else
+         {
+            _workSol._redCost[i] = basicDual * colVectorRational(i);
+            _workSol._redCost[i] -= objRational(i);
+            if( _workSol._redCost[i] > 0 )
+            {
+               if( ((maximizing && basisStatusCols[i] != SPxSolver::ON_LOWER) || (!maximizing && basisStatusCols[i] != SPxSolver::ON_UPPER))
+                  && (basisStatusCols[i] != SPxSolver::ZERO || upperRational(i) != 0) )
+               {
+                  dualFeasible = false;
+                  if( _workSol._redCost[i] > dualViolation )
+                     dualViolation = _workSol._redCost[i];
+               }
+               _workSol._redCost[i] *= -1;
+            }
+            else if( _workSol._redCost[i] < 0 )
+            {
+               _workSol._redCost[i] *= -1;
+               if( ((maximizing && basisStatusCols[i] != SPxSolver::ON_UPPER) || (!maximizing && basisStatusCols[i] != SPxSolver::ON_LOWER))
+                  && (basisStatusCols[i] != SPxSolver::ZERO || lowerRational(i) != 0) )
+               {
+                  dualFeasible = false;
+                  if( _workSol._redCost[i] > dualViolation )
+                     dualViolation = _workSol._redCost[i];
+               }
+            }
+            else
+               _workSol._redCost[i] *= -1;
+         }
+      }
+
+      if( !dualFeasible )
+      {
+         MSG_INFO1( spxout << "Rational solution dual infeasible.\n" );
       }
 
       // store solution
-      _hasBasis = true;
-      if( &basisStatusRows != &_basisStatusRows )
-         _basisStatusRows = basisStatusRows;
-      if( &basisStatusCols != &_basisStatusCols )
-         _basisStatusCols = basisStatusCols;
-
-      sol._primal.reDim(numColsRational());
-      j = numBasicRows;
-      for( int i = 0; i < basisStatusCols.size(); i++ )
+      optimal = primalFeasible && dualFeasible;
+      if( optimal || boolParam(SoPlex::RATFACJUMP) )
       {
-         if( basisStatusCols[i] == SPxSolver::BASIC )
-         {
-            assert(j < matrixdim);
-            sol._primal[i] = basicPrimal[j];
-            j++;
-         }
-         else if( basisStatusCols[i] == SPxSolver::ON_LOWER )
-            sol._primal[i] = lowerRational(i);
-         else if( basisStatusCols[i] == SPxSolver::ON_UPPER )
-            sol._primal[i] = upperRational(i);
-         else if( basisStatusCols[i] == SPxSolver::ZERO )
-            sol._primal[i] = 0;
-         else if( basisStatusCols[i] == SPxSolver::FIXED )
-         {
-            assert(lowerRational(i) == upperRational(i));
-            sol._primal[i] = lowerRational(i);
-         }
-         else
-         {
-            assert(basisStatusCols[i] == SPxSolver::UNDEFINED);
-            MSG_ERROR( spxout << "Undefined basis status of column in rational factorization.\n" );
-            error = true;
-            goto TERMINATE;
-         }
-      }
-      sol._slacks.reDim(numRowsRational());
-      _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-      sol._hasPrimal = true;
+         _hasBasis = true;
+         if( &basisStatusRows != &_basisStatusRows )
+            _basisStatusRows = basisStatusRows;
+         if( &basisStatusCols != &_basisStatusCols )
+            _basisStatusCols = basisStatusCols;
 
-      sol._dual = basicDual;
-      for( int i = 0; i < numColsRational(); i++ )
-      {
-         if( basisStatusCols[i] == SPxSolver::BASIC )
-            sol._redCost[i] = 0;
-         else
+         sol._primal.reDim(numColsRational());
+         j = numBasicRows;
+         for( int i = 0; i < basisStatusCols.size(); i++ )
          {
-            sol._redCost[i] = basicDual * colVectorRational(i);
-            sol._redCost[i] -= objRational(i);
-            sol._redCost[i] *= -1;
+            if( basisStatusCols[i] == SPxSolver::BASIC )
+            {
+               assert(j < matrixdim);
+               sol._primal[i] = basicPrimal[j];
+               j++;
+            }
+            else if( basisStatusCols[i] == SPxSolver::ON_LOWER )
+               sol._primal[i] = lowerRational(i);
+            else if( basisStatusCols[i] == SPxSolver::ON_UPPER )
+               sol._primal[i] = upperRational(i);
+            else if( basisStatusCols[i] == SPxSolver::ZERO )
+               sol._primal[i] = 0;
+            else if( basisStatusCols[i] == SPxSolver::FIXED )
+            {
+               assert(lowerRational(i) == upperRational(i));
+               sol._primal[i] = lowerRational(i);
+            }
+            else
+            {
+               assert(basisStatusCols[i] == SPxSolver::UNDEFINED);
+               MSG_ERROR( spxout << "Undefined basis status of column in rational factorization.\n" );
+               error = true;
+               goto TERMINATE;
+            }
          }
+         sol._slacks.reDim(numRowsRational());
+         _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
+         sol._hasPrimal = true;
+
+         sol._dual = basicDual;
+         for( int i = 0; i < numColsRational(); i++ )
+         {
+            if( basisStatusCols[i] == SPxSolver::BASIC )
+               sol._redCost[i] = 0;
+            else if( basisStatusCols[i] == SPxSolver::FIXED )
+            {
+               sol._redCost[i] = basicDual * colVectorRational(i);
+               sol._redCost[i] -= objRational(i);
+               sol._redCost[i] *= -1;
+            }
+            else
+               sol._redCost[i] = _workSol._redCost[i];
+         }
+         sol._hasDual = true;
       }
-      sol._hasDual = true;
 
    TERMINATE:
       // stop rational solving time
@@ -3650,6 +3841,7 @@ namespace soplex
    {
       bool success;
       bool isSolBasic;
+      DIdxSet basicIndices(numColsRational());
 
       error = false;
       stopped = false;
@@ -3665,8 +3857,14 @@ namespace soplex
 
       // reconstruct primal vector
       _workSol._primal = sol._primal;
+      for( int j = 0; j < numColsRational(); ++j )
+      {
+         if( basisStatusCols[j] == SPxSolver::BASIC )
+            basicIndices.addIdx(j);
+      }
 
-      success = reconstructVector(_workSol._primal, denomBoundSquared);
+      success = reconstructVector(_workSol._primal, denomBoundSquared, &basicIndices);
+
       if( !success )
       {
          MSG_INFO1( spxout << "Rational reconstruction of primal solution failed.\n" );
@@ -3747,6 +3945,7 @@ namespace soplex
       _workSol._dual = sol._dual;
 
       success = reconstructVector(_workSol._dual, denomBoundSquared);
+
       if( !success )
       {
          MSG_INFO1( spxout << "Rational reconstruction of dual solution failed.\n" );
@@ -3877,6 +4076,7 @@ namespace soplex
       if( !isSolBasic )
       {
          MSG_WARNING( spxout << "Warning: Reconstructed solution not basic.\n" );
+         _hasBasis = false;
       }
 
       // stop timing

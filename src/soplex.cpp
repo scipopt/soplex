@@ -160,6 +160,11 @@ namespace soplex
             _boolParamDescription[SoPlex::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
             _boolParamDefault[SoPlex::POWERSCALING] = true;
 
+            // continue iterative refinement with exact basic solution if not optimal?
+            _boolParamName[SoPlex::RATFACJUMP] = "ratfacjump";
+            _boolParamDescription[SoPlex::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
+            _boolParamDefault[SoPlex::RATFACJUMP] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -3261,7 +3266,7 @@ namespace soplex
    /// gets violation of reduced costs; returns true on success
    bool SoPlex::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasDual() || !hasBasis() )
+      if( !hasDual() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -3277,7 +3282,7 @@ namespace soplex
 
       for( int c = numColsReal() - 1; c >= 0; c-- )
       {
-         SPxSolver::VarStatus colStatus = basisColStatus(c);
+         assert(!_hasBasis || basisColStatus(c) != SPxSolver::UNDEFINED);
 
          if( _colTypes[c] == RANGETYPE_FIXED )
          {
@@ -3285,14 +3290,14 @@ namespace soplex
             continue;
          }
 
-         assert(colStatus != SPxSolver::ON_LOWER || _solRational._primal[c] == lowerRational(c));
-         assert(colStatus != SPxSolver::ON_UPPER || _solRational._primal[c] == upperRational(c));
-         assert(colStatus != SPxSolver::FIXED || _solRational._primal[c] == lowerRational(c));
-         assert(colStatus != SPxSolver::FIXED || _solRational._primal[c] == upperRational(c));
+         assert(!_hasBasis || basisColStatus(c) != SPxSolver::ON_LOWER || _solRational._primal[c] == lowerRational(c));
+         assert(!_hasBasis || basisColStatus(c) != SPxSolver::ON_UPPER || _solRational._primal[c] == upperRational(c));
+         assert(!_hasBasis || basisColStatus(c) != SPxSolver::FIXED || _solRational._primal[c] == lowerRational(c));
+         assert(!_hasBasis || basisColStatus(c) != SPxSolver::FIXED || _solRational._primal[c] == upperRational(c));
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( colStatus != SPxSolver::ON_UPPER && _solRational._primal[c] != upperRational(c) && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            if( _solRational._primal[c] != upperRational(c) && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
@@ -3301,7 +3306,7 @@ namespace soplex
                   maxviol = -redcost[c];
                }
             }
-            if( colStatus != SPxSolver::ON_LOWER && _solRational._primal[c] != lowerRational(c) && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            if( _solRational._primal[c] != lowerRational(c) && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
@@ -3313,7 +3318,7 @@ namespace soplex
          }
          else
          {
-            if( colStatus != SPxSolver::ON_UPPER && _solRational._primal[c] != upperRational(c) && colStatus != SPxSolver::FIXED && redcost[c] > 0 )
+            if( _solRational._primal[c] != upperRational(c) && redcost[c] > 0 )
             {
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
@@ -3322,7 +3327,7 @@ namespace soplex
                   maxviol = redcost[c];
                }
             }
-            if( colStatus != SPxSolver::ON_LOWER && _solRational._primal[c] != lowerRational(c) && colStatus != SPxSolver::FIXED && redcost[c] < 0 )
+            if( _solRational._primal[c] != lowerRational(c) && redcost[c] < 0 )
             {
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
@@ -3342,7 +3347,7 @@ namespace soplex
    /// gets violation of dual multipliers; returns true on success
    bool SoPlex::getDualViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasDual() || !hasBasis() )
+      if( !hasDual() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -3358,8 +3363,7 @@ namespace soplex
 
       for( int r = numRowsReal() - 1; r >= 0; r-- )
       {
-         SPxSolver::VarStatus rowStatus = basisRowStatus(r);
-         assert(rowStatus != SPxSolver::UNDEFINED);
+         assert(!_hasBasis || basisRowStatus(r) != SPxSolver::UNDEFINED);
 
          if( _rowTypes[r] == RANGETYPE_FIXED )
          {
@@ -3367,34 +3371,34 @@ namespace soplex
             continue;
          }
 
-         assert(rowStatus != SPxSolver::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
-         assert(rowStatus != SPxSolver::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
-         assert(rowStatus != SPxSolver::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
-         assert(rowStatus != SPxSolver::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+         assert(!_hasBasis || basisRowStatus(r) != SPxSolver::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+         assert(!_hasBasis || basisRowStatus(r) != SPxSolver::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+         assert(!_hasBasis || basisRowStatus(r) != SPxSolver::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+         assert(!_hasBasis || basisRowStatus(r) != SPxSolver::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
 
          if( intParam(SoPlex::OBJSENSE) == OBJSENSE_MINIMIZE )
          {
-            if( rowStatus != SPxSolver::ON_UPPER && _solRational._slacks[r] != rhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
+            if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
                {
                   MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(-dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
-                     << ", status = " << rowStatus
+                     << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
                      << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
                   maxviol = -dual[r];
                }
             }
-            if( rowStatus != SPxSolver::ON_LOWER && _solRational._slacks[r] != lhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
+            if( _solRational._slacks[r] > lhsRational(r) + _rationalFeastol && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
                {
                   MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
-                     << ", status = " << rowStatus
+                     << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
                      << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
                   maxviol = dual[r];
@@ -3403,27 +3407,27 @@ namespace soplex
          }
          else
          {
-            if( rowStatus != SPxSolver::ON_UPPER && _solRational._slacks[r] != rhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] > 0 )
+            if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] > 0 )
             {
                sumviol += dual[r];
                if( dual[r] > maxviol )
                {
                   MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
-                     << ", status = " << rowStatus
+                     << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
                      << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
                   maxviol = dual[r];
                }
             }
-            if( rowStatus != SPxSolver::ON_LOWER && _solRational._slacks[r] != lhsRational(r) && rowStatus != SPxSolver::FIXED && dual[r] < 0 )
+            if( _solRational._slacks[r] > lhsRational(r) + _rationalFeastol && dual[r] < 0 )
             {
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
                {
                   MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(-dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
-                     << ", status = " << rowStatus
+                     << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
                      << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
                   maxviol = -dual[r];
@@ -4296,9 +4300,8 @@ namespace soplex
    /// clears starting basis
    void SoPlex::clearBasis()
    {
-      if( _isRealLPLoaded )
-         _solver.reLoad();
-
+      _solver.reLoad();
+      _status = _solver.status();
       _hasBasis = false;
    }
 
@@ -4832,6 +4835,8 @@ namespace soplex
       case RATREC:
          break;
       case POWERSCALING:
+         break;
+      case RATFACJUMP:
          break;
       default:
          return false;

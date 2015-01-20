@@ -141,6 +141,12 @@ namespace soplex
 
       /// provides read-only access to underlying mpq_t
       const mpq_t& getMpqRef() const;
+
+      /// provides write access to underlying mpq_t; use with care
+      mpq_t* getMpqPtr_w() const;
+
+      /// provides write access to underlying mpq_t; use with care
+      mpq_t& getMpqRef_w() const;
 #endif
       //@}
 
