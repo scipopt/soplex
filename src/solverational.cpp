@@ -477,9 +477,11 @@ namespace soplex
       dualScale = Rational::POSONE;
 
       // control progress
-      Rational sumMaxViolation;
+      Rational maxViolation;
       Rational bestViolation = _rationalPosInfty;
       const Rational violationImprovementFactor = 0.9;
+      const Rational errorCorrectionFactor = 1.1;
+      Rational errorCorrection = 2;
       int numFailedRefinements = 0;
 
       // store basis status in case solving modified problem failed
@@ -709,18 +711,21 @@ namespace soplex
          }
 
          // check progress
-         sumMaxViolation = boundsViolation;
-         sumMaxViolation += sideViolation;
-         sumMaxViolation += redCostViolation;
-         sumMaxViolation += dualViolation;
+         maxViolation = boundsViolation;
+         if( sideViolation > maxViolation )
+            maxViolation = sideViolation;
+         if( redCostViolation > maxViolation )
+            maxViolation = redCostViolation;
+         if( dualViolation > maxViolation )
+            maxViolation = dualViolation;
          bestViolation *= violationImprovementFactor;
-         if( sumMaxViolation > bestViolation )
+         if( maxViolation > bestViolation )
          {
             MSG_INFO2( spxout << "Failed to reduce violation significantly.\n" );
             numFailedRefinements++;
          }
          else
-            bestViolation = sumMaxViolation;
+            bestViolation = maxViolation;
 
          // decide whether to perform rational reconstruction and/or factorization
          bool performRatfac = boolParam(SoPlex::RATFAC)
@@ -729,13 +734,14 @@ namespace soplex
             && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
 
          // attempt rational reconstruction
-         if( performRatrec && sumMaxViolation > 0 )
+         errorCorrection *= errorCorrectionFactor;
+         if( performRatrec && maxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational reconstruction . . .\n" );
 
-            Rational primalDboundSquared = boundsViolation + sideViolation;
-            Rational dualDboundSquared = dualViolation + redCostViolation;
-            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, primalDboundSquared, dualDboundSquared) )
+            maxViolation *= errorCorrection; // only used for sign check later
+            maxViolation.invert();
+            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, maxViolation) )
             {
                MSG_INFO1( spxout << "Tolerances reached.\n" );
                primalFeasible = true;
@@ -747,7 +753,7 @@ namespace soplex
          }
 
          // solve basis systems exactly
-         if( performRatfac && sumMaxViolation > 0 )
+         if( performRatfac && maxViolation > 0 )
          {
             MSG_INFO1( spxout << "Performing rational factorization . . .\n" );
 
@@ -3831,7 +3837,7 @@ namespace soplex
    }
 
    /// attempts rational reconstruction of primal-dual solution
-   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, Rational& primalDboundSquared, Rational& dualDboundSquared)
+   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared)
    {
       bool success;
       bool isSolBasic;
@@ -3856,16 +3862,8 @@ namespace soplex
          if( basisStatusCols[j] == SPxSolver::BASIC )
             basicIndices.addIdx(j);
       }
-      if( primalDboundSquared > 0 )
-      {
-         primalDboundSquared.invert();
-         success = reconstructVector(_workSol._primal, primalDboundSquared, &basicIndices);
-      }
-      else
-      {
-         MSG_INFO1( spxout << "Skipping primal rational reconstruction.\n" );
-         success = true;
-      }
+
+      success = reconstructVector(_workSol._primal, denomBoundSquared, &basicIndices);
 
       if( !success )
       {
@@ -3946,16 +3944,7 @@ namespace soplex
       // reconstruct dual vector
       _workSol._dual = sol._dual;
 
-      if( dualDboundSquared > 0 )
-      {
-         dualDboundSquared.invert();
-         success = reconstructVector(_workSol._dual, dualDboundSquared);
-      }
-      else
-      {
-         MSG_INFO1( spxout << "Skipping dual rational reconstruction.\n" );
-         success = true;
-      }
+      success = reconstructVector(_workSol._dual, denomBoundSquared);
 
       if( !success )
       {
