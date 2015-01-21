@@ -165,6 +165,11 @@ namespace soplex
             _boolParamDescription[SoPlex::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
             _boolParamDefault[SoPlex::RATFACJUMP] = false;
 
+            // should feasibility be tested with relaxed bounds and sides?
+            _boolParamName[SoPlex::FEASRELAX] = "feasrelax";
+            _boolParamDescription[SoPlex::FEASRELAX] = "should feasibility be tested with relaxed bounds and sides?";
+            _boolParamDefault[SoPlex::FEASRELAX] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4837,6 +4842,8 @@ namespace soplex
       case POWERSCALING:
          break;
       case RATFACJUMP:
+         break;
+      case FEASRELAX:
          break;
       default:
          return false;

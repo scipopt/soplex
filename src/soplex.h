@@ -819,8 +819,11 @@ public:
       /// continue iterative refinement with exact basic solution if not optimal?
       RATFACJUMP = 7,
 
+      /// should feasibility be tested with relaxed bounds and sides?
+      FEASRELAX = 8,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 8
+      BOOLPARAM_COUNT = 9
    } BoolParam;
 
    /// integer parameters
