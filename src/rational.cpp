@@ -2144,6 +2144,14 @@ std::ostream& operator<<(std::ostream& os, const Rational& r)
 
 
 
+/// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
+int compareRational(const Rational& r, const Rational& s)
+{
+   return mpq_cmp(r.dpointer->privatevalue, s.dpointer->privatevalue);
+}
+
+
+
 /// equality operator
 bool operator==(const Rational& r, const Rational& s)
 {
@@ -3471,6 +3479,19 @@ std::ostream& operator<<(std::ostream& os, const Rational& r)
 {
    os << r.dpointer->privatevalue;
    return os;
+}
+
+
+
+/// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
+int compareRational(const Rational& r, const Rational& s)
+{
+   if( r.dpointer->privatevalue > s.dpointer->privatevalue)
+      return 1;
+   else if( r.dpointer->privatevalue < s.dpointer->privatevalue)
+      return -1;
+   else
+      return 0;
 }
 
 

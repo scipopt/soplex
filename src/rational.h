@@ -293,6 +293,7 @@ namespace soplex
       //**@name Friends */
       //@{
 
+      friend int compareRational(const Rational& r, const Rational& s);
       friend bool operator!=(const Rational& r, const Rational& s);
       friend bool operator==(const Rational& r, const Rational& s);
       friend bool operator<(const Rational& r, const Rational& s);
@@ -377,6 +378,9 @@ namespace soplex
 
    //**@name Relational operators */
    //@{
+
+   /// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
+   int compareRational(const Rational& r, const Rational& s);
 
    /// equality operator
    bool operator==(const Rational& r, const Rational& s);
