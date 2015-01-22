@@ -1283,7 +1283,9 @@ private:
    SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
 
+   DVector transformedObj;       // the objective coefficients of the transformed problem
    DVector _idsFeasVector;       // feasibility vector calculated using unshifted bounds.
+   LPRowSet transformedRows;     // a set of the original rows that have been transformed using the original basis.
    SPxColId _compSlackColId;     // column id of the complementary problem slack column.
    SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
    bool* _idsReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
@@ -1626,6 +1628,9 @@ private:
    /// retrieves the compatible columns from the constraint matrix
    void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval, int nnonposind,
          int* ncompatind);
+
+   /// computes the reduced problem objective coefficients
+   void _computeReducedProbObjCoeff();
 
    /// deletes rows and columns from the reduced problem
    void _deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval);

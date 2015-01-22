@@ -256,6 +256,9 @@ namespace soplex
       int nnonposind = 0;
       int ncompatind = 0;
 
+      _idsRedLP = 0;
+      spx_alloc(_idsRedLP);
+      _idsRedLP = new (_idsRedLP) SPxLPIds(_solver);
 
 #ifdef EXTRA_PRINT
       DVector dualSolutions(numRowsReal());
@@ -317,6 +320,12 @@ namespace soplex
       printf("Solving time: %f\n", solveTime());
 #endif
 
+      // computing the reduced problem obj coefficient vector and updating the problem
+      _computeReducedProbObjCoeff();
+
+
+      _solver.loadLP(*_idsRedLP);
+
 #ifdef EXTRA_PRINT
       for( int i = 0; i < numRowsReal(); i++ )
          printf("%d %d\n", i, rowsforremoval[i]);
@@ -335,6 +344,7 @@ namespace soplex
       spx_free(colsforremoval);
       spx_free(nonposind);
       spx_free(bind);
+      spx_free(_idsRedLP);
    }
 
 
@@ -822,8 +832,8 @@ namespace soplex
             //@todo need to check this regarding min and max problems
             if( isZero(feasVector[i]) )
             {
-               nonposind[*nnonposind] = i;
-               (*nnonposind)++;
+               //nonposind[*nnonposind] = i;
+               //(*nnonposind)++;
 
                // NOTE: commenting out the delCol flag at this point. The colsforremoval array should indicate the
                // columns that have a zero reduced cost. Hence, the delCol flag should only be set in the isSPxColId
@@ -838,7 +848,7 @@ namespace soplex
 
             if( isZero(feasVector[i]) )
             {
-               nonposind[*nnonposind] = i;
+               nonposind[*nnonposind] = _solver.number(_solver.basis().baseId(i));
                (*nnonposind)++;
 
                delCol = true;
@@ -848,18 +858,20 @@ namespace soplex
          // setting an array to identify the columns to be removed from the LP to form the reduced problem
          if( delCol )
          {
-            colsforremoval[i] = -1;
-            _idsReducedProbCols[i] = false;
+            colsforremoval[_solver.number(_solver.basis().baseId(i))] = -1;
+            _idsReducedProbCols[_solver.number(_solver.basis().baseId(i))] = false;
          }
-         else
+         else if( _solver.basis().baseId(i).isSPxColId() )
          {
-            colsforremoval[i] = i;
-            _idsReducedProbColIDs[i] = SPxColId(_solver.cId(i));
 #if 0
+            colsforremoval[_solver.number(_solver.basis().baseId(i))] = _solver.number(_solver.basis().baseId(i));
+            _idsReducedProbColIDs[_solver.number(_solver.basis().baseId(i))] = SPxColId(_solver.basis().baseId(i));
+#endif
+#if 1
             if( _solver.basis().baseId(i).isSPxColId() )
-               _idsReducedProbColIDs[i] = SPxColId(_solver.basis().baseId(i));
+               _idsReducedProbColIDs[_solver.number(_solver.basis().baseId(i))] = SPxColId(_solver.basis().baseId(i));
             else
-               _idsReducedProbCols[i] = false;
+               _idsReducedProbCols[_solver.number(_solver.basis().baseId(i))] = false;
 #endif
          }
       }
@@ -869,6 +881,8 @@ namespace soplex
 
 
    /// retrieves the compatible columns from the constraint matrix
+   // This function also updates the constraint matrix of the reduced problem. It is efficient to perform this in the
+   // following function because the required linear algebra has been performed.
    void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
          int nnonposind, int* ncompatind)
    {
@@ -913,6 +927,31 @@ namespace soplex
             (*ncompatind)++;
 
             _idsReducedProbRowIDs[i] = _solver.rowId(i);
+
+            // changing the matrix coefficients
+            LPRowReal rowtoupdate;
+            DSVector newRowVector;
+
+            if( y.isSetup() )
+            {
+               for( int j = 0; j < y.size(); j++ )
+                  newRowVector.add(y.index(j), y.value(j));
+            }
+            else
+            {
+               for( int j = 0; j < numColsReal(); j++ )
+               {
+                  if( !isZero(y[j]) )
+                     newRowVector.add(j, y[j]);
+               }
+            }
+
+            _solver.getRow(i, rowtoupdate);
+
+            rowtoupdate.setRowVector(newRowVector);
+            transformedRows.add(rowtoupdate);
+            _idsRedLP->changeRow(i, rowtoupdate);
+
 #if 0
             // checking the columns contained in the removed row to ensure that all are removed.
             LPRowReal lprow;
@@ -961,6 +1000,29 @@ namespace soplex
 
 
 
+   /// computes the reduced problem objective coefficients
+   void SoPlex::_computeReducedProbObjCoeff()
+   {
+      SSVector y(numColsReal());
+
+      // the rhs of this calculation is the original objective coefficient vector
+      // so we are solving y B = c
+      try
+      {
+         _solver.basis().solve(y, _solver.maxObj());
+      }
+      catch( SPxException E )
+      {
+         MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
+      }
+
+      transformedObj = DVectorBase<Real>(y);
+      // setting the updated objective vector
+      _idsRedLP->changeObj(transformedObj);
+   }
+
+
+
    // @todo need to put in a check similar to _isRealLPLoaded for the ids LP.
    void SoPlex::_deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval)
    {
@@ -969,7 +1031,7 @@ namespace soplex
 #endif
       assert(_basisStatusRows.size() == numRowsReal());
       _solver.removeRows(rowsforremoval);
-      _solver.removeCols(colsforremoval);
+      //_solver.removeCols(colsforremoval);
 
 
       // removing rows from the solver LP
