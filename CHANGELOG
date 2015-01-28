@@ -17,6 +17,7 @@ performance:
 - faster iterative refinement by using powers of two as scaling factors
 - reuse factorization during iterative refinement
 - no transformation of objective sense for rational solve
+- simplifier makes fewer constructor/destructor calls to DSVector class by reusing the data structures
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving

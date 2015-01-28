@@ -1082,6 +1082,10 @@ private:
    DataArray<int>                  m_cIdx;       ///< column index vector in original LP.
    DataArray<int>                  m_rIdx;       ///< row index vector in original LP.
    DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
+   Array<DSVector>                 m_classSetRows; ///< stores parallel classes with non-zero colum entry
+   Array<DSVector>                 m_classSetCols; ///< stores parallel classes with non-zero row entry
+   Array<DSVector>                 m_dupRows;    ///< arrange duplicate rows using bucket sort w.r.t. their pClass values
+   Array<DSVector>                 m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
    bool                            m_postsolved; ///< status of postsolving.
    Real                            m_epsilon;    ///< epsilon zero.
    Real                            m_feastol;    ///< primal feasibility tolerance.

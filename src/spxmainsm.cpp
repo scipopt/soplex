@@ -3043,8 +3043,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       idxSet.addIdx(i);
    }
 
-   // stores parallel classes with non-zero colum entry
-   Array<DSVector> classSet(lp.nRows());
    Real oldVal;
 
    // main loop
@@ -3060,7 +3058,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          if (scale[i] == 0.0)
             scale[i] = aij;
 
-         classSet[pClass[i]].add(i, aij / scale[i]);
+         m_classSetRows[pClass[i]].add(i, aij / scale[i]);
          if (--classSize[pClass[i]] == 0)
             idxSet.addIdx(pClass[i]);
       }
@@ -3070,47 +3068,45 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       {
          int k = pClass[col.index(m)];
 
-         if (classSet[k].size() > 0)
+         if (m_classSetRows[k].size() > 0)
          {
             // sort classSet[k] w.r.t. scaled column values
             ElementCompare compare;
 
-            if (classSet[k].size() > 1)
-               SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
+            if (m_classSetRows[k].size() > 1)
+               SPxQuicksort(m_classSetRows[k].mem(), m_classSetRows[k].size(), compare);
 
             // use new index first
             int classIdx = idxSet.index(0);
             idxSet.remove(0);
 
-            for(int l = 0; l < classSet[k].size(); ++l)
+            for(int l = 0; l < m_classSetRows[k].size(); ++l)
             {
-               if (l != 0 && NErel(classSet[k].value(l), oldVal, epsZero()))
+               if (l != 0 && NErel(m_classSetRows[k].value(l), oldVal, epsZero()))
                {
                   classIdx = idxSet.index(0);
                   idxSet.remove(0);
                }
 
-               pClass[classSet[k].index(l)] = classIdx;
+               pClass[m_classSetRows[k].index(l)] = classIdx;
                ++classSize[classIdx];
 
-               oldVal = classSet[k].value(l);
+               oldVal = m_classSetRows[k].value(l);
             }
 
-            classSet[k].clear();
+            m_classSetRows[k].clear();
          }
       }
    }
 
    spx_free(idxMem);
 
-   // arrange duplicate rows using bucket sort w.r.t. their pClass values
-   Array<DSVector> dupRows(lp.nRows());
    DataArray<bool> remRow(lp.nRows());
 
-   for(int k = 0; k < dupRows.size(); ++k)
+   for(int k = 0; k < lp.nRows(); ++k)
    {
       remRow[k] = false;
-      dupRows[pClass[k]].add(k, 0.0);
+      m_dupRows[pClass[k]].add(k, 0.0);
    }
 
    const int nRowsOld_tmp = lp.nRows();
@@ -3126,9 +3122,9 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    int idxLastDupRows = -1;
    int numDelRows = 0;
 
-   for(int k = 0; k < dupRows.size(); ++k)
+   for(int k = 0; k < lp.nRows(); ++k)
    {
-      if (dupRows[k].size() > 1 && !(lp.rowVector(dupRows[k].index(0)).size() == 1))
+      if (m_dupRows[k].size() > 1 && !(lp.rowVector(m_dupRows[k].index(0)).size() == 1))
       {
          idxLastDupRows = k;
 
@@ -3137,13 +3133,13 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
             idxFirstDupRows = k;
          }
 
-         for(int l = 1; l < dupRows[k].size(); ++l)
+         for(int l = 1; l < m_dupRows[k].size(); ++l)
          {
-            int i = dupRows[k].index(l);
+            int i = m_dupRows[k].index(l);
             perm_tmp[i] = -1;
          }
 
-         numDelRows += (dupRows[k].size()-1);
+         numDelRows += (m_dupRows[k].size()-1);
       }
    }
 
@@ -3161,14 +3157,14 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    DVector newLhsVec(lp.lhs());
    DVector newRhsVec(lp.rhs());
 
-   for(int k = 0; k < dupRows.size(); ++k)
+   for(int k = 0; k < lp.nRows(); ++k)
    {
-      if (dupRows[k].size() > 1 && !(lp.rowVector(dupRows[k].index(0)).size() == 1))
+      if (m_dupRows[k].size() > 1 && !(lp.rowVector(m_dupRows[k].index(0)).size() == 1))
       {
-         MSG_INFO3( spxout << "IMAISM53 " << dupRows[k].size()
+         MSG_INFO3( spxout << "IMAISM53 " << m_dupRows[k].size()
                            << " duplicate rows found" << std::endl; )
 
-         m_stat[DUPLICATE_ROW] += dupRows[k].size()-1;
+         m_stat[DUPLICATE_ROW] += m_dupRows[k].size()-1;
 
          // index of one non-column singleton row in dupRows[k]
          int  rowIdx    = -1;
@@ -3177,12 +3173,12 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
          Real maxLhs    = -infinity;
          Real minRhs    = +infinity;
 
-         DataArray<bool> isLhsEqualRhs(dupRows[k].size());
+         DataArray<bool> isLhsEqualRhs(m_dupRows[k].size());
 
          // determine strictest bounds on constraint
-         for(int l = 0; l < dupRows[k].size(); ++l)
+         for(int l = 0; l < m_dupRows[k].size(); ++l)
          {
-            int i = dupRows[k].index(l);
+            int i = m_dupRows[k].index(l);
             isLhsEqualRhs[l] = (lp.lhs(i) == lp.rhs(i));
 
             ASSERT_WARN( "WMAISM54", isNotZero(scale[i], 1.0 / infinity) );
@@ -3237,14 +3233,14 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                }
                DuplicateRowsPS* DuplicateRowsPSptr = 0;
                spx_alloc(DuplicateRowsPSptr);
-               m_hist.append(new (DuplicateRowsPSptr) DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm, isLhsEqualRhs, true, EQrel(newLhs, newRhs), k==idxFirstDupRows));
+               m_hist.append(new (DuplicateRowsPSptr) DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, m_dupRows[k], scale, da_perm, isLhsEqualRhs, true, EQrel(newLhs, newRhs), k==idxFirstDupRows));
             }
             else
             {
                DataArray<int> da_perm_empty(0);
                DuplicateRowsPS* DuplicateRowsPSptr = 0;
                spx_alloc(DuplicateRowsPSptr);
-               m_hist.append(new (DuplicateRowsPSptr) DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs), k == idxFirstDupRows));
+               m_hist.append(new (DuplicateRowsPSptr) DuplicateRowsPS(lp, rowIdx, maxLhsIdx, minRhsIdx, m_dupRows[k], scale, da_perm_empty, isLhsEqualRhs, false, EQrel(newLhs, newRhs), k == idxFirstDupRows));
             }
 
             if (maxLhs > lp.lhs(rowIdx) || minRhs < lp.rhs(rowIdx))
@@ -3269,6 +3265,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
             }
          }
       }
+      m_dupRows[k].clear();
    }
 
    // change ranges for all modified constraints by one single call (more efficient)
@@ -3369,9 +3366,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       idxSet.addIdx(j);
    }
 
-   // stores parallel classes with non-zero row entry
-   Array<DSVector> classSet(lp.nCols());
-
    Real oldVal;
 
    // main loop
@@ -3387,7 +3381,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
          if (scale[j] == 0.0)
             scale[j] = aij;
 
-         classSet[pClass[j]].add(j, aij / scale[j]);
+         m_classSetCols[pClass[j]].add(j, aij / scale[j]);
          if (--classSize[pClass[j]] == 0)
             idxSet.addIdx(pClass[j]);
       }
@@ -3397,45 +3391,42 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       {
          int k = pClass[row.index(m)];
 
-         if (classSet[k].size() > 0)
+         if (m_classSetCols[k].size() > 0)
          {
             // sort classSet[k] w.r.t. scaled row values
             ElementCompare compare;
 
-            if (classSet[k].size() > 1)
-               SPxQuicksort(classSet[k].mem(), classSet[k].size(), compare);
+            if (m_classSetCols[k].size() > 1)
+               SPxQuicksort(m_classSetCols[k].mem(), m_classSetCols[k].size(), compare);
 
             // use new index first
             int classIdx = idxSet.index(0);
             idxSet.remove(0);
 
-            for(int l = 0; l < classSet[k].size(); ++l)
+            for(int l = 0; l < m_classSetCols[k].size(); ++l)
             {
-               if (l != 0 && NErel(classSet[k].value(l), oldVal, epsZero()))
+               if (l != 0 && NErel(m_classSetCols[k].value(l), oldVal, epsZero()))
                {
                   // start new parallel class
                   classIdx = idxSet.index(0);
                   idxSet.remove(0);
                }
 
-               pClass[classSet[k].index(l)] = classIdx;
+               pClass[m_classSetCols[k].index(l)] = classIdx;
                ++classSize[classIdx];
 
-               oldVal = classSet[k].value(l);
+               oldVal = m_classSetCols[k].value(l);
             }
 
-            classSet[k].clear();
+            m_classSetCols[k].clear();
          }
       }
    }
 
    spx_free(idxMem);
 
-   // arrange duplicate columns w.r.t. their pClass values
-   Array<DSVector> dupCols(lp.nCols());
-
-   for(int k = 0; k < dupCols.size(); ++k)
-      dupCols[pClass[k]].add(k, 0.0);
+   for(int k = 0; k < lp.nCols(); ++k)
+      m_dupCols[pClass[k]].add(k, 0.0);
 
    DataArray<bool> remCol(lp.nCols());
    DataArray<bool> fixAndRemCol(lp.nCols());
@@ -3449,11 +3440,11 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
    bool hasDuplicateCol = false;
    DataArray<int>  m_perm_empty(0);
 
-   for(int k = 0; k < dupCols.size(); ++k)
+   for(int k = 0; k < lp.nCols(); ++k)
    {
-      if (dupCols[k].size() > 1 && !(lp.colVector(dupCols[k].index(0)).size() == 1))
+      if (m_dupCols[k].size() > 1 && !(lp.colVector(m_dupCols[k].index(0)).size() == 1))
       {
-         MSG_INFO3( spxout << "IMAISM58 " << dupCols[k].size()
+         MSG_INFO3( spxout << "IMAISM58 " << m_dupCols[k].size()
                            << " duplicate columns found" << std::endl; )
 
          if (!hasDuplicateCol)
@@ -3464,12 +3455,12 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
             hasDuplicateCol = true;
          }
 
-         for(int l = 0; l < dupCols[k].size(); ++l)
+         for(int l = 0; l < m_dupCols[k].size(); ++l)
          {
-            for(int m = 0; m < dupCols[k].size(); ++m)
+            for(int m = 0; m < m_dupCols[k].size(); ++m)
             {
-               int j1  = dupCols[k].index(l);
-               int j2  = dupCols[k].index(m);
+               int j1  = m_dupCols[k].index(l);
+               int j2  = m_dupCols[k].index(m);
 
                if (l != m && !remCol[j1] && !remCol[j2])
                {
@@ -3634,6 +3625,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
             }
          }
       }
+      m_dupCols[k].clear();
    }
 
    for(int j = 0; j < lp.nCols(); ++j)
@@ -3858,6 +3850,11 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    m_rBasisStat.reSize(lp.nRows());
    m_cIdx.reSize(lp.nCols());
    m_rIdx.reSize(lp.nRows());
+
+   m_classSetRows.reSize(lp.nRows());
+   m_classSetCols.reSize(lp.nCols());
+   m_dupRows.reSize(lp.nRows());
+   m_dupCols.reSize(lp.nCols());
 
    m_keepbounds = keepbounds;
 
