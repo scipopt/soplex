@@ -361,6 +361,8 @@ int SPxSteepPR::selectLeave()
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(retid));
       assert( thesolver->coPvec().delta().isConsistent() );
+      // coPvec().delta() might be not setup when it contains too many nonzeros
+      // this is intended and forcing to keep the sparsity information leads to a slowdown
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
    }
