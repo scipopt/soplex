@@ -36,9 +36,6 @@
 #include "unitvectorbase.h"
 #include "svsetbase.h"
 
-// specialized multAdd() for rationals
-#define SOPLEX_PERFALT_10
-
 #define SOPLEX_VECTOR_MARKER   1e-100
 
 namespace soplex
@@ -303,7 +300,7 @@ VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
 
 
 
-#ifdef SOPLEX_PERFALT_10
+#ifndef SOPLEX_LEGACY
 /// Addition of scaled vector, specialization for rationals
 template <>
 template <>
