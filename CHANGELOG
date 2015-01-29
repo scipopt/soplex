@@ -43,6 +43,7 @@ fixed bugs:
 - fixed default bounds of integer variables in MPS reader
 - adjust basis status of nonbasic rows automatically to row type when reading basis file
 - fix compiler error from missing operators between Rational and ints for GMP=false
+- fix memory leak with static rational numbers Rational::{ZERO,POSONE,NEGONE} and list memory
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG

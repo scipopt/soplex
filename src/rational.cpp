@@ -562,19 +562,20 @@ Rational::Rational(const mpq_t& q)
 /// destructor
 Rational::~Rational()
 {
-   if( Rational::useListMem )
+   assert(Rational::useListMem || unusedPrivateList.length() == 0);
+
+   if( !Rational::useListMem || this == &Rational::ZERO || this == &Rational::POSONE || this == &Rational::NEGONE )
+   {
+      dpointer->~Private();
+      spx_free(dpointer);
+   }
+   else
    {
       // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
       // elements) if there are much more unused than used Private objects; this requires counting the used Private
       // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
       // because freeing costs time
       unusedPrivateList.append(dpointer);
-   }
-   else
-   {
-      assert(unusedPrivateList.length() == 0);
-      dpointer->~Private();
-      spx_free(dpointer);
    }
 }
 
