@@ -1295,6 +1295,7 @@ private:
    int* _idsCompProbRowIDsIdx;   // the index to _idsPrimalRowIDs for a given original row.
    int* _idsCompProbColIDsIdx;   // the index to _idsPrimalColIDs for a given original col.
    DataArray < SPxRowId > _idsReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
+   DataArray < SPxRowId > _idsReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
    DataArray < SPxColId > _idsReducedProbColIDs;   // the col IDs for the related cols in the reduced problem
    DataArray < SPxRowId > _idsPrimalRowIDs;        // the primal row IDs from the original problem
    DataArray < SPxColId > _idsPrimalColIDs;        // the primal col IDs from the original problem
@@ -1634,6 +1635,10 @@ private:
 
    /// deletes rows and columns from the reduced problem
    void _deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval);
+
+   /// computes the compatible bound constraints and adds them to the reduced problem
+   void _getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind, int* ncompatboundcons,
+         int nnonposind);
 
    /// computes the rows to remove from the complementary problem
    void _getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval, int* nrowsforremoval,
