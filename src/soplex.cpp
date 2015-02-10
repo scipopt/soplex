@@ -557,6 +557,13 @@ namespace soplex
       , _hasSolReal(false)
       , _hasSolRational(false)
    {
+      // transfer message handler
+      _solver.setOutstream(spxout);
+      _scalerUniequi.setOutstream(spxout);
+      _scalerBiequi.setOutstream(spxout);
+      _scalerGeo1.setOutstream(spxout);
+      _scalerGeo8.setOutstream(spxout);
+
       // give lu factorization to solver
       _solver.setSolver(&_slufactor);
 
@@ -564,6 +571,7 @@ namespace soplex
       // initialized in setSettings() below
       _realLP = &_solver;
       _isRealLPLoaded = true;
+      _realLP->setOutstream(spxout);
 
       // initialize statistics
       spx_alloc(_statistics);
@@ -586,6 +594,9 @@ namespace soplex
    {
       if( this != &rhs )
       {
+         // copy message handler
+         spxout = rhs.spxout;
+
          // copy statistics
          *_statistics = *(rhs._statistics);
 
@@ -2659,7 +2670,7 @@ namespace soplex
          // ensure that tolerances are reasonable for the floating-point solver
          if( realParam(SoPlex::FEASTOL) < _currentSettings->_realParamLower[SoPlex::FPFEASTOL] )
          {
-            MSG_WARNING( spxout << "Cannot call floating-point solver with feasibility tolerance below "
+            MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with feasibility tolerance below "
                << _currentSettings->_realParamLower[SoPlex::FPFEASTOL] << " - relaxing tolerance\n");
             _solver.setFeastol(_currentSettings->_realParamLower[SoPlex::FPFEASTOL]);
          }
@@ -2668,7 +2679,7 @@ namespace soplex
 
          if( realParam(SoPlex::OPTTOL) < _currentSettings->_realParamLower[SoPlex::FPOPTTOL] )
          {
-            MSG_WARNING( spxout << "Cannot call floating-point solver with optimality tolerance below "
+            MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with optimality tolerance below "
                << _currentSettings->_realParamLower[SoPlex::FPOPTTOL] << " - relaxing tolerance\n");
             _solver.setOpttol(_currentSettings->_realParamLower[SoPlex::FPOPTTOL]);
          }
@@ -2709,7 +2720,7 @@ namespace soplex
          _solveRational();
       }
 
-      MSG_INFO1( spxout << "\n";
+      MSG_INFO1( spxout, spxout << "\n";
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
@@ -3307,7 +3318,7 @@ namespace soplex
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
                {
-                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(-redcost[c]) << "\n" );
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(-redcost[c]) << "\n" );
                   maxviol = -redcost[c];
                }
             }
@@ -3316,7 +3327,7 @@ namespace soplex
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
                {
-                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(redcost[c]) << "\n" );
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(redcost[c]) << "\n" );
                   maxviol = redcost[c];
                }
             }
@@ -3328,7 +3339,7 @@ namespace soplex
                sumviol += redcost[c];
                if( redcost[c] > maxviol )
                {
-                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(redcost[c]) << "\n" );
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(redcost[c]) << "\n" );
                   maxviol = redcost[c];
                }
             }
@@ -3337,7 +3348,7 @@ namespace soplex
                sumviol += -redcost[c];
                if( redcost[c] < -maxviol )
                {
-                  MSG_DEBUG( spxout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(-redcost[c]) << "\n" );
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(-redcost[c]) << "\n" );
                   maxviol = -redcost[c];
                }
             }
@@ -3388,7 +3399,7 @@ namespace soplex
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
                {
-                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(-dual[r])
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(-dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
                      << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
@@ -3401,7 +3412,7 @@ namespace soplex
                sumviol += dual[r];
                if( dual[r] > maxviol )
                {
-                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(dual[r])
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
                      << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
@@ -3417,7 +3428,7 @@ namespace soplex
                sumviol += dual[r];
                if( dual[r] > maxviol )
                {
-                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(dual[r])
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
                      << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
@@ -3430,7 +3441,7 @@ namespace soplex
                sumviol += -dual[r];
                if( dual[r] < -maxviol )
                {
-                  MSG_DEBUG( spxout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(-dual[r])
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(-dual[r])
                      << " (slack = " << rationalToString(_solRational._slacks[r])
                      << ", status = " << basisRowStatus(r)
                      << ", lhs = " << rationalToString(lhsRational(r))
@@ -3905,7 +3916,7 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
          }
          // copy sparse data to dense result vector based on coef array
@@ -3980,7 +3991,7 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
          }
 
@@ -4049,7 +4060,7 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
          }
          // copy sparse data to dense result vector based on coef array
@@ -4124,7 +4135,7 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
             return false;
          }
 
@@ -4192,7 +4203,7 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
             return false;
          }
       }
@@ -4233,7 +4244,7 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
             return false;
          }
 
@@ -4933,7 +4944,27 @@ namespace soplex
 
       // verbosity level
       case SoPlex::VERBOSITY:
-         Param::setVerbose(value);
+         switch(value)
+         {
+         case 0:
+            spxout.setVerbosity(SPxOut::ERROR);
+            break;
+         case 1:
+            spxout.setVerbosity(SPxOut::WARNING);
+            break;
+         case 2:
+            spxout.setVerbosity(SPxOut::DEBUG);
+            break;
+         case 3:
+            spxout.setVerbosity(SPxOut::INFO1);
+            break;
+         case 4:
+            spxout.setVerbosity(SPxOut::INFO2);
+            break;
+         case 5:
+            spxout.setVerbosity(SPxOut::INFO3);
+            break;
+         }
          break;
 
       // type of simplifier
@@ -5440,14 +5471,14 @@ namespace soplex
       // start timing
       _statistics->readingTime->start();
 
-      MSG_INFO1( spxout << "Loading settings file <" << filename << "> . . .\n" );
+      MSG_INFO1( spxout, spxout << "Loading settings file <" << filename << "> . . .\n" );
 
       // open file
       spxifstream file(filename);
 
       if( !file )
       {
-         MSG_ERROR( spxout << "Error opening settings file.\n" );
+         MSG_ERROR( std::cerr << "Error opening settings file.\n" );
          return false;
       }
 
@@ -5468,11 +5499,11 @@ namespace soplex
 
       if( readError && strlen(line) == SET_MAX_LINE_LEN - 1 )
       {
-         MSG_ERROR( spxout << "Error reading settings file: line " << lineNumber << " in settings file exceeds " << SET_MAX_LINE_LEN - 2 << " characters.\n" );
+         MSG_ERROR( std::cerr << "Error reading settings file: line " << lineNumber << " in settings file exceeds " << SET_MAX_LINE_LEN - 2 << " characters.\n" );
       }
       else if( readError )
       {
-         MSG_ERROR( spxout << "Error reading settings file: line " << lineNumber << ".\n" );
+         MSG_ERROR( std::cerr << "Error reading settings file: line " << lineNumber << ".\n" );
       }
 
       // stop timing
@@ -5518,7 +5549,7 @@ namespace soplex
             line++;
          if( *line != ':' )
          {
-            MSG_ERROR( spxout << "Error parsing setting string: no ':' separating parameter type and name.\n" );
+            MSG_ERROR( std::cerr << "Error parsing setting string: no ':' separating parameter type and name.\n" );
             return false;
          }
          line++;
@@ -5529,7 +5560,7 @@ namespace soplex
          line++;
       if( *line == '\0' || *line == '\n' || *line == '#' )
       {
-         MSG_ERROR( spxout << "Error parsing setting string: no parameter name.\n");
+         MSG_ERROR( std::cerr << "Error parsing setting string: no parameter name.\n");
          return false;
       }
       char* paramName = line;
@@ -5552,7 +5583,7 @@ namespace soplex
             line++;
          if( *line != '=' )
          {
-            MSG_ERROR( spxout << "Error parsing setting string: no '=' after parameter name.\n" );
+            MSG_ERROR( std::cerr << "Error parsing setting string: no '=' after parameter name.\n" );
             return false;
          }
          line++;
@@ -5563,7 +5594,7 @@ namespace soplex
          line++;
       if( *line == '\0' || *line == '\n' || *line == '#' )
       {
-         MSG_ERROR( spxout << "Error parsing setting string: no parameter value.\n");
+         MSG_ERROR( std::cerr << "Error parsing setting string: no parameter value.\n");
          return false;
       }
       char* paramValueString = line;
@@ -5580,7 +5611,7 @@ namespace soplex
             line++;
          if( *line != '\0' && *line != '\n' && *line != '#' )
          {
-            MSG_ERROR( spxout << "Error parsing setting string: additional character '" << *line << "' after parameter value.\n" );
+            MSG_ERROR( std::cerr << "Error parsing setting string: additional character '" << *line << "' after parameter value.\n" );
             return false;
          }
       }
@@ -5592,7 +5623,7 @@ namespace soplex
          {
             if( param >= SoPlex::BOOLPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+               MSG_ERROR( std::cerr << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -5617,7 +5648,7 @@ namespace soplex
                }
                else
                {
-                  MSG_ERROR( spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for bool parameter <" << paramName << ">.\n" );
+                  MSG_ERROR( std::cerr << "Error parsing setting string: invalid value <" << paramValueString << "> for bool parameter <" << paramName << ">.\n" );
                   return false;
                }
             }
@@ -5633,7 +5664,7 @@ namespace soplex
          {
             if( param >= SoPlex::INTPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+               MSG_ERROR( std::cerr << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_intParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -5644,7 +5675,7 @@ namespace soplex
                   break;
                else
                {
-                  MSG_ERROR( spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for int parameter <" << paramName << ">.\n" );
+                  MSG_ERROR( std::cerr << "Error parsing setting string: invalid value <" << paramValueString << "> for int parameter <" << paramName << ">.\n" );
                   return false;
                }
             }
@@ -5660,7 +5691,7 @@ namespace soplex
          {
             if( param >= SoPlex::REALPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+               MSG_ERROR( std::cerr << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_realParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -5671,7 +5702,7 @@ namespace soplex
                   break;
                else
                {
-                  MSG_ERROR( spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for real parameter <" << paramName << ">.\n" );
+                  MSG_ERROR( std::cerr << "Error parsing setting string: invalid value <" << paramValueString << "> for real parameter <" << paramName << ">.\n" );
                   return false;
                }
             }
@@ -5688,7 +5719,7 @@ namespace soplex
          {
             if( param >= SoPlex::RATIONALPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+               MSG_ERROR( std::cerr << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_rationalParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -5699,7 +5730,7 @@ namespace soplex
                   break;
                else
                {
-                  MSG_ERROR( spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for rational parameter <" << paramName << ">.\n" );
+                  MSG_ERROR( std::cerr << "Error parsing setting string: invalid value <" << paramValueString << "> for rational parameter <" << paramName << ">.\n" );
                   return false;
                }
             }
@@ -5709,7 +5740,7 @@ namespace soplex
       }
 #endif
 
-      MSG_ERROR( spxout << "Error parsing setting string: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << ">.\n" );
+      MSG_ERROR( std::cerr << "Error parsing setting string: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << ">.\n" );
 
       return false;
    }
@@ -5906,35 +5937,35 @@ namespace soplex
    {
       // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
-      MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
+      MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
          << "." << (SOPLEX_VERSION % 100)/10
          << "." << SOPLEX_VERSION % 10
          << "." << SOPLEX_SUBVERSION );
 #else
-      MSG_INFO1( spxout << "SoPlex version " << SOPLEX_VERSION/100
+      MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
          << "." << (SOPLEX_VERSION % 100)/10
          << "." << SOPLEX_VERSION % 10 );
 #endif
 
 #ifndef NDEBUG
-      MSG_INFO1( spxout << " [mode: debug]" );
+      MSG_INFO1( spxout, spxout << " [mode: debug]" );
 #else
-      MSG_INFO1( spxout << " [mode: optimized]" );
+      MSG_INFO1( spxout, spxout << " [mode: optimized]" );
 #endif
 
-      MSG_INFO1( spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
+      MSG_INFO1( spxout, spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
 
 #ifdef SOPLEX_WITH_GMP
 #ifdef mpir_version
-      MSG_INFO1( spxout << " [rational: MPIR " << mpir_version << "]" );
+      MSG_INFO1( spxout, spxout << " [rational: MPIR " << mpir_version << "]" );
 #else
-      MSG_INFO1( spxout << " [rational: GMP " << gmp_version << "]" );
+      MSG_INFO1( spxout, spxout << " [rational: GMP " << gmp_version << "]" );
 #endif
 #else
-      MSG_INFO1( spxout << " [rational: long double]" );
+      MSG_INFO1( spxout, spxout << " [rational: long double]" );
 #endif
 
-      MSG_INFO1( spxout << " [githash: " << getGitHash() << "]\n" );
+      MSG_INFO1( spxout, spxout << " [githash: " << getGitHash() << "]\n" );
    }
 
 
@@ -5956,7 +5987,7 @@ namespace soplex
       // compare number of Rows
       if( _realLP->nRows() != _rationalLP->nRows() )
       {
-         MSG_ERROR( spxout << "The number of Rows in the Real LP does not match the one in the Rational LP."
+         MSG_ERROR( std::cerr << "The number of Rows in the Real LP does not match the one in the Rational LP."
                << " Real LP: " << _realLP->nRows() << "  Rational LP: " << _rationalLP->nRows() << std::endl);
          result = false;
          nRowsMatch = false;
@@ -5965,7 +5996,7 @@ namespace soplex
       // compare number of Columns
       if( _realLP->nCols() != _rationalLP->nCols() )
       {
-         MSG_ERROR( spxout << "The number of Columns in the Real LP does not match the one in the Rational LP."
+         MSG_ERROR( std::cerr << "The number of Columns in the Real LP does not match the one in the Rational LP."
                << " Real LP: " << _realLP->nCols() << "  Rational LP: " << _rationalLP->nCols() << std::endl);
          result = false;
          nColsMatch = false;
@@ -5974,7 +6005,7 @@ namespace soplex
       // compare number of nonZeros
       if( _realLP->nNzos() != _rationalLP->nNzos() )
       {
-         MSG_ERROR( spxout << "The number of nonZeros in the Real LP does not match the one in the Rational LP."
+         MSG_ERROR( std::cerr << "The number of nonZeros in the Real LP does not match the one in the Rational LP."
                << " Real LP: " << _realLP->nNzos() << "  Rational LP: " << _rationalLP->nNzos() << std::endl);
          result = false;
       }
@@ -5982,7 +6013,7 @@ namespace soplex
       // compare the dimensions of the right hand side vectors
       if( _realLP->rhs().dim() != _rationalLP->rhs().dim() )
       {
-         MSG_ERROR( spxout << "The dimension of the right hand side vector of the Real LP does not match the one of the Rational LP."
+         MSG_ERROR( std::cerr << "The dimension of the right hand side vector of the Real LP does not match the one of the Rational LP."
                << " Real LP: " << _realLP->rhs().dim() << "  Rational LP: " << _rationalLP->rhs().dim() << std::endl);
          result = false;
          rhsDimMatch = false;
@@ -5992,7 +6023,7 @@ namespace soplex
       // compare the dimensions of the left hand side vectors
       if( _realLP->lhs().dim() != _rationalLP->lhs().dim() )
       {
-         MSG_ERROR( spxout << "The dimension of the left hand side vector of the Real LP does not match the one of the Rational LP."
+         MSG_ERROR( std::cerr << "The dimension of the left hand side vector of the Real LP does not match the one of the Rational LP."
                << " Real LP: " << _realLP->lhs().dim() << "  Rational LP: " << _rationalLP->lhs().dim() << std::endl);
          result = false;
          lhsDimMatch = false;
@@ -6001,7 +6032,7 @@ namespace soplex
       // compare the dimensions of the objective function vectors
       if( _realLP->maxObj().dim() != _rationalLP->maxObj().dim() )
       {
-         MSG_ERROR( spxout << "The dimension of the objective function vector of the Real LP does not match the one of the Rational LP."
+         MSG_ERROR( std::cerr << "The dimension of the objective function vector of the Real LP does not match the one of the Rational LP."
                << " Real LP: " << _realLP->maxObj().dim() << "  Rational LP: " << _rationalLP->maxObj().dim() << std::endl);
          result = false;
          maxObjDimMatch = false;
@@ -6010,7 +6041,7 @@ namespace soplex
       // compare the sense
       if( (int)_realLP->spxSense() != (int)_rationalLP->spxSense() )
          {
-            MSG_ERROR( spxout << "The objective function sense of the Real LP does not match the one of the Rational LP."
+            MSG_ERROR( std::cerr << "The objective function sense of the Real LP does not match the one of the Rational LP."
                << " Real LP: " << (_realLP->spxSense() == SPxLPReal::MINIMIZE ? "MIN" : "MAX")
                << "  Rational LP: " << (_rationalLP->spxSense() == SPxLPRational::MINIMIZE ? "MIN" : "MAX") << std::endl);
             result = false;
@@ -6019,7 +6050,7 @@ namespace soplex
       // compare the dimensions of upper bound vectors
       if( _realLP->upper().dim() != _rationalLP->upper().dim() )
       {
-         MSG_ERROR( spxout << "The dimension of the upper bound vector of the Real LP does not match the one of the Rational LP."
+         MSG_ERROR( std::cerr << "The dimension of the upper bound vector of the Real LP does not match the one of the Rational LP."
                << " Real LP: " << _realLP->upper().dim() << "  Rational LP: " << _rationalLP->upper().dim() << std::endl);
          result = false;
          upperDimMatch = false;
@@ -6028,7 +6059,7 @@ namespace soplex
       // compare the dimensions of the objective function vectors
       if( _realLP->lower().dim() != _rationalLP->lower().dim() )
       {
-         MSG_ERROR( spxout << "The dimension of the lower bound vector of the Real LP does not match the one of the Rational LP."
+         MSG_ERROR( std::cerr << "The dimension of the lower bound vector of the Real LP does not match the one of the Rational LP."
                << " Real LP: " << _realLP->lower().dim() << "  Rational LP: " << _rationalLP->lower().dim() << std::endl);
          result = false;
          lowerDimMatch = false;
@@ -6054,7 +6085,7 @@ namespace soplex
                {
                   if( !quiet )
                   {
-                     MSG_ERROR( spxout << "Entries number " << i << " of the right hand side vectors don't match."
+                     MSG_ERROR( std::cerr << "Entries number " << i << " of the right hand side vectors don't match."
                            << " Real LP: " << _realLP->rhs()[i] << "  Rational LP: " << _rationalLP->rhs()[i] << std::endl);
                   }
                   rhsValMatch = false;
@@ -6064,7 +6095,7 @@ namespace soplex
 
             if( !rhsValMatch && quiet )
             {
-               MSG_ERROR( spxout << "The values of the right hand side vectors don't match." << std::endl );
+               MSG_ERROR( std::cerr << "The values of the right hand side vectors don't match." << std::endl );
             }
          }
 
@@ -6079,7 +6110,7 @@ namespace soplex
                {
                   if( !quiet )
                   {
-                     MSG_ERROR( spxout << "Entries number " << i << " of the left hand side vectors don't match."
+                     MSG_ERROR( std::cerr << "Entries number " << i << " of the left hand side vectors don't match."
                            << " Real LP: " << _realLP->lhs()[i] << "  Rational LP: " << _rationalLP->lhs()[i] << std::endl);
                   }
                   lhsValMatch = false;
@@ -6089,7 +6120,7 @@ namespace soplex
 
             if( !lhsValMatch && quiet )
             {
-               MSG_ERROR( spxout << "The values of the left hand side vectors don't match." << std::endl );
+               MSG_ERROR( std::cerr << "The values of the left hand side vectors don't match." << std::endl );
             }
          }
 
@@ -6102,7 +6133,7 @@ namespace soplex
                {
                   if( !quiet )
                   {
-                     MSG_ERROR( spxout << "Entries number " << i << " of the objective function vectors don't match."
+                     MSG_ERROR( std::cerr << "Entries number " << i << " of the objective function vectors don't match."
                            << " Real LP: " << _realLP->maxObj()[i] << "  Rational LP: " << _rationalLP->maxObj()[i] << std::endl);
                   }
                   maxObjValMatch = false;
@@ -6112,7 +6143,7 @@ namespace soplex
 
             if( !maxObjValMatch && quiet )
             {
-               MSG_ERROR( spxout << "The values of the objective function vectors don't match." << std::endl );
+               MSG_ERROR( std::cerr << "The values of the objective function vectors don't match." << std::endl );
             }
          }
 
@@ -6127,7 +6158,7 @@ namespace soplex
                {
                   if( !quiet )
                   {
-                     MSG_ERROR( spxout << "Entries number " << i << " of the upper bound vectors don't match."
+                     MSG_ERROR( std::cerr << "Entries number " << i << " of the upper bound vectors don't match."
                            << " Real LP: " << _realLP->upper()[i] << "  Rational LP: " << _rationalLP->upper()[i] << std::endl);
                   }
                   upperValMatch = false;
@@ -6137,7 +6168,7 @@ namespace soplex
 
             if( !upperValMatch && quiet )
             {
-               MSG_ERROR( spxout << "The values of the upper bound vectors don't match." << std::endl );
+               MSG_ERROR( std::cerr << "The values of the upper bound vectors don't match." << std::endl );
             }
          }
 
@@ -6152,7 +6183,7 @@ namespace soplex
                {
                   if( !quiet )
                   {
-                     MSG_ERROR( spxout << "Entries number " << i << " of the lower bound vectors don't match."
+                     MSG_ERROR( std::cerr << "Entries number " << i << " of the lower bound vectors don't match."
                            << " Real LP: " << _realLP->lower()[i] << "  Rational LP: " << _rationalLP->lower()[i] << std::endl);
                   }
                   lowerValMatch = false;
@@ -6162,7 +6193,7 @@ namespace soplex
 
             if( !lowerValMatch && quiet )
             {
-               MSG_ERROR( spxout << "The values of the lower bound vectors don't match." << std::endl );
+               MSG_ERROR( std::cerr << "The values of the lower bound vectors don't match." << std::endl );
             }
          }
       }
@@ -6180,7 +6211,7 @@ namespace soplex
                {
                   if( !quiet )
                   {
-                     MSG_ERROR( spxout << "Entries number " << j << " of column number " << i << " don't match."
+                     MSG_ERROR( std::cerr << "Entries number " << j << " of column number " << i << " don't match."
                            << " Real LP: " << _realLP->colVector(i)[j] << "  Rational LP: " << _rationalLP->colVector(i)[j] << std::endl);
                   }
                   matrixValMatch = false;
@@ -6191,7 +6222,7 @@ namespace soplex
 
          if( !matrixValMatch && quiet )
          {
-            MSG_ERROR( spxout << "The values of the matrices don't match." << std::endl );
+            MSG_ERROR( std::cerr << "The values of the matrices don't match." << std::endl );
          }
       }
 
@@ -6972,6 +7003,7 @@ namespace soplex
       {
          spx_alloc(_rationalLP);
          _rationalLP = new (_rationalLP) SPxLPRational();
+         _rationalLP->setOutstream(spxout);
       }
    }
 
@@ -7066,12 +7098,12 @@ namespace soplex
       }
       catch( const SPxException& E )
       {
-         MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while solving real LP.\n" );
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while solving real LP.\n" );
          _status = SPxSolver::ERROR;
       }
       catch( ... )
       {
-         MSG_ERROR( spxout << "Caught unknown exception while solving real LP.\n" );
+         MSG_ERROR( std::cerr << "Caught unknown exception while solving real LP.\n" );
          _status = SPxSolver::ERROR;
       }
       _statistics->simplexTime->stop();
@@ -7324,7 +7356,7 @@ namespace soplex
             line++;
          if( *line != ':' )
          {
-            MSG_ERROR( spxout << "Error parsing settings file: no ':' separating parameter type and name in line " << lineNumber << ".\n" );
+            MSG_ERROR( std::cerr << "Error parsing settings file: no ':' separating parameter type and name in line " << lineNumber << ".\n" );
             return false;
          }
          line++;
@@ -7335,7 +7367,7 @@ namespace soplex
          line++;
       if( *line == '\0' || *line == '\n' || *line == '#' )
       {
-         MSG_ERROR( spxout << "Error parsing settings file: no parameter name in line " << lineNumber << ".\n");
+         MSG_ERROR( std::cerr << "Error parsing settings file: no parameter name in line " << lineNumber << ".\n");
          return false;
       }
       char* paramName = line;
@@ -7358,7 +7390,7 @@ namespace soplex
             line++;
          if( *line != '=' )
          {
-            MSG_ERROR( spxout << "Error parsing settings file: no '=' after parameter name in line " << lineNumber << ".\n" );
+            MSG_ERROR( std::cerr << "Error parsing settings file: no '=' after parameter name in line " << lineNumber << ".\n" );
             return false;
          }
          line++;
@@ -7369,7 +7401,7 @@ namespace soplex
          line++;
       if( *line == '\0' || *line == '\n' || *line == '#' )
       {
-         MSG_ERROR( spxout << "Error parsing settings file: no parameter value in line " << lineNumber << ".\n");
+         MSG_ERROR( std::cerr << "Error parsing settings file: no parameter value in line " << lineNumber << ".\n");
          return false;
       }
       char* paramValueString = line;
@@ -7386,7 +7418,7 @@ namespace soplex
             line++;
          if( *line != '\0' && *line != '\n' && *line != '#' )
          {
-            MSG_ERROR( spxout << "Error parsing settings file: additional character '" << *line << "' after parameter value in line " << lineNumber << ".\n" );
+            MSG_ERROR( std::cerr << "Error parsing settings file: additional character '" << *line << "' after parameter value in line " << lineNumber << ".\n" );
             return false;
          }
       }
@@ -7398,7 +7430,7 @@ namespace soplex
          {
             if( param >= SoPlex::BOOLPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               MSG_ERROR( std::cerr << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_boolParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -7423,7 +7455,7 @@ namespace soplex
                }
                else
                {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for bool parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  MSG_ERROR( std::cerr << "Error parsing settings file: invalid value <" << paramValueString << "> for bool parameter <" << paramName << "> in line " << lineNumber << ".\n" );
                   return false;
                }
             }
@@ -7439,7 +7471,7 @@ namespace soplex
          {
             if( param >= SoPlex::INTPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               MSG_ERROR( std::cerr << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_intParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -7450,7 +7482,7 @@ namespace soplex
                   break;
                else
                {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for int parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  MSG_ERROR( std::cerr << "Error parsing settings file: invalid value <" << paramValueString << "> for int parameter <" << paramName << "> in line " << lineNumber << ".\n" );
                   return false;
                }
             }
@@ -7466,7 +7498,7 @@ namespace soplex
          {
             if( param >= SoPlex::REALPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               MSG_ERROR( std::cerr << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_realParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -7477,7 +7509,7 @@ namespace soplex
                   break;
                else
                {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for real parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  MSG_ERROR( std::cerr << "Error parsing settings file: invalid value <" << paramValueString << "> for real parameter <" << paramName << "> in line " << lineNumber << ".\n" );
                   return false;
                }
             }
@@ -7494,7 +7526,7 @@ namespace soplex
          {
             if( param >= SoPlex::RATIONALPARAM_COUNT )
             {
-               MSG_ERROR( spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
+               MSG_ERROR( std::cerr << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                return false;
             }
             else if( strncmp(paramName, _currentSettings->_rationalParamName[param].c_str(), SET_MAX_LINE_LEN) == 0 )
@@ -7505,7 +7537,7 @@ namespace soplex
                   break;
                else
                {
-                  MSG_ERROR( spxout << "Error parsing settings file: invalid value <" << paramValueString << "> for rational parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+                  MSG_ERROR( std::cerr << "Error parsing settings file: invalid value <" << paramValueString << "> for rational parameter <" << paramName << "> in line " << lineNumber << ".\n" );
                   return false;
                }
             }
@@ -7515,7 +7547,7 @@ namespace soplex
       }
 #endif
 
-      MSG_ERROR( spxout << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
+      MSG_ERROR( std::cerr << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
 
       return false;
    }

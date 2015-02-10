@@ -110,6 +110,15 @@ private:
 
 public:
 
+   // message handler
+   SPxOut* spxout;
+
+public:
+
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Inquiry */
    //@{

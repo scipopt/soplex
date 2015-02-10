@@ -66,6 +66,8 @@ protected:
    int         m_keptLRhs;
    /// objective offset
    Real        m_objoffset;
+   /// message handler
+   SPxOut*     spxout;
    //@}
 
 public:
@@ -100,6 +102,7 @@ public:
       , m_keptBnds(0)
       , m_keptLRhs(0)
       , m_objoffset(0.0)
+      , spxout(0)
    {
       assert(isConsistent());
 
@@ -118,6 +121,7 @@ public:
       , m_keptBnds(old.m_keptBnds)
       , m_keptLRhs(old.m_keptLRhs)
       , m_objoffset(old.m_objoffset)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }
@@ -137,6 +141,7 @@ public:
          m_keptBnds = rhs.m_keptBnds;
          m_keptLRhs = rhs.m_keptLRhs;
          m_objoffset = rhs.m_objoffset;
+         spxout = rhs.spxout;
 
          assert(isConsistent());
       }

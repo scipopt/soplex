@@ -115,19 +115,16 @@ void SPxBasis::Desc::dump() const
    int i;
 
    // Dump regardless of the verbosity level if this method is called.
-   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
-   spxout.setVerbosity( SPxOut::ERROR );
 
-   spxout << "DBDESC01 column status: ";
+   std::cout << "DBDESC01 column status: ";
    for(i = 0; i < nCols(); i++)
-      spxout << colStatus(i);
-   spxout << std::endl;
+      std::cout << colStatus(i);
+   std::cout << std::endl;
 
-   spxout << "DBDESC02 row status:    ";
+   std::cout << "DBDESC02 row status:    ";
    for(i = 0; i < nRows(); i++)
-      spxout << rowStatus(i); 
-   spxout << std::endl;
-   spxout.setVerbosity( tmp_verbosity );
+      std::cout << rowStatus(i);
+   std::cout << std::endl;
 }
 
 bool SPxBasis::Desc::isConsistent() const

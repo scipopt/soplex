@@ -58,7 +58,7 @@ public:
          timer = new (timer) WallclockTimer();
          break;
       default:
-         MSG_ERROR( spxout << "wrong timer specified" << std::endl; )
+         MSG_ERROR( std::cerr << "wrong timer specified" << std::endl; )
       }
       return timer;
    }

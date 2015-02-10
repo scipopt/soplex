@@ -406,6 +406,8 @@ private:
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
    bool      freeSlinSolver; ///< true iff factor should be freed inside of this object
+   SPxOut*   spxout;         ///< message handler
+
    //@}
 
 public:
@@ -426,7 +428,7 @@ public:
       if( thestatus != stat )
       {
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG( spxout << "DBSTAT01 SPxBasis::setStatus(): status: "
+         MSG_DEBUG( std::cout << "DBSTAT01 SPxBasis::setStatus(): status: "
                     << int(thestatus) << " (" << thestatus << ") -> "
                     << int(stat) << " (" << stat << ")" << std::endl; )
 #endif
@@ -835,6 +837,11 @@ public:
          ;
 
       return s.str();
+   }
+
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
    }
    //@}
 

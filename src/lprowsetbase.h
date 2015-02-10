@@ -258,7 +258,7 @@ public:
          rhs_w(i) = infinity;
          break;
       case LPRowBase<R>::RANGE:
-         MSG_ERROR( spxout << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
+         MSG_ERROR( std::cerr << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
          throw SPxInternalCodeException("XROWST01 This should never happen.");
       default:
          throw SPxInternalCodeException("XROWST02 This should never happen.");

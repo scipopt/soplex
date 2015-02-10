@@ -55,15 +55,15 @@ namespace soplex
    @param  expr    Expression that must be satisfied.
 */
 #if defined (NDEBUG) && defined (WITH_WARNINGS)
-#define ASSERT_WARN( prefix, expr )              \
-   if ( !( expr ) )                                                     \
-      {                                                                 \
-         MSG_WARNING( spxout                                            \
-                      << prefix                                         \
-                      << " failed assertion on line " << __LINE__       \
-                      << " in file " << __FILE__ << ": "                \
-                      << #expr                                          \
-                      << std::endl; );                                  \
+#define ASSERT_WARN( prefix, expr )                        \
+   if ( !( expr ) )                                        \
+      {                                                    \
+         std::cerr                                         \
+         << prefix                                         \
+         << " failed assertion on line " << __LINE__       \
+         << " in file " << __FILE__ << ": "                \
+         << #expr                                          \
+         << std::endl;                                     \
       }
 #else // just a normal assert
 #define ASSERT_WARN( prefix, expr ) ( assert( expr ) )
@@ -77,17 +77,18 @@ namespace soplex
  */
 
 /**
-   Executes \p do_something with verbosity level \p verbosity, resetting
+   Prints/Executes \p stream with verbosity level \p verbosity, resetting
    the old verbosity level afterwards.
-   Usually the parameter \p do_something prints something out.
+   Usually the parameter \p stream prints something out.
    This is an internal define used by MSG_ERROR, MSG_WARNING, etc.
 */
 #ifdef DISABLE_VERBOSITY
-#define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) {}
+#define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) {}
+#define DO_WITH_ERR_VERBOSITY( do_something ) {}
 #else
-#define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
+#define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) \
    {                                                     \
-     if( verbosity <= Param::verbose() )                 \
+     if( verbosity <= spxout.getVerbosity() )            \
      {                                                   \
         const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
         spxout.setVerbosity( verbosity );                \
@@ -95,18 +96,19 @@ namespace soplex
         spxout.setVerbosity( old_verbosity );            \
      }                                                   \
    }
+#define DO_WITH_ERR_VERBOSITY( do_something ) { do_something; }
 #endif
 
 /// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
-#define MSG_ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
+#define MSG_ERROR(x)            { DO_WITH_ERR_VERBOSITY( x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::WARNING.
-#define MSG_WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
+#define MSG_WARNING(spxout, x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO1.
-#define MSG_INFO1(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, x ) }
+#define MSG_INFO1(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO2.
-#define MSG_INFO2(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, x ) }
+#define MSG_INFO2(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
-#define MSG_INFO3(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, x ) }
+#define MSG_INFO3(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, spxout, x ) }
 
 extern bool msginconsistent(const char* name, const char* file, int line);
 
@@ -114,7 +116,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 
 #if defined(SOPLEX_DEBUG)
 // print output in any case, regardless of Param::verbose():
-#define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::DEBUG, x ) }
+#define MSG_DEBUG(x) { x; }
 #else
 #define MSG_DEBUG(x) /**/
 #endif //!SOPLEX_DEBUG
@@ -238,8 +240,6 @@ private:
    static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
    static Real s_epsilon_pivot;
-   /// verbosity level
-   static int  s_verbose;
    //@}
 
 public:
@@ -275,13 +275,6 @@ public:
       }
       ///
    static void setEpsilonPivot(Real eps);
-   /// returns verbosity level
-   inline static int verbose()
-   {
-      return s_verbose;
-   }
-   /// sets verbosity level
-   static void setVerbose(int p_verbose);
    //@}
 };
 

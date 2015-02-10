@@ -118,7 +118,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    }
    else
    {
-      MSG_INFO1( spxout << " --- initializing steepest edge multipliers" << std::endl; )
+      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl; )
 
       if (type == SPxSolver::ENTER)
       {
@@ -254,7 +254,7 @@ void SPxSteepPR::left4(int n, SPxId id)
 #ifndef NDEBUG
       if (fabs(rhoVec[n]) < theeps * 0.5)
       {
-         MSG_ERROR( spxout << "WSTEEP04: rhoVec = "
+         MSG_ERROR( std::cerr << "WSTEEP04: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
       }
 #endif  // NDEBUG
@@ -351,7 +351,7 @@ int SPxSteepPR::selectLeave()
    if( retid < 0 && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WSTEEP03 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP03 trying refinement step..\n"; )
       retid = selectLeaveX(theeps/STEEP_REFINETOL);
    }
 
@@ -394,7 +394,7 @@ int SPxSteepPR::selectLeaveX(Real tol)
          if( coPenalty_ptr[i] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
                                 << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * p[i];
@@ -433,7 +433,7 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
          if( coPenalty_ptr[idx] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * p[idx];
@@ -482,7 +482,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
          if( coPen[idx] < -tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * prefPtr[idx];
@@ -524,7 +524,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
          if( coPen[idx] < -tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * prefPtr[idx];
@@ -732,7 +732,7 @@ SPxId SPxSteepPR::selectEnter()
    if( !enterId.isValid() && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WSTEEP05 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP05 trying refinement step..\n"; )
       enterId = selectEnterX(theeps/STEEP_REFINETOL);
    }
 
@@ -1168,7 +1168,7 @@ bool SPxSteepPR::isConsistent() const
          x = coPenalty[i] - tmp.length2();
          if (x > thesolver->leavetol() || -x > thesolver->leavetol())
          {
-            MSG_ERROR( spxout << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
+            MSG_ERROR( std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
          }
       }
    }

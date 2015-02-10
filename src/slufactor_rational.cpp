@@ -412,7 +412,7 @@ SLUFactorRational::Status SLUFactorRational::change(
    }
    usetup = false;
 
-   MSG_DEBUG( spxout << "DSLUFA01\tupdated\t\tstability = " << stability()
+   MSG_DEBUG( std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
                      << std::endl; )
 
    return status();
@@ -999,7 +999,7 @@ SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[
    stat = OK;
    factor(matrix, lastThreshold);
 
-   MSG_DEBUG( spxout << "DSLUFA02 threshold = " << lastThreshold
+   MSG_DEBUG( std::cout << "DSLUFA02 threshold = " << lastThreshold
                      << "\tstability = " << stability()
                      << "\tminStability = " << minStability << std::endl; )
    MSG_DEBUG(

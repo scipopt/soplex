@@ -83,6 +83,7 @@ void SPxSolver::loadLP(const SPxLP& lp)
 void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
 {
    SPxBasis::loadSolver(slu, destroy);
+   slu->spxout = spxout;
 }
 
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
@@ -182,7 +183,7 @@ void SPxSolver::setType(Type tp)
       factorized = false;
       m_numCycle = 0;
 #endif
-      MSG_INFO3( spxout << "Switching to "
+      MSG_INFO3( (*spxout), (*spxout) << "Switching to "
                         << static_cast<const char*>((tp == LEAVE)
                            ? "leaving" : "entering")
                         << " algorithm" << std::endl; )
@@ -510,7 +511,7 @@ void SPxSolver::clearUpdateVecs(void)
 void SPxSolver::factorize()
 {
 
-   MSG_INFO3( spxout << " --- refactorizing basis matrix" << std::endl; )
+   MSG_INFO3( (*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl; )
 
    try
    {
@@ -555,27 +556,27 @@ void SPxSolver::factorize()
          ctmp -= coPvec();
          if (ftmp.length() > DEFAULT_BND_VIOL)
          {
-            MSG_DEBUG( spxout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
+            MSG_DEBUG( std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
             ftmp = fVec();
             multBaseWith(ftmp);
             ftmp -= fRhs();
             if (ftmp.length() > DEFAULT_BND_VIOL)
-               MSG_ERROR( spxout << "ESOLVE29 " << iteration() << ": fVec error = " 
+               MSG_ERROR( std::cerr << "ESOLVE29 " << iteration() << ": fVec error = "
                                  << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
          if (ctmp.length() > DEFAULT_BND_VIOL)
          {
-            MSG_DEBUG( spxout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
+            MSG_DEBUG( std::cout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
             ctmp = coPvec();
             multWithBase(ctmp);
             ctmp -= coPrhs();
             if (ctmp.length() > DEFAULT_BND_VIOL)
-               MSG_ERROR( spxout << "ESOLVE30 " << iteration() << ": coPvec error = " 
+               MSG_ERROR( std::cerr << "ESOLVE30 " << iteration() << ": coPvec error = "
                                  << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
          if (ptmp.length() > DEFAULT_BND_VIOL)
          {
-            MSG_DEBUG( spxout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
+            MSG_DEBUG( std::cout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
          }
 #endif  // NDEBUG
 
@@ -1458,7 +1459,7 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
       vstat = BASIC;
       break;
    default:
-      MSG_ERROR( spxout << "ESOLVE26 ERROR: unknown basis status (" << stat << ")" 
+      MSG_ERROR( std::cerr << "ESOLVE26 ERROR: unknown basis status (" << stat << ")"
                         << std::endl; )
       throw SPxInternalCodeException("XSOLVE22 This should never happen.");
    }
@@ -1517,7 +1518,7 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
       rstat = dualRowStatus(row);
       break;
    default:
-      MSG_ERROR( spxout << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")" 
+      MSG_ERROR( std::cerr << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")"
                         << std::endl; )
       throw SPxInternalCodeException("XSOLVE23 This should never happen.");
    }
@@ -1582,7 +1583,7 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
       cstat = dualColStatus(col);
       break;
    default:
-      MSG_ERROR( spxout << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")" 
+      MSG_ERROR( std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
                         << std::endl; )
       throw SPxInternalCodeException("XSOLVE24 This should never happen.");
    }

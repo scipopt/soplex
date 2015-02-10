@@ -176,6 +176,7 @@ public:
    //@{
    /// default constructor
    SLinSolver()
+      : spxout(0)
    {}
    /// destructor
    virtual ~SLinSolver()
@@ -184,6 +185,8 @@ public:
    virtual SLinSolver* clone() const = 0;
    //@}
 
+   /// message handler
+   SPxOut* spxout;
 
 
 };

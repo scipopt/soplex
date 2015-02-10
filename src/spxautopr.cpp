@@ -79,7 +79,7 @@ bool SPxAutoPR::setActivePricer(SPxSolver::Type type)
 int SPxAutoPR::selectLeave()
 {
    if( setActivePricer(SPxSolver::LEAVE) )
-      MSG_INFO1( spxout << " --- active pricer: " << activepricer->getName() << std::endl; )
+      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
 
    return activepricer->selectLeave();
 }
@@ -92,7 +92,7 @@ void SPxAutoPR::left4(int n, SPxId id)
 SPxId SPxAutoPR::selectEnter()
 {
    if( setActivePricer(SPxSolver::ENTER) )
-      MSG_INFO1( spxout << " --- active pricer: " << activepricer->getName() << std::endl; )
+      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
 
    return activepricer->selectEnter();
 }

@@ -372,7 +372,15 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
+   mutable SPxOut* spxout;              ///< message handler
+
    //-----------------------------
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+      SPxLPBase::spxout = &newOutstream;
+   }
+
    /**@name Access */
    //@{
    /// return the version of SPxSolver as number like 123 for 1.2.3

@@ -62,7 +62,7 @@ namespace soplex
       case SPxSolver::OPTIMAL:
          if( !_isRealLPLoaded )
          {
-            MSG_INFO1( spxout << " --- transforming basis into original space" << std::endl; )
+            MSG_INFO1( spxout, spxout << " --- transforming basis into original space" << std::endl; )
             _solver.changeObjOffset(0.0);
             _resolveWithoutPreprocessing(simplificationStatus);
             return;
@@ -285,11 +285,11 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          }
          catch( ... )
          {
-            MSG_ERROR( spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_ERROR( std::cerr << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
             _status = SPxSolver::ERROR;
          }
       }

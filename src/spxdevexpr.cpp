@@ -164,7 +164,7 @@ int SPxDevexPR::selectLeave()
    if ( retid < 0 && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WDEVEX02 trying refinement step..\n"; )
       retid = selectLeaveX(theeps/DEVEX_REFINETOL);
    }
 
@@ -324,7 +324,7 @@ void SPxDevexPR::left4(int n, SPxId id)
 #ifndef NDEBUG
       if (fabs(rhoVec[n]) < theeps)
       {
-         MSG_ERROR( spxout << "WDEVEX01: rhoVec = "
+         MSG_ERROR( std::cerr << "WDEVEX01: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than theeps = " << theeps << std::endl; )
       }
 #endif  // NDEBUG
@@ -455,7 +455,7 @@ SPxId SPxDevexPR::selectEnter()
    if( !enterId.isValid() && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WDEVEX02 trying refinement step..\n"; )
       enterId = selectEnterX(theeps/DEVEX_REFINETOL);
    }
 

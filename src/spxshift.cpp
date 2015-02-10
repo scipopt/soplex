@@ -38,7 +38,7 @@ void SPxSolver::shiftFvec()
    {
       if (theUBbound[i] + allow < (*theFvec)[i])
       {
-         MSG_DEBUG( spxout << "DSHIFT08 theUBbound[" << i << "] violated by " << (*theFvec)[i] - theUBbound[i] - allow << std::endl );
+         MSG_DEBUG( std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " << (*theFvec)[i] - theUBbound[i] - allow << std::endl );
 
          if (theUBbound[i] != theLBbound[i])
             shiftUBbound(i, (*theFvec)[i] + Real(mult));
@@ -50,7 +50,7 @@ void SPxSolver::shiftFvec()
       }
       else if ((*theFvec)[i] < theLBbound[i] - allow)
       {
-         MSG_DEBUG( spxout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] - (*theFvec)[i] - allow << std::endl );
+         MSG_DEBUG( std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] - (*theFvec)[i] - allow << std::endl );
 
          if (theUBbound[i] != theLBbound[i])
             shiftLBbound(i, (*theFvec)[i] - Real(mult));
@@ -64,7 +64,7 @@ void SPxSolver::shiftFvec()
 
 #ifndef NDEBUG
    testBounds();
-   MSG_DEBUG( spxout << "DSHIFT01 shiftFvec: OK" << std::endl; )
+   MSG_DEBUG( std::cout << "DSHIFT01 shiftFvec: OK" << std::endl; )
 #endif
 }
 
@@ -141,7 +141,7 @@ void SPxSolver::shiftPvec()
 
 #ifndef NDEBUG
    testBounds();
-   MSG_DEBUG( spxout << "DSHIFT02 shiftPvec: OK" << std::endl; )
+   MSG_DEBUG( std::cout << "DSHIFT02 shiftPvec: OK" << std::endl; )
 #endif
 }
 // -----------------------------------------------------------------
@@ -291,19 +291,19 @@ void SPxSolver::perturbMax(
 
 void SPxSolver::perturbMinEnter(void)
 {
-   MSG_DEBUG( spxout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
+   MSG_DEBUG( std::cout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
    perturbMin(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
+   MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
 
 void SPxSolver::perturbMaxEnter(void)
 {
-   MSG_DEBUG( spxout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
+   MSG_DEBUG( std::cout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
    perturbMax(fVec(), lbBound(), ubBound(), epsilon(), entertol());
-   MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
+   MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
 
@@ -444,33 +444,33 @@ Real SPxSolver::perturbMax(
 
 void SPxSolver::perturbMinLeave(void)
 {
-   MSG_DEBUG( spxout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
+   MSG_DEBUG( std::cout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
       desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
       desc().coStatus(), 0, 1);
-   MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
+   MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
 
 void SPxSolver::perturbMaxLeave(void)
 {
-   MSG_DEBUG( spxout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
+   MSG_DEBUG( std::cout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
       desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
       desc().coStatus(), 0, 1);
-   MSG_DEBUG( spxout << "\t->" << shift() << std::endl; )
+   MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
 
 void SPxSolver::unShift(void)
 {
-   MSG_INFO3( spxout << "DSHIFT07 = " << "unshifting ..." << std::endl; );
+   MSG_INFO3( (*spxout), (*spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
 
    if (isInitialized())
    {

@@ -75,7 +75,7 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR( spxout << "ESVECS01 ERROR: "
+                  MSG_ERROR( std::cerr << "ESVECS01 ERROR: "
                                     << "inconsistent basis must not happen!" 
                                     << std::endl; )
                   throw SPxInternalCodeException("XSVECS01 This should never happen.");
@@ -128,7 +128,7 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR( spxout << "ESVECS04 ERROR: "
+                  MSG_ERROR( std::cerr << "ESVECS04 ERROR: "
                      << "inconsistent basis must not happen!"
                      << std::endl; )
                      throw SPxInternalCodeException("XSVECS06 This should never happen.");
@@ -176,7 +176,7 @@ void SPxSolver::computeFrhsXtra()
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS02 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS02 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS02 This should never happen.");
@@ -233,7 +233,7 @@ void SPxSolver::computeFrhs1(
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS03 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS03 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS04 This should never happen.");
@@ -285,7 +285,7 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               MSG_WARNING( spxout << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
+               MSG_WARNING( (*spxout), (*spxout) << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
                                    << colfb[i] << " " << coufb[i]
                                    << " shouldn't be" << std::endl; )
             }
@@ -294,7 +294,7 @@ void SPxSolver::computeFrhs2(
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS05 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS05 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS05 This should never happen.");

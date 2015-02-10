@@ -2754,7 +2754,7 @@ void CLUFactorRational::factor(
    const Rational& threshold            ///< pivoting threshold
    )
 {
-   MSG_DEBUG( spxout << "CLUFactorRational::factor()\n" );
+   MSG_DEBUG( std::cout << "CLUFactorRational::factor()\n" );
 
    factorTime->start();
 
@@ -2822,9 +2822,6 @@ void CLUFactorRational::dump() const
    int i, j, k;
 
    // Dump regardless of the verbosity level if this method is called;
-   // store the old level and restore it at the end of the method.
-   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
-   spxout.setVerbosity( SPxOut::ERROR );
 
    /*  Dump U:
     */
@@ -2832,11 +2829,11 @@ void CLUFactorRational::dump() const
    for ( i = 0; i < thedim; ++i )
    {
       if ( row.perm[i] >= 0 )
-         spxout << "DCLUFA01 diag[" << i << "]: [" << col.orig[row.perm[i]]
+         std::cout << "DCLUFA01 diag[" << i << "]: [" << col.orig[row.perm[i]]
          << "] = " << diag[i] << std::endl;
 
       for ( j = 0; j < u.row.len[i]; ++j )
-         spxout << "DCLUFA02   u[" << i << "]: ["
+         std::cout << "DCLUFA02   u[" << i << "]: ["
          << u.row.idx[u.row.start[i] + j] << "] = "
          << u.row.val[u.row.start[i] + j] << std::endl;
    }
@@ -2848,18 +2845,16 @@ void CLUFactorRational::dump() const
       for ( j = 0; j < l.firstUnused; ++j )
          if ( col.orig[row.perm[l.row[j]]] == i )
          {
-            spxout << "DCLUFA03 l[" << i << "]" << std::endl;
+            std::cout << "DCLUFA03 l[" << i << "]" << std::endl;
 
             for ( k = l.start[j]; k < l.start[j + 1]; ++k )
-               spxout << "DCLUFA04   l[" << k - l.start[j]
+               std::cout << "DCLUFA04   l[" << k - l.start[j]
                << "]:  [" << l.idx[k]
                << "] = "  << l.val[k] << std::endl;
 
             break;
          }
    }
-
-   spxout.setVerbosity( tmp_verbosity );
 
    return;
 }
@@ -3309,7 +3304,7 @@ void CLUFactorRational::solveLright( Rational* vec )
          if( timeLimitReached() )
             return;
 
-         MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+         MSG_DEBUG( std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
 
          k = lbeg[i];
          idx = &( lidx[k] );
@@ -3317,7 +3312,7 @@ void CLUFactorRational::solveLright( Rational* vec )
 
          for ( j = lbeg[i + 1]; j > k; --j )
          {
-            MSG_DEBUG( spxout << "                         -> y" << *idx << " -= " << x << " * " << *val << " = " << x * ( *val ) << "    -> " << vec[*idx] - x * ( *val ) << std::endl; )
+            MSG_DEBUG( std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val << " = " << x * ( *val ) << "    -> " << vec[*idx] - x * ( *val ) << std::endl; )
             vec[*idx++] -= x * ( *val++ );
          }
       }
@@ -3325,7 +3320,7 @@ void CLUFactorRational::solveLright( Rational* vec )
 
    if ( l.updateType )                   /* Forest-Tomlin Updates */
    {
-      MSG_DEBUG( spxout << "performing FT updates..." << std::endl; )
+      MSG_DEBUG( std::cout << "performing FT updates..." << std::endl; )
 
       end = l.firstUnused;
 
@@ -3341,10 +3336,10 @@ void CLUFactorRational::solveLright( Rational* vec )
 
          vec[lrow[i]] -= x;
 
-         MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+         MSG_DEBUG( std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
       }
 
-      MSG_DEBUG( spxout << "finished FT updates." << std::endl; )
+      MSG_DEBUG( std::cout << "finished FT updates." << std::endl; )
    }
 }
 

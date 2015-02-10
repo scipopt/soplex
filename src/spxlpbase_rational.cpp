@@ -101,7 +101,7 @@ static bool LPFisFree(const char* s)
 /** If only a sign is encountered, the number is assumed to be \c sign * 1.  This routine will not catch malformatted
  *  numbers like .e10 !
  */
-static Rational LPFreadValue(char*& pos, const int lineno = -1)
+static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 {
    assert(LPFisValue(pos));
 
@@ -172,7 +172,7 @@ static Rational LPFreadValue(char*& pos, const int lineno = -1)
       if( has_dot || has_exponent || has_emptydivisor ||
          (*s == '.') ||(*s == '+') || (*s == '-') || (tolower(*s) == 'e') )
       {
-         MSG_WARNING( spxout << "WLPFRD03 Warning: In line " << lineno << ": malformed rational value in LP file\n";)
+         MSG_WARNING( (*spxout), (*spxout) << "WLPFRD03 Warning: In line " << lineno << ": malformed rational value in LP file\n";)
       }
    }
 
@@ -181,7 +181,7 @@ static Rational LPFreadValue(char*& pos, const int lineno = -1)
 
    if( has_emptyexponent )
    {
-      MSG_WARNING( spxout << "WLPFRD01 Warning: In line " << lineno << ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "WLPFRD01 Warning: In line " << lineno << ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n" );
    }
 
    if( !has_digits )
@@ -194,14 +194,14 @@ static Rational LPFreadValue(char*& pos, const int lineno = -1)
 
       if( !value.readString(tmp) )
       {
-         MSG_WARNING( spxout <<"WLPFRD04 Warning: In line " << lineno << ": malformed rational value in LP file\n" );
+         MSG_WARNING( (*spxout), (*spxout) <<"WLPFRD04 Warning: In line " << lineno << ": malformed rational value in LP file\n" );
       }
    }
    pos += s - pos;
 
    assert(pos == s);
 
-   MSG_DEBUG( spxout << "DLPFRD01 LPFreadValue = " << value << std::endl; )
+   MSG_DEBUG( std::cout << "DLPFRD01 LPFreadValue = " << value << std::endl; )
 
    if( LPFisSpace(*pos) )
       pos++;
@@ -216,7 +216,7 @@ static Rational LPFreadValue(char*& pos, const int lineno = -1)
  *  is added to \p colset. \p pos is advanced behind the name.
  *  @return The Index of the named column.
  */
-static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>& colset, const LPColBase<Rational>* emptycol)
+static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>& colset, const LPColBase<Rational>* emptycol, SPxOut* spxout)
 {
    assert(LPFisColName(pos));
    assert(colnames != 0);
@@ -239,7 +239,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>&
    {
       // We only add the name if we got an empty column.
       if( emptycol == 0 )
-         MSG_WARNING( spxout << "WLPFRD02 Unknown variable \"" << name << "\" "; )
+         MSG_WARNING( (*spxout), (*spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
       else
       {
          colidx = colnames->num();
@@ -248,7 +248,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>&
       }
    }
 
-   MSG_DEBUG( spxout << "DLPFRD03 LPFreadColName [" << name << "] = " << colidx << std::endl; )
+   MSG_DEBUG( std::cout << "DLPFRD03 LPFreadColName [" << name << "] = " << colidx << std::endl; )
 
    if( LPFisSpace(*pos) )
       pos++;
@@ -270,7 +270,7 @@ static int LPFreadSense(char*& pos)
    else if( *pos == '=' )
       pos++;
 
-   MSG_DEBUG( spxout << "DLPFRD04 LPFreadSense = " << static_cast<char>(sense) << std::endl; )
+   MSG_DEBUG( std::cout << "DLPFRD04 LPFreadSense = " << static_cast<char>(sense) << std::endl; )
 
    if( LPFisSpace(*pos) )
       pos++;
@@ -319,7 +319,7 @@ static bool LPFhasKeyword(char*& pos, const char* keyword)
    {
       pos += k;
 
-      MSG_DEBUG( spxout << "DLPFRD05 LPFhasKeyword: " << keyword << std::endl; )
+      MSG_DEBUG( std::cout << "DLPFRD05 LPFhasKeyword: " << keyword << std::endl; )
 
       return true;
    }
@@ -499,12 +499,12 @@ bool SPxLPBase<Rational>::readLPF(
       {
          if( strlen(buf) == LPF_MAX_LINE_LEN - 1 )
          {
-            MSG_ERROR( spxout << "ELPFRD06 Line exceeds " << LPF_MAX_LINE_LEN - 2
+            MSG_ERROR( std::cerr << "ELPFRD06 Line exceeds " << LPF_MAX_LINE_LEN - 2
                             << " characters" << std::endl; )
          }
          else
          {
-            MSG_ERROR( spxout << "ELPFRD07 No 'End' marker found" << std::endl; )
+            MSG_ERROR( std::cerr << "ELPFRD07 No 'End' marker found" << std::endl; )
             finished = true;
          }
          break;
@@ -513,7 +513,7 @@ bool SPxLPBase<Rational>::readLPF(
       i   = 0;
       pos = buf;
 
-      MSG_DEBUG( spxout << "DLPFRD08 Reading line " << lineno
+      MSG_DEBUG( std::cout << "DLPFRD08 Reading line " << lineno
                         << " (pos=" << pos << ")" << std::endl; )
 
       // 1. Remove comments.
@@ -634,7 +634,7 @@ bool SPxLPBase<Rational>::readLPF(
       //-----------------------------------------------------------------------
       pos = line;
 
-      MSG_DEBUG( spxout << "DLPFRD09 pos=" << pos << std::endl; )
+      MSG_DEBUG( std::cout << "DLPFRD09 pos=" << pos << std::endl; )
 
       // 7. We have something left to process.
       while( (pos != 0) && (*pos != '\0') )
@@ -662,7 +662,7 @@ bool SPxLPBase<Rational>::readLPF(
                      pre_sign = val;
                }
                have_value = true;
-               val = LPFreadValue(pos, lineno);
+               val = LPFreadValue(pos, spxout, lineno);
                val *= pre_sign;
             }
             if( *pos == '\0' )
@@ -672,7 +672,7 @@ bool SPxLPBase<Rational>::readLPF(
                goto syntax_error;
 
             have_value = false;
-            colidx = LPFreadColName(pos, cnames, cset, &emptycol);
+            colidx = LPFreadColName(pos, cnames, cset, &emptycol, spxout);
             vec.add(colidx, val);
             break;
          case CONSTRAINTS:
@@ -693,7 +693,7 @@ bool SPxLPBase<Rational>::readLPF(
                }
 
                have_value = true;
-               val = LPFreadValue(pos, lineno);
+               val = LPFreadValue(pos, spxout, lineno);
                val *= pre_sign;
 
                if( sense != 0 )
@@ -742,7 +742,7 @@ bool SPxLPBase<Rational>::readLPF(
             {
                if( LPFisColName(pos) )
                {
-                  colidx = LPFreadColName(pos, cnames, cset, &emptycol);
+                  colidx = LPFreadColName(pos, cnames, cset, &emptycol, spxout);
 
                   if( val != 0 )
                   {
@@ -766,7 +766,7 @@ bool SPxLPBase<Rational>::readLPF(
 
                         assert(cnames->has(colidx));
 
-                        MSG_WARNING( spxout << "WLPFRD10 Duplicate index "
+                        MSG_WARNING( (*spxout), (*spxout) << "WLPFRD10 Duplicate index "
                                             << (*cnames)[colidx]
                                             << " in line " << lineno
                                             << std::endl; )
@@ -798,7 +798,7 @@ bool SPxLPBase<Rational>::readLPF(
 
             if( LPFisValue(pos) )
             {
-               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, lineno);
+               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, spxout, lineno);
 
                if( !LPFisSense(pos) )
                   goto syntax_error;
@@ -810,9 +810,9 @@ bool SPxLPBase<Rational>::readLPF(
             if( !LPFisColName(pos) )
                goto syntax_error;
 
-            if( (colidx = LPFreadColName(pos, cnames, cset, 0)) < 0 )
+            if( (colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0 )
             {
-               MSG_WARNING( spxout << "WLPFRD11 in Bounds section line "
+               MSG_WARNING( (*spxout), (*spxout) << "WLPFRD11 in Bounds section line "
                                    << lineno << " ignored" << std::endl; )
                *pos = '\0';
                continue;
@@ -847,7 +847,7 @@ bool SPxLPBase<Rational>::readLPF(
                if( !LPFisValue(pos) )
                   goto syntax_error;
 
-               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, lineno);
+               val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos,  spxout, lineno);
 
                if( sense == '<' )
                   cset.upper_w(colidx) = val;
@@ -869,9 +869,9 @@ bool SPxLPBase<Rational>::readLPF(
             break;
          case BINARIES:
          case INTEGERS:
-            if( (colidx = LPFreadColName(pos, cnames, cset, 0)) < 0 )
+            if( (colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0 )
             {
-               MSG_WARNING( spxout << "WLPFRD12 in Binary/General section line " << lineno << " ignored" << std::endl; )
+               MSG_WARNING( (*spxout), (*spxout) << "WLPFRD12 in Binary/General section line " << lineno << " ignored" << std::endl; )
             }
             else
             {
@@ -892,7 +892,7 @@ bool SPxLPBase<Rational>::readLPF(
             }
             break;
          case START:
-            MSG_ERROR( spxout << "ELPFRD13 This seems to be no LP format file" << std::endl; )
+            MSG_ERROR( std::cerr << "ELPFRD13 This seems to be no LP format file" << std::endl; )
             goto syntax_error;
          default:
             throw SPxInternalCodeException("XLPFRD01 This should never happen.");
@@ -914,17 +914,17 @@ bool SPxLPBase<Rational>::readLPF(
 syntax_error:
    if( finished )
    {
-      MSG_INFO2( spxout << "Finished reading " << lineno << " lines" << std::endl; )
+      MSG_INFO2( (*spxout), (*spxout) << "Finished reading " << lineno << " lines" << std::endl; )
    }
    else
-      MSG_ERROR( spxout << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
+      MSG_ERROR( std::cerr << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
 
    if( p_cnames == 0 )
       spx_free(cnames);
    if( p_rnames == 0 )
       spx_free(rnames);
 
-   MSG_DEBUG( spxout << "DLPFRD16\n" << *this; )
+   MSG_DEBUG( std::cout << "DLPFRD16\n" << *this; )
 
    return finished;
 }
@@ -936,7 +936,7 @@ syntax_error:
 // ---------------------------------------------------------------------------------------------------------------------
 
 /// Process NAME section.
-static void MPSreadName(MPSInput& mps)
+static void MPSreadName(MPSInput& mps, SPxOut* spxout)
 {
    do
    {
@@ -947,7 +947,7 @@ static void MPSreadName(MPSInput& mps)
       // Sometimes the name is omitted.
       mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
-      MSG_INFO2( spxout << "IMPSRD01 Problem name   : " << mps.probName() << std::endl; )
+      MSG_INFO2( (*spxout), (*spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl; )
 
       // This has to be a new section
       if( !mps.readLine() || (mps.field0() == 0) )
@@ -1037,7 +1037,7 @@ static void MPSreadObjname(MPSInput& mps)
 
 
 /// Process ROWS section.
-static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rnames)
+static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rnames, SPxOut* spxout)
 {
    LPRowBase<Rational> row;
 
@@ -1045,7 +1045,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rn
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( spxout << "IMPSRD02 Objective name : " << mps.objName() << std::endl; )
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD02 Objective name : " << mps.objName() << std::endl; )
 
          if( strcmp(mps.field0(), "COLUMNS") )
             break;
@@ -1098,7 +1098,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rn
 
 
 /// Process COLUMNS section.
-static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const NameSet&  rnames, LPColSetBase<Rational>& cset, NameSet& cnames, DIdxSet* intvars)
+static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const NameSet&  rnames, LPColSetBase<Rational>& cset, NameSet& cnames, DIdxSet* intvars, SPxOut* spxout)
 {
    Rational val;
    int idx;
@@ -1163,7 +1163,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
       if( !val.readString(mps.field3()) )
       {
-         MSG_WARNING( spxout <<"WMPSRD01 Warning: malformed rational value in MPS file\n" );
+         MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD01 Warning: malformed rational value in MPS file\n" );
       }
 
 
@@ -1183,7 +1183,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
          if( !val.readString(mps.field5()) )
          {
-            MSG_WARNING( spxout <<"WMPSRD02 Warning: malformed rational value in MPS file\n" );
+            MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD02 Warning: malformed rational value in MPS file\n" );
          }
 
          if( !strcmp(mps.field4(), mps.objName()) )
@@ -1204,7 +1204,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
 
 /// Process RHS section.
-static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSet& rnames)
+static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSet& rnames, SPxOut* spxout)
 {
    char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
    char addname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1215,7 +1215,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( spxout << "IMPSRD03 RHS name       : " << rhsname  << std::endl; );
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl; );
 
          if( !strcmp(mps.field0(), "RANGES") )
             mps.setSection(MPSInput::RANGES);
@@ -1244,7 +1244,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          {
             assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
             strcpy(addname, mps.field1());
-            MSG_INFO3( spxout << "IMPSRD07 RHS ignored    : " << addname << std::endl );
+            MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
          }
       }
       else
@@ -1255,7 +1255,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          {
             if( !val.readString(mps.field3()) )
             {
-               MSG_WARNING( spxout <<"WMPSRD03 Warning: malformed rational value in MPS file\n" );
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD03 Warning: malformed rational value in MPS file\n" );
             }
 
             // LE or EQ
@@ -1274,7 +1274,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             {
                if( !val.readString(mps.field5()) )
                {
-                  MSG_WARNING( spxout <<"WMPSRD04 Warning: malformed rational value in MPS file\n" );
+                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD04 Warning: malformed rational value in MPS file\n" );
                }
 
                // LE or EQ
@@ -1294,7 +1294,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
 
 
 /// Process RANGES section.
-static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const NameSet& rnames)
+static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const NameSet& rnames, SPxOut* spxout)
 {
    char rngname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int idx;
@@ -1304,7 +1304,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( spxout << "IMPSRD04 Range name     : " << rngname << std::endl; );
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl; );
 
          if( !strcmp(mps.field0(), "BOUNDS") )
             mps.setSection(MPSInput::BOUNDS);
@@ -1345,7 +1345,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
          {
             if( !val.readString(mps.field3()) )
             {
-               MSG_WARNING( spxout <<"WMPSRD05 Warning: malformed rational value in MPS file\n" );
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD05 Warning: malformed rational value in MPS file\n" );
             }
 
             // EQ
@@ -1383,7 +1383,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             {
                if( !val.readString(mps.field5()) )
                {
-                  MSG_WARNING( spxout <<"WMPSRD06 Warning: malformed rational value in MPS file\n" );
+                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD06 Warning: malformed rational value in MPS file\n" );
                }
 
                // EQ
@@ -1422,7 +1422,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
 
 
 /// Process BOUNDS section.
-static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const NameSet& cnames, DIdxSet* intvars)
+static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const NameSet& cnames, DIdxSet* intvars, SPxOut* spxout)
 {
    DIdxSet oldbinvars;
    char bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1433,7 +1433,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( spxout << "IMPSRD05 Bound name     : " << bndname << std::endl; )
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD05 Bound name     : " << bndname << std::endl; )
 
          if( strcmp(mps.field0(), "ENDATA") )
             break;
@@ -1481,7 +1481,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
             {
                if( !val.readString(mps.field4()) )
                {
-                  MSG_WARNING( spxout <<"WMPSRD07 Warning: malformed rational value in MPS file\n" );
+                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file\n" );
                }
             }
 
@@ -1613,7 +1613,7 @@ bool SPxLPBase<Rational>::readMPS(
 
    MPSInput mps(p_input);
 
-   MPSreadName(mps);
+   MPSreadName(mps, spxout);
 
    if( mps.section() == MPSInput::OBJSEN )
       MPSreadObjsen(mps);
@@ -1622,21 +1622,21 @@ bool SPxLPBase<Rational>::readMPS(
       MPSreadObjname(mps);
 
    if( mps.section() == MPSInput::ROWS )
-      MPSreadRows(mps, rset, *rnames);
+      MPSreadRows(mps, rset, *rnames, spxout);
 
    addedRows(rset.num());
 
    if( mps.section() == MPSInput::COLUMNS )
-      MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars);
+      MPSreadCols(mps, rset, *rnames, cset, *cnames, p_intvars, spxout);
 
    if( mps.section() == MPSInput::RHS )
-      MPSreadRhs(mps, rset, *rnames);
+      MPSreadRhs(mps, rset, *rnames, spxout);
 
    if( mps.section() == MPSInput::RANGES )
-      MPSreadRanges(mps, rset, *rnames);
+      MPSreadRanges(mps, rset, *rnames, spxout);
 
    if( mps.section() == MPSInput::BOUNDS )
-      MPSreadBounds(mps, cset, *cnames, p_intvars);
+      MPSreadBounds(mps, cset, *cnames, p_intvars, spxout);
 
    if( mps.section() != MPSInput::ENDATA )
       mps.syntaxError();
@@ -1647,7 +1647,7 @@ bool SPxLPBase<Rational>::readMPS(
    {
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Rational>::MINIMIZE : SPxLPBase<Rational>::MAXIMIZE);
 
-      MSG_INFO2( spxout << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
+      MSG_INFO2( (*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
 
       added2Set(
          *(reinterpret_cast<SVSetBase<Rational>*>(static_cast<LPRowSetBase<Rational>*>(this))),
@@ -1740,7 +1740,8 @@ static void LPFwriteSVector(
    const SPxLPBase<Rational>&   p_lp,       ///< the LP
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
-   const SVectorBase<Rational>& p_svec )    ///< vector to write
+   const SVectorBase<Rational>& p_svec,     ///< vector to write
+   SPxOut* spxout )
 {
 
    char name[16];
@@ -1768,7 +1769,7 @@ static void LPFwriteSVector(
             p_output << "\n\t";
             if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
             {
-               MSG_WARNING( spxout << "XLPSWR01 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+               MSG_WARNING( (*spxout), (*spxout) << "XLPSWR01 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
             }
             pos = p_output.tellp();
          }
@@ -1791,7 +1792,8 @@ static void LPFwriteSVector(
 static void LPFwriteObjective(
    const SPxLPBase<Rational>& p_lp,       ///< the LP
    std::ostream&          p_output,   ///< output stream
-   const NameSet*         p_cnames    ///< column names
+   const NameSet*         p_cnames,   ///< column names
+   SPxOut* spxout
    )
 {
 
@@ -1804,7 +1806,7 @@ static void LPFwriteObjective(
    DSVectorBase<Rational> svec(obj.dim());
    svec.operator=(obj);
    svec *= Rational(sense);
-   LPFwriteSVector(p_lp, p_output, p_cnames, svec);
+   LPFwriteSVector(p_lp, p_output, p_cnames, svec, spxout);
    p_output << "\n";
 }
 
@@ -1817,14 +1819,15 @@ static void LPFwriteRow(
    const NameSet*           p_cnames,   ///< column names
    const SVectorBase<Rational>& p_svec,     ///< vector of the row
    const Rational&              p_lhs,      ///< lhs of the row
-   const Rational&              p_rhs       ///< rhs of the row
+   const Rational&              p_rhs,      ///< rhs of the row
+   SPxOut* spxout
    )
 {
 
    long long pos;
    pos = p_output.tellp();
 
-   LPFwriteSVector(p_lp, p_output, p_cnames, p_svec);
+   LPFwriteSVector(p_lp, p_output, p_cnames, p_svec, spxout);
 
    long long sidelen;
    sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(-infinity)) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
@@ -1835,7 +1838,7 @@ static void LPFwriteRow(
       p_output << "\n\t";
       if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
       {
-         MSG_WARNING( spxout << "XLPSWR02 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+         MSG_WARNING( (*spxout), (*spxout) << "XLPSWR02 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
       }
       pos = p_output.tellp();
    }
@@ -1855,7 +1858,7 @@ static void LPFwriteRow(
 
    if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
    {
-      MSG_WARNING( spxout << "XLPSWR03 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "XLPSWR03 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
    }
 }
 
@@ -1866,7 +1869,8 @@ static void LPFwriteRows(
    const SPxLPBase<Rational>& p_lp,       ///< the LP
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_rnames,   ///< row names
-   const NameSet*         p_cnames   ///< column names
+   const NameSet*         p_cnames,   ///< column names
+   SPxOut* spxout
    )
 {
 
@@ -1884,15 +1888,15 @@ static void LPFwriteRows(
       {
          // ranged row -> write two non-ranged rows
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << "_1 : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, infinity);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, infinity, spxout);
 
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << "_2 : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -infinity, rhs);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -infinity, rhs, spxout);
       }
       else
       {
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << " : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, rhs);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, rhs, spxout);
       }
    }
 }
@@ -1904,7 +1908,8 @@ static void LPFwriteRows(
 static void LPFwriteBounds(
    const SPxLPBase<Rational>&   p_lp,       ///< the LP to write
    std::ostream&            p_output,   ///< output stream
-   const NameSet*           p_cnames    ///< column names
+   const NameSet*           p_cnames,   ///< column names
+   SPxOut* spxout
    )
 {
 
@@ -1953,7 +1958,7 @@ static void LPFwriteBounds(
       // check if max line length exceeded
       if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
       {
-         MSG_WARNING( spxout << "XLPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing LP file\n" );
+         MSG_WARNING( (*spxout), (*spxout) << "XLPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing LP file\n" );
       }
       pos = p_output.tellp();
    }
@@ -1994,9 +1999,9 @@ void SPxLPBase<Rational>::writeLPF(
    ) const
 {
 
-   LPFwriteObjective(*this, p_output, p_cnames);
-   LPFwriteRows(*this, p_output, p_rnames, p_cnames);
-   LPFwriteBounds(*this, p_output, p_cnames);
+   LPFwriteObjective(*this, p_output, p_cnames, spxout);
+   LPFwriteRows(*this, p_output, p_rnames, p_cnames, spxout);
+   LPFwriteBounds(*this, p_output, p_cnames, spxout);
    LPFwriteGenerals(*this, p_output, p_cnames, p_intvars);
 
    p_output << "End" << std::endl;
@@ -2013,6 +2018,7 @@ static void MPSwriteRecord(
    std::ostream&  os,
    const char*    indicator,
    const char*    name,
+   SPxOut* spxout,
    const char*    name1  = 0,
    const Rational value1 = 0,
    const char*    name2  = 0,
@@ -2040,7 +2046,7 @@ static void MPSwriteRecord(
    // Warning if line is too long
    if( (long long)(os.tellp()) - pos > MAX_LINE_WRITE_LEN )
    {
-      MSG_WARNING( spxout << "XMPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing MPS file\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "XMPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing MPS file\n" );
    }
 }
 
@@ -2130,10 +2136,10 @@ void SPxLPBase<Rational>::writeMPS(
       else
          throw SPxInternalCodeException("XMPSWR02 This should never happen.");
 
-      MPSwriteRecord(p_output, indicator, MPSgetRowName(*this, i, p_rnames, name));
+      MPSwriteRecord(p_output, indicator, MPSgetRowName(*this, i, p_rnames, name), spxout);
    }
 
-   MPSwriteRecord(p_output, "N", "MINIMIZE");
+   MPSwriteRecord(p_output, "N", "MINIMIZE", spxout);
 
    // --- COLUMNS Section ---
    p_output << "COLUMNS" << std::endl;
@@ -2160,16 +2166,16 @@ void SPxLPBase<Rational>::writeMPS(
          assert(colsize2 % 2 == 0);
 
          for( k = 0; k < colsize2; k += 2 )
-            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name),
+            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), spxout,
                MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k),
                MPSgetRowName(*this, col.index(k + 1), p_rnames, name2), col.value(k + 1));
 
          if( colsize2 != col.size() )
-            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name),
+            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), spxout,
                MPSgetRowName(*this, col.index(k), p_rnames, name1), col.value(k));
 
          if( maxObj(i) != 0 )
-            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), "MINIMIZE", -maxObj(i));
+            MPSwriteRecord(p_output, 0, getColName(*this, i, p_cnames, name), spxout, "MINIMIZE", -maxObj(i));
       }
 
       if( is_intrun )
@@ -2199,11 +2205,11 @@ void SPxLPBase<Rational>::writeMPS(
 
          if( k < nRows() )
          {
-            MPSwriteRecord(p_output, 0, "RHS", MPSgetRowName(*this, i, p_rnames, name1), rhsval1,
+            MPSwriteRecord(p_output, 0, "RHS", spxout, MPSgetRowName(*this, i, p_rnames, name1), rhsval1,
                MPSgetRowName(*this, k, p_rnames, name2), rhsval2);
          }
          else
-            MPSwriteRecord(p_output, 0, "RHS", MPSgetRowName(*this, i, p_rnames, name1), rhsval1);
+            MPSwriteRecord(p_output, 0, "RHS", spxout, MPSgetRowName(*this, i, p_rnames, name1), rhsval1);
 
          i = k + 1;
       }
@@ -2220,7 +2226,7 @@ void SPxLPBase<Rational>::writeMPS(
          {
             Rational range = rhs(i);
             range -= lhs(i);
-            MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), range);
+            MPSwriteRecord(p_output, "", "RANGE", spxout, MPSgetRowName(*this, i, p_rnames, name1), range);
          }
       }
    }
@@ -2238,35 +2244,35 @@ void SPxLPBase<Rational>::writeMPS(
 
       if( lower(i) == upper(i) )
       {
-         MPSwriteRecord(p_output, "FX", "BOUND", getColName(*this, i, p_cnames, name1), lower(i));
+         MPSwriteRecord(p_output, "FX", "BOUND", spxout, getColName(*this, i, p_cnames, name1), lower(i));
          continue;
       }
 
       if( (double(lower(i)) <= double(-infinity)) && (double(upper(i)) >= double(infinity)) )
       {
-         MPSwriteRecord(p_output, "FR", "BOUND", getColName(*this, i, p_cnames, name1));
+         MPSwriteRecord(p_output, "FR", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
          continue;
       }
 
       if( lower(i) != 0 )
       {
          if( double(lower(i)) > -double(infinity) )
-            MPSwriteRecord(p_output, "LO", "BOUND", getColName(*this, i, p_cnames, name1), lower(i));
+            MPSwriteRecord(p_output, "LO", "BOUND", spxout, getColName(*this, i, p_cnames, name1), lower(i));
          else
-            MPSwriteRecord(p_output, "MI", "BOUND", getColName(*this, i, p_cnames, name1));
+            MPSwriteRecord(p_output, "MI", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
       }
 
       if( has_intvars && (p_intvars->number(i) >= 0) )
       {
          // Integer variables have default upper bound 1, but we should write
          // it nevertheless since CPLEX seems to assume infinity otherwise.
-         MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
+         MPSwriteRecord(p_output, "UP", "BOUND", spxout, getColName(*this, i, p_cnames, name1), upper(i));
       }
       else
       {
          // Continous variables have default upper bound infinity
          if( double(upper(i)) < double(infinity) )
-            MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
+            MPSwriteRecord(p_output, "UP", "BOUND", spxout, getColName(*this, i, p_cnames, name1), upper(i));
       }
    }
 
@@ -2276,7 +2282,7 @@ void SPxLPBase<Rational>::writeMPS(
    // Output warning when writing a maximisation problem
    if( spxSense() == SPxLPBase<Rational>::MAXIMIZE )
    {
-      MSG_WARNING( spxout << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
    }
 }
 

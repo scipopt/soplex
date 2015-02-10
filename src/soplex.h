@@ -105,6 +105,10 @@ public:
    //@}
 
 
+   /// message handler
+//   SPxOut spxout;
+
+
    //**@name Access to the real LP */
    //@{
 
@@ -1194,6 +1198,8 @@ public:
 
    /// class of parameter settings
    class Settings;
+
+   mutable SPxOut spxout;
 
    /// returns boolean parameter value
    bool boolParam(const BoolParam param) const;

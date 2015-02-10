@@ -39,9 +39,23 @@ namespace soplex
       spx_free(m_streams);
    }
 
-   //---------------------------------------------------
+   SPxOut& SPxOut::operator =(const SPxOut& base)
+   {
+      m_verbosity = base.m_verbosity;
+      m_streams = base.m_streams;
 
-   // define global instance
-   SPxOut spxout;
+      return *this;
+   }
+
+   SPxOut::SPxOut(const SPxOut& rhs)
+   {
+      m_verbosity = rhs.m_verbosity;
+      m_streams = 0;
+      spx_alloc(m_streams, INFO3+1);
+      m_streams = new (m_streams) std::ostream*[INFO3+1];
+      m_streams[ ERROR ] = m_streams[ WARNING ] = rhs.m_streams[ERROR];
+      for ( int i = DEBUG; i <= INFO3; ++i )
+         m_streams[ i ] = rhs.m_streams[ i ];
+   }
 
 } // namespace soplex

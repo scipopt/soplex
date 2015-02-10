@@ -38,7 +38,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       Real x, y;
       int i;
 
-      MSG_DEBUG( spxout << "DVECST01 colWeight[]: "; )
+      MSG_DEBUG( std::cout << "DVECST01 colWeight[]: "; )
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -53,11 +53,11 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             colWeight[i] = -y + bias * obj[i];
             colUp[i] = 1;
          }
-         MSG_DEBUG( spxout << colWeight[i] << " "; )
+         MSG_DEBUG( std::cout << colWeight[i] << " "; )
       }
-      MSG_DEBUG( spxout << std::endl << std::endl; )
+      MSG_DEBUG( std::cout << std::endl << std::endl; )
 
-      MSG_DEBUG( spxout << "DVECST02 rowWeight[]: "; )
+      MSG_DEBUG( std::cout << "DVECST02 rowWeight[]: "; )
       for (i = base.nRows(); i--;)
       {
          const SVector& row = base.rowVector(i);
@@ -74,9 +74,9 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
             rowRight[i] = 1;
          }
-         MSG_DEBUG( spxout << rowWeight[i] << " "; )
+         MSG_DEBUG( std::cout << rowWeight[i] << " "; )
       }
-      MSG_DEBUG( spxout << std::endl; )
+      MSG_DEBUG( std::cout << std::endl; )
    }
 
    else if (state == DVEC)

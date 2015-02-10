@@ -726,7 +726,7 @@ static void changeLowerStatus(
    const SPxBasis&         basis,
    int                     i)
 {
-   MSG_DEBUG( spxout << "DCHANG01 changeLowerStatus(): col " << i
+   MSG_DEBUG( std::cout << "DCHANG01 changeLowerStatus(): col " << i
                      << "[" << newLower << ":" << upper << "] " << stat; )
 
    switch (stat)
@@ -759,7 +759,7 @@ static void changeLowerStatus(
    default:
       throw SPxInternalCodeException("XCHANG01 This should never happen.");
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; )
+   MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
 }
 
 void SPxSolver::changeLower(const Vector& newLower)
@@ -800,7 +800,7 @@ static void changeUpperStatus(
    const SPxBasis&         basis,
    int                     i)
 {
-   MSG_DEBUG( spxout << "DCHANG02 changeUpperStatus(): col " << i
+   MSG_DEBUG( std::cout << "DCHANG02 changeUpperStatus(): col " << i
                      << "[" << lower << ":" << newUpper << "] " << stat; )
 
    switch (stat)
@@ -833,7 +833,7 @@ static void changeUpperStatus(
    default:
       throw SPxInternalCodeException("XCHANG02 This should never happen.");
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; );
+   MSG_DEBUG( std::cout << " -> " << stat << std::endl; );
 }
 
 void SPxSolver::changeUpper(const Vector& newUpper)
@@ -888,7 +888,7 @@ static void changeLhsStatus(
    const SPxBasis& basis,
    int i)
 {
-   MSG_DEBUG( spxout << "DCHANG03 changeLhsStatus()  : row " << i
+   MSG_DEBUG( std::cout << "DCHANG03 changeLhsStatus()  : row " << i
                      << ": " << stat; )
    switch (stat)
    {
@@ -920,7 +920,7 @@ static void changeLhsStatus(
    default:
       throw SPxInternalCodeException("XCHANG03 This should never happen.");
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; )
+   MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
 }
 
 void SPxSolver::changeLhs(const Vector& newLhs)
@@ -956,7 +956,7 @@ static void changeRhsStatus(
    const SPxBasis& basis,
    int i)
 {
-   MSG_DEBUG( spxout << "DCHANG04 changeRhsStatus()  : row " << i
+   MSG_DEBUG( std::cout << "DCHANG04 changeRhsStatus()  : row " << i
                      << ": " << stat; )
    switch (stat)
    {
@@ -988,7 +988,7 @@ static void changeRhsStatus(
    default:
       throw SPxInternalCodeException("XCHANG04 This should never happen.");
    }
-   MSG_DEBUG( spxout << " -> " << stat << std::endl; )
+   MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
 }
 
 

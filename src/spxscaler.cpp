@@ -51,10 +51,12 @@ std::ostream& operator<<(std::ostream& s, const SPxScaler& sc)
 SPxScaler::SPxScaler(
    const char* name, 
    bool        colFirst, 
-   bool        doBoth) 
+   bool        doBoth,
+   SPxOut*     outstream)
    : m_name(name)
    , m_colFirst(colFirst)
    , m_doBoth(doBoth)
+   , spxout(outstream)
 {
    assert(SPxScaler::isConsistent());
 }
@@ -65,6 +67,7 @@ SPxScaler::SPxScaler(const SPxScaler& old)
    , m_rowscale(old.m_rowscale)
    , m_colFirst(old.m_colFirst)
    , m_doBoth(old.m_doBoth)
+   , spxout(old.spxout)
 {
    assert(SPxScaler::isConsistent());
 }
@@ -83,6 +86,7 @@ SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
       m_rowscale = rhs.m_rowscale;
       m_colFirst = rhs.m_colFirst;
       m_doBoth   = rhs.m_doBoth;
+      spxout     = rhs.spxout;
 
       assert(SPxScaler::isConsistent());
    }
