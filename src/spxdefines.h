@@ -290,6 +290,17 @@ inline Real spxSqrt(Real a)
    return sqrt(a);
 }
 
+/// returns x * 2^exp
+inline Real spxLdexp(Real x, int exp)
+{
+   return ldexp(x,exp);
+}
+
+// returns x and exp such that y = x * 2^exp
+inline Real spxFrexp(Real y, int* exp)
+{
+   return frexp(y, exp);
+}
 
 /// returns max(|a|,|b|)
 inline Real maxAbs(Real a, Real b)
