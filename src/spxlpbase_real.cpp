@@ -1314,10 +1314,10 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSe
             {
                // GE
                if( rset.lhs(idx) > -infinity )
-                  rset.rhs_w(idx)  = rset.lhs(idx) + fabs(val);
+                  rset.rhs_w(idx)  = rset.lhs(idx) + spxAbs(val);
                // LE
                else
-                  rset.lhs_w(idx)  = rset.rhs(idx) - fabs(val);
+                  rset.lhs_w(idx)  = rset.rhs(idx) - spxAbs(val);
             }
          }
 
@@ -1343,10 +1343,10 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSe
                {
                   // GE
                   if( rset.lhs(idx) > -infinity )
-                     rset.rhs_w(idx)  = rset.lhs(idx) + fabs(val);
+                     rset.rhs_w(idx)  = rset.lhs(idx) + spxAbs(val);
                   // LE
                   else
-                     rset.lhs_w(idx)  = rset.rhs(idx) - fabs(val);
+                     rset.lhs_w(idx)  = rset.rhs(idx) - spxAbs(val);
                }
             }
          }

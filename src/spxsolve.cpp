@@ -420,7 +420,7 @@ SPxSolver::Status SPxSolver::solve()
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
             if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
             {
-               if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
+               if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
                   if( stallNumRecovers < MAXSTALLRECOVERS )
                   {
@@ -693,7 +693,7 @@ SPxSolver::Status SPxSolver::solve()
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
             if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
             {
-               if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
+               if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
                   if( stallNumRecovers < MAXSTALLRECOVERS )
                   {

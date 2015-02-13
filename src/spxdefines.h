@@ -279,7 +279,7 @@ public:
 };
 
 /// returns |a|
-inline Real abs(Real a)
+inline Real spxAbs(Real a)
 {
    return fabs(a);
 }
@@ -287,8 +287,8 @@ inline Real abs(Real a)
 /// returns max(|a|,|b|)
 inline Real maxAbs(Real a, Real b)
 {
-   const Real absa = fabs(a);
-   const Real absb = fabs(b);
+   const Real absa = spxAbs(a);
+   const Real absb = spxAbs(b);
 
    return absa > absb ? absa : absb;
 }
@@ -302,13 +302,13 @@ inline Real relDiff(Real a, Real b)
 /// returns \c true iff |a-b| <= eps
 inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(a - b) <= eps;
+   return spxAbs(a - b) <= eps;
 }
 
 /// returns \c true iff |a-b| > eps
 inline bool NE(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(a - b) > eps;
+   return spxAbs(a - b) > eps;
 }
 
 /// returns \c true iff a < b + eps
@@ -338,25 +338,25 @@ inline bool GE(Real a, Real b, Real eps = Param::epsilon())
 /// returns \c true iff |a| <= eps
 inline bool isZero(Real a, Real eps = Param::epsilon())
 {
-   return fabs(a) <= eps;
+   return spxAbs(a) <= eps;
 }
 
 /// returns \c true iff |a| > eps
 inline bool isNotZero(Real a, Real eps = Param::epsilon())
 {
-   return fabs(a) > eps;
+   return spxAbs(a) > eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| <= eps
 inline bool EQrel(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(relDiff(a, b)) <= eps;
+   return spxAbs(relDiff(a, b)) <= eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| > eps
 inline bool NErel(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(relDiff(a, b)) > eps;
+   return spxAbs(relDiff(a, b)) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= -eps

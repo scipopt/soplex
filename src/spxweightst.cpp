@@ -426,18 +426,18 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
    for (i = 0; i < bse.nCols(); i++)
    {
       if ((up[i] < infinity) && (fabs(up[i]) > maxabs))
-         maxabs = fabs(up[i]);
+         maxabs = spxAbs(up[i]);
       
       if ((low[i] > -infinity) && (fabs(low[i]) > maxabs))
-         maxabs = fabs(low[i]);
+         maxabs = spxAbs(low[i]);
    }
    for (i = 0; i < bse.nRows(); i++)
    {
       if ((rhs[i] < infinity) && (fabs(rhs[i]) > maxabs))
-         maxabs = fabs(rhs[i]);
+         maxabs = spxAbs(rhs[i]);
       
       if ((lhs[i] > -infinity) && (fabs(lhs[i]) > maxabs))
-         maxabs = fabs(lhs[i]);
+         maxabs = spxAbs(lhs[i]);
    }
 
    /**@todo The comments are wrong. The first is for dual simplex and
@@ -473,13 +473,13 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
          if (up[i] < infinity)
          {
             if (fabs(low[i] - up[i]) < base.epsilon())
-               colWeight[i] = c_fixed + n + fabs(x);
+               colWeight[i] = c_fixed + n + spxAbs(x);
             else if (low[i] > -infinity)
             {
                colWeight[i] = c_dbl_bounded + l - u + n;
 
-               l = fabs(l);
-               u = fabs(u);
+               l = spxAbs(l);
+               u = spxAbs(u);
 
                if (u < l)
                {
@@ -507,7 +507,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
             }
             else
             {
-               colWeight[i] = c_free + n - fabs(x);
+               colWeight[i] = c_free + n - spxAbs(x);
             }
          }
       }
@@ -526,7 +526,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
                Real l = bx * lhs[i];
 
                rowWeight[i] = r_dbl_bounded + l - u;
-               rowRight[i]  = fabs(u) < fabs(l);
+               rowRight[i]  = spxAbs(u) < spxAbs(l);
             }
             else
             {
@@ -574,7 +574,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
          if (up[i] < infinity)
          {
             if (fabs(low[i] - up[i]) < base.epsilon())
-               colWeight[i] = c_fixed + n + fabs(x);
+               colWeight[i] = c_fixed + n + spxAbs(x);
             else if (low[i] > -infinity)
             {
                if (x > 0)
@@ -602,7 +602,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
                colUp[i]     = false;
             }
             else
-               colWeight[i] = c_free + n - fabs(x);
+               colWeight[i] = c_free + n - spxAbs(x);
          }
       }
 
@@ -617,7 +617,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
          if (rhs[i] < infinity)
          {
             if (fabs(lhs[i] - rhs[i]) < base.epsilon())
-               rowWeight[i] = r_fixed + n + fabs(x);
+               rowWeight[i] = r_fixed + n + spxAbs(x);
             else if (lhs[i] > -infinity)
             {
                if (x > 0)
@@ -646,7 +646,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
             }
             else
             {
-               rowWeight[i] = r_free + n - fabs(x);
+               rowWeight[i] = r_free + n - spxAbs(x);
             }
          }
       }

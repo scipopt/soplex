@@ -382,7 +382,7 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
          {
             assert(EQrel(oldLo, x[cIdx], eps()) || EQrel(oldUp, x[cIdx], eps()));
 
-            Real violation = fabs(r[cIdx]/aij);
+            Real violation = spxAbs(r[cIdx]/aij);
 
             cStatus[cIdx] = EQrel(oldLo, x[cIdx], eps()) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
 
@@ -1401,8 +1401,8 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
       // fixed columns will be eliminated later
       if (NE(lo, up))
       {
-         lo = fabs(lo);
-         up = fabs(up);
+         lo = spxAbs(lo);
+         up = spxAbs(up);
 
          Real absBnd = (lo > up) ? lo : up;
 
@@ -1415,7 +1415,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
 
          while(i < col.size())
          {
-            Real aij = fabs(col.value(i));
+            Real aij = spxAbs(col.value(i));
 
             if (isZero(aij * absBnd, tol))
             {
@@ -1755,7 +1755,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.lhs(i) / rhsBnd) > Param::epsilon())
+                  && spxAbs(lp.lhs(i) / rhsBnd) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -1792,7 +1792,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.rhs(i) / lhsBnd) > Param::epsilon())
+                  && spxAbs(lp.rhs(i) / lhsBnd) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -1859,7 +1859,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.lhs(i) / rhsBnd) > Param::epsilon())
+                  && spxAbs(lp.lhs(i) / rhsBnd) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -1895,7 +1895,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && fabs(lp.rhs(i) / lhsBnd) > Param::epsilon())
+                  && spxAbs(lp.rhs(i) / lhsBnd) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);

@@ -579,10 +579,10 @@ void SoPlexLegacy::qualConstraintViolation(
       assert(lhs( row ) <= rhs( row ));
 
       if (val < lhs( row ))
-         viol = fabs(val - lhs( row ));
+         viol = spxAbs(val - lhs( row ));
       else
          if (val > rhs( row ))
-            viol = fabs(val - rhs( row ));
+            viol = spxAbs(val - rhs( row ));
 
       if (viol > maxviol)
          maxviol = viol;
@@ -609,10 +609,10 @@ void SoPlexLegacy::qualBoundViolation(
       Real viol = 0.0;
 
       if (solu[col] < lower( col ))
-         viol = fabs( solu[col] - lower( col ));
+         viol = spxAbs( solu[col] - lower( col ));
       else
          if (solu[col] > upper( col ))
-            viol = fabs( solu[col] - upper( col ));
+            viol = spxAbs( solu[col] - upper( col ));
 
       if (viol > maxviol)
          maxviol = viol;

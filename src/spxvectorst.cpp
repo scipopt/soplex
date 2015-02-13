@@ -90,7 +90,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       Real x, y, len;
       int i, j;
       for (i = base.nRows(); i--;)
-         rowWeight[i] += fabs(vec[i]);
+         rowWeight[i] += spxAbs(vec[i]);
 
       for (i = base.nCols(); i--;)
       {
@@ -102,7 +102,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             len += x * x;
          }
          if (len > 0)
-            colWeight[i] += fabs(y / len - base.maxObj(i));
+            colWeight[i] += spxAbs(y / len - base.maxObj(i));
       }
    }
    else

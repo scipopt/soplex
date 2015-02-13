@@ -353,7 +353,7 @@ namespace soplex
       friend Rational operator*(const int& d, const Rational& r);
       friend Rational operator/(const int& d, const Rational& r);
 
-      friend Rational abs(const Rational& r);
+      friend Rational spxAbs(const Rational& r);
       friend int sign(const Rational& r);
       friend Rational operator-(const Rational& q);
 
@@ -539,7 +539,7 @@ namespace soplex
    Rational operator+(const int& d, const Rational& r);
 
    /// absolute function
-   Rational abs(const Rational& r);
+   Rational spxAbs(const Rational& r);
 
    /// Sign function; returns 1 if r > 0, 0 if r = 0, and -1 if r < 0.
    int sign(const Rational& r);

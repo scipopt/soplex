@@ -431,7 +431,7 @@ bool SPxBoundFlippingRT::getData(
       thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
       Real x = upd[idx];
       // skip breakpoint if it is too small
-      if( fabs(x) < stab )
+      if( spxAbs(x) < stab )
       {
          return false;
       }
@@ -459,7 +459,7 @@ bool SPxBoundFlippingRT::getData(
    else // src == COPVEC
    {
       Real x = upd[idx];
-      if( fabs(x) < stab )
+      if( spxAbs(x) < stab )
       {
          return false;
       }
@@ -506,7 +506,7 @@ bool SPxBoundFlippingRT::getData(
 
    Real x = upd[idx];
    // skip breakpoint if it is too small
-   if( fabs(x) < stab )
+   if( spxAbs(x) < stab )
    {
       return false;
    }
@@ -628,13 +628,13 @@ SPxId SPxBoundFlippingRT::selectEnter(
    breakpoints[0] = tmp;
 
    // get initial slope
-   slope = fabs(thesolver->fTest()[leaveIdx]);
+   slope = spxAbs(thesolver->fTest()[leaveIdx]);
    if( slope == 0 )
    {
       // this may only happen if SoPlex decides to make an instable pivot
       assert(thesolver->instableLeaveNum >= 0);
       // restore original slope
-      slope = fabs(thesolver->instableLeaveVal);
+      slope = spxAbs(thesolver->instableLeaveVal);
    }
 
    // set up structures for the quicksort implementation
@@ -666,7 +666,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
          }
          else
          {
-            Real absupd = fabs(pupd[i]);
+            Real absupd = spxAbs(pupd[i]);
             slope -= (thesolver->upper(i) * absupd) - (thesolver->lower(i) * absupd);
             // get most stable pivot
             if( absupd > moststable )
@@ -684,7 +684,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
          }
          else
          {
-            Real absupd = fabs(cupd[i]);
+            Real absupd = spxAbs(cupd[i]);
             slope -= (thesolver->rhs(i) * absupd) - (thesolver->lhs(i) * absupd);
             if( absupd > moststable )
                moststable = absupd;
@@ -734,7 +734,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
             continue;
          }
          Real x = pupd[idx];
-         if( fabs(x) > moststable )
+         if( spxAbs(x) > moststable )
          {
             thesolver->pVec()[idx] = thesolver->vector(idx) * thesolver->coPvec();
             stableDelta = (x > 0.0) ? upb[idx] : lpb[idx];
@@ -742,7 +742,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
 
             if( stableDelta <= bestDelta)
             {
-               moststable = fabs(x);
+               moststable = spxAbs(x);
                bestBp = stableBp;
             }
          }
@@ -757,14 +757,14 @@ SPxId SPxBoundFlippingRT::selectEnter(
             continue;
          }
          Real x = cupd[idx];
-         if( fabs(x) > moststable )
+         if( spxAbs(x) > moststable )
          {
             stableDelta = (x > 0.0) ? ucb[idx] : lcb[idx];
             stableDelta = (stableDelta - cvec[idx]) / x;
 
             if( stableDelta <= bestDelta )
             {
-               moststable = fabs(x);
+               moststable = spxAbs(x);
                bestBp = stableBp;
             }
          }
@@ -850,7 +850,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
    }
 
    // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
-   if( npassedBp > 0 && fabs(breakpoints[npassedBp].val) > fastDelta )
+   if( npassedBp > 0 && spxAbs(breakpoints[npassedBp].val) > fastDelta )
    {
       flipAndUpdate(npassedBp);
       thesolver->boundflips = npassedBp;
@@ -964,7 +964,7 @@ int SPxBoundFlippingRT::selectLeave(
    breakpoints[0] = tmp;
 
    // get initial slope
-   slope = fabs(enterTest);
+   slope = spxAbs(enterTest);
    if( slope == 0 )
    {
       // this may only happen if SoPlex decides to make an instable pivot
@@ -995,7 +995,7 @@ int SPxBoundFlippingRT::selectLeave(
       // compute new slope
       Real upper;
       Real lower;
-      Real absupd = fabs(upd[breakpointidx]);
+      Real absupd = spxAbs(upd[breakpointidx]);
       SPxId baseId = thesolver->baseId(breakpointidx);
       int i = thesolver->number(baseId);
       if( baseId.isSPxColId() )
@@ -1050,14 +1050,14 @@ int SPxBoundFlippingRT::selectLeave(
       int breakpointidx = breakpoints[stableBp].idx;
       assert( breakpoints[stableBp].src == FVEC );
       Real x = upd[breakpointidx];
-      if( fabs(x) > moststable )
+      if( spxAbs(x) > moststable )
       {
          stableDelta = (x > 0.0) ? ub[breakpointidx] : lb[breakpointidx];
          stableDelta = (stableDelta - vec[breakpointidx]) / x;
 
          if( stableDelta <= bestDelta)
          {
-            moststable = fabs(x);
+            moststable = spxAbs(x);
             bestBp = stableBp;
          }
       }
@@ -1135,7 +1135,7 @@ int SPxBoundFlippingRT::selectLeave(
    }
 
    // flip bounds of skipped breakpoints only if a nondegenerate step is to be performed
-   if( npassedBp > 0 && fabs(breakpoints[npassedBp].val) > fastDelta )
+   if( npassedBp > 0 && spxAbs(breakpoints[npassedBp].val) > fastDelta )
    {
       flipAndUpdate(npassedBp);
       thesolver->boundflips = npassedBp;

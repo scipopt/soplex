@@ -276,7 +276,7 @@ void CLUFactor::setPivot( const int p_stage,
    row.perm[p_row]   = p_stage;
    col.perm[p_col]   = p_stage;
    diag[p_row]       = REAL( 1.0 ) / val;
-   if( fabs(val) < Param::epsilonPivot() )
+   if( spxAbs(val) < Param::epsilonPivot() )
    {
       MSG_ERROR( std::cerr
                  << "LU pivot element is almost zero (< "
@@ -287,8 +287,8 @@ void CLUFactor::setPivot( const int p_stage,
       stat = SLinSolver::SINGULAR;
    }
 
-   if ( fabs( diag[p_row] ) > maxabs )
-      maxabs = fabs( diag[p_row] );
+   if ( spxAbs( diag[p_row] ) > maxabs )
+      maxabs = spxAbs( diag[p_row] );
 }
 
 /*****************************************************************************/
@@ -791,8 +791,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
          if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
-            if ( fabs( x ) > l_maxabs )
-               l_maxabs = fabs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             /* insert to column file */
             assert( k - cbeg[p_col] < cmax[p_col] );
@@ -845,8 +845,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
          if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
-            if ( fabs( x ) > l_maxabs )
-               l_maxabs = fabs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             /* insert to column file */
             if ( k >= j )
@@ -1009,8 +1009,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             ll++;
 
-            if ( fabs( x ) > l_maxabs )
-               l_maxabs = fabs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             j = rbeg[n];
 
@@ -1081,8 +1081,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             if ( x != 0.0 )
             {
-               if ( fabs( x ) > l_maxabs )
-                  l_maxabs = fabs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                ridx[n] = j;
 
@@ -1147,8 +1147,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
                p_work[k] = 0.0;
                ll++;
 
-               if ( fabs( x ) > l_maxabs )
-                  l_maxabs = fabs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                j = rbeg[n];
 
@@ -1213,8 +1213,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             if ( x != 0.0 )
             {
-               if ( fabs( x ) > l_maxabs )
-                  l_maxabs = fabs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                ridx[n] = j;
 
@@ -1308,8 +1308,8 @@ void CLUFactor::update( int p_col, Real* p_work, const int* p_idx, int num )
       p_work[j] = 0.0;
       ++ll;
 
-      if ( fabs( x ) > maxabs )
-         maxabs = fabs( x );
+      if ( spxAbs( x ) > maxabs )
+         maxabs = spxAbs( x );
    }
 
    stat = SLinSolver::OK;
@@ -1352,8 +1352,8 @@ void CLUFactor::updateNoClear(
       lval[ll] = x = rezi * p_work[j];
       ++ll;
 
-      if ( fabs( x ) > maxabs )
-         maxabs = fabs( x );
+      if ( spxAbs( x ) > maxabs )
+         maxabs = spxAbs( x );
    }
 
    stat = SLinSolver::OK;
@@ -1546,8 +1546,8 @@ void CLUFactor::initFactorMatrix( const SVector** vec, const Real eps )
             /* update maximum absolute nonzero value */
             x = psv->value( j );
 
-            if ( fabs( x ) > initMaxabs )
-               initMaxabs = fabs( x );
+            if ( spxAbs( x ) > initMaxabs )
+               initMaxabs = spxAbs( x );
 
             /* permute to front and mark as singleton */
             setPivot( temp.stage, i, psv->index( j ), x );
@@ -1589,8 +1589,8 @@ void CLUFactor::initFactorMatrix( const SVector** vec, const Real eps )
 
                   /* update maximum absolute nonzero value */
 
-                  if ( fabs( x ) > initMaxabs )
-                     initMaxabs = fabs( x );
+                  if ( spxAbs( x ) > initMaxabs )
+                     initMaxabs = spxAbs( x );
 
                   nnonzeros++;
                }
@@ -2118,11 +2118,11 @@ void CLUFactor::selectPivots( Real threshold )
 
          if (( l_maxabs = temp.s_max[rw] ) < 0 )
          {
-            l_maxabs = fabs( u.row.val[len] );
+            l_maxabs = spxAbs( u.row.val[len] );
 
             for ( i = len - 1; i >= beg; --i )
-               if ( l_maxabs < fabs( u.row.val[i] ) )
-                  l_maxabs = fabs( u.row.val[i] );
+               if ( l_maxabs < spxAbs( u.row.val[i] ) )
+                  l_maxabs = spxAbs( u.row.val[i] );
 
             temp.s_max[rw] = l_maxabs;               /* ##### */
          }
@@ -2139,7 +2139,7 @@ void CLUFactor::selectPivots( Real threshold )
             j = temp.s_cact[k];
             x = u.row.val[i];
 
-            if ( j < mkwtz && fabs( x ) > l_maxabs )
+            if ( j < mkwtz && spxAbs( x ) > l_maxabs )
             {
                mkwtz = j;
                cl = k;
@@ -2194,12 +2194,12 @@ void CLUFactor::selectPivots( Real threshold )
                      /*  case 2: l_maxabs needs to be computed
                       */
                      m = u.row.start[k];
-                     l_maxabs = fabs( u.row.val[m] );
+                     l_maxabs = spxAbs( u.row.val[m] );
 
                      for ( kk = m + u.row.len[k] - 1; kk >= m; --kk )
                      {
-                        if ( l_maxabs < fabs( u.row.val[kk] ) )
-                           l_maxabs = fabs( u.row.val[kk] );
+                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
+                           l_maxabs = spxAbs( u.row.val[kk] );
 
                         if ( u.row.idx[kk] == cl )
                         {
@@ -2211,8 +2211,8 @@ void CLUFactor::selectPivots( Real threshold )
 
                      for ( --kk; kk > m; --kk )
                      {
-                        if ( l_maxabs < fabs( u.row.val[kk] ) )
-                           l_maxabs = fabs( u.row.val[kk] );
+                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
+                           l_maxabs = spxAbs( u.row.val[kk] );
                      }
 
                      temp.s_max[k] = l_maxabs;
@@ -2220,7 +2220,7 @@ void CLUFactor::selectPivots( Real threshold )
 
                   l_maxabs *= threshold;
 
-                  if ( fabs( x ) > l_maxabs )
+                  if ( spxAbs( x ) > l_maxabs )
                   {
                      mkwtz = j;
                      rw = k;
@@ -2641,8 +2641,8 @@ int CLUFactor::setupColVals()
          u.col.idx[k] = i;
          u.col.val[k] = *val;
 
-         if ( fabs( *val ) > maxabs )
-            maxabs = fabs( *val );
+         if ( spxAbs( *val ) > maxabs )
+            maxabs = spxAbs( *val );
 
          idx++;
 
@@ -3706,8 +3706,8 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 
       Real x  = vec[c];
 
-      ASSERT_WARN( "WSOLVE01", fabs( x ) < 1e40 );
-      ASSERT_WARN( "WSOLVE02", fabs( vec[c] ) < 1e40 );
+      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
+      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
 
 #if defined(WITH_WARNINGS) || !defined(NDEBUG)
       Real y = vec[c];
@@ -3717,25 +3717,25 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 
       if ( x != 0.0 )
       {
-         ASSERT_WARN( "WSOLVE03", fabs( diag[r] ) < 1e40 );
+         ASSERT_WARN( "WSOLVE03", spxAbs( diag[r] ) < 1e40 );
 
          x        *= diag[r];
          p_work[r] = x;
 
-         ASSERT_WARN( "WSOLVE04", fabs( x ) < 1e40 );
+         ASSERT_WARN( "WSOLVE04", spxAbs( x ) < 1e40 );
 
          int end = u.row.start[r] + u.row.len[r];
 
          for ( int m = u.row.start[r]; m < end; m++ )
          {
-            ASSERT_WARN( "WSOLVE05", fabs( u.row.val[m] ) < 1e40 );
-            ASSERT_WARN( "WSOLVE06", fabs( vec[u.row.idx[m]] ) < infinity );
+            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
+            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < infinity );
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            ASSERT_WARN( "WSOLVE07", fabs( vec[u.row.idx[m]] ) < 1e40 );
+            ASSERT_WARN( "WSOLVE07", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
          }
       }
 
-      ASSERT_WARN( "WSOLVE08", fabs( y ) < 1e40 );
+      ASSERT_WARN( "WSOLVE08", spxAbs( y ) < 1e40 );
    }
 }
 

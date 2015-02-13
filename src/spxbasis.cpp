@@ -1011,7 +1011,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = y.length();
 
       // stop if converged
-      if( abs(norm1 - norm2) < tolerance * norm1 )
+      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^T*y and normalize
@@ -1036,7 +1036,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = x.length();
 
       // stop if converged
-      if( abs(norm1 - norm2) < tolerance * norm1 )
+      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^-T*y and normalize

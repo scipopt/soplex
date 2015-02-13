@@ -276,8 +276,8 @@ void CLUFactorRational::setPivot( const int p_stage,
    col.perm[p_col]   = p_stage;
    diag[p_row]       = 1.0 / val;
 
-   if ( abs( diag[p_row] ) > maxabs )
-      maxabs = abs( diag[p_row] );
+   if ( spxAbs( diag[p_row] ) > maxabs )
+      maxabs = spxAbs( diag[p_row] );
 }
 
 /*****************************************************************************/
@@ -772,8 +772,8 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
          if ( x != 0 )
          {
-            if ( abs( x ) > l_maxabs )
-               l_maxabs = abs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             /* insert to column file */
             assert( k - cbeg[p_col] < cmax[p_col] );
@@ -826,8 +826,8 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
          if ( x != 0 )
          {
-            if ( abs( x ) > l_maxabs )
-               l_maxabs = abs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             /* insert to column file */
             if ( k >= j )
@@ -989,8 +989,8 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
             ll++;
 
-            if ( abs( x ) > l_maxabs )
-               l_maxabs = abs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             j = rbeg[n];
 
@@ -1062,8 +1062,8 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
             if ( x != 0 )
             {
-               if ( abs( x ) > l_maxabs )
-                  l_maxabs = abs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                ridx[n] = j;
 
@@ -1127,8 +1127,8 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
                p_work[k] = 0;
                ll++;
 
-               if ( abs( x ) > l_maxabs )
-                  l_maxabs = abs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                j = rbeg[n];
 
@@ -1193,8 +1193,8 @@ void CLUFactorRational::forestUpdate( int p_col, Rational* p_work, int num, int 
 
             if ( x != 0 )
             {
-               if ( abs( x ) > l_maxabs )
-                  l_maxabs = abs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                ridx[n] = j;
 
@@ -1286,8 +1286,8 @@ void CLUFactorRational::update( int p_col, Rational* p_work, const int* p_idx, i
       p_work[j] = 0;
       ++ll;
 
-      if ( abs( x ) > maxabs )
-         maxabs = abs( x );
+      if ( spxAbs( x ) > maxabs )
+         maxabs = spxAbs( x );
    }
 
    stat = SLinSolverRational::OK;
@@ -1328,8 +1328,8 @@ void CLUFactorRational::updateNoClear(
       lval[ll] = x = rezi * p_work[j];
       ++ll;
 
-      if ( abs( x ) > maxabs )
-         maxabs = abs( x );
+      if ( spxAbs( x ) > maxabs )
+         maxabs = spxAbs( x );
    }
 
    stat = SLinSolverRational::OK;
@@ -1522,8 +1522,8 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
             /* update maximum absolute nonzero value */
             x = psv->value( j );
 
-            if ( abs( x ) > initMaxabs )
-               initMaxabs = abs( x );
+            if ( spxAbs( x ) > initMaxabs )
+               initMaxabs = spxAbs( x );
 
             /* permute to front and mark as singleton */
             setPivot( temp.stage, i, psv->index( j ), x );
@@ -1565,8 +1565,8 @@ void CLUFactorRational::initFactorMatrix( const SVectorRational** vec )
 
                   /* update maximum absolute nonzero value */
 
-                  if ( abs( x ) > initMaxabs )
-                     initMaxabs = abs( x );
+                  if ( spxAbs( x ) > initMaxabs )
+                     initMaxabs = spxAbs( x );
 
                   nnonzeros++;
                }
@@ -2094,11 +2094,11 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
 
          if( temp.s_max[rw] < 0 )
          {
-            l_maxabs = abs( u.row.val[len] );
+            l_maxabs = spxAbs( u.row.val[len] );
 
             for ( i = len - 1; i >= beg; --i )
-               if ( l_maxabs < abs( u.row.val[i] ) )
-                  l_maxabs = abs( u.row.val[i] );
+               if ( l_maxabs < spxAbs( u.row.val[i] ) )
+                  l_maxabs = spxAbs( u.row.val[i] );
 
             temp.s_max[rw] = l_maxabs;               /* ##### */
          }
@@ -2117,7 +2117,7 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
             j = temp.s_cact[k];
             x = u.row.val[i];
 
-            if ( j < mkwtz && abs( x ) > l_maxabs )
+            if ( j < mkwtz && spxAbs( x ) > l_maxabs )
             {
                mkwtz = j;
                cl = k;
@@ -2172,12 +2172,12 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
                      /*  case 2: l_maxabs needs to be computed
                       */
                      m = u.row.start[k];
-                     l_maxabs = abs( u.row.val[m] );
+                     l_maxabs = spxAbs( u.row.val[m] );
 
                      for ( kk = m + u.row.len[k] - 1; kk >= m; --kk )
                      {
-                        if ( l_maxabs < abs( u.row.val[kk] ) )
-                           l_maxabs = abs( u.row.val[kk] );
+                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
+                           l_maxabs = spxAbs( u.row.val[kk] );
 
                         if ( u.row.idx[kk] == cl )
                         {
@@ -2189,8 +2189,8 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
 
                      for ( --kk; kk > m; --kk )
                      {
-                        if ( l_maxabs < abs( u.row.val[kk] ) )
-                           l_maxabs = abs( u.row.val[kk] );
+                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
+                           l_maxabs = spxAbs( u.row.val[kk] );
                      }
 
                      temp.s_max[k] = l_maxabs;
@@ -2198,7 +2198,7 @@ void CLUFactorRational::selectPivots( const Rational& threshold )
 
                   l_maxabs *= threshold;
 
-                  if ( abs( x ) > l_maxabs )
+                  if ( spxAbs( x ) > l_maxabs )
                   {
                      mkwtz = j;
                      rw = k;
@@ -2626,8 +2626,8 @@ int CLUFactorRational::setupColVals()
          u.col.idx[k] = i;
          u.col.val[k] = *val;
 
-         if ( abs( *val ) > maxabs )
-            maxabs = abs( *val );
+         if ( spxAbs( *val ) > maxabs )
+            maxabs = spxAbs( *val );
 
          idx++;
 
@@ -3619,8 +3619,8 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
 
       Rational x  = vec[c];
 
-      //      ASSERT_WARN( "WSOLVE01", fabs( x ) < 1e40 );
-      //      ASSERT_WARN( "WSOLVE02", fabs( vec[c] ) < 1e40 );
+      //      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
+      //      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
 
 #if defined(WITH_WARNINGS) || !defined(NDEBUG)
       Rational y = vec[c];
@@ -3633,25 +3633,25 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
          if( timeLimitReached() )
             return;
 
-         //         ASSERT_WARN( "WSOLVE03", fabs( diag[r] ) < 1e40 );
+         //         ASSERT_WARN( "WSOLVE03", spxAbs( diag[r] ) < 1e40 );
 
          x        *= diag[r];
          p_work[r] = x;
 
-         //         ASSERT_WARN( "WSOLVE04", fabs( x ) < 1e40 );
+         //         ASSERT_WARN( "WSOLVE04", spxAbs( x ) < 1e40 );
 
          int end = u.row.start[r] + u.row.len[r];
 
          for ( int m = u.row.start[r]; m < end; m++ )
          {
-            //            ASSERT_WARN( "WSOLVE05", fabs( u.row.val[m] ) < 1e40 );
-            //            ASSERT_WARN( "WSOLVE06", fabs( vec[u.row.idx[m]] ) < infinity );
+            //            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
+            //            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < infinity );
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            //            ASSERT_WARN( "WSOLVE07", fabs( vec[u.row.idx[m]] ) < 1e40 );
+            //            ASSERT_WARN( "WSOLVE07", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
          }
       }
 
-      //      ASSERT_WARN( "WSOLVE08", fabs( y ) < 1e40 );
+      //      ASSERT_WARN( "WSOLVE08", spxAbs( y ) < 1e40 );
    }
 }
 

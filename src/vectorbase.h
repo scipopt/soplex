@@ -320,7 +320,7 @@ public:
 
       for( int i = 0; i < dimen; i++ )
       {
-         R x = abs(val[i]);
+         R x = spxAbs(val[i]);
 
          if( x > maxi )
             maxi = x;
@@ -337,11 +337,11 @@ public:
       assert(dim() > 0);
       assert(dim() == dimen);
 
-      R mini = abs(val[0]);
+      R mini = spxAbs(val[0]);
 
       for( int i = 1; i < dimen; i++ )
       {
-         R x = abs(val[i]);
+         R x = spxAbs(val[i]);
 
          if( x < mini )
             mini = x;

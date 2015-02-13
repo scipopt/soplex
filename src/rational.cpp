@@ -1725,7 +1725,7 @@ bool Rational::isNextTo(const double& d)
    }
 
    // check if d equals the closer end of the intervall
-   bool result = (abs(*this - a) < abs(*this - b))
+   bool result = (spxAbs(*this - a) < spxAbs(*this - b))
       ? (d == a)
       : (d == b);
 
@@ -2820,7 +2820,7 @@ Rational operator/(const int& d, const Rational& r)
 
 
 /// Absolute.
-Rational abs(const Rational& r)
+Rational spxAbs(const Rational& r)
 {
    Rational res;
    mpq_abs(res.dpointer->privatevalue, r.dpointer->privatevalue);
@@ -3915,7 +3915,7 @@ Rational operator/(const int& d, const Rational& r)
 
 
 /// Absolute.
-Rational abs(const Rational& r)
+Rational spxAbs(const Rational& r)
 {
    Rational res = r;
 

@@ -655,7 +655,7 @@ bool SPxLPBase<Rational>::readLPF(
                 */
                if( have_value )
                {
-                  if( abs(val) != 1 )
+                  if( spxAbs(val) != 1 )
                      goto syntax_error;
 
                   if( val == -1 )
@@ -685,7 +685,7 @@ bool SPxLPBase<Rational>::readLPF(
                 */
                if( have_value )
                {
-                  if( abs(val) != 1 )
+                  if( spxAbs(val) != 1 )
                      goto syntax_error;
 
                   if( val == -1 )
@@ -1364,13 +1364,13 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                if( double(rset.lhs(idx)) > -double(infinity) )
                {
                   rset.rhs_w(idx) = rset.lhs(idx);
-                  rset.rhs_w(idx) += abs(val);
+                  rset.rhs_w(idx) += spxAbs(val);
                }
                // LE
                else
                {
                   rset.lhs_w(idx) = rset.rhs(idx);
-                  rset.lhs_w(idx) -= abs(val);
+                  rset.lhs_w(idx) -= spxAbs(val);
                }
             }
          }
@@ -1402,13 +1402,13 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                   if( double(rset.lhs(idx)) > -double(infinity) )
                   {
                      rset.rhs_w(idx) = rset.lhs(idx);
-                     rset.rhs_w(idx) += abs(val);
+                     rset.rhs_w(idx) += spxAbs(val);
                   }
                   // LE
                   else
                   {
                      rset.lhs_w(idx) = rset.rhs(idx);
-                     rset.lhs_w(idx) -= abs(val);
+                     rset.lhs_w(idx) -= spxAbs(val);
                   }
                }
             }

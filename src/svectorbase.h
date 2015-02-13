@@ -440,8 +440,8 @@ public:
 
       for( int i = size() - 1; i >= 0; --i )
       {
-         if( abs(m_elem[i].val) > maxi )
-            maxi = abs(m_elem[i].val);
+         if( spxAbs(m_elem[i].val) > maxi )
+            maxi = spxAbs(m_elem[i].val);
       }
 
       assert(maxi >= 0);
@@ -456,8 +456,8 @@ public:
 
       for( int i = size() - 1; i >= 0; --i )
       {
-         if( abs(m_elem[i].val) < mini )
-            mini = abs(m_elem[i].val);
+         if( spxAbs(m_elem[i].val) < mini )
+            mini = spxAbs(m_elem[i].val);
       }
 
       assert(mini >= 0);

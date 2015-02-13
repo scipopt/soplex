@@ -1052,7 +1052,7 @@ bool SPxSolver::enter(SPxId& enterId)
       {
          for( int i = coSolveVector3->dim()-1; i >= 0; --i)
          {
-            if( fabs((*coSolveVector3)[i]) > epsilon() )
+            if( spxAbs((*coSolveVector3)[i]) > epsilon() )
                (*thePvec).multAdd(-(*coSolveVector3)[i],(*thecovectors)[i]);
          }
          // we need to update enterPric in case it was changed by bound flips

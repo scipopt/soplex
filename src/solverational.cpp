@@ -1243,7 +1243,7 @@ namespace soplex
                   debugDualViolation = -val;
                }
 
-               if( basisStatusRow == SPxSolver::BASIC && abs(val) > debugBasicDualViolation )
+               if( basisStatusRow == SPxSolver::BASIC && spxAbs(val) > debugBasicDualViolation )
                {
                   MSG_DEBUG( std::cout << "basisStatusRow = " << basisStatusRow
                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
@@ -1251,7 +1251,7 @@ namespace soplex
                      << ", dualReal[r] = " << rationalToString(val)
                      << ", dualReal[r] = " << dualReal[r]
                      << "\n" );
-                  debugBasicDualViolation = abs(val);
+                  debugBasicDualViolation = spxAbs(val);
                }
             }
 
@@ -1558,7 +1558,7 @@ namespace soplex
          {
             const Rational& value = colVector.value(k);
 
-            if( abs(value) > maxValue )
+            if( spxAbs(value) > maxValue )
             {
                MSG_DEBUG( std::cout << "   --> nonzero " << k << " has value " << rationalToString(value) << " in row " << colVector.index(k) << "\n" );
 
@@ -1625,7 +1625,7 @@ namespace soplex
          {
             const Rational& value = colVector.value(k);
 
-            if( abs(value) < minValue )
+            if( spxAbs(value) < minValue )
             {
                MSG_DEBUG( std::cout << "   --> nonzero " << k << " has value " << rationalToString(value) << " in row " << colVector.index(k) << "\n" );
 
@@ -1737,7 +1737,7 @@ namespace soplex
 
       for( int i = _beforeLiftCols; i < numColsRational() && sol._hasDual; i++ )
       {
-         if( abs(maxValue * sol._redCost[i]) > _rationalOpttol )
+         if( spxAbs(maxValue * sol._redCost[i]) > _rationalOpttol )
          {
             MSG_INFO1( spxout, spxout << "Warning: lost dual solution during project phase.\n" );
             sol._hasDual = false;
@@ -2887,7 +2887,7 @@ namespace soplex
       temp = 0;
       const int size = ytransA.size();
       for( int n = 0; n < size; n++ )
-         temp += abs(ytransA.value(n));
+         temp += spxAbs(ytransA.value(n));
 
       // if the one norm is zero then ytransA is zero the Farkas proof should have been verified above
       assert(temp != 0);

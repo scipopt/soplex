@@ -154,7 +154,7 @@ Real SPxScaler::computeScalingVecs(
 
       for( int j = 0; j < vec.size(); ++j)
       {
-         Real x = fabs(vec.value(j) * coScaleval[vec.index(j)]);
+         Real x = spxAbs(vec.value(j) * coScaleval[vec.index(j)]);
 
          if (!isZero(x))
          {
@@ -334,7 +334,7 @@ Real SPxScaler::minAbsColscale() const
 
    for(int i = 0; i < m_colscale.size(); ++i)
       if (fabs(m_colscale[i]) < mini)
-         mini = fabs(m_colscale[i]);
+         mini = spxAbs(m_colscale[i]);
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(mini, &exp);
@@ -350,7 +350,7 @@ Real SPxScaler::maxAbsColscale() const
 
    for(int i = 0; i < m_colscale.size(); ++i)
       if (fabs(m_colscale[i]) > maxi)
-         maxi = fabs(m_colscale[i]);
+         maxi = spxAbs(m_colscale[i]);
 
 #ifdef BITSHIFTSCALING
    int exp;
@@ -367,7 +367,7 @@ Real SPxScaler::minAbsRowscale() const
 
    for(int i = 0; i < m_rowscale.size(); ++i)
       if (fabs(m_rowscale[i]) < mini)
-         mini = fabs(m_rowscale[i]);
+         mini = spxAbs(m_rowscale[i]);
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(mini, &exp);
@@ -383,7 +383,7 @@ Real SPxScaler::maxAbsRowscale() const
 
    for(int i = 0; i < m_rowscale.size(); ++i)
       if (fabs(m_rowscale[i]) > maxi)
-         maxi = fabs(m_rowscale[i]);
+         maxi = spxAbs(m_rowscale[i]);
 #ifdef BITSHIFTSCALING
    int exp;
    frexp(maxi, &exp);
@@ -409,7 +409,7 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
 
       for(int j = 0; j < vec.size(); ++j)
       {
-         Real x = fabs(vec.value(j));
+         Real x = spxAbs(vec.value(j));
 
          if (x < mini)
             mini = x;
@@ -441,7 +441,7 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 
       for(int j = 0; j < vec.size(); ++j)
       {
-         Real x = fabs(vec.value(j));
+         Real x = spxAbs(vec.value(j));
 
          if (x < mini)
             mini = x;
