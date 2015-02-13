@@ -6081,7 +6081,7 @@ namespace soplex
             {
                if( (GE(_realLP->rhs()[i], realParam(SoPlex::INFTY)) != (_rationalLP->rhs()[i] >= _rationalPosInfty))
                   || (LT(_realLP->rhs()[i], realParam(SoPlex::INFTY)) && _rationalLP->rhs()[i] < _rationalPosInfty
-                     && !_rationalLP->rhs()[i].isAdjacentTo(_realLP->rhs()[i])) )
+                     && !_rationalLP->rhs()[i].isAdjacentTo((double)_realLP->rhs()[i])) )
                {
                   if( !quiet )
                   {
@@ -6106,7 +6106,7 @@ namespace soplex
             {
                if( (LE(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lhs()[i] <= _rationalNegInfty))
                   || (GT(_realLP->lhs()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lhs()[i] > _rationalNegInfty
-                     && !_rationalLP->lhs()[i].isAdjacentTo(_realLP->lhs()[i])) )
+                     && !_rationalLP->lhs()[i].isAdjacentTo((double)_realLP->lhs()[i])) )
                {
                   if( !quiet )
                   {
@@ -6129,7 +6129,7 @@ namespace soplex
          {
             for( int i = 0; i < _realLP->maxObj().dim(); i++ )
             {
-               if( !_rationalLP->maxObj()[i].isAdjacentTo(_realLP->maxObj()[i]) )
+               if( !_rationalLP->maxObj()[i].isAdjacentTo((double)_realLP->maxObj()[i]) )
                {
                   if( !quiet )
                   {
@@ -6154,7 +6154,7 @@ namespace soplex
             {
                if( (GE(_realLP->upper()[i], realParam(SoPlex::INFTY)) != (_rationalLP->upper()[i] >= _rationalPosInfty))
                   || (LT(_realLP->upper()[i], realParam(SoPlex::INFTY)) && _rationalLP->upper()[i] < _rationalPosInfty
-                     && !_rationalLP->upper()[i].isAdjacentTo(_realLP->upper()[i])) )
+                     && !_rationalLP->upper()[i].isAdjacentTo((double)_realLP->upper()[i])) )
                {
                   if( !quiet )
                   {
@@ -6179,7 +6179,7 @@ namespace soplex
             {
                if( (LE(_realLP->lower()[i], -realParam(SoPlex::INFTY)) != (_rationalLP->lower()[i] <= _rationalNegInfty))
                   || (GT(_realLP->lower()[i], -realParam(SoPlex::INFTY)) && _rationalLP->lower()[i] > _rationalNegInfty
-                     && !_rationalLP->lower()[i].isAdjacentTo(_realLP->lower()[i])) )
+                     && !_rationalLP->lower()[i].isAdjacentTo((double)_realLP->lower()[i])) )
                {
                   if( !quiet )
                   {
@@ -6207,7 +6207,7 @@ namespace soplex
          {
             for( int j = 0;j < _realLP->nRows() ; j++ )
             {
-               if( !_rationalLP->colVector(i)[j].isAdjacentTo(_realLP->colVector(i)[j]) )
+               if( !_rationalLP->colVector(i)[j].isAdjacentTo((double)_realLP->colVector(i)[j]) )
                {
                   if( !quiet )
                   {
