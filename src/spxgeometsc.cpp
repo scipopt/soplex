@@ -54,7 +54,7 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 Real SPxGeometSC::computeScale(Real mini, Real maxi) const
 {
 
-   return sqrt(mini * maxi);
+   return spxSqrt(mini * maxi);
 }
 
 void SPxGeometSC::scale(SPxLP& lp) 

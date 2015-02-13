@@ -284,6 +284,13 @@ inline Real spxAbs(Real a)
    return fabs(a);
 }
 
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+   return sqrt(a);
+}
+
+
 /// returns max(|a|,|b|)
 inline Real maxAbs(Real a, Real b)
 {
