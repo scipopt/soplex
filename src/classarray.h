@@ -354,7 +354,7 @@ public:
     *  @param p_max  maximum number of elements the array can hold.
     *  @param p_fac  value for memFactor.
     */
-   explicit ClassArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
+   explicit ClassArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
       : data(0)
       , memFactor(p_fac)
    {
