@@ -1834,7 +1834,7 @@ namespace soplex
             {
                if( _basisStatusRows[i] == SPxSolver::FIXED && _solver.lhs(i) != _solver.rhs(i) )
                {
-                  assert(_solver.rhs(i) == nextafter(_solver.lhs(i), infinity));
+                  assert(_solver.rhs(i) == spxNextafter(_solver.lhs(i), infinity));
                   if( _hasSolRational && _solRational.hasDual()
                      && ((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE && _solRational._dual[i] > 0)
                         || (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE && _solRational._dual[i] < 0)) )

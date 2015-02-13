@@ -291,6 +291,12 @@ inline Real spxSqrt(Real a)
    return sqrtl(a);
 }
 
+// returns the next representable value after x in the direction of y
+inline Real spxNextafter(Real x, Real y)
+{
+   return nextafterl(x,y);
+}
+
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
 {
@@ -313,6 +319,12 @@ inline Real spxAbs(Real a)
 inline Real spxSqrt(Real a)
 {
    return sqrt(a);
+}
+
+// returns the next representable value after x in the direction of y
+inline Real spxNextafter(Real x, Real y)
+{
+   return nextafter(x,y);
 }
 
 /// returns x * 2^exp

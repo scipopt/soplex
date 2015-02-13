@@ -1716,12 +1716,12 @@ bool Rational::isNextTo(const double& d)
    if( Rational(x) < *this )
    {
       a = x;
-      b = nextafter(a, infinity);
+      b = spxNextafter(a, infinity);
    }
    else
    {
       b = x;
-      a = nextafter(b, -infinity);
+      a = spxNextafter(b, -infinity);
    }
 
    // check if d equals the closer end of the intervall
@@ -1752,13 +1752,13 @@ bool Rational::isAdjacentTo(const double& d) const
    if( cmp < 0 )
    {
       a = x;
-      b = nextafter(a, infinity);
+      b = spxNextafter(a, infinity);
    }
    // the rounded value is larger than the rational value
    else if( cmp > 0 )
    {
       b = x;
-      a = nextafter(b, -infinity);
+      a = spxNextafter(b, -infinity);
    }
    // the rational value is representable in double precision
    else
