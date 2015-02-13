@@ -3015,7 +3015,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    DataArray<int>    pClass(lp.nRows());           // class of parallel rows
    DataArray<int>    classSize(lp.nRows());        // size of each class
-   DataArray<double> scale(lp.nRows());            // scaling factor for each row
+   DataArray<Real>   scale(lp.nRows());            // scaling factor for each row
    int*              idxMem = 0;
 
    try
@@ -3338,7 +3338,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    DataArray<int>    pClass(lp.nCols());          // class of parallel columns
    DataArray<int>    classSize(lp.nCols());       // size of each class
-   DataArray<double> scale(lp.nCols());           // scaling factor for each column
+   DataArray<Real>   scale(lp.nCols());           // scaling factor for each column
    int*              idxMem = 0;
 
    try

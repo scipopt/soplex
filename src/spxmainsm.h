@@ -893,7 +893,7 @@ private:
    public:
       DuplicateRowsPS(const SPxLP& lp, int _i,
                       int maxLhsIdx, int minRhsIdx, const DSVector& dupRows,
-                      const DataArray<double> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
+                      const DataArray<Real> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
                       bool isTheLast, bool isFixedRow, bool isFirst = false)
          : PostStep("DuplicateRows", lp.nRows(), lp.nCols())
          , m_i(_i)
