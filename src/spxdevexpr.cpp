@@ -322,7 +322,7 @@ void SPxDevexPR::left4(int n, SPxId id)
       Real beta_q = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
 #ifndef NDEBUG
-      if (fabs(rhoVec[n]) < theeps)
+      if (spxAbs(rhoVec[n]) < theeps)
       {
          MSG_ERROR( std::cerr << "WDEVEX01: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than theeps = " << theeps << std::endl; )

@@ -294,7 +294,7 @@ void SPxWeightST::generate(SPxSolver& base)
                int  k = bVec.index(j);
                int  l = base.coVector(k).size();
 
-               if (!forbidden[k] && (fabs(x) > STABLE * max) && (l < best))
+               if (!forbidden[k] && (spxAbs(x) > STABLE * max) && (l < best))
                {
                   best = l;
                   sel  = k;
@@ -425,18 +425,18 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
    // find absolut biggest entry in bounds and left-/right hand side
    for (i = 0; i < bse.nCols(); i++)
    {
-      if ((up[i] < infinity) && (fabs(up[i]) > maxabs))
+      if ((up[i] < infinity) && (spxAbs(up[i]) > maxabs))
          maxabs = spxAbs(up[i]);
       
-      if ((low[i] > -infinity) && (fabs(low[i]) > maxabs))
+      if ((low[i] > -infinity) && (spxAbs(low[i]) > maxabs))
          maxabs = spxAbs(low[i]);
    }
    for (i = 0; i < bse.nRows(); i++)
    {
-      if ((rhs[i] < infinity) && (fabs(rhs[i]) > maxabs))
+      if ((rhs[i] < infinity) && (spxAbs(rhs[i]) > maxabs))
          maxabs = spxAbs(rhs[i]);
       
-      if ((lhs[i] > -infinity) && (fabs(lhs[i]) > maxabs))
+      if ((lhs[i] > -infinity) && (spxAbs(lhs[i]) > maxabs))
          maxabs = spxAbs(lhs[i]);
    }
 
@@ -472,7 +472,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
 
          if (up[i] < infinity)
          {
-            if (fabs(low[i] - up[i]) < base.epsilon())
+            if (spxAbs(low[i] - up[i]) < base.epsilon())
                colWeight[i] = c_fixed + n + spxAbs(x);
             else if (low[i] > -infinity)
             {
@@ -516,7 +516,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
       {
          if (rhs[i] < infinity)
          {
-            if (fabs(lhs[i] - rhs[i]) < base.epsilon())
+            if (spxAbs(lhs[i] - rhs[i]) < base.epsilon())
             {
                rowWeight[i] = r_fixed;
             }
@@ -573,7 +573,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
 
          if (up[i] < infinity)
          {
-            if (fabs(low[i] - up[i]) < base.epsilon())
+            if (spxAbs(low[i] - up[i]) < base.epsilon())
                colWeight[i] = c_fixed + n + spxAbs(x);
             else if (low[i] > -infinity)
             {
@@ -616,7 +616,7 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
 
          if (rhs[i] < infinity)
          {
-            if (fabs(lhs[i] - rhs[i]) < base.epsilon())
+            if (spxAbs(lhs[i] - rhs[i]) < base.epsilon())
                rowWeight[i] = r_fixed + n + spxAbs(x);
             else if (lhs[i] > -infinity)
             {

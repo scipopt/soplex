@@ -624,7 +624,7 @@ bool SPxLPBase<Real>::readLPF(
                 */
                if( have_value )
                {
-                  if( NE(fabs(val), 1.0) )
+                  if( NE(spxAbs(val), 1.0) )
                      goto syntax_error;
 
                   if( EQ(val, -1.0) )
@@ -653,7 +653,7 @@ bool SPxLPBase<Real>::readLPF(
                 */
                if( have_value )
                {
-                  if( NE(fabs(val), 1.0) )
+                  if( NE(spxAbs(val), 1.0) )
                      goto syntax_error;
 
                   if( EQ(val, -1.0) )

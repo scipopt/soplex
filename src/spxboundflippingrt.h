@@ -173,7 +173,7 @@ private:
       Breakpoint         y
       )
    {
-      return (fabs(x.val) < spxAbs(y.val));
+      return (spxAbs(x.val) < spxAbs(y.val));
    };
 
 public:

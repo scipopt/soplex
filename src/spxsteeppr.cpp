@@ -252,7 +252,7 @@ void SPxSteepPR::left4(int n, SPxId id)
 
       //TK: I gave the 0.5 extra, because I am not sure how hard this assert is.
 #ifndef NDEBUG
-      if (fabs(rhoVec[n]) < theeps * 0.5)
+      if (spxAbs(rhoVec[n]) < theeps * 0.5)
       {
          MSG_ERROR( std::cerr << "WSTEEP04: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )

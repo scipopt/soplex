@@ -792,7 +792,7 @@ bool SPxSolver::leave(int leaveIdx)
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
 
-            if (fabs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
+            if (spxAbs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
             {
                if (instable)
                {

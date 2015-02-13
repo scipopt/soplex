@@ -333,7 +333,7 @@ Real SPxScaler::minAbsColscale() const
    Real mini = infinity;
 
    for(int i = 0; i < m_colscale.size(); ++i)
-      if (fabs(m_colscale[i]) < mini)
+      if (spxAbs(m_colscale[i]) < mini)
          mini = spxAbs(m_colscale[i]);
 #ifdef BITSHIFTSCALING
    int exp;
@@ -349,7 +349,7 @@ Real SPxScaler::maxAbsColscale() const
    Real maxi = 0.0;
 
    for(int i = 0; i < m_colscale.size(); ++i)
-      if (fabs(m_colscale[i]) > maxi)
+      if (spxAbs(m_colscale[i]) > maxi)
          maxi = spxAbs(m_colscale[i]);
 
 #ifdef BITSHIFTSCALING
@@ -366,7 +366,7 @@ Real SPxScaler::minAbsRowscale() const
    Real mini = infinity;
 
    for(int i = 0; i < m_rowscale.size(); ++i)
-      if (fabs(m_rowscale[i]) < mini)
+      if (spxAbs(m_rowscale[i]) < mini)
          mini = spxAbs(m_rowscale[i]);
 #ifdef BITSHIFTSCALING
    int exp;
@@ -382,7 +382,7 @@ Real SPxScaler::maxAbsRowscale() const
    Real maxi = 0.0;
 
    for(int i = 0; i < m_rowscale.size(); ++i)
-      if (fabs(m_rowscale[i]) > maxi)
+      if (spxAbs(m_rowscale[i]) > maxi)
          maxi = spxAbs(m_rowscale[i]);
 #ifdef BITSHIFTSCALING
    int exp;

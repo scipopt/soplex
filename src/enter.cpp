@@ -1014,7 +1014,7 @@ bool SPxSolver::enter(SPxId& enterId)
     */
    if (leaveIdx >= 0)
    {
-      if (fabs(leaveVal) < entertol())
+      if (spxAbs(leaveVal) < entertol())
       {
          if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
             && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 

@@ -105,7 +105,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " UCbound: " << thesolver->theUCbound[idx]
                            << " LCbound: " << thesolver->theLCbound[idx]
                            << std::endl; )
-         assert(fabs(range) < 1e20);
+         assert(spxAbs(range) < 1e20);
          updPrimRhs.multAdd(range, thesolver->vector(idx));
       }
       else if( breakpoints[i].src == COPVEC )
@@ -151,7 +151,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " URbound: " << thesolver->theURbound[idx]
                            << " LRbound: " << thesolver->theLRbound[idx]
                            << std::endl; )
-         assert(fabs(range) < 1e20);
+         assert(spxAbs(range) < 1e20);
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
       }
       else if( breakpoints[i].src == FVEC )
@@ -238,7 +238,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << " upper: " << upper
                            << " bp.val: " << breakpoints[i].val
                            << std::endl; )
-         assert(fabs(range) < 1e20);
+         assert(spxAbs(range) < 1e20);
          assert(updPrimRhs[idx] == 0);
          updPrimRhs.add(idx, range);
       }
