@@ -278,6 +278,31 @@ public:
    //@}
 };
 
+#ifdef WITH_LONG_DOUBLE
+/// returns |a|
+inline Real spxAbs(Real a)
+{
+   return fabsl(a);
+}
+
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+   return sqrtl(a);
+}
+
+/// returns x * 2^exp
+inline Real spxLdexp(Real x, int exp)
+{
+   return ldexpl(x,exp);
+}
+
+// returns x and exp such that y = x * 2^exp
+inline Real spxFrexp(Real y, int* exp)
+{
+   return frexpl(y, exp);
+}
+#else
 /// returns |a|
 inline Real spxAbs(Real a)
 {
@@ -301,6 +326,7 @@ inline Real spxFrexp(Real y, int* exp)
 {
    return frexp(y, exp);
 }
+#endif
 
 /// returns max(|a|,|b|)
 inline Real maxAbs(Real a, Real b)
