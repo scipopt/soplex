@@ -407,7 +407,7 @@ void SPxBasis::removedCols(const int perm[])
 void SPxBasis::invalidate()
 {
 
-   MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
+   MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
 
    factorized    = false;
    matrixIsSetup = false;

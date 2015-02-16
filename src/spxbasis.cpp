@@ -309,8 +309,6 @@ void SPxBasis::load(SPxSolver* lp)
    assert(lp != 0);
    theLP = lp;
 
-   setOutstream(*theLP->spxout);
-
    setRep();
 
    addedRows(lp->nRows());
