@@ -3315,7 +3315,7 @@ namespace soplex
    /// gets violation of reduced costs; returns true on success
    bool SoPlex::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasDual() )
+      if( !hasDual() || !hasPrimal() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -3396,7 +3396,7 @@ namespace soplex
    /// gets violation of dual multipliers; returns true on success
    bool SoPlex::getDualViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasDual() )
+      if( !hasDual() || !hasPrimal() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
