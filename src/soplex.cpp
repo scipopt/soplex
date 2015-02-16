@@ -143,7 +143,7 @@ namespace soplex
             // should a rational factorization be performed after iterative refinement?
             _boolParamName[SoPlex::RATFAC] = "ratfac";
             _boolParamDescription[SoPlex::RATFAC] = "should a rational factorization be performed after iterative refinement?";
-            _boolParamDefault[SoPlex::RATFAC] = false;
+            _boolParamDefault[SoPlex::RATFAC] = true;
 
             // should cycling solutions be accepted during iterative refinement?
             _boolParamName[SoPlex::ACCEPTCYCLING] = "acceptcycling";
@@ -153,7 +153,7 @@ namespace soplex
             // apply rational reconstruction after each iterative refinement?
             _boolParamName[SoPlex::RATREC] = "ratrec";
             _boolParamDescription[SoPlex::RATREC] = "apply rational reconstruction after each iterative refinement?";
-            _boolParamDefault[SoPlex::RATREC] = false;
+            _boolParamDefault[SoPlex::RATREC] = true;
 
             // round scaling factors for iterative refinement to powers of two?
             _boolParamName[SoPlex::POWERSCALING] = "powerscaling";
