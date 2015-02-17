@@ -372,7 +372,7 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
-   mutable SPxOut* spxout;              ///< message handler
+   SPxOut* spxout;                     ///< message handler
 
    //-----------------------------
    void setOutstream(SPxOut& newOutstream)

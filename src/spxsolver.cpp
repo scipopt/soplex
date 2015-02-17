@@ -82,8 +82,11 @@ void SPxSolver::loadLP(const SPxLP& lp)
 
 void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
 {
-   SPxBasis::loadSolver(slu, destroy);
+   // we need to set the outstream before we load the solver to ensure that the basis
+   // can be initialized with this pointer in loadSolver()
+   assert(spxout != 0);
    slu->spxout = spxout;
+   SPxBasis::loadSolver(slu, destroy);
 }
 
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)

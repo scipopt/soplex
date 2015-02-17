@@ -93,7 +93,7 @@ void SPxBasis::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
-   MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; )
+   MSG_INFO3( (*spxout), (*spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; )
 
    int i;
    nzCount = 0;
@@ -196,7 +196,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    int   i;
    int   j;
 
-   MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS02 loading of Basis invalidates factorization" << std::endl; )
+   MSG_INFO3( (*spxout), (*spxout) << "IBASIS02 loading of Basis invalidates factorization" << std::endl; )
 
    lastin      = none;
    lastout     = none;
@@ -309,6 +309,8 @@ void SPxBasis::load(SPxSolver* lp)
    assert(lp != 0);
    theLP = lp;
 
+   setOutstream(*theLP->spxout);
+
    setRep();
 
    addedRows(lp->nRows());
@@ -324,7 +326,9 @@ void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
 
    assert(!freeSlinSolver || factor != 0);
 
-   MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS03 loading of Solver invalidates factorization"
+   setOutstream(*p_solver->spxout);
+
+   MSG_INFO3( (*spxout), (*spxout) << "IBASIS03 loading of Solver invalidates factorization"
                         << std::endl; )
 
 
@@ -745,7 +749,7 @@ void SPxBasis::change(
       // relative fill too high ?
       else if (Real(factor->memory()) > lastFill * Real(nzCount))
       {
-         MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS04 fill factor triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS04 fill factor triggers refactorization"
                               << " memory= " << factor->memory()
                               << " nzCount= " << nzCount
                               << " lastFill= " << lastFill
@@ -756,7 +760,7 @@ void SPxBasis::change(
       // absolute fill too high ?
       else if (nzCount > lastNzCount)
       {
-         MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS05 nonzero factor triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS05 nonzero factor triggers refactorization"
                               << " nzCount= " << nzCount
                               << " lastNzCount= " << lastNzCount
                               << " nonzeroFactor= " << nonzeroFactor
@@ -766,7 +770,7 @@ void SPxBasis::change(
       // too many updates ?
       else if (updateCount >= maxUpdates)
       {
-         MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS06 update count triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS06 update count triggers refactorization"
                               << " updateCount= " << updateCount
                               << " maxUpdates= " << maxUpdates
                               << std::endl; )
@@ -787,7 +791,7 @@ void SPxBasis::change(
          }
          catch( ... )
          {
-            MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS13 problems updating factorization; refactorizing basis"
+            MSG_INFO3( (*spxout), (*spxout) << "IBASIS13 problems updating factorization; refactorizing basis"
                << std::endl; )
 
 #ifdef MEASUREUPDATETIME
@@ -815,7 +819,7 @@ void SPxBasis::change(
             // we have to invalidate the basis to have the statuses correct
             catch( const SPxException& F )
             {
-               MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS14 problems updating factorization; invalidating factorization"
+               MSG_INFO3( (*spxout), (*spxout) << "IBASIS14 problems updating factorization; invalidating factorization"
                   << std::endl; )
 
 #ifdef MEASUREUPDATETIME
@@ -831,7 +835,7 @@ void SPxBasis::change(
 
          if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
-            MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "IBASIS07 stability triggers refactorization"
+            MSG_INFO3( (*spxout), (*spxout) << "IBASIS07 stability triggers refactorization"
                                  << " stability= " << factor->stability()
                                  << " minStab= " << minStab
                                  << std::endl; )

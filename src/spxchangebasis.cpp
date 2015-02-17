@@ -37,7 +37,7 @@ void SPxBasis::reDim()
 
    if (theLP->dim() != matrix.size())
    {
-      MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
+      MSG_INFO3( (*spxout), (*spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
                            << std::endl; )
 
       matrix.reSize (theLP->dim());
@@ -406,8 +406,11 @@ void SPxBasis::removedCols(const int perm[])
  */
 void SPxBasis::invalidate()
 {
-
-   MSG_INFO3( (*theLP->spxout), (*theLP->spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
+   assert(spxout != 0);
+   if( spxout != 0 )
+   {
+      MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
+   }
 
    factorized    = false;
    matrixIsSetup = false;

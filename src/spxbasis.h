@@ -406,6 +406,8 @@ private:
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
    bool      freeSlinSolver; ///< true iff factor should be freed inside of this object
+   SPxOut*   spxout;         ///< message handler
+
    //@}
 
 public:
@@ -837,6 +839,10 @@ public:
       return s.str();
    }
 
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
    //@}
 
    //--------------------------------------
