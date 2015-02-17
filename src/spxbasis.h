@@ -376,6 +376,7 @@ protected:
       reset.
    */
    int    iterCount;     ///< number of calls to change() since last manipulation
+   int    lastIterCount; ///< number of calls to change() before halting the simplex
    int    updateCount;   ///< number of calls to change() since last factorize()
    int    totalUpdateCount;///< number of updates
    Timer  totalUpdateTime;///< time spent in updates
@@ -528,6 +529,13 @@ public:
    {
       return iterCount;
    }
+
+   /// returns the number of iterations prior to the last break in execution
+   inline int prevIteration() const
+   {
+      return lastIterCount;
+   }
+
    /// returns loaded solver.
    inline SPxSolver* solver() const
    {

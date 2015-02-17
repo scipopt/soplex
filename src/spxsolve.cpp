@@ -116,6 +116,7 @@ SPxSolver::Status SPxSolver::solve()
 
    m_numCycle = 0;
    iterCount  = 0;
+   lastIterCount = 0;
    if (!isInitialized())
    {
       /*
@@ -1203,12 +1204,13 @@ bool SPxSolver::terminate()
 
    // the improved dual simplex requires a starting basis
    // if the flag getStartingIdsBasis is set to true the simplex will terminate when a dual basis is found
-   if( getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL )// && iteration() % 100 == 0 )
+   if( type() == ENTER && getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL &&
+         iteration() > prevIteration()/*iteration() % 10 == 0*/ )
    {
       Real degeneracyLevel = 0;
       degeneracyLevel = getDegeneracyLevel(fVec());
-      printf("%d Degeneracy Level: %f\n", iteration(), degeneracyLevel);
-      if( (degeneracyLevel < 0.8 && degeneracyLevel > 0.2) && iteration() > nRows()*0.2 )
+      printf("%d %d Degeneracy Level: %f\n", iteration(), lastUpdate(), degeneracyLevel);
+      if( (degeneracyLevel < 0.9 && degeneracyLevel > 0.1) /*&& iteration() > nRows()*0.2*/ )
       {
          m_status = UNKNOWN;
          return true;

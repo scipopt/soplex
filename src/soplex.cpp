@@ -2225,7 +2225,7 @@ namespace soplex
       {
          setIntParam(SoPlex::SOLVEMODE, SOLVEMODE_REAL);
          setIntParam(SoPlex::REPRESENTATION, REPRESENTATION_ROW);
-         setIntParam(SoPlex::ALGORITHM, ALGORITHM_ENTER);
+         setIntParam(SoPlex::ALGORITHM, ALGORITHM_LEAVE);
 
          _solveImprovedDualSimplex();
       }

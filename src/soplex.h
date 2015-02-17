@@ -1312,6 +1312,11 @@ private:
    int _nDualRows;         // the number of dual rows in the complementary problem. NOTE: _nPrimalRows = _nDualCols
    int _nDualCols;         // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
 
+   // Statistic information
+   int numIdsIter;         // the number of iterations of the improved dual simplex algorithm.
+   int numRedProbIter;     // the number of simplex iterations performed in the reduced problem.
+   int numCompProbIter;    // the number of iterations of the complementary problem.
+
    idsSolverStatus _loadedLP;
 
    //@}
@@ -1680,8 +1685,8 @@ private:
    /// determining which bound the primal variables will be fixed to.
    int getOrigVarFixedDirection(int colNum);
 
-   /// update the reduced problem based on the dual farkas ray
-   int _updateIdsReducedProblemFarkas(DVector duals, bool feasible);
+   /// checks the dual feasibility of the current basis
+   bool checkBasisDualFeasibility(Vector feasVec);
 
    //@}
 };
