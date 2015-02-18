@@ -500,6 +500,7 @@ void SLUFactor::clear()
  */
 void SLUFactor::assign(const SLUFactor& old)
 {
+   spxout = old.spxout;
 
    // slufactor
    uptype        = old.uptype;

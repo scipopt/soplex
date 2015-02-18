@@ -1175,6 +1175,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , remainingRoundsLeave(base.remainingRoundsLeave)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
+   , spxout(base.spxout)
 {
 
    if (base.theRep == COLUMN)

@@ -2349,6 +2349,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
       , offset(old.offset)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }
@@ -2360,6 +2361,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }

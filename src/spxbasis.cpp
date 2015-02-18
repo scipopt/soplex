@@ -1162,6 +1162,7 @@ SPxBasis::SPxBasis(Timer::TYPE ttype)
    , minStab(0.0)
    , thestatus (NO_PROBLEM)
    , freeSlinSolver(false)
+   , spxout(0)
 {
    // info: is not consistent at this moment, e.g. because theLP == 0
 
@@ -1198,6 +1199,7 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , minStab(old.minStab)
    , thestatus(old.thestatus)
    , thedesc(old.thedesc)
+   , spxout(old.spxout)
 {
 
    this->factor = old.factor->clone();
