@@ -1,3 +1,10 @@
+Bugfix Version
+==============
+
+fixed bugs:
+- fix uninitialized value in class SPxWeightST
+
+
 18 Dec 2014 - Release 2.0.1
 ===========================
 
