@@ -110,6 +110,8 @@ public:
    SPxWeightST()
       : SPxStarter("Weight")
    {
+      weight = 0;
+      coWeight = 0;
       assert(isConsistent());
    }
    /// copy constructor
