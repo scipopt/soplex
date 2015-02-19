@@ -194,7 +194,7 @@ public:
    /// Returns the objective coefficient of the LPRowBase with DataKey \p k in LPRowSetBase (writeable).
    R& obj_w(const DataKey& k)
    {
-      return obj[number(k)];
+      return object[number(k)];
    }
 
    /// Returns a writable rowVector of the \p i 'th LPRowBase.
