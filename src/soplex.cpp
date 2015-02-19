@@ -512,6 +512,7 @@ namespace soplex
       // initialized in setSettings() below
       _realLP = &_solver;
       _isRealLPLoaded = true;
+      _currentProb = IDS_ORIG;
 
       // initialize statistics
       spx_alloc(_statistics);

@@ -315,6 +315,10 @@ namespace soplex
    {
       assert(status() != SPxSolver::OPTIMAL || _isRealLPLoaded);
 
+      // _currentProb == IDS_RED && status() != SPxSolver::OPTIMAL
+      // _currentProb == IDS_COMP && status() == SPxSolver::OPTIMAL
+      // _currentProb == IDS_ORIG && status() >= SPxSolver::OPTIMAL
+
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::ERROR);
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_RATIOTESTER);
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_PRICER);

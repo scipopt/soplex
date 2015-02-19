@@ -1210,9 +1210,7 @@ private:
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
    SPxLPReal* _realLP; // the real LP is also used as the original LP for the improved dual simplex
-   // @todo remove the _ideRedLP and _idsCompLP
-   SPxLPIds* _idsRedLP; // the reduced problem LP for the improved dual simplex
-   SPxLPIds* _idsCompLP; // the complementary problem LP for the improved dual simplex
+   SPxLPIds* _idsLP; // used to store the original LP for the improved dual simplex
    SPxSimplifier* _simplifier;
    SPxScaler* _scaler;
    SPxStarter* _starter;
@@ -1266,15 +1264,23 @@ private:
 
    typedef enum
    {
-      // the real (original) LP is loaded in the _solver variable
-      IDS_REALLPLOADED = 0,
+      // is the original problem currently being solved.
+      IDS_ORIG = 0,
 
-      // the reduced problem lp is loaded in the _solver variable
-      IDS_REDLPLOADED = 1,
+      // is the reduced problem currently being solved.
+      IDS_RED = 1,
 
-      // the complementary problem is loaded in the _solver variable
-      IDS_COMPLPLOADED = 2
-   } idsSolverStatus;
+      // is the complementary problem currently being solved.
+      IDS_COMP = 2
+   } idsStatus;
+
+   // the expected sign of the dual variables.
+   enum DualSign
+   {
+      IS_POS,
+      IS_NEG,
+      IS_FREE
+   };
 
    SPxSolver _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
@@ -1317,7 +1323,7 @@ private:
    int numRedProbIter;     // the number of simplex iterations performed in the reduced problem.
    int numCompProbIter;    // the number of iterations of the complementary problem.
 
-   idsSolverStatus _loadedLP;
+   idsStatus _currentProb;
 
    //@}
 
@@ -1627,6 +1633,12 @@ private:
    /// forms the complementary problem
    void _formIdsComplementaryProblem();
 
+   /// simplifies the problem and solves
+   void _idsSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
+
+   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
+   void _idsResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
+
    // This function assumes that the basis is in the row form.
    void _getNonPositiveDualMultiplierInds(Vector feasVector, int* nonposind, int* bind, int* colsforremoval,
          int* nnonposind);
@@ -1637,9 +1649,6 @@ private:
 
    /// computes the reduced problem objective coefficients
    void _computeReducedProbObjCoeff();
-
-   /// deletes rows and columns from the reduced problem
-   void _deleteRowsAndColumnsReducedProblem(int* colsforremoval, int* rowsforremoval);
 
    /// computes the compatible bound constraints and adds them to the reduced problem
    void _getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind, int* ncompatboundcons,
@@ -1653,7 +1662,7 @@ private:
    void _deleteAndUpdateRowsComplementaryProblem(int* initFixedVars);
 
    /// evaluates the solution of the reduced problem for the IDS
-   void _evaluateSolutionIDS();
+   void _evaluateSolutionIDS(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
 
    /// solves the complementary problem
    void _solveIdsComplementaryProblem();
@@ -1687,6 +1696,12 @@ private:
 
    /// checks the dual feasibility of the current basis
    bool checkBasisDualFeasibility(Vector feasVec);
+
+   /// returns the expected sign of the dual variables for the reduced problem
+   DualSign getExpectedDualVariableSign(int rowNumber);
+
+   /// returns the expected sign of the dual variables for the original problem
+   DualSign getOrigProbDualVariableSign(int rowNumber);
 
    //@}
 };

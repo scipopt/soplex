@@ -1207,6 +1207,12 @@ bool SPxSolver::terminate()
    if( type() == ENTER && getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL &&
          iteration() > prevIteration()/*iteration() % 10 == 0*/ )
    {
+      if( SPxBasis::status() >= SPxBasis::OPTIMAL )
+      {
+         m_status = RUNNING;
+         return true;
+      }
+
       Real degeneracyLevel = 0;
       degeneracyLevel = getDegeneracyLevel(fVec());
       printf("%d %d Degeneracy Level: %f\n", iteration(), lastUpdate(), degeneracyLevel);
