@@ -1625,7 +1625,7 @@ Real SPxSolver::getDegeneracyLevel(Vector feasvec)
    {
       // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
       // reduced costs. This requirement is regardless of the objective sense.
-      if( isZero(feasvec[i]) )
+      if( isZero(feasvec[i], feastol()) )
          numDegenerateRows++;
    }
 

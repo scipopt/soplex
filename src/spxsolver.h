@@ -1910,6 +1910,15 @@ public:
 
       return s.str();
    }
+
+   /// returns whether a basis needs to be found for the improved dual simplex
+   IdsStatus getIdsStatus() const
+   {
+      if( getStartingIdsBasis )
+         return FINDSTARTBASIS;
+      else
+         return DONTFINDSTARTBASIS;
+   }
    //@}
 
    //------------------------------------

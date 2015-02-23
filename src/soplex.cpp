@@ -215,8 +215,8 @@ namespace soplex
             _intParamDescription[SoPlex::VERBOSITY] = "verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)";
             _intParamLower[SoPlex::VERBOSITY] = 0;
             _intParamUpper[SoPlex::VERBOSITY] = 5;
-            //_intParamDefault[SoPlex::VERBOSITY] = SoPlex::VERBOSITY_NORMAL;
-            _intParamDefault[SoPlex::VERBOSITY] = SoPlex::VERBOSITY_FULL;
+            _intParamDefault[SoPlex::VERBOSITY] = SoPlex::VERBOSITY_NORMAL;
+            //_intParamDefault[SoPlex::VERBOSITY] = SoPlex::VERBOSITY_FULL;
 
             // type of simplifier
             _intParamName[SoPlex::SIMPLIFIER] = "simplifier";

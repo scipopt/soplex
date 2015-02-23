@@ -80,7 +80,8 @@ namespace soplex
          _idsSimplifyAndSolve(_solver, _slufactor, false, false);
          _solver.basis().solve(_idsFeasVector, _solver.maxObj());
          degeneracyLevel = _solver.getDegeneracyLevel(_idsFeasVector);
-         if( _solver.type() == SPxSolver::LEAVE || _solver.status() >= SPxSolver::OPTIMAL )
+         if( _solver.type() == SPxSolver::LEAVE || _solver.status() >= SPxSolver::OPTIMAL
+               || _solver.getIdsStatus() == SPxSolver::DONTFINDSTARTBASIS )
          {
             // returning the sense to minimise
             if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -148,6 +149,11 @@ namespace soplex
          _currentProb = IDS_RED;
 
          // solve the reduced problem
+         printf("\n");
+         printf("=========================\n");
+         printf("Solving: Reduced Problem.\n");
+         printf("=========================\n");
+         printf("\n");
          _hasBasis = hasRedBasis;
          _idsSimplifyAndSolve(_solver, _slufactor, !i, !i);
          assert(_isRealLPLoaded);
@@ -161,12 +167,6 @@ namespace soplex
 
          if( _solver.status() > SPxSolver::OPTIMAL )
             break;
-
-         printf("Writing the reduced lp to a file\n");
-         if( _solver.status() == SPxSolver::OPTIMAL )
-            _solver.writeFile("reduced.lp");
-         else
-            _solver.writeFile("reduced_infeas.lp");
 
          _idsFeasVector.reDim(_solver.nCols());
          _solver.basis().solve(_idsFeasVector, _solver.maxObj());
@@ -191,6 +191,11 @@ namespace soplex
          _currentProb = IDS_COMP;
 
          // solve the complementary problem
+         printf("\n");
+         printf("===============================\n");
+         printf("Solving: Complementary Problem.\n");
+         printf("===============================\n");
+         printf("\n");
          _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
          assert(_isRealLPLoaded);
 
@@ -354,8 +359,6 @@ namespace soplex
       printf("Solving time: %f\n", solveTime());
 #endif
 
-      VectorReal origObj = _solver.maxObj();
-
       // computing the reduced problem obj coefficient vector and updating the problem
       _computeReducedProbObjCoeff();
 
@@ -381,9 +384,6 @@ namespace soplex
 
       for( int i = 0; i < ncompatboundcons; i++ )
          _idsReducedProbColRowIDs[compatboundcons[i]] = addedrowids[i];
-
-
-      VectorReal finalObj = _solver.maxObj();
 
       // freeing allocated memory
       spx_free(addedrowids);
@@ -888,15 +888,15 @@ namespace soplex
             // instances.
             //if( GT(compProbPrimal*maxDualRatio, 0, 1e-10) ||
                   //(isZero(maxDualRatio, 1e-10) && GT(compProbPrimal, 0, 1e-10)) )
-            int compRowNum = _compSolver.number(SPxColId(_idsDualColIDs[i]));
+                  //int compRowNum = _compSolver.number(SPxColId(_idsDualColIDs[i]));
             SoPlex::DualSign varSign = getOrigProbDualVariableSign(rownumber);
 
 #ifdef SOLVEIDS_DEBUG
             printf("i: %d, rownumber: %d, compProbPrimal: %f, dualSign: %d\n", i, rownumber, compProbPrimal, varSign);
 #endif
-            if( (varSign == SoPlex::IS_FREE && !isZero(compProbPrimal, 1e-10)) ||
-                  (varSign == SoPlex::IS_POS && GT(compProbPrimal*maxDualRatio, 0, 1e-10)) ||
-                  (varSign == SoPlex::IS_NEG && LT(compProbPrimal*maxDualRatio, 0, 1e-10))
+            if( (varSign == SoPlex::IS_FREE && !isZero(compProbPrimal, feastol)) ||
+                  (varSign == SoPlex::IS_POS && GT(compProbPrimal*maxDualRatio, 0, feastol)) ||
+                  (varSign == SoPlex::IS_NEG && LT(compProbPrimal*maxDualRatio, 0, feastol))
                   /*|| (//isZero(objValue, 1e-10) &&
                    * _compSolver.basis().desc().rowStatus(compRowNum) > SPxBasis::Desc::D_FREE &&
                      _compSolver.basis().desc().rowStatus(compRowNum) < SPxBasis::Desc::D_UNDEFINED)*/ )
@@ -904,67 +904,6 @@ namespace soplex
 #ifdef SOLVEIDS_DEBUG
                printf("Adding rows!!!\n");
 #endif
-               LPColSet additionalcols;
-               int* newcolidx = 0;
-               int nnewcolidx = 0;
-               spx_alloc(newcolidx, _realLP->nCols());
-
-               int* changeElementCol = 0;
-               int* changeElementRow = 0;
-               double* changeElementVal = 0;
-               int nChangeElement = 0;
-               spx_alloc(changeElementCol, _realLP->nCols());
-               spx_alloc(changeElementRow, _realLP->nCols());
-               spx_alloc(changeElementVal, _realLP->nCols());
-
-#if 0
-               _realLP->getRow(_realLP->number(SPxRowId(_idsPrimalRowIDs[i])), origlprow);
-               for( int j = 0; j < origlprow.rowVector().size(); j++ )
-               {
-                  printf("%d %d\n", j, _solver.number(_idsReducedProbColIDs[origlprow.rowVector().index(j)]));
-                  // the column of the new row may not exist in the current reduced problem.
-                  // if the column does not exist, then it is necessary to create the column.
-                  int colnumber = origlprow.rowVector().index(j);
-                  if( !_idsReducedProbCols[colnumber] )
-                  {
-                     printf("(%d), %d obj: %f, lb: %f, ub: %f\n", currnumcols, colnumber, _realLP->maxObj(colnumber),
-                           _realLP->lower(colnumber), _realLP->upper(colnumber));
-                     assert(!_idsReducedProbColIDs[colnumber].isValid());
-                     additionalcols.create(1, _realLP->maxObj(colnumber), _realLP->lower(colnumber),
-                           _realLP->upper(colnumber));
-
-                     rowtoaddVec.add(currnumcols, origlprow.rowVector().value(j));
-                     _idsReducedProbCols[colnumber] = true;
-                     currnumcols++;
-
-                     newcolidx[nnewcolidx] = colnumber;
-                     nnewcolidx++;
-
-                     // Checking the non-zeros of the column
-                     LPColReal addedCol;
-                     _realLP->getCol(colnumber, addedCol);
-                     for( int k = 0; k < addedCol.colVector().size(); k++ )
-                     {
-                        if( _idsReducedProbRows[addedCol.colVector().index(k)] )
-                        {
-                           printf("=========================================== Found extra entry!!!!\n");
-                           changeElementCol[nChangeElement] = currnumcols - 1;
-                           changeElementRow[nChangeElement] =
-                              _solver.number(_idsReducedProbRowIDs[addedCol.colVector().index(k)]);
-                           changeElementVal[nChangeElement] = addedCol.colVector().value(k);
-                           nChangeElement++;
-                        }
-                     }
-                  }
-                  else
-                     rowtoaddVec.add(_solver.number(_idsReducedProbColIDs[origlprow.rowVector().index(j)]),
-                           origlprow.rowVector().value(j));
-               }
-
-               updaterows.add(origlprow.lhs(), rowtoaddVec, origlprow.rhs());
-#endif
-
-
                //this set of statements are required to add rows to the reduced problem. This will add a row for every
                //violated constraint. I only want to add a row for the most violated constraint. That is why the row
                //adding functionality is put outside the for loop.
@@ -982,26 +921,6 @@ namespace soplex
                   bestrow = rownumber;
                }
 #endif
-
-
-               SPxColId* addedcolids = 0;
-               spx_alloc(addedcolids, nnewcolidx);
-#if 0
-               _solver.addCols(addedcolids, additionalcols);
-
-               for( int j = 0; j < nnewcolidx; j++ )
-                  _idsReducedProbColIDs[newcolidx[j]] = addedcolids[j];
-
-               for( int j = 0; j < nChangeElement; j++ )
-                  _solver.changeElement(changeElementRow[j], changeElementCol[j], changeElementVal[j]);
-#endif
-
-               // freeing allocated memory
-               spx_free(addedcolids);
-               spx_free(changeElementVal);
-               spx_free(changeElementRow);
-               spx_free(changeElementCol);
-               spx_free(newcolidx);
             }
          }
       }
@@ -1040,6 +959,9 @@ namespace soplex
          int* nnonposind)
    {
       assert(_solver.rep() == SPxSolver::ROW);
+
+      Real feastol = realParam(SoPlex::FEASTOL);
+
       bool delCol;
 
       _idsReducedProbColIDs.reSize(numColsReal());
@@ -1067,7 +989,7 @@ namespace soplex
                                                                                    // for the original LP.
 
             //@todo need to check this regarding min and max problems
-            if( isZero(feasVector[i]) )
+            if( isZero(feasVector[i], feastol) )
             {
                nonposind[*nnonposind] = i;
                (*nnonposind)++;
@@ -1085,8 +1007,8 @@ namespace soplex
 #endif
             bind[i] = _realLP->number(SPxColId(_solver.basis().baseId(i)));
 
-            int colnumber = _solver.number(_solver.basis().baseId(i));
-            if( isZero(feasVector[i])/* &&
+            //int colnumber = _solver.number(_solver.basis().baseId(i));
+            if( isZero(feasVector[i], feastol)/* &&
                    _solver.basis().desc().colStatus(colnumber) != SPxBasis::Desc::P_FIXED*/ )
             {
                //nonposind[*nnonposind] = _solver.number(_solver.basis().baseId(i));
@@ -2109,24 +2031,24 @@ namespace soplex
    // next steps in the algorithm.
    void SoPlex::_evaluateSolutionIDS(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result)
    {
-      SPxSolver::Status status;
+      SPxSolver::Status solverStat = SPxSolver::UNKNOWN;
       if( result == SPxSimplifier::INFEASIBLE )
-         status = SPxSolver::INFEASIBLE;
+         solverStat = SPxSolver::INFEASIBLE;
       else if( result == SPxSimplifier::DUAL_INFEASIBLE )
-         status = SPxSolver::INForUNBD;
+         solverStat = SPxSolver::INForUNBD;
       else if( result == SPxSimplifier::UNBOUNDED )
-         status = SPxSolver::UNBOUNDED;
+         solverStat = SPxSolver::UNBOUNDED;
       else if( result == SPxSimplifier::VANISHED )
-         status = SPxSolver::OPTIMAL;
+         solverStat = SPxSolver::OPTIMAL;
       else if( result == SPxSimplifier::OKAY )
-         status = solver.status();
+         solverStat = solver.status();
 
       // updating the status of SoPlex if the problem solved is the reduced problem.
       if( _currentProb == IDS_ORIG || _currentProb == IDS_RED )
-         _status = status;
+         _status = solverStat;
 
       // process result
-      switch( status )
+      switch( solverStat )
       {
          case SPxSolver::OPTIMAL:
             if( !_isRealLPLoaded )
