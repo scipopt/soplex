@@ -1069,7 +1069,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
-      spxout << "DSLUFA03 Basis:\n";
+      std::cout << "DSLUFA03 Basis:\n";
       int j = 0;
       for (i = 0; i < dim(); ++i)
          j += matrix[i]->size();
@@ -1080,10 +1080,10 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
                     i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
       }
       fclose(fl);
-      spxout << "DSLUFA04 LU-Factors:" << std::endl;
+      std::cout << "DSLUFA04 LU-Factors:" << std::endl;
       dump();
       
-      spxout << "DSLUFA05 threshold = " << lastThreshold 
+      std::cout << "DSLUFA05 threshold = " << lastThreshold
              << "\tstability = " << stability() << std::endl;
    )
 

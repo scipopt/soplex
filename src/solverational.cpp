@@ -3934,7 +3934,7 @@ namespace soplex
 
          if( _upperFinite(_rowTypes[r]) && _workSol._slacks[r] > rhsRational(r) )
          {
-            MSG_DEBUG( std:cout << "Rhs of row " << r << " violated by " << rationalToString(_workSol._slacks[r] - rhsRational(r)) << "\n" );
+            MSG_DEBUG( std::cout << "Rhs of row " << r << " violated by " << rationalToString(_workSol._slacks[r] - rhsRational(r)) << "\n" );
             MSG_INFO1( spxout, spxout << "Reconstructed solution primal infeasible (4).\n" );
             _statistics->reconstructionTime->stop();
             return false;

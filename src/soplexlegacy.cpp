@@ -694,8 +694,6 @@ bool SoPlexLegacy::writeBasisFile(
    }
 
    #ifndef NDEBUG
-   MSG_DEBUG( thedesc.dump() );
-
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for( ; row < nRows(); row++ )
    {
@@ -703,7 +701,6 @@ bool SoPlexLegacy::writeBasisFile(
          break;
    }
    assert(row == nRows());
-
    #endif // NDEBUG
 
    os << "ENDATA" << std::endl;

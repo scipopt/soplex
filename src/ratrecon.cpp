@@ -80,7 +80,7 @@ namespace soplex
 
       mpz_sqrt(Dbound, Dbound);
 
-      MSG_DEBUG( spxout << "reconstructing " << dim << " dimensional vector with denominator bound " << mpz_get_str(0, 10, Dbound) << "\n" );
+      MSG_DEBUG( std::cout << "reconstructing " << dim << " dimensional vector with denominator bound " << mpz_get_str(0, 10, Dbound) << "\n" );
 
       /* if Dbound is below 2^24 increase it to this value, this avoids changing input vectors that have low denominator
        * because they are floating point representable
@@ -107,7 +107,7 @@ namespace soplex
          assert(j >= 0);
          assert(j < dim);
 
-         MSG_DEBUG( spxout << "  --> component " << j << " = " << &xnum[j] << " / denom\n" );
+         MSG_DEBUG( std::cout << "  --> component " << j << " = " << &xnum[j] << " / denom\n" );
 
          /* if xnum =0 , then just leave x[j] as zero */
          if( mpz_sgn(xnum[j]) != 0 )
@@ -123,7 +123,7 @@ namespace soplex
 
             if(mpz_cmp(td,Dbound)<=0)
             {
-               MSG_DEBUG( spxout << "marker 1\n" );
+               MSG_DEBUG( std::cout << "marker 1\n" );
 
                mpq_set_num(resvec[j].getMpqRef_w(),tn);
                mpq_set_den(resvec[j].getMpqRef_w(),td);
@@ -131,7 +131,7 @@ namespace soplex
             }
             else
             {
-               MSG_DEBUG( spxout << "marker 2\n" );
+               MSG_DEBUG( std::cout << "marker 2\n" );
 
                mpz_set_ui(temp,1);
 
@@ -156,7 +156,7 @@ namespace soplex
                /* if q is already big, skip loop */
                if( mpz_cmp(q[2],Dbound) > 0 )
                {
-                  MSG_DEBUG( spxout << "marker 3\n" );
+                  MSG_DEBUG( std::cout << "marker 3\n" );
                   done = 1;
                }
 
@@ -187,7 +187,7 @@ namespace soplex
                      done = 1;
                   cfcnt++;
 
-                  MSG_DEBUG( spxout << "  --> convergent denominator = " << &q[2] << "\n" );
+                  MSG_DEBUG( std::cout << "  --> convergent denominator = " << &q[2] << "\n" );
                }
 
                /* Assign the values */
@@ -199,7 +199,7 @@ namespace soplex
 
                if( mpz_cmp(gcd, Dbound) > 0 )
                {
-                  MSG_DEBUG( spxout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n" );
+                  MSG_DEBUG( std::cout << "terminating with gcd " << &gcd << " exceeding Dbound " << &Dbound << "\n" );
                   rval = false;
                   goto CLEANUP;
                }
@@ -271,7 +271,7 @@ namespace soplex
          }
       }
 
-      MSG_DEBUG( spxout << "LCM = " << mpz_get_str(0, 10, denom) << "\n" );
+      MSG_DEBUG( std::cout << "LCM = " << mpz_get_str(0, 10, denom) << "\n" );
 
       /* reconstruct */
       rval = Reconstruct(input, xnum, denom, dim, denomBoundSquared, indexSet);

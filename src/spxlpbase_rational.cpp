@@ -924,8 +924,6 @@ syntax_error:
    if( p_rnames == 0 )
       spx_free(rnames);
 
-   MSG_DEBUG( std::cout << "DLPFRD16\n" << *this; )
-
    return finished;
 }
 

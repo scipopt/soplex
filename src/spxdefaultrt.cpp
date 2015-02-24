@@ -384,7 +384,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int)
 
    MSG_DEBUG(
       if( !enterId.isValid() )
-         spxout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;
+         std::cout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;
    )
    max = val;
 

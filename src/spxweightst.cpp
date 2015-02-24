@@ -306,9 +306,9 @@ void SPxWeightST::generate(SPxSolver& base)
          {
             MSG_DEBUG(
                if (pref[i].type() == SPxId::ROW_ID)
-                  spxout << "DWEIST01 r" << base.number(pref[i]);
+                  std::cout << "DWEIST01 r" << base.number(pref[i]);
                else
-                  spxout << "DWEIST02 c" << base.number(pref[i]);
+                  std::cout << "DWEIST02 c" << base.number(pref[i]);
             )
 
             forbidden[sel] = 2;
@@ -654,12 +654,12 @@ void SPxWeightST::setupWeights(SPxSolver& bse)
 
    MSG_DEBUG({
       for(i = 0; i < bse.nCols(); i++)
-         spxout << "C i= " << i 
+         std::cout << "C i= " << i
                   << " up= " << colUp[i]
                   << " w= " << colWeight[i]
                   << std::endl;
       for(i = 0; i < bse.nRows(); i++)
-         spxout << "R i= " << i 
+         std::cout << "R i= " << i
                   << " rr= " << rowRight[i]
                   << " w= " << rowWeight[i]
                   << std::endl;

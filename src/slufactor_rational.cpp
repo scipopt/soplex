@@ -1005,21 +1005,21 @@ SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[
    MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
-      spxout << "DSLUFA03 Basis:\n";
+      std::cout << "DSLUFA03 Basis:\n";
       int j = 0;
       for (i = 0; i < dim(); ++i)
          j += matrix[i]->size();
       for (i = 0; i < dim(); ++i)
       {
          for (j = 0; j < matrix[i]->size(); ++j)
-            fprintf(fl, "%8d  %8d  %16g\n",
-                    i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
+            fprintf(fl, "%8d  %8d  %s\n",
+                    i + 1, matrix[i]->index(j) + 1, rationalToString(matrix[i]->value(j)).c_str());
       }
       fclose(fl);
-      spxout << "DSLUFA04 LU-Factors:" << std::endl;
+      std::cout << "DSLUFA04 LU-Factors:" << std::endl;
       dump();
 
-      spxout << "DSLUFA05 threshold = " << lastThreshold
+      std::cout << "DSLUFA05 threshold = " << lastThreshold
              << "\tstability = " << stability() << std::endl;
    )
 

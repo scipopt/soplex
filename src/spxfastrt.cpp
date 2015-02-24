@@ -946,7 +946,7 @@ int SPxFastRT::selectLeave(Real& val, Real)
 
    MSG_DEBUG(
       if (leave >= 0)
-         spxout
+         std::cout
            << "DFSTRT01 "
            << thesolver->basis().iteration() << "("
            << std::setprecision(6) << thesolver->value() << ","
@@ -957,7 +957,7 @@ int SPxFastRT::selectLeave(Real& val, Real)
            << std::setprecision(6) << maxabs
            << std::endl;
       else
-         spxout << "DFSTRT02 " << thesolver->basis().iteration()
+         std::cout << "DFSTRT02 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
 
@@ -1292,11 +1292,11 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
             x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
          else
             x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-         spxout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
+         std::cout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
                 << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
       }
       else
-         spxout << "DFSTRT04 " << thesolver->basis().iteration()
+         std::cout << "DFSTRT04 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
 

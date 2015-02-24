@@ -1679,26 +1679,26 @@ Rational& Rational::powRound()
 {
    mpz_t roundval;
 
-   MSG_DEBUG( spxout << "rounding " << rationalToString(this->dpointer->privatevalue) << " to power of two" << "\n" );
+   MSG_DEBUG( std::cout << "rounding " << rationalToString(this->dpointer->privatevalue) << " to power of two" << "\n" );
 
    mpz_init(roundval);
    mpz_cdiv_q(roundval, mpq_numref(this->dpointer->privatevalue), mpq_denref(this->dpointer->privatevalue));
    mpz_sub_ui(roundval, roundval, 1);
 
-   MSG_DEBUG( spxout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
+   MSG_DEBUG( std::cout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
 
    size_t binlog = mpz_sizeinbase(roundval, 2);
 
-   MSG_DEBUG( spxout << "   --> 2^" << binlog << "\n" );
+   MSG_DEBUG( std::cout << "   --> 2^" << binlog << "\n" );
 
    mpz_ui_pow_ui(roundval, 2, binlog);
 
-   MSG_DEBUG( spxout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
+   MSG_DEBUG( std::cout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
 
    mpq_set_z(this->dpointer->privatevalue, roundval);
    mpz_clear(roundval);
 
-   MSG_DEBUG( spxout << "   --> " << rationalToString(this->dpointer->privatevalue) << "\n" );
+   MSG_DEBUG( std::cout << "   --> " << rationalToString(this->dpointer->privatevalue) << "\n" );
 
    return *this;
 }
