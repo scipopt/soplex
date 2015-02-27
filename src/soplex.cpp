@@ -4912,33 +4912,23 @@ namespace soplex
 
       // maximum number of updates before fresh factorization
       case SoPlex::FACTOR_UPDATE_MAX:
-         if( value <= 1 )
-            return false;
          _solver.basis().setMaxUpdates(value);
          break;
 
       // iteration limit (-1 if unlimited)
       case SoPlex::ITERLIMIT:
-         if( value < -1 )
-            return false;
          break;
 
       // refinement limit (-1 if unlimited)
       case SoPlex::REFLIMIT:
-         if( value < -1 )
-            return false;
          break;
 
       // stalling refinement limit (-1 if unlimited)
       case SoPlex::STALLREFLIMIT:
-         if( value < -1 )
-            return false;
          break;
 
       // display frequency
       case SoPlex::DISPLAYFREQ:
-         if( value <= 0 )
-            return false;
          _solver.setDisplayFreq(value);
          break;
 
@@ -5170,8 +5160,6 @@ namespace soplex
 
       // minimum number of stalling refinements since last pivot to trigger rational factorization
       case SoPlex::RATFAC_MINSTALLS:
-         if( value < 0 )
-            return false;
          break;
 
       default:
