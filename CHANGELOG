@@ -36,6 +36,7 @@ interface & parameters:
 - new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
 - new parameter bool:powerscaling for rounding scaling factors during iterative refinement to powers of two
 - new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
+- new methods to store and set steepest edge weights
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier

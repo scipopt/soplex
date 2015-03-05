@@ -34,6 +34,7 @@ void SPxSteepPR::clear()
 {
    thesolver = 0;
    prefSetup = 0;
+   weightsSetup = false;
 }
 
 void SPxSteepPR::load(SPxSolver* base)
@@ -91,22 +92,48 @@ void SPxSteepPR::setType(SPxSolver::Type type)
 void SPxSteepPR::setupWeights(SPxSolver::Type type)
 {
    int i;
-   if (setup == DEFAULT)
+   int endDim = 0;
+   int endCoDim = 0;
+
+   if( setup == DEFAULT )
    {
-      if (type == SPxSolver::ENTER)
+      if( type == SPxSolver::ENTER )
       {
-         coPenalty.reDim(thesolver->dim());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+         if( weightsSetup )
+         {
+            // check for added/removed rows and adapt norms accordingly
+            if (coPenalty.dim() < thesolver->dim())
+               endDim = coPenalty.dim();
+            else
+               endDim = thesolver->dim();
+            if (penalty.dim() < thesolver->coDim())
+               endCoDim = penalty.dim();
+            else
+               endCoDim = thesolver->coDim();
+         }
+
+         coPenalty.reDim(thesolver->dim(), false);
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
             coPenalty[i] = 2;
-         penalty.reDim(thesolver->coDim());
-         for (i = thesolver->coDim() - 1; i >= 0; --i)
+         penalty.reDim(thesolver->coDim(), false);
+         for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
             penalty[i] = 1;
       }
       else
       {
          assert(type == SPxSolver::LEAVE);
-         coPenalty.reDim(thesolver->dim());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+
+         if( weightsSetup )
+         {
+            // check for added/removed rows and adapt norms accordingly
+            if (coPenalty.dim() < thesolver->dim())
+               endDim = coPenalty.dim();
+            else
+               endDim = thesolver->dim();
+         }
+
+         coPenalty.reDim(thesolver->dim(), false);
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
          {
             const SPxId id = thesolver->basis().baseId(i);
             const int n    = thesolver->number(id);
@@ -122,19 +149,19 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
 
       if (type == SPxSolver::ENTER)
       {
-         coPenalty.reDim(thesolver->dim());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+         coPenalty.reDim(thesolver->dim(), false);
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
             coPenalty[i] = 1;
-         penalty.reDim(thesolver->coDim());
-         for (i = thesolver->coDim() - 1; i >= 0; --i)
+         penalty.reDim(thesolver->coDim(), false);
+         for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
             penalty[i] = 1 + thesolver->vector(i).length2();
       }
       else
       {
          assert(type == SPxSolver::LEAVE);
-         coPenalty.reDim(thesolver->dim());
+         coPenalty.reDim(thesolver->dim(), false);
          SSVector tmp(thesolver->dim(), thesolver->epsilon());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
          {
             const SPxId id = thesolver->basis().baseId(i);
             const int n    = thesolver->number(id);
@@ -145,7 +172,78 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
          }
       }
    }
+   // allow exporting of norms when in dual simplex
+   if( (type == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN) ||
+       (type == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW) )
+      weightsSetup = true;
+   else
+      weightsSetup = false;
 }
+
+bool SPxSteepPR::getDualNorms(int& nrows, int& ncols, Real* norms) const
+{
+   MSG_DEBUG( std::cout << "exporting dual steepest edge norms" << std::endl; )
+
+   if( !weightsSetup )
+      return false;
+
+   if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
+   {
+      ncols = 0;
+      nrows = coPenalty.dim();
+
+      assert(nrows == thesolver->dim());
+
+      for( int i = 0; i < nrows; ++i)
+         norms[i] = coPenalty[i];
+   }
+   else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW)
+   {
+      nrows = penalty.dim();
+      ncols = coPenalty.dim();
+
+      assert(ncols == thesolver->dim());
+      assert(nrows == thesolver->coDim());
+
+      for( int i = 0; i < nrows; ++i )
+         norms[i] = penalty[i];
+
+      for( int i = 0; i < ncols; ++i )
+         norms[nrows + i] = coPenalty[i];
+   }
+   else
+      return false;
+
+   return true;
+}
+
+bool SPxSteepPR::setDualNorms(int nrows, int ncols, Real* norms)
+{
+   MSG_DEBUG( std::cout << "setting dual steepest edge norms" << std::endl; )
+
+   if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
+   {
+      for( int i = 0; i < nrows; ++i )
+         coPenalty[i] = norms[i];
+      weightsSetup = true;
+   }
+   else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW)
+   {
+      for( int i = 0; i < nrows; ++i )
+         penalty[i] = norms[i];
+      for( int i = 0; i < ncols; ++i )
+         coPenalty[i] = norms[nrows + i];
+      weightsSetup = true;
+   }
+   else
+   {
+      weightsSetup = false;
+      return false;
+   }
+
+   return true;
+}
+
 
 void SPxSteepPR::setupPrefsX(
    Real mult, 

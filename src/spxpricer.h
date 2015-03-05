@@ -239,6 +239,20 @@ public:
    {}
    //@}
 
+   /**@name Import/Export norms */
+   //@{
+   /// export norms from pricer
+   virtual bool getDualNorms(int& nrows, int& ncols, Real* norms) const
+   {
+      return false;
+   }
+   /// import norms into pricer
+   virtual bool setDualNorms(int nrows, int ncols, Real* norms)
+   {
+      return false;
+   }
+   //@}
+
    //-------------------------------------
    /**@name Debugging */
    //@{

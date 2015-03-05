@@ -823,20 +823,11 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
 
       if (sel > fastDelta / maxabs)
       {
+         sel = 0.0;
          if (x > 0.0)
-         {
-            thesolver->theShift += low[leave];
-            sel = 0.0;
-            low[leave] = vec[leave] + sel * x;
-            thesolver->theShift -= low[leave];
-         }
+            thesolver->shiftLBbound(leave, vec[leave]);
          else
-         {
-            thesolver->theShift -= up[leave];
-            sel = 0.0;
-            up[leave] = vec[leave] + sel * x;
-            thesolver->theShift += up[leave];
-         }
+            thesolver->shiftUBbound(leave, vec[leave]);
       }
    }
    else

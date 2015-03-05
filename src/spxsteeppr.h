@@ -93,6 +93,8 @@ private:
    Setup setup;
    /// has a refinement step already been tried?
    bool refined;
+   /// are weights set up (either by setDualNorms() or by setupWeights())?
+   bool weightsSetup;
    //@}
 
    //-------------------------------------
@@ -140,7 +142,11 @@ public:
    SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
       : SPxPricer(name)
       , workRhs (0, 1e-16)
+      , pi_p(1.0)
+      , prefSetup(0)
       , setup (mode)
+      , refined(false)
+      , weightsSetup(false)
    {
       assert(isConsistent());
    }
@@ -157,6 +163,8 @@ public:
       , pref(old.pref)
       , leavePref(old.leavePref)
       , setup(old.setup)
+      , refined(old.refined)
+      , weightsSetup(old.weightsSetup)
    {
       assert(isConsistent());
    }
@@ -176,6 +184,8 @@ public:
          pref = rhs.pref;
          leavePref = rhs.leavePref;
          setup = rhs.setup;
+         refined = rhs.refined;
+         weightsSetup = rhs.weightsSetup;
 
          assert(isConsistent());
       }
@@ -223,6 +233,14 @@ public:
    virtual void removedVecs(const int perm[]);
    /// \p n covectors have been removed from loaded LP.
    virtual void removedCoVecs(const int perm[]);
+   //@}
+
+   /**@name Import/Export norms */
+   //@{
+   /// export norms from pricer
+   virtual bool getDualNorms(int& nrows, int& ncols, Real* norms) const;
+   /// import norms into pricer
+   virtual bool setDualNorms(int nrows, int ncols, Real* norms);
    //@}
 
    //-------------------------------------

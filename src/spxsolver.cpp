@@ -1697,6 +1697,19 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
    loadBasis(ds);
 }
 
+bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
+{
+   assert(thepricer != NULL);
+   return thepricer->getDualNorms(nnormsRow, nnormsCol, norms);
+}
+
+bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
+{
+   assert(thepricer != NULL);
+   return thepricer->setDualNorms(nnormsRow, nnormsCol, norms);
+}
+
+
 //
 // Auxiliary functions.
 //

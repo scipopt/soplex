@@ -1408,15 +1408,21 @@ public:
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      theShift += to - theUBbound[i];
-      theUBbound[i] = to;
+      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
+      {
+         theShift += to - theUBbound[i];
+         theUBbound[i] = to;
+      }
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      theShift += theLBbound[i] - to;
-      theLBbound[i] = to;
+      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
+      {
+         theShift += theLBbound[i] - to;
+         theLBbound[i] = to;
+      }
    }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
    void shiftUPbound(int i, Real to)
@@ -1859,6 +1865,13 @@ public:
          m_status = UNKNOWN;
       SPxBasis::setStatus( stat );
    }
+
+   /// get dual steepest edge norms
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+
+   /// set dual steepest edge norms
+   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
+
    /// reset cumulative time counter to zero.
    void resetCumulativeTime()
    {
