@@ -87,14 +87,17 @@ namespace soplex
 #define DO_WITH_ERR_VERBOSITY( do_something ) {}
 #else
 #define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) \
-   {                                                     \
-     if( verbosity <= spxout.getVerbosity() )            \
-     {                                                   \
-        const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
-        spxout.setVerbosity( verbosity );                \
-        do_something;                                    \
-        spxout.setVerbosity( old_verbosity );            \
-     }                                                   \
+   {                                                             \
+     if( &spxout != NULL )                                       \
+     {                                                           \
+        if( verbosity <= spxout.getVerbosity() )                 \
+        {                                                        \
+           const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
+           spxout.setVerbosity( verbosity );                     \
+           do_something;                                         \
+           spxout.setVerbosity( old_verbosity );                 \
+        }                                                        \
+     }                                                           \
    }
 #define DO_WITH_ERR_VERBOSITY( do_something ) { do_something; }
 #endif
