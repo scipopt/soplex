@@ -472,6 +472,7 @@ SPxId SPxDevexPR::selectEnterX(Real tol)
 
    best = 0;
    bestCo = 0;
+   last = 1.0;
 
    // avoid uninitialized value later on in entered4X()
    last = 1.0;

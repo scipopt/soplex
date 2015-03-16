@@ -173,6 +173,8 @@ void SPxSolver::setType(Type tp)
    {
       theType = tp;
 
+      forceRecompNonbasicValue();
+
       unInit();
 #if 0
       else
@@ -483,6 +485,7 @@ void SPxSolver::clear()
    theTest.clear();
    theCoTest.clear();
 
+   forceRecompNonbasicValue();
    unInit();
    SPxLP::clear();
    setBasisStatus(SPxBasis::NO_PROBLEM);
@@ -651,12 +654,17 @@ Real SPxSolver::maxInfeas() const
    return inf;
 }
 
-Real SPxSolver::nonbasicValue() const
+Real SPxSolver::nonbasicValue()
 {
-
    int i;
    Real val = 0;
    const SPxBasis::Desc& ds = desc();
+
+#ifndef ADDITIONAL_CHECKS
+   // if the value is available we don't need to recompute it
+   if ( m_nonbasicValueUpToDate && rep() == COLUMN )
+      return m_nonbasicValue;
+#endif
 
    if (rep() == COLUMN)
    {
@@ -674,7 +682,7 @@ Real SPxSolver::nonbasicValue() const
                val += theLCbound[i] * SPxLP::lower(i);
                //@ val += maxObj(i) * SPxLP::lower(i);
                break;
-            case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+            case SPxBasis::Desc::P_FIXED :
                val += maxObj(i) * SPxLP::lower(i);
                break;
             default:
@@ -691,7 +699,7 @@ Real SPxSolver::nonbasicValue() const
             case SPxBasis::Desc::P_ON_LOWER :
                val += theURbound[i] * SPxLP::lhs(i);
                break;
-            case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+            case SPxBasis::Desc::P_FIXED :
                val += maxRowObj(i) * SPxLP::lhs(i);
                break;
             default:
@@ -712,7 +720,7 @@ Real SPxSolver::nonbasicValue() const
             case SPxBasis::Desc::P_ON_LOWER :
                val += maxObj(i) * theLCbound[i];
                break;
-            case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+            case SPxBasis::Desc::P_FIXED :
                assert(theLCbound[i] == theUCbound[i]);
                val += maxObj(i) * theLCbound[i];
                break;
@@ -730,7 +738,7 @@ Real SPxSolver::nonbasicValue() const
             case SPxBasis::Desc::P_ON_LOWER :
                val += maxRowObj(i) * theURbound[i];
                break;
-            case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+            case SPxBasis::Desc::P_FIXED :
                val += maxRowObj(i) * theURbound[i];
                break;
             default:
@@ -781,14 +789,28 @@ Real SPxSolver::nonbasicValue() const
       }
    }
 
+#ifdef ADDITIONAL_CHECKS
+   if( m_nonbasicValueUpToDate && m_nonbasicValue != val )
+   {
+      MSG_DEBUG( std::cout << "\niteration: " << iteration() << " nonbasicvalue: " << m_nonbasicValue << " val: " << val << " diff: " << m_nonbasicValue - val << std::endl; )
+      assert(spxAbs(m_nonbasicValue - val) < 1e-9);
+   }
+#endif
+
+   if( !m_nonbasicValueUpToDate && rep() == COLUMN)
+   {
+      m_nonbasicValue = val;
+      m_nonbasicValueUpToDate = true;
+   }
+
    return val;
 }
 
-Real SPxSolver::value() const
+Real SPxSolver::value()
 {
-   Real x;
-
    assert(isInitialized());
+
+   Real x;
 
    // calling value() without having a suitable status is an error.
    if (!isInitialized())
@@ -806,6 +828,24 @@ Real SPxSolver::value() const
 
    return x;
 }
+
+bool SPxSolver::updateNonbasicValue(Real objChange)
+{
+   if( m_nonbasicValueUpToDate )
+      m_nonbasicValue += objChange;
+
+   MSG_DEBUG( std::cout
+      << "Iteration: " << iteration()
+      << ": updated objValue: " << objChange
+      << ", new value: " << m_nonbasicValue
+      << ", correct value: " << nonbasicValue()
+      << std::endl;
+   )
+
+   return m_nonbasicValueUpToDate;
+}
+
+
 
 void SPxSolver::setFeastol(Real d)
 {
@@ -867,6 +907,8 @@ SPxSolver::SPxSolver(
    , nCallsToTimelim(0)
    , objLimit(infinity)
    , m_status(UNKNOWN)
+   , m_nonbasicValue(0.0)
+   , m_nonbasicValueUpToDate(false)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -1118,6 +1160,8 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , nCallsToTimelim(base.nCallsToTimelim)
    , objLimit(base.objLimit)
    , m_status(base.m_status)
+   , m_nonbasicValue(base.m_nonbasicValue)
+   , m_nonbasicValueUpToDate(base.m_nonbasicValueUpToDate)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
    , theShift(base.theShift)
@@ -1695,6 +1739,7 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
       ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
 
    loadBasis(ds);
+   forceRecompNonbasicValue();
 }
 
 bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const

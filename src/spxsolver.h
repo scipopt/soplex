@@ -228,6 +228,9 @@ private:
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
+   Real           m_nonbasicValue;         ///< nonbasic part of current objective value
+   bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
+
    Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm
    Real           theShift;    ///< sum of all shifts applied to any bound.
@@ -525,7 +528,19 @@ public:
    /**@return Objective value of the current solution vector
     *         (see #getPrimal()).
     */
-   virtual Real value() const;
+   virtual Real value();
+
+   // update nonbasic part of the objective value by the given amount
+   /**@return whether nonbasic part of objective is reliable
+    */
+   bool updateNonbasicValue(Real objChange);
+
+   // trigger a recomputation of the nonbasic part of the objective value
+   void forceRecompNonbasicValue()
+   {
+      m_nonbasicValue = 0.0;
+      m_nonbasicValueUpToDate = false;
+   }
 
 #if 0
    /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics
@@ -819,6 +834,8 @@ public:
       unInit();
    }
    ///
+   virtual void changeLowerStatus(int i, Real newLower, Real oldLower = 0.0);
+   ///
    virtual void changeLower(const Vector& newLower);
    ///
    virtual void changeLower(int i, const Real& newLower);
@@ -827,6 +844,8 @@ public:
    {
       changeLower(number(p_id), p_newLower);
    }
+   ///
+   virtual void changeUpperStatus(int i, Real newUpper, Real oldLower = 0.0);
    ///
    virtual void changeUpper(const Vector& newUpper);
    ///
@@ -847,6 +866,8 @@ public:
       changeBounds(number(p_id), p_newLower, p_newUpper);
    }
    ///
+   virtual void changeLhsStatus(int i, Real newLhs, Real oldLhs = 0.0);
+   ///
    virtual void changeLhs(const Vector& newLhs);
    ///
    virtual void changeLhs(int i, const Real& newLhs);
@@ -855,6 +876,8 @@ public:
    {
       changeLhs(number(p_id), p_newLhs);
    }
+   ///
+   virtual void changeRhsStatus(int i, Real newRhs, Real oldRhs = 0.0);
    ///
    virtual void changeRhs(const Vector& newRhs);
    ///
@@ -1717,7 +1740,7 @@ protected:
     *  the objective value resulting form nonbasic variables for #COLUMN
     *  Representation.
     */
-   Real nonbasicValue() const;
+   Real nonbasicValue();
 
    /// Get pointer to the \p id 'th vector
    virtual const SVector* enterVector(const SPxId& p_id)
@@ -1729,21 +1752,21 @@ protected:
    ///
    virtual void getLeaveVals(int i,
       SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
-      Real& leaveMax, Real& leavebound, int& leaveNum);
+      Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
    ///
    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
       Real& enterBound, Real& newUBbound,
-      Real& newLBbound, Real& newCoPrhs);
+      Real& newLBbound, Real& newCoPrhs, Real& objChange);
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
       Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO);
+      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
    ///
-   virtual void getEnterVals2(int leaveIdx, 
-      Real enterMax, Real& leaveBound);
+   virtual void getEnterVals2(int leaveIdx,
+      Real enterMax, Real& leaveBound, Real& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
-      Real leaveVal, const SVector& vec);
+      Real leaveVal, const SVector& vec, Real& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
       Real enterTest, SPxBasis::Desc::Status enterStat);
@@ -1811,7 +1834,7 @@ public:
    /// return objective limit.
    virtual Real terminationValue() const;
    /// get objective value of current solution.
-   virtual Real objValue() const
+   virtual Real objValue()
    {
       return value();
    }
@@ -1819,7 +1842,7 @@ public:
    Status 
    getResult( Real* value = 0, Vector* primal = 0,
               Vector* slacks = 0, Vector* dual = 0, 
-              Vector* reduCost = 0) const;
+              Vector* reduCost = 0);
 
 protected:
 

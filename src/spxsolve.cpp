@@ -187,6 +187,8 @@ SPxSolver::Status SPxSolver::solve()
 
       if (type() == ENTER)
       {
+         forceRecompNonbasicValue();
+
          int enterCycleCount = 0;
          int enterFacPivotCount = 0;
 
@@ -501,6 +503,8 @@ SPxSolver::Status SPxSolver::solve()
       else
       {
          assert(type() == LEAVE);
+
+         forceRecompNonbasicValue();
 
          int leaveCycleCount = 0;
          int leaveFacPivotCount = 0;
@@ -1578,7 +1582,7 @@ SPxSolver::Status SPxSolver::getResult(
    Vector* p_primal,
    Vector* p_slacks,
    Vector* p_dual,
-   Vector* reduCosts) const
+   Vector* reduCosts)
 {
    if (p_value)
       *p_value = this->value();

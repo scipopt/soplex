@@ -58,6 +58,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
       Real range;
       Real upper;
       Real lower;
+      Real objChange = 0.0;
       SPxBasis::Desc::Status stat;
       SPxBasis::Desc& ds = thesolver->basis().desc();
 
@@ -76,6 +77,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                assert((*thesolver->theLbound)[idx] == -infinity);
                (*thesolver->theLbound)[idx] = (*thesolver->theUbound)[idx];
                (*thesolver->theUbound)[idx] = infinity;
+               objChange = range * (*thesolver->theLbound)[idx];
                break;
             case SPxBasis::Desc::P_ON_LOWER :
                ds.status(idx) = SPxBasis::Desc::P_ON_UPPER;
@@ -83,6 +85,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                assert((*thesolver->theUbound)[idx] == infinity);
                (*thesolver->theUbound)[idx] = (*thesolver->theLbound)[idx];
                (*thesolver->theLbound)[idx] = -infinity;
+               objChange = range * (*thesolver->theUbound)[idx];
                break;
             default :
                ++skipped;
@@ -107,6 +110,8 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << std::endl; )
          assert(spxAbs(range) < 1e20);
          updPrimRhs.multAdd(range, thesolver->vector(idx));
+         if( objChange != 0.0 )
+            thesolver->updateNonbasicValue(objChange);
       }
       else if( breakpoints[i].src == COPVEC )
       {
@@ -122,6 +127,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                assert((*thesolver->theCoUbound)[idx] == infinity);
                (*thesolver->theCoUbound)[idx] = -(*thesolver->theCoLbound)[idx];
                (*thesolver->theCoLbound)[idx] = -infinity;
+               objChange = range * (*thesolver->theCoUbound)[idx];
                break;
             case SPxBasis::Desc::P_ON_LOWER :
                ds.coStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
@@ -129,6 +135,7 @@ void SPxBoundFlippingRT::flipAndUpdate(
                assert((*thesolver->theCoLbound)[idx] == -infinity);
                (*thesolver->theCoLbound)[idx] = -(*thesolver->theCoUbound)[idx];
                (*thesolver->theCoUbound)[idx] = infinity;
+               objChange = range * (*thesolver->theCoLbound)[idx];
                break;
             default :
                ++skipped;
@@ -153,6 +160,8 @@ void SPxBoundFlippingRT::flipAndUpdate(
                            << std::endl; )
          assert(spxAbs(range) < 1e20);
          updPrimRhs.setValue(idx, updPrimRhs[idx] - range);
+         if( objChange != 0.0 )
+            thesolver->updateNonbasicValue(objChange);
       }
       else if( breakpoints[i].src == FVEC )
       {

@@ -396,7 +396,8 @@ void SPxSolver::getEnterVals
    Real& enterMax,
    Real& enterPric,
    SPxBasis::Desc::Status& enterStat,
-   Real& enterRO
+   Real& enterRO,
+   Real& objChange
 )
 {
    int enterIdx;
@@ -433,6 +434,7 @@ void SPxSolver::getEnterVals
          enterMax = enterLB - enterUB;
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
+         objChange -= enterVal * enterRO;
          if( enterLB <= -infinity )
             ds.colStatus(enterIdx) = SPxBasis::Desc::D_ON_LOWER;
          else if( EQ( enterLB, enterUB ) )
@@ -448,6 +450,7 @@ void SPxSolver::getEnterVals
          enterMax = enterUB - enterLB;
          enterPric = (*thePvec)[enterIdx];
          enterRO = maxObj(enterIdx);
+         objChange -= enterVal * enterRO;
          if( enterUB >= infinity )
             ds.colStatus(enterIdx) = SPxBasis::Desc::D_ON_UPPER;
          else if( EQ( enterLB, enterUB ) )
@@ -476,6 +479,7 @@ void SPxSolver::getEnterVals
          enterVal = enterUB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = SPxLP::lower(enterIdx);
+         objChange -= enterRO * enterVal;
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
@@ -487,6 +491,7 @@ void SPxSolver::getEnterVals
          enterVal = enterLB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = SPxLP::upper(enterIdx);
+         objChange -= enterRO * enterVal;
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_FREE:
@@ -524,6 +529,8 @@ void SPxSolver::getEnterVals
             enterMax = -infinity;
             ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          }
+         objChange -= theLCbound[enterIdx] * SPxLP::upper(enterIdx);
+         objChange -= theUCbound[enterIdx] * SPxLP::lower(enterIdx);
          break;
       default:
          throw SPxInternalCodeException("XENTER01 This should never happen.");
@@ -531,6 +538,7 @@ void SPxSolver::getEnterVals
       MSG_DEBUG( std::cout << "DENTER03 SPxSolver::getEnterVals() : col " << enterIdx
                         << ": " << enterStat
                         << " -> " << ds.colStatus(enterIdx)
+                        << " objChange: " << objChange
                         << std::endl; )
    }
 
@@ -566,6 +574,7 @@ void SPxSolver::getEnterVals
          enterMax = enterUB - enterLB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = maxRowObj(enterIdx);
+         objChange -= enterRO * enterVal;
          if( enterUB >= infinity )
             ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_LOWER;
          else if( EQ( enterLB, enterUB ) )
@@ -581,6 +590,7 @@ void SPxSolver::getEnterVals
          enterMax = enterLB - enterUB;
          enterPric = (*theCoPvec)[enterIdx];
          enterRO = maxRowObj(enterIdx);
+         objChange -= enterRO * enterVal;
          if( enterLB <= -infinity )
             ds.rowStatus(enterIdx) = SPxBasis::Desc::D_ON_UPPER;
          else if( EQ( enterLB, enterUB ) )
@@ -610,6 +620,7 @@ void SPxSolver::getEnterVals
          enterMax = -infinity;
          enterPric = (*thePvec)[enterIdx];
          enterRO = lhs(enterIdx);
+         objChange -= enterRO * enterVal;
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
@@ -621,6 +632,7 @@ void SPxSolver::getEnterVals
          enterMax = infinity;
          enterPric = (*thePvec)[enterIdx];
          enterRO = rhs(enterIdx);
+         objChange -= enterRO * enterVal;
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_FREE:
@@ -655,6 +667,8 @@ void SPxSolver::getEnterVals
             enterRO = lhs(enterIdx);
             ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
          }
+         objChange -= theLRbound[enterIdx] * rhs(enterIdx);
+         objChange -= theURbound[enterIdx] * lhs(enterIdx);
          break;
 
       default:
@@ -663,6 +677,7 @@ void SPxSolver::getEnterVals
       MSG_DEBUG( std::cout << "DENTER05 SPxSolver::getEnterVals() : row "
                         << enterIdx << ": " << enterStat
                         << " -> " << ds.rowStatus(enterIdx)
+                        << " objChange: " << objChange
                         << std::endl; )
    }
 }
@@ -673,7 +688,8 @@ void SPxSolver::getEnterVals2
 (
    int leaveIdx,
    Real enterMax,
-   Real& leavebound
+   Real& leavebound,
+   Real& objChange
 )
 {
    int idx;
@@ -696,12 +712,42 @@ void SPxSolver::getEnterVals2
          leavebound = theLBbound[leaveIdx];
          theLRbound[idx] = leavebound;
          ds.rowStatus(idx) = dualRowStatus(idx);
+         switch (ds.rowStatus(idx))
+         {
+         case SPxBasis::Desc::D_ON_UPPER :
+            objChange += theURbound[idx] * lhs(idx);
+            break;
+         case SPxBasis::Desc::D_ON_LOWER :
+            objChange += theLRbound[idx] * rhs(idx);
+            break;
+         case SPxBasis::Desc::D_ON_BOTH :
+            objChange += theURbound[idx] * lhs(idx);
+            objChange += theLRbound[idx] * rhs(idx);
+            break;
+         default:
+            break;
+         }
          break;
       case SPxBasis::Desc::P_ON_LOWER :
          assert(rep() == ROW);
          leavebound = theUBbound[leaveIdx];
          theURbound[idx] = leavebound;
          ds.rowStatus(idx) = dualRowStatus(idx);
+         switch (ds.rowStatus(idx))
+         {
+         case SPxBasis::Desc::D_ON_UPPER :
+            objChange += theURbound[idx] * lhs(idx);
+            break;
+         case SPxBasis::Desc::D_ON_LOWER :
+            objChange += theLRbound[idx] * rhs(idx);
+            break;
+         case SPxBasis::Desc::D_ON_BOTH :
+            objChange += theURbound[idx] * lhs(idx);
+            objChange += theLRbound[idx] * rhs(idx);
+            break;
+         default:
+            break;
+         }
          break;
       case SPxBasis::Desc::P_FREE :
          assert(rep() == ROW);
@@ -736,18 +782,21 @@ void SPxSolver::getEnterVals2
             leavebound = theLBbound[leaveIdx];
          theLRbound[idx] = leavebound;
          theURbound[idx] = leavebound;
+         objChange += leavebound * maxRowObj(leaveIdx);
          ds.rowStatus(idx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == COLUMN);
          leavebound = theUBbound[leaveIdx];
          theURbound[idx] = leavebound;
+         objChange += leavebound * maxRowObj(leaveIdx);
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
          assert(rep() == COLUMN);
          leavebound = theLBbound[leaveIdx];
          theLRbound[idx] = leavebound;
+         objChange += leavebound * maxRowObj(leaveIdx);
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
@@ -756,12 +805,14 @@ void SPxSolver::getEnterVals2
          {
             leavebound = theUBbound[leaveIdx];
             theURbound[idx] = leavebound;
+            objChange += leavebound * maxRowObj(leaveIdx);
             ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          }
          else
          {
             leavebound = theLBbound[leaveIdx];
             theLRbound[idx] = leavebound;
+            objChange += leavebound * maxRowObj(leaveIdx);
             ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          }
          break;
@@ -772,6 +823,7 @@ void SPxSolver::getEnterVals2
       MSG_DEBUG( std::cout << "DENTER06 SPxSolver::getEnterVals2(): row "
                         << idx << ": " << leaveStat
                         << " -> " << ds.rowStatus(idx)
+                        << " objChange: " << objChange
                         << std::endl; )
    }
 
@@ -788,12 +840,42 @@ void SPxSolver::getEnterVals2
          leavebound = theLBbound[leaveIdx];
          theLCbound[idx] = leavebound;
          ds.colStatus(idx) = dualColStatus(idx);
+         switch (ds.colStatus(idx))
+         {
+         case SPxBasis::Desc::D_ON_UPPER :
+            objChange += theUCbound[idx] * lower(idx);
+            break;
+         case SPxBasis::Desc::D_ON_LOWER :
+            objChange += theLCbound[idx] * upper(idx);
+            break;
+         case SPxBasis::Desc::D_ON_BOTH :
+            objChange += theLCbound[idx] * upper(idx);
+            objChange += theUCbound[idx] * lower(idx);
+            break;
+         default:
+            break;
+         }
          break;
       case SPxBasis::Desc::P_ON_LOWER :
          assert(rep() == ROW);
          leavebound = theUBbound[leaveIdx];
          theUCbound[idx] = leavebound;
          ds.colStatus(idx) = dualColStatus(idx);
+         switch (ds.colStatus(idx))
+         {
+         case SPxBasis::Desc::D_ON_UPPER :
+            objChange += theUCbound[idx] * lower(idx);
+            break;
+         case SPxBasis::Desc::D_ON_LOWER :
+            objChange += theLCbound[idx] * upper(idx);
+            break;
+         case SPxBasis::Desc::D_ON_BOTH :
+            objChange += theLCbound[idx] * upper(idx);
+            objChange += theUCbound[idx] * lower(idx);
+            break;
+         default:
+            break;
+         }
          break;
       case SPxBasis::Desc::P_FREE :
          assert(rep() == ROW);
@@ -822,18 +904,21 @@ void SPxSolver::getEnterVals2
             leavebound = theUBbound[leaveIdx];
          theUCbound[idx] =
             theLCbound[idx] = leavebound;
+         objChange += maxObj(idx) * leavebound;
          ds.colStatus(idx) = SPxBasis::Desc::P_FIXED;
          break;
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == COLUMN);
          leavebound = theLBbound[leaveIdx];
          theLCbound[idx] = leavebound;
+         objChange += maxObj(idx) * leavebound;
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          break;
       case SPxBasis::Desc::D_ON_LOWER :
          assert(rep() == COLUMN);
          leavebound = theUBbound[leaveIdx];
          theUCbound[idx] = leavebound;
+         objChange += maxObj(idx) * leavebound;
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          break;
       case SPxBasis::Desc::D_ON_BOTH :
@@ -843,12 +928,14 @@ void SPxSolver::getEnterVals2
          {
             leavebound = theUBbound[leaveIdx];
             theUCbound[idx] = leavebound;
+            objChange += maxObj(idx) * leavebound;
             ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          }
          else
          {
             leavebound = theLBbound[leaveIdx];
             theLCbound[idx] = leavebound;
+            objChange += maxObj(idx) * leavebound;
             ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          }
          break;
@@ -859,6 +946,7 @@ void SPxSolver::getEnterVals2
       MSG_DEBUG( std::cout << "DENTER07 SPxSolver::getEnterVals2(): col "
                         << idx << ": " << leaveStat
                         << " -> " << ds.colStatus(idx)
+                        << " objChange: " << objChange
                         << std::endl; )
    }
 }
@@ -869,9 +957,11 @@ SPxSolver::ungetEnterVal(
    SPxId enterId,
    SPxBasis::Desc::Status enterStat,
    Real leaveVal,
-   const SVector& vec
+   const SVector& vec,
+   Real& objChange
 )
 {
+   assert(rep() == COLUMN);
    int enterIdx;
    SPxBasis::Desc& ds = desc();
 
@@ -879,9 +969,15 @@ SPxSolver::ungetEnterVal(
    {
       enterIdx = number(SPxColId(enterId));
       if (enterStat == SPxBasis::Desc::P_ON_UPPER)
+      {
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
+         objChange += theLCbound[enterIdx] * maxObj(enterIdx);
+      }
       else
+      {
          ds.colStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
+         objChange += theUCbound[enterIdx] * maxObj(enterIdx);
+      }
       theFrhs->multAdd(leaveVal, vec);
    }
    else
@@ -889,9 +985,15 @@ SPxSolver::ungetEnterVal(
       enterIdx = number(SPxRowId(enterId));
       assert(enterId.isSPxRowId());
       if (enterStat == SPxBasis::Desc::P_ON_UPPER)
+      {
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_LOWER;
+         objChange += (theURbound[enterIdx]) * maxRowObj(enterIdx);
+      }
       else
+      {
          ds.rowStatus(enterIdx) = SPxBasis::Desc::P_ON_UPPER;
+         objChange += (theLRbound[enterIdx]) * maxRowObj(enterIdx);
+      }
       (*theFrhs)[enterIdx] += leaveVal;
    }
    if (isId(enterId))
@@ -940,18 +1042,20 @@ bool SPxSolver::enter(SPxId& enterId)
    Real enterPric;      // priced value of entering variable
    SPxBasis::Desc::Status enterStat;      // status of entering variable
    Real enterRO;        // rhs/obj of entering variable
+   Real objChange = 0.0;
    const SVector* enterVec = enterVector(enterId);
 
    bool instable = instableEnter;
    assert(!instable || instableEnterId.isValid());
 
    getEnterVals(enterId, enterTest, enterUB, enterLB,
-      enterVal, enterMax, enterPric, enterStat, enterRO);
+      enterVal, enterMax, enterPric, enterStat, enterRO, objChange);
 
    if (enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
+      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
       MSG_DEBUG( std::cout << "DENTER08 rejecting false enter pivot" << std::endl; )
 
@@ -1087,7 +1191,7 @@ bool SPxSolver::enter(SPxId& enterId)
       Real leavebound;             // bound on which leaving variable moves
       try
       {
-         getEnterVals2(leaveIdx, enterMax, leavebound);
+         getEnterVals2(leaveIdx, enterMax, leavebound, objChange);
       }
       catch( const SPxException& F )
       {
@@ -1116,6 +1220,8 @@ bool SPxSolver::enter(SPxId& enterId)
       if (enterVal > epsilon() || enterVal < -epsilon())
          theFrhs->multAdd(enterVal, *enterVec);
 
+      // update objective funtion value
+      updateNonbasicValue(objChange);
 
       //  change basis matrix
       change(leaveIdx, enterId, enterVec, &(theFvec->delta()));
@@ -1136,6 +1242,9 @@ bool SPxSolver::enter(SPxId& enterId)
          leaveVal != enterMax is the case that selectLeave has found only an instable leaving
          variable. We store this leaving variable for later if we are not already in the
          instable case */
+
+      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
+
       if (!instable)
       {
          instableEnterId = enterId;
@@ -1143,6 +1252,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
          rejectEnter(enterId, 0.0, enterStat);
          change(-1, none, 0);
+
 
          return true;
       }
@@ -1169,7 +1279,10 @@ bool SPxSolver::enter(SPxId& enterId)
       theFvec->value() = leaveVal;
       theFvec->update();
 
-      ungetEnterVal(enterId, enterStat, leaveVal, *enterVec);
+      ungetEnterVal(enterId, enterStat, leaveVal, *enterVec, objChange);
+
+      // update objective funtion value
+      updateNonbasicValue(objChange);
    }
    /*  No variable could be selected to leave the basis and even the entering
        variable is unbounded --- this is a failure.  
@@ -1182,6 +1295,8 @@ bool SPxSolver::enter(SPxId& enterId)
        */
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
+
+      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
       if (lastUpdate() > 1)
       {
