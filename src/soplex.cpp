@@ -958,6 +958,39 @@ namespace soplex
 
 
 
+   /// gets number of available dual norms
+   void SoPlex::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+   {
+      nnormsRow = 0;
+      nnormsCol = 0;
+      if( !strcmp(_solver.pricer()->getName(), "Steep") ||
+          !strcmp(_solver.pricer()->getName(), "SteepEx") ||
+          !strcmp(_solver.pricer()->getName(), "Auto") )
+      {
+         if( _solver.rep() == SPxSolver::ROW )
+            nnormsCol = _solver.coDim();
+         nnormsRow = _solver.dim();
+      }
+   }
+
+
+
+   /// gets steepest edge norms and returns false if they are not available
+   bool SoPlex::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
+   {
+      return _solver.getDualNorms(nnormsRow, nnormsCol, norms);
+   }
+
+
+
+   /// sets steepest edge norms and returns false if that's not possible
+   bool SoPlex::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
+   {
+      return _solver.setDualNorms(nnormsRow, nnormsCol, norms);
+   }
+
+
+
    /// returns number of rows
    int SoPlex::numRowsRational() const
    {

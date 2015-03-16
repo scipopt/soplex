@@ -186,6 +186,15 @@ public:
    /// stored internally, this is generally faster
    Real maxObjReal(int i) const;
 
+   /// gets number of available dual norms
+   void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
+
+   /// gets steepest edge norms and returns false if they are not available
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+
+   /// sets steepest edge norms and returns false if that's not possible
+   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
+
    //@}
 
 
