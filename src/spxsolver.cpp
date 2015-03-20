@@ -797,7 +797,7 @@ Real SPxSolver::nonbasicValue()
    }
 #endif
 
-   if( !m_nonbasicValueUpToDate && rep() == COLUMN)
+   if( !m_nonbasicValueUpToDate )
    {
       m_nonbasicValue = val;
       m_nonbasicValueUpToDate = true;
