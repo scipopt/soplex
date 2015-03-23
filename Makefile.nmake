@@ -60,6 +60,7 @@ LIBDIR		=	lib
 NAME		=	soplex
 LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\clufactor.obj \
+				$(LIBOBJDIR)\clufactor_rational.obj \
 				$(LIBOBJDIR)\didxset.obj \
 				$(LIBOBJDIR)\enter.obj \
 				$(LIBOBJDIR)\gzstream.obj \
@@ -70,6 +71,7 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\rational.obj \
 				$(LIBOBJDIR)\ratrecon.obj \
 				$(LIBOBJDIR)\slufactor.obj \
+				$(LIBOBJDIR)\slufactor_rational.obj \
 				$(LIBOBJDIR)\solverational.obj \
 				$(LIBOBJDIR)\solvereal.obj \
 				$(LIBOBJDIR)\soplex.obj \
@@ -113,7 +115,6 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\statistics.obj \
 				$(LIBOBJDIR)\usertimer.obj \
 				$(LIBOBJDIR)\wallclocktimer.obj \
-				$(LIBOBJDIR)\unitvector.obj \
 				$(LIBOBJDIR)\updatevector.obj
 BINOBJ		=	$(BINOBJDIR)\soplexmain.obj
 EXAMPLEOBJ	=	$(BINOBJDIR)\example.obj
