@@ -1949,6 +1949,12 @@ bool Rational::readString(const char* s)
 /// convert rational number to string
 std::string rationalToString(const Rational& r, const int precision)
 {
+
+#if defined(_WIN32) || defined(_WIN64)
+  std::stringstream sstream;
+  sstream << r;
+  return sstream.str();
+#else
    if( precision <= 0 )
    {
       std::stringstream sstream;
@@ -1972,6 +1978,7 @@ std::string rationalToString(const Rational& r, const int precision)
       fclose(tmpStream);
       return retString;
    }
+#endif
 }
 
 
