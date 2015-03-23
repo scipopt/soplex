@@ -292,10 +292,12 @@ inline Real spxSqrt(Real a)
 }
 
 // returns the next representable value after x in the direction of y
+#ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafterl(x,y);
 }
+#endif
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
@@ -322,10 +324,12 @@ inline Real spxSqrt(Real a)
 }
 
 // returns the next representable value after x in the direction of y
+#ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafter(x,y);
 }
+#endif
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
