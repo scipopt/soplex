@@ -37,13 +37,13 @@ LIBEXT		=	lib
 EXEEXT      =	exe
 
 # will this be compiled for PARASCIP? (disables output because it uses global variables)
-PARASCIP	=	0
+PARASCIP	   =	false
 
 # old 1.x interface?
-LEGACY	=	0
+LEGACY      =	false
 
-GMP			=	1
-ZLIB		=	1
+GMP			=	true
+ZLIB		   = 	true
 
 COMP		=	msvc
 CXX			=	cl
@@ -141,7 +141,7 @@ ARFLAGS		=	$(ARFLAGS) $(USRARFLAGS)
 # PARASCIP
 #-----------------------------------------------------------------------------
 
-!if $(PARASCIP) == 1
+!if "$(PARASCIP)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /DDISABLE_VERBOSITY
 !endif
 
@@ -149,7 +149,7 @@ CPPFLAGS	=	$(CPPFLAGS) /DDISABLE_VERBOSITY
 # LEGACY
 #-----------------------------------------------------------------------------
 
-!if $(LEGACY) == 1
+!if "$(LEGACY)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /DSOPLEX_LEGACY
 !endif
 
@@ -173,12 +173,12 @@ LIBOBJDIR	=	$(OBJDIR)\lib
 # External Libraries
 #-----------------------------------------------------------------------------
 
-!if $(GMP) == 1
+!if "$(GMP)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /Ilib\mpir.$(ARCH) /DSOPLEX_WITH_GMP
 LIBS		=	$(LIBS) lib\libmpir.$(ARCH).lib
 !endif
 
-!if $(ZLIB) == 1
+!if "$(ZLIB)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /Ilib\zlib /DSOPLEX_WITH_ZLIB
 LIBS		=	$(LIBS) lib\libz.$(ARCH).lib
 LDFLAGS		=	$(LDFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD
