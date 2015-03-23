@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <limits.h>
 
 #include "spxdefines.h"
 
@@ -323,7 +324,7 @@ public:
       primes[39] = 879190747;
       primes[40] = 941083981;
       primes[41] = 982451653;
-      primes[42] = __INT_MAX__;
+      primes[42] = INT_MAX;
       nprimes = 43;
 
       m_hashsize = (hashsize < 1) ? autoHashSize() : hashsize;
