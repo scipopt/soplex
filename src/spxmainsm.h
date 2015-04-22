@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -122,23 +122,68 @@ private:
       }
    };
 
+   /**@brief   Postsolves row objectives.
+      @ingroup Algo
+   */
+   class RowObjPS : public PostStep
+   {
+   private:
+      int m_i; ///< row index
+      int m_j; ///< slack column index
+
+   public:
+      ///
+   RowObjPS(const SPxLP& lp, int _i, int _j)
+         : PostStep("RowObj", lp.nRows(), lp.nCols())
+         , m_i(_i)
+         , m_j(_j)
+      {}
+      /// copy constructor
+      RowObjPS(const RowObjPS& old)
+         : PostStep(old)
+         , m_i(old.m_i)
+         , m_j(old.m_j)
+      {}
+      /// assignment operator
+      RowObjPS& operator=( const RowObjPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            m_i = rhs.m_i;
+            m_j = rhs.m_j;
+         }
+
+         return *this;
+      }
+      ///
+      virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         return new RowObjPS(*this);
+      }
+   };
+
    /**@brief   Postsolves unconstraint constraints.
       @ingroup Algo
    */
    class FreeConstraintPS : public PostStep
    {
    private:
-      const int m_i;
-      const int m_old_i;
+      int m_i;
+      int m_old_i;
       DSVector  m_row;
+      Real m_row_obj;
 
    public:
       ///
-      FreeConstraintPS(const SPxLP& lp, int _i)
+   FreeConstraintPS(const SPxLP& lp, int _i)
          : PostStep("FreeConstraint", lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows()-1)
          , m_row(lp.rowVector(_i))
+         , m_row_obj(lp.rowObj(_i))
       {}
       /// copy constructor
       FreeConstraintPS(const FreeConstraintPS& old)
@@ -146,14 +191,17 @@ private:
          , m_i(old.m_i)
          , m_old_i(old.m_old_i)
          , m_row(old.m_row)
+         , m_row_obj(old.m_row_obj)
       {}
       /// assignment operator
       FreeConstraintPS& operator=( const FreeConstraintPS& rhs)
       {
          if(this != &rhs)
          {
-            PostStep::operator=(rhs);
+            m_i = rhs.m_i;
+            m_old_i = rhs.m_old_i;
             m_row = rhs.m_row;
+            m_row_obj = rhs.m_row_obj;
          }
 
          return *this;
@@ -174,8 +222,9 @@ private:
    class EmptyConstraintPS : public PostStep
    {
    private:
-      const int m_i;
-      const int m_old_i;
+      int m_i;
+      int m_old_i;
+      Real m_row_obj;
 
    public:
       ///
@@ -183,19 +232,23 @@ private:
          : PostStep("EmptyConstraint", lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_old_i(lp.nRows()-1)
+         , m_row_obj(lp.rowObj(_i))
       {}
       /// copy constructor
       EmptyConstraintPS(const EmptyConstraintPS& old)
          : PostStep(old)
          , m_i(old.m_i)
          , m_old_i(old.m_old_i)
+         , m_row_obj(old.m_row_obj)
       {}
       /// assignment operator
       EmptyConstraintPS& operator=( const EmptyConstraintPS& rhs)
       {
          if(this != &rhs)
          {
-            PostStep::operator=(rhs);
+            m_i = rhs.m_i;
+            m_old_i = rhs.m_old_i;
+            m_row_obj = rhs.m_row_obj;
          }
 
          return *this;
@@ -230,6 +283,7 @@ private:
       const Real m_newUp;
       const Real m_oldLo;
       const Real m_oldUp;
+      const Real m_row_obj;
 
    public:
       ///
@@ -250,6 +304,7 @@ private:
          , m_newUp(newUp)
          , m_oldLo(oldLo)
          , m_oldUp(oldUp)
+         , m_row_obj(lp.rowObj(_i))
       {}
       /// copy constructor
       RowSingletonPS(const RowSingletonPS& old)
@@ -268,6 +323,7 @@ private:
          , m_newUp(old.m_newUp)
          , m_oldLo(old.m_oldLo)
          , m_oldUp(old.m_oldUp)
+         , m_row_obj(old.m_row_obj)
       {}
       /// assignment operator
       RowSingletonPS& operator=( const RowSingletonPS& rhs)
@@ -309,6 +365,7 @@ private:
       DataArray<Real> m_oldUppers;
       const Real      m_lhs;
       const Real      m_rhs;
+      const Real      m_rowobj;
 
    public:
       ///
@@ -327,6 +384,7 @@ private:
          , m_oldUppers(up)
          , m_lhs(lp.lhs(_i))
          , m_rhs(lp.rhs(_i))
+         , m_rowobj(lp.rowObj(_i))
       {
          for(int k = 0; k < m_row.size(); ++k)
          {
@@ -350,6 +408,7 @@ private:
          , m_oldUppers(old.m_oldUppers)
          , m_lhs(old.m_lhs)
          , m_rhs(old.m_rhs)
+         , m_rowobj(old.m_rowobj)
       {}
       /// assignment operator
       ForceConstraintPS& operator=( const ForceConstraintPS& rhs)
@@ -510,6 +569,7 @@ private:
       const Real      m_bnd;
       DSVector        m_col;
       DSVector        m_lRhs;
+      DSVector        m_rowObj;
       Array<DSVector> m_rows;
       const bool      m_loFree;
 
@@ -523,6 +583,7 @@ private:
          , m_bnd(loFree ? lp.upper(_j) : lp.lower(_j))
          , m_col(col_idx_sorted)
          , m_lRhs(lp.colVector(_j).size())
+         , m_rowObj(lp.colVector(_j).size())
          , m_rows(lp.colVector(_j).size())
          , m_loFree(loFree)
       {
@@ -530,13 +591,15 @@ private:
          {
             assert(isNotZero(m_col.value(k)));
 
+            int r = m_col.index(k);
             if ((m_loFree  && m_col.value(k) > 0) ||
                 (!m_loFree && m_col.value(k) < 0))
-               m_lRhs.add(k, lp.rhs(m_col.index(k)));
+               m_lRhs.add(k, lp.rhs(r));
             else
-               m_lRhs.add(k, lp.lhs(m_col.index(k)));
+               m_lRhs.add(k, lp.lhs(r));
 
-            m_rows[k] = lp.rowVector(m_col.index(k));
+            m_rows[k] = lp.rowVector(r);
+            m_rowObj.add(k, lp.rowObj(r));
          }
       }
       /// copy constructor
@@ -548,6 +611,7 @@ private:
          , m_bnd(old.m_bnd)
          , m_col(old.m_col)
          , m_lRhs(old.m_lRhs)
+         , m_rowObj(old.m_rowObj)
          , m_rows(old.m_rows)
          , m_loFree(old.m_loFree)
       {}
@@ -559,6 +623,7 @@ private:
             PostStep::operator=(rhs);
             m_col = rhs.m_col;
             m_lRhs = rhs.m_lRhs;
+            m_rowObj = rhs.m_rowObj;
             m_rows = rhs.m_rows;
          }
 
@@ -666,7 +731,7 @@ private:
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lRhs(slackVal)
          , m_onLhs(slackVal == lp.lhs(_i))
-         , m_eqCons(EQrel(lp.lhs(_i), lp.rhs(_i)))
+         , m_eqCons(lp.lhs(_i) == lp.rhs(_i))
          , m_row(lp.rowVector(_i))
       {
          assert(m_row[m_j] != 0.0);
@@ -742,7 +807,7 @@ private:
          , m_k(_k)
          , m_i(_i)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
-         , m_jFixed(EQrel(lp.lower(_j), lp.upper(_j)))
+         , m_jFixed(lp.lower(_j) == lp.upper(_j))
          , m_jObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_kObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_k) : -lp.obj(_k))
          , m_aij(lp.colVector(_j).value(0))
@@ -811,6 +876,7 @@ private:
    {
    private:
       const int       m_i;
+      const Real      m_i_rowObj;
       const int       m_maxLhsIdx;
       const int       m_minRhsIdx;
       const bool      m_maxSense;
@@ -819,6 +885,7 @@ private:
       const bool      m_fixed;
       const int       m_nCols;
       DSVector        m_scale;
+      DSVector        m_rowObj;
       DataArray<int>  m_rIdxLocalOld;
       DataArray<int>  m_perm;
       DataArray<bool> m_isLhsEqualRhs;
@@ -826,10 +893,11 @@ private:
    public:
       DuplicateRowsPS(const SPxLP& lp, int _i,
                       int maxLhsIdx, int minRhsIdx, const DSVector& dupRows,
-                      const DataArray<double> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
+                      const DataArray<Real> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
                       bool isTheLast, bool isFixedRow, bool isFirst = false)
          : PostStep("DuplicateRows", lp.nRows(), lp.nCols())
          , m_i(_i)
+         , m_i_rowObj(lp.rowObj(_i))
          , m_maxLhsIdx((maxLhsIdx == -1) ? -1 : maxLhsIdx)
          , m_minRhsIdx((minRhsIdx == -1) ? -1 : minRhsIdx)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
@@ -838,6 +906,7 @@ private:
          , m_fixed(isFixedRow)
          , m_nCols(lp.nCols())
          , m_scale(dupRows.size())
+         , m_rowObj(dupRows.size())
          , m_rIdxLocalOld(dupRows.size())
          , m_perm(perm)
          , m_isLhsEqualRhs(isLhsEqualRhs)
@@ -847,6 +916,7 @@ private:
          for(int k = 0; k < dupRows.size(); ++k)
          {
             m_scale.add(dupRows.index(k), rowScale / scale[dupRows.index(k)]);
+            m_rowObj.add(dupRows.index(k), lp.rowObj(dupRows.index(k)));
             m_rIdxLocalOld[k] = dupRows.index(k);
          }
       }
@@ -854,6 +924,7 @@ private:
       DuplicateRowsPS(const DuplicateRowsPS& old)
          : PostStep(old)
          , m_i(old.m_i)
+         , m_i_rowObj(old.m_i_rowObj)
          , m_maxLhsIdx(old.m_maxLhsIdx)
          , m_minRhsIdx(old.m_minRhsIdx)
          , m_maxSense(old.m_maxSense)
@@ -862,6 +933,7 @@ private:
          , m_fixed(old.m_fixed)
          , m_nCols(old.m_nCols)
          , m_scale(old.m_scale)
+         , m_rowObj(old.m_rowObj)
          , m_rIdxLocalOld(old.m_rIdxLocalOld)
          , m_perm(old.m_perm)
          , m_isLhsEqualRhs(old.m_isLhsEqualRhs)
@@ -873,6 +945,7 @@ private:
          {
             PostStep::operator=(rhs);
             m_scale = rhs.m_scale;
+            m_rowObj = rhs.m_rowObj;
             m_rIdxLocalOld = rhs.m_rIdxLocalOld;
             m_perm = rhs.m_perm;
             m_isLhsEqualRhs = rhs.m_isLhsEqualRhs;
@@ -1009,6 +1082,10 @@ private:
    DataArray<int>                  m_cIdx;       ///< column index vector in original LP.
    DataArray<int>                  m_rIdx;       ///< row index vector in original LP.
    DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
+   Array<DSVector>                 m_classSetRows; ///< stores parallel classes with non-zero colum entry
+   Array<DSVector>                 m_classSetCols; ///< stores parallel classes with non-zero row entry
+   Array<DSVector>                 m_dupRows;    ///< arrange duplicate rows using bucket sort w.r.t. their pClass values
+   Array<DSVector>                 m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
    bool                            m_postsolved; ///< status of postsolving.
    Real                            m_epsilon;    ///< epsilon zero.
    Real                            m_feastol;    ///< primal feasibility tolerance.
@@ -1016,6 +1093,7 @@ private:
    DataArray<int>                  m_stat;       ///< preprocessing history.
    SPxLP::SPxSense                 m_thesense;   ///< optimization sense.
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
+   int                             m_addedcols;  ///< columns added by handleRowObjectives()
    Result                          m_result;     ///< result of the simplification.
    //@}
 
@@ -1023,6 +1101,9 @@ private:
    //------------------------------------
    //**@name Private helpers */
    //@{
+   /// handle row objectives
+   void handleRowObjectives(SPxLP& lp);
+
    /// handles extreme values by setting them to zero or infinity.
    void handleExtremes(SPxLP& lp);
 
@@ -1095,8 +1176,8 @@ public:
    //**@name Constructors / destructors */
    //@{
    /// default constructor.
-   SPxMainSM()
-      : SPxSimplifier("MainSM")
+   SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
+      : SPxSimplifier("MainSM", ttype)
       , m_stat(15)
    {}
    /// copy constructor.
@@ -1117,6 +1198,7 @@ public:
       , m_stat(old.m_stat)
       , m_thesense(old.m_thesense)
       , m_keepbounds(old.m_keepbounds)
+      , m_addedcols(old.m_addedcols)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);
@@ -1149,6 +1231,7 @@ public:
          m_stat = rhs.m_stat;
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
+         m_addedcols = rhs.m_addedcols;
 
          // delete pointers in m_hist
          for(int k = 0; k < m_hist.size(); ++k)
@@ -1254,9 +1337,11 @@ public:
       return m_cBasisStat[j];
    }
    /// get optimal basis.
-   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const
    {
       assert(m_postsolved);
+      assert(rowsSize < 0 || rowsSize >= m_rBasisStat.size());
+      assert(colsSize < 0 || colsSize >= m_cBasisStat.size());
 
       for(int i = 0; i < m_rBasisStat.size(); ++i)
          rows[i] = m_rBasisStat[i];

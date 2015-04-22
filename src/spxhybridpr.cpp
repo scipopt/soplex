@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-//#define DEBUGGING 1
 
 #include <iostream>
 
@@ -91,7 +89,7 @@ void SPxHybridPR::setType(SPxSolver::Type tp)
       }
    }
    
-   MSG_INFO1( spxout << "IPRHYB01 switching to "
+   MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << "IPRHYB01 switching to "
                         << thepricer->getName() << std::endl; )
 
    thepricer->setType(tp);

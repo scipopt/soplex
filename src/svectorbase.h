@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -440,8 +440,8 @@ public:
 
       for( int i = size() - 1; i >= 0; --i )
       {
-         if( abs(m_elem[i].val) > maxi )
-            maxi = abs(m_elem[i].val);
+         if( spxAbs(m_elem[i].val) > maxi )
+            maxi = spxAbs(m_elem[i].val);
       }
 
       assert(maxi >= 0);
@@ -456,8 +456,8 @@ public:
 
       for( int i = size() - 1; i >= 0; --i )
       {
-         if( abs(m_elem[i].val) < mini )
-            mini = abs(m_elem[i].val);
+         if( spxAbs(m_elem[i].val) < mini )
+            mini = spxAbs(m_elem[i].val);
       }
 
       assert(mini >= 0);
@@ -468,7 +468,7 @@ public:
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
    Real length() const
    {
-      return sqrt((Real)length2());
+      return spxSqrt((Real)length2());
    }
 
    /// Squared norm.
@@ -512,31 +512,39 @@ public:
    R operator*(const SVectorBase<S>& w) const
    {
       R x = 0;
+      int n = size();
+      int m = w.size();
+      if( n == 0 || m == 0 )
+         return x;
       int i = 0;
       int j = 0;
       Element* e = m_elem;
       typename SVectorBase<S>::Element wj = w.element(j);
-      int n = size();
-      int m = w.size();
 
-      for( ; i < n || j < m; ++i, ++j )
+      while( true )
       {
          if( e->idx == wj.idx )
          {
             x += e->val * wj.val;
-            e++;
             i++;
             j++;
+            if( i == n || j == m )
+              break;
+            e++;
             wj = w.element(j);
          }
          else if( e->idx < wj.idx )
          {
-            e++;
             i++;
+            if( i == n )
+              break;
+            e++;
          }
          else
          {
             j++;
+            if( j == m )
+              break;
             wj = w.element(j);
          }
       }
@@ -715,31 +723,39 @@ template < class S >
 Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
 {
    Real x = 0;
+   int n = size();
+   int m = w.size();
+   if( n == 0 || m == 0 )
+      return x;
    int i = 0;
    int j = 0;
    SVectorBase<Real>::Element* e = m_elem;
    typename SVectorBase<S>::Element wj = w.element(j);
-   int n = size();
-   int m = w.size();
 
-   for( ; i < n || j < m; ++i, ++j )
+   while( true )
    {
       if( e->idx == wj.idx )
       {
          x += e->val * Real(wj.val);
-         e++;
          i++;
          j++;
+         if( i == n || j == m )
+            break;
+         e++;
          wj = w.element(j);
       }
       else if( e->idx < wj.idx )
       {
-         e++;
          i++;
+         if( i == n )
+            break;
+         e++;
       }
       else
       {
          j++;
+         if( j == m )
+            break;
          wj = w.element(j);
       }
    }

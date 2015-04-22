@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -144,7 +144,7 @@ public:
          {
             if( VectorBase<R>::val[i] != R(0) )
             {
-               if( abs(VectorBase<R>::val[i]) <= epsilon )
+               if( spxAbs(VectorBase<R>::val[i]) <= epsilon )
                   VectorBase<R>::val[i] = R(0);
                else
                {
@@ -228,7 +228,7 @@ public:
 
          if( n < 0 )
          {
-            if( abs(x) > epsilon )
+            if( spxAbs(x) > epsilon )
                IdxSet::add(1, &i);
          }
          else if( x == R(0) )
@@ -490,7 +490,7 @@ public:
 
          for( int i = 0; i < num; ++i )
          {
-            R x = abs(VectorBase<R>::val[idx[i]]);
+            R x = spxAbs(VectorBase<R>::val[idx[i]]);
 
             if( x > maxabs )
                maxabs = x;
@@ -521,7 +521,7 @@ public:
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
    Real length() const
    {
-      return sqrt((Real)length2());
+      return spxSqrt((Real)length2());
    }
 
    //@}
@@ -603,9 +603,9 @@ public:
          {
             int j = number(i);
 
-            if( j < 0 && abs(VectorBase<R>::val[i]) > 0 )
+            if( j < 0 && spxAbs(VectorBase<R>::val[i]) > 0 )
             {
-               MSG_ERROR( spxout << "ESSVEC01 i = " << i
+               MSG_ERROR( std::cerr << "ESSVEC01 i = " << i
                   << "\tidx = " << j
                   << "\tval = " << std::setprecision(16) << VectorBase<R>::val[i]
                   << std::endl; )
@@ -715,7 +715,7 @@ public:
          {
             if( rhs.val[i] != 0 )
             {
-               if( abs(rhs.val[i]) > epsilon )
+               if( spxAbs(rhs.val[i]) > epsilon )
                {
                   rhs.idx[num] = i;
                   idx[num] = i;
@@ -771,7 +771,7 @@ public:
 
             for( int i = 0; i < d; ++i )
             {
-               if( abs(rhs.val[i]) > epsilon )
+               if( spxAbs(rhs.val[i]) > epsilon )
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
@@ -816,7 +816,7 @@ public:
 
             for( int i = 0; i < rhs.dim(); ++i )
             {
-               if( abs(rhs.val[i]) > epsilon )
+               if( spxAbs(rhs.val[i]) > epsilon )
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;

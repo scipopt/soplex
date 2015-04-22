@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -19,6 +19,12 @@
 #ifndef _SPXBASIS_H_
 #define _SPXBASIS_H_
 
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define SOPLEX_DEBUG_SPXBASIS
+#undef SOPLEX_DEBUG
+#endif
+
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
@@ -33,7 +39,7 @@
 #include "slinsolver.h"
 #include "nameset.h"
 #include "spxout.h"
-#include "timer.h"
+#include "timerfactory.h"
 
 //#define MEASUREUPDATETIME
 
@@ -378,12 +384,14 @@ protected:
    int    iterCount;     ///< number of calls to change() since last manipulation
    int    lastIterCount; ///< number of calls to change() before halting the simplex
    int    updateCount;   ///< number of calls to change() since last factorize()
-   int    totalUpdateCount;///< number of updates
-   Timer  totalUpdateTime;///< time spent in updates
+   int    totalUpdateCount; ///< number of updates
    int    nzCount;       ///< number of nonzeros in basis matrix
    int    lastMem;       ///< memory needed after last fresh factorization
    Real   lastFill;      ///< fill ratio that occured during last factorization
    int    lastNzCount;   ///< number of nonzeros in basis matrix after last fresh factorization
+
+   Timer* theTime;  ///< time spent in updates
+   Timer::TYPE timerType;   ///< type of timer (user or wallclock)
 
    SPxId  lastin;        ///< lastEntered(): variable entered the base last
    SPxId  lastout;       ///< lastLeft(): variable left the base last
@@ -399,6 +407,8 @@ private:
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
    bool      freeSlinSolver; ///< true iff factor should be freed inside of this object
+   SPxOut*   spxout;         ///< message handler
+
    //@}
 
 public:
@@ -418,9 +428,11 @@ public:
 
       if( thestatus != stat )
       {
-         MSG_DEBUG( spxout << "DBSTAT01 SPxBasis::setStatus(): status: "
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "DBSTAT01 SPxBasis::setStatus(): status: "
                     << int(thestatus) << " (" << thestatus << ") -> "
                     << int(stat) << " (" << stat << ")" << std::endl; )
+#endif
 
          thestatus = stat;
          if( stat == NO_PROBLEM )
@@ -753,7 +765,7 @@ public:
     *  \c NULL, default names are used for the constraints and variables.
     */
    virtual void writeBasis(std::ostream& os, 
-      const NameSet* rownames, const NameSet* colnames) const;
+      const NameSet* rownames, const NameSet* colnames, const bool cpxFormat = false) const;
 
    virtual void printMatrix() const;
 
@@ -813,7 +825,7 @@ public:
    /// time spent in updates
    Real getTotalUpdateTime() const
    {
-      return totalUpdateTime.userTime();
+      return theTime->time();
    }
    /// number of updates performed
    int getTotalUpdateCount() const
@@ -834,13 +846,18 @@ public:
 
       return s.str();
    }
+
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
    //@}
 
    //--------------------------------------
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
-   SPxBasis();
+   SPxBasis(Timer::TYPE ttype = Timer::USER_TIME);
    /// copy constructor
    SPxBasis(const SPxBasis& old);
    /// assignment operator
@@ -889,4 +906,12 @@ std::ostream& operator<<( std::ostream& os,
 
 
 } // namespace soplex
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef SOPLEX_DEBUG_SPXBASIS
+#define SOPLEX_DEBUG
+#undef SOPLEX_DEBUG_SPXBASIS
+#endif
+
 #endif // _SPXBASIS_H_

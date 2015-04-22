@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -78,7 +78,7 @@ public:
    /*  Construct LPColBase with the given objective value \p obj, a column %vector \p vec, upper bound \p upper and
     *  lower bound \p lower.
     */
-   LPColBase<R>(R p_obj, const SVectorBase<R>& p_vector, R p_upper, R p_lower)
+   LPColBase<R>(const R& p_obj, const SVectorBase<R>& p_vector, const R& p_upper, const R& p_lower)
       : up(p_upper), low(p_lower), object(p_obj), vec(p_vector)
    {
       assert(isConsistent());
@@ -116,7 +116,7 @@ public:
    }
 
    /// Sets objective value.
-   void setObj(R p_object)
+   void setObj(const R& p_object)
    {
       object = p_object;
    }
@@ -128,7 +128,7 @@ public:
    }
 
    /// Sets upper bound.
-   void setUpper(R p_up)
+   void setUpper(const R& p_up)
    {
       up = p_up;
    }
@@ -139,7 +139,7 @@ public:
       return low;
    }
    /// Sets lower bound.
-   void setLower(R p_low)
+   void setLower(const R& p_low)
    {
       low = p_low;
    }

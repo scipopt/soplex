@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.0.0.1
+VERSION		:=	2.0.1.3
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -120,6 +120,7 @@ LIBHEADER	=	array.h \
 			basevectors.h \
 			classarray.h \
 			clufactor.h \
+			clufactor_rational.h \
 			cring.h \
 			dataarray.h \
 			datahashtable.h \
@@ -147,8 +148,11 @@ LIBHEADER	=	array.h \
 			nameset.h \
 			random.h \
 			rational.h \
+			ratrecon.h \
 			slinsolver.h \
+			slinsolver_rational.h \
 			slufactor.h \
+			slufactor_rational.h \
 			solbase.h \
 			sol.h \
 			soplex.h \
@@ -195,12 +199,14 @@ LIBHEADER	=	array.h \
 			svsetbase.h \
 			svset.h \
 			timer.h \
+			unitvectorbase.h \
 			unitvector.h \
 			updatevector.h \
 			vectorbase.h \
 			vector.h
 LIBOBJ		= 	changesoplex.o \
 			clufactor.o \
+			clufactor_rational.o \
 			didxset.o \
 			enter.o \
 			gzstream.o \
@@ -209,8 +215,10 @@ LIBOBJ		= 	changesoplex.o \
 			mpsinput.o \
 			nameset.o \
 			rational.o \
+			ratrecon.o \
 			slufactor.o \
 			solveids.o \
+			slufactor_rational.o \
 			solverational.o \
 			solvereal.o \
 			soplex.o \
@@ -252,8 +260,8 @@ LIBOBJ		= 	changesoplex.o \
 			spxweightst.o \
 			spxwritestate.o \
 			statistics.o \
-			timer.o \
-			unitvector.o \
+			usertimer.o \
+			wallclocktimer.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o

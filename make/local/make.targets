@@ -11,3 +11,19 @@ testcluster:
 		$(notdir $(BINNAME)) $(SETTINGS) $(TIME) $(MEM) \
 		$(CONTINUE) \
 		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE);
+
+.PHONY: testclusterperplex
+testclusterperplex:
+		cd check; \
+		$(shell) ./check_cluster_perplex.sh $(TEST) $(BINDIR)/perplex \
+		$(notdir $(BINNAME)) $(SETTINGS) $(TIME) $(MEM) \
+		$(CONTINUE) \
+		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE);
+
+.PHONY: testclusterqsoptex
+testclusterqsoptex:
+		cd check; \
+		$(shell) ./check_cluster_qsoptex.sh $(TEST) $(BINDIR)/qsoptex \
+		$(notdir $(BINNAME)) $(SETTINGS) $(TIME) $(MEM) \
+		$(CONTINUE) \
+		$(QUEUETYPE) $(QUEUE) $(PPN) $(CLIENTTMPDIR) $(NOWAITCLUSTER) $(EXCLUSIVE);

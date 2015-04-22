@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -29,7 +29,6 @@ Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
 Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-int  Param::s_verbose               = 1;
 
 bool msginconsistent(const char* name, const char* file, int line)
 {
@@ -37,7 +36,7 @@ bool msginconsistent(const char* name, const char* file, int line)
    assert(file != 0);
    assert(line >= 0);
 
-   MSG_ERROR( spxout << file << "(" << line << ") "
+   MSG_ERROR( std::cerr << file << "(" << line << ") "
    << "Inconsistency detected in " << name << std::endl; )
 
    return 0;
@@ -61,13 +60,6 @@ void Param::setEpsilonUpdate(Real eps)
 void Param::setEpsilonPivot(Real eps)
 {
    s_epsilon_pivot = eps;
-}
-
-void Param::setVerbose(int p_verbose)
-{
-#ifndef DISABLE_VERBOSITY
-   s_verbose = p_verbose;
-#endif
 }
 
 } // namespace soplex

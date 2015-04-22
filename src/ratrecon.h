@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,21 +21,21 @@
 #ifndef _RATRECON_H_
 #define _RATRECON_H_
 
-#include <math.h>
-#include <assert.h>
-#include <iostream>
-#include <string.h>
+#ifndef SOPLEX_LEGACY
 
+#include "spxdefines.h"
 #include "rational.h"
 #include "sol.h"
-#include "spxdefines.h"
 #include "basevectors.h"
-#include "gmp.h"
+#include "didxset.h"
 
 namespace soplex
 {
-   bool reconstructSol(SolRational& solution);
-   bool reconstructVector(VectorBase<Rational>& input);
+   /** reconstruct a rational vector */
+   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0);
 
+   /** reconstruct a rational solution */
+   bool reconstructSol(SolRational& solution);
 } // namespace soplex
+#endif
 #endif // _RATRECON_H_

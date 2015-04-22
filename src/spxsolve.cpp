@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-//#define DEBUGGING
 
 #include <assert.h>
 #include <iostream>
@@ -26,7 +24,6 @@
 #include "spxdefaultrt.h"
 #include "spxstarter.h"
 #include "spxout.h"
-#include "exceptions.h"
 
 #define MAXCYCLES 400
 #define MAXSTALLS 10000
@@ -57,7 +54,7 @@ bool SPxSolver::precisionReached(Real& newpricertol) const
    {
       newpricertol = thepricer->epsilon() / 10.0;
 
-      MSG_INFO3( spxout << "Precision not reached: Pricer tolerance = "
+      MSG_INFO3( (*spxout), (*spxout) << "Precision not reached: Pricer tolerance = "
                            << thepricer->epsilon()
                            << " new tolerance = " << newpricertol
                            << std::endl
@@ -111,8 +108,8 @@ SPxSolver::Status SPxSolver::solve()
       m_status = NO_RATIOTESTER;
       throw SPxStatusException("XSOLVE04 No RatioTester loaded");
    }
-   theTime.reset();
-   theTime.start();
+   theTime->reset();
+   theTime->start();
 
    m_numCycle = 0;
    iterCount  = 0;
@@ -154,9 +151,9 @@ SPxSolver::Status SPxSolver::solve()
    thepricer->setType(type());
    theratiotester->setType(type());
 
-   MSG_INFO3(
-      spxout << "starting value = " << value() << std::endl;
-      spxout << "starting shift = " << shift() << std::endl;
+   MSG_INFO3( (*spxout),
+      (*spxout) << "starting value = " << value() << std::endl
+             << "starting shift = " << shift() << std::endl;
    )
 
    if (SPxBasis::status() == SPxBasis::OPTIMAL)
@@ -193,6 +190,8 @@ SPxSolver::Status SPxSolver::solve()
 
       if (type() == ENTER)
       {
+         forceRecompNonbasicValue();
+
          int enterCycleCount = 0;
          int enterFacPivotCount = 0;
 
@@ -220,7 +219,7 @@ SPxSolver::Status SPxSolver::solve()
             lastDelta *= 0.01;
             theratiotester->setDelta(lastDelta);
             assert(theratiotester->getDelta() > 0);
-            MSG_DEBUG( spxout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
+            MSG_DEBUG( std::cout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
          }
          else
          {
@@ -228,8 +227,11 @@ SPxSolver::Status SPxSolver::solve()
             theratiotester->setDelta(entertol());
          }
 
+         printDisplayLine(true);
          do
          {
+            printDisplayLine();
+
             enterId = thepricer->selectEnter();
 
             if (!enterId.isValid() && instableEnterId.isValid() && lastUpdate() == 0)
@@ -238,8 +240,8 @@ SPxSolver::Status SPxSolver::solve()
                   that this is due to the scaling of the test values. Thus, we use
                   instableEnterId and SPxFastRT::selectEnter shall accept even an instable
                   leaving variable. */
-               MSG_INFO3(
-                  spxout << " --- trying instable enter iteration" << std::endl;
+               MSG_INFO3( (*spxout),
+                  (*spxout) << " --- trying instable enter iteration" << std::endl;
                   )
 
                enterId = instableEnterId;
@@ -314,7 +316,7 @@ SPxSolver::Status SPxSolver::solve()
                {
                   Real newpricertol = minpricertol;
 
-                  MSG_INFO2( spxout << " --- checking feasibility and optimality\n")
+                  MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
                   computeTest();
                   computeCoTest();
 
@@ -329,7 +331,7 @@ SPxSolver::Status SPxSolver::solve()
 
                      thepricer->setEpsilon(newpricertol);
 
-                     MSG_INFO2( spxout << " --- setting pricer tolerance to "
+                     MSG_INFO2( (*spxout), (*spxout) << " --- setting pricer tolerance to "
                                           << thepricer->epsilon()
                                           << std::endl; )
                   }
@@ -347,7 +349,7 @@ SPxSolver::Status SPxSolver::solve()
                      break;
                   }
                }
-               MSG_INFO3( spxout << " --- solve(enter) triggers refactorization" << std::endl; )
+               MSG_INFO3( (*spxout), (*spxout) << " --- solve(enter) triggers refactorization" << std::endl; )
 
                // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                // create cycling, so it is performed only a limited number of times per ENTER round
@@ -358,7 +360,7 @@ SPxSolver::Status SPxSolver::solve()
                   // if the factorization was found out to be singular, we have to quit
                   if( SPxBasis::status() < SPxBasis::REGULAR )
                   {
-                     MSG_ERROR( spxout << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     MSG_ERROR( std::cerr << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
                      stop = true;
                      break;
                   }
@@ -381,7 +383,7 @@ SPxSolver::Status SPxSolver::solve()
             /* check if we have iterations left */
             if (maxIters >= 0 && iterations() >= maxIters)
             {
-               MSG_INFO2( spxout << " --- maximum number of iterations (" << maxIters
+               MSG_INFO2( (*spxout), (*spxout) << " --- maximum number of iterations (" << maxIters
                                  << ") reached" << std::endl; )
                m_status = ABORT_ITER;
                stop = true;
@@ -404,7 +406,7 @@ SPxSolver::Status SPxSolver::solve()
                enterCycleCount++;
                if( enterCycleCount > MAXCYCLES )
                {
-                  MSG_INFO2( spxout << " --- abort solving due to cycling in "
+                  MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to cycling in "
                                        << "entering algorithm" << std::endl; );
                   m_status = ABORT_CYCLING;
                   stop = true;
@@ -423,12 +425,12 @@ SPxSolver::Status SPxSolver::solve()
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
             if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
             {
-               if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
+               if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
                   if( stallNumRecovers < MAXSTALLRECOVERS )
                   {
                      /* try to recover by unshifting/switching algorithm up to MAXSTALLRECOVERS times (just a number picked) */
-                     MSG_INFO3( spxout << " --- stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
+                     MSG_INFO3( (*spxout), (*spxout) << " --- stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
 
                      ++stallNumRecovers;
                      break;
@@ -436,7 +438,7 @@ SPxSolver::Status SPxSolver::solve()
                   else
                   {
                      /* giving up */
-                     MSG_INFO2( spxout << " --- abort solving due to stalling in entering algorithm." << std::endl; );
+                     MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to stalling in entering algorithm." << std::endl; );
 
                      m_status = ABORT_CYCLING;
                      stop = true;
@@ -455,8 +457,8 @@ SPxSolver::Status SPxSolver::solve()
          }
          while (!stop);
 
-         MSG_INFO3(
-            spxout << " --- enter finished. iteration: " << iteration()
+         MSG_INFO3( (*spxout),
+            (*spxout) << " --- enter finished. iteration: " << iteration()
                    << ", value: " << value()
                    << ", shift: " << shift()
                    << ", epsilon: " << epsilon()
@@ -482,8 +484,8 @@ SPxSolver::Status SPxSolver::solve()
 
                Real maxinfeas = maxInfeas();
 
-               MSG_INFO3(
-                  spxout << " --- maxInfeas: " << maxinfeas
+               MSG_INFO3( (*spxout),
+                  (*spxout) << " --- maxInfeas: " << maxinfeas
                          << ", shift: " << shift()
                          << ", entertol: " << entertol() << std::endl;
                )
@@ -504,6 +506,8 @@ SPxSolver::Status SPxSolver::solve()
       else
       {
          assert(type() == LEAVE);
+
+         forceRecompNonbasicValue();
 
          int leaveCycleCount = 0;
          int leaveFacPivotCount = 0;
@@ -532,7 +536,7 @@ SPxSolver::Status SPxSolver::solve()
             lastDelta *= 0.01;
             theratiotester->setDelta(lastDelta);
             assert(theratiotester->getDelta() > 0);
-            MSG_DEBUG( spxout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
+            MSG_DEBUG( std::cout << "decreased delta for ratiotest to: " << theratiotester->getDelta() << std::endl; )
          }
          else
          {
@@ -540,8 +544,11 @@ SPxSolver::Status SPxSolver::solve()
             theratiotester->setDelta(leavetol());
          }
 
+         printDisplayLine(true);
          do
          {
+            printDisplayLine();
+
             leaveNum = thepricer->selectLeave();
 
             if (leaveNum < 0 && instableLeaveNum >= 0 && lastUpdate() == 0)
@@ -550,8 +557,8 @@ SPxSolver::Status SPxSolver::solve()
                   that this is due to the scaling of theCoTest[...]. Thus, we use 
                   instableLeaveNum and SPxFastRT::selectEnter shall accept even an instable
                   entering variable. */
-               MSG_INFO3(
-                  spxout << " --- trying instable leave iteration" << std::endl;
+               MSG_INFO3( (*spxout),
+                  (*spxout) << " --- trying instable leave iteration" << std::endl;
                )
             
                leaveNum = instableLeaveNum;
@@ -586,7 +593,7 @@ SPxSolver::Status SPxSolver::solve()
                {
                   Real newpricertol = minpricertol;
 
-                  MSG_INFO2( spxout << " --- checking feasibility and optimality\n")
+                  MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
                   computeFtest();
 
                   // is the solution good enough ?
@@ -600,7 +607,7 @@ SPxSolver::Status SPxSolver::solve()
 
                      thepricer->setEpsilon(newpricertol);
 
-                     MSG_INFO2( spxout << " --- setting pricer tolerance to "
+                     MSG_INFO2( (*spxout), (*spxout) << " --- setting pricer tolerance to "
                                           << thepricer->epsilon()
                                           << std::endl; );
                   }
@@ -618,7 +625,7 @@ SPxSolver::Status SPxSolver::solve()
                      break;
                   }
                }
-               MSG_INFO3( spxout << " --- solve(leave) triggers refactorization" << std::endl; )
+               MSG_INFO3( (*spxout), (*spxout) << " --- solve(leave) triggers refactorization" << std::endl; )
 
                // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                // create cycling, so it is performed only a limited number of times per LEAVE round
@@ -629,7 +636,7 @@ SPxSolver::Status SPxSolver::solve()
                   // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                   if (SPxBasis::status() < SPxBasis::REGULAR)
                   {
-                     MSG_ERROR( spxout << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     MSG_ERROR( std::cerr << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
                      stop = true;
                      break;
                   }
@@ -652,7 +659,7 @@ SPxSolver::Status SPxSolver::solve()
             /* check if we have iterations left */
             if (maxIters >= 0 && iterations() >= maxIters)
             {
-               MSG_INFO2( spxout << " --- maximum number of iterations (" << maxIters
+               MSG_INFO2( (*spxout), (*spxout) << " --- maximum number of iterations (" << maxIters
                                  << ") reached" << std::endl; )
                m_status = ABORT_ITER;
                stop = true;
@@ -675,7 +682,7 @@ SPxSolver::Status SPxSolver::solve()
                leaveCycleCount++;
                if( leaveCycleCount > MAXCYCLES )
                {
-                  MSG_INFO2( spxout << " --- abort solving due to cycling in leaving algorithm" << std::endl; );
+                  MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to cycling in leaving algorithm" << std::endl; );
                   m_status = ABORT_CYCLING;
                   stop = true;
                }
@@ -693,12 +700,12 @@ SPxSolver::Status SPxSolver::solve()
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
             if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
             {
-               if( fabs(value() - stallRefValue) <= epsilon() && fabs(shift() - stallRefShift) <= epsilon() )
+               if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
                   if( stallNumRecovers < MAXSTALLRECOVERS )
                   {
                      /* try to recover by switching algorithm up to MAXSTALLRECOVERS times */
-                     MSG_INFO3( spxout << " --- stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
+                     MSG_INFO3( (*spxout), (*spxout) << " --- stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
 
                      ++stallNumRecovers;
                      break;
@@ -706,7 +713,7 @@ SPxSolver::Status SPxSolver::solve()
                   else
                   {
                      /* giving up */
-                     MSG_INFO2( spxout << " --- abort solving due to stalling in leaving algorithm" << std::endl; );
+                     MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to stalling in leaving algorithm" << std::endl; );
 
                      m_status = ABORT_CYCLING;
                      stop = true;
@@ -725,8 +732,8 @@ SPxSolver::Status SPxSolver::solve()
          }
          while (!stop);
 
-         MSG_INFO3(
-            spxout << " --- leave finished. iteration: " << iteration()
+         MSG_INFO3( (*spxout),
+            (*spxout) << " --- leave finished. iteration: " << iteration()
                    << ", value: " << value()
                    << ", shift: " << shift()
                    << ", epsilon: " << epsilon()
@@ -753,8 +760,8 @@ SPxSolver::Status SPxSolver::solve()
                   m_status = ABORT_CYCLING;
                   throw SPxStatusException("XSOLVE13 Abort solving due to cycling");
                }
-               MSG_INFO3(
-                  spxout << " --- maxInfeas: " << maxInfeas()
+               MSG_INFO3( (*spxout),
+                  (*spxout) << " --- maxInfeas: " << maxInfeas()
                          << ", shift: " << shift()
                          << ", leavetol: " << leavetol()
                          << ", cycle count: " << cycleCount << std::endl;
@@ -774,8 +781,8 @@ SPxSolver::Status SPxSolver::solve()
 
                Real maxinfeas = maxInfeas();
 
-               MSG_INFO3(
-                  spxout << " --- maxInfeas: " << maxinfeas
+               MSG_INFO3( (*spxout),
+                  (*spxout) << " --- maxInfeas: " << maxinfeas
                          << ", shift: " << shift()
                          << ", leavetol: " << leavetol() << std::endl;
                )
@@ -805,7 +812,7 @@ SPxSolver::Status SPxSolver::solve()
       assert(m_status != SINGULAR);
 
       }
-      catch( SPxException E )
+      catch( const SPxException& E )
       {
          // if we stopped due to a singular basis, we reload the original basis and try again with tighter
          // tolerance (only once)
@@ -817,13 +824,13 @@ SPxSolver::Status SPxSolver::solve()
             {
                m_entertol = 0.01 * m_entertol;
 
-               MSG_INFO2( spxout << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
+               MSG_INFO2( (*spxout), (*spxout) << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
             }
             else
             {
                m_leavetol = 0.01 * m_leavetol;
 
-               MSG_INFO2( spxout << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
+               MSG_INFO2( (*spxout), (*spxout) << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
             }
 
             // load original basis
@@ -839,9 +846,9 @@ SPxSolver::Status SPxSolver::solve()
                init();
                theratiotester->setType(type());
             }
-            catch( SPxException Ex )
+            catch( const SPxException& Ex )
             {
-               MSG_INFO2( spxout << " --- reloaded basis singular, resetting original tolerances" << std::endl; )
+               MSG_INFO2( (*spxout), (*spxout) << " --- reloaded basis singular, resetting original tolerances" << std::endl; )
 
                if( tightenedtype == ENTER )
                   m_entertol = 100.0 * m_entertol;
@@ -893,7 +900,7 @@ SPxSolver::Status SPxSolver::solve()
       theratiotester->setType(type());
    }
 
-   theTime.stop();
+   theTime->stop();
    theCumulativeTime += time();
 
    if (m_status == RUNNING)
@@ -902,15 +909,15 @@ SPxSolver::Status SPxSolver::solve()
       throw SPxStatusException("XSOLVE05 Status is still RUNNING when it shouldn't be");
    }
 
-   MSG_INFO3(
-      spxout << "Finished solving (status=" << status()
+   MSG_INFO3( (*spxout),
+      (*spxout) << "Finished solving (status=" << status()
              << ", iters=" << iterCount
              << ", leave=" << leaveCount
              << ", enter=" << enterCount
              << ", flips=" << totalboundflips;
       if( status() == OPTIMAL )
-         spxout << ", objValue=" << value();
-      spxout << ")" << std::endl;
+         (*spxout) << ", objValue=" << value();
+      (*spxout) << ")" << std::endl;
    )
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
@@ -935,7 +942,7 @@ SPxSolver::Status SPxSolver::solve()
          {
             // Minor rhs violations happen frequently, so print these
             // warnings only with verbose level INFO2 and higher.
-            MSG_INFO2( spxout << "WSOLVE88 Warning! Constraint " << row
+            MSG_INFO2( (*spxout), (*spxout) << "WSOLVE88 Warning! Constraint " << row
                               << " is violated by solution" << std::endl
                               << "   lhs:" << lhs( row )
                               << " <= val:" << val
@@ -951,7 +958,7 @@ SPxSolver::Status SPxSolver::solve()
 
                assert( c < nRows() );
 
-               MSG_WARNING( spxout << "WSOLVE90 basis idx:" << c
+               MSG_WARNING( (*spxout), (*spxout) << "WSOLVE90 basis idx:" << c
                                    << " fVec:" << fVec()[c]
                                    << " fRhs:" << fRhs()[c]
                                    << " fTest:" << fTest()[c] << std::endl; )
@@ -965,7 +972,7 @@ SPxSolver::Status SPxSolver::solve()
          {
             // Minor bound violations happen frequently, so print these
             // warnings only with verbose level INFO2 and higher.
-            MSG_INFO2( spxout << "WSOLVE91 Warning! Bound for column " << col
+            MSG_INFO2( (*spxout), (*spxout) << "WSOLVE91 Warning! Bound for column " << col
                                  << " is violated by solution" << std::endl
                                  << "   lower:" << lower( col )
                                  << " <= val:" << sol[col]
@@ -979,7 +986,7 @@ SPxSolver::Status SPxSolver::solve()
                      break;
 
                assert( c < nRows() );
-               MSG_WARNING( spxout << "WSOLVE92 basis idx:" << c
+               MSG_WARNING( (*spxout), (*spxout) << "WSOLVE92 basis idx:" << c
                                    << " fVec:" << fVec()[c]
                                    << " fRhs:" << fRhs()[c]
                                    << " fTest:" << fTest()[c] << std::endl; )
@@ -993,6 +1000,7 @@ SPxSolver::Status SPxSolver::solve()
      ? enterCount
      : leaveCount;
 
+   printDisplayLine(true);
    return status();
 }
 
@@ -1008,19 +1016,19 @@ void SPxSolver::testVecs()
    tmp -= *theCoPrhs;
    if (tmp.length() > leavetol())
    {
-      MSG_INFO3( spxout << "ISOLVE93 " << iteration() << ":\tcoP error = \t"
+      MSG_INFO3( (*spxout), (*spxout) << "ISOLVE93 " << iteration() << ":\tcoP error = \t"
                         << tmp.length() << std::endl; )
 
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       multWithBase(tmp);
       tmp -= *theCoPrhs;
-      MSG_INFO3( spxout << "ISOLVE94\t\t" << tmp.length() << std::endl; )
+      MSG_INFO3( (*spxout), (*spxout) << "ISOLVE94\t\t" << tmp.length() << std::endl; )
 
       tmp.clear();
       SPxBasis::coSolve(tmp, *theCoPrhs);
       tmp -= *theCoPvec;
-      MSG_INFO3( spxout << "ISOLVE95\t\t" << tmp.length() << std::endl; )
+      MSG_INFO3( (*spxout), (*spxout) << "ISOLVE95\t\t" << tmp.length() << std::endl; )
    }
 
    tmp = *theFvec;
@@ -1028,13 +1036,13 @@ void SPxSolver::testVecs()
    tmp -= *theFrhs;
    if (tmp.length() > entertol())
    {
-      MSG_INFO3( spxout << "ISOLVE96 " << iteration() << ":\t  F error = \t"
+      MSG_INFO3( (*spxout), (*spxout) << "ISOLVE96 " << iteration() << ":\t  F error = \t"
                            << tmp.length() << std::endl; )
 
       tmp.clear();
       SPxBasis::solve(tmp, *theFrhs);
       tmp -= *theFvec;
-      MSG_INFO3( spxout << "ISOLVE97\t\t" << tmp.length() << std::endl; )
+      MSG_INFO3( (*spxout), (*spxout) << "ISOLVE97\t\t" << tmp.length() << std::endl; )
    }
 
    if (type() == ENTER)
@@ -1044,7 +1052,7 @@ void SPxSolver::testVecs()
          if (theCoTest[i] < -leavetol() && isCoBasic(i))
          {
             /// @todo Error message "this shalt not be": shalt this be an assert (also below)?
-            MSG_ERROR( spxout << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
+            MSG_ERROR( std::cerr << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i
                               << ", theCoTest[i]=" << theCoTest[i]
@@ -1056,7 +1064,7 @@ void SPxSolver::testVecs()
       {
          if (theTest[i] < -leavetol() && isBasic(i))
          {
-            MSG_ERROR( spxout << "ESOLVE99 testVecs: theTest: this shalt not be!"
+            MSG_ERROR( std::cerr << "ESOLVE99 testVecs: theTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i
                               << ", theTest[i]=" << theTest[i]
@@ -1066,6 +1074,31 @@ void SPxSolver::testVecs()
    }
 }
 
+
+/// print display line of flying table
+void SPxSolver::printDisplayLine(const bool force)
+{
+   MSG_INFO1( (*spxout),
+      if( displayLine % (displayFreq*30) == 0 )
+      {
+         (*spxout) << "type |   time |   iters | facts |  shift   |    value\n";
+      }
+      if( force || (displayLine % displayFreq == 0) )
+      {
+         (type() == LEAVE) ? (*spxout) << "  L  |" : (*spxout) << "  E  |";
+         (*spxout) << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
+         (*spxout) << std::scientific << std::setprecision(2);
+         (*spxout) << std::setw(8) << iteration() << " | "
+         << std::setw(5) << slinSolver()->getFactorCount() << " | "
+         << shift() << " | "
+         << std::setprecision(8) << value() + objOffset()
+         << std::endl;
+      }
+      displayLine++;
+   );
+}
+
+
 bool SPxSolver::terminate()
 {
 #ifdef ENABLE_ADDITIONAL_CHECKS
@@ -1073,26 +1106,7 @@ bool SPxSolver::terminate()
       testVecs();
 #endif
 
-   MSG_INFO1(
-      if( iteration() % (displayFreq*30) == 0 )
-      {
-         spxout << "type |   time |   iters | facts |  shift   |    value\n";
-      }
-      if( iteration() % displayFreq == 0 )
-      {
-         (type() == LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
-         spxout << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
-         spxout << std::scientific << std::setprecision(2);
-         spxout << std::setw(8) << iteration() << " | "
-         << std::setw(5) << slinSolver()->getFactorCount() << " | "
-         << shift() << " | "
-         << std::setprecision(8) << value() + objOffset()
-         << std::endl;
-      }
-   );
-
    int redo = dim();
-
    if (redo < 1000)
       redo = 1000;
 
@@ -1114,16 +1128,16 @@ bool SPxSolver::terminate()
       cr -= *theCoPrhs;
       fr -= *theFrhs;
       if (cr.length() > leavetol())
-         MSG_WARNING( spxout << "WSOLVE50 unexpected change of coPrhs " 
+         MSG_WARNING( (*spxout), (*spxout) << "WSOLVE50 unexpected change of coPrhs "
                              << cr.length() << std::endl; )
       if (fr.length() > entertol())
-         MSG_WARNING( spxout << "WSOLVE51 unexpected change of   Frhs " 
+         MSG_WARNING( (*spxout), (*spxout) << "WSOLVE51 unexpected change of   Frhs "
                              << fr.length() << std::endl; )
 #endif
 
       if (updateCount > 1)
       {
-         MSG_INFO3( spxout << " --- terminate triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << " --- terminate triggers refactorization"
                            << std::endl; )
          factorize();
       }
@@ -1149,12 +1163,12 @@ bool SPxSolver::terminate()
       return true;
    }
 
-   if ( maxTime >= 0 && maxTime < infinity && time() >= maxTime )
+   if ( isTimeLimitReached() )
    {
-      MSG_INFO2( spxout << " --- timelimit (" << maxTime
+      MSG_INFO2( (*spxout), (*spxout) << " --- timelimit (" << maxTime
                         << ") reached" << std::endl; )
       m_status = ABORT_TIME;
-      return true;   
+      return true;
    }
 
    // objLimit is set and we are running DUAL:
@@ -1183,10 +1197,10 @@ bool SPxSolver::terminate()
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if( spxSense() * value() <= spxSense() * objLimit ) 
          {
-            MSG_INFO2( spxout << " --- objective value limit (" << objLimit
+            MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )
             MSG_DEBUG(
-               spxout << " --- objective value limit reached" << std::endl
+               (*spxout) << " --- objective value limit reached" << std::endl
                       << " (value: " << value()
                       << ", limit: " << objLimit << ")" << std::endl
                       << " (spxSense: " << int(spxSense())
@@ -1300,7 +1314,7 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
    if (rep() == ROW)
    {
       int i;
-      p_vector.clear ();
+      p_vector = maxRowObj();
       for (i = nCols() - 1; i >= 0; --i)
       {
          if (baseId(i).isSPxRowId())
@@ -1603,7 +1617,7 @@ SPxSolver::Status SPxSolver::getResult(
    Vector* p_primal,
    Vector* p_slacks,
    Vector* p_dual,
-   Vector* reduCosts) const
+   Vector* reduCosts)
 {
    if (p_value)
       *p_value = this->value();

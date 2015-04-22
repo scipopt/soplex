@@ -80,7 +80,7 @@ for instance in `cat $TESTSET`
 do
     echo @01 $instance
     echo @01 $instance >>$ERRFILE
-    $BINFILE $opt --loadset=$SETFILE -c -q -t$TIME $instance 2>>$ERRFILE
+    $BINFILE $opt --loadset=$SETFILE -v4 --int:displayfreq=10000 -c -q -t$TIME $instance 2>>$ERRFILE
     echo =ready=
 done | tee -a $OUTFILE
 date >>$OUTFILE

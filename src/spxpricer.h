@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -237,6 +237,20 @@ public:
    /// covectors given by \p perm have been removed from loaded LP.
    virtual void removedCoVecs(const int* /*perm*/)
    {}
+   //@}
+
+   /**@name Import/Export norms */
+   //@{
+   /// export norms from pricer
+   virtual bool getDualNorms(int& nrows, int& ncols, Real* norms) const
+   {
+      return false;
+   }
+   /// import norms into pricer
+   virtual bool setDualNorms(int nrows, int ncols, Real* norms)
+   {
+      return false;
+   }
    //@}
 
    //-------------------------------------

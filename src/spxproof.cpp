@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -67,7 +67,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       Easyval y(dualsol[i]);
 
       ytb += y*b;
-      MSG_DEBUG( spxout << "DPROOF02 y[" << i << "] = " << dualsol[i]
+      MSG_DEBUG( std::cout << "DPROOF02 y[" << i << "] = " << dualsol[i]
                         << ", lhs[" << i << "] = " << lhsvec[i]
                         << ", rhs[" << i << "] = " << rhsvec[i]
                         << " -> ytb = " << ytb << std::endl; )
@@ -83,7 +83,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
       getCol(j, col);
       SVector colvec = col.colVector();  /* make this faster !!! */
       Easyval diff = objvec[j];
-      MSG_DEBUG( spxout << "DPROOF03 obj[" << j << "] = " << objvec[j]
+      MSG_DEBUG( std::cout << "DPROOF03 obj[" << j << "] = " << objvec[j]
                         << " -> diff = " << diff << std::endl; )
 
       for( int i = 0; i < colvec.size(); ++i )
@@ -91,7 +91,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
          Easyval y(dualsol[colvec.index(i)]);
          Easyval a(colvec.value(i));
          diff -= y*a;
-         MSG_DEBUG( spxout << "DPROOF04 y[" << colvec.index(i) << "] = " 
+         MSG_DEBUG( std::cout << "DPROOF04 y[" << colvec.index(i) << "] = "
                            << dualsol[colvec.index(i)]
                            << ", a[" << colvec.index(i) << "] = "
                            << colvec.value(i)
@@ -100,7 +100,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 
       diff *= x;
       scalprod += diff;
-      MSG_DEBUG( spxout << "DPROOF05 x[" << j << "] = " << x 
+      MSG_DEBUG( std::cout << "DPROOF05 x[" << j << "] = " << x
                         << " -> diff = " << diff << std::endl
                         << "   ------------> scalprod = " 
                         << scalprod << std::endl; )
@@ -108,7 +108,7 @@ Real SPxSolver::provedBound(Vector& dualsol, const Vector& objvec) const
 
    /* add y^Tb */
    scalprod += ytb;
-   MSG_INFO1( spxout << "IPROOF01 proved bound = " << scalprod << std::endl; );
+   MSG_INFO1( spxout, spxout << "IPROOF01 proved bound = " << scalprod << std::endl; );
 
    /* depending on the objective sense, choose min or max */
    if( spxSense() == MINIMIZE )

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -26,6 +26,7 @@
 
 #include "spxdefines.h"
 #include "timer.h"
+#include "timerfactory.h"
 #include "spxlp.h"
 #include "spxbasis.h"
 #include "array.h"
@@ -39,7 +40,9 @@
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
                                            * coIds are more likely to enter if SPARSITY_TRADEOFF is close to 0
                                            */
-
+#define MAXNCLCKSKIPS            32       /**< maximum number of clock skips (iterations without time measuring) */
+#define SAFETYFACTOR             1e-2     /**< the probability to skip the clock when the time limit has been reached */
+#define NINITCALLS               200      /**< the number of clock updates in isTimelimitReached() before clock skipping starts */
 namespace soplex
 {
 class SPxPricer;
@@ -227,12 +230,18 @@ private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
-   Timer          theTime;     ///< time spent in last call to method solve()
+   Timer*         theTime;     ///< time spent in last call to method solve()
+   Timer::TYPE    timerType;   ///< type of timer (user or wallclock)
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
+   int            nClckSkipsLeft; ///< remaining number of times the clock can be safely skipped
+   long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
+
+   Real           m_nonbasicValue;         ///< nonbasic part of current objective value
+   bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
 
    Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
@@ -269,6 +278,7 @@ private:
    bool           instableEnter;
    Real           instableEnterVal;
 
+   int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
    bool           getStartingIdsBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
@@ -382,7 +392,15 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
+   SPxOut* spxout;                     ///< message handler
+
    //-----------------------------
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+      SPxLPBase::spxout = &newOutstream;
+   }
+
    /**@name Access */
    //@{
    /// return the version of SPxSolver as number like 123 for 1.2.3
@@ -498,7 +516,7 @@ public:
     *  variables.
     */
    virtual bool writeBasisFile(const char* filename, 
-      const NameSet* rowNames, const NameSet* colNames) const;
+      const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat = false) const;
 
    /** Write current LP, basis, and parameter settings.
     *  LP is written in MPS format to "\p filename".mps, basis is written in "\p filename".bas, and parameters
@@ -506,7 +524,7 @@ public:
     *  the constraints and variables.
     */
    virtual bool writeState(const char* filename, 
-      const NameSet* rowNames = NULL, const NameSet* colNames = NULL) const;
+      const NameSet* rowNames = NULL, const NameSet* colNames = NULL, const bool cpxFormat = false) const;
 
    //@}
 
@@ -529,7 +547,19 @@ public:
    /**@return Objective value of the current solution vector
     *         (see #getPrimal()).
     */
-   virtual Real value() const;
+   virtual Real value();
+
+   // update nonbasic part of the objective value by the given amount
+   /**@return whether nonbasic part of objective is reliable
+    */
+   bool updateNonbasicValue(Real objChange);
+
+   // trigger a recomputation of the nonbasic part of the objective value
+   void forceRecompNonbasicValue()
+   {
+      m_nonbasicValue = 0.0;
+      m_nonbasicValueUpToDate = false;
+   }
 
 #if 0
    /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics
@@ -621,6 +651,9 @@ public:
    ///  @throw SPxStatusException if no problem loaded
    virtual Status getDualfarkas (Vector& vector) const;
 
+   /// print display line of flying table
+   virtual void printDisplayLine(const bool force = false);
+
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
     *  the algorithm is to terminate. In this case a nonzero value is
@@ -695,6 +728,19 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
+   /// set timing type
+   void setTiming(Timer::TYPE ttype)
+   {
+      theTime = TimerFactory::switchTimer(theTime, ttype);
+      timerType = ttype;
+   }
+   /// set timing type
+   Timer::TYPE getTiming()
+   {
+      assert(timerType == theTime->type());
+      return timerType;
+   }
+
    /// set display frequency
    void setDisplayFreq(int freq)
    {
@@ -783,6 +829,32 @@ public:
       changeObj(number(p_id), p_newVal);
    }
    ///
+   virtual void changeMaxObj(const Vector& newObj);
+   ///
+   virtual void changeMaxObj(int i, const Real& newVal);
+   ///
+   virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal)
+   {
+      changeMaxObj(number(p_id), p_newVal);
+   }
+   ///
+   virtual void changeRowObj(const Vector& newObj);
+   ///
+   virtual void changeRowObj(int i, const Real& newVal);
+   ///
+   virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal)
+   {
+      changeRowObj(number(p_id), p_newVal);
+   }
+   ///
+   virtual void clearRowObjs()
+   {
+      SPxLP::clearRowObjs();
+      unInit();
+   }
+   ///
+   virtual void changeLowerStatus(int i, Real newLower, Real oldLower = 0.0);
+   ///
    virtual void changeLower(const Vector& newLower);
    ///
    virtual void changeLower(int i, const Real& newLower);
@@ -791,6 +863,8 @@ public:
    {
       changeLower(number(p_id), p_newLower);
    }
+   ///
+   virtual void changeUpperStatus(int i, Real newUpper, Real oldLower = 0.0);
    ///
    virtual void changeUpper(const Vector& newUpper);
    ///
@@ -811,6 +885,8 @@ public:
       changeBounds(number(p_id), p_newLower, p_newUpper);
    }
    ///
+   virtual void changeLhsStatus(int i, Real newLhs, Real oldLhs = 0.0);
+   ///
    virtual void changeLhs(const Vector& newLhs);
    ///
    virtual void changeLhs(int i, const Real& newLhs);
@@ -819,6 +895,8 @@ public:
    {
       changeLhs(number(p_id), p_newLhs);
    }
+   ///
+   virtual void changeRhsStatus(int i, Real newRhs, Real oldRhs = 0.0);
    ///
    virtual void changeRhs(const Vector& newRhs);
    ///
@@ -1372,15 +1450,21 @@ public:
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      theShift += to - theUBbound[i];
-      theUBbound[i] = to;
+      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
+      {
+         theShift += to - theUBbound[i];
+         theUBbound[i] = to;
+      }
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      theShift += theLBbound[i] - to;
-      theLBbound[i] = to;
+      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
+      {
+         theShift += theLBbound[i] - to;
+         theLBbound[i] = to;
+      }
    }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
    void shiftUPbound(int i, Real to)
@@ -1597,6 +1681,7 @@ private:
    void computeFtest();
    /// update basis feasibility test vector.
    void updateFtest();
+
    //@}
 
    //------------------------------------
@@ -1635,7 +1720,11 @@ protected:
    {
       return initialized;
    }
-   /// unintialize data structures.
+
+   /// resets clock average statistics
+   void resetClockStats();
+
+   /// uninitialize data structures.
    virtual void unInit()
    {
       initialized = false;
@@ -1670,7 +1759,7 @@ protected:
     *  the objective value resulting form nonbasic variables for #COLUMN
     *  Representation.
     */
-   Real nonbasicValue() const;
+   Real nonbasicValue();
 
    /// Get pointer to the \p id 'th vector
    virtual const SVector* enterVector(const SPxId& p_id)
@@ -1682,21 +1771,21 @@ protected:
    ///
    virtual void getLeaveVals(int i,
       SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
-      Real& leaveMax, Real& leavebound, int& leaveNum);
+      Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
    ///
    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
       Real& enterBound, Real& newUBbound,
-      Real& newLBbound, Real& newCoPrhs);
+      Real& newLBbound, Real& newCoPrhs, Real& objChange);
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
       Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO);
+      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
    ///
-   virtual void getEnterVals2(int leaveIdx, 
-      Real enterMax, Real& leaveBound);
+   virtual void getEnterVals2(int leaveIdx,
+      Real enterMax, Real& leaveBound, Real& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
-      Real leaveVal, const SVector& vec);
+      Real leaveVal, const SVector& vec, Real& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
       Real enterTest, SPxBasis::Desc::Status enterStat);
@@ -1764,7 +1853,7 @@ public:
    /// return objective limit.
    virtual Real terminationValue() const;
    /// get objective value of current solution.
-   virtual Real objValue() const
+   virtual Real objValue()
    {
       return value();
    }
@@ -1772,7 +1861,7 @@ public:
    Status 
    getResult( Real* value = 0, Vector* primal = 0,
               Vector* slacks = 0, Vector* dual = 0, 
-              Vector* reduCost = 0) const;
+              Vector* reduCost = 0);
 
 protected:
 
@@ -1797,7 +1886,7 @@ public:
    VarStatus getBasisColStatus( int col ) const;
 
    /// get current basis, and return solver status.
-   Status getBasis(VarStatus rows[], VarStatus cols[]) const;
+   Status getBasis(VarStatus rows[], VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const;
 
    /// gets basis status
    SPxBasis::SPxStatus getBasisStatus() const
@@ -1822,6 +1911,12 @@ public:
    /// get level of dual degeneracy
    // this function is used for the improved dual simplex
    Real getDegeneracyLevel(Vector feasvec);
+
+   /// get dual steepest edge norms
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+
+   /// set dual steepest edge norms
+   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
    /// reset cumulative time counter to zero.
    void resetCumulativeTime()
@@ -1869,8 +1964,13 @@ public:
    /// time spent in last call to method solve().
    Real time() const
    {
-      return theTime.userTime();
+      return theTime->time();
    }
+
+   /// returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
+   ///
+   bool isTimeLimitReached(const bool forceCheck = false);
+
    /// cumulative time spent in all calls to method solve().
    Real cumulativeTime() const
    {
@@ -1959,7 +2059,8 @@ public:
    /// default constructor.
    explicit
    SPxSolver( Type            type  = LEAVE, 
-              Representation  rep   = ROW  );
+              Representation  rep   = ROW,
+              Timer::TYPE     ttype = Timer::USER_TIME);
    // virtual destructor
    virtual ~SPxSolver();
    //@}

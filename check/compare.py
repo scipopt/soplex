@@ -9,6 +9,12 @@ import json
 
 # This script compares several SoPlex .json files.
 # The first argument is the default run that is compared to all other runs.
+# Set values to be compared and respective shift values in arrays 'compareValues' and 'shift'
+
+def printUsage(name):
+    print 'compare several runs of the same testset'
+    print 'usage: '+name+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]'
+    quit()
 
 # compute speed-up or slow-down factors for all instances of two settings
 # compareValue is the name of the value of the loaded dictionary
@@ -30,30 +36,37 @@ def updateGeoMean(new, mean, count, shift):
     assert mean > 0
     if shift == 0:
         shift = 0.0000001
-    return math.pow(float(mean), float(count)/float(count+1)) * math.pow(float(new)+shift, 1.0/float(count+1))
+    return math.pow(float(mean+shift), float(count-1)/float(count)) * math.pow(float(new)+shift, 1.0/float(count)) - shift
 
 # print header lines
 def printHeader():
-    border = '-'*(namelength) + '+' + '-'*(iterlength + timelength) + '+'
-    output1 = '-'.join([version[0],hash[0],default]).rjust(namelength + iterlength + timelength)
-    output2 = 'name'.ljust(namelength) + '|' + 'iters'.rjust(iterlength-1) + 'time'.rjust(timelength)
+    border = '-'*(namelength) + '+' + '-'*(sum(length)+1) + '+'
+    output1 = '-'.join([version[0],hash[0],default]).rjust(namelength+sum(length)+1)
+    output2 = 'name'.ljust(namelength) + ' '
+    # print name of compareValue of first setting
+    for i,c in enumerate(compareValues):
+        output2 += c.rjust(length[i])
+    # print compareValues and factornames for other settings
     for i,s in enumerate(settings[1:]):
-        output1 = output1 + ' |' + '-'.join([version[i+1],hash[i+1],s]).center(iterlength + timelength + 2*factorlength)
-        output2 = output2 + ' |' + 'iters'.rjust(iterlength) + 'time'.rjust(timelength)
-        output2 = output2 + 'iterQ'.rjust(factorlength) + 'timeQ'.rjust(factorlength)
-        border = border + '-'*(iterlength + timelength + 2*factorlength + 1) + '+'
+        output1 += ' |' + '-'.join([version[i+1],hash[i+1],s]).center(sum(length) + len(compareValues)*factorlength)
+        border += '-'*(sum(length) + len(compareValues)*factorlength + 1) + '+'
+        output2 += ' |'
+        for ic,c in enumerate(compareValues):
+            output2 += c.rjust(length[ic])
+        for c in compareValues:
+            output2 += (c+'Q').rjust(factorlength)
     print border
     print output1
     print output2
     print border
 
+# print usage and exit
 if len(sys.argv) < 2:
-    print 'compare several runs of the same testset'
-    print 'usage: '+sys.argv[0]+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]'
-    quit()
+    printUsage(sys.argv[0])
 
 # set compare values, used to identify the values from computeFactor
 compareValues = ['solvetime','iters']
+shift = [0.1, 10, 1]
 
 # look for instances to ignore
 ignore = []
@@ -94,7 +107,7 @@ default = settings[0]
 
 # extract instance names
 instances = results[default].keys()
-namelength = 12
+namelength = 16
 for i in instances:
     namelength = max(len(i), namelength)
 
@@ -104,12 +117,19 @@ for s in settings:
 
 # check all settings for aborts or instances to ignore and remove them
 aborts = ''
+mintime = 0
 for s in settings:
     for i in instances:
-        if results[s][i]['status'] == 'abort' or i in ignore:
+        if i not in results[s]:
+            aborts = aborts + i + '\n'
+            instances.remove(i)
+            del results[default][i]
+        elif results[s][i]['status'] == 'abort' or i in ignore:
             aborts = aborts + i + '\n'
             instances.remove(i)
             del results[s][i]
+        else:
+            results[s][i]['solvetime'] = max( mintime, results[s][i]['solvetime'] )
 
 # compute all the comparison factors
 for c in compareValues:
@@ -118,77 +138,87 @@ for c in compareValues:
         factors[c][s] = {}
         computeFactor(c, default, s)
 
-namelength = namelength + 1
-timelength = 6
-iterlength = 6
-for s in settings:
-    for i in instances:
-        timelength = max(len(str(results[s][i]['solvetime'])), timelength)
-        iterlength = max(len(str(results[s][i]['iters'])), iterlength)
+# compute column lengths
+namelength += 1
+length = []
+for idx,c in enumerate(compareValues):
+    length.append(len(c))
+    for s in settings:
+        for i in instances:
+            length[idx] = max(length[idx],len(str(results[s][i][c])))
+    length[idx] += 2
 
-timelength = timelength + 2
-iterlength = iterlength + 2
-factorlength = 8
+factorlength = max(length)
 
 printHeader()
 
-sumtime = [0] * len(settings)
-sumiter = [0] * len(settings)
-meantime = [1.0] * len(settings)
-meaniter = [1.0] * len(settings)
-shmeantime = [1.0] * len(settings)
-shmeaniter = [1.0] * len(settings)
-shiftiter = 10
-shifttime = 0.1
 count = 0
+
+sumValue = {}
+meanValue = {}
+shmeanValue = {}
+
+#initialize mean and shmean variables
+for c in compareValues:
+    sumValue[c] = {}
+    meanValue[c] = {}
+    shmeanValue[c] = {}
+    for s in settings:
+        sumValue[c][s] = 0
+        meanValue[c][s] = 1.0
+        shmeanValue[c][s] = 1.0
 
 # print data for all instances with the computed length
 for i in sorted(instances):
-    count = count + 1
-    time = results[default][i]['solvetime']
-    iter = results[default][i]['iters']
-    sumtime[0] = sumtime[0] + time
-    sumiter[0] = sumiter[0] + iter
-    meantime[0] = updateGeoMean(time, meantime[0], count, 0)
-    meaniter[0] = updateGeoMean(iter, meaniter[0], count, 0)
-    shmeantime[0] = updateGeoMean(time, shmeantime[0], count, shifttime)
-    shmeaniter[0] = updateGeoMean(iter, shmeaniter[0], count, shiftiter)
+    count += 1
     output = i.ljust(namelength)
-    # print results of default settings
-    output = output + '{0:{width}d}'.format(iter, width=iterlength)
-    output = output + '{0:{width}.2f}'.format(time, width=timelength)
+    for ic,c in enumerate(compareValues):
+        # print results of default settings
+        value = results[default][i][c]
+        sumValue[c][default] += value
+        meanValue[c][default] = updateGeoMean(value, meanValue[c][default], count, 0)
+        shmeanValue[c][default] = updateGeoMean(value, shmeanValue[c][default], count, shift[ic])
+        output += str(value).rjust(length[ic])
+
     # print results of remaining settings
-    for idx, s in enumerate(settings[1:]):
-        time = results[s][i]['solvetime']
-        iter = results[s][i]['iters']
-        sumiter[idx+1] = sumiter[idx+1] + iter
-        sumtime[idx+1] = sumtime[idx+1] + time
-        meantime[idx+1] = updateGeoMean(time, meantime[idx+1], count, 0)
-        meaniter[idx+1] = updateGeoMean(iter, meaniter[idx+1], count, 0)
-        shmeantime[idx+1] = updateGeoMean(time, shmeantime[idx+1], count, shifttime)
-        shmeaniter[idx+1] = updateGeoMean(iter, shmeaniter[idx+1], count, shiftiter)
-        output = output + '{0:{width}d}'.format(iter, width=iterlength+2)
-        output = output + '{0:{width}.2f}'.format(time, width=timelength)
-        output = output + '{0:{width}.2f}'.format(factors['iters'][s][i], width=factorlength)
-        output = output + '{0:{width}.2f}'.format(factors['solvetime'][s][i], width=factorlength)
+    for ids, s in enumerate(settings[1:]):
+        output += '  '
+        for ic,c in enumerate(compareValues):
+            value = results[s][i][c]
+            sumValue[c][s] += value
+            meanValue[c][s] = updateGeoMean(value, meanValue[c][s], count, 0)
+            shmeanValue[c][s] = updateGeoMean(value, shmeanValue[c][s], count, shift[ic])
+            output += str(value).rjust(length[ic])
+        # print calculated factors
+        for ic,c in enumerate(compareValues):
+            output += '{0:{width}.2f}'.format(factors[c][s][i], width=factorlength)
     print output
 
 printHeader()
 
 # print summary of comparision
-output1 = 'sum:'.ljust(namelength) + '{0:{width}d}'.format(sumiter[0], width=iterlength)
-output1 = output1 + '{0:{width}.2f}'.format(sumtime[0], width=timelength)
-output2 = 'geo mean:'.ljust(namelength) + '{0:{width}.2f}'.format(meaniter[0], width=iterlength)
-output2 = output2 + '{0:{width}.2f}'.format(meantime[0], width=timelength)
-output3 = 'shifted:'.ljust(namelength) + '{0:{width}.2f}'.format(shmeaniter[0], width=iterlength)
-output3 = output3 + '{0:{width}.2f}'.format(shmeantime[0], width=timelength)
-for idx, s in enumerate(settings[1:]):
-    output1 = output1 + '{0:{width}d}'.format(sumiter[idx+1], width=iterlength + 2)
-    output1 = output1 + '{0:{width}.2f}'.format(sumtime[idx+1], width=timelength) + ' '*2*factorlength
-    output2 = output2 + '{0:{width}.2f}'.format(meaniter[idx+1], width=iterlength + 2)
-    output2 = output2 + '{0:{width}.2f}'.format(meantime[idx+1], width=timelength) + ' '*2*factorlength
-    output3 = output3 + '{0:{width}.2f}'.format(shmeaniter[idx+1], width=iterlength + 2)
-    output3 = output3 + '{0:{width}.2f}'.format(shmeantime[idx+1], width=timelength) + ' '*2*factorlength
+output1 = 'sum:'.ljust(namelength)
+output2 = 'geo mean:'.ljust(namelength)
+output3 = 'shifted:'.ljust(namelength)
+# print values of default setting
+for ic,c in enumerate(compareValues):
+    output1 += str(sumValue[c][default]).rjust(length[ic])
+    output2 += str(round(meanValue[c][default],1)).rjust(length[ic])
+    output3 += str(round(shmeanValue[c][default],1)).rjust(length[ic])
+# padding to next setting
+output1 += '  '
+output2 += '  '
+output3 += '  '
+for ids, s in enumerate(settings[1:]):
+    # values of other settings
+    for ic,c in enumerate(compareValues):
+        output1 += str(sumValue[c][s]).rjust(length[ic])
+        output2 += str(round(meanValue[c][s],1)).rjust(length[ic])
+        output3 += str(round(shmeanValue[c][s],1)).rjust(length[ic])
+    # padding to next setting
+    output1 += ' '*(len(compareValues)*factorlength + 2)
+    output2 += ' '*(len(compareValues)*factorlength + 2)
+    output3 += ' '*(len(compareValues)*factorlength + 2)
 print output1
 print output2
 print output3

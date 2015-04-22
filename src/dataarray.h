@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -250,11 +250,8 @@ public:
        In no instance max() will be set to a value less than 1 (even if
        specified).
 
-       @return reMax returns the difference in bytes of the new and the old
-               memory block, which can be used to update pointers pointing 
-               to elements of the memory block.
     */
-   ptrdiff_t reMax(int newMax = 1, int newSize = -1)
+   void reMax(int newMax = 1, int newSize = -1)
    {
       if (newSize >= 0)
          thesize = newSize;
@@ -263,18 +260,16 @@ public:
       if (newMax < 1)
          newMax = 1;
       if (newMax == themax)
-         return 0;
+         return;
       themax = newMax;
-      T* olddata = data;
       if (thesize <= 0)
       {
+         /* no data needs to be copied so do a clean free and alloc */
          spx_free(data);
          spx_alloc(data, themax);
       }
       else
          spx_realloc(data, themax);
-
-      return reinterpret_cast<char*>(data) - reinterpret_cast<char*>(olddata);
    }
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -31,7 +31,9 @@ namespace soplex
 bool SPxSolver::writeState(
    const char*    filename,
    const NameSet* rowNames,
-   const NameSet* colNames ) const
+   const NameSet* colNames,
+   const bool cpxFormat
+   ) const
 {
 
    std::string ofname;
@@ -55,16 +57,14 @@ bool SPxSolver::writeState(
       ofs << " 0";
    else if (!strcmp(pricer()->getName(), "Dantzig"))
       ofs << "1" << std::endl;
-   else if (!strcmp(pricer()->getName(), "Devex"))
-      ofs << "2" << std::endl;
    else if (!strcmp(pricer()->getName(), "ParMult"))
-      ofs << "3" << std::endl;
+      ofs << "2" << std::endl;
    else if (!strcmp(pricer()->getName(), "Devex"))
-      ofs << "4" << std::endl;
+      ofs << "3" << std::endl;
    else if (!strcmp(pricer()->getName(), "Steep"))
-      ofs << "5" << std::endl;
+      ofs << "4" << std::endl;
    else if (!strcmp(pricer()->getName(), "SteepEx"))
-      ofs << "6" << std::endl;
+      ofs << "5" << std::endl;
    ofs << "int:ratiotester = ";
    if (!strcmp(ratiotester()->getName(), "Default"))
       ofs << "0" << std::endl;
@@ -91,7 +91,7 @@ bool SPxSolver::writeState(
 
    // write basis
    ofname = std::string(filename) + ".bas";
-   return writeBasisFile(ofname.c_str(), rowNames, colNames);
+   return writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
 }
 
 } // namespace soplex

@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2014 Konrad-Zuse-Zentrum                            */
+/*                  1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -20,6 +20,12 @@
 #ifndef _BASEVECTORS_H_
 #define _BASEVECTORS_H_
 
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define SOPLEX_DEBUG_BASEVECTORS
+#undef SOPLEX_DEBUG
+#endif
+
 #include "spxdefines.h"
 #include "rational.h"
 #include "vectorbase.h"
@@ -27,10 +33,8 @@
 #include "ssvectorbase.h"
 #include "svectorbase.h"
 #include "dsvectorbase.h"
+#include "unitvectorbase.h"
 #include "svsetbase.h"
-
-// specialized multAdd() for rationals
-// #define SOPLEX_PERFALT_10
 
 #define SOPLEX_VECTOR_MARKER   1e-100
 
@@ -296,7 +300,7 @@ VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
 
 
 
-#ifdef SOPLEX_PERFALT_10
+#ifndef SOPLEX_LEGACY
 /// Addition of scaled vector, specialization for rationals
 template <>
 template <>
@@ -841,6 +845,40 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
 
 
 
+/// Assigns only the elements of \p rhs.
+template <  >
+template <  >
+inline
+SSVectorBase<Rational>& SSVectorBase<Rational>::assign(const SVectorBase<Rational>& rhs)
+{
+   assert(rhs.dim() <= VectorBase<Rational>::dim());
+
+   int s = rhs.size();
+   num = 0;
+
+   for( int i = 0; i < s; ++i )
+   {
+      int k = rhs.index(i);
+      const Rational& v = rhs.value(i);
+
+      if( v == 0 )
+         VectorBase<Rational>::val[k] = 0;
+      else
+      {
+         VectorBase<Rational>::val[k] = v;
+         idx[num++] = k;
+      }
+   }
+
+   setupStatus = true;
+
+   assert(isConsistent());
+
+   return *this;
+}
+
+
+
 /// Assignment operator.
 template < class R >
 template < class S >
@@ -1306,5 +1344,12 @@ std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
    return os;
 }
 }
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef SOPLEX_DEBUG_BASEVECTORS
+#define SOPLEX_DEBUG
+#undef SOPLEX_DEBUG_BASEVECTORS
+#endif
 
 #endif // _BASEVECTORS_H_

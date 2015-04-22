@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2014 Konrad-Zuse-Zentrum                            */
+/*                  1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -19,6 +19,12 @@
  */
 #ifndef _SOLBASE_H_
 #define _SOLBASE_H_
+
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define SOPLEX_DEBUG_SOLBASE
+#undef SOPLEX_DEBUG
+#endif
 
 #include <assert.h>
 #include <string.h>
@@ -117,6 +123,90 @@ public:
          vector = _dualFarkas;
 
       return _hasDualFarkas;
+   }
+
+   /// returns total size of primal solution
+   int totalSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += totalSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += totalSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns total size of dual solution
+   int totalSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += totalSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += totalSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
+   }
+
+   /// returns size of least common multiple of denominators in primal solution
+   int dlcmSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += dlcmSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += dlcmSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns  size of least common multiple of denominators in dual solution
+   int dlcmSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += dlcmSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += dlcmSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
+   }
+
+   /// returns size of largest denominator in primal solution
+   int dmaxSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += dmaxSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += dmaxSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns size of largest denominator in dual solution
+   int dmaxSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += dmaxSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += dmaxSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
    }
 
    /// invalidate solution
@@ -220,4 +310,12 @@ private:
    }
 };
 } // namespace soplex
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef SOPLEX_DEBUG_SOLBASE
+#define SOPLEX_DEBUG
+#undef SOPLEX_DEBUG_SOLBASE
+#endif
+
 #endif // _SOLBASE_H_

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
@@ -375,7 +373,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int)
 
    if (enterId.isValid() && solver()->isBasic(enterId))
    {
-      MSG_DEBUG( spxout << "DDEFRT01 isValid() && isBasic(): max=" << max
+      MSG_DEBUG( std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
                         << std::endl; )
       if (cnum >= 0)
          solver()->coPvec().delta().clearNum(cnum);
@@ -386,7 +384,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int)
 
    MSG_DEBUG(
       if( !enterId.isValid() )
-         spxout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;
+         std::cout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;
    )
    max = val;
 

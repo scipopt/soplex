@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -34,7 +34,7 @@ void NameSet::add(DataKey& p_key, const char* str)
 
    if (!hashtab.has(nstr))
    {
-      if (size() + 1 > max())
+      if (size() + 1 > max() * HASHTABLE_FILLFACTOR)
       {
          assert(factor >= 1);
          reMax(int(factor*max() + 8));
@@ -183,15 +183,16 @@ void NameSet::memPack()
 /// returns the hash value of the name.
 static int NameSetNameHashFunction(const NameSet::Name* str)
 {
-   unsigned int res = 0;
+   unsigned int res = 37;
    const char* sptr = str->name;
 
    while(*sptr != '\0')
    {
-      res *= 65;
-      res += (unsigned int) (*sptr++ - int('0'));
-      res %= 0x0fffffff;
+      res *= 11;
+      res += (unsigned int) (*sptr++);
+
    }
+   res %= 0x0fffffff;
    return ((int) res);
 }
 

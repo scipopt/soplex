@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -54,6 +54,7 @@ private:
 
    R left;                 ///< left-hand side of the constraint
    R right;                ///< right-hand side of the constraint
+   R object;               ///< objective coefficient of corresponding slack variable s = vec times primal
    DSVectorBase<R> vec;    ///< the row vector
 
    //@}
@@ -64,8 +65,8 @@ public:
    /**@name Types */
    //@{
 
-   /// (In)Equality of an LP row.
-   /** #LPRowBase%s may be of one of the above Types. This datatype may be used for constructing new #LPRowBase%s in the
+   /// (In)Equality type of an LP row.
+   /** #LPRowBase%s may be of one of the following Types. This datatype may be used for constructing new #LPRowBase%s in the
     *  regular form.
     */
    enum Type
@@ -84,14 +85,14 @@ public:
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
    explicit LPRowBase<R>(int defDim = 0)
-      : left(0), right(infinity), vec(defDim)
+      : left(0), right(infinity), object(0), vec(defDim)
    {
       assert(isConsistent());
    }
 
    /// Copy constructor.
    LPRowBase<R>(const LPRowBase<R>& row)
-      : left(row.left), right(row.right), vec(row.vec)
+      : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
    }
@@ -99,21 +100,21 @@ public:
    /// Copy constructor.
    template < class S >
    LPRowBase<R>(const LPRowBase<S>& row)
-      : left(row.left), right(row.right), vec(row.vec)
+      : left(row.left), right(row.right), object(row.object), vec(row.vec)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase with the given left-hand side, right-hand side and rowVector.
-   LPRowBase<R>(R p_lhs, const SVectorBase<R>& p_rowVector, R p_rhs)
-      : left(p_lhs), right(p_rhs), vec(p_rowVector)
+   LPRowBase<R>(const R& p_lhs, const SVectorBase<R>& p_rowVector, const R& p_rhs, const R& p_obj = 0)
+      : left(p_lhs), right(p_rhs), object(p_obj), vec(p_rowVector)
    {
       assert(isConsistent());
    }
 
    /// Constructs LPRowBase from passed \p rowVector, \p type and \p value.
-   LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, R p_value)
-   : vec(p_rowVector)
+   LPRowBase<R>(const SVectorBase<R>& p_rowVector, Type p_type, const R& p_value, const R& p_obj = 0)
+      : object(p_obj), vec(p_rowVector)
    {
       switch( p_type )
       {
@@ -179,7 +180,7 @@ public:
          right = infinity;
          break;
       case RANGE:
-         MSG_ERROR( spxout << "ELPROW01 RANGE not supported in LPRow::setType()"
+         MSG_ERROR( std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
             << std::endl; )
             throw SPxInternalCodeException("XLPROW01 This should never happen.");
       default:
@@ -205,7 +206,7 @@ public:
    }
 
    /// Sets left-hand side value.
-   void setLhs(R p_left)
+   void setLhs(const R& p_left)
    {
       left = p_left;
    }
@@ -217,9 +218,21 @@ public:
    }
 
    /// Sets right-hand side value.
-   void setRhs(R p_right)
+   void setRhs(const R& p_right)
    {
       right = p_right;
+   }
+
+   /// Objective coefficient value.
+   R obj() const
+   {
+      return object;
+   }
+
+   /// Sets objective coefficient value.
+   void setObj(const R& p_obj)
+   {
+      object = p_obj;
    }
 
    /// Constraint row vector.

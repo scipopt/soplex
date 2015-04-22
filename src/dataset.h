@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -532,7 +532,7 @@ public:
       {
          spx_alloc(thekey, themax);
       }
-      catch(SPxMemoryException& x)
+      catch(const SPxMemoryException& x)
       {
          spx_free(theitem);
          throw x;
@@ -558,7 +558,7 @@ public:
       {
          spx_alloc(thekey, themax);
       }
-      catch(SPxMemoryException& x)
+      catch(const SPxMemoryException& x)
       {
          spx_free(theitem);
          throw x;

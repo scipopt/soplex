@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,15 +13,12 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-//#define DEBUGGING 1
-
 #include <iostream>
 
 #include "spxdefines.h"
 #include "spxbasis.h"
 #include "spxsolver.h"
 #include "spxout.h"
-#include "exceptions.h"
 
 namespace soplex
 {
@@ -31,7 +28,7 @@ void SPxBasis::reDim()
 
    assert(theLP != 0);
 
-   MSG_DEBUG( spxout << "DCHBAS01 SPxBasis::reDim():"
+   MSG_DEBUG( std::cout << "DCHBAS01 SPxBasis::reDim():"
                      << " matrixIsSetup=" << matrixIsSetup
                      << " fatorized=" << factorized
                      << std::endl; )
@@ -40,7 +37,7 @@ void SPxBasis::reDim()
 
    if (theLP->dim() != matrix.size())
    {
-      MSG_INFO3( spxout << "ICHBAS02 basis redimensioning invalidates factorization" 
+      MSG_INFO3( (*spxout), (*spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
                            << std::endl; )
 
       matrix.reSize (theLP->dim());
@@ -49,7 +46,7 @@ void SPxBasis::reDim()
       factorized    = false;
    }
 
-   MSG_DEBUG( spxout << "DCHBAS03 SPxBasis::reDim(): -->"
+   MSG_DEBUG( std::cout << "DCHBAS03 SPxBasis::reDim(): -->"
                      << " matrixIsSetup=" << matrixIsSetup
                      << " fatorized=" << factorized
                      << std::endl; )
@@ -118,7 +115,7 @@ void SPxBasis::addedRows(int n)
       case DUAL:
          break;
       default:
-         MSG_ERROR( spxout << "ECHBAS04 Unknown basis status!" << std::endl; )
+         MSG_ERROR( std::cerr << "ECHBAS04 Unknown basis status!" << std::endl; )
          throw SPxInternalCodeException("XCHBAS01 This should never happen.");
       }
    }
@@ -137,7 +134,7 @@ void SPxBasis::removedRow(int i)
          setStatus(NO_PROBLEM);
          factorized = false;
 
-         MSG_DEBUG( spxout << "DCHBAS05 Warning: deleting basic row!\n"; )
+         MSG_DEBUG( std::cout << "DCHBAS05 Warning: deleting basic row!\n"; )
       }
    }
    else
@@ -147,7 +144,7 @@ void SPxBasis::removedRow(int i)
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         MSG_DEBUG( spxout << "DCHBAS06 Warning: deleting nonbasic row!\n"; )
+         MSG_DEBUG( std::cout << "DCHBAS06 Warning: deleting nonbasic row!\n"; )
       }
       else if (status() > NO_PROBLEM && matrixIsSetup)
       {
@@ -190,7 +187,7 @@ void SPxBasis::removedRows(const int perm[])
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  MSG_DEBUG( spxout << "DCHBAS07 Warning: deleting basic row!\n"; )
+                  MSG_DEBUG( std::cout << "DCHBAS07 Warning: deleting basic row!\n"; )
                }
             }
             else                            // row was moved
@@ -317,7 +314,7 @@ void SPxBasis::addedCols(int n)
       case PRIMAL:
          break;
       default:
-         MSG_ERROR( spxout << "ECHBAS08 Unknown basis status!" << std::endl; )
+         MSG_ERROR( std::cerr << "ECHBAS08 Unknown basis status!" << std::endl; )
          throw SPxInternalCodeException("XCHBAS02 This should never happen.");
       }
    }
@@ -409,9 +406,11 @@ void SPxBasis::removedCols(const int perm[])
  */
 void SPxBasis::invalidate()
 {
-
-   MSG_INFO3( spxout << "ICHBAS09 explicit invalidation of factorization" 
-                        << std::endl; )
+   assert(spxout != 0);
+   if( spxout != 0 )
+   {
+      MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
+   }
 
    factorized    = false;
    matrixIsSetup = false;

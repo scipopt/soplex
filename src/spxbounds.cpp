@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-//#define DEBUGGING 1
 
 #include <assert.h>
 #include <iostream>
@@ -113,8 +111,8 @@ void SPxSolver::setDualColBounds()
 
    for(i = 0; i < nRows(); ++i)
    {
-      theURbound[i] = 0.0;
-      theLRbound[i] = 0.0;
+      theURbound[i] = maxRowObj(i);
+      theLRbound[i] = maxRowObj(i);
 
       clearDualBounds(ds.rowStatus(i), theURbound[i], theLRbound[i]);
    }
@@ -236,10 +234,10 @@ void SPxSolver::setLeaveBound4Row(int i, int n)
    {
    case SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
-      theUBbound[i] = 0.0;
+      theUBbound[i] = -maxRowObj(n);
       break;
    case SPxBasis::Desc::P_ON_UPPER :
-      theLBbound[i] = 0.0;
+      theLBbound[i] = -maxRowObj(n);
       theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
@@ -247,8 +245,8 @@ void SPxSolver::setLeaveBound4Row(int i, int n)
       theUBbound[i] = infinity;
       break;
    case SPxBasis::Desc::P_FREE :
-      theLBbound[i] = 0.0;
-      theUBbound[i] = 0.0;
+      theLBbound[i] = -maxRowObj(n);
+      theUBbound[i] = -maxRowObj(n);
       break;
 
    default:
@@ -319,7 +317,7 @@ void SPxSolver::testBounds() const
          // warnings only with verbose level INFO2 and higher.
          if ((*theFvec)[i] > theUBbound[i] + viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2( spxout << "WBOUND01 Invalid upper enter bound " << i 
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND01 Invalid upper enter bound " << i
                             << " viol_max: " << viol_max
                             << " Fvec: " << (*theFvec)[i] 
                             << " UBbound: "<< theUBbound[i] << std::endl; )
@@ -327,7 +325,7 @@ void SPxSolver::testBounds() const
          }
          if ((*theFvec)[i] < theLBbound[i] - viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2( spxout << "WBOUND02 Invalid lower enter bound " << i 
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND02 Invalid lower enter bound " << i
                             << " viol_max: " << viol_max
                             << " Fvec: " << (*theFvec)[i] 
                             << " LBbound: "<< theLBbound[i] << std::endl; )
@@ -335,7 +333,7 @@ void SPxSolver::testBounds() const
          }
          if( nlinesprinted >= 3 )
          {
-            MSG_INFO2( spxout << "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl );
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl );
             break;
          }
       }
@@ -351,7 +349,7 @@ void SPxSolver::testBounds() const
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2( spxout << "WBOUND03 Invalid upper cobound " << i
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND03 Invalid upper cobound " << i
                             << " viol_max: " << viol_max
                             << " CoPvec: " << (*theCoPvec)[i]
                             << " CoUbound: "<< (*theCoUbound)[i] << std::endl; )
@@ -359,7 +357,7 @@ void SPxSolver::testBounds() const
          }
          if ((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2( spxout << "WBOUND04 Invalid lower cobound " << i 
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND04 Invalid lower cobound " << i
                             << " viol_max: " << viol_max
                             << " CoPvec: " << (*theCoPvec )[i]
                             << " CoLbound: " << (*theCoLbound)[i] 
@@ -368,7 +366,7 @@ void SPxSolver::testBounds() const
          }
          if( nlinesprinted >= 3 )
          {
-            MSG_INFO2( spxout << "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl );
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl );
             break;
          }
       }
@@ -378,7 +376,7 @@ void SPxSolver::testBounds() const
       {
          if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2( spxout << "WBOUND05 Invalid upper bound " << i 
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND05 Invalid upper bound " << i
                             << " viol_max: " << viol_max
                             << " Pvec: " << (*thePvec)[i]
                             << " Ubound: " << (*theUbound)[i] << std::endl; )
@@ -386,7 +384,7 @@ void SPxSolver::testBounds() const
          }
          if ((*thePvec)[i] < (*theLbound)[i] - viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2( spxout << "WBOUND06 Invalid lower bound " << i 
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND06 Invalid lower bound " << i
                             << " viol_max: " << viol_max
                             << " Pvec: " << (*thePvec)[i]
                             << " Lbound: " << (*theLbound)[i] << std::endl; )
@@ -394,7 +392,7 @@ void SPxSolver::testBounds() const
          }
          if( nlinesprinted >= 3 )
          {
-            MSG_INFO2( spxout << "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl );
+            MSG_INFO2( (*spxout), (*spxout) << "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl );
             break;
          }
       }

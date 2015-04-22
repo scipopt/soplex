@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,8 +21,11 @@
 
 #include <iostream>
 #include <assert.h>
+#include <limits.h>
 
 #include "spxdefines.h"
+
+#define   HASHTABLE_FILLFACTOR   0.7
 
 namespace soplex
 {
@@ -110,6 +113,11 @@ private:
    int (*m_hashfun) (const HashItem*);  
    /// memory is \ref soplex::DataHashTable::reMax() "reMax()"ed by this factor if a new element does't fit
    Real m_memfactor;  
+   /// some prime numbers for fast access
+   int primes[50];
+   /// number of stored prime numbers
+   int nprimes;
+
    //@}
 
 public:
@@ -158,7 +166,7 @@ public:
    {
       assert(!has(h));
 
-      if (m_used >= m_elem.size())
+      if (m_used >= m_elem.size() * HASHTABLE_FILLFACTOR)
          reMax(int(m_memfactor * m_used) + 1);
 
       assert(m_used < m_elem.size());
@@ -265,7 +273,7 @@ public:
     */
    explicit DataHashTable(
       int (*hashfun)(const HashItem*), 
-      int maxsize  = 256, 
+      int maxsize  = 265,
       int hashsize = 0, 
       Real factor  = 2.0)
       : m_elem(maxsize)
@@ -273,6 +281,51 @@ public:
       , m_memfactor(factor)
    {
       clear();
+
+      primes[0] = 1523;
+      primes[1] = 3547;
+      primes[2] = 8011;
+      primes[3] = 17707;
+      primes[4] = 38723;
+      primes[5] = 83833;
+      primes[6] = 180317;
+      primes[7] = 385897;
+      primes[8] = 821411;
+      primes[9] = 1742369;
+      primes[10] = 3680893;
+      primes[11] = 5693959;
+      primes[12] = 7753849;
+      primes[13] = 9849703;
+      primes[14] = 11973277;
+      primes[15] = 14121853;
+      primes[16] = 17643961;
+      primes[17] = 24273817;
+      primes[18] = 32452843;
+      primes[19] = 49979687;
+      primes[20] = 67867967;
+      primes[21] = 86028121;
+      primes[22] = 104395301;
+      primes[23] = 122949823;
+      primes[24] = 141650939;
+      primes[25] = 160481183;
+      primes[26] = 179424673;
+      primes[27] = 198491317;
+      primes[28] = 217645177;
+      primes[29] = 256203161;
+      primes[30] = 314606869;
+      primes[31] = 373587883;
+      primes[32] = 433024223;
+      primes[33] = 492876847;
+      primes[34] = 553105243;
+      primes[35] = 613651349;
+      primes[36] = 694847533;
+      primes[37] = 756065159;
+      primes[38] = 817504243;
+      primes[39] = 879190747;
+      primes[40] = 941083981;
+      primes[41] = 982451653;
+      primes[42] = INT_MAX;
+      nprimes = 43;
 
       m_hashsize = (hashsize < 1) ? autoHashSize() : hashsize;
 
@@ -288,6 +341,8 @@ public:
       m_memfactor = base.m_memfactor;
       m_used = base.m_used;
       m_hashsize = base.m_hashsize;
+      primes = base.primes;
+      nprimes = base.nprimes;
 
       assert(m_memfactor > 1.0);
       assert(isConsistent());
@@ -301,6 +356,8 @@ public:
       , m_memfactor(base.m_memfactor)
       , m_used(base.m_used)
       , m_hashsize(base.m_hashsize)
+      , primes(base.primes)
+      , nprimes(base.nprimes)
    {
       assert(m_memfactor > 1.0);
       assert(isConsistent());
@@ -312,13 +369,48 @@ private:
    //-----------------------------------
    /**@name Helpers */
    //@{
-   /// automatically computes a good \ref soplex::DataHashTable::m_hashsize "m_hashsize".
-   /** Computes a good #m_hashsize as the product of all prime numbers 
-    *  not divisors of the number of elements that are <= 
-    *  the maximum divisor of the number of elemens.
+   /// determine a good \ref soplex::DataHashTable::m_hashsize "m_hashsize".
+   /** Determine next larger prime number for new #m_hashsize
     *  @return good value for #m_hashsize
     */
    int autoHashSize() const
+   {
+      int oldsize = m_elem.size();
+
+      int left = 0;
+      int right = nprimes - 1;
+      int middle;
+
+      while( left <= right)
+      {
+         middle = (left + right) / 2;
+
+         if( oldsize < primes[middle])
+         {
+            right = middle - 1;
+         }
+         else if( oldsize > primes[middle])
+         {
+            left = middle + 1;
+         }
+         else
+         {
+            assert(oldsize == primes[middle]);
+            return primes[middle + 1];
+         }
+      }
+
+      assert(left == right + 1);
+      return primes[left];
+   }
+
+   /// automatically computes a good \ref soplex::DataHashTable::m_hashsize "m_hashsize".
+      /** Computes a good #m_hashsize as the product of all prime numbers
+       *  not divisors of the number of elements that are <=
+       *  the maximum divisor of the number of elemens.
+       *  @return good value for #m_hashsize
+       */
+   int autoHashSizeold() const
    {
       DataArray< bool > prime(m_elem.size());
       int hashsize = 1;
@@ -386,5 +478,6 @@ private:
    //@}
 
 };
+
 } // namespace soplex
 #endif // _DATAHASHTABLE_H_

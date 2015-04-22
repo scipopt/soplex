@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-//#define DEBUGGING 1
 
 //TODO may be faster to have a greater zero tolerance for sparse pricing vectors
 //     to reduce the number of nonzero entries, e.g. for workVec
@@ -36,6 +34,7 @@ void SPxSteepPR::clear()
 {
    thesolver = 0;
    prefSetup = 0;
+   weightsSetup = false;
 }
 
 void SPxSteepPR::load(SPxSolver* base)
@@ -71,17 +70,20 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    {
       if( thesolver->sparsePricingEnter )
       {
+         bestPrices.clear();
          bestPrices.setMax(thesolver->dim());
          prices.reMax(thesolver->dim());
       }
       if( thesolver->sparsePricingEnterCo )
       {
+         bestPricesCo.clear();
          bestPricesCo.setMax(thesolver->coDim());
          pricesCo.reMax(thesolver->coDim());
       }
    }
    if( type == SPxSolver::LEAVE && thesolver->sparsePricingLeave && thesolver->hyperPricingLeave )
    {
+      bestPrices.clear();
       bestPrices.setMax(thesolver->dim());
       prices.reMax(thesolver->dim());
    }
@@ -90,22 +92,48 @@ void SPxSteepPR::setType(SPxSolver::Type type)
 void SPxSteepPR::setupWeights(SPxSolver::Type type)
 {
    int i;
-   if (setup == DEFAULT)
+   int endDim = 0;
+   int endCoDim = 0;
+
+   if( setup == DEFAULT )
    {
-      if (type == SPxSolver::ENTER)
+      if( type == SPxSolver::ENTER )
       {
-         coPenalty.reDim(thesolver->dim());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+         if( weightsSetup )
+         {
+            // check for added/removed rows and adapt norms accordingly
+            if (coPenalty.dim() < thesolver->dim())
+               endDim = coPenalty.dim();
+            else
+               endDim = thesolver->dim();
+            if (penalty.dim() < thesolver->coDim())
+               endCoDim = penalty.dim();
+            else
+               endCoDim = thesolver->coDim();
+         }
+
+         coPenalty.reDim(thesolver->dim(), false);
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
             coPenalty[i] = 2;
-         penalty.reDim(thesolver->coDim());
-         for (i = thesolver->coDim() - 1; i >= 0; --i)
+         penalty.reDim(thesolver->coDim(), false);
+         for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
             penalty[i] = 1;
       }
       else
       {
          assert(type == SPxSolver::LEAVE);
-         coPenalty.reDim(thesolver->dim());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+
+         if( weightsSetup )
+         {
+            // check for added/removed rows and adapt norms accordingly
+            if (coPenalty.dim() < thesolver->dim())
+               endDim = coPenalty.dim();
+            else
+               endDim = thesolver->dim();
+         }
+
+         coPenalty.reDim(thesolver->dim(), false);
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
          {
             const SPxId id = thesolver->basis().baseId(i);
             const int n    = thesolver->number(id);
@@ -117,23 +145,23 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    }
    else
    {
-      MSG_INFO1( spxout << " --- initializing steepest edge multipliers" << std::endl; )
+      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl; )
 
       if (type == SPxSolver::ENTER)
       {
-         coPenalty.reDim(thesolver->dim());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+         coPenalty.reDim(thesolver->dim(), false);
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
             coPenalty[i] = 1;
-         penalty.reDim(thesolver->coDim());
-         for (i = thesolver->coDim() - 1; i >= 0; --i)
+         penalty.reDim(thesolver->coDim(), false);
+         for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
             penalty[i] = 1 + thesolver->vector(i).length2();
       }
       else
       {
          assert(type == SPxSolver::LEAVE);
-         coPenalty.reDim(thesolver->dim());
+         coPenalty.reDim(thesolver->dim(), false);
          SSVector tmp(thesolver->dim(), thesolver->epsilon());
-         for (i = thesolver->dim() - 1; i >= 0; --i)
+         for (i = thesolver->dim() - 1; i >= endDim; --i)
          {
             const SPxId id = thesolver->basis().baseId(i);
             const int n    = thesolver->number(id);
@@ -144,7 +172,78 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
          }
       }
    }
+   // allow exporting of norms when in dual simplex
+   if( (type == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN) ||
+       (type == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW) )
+      weightsSetup = true;
+   else
+      weightsSetup = false;
 }
+
+bool SPxSteepPR::getDualNorms(int& nrows, int& ncols, Real* norms) const
+{
+   MSG_DEBUG( std::cout << "exporting dual steepest edge norms" << std::endl; )
+
+   if( !weightsSetup )
+      return false;
+
+   if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
+   {
+      ncols = 0;
+      nrows = coPenalty.dim();
+
+      assert(nrows == thesolver->dim());
+
+      for( int i = 0; i < nrows; ++i)
+         norms[i] = coPenalty[i];
+   }
+   else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW)
+   {
+      nrows = penalty.dim();
+      ncols = coPenalty.dim();
+
+      assert(ncols == thesolver->dim());
+      assert(nrows == thesolver->coDim());
+
+      for( int i = 0; i < nrows; ++i )
+         norms[i] = penalty[i];
+
+      for( int i = 0; i < ncols; ++i )
+         norms[nrows + i] = coPenalty[i];
+   }
+   else
+      return false;
+
+   return true;
+}
+
+bool SPxSteepPR::setDualNorms(int nrows, int ncols, Real* norms)
+{
+   MSG_DEBUG( std::cout << "setting dual steepest edge norms" << std::endl; )
+
+   if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
+   {
+      for( int i = 0; i < nrows; ++i )
+         coPenalty[i] = norms[i];
+      weightsSetup = true;
+   }
+   else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW)
+   {
+      for( int i = 0; i < nrows; ++i )
+         penalty[i] = norms[i];
+      for( int i = 0; i < ncols; ++i )
+         coPenalty[i] = norms[nrows + i];
+      weightsSetup = true;
+   }
+   else
+   {
+      weightsSetup = false;
+      return false;
+   }
+
+   return true;
+}
+
 
 void SPxSteepPR::setupPrefsX(
    Real mult, 
@@ -251,9 +350,9 @@ void SPxSteepPR::left4(int n, SPxId id)
 
       //TK: I gave the 0.5 extra, because I am not sure how hard this assert is.
 #ifndef NDEBUG
-      if (fabs(rhoVec[n]) < theeps * 0.5)
+      if (spxAbs(rhoVec[n]) < theeps * 0.5)
       {
-         MSG_ERROR( spxout << "WSTEEP04: rhoVec = "
+         MSG_ERROR( std::cerr << "WSTEEP04: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
       }
 #endif  // NDEBUG
@@ -350,7 +449,7 @@ int SPxSteepPR::selectLeave()
    if( retid < 0 && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WSTEEP03 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP03 trying refinement step..\n"; )
       retid = selectLeaveX(theeps/STEEP_REFINETOL);
    }
 
@@ -360,6 +459,8 @@ int SPxSteepPR::selectLeave()
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(retid));
       assert( thesolver->coPvec().delta().isConsistent() );
+      // coPvec().delta() might be not setup when it contains too many nonzeros
+      // this is intended and forcing to keep the sparsity information leads to a slowdown
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
    }
@@ -391,7 +492,7 @@ int SPxSteepPR::selectLeaveX(Real tol)
          if( coPenalty_ptr[i] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coPenalty too small ("
                                 << coPenalty_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * p[i];
@@ -430,7 +531,7 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
          if( coPenalty_ptr[idx] < tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
                                 << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * p[idx];
@@ -479,8 +580,8 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
          if( coPen[idx] < -tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
-                                << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+                                << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * prefPtr[idx];
          }
@@ -521,8 +622,8 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
          if( coPen[idx] < -tol )
          {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
-                                << coPenalty_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
+            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coPenalty too small ("
+                                << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
 #endif
             x = x * x / tol * prefPtr[idx];
          }
@@ -729,7 +830,7 @@ SPxId SPxSteepPR::selectEnter()
    if( !enterId.isValid() && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WSTEEP05 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP05 trying refinement step..\n"; )
       enterId = selectEnterX(theeps/STEEP_REFINETOL);
    }
 
@@ -1165,7 +1266,7 @@ bool SPxSteepPR::isConsistent() const
          x = coPenalty[i] - tmp.length2();
          if (x > thesolver->leavetol() || -x > thesolver->leavetol())
          {
-            MSG_ERROR( spxout << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
+            MSG_ERROR( std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
          }
       }
    }

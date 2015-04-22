@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -100,9 +100,13 @@ public:
    SoPlex(const SoPlex& rhs);
 
    /// destructor
-   ~SoPlex();
+   virtual ~SoPlex();
 
    //@}
+
+
+   /// message handler
+//   SPxOut spxout;
 
 
    //**@name Access to the real LP */
@@ -182,6 +186,15 @@ public:
    /// stored internally, this is generally faster
    Real maxObjReal(int i) const;
 
+   /// gets number of available dual norms
+   void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
+
+   /// gets steepest edge norms and returns false if they are not available
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+
+   /// sets steepest edge norms and returns false if that's not possible
+   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
+
    //@}
 
 
@@ -250,6 +263,9 @@ public:
 
    /// gets objective function vector
    void getObjRational(VectorRational& obj) const;
+
+   /// gets objective value of column \p i
+   void getObjRational(int i, Rational& obj) const;
 
    /// returns objective value of column \p i
    Rational objRational(int i) const;
@@ -380,7 +396,10 @@ public:
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single row
-   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, int rowSize, const mpq_t* rhs);
+   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs);
+
+   /// adds a set of rows
+   void addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs);
 #endif
 
    /// adds multiple rows
@@ -388,6 +407,14 @@ public:
 
    /// adds a single column
    void addColRational(const LPColRational& lpcol);
+
+#ifdef SOPLEX_WITH_GMP
+   /// adds a single column
+   void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper);
+
+   /// adds a set of columns
+   void addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper);
+#endif
 
    /// adds multiple columns
    void addColsRational(const LPColSetRational& lpcolset);
@@ -423,6 +450,11 @@ public:
    /// changes left- and right-hand side of row \p i
    void changeRangeRational(int i, const Rational& lhs, const Rational& rhs);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes left- and right-hand side of row \p i
+   void changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs);
+#endif
+
    /// replaces column \p i with \p lpcol
    void changeColRational(int i, const LPColRational& lpcol);
 
@@ -432,11 +464,21 @@ public:
    /// changes lower bound of column i to \p lower
    void changeLowerRational(int i, const Rational& lower);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes lower bound of column i to \p lower
+   void changeLowerRational(int i, const mpq_t* lower);
+#endif
+
    /// changes vector of upper bounds to \p upper
    void changeUpperRational(const VectorRational& upper);
 
    /// changes \p i 'th upper bound to \p upper
    void changeUpperRational(int i, const Rational& upper);
+
+#ifdef SOPLEX_WITH_GMP
+   /// changes upper bound of column i to \p upper
+   void changeUpperRational(int i, const mpq_t* upper);
+#endif
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsRational(const VectorRational& lower, const VectorRational& upper);
@@ -444,14 +486,29 @@ public:
    /// changes bounds of column \p i to \p lower and \p upper
    void changeBoundsRational(int i, const Rational& lower, const Rational& upper);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes bounds of column \p i to \p lower and \p upper
+   void changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper);
+#endif
+
    /// changes objective function vector to \p obj
    void changeObjRational(const VectorRational& obj);
 
    /// changes objective coefficient of column i to \p obj
    void changeObjRational(int i, const Rational& obj);
 
+#ifdef SOPLEX_WITH_GMP
+   /// changes objective coefficient of column i to \p obj
+   void changeObjRational(int i, const mpq_t* obj);
+#endif
+
    /// changes matrix entry in row \p i and column \p j to \p val
    void changeElementRational(int i, int j, const Rational& val);
+
+#ifdef SOPLEX_WITH_GMP
+   /// changes matrix entry in row \p i and column \p j to \p val
+   void changeElementRational(int i, int j, const mpq_t* val);
+#endif
 
    /// removes row \p i
    void removeRowRational(int i);
@@ -593,6 +650,44 @@ public:
    /// gets violation of dual multipliers; returns true on success
    bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
+#ifdef SOPLEX_WITH_GMP
+   /// gets the primal solution vector if available; returns true on success
+   bool getPrimalRational(mpq_t* vector, const int size);
+
+   /// gets the vector of slack values if available; returns true on success
+   bool getSlacksRational(mpq_t* vector, const int size);
+
+   /// gets the primal ray if LP is unbounded; returns true on success
+   bool getPrimalRayRational(mpq_t* vector, const int size);
+
+   /// gets the dual solution vector if available; returns true on success
+   bool getDualRational(mpq_t* vector, const int size);
+
+   /// gets the vector of reduced cost values if available; returns true on success
+   bool getRedCostRational(mpq_t* vector, const int size);
+
+   /// gets the Farkas proof if LP is infeasible; returns true on success
+   bool getDualFarkasRational(mpq_t* vector, const int size);
+#endif
+
+   /// get size of primal solution
+   int totalSizePrimalRational(const int base = 2);
+
+   /// get size of dual solution
+   int totalSizeDualRational(const int base = 2);
+
+   /// get size of least common multiple of denominators in primal solution
+   int dlcmSizePrimalRational(const int base = 2);
+
+   /// get size of least common multiple of denominators in dual solution
+   int dlcmSizeDualRational(const int base = 2);
+
+   /// get size of largest denominator in primal solution
+   int dmaxSizePrimalRational(const int base = 2);
+
+   /// get size of largest denominator in dual solution
+   int dmaxSizeDualRational(const int base = 2);
+
    //@}
 
 
@@ -694,15 +789,15 @@ public:
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0) const;
+   void writeStateRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    //@}
 
@@ -722,12 +817,30 @@ public:
       /// should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
       TESTDUALINF = 2,
 
+      /// should a rational factorization be performed after iterative refinement?
+      RATFAC = 3,
+
+      /// should cycling solutions be accepted during iterative refinement?
       /// should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
       // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-      USEIMPROVEDDUALSIMPLEX = 3,
+      USEIMPROVEDDUALSIMPLEX = 4,
+
+      ACCEPTCYCLING = 5,
+
+      /// apply rational reconstruction after each iterative refinement?
+      RATREC = 6,
+
+      /// round scaling factors for iterative refinement to powers of two?
+      POWERSCALING = 7,
+
+      /// continue iterative refinement with exact basic solution if not optimal?
+      RATFACJUMP = 8,
+
+      /// should feasibility be tested with relaxed bounds and sides?
+      FEASRELAX = 9,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 4
+      BOOLPARAM_COUNT = 10
    } BoolParam;
 
    /// integer parameters
@@ -739,7 +852,7 @@ public:
       /// type of computational form, i.e., column or row representation
       REPRESENTATION = 1,
 
-      /// type of algorithm, i.e., enter or leave
+      /// type of algorithm, i.e., primal or dual
       ALGORITHM = 2,
 
       /// type of LU update
@@ -790,11 +903,17 @@ public:
       /// mode for a posteriori feasibility checks
       CHECKMODE = 18,
 
+      /// type of timer
+      TIMER = 19,
+
       /// mode for hyper sparse pricing
-      HYPER_PRICING = 19,
+      HYPER_PRICING = 20,
+
+      /// minimum number of stalling refinements since last pivot to trigger rational factorization
+      RATFAC_MINSTALLS = 21,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 20
+      INTPARAM_COUNT = 22
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -823,11 +942,11 @@ public:
    /// values for parameter ALGORITHM
    enum
    {
-      /// entering algorithm, i.e., primal simplex for column and dual simplex for row representation
-      ALGORITHM_ENTER = 0,
+      /// primal simplex algorithm, i.e., entering for column and leaving for row representation
+      ALGORITHM_PRIMAL = 0,
 
-      /// leaving algorithm, i.e., dual simplex for column and primal simplex for row representation
-      ALGORITHM_LEAVE = 1
+      /// dual simplex algorithm, i.e., leaving for column and entering for row representation
+      ALGORITHM_DUAL = 1
    };
 
    /// values for parameter FACTOR_UPDATE_TYPE
@@ -994,6 +1113,19 @@ public:
       CHECKMODE_RATIONAL = 2
    };
 
+   /// values for parameter TIMER
+   enum
+   {
+      /// disable timing
+      TIMER_OFF = 0,
+
+      /// cpu or user time
+      TIMER_CPU = 1,
+
+      /// wallclock time
+      TIMER_WALLCLOCK = 2
+   };
+
    /// values for parameter HYPER_PRICING
    enum
    {
@@ -1058,8 +1190,14 @@ public:
       /// sparse pricing threshold (\#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
       SPARSITY_THRESHOLD = 15,
 
+      /// threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
+      REPRESENTATION_SWITCH = 16,
+
+      /// geometric frequency at which to apply rational reconstruction
+      RATREC_FREQ = 17,
+
       /// number of real parameters
-      REALPARAM_COUNT = 16
+      REALPARAM_COUNT = 18
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1073,6 +1211,8 @@ public:
 
    /// class of parameter settings
    class Settings;
+
+   mutable SPxOut spxout;
 
    /// returns boolean parameter value
    bool boolParam(const BoolParam param) const;
@@ -1223,6 +1363,7 @@ private:
    DVectorReal _manualLhs;
    DVectorReal _manualRhs;
    DVectorReal _manualObj;
+   SPxLPReal _manualRealLP;
 
    //@}
 
@@ -1248,13 +1389,35 @@ private:
    DVectorRational _modLhs;
    DVectorRational _modRhs;
    DVectorRational _modObj;
-   DSVectorRational _primalDiff;
-   DSVectorRational _dualDiff;
+   DSVectorRational _primalDualDiff;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
    DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
+   DataArray< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
    int _beforeLiftCols;
+
+   /// type of bounds and sides
+   typedef enum
+   {
+      /// both bounds are infinite
+      RANGETYPE_FREE = 0,
+
+      /// lower bound is finite, upper bound is infinite
+      RANGETYPE_LOWER = 1,
+
+      /// upper bound is finite, lower bound is infinite
+      RANGETYPE_UPPER = 2,
+
+      /// lower and upper bound finite, but different
+      RANGETYPE_BOXED = 3,
+
+      /// lower bound equals upper bound
+      RANGETYPE_FIXED = 4
+   } RangeType;
+
+   DataArray< RangeType > _colTypes;
+   DataArray< RangeType > _rowTypes;
 
    //@}
 
@@ -1339,6 +1502,7 @@ private:
 
    SolReal _solReal;
    SolRational _solRational;
+   SolRational _workSol;
 
    bool _hasBasis;
    bool _hasSolReal;
@@ -1349,6 +1513,9 @@ private:
 
    //**@name Constant helper methods */
    //@{
+
+   /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
+   void _ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const;
 
    /// creates a permutation for removing rows/columns from an array of indices
    void _idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
@@ -1362,8 +1529,20 @@ private:
    /// should solving process be stopped?
    bool _isSolveStopped() const;
 
-   /// parses one line in a settings file and returns true on success; note that the string is modified
-   bool _parseSettingsLine(char* line, const int lineNumber);
+   /// determines RangeType from real bounds
+   RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
+
+   /// determines RangeType from rational bounds
+   RangeType _rangeTypeRational(const Rational& lower, const Rational& upper) const;
+
+   /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
+   RangeType _switchRangeType(const RangeType& rangeType) const;
+
+   /// checks whether RangeType corresponds to finite lower bound
+   bool _lowerFinite(const RangeType& rangeType) const;
+
+   /// checks whether RangeType corresponds to finite upper bound
+   bool _upperFinite(const RangeType& rangeType) const;
 
    //@}
 
@@ -1382,6 +1561,9 @@ private:
 
    /// adds a single column to the real LP and adjusts basis
    void _addColReal(const LPColReal& lpcol);
+
+   /// adds a single column to the real LP and adjusts basis
+   void _addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
 
    /// adds multiple columns to the real LP and adjusts basis
    void _addColsReal(const LPColSetReal& lpcolset);
@@ -1489,6 +1671,12 @@ private:
    /// integer variables if desired
    bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
+   /// recomputes range types from scratch using real LP
+   void _recomputeRangeTypesReal();
+
+   /// recomputes range types from scratch using rational LP
+   void _recomputeRangeTypesRational();
+
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
    void _syncLPReal(bool time = true);
 
@@ -1500,6 +1688,12 @@ private:
 
    /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    void _syncRationalSolution();
+
+   /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+   const UnitVectorRational* _unitVectorRational(const int i);
+
+   /// parses one line in a settings file and returns true on success; note that the string is modified
+   bool _parseSettingsLine(char* line, const int lineNumber);
 
    //@}
 
@@ -1530,6 +1724,12 @@ private:
 
    /// restore basis
    void _restoreBasis();
+
+   /// stores objective, bounds, and sides of real LP
+   void _storeLPReal();
+
+   /// restores objective, bounds, and sides of real LP
+   void _restoreLPReal();
 
    /// introduces slack variables to transform inequality constraints into equations for both rational and real LP,
    /// which should be in sync
@@ -1584,13 +1784,18 @@ private:
    /// solves real LP during iterative refinement
    SPxSolver::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
                                            DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                           DataArray< SPxSolver::VarStatus >& basisStatusCols);
+                                           DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// solves real LP with recovery mechanism
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                      DataArray< SPxSolver::VarStatus >& basisStatusCols);
+                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
+   /// factorizes rational basis matrix in column representation
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, bool& optimal);
+
+   /// attempts rational reconstruction of primal-dual solution
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared);
    //@}
 
 

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -52,13 +52,20 @@ inline void spx_alloc(T& p, int n = 1)
 
    if (n == 0)
       n = 1;
-   
-   p = reinterpret_cast<T>(malloc(sizeof(*p) * (unsigned int) n));
+
+   try
+   {
+      p = reinterpret_cast<T>(malloc(sizeof(*p) * (unsigned int) n));
+   }
+   catch( const std::bad_alloc& )
+   {
+      throw(SPxMemoryException("Error allocating memory"));
+   }
 
    if (0 == p)
    {
-      MSG_ERROR( spxout << "EMALLC01 malloc: Out of memory - cannot allocate " 
-                        << sizeof(*p) * (unsigned int) n << " bytes" << std::endl; )
+      std::cerr << "EMALLC01 malloc: Out of memory - cannot allocate "
+                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
       throw(SPxMemoryException("XMALLC01 malloc: Could not allocate enough memory") );
    }
 }
@@ -73,15 +80,25 @@ inline void spx_realloc(T& p, int n)
 {
    assert(n >= 0);
 
+   /* new pointer to not lose old one in case of problems */
+   T pp;
+
    if (n == 0)
       n = 1;
 
-   T pp = reinterpret_cast<T>(realloc(p, sizeof(*p) * (unsigned int) n));
+   try
+   {
+      pp = reinterpret_cast<T>(realloc(p, sizeof(*p) * (unsigned int) n));
+   }
+   catch( const std::bad_alloc& )
+   {
+      throw(SPxMemoryException("Error reallocating memory"));
+   }
 
    if (0 == pp)
    {
-      MSG_ERROR( spxout << "EMALLC02 realloc: Out of memory - cannot allocate "
-                        << sizeof(*p) * (unsigned int) n << " bytes" << std::endl; )
+      std::cerr << "EMALLC02 realloc: Out of memory - cannot allocate "
+                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
       throw(SPxMemoryException("XMALLC02 realloc: Could not allocate enough memory") );
    }
    p=pp;

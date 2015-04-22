@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -66,6 +66,7 @@ public:
    //@{
    /// default construtor.
    explicit SoPlexLegacy(
+      SPxOut&                   outstream,
       SPxSolver::Type           type = SPxSolver::LEAVE,
       SPxSolver::Representation rep  = SPxSolver::COLUMN );
    virtual ~SoPlexLegacy();
@@ -75,9 +76,20 @@ public:
    SoPlexLegacy(const SoPlexLegacy&);
    //@}
 
+   /// message handler
+//   mutable SPxOut spxout;
+
    //---------------------------------------
    //**@name Access / modification */
    //@{
+
+   /// set verbosity
+//   virtual void setVerbosity(const SPxOut::Verbosity v)
+//   {
+//      spxout.setVerbosity(v);
+//      setOutstream(spxout);
+//   }
+
    /// set update type for factorization.
    virtual void setUtype(SLUFactor::UpdateType tp)
    {
@@ -155,7 +167,7 @@ public:
    {
       if (has_simplifier())
       {
-         MSG_ERROR( spxout << "ESOLVR04 setting starting basis with presolving not yet implemented" << std::endl; )
+         MSG_ERROR( std::cerr << "ESOLVR04 setting starting basis with presolving not yet implemented" << std::endl; )
             throw SPxStatusException("XSOLVR04 setting starting basis with presolving not yet implemented");
       }
 

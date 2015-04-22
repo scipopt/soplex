@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
+#include "timerfactory.h"
 #include "dvector.h"
 #include "slinsolver.h"
 #include "clufactor.h"
@@ -85,7 +86,8 @@ protected:
    /// |x| < epsililon is considered to be 0.
    Real epsilon;
    /// Time spent in solves
-   Timer   solveTime; 
+   Timer* solveTime;
+   Timer::TYPE timerType;
    /// Number of solves
    int     solveCount;
    //@}
@@ -213,12 +215,12 @@ public:
    /// time spent in factorizations
    Real getFactorTime() const
    {
-      return factorTime.userTime();
+      return factorTime->time();
    }
    /// reset FactorTime
    void resetFactorTime()
    {
-      factorTime.reset();
+      factorTime->reset();
    }
    /// number of factorizations performed
    int getFactorCount() const
@@ -228,12 +230,12 @@ public:
    /// time spent in solves
    Real getSolveTime() const
    {
-      return solveTime.userTime();
+      return solveTime->time();
    }
    /// reset SolveTime
    void resetSolveTime()
    {
-      solveTime.reset();
+      solveTime->reset();
    }
    /// number of solves performed
    int getSolveCount() const
@@ -243,8 +245,8 @@ public:
    /// reset timers and counters
    void resetCounters()
    {
-      factorTime.reset();
-      solveTime.reset();
+      factorTime->reset();
+      solveTime->reset();
       factorCount = 0;
       solveCount = 0;
    }

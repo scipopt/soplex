@@ -3,19 +3,59 @@
 Developer version
 =================
 
+features:
+- support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
+- rational solves with basis matrix based on a rational LU factorization
+- rational reconstruction routines during iterative refinement
+
 performance:
-- iterative refinement for ranged rows, making the transformation to equality form unnecessary
+- iterative refinement for ranged rows without introducing explicit slack variables
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
+- do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
+- faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
+- more efficient arithmetic in class Rational by checking special cases
+- faster iterative refinement by using powers of two as scaling factors
+- reuse factorization during iterative refinement
+- no transformation of objective sense for rational solve
+- simplifier makes fewer constructor/destructor calls to DSVector class by reusing the data structures
+- update nonbasic part of objective function value instead of completely recomputing it every time
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
 - new make option EG={true,false} to build with EGlib
 - bound flipping is now enabled by default
+- new command line option --writefile to save LP file as read by SoPlex
+- new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
+- improved printing of rationals in limited precision
+- added possibility to write basis file in original Cplex definition
+- new parameter bool:ratfac to control whether rational factorization is attempted during iterative refinement
+- new parameter int:ratfac_minstalls for minimum number of stalling refinements since last pivot to trigger rational
+  factorization
+- new parameter bool:ratrec to control whether rational reconstruction is attempted during iterative refinement
+- new statistics section on rational reconstruction
+- new statistics section on size of rational solution in base 2 and base 10
+- new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
+- new parameter bool:powerscaling for rounding scaling factors during iterative refinement to powers of two
+- new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
+- new methods to store and set steepest edge weights
+
+fixed bugs:
+- do not categorically remove nonzeros with small absolute value in simplifier
+- allow empty lines in MPS files
+- fixed default bounds of integer variables in MPS reader
+- adjust basis status of nonbasic rows automatically to row type when reading basis file
+- fix compiler error from missing operators between Rational and ints for GMP=false
+- fix memory leak with static rational numbers Rational::{ZERO,POSONE,NEGONE} and list memory
+- fix uninitialized value in class SPxWeightST
+
+code quality:
+- change flag DEBUGGING to SOPLEX_DEBUG
+- deactivate SOPLEX_DEBUG flag in header files if defined externally
+- SPxOut output stream is no longer a global variable
 
 
-
-Bugfix version
-==============
+18 Dec 2014 - Release 2.0.1
+===========================
 
 features:
 - restore basis of original LP after performing iterative refinement on feasibility LP
@@ -29,12 +69,17 @@ performance:
 
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
-- new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
+- more statistics on type of refinement rounds
+- type of timing can now be switched between CPU time and wallclock time
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
+- fix MPS reader for files without blank line at EOF
 - fix pointer of activepricer in copy constructor and assignment operator of auto pricer SPxAutoPR
-
+- fix bug from uninitialized Farkas vector when simplifier detected infeasibility during iterative refinement
+- fix bug when perturbing fixed variables
+- fix bug with incorrect index incrementation in sparse inner vector product
+- fix compiler error with class Rational::Private and GMP=false
 
 
 27 Feb 2014 - Release 2.0.0

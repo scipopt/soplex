@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -18,6 +18,12 @@
  */
 #ifndef _SPXLPBASE_H_
 #define _SPXLPBASE_H_
+
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define SOPLEX_DEBUG_SPXLPBASE
+#undef SOPLEX_DEBUG
+#endif
 
 #include <assert.h>
 #include <iostream>
@@ -104,6 +110,15 @@ private:
 
 public:
 
+   // message handler
+   SPxOut* spxout;
+
+public:
+
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Inquiry */
    //@{
@@ -172,9 +187,9 @@ public:
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const
    {
-
       row.setLhs(lhs(i));
       row.setRhs(rhs(i));
+      row.setObj(rowObj(i));
       row.setRowVector(DSVectorBase<R>(rowVector(i)));
    }
 
@@ -190,7 +205,7 @@ public:
 
       set.clear();
       for( int i = start; i <= end; i++ )
-         set.add(lhs(i), rowVector(i), rhs(i));
+         set.add(lhs(i), rowVector(i), rhs(i), rowObj(i));
    }
 
    /// Gets row vector of row \p i.
@@ -239,6 +254,50 @@ public:
    const R& lhs(const SPxRowId& id) const
    {
       return LPRowSetBase<R>::lhs(id);
+   }
+
+   /// Gets row objective function vector.
+   void getRowObj(VectorBase<R>& prowobj) const
+   {
+      prowobj = LPRowSetBase<R>::obj();
+      if( spxSense() == MINIMIZE )
+         prowobj *= -1.0;
+   }
+
+   ///
+   R rowObj(int i) const
+   {
+      if( spxSense() == MINIMIZE )
+         return -maxRowObj(i);
+      else
+         return maxRowObj(i);
+   }
+
+   /// Returns row objective function value of row with identifier \p id.
+   R rowObj(const SPxRowId& id) const
+   {
+      if( spxSense() == MINIMIZE )
+         return -maxRowObj(id);
+      else
+         return maxRowObj(id);
+   }
+
+   ///
+   const VectorBase<R>& maxRowObj() const
+   {
+      return LPRowSetBase<R>::obj();
+   }
+
+   ///
+   const R& maxRowObj(int i) const
+   {
+      return LPRowSetBase<R>::obj(i);
+   }
+
+   /// Returns row objective function value of row with identifier \p id.
+   const R& maxRowObj(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::obj(id);
    }
 
    /// Returns the inequality type of the \p i'th LPRow.
@@ -441,6 +500,11 @@ public:
    template < class S >
    void addRow(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
    {
+      assert(lhsValue != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rhsValue != 0);
+
       int idx = nRows();
       int oldColNumber = nCols();
 
@@ -481,6 +545,97 @@ public:
       doAddRows(pset);
    }
 
+   ///
+   template < class S >
+   void addRows(const S* lhsValues, const S* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const S* rhsValues)
+   {
+      assert(lhsValues != 0);
+      assert(numValues <= 0 || rowValues != 0);
+      assert(numValues <= 0 || rowIndices != 0);
+      assert(numValues <= 0 || rowStarts != 0);
+      assert(numValues <= 0 || rowLengths != 0);
+      assert(rhsValues != 0);
+
+      int i, j, k, idx;
+      SVectorBase<R>* col;
+      DataArray < int > newCols(nCols());
+      int oldRowNumber = nRows();
+      int oldColNumber = nCols();
+
+      LPRowSetBase<R>::memRemax(oldRowNumber + numRows);
+      for( i = 0; i < numRows; i++ )
+      {
+         assert(numValues <= 0 || rowStarts[i] + rowLengths[i] <= numValues);
+         if( numValues <= 0 )
+            LPRowSetBase<R>::add(&(lhsValues[i]), (S*)0, (int*)0, 0, &(rhsValues[i]));
+         else
+            LPRowSetBase<R>::add(&(lhsValues[i]), &(rowValues[rowStarts[i]]), &(rowIndices[rowStarts[i]]), rowLengths[i], &(rhsValues[i]));
+      }
+
+      assert(LPRowSetBase<R>::isConsistent());
+      assert(LPColSetBase<R>::isConsistent());
+
+      // count additional nonzeros per column
+      for( i = nCols() - 1; i >= 0; --i )
+         newCols[i] = 0;
+      if( numValues > 0 )
+      {
+         for( i = 0; i < numRows; i++ )
+         {
+            for( j = rowStarts[i]; j < rowStarts[i] + rowLengths[i]; j++ )
+            {
+               ///@todo implement the addition of new columns as in doAddRows()
+               assert(rowIndices[j] >= 0);
+               assert(rowIndices[j] < oldColNumber);
+               newCols[rowIndices[j]]++;
+            }
+         }
+      }
+
+      // extend columns as required (backward because of memory efficiency reasons)
+      for( i = nCols() - 1; i >= 0; --i )
+      {
+         if( newCols[i] > 0 )
+         {
+            int len = newCols[i] + colVector(i).size();
+            LPColSetBase<R>::xtend(i, len);
+
+            /* preset the sizes: beware that this can irritate a consistency check call from xtend(). We need to set the
+             * sizes here, because a possible garbage collection called from xtend might destroy the sizes again. */
+            colVector_w(i).set_size( len );
+         }
+      }
+
+      // insert new elements to column file
+      for( i = nRows() - 1; i >= oldRowNumber; --i )
+      {
+         const SVectorBase<R>& vec = rowVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            k = vec.index(j);
+            col = &colVector_w(k);
+            idx = col->size() - newCols[k];
+            assert(newCols[k] > 0);
+            assert(idx >= 0);
+            newCols[k]--;
+            col->index(idx) = i;
+            col->value(idx) = vec.value(j);
+         }
+      }
+
+#ifndef NDEBUG
+      for( i = 0; i < nCols(); ++i )
+         assert( newCols[i] == 0 );
+#endif
+
+      assert(SPxLPBase<R>::isConsistent());
+
+      assert( numRows == nRows() - oldRowNumber );
+      addedRows( nRows() - oldRowNumber );
+      addedCols( nCols() - oldColNumber );
+   }
+
    /// adds all LPRowBase%s of \p pset to LPRowSetBase.
    virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set)
    {
@@ -497,6 +652,45 @@ public:
       doAddCol(col);
    }
 
+   ///
+   virtual void addCol(const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   {
+      doAddCol(objValue, lowerValue, colVec, upperValue);
+   }
+
+   ///
+   template < class S >
+   void addCol(const S* objValue, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   {
+      int idx = nCols();
+      int oldRowNumber = nRows();
+
+      LPColSetBase<R>::add(objValue, lowerValue, colValues, colIndices, colSize, upperValue);
+      if( thesense != MAXIMIZE )
+         LPColSetBase<R>::maxObj_w(idx) *= -1;
+
+      // now insert nonzeros to column file also
+      for( int j = colSize - 1; j >= 0; --j )
+      {
+         const S& val = colValues[j];
+         int i = colIndices[j];
+
+         // create new rows if required
+         if( i >= nRows() )
+         {
+            LPRowBase<R> empty;
+            for( int k = nRows(); k <= i; ++k )
+               LPRowSetBase<R>::add(empty);
+         }
+
+         assert(i < nRows());
+         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
+   }
+
    /// Adds \p col to LPColSetVBase.
    virtual void addCol(SPxColId& id, const LPColBase<R>& col)
    {
@@ -508,6 +702,95 @@ public:
    virtual void addCols(const LPColSetBase<R>& pset)
    {
       doAddCols(pset);
+   }
+
+   ///
+   template < class S >
+   void addCols(const S* objValue, const S* lowerValues, const S* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const S* upperValues)
+   {
+      assert(lowerValues != 0);
+      assert(numValues <= 0 || colValues != 0);
+      assert(numValues <= 0 || colIndices != 0);
+      assert(numValues <= 0 || colStarts != 0);
+      assert(numValues <= 0 || colLengths != 0);
+      assert(upperValues != 0);
+
+      int i, j, k, idx;
+      SVectorBase<R>* row;
+      DataArray < int > newRows(nRows());
+      int oldColNumber = nCols();
+      int oldRowNumber = nRows();
+      idx = nCols();
+
+      LPColSetBase<R>::memRemax(oldColNumber + numCols);
+      for( i = 0; i < numCols; i++ )
+      {
+         assert(numValues <= 0 || colStarts[i] + colLengths[i] <= numValues);
+         if( numValues <= 0 )
+            LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), (S*)0, (int*)0, 0, &(upperValues[i]));
+         else
+            LPColSetBase<R>::add(&(objValue[i]), &(lowerValues[i]), &(colValues[colStarts[i]]), &(colIndices[colStarts[i]]), colLengths[i], &(upperValues[i]));
+
+         if( thesense != MAXIMIZE )
+            LPColSetBase<R>::maxObj_w(idx + i) *= -1;
+      }
+
+      assert(LPColSetBase<R>::isConsistent());
+      assert(LPRowSetBase<R>::isConsistent());
+
+      // count additional nonzeros per rows
+      for( i = nRows() - 1; i >= 0; --i )
+         newRows[i] = 0;
+      for( i = numValues - 1; i >= 0; --i )
+      {
+         ///@todo implement the addition of new rows as in doAddCols()
+         assert(colIndices[i] >= 0);
+         assert(colIndices[i] < oldRowNumber);
+         newRows[colIndices[i]]++;
+      }
+
+      // extend rows as required (backward because of memory efficiency reasons)
+      for( i = nRows() - 1; i >= 0; --i )
+      {
+         if( newRows[i] > 0 )
+         {
+            int len = newRows[i] + rowVector(i).size();
+            LPRowSetBase<R>::xtend(i, len);
+
+            /* preset the sizes: beware that this can irritate a consistency check call from xtend(). We need to set the
+             * sizes here, because a possible garbage collection called from xtend might destroy the sizes again. */
+            rowVector_w(i).set_size( len );
+         }
+      }
+
+      // insert new elements to row file
+      for( i = nCols() - 1; i >= oldColNumber; --i )
+      {
+         const SVectorBase<R>& vec = colVector(i);
+
+         for( j = vec.size() - 1; j >= 0; --j )
+         {
+            k = vec.index(j);
+            row = &rowVector_w(k);
+            idx = row->size() - newRows[k];
+            assert(newRows[k] > 0);
+            assert(idx >= 0);
+            newRows[k]--;
+            row->index(idx) = i;
+            row->value(idx) = vec.value(j);
+         }
+      }
+
+#ifndef NDEBUG
+      for( i = 0; i < nRows(); ++i )
+         assert( newRows[i] == 0 );
+#endif
+
+      assert(SPxLPBase<R>::isConsistent());
+
+      assert( numCols == nCols() - oldColNumber );
+      addedCols( nCols() - oldColNumber );
+      addedRows( nRows() - oldRowNumber );
    }
 
    /// Adds all LPColBase%s of \p set to LPColSetBase.
@@ -895,14 +1178,27 @@ public:
 
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
-      LPColSetBase<R>::maxObj_w() *= R(spxSense() == MINIMIZE ? -1 : 1);
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w() *= -1;
       assert(isConsistent());
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
    virtual void changeObj(int i, const R& newVal)
    {
-      LPColSetBase<R>::maxObj_w(i) = (spxSense() == MINIMIZE) ? -newVal : newVal;
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w(i) *= -1;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   template < class S >
+   void changeObj(int i, const S* newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = *newVal;
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w(i) *= -1;
       assert(isConsistent());
    }
 
@@ -910,6 +1206,35 @@ public:
    virtual void changeObj(SPxColId id, const R& newVal)
    {
       changeObj(number(id), newVal);
+   }
+
+   /// Changes objective vector to \p newObj.
+   virtual void changeMaxObj(const VectorBase<R>& newObj)
+   {
+      assert(maxObj().dim() == newObj.dim());
+      LPColSetBase<R>::maxObj_w() = newObj;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   virtual void changeMaxObj(int i, const R& newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   template < class S >
+   void changeMaxObj(int i, const S* newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = *newVal;
+      assert(isConsistent());
+   }
+
+   /// Changes objective value of column with identifier \p id to \p newVal.
+   virtual void changeMaxObj(SPxColId id, const R& newVal)
+   {
+      changeMaxObj(number(id), newVal);
    }
 
    /// Changes vector of lower bounds to \p newLower.
@@ -926,6 +1251,14 @@ public:
    {
 
       LPColSetBase<R>::lower_w(i) = newLower;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th lower bound to \p newLower.
+   template < class S >
+   void changeLower(int i, const S* newLower)
+   {
+      LPColSetBase<R>::lower_w(i) = *newLower;
       assert(isConsistent());
    }
 
@@ -952,6 +1285,14 @@ public:
       assert(isConsistent());
    }
 
+   /// Changes \p i 'th upper bound to \p newUpper.
+   template < class S >
+   void changeUpper(int i, const S* newUpper)
+   {
+      LPColSetBase<R>::upper_w(i) = *newUpper;
+      assert(isConsistent());
+   }
+
    /// Changes upper bound of column with identifier \p id to \p newLower.
    virtual void changeUpper(SPxColId id, const R& newUpper)
    {
@@ -973,6 +1314,15 @@ public:
 
       changeLower(i, newLower);
       changeUpper(i, newUpper);
+      assert(isConsistent());
+   }
+
+   /// Changes bounds of column \p i to \p newLower and \p newUpper.
+   template < class S >
+   void changeBounds(int i, const S* newLower, const S* newUpper)
+   {
+      LPColSetBase<R>::lower_w(i) = *newLower;
+      LPColSetBase<R>::upper_w(i) = *newUpper;
       assert(isConsistent());
    }
 
@@ -1050,10 +1400,50 @@ public:
       assert(isConsistent());
    }
 
+   /// Changes left and right hand side of row \p i.
+   template < class S >
+   void changeRange(int i, const S* newLhs, const S* newRhs)
+   {
+      LPRowSetBase<R>::lhs_w(i) = *newLhs;
+      LPRowSetBase<R>::rhs_w(i) = *newRhs;
+      assert(isConsistent());
+   }
+
    /// Changes left and right hand side of row with identifier \p id.
    virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs)
    {
       changeRange(number(id), newLhs, newRhs);
+   }
+
+   /// Changes row objective function vector to \p newRowObj.
+   virtual void changeRowObj(const VectorBase<R>& newRowObj)
+   {
+      assert(maxRowObj().dim() == newRowObj.dim());
+      LPRowSetBase<R>::obj_w() = newRowObj;
+      if( spxSense() == MINIMIZE )
+         LPRowSetBase<R>::obj_w() *= -1;
+      assert(isConsistent());
+   }
+
+   /// Changes \p i 'th row objective function value to \p newRowObj.
+   virtual void changeRowObj(int i, const R& newRowObj)
+   {
+      LPRowSetBase<R>::obj_w(i) = newRowObj;
+      if( spxSense() == MINIMIZE )
+         LPRowSetBase<R>::obj_w(i) *= -1;
+      assert(isConsistent());
+   }
+
+   /// Changes row objective function value for row with identifier \p id.
+   virtual void changeRowObj(SPxRowId id, const R& newRowObj)
+   {
+      changeRowObj(number(id), newRowObj);
+   }
+
+   /// Clears row objective function values for all rows
+   virtual void clearRowObjs()
+   {
+      LPRowSetBase<R>::obj_w().clear();
    }
 
    /// Replaces \p i 'th row of LP with \p newRow.
@@ -1072,6 +1462,7 @@ public:
 
       changeLhs(n, newRow.lhs());
       changeRhs(n, newRow.rhs());
+      changeRowObj(n, newRow.obj());
 
       const SVectorBase<R>& newrow = newRow.rowVector();
       for( j = newrow.size() - 1; j >= 0; --j )
@@ -1156,6 +1547,35 @@ public:
       assert(isConsistent());
    }
 
+   /// Changes LP element (\p i, \p j) to \p val.
+   template < class S >
+   void changeElement(int i, int j, const S* val)
+   {
+      SVectorBase<R>& row = rowVector_w(i);
+      SVectorBase<R>& col = colVector_w(j);
+
+      if( mpq_get_d(*val) != R(0) )
+      {
+         if( row.number(j) >= 0 )
+         {
+            row.value(row.number(j)) = *val;
+            col.value(col.number(i)) = *val;
+         }
+         else
+         {
+            LPRowSetBase<R>::add2(i, 1, &j, val);
+            LPColSetBase<R>::add2(j, 1, &i, val);
+         }
+      }
+      else if( row.number(j) >= 0 )
+      {
+         row.remove(row.number(j));
+         col.remove(col.number(i));
+      }
+
+      assert(isConsistent());
+   }
+
    /// Changes LP element identified by (\p rid, \p cid) to \p val.
    virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val)
    {
@@ -1166,7 +1586,10 @@ public:
    virtual void changeSense(SPxSense sns)
    {
       if( sns != thesense )
-         LPColSetBase<R>::maxObj_w() *= -1.0;
+      {
+         LPColSetBase<R>::maxObj_w() *= -1;
+         LPRowSetBase<R>::obj_w() *= -1;
+      }
       thesense = sns;
    }
 
@@ -1387,6 +1810,12 @@ protected:
    R& lhs_w(int i)
    {
       return LPRowSetBase<R>::lhs_w(i);
+   }
+
+   /// Returns objective function value of row \p i.
+   R& maxRowObj_w(int i)
+   {
+      return LPRowSetBase<R>::obj_w(i);
    }
 
    /// Returns objective value of column \p i for maximization problem.
@@ -1765,13 +2194,46 @@ private:
       const SVectorBase<R>& vec = col.colVector();
 
       LPColSetBase<R>::add(col);
-      LPColSetBase<R>::maxObj_w(idx) *= thesense;
+      if( thesense != MAXIMIZE )
+         LPColSetBase<R>::maxObj_w(idx) *= -1;
 
       // now insert nonzeros to row file also
       for( int j = vec.size() - 1; j >= 0; --j )
       {
          R val = vec.value(j);
          int i = vec.index(j);
+
+         // create new rows if required
+         if( i >= nRows() )
+         {
+            LPRowBase<R> empty;
+            for( int k = nRows(); k <= i; ++k )
+               LPRowSetBase<R>::add(empty);
+         }
+
+         assert(i < nRows());
+         LPRowSetBase<R>::add2(i, 1, &idx, &val);
+      }
+
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
+   }
+
+   ///
+   void doAddCol (const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   {
+      int idx = nCols();
+      int oldRowNumber = nRows();
+
+      LPColSetBase<R>::add(objValue, lowerValue, colVec, upperValue);
+      if( thesense != MAXIMIZE )
+         LPColSetBase<R>::maxObj_w(idx) *= -1;
+
+      // now insert nonzeros to row file also
+      for( int j = colVec.size() - 1; j >= 0; --j )
+      {
+         R val = colVec.value(j);
+         int i = colVec.index(j);
 
          // create new rows if required
          if( i >= nRows() )
@@ -1900,6 +2362,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
       , offset(old.offset)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }
@@ -1911,6 +2374,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }
@@ -1952,4 +2416,12 @@ public:
 };
 
 } // namespace soplex
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef SOPLEX_DEBUG_SPXLPBASE
+#define SOPLEX_DEBUG
+#undef SOPLEX_DEBUG_SPXLPBASE
+#endif
+
 #endif // _SPXLPBASE_H_

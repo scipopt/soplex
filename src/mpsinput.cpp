@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -16,7 +16,6 @@
 /**@file  mpsinput.cpp
  * @brief Read MPS format files.
  */
-//#define DEBUGGING 1             // Setting this generates a lot of output
 
 #include <assert.h>
 #include <ctype.h>
@@ -61,32 +60,41 @@ bool MPSInput::readLine()
    int   space;
    char* s;
    bool  is_marker;
+   bool  is_comment;
 
    do
    {
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
       is_marker = false;
    
-      // Read until we have a not comment line.
+      // Read until we have a non-empty, non-comment line.
       do
       {
-         if( !m_input.getline(m_buf, sizeof(m_buf)).good() )
+         if( !m_input.getline(m_buf, sizeof(m_buf)).good() && !m_input.eof() )
             return false;
         m_lineno++;
 
-        MSG_DEBUG( spxout << "DMPSIN01 Line " << m_lineno
+        MSG_DEBUG( std::cout << "DMPSIN01 Line " << m_lineno
                           << " " << m_buf << std::endl; )
-      } 
-      while(*m_buf == '*');
 
-      /* Normalize line
-       */
+        /* check if comment line */
+        is_comment = true;
+        if( m_buf[0] == '*' )
+           continue;
+
+        /* normalize line and check if it is empty */
+        len = int(strlen(m_buf));
+        for( int i = 0; i < len; i++ )
+        {
+           if( m_buf[i] == '\t' || m_buf[i] == '\n' || m_buf[i] == '\r' )
+              m_buf[i] = BLANK;
+           else if( m_buf[i] != BLANK )
+              is_comment = false;
+        }
+      }
+      while( is_comment );
+
       len = int(strlen(m_buf));
-
-      for(int i = 0; i < len; i++)
-         if ((m_buf[i] == '\t') || (m_buf[i] == '\n') || (m_buf[i] == '\r'))
-            m_buf[i] = BLANK;
-      
       if (len < 80)
          clear_from(m_buf, len);
 
@@ -222,8 +230,8 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-   MSG_DEBUG(
-      spxout << "DMPSIN02 -----------------------------------------------" 
+   MSG_DEBUG( std::cerr
+             << "DMPSIN02 -----------------------------------------------"
              << std::endl
              << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
              << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl

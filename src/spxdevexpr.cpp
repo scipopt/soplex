@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -53,11 +53,13 @@ void SPxDevexPR::init(SPxSolver::Type tp)
       {
          if( thesolver->sparsePricingEnter )
          {
+            bestPrices.clear();
             bestPrices.setMax(thesolver->dim());
             prices.reMax(thesolver->dim());
          }
          if( thesolver->sparsePricingEnterCo )
          {
+            bestPricesCo.clear();
             bestPricesCo.setMax(thesolver->coDim());
             pricesCo.reMax(thesolver->coDim());
          }
@@ -69,6 +71,7 @@ void SPxDevexPR::init(SPxSolver::Type tp)
          coPenalty[i] = 1;
       if (thesolver->sparsePricingLeave && thesolver->hyperPricingLeave)
       {
+         bestPrices.clear();
          bestPrices.setMax(thesolver->dim());
          prices.reMax(thesolver->dim());
       }
@@ -161,7 +164,7 @@ int SPxDevexPR::selectLeave()
    if ( retid < 0 && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WDEVEX02 trying refinement step..\n"; )
       retid = selectLeaveX(theeps/DEVEX_REFINETOL);
    }
 
@@ -319,9 +322,9 @@ void SPxDevexPR::left4(int n, SPxId id)
       Real beta_q = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
 #ifndef NDEBUG
-      if (fabs(rhoVec[n]) < theeps)
+      if (spxAbs(rhoVec[n]) < theeps)
       {
-         MSG_ERROR( spxout << "WDEVEX01: rhoVec = "
+         MSG_ERROR( std::cerr << "WDEVEX01: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than theeps = " << theeps << std::endl; )
       }
 #endif  // NDEBUG
@@ -452,7 +455,7 @@ SPxId SPxDevexPR::selectEnter()
    if( !enterId.isValid() && !refined )
    {
       refined = true;
-      MSG_INFO3( spxout << "WDEVEX02 trying refinement step..\n"; )
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WDEVEX02 trying refinement step..\n"; )
       enterId = selectEnterX(theeps/DEVEX_REFINETOL);
    }
 
@@ -469,6 +472,7 @@ SPxId SPxDevexPR::selectEnterX(Real tol)
 
    best = 0;
    bestCo = 0;
+   last = 1.0;
 
    // avoid uninitialized value later on in entered4X()
    last = 1.0;

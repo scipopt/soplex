@@ -26,7 +26,7 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['rows','cols','primalviol','dualviol','iters','flips','solvetime','value','status']
+columns = ['name','rows','cols','pviol','dviol','iters','refs','solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -48,6 +48,7 @@ tolerance = 1e-6
 instances = {}
 stats = False
 printedIdentifier = False
+section = 'soplex'
 
 for idx, outline in enumerate(outlines):
     # print identifier
@@ -61,13 +62,67 @@ for idx, outline in enumerate(outlines):
             instancename = instancename + '.' + linesplit[i]
         length = len(instancename)
         if length > namelength:
-            instancename = instancename[length-namelength-2:length-2]
+            shortname = instancename[0:namelength/2-1] + '~' + instancename[length-namelength/2:]
+        else:
+            shortname = instancename
 
         # initialize new data set
         instances[instancename] = {}
         instances[instancename]['status'] = 'abort'
+        instances[instancename]['name'] = shortname
         # wait for statistics block
         stats = False
+
+    # invalidate instancename
+    elif outline.startswith('=ready='):
+        section = 'soplex'
+        instancename = ''
+
+    elif outline.startswith('=perplex='):
+        section = 'perplex'
+        stats = False
+        instances[instancename]['perplex'] = 'unknown'
+
+    elif outline.startswith('=qsoptex='):
+        section = 'qsoptex'
+        stats = False
+        instances[instancename]['qso:stat'] = 'unknown'
+        instances[instancename]['qso:lpval'] = '--'
+        instances[instancename]['qso:time'] = instances[instancename]['timelimit']
+        instances[instancename]['qso:prec'] = 64
+
+    elif section == 'perplex':
+        if outline.find('No such file or directory') >= 0:
+            instances[instancename]['perplex'] = 'readerror'
+        elif outline.startswith('Basis read'):
+            instances[instancename]['perplex'] = 'timeout'
+        elif outline.startswith('Solution is optimal'):
+            if instances[instancename]['perplex'] == 'dinfeas':
+                instances[instancename]['perplex'] = 'optimal'
+            elif instances[instancename]['perplex'] == 'pdinfeas' or instances[instancename]['perplex'] == 'timeout':
+                instances[instancename]['perplex'] = 'pinfeas'
+        elif outline.startswith('Solution is feasible'):
+            if instances[instancename]['perplex'] == 'pinfeas':
+                instances[instancename]['perplex'] = 'optimal'
+            elif instances[instancename]['perplex'] == 'pdinfeas' or instances[instancename]['perplex'] == 'timeout':
+                instances[instancename]['perplex'] = 'dinfeas'
+        elif outline.startswith('Solution is not ') and instances[instancename]['perplex'] == 'timeout':
+            instances[instancename]['perplex'] = 'pdinfeas'
+
+    elif section == 'qsoptex':
+        if outline.startswith('Time for SOLVER:'):
+            instances[instancename]['qso:time'] = float(outline.split()[-2])
+        elif outline.find('Problem Solved Exactly') >= 0:
+            instances[instancename]['qso:stat'] = 'optimal'
+        elif outline.find('Problem Is Infeasible') >= 0:
+            instances[instancename]['qso:stat'] = 'infeasible'
+        elif outline.startswith('@24') and instances[instancename]['qso:time'] >= instances[instancename]['timelimit']:
+            instances[instancename]['qso:stat'] = 'timeout'
+        elif outline.startswith('LP Value'):
+            instances[instancename]['qso:lpval'] = outline.split()[2].rstrip(',')
+        elif outline.find('Trying mpf with') >= 0:
+            instances[instancename]['qso:prec'] = max( int(outline.split()[3]), instances[instancename]['qso:prec'] )
+
     elif outline.startswith('SoPlex version'):
         instances[instancename]['hash'] = outline.split()[-1].rstrip(']')[0:9]
         if not printedIdentifier:
@@ -75,12 +130,11 @@ for idx, outline in enumerate(outlines):
             print
             print outline
 
-    # invalidate instancename
-    elif outline.startswith('=ready='):
-        instancename = ''
-
     elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
         instances[instancename]['status'] = 'fail'
+
+    elif outline.startswith('real:timelimit'):
+        instances[instancename]['timelimit'] = float(outline.split()[-1])
 
     elif outline.startswith('Statistics'):
         stats = True
@@ -113,13 +167,15 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['minabsval'] = float(outlines[idx+15].split()[4])
             instances[instancename]['maxabsval'] = float(outlines[idx+16].split()[4])
 
-        elif outline.startswith('Iterations'):
-            instances[instancename]['iters'] = int(outline.split()[2])
-            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
-            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
-            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
-            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
-            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+        elif outline.startswith('Violation'):
+            primviol = outlines[idx+2].split()[3]
+            dualviol = outlines[idx+3].split()[3]
+            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
+                instances[instancename]['pviol'] = float("{:.2e}".format(float(primviol)))
+                instances[instancename]['dviol'] = float("{:.2e}".format(float(dualviol)))
+            else:
+                instances[instancename]['pviol'] = '-'
+                instances[instancename]['dviol'] = '-'
 
         elif outline.startswith('Total time'):
             instances[instancename]['time'] = float(outline.split()[3])
@@ -129,21 +185,24 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['simplextime'] = float(outlines[idx+4].split()[2])
             instances[instancename]['synctime'] = float(outlines[idx+5].split()[2])
             instances[instancename]['transformtime'] = float(outlines[idx+6].split()[2])
-            instances[instancename]['othertime'] = float(outlines[idx+7].split()[2])
+            instances[instancename]['rationaltime'] = float(outlines[idx+7].split()[2])
+            instances[instancename]['othertime'] = float(outlines[idx+8].split()[2])
 
         elif outline.startswith('Refinements'):
-            instances[instancename]['refinements'] = int(outline.split()[2])
-            instances[instancename]['stalling'] = int(outlines[idx+1].split()[2])
+            instances[instancename]['refs'] = int(outline.split()[2])
+            instances[instancename]['stallrefs'] = int(outlines[idx+1].split()[2])
+            instances[instancename]['pivrefs'] = int(outlines[idx+2].split()[2])
+            instances[instancename]['feasrefs'] = int(outlines[idx+3].split()[2])
+            instances[instancename]['unbdrefs'] = int(outlines[idx+4].split()[2])
 
-        elif outline.startswith('Violation'):
-            primviol = outlines[idx+2].split()[3]
-            dualviol = outlines[idx+3].split()[3]
-            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
-                instances[instancename]['primalviol'] = float(primviol)
-                instances[instancename]['dualviol'] = float(dualviol)
-            else:
-                instances[instancename]['primalviol'] = '-'
-                instances[instancename]['dualviol'] = '-'
+        elif outline.startswith('Iterations'):
+            instances[instancename]['iters'] = int(outline.split()[2])
+            instances[instancename]['scratchiters'] = int(outlines[idx+1].split()[3])
+            instances[instancename]['basisiters'] = int(outlines[idx+2].split()[3])
+            instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
+            instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
+            instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+            instances[instancename]['speed'] = round(float(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
 
         elif outline.startswith('LU factorizations'):
             instances[instancename]['lufacts'] = int(outline.split()[3])
@@ -182,7 +241,7 @@ if check_solu:
                 # check solution status
                 if value in ['infeasible', 'unbounded']:
                     if not instances[name]['status'] == value:
-                        instances[name]['status'] = 'fail'
+                        instances[name]['status'] = 'inconsistent'
                 elif value == 'unknown':
                     instances[name]['status'] = 'not verified'
                 elif (abs(instances[name]['value'] - value))/max(abs(instances[name]['value']),abs(value),tolerance) > tolerance:
@@ -203,8 +262,7 @@ aborts = sum(1 for name in instances if instances[name]['status'] == 'abort')
 inconsistents = sum(1 for name in instances if instances[name]['status'] == 'inconsistent')
 
 length = []
-
-output = 'name'.ljust(namelength)
+output = ''
 # calculate maximum width of each column
 for i,c in enumerate(columns):
     length.append(len(c))
@@ -218,7 +276,7 @@ print '-'*len(output)
 
 # print data for all instances with the computed length
 for name in sorted(instances):
-    output = name.ljust(namelength)
+    output = ''
     for i,c in enumerate(columns):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print output
@@ -248,9 +306,6 @@ if check_test:
         instancename = linesplit[0]
         for i in range(1, len(linesplit)-1):
             instancename = instancename + '.' + linesplit[i]
-        length = len(instancename)
-        if length > namelength:
-            instancename = instancename[length-namelength-2:length-2]
         if not instancename in instances:
             if not printedMissing:
                 print

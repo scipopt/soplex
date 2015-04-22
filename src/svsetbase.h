@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -19,6 +19,12 @@
 
 #ifndef _SVSETBASE_H_
 #define _SVSETBASE_H_
+
+/* undefine SOPLEX_DEBUG flag from including files; if SOPLEX_DEBUG should be defined in this file, do so below */
+#ifdef SOPLEX_DEBUG
+#define SOPLEX_DEBUG_SVSETBASE
+#undef SOPLEX_DEBUG
+#endif
 
 #include <assert.h>
 
@@ -160,7 +166,9 @@ private:
    /// count size of unused memory exactly
    void countUnusedMem()
    {
-      MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+#ifdef SOPLEX_DEBUG
+      MSG_DEBUG( std::cout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+#endif
 
       unusedMem = memSize();
       for( DLPSV* ps = list.first(); ps; ps = list.next(ps) )
@@ -168,7 +176,9 @@ private:
 
       numUnusedMemUpdates = 0;
 
-      MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << unusedMem << "\n" );
+#ifdef SOPLEX_DEBUG
+      MSG_DEBUG( std::cout << "               --> NEW: unusedMem = " << unusedMem << "\n" );
+#endif
    }
 
    /// update estimation of unused memory
@@ -177,7 +187,7 @@ private:
       unusedMem += change;
       numUnusedMemUpdates++;
 
-      if( unusedMem < 0 || unusedMem > memSize() || numUnusedMemUpdates >= 10000 )
+      if( unusedMem < 0 || unusedMem > memSize() || numUnusedMemUpdates >= 1000000 )
          countUnusedMem();
    }
 
@@ -210,7 +220,9 @@ private:
          ps->set_max(ps->size());
 
          // decrease counter of unused memory
-         MSG_DEBUG( spxout << "ensureMem, this = " << (void*)this << ": updateUnusedMemEstimation -= " << unusedPsMem << "\n" );
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "ensureMem, this = " << (void*)this << ": updateUnusedMemEstimation -= " << unusedPsMem << "\n" );
+#endif
          updateUnusedMemEstimation(-unusedPsMem);
       }
 
@@ -241,7 +253,9 @@ private:
          SVSetBaseArray::removeLast(ps->max());
 
          // decrease counter of unused memory
-         MSG_DEBUG( spxout << "deleteVec (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - ps->size() << "\n" );
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "deleteVec (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - ps->size() << "\n" );
+#endif
          updateUnusedMemEstimation(ps->size() - ps->max());
       }
       /* merge space of predecessor with position which will be deleted, therefore we do not need to delete any memory
@@ -256,7 +270,9 @@ private:
          prev->set_size(sz);
 
          // increase counter of unused memory
-         MSG_DEBUG( spxout << "deleteVec (2), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "deleteVec (2), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+#endif
          updateUnusedMemEstimation(ps->size());
       }
       /* simply remove the front entries; we do not shift the second vector to the front, because we count the unused
@@ -265,7 +281,9 @@ private:
       else
       {
          // increase counter of unused memory
-         MSG_DEBUG( spxout << "deleteVec (3), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "deleteVec (3), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+#endif
          updateUnusedMemEstimation(ps->size());
       }
 
@@ -319,12 +337,16 @@ public:
    template < class S >
    void add(DataKey& nkey, const S* rowValues, const int* rowIndices, int rowSize)
    {
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+
       // create empty vector
       ensurePSVec(1);
       SVectorBase<R>* new_svec = create(nkey, rowSize);
 
       // assign values
-      new_svec->assignArray(rowValues, rowIndices, rowSize);
+      if( rowSize > 0 )
+         new_svec->assignArray(rowValues, rowIndices, rowSize);
    }
 
    /// Adds all \p n SVectorBase%s in the array \p svec to the %set.
@@ -473,7 +495,9 @@ public:
 #endif
 
             // decrease counter of unused memory (assume that new entries will be used)
-            MSG_DEBUG( spxout << "xtend (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - sz << "\n" );
+#ifdef SOPLEX_DEBUG
+            MSG_DEBUG( std::cout << "xtend (1), this = " << (void*)this << ": updateUnusedMemEstimation -= " << ps->max() - sz << "\n" );
+#endif
             updateUnusedMemEstimation(sz - ps->max());
 
             ps->setMem(newmax, ps->mem());
@@ -502,7 +526,9 @@ public:
             }
 
             // increase counter of unused memory (assume that new entries will be used)
-            MSG_DEBUG( spxout << "xtend (2), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+#ifdef SOPLEX_DEBUG
+            MSG_DEBUG( std::cout << "xtend (2), this = " << (void*)this << ": updateUnusedMemEstimation += " << ps->size() << "\n" );
+#endif
             updateUnusedMemEstimation(ps->size());
 
             list.remove(ps);
@@ -791,7 +817,9 @@ public:
 
       if( delta != 0 )
       {
-         MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+#endif
 
          int used = 0;
          for( DLPSV* ps = list.first(); ps; ps = list.next(ps) )
@@ -816,7 +844,9 @@ public:
          unusedMem = memSize() - used;
          numUnusedMemUpdates = 0;
 
-         MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << unusedMem << " after memRemax(" << newmax << ")\n" );
+#ifdef SOPLEX_DEBUG
+         MSG_DEBUG( std::cout << "               --> NEW: unusedMem = " << unusedMem << " after memRemax(" << newmax << ")\n" );
+#endif
       }
    }
 
@@ -855,9 +885,10 @@ public:
          used += sz;
       }
 
-      MSG_DEBUG( spxout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
-      MSG_DEBUG( spxout << "               --> NEW: unusedMem = " << memSize() - used << ", zero after memPack() at memMax() = "<< memMax() << "\n" );
-
+#ifdef SOPLEX_DEBUG
+      MSG_DEBUG( std::cout << "counting unused memory (unusedMem = " << unusedMem << ", numUnusedMemUpdates = " << numUnusedMemUpdates << ", this = " << (void*)this << ")\n" );
+      MSG_DEBUG( std::cout << "               --> NEW: unusedMem = " << memSize() - used << ", zero after memPack() at memMax() = "<< memMax() << "\n" );
+#endif
 #ifndef NDEBUG
       Nonzero<R>* olddata = SVSetBaseArray::data;
       SVSetBaseArray::reSize(used);
@@ -1012,4 +1043,12 @@ public:
 };
 
 } // namespace soplex
+
+/* reset the SOPLEX_DEBUG flag to its original value */
+#undef SOPLEX_DEBUG
+#ifdef SOPLEX_DEBUG_SVSETBASE
+#define SOPLEX_DEBUG
+#undef SOPLEX_DEBUG_SVSETBASE
+#endif
+
 #endif // _SVSETBASE_H_

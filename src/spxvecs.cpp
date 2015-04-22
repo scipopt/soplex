@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -75,7 +75,7 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR( spxout << "ESVECS01 ERROR: "
+                  MSG_ERROR( std::cerr << "ESVECS01 ERROR: "
                                     << "inconsistent basis must not happen!" 
                                     << std::endl; )
                   throw SPxInternalCodeException("XSVECS01 This should never happen.");
@@ -104,7 +104,44 @@ void SPxSolver::computeFrhs()
          *theFrhs += maxObj();
       }
       else
+      {
+         ///@todo put this into a separate method
          *theFrhs = maxObj();
+         const SPxBasis::Desc& ds = desc();
+         for (int i = 0; i < nRows(); ++i)
+         {
+            SPxBasis::Desc::Status stat = ds.rowStatus(i);
+
+            if (!isBasic(stat))
+            {
+               Real x;
+
+               switch (stat)
+               {
+               case SPxBasis::Desc::D_FREE :
+                  continue;
+
+               case SPxBasis::Desc::D_ON_UPPER :
+               case SPxBasis::Desc::D_ON_LOWER :
+               case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+                  x = maxRowObj(i);
+                  break;
+
+               default:
+                  MSG_ERROR( std::cerr << "ESVECS04 ERROR: "
+                     << "inconsistent basis must not happen!"
+                     << std::endl; )
+                     throw SPxInternalCodeException("XSVECS06 This should never happen.");
+               }
+               assert(x < infinity);
+               assert(x > -infinity);
+               // assert(x == 0.0);
+
+               if (x != 0.0)
+                  theFrhs->multAdd(x, vector(i));
+            }
+         }
+      }
    }
 }
 
@@ -139,7 +176,7 @@ void SPxSolver::computeFrhsXtra()
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS02 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS02 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS02 This should never happen.");
@@ -196,7 +233,7 @@ void SPxSolver::computeFrhs1(
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS03 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS03 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS04 This should never happen.");
@@ -248,16 +285,16 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               MSG_WARNING( spxout << "WSVECS04 Frhs2: " << stat << " " 
+               MSG_WARNING( (*spxout), (*spxout) << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
                                    << colfb[i] << " " << coufb[i]
                                    << " shouldn't be" << std::endl; )
             }
-            //assert(colfb[i] == coufb[i]);
+            assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS05 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS05 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS05 This should never happen.");
@@ -315,7 +352,7 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
       // columnwise representation:
       // slacks must be left 0!
    default:
-      (*theCoPrhs)[i] = 0;
+      (*theCoPrhs)[i] = maxRowObj(n);
       break;
    }
 }
@@ -396,7 +433,7 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
       break;
 
    default:
-      (*theCoPrhs)[i] = 0;
+      (*theCoPrhs)[i] = maxRowObj(n);
       break;
    }
 }

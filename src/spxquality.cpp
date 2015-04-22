@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -45,10 +45,10 @@ void SPxSolver::qualConstraintViolation(Real& maxviol, Real& sumviol) const
       assert(lhs( row ) <= rhs( row ));
 
       if (val < lhs( row )) 
-         viol = fabs(val - lhs( row ));
+         viol = spxAbs(val - lhs( row ));
       else
          if (val > rhs( row ))
-            viol = fabs(val - rhs( row ));
+            viol = spxAbs(val - rhs( row ));
 
       if (viol > maxviol)
          maxviol = viol;
@@ -74,10 +74,10 @@ void SPxSolver::qualBoundViolation(
       Real viol = 0.0;
 
       if (solu[col] < lower( col ))
-         viol = fabs( solu[col] - lower( col ));
+         viol = spxAbs( solu[col] - lower( col ));
       else
          if (solu[col] > upper( col ))
-            viol = fabs( solu[col] - upper( col ));
+            viol = spxAbs( solu[col] - upper( col ));
          
       if (viol > maxviol)
          maxviol = viol;
@@ -106,7 +106,7 @@ void SPxSolver::qualSlackViolation(Real& maxviol, Real& sumviol) const
       for( int col = 0; col < rowvec.size(); ++col )
          val += rowvec.value( col ) * solu[rowvec.index( col )];
 
-      Real viol = fabs(val - slacks[row]);
+      Real viol = spxAbs(val - slacks[row]);
 
       if (viol > maxviol)
          maxviol = viol;

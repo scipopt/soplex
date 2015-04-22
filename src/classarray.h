@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -354,7 +354,7 @@ public:
     *  @param p_max  maximum number of elements the array can hold.
     *  @param p_fac  value for memFactor.
     */
-   explicit ClassArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
+   explicit ClassArray(int p_size = 0, int p_max = 0, double p_fac = 1.2)
       : data(0)
       , memFactor(p_fac)
    {

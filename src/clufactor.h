@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -62,7 +62,11 @@ public:
       int    mkwtz;               ///< markowitz number of pivot 
 
       Pring() : next(0), prev(0)  ///< constructor
-      {}      
+      {
+         mkwtz = -1;
+         idx = -1;
+         pos = -1;
+      }
 
    private:
       Pring(const Pring&);             ///< blocked copy constructor
@@ -197,7 +201,7 @@ protected:
 
    Real*   work;              ///< Working array: must always be left as 0! 
 
-   Timer   factorTime;        ///< Time spent in factorizations
+   Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
    //@}
 

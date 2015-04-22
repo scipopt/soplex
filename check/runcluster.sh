@@ -4,7 +4,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -23,6 +23,7 @@ fi
 
 OUTFILE=$CLIENTTMPDIR/$BASENAME.out
 ERRFILE=$CLIENTTMPDIR/$BASENAME.err
+BASFILE=$CLIENTTMPDIR/$BASENAME.bas
 TMPFILE=$SOLVERPATH/results/$BASENAME.tmp
 
 uname -a                            > $OUTFILE
@@ -34,17 +35,16 @@ date                                >> $OUTFILE
 date                                >> $ERRFILE
 echo -----------------------------  >> $OUTFILE
 date +"@03 %s"                      >> $OUTFILE
-$EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set -c -q -t$TIMELIMIT $INSTANCE >> $OUTFILE 2>>$ERRFILE
+$EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set --writebas=$BASFILE -c -q -t$TIMELIMIT $INSTANCE >> $OUTFILE 2>>$ERRFILE
 date +"@04 %s"                      >> $OUTFILE
 echo -----------------------------  >> $OUTFILE
 date                                >> $OUTFILE
 echo -----------------------------  >> $OUTFILE
 date                                >> $ERRFILE
-echo                                >> $OUTFILE
-echo =ready=                        >> $OUTFILE
 
 mv $OUTFILE $SOLVERPATH/results/$BASENAME.out
 mv $ERRFILE $SOLVERPATH/results/$BASENAME.err
+mv $BASFILE $SOLVERPATH/results/$BASENAME.bas
 
 rm -f $TMPFILE
 #chmod g+r $ERRFILE

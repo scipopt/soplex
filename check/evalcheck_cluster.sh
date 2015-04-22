@@ -4,7 +4,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -44,6 +44,7 @@ do
     OUTFILE=$DIR/$EVALFILE.out
     ERRFILE=$DIR/$EVALFILE.err
     RESFILE=$DIR/$EVALFILE.res
+    SETFILE=$DIR/$EVALFILE.set
 
     # check if the eval file exists; if this is the case construct the overall solution files
     if test -e $DIR/$EVALFILE.eval
@@ -82,6 +83,33 @@ do
                 echo Missing $i
             fi
 
+            FILE=$i.perplex.out
+            if test -e $FILE
+            then
+                echo           >> $OUTFILE
+                echo =perplex= >> $OUTFILE
+                cat $FILE >> $OUTFILE
+                if test "$REMOVE" = "1"
+                then
+                    rm -f $FILE
+                fi
+            fi
+
+            FILE=$i.qsoptex.out
+            if test -e $FILE
+            then
+                echo           >> $OUTFILE
+                echo =qsoptex= >> $OUTFILE
+                cat $FILE >> $OUTFILE
+                if test "$REMOVE" = "1"
+                then
+                    rm -f $FILE
+                fi
+            fi
+
+            echo         >> $OUTFILE
+            echo =ready= >> $OUTFILE
+
             FILE=$i.err
             if test -e $FILE
             then
@@ -92,6 +120,20 @@ do
                 fi
             fi
 
+	         FILE=$i.set
+	         if test -e $FILE
+	         then
+	             cp $FILE $SETFILE
+	             if test "$REMOVE" = "1"
+	             then
+		              rm -f $FILE
+	             fi
+	         fi
+
+            if test "$REMOVE" = "1"
+            then
+                rm -f $i.bas
+            fi
         done
 
         if test "$REMOVE" = "1"

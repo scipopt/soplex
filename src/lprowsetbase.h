@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -53,6 +53,7 @@ private:
 
    DVectorBase<R> left;    ///< vector of left hand sides (lower bounds) of LPRowBase%s.
    DVectorBase<R> right;   ///< vector of right hand sides (upper bounds) of LPRowBase%s.
+   DVectorBase<R> object;  ///< vector of objective coefficients.
 
    //@}
 
@@ -160,6 +161,42 @@ public:
       return right[number(k)];
    }
 
+   /// Returns the vector of objective coefficients.
+   const VectorBase<R>& obj() const
+   {
+      return object;
+   }
+
+   /// Returns the vector of objective coefficients (writeable).
+   VectorBase<R>& obj_w()
+   {
+      return object;
+   }
+
+   /// Returns the objective coefficient of the \p i 'th LPRowBase.
+   const R& obj(int i) const
+   {
+      return object[i];
+   }
+
+   /// Returns the objective coefficient of the \p i 'th LPRowBase (writeable).
+   R& obj_w(int i)
+   {
+      return object[i];
+   }
+
+   /// Returns the objective coefficient of the LPRowBase with DataKey \p k in LPRowSetBase.
+   const R& obj(const DataKey& k) const
+   {
+      return object[number(k)];
+   }
+
+   /// Returns the objective coefficient of the LPRowBase with DataKey \p k in LPRowSetBase (writeable).
+   R& obj_w(const DataKey& k)
+   {
+      return object[number(k)];
+   }
+
    /// Returns a writable rowVector of the \p i 'th LPRowBase.
    SVectorBase<R>& rowVector_w(int i)
    {
@@ -221,7 +258,7 @@ public:
          rhs_w(i) = infinity;
          break;
       case LPRowBase<R>::RANGE:
-         MSG_ERROR( spxout << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
+         MSG_ERROR( std::cerr << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
          throw SPxInternalCodeException("XROWST01 This should never happen.");
       default:
          throw SPxInternalCodeException("XROWST02 This should never happen.");
@@ -229,7 +266,7 @@ public:
    }
 
    /// Returns the value of the \p i'th LPRowBase.
-   R value(int i) const
+   const R& value(int i) const
    {
       if( rhs(i) < infinity )
          return rhs(i);
@@ -244,7 +281,7 @@ public:
    /** The \em value of a row depends on its type: if the inequality is of type "greater or equal", the value is the lhs
     *  of the row. Otherwise, the value is the rhs.
    */
-   R value(const DataKey& k) const
+   const R& value(const DataKey& k) const
    {
       return value(number(k));
    }
@@ -288,44 +325,59 @@ public:
    /// Adds \p row to LPRowSetBase.
    void add(DataKey& pkey, const LPRowBase<R>& prow)
    {
-      add(pkey, prow.lhs(), prow.rowVector(), prow.rhs());
+      add(pkey, prow.lhs(), prow.rowVector(), prow.rhs(), prow.obj());
    }
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to LPRowSetBase.
-   void add(R plhs, const SVectorBase<R>& prowVector, R prhs)
+   void add(const R& plhs, const SVectorBase<R>& prowVector, const R& prhs, const R& pobj = 0)
    {
       DataKey k;
-      add(k, plhs, prowVector, prhs);
+      add(k, plhs, prowVector, prhs, pobj);
    }
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to LPRowSetBase.
    template < class S >
-   void add(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
+   void add(const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue, const S* objValue = 0)
    {
+      assert(lhsValue != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rhsValue != 0);
+
       DataKey k;
-      add(k, lhsValue, rowValues, rowIndices, rowSize, rhsValue);
+      add(k, lhsValue, rowValues, rowIndices, rowSize, rhsValue, objValue);
    }
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to
    /// LPRowSetBase, with DataKey \p key.
    template < class S >
-   void add(DataKey& newkey, const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue)
+   void add(DataKey& newkey, const S* lhsValue, const S* rowValues, const int* rowIndices, int rowSize, const S* rhsValue, const S* objValue = 0)
    {
+      assert(lhsValue != 0);
+      assert(rowSize <= 0 || rowValues != 0);
+      assert(rowSize <= 0 || rowIndices != 0);
+      assert(rhsValue != 0);
+
       SVSetBase<R>::add(newkey, rowValues, rowIndices, rowSize);
 
       if( num() > left.dim() )
       {
          left.reDim(num());
          right.reDim(num());
+         object.reDim(num());
       }
 
       left[num() - 1] = *lhsValue;
       right[num() - 1] = *rhsValue;
+      if( objValue != 0 )
+         object[num() - 1] = *objValue;
+      else
+         object[num() - 1] = 0;
    }
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to
    /// LPRowSetBase, with DataKey \p key.
-   void add(DataKey& newkey, R newlhs, const SVectorBase<R>& newrowVector, R newrhs)
+   void add(DataKey& newkey, const R& newlhs, const SVectorBase<R>& newrowVector, const R& newrhs, const R& newobj = 0)
    {
       SVSetBase<R>::add(newkey, newrowVector);
 
@@ -333,10 +385,12 @@ public:
       {
          left.reDim(num());
          right.reDim(num());
+         object.reDim(num());
       }
 
       left[num() - 1] = newlhs;
       right[num() - 1] = newrhs;
+      object[num() - 1] = newobj;
    }
 
    ///
@@ -350,12 +404,14 @@ public:
       {
          left.reDim(num());
          right.reDim(num());
+         object.reDim(num());
       }
 
       for( int j = 0; i < num(); ++i, ++j )
       {
          left[i] = newset.lhs(j);
          right[i] = newset.rhs(j);
+         object[i] = newset.obj(j);
       }
    }
 
@@ -394,24 +450,33 @@ public:
       SVSetBase<R>::add2(rowVector_w(i), n, idx, val);
    }
 
-   /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
-   SVectorBase<R>& create(int pnonzeros = 0, R plhs = 0, R prhs = 1)
+   /// Adds \p n nonzero (\p idx, \p val)-pairs to \p i 'th rowVector.
+   template < class S >
+   void add2(int i, int n, const int idx[], const S val[])
    {
-      DataKey k;
-      return create(k, pnonzeros, plhs, prhs);
+      SVSetBase<R>::add2(rowVector_w(i), n, idx, val);
    }
 
    /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
-   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, R newlhs = 0, R newrhs = 1)
+   SVectorBase<R>& create(int pnonzeros = 0, const R& plhs = 0, const R& prhs = 1, const R& pobj = 0)
+   {
+      DataKey k;
+      return create(k, pnonzeros, plhs, prhs, pobj);
+   }
+
+   /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& newlhs = 0, const R& newrhs = 1, const R& newobj = 0)
    {
       if( num() + 1 > left.dim() )
       {
          left.reDim(num() + 1);
          right.reDim(num() + 1);
+         object.reDim(num() + 1);
       }
 
       left[num()] = newlhs;
       right[num()] = newrhs;
+      object[num()] = newobj;
 
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
@@ -432,8 +497,10 @@ public:
       SVSetBase<R>::remove(i);
       left[i] = left[num()];
       right[i] = right[num()];
+      object[i] = object[num()];
       left.reDim(num());
       right.reDim(num());
+      object.reDim(num());
    }
 
    /// Removes LPRowBase with DataKey \p k.
@@ -455,11 +522,13 @@ public:
          {
             left[perm[i]] = left[i];
             right[perm[i]] = right[i];
+            object[perm[i]] = object[i];
          }
       }
 
       left.reDim (num());
       right.reDim(num());
+      object.reDim(num());
    }
 
    /// Removes \p n LPRowBase%s with row numbers given by \p nums.
@@ -483,11 +552,13 @@ public:
          {
             left[perm[i]] = left[i];
             right[perm[i]] = right[i];
+            object[perm[i]] = object[i];
          }
       }
 
       left.reDim (num());
       right.reDim(num());
+      object.reDim(num());
    }
 
    /// Removes all LPRowBase%s.
@@ -496,6 +567,7 @@ public:
       SVSetBase<R>::clear();
       left.reDim(num());
       right.reDim(num());
+      object.reDim(num());
    }
 
    //@}
@@ -514,6 +586,7 @@ public:
       SVSetBase<R>::reMax(newmax);
       left.reSize (max());
       right.reSize(max());
+      object.reSize(max());
    }
 
    /// Returns number of used nonzero entries.
@@ -553,10 +626,12 @@ public:
 
       if( ldim != right.dim() )
          return MSGinconsistent("LPRowSetBase");
+      if( ldim != object.dim() )
+         return MSGinconsistent("LPRowSetBase");
       if( ldim != num() )
          return MSGinconsistent("LPRowSetBase");
 
-      return left.isConsistent() && right.isConsistent() && SVSetBase<R>::isConsistent();
+      return left.isConsistent() && right.isConsistent() && object.isConsistent() && SVSetBase<R>::isConsistent();
 #else
       return true;
 #endif
@@ -575,7 +650,7 @@ public:
     */
    explicit
    LPRowSetBase<R>(int pmax = -1, int pmemmax = -1)
-      : SVSetBase<R>(pmax, pmemmax), left(0), right(0)
+      : SVSetBase<R>(pmax, pmemmax), left(0), right(0), object(0)
    {
       assert(isConsistent());
    }
@@ -588,6 +663,7 @@ public:
          SVSetBase<R>::operator=(rs);
          left = rs.left;
          right = rs.right;
+         object = rs.object;
 
          assert(isConsistent());
       }
@@ -604,6 +680,7 @@ public:
          SVSetBase<R>::operator=(rs);
          left = rs.left;
          right = rs.right;
+         object = rs.object;
 
          assert(isConsistent());
       }
@@ -616,6 +693,7 @@ public:
       : SVSetBase<R>(rs)
       , left(rs.left)
       , right(rs.right)
+      , object(rs.object)
    {
       assert(isConsistent());
    }
@@ -626,6 +704,7 @@ public:
       : SVSetBase<R>(rs)
       , left(rs.left)
       , right(rs.right)
+      , object(rs.object)
    {
       assert(isConsistent());
    }

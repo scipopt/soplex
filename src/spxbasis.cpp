@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-//#define DEBUGGING 1
 
 #include <assert.h>
 #include <cstdio>
@@ -95,8 +93,7 @@ void SPxBasis::loadMatrixVecs()
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
 
-   MSG_INFO3( spxout << "IBASIS01 loadMatrixVecs() invalidates factorization" 
-                        << std::endl; )
+   MSG_INFO3( (*spxout), (*spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; )
 
    int i;
    nzCount = 0;
@@ -121,7 +118,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
 
    if ( ds.nRows() != theLP->nRows() || ds.nCols() != theLP->nCols() )
    {
-      MSG_DEBUG( spxout << "IBASIS20 Dimension mismatch\n" );
+      MSG_DEBUG( std::cout << "IBASIS20 Dimension mismatch\n" );
       return false;
    }
 
@@ -132,7 +129,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
       {
          if ( ds.rowstat[row] != dualRowStatus(row) )
          {
-            MSG_DEBUG( spxout << "IBASIS21 Basic row " << row << " with incorrect dual status " << dualRowStatus(row) << "\n");
+            MSG_DEBUG( std::cout << "IBASIS21 Basic row " << row << " with incorrect dual status " << dualRowStatus(row) << "\n");
             return false;
          }
       }
@@ -143,7 +140,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
               || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLP::rhs(row) >= infinity)
               || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLP::lhs(row) <= -infinity) )
          {
-            MSG_DEBUG( spxout << "IBASIS22 Nonbasic row with incorrect status: lhs=" << theLP->SPxLP::lhs(row) << ", rhs=" << theLP->SPxLP::rhs(row) << ", stat=" << ds.rowstat[row] << "\n");
+            MSG_DEBUG( std::cout << "IBASIS22 Nonbasic row with incorrect status: lhs=" << theLP->SPxLP::lhs(row) << ", rhs=" << theLP->SPxLP::rhs(row) << ", stat=" << ds.rowstat[row] << "\n");
             return false;
          }
       }
@@ -155,7 +152,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
       {
          if ( ds.colstat[col] !=  dualColStatus(col) )
          {
-            MSG_DEBUG( spxout << "IBASIS23 Basic column " << col << " with incorrect dual status " << ds.colstat[col] << " != " << dualColStatus(col) << "\n");
+            MSG_DEBUG( std::cout << "IBASIS23 Basic column " << col << " with incorrect dual status " << ds.colstat[col] << " != " << dualColStatus(col) << "\n");
             return false;
          }
       }
@@ -166,7 +163,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLP::upper(col) >= infinity)
               || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLP::lower(col) <= -infinity) )
          {
-            MSG_DEBUG( spxout << "IBASIS24 Nonbasic column with incorrect status: lower=" << theLP->SPxLP::lower(col) << ", upper=" << theLP->SPxLP::upper(col) << ", stat=" << ds.colstat[col] << "\n");
+            MSG_DEBUG( std::cout << "IBASIS24 Nonbasic column with incorrect status: lower=" << theLP->SPxLP::lower(col) << ", upper=" << theLP->SPxLP::upper(col) << ", stat=" << ds.colstat[col] << "\n");
             return false;
          }
       }
@@ -174,7 +171,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
 
    if ( basisdim != theLP->nCols() )
    {
-      MSG_DEBUG( spxout << "IBASIS25 Incorrect basis dimension " << basisdim << " != " << theLP->nCols() << "\n" );
+      MSG_DEBUG( std::cout << "IBASIS25 Incorrect basis dimension " << basisdim << " != " << theLP->nCols() << "\n" );
       return false;
    }
 
@@ -199,8 +196,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    int   i;
    int   j;
 
-   MSG_INFO3( spxout << "IBASIS02 loading of Basis invalidates factorization" 
-                        << std::endl; )
+   MSG_INFO3( (*spxout), (*spxout) << "IBASIS02 loading of Basis invalidates factorization" << std::endl; )
 
    lastin      = none;
    lastout     = none;
@@ -228,7 +224,7 @@ void SPxBasis::loadDesc(const Desc& ds)
          thedesc.rowStatus(i) = dualRowStatus(i);
       else if (thedesc.rowStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
       {
-         if (theLP->SPxLP::lhs(i) > -infinity)
+         if (theLP->SPxLP::lhs(i) > -infinity && theLP->SPxLP::maxRowObj(i) < 0.0)
             thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
          else if (theLP->SPxLP::rhs(i) < infinity)
             thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
@@ -313,6 +309,8 @@ void SPxBasis::load(SPxSolver* lp)
    assert(lp != 0);
    theLP = lp;
 
+   setOutstream(*theLP->spxout);
+
    setRep();
 
    addedRows(lp->nRows());
@@ -328,7 +326,9 @@ void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
 
    assert(!freeSlinSolver || factor != 0);
 
-   MSG_INFO3( spxout << "IBASIS03 loading of Solver invalidates factorization" 
+   setOutstream(*p_solver->spxout);
+
+   MSG_INFO3( (*spxout), (*spxout) << "IBASIS03 loading of Solver invalidates factorization"
                         << std::endl; )
 
 
@@ -471,7 +471,9 @@ bool SPxBasis::readBasis(
          if (!strcmp(mps.field1(), "XU"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            if ( theLP->SPxLP::lhs(r) == theLP->SPxLP::rhs(r) )
+            if( theLP->LPRowSet::type(r) == LPRow::GREATER_EQUAL )
+               l_desc.rowstat[r] = Desc::P_ON_LOWER;
+            else if( theLP->LPRowSet::type(r) == LPRow::EQUAL )
                l_desc.rowstat[r] = Desc::P_FIXED;
             else
                l_desc.rowstat[r] = Desc::P_ON_UPPER;
@@ -479,7 +481,9 @@ bool SPxBasis::readBasis(
          else if (!strcmp(mps.field1(), "XL"))
          {
             l_desc.colstat[c] = dualColStatus(c);
-            if ( theLP->SPxLP::lhs(r) == theLP->SPxLP::rhs(r) )
+            if( theLP->LPRowSet::type(r) == LPRow::LESS_EQUAL )
+               l_desc.rowstat[r] = Desc::P_ON_UPPER;
+            else if( theLP->LPRowSet::type(r) == LPRow::EQUAL )
                l_desc.rowstat[r] = Desc::P_FIXED;
             else
                l_desc.rowstat[r] = Desc::P_ON_LOWER;
@@ -590,7 +594,8 @@ static const char* getColName(
 void SPxBasis::writeBasis(
    std::ostream&  os, 
    const NameSet* rowNames, 
-   const NameSet* colNames 
+   const NameSet* colNames,
+   const bool cpxFormat
    ) const
 {
    assert(theLP != 0);
@@ -621,8 +626,12 @@ void SPxBasis::writeBasis(
 
          assert( row != theLP->nRows() );
 
-         os << ( thedesc.rowStatus( row ) == Desc::P_ON_UPPER ? " XU " : " XL " )
-            << std::setw(8) << getColName(theLP, col, colNames, buf);
+         if( thedesc.rowStatus( row ) == Desc::P_ON_UPPER && (!cpxFormat || theLP->LPRowSet::type(row) == LPRow::RANGE) )
+            os << " XU ";
+         else
+            os << " XL ";
+
+         os << std::setw(8) << getColName(theLP, col, colNames, buf);
 
          /* break in two parts since buf is reused */
          os << "       " 
@@ -673,7 +682,7 @@ void SPxBasis::printMatrix() const
 
    for( int i = 0; i < matrix.size(); i++ )
    {
-      spxout << "C" << i << "=" << *matrix[i] << std::endl;
+      std::cout << "C" << i << "=" << *matrix[i] << std::endl;
    }
 }
 
@@ -700,7 +709,7 @@ void SPxBasis::printMatrixMTX(int number)
       {
          int idx = baseVec(i).index(j);
          Real val = baseVec(i).value(j);
-         fprintf(basisfile, "%d %d %.13" "f" "\n",i+1,idx+1,val);
+         fprintf(basisfile, "%d %d %.13" REAL_FORMAT "\n",i+1,idx+1,val);
       }
    }
    fclose (basisfile);
@@ -740,7 +749,7 @@ void SPxBasis::change(
       // relative fill too high ?
       else if (Real(factor->memory()) > lastFill * Real(nzCount))
       {
-         MSG_INFO3( spxout << "IBASIS04 fill factor triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS04 fill factor triggers refactorization"
                               << " memory= " << factor->memory()
                               << " nzCount= " << nzCount
                               << " lastFill= " << lastFill
@@ -751,7 +760,7 @@ void SPxBasis::change(
       // absolute fill too high ?
       else if (nzCount > lastNzCount)
       {
-         MSG_INFO3( spxout << "IBASIS05 nonzero factor triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS05 nonzero factor triggers refactorization"
                               << " nzCount= " << nzCount
                               << " lastNzCount= " << lastNzCount
                               << " nonzeroFactor= " << nonzeroFactor
@@ -761,7 +770,7 @@ void SPxBasis::change(
       // too many updates ?
       else if (updateCount >= maxUpdates)
       {
-         MSG_INFO3( spxout << "IBASIS06 update count triggers refactorization"
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS06 update count triggers refactorization"
                               << " updateCount= " << updateCount
                               << " maxUpdates= " << maxUpdates
                               << std::endl; )
@@ -772,21 +781,21 @@ void SPxBasis::change(
          try
          {
 #ifdef MEASUREUPDATETIME
-            totalUpdateTime.start();
+            theTime.start();
 #endif
             factor->change(i, *enterVec, eta);
             totalUpdateCount++;
 #ifdef MEASUREUPDATETIME
-            totalUpdateTime.stop();
+            theTime.stop();
 #endif
          }
          catch( ... )
          {
-            MSG_INFO3( spxout << "IBASIS13 problems updating factorization; refactorizing basis"
+            MSG_INFO3( (*spxout), (*spxout) << "IBASIS13 problems updating factorization; refactorizing basis"
                << std::endl; )
 
 #ifdef MEASUREUPDATETIME
-            totalUpdateTime.stop();
+            theTime.stop();
 #endif
 
             // singularity was detected in update; we refactorize
@@ -798,23 +807,23 @@ void SPxBasis::change(
             try
             {
 #ifdef MEASUREUPDATETIME
-               totalUpdateTime.start();
+               theTime.start();
 #endif
                factor->change(i, *enterVec, eta);
                totalUpdateCount++;
 #ifdef MEASUREUPDATETIME
-               totalUpdateTime.stop();
+               theTime.stop();
 #endif
             }
             // with a freshly factorized, regular basis, the update is unlikely to fail; if this happens nevertheless,
             // we have to invalidate the basis to have the statuses correct
-            catch( SPxException F )
+            catch( const SPxException& F )
             {
-               MSG_INFO3( spxout << "IBASIS14 problems updating factorization; invalidating factorization"
+               MSG_INFO3( (*spxout), (*spxout) << "IBASIS14 problems updating factorization; invalidating factorization"
                   << std::endl; )
 
 #ifdef MEASUREUPDATETIME
-               totalUpdateTime.stop();
+               theTime.stop();
 #endif
 
                factorized = false;
@@ -826,7 +835,7 @@ void SPxBasis::change(
 
          if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
          {
-            MSG_INFO3( spxout << "IBASIS07 stability triggers refactorization"
+            MSG_INFO3( (*spxout), (*spxout) << "IBASIS07 stability triggers refactorization"
                                  << " stability= " << factor->stability()
                                  << " minStab= " << minStab
                                  << std::endl; )
@@ -870,7 +879,7 @@ void SPxBasis::factorize()
       setStatus(SINGULAR);
       break;
    default :
-      MSG_ERROR( spxout << "EBASIS08 error: unknown status of factorization.\n"; )
+      MSG_ERROR( std::cerr << "EBASIS08 error: unknown status of factorization.\n"; )
       throw SPxInternalCodeException("XBASIS01 This should never happen.");
       // factorized = false;
    }
@@ -1004,7 +1013,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = y.length();
 
       // stop if converged
-      if( abs(norm1 - norm2) < tolerance * norm1 )
+      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^T*y and normalize
@@ -1029,7 +1038,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = x.length();
 
       // stop if converged
-      if( abs(norm1 - norm2) < tolerance * norm1 )
+      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^-T*y and normalize
@@ -1052,19 +1061,17 @@ void SPxBasis::dump()
    int i, basesize;
 
    // Dump regardless of the verbosity level if this method is called.
-   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
-   spxout.setVerbosity( SPxOut::DEBUG );
 
-   spxout << "DBASIS09 Basis entries:";
+   std::cout << "DBASIS09 Basis entries:";
    basesize = 0;
    for (i = 0; i < theLP->nRows(); ++i)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          if(basesize % 10 == 0)
-            spxout << std::endl << "DBASIS10 ";
+            std::cout << std::endl << "DBASIS10 ";
          SPxRowId id = theLP->SPxLP::rId(i);
-         spxout << "\tR" << theLP->number(id);
+         std::cout << "\tR" << theLP->number(id);
          basesize++;
       }
    }
@@ -1074,16 +1081,15 @@ void SPxBasis::dump()
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
          if(basesize % 10 == 0)
-            spxout << std::endl << "DBASIS11 ";
+            std::cout << std::endl << "DBASIS11 ";
          SPxColId id = theLP->SPxLP::cId(i);
-         spxout << "\tC" << theLP->number(id);
+         std::cout << "\tC" << theLP->number(id);
          basesize++;
       }
    }
-   spxout << std::endl;
+   std::cout << std::endl;
 
    assert(basesize == matrix.size());
-   spxout.setVerbosity( tmp_verbosity );
 }
 
 
@@ -1135,7 +1141,7 @@ bool SPxBasis::isConsistent() const
 #endif // CONSISTENCY_CHECKS
 }
 
-SPxBasis::SPxBasis()
+SPxBasis::SPxBasis(Timer::TYPE ttype)
    : theLP (0)
    , matrixIsSetup (false)
    , factor (0)
@@ -1144,13 +1150,23 @@ SPxBasis::SPxBasis()
    , nonzeroFactor(10.0)
    , fillFactor(5.0)
    , iterCount (0)
+   , updateCount(0)
+   , totalUpdateCount(0)
    , nzCount (1)
+   , lastMem(0)
+   , lastFill(0)
+   , lastNzCount(0)
+   , theTime(0)
+   , timerType(ttype)
+   , lastidx(0)
    , minStab(0.0)
    , thestatus (NO_PROBLEM)
    , freeSlinSolver(false)
+   , spxout(0)
 {
-
    // info: is not consistent at this moment, e.g. because theLP == 0
+
+   theTime = TimerFactory::createTimer(timerType);
 }
 
 /**@warning Do not change the LP object.
@@ -1169,15 +1185,21 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , nonzeroFactor(old.nonzeroFactor)
    , fillFactor(old.fillFactor)
    , iterCount(old.iterCount)
+   , updateCount(old.updateCount)
+   , totalUpdateCount(old.totalUpdateCount)
    , nzCount(old.nzCount)
+   , lastMem(old.lastMem)
    , lastFill(old.lastFill)
    , lastNzCount(old.lastNzCount)
+   , theTime(old.theTime)
+   , timerType(old.timerType)
    , lastin(old.lastin)
    , lastout(old.lastout)
    , lastidx(old.lastidx)
    , minStab(old.minStab)
    , thestatus(old.thestatus)
    , thedesc(old.thedesc)
+   , spxout(old.spxout)
 {
 
    this->factor = old.factor->clone();
@@ -1196,6 +1218,8 @@ SPxBasis::~SPxBasis()
       delete factor;
       factor = 0;
    }
+
+   spx_free(theTime);
 }
 
 

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -263,14 +263,14 @@ public:
    }
 
    ///
-   void add(R pobj, R plower, const SVectorBase<R>& pcolVector, R pupper)
+   void add(const R& pobj, const R& plower, const SVectorBase<R>& pcolVector, const R& pupper)
    {
       DataKey k;
       add(k, pobj, plower, pcolVector, pupper);
    }
 
    /// Adds LPColBase consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to LPColSetBase.
-   void add(DataKey& newkey, R obj, R newlower, const SVectorBase<R>& newcolVector, R newupper)
+   void add(DataKey& newkey, const R& obj, const R& newlower, const SVectorBase<R>& newcolVector, const R& newupper)
    {
       SVSetBase<R>::add(newkey, newcolVector);
 
@@ -284,6 +284,33 @@ public:
       low[num() - 1] = newlower;
       up[num() - 1] = newupper;
       object[num() - 1] = obj;
+   }
+
+   /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to LPColSetBase.
+   template < class S >
+   void add(const S* obj, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   {
+      DataKey k;
+      add(k, obj, lowerValue, colValues, colIndices, colSize, upperValue);
+   }
+
+   /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to
+   /// LPColSetBase, with DataKey \p key.
+   template < class S >
+   void add(DataKey& newkey, const S* objValue, const S* lowerValue, const S* colValues, const int* colIndices, int colSize, const S* upperValue)
+   {
+      SVSetBase<R>::add(newkey, colValues, colIndices, colSize);
+
+      if( num() > low.dim() )
+      {
+         low.reDim(num());
+         up.reDim(num());
+         object.reDim(num());
+      }
+
+      low[num() - 1] = *lowerValue;
+      up[num() - 1] = *upperValue;
+      object[num() - 1] = *objValue;
    }
 
    ///
@@ -351,14 +378,14 @@ public:
    }
 
    ///
-   SVectorBase<R>& create(int pnonzeros = 0, R pobj = 1, R plw = 0, R pupp = 1)
+   SVectorBase<R>& create(int pnonzeros = 0, const R& pobj = 1, const R& plw = 0, const R& pupp = 1)
    {
       DataKey k;
       return create(k, pnonzeros, pobj, plw, pupp);
    }
 
    /// Creates new LPColBase with specified arguments and returns a reference to its column vector.
-   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, R obj = 1, R newlow = 0, R newup = 1)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& obj = 1, const R& newlow = 0, const R& newup = 1)
    {
       if( num() + 1 > low.dim() )
       {
