@@ -6513,6 +6513,9 @@ namespace soplex
       _statistics->luFactorizations += _slufactor.getFactorCount();
       _statistics->luSolves += _slufactor.getSolveCount();
       _slufactor.resetCounters();
+
+      _statistics->degenPivotsPrimal += _solver.primalDegeneratePivots();
+      _statistics->degenPivotsDual += _solver.dualDegeneratePivots();
    }
 
 

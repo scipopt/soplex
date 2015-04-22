@@ -964,7 +964,10 @@ bool SPxSolver::leave(int leaveIdx)
             if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
                && leaveStat != SPxBasis::Desc::P_FREE
                && leaveStat != SPxBasis::Desc::D_FREE)
+            {
                m_numCycle++;
+               leaveCycles++;
+            }
          }
          else
             m_numCycle /= 2;

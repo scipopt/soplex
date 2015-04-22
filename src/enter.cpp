@@ -1020,7 +1020,10 @@ bool SPxSolver::enter(SPxId& enterId)
       {
          if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
             && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
+         {
             m_numCycle++;
+            enterCycles++;
+         }
       }
       else
          m_numCycle /= 2;

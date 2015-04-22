@@ -234,13 +234,13 @@ private:
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
 
-   Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
-   Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm
-   Real           theShift;    ///< sum of all shifts applied to any bound.
-   Real           lastShift;   ///< for forcing feasibility.
-   int            m_maxCycle;  ///< maximum steps before cycling is detected.
-   int            m_numCycle;  ///< actual number of degenerate steps so far.
-   bool           initialized; ///< true, if all vectors are setup.
+   Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
+   Real           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
+   Real           theShift;      ///< sum of all shifts applied to any bound.
+   Real           lastShift;     ///< for forcing feasibility.
+   int            m_maxCycle;    ///< maximum steps before cycling is detected.
+   int            m_numCycle;    ///< actual number of degenerate steps so far.
+   bool           initialized;   ///< true, if all vectors are setup.
 
    Vector*        solveVector2;      ///< when 2 systems are to solve at a time
    SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
@@ -332,6 +332,11 @@ protected:
    
    int             boundflips;          ///< number of performed bound flips
    int             totalboundflips;     ///< total number of bound flips
+
+   int            enterCycles;      ///< the number of degenerate steps during the entering algorithm
+   int            leaveCycles;      ///< the number of degenerate steps during the leaving algorithm
+   int            enterDegenCand;   ///< the number of degenerate candidates in the entering algorithm
+   int            leaveDegenCand;   ///< the number of degenerate candidates in the leaving algorithm
 
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
@@ -1828,6 +1833,18 @@ public:
    int boundFlips() const
    {
       return totalboundflips;
+   }
+
+   /// get number of dual degenerate pivots
+   int dualDegeneratePivots()
+   {
+      return (rep() == ROW) ? enterCycles : leaveCycles;
+   }
+
+   /// get number of primal degenerate pivots
+   int primalDegeneratePivots()
+   {
+      return (rep() == ROW) ? leaveCycles : enterCycles;
    }
 
    /// get number of iterations of current solution.

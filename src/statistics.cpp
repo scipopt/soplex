@@ -52,6 +52,15 @@ namespace soplex
       luSolves = 0;
       refinements = 0;
       stallRefinements = 0;
+
+      callsReducedProb = 0;
+      iterationsInit = 0;
+      iterationsRedProb = 0;
+      iterationsCompProb = 0;
+      degenPivotsPrimal = 0;
+      degenPivotsDual = 0;
+      degenPivotCandPrimal = 0;
+      degenPivotCandDual = 0;
    }
 
    /// prints statistics
@@ -115,6 +124,21 @@ namespace soplex
       else
          os << "-\n";
       os << "  Solve time        : " << luSolveTime << "\n";
+
+      os << "Degeneracy          : \n";
+      os << "  Primal Pivots     : " << degenPivotsPrimal << "\n";
+      os << "  Dual Pivots       : " << degenPivotsDual << "\n";
+      os << "  Primal Candidates : " << degenPivotCandPrimal << "\n";
+      os << "  Dual Candidates   : " << degenPivotCandDual << "\n";
+
+      if( iterationsInit > 0 )
+      {
+         os << "Decomp. Iterations  : \n";
+         os << "  Algorithm Iter.   : " << callsReducedProb << "\n";
+         os << "  Initial           : " << iterationsInit << "\n";
+         os << "  Reduced Problem   : " << iterationsRedProb << "\n";
+         os << "  Comp. Problem     : " << iterationsCompProb << "\n";
+      }
    }
 } // namespace soplex
 #endif

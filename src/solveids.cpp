@@ -107,6 +107,9 @@ namespace soplex
          printf("Degeneracy Level: %f, Infeasibility: %f\n", degeneracyLevel, _solver.maxInfeas());
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_idsFeasVector) );
 
+      // updating the algorithm iterations statistic
+      _statistics->callsReducedProb++;
+
       _solver.setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
       _hasBasis = true; // this is probably wrong. Will need to set this properly.
 
@@ -117,6 +120,9 @@ namespace soplex
 
       int prevIterCount = 0;
 
+      // setting the verbosity level
+      const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
+      spxout.setVerbosity( SPxOut::ERROR );
 
       // creating copies of the original problem that will be manipulated to form the reduced and complementary
       // problems.
@@ -156,6 +162,11 @@ namespace soplex
          printf("\n");
          _hasBasis = hasRedBasis;
          _idsSimplifyAndSolve(_solver, _slufactor, !i, !i);
+
+         // updating the algorithm iterations statistics
+         _statistics->callsReducedProb++;
+
+
          assert(_isRealLPLoaded);
          hasRedBasis = _hasBasis;
          _hasBasis = false;
@@ -255,6 +266,9 @@ namespace soplex
 
          // Need to add commands to multiply the objective solution values by -1
       }
+
+      // resetting the verbosity level
+      spxout.setVerbosity( orig_verbosity );
 
       spx_free(_idsCompProbColIDsIdx);
       spx_free(_idsCompProbRowIDsIdx);
@@ -611,8 +625,9 @@ namespace soplex
          _statistics->simplexTime.stop();
 
          // record statistics
-         // only record statistics for the original problem and reduced problem.
+         // only record the main statistics for the original problem and reduced problem.
          // the complementary problem is a pivoting rule, so these will be held in other statistics.
+         // statistics on the number of iterations for each problem is stored in individual variables.
          if( _currentProb == IDS_ORIG || _currentProb == IDS_RED )
          {
             _statistics->iterations += solver.iterations();
@@ -624,7 +639,19 @@ namespace soplex
             _statistics->luFactorizations += sluFactor.getFactorCount();
             _statistics->luSolves += sluFactor.getSolveCount();
             sluFactor.resetCounters();
+
+            _statistics->degenPivotsPrimal += solver.primalDegeneratePivots();
+            _statistics->degenPivotsDual += solver.dualDegeneratePivots();
+
+            if( _currentProb == IDS_ORIG )
+               _statistics->iterationsInit += solver.iterations();
+            else
+               _statistics->iterationsRedProb += solver.iterations();
          }
+
+         if( _currentProb == IDS_COMP )
+            _statistics->iterationsCompProb += solver.iterations();
+
       }
 
       // check the result and run again without preprocessing if necessary

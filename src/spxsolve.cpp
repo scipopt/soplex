@@ -169,6 +169,8 @@ SPxSolver::Status SPxSolver::solve()
    primalCount = 0;
    boundflips = 0;
    totalboundflips = 0;
+   enterCycles = 0;
+   leaveCycles = 0;
 
    stallNumRecovers = 0;
 
@@ -497,8 +499,6 @@ SPxSolver::Status SPxSolver::solve()
             init();
             thepricer->setType(type());
             theratiotester->setType(type());
-
-            printf("Switching to LEAVE\n");
          }
       }
       else
@@ -800,8 +800,6 @@ SPxSolver::Status SPxSolver::solve()
             init();
             thepricer->setType(type());
             theratiotester->setType(type());
-
-            printf("Switching to ENTER\n");
          }
       }
       assert(m_status != SINGULAR);
