@@ -111,6 +111,8 @@ namespace soplex
       int iterationsInit;        ///< number of iterations in the initial LP
       int iterationsRedProb;     ///< number of iterations of the reduced problem
       int iterationsCompProb;    ///< number of iterations of the complementary problem
+      int numRedProbRows;        ///< number of rows in the reduced problem
+      int numRedProbCols;        ///< number of columns in the reduced problem
       int degenPivotsPrimal;     ///< number of primal degenerate pivots
       int degenPivotsDual;       ///< number of dual degenerate pivots
       int degenPivotCandPrimal;  ///< number of pivoting candidates that will produce a degenerate step in the primal

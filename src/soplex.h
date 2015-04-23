@@ -1445,6 +1445,12 @@ private:
       IS_FREE
    };
 
+   struct idxList
+   {
+      int      idx;
+      idxList* prevIdx;
+   };
+
    SPxSolver _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
                           // problem will be stored in _solver and the complementary problem will be stored in
@@ -1481,7 +1487,12 @@ private:
    int _nDualRows;         // the number of dual rows in the complementary problem. NOTE: _nPrimalRows = _nDualCols
    int _nDualCols;         // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
 
+   idxList* _elimRedProbRows; // a linked list containing the rows eliminated from the reduced problem
+
+   int _idsDisplayLine;     // the count for the display line
+
    // Statistic information
+   int numIncludedRows;    // the number of rows currently included in the reduced problem.
    int numIdsIter;         // the number of iterations of the improved dual simplex algorithm.
    int numRedProbIter;     // the number of simplex iterations performed in the reduced problem.
    int numCompProbIter;    // the number of iterations of the complementary problem.
@@ -1907,6 +1918,9 @@ private:
 
    /// returns the expected sign of the dual variables for the original problem
    DualSign getOrigProbDualVariableSign(int rowNumber);
+
+   /// prints a display line of the flying table for the IDS
+   void printIdsDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
 
    //@}
 };

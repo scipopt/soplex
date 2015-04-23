@@ -2364,7 +2364,6 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
 
    // setting the dual row ids for the related primal cols.
    // this assumes that the rows are added in sequential order.
-   printf("Number of primal indicies: %d\n", primalcolsidx);
    for( int i = 0; i < primalcolsidx; i++ )
       dualRowIds[i] = dualLP.rId(i);
 

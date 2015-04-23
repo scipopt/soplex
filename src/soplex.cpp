@@ -145,13 +145,13 @@ namespace soplex
             _boolParamDescription[SoPlex::RATFAC] = "should a rational factorization be performed after iterative refinement?";
             _boolParamDefault[SoPlex::RATFAC] = true;
 
-            // should cycling solutions be accepted during iterative refinement?
             // should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
             // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
             _boolParamName[SoPlex::USEIMPROVEDDUALSIMPLEX] = "improveddualsimplex";
             _boolParamDescription[SoPlex::USEIMPROVEDDUALSIMPLEX] = "should the improved dual simplex be used to solve the LP?";
-            _boolParamDefault[SoPlex::USEIMPROVEDDUALSIMPLEX] = true;
+            _boolParamDefault[SoPlex::USEIMPROVEDDUALSIMPLEX] = false;
 
+            // should cycling solutions be accepted during iterative refinement?
             _boolParamName[SoPlex::ACCEPTCYCLING] = "acceptcycling";
             _boolParamDescription[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
             _boolParamDefault[SoPlex::ACCEPTCYCLING] = false;
@@ -2709,7 +2709,7 @@ namespace soplex
       {
          setIntParam(SoPlex::SOLVEMODE, SOLVEMODE_REAL);
          setIntParam(SoPlex::REPRESENTATION, REPRESENTATION_ROW);
-         setIntParam(SoPlex::ALGORITHM, ALGORITHM_LEAVE);
+         setIntParam(SoPlex::ALGORITHM, ALGORITHM_DUAL);
 
          _solveImprovedDualSimplex();
       }
@@ -4895,6 +4895,8 @@ namespace soplex
       case TESTDUALINF:
          break;
       case RATFAC:
+         break;
+      case USEIMPROVEDDUALSIMPLEX:
          break;
       case ACCEPTCYCLING:
          break;

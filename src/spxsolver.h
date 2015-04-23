@@ -652,7 +652,7 @@ public:
    virtual Status getDualfarkas (Vector& vector) const;
 
    /// print display line of flying table
-   virtual void printDisplayLine(const bool force = false);
+   virtual void printDisplayLine(const bool force = false, const bool forceHead = false);
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
@@ -746,6 +746,13 @@ public:
    {
       displayFreq = freq;
    }
+
+   /// get display frequency
+   int getDisplayFreq()
+   {
+      return displayFreq;
+   }
+
    // enable sparse pricing when viols < fac * dim()
    void setSparsePricingFactor(Real fac)
    {

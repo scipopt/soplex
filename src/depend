@@ -134,23 +134,14 @@ $(LIBOBJDIR)/slufactor.o: src/slufactor.cpp src/spxdefines.h src/slufactor.h \
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/vector.h src/slinsolver.h src/svector.h src/ssvector.h \
  src/dsvector.h src/didxset.h src/clufactor.h src/cring.h
-$(LIBOBJDIR)/slufactor_rational.o: src/slufactor_rational.cpp src/spxdefines.h \
- src/slufactor_rational.h src/timerfactory.h src/spxalloc.h src/spxout.h \
- src/exceptions.h src/notimer.h src/timer.h src/usertimer.h \
- src/wallclocktimer.h src/dvector.h src/basevectors.h src/rational.h \
- src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
- src/ssvectorbase.h src/idxset.h src/svectorbase.h src/dsvectorbase.h \
- src/unitvectorbase.h src/svsetbase.h src/classarray.h src/dataset.h \
- src/dataarray.h src/datakey.h src/vector.h src/slinsolver_rational.h \
- src/svector.h src/ssvector.h src/dsvector.h src/didxset.h \
- src/clufactor_rational.h src/cring.h
 $(LIBOBJDIR)/solveids.o: src/solveids.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/ssvectorbase.h src/idxset.h src/svectorbase.h \
- src/dsvectorbase.h src/svsetbase.h src/classarray.h src/dataset.h \
- src/dataarray.h src/datakey.h src/spxsolver.h src/timer.h src/spxlp.h \
- src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
+ src/dsvectorbase.h src/unitvectorbase.h src/svsetbase.h src/classarray.h \
+ src/dataset.h src/dataarray.h src/datakey.h src/spxsolver.h src/timer.h \
+ src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
+ src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
  src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
@@ -164,6 +155,16 @@ $(LIBOBJDIR)/solveids.o: src/solveids.cpp src/soplex.h src/spxdefines.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h src/statistics.h
+$(LIBOBJDIR)/slufactor_rational.o: src/slufactor_rational.cpp src/spxdefines.h \
+ src/slufactor_rational.h src/timerfactory.h src/spxalloc.h src/spxout.h \
+ src/exceptions.h src/notimer.h src/timer.h src/usertimer.h \
+ src/wallclocktimer.h src/dvector.h src/basevectors.h src/rational.h \
+ src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
+ src/ssvectorbase.h src/idxset.h src/svectorbase.h src/dsvectorbase.h \
+ src/unitvectorbase.h src/svsetbase.h src/classarray.h src/dataset.h \
+ src/dataarray.h src/datakey.h src/vector.h src/slinsolver_rational.h \
+ src/svector.h src/ssvector.h src/dsvector.h src/didxset.h \
+ src/clufactor_rational.h src/cring.h
 $(LIBOBJDIR)/solverational.o: src/solverational.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \

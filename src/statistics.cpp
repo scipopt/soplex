@@ -76,6 +76,8 @@ namespace soplex
       iterationsInit = 0;
       iterationsRedProb = 0;
       iterationsCompProb = 0;
+      numRedProbRows = 0;
+      numRedProbCols = 0;
       degenPivotsPrimal = 0;
       degenPivotsDual = 0;
       degenPivotCandPrimal = 0;
@@ -170,6 +172,7 @@ namespace soplex
          os << "  Initial           : " << iterationsInit << "\n";
          os << "  Reduced Problem   : " << iterationsRedProb << "\n";
          os << "  Comp. Problem     : " << iterationsCompProb << "\n";
+         os << "Red. Problem Size   : \n";
       }
    }
 } // namespace soplex

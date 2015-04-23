@@ -1076,14 +1076,14 @@ void SPxSolver::testVecs()
 
 
 /// print display line of flying table
-void SPxSolver::printDisplayLine(const bool force)
+void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
 {
    MSG_INFO1( (*spxout),
-      if( displayLine % (displayFreq*30) == 0 )
+      if( forceHead || displayLine % (displayFreq*30) == 0 )
       {
          (*spxout) << "type |   time |   iters | facts |  shift   |    value\n";
       }
-      if( force || (displayLine % displayFreq == 0) )
+      if( (force || (displayLine % displayFreq == 0)) && !forceHead )
       {
          (type() == LEAVE) ? (*spxout) << "  L  |" : (*spxout) << "  E  |";
          (*spxout) << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";

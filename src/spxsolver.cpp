@@ -988,6 +988,7 @@ SPxSolver::~SPxSolver()
    }
 
    // free timer
+   assert(theTime);
    theTime->~Timer();
    spx_free(theTime);
 }

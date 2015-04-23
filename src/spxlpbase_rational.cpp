@@ -2294,7 +2294,7 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
       SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols)
 {
    assert(false);
-   MSG_ERROR( spxout << "Method buildDualProblem() not implemented for Rational\n" );
+   MSG_ERROR( std::cerr << "Method buildDualProblem() not implemented for Rational\n" );
 }
 
 

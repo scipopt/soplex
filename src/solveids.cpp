@@ -36,7 +36,6 @@
 namespace soplex
 {
 
-
    /// solves LP using the improved dual simplex
    void SoPlex::_solveImprovedDualSimplex()
    {
@@ -44,7 +43,7 @@ namespace soplex
       assert(_solver.type() == SPxSolver::LEAVE);
 
       // start timing
-      _statistics->solvingTime.start();
+      _statistics->solvingTime->start();
 
       //@todo Need to check this. Where will the solving of the IDS take place? In the SoPlex::solve, _solvereal or
       //_solverational?
@@ -101,10 +100,9 @@ namespace soplex
             _storeSolutionReal();
 
             // stop timing
-            _statistics->solvingTime.stop();
+            _statistics->solvingTime->stop();
             return;
          }
-         printf("Degeneracy Level: %f, Infeasibility: %f\n", degeneracyLevel, _solver.maxInfeas());
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_idsFeasVector) );
 
       // updating the algorithm iterations statistic
@@ -118,7 +116,14 @@ namespace soplex
       numRedProbIter = _solver.iterations();
       numCompProbIter = 0;
 
-      int prevIterCount = 0;
+      // setting the display information
+      _idsDisplayLine = 0;
+
+      MSG_INFO1( spxout,
+         spxout << "========      Degeneracy Detected       ========" << std::endl;
+         spxout << std::endl;
+         spxout << "======== Commencing decomposition solve ========" << std::endl;
+         );
 
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
@@ -141,7 +146,7 @@ namespace soplex
       _solver.writeFile("reduced.lp");
 #endif
 
-      //#ifdef SOLVEIDS_DEBUG
+#ifdef SOLVEIDS_DEBUG
          printf("Reduced Prob Rows: ");
          for( int j = 0; j < numRowsReal(); j++ )
          {
@@ -149,19 +154,24 @@ namespace soplex
                printf("%d ", j);
          }
          printf("\n");
-         //#endif
+#endif
 
          // setting the current solving mode.
          _currentProb = IDS_RED;
 
          // solve the reduced problem
+#ifdef SOLVEIDS_DEBUG
          printf("\n");
          printf("=========================\n");
          printf("Solving: Reduced Problem.\n");
          printf("=========================\n");
          printf("\n");
+#endif
          _hasBasis = hasRedBasis;
          _idsSimplifyAndSolve(_solver, _slufactor, !i, !i);
+
+         // printing display line
+         printIdsDisplayLine(_solver, orig_verbosity, !i, !i);
 
          // updating the algorithm iterations statistics
          _statistics->callsReducedProb++;
@@ -170,11 +180,6 @@ namespace soplex
          assert(_isRealLPLoaded);
          hasRedBasis = _hasBasis;
          _hasBasis = false;
-
-         // updating the iteration counter
-         numRedProbIter += (_statistics->iterations - prevIterCount);
-         prevIterCount = _statistics->iterations;
-
 
          if( _solver.status() > SPxSolver::OPTIMAL )
             break;
@@ -202,17 +207,15 @@ namespace soplex
          _currentProb = IDS_COMP;
 
          // solve the complementary problem
+#ifdef SOLVEIDS_DEBUG
          printf("\n");
          printf("===============================\n");
          printf("Solving: Complementary Problem.\n");
          printf("===============================\n");
          printf("\n");
+#endif
          _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
          assert(_isRealLPLoaded);
-
-         // updating the iteration counter
-         numCompProbIter += (_statistics->iterations - prevIterCount);
-         prevIterCount = _statistics->iterations;
 
 #ifdef SOLVEIDS_DEBUG
          printf("Iteration %d Objective Value: %f\n", i, _compSolver.objValue());
@@ -270,27 +273,42 @@ namespace soplex
       // resetting the verbosity level
       spxout.setVerbosity( orig_verbosity );
 
+      MSG_INFO1( spxout,
+         spxout << "========  Decomposition solve completed ========" << std::endl;
+         spxout << std::endl;
+         spxout << "========   Resolving original problem   ========" << std::endl;
+         );
+
+      // freeing the eliminated rows list
+      while (_elimRedProbRows != NULL)
+      {
+         idxList* currIdx = _elimRedProbRows;
+         _elimRedProbRows = currIdx->prevIdx;
+         spx_free(currIdx);
+      }
+
       spx_free(_idsCompProbColIDsIdx);
       spx_free(_idsCompProbRowIDsIdx);
       spx_free(_fixedOrigVars);
+      spx_free(_idsReducedProbCols);
+      spx_free(_idsReducedProbRows);
 
       // resolving the problem to update the real lp and solve with the correct objective.
       _realLP->~SPxLPReal();
       spx_free(_realLP);
       _realLP = &_solver;
       _isRealLPLoaded = true;
-      _preprocessAndSolveReal(false);
 
-      // printing the statistics
-      printf("Number of algorithm iterations: %d\n", numIdsIter);
-      printf("Number of Reduced Problem simplex iterations: %d\n", numRedProbIter);
-      printf("Number of Complementary Problem simplex iterations: %d\n", numCompProbIter);
+      // printing display line for resolve of problem
+      _solver.printDisplayLine(false, true);
+
+      _preprocessAndSolveReal(false);
 
       // storing the solution from the reduced problem
       _storeSolutionReal();
 
       // stop timing
-      _statistics->solvingTime.stop();
+      _statistics->solvingTime->stop();
    }
 
 
@@ -305,6 +323,9 @@ namespace soplex
       spx_alloc(_realLP);
       _realLP = new (_realLP) SPxLPIds(_solver);
 
+      // initialising the eliminated rows list
+      _elimRedProbRows = NULL;
+
       // allocating memory for the reduced problem rows and cols flag array
       _idsReducedProbRows = 0;
       spx_alloc(_idsReducedProbRows, numRowsReal());
@@ -314,7 +335,13 @@ namespace soplex
       // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
       // a positive reduced cost.
       _compSolver = _solver;
+      //_compSolver.reLoad();
+      _compSolver.setOutstream(spxout);
       _compSolver.setSolver(&_compSlufactor);
+      //_compSolver.loadLP(*_realLP);
+      //_compSolver.loadBasis(_solver.basis().desc());
+
+      //_idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
    }
 
 
@@ -398,6 +425,23 @@ namespace soplex
 
       for( int i = 0; i < ncompatboundcons; i++ )
          _idsReducedProbColRowIDs[compatboundcons[i]] = addedrowids[i];
+
+
+      // extracting the rows not contained in the reduced problem
+      numIncludedRows = 0;
+      for( int j = 0; j < numRowsReal(); j++ )
+      {
+         if( !_idsReducedProbRows[j] )
+         {
+            idxList* newRow = 0;
+            spx_alloc(newRow);
+            newRow->idx = j;
+            newRow->prevIdx = _elimRedProbRows;
+            _elimRedProbRows = newRow;
+         }
+         else
+            numIncludedRows++;
+      }
 
       // freeing allocated memory
       spx_free(addedrowids);
@@ -513,7 +557,7 @@ namespace soplex
    /// simplifies the problem and solves
    void SoPlex::_idsSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing)
    {
-      _statistics->preprocessingTime.start();
+      _statistics->preprocessingTime->start();
 
       SPxSimplifier::Result result = SPxSimplifier::OKAY;
 
@@ -610,7 +654,7 @@ namespace soplex
          solver.changeObjOffset(_simplifier->getObjoffset());
       }
 
-      _statistics->preprocessingTime.stop();
+      _statistics->preprocessingTime->stop();
 
       // run the simplex method if problem has not been solved by the simplifier
       if( result == SPxSimplifier::OKAY )
@@ -620,9 +664,9 @@ namespace soplex
 
          bool _hadBasis = _hasBasis;
 
-         _statistics->simplexTime.start();
+         _statistics->simplexTime->start();
          solver.solve();
-         _statistics->simplexTime.stop();
+         _statistics->simplexTime->stop();
 
          // record statistics
          // only record the main statistics for the original problem and reduced problem.
@@ -634,10 +678,10 @@ namespace soplex
             _statistics->iterationsPrimal += solver.primalIterations();
             _statistics->iterationsFromBasis += _hadBasis ? solver.iterations() : 0;
             _statistics->boundflips += solver.boundFlips();
-            _statistics->luFactorizationTime += sluFactor.getFactorTime();
-            _statistics->luSolveTime += sluFactor.getSolveTime();
-            _statistics->luFactorizations += sluFactor.getFactorCount();
-            _statistics->luSolves += sluFactor.getSolveCount();
+            _statistics->luFactorizationTimeReal += sluFactor.getFactorTime();
+            _statistics->luSolveTimeReal += sluFactor.getSolveTime();
+            _statistics->luFactorizationsReal += sluFactor.getFactorCount();
+            _statistics->luSolvesReal += sluFactor.getSolveCount();
             sluFactor.resetCounters();
 
             _statistics->degenPivotsPrimal += solver.primalDegeneratePivots();
@@ -746,8 +790,6 @@ namespace soplex
    void SoPlex::_updateIdsReducedProblem(Real objValue, DVector dualVector, DVector redcostVector,
          DVector compPrimalVector)
    {
-      printf("_updateIdsReducedProblem\n");
-
       Real feastol = realParam(SoPlex::FEASTOL);
 
       Real maxDualRatio = infinity;
@@ -969,6 +1011,31 @@ namespace soplex
 
       for( int i = 0; i < nnewrowidx; i++ )
          _idsReducedProbRowIDs[newrowidx[i]] = addedrowids[i];
+
+      // updating the eliminated rows list
+      idxList* currIdx = _elimRedProbRows;
+      while( currIdx != NULL && _idsReducedProbRows[currIdx->idx])
+      {
+         _elimRedProbRows = currIdx->prevIdx;
+         spx_free(currIdx);
+         currIdx = _elimRedProbRows;
+         numIncludedRows++;
+      }
+
+      idxList* prevIdx = currIdx->prevIdx;
+      while( prevIdx != NULL )
+      {
+         if( _idsReducedProbRows[prevIdx->idx] )
+         {
+            currIdx->prevIdx = prevIdx->prevIdx;
+            spx_free(prevIdx);
+            numIncludedRows++;
+         }
+         else
+            currIdx = prevIdx;
+
+         prevIdx = currIdx->prevIdx;
+      }
 
       // freeing allocated memory
       spx_free(addedrowids);
@@ -2235,6 +2302,47 @@ namespace soplex
 
       return IS_FREE;
    }
+
+
+   /// print display line of flying table
+   void SoPlex::printIdsDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead)
+   {
+      // setting the verbosity level
+      const SPxOut::Verbosity currVerb = spxout.getVerbosity();
+      spxout.setVerbosity( origVerb );
+
+      int displayFreq = solver.getDisplayFreq();
+
+      MSG_INFO1( spxout,
+         if( forceHead || (_idsDisplayLine % (displayFreq*30) == 0) )
+         {
+            spxout << "type |   time |   iters | red iter | alg iter |     rows |     cols |  shift   |    value\n";
+         }
+         if( force || (_idsDisplayLine % displayFreq == 0) )
+         {
+            (solver.type() == SPxSolver::LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
+            spxout << std::fixed << std::setw(7) << std::setprecision(1) << solver.time() << " |";
+            spxout << std::scientific << std::setprecision(2);
+            spxout << std::setw(8) << _statistics->iterations << " | ";
+            spxout << std::scientific << std::setprecision(2);
+            spxout << std::setw(8) << solver.iterations() << " | ";
+            spxout << std::scientific << std::setprecision(2);
+            spxout << std::setw(8) << _statistics->callsReducedProb << " | ";
+            spxout << std::scientific << std::setprecision(2);
+            spxout << std::setw(8) << numIncludedRows << " | ";
+            spxout << std::scientific << std::setprecision(2);
+            spxout << std::setw(8) << solver.nCols() << " | "
+            << solver.shift() << " | "
+            << std::setprecision(8) << solver.value() + solver.objOffset()
+            << std::endl;
+
+         }
+         _idsDisplayLine++;
+      );
+
+      spxout.setVerbosity( currVerb );
+   }
+
 
 } // namespace soplex
 #endif

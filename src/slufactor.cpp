@@ -502,6 +502,9 @@ void SLUFactor::assign(const SLUFactor& old)
 {
    spxout = old.spxout;
 
+   solveTime = TimerFactory::createTimer(old.solveTime->type());
+   factorTime = TimerFactory::createTimer(old.factorTime->type());
+
    // slufactor
    uptype        = old.uptype;
    minThreshold  = old.minThreshold;
@@ -934,9 +937,12 @@ void SLUFactor::freeAll()
    if(l.rbeg) spx_free(l.rbeg);
    if(l.rorig) spx_free(l.rorig);
    if(l.rperm) spx_free(l.rperm);
-  
-   spx_free(solveTime);
-   spx_free(factorTime);
+ 
+   if (solveTime)
+      spx_free(solveTime);
+
+   if (factorTime)
+      spx_free(factorTime);
 }
 
 SLUFactor::~SLUFactor()
