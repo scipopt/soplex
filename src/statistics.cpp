@@ -37,6 +37,54 @@ namespace soplex
       clearAllData();
    }
 
+   /// copy constructor
+   SoPlex::Statistics::Statistics(const Statistics& base)
+   {
+      timerType = base.timerType;
+      readingTime = TimerFactory::createTimer(timerType);
+      solvingTime = TimerFactory::createTimer(timerType);
+      preprocessingTime = TimerFactory::createTimer(timerType);
+      simplexTime = TimerFactory::createTimer(timerType);
+      syncTime = TimerFactory::createTimer(timerType);
+      transformTime = TimerFactory::createTimer(timerType);
+      rationalTime = TimerFactory::createTimer(timerType);
+      reconstructionTime = TimerFactory::createTimer(timerType);
+      clearAllData();
+   }
+
+   /// assignment operator
+   SoPlex::Statistics& SoPlex::Statistics::operator=(const Statistics &rhs)
+   {
+      *readingTime = *(rhs.readingTime);
+      *solvingTime = *(rhs.solvingTime);
+      *preprocessingTime = *(rhs.preprocessingTime);
+      *simplexTime = *(rhs.simplexTime);
+      *syncTime = *(rhs.syncTime);
+      *transformTime = *(rhs.transformTime);
+      *rationalTime = *(rhs.rationalTime);
+      *reconstructionTime = *(rhs.reconstructionTime);
+      timerType = rhs.timerType;
+      luFactorizationTimeReal = rhs.luFactorizationTimeReal;
+      luSolveTimeReal = rhs.luSolveTimeReal;
+      luFactorizationTimeRational = rhs.luFactorizationTimeRational;
+      luSolveTimeRational = rhs.luSolveTimeRational;
+      iterations = rhs.iterations;
+      iterationsPrimal = rhs.iterationsPrimal;
+      iterationsFromBasis = rhs.iterationsFromBasis;
+      boundflips = rhs.boundflips;
+      luFactorizationsReal = rhs.luFactorizationsReal;
+      luSolvesReal = rhs.luSolvesReal;
+      luFactorizationsRational = rhs.luFactorizationsRational;
+      rationalReconstructions = rhs.rationalReconstructions;
+      refinements = rhs.refinements;
+      stallRefinements = rhs.stallRefinements;
+      pivotRefinements = rhs.pivotRefinements;
+      feasRefinements = rhs.feasRefinements;
+      unbdRefinements = rhs.unbdRefinements;
+
+      return *this;
+   }
+
    /// clears all statistics
    void SoPlex::Statistics::clearAllData()
    {

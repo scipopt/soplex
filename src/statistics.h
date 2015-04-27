@@ -42,6 +42,12 @@ namespace soplex
       /// default constructor
       Statistics(Timer::TYPE ttype = Timer::USER_TIME);
 
+      /// copy constructor
+      Statistics(const Statistics& base);
+
+      /// assignment operator
+      Statistics& operator=(const Statistics& rhs);
+
       /// destructor
       ~Statistics()
       {

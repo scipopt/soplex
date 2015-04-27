@@ -39,10 +39,12 @@ namespace soplex
       spx_free(m_streams);
    }
 
-   SPxOut& SPxOut::operator =(const SPxOut& base)
+   SPxOut& SPxOut::operator=(const SPxOut& base)
    {
       m_verbosity = base.m_verbosity;
-      m_streams = base.m_streams;
+
+      for ( int i = DEBUG; i <= INFO3; ++i )
+         m_streams[ i ] = base.m_streams[ i ];
 
       return *this;
    }

@@ -637,6 +637,16 @@ namespace soplex
          if( rhs._hasSolRational )
             _solRational = rhs._solRational;
 
+         // set message handlers in members
+         _solver.setOutstream(spxout);
+         _scalerUniequi.setOutstream(spxout);
+         _scalerBiequi.setOutstream(spxout);
+         _scalerGeo1.setOutstream(spxout);
+         _scalerGeo8.setOutstream(spxout);
+
+         // transfer the lu solver
+         _solver.setSolver(&_slufactor);
+
          // initialize pointers for simplifier, scaler, and starter
          setIntParam(SoPlex::SIMPLIFIER, intParam(SoPlex::SIMPLIFIER), true, true);
          setIntParam(SoPlex::SCALER, intParam(SoPlex::SCALER), true, true);

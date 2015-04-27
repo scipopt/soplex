@@ -111,7 +111,6 @@ public:
    /// copy constructor
    SPxSimplifier( const SPxSimplifier& old)
       : m_name(old.m_name)
-      , m_timeUsed(old.m_timeUsed)
       , m_timerType(old.m_timerType)
       , m_remRows(old.m_remRows)
       , m_remCols(old.m_remCols)
@@ -123,6 +122,7 @@ public:
       , m_objoffset(old.m_objoffset)
       , spxout(old.spxout)
    {
+      m_timeUsed = TimerFactory::createTimer(m_timerType);
       assert(isConsistent());
    }
    /// assignment operator
@@ -131,7 +131,7 @@ public:
       if(this != &rhs)
       {
          m_name = rhs.m_name;
-         m_timeUsed = rhs.m_timeUsed;
+         *m_timeUsed = *(rhs.m_timeUsed);
          m_timerType = rhs.m_timerType;
          m_remRows = rhs.m_remRows;
          m_remCols = rhs.m_remCols;
@@ -152,6 +152,7 @@ public:
    virtual ~SPxSimplifier()
    {
       m_name = 0;
+      m_timeUsed->~Timer();
       spx_free(m_timeUsed);
    }
    /// clone function for polymorphism
