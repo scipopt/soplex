@@ -1440,15 +1440,9 @@ private:
    // the expected sign of the dual variables.
    enum DualSign
    {
-      IS_POS,
-      IS_NEG,
-      IS_FREE
-   };
-
-   struct idxList
-   {
-      int      idx;
-      idxList* prevIdx;
+      IS_POS = 0,
+      IS_NEG = 1,
+      IS_FREE = 2
    };
 
    SPxSolver _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
@@ -1487,8 +1481,6 @@ private:
    int _nDualRows;         // the number of dual rows in the complementary problem. NOTE: _nPrimalRows = _nDualCols
    int _nDualCols;         // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
 
-   idxList* _elimRedProbRows; // a linked list containing the rows eliminated from the reduced problem
-
    int _idsDisplayLine;     // the count for the display line
 
    // Statistic information
@@ -1496,6 +1488,24 @@ private:
    int numIdsIter;         // the number of iterations of the improved dual simplex algorithm.
    int numRedProbIter;     // the number of simplex iterations performed in the reduced problem.
    int numCompProbIter;    // the number of iterations of the complementary problem.
+
+   // problem statistics
+   int numProbRows;
+   int numProbCols;
+   int numNonzeros;
+   Real minAbsNonzero;
+   Real maxAbsNonzero;
+
+   int origCountLower;
+   int origCountUpper;
+   int origCountBoxed;
+   int origCountFreeCol;
+
+   int origCountLhs;
+   int origCountRhs;
+   int origCountRanged;
+   int origCountFreeRow;
+
 
    idsStatus _currentProb;
 
@@ -1889,6 +1899,9 @@ private:
    /// update the reduced problem with additional columns and rows
    void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector);
 
+   /// builds the update rows with those violated in the complmentary problem
+   void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
+
    /// update the dual complementary problem with additional columns and rows
    void _updateIdsComplementaryProblem(DVector dualVector);
 
@@ -1921,6 +1934,15 @@ private:
 
    /// prints a display line of the flying table for the IDS
    void printIdsDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
+
+   /// stores the problem statistics of the original problem
+   void getOriginalProblemStatistics();
+
+   /// stores the problem statistics of the original problem
+   void printOriginalProblemStatistics(std::ostream& os);
+
+   /// gets the coefficient of the slack variable in the primal complementary problem
+   Real getCompSlackVarCoeff(int primalRowNum);
 
    //@}
 };

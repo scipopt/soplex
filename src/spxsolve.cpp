@@ -1091,8 +1091,10 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          (*spxout) << std::setw(8) << iteration() << " | "
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
-         << std::setprecision(8) << value() + objOffset()
-         << std::endl;
+         << std::setprecision(8) << value() + objOffset();
+         if( getStartingIdsBasis )
+            (*spxout) << " (" << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
+         (*spxout) << std::endl;
       }
       displayLine++;
    );

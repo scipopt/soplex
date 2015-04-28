@@ -5895,10 +5895,15 @@ namespace soplex
       printStatus(os, _status);
 
       os << "Original problem    : \n";
-      if( intParam(SoPlex::READMODE) == READMODE_REAL )
-         _realLP->printProblemStatistics(os);
+      if ( boolParam(SoPlex::USEIMPROVEDDUALSIMPLEX) )
+         printOriginalProblemStatistics(os);
       else
-         _rationalLP->printProblemStatistics(os);
+      {
+         if( intParam(SoPlex::READMODE) == READMODE_REAL )
+            _realLP->printProblemStatistics(os);
+         else
+            _rationalLP->printProblemStatistics(os);
+      }
 
       os << "Objective sense     : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
       printSolutionStatistics(os);

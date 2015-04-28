@@ -158,7 +158,7 @@ namespace soplex
 
       os << "Rat. reconstructions: " << rationalReconstructions << "\n"
          << "  Rat. rec. time    : " << reconstructionTime->time() << "\n";
-         
+
       os << "Degeneracy          : \n";
       os << "  Primal Pivots     : " << degenPivotsPrimal << "\n";
       os << "  Dual Pivots       : " << degenPivotsDual << "\n";
@@ -167,12 +167,15 @@ namespace soplex
 
       if( iterationsInit > 0 )
       {
+         os << "Algorithm Iterations: " << callsReducedProb << "\n";
          os << "Decomp. Iterations  : \n";
-         os << "  Algorithm Iter.   : " << callsReducedProb << "\n";
+         os << "  Total             : " << iterationsInit + iterationsRedProb << "\n";
          os << "  Initial           : " << iterationsInit << "\n";
          os << "  Reduced Problem   : " << iterationsRedProb << "\n";
          os << "  Comp. Problem     : " << iterationsCompProb << "\n";
          os << "Red. Problem Size   : \n";
+         os << "  Rows              : " << numRedProbRows << "\n";
+         os << "  Columns           : " << numRedProbCols << "\n";
       }
    }
 } // namespace soplex
