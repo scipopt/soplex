@@ -19,6 +19,7 @@ performance:
 - no transformation of objective sense for rational solve
 - simplifier makes fewer constructor/destructor calls to DSVector class by reusing the data structures
 - update nonbasic part of objective function value instead of completely recomputing it every time
+- activate hyper sparse pricing per default
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
