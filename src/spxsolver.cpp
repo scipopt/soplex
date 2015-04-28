@@ -1003,7 +1003,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       theType = base.theType;
       thePricing = base.thePricing;
       theRep = base.theRep;
-      theTime = base.theTime;
+      timerType = base.timerType;
       maxIters = base.maxIters;
       maxTime = base.maxTime;
       objLimit = base.objLimit;
@@ -1162,7 +1162,6 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theType(base.theType)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
-   , theTime(base.theTime)
    , timerType(base.timerType)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
@@ -1232,6 +1231,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
    , spxout(base.spxout)
 {
+   theTime = TimerFactory::createTimer(timerType);
 
    if (base.theRep == COLUMN)
    {

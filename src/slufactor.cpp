@@ -707,6 +707,8 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
       eta    = old.eta;
       forest = old.forest;
 
+      timerType = old.timerType;
+
       freeAll();
       try
       {
@@ -865,6 +867,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
    , eta (old.eta)
    , forest(old.forest)
+   , timerType(old.timerType)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -892,6 +895,9 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    l.rbeg      = 0;
    l.rorig     = 0;
    l.rperm     = 0;
+
+   solveTime = TimerFactory::createTimer(timerType);
+   factorTime = TimerFactory::createTimer(timerType);
 
    try
    {
@@ -937,17 +943,16 @@ void SLUFactor::freeAll()
    if(l.rbeg) spx_free(l.rbeg);
    if(l.rorig) spx_free(l.rorig);
    if(l.rperm) spx_free(l.rperm);
- 
-   if (solveTime)
-      spx_free(solveTime);
-
-   if (factorTime)
-      spx_free(factorTime);
 }
 
 SLUFactor::~SLUFactor()
 {
    freeAll();
+
+   solveTime->~Timer();
+   factorTime->~Timer();
+   spx_free(solveTime);
+   spx_free(factorTime);
 }
 
 static Real betterThreshold(Real th)
