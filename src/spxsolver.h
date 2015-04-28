@@ -1431,6 +1431,7 @@ public:
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
+      // don't shift fixed variables
       if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
       {
          theShift += to - theUBbound[i];
@@ -1441,6 +1442,7 @@ public:
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
+      // don't shift fixed variables
       if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
       {
          theShift += theLBbound[i] - to;

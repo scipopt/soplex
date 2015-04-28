@@ -833,11 +833,8 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
    else
    {
       sel = 0.0;
-      if (vec[leave] < low[leave])
-         thesolver->theShift += low[leave] - vec[leave];
-      else
-         thesolver->theShift += vec[leave] - up[leave];
-      low[leave] = up[leave] = vec[leave];
+      thesolver->shiftLBbound(leave, vec[leave]);
+      thesolver->shiftUBbound(leave, vec[leave]);
    }
 
    return false;
