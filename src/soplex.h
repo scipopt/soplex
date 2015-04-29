@@ -1944,6 +1944,9 @@ private:
    /// gets the coefficient of the slack variable in the primal complementary problem
    Real getCompSlackVarCoeff(int primalRowNum);
 
+   /// function call to terminate the decomposition simplex
+   bool idsTerminate();
+
    //@}
 };
 }

@@ -1978,11 +1978,24 @@ public:
    ///
    bool isTimeLimitReached(const bool forceCheck = false);
 
+   /// the maximum runtime
+   Real getMaxTime()
+   {
+      return maxTime;
+   }
+
    /// cumulative time spent in all calls to method solve().
    Real cumulativeTime() const
    {
       return theCumulativeTime;
    }
+
+   /// the maximum number of iterations
+   int getMaxIters()
+   {
+      return maxIters;
+   }
+
    /// return const lp's rows if available.
    const LPRowSet& rows() const
    {

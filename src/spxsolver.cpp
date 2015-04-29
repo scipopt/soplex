@@ -1753,6 +1753,7 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
    forceRecompNonbasicValue();
 }
 
+// NOTE: This only works for the row representation. Need to update to account for column representation.
 Real SPxSolver::getDegeneracyLevel(Vector feasvec)
 {
    int numDegenerateRows = 0;
