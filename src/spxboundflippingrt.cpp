@@ -524,10 +524,13 @@ bool SPxBoundFlippingRT::getData(
    else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
    {
       val = 0.0;
-      if( max * x > 0 )
-         thesolver->shiftUBbound(idx, vec[idx]);
-      else
-         thesolver->shiftLBbound(idx, vec[idx]);
+      if( thesolver->dualStatus(thesolver->baseId(idx)) != SPxBasis::Desc::D_ON_BOTH )
+      {
+         if( max * x > 0 )
+            thesolver->shiftUBbound(idx, vec[idx]);
+         else
+            thesolver->shiftLBbound(idx, vec[idx]);
+      }
    }
    return true;
 }

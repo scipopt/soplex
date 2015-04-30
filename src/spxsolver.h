@@ -1372,23 +1372,15 @@ public:
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      // don't do the shifting in case of equal bounds
-      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
-      {
-         theShift += to - theUBbound[i];
-         theUBbound[i] = to;
-      }
+      theShift += to - theUBbound[i];
+      theUBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      // don't do the shifting in case of equal bounds
-      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
-      {
-         theShift += theLBbound[i] - to;
-         theLBbound[i] = to;
-      }
+      theShift += theLBbound[i] - to;
+      theLBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
    void shiftUPbound(int i, Real to)

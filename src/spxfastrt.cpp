@@ -793,10 +793,13 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
       if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
-         if (x < 0.0)
-            thesolver->shiftLBbound(leave, vec[leave]);
-         else
-            thesolver->shiftUBbound(leave, vec[leave]);
+         if( thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         {
+            if (x < 0.0)
+               thesolver->shiftLBbound(leave, vec[leave]);
+            else
+               thesolver->shiftUBbound(leave, vec[leave]);
+         }
       }
    }
    else
@@ -825,10 +828,13 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
       if (sel > fastDelta / maxabs)
       {
          sel = 0.0;
-         if (x > 0.0)
-            thesolver->shiftLBbound(leave, vec[leave]);
-         else
-            thesolver->shiftUBbound(leave, vec[leave]);
+         if( thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         {
+            if (x > 0.0)
+               thesolver->shiftLBbound(leave, vec[leave]);
+            else
+               thesolver->shiftUBbound(leave, vec[leave]);
+         }
       }
    }
    else
