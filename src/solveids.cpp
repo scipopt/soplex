@@ -20,6 +20,7 @@
 #include "soplex.h"
 #include "statistics.h"
 
+#define SIMPLEDEBUG
 //#define DEBUGGING
 //#define SOLVEIDS_DEBUG
 //#define WRITE_LP
@@ -45,6 +46,7 @@ namespace soplex
       assert(_solver.type() == SPxSolver::LEAVE);
 
       bool stop = false;   // flag to indicate that the algorithm must terminate
+      int stopCount = 0;
 
       // start timing
       _statistics->solvingTime->start();
@@ -66,10 +68,10 @@ namespace soplex
          _solver.changeSense(SPxLPBase<Real>::MAXIMIZE);
       }
 
-#ifdef WRITE_LP
+      //#ifdef WRITE_LP
       printf("Writing the original lp to a file\n");
       _solver.writeFile("original.lp");
-#endif
+      //#endif
 
       // it is necessary to solve the initial problem to find a starting basis
       _solver.setIdsStatus(SPxSolver::FINDSTARTBASIS);
@@ -144,7 +146,7 @@ namespace soplex
       bool hasRedBasis = false;
 
       int algIterCount = 0;
-      while( !stop )
+      while( !stop || stopCount <= 0 )
       {
 #ifdef WRITE_LP
       printf("Writing the reduced lp to a file\n");
@@ -178,7 +180,11 @@ namespace soplex
          stop = idsTerminate();  // checking whether the algorithm should terminate
 
          // printing display line
+#ifdef SIMPLEDEBUG
+         printIdsDisplayLine(_solver, orig_verbosity, true, !algIterCount);
+#else
          printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
+#endif
 
          // updating the algorithm iterations statistics
          _statistics->callsReducedProb++;
@@ -224,7 +230,7 @@ namespace soplex
          _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
          assert(_isRealLPLoaded);
 
-#ifdef SOLVEIDS_DEBUG
+#ifdef SIMPLEDEBUG
          printf("Iteration %d Objective Value: %f\n", algIterCount, _compSolver.objValue());
 #endif
 
@@ -239,6 +245,9 @@ namespace soplex
          // check the optimality of the original problem with the objective value of the complementary problem
          if( GE(_compSolver.objValue(), 0.0, 1e-10) || _compSolver.status() == SPxSolver::UNBOUNDED )
             stop = true;
+
+         if( stop )
+            stopCount++;
 
          if( !stop )
          {
@@ -260,7 +269,7 @@ namespace soplex
       // the basis has to be set to false
       _hasBasis = false;
 
-#ifdef WRITE_LP
+      //#ifdef WRITE_LP
       SPxLPIds compDualLP;
       _compSolver.buildDualProblem(compDualLP, _idsPrimalRowIDs.get_ptr(), _idsPrimalColIDs.get_ptr(),
             _idsDualRowIDs.get_ptr(), _idsDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
@@ -268,7 +277,7 @@ namespace soplex
       _compSolver.loadLP(compDualLP);
       printf("Writing the complementary lp to a file\n");
       _compSolver.writeFile("complement.lp");
-#endif
+      //#endif
 
       // returning the sense to minimise
       if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -1040,7 +1049,7 @@ namespace soplex
 #endif
 
       // if no rows are identified by the pricing rule, we add rows based upon the constraint violations
-      if( ratioTest && nnewrowidx == 0 )
+      if( !ratioTest && nnewrowidx == 0 )
       {
          _findViolatedRows(objValue, updaterows, newrowidx, nnewrowidx);
       }
@@ -1059,12 +1068,13 @@ namespace soplex
 
 
 
-#define LARGEST_VIOL
+   //#define LARGEST_VIOL
    /// builds the update rows with those violated in the complmentary problem
    // A row is violated in the constraint matrix Ax <= b, if b - A_{i}x < 0
    // To aid the computation, all violations are translated to <= constraints
    void SoPlex::_findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx)
    {
+      printf("Finding violated rows\n");
       Real feastol = realParam(SoPlex::FEASTOL);
       DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
 
@@ -1108,6 +1118,13 @@ namespace soplex
                // computation.
                if( tempViol < compProbViol )
                   compProbViol = tempViol;
+            }
+
+            if( GE(compObjValue, 0.0, feastol) )
+            {
+               printf("Rowtype: %d, Constraints violation: %.20f\n", _realLP->rowType(rownumber), compProbViol);
+               //if( _realLP->rowType(rownumber) == LPRowBase<Real>::LESS_EQUAL )
+                  //compProbViol = -1;
             }
 
 #ifdef SOLVEIDS_DEBUG
@@ -1599,15 +1616,8 @@ namespace soplex
             // that a <= constraint can be at its bound in a minimisation problem, hence it will require the equality to
             // be set to the rhs.
             int rowNum = _solver.number(_idsReducedProbRowIDs[i]);
-            if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_FREE )
-            {
-               _idsElimPrimalRowIDs[_nElimPrimalRows] = _idsReducedProbRowIDs[i];
-               _nElimPrimalRows++;
-               rowsforremoval[nrowsforremoval] = i;
-               nrowsforremoval++;
-            }
-            else if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_ON_UPPER ||
-                  _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_FIXED )// 07.01.2014 check condition
+            if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_ON_UPPER ||
+                  _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::P_FIXED )
             {
                //_compSolver.changeLhs(_idsReducedProbRowIDs[i], _solver.rhs(_idsReducedProbRowIDs[i]));
                _compSolver.changeLhs(i, _solver.rhs(_idsReducedProbRowIDs[i]));
@@ -1617,7 +1627,17 @@ namespace soplex
                //_compSolver.changeRhs(_idsReducedProbRowIDs[i], _solver.lhs(_idsReducedProbRowIDs[i]));
                _compSolver.changeRhs(i, _solver.lhs(_idsReducedProbRowIDs[i]));
             }
-            // NOTE: we are missing the equality constraints.
+            else if( _solver.basis().desc().rowStatus(rowNum) == SPxBasis::Desc::D_FREE ) // equality constraints
+            {
+               _compSolver.changeLhs(i, _solver.rhs(_idsReducedProbRowIDs[i]));
+            }
+            else // all other constraints
+            {
+               _idsElimPrimalRowIDs[_nElimPrimalRows] = _idsReducedProbRowIDs[i];
+               _nElimPrimalRows++;
+               rowsforremoval[nrowsforremoval] = i;
+               nrowsforremoval++;
+            }
          }
       }
 
@@ -1807,6 +1827,9 @@ namespace soplex
       for( int i = 0; i < prevPrimalRowIds; i++ )
       {
          int rowNumber = _realLP->number(_idsPrimalRowIDs[i]);
+         // this loop runs over all rows previously in the complementary problem. If rows are added to the reduced
+         // problem, they will be transfered from the incompatible set to the compatible set in the following if
+         // statement.
          if( _idsReducedProbRows[rowNumber] )
          {
             // rows added to the reduced problem may have been equality constriants. The equality constraints from the
@@ -2035,7 +2058,7 @@ namespace soplex
 
                _idsFixedVarDualIDs[i] = tempId;
             }
-            else
+            else if( false )
             {
                assert((LE(_realLP->lower(i), -infinity) && GE(_realLP->upper(i), infinity)) ||
                      _compSolver.number(SPxColId(_idsVarBoundDualIDs[i*2])) >= 0);
@@ -2118,7 +2141,7 @@ namespace soplex
                }
                // 09.02.15 I think that the else should only be entered if the column does not exist in the reduced
                // prob. I have tested by just leaving this as an else (without the if), but I think that this is wrong.
-               else //if( !_idsReducedProbColRowIDs[i].isValid() )
+               else if( false ) //if( !_idsReducedProbColRowIDs[i].isValid() )
                {
                   bool isRedProbCol = _idsReducedProbColRowIDs[i].isValid();
                   // 29.04.15 in the current implementation only free variables are not included in the reduced problem
@@ -2235,7 +2258,8 @@ namespace soplex
          assert(_solver.rhs(rowNumber) < infinity);
          return 1;
       }
-      else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::P_ON_LOWER )
+      else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::P_ON_LOWER ||
+         _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::D_FREE )
       {
          assert(_solver.lhs(rowNumber) > -infinity);
          return -1;
@@ -2447,8 +2471,9 @@ namespace soplex
          }
          if( force || (_idsDisplayLine % displayFreq == 0) )
          {
+            Real currentTime = _statistics->solvingTime->time();
             (solver.type() == SPxSolver::LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
-            spxout << std::fixed << std::setw(7) << std::setprecision(1) << solver.time() << " |";
+            spxout << std::fixed << std::setw(7) << std::setprecision(1) << currentTime << " |";
             spxout << std::scientific << std::setprecision(2);
             spxout << std::setw(8) << _statistics->iterations << " | ";
             spxout << std::scientific << std::setprecision(2);
