@@ -103,7 +103,7 @@ private:
    int                   relax_count;        /**< count rounds of ratio test */
    DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
    SSVector              updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
-   DVector               updPrimVec;         /**< allocation of memory for additional solution vector */
+   SSVector              updPrimVec;         /**< allocation of memory for additional solution vector */
    //@}
 
    /** store all available pivots/breakpoints in an array (positive pivot search direction) */

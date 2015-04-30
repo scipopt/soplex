@@ -239,13 +239,13 @@ private:
    int            m_numCycle;  ///< actual number of degenerate steps so far.
    bool           initialized; ///< true, if all vectors are setup.
 
-   Vector*        solveVector2;      ///< when 2 systems are to solve at a time
-   SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
-   Vector*        solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-   Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
-   SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
-   Vector*        coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    SSVector*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
    bool           freePricer;        ///< true iff thepricer should be freed inside of object
@@ -1540,7 +1540,7 @@ public:
     *  performance advantages over solving the two linear systems
     *  seperately.
     */
-   void setup4solve(Vector* p_y, SSVector* p_rhs)
+   void setup4solve(SSVector* p_y, SSVector* p_rhs)
    {
       assert(type() == LEAVE);
       solveVector2    = p_y;
@@ -1554,7 +1554,7 @@ public:
     *  other system. Solving several linear system at a time has
     *  performance advantages over solving them seperately.
     */
-   void setup4solve2(Vector* p_y2, SSVector* p_rhs2)
+   void setup4solve2(SSVector* p_y2, SSVector* p_rhs2)
    {
       assert(type() == LEAVE);
       solveVector3    = p_y2;
@@ -1568,7 +1568,7 @@ public:
     *  performance advantages over solving the two linear systems
     *  seperately.
     */
-   void setup4coSolve(Vector* p_y, SSVector* p_rhs)
+   void setup4coSolve(SSVector* p_y, SSVector* p_rhs)
    {
       assert(type() == ENTER);
       coSolveVector2    = p_y;
@@ -1580,7 +1580,7 @@ public:
     *  call to SPxRatioTester. The system will be solved along
     *  with two other systems.
     */
-   void setup4coSolve2(Vector* p_z, SSVector* p_rhs)
+   void setup4coSolve2(SSVector* p_z, SSVector* p_rhs)
    {
       assert(type() == ENTER);
       coSolveVector3    = p_z;

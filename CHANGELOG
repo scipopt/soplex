@@ -11,6 +11,8 @@ features:
 performance:
 - iterative refinement for ranged rows without introducing explicit slack variables
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
+- use sparse data structures (SSVector instead of Vector) for LU solves with 2 or 3 right hand sides
+  (necessary for steepest edge weights and/or bound flipping ratio test updates)
 - do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
 - faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
 - more efficient arithmetic in class Rational by checking special cases

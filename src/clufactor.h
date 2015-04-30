@@ -407,6 +407,13 @@ protected:
       Real* vec2, Real eps2,            /* result2 */
       Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
       Real* forest, int* forestNum, int* forestIdx);
+   /// sparse version of above method
+   void vSolveRight4update2sparse(
+      Real eps, Real* vec, int* idx,    /* result1 */
+      Real* rhs, int* ridx, int& rn,    /* rhs1    */
+      Real eps2, Real* vec2, int* idx2, /* result2 */
+      Real* rhs2, int* ridx2, int& rn2, /* rhs2    */
+      Real* forest, int* forestNum, int* forestIdx);
    ///
    int vSolveRight4update3(Real eps,
       Real* vec, int* idx,              /* result1 */
@@ -415,6 +422,15 @@ protected:
       Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
       Real* vec3, Real eps3,            /* result3 */
       Real* rhs3, int* ridx3, int rn3,  /* rhs3    */
+      Real* forest, int* forestNum, int* forestIdx);
+   /// sparse version of above method
+   void vSolveRight4update3sparse(
+      Real eps, Real* vec, int* idx,    /* result1 */
+      Real* rhs, int* ridx, int& rn,    /* rhs1    */
+      Real eps2, Real* vec2, int* idx2, /* result2 */
+      Real* rhs2, int* ridx2, int& rn2, /* rhs2    */
+      Real eps3, Real* vec3, int* idx3, /* result3 */
+      Real* rhs3, int* ridx3, int& rn3, /* rhs3    */
       Real* forest, int* forestNum, int* forestIdx);
    ///
    void vSolveRightNoNZ(Real* vec2, Real eps2,              /* result2 */
@@ -433,6 +449,12 @@ protected:
       Real* rhs, int* ridx, int rn,            /* rhs    */
       Real* vec2,                              /* result2 */
       Real* rhs2, int* ridx2, int rn2);        /* rhs2    */
+   /// sparse version of solving 2 systems of equations
+   void vSolveLeft2sparse(Real eps,
+                          Real* vec, int* idx,                     /* result */
+                          Real* rhs, int* ridx, int& rn,           /* rhs    */
+                          Real* vec2, int* idx2,                   /* result2 */
+                          Real* rhs2, int* ridx2, int& rn2);       /* rhs2    */
    ///
    int vSolveLeft3(Real eps,
                    Real* vec, int* idx,                     /* result */
@@ -441,6 +463,14 @@ protected:
                    Real* rhs2, int* ridx2, int rn2,         /* rhs2    */
                    Real* vec3,                              /* result3 */
                    Real* rhs3, int* ridx3, int rn3);        /* rhs3    */
+   /// sparse version of solving 3 systems of equations
+   void vSolveLeft3sparse(Real eps,
+                          Real* vec, int* idx,                     /* result */
+                          Real* rhs, int* ridx, int& rn,           /* rhs    */
+                          Real* vec2, int* idx2,                   /* result2 */
+                          Real* rhs2, int* ridx2, int& rn2,        /* rhs2    */
+                          Real* vec3, int* idx3,                   /* result2 */
+                          Real* rhs3, int* ridx3, int& rn3);       /* rhs2    */
 
    void forestUpdate(int col, Real* work, int num, int *nonz);
 

@@ -193,17 +193,27 @@ public:
    void solveRight4update(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// Sparse version of solving two systems of equations
+   void solve2right4update(SSVector& x, SSVector& y, const SVector& b, SSVector& d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solve3right4update(SSVector& x, Vector& y, Vector& z, 
+   void solve3right4update(SSVector& x, Vector& y, Vector& z,
                            const SVector& b, SSVector& d, SSVector& e);
-   /// Solves \f$Ax=b\f$.
+   /// sparse version of solving three systems of equations
+   void solve3right4update(SSVector& x, SSVector& y, SSVector& z,
+                           const SVector& b, SSVector& d, SSVector& e);
+   /// sparse version of solving one system of equations with transposed basis matrix
    void solveLeft(Vector& x, const Vector& b);
    /// Solves \f$Ax=b\f$.
    void solveLeft(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solveLeft(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// sparse version of solving two systems of equations with transposed basis matrix
+   void solveLeft(SSVector& x, SSVector& two, const SVector& b, SSVector& rhs2);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    void solveLeft(SSVector& x, Vector& y, Vector& z,
+                  const SVector& b, SSVector& d, SSVector& e);
+   /// sparse version of solving three systems of equations with transposed basis matrix
+   void solveLeft(SSVector& x, SSVector& y, SSVector& z,
                   const SVector& b, SSVector& d, SSVector& e);
    ///
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);

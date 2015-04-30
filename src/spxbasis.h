@@ -634,7 +634,14 @@ public:
    /// solves two systems in one call.
    void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized) 
+      if (!factorized)
+         SPxBasis::factorize();
+      factor->solve2right4update(x, y, rhsx, rhsy);
+   }
+   /// solves two systems in one call using only sparse data structures
+   void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
+   {
+      if (!factorized)
          SPxBasis::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
@@ -648,7 +655,16 @@ public:
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
    }
-
+   /// solves three systems in one call using only sparse data structures
+   void solve4update(SSVector& x, SSVector& y, SSVector& y2,
+                     const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
+   {
+      if (!factorized)
+         SPxBasis::factorize();
+      assert(rhsy.isSetup());
+      assert(rhsy2.isSetup());
+      factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
+   }
    /// Cosolves linear system with basis matrix.
    /** Depending on the representation, for a SPxBasis B,
        B.coSolve(x) computes
@@ -665,7 +681,7 @@ public:
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
    }
-   ///
+   /// Sparse version of coSolve
    void coSolve(SSVector& x, const SVector& rhs)
    {
       if (!factorized) 
@@ -675,12 +691,26 @@ public:
    /// solves two systems in one call.
    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
+      if (!factorized)
+         SPxBasis::factorize();
+      factor->solveLeft(x, y, rhsx, rhsy);
+   }
+   /// Sparse version of solving two systems in one call.
+   void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
+   {
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call. May be improved by using just one pass through the basis.
    void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
+   {
+      if (!factorized)
+         SPxBasis::factorize();
+      factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
+   }
+   /// Sparse version of solving three systems in one call.
+   void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
    {
       if (!factorized)
          SPxBasis::factorize();

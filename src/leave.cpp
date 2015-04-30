@@ -604,6 +604,7 @@ bool SPxSolver::leave(int leaveIdx)
    /*
        Before performing the actual basis update, we must determine, how this
        is to be accomplished.
+       When using steepest edge pricing this solve is already performed by the pricer
     */
    if (theCoPvec->delta().isSetup() && theCoPvec->delta().size() == 0)
    {
@@ -752,7 +753,6 @@ bool SPxSolver::leave(int leaveIdx)
       if (enterId != baseId(leaveIdx))
       {
          const SVector& newVector = *enterVector(enterId);
-
          // update feasibility vectors
          if( solveVector2 != NULL && solveVector3 != NULL )
          {

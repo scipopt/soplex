@@ -68,7 +68,7 @@ private:
    /// vector of pricing penalties
    DVector coPenalty;
    /// working vector
-   DVector workVec;
+   SSVector workVec;
    /// working vector
    SSVector workRhs;
    /// temporary array of precomputed pricing values
@@ -141,9 +141,10 @@ public:
    ///
    SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
       : SPxPricer(name)
-      , workRhs (0, 1e-16)
+      , workVec (0)
+      , workRhs (0)
       , pi_p(1.0)
-      , prefSetup(0)
+      , prefSetup (0)
       , setup (mode)
       , refined(false)
       , weightsSetup(false)
