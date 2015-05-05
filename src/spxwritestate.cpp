@@ -51,10 +51,11 @@ bool SPxSolver::writeState(
        << "." << SOPLEX_SUBVERSION << std::endl << std::endl;
    ofs << "# run SoPlex as follows:" << std::endl;
    ofs << "# bin/soplex --loadset=spxcheck.set --readbas=spxcheck.bas spxcheck.mps\n" << std::endl;
+   ofs << "int:representation = " << ( rep() == SPxSolver::COLUMN ? "1" : "2" ) << std::endl;
    ofs << "int:factor_update_max = " << basis().getMaxUpdates() << std::endl;
    ofs << "int:pricer = ";
    if (!strcmp(pricer()->getName(), "Auto"))
-      ofs << " 0";
+      ofs << " 0" << std::endl;
    else if (!strcmp(pricer()->getName(), "Dantzig"))
       ofs << "1" << std::endl;
    else if (!strcmp(pricer()->getName(), "ParMult"))
