@@ -34,7 +34,8 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
-#define HYPERPRICINGFACTOR       10       /**< do hyper pricing only if problem size is larger than HYPERPRICINGFACTOR * maxUpdates */
+#define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
+#define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
 #define SPARSITYFACTOR           0.6      /**< percentage of infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorizations until sparsity is tested again */
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
@@ -83,8 +84,6 @@ class SPxSolver : public SPxLP, protected SPxBasis
    friend class SoPlexLegacy;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
-   friend class SPxSteepPR;  // this is necessary to make getMaxUpdates() accessible
-   friend class SPxDevexPR;  //
 
 public:
 

@@ -55,6 +55,7 @@ code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
 - deactivate SOPLEX_DEBUG flag in header files if defined externally
 - SPxOut output stream is no longer a global variable
+- hyper pricing parameters (i.e. candidate list size and activation threshold) are not linked to maxUpdates of factorization anymore
 
 
 18 Dec 2014 - Release 2.0.1

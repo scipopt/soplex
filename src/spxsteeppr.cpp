@@ -410,7 +410,7 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
    compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), thesolver->getMaxUpdates());
+   nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), HYPERPRICINGSIZE);
    // copy indices of best values to bestPrices
    for( int i = 0; i < nsorted; ++i )
    {
@@ -750,7 +750,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
    compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), thesolver->getMaxUpdates());
+   nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), HYPERPRICINGSIZE);
    // copy indices of best values to bestPrices
    for( int i = 0; i < nsorted; ++i )
    {
@@ -804,7 +804,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
    compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), compare, 0, pricesCo.size(), thesolver->getMaxUpdates());
+   nsorted = SPxQuicksortPart(pricesCo.get_ptr(), compare, 0, pricesCo.size(), HYPERPRICINGSIZE);
    // copy indices of best values to bestPrices
    for( int i = 0; i < nsorted; ++i )
    {

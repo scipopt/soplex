@@ -7117,7 +7117,7 @@ namespace soplex
       _solver.setSparsePricingFactor(realParam(SoPlex::SPARSITY_THRESHOLD));
       if( (intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_ON)
             || ((intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_AUTO)
-            && (_solver.nRows() > HYPERPRICINGFACTOR * _solver.basis().getMaxUpdates())) )
+            && (_solver.nRows() + _solver.nCols() > HYPERPRICINGTHRESHOLD )) )
          _solver.hyperPricing(true);
       else if( intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_OFF )
          _solver.hyperPricing(false);
