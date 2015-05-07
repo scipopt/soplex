@@ -35,7 +35,7 @@ date                                >> $OUTFILE
 date                                >> $ERRFILE
 echo -----------------------------  >> $OUTFILE
 date +"@03 %s"                      >> $OUTFILE
-$EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set --writebas=$BASFILE -c -q -t$TIMELIMIT $INSTANCE >> $OUTFILE 2>>$ERRFILE
+$EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set --writebas=$BASFILE -v4 --int:displayfreq=10000 -c -q -t$TIMELIMIT $INSTANCE >> $OUTFILE 2>>$ERRFILE
 date +"@04 %s"                      >> $OUTFILE
 echo -----------------------------  >> $OUTFILE
 date                                >> $OUTFILE
