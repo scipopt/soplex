@@ -1950,7 +1950,7 @@ bool Rational::readString(const char* s)
 std::string rationalToString(const Rational& r, const int precision)
 {
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64) || defined(__APPLE__)
   std::stringstream sstream;
   sstream << r;
   return sstream.str();
