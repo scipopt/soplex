@@ -22,21 +22,24 @@ def printUsage(name):
 def computeFactor(compareValue, defaultSetting, compareSetting):
     "compute speed-up or slow-down factors for all instances of two settings"
     for instance in results[defaultSetting]:
-        value = results[compareSetting][instance][compareValue]
-        defvalue = results[defaultSetting][instance][compareValue]
-        if defaultSetting == compareSetting:
-            factors[compareValue][compareSetting][instance] = defvalue
-        elif defvalue == 0:
+        if not instance in results[compareSetting]:
+            factors[compareValue][compareSetting][instance] = 0.0
+        elif not compareValue in results[compareSetting][instance]:
             factors[compareValue][compareSetting][instance] = 0.0
         else:
-            factors[compareValue][compareSetting][instance] = float(value) / float(defvalue)
+          value = results[compareSetting][instance][compareValue]
+          defvalue = results[defaultSetting][instance][compareValue]
+          if defaultSetting == compareSetting:
+              factors[compareValue][compareSetting][instance] = defvalue
+          elif defvalue == 0:
+              factors[compareValue][compareSetting][instance] = 0.0
+          else:
+              factors[compareValue][compareSetting][instance] = float(value) / float(defvalue)
 
 # update the current (shifted) geometric metric
 def updateGeoMean(new, mean, count, shift):
     assert mean > 0
-    if shift == 0:
-        shift = 0.0000001
-    return math.pow(float(mean+shift), float(count-1)/float(count)) * math.pow(float(new)+shift, 1.0/float(count)) - shift
+    return math.pow(float(mean), float(count-1)/float(count)) * math.pow(float(new)+shift, 1.0/float(count))
 
 # print header lines
 def printHeader():
@@ -176,7 +179,7 @@ for i in sorted(instances):
         # print results of default settings
         value = results[default][i][c]
         sumValue[c][default] += value
-        meanValue[c][default] = updateGeoMean(value, meanValue[c][default], count, 0)
+        meanValue[c][default] = updateGeoMean(value, meanValue[c][default], count, 0.0001)
         shmeanValue[c][default] = updateGeoMean(value, shmeanValue[c][default], count, shift[ic])
         output += str(value).rjust(length[ic])
 
@@ -186,13 +189,18 @@ for i in sorted(instances):
         for ic,c in enumerate(compareValues):
             value = results[s][i][c]
             sumValue[c][s] += value
-            meanValue[c][s] = updateGeoMean(value, meanValue[c][s], count, 0)
+            meanValue[c][s] = updateGeoMean(value, meanValue[c][s], count, 0.0001)
             shmeanValue[c][s] = updateGeoMean(value, shmeanValue[c][s], count, shift[ic])
             output += str(value).rjust(length[ic])
         # print calculated factors
         for ic,c in enumerate(compareValues):
             output += '{0:{width}.2f}'.format(factors[c][s][i], width=factorlength)
+
     print output
+
+shmeanValue[c][default] -= shift[ic]
+shmeanValue[c][s] -= shift[ic]
+
 
 printHeader()
 
