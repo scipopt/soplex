@@ -278,12 +278,14 @@ void CLUFactor::setPivot( const int p_stage,
    diag[p_row]       = REAL( 1.0 ) / val;
    if( spxAbs(val) < Param::epsilonPivot() )
    {
+#ifndef NDEBUG
       MSG_ERROR( std::cerr
                  << "LU pivot element is almost zero (< "
                  << Param::epsilonPivot()
                  << ") - Basis is numerically singular"
                  << std::endl;
       )
+#endif
       stat = SLinSolver::SINGULAR;
    }
 
