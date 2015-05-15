@@ -1,7 +1,5 @@
-(maintain each list from top to bottom)
-
-Developer version
-=================
+June 2015 - Release 2.2.0
+=========================
 
 features:
 - support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
@@ -56,6 +54,14 @@ code quality:
 - deactivate SOPLEX_DEBUG flag in header files if defined externally
 - SPxOut output stream is no longer a global variable
 - hyper pricing parameters (i.e. candidate list size and activation threshold) are not linked to maxUpdates of factorization anymore
+
+
+18 Feb 2015 - Release 2.1.0
+===========================
+
+SoPlex 2.1 is an internal release that was packed for installing an 80bit extended-precision version on the NEOS Server
+for Optimization.  It contains many of the features of SoPlex 2.2, in particular for solving LPs with rational input
+data exactly.
 
 
 18 Dec 2014 - Release 2.0.1
