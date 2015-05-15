@@ -525,11 +525,8 @@ bool SPxBoundFlippingRT::getData(
    if( upp[idx] == low[idx] )
    {
       val = 0.0;
-      if( vec[idx] > upp[idx] )
-         thesolver->theShift += vec[idx] - upp[idx];
-      else
-         thesolver->theShift += low[idx] - vec[idx];
-      thesolver->ubBound()[idx] = thesolver->lbBound()[idx] = vec[idx];
+      thesolver->shiftLBbound(idx, vec[idx]);
+      thesolver->shiftUBbound(idx, vec[idx]);
    }
    else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
    {
