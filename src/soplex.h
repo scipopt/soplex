@@ -1461,7 +1461,6 @@ private:
    bool* _idsReducedProbCols;    // flag to indicate the inclusion of a col in the reduced problem.
    int* _idsRowStatus;
    int* _idsColStatus;
-   int* _idsCompProbRowIDsIdx;   // the index to _idsPrimalRowIDs for a given original row.
    int* _idsCompProbColIDsIdx;   // the index to _idsPrimalColIDs for a given original col.
    DataArray < SPxRowId > _idsReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
    DataArray < SPxRowId > _idsReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
@@ -1903,7 +1902,7 @@ private:
    void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
 
    /// update the dual complementary problem with additional columns and rows
-   void _updateIdsComplementaryProblem(DVector dualVector);
+   void _updateIdsComplementaryProblem(DVector dualVector, bool origObj);
 
    /// checking the optimality of the original problem.
    void _checkOriginalProblemOptimality();
@@ -1919,6 +1918,9 @@ private:
 
    /// updating the dual columns related to the fixed primal variables.
    void _updateComplementaryFixedPrimalVars(int* currFixedVars);
+
+   /// updating the complementary problem with the original objective function
+   void _setComplementaryOriginalObjective();
 
    /// determining which bound the primal variables will be fixed to.
    int getOrigVarFixedDirection(int colNum);
