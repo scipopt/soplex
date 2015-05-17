@@ -2256,11 +2256,46 @@ namespace soplex
          {
             if( EQ(_realLP->lower(i), _realLP->upper(i)) )
             {
+               // fixed variable
             }
             else if( GT(_realLP->lower(i), -infinity) && LT(_realLP->upper(i), infinity) )
             {
+               // variable has two bounds
+               if( EQ(_realLP->lower(i), 0.0) )
+               {
+                  // standard greater than/equal constraint
+               }
+               else if( EQ(_realLP->upper(i), 0.0) )
+               {
+                  // standard less than/equal constraint
+               }
+               else
+               {
+                  // bounded variable
+               }
             }
-            else if( GT(_realLP->) )
+            else if( GT(_realLP->lower(i), -infinity) )
+            {
+               if( EQ(_realLP->lower(i), 0.0) )
+               {
+                  // standard greater than/equal constraint
+               }
+               else
+               {
+                  // non-standard bounds
+               }
+            }
+            else if( LT(_realLP->upper(i), infinity) )
+            {
+               if( EQ(_realLP->upper(i), 0.0) )
+               {
+                  // standard less than/equal constraint
+               }
+               else
+               {
+                  // non-standard bounds
+               }
+            }
             if( _fixedOrigVars[i] != 0 )
             {
                assert(_compSolver.number(SPxColId(_idsFixedVarDualIDs[i])) >= 0);
