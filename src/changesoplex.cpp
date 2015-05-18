@@ -741,20 +741,23 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
          if (currUpper >= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theLCbound[i] * oldLower;
+            if( m_nonbasicValueUpToDate )
+               objChange = -theLCbound[i] * oldLower;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_UPPER;
-            objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
+            if( m_nonbasicValueUpToDate )
+               objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
          }
       }
       else if (newLower == currUpper)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxObj(i) * (newLower - oldLower);
+         if( m_nonbasicValueUpToDate )
+            objChange = maxObj(i) * (newLower - oldLower);
       }
-      else
+      else if( m_nonbasicValueUpToDate )
          objChange = theLCbound[i] * (newLower - oldLower);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
@@ -765,7 +768,8 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
       if (newLower > -infinity)
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         objChange = theLCbound[i] * newLower;
+         if( m_nonbasicValueUpToDate )
+            objChange = theLCbound[i] * newLower;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -843,29 +847,31 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
          if (currLower <= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theUCbound[i] * oldUpper;
+            if( m_nonbasicValueUpToDate )
+               objChange = -theUCbound[i] * oldUpper;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_LOWER;
-            objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
+            if( m_nonbasicValueUpToDate )
+               objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
          }
       }
       else if (newUpper == currLower)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxObj(i) * (newUpper - oldUpper);
+         if( m_nonbasicValueUpToDate )
+            objChange = maxObj(i) * (newUpper - oldUpper);
       }
-      else
-      {
+      else if( m_nonbasicValueUpToDate )
          objChange = theUCbound[i] * (newUpper - oldUpper);
-      }
       break;
    case SPxBasis::Desc::P_FREE:
       if (newUpper < infinity)
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         objChange = theUCbound[i] * newUpper;
+         if( m_nonbasicValueUpToDate )
+            objChange = theUCbound[i] * newUpper;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -949,20 +955,23 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
          if (currRhs >= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theURbound[i] * oldLhs;
+            if( m_nonbasicValueUpToDate )
+               objChange = -theURbound[i] * oldLhs;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_UPPER;
-            objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
+            if( m_nonbasicValueUpToDate )
+               objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
          }
       }
       else if (newLhs == currRhs)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxRowObj(i) * (newLhs - oldLhs);
+         if( m_nonbasicValueUpToDate )
+            objChange = maxRowObj(i) * (newLhs - oldLhs);
       }
-      else
+      else if( m_nonbasicValueUpToDate )
          objChange = theURbound[i] * (newLhs - oldLhs);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
@@ -973,7 +982,8 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
       if (newLhs > -infinity)
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         objChange = theURbound[i] * newLhs;
+         if( m_nonbasicValueUpToDate )
+            objChange = theURbound[i] * newLhs;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -1043,20 +1053,23 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
          if (currLhs <= -infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theLRbound[i] * oldRhs;
+            if( m_nonbasicValueUpToDate )
+               objChange = -theLRbound[i] * oldRhs;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_LOWER;
-            objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
+            if( m_nonbasicValueUpToDate )
+               objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
          }
       }
       else if (newRhs == currLhs)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxRowObj(i) * (newRhs - oldRhs);
+         if( m_nonbasicValueUpToDate )
+            objChange = maxRowObj(i) * (newRhs - oldRhs);
       }
-      else
+      else if( m_nonbasicValueUpToDate )
          objChange = theLRbound[i] * (newRhs - oldRhs);
       break;
    case SPxBasis::Desc::P_ON_LOWER:
@@ -1067,7 +1080,8 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
       if (newRhs < infinity)
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         objChange = theLRbound[i] * newRhs;
+         if( m_nonbasicValueUpToDate )
+            objChange = theLRbound[i] * newRhs;
       }
       break;
    case SPxBasis::Desc::P_FIXED:

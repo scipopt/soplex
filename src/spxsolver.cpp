@@ -662,7 +662,7 @@ Real SPxSolver::nonbasicValue()
 
 #ifndef ADDITIONAL_CHECKS
    // if the value is available we don't need to recompute it
-   if ( m_nonbasicValueUpToDate && rep() == COLUMN )
+   if ( m_nonbasicValueUpToDate )
       return m_nonbasicValue;
 #endif
 
