@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**@mainpage Overview
-   @version  2.0.1.3
+   @version  2.2.0a
 
    @section Main The Sequential object-oriented simplex class library.
 

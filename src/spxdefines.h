@@ -36,8 +36,8 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION         201
-#define SOPLEX_SUBVERSION        3
+#define SOPLEX_VERSION         220
+#define SOPLEX_SUBVERSION        0
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
