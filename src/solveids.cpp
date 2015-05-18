@@ -1059,7 +1059,7 @@ namespace soplex
 
 
 
-   //#define LARGEST_VIOL
+#define LARGEST_VIOL
    /// builds the update rows with those violated in the complmentary problem
    // A row is violated in the constraint matrix Ax <= b, if b - A_{i}x < 0
    // To aid the computation, all violations are translated to <= constraints
@@ -2132,6 +2132,9 @@ namespace soplex
          assert(_idsCompProbColIDsIdx[i] != -1);
          if( _idsCompProbColIDsIdx[i] != -1 )
          {
+            int idIndex = _idsCompProbColIDsIdx[i];
+            assert(_compSolver.number(SPxRowId(_idsDualRowIDs[idIndex])) >= 0);
+            col.add(_compSolver.number(SPxRowId(_idsDualRowIDs[idIndex])), 1.0);
             if( currFixedVars[i] != 0 )
             {
                assert(currFixedVars[i] == -1 || currFixedVars[i] == 1);
@@ -2183,6 +2186,7 @@ namespace soplex
                   numBoundConsCols++;
                }
             }
+            col.clear();
             _fixedOrigVars[i] = currFixedVars[i];
          }
       }
@@ -2247,7 +2251,7 @@ namespace soplex
    /// updating the complementary problem with the original objective function
    void SoPlex::_setComplementaryOriginalObjective()
    {
-#if 1
+#if 0
       for( int i = 0; i < _realLP->nCols(); i++ )
       {
          assert(_idsCompProbColIDsIdx[i] != -1);   // this should be true in the current implementation
