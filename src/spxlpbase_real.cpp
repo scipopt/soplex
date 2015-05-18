@@ -2244,12 +2244,12 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
             col.add(numAddedRows, 1.0);
             if( spxSense() == MINIMIZE )
             {
-               dualrows.create(0, obj(i), infinity);
+               dualrows.create(0, obj(i), obj(i));
                dualcols.add(upper(i), -infinity, col, 0.0);
             }
             else
             {
-               dualrows.create(0, -infinity, obj(i));
+               dualrows.create(0, obj(i), obj(i));
                dualcols.add(upper(i), 0.0, col, infinity);
             }
             col.clear();
@@ -2272,12 +2272,12 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
             col.add(numAddedRows, 1.0);
             if( spxSense() == MINIMIZE )
             {
-               dualrows.create(0, -infinity, obj(i));
+               dualrows.create(0, obj(i), obj(i));
                dualcols.add(lower(i), 0.0, col, infinity);
             }
             else
             {
-               dualrows.create(0, obj(i), infinity);
+               dualrows.create(0, obj(i), obj(i));
                dualcols.add(lower(i), -infinity, col, 0.0);
             }
             col.clear();
@@ -2286,7 +2286,7 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
          }
          numAddedRows++;
       }
-      else if ( NE(lower(i), upper(i)) )// a bounded variable
+      else if ( NE(lower(i), upper(i)) )// a boxed variable
       {
          if( isZero(lower(i)) ) // variable bounded between 0 and upper(i)
          {
