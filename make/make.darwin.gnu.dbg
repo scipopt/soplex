@@ -1,2 +1,2 @@
 CPPFLAGS	+=
-CXXFLAGS	+=	-O0 -g -ansi $(GCCWARN)
+CXXFLAGS	+=	-O0 -g $(GCCWARN)
