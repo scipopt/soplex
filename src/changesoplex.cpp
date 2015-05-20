@@ -1181,6 +1181,9 @@ void SPxSolver::changeRow(int i, const LPRow& newRow)
 
 void SPxSolver::changeCol(int i, const LPCol& newCol)
 {
+   if( i < 0 )
+      return;
+
    forceRecompNonbasicValue();
 
    SPxLP::changeCol(i, newCol);
@@ -1191,6 +1194,9 @@ void SPxSolver::changeCol(int i, const LPCol& newCol)
 
 void SPxSolver::changeElement(int i, int j, const Real& val)
 {
+   if( i < 0 || j < 0 )
+      return;
+
    forceRecompNonbasicValue();
 
    SPxLP::changeElement(i, j, val);
