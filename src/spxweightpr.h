@@ -78,8 +78,8 @@ public:
    /// default constructor
    SPxWeightPR()
       : SPxPricer("Weight")
-      , coPenalty(0)
       , penalty(0)
+      , coPenalty(0)
       , objlength(0)
    {}
    /// copy constructor
