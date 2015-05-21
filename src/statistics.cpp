@@ -26,14 +26,15 @@ namespace soplex
    /// default constructor
    SoPlex::Statistics::Statistics(Timer::TYPE ttype)
    {
-      readingTime = TimerFactory::createTimer(ttype);
-      solvingTime = TimerFactory::createTimer(ttype);
-      preprocessingTime = TimerFactory::createTimer(ttype);
-      simplexTime = TimerFactory::createTimer(ttype);
-      syncTime = TimerFactory::createTimer(ttype);
-      transformTime = TimerFactory::createTimer(ttype);
-      rationalTime = TimerFactory::createTimer(ttype);
-      reconstructionTime = TimerFactory::createTimer(ttype);
+      timerType = ttype;
+      readingTime = TimerFactory::createTimer(timerType);
+      solvingTime = TimerFactory::createTimer(timerType);
+      preprocessingTime = TimerFactory::createTimer(timerType);
+      simplexTime = TimerFactory::createTimer(timerType);
+      syncTime = TimerFactory::createTimer(timerType);
+      transformTime = TimerFactory::createTimer(timerType);
+      rationalTime = TimerFactory::createTimer(timerType);
+      reconstructionTime = TimerFactory::createTimer(timerType);
       clearAllData();
    }
 

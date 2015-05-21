@@ -1083,6 +1083,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    , CLUFactor()
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+   , usetup(old.usetup)
    , eta (old.eta)
    , forest(old.forest)
    , timerType(old.timerType)
@@ -1114,6 +1115,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    l.rorig     = 0;
    l.rperm     = 0;
 
+   solveCount = 0;
    solveTime = TimerFactory::createTimer(timerType);
    factorTime = TimerFactory::createTimer(timerType);
 

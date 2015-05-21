@@ -97,6 +97,8 @@ public:
    /// default constructor
    SPxDevexPR() 
       : SPxPricer("Devex")
+      , last(0)
+      , refined(false)
    {}
    /// copy constructor
    SPxDevexPR( const SPxDevexPR& old)
@@ -104,6 +106,7 @@ public:
       , last(old.last)
       , penalty(old.penalty)
       , coPenalty(old.coPenalty)
+      , refined(false)
    {}
    /// assignment operator
    SPxDevexPR& operator=( const SPxDevexPR& rhs)

@@ -169,6 +169,7 @@ public:
    explicit SPxRatioTester(const char* name)
       : thesolver(0)
       , m_name(name)
+      , m_type(SPxSolver::LEAVE)
       , delta(1e-6)
    {}
    /// copy constructor

@@ -236,6 +236,8 @@ private:
 
    /// default constructor only for friends
    SolBase<R>()
+      : _primalObjVal(0)
+      , _dualObjVal(0)
    {
       invalidate();
    }

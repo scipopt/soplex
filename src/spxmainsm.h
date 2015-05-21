@@ -1178,7 +1178,15 @@ public:
    /// default constructor.
    SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
       : SPxSimplifier("MainSM", ttype)
+      , m_postsolved(0)
+      , m_epsilon(DEFAULT_EPS_ZERO)
+      , m_feastol(DEFAULT_BND_VIOL)
+      , m_opttol(DEFAULT_BND_VIOL)
       , m_stat(15)
+      , m_thesense(SPxLP::MAXIMIZE)
+      , m_keepbounds(false)
+      , m_addedcols(0)
+      , m_result(OKAY)
    {}
    /// copy constructor.
    SPxMainSM(const SPxMainSM& old)
@@ -1199,6 +1207,7 @@ public:
       , m_thesense(old.m_thesense)
       , m_keepbounds(old.m_keepbounds)
       , m_addedcols(old.m_addedcols)
+      , m_result(old.m_result)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);

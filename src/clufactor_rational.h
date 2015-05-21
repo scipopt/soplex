@@ -63,7 +63,12 @@ public:
       int    pos;                 ///< position of pivot column in row
       int    mkwtz;               ///< markowitz number of pivot
 
-      Pring() : next(0), prev(0)  ///< constructor
+      Pring()                     ///< constructor
+         : next(0)
+         , prev(0)
+         , idx(0)
+         , pos(0)
+         , mkwtz(0)
       {}
 
    private:

@@ -134,7 +134,10 @@ public:
          coWeight = &colWeight;
       }
       else  // old.weight and old.coWeight are not set correctly, do nothing.
-      {}
+      {
+         weight = 0;
+         coWeight = 0;
+      }
 
       assert(isConsistent());
    }

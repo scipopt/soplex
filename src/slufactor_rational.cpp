@@ -825,8 +825,10 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    , CLUFactorRational()
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+   , usetup(old.usetup)
    , eta (old.eta)
    , forest(old.forest)
+   , timerType(old.timerType)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -849,6 +851,10 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    l.rbeg      = 0;
    l.rorig     = 0;
    l.rperm     = 0;
+
+   solveCount = 0;
+   solveTime = TimerFactory::createTimer(timerType);
+   factorTime = TimerFactory::createTimer(timerType);
 
    try
    {

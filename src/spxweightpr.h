@@ -76,9 +76,12 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxWeightPR() 
+   SPxWeightPR()
       : SPxPricer("Weight")
-   {}   
+      , coPenalty(0)
+      , penalty(0)
+      , objlength(0)
+   {}
    /// copy constructor
    SPxWeightPR( const SPxWeightPR& old)
       : SPxPricer(old)

@@ -86,6 +86,10 @@ public:
    /// default constructor
    SPxParMultPR() 
       : SPxPricer("ParMult")
+      , multiParts(0)
+      , used(0)
+      , min(0)
+      , last(0)
    {}
    /// copy constructor
    SPxParMultPR( const SPxParMultPR& old)
