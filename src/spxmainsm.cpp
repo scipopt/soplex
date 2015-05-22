@@ -3103,6 +3103,9 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    DataArray<bool> remRow(lp.nRows());
 
+   for(int k = 0; k < lp.nRows(); ++k )
+      m_dupRows[k].clear();
+
    for(int k = 0; k < lp.nRows(); ++k)
    {
       remRow[k] = false;
@@ -3265,7 +3268,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
             }
          }
       }
-      m_dupRows[k].clear();
    }
 
    // change ranges for all modified constraints by one single call (more efficient)
@@ -3425,16 +3427,17 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    spx_free(idxMem);
 
-   for(int k = 0; k < lp.nCols(); ++k)
-      m_dupCols[pClass[k]].add(k, 0.0);
-
    DataArray<bool> remCol(lp.nCols());
    DataArray<bool> fixAndRemCol(lp.nCols());
 
-   for(int j = 0; j < lp.nCols(); ++j)
+   for( int k = 0; k < lp.nCols(); ++k )
+      m_dupCols[k].clear();
+
+   for(int k = 0; k < lp.nCols(); ++k)
    {
-      remCol[j] = false;
-      fixAndRemCol[j] = false;
+      remCol[k] = false;
+      fixAndRemCol[k] = false;
+      m_dupCols[pClass[k]].add(k, 0.0);
    }
 
    bool hasDuplicateCol = false;
@@ -3625,7 +3628,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
             }
          }
       }
-      m_dupCols[k].clear();
    }
 
    for(int j = 0; j < lp.nCols(); ++j)
