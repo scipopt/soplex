@@ -198,10 +198,10 @@ void SPxSolver::setType(Type tp)
 void SPxSolver::initRep(Representation p_rep)
 {
 
-   theRep = p_rep;
-
    Real tmpfeastol = feastol();
    Real tmpopttol = opttol();
+
+   theRep = p_rep;
 
    if (theRep == COLUMN)
    {

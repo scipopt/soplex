@@ -48,6 +48,7 @@ fixed bugs:
 - fix compiler error from missing operators between Rational and ints for GMP=false
 - fix memory leak with static rational numbers Rational::{ZERO,POSONE,NEGONE} and list memory
 - fix uninitialized value in class SPxWeightST
+- eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
