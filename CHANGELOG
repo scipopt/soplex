@@ -49,6 +49,7 @@ fixed bugs:
 - fix memory leak with static rational numbers Rational::{ZERO,POSONE,NEGONE} and list memory
 - fix uninitialized value in class SPxWeightST
 - fix wrong basis status in postsolving of aggregated variables
+- eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
