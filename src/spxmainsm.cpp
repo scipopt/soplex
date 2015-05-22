@@ -890,35 +890,12 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       ASSERT_WARN( "WMAISM73", isNotZero(m_aij * aik) );
 
       // basis:
-      if (cStatus[m_k] == SPxSolver::ON_LOWER)
-      {
-         if (m_jFixed)
-            cStatus[m_j] = SPxSolver::FIXED;
-         else
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-      }
-      else if (cStatus[m_k] == SPxSolver::ON_UPPER)
-      {
-         if (m_jFixed)
-            cStatus[m_j] = SPxSolver::FIXED;
-         else
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-      }
+      if( m_jFixed)
+         cStatus[m_j] = SPxSolver::FIXED;
       else
-      {
-         if (m_jFixed)
-            cStatus[m_j] = SPxSolver::FIXED;
-         else if (m_strictLo)
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-         else
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-      }
+         cStatus[m_j] = (r[m_j] > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
 
       cStatus[m_k] = SPxSolver::BASIC;
-
-      assert((r[m_j] >= -eps() && cStatus[m_j] == SPxSolver::ON_LOWER)||
-             (r[m_j] <= eps() && cStatus[m_j] == SPxSolver::ON_UPPER ) ||
-             (cStatus[m_j] == SPxSolver::FIXED));
    }
 
 #ifdef CHECK_BASIC_DIM
