@@ -20,7 +20,7 @@
 #include "soplex.h"
 #include "statistics.h"
 
-#define SIMPLEDEBUG
+//#define SIMPLEDEBUG
 //#define DEBUGGING
 //#define SOLVEIDS_DEBUG
 //#define WRITE_LP
@@ -141,6 +141,7 @@ namespace soplex
 
       // creating the initial reduced problem from the basis information
       _formIdsReducedProblem();
+
 
       _hasBasis = false;
       bool hasRedBasis = false;
@@ -263,13 +264,19 @@ namespace soplex
          algIterCount++;
       }
 
+      // resetting the verbosity level
+      spxout.setVerbosity( orig_verbosity );
+
+      // solving the complementary problem with the original objective function
+      _setComplementaryOriginalObjective();
+
       // for clean up
       // the real lp has to be set to not loaded.
       //_isRealLPLoaded = false;
       // the basis has to be set to false
       _hasBasis = false;
 
-      //#ifdef WRITE_LP
+#ifdef WRITE_LP
       SPxLPIds compDualLP;
       _compSolver.buildDualProblem(compDualLP, _idsPrimalRowIDs.get_ptr(), _idsPrimalColIDs.get_ptr(),
             _idsDualRowIDs.get_ptr(), _idsDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
@@ -277,7 +284,27 @@ namespace soplex
       _compSolver.loadLP(compDualLP);
       printf("Writing the complementary lp to a file\n");
       _compSolver.writeFile("complement.lp");
-      //#endif
+
+      _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
+
+      _solReal._hasPrimal = true;
+      _hasSolReal = true;
+      // get the primal solutions from the reduced problem
+      DVector reducedLPPrimalVector(_solver.nCols());
+      _compSolver.getPrimal(reducedLPPrimalVector);
+      _solReal._primal.reDim(_compSolver.nCols());
+      _solReal._primal = reducedLPPrimalVector;
+
+      Real maxviol = 0;
+      Real sumviol = 0;
+
+      if( getIdsBoundViolation(maxviol, sumviol) )
+         printf("Bound violation: %f %f\n", maxviol, sumviol);
+
+      if( getIdsRowViolation(maxviol, sumviol) )
+         printf("Row violation: %f %f\n", maxviol, sumviol);
+#endif
+
 
       // returning the sense to minimise
       if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -376,6 +403,9 @@ namespace soplex
       int nnonposind = 0;
       int ncompatind = 0;
 
+      assert(_solver.nCols() == numColsReal());
+      assert(_solver.nRows() == numRowsReal());
+
       // setting row counter to zero
       numIncludedRows = 0;
 
@@ -400,9 +430,9 @@ namespace soplex
       printf("Computing the compatible columns\n");
       printf("Solving time: %f\n", solveTime());
 #endif
-      spx_alloc(compatind, numRowsReal());
-      spx_alloc(rowsforremoval, numRowsReal());
-      _getCompatibleColumns(nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind);
+      spx_alloc(compatind, _solver.nRows());
+      spx_alloc(rowsforremoval, _solver.nRows());
+      _getCompatibleColumns(nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind, true);
 
       int* compatboundcons = 0;
       int ncompatboundcons = 0;
@@ -687,6 +717,9 @@ namespace soplex
             _statistics->degenPivotsPrimal += solver.primalDegeneratePivots();
             _statistics->degenPivotsDual += solver.dualDegeneratePivots();
 
+            _statistics->sumDualDegen += _solver.sumDualDegeneracy();
+            _statistics->sumPrimalDegen += _solver.sumPrimalDegeneracy();
+
             if( _currentProb == IDS_ORIG )
                _statistics->iterationsInit += solver.iterations();
             else
@@ -945,8 +978,6 @@ namespace soplex
       int bestrow = -1;
       spx_alloc(newrowidx, _nPrimalRows);
 
-      //bool ratioTest = true;
-      bool ratioTest = false;
       for( int i = 0; i < _nPrimalRows; i++ )
       {
          LPRowReal origlprow;
@@ -978,7 +1009,7 @@ namespace soplex
             printf("i: %d, rownumber: %d, compProbPrimal: %f, dualSign: %d\n", i, rownumber, compProbPrimal, varSign);
 #endif
             // add row to the reduced problem if the computed dual is of the correct sign for a feasible dual solution
-            if( ratioTest && ((varSign == SoPlex::IS_FREE && !isZero(compProbPrimal, feastol)) ||
+            if( ((varSign == SoPlex::IS_FREE && !isZero(compProbPrimal, feastol)) ||
                   (varSign == SoPlex::IS_POS && GT(compProbPrimal*maxDualRatio, 0, feastol)) ||
                   (varSign == SoPlex::IS_NEG && LT(compProbPrimal*maxDualRatio, 0, feastol)))
                   /*|| (//isZero(objValue, 1e-10) &&
@@ -992,8 +1023,8 @@ namespace soplex
                //violated constraint. I only want to add a row for the most violated constraint. That is why the row
                //adding functionality is put outside the for loop.
 #if 1
-               updaterows.add(transformedRows.lhs(rownumber), transformedRows.rowVector(rownumber),
-                     transformedRows.rhs(rownumber));
+               updaterows.add(_transformedRows.lhs(rownumber), _transformedRows.rowVector(rownumber),
+                     _transformedRows.rhs(rownumber));
 
                if( !_idsReducedProbRows[rownumber] )
                {
@@ -1016,8 +1047,8 @@ namespace soplex
 
 #if 0
       // only adding the most violated row.
-      updaterows.add(transformedRows.lhs(bestrow), transformedRows.rowVector(bestrow),
-            transformedRows.rhs(bestrow));
+      updaterows.add(_transformedRows.lhs(bestrow), _transformedRows.rowVector(bestrow),
+            _transformedRows.rhs(bestrow));
 
       _idsReducedProbRows[bestrow] = true;
       newrowidx[nnewrowidx] = bestrow;
@@ -1040,7 +1071,7 @@ namespace soplex
 #endif
 
       // if no rows are identified by the pricing rule, we add rows based upon the constraint violations
-      if( !ratioTest && nnewrowidx == 0 )
+      if( nnewrowidx == 0 )
       {
          _findViolatedRows(objValue, updaterows, newrowidx, nnewrowidx);
       }
@@ -1065,7 +1096,6 @@ namespace soplex
    // To aid the computation, all violations are translated to <= constraints
    void SoPlex::_findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx)
    {
-      printf("Finding violated rows\n");
       Real feastol = realParam(SoPlex::FEASTOL);
       DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
 
@@ -1127,8 +1157,8 @@ namespace soplex
                printf("Adding rows!!!\n");
 #endif
 #ifndef LARGEST_VIOL
-               updaterows.add(transformedRows.lhs(rownumber), transformedRows.rowVector(rownumber),
-                     transformedRows.rhs(rownumber));
+               updaterows.add(_transformedRows.lhs(rownumber), _transformedRows.rowVector(rownumber),
+                     _transformedRows.rhs(rownumber));
 
                if( !_idsReducedProbRows[rownumber] )
                {
@@ -1150,8 +1180,8 @@ namespace soplex
       }
 #ifdef LARGEST_VIOL
       // only adding the most violated row.
-      updaterows.add(transformedRows.lhs(bestrow), transformedRows.rowVector(bestrow),
-            transformedRows.rhs(bestrow));
+      updaterows.add(_transformedRows.lhs(bestrow), _transformedRows.rowVector(bestrow),
+            _transformedRows.rhs(bestrow));
 
       assert(!_idsReducedProbRows[bestrow]);
       if( !_idsReducedProbRows[bestrow] )
@@ -1162,8 +1192,6 @@ namespace soplex
       _idsReducedProbRows[bestrow] = true;
       newrowidx[nnewrowidx] = bestrow;
       nnewrowidx++;
-
-      printf("Best row added to the reduced problem: %d\n", bestrow);
 #endif
    }
 
@@ -1270,21 +1298,28 @@ namespace soplex
    // This function also updates the constraint matrix of the reduced problem. It is efficient to perform this in the
    // following function because the required linear algebra has been performed.
    void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
-         int nnonposind, int* ncompatind)
+         int nnonposind, int* ncompatind, bool formRedProb)
    {
+      Real feastol = realParam(SoPlex::FEASTOL);
+
       bool compatible;
-      SSVector y(numColsReal());
+      SSVector y(_solver.nCols());
       y.unSetup();
 
       *ncompatind  = 0;
 
-      _idsReducedProbRowIDs.reSize(numRowsReal());
-      _idsReducedProbColRowIDs.reSize(numColsReal());
+      if( formRedProb )
+      {
+         _idsReducedProbRowIDs.reSize(_solver.nRows());
+         _idsReducedProbColRowIDs.reSize(_solver.nRows());
+      }
 
       for( int i = 0; i < numRowsReal(); ++i )
       {
          rowsforremoval[i] = i;
-         _idsReducedProbRows[i] = true;
+         if( formRedProb )
+            _idsReducedProbRows[i] = true;
+
          numIncludedRows++;
 
          // the rhs of this calculation are the rows of the constraint matrix
@@ -1304,7 +1339,7 @@ namespace soplex
          {
             // @todo really need to check this part of the code. Run through this with Ambros or Matthias.
             // 09.02.2014 getting a tolerance issue with this check. Don't know how to fix it.
-            if( !isZero(y[nonposind[j]], 1e-15) )
+            if( !isZero(y[nonposind[j]], feastol) )
             {
                compatible = false;
                break;
@@ -1324,7 +1359,7 @@ namespace soplex
          {
             for( int j = 0; j < numColsReal(); j++ )
             {
-               if( !isZero(y[j]) )
+               if( !isZero(y[j], feastol) )
                   newRowVector.add(j, y[j]);
             }
          }
@@ -1333,7 +1368,9 @@ namespace soplex
          _solver.getRow(i, rowtoupdate);
 
          rowtoupdate.setRowVector(newRowVector);
-         transformedRows.add(rowtoupdate);
+
+         if( formRedProb )
+            _transformedRows.add(rowtoupdate);
 
 
          // Making all equality constraints compatible, i.e. they are included in the reduced problem
@@ -1345,10 +1382,13 @@ namespace soplex
             compatind[*ncompatind] = i;
             (*ncompatind)++;
 
-            _idsReducedProbRowIDs[i] = _solver.rowId(i);
+            if( formRedProb )
+            {
+               _idsReducedProbRowIDs[i] = _solver.rowId(i);
 
-            // updating the compatible row
-            _idsLP->changeRow(i, rowtoupdate);
+               // updating the compatible row
+               _idsLP->changeRow(i, rowtoupdate);
+            }
 
 #if 0
             // checking the columns contained in the removed row to ensure that all are removed.
@@ -1370,8 +1410,10 @@ namespace soplex
          {
             // setting an array to identify the rows to be removed from the LP to form the reduced problem
             rowsforremoval[i] = -1;
-            _idsReducedProbRows[i] = false;
             numIncludedRows--;
+
+            if( formRedProb )
+               _idsReducedProbRows[i] = false;
 #if 0
             // checking the columns contained in the removed row to ensure that all are removed.
             LPRowReal lprow;
@@ -1394,7 +1436,7 @@ namespace soplex
 #endif
          }
       }
-      assert(numIncludedRows <= _realLP->nRows());
+      assert(numIncludedRows <= _solver.nRows());
    }
 
 
@@ -1402,6 +1444,8 @@ namespace soplex
    /// computes the reduced problem objective coefficients
    void SoPlex::_computeReducedProbObjCoeff()
    {
+      Real feastol = realParam(SoPlex::FEASTOL);
+
       SSVector y(numColsReal());
       y.unSetup();
 
@@ -1416,7 +1460,7 @@ namespace soplex
          MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
       }
 
-      transformedObj.reDim(numColsReal());
+      _transformedObj.reDim(numColsReal());
       if( y.isSetup() )
       {
          int ycount = 0;
@@ -1424,26 +1468,26 @@ namespace soplex
          {
             if( ycount < y.size() && i == y.index(ycount) )
             {
-               transformedObj[i] = y.value(ycount);
+               _transformedObj[i] = y.value(ycount);
                ycount++;
             }
             else
-               transformedObj[i] = 0.0;
+               _transformedObj[i] = 0.0;
          }
       }
       else
       {
          for( int i = 0; i < numColsReal(); i++ )
          {
-            if( isZero(y[i]) )
-               transformedObj[i] = 0.0;
+            if( isZero(y[i], feastol) )
+               _transformedObj[i] = 0.0;
             else
-               transformedObj[i] = y[i];
+               _transformedObj[i] = y[i];
          }
       }
 
       // setting the updated objective vector
-      _idsLP->changeObj(transformedObj);
+      _idsLP->changeObj(_transformedObj);
    }
 
 
@@ -1454,6 +1498,8 @@ namespace soplex
    void SoPlex::_getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind,
          int* ncompatboundcons, int nnonposind)
    {
+      Real feastol = realParam(SoPlex::FEASTOL);
+
       bool compatible;
       SSVector y(numColsReal());
       y.unSetup();
@@ -1508,7 +1554,7 @@ namespace soplex
          {
             for( int j = 0; j < numColsReal(); j++ )
             {
-               if( !isZero(y[j]) )
+               if( !isZero(y[j], feastol) )
                {
                   newRowVector.add(j, y[j]);
                }
@@ -1516,7 +1562,7 @@ namespace soplex
          }
 
          // will probably need to map this set of rows.
-         transformedRows.add(_solver.lower(i), newRowVector, _solver.upper(i));
+         _transformedRows.add(_solver.lower(i), newRowVector, _solver.upper(i));
 
          // variable bounds are compatible in the current implementation.
          compatible = true;
@@ -1540,6 +1586,8 @@ namespace soplex
 
                boundcons.add(lhs, newRowVector, rhs);
             }
+
+
          }
       }
 
@@ -1675,6 +1723,8 @@ namespace soplex
    // the constraints and the removal of variables
    void SoPlex::_updateIdsComplementaryProblem(DVector dualVector, bool origObj)
    {
+      Real feastol = realParam(SoPlex::FEASTOL);
+
       int prevNumCols = _compSolver.nCols(); // number of columns in the previous formulation of the complementary prob
       int prevNumRows = _compSolver.nRows();
       int prevPrimalRowIds = _nPrimalRows;
@@ -1761,7 +1811,9 @@ namespace soplex
 
             if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_UPPER ||
                   _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_FIXED ||
-                  _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_FREE )
+                  _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_FREE ||
+                 (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_LOWER &&
+                 EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
             {
                // this assert should stay, but there is an issue with the status and the dual vector
                //assert(GT(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])], 0.0));
@@ -1784,7 +1836,9 @@ namespace soplex
 
                numElimColsAdded++;
             }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER )
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER ||
+              (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_UPPER &&
+              EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
             {
                // this assert should stay, but there is an issue with the status and the dual vector
                //assert(LT(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])], 0.0));
@@ -1857,13 +1911,17 @@ namespace soplex
             assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
             if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_UPPER ||
                   _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_FIXED ||
-                  _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_FREE )
+                  _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_FREE ||
+                 (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_LOWER &&
+                 EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
             {
                //assert(GT(dualVector[solverRowNum], 0.0));
                _compSolver.changeObj(_idsDualColIDs[i], _realLP->rhs(SPxRowId(_idsPrimalRowIDs[i])));
                _compSolver.changeBounds(_idsDualColIDs[i], -infinity, infinity);
             }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER )
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER ||
+              (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_UPPER &&
+              EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
             {
                //assert(LT(dualVector[solverRowNum], 0.0));
                _compSolver.changeObj(_idsDualColIDs[i], _realLP->lhs(SPxRowId(_idsPrimalRowIDs[i])));
@@ -1871,7 +1929,6 @@ namespace soplex
             }
             else //if ( _solver.basis().desc().rowStatus(solverRowNum) != SPxBasis::Desc::D_FREE )
             {
-               printf("Row (%d,%d) status: %d\n", rowNumber, solverRowNum, _solver.basis().desc().rowStatus(solverRowNum));
                //assert(isZero(dualVector[solverRowNum], 0.0));
 
                colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_idsDualColIDs[i]));
@@ -1911,6 +1968,8 @@ namespace soplex
                      slackRowCoeff.add(_compSolver.number(SPxColId(_idsDualColIDs[i])), SLACKCOEFF);
                      slackRowCoeff.add(_compSolver.number(SPxColId(_idsDualColIDs[i + 1])), -SLACKCOEFF);
                   }
+
+
                   i++;
                   break;
                case LPRowBase<Real>::EQUAL:
@@ -1930,6 +1989,36 @@ namespace soplex
                   break;
                default:
                   throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+            }
+
+            if( origObj )
+            {
+               int numRemove = 1;
+               int removeCount = 0;
+               if( _realLP->number(SPxColId(_idsPrimalRowIDs[i])) ==
+                        _realLP->number(SPxColId(_idsPrimalRowIDs[i+1])) )
+                  numRemove++;
+
+               do
+               {
+                  colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_idsDualColIDs[i]));
+                  ncolsforremoval++;
+
+                  if( _nElimPrimalRows >= _idsElimPrimalRowIDs.size() )
+                     _idsElimPrimalRowIDs.reSize(_realLP->nRows());
+
+                  _idsElimPrimalRowIDs[_nElimPrimalRows] = _idsPrimalRowIDs[i];
+                  _nElimPrimalRows++;
+                  _idsPrimalRowIDs.remove(i);
+                  _nPrimalRows--;
+                  _idsDualColIDs.remove(i);
+                  _nDualCols--;
+
+                  i--;
+                  prevPrimalRowIds--;
+
+                  removeCount++;
+               } while( removeCount < numRemove );
             }
          }
       }
@@ -2017,25 +2106,38 @@ namespace soplex
    /// identify the dual columns related to the fixed variables
    void SoPlex::_identifyComplementaryFixedPrimalVars(int* currFixedVars)
    {
+      Real feastol = realParam(SoPlex::FEASTOL);
+
       int numFixedVar = 0;
       for( int i = 0; i < _realLP->nCols(); i++ )
       {
          currFixedVars[i] = 0;
-         assert(_idsReducedProbColRowIDs[i].isValid());
          if( !_idsReducedProbColRowIDs[i].isValid() )
             continue;
 
          int rowNumber = _solver.number(_idsReducedProbColRowIDs[i]);
-         if( _idsReducedProbColRowIDs[i].isValid() &&
-              (_solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::P_ON_UPPER ||
+         if( _idsReducedProbColRowIDs[i].isValid() )
+         {
+            if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::P_ON_UPPER ||
                _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::P_ON_LOWER ||
                _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::P_FIXED ||
-               _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::D_FREE) )
-         {
-            // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
-            currFixedVars[i] = getOrigVarFixedDirection(i);
+               _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::D_FREE )
+            {
+               // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
+               currFixedVars[i] = getOrigVarFixedDirection(i);
 
-            numFixedVar++;
+               numFixedVar++;
+            }
+            else
+            {
+               // the dual flags do not imply anything about the primal status of the rows.
+               if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::D_ON_LOWER &&
+                EQ(_solver.rhs(rowNumber) - _solver.pVec()[rowNumber], 0.0, feastol) )
+                  currFixedVars[i] = 1;
+               else if(  _solver.basis().desc().rowStatus(rowNumber) == SPxBasis::Desc::D_ON_UPPER &&
+                EQ(_solver.pVec()[rowNumber] - _solver.lhs(rowNumber), 0.0, feastol) )
+                  currFixedVars[i] = -1;
+            }
          }
       }
 
@@ -2239,8 +2341,6 @@ namespace soplex
          }
       }
 
-      printf("Number of fixed vars: %d. Number of bound cons: %d\n", numFixedVars, numBoundConsCols);
-
       // freeing allocated memory
       spx_free(addedbndcolids);
       spx_free(addedcolids);
@@ -2251,98 +2351,69 @@ namespace soplex
    /// updating the complementary problem with the original objective function
    void SoPlex::_setComplementaryOriginalObjective()
    {
-#if 0
       for( int i = 0; i < _realLP->nCols(); i++ )
       {
          assert(_idsCompProbColIDsIdx[i] != -1);   // this should be true in the current implementation
          int idIndex = _idsCompProbColIDsIdx[i];
-         if( _idsCompProbColIDsIdx[i] != -1 )//&& _fixedOrigVars[i] != currFixedVars[i] )
+         int compRowNumber = _compSolver.number(_idsDualRowIDs[idIndex]);
+         if( _idsCompProbColIDsIdx[i] != -1 )
          {
-            if( EQ(_realLP->lower(i), _realLP->upper(i)) )
+            // In the dual conversion, when a variable has a non-standard bound it is converted to a free variable.
+            if( LE(_realLP->lower(i), -infinity) && GE(_realLP->upper(i), infinity) )
+            {
+               // unrestricted variable
+               _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
+               _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
+               assert(LE(_compSolver.lhs(compRowNumber), _compSolver.rhs(compRowNumber)));
+            }
+            else if( LE(_realLP->lower(i), -infinity) )
+            {
+               // variable with a finite upper bound
+               _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
+               if( isZero(_realLP->upper(i)) )
+                  _compSolver.changeLhs(compRowNumber, -infinity);
+               else
+                  _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
+            }
+            else if( GE(_realLP->upper(i), infinity) )
+            {
+               // variable with a finite lower bound
+               _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
+               if( isZero(_realLP->upper(i)) )
+                  _compSolver.changeRhs(compRowNumber, infinity);
+               else
+                  _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
+            }
+            else if( NE(_realLP->lower(i), _realLP->upper(i)) )
+            {
+               // variable with a finite upper and lower bound
+               if( isZero(_realLP->upper(i)) )
+               {
+                  _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
+                  _compSolver.changeRhs(compRowNumber, infinity);
+               }
+               else if( isZero(_realLP->upper(i)) )
+               {
+                  _compSolver.changeLhs(compRowNumber, -infinity);
+                  _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
+               }
+               else
+               {
+                  _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
+                  _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
+               }
+            }
+            else
             {
                // fixed variable
-            }
-            else if( GT(_realLP->lower(i), -infinity) && LT(_realLP->upper(i), infinity) )
-            {
-               // variable has two bounds
-               if( EQ(_realLP->lower(i), 0.0) )
-               {
-                  // standard greater than/equal constraint
-               }
-               else if( EQ(_realLP->upper(i), 0.0) )
-               {
-                  // standard less than/equal constraint
-               }
-               else
-               {
-                  // bounded variable
-               }
-            }
-            else if( GT(_realLP->lower(i), -infinity) )
-            {
-               if( EQ(_realLP->lower(i), 0.0) )
-               {
-                  // standard greater than/equal constraint
-               }
-               else
-               {
-                  // non-standard bounds
-               }
-            }
-            else if( LT(_realLP->upper(i), infinity) )
-            {
-               if( EQ(_realLP->upper(i), 0.0) )
-               {
-                  // standard less than/equal constraint
-               }
-               else
-               {
-                  // non-standard bounds
-               }
-            }
-            if( _fixedOrigVars[i] != 0 )
-            {
-               assert(_compSolver.number(SPxColId(_idsFixedVarDualIDs[i])) >= 0);
-               assert(_fixedOrigVars[i] == -1 || _fixedOrigVars[i] == 1);
-
-               if( _fixedOrig )
-
-            }
-            else if( false && !_idsReducedProbColRowIDs[i].isValid() ) // we want to remove all valid columns
-               // in the current implementation, the only columns not included in the reduced problem are free columns.
-            {
-               assert((LE(_realLP->lower(i), -infinity) && GE(_realLP->upper(i), infinity)) ||
-                     _compSolver.number(SPxColId(_idsVarBoundDualIDs[i*2])) >= 0);
-               int varcount = 0;
-               if( GT(_realLP->lower(i), -infinity) )
-               {
-                  colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_idsVarBoundDualIDs[i*2 + varcount]));
-                  ncolsforremoval++;
-
-                  _idsVarBoundDualIDs[i*2 + varcount] = tempId;
-                  varcount++;
-               }
-
-               if( LT(_realLP->upper(i), infinity) )
-               {
-                  colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_idsVarBoundDualIDs[i*2 + varcount]));
-                  ncolsforremoval++;
-
-                  _idsVarBoundDualIDs[i*2 + varcount] = tempId;
-               }
-
+               _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
+               _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
             }
          }
       }
 
-      int* perm = 0;
-      spx_alloc(perm, _compSolver.nCols());
-      _compSolver.removeCols(colsforremoval, ncolsforremoval, perm);
-
-      // freeing allocated memory
-      spx_free(perm);
-      spx_free(colsforremoval);
-#endif
+      // removing the complementary problem slack column dual row
+      _compSolver.removeRow(_compSlackDualRowId);
    }
 
 
@@ -2738,6 +2809,127 @@ namespace soplex
 
 
 
+   /// gets violation of bounds; returns true on success
+   bool SoPlex::getIdsBoundViolation(Real& maxviol, Real& sumviol)
+   {
+      VectorReal& primal = _solReal._primal;
+      assert(primal.dim() == _realLP->nCols());
+
+      maxviol = 0.0;
+      sumviol = 0.0;
+
+      for( int i = _realLP->nCols() - 1; i >= 0; i-- )
+      {
+         Real viol = _realLP->lower(i) - primal[i];
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+         //else if( isZero(viol) )
+            //printf("Col %d fixed to lower. Redprob fixed: %d\n", i, _fixedOrigVars[i]);
+
+         viol = primal[i] - _realLP->upper(i);
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+         //else if( isZero(viol) )
+            //printf("Col %d fixed to upper. Redprob fixed: %d\n", i, _fixedOrigVars[i]);
+      }
+
+      return true;
+   }
+
+
+
+   /// gets violation of constraints; returns true on success
+   bool SoPlex::getIdsRowViolation(Real& maxviol, Real& sumviol)
+   {
+      Real feastol = realParam(SoPlex::FEASTOL);
+
+      VectorReal& primal = _solReal._primal;
+      assert(primal.dim() == _realLP->nCols());
+
+      DVectorReal activity(_realLP->nRows());
+      _realLP->computePrimalActivity(primal, activity);
+      maxviol = 0.0;
+      sumviol = 0.0;
+
+      bool isViol = false;
+
+      for( int i = _realLP->nRows() - 1; i >= 0; i-- )
+      {
+         int solverRowNum = _solver.number(_idsReducedProbRowIDs[i]);
+
+         isViol = false;
+
+         Real viol = _realLP->lhs(i) - activity[i];
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+
+         if( GT(viol, 0.0, feastol) )
+            isViol = true;
+
+         viol = activity[i] - _realLP->rhs(i);
+         if( viol > 0.0 )
+         {
+            sumviol += viol;
+            if( viol > maxviol )
+               maxviol = viol;
+         }
+
+         if( GT(viol, 0.0, feastol) )
+            isViol = true;
+
+         if( isViol )
+         {
+            if( _idsReducedProbRows[i] &&
+               (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_UPPER ||
+               _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_FIXED ||
+               _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER ||
+               _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_FREE) )
+               printf("I");
+            printf("(%d, %d, %d, %d) %f ", _solver.basis().desc().rowStatus(solverRowNum), _idsReducedProbRows[i], i,
+               solverRowNum, viol);
+            printf("Bounds = Lower (%f, %f) Upper (%f, %f)\n", _realLP->lhs(i), _solver.lhs(solverRowNum),
+               _realLP->rhs(i), _solver.rhs(solverRowNum));
+
+            if( _idsReducedProbRows[i] )
+            {
+               for( int j = 0; j < _realLP->rowVector(i).size(); j++ )
+                  printf("(%d, %f) ", _realLP->rowVector(i).index(j), _realLP->rowVector(i).value(j));
+               printf("\n");
+
+               for( int j = 0; j < _solver.rowVector(solverRowNum).size(); j++ )
+               {
+                  int rowNumber = _solver.number(_idsReducedProbColRowIDs[_solver.rowVector(solverRowNum).index(j)]);
+                  printf("(%d, %f, %d) ", _solver.rowVector(solverRowNum).index(j),
+                     _solver.rowVector(solverRowNum).value(j), _solver.basis().desc().rowStatus(rowNumber));
+
+                  for( int k = 0; k < _solver.rowVector(rowNumber).size(); k++ )
+                     printf("(%d, %f) ", _solver.rowVector(rowNumber).index(k),
+                        _solver.rowVector(rowNumber).value(k));
+
+               }
+               printf("\n");
+            }
+         }
+      }
+      printf("\n");
+
+      return true;
+   }
+
+
+
    /// function call to terminate the decomposition simplex
    bool SoPlex::idsTerminate()
    {
@@ -2756,6 +2948,13 @@ namespace soplex
       }
 
       return false;
+   }
+
+
+
+   /// function call to terminate the decomposition simplex
+   void SoPlex::_getIdsPrimalVector(Vector& primal)
+   {
    }
 
 } // namespace soplex
