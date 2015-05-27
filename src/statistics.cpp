@@ -130,6 +130,8 @@ namespace soplex
       degenPivotsDual = 0;
       degenPivotCandPrimal = 0;
       degenPivotCandDual = 0;
+      sumDualDegen = 0;
+      sumPrimalDegen = 0;
    }
 
    /// prints statistics
@@ -138,6 +140,10 @@ namespace soplex
       Real solTime = solvingTime->time();
       Real totTime = readingTime->time() + solTime;
       Real otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() - simplexTime->time() - rationalTime->time();
+
+      Real avgPrimalDegeneracy = iterationsPrimal > 0 ? sumPrimalDegen / iterationsPrimal : 0.0;
+      Real avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?
+         (sumDualDegen / (iterations - iterationsPrimal)) : 0.0;
 
       os << std::fixed << std::setprecision(2);
 
@@ -212,6 +218,8 @@ namespace soplex
       os << "  Dual Pivots       : " << degenPivotsDual << "\n";
       os << "  Primal Candidates : " << degenPivotCandPrimal << "\n";
       os << "  Dual Candidates   : " << degenPivotCandDual << "\n";
+      os << "  Average Primal    : " << avgPrimalDegeneracy << "\n";
+      os << "  Average Dual      : " << avgDualDegeneracy << "\n";
 
       if( iterationsInit > 0 )
       {

@@ -282,6 +282,7 @@ private:
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
    bool           getStartingIdsBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
+   bool           computeDegeneracy;
    //@}
 
 protected:
@@ -347,6 +348,8 @@ protected:
    int            leaveCycles;      ///< the number of degenerate steps during the leaving algorithm
    int            enterDegenCand;   ///< the number of degenerate candidates in the entering algorithm
    int            leaveDegenCand;   ///< the number of degenerate candidates in the leaving algorithm
+   Real           primalDegenSum;   ///< the sum of the primal degeneracy percentage
+   Real           dualDegenSum;     ///< the sum of the dual degeneracy percentage
 
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
@@ -1917,7 +1920,7 @@ public:
 
    /// get level of dual degeneracy
    // this function is used for the improved dual simplex
-   Real getDegeneracyLevel(Vector feasvec);
+   Real getDegeneracyLevel(Vector degenvec);
 
    /// get dual steepest edge norms
    bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
@@ -1947,6 +1950,18 @@ public:
    int primalDegeneratePivots()
    {
       return (rep() == ROW) ? leaveCycles : enterCycles;
+   }
+
+   /// get the sum of dual degeneracy
+   Real sumDualDegeneracy()
+   {
+      return dualDegenSum;
+   }
+
+   /// get the sum of primal degeneracy
+   Real sumPrimalDegeneracy()
+   {
+      return primalDegenSum;
    }
 
    /// get number of iterations of current solution.
@@ -2055,6 +2070,19 @@ public:
          return FINDSTARTBASIS;
       else
          return DONTFINDSTARTBASIS;
+   }
+
+   /// sets whether the degeneracy is computed at each iteration
+   void setComputeDegenFlag(bool computeDegen)
+   {
+      computeDegeneracy = computeDegen;
+   }
+
+
+   /// returns whether the degeneracy is computed in each iteration
+   bool getComputeDegeneracy() const
+   {
+      return computeDegeneracy;
    }
    //@}
 

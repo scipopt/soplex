@@ -123,6 +123,8 @@ namespace soplex
       int degenPivotsDual;       ///< number of dual degenerate pivots
       int degenPivotCandPrimal;  ///< number of pivoting candidates that will produce a degenerate step in the primal
       int degenPivotCandDual;    ///< number of pivoting candidates that will produce a degenerate step in the dual
+      Real sumDualDegen;         ///< the sum of the rate of dual degeneracy at each iteration
+      Real sumPrimalDegen;       ///< the sum of the rate of primal degeneracy at each iteration
 
       //@}
    };

@@ -168,6 +168,8 @@ SPxSolver::Status SPxSolver::solve()
    totalboundflips = 0;
    enterCycles = 0;
    leaveCycles = 0;
+   primalDegenSum = 0;
+   dualDegenSum = 0;
 
    stallNumRecovers = 0;
 
@@ -1216,6 +1218,35 @@ bool SPxSolver::terminate()
       }
    }
 
+
+
+   if( getComputeDegeneracy() && iteration() > prevIteration() )
+   {
+      DVector degenvec(nCols());
+      if( rep() == ROW )
+      {
+         if( type() == ENTER )   // dual simplex
+            dualDegenSum += getDegeneracyLevel(fVec());
+         else                    // primal simplex
+         {
+            getPrimal(degenvec);
+            primalDegenSum += getDegeneracyLevel(degenvec);
+         }
+      }
+      else
+      {
+         assert(rep() == COLUMN);
+         if( type() == LEAVE )   // dual simplex
+            dualDegenSum += getDegeneracyLevel(pVec());
+         else
+         {
+            getPrimal(degenvec);
+            primalDegenSum += getDegeneracyLevel(degenvec);
+         }
+      }
+   }
+
+
    // the improved dual simplex requires a starting basis
    // if the flag getStartingIdsBasis is set to true the simplex will terminate when a dual basis is found
    if( type() == ENTER && getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL &&
@@ -1247,6 +1278,7 @@ bool SPxSolver::terminate()
       }
    }
 
+   lastIterCount = iterCount;
 
    return false;
 }

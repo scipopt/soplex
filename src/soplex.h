@@ -825,22 +825,24 @@ public:
       // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
       USEIMPROVEDDUALSIMPLEX = 4,
 
-      ACCEPTCYCLING = 5,
+      COMPUTEDEGEN = 5,
+
+      ACCEPTCYCLING = 6,
 
       /// apply rational reconstruction after each iterative refinement?
-      RATREC = 6,
+      RATREC = 7,
 
       /// round scaling factors for iterative refinement to powers of two?
-      POWERSCALING = 7,
+      POWERSCALING = 8,
 
       /// continue iterative refinement with exact basic solution if not optimal?
-      RATFACJUMP = 8,
+      RATFACJUMP = 9,
 
       /// should feasibility be tested with relaxed bounds and sides?
-      FEASRELAX = 9,
+      FEASRELAX = 10,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 10
+      BOOLPARAM_COUNT = 11
    } BoolParam;
 
    /// integer parameters
@@ -1946,8 +1948,17 @@ private:
    /// gets the coefficient of the slack variable in the primal complementary problem
    Real getCompSlackVarCoeff(int primalRowNum);
 
+   /// gets violation of bounds; returns true on success
+   bool getIdsBoundViolation(Real& maxviol, Real& sumviol);
+
+   /// gets violation of constraints; returns true on success
+   bool getIdsRowViolation(Real& maxviol, Real& sumviol);
+
    /// function call to terminate the decomposition simplex
    bool idsTerminate();
+
+   /// function call to terminate the decomposition simplex
+   void _getIdsPrimalVector(Vector& primal);
 
    //@}
 };

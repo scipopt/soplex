@@ -932,6 +932,7 @@ SPxSolver::SPxSolver(
    , displayFreq (200)
    , sparsePricingFactor(SPARSITYFACTOR)
    , getStartingIdsBasis(false)
+   , computeDegeneracy(false)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -1754,24 +1755,67 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 }
 
 // NOTE: This only works for the row representation. Need to update to account for column representation.
-Real SPxSolver::getDegeneracyLevel(Vector feasvec)
+// The degenvec differs relative to the algorithm being used.
+// For the primal simplex, degenvec is the primal solution values.
+// For the dual simplex, the degenvec is the feasvec (ROW) and pVec (COLUMN).
+Real SPxSolver::getDegeneracyLevel(Vector degenvec)
 {
-   int numDegenerateRows = 0;
+   int numDegenerate = 0;
    Real degeneracyLevel = 0;
 
    // iterating over all columns in the basis matrix
    // this identifies the basis indices and those that have a zero dual multiplier (rows) or zero reduced cost (cols).
-   for( int i = 0; i < nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
+   if( rep() == ROW )
    {
-      // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
-      // reduced costs. This requirement is regardless of the objective sense.
-      if( isZero(feasvec[i], feastol()) )
-         numDegenerateRows++;
+      for( int i = 0; i < nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
+      {
+         // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
+         // reduced costs. This requirement is regardless of the objective sense.
+         if( isZero(degenvec[i], feastol()) )
+            numDegenerate++;
+      }
+
+      if( type() == ENTER )   // dual simplex
+         degeneracyLevel = Real(numDegenerate)/nCols();
+      else                    // primal simplex
+      {
+         assert(type() == LEAVE);
+         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate - (nCols() - nRows())) : 0.0;
+         degeneracyLevel = degenVars/nRows();
+      }
    }
+   else
+   {
+      assert(rep() == COLUMN);
 
-   degeneracyLevel = Real(numDegenerateRows)/nCols();
+      for( int i = 0; i < nCols(); i++ )
+      {
+         if( type() == LEAVE )   // dual simplex
+         {
+            if( isZero(maxObj()[i] - degenvec[i], feastol()) )
+               numDegenerate++;
+         }
+         else                    // primal simplex
+         {
+            assert( type() == ENTER );
+            if( isZero(degenvec[i], feastol()) )
+               numDegenerate++;
+         }
+      }
 
-   lastIterCount = iterCount;
+
+      if( type() == LEAVE )   // dual simplex
+      {
+         Real degenVars = nRows() > numDegenerate ? Real(nRows() - numDegenerate) : 0.0;
+         degeneracyLevel = degenVars/nCols();
+      }
+      else                    // primal simplex
+      {
+         assert(type() == ENTER);
+         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate - (nCols() - nRows())) : 0.0;
+         degeneracyLevel = degenVars/nRows();
+      }
+   }
 
    return degeneracyLevel;
 }

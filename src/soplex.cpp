@@ -151,6 +151,11 @@ namespace soplex
             _boolParamDescription[SoPlex::USEIMPROVEDDUALSIMPLEX] = "should the improved dual simplex be used to solve the LP?";
             _boolParamDefault[SoPlex::USEIMPROVEDDUALSIMPLEX] = false;
 
+            // should the degeneracy be computed for each basis?
+            _boolParamName[SoPlex::COMPUTEDEGEN] = "computedegen";
+            _boolParamDescription[SoPlex::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
+            _boolParamDefault[SoPlex::COMPUTEDEGEN] = false;
+
             // should cycling solutions be accepted during iterative refinement?
             _boolParamName[SoPlex::ACCEPTCYCLING] = "acceptcycling";
             _boolParamDescription[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
@@ -2721,6 +2726,8 @@ namespace soplex
          setIntParam(SoPlex::REPRESENTATION, REPRESENTATION_ROW);
          setIntParam(SoPlex::ALGORITHM, ALGORITHM_DUAL);
 
+         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
+
          _solveImprovedDualSimplex();
       }
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
@@ -2745,6 +2752,8 @@ namespace soplex
          }
          else
             _solver.setOpttol(realParam(SoPlex::OPTTOL));
+
+         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
          _solveReal();
       }
@@ -4907,6 +4916,8 @@ namespace soplex
       case RATFAC:
          break;
       case USEIMPROVEDDUALSIMPLEX:
+         break;
+      case COMPUTEDEGEN:
          break;
       case ACCEPTCYCLING:
          break;
@@ -7177,6 +7188,8 @@ namespace soplex
 
       _statistics->degenPivotsPrimal += _solver.primalDegeneratePivots();
       _statistics->degenPivotsDual += _solver.dualDegeneratePivots();
+      _statistics->sumDualDegen += _solver.sumDualDegeneracy();
+      _statistics->sumPrimalDegen += _solver.sumPrimalDegeneracy();
    }
 
 
