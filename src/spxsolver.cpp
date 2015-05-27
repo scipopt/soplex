@@ -55,6 +55,7 @@ bool SPxSolver::read(std::istream& in, NameSet* rowNames,
 
 void SPxSolver::reLoad()
 {
+   forceRecompNonbasicValue();
    unInit();
    unLoad();
    theLP = this;
@@ -790,11 +791,7 @@ Real SPxSolver::nonbasicValue()
    }
 
 #ifdef ADDITIONAL_CHECKS
-   if( m_nonbasicValueUpToDate && m_nonbasicValue != val )
-   {
-      MSG_DEBUG( std::cout << "\niteration: " << iteration() << " nonbasicvalue: " << m_nonbasicValue << " val: " << val << " diff: " << m_nonbasicValue - val << std::endl; )
-      assert(spxAbs(m_nonbasicValue - val) < 1e-9);
-   }
+   assert(!m_nonbasicValueUpToDate || EQ(m_nonbasicValue, val));
 #endif
 
    if( !m_nonbasicValueUpToDate )
