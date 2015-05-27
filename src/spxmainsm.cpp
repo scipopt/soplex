@@ -1662,6 +1662,8 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
    int keptBnds = 0;
    int keptLRhs = 0;
 
+   int oldRows = lp.nRows();
+
    bool redundantLower;
    bool redundantUpper;
    bool redundantLhs;
@@ -2154,7 +2156,6 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 
    if (remRows + chgLRhs + chgBnds > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remNzos += remNzos;
       m_chgLRhs += chgLRhs;
@@ -2170,7 +2171,8 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                         << keptBnds << " column bounds, "
                         << keptLRhs << " row bounds"
                         << std::endl; )
-
+      if( remRows > m_minReduction * oldRows )
+         again = true;
    }
    return OKAY;
 }
@@ -2194,6 +2196,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
    int remCols = 0;
    int remNzos = 0;
    int chgBnds = 0;
+
+   int oldCols = lp.nCols();
+   int oldRows = lp.nRows();
 
    for(int j = lp.nCols()-1; j >= 0; --j)
    {
@@ -2682,7 +2687,6 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
    if (remCols + remRows > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remCols += remCols;
       m_remNzos += remNzos;
@@ -2694,6 +2698,8 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds"
                         << std::endl; )
+      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+         again = true;
    }
    return OKAY;
 }
@@ -2711,6 +2717,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    int remRows = 0;
    int remCols = 0;
    int remNzos = 0;
+
+   int oldRows = lp.nRows();
+   int oldCols = lp.nCols();
 
    DataArray<bool> colSingleton(lp.nCols());
    DVector         dualVarLo(lp.nRows());
@@ -2934,7 +2943,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
    if (remCols + remRows > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remCols += remCols;
       m_remNzos += remNzos;
@@ -2944,6 +2952,8 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
+      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+         again = true;
    }
    return OKAY;
 }
@@ -2959,6 +2969,8 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    int remRows = 0;
    int remNzos = 0;
+
+   int oldRows = lp.nRows();
 
    // remove empty rows and columns
    SPxSimplifier::Result ret = removeEmpty(lp);
@@ -3286,7 +3298,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    if (remRows + remNzos > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remNzos += remNzos;
 
@@ -3294,6 +3305,9 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                         << remRows << " rows, "
                         << remNzos << " non-zeros"
                         << std::endl; )
+      if( remRows > m_minReduction * oldRows )
+         again = true;
+
    }
    return OKAY;
 }
@@ -3661,7 +3675,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    if (remCols > 0)
    {
-      again      = true;
       m_remCols += remCols;
       m_remNzos += remNzos;
 
@@ -3669,6 +3682,8 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
+      if( remCols > m_minReduction * nColsOld )
+         again = true;
    }
    return OKAY;
 }

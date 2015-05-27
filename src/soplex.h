@@ -1192,8 +1192,11 @@ public:
       /// geometric frequency at which to apply rational reconstruction
       RATREC_FREQ = 17,
 
+      /// minimal reduction (sum of removed rows/cols) to continue simplification
+      MINRED = 18,
+
       /// number of real parameters
-      REALPARAM_COUNT = 18
+      REALPARAM_COUNT = 19
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM

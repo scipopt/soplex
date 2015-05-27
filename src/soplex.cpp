@@ -456,6 +456,13 @@ namespace soplex
             _realParamUpper[SoPlex::RATREC_FREQ] = DEFAULT_INFINITY;
             _realParamDefault[SoPlex::RATREC_FREQ] = 1.2;
 
+            // minimal reduction (sum of removed rows/cols) to continue simplification
+            _realParamName[SoPlex::MINRED] = "minred";
+            _realParamDescription[SoPlex::MINRED] = "minimal reduction (sum of removed rows/cols) to continue simplification";
+            _realParamLower[SoPlex::MINRED] = 0.0;
+            _realParamUpper[SoPlex::MINRED] = 1.0;
+            _realParamDefault[SoPlex::MINRED] = 1e-4;
+
             _defaultsAndBoundsInitialized = true;
          }
 
@@ -5313,6 +5320,10 @@ namespace soplex
       case SoPlex::RATREC_FREQ:
          break;
 
+      // minimal reduction (sum of removed rows/cols) to continue simplification
+      case SoPlex::MINRED:
+         break;
+
       default:
          return false;
       }
@@ -6989,6 +7000,7 @@ namespace soplex
       case SIMPLIFIER_AUTO:
          _simplifier = &_simplifierMainSM;
          assert(_simplifier != 0);
+         _simplifier->setMinReduction(realParam(MINRED));
          break;
       default:
          break;
