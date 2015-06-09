@@ -146,7 +146,7 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
-   solveCount++;
+   solveCount += 2;
    solveTime->stop();
 }
 
@@ -201,7 +201,7 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
-   solveCount++;
+   solveCount += 2;
    solveTime->stop();
 }
 
@@ -259,7 +259,7 @@ void SLUFactor::solve3right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
-   solveCount++;
+   solveCount += 3;
    solveTime->stop();
 }
 
@@ -328,7 +328,7 @@ void SLUFactor::solve3right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
-   solveCount++;
+   solveCount += 3;
    solveTime->stop();
 }
 
@@ -407,7 +407,7 @@ void SLUFactor::solveLeft(
    ssvec.setSize(0);
    ssvec.forceSetup();
 
-   solveCount++;
+   solveCount += 2;
    solveTime->stop();
 }
 
@@ -456,7 +456,7 @@ void SLUFactor::solveLeft(
    ssvec.setSize(0);
    ssvec.forceSetup();
 
-   solveCount++;
+   solveCount += 2;
    solveTime->stop();
 }
 
@@ -493,7 +493,7 @@ void SLUFactor::solveLeft(
    ssvec.setSize(0);
    ssvec.forceSetup();
 
-   solveCount++;
+   solveCount += 3;
    solveTime->stop();
 }
 
@@ -540,7 +540,7 @@ void SLUFactor::solveLeft(
    ssvec.setSize(0);
    ssvec.forceSetup();
 
-   solveCount++;
+   solveCount += 3;
    solveTime->stop();
 }
 
