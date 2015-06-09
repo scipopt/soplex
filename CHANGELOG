@@ -52,6 +52,7 @@ fixed bugs:
 - fix wrong basis status in postsolving of aggregated variables
 - eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
 - force recomputation of nonbasic objective value when reloading SPxSolver
+- correct counting of LU solves (when solving with more than one rhs this is counted accordingly)
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
