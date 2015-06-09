@@ -56,6 +56,11 @@ protected:
    SPxSolver*  thesolver;
    /// violation bound
    Real        theeps;
+   /// vector to store pricing weights or norms
+   DVector     weights;
+   DVector     coWeights;
+   /// are the weights already set up?
+   bool        weightsAreSetup;
    //@}
 
 
@@ -241,15 +246,103 @@ public:
 
    /**@name Import/Export norms */
    //@{
+   /// get number of available norms
+   virtual void getNdualNorms(int& nrows, int& ncols)
+   {
+      if( weightsAreSetup )
+      {
+         if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN )
+         {
+            ncols = 0;
+            nrows = coWeights.dim();
+
+            assert(nrows == thesolver->dim());
+         }
+         else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW )
+         {
+            nrows = weights.dim();
+            ncols = coWeights.dim();
+
+            assert(ncols == thesolver->dim());
+            assert(nrows == thesolver->coDim());
+         }
+      }
+      else
+      {
+         nrows = 0;
+         ncols = 0;
+      }
+   }
+
    /// export norms from pricer
    virtual bool getDualNorms(int& nrows, int& ncols, Real* norms) const
    {
-      return false;
+      MSG_DEBUG( std::cout << "exporting dual norms" << std::endl; )
+
+      nrows = 0;
+      ncols = 0;
+
+      if( !weightsAreSetup )
+         return false;
+
+      if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN )
+      {
+         ncols = 0;
+         nrows = coWeights.dim();
+
+         assert(nrows == thesolver->dim());
+
+         for( int i = 0; i < nrows; ++i)
+            norms[i] = coWeights[i];
+      }
+      else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW )
+      {
+         nrows = weights.dim();
+         ncols = coWeights.dim();
+
+         assert(ncols == thesolver->dim());
+         assert(nrows == thesolver->coDim());
+
+         for( int i = 0; i < nrows; ++i )
+            norms[i] = weights[i];
+
+         for( int i = 0; i < ncols; ++i )
+            norms[nrows + i] = coWeights[i];
+      }
+      else
+         return false;
+
+      return true;
    }
    /// import norms into pricer
    virtual bool setDualNorms(int nrows, int ncols, Real* norms)
    {
-      return false;
+      MSG_DEBUG( std::cout << "setting dual norms" << std::endl; )
+
+      if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
+      {
+         assert(coWeights.dim() >= nrows);
+         for( int i = 0; i < nrows; ++i )
+            coWeights[i] = norms[i];
+         weightsAreSetup = true;
+      }
+      else if( thesolver->type() == SPxSolver::ENTER && thesolver->rep() == SPxSolver::ROW)
+      {
+         assert(weights.dim() >= nrows);
+         assert(coWeights.dim() >= ncols);
+         for( int i = 0; i < nrows; ++i )
+            weights[i] = norms[i];
+         for( int i = 0; i < ncols; ++i )
+            coWeights[i] = norms[nrows + i];
+         weightsAreSetup = true;
+      }
+      else
+      {
+         weightsAreSetup = false;
+         return false;
+      }
+
+      return true;
    }
    //@}
 
@@ -274,6 +367,9 @@ public:
       : m_name(p_name)
       , thesolver(0)
       , theeps(0.0)
+      , weights(0)
+      , coWeights(0)
+      , weightsAreSetup(false)
    {}
 
    /// copy constructor
@@ -281,6 +377,9 @@ public:
       : m_name(old.m_name) 
       , thesolver(old.thesolver)
       , theeps(old.theeps)
+      , weights(old.weights)
+      , coWeights(old.coWeights)
+      , weightsAreSetup(old.weightsAreSetup)
    {}
    
    /// assignment operator
@@ -291,6 +390,9 @@ public:
          m_name = rhs.m_name; 
          thesolver = rhs.thesolver;
          theeps = rhs.theeps;
+         weights = rhs.weights;
+         coWeights = rhs.coWeights;
+         weightsAreSetup = rhs.weightsAreSetup;
 
          assert(isConsistent());
       }

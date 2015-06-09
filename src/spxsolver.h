@@ -1882,10 +1882,13 @@ public:
       SPxBasis::setStatus( stat );
    }
 
-   /// get dual steepest edge norms
+   /// get number of dual norms
+   void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
+
+   /// get dual norms
    bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
 
-   /// set dual steepest edge norms
+   /// set dual norms
    bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
    /// reset cumulative time counter to zero.

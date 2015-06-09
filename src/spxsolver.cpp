@@ -1740,6 +1740,12 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
    forceRecompNonbasicValue();
 }
 
+void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+{
+   assert(thepricer != NULL);
+   return thepricer->getNdualNorms(nnormsRow, nnormsCol);
+}
+
 bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
 {
    assert(thepricer != NULL);

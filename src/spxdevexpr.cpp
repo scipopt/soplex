@@ -32,8 +32,8 @@ bool SPxDevexPR::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    if (thesolver != 0)
-      if (penalty.dim() != thesolver->coDim()
-           || coPenalty.dim() != thesolver->dim())
+      if (weights.dim() != thesolver->coDim()
+           || coWeights.dim() != thesolver->dim())
          return MSGinconsistent("SPxDevexPR");
 #endif
 
@@ -45,10 +45,10 @@ void SPxDevexPR::init(SPxSolver::Type tp)
    int i;
    if (tp == SPxSolver::ENTER)
    {
-      for (i = penalty.dim(); --i >= 0;)
-         penalty[i] = 2;
-      for (i = coPenalty.dim(); --i >= 0;)
-         coPenalty[i] = 2;
+      for (i = weights.dim(); --i >= 0;)
+         weights[i] = 2;
+      for (i = coWeights.dim(); --i >= 0;)
+         coWeights[i] = 2;
       if( thesolver->hyperPricingEnter )
       {
          if( thesolver->sparsePricingEnter )
@@ -67,8 +67,8 @@ void SPxDevexPR::init(SPxSolver::Type tp)
    }
    else
    {
-      for (i = coPenalty.dim(); --i >= 0;)
-         coPenalty[i] = 1;
+      for (i = coWeights.dim(); --i >= 0;)
+         coWeights[i] = 1;
       if (thesolver->sparsePricingLeave && thesolver->hyperPricingLeave)
       {
          bestPrices.clear();
@@ -76,6 +76,7 @@ void SPxDevexPR::init(SPxSolver::Type tp)
          prices.reMax(thesolver->dim());
       }
    }
+   weightsAreSetup = true;
    assert(isConsistent());
 }
 
@@ -104,7 +105,7 @@ int SPxDevexPR::buildBestPriceVectorLeave( Real feastol )
    int nsorted;
    Real fTesti;
    const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    IdxElement price;
    prices.clear();
    bestPrices.clear();
@@ -178,10 +179,10 @@ int SPxDevexPR::selectLeaveX(Real feastol, int start, int incr)
    Real x;
 
    const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    Real best = 0;
    int bstI = -1;
-   int end = coPenalty.dim();
+   int end = coWeights.dim();
 
    for (; start < end; start += incr)
    {
@@ -204,7 +205,7 @@ int SPxDevexPR::selectLeaveSparse(Real feastol)
    Real x;
 
    const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    Real best = 0;
    int bstI = -1;
    int idx = -1;
@@ -241,7 +242,7 @@ int SPxDevexPR::selectLeaveHyper(Real feastol)
    Real x;
 
    const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    Real best = 0;
    Real leastBest = infinity;
    int bstI = -1;
@@ -337,10 +338,10 @@ void SPxDevexPR::left4(int n, SPxId id)
          j = rhoIdx.index(i);
          x = rhoVec[j] * rhoVec[j] * beta_q;
          // if(x > coPenalty[j])
-         coPenalty[j] += x;
+         coWeights[j] += x;
       }
 
-      coPenalty[n] = beta_q;
+      coWeights[n] = beta_q;
    }
 }
 
@@ -350,7 +351,7 @@ SPxId SPxDevexPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
    int nsorted;
    Real x;
    const Real* coTest = thesolver->coTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    IdxElement price;
    prices.clear();
    bestPrices.clear();
@@ -400,7 +401,7 @@ SPxId SPxDevexPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
    int nsorted;
    Real x;
    const Real* test = thesolver->test().get_const_ptr();
-   const Real* pen = penalty.get_const_ptr();
+   const Real* pen = weights.get_const_ptr();
    IdxElement price;
    pricesCo.clear();
    bestPricesCo.clear();
@@ -505,7 +506,7 @@ SPxId SPxDevexPR::selectEnterX(Real tol)
 SPxId SPxDevexPR::selectEnterHyperDim(Real& best, Real feastol)
 {
    const Real* cTest = thesolver->coTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    Real leastBest = infinity;
    Real coTesti;
    Real coPeni;
@@ -587,7 +588,7 @@ SPxId SPxDevexPR::selectEnterHyperDim(Real& best, Real feastol)
 SPxId SPxDevexPR::selectEnterHyperCoDim(Real& best, Real feastol)
 {
    const Real* test = thesolver->test().get_const_ptr();
-   const Real* pen = penalty.get_const_ptr();
+   const Real* pen = weights.get_const_ptr();
    Real leastBest = infinity;
    Real testi;
    Real peni;
@@ -668,14 +669,14 @@ SPxId SPxDevexPR::selectEnterHyperCoDim(Real& best, Real feastol)
 SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
 {
    const Real* cTest = thesolver->coTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
+   const Real* cpen = coWeights.get_const_ptr();
    int enterIdx = -1;
    int idx;
    Real coTesti;
    Real coPeni;
    Real x;
 
-   assert(coPenalty.dim() == thesolver->coTest().dim());
+   assert(coWeights.dim() == thesolver->coTest().dim());
    for(int i = thesolver->infeasibilities.size() -1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
@@ -707,14 +708,14 @@ SPxId SPxDevexPR::selectEnterSparseDim(Real& best, Real feastol)
 SPxId SPxDevexPR::selectEnterSparseCoDim(Real& best, Real feastol)
 {
    const Real* test = thesolver->test().get_const_ptr();
-   const Real* pen = penalty.get_const_ptr();
+   const Real* pen = weights.get_const_ptr();
    int enterIdx = -1;
    int idx;
    Real testi;
    Real peni;
    Real x;
 
-   assert(penalty.dim() == thesolver->test().dim());
+   assert(weights.dim() == thesolver->test().dim());
    for (int i = thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
    {
       idx = thesolver->infeasibilitiesCo.index(i);
@@ -747,8 +748,8 @@ SPxId SPxDevexPR::selectEnterSparseCoDim(Real& best, Real feastol)
 SPxId SPxDevexPR::selectEnterDenseDim(Real& best, Real feastol, int start, int incr)
 {
    const Real* cTest = thesolver->coTest().get_const_ptr();
-   const Real* cpen = coPenalty.get_const_ptr();
-   int end = coPenalty.dim();
+   const Real* cpen = coWeights.get_const_ptr();
+   int end = coWeights.dim();
    int enterIdx = -1;
    Real x;
 
@@ -777,8 +778,8 @@ SPxId SPxDevexPR::selectEnterDenseDim(Real& best, Real feastol, int start, int i
 SPxId SPxDevexPR::selectEnterDenseCoDim(Real& best, Real feastol, int start, int incr)
 {
    const Real* test = thesolver->test().get_const_ptr();
-   const Real* pen = penalty.get_const_ptr();
-   int end = penalty.dim();
+   const Real* pen = weights.get_const_ptr();
+   int end = weights.dim();
    int enterIdx = -1;
    Real x;
 
@@ -827,8 +828,8 @@ void SPxDevexPR::entered4(SPxId /*id*/, int n)
       for (j = coPidx.size() - 1; j >= 0; --j)
       {
          i = coPidx.index(j);
-         coPenalty[i] += xi_p * coPvec[i] * coPvec[i];
-         if (coPenalty[i] <= 1 || coPenalty[i] > 1e+6)
+         coWeights[i] += xi_p * coPvec[i] * coPvec[i];
+         if (coWeights[i] <= 1 || coWeights[i] > 1e+6)
          {
             init(SPxSolver::ENTER);
             return;
@@ -838,8 +839,8 @@ void SPxDevexPR::entered4(SPxId /*id*/, int n)
       for (j = pIdx.size() - 1; j >= 0; --j)
       {
          i = pIdx.index(j);
-         penalty[i] += xi_p * pVec[i] * pVec[i];
-         if (penalty[i] <= 1 || penalty[i] > 1e+6)
+         weights[i] += xi_p * pVec[i] * pVec[i];
+         if (weights[i] <= 1 || weights[i] > 1e+6)
          {
             init(SPxSolver::ENTER);
             return;
@@ -851,19 +852,19 @@ void SPxDevexPR::entered4(SPxId /*id*/, int n)
 void SPxDevexPR::addedVecs (int n)
 {
    int initval = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
-   n = penalty.dim();
-   penalty.reDim (thesolver->coDim());
-   for (int i = penalty.dim()-1; i >= n; --i )
-      penalty[i] = initval;
+   n = weights.dim();
+   weights.reDim (thesolver->coDim());
+   for (int i = weights.dim()-1; i >= n; --i )
+      weights[i] = initval;
 }
 
 void SPxDevexPR::addedCoVecs(int n)
 {
    int initval = (thesolver->type() == SPxSolver::ENTER) ? 2 : 1;
-   n = coPenalty.dim();
-   coPenalty.reDim(thesolver->dim());
-   for (int i = coPenalty.dim()-1; i >= n; --i)
-      coPenalty[i] = initval;
+   n = coWeights.dim();
+   coWeights.reDim(thesolver->dim());
+   for (int i = coWeights.dim()-1; i >= n; --i)
+      coWeights[i] = initval;
 }
 
 } // namespace soplex

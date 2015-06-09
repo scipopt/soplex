@@ -21,6 +21,7 @@ performance:
 - update nonbasic part of objective function value instead of completely recomputing it every time
 - activate hyper sparse pricing per default
 - faster solve methods by clearing temporary vectors more efficiently (esp. useful for steepest edge pricing)
+- steepest edge and devex pricer share the same norm/weight array to avoid the initialization phase after a pricer switch
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving

@@ -48,8 +48,6 @@ private:
    /**@name Data */
    //@{
    Real  last;           ///< penalty, selected at last iteration.
-   DVector penalty;      ///< vector of pricing penalties.
-   DVector coPenalty;    ///< vector of pricing penalties.
    DataArray<IdxElement> prices;   ///< temporary array of precomputed pricing values
    DataArray<IdxElement> pricesCo; ///< temporary array of precomputed pricing values
    DIdxSet bestPrices;   ///< set of best pricing candidates
@@ -104,8 +102,6 @@ public:
    SPxDevexPR( const SPxDevexPR& old)
       : SPxPricer(old)
       , last(old.last)
-      , penalty(old.penalty)
-      , coPenalty(old.coPenalty)
       , refined(false)
    {}
    /// assignment operator
@@ -115,8 +111,6 @@ public:
       {
          SPxPricer::operator=(rhs);
          last = rhs.last;
-         penalty = rhs.penalty;
-         coPenalty = rhs.coPenalty;
       }
 
       return *this;

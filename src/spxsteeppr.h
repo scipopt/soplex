@@ -63,10 +63,6 @@ private:
    //-------------------------------------
    /**@name Data */
    //@{
-   /// vector of pricing penalties
-   DVector penalty;
-   /// vector of pricing penalties
-   DVector coPenalty;
    /// working vector
    SSVector workVec;
    /// working vector
@@ -93,8 +89,6 @@ private:
    Setup setup;
    /// has a refinement step already been tried?
    bool refined;
-   /// are weights set up (either by setDualNorms() or by setupWeights())?
-   bool weightsSetup;
    //@}
 
    //-------------------------------------
@@ -147,15 +141,12 @@ public:
       , prefSetup (0)
       , setup (mode)
       , refined(false)
-      , weightsSetup(false)
    {
       assert(isConsistent());
    }
    /// copy constructor
    SPxSteepPR( const SPxSteepPR& old)
       : SPxPricer(old)
-      , penalty(old.penalty)
-      , coPenalty(old.coPenalty)
       , workVec(old.workVec)
       , workRhs(old.workRhs)
       , pi_p(old.pi_p)
@@ -165,7 +156,6 @@ public:
       , leavePref(old.leavePref)
       , setup(old.setup)
       , refined(old.refined)
-      , weightsSetup(old.weightsSetup)
    {
       assert(isConsistent());
    }
@@ -175,8 +165,6 @@ public:
       if(this != &rhs)
       {
          SPxPricer::operator=(rhs);
-         penalty = rhs.penalty;
-         coPenalty = rhs.coPenalty;
          workVec = rhs.workVec;
          workRhs = rhs.workRhs;
          pi_p = rhs.pi_p;
@@ -186,7 +174,6 @@ public:
          leavePref = rhs.leavePref;
          setup = rhs.setup;
          refined = rhs.refined;
-         weightsSetup = rhs.weightsSetup;
 
          assert(isConsistent());
       }
@@ -234,14 +221,6 @@ public:
    virtual void removedVecs(const int perm[]);
    /// \p n covectors have been removed from loaded LP.
    virtual void removedCoVecs(const int perm[]);
-   //@}
-
-   /**@name Import/Export norms */
-   //@{
-   /// export norms from pricer
-   virtual bool getDualNorms(int& nrows, int& ncols, Real* norms) const;
-   /// import norms into pricer
-   virtual bool setDualNorms(int nrows, int ncols, Real* norms);
    //@}
 
    //-------------------------------------

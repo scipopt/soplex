@@ -978,18 +978,7 @@ namespace soplex
    /// gets number of available dual norms
    void SoPlex::getNdualNorms(int& nnormsRow, int& nnormsCol) const
    {
-      nnormsRow = 0;
-      nnormsCol = 0;
-      if( !strcmp(_solver.pricer()->getName(), "Steep") ||
-          !strcmp(_solver.pricer()->getName(), "SteepEx") ||
-          !strcmp(_solver.pricer()->getName(), "Auto") )
-      {
-         nnormsRow = _solver.nRows();
-
-         // column norms are only used in row representation
-         if( _solver.rep() == SPxSolver::ROW )
-            nnormsCol = _solver.nCols();
-      }
+      _solver.getNdualNorms(nnormsRow, nnormsCol);
    }
 
 
