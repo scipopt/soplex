@@ -96,6 +96,8 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
       x.forceSetup();
    }
    usetup = true;
+   ssvec.setSize(0);
+   ssvec.forceSetup();
 
    solveCount++;
    solveTime->stop();
@@ -114,6 +116,8 @@ void SLUFactor::solve2right4update(
    int  n;
    int  f;
    int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
 
@@ -146,6 +150,10 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+   rhs.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
    solveCount += 2;
    solveTime->stop();
 }
@@ -162,6 +170,8 @@ void SLUFactor::solve2right4update(
    int  n;
    int  f;
    int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
 
@@ -201,6 +211,10 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+   rhs.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
    solveCount += 2;
    solveTime->stop();
 }
@@ -221,6 +235,8 @@ void SLUFactor::solve3right4update(
    int  n;
    int  f;
    int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
    int  rsize2 = rhs2.size();
@@ -259,6 +275,11 @@ void SLUFactor::solve3right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+   rhs.forceSetup();
+   rhs2.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
    solveCount += 3;
    solveTime->stop();
 }
@@ -271,12 +292,13 @@ void SLUFactor::solve3right4update(
    SSVector&      rhs,
    SSVector&      rhs2)
 {
-
    solveTime->start();
 
    int  n;
    int  f;
    int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
    int  rsize2 = rhs2.size();
@@ -328,6 +350,11 @@ void SLUFactor::solve3right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+   rhs.forceSetup();
+   rhs2.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
    solveCount += 3;
    solveTime->stop();
 }
