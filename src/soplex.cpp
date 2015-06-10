@@ -984,9 +984,11 @@ namespace soplex
           !strcmp(_solver.pricer()->getName(), "SteepEx") ||
           !strcmp(_solver.pricer()->getName(), "Auto") )
       {
+         nnormsRow = _solver.nRows();
+
+         // column norms are only used in row representation
          if( _solver.rep() == SPxSolver::ROW )
-            nnormsCol = _solver.coDim();
-         nnormsRow = _solver.dim();
+            nnormsCol = _solver.nCols();
       }
    }
 
