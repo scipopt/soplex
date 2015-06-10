@@ -895,6 +895,7 @@ SPxSolver::SPxSolver(
    Timer::TYPE     ttype)
    : theType (p_type)
    , thePricing(FULL)
+   , theRep(p_rep)
    , theTime(0)
    , timerType(ttype)
    , theCumulativeTime(0.0)
