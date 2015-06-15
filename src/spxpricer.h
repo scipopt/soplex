@@ -247,8 +247,11 @@ public:
    /**@name Import/Export norms */
    //@{
    /// get number of available norms
-   virtual void getNdualNorms(int& nrows, int& ncols)
+   virtual void getNdualNorms(int& nrows, int& ncols) const
    {
+      nrows = 0;
+      ncols = 0;
+
       if( weightsAreSetup )
       {
          if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN )
@@ -267,18 +270,11 @@ public:
             assert(nrows == thesolver->coDim());
          }
       }
-      else
-      {
-         nrows = 0;
-         ncols = 0;
-      }
    }
 
    /// export norms from pricer
    virtual bool getDualNorms(int& nrows, int& ncols, Real* norms) const
    {
-      MSG_DEBUG( std::cout << "exporting dual norms" << std::endl; )
-
       nrows = 0;
       ncols = 0;
 
@@ -317,8 +313,6 @@ public:
    /// import norms into pricer
    virtual bool setDualNorms(int nrows, int ncols, Real* norms)
    {
-      MSG_DEBUG( std::cout << "setting dual norms" << std::endl; )
-
       if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
       {
          assert(coWeights.dim() >= nrows);
