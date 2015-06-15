@@ -386,8 +386,10 @@ public:
       assert(n >= 0);
       assert(n < size());
 
-      set_size(size() - 1);
-      m_elem[n] = m_elem[size()];
+      int newsize = size() - 1;
+      set_size(newsize);
+      if( n < newsize )
+         m_elem[n] = m_elem[newsize];
    }
 
    /// Remove all indices.
