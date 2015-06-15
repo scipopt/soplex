@@ -470,7 +470,7 @@ void SLUFactor::solveLeft(
    else
    {
       n1 = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n1,
-            y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), rhs2.size());
+            y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
 //      y.setup();
    }
    x.setSize(n1);
@@ -499,7 +499,7 @@ void SLUFactor::solveLeft(
 
    solveTime->start();
 
-   int   n;
+   int   n, n2, n3;
    Real* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
 
@@ -508,9 +508,12 @@ void SLUFactor::solveLeft(
    z.clear();
    ssvec.assign(rhs1);
    n = ssvec.size(); // see altValues();
+   n2 = rhs2.size();
+   n3 = rhs3.size();
+
    n = vSolveLeft3(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
-                   y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), rhs2.size(),
-                   z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), rhs3.size());
+                   y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), n2,
+                   z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), n3);
 
    x.setSize(n);
 
