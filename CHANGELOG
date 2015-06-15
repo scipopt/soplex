@@ -55,7 +55,7 @@ fixed bugs:
 - eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
 - force recomputation of nonbasic objective value when reloading SPxSolver
 - correct counting of LU solves (when solving with more than one rhs this is counted accordingly)
-- correct retutn of available dual norms in pricer
+- correct return of available dual norms in pricer
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
