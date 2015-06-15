@@ -557,7 +557,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       MSG_DEBUG( std::cout << "DLBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
+   if( !thesolver->enableBoundFlips || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DLBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectEnter(val, leaveIdx);
@@ -899,11 +899,13 @@ int SPxBoundFlippingRT::selectLeave(
       MSG_DEBUG( std::cout << "DEBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableLongsteps || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
+
+   if( !thesolver->enableBoundFlips || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DEBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectLeave(val, enterTest);
    }
+
    const Real*  vec = thesolver->fVec().get_const_ptr();         /**< pointer to values of current vector */
    const Real*  upd = thesolver->fVec().delta().values();        /**< pointer to update values of current vector */
    const int*   idx = thesolver->fVec().delta().indexMem();      /**< pointer to indices of current vector */

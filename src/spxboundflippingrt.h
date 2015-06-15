@@ -98,7 +98,6 @@ private:
    /**@name Data
     */
    //@{
-   bool                  enableLongsteps;    /**< enable or disable long steps (bound flips) */
    Real                  flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
    int                   relax_count;        /**< count rounds of ratio test */
    DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
@@ -178,20 +177,12 @@ private:
 
 public:
 
-   void setLongsteps(
-      bool               ls
-      )
-   {
-      enableLongsteps = ls;
-   }
-
    //-------------------------------------
    /**@name Construction / destruction */
    //@{
    /// default constructor
    SPxBoundFlippingRT()
       : SPxFastRT("Bound Flipping")
-      , enableLongsteps(true)
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
@@ -201,7 +192,6 @@ public:
    /// copy constructor
    SPxBoundFlippingRT(const SPxBoundFlippingRT& old)
       : SPxFastRT(old)
-      , enableLongsteps(true)
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
