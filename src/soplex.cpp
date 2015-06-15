@@ -170,6 +170,11 @@ namespace soplex
             _boolParamDescription[SoPlex::FEASRELAX] = "should feasibility be tested with relaxed bounds and sides?";
             _boolParamDefault[SoPlex::FEASRELAX] = false;
 
+            // use bound flipping also for row representation?
+            _boolParamName[SoPlex::ROWBOUNDFLIPS] = "rowboundflips";
+            _boolParamDescription[SoPlex::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
+            _boolParamDefault[SoPlex::ROWBOUNDFLIPS] = false;
+
             // objective sense
             _intParamName[SoPlex::OBJSENSE] = "objsense";
             _intParamDescription[SoPlex::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
@@ -4896,6 +4901,9 @@ namespace soplex
       case RATFACJUMP:
          break;
       case FEASRELAX:
+         break;
+      case ROWBOUNDFLIPS:
+         _ratiotesterBoundFlipping.useBoundFlipsRow(value);
          break;
       default:
          return false;

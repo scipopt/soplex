@@ -42,6 +42,7 @@ interface & parameters:
 - new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
 - new methods to store and set steepest edge weights
 - new parameter to control the minimal reduction factor in the simplifier to continue presolving (default 1e-4)
+- new parameter to enable bound flipping also for row representation
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier

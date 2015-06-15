@@ -250,12 +250,6 @@ void SPxSolver::initRep(Representation p_rep)
 
    if (thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
-
-   // disable bound flipping when in row representation (only relevant for BoundFlippingRT)
-   if (theRep == ROW)
-      enableBoundFlips = false;
-   else
-      enableBoundFlips = true;
 }
 
 void SPxSolver::setRep(Representation p_rep)

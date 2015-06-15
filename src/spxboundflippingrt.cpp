@@ -557,7 +557,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       MSG_DEBUG( std::cout << "DLBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !thesolver->enableBoundFlips || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
+   if( !enableBoundFlips || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DLBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectEnter(val, leaveIdx);
@@ -900,7 +900,7 @@ int SPxBoundFlippingRT::selectLeave(
       flipPotential = 1;
    }
 
-   if( !thesolver->enableBoundFlips || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
+   if( !enableBoundFlips || !enableRowBoundFlips || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DEBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectLeave(val, enterTest);

@@ -374,8 +374,6 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
-   bool     enableBoundFlips;          ///< enable or disable long steps in BoundFlippingRT
-
    SPxOut* spxout;                     ///< message handler
 
    //-----------------------------

@@ -98,6 +98,8 @@ private:
    /**@name Data
     */
    //@{
+   bool                  enableBoundFlips;   /**< enable or disable long steps in BoundFlippingRT */
+   bool                  enableRowBoundFlips;/**< enable bound flips also for row representation */
    Real                  flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
    int                   relax_count;        /**< count rounds of ratio test */
    DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
@@ -183,6 +185,8 @@ public:
    /// default constructor
    SPxBoundFlippingRT()
       : SPxFastRT("Bound Flipping")
+      , enableBoundFlips(true)
+      , enableRowBoundFlips(false)
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
@@ -192,6 +196,8 @@ public:
    /// copy constructor
    SPxBoundFlippingRT(const SPxBoundFlippingRT& old)
       : SPxFastRT(old)
+      , enableBoundFlips(old.enableBoundFlips)
+      , enableRowBoundFlips(old.enableRowBoundFlips)
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
@@ -205,6 +211,10 @@ public:
       {
          SPxFastRT::operator=(rhs);
       }
+
+      enableBoundFlips = rhs.enableBoundFlips;
+      enableRowBoundFlips = rhs.enableRowBoundFlips;
+      flipPotential = rhs.flipPotential;
 
       return *this;
    }
@@ -232,6 +242,15 @@ public:
       int                leaveIdx
       );
 
+   void useBoundFlips(bool bf)
+   {
+      enableBoundFlips = bf;
+   }
+
+   void useBoundFlipsRow(bool bf)
+   {
+      enableRowBoundFlips = bf;
+   }
    //@}
 };
 

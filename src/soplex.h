@@ -835,8 +835,11 @@ public:
       /// should feasibility be tested with relaxed bounds and sides?
       FEASRELAX = 8,
 
+      /// use bound flipping also for row representation?
+      ROWBOUNDFLIPS = 9,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 9
+      BOOLPARAM_COUNT = 10
    } BoolParam;
 
    /// integer parameters
