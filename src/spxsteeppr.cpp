@@ -385,7 +385,6 @@ int SPxSteepPR::selectLeave()
 
    if( retid >= 0 )
    {
-      assert( thesolver->coPvec().delta().size() == 0 );
       assert( thesolver->coPvec().delta().isConsistent() );
       // coPvec().delta() might be not setup after the solve when it contains too many nonzeros.
       // This is intended and forcing to keep the sparsity information leads to a slowdown
