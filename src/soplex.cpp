@@ -4259,7 +4259,7 @@ namespace soplex
 
          DSVectorReal rowrhs(numColsReal());
          SSVectorReal y(numColsReal());
-         int* bind;
+         int* bind = 0;
 
          // get ordering of column basis matrix
          spx_alloc(bind, numRowsReal());
