@@ -95,7 +95,7 @@ public:
    }
    
    /// destructor.
-   ~IdxSet()
+   virtual ~IdxSet()
    {
       if(freeArray)
          spx_free(idx);

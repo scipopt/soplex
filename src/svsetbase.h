@@ -959,7 +959,7 @@ public:
    }
 
    /// Destructor
-   ~SVSetBase<R>()
+   virtual ~SVSetBase<R>()
    {}
 
    /// Assignment operator.

@@ -222,7 +222,7 @@ public:
    DVectorBase<R>& operator=(const SVectorBase<S>& vec);
 
    /// Destructor.
-   ~DVectorBase<R>()
+   virtual ~DVectorBase<R>()
    {
       if( mem != 0 )
       {

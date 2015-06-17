@@ -194,7 +194,7 @@ public:
    DSVectorBase<R>& operator=(const SSVectorBase<S>& vec);
 
    /// Destructor.
-   ~DSVectorBase<R>()
+   virtual ~DSVectorBase<R>()
    {
       if( theelem )
       {

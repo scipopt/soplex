@@ -710,7 +710,7 @@ public:
    }
 
    /// Destructor.
-   ~LPRowSetBase<R>()
+   virtual ~LPRowSetBase<R>()
    {}
 
    //@}

@@ -627,7 +627,7 @@ public:
    }
 
    /// Destructor.
-   ~LPColSetBase<R>()
+   virtual ~LPColSetBase<R>()
    {}
 
    //@}

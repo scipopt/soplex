@@ -120,7 +120,7 @@ public:
       return *this;
    }
    /// destructor.
-   ~DIdxSet();
+   virtual ~DIdxSet();
    //@}
 };
 

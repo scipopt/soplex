@@ -375,7 +375,7 @@ public:
    }
 
    /// Destructor.
-   ~ClassArray()
+   virtual ~ClassArray()
    {
       if( data )
       {
