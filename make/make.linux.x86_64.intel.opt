@@ -2,7 +2,7 @@ CXX	=	icpc
 LINKCXX	=	icpc
 DCXX	=	icpc
 CPPFLAGS=	-Isrc -DNDEBUG 
-CXXFLAGS=	-O3 -std=c++0x -axSSE4.1 -w1 -ip -mtune=native #-msse4.1 #-fno-rtti
+CXXFLAGS=	-O2 -std=c++0x -w1 -ip -mtune=core2 #-msse4.1 #-fno-rtti
 LDFLAGS	=	-lpthread -lm -lstdc++ -lirc
 ARFLAGS	=	crs
 ZLIB_FLAGS	=
