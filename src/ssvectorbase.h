@@ -49,8 +49,6 @@ private:
 
    friend class DVectorBase<R>;
    friend class VectorBase<R>;
-   template < class S > friend class DVectorBase;
-   template < class S > friend class VectorBase;
    template < class S > friend class DSVectorBase;
 
    // ------------------------------------------------------------------------------------------------------------------

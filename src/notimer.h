@@ -39,11 +39,11 @@ public:
       : Timer()
    {}
    /// copy constructor
-   NoTimer(const NoTimer& old)
+   NoTimer(const NoTimer&)
       : Timer()
    {}
    /// assignment operator
-   NoTimer& operator=(const NoTimer& old)
+   NoTimer& operator=(const NoTimer&)
    {
       return *this;
    }

@@ -96,12 +96,12 @@ public:
    /**@name Timers */
    //@{
    /// types of timers
-   enum
+   typedef enum
    {
       OFF = 0,
       USER_TIME = 1,
       WALLCLOCK_TIME = 2
-   } typedef TYPE;
+   } TYPE;
    //@}
 
    //------------------------------------
