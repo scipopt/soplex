@@ -2844,7 +2844,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       Real obj = lp.maxObj(j);
 
       // 1. dominated column
-      // Is the problem really unbounded in the cases below ??? Or is only dual infeasiblity be shown
+      // Is the problem really unbounded in the cases below ??? Or is only dual infeasibility be shown
       if (GTrel(obj, dualConsUp[j], opttol()))
       {
 #if DOMINATED_COLUMN
@@ -3897,7 +3897,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 #endif
    }
 
-   // preprocessing detected infeasibility or unboundness
+   // preprocessing detected infeasibility or unboundedness
    if (m_result != OKAY)
       return m_result;
 

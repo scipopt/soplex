@@ -39,7 +39,7 @@ namespace soplex
    linear programming" by E. Andersen and K. Andersen (Mathematical
    Programming, 1995).  It implements all proposed methods and some
    other preprocessing techniques for removing redundant rows and
-   columns and bounds.  Also infeasibility and unboundness may be
+   columns and bounds.  Also infeasibility and unboundedness may be
    detected.
 
    Removed are:

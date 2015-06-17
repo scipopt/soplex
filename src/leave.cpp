@@ -699,7 +699,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             enterVal != leaveMax is the case that selectEnter has found only an instable entering
             variable. We store this leaving variable for later -- if we are not already in the
-            instable case: then we continue and conclude unboundness/infeasiblity */
+            instable case: then we continue and conclude unboundedness/infeasibility */
          if (!instable)
          {
             instableLeaveNum = leaveIdx;
@@ -724,7 +724,7 @@ bool SPxSolver::leave(int leaveIdx)
          return true;
       }
 
-      MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundness/infeasiblity found "
+      MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
                            << "in leave()" << std::endl; )
 
       if (rep() != COLUMN)
@@ -827,7 +827,7 @@ bool SPxSolver::leave(int leaveIdx)
                   variables were found: Thus, above we already accepted such an instable
                   entering variable. Now even this seems to be impossible, thus we conclude
                   unboundedness/infeasibility. */
-               MSG_INFO3( (*spxout), (*spxout) << "ILEAVE03 unboundness/infeasiblity found "
+               MSG_INFO3( (*spxout), (*spxout) << "ILEAVE03 unboundedness/infeasibility found "
                   << "in leave()" << std::endl; )
 
                rejectLeave(leaveNum, leaveId, leaveStat);

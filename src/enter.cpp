@@ -1310,7 +1310,7 @@ bool SPxSolver::enter(SPxId& enterId)
          return true;
       }
 
-      MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundness/infeasiblity found in "
+      MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundedness/infeasibility found in "
                            << "enter()" << std::endl; )
 
       if (rep() == ROW)
