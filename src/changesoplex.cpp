@@ -684,6 +684,7 @@ void SPxSolver::changeObj(int i, const Real& newVal)
 
 void SPxSolver::changeMaxObj(const Vector& newObj)
 {
+   forceRecompNonbasicValue();
 
    SPxLP::changeMaxObj(newObj);
 
@@ -695,6 +696,7 @@ void SPxSolver::changeMaxObj(const Vector& newObj)
 
 void SPxSolver::changeMaxObj(int i, const Real& newVal)
 {
+   forceRecompNonbasicValue();
 
    SPxLP::changeMaxObj(i, newVal);
 
@@ -706,6 +708,8 @@ void SPxSolver::changeMaxObj(int i, const Real& newVal)
 
 void SPxSolver::changeRowObj(const Vector& newObj)
 {
+   forceRecompNonbasicValue();
+
    SPxLP::changeRowObj(newObj);
 
    /**@todo Factorization remains valid, we do not need a reDim()
@@ -716,6 +720,8 @@ void SPxSolver::changeRowObj(const Vector& newObj)
 
 void SPxSolver::changeRowObj(int i, const Real& newVal)
 {
+   forceRecompNonbasicValue();
+
    SPxLP::changeRowObj(i, newVal);
 
    /**@todo Factorization remains valid, we do not need a reDim()
