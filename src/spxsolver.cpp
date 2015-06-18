@@ -596,10 +596,12 @@ void SPxSolver::factorize()
       {
          assert(type() == ENTER);
 
+         SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
          computeCoTest();
+
          if (pricing() == FULL)
          {
-#if 0       /* was deactivated */
+#if 0       /* was deactivated (this is probably too expansive) */
             computePvec();
 #endif
             /* was deactivated, but this leads to warnings in testVecs() */
