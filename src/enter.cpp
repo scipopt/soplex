@@ -1310,6 +1310,21 @@ bool SPxSolver::enter(SPxId& enterId)
          return true;
       }
 
+      /* do not exit with status infeasible or unbounded if there is only a very small violation
+       * ROW: recompute the primal variables and activities for another, more precise, round of pricing
+       */
+      else if (spxAbs(enterTest) < entertol())
+      {
+         MSG_INFO3( (*spxout), (*spxout) << "IENTER11 clean up step to reduce numerical errors" << std::endl; )
+
+         SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+         computePvec();
+         computeCoTest();
+         computeTest();
+
+         return true;
+      }
+
       MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundedness/infeasibility found in "
                            << "enter()" << std::endl; )
 
