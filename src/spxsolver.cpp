@@ -241,6 +241,8 @@ void SPxSolver::initRep(Representation p_rep)
    unInit();
    reDim();
 
+   forceRecompNonbasicValue();
+
    setFeastol(tmpfeastol);
    setOpttol(tmpopttol);
 
@@ -793,7 +795,11 @@ Real SPxSolver::nonbasicValue()
    }
 
 #ifdef ADDITIONAL_CHECKS
-   assert(!m_nonbasicValueUpToDate || EQ(m_nonbasicValue, val));
+   if( m_nonbasicValueUpToDate && NE(m_nonbasicValue, val) )
+   {
+      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue << ", correct nonbasic value: " << val << std::endl; )
+      assert(EQrel(m_nonbasicValue, val,1e-14));
+   }
 #endif
 
    if( !m_nonbasicValueUpToDate )
