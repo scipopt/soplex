@@ -1,50 +1,97 @@
-//-----------------------------------------------------------------------------
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                           */
+/*                  This file is part of the class library                   */
+/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*                                                                           */
+/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*                            fuer Informationstechnik Berlin                */
+/*                                                                           */
+/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*                                                                           */
+/*  You should have received a copy of the ZIB Academic License              */
+/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*                                                                           */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**@file   xternal.cpp
+ * @brief  SoPlex documentation pages
+ * @author Ambros Gleixner
+ * @author Thorsten Koch
+ * @author Matthias Miltenberger
+ * @author Sebastian Orlowski
+ * @author Marc Pfetsch
+ * @author Andreas Tuchscherer
+ */
+
 /**@mainpage Overview
-   @version  2.2.0a
+ *
+ * @section MAIN What is SoPlex?
+ *
+ * SoPlex is an optimization package for solving linear programming problems
+ * (LPs) that can be used standalone via a command line interface and as a
+ * callable library.  Its main features are:
+ *
+ * - an advanced implementation of the primal and dual revised simplex
+ *   algorithm,
+ *
+ * - an object-oriented software design written in C++,
+ *
+ * - presolving, scaling, exploitation of sparsity, hot-starting from any
+ *   regular basis,
+ *
+ * - column- and row-oriented form of the simplex algorithm,
+ *
+ * - a compile-time option to use 80bit extended ("quad") precision for
+ *   numerically difficult LPs, and
+ *
+ * - special support for the exact solution of LPs with rational input data.
+ *
+ * SoPlex has been used in numerous reasearch and industry projects and is the
+ * standard LP solver linked to the constraint integer programming solver <a
+ * href="http://scip.zib.de/">SCIP</a>.
+ *
+ *@section INST Download, License, and Installation
+ *
+ * SoPlex can be downloaded in source code and as precompiled binaries from the
+ * <a href="http://soplex.zib.de">SoPlex</a> web page.  It is also distributed
+ * as part of the <a href="http://scip.zib.de/">SCIP Optimization Suite</a>.
+ *
+ * SoPlex is distributed under the terms of the \ref LICENSE "ZIB Academic Licence"
+ * and can be freely used for academic research.  See the <a
+ * href="http://soplex.zib.de">SoPlex</a> web page or contact us for more
+ * information.
+ *
+ * For help with installation please consult the \ref INSTALL "INSTALL" file in
+ * the distribution.
+ *
+ * @section GETTINGSTARTED Getting started
+ *
+ * - \ref FAQ      "Frequently Asked Questions"
+ *
+ * - \ref CMD      "How to use the SoPlex command line"
+ *
+ * - \ref LIB      "How to use SoPlex as a callable library"
+ *
+ * - \ref PROG     "Programming with SoPlex"
+ *
+ * A tutorial article for getting started with the SCIP Optimization Suite,
+ * which includes SoPlex, is available as <a
+ * href="http://scip.zib.de/doc/ZR-12-27.pdf">ZIB-Report 12-27</a>.
+ *
+ * @section AUTHORS Authors
+ *
+ * The initial implementation of SoPlex has been developed by Roland Wunderling
+ * as part of his Ph.D. thesis <a
+ * href="http://www.zib.de/PaperWeb/abstracts/TR-96-09">"Paralleler und
+ * Objektorientierter Simplex-Algorithmus"</a> from 1996.  Since then many
+ * developers have maintained and improved the underlying algorithms.  See the
+ * <a href="http://soplex.zib.de">SoPlex</a> web page for a comprehensive list
+ * of all contributors.
+ *
+ * @version  2.2.0a
+ */
 
-   @section Main The Sequential object-oriented simplex class library.
 
-   This software has been implemented as a part of Roland Wunderling's 
-   Ph.D. thesis "Paralleler und Objektorientierter Simplex-Algorithmus"
-   which can be found at http://www.zib.de/PaperWeb/abstracts/TR-96-09
-   (in German).
-
-   SoPlex is part of the SCIP Optimization Suite.  A tutorial article for
-   getting started with the SCIP Optimization Suite is available as ZIB
-   technical report 12-27 <a href="http://scip.zib.de/doc/ZR-12-27.pdf">here</a>.
-
-   SoPlex is implemented in C++. The code should be compliant with the 
-   current ANSI standard. RTTI and STL (other then iostream) are not used. 
-   Everything is in one namespace \em soplex.
-
-   - \ref INST     "Installation"
-
-   - \ref FAQ      "Frequently asked questions"
-
-   - \ref SHELL    "How to use the SoPlex command line"
-
-   - \ref LIB      "How to use SoPlex as a callable library"
-
-   - \ref PROG     "Programming with SoPlex"
-
-   @author   Roland Wunderling
-   @author   Tobias Achterberg
-   @author   Timo Berthold
-   @author   Andreas Bley
-   @author   Dennis Elbrächter
-   @author   Ambros Gleixner
-   @author   Wei Huang
-   @author   Benjamin Hiller
-   @author   Thorsten Koch
-   @author   Matthias Miltenberger
-   @author   Sebastian Orlowski
-   @author   Marc Pfetsch
-   @author   Eva Ramlow
-   @author   Daniel Steffy
-   @author   Andreas Tuchscherer
-
-*/
-//-----------------------------------------------------------------------------
 /**@namespace soplex
    @brief     Everything should be within this namespace.
 
@@ -52,7 +99,8 @@
    If anything here is defined outside, this is a mistake and 
    should be reported. 
 */
-//-----------------------------------------------------------------------------
+
+
 /**@defgroup Elementary Elementary Classes
    @brief    General purpose classes.
    
@@ -60,7 +108,7 @@
    projects way beyond the scope of numerical software or linear
    programming.
 */
-//-----------------------------------------------------------------------------
+
 /**@defgroup Algebra Linear Algebra Classes
    @brief Basic data types for linear algebra computations.
    
@@ -70,14 +118,14 @@
    For complex tasks, such as solving linear systems of equations,
    algorithmic classes are provided instead.
 */
-//-----------------------------------------------------------------------------
+
 /**@defgroup Algo Algorithmic Classes
    @brief Implementation of numerical algorithms.   
    
    Algorithmic classes serve for implementing a variety of
    algorithms for solving numerical (sub-)problems.
 */
-//-----------------------------------------------------------------------------
+
 /**@page DataObjects Data Objects 
 
     \em Data \em objects refer to C++ objects that do not allocate any
@@ -98,158 +146,184 @@
     relevant when using such objects in container classes such as
     DataArray or Array.  
 */
-//-----------------------------------------------------------------------------
-/**@page INST Installation
 
-   See the INSTALL file in the distribution.
+
+/**@page LICENSE License
+ *
+ * \verbinclude COPYING
  */
-//-----------------------------------------------------------------------------
+
+
+/**@page INSTALL Installation
+ *
+ * \verbinclude INSTALL
+ */
+
+
 /**@page FAQ Frequently Asked Questions
  * \htmlinclude faq.inc
- */           
-//-----------------------------------------------------------------------------
-/**@page SHELL How to use the SoPlex command line
+ */
 
-   Running the command line version of SoPlex without any arguments displays
-   a list of options.  You can write a parameter file with default parameters
-   by using option --saveset=FILENAME.set.  After changing parameter values
-   in this file you can use it by with --loadset=FILENAME.set.
-   The most frequently used parameters have abbreviations as explained in the
-   initial help.
 
-   The old command line interface of version 1.x is available when you
-   compile with LEGACY=true (using the provided Makefile) or compile with the
-   preprocessor define SOPLEX_LEGACY.
-*/
-//-----------------------------------------------------------------------------
+/**@page CMD How to use the SoPlex command line
+ *
+ * Running the command line binary of SoPlex without any arguments displays a
+ * list of options.  You can write a parameter file with default parameters by
+ * using option --saveset=FILENAME.set.  After changing parameter values in this
+ * file you can use it by with --loadset=FILENAME.set.  The most frequently used
+ * parameters have abbreviations.
+ *
+ * For compatibility the command line interface of SoPlex versions 1.x is
+ * available when you compile SoPlex with "make LEGACY=true" (using the provided
+ * Makefile) or compile with the preprocessor define SOPLEX_LEGACY.
+ */
+
+
 /**@page LIB How to use SoPlex as a callable library
-
-   The main interface is given by the class \ref soplex::SoPlex, which handles the
-   construction and modification of an LP, the solving process, allows to
-   access and change parameters, and retrive solution information.
-
-   With version 2.0, the SoPlex class has been updated significantly compared
-   to the 1.x version.  Although this is deprecated, it is still possible to use
-   the old interface class by compiling with LEGACY=true (using the provided
-   Makefile) or defining the preprocessor flag SOPLEX_LEGACY.
+ *
+ *@section LIB1 Namespace "soplex"
+ *
+ * The entire SoPlex code is contained in the namespace \ref soplex.  Because of
+ * this, either all classes and methods must be qualified by the prefix
+ * "soplex::" or a "using namespace soplex;" must be present.
+ *
+ *@section LIB2 Interface class
+ *
+ * The main interface is given by the class \ref soplex::SoPlex "SoPlex", which
+ * handles the construction and modification of an LP, the solving process,
+ * allows to access and change parameters, and retrieve solution information.
+ *
+ * A basic example on how to construct and solve an LP via the class
+ * \ref soplex::SoPlex "SoPlex" is given in the file \ref example.cpp.
+ *
+ *@section LIB3 Deprecated 1.x interface
+ *
+ * With version 2.0, the SoPlex class has been updated significantly compared to
+ * the 1.x version.  Although this is deprecated, it is still possible to use
+ * the 1.x interface class by compiling with LEGACY=true (using the provided
+ * Makefile) or compiling with the preprocessor flag SOPLEX_LEGACY.  This
+ * deactivates the functionalities to solve LPs exactly.
 */
-//-----------------------------------------------------------------------------
-/**@page PROG Programming with SoPlex 
-   
-   The SoPlex class library comprises classes that may be categorized into
-   three different types:
 
-   - Elementary classes are provided for general purpose use in
-     projects way beyond the scope of numerical software or linear
-     programming.
-   - Linear algebra classes provide basic data types for (sparse)
-     linear algebra computations. However, their functionality is
-     restricted to simple operations such as addition and scaling.
-     For complex tasks, such as solving linear systems of equations,
-     algorithmic classes are provided instead.
-   - Algorithmic classes serve for implementing maybe a variety of
-     algorithms for solving numerical (sub-)problems.
 
-   The following sections are dedicated to users who want to
-   provide own pricers, ratio test, start basis generation codes or
-   LP simplifiers to use with SoPlex or who want to derive own
-   implementations (e.g. parallel versions) using SoPlex.
+/**@page PROG Programming with SoPlex
+ *
+ * Besides the main interface class \ref soplex::SoPlex "SoPlex", the classes of
+ * the SoPlex library are categorized into three different types:
+ *
+ * - Elementary classes are provided for general purpose use in projects way
+ *   beyond the scope of numerical software or linear programming.
+ *
+ * - Linear algebra classes provide basic data types for (sparse) linear algebra
+ *   computations. However, their functionality is restricted to simple
+ *   operations such as addition and scaling.  For complex tasks, such as
+ *   solving linear systems of equations, algorithmic classes are provided
+ *   instead.
+ *
+ * - Algorithmic classes serve for implementing maybe a variety of algorithms
+ *   for solving numerical (sub-)problems.
+ *
+ * The main class implementing the primal and dual simplex algorithm is the
+ * class \ref soplex::SPxSolver "SPxSolver".  The following sections are
+ * dedicated to users who want to provide own components of the simplex
+ * algorithm such as pricers, ratio tests, start basis generators or LP
+ * simplifiers to use with SoPlex's standard floating-point simplex
+ * implementation.
+ *
+ *@section Representation Virtualizing the Representation
+ *
+ * The primal Simplex on the columnwise representation is structurally
+ * equivalent to the dual Simplex on the rowwise representation and vice versa
+ * (see below). Hence, it is desirable to treat both cases in a very similar
+ * manner. This is supported by the programmer's interface of SoPlex which
+ * provides access methods for all internal data in two ways: one is relative to
+ * the "physical" representation of the LP in rows and columns, while the other
+ * is relative to the chosen basis representation.
+ *
+ * If e.g. a \ref soplex::SPxPricer "SPxPricer" is written using the second type
+ * of methods only (which will generally be the case), the same code can be used
+ * for running SoPlex's simplex algorithm for both representations.  We will now
+ * give two examples for this abstraction from the chosen representation.
+ *
+ * Methods \c vector() will return a column or a row vector, corresponding to
+ * the chosen basis representation.  The other "vectors" will be referred to as
+ * \em covectors:
+ *
+ * <TABLE>
+ * <TR><TD>&nbsp;  </TD><TD>ROW      </TD><TD>COLUMN   </TD></TR>
+ * <TR><TD>vector  </TD><TD>rowVector</TD><TD>colVector</TD></TR>
+ * <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
+ * </TABLE>
+ *
+ * Whether the \ref soplex::SPxBasis::Desc::Status "SPxBasis::Desc::Status" of a
+ * variable indicates that the corresponding vector is in the basis matrix or
+ * not also depends on the chosen representation. Hence, methods \c isBasic()
+ * are provided to get the correct answer for both representations.
+ *
+ *@section Simplex Vectors and Bounds
+ *
+ * The Simplex algorithms keeps three vectors which are associated to each
+ * basis.  Two of them are required for the pricing, while the third one is
+ * needed for detecting feasibility of the basis. For all three vectors, bounds
+ * are defined. The Simplex algorithm changes the basis until all three vectors
+ * satisfy their bounds, which means that the optimal solution has been found.
+ *
+ * With each update of the basis, also the three vectors need to be
+ * updated. This is best supported by the use of \c UpdateVectors.
+ *
+ *@subsection Variables
+ *
+ * The Simplex algorithm works with two types of variables, primals and duals.
+ * The primal variables are associated with each column of an LP, whereas the
+ * dual variables are associated with each row.  However, for each row a slack
+ * variable must be added to the set of primals (to represent inequalities), and
+ * a reduced cost variable must be added for each column (to represent upper or
+ * lower bounds). Note, that mathematically, one dual variable for each bound
+ * (upper and lower) should be added. However, this variable would always yield
+ * the same value and can, hence, be implemented as one.
+ *
+ * To summarize, we have a primal variable for each LP column and row (i.e., its
+ * slack) as well as a dual variable for each LP row and column (i.e., its
+ * bounds). However, not all these values need to be stored and computed, since
+ * the structure of the Simplex algorithms allow to keep them implicitly.
+ *
+ * If the SPxBasis's Status of a row or column is one of \c P_ON_LOWER, \c
+ * P_ON_UPPER, \c P_FIXED or \c P_FREE, the value of the corresponding primal
+ * variable is the lower, upper or both bound(s) or 0, respectively.  The
+ * corresponding dual variable needs to be computed. Equivalently, for a Status
+ * of \c D_FREE, \c D_ON_UPPER, \c D_ON_LOWER, \c D_ON_BOTH or \c D_UNDEFINED,
+ * the corresponding dual variable is 0, whereas the primal one needs to be
+ * computed.
+ *
+ * The following vectors are declared for holding the values to be computed: \c
+ * primRhs, \c primVec (with dimension \c nCols()) for the primal variables, and
+ * \c dualRhs, \c dualVec (with dimension \c nRows()) for the dual
+ * variables. The additional variable \c addvec (with dimension \c coDim())
+ * depends on the representation.
+ *
+ * @subsection Bounds
+ *
+ * Primal and dual variables are bounded (including \f$\pm\infty\f$ as bounds).
+ * If all primal variables are within their bounds, the Simplex basis is said to
+ * be primal feasible. Analogously, if all dual variables are within their
+ * bounds, its is called dual feasible.  If a basis is both, primal and dual
+ * feasible, the optimal solution has been found.
+ *
+ * In the dual Simplex, the basis is maintained dual feasible, while primal
+ * feasibility is improved via basis updates. However, for numerical reasons
+ * dual feasibility must be relaxed from time to time.  Equivalently, primal
+ * feasibility will be relaxed to retain numerical stability in the primal
+ * Simplex algorithm.
+ *
+ * Relaxation of (dual or primal) feasibility is achieved by relaxing the bounds
+ * of primal or dual variables. However, for each type of Simplex only the
+ * corresponding bounds need to be relaxed. Hence, we define only one vector of
+ * upper and lower bound for each row and column and initialize it with primal
+ * or dual bound, depending on the Simplex type (see \c theURbound, \c
+ * theLRbound, \c theUCbound, \c theLCbound).
+ */
 
-   @section Representation Virtualizing the Representation
-   The primal Simplex on the columnwise representation is
-   structurally equivalent to the dual Simplex on the rowwise
-   representation and vice versa (see below). Hence, it is
-   desirable to treat both cases in a very similar manner. This
-   is supported by the programmer's interface of SoPlex which
-   provides access methods for all internal data in two ways: one
-   is relative to the "physical" representation of the LP in
-   rows and columns, while the other is relative to the chosen
-   basis representation. If e.g. a soplex::SPxPricer is
-   written using the second type of methods only (which will
-   generally be the case), the same code can be used for running
-   SoPlex's simplex algorithm for both representations. 
-   We will now give two examples for this
-   abstraction from the chosen representation.
 
-   Methods \c vector() will return a column or a row vector,
-   corresponding to the chosen basis representation. 
-   The other "vectors" will be referred to as \em covectors:
-     
-   <TABLE>
-   <TR><TD>&nbsp;  </TD><TD>ROW      </TD><TD>COLUMN   </TD></TR>
-   <TR><TD>vector  </TD><TD>rowVector</TD><TD>colVector</TD></TR>
-   <TR><TD>coVector</TD><TD>colVector</TD><TD>rowVector</TD></TR>
-   </TABLE>
-    
-   Whether the soplex::SPxBasis::Desc::Status of a variable indicates that the
-   corresponding vector is in the basis matrix or not also depends on the
-   chosen representation. Hence, methods \c isBasic() are provided to get the
-   correct answer for both representations.  
-   
-   @section Simplex Vectors and Bounds
-   The Simplex algorithms keeps three vectors which are associated to each basis.
-   Two of them are required for the pricing, while the third one is needed for
-   detecting feasibility of the basis. For all three vectors, bounds are
-   defined. The Simplex algorithm changes the basis until all three vectors
-   satisfy their bounds, which means that the optimal solution has been found.
-    
-   With each update of the basis, also the three vectors need to be
-   updated. This is best supported by the use of \c UpdateVectors.
-    
-   @subsection Variables
-   The Simplex algorithm works with two types of variables, primals and
-   duals.  The primal variables are associated with each column of
-   an LP, whereas the dual variables are associated with each row.
-   However, for each row a slack variable must be added to the set of
-   primals (to represent inequalities), and a reduced cost variable must be
-   added for each column (to represent upper or lower bounds). Note, that
-   mathematically, one dual variable for each bound (upper and lower) should
-   be added. However, this variable would always yield the same value and
-   can, hence, be implemented as one.
-    
-   To summarize, we have a primal variable for each LP column and row
-   (i.e., its slack) as well as a dual variable for each LP row and column
-   (i.e., its bounds). However, not all these values need to be stored and
-   computed, since the structure of the Simplex algorithms allow to
-   keep them implicitly.
-      
-   If the SPxBasis's Status of a row or column is one of \c P_ON_LOWER,
-   \c P_ON_UPPER, \c P_FIXED or \c P_FREE, the value of the corresponding
-   primal variable is the lower, upper or both bound(s) or 0, respectively.
-   The corresponding dual variable needs to be computed. Equivalently, for
-   a Status of \c D_FREE, \c D_ON_UPPER, \c D_ON_LOWER, \c D_ON_BOTH or
-   \c D_UNDEFINED, the corresponding dual variable is 0, whereas the primal 
-   one needs to be computed.
-
-   The following vectors are declared for holding the values to be computed:
-   \c primRhs, \c primVec (with dimension \c nCols()) for the primal
-   variables, and \c dualRhs, \c dualVec (with dimension \c nRows()) for the 
-   dual variables. The additional variable \c addvec (with dimension \c coDim())
-   depends on the representation.
-
-   @subsection Bounds 
-   Primal and dual variables are bounded (including \f$\pm\infty\f$ as
-   bounds).  If all primal variables are within their bounds, the
-   Simplex basis is said to be primal feasible. Analogously, if all
-   dual variables are within their bounds, its is called dual
-   feasible.  If a basis is both, primal and dual feasible, the
-   optimal solution has been found.
-
-   In the dual Simplex, the basis is maintained dual feasible, while
-   primal feasibility is improved via basis updates. However, for
-   numerical reasons dual feasibility must be relaxed from time to time.
-   Equivalently, primal feasibility will be relaxed to
-   retain numerical stability in the primal Simplex algorithm.
-
-   Relaxation of (dual or primal) feasibility is achieved by
-   relaxing the bounds of primal or dual variables. However, for each
-   type of Simplex only the corresponding bounds need to be
-   relaxed. Hence, we define only one vector of upper and lower bound
-   for each row and column and initialize it with primal or dual
-   bound, depending on the Simplex type (see \c theURbound,
-   \c theLRbound, \c theUCbound, \c theLCbound). 
-*/
-//-----------------------------------------------------------------------------
 /**@page IR Iterative Refinement
 
    Since version 1.7, SoPlex provides the new feature \em iterative \em refinement that
@@ -274,6 +348,3 @@
    in the distribution.
 
  */
-//-----------------------------------------------------------------------------
-
-
