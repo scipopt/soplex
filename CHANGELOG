@@ -26,7 +26,7 @@ performance:
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
 - new make option EG={true,false} to build with EGlib
-- bound flipping is now enabled by default
+- bound flipping is now enabled by default when using column representation
 - new command line option --writefile to save LP file as read by SoPlex
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - improved printing of rationals in limited precision
@@ -40,9 +40,9 @@ interface & parameters:
 - new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
 - new parameter bool:powerscaling for rounding scaling factors during iterative refinement to powers of two
 - new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
-- new methods to store and set steepest edge weights
-- new parameter to control the minimal reduction factor in the simplifier to continue presolving (default 1e-4)
-- new parameter to enable bound flipping also for row representation
+- new methods to store and set dual norms for pricing
+- new parameter real:minred to control the minimal reduction factor in the simplifier to continue presolving (default 1e-4)
+- new parameter bool:rowboundlfips to enable bound flipping also for row representation
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
@@ -56,7 +56,6 @@ fixed bugs:
 - eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
 - force recomputation of nonbasic objective value when reloading SPxSolver
 - correct counting of LU solves (when solving with more than one rhs this is counted accordingly)
-- correct return of available dual norms in pricer
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
