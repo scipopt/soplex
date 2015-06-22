@@ -1,0 +1,14 @@
+Notes for SoPlex Release 2.2.0
+
+What's new
+----------
+
+- dual norms can now be extracted and restored
+- rational solves with basis matrix based on a rational LU factorization
+- rational reconstruction routines during iterative refinement
+- iterative refinement for ranged rows without introducing explicit slack variables
+- SPxOut output stream is no longer a global variable --> thread safety
+
+- performance improvements, especially regarding iterative refinement and sparse problems
+
+For details see the CHANGELOG file and the Doxygen documentation.
