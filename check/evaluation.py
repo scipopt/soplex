@@ -26,7 +26,8 @@ if not len(sys.argv) == 2:
     quit()
 
 # specify columns for the output (can be modified)
-columns = ['name','rows','cols','pviol','dviol','iters','refs','solvetime','value','status']
+columns = ['name','rows','cols','pviol','dviol','iters','algiter','ppiv','dpiv','avgpdegen','avgddegen','refs',\
+        'solvetime','value','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -211,6 +212,18 @@ for idx, outline in enumerate(outlines):
         elif outline.startswith('LU solves'):
             instances[instancename]['lusolves'] = int(outline.split()[3])
             instances[instancename]['lusolvetime'] = float(outlines[idx+2].split()[3])
+
+        elif outline.startswith('Degeneracy'):
+            instances[instancename]['ppiv'] = int(outlines[idx + 1].split()[3])
+            instances[instancename]['dpiv'] = int(outlines[idx + 2].split()[3])
+            instances[instancename]['primcand'] = int(outlines[idx + 3].split()[3])
+            instances[instancename]['dualcand'] = int(outlines[idx + 4].split()[3])
+            instances[instancename]['avgpdegen'] = float(outlines[idx + 5].split()[3])
+            instances[instancename]['avgddegen'] = float(outlines[idx + 6].split()[3])
+
+        elif outline.startswith('Algorithm Iterations'):
+            instances[instancename]['algiter'] = int(outline.split()[2])
+
 
 # try parsing solution file
 check_solu = False
