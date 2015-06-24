@@ -49,10 +49,10 @@
         which will deactivate the possibility to read gzipped LP and MPS files.
 
 
-3.      Working with the 1.x interface / Compiling without the new C++11 standard
+3.      Working with the 1.x interface / Compiling without the C++11 standard
 
         We use the feature of explicit conversion operators introduced by the
-        new C++11 standard.  If your compiler does not support this, or if for other
+        C++11 standard.  If your compiler does not support this, or if for other
         reasons you wish to use the old SoPlex 1.x interface, you can build with
 
         make COMP=<as before> OPT=<as before> LEGACY=true
@@ -114,4 +114,4 @@
         ZIB technical report TR 96-09, Berlin 1996
 
         A copy of the thesis can be retreived from
-        www.zib.de/Publications/abstracts/TR-96-09/
+        https://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/538
