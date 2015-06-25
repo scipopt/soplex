@@ -1739,7 +1739,8 @@ static void LPFwriteSVector(
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
    const SVectorBase<Rational>& p_svec,     ///< vector to write
-   SPxOut* spxout )
+   SPxOut*                  spxout      ///< out stream
+   )
 {
 
    char name[16];
@@ -1791,7 +1792,7 @@ static void LPFwriteObjective(
    const SPxLPBase<Rational>& p_lp,       ///< the LP
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_cnames,   ///< column names
-   SPxOut* spxout
+   SPxOut*                spxout      ///< out stream
    )
 {
 
@@ -1818,7 +1819,7 @@ static void LPFwriteRow(
    const SVectorBase<Rational>& p_svec,     ///< vector of the row
    const Rational&              p_lhs,      ///< lhs of the row
    const Rational&              p_rhs,      ///< rhs of the row
-   SPxOut* spxout
+   SPxOut*                      spxout      ///< out stream
    )
 {
 
@@ -1868,7 +1869,7 @@ static void LPFwriteRows(
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_rnames,   ///< row names
    const NameSet*         p_cnames,   ///< column names
-   SPxOut* spxout
+   SPxOut*                spxout      ///< out stream
    )
 {
 
@@ -1907,7 +1908,7 @@ static void LPFwriteBounds(
    const SPxLPBase<Rational>&   p_lp,       ///< the LP to write
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
-   SPxOut* spxout
+   SPxOut*                  spxout      ///< out stream
    )
 {
 
