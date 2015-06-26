@@ -55,7 +55,7 @@ $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
 $NAME/make/make* \
-$NAME/settings/default.set \
+$NAME/settings/exact.set \
 $NAME/settings/devex.set \
 $NAME/settings/steep.set \
 $NAME/src/depend* \
