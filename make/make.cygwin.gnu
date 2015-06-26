@@ -1,1 +1,5 @@
-CXXFLAGS        +=      -std=c++11
+LDFLAGS		+=	-lm
+ARFLAGS		=	crs
+ZLIB_FLAGS	=
+ZLIB_LDFLAGS 	=	-lz
+CXXFLAGS        +=      $(GCCWARN) -std=c++11
