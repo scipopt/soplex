@@ -376,21 +376,23 @@
  * you need to compile SoPlex with GMP support (default, see the \ref INSTALL "INSTALL" file) and change the following
  * parameters from their default value:
  *
- * - <tt>real:feastol = 0</tt>
+ * - <code>real:feastol = 0</code>
  *
- * - <tt>real:opttol = 0</tt>
+ * - <code>real:opttol = 0</code>
  *
- * - <tt>int:solvemode = 2</tt>
+ * - <code>int:solvemode = 2</code>
  *
- * - <tt>int:syncmode = 1</tt>
+ * - <code>int:syncmode = 1</code>
  *
- * - <tt>int:readmode = 1</tt> (optional, activates exact parsing of input files)
+ * - <code>int:readmode = 1</code> (optional, activates exact parsing of input files)
  *
- * - <tt>int:checkmode = 2</tt> (optional, activates exact final check of feasibility and optimality at the command
+ * - <code>int:checkmode = 2</code> (optional, activates exact final check of feasibility and optimality at the command
  *   line)
  *
  * See \ref PARS "this page" how to change parameters and the \ref PARSLIST "list of all SoPlex parameters" for their
- * detailed description.
+ * detailed description.  A settings file <code>exact.set</code> for exact solving is provided in the folder
+ * <code>settings</code> of the distribution.  On the command line, this can be read with option
+ * <code>\--loadset=settings/exact.set</code>.
  *
  * If you have questions on particularly this feature you can contact <a href="http://www.zib.de/gleixner/">Ambros
  * Gleixner</a> or post them on the SoPlex mailing list.
@@ -408,5 +410,5 @@
  *   href="http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:0297-zib-55118">ZIB-Report 15-15</a>, Zuse Institute
  *   Berlin, 2015.
  *
- * <b>When using SoPlex with the exact features, please cite the above papers.</b>
+ * <b>When using SoPlex as an exact LP solver, please cite the above papers.</b>
  */
