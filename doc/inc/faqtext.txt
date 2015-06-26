@@ -118,9 +118,13 @@ SECTION:Frequently asked questions about SoPlex
     LABEL:primaldualsimplex
     ANSWER:
     <p>
-        That is nearly easy. You can set SoPlex to use the
-        ENTERing and LEAVEing algorithm and
-        COLUMN and ROW representation.
+        SoPlex implements a composite simplex, i.e., it switches between primal and dual
+        simplex and the user can only specify the starting algorithm via the integer
+        parameter "int:algorithm = 0 (primal) / 1 (dual)".
+    </p>
+    <p>
+        When using the low-level class SPxSolver, you can specify to use the
+        ENTERing and LEAVEing algorithm and COLUMN and ROW representation.
     </p>
     <center>
         <table border="1" rules="all">

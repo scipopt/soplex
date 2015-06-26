@@ -9,6 +9,10 @@ rm -f $NAME.tgz
 # compile to create the correct GiTHash
 make githash
 
+echo generating default setting files
+make OPT=opt ZLIB=false -j4
+bin/soplex --saveset=doc/inc/parameters.set
+
 # Before we create a tarball change the directory and file rights in a command way
 echo adjust file modes
 find ./ -type d -exec chmod 750 {} \;

@@ -63,15 +63,9 @@
 
 4.      Compiling SoPlex with GMP
 
-        From version 1.7 on, SoPlex provides the new feature iterative
-        refinement to compute extended-precision solutions. For details,
-        see ZIB report 12-19 available at
-
-        http://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/1545
-
-        This feature works best with rational arithmetic.  We use the GNU
-        Multiple Precision library (http://www.gmplib.org/) for this.  If GMP
-        is not available, you can deactivate it by building with
+        For using SoPlex as an exact rational LP solver, SoPlex must be compiled
+        with support for the GNU Multiple Precision library (http://www.gmplib.org/)
+        for this.  If GMP is not available, you can deactivate it by building with
 
         make COMP=<as before> OPT=<as before> GMP=false.
 
@@ -111,7 +105,19 @@
 
         Roland Wunderling,
         "Paralleler und Objekt-orientierter Simplex-Algorithmus",
-        ZIB technical report TR 96-09, Berlin 1996
+        Ph.D. thesis, TU Berlin, 1996, available as ZIB-Report 96-09
+        under http://nbn-resolving.de/urn:nbn:de:0297-zib-5386
 
-        A copy of the thesis can be retreived from
-        https://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/538
+        If you use SoPlex as an exact rational LP solver, please cite
+        the references
+
+        Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter,
+        "Improving the Accuracy of Linear Programming Solvers with Iterative
+        Refinement",
+        Proc. of ISSAC '12, pages 187--194, 2012, available as ZIB-Report 12-19
+        under http://nbn-resolving.de/urn:nbn:de:0297-zib-15451
+
+        Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter.
+        "Iterative Refinement for Linear Programming",
+        ZIB-Report 15-15, Zuse Institute Berlin, 2015, available under
+        http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:0297-zib-55118
