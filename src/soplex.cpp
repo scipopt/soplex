@@ -21,6 +21,7 @@
 #include <assert.h>
 #include "limits.h"
 #include <iostream>
+#include <strings.h>
 
 #include "soplex.h"
 #include "spxfileio.h"
