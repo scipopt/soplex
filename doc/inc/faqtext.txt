@@ -138,12 +138,6 @@ SECTION:Frequently asked questions about SoPlex
         Then Entering is the Primal and Leaving is the Dual algorithm.
         In ROW oriented representation, we have in principle the
         explicit dual and then the algorithms are reversed.
-
-        The only problem is that SoPlex is a composite simplex algorithm.
-        That means it switches between entering and leaving algorithm
-        as it needs. So all you can choose is which algorithm is used first,
-        but then an arbitrary number of switches may occur. (Even so, often
-        no switch at all happens.)
     </p>
 
     QUESTION:I got a segment violation or a signal 11.

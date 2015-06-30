@@ -135,7 +135,6 @@ SoPlex implements a composite simplex, i.e., it switches between primal and dual
 simplex and the user can only specify the starting algorithm via the integer
 parameter "int:algorithm = 0 (primal) / 1 (dual)".
 </p>
-
 <p>
 When using the low-level class SPxSolver, you can specify to use the
 ENTERing and LEAVEing algorithm and COLUMN and ROW representation.
@@ -152,7 +151,6 @@ COLUMN oriented is the "usual" representation.
 Then Entering is the Primal and Leaving is the Dual algorithm.
 In ROW oriented representation, we have in principle the
 explicit dual and then the algorithms are reversed.
-
 </p>
     </div>
   </li>
