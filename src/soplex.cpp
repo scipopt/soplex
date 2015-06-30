@@ -21,7 +21,10 @@
 #include <assert.h>
 #include "limits.h"
 #include <iostream>
+
+#ifndef _MSC_VER
 #include <strings.h>
+#endif
 
 #include "soplex.h"
 #include "spxfileio.h"
