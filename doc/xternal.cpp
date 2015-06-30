@@ -220,9 +220,9 @@
  *
  * When using the command line interface, parameters can be changed with the generic option
  *
- * <code>\--<type>:<name>=<val></code>
+ * <code>\--&lt;type&gt;:&lt;name&gt;=&lt;val&gt;</code>
  *
- * where <type> is one of <code>bool</code>, <code>int</code>, or <code>real</code> and name is the name of the
+ * where &lt;type&gt; is one of <code>bool</code>, <code>int</code>, or <code>real</code> and name is the name of the
  * parameter.  E.g., in order to deactivate the simplifier, one can use the option <code>\--bool:simplifier=0</code>.
  *
  *@section PARS2 Setting parameters via the callable library
