@@ -1623,9 +1623,13 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
          _rationalLP->removeRow(i);
-         _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+         // only swap elements if not the last one was removed
+         if( i < _rationalLP->nRows() )
+         {
+            _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+            assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+         }
          _rowTypes.reSize(_rationalLP->nRows());
-         assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
       }
 
       _invalidateSolution();
@@ -1711,9 +1715,13 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
          _rationalLP->removeCol(i);
-         _colTypes[i] = _colTypes[_rationalLP->nCols()];
+         // only swap elements if not the last one was removed
+         if( i < _rationalLP->nCols() )
+         {
+            _colTypes[i] = _colTypes[_rationalLP->nCols()];
+            assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+         }
          _colTypes.reSize(_rationalLP->nCols());
-         assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
       }
 
       _invalidateSolution();
@@ -2496,9 +2504,13 @@ namespace soplex
          return;
 
       _rationalLP->removeRow(i);
-      _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+      // only swap elements if not the last one was removed
+      if( i < _rationalLP->nRows() )
+      {
+         _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+         assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+      }
       _rowTypes.reSize(_rationalLP->nRows());
-      assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _removeRowReal(i);
@@ -2587,9 +2599,13 @@ namespace soplex
          return;
 
       _rationalLP->removeCol(i);
-      _colTypes[i] = _colTypes[_rationalLP->nCols()];
+      // only swap elements if not the last one was removed
+      if( i < _rationalLP->nCols() )
+      {
+         _colTypes[i] = _colTypes[_rationalLP->nCols()];
+         assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+      }
       _colTypes.reSize(_rationalLP->nCols());
-      assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _removeColReal(i);
