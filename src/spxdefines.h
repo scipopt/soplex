@@ -223,7 +223,7 @@ typedef double Real;
 #define DEFAULT_INFINITY   1e100
 
 
-
+#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 
 #endif // !WITH_FLOAT

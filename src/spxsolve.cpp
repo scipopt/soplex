@@ -1076,7 +1076,7 @@ void SPxSolver::printDisplayLine(const bool force)
    MSG_INFO1( (*spxout),
       if( displayLine % (displayFreq*30) == 0 )
       {
-         (*spxout) << "type |   time |   iters | facts |  shift   |    value\n";
+         (*spxout) << "type |   time |   iters | facts |  shift   |violation |    value\n";
       }
       if( force || (displayLine % displayFreq == 0) )
       {
@@ -1086,6 +1086,7 @@ void SPxSolver::printDisplayLine(const bool force)
          (*spxout) << std::setw(8) << iteration() << " | "
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
+         << MAXIMUM(0.0, m_maxInfeas + m_maxInfeasCo) << " | "
          << std::setprecision(8) << value() + objOffset()
          << std::endl;
       }

@@ -27,7 +27,6 @@
 
 namespace soplex
 {
-#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
@@ -628,17 +627,16 @@ void SPxSolver::factorize()
 /* We compute how much the current solution violates (primal or dual) feasibility. In the
    row/enter or column/leave algorithm the maximum violation of dual feasibility is
    computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
-   Except when DO_COMPLETE_CHECK is defined which will check all values, regardless of type. */
+   Additionally, the violation from pricing is taken into account. */
 Real SPxSolver::maxInfeas() const
 {
    Real inf = 0.0;
 
-// TODO find a better, i.e. faster, way of testing feasibility
-#define DO_COMPLETE_CHECK
-#ifndef DO_COMPLETE_CHECK
    if (type() == ENTER)
    {
-#endif
+      if( m_maxInfeasUpToDate && m_maxInfeasCoUpToDate )
+         inf = m_maxInfeas + m_maxInfeasCo;
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
@@ -646,12 +644,14 @@ Real SPxSolver::maxInfeas() const
          else if ((*theFvec)[i] < theLBbound[i])
             inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
-#ifndef DO_COMPLETE_CHECK
    }
    else
    {
       assert(type() == LEAVE);
-#endif
+
+      if( m_maxInfeasUpToDate )
+         inf = m_maxInfeas;
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
@@ -666,9 +666,7 @@ Real SPxSolver::maxInfeas() const
          else if ((*thePvec)[i] < (*theLbound)[i])
             inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
       }
-#ifndef DO_COMPLETE_CHECK
    }
-#endif
 
    return inf;
 }
@@ -929,6 +927,10 @@ SPxSolver::SPxSolver(
    , m_status(UNKNOWN)
    , m_nonbasicValue(0.0)
    , m_nonbasicValueUpToDate(false)
+   , m_maxInfeas(0.0)
+   , m_maxInfeasUpToDate(false)
+   , m_maxInfeasCo(0.0)
+   , m_maxInfeasCoUpToDate(false)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -1018,6 +1020,12 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       maxTime = base.maxTime;
       objLimit = base.objLimit;
       m_status = base.m_status;
+      m_nonbasicValue = base.m_nonbasicValue;
+      m_nonbasicValueUpToDate = base.m_nonbasicValueUpToDate;
+      m_maxInfeas = base.m_maxInfeas;
+      m_maxInfeasUpToDate = base.m_maxInfeasUpToDate;
+      m_maxInfeasCo = base.m_maxInfeasCo;
+      m_maxInfeasCoUpToDate = base.m_maxInfeasCoUpToDate;
       m_entertol = base.m_entertol;
       m_leavetol = base.m_leavetol;
       theShift = base.theShift;
@@ -1181,6 +1189,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , m_status(base.m_status)
    , m_nonbasicValue(base.m_nonbasicValue)
    , m_nonbasicValueUpToDate(base.m_nonbasicValueUpToDate)
+   , m_maxInfeas(base.m_maxInfeas)
+   , m_maxInfeasUpToDate(base.m_maxInfeasUpToDate)
+   , m_maxInfeasCo(base.m_maxInfeasCo)
+   , m_maxInfeasCoUpToDate(base.m_maxInfeasCoUpToDate)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
    , theShift(base.theShift)
