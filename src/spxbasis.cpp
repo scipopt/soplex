@@ -865,6 +865,7 @@ void SPxBasis::factorize()
       if (status() == SINGULAR)
          setStatus(REGULAR);
 
+      factorized = true;
       minStab = factor->stability();
 
       // This seems allways be about 1e-7 
@@ -877,20 +878,22 @@ void SPxBasis::factorize()
       break;
    case SLinSolver::SINGULAR :
       setStatus(SINGULAR);
+      factorized = false;
       break;
    default :
       MSG_ERROR( std::cerr << "EBASIS08 error: unknown status of factorization.\n"; )
+      factorized = false;
       throw SPxInternalCodeException("XBASIS01 This should never happen.");
-      // factorized = false;
    }
 
    lastMem    = factor->memory();
    lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount > 0 ? nzCount : 1);
    lastNzCount = int(nonzeroFactor * Real(nzCount > 0 ? nzCount : 1));
-   factorized = true;
 
    if (status() == SINGULAR)
-      throw SPxStatusException();
+   {
+      throw SPxStatusException("Cannot factorize singular matrix");
+   }
 }
 
 Vector& SPxBasis::multWithBase(Vector& x) const
