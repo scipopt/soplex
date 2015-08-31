@@ -382,12 +382,18 @@ void SPxSolver::init()
 
    // we better factorize explicitly before solving
    if( !factorized )
-      SPxBasis::factorize();
-
-   // we need to abort in case the factorization failed
-   if( SPxBasis::status() <= SPxBasis::SINGULAR )
    {
-      throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
+      try
+      {
+         SPxBasis::factorize();
+      }
+      catch( const SPxException& x )
+      {
+         // we need to abort in case the factorization failed
+         assert(SPxBasis::status() <= SPxBasis::SINGULAR);
+         m_status = SINGULAR;
+         throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
+      }
    }
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
