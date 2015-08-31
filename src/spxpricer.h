@@ -313,6 +313,11 @@ public:
    /// import norms into pricer
    virtual bool setDualNorms(int nrows, int ncols, Real* norms)
    {
+      weightsAreSetup = false;
+
+      if( thesolver == NULL )
+         return false;
+
       if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN)
       {
          assert(coWeights.dim() >= nrows);
@@ -331,10 +336,7 @@ public:
          weightsAreSetup = true;
       }
       else
-      {
-         weightsAreSetup = false;
          return false;
-      }
 
       return true;
    }
