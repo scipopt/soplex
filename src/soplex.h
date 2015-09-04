@@ -1453,6 +1453,7 @@ private:
                           // _compSolver.
    SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
+   SPxBasis _idsTransBasis;   // the basis required for the transformation to form the reduced problem
 
    DVector _transformedObj;       // the objective coefficients of the transformed problem
    DVector _idsFeasVector;       // feasibility vector calculated using unshifted bounds.
@@ -1886,7 +1887,7 @@ private:
          int nnonposind);
 
    /// removing rows from the complementary problem.
-   void _deleteAndUpdateRowsComplementaryProblem(int* initFixedVars);
+   void _deleteAndUpdateRowsComplementaryProblem();
 
    /// evaluates the solution of the reduced problem for the IDS
    void _evaluateSolutionIDS(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
@@ -1904,10 +1905,10 @@ private:
    void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
 
    /// update the dual complementary problem with additional columns and rows
-   void _updateIdsComplementaryProblem(DVector dualVector, bool origObj);
+   void _updateIdsComplementaryProblem(bool origObj);
 
    /// checking the optimality of the original problem.
-   void _checkOriginalProblemOptimality();
+   void _checkOriginalProblemOptimality(Vector primalVector);
 
    /// updating the slack column coefficients to adjust for equality constraints
    void _updateComplementarySlackColCoeff();
@@ -1956,6 +1957,16 @@ private:
 
    /// function call to terminate the decomposition simplex
    bool idsTerminate();
+
+   /// function to build a basis for the original problem as given by the solution to the reduced problem
+   void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat);
+
+   /// function to retrieve the original problem row basis status from the reduced and complementary problems
+   void getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
+      DataArray< SPxSolver::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
+
+   /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
+   void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
    /// function call to terminate the decomposition simplex
    void _getIdsPrimalVector(Vector& primal);
