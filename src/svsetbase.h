@@ -506,7 +506,11 @@ public:
          else
          {
             ensureMem(newmax);
-            SVectorBase<R> newps(newmax, &SVSetBaseArray::last() + 1);
+            SVectorBase<R> newps(0,0);
+            if( SVSetBaseArray::size() > 0 )
+               newps.setMem(newmax, &SVSetBaseArray::last() + 1);
+            else
+               newps.setMem(newmax, SVSetBaseArray::get_ptr());
 #ifndef NDEBUG
             Nonzero<R>* olddata = SVSetBaseArray::data;
             SVSetBaseArray::insert(memSize(), newmax);

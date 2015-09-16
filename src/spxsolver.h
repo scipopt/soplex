@@ -380,7 +380,7 @@ public:
    void setOutstream(SPxOut& newOutstream)
    {
       spxout = &newOutstream;
-      SPxLPBase::spxout = &newOutstream;
+      SPxLP::spxout = &newOutstream;
    }
 
    /**@name Access */
