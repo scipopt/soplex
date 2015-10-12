@@ -129,11 +129,16 @@ namespace soplex
       //**@name Typecasts */
       //@{
 
+#ifndef _MSC_VER
       /// typecasts Rational to double (only allows explicit typecasting)
       explicit operator double() const;
 
       /// typecasts Rational to long double (only allows explicit typecasting)
       explicit operator long double() const;
+#else
+      operator double() const;
+      operator long double() const;
+#endif
 
 #ifdef SOPLEX_WITH_GMP
       /// provides read-only access to underlying mpq_t

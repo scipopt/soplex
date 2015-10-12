@@ -31,6 +31,9 @@
 #define _SPXDEFINES_H_
 
 #include <math.h>
+#ifdef _MSC_VER
+#include <float.h>
+#endif
 
 
 
@@ -330,7 +333,11 @@ inline Real spxSqrt(Real a)
 #ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
+#ifndef _MSC_VER
    return nextafter(x,y);
+#else
+   return _nextafter(x,y);
+#endif
 }
 #endif
 
