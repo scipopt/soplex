@@ -632,8 +632,8 @@ Real SPxSolver::maxInfeas() const
 {
    Real inf = 0.0;
 
-   if (type() == ENTER)
-   {
+//   if (type() == ENTER)
+//   {
       for (int i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
@@ -641,10 +641,10 @@ Real SPxSolver::maxInfeas() const
          if (theLBbound[i] > (*theFvec)[i])
             inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
-   }
-   else
-   {
-      assert(type() == LEAVE);
+//   }
+//   else
+//   {
+//      assert(type() == LEAVE);
 
       for (int i = 0; i < dim(); i++)
       {
@@ -660,7 +660,7 @@ Real SPxSolver::maxInfeas() const
          else if ((*thePvec)[i] < (*theLbound)[i])
             inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
       }
-   }
+//   }
 
    return inf;
 }
