@@ -634,13 +634,13 @@ Real SPxSolver::maxInfeas() const
 
 //   if (type() == ENTER)
 //   {
-      for (int i = 0; i < dim(); i++)
-      {
-         if ((*theFvec)[i] > theUBbound[i])
-            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-         if (theLBbound[i] > (*theFvec)[i])
-            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
-      }
+//      for (int i = 0; i < dim(); i++)
+//      {
+//         if ((*theFvec)[i] > theUBbound[i])
+//            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
+//         if (theLBbound[i] > (*theFvec)[i])
+//            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
+//      }
 //   }
 //   else
 //   {
@@ -648,9 +648,14 @@ Real SPxSolver::maxInfeas() const
 
       for (int i = 0; i < dim(); i++)
       {
+         if ((*theFvec)[i] > theUBbound[i])
+            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
+         else if ((*theFvec)[i] < theLBbound[i])
+            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
+
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
-         if ((*theCoLbound)[i] > (*theCoPvec)[i])
+         else if ((*theCoPvec)[i] < (*theCoLbound)[i])
             inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
       for (int i = 0; i < coDim(); i++)
