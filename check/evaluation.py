@@ -22,7 +22,7 @@ def typeofvalue(text):
     return str
 
 if not len(sys.argv) == 2:
-    print 'usage: '+sys.argv[0]+' <soplex_test_run>.out'
+    print('usage: '+sys.argv[0]+' <soplex_test_run>.out')
     quit()
 
 # specify columns for the output (can be modified)
@@ -124,11 +124,11 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['qso:prec'] = max( int(outline.split()[3]), instances[instancename]['qso:prec'] )
 
     elif outline.startswith('SoPlex version'):
-        instances[instancename]['hash'] = outline.split()[-1].rstrip(']')[0:9]
+        instances[instancename]['githash'] = outline.split()[-1].rstrip(']')[0:9]
         if not printedIdentifier:
             printedIdentifier = True
-            print
-            print outline
+            print()
+            print(outline)
 
     elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
         instances[instancename]['status'] = 'fail'
@@ -271,19 +271,19 @@ for i,c in enumerate(columns):
     output = output + ' ' + c.rjust(length[i] + 1)
 
 # print column header
-print output
-print '-'*len(output)
+print(output)
+print('-'*len(output))
 
 # print data for all instances with the computed length
 for name in sorted(instances):
     output = ''
     for i,c in enumerate(columns):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
-    print output
+    print(output)
 
-print
-print 'Results (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):'
-print '{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts)
+print()
+print('Results (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):')
+print('{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts))
 
 # try to check for missing files
 check_test = False
@@ -291,10 +291,10 @@ try:
     with open(testname):
         check_test = True
 except IOError:
-    print 'No testset file found to check run for completeness.'
+    print('No testset file found to check run for completeness.')
 
 if not check_solu:
-    print 'No solution file found to check objective values.'
+    print('No solution file found to check objective values.')
 
 if check_test:
     testfile = open(testname,'r')
@@ -308,8 +308,8 @@ if check_test:
             instancename = instancename + '.' + linesplit[i]
         if not instancename in instances:
             if not printedMissing:
-                print
-            print 'missing instance: '+instancename
+                print()
+            print('missing instance: '+instancename)
             printedMissing = True
 
     testfile.close()

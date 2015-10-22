@@ -12,8 +12,8 @@ import json
 # Set values to be compared and respective shift values in arrays 'compareValues' and 'shift'
 
 def printUsage(name):
-    print 'compare several runs of the same testset'
-    print 'usage: '+name+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]'
+    print('compare several runs of the same testset')
+    print('usage: '+name+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]')
     quit()
 
 # compute speed-up or slow-down factors for all instances of two settings
@@ -44,24 +44,24 @@ def updateGeoMean(new, mean, count, shift):
 # print header lines
 def printHeader():
     border = '-'*(namelength) + '+' + '-'*(sum(length)+1) + '+'
-    output1 = '-'.join([version[0],hash[0],default]).rjust(namelength+sum(length)+1)
+    output1 = '-'.join([version[0],githash[0],default]).rjust(namelength+sum(length)+1)
     output2 = 'name'.ljust(namelength) + ' '
     # print name of compareValue of first setting
     for i,c in enumerate(compareValues):
         output2 += c.rjust(length[i])
     # print compareValues and factornames for other settings
     for i,s in enumerate(settings[1:]):
-        output1 += ' |' + '-'.join([version[i+1],hash[i+1],s]).center(sum(length) + len(compareValues)*factorlength)
+        output1 += ' |' + '-'.join([version[i+1],githash[i+1],s]).center(sum(length) + len(compareValues)*factorlength)
         border += '-'*(sum(length) + len(compareValues)*factorlength + 1) + '+'
         output2 += ' |'
         for ic,c in enumerate(compareValues):
             output2 += c.rjust(length[ic])
         for c in compareValues:
             output2 += (c+'Q').rjust(factorlength)
-    print border
-    print output1
-    print output2
-    print border
+    print(border)
+    print(output1)
+    print(output2)
+    print(border)
 
 # print usage and exit
 if len(sys.argv) < 2:
@@ -87,7 +87,7 @@ factors = {}
 settings = []
 version = []
 opt = []
-hash = []
+githash = []
 
 # load given .json files
 for run in range(1,runs):
@@ -100,7 +100,7 @@ for run in range(1,runs):
     opt.append(sys.argv[run].split('/')[-1].split('.')[-3])
     # check for identical testset
     if not testset == dataname.split('/')[-1].split('.')[1]:
-        print 'inconsistent testsets'
+        print('inconsistent testsets')
         quit()
     with open(dataname) as f:
         results[setting] = json.load(f)
@@ -109,14 +109,14 @@ for run in range(1,runs):
 default = settings[0]
 
 # extract instance names
-instances = results[default].keys()
+instances = list(results[default].keys())
 namelength = 16
 for i in instances:
     namelength = max(len(i), namelength)
 
 # extract git hashes
 for s in settings:
-    hash.append(results[s][instances[0]]['hash'])
+    githash.append(results[s][instances[0]]['githash'])
 
 # check all settings for aborts or instances to ignore and remove them
 aborts = ''
@@ -196,7 +196,7 @@ for i in sorted(instances):
         for ic,c in enumerate(compareValues):
             output += '{0:{width}.2f}'.format(factors[c][s][i], width=factorlength)
 
-    print output
+    print(output)
 
 shmeanValue[c][default] -= shift[ic]
 shmeanValue[c][s] -= shift[ic]
@@ -227,11 +227,11 @@ for ids, s in enumerate(settings[1:]):
     output1 += ' '*(len(compareValues)*factorlength + 2)
     output2 += ' '*(len(compareValues)*factorlength + 2)
     output3 += ' '*(len(compareValues)*factorlength + 2)
-print output1
-print output2
-print output3
+print(output1)
+print(output2)
+print(output3)
 
 # print aborted and ignored instances
 if not aborts == '':
-    print '\naborted and ignored instances:'
-    print aborts
+    print('\naborted and ignored instances:')
+    print(aborts)
