@@ -1250,7 +1250,9 @@ bool SPxSolver::enter(SPxId& enterId)
          instableEnterId = enterId;
          instableEnterVal = enterTest;
 
-         rejectEnter(enterId, 0.0, enterStat);
+         MSG_DEBUG( std::cout << "DENTER09 rejecting enter pivot and looking for others" << std::endl; )
+
+         rejectEnter(enterId, enterTest / 10.0, enterStat);
          change(-1, none, 0);
 
 
@@ -1258,6 +1260,7 @@ bool SPxSolver::enter(SPxId& enterId)
       }
       else
       {
+         MSG_DEBUG( std::cout << "DENTER10 rejecting enter pivot in instable state, resetting values" << std::endl; )
          rejectEnter(enterId, enterTest, enterStat);
          change(-1, none, 0);
       }

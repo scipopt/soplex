@@ -237,9 +237,7 @@ SPxSolver::Status SPxSolver::solve()
                   that this is due to the scaling of the test values. Thus, we use
                   instableEnterId and SPxFastRT::selectEnter shall accept even an instable
                   leaving variable. */
-               MSG_INFO3( (*spxout),
-                  (*spxout) << " --- trying instable enter iteration" << std::endl;
-                  )
+               MSG_INFO3( (*spxout), (*spxout) << " --- trying instable enter iteration" << std::endl; )
 
                enterId = instableEnterId;
                instableEnter = true;
@@ -340,7 +338,7 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // We have an iterationlimit and everything looks good? Then stop!
                   // 6 is just a number picked.
-                  else if (maxIters > 0 && lastUpdate() < 6)
+                  else if (!(instableEnterId.isValid()) && maxIters > 0 && lastUpdate() < 6)
                   {
                      priced = true;
                      break;
@@ -616,7 +614,7 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // We have an iteration limit and everything looks good? Then stop!
                   // 6 is just a number picked.
-                  else if (maxIters > 0 && lastUpdate() < 6)
+                  else if (instableLeaveNum == -1 && maxIters > 0 && lastUpdate() < 6)
                   {
                      priced = true;
                      break;

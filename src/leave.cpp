@@ -706,7 +706,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             // Note: These changes do not survive a refactorization
             instableLeaveVal = theCoTest[leaveIdx];
-            theCoTest[leaveIdx] = 0.0;
+            theCoTest[leaveIdx] = instableLeaveVal / 10.0;
 
             return true;
          }
