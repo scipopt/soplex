@@ -1286,6 +1286,8 @@ bool SPxSolver::enter(SPxId& enterId)
 
       // update objective funtion value
       updateNonbasicValue(objChange);
+
+      MSG_DEBUG( std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl; )
    }
    /*  No variable could be selected to leave the basis and even the entering
        variable is unbounded --- this is a failure.  
