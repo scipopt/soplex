@@ -627,32 +627,33 @@ void SPxSolver::factorize()
 
 /* We compute how much the current solution violates (primal or dual) feasibility. In the
    row/enter or column/leave algorithm the maximum violation of dual feasibility is
-   computed. In the row/leave or column/enter algorithm the primal feasibility is checked. */
+   computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
+   Except when DO_COMPLETE_CHECK is defined which will check all values, regardless of type. */
 Real SPxSolver::maxInfeas() const
 {
    Real inf = 0.0;
 
-//   if (type() == ENTER)
-//   {
-//      for (int i = 0; i < dim(); i++)
-//      {
-//         if ((*theFvec)[i] > theUBbound[i])
-//            inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-//         if (theLBbound[i] > (*theFvec)[i])
-//            inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
-//      }
-//   }
-//   else
-//   {
-//      assert(type() == LEAVE);
-
+// TODO find a better, i.e. faster, way of testing feasibility
+#define DO_COMPLETE_CHECK
+#ifndef DO_COMPLETE_CHECK
+   if (type() == ENTER)
+   {
+#endif
       for (int i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
             inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
          else if ((*theFvec)[i] < theLBbound[i])
             inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
-
+      }
+#ifndef DO_COMPLETE_CHECK
+   }
+   else
+   {
+      assert(type() == LEAVE);
+#endif
+      for (int i = 0; i < dim(); i++)
+      {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
          else if ((*theCoPvec)[i] < (*theCoLbound)[i])
@@ -665,7 +666,9 @@ Real SPxSolver::maxInfeas() const
          else if ((*thePvec)[i] < (*theLbound)[i])
             inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
       }
-//   }
+#ifndef DO_COMPLETE_CHECK
+   }
+#endif
 
    return inf;
 }
