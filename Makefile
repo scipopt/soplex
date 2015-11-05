@@ -146,6 +146,7 @@ LIBHEADER	=	array.h \
 			lprowset.h \
 			mpsinput.h \
 			nameset.h \
+			notimer.h \
 			random.h \
 			rational.h \
 			ratrecon.h \
@@ -199,11 +200,14 @@ LIBHEADER	=	array.h \
 			svsetbase.h \
 			svset.h \
 			timer.h \
+			timerfactory.h \
 			unitvectorbase.h \
 			unitvector.h \
+			usertimer.h \
 			updatevector.h \
 			vectorbase.h \
 			vector.h
+			wallclocktimer.h \
 LIBOBJ		= 	changesoplex.o \
 			clufactor.o \
 			clufactor_rational.o \
