@@ -130,11 +130,10 @@ void SPxSolver::updateFtest()
    if( boundflips > 0 )
    {
       Real eps = epsilon();
-      for( int j = 0; j < solveVector3->size(); ++j )
+      for( int i = 0; i < solveVector3->dim(); ++i )
       {
-         if( spxAbs(solveVector3->value(j)) > eps )
+         if( (*solveVector3)[i] > eps || (*solveVector3)[i] < -eps )
          {
-            int i = solveVector3->index(j);
             ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
             if( sparsePricingLeave && ftest[i] < -theeps )
             {
