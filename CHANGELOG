@@ -16,6 +16,7 @@ fixed bugs:
 - fix removing rows/cols in SoPlex interface
 
 code quality:
+- removed some hard float comparisons (use 'EQ()' instead of '==' )
 - check scripts are now python3 compliant
 
 

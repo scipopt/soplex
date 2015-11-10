@@ -659,7 +659,7 @@ bool SPxSolver::leave(int leaveIdx)
    boundflips = 0;
    Real oldShift = theShift;
    SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
-   if (theShift != oldShift)
+   if (NE(theShift, oldShift))
    {
       MSG_DEBUG( std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest" << std::endl; )
       forceRecompNonbasicValue();
@@ -683,7 +683,7 @@ bool SPxSolver::leave(int leaveIdx)
       change(-1, none, 0);
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if (enterVal != leaveMax)
+      if (NE(enterVal, leaveMax))
       {
          MSG_DEBUG( std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
                            << ", theCoTest=" << theCoTest[leaveIdx] << ")"

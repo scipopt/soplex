@@ -1120,7 +1120,7 @@ bool SPxSolver::enter(SPxId& enterId)
    {
       if (spxAbs(leaveVal) < entertol())
       {
-         if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
+         if (EQ(theUBbound[leaveIdx], theLBbound[leaveIdx])
             && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
             m_numCycle++;
       }
@@ -1228,7 +1228,7 @@ bool SPxSolver::enter(SPxId& enterId)
    }
    /*  No leaving vector could be found that would yield a stable pivot step.
     */
-   else if (leaveVal != -enterMax)
+   else if (NE(leaveVal, -enterMax))
    {
       /* In the ENTER algorithm, when for a selected entering variable we find only
          an instable leaving variable, then the basis change is not conducted.
