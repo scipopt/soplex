@@ -206,8 +206,8 @@ LIBHEADER	=	array.h \
 			usertimer.h \
 			updatevector.h \
 			vectorbase.h \
-			vector.h
-			wallclocktimer.h \
+			vector.h \
+			wallclocktimer.h
 LIBOBJ		= 	changesoplex.o \
 			clufactor.o \
 			clufactor_rational.o \
