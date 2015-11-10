@@ -671,6 +671,47 @@ Real SPxSolver::maxInfeas() const
    return inf;
 }
 
+/* check for (dual) violations above tol and immediately return false w/o checking the remaining values
+   This method is useful for verifying whether an objective limit can be used as termination criterion */
+bool SPxSolver::noViols(Real tol) const
+{
+   assert(tol >= 0.0);
+
+   if( type() == ENTER )
+   {
+      for( int i = 0; i < dim(); i++ )
+      {
+         if( (*theFvec)[i] - theUBbound[i] > tol )
+            return false;
+         if( theLBbound[i] - (*theFvec)[i] > tol )
+            return false;
+      }
+   }
+   else
+   {
+      assert(type() == LEAVE);
+
+      if( m_maxInfeasUpToDate && m_maxInfeas > tol )
+         return false;
+
+      for( int i = 0; i < dim(); i++ )
+      {
+         if( (*theCoPvec)[i] - (*theCoUbound)[i] > tol )
+            return false;
+         if( (*theCoLbound)[i] - (*theCoPvec)[i] > tol )
+            return false;
+      }
+      for (int i = 0; i < coDim(); i++)
+      {
+         if( (*thePvec)[i] - (*theUbound)[i] > tol )
+            return false;
+         if( (*theLbound)[i] - (*thePvec)[i] > tol )
+            return false;
+      }
+   }
+   return true;
+}
+
 Real SPxSolver::nonbasicValue()
 {
    int i;

@@ -5,6 +5,7 @@ features:
 
 performance:
 - faster updateFtest() by exploiting sparsity in solveVector3
+- new method noViols() for checking violations, that terminates faster than maxInfeas()
 
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log

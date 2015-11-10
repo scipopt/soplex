@@ -1188,7 +1188,7 @@ bool SPxSolver::terminate()
       // It might be even possible to use this termination value in case of
       // bound violations (shifting) but in this case it is quite difficult
       // to determine if we already reached the limit.
-      if( shift() < epsilon() && maxInfeas() + shift() <= opttol() )
+      if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
          if( spxSense() * value() <= spxSense() * objLimit ) 
@@ -1203,7 +1203,7 @@ bool SPxSolver::terminate()
                       << ", rep: " << int(rep())
                       << ", type: " << int(type()) << ")" << std::endl;
             )
-            
+
             m_status = ABORT_VALUE;
             return true;
          }

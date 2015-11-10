@@ -1600,6 +1600,11 @@ public:
     */
    virtual Real maxInfeas() const;
 
+   /// check for violations above tol and immediately return false w/o checking the remaining values
+   /** This method is useful for verifying whether an objective limit can be used as termination criterion
+    */
+   virtual bool noViols(Real tol) const;
+
    /// Return current basis.
    /**@note The basis can be used to solve linear systems or use
     *  any other of its (const) methods.  It is, however, encuraged
