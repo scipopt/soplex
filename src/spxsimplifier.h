@@ -103,8 +103,8 @@ public:
       , m_chgLRhs(0)
       , m_keptBnds(0)
       , m_keptLRhs(0)
-      , m_objoffset(1e-4)
-      , m_minReduction(0.0)
+      , m_objoffset(0.0)
+      , m_minReduction(1e-4)
       , spxout(0)
    {
       assert(isConsistent());
