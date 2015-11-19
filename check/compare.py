@@ -12,8 +12,8 @@ import json
 # Set values to be compared and respective shift values in arrays 'compareValues' and 'shift'
 
 def printUsage(name):
-    print 'compare several runs of the same testset'
-    print 'usage: '+name+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]'
+    print('compare several runs of the same testset')
+    print('usage: '+name+' [prf=<performance-profile>.prf] [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]')
     quit()
 
 # compute speed-up or slow-down factors for all instances of two settings
@@ -23,16 +23,16 @@ def computeFactor(compareValue, defaultSetting, compareSetting):
     "compute speed-up or slow-down factors for all instances of two settings"
     for instance in results[defaultSetting]:
         if not instance in results[compareSetting]:
-            factors[compareValue][compareSetting][instance] = 0.0
+            factors[compareValue][compareSetting][instance] = 1.0
         elif not compareValue in results[compareSetting][instance]:
-            factors[compareValue][compareSetting][instance] = 0.0
+            factors[compareValue][compareSetting][instance] = 1.0
         else:
           value = results[compareSetting][instance][compareValue]
           defvalue = results[defaultSetting][instance][compareValue]
           if defaultSetting == compareSetting:
               factors[compareValue][compareSetting][instance] = defvalue
           elif defvalue == 0:
-              factors[compareValue][compareSetting][instance] = 0.0
+              factors[compareValue][compareSetting][instance] = 1.0
           else:
               factors[compareValue][compareSetting][instance] = float(value) / float(defvalue)
 
@@ -58,10 +58,10 @@ def printHeader():
             output2 += c.rjust(length[ic])
         for c in compareValues:
             output2 += (c+'Q').rjust(factorlength)
-    print border
-    print output1
-    print output2
-    print border
+    print(border)
+    print(output1)
+    print(output2)
+    print(border)
 
 # print usage and exit
 if len(sys.argv) < 2:
@@ -71,11 +71,15 @@ if len(sys.argv) < 2:
 compareValues = ['solvetime','iters']
 shift = [0.1, 10, 1]
 
-# look for instances to ignore
+# look for instances to ignore and check whether performance profile files should be created
 ignore = []
+performanceProFile = ''
 for a in sys.argv[1:]:
     if a.startswith('ignore='):
-        ignore = a.lstrip('ignore=').split(',')
+        ignore = a[7:].split(',')
+        sys.argv.remove(a)
+    elif a.startswith('prf='):
+        performanceProFile = a[4:]
         sys.argv.remove(a)
 
 # parse testset from first file
@@ -94,13 +98,13 @@ for run in range(1,runs):
     dataname = sys.argv[run]
     setting = sys.argv[run].split('/')[-1].split('.')[-2]
     if setting in settings:
-        setting = setting+str(run)
+        setting = '_'.join([setting, str(run)])
     settings.append(setting)
-    version.append('.'.join(sys.argv[run].split('/')[-1].split('.')[2:-6]).lstrip('soplex-'))
+    version.append('.'.join(sys.argv[run].split('/')[-1].split('.')[2:3])[7:])
     opt.append(sys.argv[run].split('/')[-1].split('.')[-3])
     # check for identical testset
     if not testset == dataname.split('/')[-1].split('.')[1]:
-        print 'inconsistent testsets'
+        print('inconsistent testsets')
         quit()
     with open(dataname) as f:
         results[setting] = json.load(f)
@@ -109,7 +113,7 @@ for run in range(1,runs):
 default = settings[0]
 
 # extract instance names
-instances = results[default].keys()
+instances = list(results[default].keys())
 namelength = 16
 for i in instances:
     namelength = max(len(i), namelength)
@@ -196,7 +200,7 @@ for i in sorted(instances):
         for ic,c in enumerate(compareValues):
             output += '{0:{width}.2f}'.format(factors[c][s][i], width=factorlength)
 
-    print output
+    print(output)
 
 shmeanValue[c][default] -= shift[ic]
 shmeanValue[c][s] -= shift[ic]
@@ -227,11 +231,33 @@ for ids, s in enumerate(settings[1:]):
     output1 += ' '*(len(compareValues)*factorlength + 2)
     output2 += ' '*(len(compareValues)*factorlength + 2)
     output3 += ' '*(len(compareValues)*factorlength + 2)
-print output1
-print output2
-print output3
+print(output1)
+print(output2)
+print(output3)
 
 # print aborted and ignored instances
 if not aborts == '':
-    print '\naborted and ignored instances:'
-    print aborts
+    print('\naborted and ignored instances:')
+    print(aborts)
+
+# generate performance profile files
+if not performanceProFile == '':
+    for idx,s in enumerate(settings):
+        filename = performanceProFile+'.'+testset+'.'+version[idx]+'.'+s+'.prf'
+        with open(filename, 'w') as f:
+            f.write('---\n')
+            f.write('algname: '+version[idx]+'_'+s+'\n')
+            f.write('success: optimal\n')
+            f.write('free_format: True\n')
+            f.write('---\n')
+            for i in sorted(instances):
+                if results[s][i]['solvetime'] < 1.0:
+                    time = 1.0
+                else:
+                    time = results[s][i]['solvetime']
+                status = results[s][i]['status'].replace(' ', '_')
+                output = i.ljust(22)
+                output += status.rjust(18)
+                output += str(time).rjust(14)
+                output += '\n'
+                f.write(output)
