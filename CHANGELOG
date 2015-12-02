@@ -16,6 +16,7 @@ fixed bugs:
 - better internal handling of singular bases
 - check whether the solver is available when setting dual norms
 - fix removing rows/cols in SoPlex interface
+- check objective limit also when presolving is activated
 
 code quality:
 - removed some hard float comparisons (use 'EQ()' instead of '==' )
