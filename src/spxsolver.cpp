@@ -691,9 +691,6 @@ bool SPxSolver::noViols(Real tol) const
    {
       assert(type() == LEAVE);
 
-      if( m_maxInfeasUpToDate && m_maxInfeas > tol )
-         return false;
-
       for( int i = 0; i < dim(); i++ )
       {
          if( (*theCoPvec)[i] - (*theCoUbound)[i] > tol )
