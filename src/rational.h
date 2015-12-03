@@ -129,7 +129,9 @@ namespace soplex
       //**@name Typecasts */
       //@{
 
-#ifndef _MSC_VER
+      // Visual Studio <= 2010 does not fully support C++11, this makes
+      // it compiling (noone checked whether it also works properly)
+#if defined(_MSC_VER) && _MSC_VER <= 1600
       /// typecasts Rational to double (only allows explicit typecasting)
       explicit operator double() const;
 
