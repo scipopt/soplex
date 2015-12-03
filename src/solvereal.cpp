@@ -141,17 +141,12 @@ namespace soplex
       _statistics->preprocessingTime->start();
 
       if( applyPreprocessing )
-      {
          _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex::INFTY));
-      }
       else
-      {
          _disableSimplifierAndScaler();
-         ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::INFTY));
-      }
+
+      _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
+         ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::OBJLIMIT_LOWER));
 
       applyPreprocessing = (_simplifier != 0 || _scaler != 0);
 

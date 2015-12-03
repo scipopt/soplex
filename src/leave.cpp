@@ -41,6 +41,10 @@ void SPxSolver::computeFtest()
    assert(type() == LEAVE);
 
    Real theeps = entertol();
+   m_pricingViolUpToDate = true;
+   m_pricingViolCoUpToDate = true;
+   m_pricingViol = 0;
+   m_pricingViolCo = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * dim());
@@ -55,6 +59,7 @@ void SPxSolver::computeFtest()
       {
          if( theCoTest[i] < -theeps )
          {
+            m_pricingViol -= theCoTest[i];
             infeasibilities.addIdx(i);
             isInfeasible[i] = SPxPricer::VIOLATED;
             ++ninfeasibilities;
@@ -70,6 +75,8 @@ void SPxSolver::computeFtest()
             ninfeasibilities = 0;
          }
       }
+      else if( theCoTest[i] < -theeps )
+            m_pricingViol -= theCoTest[i];
    }
 
    if( ninfeasibilities == 0 && !sparsePricingLeave )
@@ -108,12 +115,19 @@ void SPxSolver::updateFtest()
    {
       int i = idx.index(j);
 
+      if( m_pricingViolUpToDate && ftest[i] < -theeps )
+         m_pricingViol += ftest[i];
+
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
+
+
       if( sparsePricingLeave && ftest[i] < -theeps )
       {
          assert(remainingRoundsLeave == 0);
+         if( m_pricingViolUpToDate )
+            m_pricingViol -= ftest[i];
          if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
          {
             // this can cause problems - we cannot keep on adding indeces to infeasibilities,
@@ -125,25 +139,38 @@ void SPxSolver::updateFtest()
          if( hyperPricingLeave )
             updateViols.addIdx(i);
       }
+      else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+         m_pricingViol -= ftest[i];
+
    }
    // if boundflips were performed, we need to update these indices as well
    if( boundflips > 0 )
    {
       Real eps = epsilon();
-      for( int i = 0; i < solveVector3->dim(); ++i )
+      for( int j = 0; j < solveVector3->size(); ++j )
       {
-         if( (*solveVector3)[i] > eps || (*solveVector3)[i] < -eps )
+         if( spxAbs(solveVector3->value(j)) > eps )
          {
+            int i = solveVector3->index(j);
+
+            if( m_pricingViolUpToDate && ftest[i] < -theeps )
+               m_pricingViol += ftest[i];
+
             ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
+
             if( sparsePricingLeave && ftest[i] < -theeps )
             {
                assert(remainingRoundsLeave == 0);
+               if( m_pricingViolUpToDate )
+                  m_pricingViol -= ftest[i];
                if( !isInfeasible[i] )
                {
                   infeasibilities.addIdx(i);
                   isInfeasible[i] = true;
                }
             }
+            else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+               m_pricingViol -= ftest[i];
          }
       }
    }
@@ -658,7 +685,7 @@ bool SPxSolver::leave(int leaveIdx)
    boundflips = 0;
    Real oldShift = theShift;
    SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
-   if (theShift != oldShift)
+   if (NE(theShift, oldShift))
    {
       MSG_DEBUG( std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest" << std::endl; )
       forceRecompNonbasicValue();
@@ -682,7 +709,7 @@ bool SPxSolver::leave(int leaveIdx)
       change(-1, none, 0);
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if (enterVal != leaveMax)
+      if (NE(enterVal, leaveMax))
       {
          MSG_DEBUG( std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
                            << ", theCoTest=" << theCoTest[leaveIdx] << ")"
@@ -706,7 +733,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             // Note: These changes do not survive a refactorization
             instableLeaveVal = theCoTest[leaveIdx];
-            theCoTest[leaveIdx] = 0.0;
+            theCoTest[leaveIdx] = instableLeaveVal / 10.0;
 
             return true;
          }
@@ -999,6 +1026,8 @@ bool SPxSolver::leave(int leaveIdx)
 
          // update feasibility vectors
          theFvec->value() = 0;
+         assert(theCoTest[leaveIdx] < 0.0);
+         m_pricingViol += theCoTest[leaveIdx];
          theCoTest[leaveIdx] *= -1;
       }
 

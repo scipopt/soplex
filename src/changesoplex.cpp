@@ -757,7 +757,7 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
                objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
          }
       }
-      else if (newLower == currUpper)
+      else if (EQ(newLower, currUpper))
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -779,7 +779,7 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
       }
       break;
    case SPxBasis::Desc::P_FIXED:
-      if (newLower != currUpper)
+      if (NE(newLower, currUpper))
          stat = SPxBasis::Desc::P_ON_UPPER;
       break;
    case SPxBasis::Desc::D_FREE:
@@ -822,7 +822,7 @@ void SPxSolver::changeLower(int i, const Real& newLower)
 {
    Real oldLower = lower(i);
 
-   if (newLower != oldLower)
+   if (NE(newLower, oldLower))
    {
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.

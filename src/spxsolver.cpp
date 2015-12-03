@@ -27,7 +27,6 @@
 
 namespace soplex
 {
-#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
@@ -627,18 +626,22 @@ void SPxSolver::factorize()
 
 /* We compute how much the current solution violates (primal or dual) feasibility. In the
    row/enter or column/leave algorithm the maximum violation of dual feasibility is
-   computed. In the row/leave or column/enter algorithm the primal feasibility is checked. */
+   computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
+   Additionally, the violation from pricing is taken into account. */
 Real SPxSolver::maxInfeas() const
 {
    Real inf = 0.0;
 
    if (type() == ENTER)
    {
+      if( m_pricingViolUpToDate && m_pricingViolCoUpToDate )
+         inf = m_pricingViol + m_pricingViolCo;
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
             inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-         if (theLBbound[i] > (*theFvec)[i])
+         else if ((*theFvec)[i] < theLBbound[i])
             inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
    }
@@ -646,11 +649,14 @@ Real SPxSolver::maxInfeas() const
    {
       assert(type() == LEAVE);
 
+      if( m_pricingViolUpToDate )
+         inf = m_pricingViol;
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
-         if ((*theCoLbound)[i] > (*theCoPvec)[i])
+         else if ((*theCoPvec)[i] < (*theCoLbound)[i])
             inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
       for (int i = 0; i < coDim(); i++)
@@ -663,6 +669,44 @@ Real SPxSolver::maxInfeas() const
    }
 
    return inf;
+}
+
+/* check for (dual) violations above tol and immediately return false w/o checking the remaining values
+   This method is useful for verifying whether an objective limit can be used as termination criterion */
+bool SPxSolver::noViols(Real tol) const
+{
+   assert(tol >= 0.0);
+
+   if( type() == ENTER )
+   {
+      for( int i = 0; i < dim(); i++ )
+      {
+         if( (*theFvec)[i] - theUBbound[i] > tol )
+            return false;
+         if( theLBbound[i] - (*theFvec)[i] > tol )
+            return false;
+      }
+   }
+   else
+   {
+      assert(type() == LEAVE);
+
+      for( int i = 0; i < dim(); i++ )
+      {
+         if( (*theCoPvec)[i] - (*theCoUbound)[i] > tol )
+            return false;
+         if( (*theCoLbound)[i] - (*theCoPvec)[i] > tol )
+            return false;
+      }
+      for (int i = 0; i < coDim(); i++)
+      {
+         if( (*thePvec)[i] - (*theUbound)[i] > tol )
+            return false;
+         if( (*theLbound)[i] - (*thePvec)[i] > tol )
+            return false;
+      }
+   }
+   return true;
 }
 
 Real SPxSolver::nonbasicValue()
@@ -921,6 +965,10 @@ SPxSolver::SPxSolver(
    , m_status(UNKNOWN)
    , m_nonbasicValue(0.0)
    , m_nonbasicValueUpToDate(false)
+   , m_pricingViol(0.0)
+   , m_pricingViolUpToDate(false)
+   , m_pricingViolCo(0.0)
+   , m_pricingViolCoUpToDate(false)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -1010,6 +1058,12 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       maxTime = base.maxTime;
       objLimit = base.objLimit;
       m_status = base.m_status;
+      m_nonbasicValue = base.m_nonbasicValue;
+      m_nonbasicValueUpToDate = base.m_nonbasicValueUpToDate;
+      m_pricingViol = base.m_pricingViol;
+      m_pricingViolUpToDate = base.m_pricingViolUpToDate;
+      m_pricingViolCo = base.m_pricingViolCo;
+      m_pricingViolCoUpToDate = base.m_pricingViolCoUpToDate;
       m_entertol = base.m_entertol;
       m_leavetol = base.m_leavetol;
       theShift = base.theShift;
@@ -1173,6 +1227,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , m_status(base.m_status)
    , m_nonbasicValue(base.m_nonbasicValue)
    , m_nonbasicValueUpToDate(base.m_nonbasicValueUpToDate)
+   , m_pricingViol(base.m_pricingViol)
+   , m_pricingViolUpToDate(base.m_pricingViolUpToDate)
+   , m_pricingViolCo(base.m_pricingViolCo)
+   , m_pricingViolCoUpToDate(base.m_pricingViolCoUpToDate)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
    , theShift(base.theShift)

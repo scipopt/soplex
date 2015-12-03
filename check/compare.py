@@ -13,7 +13,7 @@ import json
 
 def printUsage(name):
     print('compare several runs of the same testset')
-    print('usage: '+name+' [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]')
+    print('usage: '+name+' [prf=<performance-profile>.prf] [ignore=<instance1>,<instance2>,...] <soplex_test_run1>.json [<soplex_test_run2>.json ...]')
     quit()
 
 # compute speed-up or slow-down factors for all instances of two settings
@@ -23,16 +23,16 @@ def computeFactor(compareValue, defaultSetting, compareSetting):
     "compute speed-up or slow-down factors for all instances of two settings"
     for instance in results[defaultSetting]:
         if not instance in results[compareSetting]:
-            factors[compareValue][compareSetting][instance] = 0.0
+            factors[compareValue][compareSetting][instance] = 1.0
         elif not compareValue in results[compareSetting][instance]:
-            factors[compareValue][compareSetting][instance] = 0.0
+            factors[compareValue][compareSetting][instance] = 1.0
         else:
           value = results[compareSetting][instance][compareValue]
           defvalue = results[defaultSetting][instance][compareValue]
           if defaultSetting == compareSetting:
               factors[compareValue][compareSetting][instance] = defvalue
           elif defvalue == 0:
-              factors[compareValue][compareSetting][instance] = 0.0
+              factors[compareValue][compareSetting][instance] = 1.0
           else:
               factors[compareValue][compareSetting][instance] = float(value) / float(defvalue)
 
@@ -71,11 +71,15 @@ if len(sys.argv) < 2:
 compareValues = ['solvetime','iters']
 shift = [0.1, 10, 1]
 
-# look for instances to ignore
+# look for instances to ignore and check whether performance profile files should be created
 ignore = []
+performanceProFile = ''
 for a in sys.argv[1:]:
     if a.startswith('ignore='):
-        ignore = a.lstrip('ignore=').split(',')
+        ignore = a[7:].split(',')
+        sys.argv.remove(a)
+    elif a.startswith('prf='):
+        performanceProFile = a[4:]
         sys.argv.remove(a)
 
 # parse testset from first file
@@ -94,9 +98,9 @@ for run in range(1,runs):
     dataname = sys.argv[run]
     setting = sys.argv[run].split('/')[-1].split('.')[-2]
     if setting in settings:
-        setting = setting+str(run)
+        setting = '_'.join([setting, str(run)])
     settings.append(setting)
-    version.append('.'.join(sys.argv[run].split('/')[-1].split('.')[2:-6]).lstrip('soplex-'))
+    version.append('.'.join(sys.argv[run].split('/')[-1].split('.')[2:3])[7:])
     opt.append(sys.argv[run].split('/')[-1].split('.')[-3])
     # check for identical testset
     if not testset == dataname.split('/')[-1].split('.')[1]:
@@ -235,3 +239,25 @@ print(output3)
 if not aborts == '':
     print('\naborted and ignored instances:')
     print(aborts)
+
+# generate performance profile files
+if not performanceProFile == '':
+    for idx,s in enumerate(settings):
+        filename = performanceProFile+'.'+testset+'.'+version[idx]+'.'+s+'.prf'
+        with open(filename, 'w') as f:
+            f.write('---\n')
+            f.write('algname: '+version[idx]+'_'+s+'\n')
+            f.write('success: optimal\n')
+            f.write('free_format: True\n')
+            f.write('---\n')
+            for i in sorted(instances):
+                if results[s][i]['solvetime'] < 1.0:
+                    time = 1.0
+                else:
+                    time = results[s][i]['solvetime']
+                status = results[s][i]['status'].replace(' ', '_')
+                output = i.ljust(22)
+                output += status.rjust(18)
+                output += str(time).rjust(14)
+                output += '\n'
+                f.write(output)

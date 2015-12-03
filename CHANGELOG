@@ -1,3 +1,28 @@
+Developer Version
+=========================
+
+features:
+
+performance:
+- faster updateFtest() by exploiting sparsity in solveVector3
+- new method noViols() for checking violations, that terminates faster than maxInfeas()
+
+interface & parameters:
+- show current dual (primal) violation of dual (primal) simplex in log
+
+fixed bugs:
+- fix for compilation with Visual Studio 2010
+- allow to extend also empty SVectors
+- better internal handling of singular bases
+- check whether the solver is available when setting dual norms
+- fix removing rows/cols in SoPlex interface
+- check objective limit also when presolving is activated
+
+code quality:
+- removed some hard float comparisons (use 'EQ()' instead of '==' )
+- check scripts are now python3 compliant
+
+
 30 June 2015 - Release 2.2.0
 =========================
 

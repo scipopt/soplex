@@ -104,6 +104,8 @@ void SPxSolver::computeTest()
 
    const SPxBasis::Desc& ds = desc();
    Real pricingTol = leavetol();
+   m_pricingViolCoUpToDate = true;
+   m_pricingViolCo = 0;
    infeasibilitiesCo.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * coDim());
@@ -128,6 +130,7 @@ void SPxSolver::computeTest()
             if( theTest[i] < -pricingTol )
             {
                assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
+               m_pricingViolCo -= theTest[i];
                infeasibilitiesCo.addIdx(i);
                isInfeasibleCo[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
@@ -143,6 +146,8 @@ void SPxSolver::computeTest()
                ninfeasibilities = 0;
             }
          }
+         else if( theTest[i] < -pricingTol )
+            m_pricingViolCo -= theTest[i];
       }
    }
    if( ninfeasibilities == 0 && !sparsePricingEnterCo )
@@ -224,6 +229,8 @@ void SPxSolver::computeCoTest()
 {
    int i;
    Real pricingTol = leavetol();
+   m_pricingViolUpToDate = true;
+   m_pricingViol = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * dim());
@@ -246,6 +253,7 @@ void SPxSolver::computeCoTest()
             if( theCoTest[i] < -pricingTol )
             {
                assert(infeasibilities.size() < infeasibilities.max());
+               m_pricingViol -= theCoTest[i];
                infeasibilities.addIdx(i);
                isInfeasible[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
@@ -261,6 +269,8 @@ void SPxSolver::computeCoTest()
                ninfeasibilities = 0;
             }
          }
+         else if( theCoTest[i] < -pricingTol )
+            m_pricingViol -= theCoTest[i];
       }
    }
    if( ninfeasibilities == 0 && !sparsePricingEnter )
@@ -304,6 +314,9 @@ void SPxSolver::updateTest()
       SPxBasis::Desc::Status stat = ds.status(j);
       if (!isBasic(stat))
       {
+         if( m_pricingViolCoUpToDate && theTest[j] < -pricingTol )
+            m_pricingViolCo += theTest[j];
+
          theTest[j] = test(j, stat);
 
          if( sparsePricingEnterCo )
@@ -311,6 +324,7 @@ void SPxSolver::updateTest()
             if( theTest[j] < -pricingTol )
             {
                assert(remainingRoundsEnterCo == 0);
+               m_pricingViolCo -= theTest[j];
                if( isInfeasibleCo[j] == SPxPricer::NOT_VIOLATED )
                {
                   infeasibilitiesCo.addIdx(j);
@@ -324,6 +338,8 @@ void SPxSolver::updateTest()
                isInfeasibleCo[j] = SPxPricer::NOT_VIOLATED;
             }
          }
+         else if( theTest[j] < -pricingTol )
+            m_pricingViolCo -= theTest[j];
       }
       else
       {
@@ -349,6 +365,9 @@ void SPxSolver::updateCoTest()
       SPxBasis::Desc::Status stat = ds.coStatus(j);
       if (!isBasic(stat))
       {
+         if( m_pricingViolUpToDate && theCoTest[j] < -pricingTol )
+            m_pricingViol += theCoTest[j];
+
          theCoTest[j] = coTest(j, stat);
 
          if( sparsePricingEnter )
@@ -356,6 +375,7 @@ void SPxSolver::updateCoTest()
             if( theCoTest[j] < -pricingTol )
             {
                assert(remainingRoundsEnter == 0);
+               m_pricingViol -= theCoTest[j];
                if( isInfeasible[j] == SPxPricer::NOT_VIOLATED )
                {
                   //                if( !hyperPricingEnter )
@@ -371,6 +391,8 @@ void SPxSolver::updateCoTest()
                isInfeasible[j] = SPxPricer::NOT_VIOLATED;
             }
          }
+         else if( theCoTest[j] < -pricingTol )
+            m_pricingViol -= theCoTest[j];
       }
       else
       {
@@ -1120,7 +1142,7 @@ bool SPxSolver::enter(SPxId& enterId)
    {
       if (spxAbs(leaveVal) < entertol())
       {
-         if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
+         if (EQ(theUBbound[leaveIdx], theLBbound[leaveIdx])
             && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
             m_numCycle++;
       }
@@ -1228,7 +1250,7 @@ bool SPxSolver::enter(SPxId& enterId)
    }
    /*  No leaving vector could be found that would yield a stable pivot step.
     */
-   else if (leaveVal != -enterMax)
+   else if (NE(leaveVal, -enterMax))
    {
       /* In the ENTER algorithm, when for a selected entering variable we find only
          an instable leaving variable, then the basis change is not conducted.
@@ -1250,7 +1272,9 @@ bool SPxSolver::enter(SPxId& enterId)
          instableEnterId = enterId;
          instableEnterVal = enterTest;
 
-         rejectEnter(enterId, 0.0, enterStat);
+         MSG_DEBUG( std::cout << "DENTER09 rejecting enter pivot and looking for others" << std::endl; )
+
+         rejectEnter(enterId, enterTest / 10.0, enterStat);
          change(-1, none, 0);
 
 
@@ -1258,6 +1282,7 @@ bool SPxSolver::enter(SPxId& enterId)
       }
       else
       {
+         MSG_DEBUG( std::cout << "DENTER10 rejecting enter pivot in instable state, resetting values" << std::endl; )
          rejectEnter(enterId, enterTest, enterStat);
          change(-1, none, 0);
       }
@@ -1283,6 +1308,8 @@ bool SPxSolver::enter(SPxId& enterId)
 
       // update objective funtion value
       updateNonbasicValue(objChange);
+
+      MSG_DEBUG( std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl; )
    }
    /*  No variable could be selected to leave the basis and even the entering
        variable is unbounded --- this is a failure.  

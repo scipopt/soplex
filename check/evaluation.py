@@ -127,7 +127,7 @@ for idx, outline in enumerate(outlines):
         instances[instancename]['githash'] = outline.split()[-1].rstrip(']')[0:9]
         if not printedIdentifier:
             printedIdentifier = True
-            print()
+            print('\n')
             print(outline)
 
     elif outline.startswith('Primal solution infeasible') or outline.startswith('Dual solution infeasible'):
@@ -281,8 +281,7 @@ for name in sorted(instances):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print(output)
 
-print()
-print('Results (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):')
+print('\nResults (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):')
 print('{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts))
 
 # try to check for missing files
@@ -308,7 +307,7 @@ if check_test:
             instancename = instancename + '.' + linesplit[i]
         if not instancename in instances:
             if not printedMissing:
-                print()
+                print('\n')
             print('missing instance: '+instancename)
             printedMissing = True
 

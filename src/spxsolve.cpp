@@ -237,9 +237,7 @@ SPxSolver::Status SPxSolver::solve()
                   that this is due to the scaling of the test values. Thus, we use
                   instableEnterId and SPxFastRT::selectEnter shall accept even an instable
                   leaving variable. */
-               MSG_INFO3( (*spxout),
-                  (*spxout) << " --- trying instable enter iteration" << std::endl;
-                  )
+               MSG_INFO3( (*spxout), (*spxout) << " --- trying instable enter iteration" << std::endl; )
 
                enterId = instableEnterId;
                instableEnter = true;
@@ -340,7 +338,7 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // We have an iterationlimit and everything looks good? Then stop!
                   // 6 is just a number picked.
-                  else if (maxIters > 0 && lastUpdate() < 6)
+                  else if (!(instableEnterId.isValid()) && maxIters > 0 && lastUpdate() < 6)
                   {
                      priced = true;
                      break;
@@ -616,7 +614,7 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // We have an iteration limit and everything looks good? Then stop!
                   // 6 is just a number picked.
-                  else if (maxIters > 0 && lastUpdate() < 6)
+                  else if (instableLeaveNum == -1 && maxIters > 0 && lastUpdate() < 6)
                   {
                      priced = true;
                      break;
@@ -1078,7 +1076,7 @@ void SPxSolver::printDisplayLine(const bool force)
    MSG_INFO1( (*spxout),
       if( displayLine % (displayFreq*30) == 0 )
       {
-         (*spxout) << "type |   time |   iters | facts |  shift   |    value\n";
+         (*spxout) << "type |   time |   iters | facts |  shift   |violation |    value\n";
       }
       if( force || (displayLine % displayFreq == 0) )
       {
@@ -1088,6 +1086,7 @@ void SPxSolver::printDisplayLine(const bool force)
          (*spxout) << std::setw(8) << iteration() << " | "
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
+         << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
          << std::setprecision(8) << value() + objOffset()
          << std::endl;
       }
@@ -1189,10 +1188,10 @@ bool SPxSolver::terminate()
       // It might be even possible to use this termination value in case of
       // bound violations (shifting) but in this case it is quite difficult
       // to determine if we already reached the limit.
-      if( shift() < epsilon() && maxInfeas() + shift() <= opttol() )
+      if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         if( spxSense() * value() <= spxSense() * objLimit ) 
+         if( spxSense() * value() + objOffset() <= spxSense() * objLimit )
          {
             MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )
@@ -1204,7 +1203,7 @@ bool SPxSolver::terminate()
                       << ", rep: " << int(rep())
                       << ", type: " << int(type()) << ")" << std::endl;
             )
-            
+
             m_status = ABORT_VALUE;
             return true;
          }
