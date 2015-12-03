@@ -104,8 +104,8 @@ void SPxSolver::computeTest()
 
    const SPxBasis::Desc& ds = desc();
    Real pricingTol = leavetol();
-   m_maxInfeasCoUpToDate = true;
-   m_maxInfeasCo = 0;
+   m_pricingViolCoUpToDate = true;
+   m_pricingViolCo = 0;
    infeasibilitiesCo.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * coDim());
@@ -130,7 +130,7 @@ void SPxSolver::computeTest()
             if( theTest[i] < -pricingTol )
             {
                assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
-               m_maxInfeasCo -= theTest[i];
+               m_pricingViolCo -= theTest[i];
                infeasibilitiesCo.addIdx(i);
                isInfeasibleCo[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
@@ -147,7 +147,7 @@ void SPxSolver::computeTest()
             }
          }
          else if( theTest[i] < -pricingTol )
-            m_maxInfeasCo -= theTest[i];
+            m_pricingViolCo -= theTest[i];
       }
    }
    if( ninfeasibilities == 0 && !sparsePricingEnterCo )
@@ -229,8 +229,8 @@ void SPxSolver::computeCoTest()
 {
    int i;
    Real pricingTol = leavetol();
-   m_maxInfeasUpToDate = true;
-   m_maxInfeas = 0;
+   m_pricingViolUpToDate = true;
+   m_pricingViol = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * dim());
@@ -253,7 +253,7 @@ void SPxSolver::computeCoTest()
             if( theCoTest[i] < -pricingTol )
             {
                assert(infeasibilities.size() < infeasibilities.max());
-               m_maxInfeas -= theCoTest[i];
+               m_pricingViol -= theCoTest[i];
                infeasibilities.addIdx(i);
                isInfeasible[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
@@ -270,7 +270,7 @@ void SPxSolver::computeCoTest()
             }
          }
          else if( theCoTest[i] < -pricingTol )
-            m_maxInfeas -= theCoTest[i];
+            m_pricingViol -= theCoTest[i];
       }
    }
    if( ninfeasibilities == 0 && !sparsePricingEnter )
@@ -314,8 +314,8 @@ void SPxSolver::updateTest()
       SPxBasis::Desc::Status stat = ds.status(j);
       if (!isBasic(stat))
       {
-         if( m_maxInfeasCoUpToDate && theTest[j] < -pricingTol )
-            m_maxInfeasCo += theTest[j];
+         if( m_pricingViolCoUpToDate && theTest[j] < -pricingTol )
+            m_pricingViolCo += theTest[j];
 
          theTest[j] = test(j, stat);
 
@@ -324,7 +324,7 @@ void SPxSolver::updateTest()
             if( theTest[j] < -pricingTol )
             {
                assert(remainingRoundsEnterCo == 0);
-               m_maxInfeasCo -= theTest[j];
+               m_pricingViolCo -= theTest[j];
                if( isInfeasibleCo[j] == SPxPricer::NOT_VIOLATED )
                {
                   infeasibilitiesCo.addIdx(j);
@@ -339,7 +339,7 @@ void SPxSolver::updateTest()
             }
          }
          else if( theTest[j] < -pricingTol )
-            m_maxInfeasCo -= theTest[j];
+            m_pricingViolCo -= theTest[j];
       }
       else
       {
@@ -365,8 +365,8 @@ void SPxSolver::updateCoTest()
       SPxBasis::Desc::Status stat = ds.coStatus(j);
       if (!isBasic(stat))
       {
-         if( m_maxInfeasUpToDate && theCoTest[j] < -pricingTol )
-            m_maxInfeas += theCoTest[j];
+         if( m_pricingViolUpToDate && theCoTest[j] < -pricingTol )
+            m_pricingViol += theCoTest[j];
 
          theCoTest[j] = coTest(j, stat);
 
@@ -375,7 +375,7 @@ void SPxSolver::updateCoTest()
             if( theCoTest[j] < -pricingTol )
             {
                assert(remainingRoundsEnter == 0);
-               m_maxInfeas -= theCoTest[j];
+               m_pricingViol -= theCoTest[j];
                if( isInfeasible[j] == SPxPricer::NOT_VIOLATED )
                {
                   //                if( !hyperPricingEnter )
@@ -392,7 +392,7 @@ void SPxSolver::updateCoTest()
             }
          }
          else if( theCoTest[j] < -pricingTol )
-            m_maxInfeas -= theCoTest[j];
+            m_pricingViol -= theCoTest[j];
       }
       else
       {

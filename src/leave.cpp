@@ -41,10 +41,10 @@ void SPxSolver::computeFtest()
    assert(type() == LEAVE);
 
    Real theeps = entertol();
-   m_maxInfeasUpToDate = true;
-   m_maxInfeasCoUpToDate = true;
-   m_maxInfeas = 0;
-   m_maxInfeasCo = 0;
+   m_pricingViolUpToDate = true;
+   m_pricingViolCoUpToDate = true;
+   m_pricingViol = 0;
+   m_pricingViolCo = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * dim());
@@ -59,7 +59,7 @@ void SPxSolver::computeFtest()
       {
          if( theCoTest[i] < -theeps )
          {
-            m_maxInfeas -= theCoTest[i];
+            m_pricingViol -= theCoTest[i];
             infeasibilities.addIdx(i);
             isInfeasible[i] = SPxPricer::VIOLATED;
             ++ninfeasibilities;
@@ -76,7 +76,7 @@ void SPxSolver::computeFtest()
          }
       }
       else if( theCoTest[i] < -theeps )
-            m_maxInfeas -= theCoTest[i];
+            m_pricingViol -= theCoTest[i];
    }
 
    if( ninfeasibilities == 0 && !sparsePricingLeave )
@@ -115,8 +115,8 @@ void SPxSolver::updateFtest()
    {
       int i = idx.index(j);
 
-      if( m_maxInfeasUpToDate && ftest[i] < -theeps )
-         m_maxInfeas += ftest[i];
+      if( m_pricingViolUpToDate && ftest[i] < -theeps )
+         m_pricingViol += ftest[i];
 
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
@@ -126,8 +126,8 @@ void SPxSolver::updateFtest()
       if( sparsePricingLeave && ftest[i] < -theeps )
       {
          assert(remainingRoundsLeave == 0);
-         if( m_maxInfeasUpToDate )
-            m_maxInfeas -= ftest[i];
+         if( m_pricingViolUpToDate )
+            m_pricingViol -= ftest[i];
          if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
          {
             // this can cause problems - we cannot keep on adding indeces to infeasibilities,
@@ -139,8 +139,8 @@ void SPxSolver::updateFtest()
          if( hyperPricingLeave )
             updateViols.addIdx(i);
       }
-      else if( m_maxInfeasUpToDate && ftest[i] < -theeps )
-         m_maxInfeas -= ftest[i];
+      else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+         m_pricingViol -= ftest[i];
 
    }
    // if boundflips were performed, we need to update these indices as well
@@ -153,24 +153,24 @@ void SPxSolver::updateFtest()
          {
             int i = solveVector3->index(j);
 
-            if( m_maxInfeasUpToDate && ftest[i] < -theeps )
-               m_maxInfeas += ftest[i];
+            if( m_pricingViolUpToDate && ftest[i] < -theeps )
+               m_pricingViol += ftest[i];
 
             ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
 
             if( sparsePricingLeave && ftest[i] < -theeps )
             {
                assert(remainingRoundsLeave == 0);
-               if( m_maxInfeasUpToDate )
-                  m_maxInfeas -= ftest[i];
+               if( m_pricingViolUpToDate )
+                  m_pricingViol -= ftest[i];
                if( !isInfeasible[i] )
                {
                   infeasibilities.addIdx(i);
                   isInfeasible[i] = true;
                }
             }
-            else if( m_maxInfeasUpToDate && ftest[i] < -theeps )
-               m_maxInfeas -= ftest[i];
+            else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+               m_pricingViol -= ftest[i];
          }
       }
    }
@@ -1027,7 +1027,7 @@ bool SPxSolver::leave(int leaveIdx)
          // update feasibility vectors
          theFvec->value() = 0;
          assert(theCoTest[leaveIdx] < 0.0);
-         m_maxInfeas += theCoTest[leaveIdx];
+         m_pricingViol += theCoTest[leaveIdx];
          theCoTest[leaveIdx] *= -1;
       }
 

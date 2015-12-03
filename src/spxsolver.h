@@ -230,10 +230,10 @@ private:
    Real           m_nonbasicValue;         ///< nonbasic part of current objective value
    bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
 
-   Real           m_maxInfeas;             ///< maximal feasibility violation of current solution
-   bool           m_maxInfeasUpToDate;     ///< true, if the stored violation is up to date
-   Real           m_maxInfeasCo;           ///< maximal feasibility violation of current solution in coDim
-   bool           m_maxInfeasCoUpToDate;   ///< true, if the stored violation in coDim is up to date
+   Real           m_pricingViol;             ///< maximal feasibility violation of current solution
+   bool           m_pricingViolUpToDate;     ///< true, if the stored violation is up to date
+   Real           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
+   bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
 
    Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm

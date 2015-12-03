@@ -634,8 +634,8 @@ Real SPxSolver::maxInfeas() const
 
    if (type() == ENTER)
    {
-      if( m_maxInfeasUpToDate && m_maxInfeasCoUpToDate )
-         inf = m_maxInfeas + m_maxInfeasCo;
+      if( m_pricingViolUpToDate && m_pricingViolCoUpToDate )
+         inf = m_pricingViol + m_pricingViolCo;
 
       for (int i = 0; i < dim(); i++)
       {
@@ -649,8 +649,8 @@ Real SPxSolver::maxInfeas() const
    {
       assert(type() == LEAVE);
 
-      if( m_maxInfeasUpToDate )
-         inf = m_maxInfeas;
+      if( m_pricingViolUpToDate )
+         inf = m_pricingViol;
 
       for (int i = 0; i < dim(); i++)
       {
@@ -965,10 +965,10 @@ SPxSolver::SPxSolver(
    , m_status(UNKNOWN)
    , m_nonbasicValue(0.0)
    , m_nonbasicValueUpToDate(false)
-   , m_maxInfeas(0.0)
-   , m_maxInfeasUpToDate(false)
-   , m_maxInfeasCo(0.0)
-   , m_maxInfeasCoUpToDate(false)
+   , m_pricingViol(0.0)
+   , m_pricingViolUpToDate(false)
+   , m_pricingViolCo(0.0)
+   , m_pricingViolCoUpToDate(false)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -1060,10 +1060,10 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       m_status = base.m_status;
       m_nonbasicValue = base.m_nonbasicValue;
       m_nonbasicValueUpToDate = base.m_nonbasicValueUpToDate;
-      m_maxInfeas = base.m_maxInfeas;
-      m_maxInfeasUpToDate = base.m_maxInfeasUpToDate;
-      m_maxInfeasCo = base.m_maxInfeasCo;
-      m_maxInfeasCoUpToDate = base.m_maxInfeasCoUpToDate;
+      m_pricingViol = base.m_pricingViol;
+      m_pricingViolUpToDate = base.m_pricingViolUpToDate;
+      m_pricingViolCo = base.m_pricingViolCo;
+      m_pricingViolCoUpToDate = base.m_pricingViolCoUpToDate;
       m_entertol = base.m_entertol;
       m_leavetol = base.m_leavetol;
       theShift = base.theShift;
@@ -1227,10 +1227,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , m_status(base.m_status)
    , m_nonbasicValue(base.m_nonbasicValue)
    , m_nonbasicValueUpToDate(base.m_nonbasicValueUpToDate)
-   , m_maxInfeas(base.m_maxInfeas)
-   , m_maxInfeasUpToDate(base.m_maxInfeasUpToDate)
-   , m_maxInfeasCo(base.m_maxInfeasCo)
-   , m_maxInfeasCoUpToDate(base.m_maxInfeasCoUpToDate)
+   , m_pricingViol(base.m_pricingViol)
+   , m_pricingViolUpToDate(base.m_pricingViolUpToDate)
+   , m_pricingViolCo(base.m_pricingViolCo)
+   , m_pricingViolCoUpToDate(base.m_pricingViolCoUpToDate)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
    , theShift(base.theShift)

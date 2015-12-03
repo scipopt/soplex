@@ -1086,7 +1086,7 @@ void SPxSolver::printDisplayLine(const bool force)
          (*spxout) << std::setw(8) << iteration() << " | "
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
-         << MAXIMUM(0.0, m_maxInfeas + m_maxInfeasCo) << " | "
+         << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
          << std::setprecision(8) << value() + objOffset()
          << std::endl;
       }
