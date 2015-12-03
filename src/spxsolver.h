@@ -388,6 +388,24 @@ public:
       SPxLP::spxout = &newOutstream;
    }
 
+   /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+   void setNonzeroFactor( Real f )
+   {
+      SPxBasis::nonzeroFactor = f;
+   }
+
+   /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+   void setFillFactor( Real f )
+   {
+      SPxBasis::fillFactor = f;
+   }
+
+   /// set refactor threshold for memory growth in current factor update compared to the last factorization
+   void setMemFactor( Real f )
+   {
+      SPxBasis::memFactor = f;
+   }
+
    /**@name Access */
    //@{
    /// return the version of SPxSolver as number like 123 for 1.2.3

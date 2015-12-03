@@ -6,9 +6,11 @@ features:
 performance:
 - faster updateFtest() by exploiting sparsity in solveVector3
 - new method noViols() for checking violations, that terminates faster than maxInfeas()
+- new refactorization trigger that takes basis size into account
 
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
+- new parameters to control refactorization triggers
 
 fixed bugs:
 - fix for compilation with Visual Studio 2010

@@ -1198,8 +1198,17 @@ public:
       /// minimal reduction (sum of removed rows/cols) to continue simplification
       MINRED = 18,
 
+      // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      REFAC_BASIS_NNZ = 19,
+
+      // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      REFAC_UPDATE_FILL = 20,
+
+      // refactor threshold for memory growth in factorization since last refactorization
+      REFAC_MEM_FACTOR = 21,
+
       /// number of real parameters
-      REALPARAM_COUNT = 19
+      REALPARAM_COUNT = 22
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM

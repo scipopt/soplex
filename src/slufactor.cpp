@@ -1269,7 +1269,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       spx_realloc(l.start, l.startSize);
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
-   // order favour sparsity
+   // order to favour sparsity
    else if (lastStability > 2.0 * minStability)
    {
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
@@ -1343,7 +1343,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       fclose(fl);
       std::cout << "DSLUFA04 LU-Factors:" << std::endl;
       dump();
-      
+
       std::cout << "DSLUFA05 threshold = " << lastThreshold
              << "\tstability = " << stability() << std::endl;
    )

@@ -472,6 +472,27 @@ namespace soplex
             _realParamUpper[SoPlex::MINRED] = 1.0;
             _realParamDefault[SoPlex::MINRED] = 1e-4;
 
+            // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+            _realParamName[SoPlex::REFAC_BASIS_NNZ] = "refac_basis_nnz";
+            _realParamDescription[SoPlex::REFAC_BASIS_NNZ] = "refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix";
+            _realParamLower[SoPlex::REFAC_BASIS_NNZ] = 1.0;
+            _realParamUpper[SoPlex::REFAC_BASIS_NNZ] = 100.0;
+            _realParamDefault[SoPlex::REFAC_BASIS_NNZ] = 10.0;
+
+            // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+            _realParamName[SoPlex::REFAC_UPDATE_FILL] = "refac_update_fill";
+            _realParamDescription[SoPlex::REFAC_UPDATE_FILL] = "refactor threshold for fill-in in current factor update compared to fill-in in last factorization";
+            _realParamLower[SoPlex::REFAC_UPDATE_FILL] = 1.0;
+            _realParamUpper[SoPlex::REFAC_UPDATE_FILL] = 100.0;
+            _realParamDefault[SoPlex::REFAC_UPDATE_FILL] = 5.0;
+
+            // refactor threshold for memory growth in factorization since last refactorization
+            _realParamName[SoPlex::REFAC_MEM_FACTOR] = "refac_mem_factor";
+            _realParamDescription[SoPlex::REFAC_MEM_FACTOR] = "refactor threshold for memory growth in factorization since last refactorization";
+            _realParamLower[SoPlex::REFAC_MEM_FACTOR] = 1.0;
+            _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 10.0;
+            _realParamDefault[SoPlex::REFAC_MEM_FACTOR] = 1.5;
+
             _defaultsAndBoundsInitialized = true;
          }
 
@@ -5343,6 +5364,15 @@ namespace soplex
       case SoPlex::MINRED:
          break;
 
+      case SoPlex::REFAC_BASIS_NNZ:
+         break;
+
+      case SoPlex::REFAC_UPDATE_FILL:
+         break;
+
+      case SoPlex::REFAC_MEM_FACTOR:
+         break;
+
       default:
          return false;
       }
@@ -7152,6 +7182,10 @@ namespace soplex
          _solver.hyperPricing(true);
       else if( intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_OFF )
          _solver.hyperPricing(false);
+
+      _solver.setNonzeroFactor(realParam(SoPlex::REFAC_BASIS_NNZ));
+      _solver.setFillFactor(realParam(SoPlex::REFAC_UPDATE_FILL));
+      _solver.setMemFactor(realParam(SoPlex::REFAC_MEM_FACTOR));
 
       // call floating-point solver and catch exceptions
       _statistics->simplexTime->start();

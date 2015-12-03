@@ -372,11 +372,15 @@ protected:
    */
    Real   nonzeroFactor;
 
-   /// allowed increase in realtive fill before refactorization
+   /// allowed increase in relative fill before refactorization
    /** When the real relative fill is bigger than fillFactor times lastFill
     *  the Basis will be refactorized.
     */ 
    Real   fillFactor;
+
+   /// allowed total increase in memory consumption before refactorization
+   Real   memFactor;
+
    /* Rank-1-updates to the basis may be performed via method #change(). In
       this case, the factorization is updated, and the following members are
       reset.
