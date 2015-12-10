@@ -73,6 +73,9 @@ PARASCIP	=	false
 # will this be compiled with the 1.x interface?
 LEGACY		=	false
 
+# is it allowed to link to external open source libraries?
+OPENSOURCE	=	true
+
 GMP		=	true
 ZLIB		=	true
 EGLIB		=	false
@@ -306,12 +309,18 @@ include make/make.$(BASE)
 
 ifeq ($(SHARED),true)
 CPPFLAGS	+=	-fPIC
-LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILD	=	$(LINKCXX)
-LIBBUILDFLAGS	+=      -shared
-LIBBUILD_o	= 	-o # the trailing space is important
 ARFLAGS		=
 RANLIB		=
+ifeq ($(COMP),msvc)
+LIBEXT		=	dll
+LIBBUILDFLAGS	+=      -dll
+LIBBUILD_o	= 	-out:
+else
+LIBEXT		=	$(SHAREDLIBEXT)
+LIBBUILDFLAGS	+=      -shared
+LIBBUILD_o	= 	-o # the trailing space is important
+endif
 endif
 
 CPPFLAGS	+=	$(USRCPPFLAGS)
@@ -376,6 +385,13 @@ ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC) $(LIBSRCHEADER)
 #-----------------------------------------------------------------------------
 # External Libraries
 #-----------------------------------------------------------------------------
+
+# check if it is allowed to link to external open source libraries
+ifeq ($(OPENSOURCE), false)
+	override ZLIB	=	false
+	override GMP	=	false
+	override EGLIB	=	false
+endif
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
