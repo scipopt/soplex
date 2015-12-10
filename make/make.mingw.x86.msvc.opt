@@ -16,3 +16,6 @@ LIBEXT		=	lib
 LINKLIBSUFFIX	=	.lib
 ZLIB_LDFLAGS	=	
 ZLIB_FLAGS	=	
+
+# NOTE: use this flag throughout the whole compilation process
+CXXFLAGS    +=  -MD

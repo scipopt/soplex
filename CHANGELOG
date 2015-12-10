@@ -19,6 +19,7 @@ fixed bugs:
 - check whether the solver is available when setting dual norms
 - fix removing rows/cols in SoPlex interface
 - check objective limit also when presolving is activated
+- fixed compilation problems under Windows with MSVC
 
 code quality:
 - removed some hard float comparisons (use 'EQ()' instead of '==' )
