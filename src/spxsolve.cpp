@@ -1191,7 +1191,7 @@ bool SPxSolver::terminate()
       if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         if( spxSense() * value() + objOffset() <= spxSense() * objLimit )
+         if( spxSense() * (value() + objOffset()) <= spxSense() * objLimit )
          {
             MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )
