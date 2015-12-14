@@ -138,6 +138,7 @@ namespace soplex
    /// solves real LP with/without preprocessing
    void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
    {
+      _solver.changeObjOffset(0.0);
       _statistics->preprocessingTime->start();
 
       if( applyPreprocessing )

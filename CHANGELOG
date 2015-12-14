@@ -13,6 +13,7 @@ interface & parameters:
 - new parameters to control refactorization triggers
 
 fixed bugs:
+- correct initialization fo objective offset in simplifier
 - fix for compilation with Visual Studio 2010
 - allow to extend also empty SVectors
 - better internal handling of singular bases
