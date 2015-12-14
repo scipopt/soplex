@@ -11,6 +11,7 @@ interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
 
 fixed bugs:
+- correct initialization fo objective offset in simplifier
 - fix for compilation with Visual Studio 2010
 - allow to extend also empty SVectors
 - better internal handling of singular bases

@@ -3774,6 +3774,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    m_timeUsed->reset();
    m_timeUsed->start();
 
+   m_objoffset = 0.0;
+
    m_remRows = 0;
    m_remCols = 0;
    m_remNzos = 0;
