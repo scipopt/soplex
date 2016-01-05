@@ -349,6 +349,9 @@ protected:
 
 public:
 
+   /// The random number generator used throughout the whole computation. Its seed can be modified.
+   Random random;
+
    /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables;
     *  for the entering Simplex algorithm this vector contains the indices of infeasible slack variables.
     */
@@ -1528,11 +1531,11 @@ private:
    ///
    Real perturbMin(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    ///
    Real perturbMax(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
    //------------------------------------

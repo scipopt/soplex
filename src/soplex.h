@@ -59,6 +59,8 @@
 
 #include "sol.h"
 
+#define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
+
 ///@todo implement automatic rep switch, based on row/col dim
 ///@todo introduce status codes for SoPlex, especially for rational solving
 
@@ -1305,6 +1307,12 @@ public:
    /// vector and matrix values only if the respective parameter is set to true.
    /// If quiet is set to true the function will only display which vectors are different.
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
+
+   /// set the random seed of the solver instance
+   void setRandomSeed(unsigned int seed);
+
+   /// returns the current random seed of the solver instance
+   unsigned int randomSeed() const;
 
    //@}
 

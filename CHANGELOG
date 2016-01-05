@@ -11,6 +11,7 @@ performance:
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
 - new parameters to control refactorization triggers
+- random seed for perturbation can be set from outside and is not reset in between
 
 fixed bugs:
 - correct initialization fo objective offset in simplifier

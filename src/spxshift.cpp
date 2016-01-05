@@ -28,7 +28,8 @@ void SPxSolver::shiftFvec()
    /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal vector in COLUMN
     * and the dual vector in ROW representation; this is equivalent to entertol()
     */
-   Random mult(10.0 * entertol(), 100.0 * entertol());
+   Real minrandom = 10.0 * entertol();
+   Real maxrandom = 100.0 * entertol();
    Real allow = entertol() - epsilon();
 
    assert(type() == ENTER);
@@ -41,7 +42,7 @@ void SPxSolver::shiftFvec()
          MSG_DEBUG( std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " << (*theFvec)[i] - theUBbound[i] - allow << std::endl );
 
          if (theUBbound[i] != theLBbound[i])
-            shiftUBbound(i, (*theFvec)[i] + Real(mult));
+            shiftUBbound(i, (*theFvec)[i] + random.next(minrandom, maxrandom));
          else
          {
             shiftUBbound(i, (*theFvec)[i]);
@@ -53,7 +54,7 @@ void SPxSolver::shiftFvec()
          MSG_DEBUG( std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] - (*theFvec)[i] - allow << std::endl );
 
          if (theUBbound[i] != theLBbound[i])
-            shiftLBbound(i, (*theFvec)[i] - Real(mult));
+            shiftLBbound(i, (*theFvec)[i] - random.next(minrandom, maxrandom));
          else
          {
             shiftLBbound(i, (*theFvec)[i]);
@@ -81,7 +82,8 @@ void SPxSolver::shiftPvec()
    /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal vector in ROW and the
     * dual vector in COLUMN representation; this is equivalent to leavetol()
     */
-   Random mult(10.0 * leavetol(), 100.0 * leavetol());
+   Real minrandom = 10.0 * leavetol();
+   Real maxrandom = 100.0 * leavetol();
    Real allow = leavetol() - epsilon();
    bool tmp;
    int i;
@@ -95,7 +97,7 @@ void SPxSolver::shiftPvec()
       if ((*theCoUbound)[i] + allow <= (*theCoPvec)[i] && tmp)
       {
          if ((*theCoUbound)[i] != (*theCoLbound)[i])
-            shiftUCbound(i, (*theCoPvec)[i] + Real(mult));
+            shiftUCbound(i, (*theCoPvec)[i] + random.next(minrandom,maxrandom));
          else
          {
             shiftUCbound(i, (*theCoPvec)[i]);
@@ -105,7 +107,7 @@ void SPxSolver::shiftPvec()
       else if ((*theCoLbound)[i] - allow >= (*theCoPvec)[i] && tmp)
       {
          if ((*theCoUbound)[i] != (*theCoLbound)[i])
-            shiftLCbound(i, (*theCoPvec)[i] - Real(mult));
+            shiftLCbound(i, (*theCoPvec)[i] - random.next(minrandom,maxrandom));
          else
          {
             shiftLCbound(i, (*theCoPvec)[i]);
@@ -120,7 +122,7 @@ void SPxSolver::shiftPvec()
       if ((*theUbound)[i] + allow <= (*thePvec)[i] && tmp)
       {
          if ((*theUbound)[i] != (*theLbound)[i])
-            shiftUPbound(i, (*thePvec)[i] + Real(mult));
+            shiftUPbound(i, (*thePvec)[i] + random.next(minrandom,maxrandom));
          else
          {
             shiftUPbound(i, (*thePvec)[i]);
@@ -130,7 +132,7 @@ void SPxSolver::shiftPvec()
       else if ((*theLbound)[i] - allow >= (*thePvec)[i] && tmp)
       {
          if ((*theUbound)[i] != (*theLbound)[i])
-            shiftLPbound(i, (*thePvec)[i] - Real(mult));
+            shiftLPbound(i, (*thePvec)[i] - random.next(minrandom,maxrandom));
          else
          {
             shiftLPbound(i, (*thePvec)[i]);
@@ -160,7 +162,8 @@ void SPxSolver::perturbMin(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10.0 * p_delta, 100.0 * p_delta);
+   Real minrandom = 10.0 * p_delta;
+   Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
    int i, j;
 
@@ -174,12 +177,12 @@ void SPxSolver::perturbMin(
 
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + Real(mult);
+         p_up[i] = vec[i] + random.next(minrandom,maxrandom);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - Real(mult);
+         p_low[i] = vec[i] - random.next(minrandom,maxrandom);
          theShift -= p_low[i] - l;
       }
    }
@@ -202,7 +205,7 @@ void SPxSolver::perturbMin(
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + Real(mult);
+            p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             theShift += p_up[i] - u;
          }
       }
@@ -210,7 +213,7 @@ void SPxSolver::perturbMin(
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - Real(mult);
+            p_low[i] = vec[i] - random.next(minrandom,maxrandom);
             theShift -= p_low[i] - l;
          }
       }
@@ -233,7 +236,8 @@ void SPxSolver::perturbMax(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10.0 * p_delta, 100.0 * p_delta);
+   Real minrandom = 10.0 * p_delta;
+   Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
    int i, j;
 
@@ -245,12 +249,12 @@ void SPxSolver::perturbMax(
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps)
       {
-         p_up[i] = vec[i] + Real(mult);
+         p_up[i] = vec[i] + random.next(minrandom,maxrandom);
          theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps)
       {
-         p_low[i] = vec[i] - Real(mult);
+         p_low[i] = vec[i] - random.next(minrandom,maxrandom);
          theShift -= p_low[i] - l;
       }
    }
@@ -273,7 +277,7 @@ void SPxSolver::perturbMax(
       {
          if (u != l && vec[i] >= u - eps)
          {
-            p_up[i] = vec[i] + Real(mult);
+            p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             theShift += p_up[i] - u;
          }
       }
@@ -281,7 +285,7 @@ void SPxSolver::perturbMax(
       {
          if (u != l && vec[i] <= l + eps)
          {
-            p_low[i] = vec[i] - Real(mult);
+            p_low[i] = vec[i] - random.next(minrandom,maxrandom);
             theShift -= p_low[i] - l;
          }
       }
@@ -315,7 +319,7 @@ Real SPxSolver::perturbMin(
    Real p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
-   int incr) const
+   int incr)
 {
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
@@ -323,7 +327,8 @@ Real SPxSolver::perturbMin(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10*p_delta, 100*p_delta);
+   Real minrandom = 10.0 * p_delta;
+   Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
    int i, j;
    Real l_theShift = 0;
@@ -336,12 +341,12 @@ Real SPxSolver::perturbMin(
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + Real(mult);
+         p_up[i] = vec[i] + random.next(minrandom,maxrandom);
          l_theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - Real(mult);
+         p_low[i] = vec[i] - random.next(minrandom,maxrandom);
          l_theShift -= p_low[i] - l;
       }
    }
@@ -357,7 +362,7 @@ Real SPxSolver::perturbMin(
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + Real(mult);
+            p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             l_theShift += p_up[i] - u;
          }
       }
@@ -365,7 +370,7 @@ Real SPxSolver::perturbMin(
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - Real(mult);
+            p_low[i] = vec[i] - random.next(minrandom,maxrandom);
             l_theShift -= p_low[i] - l;
          }
       }
@@ -382,7 +387,7 @@ Real SPxSolver::perturbMax(
    Real p_delta,
    const SPxBasis::Desc::Status* stat,
    int start,
-   int incr) const
+   int incr)
 {
    assert(uvec.dim() == p_low.dim());
    assert(uvec.dim() == p_up.dim());
@@ -390,7 +395,8 @@ Real SPxSolver::perturbMax(
    const Real* vec = uvec.get_const_ptr();
    const Real* upd = uvec.delta().values();
    const IdxSet& idx = uvec.delta().indices();
-   Random mult(10*p_delta, 100*p_delta);
+   Real minrandom = 10.0 * p_delta;
+   Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
    int i, j;
    Real l_theShift = 0;
@@ -403,12 +409,12 @@ Real SPxSolver::perturbMax(
       l = p_low[i];
       if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
       {
-         p_up[i] = vec[i] + Real(mult);
+         p_up[i] = vec[i] + random.next(minrandom,maxrandom);
          l_theShift += p_up[i] - u;
       }
       if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
       {
-         p_low[i] = vec[i] - Real(mult);
+         p_low[i] = vec[i] - random.next(minrandom,maxrandom);
          l_theShift -= p_low[i] - l;
       }
    }
@@ -424,7 +430,7 @@ Real SPxSolver::perturbMax(
       {
          if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
          {
-            p_up[i] = vec[i] + Real(mult);
+            p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             l_theShift += p_up[i] - u;
          }
       }
@@ -432,7 +438,7 @@ Real SPxSolver::perturbMax(
       {
          if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
          {
-            p_low[i] = vec[i] - Real(mult);
+            p_low[i] = vec[i] - random.next(minrandom,maxrandom);
             l_theShift -= p_low[i] - l;
          }
       }

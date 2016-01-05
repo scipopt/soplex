@@ -5483,6 +5483,13 @@ namespace soplex
          printedValue = true;
       }
 #endif
+
+      if( _solver.random.getSeed() != DEFAULT_RANDOM_SEED )
+      {
+         spxout << "uint:random_seed = " << _solver.random.getSeed() << "\n";
+         printedValue = true;
+      }
+
       if( printedValue )
          spxout << std::endl;
    }
@@ -5548,6 +5555,14 @@ namespace soplex
          file << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
       }
 #endif
+
+      if( !onlyChanged || _solver.random.getSeed() != DEFAULT_RANDOM_SEED )
+      {
+         file << "\n";
+         file << "# initial random seed used for perturbation\n";
+         file << "# range [0, " << UINT_MAX << "], default "<< DEFAULT_RANDOM_SEED << "\n";
+         file << "uint:random_seed = " << _solver.random.getSeed() << "\n";
+      }
 
       return true;
    }
@@ -5831,6 +5846,24 @@ namespace soplex
          return true;
       }
 #endif
+
+      // check whether we have the random seed
+      if( strncmp(paramTypeString, "uint", 4) == 0 )
+      {
+         if( strncmp(paramName, "random_seed", 11) == 0 )
+         {
+            unsigned int value;
+
+            if( sscanf(paramValueString, "%u", &value) == 1 )
+            {
+               setRandomSeed(value);
+               return true;
+            }
+         }
+
+         MSG_ERROR( std::cerr << "Error parsing setting string for uint parameter <random_seed>.\n" );
+         return false;
+      }
 
       MSG_ERROR( std::cerr << "Error parsing setting string: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << ">.\n" );
 
@@ -6319,6 +6352,22 @@ namespace soplex
       }
 
       return result;
+   }
+
+
+
+   /// set the random seed of the solver instance
+   void SoPlex::setRandomSeed(unsigned int seed)
+   {
+      _solver.random.setSeed(seed);
+   }
+
+
+
+   /// returns the current random seed of the solver instance or the one stored in the settings
+   unsigned int SoPlex::randomSeed() const
+   {
+      return _solver.random.getSeed();
    }
 
 
@@ -7643,6 +7692,24 @@ namespace soplex
          return true;
       }
 #endif
+
+      // check whether we have the random seed
+      if( strncmp(paramTypeString, "uint", 4) == 0 )
+      {
+         if( strncmp(paramName, "random_seed", 11) == 0 )
+         {
+            unsigned int value;
+
+            if( sscanf(paramValueString, "%u", &value) == 1 )
+            {
+               setRandomSeed(value);
+               return true;
+            }
+         }
+
+         MSG_ERROR( std::cerr << "Error parsing settings file for uint parameter <random_seed>.\n" );
+         return false;
+      }
 
       MSG_ERROR( std::cerr << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
 
