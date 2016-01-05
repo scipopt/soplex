@@ -5526,7 +5526,8 @@ namespace soplex
 
          file << "\n";
          file << "# " << _currentSettings->_intParamDescription[i] << "\n";
-         file << "# range [-2147483648,2147483647], default " << _currentSettings->_intParamDefault[i] << "\n";
+         file << "# range [" << _currentSettings->_intParamLower[i] << "," << _currentSettings->_intParamUpper[i]
+            << "], default " << _currentSettings->_intParamDefault[i] << "\n";
          file << "int:" << _currentSettings->_intParamName[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
       }
 

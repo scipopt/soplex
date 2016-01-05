@@ -107,10 +107,6 @@ public:
    //@}
 
 
-   /// message handler
-//   SPxOut spxout;
-
-
    //**@name Access to the real LP */
    //@{
 
