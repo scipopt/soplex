@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.2.0.2
+VERSION		:=	2.2.0.3
 SPXGITHASH	=
 
 VERBOSE		=	false
