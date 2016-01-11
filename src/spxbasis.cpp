@@ -745,7 +745,7 @@ void SPxBasis::change(
       ++iterCount;
       ++updateCount;
 
-      MSG_INFO3( (*spxout), (*spxout) << "factor_stats: iteration= " << iteration()
+      MSG_DEBUG( std::cout << "factor_stats: iteration= " << iteration()
          << " update= " << updateCount
          << " total_update= " << totalUpdateCount
          << " nonzero_B= " << nzCount
