@@ -854,7 +854,7 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
    case SPxBasis::Desc::P_ON_UPPER:
       if (newUpper >= infinity)
       {
-         if (currLower <= infinity)
+         if (currLower <= -infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
             if( m_nonbasicValueUpToDate && rep() == COLUMN )
