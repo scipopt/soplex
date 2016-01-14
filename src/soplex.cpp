@@ -490,7 +490,7 @@ namespace soplex
             _realParamName[SoPlex::REFAC_MEM_FACTOR] = "refac_mem_factor";
             _realParamDescription[SoPlex::REFAC_MEM_FACTOR] = "refactor threshold for memory growth in factorization since last refactorization";
             _realParamLower[SoPlex::REFAC_MEM_FACTOR] = 1.0;
-            _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 10.0;
+            _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 100.0;
             _realParamDefault[SoPlex::REFAC_MEM_FACTOR] = 1.5;
 
             _defaultsAndBoundsInitialized = true;
