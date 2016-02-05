@@ -4810,8 +4810,8 @@ namespace soplex
       ofname = std::string(filename) + ".set";
       saveSettingsFile(ofname.c_str());
 
-      // write problem in MPS format
-      ofname = std::string(filename) + ".mps";
+      // write problem in MPS/LP format
+      ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
       writeFileReal(ofname.c_str(), rowNames, colNames, 0);
 
       // write basis
@@ -4831,8 +4831,8 @@ namespace soplex
       ofname = std::string(filename) + ".set";
       saveSettingsFile(ofname.c_str());
 
-      // write problem in MPS format
-      ofname = std::string(filename) + ".mps";
+      // write problem in MPS/LP format
+      ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
       writeFileRational(ofname.c_str(), rowNames, colNames, 0);
 
       // write basis
