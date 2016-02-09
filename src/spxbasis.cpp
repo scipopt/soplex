@@ -212,8 +212,6 @@ void SPxBasis::loadDesc(const Desc& ds)
 
    assert(theLP->dim() == matrix.size());
 
-   // MSG_DEBUG( dump(); )
-
    nzCount = 0;
    for (j = i = 0; i < theLP->nRows(); ++i)
    {
@@ -313,10 +311,7 @@ void SPxBasis::load(SPxSolver* lp)
 
    setRep();
 
-   addedRows(lp->nRows());
-   addedCols(lp->nCols());
-
-   setStatus(REGULAR);
+   restoreInitialBasis();
 
    loadDesc(thedesc);
 }
