@@ -1458,7 +1458,7 @@ private:
    bool _isConsistent() const;
 
    /// should solving process be stopped?
-   bool _isSolveStopped() const;
+   bool _isSolveStopped(bool& stoppedTime, bool& stoppedIter) const;
 
    /// determines RangeType from real bounds
    RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
@@ -1636,13 +1636,23 @@ private:
    void _solveRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void _performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+   void _performOptIRStable(SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minRounds,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stopped,
+      bool& stoppedIter,
+      bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
+   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& stoppedIter, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& stoppedIter, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();
@@ -1723,10 +1733,10 @@ private:
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, bool& optimal);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared);
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
    //@}
 
 

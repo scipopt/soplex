@@ -6357,14 +6357,16 @@ namespace soplex
 
 
    /// should solving process be stopped?
-   bool SoPlex::_isSolveStopped() const
+   bool SoPlex::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
    {
       assert(_statistics != 0);
 
-      return (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime->time() >= realParam(TIMELIMIT))
-         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
+      stoppedTime = (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime->time() >= realParam(TIMELIMIT));
+      stoppedIter = (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
          || (intParam(REFLIMIT) >= 0 && _statistics->refinements >= intParam(REFLIMIT))
          || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements >= intParam(STALLREFLIMIT));
+
+      return stoppedTime || stoppedIter;
    }
 
 

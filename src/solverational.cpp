@@ -93,18 +93,22 @@ namespace soplex
          _transformEquality();
 
       _storedBasis = false;
+
+      bool stoppedTime;
+      bool stoppedIter;
       do
       {
          bool primalFeasible = false;
          bool dualFeasible = false;
          bool infeasible = false;
          bool unbounded = false;
-         bool stopped = false;
          bool error = false;
+         stoppedTime = false;
+         stoppedIter = false;
 
          // solve problem with iterative refinement and recovery mechanism
          _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
-            primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
 
          // case: an unrecoverable error occured
          if( error )
@@ -113,9 +117,14 @@ namespace soplex
             break;
          }
          // case: stopped due to some limit
-         else if( stopped )
+         else if( stoppedTime )
          {
             _status = SPxSolver::ABORT_TIME;
+            break;
+         }
+         else if(  stoppedIter )
+         {
+            _status = SPxSolver::ABORT_ITER;
             break;
          }
          // case: unboundedness detected for the first time
@@ -123,7 +132,7 @@ namespace soplex
          {
             SolRational solUnbounded;
 
-            _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stopped, error);
+            _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stoppedTime, stoppedIter, error);
 
             assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
             assert(!solUnbounded.hasPrimalRay() || hasUnboundedRay);
@@ -146,13 +155,18 @@ namespace soplex
 
             unboundednessNotCertified = !hasUnboundedRay;
 
-            if( stopped )
+            if( stoppedTime )
             {
                _status = SPxSolver::ABORT_TIME;
                break;
             }
+            else if( stoppedIter )
+            {
+               _status = SPxSolver::ABORT_ITER;
+               break;
+            }
 
-            _performFeasIRStable(_solRational, infeasible, stopped, error);
+            _performFeasIRStable(_solRational, infeasible, stoppedTime, stoppedIter, error);
 
             ///@todo this should be stored already earlier, possible switch use solRational above and solFeas here
             if( hasUnboundedRay )
@@ -167,9 +181,14 @@ namespace soplex
                _status = SPxSolver::ERROR;
                break;
             }
-            else if( stopped )
+            else if( stoppedTime )
             {
                _status = SPxSolver::ABORT_TIME;
+               break;
+            }
+            else if( stoppedIter )
+            {
+               _status = SPxSolver::ABORT_ITER;
                break;
             }
             else if( infeasible )
@@ -195,7 +214,7 @@ namespace soplex
          {
             _storeBasis();
 
-            _performFeasIRStable(_solRational, infeasible, stopped, error);
+            _performFeasIRStable(_solRational, infeasible, stoppedTime, stoppedIter, error);
 
             if( error )
             {
@@ -207,9 +226,15 @@ namespace soplex
 
             infeasibilityNotCertified = !infeasible;
 
-            if( stopped )
+            if( stoppedTime )
             {
                _status = SPxSolver::ABORT_TIME;
+               _restoreBasis();
+               break;
+            }
+            else if( stoppedIter )
+            {
+               _status = SPxSolver::ABORT_ITER;
                _restoreBasis();
                break;
             }
@@ -218,7 +243,7 @@ namespace soplex
             {
                SolRational solUnbounded;
 
-               _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stopped, error);
+               _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stoppedTime, stoppedIter, error);
 
                assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
                assert(!solUnbounded.hasPrimalRay() || hasUnboundedRay);
@@ -283,11 +308,9 @@ namespace soplex
             break;
          }
       }
-      while( !_isSolveStopped() );
+      while( !_isSolveStopped(stoppedTime, stoppedIter) );
 
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
-      if( _isSolveStopped() )
-         _status = SPxSolver::ABORT_TIME;
 
       if( _status == SPxSolver::OPTIMAL || _status == SPxSolver::INFEASIBLE || _status == SPxSolver::UNBOUNDED )
          _hasSolRational = true;
@@ -327,7 +350,18 @@ namespace soplex
 
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void SoPlex::_performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error)
+   void SoPlex::_performOptIRStable(
+      SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minRounds,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stoppedTime,
+      bool& stoppedIter,
+      bool& error)
    {
       // start rational solving timing
       _statistics->rationalTime->start();
@@ -336,7 +370,8 @@ namespace soplex
       dualFeasible = false;
       infeasible = false;
       unbounded = false;
-      stopped = false;
+      stoppedTime = false;
+      stoppedIter = false;
       error = false;
 
       // set working tolerances in floating-point solver
@@ -406,8 +441,10 @@ namespace soplex
          unbounded = true;
          return;
       case SPxSolver::ABORT_TIME:
+         stoppedTime = true;
+         return;
       case SPxSolver::ABORT_ITER:
-         stopped = true;
+         stoppedIter = true;
          return;
       default:
          error = true;
@@ -704,11 +741,8 @@ namespace soplex
          }
 
          // terminate if some limit is reached
-         if( _isSolveStopped() )
-         {
-            stopped = true;
+         if( _isSolveStopped(stoppedTime, stoppedIter) )
             break;
-         }
 
          // check progress
          maxViolation = boundsViolation;
@@ -741,7 +775,7 @@ namespace soplex
 
             maxViolation *= errorCorrection; // only used for sign check later
             maxViolation.invert();
-            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, maxViolation) )
+            if( _reconstructSolutionRational(sol, _basisStatusRows, _basisStatusCols, maxViolation) )
             {
                MSG_INFO1( spxout, spxout << "Tolerances reached.\n" );
                primalFeasible = true;
@@ -758,10 +792,10 @@ namespace soplex
             MSG_INFO1( spxout, spxout << "Performing rational factorization . . .\n" );
 
             bool optimal;
-            _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stopped, error, optimal);
+            _factorizeColumnRational(sol, _basisStatusRows, _basisStatusCols, stoppedTime, stoppedIter, error, optimal);
             factorSolNewBasis = false;
 
-            if( stopped )
+            if( stoppedTime )
             {
                MSG_INFO1( spxout, spxout << "Stopped rational factorization.\n" );
             }
@@ -1036,7 +1070,10 @@ namespace soplex
             _solver.clearRowObjs();
             return;
          case SPxSolver::ABORT_TIME:
-         case SPxSolver::ABORT_ITER: stopped = true;
+            stoppedTime = true;
+            return;
+         case SPxSolver::ABORT_ITER:
+            stoppedIter = true;
             _solver.clearRowObjs();
             return;
          default:
@@ -1366,7 +1403,12 @@ namespace soplex
 
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void SoPlex::_performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error)
+   void SoPlex::_performUnboundedIRStable(
+      SolRational& sol,
+      bool& hasUnboundedRay,
+      bool& stopped,
+      bool& stoppedIter,
+      bool& error)
    {
       bool primalFeasible;
       bool dualFeasible;
@@ -1383,7 +1425,7 @@ namespace soplex
       int oldRefinements = _statistics->refinements;
 
       // perform iterative refinement
-      _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+      _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, stoppedIter, error);
 
       // update unbounded refinement counter
       _statistics->unbdRefinements += _statistics->refinements - oldRefinements;
@@ -1427,7 +1469,12 @@ namespace soplex
 
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void SoPlex::_performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& error)
+   void SoPlex::_performFeasIRStable(
+      SolRational& sol,
+      bool& withDualFarkas,
+      bool& stopped,
+      bool& stoppedIter,
+      bool& error)
    {
       bool primalFeasible;
       bool dualFeasible;
@@ -1457,7 +1504,7 @@ namespace soplex
          int oldRefinements = _statistics->refinements;
 
          // perform iterative refinement
-         _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, error);
+         _performOptIRStable(sol, false, false, 0, primalFeasible, dualFeasible, infeasible, unbounded, stopped, stoppedIter, error);
 
          // update feasible refinement counter
          _statistics->feasRefinements += _statistics->refinements - oldRefinements;
@@ -3271,8 +3318,8 @@ namespace soplex
          if( solved )
             break;
 
-         if( _isSolveStopped() )
-            break;
+//         if( _isSolveStopped() )
+//            break;
 
          if( initialSolve )
          {
@@ -3439,12 +3486,13 @@ namespace soplex
 
 
    /// factorizes rational basis matrix in column representation
-   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, bool& optimal)
+   void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal)
    {
       // start rational solving time
       _statistics->rationalTime->start();
 
-      stopped = false;
+      stoppedTime = false;
+      stoppedIter = false;
       error = false;
       optimal = false;
 
@@ -3566,7 +3614,7 @@ namespace soplex
       if( linsolver.status() == SLinSolverRational::TIME )
       {
          MSG_INFO2( spxout, spxout << "Rational factorization hit time limit.\n" );
-         stopped = true;
+         stoppedTime = true;
          return;
       }
       else if( linsolver.status() != SLinSolverRational::OK )
@@ -3587,10 +3635,9 @@ namespace soplex
       _statistics->luSolveTimeRational += linsolver.getSolveTime();
       linsolver.resetCounters();
 
-      if( _isSolveStopped() )
+      if( _isSolveStopped(stoppedTime, stoppedIter) )
       {
          MSG_INFO2( spxout, spxout << "Rational factorization hit time limit while solving for primal.\n" );
-         stopped = true;
          return;
       }
 
@@ -3666,10 +3713,9 @@ namespace soplex
       _statistics->luSolveTimeRational += linsolver.getSolveTime();
       linsolver.resetCounters();
 
-      if( _isSolveStopped() )
+      if( _isSolveStopped(stoppedTime, stoppedIter) )
       {
          MSG_INFO2( spxout, spxout << "Rational factorization hit time limit while solving for dual.\n" );
-         stopped = true;
          return;
       }
 
@@ -3837,14 +3883,12 @@ namespace soplex
    }
 
    /// attempts rational reconstruction of primal-dual solution
-   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared)
+   bool SoPlex::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared)
    {
       bool success;
       bool isSolBasic;
       DIdxSet basicIndices(numColsRational());
 
-      error = false;
-      stopped = false;
       success = false;
       isSolBasic = true;
 
