@@ -302,22 +302,6 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
          if( upp[i] < infinity )
          {
             Real y = upp[i] - vec[i];
-            if( y <= -thesolver->opttol() )
-            {
-               switch (src)
-               {
-               case PVEC :
-                  thesolver->shiftUPbound(i, vec[i]);
-                  break;
-               case COPVEC :
-                  thesolver->shiftUCbound(i, vec[i]);
-                  break;
-               case FVEC :
-                  thesolver->shiftUBbound(i, vec[i]);
-               }
-               y = 0.0;
-            }
-            assert(y > -thesolver->opttol());
             curVal = (y <= 0) ? fastDelta / x : (y + fastDelta) / x;
             assert(curVal > 0);
 
@@ -339,22 +323,6 @@ void SPxBoundFlippingRT::collectBreakpointsMax(
          if (low[i] > -infinity)
          {
             Real y = low[i] - vec[i];
-            if( y >= thesolver->opttol() )
-            {
-               switch (src)
-               {
-               case PVEC :
-                  thesolver->shiftLPbound(i, vec[i]);
-                  break;
-               case COPVEC :
-                  thesolver->shiftLCbound(i, vec[i]);
-                  break;
-               case FVEC :
-                  thesolver->shiftLBbound(i, vec[i]);
-               }
-               y = 0.0;
-            }
-            assert(y < thesolver->opttol());
             curVal = (y >= 0) ? -fastDelta / x : (y - fastDelta) / x;
             assert(curVal > 0);
 
@@ -408,22 +376,7 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
          if( low[i] > -infinity )
          {
             Real y = low[i] - vec[i];
-            if( y >= thesolver->opttol() )
-            {
-               switch (src)
-               {
-               case PVEC :
-                  thesolver->shiftLPbound(i, vec[i]);
-                  break;
-               case COPVEC :
-                  thesolver->shiftLCbound(i, vec[i]);
-                  break;
-               case FVEC :
-                  thesolver->shiftLBbound(i, vec[i]);
-               }
-               y = 0.0;
-            }
-            assert(y < thesolver->opttol());
+
             curVal = (y >= 0) ? fastDelta / x : (fastDelta - y) / x;
             assert(curVal > 0);
 
@@ -445,22 +398,6 @@ void SPxBoundFlippingRT::collectBreakpointsMin(
          if (upp[i] < infinity)
          {
             Real y = upp[i] - vec[i];
-            if( y <= -thesolver->opttol() )
-            {
-               switch (src)
-               {
-               case PVEC :
-                  thesolver->shiftUPbound(i, vec[i]);
-                  break;
-               case COPVEC :
-                  thesolver->shiftUCbound(i, vec[i]);
-                  break;
-               case FVEC :
-                  thesolver->shiftUBbound(i, vec[i]);
-               }
-               y = 0.0;
-            }
-            assert(y > -thesolver->opttol());
             curVal = (y <= 0) ? -fastDelta / x : -(y + fastDelta) / x;
             assert(curVal > 0);
 
