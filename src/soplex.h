@@ -1485,6 +1485,9 @@ private:
 
    int _idsDisplayLine;     // the count for the display line
 
+   NameSet* _rowNames;      // the row names from the input file
+   NameSet* _colNames;      // the col names from the input file
+
    // Statistic information
    int numIncludedRows;    // the number of rows currently included in the reduced problem.
    int numIdsIter;         // the number of iterations of the improved dual simplex algorithm.

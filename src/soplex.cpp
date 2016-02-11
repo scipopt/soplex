@@ -2728,6 +2728,16 @@ namespace soplex
 
          _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
+         //This is here for debugging purposes. Will need to remove in the future.
+         //
+         //SPxLPIds dualLP;
+         //_solver.buildDualProblem(dualLP);
+
+         //char buffer[50];
+         //sprintf(buffer, "origprobdual.lp");
+         //printf("Writing the dual lp to a file\n");
+         //dualLP.writeFile(buffer);
+
          _solveImprovedDualSimplex();
       }
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
@@ -4477,10 +4487,17 @@ namespace soplex
    /// integer variables if desired; returns true on success
    bool SoPlex::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
    {
+      bool success = false;
       if( intParam(SoPlex::READMODE) == READMODE_REAL )
-         return _readFileReal(filename, rowNames, colNames, intVars);
+         success = _readFileReal(filename, rowNames, colNames, intVars);
       else
-         return _readFileRational(filename, rowNames, colNames, intVars);
+         success = _readFileRational(filename, rowNames, colNames, intVars);
+
+      // storing the row and column names for use in the IDS print basis methods
+      _rowNames = rowNames;
+      _colNames = colNames;
+
+      return success;
    }
 
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p

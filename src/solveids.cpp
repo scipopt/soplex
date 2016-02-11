@@ -149,10 +149,10 @@ namespace soplex
       int algIterCount = 0;
       while( !stop || stopCount <= 0 )
       {
-         //#ifdef WRITE_LP
+#ifdef WRITE_LP
       printf("Writing the reduced lp to a file\n");
       _solver.writeFile("reduced.lp");
-      //#endif
+#endif
 
 #ifdef SOLVEIDS_DEBUG
          printf("Reduced Prob Rows: ");
@@ -176,7 +176,10 @@ namespace soplex
          printf("\n");
 #endif
          _hasBasis = hasRedBasis;
-         _idsSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
+         if( stopCount <= 0 )
+            _idsSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
+         else
+            _idsSimplifyAndSolve(_solver, _slufactor, true, true);
 
          stop = idsTerminate();  // checking whether the algorithm should terminate
 
@@ -244,10 +247,15 @@ namespace soplex
          //compPrimalLP.writeFile(buffer);
 
          // check the optimality of the original problem with the objective value of the complementary problem
-         if( GE(_compSolver.objValue(), 0.0, 1e-10) || _compSolver.status() == SPxSolver::UNBOUNDED )
+         // 09.02.2016 I think that this should be a check for feasibility, not unboundedness. The complementary problem
+         // is solved as the dual.
+         if( GE(_compSolver.objValue(), 0.0, 1e-10) || _compSolver.status() == SPxSolver::INFEASIBLE
+            || _compSolver.status() == SPxSolver::UNBOUNDED )
          {
             if( _compSolver.status() == SPxSolver::UNBOUNDED )
                printf("Unbounded complementary problem.\n");
+            if( _compSolver.status() == SPxSolver::INFEASIBLE )
+               printf("Infeasible complementary problem.\n");
             stop = true;
          }
 
@@ -273,8 +281,10 @@ namespace soplex
       _solver.getPrimal(reducedLPPrimalVector);
       _checkOriginalProblemOptimality(reducedLPPrimalVector);
 
+#ifdef WRITEBASIS
       // writing the original problem basis
-      _writeOriginalProblemBasis("orig_basis.bas", NULL, NULL, false);
+      _writeOriginalProblemBasis("orig_basis.bas", _rowNames, _colNames, false);
+#endif
 
       // resetting the verbosity level
       spxout.setVerbosity( orig_verbosity );
@@ -1846,7 +1856,7 @@ namespace soplex
             {
                assert(_idsPrimalRowIDs[i].idx == _idsPrimalRowIDs[i+1].idx);
 
-#if 1 // 22.06.2015
+#if 0 // 22.06.2015
                if( _realLP->rowType(_idsPrimalRowIDs[i]) == LPRowBase<Real>::RANGE )
                {
                   _compSolver.changeObj(_idsDualColIDs[i + 1], 0.0);
@@ -1892,7 +1902,7 @@ namespace soplex
                //assert(isZero(dualVector[solverRowNum], 0.0));
 
                // 22.06.2015 Testing keeping all rows in the complementary problem
-#if 1
+#if 0
                switch( _realLP->rowType(_idsPrimalRowIDs[i]) )
                {
                   case LPRowBase<Real>::RANGE:
@@ -2024,9 +2034,13 @@ namespace soplex
       _compSolver.changeRow(_compSlackDualRowId, compSlackRow);
 
 
+      // if the original objective is used, then all dual columns related to primal rows not in the reduced problem are
+      // removed from the complementary problem.
+      // As a result, the slack row becomes an empty row.
       int* perm = 0;
       spx_alloc(perm, _compSolver.nCols() + numElimColsAdded);
       _compSolver.removeCols(colsforremoval, ncolsforremoval, perm);
+
 
       // updating the dual columns to represent the fixed primal variables.
       int* currFixedVars = 0;
