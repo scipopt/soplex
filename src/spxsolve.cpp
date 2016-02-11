@@ -182,6 +182,9 @@ SPxSolver::Status SPxSolver::solve()
       coSolveVector2 = 0;
       coSolveVector3 = 0;
 
+      updateViols.clear();
+      updateViolsCo.clear();
+
       try
       {
 
