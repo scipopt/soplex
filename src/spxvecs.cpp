@@ -64,7 +64,7 @@ void SPxSolver::computeFrhs()
                case SPxBasis::Desc::P_FREE :
                   continue;
 
-               case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
+               case (SPxBasis::Desc::P_FIXED) :
                   assert(lhs(i) == rhs(i));
                   //lint -fallthrough
                case SPxBasis::Desc::P_ON_UPPER :
@@ -123,7 +123,7 @@ void SPxSolver::computeFrhs()
 
                case SPxBasis::Desc::D_ON_UPPER :
                case SPxBasis::Desc::D_ON_LOWER :
-               case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+               case (SPxBasis::Desc::D_ON_BOTH) :
                   x = maxRowObj(i);
                   break;
 
@@ -165,7 +165,7 @@ void SPxSolver::computeFrhsXtra()
          case SPxBasis::Desc::P_FREE :
             continue;
 
-         case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
+         case (SPxBasis::Desc::P_FIXED) :
             assert(SPxLP::lower(i) == SPxLP::upper(i));
             //lint -fallthrough
          case SPxBasis::Desc::P_ON_UPPER :
@@ -226,9 +226,9 @@ void SPxSolver::computeFrhs1(
             x = lfb[i];
             break;
 
-         case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
+         case (SPxBasis::Desc::P_FIXED) :
             assert(lfb[i] == ufb[i]);
-         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+         case (SPxBasis::Desc::D_ON_BOTH) :
             x = lfb[i];
             break;
 
@@ -334,7 +334,7 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
    switch (desc().rowStatus(n))
    {
    // rowwise representation:
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::P_FIXED :
       assert(lhs(n) > -infinity);
       assert(rhs(n) == lhs(n));
       //lint -fallthrough
@@ -364,7 +364,7 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
    switch (desc().colStatus(n))
    {
       // rowwise representation:
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::P_FIXED :
       assert(SPxLP::upper(n) == SPxLP::lower(n));
       assert(SPxLP::lower(n) > -infinity);
       //lint -fallthrough
@@ -381,7 +381,7 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
 
       // columnwise representation:
    case SPxBasis::Desc::D_UNDEFINED :
-   case SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER :
+   case SPxBasis::Desc::D_ON_BOTH :
    case SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::D_ON_LOWER :
    case SPxBasis::Desc::D_FREE :
@@ -415,8 +415,8 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
    {
-   case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::D_ON_BOTH :
+   case SPxBasis::Desc::P_FIXED :
       assert(theLRbound[n] > -infinity);
       assert(theURbound[n] == theLRbound[n]);
       //lint -fallthrough
@@ -445,8 +445,8 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
    switch (desc().colStatus(n))
    {
    case SPxBasis::Desc::D_UNDEFINED :
-   case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::D_ON_BOTH :
+   case SPxBasis::Desc::P_FIXED :
       assert(theLCbound[n] > -infinity);
       assert(theUCbound[n] == theLCbound[n]);
       //lint -fallthrough

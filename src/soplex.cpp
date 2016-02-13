@@ -4831,8 +4831,8 @@ namespace soplex
       ofname = std::string(filename) + ".set";
       saveSettingsFile(ofname.c_str());
 
-      // write problem in MPS format
-      ofname = std::string(filename) + ".mps";
+      // write problem in MPS/LP format
+      ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
       writeFileReal(ofname.c_str(), rowNames, colNames, 0);
 
       // write basis
@@ -4852,8 +4852,8 @@ namespace soplex
       ofname = std::string(filename) + ".set";
       saveSettingsFile(ofname.c_str());
 
-      // write problem in MPS format
-      ofname = std::string(filename) + ".mps";
+      // write problem in MPS/LP format
+      ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
       writeFileRational(ofname.c_str(), rowNames, colNames, 0);
 
       // write basis
@@ -6437,14 +6437,16 @@ namespace soplex
 
 
    /// should solving process be stopped?
-   bool SoPlex::_isSolveStopped() const
+   bool SoPlex::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
    {
       assert(_statistics != 0);
 
-      return (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime->time() >= realParam(TIMELIMIT))
-         || (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
+      stoppedTime = (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime->time() >= realParam(TIMELIMIT));
+      stoppedIter = (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
          || (intParam(REFLIMIT) >= 0 && _statistics->refinements >= intParam(REFLIMIT))
          || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements >= intParam(STALLREFLIMIT));
+
+      return stoppedTime || stoppedIter;
    }
 
 

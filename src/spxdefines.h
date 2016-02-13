@@ -222,12 +222,10 @@ typedef double Real;
 #endif
 #define DEFAULT_INFINITY   1e100
 
-
-#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
-
-
 #endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
+
+#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 extern const Real infinity;
 
