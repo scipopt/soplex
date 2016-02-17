@@ -1142,7 +1142,7 @@ bool SPxSolver::enter(SPxId& enterId)
    {
       if (spxAbs(leaveVal) < entertol())
       {
-         if (EQ(theUBbound[leaveIdx], theLBbound[leaveIdx])
+         if (NE(theUBbound[leaveIdx], theLBbound[leaveIdx])
             && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
             m_numCycle++;
       }
