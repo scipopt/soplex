@@ -252,8 +252,8 @@ void SPxSolver::computeFrhs1(
     \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
  */
 void SPxSolver::computeFrhs2(
-   const Vector& coufb,   ///< upper feasibility bound for covariables
-   const Vector& colfb)   ///< lower feasibility bound for covariables
+   Vector& coufb,   ///< upper feasibility bound for covariables
+   Vector& colfb)   ///< lower feasibility bound for covariables
 {
    const SPxBasis::Desc& ds = desc();
 
@@ -288,6 +288,13 @@ void SPxSolver::computeFrhs2(
                MSG_WARNING( (*spxout), (*spxout) << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
                                    << colfb[i] << " " << coufb[i]
                                    << " shouldn't be" << std::endl; )
+               if( colfb[i] == 0.0 || coufb[i] == 0.0 )
+                  colfb[i] = coufb[i] = 0.0;
+               else
+               {
+                  Real mid = (colfb[i] + coufb[i]) / 2.0;
+                  colfb[i] = coufb[i] = mid;
+               }
             }
             assert(colfb[i] == coufb[i]);
             x = colfb[i];
