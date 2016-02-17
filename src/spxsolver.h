@@ -1724,7 +1724,7 @@ protected:
    ///
    virtual void computeFrhs1(const Vector&, const Vector&);
    ///
-   void computeFrhs2(const Vector&, const Vector&);
+   void computeFrhs2(Vector&, Vector&);
    /// compute \ref soplex::SPxSolver::theCoPrhs "theCoPrhs" for entering Simplex.
    virtual void computeEnterCoPrhs();
    ///
