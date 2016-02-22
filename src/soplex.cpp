@@ -3174,7 +3174,7 @@ namespace soplex
    /// gets the primal solution vector if available; returns true on success
    bool SoPlex::getPrimalRational(VectorRational& vector)
    {
-      if( hasPrimal() && vector.dim() >= numColsRational() )
+      if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational() )
       {
          _syncRationalSolution();
          _solRational.getPrimal(vector);
@@ -3189,7 +3189,7 @@ namespace soplex
    /// gets the vector of slack values if available; returns true on success
    bool SoPlex::getSlacksRational(VectorRational& vector)
    {
-      if( hasPrimal() && vector.dim() >= numRowsRational() )
+      if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational() )
       {
          _syncRationalSolution();
          _solRational.getSlacks(vector);
@@ -3204,7 +3204,7 @@ namespace soplex
    /// gets the primal ray if LP is unbounded; returns true on success
    bool SoPlex::getPrimalRayRational(VectorRational& vector)
    {
-      if( hasPrimalRay() && vector.dim() >= numColsRational() )
+      if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsRational() )
       {
          _syncRationalSolution();
          _solRational.getPrimalRay(vector);
@@ -3219,7 +3219,7 @@ namespace soplex
    /// gets the dual solution vector if available; returns true on success
    bool SoPlex::getDualRational(VectorRational& vector)
    {
-      if( hasDual() && vector.dim() >= numRowsRational() )
+      if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
       {
          _syncRationalSolution();
          _solRational.getDual(vector);
@@ -3234,7 +3234,7 @@ namespace soplex
    /// gets the vector of reduced cost values if available; returns true on success
    bool SoPlex::getRedCostRational(VectorRational& vector)
    {
-      if( hasDual() && vector.dim() >= numColsRational() )
+      if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsRational() )
       {
          _syncRationalSolution();
          _solRational.getRedCost(vector);
@@ -3249,7 +3249,7 @@ namespace soplex
    /// gets the Farkas proof if LP is infeasible; returns true on success
    bool SoPlex::getDualFarkasRational(VectorRational& vector)
    {
-      if( hasDualFarkas() && vector.dim() >= numRowsRational() )
+      if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational() )
       {
          _syncRationalSolution();
          _solRational.getDualFarkas(vector);

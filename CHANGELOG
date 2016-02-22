@@ -9,6 +9,7 @@ performance:
 
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
+- options -X and -Y to print primal and dual solution as rationals
 
 fixed bugs:
 - correct initialization fo objective offset in simplifier
