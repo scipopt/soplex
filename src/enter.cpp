@@ -1049,6 +1049,45 @@ void SPxSolver::rejectEnter(
    }
 }
 
+
+void SPxSolver::computePrimalray4Col(Real direction, SPxId enterId)
+{
+   Real sign = (direction > 0 ? 1.0 : -1.0);
+
+   primalRay.clear();
+   primalRay.setMax(fVec().delta().size() + 1);
+
+   for( int j = 0; j < fVec().delta().size(); ++j )
+   {
+      SPxId i = baseId(fVec().idx().index(j));
+      if( i.isSPxColId() )
+         primalRay.add(number(SPxColId(i)), sign*fVec().delta().value(j));
+   }
+
+   if( enterId.isSPxColId() )
+      primalRay.add(number(SPxColId(enterId)), -sign);
+}
+
+
+void SPxSolver::computeDualfarkas4Row(Real direction, SPxId enterId)
+{
+   Real sign = (direction > 0 ? -1.0 : 1.0);
+
+   dualFarkas.clear();
+   dualFarkas.setMax(fVec().delta().size() + 1);
+
+   for( int j = 0; j < fVec().delta().size(); ++j )
+   {
+      SPxId spxid = baseId(fVec().idx().index(j));
+      if( spxid.isSPxRowId() )
+         dualFarkas.add(number(SPxRowId(spxid)), sign * fVec().delta().value(j));
+   }
+
+   if( enterId.isSPxRowId() )
+      dualFarkas.add(number(SPxRowId(enterId)), -sign);
+}
+
+
 bool SPxSolver::enter(SPxId& enterId)
 {
    assert(enterId.isValid());
@@ -1357,45 +1396,13 @@ bool SPxSolver::enter(SPxId& enterId)
 
       if (rep() == ROW)
       {
-         Real sign;
-
-         dualFarkas.clear();
-         dualFarkas.setMax(fVec().delta().size() + 1);
-         sign = (leaveVal > 0 ? -1.0 : 1.0);
-
-         for( int j = 0; j < fVec().delta().size(); ++j )
-         {
-            SPxId spxid = baseId(fVec().idx().index(j));
-
-            if( spxid.isSPxRowId() )
-               dualFarkas.add(number(SPxRowId(spxid)), sign * fVec().delta().value(j));
-         }
-
-         if( enterId.isSPxRowId() )
-            dualFarkas.add(number(SPxRowId(enterId)), -sign);
-
+         computeDualfarkas4Row(leaveVal, enterId);
          setBasisStatus(SPxBasis::INFEASIBLE);
       }
       /**@todo if shift() is not zero, we must not conclude primal unboundedness */
       else
       {
-         Real sign;
-
-         primalRay.clear();
-         primalRay.setMax(fVec().delta().size() + 1);
-         sign = leaveVal > 0 ? 1.0 : -1.0;
-
-         for( int j = 0; j < fVec().delta().size(); ++j )
-         {
-            SPxId i = baseId(fVec().idx().index(j));
-
-            if( i.isSPxColId() )
-               primalRay.add(number(SPxColId(i)), sign*fVec().delta().value(j));
-         }
-
-         if( enterId.isSPxColId() )
-            primalRay.add(number(SPxColId(enterId)), -sign);
-
+         computePrimalray4Col(leaveVal, enterId);
          setBasisStatus(SPxBasis::UNBOUNDED);
       }
       return false;

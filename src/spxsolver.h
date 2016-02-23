@@ -1819,6 +1819,21 @@ protected:
    virtual void setLeaveBounds();
    //@}
 
+   //------------------------------------
+   /** Compute the primal ray or the farkas proof in case of unboundedness
+    *  or infeasibility.
+    */
+   //@{
+   ///
+   void computePrimalray4Col(Real direction, SPxId enterId);
+   ///
+   void computePrimalray4Row(Real direction);
+   ///
+   void computeDualfarkas4Col(Real direction);
+   ///
+   void computeDualfarkas4Row(Real direction, SPxId enterId);
+   //@}
+
 public:
 
    //------------------------------------
