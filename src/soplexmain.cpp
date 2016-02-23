@@ -686,24 +686,26 @@ int main(int argc, char* argv[])
          else
             MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.")
       }
+
+
       if( printPrimalRational )
       {
-      	DVectorRational primal(soplex->numColsReal());
-      	if( soplex->getPrimalRational(primal) )
-      	{
-      		MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
-				for( int i = 0; i < soplex->numColsRational(); ++i )
-				{
-				  if ( primal[i] != (Rational) 0 )
-					  MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
-							  << std::setw(17)
-				  << std::setprecision(9)
-				  << primal[i] << std::endl; )
-				}
-      		MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero." << std::endl; )
-      	}
-      	else
-      		MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.")
+         DVectorRational primal(soplex->numColsReal());
+         if( soplex->getPrimalRational(primal) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
+                for( int i = 0; i < soplex->numColsRational(); ++i )
+                {
+                  if ( primal[i] != (Rational) 0 )
+                      MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
+                              << std::setw(17)
+                  << std::setprecision(9)
+                  << primal[i] << std::endl; )
+                }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero." << std::endl; )
+         }
+         else
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.")
       }
 
 
@@ -732,19 +734,19 @@ int main(int argc, char* argv[])
 
       if( printDualRational )
       {
-      	DVectorRational dual(soplex->numRowsReal());
-      	if( soplex->getDualRational(dual) )
-      	{
-      		MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual multipliers (name, value):\n"; )
-				for( int i = 0; i < soplex->numRowsRational(); ++i )
-				{
-					if ( dual[i] != (Rational) 0 )
-						MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t" << dual[i] << std::endl; )
-				}
-      		MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero." << std::endl; )
-      	}
-      	else
-      		MSG_INFO1( soplex->spxout, soplex->spxout << "No dual (rational) solution available.")
+         DVectorRational dual(soplex->numRowsReal());
+         if( soplex->getDualRational(dual) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual multipliers (name, value):\n"; )
+            for( int i = 0; i < soplex->numRowsRational(); ++i )
+            {
+               if ( dual[i] != (Rational) 0 )
+                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t" << dual[i] << std::endl; )
+            }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero." << std::endl; )
+         }
+         else
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual (rational) solution available.")
       }
 
 
