@@ -594,7 +594,7 @@ void SPxSolver::factorize()
          }
 #endif  // NDEBUG
 
-         computeFtest();
+        computeFtest();
 #if 0    /* was deactivated */
          computePvec();
 #endif
@@ -608,9 +608,9 @@ void SPxSolver::factorize()
 
          if (pricing() == FULL)
          {
-#if 0       /* was deactivated (this is probably too expansive) */
+            /* was deactivated (this is probably too expensive) */
             computePvec();
-#endif
+
             /* was deactivated, but this leads to warnings in testVecs() */
             computeTest();
          }
