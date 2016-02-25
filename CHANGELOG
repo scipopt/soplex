@@ -1,7 +1,5 @@
-Developer Version
+26 February 2016 - Release 2.2.1
 =========================
-
-features:
 
 performance:
 - faster updateFtest() by exploiting sparsity in solveVector3
@@ -12,7 +10,7 @@ interface & parameters:
 - options -X and -Y to print primal and dual solution as rationals
 
 fixed bugs:
-- correct initialization fo objective offset in simplifier
+- correct initialization of objective offset in simplifier
 - fix for compilation with Visual Studio 2010
 - allow to extend also empty SVectors
 - better internal handling of singular bases
