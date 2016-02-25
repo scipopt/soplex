@@ -594,10 +594,7 @@ void SPxSolver::factorize()
          }
 #endif  // NDEBUG
 
-        computeFtest();
-#if 0    /* was deactivated */
-         computePvec();
-#endif
+         computeFtest();
       }
       else
       {
@@ -608,8 +605,10 @@ void SPxSolver::factorize()
 
          if (pricing() == FULL)
          {
-            /* was deactivated (this is probably too expensive) */
-            computePvec();
+            /* to save time only recompute the row activities (in row rep) when we are already nearly optimal to
+             * avoid missing any violations from previous updates */
+            if( rep() == ROW && m_pricingViolCo < entertol() && m_pricingViol < entertol() )
+               computePvec();
 
             /* was deactivated, but this leads to warnings in testVecs() */
             computeTest();
