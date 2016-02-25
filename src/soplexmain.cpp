@@ -72,6 +72,8 @@ void printUsage(const char* const argv[], int idx)
       "  -v<level>              set verbosity to <level> (0 - error, 3 - normal, 5 - high)\n"
       "  -x                     print primal solution\n"
       "  -y                     print dual multipliers\n"
+      "  -X                     print primal solution in rational numbers\n"
+      "  -Y                     print dual multipliers in rational numbers\n"
       "  -q                     display detailed statistics\n"
       "  -c                     perform final check of optimal solution in original problem\n"
       "\n";
