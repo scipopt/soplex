@@ -408,7 +408,6 @@ $(LIBOBJDIR)/spxgeometsc.o: src/spxgeometsc.cpp src/spxgeometsc.h src/spxdefines
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
  src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h
-$(LIBOBJDIR)/spxgithash.o: src/spxgithash.cpp src/spxgithash.h src/git_hash.cpp
 $(LIBOBJDIR)/spxharrisrt.o: src/spxharrisrt.cpp src/spxdefines.h src/spxharrisrt.h \
  src/spxratiotester.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
