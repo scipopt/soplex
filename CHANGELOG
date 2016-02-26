@@ -8,6 +8,7 @@ performance:
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
 - options -X and -Y to print primal and dual solution as rationals
+- add new compiling flag OPENSOURCE to allow/forbid the usage of third party software
 
 fixed bugs:
 - correct initialization of objective offset in simplifier
