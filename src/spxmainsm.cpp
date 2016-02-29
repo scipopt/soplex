@@ -4008,7 +4008,6 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
       catch( ... )
       {
          MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ".\n" );
-         assert(false);
          throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
       }
 
