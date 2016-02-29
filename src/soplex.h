@@ -827,22 +827,24 @@ public:
 
       COMPUTEDEGEN = 5,
 
-      ACCEPTCYCLING = 6,
+      USECOMPDUAL = 6,
+
+      ACCEPTCYCLING = 7,
 
       /// apply rational reconstruction after each iterative refinement?
-      RATREC = 7,
+      RATREC = 8,
 
       /// round scaling factors for iterative refinement to powers of two?
-      POWERSCALING = 8,
+      POWERSCALING = 9,
 
       /// continue iterative refinement with exact basic solution if not optimal?
-      RATFACJUMP = 9,
+      RATFACJUMP = 10,
 
       /// should feasibility be tested with relaxed bounds and sides?
-      FEASRELAX = 10,
+      FEASRELAX = 11,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 11
+      BOOLPARAM_COUNT = 12
    } BoolParam;
 
    /// integer parameters
@@ -1457,8 +1459,8 @@ private:
 
    DVector _transformedObj;       // the objective coefficients of the transformed problem
    DVector _idsFeasVector;       // feasibility vector calculated using unshifted bounds.
-   LPRowSet _transformedRows;     // a set of the original rows that have been transformed using the original basis.
-   SPxColId _compSlackColId;     // column id of the complementary problem slack column.
+   LPRowSet _transformedRows;    // a set of the original rows that have been transformed using the original basis.
+   SPxColId _compSlackColId;     // column id of the primal complementary problem slack column.
    SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
    bool* _idsReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
    bool* _idsReducedProbCols;    // flag to indicate the inclusion of a col in the reduced problem.
@@ -1475,6 +1477,14 @@ private:
    DataArray < SPxColId > _idsDualColIDs;          // the dual col IDs from the complementary problem
    DataArray < SPxColId > _idsFixedVarDualIDs;     // the column ids related to the fixed variables.
    DataArray < SPxColId > _idsVarBoundDualIDs;     // the column ids related to the variable bound constraints.
+
+   DataArray < SPxColId > _idsCompPrimalFixedVarIDs;  // the column ids related to the fixed variables in the complementary primal.
+   DataArray < SPxColId > _idsCompPrimalVarBoundIDs;  // the column ids related to the variable bound constraints in the complementary primal.
+
+   DataArray < SPxRowId > _idsCompPrimalRowIDs;        // the primal row IDs from the complementary problem
+   DataArray < SPxColId > _idsCompPrimalColIDs;        // the primal col IDs from the complementary problem
+
+
    int* _fixedOrigVars;    // the original variables that are at their bounds in the reduced problem.
                            // 1: fixed to upper, -1: fixed to lower, 0: unfixed.
    int _nPrimalRows;       // the number of original problem rows included in the complementary problem
@@ -1482,6 +1492,8 @@ private:
    int _nElimPrimalRows;   // the number of primal rows from the original problem eliminated from the complementary prob
    int _nDualRows;         // the number of dual rows in the complementary problem. NOTE: _nPrimalRows = _nDualCols
    int _nDualCols;         // the number of dual columns in the complementary problem. NOTE: _nPrimalRows = _nDualCols
+   int _nCompPrimalRows;   // the number of rows in the complementary primal problem. NOTE: _nPrimalRows = _nCompPrimalRows
+   int _nCompPrimalCols;   // the number of dual columns in the complementary problem. NOTE: _nPrimalCols = _nCompPrimalCols
 
    int _idsDisplayLine;     // the count for the display line
 
@@ -1890,7 +1902,7 @@ private:
          int nnonposind);
 
    /// removing rows from the complementary problem.
-   void _deleteAndUpdateRowsComplementaryProblem();
+   void _deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
 
    /// evaluates the solution of the reduced problem for the IDS
    void _evaluateSolutionIDS(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
@@ -1902,31 +1914,47 @@ private:
    void _performIdsRatioTest();
 
    /// update the reduced problem with additional columns and rows
-   void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector);
+   void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
+      DVector compDualVector);
 
    /// builds the update rows with those violated in the complmentary problem
    void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
 
    /// update the dual complementary problem with additional columns and rows
-   void _updateIdsComplementaryProblem(bool origObj);
+   void _updateIdsComplementaryDualProblem(bool origObj);
+
+   /// update the primal complementary problem with additional columns and rows
+   void _updateIdsComplementaryPrimalProblem(bool origObj);
 
    /// checking the optimality of the original problem.
    void _checkOriginalProblemOptimality(Vector primalVector);
 
    /// updating the slack column coefficients to adjust for equality constraints
-   void _updateComplementarySlackColCoeff();
+   void _updateComplementaryDualSlackColCoeff();
+
+   /// updating the slack column coefficients to adjust for equality constraints
+   void _updateComplementaryPrimalSlackColCoeff();
 
    /// removing the dual columns related to the fixed variables
-   void _removeComplementaryFixedPrimalVars(int* currFixedVars);
+   void _removeComplementaryDualFixedPrimalVars(int* currFixedVars);
 
    /// removing the dual columns related to the fixed variables
-   void _identifyComplementaryFixedPrimalVars(int* currFixedVars);
+   void _identifyComplementaryDualFixedPrimalVars(int* currFixedVars);
 
    /// updating the dual columns related to the fixed primal variables.
-   void _updateComplementaryFixedPrimalVars(int* currFixedVars);
+   void _updateComplementaryDualFixedPrimalVars(int* currFixedVars);
 
-   /// updating the complementary problem with the original objective function
-   void _setComplementaryOriginalObjective();
+   /// removing the dual columns related to the fixed variables
+   void _identifyComplementaryPrimalFixedPrimalVars(int* currFixedVars);
+
+   /// updating the dual columns related to the fixed primal variables.
+   void _updateComplementaryPrimalFixedPrimalVars(int* currFixedVars);
+
+   /// updating the complementary dual problem with the original objective function
+   void _setComplementaryDualOriginalObjective();
+
+   /// updating the complementary primal problem with the original objective function
+   void _setComplementaryPrimalOriginalObjective();
 
    /// determining which bound the primal variables will be fixed to.
    int getOrigVarFixedDirection(int colNum);

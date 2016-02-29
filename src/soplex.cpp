@@ -156,6 +156,11 @@ namespace soplex
             _boolParamDescription[SoPlex::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
             _boolParamDefault[SoPlex::COMPUTEDEGEN] = false;
 
+            // should the dual of the complementary problem be used in the improved dual simplex?
+            _boolParamName[SoPlex::USECOMPDUAL] = "usecompdual";
+            _boolParamDescription[SoPlex::USECOMPDUAL] = "should the dual of the complementary problem be used in the improved dual simplex?";
+            _boolParamDefault[SoPlex::USECOMPDUAL] = false;
+
             // should cycling solutions be accepted during iterative refinement?
             _boolParamName[SoPlex::ACCEPTCYCLING] = "acceptcycling";
             _boolParamDescription[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
@@ -4935,6 +4940,8 @@ namespace soplex
       case USEIMPROVEDDUALSIMPLEX:
          break;
       case COMPUTEDEGEN:
+         break;
+      case USECOMPDUAL:
          break;
       case ACCEPTCYCLING:
          break;

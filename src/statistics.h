@@ -125,6 +125,12 @@ namespace soplex
       int degenPivotCandDual;    ///< number of pivoting candidates that will produce a degenerate step in the dual
       Real sumDualDegen;         ///< the sum of the rate of dual degeneracy at each iteration
       Real sumPrimalDegen;       ///< the sum of the rate of primal degeneracy at each iteration
+      Real decompBasisCondNum;   ///< the condition number for the basis used to perform the decomposition
+      Real totalBoundViol;       ///< the sum of the bound violations in the original problem using the red prob sol
+      Real totalRowViol;         ///< the sum of the row violations in the original problem using the red prob sol
+      Real maxBoundViol;         ///< the max bound violation in the original problem using the red prob sol
+      Real maxRowViol;           ///< the max row violations in the original problem using the red prob sol
+      int  compProbStatus;       ///< status of the complementary problem
 
       //@}
    };

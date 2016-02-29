@@ -132,6 +132,12 @@ namespace soplex
       degenPivotCandDual = 0;
       sumDualDegen = 0;
       sumPrimalDegen = 0;
+      decompBasisCondNum = 0;
+      totalBoundViol = 0;
+      totalRowViol = 0;
+      maxBoundViol = 0;
+      maxRowViol = 0;
+      compProbStatus = 0;
    }
 
    /// prints statistics
@@ -232,6 +238,18 @@ namespace soplex
          os << "Red. Problem Size   : \n";
          os << "  Rows              : " << numRedProbRows << "\n";
          os << "  Columns           : " << numRedProbCols << "\n";
+
+         os << std::scientific << std::setprecision(20);
+         os << "Decomp. Basis Cond. : " << decompBasisCondNum << "\n";
+         os << "Decomp Violations   : \n";
+         os << "  Sum Bound         : " << totalBoundViol << "\n";
+         os << "  Sum Row           : " << totalRowViol << "\n";
+         os << "  Max Bound         : " << maxBoundViol << "\n";
+         os << "  Max Row           : " << maxRowViol << "\n";
+
+         os << std::fixed << std::setprecision(2);
+
+         os << "Comp Problem Status : " << compProbStatus << "\n";
       }
    }
 } // namespace soplex
