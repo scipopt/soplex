@@ -1,0 +1,25 @@
+# SoPlex version 2.0.1.3
+
+# should the improved dual simplex be used to solve the LP?
+# range {true, false}, default false
+bool:improveddualsimplex = true
+
+# should the degeneracy be computed for each basis?
+# range {true, false}, default false
+bool:computedegen = true
+
+# display frequency
+# range [-2147483648,2147483647], default 200
+int:displayfreq = 50
+
+# primal feasibility tolerance
+# range [0,1], default 1e-06
+real:feastol = 1e-06
+
+# dual feasibility tolerance
+# range [0,1], default 1e-06
+real:opttol = 1e-06
+
+# general zero tolerance
+# range [0,1], default 1e-16
+real:epsilon_zero = 1e-16

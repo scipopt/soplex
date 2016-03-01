@@ -1,0 +1,205 @@
+# SoPlex version 2.0.1.3
+
+# should lifting be used to reduce range of nonzero matrix coefficients?
+# range {true, false}, default false
+bool:lifting = false
+
+# should LP be transformed to equality form before a rational solve?
+# range {true, false}, default false
+bool:eqtrans = false
+
+# should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
+# range {true, false}, default false
+bool:testdualinf = false
+
+# should a rational factorization be performed after iterative refinement?
+# range {true, false}, default true
+bool:ratfac = true
+
+# should the improved dual simplex be used to solve the LP?
+# range {true, false}, default false
+bool:improveddualsimplex = false
+
+# should the degeneracy be computed for each basis?
+# range {true, false}, default false
+bool:computedegen = true
+
+# should cycling solutions be accepted during iterative refinement?
+# range {true, false}, default false
+bool:acceptcycling = false
+
+# apply rational reconstruction after each iterative refinement?
+# range {true, false}, default true
+bool:ratrec = true
+
+# round scaling factors for iterative refinement to powers of two?
+# range {true, false}, default true
+bool:powerscaling = true
+
+# continue iterative refinement with exact basic solution if not optimal?
+# range {true, false}, default false
+bool:ratfacjump = false
+
+# should feasibility be tested with relaxed bounds and sides?
+# range {true, false}, default false
+bool:feasrelax = false
+
+# objective sense (-1 - minimize, +1 - maximize)
+# range [-2147483648,2147483647], default 1
+int:objsense = 1
+
+# type of computational form (0 - auto, 1 - column representation, 2 - row representation)
+# range [-2147483648,2147483647], default 0
+int:representation = 2
+
+# type of algorithm (0 - primal, 1 - dual)
+# range [-2147483648,2147483647], default 1
+int:algorithm = 1
+
+# type of LU update (0 - eta update, 1 - Forrest-Tomlin update)
+# range [-2147483648,2147483647], default 1
+int:factor_update_type = 1
+
+# maximum number of LU updates without fresh factorization
+# range [-2147483648,2147483647], default 200
+int:factor_update_max = 200
+
+# iteration limit (-1 - no limit)
+# range [-2147483648,2147483647], default -1
+int:iterlimit = -1
+
+# refinement limit (-1 - no limit)
+# range [-2147483648,2147483647], default -1
+int:reflimit = -1
+
+# stalling refinement limit (-1 - no limit)
+# range [-2147483648,2147483647], default -1
+int:stallreflimit = -1
+
+# display frequency
+# range [-2147483648,2147483647], default 200
+int:displayfreq = 200
+
+# verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)
+# range [-2147483648,2147483647], default 3
+int:verbosity = 3
+
+# simplifier (0 - off, 1 - auto)
+# range [-2147483648,2147483647], default 1
+int:simplifier = 1
+
+# scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)
+# range [-2147483648,2147483647], default 2
+int:scaler = 2
+
+# crash basis generated when starting from scratch (0 - none, 1 - weight, 2 - sum, 3 - vector)
+# range [-2147483648,2147483647], default 0
+int:starter = 0
+
+# pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
+# range [-2147483648,2147483647], default 0
+int:pricer = 0
+
+# method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)
+# range [-2147483648,2147483647], default 3
+int:ratiotester = 3
+
+# mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)
+# range [-2147483648,2147483647], default 0
+int:syncmode = 0
+
+# mode for reading LP files (0 - floating-point, 1 - rational)
+# range [-2147483648,2147483647], default 0
+int:readmode = 0
+
+# mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - force iterative refinement)
+# range [-2147483648,2147483647], default 1
+int:solvemode = 1
+
+# mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - rational check)
+# range [-2147483648,2147483647], default 1
+int:checkmode = 1
+
+# type of timer (1 - cputime, aka. usertime, 2 - wallclock time, 0 - no timing)
+# range [-2147483648,2147483647], default 1
+int:timer = 1
+
+# mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)
+# range [-2147483648,2147483647], default 1
+int:hyperpricing = 1
+
+# minimum number of stalling refinements since last pivot to trigger rational factorization
+# range [-2147483648,2147483647], default 2
+int:ratfac_minstalls = 2
+
+# primal feasibility tolerance
+# range [0,1], default 1e-06
+real:feastol = 1e-06
+
+# dual feasibility tolerance
+# range [0,1], default 1e-06
+real:opttol = 1e-06
+
+# general zero tolerance
+# range [0,1], default 1e-16
+real:epsilon_zero = 1e-16
+
+# zero tolerance used in factorization
+# range [0,1], default 1e-20
+real:epsilon_factorization = 1e-20
+
+# zero tolerance used in update of the factorization
+# range [0,1], default 1e-16
+real:epsilon_update = 1e-16
+
+# pivot zero tolerance used in factorization
+# range [0,1], default 1e-10
+real:epsilon_pivot = 1e-10
+
+# infinity threshold
+# range [1e+10,1e+100], default 1e+100
+real:infty = 1e+100
+
+# time limit in seconds
+# range [0,1e+100], default 1e+100
+real:timelimit = 1e+100
+
+# lower limit on objective value
+# range [-1e+100,1e+100], default -1e+100
+real:objlimit_lower = -1e+100
+
+# upper limit on objective value
+# range [-1e+100,1e+100], default 1e+100
+real:objlimit_upper = 1e+100
+
+# working tolerance for feasibility in floating-point solver during iterative refinement
+# range [1e-12,1], default 1e-09
+real:fpfeastol = 1e-09
+
+# working tolerance for optimality in floating-point solver during iterative refinement
+# range [1e-12,1], default 1e-09
+real:fpopttol = 1e-09
+
+# maximum increase of scaling factors between refinements
+# range [1,1e+100], default 1e+25
+real:maxscaleincr = 1e+25
+
+# lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
+# range [0,0.1], default 0.000976562
+real:liftminval = 0.000976562
+
+# lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
+# range [10,1e+100], default 1024
+real:liftmaxval = 1024
+
+# sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)
+# range [0,1], default 0.6
+real:sparsity_threshold = 0.6
+
+# threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
+# range [0,1e+100], default 1e+100
+real:representation_switch = 1e+100
+
+# geometric frequency at which to apply rational reconstruction
+# range [1,1e+100], default 1.2
+real:ratrec_freq = 1.2
