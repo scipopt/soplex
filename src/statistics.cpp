@@ -249,7 +249,11 @@ namespace soplex
 
          os << std::fixed << std::setprecision(2);
 
-         os << "Comp Problem Status : " << compProbStatus << "\n";
+         os << "Red. Problem Status : " << redProbStatus << "\n";
+         os << "Comp. Problem Status: " << compProbStatus << "\n";
+
+         os << std::scientific << std::setprecision(20);
+         os << "Comp. Problem Obj.  : " << finalCompObj << "\n";
       }
    }
 } // namespace soplex

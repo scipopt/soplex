@@ -130,7 +130,9 @@ namespace soplex
       Real totalRowViol;         ///< the sum of the row violations in the original problem using the red prob sol
       Real maxBoundViol;         ///< the max bound violation in the original problem using the red prob sol
       Real maxRowViol;           ///< the max row violations in the original problem using the red prob sol
+      int  redProbStatus;        ///< status of the reduced problem
       int  compProbStatus;       ///< status of the complementary problem
+      Real finalCompObj;         ///< the final objective function of the complementary problem
 
       //@}
    };

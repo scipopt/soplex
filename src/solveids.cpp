@@ -197,6 +197,7 @@ namespace soplex
 
          // updating the algorithm iterations statistics
          _statistics->callsReducedProb++;
+         _statistics->redProbStatus = _solver.status();
 
 
          assert(_isRealLPLoaded);
@@ -270,6 +271,7 @@ namespace soplex
             || _compSolver.status() == SPxSolver::UNBOUNDED )
          {
             _statistics->compProbStatus = _compSolver.status();
+            _statistics->finalCompObj = _compSolver.objValue();
             if( _compSolver.status() == SPxSolver::UNBOUNDED )
                printf("Unbounded complementary problem.\n");
             if( _compSolver.status() == SPxSolver::INFEASIBLE )
@@ -1308,12 +1310,14 @@ namespace soplex
                   compProbViol = tempViol;
             }
 
+#if 0
             if( GE(compObjValue, 0.0, feastol) )
             {
                printf("Rowtype: %d, Constraints violation: %.20f\n", _realLP->rowType(rownumber), compProbViol);
                //if( _realLP->rowType(rownumber) == LPRowBase<Real>::LESS_EQUAL )
                   //compProbViol = -1;
             }
+#endif
 
 #ifdef SOLVEIDS_DEBUG
             printf("i: %d, rownumber: %d, compProbViol: %f\n", i, rownumber, compProbViol);
@@ -1896,8 +1900,10 @@ namespace soplex
       for( int i = 0; i < _nElimPrimalRows; i++ )
       {
          int rowNumber = _realLP->number(_idsElimPrimalRowIDs[i]);
+#if 0
          if( _realLP->rowType(_idsElimPrimalRowIDs[i]) == LPRowBase<Real>::EQUAL )
             printf("Equality constraint eliminated.\n");
+#endif
 
          /*
           * =================================================
@@ -1937,7 +1943,7 @@ namespace soplex
                if( _idsCompProbColIDsIdx[colNumber] == -1 )
                {
                   assert(!_idsReducedProbColIDs[colNumber].isValid());
-                  printf("Adding column to complementary problem: %d\n", colNumber);
+                  //printf("Adding column to complementary problem: %d\n", colNumber);
                   _idsPrimalColIDs[_nPrimalCols] = _realLP->cId(colNumber);
                   _idsCompProbColIDsIdx[colNumber] = _nPrimalCols;
                   _fixedOrigVars[colNumber] = -2;
@@ -2289,8 +2295,10 @@ namespace soplex
       for( int i = 0; i < _nElimPrimalRows; i++ )
       {
          int rowNumber = _realLP->number(_idsElimPrimalRowIDs[i]);
+#if 0
          if( _realLP->rowType(_idsElimPrimalRowIDs[i]) == LPRowBase<Real>::EQUAL )
             printf("Equality constraint eliminated.\n");
+#endif
 
          /*
           * =================================================
