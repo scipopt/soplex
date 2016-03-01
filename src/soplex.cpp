@@ -5469,7 +5469,11 @@ namespace soplex
          return false;
 
       file.setf(std::ios::left);
-      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10 << "." << SOPLEX_SUBVERSION << "\n";
+      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
+#if SOPLEX_SUBVERSION > 0
+      file << "." << SOPLEX_SUBVERSION;
+#endif
+      file << "\n";
 
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
       {
