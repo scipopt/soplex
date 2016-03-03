@@ -27,7 +27,9 @@
 //#define NO_TOL
 //#define NO_TRANSFORM
 
-#define SLACKCOEFF   1.0   /**< the coefficient of the slack variable in the incompatible rows. */
+#define MAX_DEGENCHECK     20    /**< the maximum number of degen checks that are performed before the IDS is abandoned */
+#define DEGENCHECK_OFFSET  50    /**< the number of iteration before the degeneracy check is reperformed */
+#define SLACKCOEFF         1.0   /**< the coefficient of the slack variable in the incompatible rows. */
 
 /* This file contains the private functions for the Improved Dual Simplex (IDS)
  *
@@ -77,6 +79,7 @@ namespace soplex
       // it is necessary to solve the initial problem to find a starting basis
       _solver.setIdsStatus(SPxSolver::FINDSTARTBASIS);
 
+      int numDegenCheck = 0;
       Real degeneracyLevel = 0;
       _idsFeasVector.reDim(_solver.nCols());
       // since the original LP may have been shifted, the dual multiplier will not be correct for the original LP. This
@@ -87,7 +90,7 @@ namespace soplex
          _solver.basis().solve(_idsFeasVector, _solver.maxObj());
          degeneracyLevel = _solver.getDegeneracyLevel(_idsFeasVector);
          if( _solver.type() == SPxSolver::LEAVE || _solver.status() >= SPxSolver::OPTIMAL
-               || _solver.getIdsStatus() == SPxSolver::DONTFINDSTARTBASIS )
+               || _solver.getIdsStatus() == SPxSolver::DONTFINDSTARTBASIS || numDegenCheck > MAX_DEGENCHECK )
          {
             // returning the sense to minimise
             if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -110,6 +113,10 @@ namespace soplex
             _statistics->solvingTime->stop();
             return;
          }
+
+         _solver.setDegenCompOffset(DEGENCHECK_OFFSET);
+
+         numDegenCheck++;
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_idsFeasVector) );
 
       // updating the algorithm iterations statistic

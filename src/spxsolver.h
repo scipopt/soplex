@@ -283,6 +283,7 @@ private:
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
    bool           getStartingIdsBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
+   int            degenCompIterOffset; ///< the number of iterations performed before the degeneracy level is computed
    //@}
 
 protected:
@@ -2083,6 +2084,20 @@ public:
    bool getComputeDegeneracy() const
    {
       return computeDegeneracy;
+   }
+
+
+   /// sets the offset for the number of iterations before the degeneracy is computed
+   void setDegenCompOffset(bool iterOffset)
+   {
+      degenCompIterOffset = iterOffset;
+   }
+
+
+   /// gets the offset for the number of iterations before the degeneracy is computed
+   bool getDegenCompOffset() const
+   {
+      return degenCompIterOffset;
    }
    //@}
 

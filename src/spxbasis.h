@@ -383,6 +383,7 @@ protected:
    */
    int    iterCount;     ///< number of calls to change() since last manipulation
    int    lastIterCount; ///< number of calls to change() before halting the simplex
+   int    iterDegenCheck;///< number of calls to change() since last degeneracy check
    int    updateCount;   ///< number of calls to change() since last factorize()
    int    totalUpdateCount; ///< number of updates
    int    nzCount;       ///< number of nonzeros in basis matrix
@@ -546,6 +547,12 @@ public:
    inline int prevIteration() const
    {
       return lastIterCount;
+   }
+
+   /// returns the number of iterations since the last degeneracy check
+   inline int lastDegenCheck() const
+   {
+      return iterDegenCheck;
    }
 
    /// returns loaded solver.

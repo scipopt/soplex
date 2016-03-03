@@ -114,6 +114,7 @@ SPxSolver::Status SPxSolver::solve()
    m_numCycle = 0;
    iterCount  = 0;
    lastIterCount = 0;
+   iterDegenCheck = 0;
    if (!isInitialized())
    {
       /*
@@ -1250,8 +1251,10 @@ bool SPxSolver::terminate()
    // the improved dual simplex requires a starting basis
    // if the flag getStartingIdsBasis is set to true the simplex will terminate when a dual basis is found
    if( type() == ENTER && getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL &&
-         iteration() > prevIteration()/*iteration() % 10 == 0*/ )
+         iteration() - lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
    {
+      iterDegenCheck = iterCount;
+
       if( SPxBasis::status() >= SPxBasis::OPTIMAL )
       {
          m_status = RUNNING;
