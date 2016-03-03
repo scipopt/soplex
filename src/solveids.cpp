@@ -1239,7 +1239,7 @@ namespace soplex
       DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
       DVector compProbPrimal(_compSolver.nCols());    // the primal vector of the complementary problem
       DVector compProbActivity(_compSolver.nRows());  // the activity vector of the complementary problem
-      Real compProbSlackVal;
+      Real compProbSlackVal = 0;
 
       if( boolParam(SoPlex::USECOMPDUAL) )
       {
