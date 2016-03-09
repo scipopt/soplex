@@ -504,7 +504,7 @@ endif
 .PHONY: doc
 doc:		
 		$(BINFILE) --saveset=doc/parameters.set
-		cd doc; $(DOXY) $(NAME).dxy > /dev/null
+		cd doc; $(DOXY) $(NAME).dxy
 
 .PHONY: test
 test:		#$(BINFILE)
