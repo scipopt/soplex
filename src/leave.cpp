@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -619,6 +619,28 @@ void SPxSolver::rejectLeave(
 }
 
 
+void SPxSolver::computePrimalray4Row(Real direction)
+{
+   Real sign = (direction > 0 ? 1.0 : -1.0);
+
+   primalRay.clear();
+   primalRay.setMax(coPvec().delta().size());
+
+   for( int i = 0; i < coPvec().delta().size(); ++i )
+      primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+}
+
+void SPxSolver::computeDualfarkas4Col(Real direction)
+{
+   Real sign = (direction > 0 ? -1.0 : 1.0);
+
+   dualFarkas.clear();
+   dualFarkas.setMax(coPvec().delta().size());
+
+   for( int i = 0; i < coPvec().delta().size(); ++i )
+      dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+}
+
 bool SPxSolver::leave(int leaveIdx)
 {
    assert(leaveIdx < dim() && leaveIdx >= 0);
@@ -766,18 +788,13 @@ bool SPxSolver::leave(int leaveIdx)
                            << "in leave()" << std::endl; )
 
       if (rep() != COLUMN)
+      {
+         computePrimalray4Row(enterVal);
          setBasisStatus(SPxBasis::UNBOUNDED);
+      }
       else
       {
-         int sign;
-         int i;
-
-         dualFarkas.clear();
-         dualFarkas.setMax(coPvec().delta().size());
-         sign = (enterVal > 0 ? -1 : +1);
-         for( i = 0; i < coPvec().delta().size(); ++i )
-            dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
-
+         computeDualfarkas4Col(enterVal);
          setBasisStatus(SPxBasis::INFEASIBLE);
       }
       return false;
@@ -875,29 +892,12 @@ bool SPxSolver::leave(int leaveIdx)
                /**@todo if shift() is not zero we must not conclude unboundedness */
                if (rep() == ROW)
                {
-                  Real sign;
-
-                  primalRay.clear();
-                  primalRay.setMax(coPvec().delta().size());
-                  sign = (enterVal > 0 ? 1.0 : -1.0);
-
-                  for( int i = 0; i < coPvec().delta().size(); ++i )
-                     primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
-
+                  computePrimalray4Row(enterVal);
                   setBasisStatus(SPxBasis::UNBOUNDED);
                }
                else
                {
-                  Real sign;
-                  int i;
-
-                  dualFarkas.clear();
-                  dualFarkas.setMax(coPvec().delta().size());
-                  sign = (enterVal > 0 ? -1.0 : +1.0);
-
-                  for( i = 0; i < coPvec().delta().size(); ++i )
-                     dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
-
+                  computeDualfarkas4Col(enterVal);
                   setBasisStatus(SPxBasis::INFEASIBLE);
                }
 

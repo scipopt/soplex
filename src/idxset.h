@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -137,7 +137,7 @@ public:
    /// returns the position number of index \p i.
    /** Returns the number of the first index \p i. If no index \p i is
        available in the #IdxSet, -1 is returned. Otherwise,
-       #index(number(i)) == \p i holds.
+       index(number(\p i)) == \p i holds.
     */
    int number(int i) const;
    //@}

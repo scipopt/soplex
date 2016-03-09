@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -595,9 +595,6 @@ void SPxSolver::factorize()
 #endif  // NDEBUG
 
          computeFtest();
-#if 0    /* was deactivated */
-         computePvec();
-#endif
       }
       else
       {
@@ -608,9 +605,11 @@ void SPxSolver::factorize()
 
          if (pricing() == FULL)
          {
-#if 0       /* was deactivated (this is probably too expansive) */
-            computePvec();
-#endif
+            /* to save time only recompute the row activities (in row rep) when we are already nearly optimal to
+             * avoid missing any violations from previous updates */
+            if( rep() == ROW && m_pricingViolCo < entertol() && m_pricingViol < entertol() )
+               computePvec();
+
             /* was deactivated, but this leads to warnings in testVecs() */
             computeTest();
          }

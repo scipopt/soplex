@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -4008,7 +4008,6 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
       catch( ... )
       {
          MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ".\n" );
-         assert(false);
          throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
       }
 

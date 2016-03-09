@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -3195,7 +3195,7 @@ namespace soplex
    /// gets the primal solution vector if available; returns true on success
    bool SoPlex::getPrimalRational(VectorRational& vector)
    {
-      if( hasPrimal() && vector.dim() >= numColsRational() )
+      if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational() )
       {
          _syncRationalSolution();
          _solRational.getPrimal(vector);
@@ -3210,7 +3210,7 @@ namespace soplex
    /// gets the vector of slack values if available; returns true on success
    bool SoPlex::getSlacksRational(VectorRational& vector)
    {
-      if( hasPrimal() && vector.dim() >= numRowsRational() )
+      if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational() )
       {
          _syncRationalSolution();
          _solRational.getSlacks(vector);
@@ -3225,7 +3225,7 @@ namespace soplex
    /// gets the primal ray if LP is unbounded; returns true on success
    bool SoPlex::getPrimalRayRational(VectorRational& vector)
    {
-      if( hasPrimalRay() && vector.dim() >= numColsRational() )
+      if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsRational() )
       {
          _syncRationalSolution();
          _solRational.getPrimalRay(vector);
@@ -3240,7 +3240,7 @@ namespace soplex
    /// gets the dual solution vector if available; returns true on success
    bool SoPlex::getDualRational(VectorRational& vector)
    {
-      if( hasDual() && vector.dim() >= numRowsRational() )
+      if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
       {
          _syncRationalSolution();
          _solRational.getDual(vector);
@@ -3255,7 +3255,7 @@ namespace soplex
    /// gets the vector of reduced cost values if available; returns true on success
    bool SoPlex::getRedCostRational(VectorRational& vector)
    {
-      if( hasDual() && vector.dim() >= numColsRational() )
+      if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsRational() )
       {
          _syncRationalSolution();
          _solRational.getRedCost(vector);
@@ -3270,7 +3270,7 @@ namespace soplex
    /// gets the Farkas proof if LP is infeasible; returns true on success
    bool SoPlex::getDualFarkasRational(VectorRational& vector)
    {
-      if( hasDualFarkas() && vector.dim() >= numRowsRational() )
+      if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational() )
       {
          _syncRationalSolution();
          _solRational.getDualFarkas(vector);
@@ -5506,7 +5506,11 @@ namespace soplex
          return false;
 
       file.setf(std::ios::left);
-      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10 << "." << SOPLEX_SUBVERSION << "\n";
+      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
+#if SOPLEX_SUBVERSION > 0
+      file << "." << SOPLEX_SUBVERSION;
+#endif
+      file << "\n";
 
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
       {

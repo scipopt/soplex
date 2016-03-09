@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1745,7 +1745,7 @@ protected:
    ///
    virtual void computeFrhs1(const Vector&, const Vector&);
    ///
-   void computeFrhs2(const Vector&, const Vector&);
+   void computeFrhs2(Vector&, Vector&);
    /// compute \ref soplex::SPxSolver::theCoPrhs "theCoPrhs" for entering Simplex.
    virtual void computeEnterCoPrhs();
    ///
@@ -1838,6 +1838,21 @@ protected:
    void setLeaveBound4Col(int i, int n);
    ///
    virtual void setLeaveBounds();
+   //@}
+
+   //------------------------------------
+   /** Compute the primal ray or the farkas proof in case of unboundedness
+    *  or infeasibility.
+    */
+   //@{
+   ///
+   void computePrimalray4Col(Real direction, SPxId enterId);
+   ///
+   void computePrimalray4Row(Real direction);
+   ///
+   void computeDualfarkas4Col(Real direction);
+   ///
+   void computeDualfarkas4Row(Real direction, SPxId enterId);
    //@}
 
 public:

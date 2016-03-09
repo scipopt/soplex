@@ -1,7 +1,19 @@
-Developer Version
-=========================
+developer version
+=================
 
-features:
+performance:
+
+interface & parameters:
+- new parameters to control refactorization triggers
+- random seed for perturbation can be set from outside and is not reset in between
+
+fixed bugs:
+
+code quality:
+
+
+29 February 2016 - Release 2.2.1
+================================
 
 performance:
 - faster updateFtest() by exploiting sparsity in solveVector3
@@ -10,11 +22,11 @@ performance:
 
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
-- new parameters to control refactorization triggers
-- random seed for perturbation can be set from outside and is not reset in between
+- options -X and -Y to print primal and dual solution as rationals
+- add new compiling flag OPENSOURCE to allow/forbid the usage of third party software
 
 fixed bugs:
-- correct initialization fo objective offset in simplifier
+- correct initialization of objective offset in simplifier
 - fix for compilation with Visual Studio 2010
 - allow to extend also empty SVectors
 - better internal handling of singular bases
@@ -29,7 +41,7 @@ code quality:
 
 
 30 June 2015 - Release 2.2.0
-=========================
+============================
 
 features:
 - support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
