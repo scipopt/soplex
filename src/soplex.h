@@ -733,6 +733,9 @@ public:
    /// clears starting basis
    void clearBasis();
 
+   /// perform solution polishing on current basis
+   void performSolutionPolishing();
+
    //@}
 
 

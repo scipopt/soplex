@@ -4389,6 +4389,40 @@ namespace soplex
 
 
 
+   /// perform solution polishing
+   void SoPlex::performSolutionPolishing()
+   {
+      // get degeneracy of basic solution
+      int numDegenRows = 0;
+      int numDegenCols = 0;
+      int basisSize = _solver.dim();
+      Real degeneracy = 0;
+      for( int i = 0; i < _solver.nRows(); ++i)
+      {
+         // basic row whose value is equal to one of its bounds
+         if( _solver.getBasisRowStatus(i) == SPxSolver::BASIC &&
+               (EQrel(dualsol[i], _solver.lhs(i), _solver.epsilon()) || EQrel(dualsol[i], _solver.rhs(i), _solver.epsilon())) )
+            ++numDegenRows;
+      }
+      for( int j = 0; j < m_solver.nCols(); ++j)
+      {
+         // basic column whose value is equal to one of its bounds
+         if( _solver.getBasisColStatus(j) == SPxSolver::BASIC &&
+               (EQrel(primsol[j], _solver.lower(j), _solver.epsilon()) || EQrel(primsol[j], _solver.upper(j), _solver.epsilon())) )
+            ++numDegenCols;
+      }
+      degeneracy = (Real)(numDegenRows+numDegenCols)/basisSize;
+      spxout << "Degeneracy of basic solution : "
+            << std::setw(6) << std::fixed << std::setprecision(4)
+      << degeneracy << " ("
+      << numDegenRows << " degenerate rows, "
+      << numDegenCols << " degenerate columns)\n"
+      << std::endl;
+
+   }
+
+
+
    /// number of iterations since last call to solve
    int SoPlex::numIterations() const
    {
