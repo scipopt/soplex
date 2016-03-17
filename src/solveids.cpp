@@ -25,7 +25,9 @@
 //#define WRITE_LP
 //#define EXTRA_PRINT
 //#define NO_TOL
+//#define USE_FEASTOL
 //#define NO_TRANSFORM
+//#define PERFORM_COMPPROB_CHECK
 
 #define MAX_DEGENCHECK     20    /**< the maximum number of degen checks that are performed before the IDS is abandoned */
 #define DEGENCHECK_OFFSET  50    /**< the number of iteration before the degeneracy check is reperformed */
@@ -323,6 +325,7 @@ namespace soplex
       // removing all rows not in the reduced problem
       _updateIdsComplementaryProblem(true);
 #endif
+#ifdef PERFORM_COMPPROB_CHECK 
       // solving the complementary problem with the original objective function
       if( boolParam(SoPlex::USECOMPDUAL) )
          _setComplementaryDualOriginalObjective();
@@ -335,7 +338,6 @@ namespace soplex
       // the basis has to be set to false
       _hasBasis = false;
 
-#ifdef WRITE_LP
       if( boolParam(SoPlex::USECOMPDUAL) )
       {
          SPxLPIds compDualLP;
@@ -1387,7 +1389,11 @@ namespace soplex
 #ifdef NO_TOL
       Real feastol = 0.0;
 #else
+#ifdef USE_FEASTOL
       Real feastol = realParam(SoPlex::FEASTOL);
+#else
+      Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#endif
 #endif
 
       bool delCol;
@@ -1485,8 +1491,11 @@ namespace soplex
 #ifdef NO_TOL
       Real feastol = 0.0;
 #else
+#ifdef USE_FEASTOL
       Real feastol = realParam(SoPlex::FEASTOL);
-      //Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#else
+      Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#endif
 #endif
 
       bool compatible;
@@ -1636,8 +1645,11 @@ namespace soplex
 #ifdef NO_TOL
       Real feastol = 0.0;
 #else
+#ifdef USE_FEASTOL
       Real feastol = realParam(SoPlex::FEASTOL);
-      //Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#else
+      Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#endif
 #endif
 
       SSVector y(numColsReal());
@@ -1695,7 +1707,11 @@ namespace soplex
 #ifdef NO_TOL
       Real feastol = 0.0;
 #else
+#ifdef USE_FEASTOL
+      Real feastol = realParam(SoPlex::FEASTOL);
+#else
       Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#endif
 #endif
 
       bool compatible;
@@ -2264,10 +2280,6 @@ namespace soplex
       spx_alloc(currFixedVars, _realLP->nCols());
       _identifyComplementaryDualFixedPrimalVars(currFixedVars);
       _removeComplementaryDualFixedPrimalVars(currFixedVars);
-#ifdef WRITE_LP
-      printf("Writing the complementary problem after column removal\n");
-      _compSolver.writeFile("comp_colremove.lp");
-#endif
       _updateComplementaryDualFixedPrimalVars(currFixedVars);
 
 
@@ -2532,10 +2544,6 @@ namespace soplex
       int* currFixedVars = 0;
       spx_alloc(currFixedVars, _realLP->nCols());
       _identifyComplementaryPrimalFixedPrimalVars(currFixedVars);
-#ifdef WRITE_LP
-      printf("Writing the complementary problem after column removal\n");
-      _compSolver.writeFile("comp_colremove.lp");
-#endif
       _updateComplementaryPrimalFixedPrimalVars(currFixedVars);
 
 
