@@ -4397,6 +4397,8 @@ namespace soplex
       int numDegenCols = 0;
       int basisSize = _solver.dim();
       Real degeneracy = 0;
+      DVectorRational primalsol(numColsReal());
+      DVectorRational redcost(numColsReal());
       for( int i = 0; i < _solver.nRows(); ++i)
       {
          // basic row whose value is equal to one of its bounds
