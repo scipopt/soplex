@@ -19,7 +19,7 @@
 #include "soplex.h"
 #include "statistics.h"
 
-//#define SIMPLEDEBUG
+#define SIMPLEDEBUG
 //#define DEBUGGING
 //#define SOLVEIDS_DEBUG
 //#define WRITE_LP
@@ -160,6 +160,8 @@ namespace soplex
       _hasBasis = false;
       bool hasRedBasis = false;
 
+      bool redProbError = false;
+
       int algIterCount = 0;
       while( !stop || stopCount <= 0 )
       {
@@ -219,6 +221,8 @@ namespace soplex
                printf("Unbounded reduced problem.\n");
             if( _solver.status() == SPxSolver::INFEASIBLE )
                printf("Infeasible reduced problem.\n");
+
+            redProbError = true;
             break;
          }
 
@@ -308,79 +312,85 @@ namespace soplex
          algIterCount++;
       }
 
-      // computing the solution for the original variables
-      DVector reducedLPPrimalVector(_solver.nCols());
-      _solver.getPrimal(reducedLPPrimalVector);
-      _checkOriginalProblemOptimality(reducedLPPrimalVector);
+      // if there is an error in solving the reduced problem, i.e. infeasible or unbounded, then we leave the
+      // decomposition solve and resolve the original. Infeasibility should be dealt with in the original problem.
+      if( !redProbError )
+      {
+         // computing the solution for the original variables
+         DVector reducedLPPrimalVector(_solver.nCols());
+         _solver.getPrimal(reducedLPPrimalVector);
+         _checkOriginalProblemOptimality(reducedLPPrimalVector);
 
 #ifdef WRITEBASIS
-      // writing the original problem basis
-      _writeOriginalProblemBasis("orig_basis.bas", _rowNames, _colNames, false);
+         // writing the original problem basis
+         _writeOriginalProblemBasis("orig_basis.bas", _rowNames, _colNames, false);
 #endif
 
-      // resetting the verbosity level
-      spxout.setVerbosity( orig_verbosity );
+         // resetting the verbosity level
+         spxout.setVerbosity( orig_verbosity );
 
 #if 0
-      // removing all rows not in the reduced problem
-      _updateIdsComplementaryProblem(true);
+         // removing all rows not in the reduced problem
+         _updateIdsComplementaryProblem(true);
 #endif
 #ifdef PERFORM_COMPPROB_CHECK 
-      // solving the complementary problem with the original objective function
-      if( boolParam(SoPlex::USECOMPDUAL) )
-         _setComplementaryDualOriginalObjective();
-      else
-         _setComplementaryPrimalOriginalObjective();
+         // solving the complementary problem with the original objective function
+         if( boolParam(SoPlex::USECOMPDUAL) )
+            _setComplementaryDualOriginalObjective();
+         else
+            _setComplementaryPrimalOriginalObjective();
 
-      // for clean up
-      // the real lp has to be set to not loaded.
-      //_isRealLPLoaded = false;
-      // the basis has to be set to false
-      _hasBasis = false;
+         // for clean up
+         // the real lp has to be set to not loaded.
+         //_isRealLPLoaded = false;
+         // the basis has to be set to false
+         _hasBasis = false;
 
-      if( boolParam(SoPlex::USECOMPDUAL) )
-      {
-         SPxLPIds compDualLP;
-         _compSolver.buildDualProblem(compDualLP, _idsPrimalRowIDs.get_ptr(), _idsPrimalColIDs.get_ptr(),
-               _idsDualRowIDs.get_ptr(), _idsDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
+         if( boolParam(SoPlex::USECOMPDUAL) )
+         {
+            SPxLPIds compDualLP;
+            _compSolver.buildDualProblem(compDualLP, _idsPrimalRowIDs.get_ptr(), _idsPrimalColIDs.get_ptr(),
+                  _idsDualRowIDs.get_ptr(), _idsDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
 
-         _compSolver.loadLP(compDualLP);
-      }
+            _compSolver.loadLP(compDualLP);
+         }
 
-      printf("Writing the complementary lp to a file\n");
-      _compSolver.writeFile("complement.lp");
+         printf("Writing the complementary lp to a file\n");
+         _compSolver.writeFile("complement.lp");
 
-      _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
+         _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
-      _solReal._hasPrimal = true;
-      _hasSolReal = true;
-      // get the primal solutions from the reduced problem
-      DVector testPrimalVector(_compSolver.nCols());
-      _compSolver.getPrimal(testPrimalVector);
-      _solReal._primal.reDim(_compSolver.nCols());
-      _solReal._primal = testPrimalVector;
+         _solReal._hasPrimal = true;
+         _hasSolReal = true;
+         // get the primal solutions from the reduced problem
+         DVector testPrimalVector(_compSolver.nCols());
+         _compSolver.getPrimal(testPrimalVector);
+         _solReal._primal.reDim(_compSolver.nCols());
+         _solReal._primal = testPrimalVector;
 
-      Real maxviol = 0;
-      Real sumviol = 0;
+         Real maxviol = 0;
+         Real sumviol = 0;
 
-      if( getIdsBoundViolation(maxviol, sumviol) )
-         printf("Bound violation: %.20f %.20f\n", maxviol, sumviol);
+         if( getIdsBoundViolation(maxviol, sumviol) )
+            printf("Bound violation: %.20f %.20f\n", maxviol, sumviol);
 
-      if( getIdsRowViolation(maxviol, sumviol) )
-         printf("Row violation: %.20f %.20f\n", maxviol, sumviol);
+         if( getIdsRowViolation(maxviol, sumviol) )
+            printf("Row violation: %.20f %.20f\n", maxviol, sumviol);
 
-      printf("Objective Value: %f\n", _compSolver.objValue());
+         printf("Objective Value: %f\n", _compSolver.objValue());
 #endif
 
-      // returning the sense to minimise
-      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
-      {
-         assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+         // returning the sense to minimise
+         if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
+         {
+            assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
 
-         _solver.changeObj(-(_solver.maxObj()));
-         _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+            _solver.changeObj(-(_solver.maxObj()));
+            _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
 
-         // Need to add commands to multiply the objective solution values by -1
+            // Need to add commands to multiply the objective solution values by -1
+         }
+
       }
 
       // resetting the verbosity level
@@ -413,7 +423,11 @@ namespace soplex
       // printing display line for resolve of problem
       _solver.printDisplayLine(false, true);
 
-      _preprocessAndSolveReal(false);
+      // if there is an error solving the reduced problem the LP must be solved from scratch
+      if (redProbError)
+         _preprocessAndSolveReal(true);
+      else
+         _preprocessAndSolveReal(false);
 
       // storing the solution from the reduced problem
       _storeSolutionReal();
@@ -816,7 +830,20 @@ namespace soplex
          bool _hadBasis = _hasBasis;
 
          _statistics->simplexTime->start();
-         solver.solve();
+         try
+         {
+            solver.solve();
+         }
+         catch( const SPxException& E )
+         {
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while solving real LP.\n" );
+            _status = SPxSolver::ERROR;
+         }
+         catch( ... )
+         {
+            MSG_ERROR( std::cerr << "Caught unknown exception while solving real LP.\n" );
+            _status = SPxSolver::ERROR;
+         }
          _statistics->simplexTime->stop();
 
          // record statistics
