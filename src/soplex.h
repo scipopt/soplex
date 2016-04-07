@@ -1868,7 +1868,7 @@ private:
    void _createIdsReducedAndComplementaryProblems();
 
    /// forms the reduced problem
-   void _formIdsReducedProblem();
+   void _formIdsReducedProblem(bool& stop);
 
    /// solves the reduced problem
    void _solveIdsReducedProblem();
@@ -1884,18 +1884,18 @@ private:
 
    // This function assumes that the basis is in the row form.
    void _getNonPositiveDualMultiplierInds(Vector feasVector, int* nonposind, int* bind, int* colsforremoval,
-         int* nnonposind);
+         int* nnonposind, bool& stop);
 
    /// retrieves the compatible columns from the constraint matrix
    void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval, int nnonposind,
-         int* ncompatind, bool formRedProb);
+         int* ncompatind, bool formRedProb, bool& stop);
 
    /// computes the reduced problem objective coefficients
-   void _computeReducedProbObjCoeff();
+   void _computeReducedProbObjCoeff(bool& stop);
 
    /// computes the compatible bound constraints and adds them to the reduced problem
    void _getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind, int* ncompatboundcons,
-         int nnonposind);
+         int nnonposind, bool& stop);
 
    /// computes the rows to remove from the complementary problem
    void _getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval, int* nrowsforremoval,
@@ -1987,7 +1987,7 @@ private:
    bool getIdsRowViolation(Real& maxviol, Real& sumviol);
 
    /// function call to terminate the decomposition simplex
-   bool idsTerminate();
+   bool idsTerminate(Real timeLimit);
 
    /// function to build a basis for the original problem as given by the solution to the reduced problem
    void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat);

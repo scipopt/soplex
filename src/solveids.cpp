@@ -19,7 +19,7 @@
 #include "soplex.h"
 #include "statistics.h"
 
-#define SIMPLEDEBUG
+//#define SIMPLEDEBUG
 //#define DEBUGGING
 //#define SOLVEIDS_DEBUG
 //#define WRITE_LP
@@ -32,6 +32,7 @@
 #define MAX_DEGENCHECK     20    /**< the maximum number of degen checks that are performed before the IDS is abandoned */
 #define DEGENCHECK_OFFSET  50    /**< the number of iteration before the degeneracy check is reperformed */
 #define SLACKCOEFF         1.0   /**< the coefficient of the slack variable in the incompatible rows. */
+#define TIMELIMIT_FRAC     0.5   /**< the fraction of the total time limit given to the setup of the reduced problem */
 
 /* This file contains the private functions for the Improved Dual Simplex (IDS)
  *
@@ -52,6 +53,9 @@ namespace soplex
 
       bool stop = false;   // flag to indicate that the algorithm must terminate
       int stopCount = 0;
+
+      // setting the initial status of the reduced problem
+      _statistics->redProbStatus = SPxSolver::NO_PROBLEM;
 
       // start timing
       _statistics->solvingTime->start();
@@ -84,6 +88,10 @@ namespace soplex
       int numDegenCheck = 0;
       Real degeneracyLevel = 0;
       _idsFeasVector.reDim(_solver.nCols());
+
+      // arrays to store the basis status for the rows and columns at the interruption of the original problem solve.
+      DataArray< SPxSolver::VarStatus > basisStatusRows;
+      DataArray< SPxSolver::VarStatus > basisStatusCols;
       // since the original LP may have been shifted, the dual multiplier will not be correct for the original LP. This
       // loop will recheck the degeneracy level and compute the proper dual multipliers.
       do
@@ -121,6 +129,25 @@ namespace soplex
          numDegenCheck++;
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_idsFeasVector) );
 
+
+      MSG_INFO1( spxout,
+         spxout << "===== Collecting the original problem basis ====" << std::endl;
+         );
+
+      // resolving the original problem without preprocessing
+      _preprocessAndSolveReal(false);
+
+      // if the original problem has a basis, this will be stored
+      if( _hasBasis )
+      {
+         basisStatusRows.reSize(numRowsReal());
+         basisStatusCols.reSize(numColsReal());
+         _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
+            basisStatusCols.size());
+      }
+
+
+
       // updating the algorithm iterations statistic
       _statistics->callsReducedProb++;
 
@@ -142,27 +169,48 @@ namespace soplex
          );
 
       // getting the decomposition basis condition number for the statistics
-      _statistics->decompBasisCondNum = _solver.basis().getExactCondition();
-      //printf("Current condition number: %e\n", _solver.basis().getExactCondition());
+      _statistics->decompBasisCondNum = _solver.basis().getEstimateCondition();
+      //printf("Current condition number: %e\n", _statistics->decompBasisCondNum);
 
-      // setting the verbosity level
-      const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      spxout.setVerbosity( SPxOut::ERROR );
+#ifdef SOLVEIDS_DEBUG
+      printf("Creating the Reduced and Complementary problems.\n");
+#endif
 
       // creating copies of the original problem that will be manipulated to form the reduced and complementary
       // problems.
       _createIdsReducedAndComplementaryProblems();
 
+#ifdef SOLVEIDS_DEBUG
+      printf("Forming the Reduced problem.\n");
+#endif
+
       // creating the initial reduced problem from the basis information
-      _formIdsReducedProblem();
+      _formIdsReducedProblem(stop);
 
 
+      // setting flags for the decomposition solve
       _hasBasis = false;
       bool hasRedBasis = false;
-
       bool redProbError = false;
-
       int algIterCount = 0;
+
+
+      // a stop will be triggered if the reduced problem exceeded a specified fraction of the time limit
+      if( stop )
+      {
+         MSG_INFO1( spxout,
+            spxout << "==== Error constructing the reduced problem ====" << std::endl;
+            );
+         stopCount++;
+         redProbError = true;
+         _statistics->redProbStatus = SPxSolver::NOT_INIT;
+      }
+
+      // setting the verbosity level
+      const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
+      spxout.setVerbosity( SPxOut::ERROR );
+      //spxout.setVerbosity( SPxOut::DEBUG );
+
       while( !stop || stopCount <= 0 )
       {
 #ifdef WRITE_LP
@@ -197,14 +245,7 @@ namespace soplex
          else
             _idsSimplifyAndSolve(_solver, _slufactor, true, true);
 
-         stop = idsTerminate();  // checking whether the algorithm should terminate
-
-         // printing display line
-#ifdef SIMPLEDEBUG
-         printIdsDisplayLine(_solver, orig_verbosity, true, !algIterCount);
-#else
-         printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
-#endif
+         stop = idsTerminate(realParam(SoPlex::TIMELIMIT));  // checking whether the algorithm should terminate
 
          // updating the algorithm iterations statistics
          _statistics->callsReducedProb++;
@@ -215,7 +256,7 @@ namespace soplex
          hasRedBasis = _hasBasis;
          _hasBasis = false;
 
-         if( _solver.status() > SPxSolver::OPTIMAL )
+         if( _solver.status() != SPxSolver::OPTIMAL )
          {
             if( _solver.status() == SPxSolver::UNBOUNDED )
                printf("Unbounded reduced problem.\n");
@@ -225,6 +266,13 @@ namespace soplex
             redProbError = true;
             break;
          }
+
+         // printing display line
+#ifdef SIMPLEDEBUG
+         printIdsDisplayLine(_solver, orig_verbosity, true, !algIterCount);
+#else
+         printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
+#endif
 
          _idsFeasVector.reDim(_solver.nCols());
          _solver.basis().solve(_idsFeasVector, _solver.maxObj());
@@ -402,8 +450,13 @@ namespace soplex
          spxout << "========   Resolving original problem   ========" << std::endl;
          );
 
-      spx_free(_idsCompProbColIDsIdx);
-      spx_free(_fixedOrigVars);
+      // if there is a reduced problem error in the first iteration the complementary problme has not been
+      // set up. In this case no memory has been allocated for _idsCompProbColIDsIdx and _fixedOrigVars.
+      if( !redProbError || algIterCount > 0 )
+      {
+         spx_free(_idsCompProbColIDsIdx);
+         spx_free(_fixedOrigVars);
+      }
       spx_free(_idsReducedProbCols);
       spx_free(_idsReducedProbRows);
 
@@ -414,20 +467,38 @@ namespace soplex
       _statistics->numRedProbRows = numIncludedRows;
       _statistics->numRedProbCols = _solver.nCols();
 
-      // resolving the problem to update the real lp and solve with the correct objective.
-      _realLP->~SPxLPReal();
-      spx_free(_realLP);
-      _realLP = &_solver;
-      _isRealLPLoaded = true;
 
       // printing display line for resolve of problem
       _solver.printDisplayLine(false, true);
 
       // if there is an error solving the reduced problem the LP must be solved from scratch
       if (redProbError)
+      {
+         MSG_INFO1( spxout,
+            spxout << "=== Reduced problem error - Solving original ===" << std::endl;
+            );
+
+         // the solver is loaded with the realLP to solve the problem from scratch
+         _solver.loadLP(*_realLP);
+         spx_free(_realLP);
+         _realLP = &_solver;
+         _isRealLPLoaded = true;
+
+         _solver.setBasis(basisStatusRows.get_const_ptr(), basisStatusCols.get_const_ptr());
          _preprocessAndSolveReal(true);
+      }
       else
+      {
+         // resolving the problem to update the real lp and solve with the correct objective.
+         // the realLP is updated with the current solver. This is to resolve the problem to get the correct solution
+         // values
+         _realLP->~SPxLPReal();
+         spx_free(_realLP);
+         _realLP = &_solver;
+         _isRealLPLoaded = true;
+
          _preprocessAndSolveReal(false);
+      }
 
       // storing the solution from the reduced problem
       _storeSolutionReal();
@@ -470,7 +541,7 @@ namespace soplex
 
 
    /// forms the reduced problem
-   void SoPlex::_formIdsReducedProblem()
+   void SoPlex::_formIdsReducedProblem(bool& stop)
    {
 #ifdef SOLVEIDS_DEBUG
       printf("Forming the reduced problem\n");
@@ -506,7 +577,8 @@ namespace soplex
 
       spx_alloc(nonposind, numColsReal());
       spx_alloc(colsforremoval, numColsReal());
-      _getNonPositiveDualMultiplierInds(_idsFeasVector, nonposind, bind, colsforremoval, &nnonposind);
+      if( !stop )
+         _getNonPositiveDualMultiplierInds(_idsFeasVector, nonposind, bind, colsforremoval, &nnonposind, stop);
 
       // get the compatible columns from the constraint matrix w.r.t the current basis matrix
 #ifdef SOLVEIDS_DEBUG
@@ -515,7 +587,8 @@ namespace soplex
 #endif
       spx_alloc(compatind, _solver.nRows());
       spx_alloc(rowsforremoval, _solver.nRows());
-      _getCompatibleColumns(nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind, true);
+      if( !stop )
+         _getCompatibleColumns(nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind, true, stop);
 
       int* compatboundcons = 0;
       int ncompatboundcons = 0;
@@ -524,7 +597,8 @@ namespace soplex
       LPRowSet boundcons;
 
       // identifying the compatible bound constraints
-      _getCompatibleBoundCons(boundcons, compatboundcons, nonposind, &ncompatboundcons, nnonposind);
+      if( !stop )
+         _getCompatibleBoundCons(boundcons, compatboundcons, nonposind, &ncompatboundcons, nnonposind, stop);
 
       // delete rows and columns from the LP to form the reduced problem
 #ifdef SOLVEIDS_DEBUG
@@ -532,31 +606,35 @@ namespace soplex
       printf("Solving time: %f\n", solveTime());
 #endif
 
-      // computing the reduced problem obj coefficient vector and updating the problem
-      _computeReducedProbObjCoeff();
-
-#ifdef SOLVEIDS_DEBUG
-      printf("Nonposinds obj coefficients\n");
-      for( int i = 0; i < nnonposind; i++ )
-      {
-         if( !isZero(_idsLP->maxObj(nonposind[i])) )
-            printf("nonposind[%d]: %d, coeff: %f\n", i, nonposind[i], _idsLP->maxObj(nonposind[i]));
-      }
-#endif
-
-      _solver.loadLP(*_idsLP);
-
-      // the colsforremoval are the columns with a zero reduced cost.
-      // the rowsforremoval are the rows identified as incompatible.
-      _solver.removeRows(rowsforremoval);
-
-      // adding the rows for the compatible bound constraints
+      // allocating memory to add bound constraints
       SPxRowId* addedrowids = 0;
       spx_alloc(addedrowids, ncompatboundcons);
-      _solver.addRows(addedrowids, boundcons);
 
-      for( int i = 0; i < ncompatboundcons; i++ )
-         _idsReducedProbColRowIDs[compatboundcons[i]] = addedrowids[i];
+      // computing the reduced problem obj coefficient vector and updating the problem
+      if( !stop )
+      {
+         _computeReducedProbObjCoeff(stop);
+
+#ifdef SOLVEIDS_DEBUG
+         printf("Nonposinds obj coefficients\n");
+         for( int i = 0; i < nnonposind; i++ )
+         {
+            if( !isZero(_idsLP->maxObj(nonposind[i])) )
+               printf("nonposind[%d]: %d, coeff: %f\n", i, nonposind[i], _idsLP->maxObj(nonposind[i]));
+         }
+#endif
+
+         _solver.loadLP(*_idsLP);
+
+         // the colsforremoval are the columns with a zero reduced cost.
+         // the rowsforremoval are the rows identified as incompatible.
+         _solver.removeRows(rowsforremoval);
+         // adding the rows for the compatible bound constraints
+         _solver.addRows(addedrowids, boundcons);
+
+         for( int i = 0; i < ncompatboundcons; i++ )
+            _idsReducedProbColRowIDs[compatboundcons[i]] = addedrowids[i];
+      }
 
 
       // freeing allocated memory
@@ -1409,7 +1487,7 @@ namespace soplex
    //
    // NOTE: Changing "nonposind[*nnonposind] = bind[i]" to "nonposind[*nnonposind] = i"
    void SoPlex::_getNonPositiveDualMultiplierInds(Vector feasVector, int* nonposind, int* bind, int* colsforremoval,
-         int* nnonposind)
+         int* nnonposind, bool& stop)
    {
       assert(_solver.rep() == SPxSolver::ROW);
 
@@ -1505,6 +1583,8 @@ namespace soplex
 #ifdef SOLVEIDS_DEBUG
       printf("\n");
 #endif
+
+      stop = idsTerminate(realParam(SoPlex::TIMELIMIT)*TIMELIMIT_FRAC);
    }
 
 
@@ -1513,7 +1593,7 @@ namespace soplex
    // This function also updates the constraint matrix of the reduced problem. It is efficient to perform this in the
    // following function because the required linear algebra has been performed.
    void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
-         int nnonposind, int* ncompatind, bool formRedProb)
+         int nnonposind, int* ncompatind, bool formRedProb, bool& stop)
    {
 #ifdef NO_TOL
       Real feastol = 0.0;
@@ -1660,6 +1740,12 @@ namespace soplex
             }
 #endif
          }
+
+         // determine whether the reduced problem setup should be terminated
+         stop = idsTerminate(realParam(SoPlex::TIMELIMIT)*TIMELIMIT_FRAC);
+
+         if( stop )
+            break;
       }
       assert(numIncludedRows <= _solver.nRows());
    }
@@ -1667,7 +1753,7 @@ namespace soplex
 
 
    /// computes the reduced problem objective coefficients
-   void SoPlex::_computeReducedProbObjCoeff()
+   void SoPlex::_computeReducedProbObjCoeff(bool& stop)
    {
 #ifdef NO_TOL
       Real feastol = 0.0;
@@ -1721,6 +1807,9 @@ namespace soplex
 
       // setting the updated objective vector
       _idsLP->changeObj(_transformedObj);
+
+      // determine whether the reduced problem setup should be terminated
+      stop = idsTerminate(realParam(SoPlex::TIMELIMIT)*TIMELIMIT_FRAC);
    }
 
 
@@ -1729,7 +1818,7 @@ namespace soplex
    // NOTE: No columns are getting removed from the reduced problem. Only the bound constraints are being removed.
    // So in the reduced problem, all variables are free unless the bound constraints are selected as compatible.
    void SoPlex::_getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind,
-         int* ncompatboundcons, int nnonposind)
+         int* ncompatboundcons, int nnonposind, bool& stop)
    {
 #ifdef NO_TOL
       Real feastol = 0.0;
@@ -1834,6 +1923,12 @@ namespace soplex
 
 
          }
+
+         // determine whether the reduced problem setup should be terminated
+         stop = idsTerminate(realParam(SoPlex::TIMELIMIT)*TIMELIMIT_FRAC);
+
+         if( stop )
+            break;
       }
 
    }
@@ -2187,7 +2282,7 @@ namespace soplex
                      _compSolver.changeBounds(_idsDualColIDs[i], 0.0, infinity);
                      break;
                   default:
-                     throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+                     throw SPxInternalCodeException("XIDSSL01 This should never happen.");
                }
 
 #else // 22.06.2015 testing keeping all rows in the complementary problem
@@ -2252,7 +2347,7 @@ namespace soplex
                   slackRowCoeff.add(_compSolver.number(SPxColId(_idsDualColIDs[i])), SLACKCOEFF);
                   break;
                default:
-                  throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+                  throw SPxInternalCodeException("XIDSSL01 This should never happen.");
             }
 
             if( origObj )
@@ -2531,7 +2626,7 @@ namespace soplex
                   slackColCoeff.add(_compSolver.number(SPxRowId(_idsCompPrimalRowIDs[i])), SLACKCOEFF);
                   break;
                default:
-                  throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+                  throw SPxInternalCodeException("XIDSSL01 This should never happen.");
             }
 
             if( origObj )
@@ -3459,7 +3554,7 @@ namespace soplex
             return SLACKCOEFF;
             break;
          default:
-            throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+            throw SPxInternalCodeException("XIDSSL01 This should never happen.");
       }
 
       return 0;
@@ -3613,9 +3708,9 @@ namespace soplex
 
 
    /// function call to terminate the decomposition simplex
-   bool SoPlex::idsTerminate()
+   bool SoPlex::idsTerminate(Real timeLimit)
    {
-      Real maxTime = realParam(SoPlex::TIMELIMIT);
+      Real maxTime = timeLimit;
 
       // check if a time limit is actually set
       if( maxTime < 0 || maxTime >= infinity )
@@ -3810,7 +3905,7 @@ namespace soplex
 
                   break;
                default:
-                  throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+                  throw SPxInternalCodeException("XIDSSL01 This should never happen.");
             }
          }
       }

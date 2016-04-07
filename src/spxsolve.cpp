@@ -1250,33 +1250,42 @@ bool SPxSolver::terminate()
 
    // the improved dual simplex requires a starting basis
    // if the flag getStartingIdsBasis is set to true the simplex will terminate when a dual basis is found
-   if( type() == ENTER && getStartingIdsBasis && SPxBasis::status() == SPxBasis::DUAL &&
-         iteration() - lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
+   if( getStartingIdsBasis )
    {
-      iterDegenCheck = iterCount;
-
-      if( SPxBasis::status() >= SPxBasis::OPTIMAL )
-      {
-         m_status = RUNNING;
-         return true;
-      }
-
-      Real degeneracyLevel = 0;
-      Real degeneracyLB = 0.1;
-      Real degeneracyUB = 0.9;
-      degeneracyLevel = getDegeneracyLevel(fVec());
-      //printf("%d %d Degeneracy Level: %f\n", iteration(), lastUpdate(), degeneracyLevel);
-      if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) /*&& iteration() > nRows()*0.2*/ )
-      {
-         m_status = UNKNOWN;
-         return true;
-      }
-
       Real iterationFrac = 0.6;
-      if( degeneracyLevel < degeneracyLB && iteration() > int(nCols()*iterationFrac) )
+      if( type() == ENTER && SPxBasis::status() == SPxBasis::DUAL &&
+         iteration() - lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
+      {
+         iterDegenCheck = iterCount;
+
+         if( SPxBasis::status() >= SPxBasis::OPTIMAL )
+         {
+            m_status = RUNNING;
+            return true;
+         }
+
+         Real degeneracyLevel = 0;
+         Real degeneracyLB = 0.1;
+         Real degeneracyUB = 0.9;
+         degeneracyLevel = getDegeneracyLevel(fVec());
+         //printf("%d %d Degeneracy Level: %f\n", iteration(), lastUpdate(), degeneracyLevel);
+         if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) /*&& iteration() > nRows()*0.2*/ )
+         {
+            m_status = REGULAR;
+            return true;
+         }
+
+         if( degeneracyLevel < degeneracyLB && iteration() > int(nCols()*iterationFrac) )
+         {
+            setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
+            m_status = REGULAR;
+            return true;
+         }
+      }
+      else if( type() == LEAVE && iteration() > int(nCols()*iterationFrac) )
       {
          setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
-         m_status = UNKNOWN;
+         m_status = REGULAR;
          return true;
       }
    }
