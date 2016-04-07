@@ -169,7 +169,7 @@ namespace soplex
          );
 
       // getting the decomposition basis condition number for the statistics
-      _statistics->decompBasisCondNum = _solver.basis().getEstimateCondition();
+      _statistics->decompBasisCondNum = _solver.basis().getEstimatedCondition();
       //printf("Current condition number: %e\n", _statistics->decompBasisCondNum);
 
 #ifdef SOLVEIDS_DEBUG
