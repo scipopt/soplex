@@ -456,7 +456,7 @@ namespace soplex
             _realParamDescription[SoPlex::REPRESENTATION_SWITCH] = "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode";
             _realParamLower[SoPlex::REPRESENTATION_SWITCH] = 0.0;
             _realParamUpper[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
-            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = 1.2;
 
             // geometric frequency at which to apply rational reconstruction
             _realParamName[SoPlex::RATREC_FREQ] = "ratrec_freq";

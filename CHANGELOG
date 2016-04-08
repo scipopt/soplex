@@ -6,6 +6,7 @@ performance:
 interface & parameters:
 - new parameters to control refactorization triggers
 - random seed for perturbation can be set from outside and is not reset in between
+- set default representation switch to 1.2
 
 fixed bugs:
 
