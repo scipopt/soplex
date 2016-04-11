@@ -423,24 +423,25 @@ public:
       int j = 0;
       int vi = index(i);
       int wj = w.index(j);
-      int n = size();
-      int m = w.size();
+      int n = size() - 1;
+      int m = w.size() - 1;
 
       while( i < n && j < m )
       {
          if( vi == wj )
          {
             x += VectorBase<R>::val[vi] * R(w.val[wj]);
-            ++i;
-            ++j;
-            vi = index(i);
-            wj = w.index(j);
+            vi = index(++i);
+            wj = w.index(++j);
          }
          else if( vi < wj )
             vi = index(++i);
          else
             wj = w.index(++j);
       }
+
+      if( vi == wj )
+         x += VectorBase<R>::val[vi] * R(w.val[wj]);
 
       return x;
    }
