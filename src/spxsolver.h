@@ -1919,6 +1919,12 @@ public:
       SPxBasis::setStatus( stat );
    }
 
+   /// setting the solver status external from the solve loop.
+   void setSolverStatus( SPxSolver::Status stat )
+   {
+      m_status = stat;
+   }
+
    /// get level of dual degeneracy
    // this function is used for the improved dual simplex
    Real getDegeneracyLevel(Vector degenvec);

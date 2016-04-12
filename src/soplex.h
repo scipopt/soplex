@@ -1484,6 +1484,11 @@ private:
    DataArray < SPxRowId > _idsCompPrimalRowIDs;        // the primal row IDs from the complementary problem
    DataArray < SPxColId > _idsCompPrimalColIDs;        // the primal col IDs from the complementary problem
 
+   int _nIdsViolBounds;       // the number of violated bound constraints
+   int _nIdsViolRows;         // the number of violated rows
+   int* _idsViolatedBounds;   // the violated bounds given by the solution to the IDS reduced problem
+   int* _idsViolatedRows;     // the violated rows given by the solution to the IDS reduced problem
+
 
    int* _fixedOrigVars;    // the original variables that are at their bounds in the reduced problem.
                            // 1: fixed to upper, -1: fixed to lower, 0: unfixed.
@@ -1917,6 +1922,9 @@ private:
    void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
       DVector compDualVector);
 
+   /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
+   void _updateIdsReducedProblemViol();
+
    /// builds the update rows with those violated in the complmentary problem
    void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
 
@@ -1927,7 +1935,7 @@ private:
    void _updateIdsComplementaryPrimalProblem(bool origObj);
 
    /// checking the optimality of the original problem.
-   void _checkOriginalProblemOptimality(Vector primalVector);
+   void _checkOriginalProblemOptimality(Vector primalVector, bool printViol);
 
    /// updating the slack column coefficients to adjust for equality constraints
    void _updateComplementaryDualSlackColCoeff();
