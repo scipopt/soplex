@@ -419,29 +419,40 @@ public:
       setup();
 
       R x = R(0);
-      int i = 0;
-      int j = 0;
-      int vi = index(i);
-      int wj = w.index(j);
-      int n = size() - 1;
-      int m = w.size() - 1;
+      int i = size() - 1;
+      int j = w.size() - 1;
 
-      while( i < n && j < m )
+      // both *this and w non-zero vectors?
+      if( i >= 0 && j >= 0 )
       {
-         if( vi == wj )
-         {
-            x += VectorBase<R>::val[vi] * R(w.val[wj]);
-            vi = index(++i);
-            wj = w.index(++j);
-         }
-         else if( vi < wj )
-            vi = index(++i);
-         else
-            wj = w.index(++j);
-      }
+         int vi = index(i);
+         int wj = w.index(j);
 
-      if( vi == wj )
-         x += VectorBase<R>::val[vi] * R(w.val[wj]);
+         while( i != 0 && j != 0 )
+         {
+            if( vi == wj )
+            {
+               x += VectorBase<R>::val[vi] * R(w.val[wj]);
+               vi = index(--i);
+               wj = w.index(--j);
+            }
+            else if( vi > wj )
+               vi = index(--i);
+            else
+               wj = w.index(--j);
+         }
+
+         /* check remaining indices */
+
+         while( i != 0 && vi != wj )
+            vi = index(--i);
+
+         while( j != 0 && vi != wj )
+            wj = w.index(--j);
+
+         if( vi == wj )
+            x += VectorBase<R>::val[vi] * R(w.val[wj]);
+      }
 
       return x;
    }
