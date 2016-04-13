@@ -35,6 +35,7 @@
 
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxleastsqsc.h"
 #include "spxgeometsc.h"
 
 #include "spxstarter.h"
@@ -1004,7 +1005,10 @@ public:
       SCALER_GEO1 = 3,
 
       /// geometric mean scaling on rows and columns, max 8 rounds
-      SCALER_GEO8 = 4
+      SCALER_GEO8 = 4,
+
+       /// least square scaling
+      SCALER_LEASTSQ = 5
    };
 
    /// values for parameter STARTER
@@ -1350,6 +1354,7 @@ private:
    SPxEquiliSC _scalerBiequi;
    SPxGeometSC _scalerGeo1;
    SPxGeometSC _scalerGeo8;
+   SPxLeastSqSC _scalerLeastsq;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;

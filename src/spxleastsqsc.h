@@ -21,8 +21,11 @@
 
 #include <assert.h>
 
+#include "spxsolver.h"
+#include "dataarray.h"
 #include "spxdefines.h"
 #include "spxscaler.h"
+#include "spxlp.h"
 
 namespace soplex
 {

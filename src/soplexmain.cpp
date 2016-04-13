@@ -64,7 +64,7 @@ void printUsage(const char* const argv[], int idx)
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
       "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
-      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)\n"
+      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
       "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3* - boundflipping)\n"
       "\n"
@@ -475,7 +475,7 @@ int main(int argc, char* argv[])
             break;
 
          case 'g' :
-            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)
+            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares)
             if( !soplex->setIntParam(SoPlex::SCALER, option[2] - '0') )
             {
                printUsage(argv, optidx);
@@ -834,6 +834,7 @@ int main(int argc, char* argv[])
 #include "spxmainsm.h"
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxleastsqsc.h"
 #include "spxgeometsc.h"
 #include "spxsumst.h"
 #include "spxweightst.h"
@@ -1171,7 +1172,7 @@ void print_usage_and_exit( const char* const argv[] )
       "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast\n"
       "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping*\n"
       "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
-      "                                            -p5 Weight\n"
+      "              -g5 leastSq                   -p5 Weight\n"
       "                                            -p6 SteepExactSetup\n"
       ;
 
@@ -1336,8 +1337,13 @@ void get_scalers(
    SPxOut*     spxout
    )
 {
+
    switch(scaling)
    {
+   case 5:
+      prescaler  = new SPxLeastSqSC(true);
+      postscaler = 0;
+      break;
    case 4:
       prescaler  = new SPxEquiliSC(true);
       postscaler = new SPxGeometSC(8);

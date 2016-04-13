@@ -52,7 +52,7 @@ Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
    return maxi;
 }
 
-void SPxEquiliSC::scale(SPxLP& lp) 
+void SPxEquiliSC::scale(SPxLP& lp)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Equilibrium scaling LP" << std::endl; )
@@ -60,14 +60,14 @@ void SPxEquiliSC::scale(SPxLP& lp)
    setup(lp);
 
    /* We want to do that direction first, with the lower ratio.
-    * Reason:           
+    * Reason:
     *                               Rowratio
     *            0.04  0.02  0.01      4
     *            4000    20  1000    200
     * Colratio    1e5   1e3   1e5
     *
     * Row first =>                  Col next =>
-    *               1   0.5  0.25         1   1   1 
+    *               1   0.5  0.25         1   1   1
     *               1   0.05 0.25         1  0.1  1
     *
     * Col first =>                  Row next =>
@@ -77,15 +77,16 @@ void SPxEquiliSC::scale(SPxLP& lp)
     */
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
-
+//    assert(0);
    bool colFirst = colratio < rowratio;
 
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << colratio 
+                        << " col-ratio= " << colratio
                         << " row-ratio= " << rowratio
                         << std::endl; )
+
    if (colFirst)
    {
       computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
@@ -112,8 +113,8 @@ void SPxEquiliSC::scale(SPxLP& lp)
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << maxColRatio(lp) 
-                        << " row-ratio= " << maxRowRatio(lp) 
+                        << " col-ratio= " << maxColRatio(lp)
+                        << " row-ratio= " << maxRowRatio(lp)
                         << std::endl; )
 }
 

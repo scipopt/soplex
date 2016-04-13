@@ -499,6 +499,65 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 }
 
 
+/// Assigns pair wise vector product of setup x and setup y to SSVectorBase.
+template < class R >
+template < class S, class T >
+inline
+SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x, const SSVectorBase<T>& y)
+{
+   assert(dim() == x.dim());
+   assert(x.dim() == y.dim());
+   assert(x.isSetup());
+   assert(y.isSetup());
+
+   clear();
+   setupStatus = false;
+
+   int i = 0;
+   int j = 0;
+   int n = x.size() - 1;
+   int m = y.size() - 1;
+
+   /* both x and y non-zero vectors? */
+   if( m >= 0 && n >= 0 )
+   {
+      int xi = x.index(i);
+      int yj = y.index(j);
+
+      while( i < n && j < m )
+      {
+         if( xi == yj )
+         {
+            VectorBase<R>::val[xi] = R(x.val[xi]) * R(y.val[xi]);
+            xi = x.index(++i);
+            yj = y.index(++j);
+         }
+         else if( xi > yj )
+            xi = x.index(++i);
+         else
+            yj = y.index(++j);
+      }
+
+      /* check (possible) remaining indices */
+
+      while( i < n && xi != yj )
+         xi = x.index(++i);
+
+      while( j < m && xi != yj )
+         yj = y.index(++j);
+
+      if( xi == yj )
+         VectorBase<R>::val[xi] = R(x.val[xi]) * R(y.val[xi]);
+   }
+
+   setup();
+
+   assert(isConsistent());
+
+   return *this;
+}
+
+
 
 /// Assigns \f$x^T \cdot A\f$ to SSVectorBase.
 template < class R >
