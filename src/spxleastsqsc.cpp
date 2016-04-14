@@ -26,7 +26,7 @@
 #include "svectorbase.h"
 #include "ssvectorbase.h"
 
-#define MAX_SCALINGROUNDS 11
+#define MAX_SCALINGROUNDS 50
 #define TERMINATION_FACTOR 0.001
 
 namespace soplex
@@ -67,10 +67,6 @@ static inline void updateScale(
    pssv = psccurr;
    psccurr = pscprev;
    pscprev = pssv;
-/*
-      for(int i = 0; i < 100; ++i )
-        std::cout << "psccurr: " << (*psccurr)[i] << " \n";
-*/
 }
 
 
@@ -126,6 +122,7 @@ static inline void updateRes(
    resvec += tmpvec;
 
    resvec *= (-1.0 / qcurr);
+   resvec.setup();
 }
 
 
@@ -134,8 +131,7 @@ static void initConstVecs(
    const SVSet* vecset,
    SVSet& facset,
    SSVector& veclogs,
-   SSVector& vecnnzeroes,
-   int nvec)
+   SSVector& vecnnzeroes)
 {
    assert(vecset != NULL);
 
@@ -144,6 +140,7 @@ static void initConstVecs(
    Real sum;
    int l;
    int size;
+   int nvec = vecset->num();
    int nnzeros;
 
    for(int k = 0; k < nvec; ++k )
@@ -180,6 +177,8 @@ static void initConstVecs(
          if( !isZero(lpvec.value(l)) )
             vecnew.add(lpvec.index(l), x);
       }
+      vecnew.sort();
+
    }
    veclogs.setup();
    vecnnzeroes.setup();
@@ -227,7 +226,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    Real scurr;
    Real sprev;
    Real eprev[3];
-   Real termination_constant;
+   Real sbreakbnd;
    int k;
    int l;
    int nrows = lp.nRows();
@@ -288,13 +287,13 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
    qcurr = 1.0;
    qprev = 0.0;
-   termination_constant = TERMINATION_FACTOR * nnzeroes;
+   sbreakbnd = TERMINATION_FACTOR * nnzeroes;
 
    for(k = 0; k < 3; ++k )
       eprev[k] = 0.0;
 
-   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzeroes, nrows);
-   initConstVecs(lp.colSet(), facncols, collogs, colnnzeroes, ncols);
+   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzeroes);
+   initConstVecs(lp.colSet(), facncols, collogs, colnnzeroes);
 
    tmprows.setup();
    tmpcols.setup();
@@ -312,49 +311,19 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    rowscale1.assignPWproduct4setup(rownnzeroes, rowlogs);
    rowscale2 = rowscale1;
 
-#if 0
-   SSVector a1(3);
-   SSVector a2(3);
-
-   SSVector a3(3);
-
-   a1.setValue(0,7);
-   a1.setValue(1,7);
-   a1.setValue(2,1);
-
-   std::cout << a1 * a2 << " \n";
-
-   a2.setValue(0,1);
-
-std::cout << a1 * a2 << " \n";
-
-a2.setValue(1,3);
-  // a2.setValue(2,2);
-
-   std::cout << a1 * a2 << " \n";
-
-   a1.setup();
-   a2.setup();
-   a3.setup();
-
-   a3.assignPWproduct4setup(a1, a2);
-
-   std::cout << a3[0] << " " << a3[1] << " " << a3[2] <<" \n";
-   assert(0);
-#endif
-
    scurr = resncols * tmpcols.assignPWproduct4setup(colnnzeroes, resncols);
 
    std::cout << "s(0): " << scurr  << " \n";
 
-   resncols.setup();
+
+//    resncols.setup();
 
    /* main loop */
    for(k = 0; k < maxscrounds; ++k )
    {
       sprev = scurr;
       std::cout << "round: " << k << " \n";
-      /* is k even? */
+      // is k even?
       if( (k % 2) == 0 )
       {
          // not in first iteration?
@@ -364,19 +333,16 @@ a2.setValue(1,3);
          updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr);
 
          scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzeroes);
-	 std::cout << "s(k+1): " << scurr  << " \n";
-
       }
       else // k is odd
       {
          updateScale(colnnzeroes, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]);
-#if 0
-      for(int i = 0; i < ncols; ++i )
-         std::cout << "colscale: " << (*csccurr)[i] << " \n";
-#endif
+
          updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr);
          scurr = resncols * (tmpcols.assignPWproduct4setup(resncols, colnnzeroes) );
       }
+
+      std::cout << "s(k+1): " << scurr  << " \n";
 
       // shift eprev entries one to the right
       for( l = 2; l > 0; --l)
@@ -389,19 +355,19 @@ a2.setValue(1,3);
       qprev = tmp;
 
       // termination criterion met?
-      if( scurr < termination_constant )
+      if( scurr < sbreakbnd )
          break;
    }
 
-   /* is k even? */
+   // is k even?
    if( (k % 2) == 0 )
    {
-      /* update column scaling factor vector */
+      // update column scaling factor vector
       updateScaleFinal(colnnzeroes, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
    }
    else // k is odd
    {
-      /* update row scaling factor vector */
+      // update row scaling factor vector
       updateScaleFinal(rownnzeroes, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2]);
    }
 
@@ -410,24 +376,59 @@ a2.setValue(1,3);
    SSVector rowscale = *rsccurr;
    SSVector colscale = *csccurr;
 
-   for(k = 0; k < nrows; k++ )
+   const SVSet* vecset = lp.colSet();
+
+   Real x = 0.0;
+   for(int i = 0; i < (vecset)->num(); ++i )
+   {
+      const SVector& vec2 = (*vecset)[i];
+      SVector vec = vec2;
+
+      vec.sort();
+
+      for( int j = 0; j < vec.size(); ++j)
+      {
+
+	assert(vec.index(j) < nrows);
+	Real  a = spxAbs(vec.value(j));
+
+         if( !isZero(a) )
+          x += pow(log2(a) -colscale[i] - rowscale[vec.index(j)], 2.0);
+
+      }
+   }
+   std::cout << "sum: " << x << "\n";
+    const SVSet* vecset2 = lp.rowSet();
+   x = 0.0;
+   for(int i = 0; i < (vecset2)->num(); ++i )
+   {
+       const SVector& vec2 = (*vecset2)[i];
+      SVector vec = vec2;
+
+      vec.sort();
+
+      for( int j = 0; j < vec.size(); ++j)
+      {
+	assert(vec.index(j) < ncols);
+	  Real  a = spxAbs(vec.value(j));
+
+         if( !isZero(a) )
+          x += pow(log2(a) -rowscale[i] - colscale[vec.index(j)], 2.0);
+      }
+   }
+   std::cout << "sum2: " << x << "\n";
+
+   for(k = 0; k < nrows; ++k )
       m_rowscale[k] = pow(2.0, - round(rowscale[k]));
 
-   for(k = 0; k < ncols; k++ )
+   for(k = 0; k < ncols; ++k )
       m_colscale[k] = pow(2.0, - round(colscale[k]));
 
-#if 0
-    for(int i = 0; i < ncols; ++i )
-         std::cout << "FINAL colscale: " << m_colscale[i] << " \n";
-
-    for(int i = 0; i < nrows; ++i )
-         std::cout << "FINAL rowscale: " << m_rowscale[i] << " \n";
-#endif
 
    std::cout << "before scaling: min= " << lp.minAbsNzo();
    std::cout << " max= " << lp.maxAbsNzo() << "\n";
 
-   /* scale */
+   // scale
    applyScaling(lp);
 
    std::cout << "after scaling: min= " << lp.minAbsNzo();

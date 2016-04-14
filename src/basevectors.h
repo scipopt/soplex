@@ -532,7 +532,7 @@ SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x
             xi = x.index(++i);
             yj = y.index(++j);
          }
-         else if( xi > yj )
+         else if( xi < yj )
             xi = x.index(++i);
          else
             yj = y.index(++j);
