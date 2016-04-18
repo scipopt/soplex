@@ -520,9 +520,9 @@ int main(int argc, char* argv[])
             break;
 
          case 'X' :
-			 // -X : print primal solution with rationals
-			 printPrimalRational = true;
-			 break;
+            // -X : print primal solution with rationals
+            printPrimalRational = true;
+            break;
 
          case 'y' :
             // -y : print dual multipliers
@@ -530,9 +530,9 @@ int main(int argc, char* argv[])
             break;
 
          case 'Y' :
-			 // -Y : print dual multipliers with rationals
-			 printDualRational = true;
-			 break;
+            // -Y : print dual multipliers with rationals
+            printDualRational = true;
+            break;
 
          case 'q' :
             // -q : display detailed statistics
