@@ -733,8 +733,8 @@ public:
    /// clears starting basis
    void clearBasis();
 
-   /// perform solution polishing on current basis
-   void performSolutionPolishing();
+   /// display number of primal degenerate rows and columns
+   void displayPrimalDegeneracy();
 
    //@}
 

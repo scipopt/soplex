@@ -2790,6 +2790,8 @@ namespace soplex
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
+      displayPrimalDegeneracy();
+
       return status();
    }
 
@@ -4389,34 +4391,48 @@ namespace soplex
 
 
 
-   /// perform solution polishing
-   void SoPlex::performSolutionPolishing()
+   /// display number of primal degenerate rows and columns
+   void SoPlex::displayPrimalDegeneracy()
    {
       // get degeneracy of basic solution
       int numDegenRows = 0;
       int numDegenCols = 0;
       int basisSize = _solver.dim();
       Real degeneracy = 0;
-      DVectorRational primalsol(numColsReal());
-      DVectorRational redcost(numColsReal());
-      for( int i = 0; i < _solver.nRows(); ++i)
+      DVectorReal primalsol(numColsReal());
+      DVectorReal redcost(numColsReal());
+      DVectorReal slacks(numRowsReal());
+      DVectorReal dualsol(numRowsReal());
+      DIdxSet degenRows;
+      DIdxSet degenCols;
+      for( int i = 0; i < numRowsReal(); ++i)
       {
          // basic row whose value is equal to one of its bounds
-         if( _solver.getBasisRowStatus(i) == SPxSolver::BASIC &&
-               (EQrel(dualsol[i], _solver.lhs(i), _solver.epsilon()) || EQrel(dualsol[i], _solver.rhs(i), _solver.epsilon())) )
+         if( basisRowStatus(i) == SPxSolver::BASIC &&
+               (EQrel(slacks[i], lhsReal(i)) || EQrel(slacks[i], rhsReal(i))) )
+         {
+            std::cout << "degenerate row: " << i << std::endl;
+            degenRows.addIdx(i);
             ++numDegenRows;
+         }
       }
-      for( int j = 0; j < m_solver.nCols(); ++j)
+      for( int j = 0; j < numColsReal(); ++j)
       {
          // basic column whose value is equal to one of its bounds
-         if( _solver.getBasisColStatus(j) == SPxSolver::BASIC &&
-               (EQrel(primsol[j], _solver.lower(j), _solver.epsilon()) || EQrel(primsol[j], _solver.upper(j), _solver.epsilon())) )
+         if( basisColStatus(j) == SPxSolver::BASIC &&
+               (EQrel(primalsol[j], lowerReal(j)) || EQrel(primalsol[j], upperReal(j))) )
+         {
+            std::cout << "degenerate col: " << j << " value: " << primalsol[j] << std::endl;
+            degenCols.addIdx(j);
             ++numDegenCols;
+         }
       }
+      assert(numDegenRows == degenRows.size());
+      assert(numDegenCols == degenCols.size());
       degeneracy = (Real)(numDegenRows+numDegenCols)/basisSize;
-      spxout << "Degeneracy of basic solution : "
-            << std::setw(6) << std::fixed << std::setprecision(4)
-      << degeneracy << " ("
+      spxout << "(primal) degeneracy of basic solution : "
+             << std::setw(6) << std::fixed << std::setprecision(4)
+      << degeneracy * 100 << "% ("
       << numDegenRows << " degenerate rows, "
       << numDegenCols << " degenerate columns)\n"
       << std::endl;
