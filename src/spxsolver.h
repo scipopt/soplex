@@ -525,6 +525,14 @@ public:
     */
    virtual Status solve();
 
+   /** Identify primal basic variables that have zero reduced costs and
+    * try to pivot them out of the basis to make them tight.
+    * This is supposed to decrease the number of fractional variables
+    * when solving LP relaxations of (mixed) integer programs.
+    * The objective must not be modified during this procedure.
+    */
+   void performSolutionPolishing();
+
    /// Status of solution process.
    Status status() const;
 

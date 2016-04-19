@@ -2790,7 +2790,7 @@ namespace soplex
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
-      displayPrimalDegeneracy();
+//      displayDegeneracy();
 
       return status();
    }
@@ -4392,51 +4392,47 @@ namespace soplex
 
 
    /// display number of primal degenerate rows and columns
-   void SoPlex::displayPrimalDegeneracy()
+   void SoPlex::displayDegeneracy()
    {
       // get degeneracy of basic solution
-      int numDegenRows = 0;
-      int numDegenCols = 0;
-      int basisSize = _solver.dim();
-      Real degeneracy = 0;
+      int numDegenColsPrim = 0;
+      int numDegenRowsDual = 0;
       DVectorReal primalsol(numColsReal());
       DVectorReal redcost(numColsReal());
       DVectorReal slacks(numRowsReal());
       DVectorReal dualsol(numRowsReal());
-      DIdxSet degenRows;
-      DIdxSet degenCols;
-      for( int i = 0; i < numRowsReal(); ++i)
-      {
-         // basic row whose value is equal to one of its bounds
-         if( basisRowStatus(i) == SPxSolver::BASIC &&
-               (EQrel(slacks[i], lhsReal(i)) || EQrel(slacks[i], rhsReal(i))) )
-         {
-            std::cout << "degenerate row: " << i << std::endl;
-            degenRows.addIdx(i);
-            ++numDegenRows;
-         }
-      }
-      for( int j = 0; j < numColsReal(); ++j)
+      DIdxSet degenColsPrim;
+      DIdxSet degenRowsDual;
+
+      getPrimalReal(primalsol);
+      getRedCostReal(redcost);
+      getSlacksReal(slacks);
+      getDualReal(dualsol);
+
+      for( int j = 0; j < numColsReal(); ++j )
       {
          // basic column whose value is equal to one of its bounds
-         if( basisColStatus(j) == SPxSolver::BASIC &&
-               (EQrel(primalsol[j], lowerReal(j)) || EQrel(primalsol[j], upperReal(j))) )
+         if( basisColStatus(j) == SPxSolver::BASIC && EQrel(redcost[j], 0) &&
+               (NErel(primalsol[j], lowerReal(j)) || NErel(primalsol[j], upperReal(j))) )
          {
-            std::cout << "degenerate col: " << j << " value: " << primalsol[j] << std::endl;
-            degenCols.addIdx(j);
-            ++numDegenCols;
+            degenColsPrim.addIdx(j);
+            ++numDegenColsPrim;
          }
       }
-      assert(numDegenRows == degenRows.size());
-      assert(numDegenCols == degenCols.size());
-      degeneracy = (Real)(numDegenRows+numDegenCols)/basisSize;
-      spxout << "(primal) degeneracy of basic solution : "
-             << std::setw(6) << std::fixed << std::setprecision(4)
-      << degeneracy * 100 << "% ("
-      << numDegenRows << " degenerate rows, "
-      << numDegenCols << " degenerate columns)\n"
-      << std::endl;
 
+      for( int i = 0; i < numRowsReal(); ++i )
+      {
+         // basic row whose value is equal to one of its bounds
+         if( (basisRowStatus(i) == SPxSolver::ON_LOWER || basisRowStatus(i) == SPxSolver::ON_UPPER) &&
+               EQrel(dualsol[i], 0.0) )
+         {
+            degenRowsDual.addIdx(i);
+            ++numDegenRowsDual;
+         }
+      }
+
+      spxout << "primal basic variables with zero reduced costs: " << numDegenColsPrim
+            << " nonbasic slacks with zero dualsol: " << numDegenRowsDual << std::endl;
    }
 
 

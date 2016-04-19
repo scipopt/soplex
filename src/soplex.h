@@ -734,7 +734,7 @@ public:
    void clearBasis();
 
    /// display number of primal degenerate rows and columns
-   void displayPrimalDegeneracy();
+   void displayDegeneracy();
 
    //@}
 

@@ -999,8 +999,50 @@ SPxSolver::Status SPxSolver::solve()
      : leaveCount;
 
    printDisplayLine(true);
+   performSolutionPolishing();
    return status();
 }
+
+void SPxSolver::performSolutionPolishing()
+{
+   // only run in column representation
+   if( rep() == ROW )
+      return;
+
+   int nCandidates = 0;
+   // the current objective value must not be changed
+   forceRecompNonbasicValue();
+   Real objVal = value();
+
+   setType(LEAVE);
+   // identify all pivot candidates
+   for( int i = 0; i < dim(); ++i )
+   {
+      // only look for variables
+      SPxId columnId = baseId(i);
+      if( columnId.isSPxColId() )
+      {
+         Real basicSolVal = (*theFvec)[i];
+         int column = baseId(i).getIdx();
+
+         // skip variables that are already on one of their bounds
+         if( EQrel(basicSolVal, lower(column)) ||
+             EQrel(basicSolVal, upper(column)) )
+            continue;
+
+         // skip variables with non-zero reduced costs
+         if( NErel(maxObj(column) - (*thePvec)[column], 0) )
+            continue;
+
+         // TODO need to make sure that the ratio test only succeeds if the value is zero
+         leave(column);
+
+         ++nCandidates;
+      }
+   }
+   std::cout << nCandidates << std::endl;
+}
+
 
 void SPxSolver::testVecs()
 {
