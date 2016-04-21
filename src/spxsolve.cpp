@@ -999,7 +999,7 @@ SPxSolver::Status SPxSolver::solve()
      : leaveCount;
 
    printDisplayLine(true);
-   performSolutionPolishing();
+//   performSolutionPolishing();
    return status();
 }
 
@@ -1009,13 +1009,22 @@ void SPxSolver::performSolutionPolishing()
    if( rep() == ROW )
       return;
 
-   int nCandidates = 0;
    // the current objective value must not be changed
-   forceRecompNonbasicValue();
+#ifndef NDEBUG
    Real objVal = value();
+#endif
+
+   int nSuccessfulPivots = 0;
+
+   MSG_INFO3( (*spxout),
+      (*spxout) << " --- perform solution polishing" << std::endl; )
 
    setType(LEAVE);
-   // identify all pivot candidates
+   init();
+   thepricer->setType(type());
+   theratiotester->setType(type());
+
+   // identify all current pivot candidates
    for( int i = 0; i < dim(); ++i )
    {
       // only look for variables
@@ -1023,7 +1032,14 @@ void SPxSolver::performSolutionPolishing()
       if( columnId.isSPxColId() )
       {
          Real basicSolVal = (*theFvec)[i];
-         int column = baseId(i).getIdx();
+         Real redcost;
+         bool success = false;
+         int column = number(baseId(i));
+         SPxBasis::Desc::Status colstat = desc().colStatus(column);
+         if (colstat == SPxBasis::Desc::D_UNDEFINED)
+         {
+            continue;
+         }
 
          // skip variables that are already on one of their bounds
          if( EQrel(basicSolVal, lower(column)) ||
@@ -1031,16 +1047,26 @@ void SPxSolver::performSolutionPolishing()
             continue;
 
          // skip variables with non-zero reduced costs
-         if( NErel(maxObj(column) - (*thePvec)[column], 0) )
+         redcost = maxObj(column) - (*thePvec)[column];
+         if( NErel(redcost, 0) )
             continue;
 
-         // TODO need to make sure that the ratio test only succeeds if the value is zero
-         leave(column);
+         MSG_INFO3( (*spxout),
+               (*spxout) << "trying variable " << i << std::endl; )
+         success = leave(i, true);
 
-         ++nCandidates;
+         if( success )
+         {
+            MSG_INFO1( (*spxout),
+               (*spxout) << "successfully removed a variable from the basis" << std::endl; )
+         }
+         assert(EQrel(objVal, value(), leavetol()));
       }
    }
-   std::cout << nCandidates << std::endl;
+   assert(EQrel(objVal, value(), leavetol()));
+   MSG_INFO1( (*spxout),
+      (*spxout) << " --- finished solution polishing (" << nSuccessfulPivots << " successful pivots)" << std::endl; )
+   setStatus(SPxStatus::OPTIMAL);
 }
 
 

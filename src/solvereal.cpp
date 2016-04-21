@@ -65,6 +65,7 @@ namespace soplex
             MSG_INFO1( spxout, spxout << " --- transforming basis into original space" << std::endl; )
             _solver.changeObjOffset(0.0);
             _resolveWithoutPreprocessing(simplificationStatus);
+            _solver.performSolutionPolishing();
             return;
          }
          else

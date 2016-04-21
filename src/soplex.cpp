@@ -2790,7 +2790,7 @@ namespace soplex
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
-//      displayDegeneracy();
+      displayDegeneracy();
 
       return status();
    }

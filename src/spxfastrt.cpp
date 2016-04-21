@@ -1180,7 +1180,7 @@ bool SPxFastRT::shortEnter(
    return false;
 }
 
-SPxId SPxFastRT::selectEnter(Real& val, int)
+SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
 {
    SPxId enterId;
    Real max, sel;
@@ -1208,6 +1208,12 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          enterId = maxDelta(nr, max, maxabs);
          if (!enterId.isValid())
             return enterId;
+         else if( polish && (enterId.isSPxColId() || NErel(max, 0)) )
+         {
+            // don't move another variable into the basis when doing solution polishing
+            val = max;
+            return SPxId();
+         }
          assert(max >= 0.0);
          assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
@@ -1246,6 +1252,12 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          enterId = minDelta(nr, max, maxabs);
          if (!enterId.isValid())
             return enterId;
+         else if( polish && (enterId.isSPxColId() || NErel(max, 0)) )
+         {
+            // don't move another variable into the basis when doing solution polishing
+            val = max;
+            return SPxId();
+         }
          assert(max <= 0.0);
          assert(!enterId.isValid() || !solver()->isBasic(enterId));
 

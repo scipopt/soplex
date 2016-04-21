@@ -319,7 +319,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real)
 }
 
 
-SPxId SPxHarrisRT::selectEnter(Real& val, int)
+SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
 {
    int i, j;
    SPxId enterId;
