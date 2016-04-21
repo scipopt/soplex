@@ -77,7 +77,7 @@ void SPxEquiliSC::scale(SPxLP& lp)
     */
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
-//    assert(0);
+
    bool colFirst = colratio < rowratio;
 
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
@@ -101,7 +101,14 @@ void SPxEquiliSC::scale(SPxLP& lp)
       if (m_doBoth)
          computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
    }
+   std::cout << "before scaling: min= " << lp.minAbsNzo();
+   std::cout << " max= " << lp.maxAbsNzo() << "\n";
+
+   /* scale */
    applyScaling(lp);
+
+   std::cout << "after scaling: min= " << lp.minAbsNzo();
+   std::cout << " max= " << lp.maxAbsNzo() << "\n";
 
    MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
                         << " max= " << maxAbsRowscale()

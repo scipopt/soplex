@@ -18,7 +18,7 @@
  */
 #include <cmath>
 #include <assert.h>
-#include <iostream> // TODO delete
+#include <iostream> // TODO needed for debug, delete
 #include "spxleastsqsc.h"
 #include "spxout.h"
 #include "basevectors.h"
@@ -31,7 +31,8 @@
 
 namespace soplex
 {
-// colnnzeroes, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]
+
+/* update scaling vector */
 static inline void updateScale(
    const SSVector vecnnzeroes,
    const SSVector resnvec,
@@ -45,7 +46,7 @@ static inline void updateScale(
 {
    assert(psccurr != NULL);
    assert(pscprev != NULL);
-   assert(qcurr * qprev != 0);
+   assert(qcurr * qprev != 0.0);
 
    Real fac = -(eprev1 * eprev2);
 
@@ -63,13 +64,13 @@ static inline void updateScale(
    *pscprev *= 1.0 / (qcurr * qprev);
    *pscprev += *psccurr;
 
-   /* swap poiners */
+   /* swap pointers */
    pssv = psccurr;
    psccurr = pscprev;
    pscprev = pssv;
 }
 
-
+/* update scaling vector after main loop */
 static inline void updateScaleFinal(
    const SSVector vecnnzeroes,
    const SSVector resnvec,
@@ -94,14 +95,13 @@ static inline void updateScaleFinal(
       *pscprev *= fac;
 
    *pscprev += tmpvec.assignPWproduct4setup(resnvec, vecnnzeroes);
-   *pscprev *= 1.0 / (q);
+   *pscprev *= 1.0 / q;
    *pscprev += *psccurr;
 
    psccurr = pscprev;
 }
 
-
-
+/* update residual vector */
 static inline void updateRes(
    const SVSet facset,
    const SSVector resvecprev,
@@ -117,7 +117,7 @@ static inline void updateRes(
    else
       resvec *= eprev;
 
-   tmpvec.assign2product4setup(facset, resvecprev); // TODO why setup??
+   tmpvec.assign2product4setup(facset, resvecprev);
    tmpvec.setup();
    resvec += tmpvec;
 
@@ -126,7 +126,7 @@ static inline void updateRes(
 }
 
 
-/** initialize constant vectors and matrices */
+/* initialize constant vectors and matrices */
 static void initConstVecs(
    const SVSet* vecset,
    SVSet& facset,
@@ -184,13 +184,14 @@ static void initConstVecs(
    vecnnzeroes.setup();
 }
 
-static const char* makename(bool doBoth)
+/* return name of scaler */
+static const char* makename()
 {
-   return doBoth ? "Least squares" : "Least squares";
+   return "Least squares";
 }
 
-SPxLeastSqSC::SPxLeastSqSC(bool doBoth)
-   : SPxScaler(makename(doBoth), false, doBoth)
+SPxLeastSqSC::SPxLeastSqSC()
+   : SPxScaler(makename(), false, false)
 {}
 
 SPxLeastSqSC::SPxLeastSqSC(const SPxLeastSqSC& old)
@@ -221,12 +222,12 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    setup(lp);
 
    Real tmp;
+   Real smax;
    Real qcurr;
    Real qprev;
    Real scurr;
    Real sprev;
    Real eprev[3];
-   Real sbreakbnd;
    int k;
    int l;
    int nrows = lp.nRows();
@@ -272,22 +273,20 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    SSVector* rsccurr = &rowscale1;
    SSVector* rscprev = &rowscale2;
 
-#if 0
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
       << " min= " << lp.minAbsNzo()
       << " max= " << lp.maxAbsNzo()
-      << " col-ratio= " << colratio
-      << " row-ratio= " << rowratio
+      << " col-ratio= " << maxColRatio(lp)
+      << " row-ratio= " << maxRowRatio(lp)
       << std::endl; )
-#endif
 
-   /* initialize */
+   /* initialize scalars, vectors and matrices */
 
    std::cout << "nrows: " << nrows << " ncols: " << ncols << "\n";
 
+   smax = TERMINATION_FACTOR * nnzeroes;
    qcurr = 1.0;
    qprev = 0.0;
-   sbreakbnd = TERMINATION_FACTOR * nnzeroes;
 
    for(k = 0; k < 3; ++k )
       eprev[k] = 0.0;
@@ -315,10 +314,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
    std::cout << "s(0): " << scurr  << " \n";
 
-
-//    resncols.setup();
-
-   /* main loop */
+   /* conjugate gradient loop */
    for(k = 0; k < maxscrounds; ++k )
    {
       sprev = scurr;
@@ -327,7 +323,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
       if( (k % 2) == 0 )
       {
          // not in first iteration?
-         if( k != 0 )
+         if( k != 0 ) // true, then update row scaling factor vector
             updateScale(rownnzeroes, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr);
@@ -336,6 +332,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
       }
       else // k is odd
       {
+         // update column scaling factor vector
          updateScale(colnnzeroes, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr);
@@ -355,7 +352,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
       qprev = tmp;
 
       // termination criterion met?
-      if( scurr < sbreakbnd )
+      if( scurr < smax )
          break;
    }
 
@@ -376,6 +373,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    SSVector rowscale = *rsccurr;
    SSVector colscale = *csccurr;
 
+#if 1
    const SVSet* vecset = lp.colSet();
 
    Real x = 0.0;
@@ -389,8 +387,8 @@ void SPxLeastSqSC::scale(SPxLP& lp)
       for( int j = 0; j < vec.size(); ++j)
       {
 
-	assert(vec.index(j) < nrows);
-	Real  a = spxAbs(vec.value(j));
+	   assert(vec.index(j) < nrows);
+	     Real a = spxAbs(vec.value(j));
 
          if( !isZero(a) )
           x += pow(log2(a) -colscale[i] - rowscale[vec.index(j)], 2.0);
@@ -398,7 +396,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
       }
    }
    std::cout << "sum: " << x << "\n";
-    const SVSet* vecset2 = lp.rowSet();
+   const SVSet* vecset2 = lp.rowSet();
    x = 0.0;
    for(int i = 0; i < (vecset2)->num(); ++i )
    {
@@ -409,14 +407,17 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
       for( int j = 0; j < vec.size(); ++j)
       {
-	assert(vec.index(j) < ncols);
-	  Real  a = spxAbs(vec.value(j));
+	     assert(vec.index(j) < ncols);
+	     Real  a = spxAbs(vec.value(j));
 
          if( !isZero(a) )
           x += pow(log2(a) -rowscale[i] - colscale[vec.index(j)], 2.0);
       }
    }
+
    std::cout << "sum2: " << x << "\n";
+
+#endif
 
    for(k = 0; k < nrows; ++k )
       m_rowscale[k] = pow(2.0, - round(rowscale[k]));

@@ -42,7 +42,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor (this scaler makes no use of inherited member m_colFirst)
-   explicit SPxLeastSqSC(bool doBoth = true);
+   explicit SPxLeastSqSC();
    /// copy constructor
    SPxLeastSqSC(const SPxLeastSqSC& old);
    /// assignment operator

@@ -584,7 +584,7 @@ namespace soplex
       , _scalerBiequi(true)
       , _scalerGeo1(1)
       , _scalerGeo8(8)
-      , _scalerLeastsq(true)
+      , _scalerLeastsq()
       , _simplifier(0)
       , _scaler(0)
       , _starter(0)
