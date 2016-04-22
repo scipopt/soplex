@@ -18,17 +18,12 @@
  */
 #include <cmath>
 #include <assert.h>
-#include <iostream> // TODO needed for debug, delete
-// TODO verify necessary includes
 #include "spxleastsqsc.h"
 #include "spxout.h"
 #include "basevectors.h"
 #include "svsetbase.h"
 #include "svectorbase.h"
 #include "ssvectorbase.h"
-
-#define MAX_SCALINGROUNDS 50
-#define TERMINATION_FACTOR 0.001
 
 namespace soplex
 {
@@ -82,9 +77,9 @@ static inline void updateScaleFinal(
    Real eprev1,
    Real eprev2)
 {
+   assert(q != 0);
    assert(psccurr != NULL);
    assert(pscprev != NULL);
-   assert(q != 0);
 
    Real fac = -(eprev1 * eprev2);
 
@@ -179,10 +174,10 @@ static void initConstVecs(
             vecnew.add(lpvec.index(l), x);
       }
       vecnew.sort();
-
    }
-   veclogs.setup();
-   vecnnzeroes.setup();
+
+   assert(veclogs.isSetup());
+   assert(vecnnzeroes.isSetup());
 }
 
 /* return name of scaler */
@@ -211,13 +206,23 @@ SPxLeastSqSC& SPxLeastSqSC::operator=(const SPxLeastSqSC& rhs)
 
 Real SPxLeastSqSC::computeScale(Real /*mini*/, Real maxi) const
 {
-
    return maxi;
+}
+
+void SPxLeastSqSC::setRealParam(Real param, const char* name)
+{
+   assert(param >= 1.0);
+   acrcydivisor = param;
+}
+
+void SPxLeastSqSC::setIntParam(int param, const char* name)
+{
+   assert(param >= 0);
+   maxrounds = param;
 }
 
 void SPxLeastSqSC::scale(SPxLP& lp)
 {
-
    MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << std::endl; )
 
    setup(lp);
@@ -234,11 +239,11 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    int nrows = lp.nRows();
    int ncols = lp.nCols();
    int nnzeroes = lp.nNzos();
-   int maxscrounds = MAX_SCALINGROUNDS;
+   int maxscrounds = maxrounds;
 
    /* constant factor matrices */
-   SVSet facnrows(nrows, nrows, 1.1, 1.2); //TODO give memory
-   SVSet facncols(ncols, ncols, 1.1, 1.2); //TODO give memory
+   SVSet facnrows(nrows, nrows, 1.1, 1.2);
+   SVSet facncols(ncols, ncols, 1.1, 1.2);
 
    /* column scaling factor vectors */
    SSVector colscale1(ncols);
@@ -283,9 +288,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
    /* initialize scalars, vectors and matrices */
 
-   std::cout << "nrows: " << nrows << " ncols: " << ncols << "\n";
-
-   smax = TERMINATION_FACTOR * nnzeroes;
+   smax = nnzeroes / acrcydivisor;
    qcurr = 1.0;
    qprev = 0.0;
 
@@ -313,13 +316,11 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
    scurr = resncols * tmpcols.assignPWproduct4setup(colnnzeroes, resncols);
 
-   std::cout << "s(0): " << scurr  << " \n";
-
    /* conjugate gradient loop */
-   for(k = 0; k < maxscrounds; ++k )
+   for( k = 0; k < maxscrounds; ++k )
    {
       sprev = scurr;
-      std::cout << "round: " << k << " \n";
+
       // is k even?
       if( (k % 2) == 0 )
       {
@@ -339,8 +340,6 @@ void SPxLeastSqSC::scale(SPxLP& lp)
          updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr);
          scurr = resncols * (tmpcols.assignPWproduct4setup(resncols, colnnzeroes) );
       }
-
-      std::cout << "s(k+1): " << scurr  << " \n";
 
       // shift eprev entries one to the right
       for( l = 2; l > 0; --l)
@@ -374,68 +373,14 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    SSVector rowscale = *rsccurr;
    SSVector colscale = *csccurr;
 
-#if 1
-   const SVSet* vecset = lp.colSet();
-
-   Real x = 0.0;
-   for(int i = 0; i < (vecset)->num(); ++i )
-   {
-      const SVector& vec2 = (*vecset)[i];
-      SVector vec = vec2;
-
-      vec.sort();
-
-      for( int j = 0; j < vec.size(); ++j)
-      {
-
-	   assert(vec.index(j) < nrows);
-	     Real a = spxAbs(vec.value(j));
-
-         if( !isZero(a) )
-          x += pow(log2(a) -colscale[i] - rowscale[vec.index(j)], 2.0);
-
-      }
-   }
-   std::cout << "sum: " << x << "\n";
-   const SVSet* vecset2 = lp.rowSet();
-   x = 0.0;
-   for(int i = 0; i < (vecset2)->num(); ++i )
-   {
-       const SVector& vec2 = (*vecset2)[i];
-      SVector vec = vec2;
-
-      vec.sort();
-
-      for( int j = 0; j < vec.size(); ++j)
-      {
-	     assert(vec.index(j) < ncols);
-	     Real  a = spxAbs(vec.value(j));
-
-         if( !isZero(a) )
-          x += pow(log2(a) -rowscale[i] - colscale[vec.index(j)], 2.0);
-      }
-   }
-
-   std::cout << "sum2: " << x << "\n";
-
-#endif
-
-   // TODO use Ambros' approach for rounding scaling factors
    for(k = 0; k < nrows; ++k )
       m_rowscale[k] = pow(2.0, - round(rowscale[k]));
 
    for(k = 0; k < ncols; ++k )
       m_colscale[k] = pow(2.0, - round(colscale[k]));
 
-
-   std::cout << "before scaling: min= " << lp.minAbsNzo();
-   std::cout << " max= " << lp.maxAbsNzo() << "\n";
-
    // scale
    applyScaling(lp);
-
-   std::cout << "after scaling: min= " << lp.minAbsNzo();
-   std::cout << " max= " << lp.maxAbsNzo() << "\n";
 
    MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
       << " max= " << maxAbsRowscale()
@@ -444,12 +389,12 @@ void SPxLeastSqSC::scale(SPxLP& lp)
       << " max= " << maxAbsColscale()
       << std::endl; )
 
-      MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
-         << " min= " << lp.minAbsNzo()
-         << " max= " << lp.maxAbsNzo()
-         << " col-ratio= " << maxColRatio(lp)
-         << " row-ratio= " << maxRowRatio(lp)
-         << std::endl; )
-      }
+   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
+      << " min= " << lp.minAbsNzo()
+      << " max= " << lp.maxAbsNzo()
+      << " col-ratio= " << maxColRatio(lp)
+      << " row-ratio= " << maxRowRatio(lp)
+      << std::endl; )
+}
 
 } // namespace soplex

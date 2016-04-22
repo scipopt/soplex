@@ -334,6 +334,13 @@ namespace soplex
             _intParamUpper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
             _intParamDefault[SoPlex::RATFAC_MINSTALLS] = 2;
 
+            // maximum number of conjugate gradient iterations in least square scaling
+            _intParamName[SoPlex::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
+            _intParamDescription[SoPlex::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
+            _intParamLower[SoPlex::LEASTSQ_MAXROUNDS] = 0;
+            _intParamUpper[SoPlex::LEASTSQ_MAXROUNDS] = INT_MAX;
+            _intParamDefault[SoPlex::LEASTSQ_MAXROUNDS] = 50;
+
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
             _realParamDescription[SoPlex::FEASTOL] = "primal feasibility tolerance";
@@ -492,6 +499,13 @@ namespace soplex
             _realParamLower[SoPlex::REFAC_MEM_FACTOR] = 1.0;
             _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 100.0;
             _realParamDefault[SoPlex::REFAC_MEM_FACTOR] = 1.5;
+
+            // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+            _realParamName[SoPlex::LEASTSQ_ACRCY] = "leastsq_acrcy";
+            _realParamDescription[SoPlex::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
+            _realParamLower[SoPlex::LEASTSQ_ACRCY] = 1.0;
+            _realParamUpper[SoPlex::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::LEASTSQ_ACRCY] = 1000.0;
 
             _defaultsAndBoundsInitialized = true;
          }
@@ -5259,6 +5273,11 @@ namespace soplex
       case SoPlex::RATFAC_MINSTALLS:
          break;
 
+      // maximum number of conjugate gradient iterations in least square scaling
+      case SoPlex::LEASTSQ_MAXROUNDS:
+         _scaler->setIntParam(value);
+         break;
+
       default:
          return false;
       }
@@ -5378,6 +5397,11 @@ namespace soplex
          break;
 
       case SoPlex::REFAC_MEM_FACTOR:
+         break;
+
+      // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      case SoPlex::LEASTSQ_ACRCY:
+         _scaler->setRealParam(value);
          break;
 
       default:

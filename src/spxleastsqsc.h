@@ -20,20 +20,20 @@
 #define _SPXLEASTSQSC_H_
 
 #include <assert.h>
-
 #include "spxsolver.h"
-#include "dataarray.h"
-#include "spxdefines.h"
 #include "spxscaler.h"
 #include "spxlp.h"
+
+#define MAX_ROUNDS 50
+#define ACCURACY_DIVISOR 1000.0
 
 namespace soplex
 {
 /**@brief Least squares scaling.
    @ingroup Algo
 
-   This SPxScaler implementation performs least squares scaling.
-   TODO add reference to paper
+   This SPxScaler implementation performs least squares scaling as suggested by Curtis and Reid in:
+   On the Automatic Scaling of Matrices for Gaussian Elimination (1972).
 */
 class SPxLeastSqSC : public SPxScaler
 {
@@ -59,11 +59,20 @@ public:
    //@}
 
    //-------------------------------------
+   /**@name Access / modification */
+   //@{
+   /// set real param (conjugate gradient accuracy)
+   virtual void setRealParam(Real param, const char* name);
+   /// set int param (maximal conjugate gradient rounds)
+   virtual void setIntParam(int param, const char* name);
+   //@}
+
+   //-------------------------------------
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
    virtual void scale(SPxLP& lp);
-   //@}
+
 
 protected:
 
@@ -73,6 +82,9 @@ protected:
    /// Does nothing but returning \p maxi.
    virtual Real computeScale(Real /*mini*/, Real maxi) const;
    //@}
+
+   Real acrcydivisor = ACCURACY_DIVISOR;
+   int maxrounds = MAX_ROUNDS;
 
 };
 } // namespace soplex

@@ -910,8 +910,11 @@ public:
       /// minimum number of stalling refinements since last pivot to trigger rational factorization
       RATFAC_MINSTALLS = 21,
 
+      /// maximum number of conjugate gradient iterations in least square scaling
+      LEASTSQ_MAXROUNDS = 22,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 22
+      INTPARAM_COUNT = 23
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1200,17 +1203,20 @@ public:
       /// minimal reduction (sum of removed rows/cols) to continue simplification
       MINRED = 18,
 
-      // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      /// refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
       REFAC_BASIS_NNZ = 19,
 
-      // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      /// refactor threshold for fill-in in current factor update compared to fill-in in last factorization
       REFAC_UPDATE_FILL = 20,
 
-      // refactor threshold for memory growth in factorization since last refactorization
+      /// refactor threshold for memory growth in factorization since last refactorization
       REFAC_MEM_FACTOR = 21,
 
+      /// accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      LEASTSQ_ACRCY = 22,
+
       /// number of real parameters
-      REALPARAM_COUNT = 22
+      REALPARAM_COUNT = 23
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
