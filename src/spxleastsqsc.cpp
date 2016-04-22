@@ -19,6 +19,7 @@
 #include <cmath>
 #include <assert.h>
 #include <iostream> // TODO needed for debug, delete
+// TODO verify necessary includes
 #include "spxleastsqsc.h"
 #include "spxout.h"
 #include "basevectors.h"
@@ -236,8 +237,8 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    int maxscrounds = MAX_SCALINGROUNDS;
 
    /* constant factor matrices */
-   SVSet facnrows(-1,-1,1.1,1.2); //TODO give memory
-   SVSet facncols(-1,-1,1.1,1.2); //TODO give memory
+   SVSet facnrows(nrows, nrows, 1.1, 1.2); //TODO give memory
+   SVSet facncols(ncols, ncols, 1.1, 1.2); //TODO give memory
 
    /* column scaling factor vectors */
    SSVector colscale1(ncols);
@@ -294,12 +295,12 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzeroes);
    initConstVecs(lp.colSet(), facncols, collogs, colnnzeroes);
 
-   tmprows.setup();
-   tmpcols.setup();
-   rowscale1.setup();
-   rowscale2.setup();
-   colscale1.setup();
-   colscale2.setup();
+   assert(tmprows.isSetup());
+   assert(tmpcols.isSetup());
+   assert(rowscale1.isSetup());
+   assert(rowscale2.isSetup());
+   assert(colscale1.isSetup());
+   assert(colscale2.isSetup());
 
    // compute first residual vector
    resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs);
@@ -419,6 +420,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
 #endif
 
+   // TODO use Ambros' approach for rounding scaling factors
    for(k = 0; k < nrows; ++k )
       m_rowscale[k] = pow(2.0, - round(rowscale[k]));
 

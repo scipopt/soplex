@@ -33,6 +33,7 @@ namespace soplex
    @ingroup Algo
 
    This SPxScaler implementation performs least squares scaling.
+   TODO add reference to paper
 */
 class SPxLeastSqSC : public SPxScaler
 {
