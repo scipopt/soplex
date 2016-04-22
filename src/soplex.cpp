@@ -259,9 +259,9 @@ namespace soplex
 
             // type of scaler
             _intParamName[SoPlex::SCALER] = "scaler";
-            _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
+            _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)";
             _intParamLower[SoPlex::SCALER] = 0;
-            _intParamUpper[SoPlex::SCALER] = 4;
+            _intParamUpper[SoPlex::SCALER] = 5;
             _intParamDefault[SoPlex::SCALER] = SoPlex::SCALER_BIEQUI;
 
             // type of starter used to create crash basis
@@ -333,6 +333,13 @@ namespace soplex
             _intParamLower[SoPlex::RATFAC_MINSTALLS] = 0;
             _intParamUpper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
             _intParamDefault[SoPlex::RATFAC_MINSTALLS] = 2;
+
+            // maximum number of conjugate gradient iterations in least square scaling
+            _intParamName[SoPlex::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
+            _intParamDescription[SoPlex::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
+            _intParamLower[SoPlex::LEASTSQ_MAXROUNDS] = 0;
+            _intParamUpper[SoPlex::LEASTSQ_MAXROUNDS] = INT_MAX;
+            _intParamDefault[SoPlex::LEASTSQ_MAXROUNDS] = 50;
 
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
@@ -493,6 +500,13 @@ namespace soplex
             _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 100.0;
             _realParamDefault[SoPlex::REFAC_MEM_FACTOR] = 1.5;
 
+            // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+            _realParamName[SoPlex::LEASTSQ_ACRCY] = "leastsq_acrcy";
+            _realParamDescription[SoPlex::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
+            _realParamLower[SoPlex::LEASTSQ_ACRCY] = 1.0;
+            _realParamUpper[SoPlex::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::LEASTSQ_ACRCY] = 1000.0;
+
             _defaultsAndBoundsInitialized = true;
          }
 
@@ -584,6 +598,7 @@ namespace soplex
       , _scalerBiequi(true)
       , _scalerGeo1(1)
       , _scalerGeo8(8)
+      , _scalerLeastsq()
       , _simplifier(0)
       , _scaler(0)
       , _starter(0)
@@ -600,6 +615,7 @@ namespace soplex
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
       _scalerGeo8.setOutstream(spxout);
+      _scalerLeastsq.setOutstream(spxout);
 
       // give lu factorization to solver
       _solver.setSolver(&_slufactor);
@@ -648,6 +664,7 @@ namespace soplex
          _scalerBiequi = rhs._scalerBiequi;
          _scalerGeo1 = rhs._scalerGeo1;
          _scalerGeo8 = rhs._scalerGeo8;
+         _scalerLeastsq = rhs._scalerLeastsq;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
@@ -680,6 +697,7 @@ namespace soplex
          _scalerBiequi.setOutstream(spxout);
          _scalerGeo1.setOutstream(spxout);
          _scalerGeo8.setOutstream(spxout);
+         _scalerLeastsq.setOutstream(spxout);
 
          // transfer the lu solver
          _solver.setSolver(&_slufactor);
@@ -5082,6 +5100,9 @@ namespace soplex
          case SCALER_GEO8:
             _scaler = &_scalerGeo8;
             break;
+         case SCALER_LEASTSQ:
+            _scaler = &_scalerLeastsq;
+            break;
          default:
             return false;
          }
@@ -5252,6 +5273,11 @@ namespace soplex
       case SoPlex::RATFAC_MINSTALLS:
          break;
 
+      // maximum number of conjugate gradient iterations in least square scaling
+      case SoPlex::LEASTSQ_MAXROUNDS:
+         _scaler->setIntParam(value);
+         break;
+
       default:
          return false;
       }
@@ -5371,6 +5397,11 @@ namespace soplex
          break;
 
       case SoPlex::REFAC_MEM_FACTOR:
+         break;
+
+      // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      case SoPlex::LEASTSQ_ACRCY:
+         _scaler->setRealParam(value);
          break;
 
       default:
@@ -7128,6 +7159,9 @@ namespace soplex
          break;
       case SCALER_GEO8:
          _scaler = &_scalerGeo8;
+         break;
+      case SCALER_LEASTSQ:
+         _scaler = &_scalerLeastsq;
          break;
       default:
          break;

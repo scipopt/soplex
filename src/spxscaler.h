@@ -90,17 +90,21 @@ public:
    //-------------------------------------
    /**@name Access / modification */
    //@{
-   /// get name of scaler.
+   /// get name of scaler
    virtual const char* getName() const;
-   /// set scaling order.
+   /// set scaling order
    virtual void setOrder(bool colFirst); 
-   /// set wether column and row scaling should be performed.
+   /// set wether column and row scaling should be performed
    virtual void setBoth(bool both); 
    /// set message handler
    virtual void setOutstream(SPxOut& newOutstream)
    {
       spxout = &newOutstream;
    }
+   /// set real parameter
+   virtual void setRealParam(Real param, const char* name = "realparam");
+   /// set int parameter
+   virtual void setIntParam(int param, const char* name = "intparam");
    //@}
 
    //-------------------------------------
