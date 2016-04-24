@@ -30,10 +30,10 @@ namespace soplex
 In the entering simplex algorithms (i.e. iteratively a vector is selected to
 \em enter the simplex basis as in the dual rowwise and primal columnwise case)
 let $A$ denote the current basis, $x$ and entering vector and $f$ the
-feasibility vector. For a feasible basis $l \le f \le u$ holds.  
-For the rowwise case $f$ is obtained by solving $f^T = c^T A^{-1}$, 
+feasibility vector. For a feasible basis $l \le f \le u$ holds.
+For the rowwise case $f$ is obtained by solving $f^T = c^T A^{-1}$,
 wherease in columnwisecase $f = A^{-1} b$.
- 
+
 Let us further consider the rowwise case. Exchanging $x$ with the $i$-th
 vector of $A$ yields
 
@@ -41,7 +41,7 @@ vector of $A$ yields
     A^{(i)} = E_i A \hbox{, with } E_i = I + e_i (x^T A^{-1} - e_i^T).
 \end{equation}
 
-With $E_i^{-1} = I + e_i \frac{e_i^T - \delta^T}{\delta}$, 
+With $E_i^{-1} = I + e_i \frac{e_i^T - \delta^T}{\delta}$,
 $\delta^T = x^T A^{-1}$ one gets the new feasibility vector
 
 \begin{eqnarray*}
@@ -205,7 +205,7 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
       if (x < 0)
          return x;
       // no break: next is else case
-      //lint -fallthrough 
+      //lint -fallthrough
    case SPxBasis::Desc::D_ON_LOWER:
       assert(rep() == ROW);
       return SPxLP::upper(i) - (*theCoPvec)[i];
@@ -1088,7 +1088,7 @@ void SPxSolver::computeDualfarkas4Row(Real direction, SPxId enterId)
 }
 
 
-bool SPxSolver::enter(SPxId& enterId)
+bool SPxSolver::enter(SPxId& enterId, bool polish)
 {
    assert(enterId.isValid());
    assert(type() == ENTER);
@@ -1130,7 +1130,7 @@ bool SPxSolver::enter(SPxId& enterId)
    // is setup (i.e. the indices of the NZEs are stored within it) and there are
    // 0 NZEs (???).
    // In that case theFvec->delta() is set such that
-   //   Base * theFvec->delta() = enterVec 
+   //   Base * theFvec->delta() = enterVec
    if (theFvec->delta().isSetup() && theFvec->delta().size() == 0)
       SPxBasis::solve4update(theFvec->delta(), *enterVec);
 #ifdef ENABLE_ADDITIONAL_CHECKS
@@ -1182,7 +1182,7 @@ bool SPxSolver::enter(SPxId& enterId)
       if (spxAbs(leaveVal) < entertol())
       {
          if (NE(theUBbound[leaveIdx], theLBbound[leaveIdx])
-            && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
+            && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE)
             m_numCycle++;
       }
       else
@@ -1351,13 +1351,13 @@ bool SPxSolver::enter(SPxId& enterId)
       MSG_DEBUG( std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl; )
    }
    /*  No variable could be selected to leave the basis and even the entering
-       variable is unbounded --- this is a failure.  
+       variable is unbounded --- this is a failure.
     */
    else
    {
       /* The following line originally was in the "lastUpdate() > 1" case;
          we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
-         basis descriptor at the correct size. 
+         basis descriptor at the correct size.
        */
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);

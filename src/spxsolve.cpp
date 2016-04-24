@@ -308,8 +308,8 @@ SPxSolver::Status SPxSolver::solve()
             {
                // we are not infeasible and have no shift
                if (  shift() <= epsilon()
-                  && ( SPxBasis::status() == SPxBasis::REGULAR 
-                     || SPxBasis::status() == SPxBasis::DUAL 
+                  && ( SPxBasis::status() == SPxBasis::REGULAR
+                     || SPxBasis::status() == SPxBasis::DUAL
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   Real newpricertol = minpricertol;
@@ -552,13 +552,13 @@ SPxSolver::Status SPxSolver::solve()
             if (leaveNum < 0 && instableLeaveNum >= 0 && lastUpdate() == 0)
             {
                /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
-                  that this is due to the scaling of theCoTest[...]. Thus, we use 
+                  that this is due to the scaling of theCoTest[...]. Thus, we use
                   instableLeaveNum and SPxFastRT::selectEnter shall accept even an instable
                   entering variable. */
                MSG_INFO3( (*spxout),
                   (*spxout) << " --- trying instable leave iteration" << std::endl;
                )
-            
+
                leaveNum = instableLeaveNum;
                instableLeave = true;
                // we also need to reset the fTest() value for getLeaveVals()
@@ -585,8 +585,8 @@ SPxSolver::Status SPxSolver::solve()
             {
                // we are not infeasible and have no shift
                if (  shift() <= epsilon()
-                  && (  SPxBasis::status() == SPxBasis::REGULAR 
-                     || SPxBasis::status() == SPxBasis::DUAL 
+                  && (  SPxBasis::status() == SPxBasis::REGULAR
+                     || SPxBasis::status() == SPxBasis::DUAL
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   Real newpricertol = minpricertol;
@@ -931,7 +931,7 @@ SPxSolver::Status SPxSolver::solve()
       for(int row = 0; row < nRows(); ++row )
       {
          const SVector& rowvec = rowVector( row );
-         val = 0.0;         
+         val = 0.0;
          for( c = 0; c < rowvec.size(); ++c )
             val += rowvec.value( c ) * sol[rowvec.index( c )];
 
@@ -950,7 +950,7 @@ SPxSolver::Status SPxSolver::solve()
             {
                // find basis variable
                for( c = 0; c < nRows(); ++c )
-                  if (basis().baseId(c).isSPxRowId()     
+                  if (basis().baseId(c).isSPxRowId()
                      && (number(basis().baseId(c)) == row))
                      break;
 
@@ -979,7 +979,7 @@ SPxSolver::Status SPxSolver::solve()
             if( type() == LEAVE && isColBasic( col ) )
             {
                for( c = 0; c < nRows() ; ++c)
-                  if ( basis().baseId( c ).isSPxColId()    
+                  if ( basis().baseId( c ).isSPxColId()
                      && ( number( basis().baseId( c ) ) == col ))
                      break;
 
@@ -1019,15 +1019,41 @@ void SPxSolver::performSolutionPolishing()
    MSG_INFO3( (*spxout),
       (*spxout) << " --- perform solution polishing" << std::endl; )
 
-   setType(LEAVE);
+   setType(ENTER);
    init();
    thepricer->setType(type());
    theratiotester->setType(type());
+   const SPxBasis::Desc& ds = desc();
+   SPxBasis:Desc::Status stat;
+   SPxId rowId;
 
    // identify all current pivot candidates
    for( int i = 0; i < dim(); ++i )
    {
-      // only look for variables
+      // only look for non-basic slack variables, i.e. rows
+      stat = ds.coStatus(i);
+      if( isBasic(stat) )
+         continue;
+
+      Real redcost = coTest(i, stat);
+
+      // only look for rows with 0 reduced costs
+      if( NErel(redcost, 0) )
+         continue;
+
+      rowId = coId(i);
+
+      MSG_INFO3( (*spxout), (*spxout) << "trying " << rowId << std::endl; )
+      success = enter(rowId, true);
+
+      if( success )
+      {
+         MSG_INFO1( (*spxout),
+            (*spxout) << "successfully removed a variable from the basis" << std::endl; )
+      }
+
+      assert(EQrel(objVal, value(), leavetol()));
+
       SPxId columnId = baseId(i);
       if( columnId.isSPxColId() )
       {
@@ -1182,7 +1208,7 @@ bool SPxSolver::terminate()
 #ifdef ENABLE_ADDITIONAL_CHECKS
       DVector cr(*theCoPrhs);
       DVector fr(*theFrhs);
-#endif 
+#endif
 
       if (type() == ENTER)
          computeEnterCoPrhs();
@@ -1250,7 +1276,7 @@ bool SPxSolver::terminate()
    //   We want stop the solving process if
    //   objLimit <= current objective value of the DUAL LP
    // - MAXIMIZATION Problem
-   //   We want stop the solving process if 
+   //   We want stop the solving process if
    //   objLimit >= current objective value of the DUAL LP
    if (objLimit < infinity && type() * rep() > 0)
    {
@@ -1338,7 +1364,7 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
 
    assert(isInitialized());
 
-   if (!isInitialized()) 
+   if (!isInitialized())
    {
       /* exit if presolving/simplifier cleared the problem */
       if (status() == NO_PROBLEM)
@@ -1371,7 +1397,7 @@ SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
 
    if (!isInitialized())
    {
-      throw SPxStatusException("XSOLVE09 No Problem loaded");    
+      throw SPxStatusException("XSOLVE09 No Problem loaded");
       // return NOT_INIT;
    }
 
@@ -1605,7 +1631,7 @@ SPxSolver::Status SPxSolver::status() const
 {
    switch( m_status )
    {
-   case UNKNOWN :      
+   case UNKNOWN :
       switch (SPxBasis::status())
       {
       case SPxBasis::NO_PROBLEM :
@@ -1625,7 +1651,7 @@ SPxSolver::Status SPxSolver::status() const
       default:
          return ERROR;
       }
-   case SINGULAR : 
+   case SINGULAR :
       return m_status;
    case OPTIMAL :
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );

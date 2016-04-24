@@ -221,7 +221,7 @@ public:
    ///
    virtual void load(SPxSolver* solver);
    ///
-   virtual int selectLeave(Real& val, Real);
+   virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
    virtual SPxId selectEnter(Real& val, int, bool polish = false);
    ///
