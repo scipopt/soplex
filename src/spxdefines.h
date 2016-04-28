@@ -144,25 +144,25 @@ typedef long double Real;
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-12
+#define DEFAULT_BND_VIOL   1e-12L
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-28
+#define DEFAULT_EPS_ZERO   1e-28L
 #endif
 /// epsilon for factorization
 #ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-30
+#define DEFAULT_EPS_FACTOR 1e-30L
 #endif
 /// epsilon for factorization update
 #ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-26
+#define DEFAULT_EPS_UPDATE 1e-26L
 #endif
 #ifndef DEFAULT_EPS_PIVOT
-#define DEFAULT_EPS_PIVOT 1e-20
+#define DEFAULT_EPS_PIVOT 1e-20L
 #endif
 ///
-#define DEFAULT_INFINITY   1e100
+#define DEFAULT_INFINITY   1e100L
 
 
 #else

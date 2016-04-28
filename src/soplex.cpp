@@ -5651,7 +5651,7 @@ namespace soplex
       // stop timing
       _statistics->readingTime->stop();
 
-      return !readError && !parseError;
+      return !readError;
    }
 
    /// parses one setting string and returns true on success

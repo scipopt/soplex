@@ -399,7 +399,7 @@ SPxSolver::Status SPxSolver::solve()
              */
             if( lastEntered().isValid() )
                enterCycleCount = 0;
-            else
+            else if( basis().status() != SPxBasis::INFEASIBLE )
             {
                enterCycleCount++;
                if( enterCycleCount > MAXCYCLES )
@@ -421,7 +421,7 @@ SPxSolver::Status SPxSolver::solve()
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-            if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
+            if( (iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasis::INFEASIBLE )
             {
                if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
@@ -675,7 +675,7 @@ SPxSolver::Status SPxSolver::solve()
              */
             if( lastIndex() >= 0 )
                leaveCycleCount = 0;
-            else
+            else if( basis().status() != SPxBasis::INFEASIBLE)
             {
                leaveCycleCount++;
                if( leaveCycleCount > MAXCYCLES )
@@ -696,7 +696,7 @@ SPxSolver::Status SPxSolver::solve()
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-            if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
+            if( (iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasis::INFEASIBLE )
             {
                if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {

@@ -1,4 +1,4 @@
-CPPFLAGS	+=	-m64
+CPPFLAGS	+=	-m64 -D_WIN64
 LDFLAGS		+=	-m64
 
 ifneq ($(OPT),opt-gccold)
