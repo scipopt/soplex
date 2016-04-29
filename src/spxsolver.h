@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -26,6 +26,7 @@
 
 #include "spxdefines.h"
 #include "timer.h"
+#include "timerfactory.h"
 #include "spxlp.h"
 #include "spxbasis.h"
 #include "array.h"
@@ -33,7 +34,8 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
-#define HYPERPRICINGFACTOR       10       /**< do hyper pricing only if problem size is larger than HYPERPRICINGFACTOR * maxUpdates */
+#define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
+#define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
 #define SPARSITYFACTOR           0.6      /**< percentage of infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorizations until sparsity is tested again */
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
@@ -82,8 +84,6 @@ class SPxSolver : public SPxLP, protected SPxBasis
    friend class SoPlexLegacy;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
-   friend class SPxSteepPR;  // this is necessary to make getMaxUpdates() accessible
-   friend class SPxDevexPR;  //
 
 public:
 
@@ -217,7 +217,8 @@ private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
-   Timer          theTime;     ///< time spent in last call to method solve()
+   Timer*         theTime;     ///< time spent in last call to method solve()
+   Timer::TYPE    timerType;   ///< type of timer (user or wallclock)
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
    int            maxIters;    ///< maximum allowed iterations.
    Real           maxTime;     ///< maximum allowed time.
@@ -225,6 +226,14 @@ private:
    long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
    Real           objLimit;    ///< objective value limit.
    Status         m_status;    ///< status of algorithm.
+
+   Real           m_nonbasicValue;         ///< nonbasic part of current objective value
+   bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
+
+   Real           m_pricingViol;             ///< maximal feasibility violation of current solution
+   bool           m_pricingViolUpToDate;     ///< true, if the stored violation is up to date
+   Real           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
+   bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
 
    Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm
@@ -234,13 +243,13 @@ private:
    int            m_numCycle;  ///< actual number of degenerate steps so far.
    bool           initialized; ///< true, if all vectors are setup.
 
-   Vector*        solveVector2;      ///< when 2 systems are to solve at a time
-   SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
-   Vector*        solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-   Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
-   SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
-   Vector*        coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    SSVector*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
    bool           freePricer;        ///< true iff thepricer should be freed inside of object
@@ -264,6 +273,7 @@ private:
    int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
+
    //@}
 
 protected:
@@ -339,6 +349,9 @@ protected:
 
 public:
 
+   /// The random number generator used throughout the whole computation. Its seed can be modified.
+   Random random;
+
    /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables;
     *  for the entering Simplex algorithm this vector contains the indices of infeasible slack variables.
     */
@@ -369,7 +382,33 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
+   SPxOut* spxout;                     ///< message handler
+
    //-----------------------------
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+      SPxLP::spxout = &newOutstream;
+   }
+
+   /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+   void setNonzeroFactor( Real f )
+   {
+      SPxBasis::nonzeroFactor = f;
+   }
+
+   /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+   void setFillFactor( Real f )
+   {
+      SPxBasis::fillFactor = f;
+   }
+
+   /// set refactor threshold for memory growth in current factor update compared to the last factorization
+   void setMemFactor( Real f )
+   {
+      SPxBasis::memFactor = f;
+   }
+
    /**@name Access */
    //@{
    /// return the version of SPxSolver as number like 123 for 1.2.3
@@ -517,7 +556,19 @@ public:
    /**@return Objective value of the current solution vector
     *         (see #getPrimal()).
     */
-   virtual Real value() const;
+   virtual Real value();
+
+   // update nonbasic part of the objective value by the given amount
+   /**@return whether nonbasic part of objective is reliable
+    */
+   bool updateNonbasicValue(Real objChange);
+
+   // trigger a recomputation of the nonbasic part of the objective value
+   void forceRecompNonbasicValue()
+   {
+      m_nonbasicValue = 0.0;
+      m_nonbasicValueUpToDate = false;
+   }
 
 #if 0
    /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics
@@ -686,6 +737,19 @@ public:
    void setOpttol(Real d);
    /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
    void setDelta(Real d);
+   /// set timing type
+   void setTiming(Timer::TYPE ttype)
+   {
+      theTime = TimerFactory::switchTimer(theTime, ttype);
+      timerType = ttype;
+   }
+   /// set timing type
+   Timer::TYPE getTiming()
+   {
+      assert(timerType == theTime->type());
+      return timerType;
+   }
+
    /// set display frequency
    void setDisplayFreq(int freq)
    {
@@ -774,6 +838,15 @@ public:
       changeObj(number(p_id), p_newVal);
    }
    ///
+   virtual void changeMaxObj(const Vector& newObj);
+   ///
+   virtual void changeMaxObj(int i, const Real& newVal);
+   ///
+   virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal)
+   {
+      changeMaxObj(number(p_id), p_newVal);
+   }
+   ///
    virtual void changeRowObj(const Vector& newObj);
    ///
    virtual void changeRowObj(int i, const Real& newVal);
@@ -789,6 +862,8 @@ public:
       unInit();
    }
    ///
+   virtual void changeLowerStatus(int i, Real newLower, Real oldLower = 0.0);
+   ///
    virtual void changeLower(const Vector& newLower);
    ///
    virtual void changeLower(int i, const Real& newLower);
@@ -797,6 +872,8 @@ public:
    {
       changeLower(number(p_id), p_newLower);
    }
+   ///
+   virtual void changeUpperStatus(int i, Real newUpper, Real oldLower = 0.0);
    ///
    virtual void changeUpper(const Vector& newUpper);
    ///
@@ -817,6 +894,8 @@ public:
       changeBounds(number(p_id), p_newLower, p_newUpper);
    }
    ///
+   virtual void changeLhsStatus(int i, Real newLhs, Real oldLhs = 0.0);
+   ///
    virtual void changeLhs(const Vector& newLhs);
    ///
    virtual void changeLhs(int i, const Real& newLhs);
@@ -825,6 +904,8 @@ public:
    {
       changeLhs(number(p_id), p_newLhs);
    }
+   ///
+   virtual void changeRhsStatus(int i, Real newRhs, Real oldRhs = 0.0);
    ///
    virtual void changeRhs(const Vector& newRhs);
    ///
@@ -1453,11 +1534,11 @@ private:
    ///
    Real perturbMin(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    ///
    Real perturbMax(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
    //------------------------------------
@@ -1487,7 +1568,7 @@ public:
     *  performance advantages over solving the two linear systems
     *  seperately.
     */
-   void setup4solve(Vector* p_y, SSVector* p_rhs)
+   void setup4solve(SSVector* p_y, SSVector* p_rhs)
    {
       assert(type() == LEAVE);
       solveVector2    = p_y;
@@ -1501,7 +1582,7 @@ public:
     *  other system. Solving several linear system at a time has
     *  performance advantages over solving them seperately.
     */
-   void setup4solve2(Vector* p_y2, SSVector* p_rhs2)
+   void setup4solve2(SSVector* p_y2, SSVector* p_rhs2)
    {
       assert(type() == LEAVE);
       solveVector3    = p_y2;
@@ -1515,7 +1596,7 @@ public:
     *  performance advantages over solving the two linear systems
     *  seperately.
     */
-   void setup4coSolve(Vector* p_y, SSVector* p_rhs)
+   void setup4coSolve(SSVector* p_y, SSVector* p_rhs)
    {
       assert(type() == ENTER);
       coSolveVector2    = p_y;
@@ -1527,7 +1608,7 @@ public:
     *  call to SPxRatioTester. The system will be solved along
     *  with two other systems.
     */
-   void setup4coSolve2(Vector* p_z, SSVector* p_rhs)
+   void setup4coSolve2(SSVector* p_z, SSVector* p_rhs)
    {
       assert(type() == ENTER);
       coSolveVector3    = p_z;
@@ -1542,6 +1623,11 @@ public:
     *  solution.
     */
    virtual Real maxInfeas() const;
+
+   /// check for violations above tol and immediately return false w/o checking the remaining values
+   /** This method is useful for verifying whether an objective limit can be used as termination criterion
+    */
+   virtual bool noViols(Real tol) const;
 
    /// Return current basis.
    /**@note The basis can be used to solve linear systems or use
@@ -1662,7 +1748,7 @@ protected:
    ///
    virtual void computeFrhs1(const Vector&, const Vector&);
    ///
-   void computeFrhs2(const Vector&, const Vector&);
+   void computeFrhs2(Vector&, Vector&);
    /// compute \ref soplex::SPxSolver::theCoPrhs "theCoPrhs" for entering Simplex.
    virtual void computeEnterCoPrhs();
    ///
@@ -1681,7 +1767,7 @@ protected:
     *  the objective value resulting form nonbasic variables for #COLUMN
     *  Representation.
     */
-   Real nonbasicValue() const;
+   Real nonbasicValue();
 
    /// Get pointer to the \p id 'th vector
    virtual const SVector* enterVector(const SPxId& p_id)
@@ -1693,21 +1779,21 @@ protected:
    ///
    virtual void getLeaveVals(int i,
       SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
-      Real& leaveMax, Real& leavebound, int& leaveNum);
+      Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
    ///
    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
       Real& enterBound, Real& newUBbound,
-      Real& newLBbound, Real& newCoPrhs);
+      Real& newLBbound, Real& newCoPrhs, Real& objChange);
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
       Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO);
+      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
    ///
-   virtual void getEnterVals2(int leaveIdx, 
-      Real enterMax, Real& leaveBound);
+   virtual void getEnterVals2(int leaveIdx,
+      Real enterMax, Real& leaveBound, Real& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
-      Real leaveVal, const SVector& vec);
+      Real leaveVal, const SVector& vec, Real& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
       Real enterTest, SPxBasis::Desc::Status enterStat);
@@ -1757,6 +1843,21 @@ protected:
    virtual void setLeaveBounds();
    //@}
 
+   //------------------------------------
+   /** Compute the primal ray or the farkas proof in case of unboundedness
+    *  or infeasibility.
+    */
+   //@{
+   ///
+   void computePrimalray4Col(Real direction, SPxId enterId);
+   ///
+   void computePrimalray4Row(Real direction);
+   ///
+   void computeDualfarkas4Col(Real direction);
+   ///
+   void computeDualfarkas4Row(Real direction, SPxId enterId);
+   //@}
+
 public:
 
    //------------------------------------
@@ -1775,7 +1876,7 @@ public:
    /// return objective limit.
    virtual Real terminationValue() const;
    /// get objective value of current solution.
-   virtual Real objValue() const
+   virtual Real objValue()
    {
       return value();
    }
@@ -1783,7 +1884,7 @@ public:
    Status 
    getResult( Real* value = 0, Vector* primal = 0,
               Vector* slacks = 0, Vector* dual = 0, 
-              Vector* reduCost = 0) const;
+              Vector* reduCost = 0);
 
 protected:
 
@@ -1829,6 +1930,16 @@ public:
          m_status = UNKNOWN;
       SPxBasis::setStatus( stat );
    }
+
+   /// get number of dual norms
+   void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
+
+   /// get dual norms
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+
+   /// set dual norms
+   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
+
    /// reset cumulative time counter to zero.
    void resetCumulativeTime()
    {
@@ -1863,7 +1974,7 @@ public:
    /// time spent in last call to method solve().
    Real time() const
    {
-      return theTime.userTime();
+      return theTime->time();
    }
 
    /// returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
@@ -1949,7 +2060,8 @@ public:
    /// default constructor.
    explicit
    SPxSolver( Type            type  = LEAVE, 
-              Representation  rep   = ROW  );
+              Representation  rep   = ROW,
+              Timer::TYPE     ttype = Timer::USER_TIME);
    // virtual destructor
    virtual ~SPxSolver();
    //@}

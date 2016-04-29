@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -31,13 +31,16 @@
 #define _SPXDEFINES_H_
 
 #include <math.h>
+#ifdef _MSC_VER
+#include <float.h>
+#endif
 
 
 
 namespace soplex
 {
-#define SOPLEX_VERSION         200
-#define SOPLEX_SUBVERSION        2
+#define SOPLEX_VERSION         221
+#define SOPLEX_SUBVERSION        1
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -55,15 +58,15 @@ namespace soplex
    @param  expr    Expression that must be satisfied.
 */
 #if defined (NDEBUG) && defined (WITH_WARNINGS)
-#define ASSERT_WARN( prefix, expr )              \
-   if ( !( expr ) )                                                     \
-      {                                                                 \
-         MSG_WARNING( spxout                                            \
-                      << prefix                                         \
-                      << " failed assertion on line " << __LINE__       \
-                      << " in file " << __FILE__ << ": "                \
-                      << #expr                                          \
-                      << std::endl; );                                  \
+#define ASSERT_WARN( prefix, expr )                        \
+   if ( !( expr ) )                                        \
+      {                                                    \
+         std::cerr                                         \
+         << prefix                                         \
+         << " failed assertion on line " << __LINE__       \
+         << " in file " << __FILE__ << ": "                \
+         << #expr                                          \
+         << std::endl;                                     \
       }
 #else // just a normal assert
 #define ASSERT_WARN( prefix, expr ) ( assert( expr ) )
@@ -77,36 +80,41 @@ namespace soplex
  */
 
 /**
-   Executes \p do_something with verbosity level \p verbosity, resetting
+   Prints/Executes \p stream with verbosity level \p verbosity, resetting
    the old verbosity level afterwards.
-   Usually the parameter \p do_something prints something out.
+   Usually the parameter \p stream prints something out.
    This is an internal define used by MSG_ERROR, MSG_WARNING, etc.
 */
 #ifdef DISABLE_VERBOSITY
-#define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) {}
+#define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) {}
+#define DO_WITH_ERR_VERBOSITY( do_something ) {}
 #else
-#define DO_WITH_TMP_VERBOSITY( verbosity, do_something ) \
-   {                                                     \
-     if( verbosity <= Param::verbose() )                 \
-     {                                                   \
-        const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
-        spxout.setVerbosity( verbosity );                \
-        do_something;                                    \
-        spxout.setVerbosity( old_verbosity );            \
-     }                                                   \
+#define DO_WITH_TMP_VERBOSITY( verbosity, spxout, do_something ) \
+   {                                                             \
+     if( &spxout != NULL )                                       \
+     {                                                           \
+        if( verbosity <= spxout.getVerbosity() )                 \
+        {                                                        \
+           const SPxOut::Verbosity  old_verbosity = spxout.getVerbosity(); \
+           spxout.setVerbosity( verbosity );                     \
+           do_something;                                         \
+           spxout.setVerbosity( old_verbosity );                 \
+        }                                                        \
+     }                                                           \
    }
+#define DO_WITH_ERR_VERBOSITY( do_something ) { do_something; }
 #endif
 
 /// Prints out message \p x if the verbosity level is at least SPxOut::ERROR.
-#define MSG_ERROR(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::ERROR,    x ) }
+#define MSG_ERROR(x)            { DO_WITH_ERR_VERBOSITY( x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::WARNING.
-#define MSG_WARNING(x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING,  x ) }
+#define MSG_WARNING(spxout, x)  { DO_WITH_TMP_VERBOSITY( SPxOut::WARNING, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO1.
-#define MSG_INFO1(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, x ) }
+#define MSG_INFO1(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO1, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO2.
-#define MSG_INFO2(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, x ) }
+#define MSG_INFO2(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO2, spxout, x ) }
 /// Prints out message \p x if the verbosity level is at least SPxOut::INFO3.
-#define MSG_INFO3(x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, x ) }
+#define MSG_INFO3(spxout, x)    { DO_WITH_TMP_VERBOSITY( SPxOut::INFO3, spxout, x ) }
 
 extern bool msginconsistent(const char* name, const char* file, int line);
 
@@ -114,7 +122,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 
 #if defined(SOPLEX_DEBUG)
 // print output in any case, regardless of Param::verbose():
-#define MSG_DEBUG(x) { DO_WITH_TMP_VERBOSITY( SPxOut::DEBUG, x ) }
+#define MSG_DEBUG(x) { x; }
 #else
 #define MSG_DEBUG(x) /**/
 #endif //!SOPLEX_DEBUG
@@ -214,12 +222,10 @@ typedef double Real;
 #endif
 #define DEFAULT_INFINITY   1e100
 
-
-
-
-
 #endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
+
+#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 extern const Real infinity;
 
@@ -238,8 +244,6 @@ private:
    static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
    static Real s_epsilon_pivot;
-   /// verbosity level
-   static int  s_verbose;
    //@}
 
 public:
@@ -275,27 +279,84 @@ public:
       }
       ///
    static void setEpsilonPivot(Real eps);
-   /// returns verbosity level
-   inline static int verbose()
-   {
-      return s_verbose;
-   }
-   /// sets verbosity level
-   static void setVerbose(int p_verbose);
    //@}
 };
 
+#ifdef WITH_LONG_DOUBLE
 /// returns |a|
-inline Real abs(Real a)
+inline Real spxAbs(Real a)
+{
+   return fabsl(a);
+}
+
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+   return sqrtl(a);
+}
+
+// returns the next representable value after x in the direction of y
+#ifndef SOPLEX_LEGACY
+inline Real spxNextafter(Real x, Real y)
+{
+   return nextafterl(x,y);
+}
+#endif
+
+/// returns x * 2^exp
+inline Real spxLdexp(Real x, int exp)
+{
+   return ldexpl(x,exp);
+}
+
+// returns x and exp such that y = x * 2^exp
+inline Real spxFrexp(Real y, int* exp)
+{
+   return frexpl(y, exp);
+}
+#else
+/// returns |a|
+inline Real spxAbs(Real a)
 {
    return fabs(a);
 }
 
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+   return sqrt(a);
+}
+
+// returns the next representable value after x in the direction of y
+#ifndef SOPLEX_LEGACY
+inline Real spxNextafter(Real x, Real y)
+{
+#ifndef _MSC_VER
+   return nextafter(x,y);
+#else
+   return _nextafter(x,y);
+#endif
+}
+#endif
+
+/// returns x * 2^exp
+inline Real spxLdexp(Real x, int exp)
+{
+   return ldexp(x,exp);
+}
+
+// returns x and exp such that y = x * 2^exp
+inline Real spxFrexp(Real y, int* exp)
+{
+   return frexp(y, exp);
+}
+#endif
+
 /// returns max(|a|,|b|)
 inline Real maxAbs(Real a, Real b)
 {
-   const Real absa = fabs(a);
-   const Real absb = fabs(b);
+   const Real absa = spxAbs(a);
+   const Real absb = spxAbs(b);
 
    return absa > absb ? absa : absb;
 }
@@ -309,13 +370,13 @@ inline Real relDiff(Real a, Real b)
 /// returns \c true iff |a-b| <= eps
 inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(a - b) <= eps;
+   return spxAbs(a - b) <= eps;
 }
 
 /// returns \c true iff |a-b| > eps
 inline bool NE(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(a - b) > eps;
+   return spxAbs(a - b) > eps;
 }
 
 /// returns \c true iff a < b + eps
@@ -345,25 +406,25 @@ inline bool GE(Real a, Real b, Real eps = Param::epsilon())
 /// returns \c true iff |a| <= eps
 inline bool isZero(Real a, Real eps = Param::epsilon())
 {
-   return fabs(a) <= eps;
+   return spxAbs(a) <= eps;
 }
 
 /// returns \c true iff |a| > eps
 inline bool isNotZero(Real a, Real eps = Param::epsilon())
 {
-   return fabs(a) > eps;
+   return spxAbs(a) > eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| <= eps
 inline bool EQrel(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(relDiff(a, b)) <= eps;
+   return spxAbs(relDiff(a, b)) <= eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| > eps
 inline bool NErel(Real a, Real b, Real eps = Param::epsilon())
 {
-   return fabs(relDiff(a, b)) > eps;
+   return spxAbs(relDiff(a, b)) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= -eps

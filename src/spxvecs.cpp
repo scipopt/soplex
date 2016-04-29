@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -64,7 +64,7 @@ void SPxSolver::computeFrhs()
                case SPxBasis::Desc::P_FREE :
                   continue;
 
-               case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
+               case (SPxBasis::Desc::P_FIXED) :
                   assert(lhs(i) == rhs(i));
                   //lint -fallthrough
                case SPxBasis::Desc::P_ON_UPPER :
@@ -75,7 +75,7 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR( spxout << "ESVECS01 ERROR: "
+                  MSG_ERROR( std::cerr << "ESVECS01 ERROR: "
                                     << "inconsistent basis must not happen!" 
                                     << std::endl; )
                   throw SPxInternalCodeException("XSVECS01 This should never happen.");
@@ -123,12 +123,12 @@ void SPxSolver::computeFrhs()
 
                case SPxBasis::Desc::D_ON_UPPER :
                case SPxBasis::Desc::D_ON_LOWER :
-               case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+               case (SPxBasis::Desc::D_ON_BOTH) :
                   x = maxRowObj(i);
                   break;
 
                default:
-                  MSG_ERROR( spxout << "ESVECS04 ERROR: "
+                  MSG_ERROR( std::cerr << "ESVECS04 ERROR: "
                      << "inconsistent basis must not happen!"
                      << std::endl; )
                      throw SPxInternalCodeException("XSVECS06 This should never happen.");
@@ -165,7 +165,7 @@ void SPxSolver::computeFrhsXtra()
          case SPxBasis::Desc::P_FREE :
             continue;
 
-         case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
+         case (SPxBasis::Desc::P_FIXED) :
             assert(SPxLP::lower(i) == SPxLP::upper(i));
             //lint -fallthrough
          case SPxBasis::Desc::P_ON_UPPER :
@@ -176,7 +176,7 @@ void SPxSolver::computeFrhsXtra()
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS02 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS02 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS02 This should never happen.");
@@ -226,14 +226,14 @@ void SPxSolver::computeFrhs1(
             x = lfb[i];
             break;
 
-         case (SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER) :
+         case (SPxBasis::Desc::P_FIXED) :
             assert(lfb[i] == ufb[i]);
-         case (SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER) :
+         case (SPxBasis::Desc::D_ON_BOTH) :
             x = lfb[i];
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS03 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS03 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS04 This should never happen.");
@@ -252,8 +252,8 @@ void SPxSolver::computeFrhs1(
     \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
  */
 void SPxSolver::computeFrhs2(
-   const Vector& coufb,   ///< upper feasibility bound for covariables
-   const Vector& colfb)   ///< lower feasibility bound for covariables
+   Vector& coufb,   ///< upper feasibility bound for covariables
+   Vector& colfb)   ///< lower feasibility bound for covariables
 {
    const SPxBasis::Desc& ds = desc();
 
@@ -285,16 +285,23 @@ void SPxSolver::computeFrhs2(
 
             if (colfb[i] != coufb[i])
             {
-               MSG_WARNING( spxout << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
+               MSG_WARNING( (*spxout), (*spxout) << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
                                    << colfb[i] << " " << coufb[i]
                                    << " shouldn't be" << std::endl; )
+               if( colfb[i] == 0.0 || coufb[i] == 0.0 )
+                  colfb[i] = coufb[i] = 0.0;
+               else
+               {
+                  Real mid = (colfb[i] + coufb[i]) / 2.0;
+                  colfb[i] = coufb[i] = mid;
+               }
             }
             assert(colfb[i] == coufb[i]);
             x = colfb[i];
             break;
 
          default:
-            MSG_ERROR( spxout << "ESVECS05 ERROR: "
+            MSG_ERROR( std::cerr << "ESVECS05 ERROR: "
                               << "inconsistent basis must not happen!" 
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS05 This should never happen.");
@@ -334,7 +341,7 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
    switch (desc().rowStatus(n))
    {
    // rowwise representation:
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::P_FIXED :
       assert(lhs(n) > -infinity);
       assert(rhs(n) == lhs(n));
       //lint -fallthrough
@@ -364,7 +371,7 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
    switch (desc().colStatus(n))
    {
       // rowwise representation:
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::P_FIXED :
       assert(SPxLP::upper(n) == SPxLP::lower(n));
       assert(SPxLP::lower(n) > -infinity);
       //lint -fallthrough
@@ -381,7 +388,7 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
 
       // columnwise representation:
    case SPxBasis::Desc::D_UNDEFINED :
-   case SPxBasis::Desc::D_ON_UPPER + SPxBasis::Desc::D_ON_LOWER :
+   case SPxBasis::Desc::D_ON_BOTH :
    case SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::D_ON_LOWER :
    case SPxBasis::Desc::D_FREE :
@@ -415,8 +422,8 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
    {
-   case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::D_ON_BOTH :
+   case SPxBasis::Desc::P_FIXED :
       assert(theLRbound[n] > -infinity);
       assert(theURbound[n] == theLRbound[n]);
       //lint -fallthrough
@@ -445,8 +452,8 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
    switch (desc().colStatus(n))
    {
    case SPxBasis::Desc::D_UNDEFINED :
-   case SPxBasis::Desc::D_ON_LOWER + SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis::Desc::D_ON_BOTH :
+   case SPxBasis::Desc::P_FIXED :
       assert(theLCbound[n] > -infinity);
       assert(theUCbound[n] == theLCbound[n]);
       //lint -fallthrough

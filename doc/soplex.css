@@ -43,11 +43,11 @@ div.inner {
 /* @group Heading Levels */
 
 h1 {
-    font-size: 150%;
+    font-size: 120%;
 }
 
 h2 {
-    font-size: 120%;
+    font-size: 110%;
 }
 
 h3 {
@@ -685,13 +685,14 @@ div.title
 {
     padding: 20px 0px 5px 0px;
     font-weight: bold;
-    font-size: 16pt;
+    font-size: 150%;
 }
 
 div.mainheadertitle
 {
     background-repeat:repeat-x;
     margin:  0px;
+    font-size: 150%;
 }
 
 td.mainheadertitle
@@ -773,4 +774,8 @@ td.mainheadertitle
     right: 30px;
     width: 170px;
     z-index: 102;
+}
+
+ul {
+    line-height: 140%;
 }

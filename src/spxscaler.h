@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -55,6 +55,7 @@ protected:
    DataArray < Real > m_rowscale;  ///< row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
+   SPxOut*            spxout;      ///< message handler
    //@}
 
    //-------------------------------------
@@ -82,7 +83,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// constructor
-   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true);
+   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true, SPxOut* spxout = NULL);
    /// copy constructor
    SPxScaler(const SPxScaler& );
    /// assignment operator
@@ -102,6 +103,11 @@ public:
    virtual void setOrder(bool colFirst); 
    /// set wether column and row scaling should be performed.
    virtual void setBoth(bool both); 
+   /// set message handler
+   virtual void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
    //@}
 
    //-------------------------------------

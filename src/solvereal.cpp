@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -26,7 +26,7 @@ namespace soplex
    void SoPlex::_solveReal()
    {
       // start timing
-      _statistics->solvingTime.start();
+      _statistics->solvingTime->start();
 
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
@@ -37,7 +37,7 @@ namespace soplex
       _storeSolutionReal();
 
       // stop timing
-      _statistics->solvingTime.stop();
+      _statistics->solvingTime->stop();
    }
 
 
@@ -62,7 +62,7 @@ namespace soplex
       case SPxSolver::OPTIMAL:
          if( !_isRealLPLoaded )
          {
-            MSG_INFO1( spxout << " --- transforming basis into original space" << std::endl; )
+            MSG_INFO1( spxout, spxout << " --- transforming basis into original space" << std::endl; )
             _solver.changeObjOffset(0.0);
             _resolveWithoutPreprocessing(simplificationStatus);
             return;
@@ -177,20 +177,16 @@ namespace soplex
    /// solves real LP with/without preprocessing
    void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
    {
-      _statistics->preprocessingTime.start();
+      _solver.changeObjOffset(0.0);
+      _statistics->preprocessingTime->start();
 
       if( applyPreprocessing )
-      {
          _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex::INFTY));
-      }
       else
-      {
          _disableSimplifierAndScaler();
-         ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::INFTY));
-      }
+
+      _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
+         ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::OBJLIMIT_LOWER));
 
       bool applySimplifier= (_simplifier != 0);
 
@@ -251,7 +247,7 @@ namespace soplex
          _solver.changeObjOffset(_simplifier->getObjoffset());
       }
 
-      _statistics->preprocessingTime.stop();
+      _statistics->preprocessingTime->stop();
 
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )
@@ -326,11 +322,11 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          }
          catch( ... )
          {
-            MSG_ERROR( spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_ERROR( std::cerr << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
             _status = SPxSolver::ERROR;
          }
       }
@@ -370,6 +366,7 @@ namespace soplex
       assert(_solver.basis().status() != SPxBasis::UNBOUNDED || status() == SPxSolver::UNBOUNDED);
       assert(_solver.basis().status() == SPxBasis::UNBOUNDED || _solver.basis().status() == SPxBasis::NO_PROBLEM || status() != SPxSolver::UNBOUNDED);
 
+      _solver.forceRecompNonbasicValue();
       _solReal._hasPrimal = (status() == SPxSolver::OPTIMAL
          || ((_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED)
             && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;

@@ -1,2 +1,3 @@
-CXXFLAGS += -O2 -g -pg -ffast-math -funroll-loops
-LDFLAGS  += -pg -ffast-math -funroll-loops
+CPPFLAGS        +=      -DNDEBUG
+CXXFLAGS        +=      -O3 -g -pg
+LDFLAGS         +=      -pg

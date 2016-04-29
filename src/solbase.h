@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2014 Konrad-Zuse-Zentrum                            */
+/*                  1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -181,6 +181,34 @@ public:
       return size;
    }
 
+   /// returns size of largest denominator in primal solution
+   int dmaxSizePrimal(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasPrimal )
+         size += dmaxSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
+
+      if( _hasPrimalRay )
+         size += dmaxSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
+
+      return size;
+   }
+
+   /// returns size of largest denominator in dual solution
+   int dmaxSizeDual(const int base = 2) const
+   {
+      int size = 0;
+
+      if( _hasDual )
+         size += dmaxSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
+
+      if( _hasDualFarkas )
+         size += dmaxSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
+
+      return size;
+   }
+
    /// invalidate solution
    void invalidate()
    {
@@ -208,6 +236,8 @@ private:
 
    /// default constructor only for friends
    SolBase<R>()
+      : _primalObjVal(0)
+      , _dualObjVal(0)
    {
       invalidate();
    }

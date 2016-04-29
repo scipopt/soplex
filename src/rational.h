@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -129,11 +129,18 @@ namespace soplex
       //**@name Typecasts */
       //@{
 
+      // Visual Studio <= 2010 does not fully support C++11, this makes
+      // it compiling (noone checked whether it also works properly)
+#if defined(_MSC_VER) && _MSC_VER <= 1600
       /// typecasts Rational to double (only allows explicit typecasting)
       explicit operator double() const;
 
       /// typecasts Rational to long double (only allows explicit typecasting)
       explicit operator long double() const;
+#else
+      operator double() const;
+      operator long double() const;
+#endif
 
 #ifdef SOPLEX_WITH_GMP
       /// provides read-only access to underlying mpq_t
@@ -141,6 +148,12 @@ namespace soplex
 
       /// provides read-only access to underlying mpq_t
       const mpq_t& getMpqRef() const;
+
+      /// provides write access to underlying mpq_t; use with care
+      mpq_t* getMpqPtr_w() const;
+
+      /// provides write access to underlying mpq_t; use with care
+      mpq_t& getMpqRef_w() const;
 #endif
       //@}
 
@@ -235,6 +248,9 @@ namespace soplex
       /// inversion
       Rational& invert();
 
+      /// round up to next power of two
+      Rational& powRound();
+
       //@}
 
 
@@ -284,6 +300,7 @@ namespace soplex
       //**@name Friends */
       //@{
 
+      friend int compareRational(const Rational& r, const Rational& s);
       friend bool operator!=(const Rational& r, const Rational& s);
       friend bool operator==(const Rational& r, const Rational& s);
       friend bool operator<(const Rational& r, const Rational& s);
@@ -343,7 +360,7 @@ namespace soplex
       friend Rational operator*(const int& d, const Rational& r);
       friend Rational operator/(const int& d, const Rational& r);
 
-      friend Rational abs(const Rational& r);
+      friend Rational spxAbs(const Rational& r);
       friend int sign(const Rational& r);
       friend Rational operator-(const Rational& q);
 
@@ -368,6 +385,9 @@ namespace soplex
 
    //**@name Relational operators */
    //@{
+
+   /// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
+   int compareRational(const Rational& r, const Rational& s);
 
    /// equality operator
    bool operator==(const Rational& r, const Rational& s);
@@ -526,7 +546,7 @@ namespace soplex
    Rational operator+(const int& d, const Rational& r);
 
    /// absolute function
-   Rational abs(const Rational& r);
+   Rational spxAbs(const Rational& r);
 
    /// Sign function; returns 1 if r > 0, 0 if r = 0, and -1 if r < 0.
    int sign(const Rational& r);
@@ -539,6 +559,9 @@ namespace soplex
 
    /// Size of least common multiple of denominators in rational vector.
    int dlcmSizeRational(const Rational* vector, const int length, const int base = 2);
+
+   /// Size of largest denominator in rational vector.
+   int dmaxSizeRational(const Rational* vector, const int length, const int base = 2);
 
    //@}
 

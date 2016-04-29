@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -194,7 +194,7 @@ public:
    /// Returns the objective coefficient of the LPRowBase with DataKey \p k in LPRowSetBase (writeable).
    R& obj_w(const DataKey& k)
    {
-      return obj[number(k)];
+      return object[number(k)];
    }
 
    /// Returns a writable rowVector of the \p i 'th LPRowBase.
@@ -258,7 +258,7 @@ public:
          rhs_w(i) = infinity;
          break;
       case LPRowBase<R>::RANGE:
-         MSG_ERROR( spxout << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
+         MSG_ERROR( std::cerr << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
          throw SPxInternalCodeException("XROWST01 This should never happen.");
       default:
          throw SPxInternalCodeException("XROWST02 This should never happen.");
@@ -710,7 +710,7 @@ public:
    }
 
    /// Destructor.
-   ~LPRowSetBase<R>()
+   virtual ~LPRowSetBase<R>()
    {}
 
    //@}

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -51,10 +51,11 @@ bool SPxSolver::writeState(
        << "." << SOPLEX_SUBVERSION << std::endl << std::endl;
    ofs << "# run SoPlex as follows:" << std::endl;
    ofs << "# bin/soplex --loadset=spxcheck.set --readbas=spxcheck.bas spxcheck.mps\n" << std::endl;
+   ofs << "int:representation = " << ( rep() == SPxSolver::COLUMN ? "1" : "2" ) << std::endl;
    ofs << "int:factor_update_max = " << basis().getMaxUpdates() << std::endl;
    ofs << "int:pricer = ";
    if (!strcmp(pricer()->getName(), "Auto"))
-      ofs << " 0";
+      ofs << " 0" << std::endl;
    else if (!strcmp(pricer()->getName(), "Dantzig"))
       ofs << "1" << std::endl;
    else if (!strcmp(pricer()->getName(), "ParMult"))
@@ -78,6 +79,7 @@ bool SPxSolver::writeState(
    ofs << "real:opttol = " << opttol() << std::endl;
    ofs << "real:epsilon_zero = " << epsilon() << std::endl;
    ofs << "real:infty = " << infinity << std::endl;
+   ofs << "uint:random_seed = " << random.getSeed() << std::endl;
    ofs.close();
 
    // write LP

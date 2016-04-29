@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -97,6 +97,10 @@ public:
    SPxOut();
    /// destructor
    virtual ~SPxOut();
+   /// copy constructor
+   SPxOut( const SPxOut& );
+   /// assignment operator
+   SPxOut& operator=( const SPxOut& );
    //@}
 
    //-----------------------------------
@@ -173,15 +177,6 @@ private:
    /// array of pointers to internal streams, indexed by verbosity level
    std::ostream**          m_streams;
    //@}
-
-   //-----------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy constructor
-   SPxOut( const SPxOut& );
-   /// assignment operator
-   SPxOut& operator=( const SPxOut& );
-   //@}
 };
 
    // ---------------------------------------------------------
@@ -235,7 +230,6 @@ private:
    //@{
    ///
 #define PASS_TO_CURRENT_OSTREAM( t ) \
-      assert(_spxout.getVerbosity() <= Param::verbose()); \
       _spxout.getCurrentStream() << t; \
       return _spxout;
 
@@ -274,19 +268,6 @@ private:
    { PASS_TO_CURRENT_OSTREAM( t ) }
    //@}
 
-   // ---------------------------------------------------------
-   //    Declare a global SPxOut instance
-   // ---------------------------------------------------------
-
-   //-----------------------------------
-   /**@name Global instance */
-   //@{
-   ///
-   extern SPxOut spxout;
-   //@}
-
 }  // namespace soplex
 
-
 #endif // _SPXOUT_H_
-

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -59,6 +59,8 @@
 
 #include "sol.h"
 
+#define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
+
 ///@todo implement automatic rep switch, based on row/col dim
 ///@todo introduce status codes for SoPlex, especially for rational solving
 
@@ -100,7 +102,7 @@ public:
    SoPlex(const SoPlex& rhs);
 
    /// destructor
-   ~SoPlex();
+   virtual ~SoPlex();
 
    //@}
 
@@ -181,6 +183,15 @@ public:
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
    Real maxObjReal(int i) const;
+
+   /// gets number of available dual norms
+   void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
+
+   /// gets steepest edge norms and returns false if they are not available
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+
+   /// sets steepest edge norms and returns false if that's not possible
+   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
    //@}
 
@@ -669,6 +680,12 @@ public:
    /// get size of least common multiple of denominators in dual solution
    int dlcmSizeDualRational(const int base = 2);
 
+   /// get size of largest denominator in primal solution
+   int dmaxSizePrimalRational(const int base = 2);
+
+   /// get size of largest denominator in dual solution
+   int dmaxSizeDualRational(const int base = 2);
+
    //@}
 
 
@@ -807,8 +824,20 @@ public:
       /// apply rational reconstruction after each iterative refinement?
       RATREC = 5,
 
+      /// round scaling factors for iterative refinement to powers of two?
+      POWERSCALING = 6,
+
+      /// continue iterative refinement with exact basic solution if not optimal?
+      RATFACJUMP = 7,
+
+      /// should feasibility be tested with relaxed bounds and sides?
+      FEASRELAX = 8,
+
+      /// use bound flipping also for row representation?
+      ROWBOUNDFLIPS = 9,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 6
+      BOOLPARAM_COUNT = 10
    } BoolParam;
 
    /// integer parameters
@@ -871,14 +900,17 @@ public:
       /// mode for a posteriori feasibility checks
       CHECKMODE = 18,
 
+      /// type of timer
+      TIMER = 19,
+
       /// mode for hyper sparse pricing
-      HYPER_PRICING = 19,
+      HYPER_PRICING = 20,
 
       /// minimum number of stalling refinements since last pivot to trigger rational factorization
-      RATFAC_MINSTALLS = 20,
+      RATFAC_MINSTALLS = 21,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 21
+      INTPARAM_COUNT = 22
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1078,6 +1110,19 @@ public:
       CHECKMODE_RATIONAL = 2
    };
 
+   /// values for parameter TIMER
+   enum
+   {
+      /// disable timing
+      TIMER_OFF = 0,
+
+      /// cpu or user time
+      TIMER_CPU = 1,
+
+      /// wallclock time
+      TIMER_WALLCLOCK = 2
+   };
+
    /// values for parameter HYPER_PRICING
    enum
    {
@@ -1148,8 +1193,20 @@ public:
       /// geometric frequency at which to apply rational reconstruction
       RATREC_FREQ = 17,
 
+      /// minimal reduction (sum of removed rows/cols) to continue simplification
+      MINRED = 18,
+
+      // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      REFAC_BASIS_NNZ = 19,
+
+      // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      REFAC_UPDATE_FILL = 20,
+
+      // refactor threshold for memory growth in factorization since last refactorization
+      REFAC_MEM_FACTOR = 21,
+
       /// number of real parameters
-      REALPARAM_COUNT = 18
+      REALPARAM_COUNT = 22
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1163,6 +1220,8 @@ public:
 
    /// class of parameter settings
    class Settings;
+
+   mutable SPxOut spxout;
 
    /// returns boolean parameter value
    bool boolParam(const BoolParam param) const;
@@ -1244,6 +1303,12 @@ public:
    /// vector and matrix values only if the respective parameter is set to true.
    /// If quiet is set to true the function will only display which vectors are different.
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
+
+   /// set the random seed of the solver instance
+   void setRandomSeed(unsigned int seed);
+
+   /// returns the current random seed of the solver instance
+   unsigned int randomSeed() const;
 
    //@}
 
@@ -1406,7 +1471,7 @@ private:
    bool _isConsistent() const;
 
    /// should solving process be stopped?
-   bool _isSolveStopped() const;
+   bool _isSolveStopped(bool& stoppedTime, bool& stoppedIter) const;
 
    /// determines RangeType from real bounds
    RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
@@ -1584,13 +1649,23 @@ private:
    void _solveRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void _performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+   void _performOptIRStable(SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minRounds,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stopped,
+      bool& stoppedIter,
+      bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
+   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& stoppedIter, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& stoppedIter, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();
@@ -1671,10 +1746,10 @@ private:
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& primalFeasible, bool& dualFeasible, Rational& primalViolation, Rational& dualViolation, bool& stopped, bool& error);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared);
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
    //@}
 
 

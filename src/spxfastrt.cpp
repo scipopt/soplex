@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -129,11 +129,12 @@ int SPxFastRT::maxDelta(
       for (idx += start; idx < last; idx += incr)
       {
          i = *idx;
-         x = upd[i];
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
          if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
             continue;
+
+         x = upd[i];
 
          if (x > epsilon)
          {
@@ -791,10 +792,13 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
       if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
-         if (x < 0.0)
-            thesolver->shiftLBbound(leave, vec[leave]);
-         else
-            thesolver->shiftUBbound(leave, vec[leave]);
+         if( thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         {
+            if (x < 0.0)
+               thesolver->shiftLBbound(leave, vec[leave]);
+            else
+               thesolver->shiftUBbound(leave, vec[leave]);
+         }
       }
    }
    else
@@ -822,30 +826,21 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
 
       if (sel > fastDelta / maxabs)
       {
-         if (x > 0.0)
+         sel = 0.0;
+         if( thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
-            thesolver->theShift += low[leave];
-            sel = 0.0;
-            low[leave] = vec[leave] + sel * x;
-            thesolver->theShift -= low[leave];
-         }
-         else
-         {
-            thesolver->theShift -= up[leave];
-            sel = 0.0;
-            up[leave] = vec[leave] + sel * x;
-            thesolver->theShift += up[leave];
+            if (x > 0.0)
+               thesolver->shiftLBbound(leave, vec[leave]);
+            else
+               thesolver->shiftUBbound(leave, vec[leave]);
          }
       }
    }
    else
    {
       sel = 0.0;
-      if (vec[leave] < low[leave])
-         thesolver->theShift += low[leave] - vec[leave];
-      else
-         thesolver->theShift += vec[leave] - up[leave];
-      low[leave] = up[leave] = vec[leave];
+      thesolver->shiftLBbound(leave, vec[leave]);
+      thesolver->shiftUBbound(leave, vec[leave]);
    }
 
    return false;
@@ -945,7 +940,7 @@ int SPxFastRT::selectLeave(Real& val, Real)
 
    MSG_DEBUG(
       if (leave >= 0)
-         spxout
+         std::cout
            << "DFSTRT01 "
            << thesolver->basis().iteration() << "("
            << std::setprecision(6) << thesolver->value() << ","
@@ -956,7 +951,7 @@ int SPxFastRT::selectLeave(Real& val, Real)
            << std::setprecision(6) << maxabs
            << std::endl;
       else
-         spxout << "DFSTRT02 " << thesolver->basis().iteration()
+         std::cout << "DFSTRT02 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
 
@@ -1291,11 +1286,11 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
             x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
          else
             x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-         spxout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
+         std::cout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
                 << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
       }
       else
-         spxout << "DFSTRT04 " << thesolver->basis().iteration()
+         std::cout << "DFSTRT04 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
 

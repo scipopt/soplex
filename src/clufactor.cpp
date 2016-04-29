@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -276,16 +276,21 @@ void CLUFactor::setPivot( const int p_stage,
    row.perm[p_row]   = p_stage;
    col.perm[p_col]   = p_stage;
    diag[p_row]       = REAL( 1.0 ) / val;
-   if( fabs(val) < Param::epsilonPivot() )
+   if( spxAbs(val) < Param::epsilonPivot() )
    {
-      MSG_WARNING(
-         spxout << "LU pivot element is almost zero (< " << Param::epsilonPivot() << ") - Basis is numerically singular" << std::endl;
+#ifndef NDEBUG
+      MSG_ERROR( std::cerr
+                 << "LU pivot element is almost zero (< "
+                 << Param::epsilonPivot()
+                 << ") - Basis is numerically singular"
+                 << std::endl;
       )
+#endif
       stat = SLinSolver::SINGULAR;
    }
 
-   if ( fabs( diag[p_row] ) > maxabs )
-      maxabs = fabs( diag[p_row] );
+   if ( spxAbs( diag[p_row] ) > maxabs )
+      maxabs = spxAbs( diag[p_row] );
 }
 
 /*****************************************************************************/
@@ -788,8 +793,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
          if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
-            if ( fabs( x ) > l_maxabs )
-               l_maxabs = fabs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             /* insert to column file */
             assert( k - cbeg[p_col] < cmax[p_col] );
@@ -842,8 +847,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
          if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
-            if ( fabs( x ) > l_maxabs )
-               l_maxabs = fabs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             /* insert to column file */
             if ( k >= j )
@@ -1006,8 +1011,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             ll++;
 
-            if ( fabs( x ) > l_maxabs )
-               l_maxabs = fabs( x );
+            if ( spxAbs( x ) > l_maxabs )
+               l_maxabs = spxAbs( x );
 
             j = rbeg[n];
 
@@ -1078,8 +1083,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             if ( x != 0.0 )
             {
-               if ( fabs( x ) > l_maxabs )
-                  l_maxabs = fabs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                ridx[n] = j;
 
@@ -1144,8 +1149,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
                p_work[k] = 0.0;
                ll++;
 
-               if ( fabs( x ) > l_maxabs )
-                  l_maxabs = fabs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                j = rbeg[n];
 
@@ -1210,8 +1215,8 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
 
             if ( x != 0.0 )
             {
-               if ( fabs( x ) > l_maxabs )
-                  l_maxabs = fabs( x );
+               if ( spxAbs( x ) > l_maxabs )
+                  l_maxabs = spxAbs( x );
 
                ridx[n] = j;
 
@@ -1305,8 +1310,8 @@ void CLUFactor::update( int p_col, Real* p_work, const int* p_idx, int num )
       p_work[j] = 0.0;
       ++ll;
 
-      if ( fabs( x ) > maxabs )
-         maxabs = fabs( x );
+      if ( spxAbs( x ) > maxabs )
+         maxabs = spxAbs( x );
    }
 
    stat = SLinSolver::OK;
@@ -1349,8 +1354,8 @@ void CLUFactor::updateNoClear(
       lval[ll] = x = rezi * p_work[j];
       ++ll;
 
-      if ( fabs( x ) > maxabs )
-         maxabs = fabs( x );
+      if ( spxAbs( x ) > maxabs )
+         maxabs = spxAbs( x );
    }
 
    stat = SLinSolver::OK;
@@ -1543,8 +1548,8 @@ void CLUFactor::initFactorMatrix( const SVector** vec, const Real eps )
             /* update maximum absolute nonzero value */
             x = psv->value( j );
 
-            if ( fabs( x ) > initMaxabs )
-               initMaxabs = fabs( x );
+            if ( spxAbs( x ) > initMaxabs )
+               initMaxabs = spxAbs( x );
 
             /* permute to front and mark as singleton */
             setPivot( temp.stage, i, psv->index( j ), x );
@@ -1586,8 +1591,8 @@ void CLUFactor::initFactorMatrix( const SVector** vec, const Real eps )
 
                   /* update maximum absolute nonzero value */
 
-                  if ( fabs( x ) > initMaxabs )
-                     initMaxabs = fabs( x );
+                  if ( spxAbs( x ) > initMaxabs )
+                     initMaxabs = spxAbs( x );
 
                   nnonzeros++;
                }
@@ -2115,11 +2120,11 @@ void CLUFactor::selectPivots( Real threshold )
 
          if (( l_maxabs = temp.s_max[rw] ) < 0 )
          {
-            l_maxabs = fabs( u.row.val[len] );
+            l_maxabs = spxAbs( u.row.val[len] );
 
             for ( i = len - 1; i >= beg; --i )
-               if ( l_maxabs < fabs( u.row.val[i] ) )
-                  l_maxabs = fabs( u.row.val[i] );
+               if ( l_maxabs < spxAbs( u.row.val[i] ) )
+                  l_maxabs = spxAbs( u.row.val[i] );
 
             temp.s_max[rw] = l_maxabs;               /* ##### */
          }
@@ -2136,7 +2141,7 @@ void CLUFactor::selectPivots( Real threshold )
             j = temp.s_cact[k];
             x = u.row.val[i];
 
-            if ( j < mkwtz && fabs( x ) > l_maxabs )
+            if ( j < mkwtz && spxAbs( x ) > l_maxabs )
             {
                mkwtz = j;
                cl = k;
@@ -2191,12 +2196,12 @@ void CLUFactor::selectPivots( Real threshold )
                      /*  case 2: l_maxabs needs to be computed
                       */
                      m = u.row.start[k];
-                     l_maxabs = fabs( u.row.val[m] );
+                     l_maxabs = spxAbs( u.row.val[m] );
 
                      for ( kk = m + u.row.len[k] - 1; kk >= m; --kk )
                      {
-                        if ( l_maxabs < fabs( u.row.val[kk] ) )
-                           l_maxabs = fabs( u.row.val[kk] );
+                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
+                           l_maxabs = spxAbs( u.row.val[kk] );
 
                         if ( u.row.idx[kk] == cl )
                         {
@@ -2208,8 +2213,8 @@ void CLUFactor::selectPivots( Real threshold )
 
                      for ( --kk; kk > m; --kk )
                      {
-                        if ( l_maxabs < fabs( u.row.val[kk] ) )
-                           l_maxabs = fabs( u.row.val[kk] );
+                        if ( l_maxabs < spxAbs( u.row.val[kk] ) )
+                           l_maxabs = spxAbs( u.row.val[kk] );
                      }
 
                      temp.s_max[k] = l_maxabs;
@@ -2217,7 +2222,7 @@ void CLUFactor::selectPivots( Real threshold )
 
                   l_maxabs *= threshold;
 
-                  if ( fabs( x ) > l_maxabs )
+                  if ( spxAbs( x ) > l_maxabs )
                   {
                      mkwtz = j;
                      rw = k;
@@ -2638,8 +2643,8 @@ int CLUFactor::setupColVals()
          u.col.idx[k] = i;
          u.col.val[k] = *val;
 
-         if ( fabs( *val ) > maxabs )
-            maxabs = fabs( *val );
+         if ( spxAbs( *val ) > maxabs )
+            maxabs = spxAbs( *val );
 
          idx++;
 
@@ -2769,7 +2774,7 @@ void CLUFactor::factor( const SVector** vec,         ///< Array of column vector
                         Real            eps )         ///< epsilon for zero detection
 {
 
-   factorTime.start();
+   factorTime->start();
 
    stat = SLinSolver::OK;
 
@@ -2816,7 +2821,7 @@ TERMINATE:
       nzCnt = setupColVals();
    }
 
-   factorTime.stop();
+   factorTime->stop();
 
    factorCount++;
 }
@@ -2826,9 +2831,6 @@ void CLUFactor::dump() const
    int i, j, k;
 
    // Dump regardless of the verbosity level if this method is called;
-   // store the old level and restore it at the end of the method.
-   const SPxOut::Verbosity tmp_verbosity = spxout.getVerbosity();
-   spxout.setVerbosity( SPxOut::ERROR );
 
    /*  Dump U:
     */
@@ -2836,11 +2838,11 @@ void CLUFactor::dump() const
    for ( i = 0; i < thedim; ++i )
    {
       if ( row.perm[i] >= 0 )
-         spxout << "DCLUFA01 diag[" << i << "]: [" << col.orig[row.perm[i]]
+         std::cout << "DCLUFA01 diag[" << i << "]: [" << col.orig[row.perm[i]]
          << "] = " << diag[i] << std::endl;
 
       for ( j = 0; j < u.row.len[i]; ++j )
-         spxout << "DCLUFA02   u[" << i << "]: ["
+         std::cout << "DCLUFA02   u[" << i << "]: ["
          << u.row.idx[u.row.start[i] + j] << "] = "
          << u.row.val[u.row.start[i] + j] << std::endl;
    }
@@ -2852,18 +2854,16 @@ void CLUFactor::dump() const
       for ( j = 0; j < l.firstUnused; ++j )
          if ( col.orig[row.perm[l.row[j]]] == i )
          {
-            spxout << "DCLUFA03 l[" << i << "]" << std::endl;
+            std::cout << "DCLUFA03 l[" << i << "]" << std::endl;
 
             for ( k = l.start[j]; k < l.start[j + 1]; ++k )
-               spxout << "DCLUFA04   l[" << k - l.start[j]
+               std::cout << "DCLUFA04   l[" << k - l.start[j]
                << "]:  [" << l.idx[k]
                << "] = "  << l.val[k] << std::endl;
 
             break;
          }
    }
-
-   spxout.setVerbosity( tmp_verbosity );
 
    return;
 }
@@ -3336,7 +3336,7 @@ void CLUFactor::solveLright( Real* vec )
    {
       if (( x = vec[lrow[i]] ) != 0.0 )
       {
-         MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+         MSG_DEBUG( std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
 
          k = lbeg[i];
          idx = &( lidx[k] );
@@ -3344,7 +3344,7 @@ void CLUFactor::solveLright( Real* vec )
 
          for ( j = lbeg[i + 1]; j > k; --j )
          {
-            MSG_DEBUG( spxout << "                         -> y" << *idx << " -= " << x << " * " << *val << " = " << x * ( *val ) << "    -> " << vec[*idx] - x * ( *val ) << std::endl; )
+            MSG_DEBUG( std::cout << "                         -> y" << *idx << " -= " << x << " * " << *val << " = " << x * ( *val ) << "    -> " << vec[*idx] - x * ( *val ) << std::endl; )
             vec[*idx++] -= x * ( *val++ );
          }
       }
@@ -3352,7 +3352,7 @@ void CLUFactor::solveLright( Real* vec )
 
    if ( l.updateType )                   /* Forest-Tomlin Updates */
    {
-      MSG_DEBUG( spxout << "performing FT updates..." << std::endl; )
+      MSG_DEBUG( std::cout << "performing FT updates..." << std::endl; )
 
       end = l.firstUnused;
 
@@ -3368,10 +3368,10 @@ void CLUFactor::solveLright( Real* vec )
 
          vec[lrow[i]] -= x;
 
-         MSG_DEBUG( spxout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
+         MSG_DEBUG( std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl; )
       }
 
-      MSG_DEBUG( spxout << "finished FT updates." << std::endl; )
+      MSG_DEBUG( std::cout << "finished FT updates." << std::endl; )
    }
 }
 
@@ -3708,8 +3708,8 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 
       Real x  = vec[c];
 
-      ASSERT_WARN( "WSOLVE01", fabs( x ) < 1e40 );
-      ASSERT_WARN( "WSOLVE02", fabs( vec[c] ) < 1e40 );
+      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
+      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
 
 #if defined(WITH_WARNINGS) || !defined(NDEBUG)
       Real y = vec[c];
@@ -3719,25 +3719,25 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 
       if ( x != 0.0 )
       {
-         ASSERT_WARN( "WSOLVE03", fabs( diag[r] ) < 1e40 );
+         ASSERT_WARN( "WSOLVE03", spxAbs( diag[r] ) < 1e40 );
 
          x        *= diag[r];
          p_work[r] = x;
 
-         ASSERT_WARN( "WSOLVE04", fabs( x ) < 1e40 );
+         ASSERT_WARN( "WSOLVE04", spxAbs( x ) < 1e40 );
 
          int end = u.row.start[r] + u.row.len[r];
 
          for ( int m = u.row.start[r]; m < end; m++ )
          {
-            ASSERT_WARN( "WSOLVE05", fabs( u.row.val[m] ) < 1e40 );
-            ASSERT_WARN( "WSOLVE06", fabs( vec[u.row.idx[m]] ) < infinity );
+            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
+            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < infinity );
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            ASSERT_WARN( "WSOLVE07", fabs( vec[u.row.idx[m]] ) < 1e40 );
+            ASSERT_WARN( "WSOLVE07", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
          }
       }
 
-      ASSERT_WARN( "WSOLVE08", fabs( y ) < 1e40 );
+      ASSERT_WARN( "WSOLVE08", spxAbs( y ) < 1e40 );
    }
 }
 
@@ -5824,6 +5824,84 @@ int CLUFactor::vSolveRight4update2( Real eps,
    return rn;
 }
 
+void CLUFactor::vSolveRight4update2sparse( Real eps, Real* vec, int* idx,        /* result1 */
+                                           Real* rhs, int* ridx, int& rn,        /* rhs1    */
+                                           Real eps2, Real* vec2, int* idx2,     /* result2 */
+                                           Real* rhs2, int* ridx2, int& rn2,     /* rhs2    */
+                                           Real* forest, int* forestNum, int* forestIdx )
+{
+   /* solve with L */
+   vSolveLright2( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2 );
+
+   Real x;
+   int i, j, k;
+   int* rperm = row.perm;
+
+   /*  turn index list into a heap for both ridx and ridx2 */
+   if ( forest )
+   {
+      int* it = forestIdx;
+
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+         {
+            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            forest[k] = x;
+         }
+         else
+            rhs[k] = 0;
+      }
+
+      *forestNum = rn = j;
+   }
+   else
+   {
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+            enQueueMax( ridx, &j, rperm[k] );
+         else
+            rhs[k] = 0;
+      }
+
+      rn = j;
+   }
+
+   for ( i = j = 0; i < rn2; ++i )
+   {
+      k = ridx2[i];
+      assert( k >= 0 && k < thedim );
+      x = rhs2[k];
+
+      if ( isNotZero( x, eps2 ) )
+         enQueueMax( ridx2, &j, rperm[k] );
+      else
+         rhs2[k] = 0;
+   }
+
+   rn2 = j;
+
+   /* solve with U */
+   rn = vSolveUright( vec, idx, rhs, ridx, rn, eps );
+   rn2 = vSolveUright( vec2, idx2, rhs2, ridx2, rn2, eps2 );
+
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = vSolveUpdateRight( vec, idx, rn, eps );
+      rn2 = vSolveUpdateRight( vec2, idx2, rn2, eps2 );
+   }
+}
+
+
 int CLUFactor::vSolveRight4update3( Real eps,
                                     Real* vec, int* idx,                 /* result1 */
                                     Real* rhs, int* ridx, int rn,        /* rhs1    */
@@ -5974,6 +6052,102 @@ int CLUFactor::vSolveRight4update3( Real eps,
    return rn;
 }
 
+void CLUFactor::vSolveRight4update3sparse( Real eps, Real* vec, int* idx,        /* result1 */
+                                           Real* rhs, int* ridx, int& rn,        /* rhs1    */
+                                           Real eps2, Real* vec2, int* idx2,     /* result2 */
+                                           Real* rhs2, int* ridx2, int& rn2,     /* rhs2    */
+                                           Real eps3, Real* vec3, int* idx3,     /* result3 */
+                                           Real* rhs3, int* ridx3, int& rn3,     /* rhs3    */
+                                           Real* forest, int* forestNum, int* forestIdx )
+{
+   vSolveLright3( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3 );
+   assert( rn >= 0 && rn <= thedim );
+   assert( rn2 >= 0 && rn2 <= thedim );
+   assert( rn3 >= 0 && rn3 <= thedim );
+
+   Real x;
+   int i, j, k;
+   int* rperm = row.perm;
+
+   /*  turn index list into a heap */
+   if ( forest )
+   {
+      int* it = forestIdx;
+
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+         {
+            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            forest[k] = x;
+         }
+         else
+            rhs[k] = 0;
+      }
+
+      *forestNum = rn = j;
+   }
+   else
+   {
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+            enQueueMax( ridx, &j, rperm[k] );
+         else
+            rhs[k] = 0;
+      }
+
+      rn = j;
+   }
+
+   for ( i = j = 0; i < rn2; ++i )
+   {
+      k = ridx2[i];
+      assert( k >= 0 && k < thedim );
+      x = rhs2[k];
+
+      if ( isNotZero( x, eps2 ) )
+         enQueueMax( ridx2, &j, rperm[k] );
+      else
+         rhs2[k] = 0;
+   }
+
+   rn2 = j;
+
+   for ( i = j = 0; i < rn3; ++i )
+   {
+      k = ridx3[i];
+      assert( k >= 0 && k < thedim );
+      x = rhs3[k];
+
+      if ( isNotZero( x, eps3 ) )
+         enQueueMax( ridx3, &j, rperm[k] );
+      else
+         rhs3[k] = 0;
+   }
+
+   rn3 = j;
+
+   rn = vSolveUright( vec, idx, rhs, ridx, rn, eps );
+   rn2 = vSolveUright( vec2, idx2, rhs2, ridx2, rn2, eps2 );
+   rn3 = vSolveUright( vec3, idx3, rhs3, ridx3, rn3, eps3 );
+
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = vSolveUpdateRight( vec, idx, rn, eps );
+      rn2 = vSolveUpdateRight( vec2, idx2, rn2, eps2 );
+      rn3 = vSolveUpdateRight( vec3, idx3, rn3, eps3 );
+   }
+}
+
 void CLUFactor::vSolveRightNoNZ(
    Real* vec2, Real eps2,              /* result2 */
    Real* rhs2, int* ridx2, int rn2 )   /* rhs2    */
@@ -6043,9 +6217,12 @@ int CLUFactor::vSolveLeft( Real eps,
       rn = solveLleftForest( eps, vec, idx, rn );
    }
 
+   // TODO verify the correctness of this check
    if ( rn + l.firstUpdate > verySparseFactor4left * thedim )
    {
+      // perform the dense solve
       solveLleftNoNZ( vec );
+      // signal the caller that the nonzero pattern is lost
       return 0;
    }
    else
@@ -6080,6 +6257,33 @@ int CLUFactor::vSolveLeft2( Real eps,
 
    return rn;
 }
+
+void CLUFactor::vSolveLeft2sparse( Real eps,
+                                   Real* vec, int* idx,                      /* result */
+                                   Real* rhs, int* ridx, int& rn,            /* rhs    */
+                                   Real* vec2, int* idx2,                    /* result2 */
+                                   Real* rhs2, int* ridx2, int& rn2 )        /* rhs2    */
+{
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = solveUpdateLeft( eps, rhs, ridx, rn );
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn2 = solveUpdateLeft( eps, rhs2, ridx2, rn2 );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+   }
+   else
+   {
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn = solveLleftForest( eps, vec, idx, rn );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+      rn2 = solveLleftForest( eps, vec2, idx2, rn2 );
+
+   }
+
+   rn = solveLleft( eps, vec, idx, rn );
+   rn2 = solveLleft( eps, vec2, idx2, rn2 );
+}
+
 
 int CLUFactor::vSolveLeft3( Real eps,
                             Real* vec, int* idx,                      /* result */
@@ -6116,6 +6320,39 @@ int CLUFactor::vSolveLeft3( Real eps,
 
    return rn;
 }
+
+void CLUFactor::vSolveLeft3sparse( Real eps,
+                                   Real* vec, int* idx,                      /* result */
+                                   Real* rhs, int* ridx, int& rn,            /* rhs    */
+                                   Real* vec2, int* idx2,                    /* result2 */
+                                   Real* rhs2, int* ridx2, int& rn2,         /* rhs2    */
+                                   Real* vec3, int* idx3,                    /* result3 */
+                                   Real* rhs3, int* ridx3, int& rn3 )        /* rhs3    */
+{
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = solveUpdateLeft( eps, rhs, ridx, rn );
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn2 = solveUpdateLeft( eps, rhs2, ridx2, rn2 );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+      rn3 = solveUpdateLeft( eps, rhs3, ridx3, rn3 );
+      rn3 = solveUleft( eps, vec3, idx3, rhs3, ridx3, rn3 );
+   }
+   else
+   {
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn = solveLleftForest( eps, vec, idx, rn );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+      rn2 = solveLleftForest( eps, vec2, idx2, rn2 );
+      rn3 = solveUleft( eps, vec3, idx3, rhs3, ridx3, rn3 );
+      rn3 = solveLleftForest( eps, vec3, idx3, rn3 );
+   }
+
+   rn = solveLleft( eps, vec, idx, rn );
+   rn2 = solveLleft( eps, vec2, idx2, rn2 );
+   rn3 = solveLleft( eps, vec3, idx3, rn3 );
+}
+
 
 void CLUFactor::vSolveLeftNoNZ( Real eps,
                                 Real* vec2,                            /* result2 */

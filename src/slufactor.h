@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
+#include "timerfactory.h"
 #include "dvector.h"
 #include "slinsolver.h"
 #include "clufactor.h"
@@ -85,7 +86,8 @@ protected:
    /// |x| < epsililon is considered to be 0.
    Real epsilon;
    /// Time spent in solves
-   Timer   solveTime; 
+   Timer* solveTime;
+   Timer::TYPE timerType;
    /// Number of solves
    int     solveCount;
    //@}
@@ -191,17 +193,27 @@ public:
    void solveRight4update(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// Sparse version of solving two systems of equations
+   void solve2right4update(SSVector& x, SSVector& y, const SVector& b, SSVector& d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solve3right4update(SSVector& x, Vector& y, Vector& z, 
+   void solve3right4update(SSVector& x, Vector& y, Vector& z,
                            const SVector& b, SSVector& d, SSVector& e);
-   /// Solves \f$Ax=b\f$.
+   /// sparse version of solving three systems of equations
+   void solve3right4update(SSVector& x, SSVector& y, SSVector& z,
+                           const SVector& b, SSVector& d, SSVector& e);
+   /// sparse version of solving one system of equations with transposed basis matrix
    void solveLeft(Vector& x, const Vector& b);
    /// Solves \f$Ax=b\f$.
    void solveLeft(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    void solveLeft(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   /// sparse version of solving two systems of equations with transposed basis matrix
+   void solveLeft(SSVector& x, SSVector& two, const SVector& b, SSVector& rhs2);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    void solveLeft(SSVector& x, Vector& y, Vector& z,
+                  const SVector& b, SSVector& d, SSVector& e);
+   /// sparse version of solving three systems of equations with transposed basis matrix
+   void solveLeft(SSVector& x, SSVector& y, SSVector& z,
                   const SVector& b, SSVector& d, SSVector& e);
    ///
    Status change(int idx, const SVector& subst, const SSVector* eta = 0);
@@ -213,12 +225,12 @@ public:
    /// time spent in factorizations
    Real getFactorTime() const
    {
-      return factorTime.userTime();
+      return factorTime->time();
    }
    /// reset FactorTime
    void resetFactorTime()
    {
-      factorTime.reset();
+      factorTime->reset();
    }
    /// number of factorizations performed
    int getFactorCount() const
@@ -228,12 +240,12 @@ public:
    /// time spent in solves
    Real getSolveTime() const
    {
-      return solveTime.userTime();
+      return solveTime->time();
    }
    /// reset SolveTime
    void resetSolveTime()
    {
-      solveTime.reset();
+      solveTime->reset();
    }
    /// number of solves performed
    int getSolveCount() const
@@ -243,8 +255,8 @@ public:
    /// reset timers and counters
    void resetCounters()
    {
-      factorTime.reset();
-      solveTime.reset();
+      factorTime->reset();
+      solveTime->reset();
       factorCount = 0;
       solveCount = 0;
    }

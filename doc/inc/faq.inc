@@ -131,9 +131,13 @@ with the GCC under <a href="http://www.cygwin.com/">Cygwin</a> or minGW
       I want a primal and a dual simplex, where are they?    </div>
     <div id="primaldualsimplex_ans" class="answer">
        <p>
-That is nearly easy. You can set SoPlex to use the
-ENTERing and LEAVEing algorithm and
-COLUMN and ROW representation.
+SoPlex implements a composite simplex, i.e., it switches between primal and dual
+simplex and the user can only specify the starting algorithm via the integer
+parameter "int:algorithm = 0 (primal) / 1 (dual)".
+</p>
+<p>
+When using the low-level class SPxSolver, you can specify to use the
+ENTERing and LEAVEing algorithm and COLUMN and ROW representation.
 </p>
 <center>
 <table border="1" rules="all">
@@ -147,12 +151,6 @@ COLUMN oriented is the "usual" representation.
 Then Entering is the Primal and Leaving is the Dual algorithm.
 In ROW oriented representation, we have in principle the
 explicit dual and then the algorithms are reversed.
-
-The only problem is that SoPlex is a composite simplex algorithm.
-That means it switches between entering and leaving algorithm
-as it needs. So all you can choose is which algorithm is used first,
-but then an arbitrary number of switches may occur. (Even so, often
-no switch at all happens.)
 </p>
     </div>
   </li>

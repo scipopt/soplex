@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -48,8 +48,6 @@ private:
    /**@name Data */
    //@{
    Real  last;           ///< penalty, selected at last iteration.
-   DVector penalty;      ///< vector of pricing penalties.
-   DVector coPenalty;    ///< vector of pricing penalties.
    DataArray<IdxElement> prices;   ///< temporary array of precomputed pricing values
    DataArray<IdxElement> pricesCo; ///< temporary array of precomputed pricing values
    DIdxSet bestPrices;   ///< set of best pricing candidates
@@ -97,13 +95,14 @@ public:
    /// default constructor
    SPxDevexPR() 
       : SPxPricer("Devex")
+      , last(0)
+      , refined(false)
    {}
    /// copy constructor
    SPxDevexPR( const SPxDevexPR& old)
       : SPxPricer(old)
       , last(old.last)
-      , penalty(old.penalty)
-      , coPenalty(old.coPenalty)
+      , refined(false)
    {}
    /// assignment operator
    SPxDevexPR& operator=( const SPxDevexPR& rhs)
@@ -112,8 +111,6 @@ public:
       {
          SPxPricer::operator=(rhs);
          last = rhs.last;
-         penalty = rhs.penalty;
-         coPenalty = rhs.coPenalty;
       }
 
       return *this;

@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.0.0.2
+VERSION		:=	2.2.1.1
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -72,6 +72,9 @@ PARASCIP	=	false
 
 # will this be compiled with the 1.x interface?
 LEGACY		=	false
+
+# is it allowed to link to external open source libraries?
+OPENSOURCE	=	true
 
 GMP		=	true
 ZLIB		=	true
@@ -146,6 +149,7 @@ LIBHEADER	=	array.h \
 			lprowset.h \
 			mpsinput.h \
 			nameset.h \
+			notimer.h \
 			random.h \
 			rational.h \
 			ratrecon.h \
@@ -199,11 +203,14 @@ LIBHEADER	=	array.h \
 			svsetbase.h \
 			svset.h \
 			timer.h \
+			timerfactory.h \
 			unitvectorbase.h \
 			unitvector.h \
+			usertimer.h \
 			updatevector.h \
 			vectorbase.h \
-			vector.h
+			vector.h \
+			wallclocktimer.h
 LIBOBJ		= 	changesoplex.o \
 			clufactor.o \
 			clufactor_rational.o \
@@ -259,7 +266,8 @@ LIBOBJ		= 	changesoplex.o \
 			spxweightst.o \
 			spxwritestate.o \
 			statistics.o \
-			timer.o \
+			usertimer.o \
+			wallclocktimer.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
@@ -301,12 +309,18 @@ include make/make.$(BASE)
 
 ifeq ($(SHARED),true)
 CPPFLAGS	+=	-fPIC
-LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILD	=	$(LINKCXX)
-LIBBUILDFLAGS	+=      -shared
-LIBBUILD_o	= 	-o # the trailing space is important
 ARFLAGS		=
 RANLIB		=
+ifeq ($(COMP),msvc)
+LIBEXT		=	dll
+LIBBUILDFLAGS	+=      -dll
+LIBBUILD_o	= 	-out:
+else
+LIBEXT		=	$(SHAREDLIBEXT)
+LIBBUILDFLAGS	+=      -shared
+LIBBUILD_o	= 	-o # the trailing space is important
+endif
 endif
 
 CPPFLAGS	+=	$(USRCPPFLAGS)
@@ -371,6 +385,13 @@ ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC) $(LIBSRCHEADER)
 #-----------------------------------------------------------------------------
 # External Libraries
 #-----------------------------------------------------------------------------
+
+# check if it is allowed to link to external open source libraries
+ifeq ($(OPENSOURCE), false)
+	override ZLIB	=	false
+	override GMP	=	false
+	override EGLIB	=	false
+endif
 
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
@@ -482,6 +503,7 @@ endif
 
 .PHONY: doc
 doc:		
+		$(BINFILE) --saveset=doc/parameters.set
 		cd doc; $(DOXY) $(NAME).dxy
 
 .PHONY: test

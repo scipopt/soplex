@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -34,6 +34,7 @@ namespace soplex
    Class Random provides random Real variables, i.e. a value variable that
    gives another value each time it is accessed. It may be used just like an
    ordinary Real by means of an overloaded cast operator Real()%.
+   This is largely the same implementation as rand() from std lib.
 */
 class Random
 {
@@ -42,27 +43,20 @@ private:
    //--------------------------------------
    /**@name Data */
    //@{
-   Real themin;           ///< minimum random number to be returned
-   Real themax;           ///< maximum random number to be returned
-   unsigned long next;    ///< random seed.
+   unsigned int seed;    ///< random seed.
    //@}
 
    //--------------------------------------
    /**@name Helpers */
    //@{
    /// increases rand seed and returns a pseudo random Real value in [0,1).
-   Real next_random ()
+   Real next_random()
    {
-      next = next * RSTEP + RADD;
-      return last_random();
-   }
-
-   /// returns the last used random value in [0,1).
-   Real last_random() const
-   {
-      Real i = int ((next / RDIVIDE) % RMULT);
+      seed = seed * RSTEP + RADD;
+      Real i = int ((seed / RDIVIDE) % RMULT);
       return ( i / RMULT );
    }
+
    //@}
 
 public:
@@ -70,91 +64,46 @@ public:
    //--------------------------------------
    /**@name Access */
    //@{
-   /// returns lower bound of random numbers.
-   Real min() const
-   {
-      return themin;
-   }
-   /// returns upper bound of random numbers.
-   Real max() const
-   {
-      return themax;
-   }
-
    /// returns next random number.
-   /** When a Random variable is used where a Real value is
-       expected, a new random number within the range specified in the
-       constructor is retured.
-    */
-   operator Real()
+   Real next(Real minimum = 0.0, Real maximum = 1.0)
    {
-      return (themin + (themax - themin) * next_random());
+      return (minimum + (maximum - minimum) * next_random());
    }
 
-   /// returns last random number or seed for next one.
-   Real last() const
+   /// returns current seed
+   unsigned int getSeed() const
    {
-      return (themin + (themax - themin) * last_random());
+      return seed;
    }
+
    //@}
 
    //--------------------------------------
    /**@name Modification */
    //@{
-   /// resets lower bound for random numbers.
-   void setMin(Real p_min)
-   {
-      themin = p_min;
-   }
-
-   /// resets upper bound for random numbers.
-   void setMax(Real p_max)
-   {
-      themax = p_max;
-   }
-
    /// resets seed for next random number.
-   void setSeed(Real seed)
+   void setSeed(unsigned int randomseed)
    {
-      seed = (seed - themin) / (themax - themin);
-      next = static_cast<unsigned int>(seed * RMULT * RDIVIDE);
+      seed = randomseed;
    }
    //@}
 
-   //--------------------------------------
-   /**@name Debugging */
-   //@{
-   /// consistency check.
-   bool isConsistent() const
-   {
-#ifdef ENABLE_CONSISTENCY_CHECKS
-      return themin <= themax;
-#else
-      return true;
-#endif
-   }
-   //@}
 
    //--------------------------------------
    /**@name Constructors / destructors */
    //@{
    /// default constructor.
-   /** Constructs a new (pseudo) Random variable returning values between
-       \p p_min and \p p_max and using \p p_seed as seed for the random
+   /** Constructs a new (pseudo) Random variable using \p randomseed as seed for the random
        variable's sequence.
    */
    explicit
-   Random(Real p_min = 0, Real p_max = 1, Real p_seed = 0.5)
-      : themin(p_min), themax(p_max)
+   Random(unsigned int randomseed = 0)
    {
-      if (p_seed < p_min || p_seed > p_max)
-         p_seed = (p_min + p_max) / 2;
-      setSeed(p_seed);
-
-      assert(isConsistent());
+      setSeed(randomseed);
    }
+
    /// destructor
-   ~Random() 
+   ~Random()
    {}
    //@}
 };

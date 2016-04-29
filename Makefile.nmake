@@ -4,7 +4,7 @@
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
 #*    Copyright (C) 1996      Roland Wunderling                              *#
-#*                  1996-2014 Konrad-Zuse-Zentrum                            *#
+#*                  1996-2016 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -30,20 +30,20 @@ ARCH		=	x86
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		=	2.0.0.2
+VERSION		=	2.2.1.1
 VERBOSE		=	0
 OPT			=	opt
 LIBEXT		=	lib
 EXEEXT      =	exe
 
 # will this be compiled for PARASCIP? (disables output because it uses global variables)
-PARASCIP	=	0
+PARASCIP	   =	false
 
 # old 1.x interface?
-LEGACY	=	0
+LEGACY      =	false
 
-GMP			=	1
-ZLIB		=	1
+GMP			=	true
+ZLIB		   = 	true
 
 COMP		=	msvc
 CXX			=	cl
@@ -60,6 +60,7 @@ LIBDIR		=	lib
 NAME		=	soplex
 LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\clufactor.obj \
+				$(LIBOBJDIR)\clufactor_rational.obj \
 				$(LIBOBJDIR)\didxset.obj \
 				$(LIBOBJDIR)\enter.obj \
 				$(LIBOBJDIR)\gzstream.obj \
@@ -70,6 +71,7 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\rational.obj \
 				$(LIBOBJDIR)\ratrecon.obj \
 				$(LIBOBJDIR)\slufactor.obj \
+				$(LIBOBJDIR)\slufactor_rational.obj \
 				$(LIBOBJDIR)\solverational.obj \
 				$(LIBOBJDIR)\solvereal.obj \
 				$(LIBOBJDIR)\soplex.obj \
@@ -111,8 +113,8 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\spxweightst.obj \
 				$(LIBOBJDIR)\spxwritestate.obj \
 				$(LIBOBJDIR)\statistics.obj \
-				$(LIBOBJDIR)\timer.obj \
-				$(LIBOBJDIR)\unitvector.obj \
+				$(LIBOBJDIR)\usertimer.obj \
+				$(LIBOBJDIR)\wallclocktimer.obj \
 				$(LIBOBJDIR)\updatevector.obj
 BINOBJ		=	$(BINOBJDIR)\soplexmain.obj
 EXAMPLEOBJ	=	$(BINOBJDIR)\example.obj
@@ -139,7 +141,7 @@ ARFLAGS		=	$(ARFLAGS) $(USRARFLAGS)
 # PARASCIP
 #-----------------------------------------------------------------------------
 
-!if $(PARASCIP) == 1
+!if "$(PARASCIP)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /DDISABLE_VERBOSITY
 !endif
 
@@ -147,7 +149,7 @@ CPPFLAGS	=	$(CPPFLAGS) /DDISABLE_VERBOSITY
 # LEGACY
 #-----------------------------------------------------------------------------
 
-!if $(LEGACY) == 1
+!if "$(LEGACY)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /DSOPLEX_LEGACY
 !endif
 
@@ -171,12 +173,12 @@ LIBOBJDIR	=	$(OBJDIR)\lib
 # External Libraries
 #-----------------------------------------------------------------------------
 
-!if $(GMP) == 1
+!if "$(GMP)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /Ilib\mpir.$(ARCH) /DSOPLEX_WITH_GMP
 LIBS		=	$(LIBS) lib\libmpir.$(ARCH).lib
 !endif
 
-!if $(ZLIB) == 1
+!if "$(ZLIB)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /Ilib\zlib /DSOPLEX_WITH_ZLIB
 LIBS		=	$(LIBS) lib\libz.$(ARCH).lib
 LDFLAGS		=	$(LDFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD

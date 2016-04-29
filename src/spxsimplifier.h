@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -22,7 +22,7 @@
 #include <assert.h>
 
 #include "spxdefines.h"
-#include "timer.h"
+#include "timerfactory.h"
 #include "spxlp.h"
 #include "spxsolver.h"
 
@@ -48,7 +48,8 @@ protected:
    /// name of the simplifier
    const char* m_name;
    /// user time used for simplification
-   Timer       m_timeUsed;
+   Timer*      m_timeUsed;
+   Timer::TYPE m_timerType;
    /// number of removed rows
    int         m_remRows;
    /// number of removed columns
@@ -65,6 +66,10 @@ protected:
    int         m_keptLRhs;
    /// objective offset
    Real        m_objoffset;
+   /// minimal reduction (sum of removed rows/cols) to continue simplification
+   Real        m_minReduction;
+   /// message handler
+   SPxOut*     spxout;
    //@}
 
 public:
@@ -87,8 +92,10 @@ public:
    /**@name Types */
    //@{
    /// constructor
-   explicit SPxSimplifier(const char* p_name)
+   explicit SPxSimplifier(const char* p_name, Timer::TYPE ttype = Timer::USER_TIME)
       : m_name(p_name)
+      , m_timeUsed(0)
+      , m_timerType(ttype)
       , m_remRows(0)
       , m_remCols(0)
       , m_remNzos(0)
@@ -97,12 +104,17 @@ public:
       , m_keptBnds(0)
       , m_keptLRhs(0)
       , m_objoffset(0.0)
+      , m_minReduction(1e-4)
+      , spxout(0)
    {
       assert(isConsistent());
+
+      m_timeUsed = TimerFactory::createTimer(ttype);
    }
    /// copy constructor
    SPxSimplifier( const SPxSimplifier& old)
       : m_name(old.m_name)
+      , m_timerType(old.m_timerType)
       , m_remRows(old.m_remRows)
       , m_remCols(old.m_remCols)
       , m_remNzos(old.m_remNzos)
@@ -111,7 +123,10 @@ public:
       , m_keptBnds(old.m_keptBnds)
       , m_keptLRhs(old.m_keptLRhs)
       , m_objoffset(old.m_objoffset)
+      , m_minReduction(1e-4)
+      , spxout(old.spxout)
    {
+      m_timeUsed = TimerFactory::createTimer(m_timerType);
       assert(isConsistent());
    }
    /// assignment operator
@@ -120,6 +135,8 @@ public:
       if(this != &rhs)
       {
          m_name = rhs.m_name;
+         *m_timeUsed = *(rhs.m_timeUsed);
+         m_timerType = rhs.m_timerType;
          m_remRows = rhs.m_remRows;
          m_remCols = rhs.m_remCols;
          m_remNzos = rhs.m_remNzos;
@@ -128,6 +145,8 @@ public:
          m_keptBnds = rhs.m_keptBnds;
          m_keptLRhs = rhs.m_keptLRhs;
          m_objoffset = rhs.m_objoffset;
+         m_minReduction = rhs.m_minReduction;
+         spxout = rhs.spxout;
 
          assert(isConsistent());
       }
@@ -138,6 +157,8 @@ public:
    virtual ~SPxSimplifier()
    {
       m_name = 0;
+      m_timeUsed->~Timer();
+      spx_free(m_timeUsed);
    }
    /// clone function for polymorphism
    virtual SPxSimplifier* clone() const = 0;
@@ -153,7 +174,7 @@ public:
    }
    virtual Real timeUsed() const
    {
-      return m_timeUsed.userTime();
+      return m_timeUsed->time();
    }
    //@}
 
@@ -205,6 +226,12 @@ public:
    virtual void addObjoffset(const Real val)
    {
       m_objoffset += val;
+   }
+
+   /// set minimal reduction threshold to continue simplification
+   virtual void setMinReduction(const Real minRed)
+   {
+      m_minReduction = minRed;
    }
    //@}
 

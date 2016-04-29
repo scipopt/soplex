@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -55,13 +55,13 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 Real SPxGeometSC::computeScale(Real mini, Real maxi) const
 {
 
-   return sqrt(mini * maxi);
+   return spxSqrt(mini * maxi);
 }
 
 void SPxGeometSC::scale(SPxLPBase<Real>& lp)
 {
 
-   MSG_INFO1( spxout << "Geometric scaling LP" << std::endl; )
+   MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << std::endl; )
 
    Real pstart = 0.0;
    Real p0     = 0.0;
@@ -77,7 +77,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp)
 
    bool colFirst = colratio < rowratio;
 
-   MSG_INFO2( spxout << "LP scaling statistics:"
+   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << colratio
@@ -97,7 +97,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp)
          p0 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
          p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
       }
-      MSG_INFO3( spxout << "Geometric scaling round " << count
+      MSG_INFO3( (*spxout), (*spxout) << "Geometric scaling round " << count
                            << " col-ratio= " << (colFirst ? p0 : p1)
                            << " row-ratio= " << (colFirst ? p1 : p0)
                            << std::endl; )
@@ -124,20 +124,20 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp)
       // reset m_colscale/m_rowscale to 1.0
       setup(lp);
 
-      MSG_INFO2( spxout << "No scaling done." << std::endl; )
+      MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
    }
    else
    {
       applyScaling(lp);
 
-      MSG_INFO3( spxout << "Row scaling min= " << minAbsRowscale()
+      MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
                            << " max= " << maxAbsRowscale()
                            << std::endl
                            << "IGEOSC06 Col scaling min= " << minAbsColscale()
                            << " max= " << maxAbsColscale()
                            << std::endl; )
 
-      MSG_INFO2( spxout << "LP scaling statistics:"
+      MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                            << " min= " << lp.minAbsNzo()
                            << " max= " << lp.maxAbsNzo()
                            << " col-ratio= " << maxColRatio(lp) 

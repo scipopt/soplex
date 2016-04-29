@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -442,7 +442,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             }
             else
             {
-               MSG_DEBUG( spxout << "DHARRI01 removing value " << pupd[i] << std::endl; )
+               MSG_DEBUG( std::cout << "DHARRI01 removing value " << pupd[i] << std::endl; )
                pupd.clearNum(j);
             }
          }
@@ -486,7 +486,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             }
             else
             {
-               MSG_DEBUG( spxout << "DHARRI02 removing value " << cupd[i] << std::endl; )
+               MSG_DEBUG( std::cout << "DHARRI02 removing value " << cupd[i] << std::endl; )
                cupd.clearNum(j);
             }
          }
@@ -636,7 +636,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             }
             else
             {
-               MSG_DEBUG( spxout << "DHARRI03 removing value " << pupd[i] << std::endl; )
+               MSG_DEBUG( std::cout << "DHARRI03 removing value " << pupd[i] << std::endl; )
                pupd.clearNum(j);
             }
          }
@@ -680,7 +680,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
             }
             else
             {
-               MSG_DEBUG( spxout << "DHARRI04 removing value " << x << std::endl; );
+               MSG_DEBUG( std::cout << "DHARRI04 removing value " << x << std::endl; );
                cupd.clearNum(j);
             }
          }

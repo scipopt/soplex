@@ -1,7 +1,47 @@
-(maintain each list from top to bottom)
-
-Developer version
+developer version
 =================
+
+performance:
+
+interface & parameters:
+- new parameters to control refactorization triggers
+- random seed for perturbation can be set from outside and is not reset in between
+
+fixed bugs:
+
+code quality:
+
+
+29 February 2016 - Release 2.2.1
+================================
+
+performance:
+- faster updateFtest() by exploiting sparsity in solveVector3
+- new method noViols() for checking violations, that terminates faster than maxInfeas()
+- new refactorization trigger that takes basis size into account
+
+interface & parameters:
+- show current dual (primal) violation of dual (primal) simplex in log
+- options -X and -Y to print primal and dual solution as rationals
+- add new compiling flag OPENSOURCE to allow/forbid the usage of third party software
+
+fixed bugs:
+- correct initialization of objective offset in simplifier
+- fix for compilation with Visual Studio 2010
+- allow to extend also empty SVectors
+- better internal handling of singular bases
+- check whether the solver is available when setting dual norms
+- fix removing rows/cols in SoPlex interface
+- check objective limit also when presolving is activated
+- fixed compilation problems under Windows with MSVC
+
+code quality:
+- removed some hard float comparisons (use 'EQ()' instead of '==' )
+- check scripts are now python3 compliant
+
+
+30 June 2015 - Release 2.2.0
+============================
 
 features:
 - support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
@@ -11,14 +51,24 @@ features:
 performance:
 - iterative refinement for ranged rows without introducing explicit slack variables
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
+- use sparse data structures (SSVector instead of Vector) for LU solves with 2 or 3 right hand sides
+  (necessary for steepest edge weights and/or bound flipping ratio test updates)
 - do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
 - faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
 - more efficient arithmetic in class Rational by checking special cases
+- faster iterative refinement by using powers of two as scaling factors
+- reuse factorization during iterative refinement
+- no transformation of objective sense for rational solve
+- simplifier makes fewer constructor/destructor calls to DSVector class by reusing the data structures
+- update nonbasic part of objective function value instead of completely recomputing it every time
+- activate hyper sparse pricing per default
+- faster solve methods by clearing temporary vectors more efficiently (esp. useful for steepest edge pricing)
+- steepest edge and devex pricer share the same norm/weight array to avoid the initialization phase after a pricer switch
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
 - new make option EG={true,false} to build with EGlib
-- bound flipping is now enabled by default
+- bound flipping is now enabled by default when using column representation
 - new command line option --writefile to save LP file as read by SoPlex
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - improved printing of rationals in limited precision
@@ -30,6 +80,11 @@ interface & parameters:
 - new statistics section on rational reconstruction
 - new statistics section on size of rational solution in base 2 and base 10
 - new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
+- new parameter bool:powerscaling for rounding scaling factors during iterative refinement to powers of two
+- new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
+- new methods to store and set dual norms for pricing
+- new parameter real:minred to control the minimal reduction factor in the simplifier to continue presolving (default 1e-4)
+- new parameter bool:rowboundlfips to enable bound flipping also for row representation
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
@@ -37,14 +92,30 @@ fixed bugs:
 - fixed default bounds of integer variables in MPS reader
 - adjust basis status of nonbasic rows automatically to row type when reading basis file
 - fix compiler error from missing operators between Rational and ints for GMP=false
+- fix memory leak with static rational numbers Rational::{ZERO,POSONE,NEGONE} and list memory
+- fix uninitialized value in class SPxWeightST
+- fix wrong basis status in postsolving of aggregated variables
+- eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
+- force recomputation of nonbasic objective value when reloading SPxSolver
+- correct counting of LU solves (when solving with more than one rhs this is counted accordingly)
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
 - deactivate SOPLEX_DEBUG flag in header files if defined externally
+- SPxOut output stream is no longer a global variable
+- hyper pricing parameters (i.e. candidate list size and activation threshold) are not linked to maxUpdates of factorization anymore
 
 
-Bugfix version
-==============
+18 Feb 2015 - Release 2.1.0
+===========================
+
+SoPlex 2.1 is an internal release that was packed for installing an 80bit extended-precision version on the NEOS Server
+for Optimization.  It contains many of the features of SoPlex 2.2, in particular for solving LPs with rational input
+data exactly.
+
+
+18 Dec 2014 - Release 2.0.1
+===========================
 
 features:
 - restore basis of original LP after performing iterative refinement on feasibility LP
@@ -59,6 +130,7 @@ performance:
 interface:
 - new method Rational::freeListMem() to free unused GMP memory manually (usage optional)
 - more statistics on type of refinement rounds
+- type of timing can now be switched between CPU time and wallclock time
 
 fixed bugs:
 - fix Rational::isAdjacentTo() when GMP=false
@@ -67,8 +139,7 @@ fixed bugs:
 - fix bug from uninitialized Farkas vector when simplifier detected infeasibility during iterative refinement
 - fix bug when perturbing fixed variables
 - fix bug with incorrect index incrementation in sparse inner vector product
-
-
+- fix compiler error with class Rational::Private and GMP=false
 
 
 27 Feb 2014 - Release 2.0.0

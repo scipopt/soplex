@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -112,6 +112,16 @@ private:
    //@}
 
 public:
+
+   // message handler
+   SPxOut* spxout;
+
+public:
+
+   void setOutstream(SPxOut& newOutstream)
+   {
+      spxout = &newOutstream;
+   }
 
    // ------------------------------------------------------------------------------------------------------------------
 
@@ -1085,6 +1095,9 @@ public:
    /// Removes \p i 'th row.
    virtual void removeRow(int i)
    {
+      if( i < 0 )
+         return;
+
       doRemoveRow(i);
    }
 
@@ -1179,6 +1192,9 @@ public:
    /// Removes \p i 'th column.
    virtual void removeCol(int i)
    {
+      if( i < 0 )
+         return;
+
       doRemoveCol(i);
    }
 
@@ -1453,14 +1469,17 @@ public:
 
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
-      LPColSetBase<R>::maxObj_w() *= (spxSense() == MINIMIZE ? -1 : 1);
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w() *= -1;
       assert(isConsistent());
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
    virtual void changeObj(int i, const R& newVal)
    {
-      LPColSetBase<R>::maxObj_w(i) = (spxSense() == MINIMIZE) ? -newVal : newVal;
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      if( spxSense() == MINIMIZE )
+         LPColSetBase<R>::maxObj_w(i) *= -1;
       assert(isConsistent());
    }
 
@@ -1478,6 +1497,35 @@ public:
    virtual void changeObj(SPxColId id, const R& newVal)
    {
       changeObj(number(id), newVal);
+   }
+
+   /// Changes objective vector to \p newObj.
+   virtual void changeMaxObj(const VectorBase<R>& newObj)
+   {
+      assert(maxObj().dim() == newObj.dim());
+      LPColSetBase<R>::maxObj_w() = newObj;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   virtual void changeMaxObj(int i, const R& newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = newVal;
+      assert(isConsistent());
+   }
+
+   /// changes \p i 'th objective vector element to \p newVal.
+   template < class S >
+   void changeMaxObj(int i, const S* newVal)
+   {
+      LPColSetBase<R>::maxObj_w(i) = *newVal;
+      assert(isConsistent());
+   }
+
+   /// Changes objective value of column with identifier \p id to \p newVal.
+   virtual void changeMaxObj(SPxColId id, const R& newVal)
+   {
+      changeMaxObj(number(id), newVal);
    }
 
    /// Changes vector of lower bounds to \p newLower.
@@ -1692,6 +1740,8 @@ public:
    /// Replaces \p i 'th row of LP with \p newRow.
    virtual void changeRow(int n, const LPRowBase<R>& newRow)
    {
+      if( n < 0 )
+         return;
 
       int j;
       SVectorBase<R>& row = rowVector_w(n);
@@ -1728,6 +1778,8 @@ public:
    /// Replaces \p i 'th column of LP with \p newCol.
    virtual void changeCol(int n, const LPColBase<R>& newCol)
    {
+      if( n < 0 )
+         return;
 
       int j;
       SVectorBase<R>& col = colVector_w(n);
@@ -1764,6 +1816,8 @@ public:
    /// Changes LP element (\p i, \p j) to \p val.
    virtual void changeElement(int i, int j, const R& val)
    {
+      if( i < 0 || j < 0 )
+         return;
 
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
@@ -1794,6 +1848,9 @@ public:
    template < class S >
    void changeElement(int i, int j, const S* val)
    {
+      if( i < 0 || j< 0 )
+         return;
+
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 
@@ -2610,6 +2667,7 @@ public:
       , offset(old.offset)
       , isScaled(old.isScaled)
       , lp_scaler(old.lp_scaler)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }
@@ -2623,6 +2681,7 @@ public:
       , offset(old.offset)
       , isScaled(old.isScaled)
       , lp_scaler(old.lp_scaler)
+      , spxout(old.spxout)
    {
       assert(isConsistent());
    }

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -79,10 +79,6 @@ const Rational Rational::NEGONE(-1, true);
 
 /// list of unused Private objects; note that this cannot be used if SOPLEX_WITH_GMP is not defined, since then the
 /// Private class has no member next() and prev()
-IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
-
-
-
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
 bool Rational::useListMem = false;
@@ -90,6 +86,11 @@ bool Rational::useListMem = false;
 bool Rational::useListMem = true;
 #endif
 
+
+
+
+/// list of unused Private objects
+IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 
 /// Defines the "Pimpl"-class Private
@@ -561,19 +562,20 @@ Rational::Rational(const mpq_t& q)
 /// destructor
 Rational::~Rational()
 {
-   if( Rational::useListMem )
+   assert(Rational::useListMem || unusedPrivateList.length() == 0);
+
+   if( !Rational::useListMem || this == &Rational::ZERO || this == &Rational::POSONE || this == &Rational::NEGONE )
+   {
+      dpointer->~Private();
+      spx_free(dpointer);
+   }
+   else
    {
       // for memory efficiency, we could free the Private object (or even more Private objects from the list of unused
       // elements) if there are much more unused than used Private objects; this requires counting the used Private
       // objects, though; we do not implement this currently, because we have not encountered memory problems, so far, and
       // because freeing costs time
       unusedPrivateList.append(dpointer);
-   }
-   else
-   {
-      assert(unusedPrivateList.length() == 0);
-      dpointer->~Private();
-      spx_free(dpointer);
    }
 }
 
@@ -708,6 +710,22 @@ const mpq_t* Rational::getMpqPtr() const
 
 /// provides read-only access to underlying mpq_t
 const mpq_t& Rational::getMpqRef() const
+{
+   return this->dpointer->privatevalue;
+}
+
+
+
+/// provides write access to underlying mpq_t; use with care
+mpq_t* Rational::getMpqPtr_w() const
+{
+   return &(this->dpointer->privatevalue);
+}
+
+
+
+/// provides write access to underlying mpq_t; use with care
+mpq_t& Rational::getMpqRef_w() const
 {
    return this->dpointer->privatevalue;
 }
@@ -1656,6 +1674,37 @@ Rational& Rational::invert()
 
 
 
+/// round up to next power of two
+Rational& Rational::powRound()
+{
+   mpz_t roundval;
+
+   MSG_DEBUG( std::cout << "rounding " << rationalToString(this->dpointer->privatevalue) << " to power of two" << "\n" );
+
+   mpz_init(roundval);
+   mpz_cdiv_q(roundval, mpq_numref(this->dpointer->privatevalue), mpq_denref(this->dpointer->privatevalue));
+   mpz_sub_ui(roundval, roundval, 1);
+
+   MSG_DEBUG( std::cout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
+
+   size_t binlog = mpz_sizeinbase(roundval, 2);
+
+   MSG_DEBUG( std::cout << "   --> 2^" << binlog << "\n" );
+
+   mpz_ui_pow_ui(roundval, 2, binlog);
+
+   MSG_DEBUG( std::cout << "   --> " << mpz_get_str(0, 10, roundval) << "\n" );
+
+   mpq_set_z(this->dpointer->privatevalue, roundval);
+   mpz_clear(roundval);
+
+   MSG_DEBUG( std::cout << "   --> " << rationalToString(this->dpointer->privatevalue) << "\n" );
+
+   return *this;
+}
+
+
+
 /// checks if d is the closest possible double
 bool Rational::isNextTo(const double& d)
 {
@@ -1667,16 +1716,16 @@ bool Rational::isNextTo(const double& d)
    if( Rational(x) < *this )
    {
       a = x;
-      b = nextafter(a, infinity);
+      b = (double)spxNextafter(a, infinity);
    }
    else
    {
       b = x;
-      a = nextafter(b, -infinity);
+      a = (double)spxNextafter(b, -infinity);
    }
 
    // check if d equals the closer end of the intervall
-   bool result = (abs(*this - a) < abs(*this - b))
+   bool result = (spxAbs(*this - a) < spxAbs(*this - b))
       ? (d == a)
       : (d == b);
 
@@ -1703,13 +1752,13 @@ bool Rational::isAdjacentTo(const double& d) const
    if( cmp < 0 )
    {
       a = x;
-      b = nextafter(a, infinity);
+      b = (double)spxNextafter(a, infinity);
    }
    // the rounded value is larger than the rational value
    else if( cmp > 0 )
    {
       b = x;
-      a = nextafter(b, -infinity);
+      a = (double)spxNextafter(b, -infinity);
    }
    // the rational value is representable in double precision
    else
@@ -1900,6 +1949,12 @@ bool Rational::readString(const char* s)
 /// convert rational number to string
 std::string rationalToString(const Rational& r, const int precision)
 {
+
+#if defined(_WIN32) || defined(_WIN64) || defined(__APPLE__)
+  std::stringstream sstream;
+  sstream << r;
+  return sstream.str();
+#else
    if( precision <= 0 )
    {
       std::stringstream sstream;
@@ -1923,6 +1978,7 @@ std::string rationalToString(const Rational& r, const int precision)
       fclose(tmpStream);
       return retString;
    }
+#endif
 }
 
 
@@ -2092,6 +2148,14 @@ std::ostream& operator<<(std::ostream& os, const Rational& r)
    os << mpq_get_str(buffer, 10, r.dpointer->privatevalue);
    free(buffer);
    return os;
+}
+
+
+
+/// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
+int compareRational(const Rational& r, const Rational& s)
+{
+   return mpq_cmp(r.dpointer->privatevalue, s.dpointer->privatevalue);
 }
 
 
@@ -2763,7 +2827,7 @@ Rational operator/(const int& d, const Rational& r)
 
 
 /// Absolute.
-Rational abs(const Rational& r)
+Rational spxAbs(const Rational& r)
 {
    Rational res;
    mpq_abs(res.dpointer->privatevalue, r.dpointer->privatevalue);
@@ -2826,6 +2890,27 @@ int dlcmSizeRational(const Rational* vector, const int length, const int base)
    mpz_clear(lcm);
 
    return size;
+}
+
+
+
+/// Size of largest denominator in rational vector.
+int dmaxSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   size_t dmax = 0;
+
+   for( int i = 0; i < length; i++ )
+   {
+      size_t dsize = mpz_sizeinbase(mpq_denref(vector[i].getMpqRef()), base);
+      if( dsize > dmax )
+         dmax = dsize;
+   }
+
+   return (int)dmax;
 }
 
 
@@ -3328,6 +3413,15 @@ Rational& Rational::invert()
 
 
 
+/// round up to next power of two
+Rational& Rational::powRound()
+{
+   ///@todo implement
+   return *this;
+}
+
+
+
 /// checks if d is the closest possible double
 bool Rational::isNextTo(const double& d)
 {
@@ -3393,6 +3487,19 @@ std::ostream& operator<<(std::ostream& os, const Rational& r)
 {
    os << r.dpointer->privatevalue;
    return os;
+}
+
+
+
+/// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
+int compareRational(const Rational& r, const Rational& s)
+{
+   if( r.dpointer->privatevalue > s.dpointer->privatevalue)
+      return 1;
+   else if( r.dpointer->privatevalue < s.dpointer->privatevalue)
+      return -1;
+   else
+      return 0;
 }
 
 
@@ -3815,7 +3922,7 @@ Rational operator/(const int& d, const Rational& r)
 
 
 /// Absolute.
-Rational abs(const Rational& r)
+Rational spxAbs(const Rational& r)
 {
    Rational res = r;
 
@@ -3864,6 +3971,18 @@ int totalSizeRational(const Rational* vector, const int length, const int base)
 
 /// Size of least common multiple of denominators in rational vector.
 int dlcmSizeRational(const Rational* vector, const int length, const int base)
+{
+   assert(vector != 0);
+   assert(length >= 0);
+   assert(base >= 0);
+
+   return 0;
+}
+
+
+
+/// Size of largest denominator in rational vector.
+int dmaxSizeRational(const Rational* vector, const int length, const int base)
 {
    assert(vector != 0);
    assert(length >= 0);

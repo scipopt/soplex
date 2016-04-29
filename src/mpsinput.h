@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -197,7 +197,7 @@ public:
    ///
    void syntaxError() 
    {
-      MSG_ERROR( spxout << "Syntax error in line " << m_lineno << std::endl; )
+      MSG_ERROR( std::cerr << "Syntax error in line " << m_lineno << std::endl; )
       m_section = ENDATA;
       m_has_error = true;
    }
@@ -208,15 +208,16 @@ public:
    {
       if ( m_ignored < m_max_ignore )
       {
-         MSG_WARNING( spxout << "Warning: line " << m_lineno << ": "
-                             << what << " \"" << what_name << "\"" 
-                             << " for " << entity << " \"" 
-                             << entity_name << "\" ignored" << std::endl; )
+         MSG_ERROR( std::cerr << "Warning: line " << m_lineno << ": "
+                              << what << " \"" << what_name << "\""
+                              << " for " << entity << " \""
+                              << entity_name << "\" ignored" << std::endl; )
          ++m_ignored;
 
          if ( m_ignored == m_max_ignore )
-            MSG_WARNING( spxout << "Warning: This was the " << m_max_ignore << " ignored entry. No further warnings on "
-                                << "ignored entries will be given." << std::endl; )
+            MSG_ERROR( std::cerr << "Warning: This was the " << m_max_ignore
+                                 << " ignored entry. No further warnings on "
+                                 << "ignored entries will be given." << std::endl; )
       }
    }
    //@}

@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2014 Konrad-Zuse-Zentrum                            */
+/*                  1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -35,9 +35,6 @@
 #include "dsvectorbase.h"
 #include "unitvectorbase.h"
 #include "svsetbase.h"
-
-// specialized multAdd() for rationals
-#define SOPLEX_PERFALT_10
 
 #define SOPLEX_VECTOR_MARKER   1e-100
 
@@ -303,7 +300,7 @@ VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
 
 
 
-#ifdef SOPLEX_PERFALT_10
+#ifndef SOPLEX_LEGACY
 /// Addition of scaled vector, specialization for rationals
 template <>
 template <>

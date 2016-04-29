@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -149,6 +149,11 @@ public:
                                    Vector& y,
                                    const SVector& b,
                                    SSVector& d ) = 0;
+   /// sparse version of solving two systems of equations
+   virtual void solve2right4update(SSVector& x,
+                                   SSVector& y,
+                                   const SVector& b,
+                                   SSVector& d ) = 0;
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
    virtual void solve3right4update(SSVector& x,
                                    Vector& y,
@@ -156,17 +161,32 @@ public:
                                    const SVector& b,
                                    SSVector& d,
                                    SSVector& e) = 0;
+   /// sparse version of solving three systems of equations
+   virtual void solve3right4update(SSVector& x,
+                                   SSVector& y,
+                                   SSVector& z,
+                                   const SVector& b,
+                                   SSVector& d,
+                                   SSVector& e) = 0;
    /// solves \f$x^TA=b^T\f$.
    virtual void solveLeft (Vector& x, const Vector& b) /* const */ = 0;
-   /// solves \f$x^TA=b^T\f$.
+   /// sparse version of solving one system of equations with transposed basis matrix
    virtual void solveLeft (SSVector& x, const SVector& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
    virtual void solveLeft (SSVector& x,
                            Vector& two,
                            const SVector& b,
                            SSVector& rhs2) /* const */ = 0;
+   /// sparse version of solving two systems of equations with transposed basis matrix
+   virtual void solveLeft (SSVector& x,
+                           SSVector& two,
+                           const SVector& b,
+                           SSVector& rhs2) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$, \f$y^TA=d^T\f$ and \f$z^TA=e^T\f$
    virtual void solveLeft (SSVector& x, Vector& y, Vector& z,
+                           const SVector& b, SSVector& d, SSVector& e) = 0;
+   /// sparse version of solving three systems of equations with transposed basis matrix
+   virtual void solveLeft (SSVector& x, SSVector& y, SSVector& z,
                            const SVector& b, SSVector& d, SSVector& e) = 0;
    //@}
 
@@ -176,6 +196,7 @@ public:
    //@{
    /// default constructor
    SLinSolver()
+      : spxout(0)
    {}
    /// destructor
    virtual ~SLinSolver()
@@ -184,6 +205,8 @@ public:
    virtual SLinSolver* clone() const = 0;
    //@}
 
+   /// message handler
+   SPxOut* spxout;
 
 
 };

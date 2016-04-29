@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -38,7 +38,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       Real x, y;
       int i;
 
-      MSG_DEBUG( spxout << "DVECST01 colWeight[]: "; )
+      MSG_DEBUG( std::cout << "DVECST01 colWeight[]: "; )
       for (i = base.nCols(); i--;)
       {
          x = vec[i] - base.SPxLP::lower(i);
@@ -53,11 +53,11 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             colWeight[i] = -y + bias * obj[i];
             colUp[i] = 1;
          }
-         MSG_DEBUG( spxout << colWeight[i] << " "; )
+         MSG_DEBUG( std::cout << colWeight[i] << " "; )
       }
-      MSG_DEBUG( spxout << std::endl << std::endl; )
+      MSG_DEBUG( std::cout << std::endl << std::endl; )
 
-      MSG_DEBUG( spxout << "DVECST02 rowWeight[]: "; )
+      MSG_DEBUG( std::cout << "DVECST02 rowWeight[]: "; )
       for (i = base.nRows(); i--;)
       {
          const SVector& row = base.rowVector(i);
@@ -74,9 +74,9 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
             rowRight[i] = 1;
          }
-         MSG_DEBUG( spxout << rowWeight[i] << " "; )
+         MSG_DEBUG( std::cout << rowWeight[i] << " "; )
       }
-      MSG_DEBUG( spxout << std::endl; )
+      MSG_DEBUG( std::cout << std::endl; )
    }
 
    else if (state == DVEC)
@@ -90,7 +90,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
       Real x, y, len;
       int i, j;
       for (i = base.nRows(); i--;)
-         rowWeight[i] += fabs(vec[i]);
+         rowWeight[i] += spxAbs(vec[i]);
 
       for (i = base.nCols(); i--;)
       {
@@ -102,7 +102,7 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             len += x * x;
          }
          if (len > 0)
-            colWeight[i] += fabs(y / len - base.maxObj(i));
+            colWeight[i] += spxAbs(y / len - base.maxObj(i));
       }
    }
    else

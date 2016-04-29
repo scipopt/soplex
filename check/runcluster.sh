@@ -4,7 +4,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -35,7 +35,7 @@ date                                >> $OUTFILE
 date                                >> $ERRFILE
 echo -----------------------------  >> $OUTFILE
 date +"@03 %s"                      >> $OUTFILE
-$EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set --writebas=$BASFILE -c -q -t$TIMELIMIT $INSTANCE >> $OUTFILE 2>>$ERRFILE
+$EXECNAME --loadset=$SOLVERPATH/../settings/$SETTINGS.set --writebas=$BASFILE -v4 --int:displayfreq=10000 -c -q -t$TIMELIMIT $INSTANCE >> $OUTFILE 2>>$ERRFILE
 date +"@04 %s"                      >> $OUTFILE
 echo -----------------------------  >> $OUTFILE
 date                                >> $OUTFILE

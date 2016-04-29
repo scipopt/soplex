@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -20,7 +20,7 @@
 
 namespace soplex
 {
-SoPlexLegacy::SoPlexLegacy(SPxSolver::Type p_type, SPxSolver::Representation p_rep)
+SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver::Representation p_rep)
    : m_solver(p_type, p_rep)
    , m_preScaler(0)
    , m_postScaler(0)
@@ -30,6 +30,7 @@ SoPlexLegacy::SoPlexLegacy(SPxSolver::Type p_type, SPxSolver::Representation p_r
    , m_freePostScaler(false)
    , m_freeSimplifier(false)
 {
+   m_solver.setOutstream(outstream);
    m_solver.setSolver(&m_slu);
    m_solver.setTester(new SPxBoundFlippingRT(), true);
    m_solver.setPricer(new SPxSteepPR(), true);
@@ -193,6 +194,8 @@ void SoPlexLegacy::setPreScaler(SPxScaler* x, const bool destroy)
       m_preScaler = 0;
    }
    m_preScaler = x;
+   if( m_preScaler )
+      m_preScaler->setOutstream(*spxout);
    m_freePreScaler = destroy;
 }
 
@@ -207,6 +210,8 @@ void SoPlexLegacy::setPostScaler(SPxScaler* x, const bool destroy)
       m_postScaler = 0;
    }
    m_postScaler = x;
+   if( m_postScaler )
+      m_postScaler->setOutstream(*spxout);
    m_freePostScaler = destroy;
 }
 
@@ -245,6 +250,7 @@ SPxSolver::Status SoPlexLegacy::solve()
 
    // working LP
    SPxLP work(*this);
+   work.setOutstream(*spxout);
 
    // keep useful bounds for bfrt
    bool keepbounds = (!strcmp(m_solver.ratiotester()->getName(), "Bound Flipping"));
@@ -514,7 +520,7 @@ SPxSolver::Status SoPlexLegacy::getPrimalray(Vector& primalray) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      MSG_ERROR( spxout << "ESOLVR02 Primal ray with presolving not yet implemented" << std::endl; )
+      MSG_ERROR( std::cerr << "ESOLVR02 Primal ray with presolving not yet implemented" << std::endl; )
       throw SPxStatusException("XSOLVR02 Primal ray with presolving not yet implemented");
    }
    SPxSolver::Status stat = m_solver.getPrimalray(primalray);
@@ -533,7 +539,7 @@ SPxSolver::Status SoPlexLegacy::getDualfarkas(Vector& dualfarkas) const
    /// Does not work yet with presolve
    if (has_simplifier())
    {
-      MSG_ERROR( spxout << "ESOLVR02 Dual farkas with presolving not yet implemented" << std::endl; )
+      MSG_ERROR( std::cerr << "ESOLVR02 Dual farkas with presolving not yet implemented" << std::endl; )
       throw SPxStatusException("XSOLVR03 Dual farkas with presolving not yet implemented");
       //      return SPxSolver::ERROR;
    }
@@ -573,10 +579,10 @@ void SoPlexLegacy::qualConstraintViolation(
       assert(lhs( row ) <= rhs( row ));
 
       if (val < lhs( row ))
-         viol = fabs(val - lhs( row ));
+         viol = spxAbs(val - lhs( row ));
       else
          if (val > rhs( row ))
-            viol = fabs(val - rhs( row ));
+            viol = spxAbs(val - rhs( row ));
 
       if (viol > maxviol)
          maxviol = viol;
@@ -603,10 +609,10 @@ void SoPlexLegacy::qualBoundViolation(
       Real viol = 0.0;
 
       if (solu[col] < lower( col ))
-         viol = fabs( solu[col] - lower( col ));
+         viol = spxAbs( solu[col] - lower( col ));
       else
          if (solu[col] > upper( col ))
-            viol = fabs( solu[col] - upper( col ));
+            viol = spxAbs( solu[col] - upper( col ));
 
       if (viol > maxviol)
          maxviol = viol;
@@ -688,8 +694,6 @@ bool SoPlexLegacy::writeBasisFile(
    }
 
    #ifndef NDEBUG
-   MSG_DEBUG( thedesc.dump() );
-
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for( ; row < nRows(); row++ )
    {
@@ -697,7 +701,6 @@ bool SoPlexLegacy::writeBasisFile(
          break;
    }
    assert(row == nRows());
-
    #endif // NDEBUG
 
    os << "ENDATA" << std::endl;

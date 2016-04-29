@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <limits.h>
 
 #include "spxdefines.h"
 
@@ -323,7 +324,7 @@ public:
       primes[39] = 879190747;
       primes[40] = 941083981;
       primes[41] = 982451653;
-      primes[42] = __INT_MAX__;
+      primes[42] = INT_MAX;
       nprimes = 43;
 
       m_hashsize = (hashsize < 1) ? autoHashSize() : hashsize;

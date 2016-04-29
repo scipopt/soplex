@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -56,7 +56,7 @@ Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
 void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
 {
 
-   MSG_INFO1( spxout << "Equilibrium scaling LP" << std::endl; )
+   MSG_INFO1( (*spxout), (*spxout) << "Equilibrium scaling LP" << std::endl; )
 
    setup(lp);
 
@@ -84,7 +84,7 @@ void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
 
    bool colFirst = colratio < rowratio;
 
-   MSG_INFO2( spxout << "LP scaling statistics:"
+   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << colratio 
@@ -106,14 +106,14 @@ void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
    }
    applyScaling(lp);
 
-   MSG_INFO3( spxout << "Row scaling min= " << minAbsRowscale()
+   MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
                         << " max= " << maxAbsRowscale()
                         << std::endl
                         << "\tCol scaling min= " << minAbsColscale()
                         << " max= " << maxAbsColscale()
                         << std::endl; )
 
-   MSG_INFO2( spxout << "LP scaling statistics:"
+   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << maxColRatio(lp) 

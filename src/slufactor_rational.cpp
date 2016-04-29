@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -42,32 +42,32 @@ namespace soplex
 void SLUFactorRational::solveRight(VectorRational& x, const VectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec = b;
    CLUFactorRational::solveRight(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveRight(SSVectorRational& x, const SVectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec.assign(b);
    x.clear();
    CLUFactorRational::solveRight(x.altValues(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRational& b)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int m;
    int n;
@@ -99,7 +99,7 @@ void SLUFactorRational::solveRight4update(SSVectorRational& x, const SVectorRati
    usetup = true;
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solve2right4update(
@@ -109,7 +109,7 @@ void SLUFactorRational::solve2right4update(
    SSVectorRational&      rhs)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int  m;
    int  n;
@@ -148,7 +148,7 @@ void SLUFactorRational::solve2right4update(
       forest.forceSetup();
    }
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solve3right4update(
@@ -160,7 +160,7 @@ void SLUFactorRational::solve3right4update(
    SSVectorRational&      rhs2)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int  m;
    int  n;
@@ -203,13 +203,13 @@ void SLUFactorRational::solve3right4update(
       forest.forceSetup();
    }
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    vec = b;
    ///@todo Why is x.clear() here used and not with solveRight() ?
@@ -217,13 +217,13 @@ void SLUFactorRational::solveLeft(VectorRational& x, const VectorRational& b) //
    CLUFactorRational::solveLeft(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    ssvec.assign(b);
 
@@ -244,7 +244,7 @@ void SLUFactorRational::solveLeft(SSVectorRational& x, const SVectorRational& b)
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(
@@ -254,7 +254,7 @@ void SLUFactorRational::solveLeft(
    SSVectorRational&      rhs2) //const
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int   n;
    Rational* svec = ssvec.altValues();
@@ -282,7 +282,7 @@ void SLUFactorRational::solveLeft(
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 void SLUFactorRational::solveLeft(
@@ -294,7 +294,7 @@ void SLUFactorRational::solveLeft(
    SSVectorRational&      rhs3)
 {
 
-   solveTime.start();
+   solveTime->start();
 
    int   n;
    Rational* svec = ssvec.altValues();
@@ -320,7 +320,7 @@ void SLUFactorRational::solveLeft(
    ssvec.forceSetup();
 
    solveCount++;
-   solveTime.stop();
+   solveTime->stop();
 }
 
 Rational SLUFactorRational::stability() const
@@ -412,7 +412,7 @@ SLUFactorRational::Status SLUFactorRational::change(
    }
    usetup = false;
 
-   MSG_DEBUG( spxout << "DSLUFA01\tupdated\t\tstability = " << stability()
+   MSG_DEBUG( std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
                      << std::endl; )
 
    return status();
@@ -703,6 +703,7 @@ SLUFactorRational::SLUFactorRational()
    , eta (1)
    , forest (1)
    , minThreshold (0.01)
+   , timerType(Timer::USER_TIME)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -730,6 +731,8 @@ SLUFactorRational::SLUFactorRational()
    thedim = 0;
    try
    {
+      solveTime = TimerFactory::createTimer(timerType);
+      factorTime = TimerFactory::createTimer(timerType);
       spx_alloc(row.perm, thedim);
       spx_alloc(row.orig, thedim);
       spx_alloc(col.perm, thedim);
@@ -822,8 +825,10 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    , CLUFactorRational()
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+   , usetup(old.usetup)
    , eta (old.eta)
    , forest(old.forest)
+   , timerType(old.timerType)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -846,6 +851,10 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    l.rbeg      = 0;
    l.rorig     = 0;
    l.rperm     = 0;
+
+   solveCount = 0;
+   solveTime = TimerFactory::createTimer(timerType);
+   factorTime = TimerFactory::createTimer(timerType);
 
    try
    {
@@ -891,6 +900,8 @@ void SLUFactorRational::freeAll()
    if(l.rorig) spx_free(l.rorig);
    if(l.rperm) spx_free(l.rperm);
 
+   spx_free(solveTime);
+   spx_free(factorTime);
 }
 
 SLUFactorRational::~SLUFactorRational()
@@ -994,27 +1005,27 @@ SLUFactorRational::Status SLUFactorRational::load(const SVectorRational* matrix[
    stat = OK;
    factor(matrix, lastThreshold);
 
-   MSG_DEBUG( spxout << "DSLUFA02 threshold = " << lastThreshold
+   MSG_DEBUG( std::cout << "DSLUFA02 threshold = " << lastThreshold
                      << "\tstability = " << stability()
                      << "\tminStability = " << minStability << std::endl; )
    MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
-      spxout << "DSLUFA03 Basis:\n";
+      std::cout << "DSLUFA03 Basis:\n";
       int j = 0;
       for (i = 0; i < dim(); ++i)
          j += matrix[i]->size();
       for (i = 0; i < dim(); ++i)
       {
          for (j = 0; j < matrix[i]->size(); ++j)
-            fprintf(fl, "%8d  %8d  %16g\n",
-                    i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
+            fprintf(fl, "%8d  %8d  %s\n",
+                    i + 1, matrix[i]->index(j) + 1, rationalToString(matrix[i]->value(j)).c_str());
       }
       fclose(fl);
-      spxout << "DSLUFA04 LU-Factors:" << std::endl;
+      std::cout << "DSLUFA04 LU-Factors:" << std::endl;
       dump();
 
-      spxout << "DSLUFA05 threshold = " << lastThreshold
+      std::cout << "DSLUFA05 threshold = " << lastThreshold
              << "\tstability = " << stability() << std::endl;
    )
 

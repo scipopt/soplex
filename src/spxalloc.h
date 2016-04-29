@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -64,8 +64,8 @@ inline void spx_alloc(T& p, int n = 1)
 
    if (0 == p)
    {
-      MSG_ERROR( spxout << "EMALLC01 malloc: Out of memory - cannot allocate " 
-                        << sizeof(*p) * (unsigned int) n << " bytes" << std::endl; )
+      std::cerr << "EMALLC01 malloc: Out of memory - cannot allocate "
+                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
       throw(SPxMemoryException("XMALLC01 malloc: Could not allocate enough memory") );
    }
 }
@@ -97,8 +97,8 @@ inline void spx_realloc(T& p, int n)
 
    if (0 == pp)
    {
-      MSG_ERROR( spxout << "EMALLC02 realloc: Out of memory - cannot allocate "
-                        << sizeof(*p) * (unsigned int) n << " bytes" << std::endl; )
+      std::cerr << "EMALLC02 realloc: Out of memory - cannot allocate "
+                << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
       throw(SPxMemoryException("XMALLC02 realloc: Could not allocate enough memory") );
    }
    p=pp;

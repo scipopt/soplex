@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -79,7 +79,7 @@ bool SPxAutoPR::setActivePricer(SPxSolver::Type type)
 int SPxAutoPR::selectLeave()
 {
    if( setActivePricer(SPxSolver::LEAVE) )
-      MSG_INFO1( spxout << " --- active pricer: " << activepricer->getName() << std::endl; )
+      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
 
    return activepricer->selectLeave();
 }
@@ -92,7 +92,7 @@ void SPxAutoPR::left4(int n, SPxId id)
 SPxId SPxAutoPR::selectEnter()
 {
    if( setActivePricer(SPxSolver::ENTER) )
-      MSG_INFO1( spxout << " --- active pricer: " << activepricer->getName() << std::endl; )
+      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
 
    return activepricer->selectEnter();
 }

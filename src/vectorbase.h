@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2014 Konrad-Zuse-Zentrum                            */
+/*                  1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -320,7 +320,7 @@ public:
 
       for( int i = 0; i < dimen; i++ )
       {
-         R x = abs(val[i]);
+         R x = spxAbs(val[i]);
 
          if( x > maxi )
             maxi = x;
@@ -337,11 +337,11 @@ public:
       assert(dim() > 0);
       assert(dim() == dimen);
 
-      R mini = abs(val[0]);
+      R mini = spxAbs(val[0]);
 
       for( int i = 1; i < dimen; i++ )
       {
-         R x = abs(val[i]);
+         R x = spxAbs(val[i]);
 
          if( x < mini )
             mini = x;
@@ -355,7 +355,7 @@ public:
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
    Real length() const
    {
-      return sqrt((Real)length2());
+      return spxSqrt((Real)length2());
    }
 
    /// Squared norm.
@@ -493,6 +493,7 @@ void VectorBase<Real>::clear()
 
 
 
+#ifndef SOPLEX_LEGACY
 /// Inner product.
 template<>
 inline
@@ -511,6 +512,7 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
 
    return x;
 }
+#endif
 
 } // namespace soplex
 #endif // _VECTORBASE_H_

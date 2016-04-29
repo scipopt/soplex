@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -169,6 +169,7 @@ public:
    explicit SPxRatioTester(const char* name)
       : thesolver(0)
       , m_name(name)
+      , m_type(SPxSolver::LEAVE)
       , delta(1e-6)
    {}
    /// copy constructor

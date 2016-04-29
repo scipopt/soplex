@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2014 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -74,7 +74,7 @@ bool MPSInput::readLine()
             return false;
         m_lineno++;
 
-        MSG_DEBUG( spxout << "DMPSIN01 Line " << m_lineno
+        MSG_DEBUG( std::cout << "DMPSIN01 Line " << m_lineno
                           << " " << m_buf << std::endl; )
 
         /* check if comment line */
@@ -230,8 +230,8 @@ bool MPSInput::readLine()
    }
    while(is_marker);
 
-   MSG_DEBUG(
-      spxout << "DMPSIN02 -----------------------------------------------" 
+   MSG_DEBUG( std::cerr
+             << "DMPSIN02 -----------------------------------------------"
              << std::endl
              << "DMPSIN03 f0=" << ((m_f0 == 0) ? "nil" : m_f0) << std::endl
              << "DMPSIN04 f1=" << ((m_f1 == 0) ? "nil" : m_f1) << std::endl
