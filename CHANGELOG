@@ -1,3 +1,16 @@
+VERSION -- NEXT
+===============
+
+interface:
+- setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
+
+fixed bugs:
+- fix inconsistent basis status in Basis and Solver
+- correct definition of numeric constants when using LONG_DOUBLE mode
+- fix bug in class SemiSparseVector
+- correctly define WIN flags for Cygwin
+
+
 29 February 2016 - Release 2.2.1
 ================================
 
