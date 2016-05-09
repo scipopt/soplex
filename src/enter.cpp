@@ -1088,7 +1088,7 @@ void SPxSolver::computeDualfarkas4Row(Real direction, SPxId enterId)
 }
 
 
-bool SPxSolver::enter(SPxId& enterId)
+bool SPxSolver::enter(SPxId& enterId, bool polish)
 {
    assert(enterId.isValid());
    assert(type() == ENTER);

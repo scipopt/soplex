@@ -1655,7 +1655,7 @@ private:
    bool leave(int i, bool polish = false);
    /** let id enter the basis and manage leaving of another one.
        @returns \c false if LP is unbounded/infeasible. */
-   bool enter(SPxId& id);
+   bool enter(SPxId& id, bool polish = false);
 
    /// test coVector \p i with status \p stat.
    Real coTest(int i, SPxBasis::Desc::Status stat) const;

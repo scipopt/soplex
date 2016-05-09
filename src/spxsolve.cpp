@@ -1005,8 +1005,8 @@ SPxSolver::Status SPxSolver::solve()
 
 void SPxSolver::performSolutionPolishing()
 {
-   // only run in column representation
-   if( rep() == ROW )
+   // only run in column representation at an optimal basis
+   if( rep() == ROW || status() != OPTIMAL )
       return;
 
    // the current objective value must not be changed
@@ -1015,51 +1015,66 @@ void SPxSolver::performSolutionPolishing()
 #endif
 
    int nSuccessfulPivots = 0;
+   const SPxBasis::Desc& ds = desc();
+   SPxBasis::Desc::Status stat;
+   SPxId polishId;
+   bool success;
 
    MSG_INFO3( (*spxout),
       (*spxout) << " --- perform solution polishing" << std::endl; )
 
-   setType(LEAVE);
+   setType(ENTER);
    init();
    thepricer->setType(type());
    theratiotester->setType(type());
 
-   // identify all current pivot candidates
+   // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
    for( int i = 0; i < dim(); ++i )
    {
-      // only look for variables
-      SPxId columnId = baseId(i);
-      if( columnId.isSPxColId() )
+      // only look for rows, i.e. slacks
+      stat = ds.coStatus(i);
+      if( !isBasic(stat) )
       {
-         Real basicSolVal = (*theFvec)[i];
-         Real redcost;
-         bool success = false;
-         int column = number(baseId(i));
-         SPxBasis::Desc::Status colstat = desc().colStatus(column);
-         if (colstat == SPxBasis::Desc::D_UNDEFINED)
+         assert(EQ(maxRowObj(i), 0));
+         if( EQrel((*theCoPvec)[i], 0) )
          {
-            continue;
+            polishId = coId(i);
+            success = enter(polishId, true);
+            if( success )
+               std::cout << "found one: " << polishId << std::endl;
          }
-
-         // skip variables that are already on one of their bounds
-         if( EQrel(basicSolVal, lower(column)) ||
-             EQrel(basicSolVal, upper(column)) )
-            continue;
-
-         // skip variables with non-zero reduced costs
-         redcost = maxObj(column) - (*thePvec)[column];
-         if( NErel(redcost, 0) )
-            continue;
-
-         MSG_INFO3( (*spxout),
-               (*spxout) << "trying variable " << i << std::endl; )
-         success = leave(i, true);
-
-         if( success )
-         {
-            MSG_INFO1( (*spxout),
-               (*spxout) << "successfully removed a variable from the basis" << std::endl; )
-         }
+//
+//
+//
+//         Real basicSolVal = (*theFvec)[i];
+//         Real redcost;
+//         bool success = false;
+//         int column = number(baseId(i));
+//         SPxBasis::Desc::Status colstat = desc().colStatus(column);
+//         if (colstat == SPxBasis::Desc::D_UNDEFINED)
+//         {
+//            continue;
+//         }
+//
+//         // skip variables that are already on one of their bounds
+//         if( EQrel(basicSolVal, lower(column)) ||
+//             EQrel(basicSolVal, upper(column)) )
+//            continue;
+//
+//         // skip variables with non-zero reduced costs
+//         redcost = maxObj(column) - (*thePvec)[column];
+//         if( NErel(redcost, 0) )
+//            continue;
+//
+//         MSG_INFO3( (*spxout),
+//               (*spxout) << "trying variable " << i << std::endl; )
+//         success = leave(i, true);
+//
+//         if( success )
+//         {
+//            MSG_INFO1( (*spxout),
+//               (*spxout) << "successfully removed a variable from the basis" << std::endl; )
+//         }
          assert(EQrel(objVal, value(), leavetol()));
       }
    }
