@@ -1422,7 +1422,7 @@ bool SPxSolver::isConsistent() const
 void SPxSolver::setTerminationTime(Real p_time)
 {
    if( p_time < 0.0 )
-      p_time = infinity;
+      p_time = 0.0;
    maxTime = p_time;
 }
 

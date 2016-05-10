@@ -23,7 +23,7 @@
 //#define DEBUGGING
 //#define SOLVEIDS_DEBUG
 //#define WRITE_LP
-#define WRITE_ERRLP
+//#define WRITE_ERRLP
 //#define EXTRA_PRINT
 //#define NO_TOL
 //#define USE_FEASTOL
@@ -274,6 +274,8 @@ namespace soplex
             if( _solver.status() == SPxSolver::INFEASIBLE )
                printf("Infeasible reduced problem.\n");
 
+            printf("Reduced problem status: %d\n", _solver.status());
+
 #ifdef WRITE_ERRLP
          printf("Writing the reduced lp with error to a file\n");
          _solver.writeFile("reduced_err.lp");
@@ -476,18 +478,17 @@ namespace soplex
 
          printf("Objective Value: %f\n", _compSolver.objValue());
 #endif
+      }
 
-         // returning the sense to minimise
-         if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
-         {
-            assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+      // returning the sense to minimise
+      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
+      {
+         assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
 
-            _solver.changeObj(-(_solver.maxObj()));
-            _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+         _solver.changeObj(-(_solver.maxObj()));
+         _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
 
-            // Need to add commands to multiply the objective solution values by -1
-         }
-
+         // Need to add commands to multiply the objective solution values by -1
       }
 
       // resetting the verbosity level
