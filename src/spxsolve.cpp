@@ -1036,10 +1036,11 @@ void SPxSolver::performSolutionPolishing()
       if( !isBasic(stat) )
       {
          assert(EQ(maxRowObj(i), 0));
-         if( EQrel((*theCoPvec)[i], 0) )
+         if( EQrel((*theCoPvec)[i], 0) && (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
          {
             polishId = coId(i);
             success = enter(polishId, true);
+            std::cout << "try pivoting" << std::endl;
             if( success )
                std::cout << "found one: " << polishId << std::endl;
          }
