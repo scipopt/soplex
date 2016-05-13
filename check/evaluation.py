@@ -62,7 +62,7 @@ for idx, outline in enumerate(outlines):
             instancename = instancename + '.' + linesplit[i]
         length = len(instancename)
         if length > namelength:
-            shortname = instancename[0:round(namelength/2)-1] + '~' + instancename[length-round(namelength/2):]
+            shortname = instancename[0:int(namelength/2)-1] + '~' + instancename[length-int(namelength/2):]
         else:
             shortname = instancename
 
