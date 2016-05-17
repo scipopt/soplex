@@ -14,8 +14,12 @@ RANLIB		=
 LN_s		=	cp -r
 LIBEXT		=	lib
 LINKLIBSUFFIX	=	.lib
-ZLIB_LDFLAGS	=	
-ZLIB_FLAGS	=	
+
+ZLIB_LDFLAGS	=	lib/libz.$(ARCH).lib -NODEFAULTLIB:LIBCMT -NODEFAULTLIB:LIBCMTD
+ZLIB_FLAGS	=	-Ilib/zlib
+
+GMP_CPPFLAGS  = -Ilib/mpir.$(ARCH)
+GMP_LDFLAGS   =  lib/libmpir.$(ARCH).lib
 
 # NOTE: use this flag throughout the whole compilation process
 CXXFLAGS    +=  -MD
