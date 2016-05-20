@@ -113,6 +113,9 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
+GMP_LDFLAGS	   =	-LIBPATH:lib -libgmp
+GMP_CPPFLAGS	=	-Ilib/gmp
+
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
 BINDIR		=	bin
@@ -397,8 +400,8 @@ GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
 ifeq ($(LEGACY),false)
-CPPFLAGS	+=	-DSOPLEX_WITH_GMP
-LDFLAGS		+=	-lgmp # todo: move this as GMP_LDFLAGS to submakefiles
+CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
+LDFLAGS	+= $(GMP_LDFLAGS)
 endif
 endif
 
