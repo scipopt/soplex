@@ -888,7 +888,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
 /** determine leaving row/column */
 int SPxBoundFlippingRT::selectLeave(
    Real&                 val,
-   Real                  enterTest
+   Real                  enterTest,
+   bool                  polish
    )
 {
    assert( m_type == SPxSolver::ENTER );
@@ -901,10 +902,10 @@ int SPxBoundFlippingRT::selectLeave(
       flipPotential = 1;
    }
 
-   if( !enableBoundFlips || !enableRowBoundFlips || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
+   if( polish || !enableBoundFlips || !enableRowBoundFlips || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DEBFRT07 switching to fast ratio test" << std::endl; )
-      return SPxFastRT::selectLeave(val, enterTest);
+      return SPxFastRT::selectLeave(val, enterTest, polish);
    }
 
    const Real*  vec = thesolver->fVec().get_const_ptr();         /**< pointer to values of current vector */

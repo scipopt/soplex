@@ -52,6 +52,8 @@ protected:
    Real fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
+   /// flag whether we are in polishing mode
+   bool polishing;
    //@}
 
    //-------------------------------------
@@ -174,6 +176,7 @@ public:
       , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
+      , polishing(false)
    {}
    /// copy constructor
    SPxFastRT(const SPxFastRT& old)
@@ -182,6 +185,7 @@ public:
       , epsilon(old.epsilon)
       , fastDelta(old.fastDelta)
       , iscoid(false)
+      , polishing(false)
    {}
    /// assignment operator
    SPxFastRT& operator=( const SPxFastRT& rhs)
@@ -193,6 +197,7 @@ public:
          epsilon = rhs.epsilon;
          fastDelta = rhs.fastDelta;
          iscoid = false;
+         polishing = false;
       }
 
       return *this;
@@ -204,6 +209,7 @@ public:
       , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
+      , polishing(false)
    {}
    /// destructor
    virtual ~SPxFastRT()
@@ -221,7 +227,7 @@ public:
    ///
    virtual void load(SPxSolver* solver);
    ///
-   virtual int selectLeave(Real& val, Real);
+   virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
    virtual SPxId selectEnter(Real& val, int, bool polish = false);
    ///

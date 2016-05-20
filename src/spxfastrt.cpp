@@ -134,6 +134,9 @@ int SPxFastRT::maxDelta(
          if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
             continue;
 
+         if( polishing && !leaving && thesolver->baseId(i).isSPxColId() )
+            continue;
+
          x = upd[i];
 
          if (x > epsilon)
@@ -846,11 +849,13 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
    return false;
 }
 
-int SPxFastRT::selectLeave(Real& val, Real)
+int SPxFastRT::selectLeave(Real& val, Real, bool polish)
 {
    Real maxabs, max, sel;
    int leave = -1;
    int cnt = 0;
+
+   polishing = polish;
 
    assert( m_type == SPxSolver::ENTER );
 
@@ -868,6 +873,7 @@ int SPxFastRT::selectLeave(Real& val, Real)
          // phase 1:
          max = val;
          maxabs = 0.0;
+         // TODO make sure that only variables are selected
          leave = maxDelta(max, maxabs);
          if (max == val)
             return -1;
@@ -954,6 +960,13 @@ int SPxFastRT::selectLeave(Real& val, Real)
          std::cout << "DFSTRT02 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
+
+   // don't make rows leave the basis during polishing
+   if( polish && thesolver->baseId(leave).isSPxRowId())
+   {
+      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a col to leave the basis" << std::endl; )
+      return -1;
+   }
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
    {

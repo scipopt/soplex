@@ -1043,6 +1043,8 @@ void SPxSolver::performSolutionPolishing()
             std::cout << "try pivoting" << std::endl;
             if( success )
                std::cout << "found one: " << polishId << std::endl;
+            assert(EQrel(objVal, value(), leavetol()));
+            assert(EQ(shift(), 0));
          }
 //
 //
@@ -1076,7 +1078,6 @@ void SPxSolver::performSolutionPolishing()
 //            MSG_INFO1( (*spxout),
 //               (*spxout) << "successfully removed a variable from the basis" << std::endl; )
 //         }
-         assert(EQrel(objVal, value(), leavetol()));
       }
    }
    assert(EQrel(objVal, value(), leavetol()));

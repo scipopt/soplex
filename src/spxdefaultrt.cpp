@@ -37,7 +37,7 @@ namespace soplex
  * basis selected to leave the basis. -1 indicates that no variable could be
  * selected. Otherwise, parameter \p val contains the chosen fVec.value().
  */
-int SPxDefaultRT::selectLeave(Real& val, Real)
+int SPxDefaultRT::selectLeave(Real& val, Real, bool)
 {
    solver()->fVec().delta().setup();
 
