@@ -113,7 +113,7 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
-GMP_LDFLAGS	   =	-LIBPATH:lib -libgmp
+GMP_LDFLAGS	   =	-LIBPATH:lib -lgmp
 GMP_CPPFLAGS	=	-Ilib/gmp
 
 SOPLEXDIR	=	$(realpath .)
