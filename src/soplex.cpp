@@ -738,6 +738,10 @@ namespace soplex
             _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
          }
 
+         // copy rational factorization
+         if( rhs._rationalLUSolver.status() == SLinSolverRational::OK )
+            _rationalLUSolver = rhs._rationalLUSolver;
+
          // copy boolean flags
          _isRealLPLoaded = rhs._isRealLPLoaded;
          _hasSolReal = rhs._hasSolReal;
@@ -1850,6 +1854,7 @@ namespace soplex
 
       _realLP->clear();
       _hasBasis = false;
+      _rationalLUSolver.clear();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
@@ -2739,6 +2744,7 @@ namespace soplex
          return;
 
       _rationalLP->clear();
+      _rationalLUSolver.clear();
       _rowTypes.clear();
       _colTypes.clear();
 
@@ -4400,6 +4406,8 @@ namespace soplex
    /// sets starting basis via arrays of statuses
    void SoPlex::setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
    {
+      _rationalLUSolver.clear();
+
       if( _isRealLPLoaded )
       {
          assert(numRowsReal() == _solver.nRows());
@@ -4431,6 +4439,7 @@ namespace soplex
       _solver.reLoad();
       _status = _solver.status();
       _hasBasis = false;
+      _rationalLUSolver.clear();
    }
 
 
@@ -4561,6 +4570,8 @@ namespace soplex
    /// default names are assumed; returns true on success
    bool SoPlex::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
+      clearBasis();
+
 #if 1
       assert(filename != 0);
       assert(_realLP != 0);
@@ -6489,6 +6500,7 @@ namespace soplex
 
       assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRowsReal());
       assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numColsReal());
+      assert(_hasBasis || _rationalLUSolver.status() == SLinSolverRational::UNLOADED);
 
       return true;
    }
@@ -6600,6 +6612,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6615,6 +6629,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6630,6 +6646,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(lprowset.num(), SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6651,6 +6669,8 @@ namespace soplex
          else
             _basisStatusCols.append(SPxSolver::ZERO);
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6666,6 +6686,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6691,6 +6713,8 @@ namespace soplex
                _basisStatusCols.append(SPxSolver::ZERO);
          }
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6712,8 +6736,9 @@ namespace soplex
          else if( _basisStatusRows[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex::INFTY) )
             _basisStatusRows[i] = (lprow.lhs() > -realParam(SoPlex::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
-   }
 
+      _rationalLUSolver.clear();
+   }
 
 
    /// changes left-hand side vector for constraints to \p lhs and adjusts basis
@@ -6862,6 +6887,8 @@ namespace soplex
          else if( _basisStatusCols[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex::INFTY) )
             _basisStatusCols[i] = (lpcol.lower() > -realParam(SoPlex::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7009,6 +7036,8 @@ namespace soplex
          if( _basisStatusRows[i] != SPxSolver::BASIC && _basisStatusCols[i] == SPxSolver::BASIC )
             _hasBasis = false;
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7034,6 +7063,8 @@ namespace soplex
             _basisStatusRows.removeLast();
          }
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7069,6 +7100,8 @@ namespace soplex
          if( _hasBasis )
             _basisStatusRows.reSize(numRowsReal());
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7094,6 +7127,8 @@ namespace soplex
             _basisStatusCols.removeLast();
          }
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7129,6 +7164,8 @@ namespace soplex
          if( _hasBasis )
             _basisStatusCols.reSize(numColsReal());
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7323,6 +7360,10 @@ namespace soplex
       }
       _statistics->simplexTime->stop();
 
+      // invalidate rational factorization of basis if pivots have been performed
+      if( _solver.iterations() > 0 )
+         _rationalLUSolver.clear();
+
       // record statistics
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
@@ -7348,9 +7389,9 @@ namespace soplex
       _statistics->clearAllData();
 
       // update status
-      _status = SPxSolver::UNKNOWN;
+      clearBasis();
       _invalidateSolution();
-      _hasBasis = false;
+      _status = SPxSolver::UNKNOWN;
 
       // start timing
       _statistics->readingTime->start();
@@ -7390,9 +7431,9 @@ namespace soplex
       _statistics->readingTime->start();
 
       // update status
-      _status = SPxSolver::UNKNOWN;
+      clearBasis();
       _invalidateSolution();
-      _hasBasis = false;
+      _status = SPxSolver::UNKNOWN;
 
       // read
       _ensureRationalLP();
@@ -7468,6 +7509,7 @@ namespace soplex
 
       ///@todo try loading old basis
       _hasBasis = false;
+      _rationalLUSolver.clear();
 
       // stop timing
       if( time )

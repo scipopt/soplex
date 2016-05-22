@@ -1017,6 +1017,7 @@ namespace soplex
                {
                   _basisStatusRows[row] = _basisStatusCols[col];
                   _basisStatusCols[col] = SPxSolver::BASIC;
+                  _rationalLUSolver.clear();
                }
             }
          }
@@ -1729,6 +1730,7 @@ namespace soplex
 
          _basisStatusCols.append(numColsRational() - _beforeLiftCols, SPxSolver::BASIC);
          _basisStatusRows.append(numRowsRational() - _beforeLiftRows, SPxSolver::FIXED);
+         _rationalLUSolver.clear();
       }
 
       MSG_DEBUG( _realLP->writeFile("afterLift.lp", 0, 0, 0) );
@@ -1809,6 +1811,7 @@ namespace soplex
          {
             MSG_INFO1( spxout, spxout << "Warning: lost basis during project phase because of nonbasic lifting column.\n" );
             _hasBasis = false;
+            _rationalLUSolver.clear();
          }
       }
 
@@ -1818,6 +1821,7 @@ namespace soplex
          {
             MSG_INFO1( spxout, spxout << "Warning: lost basis during project phase because of basic lifting row.\n" );
             _hasBasis = false;
+            _rationalLUSolver.clear();
          }
       }
 
@@ -1825,6 +1829,7 @@ namespace soplex
       {
          _basisStatusCols.reSize(_beforeLiftCols);
          _basisStatusRows.reSize(_beforeLiftRows);
+         _rationalLUSolver.clear();
       }
 
       // print LP if in debug mode
@@ -1974,6 +1979,8 @@ namespace soplex
 
             _basisStatusRows[row] = SPxSolver::FIXED;
          }
+
+         _rationalLUSolver.clear();
       }
 
       MSG_DEBUG( _realLP->writeFile("afterTransEqu.lp", 0, 0, 0) );
@@ -2064,6 +2071,8 @@ namespace soplex
          }
 
          _basisStatusCols.reSize(numOrigCols);
+         if( _slackCols.num() > 0 )
+            _rationalLUSolver.clear();
       }
 
       // not earlier because of debug message
@@ -2208,6 +2217,7 @@ namespace soplex
       {
          _basisStatusCols.append(SPxSolver::ON_UPPER);
          _basisStatusRows.append(SPxSolver::BASIC);
+         _rationalLUSolver.clear();
       }
 
       // print LP if in debug mode
@@ -2331,6 +2341,9 @@ namespace soplex
          assert((lowerReal(c) > -realParam(SoPlex::INFTY)) == _lowerFinite(_colTypes[c]));
          assert((upperReal(c) < realParam(SoPlex::INFTY)) == _upperFinite(_colTypes[c]));
       }
+
+      // invalidate rational basis factorization
+      _rationalLUSolver.clear();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
@@ -2627,6 +2640,9 @@ namespace soplex
          _basisStatusCols.append(SPxSolver::ON_UPPER);
       }
 
+      // invalidate rational basis factorization
+      _rationalLUSolver.clear();
+
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterTransFeas.lp", 0, 0, 0) );
 
@@ -2781,6 +2797,9 @@ namespace soplex
       _rationalLP->removeCol(numOrigCols);
       _realLP->removeCol(numOrigCols);
       _colTypes.reSize(numOrigCols);
+
+      // invalidate rational basis factorization
+      _rationalLUSolver.clear();
 
       // print LP if in debug mode
       MSG_DEBUG( _realLP->writeFile("afterUntransFeas.lp", 0, 0, 0) );
@@ -3082,6 +3101,10 @@ namespace soplex
          spx_alloc(rationalLP);
          rationalLP = new (rationalLP) SPxLPRational(_solver);
       }
+
+      // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no 
+      if( _simplifier != 0 || _scaler != 0 )
+        _rationalLUSolver.clear();
 
       // stop timing
       _statistics->syncTime->stop();
@@ -3496,7 +3519,6 @@ namespace soplex
       error = false;
       optimal = false;
 
-      SLUFactorRational linsolver;
       const bool maximizing = (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE);
       const int matrixdim = numRowsRational();
       DataArray< const SVectorRational* > matrix(matrixdim);
@@ -3599,41 +3621,45 @@ namespace soplex
          goto TERMINATE;
       }
 
-      // load rational basis matrix
-      if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
-      else
-         linsolver.setTimeLimit(-1.0);
-      linsolver.load(matrix.get_ptr(), matrixdim);
+      // load and factorize rational basis matrix
+      if( _rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.status() == SLinSolverRational::TIME )
+      {
+         if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
+            _rationalLUSolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
+         else
+            _rationalLUSolver.setTimeLimit(-1.0);
+         _rationalLUSolver.load(matrix.get_ptr(), matrixdim);
 
-      // record statistics
-      _statistics->luFactorizationTimeRational += linsolver.getFactorTime();
-      _statistics->luFactorizationsRational += linsolver.getFactorCount();
-      linsolver.resetCounters();
+         // record statistics
+         _statistics->luFactorizationTimeRational += _rationalLUSolver.getFactorTime();
+         _statistics->luFactorizationsRational += _rationalLUSolver.getFactorCount();
+         _rationalLUSolver.resetCounters();
+      }
 
-      if( linsolver.status() == SLinSolverRational::TIME )
+      if( _rationalLUSolver.status() == SLinSolverRational::TIME )
       {
          MSG_INFO2( spxout, spxout << "Rational factorization hit time limit.\n" );
          stoppedTime = true;
          return;
       }
-      else if( linsolver.status() != SLinSolverRational::OK )
+      else if( _rationalLUSolver.status() != SLinSolverRational::OK )
       {
          MSG_ERROR( std::cerr << "Error performing rational LU factorization.\n" );
          error = true;
          return;
       }
+      assert(_rationalLUSolver.status() == SLinSolverRational::OK);
 
       // solve for primal solution
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
+         _rationalLUSolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
       else
-         linsolver.setTimeLimit(-1.0);
-      linsolver.solveRight(basicPrimal, basicPrimalRhs);
+         _rationalLUSolver.setTimeLimit(-1.0);
+      _rationalLUSolver.solveRight(basicPrimal, basicPrimalRhs);
 
       // record statistics
-      _statistics->luSolveTimeRational += linsolver.getSolveTime();
-      linsolver.resetCounters();
+      _statistics->luSolveTimeRational += _rationalLUSolver.getSolveTime();
+      _rationalLUSolver.resetCounters();
 
       if( _isSolveStopped(stoppedTime, stoppedIter) )
       {
@@ -3704,14 +3730,14 @@ namespace soplex
 
       // solve for dual solution
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-         linsolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
+         _rationalLUSolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
       else
-         linsolver.setTimeLimit(-1.0);
-      linsolver.solveLeft(basicDual, basicDualRhs);
+         _rationalLUSolver.setTimeLimit(-1.0);
+      _rationalLUSolver.solveLeft(basicDual, basicDualRhs);
 
       // record statistics
-      _statistics->luSolveTimeRational += linsolver.getSolveTime();
-      linsolver.resetCounters();
+      _statistics->luSolveTimeRational += _rationalLUSolver.getSolveTime();
+      _rationalLUSolver.resetCounters();
 
       if( _isSolveStopped(stoppedTime, stoppedIter) )
       {

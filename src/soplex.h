@@ -28,6 +28,7 @@
 #include "basevectors.h"
 #include "spxsolver.h"
 #include "slufactor.h"
+#include "slufactor_rational.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "spxsimplifier.h"
@@ -1412,6 +1413,7 @@ private:
    //@{
 
    SPxLPRational* _rationalLP;
+   SLUFactorRational _rationalLUSolver;
 
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
