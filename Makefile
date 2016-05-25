@@ -426,6 +426,16 @@ LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containi
 endif
 endif
 
+ifeq ($(GMP),true)
+ifeq ($(COMP),msvc)
+SOFTLINKS	+=	$(LIBDIR)/mpir.$(ARCH)
+SOFTLINKS	+=	$(LIBDIR)/libmpir.$(ARCH).$(OPT).lib
+LINKSINFO	+=	"\n  -> \"mpir.$(ARCH)\" is a directory containing the mpir installation, i.e., \"mpir.$(ARCH)/gmp.h\" should exist.\n"
+LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
+endif
+endif
+
+
 #-----------------------------------------------------------------------------
 # Rules
 #-----------------------------------------------------------------------------
