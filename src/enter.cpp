@@ -12,7 +12,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#define SOPLEX_DEBUG
+
 /*      \SubSection{Updating the Basis for Entering Variables}
  */
 #include <assert.h>
@@ -1152,7 +1152,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   if (m_numCycle > m_maxCycle)
+   if (!polish && m_numCycle > m_maxCycle)
    {
       if (-enterMax > 0)
          perturbMaxEnter();

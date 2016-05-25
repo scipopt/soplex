@@ -531,7 +531,7 @@ public:
     * when solving LP relaxations of (mixed) integer programs.
     * The objective must not be modified during this procedure.
     */
-   void performSolutionPolishing();
+   void performSolutionPolishing(bool maximizeBasicSlack = true);
 
    /// Status of solution process.
    Status status() const;
