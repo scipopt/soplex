@@ -1014,12 +1014,12 @@ void SPxSolver::performSolutionPolishing()
    Real objVal = value();
 #endif
 
-   int previousIters = iterations();
    int nSuccessfulPivots = 0;
    const SPxBasis::Desc& ds = desc();
    SPxBasis::Desc::Status stat;
    SPxId polishId;
    bool success;
+   polishCount = 0;
 
    MSG_INFO2( (*spxout),
       (*spxout) << " --- perform solution polishing" << std::endl; )
@@ -1085,7 +1085,10 @@ void SPxSolver::performSolutionPolishing()
       }
    }
 
+#ifdef ENABLE_ADDITIONAL_CHECKS
+   int previousIters = iterations();
    Real tolerance = entertol();
+
    if( !precisionReached(tolerance) )
    {
       MSG_INFO3( (*spxout),
@@ -1093,7 +1096,10 @@ void SPxSolver::performSolutionPolishing()
       solve();
    }
 
-   polishCount = iterations() - previousIters;
+   // sum up polish pivots and additional iterations from clean up step
+   polishCount += iterations() - previousIters;
+#endif
+   polishCount += nSuccessfulPivots;
 
    MSG_INFO1( (*spxout),
       (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
