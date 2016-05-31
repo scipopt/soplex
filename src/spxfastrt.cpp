@@ -779,7 +779,7 @@ bool SPxFastRT::minShortLeave(Real& sel, int leave, Real maxabs)
    return false;
 }
 
-bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
+bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
 {
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
@@ -795,7 +795,7 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
       if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
-         if( thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
             if (x < 0.0)
                thesolver->shiftLBbound(leave, vec[leave]);
@@ -807,14 +807,17 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs)
    else
    {
       sel = 0.0;
-      thesolver->shiftLBbound(leave, vec[leave]);
-      thesolver->shiftUBbound(leave, vec[leave]);
+      if( !polish )
+      {
+         thesolver->shiftLBbound(leave, vec[leave]);
+         thesolver->shiftUBbound(leave, vec[leave]);
+      }
    }
 
    return false;
 }
 
-bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
+bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
 {
    UpdateVector& vec = thesolver->fVec();
    Vector& low = thesolver->lbBound();
@@ -830,7 +833,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
       if (sel > fastDelta / maxabs)
       {
          sel = 0.0;
-         if( thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH)
          {
             if (x > 0.0)
                thesolver->shiftLBbound(leave, vec[leave]);
@@ -842,8 +845,11 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs)
    else
    {
       sel = 0.0;
-      thesolver->shiftLBbound(leave, vec[leave]);
-      thesolver->shiftUBbound(leave, vec[leave]);
+      if( !polish )
+      {
+         thesolver->shiftLBbound(leave, vec[leave]);
+         thesolver->shiftUBbound(leave, vec[leave]);
+      }
    }
 
    return false;
@@ -896,7 +902,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
             else
                cnt += TRIES;
          }
-         if (!maxReLeave(sel, leave, maxabs))
+         if (!maxReLeave(sel, leave, maxabs, polish))
             break;
          relax();
       }
@@ -935,7 +941,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
             else
                cnt += TRIES;
          }
-         if (!minReLeave(sel, leave, maxabs))
+         if (!minReLeave(sel, leave, maxabs, polish))
             break;
          relax();
       }
@@ -961,11 +967,19 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
                 << ": skipping instable pivot" << std::endl;
    )
 
-   // don't make rows leave the basis during polishing
-   if( polish && thesolver->baseId(leave).isSPxRowId())
+   // decide whether the chosen leave index confirms to the polishing objective
+   if( polish )
    {
-      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a col to leave the basis" << std::endl; )
-      return -1;
+      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK && thesolver->baseId(leave).isSPxRowId() )
+      {
+         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a col to leave the basis" << std::endl; )
+         return -1;
+      }
+      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK && thesolver->baseId(leave).isSPxColId() )
+      {
+         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a row to leave the basis" << std::endl; )
+         return -1;
+      }
    }
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())

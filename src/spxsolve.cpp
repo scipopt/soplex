@@ -163,6 +163,7 @@ SPxSolver::Status SPxSolver::solve()
    leaveCount = 0;
    enterCount = 0;
    primalCount = 0;
+   polishCount = 0;
    boundflips = 0;
    totalboundflips = 0;
 
@@ -1002,10 +1003,10 @@ SPxSolver::Status SPxSolver::solve()
    return status();
 }
 
-void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
+void SPxSolver::performSolutionPolishing()
 {
    // only run in column representation at an optimal basis
-   if( rep() == ROW || status() != OPTIMAL )
+   if( polishObj == SolutionPolish::OFF || rep() == ROW || status() != OPTIMAL )
       return;
 
    // the current objective value must not be changed
@@ -1013,20 +1014,20 @@ void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
    Real objVal = value();
 #endif
 
+   int previousIters = iterations();
    int nSuccessfulPivots = 0;
    const SPxBasis::Desc& ds = desc();
    SPxBasis::Desc::Status stat;
    SPxId polishId;
    bool success;
 
-   MSG_INFO3( (*spxout),
+   MSG_INFO2( (*spxout),
       (*spxout) << " --- perform solution polishing" << std::endl; )
 
    setType(ENTER); // use primal simplex to preserve feasibility
    init();
    theratiotester->setType(type());
-
-   if( maximizeBasicSlack )
+   if( polishObj == SolutionPolish::MAXBASICSLACK )
    {
       // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
       for( int i = 0; i < dim(); ++i )
@@ -1039,7 +1040,7 @@ void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
             if( EQrel((*theCoPvec)[i], 0) &&
                 (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
             {
-               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << std::endl; )
+               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat << std::endl; )
                polishId = coId(i);
                success = enter(polishId, true);
                if( success )
@@ -1048,7 +1049,7 @@ void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
                   ++nSuccessfulPivots;
                }
                clearUpdateVecs();
-               assert(EQrel(objVal, value(), leavetol()));
+               assert(EQrel(objVal, value(), entertol()));
                assert(EQ(shift(), 0));
             }
          }
@@ -1056,6 +1057,7 @@ void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
    }
    else
    {
+      assert(polishObj == SolutionPolish::MINBASICSLACK);
       // identify nonbasic variables, i.e. columns, that may be moved into the basis
       for( int i = 0; i < coDim(); ++i )
       {
@@ -1068,7 +1070,7 @@ void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
                 (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
             {
                polishId = id(i);
-               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << std::endl; )
+               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat << std::endl; )
                success = enter(polishId, true);
                if( success )
                {
@@ -1083,10 +1085,18 @@ void SPxSolver::performSolutionPolishing(bool maximizeBasicSlack)
       }
    }
 
-   assert(EQrel(objVal, value(), leavetol()));
+   Real tolerance = entertol();
+   if( !precisionReached(tolerance) )
+   {
+      MSG_INFO3( (*spxout),
+         (*spxout) << " --- perform clean up step" << std::endl; )
+      solve();
+   }
+
+   polishCount = iterations() - previousIters;
+
    MSG_INFO1( (*spxout),
-      (*spxout) << " --- finished solution polishing (" << nSuccessfulPivots << " successful pivots)" << std::endl; )
-   iterCount += nSuccessfulPivots;
+      (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
 
    setStatus(SPxStatus::OPTIMAL);
 }

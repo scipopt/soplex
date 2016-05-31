@@ -202,6 +202,7 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
             instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
             instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+            instances[instancename]['polish'] = int(outlines[idx+6].split()[-1])
             instances[instancename]['speed'] = round(float(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
 
         elif outline.startswith('LU factorizations'):

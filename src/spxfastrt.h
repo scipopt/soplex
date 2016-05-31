@@ -147,9 +147,9 @@ protected:
    /** Tests whether the selected leave index needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
-   bool minReLeave(Real& sel, int leave, Real maxabs);
+   bool minReLeave(Real& sel, int leave, Real maxabs, bool polish = false);
    ///
-   bool maxReLeave(Real& sel, int leave, Real maxabs);
+   bool maxReLeave(Real& sel, int leave, Real maxabs, bool polish = false);
 
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)

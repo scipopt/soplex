@@ -731,14 +731,6 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       change(-1, none, 0);
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if( polish )
-      {
-         // the solution polishing pivot could not be performed
-         MSG_INFO3((*spxout),
-            (*spxout) << "could not perform solution polishing on basic variable " << leaveIdx << std::endl)
-         return false;
-      }
-
       if (NE(enterVal, leaveMax))
       {
          MSG_DEBUG( std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx

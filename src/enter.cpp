@@ -1112,7 +1112,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    getEnterVals(enterId, enterTest, enterUB, enterLB,
       enterVal, enterMax, enterPric, enterStat, enterRO, objChange);
 
-   if (!polish && enterTest > -epsilon())
+   if (polishObj == SolutionPolish::OFF && enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
@@ -1120,7 +1120,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
 
       MSG_DEBUG( std::cout << "DENTER08 rejecting false enter pivot" << std::endl; )
 
-      return true;
+      return false;
    }
 
    /*  Before performing the actual basis update, we must determine, how this
@@ -1152,7 +1152,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   if (!polish && m_numCycle > m_maxCycle)
+   if (polishObj == SolutionPolish::OFF && m_numCycle > m_maxCycle)
    {
       if (-enterMax > 0)
          perturbMaxEnter();
@@ -1163,7 +1163,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    Real leaveVal = -enterMax;
 
    boundflips = 0;
-   int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest);
+   int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest, polish);
 
    /* in row representation, fixed columns and rows should not leave the basis */
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
@@ -1286,6 +1286,8 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
 
       //  change basis matrix
       change(leaveIdx, enterId, enterVec, &(theFvec->delta()));
+
+      return true;
    }
    /*  No leaving vector could be found that would yield a stable pivot step.
     */
@@ -1315,9 +1317,6 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
 
          rejectEnter(enterId, enterTest / 10.0, enterStat);
          change(-1, none, 0);
-
-
-         return true;
       }
       else
       {
@@ -1325,6 +1324,8 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          rejectEnter(enterId, enterTest, enterStat);
          change(-1, none, 0);
       }
+
+      return false;
    }
    /*  No leaving vector has been selected from the basis. However, if the
        shift amount for |fVec| is bounded, we are in the case, that the
@@ -1333,7 +1334,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
        happen in primal/columnwise case with upper and lower bounds on
        variables.
     */
-   else if (leaveVal < infinity && leaveVal > -infinity)
+   else if (!polish && leaveVal < infinity && leaveVal > -infinity)
    {
       assert(rep() == COLUMN);
       assert(leaveVal == -enterMax);
@@ -1349,6 +1350,8 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
       updateNonbasicValue(objChange);
 
       MSG_DEBUG( std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl; )
+
+      return false;
    }
    /*  No variable could be selected to leave the basis and even the entering
        variable is unbounded --- this is a failure.
@@ -1364,7 +1367,10 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
 
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if (lastUpdate() > 1)
+      if (polish)
+         return false;
+
+      else if (lastUpdate() > 1)
       {
          MSG_INFO3( (*spxout), (*spxout) << "IENTER01 factorization triggered in "
                               << "enter() for feasibility test" << std::endl; )
@@ -1373,7 +1379,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          /* after a factorization, the entering column/row might not be infeasible or suboptimal anymore, hence we do
           * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again
           */
-         return true;
+         return false;
       }
 
       /* do not exit with status infeasible or unbounded if there is only a very small violation
@@ -1388,7 +1394,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          computeCoTest();
          computeTest();
 
-         return true;
+         return false;
       }
 
       MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundedness/infeasibility found in "
@@ -1405,8 +1411,8 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          computePrimalray4Col(leaveVal, enterId);
          setBasisStatus(SPxBasis::UNBOUNDED);
       }
+
       return false;
    }
-   return true;
 }
 } // namespace soplex

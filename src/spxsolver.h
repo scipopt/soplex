@@ -207,6 +207,15 @@ public:
       INForUNBD      =  4   ///< LP is primal infeasible or unbounded.
    };
 
+   /// objective for solution polishing
+   enum SolutionPolish
+   {
+      OFF,                  ///< don't perform modifications on optimal basis
+      MAXBASICSLACK,        ///< maximize number of basic slack variables, i.e. more variables on bounds
+      MINBASICSLACK         ///< minimize number of basic slack variables, i.e. more variables between bounds
+   };
+
+
    //@}
 
 private:
@@ -217,6 +226,7 @@ private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
+   SolutionPolish polishObj;   ///< objective of solution polishing
    Timer*         theTime;     ///< time spent in last call to method solve()
    Timer::TYPE    timerType;   ///< type of timer (user or wallclock)
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
@@ -331,6 +341,7 @@ protected:
    int             leaveCount;    ///< number of LEAVE iterations
    int             enterCount;    ///< number of ENTER iterations
    int             primalCount;   ///< number of primal iterations
+   int             polishCount;   ///< number of solution polishing iterations
 
    int             boundflips;          ///< number of performed bound flips
    int             totalboundflips;     ///< total number of bound flips
@@ -531,7 +542,19 @@ public:
     * when solving LP relaxations of (mixed) integer programs.
     * The objective must not be modified during this procedure.
     */
-   void performSolutionPolishing(bool maximizeBasicSlack = true);
+   void performSolutionPolishing();
+
+   /// set objective of solution polishing (0: off, 1: max_basic_slack, 2: min_basic_slack)
+   void setSolutionPolishing(SolutionPolish _polishObj)
+   {
+      polishObj = _polishObj;
+   }
+
+   /// return objective of solution polishing
+   SolutionPolish getSolutionPolishing()
+   {
+      return polishObj;
+   }
 
    /// Status of solution process.
    Status status() const;
@@ -1652,7 +1675,7 @@ private:
 
    /** let index \p i leave the basis and manage entering of another one.
        @returns \c false if LP is unbounded/infeasible. */
-   bool leave(int i, bool polish = false);
+   bool leave(int i);
    /** let id enter the basis and manage leaving of another one.
        @returns \c false if LP is unbounded/infeasible. */
    bool enter(SPxId& id, bool polish = false);
@@ -1953,6 +1976,12 @@ public:
    int dualIterations()
    {
       return iterations() - primalIterations();
+   }
+
+   /// return number of iterations done with primal algorithm
+   int polishIterations()
+   {
+      return polishCount;
    }
 
    /// time spent in last call to method solve().
