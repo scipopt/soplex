@@ -641,7 +641,7 @@ void SPxSolver::computeDualfarkas4Col(Real direction)
       dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
 }
 
-bool SPxSolver::leave(int leaveIdx, bool polish)
+bool SPxSolver::leave(int leaveIdx)
 {
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
@@ -706,7 +706,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
    Real enterVal = leaveMax;
    boundflips = 0;
    Real oldShift = theShift;
-   SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx, polish);
+   SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
    if (NE(theShift, oldShift))
    {
       MSG_DEBUG( std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest" << std::endl; )
