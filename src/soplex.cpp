@@ -2836,8 +2836,6 @@ namespace soplex
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
-      displayDegeneracy();
-
       return status();
    }
 
@@ -4477,8 +4475,8 @@ namespace soplex
          }
       }
 
-      spxout << "primal basic variables with zero reduced costs: " << numDegenColsPrim
-            << " nonbasic slacks with zero dualsol: " << numDegenRowsDual << std::endl;
+      MSG_INFO3( spxout,  spxout << "primal basic variables with zero reduced costs: " << numDegenColsPrim
+            << " nonbasic slacks with zero dualsol: " << numDegenRowsDual << std::endl );
    }
 
 
