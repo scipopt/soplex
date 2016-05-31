@@ -1,6 +1,9 @@
 developer version
 =================
 
+features:
+- new scaler: Least Squares, aka Curtis-Reid-Scaling
+
 performance:
 
 interface & parameters:
