@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.2.1
+VERSION		:=	2.2.1.1
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -52,7 +52,7 @@ OPT		=	opt
 STATICLIBEXT	=	a
 SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
-EXEEXTENSION	=	
+EXEEXTENSION	=
 TEST		=	quick
 ALGO		=  1 2 3 4
 LIMIT		=  #
@@ -106,9 +106,9 @@ LIBBUILDFLAGS	=       $(ARFLAGS)
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=
-BINOFLAGS	=	
-LIBOFLAGS	=	
-LDFLAGS		=	
+BINOFLAGS	=
+LIBOFLAGS	=
+LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
@@ -171,6 +171,7 @@ LIBHEADER	=	array.h \
 			spxdefines.h \
 			spxdevexpr.h \
 			spxequilisc.h \
+			spxleastsqsc.h \
 			spxfastrt.h \
 			spxfileio.h \
 			spxgeometsc.h \
@@ -240,6 +241,7 @@ LIBOBJ		= 	changesoplex.o \
 			spxdesc.o \
 			spxdevexpr.o \
 			spxequilisc.o \
+			spxleastsqsc.o \
 			spxfastrt.o \
 			spxfileio.o \
 			spxgeometsc.o \
@@ -271,7 +273,7 @@ LIBOBJ		= 	changesoplex.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
-REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
+REPOSIT		=	# template repository, explicitly empty  #spxproof.o
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
@@ -486,7 +488,7 @@ endif
 # this empty target is needed for the SoPlex release versions
 githash::	# do not remove the double-colon
 
-# include local targets 
+# include local targets
 -include make/local/make.targets
 
 # include install targets
@@ -502,7 +504,8 @@ else
 endif
 
 .PHONY: doc
-doc:		
+doc:
+		$(BINFILE) --saveset=doc/parameters.set
 		cd doc; $(DOXY) $(NAME).dxy
 
 .PHONY: test
@@ -539,12 +542,12 @@ cleanbin:	| $(BINDIR)
 
 .PHONY: cleanlib
 cleanlib:	| $(LIBDIR)
-		@echo "remove library $(LIBFILE)" 
+		@echo "remove library $(LIBFILE)"
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 .PHONY: clean
 clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
-		@echo "remove objective files" 
+		@echo "remove objective files"
 ifneq ($(LIBOBJDIR),)
 		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
 endif
@@ -563,7 +566,7 @@ vimtags:
 etags:
 		-ctags -e -o TAGS src/*.cpp src/*.h
 
-$(OBJDIR):	
+$(OBJDIR):
 		@-mkdir -p $(OBJDIR)
 
 $(BINOBJDIR):	| $(OBJDIR)

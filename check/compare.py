@@ -44,14 +44,14 @@ def updateGeoMean(new, mean, count, shift):
 # print header lines
 def printHeader():
     border = '-'*(namelength) + '+' + '-'*(sum(length)+1) + '+'
-    output1 = '-'.join([version[0],hash[0],default]).rjust(namelength+sum(length)+1)
+    output1 = '-'.join([settings[0],githash[0]]).rjust(namelength+sum(length)+1)
     output2 = 'name'.ljust(namelength) + ' '
     # print name of compareValue of first setting
     for i,c in enumerate(compareValues):
         output2 += c.rjust(length[i])
     # print compareValues and factornames for other settings
     for i,s in enumerate(settings[1:]):
-        output1 += ' |' + '-'.join([version[i+1],hash[i+1],s]).center(sum(length) + len(compareValues)*factorlength)
+        output1 += ' |' + '-'.join([s,githash[i+1]]).center(sum(length) + len(compareValues)*factorlength)
         border += '-'*(sum(length) + len(compareValues)*factorlength + 1) + '+'
         output2 += ' |'
         for ic,c in enumerate(compareValues):
@@ -91,16 +91,18 @@ factors = {}
 settings = []
 version = []
 opt = []
-hash = []
+githash = []
 
 # load given .json files
 for run in range(1,runs):
     dataname = sys.argv[run]
     setting = sys.argv[run].split('/')[-1].split('.')[-2]
+    v = '.'.join(sys.argv[run].split('/')[-1].split('.')[2:-7])[7:]
+    version.append(v)
+    setting = '.'.join([v,setting])
     if setting in settings:
         setting = '_'.join([setting, str(run)])
     settings.append(setting)
-    version.append('.'.join(sys.argv[run].split('/')[-1].split('.')[2:3])[7:])
     opt.append(sys.argv[run].split('/')[-1].split('.')[-3])
     # check for identical testset
     if not testset == dataname.split('/')[-1].split('.')[1]:
@@ -120,7 +122,7 @@ for i in instances:
 
 # extract git hashes
 for s in settings:
-    hash.append(results[s][instances[0]]['hash'])
+    githash.append(results[s][instances[0]]['githash'])
 
 # check all settings for aborts or instances to ignore and remove them
 aborts = ''
@@ -214,9 +216,9 @@ output2 = 'geo mean:'.ljust(namelength)
 output3 = 'shifted:'.ljust(namelength)
 # print values of default setting
 for ic,c in enumerate(compareValues):
-    output1 += str(sumValue[c][default]).rjust(length[ic])
-    output2 += str(round(meanValue[c][default],1)).rjust(length[ic])
-    output3 += str(round(shmeanValue[c][default],1)).rjust(length[ic])
+    output1 += str(round(sumValue[c][default],2)).rjust(length[ic])
+    output2 += str(round(meanValue[c][default],2)).rjust(length[ic])
+    output3 += str(round(shmeanValue[c][default],2)).rjust(length[ic])
 # padding to next setting
 output1 += '  '
 output2 += '  '
@@ -224,9 +226,9 @@ output3 += '  '
 for ids, s in enumerate(settings[1:]):
     # values of other settings
     for ic,c in enumerate(compareValues):
-        output1 += str(sumValue[c][s]).rjust(length[ic])
-        output2 += str(round(meanValue[c][s],1)).rjust(length[ic])
-        output3 += str(round(shmeanValue[c][s],1)).rjust(length[ic])
+        output1 += str(round(sumValue[c][s],2)).rjust(length[ic])
+        output2 += str(round(meanValue[c][s],2)).rjust(length[ic])
+        output3 += str(round(shmeanValue[c][s],2)).rjust(length[ic])
     # padding to next setting
     output1 += ' '*(len(compareValues)*factorlength + 2)
     output2 += ' '*(len(compareValues)*factorlength + 2)
@@ -243,10 +245,10 @@ if not aborts == '':
 # generate performance profile files
 if not performanceProFile == '':
     for idx,s in enumerate(settings):
-        filename = performanceProFile+'.'+testset+'.'+version[idx]+'.'+s+'.prf'
+        filename = performanceProFile+'.'+testset+'.soplex-'+s+'.prf'
         with open(filename, 'w') as f:
             f.write('---\n')
-            f.write('algname: '+version[idx]+'_'+s+'\n')
+            f.write('algname: '+s+'\n')
             f.write('success: optimal\n')
             f.write('free_format: True\n')
             f.write('---\n')

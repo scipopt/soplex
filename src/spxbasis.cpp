@@ -267,7 +267,7 @@ void SPxBasis::loadDesc(const Desc& ds)
          SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
-         nzCount += matrix[j++]->size();      
+         nzCount += matrix[j++]->size();
       }
    }
 
@@ -730,7 +730,9 @@ void SPxBasis::change(
    {
       assert(enterVec != 0);
 
+      // update the counter for nonzeros in the basis matrix
       nzCount      = nzCount - matrix[i]->size() + enterVec->size();
+      // let the new id enter the basis
       matrix[i]    = enterVec;
       lastout      = theBaseId[i];
       theBaseId[i] = id;
@@ -738,9 +740,31 @@ void SPxBasis::change(
       ++iterCount;
       ++updateCount;
 
+      MSG_DEBUG( std::cout << "factor_stats: iteration= " << iteration()
+         << " update= " << updateCount
+         << " total_update= " << totalUpdateCount
+         << " nonzero_B= " << nzCount
+         << " nonzero_LU= " << factor->memory()
+         << " factor_fill= " << lastFill
+         << " time= " << theLP->time()
+         << std::endl; )
+
       // never factorize? Just do it !
       if (!factorized)
          factorize();
+
+      // too much memory growth ?
+      else if (Real(factor->memory()) > factor->dim() + lastMem * memFactor)
+      {
+         MSG_INFO3( (*spxout), (*spxout) << "IBASIS04 memory growth factor triggers refactorization"
+                              << " memory= " << factor->memory()
+                              << " lastMem= " << lastMem
+                              << " memFactor= " << memFactor
+                              << std::endl; )
+
+         factorize();
+      }
+
       // relative fill too high ?
       else if (Real(factor->memory()) > lastFill * Real(nzCount))
       {
@@ -752,7 +776,7 @@ void SPxBasis::change(
 
          factorize();
       }
-      // absolute fill too high ?
+      // absolute fill in basis matrix too high ?
       else if (nzCount > lastNzCount)
       {
          MSG_INFO3( (*spxout), (*spxout) << "IBASIS05 nonzero factor triggers refactorization"
@@ -881,8 +905,10 @@ void SPxBasis::factorize()
       throw SPxInternalCodeException("XBASIS01 This should never happen.");
    }
 
+   // get nonzero count of factorization
    lastMem    = factor->memory();
-   lastFill   = fillFactor * Real(factor->memory()) / Real(nzCount > 0 ? nzCount : 1);
+   // compute fill ratio between factorization and basis matrix (multiplied with tolerance)
+   lastFill   = fillFactor * Real(lastMem) / Real(nzCount > 0 ? nzCount : 1);
    lastNzCount = int(nonzeroFactor * Real(nzCount > 0 ? nzCount : 1));
 
    if (status() == SINGULAR)
@@ -1147,6 +1173,7 @@ SPxBasis::SPxBasis(Timer::TYPE ttype)
    , maxUpdates (180)
    , nonzeroFactor(10.0)
    , fillFactor(5.0)
+   , memFactor(1.5)
    , iterCount (0)
    , updateCount(0)
    , totalUpdateCount(0)
@@ -1182,6 +1209,7 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , maxUpdates(old.maxUpdates)
    , nonzeroFactor(old.nonzeroFactor)
    , fillFactor(old.fillFactor)
+   , memFactor(old.memFactor)
    , iterCount(old.iterCount)
    , updateCount(old.updateCount)
    , totalUpdateCount(old.totalUpdateCount)
@@ -1248,6 +1276,7 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       maxUpdates    = rhs.maxUpdates;
       nonzeroFactor = rhs.nonzeroFactor;
       fillFactor    = rhs.fillFactor;
+      memFactor     = rhs.memFactor;
       iterCount     = rhs.iterCount;
       nzCount       = rhs.nzCount;
       lastFill      = rhs.lastFill;

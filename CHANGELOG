@@ -1,9 +1,25 @@
+developer version
+=================
+
+performance:
+
+interface & parameters:
+- new parameters to control refactorization triggers
+- random seed for perturbation can be set from outside and is not reset in between
+- set default representation switch to 1.2
+
+fixed bugs:
+
+code quality:
+
+
 29 February 2016 - Release 2.2.1
 ================================
 
 performance:
 - faster updateFtest() by exploiting sparsity in solveVector3
 - new method noViols() for checking violations, that terminates faster than maxInfeas()
+- new refactorization trigger that takes basis size into account
 
 interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log

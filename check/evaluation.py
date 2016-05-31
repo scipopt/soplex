@@ -124,7 +124,7 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['qso:prec'] = max( int(outline.split()[3]), instances[instancename]['qso:prec'] )
 
     elif outline.startswith('SoPlex version'):
-        instances[instancename]['hash'] = outline.split()[-1].rstrip(']')[0:9]
+        instances[instancename]['githash'] = outline.split()[-1].rstrip(']')[0:9]
         if not printedIdentifier:
             printedIdentifier = True
             print('\n')

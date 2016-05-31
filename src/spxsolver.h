@@ -360,6 +360,9 @@ protected:
 
 public:
 
+   /// The random number generator used throughout the whole computation. Its seed can be modified.
+   Random random;
+
    /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables;
     *  for the entering Simplex algorithm this vector contains the indices of infeasible slack variables.
     */
@@ -397,6 +400,24 @@ public:
    {
       spxout = &newOutstream;
       SPxLP::spxout = &newOutstream;
+   }
+
+   /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+   void setNonzeroFactor( Real f )
+   {
+      SPxBasis::nonzeroFactor = f;
+   }
+
+   /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+   void setFillFactor( Real f )
+   {
+      SPxBasis::fillFactor = f;
+   }
+
+   /// set refactor threshold for memory growth in current factor update compared to the last factorization
+   void setMemFactor( Real f )
+   {
+      SPxBasis::memFactor = f;
    }
 
    /**@name Access */
@@ -1541,11 +1562,11 @@ private:
    ///
    Real perturbMin(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    ///
    Real perturbMax(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
    //------------------------------------

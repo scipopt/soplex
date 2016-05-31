@@ -137,7 +137,7 @@ public:
    /// returns the position number of index \p i.
    /** Returns the number of the first index \p i. If no index \p i is
        available in the #IdxSet, -1 is returned. Otherwise,
-       #index(number(i)) == \p i holds.
+       index(number(\p i)) == \p i holds.
     */
    int number(int i) const;
    //@}

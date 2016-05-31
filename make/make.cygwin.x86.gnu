@@ -1,4 +1,4 @@
-CPPFLAGS	+=	-m32
+CPPFLAGS	+=	-m32 -D_WIN32
 LDFLAGS		+=	-m32
 
 ifneq ($(OPT),opt-gccold)

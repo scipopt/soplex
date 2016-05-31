@@ -35,6 +35,7 @@
 
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxleastsqsc.h"
 #include "spxgeometsc.h"
 
 #include "spxstarter.h"
@@ -58,6 +59,8 @@
 #include "spxboundflippingrt.h"
 
 #include "sol.h"
+
+#define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim
 ///@todo introduce status codes for SoPlex, especially for rational solving
@@ -103,10 +106,6 @@ public:
    virtual ~SoPlex();
 
    //@}
-
-
-   /// message handler
-//   SPxOut spxout;
 
 
    //**@name Access to the real LP */
@@ -914,11 +913,14 @@ public:
       /// minimum number of stalling refinements since last pivot to trigger rational factorization
       RATFAC_MINSTALLS = 21,
 
+      /// maximum number of conjugate gradient iterations in least square scaling
+      LEASTSQ_MAXROUNDS = 22,
+
       /// mode for solution polishing
-      SOLUTION_POLISHING = 22,
+      SOLUTION_POLISHING = 23,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 23
+      INTPARAM_COUNT = 24
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1012,7 +1014,10 @@ public:
       SCALER_GEO1 = 3,
 
       /// geometric mean scaling on rows and columns, max 8 rounds
-      SCALER_GEO8 = 4
+      SCALER_GEO8 = 4,
+
+       /// least square scaling
+      SCALER_LEASTSQ = 5
    };
 
    /// values for parameter STARTER
@@ -1217,8 +1222,20 @@ public:
       /// minimal reduction (sum of removed rows/cols) to continue simplification
       MINRED = 18,
 
+      /// refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      REFAC_BASIS_NNZ = 19,
+
+      /// refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      REFAC_UPDATE_FILL = 20,
+
+      /// refactor threshold for memory growth in factorization since last refactorization
+      REFAC_MEM_FACTOR = 21,
+
+      /// accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      LEASTSQ_ACRCY = 22,
+
       /// number of real parameters
-      REALPARAM_COUNT = 19
+      REALPARAM_COUNT = 23
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1316,6 +1333,12 @@ public:
    /// If quiet is set to true the function will only display which vectors are different.
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
 
+   /// set the random seed of the solver instance
+   void setRandomSeed(unsigned int seed);
+
+   /// returns the current random seed of the solver instance
+   unsigned int randomSeed() const;
+
    //@}
 
 private:
@@ -1356,6 +1379,7 @@ private:
    SPxEquiliSC _scalerBiequi;
    SPxGeometSC _scalerGeo1;
    SPxGeometSC _scalerGeo8;
+   SPxLeastSqSC _scalerLeastsq;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;

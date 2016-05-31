@@ -259,9 +259,9 @@ namespace soplex
 
             // type of scaler
             _intParamName[SoPlex::SCALER] = "scaler";
-            _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
+            _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)";
             _intParamLower[SoPlex::SCALER] = 0;
-            _intParamUpper[SoPlex::SCALER] = 4;
+            _intParamUpper[SoPlex::SCALER] = 5;
             _intParamDefault[SoPlex::SCALER] = SoPlex::SCALER_BIEQUI;
 
             // type of starter used to create crash basis
@@ -333,6 +333,13 @@ namespace soplex
             _intParamLower[SoPlex::RATFAC_MINSTALLS] = 0;
             _intParamUpper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
             _intParamDefault[SoPlex::RATFAC_MINSTALLS] = 2;
+
+            // maximum number of conjugate gradient iterations in least square scaling
+            _intParamName[SoPlex::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
+            _intParamDescription[SoPlex::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
+            _intParamLower[SoPlex::LEASTSQ_MAXROUNDS] = 0;
+            _intParamUpper[SoPlex::LEASTSQ_MAXROUNDS] = INT_MAX;
+            _intParamDefault[SoPlex::LEASTSQ_MAXROUNDS] = 50;
 
             // mode for solution polishing
             _intParamName[SoPlex::SOLUTION_POLISHING] = "solutionpolishing";
@@ -463,7 +470,7 @@ namespace soplex
             _realParamDescription[SoPlex::REPRESENTATION_SWITCH] = "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode";
             _realParamLower[SoPlex::REPRESENTATION_SWITCH] = 0.0;
             _realParamUpper[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
-            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = 1.2;
 
             // geometric frequency at which to apply rational reconstruction
             _realParamName[SoPlex::RATREC_FREQ] = "ratrec_freq";
@@ -478,6 +485,34 @@ namespace soplex
             _realParamLower[SoPlex::MINRED] = 0.0;
             _realParamUpper[SoPlex::MINRED] = 1.0;
             _realParamDefault[SoPlex::MINRED] = 1e-4;
+
+            // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+            _realParamName[SoPlex::REFAC_BASIS_NNZ] = "refac_basis_nnz";
+            _realParamDescription[SoPlex::REFAC_BASIS_NNZ] = "refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix";
+            _realParamLower[SoPlex::REFAC_BASIS_NNZ] = 1.0;
+            _realParamUpper[SoPlex::REFAC_BASIS_NNZ] = 100.0;
+            _realParamDefault[SoPlex::REFAC_BASIS_NNZ] = 10.0;
+
+            // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+            _realParamName[SoPlex::REFAC_UPDATE_FILL] = "refac_update_fill";
+            _realParamDescription[SoPlex::REFAC_UPDATE_FILL] = "refactor threshold for fill-in in current factor update compared to fill-in in last factorization";
+            _realParamLower[SoPlex::REFAC_UPDATE_FILL] = 1.0;
+            _realParamUpper[SoPlex::REFAC_UPDATE_FILL] = 100.0;
+            _realParamDefault[SoPlex::REFAC_UPDATE_FILL] = 5.0;
+
+            // refactor threshold for memory growth in factorization since last refactorization
+            _realParamName[SoPlex::REFAC_MEM_FACTOR] = "refac_mem_factor";
+            _realParamDescription[SoPlex::REFAC_MEM_FACTOR] = "refactor threshold for memory growth in factorization since last refactorization";
+            _realParamLower[SoPlex::REFAC_MEM_FACTOR] = 1.0;
+            _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 100.0;
+            _realParamDefault[SoPlex::REFAC_MEM_FACTOR] = 1.5;
+
+            // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+            _realParamName[SoPlex::LEASTSQ_ACRCY] = "leastsq_acrcy";
+            _realParamDescription[SoPlex::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
+            _realParamLower[SoPlex::LEASTSQ_ACRCY] = 1.0;
+            _realParamUpper[SoPlex::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::LEASTSQ_ACRCY] = 1000.0;
 
             _defaultsAndBoundsInitialized = true;
          }
@@ -570,6 +605,7 @@ namespace soplex
       , _scalerBiequi(true)
       , _scalerGeo1(1)
       , _scalerGeo8(8)
+      , _scalerLeastsq()
       , _simplifier(0)
       , _scaler(0)
       , _starter(0)
@@ -586,6 +622,7 @@ namespace soplex
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
       _scalerGeo8.setOutstream(spxout);
+      _scalerLeastsq.setOutstream(spxout);
 
       // give lu factorization to solver
       _solver.setSolver(&_slufactor);
@@ -634,6 +671,7 @@ namespace soplex
          _scalerBiequi = rhs._scalerBiequi;
          _scalerGeo1 = rhs._scalerGeo1;
          _scalerGeo8 = rhs._scalerGeo8;
+         _scalerLeastsq = rhs._scalerLeastsq;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
@@ -666,6 +704,7 @@ namespace soplex
          _scalerBiequi.setOutstream(spxout);
          _scalerGeo1.setOutstream(spxout);
          _scalerGeo8.setOutstream(spxout);
+         _scalerLeastsq.setOutstream(spxout);
 
          // transfer the lu solver
          _solver.setSolver(&_slufactor);
@@ -5116,6 +5155,9 @@ namespace soplex
          case SCALER_GEO8:
             _scaler = &_scalerGeo8;
             break;
+         case SCALER_LEASTSQ:
+            _scaler = &_scalerLeastsq;
+            break;
          default:
             return false;
          }
@@ -5286,6 +5328,11 @@ namespace soplex
       case SoPlex::RATFAC_MINSTALLS:
          break;
 
+      // maximum number of conjugate gradient iterations in least square scaling
+      case SoPlex::LEASTSQ_MAXROUNDS:
+         _scaler->setIntParam(value);
+         break;
+
       // mode of solution polishing
       case SoPlex::SOLUTION_POLISHING:
          switch( value )
@@ -5415,6 +5462,20 @@ namespace soplex
       case SoPlex::MINRED:
          break;
 
+      case SoPlex::REFAC_BASIS_NNZ:
+         break;
+
+      case SoPlex::REFAC_UPDATE_FILL:
+         break;
+
+      case SoPlex::REFAC_MEM_FACTOR:
+         break;
+
+      // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      case SoPlex::LEASTSQ_ACRCY:
+         _scaler->setRealParam(value);
+         break;
+
       default:
          return false;
       }
@@ -5525,6 +5586,13 @@ namespace soplex
          printedValue = true;
       }
 #endif
+
+      if( _solver.random.getSeed() != DEFAULT_RANDOM_SEED )
+      {
+         spxout << "uint:random_seed = " << _solver.random.getSeed() << "\n";
+         printedValue = true;
+      }
+
       if( printedValue )
          spxout << std::endl;
    }
@@ -5541,7 +5609,11 @@ namespace soplex
          return false;
 
       file.setf(std::ios::left);
-      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10 << "." << SOPLEX_SUBVERSION << "\n";
+      file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
+#if SOPLEX_SUBVERSION > 0
+      file << "." << SOPLEX_SUBVERSION;
+#endif
+      file << "\n";
 
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
       {
@@ -5561,7 +5633,8 @@ namespace soplex
 
          file << "\n";
          file << "# " << _currentSettings->_intParamDescription[i] << "\n";
-         file << "# range [-2147483648,2147483647], default " << _currentSettings->_intParamDefault[i] << "\n";
+         file << "# range [" << _currentSettings->_intParamLower[i] << "," << _currentSettings->_intParamUpper[i]
+            << "], default " << _currentSettings->_intParamDefault[i] << "\n";
          file << "int:" << _currentSettings->_intParamName[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
       }
 
@@ -5590,6 +5663,14 @@ namespace soplex
          file << "rational:" << _currentSettings->_rationalParamName[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
       }
 #endif
+
+      if( !onlyChanged || _solver.random.getSeed() != DEFAULT_RANDOM_SEED )
+      {
+         file << "\n";
+         file << "# initial random seed used for perturbation\n";
+         file << "# range [0, " << UINT_MAX << "], default "<< DEFAULT_RANDOM_SEED << "\n";
+         file << "uint:random_seed = " << _solver.random.getSeed() << "\n";
+      }
 
       return true;
    }
@@ -5642,7 +5723,7 @@ namespace soplex
       // stop timing
       _statistics->readingTime->stop();
 
-      return !readError && !parseError;
+      return !readError;
    }
 
    /// parses one setting string and returns true on success
@@ -5873,6 +5954,24 @@ namespace soplex
          return true;
       }
 #endif
+
+      // check whether we have the random seed
+      if( strncmp(paramTypeString, "uint", 4) == 0 )
+      {
+         if( strncmp(paramName, "random_seed", 11) == 0 )
+         {
+            unsigned int value;
+
+            if( sscanf(paramValueString, "%u", &value) == 1 )
+            {
+               setRandomSeed(value);
+               return true;
+            }
+         }
+
+         MSG_ERROR( std::cerr << "Error parsing setting string for uint parameter <random_seed>.\n" );
+         return false;
+      }
 
       MSG_ERROR( std::cerr << "Error parsing setting string: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << ">.\n" );
 
@@ -6361,6 +6460,22 @@ namespace soplex
       }
 
       return result;
+   }
+
+
+
+   /// set the random seed of the solver instance
+   void SoPlex::setRandomSeed(unsigned int seed)
+   {
+      _solver.random.setSeed(seed);
+   }
+
+
+
+   /// returns the current random seed of the solver instance or the one stored in the settings
+   unsigned int SoPlex::randomSeed() const
+   {
+      return _solver.random.getSeed();
    }
 
 
@@ -7117,6 +7232,9 @@ namespace soplex
       case SCALER_GEO8:
          _scaler = &_scalerGeo8;
          break;
+      case SCALER_LEASTSQ:
+         _scaler = &_scalerLeastsq;
+         break;
       default:
          break;
       }
@@ -7226,6 +7344,10 @@ namespace soplex
          _solver.hyperPricing(true);
       else if( intParam(SoPlex::HYPER_PRICING) == SoPlex::HYPER_PRICING_OFF )
          _solver.hyperPricing(false);
+
+      _solver.setNonzeroFactor(realParam(SoPlex::REFAC_BASIS_NNZ));
+      _solver.setFillFactor(realParam(SoPlex::REFAC_UPDATE_FILL));
+      _solver.setMemFactor(realParam(SoPlex::REFAC_MEM_FACTOR));
 
       // call floating-point solver and catch exceptions
       _statistics->simplexTime->start();
@@ -7686,6 +7808,24 @@ namespace soplex
          return true;
       }
 #endif
+
+      // check whether we have the random seed
+      if( strncmp(paramTypeString, "uint", 4) == 0 )
+      {
+         if( strncmp(paramName, "random_seed", 11) == 0 )
+         {
+            unsigned int value;
+
+            if( sscanf(paramValueString, "%u", &value) == 1 )
+            {
+               setRandomSeed(value);
+               return true;
+            }
+         }
+
+         MSG_ERROR( std::cerr << "Error parsing settings file for uint parameter <random_seed>.\n" );
+         return false;
+      }
 
       MSG_ERROR( std::cerr << "Error parsing settings file: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << "> in line " << lineNumber << ".\n" );
 
