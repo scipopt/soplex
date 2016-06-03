@@ -52,8 +52,6 @@ protected:
    Real fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
-   /// flag whether we are in polishing mode
-   bool polishing;
    //@}
 
    //-------------------------------------
@@ -146,6 +144,7 @@ protected:
    /// numerical stability tests.
    /** Tests whether the selected leave index needs to be discarded (and do so)
        and the ratio test is to be recomputed.
+       If \p polish is set to true no shifts are applied.
    */
    bool minReLeave(Real& sel, int leave, Real maxabs, bool polish = false);
    ///
@@ -176,7 +175,6 @@ public:
       , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
-      , polishing(false)
    {}
    /// copy constructor
    SPxFastRT(const SPxFastRT& old)
@@ -185,7 +183,6 @@ public:
       , epsilon(old.epsilon)
       , fastDelta(old.fastDelta)
       , iscoid(false)
-      , polishing(false)
    {}
    /// assignment operator
    SPxFastRT& operator=( const SPxFastRT& rhs)
@@ -197,7 +194,6 @@ public:
          epsilon = rhs.epsilon;
          fastDelta = rhs.fastDelta;
          iscoid = false;
-         polishing = false;
       }
 
       return *this;
@@ -209,7 +205,6 @@ public:
       , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
-      , polishing(false)
    {}
    /// destructor
    virtual ~SPxFastRT()
@@ -229,7 +224,7 @@ public:
    ///
    virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
-   virtual SPxId selectEnter(Real& val, int, bool polish = false);
+   virtual SPxId selectEnter(Real& val, int);
    ///
    virtual void setType(SPxSolver::Type type);
    ///

@@ -1000,6 +1000,8 @@ SPxSolver::Status SPxSolver::solve()
      : leaveCount;
 
    printDisplayLine(true);
+   performSolutionPolishing();
+
    return status();
 }
 

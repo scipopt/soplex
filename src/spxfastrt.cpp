@@ -134,9 +134,6 @@ int SPxFastRT::maxDelta(
          if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
             continue;
 
-         if( polishing && !leaving && thesolver->baseId(i).isSPxColId() )
-            continue;
-
          x = upd[i];
 
          if (x > epsilon)
@@ -833,7 +830,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
       if (sel > fastDelta / maxabs)
       {
          sel = 0.0;
-         if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH)
+         if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
             if (x > 0.0)
                thesolver->shiftLBbound(leave, vec[leave]);
@@ -861,8 +858,6 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
    int leave = -1;
    int cnt = 0;
 
-   polishing = polish;
-
    assert( m_type == SPxSolver::ENTER );
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.cpp)
@@ -879,7 +874,6 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
          // phase 1:
          max = val;
          maxabs = 0.0;
-         // TODO make sure that only variables are selected
          leave = maxDelta(max, maxabs);
          if (max == val)
             return -1;
@@ -967,18 +961,18 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
                 << ": skipping instable pivot" << std::endl;
    )
 
-   // decide whether the chosen leave index confirms to the polishing objective
    if( polish )
    {
+      // decide whether the chosen leave index contributes to the polishing objective
       if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK && thesolver->baseId(leave).isSPxRowId() )
       {
          MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a col to leave the basis" << std::endl; )
-         return -1;
+            return -1;
       }
       else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK && thesolver->baseId(leave).isSPxColId() )
       {
          MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a row to leave the basis" << std::endl; )
-         return -1;
+            return -1;
       }
    }
 
@@ -1207,7 +1201,7 @@ bool SPxFastRT::shortEnter(
    return false;
 }
 
-SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
+SPxId SPxFastRT::selectEnter(Real& val, int)
 {
    SPxId enterId;
    Real max, sel;
@@ -1235,12 +1229,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
          enterId = maxDelta(nr, max, maxabs);
          if (!enterId.isValid())
             return enterId;
-         else if( polish && (enterId.isSPxColId() || NErel(max, 0)) )
-         {
-            // don't move another variable into the basis when doing solution polishing
-            val = max;
-            return SPxId();
-         }
+
          assert(max >= 0.0);
          assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
@@ -1279,12 +1268,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
          enterId = minDelta(nr, max, maxabs);
          if (!enterId.isValid())
             return enterId;
-         else if( polish && (enterId.isSPxColId() || NErel(max, 0)) )
-         {
-            // don't move another variable into the basis when doing solution polishing
-            val = max;
-            return SPxId();
-         }
+
          assert(max <= 0.0);
          assert(!enterId.isValid() || !solver()->isBasic(enterId));
 

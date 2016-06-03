@@ -4435,52 +4435,6 @@ namespace soplex
 
 
 
-   /// display number of primal degenerate rows and columns
-   void SoPlex::displayDegeneracy()
-   {
-      // get degeneracy of basic solution
-      int numDegenColsPrim = 0;
-      int numDegenRowsDual = 0;
-      DVectorReal primalsol(numColsReal());
-      DVectorReal redcost(numColsReal());
-      DVectorReal slacks(numRowsReal());
-      DVectorReal dualsol(numRowsReal());
-      DIdxSet degenColsPrim;
-      DIdxSet degenRowsDual;
-
-      getPrimalReal(primalsol);
-      getRedCostReal(redcost);
-      getSlacksReal(slacks);
-      getDualReal(dualsol);
-
-      for( int j = 0; j < numColsReal(); ++j )
-      {
-         // basic column whose value is equal to one of its bounds
-         if( basisColStatus(j) == SPxSolver::BASIC && EQrel(redcost[j], 0) &&
-               (NErel(primalsol[j], lowerReal(j)) || NErel(primalsol[j], upperReal(j))) )
-         {
-            degenColsPrim.addIdx(j);
-            ++numDegenColsPrim;
-         }
-      }
-
-      for( int i = 0; i < numRowsReal(); ++i )
-      {
-         // basic row whose value is equal to one of its bounds
-         if( (basisRowStatus(i) == SPxSolver::ON_LOWER || basisRowStatus(i) == SPxSolver::ON_UPPER) &&
-               EQrel(dualsol[i], 0.0) )
-         {
-            degenRowsDual.addIdx(i);
-            ++numDegenRowsDual;
-         }
-      }
-
-      MSG_INFO3( spxout,  spxout << "primal basic variables with zero reduced costs: " << numDegenColsPrim
-            << " nonbasic slacks with zero dualsol: " << numDegenRowsDual << std::endl );
-   }
-
-
-
    /// number of iterations since last call to solve
    int SoPlex::numIterations() const
    {
@@ -7352,8 +7306,6 @@ namespace soplex
       try
       {
          _solver.solve();
-         if( intParam(SoPlex::SOLUTION_POLISHING) != SoPlex::POLISHING_OFF )
-            _solver.performSolutionPolishing();
       }
       catch( const SPxException& E )
       {

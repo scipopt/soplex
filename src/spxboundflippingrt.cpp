@@ -545,8 +545,7 @@ bool SPxBoundFlippingRT::getData(
 /** determine entering row/column */
 SPxId SPxBoundFlippingRT::selectEnter(
    Real&                 val,
-   int                   leaveIdx,
-   bool                  polish
+   int                   leaveIdx
    )
 {
    assert( m_type == SPxSolver::LEAVE );
@@ -558,10 +557,10 @@ SPxId SPxBoundFlippingRT::selectEnter(
       MSG_DEBUG( std::cout << "DLBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableBoundFlips || polish || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
+   if( !enableBoundFlips || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DLBFRT07 switching to fast ratio test" << std::endl; )
-      return SPxFastRT::selectEnter(val, leaveIdx, polish);
+      return SPxFastRT::selectEnter(val, leaveIdx);
    }
    const Real*  pvec = thesolver->pVec().get_const_ptr();
    const Real*  pupd = thesolver->pVec().delta().values();

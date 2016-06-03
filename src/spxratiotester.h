@@ -152,7 +152,7 @@ public:
        element of pVec() or coPvec(), that reaches one of its bounds
        with this update.
     */
-   virtual SPxId selectEnter(Real& val, int leaveIdx, bool polish = false) = 0;
+   virtual SPxId selectEnter(Real& val, int leaveIdx) = 0;
 
    /// sets Simplex type.
    /** Informs pricer about (a change of) the loaded SoPlex's Type. In
