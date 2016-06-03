@@ -341,6 +341,13 @@ namespace soplex
             _intParamUpper[SoPlex::LEASTSQ_MAXROUNDS] = INT_MAX;
             _intParamDefault[SoPlex::LEASTSQ_MAXROUNDS] = 50;
 
+            // mode for solution polishing
+            _intParamName[SoPlex::SOLUTION_POLISHING] = "solution_polishing";
+            _intParamDescription[SoPlex::SOLUTION_POLISHING] = "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)";
+            _intParamLower[SoPlex::SOLUTION_POLISHING] = 0;
+            _intParamUpper[SoPlex::SOLUTION_POLISHING] = 2;
+            _intParamDefault[SoPlex::SOLUTION_POLISHING] = SoPlex::POLISHING_OFF;
+
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
             _realParamDescription[SoPlex::FEASTOL] = "primal feasibility tolerance";
@@ -5278,6 +5285,23 @@ namespace soplex
          _scaler->setIntParam(value);
          break;
 
+      // mode of solution polishing
+      case SoPlex::SOLUTION_POLISHING:
+         switch( value )
+         {
+         case POLISHING_OFF:
+            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
+            break;
+         case POLISHING_MAXBASICSLACK:
+            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MAXBASICSLACK);
+            break;
+         case POLISHING_MINBASICSLACK:
+            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MINBASICSLACK);
+            break;
+         default:
+            return false;
+         }
+         break;
       default:
          return false;
       }
@@ -7299,6 +7323,7 @@ namespace soplex
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
+      _statistics->iterationsPolish += _solver.polishIterations();
       _statistics->boundflips += _solver.boundFlips();
       _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
       _statistics->luSolveTimeReal += _slufactor.getSolveTime();

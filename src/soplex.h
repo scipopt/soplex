@@ -913,8 +913,11 @@ public:
       /// maximum number of conjugate gradient iterations in least square scaling
       LEASTSQ_MAXROUNDS = 22,
 
+      /// mode for solution polishing
+      SOLUTION_POLISHING = 23,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 23
+      INTPARAM_COUNT = 24
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1141,6 +1144,19 @@ public:
 
       /// always
       HYPER_PRICING_ON = 2
+   };
+
+   /// values for parameter SOLUTION_POLISHING
+   enum
+   {
+      /// no solution polishing
+      POLISHING_OFF = 0,
+
+      /// maximize number of basic slack variables, i.e. more variables on bounds
+      POLISHING_MAXBASICSLACK = 1,
+
+      /// minimize number of basic slack variables, i.e. more variables between bounds
+      POLISHING_MINBASICSLACK = 2
    };
 
    /// real parameters

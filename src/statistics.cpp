@@ -169,10 +169,11 @@ namespace soplex
       os << "\n  Primal            : " << iterationsPrimal;
       if( iterations > 0 )
          os << " (" << 100*double(iterationsPrimal)/double(iterations) << "%)";
-      os << "\n  Dual              : " << iterations - iterationsPrimal;
+      os << "\n  Dual              : " << iterations - iterationsPrimal - iterationsPolish;
       if( iterations > 0 )
          os << " (" << 100*double((iterations - iterationsPrimal))/double(iterations) << "%)";
       os << "\n  Bound flips       : " << boundflips;
+      os << "\n  Sol. polishing    : " << iterationsPolish;
 
       os << "\nLU factorizations   : " << luFactorizationsReal << "\n"
          << "  Factor. frequency : ";

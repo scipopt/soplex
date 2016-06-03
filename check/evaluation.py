@@ -62,7 +62,7 @@ for idx, outline in enumerate(outlines):
             instancename = instancename + '.' + linesplit[i]
         length = len(instancename)
         if length > namelength:
-            shortname = instancename[0:namelength/2-1] + '~' + instancename[length-namelength/2:]
+            shortname = instancename[0:int(namelength/2)-1] + '~' + instancename[length-int(namelength/2):]
         else:
             shortname = instancename
 
@@ -202,6 +202,7 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['primaliters'] = int(outlines[idx+3].split()[2])
             instances[instancename]['dualiters'] = int(outlines[idx+4].split()[2])
             instances[instancename]['flips'] = int(outlines[idx+5].split()[3])
+            instances[instancename]['polish'] = int(outlines[idx+6].split()[-1])
             instances[instancename]['speed'] = round(float(instances[instancename]['iters'])/max(instances[instancename]['solvetime'],tolerance),2)
 
         elif outline.startswith('LU factorizations'):

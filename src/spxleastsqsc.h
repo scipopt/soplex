@@ -89,4 +89,3 @@ protected:
 };
 } // namespace soplex
 #endif // _SPXLEASTSQSC_H_
-

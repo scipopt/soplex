@@ -3,6 +3,11 @@ developer version
 
 features:
 - new scaler: Least Squares, aka Curtis-Reid-Scaling
+- solution polishing: perform additional primal pivots at optimal basis
+  turn on with parameter 'int:solution_polishing'
+    0 - off
+    1 - try to increase number of basic slack vars
+    2 - try to decrease number of basic slack vars
 
 performance:
 
