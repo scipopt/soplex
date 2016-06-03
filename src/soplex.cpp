@@ -342,7 +342,7 @@ namespace soplex
             _intParamDefault[SoPlex::LEASTSQ_MAXROUNDS] = 50;
 
             // mode for solution polishing
-            _intParamName[SoPlex::SOLUTION_POLISHING] = "solutionpolishing";
+            _intParamName[SoPlex::SOLUTION_POLISHING] = "solution_polishing";
             _intParamDescription[SoPlex::SOLUTION_POLISHING] = "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)";
             _intParamLower[SoPlex::SOLUTION_POLISHING] = 0;
             _intParamUpper[SoPlex::SOLUTION_POLISHING] = 2;
