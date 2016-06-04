@@ -1414,6 +1414,7 @@ private:
 
    SPxLPRational* _rationalLP;
    SLUFactorRational _rationalLUSolver;
+   DataArray<int> _rationalLUSolverBind;
 
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
@@ -1773,6 +1774,9 @@ private:
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
+
+   /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
+   void _computeBasisInverseRational();
 
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);

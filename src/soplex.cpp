@@ -6500,7 +6500,9 @@ namespace soplex
 
       assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRowsReal());
       assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numColsReal());
-      assert(_hasBasis || _rationalLUSolver.status() == SLinSolverRational::UNLOADED);
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == numRowsRational());
 
       return true;
    }

@@ -3508,6 +3508,59 @@ namespace soplex
 
 
 
+   /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
+   void SoPlex::_computeBasisInverseRational()
+   {
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+         || _rationalLUSolver.status() == SLinSolverRational::TIME);
+
+      const int matrixdim = numRowsRational();
+      assert(_rationalLUSolverBind.size() == matrixdim);
+
+      DataArray< const SVectorRational* > matrix(matrixdim);
+      _rationalLUSolverBind.reSize(matrixdim);
+
+      for( int i = 0; i < matrixdim; i++ )
+      {
+         if( _rationalLUSolverBind[i] >= 0 )
+         {
+            assert(_rationalLUSolverBind[i] < numColsRational());
+            matrix[i] = &colVectorRational(_rationalLUSolverBind[i]);
+         }
+         else
+         {
+            assert(-1 - _rationalLUSolverBind[i] >= 0);
+            assert(-1 - _rationalLUSolverBind[i] < numRowsRational());
+            matrix[i] = _unitVectorRational(-1 - _rationalLUSolverBind[i]);
+         }
+      }
+
+      // load and factorize rational basis matrix
+      if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
+         _rationalLUSolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
+      else
+         _rationalLUSolver.setTimeLimit(-1.0);
+      _rationalLUSolver.load(matrix.get_ptr(), matrixdim);
+
+      // record statistics
+      _statistics->luFactorizationTimeRational += _rationalLUSolver.getFactorTime();
+      _statistics->luFactorizationsRational += _rationalLUSolver.getFactorCount();
+      _rationalLUSolver.resetCounters();
+
+      if( _rationalLUSolver.status() == SLinSolverRational::TIME )
+      {
+         MSG_INFO2( spxout, spxout << "Rational factorization hit time limit.\n" );
+      }
+      else if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      {
+         MSG_ERROR( std::cerr << "Error performing rational LU factorization.\n" );
+      }
+
+      return;
+   }
+
+
+
    /// factorizes rational basis matrix in column representation
    void SoPlex::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal)
    {
@@ -3521,13 +3574,24 @@ namespace soplex
 
       const bool maximizing = (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE);
       const int matrixdim = numRowsRational();
-      DataArray< const SVectorRational* > matrix(matrixdim);
+      bool loadMatrix = (_rationalLUSolver.status() == SLinSolverRational::UNLOADED
+         || _rationalLUSolver.status() == SLinSolverRational::TIME);
       int numBasicRows;
+
+      assert(loadMatrix || matrixdim == _rationalLUSolver.dim());
+      assert(loadMatrix || matrixdim == _rationalLUSolverBind.size());
+      if( !loadMatrix && (matrixdim != _rationalLUSolver.dim() || matrixdim != _rationalLUSolverBind.size()) )
+      {
+         MSG_WARNING( spxout, spxout << "Warning: dimensioning error in rational matrix factorization (recovered).\n" );
+         loadMatrix = true;
+      }
 
       _workSol._primal.reDim(matrixdim);
       _workSol._slacks.reDim(matrixdim);
       _workSol._dual.reDim(matrixdim);
       _workSol._redCost.reDim(numColsRational() > matrixdim ? numColsRational() : matrixdim);
+      if( loadMatrix )
+         _rationalLUSolverBind.reSize(matrixdim);
 
       DVectorRational& basicPrimalRhs = _workSol._slacks;
       DVectorRational& basicDualRhs = _workSol._redCost;
@@ -3550,7 +3614,8 @@ namespace soplex
          {
             basicPrimalRhs[i] = 0;
             basicDualRhs[j] = 0;
-            matrix[j] = _unitVectorRational(i);
+            if( loadMatrix )
+               _rationalLUSolverBind[j] = -1 - i;
             j++;
          }
          else if( basisStatusRows[i] == SPxSolver::ON_LOWER )
@@ -3585,7 +3650,8 @@ namespace soplex
          if( basisStatusCols[i] == SPxSolver::BASIC && j < matrixdim )
          {
             basicDualRhs[j] = objRational(i);
-            matrix[j] = &colVectorRational(i);
+            if( loadMatrix )
+               _rationalLUSolverBind[j] = i;
             j++;
          }
          else if( basisStatusCols[i] == SPxSolver::ON_LOWER )
@@ -3622,29 +3688,16 @@ namespace soplex
       }
 
       // load and factorize rational basis matrix
-      if( _rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.status() == SLinSolverRational::TIME )
-      {
-         if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
-            _rationalLUSolver.setTimeLimit(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
-         else
-            _rationalLUSolver.setTimeLimit(-1.0);
-         _rationalLUSolver.load(matrix.get_ptr(), matrixdim);
-
-         // record statistics
-         _statistics->luFactorizationTimeRational += _rationalLUSolver.getFactorTime();
-         _statistics->luFactorizationsRational += _rationalLUSolver.getFactorCount();
-         _rationalLUSolver.resetCounters();
-      }
+      if( loadMatrix )
+         _computeBasisInverseRational();
 
       if( _rationalLUSolver.status() == SLinSolverRational::TIME )
       {
-         MSG_INFO2( spxout, spxout << "Rational factorization hit time limit.\n" );
          stoppedTime = true;
          return;
       }
       else if( _rationalLUSolver.status() != SLinSolverRational::OK )
       {
-         MSG_ERROR( std::cerr << "Error performing rational LU factorization.\n" );
          error = true;
          return;
       }
@@ -3676,6 +3729,7 @@ namespace soplex
          if( basisStatusRows[i] == SPxSolver::BASIC )
          {
             assert(j < matrixdim);
+            assert(_rationalLUSolverBind[j] == -1 - i);
             violation = lhsRational(i);
             violation += basicPrimal[j];
             if( violation > primalViolation )
@@ -3699,6 +3753,7 @@ namespace soplex
          if( basisStatusCols[i] == SPxSolver::BASIC )
          {
             assert(j < matrixdim);
+            assert(_rationalLUSolverBind[j] == i);
             if( basicPrimal[j] < lowerRational(i) )
             {
                violation = lowerRational(i);
@@ -3859,6 +3914,7 @@ namespace soplex
             if( basisStatusCols[i] == SPxSolver::BASIC )
             {
                assert(j < matrixdim);
+               assert(_rationalLUSolverBind[j] == i);
                sol._primal[i] = basicPrimal[j];
                j++;
             }
