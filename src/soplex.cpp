@@ -4403,6 +4403,123 @@ namespace soplex
 
 
 
+   /// compute rational basis inverse; returns true on success
+   bool SoPlex::computeBasisInverseRational()
+   {
+      if( !hasBasis() )
+      {
+         _rationalLUSolver.clear();
+         assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED);
+         return false;
+      }
+
+      if( _rationalLUSolver.status() == SLinSolverRational::UNLOADED
+         || _rationalLUSolver.status() == SLinSolverRational::TIME )
+      {
+         _rationalLUSolverBind.reSize(numColsRational());
+         getBasisInd(_rationalLUSolverBind.get_ptr());
+         _computeBasisInverseRational();
+      }
+
+      if( _rationalLUSolver.status() == SLinSolverRational::OK )
+         return true;
+
+      return false;
+   }
+
+
+
+   /// gets an array of indices for the columns of the rational basis matrix; bind[i] >= 0 means that the i-th column of
+   /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
+   /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
+   bool SoPlex::getBasisIndRational(DataArray<int>& bind)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      bind = _rationalLUSolverBind;
+      assert(bind.size() == numRowsRational());
+      return true;
+   }
+
+
+
+   /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
+   bool SoPlex::getBasisInverseRowRational(const int r, SSVectorRational& vec)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      try
+      {
+         vec.reDim(numRowsRational());
+         _rationalLUSolver.solveLeft(vec, *_unitVectorRational(r));
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing rational basis inverse row.\n" );
+         return false;
+      }
+      return true;
+   }
+
+
+
+   /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
+   bool SoPlex::getBasisInverseColRational(const int c, SSVectorRational& vec)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      try
+      {
+         vec.reDim(numRowsRational());
+         _rationalLUSolver.solveRight(vec, *_unitVectorRational(c));
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing rational basis inverse column.\n" );
+         return false;
+      }
+      return true;
+   }
+
+
+
+   /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
+   /// on success
+   bool SoPlex::getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      try
+      {
+         sol.reDim(numRowsRational());
+         _rationalLUSolver.solveRight(sol, rhs);
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during right solve with rational basis inverse.\n" );
+         return false;
+      }
+      return true;
+   }
+
+
+
    /// sets starting basis via arrays of statuses
    void SoPlex::setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
    {
