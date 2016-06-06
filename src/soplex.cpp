@@ -7111,10 +7111,14 @@ namespace soplex
       bool _hadBasis = _hasBasis;
 
       // set time and iteration limit
-      if( intParam(SoPlex::ITERLIMIT) >= 0 )
+      if( intParam(SoPlex::ITERLIMIT) < realParam(SoPlex::INFTY) )
          _solver.setTerminationIter(intParam(SoPlex::ITERLIMIT) - _statistics->iterations);
+      else
+         _solver.setTerminationIter(-1);
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
          _solver.setTerminationTime(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
+      else
+         _solver.setTerminationTime(-1);
 
       // ensure that tolerances are not too small
       if( _solver.feastol() < 1e-12 )
