@@ -381,8 +381,12 @@ namespace soplex
             DVector compLPDualVector(_compSolver.nRows());
             _compSolver.getDual(compLPDualVector);
 
-            _updateIdsReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
-               compLPPrimalVector, compLPDualVector);
+            //_updateIdsReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
+               //compLPPrimalVector, compLPDualVector);
+            DVector reducedLPPrimalVector(_solver.nCols());
+            _solver.getPrimal(reducedLPPrimalVector);
+            _checkOriginalProblemOptimality(reducedLPPrimalVector, false);
+            _updateIdsReducedProblemViol(false);
          }
          // if the complementary problem is infeasible or unbounded, it is possible that the algorithm can continue.
          // a check of the original problem is required to determine whether there are any violations.
@@ -401,7 +405,7 @@ namespace soplex
 
             // updating the reduced problem with the original problem violated rows
             if( !stop )
-               _updateIdsReducedProblemViol();
+               _updateIdsReducedProblemViol(true);
          }
 
          if( stop )
@@ -1274,7 +1278,7 @@ namespace soplex
       spx_alloc(newrowidx, _nPrimalRows);
 
       bool ratioTest = true;
-      //ratioTest = false;
+      ratioTest = false;
       for( int i = 0; i < _nPrimalRows; i++ )
       {
          LPRowReal origlprow;
@@ -1398,7 +1402,7 @@ namespace soplex
 
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
-   void SoPlex::_updateIdsReducedProblemViol()
+   void SoPlex::_updateIdsReducedProblemViol(bool allrows)
    {
       LPRowSet updaterows;
 
@@ -1407,9 +1411,13 @@ namespace soplex
       spx_alloc(newrowidx, _nPrimalRows);
 
       int rowNumber;
+
+      int nrowstoadd = 1;  // adding the most violated row
+      if( allrows )
+         nrowstoadd = _nIdsViolRows;   // adding all violated rows
+
       // adding all violated rows.
-      for( int i = 0; i < _nIdsViolRows; i++ )   // adding all violated rows
-         //for( int i = 0; i < 1; i++ )  // adding the most violated row
+      for( int i = 0; i < nrowstoadd; i++ )
       {
          rowNumber = _idsViolatedRows[i];
 
@@ -1436,7 +1444,7 @@ namespace soplex
 
 
 
-   //#define LARGEST_VIOL
+#define LARGEST_VIOL
    /// builds the update rows with those violated in the complmentary problem
    // A row is violated in the constraint matrix Ax <= b, if b - A_{i}x < 0
    // To aid the computation, all violations are translated to <= constraints

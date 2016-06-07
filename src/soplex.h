@@ -1923,7 +1923,7 @@ private:
       DVector compDualVector);
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
-   void _updateIdsReducedProblemViol();
+   void _updateIdsReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
    void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
