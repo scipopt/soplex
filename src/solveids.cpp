@@ -286,11 +286,11 @@ namespace soplex
          }
 
          // printing display line
-#ifdef SIMPLEDEBUG
+         //#ifdef SIMPLEDEBUG
          printIdsDisplayLine(_solver, orig_verbosity, true, !algIterCount);
-#else
-         printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
-#endif
+         //#else
+         //printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
+         //#endif
 
          //_idsFeasVector.reDim(_solver.nCols());
          //_solver.basis().solve(_idsFeasVector, _solver.maxObj());
@@ -1404,6 +1404,15 @@ namespace soplex
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
    void SoPlex::_updateIdsReducedProblemViol(bool allrows)
    {
+#ifdef NO_TOL
+      Real feastol = 0.0;
+#else
+#ifdef USE_FEASTOL
+      Real feastol = realParam(SoPlex::FEASTOL);
+#else
+      Real feastol = realParam(SoPlex::EPSILON_ZERO);
+#endif
+#endif
       LPRowSet updaterows;
 
       int* newrowidx = 0;
@@ -1411,21 +1420,107 @@ namespace soplex
       spx_alloc(newrowidx, _nPrimalRows);
 
       int rowNumber;
+      int bestrow = -1;
+      Real bestrownorm = infinity;
+      Real percenttoadd = 1;
 
       int nrowstoadd = 1;  // adding the most violated row
-      if( allrows )
+      //if( allrows )
          nrowstoadd = _nIdsViolRows;   // adding all violated rows
 
-      // adding all violated rows.
+      SSVector y(_solver.nCols());
+      y.unSetup();
+
       for( int i = 0; i < nrowstoadd; i++ )
       {
          rowNumber = _idsViolatedRows[i];
 
-         updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
-               _transformedRows.rhs(rowNumber));
+         if( !allrows )
+         {
+            Real norm = 0;
 
-         _idsReducedProbRows[rowNumber] = true;
-         newrowidx[nnewrowidx] = rowNumber;
+            // the rhs of this calculation are the rows of the constraint matrix
+            // so we are solving y B = A_{i,.}
+            try
+            {
+               _solver.basis().solve(y, _solver.vector(rowNumber));
+            }
+            catch( SPxException E )
+            {
+               MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
+            }
+
+
+            if( y.isSetup() )
+            {
+               for( int j = 0; j < y.size(); j++ )
+               {
+                  if( isZero(_solver.fVec()[i], feastol) )
+                     norm += spxAbs(y.value(j))*spxAbs(y.value(j));
+               }
+            }
+            else
+            {
+               for( int j = 0; j < numColsReal(); j++ )
+               {
+                  if( isZero(_solver.fVec()[i], feastol) )
+                     norm += spxAbs(y[j])*spxAbs(y[j]);
+               }
+            }
+
+
+            norm = spxSqrt(norm);
+            //printf("row: %d, norm: %f\n", rowNumber, norm);
+            if( LT(norm, bestrownorm) )
+            {
+               bestrow = rowNumber;
+               bestrownorm = norm;
+            }
+
+            if( isZero(norm, feastol) && LT(nnewrowidx/Real(numRowsReal()), percenttoadd) )
+            {
+               updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
+                  _transformedRows.rhs(rowNumber));
+
+               _idsReducedProbRows[rowNumber] = true;
+               newrowidx[nnewrowidx] = rowNumber;
+               nnewrowidx++;
+            }
+
+         }
+         else
+         {
+            updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
+                  _transformedRows.rhs(rowNumber));
+
+            _idsReducedProbRows[rowNumber] = true;
+            newrowidx[nnewrowidx] = rowNumber;
+            nnewrowidx++;
+         }
+      }
+
+      if( nnewrowidx == 0 )
+      {
+         for( int i = 0; i < nrowstoadd; i++ )
+         {
+            rowNumber = _idsViolatedRows[i];
+
+            updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
+                  _transformedRows.rhs(rowNumber));
+
+            _idsReducedProbRows[rowNumber] = true;
+            newrowidx[nnewrowidx] = rowNumber;
+            nnewrowidx++;
+         }
+      }
+
+      if( !allrows && bestrow >= 0 )
+      {
+         updaterows.add(_transformedRows.lhs(bestrow), _transformedRows.rowVector(bestrow),
+            _transformedRows.rhs(bestrow));
+
+         _idsReducedProbRows[bestrow] = true;
+         newrowidx[nnewrowidx] = bestrow;
          nnewrowidx++;
       }
 
