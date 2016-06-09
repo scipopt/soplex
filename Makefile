@@ -113,6 +113,9 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
+GMP_LDFLAGS	   =	-LIBPATH:lib -lgmp
+GMP_CPPFLAGS	=	-Ilib/gmp
+
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
 BINDIR		=	bin
@@ -399,8 +402,8 @@ GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
 ifeq ($(LEGACY),false)
-CPPFLAGS	+=	-DSOPLEX_WITH_GMP
-LDFLAGS		+=	-lgmp # todo: move this as GMP_LDFLAGS to submakefiles
+CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
+LDFLAGS	+= $(GMP_LDFLAGS)
 endif
 endif
 
@@ -424,6 +427,16 @@ SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
 LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a\" should exist.\n"
 endif
 endif
+
+ifeq ($(GMP),true)
+ifeq ($(COMP),msvc)
+SOFTLINKS	+=	$(LIBDIR)/mpir.$(ARCH)
+SOFTLINKS	+=	$(LIBDIR)/libmpir.$(ARCH).$(OPT).lib
+LINKSINFO	+=	"\n  -> \"mpir.$(ARCH)\" is a directory containing the mpir installation, i.e., \"mpir.$(ARCH)/gmp.h\" should exist.\n"
+LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
+endif
+endif
+
 
 #-----------------------------------------------------------------------------
 # Rules

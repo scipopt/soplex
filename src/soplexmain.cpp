@@ -40,6 +40,9 @@ extern "C" {
 
 using namespace soplex;
 
+// function prototype
+int main(int argc, char* argv[]);
+
 // prints usage and command line options
 static
 void printUsage(const char* const argv[], int idx)
