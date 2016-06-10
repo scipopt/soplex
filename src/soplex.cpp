@@ -7118,7 +7118,7 @@ namespace soplex
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
          _solver.setTerminationTime(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
       else
-         _solver.setTerminationTime(-1);
+         _solver.setTerminationTime(SoPlex::INFTY);
 
       // ensure that tolerances are not too small
       if( _solver.feastol() < 1e-12 )
