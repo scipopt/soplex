@@ -4416,7 +4416,7 @@ namespace soplex
       if( _rationalLUSolver.status() == SLinSolverRational::UNLOADED
          || _rationalLUSolver.status() == SLinSolverRational::TIME )
       {
-         _rationalLUSolverBind.reSize(numColsRational());
+         _rationalLUSolverBind.reSize(numRowsRational());
          getBasisInd(_rationalLUSolverBind.get_ptr());
          _computeBasisInverseRational();
       }
