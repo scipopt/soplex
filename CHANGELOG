@@ -16,6 +16,7 @@ interface & parameters:
 - random seed for perturbation can be set from outside and is not reset in between
 - set default representation switch to 1.2
 - setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
+- new interface methods to access rational factorization of basis matrix
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver
