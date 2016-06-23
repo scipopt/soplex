@@ -435,6 +435,10 @@ LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
 endif
 endif
 
+ifeq ($(SHARED),true)
+EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS)
+endif
+
 
 #-----------------------------------------------------------------------------
 # Rules
@@ -488,7 +492,7 @@ makelibfile:	preprocess
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
-		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(EXT_LIBS)
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
