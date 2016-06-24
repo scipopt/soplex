@@ -9,6 +9,7 @@ fixed bugs:
 - correct definition of numeric constants when using LONG_DOUBLE mode
 - fix bug in class SemiSparseVector
 - correctly define WIN flags for Cygwin
+- shared library knows its dependencies (GMP, ZLIB)
 
 
 29 February 2016 - Release 2.2.1
