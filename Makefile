@@ -113,8 +113,8 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
-GMP_LDFLAGS	   =	-LIBPATH:lib -lgmp
-GMP_CPPFLAGS	=	-Ilib/gmp
+GMP_LDFLAGS	=	-lgmp
+GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -403,6 +403,9 @@ ifeq ($(LEGACY),false)
 CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
 LDFLAGS	+= $(GMP_LDFLAGS)
 endif
+else
+GMP_LDFLAGS	=
+GMP_CPPFLAGS	=
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -413,6 +416,9 @@ endif
 ifeq ($(ZLIB),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
+else
+ZLIB_LDFLAGS	=
+ZLIB_FLAGS	=
 endif
 
 EGLIBDEP	:=	$(SRCDIR)/depend.eglib
