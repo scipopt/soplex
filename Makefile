@@ -323,6 +323,7 @@ else
 LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILDFLAGS	+=      -shared
 LIBBUILD_o	= 	-o # the trailing space is important
+LINKRPATH	=	-Wl,-rpath,
 endif
 endif
 
@@ -478,11 +479,19 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
+ifeq ($(SHARED),true)
+$(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
+		@echo "-> linking $@"
+		-$(LINKCXX) $(BINOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)$(realpath $(LIBDIR)) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
+		|| ($(MAKE) errorhints && false)
+else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
 		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
+endif
 
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)

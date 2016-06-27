@@ -10,6 +10,7 @@ fixed bugs:
 - fix bug in class SemiSparseVector
 - correctly define WIN flags for Cygwin
 - shared library knows its dependencies (GMP, ZLIB)
+- when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
 
 
 29 February 2016 - Release 2.2.1
