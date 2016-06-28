@@ -483,7 +483,7 @@ ifeq ($(SHARED),true)
 $(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
 		-$(LINKCXX) $(BINOBJFILES) \
-		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)$(realpath $(LIBDIR)) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
+		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
 else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
