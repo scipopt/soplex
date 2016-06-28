@@ -11,6 +11,7 @@ fixed bugs:
 - correctly define WIN flags for Cygwin
 - fix bug in left solve with rational LU factorization
 - shared library knows its dependencies (GMP, ZLIB)
+- when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
 
 
 29 February 2016 - Release 2.2.1
