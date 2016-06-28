@@ -113,8 +113,8 @@ ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
-GMP_LDFLAGS	   =	-LIBPATH:lib -lgmp
-GMP_CPPFLAGS	=	-Ilib/gmp
+GMP_LDFLAGS	=	-lgmp
+GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -325,6 +325,7 @@ else
 LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILDFLAGS	+=      -shared
 LIBBUILD_o	= 	-o # the trailing space is important
+LINKRPATH	=	-Wl,-rpath,
 endif
 endif
 
@@ -405,6 +406,9 @@ ifeq ($(LEGACY),false)
 CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
 LDFLAGS	+= $(GMP_LDFLAGS)
 endif
+else
+GMP_LDFLAGS	=
+GMP_CPPFLAGS	=
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -415,6 +419,9 @@ endif
 ifeq ($(ZLIB),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
+else
+ZLIB_LDFLAGS	=
+ZLIB_FLAGS	=
 endif
 
 EGLIBDEP	:=	$(SRCDIR)/depend.eglib
@@ -435,6 +442,10 @@ SOFTLINKS	+=	$(LIBDIR)/libmpir.$(ARCH).$(OPT).lib
 LINKSINFO	+=	"\n  -> \"mpir.$(ARCH)\" is a directory containing the mpir installation, i.e., \"mpir.$(ARCH)/gmp.h\" should exist.\n"
 LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
 endif
+endif
+
+ifeq ($(SHARED),true)
+EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS)
 endif
 
 
@@ -470,11 +481,19 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
+ifeq ($(SHARED),true)
+$(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
+		@echo "-> linking $@"
+		-$(LINKCXX) $(BINOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
+		|| ($(MAKE) errorhints && false)
+else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
 		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
+endif
 
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
@@ -490,7 +509,7 @@ makelibfile:	preprocess
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
-		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(EXT_LIBS)
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
