@@ -92,7 +92,7 @@
  * <a href="http://soplex.zib.de">SoPlex</a> web page for a comprehensive list
  * of all contributors.
  *
- * @version  2.2.1.1
+ * @version  2.2.1.2
  */
 
 
