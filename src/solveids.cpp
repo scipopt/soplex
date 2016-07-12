@@ -198,7 +198,6 @@ namespace soplex
       // creating the initial reduced problem from the basis information
       _formIdsReducedProblem(stop);
 
-
       // setting flags for the decomposition solve
       _hasBasis = false;
       bool hasRedBasis = false;
@@ -2009,7 +2008,9 @@ namespace soplex
       }
 
       // setting the updated objective vector
+#ifndef NO_TRANSFORM
       _idsLP->changeObj(_transformedObj);
+#endif
 
       // determine whether the reduced problem setup should be terminated
       stop = idsTerminate(realParam(SoPlex::TIMELIMIT)*TIMELIMIT_FRAC);
