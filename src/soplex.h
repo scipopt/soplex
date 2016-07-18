@@ -28,6 +28,7 @@
 #include "basevectors.h"
 #include "spxsolver.h"
 #include "slufactor.h"
+#include "slufactor_rational.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "spxsimplifier.h"
@@ -35,6 +36,7 @@
 
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxleastsqsc.h"
 #include "spxgeometsc.h"
 
 #include "spxstarter.h"
@@ -725,6 +727,24 @@ public:
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
+   /// compute rational basis inverse; returns true on success
+   bool computeBasisInverseRational();
+
+   /// gets an array of indices for the columns of the rational basis matrix; bind[i] >= 0 means that the i-th column of
+   /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
+   /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
+   bool getBasisIndRational(DataArray<int>& bind);
+
+   /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
+   bool getBasisInverseRowRational(const int r, SSVectorRational& vec);
+
+   /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
+   bool getBasisInverseColRational(const int c, SSVectorRational& vec);
+
+   /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
+   /// on success
+   bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
+
    /// sets starting basis via arrays of statuses
    void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
 
@@ -909,8 +929,14 @@ public:
       /// minimum number of stalling refinements since last pivot to trigger rational factorization
       RATFAC_MINSTALLS = 21,
 
+      /// maximum number of conjugate gradient iterations in least square scaling
+      LEASTSQ_MAXROUNDS = 22,
+
+      /// mode for solution polishing
+      SOLUTION_POLISHING = 23,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 22
+      INTPARAM_COUNT = 24
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1004,7 +1030,10 @@ public:
       SCALER_GEO1 = 3,
 
       /// geometric mean scaling on rows and columns, max 8 rounds
-      SCALER_GEO8 = 4
+      SCALER_GEO8 = 4,
+
+       /// least square scaling
+      SCALER_LEASTSQ = 5
    };
 
    /// values for parameter STARTER
@@ -1136,6 +1165,19 @@ public:
       HYPER_PRICING_ON = 2
    };
 
+   /// values for parameter SOLUTION_POLISHING
+   enum
+   {
+      /// no solution polishing
+      POLISHING_OFF = 0,
+
+      /// maximize number of basic slack variables, i.e. more variables on bounds
+      POLISHING_MAXBASICSLACK = 1,
+
+      /// minimize number of basic slack variables, i.e. more variables between bounds
+      POLISHING_MINBASICSLACK = 2
+   };
+
    /// real parameters
    typedef enum
    {
@@ -1196,17 +1238,20 @@ public:
       /// minimal reduction (sum of removed rows/cols) to continue simplification
       MINRED = 18,
 
-      // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      /// refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
       REFAC_BASIS_NNZ = 19,
 
-      // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      /// refactor threshold for fill-in in current factor update compared to fill-in in last factorization
       REFAC_UPDATE_FILL = 20,
 
-      // refactor threshold for memory growth in factorization since last refactorization
+      /// refactor threshold for memory growth in factorization since last refactorization
       REFAC_MEM_FACTOR = 21,
 
+      /// accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      LEASTSQ_ACRCY = 22,
+
       /// number of real parameters
-      REALPARAM_COUNT = 22
+      REALPARAM_COUNT = 23
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1350,6 +1395,7 @@ private:
    SPxEquiliSC _scalerBiequi;
    SPxGeometSC _scalerGeo1;
    SPxGeometSC _scalerGeo8;
+   SPxLeastSqSC _scalerLeastsq;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;
@@ -1385,6 +1431,8 @@ private:
    //@{
 
    SPxLPRational* _rationalLP;
+   SLUFactorRational _rationalLUSolver;
+   DataArray<int> _rationalLUSolverBind;
 
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
@@ -1744,6 +1792,9 @@ private:
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
+
+   /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
+   void _computeBasisInverseRational();
 
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);

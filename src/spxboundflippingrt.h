@@ -234,7 +234,8 @@ public:
    ///
    virtual int selectLeave(
       Real&              val,
-      Real               enterTest
+      Real               enterTest,
+      bool               polish = false
       );
    ///
    virtual SPxId selectEnter(

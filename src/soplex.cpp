@@ -259,9 +259,9 @@ namespace soplex
 
             // type of scaler
             _intParamName[SoPlex::SCALER] = "scaler";
-            _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric)";
+            _intParamDescription[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)";
             _intParamLower[SoPlex::SCALER] = 0;
-            _intParamUpper[SoPlex::SCALER] = 4;
+            _intParamUpper[SoPlex::SCALER] = 5;
             _intParamDefault[SoPlex::SCALER] = SoPlex::SCALER_BIEQUI;
 
             // type of starter used to create crash basis
@@ -333,6 +333,20 @@ namespace soplex
             _intParamLower[SoPlex::RATFAC_MINSTALLS] = 0;
             _intParamUpper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
             _intParamDefault[SoPlex::RATFAC_MINSTALLS] = 2;
+
+            // maximum number of conjugate gradient iterations in least square scaling
+            _intParamName[SoPlex::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
+            _intParamDescription[SoPlex::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
+            _intParamLower[SoPlex::LEASTSQ_MAXROUNDS] = 0;
+            _intParamUpper[SoPlex::LEASTSQ_MAXROUNDS] = INT_MAX;
+            _intParamDefault[SoPlex::LEASTSQ_MAXROUNDS] = 50;
+
+            // mode for solution polishing
+            _intParamName[SoPlex::SOLUTION_POLISHING] = "solution_polishing";
+            _intParamDescription[SoPlex::SOLUTION_POLISHING] = "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)";
+            _intParamLower[SoPlex::SOLUTION_POLISHING] = 0;
+            _intParamUpper[SoPlex::SOLUTION_POLISHING] = 2;
+            _intParamDefault[SoPlex::SOLUTION_POLISHING] = SoPlex::POLISHING_OFF;
 
             // primal feasibility tolerance
             _realParamName[SoPlex::FEASTOL] = "feastol";
@@ -456,7 +470,7 @@ namespace soplex
             _realParamDescription[SoPlex::REPRESENTATION_SWITCH] = "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode";
             _realParamLower[SoPlex::REPRESENTATION_SWITCH] = 0.0;
             _realParamUpper[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
-            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::REPRESENTATION_SWITCH] = 1.2;
 
             // geometric frequency at which to apply rational reconstruction
             _realParamName[SoPlex::RATREC_FREQ] = "ratrec_freq";
@@ -492,6 +506,13 @@ namespace soplex
             _realParamLower[SoPlex::REFAC_MEM_FACTOR] = 1.0;
             _realParamUpper[SoPlex::REFAC_MEM_FACTOR] = 100.0;
             _realParamDefault[SoPlex::REFAC_MEM_FACTOR] = 1.5;
+
+            // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+            _realParamName[SoPlex::LEASTSQ_ACRCY] = "leastsq_acrcy";
+            _realParamDescription[SoPlex::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
+            _realParamLower[SoPlex::LEASTSQ_ACRCY] = 1.0;
+            _realParamUpper[SoPlex::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
+            _realParamDefault[SoPlex::LEASTSQ_ACRCY] = 1000.0;
 
             _defaultsAndBoundsInitialized = true;
          }
@@ -584,6 +605,7 @@ namespace soplex
       , _scalerBiequi(true)
       , _scalerGeo1(1)
       , _scalerGeo8(8)
+      , _scalerLeastsq()
       , _simplifier(0)
       , _scaler(0)
       , _starter(0)
@@ -600,6 +622,7 @@ namespace soplex
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
       _scalerGeo8.setOutstream(spxout);
+      _scalerLeastsq.setOutstream(spxout);
 
       // give lu factorization to solver
       _solver.setSolver(&_slufactor);
@@ -648,6 +671,7 @@ namespace soplex
          _scalerBiequi = rhs._scalerBiequi;
          _scalerGeo1 = rhs._scalerGeo1;
          _scalerGeo8 = rhs._scalerGeo8;
+         _scalerLeastsq = rhs._scalerLeastsq;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
          _starterVector = rhs._starterVector;
@@ -680,6 +704,7 @@ namespace soplex
          _scalerBiequi.setOutstream(spxout);
          _scalerGeo1.setOutstream(spxout);
          _scalerGeo8.setOutstream(spxout);
+         _scalerLeastsq.setOutstream(spxout);
 
          // transfer the lu solver
          _solver.setSolver(&_slufactor);
@@ -712,6 +737,10 @@ namespace soplex
             spx_alloc(_rationalLP);
             _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
          }
+
+         // copy rational factorization
+         if( rhs._rationalLUSolver.status() == SLinSolverRational::OK )
+            _rationalLUSolver = rhs._rationalLUSolver;
 
          // copy boolean flags
          _isRealLPLoaded = rhs._isRealLPLoaded;
@@ -1825,6 +1854,7 @@ namespace soplex
 
       _realLP->clear();
       _hasBasis = false;
+      _rationalLUSolver.clear();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
@@ -2714,6 +2744,7 @@ namespace soplex
          return;
 
       _rationalLP->clear();
+      _rationalLUSolver.clear();
       _rowTypes.clear();
       _colTypes.clear();
 
@@ -4372,9 +4403,128 @@ namespace soplex
 
 
 
+   /// compute rational basis inverse; returns true on success
+   bool SoPlex::computeBasisInverseRational()
+   {
+      if( !hasBasis() )
+      {
+         _rationalLUSolver.clear();
+         assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED);
+         return false;
+      }
+
+      if( _rationalLUSolver.status() == SLinSolverRational::UNLOADED
+         || _rationalLUSolver.status() == SLinSolverRational::TIME )
+      {
+         _rationalLUSolverBind.reSize(numRowsRational());
+         getBasisInd(_rationalLUSolverBind.get_ptr());
+         _computeBasisInverseRational();
+      }
+
+      if( _rationalLUSolver.status() == SLinSolverRational::OK )
+         return true;
+
+      return false;
+   }
+
+
+
+   /// gets an array of indices for the columns of the rational basis matrix; bind[i] >= 0 means that the i-th column of
+   /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
+   /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
+   bool SoPlex::getBasisIndRational(DataArray<int>& bind)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      bind = _rationalLUSolverBind;
+      assert(bind.size() == numRowsRational());
+      return true;
+   }
+
+
+
+   /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
+   bool SoPlex::getBasisInverseRowRational(const int r, SSVectorRational& vec)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      try
+      {
+         vec.reDim(numRowsRational());
+         _rationalLUSolver.solveLeft(vec, *_unitVectorRational(r));
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing rational basis inverse row.\n" );
+         return false;
+      }
+      return true;
+   }
+
+
+
+   /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
+   bool SoPlex::getBasisInverseColRational(const int c, SSVectorRational& vec)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      try
+      {
+         vec.reDim(numRowsRational());
+         _rationalLUSolver.solveRight(vec, *_unitVectorRational(c));
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while computing rational basis inverse column.\n" );
+         return false;
+      }
+      return true;
+   }
+
+
+
+   /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
+   /// on success
+   bool SoPlex::getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol)
+   {
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         computeBasisInverseRational();
+
+      if( _rationalLUSolver.status() != SLinSolverRational::OK )
+         return false;
+
+      try
+      {
+         sol.reDim(numRowsRational());
+         _rationalLUSolver.solveRight(sol, rhs);
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during right solve with rational basis inverse.\n" );
+         return false;
+      }
+      return true;
+   }
+
+
+
    /// sets starting basis via arrays of statuses
    void SoPlex::setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
    {
+      _rationalLUSolver.clear();
+
       if( _isRealLPLoaded )
       {
          assert(numRowsReal() == _solver.nRows());
@@ -4406,6 +4556,7 @@ namespace soplex
       _solver.reLoad();
       _status = _solver.status();
       _hasBasis = false;
+      _rationalLUSolver.clear();
    }
 
 
@@ -4536,6 +4687,8 @@ namespace soplex
    /// default names are assumed; returns true on success
    bool SoPlex::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
    {
+      clearBasis();
+
 #if 1
       assert(filename != 0);
       assert(_realLP != 0);
@@ -5082,6 +5235,9 @@ namespace soplex
          case SCALER_GEO8:
             _scaler = &_scalerGeo8;
             break;
+         case SCALER_LEASTSQ:
+            _scaler = &_scalerLeastsq;
+            break;
          default:
             return false;
          }
@@ -5252,6 +5408,28 @@ namespace soplex
       case SoPlex::RATFAC_MINSTALLS:
          break;
 
+      // maximum number of conjugate gradient iterations in least square scaling
+      case SoPlex::LEASTSQ_MAXROUNDS:
+         _scaler->setIntParam(value);
+         break;
+
+      // mode of solution polishing
+      case SoPlex::SOLUTION_POLISHING:
+         switch( value )
+         {
+         case POLISHING_OFF:
+            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
+            break;
+         case POLISHING_MAXBASICSLACK:
+            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MAXBASICSLACK);
+            break;
+         case POLISHING_MINBASICSLACK:
+            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MINBASICSLACK);
+            break;
+         default:
+            return false;
+         }
+         break;
       default:
          return false;
       }
@@ -5371,6 +5549,11 @@ namespace soplex
          break;
 
       case SoPlex::REFAC_MEM_FACTOR:
+         break;
+
+      // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      case SoPlex::LEASTSQ_ACRCY:
+         _scaler->setRealParam(value);
          break;
 
       default:
@@ -5620,7 +5803,7 @@ namespace soplex
       // stop timing
       _statistics->readingTime->stop();
 
-      return !readError && !parseError;
+      return !readError;
    }
 
    /// parses one setting string and returns true on success
@@ -6434,6 +6617,9 @@ namespace soplex
 
       assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRowsReal());
       assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numColsReal());
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
+      assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == numRowsRational());
 
       return true;
    }
@@ -6545,6 +6731,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6560,6 +6748,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6575,6 +6765,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(lprowset.num(), SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6596,6 +6788,8 @@ namespace soplex
          else
             _basisStatusCols.append(SPxSolver::ZERO);
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6611,6 +6805,8 @@ namespace soplex
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
       else if( _hasBasis )
          _basisStatusRows.append(SPxSolver::BASIC);
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6636,6 +6832,8 @@ namespace soplex
                _basisStatusCols.append(SPxSolver::ZERO);
          }
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6657,8 +6855,9 @@ namespace soplex
          else if( _basisStatusRows[i] == SPxSolver::ON_UPPER && lprow.rhs() >= realParam(SoPlex::INFTY) )
             _basisStatusRows[i] = (lprow.lhs() > -realParam(SoPlex::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
-   }
 
+      _rationalLUSolver.clear();
+   }
 
 
    /// changes left-hand side vector for constraints to \p lhs and adjusts basis
@@ -6807,6 +7006,8 @@ namespace soplex
          else if( _basisStatusCols[i] == SPxSolver::ON_UPPER && lpcol.upper() >= realParam(SoPlex::INFTY) )
             _basisStatusCols[i] = (lpcol.lower() > -realParam(SoPlex::INFTY)) ? SPxSolver::ON_LOWER : SPxSolver::ZERO;
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6954,6 +7155,8 @@ namespace soplex
          if( _basisStatusRows[i] != SPxSolver::BASIC && _basisStatusCols[i] == SPxSolver::BASIC )
             _hasBasis = false;
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -6979,6 +7182,8 @@ namespace soplex
             _basisStatusRows.removeLast();
          }
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7014,6 +7219,8 @@ namespace soplex
          if( _hasBasis )
             _basisStatusRows.reSize(numRowsReal());
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7039,6 +7246,8 @@ namespace soplex
             _basisStatusCols.removeLast();
          }
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7074,6 +7283,8 @@ namespace soplex
          if( _hasBasis )
             _basisStatusCols.reSize(numColsReal());
       }
+
+      _rationalLUSolver.clear();
    }
 
 
@@ -7128,6 +7339,9 @@ namespace soplex
          break;
       case SCALER_GEO8:
          _scaler = &_scalerGeo8;
+         break;
+      case SCALER_LEASTSQ:
+         _scaler = &_scalerLeastsq;
          break;
       default:
          break;
@@ -7191,10 +7405,14 @@ namespace soplex
       bool _hadBasis = _hasBasis;
 
       // set time and iteration limit
-      if( intParam(SoPlex::ITERLIMIT) >= 0 )
+      if( intParam(SoPlex::ITERLIMIT) < realParam(SoPlex::INFTY) )
          _solver.setTerminationIter(intParam(SoPlex::ITERLIMIT) - _statistics->iterations);
+      else
+         _solver.setTerminationIter(-1);
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
          _solver.setTerminationTime(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
+      else
+         _solver.setTerminationTime(SoPlex::INFTY);
 
       // ensure that tolerances are not too small
       if( _solver.feastol() < 1e-12 )
@@ -7261,10 +7479,15 @@ namespace soplex
       }
       _statistics->simplexTime->stop();
 
+      // invalidate rational factorization of basis if pivots have been performed
+      if( _solver.iterations() > 0 )
+         _rationalLUSolver.clear();
+
       // record statistics
       _statistics->iterations += _solver.iterations();
       _statistics->iterationsPrimal += _solver.primalIterations();
       _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
+      _statistics->iterationsPolish += _solver.polishIterations();
       _statistics->boundflips += _solver.boundFlips();
       _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
       _statistics->luSolveTimeReal += _slufactor.getSolveTime();
@@ -7285,9 +7508,9 @@ namespace soplex
       _statistics->clearAllData();
 
       // update status
-      _status = SPxSolver::UNKNOWN;
+      clearBasis();
       _invalidateSolution();
-      _hasBasis = false;
+      _status = SPxSolver::UNKNOWN;
 
       // start timing
       _statistics->readingTime->start();
@@ -7327,9 +7550,9 @@ namespace soplex
       _statistics->readingTime->start();
 
       // update status
-      _status = SPxSolver::UNKNOWN;
+      clearBasis();
       _invalidateSolution();
-      _hasBasis = false;
+      _status = SPxSolver::UNKNOWN;
 
       // read
       _ensureRationalLP();
@@ -7405,6 +7628,7 @@ namespace soplex
 
       ///@todo try loading old basis
       _hasBasis = false;
+      _rationalLUSolver.clear();
 
       // stop timing
       if( time )

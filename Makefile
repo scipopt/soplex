@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.2.1.1
+VERSION		:=	2.2.1.2
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -52,7 +52,7 @@ OPT		=	opt
 STATICLIBEXT	=	a
 SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
-EXEEXTENSION	=	
+EXEEXTENSION	=
 TEST		=	quick
 ALGO		=  1 2 3 4
 LIMIT		=  #
@@ -106,12 +106,15 @@ LIBBUILDFLAGS	=       $(ARFLAGS)
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=
-BINOFLAGS	=	
-LIBOFLAGS	=	
-LDFLAGS		=	
+BINOFLAGS	=
+LIBOFLAGS	=
+LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
+
+GMP_LDFLAGS	=	-lgmp
+GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -171,6 +174,7 @@ LIBHEADER	=	array.h \
 			spxdefines.h \
 			spxdevexpr.h \
 			spxequilisc.h \
+			spxleastsqsc.h \
 			spxfastrt.h \
 			spxfileio.h \
 			spxgeometsc.h \
@@ -240,6 +244,7 @@ LIBOBJ		= 	changesoplex.o \
 			spxdesc.o \
 			spxdevexpr.o \
 			spxequilisc.o \
+			spxleastsqsc.o \
 			spxfastrt.o \
 			spxfileio.o \
 			spxgeometsc.o \
@@ -271,7 +276,7 @@ LIBOBJ		= 	changesoplex.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
-REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
+REPOSIT		=	# template repository, explicitly empty  #spxproof.o
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
@@ -320,6 +325,7 @@ else
 LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILDFLAGS	+=      -shared
 LIBBUILD_o	= 	-o # the trailing space is important
+LINKRPATH	=	-Wl,-rpath,
 endif
 endif
 
@@ -397,9 +403,12 @@ GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
 ifeq ($(LEGACY),false)
-CPPFLAGS	+=	-DSOPLEX_WITH_GMP
-LDFLAGS		+=	-lgmp # todo: move this as GMP_LDFLAGS to submakefiles
+CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
+LDFLAGS	+= $(GMP_LDFLAGS)
 endif
+else
+GMP_LDFLAGS	=
+GMP_CPPFLAGS	=
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -410,6 +419,9 @@ endif
 ifeq ($(ZLIB),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
+else
+ZLIB_LDFLAGS	=
+ZLIB_FLAGS	=
 endif
 
 EGLIBDEP	:=	$(SRCDIR)/depend.eglib
@@ -422,6 +434,20 @@ SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
 LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a\" should exist.\n"
 endif
 endif
+
+ifeq ($(GMP),true)
+ifeq ($(COMP),msvc)
+SOFTLINKS	+=	$(LIBDIR)/mpir.$(ARCH)
+SOFTLINKS	+=	$(LIBDIR)/libmpir.$(ARCH).$(OPT).lib
+LINKSINFO	+=	"\n  -> \"mpir.$(ARCH)\" is a directory containing the mpir installation, i.e., \"mpir.$(ARCH)/gmp.h\" should exist.\n"
+LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
+endif
+endif
+
+ifeq ($(SHARED),true)
+EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS)
+endif
+
 
 #-----------------------------------------------------------------------------
 # Rules
@@ -455,11 +481,19 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
+ifeq ($(SHARED),true)
+$(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
+		@echo "-> linking $@"
+		-$(LINKCXX) $(BINOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
+		|| ($(MAKE) errorhints && false)
+else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
 		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
+endif
 
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
@@ -475,7 +509,7 @@ makelibfile:	preprocess
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
-		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(EXT_LIBS)
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
@@ -486,7 +520,7 @@ endif
 # this empty target is needed for the SoPlex release versions
 githash::	# do not remove the double-colon
 
-# include local targets 
+# include local targets
 -include make/local/make.targets
 
 # include install targets
@@ -502,7 +536,7 @@ else
 endif
 
 .PHONY: doc
-doc:		
+doc:
 		$(BINFILE) --saveset=doc/parameters.set
 		cd doc; $(DOXY) $(NAME).dxy
 
@@ -540,12 +574,12 @@ cleanbin:	| $(BINDIR)
 
 .PHONY: cleanlib
 cleanlib:	| $(LIBDIR)
-		@echo "remove library $(LIBFILE)" 
+		@echo "remove library $(LIBFILE)"
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 .PHONY: clean
 clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
-		@echo "remove objective files" 
+		@echo "remove objective files"
 ifneq ($(LIBOBJDIR),)
 		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
 endif
@@ -564,7 +598,7 @@ vimtags:
 etags:
 		-ctags -e -o TAGS src/*.cpp src/*.h
 
-$(OBJDIR):	
+$(OBJDIR):
 		@-mkdir -p $(OBJDIR)
 
 $(BINOBJDIR):	| $(OBJDIR)

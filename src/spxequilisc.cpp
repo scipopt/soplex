@@ -53,7 +53,7 @@ Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
    return maxi;
 }
 
-void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
+void SPxEquiliSC::scale(SPxLP& lp)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Equilibrium scaling LP" << std::endl; )
@@ -87,9 +87,10 @@ void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << colratio 
+                        << " col-ratio= " << colratio
                         << " row-ratio= " << rowratio
                         << std::endl; )
+
    if (colFirst)
    {
       computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
@@ -104,6 +105,8 @@ void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
       if (m_doBoth)
          computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
    }
+
+   /* scale */
    applyScaling(lp);
 
    MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
@@ -116,8 +119,8 @@ void SPxEquiliSC::scale(SPxLPBase<Real>& lp)
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
-                        << " col-ratio= " << maxColRatio(lp) 
-                        << " row-ratio= " << maxRowRatio(lp) 
+                        << " col-ratio= " << maxColRatio(lp)
+                        << " row-ratio= " << maxRowRatio(lp)
                         << std::endl; )
 }
 

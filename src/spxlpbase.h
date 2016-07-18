@@ -80,6 +80,7 @@ class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
    friend class SPxBasis;
    friend class SPxScaler;
    friend class SPxEquiliSC;
+   friend class SPxLeastSqSC;
    friend class SPxGeometSC;
    friend class SPxMainSM;
 

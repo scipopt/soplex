@@ -114,6 +114,12 @@ void SPxScaler::setBoth(bool both)
    m_doBoth = both;
 }
 
+void SPxScaler::setRealParam(Real param, const char* name)
+{}
+
+void SPxScaler::setIntParam(int param, const char* name)
+{}
+
 void SPxScaler::setup(SPxLP& lp)
 {
 

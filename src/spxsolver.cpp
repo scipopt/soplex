@@ -961,6 +961,7 @@ SPxSolver::SPxSolver(
    : theType (p_type)
    , thePricing(FULL)
    , theRep(p_rep)
+   , polishObj(SolutionPolish::OFF)
    , theTime(0)
    , timerType(ttype)
    , theCumulativeTime(0.0)
@@ -1060,6 +1061,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       theType = base.theType;
       thePricing = base.thePricing;
       theRep = base.theRep;
+      polishObj = base.polishObj;
       timerType = base.timerType;
       maxIters = base.maxIters;
       maxTime = base.maxTime;
@@ -1224,6 +1226,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theType(base.theType)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
+   , polishObj(base.polishObj)
    , timerType(base.timerType)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
@@ -1486,7 +1489,7 @@ bool SPxSolver::isConsistent() const
 void SPxSolver::setTerminationTime(Real p_time)
 {
    if( p_time < 0.0 )
-      p_time = infinity;
+      p_time = 0.0;
    maxTime = p_time;
 }
 
@@ -1514,7 +1517,7 @@ bool SPxSolver::isTimeLimitReached(const bool forceCheck)
    ++nCallsToTimelim;
 
    // check if a time limit is actually set
-   if( maxTime < 0 || maxTime >= infinity )
+   if( maxTime >= infinity )
       return false;
 
    // check if the expensive system call to update the time should be skipped again
