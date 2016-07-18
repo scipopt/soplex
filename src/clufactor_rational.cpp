@@ -5935,13 +5935,7 @@ int CLUFactorRational::vSolveLeft( Rational* vec, int* idx,                     
       rn = solveLleftForest( vec, idx, rn );
    }
 
-   if ( rn + l.firstUpdate > verySparseFactor4left * thedim )
-   {
-      solveLleftNoNZ( vec );
-      return 0;
-   }
-   else
-      return solveLleft( vec, idx, rn );
+   return solveLleft( vec, idx, rn );
 }
 
 int CLUFactorRational::vSolveLeft2( Rational* vec, int* idx,                      /* result */

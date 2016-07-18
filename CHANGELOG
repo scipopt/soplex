@@ -1,14 +1,31 @@
 developer version
 =================
 
+features:
+- new scaler: Least Squares, aka Curtis-Reid-Scaling
+- solution polishing: perform additional primal pivots at optimal basis
+  turn on with parameter 'int:solution_polishing'
+    0 - off
+    1 - try to increase number of basic slack vars
+    2 - try to decrease number of basic slack vars
+
 performance:
 
 interface & parameters:
 - new parameters to control refactorization triggers
 - random seed for perturbation can be set from outside and is not reset in between
 - set default representation switch to 1.2
+- setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
+- new interface methods to access rational factorization of basis matrix
 
 fixed bugs:
+- fix inconsistent basis status in Basis and Solver
+- correct definition of numeric constants when using LONG_DOUBLE mode
+- fix bug in class SemiSparseVector
+- correctly define WIN flags for Cygwin
+- fix bug in left solve with rational LU factorization
+- shared library knows its dependencies (GMP, ZLIB)
+- when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
 
 code quality:
 
@@ -25,6 +42,7 @@ interface & parameters:
 - show current dual (primal) violation of dual (primal) simplex in log
 - options -X and -Y to print primal and dual solution as rationals
 - add new compiling flag OPENSOURCE to allow/forbid the usage of third party software
+- improve Makefiles for better usage of MSVC on MinGW
 
 fixed bugs:
 - correct initialization of objective offset in simplifier

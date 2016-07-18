@@ -28,6 +28,7 @@
 #include "basevectors.h"
 #include "spxsolver.h"
 #include "slufactor.h"
+#include "slufactor_rational.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "spxsimplifier.h"
@@ -726,6 +727,24 @@ public:
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
+   /// compute rational basis inverse; returns true on success
+   bool computeBasisInverseRational();
+
+   /// gets an array of indices for the columns of the rational basis matrix; bind[i] >= 0 means that the i-th column of
+   /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
+   /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
+   bool getBasisIndRational(DataArray<int>& bind);
+
+   /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
+   bool getBasisInverseRowRational(const int r, SSVectorRational& vec);
+
+   /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
+   bool getBasisInverseColRational(const int c, SSVectorRational& vec);
+
+   /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
+   /// on success
+   bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
+
    /// sets starting basis via arrays of statuses
    void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
 
@@ -913,8 +932,11 @@ public:
       /// maximum number of conjugate gradient iterations in least square scaling
       LEASTSQ_MAXROUNDS = 22,
 
+      /// mode for solution polishing
+      SOLUTION_POLISHING = 23,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 23
+      INTPARAM_COUNT = 24
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1141,6 +1163,19 @@ public:
 
       /// always
       HYPER_PRICING_ON = 2
+   };
+
+   /// values for parameter SOLUTION_POLISHING
+   enum
+   {
+      /// no solution polishing
+      POLISHING_OFF = 0,
+
+      /// maximize number of basic slack variables, i.e. more variables on bounds
+      POLISHING_MAXBASICSLACK = 1,
+
+      /// minimize number of basic slack variables, i.e. more variables between bounds
+      POLISHING_MINBASICSLACK = 2
    };
 
    /// real parameters
@@ -1396,6 +1431,8 @@ private:
    //@{
 
    SPxLPRational* _rationalLP;
+   SLUFactorRational _rationalLUSolver;
+   DataArray<int> _rationalLUSolverBind;
 
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
@@ -1755,6 +1792,9 @@ private:
    SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
+
+   /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
+   void _computeBasisInverseRational();
 
    /// factorizes rational basis matrix in column representation
    void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);

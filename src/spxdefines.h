@@ -40,7 +40,7 @@
 namespace soplex
 {
 #define SOPLEX_VERSION         221
-#define SOPLEX_SUBVERSION        1
+#define SOPLEX_SUBVERSION        2
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -226,6 +226,7 @@ typedef double Real;
 #endif // !WITH_LONG_DOUBLE
 
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
+#define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
 
 extern const Real infinity;
 

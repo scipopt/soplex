@@ -40,6 +40,9 @@ extern "C" {
 
 using namespace soplex;
 
+// function prototype
+int main(int argc, char* argv[]);
+
 // prints usage and command line options
 static
 void printUsage(const char* const argv[], int idx)
@@ -672,18 +675,22 @@ int main(int argc, char* argv[])
          DVector primal(soplex->numColsReal());
          if( soplex->getPrimalReal(primal) )
          {
+            int nNonzeros = 0;
             MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
             for( int i = 0; i < soplex->numColsReal(); ++i )
             {
                if ( isNotZero( primal[i] ) )
+               {
                   MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
                                     << std::setw(17)
                                     << std::setprecision(9)
                                     << primal[i] << std::endl; )
+                  ++nNonzeros;
+               }
             }
             MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero (within "
                               << std::setprecision(1) << std::scientific << Param::epsilon()
-                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
+                              << std::setprecision(8) << std::fixed << "). Solution has " << nNonzeros << " nonzero entries." << std::endl; )
          }
          else
             MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.")

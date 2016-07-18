@@ -123,7 +123,7 @@ public:
        returned index, must be the index of an element of fVec(), that
        reaches one of its bounds with this update.
    */
-   virtual int selectLeave(Real& val, Real enterTest) = 0;
+   virtual int selectLeave(Real& val, Real enterTest, bool polish = false) = 0;
 
    /// selects variable Id to enter the basis.
    /** Method #selectEnter() is called by the loaded SoPlex solver, when

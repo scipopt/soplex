@@ -101,6 +101,7 @@ namespace soplex
       int iterations; ///< number of iterations/pivots
       int iterationsPrimal; ///< number of iterations with Primal
       int iterationsFromBasis; ///< number of iterations from Basis
+      int iterationsPolish; ///< number of iterations during solution polishing
       int boundflips; ///< number of dual bound flips
       int luFactorizationsReal; ///< number of basis matrix factorizations in real precision
       int luSolvesReal; ///< number of (forward and backward) solves with basis matrix in real precision
