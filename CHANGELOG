@@ -26,6 +26,7 @@ fixed bugs:
 - fix bug in left solve with rational LU factorization
 - shared library knows its dependencies (GMP, ZLIB)
 - when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
+- fixed memory bug in class DSVectorBase when resizing zero length vectors
 
 interface:
 - submakefile for CrayXC systems added
