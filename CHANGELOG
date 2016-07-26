@@ -27,6 +27,9 @@ fixed bugs:
 - shared library knows its dependencies (GMP, ZLIB)
 - when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
 
+interface:
+- submakefile for CrayXC systems added
+
 code quality:
 
 
