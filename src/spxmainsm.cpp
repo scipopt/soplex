@@ -42,6 +42,7 @@
 //dual
 #define DOMINATED_COLUMN        1
 #define WEAKLY_DOMINATED_COLUMN 1
+#define MULTI_AGGREGATE         0
 
 
 #define EXTREMES                1
@@ -1246,6 +1247,79 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 
    // dual:
    r[m_j] = m_scale * r[m_k];
+}
+
+void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
+                                            DataArray<SPxSolver::VarStatus>& cStatus,
+                                            DataArray<SPxSolver::VarStatus>& rStatus) const
+{
+
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
+   // correcting the change of idx by deletion of the column:
+   x[m_old_j] = x[m_j];
+   r[m_old_j] = r[m_j];
+   cStatus[m_old_j] = cStatus[m_j];
+
+   // primal:
+   Real val = 0.0;
+   Real aij = m_row[m_j];
+
+   for(int k = 0; k < m_row.size(); ++k)
+   {
+      if(m_row.index(k) != m_j)
+         val += m_row.value(k) * x[m_row.index(k)];
+   }
+
+   Real scale;
+#if 0 //don't know whether I need to worry about the scale. I don't think so
+   scale = maxAbs(m_lRhs, val);
+
+   if (scale < 1.0)
+#endif
+      scale = 1.0;
+
+   Real z = (m_const / scale) - (val / scale);
+
+   if (isZero(z))
+      z = 0.0;
+
+   x[m_j] = z * scale / aij;
+   s[m_i] = 0.0;
+
+   // dual:
+   Real dualVal = 0.0;
+
+   for(int k = 0; k < m_col.size(); ++k)
+   {
+      if(m_col.index(k) != m_i)
+         dualVal += m_col.value(k)*y[m_col.index(k)];
+   }
+
+   z = m_obj - dualVal;
+
+   y[m_i] = z / aij;
+   r[m_j] = 0.0;
+
+   // basis:
+   cStatus[m_j] = SPxSolver::BASIC;
+
+   if (m_eqCons)
+      rStatus[m_i] = SPxSolver::FIXED;
+   else if (m_onLhs)
+      rStatus[m_i] = SPxSolver::ON_LOWER;
+   else
+      rStatus[m_i] = SPxSolver::ON_UPPER;
+
+#ifdef CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+      throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::handleRowObjectives(SPxLP& lp)
@@ -2726,6 +2800,8 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    DVector         dualVarUp(lp.nRows());
    DVector         dualConsLo(lp.nCols());
    DVector         dualConsUp(lp.nCols());
+   DVector         upLocks(lp.nCols());
+   DVector         downLocks(lp.nCols());
 
    // init
    for(int i = lp.nRows()-1; i >= 0; --i)
@@ -2781,6 +2857,10 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                dualVarUp[i] = bound;
          }
       }
+
+      // setting the locks on the variables
+      upLocks[j] = 0;
+      downLocks[j] = 0;
    }
 
    // compute bounds on the dual constraints
@@ -2938,6 +3018,240 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 #endif
       }
    }
+
+#if MULTI_AGGREGATE
+   for(int j = lp.nCols()-1; j >= 0; --j)
+   {
+      if (lp.colVector(j).size() <= 1)
+         continue;
+
+      const SVector& col = lp.colVector(j);
+      for(int k = 0; k < col.size(); ++k)
+      {
+         Real aij = col.value(k);
+
+         ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
+
+         if(GT(lp.lhs(col.index(k)), -infinity) && LT(lp.rhs(col.index(k)), infinity))
+         {
+            upLocks[j]++;
+            downLocks[j]++;
+         }
+         else if (aij > 0)
+         {
+            if(GT(lp.lhs(col.index(k)), -infinity))
+               downLocks[j]++;
+            else
+               upLocks[j]++;
+         }
+         else if (aij < 0)
+         {
+            if(LT(lp.rhs(col.index(k)), infinity))
+               upLocks[j]++;
+            else
+               downLocks[j]++;
+         }
+      }
+
+      // multi-aggregate column
+      if (upLocks[j] == 1 || downLocks[j] == 1)
+      {
+         Real lower = lp.lower(j);
+         Real upper = lp.upper(j);
+         int maxOtherLocks;
+         int bestpos = -1;
+         bool bestislhs = true;
+
+
+
+         for(int k = 0; k < col.size(); ++k)
+         {
+            int rowNumber;
+            Real lhs;
+            Real rhs;
+            bool lhsExists;
+            bool rhsExists;
+            bool aggLhs;
+            bool aggRhs;
+
+            rowNumber = col.index(k);
+            lhs = lp.lhs(rowNumber);
+            rhs = lp.rhs(rowNumber);
+
+            lhsExists = GT(lhs, -infinity);
+            rhsExists = LT(rhs, infinity);
+
+            if (lp.rowVector(rowNumber).size() <= 2)
+               maxOtherLocks = INT_MAX;
+            else if (lp.rowVector(rowNumber).size() == 3)
+               maxOtherLocks = 3;
+            else if (lp.rowVector(rowNumber).size() == 4)
+               maxOtherLocks = 2;
+            else
+               maxOtherLocks = 1;
+
+            aggLhs = lhsExists
+               && ((col.value(k) > 0.0 && !LT(lp.maxObj(j), 0.0) && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks)
+               || (col.value(k) < 0.0 && !GT(lp.maxObj(j), 0.0) && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks));
+            aggRhs = rhsExists
+               && ((col.value(k) > 0.0 && !GT(lp.maxObj(j), 0.0) && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks)
+               || (col.value(k) < 0.0 && !LT(lp.maxObj(j), 0.0) && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks));
+
+            if (aggLhs || aggRhs)
+            {
+               const SVector& row = lp.rowVector(rowNumber);
+               Real minVal = 0;   // this is the minimum value that the aggregation can attain
+               Real maxVal = 0;   // this is the maximum value that the aggregation can attain
+               bool minInfinite = false;
+               bool minNegInfinite = false;
+               bool maxInfinite = false;
+               bool maxNegInfinite = false;
+
+               for (int l = 0; l < row.size(); ++l)
+               {
+                  if (row.index(l) != j)
+                  {
+                     // computing the minimum activity of the aggregated variables
+                     if (GT(row.value(l), 0.0))
+                     {
+                        if (LE(lp.lower(row.index(l)), -infinity))
+                           minNegInfinite = true;
+                        else
+                           minVal += row.value(l)*lp.lower(row.index(l));
+                     }
+                     else if (LT(row.value(l), 0.0))
+                     {
+                        if (GE(lp.upper(row.index(l)), infinity))
+                           minInfinite = true;
+                        else
+                           minVal += row.value(l)*lp.upper(row.index(l));
+                     }
+
+                     // computing the maximum activity of the aggregated variables
+                     if (GT(row.value(l), 0.0))
+                     {
+                        if (LE(lp.lower(row.index(l)), -infinity))
+                           maxNegInfinite = true;
+                        else
+                           maxVal += row.value(l)*lp.upper(row.index(l));
+                     }
+                     else if (LT(row.value(l), 0.0))
+                     {
+                        if (GE(lp.upper(row.index(l)), infinity))
+                           maxInfinite = true;
+                        else
+                           maxVal += row.value(l)*lp.lower(row.index(l));
+                     }
+                  }
+               }
+
+               // if an infinite value exists for the minimum activity, then that it taken
+               if (minInfinite)
+                  minVal = infinity;
+               else if (minNegInfinite)
+                  minVal = -infinity;
+
+               // if an -infinite value exists for the maximum activity, then that value is taken
+               if (maxNegInfinite)
+                  maxVal = -infinity;
+               else if (maxInfinite)
+                  maxVal = infinity;
+
+               // we will try to aggregate to the lhs
+               if (aggLhs)
+               {
+                  // correctly computing the bounds
+                  minVal = lhs - minVal;
+                  minVal /= col.value(k);
+
+                  maxVal = lhs - maxVal;
+                  maxVal /= col.value(k);
+
+                  // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
+                  if (GE(minVal, lower, feastol()) && LE(maxVal, upper, feastol()))
+                  {
+                     bestpos = col.index(k);
+                     bestislhs = true;
+                     break;
+                  }
+               }
+
+               // we will try to aggregate to the rhs
+               if (aggRhs)
+               {
+                  // correctly computing the bounds
+                  minVal = rhs - minVal;
+                  minVal /= col.value(k);
+
+                  maxVal = rhs - maxVal;
+                  maxVal /= col.value(k);
+
+                  if (GE(minVal, lower, feastol()) && LE(maxVal, upper, feastol()))
+                  {
+                     bestpos = col.index(k);
+                     bestislhs = false;
+                     break;
+                  }
+               }
+            }
+         }
+
+         // it is only possible to aggregate if a best position has been found
+         if( bestpos >= 0 )
+         {
+            const SVector& bestRow = lp.rowVector(bestpos);
+            // aggregating the variable and applying the fixings to the all other constraints
+            Real aggConstant = (bestislhs ? lp.lhs(bestpos) : lp.rhs(bestpos));   // this is the lhs or rhs of the aggregated row
+            Real aggAij = bestRow[j];                                   // this is the coefficient of the deleted col
+
+            printf("col: %d, bestpos: %d, aggConstant: %f, aggAij: %f\n", j, bestpos, aggConstant, aggAij);
+            for(int k = 0; k < col.size(); ++k)
+            {
+               if(col.index(k) != bestpos)
+               {
+                  int rowNumber = col.index(k);
+                  DVector updateRow(lp.nCols());
+                  Real updateRhs = lp.rhs(col.index(k));
+                  Real updateLhs = lp.lhs(col.index(k));
+
+                  updateRow = lp.rowVector(col.index(k));
+
+                  // updating the row with the best row
+                  for(int l = 0; l < bestRow.size(); l++)
+                  {
+                     if(lp.rowVector(rowNumber).number(bestRow.index(l)) >= 0)
+                        lp.changeElement(rowNumber, bestRow.index(l), updateRow[bestRow.index(l)] - bestRow.value(l)/aggAij);
+                     else
+                        lp.changeElement(rowNumber, bestRow.index(l), -1.0*bestRow.value(l)/aggAij);
+                  }
+
+                  // NOTE: I don't know whether we should change the LHS and RHS if they are currently at infinity
+                  if(LT(lp.rhs(rowNumber), infinity))
+                     lp.changeRhs(rowNumber, updateRhs - aggConstant/aggAij);
+                  if(GT(lp.lhs(rowNumber), -infinity))
+                     lp.changeLhs(rowNumber, updateLhs - aggConstant/aggAij);
+               }
+            }
+
+            for(int l = 0; l < bestRow.size(); l++)
+               lp.changeMaxObj(bestRow.index(l), lp.maxObj(bestRow.index(l)) - bestRow.value(l)/aggAij);
+
+            MultiAggregationPS* MultiAggregationPSptr = 0;
+            spx_alloc(MultiAggregationPSptr);
+            m_hist.append(new (MultiAggregationPSptr) MultiAggregationPS(lp, *this, bestpos, j, aggConstant));
+
+            ++remCols;
+            remNzos += lp.colVector(j).size();
+            removeCol(lp, j);
+            ++remRows;
+            remNzos += lp.rowVector(bestpos).size();
+            removeRow(lp, bestpos);
+
+            ++m_stat[MULTI_AGG];
+         }
+      }
+   }
+#endif
 
    assert(remRows > 0 || remCols > 0 || remNzos == 0);
 
@@ -3833,7 +4147,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << numBoxedCols << " boxed columns"
                      << std::endl; )
 
-   m_stat.reSize(15);
+   m_stat.reSize(16);
 
    for(int k = 0; k < m_stat.size(); ++k)
       m_stat[k] = 0;
@@ -3964,6 +4278,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
                      << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
                      << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
+                     << m_stat[MULTI_AGGREGATE]      << " multi aggregation of variables\n"
                      << std::endl; );
 
    m_timeUsed->stop();
