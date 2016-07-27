@@ -42,7 +42,7 @@
 //dual
 #define DOMINATED_COLUMN        1
 #define WEAKLY_DOMINATED_COLUMN 1
-#define MULTI_AGGREGATE         0
+#define MULTI_AGGREGATE         1
 
 
 #define EXTREMES                1
@@ -3037,18 +3037,18 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
             upLocks[j]++;
             downLocks[j]++;
          }
-         else if (aij > 0)
+         else if (GT(lp.lhs(col.index(k)), -infinity))
          {
-            if(GT(lp.lhs(col.index(k)), -infinity))
+            if(aij > 0)
                downLocks[j]++;
-            else
+            else if (aij < 0)
                upLocks[j]++;
          }
-         else if (aij < 0)
+         else if (LT(lp.rhs(col.index(k)), infinity))
          {
-            if(LT(lp.rhs(col.index(k)), infinity))
+            if(aij > 0)
                upLocks[j]++;
-            else
+            else if (aij < 0)
                downLocks[j]++;
          }
       }
