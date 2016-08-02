@@ -1049,6 +1049,8 @@ void SPxSolver::performSolutionPolishing()
                {
                   MSG_INFO3( (*spxout), (*spxout) << "success!" << std::endl; )
                   ++nSuccessfulPivots;
+                  if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                     break;
                }
                clearUpdateVecs();
                assert(EQrel(objVal, value(), entertol()));
@@ -1078,6 +1080,8 @@ void SPxSolver::performSolutionPolishing()
                {
                   MSG_INFO3( (*spxout), (*spxout) << "success!" << std::endl; )
                   ++nSuccessfulPivots;
+                  if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                     break;
                }
                clearUpdateVecs();
                assert(EQrel(objVal, value(), leavetol()));
