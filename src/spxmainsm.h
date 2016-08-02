@@ -1040,6 +1040,8 @@ private:
       const int  m_i;
       const int  m_old_j;
       const int  m_old_i;
+      const Real m_upper;
+      const Real m_lower;
       const Real m_obj;
       const Real m_const;
       const bool m_onLhs;
@@ -1055,6 +1057,8 @@ private:
          , m_i(_i)
          , m_old_j(lp.nCols()-1)
          , m_old_i(lp.nRows()-1)
+         , m_upper(lp.upper(_j))
+         , m_lower(lp.lower(_j))
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_const(constant)
          , m_onLhs(EQ(constant, lp.lhs(_i)))
@@ -1063,7 +1067,14 @@ private:
          , m_col(lp.colVector(_j))
       {
          assert(m_row[m_j] != 0.0);
-         simplifier.addObjoffset(m_const/m_row[m_j]);
+         simplifier.addObjoffset(m_obj*m_const/m_row[m_j]);
+#if 0
+         printf("%d: ", m_j);
+         for(int i = 0; i < m_row.size(); i++)
+            printf("(%d,%f) ", m_row.index(i), m_row.value(i));
+         printf("Const: %f", m_const);
+         printf("\n");
+#endif
       }
       /// copy constructor
       MultiAggregationPS(const MultiAggregationPS& old)
@@ -1072,6 +1083,8 @@ private:
          , m_i(old.m_i)
          , m_old_j(old.m_old_j)
          , m_old_i(old.m_old_i)
+         , m_upper(old.m_upper)
+         , m_lower(old.m_lower)
          , m_obj(old.m_obj)
          , m_const(old.m_const)
          , m_onLhs(old.m_onLhs)
