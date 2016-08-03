@@ -1028,6 +1028,7 @@ void SPxSolver::performSolutionPolishing()
 
    setType(ENTER); // use primal simplex to preserve feasibility
    init();
+   instableEnter = false;
    theratiotester->setType(type());
    if( polishObj == SolutionPolish::MAXBASICSLACK )
    {

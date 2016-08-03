@@ -961,7 +961,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
                 << ": skipping instable pivot" << std::endl;
    )
 
-   if( polish )
+   if( polish && leave >= 0 )
    {
       // decide whether the chosen leave index contributes to the polishing objective
       if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK && thesolver->baseId(leave).isSPxRowId() )
