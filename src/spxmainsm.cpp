@@ -39,10 +39,14 @@
 #define ZERO_OBJ_COL_SINGLETON  1
 #define DOUBLETON_EQUATION      1
 #define FREE_COL_SINGLETON      1
+#define TIGHTEN_VAR_BOUND       0
 //dual
 #define DOMINATED_COLUMN        1
 #define WEAKLY_DOMINATED_COLUMN 1
 #define MULTI_AGGREGATE         1
+//other
+#define TRIVIAL_HEURISTICS      1
+#define PSEUDOOBJ               1
 
 
 #define EXTREMES                1
@@ -1540,6 +1544,280 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
    assert(lp.isConsistent());
 }
 
+/// computes the minimum and maximum residual activity for a given variable
+void SPxMainSM::computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct, Real& maxAct)
+{
+   const SVector& row = lp.rowVector(rowNumber);
+   bool minInfinite = false;
+   bool minNegInfinite = false;
+   bool maxInfinite = false;
+   bool maxNegInfinite = false;
+
+   minAct = 0;   // this is the minimum value that the aggregation can attain
+   maxAct = 0;   // this is the maximum value that the aggregation can attain
+
+   for (int l = 0; l < row.size(); ++l)
+   {
+      if (colNumber < 0 || row.index(l) != colNumber)
+      {
+         // computing the minimum activity of the aggregated variables
+         if (GT(row.value(l), 0.0))
+         {
+            if (LE(lp.lower(row.index(l)), -infinity))
+               minNegInfinite = true;
+            else
+               minAct += row.value(l)*lp.lower(row.index(l));
+         }
+         else if (LT(row.value(l), 0.0))
+         {
+            if (GE(lp.upper(row.index(l)), infinity))
+               minNegInfinite = true;
+            else
+               minAct += row.value(l)*lp.upper(row.index(l));
+         }
+
+         // computing the maximum activity of the aggregated variables
+         if (GT(row.value(l), 0.0))
+         {
+            if (GE(lp.upper(row.index(l)), infinity))
+               maxInfinite = true;
+            else
+               maxAct += row.value(l)*lp.upper(row.index(l));
+         }
+         else if (LT(row.value(l), 0.0))
+         {
+            if (LE(lp.lower(row.index(l)), -infinity))
+               maxInfinite = true;
+            else
+               maxAct += row.value(l)*lp.lower(row.index(l));
+         }
+      }
+   }
+
+   // if an infinite value exists for the minimum activity, then that it taken
+   if (minNegInfinite)
+      minAct = -infinity;
+
+   // if an -infinite value exists for the maximum activity, then that value is taken
+   if (maxInfinite)
+      maxAct = infinity;
+}
+
+
+/// calculate min/max value for the multi aggregated variables
+void SPxMainSM::computeMinMaxValues(SPxLP& lp, Real side, Real val, Real minRes, Real maxRes, Real& minVal, Real& maxVal)
+{
+   minVal = 0;
+   maxVal = 0;
+
+   if(LT(val, 0.0))
+   {
+      if(LE(minRes, -infinity))
+         minVal = -infinity;
+      else
+         minVal = (side - minRes)/val;
+
+      if(GE(maxRes, infinity))
+         maxVal = infinity;
+      else
+         maxVal = (side - maxRes)/val;
+   }
+   else if(GT(val, 0.0))
+   {
+      if(GE(maxRes, infinity))
+         minVal = -infinity;
+      else
+         minVal = (side - maxRes)/val;
+
+      if(LE(minRes, -infinity))
+         maxVal = infinity;
+      else
+         maxVal = (side - minRes)/val;
+   }
+}
+
+
+/// tries to find good lower bound solutions by applying some trivial heuristics
+void SPxMainSM::trivialHeuristic(SPxLP& lp)
+{
+   DVector         zerosol(lp.nCols());  // the zero solution vector
+   DVector         lowersol(lp.nCols()); // the lower bound solution vector
+   DVector         uppersol(lp.nCols()); // the upper bound solution vector
+   DVector         locksol(lp.nCols());  // the locks solution vector
+
+   DVector         upLocks(lp.nCols());
+   DVector         downLocks(lp.nCols());
+
+   Real            zeroObj = m_objoffset;
+   Real            lowerObj = m_objoffset;
+   Real            upperObj = m_objoffset;
+   Real            lockObj = m_objoffset;
+
+   bool            zerovalid = true;
+
+   Real largeValue = infinity;
+   if(LT(1.0/feastol(), infinity))
+      largeValue = 1.0/feastol();
+
+
+
+   for(int j = lp.nCols()-1; j >= 0; --j)
+   {
+      upLocks[j] = 0;
+      downLocks[j] = 0;
+
+      // computing the locks on the variables
+      const SVector& col = lp.colVector(j);
+      for(int k = 0; k < col.size(); ++k)
+      {
+         Real aij = col.value(k);
+
+         ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
+
+         if(GT(lp.lhs(col.index(k)), -infinity) && LT(lp.rhs(col.index(k)), infinity))
+         {
+            upLocks[j]++;
+            downLocks[j]++;
+         }
+         else if (GT(lp.lhs(col.index(k)), -infinity))
+         {
+            if(aij > 0)
+               downLocks[j]++;
+            else if (aij < 0)
+               upLocks[j]++;
+         }
+         else if (LT(lp.rhs(col.index(k)), infinity))
+         {
+            if(aij > 0)
+               upLocks[j]++;
+            else if (aij < 0)
+               downLocks[j]++;
+         }
+      }
+
+      Real lower = lp.lower(j);
+      Real upper = lp.upper(j);
+
+      if(LE(lower, -infinity))
+         lower = MINIMUM(-largeValue, upper);
+      if(GE(upper, infinity))
+         upper = MAXIMUM(lp.lower(j), largeValue);
+
+      if(zerovalid)
+      {
+         if(LE(lower, 0.0, feastol()) && GE(upper, 0.0, feastol()))
+            zerosol[j] = 0.0;
+         else
+            zerovalid = false;
+      }
+
+      lowersol[j] = lower;
+      uppersol[j] = upper;
+
+      if(downLocks[j] > upLocks[j])
+         locksol[j] = upper;
+      else if(downLocks[j] < upLocks[j])
+         locksol[j] = lower;
+      else
+         locksol[j] = (lower + upper)/2.0;
+
+      lowerObj += lp.maxObj(j)*lowersol[j];
+      upperObj += lp.maxObj(j)*uppersol[j];
+      lockObj += lp.maxObj(j)*locksol[j];
+   }
+
+   // trying the lower bound solution
+   if(checkSolution(lp, lowersol))
+   {
+      if(lowerObj > m_cutoffbound)
+         m_cutoffbound = lowerObj;
+   }
+
+   // trying the upper bound solution
+   if(checkSolution(lp, uppersol))
+   {
+      if(upperObj > m_cutoffbound)
+         m_cutoffbound = upperObj;
+   }
+
+   // trying the zero solution
+   if(zerovalid && checkSolution(lp, zerosol))
+   {
+      if(zeroObj > m_cutoffbound)
+         m_cutoffbound = zeroObj;
+   }
+
+   // trying the lock solution
+   if(checkSolution(lp, locksol))
+   {
+      if(lockObj > m_cutoffbound)
+         m_cutoffbound = lockObj;
+   }
+}
+
+
+/// checks a solution for feasibility
+bool SPxMainSM::checkSolution(SPxLP& lp, DVector sol)
+{
+   for(int i = lp.nRows()-1; i >= 0; --i)
+   {
+      const SVector& row = lp.rowVector(i);
+      Real activity = 0;
+
+      for(int k = 0; k < row.size(); k++)
+         activity += row.value(k)*sol[row.index(k)];
+
+      if(!GE(activity, lp.lhs(i), feastol()) || !LE(activity, lp.rhs(i), feastol()))
+         return false;
+   }
+
+   return true;
+}
+
+
+
+/// tightens variable bounds by propagating the pseudo objective function value.
+void SPxMainSM::propagatePseudoobj(SPxLP& lp)
+{
+   Real pseudoObj = m_objoffset;
+
+   for(int j = lp.nCols()-1; j >= 0; --j)
+   {
+      Real val = lp.maxObj(j);
+      if(val < 0)
+         pseudoObj += val*lp.lower(j);
+      else if(val > 0)
+         pseudoObj += val*lp.upper(j);
+   }
+
+   if(pseudoObj > m_pseudoobj)
+      m_pseudoobj = pseudoObj;
+
+   for(int j = lp.nCols()-1; j >= 0; --j)
+   {
+      Real objval = lp.maxObj(j);
+
+      if(EQ(objval, 0.0))
+         continue;
+
+      if(objval < 0.0)
+      {
+         Real newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
+
+         if(LT(newbound, lp.upper(j)))
+            lp.changeUpper(j, newbound);
+      }
+      else if(objval > 0.0)
+      {
+         Real newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
+         if(GT(newbound, lp.lower(j)))
+            lp.changeLower(j, newbound);
+      }
+   }
+}
+
+
+
 SPxSimplifier::Result SPxMainSM::removeEmpty(SPxLP& lp)
 {
 
@@ -2760,9 +3038,205 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
             removeCol(lp, j);
 
             ++m_stat[FREE_SINGLETON_COL];
+
+            continue;
 #endif
          }
       }
+
+      if (NErel(lp.lower(j), lp.upper(j), feastol()))
+      {
+#if TIGHTEN_VAR_BOUND
+         for(int k = 0; k < col.size(); ++k)
+         {
+            // will be set to false if any constraint implies a bound on the variable
+            bool lhsFree = true;
+            bool rhsFree = true;
+
+            int i = col.index(k);
+
+            Real val = col.value(k);
+            Real upper = lp.upper(j);
+            Real lower = lp.lower(j);
+            Real rhs = lp.rhs(i);
+            Real lhs = lp.lhs(i);
+
+            // warn since this unhandled case may slip through unnoticed otherwise
+            ASSERT_WARN( "WMAISM31", isNotZero(col.value(k), 1.0 / infinity) );
+
+            if (rhs <  infinity)
+               rhsFree = false;
+
+            if (lhs > -infinity)
+               lhsFree = false;
+
+            if (lhsFree && rhsFree)
+                continue;
+
+            Real minAct;
+            Real maxAct;
+
+            computeMinMaxResidualActivity(lp, i, -1, minAct, maxAct);
+
+            if (val > 0.0)
+            {
+               // check if the upper bound can be tightened
+               if (!rhsFree)
+               {
+                  Real slack;
+                  Real alpha;
+
+                  // if the minimum activity is greater than the rhs, then the constraint is infeasible.
+                  if (LT(rhs, minAct, feastol()))
+                  {
+                     MSG_INFO3( (*spxout), (*spxout) << "constraint is infeasible"
+                        << std::endl; )
+                        return INFEASIBLE;
+                  }
+
+                  slack = rhs - minAct;
+
+                  // if the slack is zero, within tolerances, then slack is set to zero.
+                  if (!GT(slack, 0.0))
+                     slack = 0.0;
+
+                  alpha = val * (upper - lower);
+                  assert(!LT(alpha, 0.0));
+
+                  if( GT(alpha, slack, feastol()) )
+                  {
+                     Real newupper;
+
+                     newupper = lower + (slack / val);
+
+                     // TODO: Must put in the simplifer steps
+                     if( newupper < upper )
+                        lp.changeUpper(j, newupper);
+
+                     upper = lp.upper(j);
+
+                  }
+
+               }
+
+               // check if the lower bound can be tightened
+               if (!lhsFree)
+               {
+                  Real slack;
+                  Real alpha;
+
+                  // if the maximum activity is less than the lhs, then the constraint is infeasible.
+                  if (LT(maxAct, lhs, feastol()))
+                  {
+                     MSG_INFO3( (*spxout), (*spxout) << "constraint is infeasible"
+                        << std::endl; )
+                        return INFEASIBLE;
+                  }
+
+                  slack = maxAct - lhs;
+
+                  // if the slack is zero, within tolerances, then slack is set to zero.
+                  if (!GT(slack, 0.0))
+                     slack = 0.0;
+
+                  alpha = val * (upper - lower);
+                  assert(!LT(alpha, 0.0));
+
+                  if( GT(alpha, slack, feastol()) )
+                  {
+                     Real newlower;
+
+                     newlower = upper - (slack / val);
+
+                     // TODO: Must put in the simplifer steps
+                     if(newlower > lower)
+                        lp.changeLower(j, newlower);
+
+                     lower = lp.lower(j);
+                  }
+               }
+            }
+            else
+            {
+               // check if the lower bound can be tightened
+               if (!rhsFree)
+               {
+                  Real slack;
+                  Real alpha;
+
+                  // if the minimum activity is greater than the rhs, then the constraint is infeasible.
+                  if (LT(rhs, minAct, feastol()))
+                  {
+                     MSG_INFO3( (*spxout), (*spxout) << "constraint is infeasible"
+                        << std::endl; )
+                        return INFEASIBLE;
+                  }
+
+                  slack = rhs - minAct;
+
+                  // if the slack is zero, within tolerances, then slack is set to zero.
+                  if (!GT(slack, 0.0))
+                     slack = 0.0;
+
+                  alpha = val * (lower - upper);
+                  assert(!LT(alpha, 0.0));
+
+                  if( GT(alpha, slack, feastol()) )
+                  {
+                     Real newlower;
+
+                     newlower = upper + (slack / val);
+
+                     // TODO: Must put in the simplifer steps
+                     if(newlower > lower)
+                        lp.changeLower(j, newlower);
+
+                     lower = lp.lower(j);
+
+                  }
+               }
+
+               // check if the upper bound can be tightened
+               if (!lhsFree)
+               {
+                  Real slack;
+                  Real alpha;
+
+                  // if the maximum activity is less than the lhs, then the constraint is infeasible.
+                  if (LT(maxAct, lhs, feastol()))
+                  {
+                     MSG_INFO3( (*spxout), (*spxout) << "constraint is infeasible"
+                        << std::endl; )
+                        return INFEASIBLE;
+                  }
+
+                  slack = maxAct - lhs;
+
+                  // if the slack is zero, within tolerances, then slack is set to zero.
+                  if (!GT(slack, 0.0))
+                     slack = 0.0;
+
+                  alpha = val * (lower - upper);
+                  assert(!LT(alpha, 0.0));
+
+                  if( GT(alpha, slack, feastol()) )
+                  {
+                     Real newupper;
+
+                     newupper = lower - (slack / val);
+
+                     // TODO: Must put in the simplifer steps
+                     if( newupper < upper )
+                        lp.changeUpper(j, newupper);
+
+                     upper = lp.upper(j);
+                  }
+               }
+            }
+         }
+#endif
+      }
+
    }
 
    if (remCols + remRows > 0)
@@ -3026,7 +3500,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    }
 
 #if MULTI_AGGREGATE
-   lp.writeFile("initial.lp");
    for(int j = lp.nCols()-1; j >= 0; --j)
    {
       if (lp.colVector(j).size() <= 1)
@@ -3108,59 +3581,11 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
             if (aggLhs || aggRhs)
             {
-               const SVector& row = lp.rowVector(rowNumber);
                Real minRes = 0;   // this is the minimum value that the aggregation can attain
                Real maxRes = 0;   // this is the maximum value that the aggregation can attain
-               bool minInfinite = false;
-               bool minNegInfinite = false;
-               bool maxInfinite = false;
-               bool maxNegInfinite = false;
 
-               for (int l = 0; l < row.size(); ++l)
-               {
-                  if (row.index(l) != j)
-                  {
-                     // computing the minimum activity of the aggregated variables
-                     if (GT(row.value(l), 0.0))
-                     {
-                        if (LE(lp.lower(row.index(l)), -infinity))
-                           minNegInfinite = true;
-                        else
-                           minRes += row.value(l)*lp.lower(row.index(l));
-                     }
-                     else if (LT(row.value(l), 0.0))
-                     {
-                        if (GE(lp.upper(row.index(l)), infinity))
-                           minNegInfinite = true;
-                        else
-                           minRes += row.value(l)*lp.upper(row.index(l));
-                     }
-
-                     // computing the maximum activity of the aggregated variables
-                     if (GT(row.value(l), 0.0))
-                     {
-                        if (GE(lp.upper(row.index(l)), infinity))
-                           maxInfinite = true;
-                        else
-                           maxRes += row.value(l)*lp.upper(row.index(l));
-                     }
-                     else if (LT(row.value(l), 0.0))
-                     {
-                        if (LE(lp.lower(row.index(l)), -infinity))
-                           maxInfinite = true;
-                        else
-                           maxRes += row.value(l)*lp.lower(row.index(l));
-                     }
-                  }
-               }
-
-               // if an infinite value exists for the minimum activity, then that it taken
-               if (minNegInfinite)
-                  minRes = -infinity;
-
-               // if an -infinite value exists for the maximum activity, then that value is taken
-               if (maxInfinite)
-                  maxRes = infinity;
+               // computing the minimum and maximum residuals if variable j is set to zero.
+               computeMinMaxResidualActivity(lp, rowNumber, j, minRes, maxRes);
 
                // we will try to aggregate to the lhs
                if (aggLhs)
@@ -3168,35 +3593,14 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                   Real minVal;
                   Real maxVal;
 
-                  if(LT(val, 0.0))
-                  {
-                     if(LE(minRes, -infinity))
-                        minVal = -infinity;
-                     else
-                        minVal = (lhs - minRes)/val;
-
-                     if(GE(maxRes, infinity))
-                        maxVal = infinity;
-                     else
-                        maxVal = (lhs - maxRes)/val;
-                  }
-                  else if(GT(val, 0.0))
-                  {
-                     if(GE(maxRes, infinity))
-                        minVal = -infinity;
-                     else
-                        minVal = (lhs - maxRes)/val;
-
-                     if(LE(minRes, -infinity))
-                        maxVal = infinity;
-                     else
-                        maxVal = (lhs - minRes)/val;
-                  }
+                  // computing the values of the upper and lower bounds for the aggregated variables
+                  computeMinMaxValues(lp, lhs, val, minRes, maxRes, minVal, maxVal);
 
                   assert(LE(minVal, maxVal));
 
                   // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
-                  if (GE(minVal, lower, feastol()) && LE(maxVal, upper, feastol()))
+                  if ((!LE(minVal, -infinity) && GE(minVal, lower, feastol()))
+                     && (!GE(maxVal, infinity) && LE(maxVal, upper, feastol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = true;
@@ -3210,34 +3614,13 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                   Real minVal;
                   Real maxVal;
 
-                  if(LT(val, 0.0))
-                  {
-                     if(LE(minRes, -infinity))
-                        minVal = -infinity;
-                     else
-                        minVal = (rhs - minRes)/val;
-
-                     if(GE(maxRes, infinity))
-                        maxVal = infinity;
-                     else
-                        maxVal = (rhs - maxRes)/val;
-                  }
-                  else if(GT(val, 0.0))
-                  {
-                     if(GE(maxRes, infinity))
-                        minVal = -infinity;
-                     else
-                        minVal = (rhs - maxRes)/val;
-
-                     if(LE(minRes, -infinity))
-                        maxVal = infinity;
-                     else
-                        maxVal = (rhs - minRes)/val;
-                  }
+                  // computing the values of the upper and lower bounds for the aggregated variables
+                  computeMinMaxValues(lp, rhs, val, minRes, maxRes, minVal, maxVal);
 
                   assert(LE(minVal, maxVal));
 
-                  if (GE(minVal, lower, feastol()) && LE(maxVal, upper, feastol()))
+                  if ((!LE(minVal, -infinity) && GE(minVal, lower, feastol()))
+                     && (!GE(maxVal, infinity) && LE(maxVal, upper, feastol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = false;
@@ -3312,7 +3695,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          }
       }
    }
-   lp.writeFile("presolved.lp");
 #endif
 
    assert(remRows > 0 || remCols > 0 || remNzos == 0);
@@ -4142,7 +4524,6 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
 {
-   lp.writeFile("original.lp");
    // transfer message handler
    spxout = lp.spxout;
    assert(spxout != 0);
@@ -4152,6 +4533,9 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    m_timeUsed->start();
 
    m_objoffset = 0.0;
+
+   m_cutoffbound = -infinity;
+   m_pseudoobj = -infinity;
 
    m_remRows = 0;
    m_remCols = 0;
@@ -4249,6 +4633,14 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    while(again && m_result == OKAY)
    {
       again = false;
+
+#if TRIVIAL_HEURISTICS
+      trivialHeuristic(lp);
+#endif
+
+#if PSEUDOOBJ
+      propagatePseudoobj(lp);
+#endif
 
 #if ROWS
       if (m_result == OKAY)

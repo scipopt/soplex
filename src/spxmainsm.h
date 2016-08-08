@@ -1152,7 +1152,8 @@ private:
       DUPLICATE_ROW        = 12,
       FIX_DUPLICATE_COL    = 13,
       SUB_DUPLICATE_COL    = 14,
-      MULTI_AGG            = 15
+      MULTI_AGG            = 15,
+      TIGHTENVARBOUND      = 16
    };
    //@}
 
@@ -1182,6 +1183,9 @@ private:
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
    int                             m_addedcols;  ///< columns added by handleRowObjectives()
    Result                          m_result;     ///< result of the simplification.
+
+   Real                            m_cutoffbound;  ///< the cutoff bound that is found by heuristics
+   Real                            m_pseudoobj;    ///< the pseudo objective function value
    //@}
 
 private:
@@ -1193,6 +1197,22 @@ private:
 
    /// handles extreme values by setting them to zero or infinity.
    void handleExtremes(SPxLP& lp);
+
+   /// computes the minimum and maximum residual activity for a given row and column. If colNumber is set to -1, then
+   //  the activity of the row is returned.
+   void computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct, Real& maxAct);
+
+   /// calculate min/max value for the multi aggregated variables
+   void computeMinMaxValues(SPxLP& lp, Real side, Real val, Real minRes, Real maxRes, Real& minVal, Real& maxVal);
+
+   /// tries to find good lower bound solutions by applying some trivial heuristics
+   void trivialHeuristic(SPxLP& lp);
+
+   /// checks a solution for feasibility
+   bool checkSolution(SPxLP& lp, DVector sol);
+
+   /// tightens variable bounds by propagating the pseudo objective function value.
+   void propagatePseudoobj(SPxLP& lp);
 
    /// removed empty rows and empty columns.
    Result removeEmpty(SPxLP& lp);
@@ -1269,7 +1289,7 @@ public:
       , m_epsilon(DEFAULT_EPS_ZERO)
       , m_feastol(DEFAULT_BND_VIOL)
       , m_opttol(DEFAULT_BND_VIOL)
-      , m_stat(16)
+      , m_stat(17)
       , m_thesense(SPxLP::MAXIMIZE)
       , m_keepbounds(false)
       , m_addedcols(0)
