@@ -21,6 +21,7 @@
 #include "spxequilisc.h"
 #include "spxout.h"
 #include "spxlpbase.h"
+#include "spxlp.h"
 
 namespace soplex
 {
