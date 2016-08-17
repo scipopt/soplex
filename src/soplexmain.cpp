@@ -288,7 +288,7 @@ int main(int argc, char* argv[])
    new (soplex) SoPlex();
 
    soplex->printVersion();
-   MSG_INFO1( soplex->spxout, soplex->spxout << "Copyright (c) 1996-2016 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
+   MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
 
    try
    {
