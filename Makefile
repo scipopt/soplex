@@ -460,7 +460,7 @@ endif
 
 .PHONY: all
 all:		makelibfile
-		@-$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 .PHONY: preprocess
 preprocess:	checkdefines
@@ -471,7 +471,7 @@ ifneq ($(SOFTLINKS),)
 				$(MAKE) -j1 $(LINKSMARKERFILE) ; \
 			fi'
 endif
-		@-$(MAKE) touchexternal
+		@$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -504,7 +504,7 @@ example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 
 .PHONY: makelibfile
 makelibfile:	preprocess
-		@-$(MAKE) $(LIBFILE)
+		@$(MAKE) $(LIBFILE)
 
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
