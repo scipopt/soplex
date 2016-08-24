@@ -1212,7 +1212,97 @@ public:
 #endif
 
    /// class of parameter settings
-   class Settings;
+   class Settings
+   {
+   public:
+      /// array of names for boolean parameters
+      static std::string _boolParamName[SoPlex::BOOLPARAM_COUNT];
+
+      /// array of names for integer parameters
+      static std::string _intParamName[SoPlex::INTPARAM_COUNT];
+
+      /// array of names for real parameters
+      static std::string _realParamName[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of names for rational parameters
+      static std::string _rationalParamName[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// array of descriptions for boolean parameters
+      static std::string _boolParamDescription[SoPlex::BOOLPARAM_COUNT];
+
+      /// array of descriptions for integer parameters
+      static std::string _intParamDescription[SoPlex::INTPARAM_COUNT];
+
+      /// array of descriptions for real parameters
+      static std::string _realParamDescription[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of descriptions for rational parameters
+      static std::string _rationalParamDescription[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// array of default values for boolean parameters
+      static bool _boolParamDefault[SoPlex::BOOLPARAM_COUNT];
+
+      /// array of default values for integer parameters
+      static int _intParamDefault[SoPlex::INTPARAM_COUNT];
+
+      /// array of default values for real parameters
+      static Real _realParamDefault[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of default values for rational parameters
+      static Rational _rationalParamDefault[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// array of lower bounds for int parameter values
+      static int _intParamLower[SoPlex::INTPARAM_COUNT];
+
+      /// array of upper bounds for int parameter values
+      static int _intParamUpper[SoPlex::INTPARAM_COUNT];
+
+      /// array of lower bounds for real parameter values
+      static Real _realParamLower[SoPlex::REALPARAM_COUNT];
+
+      /// array of upper bounds for real parameter values
+      static Real _realParamUpper[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of lower bounds for rational parameter values
+      static Rational _rationalParamLower[SoPlex::RATIONALPARAM_COUNT];
+
+      /// array of upper bounds for rational parameter values
+      static Rational _rationalParamUpper[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// have static arrays been initialized?
+      static bool _defaultsAndBoundsInitialized;
+
+      /// array of current boolean parameter values
+      bool _boolParamValues[SoPlex::BOOLPARAM_COUNT];
+
+      /// array of current integer parameter values
+      int _intParamValues[SoPlex::INTPARAM_COUNT];
+
+      /// array of current real parameter values
+      Real _realParamValues[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of current rational parameter values
+      Rational _rationalParamValues[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// default constructor initializing default settings
+      Settings();
+
+      /// copy constructor
+      Settings(const Settings& settings);
+
+      /// assignment operator
+      Settings& operator=(const Settings& settings);
+   };
 
    mutable SPxOut spxout;
 
