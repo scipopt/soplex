@@ -677,6 +677,10 @@ ifneq ($(SHARED),$(LAST_SHARED))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
+ifneq ($(SANITIZE),$(LAST_SANITIZE))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
 ifneq ($(USRCXXFLAGS),$(LAST_USRCXXFLAGS))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
@@ -699,6 +703,7 @@ endif
 		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
 		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
+		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
