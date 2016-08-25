@@ -182,7 +182,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
 /*
     Loading a #Desc# into the basis can be done more efficiently, by
     explicitely programming both cases, for the rowwise and for the columnwise
-    representation. This implementation hides this distingtion in the use of
+    representation. This implementation hides this distinction in the use of
     methods #isBasic()# and #vector()#.
  */
 void SPxBasis::loadDesc(const Desc& ds)
