@@ -1548,10 +1548,8 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
 void SPxMainSM::computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct, Real& maxAct)
 {
    const SVector& row = lp.rowVector(rowNumber);
-   bool minInfinite = false;
    bool minNegInfinite = false;
    bool maxInfinite = false;
-   bool maxNegInfinite = false;
 
    minAct = 0;   // this is the minimum value that the aggregation can attain
    maxAct = 0;   // this is the maximum value that the aggregation can attain
@@ -3638,7 +3636,10 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
             Real aggConstant = (bestislhs ? lp.lhs(bestpos) : lp.rhs(bestpos));   // this is the lhs or rhs of the aggregated row
             Real aggAij = bestRow[j];                                   // this is the coefficient of the deleted col
 
-            printf("col: %d, bestpos: %d, aggConstant: %f, aggAij: %f\n", j, bestpos, aggConstant, aggAij);
+            MSG_INFO3( (*spxout), (*spxout) << "IMAISM51 col " << j
+                                            << ": Aggregating row: " << bestpos
+                                            << " Aggregation Constant=" << aggConstant
+                                            << " Coefficient of aggregated col=" << aggAij << std::endl; )
 
             MultiAggregationPS* MultiAggregationPSptr = 0;
             spx_alloc(MultiAggregationPSptr);
@@ -4733,7 +4734,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
                      << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
                      << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
-                     << m_stat[MULTI_AGGREGATE]      << " multi aggregation of variables\n"
+                     << m_stat[MULTI_AGG]      << " multi aggregation of variables\n"
                      << std::endl; );
 
    m_timeUsed->stop();
