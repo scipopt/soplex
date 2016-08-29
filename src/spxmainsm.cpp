@@ -3534,8 +3534,8 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
       upLocks[j] = 0;
       downLocks[j] = 0;
 
-      if (lp.colVector(j).size() <= 1)
-         continue;
+      //if (lp.colVector(j).size() <= 1)
+         //continue;
 
       const SVector& col = lp.colVector(j);
       for(int k = 0; k < col.size(); ++k)
@@ -3592,6 +3592,9 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
             lhs = lp.lhs(rowNumber);
             rhs = lp.rhs(rowNumber);
 
+            if( EQ(lhs, rhs, feastol()) )
+               continue;
+
             lhsExists = GT(lhs, -infinity);
             rhsExists = LT(rhs, infinity);
 
@@ -3605,11 +3608,11 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
                maxOtherLocks = 1;
 
             aggLhs = lhsExists
-               && ((col.value(k) > 0.0 && lp.maxObj(j) >= 0.0 && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks)
-               || (col.value(k) < 0.0 && lp.maxObj(j) <= 0.0 && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks));
+               && ((col.value(k) > 0.0 && lp.maxObj(j) <= 0.0 && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks)
+               || (col.value(k) < 0.0 && lp.maxObj(j) >= 0.0 && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks));
             aggRhs = rhsExists
-               && ((col.value(k) > 0.0 && lp.maxObj(j) <= 0.0 && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks)
-               || (col.value(k) < 0.0 && lp.maxObj(j) >= 0.0 && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks));
+               && ((col.value(k) > 0.0 && lp.maxObj(j) >= 0.0 && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks)
+               || (col.value(k) < 0.0 && lp.maxObj(j) <= 0.0 && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks));
 
             if (aggLhs || aggRhs)
             {
@@ -4563,7 +4566,6 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
 {
-   lp.writeFile("presimplify.lp");
    // transfer message handler
    spxout = lp.spxout;
    assert(spxout != 0);
@@ -4701,6 +4703,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
       if( !again )
       {
+         lp.writeFile("premultiagg.lp");
 #if TRIVIAL_HEURISTICS
          trivialHeuristic(lp);
 #endif
