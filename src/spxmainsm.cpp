@@ -3278,8 +3278,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    DVector         dualVarUp(lp.nRows());
    DVector         dualConsLo(lp.nCols());
    DVector         dualConsUp(lp.nCols());
-   DVector         upLocks(lp.nCols());
-   DVector         downLocks(lp.nCols());
 
    // init
    for(int i = lp.nRows()-1; i >= 0; --i)
@@ -3336,9 +3334,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          }
       }
 
-      // setting the locks on the variables
-      upLocks[j] = 0;
-      downLocks[j] = 0;
    }
 
    // compute bounds on the dual constraints
@@ -3497,9 +3492,48 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       }
    }
 
-#if MULTI_AGGREGATE
+
+   assert(remRows > 0 || remCols > 0 || remNzos == 0);
+
+   if (remCols + remRows > 0)
+   {
+      m_remRows += remRows;
+      m_remCols += remCols;
+      m_remNzos += remNzos;
+
+      MSG_INFO2( (*spxout), (*spxout) << "Simplifier (dual) removed "
+                        << remRows << " rows, "
+                        << remCols << " cols, "
+                        << remNzos << " non-zeros"
+                        << std::endl; )
+      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+         again = true;
+   }
+   return OKAY;
+}
+
+
+
+SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
+{
+   // this simplifier eliminates rows and columns by performing multi aggregations as identified by the constraint
+   // activities.
+   int remRows = 0;
+   int remCols = 0;
+   int remNzos = 0;
+
+   int oldRows = lp.nRows();
+   int oldCols = lp.nCols();
+
+   DVector upLocks(lp.nCols());
+   DVector downLocks(lp.nCols());
+
    for(int j = lp.nCols()-1; j >= 0; --j)
    {
+      // setting the locks on the variables
+      upLocks[j] = 0;
+      downLocks[j] = 0;
+
       if (lp.colVector(j).size() <= 1)
          continue;
 
@@ -3571,11 +3605,11 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                maxOtherLocks = 1;
 
             aggLhs = lhsExists
-               && ((col.value(k) > 0.0 && !LT(lp.maxObj(j), 0.0) && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks)
-               || (col.value(k) < 0.0 && !GT(lp.maxObj(j), 0.0) && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks));
+               && ((col.value(k) > 0.0 && lp.maxObj(j) >= 0.0 && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks)
+               || (col.value(k) < 0.0 && lp.maxObj(j) <= 0.0 && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks));
             aggRhs = rhsExists
-               && ((col.value(k) > 0.0 && !GT(lp.maxObj(j), 0.0) && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks)
-               || (col.value(k) < 0.0 && !LT(lp.maxObj(j), 0.0) && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks));
+               && ((col.value(k) > 0.0 && lp.maxObj(j) <= 0.0 && upLocks[j] == 1 && downLocks[j] <= maxOtherLocks)
+               || (col.value(k) < 0.0 && lp.maxObj(j) >= 0.0 && downLocks[j] == 1 && upLocks[j] <= maxOtherLocks));
 
             if (aggLhs || aggRhs)
             {
@@ -3597,8 +3631,8 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                   assert(LE(minVal, maxVal));
 
                   // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
-                  if ((!LE(minVal, -infinity) && GE(minVal, lower, feastol()))
-                     && (!GE(maxVal, infinity) && LE(maxVal, upper, feastol())))
+                  if ((minVal > -infinity && GT(minVal, lower, opttol()))
+                     && (maxVal < infinity && LT(maxVal, upper, opttol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = true;
@@ -3617,8 +3651,8 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
                   assert(LE(minVal, maxVal));
 
-                  if ((!LE(minVal, -infinity) && GE(minVal, lower, feastol()))
-                     && (!GE(maxVal, infinity) && LE(maxVal, upper, feastol())))
+                  if ((minVal > -infinity && GT(minVal, lower, opttol()))
+                     && (maxVal < infinity && LT(maxVal, upper, opttol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = false;
@@ -3636,10 +3670,12 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
             Real aggConstant = (bestislhs ? lp.lhs(bestpos) : lp.rhs(bestpos));   // this is the lhs or rhs of the aggregated row
             Real aggAij = bestRow[j];                                   // this is the coefficient of the deleted col
 
-            MSG_INFO3( (*spxout), (*spxout) << "IMAISM51 col " << j
+            //MSG_INFO2( (*spxout),
+               (*spxout) << "IMAISM51 col " << j
                                             << ": Aggregating row: " << bestpos
                                             << " Aggregation Constant=" << aggConstant
-                                            << " Coefficient of aggregated col=" << aggAij << std::endl; )
+                                            << " Coefficient of aggregated col=" << aggAij << std::endl;
+               //)
 
             MultiAggregationPS* MultiAggregationPSptr = 0;
             spx_alloc(MultiAggregationPSptr);
@@ -3696,7 +3732,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
          }
       }
    }
-#endif
+
 
    assert(remRows > 0 || remCols > 0 || remNzos == 0);
 
@@ -3706,7 +3742,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       m_remCols += remCols;
       m_remNzos += remNzos;
 
-      MSG_INFO2( (*spxout), (*spxout) << "Simplifier (dual) removed "
+      MSG_INFO2( (*spxout), (*spxout) << "Simplifier (multi-aggregation) removed "
                         << remRows << " rows, "
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
@@ -3716,6 +3752,8 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    }
    return OKAY;
 }
+
+
 
 SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 {
@@ -4525,6 +4563,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
 SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
 {
+   lp.writeFile("presimplify.lp");
    // transfer message handler
    spxout = lp.spxout;
    assert(spxout != 0);
@@ -4635,14 +4674,6 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    {
       again = false;
 
-#if TRIVIAL_HEURISTICS
-      trivialHeuristic(lp);
-#endif
-
-#if PSEUDOOBJ
-      propagatePseudoobj(lp);
-#endif
-
 #if ROWS
       if (m_result == OKAY)
          m_result = simplifyRows(lp, again);
@@ -4667,6 +4698,23 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
       if (m_result == OKAY)
          m_result = duplicateCols(lp, again);
 #endif
+
+      if( !again )
+      {
+#if TRIVIAL_HEURISTICS
+         trivialHeuristic(lp);
+#endif
+
+#if PSEUDOOBJ
+         propagatePseudoobj(lp);
+#endif
+
+#if MULTI_AGGREGATE
+      if (m_result == OKAY)
+         m_result = multiaggregation(lp, again);
+#endif
+      }
+
    }
 
    // preprocessing detected infeasibility or unboundedness

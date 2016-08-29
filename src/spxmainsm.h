@@ -1229,6 +1229,9 @@ private:
    /// performs simplification steps on the LP based on dual concepts.
    Result simplifyDual(SPxLP& lp, bool& again);
 
+   /// performs multi-aggregations of variable based upon constraint activitu.
+   Result multiaggregation(SPxLP& lp, bool& again);
+
    /// removes duplicate rows.
    Result duplicateRows(SPxLP& lp, bool& again);
 
