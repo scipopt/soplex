@@ -3,6 +3,7 @@ VERSION -- NEXT
 
 interface:
 - setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
+- allow parsing of "inf" bounds in MPS reader
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver
