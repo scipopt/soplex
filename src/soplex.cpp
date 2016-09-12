@@ -5281,7 +5281,8 @@ namespace soplex
 
       // maximum number of conjugate gradient iterations in least square scaling
       case SoPlex::LEASTSQ_MAXROUNDS:
-         _scaler->setIntParam(value);
+         if( _scaler )
+            _scaler->setIntParam(value);
          break;
 
       // mode of solution polishing
@@ -5424,7 +5425,8 @@ namespace soplex
 
       // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
       case SoPlex::LEASTSQ_ACRCY:
-         _scaler->setRealParam(value);
+         if( _scaler )
+            _scaler->setRealParam(value);
          break;
 
       default:
