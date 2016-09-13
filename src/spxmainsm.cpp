@@ -3032,7 +3032,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       idxSet.addIdx(i);
    }
 
-   Real oldVal;
+   Real oldVal = 0.0;
 
    // main loop
    for(int j = 0; j < lp.nCols(); ++j)
@@ -3359,7 +3359,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       idxSet.addIdx(j);
    }
 
-   Real oldVal;
+   Real oldVal = 0.0;
 
    // main loop
    for(int i = 0; i < lp.nRows(); ++i)
