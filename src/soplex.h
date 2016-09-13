@@ -1267,70 +1267,63 @@ public:
    class Settings
    {
    public:
-      /// array of names for boolean parameters
-      static std::string _boolParamName[SoPlex::BOOLPARAM_COUNT];
+      static struct BoolParam {
+         /// constructor
+         BoolParam();
+         /// array of names for boolean parameters
+         std::string name[SoPlex::BOOLPARAM_COUNT];
+         /// array of descriptions for boolean parameters
+         std::string description[SoPlex::BOOLPARAM_COUNT];
+         /// array of default values for boolean parameters
+         bool defaultValue[SoPlex::BOOLPARAM_COUNT];
+      } boolParam;
 
-      /// array of names for integer parameters
-      static std::string _intParamName[SoPlex::INTPARAM_COUNT];
+      static struct IntParam {
+         /// constructor
+         IntParam();
+          /// array of names for integer parameters
+         std::string name[SoPlex::INTPARAM_COUNT];
+         /// array of descriptions for integer parameters
+         std::string description[SoPlex::INTPARAM_COUNT];
+         /// array of default values for integer parameters
+         int defaultValue[SoPlex::INTPARAM_COUNT];
+         /// array of lower bounds for int parameter values
+         int lower[SoPlex::INTPARAM_COUNT];
+         /// array of upper bounds for int parameter values
+         int upper[SoPlex::INTPARAM_COUNT];
+      } intParam;
 
-      /// array of names for real parameters
-      static std::string _realParamName[SoPlex::REALPARAM_COUNT];
-
-#ifdef SOPLEX_WITH_RATIONALPARAM
-      /// array of names for rational parameters
-      static std::string _rationalParamName[SoPlex::RATIONALPARAM_COUNT];
-#endif
-
-      /// array of descriptions for boolean parameters
-      static std::string _boolParamDescription[SoPlex::BOOLPARAM_COUNT];
-
-      /// array of descriptions for integer parameters
-      static std::string _intParamDescription[SoPlex::INTPARAM_COUNT];
-
-      /// array of descriptions for real parameters
-      static std::string _realParamDescription[SoPlex::REALPARAM_COUNT];
-
-#ifdef SOPLEX_WITH_RATIONALPARAM
-      /// array of descriptions for rational parameters
-      static std::string _rationalParamDescription[SoPlex::RATIONALPARAM_COUNT];
-#endif
-
-      /// array of default values for boolean parameters
-      static bool _boolParamDefault[SoPlex::BOOLPARAM_COUNT];
-
-      /// array of default values for integer parameters
-      static int _intParamDefault[SoPlex::INTPARAM_COUNT];
-
-      /// array of default values for real parameters
-      static Real _realParamDefault[SoPlex::REALPARAM_COUNT];
-
-#ifdef SOPLEX_WITH_RATIONALPARAM
-      /// array of default values for rational parameters
-      static Rational _rationalParamDefault[SoPlex::RATIONALPARAM_COUNT];
-#endif
-
-      /// array of lower bounds for int parameter values
-      static int _intParamLower[SoPlex::INTPARAM_COUNT];
-
-      /// array of upper bounds for int parameter values
-      static int _intParamUpper[SoPlex::INTPARAM_COUNT];
-
-      /// array of lower bounds for real parameter values
-      static Real _realParamLower[SoPlex::REALPARAM_COUNT];
-
-      /// array of upper bounds for real parameter values
-      static Real _realParamUpper[SoPlex::REALPARAM_COUNT];
+      static struct RealParam {
+         /// constructor
+         RealParam();
+         /// array of names for real parameters
+         std::string name[SoPlex::REALPARAM_COUNT];
+         /// array of descriptions for real parameters
+         std::string description[SoPlex::REALPARAM_COUNT];
+         /// array of default values for real parameters
+         Real defaultValue[SoPlex::REALPARAM_COUNT];
+         /// array of lower bounds for real parameter values
+         Real lower[SoPlex::REALPARAM_COUNT];
+         /// array of upper bounds for real parameter values
+         Real upper[SoPlex::REALPARAM_COUNT];
+      } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-      /// array of lower bounds for rational parameter values
-      static Rational _rationalParamLower[SoPlex::RATIONALPARAM_COUNT];
-
-      /// array of upper bounds for rational parameter values
-      static Rational _rationalParamUpper[SoPlex::RATIONALPARAM_COUNT];
+      static struct RationalParam {
+         /// constructor
+         RationalParam();
+         /// array of names for rational parameters
+         std::string name[SoPlex::RATIONALPARAM_COUNT];
+         /// array of descriptions for rational parameters
+         std::string description[SoPlex::RATIONALPARAM_COUNT];
+         /// array of default values for rational parameters
+         Rational defaultValue[SoPlex::RATIONALPARAM_COUNT];
+         /// array of lower bounds for rational parameter values
+         Rational lower[SoPlex::RATIONALPARAM_COUNT];
+         /// array of upper bounds for rational parameter values
+         Rational upper[SoPlex::RATIONALPARAM_COUNT];
+      } rationalParam;
 #endif
-
-      /// have static arrays been initialized?
-      static bool _defaultsAndBoundsInitialized;
 
       /// array of current boolean parameter values
       bool _boolParamValues[SoPlex::BOOLPARAM_COUNT];
