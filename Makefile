@@ -458,7 +458,7 @@ endif
 
 .PHONY: all
 all:		makelibfile
-		@-$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 .PHONY: preprocess
 preprocess:	checkdefines
