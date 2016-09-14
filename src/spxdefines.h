@@ -228,7 +228,7 @@ typedef double Real;
 
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
-extern const Real infinity;
+thread_local extern const Real infinity;
 
 class Param
 {
@@ -238,13 +238,13 @@ private:
    /**@name Data */
    //@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   static Real s_epsilon;
+   thread_local static Real s_epsilon;
    /// epsilon for factorization
-   static Real s_epsilon_factorization;
+   thread_local static Real s_epsilon_factorization;
    /// epsilon for factorization update
-   static Real s_epsilon_update;
+   thread_local static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   static Real s_epsilon_pivot;
+   thread_local static Real s_epsilon_pivot;
    //@}
 
 public:
