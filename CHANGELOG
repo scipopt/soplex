@@ -34,6 +34,7 @@ interface:
 - submakefile for CrayXC systems added
 
 code quality:
+- SoPlex is thread-safe by using the storage class specifier thread-local for static variables
 
 
 29 February 2016 - Release 2.2.1
