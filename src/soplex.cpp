@@ -5473,17 +5473,17 @@ namespace soplex
    void SoPlex::resetSettings(const bool quiet, const bool init)
    {
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
-         setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet, init);
+         setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], quiet, init);
 
       for( int i = 0; i < SoPlex::INTPARAM_COUNT; i++ )
-         setIntParam((IntParam)i, _currentSettings->_intParamValues[i], quiet, init);
+         setIntParam((IntParam)i, _currentSettings->intParam.defaultValue[i], quiet, init);
 
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
-         setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet, init);
+         setRealParam((RealParam)i, _currentSettings->realParam.defaultValue[i], quiet, init);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
-         success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet, init);
+         success &= setRationalParam((RationalParam)i, _currentSettings->rationalParam.defaultValue[i], quiet, init);
 #endif
    }
 
