@@ -388,6 +388,34 @@ namespace soplex
       lower[SoPlex::MINRED] = 0.0;
       upper[SoPlex::MINRED] = 1.0;
       defaultValue[SoPlex::MINRED] = 1e-4;
+
+      // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      name[SoPlex::REFAC_BASIS_NNZ] = "refac_basis_nnz";
+      description[SoPlex::REFAC_BASIS_NNZ] = "refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix";
+      lower[SoPlex::REFAC_BASIS_NNZ] = 1.0;
+      upper[SoPlex::REFAC_BASIS_NNZ] = 100.0;
+      defaultValue[SoPlex::REFAC_BASIS_NNZ] = 10.0;
+
+      // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      name[SoPlex::REFAC_UPDATE_FILL] = "refac_update_fill";
+      description[SoPlex::REFAC_UPDATE_FILL] = "refactor threshold for fill-in in current factor update compared to fill-in in last factorization";
+      lower[SoPlex::REFAC_UPDATE_FILL] = 1.0;
+      upper[SoPlex::REFAC_UPDATE_FILL] = 100.0;
+      defaultValue[SoPlex::REFAC_UPDATE_FILL] = 5.0;
+
+      // refactor threshold for memory growth in factorization since last refactorization
+      name[SoPlex::REFAC_MEM_FACTOR] = "refac_mem_factor";
+      description[SoPlex::REFAC_MEM_FACTOR] = "refactor threshold for memory growth in factorization since last refactorization";
+      lower[SoPlex::REFAC_MEM_FACTOR] = 1.0;
+      upper[SoPlex::REFAC_MEM_FACTOR] = 10.0;
+      defaultValue[SoPlex::REFAC_MEM_FACTOR] = 1.5;
+
+      // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      name[SoPlex::LEASTSQ_ACRCY] = "leastsq_acrcy";
+      description[SoPlex::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
+      lower[SoPlex::LEASTSQ_ACRCY] = 1.0;
+      upper[SoPlex::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
+      defaultValue[SoPlex::LEASTSQ_ACRCY] = 1000.0;
    }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
