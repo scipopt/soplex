@@ -18,6 +18,7 @@ interface & parameters:
 - setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
 - new interface methods to access rational factorization of basis matrix
 - allow parsing of "inf" bounds in MPS reader
+- new method to reset parameters to default values
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver

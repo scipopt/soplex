@@ -5497,6 +5497,23 @@ namespace soplex
       return success;
    }
 
+   /// resets default parameter settings
+   void SoPlex::resetSettings(const bool quiet, const bool init)
+   {
+      for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
+         setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], quiet, init);
+
+      for( int i = 0; i < SoPlex::INTPARAM_COUNT; i++ )
+         setIntParam((IntParam)i, _currentSettings->intParam.defaultValue[i], quiet, init);
+
+      for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
+         setRealParam((RealParam)i, _currentSettings->realParam.defaultValue[i], quiet, init);
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
+         success &= setRationalParam((RationalParam)i, _currentSettings->rationalParam.defaultValue[i], quiet, init);
+#endif
+   }
 
 
    /// print non-default parameter values
