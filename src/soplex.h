@@ -1385,6 +1385,9 @@ public:
    /// sets parameter settings; returns true on success
    bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
 
+   /// resets default parameter settings
+   void resetSettings(const bool quiet = false, const bool init = false);
+
    /// print non-default parameter values
    void printUserSettings();
 
