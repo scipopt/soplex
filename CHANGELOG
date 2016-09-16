@@ -19,6 +19,7 @@ interface & parameters:
 - new interface methods to access rational factorization of basis matrix
 - allow parsing of "inf" bounds in MPS reader
 - new method to reset parameters to default values
+- new method to change the objective function offset
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver
