@@ -416,6 +416,13 @@ namespace soplex
       lower[SoPlex::LEASTSQ_ACRCY] = 1.0;
       upper[SoPlex::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
       defaultValue[SoPlex::LEASTSQ_ACRCY] = 1000.0;
+
+      // objective offset
+      name[SoPlex::OBJ_OFFSET] = "obj_offset";
+      description[SoPlex::OBJ_OFFSET] = "objective offset to be used";
+      lower[SoPlex::OBJ_OFFSET] = -DEFAULT_INFINITY;
+      upper[SoPlex::OBJ_OFFSET] = DEFAULT_INFINITY;
+      defaultValue[SoPlex::OBJ_OFFSET] = 0.0;
    }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -2773,12 +2780,12 @@ namespace soplex
       else if( hasPrimal() )
       {
          _syncRealSolution();
-         return _solReal._primalObjVal;
+         return _solReal._primalObjVal + realParam(SoPlex::OBJ_OFFSET);
       }
       else if( hasDual() )
       {
          _syncRealSolution();
-         return _solReal._dualObjVal;
+         return _solReal._dualObjVal + realParam(SoPlex::OBJ_OFFSET);
       }
       else
          return 0.0;
@@ -5431,6 +5438,14 @@ namespace soplex
             _scaler->setRealParam(value);
          break;
 
+      // objective offset
+      case SoPlex::OBJ_OFFSET:
+         if( _realLP )
+            _realLP->changeObjOffset(value);
+         if( _rationalLP )
+            _rationalLP->changeObjOffset(value);
+         break;
+
       default:
          return false;
       }
@@ -7417,7 +7432,7 @@ namespace soplex
       if( success )
       {
          setIntParam(SoPlex::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
-         _realLP->changeObjOffset(0.0);
+         _realLP->changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
 
          // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
          // and not to reading time
@@ -7457,7 +7472,7 @@ namespace soplex
       if( success )
       {
          setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
-         _rationalLP->changeObjOffset(0);
+         _rationalLP->changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
          _recomputeRangeTypesRational();
 
          // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time

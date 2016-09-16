@@ -1250,8 +1250,11 @@ public:
       /// accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
       LEASTSQ_ACRCY = 22,
 
+      /// objective offset
+      OBJ_OFFSET = 23,
+
       /// number of real parameters
-      REALPARAM_COUNT = 23
+      REALPARAM_COUNT = 24
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
