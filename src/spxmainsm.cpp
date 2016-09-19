@@ -3534,8 +3534,8 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
       upLocks[j] = 0;
       downLocks[j] = 0;
 
-      //if (lp.colVector(j).size() <= 1)
-         //continue;
+      if (lp.colVector(j).size() <= 1)
+         continue;
 
       const SVector& col = lp.colVector(j);
       for(int k = 0; k < col.size(); ++k)
@@ -4703,7 +4703,6 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
       if( !again )
       {
-         lp.writeFile("premultiagg.lp");
 #if TRIVIAL_HEURISTICS
          trivialHeuristic(lp);
 #endif
