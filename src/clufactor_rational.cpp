@@ -34,7 +34,6 @@ namespace soplex
 
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
-static const Real verySparseFactor4left  = 0.1;
 
 /* generic heap management */
 static void enQueueMax( int* heap, int* size, int elem )

@@ -2090,7 +2090,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.lhs(i) / rhsBnd) > Param::epsilon())
+                  && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -2127,7 +2127,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.rhs(i) / lhsBnd) > Param::epsilon())
+                  && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -2194,7 +2194,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.lhs(i) / rhsBnd) > Param::epsilon())
+                  && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -2230,7 +2230,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.rhs(i) / lhsBnd) > Param::epsilon())
+                  && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -3832,7 +3832,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       idxSet.addIdx(i);
    }
 
-   Real oldVal;
+   Real oldVal = 0.0;
 
    // main loop
    for(int j = 0; j < lp.nCols(); ++j)
@@ -4159,7 +4159,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       idxSet.addIdx(j);
    }
 
-   Real oldVal;
+   Real oldVal = 0.0;
 
    // main loop
    for(int i = 0; i < lp.nRows(); ++i)
