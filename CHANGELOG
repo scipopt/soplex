@@ -38,6 +38,7 @@ interface:
 
 code quality:
 - SoPlex is thread-safe by using the storage class specifier thread-local for static variables
+- disabling verbosity when using PARASCIP is not necessary anymore
 
 
 29 February 2016 - Release 2.2.1
