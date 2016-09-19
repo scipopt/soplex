@@ -1372,24 +1372,24 @@ public:
    const Settings& settings() const;
 
    /// sets boolean parameter value; returns true on success
-   bool setBoolParam(const BoolParam param, const bool value, const bool quiet = false, const bool init = false);
+   bool setBoolParam(const BoolParam param, const bool value, const bool init = true);
 
    /// sets integer parameter value; returns true on success
-   bool setIntParam(const IntParam param, const int value, const bool quiet = false, const bool init = false);
+   bool setIntParam(const IntParam param, const int value, const bool init = true);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const Real value, const bool quiet = false, const bool init = false);
+   bool setRealParam(const RealParam param, const Real value, const bool init = true);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
-   bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
+   bool setRationalParam(const RationalParam param, const Rational value, const bool init = true);
 #endif
 
    /// sets parameter settings; returns true on success
-   bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
+   bool setSettings(const Settings& newSettings, const bool init = true);
 
    /// resets default parameter settings
-   void resetSettings(const bool quiet = false, const bool init = false);
+   void resetSettings(const bool quiet = false, const bool init = true);
 
    /// print non-default parameter values
    void printUserSettings();

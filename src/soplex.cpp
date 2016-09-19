@@ -520,7 +520,7 @@ namespace soplex
       // initialize parameter settings to default
       spx_alloc(_currentSettings);
       _currentSettings = new (_currentSettings) Settings();
-      setSettings(*_currentSettings, true, true);
+      setSettings(*_currentSettings, true);
 
       _lastSolveMode = intParam(SoPlex::SOLVEMODE);
 
@@ -590,9 +590,9 @@ namespace soplex
          _solver.setSolver(&_slufactor);
 
          // initialize pointers for simplifier, scaler, and starter
-         setIntParam(SoPlex::SIMPLIFIER, intParam(SoPlex::SIMPLIFIER), true, true);
-         setIntParam(SoPlex::SCALER, intParam(SoPlex::SCALER), true, true);
-         setIntParam(SoPlex::STARTER, intParam(SoPlex::STARTER), true, true);
+         setIntParam(SoPlex::SIMPLIFIER, intParam(SoPlex::SIMPLIFIER), true);
+         setIntParam(SoPlex::SCALER, intParam(SoPlex::SCALER), true);
+         setIntParam(SoPlex::STARTER, intParam(SoPlex::STARTER), true);
 
          // copy real LP if different from the LP in the solver
          if( rhs._realLP != &(rhs._solver) )
@@ -4947,7 +4947,7 @@ namespace soplex
 
 
    /// sets boolean parameter value; returns true on success
-   bool SoPlex::setBoolParam(const BoolParam param, const bool value, const bool quiet, const bool init)
+   bool SoPlex::setBoolParam(const BoolParam param, const bool value, const bool init)
    {
       assert(param >= 0);
       assert(param < SoPlex::BOOLPARAM_COUNT);
@@ -4990,7 +4990,7 @@ namespace soplex
 
 
    /// sets integer parameter value; returns true on success
-   bool SoPlex::setIntParam(const IntParam param, const int value, const bool quiet, const bool init)
+   bool SoPlex::setIntParam(const IntParam param, const int value, const bool init)
    {
       assert(param >= 0);
       assert(param < INTPARAM_COUNT);
@@ -5322,7 +5322,7 @@ namespace soplex
 
 
    /// sets real parameter value; returns true on success
-   bool SoPlex::setRealParam(const RealParam param, const Real value, const bool quiet, const bool init)
+   bool SoPlex::setRealParam(const RealParam param, const Real value, const bool init)
    {
       assert(param >= 0);
       assert(param < REALPARAM_COUNT);
@@ -5458,7 +5458,7 @@ namespace soplex
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
-   bool SoPlex::setRationalParam(const RationalParam param, const Rational value, const bool quiet, const bool init)
+   bool SoPlex::setRationalParam(const RationalParam param, const Rational value, const bool init)
    {
       assert(param >= 0);
       assert(param < RATIONALPARAM_COUNT);
@@ -5485,7 +5485,7 @@ namespace soplex
 
 
    /// sets parameter settings; returns true on success
-   bool SoPlex::setSettings(const Settings& newSettings, const bool quiet, const bool init)
+   bool SoPlex::setSettings(const Settings& newSettings, const bool init)
    {
       assert(init || _isConsistent());
 
@@ -5494,17 +5494,17 @@ namespace soplex
       *_currentSettings = newSettings;
 
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
-         success &= setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], quiet, init);
+         success &= setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], init);
 
       for( int i = 0; i < SoPlex::INTPARAM_COUNT; i++ )
-         success &= setIntParam((IntParam)i, _currentSettings->_intParamValues[i], quiet, init);
+         success &= setIntParam((IntParam)i, _currentSettings->_intParamValues[i], init);
 
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
-         success &= setRealParam((RealParam)i, _currentSettings->_realParamValues[i], quiet, init);
+         success &= setRealParam((RealParam)i, _currentSettings->_realParamValues[i], init);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
-         success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], quiet, init);
+         success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], init);
 #endif
 
       assert(_isConsistent());
@@ -5516,17 +5516,17 @@ namespace soplex
    void SoPlex::resetSettings(const bool quiet, const bool init)
    {
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
-         setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], quiet, init);
+         setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], init);
 
       for( int i = 0; i < SoPlex::INTPARAM_COUNT; i++ )
-         setIntParam((IntParam)i, _currentSettings->intParam.defaultValue[i], quiet, init);
+         setIntParam((IntParam)i, _currentSettings->intParam.defaultValue[i], init);
 
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
-         setRealParam((RealParam)i, _currentSettings->realParam.defaultValue[i], quiet, init);
+         setRealParam((RealParam)i, _currentSettings->realParam.defaultValue[i], init);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       for( int i = 0; i < SoPlex::RATIONALPARAM_COUNT; i++ )
-         success &= setRationalParam((RationalParam)i, _currentSettings->rationalParam.defaultValue[i], quiet, init);
+         success &= setRationalParam((RationalParam)i, _currentSettings->rationalParam.defaultValue[i], init);
 #endif
    }
 
@@ -5873,7 +5873,7 @@ namespace soplex
             {
                int value;
 
-               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value) )
+               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value, false) )
                   break;
                else
                {
@@ -7431,7 +7431,7 @@ namespace soplex
 
       if( success )
       {
-         setIntParam(SoPlex::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
+         setIntParam(SoPlex::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true);
          _realLP->changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
 
          // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
@@ -7471,7 +7471,7 @@ namespace soplex
 
       if( success )
       {
-         setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true, true);
+         setIntParam(SoPlex::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex::OBJSENSE_MAXIMIZE : SoPlex::OBJSENSE_MINIMIZE), true);
          _rationalLP->changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
          _recomputeRangeTypesRational();
 
@@ -7763,7 +7763,7 @@ namespace soplex
             {
                int value;
 
-               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value) )
+               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value, false) )
                   break;
                else
                {
