@@ -1348,7 +1348,7 @@ void get_scalers(
    switch(scaling)
    {
    case 5:
-      prescaler  = new SPxLeastSqSC(true);
+      prescaler  = new SPxLeastSqSC();
       postscaler = 0;
       break;
    case 4:
@@ -1921,7 +1921,7 @@ int main(int argc, char* argv[])
       int                       scaling        = 2;
       int                       simplifying    = 1;
       int                       iterlimit      = -1;
-      Real                      timelimit      = -1.0;
+      Real                      timelimit      = DEFAULT_INFINITY;
       Real                      delta          = DEFAULT_BND_VIOL;
       Real                      feastol        = DEFAULT_BND_VIOL;
       Real                      opttol         = DEFAULT_BND_VIOL;
