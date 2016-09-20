@@ -1911,7 +1911,7 @@ int main(int argc, char* argv[])
       int                       scaling        = 2;
       int                       simplifying    = 1;
       int                       iterlimit      = -1;
-      Real                      timelimit      = -1.0;
+      Real                      timelimit      = DEFAULT_INFINITY;
       Real                      delta          = DEFAULT_BND_VIOL;
       Real                      feastol        = DEFAULT_BND_VIOL;
       Real                      opttol         = DEFAULT_BND_VIOL;
