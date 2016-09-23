@@ -82,11 +82,6 @@ namespace soplex
       description[SoPlex::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
       defaultValue[SoPlex::RATFACJUMP] = false;
 
-      // should feasibility be tested with relaxed bounds and sides?
-      name[SoPlex::FEASRELAX] = "feasrelax";
-      description[SoPlex::FEASRELAX] = "should feasibility be tested with relaxed bounds and sides?";
-      defaultValue[SoPlex::FEASRELAX] = false;
-
       // use bound flipping also for row representation?
       name[SoPlex::ROWBOUNDFLIPS] = "rowboundflips";
       description[SoPlex::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
@@ -4973,8 +4968,6 @@ namespace soplex
       case POWERSCALING:
          break;
       case RATFACJUMP:
-         break;
-      case FEASRELAX:
          break;
       case ROWBOUNDFLIPS:
          _ratiotesterBoundFlipping.useBoundFlipsRow(value);

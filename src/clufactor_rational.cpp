@@ -3621,10 +3621,6 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
       //      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
       //      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
 
-#if defined(WITH_WARNINGS) || !defined(NDEBUG)
-      Rational y = vec[c];
-#endif
-
       vec[c]  = 0;
 
       if ( x != 0 )
