@@ -110,6 +110,7 @@ namespace soplex
       iterations = 0;
       iterationsPrimal = 0;
       iterationsFromBasis = 0;
+      iterationsPolish = 0;
       boundflips = 0;
       luFactorizationsReal = 0;
       luSolvesReal = 0;
