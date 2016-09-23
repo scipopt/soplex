@@ -67,9 +67,6 @@ LINKSINFO	=
 MEM		=	2000
 CONTINUE	=	false
 
-# will this be compiled for PARASCIP? (disables output because it uses global variables)
-PARASCIP	=	false
-
 # will this be compiled with the 1.x interface?
 LEGACY		=	false
 
@@ -334,17 +331,6 @@ CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
 DFLAGS		+=	$(USRDFLAGS)
-
-#-----------------------------------------------------------------------------
-# PARASCIP
-#-----------------------------------------------------------------------------
-
-PARASCIPDEP	:=	$(SRCDIR)/depend.parascip
-PARASCIPSRC	:=	$(shell cat $(PARASCIPDEP))
-
-ifeq ($(PARASCIP),true)
-CPPFLAGS	+=	-DDISABLE_VERBOSITY
-endif
 
 #-----------------------------------------------------------------------------
 # LEGACY
@@ -631,7 +617,6 @@ depend:
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
 		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
 		@echo `grep -l "SOPLEX_LEGACY" $(ALLSRC)` >$(LEGACYDEP)
-		@echo `grep -l "DISABLE_VERBOSITY" $(ALLSRC)` >$(PARASCIPDEP)
 
 -include	$(DEPEND)
 
@@ -649,7 +634,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -666,9 +651,6 @@ ifneq ($(ZLIB),$(LAST_ZLIB))
 endif
 ifneq ($(EGLIB),$(LAST_EGLIB))
 		@-touch $(EGLIBSRC)
-endif
-ifneq ($(PARASCIP),$(LAST_PARASCIP))
-		@-touch $(PARASCIPSRC)
 endif
 ifneq ($(LEGACY),$(LAST_LEGACY))
 		@-touch $(LEGACYSRC)
@@ -700,7 +682,6 @@ endif
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_EGLIB=$(EGLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
 		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
@@ -780,11 +761,6 @@ endif
 ifneq ($(EGLIB),true)
 ifneq ($(EGLIB),false)
 		$(error invalid EGLIB flag selected: EGLIB=$(EGLIB). Possible options are: true false)
-endif
-endif
-ifneq ($(PARASCIP),true)
-ifneq ($(PARASCIP),false)
-		$(error invalid PARASCIP flag selected: PARASCIP=$(PARASCIP). Possible options are: true false)
 endif
 endif
 ifneq ($(LEGACY),true)
