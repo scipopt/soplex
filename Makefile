@@ -482,13 +482,13 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 ifeq ($(SHARED),true)
 $(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		-$(LINKCXX) $(BINOBJFILES) \
+		$(LINKCXX) $(BINOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
 else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
 endif
@@ -496,7 +496,7 @@ endif
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		@echo "-> linking $(EXAMPLEFILE)"
-		-$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
+		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE) \
 		|| ($(MAKE) errorhints && false)
 
