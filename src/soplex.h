@@ -856,8 +856,11 @@ public:
       /// use bound flipping also for row representation?
       ROWBOUNDFLIPS = 9,
 
+      /// use persistent scaling?
+      PERSISTENTSCALING = 10,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 10
+      BOOLPARAM_COUNT = 11
    } BoolParam;
 
    /// integer parameters
@@ -1355,6 +1358,9 @@ public:
    /// returns the current random seed of the solver instance
    unsigned int randomSeed() const;
 
+   /// is persistent scaling being used?
+   bool persistentScaling() const;
+
    //@}
 
 private:
@@ -1502,6 +1508,12 @@ private:
 
    //@}
 
+   //**@name Miscellaneous */
+   //@{
+
+   bool _persistentscaling;
+
+   //@}
 
    //**@name Constant helper methods */
    //@{

@@ -22,6 +22,7 @@
 #include "spxout.h"
 #include "spxlpbase.h"
 #include "spxlp.h"
+#include "soplex.h"
 
 namespace soplex
 {
