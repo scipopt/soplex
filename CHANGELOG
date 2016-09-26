@@ -32,6 +32,7 @@ fixed bugs:
 - when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
 - fixed memory bug in class DSVectorBase when resizing zero length vectors
 - restore initial basis when given basis has too many basic variables
+- improve behaviour for LPs with zero constraints
 
 interface:
 - submakefile for CrayXC systems added
