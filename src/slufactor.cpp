@@ -577,14 +577,13 @@ void SLUFactor::solveLeft(
 
 Real SLUFactor::stability() const
 {
-   assert(maxabs != 0.0);
-
    if (status() != OK)
       return 0;
 
    if (maxabs < initMaxabs)
       return 1;
 
+   assert(maxabs != 0.0);
    return initMaxabs / maxabs;
 }
 
