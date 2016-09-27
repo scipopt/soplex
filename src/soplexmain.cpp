@@ -694,6 +694,23 @@ int main(int argc, char* argv[])
          }
          else
             MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.")
+
+         if( soplex->getPrimalRayReal(primal) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal ray (name, value):\n"; )
+            for( int i = 0; i < soplex->numColsReal(); ++i )
+            {
+               if ( isNotZero( primal[i] ) )
+                  MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision(9)
+                                    << primal[i] << std::endl; )
+            }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
+                              << std::setprecision(1) << std::scientific << Param::epsilon()
+                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
+         }
+
       }
 
 
@@ -738,6 +755,22 @@ int main(int argc, char* argv[])
          }
          else
             MSG_INFO1( soplex->spxout, soplex->spxout << "No dual solution available.")
+
+         if( soplex->getDualFarkasReal(dual) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual Farkas (name, value):\n"; )
+            for( int i = 0; i < soplex->numRowsReal(); ++i )
+            {
+               if ( isNotZero( dual[i] ) )
+                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision(9)
+                                    << dual[i] << std::endl; )
+            }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
+                              << std::setprecision(1) << std::scientific << Param::epsilon()
+                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
+         }
       }
 
 
