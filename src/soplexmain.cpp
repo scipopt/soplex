@@ -693,7 +693,7 @@ int main(int argc, char* argv[])
                               << std::setprecision(8) << std::fixed << "). Solution has " << nNonzeros << " nonzero entries." << std::endl; )
          }
          else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.")
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.\n")
 
          if( soplex->getPrimalRayReal(primal) )
          {
@@ -731,7 +731,7 @@ int main(int argc, char* argv[])
             MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero." << std::endl; )
          }
          else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.")
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.\n")
       }
 
 
@@ -754,7 +754,7 @@ int main(int argc, char* argv[])
                               << std::setprecision(8) << std::fixed << ")." << std::endl; )
          }
          else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual solution available.")
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual solution available.\n")
 
          if( soplex->getDualFarkasReal(dual) )
          {
@@ -788,7 +788,7 @@ int main(int argc, char* argv[])
             MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero." << std::endl; )
          }
          else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual (rational) solution available.")
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual (rational) solution available.\n")
       }
 
 
