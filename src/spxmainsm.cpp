@@ -1272,22 +1272,14 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
    Real val = 0.0;
    Real aij = m_row[m_j];
 
-   //printf("%d: ", m_j);
    for(int k = 0; k < m_row.size(); ++k)
    {
       if(m_row.index(k) != m_j)
          val += m_row.value(k) * x[m_row.index(k)];
-      //printf("(%d,%f x %f) ", m_row.index(k), m_row.value(k), x[m_row.index(k)]);
    }
-   //printf("\n");
 
    Real scale;
-#if 0 //don't know whether I need to worry about the scale. I don't think so
-   scale = maxAbs(m_const, val);
-
-   if (scale < 1.0)
-#endif
-      scale = 1.0;
+   scale = 1.0;
 
    Real z = (m_const / scale) - (val / scale);
 
@@ -1295,7 +1287,6 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
       z = 0.0;
 
    x[m_j] = z * scale / aij;
-   //printf("Var: %d Value: %f\n", m_j, x[m_j]);
    s[m_i] = 0.0;
 
    assert(GE(x[m_j], m_lower) && LE(x[m_j], m_upper));
@@ -3673,12 +3664,12 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
             Real aggConstant = (bestislhs ? lp.lhs(bestpos) : lp.rhs(bestpos));   // this is the lhs or rhs of the aggregated row
             Real aggAij = bestRow[j];                                   // this is the coefficient of the deleted col
 
-            //MSG_INFO2( (*spxout),
+            MSG_INFO3( (*spxout),
                (*spxout) << "IMAISM51 col " << j
                                             << ": Aggregating row: " << bestpos
                                             << " Aggregation Constant=" << aggConstant
                                             << " Coefficient of aggregated col=" << aggAij << std::endl;
-               //)
+               )
 
             MultiAggregationPS* MultiAggregationPSptr = 0;
             spx_alloc(MultiAggregationPSptr);
@@ -4784,7 +4775,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
                      << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
                      << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
-                     << m_stat[MULTI_AGG]      << " multi aggregation of variables\n"
+                     << m_stat[MULTI_AGG]            << " multi aggregation of variables\n"
                      << std::endl; );
 
    m_timeUsed->stop();
