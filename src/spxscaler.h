@@ -43,6 +43,7 @@ class SPxLPBase;
    loaded to a SPxScaler for #scale()%ing it. The scaling can
    be undone by calling unscale().
 */
+
 class SPxScaler
 {
 protected:
@@ -117,7 +118,7 @@ public:
    //-------------------------------------
    /**@name Scaling */
    //@{
-   /// scale SPxLP. 
+   /// scale SPxLP.
    virtual void scale(SPxLPBase<Real>& lp) = 0;
    /// unscale SPxLP
    virtual void unscale(SPxLPBase<Real>& lp);
@@ -125,30 +126,58 @@ public:
    virtual Real getColScale(int i);
    /// returns scaling factor for row \p i
    virtual Real getRowScale(int i);
+   /// gets unscaled column \p i
+   virtual void getColUnscaled(const SPxLPBase<Real>& lp, int i, SVector& vec) const;
+#if 1
    /// returns unscaled Column \p i of LP \p lp
    virtual DSVector returnUnscaledColumnVector(const SPxLPBase<Real>& lp, int i) const;
-   /// returns unscaled upper bound \p i of LP \lp
-   virtual Real returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const;
+#endif
+   /// returns unscaled upper bound \p i
+   virtual Real upperUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled upper bound vector of LP \lp
+   virtual void getUpperUnscaled(const SPxLPBase<Real>& lp, DVector& vec) const;
+#if 0
    /// returns unscaled upper bound vector of LP \lp
    virtual DVector returnUnscaledUpperVector(const SPxLPBase<Real>& lp) const;
-   /// returns unscaled lower bound \p i of LP \lp
-   virtual Real returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const;
+#endif
+   /// returns unscaled lower bound \p i
+   virtual Real lowerUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// gets unscaled lower bound vector
+   virtual void getLowerUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
+#if 0
    /// returns unscaled lower bound vector of LP \lp
    virtual DVector returnUnscaledLowerVector(const SPxLPBase<Real>& lp) const;
-   /// returns unscaled objective function coefficient of \p i of LP \lp
-   virtual Real returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const;
+#endif
+   /// returns unscaled objective function coefficient of \p i
+   virtual Real maxObjUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// gets unscaled objective function
+   virtual void getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
+#if 0
    /// returns unscaled objective function of LP \p lp
    virtual DVector returnUnscaledObjVector(const SPxLPBase<Real>& lp) const;
+#endif
+   /// returns unscaled row \p i
+   virtual void getRowUnscaled(const SPxLPBase<Real>& lp, int i, SVector& vec) const;
+#if 1
    /// returns unscaled Row \p i of LP \p lp
    virtual DSVector returnUnscaledRowVector(const SPxLPBase<Real>& lp, int i) const;
-   /// returns unscaled right hand side \p i of LP \lp
-   virtual Real returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const;
+#endif
+   /// returns unscaled right hand side \p i
+   virtual Real rhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// gets unscaled right hand side vector
+   virtual void getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
+#if 0
    /// returns unscaled right hand side vector of LP \lp
    virtual DVector returnUnscaledRhsVector(const SPxLPBase<Real>& lp) const;
+#endif
    /// returns unscaled left hand side \p i of LP \lp
-   virtual Real returnUnscaledLhs(const SPxLPBase<Real>& lp, int i) const;
+   virtual Real lhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// returns unscaled left hand side vector of LP \lp
+   virtual void getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
+#if 0
    /// returns unscaled left hand side vector of LP \lp
    virtual DVector returnUnscaledLhsVector(const SPxLPBase<Real>& lp) const;
+#endif
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(Vector& x) const;
    /// unscale dense slack vector given in \p s.

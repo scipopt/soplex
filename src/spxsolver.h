@@ -54,11 +54,11 @@ class SPxStarter;
    @ingroup Algo
 
    SPxSolver is an LP solver class using the revised Simplex algorithm. It
-   provids two basis representations, namely a column basis and a row basis
+   provides two basis representations, namely a column basis and a row basis
    (see #Representation). For both representations, a primal and
    dual algorithm is available (see \ref Type).
 
-   In addition, SPxSolver can be custumized with various respects:
+   In addition, SPxSolver can be customized with various respects:
    - pricing algorithms using SPxPricer
    - ratio test using class SPxRatioTester
    - computation of a start basis using class SPxStarter

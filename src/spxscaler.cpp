@@ -324,10 +324,32 @@ Real SPxScaler::getRowScale(int i)
    return m_rowscale[i];
 }
 
+
+/// Gets unscaled column \p i
+void SPxScaler::getColUnscaled(const SPxLP& lp, int i, SVector& vec) const
+{
+   assert(i < lp.nCols());
+   assert(i >= 0);
+
+   vec = lp.LPColSet::colVector(i);
+
+   int exp1;
+   frexp(m_colscale[i], &exp1);
+   int exp2;
+   for( int j = 0; j < vec.size(); j++ )
+   {
+      frexp(m_rowscale[vec.index(j)], &exp2);
+      vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+   }
+}
+
+
+#if 1
 /// Returns unscaled Column \p i
 DSVector SPxScaler::returnUnscaledColumnVector(const SPxLP& lp, int i) const
 {
-   assert(i <= lp.nCols());
+   assert(i < lp.nCols());
+   assert(i >= 0);
 
    DSVector result;
    result = lp.LPColSet::colVector(i);
@@ -343,7 +365,29 @@ DSVector SPxScaler::returnUnscaledColumnVector(const SPxLP& lp, int i) const
 
    return result;
 }
+#endif
 
+
+/// returns unscaled upper bound \p i
+Real SPxScaler::upperUnscaled(const SPxLPBase<Real>& lp, int i) const
+{
+   assert(i < lp.nCols());
+   assert(i >= 0);
+
+   int exp;
+   frexp(m_colscale[i], &exp);
+
+   if( lp.LPColSet::upper(i) < infinity )
+   {
+      return ldexp(lp.LPColSet::upper(i) , exp - 1);
+   }
+   else
+   {
+      return lp.LPColSet::upper(i);
+   }
+}
+
+#if 0
 /// returns unscaled upper bound \p i of LP \lp
 Real SPxScaler::returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const
 {
@@ -361,7 +405,23 @@ Real SPxScaler::returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const
       return lp.LPColSet::upper(i);
    }
 }
+#endif
 
+
+
+/// gets unscaled upper bound vector
+void SPxScaler::getUpperUnscaled(const SPxLPBase<Real>& lp, DVector& vec) const
+{
+   int exp;
+
+   for( int i = 0; i < lp.LPColSet::upper().dim(); i++)
+   {
+      frexp(m_colscale[i], &exp);
+      vec[i] = ldexp(lp.LPColSet::upper()[i], exp - 1);
+   }
+}
+
+#if 0
 /// returns unscaled upper bound vector of LP \lp
 DVector SPxScaler::returnUnscaledUpperVector(const SPxLPBase<Real>& lp) const
 {
@@ -376,7 +436,26 @@ DVector SPxScaler::returnUnscaledUpperVector(const SPxLPBase<Real>& lp) const
 
    return result;
 }
+#endif
 
+Real SPxScaler::lowerUnscaled(const SPxLPBase<Real>& lp, int i) const
+{
+   assert(i < lp.nCols());
+   assert(i >= 0);
+
+   int exp;
+   frexp(m_colscale[i], &exp);
+
+   if( lp.LPColSet::lower(i) > -infinity )
+   {
+      return ldexp(lp.LPColSet::lower(i) , exp - 1);
+   }
+   else
+   {
+      return lp.LPColSet::lower(i);
+   }
+}
+#if 0
 /// returns unscaled lower bound \p i of LP \lp
 Real SPxScaler::returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const
 {
@@ -394,7 +473,21 @@ Real SPxScaler::returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const
       return lp.LPColSet::lower(i);
    }
 }
+#endif
 
+
+/// returns unscaled lower bound vector of LP \lp
+void SPxScaler::getLowerUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
+{
+   int exp;
+
+   for( int i = 0; i < lp.LPColSet::lower().dim(); i++)
+   {
+      frexp(m_colscale[i], &exp);
+      vec[i] = ldexp(lp.LPColSet::lower()[i], exp - 1);
+   }
+}
+#if 0
 /// returns unscaled lower bound vector of LP \lp
 DVector SPxScaler::returnUnscaledLowerVector(const SPxLPBase<Real>& lp) const
 {
@@ -409,11 +502,13 @@ DVector SPxScaler::returnUnscaledLowerVector(const SPxLPBase<Real>& lp) const
 
    return result;
 }
+#endif
 
-/// returns unscaled objective function coefficient of \p i of LP \lp
-Real SPxScaler::returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const
+/// returns unscaled objective function coefficient of \p i
+Real SPxScaler::maxObjUnscaled(const SPxLPBase<Real>& lp, int i) const
 {
-   assert(i <= lp.nCols());
+   assert(i < lp.nCols());
+   assert(i >= 0);
 
    int exp;
    frexp(m_colscale[i], &exp);
@@ -421,6 +516,19 @@ Real SPxScaler::returnUnscaledObj(const SPxLPBase<Real>& lp, int i) const
    return ldexp(lp.LPColSet::maxObj(i) , -exp + 1);
 }
 
+
+/// gets unscaled objective function coefficient of \p i
+void SPxScaler::getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
+{
+   int exp;
+
+   for( int i = 0; i < lp.LPColSet::maxObj().dim(); i++)
+   {
+      frexp(m_colscale[i], &exp);
+      vec[i] = ldexp(lp.LPColSet::maxObj()[i], -exp + 1);
+   }
+}
+#if 0
 /// returns unscaled objective function coefficient of \p i of LP \lp
 DVector SPxScaler::returnUnscaledObjVector(const SPxLPBase<Real>& lp) const
 {
@@ -435,11 +543,29 @@ DVector SPxScaler::returnUnscaledObjVector(const SPxLPBase<Real>& lp) const
 
    return result;
 }
+#endif
 
-/// Returns unscaled Row \p i
+/// returns unscaled row \p i
+void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, SVector& vec) const
+{
+   assert(i < lp.nRows());
+   assert(i >= 0);
+
+   int exp1;
+   frexp(m_rowscale[i], &exp1);
+   int exp2;
+   for( int j = 0; j < vec.size(); j++ )
+   {
+      frexp(m_colscale[vec.index(j)], &exp2);
+      vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+   }
+}
+#if 1
+/// returns unscaled row \p i
 DSVector SPxScaler::returnUnscaledRowVector(const SPxLP& lp, int i) const
 {
-   assert(i <= lp.nRows());
+   assert(i < lp.nRows());
+   assert(i >= 0);
 
    DSVector result;
    result = lp.LPRowSet::rowVector(i);
@@ -455,7 +581,27 @@ DSVector SPxScaler::returnUnscaledRowVector(const SPxLP& lp, int i) const
 
    return result;
 }
+#endif
 
+/// returns unscaled right hand side \p i
+Real SPxScaler::rhsUnscaled(const SPxLPBase<Real>& lp, int i) const
+{
+   assert(i < lp.nRows());
+   assert(i >= 0);
+
+   int exp;
+   frexp(m_rowscale[i], &exp);
+
+   if( lp.LPRowSet::rhs(i) < infinity )
+   {
+      return ldexp(lp.LPRowSet::rhs(i) , -exp + 1);
+   }
+   else
+   {
+      return lp.LPRowSet::rhs(i);
+   }
+}
+#if 0
 /// returns unscaled right hand side \p i of LP \lp
 Real SPxScaler::returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const
 {
@@ -473,7 +619,22 @@ Real SPxScaler::returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const
       return lp.LPRowSet::rhs(i);
    }
 }
+#endif
 
+
+/// gets unscaled right hand side vector
+void SPxScaler::getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
+{
+   int exp;
+
+   for( int i = 0; i < lp.LPRowSet::rhs().dim(); i++)
+   {
+      frexp(m_rowscale[i], &exp);
+      vec[i] = ldexp(lp.LPRowSet::rhs()[i], -exp + 1);
+   }
+}
+
+#if 0
 /// returns unscaled right hand side vector of LP \lp
 DVector SPxScaler::returnUnscaledRhsVector(const SPxLPBase<Real>& lp) const
 {
@@ -488,11 +649,13 @@ DVector SPxScaler::returnUnscaledRhsVector(const SPxLPBase<Real>& lp) const
 
    return result;
 }
+#endif
 
 /// returns unscaled left hand side \p i of LP \lp
-Real SPxScaler::returnUnscaledLhs(const SPxLPBase<Real>& lp, int i) const
+Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
 {
-   assert(i <= lp.nRows());
+   assert(i < lp.nRows());
+   assert(i >= 0);
 
    int exp;
    frexp(m_rowscale[i], &exp);
@@ -508,6 +671,18 @@ Real SPxScaler::returnUnscaledLhs(const SPxLPBase<Real>& lp, int i) const
 }
 
 /// returns unscaled left hand side vector of LP \lp
+void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
+{
+   int exp;
+
+   for( int i = 0; i < lp.LPRowSet::lhs().dim(); i++)
+   {
+      frexp(m_rowscale[i], &exp);
+      vec[i] = ldexp(lp.LPRowSet::lhs()[i], -exp + 1);
+   }
+}
+#if 0
+/// returns unscaled left hand side vector of LP \lp
 DVector SPxScaler::returnUnscaledLhsVector(const SPxLPBase<Real>& lp) const
 {
    int exp;
@@ -521,6 +696,7 @@ DVector SPxScaler::returnUnscaledLhsVector(const SPxLPBase<Real>& lp) const
 
    return result;
 }
+#endif
 
 void SPxScaler::unscalePrimal(Vector& x) const
 {

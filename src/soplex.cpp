@@ -884,7 +884,7 @@ namespace soplex
 
 
 
-   /// returns vector of row \p i @todo problem: is called in soplex!
+   /// returns vector of row \p i
    const SVectorReal& SoPlex::rowVectorReal(int i) const
    {
       assert(_realLP != 0);
@@ -897,10 +897,6 @@ namespace soplex
    const VectorReal& SoPlex::rhsReal() const
    {
       assert(_realLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _realLP->rhs();
    }
 
@@ -910,9 +906,6 @@ namespace soplex
    Real SoPlex::rhsReal(int i) const
    {
       assert(_realLP != 0);
-
-      //@todo get scaling factor....
-
       return _realLP->rhs(i);
    }
 
@@ -922,10 +915,6 @@ namespace soplex
    const VectorReal& SoPlex::lhsReal() const
    {
       assert(_realLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _realLP->lhs();
    }
 
@@ -935,9 +924,6 @@ namespace soplex
    Real SoPlex::lhsReal(int i) const
    {
       assert(_realLP != 0);
-
-      //@todo get scaling factor....
-
       return _realLP->lhs(i);
    }
 
@@ -974,10 +960,6 @@ namespace soplex
    const SVectorReal& SoPlex::colVectorReal(int i) const
    {
       assert(_realLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _realLP->colVector(i);
    }
 
@@ -987,10 +969,6 @@ namespace soplex
    const VectorReal& SoPlex::upperReal() const
    {
       assert(_realLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _realLP->upper();
    }
 
@@ -1000,9 +978,6 @@ namespace soplex
    Real SoPlex::upperReal(int i) const
    {
       assert(_realLP != 0);
-
-      //@todo
-
       return _realLP->upper(i);
    }
 
@@ -1012,10 +987,6 @@ namespace soplex
    const VectorReal& SoPlex::lowerReal() const
    {
       assert(_realLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _realLP->lower();
    }
 
@@ -1025,8 +996,6 @@ namespace soplex
    Real SoPlex::lowerReal(int i) const
    {
       assert(_realLP != 0);
-
-      //@todo
       return _realLP->lower(i);
    }
 
@@ -1055,10 +1024,6 @@ namespace soplex
    const VectorReal& SoPlex::maxObjReal() const
    {
       assert(_realLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _realLP->maxObj();
    }
 
@@ -1069,7 +1034,6 @@ namespace soplex
    Real SoPlex::maxObjReal(int i) const
    {
       assert(_realLP != 0);
-      //@todo
       return _realLP->maxObj(i);
    }
 
@@ -1166,10 +1130,6 @@ namespace soplex
    const SVectorRational& SoPlex::rowVectorRational(int i) const
    {
       assert(_rationalLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _rationalLP->rowVector(i);
    }
 
@@ -1179,10 +1139,6 @@ namespace soplex
    const VectorRational& SoPlex::rhsRational() const
    {
       assert(_rationalLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _rationalLP->rhs();
    }
 
@@ -1192,10 +1148,6 @@ namespace soplex
    const Rational& SoPlex::rhsRational(int i) const
    {
       assert(_rationalLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _rationalLP->rhs(i);
    }
 
@@ -1205,10 +1157,6 @@ namespace soplex
    const VectorRational& SoPlex::lhsRational() const
    {
       assert(_rationalLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _rationalLP->lhs();
    }
 
@@ -1254,10 +1202,6 @@ namespace soplex
    const SVectorRational& SoPlex::colVectorRational(int i) const
    {
       assert(_rationalLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
       return _rationalLP->colVector(i);
    }
 
@@ -1267,11 +1211,6 @@ namespace soplex
    const VectorRational& SoPlex::upperRational() const
    {
       assert(_rationalLP != 0);
-
-      if( SoPlex::persistentScaling() )
-         throw SPxInterfaceException("Interface method cannot be used when persistent scaling is active; use corresponding method with void return type");
-
-
       return _rationalLP->upper();
    }
 
