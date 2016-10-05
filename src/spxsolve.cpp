@@ -1023,8 +1023,7 @@ void SPxSolver::performSolutionPolishing()
    bool success = false;
    bool stop = false;
 
-   MSG_INFO2( (*spxout),
-      (*spxout) << " --- perform solution polishing" << std::endl; )
+   MSG_INFO2( (*spxout), (*spxout) << " --- perform solution polishing" << std::endl; )
 
    setType(ENTER); // use primal simplex to preserve feasibility
    init();
@@ -1044,10 +1043,10 @@ void SPxSolver::performSolutionPolishing()
             {
                // only consider rows with zero dual multiplier to preserve optimality
                if( EQrel((*theCoPvec)[i], 0) &&
-                     (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
+                   (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
                {
                   MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat; )
-                     polishId = coId(i);
+                  polishId = coId(i);
                   success = enter(polishId, true);
                   clearUpdateVecs();
                   assert(EQrel(objVal, value(), entertol()));
@@ -1071,49 +1070,42 @@ void SPxSolver::performSolutionPolishing()
    else
    {
       assert(polishObj == SolutionPolish::MINBASICSLACK);
-      // identify nonbasic variables, i.e. columns, that may be moved into the basis
-      for( int i = 0; i < coDim(); ++i )
+      while( !stop )
       {
-         // only look for columns, i.e. variables
-         stat = ds.status(i);
-         if( !isBasic(stat) )
+         nSuccessfulPivots = 0;
+         // identify nonbasic variables, i.e. columns, that may be moved into the basis
+         for( int i = 0; i < coDim(); ++i )
          {
-            // only consider variables with zero reduced costs to preserve optimality
-            if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
-                (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
+            // only look for columns, i.e. variables
+            stat = ds.status(i);
+            if( !isBasic(stat) )
             {
-               polishId = id(i);
-               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat << std::endl; )
-               success = enter(polishId, true);
-               if( success )
+               // only consider variables with zero reduced costs to preserve optimality
+               if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
+                     (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
                {
-                  MSG_INFO3( (*spxout), (*spxout) << "success!" << std::endl; )
-                  ++nSuccessfulPivots;
-                  if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
-                     break;
+                  polishId = id(i);
+                  MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat; )
+                  success = enter(polishId, true);
+                  clearUpdateVecs();
+                  assert(EQrel(objVal, value(), leavetol()));
+                  assert(EQ(shift(), 0));
+                  if( success )
+                  {
+                     MSG_INFO3( (*spxout), (*spxout) << " -> success!" << std::endl; )
+                        ++nSuccessfulPivots;
+                     if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                        break;
+                  }
                }
-               clearUpdateVecs();
-               assert(EQrel(objVal, value(), leavetol()));
-               assert(EQ(shift(), 0));
             }
          }
+         // terminate if in the last round no more polishing steps were performed
+         if( nSuccessfulPivots == 0 )
+            stop = true;
+         polishCount += nSuccessfulPivots;
       }
    }
-
-#ifdef ENABLE_ADDITIONAL_CHECKS
-   int previousIters = iterations();
-   Real tolerance = entertol();
-
-   if( !precisionReached(tolerance) )
-   {
-      MSG_INFO3( (*spxout),
-         (*spxout) << " --- perform clean up step" << std::endl; )
-      solve();
-   }
-
-   // sum up polish pivots and additional iterations from clean up step
-   polishCount += iterations() - previousIters;
-#endif
 
    MSG_INFO1( (*spxout),
       (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
