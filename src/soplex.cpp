@@ -243,6 +243,20 @@ namespace soplex
       lower[SoPlex::RATFAC_MINSTALLS] = 0;
       upper[SoPlex::RATFAC_MINSTALLS] = INT_MAX;
       defaultValue[SoPlex::RATFAC_MINSTALLS] = 2;
+
+      // maximum number of conjugate gradient iterations in least square scaling
+      name[SoPlex::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
+      description[SoPlex::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
+      lower[SoPlex::LEASTSQ_MAXROUNDS] = 0;
+      upper[SoPlex::LEASTSQ_MAXROUNDS] = INT_MAX;
+      defaultValue[SoPlex::LEASTSQ_MAXROUNDS] = 50;
+
+      // mode for solution polishing
+      name[SoPlex::SOLUTION_POLISHING] = "solution_polishing";
+      description[SoPlex::SOLUTION_POLISHING] = "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)";
+      lower[SoPlex::SOLUTION_POLISHING] = 0;
+      upper[SoPlex::SOLUTION_POLISHING] = 2;
+      defaultValue[SoPlex::SOLUTION_POLISHING] = SoPlex::POLISHING_OFF;
    }
 
    SoPlex::Settings::RealParam::RealParam() {
