@@ -1016,12 +1016,12 @@ void SPxSolver::performSolutionPolishing()
    Real objVal = value();
 #endif
 
-   int nSuccessfulPivots = 0;
+   int nSuccessfulPivots;
    const SPxBasis::Desc& ds = desc();
    SPxBasis::Desc::Status stat;
    SPxId polishId;
-   bool success;
-   polishCount = 0;
+   bool success = false;
+   bool stop = false;
 
    MSG_INFO2( (*spxout),
       (*spxout) << " --- perform solution polishing" << std::endl; )
@@ -1032,32 +1032,40 @@ void SPxSolver::performSolutionPolishing()
    theratiotester->setType(type());
    if( polishObj == SolutionPolish::MAXBASICSLACK )
    {
-      // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
-      for( int i = 0; i < dim(); ++i )
+      while( !stop )
       {
-         // only look for rows, i.e. slacks
-         stat = ds.coStatus(i);
-         if( !isBasic(stat) )
+         nSuccessfulPivots = 0;
+         // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
+         for( int i = 0; i < dim(); ++i )
          {
-            // only consider rows with zero dual multiplier to preserve optimality
-            if( EQrel((*theCoPvec)[i], 0) &&
-                (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
+            // only look for rows, i.e. slacks
+            stat = ds.coStatus(i);
+            if( !isBasic(stat) )
             {
-               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat << std::endl; )
-               polishId = coId(i);
-               success = enter(polishId, true);
-               if( success )
+               // only consider rows with zero dual multiplier to preserve optimality
+               if( EQrel((*theCoPvec)[i], 0) &&
+                     (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
                {
-                  MSG_INFO3( (*spxout), (*spxout) << "success!" << std::endl; )
-                  ++nSuccessfulPivots;
-                  if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
-                     break;
+                  MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat; )
+                     polishId = coId(i);
+                  success = enter(polishId, true);
+                  clearUpdateVecs();
+                  assert(EQrel(objVal, value(), entertol()));
+                  assert(EQ(shift(), 0));
+                  if( success )
+                  {
+                     MSG_INFO3( (*spxout), (*spxout) << " -> success!" << std::endl; )
+                     ++nSuccessfulPivots;
+                     if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                        stop = true;
+                  }
                }
-               clearUpdateVecs();
-               assert(EQrel(objVal, value(), entertol()));
-               assert(EQ(shift(), 0));
             }
          }
+         // terminate if in the last round no more polishing steps were performed
+         if( nSuccessfulPivots == 0 )
+            stop = true;
+         polishCount += nSuccessfulPivots;
       }
    }
    else
@@ -1106,7 +1114,6 @@ void SPxSolver::performSolutionPolishing()
    // sum up polish pivots and additional iterations from clean up step
    polishCount += iterations() - previousIters;
 #endif
-   polishCount += nSuccessfulPivots;
 
    MSG_INFO1( (*spxout),
       (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
