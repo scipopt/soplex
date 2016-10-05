@@ -158,11 +158,19 @@ static void initConstVecs(
          }
       }
 
+      if( nnzeros > 0)
+      {
+         x = (1.0 / nnzeros);
+      }
+      else
+      {
+         /* all-0 entries, so assume row is already scaled (all-1) */
+         sum = (Real) size;
+         x = 1.0 / size;
+      }
+
       veclogs.add(k, sum);
 
-      assert(nnzeros > 0);
-
-      x = (1.0 / nnzeros);
       vecnnzeroes.add(k, x);
 
       /* create new vector for facset */

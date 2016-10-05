@@ -1412,7 +1412,14 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Real>& cset, const NameSet
             mps.entryIgnored("column", mps.field3(), "bound", bndname);
          else
          {
-            val = (mps.field4() == 0) ? 0.0 : atof(mps.field4());
+            if( mps.field4() == 0 )
+               val = 0.0;
+            else if( !strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf") )
+               val = -infinity;
+            else if( !strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf") || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf") )
+               val = infinity;
+            else
+               val = atof(mps.field4());
 
             // ILOG extension (Integer Bound)
             if( mps.field1()[1] == 'I' )

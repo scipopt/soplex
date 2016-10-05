@@ -379,6 +379,12 @@ void SPxSolver::init()
       theratiotester->setDelta(leavetol());
    }
 
+   // catch pathological case for LPs with zero constraints
+   if( dim() == 0 )
+   {
+      factorized = true;
+   }
+
    // we better factorize explicitly before solving
    if( !factorized )
    {

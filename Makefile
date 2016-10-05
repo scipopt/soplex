@@ -67,9 +67,6 @@ LINKSINFO	=
 MEM		=	2000
 CONTINUE	=	false
 
-# will this be compiled for PARASCIP? (disables output because it uses global variables)
-PARASCIP	=	false
-
 # will this be compiled with the 1.x interface?
 LEGACY		=	false
 
@@ -336,17 +333,6 @@ ARFLAGS		+=	$(USRARFLAGS)
 DFLAGS		+=	$(USRDFLAGS)
 
 #-----------------------------------------------------------------------------
-# PARASCIP
-#-----------------------------------------------------------------------------
-
-PARASCIPDEP	:=	$(SRCDIR)/depend.parascip
-PARASCIPSRC	:=	$(shell cat $(PARASCIPDEP))
-
-ifeq ($(PARASCIP),true)
-CPPFLAGS	+=	-DDISABLE_VERBOSITY
-endif
-
-#-----------------------------------------------------------------------------
 # LEGACY
 #-----------------------------------------------------------------------------
 
@@ -460,7 +446,7 @@ endif
 
 .PHONY: all
 all:		makelibfile
-		@-$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 .PHONY: preprocess
 preprocess:	checkdefines
@@ -471,7 +457,7 @@ ifneq ($(SOFTLINKS),)
 				$(MAKE) -j1 $(LINKSMARKERFILE) ; \
 			fi'
 endif
-		@-$(MAKE) touchexternal
+		@$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -484,13 +470,13 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 ifeq ($(SHARED),true)
 $(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		-$(LINKCXX) $(BINOBJFILES) \
+		$(LINKCXX) $(BINOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
 else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
 endif
@@ -498,13 +484,13 @@ endif
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		@echo "-> linking $(EXAMPLEFILE)"
-		-$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
+		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE) \
 		|| ($(MAKE) errorhints && false)
 
 .PHONY: makelibfile
 makelibfile:	preprocess
-		@-$(MAKE) $(LIBFILE)
+		@$(MAKE) $(LIBFILE)
 
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
@@ -631,7 +617,6 @@ depend:
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
 		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
 		@echo `grep -l "SOPLEX_LEGACY" $(ALLSRC)` >$(LEGACYDEP)
-		@echo `grep -l "DISABLE_VERBOSITY" $(ALLSRC)` >$(PARASCIPDEP)
 
 -include	$(DEPEND)
 
@@ -649,7 +634,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -667,13 +652,14 @@ endif
 ifneq ($(EGLIB),$(LAST_EGLIB))
 		@-touch $(EGLIBSRC)
 endif
-ifneq ($(PARASCIP),$(LAST_PARASCIP))
-		@-touch $(PARASCIPSRC)
-endif
 ifneq ($(LEGACY),$(LAST_LEGACY))
 		@-touch $(LEGACYSRC)
 endif
 ifneq ($(SHARED),$(LAST_SHARED))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+ifneq ($(SANITIZE),$(LAST_SANITIZE))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
@@ -696,9 +682,9 @@ endif
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_EGLIB=$(EGLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
 		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
+		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
@@ -775,11 +761,6 @@ endif
 ifneq ($(EGLIB),true)
 ifneq ($(EGLIB),false)
 		$(error invalid EGLIB flag selected: EGLIB=$(EGLIB). Possible options are: true false)
-endif
-endif
-ifneq ($(PARASCIP),true)
-ifneq ($(PARASCIP),false)
-		$(error invalid PARASCIP flag selected: PARASCIP=$(PARASCIP). Possible options are: true false)
 endif
 endif
 ifneq ($(LEGACY),true)

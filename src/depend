@@ -11,11 +11,13 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h src/spxdefines.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h src/spxgithash.h
@@ -32,11 +34,13 @@ $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/spxdefines.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h
@@ -157,16 +161,17 @@ $(LIBOBJDIR)/solverational.o: src/solverational.cpp src/soplex.h src/spxdefines.
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h src/statistics.h \
- src/slufactor_rational.h src/slinsolver_rational.h \
- src/clufactor_rational.h src/ratrecon.h
+ src/ratrecon.h
 $(LIBOBJDIR)/solvereal.o: src/solvereal.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -180,11 +185,13 @@ $(LIBOBJDIR)/solvereal.o: src/solvereal.cpp src/soplex.h src/spxdefines.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h src/statistics.h
@@ -201,11 +208,13 @@ $(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h src/spxdefines.h src/basevect
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h src/spxgithash.h \
@@ -570,11 +579,13 @@ $(LIBOBJDIR)/spxsolver.o: src/spxsolver.cpp src/spxdefines.h src/soplex.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h
@@ -710,11 +721,13 @@ $(LIBOBJDIR)/statistics.o: src/statistics.cpp src/statistics.h src/soplex.h \
  src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
  src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
  src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h src/spxsimplifier.h \
- src/spxmainsm.h src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h \
- src/spxgeometsc.h src/spxstarter.h src/spxweightst.h src/spxsumst.h \
- src/spxvectorst.h src/spxpricer.h src/sorter.h src/spxautopr.h \
- src/spxdevexpr.h src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
+ src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
+ src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
+ src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
  src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
  src/spxboundflippingrt.h src/sol.h src/solbase.h
