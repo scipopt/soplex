@@ -3786,8 +3786,6 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    m_result     = OKAY;
    bool   again = true;
-   int numRangedRows = 0;
-   int numBoxedCols = 0;
 
    if(m_hist.size() > 0)
    {
@@ -3816,22 +3814,23 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    m_feastol = ftol;
    m_opttol = otol;
 
-   for(int i = 0; i < lp.nRows(); ++i)
-   {
-      if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
-         ++numRangedRows;
-   }
 
-   for(int j = 0; j < lp.nCols(); ++j)
-   {
-      if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
-         ++numBoxedCols;
-   }
+   MSG_INFO2( (*spxout),
+      int numRangedRows = 0;
+      int numBoxedCols = 0;
 
-   MSG_INFO2( (*spxout), (*spxout) << "LP has "
-                     << numRangedRows << " ranged rows, "
-                     << numBoxedCols << " boxed columns"
-                     << std::endl; )
+      for(int i = 0; i < lp.nRows(); ++i)
+         if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+            ++numRangedRows;
+      for(int j = 0; j < lp.nCols(); ++j)
+         if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+            ++numBoxedCols;
+
+      (*spxout) << "LP has "
+                << numRangedRows << " ranged rows, "
+                << numBoxedCols << " boxed columns"
+                << std::endl;
+   )
 
    m_stat.reSize(15);
 
@@ -3925,22 +3924,23 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << lp.nNzos() << " nonzeros"
                      << std::endl; )
 
-   // reset counter
-   numRangedRows = 0;
-   numBoxedCols  = 0;
+   MSG_INFO2( (*spxout),
+      int numRangedRows = 0;
+      int numBoxedCols  = 0;
 
-   for(int i = 0; i < lp.nRows(); ++i)
-      if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
-         ++numRangedRows;
+      for(int i = 0; i < lp.nRows(); ++i)
+         if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+            ++numRangedRows;
 
-   for(int j = 0; j < lp.nCols(); ++j)
-      if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
-         ++numBoxedCols;
+      for(int j = 0; j < lp.nCols(); ++j)
+         if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+            ++numBoxedCols;
 
-   MSG_INFO2( (*spxout), (*spxout) << "Reduced LP has "
-                     << numRangedRows << " ranged rows, "
-                     << numBoxedCols << " boxed columns"
-                     << std::endl; )
+      (*spxout) << "Reduced LP has "
+                << numRangedRows << " ranged rows, "
+                << numBoxedCols << " boxed columns"
+                << std::endl;
+   )
 
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {

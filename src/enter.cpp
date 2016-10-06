@@ -1225,9 +1225,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
             enterPric = (*theCoPvec)[number(SPxColId(enterId))];
          else
             enterPric = (*thePvec)[number(SPxRowId(enterId))];
-         MSG_INFO3( (*spxout), (*spxout) << "IEBFRT02 "
-         << "breakpoints passed / bounds flipped = " << boundflips
-         << std::endl; )
+         MSG_DEBUG( std::cout << "IEBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
          totalboundflips += boundflips;
       }
 
