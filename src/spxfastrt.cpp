@@ -965,15 +965,9 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
    {
       // decide whether the chosen leave index contributes to the polishing objective
       if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK && thesolver->baseId(leave).isSPxRowId() )
-      {
-         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a col to leave the basis" << std::endl; )
-            return -1;
-      }
+         return -1;
       else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK && thesolver->baseId(leave).isSPxColId() )
-      {
-         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a row to leave the basis" << std::endl; )
-            return -1;
-      }
+         return -1;
    }
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())

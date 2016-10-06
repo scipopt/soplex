@@ -1045,7 +1045,7 @@ void SPxSolver::performSolutionPolishing()
                if( EQrel((*theCoPvec)[i], 0) &&
                    (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
                {
-                  MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat; )
+                  MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
                   polishId = coId(i);
                   success = enter(polishId, true);
                   clearUpdateVecs();
@@ -1053,11 +1053,12 @@ void SPxSolver::performSolutionPolishing()
                   assert(EQ(shift(), 0));
                   if( success )
                   {
-                     MSG_INFO3( (*spxout), (*spxout) << " -> success!" << std::endl; )
+                     MSG_DEBUG( std::cout << " -> success!"; )
                      ++nSuccessfulPivots;
                      if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
                         stop = true;
                   }
+                  MSG_DEBUG( std::cout << std::endl; )
                }
             }
          }
@@ -1085,18 +1086,19 @@ void SPxSolver::performSolutionPolishing()
                      (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
                {
                   polishId = id(i);
-                  MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat; )
+                  MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
                   success = enter(polishId, true);
                   clearUpdateVecs();
                   assert(EQrel(objVal, value(), leavetol()));
                   assert(EQ(shift(), 0));
                   if( success )
                   {
-                     MSG_INFO3( (*spxout), (*spxout) << " -> success!" << std::endl; )
+                     MSG_DEBUG( std::cout << " -> success!"; )
                         ++nSuccessfulPivots;
                      if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
-                        break;
+                        stop = true;
                   }
+                  MSG_DEBUG( std::cout << std::endl; )
                }
             }
          }
