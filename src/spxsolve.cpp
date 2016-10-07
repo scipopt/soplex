@@ -1011,6 +1011,16 @@ void SPxSolver::performSolutionPolishing()
    if( polishObj == SolutionPolish::OFF || rep() == ROW || status() != OPTIMAL )
       return;
 
+   // treat all variables as integer variables if the information was not provided
+   if( integerVariables.size() != nCols() )
+   {
+      integerVariables.reSize(nCols());
+      for( int i = 0; i < nCols(); ++i )
+      {
+         integerVariables[i] = 1;
+      }
+   }
+
    // the current objective value must not be changed
 #ifndef NDEBUG
    Real objVal = value();
@@ -1037,7 +1047,6 @@ void SPxSolver::performSolutionPolishing()
          // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
          for( int i = 0; i < dim(); ++i )
          {
-            // only look for rows, i.e. slacks
             stat = ds.coStatus(i);
             if( !isBasic(stat) )
             {
@@ -1047,6 +1056,34 @@ void SPxSolver::performSolutionPolishing()
                {
                   MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
                   polishId = coId(i);
+                  success = enter(polishId, true);
+                  clearUpdateVecs();
+                  assert(EQrel(objVal, value(), entertol()));
+                  assert(EQ(shift(), 0));
+                  if( success )
+                  {
+                     MSG_DEBUG( std::cout << " -> success!"; )
+                     ++nSuccessfulPivots;
+                     if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                        stop = true;
+                  }
+                  MSG_DEBUG( std::cout << std::endl; )
+               }
+            }
+         }
+         // identify nonbasic variables that may be moved into the basis
+         for( int i = 0; i < coDim(); ++i )
+         {
+            stat = ds.status(i);
+            if( !isBasic(stat) )
+            {
+               // only consider continuos variables with zero dual multiplier to preserve optimality
+               if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
+                   integerVariables[i] == 0 &&
+                   (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
+               {
+                  MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
+                  polishId = id(i);
                   success = enter(polishId, true);
                   clearUpdateVecs();
                   assert(EQrel(objVal, value(), entertol()));

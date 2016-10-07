@@ -963,11 +963,20 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
 
    if( polish && leave >= 0 )
    {
+      SPxId leaveId = thesolver->baseId(leave);
       // decide whether the chosen leave index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK && thesolver->baseId(leave).isSPxRowId() )
-         return -1;
-      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK && thesolver->baseId(leave).isSPxColId() )
-         return -1;
+      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
+      {
+         if( leaveId.isSPxRowId() )
+            return -1;
+         else if( leaveId.isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 0 )
+            return -1;
+      }
+      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
+      {
+         if( thesolver->baseId(leave).isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 1 )
+            return -1;
+      }
    }
 
    if (leave >= 0 || minStab > 2*solver()->epsilon())
