@@ -1152,8 +1152,7 @@ private:
       DUPLICATE_ROW        = 12,
       FIX_DUPLICATE_COL    = 13,
       SUB_DUPLICATE_COL    = 14,
-      MULTI_AGG            = 15,
-      TIGHTENVARBOUND      = 16
+      MULTI_AGG            = 15
    };
    //@}
 
@@ -1292,11 +1291,13 @@ public:
       , m_epsilon(DEFAULT_EPS_ZERO)
       , m_feastol(DEFAULT_BND_VIOL)
       , m_opttol(DEFAULT_BND_VIOL)
-      , m_stat(17)
+      , m_stat(16)
       , m_thesense(SPxLP::MAXIMIZE)
       , m_keepbounds(false)
       , m_addedcols(0)
       , m_result(OKAY)
+      , m_cutoffbound(-infinity)
+      , m_pseudoobj(-infinity)
    {}
    /// copy constructor.
    SPxMainSM(const SPxMainSM& old)
@@ -1318,6 +1319,8 @@ public:
       , m_keepbounds(old.m_keepbounds)
       , m_addedcols(old.m_addedcols)
       , m_result(old.m_result)
+      , m_cutoffbound(old.m_cutoffbound)
+      , m_pseudoobj(old.m_pseudoobj)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);
@@ -1351,6 +1354,9 @@ public:
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
          m_addedcols = rhs.m_addedcols;
+         m_result = rhs.m_result;
+         m_cutoffbound = rhs.m_cutoffbound;
+         m_pseudoobj = rhs.m_pseudoobj;
 
          // delete pointers in m_hist
          for(int k = 0; k < m_hist.size(); ++k)
