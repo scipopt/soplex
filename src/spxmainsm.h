@@ -1030,6 +1030,92 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves multi aggregation.
+      @ingroup Algo
+   */
+   class MultiAggregationPS : public PostStep
+   {
+   private:
+      const int  m_j;
+      const int  m_i;
+      const int  m_old_j;
+      const int  m_old_i;
+      const Real m_upper;
+      const Real m_lower;
+      const Real m_obj;
+      const Real m_const;
+      const bool m_onLhs;
+      const bool m_eqCons;
+      DSVector   m_row;
+      DSVector   m_col;
+
+   public:
+      ///
+      MultiAggregationPS(const SPxLP& lp, SPxMainSM& simplifier, int _i, int _j, Real constant)
+         : PostStep("MultiAggregation", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_i(_i)
+         , m_old_j(lp.nCols()-1)
+         , m_old_i(lp.nRows()-1)
+         , m_upper(lp.upper(_j))
+         , m_lower(lp.lower(_j))
+         , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
+         , m_const(constant)
+         , m_onLhs(EQ(constant, lp.lhs(_i)))
+         , m_eqCons(EQ(lp.lhs(_i), lp.rhs(_i)))
+         , m_row(lp.rowVector(_i))
+         , m_col(lp.colVector(_j))
+      {
+         assert(m_row[m_j] != 0.0);
+         simplifier.addObjoffset(m_obj*m_const/m_row[m_j]);
+#if 0
+         printf("%d: ", m_j);
+         for(int i = 0; i < m_row.size(); i++)
+            printf("(%d,%f) ", m_row.index(i), m_row.value(i));
+         printf("Const: %f", m_const);
+         printf("\n");
+#endif
+      }
+      /// copy constructor
+      MultiAggregationPS(const MultiAggregationPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_i(old.m_i)
+         , m_old_j(old.m_old_j)
+         , m_old_i(old.m_old_i)
+         , m_upper(old.m_upper)
+         , m_lower(old.m_lower)
+         , m_obj(old.m_obj)
+         , m_const(old.m_const)
+         , m_onLhs(old.m_onLhs)
+         , m_eqCons(old.m_eqCons)
+         , m_row(old.m_row)
+         , m_col(old.m_col)
+      {}
+      /// assignment operator
+      MultiAggregationPS& operator=( const MultiAggregationPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_row = rhs.m_row;
+            m_col = rhs.m_col;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         MultiAggregationPS* MultiAggregationPSptr = 0;
+         spx_alloc(MultiAggregationPSptr);
+         return new (MultiAggregationPSptr) MultiAggregationPS(*this);
+      }
+      ///
+      virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+   };
+
    // friends
    friend class FreeConstraintPS;
    friend class EmptyConstraintPS;
@@ -1065,7 +1151,8 @@ private:
       WEAKLY_DOMINATED_COL = 11,
       DUPLICATE_ROW        = 12,
       FIX_DUPLICATE_COL    = 13,
-      SUB_DUPLICATE_COL    = 14
+      SUB_DUPLICATE_COL    = 14,
+      MULTI_AGG            = 15
    };
    //@}
 
@@ -1095,6 +1182,9 @@ private:
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
    int                             m_addedcols;  ///< columns added by handleRowObjectives()
    Result                          m_result;     ///< result of the simplification.
+
+   Real                            m_cutoffbound;  ///< the cutoff bound that is found by heuristics
+   Real                            m_pseudoobj;    ///< the pseudo objective function value
    //@}
 
 private:
@@ -1106,6 +1196,22 @@ private:
 
    /// handles extreme values by setting them to zero or infinity.
    void handleExtremes(SPxLP& lp);
+
+   /// computes the minimum and maximum residual activity for a given row and column. If colNumber is set to -1, then
+   //  the activity of the row is returned.
+   void computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct, Real& maxAct);
+
+   /// calculate min/max value for the multi aggregated variables
+   void computeMinMaxValues(SPxLP& lp, Real side, Real val, Real minRes, Real maxRes, Real& minVal, Real& maxVal);
+
+   /// tries to find good lower bound solutions by applying some trivial heuristics
+   void trivialHeuristic(SPxLP& lp);
+
+   /// checks a solution for feasibility
+   bool checkSolution(SPxLP& lp, DVector sol);
+
+   /// tightens variable bounds by propagating the pseudo objective function value.
+   void propagatePseudoobj(SPxLP& lp);
 
    /// removed empty rows and empty columns.
    Result removeEmpty(SPxLP& lp);
@@ -1121,6 +1227,9 @@ private:
 
    /// performs simplification steps on the LP based on dual concepts.
    Result simplifyDual(SPxLP& lp, bool& again);
+
+   /// performs multi-aggregations of variable based upon constraint activitu.
+   Result multiaggregation(SPxLP& lp, bool& again);
 
    /// removes duplicate rows.
    Result duplicateRows(SPxLP& lp, bool& again);
@@ -1182,11 +1291,13 @@ public:
       , m_epsilon(DEFAULT_EPS_ZERO)
       , m_feastol(DEFAULT_BND_VIOL)
       , m_opttol(DEFAULT_BND_VIOL)
-      , m_stat(15)
+      , m_stat(16)
       , m_thesense(SPxLP::MAXIMIZE)
       , m_keepbounds(false)
       , m_addedcols(0)
       , m_result(OKAY)
+      , m_cutoffbound(-infinity)
+      , m_pseudoobj(-infinity)
    {}
    /// copy constructor.
    SPxMainSM(const SPxMainSM& old)
@@ -1208,6 +1319,8 @@ public:
       , m_keepbounds(old.m_keepbounds)
       , m_addedcols(old.m_addedcols)
       , m_result(old.m_result)
+      , m_cutoffbound(old.m_cutoffbound)
+      , m_pseudoobj(old.m_pseudoobj)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);
@@ -1241,6 +1354,9 @@ public:
          m_thesense = rhs.m_thesense;
          m_keepbounds = rhs.m_keepbounds;
          m_addedcols = rhs.m_addedcols;
+         m_result = rhs.m_result;
+         m_cutoffbound = rhs.m_cutoffbound;
+         m_pseudoobj = rhs.m_pseudoobj;
 
          // delete pointers in m_hist
          for(int k = 0; k < m_hist.size(); ++k)
