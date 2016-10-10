@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -165,6 +165,7 @@ SPxSolver::Status SPxSolver::solve()
    leaveCount = 0;
    enterCount = 0;
    primalCount = 0;
+   polishCount = 0;
    boundflips = 0;
    totalboundflips = 0;
    enterCycles = 0;
@@ -187,6 +188,9 @@ SPxSolver::Status SPxSolver::solve()
       solveVector3 = 0;
       coSolveVector2 = 0;
       coSolveVector3 = 0;
+
+      updateViols.clear();
+      updateViolsCo.clear();
 
       try
       {
@@ -243,9 +247,7 @@ SPxSolver::Status SPxSolver::solve()
                   that this is due to the scaling of the test values. Thus, we use
                   instableEnterId and SPxFastRT::selectEnter shall accept even an instable
                   leaving variable. */
-               MSG_INFO3( (*spxout),
-                  (*spxout) << " --- trying instable enter iteration" << std::endl;
-                  )
+               MSG_INFO3( (*spxout), (*spxout) << " --- trying instable enter iteration" << std::endl; )
 
                enterId = instableEnterId;
                instableEnter = true;
@@ -346,7 +348,7 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // We have an iterationlimit and everything looks good? Then stop!
                   // 6 is just a number picked.
-                  else if (maxIters > 0 && lastUpdate() < 6)
+                  else if (!(instableEnterId.isValid()) && maxIters > 0 && lastUpdate() < 6)
                   {
                      priced = true;
                      break;
@@ -404,7 +406,7 @@ SPxSolver::Status SPxSolver::solve()
              */
             if( lastEntered().isValid() )
                enterCycleCount = 0;
-            else
+            else if( basis().status() != SPxBasis::INFEASIBLE )
             {
                enterCycleCount++;
                if( enterCycleCount > MAXCYCLES )
@@ -426,7 +428,7 @@ SPxSolver::Status SPxSolver::solve()
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-            if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
+            if( (iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasis::INFEASIBLE )
             {
                if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
@@ -622,7 +624,7 @@ SPxSolver::Status SPxSolver::solve()
                   }
                   // We have an iteration limit and everything looks good? Then stop!
                   // 6 is just a number picked.
-                  else if (maxIters > 0 && lastUpdate() < 6)
+                  else if (instableLeaveNum == -1 && maxIters > 0 && lastUpdate() < 6)
                   {
                      priced = true;
                      break;
@@ -680,7 +682,7 @@ SPxSolver::Status SPxSolver::solve()
              */
             if( lastIndex() >= 0 )
                leaveCycleCount = 0;
-            else
+            else if( basis().status() != SPxBasis::INFEASIBLE)
             {
                leaveCycleCount++;
                if( leaveCycleCount > MAXCYCLES )
@@ -701,7 +703,7 @@ SPxSolver::Status SPxSolver::solve()
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-            if( (iteration() - stallRefIter) % MAXSTALLS == 0 )
+            if( (iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasis::INFEASIBLE )
             {
                if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                {
@@ -1004,8 +1006,115 @@ SPxSolver::Status SPxSolver::solve()
      : leaveCount;
 
    printDisplayLine(true);
+   performSolutionPolishing();
+
    return status();
 }
+
+void SPxSolver::performSolutionPolishing()
+{
+   // only run in column representation at an optimal basis
+   if( polishObj == SolutionPolish::OFF || rep() == ROW || status() != OPTIMAL )
+      return;
+
+   // the current objective value must not be changed
+#ifndef NDEBUG
+   Real objVal = value();
+#endif
+
+   int nSuccessfulPivots = 0;
+   const SPxBasis::Desc& ds = desc();
+   SPxBasis::Desc::Status stat;
+   SPxId polishId;
+   bool success;
+   polishCount = 0;
+
+   MSG_INFO2( (*spxout),
+      (*spxout) << " --- perform solution polishing" << std::endl; )
+
+   setType(ENTER); // use primal simplex to preserve feasibility
+   init();
+   theratiotester->setType(type());
+   if( polishObj == SolutionPolish::MAXBASICSLACK )
+   {
+      // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
+      for( int i = 0; i < dim(); ++i )
+      {
+         // only look for rows, i.e. slacks
+         stat = ds.coStatus(i);
+         if( !isBasic(stat) )
+         {
+            // only consider rows with zero dual multiplier to preserve optimality
+            if( EQrel((*theCoPvec)[i], 0) &&
+                (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
+            {
+               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat << std::endl; )
+               polishId = coId(i);
+               success = enter(polishId, true);
+               if( success )
+               {
+                  MSG_INFO3( (*spxout), (*spxout) << "success!" << std::endl; )
+                  ++nSuccessfulPivots;
+               }
+               clearUpdateVecs();
+               assert(EQrel(objVal, value(), entertol()));
+               assert(EQ(shift(), 0));
+            }
+         }
+      }
+   }
+   else
+   {
+      assert(polishObj == SolutionPolish::MINBASICSLACK);
+      // identify nonbasic variables, i.e. columns, that may be moved into the basis
+      for( int i = 0; i < coDim(); ++i )
+      {
+         // only look for columns, i.e. variables
+         stat = ds.status(i);
+         if( !isBasic(stat) )
+         {
+            // only consider variables with zero reduced costs to preserve optimality
+            if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
+                (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
+            {
+               polishId = id(i);
+               MSG_INFO3( (*spxout), (*spxout) << "try pivoting: " << polishId << " stat: " << stat << std::endl; )
+               success = enter(polishId, true);
+               if( success )
+               {
+                  MSG_INFO3( (*spxout), (*spxout) << "success!" << std::endl; )
+                  ++nSuccessfulPivots;
+               }
+               clearUpdateVecs();
+               assert(EQrel(objVal, value(), leavetol()));
+               assert(EQ(shift(), 0));
+            }
+         }
+      }
+   }
+
+#ifdef ENABLE_ADDITIONAL_CHECKS
+   int previousIters = iterations();
+   Real tolerance = entertol();
+
+   if( !precisionReached(tolerance) )
+   {
+      MSG_INFO3( (*spxout),
+         (*spxout) << " --- perform clean up step" << std::endl; )
+      solve();
+   }
+
+   // sum up polish pivots and additional iterations from clean up step
+   polishCount += iterations() - previousIters;
+#endif
+   polishCount += nSuccessfulPivots;
+
+   MSG_INFO1( (*spxout),
+      (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
+
+   setStatus(SPxStatus::OPTIMAL);
+}
+
 
 void SPxSolver::testVecs()
 {
@@ -1084,7 +1193,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
    MSG_INFO1( (*spxout),
       if( forceHead || displayLine % (displayFreq*30) == 0 )
       {
-         (*spxout) << "type |   time |   iters | facts |  shift   |    value\n";
+         (*spxout) << "type |   time |   iters | facts |  shift   |violation |    value\n";
       }
       if( (force || (displayLine % displayFreq == 0)) && !forceHead )
       {
@@ -1094,6 +1203,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          (*spxout) << std::setw(8) << iteration() << " | "
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
+         << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
          << std::setprecision(8) << value() + objOffset();
          if( getStartingIdsBasis && rep() == SPxSolver::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
@@ -1197,10 +1307,10 @@ bool SPxSolver::terminate()
       // It might be even possible to use this termination value in case of
       // bound violations (shifting) but in this case it is quite difficult
       // to determine if we already reached the limit.
-      if( shift() < epsilon() && maxInfeas() + shift() <= opttol() )
+      if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         if( spxSense() * value() <= spxSense() * objLimit ) 
+         if( spxSense() * (value() + objOffset()) <= spxSense() * objLimit )
          {
             MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )
@@ -1212,7 +1322,7 @@ bool SPxSolver::terminate()
                       << ", rep: " << int(rep())
                       << ", type: " << int(type()) << ")" << std::endl;
             )
-            
+
             m_status = ABORT_VALUE;
             return true;
          }

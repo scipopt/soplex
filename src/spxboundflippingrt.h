@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -98,12 +98,13 @@ private:
    /**@name Data
     */
    //@{
-   bool                  enableLongsteps;    /**< enable or disable long steps (bound flips) */
+   bool                  enableBoundFlips;   /**< enable or disable long steps in BoundFlippingRT */
+   bool                  enableRowBoundFlips;/**< enable bound flips also for row representation */
    Real                  flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
    int                   relax_count;        /**< count rounds of ratio test */
    DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
    SSVector              updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
-   DVector               updPrimVec;         /**< allocation of memory for additional solution vector */
+   SSVector              updPrimVec;         /**< allocation of memory for additional solution vector */
    //@}
 
    /** store all available pivots/breakpoints in an array (positive pivot search direction) */
@@ -178,20 +179,14 @@ private:
 
 public:
 
-   void setLongsteps(
-      bool               ls
-      )
-   {
-      enableLongsteps = ls;
-   }
-
    //-------------------------------------
    /**@name Construction / destruction */
    //@{
    /// default constructor
    SPxBoundFlippingRT()
       : SPxFastRT("Bound Flipping")
-      , enableLongsteps(true)
+      , enableBoundFlips(true)
+      , enableRowBoundFlips(false)
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
@@ -201,7 +196,8 @@ public:
    /// copy constructor
    SPxBoundFlippingRT(const SPxBoundFlippingRT& old)
       : SPxFastRT(old)
-      , enableLongsteps(true)
+      , enableBoundFlips(old.enableBoundFlips)
+      , enableRowBoundFlips(old.enableRowBoundFlips)
       , flipPotential(1)
       , relax_count(0)
       , breakpoints(10)
@@ -215,6 +211,10 @@ public:
       {
          SPxFastRT::operator=(rhs);
       }
+
+      enableBoundFlips = rhs.enableBoundFlips;
+      enableRowBoundFlips = rhs.enableRowBoundFlips;
+      flipPotential = rhs.flipPotential;
 
       return *this;
    }
@@ -234,7 +234,8 @@ public:
    ///
    virtual int selectLeave(
       Real&              val,
-      Real               enterTest
+      Real               enterTest,
+      bool               polish = false
       );
    ///
    virtual SPxId selectEnter(
@@ -242,6 +243,15 @@ public:
       int                leaveIdx
       );
 
+   void useBoundFlips(bool bf)
+   {
+      enableBoundFlips = bf;
+   }
+
+   void useBoundFlipsRow(bool bf)
+   {
+      enableRowBoundFlips = bf;
+   }
    //@}
 };
 

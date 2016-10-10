@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -26,14 +26,15 @@ namespace soplex
    /// default constructor
    SoPlex::Statistics::Statistics(Timer::TYPE ttype)
    {
-      readingTime = TimerFactory::createTimer(ttype);
-      solvingTime = TimerFactory::createTimer(ttype);
-      preprocessingTime = TimerFactory::createTimer(ttype);
-      simplexTime = TimerFactory::createTimer(ttype);
-      syncTime = TimerFactory::createTimer(ttype);
-      transformTime = TimerFactory::createTimer(ttype);
-      rationalTime = TimerFactory::createTimer(ttype);
-      reconstructionTime = TimerFactory::createTimer(ttype);
+      timerType = ttype;
+      readingTime = TimerFactory::createTimer(timerType);
+      solvingTime = TimerFactory::createTimer(timerType);
+      preprocessingTime = TimerFactory::createTimer(timerType);
+      simplexTime = TimerFactory::createTimer(timerType);
+      syncTime = TimerFactory::createTimer(timerType);
+      transformTime = TimerFactory::createTimer(timerType);
+      rationalTime = TimerFactory::createTimer(timerType);
+      reconstructionTime = TimerFactory::createTimer(timerType);
       clearAllData();
    }
 
@@ -109,6 +110,7 @@ namespace soplex
       iterations = 0;
       iterationsPrimal = 0;
       iterationsFromBasis = 0;
+      iterationsPolish = 0;
       boundflips = 0;
       luFactorizationsReal = 0;
       luSolvesReal = 0;
@@ -191,10 +193,11 @@ namespace soplex
       os << "\n  Primal            : " << iterationsPrimal;
       if( iterations > 0 )
          os << " (" << 100*double(iterationsPrimal)/double(iterations) << "%)";
-      os << "\n  Dual              : " << iterations - iterationsPrimal;
+      os << "\n  Dual              : " << iterations - iterationsPrimal - iterationsPolish;
       if( iterations > 0 )
          os << " (" << 100*double((iterations - iterationsPrimal))/double(iterations) << "%)";
       os << "\n  Bound flips       : " << boundflips;
+      os << "\n  Sol. polishing    : " << iterationsPolish;
 
       os << "\nLU factorizations   : " << luFactorizationsReal << "\n"
          << "  Factor. frequency : ";

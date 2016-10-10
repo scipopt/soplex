@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -42,7 +42,7 @@ void SPxSolver::qualConstraintViolation(Real& maxviol, Real& sumviol) const
 
       Real viol = 0.0;
 
-      assert(lhs( row ) <= rhs( row ));
+      assert(lhs( row ) <= rhs( row ) + epsilon());
 
       if (val < lhs( row )) 
          viol = spxAbs(val - lhs( row ));
@@ -69,7 +69,7 @@ void SPxSolver::qualBoundViolation(
 
    for( int col = 0; col < nCols(); ++col )
    {
-      assert( lower( col ) <= upper( col ));
+      assert(lower( col ) <= upper( col ) + epsilon());
 
       Real viol = 0.0;
 

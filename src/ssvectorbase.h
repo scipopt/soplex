@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -49,8 +49,6 @@ private:
 
    friend class DVectorBase<R>;
    friend class VectorBase<R>;
-   template < class S > friend class DVectorBase;
-   template < class S > friend class VectorBase;
    template < class S > friend class DSVectorBase;
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -421,27 +419,39 @@ public:
       setup();
 
       R x = R(0);
-      int i = 0;
-      int j = 0;
-      int vi = index(i);
-      int wj = w.index(j);
-      int n = size();
-      int m = w.size();
+      int i = size() - 1;
+      int j = w.size() - 1;
 
-      while( i < n && j < m )
+      // both *this and w non-zero vectors?
+      if( i >= 0 && j >= 0 )
       {
-         if( vi == wj )
+         int vi = index(i);
+         int wj = w.index(j);
+
+         while( i != 0 && j != 0 )
          {
-            x += VectorBase<R>::val[vi] * R(w.val[wj]);
-            ++i;
-            ++j;
-            vi = index(i);
-            wj = w.index(j);
+            if( vi == wj )
+            {
+               x += VectorBase<R>::val[vi] * R(w.val[wj]);
+               vi = index(--i);
+               wj = w.index(--j);
+            }
+            else if( vi > wj )
+               vi = index(--i);
+            else
+               wj = w.index(--j);
          }
-         else if( vi < wj )
-            vi = index(++i);
-         else
-            wj = w.index(++j);
+
+         /* check remaining indices */
+
+         while( i != 0 && vi != wj )
+            vi = index(--i);
+
+         while( j != 0 && vi != wj )
+            wj = w.index(--j);
+
+         if( vi == wj )
+            x += VectorBase<R>::val[vi] * R(w.val[wj]);
       }
 
       return x;
@@ -466,6 +476,10 @@ public:
 
       return *this;
    }
+
+   /// Assigns pair wise vector product to SSVectorBase.
+   template < class S, class T >
+   SSVectorBase<R>& assignPWproduct4setup(const SSVectorBase<S>& x, const SSVectorBase<T>& y);
 
    /// Assigns \f$x^T \cdot A\f$ to SSVectorBase.
    template < class S, class T >

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -41,6 +41,10 @@ void SPxSolver::computeFtest()
    assert(type() == LEAVE);
 
    Real theeps = entertol();
+   m_pricingViolUpToDate = true;
+   m_pricingViolCoUpToDate = true;
+   m_pricingViol = 0;
+   m_pricingViolCo = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * dim());
@@ -55,6 +59,7 @@ void SPxSolver::computeFtest()
       {
          if( theCoTest[i] < -theeps )
          {
+            m_pricingViol -= theCoTest[i];
             infeasibilities.addIdx(i);
             isInfeasible[i] = SPxPricer::VIOLATED;
             ++ninfeasibilities;
@@ -70,6 +75,8 @@ void SPxSolver::computeFtest()
             ninfeasibilities = 0;
          }
       }
+      else if( theCoTest[i] < -theeps )
+            m_pricingViol -= theCoTest[i];
    }
 
    if( ninfeasibilities == 0 && !sparsePricingLeave )
@@ -108,12 +115,19 @@ void SPxSolver::updateFtest()
    {
       int i = idx.index(j);
 
+      if( m_pricingViolUpToDate && ftest[i] < -theeps )
+         m_pricingViol += ftest[i];
+
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
          ? theUBbound[i] - (*theFvec)[i]
          : (*theFvec)[i] - theLBbound[i];
+
+
       if( sparsePricingLeave && ftest[i] < -theeps )
       {
          assert(remainingRoundsLeave == 0);
+         if( m_pricingViolUpToDate )
+            m_pricingViol -= ftest[i];
          if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
          {
             // this can cause problems - we cannot keep on adding indeces to infeasibilities,
@@ -125,25 +139,38 @@ void SPxSolver::updateFtest()
          if( hyperPricingLeave )
             updateViols.addIdx(i);
       }
+      else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+         m_pricingViol -= ftest[i];
+
    }
    // if boundflips were performed, we need to update these indices as well
    if( boundflips > 0 )
    {
       Real eps = epsilon();
-      for( int i = 0; i < solveVector3->dim(); ++i )
+      for( int j = 0; j < solveVector3->size(); ++j )
       {
-         if( (*solveVector3)[i] > eps || (*solveVector3)[i] < -eps )
+         if( spxAbs(solveVector3->value(j)) > eps )
          {
+            int i = solveVector3->index(j);
+
+            if( m_pricingViolUpToDate && ftest[i] < -theeps )
+               m_pricingViol += ftest[i];
+
             ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
+
             if( sparsePricingLeave && ftest[i] < -theeps )
             {
                assert(remainingRoundsLeave == 0);
+               if( m_pricingViolUpToDate )
+                  m_pricingViol -= ftest[i];
                if( !isInfeasible[i] )
                {
                   infeasibilities.addIdx(i);
                   isInfeasible[i] = true;
                }
             }
+            else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+               m_pricingViol -= ftest[i];
          }
       }
    }
@@ -592,6 +619,28 @@ void SPxSolver::rejectLeave(
 }
 
 
+void SPxSolver::computePrimalray4Row(Real direction)
+{
+   Real sign = (direction > 0 ? 1.0 : -1.0);
+
+   primalRay.clear();
+   primalRay.setMax(coPvec().delta().size());
+
+   for( int i = 0; i < coPvec().delta().size(); ++i )
+      primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+}
+
+void SPxSolver::computeDualfarkas4Col(Real direction)
+{
+   Real sign = (direction > 0 ? -1.0 : 1.0);
+
+   dualFarkas.clear();
+   dualFarkas.setMax(coPvec().delta().size());
+
+   for( int i = 0; i < coPvec().delta().size(); ++i )
+      dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
+}
+
 bool SPxSolver::leave(int leaveIdx)
 {
    assert(leaveIdx < dim() && leaveIdx >= 0);
@@ -604,6 +653,7 @@ bool SPxSolver::leave(int leaveIdx)
    /*
        Before performing the actual basis update, we must determine, how this
        is to be accomplished.
+       When using steepest edge pricing this solve is already performed by the pricer
     */
    if (theCoPvec->delta().isSetup() && theCoPvec->delta().size() == 0)
    {
@@ -657,7 +707,7 @@ bool SPxSolver::leave(int leaveIdx)
    boundflips = 0;
    Real oldShift = theShift;
    SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
-   if (theShift != oldShift)
+   if (NE(theShift, oldShift))
    {
       MSG_DEBUG( std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest" << std::endl; )
       forceRecompNonbasicValue();
@@ -681,7 +731,7 @@ bool SPxSolver::leave(int leaveIdx)
       change(-1, none, 0);
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if (enterVal != leaveMax)
+      if (NE(enterVal, leaveMax))
       {
          MSG_DEBUG( std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
                            << ", theCoTest=" << theCoTest[leaveIdx] << ")"
@@ -698,14 +748,14 @@ bool SPxSolver::leave(int leaveIdx)
 
             enterVal != leaveMax is the case that selectEnter has found only an instable entering
             variable. We store this leaving variable for later -- if we are not already in the
-            instable case: then we continue and conclude unboundness/infeasiblity */
+            instable case: then we continue and conclude unboundedness/infeasibility */
          if (!instable)
          {
             instableLeaveNum = leaveIdx;
 
             // Note: These changes do not survive a refactorization
             instableLeaveVal = theCoTest[leaveIdx];
-            theCoTest[leaveIdx] = 0.0;
+            theCoTest[leaveIdx] = instableLeaveVal / 10.0;
 
             return true;
          }
@@ -723,22 +773,28 @@ bool SPxSolver::leave(int leaveIdx)
          return true;
       }
 
-      MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundness/infeasiblity found "
+      /* do not exit with status infeasible or unbounded if there is only a very small violation */
+      if (spxAbs(enterVal) < leavetol())
+      {
+         MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
+
+         computeFrhs();
+         SPxBasis::solve(*theFvec, *theFrhs);
+         computeFtest();
+
+         return true;
+      }
+      MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
                            << "in leave()" << std::endl; )
 
       if (rep() != COLUMN)
+      {
+         computePrimalray4Row(enterVal);
          setBasisStatus(SPxBasis::UNBOUNDED);
+      }
       else
       {
-         int sign;
-         int i;
-
-         dualFarkas.clear();
-         dualFarkas.setMax(coPvec().delta().size());
-         sign = (enterVal > 0 ? -1 : +1);
-         for( i = 0; i < coPvec().delta().size(); ++i )
-            dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
-
+         computeDualfarkas4Col(enterVal);
          setBasisStatus(SPxBasis::INFEASIBLE);
       }
       return false;
@@ -752,7 +808,6 @@ bool SPxSolver::leave(int leaveIdx)
       if (enterId != baseId(leaveIdx))
       {
          const SVector& newVector = *enterVector(enterId);
-
          // update feasibility vectors
          if( solveVector2 != NULL && solveVector3 != NULL )
          {
@@ -770,9 +825,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            MSG_INFO3( (*spxout), (*spxout) << "ILBFRT02 "
-                              << "breakpoints passed / bounds flipped = " << boundflips
-                              << std::endl; )
+            MSG_DEBUG( std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
             totalboundflips += boundflips;
          }
          else if( solveVector2 != NULL )
@@ -797,9 +850,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            MSG_INFO3( (*spxout), (*spxout) << "ILBFRT02 "
-                              << "breakpoints passed / bounds flipped = " << boundflips
-                              << std::endl; )
+            MSG_DEBUG( std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
             totalboundflips += boundflips;
          }
          else
@@ -827,7 +878,7 @@ bool SPxSolver::leave(int leaveIdx)
                   variables were found: Thus, above we already accepted such an instable
                   entering variable. Now even this seems to be impossible, thus we conclude
                   unboundedness/infeasibility. */
-               MSG_INFO3( (*spxout), (*spxout) << "ILEAVE03 unboundness/infeasiblity found "
+               MSG_INFO3( (*spxout), (*spxout) << "ILEAVE03 unboundedness/infeasibility found "
                   << "in leave()" << std::endl; )
 
                rejectLeave(leaveNum, leaveId, leaveStat);
@@ -837,29 +888,12 @@ bool SPxSolver::leave(int leaveIdx)
                /**@todo if shift() is not zero we must not conclude unboundedness */
                if (rep() == ROW)
                {
-                  Real sign;
-
-                  primalRay.clear();
-                  primalRay.setMax(coPvec().delta().size());
-                  sign = (enterVal > 0 ? 1.0 : -1.0);
-
-                  for( int i = 0; i < coPvec().delta().size(); ++i )
-                     primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
-
+                  computePrimalray4Row(enterVal);
                   setBasisStatus(SPxBasis::UNBOUNDED);
                }
                else
                {
-                  Real sign;
-                  int i;
-
-                  dualFarkas.clear();
-                  dualFarkas.setMax(coPvec().delta().size());
-                  sign = (enterVal > 0 ? -1.0 : +1.0);
-
-                  for( i = 0; i < coPvec().delta().size(); ++i )
-                     dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
-
+                  computeDualfarkas4Col(enterVal);
                   setBasisStatus(SPxBasis::INFEASIBLE);
                }
 
@@ -988,6 +1022,8 @@ bool SPxSolver::leave(int leaveIdx)
 
          // update feasibility vectors
          theFvec->value() = 0;
+         assert(theCoTest[leaveIdx] < 0.0);
+         m_pricingViol += theCoTest[leaveIdx];
          theCoTest[leaveIdx] *= -1;
       }
 

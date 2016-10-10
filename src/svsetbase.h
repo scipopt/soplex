@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -506,7 +506,11 @@ public:
          else
          {
             ensureMem(newmax);
-            SVectorBase<R> newps(newmax, &SVSetBaseArray::last() + 1);
+            SVectorBase<R> newps(0,0);
+            if( SVSetBaseArray::size() > 0 )
+               newps.setMem(newmax, &SVSetBaseArray::last() + 1);
+            else
+               newps.setMem(newmax, SVSetBaseArray::get_ptr());
 #ifndef NDEBUG
             Nonzero<R>* olddata = SVSetBaseArray::data;
             SVSetBaseArray::insert(memSize(), newmax);
@@ -959,7 +963,7 @@ public:
    }
 
    /// Destructor
-   ~SVSetBase<R>()
+   virtual ~SVSetBase<R>()
    {}
 
    /// Assignment operator.

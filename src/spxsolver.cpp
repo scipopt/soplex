@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -27,7 +27,6 @@
 
 namespace soplex
 {
-#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 
 bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
@@ -55,6 +54,7 @@ bool SPxSolver::read(std::istream& in, NameSet* rowNames,
 
 void SPxSolver::reLoad()
 {
+   forceRecompNonbasicValue();
    unInit();
    unLoad();
    theLP = this;
@@ -198,10 +198,10 @@ void SPxSolver::setType(Type tp)
 void SPxSolver::initRep(Representation p_rep)
 {
 
-   theRep = p_rep;
-
    Real tmpfeastol = feastol();
    Real tmpopttol = opttol();
+
+   theRep = p_rep;
 
    if (theRep == COLUMN)
    {
@@ -239,6 +239,8 @@ void SPxSolver::initRep(Representation p_rep)
    }
    unInit();
    reDim();
+
+   forceRecompNonbasicValue();
 
    setFeastol(tmpfeastol);
    setOpttol(tmpopttol);
@@ -377,14 +379,26 @@ void SPxSolver::init()
       theratiotester->setDelta(leavetol());
    }
 
+   // catch pathological case for LPs with zero constraints
+   if( dim() == 0 )
+   {
+      factorized = true;
+   }
+
    // we better factorize explicitly before solving
    if( !factorized )
-      SPxBasis::factorize();
-
-   // we need to abort in case the factorization failed
-   if( SPxBasis::status() <= SPxBasis::SINGULAR )
    {
-      throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
+      try
+      {
+         SPxBasis::factorize();
+      }
+      catch( const SPxException& x )
+      {
+         // we need to abort in case the factorization failed
+         assert(SPxBasis::status() <= SPxBasis::SINGULAR);
+         m_status = SINGULAR;
+         throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
+      }
    }
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
@@ -595,20 +609,21 @@ void SPxSolver::factorize()
 #endif  // NDEBUG
 
          computeFtest();
-#if 0    /* was deactivated */
-         computePvec();
-#endif
       }
       else
       {
          assert(type() == ENTER);
 
+         SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
          computeCoTest();
+
          if (pricing() == FULL)
          {
-#if 0       /* was deactivated */
-            computePvec();
-#endif
+            /* to save time only recompute the row activities (in row rep) when we are already nearly optimal to
+             * avoid missing any violations from previous updates */
+            if( rep() == ROW && m_pricingViolCo < entertol() && m_pricingViol < entertol() )
+               computePvec();
+
             /* was deactivated, but this leads to warnings in testVecs() */
             computeTest();
          }
@@ -624,18 +639,22 @@ void SPxSolver::factorize()
 
 /* We compute how much the current solution violates (primal or dual) feasibility. In the
    row/enter or column/leave algorithm the maximum violation of dual feasibility is
-   computed. In the row/leave or column/enter algorithm the primal feasibility is checked. */
+   computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
+   Additionally, the violation from pricing is taken into account. */
 Real SPxSolver::maxInfeas() const
 {
    Real inf = 0.0;
 
    if (type() == ENTER)
    {
+      if( m_pricingViolUpToDate && m_pricingViolCoUpToDate )
+         inf = m_pricingViol + m_pricingViolCo;
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theFvec)[i] > theUBbound[i])
             inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-         if (theLBbound[i] > (*theFvec)[i])
+         else if ((*theFvec)[i] < theLBbound[i])
             inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
    }
@@ -643,11 +662,14 @@ Real SPxSolver::maxInfeas() const
    {
       assert(type() == LEAVE);
 
+      if( m_pricingViolUpToDate )
+         inf = m_pricingViol;
+
       for (int i = 0; i < dim(); i++)
       {
          if ((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
-         if ((*theCoLbound)[i] > (*theCoPvec)[i])
+         else if ((*theCoPvec)[i] < (*theCoLbound)[i])
             inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
       for (int i = 0; i < coDim(); i++)
@@ -662,6 +684,44 @@ Real SPxSolver::maxInfeas() const
    return inf;
 }
 
+/* check for (dual) violations above tol and immediately return false w/o checking the remaining values
+   This method is useful for verifying whether an objective limit can be used as termination criterion */
+bool SPxSolver::noViols(Real tol) const
+{
+   assert(tol >= 0.0);
+
+   if( type() == ENTER )
+   {
+      for( int i = 0; i < dim(); i++ )
+      {
+         if( (*theFvec)[i] - theUBbound[i] > tol )
+            return false;
+         if( theLBbound[i] - (*theFvec)[i] > tol )
+            return false;
+      }
+   }
+   else
+   {
+      assert(type() == LEAVE);
+
+      for( int i = 0; i < dim(); i++ )
+      {
+         if( (*theCoPvec)[i] - (*theCoUbound)[i] > tol )
+            return false;
+         if( (*theCoLbound)[i] - (*theCoPvec)[i] > tol )
+            return false;
+      }
+      for (int i = 0; i < coDim(); i++)
+      {
+         if( (*thePvec)[i] - (*theUbound)[i] > tol )
+            return false;
+         if( (*theLbound)[i] - (*thePvec)[i] > tol )
+            return false;
+      }
+   }
+   return true;
+}
+
 Real SPxSolver::nonbasicValue()
 {
    int i;
@@ -670,7 +730,7 @@ Real SPxSolver::nonbasicValue()
 
 #ifndef ADDITIONAL_CHECKS
    // if the value is available we don't need to recompute it
-   if ( m_nonbasicValueUpToDate && rep() == COLUMN )
+   if ( m_nonbasicValueUpToDate )
       return m_nonbasicValue;
 #endif
 
@@ -798,10 +858,10 @@ Real SPxSolver::nonbasicValue()
    }
 
 #ifdef ADDITIONAL_CHECKS
-   if( m_nonbasicValueUpToDate && m_nonbasicValue != val )
+   if( m_nonbasicValueUpToDate && NE(m_nonbasicValue, val) )
    {
-      MSG_DEBUG( std::cout << "\niteration: " << iteration() << " nonbasicvalue: " << m_nonbasicValue << " val: " << val << " diff: " << m_nonbasicValue - val << std::endl; )
-      assert(spxAbs(m_nonbasicValue - val) < 1e-9);
+      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue << ", correct nonbasic value: " << val << std::endl; )
+      assert(EQrel(m_nonbasicValue, val,1e-14));
    }
 #endif
 
@@ -906,6 +966,8 @@ SPxSolver::SPxSolver(
    Timer::TYPE     ttype)
    : theType (p_type)
    , thePricing(FULL)
+   , theRep(p_rep)
+   , polishObj(SolutionPolish::OFF)
    , theTime(0)
    , timerType(ttype)
    , theCumulativeTime(0.0)
@@ -917,6 +979,10 @@ SPxSolver::SPxSolver(
    , m_status(UNKNOWN)
    , m_nonbasicValue(0.0)
    , m_nonbasicValueUpToDate(false)
+   , m_pricingViol(0.0)
+   , m_pricingViolUpToDate(false)
+   , m_pricingViolCo(0.0)
+   , m_pricingViolCoUpToDate(false)
    , theShift (0)
    , m_maxCycle(100)
    , m_numCycle(0)
@@ -948,8 +1014,8 @@ SPxSolver::SPxSolver(
    , sparsePricingLeave(false)
    , sparsePricingEnter(false)
    , sparsePricingEnterCo(false)
-   , hyperPricingLeave(false)
-   , hyperPricingEnter(false)
+   , hyperPricingLeave(true)
+   , hyperPricingEnter(true)
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
@@ -1005,11 +1071,18 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       theType = base.theType;
       thePricing = base.thePricing;
       theRep = base.theRep;
+      polishObj = base.polishObj;
       timerType = base.timerType;
       maxIters = base.maxIters;
       maxTime = base.maxTime;
       objLimit = base.objLimit;
       m_status = base.m_status;
+      m_nonbasicValue = base.m_nonbasicValue;
+      m_nonbasicValueUpToDate = base.m_nonbasicValueUpToDate;
+      m_pricingViol = base.m_pricingViol;
+      m_pricingViolUpToDate = base.m_pricingViolUpToDate;
+      m_pricingViolCo = base.m_pricingViolCo;
+      m_pricingViolCoUpToDate = base.m_pricingViolCoUpToDate;
       m_entertol = base.m_entertol;
       m_leavetol = base.m_leavetol;
       theShift = base.theShift;
@@ -1164,6 +1237,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , theType(base.theType)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
+   , polishObj(base.polishObj)
    , timerType(base.timerType)
    , theCumulativeTime(base.theCumulativeTime)
    , maxIters(base.maxIters)
@@ -1174,6 +1248,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , m_status(base.m_status)
    , m_nonbasicValue(base.m_nonbasicValue)
    , m_nonbasicValueUpToDate(base.m_nonbasicValueUpToDate)
+   , m_pricingViol(base.m_pricingViol)
+   , m_pricingViolUpToDate(base.m_pricingViolUpToDate)
+   , m_pricingViolCo(base.m_pricingViolCo)
+   , m_pricingViolCoUpToDate(base.m_pricingViolCoUpToDate)
    , m_entertol(base.m_entertol)
    , m_leavetol(base.m_leavetol)
    , theShift(base.theShift)
@@ -1450,7 +1528,7 @@ bool SPxSolver::isTimeLimitReached(const bool forceCheck)
    ++nCallsToTimelim;
 
    // check if a time limit is actually set
-   if( maxTime < 0 || maxTime >= infinity )
+   if( maxTime >= infinity )
       return false;
 
    // check if the expensive system call to update the time should be skipped again
@@ -1753,6 +1831,12 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 
    loadBasis(ds);
    forceRecompNonbasicValue();
+}
+
+void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+{
+   assert(thepricer != NULL);
+   return thepricer->getNdualNorms(nnormsRow, nnormsCol);
 }
 
 // NOTE: This only works for the row representation. Need to update to account for column representation.

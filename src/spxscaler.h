@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -90,17 +90,21 @@ public:
    //-------------------------------------
    /**@name Access / modification */
    //@{
-   /// get name of scaler.
+   /// get name of scaler
    virtual const char* getName() const;
-   /// set scaling order.
+   /// set scaling order
    virtual void setOrder(bool colFirst); 
-   /// set wether column and row scaling should be performed.
+   /// set wether column and row scaling should be performed
    virtual void setBoth(bool both); 
    /// set message handler
    virtual void setOutstream(SPxOut& newOutstream)
    {
       spxout = &newOutstream;
    }
+   /// set real parameter
+   virtual void setRealParam(Real param, const char* name = "realparam");
+   /// set int parameter
+   virtual void setIntParam(int param, const char* name = "intparam");
    //@}
 
    //-------------------------------------

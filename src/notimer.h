@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -39,11 +39,11 @@ public:
       : Timer()
    {}
    /// copy constructor
-   NoTimer(const NoTimer& old)
+   NoTimer(const NoTimer&)
       : Timer()
    {}
    /// assignment operator
-   NoTimer& operator=(const NoTimer& old)
+   NoTimer& operator=(const NoTimer&)
    {
       return *this;
    }

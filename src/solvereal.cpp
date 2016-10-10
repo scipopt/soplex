@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -63,7 +63,7 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO1( spxout, spxout << " --- transforming basis into original space" << std::endl; )
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             _resolveWithoutPreprocessing(simplificationStatus);
             return;
          }
@@ -77,7 +77,7 @@ namespace soplex
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             _preprocessAndSolveReal(false);
             return;
          }
@@ -89,7 +89,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             _preprocessAndSolveReal(false);
             return;
          }
@@ -99,7 +99,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             _preprocessAndSolveReal(false);
             return;
          }
@@ -138,20 +138,16 @@ namespace soplex
    /// solves real LP with/without preprocessing
    void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
    {
+      _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
 
       if( applyPreprocessing )
-      {
          _enableSimplifierAndScaler();
-         _solver.setTerminationValue(realParam(SoPlex::INFTY));
-      }
       else
-      {
          _disableSimplifierAndScaler();
-         ///@todo implement for both objective senses
-         _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
-            ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::INFTY));
-      }
+
+      _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
+         ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::OBJLIMIT_LOWER));
 
       applyPreprocessing = (_simplifier != 0 || _scaler != 0);
 
@@ -209,7 +205,7 @@ namespace soplex
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
-         _solver.changeObjOffset(_simplifier->getObjoffset());
+         _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
       }
 
       _statistics->preprocessingTime->stop();

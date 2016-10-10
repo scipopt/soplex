@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -111,6 +111,12 @@ void SPxScaler::setBoth(bool both)
 
    m_doBoth = both;
 }
+
+void SPxScaler::setRealParam(Real param, const char* name)
+{}
+
+void SPxScaler::setIntParam(int param, const char* name)
+{}
 
 void SPxScaler::setup(SPxLP& lp)
 {

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -48,8 +48,8 @@ namespace soplex
       class Private;
       Private* dpointer;
 
-      static IdList< Private > unusedPrivateList;
-      static bool useListMem;
+      thread_local static IdList< Private > unusedPrivateList;
+      thread_local static bool useListMem;
 
       /// special constructor only for initializing static rational variables; this is necessary since we need a
       /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
@@ -129,11 +129,18 @@ namespace soplex
       //**@name Typecasts */
       //@{
 
+      // Visual Studio <= 2010 does not fully support C++11, this makes
+      // it compiling (noone checked whether it also works properly)
+#if defined(_MSC_VER) && _MSC_VER <= 1600
       /// typecasts Rational to double (only allows explicit typecasting)
       explicit operator double() const;
 
       /// typecasts Rational to long double (only allows explicit typecasting)
       explicit operator long double() const;
+#else
+      operator double() const;
+      operator long double() const;
+#endif
 
 #ifdef SOPLEX_WITH_GMP
       /// provides read-only access to underlying mpq_t

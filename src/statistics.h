@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -101,6 +101,7 @@ namespace soplex
       int iterations; ///< number of iterations/pivots
       int iterationsPrimal; ///< number of iterations with Primal
       int iterationsFromBasis; ///< number of iterations from Basis
+      int iterationsPolish; ///< number of iterations during solution polishing
       int boundflips; ///< number of dual bound flips
       int luFactorizationsReal; ///< number of basis matrix factorizations in real precision
       int luSolvesReal; ///< number of (forward and backward) solves with basis matrix in real precision

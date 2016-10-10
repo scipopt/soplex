@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -386,8 +386,10 @@ public:
       assert(n >= 0);
       assert(n < size());
 
-      set_size(size() - 1);
-      m_elem[n] = m_elem[size()];
+      int newsize = size() - 1;
+      set_size(newsize);
+      if( n < newsize )
+         m_elem[n] = m_elem[newsize];
    }
 
    /// Remove all indices.

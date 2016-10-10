@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="2.0.1.3"
+VERSION="2.2.1.2"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
@@ -8,6 +8,10 @@ rm -f $NAME.tgz
 
 # compile to create the correct GiTHash
 make githash
+
+echo generating default setting files
+make OPT=opt ZLIB=false -j4
+bin/soplex --saveset=doc/inc/parameters.set
 
 # Before we create a tarball change the directory and file rights in a command way
 echo adjust file modes
@@ -51,7 +55,7 @@ $NAME/doc/xternal.cpp \
 $NAME/doc/inc/faq.inc \
 $NAME/doc/inc/faqcss.inc \
 $NAME/make/make* \
-$NAME/settings/default.set \
+$NAME/settings/exact.set \
 $NAME/settings/devex.set \
 $NAME/settings/steep.set \
 $NAME/src/depend* \

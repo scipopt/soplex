@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -79,6 +79,7 @@ class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
    friend class SPxBasis;
    friend class SPxScaler;
    friend class SPxEquiliSC;
+   friend class SPxLeastSqSC;
    friend class SPxGeometSC;
    friend class SPxMainSM;
 
@@ -119,6 +120,7 @@ public:
    {
       spxout = &newOutstream;
    }
+
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Inquiry */
    //@{
@@ -812,6 +814,9 @@ public:
    /// Removes \p i 'th row.
    virtual void removeRow(int i)
    {
+      if( i < 0 )
+         return;
+
       doRemoveRow(i);
    }
 
@@ -906,6 +911,9 @@ public:
    /// Removes \p i 'th column.
    virtual void removeCol(int i)
    {
+      if( i < 0 )
+         return;
+
       doRemoveCol(i);
    }
 
@@ -1449,6 +1457,8 @@ public:
    /// Replaces \p i 'th row of LP with \p newRow.
    virtual void changeRow(int n, const LPRowBase<R>& newRow)
    {
+      if( n < 0 )
+         return;
 
       int j;
       SVectorBase<R>& row = rowVector_w(n);
@@ -1485,6 +1495,8 @@ public:
    /// Replaces \p i 'th column of LP with \p newCol.
    virtual void changeCol(int n, const LPColBase<R>& newCol)
    {
+      if( n < 0 )
+         return;
 
       int j;
       SVectorBase<R>& col = colVector_w(n);
@@ -1521,6 +1533,8 @@ public:
    /// Changes LP element (\p i, \p j) to \p val.
    virtual void changeElement(int i, int j, const R& val)
    {
+      if( i < 0 || j < 0 )
+         return;
 
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
@@ -1551,6 +1565,9 @@ public:
    template < class S >
    void changeElement(int i, int j, const S* val)
    {
+      if( i < 0 || j< 0 )
+         return;
+
       SVectorBase<R>& row = rowVector_w(i);
       SVectorBase<R>& col = colVector_w(j);
 

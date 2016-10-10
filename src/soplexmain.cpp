@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -40,6 +40,9 @@ extern "C" {
 
 using namespace soplex;
 
+// function prototype
+int main(int argc, char* argv[]);
+
 // prints usage and command line options
 static
 void printUsage(const char* const argv[], int idx)
@@ -64,7 +67,7 @@ void printUsage(const char* const argv[], int idx)
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
       "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
-      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)\n"
+      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
       "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3* - boundflipping)\n"
       "\n"
@@ -72,6 +75,8 @@ void printUsage(const char* const argv[], int idx)
       "  -v<level>              set verbosity to <level> (0 - error, 3 - normal, 5 - high)\n"
       "  -x                     print primal solution\n"
       "  -y                     print dual multipliers\n"
+      "  -X                     print primal solution in rational numbers\n"
+      "  -Y                     print dual multipliers in rational numbers\n"
       "  -q                     display detailed statistics\n"
       "  -c                     perform final check of optimal solution in original problem\n"
       "\n";
@@ -268,7 +273,9 @@ int main(int argc, char* argv[])
    char* savesetname = 0;
    char* diffsetname = 0;
    bool printPrimal = false;
+   bool printPrimalRational = false;
    bool printDual = false;
+   bool printDualRational = false;
    bool displayStatistics = false;
    bool checkSol = false;
 
@@ -281,7 +288,7 @@ int main(int argc, char* argv[])
    new (soplex) SoPlex();
 
    soplex->printVersion();
-   MSG_INFO1( soplex->spxout, soplex->spxout << "Copyright (c) 1996-2015 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)\n\n" );
+   MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
 
    try
    {
@@ -305,7 +312,7 @@ int main(int argc, char* argv[])
          // option string must start with '-', must contain at least two characters, and exactly two characters if and
          // only if it is -x, -y, -q, or -c
          if( option[0] != '-' || option[1] == '\0'
-            || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'y' || option[1] == 'q' || option[1] == 'c')) )
+            || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y' || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')) )
          {
             printUsage(argv, optidx);
             returnValue = 1;
@@ -471,7 +478,7 @@ int main(int argc, char* argv[])
             break;
 
          case 'g' :
-            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric)
+            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares)
             if( !soplex->setIntParam(SoPlex::SCALER, option[2] - '0') )
             {
                printUsage(argv, optidx);
@@ -515,9 +522,19 @@ int main(int argc, char* argv[])
             printPrimal = true;
             break;
 
+         case 'X' :
+            // -X : print primal solution with rationals
+            printPrimalRational = true;
+            break;
+
          case 'y' :
             // -y : print dual multipliers
             printDual = true;
+            break;
+
+         case 'Y' :
+            // -Y : print dual multipliers with rationals
+            printDualRational = true;
             break;
 
          case 'q' :
@@ -658,7 +675,29 @@ int main(int argc, char* argv[])
          DVector primal(soplex->numColsReal());
          if( soplex->getPrimalReal(primal) )
          {
+            int nNonzeros = 0;
             MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
+            for( int i = 0; i < soplex->numColsReal(); ++i )
+            {
+               if ( isNotZero( primal[i] ) )
+               {
+                  MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision(9)
+                                    << primal[i] << std::endl; )
+                  ++nNonzeros;
+               }
+            }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero (within "
+                              << std::setprecision(1) << std::scientific << Param::epsilon()
+                              << std::setprecision(8) << std::fixed << "). Solution has " << nNonzeros << " nonzero entries." << std::endl; )
+         }
+         else
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.\n")
+
+         if( soplex->getPrimalRayReal(primal) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal ray (name, value):\n"; )
             for( int i = 0; i < soplex->numColsReal(); ++i )
             {
                if ( isNotZero( primal[i] ) )
@@ -667,13 +706,34 @@ int main(int argc, char* argv[])
                                     << std::setprecision(9)
                                     << primal[i] << std::endl; )
             }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero (within "
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
                               << std::setprecision(1) << std::scientific << Param::epsilon()
                               << std::setprecision(8) << std::fixed << ")." << std::endl; )
          }
-         else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal solution available.")
+
       }
+
+
+      if( printPrimalRational )
+      {
+         DVectorRational primal(soplex->numColsReal());
+         if( soplex->getPrimalRational(primal) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
+                for( int i = 0; i < soplex->numColsRational(); ++i )
+                {
+                  if ( primal[i] != (Rational) 0 )
+                      MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
+                              << std::setw(17)
+                  << std::setprecision(9)
+                  << primal[i] << std::endl; )
+                }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero." << std::endl; )
+         }
+         else
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.\n")
+      }
+
 
       if( printDual )
       {
@@ -694,8 +754,43 @@ int main(int argc, char* argv[])
                               << std::setprecision(8) << std::fixed << ")." << std::endl; )
          }
          else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual solution available.")
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual solution available.\n")
+
+         if( soplex->getDualFarkasReal(dual) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual Farkas (name, value):\n"; )
+            for( int i = 0; i < soplex->numRowsReal(); ++i )
+            {
+               if ( isNotZero( dual[i] ) )
+                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t"
+                                    << std::setw(17)
+                                    << std::setprecision(9)
+                                    << dual[i] << std::endl; )
+            }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
+                              << std::setprecision(1) << std::scientific << Param::epsilon()
+                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
+         }
       }
+
+
+      if( printDualRational )
+      {
+         DVectorRational dual(soplex->numRowsReal());
+         if( soplex->getDualRational(dual) )
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual multipliers (name, value):\n"; )
+            for( int i = 0; i < soplex->numRowsRational(); ++i )
+            {
+               if ( dual[i] != (Rational) 0 )
+                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t" << dual[i] << std::endl; )
+            }
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero." << std::endl; )
+         }
+         else
+            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual (rational) solution available.\n")
+      }
+
 
       if( checkSol )
          checkSolution(*soplex);
@@ -779,6 +874,7 @@ int main(int argc, char* argv[])
 #include "spxmainsm.h"
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxleastsqsc.h"
 #include "spxgeometsc.h"
 #include "spxsumst.h"
 #include "spxweightst.h"
@@ -962,7 +1058,7 @@ void print_version_info()
 
    const char* banner2 =
    "*                                                                      *\n"
-   "*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                       *\n"
+   "*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                       *\n"
    "*                            fuer Informationstechnik Berlin           *\n"
    "*                                                                      *\n"
    "*  SoPlex is distributed under the terms of the ZIB Academic Licence.  *\n"
@@ -1058,7 +1154,7 @@ void print_short_version_info()
    "************************************************************************\n"
    "* SoPlex --- the Sequential object-oriented simPlex. ";
    const char* banner2 =
-   "* Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                          *\n"
+   "* Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                          *\n"
    "*                         fuer Informationstechnik Berlin              *\n"
    "************************************************************************\n";
 
@@ -1116,7 +1212,7 @@ void print_usage_and_exit( const char* const argv[] )
       "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast\n"
       "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping*\n"
       "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
-      "                                            -p5 Weight\n"
+      "              -g5 leastSq                   -p5 Weight\n"
       "                                            -p6 SteepExactSetup\n"
       ;
 
@@ -1281,8 +1377,13 @@ void get_scalers(
    SPxOut*     spxout
    )
 {
+
    switch(scaling)
    {
+   case 5:
+      prescaler  = new SPxLeastSqSC();
+      postscaler = 0;
+      break;
    case 4:
       prescaler  = new SPxEquiliSC(true);
       postscaler = new SPxGeometSC(8);
@@ -1853,7 +1954,7 @@ int main(int argc, char* argv[])
       int                       scaling        = 2;
       int                       simplifying    = 1;
       int                       iterlimit      = -1;
-      Real                      timelimit      = -1.0;
+      Real                      timelimit      = DEFAULT_INFINITY;
       Real                      delta          = DEFAULT_BND_VIOL;
       Real                      feastol        = DEFAULT_BND_VIOL;
       Real                      opttol         = DEFAULT_BND_VIOL;

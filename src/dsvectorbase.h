@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -194,7 +194,7 @@ public:
    DSVectorBase<R>& operator=(const SSVectorBase<S>& vec);
 
    /// Destructor.
-   ~DSVectorBase<R>()
+   virtual ~DSVectorBase<R>()
    {
       if( theelem )
       {
@@ -271,7 +271,8 @@ public:
       for( i = SVectorBase<R>::max()-1; i >= 0; i-- )
          theelem[i].~Nonzero<R>();
 
-      spx_free(theelem);
+      if( theelem != 0 )
+         spx_free(theelem);
 
       /* assign new memory */
       theelem = newmem;

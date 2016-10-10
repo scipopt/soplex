@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -31,13 +31,17 @@
 #define _SPXDEFINES_H_
 
 #include <math.h>
+#ifdef _MSC_VER
+#include <float.h>
+#endif
 
 
 
 namespace soplex
 {
-#define SOPLEX_VERSION         201
-#define SOPLEX_SUBVERSION        3
+#define SOPLEX_VERSION         221
+#define SOPLEX_SUBVERSION        2
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2016 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -141,25 +145,25 @@ typedef long double Real;
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
-#define DEFAULT_BND_VIOL   1e-12
+#define DEFAULT_BND_VIOL   1e-12L
 #endif
 /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
 #ifndef DEFAULT_EPS_ZERO
-#define DEFAULT_EPS_ZERO   1e-28
+#define DEFAULT_EPS_ZERO   1e-28L
 #endif
 /// epsilon for factorization
 #ifndef DEFAULT_EPS_FACTOR
-#define DEFAULT_EPS_FACTOR 1e-30
+#define DEFAULT_EPS_FACTOR 1e-30L
 #endif
 /// epsilon for factorization update
 #ifndef DEFAULT_EPS_UPDATE
-#define DEFAULT_EPS_UPDATE 1e-26
+#define DEFAULT_EPS_UPDATE 1e-26L
 #endif
 #ifndef DEFAULT_EPS_PIVOT
-#define DEFAULT_EPS_PIVOT 1e-20
+#define DEFAULT_EPS_PIVOT 1e-20L
 #endif
 ///
-#define DEFAULT_INFINITY   1e100
+#define DEFAULT_INFINITY   1e100L
 
 
 #else
@@ -219,14 +223,13 @@ typedef double Real;
 #endif
 #define DEFAULT_INFINITY   1e100
 
-
-
-
-
 #endif // !WITH_FLOAT
 #endif // !WITH_LONG_DOUBLE
 
-extern const Real infinity;
+#define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
+#define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
+
+thread_local extern const Real infinity;
 
 class Param
 {
@@ -236,13 +239,13 @@ private:
    /**@name Data */
    //@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   static Real s_epsilon;
+   thread_local static Real s_epsilon;
    /// epsilon for factorization
-   static Real s_epsilon_factorization;
+   thread_local static Real s_epsilon_factorization;
    /// epsilon for factorization update
-   static Real s_epsilon_update;
+   thread_local static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   static Real s_epsilon_pivot;
+   thread_local static Real s_epsilon_pivot;
    //@}
 
 public:
@@ -330,7 +333,11 @@ inline Real spxSqrt(Real a)
 #ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
+#ifndef _MSC_VER
    return nextafter(x,y);
+#else
+   return _nextafter(x,y);
+#endif
 }
 #endif
 

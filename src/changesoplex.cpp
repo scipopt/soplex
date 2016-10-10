@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -684,6 +684,7 @@ void SPxSolver::changeObj(int i, const Real& newVal)
 
 void SPxSolver::changeMaxObj(const Vector& newObj)
 {
+   forceRecompNonbasicValue();
 
    SPxLP::changeMaxObj(newObj);
 
@@ -695,6 +696,7 @@ void SPxSolver::changeMaxObj(const Vector& newObj)
 
 void SPxSolver::changeMaxObj(int i, const Real& newVal)
 {
+   forceRecompNonbasicValue();
 
    SPxLP::changeMaxObj(i, newVal);
 
@@ -706,6 +708,8 @@ void SPxSolver::changeMaxObj(int i, const Real& newVal)
 
 void SPxSolver::changeRowObj(const Vector& newObj)
 {
+   forceRecompNonbasicValue();
+
    SPxLP::changeRowObj(newObj);
 
    /**@todo Factorization remains valid, we do not need a reDim()
@@ -716,6 +720,8 @@ void SPxSolver::changeRowObj(const Vector& newObj)
 
 void SPxSolver::changeRowObj(int i, const Real& newVal)
 {
+   forceRecompNonbasicValue();
+
    SPxLP::changeRowObj(i, newVal);
 
    /**@todo Factorization remains valid, we do not need a reDim()
@@ -741,20 +747,23 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
          if (currUpper >= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theLCbound[i] * oldLower;
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = -theLCbound[i] * oldLower;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_UPPER;
-            objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
          }
       }
-      else if (newLower == currUpper)
+      else if (EQ(newLower, currUpper))
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxObj(i) * (newLower - oldLower);
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = maxObj(i) * (newLower - oldLower);
       }
-      else
+      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theLCbound[i] * (newLower - oldLower);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
@@ -765,11 +774,12 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
       if (newLower > -infinity)
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         objChange = theLCbound[i] * newLower;
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = theLCbound[i] * newLower;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
-      if (newLower != currUpper)
+      if (NE(newLower, currUpper))
          stat = SPxBasis::Desc::P_ON_UPPER;
       break;
    case SPxBasis::Desc::D_FREE:
@@ -777,6 +787,8 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
+      if( rep() == ROW && theShift > 0.0 )
+         forceRecompNonbasicValue();
       stat = dualColStatus(i);
       break;
    default:
@@ -785,7 +797,9 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
 
    MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
 
-   updateNonbasicValue(objChange);
+   // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
+   if( rep() == COLUMN )
+      updateNonbasicValue(objChange);
 }
 
 void SPxSolver::changeLower(const Vector& newLower)
@@ -808,7 +822,7 @@ void SPxSolver::changeLower(int i, const Real& newLower)
 {
    Real oldLower = lower(i);
 
-   if (newLower != oldLower)
+   if (NE(newLower, oldLower))
    {
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.
@@ -840,32 +854,34 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
    case SPxBasis::Desc::P_ON_UPPER:
       if (newUpper >= infinity)
       {
-         if (currLower <= infinity)
+         if (currLower <= -infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theUCbound[i] * oldUpper;
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = -theUCbound[i] * oldUpper;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_LOWER;
-            objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
          }
       }
       else if (newUpper == currLower)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxObj(i) * (newUpper - oldUpper);
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = maxObj(i) * (newUpper - oldUpper);
       }
-      else
-      {
+      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theUCbound[i] * (newUpper - oldUpper);
-      }
       break;
    case SPxBasis::Desc::P_FREE:
       if (newUpper < infinity)
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         objChange = theUCbound[i] * newUpper;
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = theUCbound[i] * newUpper;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -877,6 +893,8 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
+      if( rep() == ROW && theShift > 0.0 )
+         forceRecompNonbasicValue();
       stat = dualColStatus(i);
       break;
    default:
@@ -884,7 +902,9 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
    }
    MSG_DEBUG( std::cout << " -> " << stat << std::endl; );
 
-   updateNonbasicValue(objChange);
+   // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
+   if( rep() == COLUMN )
+      updateNonbasicValue(objChange);
 }
 
 void SPxSolver::changeUpper(const Vector& newUpper)
@@ -949,20 +969,23 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
          if (currRhs >= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theURbound[i] * oldLhs;
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = -theURbound[i] * oldLhs;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_UPPER;
-            objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
          }
       }
       else if (newLhs == currRhs)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxRowObj(i) * (newLhs - oldLhs);
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = maxRowObj(i) * (newLhs - oldLhs);
       }
-      else
+      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theURbound[i] * (newLhs - oldLhs);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
@@ -973,7 +996,8 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
       if (newLhs > -infinity)
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         objChange = theURbound[i] * newLhs;
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = theURbound[i] * newLhs;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -985,6 +1009,8 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
+      if( rep() == ROW && theShift > 0.0 )
+         forceRecompNonbasicValue();
       stat = dualRowStatus(i);
       break;
    default:
@@ -992,7 +1018,9 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
    }
    MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
 
-   updateNonbasicValue(objChange);
+   // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
+   if( rep() == COLUMN )
+      updateNonbasicValue(objChange);
 }
 
 void SPxSolver::changeLhs(const Vector& newLhs)
@@ -1043,20 +1071,23 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
          if (currLhs <= -infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            objChange = -theLRbound[i] * oldRhs;
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = -theLRbound[i] * oldRhs;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_LOWER;
-            objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
+            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+               objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
          }
       }
       else if (newRhs == currLhs)
       {
          stat = SPxBasis::Desc::P_FIXED;
-         objChange = maxRowObj(i) * (newRhs - oldRhs);
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = maxRowObj(i) * (newRhs - oldRhs);
       }
-      else
+      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theLRbound[i] * (newRhs - oldRhs);
       break;
    case SPxBasis::Desc::P_ON_LOWER:
@@ -1067,7 +1098,8 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
       if (newRhs < infinity)
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         objChange = theLRbound[i] * newRhs;
+         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+            objChange = theLRbound[i] * newRhs;
       }
       break;
    case SPxBasis::Desc::P_FIXED:
@@ -1079,6 +1111,8 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
+      if( rep() == ROW && theShift > 0.0 )
+         forceRecompNonbasicValue();
       stat = dualRowStatus(i);
       break;
    default:
@@ -1086,7 +1120,9 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
    }
    MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
 
-   updateNonbasicValue(objChange);
+   // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
+   if( rep() == COLUMN )
+      updateNonbasicValue(objChange);
 }
 
 
@@ -1167,6 +1203,9 @@ void SPxSolver::changeRow(int i, const LPRow& newRow)
 
 void SPxSolver::changeCol(int i, const LPCol& newCol)
 {
+   if( i < 0 )
+      return;
+
    forceRecompNonbasicValue();
 
    SPxLP::changeCol(i, newCol);
@@ -1177,6 +1216,9 @@ void SPxSolver::changeCol(int i, const LPCol& newCol)
 
 void SPxSolver::changeElement(int i, int j, const Real& val)
 {
+   if( i < 0 || j < 0 )
+      return;
+
    forceRecompNonbasicValue();
 
    SPxLP::changeElement(i, j, val);

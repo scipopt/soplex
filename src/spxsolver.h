@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -34,7 +34,8 @@
 #include "unitvector.h"
 #include "updatevector.h"
 
-#define HYPERPRICINGFACTOR       10       /**< do hyper pricing only if problem size is larger than HYPERPRICINGFACTOR * maxUpdates */
+#define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
+#define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
 #define SPARSITYFACTOR           0.6      /**< percentage of infeasibilities that is considered sparse */
 #define DENSEROUNDS               5       /**< number of refactorizations until sparsity is tested again */
 #define SPARSITY_TRADEOFF        0.8      /**< threshold to decide whether Ids or coIds are preferred to enter the basis;
@@ -56,17 +57,17 @@ class SPxStarter;
    provids two basis representations, namely a column basis and a row basis
    (see #Representation). For both representations, a primal and
    dual algorithm is available (see \ref Type).
- 
+
    In addition, SPxSolver can be custumized with various respects:
    - pricing algorithms using SPxPricer
    - ratio test using class SPxRatioTester
    - computation of a start basis using class SPxStarter
    - preprocessing of the LP using class SPxSimplifier
-   - termination criteria by overriding 
- 
+   - termination criteria by overriding
+
    SPxSolver is derived from SPxLP that is used to store the LP to be solved.
    Hence, the LPs solved with SPxSolver have the general format
- 
+
    \f[
    \begin{array}{rl}
        \hbox{max}   & \mbox{maxObj}^T x                 \\
@@ -74,7 +75,7 @@ class SPxStarter;
                     & \mbox{low} \le x  \le \mbox{up}
    \end{array}
    \f]
- 
+
    Also, SPxLP provide all manipulation methods for the LP. They allow
    SPxSolver to be used within cutting plane algorithms.
 */
@@ -83,8 +84,6 @@ class SPxSolver : public SPxLP, protected SPxBasis
    friend class SoPlexLegacy;
    friend class SPxFastRT;
    friend class SPxBoundFlippingRT;
-   friend class SPxSteepPR;  // this is necessary to make getMaxUpdates() accessible
-   friend class SPxDevexPR;  //
 
 public:
 
@@ -101,7 +100,7 @@ public:
     *  Type Representation determines the representation of SPxSolver, i.e.
     *  a columnwise (#COLUMN == 1) or rowwise (#ROW == -1) one.
     */
-   enum Representation  
+   enum Representation
    {
       ROW    = -1,  ///< rowwise representation.
       COLUMN =  1   ///< columnwise representation.
@@ -170,7 +169,7 @@ public:
        *  that it may be feasible for a pricer to return an Id with
        *  #test() > 0; such will be rejected by SPxSolver.
        */
-      PARTIAL  
+      PARTIAL
    };
 
    /// Improved dual simplex status
@@ -220,6 +219,15 @@ public:
       INForUNBD      =  4   ///< LP is primal infeasible or unbounded.
    };
 
+   /// objective for solution polishing
+   enum SolutionPolish
+   {
+      OFF,                  ///< don't perform modifications on optimal basis
+      MAXBASICSLACK,        ///< maximize number of basic slack variables, i.e. more variables on bounds
+      MINBASICSLACK         ///< minimize number of basic slack variables, i.e. more variables between bounds
+   };
+
+
    //@}
 
 private:
@@ -230,6 +238,7 @@ private:
    Type           theType;     ///< entering or leaving algortihm.
    Pricing        thePricing;  ///< full or partial pricing.
    Representation theRep;      ///< row or column representation.
+   SolutionPolish polishObj;   ///< objective of solution polishing
    Timer*         theTime;     ///< time spent in last call to method solve()
    Timer::TYPE    timerType;   ///< type of timer (user or wallclock)
    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
@@ -243,6 +252,11 @@ private:
    Real           m_nonbasicValue;         ///< nonbasic part of current objective value
    bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
 
+   Real           m_pricingViol;             ///< maximal feasibility violation of current solution
+   bool           m_pricingViolUpToDate;     ///< true, if the stored violation is up to date
+   Real           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
+   bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
+
    Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
    Real           theShift;      ///< sum of all shifts applied to any bound.
@@ -251,13 +265,13 @@ private:
    int            m_numCycle;    ///< actual number of degenerate steps so far.
    bool           initialized;   ///< true, if all vectors are setup.
 
-   Vector*        solveVector2;      ///< when 2 systems are to solve at a time
-   SSVector*      solveVector2rhs;   ///< when 2 systems are to solve at a time
-   Vector*        solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-   Vector*        coSolveVector2;    ///< when 2 systems are to solve at a time
-   SSVector*      coSolveVector2rhs; ///< when 2 systems are to solve at a time
-   Vector*        coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
    SSVector*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
    bool           freePricer;        ///< true iff thepricer should be freed inside of object
@@ -265,7 +279,7 @@ private:
    bool           freeStarter;       ///< true iff thestarter should be freed inside of object
 
    /* Store the index of a leaving variable if only an instable entering variable has been found.
-      instableLeave == true iff this instable basis change should be performed. 
+      instableLeave == true iff this instable basis change should be performed.
       (see spxsolve.cpp and leave.cpp) */
    int            instableLeaveNum;
    bool           instableLeave;
@@ -306,7 +320,7 @@ protected:
    DVector        theUCbound;  ///< Upper Column Feasibility bound
    DVector        theLCbound;  ///< Lower Column Feasibility bound
 
-   /** In entering Simplex algorithm, the ratio test must ensure that all 
+   /** In entering Simplex algorithm, the ratio test must ensure that all
     *  \em basic variables remain within their feasibility bounds. To give fast
     *  acces to them, the bounds of basic variables are copied into the
     *  following two vectors.
@@ -341,7 +355,8 @@ protected:
    int             leaveCount;    ///< number of LEAVE iterations
    int             enterCount;    ///< number of ENTER iterations
    int             primalCount;   ///< number of primal iterations
-   
+   int             polishCount;   ///< number of solution polishing iterations
+
    int             boundflips;          ///< number of performed bound flips
    int             totalboundflips;     ///< total number of bound flips
 
@@ -360,11 +375,14 @@ protected:
    //-----------------------------
    /**@name Precision */
    //@{
-   /// is the solution precise enough, or should we increase delta() ? 
+   /// is the solution precise enough, or should we increase delta() ?
    virtual bool precisionReached(Real& newpricertol) const;
    //@}
 
 public:
+
+   /// The random number generator used throughout the whole computation. Its seed can be modified.
+   Random random;
 
    /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables;
     *  for the entering Simplex algorithm this vector contains the indices of infeasible slack variables.
@@ -402,7 +420,25 @@ public:
    void setOutstream(SPxOut& newOutstream)
    {
       spxout = &newOutstream;
-      SPxLPBase::spxout = &newOutstream;
+      SPxLP::spxout = &newOutstream;
+   }
+
+   /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+   void setNonzeroFactor( Real f )
+   {
+      SPxBasis::nonzeroFactor = f;
+   }
+
+   /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+   void setFillFactor( Real f )
+   {
+      SPxBasis::fillFactor = f;
+   }
+
+   /// set refactor threshold for memory growth in current factor update compared to the last factorization
+   void setMemFactor( Real f )
+   {
+      SPxBasis::memFactor = f;
    }
 
    /**@name Access */
@@ -444,32 +480,32 @@ public:
 
    //-----------------------------
    /**@name Setup
-    *  Before solving an LP with an instance of SPxSolver, 
+    *  Before solving an LP with an instance of SPxSolver,
     *  the following steps must be performed:
     *
     *  -# Load the LP by copying an external LP or reading it from an
     *     input stream.
-    *  -# Setup the pricer to use by loading an \ref soplex::SPxPricer 
+    *  -# Setup the pricer to use by loading an \ref soplex::SPxPricer
     *     "SPxPricer" object (if not already done in a previous call).
-    *  -# Setup the ratio test method to use by loading an 
-    *     \ref soplex::SPxRatioTester "SPxRatioTester" object 
+    *  -# Setup the ratio test method to use by loading an
+    *     \ref soplex::SPxRatioTester "SPxRatioTester" object
     *     (if not already done in a previous call).
     *  -# Setup the linear system solver to use by loading an
     *     \ref soplex::SLinSolver "SLinSolver" object
     *     (if not already done in a previous call).
     *  -# Optionally setup an start basis generation method by loading an
     *     \ref soplex::SPxStarter "SPxStarter" object.
-    *  -# Optionally setup a start basis by loading a 
+    *  -# Optionally setup a start basis by loading a
     *     \ref soplex::SPxBasis::Desc "SPxBasis::Desc" object.
-    *  -# Optionally switch to another basis 
-    *     \ref soplex::SPxSolver::Representation "Representation" 
+    *  -# Optionally switch to another basis
+    *     \ref soplex::SPxSolver::Representation "Representation"
     *     by calling method \ref soplex::SPxSolver::setRep() "setRep()".
-    *  -# Optionally switch to another algorithm 
-    *     \ref soplex::SPxSolver::Type "Type" 
+    *  -# Optionally switch to another algorithm
+    *     \ref soplex::SPxSolver::Type "Type"
     *     by calling method \ref soplex::SPxSolver::setType() "setType()".
     *
     *  Now the solver is ready for execution. If the loaded LP is to be solved
-    *  again from scratch, this can be done with method 
+    *  again from scratch, this can be done with method
     *  \ref soplex::SPxSolver::reLoad() "reLoad()". Finally,
     *  \ref soplex::SPxSolver::clear() "clear()" removes the LP from the solver.
     */
@@ -512,14 +548,14 @@ public:
     *  colNames are \c NULL, default names are used for the constraints and
     *  variables.
     */
-   virtual bool readBasisFile(const char* filename, 
+   virtual bool readBasisFile(const char* filename,
       const NameSet* rowNames, const NameSet* colNames);
 
    /** Write basis to \p filename in MPS format. If \p rowNames and \p
     *  colNames are \c NULL, default names are used for the constraints and
     *  variables.
     */
-   virtual bool writeBasisFile(const char* filename, 
+   virtual bool writeBasisFile(const char* filename,
       const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat = false) const;
 
    /** Write current LP, basis, and parameter settings.
@@ -527,7 +563,7 @@ public:
     *  are written to "\p filename".set. If \p rowNames and \p colNames are \c NULL, default names are used for
     *  the constraints and variables.
     */
-   virtual bool writeState(const char* filename, 
+   virtual bool writeState(const char* filename,
       const NameSet* rowNames = NULL, const NameSet* colNames = NULL, const bool cpxFormat = false) const;
 
    //@}
@@ -543,6 +579,26 @@ public:
     *  or ratiotester loaded or if solve is still running when it shouldn't be
     */
    virtual Status solve();
+
+   /** Identify primal basic variables that have zero reduced costs and
+    * try to pivot them out of the basis to make them tight.
+    * This is supposed to decrease the number of fractional variables
+    * when solving LP relaxations of (mixed) integer programs.
+    * The objective must not be modified during this procedure.
+    */
+   void performSolutionPolishing();
+
+   /// set objective of solution polishing (0: off, 1: max_basic_slack, 2: min_basic_slack)
+   void setSolutionPolishing(SolutionPolish _polishObj)
+   {
+      polishObj = _polishObj;
+   }
+
+   /// return objective of solution polishing
+   SolutionPolish getSolutionPolishing()
+   {
+      return polishObj;
+   }
 
    /// Status of solution process.
    Status status() const;
@@ -583,7 +639,7 @@ public:
     *  to the argument \p vector. Hence, \p vector must be of dimension
     *  #nCols().
     *
-    *  @throw SPxStatusException if not initialized 
+    *  @throw SPxStatusException if not initialized
     */
    virtual Status getPrimal(Vector& vector) const;
 
@@ -681,7 +737,7 @@ public:
    /**@name Control Parameters */
    //@{
    /// values \f$|x| < \epsilon\f$ are considered to be 0.
-   /** if you want another value for epsilon, use 
+   /** if you want another value for epsilon, use
     * \ref soplex::Param::setEpsilon() "Param::setEpsilon()".
     */
    Real epsilon() const
@@ -776,12 +832,12 @@ public:
     *  degenerate steps is counted by numCycle().
     */
    /// maximum number of degenerate simplex steps before we detect cycling.
-   int maxCycle() const 
+   int maxCycle() const
    {
       return m_maxCycle;
    }
    /// actual number of degenerate simplex steps encountered so far.
-   int numCycle() const 
+   int numCycle() const
    {
       return m_numCycle;
    }
@@ -1211,7 +1267,7 @@ public:
    }
    /// right-hand side vector for \ref soplex::SPxSolver::fVec "fVec"
    /** The feasibility vector is computed by solving a linear system with the
-    *  basis matrix. The right-hand side vector of this system is referred 
+    *  basis matrix. The right-hand side vector of this system is referred
     *  to as \em feasibility, \em right-hand \em side \em vector #fRhs().
     *
     *  For a row basis, #fRhs() is the objective vector (ignoring shifts).
@@ -1230,7 +1286,7 @@ public:
    /// upper bound for #fVec, writable.
    /** This method returns the upper bound for the feasibility vector.
     *  It may only be called for the #ENTER%ing Simplex.
-    *  
+    *
     *  For the #ENTER%ing Simplex algorithms, the feasibility vector is
     *  maintained to fullfill its bounds. As #fVec itself, also its
     *  bounds depend on the chosen representation. Further, they may
@@ -1461,21 +1517,15 @@ public:
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
-      {
-         theShift += to - theUBbound[i];
-         theUBbound[i] = to;
-      }
+      theShift += to - theUBbound[i];
+      theUBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      if( dualStatus(baseId(i)) != SPxBasis::Desc::D_ON_BOTH )
-      {
-         theShift += theLBbound[i] - to;
-         theLBbound[i] = to;
-      }
+      theShift += theLBbound[i] - to;
+      theLBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
    void shiftUPbound(int i, Real to)
@@ -1542,11 +1592,11 @@ private:
    ///
    Real perturbMin(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    ///
    Real perturbMax(const UpdateVector& uvec,
       Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr) const;
+      const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
    //------------------------------------
@@ -1555,12 +1605,12 @@ private:
     *  own SPxPricer or SPxRatioTester classes. Here is, how
     *  SPxSolver will call methods from its loaded SPxPricer and
     *  SPxRatioTester.
-    *  
+    *
     *  For the entering Simplex:
     *    -# \ref soplex::SPxPricer::selectEnter() "SPxPricer::selectEnter()"
     *    -# \ref soplex::SPxRatioTester::selectLeave() "SPxRatioTester::selectLeave()"
     *    -# \ref soplex::SPxPricer::entered4() "SPxPricer::entered4()"
-    *  
+    *
     *  For the leaving Simplex:
     *    -# \ref soplex::SPxPricer::selectLeave() "SPxPricer::selectLeave()"
     *    -# \ref soplex::SPxRatioTester::selectEnter() "SPxRatioTester::selectEnter()"
@@ -1576,7 +1626,7 @@ public:
     *  performance advantages over solving the two linear systems
     *  seperately.
     */
-   void setup4solve(Vector* p_y, SSVector* p_rhs)
+   void setup4solve(SSVector* p_y, SSVector* p_rhs)
    {
       assert(type() == LEAVE);
       solveVector2    = p_y;
@@ -1590,12 +1640,12 @@ public:
     *  other system. Solving several linear system at a time has
     *  performance advantages over solving them seperately.
     */
-   void setup4solve2(Vector* p_y2, SSVector* p_rhs2)
+   void setup4solve2(SSVector* p_y2, SSVector* p_rhs2)
    {
       assert(type() == LEAVE);
       solveVector3    = p_y2;
       solveVector3rhs = p_rhs2;
-   }   
+   }
    /// Setup vectors to be cosolved within Simplex loop.
    /** Load vector \p y to be #coSolve%d with the basis matrix during
     *  the #ENTER Simplex. The system will be solved after #SPxSolver%'s
@@ -1604,7 +1654,7 @@ public:
     *  performance advantages over solving the two linear systems
     *  seperately.
     */
-   void setup4coSolve(Vector* p_y, SSVector* p_rhs)
+   void setup4coSolve(SSVector* p_y, SSVector* p_rhs)
    {
       assert(type() == ENTER);
       coSolveVector2    = p_y;
@@ -1616,7 +1666,7 @@ public:
     *  call to SPxRatioTester. The system will be solved along
     *  with two other systems.
     */
-   void setup4coSolve2(Vector* p_z, SSVector* p_rhs)
+   void setup4coSolve2(SSVector* p_z, SSVector* p_rhs)
    {
       assert(type() == ENTER);
       coSolveVector3    = p_z;
@@ -1631,6 +1681,11 @@ public:
     *  solution.
     */
    virtual Real maxInfeas() const;
+
+   /// check for violations above tol and immediately return false w/o checking the remaining values
+   /** This method is useful for verifying whether an objective limit can be used as termination criterion
+    */
+   virtual bool noViols(Real tol) const;
 
    /// Return current basis.
    /**@note The basis can be used to solve linear systems or use
@@ -1674,7 +1729,7 @@ private:
    bool leave(int i);
    /** let id enter the basis and manage leaving of another one.
        @returns \c false if LP is unbounded/infeasible. */
-   bool enter(SPxId& id);
+   bool enter(SPxId& id, bool polish = false);
 
    /// test coVector \p i with status \p stat.
    Real coTest(int i, SPxBasis::Desc::Status stat) const;
@@ -1751,7 +1806,7 @@ protected:
    ///
    virtual void computeFrhs1(const Vector&, const Vector&);
    ///
-   void computeFrhs2(const Vector&, const Vector&);
+   void computeFrhs2(Vector&, Vector&);
    /// compute \ref soplex::SPxSolver::theCoPrhs "theCoPrhs" for entering Simplex.
    virtual void computeEnterCoPrhs();
    ///
@@ -1776,7 +1831,7 @@ protected:
    virtual const SVector* enterVector(const SPxId& p_id)
    {
       assert(p_id.isValid());
-      return p_id.isSPxRowId() 
+      return p_id.isSPxRowId()
          ? &vector(SPxRowId(p_id)) : &vector(SPxColId(p_id));
    }
    ///
@@ -1846,6 +1901,21 @@ protected:
    virtual void setLeaveBounds();
    //@}
 
+   //------------------------------------
+   /** Compute the primal ray or the farkas proof in case of unboundedness
+    *  or infeasibility.
+    */
+   //@{
+   ///
+   void computePrimalray4Col(Real direction, SPxId enterId);
+   ///
+   void computePrimalray4Row(Real direction);
+   ///
+   void computeDualfarkas4Col(Real direction);
+   ///
+   void computeDualfarkas4Row(Real direction, SPxId enterId);
+   //@}
+
 public:
 
    //------------------------------------
@@ -1869,9 +1939,9 @@ public:
       return value();
    }
    /// get all results of last solve.
-   Status 
+   Status
    getResult( Real* value = 0, Vector* primal = 0,
-              Vector* slacks = 0, Vector* dual = 0, 
+              Vector* slacks = 0, Vector* dual = 0,
               Vector* reduCost = 0);
 
 protected:
@@ -1929,10 +1999,13 @@ public:
    // this function is used for the improved dual simplex
    Real getDegeneracyLevel(Vector degenvec);
 
-   /// get dual steepest edge norms
+   /// get number of dual norms
+   void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
+
+   /// get dual norms
    bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
 
-   /// set dual steepest edge norms
+   /// set dual norms
    bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
    /// reset cumulative time counter to zero.
@@ -1988,6 +2061,12 @@ public:
    int dualIterations()
    {
       return iterations() - primalIterations();
+   }
+
+   /// return number of iterations done with primal algorithm
+   int polishIterations()
+   {
+      return polishCount;
    }
 
    /// time spent in last call to method solve().
@@ -2127,7 +2206,7 @@ public:
    //@{
    /// default constructor.
    explicit
-   SPxSolver( Type            type  = LEAVE, 
+   SPxSolver( Type            type  = LEAVE,
               Representation  rep   = ROW,
               Timer::TYPE     ttype = Timer::USER_TIME);
    // virtual destructor

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -144,10 +144,11 @@ protected:
    /// numerical stability tests.
    /** Tests whether the selected leave index needs to be discarded (and do so)
        and the ratio test is to be recomputed.
+       If \p polish is set to true no shifts are applied.
    */
-   bool minReLeave(Real& sel, int leave, Real maxabs);
+   bool minReLeave(Real& sel, int leave, Real maxabs, bool polish = false);
    ///
-   bool maxReLeave(Real& sel, int leave, Real maxabs);
+   bool maxReLeave(Real& sel, int leave, Real maxabs, bool polish = false);
 
    /// numerical stability check.
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
@@ -170,6 +171,9 @@ public:
    /// default constructor
    SPxFastRT()
       : SPxRatioTester("Fast")
+      , minStab(DEFAULT_BND_VIOL)
+      , epsilon(DEFAULT_EPS_ZERO)
+      , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
    /// copy constructor
@@ -197,6 +201,9 @@ public:
    /// bound flipping constructor
    SPxFastRT(const char* name)
       : SPxRatioTester(name)
+      , minStab(DEFAULT_BND_VIOL)
+      , epsilon(DEFAULT_EPS_ZERO)
+      , fastDelta(DEFAULT_BND_VIOL)
       , iscoid(false)
    {}
    /// destructor
@@ -215,7 +222,7 @@ public:
    ///
    virtual void load(SPxSolver* solver);
    ///
-   virtual int selectLeave(Real& val, Real);
+   virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
    virtual SPxId selectEnter(Real& val, int);
    ///

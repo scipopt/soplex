@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -28,6 +28,7 @@
 #include "basevectors.h"
 #include "spxsolver.h"
 #include "slufactor.h"
+#include "slufactor_rational.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "spxsimplifier.h"
@@ -35,6 +36,7 @@
 
 #include "spxscaler.h"
 #include "spxequilisc.h"
+#include "spxleastsqsc.h"
 #include "spxgeometsc.h"
 
 #include "spxstarter.h"
@@ -58,6 +60,8 @@
 #include "spxboundflippingrt.h"
 
 #include "sol.h"
+
+#define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim
 ///@todo introduce status codes for SoPlex, especially for rational solving
@@ -103,10 +107,6 @@ public:
    virtual ~SoPlex();
 
    //@}
-
-
-   /// message handler
-//   SPxOut spxout;
 
 
    //**@name Access to the real LP */
@@ -727,6 +727,24 @@ public:
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
+   /// compute rational basis inverse; returns true on success
+   bool computeBasisInverseRational();
+
+   /// gets an array of indices for the columns of the rational basis matrix; bind[i] >= 0 means that the i-th column of
+   /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
+   /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
+   bool getBasisIndRational(DataArray<int>& bind);
+
+   /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
+   bool getBasisInverseRowRational(const int r, SSVectorRational& vec);
+
+   /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
+   bool getBasisInverseColRational(const int c, SSVectorRational& vec);
+
+   /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
+   /// on success
+   bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
+
    /// sets starting basis via arrays of statuses
    void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
 
@@ -840,8 +858,8 @@ public:
       /// continue iterative refinement with exact basic solution if not optimal?
       RATFACJUMP = 10,
 
-      /// should feasibility be tested with relaxed bounds and sides?
-      FEASRELAX = 11,
+      /// use bound flipping also for row representation?
+      ROWBOUNDFLIPS = 11,
 
       /// number of boolean parameters
       BOOLPARAM_COUNT = 12
@@ -916,8 +934,14 @@ public:
       /// minimum number of stalling refinements since last pivot to trigger rational factorization
       RATFAC_MINSTALLS = 21,
 
+      /// maximum number of conjugate gradient iterations in least square scaling
+      LEASTSQ_MAXROUNDS = 22,
+
+      /// mode for solution polishing
+      SOLUTION_POLISHING = 23,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 22
+      INTPARAM_COUNT = 24
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1011,7 +1035,10 @@ public:
       SCALER_GEO1 = 3,
 
       /// geometric mean scaling on rows and columns, max 8 rounds
-      SCALER_GEO8 = 4
+      SCALER_GEO8 = 4,
+
+       /// least square scaling
+      SCALER_LEASTSQ = 5
    };
 
    /// values for parameter STARTER
@@ -1143,6 +1170,19 @@ public:
       HYPER_PRICING_ON = 2
    };
 
+   /// values for parameter SOLUTION_POLISHING
+   enum
+   {
+      /// no solution polishing
+      POLISHING_OFF = 0,
+
+      /// maximize number of basic slack variables, i.e. more variables on bounds
+      POLISHING_MAXBASICSLACK = 1,
+
+      /// minimize number of basic slack variables, i.e. more variables between bounds
+      POLISHING_MINBASICSLACK = 2
+   };
+
    /// real parameters
    typedef enum
    {
@@ -1200,8 +1240,26 @@ public:
       /// geometric frequency at which to apply rational reconstruction
       RATREC_FREQ = 17,
 
+      /// minimal reduction (sum of removed rows/cols) to continue simplification
+      MINRED = 18,
+
+      /// refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
+      REFAC_BASIS_NNZ = 19,
+
+      /// refactor threshold for fill-in in current factor update compared to fill-in in last factorization
+      REFAC_UPDATE_FILL = 20,
+
+      /// refactor threshold for memory growth in factorization since last refactorization
+      REFAC_MEM_FACTOR = 21,
+
+      /// accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      LEASTSQ_ACRCY = 22,
+
+      /// objective offset
+      OBJ_OFFSET = 23,
+
       /// number of real parameters
-      REALPARAM_COUNT = 18
+      REALPARAM_COUNT = 24
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1214,7 +1272,90 @@ public:
 #endif
 
    /// class of parameter settings
-   class Settings;
+   class Settings
+   {
+   public:
+      static struct BoolParam {
+         /// constructor
+         BoolParam();
+         /// array of names for boolean parameters
+         std::string name[SoPlex::BOOLPARAM_COUNT];
+         /// array of descriptions for boolean parameters
+         std::string description[SoPlex::BOOLPARAM_COUNT];
+         /// array of default values for boolean parameters
+         bool defaultValue[SoPlex::BOOLPARAM_COUNT];
+      } boolParam;
+
+      static struct IntParam {
+         /// constructor
+         IntParam();
+          /// array of names for integer parameters
+         std::string name[SoPlex::INTPARAM_COUNT];
+         /// array of descriptions for integer parameters
+         std::string description[SoPlex::INTPARAM_COUNT];
+         /// array of default values for integer parameters
+         int defaultValue[SoPlex::INTPARAM_COUNT];
+         /// array of lower bounds for int parameter values
+         int lower[SoPlex::INTPARAM_COUNT];
+         /// array of upper bounds for int parameter values
+         int upper[SoPlex::INTPARAM_COUNT];
+      } intParam;
+
+      static struct RealParam {
+         /// constructor
+         RealParam();
+         /// array of names for real parameters
+         std::string name[SoPlex::REALPARAM_COUNT];
+         /// array of descriptions for real parameters
+         std::string description[SoPlex::REALPARAM_COUNT];
+         /// array of default values for real parameters
+         Real defaultValue[SoPlex::REALPARAM_COUNT];
+         /// array of lower bounds for real parameter values
+         Real lower[SoPlex::REALPARAM_COUNT];
+         /// array of upper bounds for real parameter values
+         Real upper[SoPlex::REALPARAM_COUNT];
+      } realParam;
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      static struct RationalParam {
+         /// constructor
+         RationalParam();
+         /// array of names for rational parameters
+         std::string name[SoPlex::RATIONALPARAM_COUNT];
+         /// array of descriptions for rational parameters
+         std::string description[SoPlex::RATIONALPARAM_COUNT];
+         /// array of default values for rational parameters
+         Rational defaultValue[SoPlex::RATIONALPARAM_COUNT];
+         /// array of lower bounds for rational parameter values
+         Rational lower[SoPlex::RATIONALPARAM_COUNT];
+         /// array of upper bounds for rational parameter values
+         Rational upper[SoPlex::RATIONALPARAM_COUNT];
+      } rationalParam;
+#endif
+
+      /// array of current boolean parameter values
+      bool _boolParamValues[SoPlex::BOOLPARAM_COUNT];
+
+      /// array of current integer parameter values
+      int _intParamValues[SoPlex::INTPARAM_COUNT];
+
+      /// array of current real parameter values
+      Real _realParamValues[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of current rational parameter values
+      Rational _rationalParamValues[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// default constructor initializing default settings
+      Settings();
+
+      /// copy constructor
+      Settings(const Settings& settings);
+
+      /// assignment operator
+      Settings& operator=(const Settings& settings);
+   };
 
    mutable SPxOut spxout;
 
@@ -1236,21 +1377,24 @@ public:
    const Settings& settings() const;
 
    /// sets boolean parameter value; returns true on success
-   bool setBoolParam(const BoolParam param, const bool value, const bool quiet = false, const bool init = false);
+   bool setBoolParam(const BoolParam param, const bool value, const bool init = true);
 
    /// sets integer parameter value; returns true on success
-   bool setIntParam(const IntParam param, const int value, const bool quiet = false, const bool init = false);
+   bool setIntParam(const IntParam param, const int value, const bool init = true);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const Real value, const bool quiet = false, const bool init = false);
+   bool setRealParam(const RealParam param, const Real value, const bool init = true);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
-   bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
+   bool setRationalParam(const RationalParam param, const Rational value, const bool init = true);
 #endif
 
    /// sets parameter settings; returns true on success
-   bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
+   bool setSettings(const Settings& newSettings, const bool init = true);
+
+   /// resets default parameter settings
+   void resetSettings(const bool quiet = false, const bool init = true);
 
    /// print non-default parameter values
    void printUserSettings();
@@ -1299,6 +1443,12 @@ public:
    /// If quiet is set to true the function will only display which vectors are different.
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
 
+   /// set the random seed of the solver instance
+   void setRandomSeed(unsigned int seed);
+
+   /// returns the current random seed of the solver instance
+   unsigned int randomSeed() const;
+
    //@}
 
 private:
@@ -1339,6 +1489,7 @@ private:
    SPxEquiliSC _scalerBiequi;
    SPxGeometSC _scalerGeo1;
    SPxGeometSC _scalerGeo8;
+   SPxLeastSqSC _scalerLeastsq;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;
    SPxVectorST _starterVector;
@@ -1376,6 +1527,8 @@ private:
    //@{
 
    SPxLPRational* _rationalLP;
+   SLUFactorRational _rationalLUSolver;
+   DataArray<int> _rationalLUSolverBind;
 
    LPColSetRational _slackCols;
    DVectorRational _unboundedLower;
@@ -1570,7 +1723,7 @@ private:
    bool _isConsistent() const;
 
    /// should solving process be stopped?
-   bool _isSolveStopped() const;
+   bool _isSolveStopped(bool& stoppedTime, bool& stoppedIter) const;
 
    /// determines RangeType from real bounds
    RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
@@ -1748,13 +1901,23 @@ private:
    void _solveRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
-   void _performOptIRStable(SolRational& sol, bool acceptUnbounded, bool acceptInfeasible, int minRounds, bool& primalFeasible, bool& dualFeasible, bool& infeasible, bool& unbounded, bool& stopped, bool& error);
+   void _performOptIRStable(SolRational& sol,
+      bool acceptUnbounded,
+      bool acceptInfeasible,
+      int minRounds,
+      bool& primalFeasible,
+      bool& dualFeasible,
+      bool& infeasible,
+      bool& unbounded,
+      bool& stopped,
+      bool& stoppedIter,
+      bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& error);
+   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& stoppedIter, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& stoppedIter, bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();
@@ -1834,11 +1997,14 @@ private:
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
                                       DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
+   /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
+   void _computeBasisInverseRational();
+
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, bool& optimal);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stopped, bool& error, const Rational& denomBoundSquared);
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
    //@}
 
 

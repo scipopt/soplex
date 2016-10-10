@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -76,9 +76,12 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxWeightPR() 
+   SPxWeightPR()
       : SPxPricer("Weight")
-   {}   
+      , penalty(0)
+      , coPenalty(0)
+      , objlength(0)
+   {}
    /// copy constructor
    SPxWeightPR( const SPxWeightPR& old)
       : SPxPricer(old)

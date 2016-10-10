@@ -39,20 +39,25 @@ mkdir -p $RESDIR
 # Abort if files are missing
 if ! test -f $SETTINGSFILE
 then
-    echo "Settings file not found: "$SETTINGSFILE
-    exit
+    if [ "$SETTINGSFILE" == "../settings/default.set" ];
+    then
+        touch $SETTINGSFILE
+    else
+        echo "Settings file not found: "$SETTINGSFILE
+        exit 1
+    fi
 fi
 
 if ! test -f $TESTSET
 then
     echo "Testset file not found: "$TESTSET
-    exit
+    exit 1
 fi
 
 if ! test -f $BINFILE
 then
     echo "SoPlex executable not found: "$BINFILE
-    exit
+    exit 1
 fi
 
 date >$OUTFILE

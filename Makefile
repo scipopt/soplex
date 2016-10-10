@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.0.1.3
+VERSION		:=	2.2.1.2
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -52,7 +52,7 @@ OPT		=	opt
 STATICLIBEXT	=	a
 SHAREDLIBEXT	=	so
 LIBEXT		=	$(STATICLIBEXT)
-EXEEXTENSION	=	
+EXEEXTENSION	=
 TEST		=	quick
 ALGO		=  1 2 3 4
 LIMIT		=  #
@@ -67,11 +67,11 @@ LINKSINFO	=
 MEM		=	2000
 CONTINUE	=	false
 
-# will this be compiled for PARASCIP? (disables output because it uses global variables)
-PARASCIP	=	false
-
 # will this be compiled with the 1.x interface?
 LEGACY		=	false
+
+# is it allowed to link to external open source libraries?
+OPENSOURCE	=	true
 
 GMP		=	true
 ZLIB		=	true
@@ -103,12 +103,15 @@ LIBBUILDFLAGS	=       $(ARFLAGS)
 
 CPPFLAGS	=	-Isrc
 CXXFLAGS	=
-BINOFLAGS	=	
-LIBOFLAGS	=	
-LDFLAGS		=	
+BINOFLAGS	=
+LIBOFLAGS	=
+LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
+
+GMP_LDFLAGS	=	-lgmp
+GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)
 SRCDIR		=	src
@@ -146,6 +149,7 @@ LIBHEADER	=	array.h \
 			lprowset.h \
 			mpsinput.h \
 			nameset.h \
+			notimer.h \
 			random.h \
 			rational.h \
 			ratrecon.h \
@@ -167,6 +171,7 @@ LIBHEADER	=	array.h \
 			spxdefines.h \
 			spxdevexpr.h \
 			spxequilisc.h \
+			spxleastsqsc.h \
 			spxfastrt.h \
 			spxfileio.h \
 			spxgeometsc.h \
@@ -199,11 +204,14 @@ LIBHEADER	=	array.h \
 			svsetbase.h \
 			svset.h \
 			timer.h \
+			timerfactory.h \
 			unitvectorbase.h \
 			unitvector.h \
+			usertimer.h \
 			updatevector.h \
 			vectorbase.h \
-			vector.h
+			vector.h \
+			wallclocktimer.h
 LIBOBJ		= 	changesoplex.o \
 			clufactor.o \
 			clufactor_rational.o \
@@ -234,6 +242,7 @@ LIBOBJ		= 	changesoplex.o \
 			spxdesc.o \
 			spxdevexpr.o \
 			spxequilisc.o \
+			spxleastsqsc.o \
 			spxfastrt.o \
 			spxfileio.o \
 			spxgeometsc.o \
@@ -265,7 +274,7 @@ LIBOBJ		= 	changesoplex.o \
 			updatevector.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
-REPOSIT		=	# template repository, explicitly empty  #spxproof.o 
+REPOSIT		=	# template repository, explicitly empty  #spxproof.o
 
 BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 
@@ -303,12 +312,19 @@ include make/make.$(BASE)
 
 ifeq ($(SHARED),true)
 CPPFLAGS	+=	-fPIC
-LIBEXT		=	$(SHAREDLIBEXT)
 LIBBUILD	=	$(LINKCXX)
-LIBBUILDFLAGS	+=      -shared
-LIBBUILD_o	= 	-o # the trailing space is important
 ARFLAGS		=
 RANLIB		=
+ifeq ($(COMP),msvc)
+LIBEXT		=	dll
+LIBBUILDFLAGS	+=      -dll
+LIBBUILD_o	= 	-out:
+else
+LIBEXT		=	$(SHAREDLIBEXT)
+LIBBUILDFLAGS	+=      -shared
+LIBBUILD_o	= 	-o # the trailing space is important
+LINKRPATH	=	-Wl,-rpath,
+endif
 endif
 
 CPPFLAGS	+=	$(USRCPPFLAGS)
@@ -316,17 +332,6 @@ CXXFLAGS	+=	$(USRCXXFLAGS)
 LDFLAGS		+=	$(USRLDFLAGS)
 ARFLAGS		+=	$(USRARFLAGS)
 DFLAGS		+=	$(USRDFLAGS)
-
-#-----------------------------------------------------------------------------
-# PARASCIP
-#-----------------------------------------------------------------------------
-
-PARASCIPDEP	:=	$(SRCDIR)/depend.parascip
-PARASCIPSRC	:=	$(shell cat $(PARASCIPDEP))
-
-ifeq ($(PARASCIP),true)
-CPPFLAGS	+=	-DDISABLE_VERBOSITY
-endif
 
 #-----------------------------------------------------------------------------
 # LEGACY
@@ -374,13 +379,23 @@ ALLSRC		=	$(BINSRC) $(EXAMPLESRC) $(LIBSRC) $(LIBSRCHEADER)
 # External Libraries
 #-----------------------------------------------------------------------------
 
+# check if it is allowed to link to external open source libraries
+ifeq ($(OPENSOURCE), false)
+	override ZLIB	=	false
+	override GMP	=	false
+	override EGLIB	=	false
+endif
+
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
 ifeq ($(LEGACY),false)
-CPPFLAGS	+=	-DSOPLEX_WITH_GMP
-LDFLAGS		+=	-lgmp # todo: move this as GMP_LDFLAGS to submakefiles
+CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
+LDFLAGS	+= $(GMP_LDFLAGS)
 endif
+else
+GMP_LDFLAGS	=
+GMP_CPPFLAGS	=
 endif
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
@@ -391,6 +406,9 @@ endif
 ifeq ($(ZLIB),true)
 CPPFLAGS	+=	-DSOPLEX_WITH_ZLIB $(ZLIB_FLAGS)
 LDFLAGS		+=	$(ZLIB_LDFLAGS)
+else
+ZLIB_LDFLAGS	=
+ZLIB_FLAGS	=
 endif
 
 EGLIBDEP	:=	$(SRCDIR)/depend.eglib
@@ -404,6 +422,20 @@ LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containi
 endif
 endif
 
+ifeq ($(GMP),true)
+ifeq ($(COMP),msvc)
+SOFTLINKS	+=	$(LIBDIR)/mpir.$(ARCH)
+SOFTLINKS	+=	$(LIBDIR)/libmpir.$(ARCH).$(OPT).lib
+LINKSINFO	+=	"\n  -> \"mpir.$(ARCH)\" is a directory containing the mpir installation, i.e., \"mpir.$(ARCH)/gmp.h\" should exist.\n"
+LINKSINFO	+=	" -> \"libmpir.*\" is the path to the MPIR library\n"
+endif
+endif
+
+ifeq ($(SHARED),true)
+EXT_LIBS	= $(ZLIB_LDFLAGS) $(GMP_LDFLAGS)
+endif
+
+
 #-----------------------------------------------------------------------------
 # Rules
 #-----------------------------------------------------------------------------
@@ -415,7 +447,7 @@ endif
 
 .PHONY: all
 all:		makelibfile
-		@-$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
+		@$(MAKE) $(BINFILE) $(LIBLINK) $(LIBSHORTLINK) $(BINLINK) $(BINSHORTLINK)
 
 .PHONY: preprocess
 preprocess:	checkdefines
@@ -426,7 +458,7 @@ ifneq ($(SOFTLINKS),)
 				$(MAKE) -j1 $(LINKSMARKERFILE) ; \
 			fi'
 endif
-		@-$(MAKE) touchexternal
+		@$(MAKE) touchexternal
 
 $(LIBLINK) $(LIBSHORTLINK):	$(LIBFILE)
 		@rm -f $@
@@ -436,27 +468,35 @@ $(BINLINK) $(BINSHORTLINK):	$(BINFILE)
 		@rm -f $@
 		cd $(dir $@) && $(LN_s) $(notdir $(BINFILE)) $(notdir $@)
 
+ifeq ($(SHARED),true)
+$(BINFILE):	$(LIBFILE) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
+		@echo "-> linking $@"
+		$(LINKCXX) $(BINOBJFILES) \
+		$(LDFLAGS) $(LINKCXX_L)$(LIBDIR) $(LINKRPATH)\$$ORIGIN/../$(LIBDIR) $(LINKCXX_l)$(LIBNAME) $(LINKCXX_o)$@ \
+		|| ($(MAKE) errorhints && false)
+else
 $(BINFILE):	$(LIBOBJFILES) $(BINOBJFILES) | $(BINDIR) $(BINOBJDIR)
 		@echo "-> linking $@"
-		-$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
+		$(LINKCXX) $(BINOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$@ \
 		|| ($(MAKE) errorhints && false)
+endif
 
 .PHONY: example
 example:	$(LIBOBJFILES) $(EXAMPLEOBJFILES) | $(BINDIR) $(EXAMPLEOBJDIR)
 		@echo "-> linking $(EXAMPLEFILE)"
-		-$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
+		$(LINKCXX) $(EXAMPLEOBJFILES) $(LIBOBJFILES) \
 		$(LDFLAGS) $(LINKCXX_o)$(EXAMPLEFILE) \
 		|| ($(MAKE) errorhints && false)
 
 .PHONY: makelibfile
 makelibfile:	preprocess
-		@-$(MAKE) $(LIBFILE)
+		@$(MAKE) $(LIBFILE)
 
 $(LIBFILE):	$(LIBOBJFILES) | $(LIBDIR) $(LIBOBJDIR)
 		@echo "-> generating library $@"
 		-rm -f $(LIBFILE)
-		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT)
+		$(LIBBUILD) $(LIBBUILDFLAGS) $(LIBBUILD_o)$@ $(LIBOBJFILES) $(REPOSIT) $(EXT_LIBS)
 ifneq ($(RANLIB),)
 		$(RANLIB) $@
 endif
@@ -467,7 +507,7 @@ endif
 # this empty target is needed for the SoPlex release versions
 githash::	# do not remove the double-colon
 
-# include local targets 
+# include local targets
 -include make/local/make.targets
 
 # include install targets
@@ -483,7 +523,8 @@ else
 endif
 
 .PHONY: doc
-doc:		
+doc:
+		$(BINFILE) --saveset=doc/parameters.set
 		cd doc; $(DOXY) $(NAME).dxy
 
 .PHONY: test
@@ -520,12 +561,12 @@ cleanbin:	| $(BINDIR)
 
 .PHONY: cleanlib
 cleanlib:	| $(LIBDIR)
-		@echo "remove library $(LIBFILE)" 
+		@echo "remove library $(LIBFILE)"
 		@-rm -f $(LIBFILE) $(LIBLINK) $(LIBSHORTLINK)
 
 .PHONY: clean
 clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
-		@echo "remove objective files" 
+		@echo "remove objective files"
 ifneq ($(LIBOBJDIR),)
 		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
 endif
@@ -544,7 +585,7 @@ vimtags:
 etags:
 		-ctags -e -o TAGS src/*.cpp src/*.h
 
-$(OBJDIR):	
+$(OBJDIR):
 		@-mkdir -p $(OBJDIR)
 
 $(BINOBJDIR):	| $(OBJDIR)
@@ -577,7 +618,6 @@ depend:
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
 		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
 		@echo `grep -l "SOPLEX_LEGACY" $(ALLSRC)` >$(LEGACYDEP)
-		@echo `grep -l "DISABLE_VERBOSITY" $(ALLSRC)` >$(PARASCIPDEP)
 
 -include	$(DEPEND)
 
@@ -595,7 +635,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(PARASCIPDEP) $(LEGACYDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(LEGACYDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -613,13 +653,14 @@ endif
 ifneq ($(EGLIB),$(LAST_EGLIB))
 		@-touch $(EGLIBSRC)
 endif
-ifneq ($(PARASCIP),$(LAST_PARASCIP))
-		@-touch $(PARASCIPSRC)
-endif
 ifneq ($(LEGACY),$(LAST_LEGACY))
 		@-touch $(LEGACYSRC)
 endif
 ifneq ($(SHARED),$(LAST_SHARED))
+		@-touch $(LIBSRC)
+		@-touch $(BINSRC)
+endif
+ifneq ($(SANITIZE),$(LAST_SANITIZE))
 		@-touch $(LIBSRC)
 		@-touch $(BINSRC)
 endif
@@ -642,9 +683,9 @@ endif
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_EGLIB=$(EGLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_PARASCIP=$(PARASCIP)" >> $(LASTSETTINGS)
 		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
+		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCPPFLAGS=$(USRCPPFLAGS)" >> $(LASTSETTINGS)
 		@echo "LAST_USRLDFLAGS=$(USRLDFLAGS)" >> $(LASTSETTINGS)
@@ -721,11 +762,6 @@ endif
 ifneq ($(EGLIB),true)
 ifneq ($(EGLIB),false)
 		$(error invalid EGLIB flag selected: EGLIB=$(EGLIB). Possible options are: true false)
-endif
-endif
-ifneq ($(PARASCIP),true)
-ifneq ($(PARASCIP),false)
-		$(error invalid PARASCIP flag selected: PARASCIP=$(PARASCIP). Possible options are: true false)
 endif
 endif
 ifneq ($(LEGACY),true)

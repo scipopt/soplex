@@ -1,7 +1,79 @@
-(maintain each list from top to bottom)
-
-Developer version
+developer version
 =================
+
+features:
+- new scaler: Least Squares, aka Curtis-Reid-Scaling
+- solution polishing: perform additional primal pivots at optimal basis
+  turn on with parameter 'int:solution_polishing'
+    0 - off
+    1 - try to increase number of basic slack vars
+    2 - try to decrease number of basic slack vars
+
+performance:
+
+interface & parameters:
+- new parameters to control refactorization triggers
+- random seed for perturbation can be set from outside and is not reset in between
+- set default representation switch to 1.2
+- setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
+- new interface methods to access rational factorization of basis matrix
+- allow parsing of "inf" bounds in MPS reader
+- new method to reset parameters to default values
+- new method to change the objective function offset
+- setParam() methods use default parameter 'init=true' to force updates in solver settings
+- print primal ray and dual farkas proof with '-x' and '-y'
+
+fixed bugs:
+- fix inconsistent basis status in Basis and Solver
+- correct definition of numeric constants when using LONG_DOUBLE mode
+- fix bug in class SemiSparseVector
+- correctly define WIN flags for Cygwin
+- fix bug in left solve with rational LU factorization
+- shared library knows its dependencies (GMP, ZLIB)
+- when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
+- fixed memory bug in class DSVectorBase when resizing zero length vectors
+- restore initial basis when given basis has too many basic variables
+- improve behaviour for LPs with zero constraints
+
+interface:
+- submakefile for CrayXC systems added
+
+code quality:
+- SoPlex is thread-safe by using the storage class specifier thread-local for static variables
+- disabling verbosity when using PARASCIP is not necessary anymore
+
+
+29 February 2016 - Release 2.2.1
+================================
+
+performance:
+- faster updateFtest() by exploiting sparsity in solveVector3
+- new method noViols() for checking violations, that terminates faster than maxInfeas()
+- new refactorization trigger that takes basis size into account
+
+interface & parameters:
+- show current dual (primal) violation of dual (primal) simplex in log
+- options -X and -Y to print primal and dual solution as rationals
+- add new compiling flag OPENSOURCE to allow/forbid the usage of third party software
+- improve Makefiles for better usage of MSVC on MinGW
+
+fixed bugs:
+- correct initialization of objective offset in simplifier
+- fix for compilation with Visual Studio 2010
+- allow to extend also empty SVectors
+- better internal handling of singular bases
+- check whether the solver is available when setting dual norms
+- fix removing rows/cols in SoPlex interface
+- check objective limit also when presolving is activated
+- fixed compilation problems under Windows with MSVC
+
+code quality:
+- removed some hard float comparisons (use 'EQ()' instead of '==' )
+- check scripts are now python3 compliant
+
+
+30 June 2015 - Release 2.2.0
+============================
 
 features:
 - support for accessing objective coefficients of implicit slack variables in column representation ("row objectives")
@@ -11,6 +83,8 @@ features:
 performance:
 - iterative refinement for ranged rows without introducing explicit slack variables
 - more efficient rational arithmetic through EGlib's memory allocator (available when building with EG=true)
+- use sparse data structures (SSVector instead of Vector) for LU solves with 2 or 3 right hand sides
+  (necessary for steepest edge weights and/or bound flipping ratio test updates)
 - do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
 - faster file reader due to better hashing (increase hash table size earlier and use more prime numbers)
 - more efficient arithmetic in class Rational by checking special cases
@@ -19,11 +93,14 @@ performance:
 - no transformation of objective sense for rational solve
 - simplifier makes fewer constructor/destructor calls to DSVector class by reusing the data structures
 - update nonbasic part of objective function value instead of completely recomputing it every time
+- activate hyper sparse pricing per default
+- faster solve methods by clearing temporary vectors more efficiently (esp. useful for steepest edge pricing)
+- steepest edge and devex pricer share the same norm/weight array to avoid the initialization phase after a pricer switch
 
 interface & parameters:
 - new parameter bool:eqtrans to control transformation to equality form before rational solving
 - new make option EG={true,false} to build with EGlib
-- bound flipping is now enabled by default
+- bound flipping is now enabled by default when using column representation
 - new command line option --writefile to save LP file as read by SoPlex
 - new parameter bool:testdualinf to decide dual feasibility even if LP is primal infeasible and farkas ray is available
 - improved printing of rationals in limited precision
@@ -37,7 +114,9 @@ interface & parameters:
 - new parameter real:ratreq_freq for geometric frequency at which to apply rational reconstruction
 - new parameter bool:powerscaling for rounding scaling factors during iterative refinement to powers of two
 - new parameter bool:ratfacjump whether to continue iterative refinement with exact basic solution if not optimal
-- new methods to store and set steepest edge weights
+- new methods to store and set dual norms for pricing
+- new parameter real:minred to control the minimal reduction factor in the simplifier to continue presolving (default 1e-4)
+- new parameter bool:rowboundlfips to enable bound flipping also for row representation
 
 fixed bugs:
 - do not categorically remove nonzeros with small absolute value in simplifier
@@ -47,11 +126,24 @@ fixed bugs:
 - fix compiler error from missing operators between Rational and ints for GMP=false
 - fix memory leak with static rational numbers Rational::{ZERO,POSONE,NEGONE} and list memory
 - fix uninitialized value in class SPxWeightST
+- fix wrong basis status in postsolving of aggregated variables
+- eliminate incorrect switching of primal and dual feasibility tolerance when changing representation
+- force recomputation of nonbasic objective value when reloading SPxSolver
+- correct counting of LU solves (when solving with more than one rhs this is counted accordingly)
 
 code quality:
 - change flag DEBUGGING to SOPLEX_DEBUG
 - deactivate SOPLEX_DEBUG flag in header files if defined externally
 - SPxOut output stream is no longer a global variable
+- hyper pricing parameters (i.e. candidate list size and activation threshold) are not linked to maxUpdates of factorization anymore
+
+
+18 Feb 2015 - Release 2.1.0
+===========================
+
+SoPlex 2.1 is an internal release that was packed for installing an 80bit extended-precision version on the NEOS Server
+for Optimization.  It contains many of the features of SoPlex 2.2, in particular for solving LPs with rational input
+data exactly.
 
 
 18 Dec 2014 - Release 2.0.1

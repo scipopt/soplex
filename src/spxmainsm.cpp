@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -890,35 +890,12 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       ASSERT_WARN( "WMAISM73", isNotZero(m_aij * aik) );
 
       // basis:
-      if (cStatus[m_k] == SPxSolver::ON_LOWER)
-      {
-         if (m_jFixed)
-            cStatus[m_j] = SPxSolver::FIXED;
-         else
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-      }
-      else if (cStatus[m_k] == SPxSolver::ON_UPPER)
-      {
-         if (m_jFixed)
-            cStatus[m_j] = SPxSolver::FIXED;
-         else
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-      }
+      if( m_jFixed)
+         cStatus[m_j] = SPxSolver::FIXED;
       else
-      {
-         if (m_jFixed)
-            cStatus[m_j] = SPxSolver::FIXED;
-         else if (m_strictLo)
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_UPPER : SPxSolver::ON_LOWER;
-         else
-            cStatus[m_j] = (m_aij * aik > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
-      }
+         cStatus[m_j] = (r[m_j] > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
 
       cStatus[m_k] = SPxSolver::BASIC;
-
-      assert((r[m_j] >= -eps() && cStatus[m_j] == SPxSolver::ON_LOWER)||
-             (r[m_j] <= eps() && cStatus[m_j] == SPxSolver::ON_UPPER ) ||
-             (cStatus[m_j] == SPxSolver::FIXED));
    }
 
 #ifdef CHECK_BASIC_DIM
@@ -1685,6 +1662,8 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
    int keptBnds = 0;
    int keptLRhs = 0;
 
+   int oldRows = lp.nRows();
+
    bool redundantLower;
    bool redundantUpper;
    bool redundantLhs;
@@ -1755,7 +1734,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.lhs(i) / rhsBnd) > Param::epsilon())
+                  && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -1792,7 +1771,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.rhs(i) / lhsBnd) > Param::epsilon())
+                  && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -1859,7 +1838,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
             {
                if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.lhs(i) / rhsBnd) > Param::epsilon())
+                  && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param::epsilon())
                {
                   Real up    = infinity;
                   Real scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -1895,7 +1874,7 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                }
                if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                   // do not perform if strongly different orders of magnitude occur
-                  && spxAbs(lp.rhs(i) / lhsBnd) > Param::epsilon())
+                  && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param::epsilon())
                {
                   Real lo    = -infinity;
                   Real scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -2177,7 +2156,6 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 
    if (remRows + chgLRhs + chgBnds > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remNzos += remNzos;
       m_chgLRhs += chgLRhs;
@@ -2193,7 +2171,8 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
                         << keptBnds << " column bounds, "
                         << keptLRhs << " row bounds"
                         << std::endl; )
-
+      if( remRows > m_minReduction * oldRows )
+         again = true;
    }
    return OKAY;
 }
@@ -2217,6 +2196,9 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
    int remCols = 0;
    int remNzos = 0;
    int chgBnds = 0;
+
+   int oldCols = lp.nCols();
+   int oldRows = lp.nRows();
 
    for(int j = lp.nCols()-1; j >= 0; --j)
    {
@@ -2705,7 +2687,6 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
 
    if (remCols + remRows > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remCols += remCols;
       m_remNzos += remNzos;
@@ -2717,6 +2698,8 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds"
                         << std::endl; )
+      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+         again = true;
    }
    return OKAY;
 }
@@ -2734,6 +2717,9 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
    int remRows = 0;
    int remCols = 0;
    int remNzos = 0;
+
+   int oldRows = lp.nRows();
+   int oldCols = lp.nCols();
 
    DataArray<bool> colSingleton(lp.nCols());
    DVector         dualVarLo(lp.nRows());
@@ -2858,7 +2844,7 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
       Real obj = lp.maxObj(j);
 
       // 1. dominated column
-      // Is the problem really unbounded in the cases below ??? Or is only dual infeasiblity be shown
+      // Is the problem really unbounded in the cases below ??? Or is only dual infeasibility be shown
       if (GTrel(obj, dualConsUp[j], opttol()))
       {
 #if DOMINATED_COLUMN
@@ -2957,7 +2943,6 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
 
    if (remCols + remRows > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remCols += remCols;
       m_remNzos += remNzos;
@@ -2967,6 +2952,8 @@ SPxSimplifier::Result SPxMainSM::simplifyDual(SPxLP& lp, bool& again)
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
+      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+         again = true;
    }
    return OKAY;
 }
@@ -2982,6 +2969,8 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    int remRows = 0;
    int remNzos = 0;
+
+   int oldRows = lp.nRows();
 
    // remove empty rows and columns
    SPxSimplifier::Result ret = removeEmpty(lp);
@@ -3043,7 +3032,7 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
       idxSet.addIdx(i);
    }
 
-   Real oldVal;
+   Real oldVal = 0.0;
 
    // main loop
    for(int j = 0; j < lp.nCols(); ++j)
@@ -3102,6 +3091,9 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
    spx_free(idxMem);
 
    DataArray<bool> remRow(lp.nRows());
+
+   for(int k = 0; k < lp.nRows(); ++k )
+      m_dupRows[k].clear();
 
    for(int k = 0; k < lp.nRows(); ++k)
    {
@@ -3265,7 +3257,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
             }
          }
       }
-      m_dupRows[k].clear();
    }
 
    // change ranges for all modified constraints by one single call (more efficient)
@@ -3307,7 +3298,6 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
 
    if (remRows + remNzos > 0)
    {
-      again      = true;
       m_remRows += remRows;
       m_remNzos += remNzos;
 
@@ -3315,6 +3305,9 @@ SPxSimplifier::Result SPxMainSM::duplicateRows(SPxLP& lp, bool& again)
                         << remRows << " rows, "
                         << remNzos << " non-zeros"
                         << std::endl; )
+      if( remRows > m_minReduction * oldRows )
+         again = true;
+
    }
    return OKAY;
 }
@@ -3366,7 +3359,7 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
       idxSet.addIdx(j);
    }
 
-   Real oldVal;
+   Real oldVal = 0.0;
 
    // main loop
    for(int i = 0; i < lp.nRows(); ++i)
@@ -3425,16 +3418,17 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    spx_free(idxMem);
 
-   for(int k = 0; k < lp.nCols(); ++k)
-      m_dupCols[pClass[k]].add(k, 0.0);
-
    DataArray<bool> remCol(lp.nCols());
    DataArray<bool> fixAndRemCol(lp.nCols());
 
-   for(int j = 0; j < lp.nCols(); ++j)
+   for( int k = 0; k < lp.nCols(); ++k )
+      m_dupCols[k].clear();
+
+   for(int k = 0; k < lp.nCols(); ++k)
    {
-      remCol[j] = false;
-      fixAndRemCol[j] = false;
+      remCol[k] = false;
+      fixAndRemCol[k] = false;
+      m_dupCols[pClass[k]].add(k, 0.0);
    }
 
    bool hasDuplicateCol = false;
@@ -3625,7 +3619,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
             }
          }
       }
-      m_dupCols[k].clear();
    }
 
    for(int j = 0; j < lp.nCols(); ++j)
@@ -3682,7 +3675,6 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
 
    if (remCols > 0)
    {
-      again      = true;
       m_remCols += remCols;
       m_remNzos += remNzos;
 
@@ -3690,6 +3682,8 @@ SPxSimplifier::Result SPxMainSM::duplicateCols(SPxLP& lp, bool& again)
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
+      if( remCols > m_minReduction * nColsOld )
+         again = true;
    }
    return OKAY;
 }
@@ -3780,6 +3774,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    m_timeUsed->reset();
    m_timeUsed->start();
 
+   m_objoffset = 0.0;
+
    m_remRows = 0;
    m_remCols = 0;
    m_remNzos = 0;
@@ -3790,8 +3786,6 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    m_result     = OKAY;
    bool   again = true;
-   int numRangedRows = 0;
-   int numBoxedCols = 0;
 
    if(m_hist.size() > 0)
    {
@@ -3820,22 +3814,23 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    m_feastol = ftol;
    m_opttol = otol;
 
-   for(int i = 0; i < lp.nRows(); ++i)
-   {
-      if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
-         ++numRangedRows;
-   }
 
-   for(int j = 0; j < lp.nCols(); ++j)
-   {
-      if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
-         ++numBoxedCols;
-   }
+   MSG_INFO2( (*spxout),
+      int numRangedRows = 0;
+      int numBoxedCols = 0;
 
-   MSG_INFO2( (*spxout), (*spxout) << "LP has "
-                     << numRangedRows << " ranged rows, "
-                     << numBoxedCols << " boxed columns"
-                     << std::endl; )
+      for(int i = 0; i < lp.nRows(); ++i)
+         if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+            ++numRangedRows;
+      for(int j = 0; j < lp.nCols(); ++j)
+         if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+            ++numBoxedCols;
+
+      (*spxout) << "LP has "
+                << numRangedRows << " ranged rows, "
+                << numBoxedCols << " boxed columns"
+                << std::endl;
+   )
 
    m_stat.reSize(15);
 
@@ -3903,7 +3898,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 #endif
    }
 
-   // preprocessing detected infeasibility or unboundness
+   // preprocessing detected infeasibility or unboundedness
    if (m_result != OKAY)
       return m_result;
 
@@ -3929,22 +3924,23 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << lp.nNzos() << " nonzeros"
                      << std::endl; )
 
-   // reset counter
-   numRangedRows = 0;
-   numBoxedCols  = 0;
+   MSG_INFO2( (*spxout),
+      int numRangedRows = 0;
+      int numBoxedCols  = 0;
 
-   for(int i = 0; i < lp.nRows(); ++i)
-      if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
-         ++numRangedRows;
+      for(int i = 0; i < lp.nRows(); ++i)
+         if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
+            ++numRangedRows;
 
-   for(int j = 0; j < lp.nCols(); ++j)
-      if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
-         ++numBoxedCols;
+      for(int j = 0; j < lp.nCols(); ++j)
+         if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+            ++numBoxedCols;
 
-   MSG_INFO2( (*spxout), (*spxout) << "Reduced LP has "
-                     << numRangedRows << " ranged rows, "
-                     << numBoxedCols << " boxed columns"
-                     << std::endl; )
+      (*spxout) << "Reduced LP has "
+                << numRangedRows << " ranged rows, "
+                << numBoxedCols << " boxed columns"
+                << std::endl;
+   )
 
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
@@ -4012,7 +4008,6 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
       catch( ... )
       {
          MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ".\n" );
-         assert(false);
          throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
       }
 

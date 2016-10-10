@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -63,7 +63,12 @@ public:
       int    pos;                 ///< position of pivot column in row
       int    mkwtz;               ///< markowitz number of pivot
 
-      Pring() : next(0), prev(0)  ///< constructor
+      Pring()                     ///< constructor
+         : next(0)
+         , prev(0)
+         , idx(0)
+         , pos(0)
+         , mkwtz(0)
       {}
 
    private:

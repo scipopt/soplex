@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -81,16 +81,16 @@ const Rational Rational::NEGONE(-1, true);
 /// Private class has no member next() and prev()
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
-bool Rational::useListMem = false;
+thread_local bool Rational::useListMem = false;
 #else
-bool Rational::useListMem = true;
+thread_local bool Rational::useListMem = true;
 #endif
 
 
 
 
 /// list of unused Private objects
-IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+thread_local IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 
 /// Defines the "Pimpl"-class Private
@@ -1950,7 +1950,7 @@ bool Rational::readString(const char* s)
 std::string rationalToString(const Rational& r, const int precision)
 {
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_WIN64) || defined(__APPLE__)
   std::stringstream sstream;
   sstream << r;
   return sstream.str();

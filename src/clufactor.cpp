@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -278,12 +278,14 @@ void CLUFactor::setPivot( const int p_stage,
    diag[p_row]       = REAL( 1.0 ) / val;
    if( spxAbs(val) < Param::epsilonPivot() )
    {
+#ifndef NDEBUG
       MSG_ERROR( std::cerr
                  << "LU pivot element is almost zero (< "
                  << Param::epsilonPivot()
                  << ") - Basis is numerically singular"
                  << std::endl;
       )
+#endif
       stat = SLinSolver::SINGULAR;
    }
 
@@ -5822,6 +5824,84 @@ int CLUFactor::vSolveRight4update2( Real eps,
    return rn;
 }
 
+void CLUFactor::vSolveRight4update2sparse( Real eps, Real* vec, int* idx,        /* result1 */
+                                           Real* rhs, int* ridx, int& rn,        /* rhs1    */
+                                           Real eps2, Real* vec2, int* idx2,     /* result2 */
+                                           Real* rhs2, int* ridx2, int& rn2,     /* rhs2    */
+                                           Real* forest, int* forestNum, int* forestIdx )
+{
+   /* solve with L */
+   vSolveLright2( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2 );
+
+   Real x;
+   int i, j, k;
+   int* rperm = row.perm;
+
+   /*  turn index list into a heap for both ridx and ridx2 */
+   if ( forest )
+   {
+      int* it = forestIdx;
+
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+         {
+            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            forest[k] = x;
+         }
+         else
+            rhs[k] = 0;
+      }
+
+      *forestNum = rn = j;
+   }
+   else
+   {
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+            enQueueMax( ridx, &j, rperm[k] );
+         else
+            rhs[k] = 0;
+      }
+
+      rn = j;
+   }
+
+   for ( i = j = 0; i < rn2; ++i )
+   {
+      k = ridx2[i];
+      assert( k >= 0 && k < thedim );
+      x = rhs2[k];
+
+      if ( isNotZero( x, eps2 ) )
+         enQueueMax( ridx2, &j, rperm[k] );
+      else
+         rhs2[k] = 0;
+   }
+
+   rn2 = j;
+
+   /* solve with U */
+   rn = vSolveUright( vec, idx, rhs, ridx, rn, eps );
+   rn2 = vSolveUright( vec2, idx2, rhs2, ridx2, rn2, eps2 );
+
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = vSolveUpdateRight( vec, idx, rn, eps );
+      rn2 = vSolveUpdateRight( vec2, idx2, rn2, eps2 );
+   }
+}
+
+
 int CLUFactor::vSolveRight4update3( Real eps,
                                     Real* vec, int* idx,                 /* result1 */
                                     Real* rhs, int* ridx, int rn,        /* rhs1    */
@@ -5972,6 +6052,102 @@ int CLUFactor::vSolveRight4update3( Real eps,
    return rn;
 }
 
+void CLUFactor::vSolveRight4update3sparse( Real eps, Real* vec, int* idx,        /* result1 */
+                                           Real* rhs, int* ridx, int& rn,        /* rhs1    */
+                                           Real eps2, Real* vec2, int* idx2,     /* result2 */
+                                           Real* rhs2, int* ridx2, int& rn2,     /* rhs2    */
+                                           Real eps3, Real* vec3, int* idx3,     /* result3 */
+                                           Real* rhs3, int* ridx3, int& rn3,     /* rhs3    */
+                                           Real* forest, int* forestNum, int* forestIdx )
+{
+   vSolveLright3( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3 );
+   assert( rn >= 0 && rn <= thedim );
+   assert( rn2 >= 0 && rn2 <= thedim );
+   assert( rn3 >= 0 && rn3 <= thedim );
+
+   Real x;
+   int i, j, k;
+   int* rperm = row.perm;
+
+   /*  turn index list into a heap */
+   if ( forest )
+   {
+      int* it = forestIdx;
+
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+         {
+            enQueueMax( ridx, &j, rperm[*it++ = k] );
+            forest[k] = x;
+         }
+         else
+            rhs[k] = 0;
+      }
+
+      *forestNum = rn = j;
+   }
+   else
+   {
+      for ( i = j = 0; i < rn; ++i )
+      {
+         k = ridx[i];
+         assert( k >= 0 && k < thedim );
+         x = rhs[k];
+
+         if ( isNotZero( x, eps ) )
+            enQueueMax( ridx, &j, rperm[k] );
+         else
+            rhs[k] = 0;
+      }
+
+      rn = j;
+   }
+
+   for ( i = j = 0; i < rn2; ++i )
+   {
+      k = ridx2[i];
+      assert( k >= 0 && k < thedim );
+      x = rhs2[k];
+
+      if ( isNotZero( x, eps2 ) )
+         enQueueMax( ridx2, &j, rperm[k] );
+      else
+         rhs2[k] = 0;
+   }
+
+   rn2 = j;
+
+   for ( i = j = 0; i < rn3; ++i )
+   {
+      k = ridx3[i];
+      assert( k >= 0 && k < thedim );
+      x = rhs3[k];
+
+      if ( isNotZero( x, eps3 ) )
+         enQueueMax( ridx3, &j, rperm[k] );
+      else
+         rhs3[k] = 0;
+   }
+
+   rn3 = j;
+
+   rn = vSolveUright( vec, idx, rhs, ridx, rn, eps );
+   rn2 = vSolveUright( vec2, idx2, rhs2, ridx2, rn2, eps2 );
+   rn3 = vSolveUright( vec3, idx3, rhs3, ridx3, rn3, eps3 );
+
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = vSolveUpdateRight( vec, idx, rn, eps );
+      rn2 = vSolveUpdateRight( vec2, idx2, rn2, eps2 );
+      rn3 = vSolveUpdateRight( vec3, idx3, rn3, eps3 );
+   }
+}
+
 void CLUFactor::vSolveRightNoNZ(
    Real* vec2, Real eps2,              /* result2 */
    Real* rhs2, int* ridx2, int rn2 )   /* rhs2    */
@@ -6041,9 +6217,12 @@ int CLUFactor::vSolveLeft( Real eps,
       rn = solveLleftForest( eps, vec, idx, rn );
    }
 
+   // TODO verify the correctness of this check
    if ( rn + l.firstUpdate > verySparseFactor4left * thedim )
    {
+      // perform the dense solve
       solveLleftNoNZ( vec );
+      // signal the caller that the nonzero pattern is lost
       return 0;
    }
    else
@@ -6078,6 +6257,33 @@ int CLUFactor::vSolveLeft2( Real eps,
 
    return rn;
 }
+
+void CLUFactor::vSolveLeft2sparse( Real eps,
+                                   Real* vec, int* idx,                      /* result */
+                                   Real* rhs, int* ridx, int& rn,            /* rhs    */
+                                   Real* vec2, int* idx2,                    /* result2 */
+                                   Real* rhs2, int* ridx2, int& rn2 )        /* rhs2    */
+{
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = solveUpdateLeft( eps, rhs, ridx, rn );
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn2 = solveUpdateLeft( eps, rhs2, ridx2, rn2 );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+   }
+   else
+   {
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn = solveLleftForest( eps, vec, idx, rn );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+      rn2 = solveLleftForest( eps, vec2, idx2, rn2 );
+
+   }
+
+   rn = solveLleft( eps, vec, idx, rn );
+   rn2 = solveLleft( eps, vec2, idx2, rn2 );
+}
+
 
 int CLUFactor::vSolveLeft3( Real eps,
                             Real* vec, int* idx,                      /* result */
@@ -6114,6 +6320,39 @@ int CLUFactor::vSolveLeft3( Real eps,
 
    return rn;
 }
+
+void CLUFactor::vSolveLeft3sparse( Real eps,
+                                   Real* vec, int* idx,                      /* result */
+                                   Real* rhs, int* ridx, int& rn,            /* rhs    */
+                                   Real* vec2, int* idx2,                    /* result2 */
+                                   Real* rhs2, int* ridx2, int& rn2,         /* rhs2    */
+                                   Real* vec3, int* idx3,                    /* result3 */
+                                   Real* rhs3, int* ridx3, int& rn3 )        /* rhs3    */
+{
+   if ( !l.updateType )          /* no Forest-Tomlin Updates */
+   {
+      rn = solveUpdateLeft( eps, rhs, ridx, rn );
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn2 = solveUpdateLeft( eps, rhs2, ridx2, rn2 );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+      rn3 = solveUpdateLeft( eps, rhs3, ridx3, rn3 );
+      rn3 = solveUleft( eps, vec3, idx3, rhs3, ridx3, rn3 );
+   }
+   else
+   {
+      rn = solveUleft( eps, vec, idx, rhs, ridx, rn );
+      rn = solveLleftForest( eps, vec, idx, rn );
+      rn2 = solveUleft( eps, vec2, idx2, rhs2, ridx2, rn2 );
+      rn2 = solveLleftForest( eps, vec2, idx2, rn2 );
+      rn3 = solveUleft( eps, vec3, idx3, rhs3, ridx3, rn3 );
+      rn3 = solveLleftForest( eps, vec3, idx3, rn3 );
+   }
+
+   rn = solveLleft( eps, vec, idx, rn );
+   rn2 = solveLleft( eps, vec2, idx2, rn2 );
+   rn3 = solveLleft( eps, vec3, idx3, rn3 );
+}
+
 
 void CLUFactor::vSolveLeftNoNZ( Real eps,
                                 Real* vec2,                            /* result2 */

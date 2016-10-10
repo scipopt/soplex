@@ -4,7 +4,7 @@
 *       SoPlex --- the Sequential object-oriented simPlex.                  *
 *                                                                           *
 *    Copyright (C) 1996      Roland Wunderling                              *
-*                  1996-2015 Konrad-Zuse-Zentrum                            *
+*                  1996-2016 Konrad-Zuse-Zentrum                            *
 *                            fuer Informationstechnik Berlin                *
 *                                                                           *
 *  SoPlex is distributed under the terms of the ZIB Academic Licence.       *
@@ -49,10 +49,10 @@
         which will deactivate the possibility to read gzipped LP and MPS files.
 
 
-3.      Working with the 1.x interface / Compiling without the new C++11 standard
+3.      Working with the 1.x interface / Compiling without the C++11 standard
 
         We use the feature of explicit conversion operators introduced by the
-        new C++11 standard.  If your compiler does not support this, or if for other
+        C++11 standard.  If your compiler does not support this, or if for other
         reasons you wish to use the old SoPlex 1.x interface, you can build with
 
         make COMP=<as before> OPT=<as before> LEGACY=true
@@ -63,15 +63,9 @@
 
 4.      Compiling SoPlex with GMP
 
-        From version 1.7 on, SoPlex provides the new feature iterative
-        refinement to compute extended-precision solutions. For details,
-        see ZIB report 12-19 available at
-
-        http://opus4.kobv.de/opus4-zib/frontdoor/index/index/docId/1545
-
-        This feature works best with rational arithmetic.  We use the GNU
-        Multiple Precision library (http://www.gmplib.org/) for this.  If GMP
-        is not available, you can deactivate it by building with
+        For using SoPlex as an exact rational LP solver, SoPlex must be compiled
+        with support for the GNU Multiple Precision library (http://www.gmplib.org/)
+        for this.  If GMP is not available, you can deactivate it by building with
 
         make COMP=<as before> OPT=<as before> GMP=false.
 
@@ -111,7 +105,19 @@
 
         Roland Wunderling,
         "Paralleler und Objekt-orientierter Simplex-Algorithmus",
-        ZIB technical report TR 96-09, Berlin 1996
+        Ph.D. thesis, TU Berlin, 1996, available as ZIB-Report 96-09
+        under http://nbn-resolving.de/urn:nbn:de:0297-zib-5386
 
-        A copy of the thesis can be retreived from
-        www.zib.de/Publications/abstracts/TR-96-09/
+        If you use SoPlex as an exact rational LP solver, please cite
+        the references
+
+        Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter,
+        "Improving the Accuracy of Linear Programming Solvers with Iterative
+        Refinement",
+        Proc. of ISSAC '12, pages 187--194, 2012, available as ZIB-Report 12-19
+        under http://nbn-resolving.de/urn:nbn:de:0297-zib-15451
+
+        Ambros M. Gleixner, Daniel E. Steffy, Kati Wolter.
+        "Iterative Refinement for Linear Programming",
+        ZIB-Report 15-15, Zuse Institute Berlin, 2015, available under
+        http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:0297-zib-55118

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -66,6 +66,8 @@ protected:
    int         m_keptLRhs;
    /// objective offset
    Real        m_objoffset;
+   /// minimal reduction (sum of removed rows/cols) to continue simplification
+   Real        m_minReduction;
    /// message handler
    SPxOut*     spxout;
    //@}
@@ -102,6 +104,7 @@ public:
       , m_keptBnds(0)
       , m_keptLRhs(0)
       , m_objoffset(0.0)
+      , m_minReduction(1e-4)
       , spxout(0)
    {
       assert(isConsistent());
@@ -120,6 +123,7 @@ public:
       , m_keptBnds(old.m_keptBnds)
       , m_keptLRhs(old.m_keptLRhs)
       , m_objoffset(old.m_objoffset)
+      , m_minReduction(1e-4)
       , spxout(old.spxout)
    {
       m_timeUsed = TimerFactory::createTimer(m_timerType);
@@ -141,6 +145,7 @@ public:
          m_keptBnds = rhs.m_keptBnds;
          m_keptLRhs = rhs.m_keptLRhs;
          m_objoffset = rhs.m_objoffset;
+         m_minReduction = rhs.m_minReduction;
          spxout = rhs.spxout;
 
          assert(isConsistent());
@@ -221,6 +226,12 @@ public:
    virtual void addObjoffset(const Real val)
    {
       m_objoffset += val;
+   }
+
+   /// set minimal reduction threshold to continue simplification
+   virtual void setMinReduction(const Real minRed)
+   {
+      m_minReduction = minRed;
    }
    //@}
 

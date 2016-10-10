@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,10 +30,10 @@ namespace soplex
 In the entering simplex algorithms (i.e. iteratively a vector is selected to
 \em enter the simplex basis as in the dual rowwise and primal columnwise case)
 let $A$ denote the current basis, $x$ and entering vector and $f$ the
-feasibility vector. For a feasible basis $l \le f \le u$ holds.  
-For the rowwise case $f$ is obtained by solving $f^T = c^T A^{-1}$, 
+feasibility vector. For a feasible basis $l \le f \le u$ holds.
+For the rowwise case $f$ is obtained by solving $f^T = c^T A^{-1}$,
 wherease in columnwisecase $f = A^{-1} b$.
- 
+
 Let us further consider the rowwise case. Exchanging $x$ with the $i$-th
 vector of $A$ yields
 
@@ -41,7 +41,7 @@ vector of $A$ yields
     A^{(i)} = E_i A \hbox{, with } E_i = I + e_i (x^T A^{-1} - e_i^T).
 \end{equation}
 
-With $E_i^{-1} = I + e_i \frac{e_i^T - \delta^T}{\delta}$, 
+With $E_i^{-1} = I + e_i \frac{e_i^T - \delta^T}{\delta}$,
 $\delta^T = x^T A^{-1}$ one gets the new feasibility vector
 
 \begin{eqnarray*}
@@ -104,6 +104,8 @@ void SPxSolver::computeTest()
 
    const SPxBasis::Desc& ds = desc();
    Real pricingTol = leavetol();
+   m_pricingViolCoUpToDate = true;
+   m_pricingViolCo = 0;
    infeasibilitiesCo.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * coDim());
@@ -128,6 +130,7 @@ void SPxSolver::computeTest()
             if( theTest[i] < -pricingTol )
             {
                assert(infeasibilitiesCo.size() < infeasibilitiesCo.max());
+               m_pricingViolCo -= theTest[i];
                infeasibilitiesCo.addIdx(i);
                isInfeasibleCo[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
@@ -143,6 +146,8 @@ void SPxSolver::computeTest()
                ninfeasibilities = 0;
             }
          }
+         else if( theTest[i] < -pricingTol )
+            m_pricingViolCo -= theTest[i];
       }
    }
    if( ninfeasibilities == 0 && !sparsePricingEnterCo )
@@ -200,7 +205,7 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
       if (x < 0)
          return x;
       // no break: next is else case
-      //lint -fallthrough 
+      //lint -fallthrough
    case SPxBasis::Desc::D_ON_LOWER:
       assert(rep() == ROW);
       return SPxLP::upper(i) - (*theCoPvec)[i];
@@ -224,6 +229,8 @@ void SPxSolver::computeCoTest()
 {
    int i;
    Real pricingTol = leavetol();
+   m_pricingViolUpToDate = true;
+   m_pricingViol = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
    int sparsitythreshold = (int) (sparsePricingFactor * dim());
@@ -246,6 +253,7 @@ void SPxSolver::computeCoTest()
             if( theCoTest[i] < -pricingTol )
             {
                assert(infeasibilities.size() < infeasibilities.max());
+               m_pricingViol -= theCoTest[i];
                infeasibilities.addIdx(i);
                isInfeasible[i] = SPxPricer::VIOLATED;
                ++ninfeasibilities;
@@ -261,6 +269,8 @@ void SPxSolver::computeCoTest()
                ninfeasibilities = 0;
             }
          }
+         else if( theCoTest[i] < -pricingTol )
+            m_pricingViol -= theCoTest[i];
       }
    }
    if( ninfeasibilities == 0 && !sparsePricingEnter )
@@ -304,6 +314,9 @@ void SPxSolver::updateTest()
       SPxBasis::Desc::Status stat = ds.status(j);
       if (!isBasic(stat))
       {
+         if( m_pricingViolCoUpToDate && theTest[j] < -pricingTol )
+            m_pricingViolCo += theTest[j];
+
          theTest[j] = test(j, stat);
 
          if( sparsePricingEnterCo )
@@ -311,6 +324,7 @@ void SPxSolver::updateTest()
             if( theTest[j] < -pricingTol )
             {
                assert(remainingRoundsEnterCo == 0);
+               m_pricingViolCo -= theTest[j];
                if( isInfeasibleCo[j] == SPxPricer::NOT_VIOLATED )
                {
                   infeasibilitiesCo.addIdx(j);
@@ -324,6 +338,8 @@ void SPxSolver::updateTest()
                isInfeasibleCo[j] = SPxPricer::NOT_VIOLATED;
             }
          }
+         else if( theTest[j] < -pricingTol )
+            m_pricingViolCo -= theTest[j];
       }
       else
       {
@@ -349,6 +365,9 @@ void SPxSolver::updateCoTest()
       SPxBasis::Desc::Status stat = ds.coStatus(j);
       if (!isBasic(stat))
       {
+         if( m_pricingViolUpToDate && theCoTest[j] < -pricingTol )
+            m_pricingViol += theCoTest[j];
+
          theCoTest[j] = coTest(j, stat);
 
          if( sparsePricingEnter )
@@ -356,6 +375,7 @@ void SPxSolver::updateCoTest()
             if( theCoTest[j] < -pricingTol )
             {
                assert(remainingRoundsEnter == 0);
+               m_pricingViol -= theCoTest[j];
                if( isInfeasible[j] == SPxPricer::NOT_VIOLATED )
                {
                   //                if( !hyperPricingEnter )
@@ -371,6 +391,8 @@ void SPxSolver::updateCoTest()
                isInfeasible[j] = SPxPricer::NOT_VIOLATED;
             }
          }
+         else if( theCoTest[j] < -pricingTol )
+            m_pricingViol -= theCoTest[j];
       }
       else
       {
@@ -1027,7 +1049,46 @@ void SPxSolver::rejectEnter(
    }
 }
 
-bool SPxSolver::enter(SPxId& enterId)
+
+void SPxSolver::computePrimalray4Col(Real direction, SPxId enterId)
+{
+   Real sign = (direction > 0 ? 1.0 : -1.0);
+
+   primalRay.clear();
+   primalRay.setMax(fVec().delta().size() + 1);
+
+   for( int j = 0; j < fVec().delta().size(); ++j )
+   {
+      SPxId i = baseId(fVec().idx().index(j));
+      if( i.isSPxColId() )
+         primalRay.add(number(SPxColId(i)), sign*fVec().delta().value(j));
+   }
+
+   if( enterId.isSPxColId() )
+      primalRay.add(number(SPxColId(enterId)), -sign);
+}
+
+
+void SPxSolver::computeDualfarkas4Row(Real direction, SPxId enterId)
+{
+   Real sign = (direction > 0 ? -1.0 : 1.0);
+
+   dualFarkas.clear();
+   dualFarkas.setMax(fVec().delta().size() + 1);
+
+   for( int j = 0; j < fVec().delta().size(); ++j )
+   {
+      SPxId spxid = baseId(fVec().idx().index(j));
+      if( spxid.isSPxRowId() )
+         dualFarkas.add(number(SPxRowId(spxid)), sign * fVec().delta().value(j));
+   }
+
+   if( enterId.isSPxRowId() )
+      dualFarkas.add(number(SPxRowId(enterId)), -sign);
+}
+
+
+bool SPxSolver::enter(SPxId& enterId, bool polish)
 {
    assert(enterId.isValid());
    assert(type() == ENTER);
@@ -1051,7 +1112,7 @@ bool SPxSolver::enter(SPxId& enterId)
    getEnterVals(enterId, enterTest, enterUB, enterLB,
       enterVal, enterMax, enterPric, enterStat, enterRO, objChange);
 
-   if (enterTest > -epsilon())
+   if (polishObj == SolutionPolish::OFF && enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
@@ -1059,7 +1120,7 @@ bool SPxSolver::enter(SPxId& enterId)
 
       MSG_DEBUG( std::cout << "DENTER08 rejecting false enter pivot" << std::endl; )
 
-      return true;
+      return false;
    }
 
    /*  Before performing the actual basis update, we must determine, how this
@@ -1069,7 +1130,7 @@ bool SPxSolver::enter(SPxId& enterId)
    // is setup (i.e. the indices of the NZEs are stored within it) and there are
    // 0 NZEs (???).
    // In that case theFvec->delta() is set such that
-   //   Base * theFvec->delta() = enterVec 
+   //   Base * theFvec->delta() = enterVec
    if (theFvec->delta().isSetup() && theFvec->delta().size() == 0)
       SPxBasis::solve4update(theFvec->delta(), *enterVec);
 #ifdef ENABLE_ADDITIONAL_CHECKS
@@ -1091,7 +1152,7 @@ bool SPxSolver::enter(SPxId& enterId)
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   if (m_numCycle > m_maxCycle)
+   if (polishObj == SolutionPolish::OFF && m_numCycle > m_maxCycle)
    {
       if (-enterMax > 0)
          perturbMaxEnter();
@@ -1102,7 +1163,7 @@ bool SPxSolver::enter(SPxId& enterId)
    Real leaveVal = -enterMax;
 
    boundflips = 0;
-   int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest);
+   int leaveIdx = theratiotester->selectLeave(leaveVal, enterTest, polish);
 
    /* in row representation, fixed columns and rows should not leave the basis */
    assert(leaveIdx < 0 || !baseId(leaveIdx).isSPxColId() || desc().colStatus(number(SPxColId(baseId(leaveIdx)))) != SPxBasis::Desc::P_FIXED);
@@ -1120,8 +1181,8 @@ bool SPxSolver::enter(SPxId& enterId)
    {
       if (spxAbs(leaveVal) < entertol())
       {
-         if (theUBbound[leaveIdx] != theLBbound[leaveIdx] 
-            && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE) 
+         if (NE(theUBbound[leaveIdx], theLBbound[leaveIdx])
+            && enterStat != Desc::P_FREE && enterStat != Desc::D_FREE)
          {
             m_numCycle++;
             enterCycles++;
@@ -1167,9 +1228,7 @@ bool SPxSolver::enter(SPxId& enterId)
             enterPric = (*theCoPvec)[number(SPxColId(enterId))];
          else
             enterPric = (*thePvec)[number(SPxRowId(enterId))];
-         MSG_INFO3( (*spxout), (*spxout) << "IEBFRT02 "
-         << "breakpoints passed / bounds flipped = " << boundflips
-         << std::endl; )
+         MSG_DEBUG( std::cout << "IEBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
          totalboundflips += boundflips;
       }
 
@@ -1228,10 +1287,12 @@ bool SPxSolver::enter(SPxId& enterId)
 
       //  change basis matrix
       change(leaveIdx, enterId, enterVec, &(theFvec->delta()));
+
+      return true;
    }
    /*  No leaving vector could be found that would yield a stable pivot step.
     */
-   else if (leaveVal != -enterMax)
+   else if (NE(leaveVal, -enterMax))
    {
       /* In the ENTER algorithm, when for a selected entering variable we find only
          an instable leaving variable, then the basis change is not conducted.
@@ -1253,17 +1314,19 @@ bool SPxSolver::enter(SPxId& enterId)
          instableEnterId = enterId;
          instableEnterVal = enterTest;
 
-         rejectEnter(enterId, 0.0, enterStat);
+         MSG_DEBUG( std::cout << "DENTER09 rejecting enter pivot and looking for others" << std::endl; )
+
+         rejectEnter(enterId, enterTest / 10.0, enterStat);
          change(-1, none, 0);
-
-
-         return true;
       }
       else
       {
+         MSG_DEBUG( std::cout << "DENTER10 rejecting enter pivot in instable state, resetting values" << std::endl; )
          rejectEnter(enterId, enterTest, enterStat);
          change(-1, none, 0);
       }
+
+      return false;
    }
    /*  No leaving vector has been selected from the basis. However, if the
        shift amount for |fVec| is bounded, we are in the case, that the
@@ -1272,7 +1335,7 @@ bool SPxSolver::enter(SPxId& enterId)
        happen in primal/columnwise case with upper and lower bounds on
        variables.
     */
-   else if (leaveVal < infinity && leaveVal > -infinity)
+   else if (!polish && leaveVal < infinity && leaveVal > -infinity)
    {
       assert(rep() == COLUMN);
       assert(leaveVal == -enterMax);
@@ -1286,22 +1349,29 @@ bool SPxSolver::enter(SPxId& enterId)
 
       // update objective funtion value
       updateNonbasicValue(objChange);
+
+      MSG_DEBUG( std::cout << "DENTER11 moving entering variable from one bound to the other" << std::endl; )
+
+      return false;
    }
    /*  No variable could be selected to leave the basis and even the entering
-       variable is unbounded --- this is a failure.  
+       variable is unbounded --- this is a failure.
     */
    else
    {
       /* The following line originally was in the "lastUpdate() > 1" case;
          we need it in the INFEASIBLE/UNBOUNDED case, too, to have the
-         basis descriptor at the correct size. 
+         basis descriptor at the correct size.
        */
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
 
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if (lastUpdate() > 1)
+      if (polish)
+         return false;
+
+      else if (lastUpdate() > 1)
       {
          MSG_INFO3( (*spxout), (*spxout) << "IENTER01 factorization triggered in "
                               << "enter() for feasibility test" << std::endl; )
@@ -1310,57 +1380,40 @@ bool SPxSolver::enter(SPxId& enterId)
          /* after a factorization, the entering column/row might not be infeasible or suboptimal anymore, hence we do
           * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again
           */
-         return true;
+         return false;
       }
 
-      MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundness/infeasiblity found in "
+      /* do not exit with status infeasible or unbounded if there is only a very small violation
+       * ROW: recompute the primal variables and activities for another, more precise, round of pricing
+       */
+      else if (spxAbs(enterTest) < entertol())
+      {
+         MSG_INFO3( (*spxout), (*spxout) << "IENTER11 clean up step to reduce numerical errors" << std::endl; )
+
+         SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+         computePvec();
+         computeCoTest();
+         computeTest();
+
+         return false;
+      }
+
+      MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundedness/infeasibility found in "
                            << "enter()" << std::endl; )
 
       if (rep() == ROW)
       {
-         Real sign;
-
-         dualFarkas.clear();
-         dualFarkas.setMax(fVec().delta().size() + 1);
-         sign = (leaveVal > 0 ? -1.0 : 1.0);
-
-         for( int j = 0; j < fVec().delta().size(); ++j )
-         {
-            SPxId spxid = baseId(fVec().idx().index(j));
-
-            if( spxid.isSPxRowId() )
-               dualFarkas.add(number(SPxRowId(spxid)), sign * fVec().delta().value(j));
-         }
-
-         if( enterId.isSPxRowId() )
-            dualFarkas.add(number(SPxRowId(enterId)), -sign);
-
+         computeDualfarkas4Row(leaveVal, enterId);
          setBasisStatus(SPxBasis::INFEASIBLE);
       }
       /**@todo if shift() is not zero, we must not conclude primal unboundedness */
       else
       {
-         Real sign;
-
-         primalRay.clear();
-         primalRay.setMax(fVec().delta().size() + 1);
-         sign = leaveVal > 0 ? 1.0 : -1.0;
-
-         for( int j = 0; j < fVec().delta().size(); ++j )
-         {
-            SPxId i = baseId(fVec().idx().index(j));
-
-            if( i.isSPxColId() )
-               primalRay.add(number(SPxColId(i)), sign*fVec().delta().value(j));
-         }
-
-         if( enterId.isSPxColId() )
-            primalRay.add(number(SPxColId(enterId)), -sign);
-
+         computePrimalray4Col(leaveVal, enterId);
          setBasisStatus(SPxBasis::UNBOUNDED);
       }
+
       return false;
    }
-   return true;
 }
 } // namespace soplex

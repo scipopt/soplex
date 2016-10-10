@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -146,7 +146,7 @@ int SPxHarrisRT::minDelta(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
-int SPxHarrisRT::selectLeave(Real& val, Real)
+int SPxHarrisRT::selectLeave(Real& val, Real, bool)
 {
    int i, j;
    Real stab, x, y;
@@ -310,7 +310,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real)
 
 
    if (lastshift != solver()->shift())
-      return selectLeave(val, 0);
+      return selectLeave(val, 0, false);
 
    assert(leave >= 0);
 

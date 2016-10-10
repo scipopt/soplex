@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -96,6 +96,8 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
       x.forceSetup();
    }
    usetup = true;
+   ssvec.setSize(0);
+   ssvec.forceSetup();
 
    solveCount++;
    solveTime->stop();
@@ -114,6 +116,8 @@ void SLUFactor::solve2right4update(
    int  n;
    int  f;
    int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
 
@@ -146,9 +150,75 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
-   solveCount++;
+   rhs.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount += 2;
    solveTime->stop();
 }
+
+void SLUFactor::solve2right4update(
+   SSVector&      x,
+   SSVector&      y,
+   const SVector& b,
+   SSVector&      rhs)
+{
+
+   solveTime->start();
+
+   int  n;
+   int  f;
+   int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+   int  rsize = rhs.size();
+   int* ridx = rhs.altIndexMem();
+
+   x.clear();
+   y.clear();
+   usetup = true;
+   ssvec = b;
+
+   if (l.updateType == ETA)
+   {
+      n = ssvec.size();
+      vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+                                ssvec.get_ptr(), sidx, n,
+                                y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                rhs.altValues(), ridx, rsize,
+                                0, 0, 0);
+      x.setSize(n);
+      //      x.forceSetup();
+      x.unSetup();
+      y.setSize(rsize);
+      y.unSetup();
+      eta.setup_and_assign(x);
+   }
+   else
+   {
+      forest.clear();
+      n = ssvec.size();
+      vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+                                ssvec.get_ptr(), sidx, n,
+                                y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                rhs.altValues(), ridx, rsize,
+                                forest.altValues(), &f, forest.altIndexMem());
+      x.setSize(n);
+      x.forceSetup();
+      y.setSize(rsize);
+      y.forceSetup();
+      forest.setSize(f);
+      forest.forceSetup();
+   }
+   rhs.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount += 2;
+   solveTime->stop();
+}
+
 
 void SLUFactor::solve3right4update(
    SSVector&      x,
@@ -165,9 +235,11 @@ void SLUFactor::solve3right4update(
    int  n;
    int  f;
    int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
    int  rsize = rhs.size();
    int* ridx = rhs.altIndexMem();
-   int rsize2 = rhs2.size();
+   int  rsize2 = rhs2.size();
    int* ridx2 = rhs2.altIndexMem();
 
    x.clear();
@@ -203,9 +275,90 @@ void SLUFactor::solve3right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
-   solveCount++;
+   rhs.forceSetup();
+   rhs2.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount += 3;
    solveTime->stop();
 }
+
+void SLUFactor::solve3right4update(
+   SSVector&      x,
+   SSVector&      y,
+   SSVector&      y2,
+   const SVector& b,
+   SSVector&      rhs,
+   SSVector&      rhs2)
+{
+   solveTime->start();
+
+   int  n;
+   int  f;
+   int* sidx = ssvec.altIndexMem();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+   int  rsize = rhs.size();
+   int* ridx = rhs.altIndexMem();
+   int  rsize2 = rhs2.size();
+   int* ridx2 = rhs2.altIndexMem();
+
+   x.clear();
+   y.clear();
+   y2.clear();
+   usetup = true;
+   ssvec = b;
+
+   if (l.updateType == ETA)
+   {
+      n = ssvec.size();
+      vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+                                ssvec.get_ptr(), sidx, n,
+                                y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                rhs.altValues(), ridx, rsize,
+                                y2.getEpsilon(), y2.altValues(), y2.altIndexMem(),
+                                rhs2.altValues(), ridx2, rsize2,
+                                0, 0, 0);
+      x.setSize(n);
+      //      x.forceSetup();
+      x.unSetup();
+      y.setSize(rsize);
+      y.unSetup();
+      y2.setSize(rsize2);
+      y2.unSetup();
+      eta.setup_and_assign(x);
+   }
+   else
+   {
+      forest.clear();
+      n = ssvec.size();
+      vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+                                ssvec.get_ptr(), sidx, n,
+                                y.getEpsilon(), y.altValues(), y.altIndexMem(),
+                                rhs.altValues(), ridx, rsize,
+                                y2.getEpsilon(), y2.altValues(), y2.altIndexMem(),
+                                rhs2.altValues(), ridx2, rsize2,
+                                forest.altValues(), &f, forest.altIndexMem());
+      x.setSize(n);
+      x.forceSetup();
+      y.setSize(rsize);
+      y.forceSetup();
+      y2.setSize(rsize2);
+      y2.forceSetup();
+
+      forest.setSize(f);
+      forest.forceSetup();
+   }
+   rhs.forceSetup();
+   rhs2.forceSetup();
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount += 3;
+   solveTime->stop();
+}
+
 
 void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
 {
@@ -226,6 +379,8 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 
    solveTime->start();
 
+   // copy to SSVec is done to avoid having to deal with the Nonzero datatype
+   // TODO change SVec to standard sparse format
    ssvec.assign(b);
 
    x.clear();
@@ -270,21 +425,68 @@ void SLUFactor::solveLeft(
    n = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
       y.get_ptr(), rhs2.altValues(), ridx, rn);
 
+   // this will unsetup x
    x.setSize(n);
 
    if (n > 0)
       x.forceSetup();
-   else
-      x.unSetup();
 
-   rhs2.setSize(0);
-   rhs2.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
 
-   solveCount++;
+   solveCount += 2;
    solveTime->stop();
 }
+
+void SLUFactor::solveLeft(
+   SSVector&      x,
+   SSVector&      y,
+   const SVector& rhs1,
+   SSVector&      rhs2) //const
+{
+
+   solveTime->start();
+
+   int   n1, n2;
+   Real* svec = ssvec.altValues();
+   int*  sidx = ssvec.altIndexMem();
+
+   x.clear();
+   y.clear();
+   ssvec.assign(rhs1);
+   n1 = ssvec.size(); // see altValues();
+   n2 = rhs2.size();
+   if( n2 < 10 )
+   {
+      vSolveLeft2sparse(x.getEpsilon(),
+                        x.altValues(), x.altIndexMem(),
+                        svec, sidx, n1,
+                        y.altValues(), y.altIndexMem(),
+                        rhs2.altValues(), rhs2.altIndexMem(), n2);
+      y.setSize(n2);
+      if( n2 > 0 )
+         y.forceSetup();
+   }
+   else
+   {
+      n1 = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n1,
+            y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
+//      y.setup();
+   }
+   x.setSize(n1);
+
+   if (n1 > 0)
+      x.forceSetup();
+//   if (n2 > 0)
+//      y.forceSetup();
+
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount += 2;
+   solveTime->stop();
+}
+
 
 void SLUFactor::solveLeft(
    SSVector&      x,
@@ -297,7 +499,7 @@ void SLUFactor::solveLeft(
 
    solveTime->start();
 
-   int   n;
+   int   n, n2, n3;
    Real* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
 
@@ -306,33 +508,82 @@ void SLUFactor::solveLeft(
    z.clear();
    ssvec.assign(rhs1);
    n = ssvec.size(); // see altValues();
+   n2 = rhs2.size();
+   n3 = rhs3.size();
+
    n = vSolveLeft3(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
-                   y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), rhs2.size(),
-                   z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), rhs3.size());
+                   y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), n2,
+                   z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), n3);
 
    x.setSize(n);
 
    if (n > 0)
       x.forceSetup();
-   else
-      x.unSetup();
 
    ssvec.setSize(0);
    ssvec.forceSetup();
 
-   solveCount++;
+   solveCount += 3;
    solveTime->stop();
 }
 
-Real SLUFactor::stability() const
+void SLUFactor::solveLeft(
+   SSVector&      x,
+   SSVector&      y,
+   SSVector&      z,
+   const SVector& rhs1,
+   SSVector&      rhs2,
+   SSVector&      rhs3)
 {
 
+   solveTime->start();
+
+   int   n1, n2, n3;
+   Real* svec = ssvec.altValues();
+   int*  sidx = ssvec.altIndexMem();
+
+   x.clear();
+   y.clear();
+   z.clear();
+   ssvec.assign(rhs1);
+   n1 = ssvec.size(); // see altValues();
+   n2 = rhs2.size();
+   n3 = rhs3.size();
+   vSolveLeft3sparse(x.getEpsilon(),
+                     x.altValues(), x.altIndexMem(),
+                     svec, sidx, n1,
+                     y.altValues(), y.altIndexMem(),
+                     rhs2.altValues(), rhs2.altIndexMem(), n2,
+                     z.altValues(), z.altIndexMem(),
+                     rhs3.altValues(), rhs3.altIndexMem(), n3);
+   x.setSize(n1);
+   y.setSize(n2);
+   z.setSize(n3);
+
+   if (n1 > 0)
+      x.forceSetup();
+   if (n2 > 0)
+      y.forceSetup();
+   if (n3 > 0)
+      z.forceSetup();
+
+   ssvec.setSize(0);
+   ssvec.forceSetup();
+
+   solveCount += 3;
+   solveTime->stop();
+}
+
+
+Real SLUFactor::stability() const
+{
    if (status() != OK)
       return 0;
 
    if (maxabs < initMaxabs)
       return 1;
 
+   assert(maxabs != 0.0);
    return initMaxabs / maxabs;
 }
 
@@ -865,6 +1116,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    , CLUFactor()
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+   , usetup(old.usetup)
    , eta (old.eta)
    , forest(old.forest)
    , timerType(old.timerType)
@@ -896,6 +1148,7 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    l.rorig     = 0;
    l.rperm     = 0;
 
+   solveCount = 0;
    solveTime = TimerFactory::createTimer(timerType);
    factorTime = TimerFactory::createTimer(timerType);
 
@@ -1019,7 +1272,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       spx_realloc(l.start, l.startSize);
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
-   // order favour sparsity
+   // order to favour sparsity
    else if (lastStability > 2.0 * minStability)
    {
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
@@ -1093,7 +1346,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       fclose(fl);
       std::cout << "DSLUFA04 LU-Factors:" << std::endl;
       dump();
-      
+
       std::cout << "DSLUFA05 threshold = " << lastThreshold
              << "\tstability = " << stability() << std::endl;
    )

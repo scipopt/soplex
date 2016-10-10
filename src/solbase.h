@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2015 Konrad-Zuse-Zentrum                            */
+/*                  1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -236,6 +236,8 @@ private:
 
    /// default constructor only for friends
    SolBase<R>()
+      : _primalObjVal(0)
+      , _dualObjVal(0)
    {
       invalidate();
    }

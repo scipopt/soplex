@@ -9,7 +9,12 @@ BINNAME=$BINNAME.$HOST
 
 RESDIR=results/quick
 
-SETTINGSLIST=(default devex steep)
+SETTINGSLIST=(default devex steep exact)
+
+if ! test -f ../settings/default.set
+then
+    touch ../settings/default.set
+fi
 
 # Solve with the different settings
 for SETTINGS in ${SETTINGSLIST[@]}

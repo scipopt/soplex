@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -55,19 +55,18 @@ void SPxBasis::reDim()
    assert( theBaseId.size() >= theLP->dim() );
 }
 
+/* adapt basis and basis descriptor to added rows */
 void SPxBasis::addedRows(int n)
 {
-
    assert(theLP != 0);
 
    if( n > 0 )
    {
       reDim();
-      
+
       if (theLP->rep() == SPxSolver::COLUMN)
       {
-         /* I think, after adding rows in column representation,
-            reDim should set these bools to false. */
+         /* after adding rows in column representation, reDim() should set these bools to false. */
          assert( !matrixIsSetup && !factorized );
 
          for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
@@ -75,11 +74,6 @@ void SPxBasis::addedRows(int n)
             thedesc.rowStatus(i) = dualRowStatus(i);
             baseId(i) = theLP->SPxLP::rId(i);
          }
-
-         /* ??? I think, this cannot happen. */
-         /* if matrix was set up, load new basis vectors to the matrix */
-         if (status() > NO_PROBLEM && matrixIsSetup)
-            loadMatrixVecs();
       }
       else
       {
@@ -87,16 +81,17 @@ void SPxBasis::addedRows(int n)
 
          for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
-
-         /* In the row case, the basis is not effected by adding rows. However, 
-          * since @c matrix stores references to the rows in the LP (SPxLP), a realloc
-          * in SPxLP (e.g. due to space requirements) might invalidate these references.
-          * We therefore have to "reload" the matrix if it is set up. Note that reDim()
-          * leaves @c matrixIsSetup untouched if only row have been added, since the basis
-          * matrix already has the correct size. */
-         if (status() > NO_PROBLEM && matrixIsSetup)
-            loadMatrixVecs();
       }
+
+      /* If matrix was set up, load new basis vectors to the matrix.
+       * In the row case, the basis is not effected by adding rows. However,
+       * since @c matrix stores references to the rows in the LP (SPxLP), a realloc
+       * in SPxLP (e.g. due to space requirements) might invalidate these references.
+       * We therefore have to "reload" the matrix if it is set up. Note that reDim()
+       * leaves @c matrixIsSetup untouched if only row have been added, since the basis
+       * matrix already has the correct size. */
+      if (status() > NO_PROBLEM && matrixIsSetup)
+         loadMatrixVecs();
 
       /* update basis status */
       switch (status())
@@ -256,6 +251,7 @@ primalColStatus(int i, const SPxLP* theLP)
 }
 
 
+/* adapt basis and basis descriptor to added columns */
 void SPxBasis::addedCols(int n)
 {
    assert(theLP != 0);
@@ -263,11 +259,10 @@ void SPxBasis::addedCols(int n)
    if( n > 0 )
    {
       reDim();
-      
+
       if (theLP->rep() == SPxSolver::ROW)
       {
-         /* I think, after adding columns in row representation,
-            reDim should set these bools to false. */
+         /* after adding columns in row representation, reDim() should set these bools to false. */
          assert( !matrixIsSetup && !factorized );
 
          for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
@@ -275,11 +270,6 @@ void SPxBasis::addedCols(int n)
             thedesc.colStatus(i) = primalColStatus(i, theLP);
             baseId(i) = theLP->SPxLP::cId(i);
          }
-
-         /* ??? I think, this cannot happen. */
-         /* if matrix was set up, load new basis vectors to the matrix */
-         if (status() > NO_PROBLEM && matrixIsSetup)
-            loadMatrixVecs();
       }
       else
       {
@@ -287,17 +277,18 @@ void SPxBasis::addedCols(int n)
 
          for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
             thedesc.colStatus(i) = primalColStatus(i, theLP);
-
-         /* In the column case, the basis is not effected by adding columns. However, 
-          * since @c matrix stores references to the columns in the LP (SPxLP), a realloc
-          * in SPxLP (e.g. due to space requirements) might invalidate these references.
-          * We therefore have to "reload" the matrix if it is set up. Note that reDim()
-          * leaves @c matrixIsSetup untouched if only columns have been added, since the 
-          * basis matrix already has the correct size. */
-         if (status() > NO_PROBLEM && matrixIsSetup)
-            loadMatrixVecs();
       }
-         
+
+      /* If matrix was set up, load new basis vectors to the matrix
+       * In the column case, the basis is not effected by adding columns. However,
+       * since @c matrix stores references to the columns in the LP (SPxLP), a realloc
+       * in SPxLP (e.g. due to space requirements) might invalidate these references.
+       * We therefore have to "reload" the matrix if it is set up. Note that reDim()
+       * leaves @c matrixIsSetup untouched if only columns have been added, since the
+       * basis matrix already has the correct size. */
+      if (status() > NO_PROBLEM && matrixIsSetup)
+         loadMatrixVecs();
+
       switch (status())
       {
       case DUAL:
@@ -417,49 +408,42 @@ void SPxBasis::invalidate()
 }
 
 
-/** 
-    This code has been adapted from SPxBasis::addedRows() and 
-    SPxBasis::addedCols().
-*/
+/**
+ * Create the initial slack basis descriptor and set up the basis matrix accordingly.
+ * This code has been adapted from SPxBasis::addedRows() and SPxBasis::addedCols().
+ */
 void SPxBasis::restoreInitialBasis()
 {
-
-   assert( !matrixIsSetup && !factorized );
+   assert(!factorized);
 
    if (theLP->rep() == SPxSolver::COLUMN)
+   {
+      for (int i = 0; i < theLP->nRows(); ++i)
       {
-         for (int i = 0; i < theLP->nRows(); ++i)
-         {
-            thedesc.rowStatus(i) = dualRowStatus(i);
-            baseId(i) = theLP->SPxLP::rId(i);
-         }
-
-         for (int i = 0; i < theLP->nCols(); ++i)
-            thedesc.colStatus(i) = primalColStatus(i, theLP);
-
-         /* ??? I think, this cannot happen. */
-         /* if matrix was set up, load new basis vectors to the matrix */
-         if (status() > NO_PROBLEM && matrixIsSetup)
-            loadMatrixVecs();
+         thedesc.rowStatus(i) = dualRowStatus(i);
+         baseId(i) = theLP->SPxLP::rId(i);
       }
+
+      for (int i = 0; i < theLP->nCols(); ++i)
+         thedesc.colStatus(i) = primalColStatus(i, theLP);
+   }
    else
+   {
+      assert(theLP->rep() == SPxSolver::ROW);
+
+      for (int i = 0; i < theLP->nRows(); ++i)
+         thedesc.rowStatus(i) = dualRowStatus(i);
+
+      for (int i = 0; i < theLP->nCols(); ++i)
       {
-         assert(theLP->rep() == SPxSolver::ROW);
-         
-         for (int i = 0; i < theLP->nRows(); ++i)
-            thedesc.rowStatus(i) = dualRowStatus(i);
-
-         for (int i = 0; i < theLP->nCols(); ++i)
-            {
-               thedesc.colStatus(i) = primalColStatus(i, theLP);
-               baseId(i) = theLP->SPxLP::cId(i);
-            }
-
-         /* ??? I think, this cannot happen. */
-         /* if matrix was set up, load new basis vectors to the matrix */
-         if (status() > NO_PROBLEM && matrixIsSetup)
-            loadMatrixVecs();
+         thedesc.colStatus(i) = primalColStatus(i, theLP);
+         baseId(i) = theLP->SPxLP::cId(i);
       }
+   }
+
+   /* if matrix was set up, load new basis vectors to the matrix */
+   if (status() > NO_PROBLEM && matrixIsSetup)
+      loadMatrixVecs();
 
    /* update basis status */
    setStatus(REGULAR);

@@ -1,0 +1,10 @@
+Notes for SoPlex Release 2.0.1
+
+What's new
+----------
+
+ - type of timing can now be switched between CPU time and wallclock time
+ - several bugfixes and performance improvements, especially for the
+   rational arithmetic functionality
+
+For details see the CHANGELOG file and the Doxygen documentation.

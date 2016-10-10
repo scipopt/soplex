@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -525,19 +525,19 @@ bool SPxBoundFlippingRT::getData(
    if( upp[idx] == low[idx] )
    {
       val = 0.0;
-      if( vec[idx] > upp[idx] )
-         thesolver->theShift += vec[idx] - upp[idx];
-      else
-         thesolver->theShift += low[idx] - vec[idx];
-      thesolver->ubBound()[idx] = thesolver->lbBound()[idx] = vec[idx];
+      thesolver->shiftLBbound(idx, vec[idx]);
+      thesolver->shiftUBbound(idx, vec[idx]);
    }
    else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
    {
       val = 0.0;
-      if( max * x > 0 )
-         thesolver->shiftUBbound(idx, vec[idx]);
-      else
-         thesolver->shiftLBbound(idx, vec[idx]);
+      if( thesolver->dualStatus(thesolver->baseId(idx)) != SPxBasis::Desc::D_ON_BOTH )
+      {
+         if( max * x > 0 )
+            thesolver->shiftUBbound(idx, vec[idx]);
+         else
+            thesolver->shiftLBbound(idx, vec[idx]);
+      }
    }
    return true;
 }
@@ -557,7 +557,7 @@ SPxId SPxBoundFlippingRT::selectEnter(
       MSG_DEBUG( std::cout << "DLBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableLongsteps || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
+   if( !enableBoundFlips || thesolver->rep() == SPxSolver::ROW || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DLBFRT07 switching to fast ratio test" << std::endl; )
       return SPxFastRT::selectEnter(val, leaveIdx);
@@ -887,7 +887,8 @@ SPxId SPxBoundFlippingRT::selectEnter(
 /** determine leaving row/column */
 int SPxBoundFlippingRT::selectLeave(
    Real&                 val,
-   Real                  enterTest
+   Real                  enterTest,
+   bool                  polish
    )
 {
    assert( m_type == SPxSolver::ENTER );
@@ -899,11 +900,13 @@ int SPxBoundFlippingRT::selectLeave(
       MSG_DEBUG( std::cout << "DEBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableLongsteps || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
+
+   if( polish || !enableBoundFlips || !enableRowBoundFlips || thesolver->rep() == SPxSolver::COLUMN || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DEBFRT07 switching to fast ratio test" << std::endl; )
-      return SPxFastRT::selectLeave(val, enterTest);
+      return SPxFastRT::selectLeave(val, enterTest, polish);
    }
+
    const Real*  vec = thesolver->fVec().get_const_ptr();         /**< pointer to values of current vector */
    const Real*  upd = thesolver->fVec().delta().values();        /**< pointer to update values of current vector */
    const int*   idx = thesolver->fVec().delta().indexMem();      /**< pointer to indices of current vector */

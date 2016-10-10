@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -825,8 +825,10 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    , CLUFactorRational()
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
+   , usetup(old.usetup)
    , eta (old.eta)
    , forest(old.forest)
+   , timerType(old.timerType)
 {
    row.perm    = 0;
    row.orig    = 0;
@@ -849,6 +851,10 @@ SLUFactorRational::SLUFactorRational(const SLUFactorRational& old)
    l.rbeg      = 0;
    l.rorig     = 0;
    l.rperm     = 0;
+
+   solveCount = 0;
+   solveTime = TimerFactory::createTimer(timerType);
+   factorTime = TimerFactory::createTimer(timerType);
 
    try
    {

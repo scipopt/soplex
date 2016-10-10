@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -39,7 +39,7 @@ namespace soplex
    linear programming" by E. Andersen and K. Andersen (Mathematical
    Programming, 1995).  It implements all proposed methods and some
    other preprocessing techniques for removing redundant rows and
-   columns and bounds.  Also infeasibility and unboundness may be
+   columns and bounds.  Also infeasibility and unboundedness may be
    detected.
 
    Removed are:
@@ -730,8 +730,8 @@ private:
          , m_old_i(lp.nRows()-1)
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lRhs(slackVal)
-         , m_onLhs(slackVal == lp.lhs(_i))
-         , m_eqCons(lp.lhs(_i) == lp.rhs(_i))
+         , m_onLhs(EQ(slackVal, lp.lhs(_i)))
+         , m_eqCons(EQ(lp.lhs(_i), lp.rhs(_i)))
          , m_row(lp.rowVector(_i))
       {
          assert(m_row[m_j] != 0.0);
@@ -807,7 +807,7 @@ private:
          , m_k(_k)
          , m_i(_i)
          , m_maxSense(lp.spxSense() == SPxLP::MAXIMIZE)
-         , m_jFixed(lp.lower(_j) == lp.upper(_j))
+         , m_jFixed(EQ(lp.lower(_j), lp.upper(_j)))
          , m_jObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_kObj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_k) : -lp.obj(_k))
          , m_aij(lp.colVector(_j).value(0))
@@ -1178,7 +1178,15 @@ public:
    /// default constructor.
    SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
       : SPxSimplifier("MainSM", ttype)
+      , m_postsolved(0)
+      , m_epsilon(DEFAULT_EPS_ZERO)
+      , m_feastol(DEFAULT_BND_VIOL)
+      , m_opttol(DEFAULT_BND_VIOL)
       , m_stat(15)
+      , m_thesense(SPxLP::MAXIMIZE)
+      , m_keepbounds(false)
+      , m_addedcols(0)
+      , m_result(OKAY)
    {}
    /// copy constructor.
    SPxMainSM(const SPxMainSM& old)
@@ -1199,6 +1207,7 @@ public:
       , m_thesense(old.m_thesense)
       , m_keepbounds(old.m_keepbounds)
       , m_addedcols(old.m_addedcols)
+      , m_result(old.m_result)
    {
       // copy pointers in m_hist
       m_hist.reSize(0);

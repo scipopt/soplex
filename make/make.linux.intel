@@ -1,1 +1,1 @@
-CXXFLAGS        +=      -std=c++0x
+CXXFLAGS        +=      -std=c++11

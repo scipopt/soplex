@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2015 Konrad-Zuse-Zentrum                            */
+/*                  1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -492,6 +492,65 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
    }
    else
       VectorBase<R>::multAdd(xx, vec);
+
+   assert(isConsistent());
+
+   return *this;
+}
+
+
+/// Assigns pair wise vector product of setup x and setup y to SSVectorBase.
+template < class R >
+template < class S, class T >
+inline
+SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x, const SSVectorBase<T>& y)
+{
+   assert(dim() == x.dim());
+   assert(x.dim() == y.dim());
+   assert(x.isSetup());
+   assert(y.isSetup());
+
+   clear();
+   setupStatus = false;
+
+   int i = 0;
+   int j = 0;
+   int n = x.size() - 1;
+   int m = y.size() - 1;
+
+   /* both x and y non-zero vectors? */
+   if( m >= 0 && n >= 0 )
+   {
+      int xi = x.index(i);
+      int yj = y.index(j);
+
+      while( i < n && j < m )
+      {
+         if( xi == yj )
+         {
+            VectorBase<R>::val[xi] = R(x.val[xi]) * R(y.val[xi]);
+            xi = x.index(++i);
+            yj = y.index(++j);
+         }
+         else if( xi < yj )
+            xi = x.index(++i);
+         else
+            yj = y.index(++j);
+      }
+
+      /* check (possible) remaining indices */
+
+      while( i < n && xi != yj )
+         xi = x.index(++i);
+
+      while( j < m && xi != yj )
+         yj = y.index(++j);
+
+      if( xi == yj )
+         VectorBase<R>::val[xi] = R(x.val[xi]) * R(y.val[xi]);
+   }
+
+   setup();
 
    assert(isConsistent());
 

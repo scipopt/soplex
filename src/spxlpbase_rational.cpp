@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1475,12 +1475,15 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
          {
             if( mps.field4() == 0 )
                val = 0;
-            else
+            else if( !strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf") )
+               val = -infinity;
+            else if( !strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf") || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf") )
+               val = infinity;
+            else if( !val.readString(mps.field4()) )
             {
-               if( !val.readString(mps.field4()) )
-               {
-                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file\n" );
-               }
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file line " << mps.lineno() << ": " << mps.field4() << "\n" );
+               mps.syntaxError();
+               return;
             }
 
             // ILOG extension (Integer Bound)
@@ -1739,7 +1742,8 @@ static void LPFwriteSVector(
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
    const SVectorBase<Rational>& p_svec,     ///< vector to write
-   SPxOut* spxout )
+   SPxOut*                  spxout      ///< out stream
+   )
 {
 
    char name[16];
@@ -1791,7 +1795,7 @@ static void LPFwriteObjective(
    const SPxLPBase<Rational>& p_lp,       ///< the LP
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_cnames,   ///< column names
-   SPxOut* spxout
+   SPxOut*                spxout      ///< out stream
    )
 {
 
@@ -1818,7 +1822,7 @@ static void LPFwriteRow(
    const SVectorBase<Rational>& p_svec,     ///< vector of the row
    const Rational&              p_lhs,      ///< lhs of the row
    const Rational&              p_rhs,      ///< rhs of the row
-   SPxOut* spxout
+   SPxOut*                      spxout      ///< out stream
    )
 {
 
@@ -1868,7 +1872,7 @@ static void LPFwriteRows(
    std::ostream&          p_output,   ///< output stream
    const NameSet*         p_rnames,   ///< row names
    const NameSet*         p_cnames,   ///< column names
-   SPxOut* spxout
+   SPxOut*                spxout      ///< out stream
    )
 {
 
@@ -1907,7 +1911,7 @@ static void LPFwriteBounds(
    const SPxLPBase<Rational>&   p_lp,       ///< the LP to write
    std::ostream&            p_output,   ///< output stream
    const NameSet*           p_cnames,   ///< column names
-   SPxOut* spxout
+   SPxOut*                  spxout      ///< out stream
    )
 {
 

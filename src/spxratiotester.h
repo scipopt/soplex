@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -123,7 +123,7 @@ public:
        returned index, must be the index of an element of fVec(), that
        reaches one of its bounds with this update.
    */
-   virtual int selectLeave(Real& val, Real enterTest) = 0;
+   virtual int selectLeave(Real& val, Real enterTest, bool polish = false) = 0;
 
    /// selects variable Id to enter the basis.
    /** Method #selectEnter() is called by the loaded SoPlex solver, when
@@ -169,6 +169,7 @@ public:
    explicit SPxRatioTester(const char* name)
       : thesolver(0)
       , m_name(name)
+      , m_type(SPxSolver::LEAVE)
       , delta(1e-6)
    {}
    /// copy constructor

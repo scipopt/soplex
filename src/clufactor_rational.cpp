@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2015 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -34,7 +34,6 @@ namespace soplex
 
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
-static const Real verySparseFactor4left  = 0.1;
 
 /* generic heap management */
 static void enQueueMax( int* heap, int* size, int elem )
@@ -3622,10 +3621,6 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
       //      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
       //      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
 
-#if defined(WITH_WARNINGS) || !defined(NDEBUG)
-      Rational y = vec[c];
-#endif
-
       vec[c]  = 0;
 
       if ( x != 0 )
@@ -5935,13 +5930,7 @@ int CLUFactorRational::vSolveLeft( Rational* vec, int* idx,                     
       rn = solveLleftForest( vec, idx, rn );
    }
 
-   if ( rn + l.firstUpdate > verySparseFactor4left * thedim )
-   {
-      solveLleftNoNZ( vec );
-      return 0;
-   }
-   else
-      return solveLleft( vec, idx, rn );
+   return solveLleft( vec, idx, rn );
 }
 
 int CLUFactorRational::vSolveLeft2( Rational* vec, int* idx,                      /* result */
