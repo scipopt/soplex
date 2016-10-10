@@ -62,21 +62,21 @@ namespace soplex
       description[SoPlex::RATFAC] = "should a rational factorization be performed after iterative refinement?";
       defaultValue[SoPlex::RATFAC] = true;
 
-            // should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
-            // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-            _boolParamName[SoPlex::USEIMPROVEDDUALSIMPLEX] = "improveddualsimplex";
-            _boolParamDescription[SoPlex::USEIMPROVEDDUALSIMPLEX] = "should the improved dual simplex be used to solve the LP?";
-            _boolParamDefault[SoPlex::USEIMPROVEDDUALSIMPLEX] = false;
+      // should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
+      // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
+      name[SoPlex::USEIMPROVEDDUALSIMPLEX] = "improveddualsimplex";
+      description[SoPlex::USEIMPROVEDDUALSIMPLEX] = "should the improved dual simplex be used to solve the LP?";
+      defaultValue[SoPlex::USEIMPROVEDDUALSIMPLEX] = false;
 
-            // should the degeneracy be computed for each basis?
-            _boolParamName[SoPlex::COMPUTEDEGEN] = "computedegen";
-            _boolParamDescription[SoPlex::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
-            _boolParamDefault[SoPlex::COMPUTEDEGEN] = false;
+      // should the degeneracy be computed for each basis?
+      name[SoPlex::COMPUTEDEGEN] = "computedegen";
+      description[SoPlex::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
+      defaultValue[SoPlex::COMPUTEDEGEN] = false;
 
-            // should the dual of the complementary problem be used in the improved dual simplex?
-            _boolParamName[SoPlex::USECOMPDUAL] = "usecompdual";
-            _boolParamDescription[SoPlex::USECOMPDUAL] = "should the dual of the complementary problem be used in the improved dual simplex?";
-            _boolParamDefault[SoPlex::USECOMPDUAL] = false;
+      // should the dual of the complementary problem be used in the improved dual simplex?
+      name[SoPlex::USECOMPDUAL] = "usecompdual";
+      description[SoPlex::USECOMPDUAL] = "should the dual of the complementary problem be used in the improved dual simplex?";
+      defaultValue[SoPlex::USECOMPDUAL] = false;
 
       // should cycling solutions be accepted during iterative refinement?
       name[SoPlex::ACCEPTCYCLING] = "acceptcycling";
