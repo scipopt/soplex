@@ -940,8 +940,11 @@ public:
       /// mode for solution polishing
       SOLUTION_POLISHING = 23,
 
+      /// the maximum number of rows that are added in each iteration of the decomposition based simplex
+      DECOMP_MAXADDEDROWS = 24,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 24
+      INTPARAM_COUNT = 25
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1582,6 +1585,38 @@ private:
    //**@name Data for the Improved Dual Simplex */
    //@{
 
+   /** row violation structure
+    */
+   struct RowViolation
+   {
+      Real               violation;          /**< the violation of the row */
+      int                idx;                /**< index of corresponding row */
+   };
+
+   /** Compare class for row violations
+    */
+   struct RowViolationCompare
+   {
+   public:
+      /** constructor
+       */
+      RowViolationCompare()
+         : entry(0)
+      {
+      }
+
+      const RowViolation*  entry;
+
+      Real operator() (
+         RowViolation      i,
+         RowViolation      j
+         ) const
+      {
+         return i.violation - j.violation;
+      }
+   };
+
+
    typedef enum
    {
       // is the original problem currently being solved.
@@ -2092,7 +2127,7 @@ private:
    void _updateIdsReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
-   void _findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx);
+   void _findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
 
    /// update the dual complementary problem with additional columns and rows
    void _updateIdsComplementaryDualProblem(bool origObj);

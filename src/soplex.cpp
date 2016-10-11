@@ -274,6 +274,14 @@ namespace soplex
       lower[SoPlex::SOLUTION_POLISHING] = 0;
       upper[SoPlex::SOLUTION_POLISHING] = 2;
       defaultValue[SoPlex::SOLUTION_POLISHING] = SoPlex::POLISHING_OFF;
+
+      // maximum number of violated rows added in each iteration of the decomposition simplex
+      name[SoPlex::DECOMP_MAXADDEDROWS] = "decomp_maxaddedrows";
+      description[SoPlex::DECOMP_MAXADDEDROWS] = "maximum number of rows that are added to the reduced problem when using the decomposition based simplex";
+      lower[SoPlex::DECOMP_MAXADDEDROWS] = 1;
+      upper[SoPlex::DECOMP_MAXADDEDROWS] = INT_MAX;
+      defaultValue[SoPlex::DECOMP_MAXADDEDROWS] = 500;
+
    }
 
    SoPlex::Settings::RealParam::RealParam() {

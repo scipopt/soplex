@@ -18,13 +18,8 @@
 
 #include "soplex.h"
 #include "statistics.h"
+#include "sorter.h"
 
-//#define SIMPLEDEBUG
-//#define DEBUGGING
-//#define SOLVEIDS_DEBUG
-//#define WRITE_LP
-//#define WRITE_ERRLP
-//#define EXTRA_PRINT
 //#define NO_TOL
 //#define USE_FEASTOL
 //#define NO_TRANSFORM
@@ -45,6 +40,9 @@
 
 namespace soplex
 {
+
+
+
 
    /// solves LP using the improved dual simplex
    void SoPlex::_solveImprovedDualSimplex()
@@ -78,11 +76,6 @@ namespace soplex
          _solver.changeSense(SPxLPBase<Real>::MAXIMIZE);
       }
 
-#ifdef WRITE_LP
-      printf("Writing the original lp to a file\n");
-      _solver.writeFile("original.lp");
-#endif
-
       // it is necessary to solve the initial problem to find a starting basis
       _solver.setIdsStatus(SPxSolver::FINDSTARTBASIS);
 
@@ -97,7 +90,7 @@ namespace soplex
       // loop will recheck the degeneracy level and compute the proper dual multipliers.
       do
       {
-         _idsSimplifyAndSolve(_solver, _slufactor, false, false);
+         _idsSimplifyAndSolve(_solver, _slufactor, true, true);
          _solver.basis().solve(_idsFeasVector, _solver.maxObj());
          degeneracyLevel = _solver.getDegeneracyLevel(_idsFeasVector);
          if( _solver.type() == SPxSolver::LEAVE || _solver.status() >= SPxSolver::OPTIMAL
@@ -114,8 +107,14 @@ namespace soplex
 
             _solver.setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
 
+            if( _solver.status() == SPxSolver::UNBOUNDED || _solver.status() == SPxSolver::INFEASIBLE )
+               _hasBasis = false;
+
             // resolving the problem to update the real lp and solve with the correct objective.
-            _idsSimplifyAndSolve(_solver, _slufactor, true, true);
+            _idsSimplifyAndSolve(_solver, _slufactor, false, true);
+
+            // retreiving the original problem statistics prior to destroying it.
+            getOriginalProblemStatistics();
 
             // storing the solution from the reduced problem
             _storeSolutionReal();
@@ -141,11 +140,10 @@ namespace soplex
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_idsFeasVector) );
 
 
-      MSG_INFO1( spxout,
-         spxout << "===== Collecting the original problem basis ====" << std::endl;
-         );
+      MSG_INFO1( spxout, spxout << "===== Collecting the original problem basis ====" << std::endl );
 
       // resolving the original problem without preprocessing
+      _isRealLPLoaded = true;
       _preprocessAndSolveReal(false);
 
       // if the original problem has a basis, this will be stored
@@ -174,26 +172,18 @@ namespace soplex
       _idsDisplayLine = 0;
 
       MSG_INFO1( spxout,
-         spxout << "========      Degeneracy Detected       ========" << std::endl;
-         spxout << std::endl;
-         spxout << "======== Commencing decomposition solve ========" << std::endl;
+         spxout << "========      Degeneracy Detected       ========" << std::endl
+         << std::endl
+         << "======== Commencing decomposition solve ========" << std::endl
          );
 
-      // getting the decomposition basis condition number for the statistics
-      //_statistics->decompBasisCondNum = _solver.basis().getEstimatedCondition();
-      //printf("Current condition number: %e\n", _statistics->decompBasisCondNum);
-
-#ifdef SOLVEIDS_DEBUG
-      printf("Creating the Reduced and Complementary problems.\n");
-#endif
+      MSG_INFO3(spxout, spxout << "Creating the Reduced and Complementary problems." << std::endl );
 
       // creating copies of the original problem that will be manipulated to form the reduced and complementary
       // problems.
       _createIdsReducedAndComplementaryProblems();
 
-#ifdef SOLVEIDS_DEBUG
-      printf("Forming the Reduced problem.\n");
-#endif
+      MSG_INFO3(spxout, spxout << "Forming the Reduced problem." << std::endl );
 
       // creating the initial reduced problem from the basis information
       _formIdsReducedProblem(stop);
@@ -208,9 +198,7 @@ namespace soplex
       // a stop will be triggered if the reduced problem exceeded a specified fraction of the time limit
       if( stop )
       {
-         MSG_INFO1( spxout,
-            spxout << "==== Error constructing the reduced problem ====" << std::endl;
-            );
+         MSG_INFO1( spxout, spxout << "==== Error constructing the reduced problem ====" << std::endl );
          stopCount++;
          redProbError = true;
          _statistics->redProbStatus = SPxSolver::NOT_INIT;
@@ -223,32 +211,17 @@ namespace soplex
 
       while( !stop || stopCount <= 0 )
       {
-#ifdef WRITE_LP
-      printf("Writing the reduced lp to a file\n");
-      _solver.writeFile("reduced.lp");
-#endif
-
-#ifdef SOLVEIDS_DEBUG
-         printf("Reduced Prob Rows: ");
-         for( int j = 0; j < numRowsReal(); j++ )
-         {
-            if( _idsReducedProbRows[j] )
-               printf("%d ", j);
-         }
-         printf("\n");
-#endif
-
          // setting the current solving mode.
          _currentProb = IDS_RED;
 
          // solve the reduced problem
-#ifdef SOLVEIDS_DEBUG
-         printf("\n");
-         printf("=========================\n");
-         printf("Solving: Reduced Problem.\n");
-         printf("=========================\n");
-         printf("\n");
-#endif
+         MSG_INFO3(spxout,
+            spxout << std::endl
+            << "=========================" << std::endl
+            << "Solving: Reduced Problem." << std::endl
+            << "=========================" << std::endl
+            << std::endl );
+
          _hasBasis = hasRedBasis;
          if( stopCount <= 0 )
             _idsSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
@@ -269,44 +242,31 @@ namespace soplex
          if( _solver.status() != SPxSolver::OPTIMAL )
          {
             if( _solver.status() == SPxSolver::UNBOUNDED )
-               printf("Unbounded reduced problem.\n");
+               MSG_INFO2(spxout, spxout << "Unbounded reduced problem." << std::endl );
             if( _solver.status() == SPxSolver::INFEASIBLE )
-               printf("Infeasible reduced problem.\n");
+               MSG_INFO2(spxout, spxout << "Infeasible reduced problem." << std::endl );
 
-            printf("Reduced problem status: %d\n", _solver.status());
-
-#ifdef WRITE_ERRLP
-         printf("Writing the reduced lp with error to a file\n");
-         _solver.writeFile("reduced_err.lp");
-#endif
+            MSG_INFO2(spxout, spxout << "Reduced problem status: " << _solver.status() << std::endl );
 
             redProbError = true;
             break;
          }
 
          // printing display line
-         //#ifdef SIMPLEDEBUG
-         printIdsDisplayLine(_solver, orig_verbosity, true, !algIterCount);
-         //#else
-         //printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
-         //#endif
+         printIdsDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
 
-         //_idsFeasVector.reDim(_solver.nCols());
-         //_solver.basis().solve(_idsFeasVector, _solver.maxObj());
-
-#if 0
-         if( algIterCount == 0 )
-            _formIdsComplementaryProblem();  // create the complementary problem using
-#else
          // get the dual solutions from the reduced problem
          DVector reducedLPDualVector(_solver.nRows());
          DVector reducedLPRedcostVector(_solver.nCols());
          _solver.getDual(reducedLPDualVector);
          _solver.getRedCost(reducedLPRedcostVector);
 
+
+         // Using the solution to the reduced problem:
+         // In the first iteration of the algorithm create the complementary problem.
+         // In the subsequent iterations of the algorithm update the complementary problem.
          if( algIterCount == 0 )
-            _formIdsComplementaryProblem();  // create the complementary problem using
-                                             // the solution to the reduced problem
+            _formIdsComplementaryProblem();
          else
          {
             if( boolParam(SoPlex::USECOMPDUAL) )
@@ -315,39 +275,27 @@ namespace soplex
                _updateIdsComplementaryPrimalProblem(false);
          }
 
-#ifdef WRITE_LP
-         printf("Writing the complementary lp to a file\n");
-         _compSolver.writeFile("complement_dual.lp");
-#endif
          // setting the current solving mode.
          _currentProb = IDS_COMP;
 
          // solve the complementary problem
-#ifdef SOLVEIDS_DEBUG
-         printf("\n");
-         printf("===============================\n");
-         printf("Solving: Complementary Problem.\n");
-         printf("===============================\n");
-         printf("\n");
-#endif
+         MSG_INFO3(spxout,
+            spxout << std::endl
+            << "=========================" << std::endl
+            << "Solving: Complementary Problem." << std::endl
+            << "=========================" << std::endl
+            << std::endl );
+
          _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
          assert(_isRealLPLoaded);
 
-#ifdef SIMPLEDEBUG
-         printf("Iteration %d Objective Value: %.20f\n", algIterCount, _compSolver.objValue());
-#endif
+         MSG_INFO3(spxout, spxout << "Iteration " << algIterCount
+            << "Objective Value: " << std::setprecision(10) << _compSolver.objValue()
+            << std::endl );
 
-         //SPxLPIds compPrimalLP;
-         //_compSolver.buildDualProblem(compPrimalLP);
 
-         //char buffer[50];
-         //sprintf(buffer, "lpfiles/complement_%d.lp", algIterCount);
-         //printf("Writing the complementary primal lp to a file\n");
-         //compPrimalLP.writeFile(buffer);
-
-         // check the optimality of the original problem with the objective value of the complementary problem
-         // 09.02.2016 I think that this should be a check for feasibility, not unboundedness. The complementary problem
-         // is solved as the dual.
+         // Check whether the complementary problem is solved with a non-negative objective function, is infeasible or
+         // unbounded. If true, then stop the algorithm.
          if( GE(_compSolver.objValue(), 0.0, 1e-20)
             || _compSolver.status() == SPxSolver::INFEASIBLE
             || _compSolver.status() == SPxSolver::UNBOUNDED )
@@ -355,21 +303,11 @@ namespace soplex
             _statistics->compProbStatus = _compSolver.status();
             _statistics->finalCompObj = _compSolver.objValue();
             if( _compSolver.status() == SPxSolver::UNBOUNDED )
-               printf("Unbounded complementary problem.\n");
+               MSG_INFO2(spxout, spxout << "Unbounded complementary problem." << std::endl );
             if( _compSolver.status() == SPxSolver::INFEASIBLE )
-               printf("Infeasible complementary problem.\n");
+               MSG_INFO2(spxout, spxout << "Infeasible complementary problem." << std::endl );
             stop = true;
-
-#ifdef WRITE_ERRLP
-            if( _compSolver.status() == SPxSolver::INFEASIBLE
-               || _compSolver.status() == SPxSolver::UNBOUNDED )
-            {
-               printf("Writing the complementary lp with error to a file\n");
-               _compSolver.writeFile("complement_err.lp");
-            }
-#endif
          }
-#endif
 
          if( !stop )
          {
@@ -423,18 +361,9 @@ namespace soplex
          _solver.getPrimal(reducedLPPrimalVector);
          _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
 
-#ifdef WRITEBASIS
-         // writing the original problem basis
-         _writeOriginalProblemBasis("orig_basis.bas", _rowNames, _colNames, false);
-#endif
-
          // resetting the verbosity level
          spxout.setVerbosity( orig_verbosity );
 
-#if 0
-         // removing all rows not in the reduced problem
-         _updateIdsComplementaryProblem(true);
-#endif
 #ifdef PERFORM_COMPPROB_CHECK 
          // solving the complementary problem with the original objective function
          if( boolParam(SoPlex::USECOMPDUAL) )
@@ -457,9 +386,6 @@ namespace soplex
             _compSolver.loadLP(compDualLP);
          }
 
-         printf("Writing the complementary lp to a file\n");
-         _compSolver.writeFile("complement.lp");
-
          _idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
          _solReal._hasPrimal = true;
@@ -474,12 +400,16 @@ namespace soplex
          Real sumviol = 0;
 
          if( getIdsBoundViolation(maxviol, sumviol) )
-            printf("Bound violation: %.20f %.20f\n", maxviol, sumviol);
+            MSG_INFO1(spxout, spxout << "Bound violation - "
+               << "Max: "<< std::setprecision(20) << maxviol << " "
+               << "Sum: "<< sumviol << std::endl );
 
          if( getIdsRowViolation(maxviol, sumviol) )
-            printf("Row violation: %.20f %.20f\n", maxviol, sumviol);
+            MSG_INFO1(spxout, spxout << "Row violation - "
+               << "Max: "<< std::setprecision(21) << maxviol << " "
+               << "Sum: "<< sumviol << std::endl );
 
-         printf("Objective Value: %f\n", _compSolver.objValue());
+         MSG_INFO1(spxout, spxout << "Objective Value: " << _compSolver.objValue() << std::endl );
 #endif
       }
 
@@ -498,9 +428,9 @@ namespace soplex
       spxout.setVerbosity( orig_verbosity );
 
       MSG_INFO1( spxout,
-         spxout << "========  Decomposition solve completed ========" << std::endl;
-         spxout << std::endl;
-         spxout << "========   Resolving original problem   ========" << std::endl;
+         spxout << "========  Decomposition solve completed ========" << std::endl
+         << std::endl
+         << "========   Resolving original problem   ========" << std::endl
          );
 
       // if there is a reduced problem error in the first iteration the complementary problme has not been
@@ -529,9 +459,7 @@ namespace soplex
       // if there is an error solving the reduced problem the LP must be solved from scratch
       if (redProbError)
       {
-         MSG_INFO1( spxout,
-            spxout << "=== Reduced problem error - Solving original ===" << std::endl;
-            );
+         MSG_INFO1( spxout, spxout << "=== Reduced problem error - Solving original ===" << std::endl );
 
          // the solver is loaded with the realLP to solve the problem from scratch
          _solver.loadLP(*_realLP);
@@ -604,9 +532,7 @@ namespace soplex
    /// forms the reduced problem
    void SoPlex::_formIdsReducedProblem(bool& stop)
    {
-#ifdef SOLVEIDS_DEBUG
-      printf("Forming the reduced problem\n");
-#endif
+      MSG_INFO3( spxout, spxout << "Forming the reduced problem" << std::endl );
       int* bind = 0;
       int* nonposind = 0;
       int* compatind = 0;
@@ -642,10 +568,9 @@ namespace soplex
          _getNonPositiveDualMultiplierInds(_idsFeasVector, nonposind, bind, colsforremoval, &nnonposind, stop);
 
       // get the compatible columns from the constraint matrix w.r.t the current basis matrix
-#ifdef SOLVEIDS_DEBUG
-      printf("Computing the compatible columns\n");
-      printf("Solving time: %f\n", solveTime());
-#endif
+      MSG_INFO3(spxout, spxout << "Computing the compatible columns" << std::endl
+        << "Solving time: " << solveTime() << std::endl );
+
       spx_alloc(compatind, _solver.nRows());
       spx_alloc(rowsforremoval, _solver.nRows());
       if( !stop )
@@ -662,10 +587,8 @@ namespace soplex
          _getCompatibleBoundCons(boundcons, compatboundcons, nonposind, &ncompatboundcons, nnonposind, stop);
 
       // delete rows and columns from the LP to form the reduced problem
-#ifdef SOLVEIDS_DEBUG
-      printf("Deleting rows and columns to form the reduced problem\n");
-      printf("Solving time: %f\n", solveTime());
-#endif
+      MSG_INFO3(spxout, spxout << "Deleting rows and columns to form the reduced problem" << std::endl
+         << "Solving time: " << solveTime() << std::endl );
 
       // allocating memory to add bound constraints
       SPxRowId* addedrowids = 0;
@@ -675,15 +598,6 @@ namespace soplex
       if( !stop )
       {
          _computeReducedProbObjCoeff(stop);
-
-#ifdef SOLVEIDS_DEBUG
-         printf("Nonposinds obj coefficients\n");
-         for( int i = 0; i < nnonposind; i++ )
-         {
-            if( !isZero(_idsLP->maxObj(nonposind[i])) )
-               printf("nonposind[%d]: %d, coeff: %f\n", i, nonposind[i], _idsLP->maxObj(nonposind[i]));
-         }
-#endif
 
          _solver.loadLP(*_idsLP);
 
@@ -707,7 +621,7 @@ namespace soplex
       spx_free(nonposind);
       spx_free(bind);
 
-      _idsLP->~SPxLPReal();
+      _idsLP->~SPxLPIds();
       spx_free(_idsLP);
    }
 
@@ -748,11 +662,6 @@ namespace soplex
          _nPrimalCols = 0;
          _nDualRows = 0;
          _nDualCols = 0;
-
-#ifdef WRITE_LP
-         printf("Writing the complementary primal lp to a file\n");
-         _compSolver.writeFile("comp_primal.lp");
-#endif
 
          // convert complementary problem to dual problem
          SPxLPIds compDualLP;
@@ -795,12 +704,6 @@ namespace soplex
 
          // updating the constraints for the complementary problem
          _updateIdsComplementaryDualProblem(false);
-
-
-#ifdef WRITE_LP
-         printf("Writing the complementary primal lp to a file\n");
-         _compSolver.writeFile("comp_dual.lp");
-#endif
       }
       else  // when using the primal of the complementary problem, no transformation of the problem is required.
       {
@@ -840,7 +743,8 @@ namespace soplex
 
          for( int i = 0; i < _compSolver.nCols(); i++ )
          {
-            if( i != _compSlackColId.getIdx() )
+
+            if( _compSolver.cId(i).getIdx() != _compSlackColId.getIdx() )
             {
                _idsPrimalColIDs[i] = _realLP->cId(i);
                _idsCompPrimalColIDs[i] = _compSolver.cId(i);
@@ -1146,13 +1050,6 @@ namespace soplex
                continue;
             }
 
-//#ifdef SOLVEIDS_DEBUG
-            //printf("%d redProbNum: %d compProbNum: %d origProbNum: %d. y = %.10f u = %.20f, rowtype: %d, DualSign: %d\n",
-                  //i, solverRowNum, _compSolver.number(SPxColId(_idsDualColIDs[i])),
-                  //_realLP->number(SPxRowId(_idsPrimalRowIDs[i])), reducedProbDual, compProbPrimal,
-                  //_solver.rowType(solverRowNum), getExpectedDualVariableSign(solverRowNum));
-//#endif
-
             // the translation of the complementary primal problem to the dual some rows resulted in two columns.
             if( usecompdual && i < _nPrimalRows - 1 &&
                   _realLP->number(SPxRowId(_idsPrimalRowIDs[i])) == _realLP->number(SPxRowId(_idsPrimalRowIDs[i + 1])) )
@@ -1165,10 +1062,6 @@ namespace soplex
 
 
             // updating the ratio
-#if 0
-            if( (LE(reducedProbDual, 0, 1e-10) && LE(compProbPrimal, 0, 1e-10)) ||
-                  (GE(reducedProbDual, 0, 1e-10) && GE(compProbPrimal, 0, 1e-10)) )
-#endif
             SoPlex::DualSign varSign = getExpectedDualVariableSign(solverRowNum);
             if( varSign == SoPlex::IS_FREE || (varSign == SoPlex::IS_POS && LE(compProbPrimal, 0, feastol)) ||
                   (varSign == SoPlex::IS_NEG && GE(compProbPrimal, 0, feastol)) )
@@ -1189,75 +1082,9 @@ namespace soplex
                compProbPrimal = compPrimalVector[_compSolver.number(SPxColId(_idsDualColIDs[i]))]; // this is v
             else
                compProbPrimal = compDualVector[_compSolver.number(SPxRowId(_idsCompPrimalRowIDs[i]))];
-//#ifdef SOLVEIDS_DEBUG
-            //printf("%d compProbNum: %d origProbNum: %d. v = %.20f\n", i, _compSolver.number(SPxColId(_idsDualColIDs[i])),
-                  //_realLP->number(SPxRowId(_idsPrimalRowIDs[i])), compProbPrimal);
-//#endif
          }
 
       }
-
-#ifdef SOLVEIDS_DEBUG
-      printf("maxDualRatio: %f\n", maxDualRatio);
-#endif
-
-#if 0 // 17.02.2016 all bound constraints and columns are in the reduced problem. So there is no need for this loop.
-      for( int i = 0; i < _nPrimalCols; i++ )
-      {
-         Real reducedProbDual = 0;
-         Real compProbPrimal = 0;
-         Real dualRatio = 0;
-         int colNumber = _realLP->number(SPxColId(_idsPrimalColIDs[i])); // Need to check this. It should probably be
-                                                                         // just colNumber = i.
-         assert(colNumber >= 0 || (colNumber == -1 && _idsPrimalColIDs[i].getIdx() == _compSlackColId.getIdx()));
-         if( colNumber >= 0 && _fixedOrigVars[colNumber] != 0 )
-         {
-            assert(_fixedOrigVars[colNumber] == -1 || _fixedOrigVars[colNumber] == 1);
-            assert(_idsReducedProbColRowIDs[colNumber].isValid());
-            assert(_compSolver.number(_idsFixedVarDualIDs[colNumber]) >= 0);
-
-            int solverRowNum = _solver.number(_idsReducedProbColRowIDs[colNumber]);
-
-            reducedProbDual = dualVector[solverRowNum]; // this is y
-            compProbPrimal = compPrimalVector[_compSolver.number(_idsFixedVarDualIDs[colNumber])]; // this is u
-
-            // the variable in the basis is degenerate.
-            if( EQ(reducedProbDual, 0.0, feastol) )
-            {
-               MSG_WARNING( spxout,
-                 spxout << "WIMDSM02: reduced problem dual value is very close to zero." << std::endl; );
-               continue;
-            }
-
-#ifdef SOLVEIDS_DEBUG
-            printf("%d %d %d: y = %.20f u = %.20f, DualSign: %d\n", i, colNumber, _fixedOrigVars[colNumber],
-                  reducedProbDual, compProbPrimal, getExpectedDualVariableSign(solverRowNum));
-#endif
-
-            assert(_realLP->number(SPxColId(_idsPrimalColIDs[i])) != _realLP->number(SPxColId(_idsPrimalColIDs[i + 1])));
-
-            // updating the ratio
-            SoPlex::DualSign varSign = getExpectedDualVariableSign(solverRowNum);
-            if( varSign == SoPlex::IS_FREE || (varSign == SoPlex::IS_POS && LE(compProbPrimal, 0, feastol)) ||
-                  (varSign == SoPlex::IS_NEG && GE(compProbPrimal, 0, feastol)) )
-            {
-               dualRatio = infinity;
-            }
-            else
-            {
-               dualRatio = reducedProbDual/compProbPrimal;
-            }
-
-            if( LT(dualRatio, maxDualRatio, feastol) )
-               maxDualRatio = dualRatio;
-         }
-      }
-
-#ifdef SOLVEIDS_DEBUG
-      printf("maxDualRatio: %f\n", maxDualRatio);
-#endif
-
-#endif
 
       // setting the maxDualRatio to a maximum of 1
       if( maxDualRatio > 1.0 )
@@ -1270,11 +1097,13 @@ namespace soplex
 
       LPRowSet updaterows;
 
+      DataArray<RowViolation> violatedrows;
+      int nviolatedrows = 0;
       int* newrowidx = 0;
       int nnewrowidx = 0;
-      double largestViolation = 0;
-      int bestrow = -1;
       spx_alloc(newrowidx, _nPrimalRows);
+
+      violatedrows.reSize(_nPrimalRows);
 
       bool ratioTest = true;
       ratioTest = false;
@@ -1315,9 +1144,6 @@ namespace soplex
 
             SoPlex::DualSign varSign = getOrigProbDualVariableSign(rownumber);
 
-#ifdef SOLVEIDS_DEBUG
-            printf("i: %d, rownumber: %d, compProbPrimal: %f, dualSign: %d\n", i, rownumber, compProbPrimal, varSign);
-#endif
             // add row to the reduced problem if the computed dual is of the correct sign for a feasible dual solution
             if( ratioTest && ((varSign == SoPlex::IS_FREE && !isZero(compProbPrimal, feastol)) ||
                   (varSign == SoPlex::IS_POS && GT(compProbPrimal*maxDualRatio, 0, feastol)) ||
@@ -1326,64 +1152,50 @@ namespace soplex
                    * _compSolver.basis().desc().rowStatus(compRowNum) > SPxBasis::Desc::D_FREE &&
                      _compSolver.basis().desc().rowStatus(compRowNum) < SPxBasis::Desc::D_UNDEFINED)*/ )
             {
-#ifdef SOLVEIDS_DEBUG
-               printf("Adding rows!!!\n");
-#endif
                //this set of statements are required to add rows to the reduced problem. This will add a row for every
                //violated constraint. I only want to add a row for the most violated constraint. That is why the row
                //adding functionality is put outside the for loop.
-#if 1
-               updaterows.add(_transformedRows.lhs(rownumber), _transformedRows.rowVector(rownumber),
-                     _transformedRows.rhs(rownumber));
-
                if( !_idsReducedProbRows[rownumber] )
                {
                   numIncludedRows++;
                   assert(numIncludedRows <= _realLP->nRows());
                }
-               _idsReducedProbRows[rownumber] = true;
-               newrowidx[nnewrowidx] = rownumber;
-               nnewrowidx++;
-#else
-               if( GT(abs(compProbPrimal*maxDualRatio), largestViolation) )
-               {
-                  largestViolation = abs(compProbPrimal*maxDualRatio);
-                  bestrow = rownumber;
-               }
-#endif
+               violatedrows[nviolatedrows].idx = rownumber;
+               violatedrows[nviolatedrows].violation = spxAbs(compProbPrimal*maxDualRatio);
+               nviolatedrows++;
             }
          }
       }
 
-#if 0
-      // only adding the most violated row.
-      updaterows.add(_transformedRows.lhs(bestrow), _transformedRows.rowVector(bestrow),
-            _transformedRows.rhs(bestrow));
 
-      _idsReducedProbRows[bestrow] = true;
-      newrowidx[nnewrowidx] = bestrow;
-      nnewrowidx++;
-#endif
-
-#if 0 // only possible if using complementary problem dual
-      for( int i = 0; i < _nPrimalCols; i++ )
-      {
-         LPRowReal origlprow;
-         DSVectorBase<Real> rowtoaddVec(_realLP->nCols());
-         Real compProbPrimal = 0;
-         Real compRowRedcost = 0;
-         int rownumber = _realLP->number(SPxRowId(_idsPrimalRowIDs[i]));
-         if( !_idsReducedProbColRowIDs[i].isValid() )
-         {
-            compRowRedcost = compProbRedcost[compRowNumber];
-         }
-      }
-#endif
+      // sorting the violated rows by the absolute violation.
+      // Only a predefined number of rows will be added to the reduced problem
+      RowViolationCompare compare;
+      compare.entry = violatedrows.get_const_ptr();
 
       // if no rows are identified by the pricing rule, we add rows based upon the constraint violations
-      if( !ratioTest || nnewrowidx == 0 )
+      if( !ratioTest || nviolatedrows == 0 )
       {
-         _findViolatedRows(objValue, updaterows, newrowidx, nnewrowidx);
+         _findViolatedRows(objValue, violatedrows, nviolatedrows);
+      }
+
+
+      int sorted = 0;
+      int sortsize = MINIMUM(intParam(SoPlex::DECOMP_MAXADDEDROWS), nviolatedrows);
+
+      // only sorting if the sort size is less than the number of violated rows.
+      if( sortsize > 0 && sortsize < nviolatedrows )
+         sorted = SPxQuicksortPart(violatedrows.get_ptr(), compare, sorted + 1, nviolatedrows, sortsize);
+
+      // adding the violated rows.
+      for( int i = 0; i < sortsize; i++ )
+      {
+         updaterows.add(_transformedRows.lhs(violatedrows[i].idx), _transformedRows.rowVector(violatedrows[i].idx),
+            _transformedRows.rhs(violatedrows[i].idx));
+
+         _idsReducedProbRows[violatedrows[i].idx] = true;
+         newrowidx[nnewrowidx] = violatedrows[i].idx;
+         nnewrowidx++;
       }
 
       SPxRowId* addedrowids = 0;
@@ -1469,7 +1281,6 @@ namespace soplex
 
 
             norm = spxSqrt(norm);
-            //printf("row: %d, norm: %f\n", rowNumber, norm);
             if( LT(norm, bestrownorm) )
             {
                bestrow = rowNumber;
@@ -1538,11 +1349,10 @@ namespace soplex
 
 
 
-#define LARGEST_VIOL
    /// builds the update rows with those violated in the complmentary problem
    // A row is violated in the constraint matrix Ax <= b, if b - A_{i}x < 0
    // To aid the computation, all violations are translated to <= constraints
-   void SoPlex::_findViolatedRows(Real compObjValue, LPRowSet& updaterows, int* newrowidx, int& nnewrowidx)
+   void SoPlex::_findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows)
    {
       Real feastol = realParam(SoPlex::FEASTOL);
       DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
@@ -1564,10 +1374,6 @@ namespace soplex
          compProbSlackVal = compProbPrimal[_compSolver.number(_compSlackColId)];
       }
 
-#ifdef LARGEST_VIOL
-      double largestViolation = 0;
-      int bestrow = -1;
-#endif
       for( int i = 0; i < _nPrimalRows; i++ )
       {
          LPRowReal origlprow;
@@ -1590,20 +1396,13 @@ namespace soplex
             }
             else
             {
-               bool isViol = false;
                Real viol = _compSolver.rhs(comprownum) - (compProbActivity[comprownum] + compProbSlackVal);
                if( viol < 0.0 )
-               {
                   compProbViol = viol;
-                  isViol = true;
-               }
 
                viol = (compProbActivity[comprownum] - compProbSlackVal) - _compSolver.lhs(comprownum);
                if( viol < 0.0 )
-               {
                   compProbViol = viol;
-                  isViol = true;
-               }
 
             }
 
@@ -1626,60 +1425,20 @@ namespace soplex
                   compProbViol = tempViol;
             }
 
-#if 0
-            if( GE(compObjValue, 0.0, feastol) )
-            {
-               printf("Rowtype: %d, Constraints violation: %.20f\n", _realLP->rowType(rownumber), compProbViol);
-               //if( _realLP->rowType(rownumber) == LPRowBase<Real>::LESS_EQUAL )
-                  //compProbViol = -1;
-            }
-#endif
 
-#ifdef SOLVEIDS_DEBUG
-            printf("i: %d, rownumber: %d, compProbViol: %f\n", i, rownumber, compProbViol);
-#endif
             if( LT(compProbViol, 0, feastol) )
             {
-#ifdef SOLVEIDS_DEBUG
-               printf("Adding rows!!!\n");
-#endif
-#ifndef LARGEST_VIOL
-               updaterows.add(_transformedRows.lhs(rownumber), _transformedRows.rowVector(rownumber),
-                     _transformedRows.rhs(rownumber));
-
                if( !_idsReducedProbRows[rownumber] )
                {
                   numIncludedRows++;
                   assert(numIncludedRows <= _realLP->nRows());
                }
-               _idsReducedProbRows[rownumber] = true;
-               newrowidx[nnewrowidx] = rownumber;
-               nnewrowidx++;
-#else
-               if( LT(compProbViol, largestViolation) )
-               {
-                  largestViolation = compProbViol;
-                  bestrow = rownumber;
-               }
-#endif
+               violatedrows[nviolatedrows].idx = rownumber;
+               violatedrows[nviolatedrows].violation = spxAbs(compProbViol);
+               nviolatedrows++;
             }
          }
       }
-#ifdef LARGEST_VIOL
-      // only adding the most violated row.
-      updaterows.add(_transformedRows.lhs(bestrow), _transformedRows.rowVector(bestrow),
-            _transformedRows.rhs(bestrow));
-
-      assert(!_idsReducedProbRows[bestrow]);
-      if( !_idsReducedProbRows[bestrow] )
-      {
-         numIncludedRows++;
-         assert(numIncludedRows <= _realLP->nRows());
-      }
-      _idsReducedProbRows[bestrow] = true;
-      newrowidx[nnewrowidx] = bestrow;
-      nnewrowidx++;
-#endif
    }
 
 
@@ -1712,9 +1471,6 @@ namespace soplex
       // this identifies the basis indices and the indicies that are positive.
       for( int i = 0; i < _solver.nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
       {
-#ifdef SOLVEIDS_DEBUG
-         printf("%d %d %f ", i, _solver.number(_solver.basis().baseId(i)), feasVector[i]);
-#endif
          _idsReducedProbCols[i] = true;
          _idsReducedProbColIDs[i].inValidate();
          colsforremoval[i] = i;
@@ -1723,9 +1479,6 @@ namespace soplex
          // information. Additionally, in getCompatibleColumns the information may not be used correctly.
          if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
          {
-#ifdef SOLVEIDS_DEBUG
-            printf("status: %d, Row\n", int(_solver.basis().desc().rowStatus(_solver.number(_solver.basis().baseId(i)))));
-#endif
             bind[i] = -1 - _realLP->number(SPxRowId(_solver.basis().baseId(i))); // getting the corresponding row
                                                                                    // for the original LP.
 
@@ -1743,9 +1496,6 @@ namespace soplex
          }
          else if( _solver.basis().baseId(i).isSPxColId() )  // get the column id's for the columns in the basis
          {
-#ifdef SOLVEIDS_DEBUG
-            printf("status: %d, Col\n", int(_solver.basis().desc().colStatus(_solver.number(_solver.basis().baseId(i)))));
-#endif
             bind[i] = _realLP->number(SPxColId(_solver.basis().baseId(i)));
 
             //int colnumber = _solver.number(_solver.basis().baseId(i));
@@ -1782,9 +1532,6 @@ namespace soplex
 #endif
          }
       }
-#ifdef SOLVEIDS_DEBUG
-      printf("\n");
-#endif
 
       stop = idsTerminate(realParam(SoPlex::TIMELIMIT)*TIMELIMIT_FRAC);
    }
@@ -2249,23 +1996,11 @@ namespace soplex
       for( int i = 0; i < _nElimPrimalRows; i++ )
       {
          int rowNumber = _realLP->number(_idsElimPrimalRowIDs[i]);
-#if 0
-         if( _realLP->rowType(_idsElimPrimalRowIDs[i]) == LPRowBase<Real>::EQUAL )
-            printf("Equality constraint eliminated.\n");
-#endif
 
-         /*
-          * =================================================
-          * This is not correct!!! The addition of rows does not take into account the different columns contained in
-          * the complementary problem compared to the original problem.
-          * MUST FIX!!!!!
-          * 07.01.2014 - I think that this is fixed. Still need to check.
-          * =================================================
-          */
-         // Originally this if was surrounded with another statement checking for basis rows. I think that this is
-         // unnecessary and the check should be related to the status of the variables.
          int solverRowNum = _solver.number(_idsReducedProbRowIDs[rowNumber]);
          assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
+
+         // checking for the basic rows in the reduced problem
          if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_UPPER ||
            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER ||
            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_FIXED ||
@@ -2275,8 +2010,6 @@ namespace soplex
            (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_UPPER &&
            LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
          {
-            // this assert should stay, but there is an issue with the status and the dual vector
-            //assert(isNotZero(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])]));
             LPRowReal origlprow;
             DSVectorBase<Real> coltoaddVec(_realLP->nCols());
 
@@ -2292,7 +2025,6 @@ namespace soplex
                if( _idsCompProbColIDsIdx[colNumber] == -1 )
                {
                   assert(!_idsReducedProbColIDs[colNumber].isValid());
-                  //printf("Adding column to complementary problem: %d\n", colNumber);
                   _idsPrimalColIDs[_nPrimalCols] = _realLP->cId(colNumber);
                   _idsCompProbColIDsIdx[colNumber] = _nPrimalCols;
                   _fixedOrigVars[colNumber] = -2;
@@ -2330,9 +2062,6 @@ namespace soplex
                  (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_LOWER &&
                  LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
             {
-               // this assert should stay, but there is an issue with the status and the dual vector
-               //assert(GT(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])], 0.0));
-               // NOTE: This will probably need the SPxRowId passed to the function to get the new row id.
                assert(LT(_realLP->rhs(_idsElimPrimalRowIDs[i]), infinity));
                addElimCols.add(_realLP->rhs(_idsElimPrimalRowIDs[i]), -infinity, coltoaddVec, infinity);
 
@@ -2372,9 +2101,8 @@ namespace soplex
          }
       }
 
-#ifdef SOLVEIDS_DEBUG
-      printf("Num added cols: %d\n", numElimColsAdded);
-#endif
+      MSG_INFO2(spxout, spxout << "Number of eliminated columns added to complementary problem: "
+         << numElimColsAdded << std::endl );
 
       // updating the _idsDualColIDs with the additional columns from the eliminated rows.
       _compSolver.addCols(addElimCols);
@@ -2624,7 +2352,6 @@ namespace soplex
    {
       Real feastol = realParam(SoPlex::FEASTOL);
 
-      int prevNumCols = _compSolver.nCols(); // number of columns in the previous formulation of the complementary prob
       int prevNumRows = _compSolver.nRows();
       int prevPrimalRowIds = _nPrimalRows;
 
@@ -2633,30 +2360,17 @@ namespace soplex
       LPRowSetBase<Real> addElimRows(_nElimPrimalRows);  // rows previously eliminated from the
                                                          // complementary problem that must be added
       int numElimRowsAdded = 0;
-      int currnumrows = prevNumRows;
       // looping over all rows from the original LP that were eliminated during the formation of the complementary
       // problem. The eliminated rows will be added if they are basic in the reduced problem.
 
       for( int i = 0; i < _nElimPrimalRows; i++ )
       {
          int rowNumber = _realLP->number(_idsElimPrimalRowIDs[i]);
-#if 0
-         if( _realLP->rowType(_idsElimPrimalRowIDs[i]) == LPRowBase<Real>::EQUAL )
-            printf("Equality constraint eliminated.\n");
-#endif
 
-         /*
-          * =================================================
-          * This is not correct!!! The addition of rows does not take into account the different columns contained in
-          * the complementary problem compared to the original problem.
-          * MUST FIX!!!!!
-          * 07.01.2014 - I think that this is fixed. Still need to check.
-          * =================================================
-          */
-         // Originally this if was surrounded with another statement checking for basis rows. I think that this is
-         // unnecessary and the check should be related to the status of the variables.
          int solverRowNum = _solver.number(_idsReducedProbRowIDs[rowNumber]);
          assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
+
+         // checking the rows that are basic in the reduced problem that should be added to the complementary problem
          if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_UPPER ||
            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER ||
            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_FIXED ||
@@ -2666,8 +2380,6 @@ namespace soplex
            (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_UPPER &&
            EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
          {
-            // this assert should stay, but there is an issue with the status and the dual vector
-            //assert(isNotZero(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])]));
             LPRowReal origlprow;
             _realLP->getRow(rowNumber, origlprow);
 
@@ -2682,9 +2394,6 @@ namespace soplex
                  (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_LOWER &&
                  EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
             {
-               // this assert should stay, but there is an issue with the status and the dual vector
-               //assert(GT(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])], 0.0));
-               // NOTE: This will probably need the SPxRowId passed to the function to get the new row id.
                assert(LT(_realLP->rhs(_idsElimPrimalRowIDs[i]), infinity));
 
                if( _nPrimalRows >= _idsPrimalRowIDs.size() )
@@ -2709,8 +2418,6 @@ namespace soplex
               (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_ON_UPPER &&
               EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
             {
-               // this assert should stay, but there is an issue with the status and the dual vector
-               //assert(LT(dualVector[_solver.number(_idsReducedProbRowIDs[rowNumber])], 0.0));
                assert(GT(_realLP->lhs(_idsElimPrimalRowIDs[i]), -infinity));
 
                if( _nPrimalRows >= _idsPrimalRowIDs.size() )
@@ -2734,9 +2441,8 @@ namespace soplex
          }
       }
 
-#ifdef SOLVEIDS_DEBUG
-      printf("Num added rows: %d\n", numElimRowsAdded);
-#endif
+      MSG_INFO2(spxout, spxout << "Number of eliminated rows added to the complementary problem: "
+         << numElimRowsAdded << std::endl );
 
       // adding the eliminated rows to the complementary problem.
       _compSolver.addRows(addElimRows);
@@ -2894,8 +2600,8 @@ namespace soplex
 
       if( printViol )
       {
-         printf("\n");
-         printf("Checking consistency between the reduced problem and the original problem.\n");
+         MSG_INFO1(spxout, spxout << std::endl
+           << "Checking consistency between the reduced problem and the original problem." << std::endl );
       }
 
 
@@ -2903,15 +2609,14 @@ namespace soplex
       Real objectiveVal = 0;
       for( int i = 0; i < _solver.nCols(); i++ )
       {
-         //printf("Variable %d: Red - %f Orig - %f\n", i, primalVector[i], x[i]);
          redObjVal += _solver.maxObj(i)*primalVector[i];
          objectiveVal += _realLP->maxObj(i)*x[i];
       }
 
       if( printViol )
       {
-         printf("Reduced Problem Objective Value: %f\n", redObjVal);
-         printf("Original Problem Objective Value: %f\n", objectiveVal);
+         MSG_INFO1(spxout, spxout << "Reduced Problem Objective Value: " << redObjVal << std::endl
+           << "Original Problem Objective Value: " << std::endl );
       }
 
       _solReal._hasPrimal = true;
@@ -2926,7 +2631,8 @@ namespace soplex
       if( getIdsBoundViolation(maxviol, sumviol) )
       {
          if( printViol )
-            printf("Bound violation: %.20f %.20f\n", maxviol, sumviol);
+            MSG_INFO1(spxout, spxout << "Bound violation - "
+               << "Max violation: " << maxviol << " Sum violation: " << sumviol << std::endl );
       }
 
       _statistics->totalBoundViol = sumviol;
@@ -2935,14 +2641,15 @@ namespace soplex
       if( getIdsRowViolation(maxviol, sumviol) )
       {
          if( printViol )
-            printf("Row violation: %.20f %.20f\n", maxviol, sumviol);
+            MSG_INFO1(spxout, spxout << "Row violation - "
+               << "Max violation: " << maxviol << " Sum violation: " << sumviol << std::endl );
       }
 
       _statistics->totalRowViol = sumviol;
       _statistics->maxRowViol = maxviol;
 
       if( printViol )
-         printf("\n");
+         MSG_INFO1(spxout, spxout << std::endl );
    }
 
 
@@ -3022,9 +2729,8 @@ namespace soplex
          }
       }
 
-#ifdef SOLVEIDS_DEBUG
-      printf("Number of fixed variables: %d\n", numFixedVar);
-#endif
+      MSG_INFO3(spxout, spxout << "Number of fixed primal variables in the complementary (dual) problem: "
+         << numFixedVar << std::endl );
    }
 
 
@@ -3252,9 +2958,8 @@ namespace soplex
          }
       }
 
-#ifdef SOLVEIDS_DEBUG
-      printf("Number of fixed variables: %d\n", numFixedVar);
-#endif
+      MSG_INFO3(spxout, spxout << "Number of fixed primal variables in the complementary (primal) problem: "
+         << numFixedVar << std::endl );
    }
 
 
@@ -3272,9 +2977,6 @@ namespace soplex
          int colNumber = _compSolver.number(SPxColId(_idsCompPrimalColIDs[i]));
          if( _fixedOrigVars[colNumber] != currFixedVars[colNumber] )
          {
-#ifdef SOLVEIDS_DEBUG
-            printf("_fixedOrigVars[%d]: %d, currFixedVars[%d]: %d\n", i, _fixedOrigVars[colNumber], i, currFixedVars[colNumber]);
-#endif
             if( currFixedVars[colNumber] != 0 )
             {
                assert(currFixedVars[colNumber] == -1 || currFixedVars[colNumber] == 1);
@@ -3811,8 +3513,6 @@ namespace soplex
                isMaxViol = true;
             }
          }
-         //else if( isZero(viol) )
-            //printf("Col %d fixed to lower. Redprob fixed: %d\n", i, _fixedOrigVars[i]);
 
          if( GT(viol, 0.0, feastol) )
             isViol = true;
@@ -3827,18 +3527,12 @@ namespace soplex
                isMaxViol = true;
             }
          }
-         //else if( isZero(viol) )
-            //printf("Col %d fixed to upper. Redprob fixed: %d\n", i, _fixedOrigVars[i]);
 
          if( GT(viol, 0.0, feastol) )
             isViol = true;
 
          if( isViol )
          {
-#if 0
-            printf("Violated column: %d. Bounds (%f, %f). Primal: %f\n", i, _realLP->lower(i), _realLP->upper(i),
-               primal[i]);
-#endif
 
             // updating the violated bounds list
             if( isMaxViol )
@@ -3880,7 +3574,6 @@ namespace soplex
       for( int i = _realLP->nRows() - 1; i >= 0; i-- )
       {
          Real currviol = 0.0;
-         int solverRowNum = _solver.number(_idsReducedProbRowIDs[i]);
 
          isViol = false;
          isMaxViol = false;
@@ -3921,42 +3614,6 @@ namespace soplex
 
          if( isViol )
          {
-#if 0
-            if( (_idsReducedProbRows[i] &&
-               (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_UPPER ||
-               _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_FIXED ||
-               _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::P_ON_LOWER ||
-               _solver.basis().desc().rowStatus(solverRowNum) == SPxBasis::Desc::D_FREE)) )
-            {
-               printf("I");
-            }
-
-            printf("(%d, %d, %d, %d) %.20f ", _solver.basis().desc().rowStatus(solverRowNum), _idsReducedProbRows[i], i,
-               solverRowNum, currviol);
-            printf("Bounds = Lower (%f, %f) Upper (%f, %f)\n", _realLP->lhs(i), _solver.lhs(solverRowNum),
-               _realLP->rhs(i), _solver.rhs(solverRowNum));
-
-            if( false && _idsReducedProbRows[i] )
-            {
-               for( int j = 0; j < _realLP->rowVector(i).size(); j++ )
-                  printf("(%d, %f) ", _realLP->rowVector(i).index(j), _realLP->rowVector(i).value(j));
-               printf("\n");
-
-               for( int j = 0; j < _solver.rowVector(solverRowNum).size(); j++ )
-               {
-                  int rowNumber = _solver.number(_idsReducedProbColRowIDs[_solver.rowVector(solverRowNum).index(j)]);
-                  printf("(%d, %f, %d) ", _solver.rowVector(solverRowNum).index(j),
-                     _solver.rowVector(solverRowNum).value(j), _solver.basis().desc().rowStatus(rowNumber));
-
-                  for( int k = 0; k < _solver.rowVector(rowNumber).size(); k++ )
-                     printf("(%d, %f) ", _solver.rowVector(rowNumber).index(k),
-                        _solver.rowVector(rowNumber).value(k));
-
-               }
-               printf("\n");
-            }
-#endif
-
             // updating the violated rows list
             if( isMaxViol )
             {
@@ -4180,7 +3837,8 @@ namespace soplex
       }
 
       nNonBasicRows = _realLP->nRows() - basicRow - nDegenerateRows;
-      printf("Number of non-basic rows: %d (from %d)\n", nNonBasicRows, _realLP->nRows());
+      MSG_INFO2(spxout, spxout << "Number of non-basic rows: " << nNonBasicRows << " (from "
+         << _realLP->nRows() << ")" << std::endl );
    }
 
 
@@ -4235,8 +3893,9 @@ namespace soplex
       }
 
       nNonBasicCols = _realLP->nCols() - basicCol;
-      printf("Number of non-basic columns: %d (from %d)\n", nNonBasicCols, _realLP->nCols());
-      printf("Number of zero dual columns: %d (from %d)\n", numZeroDual, _realLP->nCols());
+      MSG_INFO2(spxout, spxout << "Number of non-basic columns: "
+         << nNonBasicCols << " (from " << _realLP->nCols() << ")" << std::endl
+         << "Number of zero dual columns: " << numZeroDual << " (from " << _realLP->nCols() << ")" << std::endl );
    }
 
 
@@ -4251,16 +3910,6 @@ namespace soplex
       int nDegenerateRows = 0;
       DataArray< int > degenerateRowNums;   // array to store the orig prob row number of degenerate rows
       DataArray< SPxSolver::VarStatus > degenerateRowStatus;  // possible status for the degenerate rows in the orig prob
-
-      for( int i = 0; i < _solver.nCols(); i++ )
-      {
-         int solverNum = _solver.number(_solver.basis().baseId(i));
-         if( _solver.basis().baseId(i).isSPxRowId() )
-            printf("%d: Row %d, Status: %d\n", i, solverNum, _solver.basis().desc().rowStatus(solverNum));
-         else
-            printf("%d: Col %d, Status: %d\n", i, solverNum, _solver.basis().desc().colStatus(solverNum));
-
-      }
 
       // setting the basis status rows and columns to size of the original problem
       _basisStatusRows.reSize(numrows);
