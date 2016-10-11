@@ -75,14 +75,6 @@ public:
 
 
 protected:
-
-   //-------------------------------------
-   /**@name Protected helpers */
-   //@{
-   /// Does nothing but returning \p maxi.
-   virtual Real computeScale(Real /*mini*/, Real maxi) const;
-   //@}
-
    Real acrcydivisor = ACCURACY_DIVISOR;
    int maxrounds = MAX_ROUNDS;
 

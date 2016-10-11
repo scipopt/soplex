@@ -61,16 +61,6 @@ public:
    /// Scale the loaded SPxLP.
    virtual void scale(SPxLPBase<Real>& lp);
    //@}
-
-protected:
-
-   //-------------------------------------
-   /**@name Protected helpers */
-   //@{
-   /// Does nothing but returning \p maxi.
-   virtual Real computeScale(Real /*mini*/, Real maxi) const;
-   //@}
-
 };
 } // namespace soplex
 #endif // _SPXEQUILISC_H_

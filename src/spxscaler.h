@@ -52,8 +52,12 @@ protected:
    /**@name Data */
    //@{
    const char*        m_name;      ///< Name of the scaler
+#if 0
    DataArray < Real > m_colscale;  ///< column scaling factors
    DataArray < Real > m_rowscale;  ///< row scaling factors
+#endif
+   DataArray < int >              m_colscaleExp;  ///< column scaling factors
+   DataArray < int >              m_rowscaleExp;  ///< row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
    SPxOut*            spxout;      ///< message handler
@@ -64,14 +68,17 @@ protected:
    //@{
    /// setup scale array for the LP.
    virtual void setup(SPxLPBase<Real>& lp);
+#if 0
    /// computes scaling value for a minimum and maximum pair.
    virtual Real computeScale(Real mini, Real maxi) const;
+
    /// iterates through vecset and calls computeScale() for each vector.
    /**@return maximum ratio between absolute biggest and smallest element for any vector.
     */
    virtual Real computeScalingVecs( const SVSet* vecset, 
-                                    const DataArray<Real>& coScaleval, 
-                                    DataArray<Real>& scaleval );
+                                    const DataArray<int>& coScaleExp,
+                                    DataArray<int>& scaleExp );
+#endif
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
    //@}
@@ -123,9 +130,9 @@ public:
    /// unscale SPxLP
    virtual void unscale(SPxLPBase<Real>& lp);
    /// returns scaling factor for column \p i
-   virtual Real getColScale(int i);
+   virtual Real getColScaleExp(int i);
    /// returns scaling factor for row \p i
-   virtual Real getRowScale(int i);
+   virtual Real getRowScaleExp(int i);
    /// gets unscaled column \p i
    virtual void getColUnscaled(const SPxLPBase<Real>& lp, int i, SVector& vec) const;
 #if 1

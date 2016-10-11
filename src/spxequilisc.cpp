@@ -31,6 +31,35 @@ static const char* makename(bool doBoth)
    return doBoth ? "bi-Equilibrium" : "uni-Equilibrium";
 }
 
+static void computeScalingExpVec(
+      const SVSet*           vecset,
+      const DataArray<int>& coScaleExp,
+      DataArray<int>&       scaleExp)
+   {
+      for( int i = 0; i < vecset->num(); ++i )
+      {
+         const SVector& vec = (*vecset)[i];
+
+         Real maxi = 0.0;
+
+         for( int j = 0; j < vec.size(); ++j )
+         {
+            Real x = spxAbs(vec.value(j) * ldexp(1.0, coScaleExp[vec.index(j)]));
+
+            if( GT(x, maxi) )
+               maxi = x;
+         }
+         // empty rows/cols are possible
+         if( maxi == 0.0 )
+            maxi = 1.0;
+
+         assert(maxi > 0.0);
+
+         frexp(1.0 / maxi, &(scaleExp[i]));
+         scaleExp[i] -= 1;
+      }
+   }
+
 SPxEquiliSC::SPxEquiliSC(bool doBoth)
    : SPxScaler(makename(doBoth), false, doBoth)
 {}
@@ -49,11 +78,6 @@ SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
    return *this;
 }
 
-Real SPxEquiliSC::computeScale(Real /*mini*/, Real maxi) const
-{
-
-   return maxi;
-}
 
 void SPxEquiliSC::scale(SPxLP& lp)
 {
@@ -95,17 +119,17 @@ void SPxEquiliSC::scale(SPxLP& lp)
 
    if (colFirst)
    {
-      computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
+      computeScalingExpVec(lp.colSet(), m_rowscaleExp, m_colscaleExp);
 
       if (m_doBoth)
-         computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
+         computeScalingExpVec(lp.rowSet(), m_colscaleExp, m_rowscaleExp);
    }
    else
    {
-      computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
+      computeScalingExpVec(lp.rowSet(), m_colscaleExp, m_rowscaleExp);
 
       if (m_doBoth)
-         computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
+         computeScalingExpVec(lp.colSet(), m_rowscaleExp, m_colscaleExp);
    }
 
    /* scale */
@@ -124,6 +148,7 @@ void SPxEquiliSC::scale(SPxLP& lp)
                         << " col-ratio= " << maxColRatio(lp)
                         << " row-ratio= " << maxRowRatio(lp)
                         << std::endl; )
+
 }
 
 } // namespace soplex

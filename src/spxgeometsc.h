@@ -40,15 +40,8 @@ protected:
    /**@name Data */
    //@{
    const int  m_maxIterations;    ///< maximum number of scaling iterations.
-   const Real m_minImprovement;   ///< improvement nesseccary to carry on.
+   const Real m_minImprovement;   ///< improvement necessary to carry on.
    const Real m_goodEnoughRatio;  ///< no scaling needed if ratio is less than this.
-   //@}
-
-   //-------------------------------------
-   /**@name Private helpers */
-   //@{
-   /// Returns \f$\sqrt{\mbox{mini}\cdot\mbox{maxi}}\f$.
-   virtual Real computeScale(Real mini, Real maxi) const;
    //@}
 
 public:

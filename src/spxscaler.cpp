@@ -38,13 +38,13 @@ std::ostream& operator<<(std::ostream& s, const SPxScaler& sc)
 {
    s << sc.getName() << " scaler:" << std::endl;
    s << "colscale = [ ";
-   for(int ci = 0; ci < sc.m_colscale.size(); ++ci )
-      s << sc.m_colscale[ci] << " ";
+   for(int ci = 0; ci < sc.m_colscaleExp.size(); ++ci )
+      s << sc.m_colscaleExp[ci] << " ";
    s << "]" << std::endl;
 
    s << "rowscale = [ ";
-   for(int ri = 0; ri < sc.m_rowscale.size(); ++ri )
-      s << sc.m_rowscale[ri] << " ";
+   for(int ri = 0; ri < sc.m_rowscaleExp.size(); ++ri )
+      s << sc.m_rowscaleExp[ri] << " ";
    s << "]" << std::endl;
 
    return s;
@@ -65,8 +65,8 @@ SPxScaler::SPxScaler(
 
 SPxScaler::SPxScaler(const SPxScaler& old)
    : m_name(old.m_name)
-   , m_colscale(old.m_colscale)
-   , m_rowscale(old.m_rowscale)
+   , m_colscaleExp(old.m_colscaleExp)
+   , m_rowscaleExp(old.m_rowscaleExp)
    , m_colFirst(old.m_colFirst)
    , m_doBoth(old.m_doBoth)
    , spxout(old.spxout)
@@ -84,8 +84,8 @@ SPxScaler& SPxScaler::operator=(const SPxScaler& rhs)
    if (this != &rhs)
    {
       m_name     = rhs.m_name;
-      m_colscale = rhs.m_colscale;
-      m_rowscale = rhs.m_rowscale;
+      m_colscaleExp = rhs.m_colscaleExp;
+      m_rowscaleExp = rhs.m_rowscaleExp;
       m_colFirst = rhs.m_colFirst;
       m_doBoth   = rhs.m_doBoth;
       spxout     = rhs.spxout;
@@ -125,18 +125,19 @@ void SPxScaler::setup(SPxLP& lp)
 
    assert(lp.isConsistent());
 
-   m_colscale.reSize(lp.nCols());
-   m_rowscale.reSize(lp.nRows());
+   m_colscaleExp.reSize(lp.nCols());
+   m_rowscaleExp.reSize(lp.nRows());
 
    int i;
 
    for(i = 0; i < lp.nCols(); ++i )
-      m_colscale[i] = 1.0;
+      m_colscaleExp[i] = 0.0;
 
    for(i = 0; i < lp.nRows(); ++i )
-      m_rowscale[i] = 1.0;
+      m_rowscaleExp[i] = 0.0;
 }
 
+#if 0
 /** This function is used by computeScaleVecs and has to be overridden.
  */
 Real SPxScaler::computeScale(Real /*mini*/, Real /*maxi*/) const
@@ -147,22 +148,22 @@ Real SPxScaler::computeScale(Real /*mini*/, Real /*maxi*/) const
 
 Real SPxScaler::computeScalingVecs(
    const SVSet*           vecset, 
-   const DataArray<Real>& coScaleval, 
-   DataArray<Real>&       scaleval) 
+   const DataArray<int>& coScaleExp,
+   DataArray<int>&       scaleExp)
 {
 
    Real pmax = 0.0;
 
-   for(int i = 0; i < vecset->num(); ++i )
+   for( int i = 0; i < vecset->num(); ++i )
    {
       const SVector& vec = (*vecset)[i];
 
       Real maxi = 0.0;
       Real mini = infinity;
 
-      for( int j = 0; j < vec.size(); ++j)
+      for( int j = 0; j < vec.size(); ++j )
       {
-         Real x = spxAbs(vec.value(j) * coScaleval[vec.index(j)]);
+         Real x = spxAbs(vec.value(j) * ldexp(1.0, coScaleExp[vec.index(j)]));
 
          if (!isZero(x))
          {
@@ -181,7 +182,9 @@ Real SPxScaler::computeScalingVecs(
       assert(mini < infinity);
       assert(maxi > 0.0);
 
-      scaleval[i] = 1.0 / computeScale(mini, maxi);
+      //scaleval[i] = 1.0 / computeScale(mini, maxi);
+      frexp(1.0 / computeScale(mini, maxi), &(scaleExp[i]));
+      scaleExp[i] -= 1;
 
       Real p = maxi / mini;
 
@@ -190,7 +193,7 @@ Real SPxScaler::computeScalingVecs(
    }
    return pmax;
 }
-
+#endif
 void SPxScaler::applyScaling(SPxLP& lp)
 {
 
@@ -200,64 +203,68 @@ void SPxScaler::applyScaling(SPxLP& lp)
    {
       SVector& vec = lp.rowVector_w(i);
 #ifdef BITSHIFTSCALING
-      int exp1,exp2;
-      frexp(m_rowscale[i], &exp2);
+      int exp1;
+      //frexp(m_rowscaleExp[i], &exp2);
+      int exp2 = m_rowscaleExp[i];
+
       for( int j = 0; j < vec.size(); ++j)
       {
-         frexp(m_colscale[vec.index(j)], &exp1);
-         vec.value(j) = ldexp(vec.value(j), exp1 + exp2 - 2);
+         //frexp(m_colscaleExp[vec.index(j)], &exp1);
+         exp1 = m_colscaleExp[vec.index(j)];
+         vec.value(j) = ldexp(vec.value(j), exp1 + exp2);
       }
       if (lp.rhs(i) < infinity)
       {
-         lp.rhs_w(i) = ldexp(lp.rhs_w(i), exp2 - 1);
+         lp.rhs_w(i) = ldexp(lp.rhs_w(i), exp2);
       }
       if (lp.lhs(i) > -infinity)
       {
-         lp.lhs_w(i) = ldexp(lp.lhs_w(i), exp2 - 1);
+         lp.lhs_w(i) = ldexp(lp.lhs_w(i), exp2);
 
       }
 #else
       for( int j = 0; j < vec.size(); ++j)
-         vec.value(j) *= m_colscale[vec.index(j)] * m_rowscale[i];
+         vec.value(j) *= m_colscaleExp[vec.index(j)] * m_rowscaleExp[i];
 
       if (lp.rhs(i) < infinity)
-         lp.rhs_w(i) *= m_rowscale[i];
+         lp.rhs_w(i) *= m_rowscaleExp[i];
       if (lp.lhs(i) > -infinity)
-         lp.lhs_w(i) *= m_rowscale[i];
+         lp.lhs_w(i) *= m_rowscaleExp[i];
 #endif
    }
    for(i = 0; i < lp.nCols(); ++i )
    {
       SVector& vec = lp.colVector_w(i);
 #ifdef BITSHIFTSCALING
-      int exp1,exp2;
-      frexp(m_colscale[i], &exp2);
+      int exp1;
+      int exp2 = m_colscaleExp[i];
+
       for( int j = 0; j < vec.size(); ++j)
       {
-         frexp(m_rowscale[vec.index(j)], &exp1);
-         vec.value(j) = ldexp(vec.value(j), exp1 + exp2 - 2);
+         exp1 = m_rowscaleExp[vec.index(j)];
+         vec.value(j) = ldexp(vec.value(j), exp1 + exp2);
       }
 
-      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), exp2 - 1);
+      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), exp2);
 
       if (lp.upper(i) < infinity)
       {
-         lp.upper_w(i) = ldexp(lp.upper_w(i), -exp2 + 1);
+         lp.upper_w(i) = ldexp(lp.upper_w(i), -exp2);
       }
       if (lp.lower(i) > -infinity)
       {
-         lp.lower_w(i) = ldexp(lp.lower_w(i), -exp2 + 1);
+         lp.lower_w(i) = ldexp(lp.lower_w(i), -exp2);
       }
 #else
       for( int j = 0; j < vec.size(); ++j)
-         vec.value(j) *= m_rowscale[vec.index(j)] * m_colscale[i];
+         vec.value(j) *= m_rowscaleExp[vec.index(j)] * m_colscaleExp[i];
 
-      lp.maxObj_w(i) *= m_colscale[i];
+      lp.maxObj_w(i) *= m_colscaleExp[i];
 
       if (lp.upper(i) < infinity)
-         lp.upper_w(i) /= m_colscale[i];
+         lp.upper_w(i) /= m_colscaleExp[i];
       if (lp.lower(i) > -infinity)
-         lp.lower_w(i) /= m_colscale[i];
+         lp.lower_w(i) /= m_colscaleExp[i];
 #endif
    }
    assert(lp.isConsistent());
@@ -270,58 +277,60 @@ void SPxScaler::unscale(SPxLPBase<Real>& lp)
    {
       SVector& vec = lp.rowVector_w(i);
 
-      int exp1,exp2;
-      frexp(m_rowscale[i], &exp2);
+      int exp1;
+      int exp2 = m_rowscaleExp[i];
+
       for( int j = 0; j < vec.size(); ++j)
       {
-         frexp(m_colscale[vec.index(j)], &exp1);
-         vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+         exp1 = m_colscaleExp[vec.index(j)];
+         vec.value(j) = ldexp(vec.value(j), -exp1 - exp2);
       }
       if (lp.rhs(i) < infinity)
       {
-         lp.rhs_w(i) = ldexp(lp.rhs_w(i), -exp2 + 1);
+         lp.rhs_w(i) = ldexp(lp.rhs_w(i), -exp2);
       }
       if (lp.lhs(i) > -infinity)
       {
-         lp.lhs_w(i) = ldexp(lp.lhs_w(i), -exp2 + 1);
+         lp.lhs_w(i) = ldexp(lp.lhs_w(i), -exp2);
       }
    }
    for( int i = 0; i < lp.nCols(); ++i )
    {
       SVector& vec = lp.colVector_w(i);
 
-      int exp1,exp2;
-      frexp(m_colscale[i], &exp2);
+      int exp1;
+      int exp2 = m_colscaleExp[i];
+
       for( int j = 0; j < vec.size(); ++j)
       {
-         frexp(m_rowscale[vec.index(j)], &exp1);
-         vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+         exp1 = m_rowscaleExp[vec.index(j)];
+         vec.value(j) = ldexp(vec.value(j), -exp1 - exp2);
       }
 
-      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), -exp2 + 1);
+      lp.maxObj_w(i) = ldexp(lp.maxObj_w(i), -exp2);
 
       if (lp.upper(i) < infinity)
       {
-         lp.upper_w(i) = ldexp(lp.upper_w(i), exp2 - 1);
+         lp.upper_w(i) = ldexp(lp.upper_w(i), exp2);
       }
       if (lp.lower(i) > -infinity)
       {
-         lp.lower_w(i) = ldexp(lp.lower_w(i), exp2 - 1);
+         lp.lower_w(i) = ldexp(lp.lower_w(i), exp2);
       }
    }
    assert(lp.isConsistent());
 }
 
 /// returns scaling factor for column \p i
-Real SPxScaler::getColScale(int i)
+Real SPxScaler::getColScaleExp(int i)
 {
-   return m_colscale[i];
+   return m_colscaleExp[i];
 }
 
 /// returns scaling factor for row \p i
-Real SPxScaler::getRowScale(int i)
+Real SPxScaler::getRowScaleExp(int i)
 {
-   return m_rowscale[i];
+   return m_rowscaleExp[i];
 }
 
 
@@ -334,18 +343,18 @@ void SPxScaler::getColUnscaled(const SPxLP& lp, int i, SVector& vec) const
    vec = lp.LPColSet::colVector(i);
 
    int exp1;
-   frexp(m_colscale[i], &exp1);
-   int exp2;
+   int exp2 = m_colscaleExp[i];
+
    for( int j = 0; j < vec.size(); j++ )
    {
-      frexp(m_rowscale[vec.index(j)], &exp2);
-      vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+      exp1 = m_rowscaleExp[vec.index(j)];
+      vec.value(j) = ldexp(vec.value(j), -exp1 - exp2);
    }
 }
 
 
 #if 1
-/// Returns unscaled Column \p i
+/// Returns unscaled Column \p i @todo: change!
 DSVector SPxScaler::returnUnscaledColumnVector(const SPxLP& lp, int i) const
 {
    assert(i < lp.nCols());
@@ -354,13 +363,12 @@ DSVector SPxScaler::returnUnscaledColumnVector(const SPxLP& lp, int i) const
    DSVector result;
    result = lp.LPColSet::colVector(i);
 
-   int exp1;
-   frexp(m_colscale[i], &exp1);
+   int exp1 = m_colscaleExp[i];
    int exp2;
    for( int j = 0; j < result.size(); j++ )
    {
-      frexp(m_rowscale[result.index(j)], &exp2);
-      result.value(j) = ldexp(result.value(j), -exp1 - exp2 + 2);
+      exp2 = m_rowscaleExp[result.index(j)];
+      result.value(j) = ldexp(result.value(j), -exp1 - exp2);
    }
 
    return result;
@@ -374,8 +382,7 @@ Real SPxScaler::upperUnscaled(const SPxLPBase<Real>& lp, int i) const
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   int exp;
-   frexp(m_colscale[i], &exp);
+   int exp = m_colscaleExp[i];
 
    if( lp.LPColSet::upper(i) < infinity )
    {
@@ -386,27 +393,6 @@ Real SPxScaler::upperUnscaled(const SPxLPBase<Real>& lp, int i) const
       return lp.LPColSet::upper(i);
    }
 }
-
-#if 0
-/// returns unscaled upper bound \p i of LP \lp
-Real SPxScaler::returnUnscaledUpper(const SPxLPBase<Real>& lp, int i) const
-{
-   assert(i <= lp.nCols());
-
-   int exp;
-   frexp(m_colscale[i], &exp);
-
-   if( lp.LPColSet::upper(i) < infinity )
-   {
-      return ldexp(lp.LPColSet::upper(i) , exp - 1);
-   }
-   else
-   {
-      return lp.LPColSet::upper(i);
-   }
-}
-#endif
-
 
 
 /// gets unscaled upper bound vector
@@ -416,64 +402,29 @@ void SPxScaler::getUpperUnscaled(const SPxLPBase<Real>& lp, DVector& vec) const
 
    for( int i = 0; i < lp.LPColSet::upper().dim(); i++)
    {
-      frexp(m_colscale[i], &exp);
+      exp = m_colscaleExp[i];
       vec[i] = ldexp(lp.LPColSet::upper()[i], exp - 1);
    }
 }
 
-#if 0
+
 /// returns unscaled upper bound vector of LP \lp
-DVector SPxScaler::returnUnscaledUpperVector(const SPxLPBase<Real>& lp) const
-{
-   int exp;
-   DVector result(lp.LPColSet::upper().dim());
-
-   for( int i = 0; i < lp.LPColSet::upper().dim(); i++)
-   {
-      frexp(m_colscale[i], &exp);
-      result[i] = ldexp(lp.LPColSet::upper()[i], exp - 1);
-   }
-
-   return result;
-}
-#endif
-
 Real SPxScaler::lowerUnscaled(const SPxLPBase<Real>& lp, int i) const
 {
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   int exp;
-   frexp(m_colscale[i], &exp);
+   int exp = m_colscaleExp[i];
 
    if( lp.LPColSet::lower(i) > -infinity )
    {
-      return ldexp(lp.LPColSet::lower(i) , exp - 1);
+      return ldexp(lp.LPColSet::lower(i), exp - 1);
    }
    else
    {
       return lp.LPColSet::lower(i);
    }
 }
-#if 0
-/// returns unscaled lower bound \p i of LP \lp
-Real SPxScaler::returnUnscaledLower(const SPxLPBase<Real>& lp, int i) const
-{
-   assert(i <= lp.nCols());
-
-   int exp;
-   frexp(m_colscale[i], &exp);
-
-   if( lp.LPColSet::lower(i) > -infinity )
-   {
-      return ldexp(lp.LPColSet::lower(i) , exp - 1);
-   }
-   else
-   {
-      return lp.LPColSet::lower(i);
-   }
-}
-#endif
 
 
 /// returns unscaled lower bound vector of LP \lp
@@ -483,26 +434,10 @@ void SPxScaler::getLowerUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 
    for( int i = 0; i < lp.LPColSet::lower().dim(); i++)
    {
-      frexp(m_colscale[i], &exp);
+      exp = m_colscaleExp[i];
       vec[i] = ldexp(lp.LPColSet::lower()[i], exp - 1);
    }
 }
-#if 0
-/// returns unscaled lower bound vector of LP \lp
-DVector SPxScaler::returnUnscaledLowerVector(const SPxLPBase<Real>& lp) const
-{
-   int exp;
-   DVector result(lp.LPColSet::lower().dim());
-
-   for( int i = 0; i < lp.LPColSet::lower().dim(); i++)
-   {
-      frexp(m_colscale[i], &exp);
-      result[i] = ldexp(lp.LPColSet::lower()[i], exp - 1);
-   }
-
-   return result;
-}
-#endif
 
 /// returns unscaled objective function coefficient of \p i
 Real SPxScaler::maxObjUnscaled(const SPxLPBase<Real>& lp, int i) const
@@ -510,8 +445,7 @@ Real SPxScaler::maxObjUnscaled(const SPxLPBase<Real>& lp, int i) const
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   int exp;
-   frexp(m_colscale[i], &exp);
+   int exp = m_colscaleExp[i];
 
    return ldexp(lp.LPColSet::maxObj(i) , -exp + 1);
 }
@@ -524,26 +458,10 @@ void SPxScaler::getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 
    for( int i = 0; i < lp.LPColSet::maxObj().dim(); i++)
    {
-      frexp(m_colscale[i], &exp);
+      exp = m_colscaleExp[i];
       vec[i] = ldexp(lp.LPColSet::maxObj()[i], -exp + 1);
    }
 }
-#if 0
-/// returns unscaled objective function coefficient of \p i of LP \lp
-DVector SPxScaler::returnUnscaledObjVector(const SPxLPBase<Real>& lp) const
-{
-   int exp;
-   DVector result(lp.LPColSet::maxObj().dim());
-
-   for( int i = 0; i < lp.LPColSet::maxObj().dim(); i++)
-   {
-      frexp(m_colscale[i], &exp);
-      result[i] = ldexp(lp.LPColSet::maxObj()[i], -exp + 1);
-   }
-
-   return result;
-}
-#endif
 
 /// returns unscaled row \p i
 void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, SVector& vec) const
@@ -552,12 +470,12 @@ void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, SVector& vec) const
    assert(i >= 0);
 
    int exp1;
-   frexp(m_rowscale[i], &exp1);
-   int exp2;
+   int exp2 = m_rowscaleExp[i];
+
    for( int j = 0; j < vec.size(); j++ )
    {
-      frexp(m_colscale[vec.index(j)], &exp2);
-      vec.value(j) = ldexp(vec.value(j), -exp1 - exp2 + 2);
+      exp1 = m_colscaleExp[vec.index(j)];
+      vec.value(j) = ldexp(vec.value(j), -exp1 - exp2);
    }
 }
 #if 1
@@ -571,12 +489,12 @@ DSVector SPxScaler::returnUnscaledRowVector(const SPxLP& lp, int i) const
    result = lp.LPRowSet::rowVector(i);
 
    int exp1;
-   frexp(m_rowscale[i], &exp1);
-   int exp2;
+   int exp2 = m_rowscaleExp[i];
+
    for( int j = 0; j < result.size(); j++ )
    {
-      frexp(m_colscale[result.index(j)], &exp2);
-      result.value(j) = ldexp(result.value(j), -exp1 - exp2 + 2);
+      exp1 = m_colscaleExp[result.index(j)];
+      result.value(j) = ldexp(result.value(j), -exp1 - exp2);
    }
 
    return result;
@@ -589,8 +507,7 @@ Real SPxScaler::rhsUnscaled(const SPxLPBase<Real>& lp, int i) const
    assert(i < lp.nRows());
    assert(i >= 0);
 
-   int exp;
-   frexp(m_rowscale[i], &exp);
+   int exp = m_rowscaleExp[i];
 
    if( lp.LPRowSet::rhs(i) < infinity )
    {
@@ -601,25 +518,6 @@ Real SPxScaler::rhsUnscaled(const SPxLPBase<Real>& lp, int i) const
       return lp.LPRowSet::rhs(i);
    }
 }
-#if 0
-/// returns unscaled right hand side \p i of LP \lp
-Real SPxScaler::returnUnscaledRhs(const SPxLPBase<Real>& lp, int i) const
-{
-   assert(i <= lp.nRows());
-
-   int exp;
-   frexp(m_rowscale[i], &exp);
-
-   if( lp.LPRowSet::rhs(i) < infinity )
-   {
-      return ldexp(lp.LPRowSet::rhs(i) , -exp + 1);
-   }
-   else
-   {
-      return lp.LPRowSet::rhs(i);
-   }
-}
-#endif
 
 
 /// gets unscaled right hand side vector
@@ -629,27 +527,11 @@ void SPxScaler::getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 
    for( int i = 0; i < lp.LPRowSet::rhs().dim(); i++)
    {
-      frexp(m_rowscale[i], &exp);
+      exp = m_rowscaleExp[i];
       vec[i] = ldexp(lp.LPRowSet::rhs()[i], -exp + 1);
    }
 }
 
-#if 0
-/// returns unscaled right hand side vector of LP \lp
-DVector SPxScaler::returnUnscaledRhsVector(const SPxLPBase<Real>& lp) const
-{
-   int exp;
-   DVector result(lp.LPRowSet::rhs().dim());
-
-   for( int i = 0; i < lp.LPRowSet::rhs().dim(); i++)
-   {
-      frexp(m_rowscale[i], &exp);
-      result[i] = ldexp(lp.LPRowSet::rhs()[i], -exp + 1);
-   }
-
-   return result;
-}
-#endif
 
 /// returns unscaled left hand side \p i of LP \lp
 Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
@@ -657,8 +539,7 @@ Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
    assert(i < lp.nRows());
    assert(i >= 0);
 
-   int exp;
-   frexp(m_rowscale[i], &exp);
+   int exp = m_rowscaleExp[i];
 
    if( lp.LPRowSet::lhs(i) > -infinity )
    {
@@ -677,92 +558,76 @@ void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 
    for( int i = 0; i < lp.LPRowSet::lhs().dim(); i++)
    {
-      frexp(m_rowscale[i], &exp);
+      exp = m_rowscaleExp[i];
       vec[i] = ldexp(lp.LPRowSet::lhs()[i], -exp + 1);
    }
 }
-#if 0
-/// returns unscaled left hand side vector of LP \lp
-DVector SPxScaler::returnUnscaledLhsVector(const SPxLPBase<Real>& lp) const
-{
-   int exp;
-   DVector result(lp.LPRowSet::lhs().dim());
-
-   for( int i = 0; i < lp.LPRowSet::lhs().dim(); i++)
-   {
-      frexp(m_rowscale[i], &exp);
-      result[i] = ldexp(lp.LPRowSet::lhs()[i], -exp + 1);
-   }
-
-   return result;
-}
-#endif
 
 void SPxScaler::unscalePrimal(Vector& x) const
 {
 
-   assert(x.dim() == m_colscale.size());
+   assert(x.dim() == m_colscaleExp.size());
 #ifdef BITSHIFTSCALING
    int exp1;
-   for(int j = 0; j < x.dim(); ++j)
+   for( int j = 0; j < x.dim(); ++j )
    {
-      spxFrexp(m_colscale[j], &exp1);
-      x[j] = spxLdexp(x[j], exp1 - 1);
+      exp1 = m_colscaleExp[j];
+      x[j] = spxLdexp(x[j], exp1);
    }
 #else
    for(int j = 0; j < x.dim(); ++j)
-      x[j] *= m_colscale[j];
+      x[j] *= m_colscaleExp[j];
 #endif
 }
 
 void SPxScaler::unscaleSlacks(Vector& s) const
 {
 
-   assert(s.dim() == m_rowscale.size());
+   assert(s.dim() == m_rowscaleExp.size());
 #ifdef BITSHIFTSCALING
    int exp1;
-   for(int i = 0; i < s.dim(); ++i)
+   for( int i = 0; i < s.dim(); ++i )
    {
-      spxFrexp(m_rowscale[i], &exp1);
-      s[i] = spxLdexp(s[i], -exp1 + 1);
+      exp1 = m_rowscaleExp[i];
+      s[i] = spxLdexp(s[i], -exp1);
    }
 #else
    for(int i = 0; i < s.dim(); ++i)
-      s[i] /= m_rowscale[i];
+      s[i] /= m_rowscaleExp[i];
 #endif
 }
 
 void SPxScaler::unscaleDual(Vector& pi) const
 {
 
-   assert(pi.dim() == m_rowscale.size());
+   assert(pi.dim() == m_rowscaleExp.size());
 #ifdef BITSHIFTSCALING
    int exp1;
-   for(int i = 0; i < pi.dim(); ++i)
+   for( int i = 0; i < pi.dim(); ++i )
    {
-      spxFrexp(m_rowscale[i], &exp1);
-      pi[i] = spxLdexp(pi[i], exp1 - 1);
+      exp1 = m_rowscaleExp[i];
+      pi[i] = spxLdexp(pi[i], exp1);
    }
 #else
    for(int i = 0; i < pi.dim(); ++i)
-      pi[i] *= m_rowscale[i];
+      pi[i] *= m_rowscaleExp[i];
 #endif
 }
 
 void SPxScaler::unscaleRedCost(Vector& r) const
 {
 
-   assert(r.dim() == m_colscale.size());
+   assert(r.dim() == m_colscaleExp.size());
 #ifdef BITSHIFTSCALING
    int exp1;
-   for(int j = 0; j < r.dim(); ++j)
+   for( int j = 0; j < r.dim(); ++j )
    {
-      spxFrexp(m_colscale[j], &exp1);
-      r[j] = spxLdexp(r[j], -exp1 + 1);
+      exp1 = m_colscaleExp[j];
+      r[j] = spxLdexp(r[j], -exp1);
    }
 #else
    for(int j = 0; j < r.dim(); ++j)
-      r[j] /= m_colscale[j];
+      r[j] /= m_colscaleExp[j];
 #endif
 }
 
@@ -771,14 +636,10 @@ Real SPxScaler::minAbsColscale() const
 
    Real mini = infinity;
 
-   for(int i = 0; i < m_colscale.size(); ++i)
-      if (spxAbs(m_colscale[i]) < mini)
-         mini = spxAbs(m_colscale[i]);
-#ifdef BITSHIFTSCALING
-   int exp;
-   spxFrexp(mini, &exp);
-   mini = spxLdexp(2.0, exp - 1);
-#endif
+   for( int i = 0; i < m_colscaleExp.size(); ++i )
+      if( spxAbs(spxLdexp(1.0, m_colscaleExp[i])) < mini )
+         mini = spxAbs(spxLdexp(1.0, m_colscaleExp[i]));
+
    return mini;
 }
 
@@ -787,15 +648,11 @@ Real SPxScaler::maxAbsColscale() const
 
    Real maxi = 0.0;
 
-   for(int i = 0; i < m_colscale.size(); ++i)
-      if (spxAbs(m_colscale[i]) > maxi)
-         maxi = spxAbs(m_colscale[i]);
+   for( int i = 0; i < m_colscaleExp.size(); ++i )
+      if( spxAbs(spxLdexp(1.0, m_colscaleExp[i])) > maxi )
+         maxi = spxAbs(spxLdexp(1.0, m_colscaleExp[i]));
 
-#ifdef BITSHIFTSCALING
-   int exp;
-   spxFrexp(maxi, &exp);
-   maxi = spxLdexp(2.0, exp - 1);
-#endif
+
    return maxi;
 }
 
@@ -804,14 +661,10 @@ Real SPxScaler::minAbsRowscale() const
 
    Real mini = infinity;
 
-   for(int i = 0; i < m_rowscale.size(); ++i)
-      if (spxAbs(m_rowscale[i]) < mini)
-         mini = spxAbs(m_rowscale[i]);
-#ifdef BITSHIFTSCALING
-   int exp;
-   spxFrexp(mini, &exp);
-   mini = spxLdexp(2.0, exp - 1);
-#endif
+   for( int i = 0; i < m_rowscaleExp.size(); ++i )
+      if( spxAbs(spxLdexp(1.0, m_rowscaleExp[i])) < mini )
+         mini = spxAbs(spxLdexp(1.0, m_rowscaleExp[i]));
+
    return mini;
 }
 
@@ -820,14 +673,10 @@ Real SPxScaler::maxAbsRowscale() const
 
    Real maxi = 0.0;
 
-   for(int i = 0; i < m_rowscale.size(); ++i)
-      if (spxAbs(m_rowscale[i]) > maxi)
-         maxi = spxAbs(m_rowscale[i]);
-#ifdef BITSHIFTSCALING
-   int exp;
-   spxFrexp(maxi, &exp);
-   maxi = spxLdexp(2.0, exp - 1);
-#endif
+   for( int i = 0; i < m_rowscaleExp.size(); ++i )
+      if( spxAbs(spxLdexp(1.0, m_rowscaleExp[i])) > maxi )
+         maxi = spxAbs(spxLdexp(1.0, m_rowscaleExp[i]));
+
    return maxi;
 }
 
@@ -899,7 +748,7 @@ bool SPxScaler::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
 
-   return m_colscale.isConsistent() && m_rowscale.isConsistent();
+   return m_colscaleExpExp.isConsistent() && m_rowscaleExpExp.isConsistent();
 #else
    return true;
 #endif
