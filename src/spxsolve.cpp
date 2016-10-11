@@ -1066,7 +1066,7 @@ void SPxSolver::performSolutionPolishing()
             }
          }
          // identify nonbasic variables that may be moved into the basis
-         if( integerVariables.size() == 0 )
+         if( integerVariables.size() != 0 )
          {
             assert(integerVariables.size() == nCols());
             for( int i = 0; i < coDim(); ++i )
@@ -1074,7 +1074,7 @@ void SPxSolver::performSolutionPolishing()
                stat = ds.status(i);
                if( !isBasic(stat) )
                {
-                  // only consider continuos variables with zero dual multiplier to preserve optimality
+                  // only consider continuous variables with zero dual multiplier to preserve optimality
                   if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
                         integerVariables[i] == 0 &&
                         (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
