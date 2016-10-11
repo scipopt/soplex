@@ -961,17 +961,32 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
                 << ": skipping instable pivot" << std::endl;
    )
 
-   if( polish )
+   if( polish && leave >= 0 )
    {
+      SPxId leaveId = thesolver->baseId(leave);
       // decide whether the chosen leave index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK && thesolver->baseId(leave).isSPxRowId() )
+      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
       {
-         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a col to leave the basis" << std::endl; )
+         // only allow (integer) variables to leave the basis
+         if( leaveId.isSPxRowId() )
             return -1;
+         else if( thesolver->integerVariables.size() > 0 )
+         {
+            assert(thesolver->integerVariables.size() == thesolver->nCols());
+            if( leaveId.isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 0 )
+               return -1;
+         }
       }
-      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK && thesolver->baseId(leave).isSPxColId() )
+      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
       {
-         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "did not find a row to leave the basis" << std::endl; )
+         // only allow slacks and continuous variables to leave the basis
+         if( thesolver->integerVariables.size() > 0 )
+         {
+            assert(thesolver->integerVariables.size() == thesolver->nCols());
+            if( thesolver->baseId(leave).isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 1 )
+               return -1;
+         }
+         else if( thesolver->baseId(leave).isSPxColId() )
             return -1;
       }
    }
