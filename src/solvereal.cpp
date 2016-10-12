@@ -326,9 +326,7 @@ namespace soplex
       assert(_solver.basis().status() == SPxBasis::UNBOUNDED || _solver.basis().status() == SPxBasis::NO_PROBLEM || status() != SPxSolver::UNBOUNDED);
 
       _solver.forceRecompNonbasicValue();
-      _solReal._hasPrimal = (status() == SPxSolver::OPTIMAL
-         || ((_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED)
-            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
+      _solReal._hasPrimal = (_solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO)) && _isRealLPLoaded;
       if( _solReal._hasPrimal )
       {
          _solReal._primal.reDim(_solver.nCols());
@@ -357,9 +355,7 @@ namespace soplex
       assert(_solver.basis().status() != SPxBasis::INFEASIBLE || status() == SPxSolver::INFEASIBLE);
       assert(_solver.basis().status() == SPxBasis::INFEASIBLE || _solver.basis().status() == SPxBasis::NO_PROBLEM || status() != SPxSolver::INFEASIBLE);
 
-      _solReal._hasDual = (status() == SPxSolver::OPTIMAL
-         || ((_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE)
-            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
+      _solReal._hasDual = (_solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO)) && _isRealLPLoaded;
       if( _solReal._hasDual )
       {
          _solReal._dual.reDim(_solver.nRows());
