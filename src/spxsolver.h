@@ -199,11 +199,13 @@ public:
      */
    enum Status
    {
-      ERROR          = -13, ///< an error occured.
-      NO_RATIOTESTER = -12, ///< No ratiotester loaded
-      NO_PRICER      = -11, ///< No pricer loaded
-      NO_SOLVER      = -10, ///< No linear solver loaded
-      NOT_INIT       = -9,  ///< not initialised error
+      ERROR          = -15, ///< an error occured.
+      NO_RATIOTESTER = -14, ///< No ratiotester loaded
+      NO_PRICER      = -13, ///< No pricer loaded
+      NO_SOLVER      = -12, ///< No linear solver loaded
+      NOT_INIT       = -11, ///< not initialised error
+      ABORT_EXDECOMP = -10, ///< solve() aborted to exit decomposition simplex
+      ABORT_DECOMP   = -9,  ///< solve() aborted due to commence decomposition simplex
       ABORT_CYCLING  = -8,  ///< solve() aborted due to detection of cycling.
       ABORT_TIME     = -7,  ///< solve() aborted due to time limit.
       ABORT_ITER     = -6,  ///< solve() aborted due to iteration limit.
@@ -298,6 +300,7 @@ private:
    bool           getStartingIdsBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
    int            degenCompIterOffset; ///< the number of iterations performed before the degeneracy level is computed
+   int            decompIterationLimit; ///< the maximum number of iterations before the decomposition simplex is aborted.
    //@}
 
 protected:
@@ -2173,16 +2176,28 @@ public:
 
 
    /// sets the offset for the number of iterations before the degeneracy is computed
-   void setDegenCompOffset(bool iterOffset)
+   void setDegenCompOffset(int iterOffset)
    {
       degenCompIterOffset = iterOffset;
    }
 
 
    /// gets the offset for the number of iterations before the degeneracy is computed
-   bool getDegenCompOffset() const
+   int getDegenCompOffset() const
    {
       return degenCompIterOffset;
+   }
+
+   /// sets the iteration limit for the decomposition simplex initialisation
+   void setDecompIterationLimit(int iterationLimit)
+   {
+      decompIterationLimit = iterationLimit;
+   }
+
+   /// returns the iteration limit for the decomposition simplex initialisation
+   int getDecompIterationLimit() const
+   {
+      return decompIterationLimit;
    }
    //@}
 

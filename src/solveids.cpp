@@ -21,7 +21,7 @@
 #include "sorter.h"
 
 //#define NO_TOL
-//#define USE_FEASTOL
+#define USE_FEASTOL
 //#define NO_TRANSFORM
 //#define PERFORM_COMPPROB_CHECK
 
@@ -79,9 +79,15 @@ namespace soplex
       // it is necessary to solve the initial problem to find a starting basis
       _solver.setIdsStatus(SPxSolver::FINDSTARTBASIS);
 
+      // setting the decomposition iteration limit to the parameter setting
+      _solver.setDecompIterationLimit(intParam(SoPlex::DECOMP_ITERLIMIT));
+
       int numDegenCheck = 0;
       Real degeneracyLevel = 0;
       _idsFeasVector.reDim(_solver.nCols());
+
+
+      bool initSolveFromScratch = true;
 
       // arrays to store the basis status for the rows and columns at the interruption of the original problem solve.
       DataArray< SPxSolver::VarStatus > basisStatusRows;
@@ -90,11 +96,12 @@ namespace soplex
       // loop will recheck the degeneracy level and compute the proper dual multipliers.
       do
       {
-         _idsSimplifyAndSolve(_solver, _slufactor, true, true);
+         _idsSimplifyAndSolve(_solver, _slufactor, initSolveFromScratch, initSolveFromScratch);
+         initSolveFromScratch = false;
          _solver.basis().solve(_idsFeasVector, _solver.maxObj());
          degeneracyLevel = _solver.getDegeneracyLevel(_idsFeasVector);
          if( _solver.type() == SPxSolver::LEAVE || _solver.status() >= SPxSolver::OPTIMAL
-               || _solver.getIdsStatus() == SPxSolver::DONTFINDSTARTBASIS || numDegenCheck > MAX_DEGENCHECK )
+               || _solver.status() == SPxSolver::ABORT_EXDECOMP || numDegenCheck > MAX_DEGENCHECK )
          {
             // returning the sense to minimise
             if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -110,8 +117,9 @@ namespace soplex
             if( _solver.status() == SPxSolver::UNBOUNDED || _solver.status() == SPxSolver::INFEASIBLE )
                _hasBasis = false;
 
+
             // resolving the problem to update the real lp and solve with the correct objective.
-            _idsSimplifyAndSolve(_solver, _slufactor, false, true);
+            _idsSimplifyAndSolve(_solver, _slufactor, false, false);
 
             // retreiving the original problem statistics prior to destroying it.
             getOriginalProblemStatistics();
@@ -139,12 +147,8 @@ namespace soplex
          numDegenCheck++;
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_idsFeasVector) );
 
-
-      MSG_INFO1( spxout, spxout << "===== Collecting the original problem basis ====" << std::endl );
-
-      // resolving the original problem without preprocessing
-      _isRealLPLoaded = true;
-      _preprocessAndSolveReal(false);
+      // decomposition simplex will commence, so the start basis does not need to be found
+      _solver.setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
 
       // if the original problem has a basis, this will be stored
       if( _hasBasis )
@@ -155,13 +159,8 @@ namespace soplex
             basisStatusCols.size());
       }
 
-
-
       // updating the algorithm iterations statistic
       _statistics->callsReducedProb++;
-
-      _solver.setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
-      _hasBasis = true; // this is probably wrong. Will need to set this properly.
 
       // setting the statistic information
       numIdsIter = 0;
@@ -207,15 +206,16 @@ namespace soplex
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
       spxout.setVerbosity( SPxOut::ERROR );
-      //spxout.setVerbosity( SPxOut::DEBUG );
 
+      // the main solving loop of the decomposition simplex.
+      // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
       while( !stop || stopCount <= 0 )
       {
          // setting the current solving mode.
          _currentProb = IDS_RED;
 
          // solve the reduced problem
-         MSG_INFO3(spxout,
+         MSG_INFO2(spxout,
             spxout << std::endl
             << "=========================" << std::endl
             << "Solving: Reduced Problem." << std::endl
@@ -223,10 +223,8 @@ namespace soplex
             << std::endl );
 
          _hasBasis = hasRedBasis;
-         if( stopCount <= 0 )
-            _idsSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
-         else
-            _idsSimplifyAndSolve(_solver, _slufactor, true, true);
+         // solving the reduced problem
+         _idsSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
 
          stop = idsTerminate(realParam(SoPlex::TIMELIMIT));  // checking whether the algorithm should terminate
 
@@ -234,11 +232,14 @@ namespace soplex
          _statistics->callsReducedProb++;
          _statistics->redProbStatus = _solver.status();
 
-
          assert(_isRealLPLoaded);
          hasRedBasis = _hasBasis;
          _hasBasis = false;
 
+         // checking the status of the reduced problem
+         // It is expected that infeasibility and unboundedness will be found in the initialisation solve. If this is
+         // not the case and the reduced problem is infeasible or unbounded the decomposition simplex will terminate.
+         // If the decomposition simplex terminates, then the original problem will be solved using the stored basis.
          if( _solver.status() != SPxSolver::OPTIMAL )
          {
             if( _solver.status() == SPxSolver::UNBOUNDED )
@@ -279,7 +280,7 @@ namespace soplex
          _currentProb = IDS_COMP;
 
          // solve the complementary problem
-         MSG_INFO3(spxout,
+         MSG_INFO2(spxout,
             spxout << std::endl
             << "=========================" << std::endl
             << "Solving: Complementary Problem." << std::endl
@@ -311,27 +312,44 @@ namespace soplex
 
          if( !stop )
          {
-            // get the primal solutions from the complementary problem
-            DVector compLPPrimalVector(_compSolver.nCols());
-            _compSolver.getPrimal(compLPPrimalVector);
+            if( !boolParam(SoPlex::EXPLICITVIOL) )
+            {
+               // get the primal solutions from the complementary problem
+               DVector compLPPrimalVector(_compSolver.nCols());
+               _compSolver.getPrimal(compLPPrimalVector);
 
-            DVector compLPDualVector(_compSolver.nRows());
-            _compSolver.getDual(compLPDualVector);
+               // get the dual solutions from the complementary problem
+               DVector compLPDualVector(_compSolver.nRows());
+               _compSolver.getDual(compLPDualVector);
 
-            //_updateIdsReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
-               //compLPPrimalVector, compLPDualVector);
-            DVector reducedLPPrimalVector(_solver.nCols());
-            _solver.getPrimal(reducedLPPrimalVector);
-            _checkOriginalProblemOptimality(reducedLPPrimalVector, false);
-            _updateIdsReducedProblemViol(false);
+               // updating the reduced problem
+               _updateIdsReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
+                  compLPPrimalVector, compLPDualVector);
+            }
+            else
+            {
+               // getting the primal solutions from the reduced problem
+               DVector reducedLPPrimalVector(_solver.nCols());
+               _solver.getPrimal(reducedLPPrimalVector);
+
+               // checking the optimality of the reduced problem solution with the original problem
+               _checkOriginalProblemOptimality(reducedLPPrimalVector, false);
+
+               // updating the reduced problem based upon the violated rows and constraints found during the optimality
+               // check
+               _updateIdsReducedProblemViol(false);
+            }
          }
          // if the complementary problem is infeasible or unbounded, it is possible that the algorithm can continue.
          // a check of the original problem is required to determine whether there are any violations.
          else if( _compSolver.status() == SPxSolver::INFEASIBLE
             || _compSolver.status() == SPxSolver::UNBOUNDED )
          {
+            // getting the primal vector from the reduced problem
             DVector reducedLPPrimalVector(_solver.nCols());
             _solver.getPrimal(reducedLPPrimalVector);
+
+            // checking the optimality of the reduced problem solution with the original problem
             _checkOriginalProblemOptimality(reducedLPPrimalVector, false);
 
             // if there are any violated rows or bounds then stop is reset and the algorithm continues.
@@ -345,9 +363,6 @@ namespace soplex
                _updateIdsReducedProblemViol(true);
          }
 
-         if( stop )
-            stopCount++;
-
          numIdsIter++;
          algIterCount++;
       }
@@ -359,12 +374,15 @@ namespace soplex
          // computing the solution for the original variables
          DVector reducedLPPrimalVector(_solver.nCols());
          _solver.getPrimal(reducedLPPrimalVector);
+
+         // checking the optimality of the reduced problem solution with the original problem
          _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
 
          // resetting the verbosity level
          spxout.setVerbosity( orig_verbosity );
 
-#ifdef PERFORM_COMPPROB_CHECK 
+         // This is an additional check to ensure that the complementary problem is solving correctly.
+#ifdef PERFORM_COMPPROB_CHECK
          // solving the complementary problem with the original objective function
          if( boolParam(SoPlex::USECOMPDUAL) )
             _setComplementaryDualOriginalObjective();
@@ -413,17 +431,6 @@ namespace soplex
 #endif
       }
 
-      // returning the sense to minimise
-      if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
-      {
-         assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
-
-         _solver.changeObj(-(_solver.maxObj()));
-         _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
-
-         // Need to add commands to multiply the objective solution values by -1
-      }
-
       // resetting the verbosity level
       spxout.setVerbosity( orig_verbosity );
 
@@ -467,7 +474,18 @@ namespace soplex
          _realLP = &_solver;
          _isRealLPLoaded = true;
 
-         _solver.setBasis(basisStatusRows.get_const_ptr(), basisStatusCols.get_const_ptr());
+         // returning the sense to minimise
+         if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
+         {
+            assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+
+            _solver.changeObj(-(_solver.maxObj()));
+            _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+
+            // Need to add commands to multiply the objective solution values by -1
+         }
+
+         //_solver.setBasis(basisStatusRows.get_const_ptr(), basisStatusCols.get_const_ptr());
          _preprocessAndSolveReal(true);
       }
       else
@@ -479,6 +497,17 @@ namespace soplex
          spx_free(_realLP);
          _realLP = &_solver;
          _isRealLPLoaded = true;
+
+         // returning the sense to minimise
+         if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
+         {
+            assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+
+            _solver.changeObj(-(_solver.maxObj()));
+            _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+
+            // Need to add commands to multiply the objective solution values by -1
+         }
 
          _preprocessAndSolveReal(false);
       }
@@ -521,6 +550,8 @@ namespace soplex
       //_idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
       // allocating memory for the violated bounds and rows arrays
+      _idsViolatedBounds = 0;
+      _idsViolatedRows = 0;
       spx_alloc(_idsViolatedBounds, numColsReal());
       spx_alloc(_idsViolatedRows, numRowsReal());
       _nIdsViolBounds = 0;
@@ -574,7 +605,7 @@ namespace soplex
       spx_alloc(compatind, _solver.nRows());
       spx_alloc(rowsforremoval, _solver.nRows());
       if( !stop )
-         _getCompatibleColumns(nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind, true, stop);
+         _getCompatibleColumns(_idsFeasVector, nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind, true, stop);
 
       int* compatboundcons = 0;
       int ncompatboundcons = 0;
@@ -719,8 +750,11 @@ namespace soplex
 
          // at this point in time the complementary problem contains all rows and columns from the original problem
          int addedrangedrows = 0;
+         _nCompPrimalRows = 0;
+         _nCompPrimalCols = 0;
          for( int i = 0; i < _realLP->nRows(); i++ )
          {
+            assert(_nCompPrimalRows < _compSolver.nRows());
             _idsPrimalRowIDs[_nPrimalRows] = _realLP->rId(i);
             _idsCompPrimalRowIDs[_nCompPrimalRows] = _compSolver.rId(i);
             _nPrimalRows++;
@@ -768,6 +802,7 @@ namespace soplex
       if( realParam(SoPlex::TIMELIMIT) < realParam(SoPlex::INFTY) )
          solver.setTerminationTime(realParam(SoPlex::TIMELIMIT) - _statistics->solvingTime->time());
 
+      solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
 
       SPxSimplifier::Result result = SPxSimplifier::OKAY;
@@ -862,7 +897,9 @@ namespace soplex
       {
          result = _simplifier->simplify(solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL),
                realParam(SoPlex::OPTTOL));
-         solver.changeObjOffset(_simplifier->getObjoffset());
+         printf("Current Offset: %f, %f (%f)\n", _simplifier->getObjoffset(), solver.objOffset(), realParam(SoPlex::OBJ_OFFSET));
+         solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
+         printf("Current Offset: %f, %f (%f)\n", _simplifier->getObjoffset(), solver.objOffset(), realParam(SoPlex::OBJ_OFFSET));
       }
 
       _statistics->preprocessingTime->stop();
@@ -936,7 +973,10 @@ namespace soplex
    {
       assert(_simplifier != 0 || _scaler != 0);
       assert(result == SPxSimplifier::VANISHED
-         || (result == SPxSimplifier::OKAY && solver.status() == SPxSolver::OPTIMAL));
+         || (result == SPxSimplifier::OKAY
+            && (solver.status() == SPxSolver::OPTIMAL
+               || solver.status() == SPxSolver::ABORT_DECOMP
+               || solver.status() == SPxSolver::ABORT_EXDECOMP )));
 
       // if simplifier is active and LP is solved in presolving or to optimality, then we unsimplify to get the basis
       if( _simplifier != 0 )
@@ -959,7 +999,7 @@ namespace soplex
 
          if( !vanished )
          {
-            assert(solver.status() == SPxSolver::OPTIMAL);
+            assert(solver.status() == SPxSolver::OPTIMAL || solver.status() == SPxSolver::ABORT_DECOMP || solver.status() == SPxSolver::ABORT_EXDECOMP);
 
             solver.getPrimal(primal);
             solver.getSlacks(slacks);
@@ -1106,7 +1146,7 @@ namespace soplex
       violatedrows.reSize(_nPrimalRows);
 
       bool ratioTest = true;
-      ratioTest = false;
+      //ratioTest = false;
       for( int i = 0; i < _nPrimalRows; i++ )
       {
          LPRowReal origlprow;
@@ -1541,8 +1581,8 @@ namespace soplex
    /// retrieves the compatible columns from the constraint matrix
    // This function also updates the constraint matrix of the reduced problem. It is efficient to perform this in the
    // following function because the required linear algebra has been performed.
-   void SoPlex::_getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
-         int nnonposind, int* ncompatind, bool formRedProb, bool& stop)
+   void SoPlex::_getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval,
+      int* colsforremoval, int nnonposind, int* ncompatind, bool formRedProb, bool& stop)
    {
 #ifdef NO_TOL
       Real feastol = 0.0;
@@ -1559,6 +1599,29 @@ namespace soplex
       y.unSetup();
 
       *ncompatind  = 0;
+
+#ifndef NDEBUG
+      int bind = 0;
+      bool* activerows = 0;
+      spx_alloc(activerows, numRowsReal());
+
+      for( int i = 0; i < numRowsReal(); ++i )
+         activerows[i] = false;
+
+      for( int i = 0; i < numColsReal(); ++i )
+      {
+         if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
+         {
+            if( !isZero(feasVector[i], feastol) )
+            {
+               bind = _realLP->number(SPxRowId(_solver.basis().baseId(i))); // getting the corresponding row
+                                                                                   // for the original LP.
+               assert(bind >= 0 && bind < numRowsReal());
+               activerows[bind] = true;
+            }
+         }
+      }
+#endif
 
       if( formRedProb )
       {
@@ -1597,6 +1660,9 @@ namespace soplex
                break;
             }
          }
+
+         // checking that the active rows are compatible
+         assert(!activerows[i] || compatible);
 
          // changing the matrix coefficients
          DSVector newRowVector;
@@ -1697,6 +1763,10 @@ namespace soplex
             break;
       }
       assert(numIncludedRows <= _solver.nRows());
+
+#ifndef NDEBUG
+      spx_free(activerows);
+#endif
    }
 
 
@@ -1957,6 +2027,8 @@ namespace soplex
          // collecting the row ids
          for( int i = 0; i < naddedrows; i++ )
             rangedRowIds[i] = addedrowid[i];
+
+         spx_free(addedrowid);
 
 
          // adding the slack column
@@ -3144,7 +3216,7 @@ namespace soplex
          case SPxSolver::OPTIMAL:
             if( !_isRealLPLoaded )
             {
-               solver.changeObjOffset(0.0);
+               solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
                _idsResolveWithoutPreprocessing(solver, sluFactor, result);
                // Need to solve the complementary problem
                return;
@@ -3160,8 +3232,22 @@ namespace soplex
             // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
             if( !_isRealLPLoaded )
             {
-               solver.changeObjOffset(0.0);
+               solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
                _idsSimplifyAndSolve(solver, sluFactor, false, false);
+               return;
+            }
+            else
+               _hasBasis = (solver.basis().status() > SPxBasis::NO_PROBLEM);
+            break;
+
+         case SPxSolver::ABORT_DECOMP:
+         case SPxSolver::ABORT_EXDECOMP:
+            // in the initialisation of the decomposition simplex, we want to keep the current basis.
+            if( !_isRealLPLoaded )
+            {
+               solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
+               _idsResolveWithoutPreprocessing(solver, sluFactor, result);
+               //_idsSimplifyAndSolve(solver, sluFactor, false, false);
                return;
             }
             else
@@ -3173,11 +3259,12 @@ namespace soplex
             // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
             if( !_isRealLPLoaded )
             {
-               solver.changeObjOffset(0.0);
+               solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
                _idsSimplifyAndSolve(solver, sluFactor, false, false);
                return;
             }
             break;
+
 
             // else fallthrough
          case SPxSolver::ABORT_TIME:

@@ -73,10 +73,16 @@ namespace soplex
       description[SoPlex::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
       defaultValue[SoPlex::COMPUTEDEGEN] = false;
 
-      // should the dual of the complementary problem be used in the improved dual simplex?
+      // should the dual of the complementary problem be used in the decomposition simplex?
       name[SoPlex::USECOMPDUAL] = "usecompdual";
-      description[SoPlex::USECOMPDUAL] = "should the dual of the complementary problem be used in the improved dual simplex?";
+      description[SoPlex::USECOMPDUAL] = "should the dual of the complementary problem be used in the decomposition simplex?";
       defaultValue[SoPlex::USECOMPDUAL] = false;
+
+      /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
+      // simplex
+      name[SoPlex::EXPLICITVIOL] = "explicitviol";
+      description[SoPlex::EXPLICITVIOL] = "Should be violations of the original problem be explicitly computed in the decomposition simplex?";
+      defaultValue[SoPlex::EXPLICITVIOL] = false;
 
       // should cycling solutions be accepted during iterative refinement?
       name[SoPlex::ACCEPTCYCLING] = "acceptcycling";
@@ -274,6 +280,13 @@ namespace soplex
       lower[SoPlex::SOLUTION_POLISHING] = 0;
       upper[SoPlex::SOLUTION_POLISHING] = 2;
       defaultValue[SoPlex::SOLUTION_POLISHING] = SoPlex::POLISHING_OFF;
+
+      // the number of iterations before the decomposition simplex initialisation is terminated.
+      name[SoPlex::DECOMP_ITERLIMIT] = "decomp_iterlimit";
+      description[SoPlex::DECOMP_ITERLIMIT] = "the number of iterations before the decomposition simplex initialisation solve is terminated";
+      lower[SoPlex::DECOMP_ITERLIMIT] = 1;
+      upper[SoPlex::DECOMP_ITERLIMIT] = INT_MAX;
+      defaultValue[SoPlex::DECOMP_ITERLIMIT] = 100;
 
       // maximum number of violated rows added in each iteration of the decomposition simplex
       name[SoPlex::DECOMP_MAXADDEDROWS] = "decomp_maxaddedrows";

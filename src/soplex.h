@@ -838,31 +838,37 @@ public:
       /// should a rational factorization be performed after iterative refinement?
       RATFAC = 3,
 
-      /// should cycling solutions be accepted during iterative refinement?
       /// should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
       // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
       USEIMPROVEDDUALSIMPLEX = 4,
 
+      // should the degeneracy be computed for each basis?
       COMPUTEDEGEN = 5,
 
+      /// should the dual of the complementary problem be used in the decomposition simplex?
       USECOMPDUAL = 6,
 
-      ACCEPTCYCLING = 7,
+      /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
+      // simplex
+      EXPLICITVIOL = 7,
+
+      /// should cycling solutions be accepted during iterative refinement?
+      ACCEPTCYCLING = 8,
 
       /// apply rational reconstruction after each iterative refinement?
-      RATREC = 8,
+      RATREC = 9,
 
       /// round scaling factors for iterative refinement to powers of two?
-      POWERSCALING = 9,
+      POWERSCALING = 10,
 
       /// continue iterative refinement with exact basic solution if not optimal?
-      RATFACJUMP = 10,
+      RATFACJUMP = 11,
 
       /// use bound flipping also for row representation?
-      ROWBOUNDFLIPS = 11,
+      ROWBOUNDFLIPS = 12,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 12
+      BOOLPARAM_COUNT = 13
    } BoolParam;
 
    /// integer parameters
@@ -940,11 +946,14 @@ public:
       /// mode for solution polishing
       SOLUTION_POLISHING = 23,
 
+      /// the number of iterations before the decomposition simplex initialisation is terminated.
+      DECOMP_ITERLIMIT = 24,
+
       /// the maximum number of rows that are added in each iteration of the decomposition based simplex
-      DECOMP_MAXADDEDROWS = 24,
+      DECOMP_MAXADDEDROWS = 25,
 
       /// number of integer parameters
-      INTPARAM_COUNT = 25
+      INTPARAM_COUNT = 26
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -2093,8 +2102,8 @@ private:
          int* nnonposind, bool& stop);
 
    /// retrieves the compatible columns from the constraint matrix
-   void _getCompatibleColumns(int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval, int nnonposind,
-         int* ncompatind, bool formRedProb, bool& stop);
+   void _getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
+      int nnonposind, int* ncompatind, bool formRedProb, bool& stop);
 
    /// computes the reduced problem objective coefficients
    void _computeReducedProbObjCoeff(bool& stop);

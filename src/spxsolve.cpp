@@ -1381,21 +1381,25 @@ bool SPxSolver::terminate()
          //printf("%d %d Degeneracy Level: %f\n", iteration(), lastUpdate(), degeneracyLevel);
          if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) /*&& iteration() > nRows()*0.2*/ )
          {
-            m_status = REGULAR;
+            m_status = ABORT_DECOMP;
             return true;
          }
 
-         if( degeneracyLevel < degeneracyLB && iteration() > int(nCols()*iterationFrac) )
+         if( degeneracyLevel < degeneracyLB && iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
          {
-            setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
-            m_status = REGULAR;
+            //setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
+            setDecompIterationLimit(0);
+            setDegenCompOffset(0);
+            m_status = ABORT_EXDECOMP;
             return true;
          }
       }
-      else if( type() == LEAVE && iteration() > int(nCols()*iterationFrac) )
+      else if( type() == LEAVE && iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
       {
-         setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
-         m_status = REGULAR;
+         //setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
+         setDecompIterationLimit(0);
+         setDegenCompOffset(0);
+         m_status = ABORT_EXDECOMP;
          return true;
       }
    }
@@ -1751,6 +1755,8 @@ SPxSolver::Status SPxSolver::status() const
    case OPTIMAL :
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );
       /*lint -fallthrough*/
+   case ABORT_EXDECOMP :
+   case ABORT_DECOMP :
    case ABORT_CYCLING :
    case ABORT_TIME :
    case ABORT_ITER :
