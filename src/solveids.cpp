@@ -51,7 +51,6 @@ namespace soplex
       assert(_solver.type() == SPxSolver::LEAVE);
 
       bool stop = false;   // flag to indicate that the algorithm must terminate
-      int stopCount = 0;
 
       // setting the initial status of the reduced problem
       _statistics->redProbStatus = SPxSolver::NO_PROBLEM;
@@ -198,7 +197,6 @@ namespace soplex
       if( stop )
       {
          MSG_INFO1( spxout, spxout << "==== Error constructing the reduced problem ====" << std::endl );
-         stopCount++;
          redProbError = true;
          _statistics->redProbStatus = SPxSolver::NOT_INIT;
       }
@@ -209,7 +207,7 @@ namespace soplex
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
-      while( !stop || stopCount <= 0 )
+      while( !stop )
       {
          // setting the current solving mode.
          _currentProb = IDS_RED;
@@ -897,9 +895,7 @@ namespace soplex
       {
          result = _simplifier->simplify(solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL),
                realParam(SoPlex::OPTTOL));
-         printf("Current Offset: %f, %f (%f)\n", _simplifier->getObjoffset(), solver.objOffset(), realParam(SoPlex::OBJ_OFFSET));
          solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
-         printf("Current Offset: %f, %f (%f)\n", _simplifier->getObjoffset(), solver.objOffset(), realParam(SoPlex::OBJ_OFFSET));
       }
 
       _statistics->preprocessingTime->stop();
