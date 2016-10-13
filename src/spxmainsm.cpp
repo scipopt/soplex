@@ -1322,6 +1322,37 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
 #endif
 }
 
+void SPxMainSM::TightenBoundsPS::execute(DVector& x, DVector&, DVector&, DVector&,
+                                     DataArray<SPxSolver::VarStatus>& cStatus,
+                                     DataArray<SPxSolver::VarStatus>& ) const
+{
+   // basis:
+   switch(cStatus[m_j])
+   {
+      case SPxSolver::FIXED:
+         if(LT(x[m_j], m_origupper) && GT(x[m_j], m_origlower))
+            cStatus[m_j] = SPxSolver::BASIC;
+         else if(LT(x[m_j], m_origupper))
+            cStatus[m_j] = SPxSolver::ON_LOWER;
+         else if(GT(x[m_j], m_origlower))
+            cStatus[m_j] = SPxSolver::ON_UPPER;
+
+         break;
+      case SPxSolver::ON_LOWER:
+         if(GT(x[m_j], m_origlower))
+            cStatus[m_j] = SPxSolver::BASIC;
+
+         break;
+      case SPxSolver::ON_UPPER:
+         if(LT(x[m_j], m_origupper))
+            cStatus[m_j] = SPxSolver::BASIC;
+
+         break;
+      default:
+         break;
+   }
+}
+
 void SPxMainSM::handleRowObjectives(SPxLP& lp)
 {
    for( int i = lp.nRows() - 1; i >= 0; --i )
@@ -1795,13 +1826,23 @@ void SPxMainSM::propagatePseudoobj(SPxLP& lp)
             Real newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
 
             if(LT(newbound, lp.upper(j)))
+            {
+               TightenBoundsPS* TightenBoundsPSptr = 0;
+               spx_alloc(TightenBoundsPSptr);
+               m_hist.append(new (TightenBoundsPSptr) TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j)));
                lp.changeUpper(j, newbound);
+            }
          }
          else if(objval > 0.0)
          {
             Real newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
             if(GT(newbound, lp.lower(j)))
+            {
+               TightenBoundsPS* TightenBoundsPSptr = 0;
+               spx_alloc(TightenBoundsPSptr);
+               m_hist.append(new (TightenBoundsPSptr) TightenBoundsPS(lp, j, lp.upper(j), lp.lower(j)));
                lp.changeLower(j, newbound);
+            }
          }
       }
    }

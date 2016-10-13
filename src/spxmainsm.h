@@ -1116,6 +1116,48 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
    };
 
+   /**@brief   Postsolves variable bound tightening from pseudo objective propagation.
+      @ingroup Algo
+   */
+   class TightenBoundsPS : public PostStep
+   {
+   private:
+      const int            m_j;
+      const Real           m_origupper;
+      const Real           m_origlower;
+
+   public:
+      ///
+      TightenBoundsPS(const SPxLP& lp, int j, Real origupper, Real origlower)
+         : PostStep("TightenBounds", lp.nRows(), lp.nCols())
+         , m_j(j)
+         , m_origupper(origupper)
+         , m_origlower(origlower)
+      {
+      }
+      /// copy constructor
+      TightenBoundsPS(const TightenBoundsPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_origupper(old.m_origupper)
+         , m_origlower(old.m_origlower)
+      {}
+      /// assignment operator
+      TightenBoundsPS& operator=( const TightenBoundsPS& rhs)
+      {
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         TightenBoundsPS* TightenBoundsPSptr = 0;
+         spx_alloc(TightenBoundsPSptr);
+         return new (TightenBoundsPSptr) TightenBoundsPS(*this);
+      }
+      ///
+      virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+   };
    // friends
    friend class FreeConstraintPS;
    friend class EmptyConstraintPS;
