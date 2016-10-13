@@ -1842,8 +1842,10 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
    return thepricer->setDualNorms(nnormsRow, nnormsCol, norms);
 }
 
-void SPxSolver::setIntegralityInformation(int* intInfo)
+void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
 {
+   assert(ncols == nCols() || (ncols == 0 && intInfo == NULL));
+
    integerVariables.reSize(nCols());
    for( int i = 0; i < nCols(); ++i )
    {

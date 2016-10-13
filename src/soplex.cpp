@@ -948,9 +948,10 @@ namespace soplex
 
 
    /// pass integrality information about the variables to the solver
-   void SoPlex::setIntegralityInformation(int* intInfo)
+   void SoPlex::setIntegralityInformation( int ncols, int* intInfo)
    {
-      _solver.setIntegralityInformation(intInfo);
+      assert(ncols == _solver.nCols() || (ncols == 0 && intInfo == NULL));
+      _solver.setIntegralityInformation(ncols, intInfo);
    }
 
 

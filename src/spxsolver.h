@@ -1971,7 +1971,7 @@ public:
    bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
    /// pass integrality information about the variables to the solver
-   void setIntegralityInformation(int* intInfo);
+   void setIntegralityInformation(int ncols, int* intInfo);
 
    /// reset cumulative time counter to zero.
    void resetCumulativeTime()
