@@ -1778,28 +1778,31 @@ void SPxMainSM::propagatePseudoobj(SPxLP& lp)
          pseudoObj += val*lp.upper(j);
    }
 
-   if(pseudoObj > m_pseudoobj)
-      m_pseudoobj = pseudoObj;
-
-   for(int j = lp.nCols()-1; j >= 0; --j)
+   if(LT(pseudoObj, infinity) && GT(pseudoObj, -infinity))
    {
-      Real objval = lp.maxObj(j);
+      if(pseudoObj > m_pseudoobj)
+         m_pseudoobj = pseudoObj;
 
-      if(EQ(objval, 0.0))
-         continue;
-
-      if(objval < 0.0)
+      for(int j = lp.nCols()-1; j >= 0; --j)
       {
-         Real newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
+         Real objval = lp.maxObj(j);
 
-         if(LT(newbound, lp.upper(j)))
-            lp.changeUpper(j, newbound);
-      }
-      else if(objval > 0.0)
-      {
-         Real newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
-         if(GT(newbound, lp.lower(j)))
-            lp.changeLower(j, newbound);
+         if(EQ(objval, 0.0))
+            continue;
+
+         if(objval < 0.0)
+         {
+            Real newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
+
+            if(LT(newbound, lp.upper(j)))
+               lp.changeUpper(j, newbound);
+         }
+         else if(objval > 0.0)
+         {
+            Real newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
+            if(GT(newbound, lp.lower(j)))
+               lp.changeLower(j, newbound);
+         }
       }
    }
 }

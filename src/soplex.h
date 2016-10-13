@@ -195,6 +195,9 @@ public:
    /// sets steepest edge norms and returns false if that's not possible
    bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
+   /// pass integrality information about the variables to the solver
+   void setIntegralityInformation(int* intInfo);
+
    //@}
 
 

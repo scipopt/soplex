@@ -1019,6 +1019,7 @@ SPxSolver::SPxSolver(
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
+   , integerVariables(0)
 {
    theTime = TimerFactory::createTimer(timerType);
 
@@ -1129,6 +1130,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
+      integerVariables = base.integerVariables;
 
       if (base.theRep == COLUMN)
       {
@@ -1295,6 +1297,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
    , primalCount(base.primalCount)
+   , polishCount(base.polishCount)
    , boundflips(base.boundflips)
    , totalboundflips(base.totalboundflips)
    , infeasibilities(base.infeasibilities)
@@ -1310,6 +1313,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
    , spxout(base.spxout)
+   , integerVariables(base.integerVariables)
 {
    theTime = TimerFactory::createTimer(timerType);
 
@@ -1916,6 +1920,16 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
    assert(thepricer != NULL);
    return thepricer->setDualNorms(nnormsRow, nnormsCol, norms);
 }
+
+void SPxSolver::setIntegralityInformation(int* intInfo)
+{
+   integerVariables.reSize(nCols());
+   for( int i = 0; i < nCols(); ++i )
+   {
+      integerVariables[i] = intInfo[i];
+   }
+}
+
 
 
 //

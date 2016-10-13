@@ -986,6 +986,14 @@ namespace soplex
 
 
 
+   /// pass integrality information about the variables to the solver
+   void SoPlex::setIntegralityInformation(int* intInfo)
+   {
+      _solver.setIntegralityInformation(intInfo);
+   }
+
+
+
    /// returns number of rows
    int SoPlex::numRowsRational() const
    {
