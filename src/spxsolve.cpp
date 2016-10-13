@@ -1011,9 +1011,12 @@ void SPxSolver::performSolutionPolishing()
    if( polishObj == SolutionPolish::OFF || rep() == ROW || status() != OPTIMAL )
       return;
 
-   // treat all variables as integer variables if the information was not provided
-   if( integerVariables.size() != nCols() )
+   // only run when integrality information is present and correct
+   if( integerVariables.size() == 0 || integerVariables.size() != nCols() )
+   {
       integerVariables.reSize(0);
+      return;
+   }
 
    // the current objective value must not be changed
 #ifndef NDEBUG
