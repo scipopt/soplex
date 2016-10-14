@@ -26,14 +26,14 @@ SANITZERFLAGS = -fsanitize=address
 endif
 
 # enable UndefinedBehaviorSanitizer
-SANITZERFLAGS += -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero
+SANITZERFLAGS += -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero
 
 endif
 
 ifeq ($(SANITIZE),true)
 
 # enable UndefinedBehaviorSanitizer
-SANITZERFLAGS = -fsanitize=undefined -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero
+SANITZERFLAGS = -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero
 
 # do not enable LeakSanitizer (https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer)
 # it may prevent usage of valgrind while also not replacing it
