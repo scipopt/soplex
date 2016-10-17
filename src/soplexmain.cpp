@@ -2105,7 +2105,7 @@ int main(int argc, char* argv[])
       spxout.setVerbosity           ( (SPxOut::Verbosity) verbose );
 
       // Set the output precision.
-      precision = int(-log10(std::min(feastol, opttol))) + 1;
+      precision = int(-log10(MINIMUM(feastol, opttol))) + 1;
 
       std::cout.setf( std::ios::scientific | std::ios::showpoint );
       std::cerr.setf( std::ios::scientific | std::ios::showpoint );
@@ -2122,8 +2122,8 @@ int main(int argc, char* argv[])
       MySoPlex work( spxout, type, representation );
       work.setOutstream         ( spxout );
       work.setUtype             ( update );
-      work.setFeastol           ( std::min(feastol, delta) );
-      work.setOpttol            ( std::min(opttol, delta) );
+      work.setFeastol           ( MINIMUM(feastol, delta) );
+      work.setOpttol            ( MINIMUM(opttol, delta) );
       work.setTerminationTime   ( timelimit );
       work.setTerminationIter   ( iterlimit );
       print_algorithm_parameters( work, representation, update );
