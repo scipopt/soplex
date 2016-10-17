@@ -1846,8 +1846,8 @@ void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
 {
    assert(ncols == nCols() || (ncols == 0 && intInfo == NULL));
 
-   integerVariables.reSize(nCols());
-   for( int i = 0; i < nCols(); ++i )
+   integerVariables.reSize(ncols);
+   for( int i = 0; i < ncols; ++i )
    {
       integerVariables[i] = intInfo[i];
    }
