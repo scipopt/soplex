@@ -53,7 +53,7 @@ int main()
    SPxSolver::Status stat;
    DVector prim(2);
    DVector dual(1);
-   stat = mysoplex.solve();
+   stat = mysoplex.optimize();
 
    /* get solution */
    if( stat == SPxSolver::OPTIMAL )

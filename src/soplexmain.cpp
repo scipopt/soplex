@@ -667,7 +667,7 @@ int main(int argc, char* argv[])
          << soplex->numColsReal() << " columns and " << soplex->numNonzerosReal() << " nonzeros.\n\n" );
 
       // solve the LP
-      soplex->solve();
+      soplex->optimize();
 
       // print solution, check solution, and display statistics
       if( printPrimal )
@@ -1581,7 +1581,7 @@ void solve_LP(MySoPlex& work)
    else
       MSG_INFO1( (*work.spxout), (*work.spxout) << "\nSolving LP ..." << std::endl; )
 
-   work.solve();
+   work.optimize();
    timer.stop();
 
    MSG_INFO1( (*work.spxout), (*work.spxout) << "\nSoPlex statistics:\n" << work.statistics(); )

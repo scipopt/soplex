@@ -23,7 +23,7 @@
 namespace soplex
 {
    /// solves real LP
-   void SoPlex::_solveReal()
+   void SoPlex::_optimizeReal()
    {
       // start timing
       _statistics->solvingTime->start();

@@ -557,8 +557,8 @@ public:
    //**@name Solving and general solution query */
    //@{
 
-   /// solves the LP
-   SPxSolver::Status solve();
+   /// optimize the given LP
+   SPxSolver::Status optimize();
 
    /// returns the current solver status
    SPxSolver::Status status() const;
@@ -1783,7 +1783,7 @@ private:
    //@{
 
    /// solves rational LP
-   void _solveRational();
+   void _optimizeRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
@@ -1897,7 +1897,7 @@ private:
    //@{
 
    /// solves real LP
-   void _solveReal();
+   void _optimizeReal();
 
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(SPxSimplifier::Result simplificationStatus);

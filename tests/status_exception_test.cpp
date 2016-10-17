@@ -115,7 +115,7 @@ bool StatusExceptionCheck::checkXSOLVR01()
 {
    SoPlex* solver = new SoPlex();
    try{
-      solver->solve();
+      solver->optimize();
    }catch(SPxStatusException& x)
    {
       delete solver;      

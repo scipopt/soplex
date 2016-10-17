@@ -25,7 +25,7 @@
 namespace soplex
 {
    /// solves rational LP
-   void SoPlex::_solveRational()
+   void SoPlex::_optimizeRational()
    {
       bool hasUnboundedRay = false;
       bool infeasibilityNotCertified = false;
