@@ -498,7 +498,7 @@ public:
    /// copy LP.
    virtual void loadLP(const SPxLP& LP);
    /// setup linear solver to use. If \p destroy is true, \p slusolver will be freed in destructor.
-   virtual void setSolver(SLinSolver* slu, const bool destroy = false);
+   virtual void setBasisSolver(SLinSolver* slu, const bool destroy = false);
    /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.
    virtual void setPricer(SPxPricer* pricer, const bool destroy = false);
    /// setup ratio-tester to use. If \p destroy is true, \p tester will be freed in destructor.

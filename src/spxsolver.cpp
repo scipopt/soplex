@@ -80,13 +80,13 @@ void SPxSolver::loadLP(const SPxLP& lp)
    SPxBasis::load(this);
 }
 
-void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
+void SPxSolver::setBasisSolver(SLinSolver* slu, const bool destroy)
 {
    // we need to set the outstream before we load the solver to ensure that the basis
    // can be initialized with this pointer in loadSolver()
    assert(spxout != 0);
    slu->spxout = spxout;
-   SPxBasis::loadSolver(slu, destroy);
+   SPxBasis::loadBasisSolver(slu, destroy);
 }
 
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
@@ -886,7 +886,7 @@ Real SPxSolver::value()
    else
       x = SPxLP::spxSense() * (nonbasicValue() + fVec() * coPrhs());
 
-   return x;
+   return x + objOffset();
 }
 
 bool SPxSolver::updateNonbasicValue(Real objChange)

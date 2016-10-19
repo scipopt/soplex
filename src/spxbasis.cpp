@@ -334,16 +334,14 @@ void SPxBasis::load(SPxSolver* lp)
    loadDesc(thedesc);
 }
 
-void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
+void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
 {
-
    assert(!freeSlinSolver || factor != 0);
 
    setOutstream(*p_solver->spxout);
 
    MSG_INFO3( (*spxout), (*spxout) << "IBASIS03 loading of Solver invalidates factorization"
                         << std::endl; )
-
 
    if(freeSlinSolver)
    {

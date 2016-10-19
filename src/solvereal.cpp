@@ -34,7 +34,6 @@ namespace soplex
       // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
       // scratch, apply preprocessing according to parameter settings
       _preprocessAndSolveReal(!_hasBasis);
-      _storeSolutionReal();
 
       // stop timing
       _statistics->solvingTime->stop();
@@ -60,15 +59,7 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
-         if( !_isRealLPLoaded )
-         {
-            MSG_INFO1( spxout, spxout << " --- transforming basis into original space" << std::endl; )
-            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
-            _resolveWithoutPreprocessing(simplificationStatus);
-            return;
-         }
-         else
-            _hasBasis = true;
+         _storeSolutionReal();
          break;
 
       case SPxSolver::UNBOUNDED:
@@ -77,7 +68,6 @@ namespace soplex
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             _preprocessAndSolveReal(false);
             return;
          }
@@ -89,7 +79,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
+            MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without presolving" << std::endl; )
             _preprocessAndSolveReal(false);
             return;
          }
@@ -99,7 +89,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
+            MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without presolving" << std::endl; )
             _preprocessAndSolveReal(false);
             return;
          }
@@ -109,22 +99,7 @@ namespace soplex
       case SPxSolver::ABORT_VALUE:
       case SPxSolver::REGULAR:
       case SPxSolver::RUNNING:
-         if( _isRealLPLoaded )
-            _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
-         // store regular basis if there is no simplifier and the original problem is not in the solver because of
-         // scaling; non-optimal bases should currently not be unsimplified
-         else if( _simplifier == 0 && _solver.basis().status() > SPxBasis::NO_PROBLEM )
-         {
-            _basisStatusRows.reSize(numRowsReal());
-            _basisStatusCols.reSize(numColsReal());
-            assert(_basisStatusRows.size() == _solver.nRows());
-            assert(_basisStatusCols.size() == _solver.nCols());
-
-            _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
-            _hasBasis = true;
-         }
-         else
-            _hasBasis = false;
+         _storeSolutionReal();
          break;
 
       default:
@@ -200,7 +175,7 @@ namespace soplex
 
       // apply problem simplification
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
-      if( _simplifier != 0 )
+      if( _simplifier )
       {
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
@@ -219,7 +194,6 @@ namespace soplex
          _solveRealLPAndRecordStatistics();
       }
 
-      // check the result and run again without preprocessing if necessary
       _evaluateSolutionReal(simplificationStatus);
    }
 
@@ -308,10 +282,20 @@ namespace soplex
 
 
 
-   /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
+   /// stores solution data from the solver, possibly after applying unscaling and unsimplifying
    void SoPlex::_storeSolutionReal()
    {
-      assert(status() != SPxSolver::OPTIMAL || _isRealLPLoaded);
+      // todo what are the possible input stages? result codes?
+
+      // prepare storage for basis (enough to fit the original basis)
+      _basisStatusRows.reSize(numRowsReal());
+      _basisStatusCols.reSize(numColsReal());
+
+      // prepare storage for the solution data
+      _solReal._primal.reDim(_solver.nCols());
+      _solReal._slacks.reDim(_solver.nRows());
+      _solReal._dual.reDim(_solver.nRows());
+      _solReal._redCost.reDim(_solver.nCols());
 
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::ERROR);
       assert(_solver.basis().status() != SPxBasis::PRIMAL || status() != SPxSolver::NO_RATIOTESTER);
@@ -328,17 +312,10 @@ namespace soplex
       _solver.forceRecompNonbasicValue();
       _solReal._hasPrimal = (status() == SPxSolver::OPTIMAL
          || ((_solver.basis().status() == SPxBasis::PRIMAL || _solver.basis().status() == SPxBasis::UNBOUNDED)
-            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
-      if( _solReal._hasPrimal )
-      {
-         _solReal._primal.reDim(_solver.nCols());
-         _solReal._slacks.reDim(_solver.nRows());
-         _solver.getPrimal(_solReal._primal);
-         _solver.getSlacks(_solReal._slacks);
-         _solReal._primalObjVal = _solver.objValue();
-      }
+            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO)));
 
       _solReal._hasPrimalRay = (status() == SPxSolver::UNBOUNDED && _isRealLPLoaded);
+
       if( _solReal._hasPrimalRay )
       {
          _solReal._primalRay.reDim(_solver.nCols());
@@ -359,24 +336,148 @@ namespace soplex
 
       _solReal._hasDual = (status() == SPxSolver::OPTIMAL
          || ((_solver.basis().status() == SPxBasis::DUAL || _solver.basis().status() == SPxBasis::INFEASIBLE)
-            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO))) && _isRealLPLoaded;
-      if( _solReal._hasDual )
-      {
-         _solReal._dual.reDim(_solver.nRows());
-         _solReal._redCost.reDim(_solver.nCols());
-         _solver.getDual(_solReal._dual);
-         _solver.getRedCost(_solReal._redCost);
-         _solReal._dualObjVal = ( _solReal._hasPrimal ? _solReal._primalObjVal : _solver.objValue() );
-      }
+            && _solver.shift() < 10.0 * realParam(SoPlex::EPSILON_ZERO)));
 
       _solReal._hasDualFarkas = (status() == SPxSolver::INFEASIBLE && _isRealLPLoaded);
+
       if( _solReal._hasDualFarkas )
       {
          _solReal._dualFarkas.reDim(_solver.nRows());
          _solver.getDualfarkas(_solReal._dualFarkas);
       }
 
+
+      // get solution data from the solver
+      _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
+                       _basisStatusRows.size(), _basisStatusCols.size());
+
+      _solver.getPrimal(_solReal._primal);
+      _solver.getSlacks(_solReal._slacks);
+      _solver.getDual(_solReal._dual);
+      _solver.getRedCost(_solReal._redCost);
+
+      _solReal._primalObjVal = _solver.objValue();
+      _solReal._dualObjVal = _solReal._primalObjVal;
+
+      // infeasible solutions shall also be stored and be accessible
       _hasSolReal = true;
+      _solReal._hasPrimal = true;
+      _solReal._hasDual = true;
+
+      // unscale vectors
+      if( _scaler != 0 )
+      {
+         _scaler->unscalePrimal(_solReal._primal);
+         _scaler->unscaleSlacks(_solReal._slacks);
+         _scaler->unscaleDual(_solReal._dual);
+         _scaler->unscaleRedCost(_solReal._redCost);
+      }
+
+      // get unsimplified solution data from simplifier
+      if( _simplifier )
+      {
+         assert(!_simplifier->isUnsimplified());
+
+         // todo check whether the simplification status is neccessary here (get it from simplifier?)
+         try
+         {
+            // pass solution data of transformed problem to simplifier
+            _simplifier->unsimplify(_solReal._primal, _solReal._dual, _solReal._slacks, _solReal._redCost,
+                                    _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+
+            // resize solution vectors to original size
+            _solReal._primal.reSize(numColsReal());
+            _solReal._slacks.reSize(numRowsReal());
+            _solReal._dual.reSize(numRowsReal());
+            _solReal._redCost.reSize(numColsReal());
+
+            // copy unsimplified solution data from simplifier
+            _solReal._primal  = _simplifier->unsimplifiedPrimal();
+            _solReal._slacks  = _simplifier->unsimplifiedSlacks();
+            _solReal._dual    = _simplifier->unsimplifiedDual();
+            _solReal._redCost = _simplifier->unsimplifiedRedCost();
+
+            // overwrite the transformed basis with the original one
+            _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
+            _hasBasis = true;
+
+            // ensure that the solver has the original problem
+            // todo don't create a new slack basis
+            assert(_realLP != &_solver);
+            _solver.loadLP(*_realLP);
+            _isRealLPLoaded = true;
+            _realLP->~SPxLPReal();
+            spx_free(_realLP);
+            _realLP = &_solver;
+
+            // load unsimplified basis
+            assert(_basisStatusRows.size() == numRowsReal());
+            assert(_basisStatusCols.size() == numColsReal());
+            _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+
+            // check solution fro violations and solve again if neccessary
+            Real boundviol = 0;
+            Real rowviol = 0;
+            Real dualviol = 0;
+            Real redcostviol = 0;
+            Real sumviol = 0;
+
+            (void) getBoundViolationReal(boundviol, sumviol);
+            (void) getRowViolationReal(rowviol, sumviol);
+            (void) getDualViolationReal(dualviol, sumviol);
+            (void) getRedCostViolationReal(redcostviol, sumviol);
+
+            if( boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol() || redcostviol >= _solver.opttol())
+            {
+               MSG_INFO1( spxout, spxout << "detected violations in original problem space -- resolve\n"; )
+               _preprocessAndSolveReal(false);
+            }
+
+#ifdef SOPLEX_DEBUG
+            MSG_DEBUG( std::cout << "DEBUG: finished solving -- starting check solve\n"; )
+            DVectorReal prim(_solver.nCols());
+            DVectorReal slacks(_solver.nRows());
+            DVectorReal dual(_solver.nRows());
+            DVectorReal redcost(_solver.nCols());
+
+            _solver.solve();
+
+            _solver.getPrimal(prim);
+            _solver.getSlacks(slacks);
+            _solver.getDual(dual);
+            _solver.getRedCost(redcost);
+
+            for( int i = 0; i < _solver.nCols(); ++i )
+            {
+               assert(EQrel(prim[i], _solReal._primal[i], _solver.feastol()));
+               assert(EQrel(redcost[i], _solReal._redCost[i], _solver.opttol()));
+            }
+            for( int i = 0; i < _solver.nRows(); ++i )
+            {
+               assert(EQrel(dual[i], _solReal._dual[i], _solver.opttol()));
+               assert(EQrel(slacks[i], _solReal._slacks[i], _solver.feastol()));
+            }
+#endif
+
+         }
+         catch( const SPxException& E )
+         {
+            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+         }
+         catch( ... )
+         {
+            MSG_ERROR( std::cerr << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+            _status = SPxSolver::ERROR;
+         }
+
+      }
+      else
+      {
+         // todo new flag to signal persistent scaling status?
+         assert(_solver.nCols() == numColsReal());
+         assert(_solver.nRows() == numRowsReal());
+         _hasBasis = true;
+      }
    }
 } // namespace soplex
 #endif

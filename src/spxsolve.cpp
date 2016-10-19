@@ -1242,7 +1242,7 @@ void SPxSolver::printDisplayLine(const bool force)
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
          << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
-         << std::setprecision(8) << value() + objOffset()
+         << std::setprecision(8) << value()
          << std::endl;
       }
       displayLine++;
@@ -1346,7 +1346,7 @@ bool SPxSolver::terminate()
       if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         if( spxSense() * (value() + objOffset()) <= spxSense() * objLimit )
+         if( spxSense() * value() <= spxSense() * objLimit )
          {
             MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )

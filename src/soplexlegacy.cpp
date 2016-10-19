@@ -31,7 +31,7 @@ SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver:
    , m_freeSimplifier(false)
 {
    m_solver.setOutstream(outstream);
-   m_solver.setSolver(&m_slu);
+   m_solver.setBasisSolver(&m_slu);
    m_solver.setTester(new SPxBoundFlippingRT(), true);
    m_solver.setPricer(new SPxSteepPR(), true);
    m_solver.setStarter(0);
@@ -76,7 +76,7 @@ SoPlexLegacy& SoPlexLegacy::operator=(const SoPlexLegacy& base)
       m_slu = base.m_slu;  // call of SLinSolver::clone() SPxBasis assignment operator not necessary (done by m_solver.setSolver(&m_slu) below)
       m_solver = base.m_solver;
       m_vanished = base.m_vanished;
-      m_solver.setSolver(&m_slu);
+      m_solver.setBasisSolver(&m_slu);
 
       // m_preScaler
       if(m_freePreScaler)
@@ -142,7 +142,7 @@ SoPlexLegacy::SoPlexLegacy(const SoPlexLegacy& old)
    , m_solver(old.m_solver)
    , m_vanished(old.m_vanished)
 {
-   m_solver.setSolver(&m_slu);
+   m_solver.setBasisSolver(&m_slu);
 
    // m_preScaler
    if(old.m_preScaler == 0)

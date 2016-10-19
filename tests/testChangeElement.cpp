@@ -32,7 +32,7 @@ int main(int argc, const char* const argv[])
    SLUFactor solver;
    SPxFastRT tester;
    SPxSteepPR pricer;
-   work.setSolver(&solver);
+   work.setBasisSolver(&solver);
    work.setTester(&tester);
    work.setPricer(&pricer);
    work.changeSense(work.MAXIMIZE);

@@ -814,7 +814,7 @@ public:
    /// sets up linear solver to use.
    /** If destroy is true, solver will be freed inside this object, e.g. in the destructor.
    */
-   virtual void loadSolver(SLinSolver* solver, const bool destroy = false);
+   virtual void loadBasisSolver(SLinSolver* solver, const bool destroy = false);
 
    /// loads the LP \p lp to the basis.
    /** This involves resetting all counters to 0 and setting up a regular

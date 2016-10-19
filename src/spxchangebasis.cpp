@@ -416,6 +416,8 @@ void SPxBasis::restoreInitialBasis()
 {
    assert(!factorized);
 
+   MSG_INFO3( (*spxout), (*spxout) << "ICHBAS10 restore initial slack basis" << std::endl; )
+
    if (theLP->rep() == SPxSolver::COLUMN)
    {
       for (int i = 0; i < theLP->nRows(); ++i)

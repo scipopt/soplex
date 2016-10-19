@@ -514,7 +514,7 @@ namespace soplex
       _scalerLeastsq.setOutstream(spxout);
 
       // give lu factorization to solver
-      _solver.setSolver(&_slufactor);
+      _solver.setBasisSolver(&_slufactor);
 
       // the real LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
       // initialized in setSettings() below
@@ -596,7 +596,7 @@ namespace soplex
          _scalerLeastsq.setOutstream(spxout);
 
          // transfer the lu solver
-         _solver.setSolver(&_slufactor);
+         _solver.setBasisSolver(&_slufactor);
 
          // initialize pointers for simplifier, scaler, and starter
          setIntParam(SoPlex::SIMPLIFIER, intParam(SoPlex::SIMPLIFIER), true);
