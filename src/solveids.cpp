@@ -203,7 +203,7 @@ namespace soplex
 
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      spxout.setVerbosity( SPxOut::ERROR );
+      //spxout.setVerbosity( SPxOut::ERROR );
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
@@ -529,7 +529,6 @@ namespace soplex
       spx_alloc(_realLP);
       _realLP = new (_realLP) SPxLPIds(_solver);
 
-
       // allocating memory for the reduced problem rows and cols flag array
       _idsReducedProbRows = 0;
       spx_alloc(_idsReducedProbRows, numRowsReal());
@@ -539,13 +538,8 @@ namespace soplex
       // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
       // a positive reduced cost.
       _compSolver = _solver;
-      //_compSolver.reLoad();
       _compSolver.setOutstream(spxout);
       _compSolver.setSolver(&_compSlufactor);
-      //_compSolver.loadLP(*_realLP);
-      //_compSolver.loadBasis(_solver.basis().desc());
-
-      //_idsSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
       // allocating memory for the violated bounds and rows arrays
       _idsViolatedBounds = 0;
@@ -562,7 +556,6 @@ namespace soplex
    void SoPlex::_formIdsReducedProblem(bool& stop)
    {
       MSG_INFO3( spxout, spxout << "Forming the reduced problem" << std::endl );
-      int* bind = 0;
       int* nonposind = 0;
       int* compatind = 0;
       int* rowsforremoval = 0;
@@ -579,6 +572,7 @@ namespace soplex
       // setting row counter to zero
       numIncludedRows = 0;
 
+      // the _idsLP is used as a helper LP object. This is used so that _realLP can still hold the original problem.
       _idsLP = 0;
       spx_alloc(_idsLP);
       _idsLP = new (_idsLP) SPxLPIds(_solver);
@@ -588,13 +582,11 @@ namespace soplex
       _basisStatusCols.reSize(numColsReal());
       _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
-      // get thie indices of the rows with positive dual multipliers and columns with positive reduced costs.
-      spx_alloc(bind, numColsReal());
-
+      // get the indices of the rows with positive dual multipliers and columns with positive reduced costs.
       spx_alloc(nonposind, numColsReal());
       spx_alloc(colsforremoval, numColsReal());
       if( !stop )
-         _getNonPositiveDualMultiplierInds(_idsFeasVector, nonposind, bind, colsforremoval, &nnonposind, stop);
+         _getZeroDualMultiplierIndices(_idsFeasVector, nonposind, colsforremoval, &nnonposind, stop);
 
       // get the compatible columns from the constraint matrix w.r.t the current basis matrix
       MSG_INFO3(spxout, spxout << "Computing the compatible columns" << std::endl
@@ -603,7 +595,8 @@ namespace soplex
       spx_alloc(compatind, _solver.nRows());
       spx_alloc(rowsforremoval, _solver.nRows());
       if( !stop )
-         _getCompatibleColumns(_idsFeasVector, nonposind, compatind, rowsforremoval, colsforremoval, nnonposind, &ncompatind, true, stop);
+         _getCompatibleColumns(_idsFeasVector, nonposind, compatind, rowsforremoval, colsforremoval, nnonposind,
+            &ncompatind, true, stop);
 
       int* compatboundcons = 0;
       int ncompatboundcons = 0;
@@ -648,7 +641,6 @@ namespace soplex
       spx_free(compatind);
       spx_free(colsforremoval);
       spx_free(nonposind);
-      spx_free(bind);
 
       _idsLP->~SPxLPIds();
       spx_free(_idsLP);
@@ -1479,12 +1471,11 @@ namespace soplex
 
 
 
+   /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
    // This function assumes that the basis is in the row form.
    // @todo extend this to the case when the basis is in the column form.
-   //
-   // NOTE: Changing "nonposind[*nnonposind] = bind[i]" to "nonposind[*nnonposind] = i"
-   void SoPlex::_getNonPositiveDualMultiplierInds(Vector feasVector, int* nonposind, int* bind, int* colsforremoval,
-         int* nnonposind, bool& stop)
+   void SoPlex::_getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
+      int* nnonposind, bool& stop)
    {
       assert(_solver.rep() == SPxSolver::ROW);
 
@@ -1505,19 +1496,14 @@ namespace soplex
 
       // iterating over all columns in the basis matrix
       // this identifies the basis indices and the indicies that are positive.
-      for( int i = 0; i < _solver.nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
+      for( int i = 0; i < _solver.nCols(); ++i )
       {
          _idsReducedProbCols[i] = true;
          _idsReducedProbColIDs[i].inValidate();
          colsforremoval[i] = i;
          delCol = false;
-         // @todo I have questions about my implementation of this function. I don't think that I am getting the right
-         // information. Additionally, in getCompatibleColumns the information may not be used correctly.
          if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
          {
-            bind[i] = -1 - _realLP->number(SPxRowId(_solver.basis().baseId(i))); // getting the corresponding row
-                                                                                   // for the original LP.
-
             //@todo need to check this regarding min and max problems
             if( isZero(feasVector[i], feastol) )
             {
@@ -1527,18 +1513,13 @@ namespace soplex
                // NOTE: commenting out the delCol flag at this point. The colsforremoval array should indicate the
                // columns that have a zero reduced cost. Hence, the delCol flag should only be set in the isSPxColId
                // branch of the if statement.
-               delCol = true;
+               //delCol = true;
             }
          }
          else if( _solver.basis().baseId(i).isSPxColId() )  // get the column id's for the columns in the basis
          {
-            bind[i] = _realLP->number(SPxColId(_solver.basis().baseId(i)));
-
-            //int colnumber = _solver.number(_solver.basis().baseId(i));
-            if( isZero(feasVector[i], feastol)/* &&
-                   _solver.basis().desc().colStatus(colnumber) != SPxBasis::Desc::P_FIXED*/ )
+            if( isZero(feasVector[i], feastol) )
             {
-               //nonposind[*nnonposind] = _solver.number(_solver.basis().baseId(i));
                nonposind[*nnonposind] = i;
                (*nnonposind)++;
 

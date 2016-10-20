@@ -1378,8 +1378,7 @@ bool SPxSolver::terminate()
          Real degeneracyLB = 0.1;
          Real degeneracyUB = 0.9;
          degeneracyLevel = getDegeneracyLevel(fVec());
-         //printf("%d %d Degeneracy Level: %f\n", iteration(), lastUpdate(), degeneracyLevel);
-         if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) /*&& iteration() > nRows()*0.2*/ )
+         if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) && iteration() > nRows()*0.2 )
          {
             m_status = ABORT_DECOMP;
             return true;
@@ -1387,7 +1386,6 @@ bool SPxSolver::terminate()
 
          if( degeneracyLevel < degeneracyLB && iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
          {
-            //setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
             setDecompIterationLimit(0);
             setDegenCompOffset(0);
             m_status = ABORT_EXDECOMP;
@@ -1396,7 +1394,6 @@ bool SPxSolver::terminate()
       }
       else if( type() == LEAVE && iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
       {
-         //setIdsStatus(SPxSolver::DONTFINDSTARTBASIS);
          setDecompIterationLimit(0);
          setDegenCompOffset(0);
          m_status = ABORT_EXDECOMP;

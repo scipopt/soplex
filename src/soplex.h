@@ -2097,8 +2097,8 @@ private:
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void _idsResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
 
-   // This function assumes that the basis is in the row form.
-   void _getNonPositiveDualMultiplierInds(Vector feasVector, int* nonposind, int* bind, int* colsforremoval,
+   /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
+   void _getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
          int* nnonposind, bool& stop);
 
    /// retrieves the compatible columns from the constraint matrix
