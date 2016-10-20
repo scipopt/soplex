@@ -1324,33 +1324,40 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
 
 void SPxMainSM::TightenBoundsPS::execute(DVector& x, DVector&, DVector&, DVector&,
                                      DataArray<SPxSolver::VarStatus>& cStatus,
-                                     DataArray<SPxSolver::VarStatus>& ) const
+                                     DataArray<SPxSolver::VarStatus>& rStatus) const
 {
    // basis:
    switch(cStatus[m_j])
    {
       case SPxSolver::FIXED:
-         if(LT(x[m_j], m_origupper) && GT(x[m_j], m_origlower))
+         if(LT(x[m_j], m_origupper, eps()) && GT(x[m_j], m_origlower, eps()))
             cStatus[m_j] = SPxSolver::BASIC;
-         else if(LT(x[m_j], m_origupper))
+         else if(LT(x[m_j], m_origupper, eps()))
             cStatus[m_j] = SPxSolver::ON_LOWER;
-         else if(GT(x[m_j], m_origlower))
+         else if(GT(x[m_j], m_origlower, eps()))
             cStatus[m_j] = SPxSolver::ON_UPPER;
 
          break;
       case SPxSolver::ON_LOWER:
-         if(GT(x[m_j], m_origlower))
+         if(GT(x[m_j], m_origlower, eps()))
             cStatus[m_j] = SPxSolver::BASIC;
 
          break;
       case SPxSolver::ON_UPPER:
-         if(LT(x[m_j], m_origupper))
+         if(LT(x[m_j], m_origupper, eps()))
             cStatus[m_j] = SPxSolver::BASIC;
 
          break;
       default:
          break;
    }
+
+#ifdef CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+      throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
+   }
+#endif
 }
 
 void SPxMainSM::handleRowObjectives(SPxLP& lp)
