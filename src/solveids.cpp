@@ -118,7 +118,9 @@ namespace soplex
 
 
             // resolving the problem to update the real lp and solve with the correct objective.
-            _idsSimplifyAndSolve(_solver, _slufactor, false, false);
+            // TODO: With some infeasible problem (e.g. refinery) the dual is violated. Setting fromScratch to true
+            // avoids this issue. Need to check what the problem is.
+            _idsSimplifyAndSolve(_solver, _slufactor, true, false);
 
             // retreiving the original problem statistics prior to destroying it.
             getOriginalProblemStatistics();
