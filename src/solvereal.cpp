@@ -59,7 +59,13 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
-         _storeSolutionReal();
+         // if the problem was solved in presolving no solver data is available
+         if( simplificationStatus == SPxSimplifier::VANISHED )
+         {
+            _storeSolutionRealFromPresol();
+         }
+         else
+             _storeSolutionReal();
          break;
 
       case SPxSolver::UNBOUNDED:
@@ -378,7 +384,7 @@ namespace soplex
       {
          assert(!_simplifier->isUnsimplified());
 
-         // todo check whether the simplification status is neccessary here (get it from simplifier?)
+         // todo check whether the simplification status is necessary here (get it from simplifier?)
          try
          {
             // pass solution data of transformed problem to simplifier
@@ -397,25 +403,28 @@ namespace soplex
             _solReal._dual    = _simplifier->unsimplifiedDual();
             _solReal._redCost = _simplifier->unsimplifiedRedCost();
 
-            // overwrite the transformed basis with the original one
+            // overwrite the transformed basis with the unsimplified one
             _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
             _hasBasis = true;
 
             // ensure that the solver has the original problem
-            // todo don't create a new slack basis
             assert(_realLP != &_solver);
-            _solver.loadLP(*_realLP);
+            // load original problem but don't setup a slack basis
+            _solver.loadLP(*_realLP, false);
             _isRealLPLoaded = true;
             _realLP->~SPxLPReal();
             spx_free(_realLP);
             _realLP = &_solver;
 
-            // load unsimplified basis
+            // todo check where else we can skip setting up the slack basis!!
+
+            // load unsimplified basis into solver
             assert(_basisStatusRows.size() == numRowsReal());
             assert(_basisStatusCols.size() == numColsReal());
+            _solver.setBasisStatus(SPxBasis::REGULAR);
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
-            // check solution fro violations and solve again if neccessary
+            // check solution for violations and solve again if necessary
             Real boundviol = 0;
             Real rowviol = 0;
             Real dualviol = 0;
@@ -479,5 +488,82 @@ namespace soplex
          _hasBasis = true;
       }
    }
+
+
+
+   void SoPlex::_storeSolutionRealFromPresol()
+   {
+      assert(_simplifier);
+      assert(_simplifier->result() == SPxSimplifier::VANISHED);
+
+      // ensure that the solver has the original problem
+      assert(_realLP != &_solver);
+      // load original LP and setup slack basis
+      _solver.loadLP(*_realLP, true);
+      _isRealLPLoaded = true;
+      _realLP->~SPxLPReal();
+      spx_free(_realLP);
+      _realLP = &_solver;
+
+      // prepare storage for basis (enough to fit the original basis)
+      _basisStatusRows.reSize(numRowsReal());
+      _basisStatusCols.reSize(numColsReal());
+
+      // prepare storage for the solution data
+      _solReal._primal.reDim(_solver.nCols());
+      _solReal._slacks.reDim(_solver.nRows());
+      _solReal._dual.reDim(_solver.nRows());
+      _solReal._redCost.reDim(_solver.nCols());
+
+      // clear solution data
+      _solReal._primal.clear();
+      _solReal._slacks.clear();
+      _solReal._dual.clear();
+      _solReal._redCost.clear();
+
+      assert(!_simplifier->isUnsimplified());
+
+      try
+      {
+         // pass solution data of transformed problem to simplifier
+         _simplifier->unsimplify(_solReal._primal, _solReal._dual, _solReal._slacks, _solReal._redCost,
+                                 _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+
+         // resize solution vectors to original size
+         _solReal._primal.reSize(numColsReal());
+         _solReal._slacks.reSize(numRowsReal());
+         _solReal._dual.reSize(numRowsReal());
+         _solReal._redCost.reSize(numColsReal());
+
+         // copy unsimplified solution data from simplifier
+         _solReal._primal  = _simplifier->unsimplifiedPrimal();
+         _solReal._slacks  = _simplifier->unsimplifiedSlacks();
+         _solReal._dual    = _simplifier->unsimplifiedDual();
+         _solReal._redCost = _simplifier->unsimplifiedRedCost();
+
+         // compute the original objective function value
+         _solReal._primalObjVal = realParam(SoPlex::OBJ_OFFSET);
+         for( int i = 0; i < numColsReal(); ++i )
+            _solReal._primalObjVal += _solReal._primal[i] * objReal(i);
+
+         // store the unsimplified basis
+         _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
+         _hasBasis = true;
+         _hasSolReal = true;
+         _solReal._hasPrimal = true;
+         _solReal._hasDual = true;
+      }
+      catch( const SPxException& E )
+      {
+         MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+      }
+      catch( ... )
+      {
+         MSG_ERROR( std::cerr << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+         _status = SPxSolver::ERROR;
+      }
+
+   }
+
 } // namespace soplex
 #endif

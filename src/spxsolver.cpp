@@ -65,7 +65,7 @@ void SPxSolver::reLoad()
       theratiotester->clear();
 }
 
-void SPxSolver::loadLP(const SPxLP& lp)
+void SPxSolver::loadLP(const SPxLP& lp, bool initSlackBasis)
 {
    clear();
    unInit();
@@ -77,7 +77,7 @@ void SPxSolver::loadLP(const SPxLP& lp)
       theratiotester->clear();
    SPxLP::operator=(lp);
    reDim();
-   SPxBasis::load(this);
+   SPxBasis::load(this, initSlackBasis);
 }
 
 void SPxSolver::setBasisSolver(SLinSolver* slu, const bool destroy)

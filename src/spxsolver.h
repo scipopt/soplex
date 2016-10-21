@@ -496,7 +496,7 @@ public:
       NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// copy LP.
-   virtual void loadLP(const SPxLP& LP);
+   virtual void loadLP(const SPxLP& LP, bool initSlackBasis = true);
    /// setup linear solver to use. If \p destroy is true, \p slusolver will be freed in destructor.
    virtual void setBasisSolver(SLinSolver* slu, const bool destroy = false);
    /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.

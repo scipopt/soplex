@@ -820,7 +820,7 @@ public:
    /** This involves resetting all counters to 0 and setting up a regular
        default basis consisting of slacks, artificial variables or bounds.
    */
-   virtual void load(SPxSolver* lp);
+   virtual void load(SPxSolver* lp, bool initSlackBasis = true);
 
    /// unloads the LP from the basis.
    virtual void unLoad()

@@ -320,7 +320,7 @@ void SPxBasis::setRep()
    }
 }
 
-void SPxBasis::load(SPxSolver* lp)
+void SPxBasis::load(SPxSolver* lp, bool initSlackBasis)
 {
    assert(lp != 0);
    theLP = lp;
@@ -329,9 +329,11 @@ void SPxBasis::load(SPxSolver* lp)
 
    setRep();
 
-   restoreInitialBasis();
-
-   loadDesc(thedesc);
+   if( initSlackBasis )
+   {
+      restoreInitialBasis();
+      loadDesc(thedesc);
+   }
 }
 
 void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)

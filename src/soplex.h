@@ -1911,6 +1911,9 @@ private:
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
    void _storeSolutionReal();
 
+   /// stores solution from the simplifier because problem vanished in presolving step
+   void _storeSolutionRealFromPresol();
+
    //@}
 };
 }
