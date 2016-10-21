@@ -135,6 +135,27 @@ namespace soplex
          else if( _solver.status() == SPxSolver::ABORT_TIME || _solver.status() == SPxSolver::ABORT_ITER
             || _solver.status() == SPxSolver::ABORT_VALUE )
          {
+            // at this point, the _idsSimplifyAndSolve does not store the realLP. It stores the _idsLP. As such, it is
+            // important to reinstall the _realLP to the _solver.
+            if( !_isRealLPLoaded )
+            {
+               _solver.loadLP(*_idsLP);
+               spx_free(_idsLP);
+               _idsLP = &_solver;
+               _isRealLPLoaded = true;
+            }
+
+            // returning the sense to minimise
+            if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
+            {
+               assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+
+               _solver.changeObj(-(_solver.maxObj()));
+               _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+            }
+
+            _preprocessAndSolveReal(false);
+
             // storing the solution from the reduced problem
             _storeSolutionReal();
 
@@ -205,7 +226,7 @@ namespace soplex
 
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      //spxout.setVerbosity( SPxOut::ERROR );
+      spxout.setVerbosity( SPxOut::ERROR );
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
@@ -371,6 +392,7 @@ namespace soplex
       // decomposition solve and resolve the original. Infeasibility should be dealt with in the original problem.
       if( !redProbError )
       {
+#ifndef NDEBUG
          // computing the solution for the original variables
          DVector reducedLPPrimalVector(_solver.nCols());
          _solver.getPrimal(reducedLPPrimalVector);
@@ -380,6 +402,7 @@ namespace soplex
 
          // resetting the verbosity level
          spxout.setVerbosity( orig_verbosity );
+#endif
 
          // This is an additional check to ensure that the complementary problem is solving correctly.
 #ifdef PERFORM_COMPPROB_CHECK
