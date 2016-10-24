@@ -47,28 +47,26 @@ class SolBase
    template < class S > friend class SolBase;
 
 public:
-   /// is a primal feasible solution available?
-   bool hasPrimal() const
+   /// is the stored solution primal feasible?
+   bool isPrimalFeasible() const
    {
-      return _hasPrimal;
+      return _isPrimalFeasible;
    }
 
-   /// gets the primal solution vector if available; returns true on success
+   /// gets the primal solution vector; returns true on success
    bool getPrimal(VectorBase<R>& vector) const
    {
-      if( _hasPrimal )
-         vector = _primal;
+      vector = _primal;
 
-      return _hasPrimal;
+      return _isPrimalFeasible;
    }
 
-   /// gets the vector of slack values if available; returns true on success
+   /// gets the vector of slack values; returns true on success
    bool getSlacks(VectorBase<R>& vector) const
    {
-      if( _hasPrimal )
-         vector = _slacks;
+      vector = _slacks;
 
-      return _hasPrimal;
+      return _isPrimalFeasible;
    }
 
    /// is a primal unbounded ray available?
@@ -87,27 +85,25 @@ public:
    }
 
    /// is a dual solution available?
-   bool hasDual() const
+   bool isDualFeasible() const
    {
-      return _hasDual;
+      return _isDualFeasible;
    }
 
-   /// gets the dual solution vector if available; returns true on success
+   /// gets the dual solution vector; returns true on success
    bool getDual(VectorBase<R>& vector) const
    {
-      if( _hasDual )
-         vector = _dual;
+      vector = _dual;
 
-      return _hasDual;
+      return _isDualFeasible;
    }
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCost(VectorBase<R>& vector) const
    {
-      if( _hasDual )
-         vector = _redCost;
+      vector = _redCost;
 
-      return _hasDual;
+      return _isDualFeasible;
    }
 
    /// is a dual farkas ray available?
@@ -130,7 +126,7 @@ public:
    {
       int size = 0;
 
-      if( _hasPrimal )
+      if( _isPrimalFeasible )
          size += totalSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
 
       if( _hasPrimalRay )
@@ -144,7 +140,7 @@ public:
    {
       int size = 0;
 
-      if( _hasDual )
+      if( _isDualFeasible )
          size += totalSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
 
       if( _hasDualFarkas )
@@ -158,7 +154,7 @@ public:
    {
       int size = 0;
 
-      if( _hasPrimal )
+      if( _isPrimalFeasible )
          size += dlcmSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
 
       if( _hasPrimalRay )
@@ -172,7 +168,7 @@ public:
    {
       int size = 0;
 
-      if( _hasDual )
+      if( _isDualFeasible )
          size += dlcmSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
 
       if( _hasDualFarkas )
@@ -186,7 +182,7 @@ public:
    {
       int size = 0;
 
-      if( _hasPrimal )
+      if( _isPrimalFeasible )
          size += dmaxSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
 
       if( _hasPrimalRay )
@@ -200,7 +196,7 @@ public:
    {
       int size = 0;
 
-      if( _hasDual )
+      if( _isDualFeasible )
          size += dmaxSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
 
       if( _hasDualFarkas )
@@ -212,9 +208,9 @@ public:
    /// invalidate solution
    void invalidate()
    {
-      _hasPrimal = false;
+      _isPrimalFeasible = false;
       _hasPrimalRay = false;
-      _hasDual = false;
+      _isDualFeasible = false;
       _hasDualFarkas = false;
    }
 
@@ -229,9 +225,9 @@ private:
    R _primalObjVal;
    R _dualObjVal;
 
-   unsigned int _hasPrimal:1;
+   unsigned int _isPrimalFeasible:1;
    unsigned int _hasPrimalRay:1;
-   unsigned int _hasDual:1;
+   unsigned int _isDualFeasible:1;
    unsigned int _hasDualFarkas:1;
 
    /// default constructor only for friends
@@ -248,25 +244,19 @@ private:
       if( this != &sol )
       {
 
-         _hasPrimal = sol._hasPrimal;
-         if( _hasPrimal )
-         {
-            _primal = sol._primal;
-            _slacks = sol._slacks;
-            _primalObjVal = sol._primalObjVal;
-         }
+         _isPrimalFeasible = sol._isPrimalFeasible;
+         _primal = sol._primal;
+         _slacks = sol._slacks;
+         _primalObjVal = sol._primalObjVal;
 
          _hasPrimalRay = sol._hasPrimalRay;
          if( _hasPrimalRay )
             _primalRay = sol._primalRay;
 
-         _hasDual = sol._hasDual;
-         if( _hasDual )
-         {
-            _dual = sol._dual;
-            _redCost = sol._redCost;
-            _dualObjVal = sol._dualObjVal;
-         }
+         _isDualFeasible = sol._isDualFeasible;
+         _dual = sol._dual;
+         _redCost = sol._redCost;
+         _dualObjVal = sol._dualObjVal;
 
          _hasDualFarkas = sol._hasDualFarkas;
          if( _hasDualFarkas )
@@ -283,25 +273,19 @@ private:
       if( (SolBase<S>*)this != &sol )
       {
 
-         _hasPrimal = sol._hasPrimal;
-         if( _hasPrimal )
-         {
-            _primal = sol._primal;
-            _slacks = sol._slacks;
-            _primalObjVal = R(sol._primalObjVal);
-         }
+         _isPrimalFeasible = sol._isPrimalFeasible;
+         _primal = sol._primal;
+         _slacks = sol._slacks;
+         _primalObjVal = R(sol._primalObjVal);
 
          _hasPrimalRay = sol._hasPrimalRay;
          if( _hasPrimalRay )
             _primalRay = sol._primalRay;
 
-         _hasDual = sol._hasDual;
-         if( _hasDual )
-         {
-            _dual = sol._dual;
-            _redCost = sol._redCost;
-            _dualObjVal = R(sol._dualObjVal);
-         }
+         _isDualFeasible = sol._isDualFeasible;
+         _dual = sol._dual;
+         _redCost = sol._redCost;
+         _dualObjVal = R(sol._dualObjVal);
 
          _hasDualFarkas = sol._hasDualFarkas;
          if( _hasDualFarkas )

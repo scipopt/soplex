@@ -560,6 +560,12 @@ public:
    /// optimize the given LP
    SPxSolver::Status optimize();
 
+   // old name for backwards compatibility
+   SPxSolver::Status solve()
+   {
+      return optimize();
+   }
+
    /// returns the current solver status
    SPxSolver::Status status() const;
 
@@ -1907,6 +1913,9 @@ private:
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void _resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus);
+
+   /// verify computed solution and resolve if necessary
+   void _verifySolutionReal();
 
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
    void _storeSolutionReal();

@@ -2756,7 +2756,7 @@ namespace soplex
    /// is a primal feasible solution available?
    bool SoPlex::hasPrimal() const
    {
-      return (_hasSolReal && _solReal.hasPrimal()) || (_hasSolRational && _solRational.hasPrimal());
+      return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
    }
 
 
@@ -2772,7 +2772,7 @@ namespace soplex
    /// is a dual feasible solution available?
    bool SoPlex::hasDual() const
    {
-      return (_hasSolReal && _solReal.hasDual()) || (_hasSolRational && _solRational.hasDual());
+      return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
    }
 
 
