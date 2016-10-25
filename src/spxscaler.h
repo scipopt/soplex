@@ -79,11 +79,12 @@ protected:
                                     const DataArray<int>& coScaleExp,
                                     DataArray<int>& scaleExp );
 #endif
-   /// applies m_colscale and m_rowscale to the \p lp.
-   virtual void applyScaling(SPxLPBase<Real>& lp);
    //@}
 
 public:
+
+   /// applies m_colscale and m_rowscale to the \p lp.
+   virtual void applyScaling(SPxLPBase<Real>& lp);
 
    friend std::ostream& operator<<(std::ostream& s, const SPxScaler& sc);
 

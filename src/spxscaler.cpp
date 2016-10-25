@@ -196,10 +196,7 @@ Real SPxScaler::computeScalingVecs(
 #endif
 void SPxScaler::applyScaling(SPxLP& lp)
 {
-
-   int i;
-
-   for(i = 0; i < lp.nRows(); ++i )
+   for( int i = 0; i < lp.nRows(); ++i )
    {
       SVector& vec = lp.rowVector_w(i);
 #ifdef BITSHIFTSCALING
@@ -232,7 +229,8 @@ void SPxScaler::applyScaling(SPxLP& lp)
          lp.lhs_w(i) *= m_rowscaleExp[i];
 #endif
    }
-   for(i = 0; i < lp.nCols(); ++i )
+
+   for( int i = 0; i < lp.nCols(); ++i )
    {
       SVector& vec = lp.colVector_w(i);
 #ifdef BITSHIFTSCALING

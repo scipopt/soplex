@@ -31,7 +31,7 @@ namespace soplex
       _statistics->solvingTime->start();
 
       // scale original problem; overwrites _realLP
-      if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled && _scaler )
+      if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled() && _scaler )
       {
          // apply scaling of realLP
          _scaler->applyScaling(*_realLP);

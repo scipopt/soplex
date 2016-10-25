@@ -38,20 +38,123 @@ void SPxLPBase<Real>::applyScaler(SPxScaler* scaler)
    assert( scaler != 0 );
    lp_scaler = scaler;
    lp_scaler->scale(*this);
-   isScaled = true;
+   _isScaled = true;
 }
 
 template<>
 void SPxLPBase<Real>::unscaleLP()
 {
-   if( isScaled )
+   if( isScaled() )
    {
       lp_scaler->unscale(*this);
-      isScaled = false;
+      _isScaled = false;
    }
 
    return;
 }
+
+template<>
+void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, VectorBase<Real>& activity, const bool unscaled) const
+{
+   if( primal.dim() != nCols() )
+   {
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+   }
+
+   if( activity.dim() != nRows() )
+   {
+      throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+   }
+
+   int c;
+
+   for( c = 0; c < nCols() && primal[c] == 0; c++ )
+      ;
+
+   if( c >= nCols() )
+   {
+      activity.clear();
+      return;
+   }
+
+   // todo: allocate svector of maximum column length
+   SVector tmp;
+
+   if( unscaled && _isScaled )
+   {
+      lp_scaler->getColUnscaled(*this, c, activity);
+   }
+   else
+      activity = colVector(c);
+
+   activity *= primal[c];
+   c++;
+
+   for( ; c < nCols(); c++ )
+   {
+      if( primal[c] != 0 )
+      {
+         if( unscaled && _isScaled )
+         {
+            lp_scaler->getColUnscaled(*this, c, tmp);
+            activity.multAdd(primal[c], tmp);
+         }
+         else
+            activity.multAdd(primal[c], colVector(c));
+      }
+   }
+}
+
+template<>
+void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBase<Real>& activity, const bool unscaled) const
+{
+   if( dual.dim() != nRows() )
+   {
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+   }
+
+   if( activity.dim() != nCols() )
+   {
+      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+   }
+
+   int r;
+
+   for( r = 0; r < nRows() && dual[r] == 0; r++ )
+      ;
+
+   if( r >= nRows() )
+   {
+      activity.clear();
+      return;
+   }
+
+   // todo: allocate svector of maximum column length
+   SVector tmp;
+
+   if( unscaled && _isScaled )
+      lp_scaler->getColUnscaled(*this, r, activity);
+   else
+      activity = rowVector(r);
+
+   activity *= dual[r];
+   r++;
+
+   for( ; r < nRows(); r++ )
+   {
+      if( dual[r] != 0 )
+      {
+         if( unscaled && _isScaled )
+         {
+            lp_scaler->getColUnscaled(*this, r, tmp);
+            activity.multAdd(dual[r], tmp);
+         }
+         else
+            activity.multAdd(dual[r], rowVector(r));
+      }
+   }
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format

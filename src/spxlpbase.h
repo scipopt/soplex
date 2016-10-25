@@ -1913,56 +1913,7 @@ public:
    /// Computes activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows
-   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity, const bool unscaled = true) const
-   {
-      if( primal.dim() != nCols() )
-      {
-         throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
-      }
-
-      if( activity.dim() != nRows() )
-      {
-         throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
-      }
-
-      int c;
-
-      for( c = 0; c < nCols() && primal[c] == 0; c++ )
-         ;
-
-      if( c >= nCols() )
-      {
-         activity.clear();
-         return;
-      }
-
-      // todo: allocate svector of maximum column length
-      SVector tmp;
-
-      if( unscaled && _isScaled )
-      {
-         lp_scaler->getColUnscaled(*this, c, activity);
-      }
-      else
-         activity = colVector(c);
-
-      activity *= primal[c];
-      c++;
-
-      for( ; c < nCols(); c++ )
-      {
-         if( primal[c] != 0 )
-         {
-            if( unscaled && _isScaled )
-            {
-               lp_scaler->getColUnscaled(*this, c, tmp);
-               activity.multAdd(primal[c], tmp);
-            }
-            else
-               activity.multAdd(primal[c], colVector(c));
-         }
-      }
-   }
+   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity, const bool unscaled = true) const;
 
    /// Updates activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
@@ -1985,54 +1936,7 @@ public:
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns
-   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity, const bool unscaled = true) const
-   {
-      if( dual.dim() != nRows() )
-      {
-         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
-      }
-
-      if( activity.dim() != nCols() )
-      {
-         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
-      }
-
-      int r;
-
-      for( r = 0; r < nRows() && dual[r] == 0; r++ )
-         ;
-
-      if( r >= nRows() )
-      {
-         activity.clear();
-         return;
-      }
-
-      // todo: allocate svector of maximum column length
-      SVector tmp;
-
-      if( unscaled && _isScaled )
-         lp_scaler->getColUnscaled(*this, r, activity);
-      else
-         activity = rowVector(r);
-
-      activity *= dual[r];
-      r++;
-
-      for( ; r < nRows(); r++ )
-      {
-         if( dual[r] != 0 )
-         {
-            if( unscaled && _isScaled )
-            {
-               lp_scaler->getColUnscaled(*this, r, tmp);
-               activity.multAdd(dual[r], tmp);
-            }
-            else
-               activity.multAdd(dual[r], rowVector(r));
-         }
-      }
-   }
+   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity, const bool unscaled = true) const;
 
    /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
@@ -2709,7 +2613,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
-      , _isScaled(old.isScaled)
+      , _isScaled(old._isScaled)
       , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
@@ -2744,7 +2648,7 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
-         _isScaled = old.isScaled;
+         _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
 
          assert(isConsistent());

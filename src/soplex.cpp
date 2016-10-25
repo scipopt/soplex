@@ -3036,7 +3036,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = primal[i] - upper(i);
+         viol = primal[i] - upper;
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -3070,8 +3070,8 @@ namespace soplex
 
       for( int i = numRowsReal() - 1; i >= 0; i-- )
       {
-         Real lhs = unscaled ? _realLP->lhsUnscaled(i) : lhs(i);
-         Real rhs = unscaled ? _realLP->rhsUnscaled(i) : rhs(i);
+         Real lhs = unscaled ? _realLP->lhsUnscaled(i) : lhsReal(i);
+         Real rhs = unscaled ? _realLP->rhsUnscaled(i) : rhsReal(i);
 
          Real viol = lhs - activity[i];
          if( viol > 0.0 )
@@ -4681,6 +4681,8 @@ namespace soplex
    {
       ///@todo implement return value
 
+      ///@todo implement for scaled LP
+#if 0
       if( unscale && boolParam(SoPlex::PERSISTENTSCALING) )
       {
          SPxLPReal* origLP;
@@ -4689,10 +4691,11 @@ namespace soplex
          origLP = new (origLP) SPxLPReal(_realLP);
          _scaler->unscale(origLP);
          origLP->writeFile(filename, rowNames, colNames, intVars);
-         origLP->~SPxLPReal();
+         origLP->~SdPxLPReal();
          spx_free(origLP);
       }
       else
+#endif
          _realLP->writeFile(filename, rowNames, colNames, intVars);
 
       return true;
