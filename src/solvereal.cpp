@@ -25,8 +25,17 @@ namespace soplex
    /// solves real LP
    void SoPlex::_solveReal()
    {
+      assert(_realLP != 0);
+
       // start timing
       _statistics->solvingTime->start();
+
+      // scale original problem; overwrites _realLP
+      if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled && _scaler )
+      {
+         // apply scaling of realLP
+         _scaler->applyScaling(*_realLP);
+      }
 
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
@@ -308,6 +317,8 @@ namespace soplex
                _scaler->unscaleSlacks(slacks);
                _scaler->unscaleDual(dual);
                _scaler->unscaleRedCost(redCost);
+
+               _solReal.setScalingInfo(false);
             }
 
             // get basis of transformed problem
