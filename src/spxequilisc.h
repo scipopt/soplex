@@ -14,7 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  spxequilisc.h
- * @brief LP euilibrium scaling.
+ * @brief LP equilibrium scaling.
  */
 #ifndef _SPXEQUILISC_H_
 #define _SPXEQUILISC_H_
