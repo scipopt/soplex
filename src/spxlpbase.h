@@ -110,7 +110,7 @@ private:
 
    SPxSense thesense;   ///< optimization sense.
    R offset;            ///< offset computed, e.g., in simplification step
-   bool isScaled;       ///< true, if scaling has been performed
+   bool _isScaled;       ///< true, if scaling has been performed
    SPxScaler* lp_scaler;///< points to the scaler if the lp has been scaled, to 0 otherwise
 
    //@}
@@ -139,9 +139,9 @@ public:
    //@{
 
    /// Returns true if and only if the LP is scaled
-   bool isLpScaled() const
+   bool isScaled() const
    {
-      return isScaled;
+      return _isScaled;
    }
 
    /// Returns number of rows in LP.
@@ -173,7 +173,7 @@ public:
 
       R mini = infinity;
 
-      if( isScaled )
+      if( _isScaled )
       {
          assert(lp_scaler != 0);
 
@@ -227,7 +227,7 @@ public:
 
       R maxi = R(0);
 
-      if( isScaled )
+      if( _isScaled )
       {
          assert(lp_scaler != 0);
 
@@ -267,7 +267,7 @@ public:
    /// Gets \p i 'th row.
    void getRowUnscaled(int i, LPRowBase<Real>& row) const
    {
-      if( isScaled )
+      if( _isScaled )
       {
          row.setLhs(lp_scaler->lhsUnscaled(*this, i));
          row.setRhs(lp_scaler->rhsUnscaled(*this, i));
@@ -292,7 +292,7 @@ public:
 
       set.clear();
 
-      if( isScaled )
+      if( _isScaled )
       {
          LPRowBase<R> lprow;
 
@@ -324,7 +324,7 @@ public:
    /// Gets unscaled row vector of row \p i.
    void getRowVectorUnscaled(int i, SVectorBase<Real>& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getRowUnscaled(*this, i, vec);
       else
          vec = SVectorBase<Real>(LPRowSetBase<Real>::rowVector(i));
@@ -365,7 +365,7 @@ public:
    /// Gets unscaled right hand side vector.
    void getRhsUnscaled(VectorBase<Real>& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getRhsUnscaled(*this, vec);
       else
          vec = LPRowSetBase<R>::rhs();
@@ -374,7 +374,7 @@ public:
    /// Returns unscaled right hand side of row number \p i.
    R rhsUnscaled(int i) const
    {
-      if( isScaled )
+      if( _isScaled )
          return lp_scaler->rhsUnscaled(*this, i);
       else
          return LPRowSetBase<R>::rhs(i);
@@ -451,7 +451,7 @@ public:
    /// Returns unscaled left hand side vector.
    void getLhsUnscaled(VectorBase<Real>& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getLhsUnscaled(*this, vec);
       else
          vec = LPRowSetBase<R>::lhs();
@@ -460,7 +460,7 @@ public:
    /// Returns unscaled left hand side of row number \p i.
    R lhsUnscaled(int i) const
    {
-      if( isScaled )
+      if( _isScaled )
          return lp_scaler->lhsUnscaled(*this,i);
       else
          return LPRowSetBase<R>::lhs(i);
@@ -497,7 +497,7 @@ public:
    void getColUnscaled(int i, LPColBase<R>& col) const
    {
 
-      if( isScaled && (is_same<R, Real>::value) )
+      if( _isScaled && (is_same<R, Real>::value) )
       {
          col.setUpper(lp_scaler->upperUnscaled(*this, i));
          col.setLower(lp_scaler->lowerUnscaled(*this, i));
@@ -521,7 +521,7 @@ public:
    void getCols(int start, int end, LPColSetBase<R>& set) const
    {
 
-      if( isScaled)
+      if( _isScaled)
       {
          LPColBase<R> lpcol;
 
@@ -555,7 +555,7 @@ public:
    /// Gets column vector of column \p i.
    void getColVectorUnscaled(int i, SVectorBase<Real>& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getColUnscaled(*this, i, vec);
       else
          vec = LPColSetBase<R>::colVector(i);
@@ -572,7 +572,7 @@ public:
    /// Returns column vector of column \p i.
    DSVectorBase<R> colVectorUnscaled(int i) const
    {
-      if( isScaled )
+      if( _isScaled )
          return lp_scaler->returnUnscaledColumnVector(*this, i);
       else
          return DSVectorBase<R>(LPColSetBase<R>::colVector(i));
@@ -590,7 +590,7 @@ public:
    void getObjUnscaled(VectorBase<Real>& pobj) const
    {
 
-      if( isScaled )
+      if( _isScaled )
       {
          lp_scaler->getMaxObjUnscaled(*this, pobj);
       }
@@ -617,7 +617,7 @@ public:
    {
       R res;
 
-      if( isScaled )
+      if( _isScaled )
       {
          res = lp_scaler->maxObjUnscaled(*this, i);
       }
@@ -662,7 +662,7 @@ public:
    /// Returns unscaled objective vector for maximization problem.
    void maxObjUnscaled(VectorBase<Real>& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getMaxObjUnscaled(*this, vec);
       else
          vec = LPColSetBase<R>::maxObj();
@@ -671,7 +671,7 @@ public:
    /// Returns unscaled objective value of column \p i for maximization problem.
    R maxObjUnscaled(int i) const
    {
-      if( isScaled )
+      if( _isScaled )
          return lp_scaler->maxObjUnscaled(*this, i);
       else
          return LPColSetBase<R>::maxObj(i);
@@ -704,7 +704,7 @@ public:
    /// Returns unscaled upper bound vector
    void upperUnscaled(DVector& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getUpperUnscaled(*this, vec);
       else
          vec = DVector(LPColSetBase<R>::upper());
@@ -713,7 +713,7 @@ public:
    /// Returns unscaled upper bound of column \p i.
    R upperUnscaled(int i) const
    {
-      if( isScaled )
+      if( _isScaled )
          return lp_scaler->upperUnscaled(*this, i);
       else
          return LPColSetBase<R>::upper(i);
@@ -746,7 +746,7 @@ public:
    /// Returns unscaled lower bound vector.
    void lowerUnscaled(Vector& vec) const
    {
-      if( isScaled )
+      if( _isScaled )
          lp_scaler->getLowerUnscaled(*this, vec);
       else
          vec = LPColSetBase<R>::lower();
@@ -755,7 +755,7 @@ public:
    /// Returns unscaled lower bound of column \p i.
    R lowerUnscaled(int i) const
    {
-      if( isScaled )
+      if( _isScaled )
          return lp_scaler->lowerUnscaled(*this, i);
       else
          return LPColSetBase<R>::lower(i);
@@ -1344,7 +1344,7 @@ public:
       LPColSetBase<R>::clear();
       thesense = MAXIMIZE;
       offset = 0;
-      isScaled = false;
+      _isScaled = false;
       lp_scaler = 0;
    }
 
@@ -1951,7 +1951,7 @@ public:
    /// Computes activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows
-   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity) const
+   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity, const bool unscaled = true) const
    {
       if( primal.dim() != nCols() )
       {
@@ -1973,7 +1973,7 @@ public:
          return;
       }
 
-      if( isScaled )
+      if( unscaled && _isScaled )
          activity = lp_scaler->returnUnscaledColumnVector(*this, c);
       else
          activity = colVector(c);
@@ -1984,7 +1984,7 @@ public:
       {
          if( primal[c] != 0 )
          {
-            if( isScaled )
+            if( unscaled && _isScaled )
                activity.multAdd(primal[c], lp_scaler->returnUnscaledColumnVector(*this, c));
             else
                activity.multAdd(primal[c], colVector(c));
@@ -2013,7 +2013,7 @@ public:
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns
-   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity) const
+   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity, const bool unscaled = true) const
    {
       if( dual.dim() != nRows() )
       {
@@ -2035,7 +2035,7 @@ public:
          return;
       }
 
-      if( isScaled )
+      if( unscaled && _isScaled )
          activity = lp_scaler->returnUnscaledRowVector(*this, r);
       else
          activity = rowVector(r);
@@ -2046,7 +2046,7 @@ public:
       {
          if( dual[r] != 0 )
          {
-            if( isScaled )
+            if( unscaled && _isScaled )
                activity.multAdd(dual[r], lp_scaler->returnUnscaledRowVector(*this, r));
             else
                activity.multAdd(dual[r], rowVector(r));
@@ -2715,7 +2715,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
       , offset(old.offset)
-      , isScaled(old.isScaled)
+      , _isScaled(old._isScaled)
       , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
@@ -2729,7 +2729,7 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
-      , isScaled(old.isScaled)
+      , _isScaled(old.isScaled)
       , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
@@ -2745,7 +2745,7 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = old.thesense;
          offset = old.offset;
-         isScaled = old.isScaled;
+         _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
 
          assert(isConsistent());
@@ -2764,7 +2764,7 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
-         isScaled = old.isScaled;
+         _isScaled = old.isScaled;
          lp_scaler = old.lp_scaler;
 
          assert(isConsistent());

@@ -3018,12 +3018,17 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
+       // determine whether we want to compute the violation in the (un)scaled problem
+      bool unscaled = !_solReal.isScaled();
+
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numColsReal() - 1; i >= 0; i-- )
       {
-         Real viol = lowerReal(i) - primal[i];
+         Real lower = unscaled ? _realLP->lowerUnscaled(i) : lowerReal(i);
+         Real upper = unscaled ? _realLP->upperUnscaled(i) : upperReal(i);
+         Real viol = lower - primal[i];
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -3031,7 +3036,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = primal[i] - upperReal(i);
+         viol = primal[i] - upper(i);
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -3055,14 +3060,20 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
+      // determine whether we want to compute the violation in the (un)scaled problem
+      bool unscaled = !_solReal.isScaled();
+
       DVectorReal activity(numRowsReal());
-      _realLP->computePrimalActivity(primal, activity);
+      _realLP->computePrimalActivity(primal, activity, unscaled);
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numRowsReal() - 1; i >= 0; i-- )
       {
-         Real viol = lhsReal(i) - activity[i];
+         Real lhs = unscaled ? _realLP->lhsUnscaled(i) : lhs(i);
+         Real rhs = unscaled ? _realLP->rhsUnscaled(i) : rhs(i);
+
+         Real viol = lhs - activity[i];
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -3070,7 +3081,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = activity[i] - rhsReal(i);
+         viol = activity[i] - rhs;
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -4666,10 +4677,24 @@ namespace soplex
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
    {
       ///@todo implement return value
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
+
+      if( unscale && boolParam(SoPlex::PERSISTENTSCALING) )
+      {
+         SPxLPReal* origLP;
+         origLP = 0;
+         spx_alloc(origLP);
+         origLP = new (origLP) SPxLPReal(_realLP);
+         _scaler->unscale(origLP);
+         origLP->writeFile(filename, rowNames, colNames, intVars);
+         origLP->~SPxLPReal();
+         spx_free(origLP);
+      }
+      else
+         _realLP->writeFile(filename, rowNames, colNames, intVars);
+
       return true;
    }
 
