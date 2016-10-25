@@ -77,12 +77,13 @@ void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, Vect
       return;
    }
 
-   // todo: allocate svector of maximum column length
-   SVector tmp;
+   DSVector* tmp = NULL;
 
    if( unscaled && _isScaled )
    {
-      lp_scaler->getColUnscaled(*this, c, activity);
+      tmp = new DSVector(colVector(c).size());
+      lp_scaler->getColUnscaled(*this, c, *tmp);
+      activity = *tmp;
    }
    else
       activity = colVector(c);
@@ -96,12 +97,19 @@ void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, Vect
       {
          if( unscaled && _isScaled )
          {
-            lp_scaler->getColUnscaled(*this, c, tmp);
-            activity.multAdd(primal[c], tmp);
+            assert(tmp != NULL);
+            lp_scaler->getColUnscaled(*this, c, *tmp);
+            activity.multAdd(primal[c], *tmp);
          }
          else
             activity.multAdd(primal[c], colVector(c));
       }
+   }
+
+   if( unscaled && _isScaled )
+   {
+      tmp->~DSVectorBase();
+      spx_free(tmp);
    }
 }
 
@@ -129,11 +137,13 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
       return;
    }
 
-   // todo: allocate svector of maximum column length
-   SVector tmp;
+   DSVector* tmp = NULL;
 
    if( unscaled && _isScaled )
-      lp_scaler->getColUnscaled(*this, r, activity);
+   {
+      tmp = new DSVector(rowVector(r).size());
+      lp_scaler->getRowUnscaled(*this, r, *tmp);
+   }
    else
       activity = rowVector(r);
 
@@ -146,12 +156,19 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
       {
          if( unscaled && _isScaled )
          {
-            lp_scaler->getColUnscaled(*this, r, tmp);
-            activity.multAdd(dual[r], tmp);
+            assert(tmp != NULL);
+            lp_scaler->getRowUnscaled(*this, r, *tmp);
+            activity.multAdd(dual[r], *tmp);
          }
          else
             activity.multAdd(dual[r], rowVector(r));
       }
+   }
+
+   if( unscaled && _isScaled )
+   {
+      tmp->~DSVectorBase();
+      spx_free(tmp);
    }
 }
 
