@@ -56,21 +56,25 @@ protected:
    DataArray < Real > m_colscale;  ///< column scaling factors
    DataArray < Real > m_rowscale;  ///< row scaling factors
 #endif
-   DataArray < int >  m_colscaleExp;  ///< column scaling factors
-   DataArray < int >  m_rowscaleExp;  ///< row scaling factors
+   DataArray < int >  m_colscaleExp;  ///< inner (post-presolving) column scaling factors
+   DataArray < int >  m_rowscaleExp;  ///< inner (post-presolving) row scaling factors
    DataArray < int >  m_colscaleExpPersistent;  ///< persistent (or outer) column scaling factors
    DataArray < int >  m_rowscaleExpPersistent;  ///< persistent (or outer) row scaling factors
-   DataArray < int >* m_activeColScaleExp; ///< pointer to currently active column scaling factors
-   DataArray < int >* m_activeRowScaleExp; ///< pointer to currently active row scaling factors
+   DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
+   DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
-   bool               m_usePersistent; ///< whether to use persistent scaling factors
+   bool               m_usingPersistentFactors; ///<  are persistent scaling factors being used?
    SPxOut*            spxout;      ///< message handler
    //@}
 
    //-------------------------------------
    /**@name Protected helpers */
    //@{
+
+   /// set pointer to currently active scaling factors (persistent/outer or inner)
+   void setActiveScalingExp(bool persistent);
+
    /// setup scale array for the LP.
    virtual void setup(SPxLPBase<Real>& lp);
 #if 0
@@ -87,6 +91,9 @@ protected:
    //@}
 
 public:
+
+   /// are persistent scaling factors being used?
+   bool usingPersistentFactors();
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
@@ -132,9 +139,9 @@ public:
    /**@name Scaling */
    //@{
    /// scale SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp) = 0;
+   virtual void scale(SPxLPBase<Real>& lp, bool persistent = true) = 0;
    /// unscale SPxLP
-   virtual void unscale(SPxLPBase<Real>& lp);
+   virtual void unscale(SPxLPBase<Real>& lp, bool persistent = true);
    /// returns scaling factor for column \p i
    virtual int getColScaleExp(int i);
    /// returns scaling factor for row \p i

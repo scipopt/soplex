@@ -79,10 +79,12 @@ SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
 }
 
 
-void SPxEquiliSC::scale(SPxLP& lp)
+void SPxEquiliSC::scale(SPxLP& lp, bool persistent)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Equilibrium scaling LP" << std::endl; )
+
+   SPxScaler::setActiveScalingExp(persistent);
 
    setup(lp);
 
@@ -107,6 +109,8 @@ void SPxEquiliSC::scale(SPxLP& lp)
     */
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
+   DataArray < int > colscaleExp = *m_activeColscaleExp;
+   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
 
    bool colFirst = colratio < rowratio;
 
@@ -119,17 +123,17 @@ void SPxEquiliSC::scale(SPxLP& lp)
 
    if (colFirst)
    {
-      computeScalingExpVec(lp.colSet(), m_rowscaleExp, m_colscaleExp);
+      computeScalingExpVec(lp.colSet(), rowscaleExp, colscaleExp);
 
       if (m_doBoth)
-         computeScalingExpVec(lp.rowSet(), m_colscaleExp, m_rowscaleExp);
+         computeScalingExpVec(lp.rowSet(), colscaleExp, rowscaleExp);
    }
    else
    {
-      computeScalingExpVec(lp.rowSet(), m_colscaleExp, m_rowscaleExp);
+      computeScalingExpVec(lp.rowSet(), colscaleExp, rowscaleExp);
 
       if (m_doBoth)
-         computeScalingExpVec(lp.colSet(), m_rowscaleExp, m_colscaleExp);
+         computeScalingExpVec(lp.colSet(), rowscaleExp, colscaleExp);
    }
 
    /* scale */

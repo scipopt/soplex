@@ -100,10 +100,12 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
    return *this;
 }
 
-void SPxGeometSC::scale(SPxLPBase<Real>& lp)
+void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << std::endl; )
+
+   SPxScaler::setActiveScalingExp(persistent);
 
    Real pstart = 0.0;
    Real p0     = 0.0;
@@ -170,17 +172,20 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp)
    }
    else
    {
+      DataArray < int > colscaleExp = *m_activeColscaleExp;
+      DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+
       int i;
       for( i = 0; i < lp.nCols(); ++i )
       {
-          frexp(colscale[i], &(m_colscaleExp[i]));
-          m_colscaleExp[i] -= 1;
+          frexp(colscale[i], &(colscaleExp[i]));
+          colscaleExp[i] -= 1;
       }
 
       for( i = 0; i < lp.nRows(); ++i )
       {
-          frexp(rowscale[i], &(m_rowscaleExp[i]));
-          m_rowscaleExp[i] -= 1;
+          frexp(rowscale[i], &(rowscaleExp[i]));
+          rowscaleExp[i] -= 1;
       }
 
       applyScaling(lp);

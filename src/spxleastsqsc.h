@@ -71,7 +71,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLP& lp);
+   virtual void scale(SPxLP& lp, bool persistent = true);
 
 
 protected:

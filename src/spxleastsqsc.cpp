@@ -217,9 +217,11 @@ void SPxLeastSqSC::setIntParam(int param, const char* name)
    maxrounds = param;
 }
 
-void SPxLeastSqSC::scale(SPxLP& lp)
+void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 {
    MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << std::endl; )
+
+   SPxScaler::setActiveScalingExp(persistent);
 
    setup(lp);
 
@@ -368,12 +370,14 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
    SSVector rowscale = *rsccurr;
    SSVector colscale = *csccurr;
+   DataArray < int > colscaleExp = *m_activeColscaleExp;
+   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
 
    for( k = 0; k < nrows; ++k )
-      m_rowscaleExp[k] = int( rowscale[k] + ((rowscale[k] >= 0)? (+0.5) : (-0.5)) );
+      rowscaleExp[k] = int( rowscale[k] + ((rowscale[k] >= 0)? (+0.5) : (-0.5)) );
 
    for( k = 0; k < ncols; ++k )
-      m_colscaleExp[k] = int( colscale[k] + ((colscale[k] >= 0)? (+0.5) : (-0.5)) );
+      colscaleExp[k] = int( colscale[k] + ((colscale[k] >= 0)? (+0.5) : (-0.5)) );
 
    // scale
    applyScaling(lp);
