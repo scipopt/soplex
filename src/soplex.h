@@ -804,6 +804,11 @@ public:
    /// marked as integer; returns true on success
    bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
+   /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
+   /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
+   /// the variables contained in it are marked as integer; returns true on success
+   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
    bool readBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0);
@@ -2124,12 +2129,6 @@ private:
 
    /// evaluates the solution of the reduced problem for the IDS
    void _evaluateSolutionIDS(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
-
-   /// solves the complementary problem
-   void _solveIdsComplementaryProblem();
-
-   /// preforms ratio test to update the dual solutions
-   void _performIdsRatioTest();
 
    /// update the reduced problem with additional columns and rows
    void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,

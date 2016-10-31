@@ -4650,6 +4650,21 @@ namespace soplex
 
 
 
+   /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
+   /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
+   /// the variables contained in it are marked as integer; returns true on success
+   bool SoPlex::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   {
+      SPxLPReal dualLP;
+      _realLP->buildDualProblem(dualLP);
+      dualLP.setOutstream(spxout);
+
+      dualLP.writeFile(filename);
+      return true;
+   }
+
+
+
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
    bool SoPlex::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)

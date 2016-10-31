@@ -2158,7 +2158,17 @@ void SPxLPBase<Real>::writeMPS(
    // Output warning when writing a maximisation problem
    if( spxSense() == SPxLPBase<Real>::MAXIMIZE )
    {
-      MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
+      //MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
+     if( &spxout != NULL )
+     {
+        if( SPxOut::WARNING <= (*spxout).getVerbosity() )
+        {
+           const SPxOut::Verbosity  old_verbosity = (*spxout).getVerbosity();
+           (*spxout).setVerbosity( SPxOut::WARNING );
+           (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n";
+           (*spxout).setVerbosity( old_verbosity );
+        }
+     }
    }
 }
 
@@ -2175,8 +2185,8 @@ void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalR
    if( primalRowIds == 0 || primalColIds == 0 || dualRowIds == 0 || dualColIds == 0 )
    {
       DataArray < SPxRowId > primalrowids(2*nRows());
-      DataArray < SPxColId > primalcolids(2*nRows());
-      DataArray < SPxRowId > dualrowids(2*nRows());
+      DataArray < SPxColId > primalcolids(2*nCols());
+      DataArray < SPxRowId > dualrowids(2*nCols());
       DataArray < SPxColId > dualcolids(2*nRows());
       int numprimalrows = 0;
       int numprimalcols = 0;
