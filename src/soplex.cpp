@@ -4296,8 +4296,7 @@ namespace soplex
                for( int i = 0; i < size; i++ )
                {
                   scaleExp = _scaler->getColScaleExp(i);
-                  rhs.add(rhs.index(i), rhs.value(i) * spxLdexp(1.0, scaleExp));
-                  //rhs.setValue(i, rhs.value(i) * spxLdexp(1.0, scaleExp)); @todo
+                  rhs.value(i) *= spxLdexp(1.0, scaleExp);
                }
 
                _solver.basis().coSolve(y, rhs);
