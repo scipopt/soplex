@@ -56,10 +56,15 @@ protected:
    DataArray < Real > m_colscale;  ///< column scaling factors
    DataArray < Real > m_rowscale;  ///< row scaling factors
 #endif
-   DataArray < int >              m_colscaleExp;  ///< column scaling factors
-   DataArray < int >              m_rowscaleExp;  ///< row scaling factors
+   DataArray < int >  m_colscaleExp;  ///< column scaling factors
+   DataArray < int >  m_rowscaleExp;  ///< row scaling factors
+   DataArray < int >  m_colscaleExpPersistent;  ///< persistent (or outer) column scaling factors
+   DataArray < int >  m_rowscaleExpPersistent;  ///< persistent (or outer) row scaling factors
+   DataArray < int >* m_activeColScaleExp; ///< pointer to currently active column scaling factors
+   DataArray < int >* m_activeRowScaleExp; ///< pointer to currently active row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
+   bool               m_usePersistent; ///< whether to use persistent scaling factors
    SPxOut*            spxout;      ///< message handler
    //@}
 
