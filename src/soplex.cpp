@@ -4168,7 +4168,7 @@ namespace soplex
 
 
    /// computes column c of basis inverse; returns true on success
-   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds)
+   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
    {
       assert(c >= 0);
       assert(c < numRowsReal());
@@ -4190,7 +4190,29 @@ namespace soplex
          SSVectorReal x(numColsReal());
          try
          {
-            _solver.basis().solve(x, _solver.unitVector(c));
+            /* unscaling required? */
+            if( unscale && _solReal.isScaled() )
+            {
+               assert(_solver.basis().baseId(c).isSPxColId());
+
+               int scaleExp =_scaler->getRowScaleExp(c);
+
+               _solver.basis().solve(x, spxLdexp(1.0, scaleExp) * _solver.unitVector(c));
+
+               int size = x.size();
+               int colIdx;
+
+               for( int i = 0; i < size; i++ )
+               {
+                  colIdx = _solver.basis().baseId(x.index(i)).getIdx();
+                  scaleExp = _scaler->getColScaleExp(colIdx);
+                  x.setValue(i, x.value(i) * spxLdexp(1.0, scaleExp));
+               }
+            }
+            else
+            {
+               _solver.basis().solve(x, _solver.unitVector(c));
+            }
          }
          catch( const SPxException& E )
          {
@@ -4265,7 +4287,36 @@ namespace soplex
          // solve system "y B = rhs", where B is the row basis matrix
          try
          {
-            _solver.basis().coSolve(y, rhs);
+            /* unscaling required? */
+            if( unscale && _solReal.isScaled() )
+            {
+               int size = rhs.size();
+               int scaleExp;
+
+               for( int i = 0; i < size; i++ )
+               {
+                  scaleExp = _scaler->getColScaleExp(i);
+                  rhs.add(rhs.index(i), rhs.value(i) * spxLdexp(1.0, scaleExp));
+                  //rhs.setValue(i, rhs.value(i) * spxLdexp(1.0, scaleExp)); @todo
+               }
+
+               _solver.basis().coSolve(y, rhs);
+
+               int rowIdx;
+               size = y.size();
+
+               for( int i = 0; i < size; i++ )
+               {
+                  assert(_solver.basis().baseId(y.index(i)).isSPxRowId());
+                  rowIdx = _solver.basis().baseId(y.index(i)).getIdx();
+                  scaleExp = _scaler->getRowScaleExp(rowIdx);
+                  y.setValue(i, y.value(i) * spxLdexp(1.0, scaleExp));
+               }
+            }
+            else
+            {
+               _solver.basis().coSolve(y, rhs);
+            }
          }
          catch( const SPxException& E )
          {

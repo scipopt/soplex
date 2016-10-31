@@ -722,7 +722,7 @@ public:
    bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL);
 
    /// computes column c of basis inverse; returns true on success
-   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL);
+   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);

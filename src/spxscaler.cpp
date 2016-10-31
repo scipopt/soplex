@@ -320,13 +320,13 @@ void SPxScaler::unscale(SPxLPBase<Real>& lp)
 }
 
 /// returns scaling factor for column \p i
-Real SPxScaler::getColScaleExp(int i)
+int SPxScaler::getColScaleExp(int i)
 {
    return m_colscaleExp[i];
 }
 
 /// returns scaling factor for row \p i
-Real SPxScaler::getRowScaleExp(int i)
+int SPxScaler::getRowScaleExp(int i)
 {
    return m_rowscaleExp[i];
 }
