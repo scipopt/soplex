@@ -281,11 +281,11 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          }
          catch( ... )
          {
-            MSG_ERROR( std::cerr << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_INFO1( spxout, spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
             _status = SPxSolver::ERROR;
          }
       }
