@@ -359,7 +359,7 @@ SPxSolver::Status SPxSolver::solve()
                   // if the factorization was found out to be singular, we have to quit
                   if( SPxBasis::status() < SPxBasis::REGULAR )
                   {
-                     MSG_ERROR( std::cerr << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
                      stop = true;
                      break;
                   }
@@ -635,7 +635,7 @@ SPxSolver::Status SPxSolver::solve()
                   // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                   if (SPxBasis::status() < SPxBasis::REGULAR)
                   {
-                     MSG_ERROR( std::cerr << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
+                     MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << SPxBasis::status() << std::endl; )
                      stop = true;
                      break;
                   }
@@ -1202,7 +1202,7 @@ void SPxSolver::testVecs()
          if (theCoTest[i] < -leavetol() && isCoBasic(i))
          {
             /// @todo Error message "this shalt not be": shalt this be an assert (also below)?
-            MSG_ERROR( std::cerr << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
+            MSG_INFO1( (*spxout), (*spxout) << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i
                               << ", theCoTest[i]=" << theCoTest[i]
@@ -1214,7 +1214,7 @@ void SPxSolver::testVecs()
       {
          if (theTest[i] < -leavetol() && isBasic(i))
          {
-            MSG_ERROR( std::cerr << "ESOLVE99 testVecs: theTest: this shalt not be!"
+            MSG_INFO1( (*spxout), (*spxout) << "ESOLVE99 testVecs: theTest: this shalt not be!"
                               << std::endl
                               << "  i=" << i
                               << ", theTest[i]=" << theTest[i]
