@@ -142,7 +142,9 @@ void checkSolutionReal(SoPlex& soplex)
          MSG_INFO1( soplex.spxout,
             Real maxviol = boundviol > rowviol ? boundviol : rowviol;
             bool feasible = (maxviol <= soplex.realParam(SoPlex::FEASTOL));
-            soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << maxviol << ").\n"
+            soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
+                          << " in original problem (max. violation = " << std::scientific << maxviol
+                          << std::setprecision(8) << std::fixed << ").\n"
             );
       }
       else
@@ -166,7 +168,9 @@ void checkSolutionReal(SoPlex& soplex)
          MSG_INFO1( soplex.spxout,
             Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
             bool feasible = (maxviol <= soplex.realParam(SoPlex::OPTTOL));
-            soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << maxviol << ").\n"
+            soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
+                          << " in original problem (max. violation = " << std::scientific << maxviol
+                          << std::setprecision(8) << std::fixed << ").\n"
             );
       }
       else
@@ -669,6 +673,11 @@ int main(int argc, char* argv[])
       // solve the LP
       soplex->solve();
 
+      int printprec;
+      int printwidth;
+      printprec = (int) log10(1/Param::epsilon());
+      printwidth = printprec + 10;
+
       // print solution, check solution, and display statistics
       if( printPrimal )
       {
@@ -680,8 +689,8 @@ int main(int argc, char* argv[])
             {
                if ( isNotZero( primal[i] ) )
                   MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision(9)
+                                    << std::setw(printwidth)
+                                    << std::setprecision(printprec)
                                     << primal[i] << std::endl; )
             }
             MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
@@ -697,9 +706,9 @@ int main(int argc, char* argv[])
                if ( isNotZero( primal[i] ) )
                {
                   MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision(9)
-                                    << primal[i] << std::endl; )
+                             << std::setw(printwidth)
+                             << std::setprecision(printprec)
+                             << primal[i] << std::endl; )
                   ++nNonzeros;
                }
             }
@@ -718,16 +727,17 @@ int main(int argc, char* argv[])
          DVectorRational primal(soplex->numColsReal());
          if( soplex->getPrimalRational(primal) )
          {
+            int nNonzeros = 0;
             MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
                 for( int i = 0; i < soplex->numColsRational(); ++i )
                 {
                   if ( primal[i] != (Rational) 0 )
-                      MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
-                              << std::setw(17)
-                  << std::setprecision(9)
-                  << primal[i] << std::endl; )
+                  {
+                     MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t" << primal[i] << std::endl; )
+                     ++nNonzeros;
+                  }
                 }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero." << std::endl; )
+            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero. Solution has " << nNonzeros << " nonzero entries." << std::endl; )
          }
          else
             MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.\n")
@@ -744,9 +754,9 @@ int main(int argc, char* argv[])
             {
                if ( isNotZero( dual[i] ) )
                   MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision(9)
-                                    << dual[i] << std::endl; )
+                             << std::setw(printwidth)
+                             << std::setprecision(printprec)
+                             << dual[i] << std::endl; )
             }
             MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
                               << std::setprecision(1) << std::scientific << Param::epsilon()
@@ -759,9 +769,9 @@ int main(int argc, char* argv[])
             {
                if ( isNotZero( dual[i] ) )
                   MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t"
-                                    << std::setw(17)
-                                    << std::setprecision(9)
-                                    << dual[i] << std::endl; )
+                             << std::setw(printwidth)
+                             << std::setprecision(printprec)
+                             << dual[i] << std::endl; )
             }
             MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero (within "
                               << std::setprecision(1) << std::scientific << Param::epsilon()
