@@ -195,6 +195,9 @@ public:
    /// sets steepest edge norms and returns false if that's not possible
    bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
 
+   /// pass integrality information about the variables to the solver
+   void setIntegralityInformation(int ncols, int* intInfo);
+
    //@}
 
 
@@ -850,17 +853,14 @@ public:
       /// continue iterative refinement with exact basic solution if not optimal?
       RATFACJUMP = 7,
 
-      /// should feasibility be tested with relaxed bounds and sides?
-      FEASRELAX = 8,
-
       /// use bound flipping also for row representation?
-      ROWBOUNDFLIPS = 9,
+      ROWBOUNDFLIPS = 8,
 
       /// use persistent scaling?
-      PERSISTENTSCALING = 10,
+      PERSISTENTSCALING = 9,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 11
+      BOOLPARAM_COUNT = 10
    } BoolParam;
 
    /// integer parameters
@@ -1253,8 +1253,11 @@ public:
       /// accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
       LEASTSQ_ACRCY = 22,
 
+      /// objective offset
+      OBJ_OFFSET = 23,
+
       /// number of real parameters
-      REALPARAM_COUNT = 23
+      REALPARAM_COUNT = 24
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1267,7 +1270,90 @@ public:
 #endif
 
    /// class of parameter settings
-   class Settings;
+   class Settings
+   {
+   public:
+      static struct BoolParam {
+         /// constructor
+         BoolParam();
+         /// array of names for boolean parameters
+         std::string name[SoPlex::BOOLPARAM_COUNT];
+         /// array of descriptions for boolean parameters
+         std::string description[SoPlex::BOOLPARAM_COUNT];
+         /// array of default values for boolean parameters
+         bool defaultValue[SoPlex::BOOLPARAM_COUNT];
+      } boolParam;
+
+      static struct IntParam {
+         /// constructor
+         IntParam();
+          /// array of names for integer parameters
+         std::string name[SoPlex::INTPARAM_COUNT];
+         /// array of descriptions for integer parameters
+         std::string description[SoPlex::INTPARAM_COUNT];
+         /// array of default values for integer parameters
+         int defaultValue[SoPlex::INTPARAM_COUNT];
+         /// array of lower bounds for int parameter values
+         int lower[SoPlex::INTPARAM_COUNT];
+         /// array of upper bounds for int parameter values
+         int upper[SoPlex::INTPARAM_COUNT];
+      } intParam;
+
+      static struct RealParam {
+         /// constructor
+         RealParam();
+         /// array of names for real parameters
+         std::string name[SoPlex::REALPARAM_COUNT];
+         /// array of descriptions for real parameters
+         std::string description[SoPlex::REALPARAM_COUNT];
+         /// array of default values for real parameters
+         Real defaultValue[SoPlex::REALPARAM_COUNT];
+         /// array of lower bounds for real parameter values
+         Real lower[SoPlex::REALPARAM_COUNT];
+         /// array of upper bounds for real parameter values
+         Real upper[SoPlex::REALPARAM_COUNT];
+      } realParam;
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      static struct RationalParam {
+         /// constructor
+         RationalParam();
+         /// array of names for rational parameters
+         std::string name[SoPlex::RATIONALPARAM_COUNT];
+         /// array of descriptions for rational parameters
+         std::string description[SoPlex::RATIONALPARAM_COUNT];
+         /// array of default values for rational parameters
+         Rational defaultValue[SoPlex::RATIONALPARAM_COUNT];
+         /// array of lower bounds for rational parameter values
+         Rational lower[SoPlex::RATIONALPARAM_COUNT];
+         /// array of upper bounds for rational parameter values
+         Rational upper[SoPlex::RATIONALPARAM_COUNT];
+      } rationalParam;
+#endif
+
+      /// array of current boolean parameter values
+      bool _boolParamValues[SoPlex::BOOLPARAM_COUNT];
+
+      /// array of current integer parameter values
+      int _intParamValues[SoPlex::INTPARAM_COUNT];
+
+      /// array of current real parameter values
+      Real _realParamValues[SoPlex::REALPARAM_COUNT];
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+      /// array of current rational parameter values
+      Rational _rationalParamValues[SoPlex::RATIONALPARAM_COUNT];
+#endif
+
+      /// default constructor initializing default settings
+      Settings();
+
+      /// copy constructor
+      Settings(const Settings& settings);
+
+      /// assignment operator
+      Settings& operator=(const Settings& settings);
+   };
 
    mutable SPxOut spxout;
 
@@ -1289,21 +1375,24 @@ public:
    const Settings& settings() const;
 
    /// sets boolean parameter value; returns true on success
-   bool setBoolParam(const BoolParam param, const bool value, const bool quiet = false, const bool init = false);
+   bool setBoolParam(const BoolParam param, const bool value, const bool init = true);
 
    /// sets integer parameter value; returns true on success
-   bool setIntParam(const IntParam param, const int value, const bool quiet = false, const bool init = false);
+   bool setIntParam(const IntParam param, const int value, const bool init = true);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const Real value, const bool quiet = false, const bool init = false);
+   bool setRealParam(const RealParam param, const Real value, const bool init = true);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
-   bool setRationalParam(const RationalParam param, const Rational value, const bool quiet = false, const bool init = false);
+   bool setRationalParam(const RationalParam param, const Rational value, const bool init = true);
 #endif
 
    /// sets parameter settings; returns true on success
-   bool setSettings(const Settings& newSettings, const bool quiet = false, const bool init = false);
+   bool setSettings(const Settings& newSettings, const bool init = true);
+
+   /// resets default parameter settings
+   void resetSettings(const bool quiet = false, const bool init = true);
 
    /// print non-default parameter values
    void printUserSettings();

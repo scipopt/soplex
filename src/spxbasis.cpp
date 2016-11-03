@@ -182,7 +182,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
 /*
     Loading a #Desc# into the basis can be done more efficiently, by
     explicitely programming both cases, for the rowwise and for the columnwise
-    representation. This implementation hides this distingtion in the use of
+    representation. This implementation hides this distinction in the use of
     methods #isBasic()# and #vector()#.
  */
 void SPxBasis::loadDesc(const Desc& ds)
@@ -195,6 +195,7 @@ void SPxBasis::loadDesc(const Desc& ds)
    SPxId none;
    int   i;
    int   j;
+   bool consistent = true;
 
    MSG_INFO3( (*spxout), (*spxout) << "IBASIS02 loading of Basis invalidates factorization" << std::endl; )
 
@@ -233,7 +234,14 @@ void SPxBasis::loadDesc(const Desc& ds)
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
          assert(theLP->dim() == matrix.size());
-         assert(j < matrix.size());
+         assert(j <= matrix.size());
+
+         if( j == matrix.size() )
+         {
+            // too many basic variables
+            consistent = false;
+            break;
+         }
 
          SPxRowId id = theLP->SPxLP::rId(i);
          theBaseId[j] = id;
@@ -262,7 +270,14 @@ void SPxBasis::loadDesc(const Desc& ds)
       if (theLP->isBasic(thedesc.colStatus(i)))
       {
          assert(theLP->dim() == matrix.size());
-         assert(j < matrix.size());
+         assert(j <= matrix.size());
+
+         if( j == matrix.size() )
+         {
+            // too many basic variables
+            consistent = false;
+            break;
+         }
 
          SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
@@ -271,8 +286,11 @@ void SPxBasis::loadDesc(const Desc& ds)
       }
    }
 
+   if( j < matrix.size() )
+      consistent = false;  // not enough basic variables
+
    /* if dimensions are inconsistent, restore slack basis */
-   if( j != matrix.size() )
+   if( !consistent )
       restoreInitialBasis();
 
    assert(isDescValid(thedesc));

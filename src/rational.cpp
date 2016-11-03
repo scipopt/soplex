@@ -81,16 +81,16 @@ const Rational Rational::NEGONE(-1, true);
 /// Private class has no member next() and prev()
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
-bool Rational::useListMem = false;
+thread_local bool Rational::useListMem = false;
 #else
-bool Rational::useListMem = true;
+thread_local bool Rational::useListMem = true;
 #endif
 
 
 
 
 /// list of unused Private objects
-IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+thread_local IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
 
 /// Defines the "Pimpl"-class Private

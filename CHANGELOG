@@ -17,6 +17,14 @@ interface & parameters:
 - set default representation switch to 1.2
 - setTerminationTime() in SPxSolver will convert a negative limit to 0 (was set to infinity before)
 - new interface methods to access rational factorization of basis matrix
+- allow parsing of "inf" bounds in MPS reader
+- new method to reset parameters to default values
+- new method to change the objective function offset
+- setParam() methods use default parameter 'init=true' to force updates in solver settings
+- print primal ray and dual farkas proof with '-x' and '-y'
+- submakefile for CrayXC systems added
+- converted many error messages to info messages that can be turned off using low verbosity
+- correct output of primal and dual solution values depending on set precision
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver
@@ -26,8 +34,13 @@ fixed bugs:
 - fix bug in left solve with rational LU factorization
 - shared library knows its dependencies (GMP, ZLIB)
 - when compiling with SHARED=true, the binary will link to libsoplex.so, resulting in a smaller file
+- fixed memory bug in class DSVectorBase when resizing zero length vectors
+- restore initial basis when given basis has too many basic variables
+- improve behaviour for LPs with zero constraints
 
 code quality:
+- SoPlex is thread-safe by using the storage class specifier thread-local for static variables
+- disabling verbosity when using PARASCIP is not necessary anymore
 
 
 29 February 2016 - Release 2.2.1

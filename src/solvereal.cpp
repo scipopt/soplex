@@ -34,7 +34,7 @@ namespace soplex
       if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled() && _scaler )
       {
          // apply scaling of realLP
-         _scaler->applyScaling(*_realLP);
+         _scaler->scale(*_realLP, true);
       }
 
       // remember that last solve was in floating-point
@@ -72,7 +72,7 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO1( spxout, spxout << " --- transforming basis into original space" << std::endl; )
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             _resolveWithoutPreprocessing(simplificationStatus);
             return;
          }
@@ -86,7 +86,7 @@ namespace soplex
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
 
             if( _scaler != 0 )
             {
@@ -111,7 +111,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
 
             if( _scaler != 0 )
             {
@@ -134,7 +134,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
-            _solver.changeObjOffset(0.0);
+            _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
 
             if( _scaler != 0 )
             {
@@ -186,7 +186,7 @@ namespace soplex
    /// solves real LP with/without preprocessing
    void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
    {
-      _solver.changeObjOffset(0.0);
+      _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
 
       if( applyPreprocessing )
@@ -253,7 +253,7 @@ namespace soplex
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
          bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
-         _solver.changeObjOffset(_simplifier->getObjoffset());
+         _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
       }
 
       _statistics->preprocessingTime->stop();
@@ -263,7 +263,7 @@ namespace soplex
       {
          if( _scaler != 0 )
          {
-            _solver.applyScaler(_scaler);
+            _scaler->scale(_solver, false);
          }
 
          _solveRealLPAndRecordStatistics();
@@ -333,11 +333,11 @@ namespace soplex
          }
          catch( const SPxException& E )
          {
-            MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          }
          catch( ... )
          {
-            MSG_ERROR( std::cerr << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
+            MSG_INFO1( spxout, spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
             _status = SPxSolver::ERROR;
          }
       }

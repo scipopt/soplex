@@ -60,8 +60,11 @@ SPxScaler::SPxScaler(
    bool        doBoth,
    SPxOut*     outstream)
    : m_name(name)
+   , m_activeColscaleExp(0)
+   , m_activeRowscaleExp(0)
    , m_colFirst(colFirst)
    , m_doBoth(doBoth)
+   , m_usingPersistentFactors(false)
    , spxout(outstream)
 {
    assert(SPxScaler::isConsistent());
@@ -113,13 +116,13 @@ void SPxScaler::setActiveScalingExp(bool persistent)
 {
    if( persistent )
    {
-      *m_activeColscaleExp = m_colscaleExpPersistent;
-      *m_activeRowscaleExp = m_rowscaleExpPersistent;
+      m_activeColscaleExp = &m_colscaleExpPersistent;
+      m_activeRowscaleExp = &m_rowscaleExpPersistent;
    }
    else
    {
-      *m_activeColscaleExp = m_colscaleExp;
-      *m_activeRowscaleExp = m_rowscaleExp;
+      m_activeColscaleExp = &m_colscaleExp;
+      m_activeRowscaleExp = &m_rowscaleExp;
    }
    m_usingPersistentFactors = persistent;
 }
@@ -155,22 +158,20 @@ void SPxScaler::setIntParam(int param, const char* name)
 
 void SPxScaler::setup(SPxLP& lp)
 {
-
+   assert(m_activeColscaleExp);
+   assert(m_activeRowscaleExp);
    assert(lp.isConsistent());
 
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
-
-   colscaleExp.reSize(lp.nCols());
-   rowscaleExp.reSize(lp.nRows());
+   m_activeColscaleExp->reSize(lp.nCols());
+   m_activeRowscaleExp->reSize(lp.nRows());
 
    int i;
 
    for(i = 0; i < lp.nCols(); ++i )
-      colscaleExp[i] = 0.0;
+      (*m_activeColscaleExp)[i] = 0.0;
 
    for(i = 0; i < lp.nRows(); ++i )
-      rowscaleExp[i] = 0.0;
+      (*m_activeRowscaleExp)[i] = 0.0;
 }
 
 #if 0
@@ -768,7 +769,7 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 bool SPxScaler::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   return (*m_activeColscaleExp).isConsistent() && ()*m_activeRowscaleExp).isConsistent();
+   return m_activeColscaleExp->isConsistent() && m_activeRowscaleExp)->isConsistent();
 #else
    return true;
 #endif

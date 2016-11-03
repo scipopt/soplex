@@ -379,6 +379,12 @@ void SPxSolver::init()
       theratiotester->setDelta(leavetol());
    }
 
+   // catch pathological case for LPs with zero constraints
+   if( dim() == 0 )
+   {
+      factorized = true;
+   }
+
    // we better factorize explicitly before solving
    if( !factorized )
    {
@@ -583,7 +589,7 @@ void SPxSolver::factorize()
             multBaseWith(ftmp);
             ftmp -= fRhs();
             if (ftmp.length() > DEFAULT_BND_VIOL)
-               MSG_ERROR( std::cerr << "ESOLVE29 " << iteration() << ": fVec error = "
+               MSG_INFO1( (*spxout), (*spxout) << "ESOLVE29 " << iteration() << ": fVec error = "
                                  << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
          if (ctmp.length() > DEFAULT_BND_VIOL)
@@ -593,7 +599,7 @@ void SPxSolver::factorize()
             multWithBase(ctmp);
             ctmp -= coPrhs();
             if (ctmp.length() > DEFAULT_BND_VIOL)
-               MSG_ERROR( std::cerr << "ESOLVE30 " << iteration() << ": coPvec error = "
+               MSG_INFO1( (*spxout), (*spxout) << "ESOLVE30 " << iteration() << ": coPvec error = "
                                  << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
          if (ptmp.length() > DEFAULT_BND_VIOL)
@@ -1010,6 +1016,7 @@ SPxSolver::SPxSolver(
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
+   , integerVariables(0)
 {
    theTime = TimerFactory::createTimer(timerType);
 
@@ -1118,6 +1125,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
+      integerVariables = base.integerVariables;
 
       if (base.theRep == COLUMN)
       {
@@ -1284,6 +1292,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , leaveCount(base.leaveCount)
    , enterCount(base.enterCount)
    , primalCount(base.primalCount)
+   , polishCount(base.polishCount)
    , boundflips(base.boundflips)
    , totalboundflips(base.totalboundflips)
    , infeasibilities(base.infeasibilities)
@@ -1299,6 +1308,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
    , spxout(base.spxout)
+   , integerVariables(base.integerVariables)
 {
    theTime = TimerFactory::createTimer(timerType);
 
@@ -1839,6 +1849,18 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
    assert(thepricer != NULL);
    return thepricer->setDualNorms(nnormsRow, nnormsCol, norms);
 }
+
+void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
+{
+   assert(ncols == nCols() || (ncols == 0 && intInfo == NULL));
+
+   integerVariables.reSize(ncols);
+   for( int i = 0; i < ncols; ++i )
+   {
+      integerVariables[i] = intInfo[i];
+   }
+}
+
 
 
 //

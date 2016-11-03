@@ -3553,7 +3553,7 @@ namespace soplex
       }
       else if( _rationalLUSolver.status() != SLinSolverRational::OK )
       {
-         MSG_ERROR( std::cerr << "Error performing rational LU factorization.\n" );
+         MSG_INFO1( spxout, spxout << "Error performing rational LU factorization.\n" );
       }
 
       return;
@@ -3631,14 +3631,14 @@ namespace soplex
          }
          else if( basisStatusRows[i] == SPxSolver::UNDEFINED )
          {
-            MSG_ERROR( std::cerr << "Undefined basis status of row in rational factorization.\n" );
+            MSG_INFO1( spxout, spxout << "Undefined basis status of row in rational factorization.\n" );
             error = true;
             goto TERMINATE;
          }
          else
          {
             assert(basisStatusRows[i] == SPxSolver::BASIC);
-            MSG_ERROR( std::cerr << "Too many basic rows in rational factorization.\n" );
+            MSG_INFO1( spxout, spxout << "Too many basic rows in rational factorization.\n" );
             error = true;
             goto TERMINATE;
          }
@@ -3667,14 +3667,14 @@ namespace soplex
          }
          else if( basisStatusCols[i] == SPxSolver::UNDEFINED )
          {
-            MSG_ERROR( std::cerr << "Undefined basis status of column in rational factorization.\n" );
+            MSG_INFO1( spxout, spxout << "Undefined basis status of column in rational factorization.\n" );
             error = true;
             goto TERMINATE;
          }
          else
          {
             assert(basisStatusCols[i] == SPxSolver::BASIC);
-            MSG_ERROR( std::cerr << "Too many basic columns in rational factorization.\n" );
+            MSG_INFO1( spxout, spxout << "Too many basic columns in rational factorization.\n" );
             error = true;
             goto TERMINATE;
          }
@@ -3682,7 +3682,7 @@ namespace soplex
 
       if( j != matrixdim )
       {
-         MSG_ERROR( std::cerr << "Too few basic entries in rational factorization.\n" );
+         MSG_INFO1( spxout, spxout << "Too few basic entries in rational factorization.\n" );
          error = true;
          goto TERMINATE;
       }
@@ -3932,7 +3932,7 @@ namespace soplex
             else
             {
                assert(basisStatusCols[i] == SPxSolver::UNDEFINED);
-               MSG_ERROR( std::cerr << "Undefined basis status of column in rational factorization.\n" );
+               MSG_INFO1( spxout, spxout << "Undefined basis status of column in rational factorization.\n" );
                error = true;
                goto TERMINATE;
             }

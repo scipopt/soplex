@@ -1560,12 +1560,15 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
          {
             if( mps.field4() == 0 )
                val = 0;
-            else
+            else if( !strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf") )
+               val = -infinity;
+            else if( !strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf") || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf") )
+               val = infinity;
+            else if( !val.readString(mps.field4()) )
             {
-               if( !val.readString(mps.field4()) )
-               {
-                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file\n" );
-               }
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file line " << mps.lineno() << ": " << mps.field4() << "\n" );
+               mps.syntaxError();
+               return;
             }
 
             // ILOG extension (Integer Bound)

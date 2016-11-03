@@ -825,9 +825,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            MSG_INFO3( (*spxout), (*spxout) << "ILBFRT02 "
-                              << "breakpoints passed / bounds flipped = " << boundflips
-                              << std::endl; )
+            MSG_DEBUG( std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
             totalboundflips += boundflips;
          }
          else if( solveVector2 != NULL )
@@ -852,9 +850,7 @@ bool SPxSolver::leave(int leaveIdx)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            MSG_INFO3( (*spxout), (*spxout) << "ILBFRT02 "
-                              << "breakpoints passed / bounds flipped = " << boundflips
-                              << std::endl; )
+            MSG_DEBUG( std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
             totalboundflips += boundflips;
          }
          else

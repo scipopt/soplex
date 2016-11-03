@@ -271,7 +271,8 @@ public:
       for( i = SVectorBase<R>::max()-1; i >= 0; i-- )
          theelem[i].~Nonzero<R>();
 
-      spx_free(theelem);
+      if( theelem != 0 )
+         spx_free(theelem);
 
       /* assign new memory */
       theelem = newmem;
