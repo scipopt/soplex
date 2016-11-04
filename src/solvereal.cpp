@@ -334,6 +334,8 @@ namespace soplex
       assert(_hasSolReal);
       assert(_solReal._isPrimalFeasible || _solReal._isDualFeasible);
 
+      MSG_INFO3( spxout, spxout << " --- verifying computed solution" << std::endl; )
+
       Real sumviol = 0;
       Real boundviol = 0;
       Real rowviol = 0;

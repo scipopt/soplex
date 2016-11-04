@@ -103,7 +103,7 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 {
 
-   MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << std::endl; )
+   MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
 
    SPxScaler::setActiveScalingExp(persistent);
 
@@ -124,7 +124,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 
    bool colFirst = colratio < rowratio;
 
-   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
+   MSG_INFO2( (*spxout), (*spxout) << "before scaling:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << colratio
@@ -132,7 +132,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                         << std::endl; )
 
    // We make at most maxIterations.
-   for(int count = 0; count < m_maxIterations; count++)
+   for( int count = 0; count < m_maxIterations; count++ )
    {
       if (colFirst)
       {
@@ -161,12 +161,12 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
       else // do not test at the first iteration, then abort if no improvement.
          if (p1 > m_minImprovement * p0)
             break;
-   }      
+   }
 
    // we scale only if either:
    // - we had at the beginning a ratio worse than 1000/1
    // - we have at least a 15% improvement.
-   if (pstart < m_goodEnoughRatio || p1 > pstart * m_minImprovement)
+   if( pstart < m_goodEnoughRatio || p1 > pstart * m_minImprovement )
    {
       MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
    }
@@ -197,7 +197,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                            << " max= " << maxAbsColscale()
                            << std::endl; )
 
-      MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
+      MSG_INFO2( (*spxout), (*spxout) << "after scaling: "
                            << " min= " << lp.minAbsNzo()
                            << " max= " << lp.maxAbsNzo()
                            << " col-ratio= " << maxColRatio(lp) 
