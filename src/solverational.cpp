@@ -3102,7 +3102,7 @@ namespace soplex
          rationalLP = new (rationalLP) SPxLPRational(_solver);
       }
 
-      // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no 
+      // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no
       if( _simplifier != 0 || _scaler != 0 )
         _rationalLUSolver.clear();
 
@@ -3123,7 +3123,7 @@ namespace soplex
 
          // apply scaling after the simplification
          if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
-            _scaler->scale(_solver);
+            _solver.applyScaler(_scaler);
 
          // run the simplex method if problem has not been solved by the simplifier
          if( simplificationStatus == SPxSimplifier::OKAY )

@@ -86,6 +86,11 @@ namespace soplex
       name[SoPlex::ROWBOUNDFLIPS] = "rowboundflips";
       description[SoPlex::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
       defaultValue[SoPlex::ROWBOUNDFLIPS] = false;
+
+      // use persistent scaling?
+      name[SoPlex::PERSISTENTSCALING] = "persistentscaling";
+      description[SoPlex::PERSISTENTSCALING] = "should persistent scaling be used?";
+      defaultValue[SoPlex::PERSISTENTSCALING] = true;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -2911,12 +2916,17 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
+       // determine whether we want to compute the violation in the (un)scaled problem
+      bool unscaled = !_solReal.isScaled();
+
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numColsReal() - 1; i >= 0; i-- )
       {
-         Real viol = lowerReal(i) - primal[i];
+         Real lower = unscaled ? _realLP->lowerUnscaled(i) : lowerReal(i);
+         Real upper = unscaled ? _realLP->upperUnscaled(i) : upperReal(i);
+         Real viol = lower - primal[i];
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -2924,7 +2934,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = primal[i] - upperReal(i);
+         viol = primal[i] - upper;
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -2948,14 +2958,20 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
+      // determine whether we want to compute the violation in the (un)scaled problem
+      bool unscaled = !_solReal.isScaled();
+
       DVectorReal activity(numRowsReal());
-      _realLP->computePrimalActivity(primal, activity);
+      _realLP->computePrimalActivity(primal, activity, unscaled);
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numRowsReal() - 1; i >= 0; i-- )
       {
-         Real viol = lhsReal(i) - activity[i];
+         Real lhs = unscaled ? _realLP->lhsUnscaled(i) : lhsReal(i);
+         Real rhs = unscaled ? _realLP->rhsUnscaled(i) : rhsReal(i);
+
+         Real viol = lhs - activity[i];
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -2963,7 +2979,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = activity[i] - rhsReal(i);
+         viol = activity[i] - rhs;
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -4050,7 +4066,7 @@ namespace soplex
 
 
    /// computes column c of basis inverse; returns true on success
-   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds)
+   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
    {
       assert(c >= 0);
       assert(c < numRowsReal());
@@ -4072,7 +4088,29 @@ namespace soplex
          SSVectorReal x(numColsReal());
          try
          {
-            _solver.basis().solve(x, _solver.unitVector(c));
+            /* unscaling required? */
+            if( unscale && _solReal.isScaled() )
+            {
+               assert(_solver.basis().baseId(c).isSPxColId());
+
+               int scaleExp =_scaler->getRowScaleExp(c);
+
+               _solver.basis().solve(x, spxLdexp(1.0, scaleExp) * _solver.unitVector(c));
+
+               int size = x.size();
+               int colIdx;
+
+               for( int i = 0; i < size; i++ )
+               {
+                  colIdx = _solver.basis().baseId(x.index(i)).getIdx();
+                  scaleExp = _scaler->getColScaleExp(colIdx);
+                  x.setValue(i, x.value(i) * spxLdexp(1.0, scaleExp));
+               }
+            }
+            else
+            {
+               _solver.basis().solve(x, _solver.unitVector(c));
+            }
          }
          catch( const SPxException& E )
          {
@@ -4147,7 +4185,35 @@ namespace soplex
          // solve system "y B = rhs", where B is the row basis matrix
          try
          {
-            _solver.basis().coSolve(y, rhs);
+            /* unscaling required? */
+            if( unscale && _solReal.isScaled() )
+            {
+               int size = rhs.size();
+               int scaleExp;
+
+               for( int i = 0; i < size; i++ )
+               {
+                  scaleExp = _scaler->getColScaleExp(i);
+                  rhs.value(i) *= spxLdexp(1.0, scaleExp);
+               }
+
+               _solver.basis().coSolve(y, rhs);
+
+               int rowIdx;
+               size = y.size();
+
+               for( int i = 0; i < size; i++ )
+               {
+                  assert(_solver.basis().baseId(y.index(i)).isSPxRowId());
+                  rowIdx = _solver.basis().baseId(y.index(i)).getIdx();
+                  scaleExp = _scaler->getRowScaleExp(rowIdx);
+                  y.setValue(i, y.value(i) * spxLdexp(1.0, scaleExp));
+               }
+            }
+            else
+            {
+               _solver.basis().coSolve(y, rhs);
+            }
          }
          catch( const SPxException& E )
          {
@@ -4540,6 +4606,12 @@ namespace soplex
 
 
 
+   bool SoPlex::persistentScaling() const
+   {
+      return _persistentscaling;
+   }
+
+
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
    /// integer variables if desired; returns true on success
    bool SoPlex::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
@@ -4553,10 +4625,27 @@ namespace soplex
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
    {
       ///@todo implement return value
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
+
+      ///@todo implement for scaled LP
+#if 0
+      if( unscale && boolParam(SoPlex::PERSISTENTSCALING) )
+      {
+         SPxLPReal* origLP;
+         origLP = 0;
+         spx_alloc(origLP);
+         origLP = new (origLP) SPxLPReal(_realLP);
+         _scaler->unscale(origLP);
+         origLP->writeFile(filename, rowNames, colNames, intVars);
+         origLP->~SdPxLPReal();
+         spx_free(origLP);
+      }
+      else
+#endif
+         _realLP->writeFile(filename, rowNames, colNames, intVars);
+
       return true;
    }
 
@@ -4994,6 +5083,9 @@ namespace soplex
          break;
       case ROWBOUNDFLIPS:
          _ratiotesterBoundFlipping.useBoundFlipsRow(value);
+         break;
+      case PERSISTENTSCALING:
+         _persistentscaling = value;
          break;
       default:
          return false;

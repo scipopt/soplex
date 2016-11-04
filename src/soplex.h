@@ -731,7 +731,7 @@ public:
    bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL);
 
    /// computes column c of basis inverse; returns true on success
-   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL);
+   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
@@ -803,7 +803,7 @@ public:
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = false) const;
 
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
@@ -862,8 +862,11 @@ public:
       /// use bound flipping also for row representation?
       ROWBOUNDFLIPS = 8,
 
+      /// use persistent scaling?
+      PERSISTENTSCALING = 9,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 9
+      BOOLPARAM_COUNT = 10
    } BoolParam;
 
    /// integer parameters
@@ -1450,6 +1453,9 @@ public:
    /// returns the current random seed of the solver instance
    unsigned int randomSeed() const;
 
+   /// is persistent scaling being used?
+   bool persistentScaling() const;
+
    //@}
 
 private:
@@ -1597,6 +1603,12 @@ private:
 
    //@}
 
+   //**@name Miscellaneous */
+   //@{
+
+   bool _persistentscaling;
+
+   //@}
 
    //**@name Constant helper methods */
    //@{

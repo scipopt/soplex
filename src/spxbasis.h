@@ -62,11 +62,11 @@ class SPxSolver;
    where \f$c, l_c, u_c, x \in {\bf R}^n\f$, \f$l_r, u_r \in {\bf R}^m\f$ and
    \f$A \in {\bf R}^{m \times n}\f$. Solving this LP with the simplex algorithm
    requires the definition of a \em basis. Such can be defined as a set of
-   column vectors or a set of row vectors building a nonsingular matrix. We
+   column vectors or a set of row vectors building a non-singular matrix. We
    will refer to the first case as the \em columnwise \em representation and
    the latter case will be called the \em rowwise \em representation. In both
-   cases, a \em basis is a set of vectors forming a nonsigular matrix. The
-   dimension of the vectors is refered to as the basis' \em dimension,
+   cases, a \em basis is a set of vectors forming a non-singular matrix. The
+   dimension of the vectors is referred to as the basis' \em dimension,
    whereas the number of vectors belonging to the LP is called the basis'
    \em codimension.
    

@@ -25,10 +25,15 @@ namespace soplex
    /// solves real LP
    void SoPlex::_optimizeReal()
    {
+      assert(_realLP != 0);
       _solReal.invalidate();
 
       // start timing
       _statistics->solvingTime->start();
+
+      // scale original problem; overwrites _realLP
+      if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled() && _scaler )
+         _scaler->scale(*_realLP, true);
 
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
@@ -101,6 +106,19 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without presolving" << std::endl; )
+
+            if( _scaler != 0 )
+            {
+               _solver.unscaleLPandClearBasis();
+               _hasBasis = false;
+            }
+            _preprocessAndSolveReal(false);
+            return;
+         }
+         else if( _scaler != 0 )
+         {
+            _solver.unscaleLPandClearBasis();
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
             return;
          }
@@ -111,6 +129,19 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without presolving" << std::endl; )
+
+            if( _scaler != 0 )
+            {
+               _solver.unscaleLPandClearBasis();
+               _hasBasis = false;
+            }
+            _preprocessAndSolveReal(false);
+            return;
+         }
+         else if( _scaler != 0 )
+         {
+            _solver.unscaleLPandClearBasis();
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
             return;
          }
@@ -132,18 +163,18 @@ namespace soplex
 
 
    /// solves real LP with/without preprocessing
-   void SoPlex::_preprocessAndSolveReal(bool applyPreprocessing)
+   void SoPlex::_preprocessAndSolveReal(bool applySimplifier)
    {
       _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
 
-      if( applyPreprocessing )
+      if( applySimplifier )
          _enableSimplifierAndScaler();
       else
          _disableSimplifierAndScaler();
 
       // determine preprocessing state based on user settings
-      applyPreprocessing = (_simplifier != 0 || _scaler != 0);
+      applySimplifier = (_simplifier != 0);
 
       _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
          ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::OBJLIMIT_LOWER));
@@ -153,8 +184,8 @@ namespace soplex
          assert(_realLP == &_solver);
 
          // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
-         // if preprocessing is turned on
-         if( applyPreprocessing )
+         // if simplifier is turned on
+         if( applySimplifier)
          {
             _realLP = 0;
             spx_alloc(_realLP);
@@ -179,9 +210,9 @@ namespace soplex
          else
             _solver.loadLP(*_realLP, true);
 
-         // if there is no preprocessing, then the original and the transformed problem are identical and it is more
+         // if there is no simplifier, then the original and the transformed problem are identical and it is more
          // memory-efficient to keep only the problem in the solver
-         if( !applyPreprocessing )
+         if( !applySimplifier )
          {
             _realLP->~SPxLPReal();
             spx_free(_realLP);
@@ -190,9 +221,9 @@ namespace soplex
          }
       }
 
-      // assert that we have two problems if and only if we apply preprocessing
-      assert(_realLP == &_solver || applyPreprocessing);
-      assert(_realLP != &_solver || !applyPreprocessing);
+      // assert that we have two problems if and only if we apply the simplifier
+      assert(_realLP == &_solver || applySimplifier);
+      assert(_realLP != &_solver || !applySimplifier);
 
       // apply problem simplification
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
@@ -211,7 +242,9 @@ namespace soplex
       if( simplificationStatus == SPxSimplifier::OKAY )
       {
          if( _scaler != 0 )
-            _scaler->scale(_solver);
+         {
+            _scaler->scale(_solver, false);
+         }
 
          _solveRealLPAndRecordStatistics();
       }
@@ -224,7 +257,7 @@ namespace soplex
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void SoPlex::_resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus)
    {
-      assert(!_isRealLPLoaded);
+      assert(!_isRealLPLoaded || _scaler != 0);
       assert(_simplifier != 0 || _scaler != 0);
 
       // if simplifier is active and LP is solved in presolving or to optimality, then we unsimplify to get the basis
@@ -257,6 +290,8 @@ namespace soplex
             _scaler->unscaleSlacks(slacks);
             _scaler->unscaleDual(dual);
             _scaler->unscaleRedCost(redCost);
+
+               _solReal.setScalingInfo(false);
          }
 
          // get basis of transformed problem

@@ -905,7 +905,7 @@ void SPxBasis::factorize()
       factorized = true;
       minStab = factor->stability();
 
-      // This seems allways be about 1e-7 
+      // This seems always to be about 1e-7
       if (minStab > 1e-4)
          minStab *= 0.001;
       if (minStab > 1e-5)

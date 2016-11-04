@@ -212,6 +212,19 @@ public:
       _hasPrimalRay = false;
       _isDualFeasible = false;
       _hasDualFarkas = false;
+
+      _isScaled = false;
+   }
+
+   /// set whether solution refers to scaled problem
+   void setScalingInfo( const bool isScaled )
+   {
+      _isScaled = isScaled;
+   }
+
+   bool isScaled()
+   {
+      return _isScaled;
    }
 
 private:
@@ -229,6 +242,8 @@ private:
    unsigned int _hasPrimalRay:1;
    unsigned int _isDualFeasible:1;
    unsigned int _hasDualFarkas:1;
+
+   bool _isScaled;
 
    /// default constructor only for friends
    SolBase<R>()

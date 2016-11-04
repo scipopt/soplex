@@ -156,6 +156,11 @@ public:
       vec = p_vec;
    }
 
+   /// Sets constraint column vector.
+   void setColVector(const DSVectorBase<R>& p_vec)
+   {
+      vec = p_vec;
+   }
    //@}
 
    // ------------------------------------------------------------------------------------------------------------------

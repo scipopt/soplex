@@ -20,13 +20,62 @@
 
 #include "spxgeometsc.h"
 #include "spxout.h"
+#include "spxlpbase.h"
 
 namespace soplex
 {
 /**@param maxIters   arbitrary small number, we choose 8
    @param minImpr    Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value.
-   @param goodEnough if the max/min ratio is allready less then 1000/1 we do not scale.
+   @param goodEnough if the max/min ratio is already less then 1000/1 we do not scale.
 */ 
+
+static Real computeScalingVec(
+      const SVSet*           vecset,
+      const DataArray<Real>& coScaleval,
+      DataArray<Real>&       scaleval)
+   {
+
+      Real pmax = 0.0;
+
+      for( int i = 0; i < vecset->num(); ++i )
+      {
+         const SVector& vec = (*vecset)[i];
+
+         Real maxi = 0.0;
+         Real mini = infinity;
+
+         for( int j = 0; j < vec.size(); ++j )
+         {
+            Real x = spxAbs(vec.value(j) * coScaleval[vec.index(j)]);
+
+            if (!isZero(x))
+            {
+               if (x > maxi)
+                  maxi = x;
+               if (x < mini)
+                  mini = x;
+            }
+         }
+         // empty rows/cols are possible
+         if (mini == infinity || maxi == 0.0)
+         {
+            mini = 1.0;
+            maxi = 1.0;
+         }
+         assert(mini < infinity);
+         assert(maxi > 0.0);
+
+         scaleval[i] = 1.0 / spxSqrt(mini * maxi);
+
+         Real p = maxi / mini;
+
+         if (p > pmax)
+            pmax = p;
+      }
+      return pmax;
+   }
+
+
 SPxGeometSC::SPxGeometSC(int maxIters, Real minImpr, Real goodEnough)
    : SPxScaler("Geometric")
    , m_maxIterations(maxIters)
@@ -51,16 +100,12 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
    return *this;
 }
 
-Real SPxGeometSC::computeScale(Real mini, Real maxi) const
-{
-
-   return spxSqrt(mini * maxi);
-}
-
-void SPxGeometSC::scale(SPxLP& lp) 
+void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << std::endl; )
+
+   SPxScaler::setActiveScalingExp(persistent);
 
    Real pstart = 0.0;
    Real p0     = 0.0;
@@ -74,6 +119,9 @@ void SPxGeometSC::scale(SPxLP& lp)
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
 
+   DataArray < Real >  rowscale(lp.nRows(), lp.nRows(), 1.2);
+   DataArray < Real >  colscale(lp.nCols(), lp.nCols(), 1.2);
+
    bool colFirst = colratio < rowratio;
 
    MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
@@ -83,18 +131,18 @@ void SPxGeometSC::scale(SPxLP& lp)
                         << " row-ratio= " << rowratio
                         << std::endl; )
 
-   // We make at most m_maxIterations. 
+   // We make at most maxIterations.
    for(int count = 0; count < m_maxIterations; count++)
    {
       if (colFirst)
       {
-         p0 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
-         p1 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
+         p0 = computeScalingVec(lp.colSet(), rowscale, colscale);
+         p1 = computeScalingVec(lp.rowSet(), colscale, rowscale);
       }
       else
       {
-         p0 = computeScalingVecs(lp.rowSet(), m_colscale, m_rowscale);
-         p1 = computeScalingVecs(lp.colSet(), m_rowscale, m_colscale);
+         p0 = computeScalingVec(lp.rowSet(), colscale, rowscale);
+         p1 = computeScalingVec(lp.colSet(), rowscale, colscale);
       }
       MSG_INFO3( (*spxout), (*spxout) << "Geometric scaling round " << count
                            << " col-ratio= " << (colFirst ? p0 : p1)
@@ -102,11 +150,11 @@ void SPxGeometSC::scale(SPxLP& lp)
                            << std::endl; )
 
       // record start value, this is done with m_col/rowscale = 1.0, so it is the
-      // value frome the "original" (as passed to the scaler) LP.
+      // value from the "original" (as passed to the scaler) LP.
       if (count == 0)
       {
          pstart = p0;
-         // are we allready good enough ?
+         // are we already good enough ?
          if (pstart < m_goodEnoughRatio)
             break;
       }
@@ -114,19 +162,32 @@ void SPxGeometSC::scale(SPxLP& lp)
          if (p1 > m_minImprovement * p0)
             break;
    }      
-   
+
    // we scale only if either:
-   // - we had at the beginng a ratio worse then 1000/1
+   // - we had at the beginning a ratio worse than 1000/1
    // - we have at least a 15% improvement.
    if (pstart < m_goodEnoughRatio || p1 > pstart * m_minImprovement)
    {
-      // reset m_colscale/m_rowscale to 1.0
-      setup(lp);
-
       MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
    }
    else
    {
+      DataArray < int > colscaleExp = *m_activeColscaleExp;
+      DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+
+      int i;
+      for( i = 0; i < lp.nCols(); ++i )
+      {
+          frexp(colscale[i], &(colscaleExp[i]));
+          colscaleExp[i] -= 1;
+      }
+
+      for( i = 0; i < lp.nRows(); ++i )
+      {
+          frexp(rowscale[i], &(rowscaleExp[i]));
+          rowscaleExp[i] -= 1;
+      }
+
       applyScaling(lp);
 
       MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
