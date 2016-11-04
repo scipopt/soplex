@@ -17,11 +17,7 @@
  * @brief LP scaling base class.
  */
 
-#define BITSHIFTSCALING
-
-#ifdef BITSHIFTSCALING
 #include <cmath>
-#endif
 
 #include <iostream>
 #include <assert.h>
@@ -238,7 +234,6 @@ void SPxScaler::applyScaling(SPxLP& lp)
       SVector& vec = lp.rowVector_w(i);
       DataArray < int > colscaleExp = *m_activeColscaleExp;
       DataArray < int > rowscaleExp = *m_activeRowscaleExp;
-#ifdef BITSHIFTSCALING
       int exp1;
       //frexp(m_rowscaleExp[i], &exp2);
       int exp2 = rowscaleExp[i];
@@ -258,15 +253,6 @@ void SPxScaler::applyScaling(SPxLP& lp)
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
 
       }
-#else
-      for( int j = 0; j < vec.size(); ++j)
-         vec.value(j) *= m_colscaleExp[vec.index(j)] * m_rowscaleExp[i];
-
-      if (lp.rhs(i) < infinity)
-         lp.rhs_w(i) *= m_rowscaleExp[i];
-      if (lp.lhs(i) > -infinity)
-         lp.lhs_w(i) *= m_rowscaleExp[i];
-#endif
    }
 
    for( int i = 0; i < lp.nCols(); ++i )
@@ -274,7 +260,6 @@ void SPxScaler::applyScaling(SPxLP& lp)
       SVector& vec = lp.colVector_w(i);
       DataArray < int > colscaleExp = *m_activeColscaleExp;
       DataArray < int > rowscaleExp = *m_activeRowscaleExp;
-#ifdef BITSHIFTSCALING
       int exp1;
       int exp2 = colscaleExp[i];
 
@@ -294,17 +279,6 @@ void SPxScaler::applyScaling(SPxLP& lp)
       {
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
       }
-#else
-      for( int j = 0; j < vec.size(); ++j)
-         vec.value(j) *= m_rowscaleExp[vec.index(j)] * colscaleExp[i];
-
-      lp.maxObj_w(i) *= colscaleExp[i];
-
-      if (lp.upper(i) < infinity)
-         lp.upper_w(i) /= colscaleExp[i];
-      if (lp.lower(i) > -infinity)
-         lp.lower_w(i) /= colscaleExp[i];
-#endif
    }
    assert(lp.isConsistent());
 }
@@ -582,17 +556,12 @@ void SPxScaler::unscalePrimal(Vector& x) const
    DataArray < int > colscaleExp = *m_activeColscaleExp;
 
    assert(x.dim() == colscaleExp.size());
-#ifdef BITSHIFTSCALING
    int exp1;
    for( int j = 0; j < x.dim(); ++j )
    {
       exp1 = colscaleExp[j];
       x[j] = spxLdexp(x[j], exp1);
    }
-#else
-   for(int j = 0; j < x.dim(); ++j)
-      x[j] *= colscaleExp[j];
-#endif
 }
 
 void SPxScaler::unscaleSlacks(Vector& s) const
@@ -600,17 +569,12 @@ void SPxScaler::unscaleSlacks(Vector& s) const
    DataArray < int > rowscaleExp = *m_activeRowscaleExp;
 
    assert(s.dim() == rowscaleExp.size());
-#ifdef BITSHIFTSCALING
    int exp1;
    for( int i = 0; i < s.dim(); ++i )
    {
       exp1 = rowscaleExp[i];
       s[i] = spxLdexp(s[i], -exp1);
    }
-#else
-   for(int i = 0; i < s.dim(); ++i)
-      s[i] /= rowscaleExp[i];
-#endif
 }
 
 void SPxScaler::unscaleDual(Vector& pi) const
@@ -618,17 +582,12 @@ void SPxScaler::unscaleDual(Vector& pi) const
    DataArray < int > rowscaleExp = *m_activeRowscaleExp;
 
    assert(pi.dim() == rowscaleExp.size());
-#ifdef BITSHIFTSCALING
    int exp1;
    for( int i = 0; i < pi.dim(); ++i )
    {
       exp1 = rowscaleExp[i];
       pi[i] = spxLdexp(pi[i], exp1);
    }
-#else
-   for(int i = 0; i < pi.dim(); ++i)
-      pi[i] *= rowscaleExp[i];
-#endif
 }
 
 void SPxScaler::unscaleRedCost(Vector& r) const
@@ -636,17 +595,12 @@ void SPxScaler::unscaleRedCost(Vector& r) const
    DataArray < int > colscaleExp = *m_activeColscaleExp;
 
    assert(r.dim() == colscaleExp.size());
-#ifdef BITSHIFTSCALING
    int exp1;
    for( int j = 0; j < r.dim(); ++j )
    {
       exp1 = colscaleExp[j];
       r[j] = spxLdexp(r[j], -exp1);
    }
-#else
-   for(int j = 0; j < r.dim(); ++j)
-      r[j] /= colscaleExp[j];
-#endif
 }
 
 Real SPxScaler::minAbsColscale() const
