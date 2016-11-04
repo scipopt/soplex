@@ -6476,7 +6476,7 @@ namespace soplex
 
 
    /// returns the current random seed of the solver instance or the one stored in the settings
-   unsigned int SoPlex::randomSeed() const
+   unsigned long SoPlex::randomSeed() const
    {
       return _solver.random.getSeed();
    }
