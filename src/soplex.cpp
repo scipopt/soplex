@@ -6468,7 +6468,7 @@ namespace soplex
 
 
    /// set the random seed of the solver instance
-   void SoPlex::setRandomSeed(unsigned int seed)
+   void SoPlex::setRandomSeed(unsigned long seed)
    {
       _solver.random.setSeed(seed);
    }
@@ -6476,7 +6476,7 @@ namespace soplex
 
 
    /// returns the current random seed of the solver instance or the one stored in the settings
-   unsigned int SoPlex::randomSeed() const
+   unsigned long SoPlex::randomSeed() const
    {
       return _solver.random.getSeed();
    }
@@ -7853,9 +7853,9 @@ namespace soplex
       {
          if( strncmp(paramName, "random_seed", 11) == 0 )
          {
-            unsigned int value;
+            unsigned long value;
 
-            if( sscanf(paramValueString, "%u", &value) == 1 )
+            if( sscanf(paramValueString, "%lu", &value) == 1 )
             {
                setRandomSeed(value);
                return true;

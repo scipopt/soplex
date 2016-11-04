@@ -1438,11 +1438,11 @@ public:
    /// If quiet is set to true the function will only display which vectors are different.
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
 
-   /// set the random seed of the solver instance
-   void setRandomSeed(unsigned int seed);
+   /// set the random seeds of the solver instance
+   void setRandomSeed(unsigned long seed);
 
    /// returns the current random seed of the solver instance
-   unsigned int randomSeed() const;
+   unsigned long randomSeed() const;
 
    //@}
 
