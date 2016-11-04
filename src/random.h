@@ -119,13 +119,13 @@ public:
    /**@name Modification */
    //@{
    /// initialize all seeds of the random number generator.
-   void setSeed(unsigned int initshift)
+   void setSeed(unsigned long initshift)
    {
       seedshift = initshift;
-      lin_seed = (unsigned int)(DEFAULT_LIN + initshift);
-      xor_seed = (unsigned int)(DEFAULT_XOR + initshift);
-      mwc_seed = (unsigned int)(DEFAULT_MWC + initshift);
-      cst_seed = (unsigned int)(DEFAULT_CST + initshift);
+      lin_seed = (unsigned long)(DEFAULT_LIN + initshift);
+      xor_seed = (unsigned long)(DEFAULT_XOR + initshift);
+      mwc_seed = (unsigned long)(DEFAULT_MWC + initshift);
+      cst_seed = (unsigned long)(DEFAULT_CST + initshift);
    }
 
    //@}
@@ -139,7 +139,7 @@ public:
        variable's sequence.
    */
    explicit
-   Random(unsigned int randomseed = 0)
+   Random(unsigned long randomseed = 0)
    {
       setSeed(randomseed);
    }
