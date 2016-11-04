@@ -1439,7 +1439,7 @@ public:
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
 
    /// set the random seeds of the solver instance
-   void setRandomSeed(unsigned int seed);
+   void setRandomSeed(unsigned long seed);
 
    /// returns the current random seed of the solver instance
    unsigned long randomSeed() const;
