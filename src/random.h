@@ -87,7 +87,7 @@ private:
 
       /* Multiply-with-carry */
       t = 698769069ULL * mwc_seed + cst_seed;
-      cst_seed = t >> 32;
+      cst_seed = (unsigned long) (t >> 32);
       mwc_seed = (unsigned long) t;
 
       Real i = (Real) (((lin_seed + xor_seed + mwc_seed) / RDIVIDE) % RMULT);
