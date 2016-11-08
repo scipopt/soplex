@@ -175,30 +175,29 @@ public:
    /// Absolute smallest non-zero element in (possibly scaled) LP.
    R minAbsNzo() const
    {
-
       R mini = infinity;
 
-      for( int i = 0; i < nCols(); ++i )
-#if 0
       if( _isScaled )
       {
          assert(lp_scaler != 0);
 
          for( int i = 0; i < nCols(); ++i )
          {
-            R m = lp_scaler->returnUnscaledColumnVector(*this, i).minAbs();
+            R m = lp_scaler->getColMinAbsUnscaled(*this, i);
 
             if( m < mini )
                mini = m;
          }
       }
       else
-#endif
       {
-         R m = colVector(i).minAbs();
+         for( int i = 0; i < nCols(); ++i )
+         {
+            R m = colVector(i).minAbs();
 
-         if( m < mini )
-            mini = m;
+            if( m < mini )
+               mini = m;
+         }
       }
 
       assert(mini >= R(0));
@@ -209,30 +208,30 @@ public:
    /// Absolute biggest non-zero element in (possibly scaled) LP.
    R maxAbsNzo() const
    {
-
       R maxi = R(0);
 
-      for( int i = 0; i < nCols(); ++i )
-#if 0
+
       if( _isScaled )
       {
          assert(lp_scaler != 0);
 
          for( int i = 0; i < nCols(); ++i )
          {
-            R m = lp_scaler->returnUnscaledColumnVector(*this, i).maxAbs();
+            R m = lp_scaler->getColMaxAbsUnscaled(*this, i);
 
             if( m > maxi )
                maxi = m;
          }
       }
       else
-#endif
       {
-         R m = colVector(i).maxAbs();
+         for( int i = 0; i < nCols(); ++i )
+         {
+            R m = colVector(i).maxAbs();
 
-         if( m > maxi )
-            maxi = m;
+            if( m > maxi )
+               maxi = m;
+         }
       }
 
       assert(maxi >= R(0));

@@ -135,6 +135,8 @@ public:
    virtual void getColUnscaled(const SPxLPBase<Real>& lp, int i, DSVector& vec) const;
    /// returns maximum absolute value of unscaled column \p i
    virtual Real getColMaxAbsUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// returns minumum absolute value of unscaled column \p i
+   virtual Real getColMinAbsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled upper bound \p i
    virtual Real upperUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled upper bound vector of LP \lp
@@ -151,6 +153,8 @@ public:
    virtual void getRowUnscaled(const SPxLPBase<Real>& lp, int i, DSVector& vec) const;
    /// returns maximum absolute value of unscaled row \p i
    virtual Real getRowMaxAbsUnscaled(const SPxLPBase<Real>& lp, int i) const;
+   /// returns minimum absolute value of unscaled row \p i
+   virtual Real getRowMinAbsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled right hand side \p i
    virtual Real rhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// gets unscaled right hand side vector
