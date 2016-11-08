@@ -369,6 +369,10 @@ namespace soplex
       {
          assert(&_solver == _realLP);
          assert(_isRealLPLoaded);
+         MSG_INFO3( spxout, spxout << "bound violation: " << boundviol
+                                   << ", row violation: " << rowviol
+                                   << ", dual violation: " << dualviol
+                                   << ", redcost violation: " << redcostviol << std::endl; )
          MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again" << std::endl; )
          if( _isRealLPScaled )
          {
@@ -467,6 +471,7 @@ namespace soplex
       // unscale vectors
       if( _scaler && _solver.isScaled() )
       {
+         MSG_INFO1( spxout, spxout << " --- unscaling internal solution" << std::endl; )
          _scaler->unscalePrimal(_solver, _solReal._primal);
          _scaler->unscaleSlacks(_solver, _solReal._slacks);
          _scaler->unscaleDual(_solver, _solReal._dual);
@@ -606,6 +611,7 @@ namespace soplex
    /// unscales stored solution to remove persistent scaling
    void SoPlex::_unscaleSolutionReal()
    {
+      MSG_INFO1( spxout, spxout << " --- unscaling external solution" << std::endl; )
       assert(_scaler);
       assert(boolParam(SoPlex::PERSISTENTSCALING));
       assert(_isRealLPScaled);

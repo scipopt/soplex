@@ -58,13 +58,12 @@ void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, Vect
       return;
    }
 
-   DSVector* tmp = 0;
+   DSVector tmp(nRows());
 
    if( unscaled && _isScaled )
    {
-      tmp = new DSVector(colVector(c).size());
-      lp_scaler->getColUnscaled(*this, c, *tmp);
-      activity = *tmp;
+      lp_scaler->getColUnscaled(*this, c, tmp);
+      activity = tmp;
    }
    else
       activity = colVector(c);
@@ -78,10 +77,8 @@ void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, Vect
       {
          if( unscaled && _isScaled )
          {
-            assert(tmp != 0);
-            tmp->setMax(colVector(c).max());
-            lp_scaler->getColUnscaled(*this, c, *tmp);
-            activity.multAdd(primal[c], *tmp);
+            lp_scaler->getColUnscaled(*this, c, tmp);
+            activity.multAdd(primal[c], tmp);
          }
          else
             activity.multAdd(primal[c], colVector(c));
@@ -109,12 +106,12 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
       return;
    }
 
-   DSVector* tmp = 0;
+   DSVector tmp(nCols());
 
    if( unscaled && _isScaled )
    {
-      tmp = new DSVector(rowVector(r).size());
-      lp_scaler->getRowUnscaled(*this, r, *tmp);
+      lp_scaler->getRowUnscaled(*this, r, tmp);
+      activity = tmp;
    }
    else
       activity = rowVector(r);
@@ -128,10 +125,8 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
       {
          if( unscaled && _isScaled )
          {
-            assert(tmp);
-            tmp->setMax(rowVector(r).size());
-            lp_scaler->getRowUnscaled(*this, r, *tmp);
-            activity.multAdd(dual[r], *tmp);
+            lp_scaler->getRowUnscaled(*this, r, tmp);
+            activity.multAdd(dual[r], tmp);
          }
          else
             activity.multAdd(dual[r], rowVector(r));

@@ -4642,6 +4642,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
                            const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[])
 {
+   MSG_INFO1( (*spxout), (*spxout) << " --- unsimplifying solution" << std::endl; )
    assert(x.dim() <= m_prim.dim());
    assert(y.dim() <= m_dual.dim());
    assert(x.dim() == r.dim());
