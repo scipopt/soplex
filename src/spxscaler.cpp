@@ -339,10 +339,13 @@ void SPxScaler::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
    int exp1;
    int exp2 = colscaleExp[i];
 
-   for( int j = 0; j < vec.size(); j++ )
+   const SVectorReal& col = lp.colVector(i);
+   vec.setMax(col.size());
+
+   for( int j = 0; j < col.size(); j++ )
    {
-      exp1 = rowscaleExp[vec.index(j)];
-      vec.value(j) = spxLdexp(vec.value(j), -exp1 - exp2);
+      exp1 = rowscaleExp[col.index(j)];
+      vec.add(col.index(j), spxLdexp(col.value(j), -exp1 - exp2));
    }
 }
 
@@ -511,10 +514,13 @@ void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, DSVector& vec) const
    int exp1;
    int exp2 = rowscaleExp[i];
 
-   for( int j = 0; j < vec.size(); j++ )
+   const SVectorReal& row = lp.rowVector(i);
+   vec.setMax(row.size());
+
+   for( int j = 0; j < row.size(); j++ )
    {
-      exp1 = colscaleExp[vec.index(j)];
-      vec.value(j) = spxLdexp(vec.value(j), -exp1 - exp2);
+      exp1 = colscaleExp[row.index(j)];
+      vec.add(row.index(j), spxLdexp(row.value(j), -exp1 - exp2));
    }
 }
 

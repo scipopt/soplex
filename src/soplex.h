@@ -127,23 +127,32 @@ public:
    /// returns biggest non-zero element in absolute value
    Real maxAbsNonzeroReal() const;
 
-   /// gets row \p i
-   void getRowReal(int i, LPRowReal& lprow) const;
+   /// returns vector of row \p i, ignoring scaling
+   const SVectorReal& rowVectorRealInternal(int i) const;
 
-   /// gets rows \p start, ..., \p end.
-   void getRowsReal(int start, int end, LPRowSetReal& lprowset) const;
+   /// gets vector of row \p i
+   void getRowVectorReal(int i, DSVectorReal& row) const;
 
-   /// returns vector of row \p i
-   const SVectorReal& rowVectorReal(int i) const;
+   /// returns right-hand side vector, ignoring scaling
+   const VectorReal& rhsRealInternal() const;
 
-   /// returns right-hand side vector
-   const VectorReal& rhsReal() const;
+   /// gets right-hand side vector
+   void rhsRealInternal(DVectorReal& rhs) const;
+
+   /// returns right-hand side of row \p i, ignoring scaling
+   Real rhsRealInternal(int i) const;
 
    /// returns right-hand side of row \p i
    Real rhsReal(int i) const;
 
-   /// returns left-hand side vector
-   const VectorReal& lhsReal() const;
+   /// returns left-hand side vector, ignoring scaling
+   const VectorReal& lhsRealInternal() const;
+
+   /// gets left-hand side vector
+   void lhsRealInternal(DVectorReal& lhs) const;
+
+   /// returns left-hand side of row \p i, ignoring scaling
+   Real lhsRealInternal(int i) const;
 
    /// returns left-hand side of row \p i
    Real lhsReal(int i) const;
@@ -151,14 +160,11 @@ public:
    /// returns inequality type of row \p i
    LPRowReal::Type rowTypeReal(int i) const;
 
-   /// gets column \p i
-   void getColReal(int i, LPColReal& lpcol) const;
+   /// returns vector of col \p i, ignoring scaling
+   const SVectorReal& colVectorRealInternal(int i) const;
 
-   /// gets columns \p start, ..., \p end
-   void getColsReal(int start, int end, LPColSetReal& lpcolset) const;
-
-   /// returns vector of column \p i
-   const SVectorReal& colVectorReal(int i) const;
+   /// gets vector of col \p i
+   void getColVectorReal(int i, DSVectorReal& col) const;
 
    /// returns upper bound vector
    const VectorReal& upperReal() const;

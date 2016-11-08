@@ -200,6 +200,213 @@ Real SPxLPBase<Real>::minAbsNzo() const
    return mini;
 }
 
+/// Gets unscaled objective vector.
+template <>
+void SPxLPBase<Real>::getObjUnscaled(VectorBase<Real>& pobj) const
+{
+   if( _isScaled )
+   {
+      assert(lp_scaler);
+      lp_scaler->getMaxObjUnscaled(*this, pobj);
+   }
+   else
+   {
+      pobj = LPColSetBase<Real>::maxObj();
+   }
+
+   if( spxSense() == MINIMIZE )
+      pobj *= -1.0;
+}
+
+/// Gets unscaled row vector of row \p i.
+template<>
+void SPxLPBase<Real>::getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getRowUnscaled(*this, i, vec);
+   else
+      vec = DSVectorBase<Real>(LPRowSetBase<Real>::rowVector(i));
+}
+
+/// Gets unscaled right hand side vector.
+template<>
+void SPxLPBase<Real>::getRhsUnscaled(VectorBase<Real>& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getRhsUnscaled(*this, vec);
+   else
+      vec = LPRowSetBase<Real>::rhs();
+}
+
+/// Returns unscaled right hand side of row number \p i.
+template<>
+Real SPxLPBase<Real>::rhsUnscaled(int i) const
+{
+   if( _isScaled )
+      return lp_scaler->rhsUnscaled(*this, i);
+   else
+      return LPRowSetBase<Real>::rhs(i);
+}
+
+/// Returns unscaled right hand side of row with identifier \p id.
+template<>
+Real SPxLPBase<Real>::rhsUnscaled(const SPxRowId& id) const
+{
+   return rhsUnscaled(number(id));
+}
+
+/// Returns unscaled left hand side vector.
+template<>
+void SPxLPBase<Real>::getLhsUnscaled(VectorBase<Real>& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getLhsUnscaled(*this, vec);
+   else
+      vec = LPRowSetBase<Real>::lhs();
+}
+
+/// Returns unscaled left hand side of row number \p i.
+template<>
+Real SPxLPBase<Real>::lhsUnscaled(int i) const
+{
+   if( _isScaled )
+      return lp_scaler->lhsUnscaled(*this,i);
+   else
+      return LPRowSetBase<Real>::lhs(i);
+}
+
+/// Returns left hand side of row with identifier \p id.
+template<>
+Real SPxLPBase<Real>::lhsUnscaled(const SPxRowId& id) const
+{
+   return lhsUnscaled(number(id));
+}
+
+/// Gets column vector of column \p i.
+template<>
+void SPxLPBase<Real>::getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getColUnscaled(*this, i, vec);
+   else
+      vec = LPColSetBase<Real>::colVector(i);
+}
+
+/// Gets column vector of column with identifier \p id.
+template<>
+void SPxLPBase<Real>::getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const
+{
+   getColVectorUnscaled(number(id), vec);
+}
+
+/// Returns unscaled objective value of column \p i.
+template<>
+Real SPxLPBase<Real>::objUnscaled(int i) const
+{
+   Real res;
+
+   if( _isScaled )
+   {
+      res = lp_scaler->maxObjUnscaled(*this, i);
+   }
+   else
+   {
+      res = maxObj(i);
+   }
+
+   if( spxSense() == MINIMIZE )
+      res *= -1;
+   return res;
+}
+
+/// Returns unscaled objective value of column with identifier \p id.
+template<>
+Real SPxLPBase<Real>::objUnscaled(const SPxColId& id) const
+{
+   return objUnscaled(number(id));
+}
+
+/// Returns unscaled objective vector for maximization problem.
+template<>
+void SPxLPBase<Real>::maxObjUnscaled(VectorBase<Real>& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getMaxObjUnscaled(*this, vec);
+   else
+      vec = LPColSetBase<Real>::maxObj();
+}
+
+/// Returns unscaled objective value of column \p i for maximization problem.
+template<>
+Real SPxLPBase<Real>::maxObjUnscaled(int i) const
+{
+   if( _isScaled )
+      return lp_scaler->maxObjUnscaled(*this, i);
+   else
+      return LPColSetBase<Real>::maxObj(i);
+}
+
+/// Returns unscaled objective value of column with identifier \p id for maximization problem.
+template<>
+Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const
+{
+   return maxObjUnscaled(number(id));
+}
+
+/// Returns unscaled upper bound vector
+template<>
+void SPxLPBase<Real>::upperUnscaled(DVector& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getUpperUnscaled(*this, vec);
+   else
+      vec = DVector(LPColSetBase<Real>::upper());
+}
+
+/// Returns unscaled upper bound of column \p i.
+template<>
+Real SPxLPBase<Real>::upperUnscaled(int i) const
+{
+   if( _isScaled )
+      return lp_scaler->upperUnscaled(*this, i);
+   else
+      return LPColSetBase<Real>::upper(i);
+}
+
+/// Returns unscaled upper bound of column with identifier \p id.
+template<>
+Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const
+{
+   return upperUnscaled(number(id));
+}
+
+/// Returns unscaled lower bound vector.
+template<>
+void SPxLPBase<Real>::lowerUnscaled(Vector& vec) const
+{
+   if( _isScaled )
+      lp_scaler->getLowerUnscaled(*this, vec);
+   else
+      vec = LPColSetBase<Real>::lower();
+}
+
+/// Returns unscaled lower bound of column \p i.
+template<>
+Real SPxLPBase<Real>::lowerUnscaled(int i) const
+{
+   if( _isScaled )
+      return lp_scaler->lowerUnscaled(*this, i);
+   else
+      return LPColSetBase<Real>::lower(i);
+}
+
+/// Returns unscaled lower bound of column with identifier \p id.
+template<>
+Real SPxLPBase<Real>::lowerUnscaled(const SPxColId& id) const
+{
+   return lowerUnscaled(number(id));
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format
 // ---------------------------------------------------------------------------------------------------------------------

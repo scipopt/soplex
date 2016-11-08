@@ -755,26 +755,8 @@ namespace soplex
 
 
 
-   /// gets row \p i
-   void SoPlex::getRowReal(int i, LPRowReal& lprow) const
-   {
-      assert(_realLP != 0);
-      _realLP->getRow(i, lprow);
-   }
-
-
-
-   /// gets rows \p start, ..., \p end.
-   void SoPlex::getRowsReal(int start, int end, LPRowSetReal& lprowset) const
-   {
-      assert(_realLP != 0);
-      _realLP->getRows(start, end, lprowset);
-   }
-
-
-
-   /// returns vector of row \p i
-   const SVectorReal& SoPlex::rowVectorReal(int i) const
+   /// returns vector of row \p i, ignoring scaling
+   const SVectorReal& SoPlex::rowVectorRealInternal(int i) const
    {
       assert(_realLP != 0);
       return _realLP->rowVector(i);
@@ -782,11 +764,54 @@ namespace soplex
 
 
 
-   /// returns right-hand side vector
-   const VectorReal& SoPlex::rhsReal() const
+   /// gets vector of row \p i
+   void SoPlex::getRowVectorReal(int i, DSVectorReal& row) const
+   {
+      assert(_realLP);
+
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         row.setMax(_realLP->rowVector(i).size());
+         _scaler->getRowUnscaled(*_realLP, i, row);
+      }
+      else
+         row = _realLP->rowVector(i);
+   }
+
+
+
+   /// returns right-hand side vector, ignoring scaling
+   const VectorReal& SoPlex::rhsRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->rhs();
+   }
+
+
+
+   /// gets right-hand side vector
+   void SoPlex::rhsRealInternal(DVectorReal& rhs) const
+   {
+      assert(_realLP);
+
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         rhs.reDim(_realLP->nRows(), false);
+         _scaler->getRhsUnscaled(*_realLP, rhs);
+      }
+      else
+         rhs = _realLP->rhs();
+   }
+
+
+
+   /// returns right-hand side of row \p i, ignoring scaling
+   Real SoPlex::rhsRealInternal(int i) const
+   {
+      assert(_realLP != 0);
+      return _realLP->rhs(i);
    }
 
 
@@ -795,16 +820,49 @@ namespace soplex
    Real SoPlex::rhsReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->rhs(i);
+
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         return _scaler->rhsUnscaled(*_realLP, i);
+      }
+      else
+         return _realLP->rhs(i);
    }
 
 
 
-   /// returns left-hand side vector
-   const VectorReal& SoPlex::lhsReal() const
+   /// returns left-hand side vector, ignoring scaling
+   const VectorReal& SoPlex::lhsRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->lhs();
+   }
+
+
+
+   /// gets left-hand side vector
+   void SoPlex::lhsRealInternal(DVectorReal& lhs) const
+   {
+      assert(_realLP);
+
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         lhs.reDim(_realLP->nRows(), false);
+         _scaler->getRhsUnscaled(*_realLP, lhs);
+      }
+      else
+         lhs = _realLP->lhs();
+   }
+
+
+
+   /// returns left-hand side of row \p i, ignoring scaling
+   Real SoPlex::lhsRealInternal(int i) const
+   {
+      assert(_realLP != 0);
+      return _realLP->lhs(i);
    }
 
 
@@ -813,7 +871,7 @@ namespace soplex
    Real SoPlex::lhsReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->lhs(i);
+      return _realLP->lhsUnscaled(i);
    }
 
 
@@ -827,29 +885,28 @@ namespace soplex
 
 
 
-   /// gets column \p i
-   void SoPlex::getColReal(int i, LPColReal& lpcol) const
-   {
-      assert(_realLP != 0);
-      return _realLP->getCol(i, lpcol);
-   }
-
-
-
-   /// gets columns \p start, ..., \p end
-   void SoPlex::getColsReal(int start, int end, LPColSetReal& lpcolset) const
-   {
-      assert(_realLP != 0);
-      return _realLP->getCols(start, end, lpcolset);
-   }
-
-
-
-   /// returns vector of column \p i
-   const SVectorReal& SoPlex::colVectorReal(int i) const
+   /// returns vector of col \p i, ignoring scaling
+   const SVectorReal& SoPlex::colVectorRealInternal(int i) const
    {
       assert(_realLP != 0);
       return _realLP->colVector(i);
+   }
+
+
+
+   /// gets vector of col \p i
+   void SoPlex::getColVectorReal(int i, DSVectorReal& col) const
+   {
+      assert(_realLP);
+
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         col.setMax(_realLP->colVector(i).size());
+         _scaler->getColUnscaled(*_realLP, i, col);
+      }
+      else
+         col = _realLP->colVector(i);
    }
 
 
@@ -4288,6 +4345,7 @@ namespace soplex
       else
       {
          assert(_solver.rep() == SPxSolver::ROW);
+         assert(!_solver.isScaled());
 
          DSVectorReal rowrhs(numColsReal());
          SSVectorReal y(numColsReal());
@@ -4342,7 +4400,8 @@ namespace soplex
                assert(index < numRowsReal());
                assert(!_solver.isRowBasic(index));
 
-               x[i] = v[index] - (rowVectorReal(index) * Vector(numColsReal(), y.get_ptr()));
+               // todo this needs to respect persistent scaling!
+               x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numColsReal(), y.get_ptr()));
             }
             else
             {
