@@ -33,38 +33,19 @@ namespace soplex
 {
 
 template<>
-void SPxLPBase<Real>::applyScaler(SPxScaler* scaler)
-{
-   assert( scaler != 0 );
-   lp_scaler = scaler;
-   lp_scaler->scale(*this);
-   _isScaled = true;
-}
-
-template<>
 void SPxLPBase<Real>::unscaleLP()
 {
-   if( isScaled() )
-   {
-      lp_scaler->unscale(*this);
-      _isScaled = false;
-   }
-
-   return;
+   lp_scaler->unscale(*this);
 }
 
 template<>
 void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, VectorBase<Real>& activity, const bool unscaled) const
 {
    if( primal.dim() != nCols() )
-   {
       throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
-   }
 
    if( activity.dim() != nRows() )
-   {
       throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
-   }
 
    int c;
 
@@ -98,6 +79,7 @@ void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, Vect
          if( unscaled && _isScaled )
          {
             assert(tmp != 0);
+            tmp->setMax(colVector(c).max());
             lp_scaler->getColUnscaled(*this, c, *tmp);
             activity.multAdd(primal[c], *tmp);
          }
@@ -111,14 +93,10 @@ template<>
 void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBase<Real>& activity, const bool unscaled) const
 {
    if( dual.dim() != nRows() )
-   {
       throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
-   }
 
    if( activity.dim() != nCols() )
-   {
       throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
-   }
 
    int r;
 
@@ -150,7 +128,8 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
       {
          if( unscaled && _isScaled )
          {
-            assert(tmp != NULL);
+            assert(tmp);
+            tmp->setMax(rowVector(r).size());
             lp_scaler->getRowUnscaled(*this, r, *tmp);
             activity.multAdd(dual[r], *tmp);
          }

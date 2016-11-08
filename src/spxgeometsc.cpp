@@ -105,8 +105,6 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 
    MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
 
-   SPxScaler::setActiveScalingExp(persistent);
-
    Real pstart = 0.0;
    Real p0     = 0.0;
    Real p1     = 0.0;

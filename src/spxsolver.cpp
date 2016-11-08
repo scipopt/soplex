@@ -514,7 +514,7 @@ void SPxSolver::clear()
 
 void SPxSolver::unscaleLPandClearBasis()
 {
-   unscaleLP();
+   SPxLPBase<Real>::unscaleLP();
    setBasisStatus(SPxBasis::NO_PROBLEM);
    SPxBasis::reDim();
    return;

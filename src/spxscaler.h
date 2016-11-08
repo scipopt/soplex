@@ -52,19 +52,10 @@ protected:
    /**@name Data */
    //@{
    const char*        m_name;      ///< Name of the scaler
-#if 0
-   DataArray < Real > m_colscale;  ///< column scaling factors
-   DataArray < Real > m_rowscale;  ///< row scaling factors
-#endif
-   DataArray < int >  m_colscaleExp;  ///< inner (post-presolving) column scaling factors
-   DataArray < int >  m_rowscaleExp;  ///< inner (post-presolving) row scaling factors
-   DataArray < int >  m_colscaleExpPersistent;  ///< persistent (or outer) column scaling factors
-   DataArray < int >  m_rowscaleExpPersistent;  ///< persistent (or outer) row scaling factors
-   DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
-   DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
+   mutable DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
+   mutable DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
-   bool               m_usingPersistentFactors; ///<  are persistent scaling factors being used?
    SPxOut*            spxout;      ///< message handler
    //@}
 
@@ -72,10 +63,7 @@ protected:
    /**@name Protected helpers */
    //@{
 
-   /// set pointer to currently active scaling factors (persistent/outer or inner)
-   void setActiveScalingExp(bool persistent);
-
-   /// setup scale array for the LP.
+   /// clear and setup scaling arrays in the LP
    virtual void setup(SPxLPBase<Real>& lp);
 #if 0
    /// computes scaling value for a minimum and maximum pair.
@@ -91,9 +79,6 @@ protected:
    //@}
 
 public:
-
-   /// are persistent scaling factors being used?
-   bool usingPersistentFactors();
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
@@ -141,17 +126,17 @@ public:
    /// scale SPxLP.
    virtual void scale(SPxLPBase<Real>& lp, bool persistent = true) = 0;
    /// unscale SPxLP
-   virtual void unscale(SPxLPBase<Real>& lp, bool persistent = true);
+   virtual void unscale(SPxLPBase<Real>& lp);
    /// returns scaling factor for column \p i
    virtual int getColScaleExp(int i);
    /// returns scaling factor for row \p i
    virtual int getRowScaleExp(int i);
    /// gets unscaled column \p i
-   virtual void getColUnscaled(const SPxLPBase<Real>& lp, int i, SVector& vec) const;
+   virtual void getColUnscaled(const SPxLPBase<Real>& lp, int i, DSVector& vec) const;
    /// returns unscaled upper bound \p i
    virtual Real upperUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled upper bound vector of LP \lp
-   virtual void getUpperUnscaled(const SPxLPBase<Real>& lp, DVector& vec) const;
+   virtual void getUpperUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
    /// returns unscaled lower bound \p i
    virtual Real lowerUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// gets unscaled lower bound vector
@@ -161,7 +146,7 @@ public:
    /// gets unscaled objective function
    virtual void getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
    /// returns unscaled row \p i
-   virtual void getRowUnscaled(const SPxLPBase<Real>& lp, int i, SVector& vec) const;
+   virtual void getRowUnscaled(const SPxLPBase<Real>& lp, int i, DSVector& vec) const;
    /// returns unscaled right hand side \p i
    virtual Real rhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// gets unscaled right hand side vector
@@ -171,13 +156,13 @@ public:
    /// returns unscaled left hand side vector of LP \lp
    virtual void getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
    /// unscale dense primal solution vector given in \p x. 
-   virtual void unscalePrimal(Vector& x) const;
+   virtual void unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const;
    /// unscale dense slack vector given in \p s.
-   virtual void unscaleSlacks(Vector& s) const;
+   virtual void unscaleSlacks(const SPxLPBase<Real>& lp, Vector& s) const;
    /// unscale dense dual solution vector given in \p pi. 
-   virtual void unscaleDual(Vector& pi) const;
+   virtual void unscaleDual(const SPxLPBase<Real>& lp, Vector& pi) const;
    /// unscale dense reduced cost vector given in \p r.
-   virtual void unscaleRedCost(Vector& r) const;
+   virtual void unscaleRedCost(const SPxLPBase<Real>& lp, Vector& r) const;
    /// absolute smallest column scaling factor
    virtual Real minAbsColscale() const;
    /// absolute biggest column scaling factor

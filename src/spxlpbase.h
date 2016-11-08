@@ -108,10 +108,12 @@ private:
    /**@name Data */
    //@{
 
-   SPxSense thesense;   ///< optimization sense.
-   R offset;            ///< offset computed, e.g., in simplification step
-   bool _isScaled;       ///< true, if scaling has been performed
-   SPxScaler* lp_scaler;///< points to the scaler if the lp has been scaled, to 0 otherwise
+   SPxSense thesense;                ///< optimization sense.
+   R offset;                         ///< offset computed, e.g., in simplification step
+   bool _isScaled;                   ///< true, if scaling has been performed
+   SPxScaler* lp_scaler;             ///< points to the scaler if the lp has been scaled, to 0 otherwise
+   DataArray < int > _colscaleExp;   ///< column scaling factors (stored as bitshift)
+   DataArray < int > _rowscaleExp;   ///< row scaling factors (stored as bitshift)
 
    //@}
 
@@ -129,9 +131,6 @@ public:
 
    // ------------------------------------------------------------------------------------------------------------------
 
-   /// applies given scaler to the lp
-   void applyScaler(SPxScaler* scaler);
-
    /// unscales the lp and clears basis
    void unscaleLP();
 
@@ -142,6 +141,12 @@ public:
    bool isScaled() const
    {
       return _isScaled;
+   }
+
+   /// set whether the LP is scaled or not
+   void setScalingInfo(bool isScaled)
+   {
+      _isScaled = isScaled;
    }
 
    /// Returns number of rows in LP.
@@ -577,6 +582,22 @@ public:
    /// Returns objective value of column \p i.
    R obj(int i) const
    {
+      R res = maxObj(i);
+
+      if( spxSense() == MINIMIZE )
+         res *= -1;
+      return res;
+   }
+
+   /// Returns objective value of column with identifier \p id.
+   R obj(const SPxColId& id) const
+   {
+      return obj(number(id));
+   }
+
+   /// Returns unscaled objective value of column \p i.
+   R objUnscaled(int i) const
+   {
       R res;
 
       if( _isScaled )
@@ -593,10 +614,10 @@ public:
       return res;
    }
 
-   /// Returns objective value of column with identifier \p id.
-   R obj(const SPxColId& id) const
+   /// Returns unscaled objective value of column with identifier \p id.
+   R objUnscaled(const SPxColId& id) const
    {
-      return obj(number(id));
+      return objUnscaled(number(id));
    }
 
    /// Returns objective vector for maximization problem.
@@ -1308,6 +1329,8 @@ public:
       offset = 0;
       _isScaled = false;
       lp_scaler = 0;
+      _colscaleExp.clear();
+      _rowscaleExp.clear();
    }
 
    //@}
@@ -2601,6 +2624,8 @@ public:
       , offset(old.offset)
       , _isScaled(old._isScaled)
       , lp_scaler(old.lp_scaler)
+      , _colscaleExp(old._colscaleExp)
+      , _rowscaleExp(old._rowscaleExp)
       , spxout(old.spxout)
    {
       assert(isConsistent());
@@ -2615,6 +2640,8 @@ public:
       , offset(old.offset)
       , _isScaled(old._isScaled)
       , lp_scaler(old.lp_scaler)
+      , _colscaleExp(old._colscaleExp)
+      , _rowscaleExp(old._rowscaleExp)
       , spxout(old.spxout)
    {
       assert(isConsistent());
@@ -2631,6 +2658,9 @@ public:
          offset = old.offset;
          _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
+         _colscaleExp = old._colscaleExp;
+         _rowscaleExp = old._rowscaleExp;
+         spxout = old.spxout;
 
          assert(isConsistent());
       }
@@ -2650,6 +2680,9 @@ public:
          offset = R(old.offset);
          _isScaled = old._isScaled;
          lp_scaler = old.lp_scaler;
+         _colscaleExp = old._colscaleExp;
+         _rowscaleExp = old._rowscaleExp;
+         spxout = old.spxout;
 
          assert(isConsistent());
       }

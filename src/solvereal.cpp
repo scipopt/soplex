@@ -33,7 +33,10 @@ namespace soplex
 
       // scale original problem; overwrites _realLP
       if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled() && _scaler )
+      {
          _scaler->scale(*_realLP, true);
+         _isRealLPScaled = true;
+      }
 
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
@@ -84,6 +87,7 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
+         _hasBasis = true;
          _storeSolutionReal();
          break;
 
@@ -98,7 +102,10 @@ namespace soplex
             _resolveWithoutPreprocessing(simplificationStatus);
          }
          else
+         {
+            _hasBasis = true;
             _storeSolutionReal();
+         }
          break;
 
       case SPxSolver::SINGULAR:
@@ -151,6 +158,7 @@ namespace soplex
       case SPxSolver::ABORT_VALUE:
       case SPxSolver::REGULAR:
       case SPxSolver::RUNNING:
+         _hasBasis = true;
          _storeSolutionReal();
          break;
 
@@ -234,6 +242,7 @@ namespace soplex
          bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
          _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
+         _solver.setScalingInfo(false);
       }
 
       _statistics->preprocessingTime->stop();
@@ -241,7 +250,7 @@ namespace soplex
       // run the simplex method if problem has not been solved by the simplifier
       if( simplificationStatus == SPxSimplifier::OKAY )
       {
-         if( _scaler != 0 )
+         if( _scaler && !_solver.isScaled() )
          {
             _scaler->scale(_solver, false);
          }
@@ -254,13 +263,14 @@ namespace soplex
 
 
 
-   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
+   /// loads original problem into solver and solves again after it has been solved to infeasibility or unboundedness with preprocessing
    void SoPlex::_resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus)
    {
       assert(!_isRealLPLoaded || _scaler != 0);
       assert(_simplifier != 0 || _scaler != 0);
+      assert(_status == SPxSolver::INFEASIBLE || _status == SPxSolver::INForUNBD || _status == SPxSolver::UNBOUNDED);
 
-      // if simplifier is active and LP is solved in presolving or to optimality, then we unsimplify to get the basis
+      // if simplifier was active, then we unsimplify to get the basis
       if( _simplifier )
       {
          assert(!_simplifier->isUnsimplified());
@@ -284,14 +294,12 @@ namespace soplex
          _solver.getRedCost(redCost);
 
          // unscale vectors
-         if( _scaler != 0 )
+         if( _scaler && _solver.isScaled())
          {
-            _scaler->unscalePrimal(primal);
-            _scaler->unscaleSlacks(slacks);
-            _scaler->unscaleDual(dual);
-            _scaler->unscaleRedCost(redCost);
-
-               _solReal.setScalingInfo(false);
+            _scaler->unscalePrimal(_solver, primal);
+            _scaler->unscaleSlacks(_solver, slacks);
+            _scaler->unscaleDual(_solver, dual);
+            _scaler->unscaleRedCost(_solver, redCost);
          }
 
          // get basis of transformed problem
@@ -332,7 +340,11 @@ namespace soplex
    void SoPlex::_verifySolutionReal()
    {
       assert(_hasSolReal);
-      assert(_solReal._isPrimalFeasible || _solReal._isDualFeasible);
+      if( !_solReal._isPrimalFeasible && !_solReal._isDualFeasible )
+      {
+         _hasSolReal = false;
+         return;
+      }
 
       MSG_INFO3( spxout, spxout << " --- verifying computed solution" << std::endl; )
 
@@ -355,7 +367,14 @@ namespace soplex
 
       if( boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol() || redcostviol >= _solver.opttol())
       {
-         MSG_INFO1( spxout, spxout << "detected violations in original problem space -- solve again" << std::endl; )
+         assert(&_solver == _realLP);
+         assert(_isRealLPLoaded);
+         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again" << std::endl; )
+         if( _isRealLPScaled )
+         {
+            _realLP->unscaleLP();
+            _isRealLPScaled = false;
+         }
          _preprocessAndSolveReal(false);
       }
    }
@@ -446,12 +465,12 @@ namespace soplex
       _hasSolReal = true;
 
       // unscale vectors
-      if( _scaler != 0 )
+      if( _scaler && _solver.isScaled() )
       {
-         _scaler->unscalePrimal(_solReal._primal);
-         _scaler->unscaleSlacks(_solReal._slacks);
-         _scaler->unscaleDual(_solReal._dual);
-         _scaler->unscaleRedCost(_solReal._redCost);
+         _scaler->unscalePrimal(_solver, _solReal._primal);
+         _scaler->unscaleSlacks(_solver, _solReal._slacks);
+         _scaler->unscaleDual(_solver, _solReal._dual);
+         _scaler->unscaleRedCost(_solver, _solReal._redCost);
       }
 
       // get unsimplified solution data from simplifier
@@ -498,9 +517,14 @@ namespace soplex
          _solver.setBasisStatus(SPxBasis::REGULAR);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
 
-         // check solution for violations and solve again if necessary
-         _verifySolutionReal();
       }
+
+      // unscale stored solution (removes persistent scaling)
+      if( _isRealLPScaled )
+         _unscaleSolutionReal();
+
+      // check solution for violations and solve again if necessary
+      _verifySolutionReal();
 
       assert(_solver.nCols() == numColsReal());
       assert(_solver.nRows() == numRowsReal());
@@ -569,8 +593,27 @@ namespace soplex
       _solReal._isPrimalFeasible = true;
       _solReal._isDualFeasible = true;
 
+      // unscale stored solution (removes persistent scaling)
+      if( _isRealLPScaled )
+         _unscaleSolutionReal();
+
       // check solution for violations and solve again if necessary
       _verifySolutionReal();
+   }
+
+
+
+   /// unscales stored solution to remove persistent scaling
+   void SoPlex::_unscaleSolutionReal()
+   {
+      assert(_scaler);
+      assert(boolParam(SoPlex::PERSISTENTSCALING));
+      assert(_isRealLPScaled);
+      assert(_realLP->isScaled());
+      _scaler->unscalePrimal(*_realLP, _solReal._primal);
+      _scaler->unscaleSlacks(*_realLP, _solReal._slacks);
+      _scaler->unscaleDual(*_realLP, _solReal._dual);
+      _scaler->unscaleRedCost(*_realLP, _solReal._redCost);
    }
 } // namespace soplex
 #endif

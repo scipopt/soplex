@@ -1517,6 +1517,7 @@ private:
    SPxStarter* _starter;
 
    bool _isRealLPLoaded;
+   bool _isRealLPScaled;
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
@@ -1934,6 +1935,9 @@ private:
 
    /// stores solution from the simplifier because problem vanished in presolving step
    void _storeSolutionRealFromPresol();
+
+   /// unscales stored solution to remove persistent scaling
+   void _unscaleSolutionReal();
 
    //@}
 };

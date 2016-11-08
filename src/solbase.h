@@ -212,19 +212,6 @@ public:
       _hasPrimalRay = false;
       _isDualFeasible = false;
       _hasDualFarkas = false;
-
-      _isScaled = false;
-   }
-
-   /// set whether solution refers to scaled problem
-   void setScalingInfo( const bool isScaled )
-   {
-      _isScaled = isScaled;
-   }
-
-   bool isScaled()
-   {
-      return _isScaled;
    }
 
 private:

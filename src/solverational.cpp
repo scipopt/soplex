@@ -3123,7 +3123,7 @@ namespace soplex
 
          // apply scaling after the simplification
          if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
-            _solver.applyScaler(_scaler);
+            _scaler->scale(_solver, false);
 
          // run the simplex method if problem has not been solved by the simplifier
          if( simplificationStatus == SPxSimplifier::OKAY )
@@ -3179,10 +3179,10 @@ namespace soplex
                      // unscale vectors
                      if( _scaler != 0 )
                      {
-                        _scaler->unscalePrimal(tmpPrimal);
-                        _scaler->unscaleSlacks(tmpSlacks);
-                        _scaler->unscaleDual(tmpDual);
-                        _scaler->unscaleRedCost(tmpRedCost);
+                        _scaler->unscalePrimal(_solver, tmpPrimal);
+                        _scaler->unscaleSlacks(_solver, tmpSlacks);
+                        _scaler->unscaleDual(_solver, tmpDual);
+                        _scaler->unscaleRedCost(_solver, tmpRedCost);
                      }
 
                      // get basis of transformed problem
@@ -3212,8 +3212,8 @@ namespace soplex
                   // unscale vectors
                   if( _scaler != 0 )
                   {
-                     _scaler->unscalePrimal(primal);
-                     _scaler->unscaleDual(dual);
+                     _scaler->unscalePrimal(_solver, primal);
+                     _scaler->unscaleDual(_solver, dual);
                   }
 
                   // get basis of transformed problem
@@ -3233,8 +3233,8 @@ namespace soplex
                   // unscale vectors
                   if( _scaler != 0 )
                   {
-                     _scaler->unscalePrimal(primal);
-                     _scaler->unscaleDual(dual);
+                     _scaler->unscalePrimal(_solver, primal);
+                     _scaler->unscaleDual(_solver, dual);
                   }
 
                   // get basis of transformed problem
@@ -3262,7 +3262,7 @@ namespace soplex
 
                // unscale vectors
                if( _scaler != 0 )
-                  _scaler->unscaleDual(dual);
+                  _scaler->unscaleDual(_solver, dual);
 
                // if the original problem is not in the solver because of scaling, we also need to store the basis
                basisStatusRows.reSize(_solver.nRows());

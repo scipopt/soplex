@@ -1406,7 +1406,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
       }
       else if (lhs > -infinity && lhs < -maxVal)
       {
-	 lp.changeLhs(i, -infinity);
+         lp.changeLhs(i, -infinity);
          ++chgLRhs;
       }
       else if (lhs <  infinity && lhs >  maxVal)
@@ -4564,7 +4564,10 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    // preprocessing detected infeasibility or unboundedness
    if (m_result != OKAY)
+   {
+      MSG_INFO1( (*spxout), (*spxout) << "Simplifier result: " << m_result << std::endl; )
       return m_result;
+   }
 
    m_remCols -= m_addedcols;
    m_remNzos -= m_addedcols;
@@ -4723,4 +4726,32 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    m_hist.clear();
    m_postsolved = true;
 }
+
+// Pretty-printing of solver status.
+std::ostream& operator<<(std::ostream& os, const SPxSimplifier::Result& status)
+{
+   switch( status )
+   {
+   case SPxSimplifier::OKAY:
+      os << "SUCCESS";
+      break;
+   case SPxSimplifier::INFEASIBLE:
+      os << "INFEASIBLE";
+      break;
+   case SPxSimplifier::DUAL_INFEASIBLE:
+      os << "DUAL_INFEASIBLE";
+      break;
+   case SPxSimplifier::UNBOUNDED:
+      os << "UNBOUNDED";
+      break;
+   case SPxSimplifier::VANISHED:
+      os << "VANISHED";
+      break;
+   default:
+      os << "UNKNOWN";
+      break;
+   }
+   return os;
+}
+
 } //namespace soplex

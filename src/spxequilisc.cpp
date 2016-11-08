@@ -84,8 +84,6 @@ void SPxEquiliSC::scale(SPxLP& lp, bool persistent)
 
    MSG_INFO1( (*spxout), (*spxout) << "Equilibrium scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
 
-   setActiveScalingExp(persistent);
-
    setup(lp);
 
    /* We want to do the direction first, which has a lower maximal ratio,

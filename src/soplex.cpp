@@ -2916,16 +2916,13 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
-       // determine whether we want to compute the violation in the (un)scaled problem
-      bool unscaled = !_solReal.isScaled();
-
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numColsReal() - 1; i >= 0; i-- )
       {
-         Real lower = unscaled ? _realLP->lowerUnscaled(i) : lowerReal(i);
-         Real upper = unscaled ? _realLP->upperUnscaled(i) : upperReal(i);
+         Real lower = _realLP->lowerUnscaled(i);
+         Real upper = _realLP->upperUnscaled(i);
          Real viol = lower - primal[i];
          if( viol > 0.0 )
          {
@@ -2958,18 +2955,15 @@ namespace soplex
       VectorReal& primal = _solReal._primal;
       assert(primal.dim() == numColsReal());
 
-      // determine whether we want to compute the violation in the (un)scaled problem
-      bool unscaled = !_solReal.isScaled();
-
       DVectorReal activity(numRowsReal());
-      _realLP->computePrimalActivity(primal, activity, unscaled);
+      _realLP->computePrimalActivity(primal, activity, true);
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numRowsReal() - 1; i >= 0; i-- )
       {
-         Real lhs = unscaled ? _realLP->lhsUnscaled(i) : lhsReal(i);
-         Real rhs = unscaled ? _realLP->rhsUnscaled(i) : rhsReal(i);
+         Real lhs = _realLP->lhsUnscaled(i);
+         Real rhs = _realLP->rhsUnscaled(i);
 
          Real viol = lhs - activity[i];
          if( viol > 0.0 )
@@ -4089,8 +4083,9 @@ namespace soplex
          try
          {
             /* unscaling required? */
-            if( unscale && _solReal.isScaled() )
+            if( unscale )
             {
+               assert(_solver.isScaled());
                assert(_solver.basis().baseId(c).isSPxColId());
 
                int scaleExp =_scaler->getRowScaleExp(c);
@@ -4186,8 +4181,9 @@ namespace soplex
          try
          {
             /* unscaling required? */
-            if( unscale && _solReal.isScaled() )
+            if( unscale )
             {
+               assert(_isRealLPScaled);
                int size = rhs.size();
                int scaleExp;
 
@@ -7370,7 +7366,12 @@ namespace soplex
    void SoPlex::_disableSimplifierAndScaler()
    {
       _simplifier = 0;
-      _scaler = 0;
+
+      // preserve scaler when persistent scaling is used
+      if( !_isRealLPScaled )
+         _scaler = 0;
+      else
+         assert(boolParam(SoPlex::PERSISTENTSCALING));
    }
 
 

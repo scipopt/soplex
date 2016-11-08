@@ -229,8 +229,6 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 {
    MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
 
-   SPxScaler::setActiveScalingExp(persistent);
-
    setup(lp);
 
    Real tmp;
