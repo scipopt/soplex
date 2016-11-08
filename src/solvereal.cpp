@@ -346,7 +346,7 @@ namespace soplex
          return;
       }
 
-      MSG_INFO3( spxout, spxout << " --- verifying computed solution" << std::endl; )
+      MSG_INFO1( spxout, spxout << " --- verifying computed solution" << std::endl; )
 
       Real sumviol = 0;
       Real boundviol = 0;

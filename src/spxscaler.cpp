@@ -359,7 +359,7 @@ Real SPxScaler::upperUnscaled(const SPxLPBase<Real>& lp, int i) const
 
    if( lp.LPColSet::upper(i) < infinity )
    {
-      return spxLdexp(lp.LPColSet::upper(i) , exp - 1);
+      return spxLdexp(lp.LPColSet::upper(i) , exp);
    }
    else
    {
@@ -379,7 +379,7 @@ void SPxScaler::getUpperUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    for( int i = 0; i < lp.LPColSet::upper().dim(); i++)
    {
       exp = colscaleExp[i];
-      vec[i] = spxLdexp(lp.LPColSet::upper()[i], exp - 1);
+      vec[i] = spxLdexp(lp.LPColSet::upper()[i], exp);
    }
 }
 
@@ -396,7 +396,7 @@ Real SPxScaler::lowerUnscaled(const SPxLPBase<Real>& lp, int i) const
 
    if( lp.LPColSet::lower(i) > -infinity )
    {
-      return spxLdexp(lp.LPColSet::lower(i), exp - 1);
+      return spxLdexp(lp.LPColSet::lower(i), exp);
    }
    else
    {
@@ -416,7 +416,7 @@ void SPxScaler::getLowerUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    for( int i = 0; i < lp.LPColSet::lower().dim(); i++)
    {
       exp = colscaleExp[i];
-      vec[i] = spxLdexp(lp.LPColSet::lower()[i], exp - 1);
+      vec[i] = spxLdexp(lp.LPColSet::lower()[i], exp);
    }
 }
 
@@ -430,7 +430,7 @@ Real SPxScaler::maxObjUnscaled(const SPxLPBase<Real>& lp, int i) const
    const DataArray < int >& colscaleExp = lp._colscaleExp;
    int exp = colscaleExp[i];
 
-   return spxLdexp(lp.LPColSet::maxObj(i) , -exp + 1);
+   return spxLdexp(lp.LPColSet::maxObj(i) , -exp);
 }
 
 
@@ -445,7 +445,7 @@ void SPxScaler::getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    for( int i = 0; i < lp.LPColSet::maxObj().dim(); i++)
    {
       exp = colscaleExp[i];
-      vec[i] = spxLdexp(lp.LPColSet::maxObj()[i], -exp + 1);
+      vec[i] = spxLdexp(lp.LPColSet::maxObj()[i], -exp);
    }
 }
 
@@ -480,7 +480,7 @@ Real SPxScaler::rhsUnscaled(const SPxLPBase<Real>& lp, int i) const
 
    if( lp.LPRowSet::rhs(i) < infinity )
    {
-      return spxLdexp(lp.LPRowSet::rhs(i) , -exp + 1);
+      return spxLdexp(lp.LPRowSet::rhs(i) , -exp);
    }
    else
    {
@@ -500,7 +500,7 @@ void SPxScaler::getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    for( int i = 0; i < lp.LPRowSet::rhs().dim(); i++)
    {
       exp = rowscaleExp[i];
-      vec[i] = spxLdexp(lp.LPRowSet::rhs()[i], -exp + 1);
+      vec[i] = spxLdexp(lp.LPRowSet::rhs()[i], -exp);
    }
 }
 
@@ -517,7 +517,7 @@ Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
 
    if( lp.LPRowSet::lhs(i) > -infinity )
    {
-      return spxLdexp(lp.LPRowSet::lhs(i) , -exp + 1);
+      return spxLdexp(lp.LPRowSet::lhs(i) , -exp);
    }
    else
    {
@@ -536,7 +536,7 @@ void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    for( int i = 0; i < lp.LPRowSet::lhs().dim(); i++)
    {
       exp = rowscaleExp[i];
-      vec[i] = spxLdexp(lp.LPRowSet::lhs()[i], -exp + 1);
+      vec[i] = spxLdexp(lp.LPRowSet::lhs()[i], -exp);
    }
 }
 
