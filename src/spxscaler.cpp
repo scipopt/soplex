@@ -325,7 +325,7 @@ int SPxScaler::getRowScaleExp(int i)
 }
 
 
-/// Gets unscaled column \p i
+/// gets unscaled column \p i
 void SPxScaler::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
 {
    assert(lp.isScaled());
@@ -346,6 +346,30 @@ void SPxScaler::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
    }
 }
 
+/// returns maximum absolute value of unscaled column \p i
+Real SPxScaler::getColMaxAbsUnscaled(const SPxLP& lp, int i) const
+{
+   assert(i < lp.nCols());
+   assert(i >= 0);
+
+   DataArray < int > colscaleExp = *m_activeColscaleExp;
+   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   const SVector& colVec = lp.LPColSet::colVector(i);
+
+   Real max = 0.0;
+   int exp1;
+   int exp2 = colscaleExp[i];
+
+   for( int j = 0; j < colVec.size(); j++ )
+   {
+      exp1 = rowscaleExp[colVec.index(j)];
+      Real abs = spxAbs(spxLdexp(colVec.value(j), -exp1 - exp2));
+      if( GT(abs, max) )
+         max = abs;
+   }
+
+   return max;
+}
 
 /// returns unscaled upper bound \p i
 Real SPxScaler::upperUnscaled(const SPxLPBase<Real>& lp, int i) const
@@ -449,7 +473,7 @@ void SPxScaler::getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    }
 }
 
-/// returns unscaled row \p i
+/// gets unscaled row \p i
 void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, DSVector& vec) const
 {
    assert(lp.isScaled());
@@ -466,6 +490,32 @@ void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, DSVector& vec) const
       exp1 = colscaleExp[vec.index(j)];
       vec.value(j) = spxLdexp(vec.value(j), -exp1 - exp2);
    }
+}
+
+/// returns maximum absolute value of unscaled row \p i
+Real SPxScaler::getRowMaxAbsUnscaled(const SPxLP& lp, int i) const
+{
+   assert(i < lp.nRows());
+   assert(i >= 0);
+   DataArray < int > colscaleExp = *m_activeColscaleExp;
+   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   const SVector& rowVec = lp.LPRowSet::rowVector(i);
+
+   Real max = 0.0;
+
+   int exp1;
+   int exp2 = rowscaleExp[i];
+
+   for( int j = 0; j < rowVec.size(); j++ )
+   {
+      exp1 = colscaleExp[rowVec.index(j)];
+      Real abs = spxAbs(spxLdexp(rowVec.value(j), -exp1 - exp2));
+
+      if( GT(abs, max) )
+         max = abs;
+   }
+
+   return max;
 }
 
 /// returns unscaled right hand side \p i
