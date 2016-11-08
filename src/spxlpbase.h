@@ -173,71 +173,11 @@ public:
    }
 
    /// Absolute smallest non-zero element in (possibly scaled) LP.
-   R minAbsNzo() const
-   {
-      R mini = infinity;
+   virtual R minAbsNzo() const;
 
-      if( _isScaled )
-      {
-         assert(lp_scaler != 0);
+   /// Absolute biggest non-zero element in (in rational case possibly scaled) LP.
+   virtual R maxAbsNzo() const;
 
-         for( int i = 0; i < nCols(); ++i )
-         {
-            R m = lp_scaler->getColMinAbsUnscaled(*this, i);
-
-            if( m < mini )
-               mini = m;
-         }
-      }
-      else
-      {
-         for( int i = 0; i < nCols(); ++i )
-         {
-            R m = colVector(i).minAbs();
-
-            if( m < mini )
-               mini = m;
-         }
-      }
-
-      assert(mini >= R(0));
-
-      return mini;
-   }
-
-   /// Absolute biggest non-zero element in (possibly scaled) LP.
-   R maxAbsNzo() const
-   {
-      R maxi = R(0);
-
-
-      if( _isScaled )
-      {
-         assert(lp_scaler != 0);
-
-         for( int i = 0; i < nCols(); ++i )
-         {
-            R m = lp_scaler->getColMaxAbsUnscaled(*this, i);
-
-            if( m > maxi )
-               maxi = m;
-         }
-      }
-      else
-      {
-         for( int i = 0; i < nCols(); ++i )
-         {
-            R m = colVector(i).maxAbs();
-
-            if( m > maxi )
-               maxi = m;
-         }
-      }
-
-      assert(maxi >= R(0));
-
-      return maxi;
-   }
 
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const

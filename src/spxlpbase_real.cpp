@@ -134,6 +134,71 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
    }
 }
 
+template<>
+Real SPxLPBase<Real>::maxAbsNzo() const
+{
+   Real maxi = 0.0;
+
+   if( _isScaled )
+   {
+      assert(lp_scaler != 0);
+
+      for( int i = 0; i < nCols(); ++i )
+      {
+         Real m = lp_scaler->getColMaxAbsUnscaled(*this, i);
+
+         if( m > maxi )
+            maxi = m;
+      }
+   }
+   else
+   {
+      for( int i = 0; i < nCols(); ++i )
+      {
+         Real m = colVector(i).maxAbs();
+
+         if( m > maxi )
+            maxi = m;
+      }
+   }
+
+   assert(maxi >= 0.0);
+
+   return maxi;
+}
+
+template<>
+Real SPxLPBase<Real>::minAbsNzo() const
+{
+   Real mini = infinity;
+
+   if( _isScaled )
+   {
+      assert(lp_scaler != 0);
+
+      for( int i = 0; i < nCols(); ++i )
+      {
+         Real m = lp_scaler->getColMinAbsUnscaled(*this, i);
+
+         if( m < mini )
+            mini = m;
+      }
+   }
+   else
+   {
+      for( int i = 0; i < nCols(); ++i )
+      {
+         Real m = colVector(i).minAbs();
+
+         if( m < mini )
+            mini = m;
+      }
+   }
+
+   assert(mini >= 0.0);
+
+   return mini;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format

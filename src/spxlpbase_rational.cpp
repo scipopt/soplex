@@ -58,9 +58,6 @@ void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& prim
       return;
    }
 
-   // todo: allocate svector of maximum column length
-   SVector tmp;
-
    activity = colVector(c);
 
    activity *= primal[c];
@@ -99,9 +96,6 @@ void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, 
       return;
    }
 
-   // todo: allocate svector of maximum column length
-   SVector tmp;
-
    activity = rowVector(r);
 
    activity *= dual[r];
@@ -116,7 +110,41 @@ void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, 
    }
 }
 
+template<>
+Rational SPxLPBase<Rational>::maxAbsNzo() const
+{
+   Rational maxi = Rational(0);
 
+   for( int i = 0; i < nCols(); ++i )
+   {
+      Rational m = colVector(i).maxAbs();
+
+      if( m > maxi )
+         maxi = m;
+   }
+
+   assert(maxi >= Rational(0));
+
+   return maxi;
+}
+
+template<>
+Rational SPxLPBase<Rational>::minAbsNzo() const
+{
+   Rational mini = infinity;
+
+   for( int i = 0; i < nCols(); ++i )
+   {
+      Rational m = colVector(i).minAbs();
+
+      if( m < mini )
+         mini = m;
+   }
+
+   assert(mini >= Rational(0));
+
+   return mini;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format
