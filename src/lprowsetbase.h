@@ -512,6 +512,8 @@ public:
    /// Removes multiple LPRowBase%s.
    void remove(int perm[])
    {
+      // todo pass _rowscaleExp& and adapt
+
       int j = num();
 
       SVSetBase<R>::remove(perm);

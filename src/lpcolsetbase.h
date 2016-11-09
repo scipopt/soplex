@@ -433,11 +433,13 @@ public:
    /// Removes multiple elements.
    void remove(int perm[])
    {
-      int j = num();
+      // todo pass _colscaleExp& and modify accordingly
+
+      int n = num();
 
       SVSetBase<R>::remove(perm);
 
-      for( int i = 0; i < j; ++i )
+      for( int i = 0; i < n; ++i )
       {
          if( perm[i] >= 0 && perm[i] != i )
          {

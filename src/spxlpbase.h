@@ -1334,6 +1334,7 @@ public:
    /// changes \p i 'th lower bound to \p newLower.
    virtual void changeLower(int i, const R& newLower)
    {
+      // todo persistent scaling!
 
       LPColSetBase<R>::lower_w(i) = newLower;
       assert(isConsistent());
@@ -1904,6 +1905,7 @@ protected:
    /// Internal helper method.
    virtual void doRemoveRows(int perm[])
    {
+      // todo pass _rowscaleExp and adapt
 
       int j = nCols();
 
@@ -1955,12 +1957,12 @@ protected:
    /// Internal helper method.
    virtual void doRemoveCols(int perm[])
    {
+      int nrows = nRows();
 
-      int j = nRows();
-
+      // todo pass _colscaleExp as reference
       LPColSetBase<R>::remove(perm);
 
-      for( int i = 0; i < j; ++i )
+      for( int i = 0; i < nrows; ++i )
       {
          SVectorBase<R>& vec = rowVector_w(i);
 
@@ -2120,6 +2122,7 @@ private:
    ///
    void doAddRows(const LPRowSetBase<R>& set)
    {
+      // todo adapt to persistent scaling of LP
 
       int i, j, k, ii, idx;
       SVectorBase<R>* col;
@@ -2273,6 +2276,7 @@ private:
    ///
    void doAddCols(const LPColSetBase<R>& set)
    {
+      // todo adapt to persistent scaling
 
       int i, j;
       int oldColNumber = nCols();

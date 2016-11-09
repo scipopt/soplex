@@ -1571,6 +1571,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      // todo implement a scaleObj method
       _realLP->changeObj(i, obj);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
@@ -7013,6 +7014,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      // todo implemement a scaleRange method
       _realLP->changeRange(i, lhs, rhs);
 
       if( _isRealLPLoaded )
@@ -7166,6 +7168,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      // todo implement a scaleBounds method
       _realLP->changeBounds(i, lower, upper);
 
       if( _isRealLPLoaded )
@@ -7188,6 +7191,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      // todo implement a scaleElement method
       _realLP->changeElement(i, j, val);
 
       if( _isRealLPLoaded )
