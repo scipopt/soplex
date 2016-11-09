@@ -22,6 +22,68 @@
 
 namespace soplex
 {
+
+   /// check scaling of LP
+   void SoPlex::_checkScalingReal(SPxLPReal* origLP)
+   {
+      MSG_INFO1( spxout, spxout << "DEBUG: checking correctness of scaled LP" << std::endl; )
+      assert(_realLP->nCols() == origLP->nCols());
+      assert(_realLP->nRows() == origLP->nRows());
+      assert(_realLP->isScaled() && !origLP->isScaled());
+      bool correct = true;
+
+      MSG_INFO1( spxout, spxout << "DEBUG: checking rows..." << std::endl; )
+      for( int i = 0; i < origLP->nRows(); ++i )
+      {
+         assert(EQ(origLP->lhs(i), _realLP->lhsUnscaled(i)));
+         assert(EQ(origLP->rhs(i), _realLP->rhsUnscaled(i)));
+
+         DSVectorReal row;
+         _realLP->getRowVectorUnscaled(i, row);
+
+         assert(origLP->rowVector(i).size() == row.size());
+
+         for( int j = 0; j < row.size(); ++j)
+         {
+            if( NE(row.value(j), origLP->rowVector(i).value(j)) )
+            {
+               MSG_INFO1( spxout, spxout << "scaling error in row " << i << ", col " << j
+                          << ": orig " << origLP->rowVector(i).value(j)
+                          << ", unscaled: " << row.value(j) << std::endl; )
+               correct = false;
+            }
+         }
+      }
+
+      MSG_INFO1( spxout, spxout << "DEBUG: checking cols..." << std::endl; )
+      for( int i = 0; i < origLP->nCols(); ++i )
+      {
+         assert(EQ(origLP->lower(i), _realLP->lowerUnscaled(i)));
+         assert(EQ(origLP->upper(i), _realLP->upperUnscaled(i)));
+         assert(EQ(origLP->obj(i), _realLP->objUnscaled(i)));
+
+         DSVectorReal col;
+         _realLP->getColVectorUnscaled(i, col);
+
+         assert(origLP->colVector(i).size() == col.size());
+
+         for( int j = 0; j < col.size(); ++j)
+         {
+            if( NE(col.value(j), origLP->colVector(i).value(j)) )
+            {
+
+               MSG_INFO1( spxout, spxout << "scaling error in col " << i << ", row " << j
+                          << ": orig " << origLP->colVector(i).value(j)
+                          << ", unscaled: " << col.value(j) << std::endl; )
+                  correct = false;
+            }
+         }
+      }
+      assert(correct);
+   }
+
+
+
    /// solves real LP
    void SoPlex::_optimizeReal()
    {
@@ -34,9 +96,20 @@ namespace soplex
       // scale original problem; overwrites _realLP
       if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled() && _scaler )
       {
+         assert(_realLP == &_solver);
+#ifdef SOPLEX_DEBUG
+         SPxLPReal* origLP = 0;
+         spx_alloc(origLP);
+         origLP = new (origLP) SPxLPReal(*_realLP);
+#endif
          _scaler->scale(*_realLP, true);
          _isRealLPScaled = true;
+#ifdef SOPLEX_DEBUG
+         _checkScalingReal(origLP);
+#endif
       }
+
+      _isRealLPVerified = false;
 
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
@@ -99,12 +172,14 @@ namespace soplex
          {
             MSG_INFO1( spxout, spxout << " --- loading original problem" << std::endl; )
             _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
+            // we cannot do more to remove violations
+            _isRealLPVerified = true;
             _resolveWithoutPreprocessing(simplificationStatus);
          }
          else
          {
             _hasBasis = true;
-            _storeSolutionReal();
+            _storeSolutionReal(false);
          }
          break;
 
@@ -159,7 +234,7 @@ namespace soplex
       case SPxSolver::REGULAR:
       case SPxSolver::RUNNING:
          _hasBasis = true;
-         _storeSolutionReal();
+         _storeSolutionReal(false);
          break;
 
       default:
@@ -182,7 +257,7 @@ namespace soplex
          _disableSimplifierAndScaler();
 
       // determine preprocessing state based on user settings
-      applySimplifier = (_simplifier != 0);
+      bool copyLP = (_simplifier != 0 || (_scaler && !_isRealLPScaled));
 
       _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
          ? realParam(SoPlex::OBJLIMIT_UPPER) : realParam(SoPlex::OBJLIMIT_LOWER));
@@ -193,7 +268,7 @@ namespace soplex
 
          // preprocessing is always applied to the LP in the solver; hence we have to create a copy of the original LP
          // if simplifier is turned on
-         if( applySimplifier)
+         if( copyLP )
          {
             _realLP = 0;
             spx_alloc(_realLP);
@@ -220,7 +295,7 @@ namespace soplex
 
          // if there is no simplifier, then the original and the transformed problem are identical and it is more
          // memory-efficient to keep only the problem in the solver
-         if( !applySimplifier )
+         if( !copyLP )
          {
             _realLP->~SPxLPReal();
             spx_free(_realLP);
@@ -230,8 +305,8 @@ namespace soplex
       }
 
       // assert that we have two problems if and only if we apply the simplifier
-      assert(_realLP == &_solver || applySimplifier);
-      assert(_realLP != &_solver || !applySimplifier);
+      assert(_realLP == &_solver || copyLP);
+      assert(_realLP != &_solver || !copyLP);
 
       // apply problem simplification
       SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
@@ -385,7 +460,7 @@ namespace soplex
 
 
    /// stores solution data from the solver, possibly after applying unscaling and unsimplifying
-   void SoPlex::_storeSolutionReal()
+   void SoPlex::_storeSolutionReal(bool verify)
    {
       // prepare storage for basis (enough to fit the original basis)
       _basisStatusRows.reSize(numRowsReal());
@@ -469,7 +544,7 @@ namespace soplex
       _hasSolReal = true;
 
       // unscale vectors
-      if( _scaler && _solver.isScaled() )
+      if( _scaler && _solver.isScaled() && !_isRealLPLoaded)
       {
          MSG_INFO1( spxout, spxout << " --- unscaling internal solution" << std::endl; )
          _scaler->unscalePrimal(_solver, _solReal._primal);
@@ -529,7 +604,8 @@ namespace soplex
          _unscaleSolutionReal();
 
       // check solution for violations and solve again if necessary
-      _verifySolutionReal();
+      if( verify )
+         _verifySolutionReal();
 
       assert(_solver.nCols() == numColsReal());
       assert(_solver.nRows() == numRowsReal());

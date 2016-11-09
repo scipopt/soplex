@@ -396,8 +396,8 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
       << std::endl; )
 
    MSG_INFO2( (*spxout), (*spxout) << "after scaling: "
-      << " min= " << lp.minAbsNzo()
-      << " max= " << lp.maxAbsNzo()
+      << " min= " << lp.minAbsNzo(false)
+      << " max= " << lp.maxAbsNzo(false)
       << " col-ratio= " << maxColRatio(lp)
       << " row-ratio= " << maxRowRatio(lp)
       << std::endl; )

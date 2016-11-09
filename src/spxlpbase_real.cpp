@@ -135,11 +135,11 @@ void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBa
 }
 
 template<>
-Real SPxLPBase<Real>::maxAbsNzo() const
+Real SPxLPBase<Real>::maxAbsNzo(bool unscaled) const
 {
    Real maxi = 0.0;
 
-   if( _isScaled )
+   if( unscaled && _isScaled )
    {
       assert(lp_scaler != 0);
 
@@ -168,11 +168,11 @@ Real SPxLPBase<Real>::maxAbsNzo() const
 }
 
 template<>
-Real SPxLPBase<Real>::minAbsNzo() const
+Real SPxLPBase<Real>::minAbsNzo(bool unscaled) const
 {
    Real mini = infinity;
 
-   if( _isScaled )
+   if( unscaled && _isScaled )
    {
       assert(lp_scaler != 0);
 

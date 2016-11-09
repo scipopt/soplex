@@ -173,10 +173,10 @@ public:
    }
 
    /// Absolute smallest non-zero element in (possibly scaled) LP.
-   virtual R minAbsNzo() const;
+   virtual R minAbsNzo(bool unscaled = true) const;
 
    /// Absolute biggest non-zero element in (in rational case possibly scaled) LP.
-   virtual R maxAbsNzo() const;
+   virtual R maxAbsNzo(bool unscaled = true) const;
 
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const

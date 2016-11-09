@@ -137,7 +137,7 @@ public:
    const VectorReal& rhsRealInternal() const;
 
    /// gets right-hand side vector
-   void rhsRealInternal(DVectorReal& rhs) const;
+   void rhsReal(DVectorReal& rhs) const;
 
    /// returns right-hand side of row \p i, ignoring scaling
    Real rhsRealInternal(int i) const;
@@ -149,7 +149,7 @@ public:
    const VectorReal& lhsRealInternal() const;
 
    /// gets left-hand side vector
-   void lhsRealInternal(DVectorReal& lhs) const;
+   void lhsReal(DVectorReal& lhs) const;
 
    /// returns left-hand side of row \p i, ignoring scaling
    Real lhsRealInternal(int i) const;
@@ -1524,6 +1524,7 @@ private:
 
    bool _isRealLPLoaded;
    bool _isRealLPScaled;
+   bool _isRealLPVerified;
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
@@ -1937,13 +1938,16 @@ private:
    void _verifySolutionReal();
 
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
-   void _storeSolutionReal();
+   void _storeSolutionReal(bool verify = true);
 
    /// stores solution from the simplifier because problem vanished in presolving step
    void _storeSolutionRealFromPresol();
 
    /// unscales stored solution to remove persistent scaling
    void _unscaleSolutionReal();
+
+   /// check scaling of LP
+   void _checkScalingReal(SPxLPReal* origLP);
 
    //@}
 };

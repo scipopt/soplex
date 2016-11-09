@@ -341,6 +341,7 @@ void SPxScaler::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
 
    const SVectorReal& col = lp.colVector(i);
    vec.setMax(col.size());
+   vec.clear();
 
    for( int j = 0; j < col.size(); j++ )
    {
@@ -425,6 +426,7 @@ Real SPxScaler::upperUnscaled(const SPxLPBase<Real>& lp, int i) const
 void SPxScaler::getUpperUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
+   assert(lp.LPColSet::upper().dim() == vec.dim());
 
    int exp;
    const DataArray < int >& colscaleExp = lp._colscaleExp;
@@ -462,6 +464,7 @@ Real SPxScaler::lowerUnscaled(const SPxLPBase<Real>& lp, int i) const
 void SPxScaler::getLowerUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
+   assert(lp.LPColSet::lower().dim() == vec.dim());
 
    int exp;
    const DataArray < int >& colscaleExp = lp._colscaleExp;
@@ -491,6 +494,7 @@ Real SPxScaler::maxObjUnscaled(const SPxLPBase<Real>& lp, int i) const
 void SPxScaler::getMaxObjUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
+   assert(lp.LPColSet::maxObj().dim() == vec.dim());
 
    int exp;
    const DataArray < int >& colscaleExp = lp._colscaleExp;
@@ -516,6 +520,7 @@ void SPxScaler::getRowUnscaled(const SPxLP& lp, int i, DSVector& vec) const
 
    const SVectorReal& row = lp.rowVector(i);
    vec.setMax(row.size());
+   vec.clear();
 
    for( int j = 0; j < row.size(); j++ )
    {
@@ -601,6 +606,7 @@ Real SPxScaler::rhsUnscaled(const SPxLPBase<Real>& lp, int i) const
 void SPxScaler::getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
+   assert(lp.LPRowSet::rhs().dim() == vec.dim());
 
    int exp;
    const DataArray < int >& rowscaleExp = lp._rowscaleExp;
@@ -637,6 +643,7 @@ Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
 void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
+   assert(lp.LPRowSet::lhs().dim() == vec.dim());
 
    int exp;
    const DataArray < int >& rowscaleExp = lp._rowscaleExp;
@@ -747,26 +754,26 @@ Real SPxScaler::minAbsRowscale() const
 {
    const DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-   Real mini = infinity;
+   int mini = INT_MAX;
 
    for( int i = 0; i < rowscaleExp.size(); ++i )
-      if( spxAbs(spxLdexp(1.0, rowscaleExp[i])) < mini )
-         mini = spxAbs(spxLdexp(1.0, rowscaleExp[i]));
+      if( rowscaleExp[i] < mini )
+         mini = rowscaleExp[i];
 
-   return mini;
+   return spxLdexp(1.0, mini);
 }
 
 Real SPxScaler::maxAbsRowscale() const
 {
    const DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-   Real maxi = 0.0;
+   int maxi = -INT_MAX;
 
    for( int i = 0; i < rowscaleExp.size(); ++i )
-      if( spxAbs(spxLdexp(1.0, rowscaleExp[i])) > maxi )
-         maxi = spxAbs(spxLdexp(1.0, rowscaleExp[i]));
+      if( rowscaleExp[i] > maxi )
+         maxi = rowscaleExp[i];
 
-   return maxi;
+   return spxLdexp(1.0, maxi);
 }
 
 /** \f$\max_{j\in\mbox{ cols}}

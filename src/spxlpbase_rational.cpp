@@ -111,7 +111,7 @@ void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, 
 }
 
 template<>
-Rational SPxLPBase<Rational>::maxAbsNzo() const
+Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const
 {
    Rational maxi = Rational(0);
 
@@ -129,7 +129,7 @@ Rational SPxLPBase<Rational>::maxAbsNzo() const
 }
 
 template<>
-Rational SPxLPBase<Rational>::minAbsNzo() const
+Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 {
    Rational mini = infinity;
 

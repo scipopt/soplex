@@ -525,6 +525,8 @@ namespace soplex
       // initialized in setSettings() below
       _realLP = &_solver;
       _isRealLPLoaded = true;
+      _isRealLPScaled = false;
+      _isRealLPVerified = false;
       _realLP->setOutstream(spxout);
 
       // initialize statistics
@@ -638,6 +640,7 @@ namespace soplex
 
          // copy boolean flags
          _isRealLPLoaded = rhs._isRealLPLoaded;
+         _isRealLPScaled = rhs._isRealLPScaled;
          _hasSolReal = rhs._hasSolReal;
          _hasSolRational = rhs._hasSolRational;
          _hasBasis = rhs._hasBasis;
@@ -791,7 +794,7 @@ namespace soplex
 
 
    /// gets right-hand side vector
-   void SoPlex::rhsRealInternal(DVectorReal& rhs) const
+   void SoPlex::rhsReal(DVectorReal& rhs) const
    {
       assert(_realLP);
 
@@ -842,7 +845,7 @@ namespace soplex
 
 
    /// gets left-hand side vector
-   void SoPlex::lhsRealInternal(DVectorReal& lhs) const
+   void SoPlex::lhsReal(DVectorReal& lhs) const
    {
       assert(_realLP);
 
