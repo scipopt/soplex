@@ -473,8 +473,8 @@ public:
       return LPColSetBase<R>::upper(id);
    }
 
-   /// Returns unscaled upper bound vector
-   void upperUnscaled(DVector& vec) const;
+   /// Gets unscaled upper bound vector
+   void getUpperUnscaled(DVector& vec) const;
 
    /// Returns unscaled upper bound of column \p i.
    R upperUnscaled(int i) const;
@@ -500,8 +500,8 @@ public:
       return LPColSetBase<R>::lower(id);
    }
 
-   /// Returns unscaled lower bound vector.
-   void lowerUnscaled(Vector& vec) const;
+   /// Gets unscaled lower bound vector.
+   void getLowerUnscaled(DVector& vec) const;
 
    /// Returns unscaled lower bound of column \p i.
    R lowerUnscaled(int i) const;

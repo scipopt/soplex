@@ -794,27 +794,10 @@ namespace soplex
 
 
    /// gets right-hand side vector
-   void SoPlex::rhsReal(DVectorReal& rhs) const
+   void SoPlex::getRhsReal(DVectorReal& rhs) const
    {
       assert(_realLP);
-
-      if( _realLP->isScaled() )
-      {
-         assert(_scaler);
-         rhs.reDim(_realLP->nRows(), false);
-         _scaler->getRhsUnscaled(*_realLP, rhs);
-      }
-      else
-         rhs = _realLP->rhs();
-   }
-
-
-
-   /// returns right-hand side of row \p i, ignoring scaling
-   Real SoPlex::rhsRealInternal(int i) const
-   {
-      assert(_realLP != 0);
-      return _realLP->rhs(i);
+      _realLP->getRhsUnscaled(rhs);
    }
 
 
@@ -823,14 +806,7 @@ namespace soplex
    Real SoPlex::rhsReal(int i) const
    {
       assert(_realLP != 0);
-
-      if( _realLP->isScaled() )
-      {
-         assert(_scaler);
-         return _scaler->rhsUnscaled(*_realLP, i);
-      }
-      else
-         return _realLP->rhs(i);
+      return _realLP->rhsUnscaled(i);
    }
 
 
@@ -845,27 +821,10 @@ namespace soplex
 
 
    /// gets left-hand side vector
-   void SoPlex::lhsReal(DVectorReal& lhs) const
+   void SoPlex::getLhsReal(DVectorReal& lhs) const
    {
       assert(_realLP);
-
-      if( _realLP->isScaled() )
-      {
-         assert(_scaler);
-         lhs.reDim(_realLP->nRows(), false);
-         _scaler->getRhsUnscaled(*_realLP, lhs);
-      }
-      else
-         lhs = _realLP->lhs();
-   }
-
-
-
-   /// returns left-hand side of row \p i, ignoring scaling
-   Real SoPlex::lhsRealInternal(int i) const
-   {
-      assert(_realLP != 0);
-      return _realLP->lhs(i);
+      _realLP->getLhsUnscaled(lhs);
    }
 
 
@@ -901,21 +860,13 @@ namespace soplex
    void SoPlex::getColVectorReal(int i, DSVectorReal& col) const
    {
       assert(_realLP);
-
-      if( _realLP->isScaled() )
-      {
-         assert(_scaler);
-         col.setMax(_realLP->colVector(i).size());
-         _scaler->getColUnscaled(*_realLP, i, col);
-      }
-      else
-         col = _realLP->colVector(i);
+      _realLP->getColVectorUnscaled(i, col);
    }
 
 
 
    /// returns upper bound vector
-   const VectorReal& SoPlex::upperReal() const
+   const VectorReal& SoPlex::upperRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->upper();
@@ -927,13 +878,22 @@ namespace soplex
    Real SoPlex::upperReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->upper(i);
+      return _realLP->upperUnscaled(i);
+   }
+
+
+
+   /// gets upper bound vector
+   void SoPlex::getUpperReal(DVectorReal& upper) const
+   {
+      assert(_realLP != 0);
+      return _realLP->getUpperUnscaled(upper);
    }
 
 
 
    /// returns lower bound vector
-   const VectorReal& SoPlex::lowerReal() const
+   const VectorReal& SoPlex::lowerRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->lower();
@@ -945,8 +905,18 @@ namespace soplex
    Real SoPlex::lowerReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->lower(i);
+      return _realLP->lowerUnscaled(i);
    }
+
+
+
+   /// gets lower bound vector
+   void SoPlex::getLowerReal(DVectorReal& lower) const
+   {
+      assert(_realLP != 0);
+      return _realLP->getLowerUnscaled(lower);
+   }
+
 
 
 
@@ -954,7 +924,7 @@ namespace soplex
    void SoPlex::getObjReal(VectorReal& obj) const
    {
       assert(_realLP != 0);
-      _realLP->getObj(obj);
+      _realLP->getObjUnscaled(obj);
    }
 
 
@@ -963,14 +933,14 @@ namespace soplex
    Real SoPlex::objReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->obj(i);
+      return _realLP->objUnscaled(i);
    }
 
 
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
-   const VectorReal& SoPlex::maxObjReal() const
+   const VectorReal& SoPlex::maxObjRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->maxObj();
@@ -983,7 +953,7 @@ namespace soplex
    Real SoPlex::maxObjReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->maxObj(i);
+      return _realLP->maxObjUnscaled(i);
    }
 
 
@@ -4825,11 +4795,11 @@ namespace soplex
 
       for( int i = 0; i < numCols; i++ )
       {
-         if( lowerReal(i) == upperReal(i) )
+         if( lowerRealInternal(i) == upperRealInternal(i) )
             _basisStatusCols[i] = SPxSolver::FIXED;
-         else if( lowerReal(i) <= double(-realParam(SoPlex::INFTY)) && upperReal(i) >= double(realParam(SoPlex::INFTY)) )
+         else if( lowerRealInternal(i) <= double(-realParam(SoPlex::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlex::INFTY)) )
             _basisStatusCols[i] = SPxSolver::ZERO;
-         else if( lowerReal(i) <= double(-realParam(SoPlex::INFTY)) )
+         else if( lowerRealInternal(i) <= double(-realParam(SoPlex::INFTY)) )
             _basisStatusCols[i] = SPxSolver::ON_UPPER;
          else
             _basisStatusCols[i] = SPxSolver::ON_LOWER;

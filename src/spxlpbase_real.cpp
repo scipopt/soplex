@@ -355,7 +355,7 @@ Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const
 
 /// Returns unscaled upper bound vector
 template<>
-void SPxLPBase<Real>::upperUnscaled(DVector& vec) const
+void SPxLPBase<Real>::getUpperUnscaled(DVector& vec) const
 {
    if( _isScaled )
       lp_scaler->getUpperUnscaled(*this, vec);
@@ -382,12 +382,12 @@ Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const
 
 /// Returns unscaled lower bound vector.
 template<>
-void SPxLPBase<Real>::lowerUnscaled(Vector& vec) const
+void SPxLPBase<Real>::getLowerUnscaled(DVector& vec) const
 {
    if( _isScaled )
       lp_scaler->getLowerUnscaled(*this, vec);
    else
-      vec = LPColSetBase<Real>::lower();
+      vec = DVector(LPColSetBase<Real>::lower());
 }
 
 /// Returns unscaled lower bound of column \p i.

@@ -137,10 +137,7 @@ public:
    const VectorReal& rhsRealInternal() const;
 
    /// gets right-hand side vector
-   void rhsReal(DVectorReal& rhs) const;
-
-   /// returns right-hand side of row \p i, ignoring scaling
-   Real rhsRealInternal(int i) const;
+   void getRhsReal(DVectorReal& rhs) const;
 
    /// returns right-hand side of row \p i
    Real rhsReal(int i) const;
@@ -149,10 +146,7 @@ public:
    const VectorReal& lhsRealInternal() const;
 
    /// gets left-hand side vector
-   void lhsReal(DVectorReal& lhs) const;
-
-   /// returns left-hand side of row \p i, ignoring scaling
-   Real lhsRealInternal(int i) const;
+   void getLhsReal(DVectorReal& lhs) const;
 
    /// returns left-hand side of row \p i
    Real lhsReal(int i) const;
@@ -167,16 +161,22 @@ public:
    void getColVectorReal(int i, DSVectorReal& col) const;
 
    /// returns upper bound vector
-   const VectorReal& upperReal() const;
+   const VectorReal& upperRealInternal() const;
 
    /// returns upper bound of column \p i
    Real upperReal(int i) const;
 
+   /// gets upper bound vector
+   void getUpperReal(DVectorReal& upper) const;
+
    /// returns lower bound vector
-   const VectorReal& lowerReal() const;
+   const VectorReal& lowerRealInternal() const;
 
    /// returns lower bound of column \p i
    Real lowerReal(int i) const;
+
+   /// gets lower bound vector
+   void getLowerReal(DVectorReal& lower) const;
 
    /// gets objective function vector
    void getObjReal(VectorReal& obj) const;
@@ -186,7 +186,7 @@ public:
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
-   const VectorReal& maxObjReal() const;
+   const VectorReal& maxObjRealInternal() const;
 
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
