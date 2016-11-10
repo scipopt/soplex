@@ -187,16 +187,18 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
-            MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without presolving" << std::endl; )
-
+            MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without simplifying" << std::endl; )
+#if 0 // we don't want to lose the persistent scaling
             if( _scaler != 0 )
             {
                _solver.unscaleLPandClearBasis();
                _hasBasis = false;
             }
+#endif
             _preprocessAndSolveReal(false);
             return;
          }
+#if 0
          else if( _scaler != 0 )
          {
             _solver.unscaleLPandClearBasis();
@@ -204,22 +206,26 @@ namespace soplex
             _preprocessAndSolveReal(false);
             return;
          }
+#endif
+         _hasBasis = false;
          break;
 
       case SPxSolver::ABORT_CYCLING:
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
-            MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without presolving" << std::endl; )
-
+            MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without simplifying" << std::endl; )
+#if 0 // we don't want to lose the persistent scaling
             if( _scaler != 0 )
             {
                _solver.unscaleLPandClearBasis();
                _hasBasis = false;
             }
+#endif
             _preprocessAndSolveReal(false);
             return;
          }
+#if 0
          else if( _scaler != 0 )
          {
             _solver.unscaleLPandClearBasis();
@@ -227,6 +233,7 @@ namespace soplex
             _preprocessAndSolveReal(false);
             return;
          }
+#endif
          // no break
       case SPxSolver::ABORT_TIME:
       case SPxSolver::ABORT_ITER:
