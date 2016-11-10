@@ -176,28 +176,29 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
 }
 
 void SPxSteepPR::setupPrefsX(
-   Real mult, 
-   Real /*tie*/, 
+   Real mult,
+   Real /*tie*/,
    Real /*cotie*/,
-   Real shift, 
-   Real coshift)
+   Real /*shift*/,
+   Real /*coshift*/)
 {
-   DataArray<Real>* p;
-   DataArray<Real>* cp;
+   // DataArray<Real>* p;
+   // DataArray<Real>* cp;
    // Real rtie;
    // Real ctie;
-   Real rshift;
-   Real cshift;
+   // Real rshift;
+   // Real cshift;
    int  i;
 
+#if 0
    if (thesolver->rep() == SPxSolver::COLUMN)
    {
       cp = &pref;
       p  = &coPref;
       // ctie = tie;
       // rtie = cotie;
-      cshift = shift;
-      rshift = coshift;
+      // cshift = shift;
+      // rshift = coshift;
    }
    else
    {
@@ -205,29 +206,32 @@ void SPxSteepPR::setupPrefsX(
       cp = &coPref;
       // rtie = tie;
       // ctie = cotie;
-      rshift = shift;
-      cshift = coshift;
+      // rshift = shift;
+      // cshift = coshift;
    }
 
    //      p[i] += rtie * thesolver->rowVector(i).size() / Real(thesolver->nCols());
    //      p[i] += EQ_PREF * (thesolver->rhs(i) == thesolver->lhs(i));
    //      p[i] += EQ_PREF * (thesolver->rhs(i) >=  infinity
    //                     &&  thesolver->lhs(i) <= -infinity);
-   for(i = 0; i < thesolver->nRows(); ++i)
-      (*p)[i] = rshift;
+   // for(i = 0; i < thesolver->nRows(); ++i)
+   //    (*p)[i] = rshift;
 
    //      cp[i] += ctie * thesolver->colVector(i).size() / Real(thesolver->nRows());
    //      cp[i] += EQ_PREF * (thesolver->upper(i) == thesolver->lower(i));
    //      cp[i] += EQ_PREF * (thesolver->upper(i) >=  infinity
    //                      &&  thesolver->lower(i) <= -infinity);
-   for(i = 0; i < thesolver->nCols(); ++i)
-      (*cp)[i] = cshift;
+   // for(i = 0; i < thesolver->nCols(); ++i)
+   //    (*cp)[i] = cshift;
+
+   // previously the next two loops where '*=' assignments
+#endif
 
    for(i = 0; i < coPref.size(); ++i)
-      coPref[i] *= 1.0 - mult * i;
+      coPref[i] = 1.0 - mult * i;
 
    for(i = 0; i < pref.size(); ++i)
-      pref[i] *= 1.0 + mult * i;
+      pref[i] = 1.0 + mult * i;
 }
 
 void SPxSteepPR::setupPrefs(SPxSolver::Type tp)
