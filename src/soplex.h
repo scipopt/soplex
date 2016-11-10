@@ -1615,6 +1615,8 @@ private:
    //@{
 
    bool _persistentscaling;
+   int  _optimizeCalls;
+   int  _unscaleCalls;
 
    //@}
 
@@ -1948,6 +1950,9 @@ private:
 
    /// check scaling of LP
    void _checkScalingReal(SPxLPReal* origLP);
+
+   /// check whether persistent scaling is supposed to be reapplied again after unscaling
+   bool _reapplyPersistentScaling() const;
 
    //@}
 };

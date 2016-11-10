@@ -20,6 +20,8 @@
 #include "soplex.h"
 #include "statistics.h"
 
+#define ALLOWED_UNSCALE_PERCENTAGE    0.1
+
 namespace soplex
 {
 
@@ -84,6 +86,16 @@ namespace soplex
 
 
 
+   /// check whether persistent scaling is supposed to be reapplied again after unscaling
+   bool SoPlex::_reapplyPersistentScaling() const
+   {
+      if( (_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE) && _optimizeCalls > 10 )
+         return false;
+      else
+         return true;
+   }
+
+
    /// solves real LP
    void SoPlex::_optimizeReal()
    {
@@ -91,6 +103,7 @@ namespace soplex
       assert(_realLP == &_solver);
 
       _solReal.invalidate();
+      ++_optimizeCalls;
 
       // start timing
       _statistics->solvingTime->start();
@@ -98,7 +111,7 @@ namespace soplex
       if( boolParam(SoPlex::PERSISTENTSCALING) )
       {
          // scale original problem; overwriting _realLP
-         if( _scaler && !_realLP->isScaled() )
+         if( _scaler && !_realLP->isScaled() && _reapplyPersistentScaling() )
          {
 #ifdef SOPLEX_DEBUG
             SPxLPReal* origLP = 0;
@@ -114,9 +127,9 @@ namespace soplex
          // unscale previously scaled problem, overwriting _realLP
          else if( !_scaler && _realLP->isScaled() )
          {
-            // todo implement counter for unscaling
             _realLP->unscaleLP();
             _isRealLPScaled = false;
+            ++_unscaleCalls;
          }
       }
 
@@ -470,9 +483,9 @@ namespace soplex
 
          if( _isRealLPScaled )
          {
-            // todo implement counter for unscaling
             _realLP->unscaleLP();
             _isRealLPScaled = false;
+            ++_unscaleCalls;
          }
 
          _preprocessAndSolveReal(false);
