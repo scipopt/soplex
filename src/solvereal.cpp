@@ -133,8 +133,6 @@ namespace soplex
          }
       }
 
-      _isRealLPVerified = false;
-
       // remember that last solve was in floating-point
       _lastSolveMode = SOLVEMODE_REAL;
 
@@ -197,7 +195,6 @@ namespace soplex
             MSG_INFO1( spxout, spxout << " --- loading original problem" << std::endl; )
             _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
             // we cannot do more to remove violations
-            _isRealLPVerified = true;
             _resolveWithoutPreprocessing(simplificationStatus);
          }
          else
@@ -212,25 +209,9 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without simplifying" << std::endl; )
-#if 0 // we don't want to lose the persistent scaling
-            if( _scaler != 0 )
-            {
-               _solver.unscaleLPandClearBasis();
-               _hasBasis = false;
-            }
-#endif
             _preprocessAndSolveReal(false);
             return;
          }
-#if 0
-         else if( _scaler != 0 )
-         {
-            _solver.unscaleLPandClearBasis();
-            _hasBasis = false;
-            _preprocessAndSolveReal(false);
-            return;
-         }
-#endif
          _hasBasis = false;
          break;
 
@@ -239,25 +220,9 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without simplifying" << std::endl; )
-#if 0 // we don't want to lose the persistent scaling
-            if( _scaler != 0 )
-            {
-               _solver.unscaleLPandClearBasis();
-               _hasBasis = false;
-            }
-#endif
             _preprocessAndSolveReal(false);
             return;
          }
-#if 0
-         else if( _scaler != 0 )
-         {
-            _solver.unscaleLPandClearBasis();
-            _hasBasis = false;
-            _preprocessAndSolveReal(false);
-            return;
-         }
-#endif
          // no break
       case SPxSolver::ABORT_TIME:
       case SPxSolver::ABORT_ITER:

@@ -526,7 +526,6 @@ namespace soplex
       _realLP = &_solver;
       _isRealLPLoaded = true;
       _isRealLPScaled = false;
-      _isRealLPVerified = false;
       _optimizeCalls = 0;
       _unscaleCalls = 0;
       _realLP->setOutstream(spxout);

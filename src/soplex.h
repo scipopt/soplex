@@ -1524,7 +1524,6 @@ private:
 
    bool _isRealLPLoaded;
    bool _isRealLPScaled;
-   bool _isRealLPVerified;
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
