@@ -88,25 +88,36 @@ namespace soplex
    void SoPlex::_optimizeReal()
    {
       assert(_realLP != 0);
+      assert(_realLP == &_solver);
+
       _solReal.invalidate();
 
       // start timing
       _statistics->solvingTime->start();
 
-      // scale original problem; overwrites _realLP
-      if( boolParam(SoPlex::PERSISTENTSCALING) && !_realLP->isScaled() && _scaler )
+      if( boolParam(SoPlex::PERSISTENTSCALING) )
       {
-         assert(_realLP == &_solver);
+         // scale original problem; overwriting _realLP
+         if( _scaler && !_realLP->isScaled() )
+         {
 #ifdef SOPLEX_DEBUG
-         SPxLPReal* origLP = 0;
-         spx_alloc(origLP);
-         origLP = new (origLP) SPxLPReal(*_realLP);
+            SPxLPReal* origLP = 0;
+            spx_alloc(origLP);
+            origLP = new (origLP) SPxLPReal(*_realLP);
 #endif
-         _scaler->scale(*_realLP, true);
-         _isRealLPScaled = true;
+            _scaler->scale(*_realLP, true);
+            _isRealLPScaled = true;
 #ifdef SOPLEX_DEBUG
-         _checkScalingReal(origLP);
+            _checkScalingReal(origLP);
 #endif
+         }
+         // unscale previously scaled problem, overwriting _realLP
+         else if( !_scaler && _realLP->isScaled() )
+         {
+            // todo implement counter for unscaling
+            _realLP->unscaleLP();
+            _isRealLPScaled = false;
+         }
       }
 
       _isRealLPVerified = false;
@@ -263,7 +274,7 @@ namespace soplex
       else
          _disableSimplifierAndScaler();
 
-      // determine preprocessing state based on user settings
+      // create a copy of the LP when simplifying or when using internal scaling, i.e. w/o persistent scaling
       bool copyLP = (_simplifier != 0 || (_scaler && !_isRealLPScaled));
 
       _solver.setTerminationValue(intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE
@@ -455,12 +466,15 @@ namespace soplex
                                    << ", row violation: " << rowviol
                                    << ", dual violation: " << dualviol
                                    << ", redcost violation: " << redcostviol << std::endl; )
-         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again" << std::endl; )
+         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again without presolving" << std::endl; )
+
          if( _isRealLPScaled )
          {
+            // todo implement counter for unscaling
             _realLP->unscaleLP();
             _isRealLPScaled = false;
          }
+
          _preprocessAndSolveReal(false);
       }
    }
@@ -552,13 +566,7 @@ namespace soplex
 
       // unscale vectors
       if( _scaler && _solver.isScaled() && !_isRealLPLoaded)
-      {
-         MSG_INFO1( spxout, spxout << " --- unscaling internal solution" << std::endl; )
-         _scaler->unscalePrimal(_solver, _solReal._primal);
-         _scaler->unscaleSlacks(_solver, _solReal._slacks);
-         _scaler->unscaleDual(_solver, _solReal._dual);
-         _scaler->unscaleRedCost(_solver, _solReal._redCost);
-      }
+         _unscaleSolutionReal(_solver, false);
 
       // get unsimplified solution data from simplifier
       if( _simplifier )
@@ -608,7 +616,7 @@ namespace soplex
 
       // unscale stored solution (removes persistent scaling)
       if( _isRealLPScaled )
-         _unscaleSolutionReal();
+         _unscaleSolutionReal(*_realLP, true);
 
       // check solution for violations and solve again if necessary
       if( verify )
@@ -683,7 +691,7 @@ namespace soplex
 
       // unscale stored solution (removes persistent scaling)
       if( _isRealLPScaled )
-         _unscaleSolutionReal();
+         _unscaleSolutionReal(*_realLP, true);
 
       // check solution for violations and solve again if necessary
       _verifySolutionReal();
@@ -691,18 +699,16 @@ namespace soplex
 
 
 
-   /// unscales stored solution to remove persistent scaling
-   void SoPlex::_unscaleSolutionReal()
+   /// unscales stored solution to remove internal or external scaling of LP
+   void SoPlex::_unscaleSolutionReal(SPxLPReal& LP, bool persistent)
    {
-      MSG_INFO1( spxout, spxout << " --- unscaling external solution" << std::endl; )
+      MSG_INFO1( spxout, spxout << " --- unscaling " << (persistent ? "external" : "internal") <<" solution" << std::endl; )
       assert(_scaler);
-      assert(boolParam(SoPlex::PERSISTENTSCALING));
-      assert(_isRealLPScaled);
-      assert(_realLP->isScaled());
-      _scaler->unscalePrimal(*_realLP, _solReal._primal);
-      _scaler->unscaleSlacks(*_realLP, _solReal._slacks);
-      _scaler->unscaleDual(*_realLP, _solReal._dual);
-      _scaler->unscaleRedCost(*_realLP, _solReal._redCost);
+      assert(!persistent || (boolParam(SoPlex::PERSISTENTSCALING) && _isRealLPScaled));
+      _scaler->unscalePrimal(LP, _solReal._primal);
+      _scaler->unscaleSlacks(LP, _solReal._slacks);
+      _scaler->unscaleDual(LP, _solReal._dual);
+      _scaler->unscaleRedCost(LP, _solReal._redCost);
    }
 } // namespace soplex
 #endif

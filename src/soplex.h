@@ -1943,8 +1943,8 @@ private:
    /// stores solution from the simplifier because problem vanished in presolving step
    void _storeSolutionRealFromPresol();
 
-   /// unscales stored solution to remove persistent scaling
-   void _unscaleSolutionReal();
+   /// unscales stored solution to remove internal or external scaling of LP
+   void _unscaleSolutionReal(SPxLPReal& LP, bool persistent = true);
 
    /// check scaling of LP
    void _checkScalingReal(SPxLPReal* origLP);
