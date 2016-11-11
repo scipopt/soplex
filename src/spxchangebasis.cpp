@@ -393,12 +393,12 @@ void SPxBasis::removedCols(const int perm[])
 }
 
 
-/**@todo is this correctly implemented?
+/**
+ * mark the basis as not factorized
  */
 void SPxBasis::invalidate()
 {
-   assert(spxout != 0);
-   if( spxout != 0 )
+   if( factorized || matrixIsSetup )
    {
       MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
    }
