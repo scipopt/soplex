@@ -37,6 +37,7 @@ fixed bugs:
 - fixed memory bug in class DSVectorBase when resizing zero length vectors
 - restore initial basis when given basis has too many basic variables
 - improve behaviour for LPs with zero constraints
+- cleaned up and corrected steepest edge pricing implementation
 
 code quality:
 - SoPlex is thread-safe by using the storage class specifier thread-local for static variables
