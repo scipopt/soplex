@@ -77,27 +77,10 @@ private:
    DIdxSet bestPricesCo;
    ///
    Real pi_p;
-   ///
-   int prefSetup;
-   /// preference multiplier for selecting as pivot
-   DataArray < Real > coPref;
-   /// preference multiplier for selecting as pivot
-   DataArray < Real > pref;
-   ///
-   DataArray < Real > leavePref;
    /// setup type.
    Setup setup;
    /// has a refinement step already been tried?
    bool refined;
-   //@}
-
-   //-------------------------------------
-   /**@name Preferences */
-   //@{
-   ///
-   void setupPrefsX(Real mult, Real /*tie*/, Real /*cotie*/, Real shift, Real coshift);
-   ///
-   void setupPrefs(SPxSolver::Type);
    //@}
 
    //-------------------------------------
@@ -138,7 +121,6 @@ public:
       , workVec (0)
       , workRhs (0)
       , pi_p(1.0)
-      , prefSetup (0)
       , setup (mode)
       , refined(false)
    {
@@ -150,10 +132,6 @@ public:
       , workVec(old.workVec)
       , workRhs(old.workRhs)
       , pi_p(old.pi_p)
-      , prefSetup(old.prefSetup)
-      , coPref(old.coPref)
-      , pref(old.pref)
-      , leavePref(old.leavePref)
       , setup(old.setup)
       , refined(old.refined)
    {
@@ -168,10 +146,6 @@ public:
          workVec = rhs.workVec;
          workRhs = rhs.workRhs;
          pi_p = rhs.pi_p;
-         prefSetup = rhs.prefSetup;
-         coPref = rhs.coPref;
-         pref = rhs.pref;
-         leavePref = rhs.leavePref;
          setup = rhs.setup;
          refined = rhs.refined;
 
