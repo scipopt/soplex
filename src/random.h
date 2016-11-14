@@ -23,9 +23,19 @@
 
 namespace soplex
 {
+
+/* initial seeds for KISS random number generator */
+#define  DEFAULT_LIN  123456789
+#define  DEFAULT_XOR  362436000
+#define  DEFAULT_MWC  521288629
+#define  DEFAULT_CST  7654321
+
+/* defines for linear congruential generator */
 #define  RSTEP    1103515245
-#define  RDIVIDE  65536
 #define  RADD     12345
+
+/* defines for shifting an unsigned integer into [0,1) */
+#define  RDIVIDE  65536
 #define  RMULT    32768
 
 /**@brief   Random numbers.
@@ -34,7 +44,16 @@ namespace soplex
    Class Random provides random Real variables, i.e. a value variable that
    gives another value each time it is accessed. It may be used just like an
    ordinary Real by means of an overloaded cast operator Real()%.
-   This is largely the same implementation as rand() from std lib.
+
+   This is an implementation of KISS random number generator developed by George Marsaglia.
+   KISS is combination of three different random number generators:
+    - Linear congruential generator
+    - Xorshift
+    - Lag-1 Multiply-with-carry
+
+   KISS has a period of 2^123 and passes all statistical test part of BigCrush-Test of TestU01 [1].
+
+   [1] http://dl.acm.org/citation.cfm?doid=1268776.1268777
 */
 class Random
 {
@@ -43,17 +62,35 @@ private:
    //--------------------------------------
    /**@name Data */
    //@{
-   unsigned int seed;    ///< random seed.
+   unsigned long seedshift;  ///< initial shift for random seeds.
+   unsigned long lin_seed;   ///< random seed for linear congruential RNS.
+   unsigned long xor_seed;   ///< random seed for XOR-shift RNS.
+   unsigned long mwc_seed;   ///< random seed Multiple-with-carry RNS.
+   unsigned long cst_seed;   ///< random seed shifted for mwc_seed.
    //@}
 
    //--------------------------------------
    /**@name Helpers */
    //@{
-   /// increases rand seed and returns a pseudo random Real value in [0,1).
+   /// executes KISS random number generator and returns a pseudo random Real value in [0,1).
    Real next_random()
    {
-      seed = seed * RSTEP + RADD;
-      Real i = int ((seed / RDIVIDE) % RMULT);
+      unsigned long long t;
+
+      /* linear congruential */
+      lin_seed = lin_seed * RSTEP + RADD;
+
+      /* Xorshift */
+      xor_seed ^= (xor_seed << 13);
+      xor_seed ^= (xor_seed >> 17);
+      xor_seed ^= (xor_seed << 5);
+
+      /* Multiply-with-carry */
+      t = 698769069ULL * mwc_seed + cst_seed;
+      cst_seed = (unsigned long) (t >> 32);
+      mwc_seed = (unsigned long) t;
+
+      Real i = (Real) (((lin_seed + xor_seed + mwc_seed) / RDIVIDE) % RMULT);
       return ( i / RMULT );
    }
 
@@ -70,10 +107,10 @@ public:
       return (minimum + (maximum - minimum) * next_random());
    }
 
-   /// returns current seed
-   unsigned int getSeed() const
+   /// returns the initial seed shift
+   unsigned long getSeed() const
    {
-      return seed;
+      return seedshift;
    }
 
    //@}
@@ -81,11 +118,16 @@ public:
    //--------------------------------------
    /**@name Modification */
    //@{
-   /// resets seed for next random number.
-   void setSeed(unsigned int randomseed)
+   /// initialize all seeds of the random number generator.
+   void setSeed(unsigned long initshift)
    {
-      seed = randomseed;
+      seedshift = initshift;
+      lin_seed = (unsigned long)(DEFAULT_LIN + initshift);
+      xor_seed = (unsigned long)(DEFAULT_XOR + initshift);
+      mwc_seed = (unsigned long)(DEFAULT_MWC + initshift);
+      cst_seed = (unsigned long)(DEFAULT_CST + initshift);
    }
+
    //@}
 
 
@@ -97,7 +139,7 @@ public:
        variable's sequence.
    */
    explicit
-   Random(unsigned int randomseed = 0)
+   Random(unsigned long randomseed = 0)
    {
       setSeed(randomseed);
    }
