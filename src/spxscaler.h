@@ -171,6 +171,20 @@ public:
    virtual void unscaleDual(const SPxLPBase<Real>& lp, Vector& pi) const;
    /// unscale dense reduced cost vector given in \p r.
    virtual void unscaleRedCost(const SPxLPBase<Real>& lp, Vector& r) const;
+   /// apply scaling to objective function vector \p origObj.
+   virtual void scaleObj(const SPxLPBase<Real>& lp, VectorReal& origObj) const;
+   /// returns scaled objective function coefficient \p origObj.
+   virtual Real scaleObj(const SPxLPBase<Real>& lp, int i, Real origObj) const;
+   /// returns scaled LP element in \p row and \p col.
+   virtual Real scaleElement(const SPxLPBase<Real>& lp, int row, int col, Real val) const;
+   /// returns scaled lower bound of column \p col.
+   virtual Real scaleLower(const SPxLPBase<Real>& lp, int col, Real lower) const;
+   /// returns scaled upper bound of column \p col.
+   virtual Real scaleUpper(const SPxLPBase<Real>& lp, int col, Real upper) const;
+   /// returns scaled left hand side of row \p row.
+   virtual Real scaleLhs(const SPxLPBase<Real>& lp, int row, Real lhs) const;
+   /// returns scaled right hand side of row \p row.
+   virtual Real scaleRhs(const SPxLPBase<Real>& lp, int row, Real rhs) const;
    /// absolute smallest column scaling factor
    virtual Real minAbsColscale() const;
    /// absolute biggest column scaling factor

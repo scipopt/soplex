@@ -58,6 +58,8 @@ private:
 
 protected:
 
+   DataArray < int > scaleExp;   ///< column scaling factors (stored as bitshift)
+
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected helpers */
    //@{
@@ -263,14 +265,14 @@ public:
    }
 
    ///
-   void add(const R& pobj, const R& plower, const SVectorBase<R>& pcolVector, const R& pupper)
+   void add(const R& pobj, const R& plower, const SVectorBase<R>& pcolVector, const R& pupper, const int& pscaleExp = 0)
    {
       DataKey k;
-      add(k, pobj, plower, pcolVector, pupper);
+      add(k, pobj, plower, pcolVector, pupper, pscaleExp);
    }
 
    /// Adds LPColBase consisting of objective value \p obj, lower bound \p lower, column vector \p colVector and upper bound \p upper to LPColSetBase.
-   void add(DataKey& newkey, const R& obj, const R& newlower, const SVectorBase<R>& newcolVector, const R& newupper)
+   void add(DataKey& newkey, const R& obj, const R& newlower, const SVectorBase<R>& newcolVector, const R& newupper, const int& newscaleExp = 0)
    {
       SVSetBase<R>::add(newkey, newcolVector);
 
@@ -279,11 +281,15 @@ public:
          low.reDim(num());
          up.reDim(num());
          object.reDim(num());
+         if( scaleExp.size() > 0 )
+            scaleExp.reSize(num());
       }
 
       low[num() - 1] = newlower;
       up[num() - 1] = newupper;
       object[num() - 1] = obj;
+      if( scaleExp.size() > 0 )
+         scaleExp[num() - 1] = newscaleExp;
    }
 
    /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to LPColSetBase.
@@ -317,6 +323,8 @@ public:
    void add(const LPColSetBase<R>& newset)
    {
       int i = num();
+      assert(!((newset.scaleExp.size() > 0) ^ (scaleExp.size() > 0)));
+      bool hasScaleExp = newset.scaleExp.size() > 0 && scaleExp.size() > 0;
 
       SVSetBase<R>::add(newset);
 
@@ -325,6 +333,8 @@ public:
          low.reDim(num());
          up.reDim(num());
          object.reDim(num());
+         if( hasScaleExp )
+            scaleExp.reSize(num());
       }
 
       for( int j = 0; i < num(); ++i, ++j )
@@ -332,6 +342,8 @@ public:
          low[i] = newset.lower(j);
          up[i] = newset.upper(j);
          object[i] = newset.maxObj(j);
+         if( hasScaleExp )
+            scaleExp[i] = newset.scaleExp[j];
       }
    }
 
@@ -378,25 +390,30 @@ public:
    }
 
    ///
-   SVectorBase<R>& create(int pnonzeros = 0, const R& pobj = 1, const R& plw = 0, const R& pupp = 1)
+   SVectorBase<R>& create(int pnonzeros = 0, const R& pobj = 1, const R& plw = 0, const R& pupp = 1, const int& pscaleExp = 0)
    {
       DataKey k;
-      return create(k, pnonzeros, pobj, plw, pupp);
+      return create(k, pnonzeros, pobj, plw, pupp, pscaleExp);
    }
 
    /// Creates new LPColBase with specified arguments and returns a reference to its column vector.
-   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& obj = 1, const R& newlow = 0, const R& newup = 1)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& obj = 1, const R& newlow = 0, const R& newup = 1, const int& newscaleExp = 0)
    {
       if( num() + 1 > low.dim() )
       {
          low.reDim(num() + 1);
          up.reDim(num() + 1);
          object.reDim(num() + 1);
+         if( scaleExp.size() > 0 )
+            scaleExp.reSize(num() + 1);
       }
 
       low[num()] = newlow;
       up[num()] = newup;
       object[num()] = obj;
+
+      if( scaleExp.size() > 0 )
+         scaleExp[num()] = newscaleExp;
 
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
@@ -422,6 +439,11 @@ public:
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
+      if( scaleExp.size() > 0 )
+      {
+         scaleExp[i] = scaleExp[num()];
+         scaleExp.reSize(num());
+      }
    }
 
    /// Removes LPColBase with DataKey \p k.
@@ -433,9 +455,8 @@ public:
    /// Removes multiple elements.
    void remove(int perm[])
    {
-      // todo pass _colscaleExp& and modify accordingly
-
       int n = num();
+      bool hasScaleExp = scaleExp.size() > 0;
 
       SVSetBase<R>::remove(perm);
 
@@ -446,12 +467,16 @@ public:
             low[perm[i]] = low[i];
             up[perm[i]] = up[i];
             object[perm[i]] = object[i];
+            if( hasScaleExp )
+               scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
+      if( hasScaleExp )
+         scaleExp.reSize(num());
    }
 
    /// Removes LPColBase%s with numbers \p nums, where \p n is the length of the array \p nums
@@ -466,6 +491,7 @@ public:
    {
       SVSetBase<R>::remove(nums, n, perm);
 
+      bool hasScaleExp = scaleExp.size() > 0;
       int j = num();
 
       for( int i = 0; i < j; ++i )
@@ -475,12 +501,16 @@ public:
             low[perm[i]] = low[i];
             up[perm[i]] = up[i];
             object[perm[i]] = object[i];
+            if( hasScaleExp )
+               scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
+      if( hasScaleExp )
+         scaleExp.reSize(num());
    }
 
    /// Removes all LPColBase%s from the set.
@@ -490,6 +520,7 @@ public:
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
+      scaleExp.clear();
    }
 
    //@}
@@ -507,6 +538,8 @@ public:
       up.reSize(max());
       low.reSize(max());
       object.reSize(max());
+      if( scaleExp.size() > 0 )
+         scaleExp.reSize(max());
    }
 
    /// Returns used nonzero memory.
@@ -569,7 +602,7 @@ public:
    */
    explicit
    LPColSetBase<R>(int pmax = -1, int pmemmax = -1)
-      : SVSetBase<R>(pmax, pmemmax), low(0), up(0), object(0)
+      : SVSetBase<R>(pmax, pmemmax), low(0), up(0), object(0), scaleExp(0)
    {
       assert(isConsistent());
    }
@@ -583,6 +616,7 @@ public:
          low = rs.low;
          up = rs.up;
          object = rs.object;
+         scaleExp = rs.scaleExp;
 
          assert(isConsistent());
       }
@@ -600,6 +634,7 @@ public:
          low = rs.low;
          up = rs.up;
          object = rs.object;
+         scaleExp = rs.scaleExp;
 
          assert(isConsistent());
       }
@@ -613,6 +648,7 @@ public:
       , low(rs.low)
       , up(rs.up)
       , object(rs.object)
+      , scaleExp(rs.scaleExp)
    {
       assert(isConsistent());
    }
@@ -624,6 +660,7 @@ public:
       , low(rs.low)
       , up(rs.up)
       , object(rs.object)
+      , scaleExp(rs.scaleExp)
    {
       assert(isConsistent());
    }

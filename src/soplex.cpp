@@ -122,7 +122,6 @@ namespace soplex
       upper[SoPlex::FACTOR_UPDATE_TYPE] = 1;
       defaultValue[SoPlex::FACTOR_UPDATE_TYPE] = SoPlex::FACTOR_UPDATE_TYPE_FT;
 
-      ///@todo which value?
       // maximum number of updates without fresh factorization
       name[SoPlex::FACTOR_UPDATE_MAX] = "factor_update_max";
       description[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization";
@@ -1572,7 +1571,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      // todo implement a scaleObj method
       _realLP->changeObj(i, obj);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
@@ -6770,6 +6768,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      bool scale = _realLP->isScaled();
       _realLP->addRow(lprow);
 
       if( _isRealLPLoaded )
@@ -6787,6 +6786,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      bool scale = _realLP->isScaled();
       _realLP->addRow(lhs, lprow, rhs);
 
       if( _isRealLPLoaded )
@@ -6804,6 +6804,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      bool scale = _realLP->isScaled();
       _realLP->addRows(lprowset);
 
       if( _isRealLPLoaded )
@@ -6820,6 +6821,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      bool scale = _realLP->isScaled();
       _realLP->addCol(lpcol);
 
       if( _isRealLPLoaded )
@@ -6844,6 +6846,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      bool scale = _realLP->isScaled();
       _realLP->addCol(obj, lower, lpcol, upper);
 
       if( _isRealLPLoaded )
@@ -6861,6 +6864,7 @@ namespace soplex
    {
       assert(_realLP != 0);
 
+      bool scale = _realLP->isScaled();
       _realLP->addCols(lpcolset);
 
       if( _isRealLPLoaded )
@@ -6887,7 +6891,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRow(i, lprow);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRow(i, lprow, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6911,7 +6916,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLhs(lhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLhs(lhs, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6932,7 +6938,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLhs(i, lhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLhs(i, lhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6950,7 +6957,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRhs(rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRhs(rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6973,7 +6981,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRhs(i, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRhs(i, rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6990,7 +6999,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRange(lhs, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRange(lhs, rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7015,8 +7025,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      // todo implemement a scaleRange method
-      _realLP->changeRange(i, lhs, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRange(i, lhs, rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7038,7 +7048,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeCol(i, lpcol);
+      bool scale = _realLP->isScaled();
+      _realLP->changeCol(i, lpcol, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7064,7 +7075,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLower(lower);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLower(lower, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7087,7 +7099,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLower(i, lower);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLower(i, lower, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7104,7 +7117,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeUpper(upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeUpper(upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7127,7 +7141,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeUpper(i, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeUpper(i, upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7144,7 +7159,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeBounds(lower, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeBounds(lower, upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7169,8 +7185,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      // todo implement a scaleBounds method
-      _realLP->changeBounds(i, lower, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeBounds(i, lower, upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7192,8 +7208,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      // todo implement a scaleElement method
-      _realLP->changeElement(i, j, val);
+      bool scale = _realLP->isScaled();
+      _realLP->changeElement(i, j, val, scale);
 
       if( _isRealLPLoaded )
       {

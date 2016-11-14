@@ -622,6 +622,62 @@ public:
       return *this;
    }
 
+   /// scale and assign
+   SVectorBase<R>& scaleAssign(int scaleExp, const SVectorBase<R>& sv)
+   {
+      if( this != &sv )
+      {
+         assert(max() == sv.size());
+
+         Nonzero<R>* e = m_elem;
+         const Nonzero<R>* s = sv.m_elem;
+
+         for( int i = 0; i < sv.size(); ++i )
+         {
+            m_elem[i].val = spxLdexp(sv[i].val, scaleExp);
+            m_elem[i].idx = sv[i].idx;
+         }
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+   /// scale and assign
+   VectorBase<R>& scaleAssign(const int* scaleExp, const VectorBase<R>& sv, bool negateExp = false)
+   {
+      if( this != &sv )
+      {
+         assert(max() == sv.size());
+
+         Nonzero<R>* e = m_elem;
+         const Nonzero<R>* s = sv.m_elem;
+
+         if( negateExp )
+         {
+            for( int i = 0; i < sv.size(); ++i )
+            {
+               m_elem[i].val = spxLdexp(sv[i].val, -scaleExp[sv[i].idx]);
+               m_elem[i].idx = sv[i].idx;
+            }
+         }
+         else
+         {
+            for( int i = 0; i < sv.size(); ++i )
+            {
+               m_elem[i].val = spxLdexp(sv[i].val, scaleExp[sv[i].idx]);
+               m_elem[i].idx = sv[i].idx;
+            }
+         }
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+
    /// Assignment operator.
    template < class S >
    SVectorBase<R>& assignArray(const S* rowValues, const int* rowIndices, int rowSize)
