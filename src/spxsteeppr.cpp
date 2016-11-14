@@ -207,6 +207,20 @@ void SPxSteepPR::left4(int n, SPxId id)
    }
 }
 
+Real inline computePrice(Real viol, Real weight, Real tol)
+{
+   if( weight < tol )
+   {
+#ifdef ENABLE_ADDITIONAL_CHECKS
+      MSG_WARNING( spxout, spxout << "WSTEEP02 pricing weight too small ("
+                                  << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
+#endif
+      return viol * viol / tol;
+   }
+   else
+      return viol * viol / weight;
+}
+
 int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
 {
    int idx;
@@ -225,11 +239,7 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
       x = fTest[idx];
       if (x < -feastol)
       {
-         if( cpen[idx] < feastol )
-            x = x * x / feastol;
-         else
-            x = x * x / cpen[idx];
-         price.val = x;
+         price.val = computePrice(x, cpen[idx], feastol);
          price.idx = idx;
          prices.append(price);
       }
@@ -311,16 +321,7 @@ int SPxSteepPR::selectLeaveX(Real tol)
 
       if (x < -tol)
       {
-         if( coWeights_ptr[i] < tol )
-         {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveX(): coWeights too small ("
-                                << coWeights_ptr[i] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
-            x = x * x / tol;
-         }
-         else
-            x = x * x / coWeights_ptr[i];
+         x = computePrice(x, coWeights_ptr[i], tol);
 
          if (x > best)
          {
@@ -349,16 +350,7 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
 
       if (x < -tol)
       {
-         if( coWeights_ptr[idx] < tol )
-         {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coWeights too small ("
-                                << coWeights_ptr[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
-            x = x * x / tol;
-         }
-         else
-            x = x * x / coWeights_ptr[idx];
+         x = computePrice(x, coWeights_ptr[idx], tol);
 
          if (x > best)
          {
@@ -395,16 +387,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
       if( x < -tol )
       {
          assert(thesolver->isInfeasible[idx] == VIOLATED || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
-         if( coPen[idx] < tol )
-         {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coWeights too small ("
-                                << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
-            x = x * x / tol;
-         }
-         else
-            x = x * x / coPen[idx];
+         x = computePrice(x, coPen[idx], tol);
 
          if( x > best )
          {
@@ -437,16 +420,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
       {
          x = fTest[idx];
          assert(x < -tol);
-         if( coPen[idx] < tol )
-         {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-            MSG_WARNING( spxout, spxout << "WSTEEP02 SPxSteepPR::selectLeaveSparse(): coWeights too small ("
-                                << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
-            x = x * x / tol;
-         }
-         else
-            x = x * x / coPen[idx];
+         x = computePrice(x, coPen[idx], tol);
 
          if( x > leastBest )
          {
@@ -550,10 +524,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
       if ( x < -feastol)
       {
          assert(thesolver->isInfeasible[idx] == VIOLATED || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
-         if( coWeights[idx] < feastol )
-            price.val = x * x / feastol;
-         else
-            price.val = x * x / coWeights_ptr[idx];
+         price.val = computePrice(x, coWeights_ptr[idx], feastol);
          price.idx = idx;
          prices.append(price);
       }
@@ -605,10 +576,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
       if ( x < -feastol)
       {
          assert(thesolver->isInfeasibleCo[idx] == VIOLATED || thesolver->isInfeasibleCo[idx] == VIOLATED_AND_CHECKED);
-         if( weights_ptr[idx] < feastol )
-            price.val = x * x / feastol;
-         else
-            price.val = x * x / weights_ptr[idx];
+         price.val = computePrice(x, weights_ptr[idx], feastol);
          price.idx = idx;
          pricesCo.append(price);
       }
@@ -723,10 +691,7 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
       x = coTest[idx];
       if( x < -tol )
       {
-         if( coWeights_ptr[idx] < tol )
-            x = x * x / tol;
-         else
-            x = x * x / coWeights_ptr[idx];
+         x = computePrice(x, coWeights_ptr[idx], tol);
          if( x > best )
          {
             best = x;
@@ -759,10 +724,7 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
          x = coTest[idx];
          if( x < -tol )
          {
-            if( coWeights_ptr[idx] < tol )
-               x = x * x / tol;
-            else
-               x = x * x / coWeights_ptr[idx];
+            x = computePrice(x, coWeights_ptr[idx], tol);
             if( x > leastBest )
             {
                if (x > best)
@@ -806,10 +768,7 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
       x = test[idx];
       if( x < -tol )
       {
-         if( weights_ptr[idx] < tol )
-            x = x * x / tol;
-         else
-            x = x * x / weights_ptr[idx];
+         x = computePrice(x, weights_ptr[idx], tol);
          if( x > best )
          {
             best = x;
@@ -842,10 +801,7 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
          x = test[idx];
          if( x < -tol )
          {
-            if( weights_ptr[idx] < tol )
-               x = x * x / tol;
-            else
-               x = x * x / weights_ptr[idx];
+            x = computePrice(x, weights_ptr[idx], tol);
             if( x > leastBest )
             {
                if (x > best)
@@ -888,10 +844,7 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
 
       if (x < -tol)
       {
-         if( coWeights_ptr[idx] < tol )
-            x = x * x / tol;
-         else
-            x = x * x / coWeights_ptr[idx];
+         x = computePrice(x, coWeights_ptr[idx], tol);
          if (x > best)
          {
             best = x;
@@ -923,10 +876,7 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
 
       if (x < -tol)
       {
-         if( weights_ptr[idx] < tol )
-            x = x * x / tol;
-         else
-            x = x * x / weights_ptr[idx];
+         x = computePrice(x, weights_ptr[idx], tol);
          if (x > best)
          {
             best   = x;
@@ -955,10 +905,7 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, Real tol)
       x = coTest[i];
       if (x < -tol)
       {
-         if( coWeights_ptr[i] < tol )
-            x = x * x / tol;
-         else
-            x = x * x / coWeights_ptr[i];
+         x = computePrice(x, coWeights_ptr[i], tol);
          if (x > best)
          {
             best = x;
@@ -982,10 +929,7 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
       x = test[i];
       if (x < -tol)
       {
-         if( weights_ptr[i] < tol )
-            x = x * x / tol;
-         else
-            x = x * x / weights_ptr[i];
+         x = computePrice(x, weights_ptr[i], tol);
          if (x > best)
          {
             best   = x;

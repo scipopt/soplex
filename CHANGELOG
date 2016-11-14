@@ -38,10 +38,12 @@ fixed bugs:
 - restore initial basis when given basis has too many basic variables
 - improve behaviour for LPs with zero constraints
 - cleaned up and corrected steepest edge pricing implementation
+- check for very small weights in devex pricing (just like for steepest edge)
 
 code quality:
 - SoPlex is thread-safe by using the storage class specifier thread-local for static variables
 - disabling verbosity when using PARASCIP is not necessary anymore
+- use inline function to compute pricing values
 
 
 29 February 2016 - Release 2.2.1
