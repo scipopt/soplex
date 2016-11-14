@@ -77,9 +77,13 @@ namespace soplex
                MSG_INFO1( spxout, spxout << "scaling error in col " << i << ", row " << j
                           << ": orig " << origLP->colVector(i).value(j)
                           << ", unscaled: " << col.value(j) << std::endl; )
-                  correct = false;
+               correct = false;
             }
          }
+      }
+      if( !correct )
+      {
+         MSG_INFO1( spxout, spxout << "scaling check failed" << std::endl; )
       }
       assert(correct);
    }
