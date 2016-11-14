@@ -356,8 +356,8 @@ Real SPxScaler::getColMaxAbsUnscaled(const SPxLP& lp, int i) const
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   DataArray < int >& colscaleExp = *m_activeColscaleExp;
+   DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVector& colVec = lp.LPColSet::colVector(i);
 
    Real max = 0.0;
@@ -368,7 +368,7 @@ Real SPxScaler::getColMaxAbsUnscaled(const SPxLP& lp, int i) const
    {
       exp1 = rowscaleExp[colVec.index(j)];
       Real abs = spxAbs(spxLdexp(colVec.value(j), -exp1 - exp2));
-      if( GT(abs, max) )
+      if( abs > max )
          max = abs;
    }
 
@@ -381,8 +381,8 @@ Real SPxScaler::getColMinAbsUnscaled(const SPxLP& lp, int i) const
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   DataArray < int >& colscaleExp = *m_activeColscaleExp;
+   DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVector& colVec = lp.LPColSet::colVector(i);
 
    Real min = infinity;
@@ -393,7 +393,7 @@ Real SPxScaler::getColMinAbsUnscaled(const SPxLP& lp, int i) const
    {
       exp1 = rowscaleExp[colVec.index(j)];
       Real abs = spxAbs(spxLdexp(colVec.value(j), -exp1 - exp2));
-      if( LT(abs, min) )
+      if( abs < min )
          min = abs;
    }
 
