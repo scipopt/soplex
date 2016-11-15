@@ -1459,9 +1459,6 @@ public:
    /// returns the current random seed of the solver instance
    unsigned long randomSeed() const;
 
-   /// is persistent scaling being used?
-   bool persistentScaling() const;
-
    //@}
 
 private:
@@ -1613,7 +1610,6 @@ private:
    //**@name Miscellaneous */
    //@{
 
-   bool _persistentscaling;
    int  _optimizeCalls;
    int  _unscaleCalls;
 

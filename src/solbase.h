@@ -230,8 +230,6 @@ private:
    unsigned int _isDualFeasible:1;
    unsigned int _hasDualFarkas:1;
 
-   bool _isScaled;
-
    /// default constructor only for friends
    SolBase<R>()
       : _primalObjVal(0)

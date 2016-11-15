@@ -4634,12 +4634,6 @@ namespace soplex
 
 
 
-   bool SoPlex::persistentScaling() const
-   {
-      return _persistentscaling;
-   }
-
-
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
    /// integer variables if desired; returns true on success
    bool SoPlex::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
@@ -5113,7 +5107,6 @@ namespace soplex
          _ratiotesterBoundFlipping.useBoundFlipsRow(value);
          break;
       case PERSISTENTSCALING:
-         _persistentscaling = value;
          break;
       default:
          return false;

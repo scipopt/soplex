@@ -190,7 +190,7 @@ namespace soplex
       {
       case SPxSolver::OPTIMAL:
          _hasBasis = true;
-         _storeSolutionReal();
+         _storeSolutionReal(!_isRealLPLoaded);
          break;
 
       case SPxSolver::UNBOUNDED:
