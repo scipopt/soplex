@@ -160,16 +160,19 @@ namespace soplex
       {
       case SPxSimplifier::INFEASIBLE:
          _status = SPxSolver::INFEASIBLE;
+         _loadRealLP(false);
          _hasBasis = false;
          return;
 
       case SPxSimplifier::DUAL_INFEASIBLE:
          _status = SPxSolver::INForUNBD;
+         _loadRealLP(false);
          _hasBasis = false;
          return;
 
       case SPxSimplifier::UNBOUNDED:
          _status = SPxSolver::UNBOUNDED;
+         _loadRealLP(false);
          _hasBasis = false;
          return;
 
@@ -579,12 +582,7 @@ namespace soplex
          _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
 
          // load original problem but don't setup a slack basis
-         _solver.loadLP(*_realLP, false);
-         _realLP->~SPxLPReal();
-         spx_free(_realLP);
-         _realLP = &_solver;
-         _isRealLPLoaded = true;
-         _hasBasis = true;
+         _loadRealLP(false);
 
          assert(_realLP == &_solver);
 
@@ -593,7 +591,7 @@ namespace soplex
          assert(_basisStatusCols.size() == numColsReal());
          _solver.setBasisStatus(SPxBasis::REGULAR);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-
+         _hasBasis = true;
       }
 
       // unscale stored solution (removes persistent scaling)
@@ -625,12 +623,8 @@ namespace soplex
       _solReal._dual.reDim(numRowsReal(), true);
       _solReal._redCost.reDim(numColsReal(), true);
 
-      // load original LP and setup slack basis
-      _solver.loadLP(*_realLP, true);
-      _isRealLPLoaded = true;
-      _realLP->~SPxLPReal();
-      spx_free(_realLP);
-      _realLP = &_solver;
+      // load original LP and setup slack basis for unsimplifying
+      _loadRealLP(true);
 
       // store slack basis
       _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
@@ -677,6 +671,18 @@ namespace soplex
 
       // check solution for violations and solve again if necessary
       _verifySolutionReal();
+   }
+
+
+
+   /// load original LP and possibly setup a slack basis
+   void SoPlex::_loadRealLP(bool initBasis)
+   {
+      _solver.loadLP(*_realLP, initBasis);
+      _isRealLPLoaded = true;
+      _realLP->~SPxLPReal();
+      spx_free(_realLP);
+      _realLP = &_solver;
    }
 
 

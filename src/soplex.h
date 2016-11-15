@@ -1947,6 +1947,9 @@ private:
    /// unscales stored solution to remove internal or external scaling of LP
    void _unscaleSolutionReal(SPxLPReal& LP, bool persistent = true);
 
+   /// load original LP and possibly setup a slack basis
+   void _loadRealLP(bool initBasis);
+
    /// check scaling of LP
    void _checkScalingReal(SPxLPReal* origLP);
 

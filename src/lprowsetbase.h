@@ -388,23 +388,19 @@ public:
          left.reDim(num());
          right.reDim(num());
          object.reDim(num());
-         if( scaleExp.size() > 0 )
-            scaleExp.reSize(num());
+         scaleExp.reSize(num());
       }
 
       left[num() - 1] = newlhs;
       right[num() - 1] = newrhs;
       object[num() - 1] = newobj;
-      if( scaleExp.size() > 0 )
-         scaleExp[num() - 1] = newscaleExp;
+      scaleExp[num() - 1] = newscaleExp;
    }
 
    ///
    void add(const LPRowSetBase<R>& newset)
    {
       int i = num();
-      assert(!((newset.scaleExp.size() > 0) ^ (scaleExp.size() > 0)));
-      bool hasScaleExp = newset.scaleExp.size() > 0 && scaleExp.size() > 0;
 
       SVSetBase<R>::add(newset);
 
@@ -413,8 +409,7 @@ public:
          left.reDim(num());
          right.reDim(num());
          object.reDim(num());
-         if( hasScaleExp )
-            scaleExp.reSize(num());
+         scaleExp.reSize(num());
       }
 
       for( int j = 0; i < num(); ++i, ++j )
@@ -422,8 +417,7 @@ public:
          left[i] = newset.lhs(j);
          right[i] = newset.rhs(j);
          object[i] = newset.obj(j);
-         if( hasScaleExp )
-            scaleExp[i] = newset.scaleExp[j];
+         scaleExp[i] = newset.scaleExp[j];
       }
    }
 
@@ -484,16 +478,13 @@ public:
          left.reDim(num() + 1);
          right.reDim(num() + 1);
          object.reDim(num() + 1);
-         if( scaleExp.size() > 0 )
-            scaleExp.reSize(num() + 1);
+         scaleExp.reSize(num() + 1);
       }
 
       left[num()] = newlhs;
       right[num()] = newrhs;
       object[num()] = newobj;
-
-      if( scaleExp.size() > 0 )
-         scaleExp[num()] = newscaleExp;
+      scaleExp[num()] = newscaleExp;
 
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
@@ -515,14 +506,11 @@ public:
       left[i] = left[num()];
       right[i] = right[num()];
       object[i] = object[num()];
+      scaleExp[i] = scaleExp[num()];
       left.reDim(num());
       right.reDim(num());
       object.reDim(num());
-      if( scaleExp.size() > 0 )
-      {
-         scaleExp[i] = scaleExp[num()];
-         scaleExp.reSize(num());
-      }
+      scaleExp.reSize(num());
    }
 
    /// Removes LPRowBase with DataKey \p k.
@@ -535,7 +523,6 @@ public:
    void remove(int perm[])
    {
       int j = num();
-      bool hasScaleExp = scaleExp.size() > 0;
 
       SVSetBase<R>::remove(perm);
 
@@ -546,16 +533,14 @@ public:
             left[perm[i]] = left[i];
             right[perm[i]] = right[i];
             object[perm[i]] = object[i];
-            if( hasScaleExp )
-               scaleExp[perm[i]] = scaleExp[i];
+            scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       left.reDim (num());
       right.reDim(num());
       object.reDim(num());
-      if( hasScaleExp )
-         scaleExp.reSize(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes \p n LPRowBase%s with row numbers given by \p nums.
@@ -571,7 +556,6 @@ public:
    {
       SVSetBase<R>::remove(nums, n, perm);
 
-      bool hasScaleExp = scaleExp.size() > 0;
       int j = num();
 
       for( int i = 0; i < j; ++i )
@@ -581,16 +565,14 @@ public:
             left[perm[i]] = left[i];
             right[perm[i]] = right[i];
             object[perm[i]] = object[i];
-            if( hasScaleExp )
-               scaleExp[perm[i]] = scaleExp[i];
+            scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       left.reDim (num());
       right.reDim(num());
       object.reDim(num());
-      if( hasScaleExp )
-         scaleExp.reSize(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes all LPRowBase%s.
@@ -620,8 +602,7 @@ public:
       left.reSize (max());
       right.reSize(max());
       object.reSize(max());
-      if( scaleExp.size() > 0 )
-         scaleExp.reSize(max());
+      scaleExp.reSize(max());
    }
 
    /// Returns number of used nonzero entries.

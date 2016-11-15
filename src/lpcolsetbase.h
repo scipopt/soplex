@@ -281,15 +281,13 @@ public:
          low.reDim(num());
          up.reDim(num());
          object.reDim(num());
-         if( scaleExp.size() > 0 )
-            scaleExp.reSize(num());
+         scaleExp.reSize(num());
       }
 
       low[num() - 1] = newlower;
       up[num() - 1] = newupper;
       object[num() - 1] = obj;
-      if( scaleExp.size() > 0 )
-         scaleExp[num() - 1] = newscaleExp;
+      scaleExp[num() - 1] = newscaleExp;
    }
 
    /// Adds LPColBase consisting of left hand side \p lhs, column vector \p colVector, and right hand side \p rhs to LPColSetBase.
@@ -323,8 +321,6 @@ public:
    void add(const LPColSetBase<R>& newset)
    {
       int i = num();
-      assert(!((newset.scaleExp.size() > 0) ^ (scaleExp.size() > 0)));
-      bool hasScaleExp = newset.scaleExp.size() > 0 && scaleExp.size() > 0;
 
       SVSetBase<R>::add(newset);
 
@@ -333,8 +329,7 @@ public:
          low.reDim(num());
          up.reDim(num());
          object.reDim(num());
-         if( hasScaleExp )
-            scaleExp.reSize(num());
+         scaleExp.reSize(num());
       }
 
       for( int j = 0; i < num(); ++i, ++j )
@@ -342,8 +337,7 @@ public:
          low[i] = newset.lower(j);
          up[i] = newset.upper(j);
          object[i] = newset.maxObj(j);
-         if( hasScaleExp )
-            scaleExp[i] = newset.scaleExp[j];
+         scaleExp[i] = newset.scaleExp[j];
       }
    }
 
@@ -404,16 +398,13 @@ public:
          low.reDim(num() + 1);
          up.reDim(num() + 1);
          object.reDim(num() + 1);
-         if( scaleExp.size() > 0 )
-            scaleExp.reSize(num() + 1);
+         scaleExp.reSize(num() + 1);
       }
 
       low[num()] = newlow;
       up[num()] = newup;
       object[num()] = obj;
-
-      if( scaleExp.size() > 0 )
-         scaleExp[num()] = newscaleExp;
+      scaleExp[num()] = newscaleExp;
 
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
@@ -436,14 +427,11 @@ public:
       low[i] = low[num()];
       up[i] = up[num()];
       object[i] = object[num()];
+      scaleExp[i] = scaleExp[num()];
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
-      if( scaleExp.size() > 0 )
-      {
-         scaleExp[i] = scaleExp[num()];
-         scaleExp.reSize(num());
-      }
+      scaleExp.reSize(num());
    }
 
    /// Removes LPColBase with DataKey \p k.
@@ -456,7 +444,6 @@ public:
    void remove(int perm[])
    {
       int n = num();
-      bool hasScaleExp = scaleExp.size() > 0;
 
       SVSetBase<R>::remove(perm);
 
@@ -467,16 +454,14 @@ public:
             low[perm[i]] = low[i];
             up[perm[i]] = up[i];
             object[perm[i]] = object[i];
-            if( hasScaleExp )
-               scaleExp[perm[i]] = scaleExp[i];
+            scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
-      if( hasScaleExp )
-         scaleExp.reSize(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes LPColBase%s with numbers \p nums, where \p n is the length of the array \p nums
@@ -491,7 +476,6 @@ public:
    {
       SVSetBase<R>::remove(nums, n, perm);
 
-      bool hasScaleExp = scaleExp.size() > 0;
       int j = num();
 
       for( int i = 0; i < j; ++i )
@@ -501,16 +485,14 @@ public:
             low[perm[i]] = low[i];
             up[perm[i]] = up[i];
             object[perm[i]] = object[i];
-            if( hasScaleExp )
-               scaleExp[perm[i]] = scaleExp[i];
+            scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       low.reDim(num());
       up.reDim(num());
       object.reDim(num());
-      if( hasScaleExp )
-         scaleExp.reSize(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes all LPColBase%s from the set.
@@ -538,8 +520,7 @@ public:
       up.reSize(max());
       low.reSize(max());
       object.reSize(max());
-      if( scaleExp.size() > 0 )
-         scaleExp.reSize(max());
+      scaleExp.reSize(max());
    }
 
    /// Returns used nonzero memory.
