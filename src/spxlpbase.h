@@ -1256,7 +1256,7 @@ public:
    //@{
 
    /// Changes objective vector to \p newObj.
-   virtual void changeObj(const VectorBase<R>& newObj, bool scale = false)
+   void changeObj(const VectorBase<R>& newObj, bool scale = false)
    {
       changeMaxObj(newObj, scale);
       if( spxSense() == MINIMIZE )
@@ -1264,7 +1264,7 @@ public:
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
-   virtual void changeObj(int i, const R& newVal, bool scale = false)
+   void changeObj(int i, const R& newVal, bool scale = false)
    {
       changeMaxObj(i, newVal, scale);
       if( spxSense() == MINIMIZE )
@@ -1282,13 +1282,13 @@ public:
    }
 
    /// Changes objective value of column with identifier \p id to \p newVal.
-   virtual void changeObj(SPxColId id, const R& newVal, bool scale = false)
+   void changeObj(SPxColId id, const R& newVal, bool scale = false)
    {
       changeObj(number(id), newVal, scale);
    }
 
    /// Changes objective vector to \p newObj.
-   virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
+   void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
    {
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
@@ -1296,7 +1296,7 @@ public:
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
-   virtual void changeMaxObj(int i, const R& newVal, bool scale = false)
+   void changeMaxObj(int i, const R& newVal, bool scale = false)
    {
       LPColSetBase<R>::maxObj_w(i) = newVal;
       assert(isConsistent());
@@ -1311,25 +1311,22 @@ public:
    }
 
    /// Changes objective value of column with identifier \p id to \p newVal.
-   virtual void changeMaxObj(SPxColId id, const R& newVal, bool scale = false)
+   void changeMaxObj(SPxColId id, const R& newVal, bool scale = false)
    {
       changeMaxObj(number(id), newVal, scale);
    }
 
    /// Changes vector of lower bounds to \p newLower.
-   virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
+   void changeLower(const VectorBase<R>& newLower, bool scale = false)
    {
-
       assert(lower().dim() == newLower.dim());
       LPColSetBase<R>::lower_w() = newLower;
       assert(isConsistent());
    }
 
    /// changes \p i 'th lower bound to \p newLower.
-   virtual void changeLower(int i, const R& newLower, bool scale = false)
+   void changeLower(int i, const R& newLower, bool scale = false)
    {
-      // todo persistent scaling!
-
       LPColSetBase<R>::lower_w(i) = newLower;
       assert(isConsistent());
    }
@@ -1343,13 +1340,13 @@ public:
    }
 
    /// changes lower bound of column with identifier \p id to \p newLower.
-   virtual void changeLower(SPxColId id, const R& newLower, bool scale = false)
+   void changeLower(SPxColId id, const R& newLower, bool scale = false)
    {
       changeLower(number(id), newLower, scale);
    }
 
    /// Changes vector of upper bounds to \p newUpper.
-   virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
+   void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
    {
       assert(upper().dim() == newUpper.dim());
       LPColSetBase<R>::upper_w() = newUpper;
@@ -1357,7 +1354,7 @@ public:
    }
 
    /// Changes \p i 'th upper bound to \p newUpper.
-   virtual void changeUpper(int i, const R& newUpper, bool scale = false)
+   void changeUpper(int i, const R& newUpper, bool scale = false)
    {
       LPColSetBase<R>::upper_w(i) = newUpper;
       assert(isConsistent());
@@ -1372,13 +1369,13 @@ public:
    }
 
    /// Changes upper bound of column with identifier \p id to \p newLower.
-   virtual void changeUpper(SPxColId id, const R& newUpper, bool scale = false)
+   void changeUpper(SPxColId id, const R& newUpper, bool scale = false)
    {
       changeUpper(number(id), newUpper, scale);
    }
 
    /// Changes variable bounds to \p newLower and \p newUpper.
-   virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper, bool scale = false)
+   void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper, bool scale = false)
    {
       changeLower(newLower, scale);
       changeUpper(newUpper, scale);
@@ -1386,7 +1383,7 @@ public:
    }
 
    /// Changes bounds of column \p i to \p newLower and \p newUpper.
-   virtual void changeBounds(int i, const R& newLower, const R& newUpper, bool scale = false)
+   void changeBounds(int i, const R& newLower, const R& newUpper, bool scale = false)
    {
       changeLower(i, newLower, scale);
       changeUpper(i, newUpper, scale);
@@ -1403,13 +1400,13 @@ public:
    }
 
    /// Changes bounds of column with identifier \p id.
-   virtual void changeBounds(SPxColId id, const R& newLower, const R& newUpper, bool scale = false)
+   void changeBounds(SPxColId id, const R& newLower, const R& newUpper, bool scale = false)
    {
       changeBounds(number(id), newLower, newUpper, scale);
    }
 
    /// Changes left hand side vector for constraints to \p newLhs.
-   virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
+   void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
    {
       assert(lhs().dim() == newLhs.dim());
       LPRowSetBase<R>::lhs_w() = newLhs;
@@ -1417,7 +1414,7 @@ public:
    }
 
    /// Changes \p i 'th left hand side value to \p newLhs.
-   virtual void changeLhs(int i, const R& newLhs, bool scale = false)
+   void changeLhs(int i, const R& newLhs, bool scale = false)
    {
       LPRowSetBase<R>::lhs_w(i) = newLhs;
       assert(isConsistent());
@@ -1432,13 +1429,13 @@ public:
    }
 
    /// Changes left hand side value for row with identifier \p id.
-   virtual void changeLhs(SPxRowId id, const R& newLhs, bool scale = false)
+   void changeLhs(SPxRowId id, const R& newLhs, bool scale = false)
    {
       changeLhs(number(id), newLhs, scale);
    }
 
    /// Changes right hand side vector for constraints to \p newRhs.
-   virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
+   void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
    {
       assert(rhs().dim() == newRhs.dim());
       LPRowSetBase<R>::rhs_w() = newRhs;
@@ -1446,20 +1443,20 @@ public:
    }
 
    /// Changes \p i 'th right hand side value to \p newRhs.
-   virtual void changeRhs(int i, const R& newRhs, bool scale = false)
+   void changeRhs(int i, const R& newRhs, bool scale = false)
    {
       LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
    }
 
    /// Changes right hand side value for row with identifier \p id.
-   virtual void changeRhs(SPxRowId id, const R& newRhs, bool scale = false)
+   void changeRhs(SPxRowId id, const R& newRhs, bool scale = false)
    {
       changeRhs(number(id), newRhs, scale);
    }
 
    /// Changes left and right hand side vectors.
-   virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs, bool scale = false)
+   void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs, bool scale = false)
    {
       changeLhs(newLhs, scale);
       changeRhs(newRhs, scale);
@@ -1467,7 +1464,7 @@ public:
    }
 
    /// Changes left and right hand side of row \p i.
-   virtual void changeRange(int i, const R& newLhs, const R& newRhs, bool scale = false)
+   void changeRange(int i, const R& newLhs, const R& newRhs, bool scale = false)
    {
       changeLhs(i, newLhs, scale);
       changeRhs(i, newRhs, scale);
@@ -1484,13 +1481,13 @@ public:
    }
 
    /// Changes left and right hand side of row with identifier \p id.
-   virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs, bool scale = false)
+   void changeRange(SPxRowId id, const R& newLhs, const R& newRhs, bool scale = false)
    {
       changeRange(number(id), newLhs, newRhs, scale);
    }
 
    /// Changes row objective function vector to \p newRowObj.
-   virtual void changeRowObj(const VectorBase<R>& newRowObj, bool scale = false)
+   void changeRowObj(const VectorBase<R>& newRowObj, bool scale = false)
    {
       assert(maxRowObj().dim() == newRowObj.dim());
       LPRowSetBase<R>::obj_w() = newRowObj;
@@ -1500,7 +1497,7 @@ public:
    }
 
    /// Changes \p i 'th row objective function value to \p newRowObj.
-   virtual void changeRowObj(int i, const R& newRowObj, bool scale = false)
+   void changeRowObj(int i, const R& newRowObj, bool scale = false)
    {
       LPRowSetBase<R>::obj_w(i) = newRowObj;
       if( spxSense() == MINIMIZE )
@@ -1509,19 +1506,19 @@ public:
    }
 
    /// Changes row objective function value for row with identifier \p id.
-   virtual void changeRowObj(SPxRowId id, const R& newRowObj, bool scale = false)
+   void changeRowObj(SPxRowId id, const R& newRowObj, bool scale = false)
    {
       changeRowObj(number(id), newRowObj, scale);
    }
 
    /// Clears row objective function values for all rows
-   virtual void clearRowObjs()
+   void clearRowObjs()
    {
       LPRowSetBase<R>::obj_w().clear();
    }
 
    /// Replaces \p i 'th row of LP with \p newRow.
-   virtual void changeRow(int n, const LPRowBase<R>& newRow, bool scale = false)
+   void changeRow(int n, const LPRowBase<R>& newRow, bool scale = false)
    {
       if( n < 0 )
          return;
@@ -1553,13 +1550,13 @@ public:
    }
 
    /// Replaces row with identifier \p id with \p newRow.
-   virtual void changeRow(SPxRowId id, const LPRowBase<R>& newRow, bool scale = false)
+   void changeRow(SPxRowId id, const LPRowBase<R>& newRow, bool scale = false)
    {
       changeRow(number(id), newRow, scale);
    }
 
    /// Replaces \p i 'th column of LP with \p newCol.
-   virtual void changeCol(int n, const LPColBase<R>& newCol, bool scale = false)
+   void changeCol(int n, const LPColBase<R>& newCol, bool scale = false)
    {
       if( n < 0 )
          return;
@@ -1591,13 +1588,13 @@ public:
    }
 
    /// Replaces column with identifier \p id with \p newCol.
-   virtual void changeCol(SPxColId id, const LPColBase<R>& newCol, bool scale = false)
+   void changeCol(SPxColId id, const LPColBase<R>& newCol, bool scale = false)
    {
       changeCol(number(id), newCol, scale);
    }
 
    /// Changes LP element (\p i, \p j) to \p val.
-   virtual void changeElement(int i, int j, const R& val, bool scale = false)
+   void changeElement(int i, int j, const R& val, bool scale = false)
    {
       if( i < 0 || j < 0 )
          return;
@@ -1660,13 +1657,13 @@ public:
    }
 
    /// Changes LP element identified by (\p rid, \p cid) to \p val.
-   virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val, bool scale = false)
+   void changeElement(SPxRowId rid, SPxColId cid, const R& val, bool scale = false)
    {
       changeElement(number(rid), number(cid), val, scale);
    }
 
    /// Changes optimization sense to \p sns.
-   virtual void changeSense(SPxSense sns)
+   void changeSense(SPxSense sns)
    {
       if( sns != thesense )
       {
@@ -1914,7 +1911,6 @@ protected:
    /// Internal helper method.
    virtual void doRemoveCol(int j)
    {
-
       const SVectorBase<R>& vec = colVector(j);
       int i;
 

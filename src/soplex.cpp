@@ -6768,7 +6768,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      bool scale = _realLP->isScaled();
       _realLP->addRow(lprow);
 
       if( _isRealLPLoaded )
@@ -6786,7 +6785,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      bool scale = _realLP->isScaled();
       _realLP->addRow(lhs, lprow, rhs);
 
       if( _isRealLPLoaded )
@@ -6804,7 +6802,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      bool scale = _realLP->isScaled();
       _realLP->addRows(lprowset);
 
       if( _isRealLPLoaded )
@@ -6821,7 +6818,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      bool scale = _realLP->isScaled();
       _realLP->addCol(lpcol);
 
       if( _isRealLPLoaded )
@@ -6846,7 +6842,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      bool scale = _realLP->isScaled();
       _realLP->addCol(obj, lower, lpcol, upper);
 
       if( _isRealLPLoaded )
@@ -6864,7 +6859,6 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      bool scale = _realLP->isScaled();
       _realLP->addCols(lpcolset);
 
       if( _isRealLPLoaded )

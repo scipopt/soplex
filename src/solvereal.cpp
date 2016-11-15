@@ -123,7 +123,7 @@ namespace soplex
             origLP = new (origLP) SPxLPReal(*_realLP);
 #endif
             _scaler->scale(*_realLP, true);
-            _isRealLPScaled = true;
+            _isRealLPScaled = _realLP->isScaled(); // a scaler might decide not to apply scaling
 #ifdef SOPLEX_DEBUG
             _checkScalingReal(origLP);
 #endif
