@@ -1816,7 +1816,7 @@ void SPxMainSM::propagatePseudoobj(SPxLP& lp)
          pseudoObj += val*lp.upper(j);
    }
 
-   if(LT(pseudoObj, infinity) && GT(pseudoObj, -infinity))
+   if(LT(pseudoObj, infinity) && GT(pseudoObj, -infinity) && GT(m_cutoffbound, -infinity) && LT(m_cutoffbound, infinity))
    {
       if(pseudoObj > m_pseudoobj)
          m_pseudoobj = pseudoObj;
