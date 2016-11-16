@@ -67,6 +67,7 @@ void SPxSolver::reLoad()
 
 void SPxSolver::loadLP(const SPxLP& lp, bool initSlackBasis)
 {
+   clear();
    unInit();
    unLoad();
    resetClockStats();

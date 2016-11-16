@@ -52,8 +52,8 @@ protected:
    /**@name Data */
    //@{
    const char*        m_name;      ///< Name of the scaler
-   mutable DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
-   mutable DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
+   DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
+   DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
    bool               m_colFirst;  ///< do column scaling first 
    bool               m_doBoth;    ///< do columns and rows
    SPxOut*            spxout;      ///< message handler
