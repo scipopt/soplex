@@ -534,8 +534,8 @@ Real SPxScaler::getRowMaxAbsUnscaled(const SPxLP& lp, int i) const
 {
    assert(i < lp.nRows());
    assert(i >= 0);
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   DataArray < int >& colscaleExp = *m_activeColscaleExp;
+   DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVector& rowVec = lp.LPRowSet::rowVector(i);
 
    Real max = 0.0;
@@ -560,8 +560,8 @@ Real SPxScaler::getRowMinAbsUnscaled(const SPxLP& lp, int i) const
 {
    assert(i < lp.nRows());
    assert(i >= 0);
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   DataArray < int >& colscaleExp = *m_activeColscaleExp;
+   DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVector& rowVec = lp.LPRowSet::rowVector(i);
 
    Real min = infinity;
