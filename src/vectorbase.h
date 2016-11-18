@@ -140,7 +140,7 @@ public:
    }
 
    /// scale and assign
-   VectorBase<R>& scaleAssign(int scaleExp, const VectorBase<R>& vec)
+   VectorBase<Real>& scaleAssign(int scaleExp, const VectorBase<Real>& vec)
    {
       if( this != &vec )
       {
@@ -156,7 +156,7 @@ public:
    }
 
    /// scale and assign
-   VectorBase<R>& scaleAssign(const int* scaleExp, const VectorBase<R>& vec, bool negateExp = false)
+   VectorBase<Real>& scaleAssign(const int* scaleExp, const VectorBase<Real>& vec, bool negateExp = false)
    {
       if( this != &vec )
       {

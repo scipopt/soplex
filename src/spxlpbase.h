@@ -1290,14 +1290,7 @@ public:
    virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
    {
       assert(maxObj().dim() == newObj.dim());
-      if( scale )
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         LPColSetBase<R>::maxObj_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newObj);
-      }
-      else
-         LPColSetBase<R>::maxObj_w() = newObj;
+      LPColSetBase<R>::maxObj_w() = newObj;
       assert(isConsistent());
    }
 
@@ -1333,14 +1326,7 @@ public:
    virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
    {
       assert(lower().dim() == newLower.dim());
-      if( scale )
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         LPColSetBase<R>::lower_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newLower, true);
-      }
-      else
-         LPColSetBase<R>::lower_w() = newLower;
+      LPColSetBase<R>::lower_w() = newLower;
       assert(isConsistent());
    }
 
@@ -1376,14 +1362,7 @@ public:
    virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
    {
       assert(upper().dim() == newUpper.dim());
-      if( scale )
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         LPColSetBase<R>::upper_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newUpper, true);
-      }
-      else
-         LPColSetBase<R>::upper_w() = newUpper;
+      LPColSetBase<R>::upper_w() = newUpper;
       assert(isConsistent());
    }
 
@@ -1450,14 +1429,7 @@ public:
    virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
    {
       assert(lhs().dim() == newLhs.dim());
-      if( scale )
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         LPRowSetBase<R>::lhs_w().scaleAssign(LPRowSetBase<R>::scaleExp.get_const_ptr(), newLhs);
-      }
-      else
-         LPRowSetBase<R>::lhs_w() = newLhs;
+      LPRowSetBase<R>::lhs_w() = newLhs;
       assert(isConsistent());
    }
 
@@ -1489,14 +1461,7 @@ public:
    virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
    {
       assert(rhs().dim() == newRhs.dim());
-      if( scale )
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         LPRowSetBase<R>::rhs_w().scaleAssign(LPRowSetBase<R>::scaleExp.get_const_ptr(), newRhs);
-      }
-      else
-         LPRowSetBase<R>::rhs_w() = newRhs;
+      LPRowSetBase<R>::rhs_w() = newRhs;
       assert(isConsistent());
    }
 

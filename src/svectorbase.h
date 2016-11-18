@@ -623,19 +623,16 @@ public:
    }
 
    /// scale and assign
-   SVectorBase<R>& scaleAssign(int scaleExp, const SVectorBase<R>& sv)
+   SVectorBase<Real>& scaleAssign(int scaleExp, const SVectorBase<Real>& sv)
    {
       if( this != &sv )
       {
-         assert(max() == sv.size());
-
-         Nonzero<R>* e = m_elem;
-         const Nonzero<R>* s = sv.m_elem;
+         assert(max() >= sv.size());
 
          for( int i = 0; i < sv.size(); ++i )
          {
-            m_elem[i].val = spxLdexp(sv[i].val, scaleExp);
-            m_elem[i].idx = sv[i].idx;
+            m_elem[i].val = spxLdexp(sv.value(i), scaleExp);
+            m_elem[i].idx = sv.index(i);
          }
 
          assert(isConsistent());
@@ -645,29 +642,26 @@ public:
    }
 
    /// scale and assign
-   VectorBase<R>& scaleAssign(const int* scaleExp, const VectorBase<R>& sv, bool negateExp = false)
+   SVectorBase<Real>& scaleAssign(const int* scaleExp, const SVectorBase<Real>& sv, bool negateExp = false)
    {
       if( this != &sv )
       {
-         assert(max() == sv.size());
-
-         Nonzero<R>* e = m_elem;
-         const Nonzero<R>* s = sv.m_elem;
+         assert(max() >= sv.size());
 
          if( negateExp )
          {
             for( int i = 0; i < sv.size(); ++i )
             {
-               m_elem[i].val = spxLdexp(sv[i].val, -scaleExp[sv[i].idx]);
-               m_elem[i].idx = sv[i].idx;
+               m_elem[i].val = spxLdexp(sv.value(i), -scaleExp[sv.index(i)]);
+               m_elem[i].idx = sv.index(i);
             }
          }
          else
          {
             for( int i = 0; i < sv.size(); ++i )
             {
-               m_elem[i].val = spxLdexp(sv[i].val, scaleExp[sv[i].idx]);
-               m_elem[i].idx = sv[i].idx;
+               m_elem[i].val = spxLdexp(sv.value(i), scaleExp[sv.index(i)]);
+               m_elem[i].idx = sv.index(i);
             }
          }
 
