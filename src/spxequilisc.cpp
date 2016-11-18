@@ -44,7 +44,7 @@ static void computeScalingExpVec(
 
          for( int j = 0; j < vec.size(); ++j )
          {
-            Real x = spxAbs(vec.value(j) * ldexp(1.0, coScaleExp[vec.index(j)]));
+            Real x = spxAbs(spxLdexp(vec.value(j), coScaleExp[vec.index(j)]));
 
             if( GT(x, maxi) )
                maxi = x;
@@ -55,7 +55,8 @@ static void computeScalingExpVec(
 
          assert(maxi > 0.0);
 
-         frexp(1.0 / maxi, &(scaleExp[i]));
+         spxFrexp(1.0 / maxi, &(scaleExp[i]));
+
          scaleExp[i] -= 1;
       }
    }
