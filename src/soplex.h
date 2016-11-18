@@ -734,7 +734,7 @@ public:
    bool getExactCondition(Real& condition);
 
    /// computes row r of basis inverse; returns true on success
-   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL);
+   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes column c of basis inverse; returns true on success
    bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);

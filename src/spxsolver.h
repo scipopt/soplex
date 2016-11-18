@@ -843,9 +843,9 @@ protected:
    /**@name Protected helpers */
    //@{
    ///
-   virtual void addedRows(int n);
+   virtual void addedRows(int n, bool scale = false);
    ///
-   virtual void addedCols(int n);
+   virtual void addedCols(int n, bool scale = false);
    ///
    virtual void doRemoveRow(int i);
    ///
@@ -862,29 +862,29 @@ public:
    /**@name Modification */
    //@{
    ///
-   virtual void changeObj(const Vector& newObj);
+   virtual void changeObj(const Vector& newObj, bool scale = false);
    ///
-   virtual void changeObj(int i, const Real& newVal);
+   virtual void changeObj(int i, const Real& newVal, bool scale = false);
    ///
-   virtual void changeObj(SPxColId p_id, const Real& p_newVal)
+   virtual void changeObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
    {
-      changeObj(number(p_id), p_newVal);
+      changeObj(number(p_id), p_newVal, scale);
    }
    ///
-   virtual void changeMaxObj(const Vector& newObj);
+   virtual void changeMaxObj(const Vector& newObj, bool scale = false);
    ///
-   virtual void changeMaxObj(int i, const Real& newVal);
+   virtual void changeMaxObj(int i, const Real& newVal, bool scale = false);
    ///
-   virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal)
+   virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
    {
-      changeMaxObj(number(p_id), p_newVal);
+      changeMaxObj(number(p_id), p_newVal, scale);
    }
    ///
-   virtual void changeRowObj(const Vector& newObj);
+   virtual void changeRowObj(const Vector& newObj, bool scale = false);
    ///
-   virtual void changeRowObj(int i, const Real& newVal);
+   virtual void changeRowObj(int i, const Real& newVal, bool scale = false);
    ///
-   virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal)
+   virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal, bool scale = false)
    {
       changeRowObj(number(p_id), p_newVal);
    }
@@ -897,88 +897,85 @@ public:
    ///
    virtual void changeLowerStatus(int i, Real newLower, Real oldLower = 0.0);
    ///
-   virtual void changeLower(const Vector& newLower);
+   virtual void changeLower(const Vector& newLower, bool scale = false);
    ///
-   virtual void changeLower(int i, const Real& newLower);
+   virtual void changeLower(int i, const Real& newLower, bool scale = false);
    ///
-   virtual void changeLower(SPxColId p_id, const Real& p_newLower)
+   virtual void changeLower(SPxColId p_id, const Real& p_newLower, bool scale = false)
    {
-      changeLower(number(p_id), p_newLower);
+      changeLower(number(p_id), p_newLower, scale);
    }
    ///
    virtual void changeUpperStatus(int i, Real newUpper, Real oldLower = 0.0);
    ///
-   virtual void changeUpper(const Vector& newUpper);
+   virtual void changeUpper(const Vector& newUpper, bool scale = false);
    ///
-   virtual void changeUpper(int i, const Real& newUpper);
+   virtual void changeUpper(int i, const Real& newUpper, bool scale = false);
    ///
-   virtual void changeUpper(SPxColId p_id, const Real& p_newUpper)
+   virtual void changeUpper(SPxColId p_id, const Real& p_newUpper, bool scale = false)
    {
-      changeUpper(number(p_id), p_newUpper);
+      changeUpper(number(p_id), p_newUpper, scale);
    }
    ///
-   virtual void changeBounds(const Vector& newLower, const Vector& newUpper);
+   virtual void changeBounds(const Vector& newLower, const Vector& newUpper, bool scale = false);
    ///
-   virtual void changeBounds(int i, const Real& newLower, const Real& newUpper);
+   virtual void changeBounds(int i, const Real& newLower, const Real& newUpper, bool scale = false);
    ///
-   virtual void changeBounds(
-      SPxColId p_id, const Real& p_newLower, const Real& p_newUpper)
+   virtual void changeBounds(SPxColId p_id, const Real& p_newLower, const Real& p_newUpper, bool scale = false)
    {
-      changeBounds(number(p_id), p_newLower, p_newUpper);
+      changeBounds(number(p_id), p_newLower, p_newUpper, scale);
    }
    ///
    virtual void changeLhsStatus(int i, Real newLhs, Real oldLhs = 0.0);
    ///
-   virtual void changeLhs(const Vector& newLhs);
+   virtual void changeLhs(const Vector& newLhs, bool scale = false);
    ///
-   virtual void changeLhs(int i, const Real& newLhs);
+   virtual void changeLhs(int i, const Real& newLhs, bool scale = false);
    ///
-   virtual void changeLhs(SPxRowId p_id, const Real& p_newLhs)
+   virtual void changeLhs(SPxRowId p_id, const Real& p_newLhs, bool scale = false)
    {
-      changeLhs(number(p_id), p_newLhs);
+      changeLhs(number(p_id), p_newLhs, scale);
    }
    ///
    virtual void changeRhsStatus(int i, Real newRhs, Real oldRhs = 0.0);
    ///
-   virtual void changeRhs(const Vector& newRhs);
+   virtual void changeRhs(const Vector& newRhs, bool scale = false);
    ///
-   virtual void changeRhs(int i, const Real& newRhs);
+   virtual void changeRhs(int i, const Real& newRhs, bool scale = false);
    ///
-   virtual void changeRhs(SPxRowId p_id, const Real& p_newRhs)
+   virtual void changeRhs(SPxRowId p_id, const Real& p_newRhs, bool scale = false)
    {
-      changeRhs(number(p_id), p_newRhs);
+      changeRhs(number(p_id), p_newRhs, scale);
    }
    ///
-   virtual void changeRange(const Vector& newLhs, const Vector& newRhs);
+   virtual void changeRange(const Vector& newLhs, const Vector& newRhs, bool scale = false);
    ///
-   virtual void changeRange(int i, const Real& newLhs, const Real& newRhs);
+   virtual void changeRange(int i, const Real& newLhs, const Real& newRhs, bool scale = false);
    ///
-   virtual void changeRange(
-      SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs)
+   virtual void changeRange(SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs, bool scale = false)
    {
-      changeRange(number(p_id), p_newLhs, p_newRhs);
+      changeRange(number(p_id), p_newLhs, p_newRhs, scale);
    }
    ///
-   virtual void changeRow(int i, const LPRow& newRow);
+   virtual void changeRow(int i, const LPRow& newRow, bool scale = false);
    ///
-   virtual void changeRow(SPxRowId p_id, const LPRow& p_newRow)
+   virtual void changeRow(SPxRowId p_id, const LPRow& p_newRow, bool scale = false)
    {
-      changeRow(number(p_id), p_newRow);
+      changeRow(number(p_id), p_newRow, scale);
    }
    ///
-   virtual void changeCol(int i, const LPCol& newCol);
+   virtual void changeCol(int i, const LPCol& newCol, bool scale = false);
    ///
-   virtual void changeCol(SPxColId p_id, const LPCol& p_newCol)
+   virtual void changeCol(SPxColId p_id, const LPCol& p_newCol, bool scale = false)
    {
-      changeCol(number(p_id), p_newCol);
+      changeCol(number(p_id), p_newCol, scale);
    }
    ///
-   virtual void changeElement(int i, int j, const Real& val);
+   virtual void changeElement(int i, int j, const Real& val, bool scale = false);
    ///
-   virtual void changeElement(
-      SPxRowId rid, SPxColId cid, const Real& val)
+   virtual void changeElement(SPxRowId rid, SPxColId cid, const Real& val, bool scale = false)
    {
-      changeElement(number(rid), number(cid), val);
+      changeElement(number(rid), number(cid), val, scale);
    }
    ///
    virtual void changeSense(SPxSense sns);

@@ -558,15 +558,15 @@ public:
    //@{
 
    ///
-   virtual void addRow(const LPRowBase<R>& row)
+   virtual void addRow(const LPRowBase<R>& row, bool scale = false)
    {
-      doAddRow(row);
+      doAddRow(row, scale);
    }
 
    ///
-   virtual void addRow(const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue)
+   virtual void addRow(const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue, bool scale = false)
    {
-      doAddRow(lhsValue, rowVec, rhsValue);
+      doAddRow(lhsValue, rowVec, rhsValue, scale);
    }
 
    ///
@@ -606,16 +606,16 @@ public:
    }
 
    /// Adds \p row to LPRowSetBase.
-   virtual void addRow(SPxRowId& id, const LPRowBase<R>& row)
+   virtual void addRow(SPxRowId& id, const LPRowBase<R>& row, bool scale = false)
    {
-      addRow(row);
+      addRow(row, scale);
       id = rId(nRows() - 1);
    }
 
    ///
-   virtual void addRows(const LPRowSetBase<R>& pset)
+   virtual void addRows(const LPRowSetBase<R>& pset, bool scale = false)
    {
-      doAddRows(pset);
+      doAddRows(pset, scale);
    }
 
    ///
@@ -710,25 +710,24 @@ public:
    }
 
    /// adds all LPRowBase%s of \p pset to LPRowSetBase.
-   virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set)
+   virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set, bool scale = false)
    {
-
       int i = nRows();
-      addRows(set);
+      addRows(set, scale);
       for( int j = 0; i < nRows(); ++i, ++j )
          id[j] = rId(i);
    }
 
    ///
-   virtual void addCol(const LPColBase<R>& col)
+   virtual void addCol(const LPColBase<R>& col, bool scale = false)
    {
-      doAddCol(col);
+      doAddCol(col, scale);
    }
 
    ///
-   virtual void addCol(const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   virtual void addCol(const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue, bool scale = false)
    {
-      doAddCol(objValue, lowerValue, colVec, upperValue);
+      doAddCol(objValue, lowerValue, colVec, upperValue, scale);
    }
 
    ///
@@ -765,16 +764,16 @@ public:
    }
 
    /// Adds \p col to LPColSetVBase.
-   virtual void addCol(SPxColId& id, const LPColBase<R>& col)
+   virtual void addCol(SPxColId& id, const LPColBase<R>& col, bool scale = false)
    {
-      addCol(col);
+      addCol(col, scale);
       id = cId(nCols() - 1);
    }
 
    ///
-   virtual void addCols(const LPColSetBase<R>& pset)
+   virtual void addCols(const LPColSetBase<R>& pset, bool scale = false)
    {
-      doAddCols(pset);
+      doAddCols(pset, scale);
    }
 
    ///
@@ -867,11 +866,11 @@ public:
    }
 
    /// Adds all LPColBase%s of \p set to LPColSetBase.
-   virtual void addCols(SPxColId id[], const LPColSetBase<R>& set)
+   virtual void addCols(SPxColId id[], const LPColSetBase<R>& set, bool scale = false)
    {
 
       int i = nCols();
-      addCols(set);
+      addCols(set, scale);
       for( int j = 0; i < nCols(); ++i, ++j )
          id[j] = cId(i);
    }
@@ -1295,10 +1294,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPColSetBase<Real>::maxObj_w().scaleAssign(LPColSetBase<Real>::scaleExp.get_const_ptr(), newObj);
+         LPColSetBase<R>::maxObj_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newObj);
       }
       else
-         LPColSetBase<Real>::maxObj_w() = newObj;
+         LPColSetBase<R>::maxObj_w() = newObj;
       assert(isConsistent());
    }
 
@@ -1309,10 +1308,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPColSetBase<Real>::maxObj_w(i) = lp_scaler->scaleObj(*this, i, newVal);
+         LPColSetBase<R>::maxObj_w(i) = lp_scaler->scaleObj(*this, i, newVal);
       }
       else
-         LPColSetBase<Real>::maxObj_w(i) = newVal;
+         LPColSetBase<R>::maxObj_w(i) = newVal;
       assert(isConsistent());
    }
 
@@ -1338,10 +1337,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPColSetBase<Real>::lower_w().scaleAssign(LPColSetBase<Real>::scaleExp.get_const_ptr(), newLower, true);
+         LPColSetBase<R>::lower_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newLower, true);
       }
       else
-         LPColSetBase<Real>::lower_w() = newLower;
+         LPColSetBase<R>::lower_w() = newLower;
       assert(isConsistent());
    }
 
@@ -1352,10 +1351,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPColSetBase<Real>::lower_w(i) = lp_scaler->scaleLower(*this, i, newLower);
+         LPColSetBase<R>::lower_w(i) = lp_scaler->scaleLower(*this, i, newLower);
       }
       else
-         LPColSetBase<Real>::lower_w(i) = newLower;
+         LPColSetBase<R>::lower_w(i) = newLower;
       assert(isConsistent());
    }
 
@@ -1381,10 +1380,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPColSetBase<Real>::upper_w().scaleAssign(LPColSetBase<Real>::scaleExp.get_const_ptr(), newUpper, true);
+         LPColSetBase<R>::upper_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newUpper, true);
       }
       else
-         LPColSetBase<Real>::upper_w() = newUpper;
+         LPColSetBase<R>::upper_w() = newUpper;
       assert(isConsistent());
    }
 
@@ -1395,10 +1394,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPColSetBase<Real>::upper_w(i) = lp_scaler->scaleUpper(*this, i, newUpper);
+         LPColSetBase<R>::upper_w(i) = lp_scaler->scaleUpper(*this, i, newUpper);
       }
       else
-         LPColSetBase<Real>::upper_w(i) = newUpper;
+         LPColSetBase<R>::upper_w(i) = newUpper;
       assert(isConsistent());
    }
 
@@ -1455,10 +1454,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPRowSetBase<Real>::lhs_w().scaleAssign(LPRowSetBase<Real>::scaleExp.get_const_ptr(), newLhs);
+         LPRowSetBase<R>::lhs_w().scaleAssign(LPRowSetBase<R>::scaleExp.get_const_ptr(), newLhs);
       }
       else
-         LPRowSetBase<Real>::lhs_w() = newLhs;
+         LPRowSetBase<R>::lhs_w() = newLhs;
       assert(isConsistent());
    }
 
@@ -1466,9 +1465,9 @@ public:
    virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
       if( scale )
-         LPRowSetBase<Real>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs);
+         LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs);
       else
-         LPRowSetBase<Real>::lhs_w(i) = newLhs;
+         LPRowSetBase<R>::lhs_w(i) = newLhs;
       assert(isConsistent());
    }
 
@@ -1494,10 +1493,10 @@ public:
       {
          assert(_isScaled);
          assert(lp_scaler);
-         LPRowSetBase<Real>::rhs_w().scaleAssign(LPRowSetBase<Real>::scaleExp.get_const_ptr(), newRhs);
+         LPRowSetBase<R>::rhs_w().scaleAssign(LPRowSetBase<R>::scaleExp.get_const_ptr(), newRhs);
       }
       else
-         LPRowSetBase<Real>::rhs_w() = newRhs;
+         LPRowSetBase<R>::rhs_w() = newRhs;
       assert(isConsistent());
    }
 
@@ -1505,9 +1504,9 @@ public:
    virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
       if( scale )
-         LPRowSetBase<Real>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs);
+         LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs);
       else
-         LPRowSetBase<Real>::rhs_w(i) = newRhs;
+         LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
    }
 
@@ -1605,7 +1604,7 @@ public:
          int idx = newrow.index(j);
          R val = newrow.value(j);
          if( scale )
-            val = spxLdexp(val, LPRowSetBase<Real>::scaleExp[n] + LPColSetBase<Real>::scaleExp[idx]);
+            val = spxLdexp(val, LPRowSetBase<R>::scaleExp[n] + LPColSetBase<R>::scaleExp[idx]);
          LPRowSetBase<R>::add2(n, 1, &idx, &val);
          LPColSetBase<R>::add2(idx, 1, &n, &val);
       }
@@ -1645,7 +1644,7 @@ public:
          int idx = newcol.index(j);
          R val = newcol.value(j);
          if( scale )
-            val = spxLdexp(val, LPColSetBase<Real>::scaleExp[n] + LPRowSetBase<Real>::scaleExp[idx]);
+            val = spxLdexp(val, LPColSetBase<R>::scaleExp[n] + LPRowSetBase<R>::scaleExp[idx]);
          LPColSetBase<R>::add2(n, 1, &idx, &val);
          LPRowSetBase<R>::add2(idx, 1, &n, &val);
       }
@@ -2037,12 +2036,34 @@ protected:
    }
 
    /// Called after the last \p n rows have just been added.
-   virtual void addedRows(int)
-   {}
+   virtual void addedRows(int newrows, bool scale = false)
+   {
+      // apply column scaling to new rows
+      if( scale )
+      {
+         for( int i = 0; i < newrows; ++i)
+         {
+            SVectorBase<R>& row = LPRowSetBase<R>::rowVector_w(nRows() - 1 - i);
+            for( int j = 0; j < row.size(); ++j)
+               row.value(j) = spxLdexp(row.value(j), LPColSetBase<R>::scaleExp[row.index(j)]);
+         }
+      }
+   }
 
    /// Called after the last \p n columns have just been added.
-   virtual void addedCols(int)
-   {}
+   virtual void addedCols(int newcols, bool scale = false)
+   {
+      // apply row scaling to new columns
+      if( scale )
+      {
+         for( int i = 0; i < newcols; ++i)
+         {
+            SVectorBase<R>& col = LPColSetBase<R>::colVector_w(nCols() - 1 - i);
+            for( int j = 0; j < col.size(); ++j)
+               col.value(j) = spxLdexp(col.value(j), LPRowSetBase<R>::scaleExp[col.index(j)]);
+         }
+      }
+   }
 
    ///
    void added2Set(SVSetBase<R>& set, const SVSetBase<R>& addset, int n)
@@ -2117,9 +2138,8 @@ private:
    }
 
    ///
-   void doAddRow (const LPRowBase<R>& row)
+   void doAddRow (const LPRowBase<R>& row, bool scale = false)
    {
-
       int idx = nRows();
       int oldColNumber = nCols();
       const SVectorBase<R>& vec = row.rowVector();
@@ -2144,12 +2164,12 @@ private:
          LPColSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedRows(1);
-      addedCols(nCols() - oldColNumber);
+      addedRows(1, scale);
+      addedCols(nCols() - oldColNumber, scale);
    }
 
    ///
-   void doAddRow (const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue)
+   void doAddRow (const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue, bool scale = false)
    {
       int idx = nRows();
       int oldColNumber = nCols();
@@ -2174,15 +2194,13 @@ private:
          LPColSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedRows(1);
-      addedCols(nCols() - oldColNumber);
+      addedRows(1, scale);
+      addedCols(nCols() - oldColNumber, scale);
    }
 
    ///
-   void doAddRows(const LPRowSetBase<R>& set)
+   void doAddRows(const LPRowSetBase<R>& set, bool scale = false)
    {
-      // todo adapt to persistent scaling of LP
-
       int i, j, k, ii, idx;
       SVectorBase<R>* col;
       DataArray < int > newCols(nCols());
@@ -2261,13 +2279,13 @@ private:
 
       assert(SPxLPBase<R>::isConsistent());
 
-      assert( set.num() == nRows() - oldRowNumber );
-      addedRows( nRows() - oldRowNumber );
-      addedCols( nCols() - oldColNumber );
+      assert(set.num() == nRows() - oldRowNumber);
+      addedRows(nRows() - oldRowNumber, scale);
+      addedCols(nCols() - oldColNumber, scale);
    }
 
    ///
-   void doAddCol (const LPColBase<R>& col)
+   void doAddCol (const LPColBase<R>& col, bool scale = false)
    {
 
       int idx = nCols();
@@ -2296,12 +2314,12 @@ private:
          LPRowSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedCols(1);
-      addedRows(nRows() - oldRowNumber);
+      addedCols(1, scale);
+      addedRows(nRows() - oldRowNumber, scale);
    }
 
    ///
-   void doAddCol (const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   void doAddCol (const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue, bool scale = false)
    {
       int idx = nCols();
       int oldRowNumber = nRows();
@@ -2328,12 +2346,12 @@ private:
          LPRowSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedCols(1);
-      addedRows(nRows() - oldRowNumber);
+      addedCols(1, scale);
+      addedRows(nRows() - oldRowNumber, scale);
    }
 
    ///
-   void doAddCols(const LPColSetBase<R>& set)
+   void doAddCols(const LPColSetBase<R>& set, bool scale = false)
    {
       // todo adapt to persistent scaling
 
@@ -2414,8 +2432,8 @@ private:
       assert(SPxLPBase<R>::isConsistent());
 
       assert(set.num() == nCols() - oldColNumber);
-      addedCols(nCols() - oldColNumber);
-      addedRows(nRows() - oldRowNumber);
+      addedCols(nCols() - oldColNumber, scale);
+      addedRows(nRows() - oldRowNumber, scale);
    }
 
    //@}
