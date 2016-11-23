@@ -53,7 +53,7 @@ class SPxLPBase;
    the former scaling factors are retained during branch-and-bound (persistent scaling).
    However, while within SoPlex the scaled problem is used, data accessed through
    the soplex.cpp interface is provided w.r.t. the original problem (i.e., in unscaled form).
-   For instance, consider a scaled constraints matrix A' with initial slack basis I.
+   For instance, consider a scaled constraints matrix A' that is extended by artificial slack variables.
    A basis \f$ B' = [(A',I)P]_{[1:m],[1:m] }\f$ (with P being a permutation matrix)
    for the scaled problem corresponds to the basis
    \f$ B = R^{-1} [(A',I)P]_{[1:m][1:m]} [P^{T} \tilde{C}^{-1} P]_{[1:m][1:m] } \f$. In
