@@ -4148,6 +4148,8 @@ namespace soplex
             /* unscaling required? */
             if( unscale && _solver.isScaled())
             {
+               /* for information on the unscaling procedure see spxscaler.h */
+
                int scaleExp =_scaler->getRowScaleExp(c);
                SVector rhs(_solver.unitVector(c));
                rhs *= spxLdexp(1.0, scaleExp);

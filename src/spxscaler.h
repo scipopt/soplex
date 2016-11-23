@@ -42,6 +42,33 @@ class SPxLPBase;
    the SPxScaler and then call #scale(). Generally any SPxLP can be
    loaded to a SPxScaler for #scale()%ing it. The scaling can
    be undone by calling unscale().
+
+   Mathematically, the scaling of a constraint matrix A can be written
+   as \f$ A' = R A C \f$, with \f$ R \f$ and \f$ C \f$, being diagonal matrices
+   corresponding to the row and column scale factors, respectively. Besides the
+   constraints matrix, also the upper and lower bounds of both columns and rows
+   need to be scaled.
+
+   Note that by default scaling is performed both before and after presolving and
+   the former scaling factors are retained during branch-and-bound (persistent scaling).
+   However, while within SoPlex the scaled problem is used, data accessed through
+   the soplex.cpp interface is provided w.r.t. the original problem (i.e., in unscaled form).
+   For instance, consider a scaled constraints matrix A' with initial slack basis I.
+   A basis \f$ B' = [(A',I)P]_{[1:m],[1:m] }\f$ (with P being a permutation matrix)
+   for the scaled problem corresponds to the basis
+   \f$ B = R^{-1} [(A',I)P]_{[1:m][1:m]} [P^{T} \tilde{C}^{-1} P]_{[1:m][1:m] } \f$. In
+   this equation, \f$ \tilde{C} \f$is of the form
+
+   \f[
+    \begin{array}{cc}
+         C & 0 \\
+         O & R^{-1}
+   \end{array}$
+    \f]
+
+   Note that in SoPlex only scaling factors \f$ 2^k, k \in \mathbb{Z} \f$ are used.
+
+
 */
 
 class SPxScaler
