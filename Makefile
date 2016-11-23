@@ -270,7 +270,8 @@ LIBOBJ		= 	changesoplex.o \
 			statistics.o \
 			usertimer.o \
 			wallclocktimer.o \
-			updatevector.o
+			updatevector.o \
+			testsoplex.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o

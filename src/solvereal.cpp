@@ -24,82 +24,6 @@
 
 namespace soplex
 {
-
-   /// check scaling of LP
-   void SoPlex::_checkScalingReal(SPxLPReal* origLP)
-   {
-      MSG_INFO1( spxout, spxout << "DEBUG: checking correctness of scaled LP" << std::endl; )
-      assert(_realLP->nCols() == origLP->nCols());
-      assert(_realLP->nRows() == origLP->nRows());
-      assert(_realLP->isScaled() && !origLP->isScaled());
-      bool correct = true;
-
-      MSG_INFO1( spxout, spxout << "DEBUG: checking rows..." << std::endl; )
-      for( int i = 0; i < origLP->nRows(); ++i )
-      {
-         assert(EQ(origLP->lhs(i), _realLP->lhsUnscaled(i)));
-         assert(EQ(origLP->rhs(i), _realLP->rhsUnscaled(i)));
-
-         DSVectorReal row;
-         _realLP->getRowVectorUnscaled(i, row);
-
-         assert(origLP->rowVector(i).size() == row.size());
-
-         for( int j = 0; j < row.size(); ++j)
-         {
-            if( NE(row.value(j), origLP->rowVector(i).value(j)) )
-            {
-               MSG_INFO1( spxout, spxout << "scaling error in row " << i << ", col " << j
-                          << ": orig " << origLP->rowVector(i).value(j)
-                          << ", unscaled: " << row.value(j) << std::endl; )
-               correct = false;
-            }
-         }
-      }
-
-      MSG_INFO1( spxout, spxout << "DEBUG: checking cols..." << std::endl; )
-      for( int i = 0; i < origLP->nCols(); ++i )
-      {
-         assert(EQ(origLP->lower(i), _realLP->lowerUnscaled(i)));
-         assert(EQ(origLP->upper(i), _realLP->upperUnscaled(i)));
-         assert(EQ(origLP->obj(i), _realLP->objUnscaled(i)));
-
-         DSVectorReal col;
-         _realLP->getColVectorUnscaled(i, col);
-
-         assert(origLP->colVector(i).size() == col.size());
-
-         for( int j = 0; j < col.size(); ++j)
-         {
-            if( NE(col.value(j), origLP->colVector(i).value(j)) )
-            {
-
-               MSG_INFO1( spxout, spxout << "scaling error in col " << i << ", row " << j
-                          << ": orig " << origLP->colVector(i).value(j)
-                          << ", unscaled: " << col.value(j) << std::endl; )
-               correct = false;
-            }
-         }
-      }
-      if( !correct )
-      {
-         MSG_INFO1( spxout, spxout << "scaling check failed" << std::endl; )
-      }
-      assert(correct);
-   }
-
-
-
-   /// check whether persistent scaling is supposed to be reapplied again after unscaling
-   bool SoPlex::_reapplyPersistentScaling() const
-   {
-      if( (_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE) && _optimizeCalls > 10 )
-         return false;
-      else
-         return true;
-   }
-
-
    /// solves real LP
    void SoPlex::_optimizeReal()
    {
@@ -146,6 +70,17 @@ namespace soplex
 
       // stop timing
       _statistics->solvingTime->stop();
+   }
+
+
+
+   /// check whether persistent scaling is supposed to be reapplied again after unscaling
+   bool SoPlex::_reapplyPersistentScaling() const
+   {
+      if( (_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE) && _optimizeCalls > 10 )
+         return false;
+      else
+         return true;
    }
 
 

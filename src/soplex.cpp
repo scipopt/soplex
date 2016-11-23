@@ -2740,96 +2740,9 @@ namespace soplex
             _solver.setOpttol(realParam(SoPlex::OPTTOL));
 
          _optimizeReal();
-
-#if 0
-         assert(&_solver == _realLP);
-         DSVector** binvcol = 0;
-         DSVector** binvrow = 0;
-         Real* coefs = 0;
-         int* inds = 0;
-         int ninds = 0;
-         int basisdim = _solver.dim();
-         assert(basisdim == numRowsReal());
-         spx_alloc(binvcol, basisdim);
-         spx_alloc(binvrow, basisdim);
-         spx_alloc(coefs, basisdim);
-         spx_alloc(inds, basisdim);
-
-         _solver.factorize();
-
-         MSG_INFO1( spxout, spxout << "computing columns of inverted basis matrix\n";)
-         // collect columns of the basis inverse
-         for( int i = 0; i < basisdim; ++i)
-         {
-            binvcol[i] = new DSVector;
-            assert(getBasisInverseColReal(i, coefs, inds, &ninds, true));
-            assert(ninds > 0);
-            binvcol[i]->add(ninds, inds, coefs);
-            assert(binvcol[i]->size() == ninds);
-            assert(binvcol[i]->value(0) == coefs[0]);
-         }
-         MSG_INFO1( spxout, spxout << "computing rows of inverted basis matrix\n";)
-         // collect rows of the basis inverse
-         for( int i = 0; i < basisdim; ++i)
-         {
-            binvrow[i] = new DSVector;
-            assert(getBasisInverseRowReal(i, coefs, inds, &ninds, true));
-            assert(ninds > 0);
-            binvrow[i]->add(ninds, inds, coefs);
-            assert(binvrow[i]->size() == ninds);
-            assert(binvrow[i]->value(0) == coefs[0]);
-         }
-
-         if( _solver.isScaled() )
-         {
-            MSG_INFO1( spxout, spxout << "unscaling LP\n";)
-            _solver.unscaleLP();
-         }
-
-         MSG_INFO1( spxout, spxout << "checking columns\n";)
-         // multiply with (unscaled) basis matrix and check result (should be unitvecs)
-         for( int i = 0; i < basisdim; ++i)
-         {
-            DVector result(basisdim);
-            result.clear();
-            result.assign(*binvcol[i]);
-            _solver.basis().multBaseWith(result);
-            Real error = 0.0;
-            for( int j = 0; j < basisdim; ++j)
-            {
-               if( j != i )
-                  error += spxAbs(result[j]); // should be zero
-               else
-                  error += spxAbs(result[j] - 1.0);
-            }
-            if( error > _solver.feastol() )
-               MSG_INFO1( spxout, spxout << i << ": " << error << std::endl; )
-         }
-         MSG_INFO1( spxout, spxout << "checking rows\n";)
-         for( int i = 0; i < basisdim; ++i)
-         {
-            DVector result(basisdim);
-            result.clear();
-            result.assign(*binvrow[i]);
-            _solver.basis().multWithBase(result);
-            Real error = 0.0;
-            for( int j = 0; j < basisdim; ++j)
-            {
-               if( j != i )
-                  error += spxAbs(result[j]); // should be zero
-               else
-                  error += spxAbs(result[j] - 1.0);
-            }
-            if( error > _solver.feastol() )
-               MSG_INFO1( spxout, spxout << i << ": " << error << std::endl; )
-         }
-
-         spx_free(inds);
-         spx_free(coefs);
-         spx_free(binvrow);
-         spx_free(binvcol);
+#ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
+         _checkBasisScaling();
 #endif
-
       }
       else if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
       {
@@ -4523,8 +4436,8 @@ namespace soplex
 
 
 
-   /// multiply with basis matrix; B * vec = result
-   bool SoPlex::multBasis(Real* vec, Real* result, bool unscale)
+   /// multiply with basis matrix; B * vec (inplace)
+   bool SoPlex::multBasis(Real* vec, bool unscale)
    {
       if( !hasBasis() )
          return false;
@@ -4560,15 +4473,11 @@ namespace soplex
             for( int i = 0; i < basisdim; ++i)
             {
                scaleExp = _scaler->getRowScaleExp(i);
-               result[i] = spxLdexp(vec[i], -scaleExp);
+               vec[i] = spxLdexp(vec[i], -scaleExp);
             }
          }
          else
-         {
             _solver.basis().multBaseWith(x);
-            for( int i = 0; i < basisdim; ++i)
-               result[i] = vec[i];
-         }
       }
       else
       {
@@ -4580,8 +4489,8 @@ namespace soplex
 
 
 
-   /// multiply with transpose of basis matrix; vec * B^T = result
-   bool SoPlex::multBasisTranspose(Real* vec, Real* result, bool unscale)
+   /// multiply with transpose of basis matrix; vec * B^T (inplace)
+   bool SoPlex::multBasisTranspose(Real* vec, bool unscale)
    {
       if( !hasBasis() )
          return false;
@@ -4619,16 +4528,12 @@ namespace soplex
                   else
                      scaleExp = _scaler->getRowScaleExp(_solver.basis().baseId(i).getIdx());
 
-                  result[i] = spxLdexp(vec[i], scaleExp);
+                  vec[i] = spxLdexp(vec[i], scaleExp);
                }
             }
          }
          else
-         {
             _solver.basis().multWithBase(x);
-            for( int i = 0; i < basisdim; ++i)
-               result[i] = vec[i];
-         }
       }
       else
       {

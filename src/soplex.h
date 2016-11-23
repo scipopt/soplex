@@ -742,11 +742,11 @@ public:
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
-   /// multiply with basis matrix; B * vec = result
-   bool multBasis(Real* vec, Real* result, bool unscale = true);
+   /// multiply with basis matrix; B * vec (inplace)
+   bool multBasis(Real* vec, bool unscale = true);
 
-   /// multiply with transpose of basis matrix; vec * B^T = result
-   bool multBasisTranspose(Real* vec, Real* result, bool unscale = true);
+   /// multiply with transpose of basis matrix; vec * B^T (inplace)
+   bool multBasisTranspose(Real* vec, bool unscale = true);
 
    /// compute rational basis inverse; returns true on success
    bool computeBasisInverseRational();
@@ -1953,7 +1953,10 @@ private:
    void _loadRealLP(bool initBasis);
 
    /// check scaling of LP
-   void _checkScalingReal(SPxLPReal* origLP);
+   void _checkScaling(SPxLPReal* origLP) const;
+
+   /// check correctness of (un)scaled basis matrix operations
+   void _checkBasisScaling();
 
    /// check whether persistent scaling is supposed to be reapplied again after unscaling
    bool _reapplyPersistentScaling() const;
