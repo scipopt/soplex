@@ -312,14 +312,14 @@ void SPxScaler::unscale(SPxLPBase<Real>& lp)
 
 /// returns scaling factor for column \p i
 /// todo pass the LP?!
-int SPxScaler::getColScaleExp(int i)
+int SPxScaler::getColScaleExp(int i) const
 {
    return (*m_activeColscaleExp)[i];
 }
 
 /// returns scaling factor for row \p i
 /// todo pass the LP?!
-int SPxScaler::getRowScaleExp(int i)
+int SPxScaler::getRowScaleExp(int i) const
 {
    return (*m_activeRowscaleExp)[i];
 }

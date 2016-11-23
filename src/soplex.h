@@ -742,6 +742,12 @@ public:
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
+   /// multiply with basis matrix; B * vec = result
+   bool multBasis(Real* vec, Real* result, bool unscale = true);
+
+   /// multiply with transpose of basis matrix; vec * B^T = result
+   bool multBasisTranspose(Real* vec, Real* result, bool unscale = true);
+
    /// compute rational basis inverse; returns true on success
    bool computeBasisInverseRational();
 

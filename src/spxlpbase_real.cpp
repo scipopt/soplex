@@ -36,7 +36,10 @@ template<>
 void SPxLPBase<Real>::unscaleLP()
 {
    MSG_INFO3( (*spxout), (*spxout) << "remove persistent scaling of LP" << std::endl; )
-   lp_scaler->unscale(*this);
+   if( lp_scaler )
+      lp_scaler->unscale(*this);
+   else
+      MSG_INFO3( (*spxout), (*spxout) << "no LP scaler available" << std::endl; )
 }
 
 template<>

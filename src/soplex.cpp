@@ -4063,12 +4063,16 @@ namespace soplex
             /* unscaling required? */
             if( unscale && _solver.isScaled())
             {
-               int scaleExp;
-               if( _solver.basis().baseId(r).isSPxColId() )
-                  scaleExp =_scaler->getColScaleExp(r);
-               else
-                  scaleExp =_scaler->getRowScaleExp(r);
+               int scaleExp = 0;
                SVector rhs(_solver.unitVector(r));
+
+               scaleExp = - _scaler->getRowScaleExp(r);
+
+               if( _solver.basis().baseId(r).isSPxColId() )
+                  scaleExp += _scaler->getColScaleExp(_solver.basis().baseId(r).getIdx());
+               else
+                  scaleExp -= _scaler->getRowScaleExp(_solver.basis().baseId(r).getIdx());
+
                rhs *= spxLdexp(1.0, scaleExp);
 
                _solver.basis().coSolve(x, rhs);
@@ -4078,7 +4082,7 @@ namespace soplex
                for( int i = 0; i < size; i++ )
                {
                   scaleExp = _scaler->getRowScaleExp(x.index(i));
-                  x.scaleValue(i, x.value(i) * spxLdexp(1.0, scaleExp));
+                  x.scaleValue(x.index(i), scaleExp);
                }
             }
             else
@@ -4092,7 +4096,7 @@ namespace soplex
             return false;
          }
          // copy sparse data to dense result vector based on coef array
-         if( ninds != NULL && inds != NULL )
+         if( ninds != 0 && inds != 0 )
          {
             // during solving SoPlex may have destroyed the sparsity structure so we need to restore it
             x.setup();
@@ -4239,15 +4243,20 @@ namespace soplex
 
                x.setup();
                int size = x.size();
-               int colIdx;
 
                for( int i = 0; i < size; i++ )
                {
                   if( _solver.basis().baseId(x.index(i)).isSPxColId() )
                   {
-                     colIdx = _solver.basis().baseId(x.index(i)).getIdx();
-                     scaleExp = _scaler->getColScaleExp(colIdx);
-                     x.scaleValue(i, spxLdexp(1.0, scaleExp));
+                     idx = _solver.basis().baseId(x.index(i)).getIdx();
+                     scaleExp = _scaler->getColScaleExp(idx);
+                     x.scaleValue(x.index(i), scaleExp);
+                  }
+                  else
+                  {
+                     idx = _solver.basis().baseId(x.index(i)).getIdx();
+                     scaleExp = - _scaler->getRowScaleExp(idx);
+                     x.scaleValue(x.index(i), scaleExp);
                   }
                }
             }
@@ -4262,7 +4271,7 @@ namespace soplex
             return false;
          }
          // copy sparse data to dense result vector based on coef array
-         if( ninds != NULL && inds != NULL )
+         if( ninds != 0 && inds != 0 )
          {
             // SoPlex may have destroyed the sparsity structure so we need to restore it
             x.setup();
@@ -4277,9 +4286,9 @@ namespace soplex
          }
          else
          {
-            VectorReal y(numColsReal(), coef);
+            VectorReal y(numRowsReal(), coef);
             y = x;
-            if( ninds != NULL )
+            if( ninds != 0 )
                *ninds = -1;
          }
       }
@@ -4509,6 +4518,123 @@ namespace soplex
          // free memory
          spx_free(bind);
       }
+      return true;
+   }
+
+
+
+   /// multiply with basis matrix; B * vec = result
+   bool SoPlex::multBasis(Real* vec, Real* result, bool unscale)
+   {
+      if( !hasBasis() )
+         return false;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.rep() == SPxSolver::COLUMN )
+      {
+         int basisdim = numRowsReal();
+
+         // create Vector from input values
+         Vector x(basisdim, vec);
+
+         if( unscale && _solver.isScaled() )
+         {
+            int scaleExp;
+            for( int i = 0; i < basisdim; ++i)
+            {
+               if( isNotZero(vec[i]) )
+               {
+                  if( _solver.basis().baseId(i).isSPxColId() )
+                     scaleExp = - _scaler->getColScaleExp(_solver.basis().baseId(i).getIdx());
+                  else
+                     scaleExp = _scaler->getRowScaleExp(_solver.basis().baseId(i).getIdx());
+
+                  vec[i] = spxLdexp(vec[i], scaleExp);
+               }
+            }
+            _solver.basis().multBaseWith(x);
+            for( int i = 0; i < basisdim; ++i)
+            {
+               scaleExp = _scaler->getRowScaleExp(i);
+               result[i] = spxLdexp(vec[i], -scaleExp);
+            }
+         }
+         else
+         {
+            _solver.basis().multBaseWith(x);
+            for( int i = 0; i < basisdim; ++i)
+               result[i] = vec[i];
+         }
+      }
+      else
+      {
+         return false;
+      }
+
+      return true;
+   }
+
+
+
+   /// multiply with transpose of basis matrix; vec * B^T = result
+   bool SoPlex::multBasisTranspose(Real* vec, Real* result, bool unscale)
+   {
+      if( !hasBasis() )
+         return false;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.rep() == SPxSolver::COLUMN )
+      {
+         int basisdim = numRowsReal();
+
+         // create Vector from input values
+         Vector x(basisdim, vec);
+
+         if( unscale && _solver.isScaled() )
+         {
+            int scaleExp;
+            for( int i = 0; i < basisdim; ++i)
+            {
+               if( isNotZero(vec[i]) )
+               {
+                  scaleExp = - _scaler->getRowScaleExp(i);
+                  vec[i] = spxLdexp(vec[i], scaleExp);
+               }
+            }
+            _solver.basis().multWithBase(x);
+            for( int i = 0; i < basisdim; ++i)
+            {
+               if( isNotZero(vec[i]) )
+               {
+                  if( _solver.basis().baseId(i).isSPxColId() )
+                     scaleExp = - _scaler->getColScaleExp(_solver.basis().baseId(i).getIdx());
+                  else
+                     scaleExp = _scaler->getRowScaleExp(_solver.basis().baseId(i).getIdx());
+
+                  result[i] = spxLdexp(vec[i], scaleExp);
+               }
+            }
+         }
+         else
+         {
+            _solver.basis().multWithBase(x);
+            for( int i = 0; i < basisdim; ++i)
+               result[i] = vec[i];
+         }
+      }
+      else
+      {
+         return false;
+      }
+
       return true;
    }
 

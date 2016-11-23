@@ -238,14 +238,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Scale \p i 'th element with a
-   void scaleValue(int i, R a)
+   /// Scale \p i 'th element by a
+   void scaleValue(int i, int scaleExp)
    {
       assert(i >= 0);
       assert(i < DVectorBase<R>::dim());
-      assert(a != R(0));
 
-      VectorBase<R>::val[i] *= a;
+      VectorBase<R>::val[i] = spxLdexp(VectorBase<R>::val[i], scaleExp);
 
       assert(isConsistent());
    }

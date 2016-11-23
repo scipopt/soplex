@@ -516,8 +516,18 @@ void SPxSolver::clear()
 void SPxSolver::unscaleLPandClearBasis()
 {
    SPxLPBase<Real>::unscaleLP();
-   setBasisStatus(SPxBasis::NO_PROBLEM);
-   SPxBasis::reDim();
+   SPxLP* origLP = 0;
+   spx_alloc(origLP);
+   origLP = new (origLP) SPxLPReal(*this);
+   clear();
+   loadLP(*origLP, false);
+//   basis().loadDesc(desc());
+//   loadMatrixVecs();
+//   SPxBasis::invalidate();
+//   SPxBasis::reDim();
+//   unInit();
+//   reDim();
+//   init();
    return;
 }
 

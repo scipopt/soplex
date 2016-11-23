@@ -128,9 +128,9 @@ public:
    /// unscale SPxLP
    virtual void unscale(SPxLPBase<Real>& lp);
    /// returns scaling factor for column \p i
-   virtual int getColScaleExp(int i);
+   virtual int getColScaleExp(int i) const;
    /// returns scaling factor for row \p i
-   virtual int getRowScaleExp(int i);
+   virtual int getRowScaleExp(int i) const;
    /// gets unscaled column \p i
    virtual void getColUnscaled(const SPxLPBase<Real>& lp, int i, DSVector& vec) const;
    /// returns maximum absolute value of unscaled column \p i
