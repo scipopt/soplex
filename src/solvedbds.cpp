@@ -251,7 +251,7 @@ namespace soplex
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
       // @todo check the verbosity. The output should be controlled externally. Must fix!!!
-      spxout.setVerbosity( SPxOut::ERROR );
+      //spxout.setVerbosity( SPxOut::ERROR );
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
@@ -333,6 +333,8 @@ namespace soplex
             << "=========================" << std::endl
             << std::endl );
 
+         _compSolver.writeFile("comp.lp");
+
          _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
          assert(_isRealLPLoaded);
 
@@ -396,7 +398,7 @@ namespace soplex
             _solver.getPrimal(reducedLPPrimalVector);
 
             // checking the optimality of the reduced problem solution with the original problem
-            _checkOriginalProblemOptimality(reducedLPPrimalVector, false);
+            _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
 
             // if there are any violated rows or bounds then stop is reset and the algorithm continues.
             if( _nDecompViolBounds > 0 || _nDecompViolRows > 0 )
@@ -1296,6 +1298,8 @@ namespace soplex
 
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
+   // TODO: Allow for the case that no rows are added. This should terminate the algorithm.
+   // TODO: Check to make sure that only rows added to the problem do not currently exist in the reduced problem.
    void SoPlex::_updateDecompReducedProblemViol(bool allrows)
    {
 #ifdef NO_TOL
@@ -2395,6 +2399,14 @@ namespace soplex
       // updating the slack column in the complementary problem
       Real lhs = 1.0;
       Real rhs = 1.0;
+
+      // it is possible that all rows are included in the reduced problem. In this case, the slack row will be empty. To
+      // avoid infeasibility, the lhs and rhs are set to 0.
+      if( slackRowCoeff.size() == 0 )
+      {
+         lhs = 0.0;
+         rhs = 0.0;
+      }
       LPRowBase<Real> compSlackRow(lhs, slackRowCoeff, rhs);
       _compSolver.changeRow(_compSlackDualRowId, compSlackRow);
 
@@ -2696,7 +2708,7 @@ namespace soplex
       if( printViol )
       {
          MSG_INFO1(spxout, spxout << "Reduced Problem Objective Value: " << redObjVal << std::endl
-           << "Original Problem Objective Value: " << std::endl );
+           << "Original Problem Objective Value: " << objectiveVal << std::endl );
       }
 
       _solReal._hasPrimal = true;
@@ -3596,6 +3608,8 @@ namespace soplex
 
       for( int i = _realLP->nCols() - 1; i >= 0; i-- )
       {
+         Real currviol = 0.0;
+
          Real viol = _realLP->lower(i) - primal[i];
 
          isViol = false;
@@ -3609,6 +3623,9 @@ namespace soplex
                maxviol = viol;
                isMaxViol = true;
             }
+
+            if( currviol < viol )
+               currviol = viol;
          }
 
          if( GT(viol, 0.0, feastol) )
@@ -3623,6 +3640,9 @@ namespace soplex
                maxviol = viol;
                isMaxViol = true;
             }
+
+            if( currviol < viol )
+               currviol = viol;
          }
 
          if( GT(viol, 0.0, feastol) )
@@ -3630,7 +3650,6 @@ namespace soplex
 
          if( isViol )
          {
-
             // updating the violated bounds list
             if( isMaxViol )
             {
