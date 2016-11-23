@@ -176,7 +176,7 @@ public:
    /** The improved dual simplex requires a starting basis to perform the problem partitioning. This flag sets the
     * status of the improved dual simplex to indicate whether the starting basis must be found or not.
     */
-   enum IdsStatus
+   enum DecompStatus
    {
       /// Starting basis has not been found yet
       FINDSTARTBASIS = 0,
@@ -297,7 +297,7 @@ private:
    int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
-   bool           getStartingIdsBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
+   bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
    int            degenCompIterOffset; ///< the number of iterations performed before the degeneracy level is computed
    int            decompIterationLimit; ///< the maximum number of iterations before the decomposition simplex is aborted.
@@ -541,7 +541,7 @@ public:
    /// set \ref soplex::SPxSolver::FULL "FULL" or \ref soplex::SPxSolver::PARTIAL "PARTIAL" pricing.
    void setPricing(Pricing pr);
    /// turn on or off the improved dual simplex.
-   void setIdsStatus(IdsStatus ids_stat);
+   void setDecompStatus(DecompStatus decomp_stat);
 
    /// reload LP.
    virtual void reLoad();
@@ -2158,9 +2158,9 @@ public:
    }
 
    /// returns whether a basis needs to be found for the improved dual simplex
-   IdsStatus getIdsStatus() const
+   DecompStatus getDecompStatus() const
    {
-      if( getStartingIdsBasis )
+      if( getStartingDecompBasis )
          return FINDSTARTBASIS;
       else
          return DONTFINDSTARTBASIS;

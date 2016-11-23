@@ -846,9 +846,9 @@ public:
       /// should a rational factorization be performed after iterative refinement?
       RATFAC = 3,
 
-      /// should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
+      /// should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
       // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-      USEIMPROVEDDUALSIMPLEX = 4,
+      USEDECOMPDUALSIMPLEX = 4,
 
       // should the degeneracy be computed for each basis?
       COMPUTEDEGEN = 5,
@@ -1524,8 +1524,8 @@ private:
    SPxFastRT _ratiotesterFast;
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
-   SPxLPReal* _realLP; // the real LP is also used as the original LP for the improved dual simplex
-   SPxLPIds* _idsLP; // used to store the original LP for the improved dual simplex
+   SPxLPReal* _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
+   SPxLPReal* _decompLP; // used to store the original LP for the decomposition dual simplex
    SPxSimplifier* _simplifier;
    SPxScaler* _scaler;
    SPxStarter* _starter;
@@ -1599,7 +1599,7 @@ private:
    //@}
 
 
-   //**@name Data for the Improved Dual Simplex */
+   //**@name Data for the Decomposition Based Dual Simplex */
    //@{
 
    /** row violation structure
@@ -1637,14 +1637,14 @@ private:
    typedef enum
    {
       // is the original problem currently being solved.
-      IDS_ORIG = 0,
+      DECOMP_ORIG = 0,
 
       // is the reduced problem currently being solved.
-      IDS_RED = 1,
+      DECOMP_RED = 1,
 
       // is the complementary problem currently being solved.
-      IDS_COMP = 2
-   } idsStatus;
+      DECOMP_COMP = 2
+   } decompStatus;
 
    // the expected sign of the dual variables.
    enum DualSign
@@ -1660,39 +1660,39 @@ private:
                           // _compSolver.
    SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
-   SPxBasis _idsTransBasis;   // the basis required for the transformation to form the reduced problem
+   SPxBasis _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
    DVector _transformedObj;       // the objective coefficients of the transformed problem
-   DVector _idsFeasVector;       // feasibility vector calculated using unshifted bounds.
+   DVector _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
    LPRowSet _transformedRows;    // a set of the original rows that have been transformed using the original basis.
    SPxColId _compSlackColId;     // column id of the primal complementary problem slack column.
    SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
-   bool* _idsReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
-   bool* _idsReducedProbCols;    // flag to indicate the inclusion of a col in the reduced problem.
-   int* _idsRowStatus;
-   int* _idsColStatus;
-   int* _idsCompProbColIDsIdx;   // the index to _idsPrimalColIDs for a given original col.
-   DataArray < SPxRowId > _idsReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
-   DataArray < SPxRowId > _idsReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
-   DataArray < SPxColId > _idsReducedProbColIDs;   // the col IDs for the related cols in the reduced problem
-   DataArray < SPxRowId > _idsPrimalRowIDs;        // the primal row IDs from the original problem
-   DataArray < SPxColId > _idsPrimalColIDs;        // the primal col IDs from the original problem
-   DataArray < SPxRowId > _idsElimPrimalRowIDs;    // the primal row IDs eliminated in the complementary problem
-   DataArray < SPxRowId > _idsDualRowIDs;          // the dual row IDs from the complementary problem
-   DataArray < SPxColId > _idsDualColIDs;          // the dual col IDs from the complementary problem
-   DataArray < SPxColId > _idsFixedVarDualIDs;     // the column ids related to the fixed variables.
-   DataArray < SPxColId > _idsVarBoundDualIDs;     // the column ids related to the variable bound constraints.
+   bool* _decompReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
+   bool* _decompReducedProbCols;    // flag to indicate the inclusion of a col in the reduced problem.
+   int* _decompRowStatus;
+   int* _decompColStatus;
+   int* _decompCompProbColIDsIdx;   // the index to _decompPrimalColIDs for a given original col.
+   DataArray < SPxRowId > _decompReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
+   DataArray < SPxRowId > _decompReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
+   DataArray < SPxColId > _decompReducedProbColIDs;   // the col IDs for the related cols in the reduced problem
+   DataArray < SPxRowId > _decompPrimalRowIDs;        // the primal row IDs from the original problem
+   DataArray < SPxColId > _decompPrimalColIDs;        // the primal col IDs from the original problem
+   DataArray < SPxRowId > _decompElimPrimalRowIDs;    // the primal row IDs eliminated in the complementary problem
+   DataArray < SPxRowId > _decompDualRowIDs;          // the dual row IDs from the complementary problem
+   DataArray < SPxColId > _decompDualColIDs;          // the dual col IDs from the complementary problem
+   DataArray < SPxColId > _decompFixedVarDualIDs;     // the column ids related to the fixed variables.
+   DataArray < SPxColId > _decompVarBoundDualIDs;     // the column ids related to the variable bound constraints.
 
-   DataArray < SPxColId > _idsCompPrimalFixedVarIDs;  // the column ids related to the fixed variables in the complementary primal.
-   DataArray < SPxColId > _idsCompPrimalVarBoundIDs;  // the column ids related to the variable bound constraints in the complementary primal.
+   DataArray < SPxColId > _decompCompPrimalFixedVarIDs;  // the column ids related to the fixed variables in the complementary primal.
+   DataArray < SPxColId > _decompCompPrimalVarBoundIDs;  // the column ids related to the variable bound constraints in the complementary primal.
 
-   DataArray < SPxRowId > _idsCompPrimalRowIDs;        // the primal row IDs from the complementary problem
-   DataArray < SPxColId > _idsCompPrimalColIDs;        // the primal col IDs from the complementary problem
+   DataArray < SPxRowId > _decompCompPrimalRowIDs;        // the primal row IDs from the complementary problem
+   DataArray < SPxColId > _decompCompPrimalColIDs;        // the primal col IDs from the complementary problem
 
-   int _nIdsViolBounds;       // the number of violated bound constraints
-   int _nIdsViolRows;         // the number of violated rows
-   int* _idsViolatedBounds;   // the violated bounds given by the solution to the IDS reduced problem
-   int* _idsViolatedRows;     // the violated rows given by the solution to the IDS reduced problem
+   int _nDecompViolBounds;       // the number of violated bound constraints
+   int _nDecompViolRows;         // the number of violated rows
+   int* _decompViolatedBounds;   // the violated bounds given by the solution to the IDS reduced problem
+   int* _decompViolatedRows;     // the violated rows given by the solution to the IDS reduced problem
 
 
    int* _fixedOrigVars;    // the original variables that are at their bounds in the reduced problem.
@@ -1705,14 +1705,14 @@ private:
    int _nCompPrimalRows;   // the number of rows in the complementary primal problem. NOTE: _nPrimalRows = _nCompPrimalRows
    int _nCompPrimalCols;   // the number of dual columns in the complementary problem. NOTE: _nPrimalCols = _nCompPrimalCols
 
-   int _idsDisplayLine;     // the count for the display line
+   int _decompDisplayLine;     // the count for the display line
 
    NameSet* _rowNames;      // the row names from the input file
    NameSet* _colNames;      // the col names from the input file
 
    // Statistic information
    int numIncludedRows;    // the number of rows currently included in the reduced problem.
-   int numIdsIter;         // the number of iterations of the improved dual simplex algorithm.
+   int numDecompIter;         // the number of iterations of the decomposition dual simplex algorithm.
    int numRedProbIter;     // the number of simplex iterations performed in the reduced problem.
    int numCompProbIter;    // the number of iterations of the complementary problem.
 
@@ -1734,7 +1734,7 @@ private:
    int origCountFreeRow;
 
 
-   idsStatus _currentProb;
+   decompStatus _currentProb;
 
    //@}
 
@@ -2081,29 +2081,29 @@ private:
    //@}
 
 
-   //**@name Private solving methods implemented in solveids.cpp */
+   //**@name Private solving methods implemented in solvedbds.cpp */
    //@{
 
-   /// solves LP using the improved dual simplex
-   void _solveImprovedDualSimplex();
+   /// solves LP using the decomposition based dual simplex
+   void _solveDecompositionDualSimplex();
 
    /// creating copies of the original problem that will be manipulated to form the reduced and complementary problems
-   void _createIdsReducedAndComplementaryProblems();
+   void _createDecompReducedAndComplementaryProblems();
 
    /// forms the reduced problem
-   void _formIdsReducedProblem(bool& stop);
+   void _formDecompReducedProblem(bool& stop);
 
    /// solves the reduced problem
-   void _solveIdsReducedProblem();
+   void _solveDecompReducedProblem();
 
    /// forms the complementary problem
-   void _formIdsComplementaryProblem();
+   void _formDecompComplementaryProblem();
 
    /// simplifies the problem and solves
-   void _idsSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
+   void _decompSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _idsResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
+   void _decompResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
 
    /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
    void _getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
@@ -2127,24 +2127,24 @@ private:
    /// removing rows from the complementary problem.
    void _deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
 
-   /// evaluates the solution of the reduced problem for the IDS
-   void _evaluateSolutionIDS(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
+   /// evaluates the solution of the reduced problem for the DBDS
+   void _evaluateSolutionDecomp(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
 
    /// update the reduced problem with additional columns and rows
-   void _updateIdsReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
+   void _updateDecompReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
       DVector compDualVector);
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
-   void _updateIdsReducedProblemViol(bool allrows);
+   void _updateDecompReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
    void _findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
 
    /// update the dual complementary problem with additional columns and rows
-   void _updateIdsComplementaryDualProblem(bool origObj);
+   void _updateDecompComplementaryDualProblem(bool origObj);
 
    /// update the primal complementary problem with additional columns and rows
-   void _updateIdsComplementaryPrimalProblem(bool origObj);
+   void _updateDecompComplementaryPrimalProblem(bool origObj);
 
    /// checking the optimality of the original problem.
    void _checkOriginalProblemOptimality(Vector primalVector, bool printViol);
@@ -2188,8 +2188,8 @@ private:
    /// returns the expected sign of the dual variables for the original problem
    DualSign getOrigProbDualVariableSign(int rowNumber);
 
-   /// prints a display line of the flying table for the IDS
-   void printIdsDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
+   /// prints a display line of the flying table for the DBDS 
+   void printDecompDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
 
    /// stores the problem statistics of the original problem
    void getOriginalProblemStatistics();
@@ -2201,13 +2201,13 @@ private:
    Real getCompSlackVarCoeff(int primalRowNum);
 
    /// gets violation of bounds; returns true on success
-   bool getIdsBoundViolation(Real& maxviol, Real& sumviol);
+   bool getDecompBoundViolation(Real& maxviol, Real& sumviol);
 
    /// gets violation of constraints; returns true on success
-   bool getIdsRowViolation(Real& maxviol, Real& sumviol);
+   bool getDecompRowViolation(Real& maxviol, Real& sumviol);
 
    /// function call to terminate the decomposition simplex
-   bool idsTerminate(Real timeLimit);
+   bool decompTerminate(Real timeLimit);
 
    /// function to build a basis for the original problem as given by the solution to the reduced problem
    void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat);
@@ -2220,7 +2220,7 @@ private:
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
    /// function call to terminate the decomposition simplex
-   void _getIdsPrimalVector(Vector& primal);
+   void _getDecompPrimalVector(Vector& primal);
 
    //@}
 };

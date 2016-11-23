@@ -1249,7 +1249,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          << shift() << " | "
          << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
          << std::setprecision(8) << value() + objOffset();
-         if( getStartingIdsBasis && rep() == SPxSolver::ROW )
+         if( getStartingDecompBasis && rep() == SPxSolver::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          (*spxout) << std::endl;
       }
@@ -1403,8 +1403,8 @@ bool SPxSolver::terminate()
 
 
    // the improved dual simplex requires a starting basis
-   // if the flag getStartingIdsBasis is set to true the simplex will terminate when a dual basis is found
-   if( getStartingIdsBasis )
+   // if the flag getStartingDecompBasis is set to true the simplex will terminate when a dual basis is found
+   if( getStartingDecompBasis )
    {
       Real iterationFrac = 0.6;
       if( type() == ENTER && SPxBasis::status() == SPxBasis::DUAL &&

@@ -62,11 +62,11 @@ namespace soplex
       description[SoPlex::RATFAC] = "should a rational factorization be performed after iterative refinement?";
       defaultValue[SoPlex::RATFAC] = true;
 
-      // should the improved dual simplex be used to solve the LP? Setting this to true forces the solve mode to
+      // should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
       // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-      name[SoPlex::USEIMPROVEDDUALSIMPLEX] = "improveddualsimplex";
-      description[SoPlex::USEIMPROVEDDUALSIMPLEX] = "should the improved dual simplex be used to solve the LP?";
-      defaultValue[SoPlex::USEIMPROVEDDUALSIMPLEX] = false;
+      name[SoPlex::USEDECOMPDUALSIMPLEX] = "decompositiondualsimplex";
+      description[SoPlex::USEDECOMPDUALSIMPLEX] = "should the decomposition based dual simplex be used to solve the LP?";
+      defaultValue[SoPlex::USEDECOMPDUALSIMPLEX] = false;
 
       // should the degeneracy be computed for each basis?
       name[SoPlex::COMPUTEDEGEN] = "computedegen";
@@ -559,7 +559,7 @@ namespace soplex
       _realLP = &_solver;
       _isRealLPLoaded = true;
       _realLP->setOutstream(spxout);
-      _currentProb = IDS_ORIG;
+      _currentProb = DECOMP_ORIG;
 
       // initialize statistics
       spx_alloc(_statistics);
@@ -2718,8 +2718,8 @@ namespace soplex
       // the solution is no longer valid
       _invalidateSolution();
 
-      // if the improved dual simplex flag is set to true
-      if ( boolParam(SoPlex::USEIMPROVEDDUALSIMPLEX) )
+      // if the decomposition based dual simplex flag is set to true
+      if ( boolParam(SoPlex::USEDECOMPDUALSIMPLEX) )
       {
          setIntParam(SoPlex::SOLVEMODE, SOLVEMODE_REAL);
          setIntParam(SoPlex::REPRESENTATION, REPRESENTATION_ROW);
@@ -2729,7 +2729,7 @@ namespace soplex
 
          //This is here for debugging purposes. Will need to remove in the future.
          //
-         //SPxLPIds dualLP;
+         //SPxLPReal dualLP;
          //_solver.buildDualProblem(dualLP);
 
          //char buffer[50];
@@ -2737,7 +2737,7 @@ namespace soplex
          //printf("Writing the dual lp to a file\n");
          //dualLP.writeFile(buffer);
 
-         _solveImprovedDualSimplex();
+         _solveDecompositionDualSimplex();
       }
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
       else if( intParam(SoPlex::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex::SOLVEMODE) == SOLVEMODE_AUTO
@@ -4612,7 +4612,7 @@ namespace soplex
       else
          success = _readFileRational(filename, rowNames, colNames, intVars);
 
-      // storing the row and column names for use in the IDS print basis methods
+      // storing the row and column names for use in the DBDS print basis methods
       _rowNames = rowNames;
       _colNames = colNames;
 
@@ -5068,7 +5068,7 @@ namespace soplex
          break;
       case RATFAC:
          break;
-      case USEIMPROVEDDUALSIMPLEX:
+      case USEDECOMPDUALSIMPLEX:
          break;
       case COMPUTEDEGEN:
          break;
@@ -6180,7 +6180,7 @@ namespace soplex
       printStatus(os, _status);
 
       os << "Original problem    : \n";
-      if ( boolParam(SoPlex::USEIMPROVEDDUALSIMPLEX) )
+      if ( boolParam(SoPlex::USEDECOMPDUALSIMPLEX) )
          printOriginalProblemStatistics(os);
       else
       {

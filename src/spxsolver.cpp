@@ -445,12 +445,12 @@ void SPxSolver::setPricing(Pricing pr)
    }
 }
 
-void SPxSolver::setIdsStatus(IdsStatus ids_stat)
+void SPxSolver::setDecompStatus(DecompStatus decomp_stat)
 {
-   if( ids_stat == FINDSTARTBASIS )
-      getStartingIdsBasis = true;
+   if( decomp_stat == FINDSTARTBASIS )
+      getStartingDecompBasis = true;
    else
-      getStartingIdsBasis = false;
+      getStartingDecompBasis = false;
 }
 
 /*
@@ -997,7 +997,7 @@ SPxSolver::SPxSolver(
    , displayLine (0)
    , displayFreq (200)
    , sparsePricingFactor(SPARSITYFACTOR)
-   , getStartingIdsBasis(false)
+   , getStartingDecompBasis(false)
    , computeDegeneracy(false)
    , degenCompIterOffset(0)
    , unitVecs (0)
@@ -1097,7 +1097,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       instableEnter = base.instableEnter;
       displayFreq = base.displayFreq;
       sparsePricingFactor = base.sparsePricingFactor;
-      getStartingIdsBasis = base.getStartingIdsBasis;
+      getStartingDecompBasis = base.getStartingDecompBasis;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
