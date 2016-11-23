@@ -3976,6 +3976,8 @@ namespace soplex
             /* unscaling required? */
             if( unscale && _solver.isScaled())
             {
+               /* for information on the unscaling procedure see spxscaler.h */
+
                int scaleExp = 0;
                SVector rhs(_solver.unitVector(r));
 
@@ -4458,6 +4460,8 @@ namespace soplex
 
          if( unscale && _solver.isScaled() )
          {
+            /* for information on the unscaling procedure see spxscaler.h */
+
             int scaleExp;
             for( int i = 0; i < basisdim; ++i)
             {
@@ -4511,6 +4515,8 @@ namespace soplex
 
          if( unscale && _solver.isScaled() )
          {
+            /* for information on the unscaling procedure see spxscaler.h */
+
             int scaleExp;
             for( int i = 0; i < basisdim; ++i)
             {
