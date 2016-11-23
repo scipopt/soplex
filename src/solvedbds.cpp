@@ -251,7 +251,7 @@ namespace soplex
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
       // @todo check the verbosity. The output should be controlled externally. Must fix!!!
-      //spxout.setVerbosity( SPxOut::ERROR );
+      spxout.setVerbosity( SPxOut::ERROR );
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
