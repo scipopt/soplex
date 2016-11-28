@@ -3979,14 +3979,14 @@ namespace soplex
                /* for information on the unscaling procedure see spxscaler.h */
 
                int scaleExp = 0;
-               SVector rhs(_solver.unitVector(r));
+               DSVector rhs(_solver.unitVector(r));
 
                scaleExp = - _scaler->getRowScaleExp(r);
 
                if( _solver.basis().baseId(r).isSPxColId() )
-                  scaleExp += _scaler->getColScaleExp(_solver.basis().baseId(r).getIdx());
+                  scaleExp += _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
                else
-                  scaleExp -= _scaler->getRowScaleExp(_solver.basis().baseId(r).getIdx());
+                  scaleExp -= _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(r)));
 
                rhs *= spxLdexp(1.0, scaleExp);
 
@@ -4153,7 +4153,7 @@ namespace soplex
                /* for information on the unscaling procedure see spxscaler.h */
 
                int scaleExp =_scaler->getRowScaleExp(c);
-               SVector rhs(_solver.unitVector(c));
+               DSVector rhs(_solver.unitVector(c));
                rhs *= spxLdexp(1.0, scaleExp);
 
                _solver.basis().solve(x, rhs);
@@ -4165,13 +4165,13 @@ namespace soplex
                {
                   if( _solver.basis().baseId(x.index(i)).isSPxColId() )
                   {
-                     idx = _solver.basis().baseId(x.index(i)).getIdx();
+                     idx = _solver.number(_solver.basis().baseId(x.index(i)));
                      scaleExp = _scaler->getColScaleExp(idx);
                      x.scaleValue(x.index(i), scaleExp);
                   }
                   else
                   {
-                     idx = _solver.basis().baseId(x.index(i)).getIdx();
+                     idx = _solver.number(_solver.basis().baseId(x.index(i)));
                      scaleExp = - _scaler->getRowScaleExp(idx);
                      x.scaleValue(x.index(i), scaleExp);
                   }

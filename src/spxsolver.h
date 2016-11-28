@@ -1318,7 +1318,7 @@ public:
     *  basis matrix and #coPrhs as the right-hand side vector. For
     *  column basis representation, #coPrhs is build up of the
     *  objective vector elements of all basic variables. For a row
-    *  basis, it consists of the thight bounds of all basic
+    *  basis, it consists of the tight bounds of all basic
     *  constraints.
     */
    const Vector& coPrhs() const
