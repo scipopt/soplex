@@ -1336,7 +1336,7 @@ bool SPxSolver::terminate()
    // - MAXIMIZATION Problem
    //   We want stop the solving process if 
    //   objLimit >= current objective value of the DUAL LP
-   if (objLimit < infinity && type() * rep() > 0)
+   if (!isScaled() && objLimit < infinity && type() * rep() > 0)
    {
       // We have no bound shifts; therefore, we can trust the current
       // objective value.
