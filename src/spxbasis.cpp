@@ -772,14 +772,13 @@ void SPxBasis::change(
          factorize();
 
       // too much memory growth ?
-      else if (Real(factor->memory()) > factor->dim() + lastMem * memFactor)
+      else if (Real(factor->memory()) > 1000 + factor->dim() + lastMem * memFactor)
       {
          MSG_INFO3( (*spxout), (*spxout) << "IBASIS04 memory growth factor triggers refactorization"
                               << " memory= " << factor->memory()
                               << " lastMem= " << lastMem
                               << " memFactor= " << memFactor
                               << std::endl; )
-
          factorize();
       }
 
