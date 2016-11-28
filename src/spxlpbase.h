@@ -1333,7 +1333,7 @@ public:
    /// changes \p i 'th lower bound to \p newLower.
    virtual void changeLower(int i, const R& newLower, bool scale = false)
    {
-      if( scale )
+      if( scale && newLower > -infinity)
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1369,7 +1369,7 @@ public:
    /// Changes \p i 'th upper bound to \p newUpper.
    virtual void changeUpper(int i, const R& newUpper, bool scale = false)
    {
-      if( scale )
+      if( scale && newUpper < infinity )
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1436,7 +1436,7 @@ public:
    /// Changes \p i 'th left hand side value to \p newLhs.
    virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
-      if( scale )
+      if( scale && newLhs > -infinity )
          LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs);
       else
          LPRowSetBase<R>::lhs_w(i) = newLhs;
@@ -1468,7 +1468,7 @@ public:
    /// Changes \p i 'th right hand side value to \p newRhs.
    virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
-      if( scale )
+      if( scale && newRhs < infinity )
          LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs);
       else
          LPRowSetBase<R>::rhs_w(i) = newRhs;
