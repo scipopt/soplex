@@ -587,6 +587,10 @@ namespace soplex
       _solReal._dual    = _simplifier->unsimplifiedDual();
       _solReal._redCost = _simplifier->unsimplifiedRedCost();
 
+      // unscale stored solution (removes persistent scaling)
+      if( _isRealLPScaled )
+         _unscaleSolutionReal(*_realLP, true);
+
       // compute the original objective function value
       _solReal._primalObjVal = realParam(SoPlex::OBJ_OFFSET);
       for( int i = 0; i < numColsReal(); ++i )
@@ -601,9 +605,6 @@ namespace soplex
       _solReal._isPrimalFeasible = true;
       _solReal._isDualFeasible = true;
 
-      // unscale stored solution (removes persistent scaling)
-      if( _isRealLPScaled )
-         _unscaleSolutionReal(*_realLP, true);
 
       // check solution for violations and solve again if necessary
       _verifySolutionReal();
