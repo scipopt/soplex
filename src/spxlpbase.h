@@ -2001,34 +2001,12 @@ protected:
    }
 
    /// Called after the last \p n rows have just been added.
-   virtual void addedRows(int newrows, bool scale = false)
-   {
-      // apply column scaling to new rows
-      if( scale )
-      {
-         for( int i = 0; i < newrows; ++i)
-         {
-            SVectorBase<R>& row = LPRowSetBase<R>::rowVector_w(nRows() - 1 - i);
-            for( int j = 0; j < row.size(); ++j)
-               row.value(j) = spxLdexp(row.value(j), LPColSetBase<R>::scaleExp[row.index(j)]);
-         }
-      }
-   }
+   virtual void addedRows(int newrows)
+   {}
 
    /// Called after the last \p n columns have just been added.
-   virtual void addedCols(int newcols, bool scale = false)
-   {
-      // apply row scaling to new columns
-      if( scale )
-      {
-         for( int i = 0; i < newcols; ++i)
-         {
-            SVectorBase<R>& col = LPColSetBase<R>::colVector_w(nCols() - 1 - i);
-            for( int j = 0; j < col.size(); ++j)
-               col.value(j) = spxLdexp(col.value(j), LPRowSetBase<R>::scaleExp[col.index(j)]);
-         }
-      }
-   }
+   virtual void addedCols(int newcols)
+   {}
 
    ///
    void added2Set(SVSetBase<R>& set, const SVSetBase<R>& addset, int n)
@@ -2107,15 +2085,35 @@ private:
    {
       int idx = nRows();
       int oldColNumber = nCols();
-      const SVectorBase<R>& vec = row.rowVector();
+      int newRowScaleExp = 0;
 
       LPRowSetBase<R>::add(row);
+
+      SVectorBase<R>& vec = rowVector_w(idx);
+
+      // compute new row scaling factor and apply it to the sides
+      if( scale )
+      {
+         newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
+
+         if( rhs(idx) < infinity )
+            rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
+         if( lhs(idx) > -infinity )
+            lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
+
+         LPRowSetBase<R>::scaleExp[idx] = newRowScaleExp;
+      }
 
       // now insert nonzeros to column file also
       for( int j = vec.size() - 1; j >= 0; --j )
       {
-         R val = vec.value(j);
          int i = vec.index(j);
+
+         // apply new row and existing column scaling factors to new values in RowSet
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new columns if required
          if( i >= nCols() )
@@ -2129,8 +2127,8 @@ private:
          LPColSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedRows(1, scale);
-      addedCols(nCols() - oldColNumber, scale);
+      addedRows(1);
+      addedCols(nCols() - oldColNumber);
    }
 
    ///
@@ -2138,14 +2136,35 @@ private:
    {
       int idx = nRows();
       int oldColNumber = nCols();
+      int newRowScaleExp = 0;
 
       LPRowSetBase<R>::add(lhsValue, rowVec, rhsValue);
 
-      // now insert nonzeros to column file also
-      for( int j = rowVec.size() - 1; j >= 0; --j )
+      // compute new row scaling factor and apply it to the sides
+      if( scale )
       {
-         R val = rowVec.value(j);
-         int i = rowVec.index(j);
+         newRowScaleExp = lp_scaler->computeScaleExp(rowVec, LPColSetBase<R>::scaleExp);
+
+         if( rhs(idx) < infinity )
+            rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
+         if( lhs(idx) > -infinity )
+            lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
+
+         LPRowSetBase<R>::scaleExp[idx] = newRowScaleExp;
+      }
+
+      SVectorBase<R>& vec = rowVector_w(idx);
+
+      // now insert nonzeros to column file also
+      for( int j = vec.size() - 1; j >= 0; --j )
+      {
+         int i = vec.index(j);
+
+         // apply new row and existing column scaling factors to new values in RowSet
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new columns if required
          if( i >= nCols() )
@@ -2159,8 +2178,8 @@ private:
          LPColSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedRows(1, scale);
-      addedCols(nCols() - oldColNumber, scale);
+      addedRows(1);
+      addedCols(nCols() - oldColNumber);
    }
 
    ///
@@ -2219,10 +2238,24 @@ private:
          }
       }
 
-      // insert new elements to column file
+      // compute new row scaling factor and insert new elements to column file
       for( i = nRows() - 1; i >= oldRowNumber; --i )
       {
-         const SVectorBase<R>& vec = rowVector(i);
+         SVectorBase<R>& vec = rowVector_w(i);
+         int newRowScaleExp = 0;
+
+         // compute new row scaling factor and apply it to the sides
+         if( scale )
+         {
+            newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
+
+            if( rhs(i) < infinity )
+               rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
+            if( lhs(i) > -infinity )
+               lhs_w(i) = spxLdexp(lhs_w(i), newRowScaleExp);
+
+            LPRowSetBase<R>::scaleExp[i] = newRowScaleExp;
+         }
 
          for( j = vec.size() - 1; j >= 0; --j )
          {
@@ -2233,6 +2266,10 @@ private:
             assert(idx >= 0);
             newCols[k]--;
             col->index(idx) = i;
+            // apply new row and existing column scaling factors to both ColSet and RowSet
+            if( scale )
+               vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[k]);
+
             col->value(idx) = vec.value(j);
          }
       }
@@ -2245,27 +2282,48 @@ private:
       assert(SPxLPBase<R>::isConsistent());
 
       assert(set.num() == nRows() - oldRowNumber);
-      addedRows(nRows() - oldRowNumber, scale);
-      addedCols(nCols() - oldColNumber, scale);
+      addedRows(nRows() - oldRowNumber);
+      addedCols(nCols() - oldColNumber);
    }
 
    ///
    void doAddCol (const LPColBase<R>& col, bool scale = false)
    {
-
       int idx = nCols();
       int oldRowNumber = nRows();
-      const SVectorBase<R>& vec = col.colVector();
+      int newColScaleExp = 0;
 
       LPColSetBase<R>::add(col);
       if( thesense != MAXIMIZE )
          LPColSetBase<R>::maxObj_w(idx) *= -1;
 
+      SVectorBase<R>& vec = colVector_w(idx);
+
+      // compute new column scaling factor and apply it to the bounds
+      if( scale )
+      {
+         newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
+
+         if( upper(idx) < infinity )
+            upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
+         if( lower(idx) > -infinity )
+            lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
+
+         maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
+
+         LPColSetBase<R>::scaleExp[idx] = newColScaleExp;
+      }
+
       // now insert nonzeros to row file also
       for( int j = vec.size() - 1; j >= 0; --j )
       {
-         R val = vec.value(j);
          int i = vec.index(j);
+
+         // apply new column and existing row scaling factors to new values in ColSet
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new rows if required
          if( i >= nRows() )
@@ -2279,8 +2337,8 @@ private:
          LPRowSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedCols(1, scale);
-      addedRows(nRows() - oldRowNumber, scale);
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
    }
 
    ///
@@ -2288,16 +2346,38 @@ private:
    {
       int idx = nCols();
       int oldRowNumber = nRows();
+      int newColScaleExp = 0;
 
       LPColSetBase<R>::add(objValue, lowerValue, colVec, upperValue);
       if( thesense != MAXIMIZE )
          LPColSetBase<R>::maxObj_w(idx) *= -1;
 
-      // now insert nonzeros to row file also
-      for( int j = colVec.size() - 1; j >= 0; --j )
+      // compute new column scaling factor and apply it to the bounds
+      if( scale )
       {
-         R val = colVec.value(j);
-         int i = colVec.index(j);
+         newColScaleExp = lp_scaler->computeScaleExp(colVec, LPRowSetBase<R>::scaleExp);
+
+         if( upper(idx) < infinity )
+            upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
+         if( lower(idx) > -infinity )
+            lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
+
+         maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
+
+         LPColSetBase<R>::scaleExp[idx] = newColScaleExp;
+      }
+
+      SVectorBase<R>& vec = colVector_w(idx);
+
+      // now insert nonzeros to row file also
+      for( int j = vec.size() - 1; j >= 0; --j )
+      {
+         int i = vec.index(j);
+
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new rows if required
          if( i >= nRows() )
@@ -2311,15 +2391,13 @@ private:
          LPRowSetBase<R>::add2(i, 1, &idx, &val);
       }
 
-      addedCols(1, scale);
-      addedRows(nRows() - oldRowNumber, scale);
+      addedCols(1);
+      addedRows(nRows() - oldRowNumber);
    }
 
    ///
    void doAddCols(const LPColSetBase<R>& set, bool scale = false)
    {
-      // todo adapt to persistent scaling
-
       int i, j;
       int oldColNumber = nCols();
       int oldRowNumber = nRows();
@@ -2375,7 +2453,23 @@ private:
       for( i = oldColNumber; i < nCols(); ++i )
       {
          LPColSetBase<R>::maxObj_w(i) *= thesense;
-         const SVectorBase<R>& vec = colVector(i);
+         SVectorBase<R>& vec = colVector_w(i);
+         int newColScaleExp = 0;
+
+         // compute new column scaling factor and apply it to the bounds
+         if( scale )
+         {
+            newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
+
+            if( upper(i) < infinity )
+               upper_w(i) = spxLdexp(upper_w(i), - newColScaleExp);
+            if( lower(i) > -infinity )
+               lower_w(i) = spxLdexp(lower_w(i), - newColScaleExp);
+
+            maxObj_w(i) = spxLdexp(maxObj_w(i), newColScaleExp);
+
+            LPColSetBase<R>::scaleExp[i] = newColScaleExp;
+         }
 
          for( j = vec.size() - 1; j >= 0; --j )
          {
@@ -2385,6 +2479,10 @@ private:
             assert(newRows[k] > 0);
             newRows[k]--;
             row.index(idx) = i;
+            // apply new column and existing row scaling factors to both ColSet and RowSet
+            if( scale )
+               vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[k]);
+
             row.value(idx) = vec.value(j);
          }
       }
@@ -2397,8 +2495,8 @@ private:
       assert(SPxLPBase<R>::isConsistent());
 
       assert(set.num() == nCols() - oldColNumber);
-      addedCols(nCols() - oldColNumber, scale);
-      addedRows(nRows() - oldRowNumber, scale);
+      addedCols(nCols() - oldColNumber);
+      addedRows(nRows() - oldRowNumber);
    }
 
    //@}

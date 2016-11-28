@@ -202,12 +202,12 @@ void SPxSolver::addedRows(int n)
 }
 #endif //0
 
-void SPxSolver::addedRows(int n, bool scale)
+void SPxSolver::addedRows(int n)
 {
 
    if( n > 0 )
    {
-      SPxLP::addedRows(n, scale);
+      SPxLP::addedRows(n);
 
       unInit();
       reDim();
@@ -413,12 +413,12 @@ void SPxSolver::addedCols(int n)
 }
 #endif //0
 
-void SPxSolver::addedCols(int n, bool scale)
+void SPxSolver::addedCols(int n)
 {
 
    if( n > 0 )
    {
-      SPxLP::addedCols(n, scale);
+      SPxLP::addedCols(n);
 
       unInit();
       reDim();

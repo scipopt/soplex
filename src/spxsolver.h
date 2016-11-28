@@ -843,9 +843,9 @@ protected:
    /**@name Protected helpers */
    //@{
    ///
-   virtual void addedRows(int n, bool scale = false);
+   virtual void addedRows(int n);
    ///
-   virtual void addedCols(int n, bool scale = false);
+   virtual void addedCols(int n);
    ///
    virtual void doRemoveRow(int i);
    ///

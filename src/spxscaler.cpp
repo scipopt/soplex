@@ -137,63 +137,35 @@ void SPxScaler::setup(SPxLP& lp)
    lp.lp_scaler = this;
 }
 
-#if 0
-/** This function is used by computeScaleVecs and has to be overridden.
- */
-Real SPxScaler::computeScale(Real /*mini*/, Real /*maxi*/) const
+int SPxScaler::computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const
 {
+   Real maxi = 0.0;
 
-   return 1.0;
-}
-
-Real SPxScaler::computeScalingVecs(
-   const SVSet*           vecset, 
-   const DataArray<int>& coScaleExp,
-   DataArray<int>&       scaleExp)
-{
-
-   Real pmax = 0.0;
-
-   for( int i = 0; i < vecset->num(); ++i )
+   // find largest absolute value after applying existing scaling factors
+   for( int i = 0; i < vec.size(); ++i )
    {
-      const SVector& vec = (*vecset)[i];
+      Real x = spxAbs(spxLdexp(vec.value(i), oldScaleExp[vec.index(i)]));
 
-      Real maxi = 0.0;
-      Real mini = infinity;
-
-      for( int j = 0; j < vec.size(); ++j )
-      {
-         Real x = spxAbs(vec.value(j) * spxLdexp(1.0, coScaleExp[vec.index(j)]));
-
-         if (!isZero(x))
-         {
-            if (x > maxi)
-               maxi = x;
-            if (x < mini)
-               mini = x;
-         }
-      }
-      // empty rows/cols are possible
-      if (mini == infinity || maxi == 0.0)
-      {
-         mini = 1.0;
-         maxi = 1.0;
-      }
-      assert(mini < infinity);
-      assert(maxi > 0.0);
-
-      //scaleval[i] = 1.0 / computeScale(mini, maxi);
-      frexp(1.0 / computeScale(mini, maxi), &(scaleExp[i]));
-      scaleExp[i] -= 1;
-
-      Real p = maxi / mini;
-
-      if (p > pmax)
-         pmax = p;
+      if( GT(x, maxi) )
+         maxi = x;
    }
-   return pmax;
+   // empty rows/cols are possible
+   if( maxi == 0.0 )
+      return 0;
+   // get exponent corresponding to new scaling factor
+   else
+   {
+      int scaleExp;
+      spxFrexp(1.0 / maxi, &(scaleExp));
+      return scaleExp - 1;
+   }
 }
-#endif
+
+int SPxScaler::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const
+{
+   return 0;
+}
+
 void SPxScaler::applyScaling(SPxLP& lp)
 {
    assert(lp.nCols() == m_activeColscaleExp->size());
@@ -220,8 +192,9 @@ void SPxScaler::applyScaling(SPxLP& lp)
       if (lp.lhs(i) > -infinity)
       {
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
-
       }
+
+      MSG_DEBUG( std::cout << "DEBUG: rowscaleExp(" << i << "): " << exp2 << std::endl; )
    }
 
    for( int i = 0; i < lp.nCols(); ++i )
@@ -246,6 +219,8 @@ void SPxScaler::applyScaling(SPxLP& lp)
       {
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
       }
+
+      MSG_DEBUG( std::cout << "DEBUG: colscaleExp(" << i << "): " << exp2 << std::endl; )
    }
 
    lp.setScalingInfo(true);
@@ -925,7 +900,7 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
 bool SPxScaler::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   return m_activeColscaleExp->isConsistent() && m_activeRowscaleExp)->isConsistent();
+   return m_activeColscaleExp->isConsistent() && m_activeRowscaleExp->isConsistent();
 #else
    return true;
 #endif

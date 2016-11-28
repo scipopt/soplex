@@ -21,6 +21,7 @@
 #include "statistics.h"
 
 #define ALLOWED_UNSCALE_PERCENTAGE    0.1
+#define MIN_OPT_CALLS_WITH_SCALING     10
 
 namespace soplex
 {
@@ -77,7 +78,7 @@ namespace soplex
    /// check whether persistent scaling is supposed to be reapplied again after unscaling
    bool SoPlex::_reapplyPersistentScaling() const
    {
-      if( (_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE) && _optimizeCalls > 10 )
+      if( (_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE) && _optimizeCalls > MIN_OPT_CALLS_WITH_SCALING )
          return false;
       else
          return true;

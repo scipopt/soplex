@@ -93,20 +93,14 @@ protected:
 
    /// clear and setup scaling arrays in the LP
    virtual void setup(SPxLPBase<Real>& lp);
-#if 0
-   /// computes scaling value for a minimum and maximum pair.
-   virtual Real computeScale(Real mini, Real maxi) const;
-
-   /// iterates through vecset and calls computeScale() for each vector.
-   /**@return maximum ratio between absolute biggest and smallest element for any vector.
-    */
-   virtual Real computeScalingVecs( const SVSet* vecset, 
-                                    const DataArray<int>& coScaleExp,
-                                    DataArray<int>& scaleExp );
-#endif
    //@}
 
 public:
+
+   /// compute a single scaling vector , e.g. of a newly added row
+   int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
+
+   int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
