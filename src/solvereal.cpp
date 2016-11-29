@@ -56,7 +56,7 @@ namespace soplex
          // unscale previously scaled problem, overwriting _realLP
          else if( !_scaler && _realLP->isScaled() )
          {
-            _realLP->unscaleLP();
+            _solver.unscaleLPandReloadBasis();
             _isRealLPScaled = false;
             ++_unscaleCalls;
          }

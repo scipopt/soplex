@@ -513,22 +513,12 @@ void SPxSolver::clear()
    isInfeasibleCo.clear();
 }
 
-void SPxSolver::unscaleLPandClearBasis()
+void SPxSolver::unscaleLPandReloadBasis()
 {
    SPxLPBase<Real>::unscaleLP();
-   SPxLP* origLP = 0;
-   spx_alloc(origLP);
-   origLP = new (origLP) SPxLPReal(*this);
-   clear();
-   loadLP(*origLP, false);
-//   basis().loadDesc(desc());
-//   loadMatrixVecs();
-//   SPxBasis::invalidate();
-//   SPxBasis::reDim();
-//   unInit();
-//   reDim();
-//   init();
-   return;
+   SPxBasis::invalidate();
+   unInit();
+   init();
 }
 
 void SPxSolver::clearUpdateVecs(void)

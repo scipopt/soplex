@@ -4221,7 +4221,7 @@ namespace soplex
          spx_alloc(bind, numRowsReal());
          getBasisInd(bind);
 
-         // get vector corresponding to requested index r
+         // get vector corresponding to requested index c
          index = bind[c];
 
          // c corresponds to a row vector
@@ -4308,7 +4308,7 @@ namespace soplex
             }
          }
 
-         // if r corresponds to a row vector, we have to add a 1 at position r
+         // if c corresponds to a row vector, we have to add a 1 at position c
          if( bind[c] < 0 )
          {
             assert(coef[index] == 0.0);

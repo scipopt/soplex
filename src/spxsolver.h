@@ -523,8 +523,8 @@ public:
    /// clear all data in solver.
    virtual void clear();
 
-   /// unscales the LP and clears the Basis
-   void unscaleLPandClearBasis();
+   /// unscales the LP and reloads the basis
+   void unscaleLPandReloadBasis();
 
    /** Load basis from \p filename in MPS format. If \p rowNames and \p
     *  colNames are \c NULL, default names are used for the constraints and

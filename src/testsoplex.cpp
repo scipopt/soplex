@@ -88,12 +88,17 @@ namespace soplex
 
    void SoPlex::_checkBasisScaling()
    {
+      if( _solver.status() != SPxSolver::OPTIMAL )
+      {
+         MSG_INFO1( spxout, spxout << "DEBUG: skipping test on non optimal bases\n" );
+         return;
+      }
+
       assert(&_solver == _realLP);
       DVector** binvcol = 0;
       DVector** binvrow = 0;
       int* inds = 0;
-      int basisdim = _solver.dim();
-      assert(basisdim == numRowsReal());
+      int basisdim = _solver.nRows(); // do all operations with regard to the column basis
       spx_alloc(binvcol, basisdim);
       spx_alloc(binvrow, basisdim);
       spx_alloc(inds, basisdim);
@@ -121,37 +126,46 @@ namespace soplex
       {
          DVector result(*binvcol[i]);
          assert(multBasis(result.get_ptr(), true));
-         Real error = 0.0;
+         Real sumerror = 0.0;
          for( int j = 0; j < basisdim; ++j)
          {
+            Real error = 0.0;
             if( j != i )
-               error += spxAbs(result[j]);
+               error = spxAbs(result[j]);
             else
-               error += spxAbs(result[j] - 1.0);
+               error = spxAbs(result[j] - 1.0);
+            if( error > 1e-12 )
+               MSG_INFO1( spxout, spxout << "ERROR: " << j << ", " << result[j] << std::endl );
+            sumerror += error;
          }
-         assert(error < 1e-12);
+         assert(sumerror < _solver.feastol());
       }
       MSG_INFO1( spxout, spxout << "DEBUG: checking rows for identity after multiplying with basis matrix\n";)
       for( int i = 0; i < basisdim; ++i)
       {
          DVector result(*binvrow[i]);
          assert(multBasisTranspose(result.get_ptr(), true));
-         Real error = 0.0;
+         Real sumerror = 0.0;
          for( int j = 0; j < basisdim; ++j)
          {
+            Real error = 0.0;
             if( j != i )
-               error += spxAbs(result[j]);
+               error = spxAbs(result[j]);
             else
-               error += spxAbs(result[j] - 1.0);
+               error = spxAbs(result[j] - 1.0);
+            if( error > 1e-12 )
+               MSG_INFO1( spxout, spxout << "ERROR: " << j << ", " << result[j] << std::endl );
+            sumerror += error;
          }
-         assert(error < 1e-12);
+         assert(sumerror < _solver.feastol());
       }
 
       if( _solver.isScaled() )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: unscaling LP\n"; )
-         _solver.unscaleLPandClearBasis();
-         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+         _solver.unscaleLPandReloadBasis();
+//         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+//         _solver.solve();
       }
 
       DVector** binvcol2 = 0;
@@ -185,10 +199,12 @@ namespace soplex
          {
             if( NE((*binvcol[i])[j], (*binvcol2[i])[j], 1e-12) )
             {
+               MSG_INFO1( spxout, spxout << "ERROR: col " << i << " " << j << ", " << (*binvcol[i])[j] << " " << (*binvcol2[i])[j] << std::endl );
                failed = true;
             }
             if( NE((*binvrow[i])[j], (*binvrow2[i])[j], 1e-12) )
             {
+               MSG_INFO1( spxout, spxout << "ERROR: row " << i << " " << j << ", " << (*binvrow[i])[j] << " " << (*binvrow2[i])[j] << std::endl );
                failed = true;
             }
          }
