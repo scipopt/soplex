@@ -166,7 +166,7 @@ int SPxScaler::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray
    return 0;
 }
 
-void SPxScaler::applyScaling(SPxLP& lp)
+void SPxScaler::applyScaling(SPxLPBase<Real>& lp)
 {
    assert(lp.nCols() == m_activeColscaleExp->size());
    assert(lp.nRows() == m_activeRowscaleExp->size());
@@ -185,14 +185,14 @@ void SPxScaler::applyScaling(SPxLP& lp)
          exp1 = colscaleExp[vec.index(j)];
          vec.value(j) = spxLdexp(vec.value(j), exp1 + exp2);
       }
-      if (lp.rhs(i) < infinity)
-      {
+
+      lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), exp2);
+
+      if( lp.rhs(i) < infinity )
          lp.rhs_w(i) = spxLdexp(lp.rhs_w(i), exp2);
-      }
-      if (lp.lhs(i) > -infinity)
-      {
+
+      if( lp.lhs(i) > -infinity )
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
-      }
 
       MSG_DEBUG( std::cout << "DEBUG: rowscaleExp(" << i << "): " << exp2 << std::endl; )
    }
@@ -211,14 +211,11 @@ void SPxScaler::applyScaling(SPxLP& lp)
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), exp2);
 
-      if (lp.upper(i) < infinity)
-      {
+      if( lp.upper(i) < infinity )
          lp.upper_w(i) = spxLdexp(lp.upper_w(i), -exp2);
-      }
-      if (lp.lower(i) > -infinity)
-      {
+
+      if( lp.lower(i) > -infinity )
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
-      }
 
       MSG_DEBUG( std::cout << "DEBUG: colscaleExp(" << i << "): " << exp2 << std::endl; )
    }
@@ -247,15 +244,16 @@ void SPxScaler::unscale(SPxLPBase<Real>& lp)
          exp1 = colscaleExp[vec.index(j)];
          vec.value(j) = spxLdexp(vec.value(j), -exp1 - exp2);
       }
-      if (lp.rhs(i) < infinity)
-      {
+
+      lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), -exp2);
+
+      if( lp.rhs(i) < infinity )
          lp.rhs_w(i) = spxLdexp(lp.rhs_w(i), -exp2);
-      }
-      if (lp.lhs(i) > -infinity)
-      {
+
+      if( lp.lhs(i) > -infinity )
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), -exp2);
-      }
    }
+
    for( int i = 0; i < lp.nCols(); ++i )
    {
       SVector& vec = lp.colVector_w(i);
@@ -271,14 +269,11 @@ void SPxScaler::unscale(SPxLPBase<Real>& lp)
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), -exp2);
 
-      if (lp.upper(i) < infinity)
-      {
+      if( lp.upper(i) < infinity )
          lp.upper_w(i) = spxLdexp(lp.upper_w(i), exp2);
-      }
-      if (lp.lower(i) > -infinity)
-      {
+
+      if( lp.lower(i) > -infinity )
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), exp2);
-      }
    }
 
    lp._isScaled = false;

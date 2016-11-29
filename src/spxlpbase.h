@@ -350,7 +350,6 @@ public:
    /// Gets columns \p start, ..., \p end.
    void getCols(int start, int end, LPColSetBase<R>& set) const
    {
-
       if( _isScaled)
       {
          LPColBase<R> lpcol;
@@ -2101,6 +2100,8 @@ private:
          if( lhs(idx) > -infinity )
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
+         maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
+
          LPRowSetBase<R>::scaleExp[idx] = newRowScaleExp;
       }
 
@@ -2149,6 +2150,8 @@ private:
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
          if( lhs(idx) > -infinity )
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
+
+         maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
 
          LPRowSetBase<R>::scaleExp[idx] = newRowScaleExp;
       }
@@ -2253,6 +2256,8 @@ private:
                rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
             if( lhs(i) > -infinity )
                lhs_w(i) = spxLdexp(lhs_w(i), newRowScaleExp);
+
+            maxRowObj_w(i) = spxLdexp(maxRowObj_w(i), newRowScaleExp);
 
             LPRowSetBase<R>::scaleExp[i] = newRowScaleExp;
          }
