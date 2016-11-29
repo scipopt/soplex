@@ -3978,15 +3978,13 @@ namespace soplex
             {
                /* for information on the unscaling procedure see spxscaler.h */
 
-               int scaleExp = 0;
+               int scaleExp;
                DSVector rhs(_solver.unitVector(r));
 
-               scaleExp = - _scaler->getRowScaleExp(r);
-
                if( _solver.basis().baseId(r).isSPxColId() )
-                  scaleExp += _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
+                  scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
                else
-                  scaleExp -= _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(r)));
+                  scaleExp = - _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(r)));
 
                rhs *= spxLdexp(1.0, scaleExp);
 
@@ -4468,9 +4466,9 @@ namespace soplex
                if( isNotZero(vec[i]) )
                {
                   if( _solver.basis().baseId(i).isSPxColId() )
-                     scaleExp = - _scaler->getColScaleExp(_solver.basis().baseId(i).getIdx());
+                     scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
                   else
-                     scaleExp = _scaler->getRowScaleExp(_solver.basis().baseId(i).getIdx());
+                     scaleExp = _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(i)));
 
                   vec[i] = spxLdexp(vec[i], scaleExp);
                }
@@ -4532,9 +4530,9 @@ namespace soplex
                if( isNotZero(vec[i]) )
                {
                   if( _solver.basis().baseId(i).isSPxColId() )
-                     scaleExp = - _scaler->getColScaleExp(_solver.basis().baseId(i).getIdx());
+                     scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
                   else
-                     scaleExp = _scaler->getRowScaleExp(_solver.basis().baseId(i).getIdx());
+                     scaleExp = _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(i)));
 
                   vec[i] = spxLdexp(vec[i], scaleExp);
                }
