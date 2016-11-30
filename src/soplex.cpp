@@ -3889,7 +3889,7 @@ namespace soplex
             bind[i] = (id.isSPxColId() ? _solver.number(id) : - 1 - _solver.number(id));
          }
       }
-      // for row representation, return the complement of the basis; for this, we need to loop through all rows and columns
+      // for row representation, return the complement of the row basis; for this, we need to loop through all rows and columns
       else
       {
          assert(_solver.rep() == SPxSolver::ROW);
@@ -4059,7 +4059,22 @@ namespace soplex
             assert(!_solver.isRowBasic(index));
 
             // get row vector
-            rhs = _solver.rowVector(index);
+            if( unscale && _solver.isScaled() )
+               _solver.getRowVectorUnscaled(index, rhs);
+            else
+               rhs = _solver.rowVector(index);
+
+            if( unscale && _solver.isScaled() )
+            {
+               for( int i = 0; i < rhs.size(); ++i)
+               {
+                  if( bind[rhs.index(i)] >= 0 )
+                     rhs.value(i) = spxLdexp(rhs.value(i), _scaler->getColScaleExp(rhs.index(i)));
+                  else
+                     rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(rhs.index(i)));
+               }
+            }
+
             rhs *= -1.0;
          }
          // r corresponds to a column vector
@@ -4071,6 +4086,9 @@ namespace soplex
 
             // get unit vector
             rhs = UnitVectorReal(index);
+
+            if( unscale && _solver.isScaled() )
+               rhs *= spxLdexp(1.0, _scaler->getColScaleExp(index));
          }
 
          // solve system "y B = rhs", where B is the row basis matrix
@@ -4099,6 +4117,9 @@ namespace soplex
                assert(bind[r] >= 0 || _solver.number(id) != index);
 
                coef[_solver.number(id)] = y[i];
+
+               if( unscale && _solver.isScaled() )
+                  coef[_solver.number(id)] = spxLdexp(y[i], _scaler->getRowScaleExp(_solver.number(id)));
             }
          }
 
@@ -4123,6 +4144,7 @@ namespace soplex
 
 
    /// computes column c of basis inverse; returns true on success
+   /// @todo does not work correctly for the row representation
    bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
    {
       assert(c >= 0);
@@ -4254,9 +4276,8 @@ namespace soplex
          try
          {
             /* unscaling required? */
-            if( unscale )
+            if( unscale && _solver.isScaled() )
             {
-               assert(_isRealLPScaled);
                int size = rhs.size();
                int scaleExp;
 
@@ -4485,7 +4506,61 @@ namespace soplex
       }
       else
       {
-         return false;
+         int colbasisdim = numRowsReal();
+
+         DSVector y(colbasisdim);
+
+         y.clear();
+
+         // create Vector from input values
+         Vector x(colbasisdim, vec);
+
+         int* bind = 0;
+         int index;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, colbasisdim);
+         getBasisInd(bind);
+
+         // temporarily create the column basis and multiply every column with x
+         for( int i = 0; i < colbasisdim; ++i)
+         {
+            if( isNotZero(x[i]) )
+            {
+               // get vector corresponding to requested index i
+               index = bind[i];
+               // r corresponds to a row vector
+               if( index < 0 )
+               {
+                  // transform index to actual row index
+                  index = -index - 1;
+
+                  // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                  assert(index >= 0);
+                  assert(index < numRowsReal());
+                  assert(!_solver.isRowBasic(index));
+
+                  y.add(x[i] * UnitVectorReal(index));
+               }
+               // r corresponds to a column vector
+               else
+               {
+                  // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                  assert(index < numColsReal());
+                  assert(!_solver.isColBasic(index));
+
+                  if( unscale && _solver.isScaled() )
+                  {
+                     DSVector col;
+                     _solver.getColVectorUnscaled(index, col);
+                     y.add(x[i] * col);
+                  }
+
+                  y.add(x[i] * _solver.colVector(index));
+               }
+            }
+         }
+         x = y;
       }
 
       return true;
@@ -4543,7 +4618,56 @@ namespace soplex
       }
       else
       {
-         return false;
+         int colbasisdim = numRowsReal();
+
+         DSVector y(colbasisdim);
+
+         // create Vector from input values
+         Vector x(colbasisdim, vec);
+
+         int* bind = 0;
+         int index;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, colbasisdim);
+         getBasisInd(bind);
+
+         // temporarily create the column basis and multiply every column with x
+         for( int i = 0; i < colbasisdim; ++i)
+         {
+            // get vector corresponding to requested index i
+            index = bind[i];
+            // r corresponds to a row vector
+            if( index < 0 )
+            {
+               // transform index to actual row index
+               index = -index - 1;
+
+               // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+               assert(index >= 0);
+               assert(index < numRowsReal());
+               assert(!_solver.isRowBasic(index));
+
+               y.add(i, x * UnitVectorReal(index));
+            }
+            // r corresponds to a column vector
+            else
+            {
+               // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+               assert(index < numColsReal());
+               assert(!_solver.isColBasic(index));
+
+               if( unscale && _solver.isScaled() )
+               {
+                  DSVector col;
+                  _solver.getColVectorUnscaled(index, col);
+                  y.add(i, x * col);
+               }
+               else
+                  y.add(i, x * _solver.colVector(index));
+            }
+         }
+         x = y;
       }
 
       return true;

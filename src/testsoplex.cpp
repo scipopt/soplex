@@ -68,7 +68,7 @@ namespace soplex
 
          for( int j = 0; j < col.size(); ++j)
          {
-            if( NE(col.value(j), origLP->colVector(i).value(j), 1e-12) )
+            if( NE(col.value(j), origLP->colVector(i).value(j), _solver.feastol()) )
             {
                MSG_INFO1( spxout, spxout << "DEBUG: scaling error in col " << i << ", row " << j
                           << ": orig " << origLP->colVector(i).value(j)
@@ -88,7 +88,7 @@ namespace soplex
 
    void SoPlex::_checkBasisScaling()
    {
-      if( _solver.status() != SPxSolver::OPTIMAL )
+      if( _status != SPxSolver::OPTIMAL )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: skipping test on non optimal bases\n" );
          return;
@@ -103,13 +103,16 @@ namespace soplex
       spx_alloc(binvrow, basisdim);
       spx_alloc(inds, basisdim);
 
-      MSG_INFO1( spxout, spxout << "DEBUG: computing columns of inverted basis matrix\n";)
-      // collect columns of the basis inverse
-      for( int i = 0; i < basisdim; ++i)
+      if( _solver.rep() == SPxSolver::COLUMN )
       {
-         binvcol[i] = new DVector(basisdim);
-         binvcol[i]->clear();
-         assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), 0, 0, true));
+         MSG_INFO1( spxout, spxout << "DEBUG: computing columns of inverted basis matrix\n";)
+         // collect columns of the basis inverse
+         for( int i = 0; i < basisdim; ++i)
+         {
+            binvcol[i] = new DVector(basisdim);
+            binvcol[i]->clear();
+            assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), 0, 0, true));
+         }
       }
       MSG_INFO1( spxout, spxout << "DEBUG: computing rows of inverted basis matrix\n";)
       // collect rows of the basis inverse
@@ -120,26 +123,30 @@ namespace soplex
          assert(getBasisInverseRowReal(i, binvrow[i]->get_ptr(), 0, 0, true));
       }
 
-      MSG_INFO1( spxout, spxout << "DEBUG: checking columns for identity after multiplying with basis matrix\n";)
-      // multiply with (unscaled) basis matrix and check result (should be unitvecs)
-      for( int i = 0; i < basisdim; ++i)
+      if( _solver.rep() == SPxSolver::COLUMN )
       {
-         DVector result(*binvcol[i]);
-         assert(multBasis(result.get_ptr(), true));
-         Real sumerror = 0.0;
-         for( int j = 0; j < basisdim; ++j)
+         MSG_INFO1( spxout, spxout << "DEBUG: checking columns for identity after multiplying with basis matrix\n";)
+         // multiply with (unscaled) basis matrix and check result (should be unitvecs)
+         for( int i = 0; i < basisdim; ++i)
          {
-            Real error = 0.0;
-            if( j != i )
-               error = spxAbs(result[j]);
-            else
-               error = spxAbs(result[j] - 1.0);
-            if( error > 1e-12 )
-               MSG_INFO1( spxout, spxout << "ERROR: " << j << ", " << result[j] << std::endl );
-            sumerror += error;
+            DVector result(*binvcol[i]);
+            assert(multBasis(result.get_ptr(), true));
+            Real sumerror = 0.0;
+            for( int j = 0; j < basisdim; ++j)
+            {
+               Real error = 0.0;
+               if( j != i )
+                  error = spxAbs(result[j]);
+               else
+                  error = spxAbs(result[j] - 1.0);
+               if( error > _solver.feastol() )
+                  MSG_INFO1( spxout, spxout << "ERROR: " << j << ", " << result[j] << std::endl );
+               sumerror += error;
+            }
+            assert(_solver.rep() == SPxSolver::ROW || sumerror < _solver.feastol());
          }
-         assert(sumerror < _solver.feastol());
       }
+
       MSG_INFO1( spxout, spxout << "DEBUG: checking rows for identity after multiplying with basis matrix\n";)
       for( int i = 0; i < basisdim; ++i)
       {
@@ -153,8 +160,8 @@ namespace soplex
                error = spxAbs(result[j]);
             else
                error = spxAbs(result[j] - 1.0);
-            if( error > 1e-12 )
-               MSG_INFO1( spxout, spxout << "ERROR: " << j << ", " << result[j] << std::endl );
+            if( error > _solver.feastol() )
+               MSG_INFO1( spxout, spxout << "ERROR: " << i << " " << j << ", " << result[j] << std::endl );
             sumerror += error;
          }
          assert(sumerror < _solver.feastol());
@@ -166,50 +173,56 @@ namespace soplex
          _solver.unscaleLPandReloadBasis();
 //         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 //         _solver.solve();
-      }
 
-      DVector** binvcol2 = 0;
-      DVector** binvrow2 = 0;
-      spx_alloc(binvcol2, basisdim);
-      spx_alloc(binvrow2, basisdim);
+         DVector** binvcol2 = 0;
+         DVector** binvrow2 = 0;
+         spx_alloc(binvcol2, basisdim);
+         spx_alloc(binvrow2, basisdim);
 
-      MSG_INFO1( spxout, spxout << "DEBUG: computing columns of inverted basis matrix again\n";)
-      // collect columns of the basis inverse
-      for( int i = 0; i < basisdim; ++i)
-      {
-         binvcol2[i] = new DVector(basisdim);
-         binvcol2[i]->clear();
-         assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), 0, 0, false));
-      }
-
-      MSG_INFO1( spxout, spxout << "DEBUG: computing rows of inverted basis matrix again\n";)
-      // collect rows of the basis inverse
-      for( int i = 0; i < basisdim; ++i)
-      {
-         binvrow2[i] = new DVector(basisdim);
-         binvrow2[i]->clear();
-         assert(getBasisInverseRowReal(i, binvrow2[i]->get_ptr(), 0, 0, false));
-      }
-
-      MSG_INFO1( spxout, spxout << "DEBUG: checking rows and columns of scaled/unscaled inverted of basis matrix\n";)
-      bool failed = false;
-      for( int i = 0; i < basisdim; ++i)
-      {
-         for( int j = 0; j < basisdim; ++j)
+         if( _solver.rep() == SPxSolver::COLUMN )
          {
-            if( NE((*binvcol[i])[j], (*binvcol2[i])[j], 1e-12) )
+            MSG_INFO1( spxout, spxout << "DEBUG: computing columns of inverted basis matrix again\n";)
+            // collect columns of the basis inverse
+            for( int i = 0; i < basisdim; ++i)
             {
-               MSG_INFO1( spxout, spxout << "ERROR: col " << i << " " << j << ", " << (*binvcol[i])[j] << " " << (*binvcol2[i])[j] << std::endl );
-               failed = true;
-            }
-            if( NE((*binvrow[i])[j], (*binvrow2[i])[j], 1e-12) )
-            {
-               MSG_INFO1( spxout, spxout << "ERROR: row " << i << " " << j << ", " << (*binvrow[i])[j] << " " << (*binvrow2[i])[j] << std::endl );
-               failed = true;
+               binvcol2[i] = new DVector(basisdim);
+               binvcol2[i]->clear();
+               assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), 0, 0, false));
             }
          }
+
+         MSG_INFO1( spxout, spxout << "DEBUG: computing rows of inverted basis matrix again\n";)
+         // collect rows of the basis inverse
+         for( int i = 0; i < basisdim; ++i)
+         {
+            binvrow2[i] = new DVector(basisdim);
+            binvrow2[i]->clear();
+            assert(getBasisInverseRowReal(i, binvrow2[i]->get_ptr(), 0, 0, false));
+         }
+
+         MSG_INFO1( spxout, spxout << "DEBUG: checking rows and columns of scaled/unscaled inverted of basis matrix\n";)
+         bool failed = false;
+         for( int i = 0; i < basisdim; ++i)
+         {
+            for( int j = 0; j < basisdim; ++j)
+            {
+               if( _solver.rep() == SPxSolver::COLUMN )
+               {
+                  if( NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.feastol()) )
+                  {
+                     MSG_INFO1( spxout, spxout << "ERROR: col " << i << " " << j << ", " << (*binvcol[i])[j] << " " << (*binvcol2[i])[j] << std::endl );
+                     failed = true;
+                  }
+               }
+               if( NE((*binvrow[i])[j], (*binvrow2[i])[j], _solver.feastol()) )
+               {
+                  MSG_INFO1( spxout, spxout << "ERROR: row " << i << " " << j << ", " << (*binvrow[i])[j] /  (*binvrow2[i])[j] << std::endl );
+                  failed = true;
+               }
+            }
+         }
+         assert(!failed);
       }
-      assert(!failed);
 
       spx_free(inds);
       spx_free(binvrow);
