@@ -201,9 +201,9 @@ namespace soplex
          }
 
          MSG_INFO1( spxout, spxout << "DEBUG: checking rows and columns of scaled/unscaled inverted of basis matrix\n";)
-         bool failed = false;
          for( int i = 0; i < basisdim; ++i)
          {
+            Real sumerror = 0.0;
             for( int j = 0; j < basisdim; ++j)
             {
                if( _solver.rep() == SPxSolver::COLUMN )
@@ -211,17 +211,17 @@ namespace soplex
                   if( NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.feastol()) )
                   {
                      MSG_INFO1( spxout, spxout << "ERROR: col " << i << " " << j << ", " << (*binvcol[i])[j] << " " << (*binvcol2[i])[j] << std::endl );
-                     failed = true;
+                     sumerror += spxAbs((*binvcol[i])[j] - (*binvcol2[i])[j]);
                   }
                }
                if( NE((*binvrow[i])[j], (*binvrow2[i])[j], _solver.feastol()) )
                {
                   MSG_INFO1( spxout, spxout << "ERROR: row " << i << " " << j << ", " << (*binvrow[i])[j] /  (*binvrow2[i])[j] << std::endl );
-                  failed = true;
+                  sumerror += spxAbs((*binvrow[i])[j] - (*binvrow2[i])[j]);
                }
             }
+            assert(sumerror < _solver.feastol());
          }
-         assert(!failed);
       }
 
       spx_free(inds);
