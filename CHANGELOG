@@ -8,6 +8,11 @@ features:
     0 - off
     1 - try to increase number of basic slack vars
     2 - try to decrease number of basic slack vars
+- persistent scaling:
+  - keep scaled LP for multiple reoptimizations
+  - modifications to LP are correctly transformed
+  - access to (inverse of) basis matrix is correctly handled
+  - enabled by default
 
 performance:
 - more efficient SoPlex class with better usability:
@@ -30,6 +35,7 @@ interface & parameters:
 - correct output of primal and dual solution values depending on set precision
 - solve() is now called optimize() to distinguish it from solves with the basis matrix; solve() is deprecated
 - LPs can be loaded into the solver w/o setting up a slack basis (new default param in loadLP() method)
+- persistent scaling can be disabled by setting bool:persistentscaling to 0
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver
