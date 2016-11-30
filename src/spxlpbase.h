@@ -2090,8 +2090,8 @@ private:
 
       SVectorBase<R>& vec = rowVector_w(idx);
 
-      // compute new row scaling factor and apply it to the sides
-      if( scale )
+      // fixme compute new row scaling factor and apply it to the sides
+      if( false && scale )
       {
          newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
 
@@ -2141,8 +2141,8 @@ private:
 
       LPRowSetBase<R>::add(lhsValue, rowVec, rhsValue);
 
-      // compute new row scaling factor and apply it to the sides
-      if( scale )
+      // fixme compute new row scaling factor and apply it to the sides
+      if( false && scale )
       {
          newRowScaleExp = lp_scaler->computeScaleExp(rowVec, LPColSetBase<R>::scaleExp);
 
@@ -2247,8 +2247,8 @@ private:
          SVectorBase<R>& vec = rowVector_w(i);
          int newRowScaleExp = 0;
 
-         // compute new row scaling factor and apply it to the sides
-         if( scale )
+         // fixme compute new row scaling factor and apply it to the sides
+         if( false && scale )
          {
             newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
 
@@ -2304,8 +2304,8 @@ private:
 
       SVectorBase<R>& vec = colVector_w(idx);
 
-      // compute new column scaling factor and apply it to the bounds
-      if( scale )
+      // fixme compute new column scaling factor and apply it to the bounds
+      if( false && scale )
       {
          newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
 
@@ -2357,8 +2357,8 @@ private:
       if( thesense != MAXIMIZE )
          LPColSetBase<R>::maxObj_w(idx) *= -1;
 
-      // compute new column scaling factor and apply it to the bounds
-      if( scale )
+      // fixme compute new column scaling factor and apply it to the bounds
+      if( false && scale )
       {
          newColScaleExp = lp_scaler->computeScaleExp(colVec, LPRowSetBase<R>::scaleExp);
 
@@ -2461,8 +2461,8 @@ private:
          SVectorBase<R>& vec = colVector_w(i);
          int newColScaleExp = 0;
 
-         // compute new column scaling factor and apply it to the bounds
-         if( scale )
+         // fixme compute new column scaling factor and apply it to the bounds
+         if( false && scale )
          {
             newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
 
