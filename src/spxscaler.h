@@ -98,9 +98,9 @@ protected:
 public:
 
    /// compute a single scaling vector , e.g. of a newly added row
-   int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
+   virtual int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
 
-   int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
+   virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
