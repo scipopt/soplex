@@ -1591,7 +1591,7 @@ void solve_LP(MySoPlex& work)
    else
       MSG_INFO1( (*work.spxout), (*work.spxout) << "\nSolving LP ..." << std::endl; )
 
-   work.optimize();
+   work.solve();
    timer.stop();
 
    MSG_INFO1( (*work.spxout), (*work.spxout) << "\nSoPlex statistics:\n" << work.statistics(); )
