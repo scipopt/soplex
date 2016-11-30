@@ -812,7 +812,7 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < newLower.dim(); ++i)
-         changeLowerStatus(i, newLower[i]);
+         changeLowerStatus(i, lower(i));
 
       unInit();
    }
@@ -830,7 +830,7 @@ void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeLowerStatus(i, newLower, oldLower);
+         changeLowerStatus(i, lower(i), oldLower);
          unInit();
       }
    }
@@ -917,7 +917,7 @@ void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < newUpper.dim(); ++i)
-         changeUpperStatus(i, newUpper[i]);
+         changeUpperStatus(i, upper(i));
 
       unInit();
    }
@@ -933,7 +933,7 @@ void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeUpperStatus(i, newUpper, oldUpper);
+         changeUpperStatus(i, upper(i), oldUpper);
          unInit();
       }
    }
@@ -1033,7 +1033,7 @@ void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < nRows(); ++i)
-         changeLhsStatus(i, newLhs[i]);
+         changeLhsStatus(i, lhs(i));
 
       unInit();
    }
@@ -1049,7 +1049,7 @@ void SPxSolver::changeLhs(int i, const Real& newLhs, bool scale)
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeLhsStatus(i, newLhs, oldLhs);
+         changeLhsStatus(i, lhs(i), oldLhs);
          unInit();
       }
    }
@@ -1136,7 +1136,7 @@ void SPxSolver::changeRhs(const Vector& newRhs, bool scale)
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < nRows(); ++i)
-         changeRhsStatus(i, newRhs[i]);
+         changeRhsStatus(i, rhs(i));
       unInit();
    }
 }
@@ -1151,7 +1151,7 @@ void SPxSolver::changeRhs(int i, const Real& newRhs, bool scale)
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeRhsStatus(i, newRhs, oldRhs);
+         changeRhsStatus(i, rhs(i), oldRhs);
          unInit();
       }
    }
@@ -1168,8 +1168,8 @@ void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs, bool sca
    {
       for (int i = nRows() - 1; i >= 0; --i)
       {
-         changeLhsStatus(i, newLhs[i]);
-         changeRhsStatus(i, newRhs[i]);
+         changeLhsStatus(i, lhs(i));
+         changeRhsStatus(i, rhs(i));
       }
       unInit();
    }
@@ -1185,8 +1185,8 @@ void SPxSolver::changeRange(int i, const Real& newLhs, const Real& newRhs, bool 
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      changeLhsStatus(i, newLhs, oldLhs);
-      changeRhsStatus(i, newRhs, oldRhs);
+      changeLhsStatus(i, lhs(i), oldLhs);
+      changeRhsStatus(i, rhs(i), oldRhs);
       unInit();
    }
 }
