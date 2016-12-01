@@ -84,6 +84,11 @@ namespace soplex
       description[SoPlex::EXPLICITVIOL] = "Should be violations of the original problem be explicitly computed in the decomposition simplex?";
       defaultValue[SoPlex::EXPLICITVIOL] = false;
 
+      /// should the decomposition solve use the SoPlex verbosity?
+      name[SoPlex::DECOMPUSEVERBOSITY] = "decompuseverbosity";
+      description[SoPlex::DECOMPUSEVERBOSITY] = "Should the decomposition simplex use the verbosity set for SoPlex? If false, then the decomposition simplex verbosity if ERROR";
+      defaultValue[SoPlex::DECOMPUSEVERBOSITY] = false;
+
       // should cycling solutions be accepted during iterative refinement?
       name[SoPlex::ACCEPTCYCLING] = "acceptcycling";
       description[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
@@ -295,6 +300,12 @@ namespace soplex
       upper[SoPlex::DECOMP_MAXADDEDROWS] = INT_MAX;
       defaultValue[SoPlex::DECOMP_MAXADDEDROWS] = 500;
 
+      // maximum number of violated rows added in each iteration of the decomposition simplex
+      name[SoPlex::DECOMP_DISPLAYFREQ] = "decompdisplayfreq";
+      description[SoPlex::DECOMP_DISPLAYFREQ] = "the frequency that the decomposition based simplex status output is displayed.";
+      lower[SoPlex::DECOMP_DISPLAYFREQ] = 1;
+      upper[SoPlex::DECOMP_DISPLAYFREQ] = INT_MAX;
+      defaultValue[SoPlex::DECOMP_DISPLAYFREQ] = 50;
    }
 
    SoPlex::Settings::RealParam::RealParam() {
@@ -5074,6 +5085,10 @@ namespace soplex
          break;
       case USECOMPDUAL:
          break;
+      case EXPLICITVIOL:
+         break;
+      case DECOMPUSEVERBOSITY:
+         break;
       case ACCEPTCYCLING:
          break;
       case RATREC:
@@ -5416,6 +5431,14 @@ namespace soplex
          default:
             return false;
          }
+         break;
+
+      // the decomposition based simplex parameter settings
+      case DECOMP_ITERLIMIT:
+         break;
+      case DECOMP_MAXADDEDROWS:
+         break;
+      case DECOMP_DISPLAYFREQ:
          break;
       default:
          return false;

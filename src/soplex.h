@@ -860,23 +860,26 @@ public:
       // simplex
       EXPLICITVIOL = 7,
 
+      /// should the decomposition solve use the SoPlex verbosity?
+      DECOMPUSEVERBOSITY = 8,
+
       /// should cycling solutions be accepted during iterative refinement?
-      ACCEPTCYCLING = 8,
+      ACCEPTCYCLING = 9,
 
       /// apply rational reconstruction after each iterative refinement?
-      RATREC = 9,
+      RATREC = 10,
 
       /// round scaling factors for iterative refinement to powers of two?
-      POWERSCALING = 10,
+      POWERSCALING = 11,
 
       /// continue iterative refinement with exact basic solution if not optimal?
-      RATFACJUMP = 11,
+      RATFACJUMP = 12,
 
       /// use bound flipping also for row representation?
-      ROWBOUNDFLIPS = 12,
+      ROWBOUNDFLIPS = 13,
 
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 13
+      BOOLPARAM_COUNT = 14
    } BoolParam;
 
    /// integer parameters
@@ -960,8 +963,11 @@ public:
       /// the maximum number of rows that are added in each iteration of the decomposition based simplex
       DECOMP_MAXADDEDROWS = 25,
 
+      /// the iteration frequency at which the decomposition solve output is displayed.
+      DECOMP_DISPLAYFREQ = 26,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 26
+      INTPARAM_COUNT = 27
    } IntParam;
 
    /// values for parameter OBJSENSE

@@ -237,6 +237,7 @@ namespace soplex
       _hasBasis = false;
       bool hasRedBasis = false;
       bool redProbError = false;
+      bool errorexplicitviol = false;
       int algIterCount = 0;
 
 
@@ -250,13 +251,16 @@ namespace soplex
 
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      // @todo check the verbosity. The output should be controlled externally. Must fix!!!
-      //spxout.setVerbosity( SPxOut::ERROR );
+      // only setting the verbosity to ERROR if the global verbosity is not used for the decomposition solve.
+      if( !boolParam(SoPlex::DECOMPUSEVERBOSITY) )
+         spxout.setVerbosity( SPxOut::ERROR );
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
       while( !stop )
       {
+         int previter = _statistics->iterations;
+
          // setting the current solving mode.
          _currentProb = DECOMP_RED;
 
@@ -299,6 +303,16 @@ namespace soplex
             break;
          }
 
+         // as a final check, if no iterations were performed with the reduced problem, then the algorithm terminates
+         if( _statistics->iterations == previter )
+         {
+            MSG_WARNING( spxout,
+               spxout << "WIMDSM02: reduced problem performed zero iterations. Terminating." << std::endl; );
+
+            stop = true;
+            break;
+         }
+
          // printing display line
          printDecompDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
 
@@ -333,21 +347,26 @@ namespace soplex
             << "=========================" << std::endl
             << std::endl );
 
-         _compSolver.writeFile("comp.lp");
+         if( !errorexplicitviol )
+         {
+            //_compSolver.writeFile("comp.lp");
 
-         _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
+            _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
+
+            MSG_INFO3(spxout, spxout << "Iteration " << algIterCount
+               << "Objective Value: " << std::setprecision(10) << _compSolver.objValue()
+               << std::endl );
+         }
+
+
          assert(_isRealLPLoaded);
-
-         MSG_INFO3(spxout, spxout << "Iteration " << algIterCount
-            << "Objective Value: " << std::setprecision(10) << _compSolver.objValue()
-            << std::endl );
 
 
          // Check whether the complementary problem is solved with a non-negative objective function, is infeasible or
          // unbounded. If true, then stop the algorithm.
-         if( GE(_compSolver.objValue(), 0.0, 1e-20)
+         if( !errorexplicitviol && (GE(_compSolver.objValue(), 0.0, 1e-20)
             || _compSolver.status() == SPxSolver::INFEASIBLE
-            || _compSolver.status() == SPxSolver::UNBOUNDED )
+            || _compSolver.status() == SPxSolver::UNBOUNDED) )
          {
             _statistics->compProbStatus = _compSolver.status();
             _statistics->finalCompObj = _compSolver.objValue();
@@ -355,10 +374,14 @@ namespace soplex
                MSG_INFO2(spxout, spxout << "Unbounded complementary problem." << std::endl );
             if( _compSolver.status() == SPxSolver::INFEASIBLE )
                MSG_INFO2(spxout, spxout << "Infeasible complementary problem." << std::endl );
+
+            if( _compSolver.status() == SPxSolver::INFEASIBLE || _compSolver.status() == SPxSolver::UNBOUNDED )
+               errorexplicitviol = true;
+
             stop = true;
          }
 
-         if( !stop )
+         if( !stop && !errorexplicitviol )
          {
             if( !boolParam(SoPlex::EXPLICITVIOL) )
             {
@@ -391,7 +414,8 @@ namespace soplex
          // if the complementary problem is infeasible or unbounded, it is possible that the algorithm can continue.
          // a check of the original problem is required to determine whether there are any violations.
          else if( _compSolver.status() == SPxSolver::INFEASIBLE
-            || _compSolver.status() == SPxSolver::UNBOUNDED )
+            || _compSolver.status() == SPxSolver::UNBOUNDED
+            || errorexplicitviol )
          {
             // getting the primal vector from the reduced problem
             DVector reducedLPPrimalVector(_solver.nCols());
@@ -410,6 +434,7 @@ namespace soplex
             if( !stop )
                _updateDecompReducedProblemViol(true);
          }
+
 
          // =============================================================================
          // Code check completed up to here
@@ -3417,10 +3442,10 @@ namespace soplex
       const SPxOut::Verbosity currVerb = spxout.getVerbosity();
       spxout.setVerbosity( origVerb );
 
-      int displayFreq = solver.getDisplayFreq();
+      int displayFreq = intParam(SoPlex::DECOMP_DISPLAYFREQ);
 
       MSG_INFO1( spxout,
-         if( forceHead || (_decompDisplayLine % (displayFreq*30) == 0) )
+         if( forceHead || (_decompDisplayLine % displayFreq == 0) )
          {
             spxout << "type |   time |   iters | red iter | alg iter |     rows |     cols |  shift   |    value\n";
          }
