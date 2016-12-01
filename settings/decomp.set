@@ -2,7 +2,7 @@
 
 # should the improved dual simplex be used to solve the LP?
 # range {true, false}, default false
-bool:improveddualsimplex = true
+bool:decompositiondualsimplex = true
 
 # should the degeneracy be computed for each basis?
 # range {true, false}, default false

@@ -2158,17 +2158,7 @@ void SPxLPBase<Real>::writeMPS(
    // Output warning when writing a maximisation problem
    if( spxSense() == SPxLPBase<Real>::MAXIMIZE )
    {
-      //MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
-     if( &spxout != NULL )
-     {
-        if( SPxOut::WARNING <= (*spxout).getVerbosity() )
-        {
-           const SPxOut::Verbosity  old_verbosity = (*spxout).getVerbosity();
-           (*spxout).setVerbosity( SPxOut::WARNING );
-           (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n";
-           (*spxout).setVerbosity( old_verbosity );
-        }
-     }
+      MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
    }
 }
 
