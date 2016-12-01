@@ -758,6 +758,20 @@ namespace soplex
 
 
 
+   /// returns (unscaled) coefficient
+   Real SoPlex::coefReal(int row, int col) const
+   {
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         return _scaler->getCoefUnscaled(*_realLP, row, col);
+      }
+      else
+         return colVectorRealInternal(col)[row];
+   }
+
+
+
    /// returns vector of row \p i, ignoring scaling
    const SVectorReal& SoPlex::rowVectorRealInternal(int i) const
    {

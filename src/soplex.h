@@ -127,6 +127,9 @@ public:
    /// returns biggest non-zero element in absolute value
    Real maxAbsNonzeroReal() const;
 
+   /// returns (unscaled) coefficient
+   Real coefReal(int row, int col) const;
+
    /// returns vector of row \p i, ignoring scaling
    const SVectorReal& rowVectorRealInternal(int i) const;
 

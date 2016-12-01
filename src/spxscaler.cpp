@@ -627,6 +627,21 @@ void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
    }
 }
 
+/// returns unscaled coefficient of LP \lp
+Real SPxScaler::getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) const
+{
+   assert(lp.isScaled());
+   assert(row < lp.nRows());
+   assert(col < lp.nCols());
+
+   const DataArray < int >& rowscaleExp = lp.LPRowSetBase<Real>::scaleExp;
+   const DataArray < int >& colscaleExp = lp.LPColSetBase<Real>::scaleExp;
+
+   return spxLdexp(lp.colVector(col)[row], - rowscaleExp[row] - colscaleExp[col]);
+}
+
+
+
 void SPxScaler::unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const
 {
    assert(lp.isScaled());

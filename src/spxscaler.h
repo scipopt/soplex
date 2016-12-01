@@ -187,6 +187,8 @@ public:
    virtual Real lhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled left hand side vector of LP \lp
    virtual void getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
+   /// returns unscaled coefficient of LP \lp
+   virtual Real getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) const;
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const;
    /// unscale dense slack vector given in \p s.
