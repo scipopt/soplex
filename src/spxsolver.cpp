@@ -589,7 +589,7 @@ void SPxSolver::factorize()
             multBaseWith(ftmp);
             ftmp -= fRhs();
             if (ftmp.length() > DEFAULT_BND_VIOL)
-               MSG_ERROR( std::cerr << "ESOLVE29 " << iteration() << ": fVec error = "
+               MSG_INFO1( (*spxout), (*spxout) << "ESOLVE29 " << iteration() << ": fVec error = "
                                  << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
          if (ctmp.length() > DEFAULT_BND_VIOL)
@@ -599,7 +599,7 @@ void SPxSolver::factorize()
             multWithBase(ctmp);
             ctmp -= coPrhs();
             if (ctmp.length() > DEFAULT_BND_VIOL)
-               MSG_ERROR( std::cerr << "ESOLVE30 " << iteration() << ": coPvec error = "
+               MSG_INFO1( (*spxout), (*spxout) << "ESOLVE30 " << iteration() << ": coPvec error = "
                                  << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
          }
          if (ptmp.length() > DEFAULT_BND_VIOL)
