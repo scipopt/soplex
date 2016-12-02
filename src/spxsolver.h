@@ -860,6 +860,7 @@ public:
 
    //-----------------------------
    /**@name Modification */
+   /// \p scale determines whether the new data needs to be scaled according to the existing LP (persistent scaling)
    //@{
    ///
    virtual void changeObj(const Vector& newObj, bool scale = false);

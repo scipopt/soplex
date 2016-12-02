@@ -736,19 +736,23 @@ public:
    /// computes the exact condition number for the current basis matrix using the power method; returns true on success
    bool getExactCondition(Real& condition);
 
-   /// computes row r of basis inverse; returns true on success
+   /// computes row \p r of basis inverse; returns true on success
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
-   /// computes column c of basis inverse; returns true on success
+   /// computes column \p c of basis inverse; returns true on success
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
-   /// computes dense solution of basis matrix B * sol = rhs; returns true on success
+   /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
 
-   /// multiply with basis matrix; B * vec (inplace)
+   /// multiply with basis matrix; B * \p vec (inplace)
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool multBasis(Real* vec, bool unscale = true);
 
-   /// multiply with transpose of basis matrix; vec * B^T (inplace)
+   /// multiply with transpose of basis matrix; \p vec * B^T (inplace)
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool multBasisTranspose(Real* vec, bool unscale = true);
 
    /// compute rational basis inverse; returns true on success

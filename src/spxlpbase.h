@@ -1253,7 +1253,7 @@ public:
    /**@name Manipulation */
    //@{
 
-   /// Changes objective vector to \p newObj.
+   /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
    virtual void changeObj(const VectorBase<R>& newObj, bool scale = false)
    {
       changeMaxObj(newObj, scale);
@@ -1261,7 +1261,7 @@ public:
          LPColSetBase<R>::maxObj_w() *= -1;
    }
 
-   /// changes \p i 'th objective vector element to \p newVal.
+   /// changes \p i 'th objective vector element to \p newVal. \p scale determines whether the new data should be scaled
    virtual void changeObj(int i, const R& newVal, bool scale = false)
    {
       changeMaxObj(i, newVal, scale);
@@ -1279,13 +1279,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes objective value of column with identifier \p id to \p newVal.
+   /// Changes objective value of column with identifier \p id to \p newVal. \p scale determines whether the new data should be scaled
    virtual void changeObj(SPxColId id, const R& newVal, bool scale = false)
    {
       changeObj(number(id), newVal, scale);
    }
 
-   /// Changes objective vector to \p newObj.
+   /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
    virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
    {
       assert(maxObj().dim() == newObj.dim());
@@ -1293,7 +1293,7 @@ public:
       assert(isConsistent());
    }
 
-   /// changes \p i 'th objective vector element to \p newVal.
+   /// changes \p i 'th objective vector element to \p newVal. \p scale determines whether the new data should be scaled
    virtual void changeMaxObj(int i, const R& newVal, bool scale = false)
    {
       if( scale )
@@ -1315,13 +1315,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes objective value of column with identifier \p id to \p newVal.
+   /// Changes objective value of column with identifier \p id to \p newVal. \p scale determines whether the new data should be scaled
    virtual void changeMaxObj(SPxColId id, const R& newVal, bool scale = false)
    {
       changeMaxObj(number(id), newVal, scale);
    }
 
-   /// Changes vector of lower bounds to \p newLower.
+   /// Changes vector of lower bounds to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
    {
       assert(lower().dim() == newLower.dim());
@@ -1329,7 +1329,7 @@ public:
       assert(isConsistent());
    }
 
-   /// changes \p i 'th lower bound to \p newLower.
+   /// changes \p i 'th lower bound to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(int i, const R& newLower, bool scale = false)
    {
       if( scale && newLower > -infinity)
@@ -1351,13 +1351,13 @@ public:
       assert(isConsistent());
    }
 
-   /// changes lower bound of column with identifier \p id to \p newLower.
+   /// changes lower bound of column with identifier \p id to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(SPxColId id, const R& newLower, bool scale = false)
    {
       changeLower(number(id), newLower, scale);
    }
 
-   /// Changes vector of upper bounds to \p newUpper.
+   /// Changes vector of upper bounds to \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
    {
       assert(upper().dim() == newUpper.dim());
@@ -1365,7 +1365,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th upper bound to \p newUpper.
+   /// Changes \p i 'th upper bound to \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeUpper(int i, const R& newUpper, bool scale = false)
    {
       if( scale && newUpper < infinity )
@@ -1387,13 +1387,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes upper bound of column with identifier \p id to \p newLower.
+   /// Changes upper bound of column with identifier \p id to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeUpper(SPxColId id, const R& newUpper, bool scale = false)
    {
       changeUpper(number(id), newUpper, scale);
    }
 
-   /// Changes variable bounds to \p newLower and \p newUpper.
+   /// Changes variable bounds to \p newLower and \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper, bool scale = false)
    {
       changeLower(newLower, scale);
@@ -1401,7 +1401,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes bounds of column \p i to \p newLower and \p newUpper.
+   /// Changes bounds of column \p i to \p newLower and \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeBounds(int i, const R& newLower, const R& newUpper, bool scale = false)
    {
       changeLower(i, newLower, scale);
@@ -1418,13 +1418,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes bounds of column with identifier \p id.
+   /// Changes bounds of column with identifier \p id. \p scale determines whether the new data should be scaled
    virtual void changeBounds(SPxColId id, const R& newLower, const R& newUpper, bool scale = false)
    {
       changeBounds(number(id), newLower, newUpper, scale);
    }
 
-   /// Changes left hand side vector for constraints to \p newLhs.
+   /// Changes left hand side vector for constraints to \p newLhs. \p scale determines whether the new data should be scaled
    virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
    {
       assert(lhs().dim() == newLhs.dim());
@@ -1432,7 +1432,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th left hand side value to \p newLhs.
+   /// Changes \p i 'th left hand side value to \p newLhs. \p scale determines whether the new data should be scaled
    virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
       if( scale && newLhs > -infinity )
@@ -1450,13 +1450,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes left hand side value for row with identifier \p id.
+   /// Changes left hand side value for row with identifier \p id. \p scale determines whether the new data should be scaled
    virtual void changeLhs(SPxRowId id, const R& newLhs, bool scale = false)
    {
       changeLhs(number(id), newLhs, scale);
    }
 
-   /// Changes right hand side vector for constraints to \p newRhs.
+   /// Changes right hand side vector for constraints to \p newRhs. \p scale determines whether the new data should be scaled
    virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
    {
       assert(rhs().dim() == newRhs.dim());
@@ -1464,7 +1464,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th right hand side value to \p newRhs.
+   /// Changes \p i 'th right hand side value to \p newRhs. \p scale determines whether the new data should be scaled
    virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
       if( scale && newRhs < infinity )
@@ -1474,13 +1474,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes right hand side value for row with identifier \p id.
+   /// Changes right hand side value for row with identifier \p id. \p scale determines whether the new data should be scaled
    virtual void changeRhs(SPxRowId id, const R& newRhs, bool scale = false)
    {
       changeRhs(number(id), newRhs, scale);
    }
 
-   /// Changes left and right hand side vectors.
+   /// Changes left and right hand side vectors. \p scale determines whether the new data should be scaled
    virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs, bool scale = false)
    {
       changeLhs(newLhs, scale);
@@ -1488,7 +1488,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes left and right hand side of row \p i.
+   /// Changes left and right hand side of row \p i. \p scale determines whether the new data should be scaled
    virtual void changeRange(int i, const R& newLhs, const R& newRhs, bool scale = false)
    {
       changeLhs(i, newLhs, scale);
@@ -1505,13 +1505,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes left and right hand side of row with identifier \p id.
+   /// Changes left and right hand side of row with identifier \p id. \p scale determines whether the new data should be scaled
    virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs, bool scale = false)
    {
       changeRange(number(id), newLhs, newRhs, scale);
    }
 
-   /// Changes row objective function vector to \p newRowObj.
+   /// Changes row objective function vector to \p newRowObj. \p scale determines whether the new data should be scaled
    virtual void changeRowObj(const VectorBase<R>& newRowObj, bool scale = false)
    {
       assert(maxRowObj().dim() == newRowObj.dim());
@@ -1521,7 +1521,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th row objective function value to \p newRowObj.
+   /// Changes \p i 'th row objective function value to \p newRowObj. \p scale determines whether the new data should be scaled
    virtual void changeRowObj(int i, const R& newRowObj, bool scale = false)
    {
       LPRowSetBase<R>::obj_w(i) = newRowObj;
@@ -1530,7 +1530,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes row objective function value for row with identifier \p id.
+   /// Changes row objective function value for row with identifier \p id. \p scale determines whether the new data should be scaled
    virtual void changeRowObj(SPxRowId id, const R& newRowObj, bool scale = false)
    {
       changeRowObj(number(id), newRowObj, scale);
@@ -1542,7 +1542,7 @@ public:
       LPRowSetBase<R>::obj_w().clear();
    }
 
-   /// Replaces \p i 'th row of LP with \p newRow.
+   /// Replaces \p i 'th row of LP with \p newRow. \p scale determines whether the new data should be scaled
    virtual void changeRow(int n, const LPRowBase<R>& newRow, bool scale = false)
    {
       if( n < 0 )
@@ -1576,13 +1576,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Replaces row with identifier \p id with \p newRow.
+   /// Replaces row with identifier \p id with \p newRow. \p scale determines whether the new data should be scaled
    virtual void changeRow(SPxRowId id, const LPRowBase<R>& newRow, bool scale = false)
    {
       changeRow(number(id), newRow, scale);
    }
 
-   /// Replaces \p i 'th column of LP with \p newCol.
+   /// Replaces \p i 'th column of LP with \p newCol. \p scale determines whether the new data should be scaled
    virtual void changeCol(int n, const LPColBase<R>& newCol, bool scale = false)
    {
       if( n < 0 )
@@ -1616,13 +1616,13 @@ public:
       assert(isConsistent());
    }
 
-   /// Replaces column with identifier \p id with \p newCol.
+   /// Replaces column with identifier \p id with \p newCol. \p scale determines whether the new data should be scaled
    virtual void changeCol(SPxColId id, const LPColBase<R>& newCol, bool scale = false)
    {
       changeCol(number(id), newCol, scale);
    }
 
-   /// Changes LP element (\p i, \p j) to \p val.
+   /// Changes LP element (\p i, \p j) to \p val. \p scale determines whether the new data should be scaled
    virtual void changeElement(int i, int j, const R& val, bool scale = false)
    {
       if( i < 0 || j < 0 )
@@ -1696,7 +1696,7 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes LP element identified by (\p rid, \p cid) to \p val.
+   /// Changes LP element identified by (\p rid, \p cid) to \p val. \p scale determines whether the new data should be scaled
    virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val, bool scale = false)
    {
       changeElement(number(rid), number(cid), val, scale);
@@ -1721,6 +1721,7 @@ public:
    /// Computes activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
    virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity, const bool unscaled = true) const;
 
    /// Updates activity of the rows for a given primal vector; activity does not need to be zero
