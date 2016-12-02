@@ -235,7 +235,7 @@ namespace soplex
       _hasBasis = false;
       bool hasRedBasis = false;
       bool redProbError = false;
-      bool errorexplicitviol = false;
+      bool explicitviol = boolParam(SoPlex::EXPLICITVIOL);
       int algIterCount = 0;
 
 
@@ -343,7 +343,7 @@ namespace soplex
             << "=========================" << std::endl
             << std::endl );
 
-         if( !errorexplicitviol )
+         if( !explicitviol )
          {
             //_compSolver.writeFile("comp.lp");
 
@@ -360,7 +360,7 @@ namespace soplex
 
          // Check whether the complementary problem is solved with a non-negative objective function, is infeasible or
          // unbounded. If true, then stop the algorithm.
-         if( !errorexplicitviol && (GE(_compSolver.objValue(), 0.0, 1e-20)
+         if( !explicitviol && (GE(_compSolver.objValue(), 0.0, 1e-20)
             || _compSolver.status() == SPxSolver::INFEASIBLE
             || _compSolver.status() == SPxSolver::UNBOUNDED) )
          {
@@ -372,46 +372,30 @@ namespace soplex
                MSG_INFO2(spxout, spxout << "Infeasible complementary problem." << std::endl );
 
             if( _compSolver.status() == SPxSolver::INFEASIBLE || _compSolver.status() == SPxSolver::UNBOUNDED )
-               errorexplicitviol = true;
+               explicitviol = true;
 
             stop = true;
          }
 
-         if( !stop && !errorexplicitviol )
+         if( !stop && !explicitviol )
          {
-            if( !boolParam(SoPlex::EXPLICITVIOL) )
-            {
-               // get the primal solutions from the complementary problem
-               DVector compLPPrimalVector(_compSolver.nCols());
-               _compSolver.getPrimal(compLPPrimalVector);
+            // get the primal solutions from the complementary problem
+            DVector compLPPrimalVector(_compSolver.nCols());
+            _compSolver.getPrimal(compLPPrimalVector);
 
-               // get the dual solutions from the complementary problem
-               DVector compLPDualVector(_compSolver.nRows());
-               _compSolver.getDual(compLPDualVector);
+            // get the dual solutions from the complementary problem
+            DVector compLPDualVector(_compSolver.nRows());
+            _compSolver.getDual(compLPDualVector);
 
-               // updating the reduced problem
-               _updateDecompReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
-                  compLPPrimalVector, compLPDualVector);
-            }
-            else
-            {
-               // getting the primal solutions from the reduced problem
-               DVector reducedLPPrimalVector(_solver.nCols());
-               _solver.getPrimal(reducedLPPrimalVector);
-
-               // checking the optimality of the reduced problem solution with the original problem
-               _checkOriginalProblemOptimality(reducedLPPrimalVector, false);
-
-               // updating the reduced problem based upon the violated rows and constraints found during the optimality
-               // check
-               _updateDecompReducedProblemViol(false);
-            }
+            // updating the reduced problem
+            _updateDecompReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
+               compLPPrimalVector, compLPDualVector);
          }
          // if the complementary problem is infeasible or unbounded, it is possible that the algorithm can continue.
          // a check of the original problem is required to determine whether there are any violations.
          else if( _compSolver.status() == SPxSolver::INFEASIBLE
             || _compSolver.status() == SPxSolver::UNBOUNDED
-            || errorexplicitviol )
+            || explicitviol )
          {
             // getting the primal vector from the reduced problem
             DVector reducedLPPrimalVector(_solver.nCols());
@@ -3441,7 +3425,7 @@ namespace soplex
       int displayFreq = intParam(SoPlex::DECOMP_DISPLAYFREQ);
 
       MSG_INFO1( spxout,
-         if( forceHead || (_decompDisplayLine % displayFreq == 0) )
+         if( forceHead || (_decompDisplayLine % (displayFreq*30) == 0) )
          {
             spxout << "type |   time |   iters | red iter | alg iter |     rows |     cols |  shift   |    value\n";
          }
@@ -3453,7 +3437,7 @@ namespace soplex
             spxout << std::scientific << std::setprecision(2);
             spxout << std::setw(8) << _statistics->iterations << " | ";
             spxout << std::scientific << std::setprecision(2);
-            spxout << std::setw(8) << solver.iterations() << " | ";
+            spxout << std::setw(8) << _statistics->iterationsRedProb << " | ";
             spxout << std::scientific << std::setprecision(2);
             spxout << std::setw(8) << _statistics->callsReducedProb << " | ";
             spxout << std::scientific << std::setprecision(2);
