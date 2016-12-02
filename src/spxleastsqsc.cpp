@@ -212,10 +212,6 @@ SPxLeastSqSC& SPxLeastSqSC::operator=(const SPxLeastSqSC& rhs)
    return *this;
 }
 
-Real SPxLeastSqSC::computeScale(Real /*mini*/, Real maxi) const
-{
-   return maxi;
-}
 
 void SPxLeastSqSC::setRealParam(Real param, const char* name)
 {
@@ -229,9 +225,9 @@ void SPxLeastSqSC::setIntParam(int param, const char* name)
    maxrounds = param;
 }
 
-void SPxLeastSqSC::scale(SPxLP& lp)
+void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 {
-   MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << std::endl; )
+   MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
 
    setup(lp);
 
@@ -287,7 +283,7 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    SSVector* rsccurr = &rowscale1;
    SSVector* rscprev = &rowscale2;
 
-   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
+   MSG_INFO2( (*spxout), (*spxout) << "before scaling:"
       << " min= " << lp.minAbsNzo()
       << " max= " << lp.maxAbsNzo()
       << " col-ratio= " << maxColRatio(lp)
@@ -380,12 +376,14 @@ void SPxLeastSqSC::scale(SPxLP& lp)
 
    SSVector rowscale = *rsccurr;
    SSVector colscale = *csccurr;
+   DataArray < int > colscaleExp = *m_activeColscaleExp;
+   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
 
-   for(k = 0; k < nrows; ++k )
-      m_rowscale[k] = pow(2.0, - round(rowscale[k]));
+   for( k = 0; k < nrows; ++k )
+      rowscaleExp[k] = int( rowscale[k] + ((rowscale[k] >= 0)? (+0.5) : (-0.5)) );
 
-   for(k = 0; k < ncols; ++k )
-      m_colscale[k] = pow(2.0, - round(colscale[k]));
+   for( k = 0; k < ncols; ++k )
+      colscaleExp[k] = int( colscale[k] + ((colscale[k] >= 0)? (+0.5) : (-0.5)) );
 
    // scale
    applyScaling(lp);
@@ -393,13 +391,13 @@ void SPxLeastSqSC::scale(SPxLP& lp)
    MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
       << " max= " << maxAbsRowscale()
       << std::endl
-      << "\tCol scaling min= " << minAbsColscale()
+      << "Col scaling min= " << minAbsColscale()
       << " max= " << maxAbsColscale()
       << std::endl; )
 
-   MSG_INFO2( (*spxout), (*spxout) << "LP scaling statistics:"
-      << " min= " << lp.minAbsNzo()
-      << " max= " << lp.maxAbsNzo()
+   MSG_INFO2( (*spxout), (*spxout) << "after scaling: "
+      << " min= " << lp.minAbsNzo(false)
+      << " max= " << lp.maxAbsNzo(false)
       << " col-ratio= " << maxColRatio(lp)
       << " row-ratio= " << maxRowRatio(lp)
       << std::endl; )

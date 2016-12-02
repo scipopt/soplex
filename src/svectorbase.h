@@ -622,6 +622,56 @@ public:
       return *this;
    }
 
+   /// scale and assign
+   SVectorBase<Real>& scaleAssign(int scaleExp, const SVectorBase<Real>& sv)
+   {
+      if( this != &sv )
+      {
+         assert(max() >= sv.size());
+
+         for( int i = 0; i < sv.size(); ++i )
+         {
+            m_elem[i].val = spxLdexp(sv.value(i), scaleExp);
+            m_elem[i].idx = sv.index(i);
+         }
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+   /// scale and assign
+   SVectorBase<Real>& scaleAssign(const int* scaleExp, const SVectorBase<Real>& sv, bool negateExp = false)
+   {
+      if( this != &sv )
+      {
+         assert(max() >= sv.size());
+
+         if( negateExp )
+         {
+            for( int i = 0; i < sv.size(); ++i )
+            {
+               m_elem[i].val = spxLdexp(sv.value(i), -scaleExp[sv.index(i)]);
+               m_elem[i].idx = sv.index(i);
+            }
+         }
+         else
+         {
+            for( int i = 0; i < sv.size(); ++i )
+            {
+               m_elem[i].val = spxLdexp(sv.value(i), scaleExp[sv.index(i)]);
+               m_elem[i].idx = sv.index(i);
+            }
+         }
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+
    /// Assignment operator.
    template < class S >
    SVectorBase<R>& assignArray(const S* rowValues, const int* rowIndices, int rowSize)

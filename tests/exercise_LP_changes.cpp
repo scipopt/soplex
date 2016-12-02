@@ -108,7 +108,7 @@ public:
 
       setPricer( &_pricer );
       setTester( &_ratiotester );
-      setSolver( &_solver );
+      setBasisSolver( &_solver );
       _solver.setUtype( update );
       // no starter, no simplifier, no scaler
 

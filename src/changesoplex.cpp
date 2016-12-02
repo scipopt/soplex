@@ -657,11 +657,11 @@ void SPxSolver::doRemoveCols(int perm[])
    }
 }
 
-void SPxSolver::changeObj(const Vector& newObj)
+void SPxSolver::changeObj(const Vector& newObj, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeObj(newObj);
+   SPxLP::changeObj(newObj, scale);
 
    /**@todo Factorization remains valid, we do not need a reDim()
     *       pricing vectors should be recomputed.
@@ -669,11 +669,11 @@ void SPxSolver::changeObj(const Vector& newObj)
    unInit();
 }
 
-void SPxSolver::changeObj(int i, const Real& newVal)
+void SPxSolver::changeObj(int i, const Real& newVal, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeObj(i, newVal);
+   SPxLP::changeObj(i, newVal, scale);
 
 
    /**@todo Factorization remains valid, we do not need a reDim()
@@ -682,11 +682,11 @@ void SPxSolver::changeObj(int i, const Real& newVal)
    unInit();
 }
 
-void SPxSolver::changeMaxObj(const Vector& newObj)
+void SPxSolver::changeMaxObj(const Vector& newObj, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeMaxObj(newObj);
+   SPxLP::changeMaxObj(newObj, scale);
 
    /**@todo Factorization remains valid, we do not need a reDim()
     *       pricing vectors should be recomputed.
@@ -694,11 +694,11 @@ void SPxSolver::changeMaxObj(const Vector& newObj)
    unInit();
 }
 
-void SPxSolver::changeMaxObj(int i, const Real& newVal)
+void SPxSolver::changeMaxObj(int i, const Real& newVal, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeMaxObj(i, newVal);
+   SPxLP::changeMaxObj(i, newVal, scale);
 
    /**@todo Factorization remains valid, we do not need a reDim()
     *       pricing vectors should be recomputed.
@@ -706,11 +706,11 @@ void SPxSolver::changeMaxObj(int i, const Real& newVal)
    unInit();
 }
 
-void SPxSolver::changeRowObj(const Vector& newObj)
+void SPxSolver::changeRowObj(const Vector& newObj, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeRowObj(newObj);
+   SPxLP::changeRowObj(newObj, scale);
 
    /**@todo Factorization remains valid, we do not need a reDim()
     *       pricing vectors should be recomputed.
@@ -718,11 +718,11 @@ void SPxSolver::changeRowObj(const Vector& newObj)
    unInit();
 }
 
-void SPxSolver::changeRowObj(int i, const Real& newVal)
+void SPxSolver::changeRowObj(int i, const Real& newVal, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeRowObj(i, newVal);
+   SPxLP::changeRowObj(i, newVal, scale);
 
    /**@todo Factorization remains valid, we do not need a reDim()
     *       pricing vectors should be recomputed.
@@ -730,7 +730,7 @@ void SPxSolver::changeRowObj(int i, const Real& newVal)
    unInit();
 }
 
-void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
+void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
 {
    SPxBasis::Desc::Status& stat      = desc().colStatus(i);
    Real                    currUpper = upper(i);
@@ -802,23 +802,23 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower )
       updateNonbasicValue(objChange);
 }
 
-void SPxSolver::changeLower(const Vector& newLower)
+void SPxSolver::changeLower(const Vector& newLower, bool scale)
 {
    // we better recompute the nonbasic value when changing all lower bounds
    forceRecompNonbasicValue();
 
-   SPxLP::changeLower(newLower);
+   SPxLP::changeLower(newLower, scale);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < newLower.dim(); ++i)
-         changeLowerStatus(i, newLower[i]);
+         changeLowerStatus(i, lower(i));
 
       unInit();
    }
 }
 
-void SPxSolver::changeLower(int i, const Real& newLower)
+void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 {
    Real oldLower = lower(i);
 
@@ -826,11 +826,11 @@ void SPxSolver::changeLower(int i, const Real& newLower)
    {
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.
-      SPxLP::changeLower(i, newLower);
+      SPxLP::changeLower(i, newLower, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeLowerStatus(i, newLower, oldLower);
+         changeLowerStatus(i, lower(i), oldLower);
          unInit();
       }
    }
@@ -907,50 +907,50 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
       updateNonbasicValue(objChange);
 }
 
-void SPxSolver::changeUpper(const Vector& newUpper)
+void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
 {
    // we better recompute the nonbasic value when changing all upper bounds
    forceRecompNonbasicValue();
 
-   SPxLP::changeUpper(newUpper);
+   SPxLP::changeUpper(newUpper, scale);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < newUpper.dim(); ++i)
-         changeUpperStatus(i, newUpper[i]);
+         changeUpperStatus(i, upper(i));
 
       unInit();
    }
 }
 
-void SPxSolver::changeUpper(int i, const Real& newUpper)
+void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 {
    Real oldUpper = upper(i);
 
    if (newUpper != oldUpper)
    {
-      SPxLP::changeUpper(i, newUpper);
+      SPxLP::changeUpper(i, newUpper, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeUpperStatus(i, newUpper, oldUpper);
+         changeUpperStatus(i, upper(i), oldUpper);
          unInit();
       }
    }
 }
 
-void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper)
+void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper, bool scale)
 {
 
-   changeLower(newLower);
-   changeUpper(newUpper);
+   changeLower(newLower, scale);
+   changeUpper(newUpper, scale);
 }
 
-void SPxSolver::changeBounds(int i, const Real& newLower, const Real& newUpper)
+void SPxSolver::changeBounds(int i, const Real& newLower, const Real& newUpper, bool scale)
 {
 
-   changeLower(i, newLower);
-   changeUpper(i, newUpper);
+   changeLower(i, newLower, scale);
+   changeUpper(i, newUpper, scale);
 }
 
 void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
@@ -1023,33 +1023,33 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
       updateNonbasicValue(objChange);
 }
 
-void SPxSolver::changeLhs(const Vector& newLhs)
+void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
 {
    // we better recompute the nonbasic value when changing all lhs
    forceRecompNonbasicValue();
 
-   SPxLP::changeLhs(newLhs);
+   SPxLP::changeLhs(newLhs, scale);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < nRows(); ++i)
-         changeLhsStatus(i, newLhs[i]);
+         changeLhsStatus(i, lhs(i));
 
       unInit();
    }
 }
 
-void SPxSolver::changeLhs(int i, const Real& newLhs)
+void SPxSolver::changeLhs(int i, const Real& newLhs, bool scale)
 {
    Real oldLhs = lhs(i);
 
    if (newLhs != oldLhs)
    {
-      SPxLP::changeLhs(i, newLhs);
+      SPxLP::changeLhs(i, newLhs, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeLhsStatus(i, newLhs, oldLhs);
+         changeLhsStatus(i, lhs(i), oldLhs);
          unInit();
       }
    }
@@ -1126,102 +1126,102 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
 }
 
 
-void SPxSolver::changeRhs(const Vector& newRhs)
+void SPxSolver::changeRhs(const Vector& newRhs, bool scale)
 {
    // we better recompute the nonbasic value when changing all rhs
    forceRecompNonbasicValue();
 
-   SPxLP::changeRhs(newRhs);
+   SPxLP::changeRhs(newRhs, scale);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = 0; i < nRows(); ++i)
-         changeRhsStatus(i, newRhs[i]);
+         changeRhsStatus(i, rhs(i));
       unInit();
    }
 }
 
-void SPxSolver::changeRhs(int i, const Real& newRhs)
+void SPxSolver::changeRhs(int i, const Real& newRhs, bool scale)
 {
    Real oldRhs = rhs(i);
 
    if (newRhs != oldRhs)
    {
-      SPxLP::changeRhs(i, newRhs);
+      SPxLP::changeRhs(i, newRhs, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
-         changeRhsStatus(i, newRhs, oldRhs);
+         changeRhsStatus(i, rhs(i), oldRhs);
          unInit();
       }
    }
 }
 
-void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs)
+void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs, bool scale)
 {
    // we better recompute the nonbasic value when changing all ranges
    forceRecompNonbasicValue();
 
-   SPxLP::changeLhs(newLhs);
-   SPxLP::changeRhs(newRhs);
+   SPxLP::changeLhs(newLhs, scale);
+   SPxLP::changeRhs(newRhs, scale);
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       for (int i = nRows() - 1; i >= 0; --i)
       {
-         changeLhsStatus(i, newLhs[i]);
-         changeRhsStatus(i, newRhs[i]);
+         changeLhsStatus(i, lhs(i));
+         changeRhsStatus(i, rhs(i));
       }
       unInit();
    }
 }
 
-void SPxSolver::changeRange(int i, const Real& newLhs, const Real& newRhs)
+void SPxSolver::changeRange(int i, const Real& newLhs, const Real& newRhs, bool scale)
 {
    Real oldLhs = lhs(i);
    Real oldRhs = rhs(i);
 
-   SPxLP::changeLhs(i, newLhs);
-   SPxLP::changeRhs(i, newRhs);
+   SPxLP::changeLhs(i, newLhs, scale);
+   SPxLP::changeRhs(i, newRhs, scale);
 
    if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      changeLhsStatus(i, newLhs, oldLhs);
-      changeRhsStatus(i, newRhs, oldRhs);
+      changeLhsStatus(i, lhs(i), oldLhs);
+      changeRhsStatus(i, rhs(i), oldRhs);
       unInit();
    }
 }
 
-void SPxSolver::changeRow(int i, const LPRow& newRow)
+void SPxSolver::changeRow(int i, const LPRow& newRow, bool scale)
 {
    forceRecompNonbasicValue();
 
-   SPxLP::changeRow(i, newRow);
+   SPxLP::changeRow(i, newRow, scale);
    if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
       SPxBasis::changedRow( i );
    unInit();
 }
 
-void SPxSolver::changeCol(int i, const LPCol& newCol)
+void SPxSolver::changeCol(int i, const LPCol& newCol, bool scale)
 {
    if( i < 0 )
       return;
 
    forceRecompNonbasicValue();
 
-   SPxLP::changeCol(i, newCol);
+   SPxLP::changeCol(i, newCol, scale);
    if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
       SPxBasis::changedCol( i );
    unInit();
 }
 
-void SPxSolver::changeElement(int i, int j, const Real& val)
+void SPxSolver::changeElement(int i, int j, const Real& val, bool scale)
 {
    if( i < 0 || j < 0 )
       return;
 
    forceRecompNonbasicValue();
 
-   SPxLP::changeElement(i, j, val);
+   SPxLP::changeElement(i, j, val, scale);
    if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
       SPxBasis::changedElement( i, j );
    unInit();

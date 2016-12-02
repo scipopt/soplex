@@ -25,7 +25,7 @@
 namespace soplex
 {
    /// solves rational LP
-   void SoPlex::_solveRational()
+   void SoPlex::_optimizeRational()
    {
       bool hasUnboundedRay = false;
       bool infeasibilityNotCertified = false;
@@ -262,12 +262,12 @@ namespace soplex
                   _solRational._primalRay = solUnbounded._primalRay;
                   _solRational._hasPrimalRay = true;
                }
-               else if( solUnbounded._hasDual )
+               else if( solUnbounded._isDualFeasible )
                {
                   MSG_INFO1( spxout, spxout << "Dual feasible.  Storing dual multipliers.\n" );
                   _solRational._dual = solUnbounded._dual;
                   _solRational._redCost = solUnbounded._redCost;
-                  _solRational._hasDual = true;
+                  _solRational._isDualFeasible = true;
                }
                else
                {
@@ -459,8 +459,8 @@ namespace soplex
       sol._slacks.reDim(numRowsRational(), false);
       sol._dual.reDim(numRowsRational(), false);
       sol._redCost.reDim(numColsRational(), false);
-      sol._hasPrimal = true;
-      sol._hasDual = true;
+      sol._isPrimalFeasible= true;
+      sol._isDualFeasible = true;
 
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
@@ -1385,8 +1385,8 @@ namespace soplex
       }
 
       // compute objective function values
-      assert(sol._hasPrimal == sol._hasDual);
-      if( sol._hasPrimal )
+      assert(sol._isPrimalFeasible== sol._isDualFeasible);
+      if( sol._isPrimalFeasible)
       {
          sol._primalObjVal = sol._primal * _rationalLP->maxObj();
          if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
@@ -1551,12 +1551,12 @@ namespace soplex
                {
 
                   success = true;
-                  sol._hasPrimal = false;
+                  sol._isPrimalFeasible= false;
                }
             }
             else
             {
-               sol._hasDual = false;
+               sol._isDualFeasible = false;
                success = true; //successfully found approximate feasible solution
             }
          }
@@ -1768,7 +1768,7 @@ namespace soplex
       _realLP->removeRowRange(_beforeLiftRows, numRowsReal() - 1);
 
       // adjust solution
-      if( sol.hasPrimal() )
+      if( sol.isPrimalFeasible() )
       {
          sol._primal.reDim(_beforeLiftCols);
          sol._slacks.reDim(_beforeLiftRows);
@@ -1784,16 +1784,16 @@ namespace soplex
       ///      optimal solutions the reduced costs of the lifting columns are zero
       const Rational maxValue = realParam(SoPlex::LIFTMAXVAL);
 
-      for( int i = _beforeLiftCols; i < numColsRational() && sol._hasDual; i++ )
+      for( int i = _beforeLiftCols; i < numColsRational() && sol._isDualFeasible; i++ )
       {
          if( spxAbs(maxValue * sol._redCost[i]) > _rationalOpttol )
          {
             MSG_INFO1( spxout, spxout << "Warning: lost dual solution during project phase.\n" );
-            sol._hasDual = false;
+            sol._isDualFeasible = false;
          }
       }
 
-      if( sol.hasDual() )
+      if( sol.isDualFeasible() )
       {
          sol._redCost.reDim(_beforeLiftCols);
          sol._dual.reDim(_beforeLiftRows);
@@ -1887,7 +1887,7 @@ namespace soplex
                if( _basisStatusRows[i] == SPxSolver::FIXED && _solver.lhs(i) != _solver.rhs(i) )
                {
                   assert(_solver.rhs(i) == spxNextafter(_solver.lhs(i), infinity));
-                  if( _hasSolRational && _solRational.hasDual()
+                  if( _hasSolRational && _solRational.isDualFeasible()
                      && ((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE && _solRational._dual[i] > 0)
                         || (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE && _solRational._dual[i] < 0)) )
                   {
@@ -2009,7 +2009,7 @@ namespace soplex
       int numOrigCols = numColsRational() - _slackCols.num();
 
       // adjust solution
-      if( sol.hasPrimal() )
+      if( sol.isPrimalFeasible() )
       {
          for( int i = 0; i < _slackCols.num(); i++ )
          {
@@ -2076,7 +2076,7 @@ namespace soplex
       }
 
       // not earlier because of debug message
-      if( sol.hasDual() )
+      if( sol.isDualFeasible() )
       {
          sol._redCost.reDim(numOrigCols);
       }
@@ -2247,9 +2247,9 @@ namespace soplex
       {
          assert(tau >= Rational::POSONE);
 
-         sol._hasPrimal = false;
+         sol._isPrimalFeasible= false;
          sol._hasPrimalRay = true;
-         sol._hasDual = false;
+         sol._isDualFeasible = false;
          sol._hasDualFarkas = false;
 
          if( tau != 1 )
@@ -2266,10 +2266,10 @@ namespace soplex
       {
          const Rational& alpha = sol._dual[numOrigRows];
 
-         assert(sol._hasDual);
+         assert(sol._isDualFeasible);
          assert(alpha <= _rationalFeastol - Rational::POSONE);
 
-         sol._hasPrimal = false;
+         sol._isPrimalFeasible= false;
          sol._hasPrimalRay = false;
          sol._hasDualFarkas = false;
 
@@ -2666,12 +2666,12 @@ namespace soplex
       // adjust solution and basis
       if( infeasible )
       {
-         assert(sol._hasDual);
+         assert(sol._isDualFeasible);
          assert(sol._primal[numOrigCols] < 1);
 
-         sol._hasPrimal = false;
+         sol._isPrimalFeasible= false;
          sol._hasPrimalRay = false;
-         sol._hasDual = false;
+         sol._isDualFeasible = false;
          sol._hasDualFarkas = true;
 
          sol._dualFarkas = sol._dual;
@@ -2679,12 +2679,12 @@ namespace soplex
          _hasBasis = false;
          _basisStatusCols.reSize(numOrigCols);
       }
-      else if( sol._hasPrimal )
+      else if( sol._isPrimalFeasible)
       {
          assert(sol._primal[numOrigCols] >= 1);
 
          sol._hasPrimalRay = false;
-         sol._hasDual = false;
+         sol._isDualFeasible = false;
          sol._hasDualFarkas = false;
 
          if( sol._primal[numOrigCols] != 1 )
@@ -2758,7 +2758,7 @@ namespace soplex
                shiftValue = _feasUpper[c];
                shiftValue -= upperRational(c);
             }
-            if( sol._hasPrimal )
+            if( sol._isPrimalFeasible)
             {
                sol._primal[c] += shiftValue;
                sol._slacks.multAdd(shiftValue, _rationalLP->colVector(c));
@@ -2808,7 +2808,7 @@ namespace soplex
       _statistics->transformTime->stop();
 
 #ifndef NDEBUG
-      if( sol._hasPrimal )
+      if( sol._isPrimalFeasible)
       {
          DVectorRational activity(numRowsRational());
          _rationalLP->computePrimalActivity(sol._primal, activity);
@@ -3102,7 +3102,7 @@ namespace soplex
          rationalLP = new (rationalLP) SPxLPRational(_solver);
       }
 
-      // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no 
+      // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no
       if( _simplifier != 0 || _scaler != 0 )
         _rationalLUSolver.clear();
 
@@ -3123,7 +3123,7 @@ namespace soplex
 
          // apply scaling after the simplification
          if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
-            _scaler->scale(_solver);
+            _scaler->scale(_solver, false);
 
          // run the simplex method if problem has not been solved by the simplifier
          if( simplificationStatus == SPxSimplifier::OKAY )
@@ -3179,10 +3179,10 @@ namespace soplex
                      // unscale vectors
                      if( _scaler != 0 )
                      {
-                        _scaler->unscalePrimal(tmpPrimal);
-                        _scaler->unscaleSlacks(tmpSlacks);
-                        _scaler->unscaleDual(tmpDual);
-                        _scaler->unscaleRedCost(tmpRedCost);
+                        _scaler->unscalePrimal(_solver, tmpPrimal);
+                        _scaler->unscaleSlacks(_solver, tmpSlacks);
+                        _scaler->unscaleDual(_solver, tmpDual);
+                        _scaler->unscaleRedCost(_solver, tmpRedCost);
                      }
 
                      // get basis of transformed problem
@@ -3212,8 +3212,8 @@ namespace soplex
                   // unscale vectors
                   if( _scaler != 0 )
                   {
-                     _scaler->unscalePrimal(primal);
-                     _scaler->unscaleDual(dual);
+                     _scaler->unscalePrimal(_solver, primal);
+                     _scaler->unscaleDual(_solver, dual);
                   }
 
                   // get basis of transformed problem
@@ -3233,8 +3233,8 @@ namespace soplex
                   // unscale vectors
                   if( _scaler != 0 )
                   {
-                     _scaler->unscalePrimal(primal);
-                     _scaler->unscaleDual(dual);
+                     _scaler->unscalePrimal(_solver, primal);
+                     _scaler->unscaleDual(_solver, dual);
                   }
 
                   // get basis of transformed problem
@@ -3262,7 +3262,7 @@ namespace soplex
 
                // unscale vectors
                if( _scaler != 0 )
-                  _scaler->unscaleDual(dual);
+                  _scaler->unscaleDual(_solver, dual);
 
                // if the original problem is not in the solver because of scaling, we also need to store the basis
                basisStatusRows.reSize(_solver.nRows());
@@ -3939,7 +3939,7 @@ namespace soplex
          }
          sol._slacks.reDim(numRowsRational());
          _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
-         sol._hasPrimal = true;
+         sol._isPrimalFeasible= true;
 
          sol._dual = basicDual;
          for( int i = 0; i < numColsRational(); i++ )
@@ -3955,7 +3955,7 @@ namespace soplex
             else
                sol._redCost[i] = _workSol._redCost[i];
          }
-         sol._hasDual = true;
+         sol._isDualFeasible  = true;
       }
 
    TERMINATE:
@@ -3974,7 +3974,7 @@ namespace soplex
       success = false;
       isSolBasic = true;
 
-      if( !sol.hasPrimal() || !sol.hasDual() )
+      if( !sol.isPrimalFeasible() || !sol.isDualFeasible() )
          return success;
 
       // start timing and increment statistics counter

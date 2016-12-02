@@ -42,6 +42,8 @@
 #include "nameset.h"
 #include "didxset.h"
 #include "spxfileio.h"
+#include "spxscaler.h"
+
 
 namespace soplex
 {
@@ -66,12 +68,14 @@ class SPxSolver;
  *
  *  Note, that the optimization sense is not saved directly. Instead, the objective function are multiplied by -1 to
  *  transform the LP to our standard form maximizing the objective function. However, the sense of the loaded LP can be
- *  retreived with method #spxSense().
+ *  retrieved with method #spxSense().
  *
- *  Further, equality constraints are modelled by \f$l_r = u_r\f$.  Analogously, fixed variables have \f$l_c = u_c\f$.
+ *  Further, equality constraints are modeled by \f$l_r = u_r\f$.  Analogously, fixed variables have \f$l_c = u_c\f$.
  *
  *  #SPxLPBase%s are saved as an SVSet, both for columns and rows. Note that this is redundant but eases the access.
  */
+
+
 template < class R >
 class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
 {
@@ -104,8 +108,10 @@ private:
    /**@name Data */
    //@{
 
-   SPxSense thesense;   ///< optimization sense.
-   R offset;            ///< offset computed, e.g., in simplification step
+   SPxSense thesense;                ///< optimization sense.
+   R offset;                         ///< offset computed, e.g., in simplification step
+   bool _isScaled;                   ///< true, if scaling has been performed
+   SPxScaler* lp_scaler;             ///< points to the scaler if the lp has been scaled, to 0 otherwise
 
    //@}
 
@@ -122,8 +128,24 @@ public:
    }
 
    // ------------------------------------------------------------------------------------------------------------------
+
+   /// unscales the lp and clears basis
+   void unscaleLP();
+
    /**@name Inquiry */
    //@{
+
+   /// Returns true if and only if the LP is scaled
+   bool isScaled() const
+   {
+      return _isScaled;
+   }
+
+   /// set whether the LP is scaled or not
+   void setScalingInfo(bool isScaled)
+   {
+      _isScaled = isScaled;
+   }
 
    /// Returns number of rows in LP.
    int nRows() const
@@ -148,43 +170,11 @@ public:
       return n;
    }
 
-   /// Absolute smallest non-zero element in LP.
-   R minAbsNzo() const
-   {
+   /// Absolute smallest non-zero element in (possibly scaled) LP.
+   virtual R minAbsNzo(bool unscaled = true) const;
 
-      R mini = infinity;
-
-      for( int i = 0; i < nCols(); ++i )
-      {
-         R m = colVector(i).minAbs();
-
-         if( m < mini )
-            mini = m;
-      }
-
-      assert(mini >= R(0));
-
-      return mini;
-   }
-
-   /// Absolute biggest non-zero element in LP.
-   R maxAbsNzo() const
-   {
-
-      R maxi = R(0);
-
-      for( int i = 0; i < nCols(); ++i )
-      {
-         R m = colVector(i).maxAbs();
-
-         if( m > maxi )
-            maxi = m;
-      }
-
-      assert(maxi >= R(0));
-
-      return maxi;
-   }
+   /// Absolute biggest non-zero element in (in rational case possibly scaled) LP.
+   virtual R maxAbsNzo(bool unscaled = true) const;
 
    /// Gets \p i 'th row.
    void getRow(int i, LPRowBase<R>& row) const
@@ -204,8 +194,8 @@ public:
    /// Gets rows \p start, ... \p end.
    void getRows(int start, int end, LPRowSetBase<R>& set) const
    {
-
       set.clear();
+
       for( int i = start; i <= end; i++ )
          set.add(lhs(i), rowVector(i), rhs(i), rowObj(i));
    }
@@ -222,17 +212,21 @@ public:
       return LPRowSetBase<R>::rowVector(id);
    }
 
+   /// Gets unscaled row vector of row \p i.
+   void getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+
    /// Returns right hand side vector.
    const VectorBase<R>& rhs() const
    {
       return LPRowSetBase<R>::rhs();
    }
 
-   ///
+   /// Returns right hand side of row number \p i.
    const R& rhs(int i) const
    {
       return LPRowSetBase<R>::rhs(i);
    }
+
 
    /// Returns right hand side of row with identifier \p id.
    const R& rhs(const SPxRowId& id) const
@@ -240,13 +234,28 @@ public:
       return LPRowSetBase<R>::rhs(id);
    }
 
+   /// Gets (internal and possibly scaled) right hand side vector.
+   void getRhs(VectorBase<R>& vec) const
+   {
+      vec = LPRowSetBase<R>::rhs();
+   }
+
+   /// Gets unscaled right hand side vector.
+   void getRhsUnscaled(VectorBase<Real>& vec) const;
+
+   /// Returns unscaled right hand side of row number \p i.
+   R rhsUnscaled(int i) const;
+
+   /// Returns unscaled right hand side of row with identifier \p id.
+   R rhsUnscaled(const SPxRowId& id) const;
+
    /// Returns left hand side vector.
    const VectorBase<R>& lhs() const
    {
       return LPRowSetBase<R>::lhs();
    }
 
-   ///
+   /// Returns left hand side of row number \p i.
    const R& lhs(int i) const
    {
       return LPRowSetBase<R>::lhs(i);
@@ -302,6 +311,15 @@ public:
       return LPRowSetBase<R>::obj(id);
    }
 
+   /// Returns unscaled left hand side vector.
+   void getLhsUnscaled(VectorBase<Real>& vec) const;
+
+   /// Returns unscaled left hand side of row number \p i.
+   R lhsUnscaled(int i) const;
+
+   /// Returns left hand side of row with identifier \p id.
+   R lhsUnscaled(const SPxRowId& id) const;
+
    /// Returns the inequality type of the \p i'th LPRow.
    typename LPRowBase<R>::Type rowType(int i) const
    {
@@ -317,7 +335,6 @@ public:
    /// Gets \p i 'th column.
    void getCol(int i, LPColBase<R>& col) const
    {
-
       col.setUpper(upper(i));
       col.setLower(lower(i));
       col.setObj(obj(i));
@@ -333,10 +350,23 @@ public:
    /// Gets columns \p start, ..., \p end.
    void getCols(int start, int end, LPColSetBase<R>& set) const
    {
+      if( _isScaled)
+      {
+         LPColBase<R> lpcol;
 
-      set.clear();
-      for( int i = start; i <= end; i++ )
-         set.add(obj(i), lower(i), colVector(i), upper(i));
+         for( int i = start; i <= end; i++ )
+         {
+            getCol(i, lpcol);
+            set.add(lpcol);
+         }
+
+      }
+      else
+      {
+         set.clear();
+         for( int i = start; i <= end; i++ )
+            set.add(obj(i), lower(i), colVector(i), upper(i));
+      }
    }
 
    /// Returns column vector of column \p i.
@@ -351,11 +381,20 @@ public:
       return LPColSetBase<R>::colVector(id);
    }
 
+   /// Gets column vector of column \p i.
+   void getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+
+   /// Gets column vector of column with identifier \p id.
+   void getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const;
+
+   /// Gets unscaled objective vector.
+   void getObjUnscaled(VectorBase<Real>& pobj) const;
+
    /// Gets objective vector.
    void getObj(VectorBase<R>& pobj) const
    {
-
       pobj = LPColSetBase<R>::maxObj();
+
       if( spxSense() == MINIMIZE )
          pobj *= -1.0;
    }
@@ -364,6 +403,7 @@ public:
    R obj(int i) const
    {
       R res = maxObj(i);
+
       if( spxSense() == MINIMIZE )
          res *= -1;
       return res;
@@ -372,11 +412,14 @@ public:
    /// Returns objective value of column with identifier \p id.
    R obj(const SPxColId& id) const
    {
-      R res = maxObj(id);
-      if( spxSense() == MINIMIZE )
-         res *= -1;
-      return res;
+      return obj(number(id));
    }
+
+   /// Returns unscaled objective value of column \p i.
+   R objUnscaled(int i) const;
+
+   /// Returns unscaled objective value of column with identifier \p id.
+   R objUnscaled(const SPxColId& id) const;
 
    /// Returns objective vector for maximization problem.
    /** Methods #maxObj() return the objective vector or its elements, after transformation to a maximization
@@ -397,8 +440,17 @@ public:
    /// Returns objective value of column with identifier \p id for maximization problem.
    const R& maxObj(const SPxColId& id) const
    {
-      return LPColSetBase<R>::maxObj(id);
+      return maxObj(number(id));
    }
+
+   /// Returns unscaled objective vector for maximization problem.
+   void maxObjUnscaled(VectorBase<Real>& vec) const;
+
+   /// Returns unscaled objective value of column \p i for maximization problem.
+   R maxObjUnscaled(int i) const;
+
+   /// Returns unscaled objective value of column with identifier \p id for maximization problem.
+   R maxObjUnscaled(const SPxColId& id) const;
 
    /// Returns upper bound vector.
    const VectorBase<R>& upper() const
@@ -418,23 +470,41 @@ public:
       return LPColSetBase<R>::upper(id);
    }
 
-   /// Returns lower bound vector.
+   /// Gets unscaled upper bound vector
+   void getUpperUnscaled(DVector& vec) const;
+
+   /// Returns unscaled upper bound of column \p i.
+   R upperUnscaled(int i) const;
+
+   /// Returns unscaled upper bound of column with identifier \p id.
+   R upperUnscaled(const SPxColId& id) const;
+
+   /// Returns (internal and possibly scaled) lower bound vector.
    const VectorBase<R>& lower() const
    {
       return LPColSetBase<R>::lower();
    }
 
-   /// Returns lower bound of column \p i.
+   /// Returns (internal and possibly scaled) lower bound of column \p i.
    const R& lower(int i) const
    {
       return LPColSetBase<R>::lower(i);
    }
 
-   /// Returns lower bound of column with identifier \p id.
+   /// Returns (internal and possibly scaled) lower bound of column with identifier \p id.
    const R& lower(const SPxColId& id) const
    {
       return LPColSetBase<R>::lower(id);
    }
+
+   /// Gets unscaled lower bound vector.
+   void getLowerUnscaled(DVector& vec) const;
+
+   /// Returns unscaled lower bound of column \p i.
+   R lowerUnscaled(int i) const;
+
+   /// Returns unscaled lower bound of column with identifier \p id.
+   R lowerUnscaled(const SPxColId& id) const;
 
    /// Returns the optimization sense.
    SPxSense spxSense() const
@@ -487,15 +557,15 @@ public:
    //@{
 
    ///
-   virtual void addRow(const LPRowBase<R>& row)
+   virtual void addRow(const LPRowBase<R>& row, bool scale = false)
    {
-      doAddRow(row);
+      doAddRow(row, scale);
    }
 
    ///
-   virtual void addRow(const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue)
+   virtual void addRow(const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue, bool scale = false)
    {
-      doAddRow(lhsValue, rowVec, rhsValue);
+      doAddRow(lhsValue, rowVec, rhsValue, scale);
    }
 
    ///
@@ -535,16 +605,16 @@ public:
    }
 
    /// Adds \p row to LPRowSetBase.
-   virtual void addRow(SPxRowId& id, const LPRowBase<R>& row)
+   virtual void addRow(SPxRowId& id, const LPRowBase<R>& row, bool scale = false)
    {
-      addRow(row);
+      addRow(row, scale);
       id = rId(nRows() - 1);
    }
 
    ///
-   virtual void addRows(const LPRowSetBase<R>& pset)
+   virtual void addRows(const LPRowSetBase<R>& pset, bool scale = false)
    {
-      doAddRows(pset);
+      doAddRows(pset, scale);
    }
 
    ///
@@ -639,25 +709,24 @@ public:
    }
 
    /// adds all LPRowBase%s of \p pset to LPRowSetBase.
-   virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set)
+   virtual void addRows(SPxRowId id[], const LPRowSetBase<R>& set, bool scale = false)
    {
-
       int i = nRows();
-      addRows(set);
+      addRows(set, scale);
       for( int j = 0; i < nRows(); ++i, ++j )
          id[j] = rId(i);
    }
 
    ///
-   virtual void addCol(const LPColBase<R>& col)
+   virtual void addCol(const LPColBase<R>& col, bool scale = false)
    {
-      doAddCol(col);
+      doAddCol(col, scale);
    }
 
    ///
-   virtual void addCol(const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   virtual void addCol(const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue, bool scale = false)
    {
-      doAddCol(objValue, lowerValue, colVec, upperValue);
+      doAddCol(objValue, lowerValue, colVec, upperValue, scale);
    }
 
    ///
@@ -694,16 +763,16 @@ public:
    }
 
    /// Adds \p col to LPColSetVBase.
-   virtual void addCol(SPxColId& id, const LPColBase<R>& col)
+   virtual void addCol(SPxColId& id, const LPColBase<R>& col, bool scale = false)
    {
-      addCol(col);
+      addCol(col, scale);
       id = cId(nCols() - 1);
    }
 
    ///
-   virtual void addCols(const LPColSetBase<R>& pset)
+   virtual void addCols(const LPColSetBase<R>& pset, bool scale = false)
    {
-      doAddCols(pset);
+      doAddCols(pset, scale);
    }
 
    ///
@@ -796,11 +865,11 @@ public:
    }
 
    /// Adds all LPColBase%s of \p set to LPColSetBase.
-   virtual void addCols(SPxColId id[], const LPColSetBase<R>& set)
+   virtual void addCols(SPxColId id[], const LPColSetBase<R>& set, bool scale = false)
    {
 
       int i = nCols();
-      addCols(set);
+      addCols(set, scale);
       for( int j = 0; i < nCols(); ++i, ++j )
          id[j] = cId(i);
    }
@@ -1013,6 +1082,10 @@ public:
       LPColSetBase<R>::clear();
       thesense = MAXIMIZE;
       offset = 0;
+      _isScaled = false;
+      lp_scaler = 0;
+      LPColSetBase<R>::scaleExp.clear();
+      LPRowSetBase<R>::scaleExp.clear();
    }
 
    //@}
@@ -1180,24 +1253,20 @@ public:
    /**@name Manipulation */
    //@{
 
-   /// Changes objective vector to \p newObj.
-   virtual void changeObj(const VectorBase<R>& newObj)
+   /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
+   virtual void changeObj(const VectorBase<R>& newObj, bool scale = false)
    {
-
-      assert(maxObj().dim() == newObj.dim());
-      LPColSetBase<R>::maxObj_w() = newObj;
+      changeMaxObj(newObj, scale);
       if( spxSense() == MINIMIZE )
          LPColSetBase<R>::maxObj_w() *= -1;
-      assert(isConsistent());
    }
 
-   /// changes \p i 'th objective vector element to \p newVal.
-   virtual void changeObj(int i, const R& newVal)
+   /// changes \p i 'th objective vector element to \p newVal. \p scale determines whether the new data should be scaled
+   virtual void changeObj(int i, const R& newVal, bool scale = false)
    {
-      LPColSetBase<R>::maxObj_w(i) = newVal;
+      changeMaxObj(i, newVal, scale);
       if( spxSense() == MINIMIZE )
          LPColSetBase<R>::maxObj_w(i) *= -1;
-      assert(isConsistent());
    }
 
    /// changes \p i 'th objective vector element to \p newVal.
@@ -1210,24 +1279,31 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes objective value of column with identifier \p id to \p newVal.
-   virtual void changeObj(SPxColId id, const R& newVal)
+   /// Changes objective value of column with identifier \p id to \p newVal. \p scale determines whether the new data should be scaled
+   virtual void changeObj(SPxColId id, const R& newVal, bool scale = false)
    {
-      changeObj(number(id), newVal);
+      changeObj(number(id), newVal, scale);
    }
 
-   /// Changes objective vector to \p newObj.
-   virtual void changeMaxObj(const VectorBase<R>& newObj)
+   /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
+   virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
    {
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
       assert(isConsistent());
    }
 
-   /// changes \p i 'th objective vector element to \p newVal.
-   virtual void changeMaxObj(int i, const R& newVal)
+   /// changes \p i 'th objective vector element to \p newVal. \p scale determines whether the new data should be scaled
+   virtual void changeMaxObj(int i, const R& newVal, bool scale = false)
    {
-      LPColSetBase<R>::maxObj_w(i) = newVal;
+      if( scale )
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         LPColSetBase<R>::maxObj_w(i) = lp_scaler->scaleObj(*this, i, newVal);
+      }
+      else
+         LPColSetBase<R>::maxObj_w(i) = newVal;
       assert(isConsistent());
    }
 
@@ -1239,26 +1315,31 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes objective value of column with identifier \p id to \p newVal.
-   virtual void changeMaxObj(SPxColId id, const R& newVal)
+   /// Changes objective value of column with identifier \p id to \p newVal. \p scale determines whether the new data should be scaled
+   virtual void changeMaxObj(SPxColId id, const R& newVal, bool scale = false)
    {
-      changeMaxObj(number(id), newVal);
+      changeMaxObj(number(id), newVal, scale);
    }
 
-   /// Changes vector of lower bounds to \p newLower.
-   virtual void changeLower(const VectorBase<R>& newLower)
+   /// Changes vector of lower bounds to \p newLower. \p scale determines whether the new data should be scaled
+   virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
    {
-
       assert(lower().dim() == newLower.dim());
       LPColSetBase<R>::lower_w() = newLower;
       assert(isConsistent());
    }
 
-   /// changes \p i 'th lower bound to \p newLower.
-   virtual void changeLower(int i, const R& newLower)
+   /// changes \p i 'th lower bound to \p newLower. \p scale determines whether the new data should be scaled
+   virtual void changeLower(int i, const R& newLower, bool scale = false)
    {
-
-      LPColSetBase<R>::lower_w(i) = newLower;
+      if( scale && newLower > -infinity)
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         LPColSetBase<R>::lower_w(i) = lp_scaler->scaleLower(*this, i, newLower);
+      }
+      else
+         LPColSetBase<R>::lower_w(i) = newLower;
       assert(isConsistent());
    }
 
@@ -1270,26 +1351,31 @@ public:
       assert(isConsistent());
    }
 
-   /// changes lower bound of column with identifier \p id to \p newLower.
-   virtual void changeLower(SPxColId id, const R& newLower)
+   /// changes lower bound of column with identifier \p id to \p newLower. \p scale determines whether the new data should be scaled
+   virtual void changeLower(SPxColId id, const R& newLower, bool scale = false)
    {
-      changeLower(number(id), newLower);
+      changeLower(number(id), newLower, scale);
    }
 
-   /// Changes vector of upper bounds to \p newUpper.
-   virtual void changeUpper(const VectorBase<R>& newUpper)
+   /// Changes vector of upper bounds to \p newUpper. \p scale determines whether the new data should be scaled
+   virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
    {
-
       assert(upper().dim() == newUpper.dim());
       LPColSetBase<R>::upper_w() = newUpper;
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th upper bound to \p newUpper.
-   virtual void changeUpper(int i, const R& newUpper)
+   /// Changes \p i 'th upper bound to \p newUpper. \p scale determines whether the new data should be scaled
+   virtual void changeUpper(int i, const R& newUpper, bool scale = false)
    {
-
-      LPColSetBase<R>::upper_w(i) = newUpper;
+      if( scale && newUpper < infinity )
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
+         LPColSetBase<R>::upper_w(i) = lp_scaler->scaleUpper(*this, i, newUpper);
+      }
+      else
+         LPColSetBase<R>::upper_w(i) = newUpper;
       assert(isConsistent());
    }
 
@@ -1301,27 +1387,25 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes upper bound of column with identifier \p id to \p newLower.
-   virtual void changeUpper(SPxColId id, const R& newUpper)
+   /// Changes upper bound of column with identifier \p id to \p newLower. \p scale determines whether the new data should be scaled
+   virtual void changeUpper(SPxColId id, const R& newUpper, bool scale = false)
    {
-      changeUpper(number(id), newUpper);
+      changeUpper(number(id), newUpper, scale);
    }
 
-   /// Changes variable bounds to \p newLower and \p newUpper.
-   virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper)
+   /// Changes variable bounds to \p newLower and \p newUpper. \p scale determines whether the new data should be scaled
+   virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper, bool scale = false)
    {
-
-      changeLower(newLower);
-      changeUpper(newUpper);
+      changeLower(newLower, scale);
+      changeUpper(newUpper, scale);
       assert(isConsistent());
    }
 
-   /// Changes bounds of column \p i to \p newLower and \p newUpper.
-   virtual void changeBounds(int i, const R& newLower, const R& newUpper)
+   /// Changes bounds of column \p i to \p newLower and \p newUpper. \p scale determines whether the new data should be scaled
+   virtual void changeBounds(int i, const R& newLower, const R& newUpper, bool scale = false)
    {
-
-      changeLower(i, newLower);
-      changeUpper(i, newUpper);
+      changeLower(i, newLower, scale);
+      changeUpper(i, newUpper, scale);
       assert(isConsistent());
    }
 
@@ -1334,24 +1418,27 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes bounds of column with identifier \p id.
-   virtual void changeBounds(SPxColId id, const R& newLower, const R& newUpper)
+   /// Changes bounds of column with identifier \p id. \p scale determines whether the new data should be scaled
+   virtual void changeBounds(SPxColId id, const R& newLower, const R& newUpper, bool scale = false)
    {
-      changeBounds(number(id), newLower, newUpper);
+      changeBounds(number(id), newLower, newUpper, scale);
    }
 
-   /// Changes left hand side vector for constraints to \p newLhs.
-   virtual void changeLhs(const VectorBase<R>& newLhs)
+   /// Changes left hand side vector for constraints to \p newLhs. \p scale determines whether the new data should be scaled
+   virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
    {
       assert(lhs().dim() == newLhs.dim());
       LPRowSetBase<R>::lhs_w() = newLhs;
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th left hand side value to \p newLhs.
-   virtual void changeLhs(int i, const R& newLhs)
+   /// Changes \p i 'th left hand side value to \p newLhs. \p scale determines whether the new data should be scaled
+   virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
-      LPRowSetBase<R>::lhs_w(i) = newLhs;
+      if( scale && newLhs > -infinity )
+         LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs);
+      else
+         LPRowSetBase<R>::lhs_w(i) = newLhs;
       assert(isConsistent());
    }
 
@@ -1363,48 +1450,49 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes left hand side value for row with identifier \p id.
-   virtual void changeLhs(SPxRowId id, const R& newLhs)
+   /// Changes left hand side value for row with identifier \p id. \p scale determines whether the new data should be scaled
+   virtual void changeLhs(SPxRowId id, const R& newLhs, bool scale = false)
    {
-      changeLhs(number(id), newLhs);
+      changeLhs(number(id), newLhs, scale);
    }
 
-   /// Changes right hand side vector for constraints to \p newRhs.
-   virtual void changeRhs(const VectorBase<R>& newRhs)
+   /// Changes right hand side vector for constraints to \p newRhs. \p scale determines whether the new data should be scaled
+   virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
    {
       assert(rhs().dim() == newRhs.dim());
       LPRowSetBase<R>::rhs_w() = newRhs;
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th right hand side value to \p newRhs.
-   virtual void changeRhs(int i, const R& newRhs)
+   /// Changes \p i 'th right hand side value to \p newRhs. \p scale determines whether the new data should be scaled
+   virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
-      LPRowSetBase<R>::rhs_w(i) = newRhs;
+      if( scale && newRhs < infinity )
+         LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs);
+      else
+         LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
    }
 
-   /// Changes right hand side value for row with identifier \p id.
-   virtual void changeRhs(SPxRowId id, const R& newRhs)
+   /// Changes right hand side value for row with identifier \p id. \p scale determines whether the new data should be scaled
+   virtual void changeRhs(SPxRowId id, const R& newRhs, bool scale = false)
    {
-      changeRhs(number(id), newRhs);
+      changeRhs(number(id), newRhs, scale);
    }
 
-   /// Changes left and right hand side vectors.
-   virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs)
+   /// Changes left and right hand side vectors. \p scale determines whether the new data should be scaled
+   virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs, bool scale = false)
    {
-
-      changeLhs(newLhs);
-      changeRhs(newRhs);
+      changeLhs(newLhs, scale);
+      changeRhs(newRhs, scale);
       assert(isConsistent());
    }
 
-   /// Changes left and right hand side of row \p i.
-   virtual void changeRange(int i, const R& newLhs, const R& newRhs)
+   /// Changes left and right hand side of row \p i. \p scale determines whether the new data should be scaled
+   virtual void changeRange(int i, const R& newLhs, const R& newRhs, bool scale = false)
    {
-
-      changeLhs(i, newLhs);
-      changeRhs(i, newRhs);
+      changeLhs(i, newLhs, scale);
+      changeRhs(i, newRhs, scale);
       assert(isConsistent());
    }
 
@@ -1417,14 +1505,14 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes left and right hand side of row with identifier \p id.
-   virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs)
+   /// Changes left and right hand side of row with identifier \p id. \p scale determines whether the new data should be scaled
+   virtual void changeRange(SPxRowId id, const R& newLhs, const R& newRhs, bool scale = false)
    {
-      changeRange(number(id), newLhs, newRhs);
+      changeRange(number(id), newLhs, newRhs, scale);
    }
 
-   /// Changes row objective function vector to \p newRowObj.
-   virtual void changeRowObj(const VectorBase<R>& newRowObj)
+   /// Changes row objective function vector to \p newRowObj. \p scale determines whether the new data should be scaled
+   virtual void changeRowObj(const VectorBase<R>& newRowObj, bool scale = false)
    {
       assert(maxRowObj().dim() == newRowObj.dim());
       LPRowSetBase<R>::obj_w() = newRowObj;
@@ -1433,8 +1521,8 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes \p i 'th row objective function value to \p newRowObj.
-   virtual void changeRowObj(int i, const R& newRowObj)
+   /// Changes \p i 'th row objective function value to \p newRowObj. \p scale determines whether the new data should be scaled
+   virtual void changeRowObj(int i, const R& newRowObj, bool scale = false)
    {
       LPRowSetBase<R>::obj_w(i) = newRowObj;
       if( spxSense() == MINIMIZE )
@@ -1442,10 +1530,10 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes row objective function value for row with identifier \p id.
-   virtual void changeRowObj(SPxRowId id, const R& newRowObj)
+   /// Changes row objective function value for row with identifier \p id. \p scale determines whether the new data should be scaled
+   virtual void changeRowObj(SPxRowId id, const R& newRowObj, bool scale = false)
    {
-      changeRowObj(number(id), newRowObj);
+      changeRowObj(number(id), newRowObj, scale);
    }
 
    /// Clears row objective function values for all rows
@@ -1454,8 +1542,8 @@ public:
       LPRowSetBase<R>::obj_w().clear();
    }
 
-   /// Replaces \p i 'th row of LP with \p newRow.
-   virtual void changeRow(int n, const LPRowBase<R>& newRow)
+   /// Replaces \p i 'th row of LP with \p newRow. \p scale determines whether the new data should be scaled
+   virtual void changeRow(int n, const LPRowBase<R>& newRow, bool scale = false)
    {
       if( n < 0 )
          return;
@@ -1470,15 +1558,17 @@ public:
 
       row.clear();
 
-      changeLhs(n, newRow.lhs());
-      changeRhs(n, newRow.rhs());
-      changeRowObj(n, newRow.obj());
+      changeLhs(n, newRow.lhs(), scale);
+      changeRhs(n, newRow.rhs(), scale);
+      changeRowObj(n, newRow.obj(), scale);
 
       const SVectorBase<R>& newrow = newRow.rowVector();
       for( j = newrow.size() - 1; j >= 0; --j )
       {
          int idx = newrow.index(j);
          R val = newrow.value(j);
+         if( scale )
+            val = spxLdexp(val, LPRowSetBase<R>::scaleExp[n] + LPColSetBase<R>::scaleExp[idx]);
          LPRowSetBase<R>::add2(n, 1, &idx, &val);
          LPColSetBase<R>::add2(idx, 1, &n, &val);
       }
@@ -1486,14 +1576,14 @@ public:
       assert(isConsistent());
    }
 
-   /// Replaces row with identifier \p id with \p newRow.
-   virtual void changeRow(SPxRowId id, const LPRowBase<R>& newRow)
+   /// Replaces row with identifier \p id with \p newRow. \p scale determines whether the new data should be scaled
+   virtual void changeRow(SPxRowId id, const LPRowBase<R>& newRow, bool scale = false)
    {
-      changeRow(number(id), newRow);
+      changeRow(number(id), newRow, scale);
    }
 
-   /// Replaces \p i 'th column of LP with \p newCol.
-   virtual void changeCol(int n, const LPColBase<R>& newCol)
+   /// Replaces \p i 'th column of LP with \p newCol. \p scale determines whether the new data should be scaled
+   virtual void changeCol(int n, const LPColBase<R>& newCol, bool scale = false)
    {
       if( n < 0 )
          return;
@@ -1508,15 +1598,17 @@ public:
 
       col.clear();
 
-      changeUpper(n, newCol.upper());
-      changeLower(n, newCol.lower());
-      changeObj(n, newCol.obj());
+      changeUpper(n, newCol.upper(), scale);
+      changeLower(n, newCol.lower(), scale);
+      changeObj(n, newCol.obj(), scale);
 
       const SVectorBase<R>& newcol = newCol.colVector();
       for( j = newcol.size() - 1; j >= 0; --j )
       {
          int idx = newcol.index(j);
          R val = newcol.value(j);
+         if( scale )
+            val = spxLdexp(val, LPColSetBase<R>::scaleExp[n] + LPRowSetBase<R>::scaleExp[idx]);
          LPColSetBase<R>::add2(n, 1, &idx, &val);
          LPRowSetBase<R>::add2(idx, 1, &n, &val);
       }
@@ -1524,14 +1616,14 @@ public:
       assert(isConsistent());
    }
 
-   /// Replaces column with identifier \p id with \p newCol.
-   virtual void changeCol(SPxColId id, const LPColBase<R>& newCol)
+   /// Replaces column with identifier \p id with \p newCol. \p scale determines whether the new data should be scaled
+   virtual void changeCol(SPxColId id, const LPColBase<R>& newCol, bool scale = false)
    {
-      changeCol(number(id), newCol);
+      changeCol(number(id), newCol, scale);
    }
 
-   /// Changes LP element (\p i, \p j) to \p val.
-   virtual void changeElement(int i, int j, const R& val)
+   /// Changes LP element (\p i, \p j) to \p val. \p scale determines whether the new data should be scaled
+   virtual void changeElement(int i, int j, const R& val, bool scale = false)
    {
       if( i < 0 || j < 0 )
          return;
@@ -1541,15 +1633,26 @@ public:
 
       if( val != R(0) )
       {
+         Real newVal;
+
+         if( scale )
+         {
+            assert(_isScaled);
+            assert(lp_scaler);
+            newVal = lp_scaler->scaleElement(*this, i, j, val);
+         }
+         else
+            newVal = val;
+
          if( row.number(j) >= 0 )
          {
-            row.value(row.number(j)) = val;
-            col.value(col.number(i)) = val;
+            row.value(row.number(j)) = newVal;
+            col.value(col.number(i)) = newVal;
          }
          else
          {
-            LPRowSetBase<R>::add2(i, 1, &j, &val);
-            LPColSetBase<R>::add2(j, 1, &i, &val);
+            LPRowSetBase<R>::add2(i, 1, &j, &newVal);
+            LPColSetBase<R>::add2(j, 1, &i, &newVal);
          }
       }
       else if( row.number(j) >= 0 )
@@ -1593,10 +1696,10 @@ public:
       assert(isConsistent());
    }
 
-   /// Changes LP element identified by (\p rid, \p cid) to \p val.
-   virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val)
+   /// Changes LP element identified by (\p rid, \p cid) to \p val. \p scale determines whether the new data should be scaled
+   virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val, bool scale = false)
    {
-      changeElement(number(rid), number(cid), val);
+      changeElement(number(rid), number(cid), val, scale);
    }
 
    /// Changes optimization sense to \p sns.
@@ -1618,38 +1721,8 @@ public:
    /// Computes activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
    ///        dimension of the activity vector does not match the number of rows
-   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity) const
-   {
-      if( primal.dim() != nCols() )
-      {
-         throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
-      }
-
-      if( activity.dim() != nRows() )
-      {
-         throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
-      }
-
-      int c;
-      for( c = 0; c < nCols() && primal[c] == 0; c++ )
-         ;
-
-      if( c >= nCols() )
-      {
-         activity.clear();
-         return;
-      }
-
-      activity = colVector(c);
-      activity *= primal[c];
-      c++;
-
-      for( ; c < nCols(); c++ )
-      {
-         if( primal[c] != 0 )
-            activity.multAdd(primal[c], colVector(c));
-      }
-   }
+   /// \p unscaled determines whether the returned data should be unscaled (if scaling was applied prior)
+   virtual void computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity, const bool unscaled = true) const;
 
    /// Updates activity of the rows for a given primal vector; activity does not need to be zero
    /// @throw SPxInternalCodeException if the dimension of primal vector does not match number of columns or if the
@@ -1672,38 +1745,7 @@ public:
    /// Computes "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
    ///        the activity vector does not match the number of columns
-   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity) const
-   {
-      if( dual.dim() != nRows() )
-      {
-         throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
-      }
-
-      if( activity.dim() != nCols() )
-      {
-         throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
-      }
-
-      int r;
-      for( r = 0; r < nRows() && dual[r] == 0; r++ )
-         ;
-
-      if( r >= nRows() )
-      {
-         activity.clear();
-         return;
-      }
-
-      activity = rowVector(r);
-      activity *= dual[r];
-      r++;
-
-      for( ; r < nRows(); r++ )
-      {
-         if( dual[r] != 0 )
-            activity.multAdd(dual[r], rowVector(r));
-      }
-   }
+   virtual void computeDualActivity(const VectorBase<R>& dual, VectorBase<R>& activity, const bool unscaled = true) const;
 
    /// Updates "dual" activity of the columns for a given dual vector, i.e., y^T A; activity does not need to be zero
    /// @throw SPxInternalCodeException if dimension of dual vector does not match number of rows or if the dimension of
@@ -1889,7 +1931,6 @@ protected:
    /// Internal helper method.
    virtual void doRemoveRows(int perm[])
    {
-
       int j = nCols();
 
       LPRowSetBase<R>::remove(perm);
@@ -1940,12 +1981,11 @@ protected:
    /// Internal helper method.
    virtual void doRemoveCols(int perm[])
    {
-
-      int j = nRows();
+      int nrows = nRows();
 
       LPColSetBase<R>::remove(perm);
 
-      for( int i = 0; i < j; ++i )
+      for( int i = 0; i < nrows; ++i )
       {
          SVectorBase<R>& vec = rowVector_w(i);
 
@@ -1961,11 +2001,11 @@ protected:
    }
 
    /// Called after the last \p n rows have just been added.
-   virtual void addedRows(int)
+   virtual void addedRows(int newrows)
    {}
 
    /// Called after the last \p n columns have just been added.
-   virtual void addedCols(int)
+   virtual void addedCols(int newcols)
    {}
 
    ///
@@ -2041,20 +2081,41 @@ private:
    }
 
    ///
-   void doAddRow (const LPRowBase<R>& row)
+   void doAddRow (const LPRowBase<R>& row, bool scale = false)
    {
-
       int idx = nRows();
       int oldColNumber = nCols();
-      const SVectorBase<R>& vec = row.rowVector();
+      int newRowScaleExp = 0;
 
       LPRowSetBase<R>::add(row);
+
+      SVectorBase<R>& vec = rowVector_w(idx);
+
+      // fixme compute new row scaling factor and apply it to the sides
+      if( false && scale )
+      {
+         newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
+
+         if( rhs(idx) < infinity )
+            rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
+         if( lhs(idx) > -infinity )
+            lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
+
+         maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
+
+         LPRowSetBase<R>::scaleExp[idx] = newRowScaleExp;
+      }
 
       // now insert nonzeros to column file also
       for( int j = vec.size() - 1; j >= 0; --j )
       {
-         R val = vec.value(j);
          int i = vec.index(j);
+
+         // apply new row and existing column scaling factors to new values in RowSet
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new columns if required
          if( i >= nCols() )
@@ -2073,18 +2134,41 @@ private:
    }
 
    ///
-   void doAddRow (const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue)
+   void doAddRow (const R& lhsValue, const SVectorBase<R>& rowVec, const R& rhsValue, bool scale = false)
    {
       int idx = nRows();
       int oldColNumber = nCols();
+      int newRowScaleExp = 0;
 
       LPRowSetBase<R>::add(lhsValue, rowVec, rhsValue);
 
-      // now insert nonzeros to column file also
-      for( int j = rowVec.size() - 1; j >= 0; --j )
+      // fixme compute new row scaling factor and apply it to the sides
+      if( false && scale )
       {
-         R val = rowVec.value(j);
-         int i = rowVec.index(j);
+         newRowScaleExp = lp_scaler->computeScaleExp(rowVec, LPColSetBase<R>::scaleExp);
+
+         if( rhs(idx) < infinity )
+            rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
+         if( lhs(idx) > -infinity )
+            lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
+
+         maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
+
+         LPRowSetBase<R>::scaleExp[idx] = newRowScaleExp;
+      }
+
+      SVectorBase<R>& vec = rowVector_w(idx);
+
+      // now insert nonzeros to column file also
+      for( int j = vec.size() - 1; j >= 0; --j )
+      {
+         int i = vec.index(j);
+
+         // apply new row and existing column scaling factors to new values in RowSet
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new columns if required
          if( i >= nCols() )
@@ -2103,9 +2187,8 @@ private:
    }
 
    ///
-   void doAddRows(const LPRowSetBase<R>& set)
+   void doAddRows(const LPRowSetBase<R>& set, bool scale = false)
    {
-
       int i, j, k, ii, idx;
       SVectorBase<R>* col;
       DataArray < int > newCols(nCols());
@@ -2159,10 +2242,26 @@ private:
          }
       }
 
-      // insert new elements to column file
+      // compute new row scaling factor and insert new elements to column file
       for( i = nRows() - 1; i >= oldRowNumber; --i )
       {
-         const SVectorBase<R>& vec = rowVector(i);
+         SVectorBase<R>& vec = rowVector_w(i);
+         int newRowScaleExp = 0;
+
+         // fixme compute new row scaling factor and apply it to the sides
+         if( false && scale )
+         {
+            newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
+
+            if( rhs(i) < infinity )
+               rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
+            if( lhs(i) > -infinity )
+               lhs_w(i) = spxLdexp(lhs_w(i), newRowScaleExp);
+
+            maxRowObj_w(i) = spxLdexp(maxRowObj_w(i), newRowScaleExp);
+
+            LPRowSetBase<R>::scaleExp[i] = newRowScaleExp;
+         }
 
          for( j = vec.size() - 1; j >= 0; --j )
          {
@@ -2173,6 +2272,10 @@ private:
             assert(idx >= 0);
             newCols[k]--;
             col->index(idx) = i;
+            // apply new row and existing column scaling factors to both ColSet and RowSet
+            if( scale )
+               vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[k]);
+
             col->value(idx) = vec.value(j);
          }
       }
@@ -2184,28 +2287,49 @@ private:
 
       assert(SPxLPBase<R>::isConsistent());
 
-      assert( set.num() == nRows() - oldRowNumber );
-      addedRows( nRows() - oldRowNumber );
-      addedCols( nCols() - oldColNumber );
+      assert(set.num() == nRows() - oldRowNumber);
+      addedRows(nRows() - oldRowNumber);
+      addedCols(nCols() - oldColNumber);
    }
 
    ///
-   void doAddCol (const LPColBase<R>& col)
+   void doAddCol (const LPColBase<R>& col, bool scale = false)
    {
-
       int idx = nCols();
       int oldRowNumber = nRows();
-      const SVectorBase<R>& vec = col.colVector();
+      int newColScaleExp = 0;
 
       LPColSetBase<R>::add(col);
       if( thesense != MAXIMIZE )
          LPColSetBase<R>::maxObj_w(idx) *= -1;
 
+      SVectorBase<R>& vec = colVector_w(idx);
+
+      // fixme compute new column scaling factor and apply it to the bounds
+      if( false && scale )
+      {
+         newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
+
+         if( upper(idx) < infinity )
+            upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
+         if( lower(idx) > -infinity )
+            lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
+
+         maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
+
+         LPColSetBase<R>::scaleExp[idx] = newColScaleExp;
+      }
+
       // now insert nonzeros to row file also
       for( int j = vec.size() - 1; j >= 0; --j )
       {
-         R val = vec.value(j);
          int i = vec.index(j);
+
+         // apply new column and existing row scaling factors to new values in ColSet
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new rows if required
          if( i >= nRows() )
@@ -2224,20 +2348,42 @@ private:
    }
 
    ///
-   void doAddCol (const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue)
+   void doAddCol (const R& objValue, const R& lowerValue, const SVectorBase<R>& colVec, const R& upperValue, bool scale = false)
    {
       int idx = nCols();
       int oldRowNumber = nRows();
+      int newColScaleExp = 0;
 
       LPColSetBase<R>::add(objValue, lowerValue, colVec, upperValue);
       if( thesense != MAXIMIZE )
          LPColSetBase<R>::maxObj_w(idx) *= -1;
 
-      // now insert nonzeros to row file also
-      for( int j = colVec.size() - 1; j >= 0; --j )
+      // fixme compute new column scaling factor and apply it to the bounds
+      if( false && scale )
       {
-         R val = colVec.value(j);
-         int i = colVec.index(j);
+         newColScaleExp = lp_scaler->computeScaleExp(colVec, LPRowSetBase<R>::scaleExp);
+
+         if( upper(idx) < infinity )
+            upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
+         if( lower(idx) > -infinity )
+            lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
+
+         maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
+
+         LPColSetBase<R>::scaleExp[idx] = newColScaleExp;
+      }
+
+      SVectorBase<R>& vec = colVector_w(idx);
+
+      // now insert nonzeros to row file also
+      for( int j = vec.size() - 1; j >= 0; --j )
+      {
+         int i = vec.index(j);
+
+         if( scale )
+            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[i]);
+
+         R val = vec.value(j);
 
          // create new rows if required
          if( i >= nRows() )
@@ -2256,9 +2402,8 @@ private:
    }
 
    ///
-   void doAddCols(const LPColSetBase<R>& set)
+   void doAddCols(const LPColSetBase<R>& set, bool scale = false)
    {
-
       int i, j;
       int oldColNumber = nCols();
       int oldRowNumber = nRows();
@@ -2314,7 +2459,23 @@ private:
       for( i = oldColNumber; i < nCols(); ++i )
       {
          LPColSetBase<R>::maxObj_w(i) *= thesense;
-         const SVectorBase<R>& vec = colVector(i);
+         SVectorBase<R>& vec = colVector_w(i);
+         int newColScaleExp = 0;
+
+         // fixme compute new column scaling factor and apply it to the bounds
+         if( false && scale )
+         {
+            newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
+
+            if( upper(i) < infinity )
+               upper_w(i) = spxLdexp(upper_w(i), - newColScaleExp);
+            if( lower(i) > -infinity )
+               lower_w(i) = spxLdexp(lower_w(i), - newColScaleExp);
+
+            maxObj_w(i) = spxLdexp(maxObj_w(i), newColScaleExp);
+
+            LPColSetBase<R>::scaleExp[i] = newColScaleExp;
+         }
 
          for( j = vec.size() - 1; j >= 0; --j )
          {
@@ -2324,6 +2485,10 @@ private:
             assert(newRows[k] > 0);
             newRows[k]--;
             row.index(idx) = i;
+            // apply new column and existing row scaling factors to both ColSet and RowSet
+            if( scale )
+               vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[k]);
+
             row.value(idx) = vec.value(j);
          }
       }
@@ -2366,6 +2531,8 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense)
       , offset(old.offset)
+      , _isScaled(old._isScaled)
+      , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
       assert(isConsistent());
@@ -2378,6 +2545,8 @@ public:
       , LPColSetBase<R>(old)
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
+      , _isScaled(old._isScaled)
+      , lp_scaler(old.lp_scaler)
       , spxout(old.spxout)
    {
       assert(isConsistent());
@@ -2392,6 +2561,9 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = old.thesense;
          offset = old.offset;
+         _isScaled = old._isScaled;
+         lp_scaler = old.lp_scaler;
+         spxout = old.spxout;
 
          assert(isConsistent());
       }
@@ -2409,6 +2581,9 @@ public:
          LPColSetBase<R>::operator=(old);
          thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
          offset = R(old.offset);
+         _isScaled = old._isScaled;
+         lp_scaler = old.lp_scaler;
+         spxout = old.spxout;
 
          assert(isConsistent());
       }

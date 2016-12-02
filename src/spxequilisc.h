@@ -14,7 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  spxequilisc.h
- * @brief LP euilibrium scaling.
+ * @brief LP equilibrium scaling.
  */
 #ifndef _SPXEQUILISC_H_
 #define _SPXEQUILISC_H_
@@ -59,18 +59,8 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLP& lp);
+   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false);
    //@}
-
-protected:
-
-   //-------------------------------------
-   /**@name Protected helpers */
-   //@{
-   /// Does nothing but returning \p maxi.
-   virtual Real computeScale(Real /*mini*/, Real maxi) const;
-   //@}
-
 };
 } // namespace soplex
 #endif // _SPXEQUILISC_H_

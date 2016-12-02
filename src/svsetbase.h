@@ -41,8 +41,8 @@ namespace soplex
  * @ingroup Algebra
  *
  *   Class SVSetBase provides a set of sparse vectors SVectorBase. All SVectorBase%s in an SVSetBase share one big
- *   memory block for their nonzeros. This memory is reffered to as the \em nonzero \em memory. The SVectorBase%s
- *   themselves are saved in another memory block refered to as the \em vector \em memory. Both memory blocks will grow
+ *   memory block for their nonzeros. This memory is referred to as the \em nonzero \em memory. The SVectorBase%s
+ *   themselves are saved in another memory block referred to as the \em vector \em memory. Both memory blocks will grow
  *   automatically if required, when adding more SVectorBase%s to the set or enlarging SVectorBase%s within the set. For
  *   controlling memory consumption, methods are provided to inquire and reset the size of the memory blocks used for
  *   vectors and nonzeros.

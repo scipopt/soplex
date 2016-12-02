@@ -233,6 +233,7 @@ public:
    {
       m_minReduction = minRed;
    }
+
    //@}
 
    //-------------------------------------
@@ -246,5 +247,9 @@ public:
    //@}
 
 };
+
+/// Pretty-printing of simplifier status
+std::ostream& operator<<( std::ostream& os, const SPxSimplifier::Result& status );
+
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_

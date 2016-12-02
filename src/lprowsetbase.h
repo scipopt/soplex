@@ -59,6 +59,8 @@ private:
 
 protected:
 
+   DataArray < int > scaleExp;   ///< row scaling factors (stored as bitshift)
+
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Helpers */
    //@{
@@ -329,10 +331,10 @@ public:
    }
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to LPRowSetBase.
-   void add(const R& plhs, const SVectorBase<R>& prowVector, const R& prhs, const R& pobj = 0)
+   void add(const R& plhs, const SVectorBase<R>& prowVector, const R& prhs, const R& pobj = 0, const int& pscaleExp = 0)
    {
       DataKey k;
-      add(k, plhs, prowVector, prhs, pobj);
+      add(k, plhs, prowVector, prhs, pobj, pscaleExp);
    }
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to LPRowSetBase.
@@ -377,7 +379,7 @@ public:
 
    /// Adds LPRowBase consisting of left hand side \p lhs, row vector \p rowVector, and right hand side \p rhs to
    /// LPRowSetBase, with DataKey \p key.
-   void add(DataKey& newkey, const R& newlhs, const SVectorBase<R>& newrowVector, const R& newrhs, const R& newobj = 0)
+   void add(DataKey& newkey, const R& newlhs, const SVectorBase<R>& newrowVector, const R& newrhs, const R& newobj = 0, const int& newscaleExp = 0)
    {
       SVSetBase<R>::add(newkey, newrowVector);
 
@@ -386,11 +388,13 @@ public:
          left.reDim(num());
          right.reDim(num());
          object.reDim(num());
+         scaleExp.reSize(num());
       }
 
       left[num() - 1] = newlhs;
       right[num() - 1] = newrhs;
       object[num() - 1] = newobj;
+      scaleExp[num() - 1] = newscaleExp;
    }
 
    ///
@@ -405,6 +409,7 @@ public:
          left.reDim(num());
          right.reDim(num());
          object.reDim(num());
+         scaleExp.reSize(num());
       }
 
       for( int j = 0; i < num(); ++i, ++j )
@@ -412,6 +417,7 @@ public:
          left[i] = newset.lhs(j);
          right[i] = newset.rhs(j);
          object[i] = newset.obj(j);
+         scaleExp[i] = newset.scaleExp[j];
       }
    }
 
@@ -458,25 +464,27 @@ public:
    }
 
    /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
-   SVectorBase<R>& create(int pnonzeros = 0, const R& plhs = 0, const R& prhs = 1, const R& pobj = 0)
+   SVectorBase<R>& create(int pnonzeros = 0, const R& plhs = 0, const R& prhs = 1, const R& pobj = 0, const int& pscaleExp = 0)
    {
       DataKey k;
-      return create(k, pnonzeros, plhs, prhs, pobj);
+      return create(k, pnonzeros, plhs, prhs, pobj, pscaleExp);
    }
 
    /// Creates new LPRowBase with specified parameters and returns a reference to its row vector.
-   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& newlhs = 0, const R& newrhs = 1, const R& newobj = 0)
+   SVectorBase<R>& create(DataKey& newkey, int nonzeros = 0, const R& newlhs = 0, const R& newrhs = 1, const R& newobj = 0, const int& newscaleExp = 0)
    {
       if( num() + 1 > left.dim() )
       {
          left.reDim(num() + 1);
          right.reDim(num() + 1);
          object.reDim(num() + 1);
+         scaleExp.reSize(num() + 1);
       }
 
       left[num()] = newlhs;
       right[num()] = newrhs;
       object[num()] = newobj;
+      scaleExp[num()] = newscaleExp;
 
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
@@ -498,9 +506,11 @@ public:
       left[i] = left[num()];
       right[i] = right[num()];
       object[i] = object[num()];
+      scaleExp[i] = scaleExp[num()];
       left.reDim(num());
       right.reDim(num());
       object.reDim(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes LPRowBase with DataKey \p k.
@@ -523,12 +533,14 @@ public:
             left[perm[i]] = left[i];
             right[perm[i]] = right[i];
             object[perm[i]] = object[i];
+            scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       left.reDim (num());
       right.reDim(num());
       object.reDim(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes \p n LPRowBase%s with row numbers given by \p nums.
@@ -553,12 +565,14 @@ public:
             left[perm[i]] = left[i];
             right[perm[i]] = right[i];
             object[perm[i]] = object[i];
+            scaleExp[perm[i]] = scaleExp[i];
          }
       }
 
       left.reDim (num());
       right.reDim(num());
       object.reDim(num());
+      scaleExp.reSize(num());
    }
 
    /// Removes all LPRowBase%s.
@@ -568,6 +582,7 @@ public:
       left.reDim(num());
       right.reDim(num());
       object.reDim(num());
+      scaleExp.clear();
    }
 
    //@}
@@ -587,6 +602,7 @@ public:
       left.reSize (max());
       right.reSize(max());
       object.reSize(max());
+      scaleExp.reSize(max());
    }
 
    /// Returns number of used nonzero entries.
@@ -650,7 +666,7 @@ public:
     */
    explicit
    LPRowSetBase<R>(int pmax = -1, int pmemmax = -1)
-      : SVSetBase<R>(pmax, pmemmax), left(0), right(0), object(0)
+      : SVSetBase<R>(pmax, pmemmax), left(0), right(0), object(0), scaleExp(0)
    {
       assert(isConsistent());
    }
@@ -664,6 +680,7 @@ public:
          left = rs.left;
          right = rs.right;
          object = rs.object;
+         scaleExp = rs.scaleExp;
 
          assert(isConsistent());
       }
@@ -681,6 +698,7 @@ public:
          left = rs.left;
          right = rs.right;
          object = rs.object;
+         scaleExp = rs.scaleExp;
 
          assert(isConsistent());
       }
@@ -694,6 +712,7 @@ public:
       , left(rs.left)
       , right(rs.right)
       , object(rs.object)
+      , scaleExp(rs.scaleExp)
    {
       assert(isConsistent());
    }
@@ -705,6 +724,7 @@ public:
       , left(rs.left)
       , right(rs.right)
       , object(rs.object)
+      , scaleExp(rs.scaleExp)
    {
       assert(isConsistent());
    }

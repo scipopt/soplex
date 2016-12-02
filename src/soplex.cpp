@@ -86,6 +86,11 @@ namespace soplex
       name[SoPlex::ROWBOUNDFLIPS] = "rowboundflips";
       description[SoPlex::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
       defaultValue[SoPlex::ROWBOUNDFLIPS] = false;
+
+      // use persistent scaling?
+      name[SoPlex::PERSISTENTSCALING] = "persistentscaling";
+      description[SoPlex::PERSISTENTSCALING] = "should persistent scaling be used?";
+      defaultValue[SoPlex::PERSISTENTSCALING] = true;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -117,7 +122,6 @@ namespace soplex
       upper[SoPlex::FACTOR_UPDATE_TYPE] = 1;
       defaultValue[SoPlex::FACTOR_UPDATE_TYPE] = SoPlex::FACTOR_UPDATE_TYPE_FT;
 
-      ///@todo which value?
       // maximum number of updates without fresh factorization
       name[SoPlex::FACTOR_UPDATE_MAX] = "factor_update_max";
       description[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization";
@@ -514,12 +518,15 @@ namespace soplex
       _scalerLeastsq.setOutstream(spxout);
 
       // give lu factorization to solver
-      _solver.setSolver(&_slufactor);
+      _solver.setBasisSolver(&_slufactor);
 
       // the real LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
       // initialized in setSettings() below
       _realLP = &_solver;
       _isRealLPLoaded = true;
+      _isRealLPScaled = false;
+      _optimizeCalls = 0;
+      _unscaleCalls = 0;
       _realLP->setOutstream(spxout);
 
       // initialize statistics
@@ -596,7 +603,7 @@ namespace soplex
          _scalerLeastsq.setOutstream(spxout);
 
          // transfer the lu solver
-         _solver.setSolver(&_slufactor);
+         _solver.setBasisSolver(&_slufactor);
 
          // initialize pointers for simplifier, scaler, and starter
          setIntParam(SoPlex::SIMPLIFIER, intParam(SoPlex::SIMPLIFIER), true);
@@ -633,6 +640,7 @@ namespace soplex
 
          // copy boolean flags
          _isRealLPLoaded = rhs._isRealLPLoaded;
+         _isRealLPScaled = rhs._isRealLPScaled;
          _hasSolReal = rhs._hasSolReal;
          _hasSolRational = rhs._hasSolRational;
          _hasBasis = rhs._hasBasis;
@@ -750,26 +758,22 @@ namespace soplex
 
 
 
-   /// gets row \p i
-   void SoPlex::getRowReal(int i, LPRowReal& lprow) const
+   /// returns (unscaled) coefficient
+   Real SoPlex::coefReal(int row, int col) const
    {
-      assert(_realLP != 0);
-      _realLP->getRow(i, lprow);
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         return _scaler->getCoefUnscaled(*_realLP, row, col);
+      }
+      else
+         return colVectorRealInternal(col)[row];
    }
 
 
 
-   /// gets rows \p start, ..., \p end.
-   void SoPlex::getRowsReal(int start, int end, LPRowSetReal& lprowset) const
-   {
-      assert(_realLP != 0);
-      _realLP->getRows(start, end, lprowset);
-   }
-
-
-
-   /// returns vector of row \p i
-   const SVectorReal& SoPlex::rowVectorReal(int i) const
+   /// returns vector of row \p i, ignoring scaling
+   const SVectorReal& SoPlex::rowVectorRealInternal(int i) const
    {
       assert(_realLP != 0);
       return _realLP->rowVector(i);
@@ -777,11 +781,37 @@ namespace soplex
 
 
 
-   /// returns right-hand side vector
-   const VectorReal& SoPlex::rhsReal() const
+   /// gets vector of row \p i
+   void SoPlex::getRowVectorReal(int i, DSVectorReal& row) const
+   {
+      assert(_realLP);
+
+      if( _realLP->isScaled() )
+      {
+         assert(_scaler);
+         row.setMax(_realLP->rowVector(i).size());
+         _scaler->getRowUnscaled(*_realLP, i, row);
+      }
+      else
+         row = _realLP->rowVector(i);
+   }
+
+
+
+   /// returns right-hand side vector, ignoring scaling
+   const VectorReal& SoPlex::rhsRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->rhs();
+   }
+
+
+
+   /// gets right-hand side vector
+   void SoPlex::getRhsReal(DVectorReal& rhs) const
+   {
+      assert(_realLP);
+      _realLP->getRhsUnscaled(rhs);
    }
 
 
@@ -790,16 +820,25 @@ namespace soplex
    Real SoPlex::rhsReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->rhs(i);
+      return _realLP->rhsUnscaled(i);
    }
 
 
 
-   /// returns left-hand side vector
-   const VectorReal& SoPlex::lhsReal() const
+   /// returns left-hand side vector, ignoring scaling
+   const VectorReal& SoPlex::lhsRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->lhs();
+   }
+
+
+
+   /// gets left-hand side vector
+   void SoPlex::getLhsReal(DVectorReal& lhs) const
+   {
+      assert(_realLP);
+      _realLP->getLhsUnscaled(lhs);
    }
 
 
@@ -808,7 +847,7 @@ namespace soplex
    Real SoPlex::lhsReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->lhs(i);
+      return _realLP->lhsUnscaled(i);
    }
 
 
@@ -822,26 +861,8 @@ namespace soplex
 
 
 
-   /// gets column \p i
-   void SoPlex::getColReal(int i, LPColReal& lpcol) const
-   {
-      assert(_realLP != 0);
-      return _realLP->getCol(i, lpcol);
-   }
-
-
-
-   /// gets columns \p start, ..., \p end
-   void SoPlex::getColsReal(int start, int end, LPColSetReal& lpcolset) const
-   {
-      assert(_realLP != 0);
-      return _realLP->getCols(start, end, lpcolset);
-   }
-
-
-
-   /// returns vector of column \p i
-   const SVectorReal& SoPlex::colVectorReal(int i) const
+   /// returns vector of col \p i, ignoring scaling
+   const SVectorReal& SoPlex::colVectorRealInternal(int i) const
    {
       assert(_realLP != 0);
       return _realLP->colVector(i);
@@ -849,8 +870,17 @@ namespace soplex
 
 
 
+   /// gets vector of col \p i
+   void SoPlex::getColVectorReal(int i, DSVectorReal& col) const
+   {
+      assert(_realLP);
+      _realLP->getColVectorUnscaled(i, col);
+   }
+
+
+
    /// returns upper bound vector
-   const VectorReal& SoPlex::upperReal() const
+   const VectorReal& SoPlex::upperRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->upper();
@@ -862,13 +892,22 @@ namespace soplex
    Real SoPlex::upperReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->upper(i);
+      return _realLP->upperUnscaled(i);
+   }
+
+
+
+   /// gets upper bound vector
+   void SoPlex::getUpperReal(DVectorReal& upper) const
+   {
+      assert(_realLP != 0);
+      return _realLP->getUpperUnscaled(upper);
    }
 
 
 
    /// returns lower bound vector
-   const VectorReal& SoPlex::lowerReal() const
+   const VectorReal& SoPlex::lowerRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->lower();
@@ -880,8 +919,18 @@ namespace soplex
    Real SoPlex::lowerReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->lower(i);
+      return _realLP->lowerUnscaled(i);
    }
+
+
+
+   /// gets lower bound vector
+   void SoPlex::getLowerReal(DVectorReal& lower) const
+   {
+      assert(_realLP != 0);
+      return _realLP->getLowerUnscaled(lower);
+   }
+
 
 
 
@@ -889,7 +938,7 @@ namespace soplex
    void SoPlex::getObjReal(VectorReal& obj) const
    {
       assert(_realLP != 0);
-      _realLP->getObj(obj);
+      _realLP->getObjUnscaled(obj);
    }
 
 
@@ -898,14 +947,14 @@ namespace soplex
    Real SoPlex::objReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->obj(i);
+      return _realLP->objUnscaled(i);
    }
 
 
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
-   const VectorReal& SoPlex::maxObjReal() const
+   const VectorReal& SoPlex::maxObjRealInternal() const
    {
       assert(_realLP != 0);
       return _realLP->maxObj();
@@ -918,7 +967,7 @@ namespace soplex
    Real SoPlex::maxObjReal(int i) const
    {
       assert(_realLP != 0);
-      return _realLP->maxObj(i);
+      return _realLP->maxObjUnscaled(i);
    }
 
 
@@ -1521,7 +1570,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeObj(obj);
+      bool scale = _realLP->isScaled();
+      _realLP->changeObj(obj, scale);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _rationalLP->changeObj(DVectorRational(obj));
@@ -1536,7 +1586,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeObj(i, obj);
+      bool scale = _realLP->isScaled();
+      _realLP->changeObj(i, obj, scale);
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _rationalLP->changeObj(i, obj);
@@ -2669,7 +2720,7 @@ namespace soplex
 
 
    /// solves the LP
-   SPxSolver::Status SoPlex::solve()
+   SPxSolver::Status SoPlex::optimize()
    {
       assert(_isConsistent());
 
@@ -2702,12 +2753,15 @@ namespace soplex
          else
             _solver.setOpttol(realParam(SoPlex::OPTTOL));
 
-         _solveReal();
+         _optimizeReal();
+#ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
+         _checkBasisScaling();
+#endif
       }
       else if( intParam(SoPlex::SYNCMODE) == SYNCMODE_ONLYREAL )
       {
          _syncLPRational();
-         _solveRational();
+         _optimizeRational();
       }
       else if( intParam(SoPlex::SYNCMODE) == SYNCMODE_MANUAL )
       {
@@ -2717,7 +2771,7 @@ namespace soplex
          assert(areLPsInSync(true, false, false));
 #endif
 
-         _solveRational();
+         _optimizeRational();
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
          assert(areLPsInSync(true, true, false));
@@ -2733,7 +2787,7 @@ namespace soplex
          assert(areLPsInSync(true, false, false));
 #endif
 
-         _solveRational();
+         _optimizeRational();
       }
 
       MSG_INFO1( spxout, spxout << "\n";
@@ -2756,7 +2810,7 @@ namespace soplex
    /// is a primal feasible solution available?
    bool SoPlex::hasPrimal() const
    {
-      return (_hasSolReal && _solReal.hasPrimal()) || (_hasSolRational && _solRational.hasPrimal());
+      return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
    }
 
 
@@ -2772,7 +2826,7 @@ namespace soplex
    /// is a dual feasible solution available?
    bool SoPlex::hasDual() const
    {
-      return (_hasSolReal && _solReal.hasDual()) || (_hasSolRational && _solRational.hasDual());
+      return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
    }
 
 
@@ -2916,7 +2970,9 @@ namespace soplex
 
       for( int i = numColsReal() - 1; i >= 0; i-- )
       {
-         Real viol = lowerReal(i) - primal[i];
+         Real lower = _realLP->lowerUnscaled(i);
+         Real upper = _realLP->upperUnscaled(i);
+         Real viol = lower - primal[i];
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -2924,7 +2980,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = primal[i] - upperReal(i);
+         viol = primal[i] - upper;
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -2949,13 +3005,16 @@ namespace soplex
       assert(primal.dim() == numColsReal());
 
       DVectorReal activity(numRowsReal());
-      _realLP->computePrimalActivity(primal, activity);
+      _realLP->computePrimalActivity(primal, activity, true);
       maxviol = 0.0;
       sumviol = 0.0;
 
       for( int i = numRowsReal() - 1; i >= 0; i-- )
       {
-         Real viol = lhsReal(i) - activity[i];
+         Real lhs = _realLP->lhsUnscaled(i);
+         Real rhs = _realLP->rhsUnscaled(i);
+
+         Real viol = lhs - activity[i];
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -2963,7 +3022,7 @@ namespace soplex
                maxviol = viol;
          }
 
-         viol = activity[i] - rhsReal(i);
+         viol = activity[i] - rhs;
          if( viol > 0.0 )
          {
             sumviol += viol;
@@ -3844,7 +3903,7 @@ namespace soplex
             bind[i] = (id.isSPxColId() ? _solver.number(id) : - 1 - _solver.number(id));
          }
       }
-      // for row representation, return the complement of the basis; for this, we need to loop through all rows and columns
+      // for row representation, return the complement of the row basis; for this, we need to loop through all rows and columns
       else
       {
          assert(_solver.rep() == SPxSolver::ROW);
@@ -3906,7 +3965,7 @@ namespace soplex
    }
 
    /// computes row r of basis inverse; returns true on success
-   bool SoPlex::getBasisInverseRowReal(int r, Real* coef, int* inds, int* ninds)
+   bool SoPlex::getBasisInverseRowReal(int r, Real* coef, int* inds, int* ninds, bool unscale)
    {
       assert(r >= 0);
       assert(r < numRowsReal());
@@ -3928,7 +3987,35 @@ namespace soplex
          SSVectorReal x(numRowsReal());
          try
          {
-            _solver.basis().coSolve(x, _solver.unitVector(r));
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+            {
+               /* for information on the unscaling procedure see spxscaler.h */
+
+               int scaleExp;
+               DSVector rhs(_solver.unitVector(r));
+
+               if( _solver.basis().baseId(r).isSPxColId() )
+                  scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
+               else
+                  scaleExp = - _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(r)));
+
+               rhs *= spxLdexp(1.0, scaleExp);
+
+               _solver.basis().coSolve(x, rhs);
+               x.setup();
+               int size = x.size();
+
+               for( int i = 0; i < size; i++ )
+               {
+                  scaleExp = _scaler->getRowScaleExp(x.index(i));
+                  x.scaleValue(x.index(i), scaleExp);
+               }
+            }
+            else
+            {
+               _solver.basis().coSolve(x, _solver.unitVector(r));
+            }
          }
          catch( const SPxException& E )
          {
@@ -3936,7 +4023,7 @@ namespace soplex
             return false;
          }
          // copy sparse data to dense result vector based on coef array
-         if( ninds != NULL && inds != NULL )
+         if( ninds != 0 && inds != 0 )
          {
             // during solving SoPlex may have destroyed the sparsity structure so we need to restore it
             x.setup();
@@ -3986,7 +4073,22 @@ namespace soplex
             assert(!_solver.isRowBasic(index));
 
             // get row vector
-            rhs = _solver.rowVector(index);
+            if( unscale && _solver.isScaled() )
+               _solver.getRowVectorUnscaled(index, rhs);
+            else
+               rhs = _solver.rowVector(index);
+
+            if( unscale && _solver.isScaled() )
+            {
+               for( int i = 0; i < rhs.size(); ++i)
+               {
+                  if( bind[rhs.index(i)] >= 0 )
+                     rhs.value(i) = spxLdexp(rhs.value(i), _scaler->getColScaleExp(rhs.index(i)));
+                  else
+                     rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(rhs.index(i)));
+               }
+            }
+
             rhs *= -1.0;
          }
          // r corresponds to a column vector
@@ -3998,6 +4100,9 @@ namespace soplex
 
             // get unit vector
             rhs = UnitVectorReal(index);
+
+            if( unscale && _solver.isScaled() )
+               rhs *= spxLdexp(1.0, _scaler->getColScaleExp(index));
          }
 
          // solve system "y B = rhs", where B is the row basis matrix
@@ -4026,6 +4131,9 @@ namespace soplex
                assert(bind[r] >= 0 || _solver.number(id) != index);
 
                coef[_solver.number(id)] = y[i];
+
+               if( unscale && _solver.isScaled() )
+                  coef[_solver.number(id)] = spxLdexp(y[i], _scaler->getRowScaleExp(_solver.number(id)));
             }
          }
 
@@ -4050,7 +4158,8 @@ namespace soplex
 
 
    /// computes column c of basis inverse; returns true on success
-   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds)
+   /// @todo does not work correctly for the row representation
+   bool SoPlex::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
    {
       assert(c >= 0);
       assert(c < numRowsReal());
@@ -4069,10 +4178,43 @@ namespace soplex
       if( _solver.rep() == SPxSolver::COLUMN )
       {
          int idx;
-         SSVectorReal x(numColsReal());
+         SSVectorReal x(numRowsReal());
          try
          {
-            _solver.basis().solve(x, _solver.unitVector(c));
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+            {
+               /* for information on the unscaling procedure see spxscaler.h */
+
+               int scaleExp =_scaler->getRowScaleExp(c);
+               DSVector rhs(_solver.unitVector(c));
+               rhs *= spxLdexp(1.0, scaleExp);
+
+               _solver.basis().solve(x, rhs);
+
+               x.setup();
+               int size = x.size();
+
+               for( int i = 0; i < size; i++ )
+               {
+                  if( _solver.basis().baseId(x.index(i)).isSPxColId() )
+                  {
+                     idx = _solver.number(_solver.basis().baseId(x.index(i)));
+                     scaleExp = _scaler->getColScaleExp(idx);
+                     x.scaleValue(x.index(i), scaleExp);
+                  }
+                  else
+                  {
+                     idx = _solver.number(_solver.basis().baseId(x.index(i)));
+                     scaleExp = - _scaler->getRowScaleExp(idx);
+                     x.scaleValue(x.index(i), scaleExp);
+                  }
+               }
+            }
+            else
+            {
+               _solver.basis().solve(x, _solver.unitVector(c));
+            }
          }
          catch( const SPxException& E )
          {
@@ -4080,7 +4222,7 @@ namespace soplex
             return false;
          }
          // copy sparse data to dense result vector based on coef array
-         if( ninds != NULL && inds != NULL )
+         if( ninds != 0 && inds != 0 )
          {
             // SoPlex may have destroyed the sparsity structure so we need to restore it
             x.setup();
@@ -4095,9 +4237,9 @@ namespace soplex
          }
          else
          {
-            VectorReal y(numColsReal(), coef);
+            VectorReal y(numRowsReal(), coef);
             y = x;
-            if( ninds != NULL )
+            if( ninds != 0 )
                *ninds = -1;
          }
       }
@@ -4115,7 +4257,7 @@ namespace soplex
          spx_alloc(bind, numRowsReal());
          getBasisInd(bind);
 
-         // get vector corresponding to requested index r
+         // get vector corresponding to requested index c
          index = bind[c];
 
          // c corresponds to a row vector
@@ -4147,7 +4289,35 @@ namespace soplex
          // solve system "y B = rhs", where B is the row basis matrix
          try
          {
-            _solver.basis().coSolve(y, rhs);
+            /* unscaling required? */
+            if( unscale && _solver.isScaled() )
+            {
+               int size = rhs.size();
+               int scaleExp;
+
+               for( int i = 0; i < size; i++ )
+               {
+                  scaleExp = _scaler->getColScaleExp(i);
+                  rhs.value(i) *= spxLdexp(1.0, scaleExp);
+               }
+
+               _solver.basis().coSolve(y, rhs);
+
+               int rowIdx;
+               size = y.size();
+
+               for( int i = 0; i < size; i++ )
+               {
+                  assert(_solver.basis().baseId(y.index(i)).isSPxRowId());
+                  rowIdx = _solver.basis().baseId(y.index(i)).getIdx();
+                  scaleExp = _scaler->getRowScaleExp(rowIdx);
+                  y.setValue(i, y.value(i) * spxLdexp(1.0, scaleExp));
+               }
+            }
+            else
+            {
+               _solver.basis().coSolve(y, rhs);
+            }
          }
          catch( const SPxException& E )
          {
@@ -4173,7 +4343,7 @@ namespace soplex
             }
          }
 
-         // if r corresponds to a row vector, we have to add a 1 at position r
+         // if c corresponds to a row vector, we have to add a 1 at position c
          if( bind[c] < 0 )
          {
             assert(coef[index] == 0.0);
@@ -4226,6 +4396,7 @@ namespace soplex
       else
       {
          assert(_solver.rep() == SPxSolver::ROW);
+         assert(!_solver.isScaled());
 
          DSVectorReal rowrhs(numColsReal());
          SSVectorReal y(numColsReal());
@@ -4280,7 +4451,8 @@ namespace soplex
                assert(index < numRowsReal());
                assert(!_solver.isRowBasic(index));
 
-               x[i] = v[index] - (rowVectorReal(index) * Vector(numColsReal(), y.get_ptr()));
+               // todo this needs to respect persistent scaling!
+               x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numColsReal(), y.get_ptr()));
             }
             else
             {
@@ -4296,6 +4468,222 @@ namespace soplex
          // free memory
          spx_free(bind);
       }
+      return true;
+   }
+
+
+
+   /// multiply with basis matrix; B * vec (inplace)
+   bool SoPlex::multBasis(Real* vec, bool unscale)
+   {
+      if( !hasBasis() )
+         return false;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.rep() == SPxSolver::COLUMN )
+      {
+         int basisdim = numRowsReal();
+
+         // create Vector from input values
+         Vector x(basisdim, vec);
+
+         if( unscale && _solver.isScaled() )
+         {
+            /* for information on the unscaling procedure see spxscaler.h */
+
+            int scaleExp;
+            for( int i = 0; i < basisdim; ++i)
+            {
+               if( isNotZero(vec[i]) )
+               {
+                  if( _solver.basis().baseId(i).isSPxColId() )
+                     scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
+                  else
+                     scaleExp = _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(i)));
+
+                  vec[i] = spxLdexp(vec[i], scaleExp);
+               }
+            }
+            _solver.basis().multBaseWith(x);
+            for( int i = 0; i < basisdim; ++i)
+            {
+               scaleExp = _scaler->getRowScaleExp(i);
+               vec[i] = spxLdexp(vec[i], -scaleExp);
+            }
+         }
+         else
+            _solver.basis().multBaseWith(x);
+      }
+      else
+      {
+         int colbasisdim = numRowsReal();
+
+         DSVector y(colbasisdim);
+
+         y.clear();
+
+         // create Vector from input values
+         Vector x(colbasisdim, vec);
+
+         int* bind = 0;
+         int index;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, colbasisdim);
+         getBasisInd(bind);
+
+         // temporarily create the column basis and multiply every column with x
+         for( int i = 0; i < colbasisdim; ++i)
+         {
+            if( isNotZero(x[i]) )
+            {
+               // get vector corresponding to requested index i
+               index = bind[i];
+               // r corresponds to a row vector
+               if( index < 0 )
+               {
+                  // transform index to actual row index
+                  index = -index - 1;
+
+                  // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                  assert(index >= 0);
+                  assert(index < numRowsReal());
+                  assert(!_solver.isRowBasic(index));
+
+                  y.add(x[i] * UnitVectorReal(index));
+               }
+               // r corresponds to a column vector
+               else
+               {
+                  // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                  assert(index < numColsReal());
+                  assert(!_solver.isColBasic(index));
+
+                  if( unscale && _solver.isScaled() )
+                  {
+                     DSVector col;
+                     _solver.getColVectorUnscaled(index, col);
+                     y.add(x[i] * col);
+                  }
+
+                  y.add(x[i] * _solver.colVector(index));
+               }
+            }
+         }
+         x = y;
+      }
+
+      return true;
+   }
+
+
+
+   /// multiply with transpose of basis matrix; vec * B^T (inplace)
+   bool SoPlex::multBasisTranspose(Real* vec, bool unscale)
+   {
+      if( !hasBasis() )
+         return false;
+
+      _ensureRealLPLoaded();
+
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.rep() == SPxSolver::COLUMN )
+      {
+         int basisdim = numRowsReal();
+
+         // create Vector from input values
+         Vector x(basisdim, vec);
+
+         if( unscale && _solver.isScaled() )
+         {
+            /* for information on the unscaling procedure see spxscaler.h */
+
+            int scaleExp;
+            for( int i = 0; i < basisdim; ++i)
+            {
+               if( isNotZero(vec[i]) )
+               {
+                  scaleExp = - _scaler->getRowScaleExp(i);
+                  vec[i] = spxLdexp(vec[i], scaleExp);
+               }
+            }
+            _solver.basis().multWithBase(x);
+            for( int i = 0; i < basisdim; ++i)
+            {
+               if( isNotZero(vec[i]) )
+               {
+                  if( _solver.basis().baseId(i).isSPxColId() )
+                     scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
+                  else
+                     scaleExp = _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(i)));
+
+                  vec[i] = spxLdexp(vec[i], scaleExp);
+               }
+            }
+         }
+         else
+            _solver.basis().multWithBase(x);
+      }
+      else
+      {
+         int colbasisdim = numRowsReal();
+
+         DSVector y(colbasisdim);
+
+         // create Vector from input values
+         Vector x(colbasisdim, vec);
+
+         int* bind = 0;
+         int index;
+
+         // get ordering of column basis matrix
+         spx_alloc(bind, colbasisdim);
+         getBasisInd(bind);
+
+         // temporarily create the column basis and multiply every column with x
+         for( int i = 0; i < colbasisdim; ++i)
+         {
+            // get vector corresponding to requested index i
+            index = bind[i];
+            // r corresponds to a row vector
+            if( index < 0 )
+            {
+               // transform index to actual row index
+               index = -index - 1;
+
+               // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+               assert(index >= 0);
+               assert(index < numRowsReal());
+               assert(!_solver.isRowBasic(index));
+
+               y.add(i, x * UnitVectorReal(index));
+            }
+            // r corresponds to a column vector
+            else
+            {
+               // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+               assert(index < numColsReal());
+               assert(!_solver.isColBasic(index));
+
+               if( unscale && _solver.isScaled() )
+               {
+                  DSVector col;
+                  _solver.getColVectorUnscaled(index, col);
+                  y.add(i, x * col);
+               }
+               else
+                  y.add(i, x * _solver.colVector(index));
+            }
+         }
+         x = y;
+      }
+
       return true;
    }
 
@@ -4553,10 +4941,27 @@ namespace soplex
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+   bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
    {
       ///@todo implement return value
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
+
+      ///@todo implement for scaled LP
+#if 0
+      if( unscale && boolParam(SoPlex::PERSISTENTSCALING) )
+      {
+         SPxLPReal* origLP;
+         origLP = 0;
+         spx_alloc(origLP);
+         origLP = new (origLP) SPxLPReal(_realLP);
+         _scaler->unscale(origLP);
+         origLP->writeFile(filename, rowNames, colNames, intVars);
+         origLP->~SdPxLPReal();
+         spx_free(origLP);
+      }
+      else
+#endif
+         _realLP->writeFile(filename, rowNames, colNames, intVars);
+
       return true;
    }
 
@@ -4678,11 +5083,11 @@ namespace soplex
 
       for( int i = 0; i < numCols; i++ )
       {
-         if( lowerReal(i) == upperReal(i) )
+         if( lowerRealInternal(i) == upperRealInternal(i) )
             _basisStatusCols[i] = SPxSolver::FIXED;
-         else if( lowerReal(i) <= double(-realParam(SoPlex::INFTY)) && upperReal(i) >= double(realParam(SoPlex::INFTY)) )
+         else if( lowerRealInternal(i) <= double(-realParam(SoPlex::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlex::INFTY)) )
             _basisStatusCols[i] = SPxSolver::ZERO;
-         else if( lowerReal(i) <= double(-realParam(SoPlex::INFTY)) )
+         else if( lowerRealInternal(i) <= double(-realParam(SoPlex::INFTY)) )
             _basisStatusCols[i] = SPxSolver::ON_UPPER;
          else
             _basisStatusCols[i] = SPxSolver::ON_LOWER;
@@ -4994,6 +5399,8 @@ namespace soplex
          break;
       case ROWBOUNDFLIPS:
          _ratiotesterBoundFlipping.useBoundFlipsRow(value);
+         break;
+      case PERSISTENTSCALING:
          break;
       default:
          return false;
@@ -6648,7 +7055,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->addRow(lprow);
+      bool scale = _realLP->isScaled();
+      _realLP->addRow(lprow, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6665,7 +7073,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->addRow(lhs, lprow, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->addRow(lhs, lprow, rhs, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6682,7 +7091,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->addRows(lprowset);
+      bool scale = _realLP->isScaled();
+      _realLP->addRows(lprowset, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6698,7 +7108,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->addCol(lpcol);
+      bool scale = _realLP->isScaled();
+      _realLP->addCol(lpcol, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6722,7 +7133,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->addCol(obj, lower, lpcol, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->addCol(obj, lower, lpcol, upper, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6739,7 +7151,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->addCols(lpcolset);
+      bool scale = _realLP->isScaled();
+      _realLP->addCols(lpcolset, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6765,7 +7178,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRow(i, lprow);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRow(i, lprow, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6789,7 +7203,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLhs(lhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLhs(lhs, scale);
 
       if( _isRealLPLoaded )
          _hasBasis = (_solver.basis().status() > SPxBasis::NO_PROBLEM);
@@ -6810,7 +7225,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLhs(i, lhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLhs(i, lhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6828,7 +7244,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRhs(rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRhs(rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6851,7 +7268,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRhs(i, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRhs(i, rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6868,7 +7286,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRange(lhs, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRange(lhs, rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6893,7 +7312,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeRange(i, lhs, rhs);
+      bool scale = _realLP->isScaled();
+      _realLP->changeRange(i, lhs, rhs, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6915,7 +7335,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeCol(i, lpcol);
+      bool scale = _realLP->isScaled();
+      _realLP->changeCol(i, lpcol, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6941,7 +7362,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLower(lower);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLower(lower, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6964,7 +7386,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeLower(i, lower);
+      bool scale = _realLP->isScaled();
+      _realLP->changeLower(i, lower, scale);
 
       if( _isRealLPLoaded )
       {
@@ -6981,7 +7404,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeUpper(upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeUpper(upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7004,7 +7428,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeUpper(i, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeUpper(i, upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7021,7 +7446,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeBounds(lower, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeBounds(lower, upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7046,7 +7472,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeBounds(i, lower, upper);
+      bool scale = _realLP->isScaled();
+      _realLP->changeBounds(i, lower, upper, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7068,7 +7495,8 @@ namespace soplex
    {
       assert(_realLP != 0);
 
-      _realLP->changeElement(i, j, val);
+      bool scale = _realLP->isScaled();
+      _realLP->changeElement(i, j, val, scale);
 
       if( _isRealLPLoaded )
       {
@@ -7278,7 +7706,12 @@ namespace soplex
    void SoPlex::_disableSimplifierAndScaler()
    {
       _simplifier = 0;
-      _scaler = 0;
+
+      // preserve scaler when persistent scaling is used
+      if( !_isRealLPScaled )
+         _scaler = 0;
+      else
+         assert(boolParam(SoPlex::PERSISTENTSCALING));
    }
 
 

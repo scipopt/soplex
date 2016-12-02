@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	2.2.1.3
+VERSION		:=	2.2.1.4
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -270,7 +270,8 @@ LIBOBJ		= 	changesoplex.o \
 			statistics.o \
 			usertimer.o \
 			wallclocktimer.o \
-			updatevector.o
+			updatevector.o \
+			testsoplex.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o
