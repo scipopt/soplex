@@ -222,13 +222,11 @@ namespace soplex
          );
 
       //spxout.setVerbosity( SPxOut::DEBUG );
-      MSG_INFO3(spxout, spxout << "Creating the Reduced and Complementary problems." << std::endl );
+      MSG_INFO2(spxout, spxout << "Creating the Reduced and Complementary problems." << std::endl );
 
       // creating copies of the original problem that will be manipulated to form the reduced and complementary
       // problems.
       _createDecompReducedAndComplementaryProblems();
-
-      MSG_INFO3(spxout, spxout << "Forming the Reduced problem." << std::endl );
 
       // creating the initial reduced problem from the basis information
       _formDecompReducedProblem(stop);
@@ -353,7 +351,7 @@ namespace soplex
 
             _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
-            MSG_INFO3(spxout, spxout << "Iteration " << algIterCount
+            MSG_INFO2(spxout, spxout << "Iteration " << algIterCount
                << "Objective Value: " << std::setprecision(10) << _compSolver.objValue()
                << std::endl );
          }
@@ -641,7 +639,7 @@ namespace soplex
    /// forms the reduced problem
    void SoPlex::_formDecompReducedProblem(bool& stop)
    {
-      MSG_INFO3( spxout, spxout << "Forming the reduced problem" << std::endl );
+      MSG_INFO2( spxout, spxout << "Forming the Reduced problem" << std::endl );
       int* nonposind = 0;
       int* compatind = 0;
       int* rowsforremoval = 0;
@@ -675,7 +673,7 @@ namespace soplex
          _getZeroDualMultiplierIndices(_decompFeasVector, nonposind, colsforremoval, &nnonposind, stop);
 
       // get the compatible columns from the constraint matrix w.r.t the current basis matrix
-      MSG_INFO3(spxout, spxout << "Computing the compatible columns" << std::endl
+      MSG_INFO2(spxout, spxout << "Computing the compatible columns" << std::endl
         << "Solving time: " << solveTime() << std::endl );
 
       spx_alloc(compatind, _solver.nRows());
@@ -695,7 +693,7 @@ namespace soplex
          _getCompatibleBoundCons(boundcons, compatboundcons, nonposind, &ncompatboundcons, nnonposind, stop);
 
       // delete rows and columns from the LP to form the reduced problem
-      MSG_INFO3(spxout, spxout << "Deleting rows and columns to form the reduced problem" << std::endl
+      MSG_INFO2(spxout, spxout << "Deleting rows and columns to form the reduced problem" << std::endl
          << "Solving time: " << solveTime() << std::endl );
 
       // allocating memory to add bound constraints
