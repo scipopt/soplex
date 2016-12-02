@@ -84,11 +84,6 @@ namespace soplex
       description[SoPlex::EXPLICITVIOL] = "Should be violations of the original problem be explicitly computed in the decomposition simplex?";
       defaultValue[SoPlex::EXPLICITVIOL] = false;
 
-      /// should the decomposition solve use the SoPlex verbosity?
-      name[SoPlex::DECOMPUSEVERBOSITY] = "decompuseverbosity";
-      description[SoPlex::DECOMPUSEVERBOSITY] = "Should the decomposition simplex use the verbosity set for SoPlex? If false, then the decomposition simplex verbosity if ERROR";
-      defaultValue[SoPlex::DECOMPUSEVERBOSITY] = false;
-
       // should cycling solutions be accepted during iterative refinement?
       name[SoPlex::ACCEPTCYCLING] = "acceptcycling";
       description[SoPlex::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
@@ -306,6 +301,13 @@ namespace soplex
       lower[SoPlex::DECOMP_DISPLAYFREQ] = 1;
       upper[SoPlex::DECOMP_DISPLAYFREQ] = INT_MAX;
       defaultValue[SoPlex::DECOMP_DISPLAYFREQ] = 50;
+
+      // the verbosity of the decomposition based simplex
+      name[SoPlex::DECOMP_VERBOSITY] = "decomp_verbosity";
+      description[SoPlex::DECOMP_VERBOSITY] = "the verbosity of decomposition based simplex (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full).";
+      lower[SoPlex::DECOMP_VERBOSITY] = 1;
+      upper[SoPlex::DECOMP_VERBOSITY] = 5;
+      defaultValue[SoPlex::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
    }
 
    SoPlex::Settings::RealParam::RealParam() {
@@ -5087,8 +5089,6 @@ namespace soplex
          break;
       case EXPLICITVIOL:
          break;
-      case DECOMPUSEVERBOSITY:
-         break;
       case ACCEPTCYCLING:
          break;
       case RATREC:
@@ -5439,6 +5439,29 @@ namespace soplex
       case DECOMP_MAXADDEDROWS:
          break;
       case DECOMP_DISPLAYFREQ:
+         break;
+      case DECOMP_VERBOSITY:
+         switch(value)
+         {
+         case 0:
+            spxout.setDecompVerbosity(SPxOut::ERROR);
+            break;
+         case 1:
+            spxout.setDecompVerbosity(SPxOut::WARNING);
+            break;
+         case 2:
+            spxout.setDecompVerbosity(SPxOut::DEBUG);
+            break;
+         case 3:
+            spxout.setDecompVerbosity(SPxOut::INFO1);
+            break;
+         case 4:
+            spxout.setDecompVerbosity(SPxOut::INFO2);
+            break;
+         case 5:
+            spxout.setDecompVerbosity(SPxOut::INFO3);
+            break;
+         }
          break;
       default:
          return false;

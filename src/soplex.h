@@ -860,9 +860,6 @@ public:
       // simplex
       EXPLICITVIOL = 7,
 
-      /// should the decomposition solve use the SoPlex verbosity?
-      DECOMPUSEVERBOSITY = 8,
-
       /// should cycling solutions be accepted during iterative refinement?
       ACCEPTCYCLING = 9,
 
@@ -966,8 +963,11 @@ public:
       /// the iteration frequency at which the decomposition solve output is displayed.
       DECOMP_DISPLAYFREQ = 26,
 
+      /// the verbosity of the decomposition based simplex
+      DECOMP_VERBOSITY = 27,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 27
+      INTPARAM_COUNT = 28
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -2224,9 +2224,6 @@ private:
 
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
-
-   /// function call to terminate the decomposition simplex
-   void _getDecompPrimalVector(Vector& primal);
 
    //@}
 };

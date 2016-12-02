@@ -249,9 +249,7 @@ namespace soplex
 
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      // only setting the verbosity to ERROR if the global verbosity is not used for the decomposition solve.
-      if( !boolParam(SoPlex::DECOMPUSEVERBOSITY) )
-         spxout.setVerbosity( SPxOut::ERROR );
+      spxout.setVerbosity( spxout.getDecompVerbosity() );
 
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
@@ -4084,13 +4082,5 @@ namespace soplex
       writeBasisFile(filename, rowNames, colNames, cpxFormat);
       _isRealLPLoaded = wasRealLPLoaded;
    }
-
-
-
-   /// function call to terminate the decomposition simplex
-   void SoPlex::_getDecompPrimalVector(Vector& primal)
-   {
-   }
-
 } // namespace soplex
 #endif
