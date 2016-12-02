@@ -16,6 +16,7 @@
 /**@file  soplexmain.cpp
  * @brief Command line interface of SoPlex LP solver
  */
+
 #ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include <math.h>
@@ -1219,9 +1220,9 @@ void print_usage_and_exit( const char* const argv[] )
       " -s0 none     -g0 none          -c0 none*   -p0 Textbook   -t0 Textbook\n"
       " -s1 Main*    -g1 uni-Equi      -c1 Weight  -p1 ParMult    -t1 Harris\n"
       "              -g2 bi-Equi*      -c2 Sum     -p2 Devex      -t2 Fast\n"
-      "              -g3 bi-Equi+Geo1  -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping*\n"
-      "              -g4 bi-Equi+Geo8              -p4 Steep*\n"
-      "              -g5 leastSq                   -p5 Weight\n"
+      "              -g3 Geo1          -c3 Vector  -p3 Hybrid!    -t3 Bound Flipping*\n"
+      "              -g4 Geo8                      -p4 Steep*\n"
+      "                                            -p5 Weight\n"
       "                                            -p6 SteepExactSetup\n"
       ;
 
@@ -1380,7 +1381,6 @@ SPxRatioTester* get_ratio_tester(const int ratiotest, SPxOut* spxout)
 //------------------------------------------------------------------------
 static
 void get_scalers(
-   SPxScaler*& prescaler,
    SPxScaler*& postscaler,
    const int   scaling,
    SPxOut*     spxout
@@ -1389,30 +1389,21 @@ void get_scalers(
 
    switch(scaling)
    {
-   case 5:
-      prescaler  = new SPxLeastSqSC();
-      postscaler = 0;
-      break;
    case 4:
-      prescaler  = new SPxEquiliSC(true);
       postscaler = new SPxGeometSC(8);
       break;
    case 3:
-      prescaler  = new SPxEquiliSC(true);
       postscaler = new SPxGeometSC(1);
       break;
    case 2 :
-      prescaler  = new SPxEquiliSC(true);
-      postscaler = 0;
+      postscaler  = new SPxEquiliSC(true);
       break;
    case 1 :
-      prescaler  = new SPxEquiliSC(false);
-      postscaler = 0;
+      postscaler  = new SPxEquiliSC(false);
       break;
    case 0 :
       /*FALLTHROUGH*/
    default :
-      prescaler  = 0;
       postscaler = 0;
       break;
    }
@@ -1420,16 +1411,12 @@ void get_scalers(
    if ( checkMode )
    {
       MSG_INFO1( (*spxout), (*spxout) << "IEXAMP19 "
-	 << ((prescaler != 0) ? prescaler->getName() : "no")
-	 << " / "
 	 << ((postscaler != 0) ? postscaler->getName() : "no")
 	 << " scaling" << std::endl; )
    }
    else
    {
       MSG_INFO1( (*spxout), (*spxout) << "scaling        = "
-	 << ((prescaler != 0) ? prescaler->getName() : "no")
-	 << " / "
 	 << ((postscaler != 0) ? postscaler->getName() : "no")
 	 << std::endl; )
    }
@@ -1891,7 +1878,6 @@ void print_solution_and_status(
 //------------------------------------------------------------------------
 static
 void clean_up(
-   SPxScaler*&       prescaler,
    SPxScaler*&       postscaler,
    SPxSimplifier*&   simplifier,
    SPxStarter*&      starter,
@@ -1900,11 +1886,6 @@ void clean_up(
    char*&            basisname
    )
 {
-   if ( prescaler != 0 )
-   {
-      delete prescaler;
-      prescaler = 0;
-   }
    if ( postscaler != 0 )
    {
       delete postscaler;
@@ -1949,7 +1930,6 @@ int main(int argc, char* argv[])
    SPxStarter*               starter        = 0;
    SPxPricer*                pricer         = 0;
    SPxRatioTester*           ratiotester    = 0;
-   SPxScaler*                prescaler      = 0;
    SPxScaler*                postscaler     = 0;
 
    SPxOut                    spxout;
@@ -2147,8 +2127,7 @@ int main(int argc, char* argv[])
       assert(work.isConsistent());
 
       // set pre- and postscaler
-      get_scalers(prescaler, postscaler, scaling, work.spxout);
-      work.setPreScaler (prescaler);
+      get_scalers(postscaler, scaling, work.spxout);
       work.setPostScaler(postscaler);
       assert(work.isConsistent());
 
@@ -2167,7 +2146,7 @@ int main(int argc, char* argv[])
                                 print_solution, print_dual, write_basis, basisname);
 
       // clean up
-      clean_up(prescaler, postscaler, simplifier, starter, pricer, ratiotester, basisname);
+      clean_up(postscaler, simplifier, starter, pricer, ratiotester, basisname);
 
       return 0;
    }
@@ -2180,7 +2159,6 @@ int main(int argc, char* argv[])
       delete starter;
       delete pricer;
       delete ratiotester;
-      delete prescaler;
       delete postscaler;
    }
 }

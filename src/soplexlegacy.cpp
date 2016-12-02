@@ -22,7 +22,6 @@ namespace soplex
 {
 SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver::Representation p_rep)
    : m_solver(p_type, p_rep)
-   , m_preScaler(0)
    , m_postScaler(0)
    , m_simplifier(0)
    , m_vanished(false)
@@ -41,15 +40,8 @@ SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver:
 
 SoPlexLegacy::~SoPlexLegacy()
 {
-   assert(!m_freePreScaler || m_preScaler != 0);
    assert(!m_freePostScaler || m_postScaler != 0);
    assert(!m_freeSimplifier || m_simplifier != 0);
-
-   if(m_freePreScaler)
-   {
-      delete m_preScaler;
-      m_preScaler = 0;
-   }
 
    if(m_freePostScaler)
    {
@@ -66,7 +58,6 @@ SoPlexLegacy::~SoPlexLegacy()
 
 SoPlexLegacy& SoPlexLegacy::operator=(const SoPlexLegacy& base)
 {
-   assert(!m_freePreScaler || m_preScaler != 0);
    assert(!m_freePostScaler || m_postScaler != 0);
    assert(!m_freeSimplifier || m_simplifier != 0);
 
@@ -77,23 +68,6 @@ SoPlexLegacy& SoPlexLegacy::operator=(const SoPlexLegacy& base)
       m_solver = base.m_solver;
       m_vanished = base.m_vanished;
       m_solver.setBasisSolver(&m_slu);
-
-      // m_preScaler
-      if(m_freePreScaler)
-      {
-         delete m_preScaler;
-         m_preScaler = 0;
-      }
-      if(base.m_preScaler == 0)
-      {
-         m_preScaler = 0;
-         m_freePreScaler = false;
-      }
-      else
-      {
-         m_preScaler = base.m_preScaler->clone();
-         m_freePreScaler = true;
-      }
 
       // m_postScaler
       if(m_freePostScaler)
@@ -144,18 +118,6 @@ SoPlexLegacy::SoPlexLegacy(const SoPlexLegacy& old)
 {
    m_solver.setBasisSolver(&m_slu);
 
-   // m_preScaler
-   if(old.m_preScaler == 0)
-   {
-      m_preScaler = 0;
-      m_freePreScaler = false;
-   }
-   else
-   {
-      m_preScaler = old.m_preScaler->clone();
-      m_freePreScaler = true;
-   }
-
    // m_postScaler
    if(old.m_postScaler == 0)
    {
@@ -182,22 +144,6 @@ SoPlexLegacy::SoPlexLegacy(const SoPlexLegacy& old)
 }
 
 
-
-void SoPlexLegacy::setPreScaler(SPxScaler* x, const bool destroy)
-{
-
-   assert(!m_freePreScaler || m_preScaler != 0);
-
-   if(m_freePreScaler)
-   {
-      delete m_preScaler;
-      m_preScaler = 0;
-   }
-   m_preScaler = x;
-   if( m_preScaler )
-      m_preScaler->setOutstream(*spxout);
-   m_freePreScaler = destroy;
-}
 
 void SoPlexLegacy::setPostScaler(SPxScaler* x, const bool destroy)
 {
@@ -255,14 +201,6 @@ SPxSolver::Status SoPlexLegacy::solve()
    // keep useful bounds for bfrt
    bool keepbounds = (!strcmp(m_solver.ratiotester()->getName(), "Bound Flipping"));
 
-   // this feature is deprecated and cannot be used anymore due to persistent scaling implementation
-   // that stores the scaling factors within the LP
-#if 0
-   // should the LP be scaled
-   if (m_preScaler != 0)
-      m_preScaler->scale(work);
-#endif
-
    // should the LP be simplified ?
    if (m_simplifier != 0)
    {
@@ -286,7 +224,7 @@ SPxSolver::Status SoPlexLegacy::solve()
 
    // should the LP be scaled after simplifing?
    if (m_postScaler != 0)
-      m_postScaler->scale(work);
+      m_postScaler->scale(work, false);
 
    /* if a basis of correct size was set externally, try to load it into the transformed LP */
    if ( m_colsbasisstatus.size() == work.nCols() && m_rowsbasisstatus.size() == work.nRows() )
@@ -328,10 +266,6 @@ SPxSolver::Status SoPlexLegacy::getPrimal(Vector& x) const
 
       x = m_simplifier->unsimplifiedPrimal();
 
-      // unscale prescaling
-      if (m_preScaler != 0)
-         m_preScaler->unscalePrimal(m_solver, x);
-
       if (m_vanished)
          return SPxSolver::OPTIMAL;
       else
@@ -344,10 +278,6 @@ SPxSolver::Status SoPlexLegacy::getPrimal(Vector& x) const
    // unscale postscaling
    if (m_postScaler != 0)
       m_postScaler->unscalePrimal(m_solver, x);
-
-   // unscale prescaling
-   if (m_preScaler != 0)
-      m_preScaler->unscalePrimal(m_solver, x);
 
    return stat;
 }
@@ -362,10 +292,6 @@ SPxSolver::Status SoPlexLegacy::getSlacks(Vector& s) const
 
       s = m_simplifier->unsimplifiedSlacks();
 
-      // unscale prescaling
-      if (m_preScaler != 0)
-         m_preScaler->unscaleSlacks(m_solver, s);
-
       if (m_vanished)
          return SPxSolver::OPTIMAL;
       else
@@ -378,10 +304,6 @@ SPxSolver::Status SoPlexLegacy::getSlacks(Vector& s) const
    // unscale postscaling
    if (m_postScaler != 0)
       m_postScaler->unscaleSlacks(m_solver, s);
-
-   // unscale prescaling
-   if (m_preScaler != 0)
-      m_preScaler->unscaleSlacks(m_solver, s);
 
    return stat;
 }
@@ -396,10 +318,6 @@ SPxSolver::Status SoPlexLegacy::getDual(Vector& pi) const
 
       pi = m_simplifier->unsimplifiedDual();
 
-      // unscale prescaling
-      if (m_preScaler != 0)
-         m_preScaler->unscaleDual(m_solver, pi);
-
       if (m_vanished)
          return SPxSolver::OPTIMAL;
       else
@@ -412,10 +330,6 @@ SPxSolver::Status SoPlexLegacy::getDual(Vector& pi) const
    // unscale postscaling
    if (m_postScaler != 0)
       m_postScaler->unscaleDual(m_solver, pi);
-
-   // unscale prescaling
-   if (m_preScaler != 0)
-      m_preScaler->unscaleDual(m_solver, pi);
 
    return stat;
 }
@@ -430,10 +344,6 @@ SPxSolver::Status SoPlexLegacy::getRedCost(Vector& rdcost) const
 
       rdcost = m_simplifier->unsimplifiedRedCost();
 
-      // unscale prescaling
-      if (m_preScaler != 0)
-         m_preScaler->unscaleRedCost(m_solver, rdcost);
-
       if (m_vanished)
          return SPxSolver::OPTIMAL;
       else
@@ -446,10 +356,6 @@ SPxSolver::Status SoPlexLegacy::getRedCost(Vector& rdcost) const
    // unscale postscaling
    if (m_postScaler != 0)
       m_postScaler->unscaleRedCost(m_solver, rdcost);
-
-   // unscale prescaling
-   if (m_preScaler != 0)
-      m_preScaler->unscaleRedCost(m_solver, rdcost);
 
    return stat;
 }
@@ -532,9 +438,6 @@ SPxSolver::Status SoPlexLegacy::getPrimalray(Vector& primalray) const
    if (m_postScaler != 0)
       m_postScaler->unscalePrimal(m_solver, primalray);
 
-   if (m_preScaler != 0)
-      m_preScaler->unscalePrimal(m_solver, primalray);
-
    return stat;
 }
 
@@ -551,9 +454,6 @@ SPxSolver::Status SoPlexLegacy::getDualfarkas(Vector& dualfarkas) const
 
    if (m_postScaler != 0)
       m_postScaler->unscaleDual(m_solver, dualfarkas);
-
-   if (m_preScaler != 0)
-      m_preScaler->unscaleDual(m_solver, dualfarkas);
 
    return stat;
 }

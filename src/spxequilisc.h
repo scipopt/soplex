@@ -59,7 +59,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp, bool persistent = true);
+   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false);
    //@}
 };
 } // namespace soplex
