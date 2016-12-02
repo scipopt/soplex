@@ -4419,7 +4419,7 @@ namespace soplex
 
 
    /// sets starting basis via arrays of statuses
-   void SoPlex::setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
+   void SoPlex::setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[])
    {
       _rationalLUSolver.clear();
 

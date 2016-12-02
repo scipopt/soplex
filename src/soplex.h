@@ -749,7 +749,7 @@ public:
    bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
 
    /// sets starting basis via arrays of statuses
-   void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
+   void setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
 
    /// clears starting basis
    void clearBasis();
