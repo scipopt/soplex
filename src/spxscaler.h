@@ -197,6 +197,10 @@ public:
    virtual void unscaleDual(const SPxLPBase<Real>& lp, Vector& pi) const;
    /// unscale dense reduced cost vector given in \p r.
    virtual void unscaleRedCost(const SPxLPBase<Real>& lp, Vector& r) const;
+   /// unscale primal ray given in \p ray.
+   virtual void unscalePrimalray(const SPxLPBase<Real>& lp, Vector& ray) const;
+   /// unscale dual ray given in \p ray.
+   virtual void unscaleDualray(const SPxLPBase<Real>& lp, Vector& ray) const;
    /// apply scaling to objective function vector \p origObj.
    virtual void scaleObj(const SPxLPBase<Real>& lp, VectorReal& origObj) const;
    /// returns scaled objective function coefficient \p origObj.
