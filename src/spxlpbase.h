@@ -142,9 +142,9 @@ public:
    }
 
    /// set whether the LP is scaled or not
-   void setScalingInfo(bool isScaled)
+   void setScalingInfo(bool scaled)
    {
-      _isScaled = isScaled;
+      _isScaled = scaled;
    }
 
    /// Returns number of rows in LP.
