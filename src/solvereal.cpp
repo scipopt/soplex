@@ -634,6 +634,10 @@ namespace soplex
       _scaler->unscaleSlacks(LP, _solReal._slacks);
       _scaler->unscaleDual(LP, _solReal._dual);
       _scaler->unscaleRedCost(LP, _solReal._redCost);
+      if( _solReal.hasPrimalRay() )
+         _scaler->unscalePrimalray(LP, _solReal._primalRay);
+      if( _solReal.hasDualFarkas() )
+         _scaler->unscaleDualray(LP, _solReal._dualFarkas);
    }
 } // namespace soplex
 #endif
