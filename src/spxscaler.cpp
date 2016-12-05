@@ -832,9 +832,11 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
       {
          Real x = spxAbs(vec.value(j));
 
-         if (x < mini)
+         if( isZero(x) )
+            continue;
+         if( x < mini )
             mini = x;
-         if (x > maxi)
+         if( x > maxi )
             maxi = x;
       }
       Real p = maxi / mini;
@@ -864,9 +866,11 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
       {
          Real x = spxAbs(vec.value(j));
 
-         if (x < mini)
+         if( isZero(x) )
+            continue;
+         if( x < mini )
             mini = x;
-         if (x > maxi)
+         if( x > maxi )
             maxi = x;
       }
       Real p = maxi / mini;
