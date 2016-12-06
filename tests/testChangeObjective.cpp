@@ -39,11 +39,11 @@ int main()
    std::istringstream is(lpstr);
    lp.readLPF(is);
 
-   lp.solve();
+   lp.optimize();
    std::cerr << lp.objValue() << std::endl;
 
    lp.changeSense(SoPlex::MINIMIZE);
-   lp.solve();
+   lp.optimize();
    std::cerr << lp.objValue() << std::endl;
 
    return 0;

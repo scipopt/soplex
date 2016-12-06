@@ -47,7 +47,7 @@ namespace soplex
 
 /// Assignment operator.
 /** Assigning an SVectorBase to a VectorBase using operator=() will set all values to 0 except the nonzeros of \p vec.
- *  This is diffent in method assign().
+ *  This is different in method assign().
  */
 
 
@@ -91,7 +91,7 @@ VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
 
 /// Assignment operator.
 /** Assigning an SSVectorBase to a VectorBase using operator=() will set all values to 0 except the nonzeros of \p vec.
- *  This is diffent in method assign().
+ *  This is different in method assign().
  */
 template < class R >
 template < class S >

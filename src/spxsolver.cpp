@@ -65,7 +65,7 @@ void SPxSolver::reLoad()
       theratiotester->clear();
 }
 
-void SPxSolver::loadLP(const SPxLP& lp)
+void SPxSolver::loadLP(const SPxLP& lp, bool initSlackBasis)
 {
    clear();
    unInit();
@@ -77,16 +77,16 @@ void SPxSolver::loadLP(const SPxLP& lp)
       theratiotester->clear();
    SPxLP::operator=(lp);
    reDim();
-   SPxBasis::load(this);
+   SPxBasis::load(this, initSlackBasis);
 }
 
-void SPxSolver::setSolver(SLinSolver* slu, const bool destroy)
+void SPxSolver::setBasisSolver(SLinSolver* slu, const bool destroy)
 {
    // we need to set the outstream before we load the solver to ensure that the basis
    // can be initialized with this pointer in loadSolver()
    assert(spxout != 0);
    slu->spxout = spxout;
-   SPxBasis::loadSolver(slu, destroy);
+   SPxBasis::loadBasisSolver(slu, destroy);
 }
 
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
@@ -521,6 +521,14 @@ void SPxSolver::clear()
    isInfeasibleCo.clear();
 }
 
+void SPxSolver::unscaleLPandReloadBasis()
+{
+   SPxLPBase<Real>::unscaleLP();
+   SPxBasis::invalidate();
+   unInit();
+   init();
+}
+
 void SPxSolver::clearUpdateVecs(void)
 {
    theFvec->clearUpdate();
@@ -894,7 +902,7 @@ Real SPxSolver::value()
    else
       x = SPxLP::spxSense() * (nonbasicValue() + fVec() * coPrhs());
 
-   return x;
+   return x + objOffset();
 }
 
 bool SPxSolver::updateNonbasicValue(Real objChange)

@@ -238,6 +238,17 @@ public:
       assert(isConsistent());
    }
 
+   /// Scale \p i 'th element by a
+   void scaleValue(int i, int scaleExp)
+   {
+      assert(i >= 0);
+      assert(i < DVectorBase<R>::dim());
+
+      VectorBase<R>::val[i] = spxLdexp(VectorBase<R>::val[i], scaleExp);
+
+      assert(isConsistent());
+   }
+
    /// Clears element \p i.
    void clearIdx(int i)
    {

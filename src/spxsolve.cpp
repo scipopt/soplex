@@ -1248,7 +1248,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
          << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
-         << std::setprecision(8) << value() + objOffset();
+         << std::setprecision(8) << value();
          if( getStartingDecompBasis && rep() == SPxSolver::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          (*spxout) << std::endl;
@@ -1344,7 +1344,7 @@ bool SPxSolver::terminate()
    // - MAXIMIZATION Problem
    //   We want stop the solving process if 
    //   objLimit >= current objective value of the DUAL LP
-   if (objLimit < infinity && type() * rep() > 0)
+   if( objLimit < infinity && type() * rep() > 0 )
    {
       // We have no bound shifts; therefore, we can trust the current
       // objective value.
@@ -1354,7 +1354,7 @@ bool SPxSolver::terminate()
       if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         if( spxSense() * (value() + objOffset()) <= spxSense() * objLimit )
+         if( spxSense() * value() <= spxSense() * objLimit )
          {
             MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )

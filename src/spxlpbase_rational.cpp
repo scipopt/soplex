@@ -33,6 +33,119 @@
 
 namespace soplex
 {
+
+template<>
+void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity, const bool unscaled) const
+{
+   if( primal.dim() != nCols() )
+   {
+      throw SPxInternalCodeException("XSPXLP01 Primal vector for computing row activity has wrong dimension");
+   }
+
+   if( activity.dim() != nRows() )
+   {
+      throw SPxInternalCodeException("XSPXLP03 Activity vector computing row activity has wrong dimension");
+   }
+
+   int c;
+
+   for( c = 0; c < nCols() && primal[c] == 0; c++ )
+      ;
+
+   if( c >= nCols() )
+   {
+      activity.clear();
+      return;
+   }
+
+   activity = colVector(c);
+
+   activity *= primal[c];
+   c++;
+
+   for( ; c < nCols(); c++ )
+   {
+      if( primal[c] != 0 )
+      {
+         activity.multAdd(primal[c], colVector(c));
+      }
+   }
+}
+
+template<>
+void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, VectorBase<Rational>& activity, const bool unscaled) const
+{
+   if( dual.dim() != nRows() )
+   {
+      throw SPxInternalCodeException("XSPXLP02 Dual vector for computing dual activity has wrong dimension");
+   }
+
+   if( activity.dim() != nCols() )
+   {
+      throw SPxInternalCodeException("XSPXLP04 Activity vector computing dual activity has wrong dimension");
+   }
+
+   int r;
+
+   for( r = 0; r < nRows() && dual[r] == 0; r++ )
+      ;
+
+   if( r >= nRows() )
+   {
+      activity.clear();
+      return;
+   }
+
+   activity = rowVector(r);
+
+   activity *= dual[r];
+   r++;
+
+   for( ; r < nRows(); r++ )
+   {
+      if( dual[r] != 0 )
+      {
+         activity.multAdd(dual[r], rowVector(r));
+      }
+   }
+}
+
+template<>
+Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const
+{
+   Rational maxi = Rational(0);
+
+   for( int i = 0; i < nCols(); ++i )
+   {
+      Rational m = colVector(i).maxAbs();
+
+      if( m > maxi )
+         maxi = m;
+   }
+
+   assert(maxi >= Rational(0));
+
+   return maxi;
+}
+
+template<>
+Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
+{
+   Rational mini = infinity;
+
+   for( int i = 0; i < nCols(); ++i )
+   {
+      Rational m = colVector(i).minAbs();
+
+      if( m < mini )
+         mini = m;
+   }
+
+   assert(mini >= Rational(0));
+
+   return mini;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Specialization for reading LP format
 // ---------------------------------------------------------------------------------------------------------------------

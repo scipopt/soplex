@@ -320,7 +320,7 @@ void SPxBasis::setRep()
    }
 }
 
-void SPxBasis::load(SPxSolver* lp)
+void SPxBasis::load(SPxSolver* lp, bool initSlackBasis)
 {
    assert(lp != 0);
    theLP = lp;
@@ -329,21 +329,21 @@ void SPxBasis::load(SPxSolver* lp)
 
    setRep();
 
-   restoreInitialBasis();
-
-   loadDesc(thedesc);
+   if( initSlackBasis )
+   {
+      restoreInitialBasis();
+      loadDesc(thedesc);
+   }
 }
 
-void SPxBasis::loadSolver(SLinSolver* p_solver, const bool destroy)
+void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
 {
-
    assert(!freeSlinSolver || factor != 0);
 
    setOutstream(*p_solver->spxout);
 
    MSG_INFO3( (*spxout), (*spxout) << "IBASIS03 loading of Solver invalidates factorization"
                         << std::endl; )
-
 
    if(freeSlinSolver)
    {
@@ -904,7 +904,7 @@ void SPxBasis::factorize()
       factorized = true;
       minStab = factor->stability();
 
-      // This seems allways be about 1e-7 
+      // This seems always to be about 1e-7
       if (minStab > 1e-4)
          minStab *= 0.001;
       if (minStab > 1e-5)

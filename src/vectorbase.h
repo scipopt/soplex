@@ -139,6 +139,47 @@ public:
       return *this;
    }
 
+   /// scale and assign
+   VectorBase<Real>& scaleAssign(int scaleExp, const VectorBase<Real>& vec)
+   {
+      if( this != &vec )
+      {
+         assert(dim() == vec.dim());
+
+         for( int i = 0; i < dimen; i++ )
+            val[i] = spxLdexp(vec[i], scaleExp);
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+   /// scale and assign
+   VectorBase<Real>& scaleAssign(const int* scaleExp, const VectorBase<Real>& vec, bool negateExp = false)
+   {
+      if( this != &vec )
+      {
+         assert(dim() == vec.dim());
+
+         if( negateExp)
+         {
+            for( int i = 0; i < dimen; i++ )
+               val[i] = spxLdexp(vec[i], -scaleExp[i]);
+         }
+         else
+         {
+            for( int i = 0; i < dimen; i++ )
+               val[i] = spxLdexp(vec[i], scaleExp[i]);
+         }
+
+         assert(isConsistent());
+      }
+
+      return *this;
+   }
+
+
    /// Assignment operator.
    /** Assigning an SVectorBase to a VectorBase using operator=() will set all values to 0 except the nonzeros of \p vec.
     *  This is diffent in method assign().

@@ -23,7 +23,7 @@ namespace soplex
 {
 /** Setting up the feasiblity bound for normal primal variables is
     straightforward. However, slack variables need some more details
-    on how we treate them. This is slightly different from usual
+    on how we treat them. This is slightly different from usual
     textbook versions. Let \f$l_i \le A_i^T x \le u_i\f$. This can be
     transformed to \f$A_i^Tx + s_i = 0\f$, with \f$-u_i \le s_i \le
     -l_i\f$. Hence, with this definition of slack variables \f$s_i\f$, we
@@ -49,7 +49,7 @@ void SPxSolver::setPrimalBounds()
    }
 }
 
-/** Seting up the basis for dual simplex requires to install upper and lower
+/** Setting up the basis for dual simplex requires to install upper and lower
     feasibility bounds for dual variables (|Lbound| and |Ubound|). Here is a
     list of how these must be set for inequalities of type \f$l \le a^Tx \le u\f$:
  

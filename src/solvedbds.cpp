@@ -605,7 +605,7 @@ namespace soplex
       // a positive reduced cost.
       _compSolver = _solver;
       _compSolver.setOutstream(spxout);
-      _compSolver.setSolver(&_compSlufactor);
+      _compSolver.setBasisSolver(&_compSlufactor);
 
       // allocating memory for the violated bounds and rows arrays
       _decompViolatedBounds = 0;
@@ -870,7 +870,7 @@ namespace soplex
          {
             solver.reLoad();
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during simplify and solve.\n" );
          }
@@ -1065,10 +1065,10 @@ namespace soplex
             // unscale vectors
             if( _scaler != 0 )
             {
-               _scaler->unscalePrimal(primal);
-               _scaler->unscaleSlacks(slacks);
-               _scaler->unscaleDual(dual);
-               _scaler->unscaleRedCost(redCost);
+               _scaler->unscalePrimal(_solver, primal);
+               _scaler->unscaleSlacks(_solver, slacks);
+               _scaler->unscaleDual(_solver, dual);
+               _scaler->unscaleRedCost(_solver, redCost);
             }
 
             // get basis of transformed problem
@@ -1081,7 +1081,7 @@ namespace soplex
             _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
             _hasBasis = true;
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          }
@@ -1349,7 +1349,7 @@ namespace soplex
             {
                _solver.basis().solve(y, _solver.vector(rowNumber));
             }
-            catch( SPxException E )
+            catch( const SPxException& E )
             {
                MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
             }
@@ -1694,7 +1694,7 @@ namespace soplex
          {
             _solver.basis().solve(y, _solver.vector(i));
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
          }
@@ -1807,7 +1807,7 @@ namespace soplex
       {
          _solver.basis().solve(y, _solver.maxObj());
       }
-      catch( SPxException E )
+      catch( const SPxException& E )
       {
          MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
       }
@@ -1889,7 +1889,7 @@ namespace soplex
          {
             _solver.basis().solve(y, _solver.unitVector(i));
          }
-         catch( SPxException E )
+         catch( const SPxException& E )
          {
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
          }
@@ -2716,7 +2716,7 @@ namespace soplex
            << "Original Problem Objective Value: " << objectiveVal << std::endl );
       }
 
-      _solReal._hasPrimal = true;
+      _solReal._isPrimalFeasible = true;
       _hasSolReal = true;
       // get the primal solutions from the reduced problem
       _solReal._primal.reDim(_solver.nCols());

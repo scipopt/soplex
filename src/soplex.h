@@ -127,23 +127,29 @@ public:
    /// returns biggest non-zero element in absolute value
    Real maxAbsNonzeroReal() const;
 
-   /// gets row \p i
-   void getRowReal(int i, LPRowReal& lprow) const;
+   /// returns (unscaled) coefficient
+   Real coefReal(int row, int col) const;
 
-   /// gets rows \p start, ..., \p end.
-   void getRowsReal(int start, int end, LPRowSetReal& lprowset) const;
+   /// returns vector of row \p i, ignoring scaling
+   const SVectorReal& rowVectorRealInternal(int i) const;
 
-   /// returns vector of row \p i
-   const SVectorReal& rowVectorReal(int i) const;
+   /// gets vector of row \p i
+   void getRowVectorReal(int i, DSVectorReal& row) const;
 
-   /// returns right-hand side vector
-   const VectorReal& rhsReal() const;
+   /// returns right-hand side vector, ignoring scaling
+   const VectorReal& rhsRealInternal() const;
+
+   /// gets right-hand side vector
+   void getRhsReal(DVectorReal& rhs) const;
 
    /// returns right-hand side of row \p i
    Real rhsReal(int i) const;
 
-   /// returns left-hand side vector
-   const VectorReal& lhsReal() const;
+   /// returns left-hand side vector, ignoring scaling
+   const VectorReal& lhsRealInternal() const;
+
+   /// gets left-hand side vector
+   void getLhsReal(DVectorReal& lhs) const;
 
    /// returns left-hand side of row \p i
    Real lhsReal(int i) const;
@@ -151,26 +157,29 @@ public:
    /// returns inequality type of row \p i
    LPRowReal::Type rowTypeReal(int i) const;
 
-   /// gets column \p i
-   void getColReal(int i, LPColReal& lpcol) const;
+   /// returns vector of col \p i, ignoring scaling
+   const SVectorReal& colVectorRealInternal(int i) const;
 
-   /// gets columns \p start, ..., \p end
-   void getColsReal(int start, int end, LPColSetReal& lpcolset) const;
-
-   /// returns vector of column \p i
-   const SVectorReal& colVectorReal(int i) const;
+   /// gets vector of col \p i
+   void getColVectorReal(int i, DSVectorReal& col) const;
 
    /// returns upper bound vector
-   const VectorReal& upperReal() const;
+   const VectorReal& upperRealInternal() const;
 
    /// returns upper bound of column \p i
    Real upperReal(int i) const;
 
+   /// gets upper bound vector
+   void getUpperReal(DVectorReal& upper) const;
+
    /// returns lower bound vector
-   const VectorReal& lowerReal() const;
+   const VectorReal& lowerRealInternal() const;
 
    /// returns lower bound of column \p i
    Real lowerReal(int i) const;
+
+   /// gets lower bound vector
+   void getLowerReal(DVectorReal& lower) const;
 
    /// gets objective function vector
    void getObjReal(VectorReal& obj) const;
@@ -180,7 +189,7 @@ public:
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
-   const VectorReal& maxObjReal() const;
+   const VectorReal& maxObjRealInternal() const;
 
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
@@ -557,8 +566,14 @@ public:
    //**@name Solving and general solution query */
    //@{
 
-   /// solves the LP
-   SPxSolver::Status solve();
+   /// optimize the given LP
+   SPxSolver::Status optimize();
+
+   // old name for backwards compatibility
+   SPxSolver::Status solve()
+   {
+      return optimize();
+   }
 
    /// returns the current solver status
    SPxSolver::Status status() const;
@@ -721,14 +736,24 @@ public:
    /// computes the exact condition number for the current basis matrix using the power method; returns true on success
    bool getExactCondition(Real& condition);
 
-   /// computes row r of basis inverse; returns true on success
-   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL);
+   /// computes row \p r of basis inverse; returns true on success
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
+   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
-   /// computes column c of basis inverse; returns true on success
-   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL);
+   /// computes column \p c of basis inverse; returns true on success
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
+   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
-   /// computes dense solution of basis matrix B * sol = rhs; returns true on success
+   /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
+
+   /// multiply with basis matrix; B * \p vec (inplace)
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
+   bool multBasis(Real* vec, bool unscale = true);
+
+   /// multiply with transpose of basis matrix; \p vec * B^T (inplace)
+   /// @param unscale determines whether the result should be unscaled according to the original LP data
+   bool multBasisTranspose(Real* vec, bool unscale = true);
 
    /// compute rational basis inverse; returns true on success
    bool computeBasisInverseRational();
@@ -749,7 +774,7 @@ public:
    bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
 
    /// sets starting basis via arrays of statuses
-   void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]);
+   void setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
 
    /// clears starting basis
    void clearBasis();
@@ -797,7 +822,7 @@ public:
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = false) const;
 
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
@@ -847,33 +872,35 @@ public:
       RATFAC = 3,
 
       /// should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
-      // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
+      /// SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
       USEDECOMPDUALSIMPLEX = 4,
 
-      // should the degeneracy be computed for each basis?
+      /// should the degeneracy be computed for each basis?
       COMPUTEDEGEN = 5,
 
       /// should the dual of the complementary problem be used in the decomposition simplex?
       USECOMPDUAL = 6,
 
-      /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
-      // simplex
+      /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition simplex
       EXPLICITVIOL = 7,
 
       /// should cycling solutions be accepted during iterative refinement?
-      ACCEPTCYCLING = 9,
+      ACCEPTCYCLING = 8,
 
       /// apply rational reconstruction after each iterative refinement?
-      RATREC = 10,
+      RATREC = 9,
 
       /// round scaling factors for iterative refinement to powers of two?
-      POWERSCALING = 11,
+      POWERSCALING = 10,
 
       /// continue iterative refinement with exact basic solution if not optimal?
-      RATFACJUMP = 12,
+      RATFACJUMP = 11,
 
       /// use bound flipping also for row representation?
-      ROWBOUNDFLIPS = 13,
+      ROWBOUNDFLIPS = 12,
+
+      /// use persistent scaling?
+      PERSISTENTSCALING = 13,
 
       /// number of boolean parameters
       BOOLPARAM_COUNT = 14
@@ -1538,6 +1565,7 @@ private:
 
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
                          // are performed on the original LP.
+   bool _isRealLPScaled;
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
@@ -1764,6 +1792,13 @@ private:
 
    //@}
 
+   //**@name Miscellaneous */
+   //@{
+
+   int  _optimizeCalls;
+   int  _unscaleCalls;
+
+   //@}
 
    //**@name Constant helper methods */
    //@{
@@ -1956,7 +1991,7 @@ private:
    //@{
 
    /// solves rational LP
-   void _solveRational();
+   void _optimizeRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
@@ -2070,7 +2105,7 @@ private:
    //@{
 
    /// solves real LP
-   void _solveReal();
+   void _optimizeReal();
 
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(SPxSimplifier::Result simplificationStatus);
@@ -2081,14 +2116,29 @@ private:
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
    void _resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus);
 
+   /// verify computed solution and resolve if necessary
+   void _verifySolutionReal();
+
    /// stores solution of the real LP; before calling this, the real LP must be loaded in the solver and solved (again)
-   void _storeSolutionReal();
+   void _storeSolutionReal(bool verify = true);
 
-   //@}
+   /// stores solution from the simplifier because problem vanished in presolving step
+   void _storeSolutionRealFromPresol();
 
+   /// unscales stored solution to remove internal or external scaling of LP
+   void _unscaleSolutionReal(SPxLPReal& LP, bool persistent = true);
 
-   //**@name Private solving methods implemented in solvedbds.cpp */
-   //@{
+   /// load original LP and possibly setup a slack basis
+   void _loadRealLP(bool initBasis);
+
+   /// check scaling of LP
+   void _checkScaling(SPxLPReal* origLP) const;
+
+   /// check correctness of (un)scaled basis matrix operations
+   void _checkBasisScaling();
+
+   /// check whether persistent scaling is supposed to be reapplied again after unscaling
+   bool _reapplyPersistentScaling() const;
 
    /// solves LP using the decomposition based dual simplex
    void _solveDecompositionDualSimplex();

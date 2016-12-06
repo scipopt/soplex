@@ -167,7 +167,7 @@ int main(int argc, const char* const argv[])
         SoPlex* lp_cp_pr = new SoPlex(lp_ori);
         try{
 
-           lp_cp_pr->solve();
+           lp_cp_pr->optimize();
            if(lp_cp_pr->status() == SPxSolver::OPTIMAL)
            {
               std::cout << "Lp has been solved to optimality with default settings, objValue is " << lp_cp_pr->objValue() << std::endl;
@@ -215,7 +215,7 @@ int main(int argc, const char* const argv[])
            {
               try{
                  (cnt[stat_idx])++;
-                 lp[current_timepoint][n_type][n_time].solve();
+                 lp[current_timepoint][n_type][n_time].optimize();
                  if(lp[current_timepoint][n_type][n_time].status() == SPxSolver::OPTIMAL)
                  {
                     double absError = abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue);
@@ -291,7 +291,7 @@ int main(int argc, const char* const argv[])
            {
               try{
                  (cnt[stat_idx])++;
-                 lp[current_timepoint][n_type][n_time].solve();
+                 lp[current_timepoint][n_type][n_time].optimize();
                  if(lp[current_timepoint][n_type][n_time].status() == SPxSolver::OPTIMAL)
                  {
                     double absError = abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue);
@@ -338,7 +338,7 @@ int main(int argc, const char* const argv[])
         
         try{
            
-           lp_ori.solve();
+           lp_ori.optimize();
            if(lp_ori.status() == SPxSolver::OPTIMAL)
            {
               std::cout << "The original lp has been solved to optimality with default settings, num of iterations is " 
@@ -393,7 +393,7 @@ int main(int argc, const char* const argv[])
            {
               try{
                  (cnt[stat_idx])++;
-                 lp[current_timepoint][n_type][n_time].solve();
+                 lp[current_timepoint][n_type][n_time].optimize();
                  if(lp[current_timepoint][n_type][n_time].status() == SPxSolver::OPTIMAL)
                  {
                     double absError = abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue);

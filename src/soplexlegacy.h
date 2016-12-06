@@ -48,7 +48,6 @@ protected:
    //   SPxWeightST st;  ///< weight starter
    SLUFactor       m_slu;        ///< LU Factorisation
    SPxSolver       m_solver;     ///< solver
-   SPxScaler*      m_preScaler;  ///< pre-scaler
    SPxScaler*      m_postScaler; ///< post-scaler
    SPxSimplifier*  m_simplifier; ///< simplifier
    bool            m_vanished;   ///< did the presolver solve the problem ?
@@ -125,8 +124,6 @@ public:
    {
       m_solver.setRep(p_rep);
    }
-   /// setup prescaler to use. If \p destroy is true, \p scaler will be freed in destructor.
-   virtual void setPreScaler(SPxScaler* scaler, const bool destroy = false);
    /// setup postscaler to use. If \p destroy is true, \p scaler will be freed in destructor.
    virtual void setPostScaler(SPxScaler* scaler, const bool destroy = false);
    /// setup simplifier to use. If \p destroy is true, \p simpli will be freed in destructor.
@@ -135,11 +132,6 @@ public:
    inline bool has_simplifier() const
    {
       return m_simplifier != 0;
-   }
-   /// has a prescaler been set?
-   inline bool has_prescaler() const
-   {
-      return m_preScaler != 0;
    }
    /// has a postscaler been set?
    inline bool has_postscaler() const

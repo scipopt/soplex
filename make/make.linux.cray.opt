@@ -2,6 +2,6 @@
 # but should be usable on other systems
 # contributed to SCIP 2016 Utz-Uwe Haus <uhaus@cray.com>
 FLAGS		+=	-DNDEBUG -DROUNDING_FE
-OFLAGS		+=	-O3 
+OFLAGS		+=	-O3
 CFLAGS		+=	-h msglevel_1
 CXXFLAGS	+=	-h msglevel_1

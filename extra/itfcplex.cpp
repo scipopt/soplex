@@ -399,7 +399,7 @@ extern "C" int CPXdualopt(CPXENVptr env, CPXLPptr lp)
    if (spx->basis().status() <= 0)
       spx->setType(SoPlex::ENTER);
 
-   spx->solve();
+   spx->optimize();
 
    return 0;
 }
@@ -1076,9 +1076,9 @@ extern "C" int CPXaddcols(
 {
     int                i ;
     LPColSet        cset(ccnt, nzcnt) ;
-    SPxCPLEX*        solve = (SPxCPLEX*)cplex ;
+    SPxCPLEX*        optimize = (SPxCPLEX*)cplex ;
 
-    DSVector        col( solve->nRows() ) ;
+    DSVector        col( optimize->nRows() ) ;
 
     for( i = 0 ; i < ccnt ; ++i )
     {
@@ -1100,21 +1100,21 @@ extern "C" int CPXaddcols(
         cset.add(objx[i], bdl[i], col, bdu[i]) ;
     }
 
-    solve->addCols( cset ) ;
+    optimize->addCols( cset ) ;
     return 0 ;
 }
 
 int delcols (CPXLPptr cplex, int begin, int end )
 {
     int        i ;
-    SPxCPLEX*                solve = (SPxCPLEX*)cplex ;
-    DataArray<int>        del( solve->nRows() ) ;
+    SPxCPLEX*                optimize = (SPxCPLEX*)cplex ;
+    DataArray<int>        del( optimize->nRows() ) ;
 
     for( i = del.size()-1 ; i >= 0 ; --i )
         del[i] = 0 ;
     for( i = begin ; i <= end ; ++i )
         del[i] = -1 ;
-    solve->removeCols( (int*)del ) ;
+    optimize->removeCols( (int*)del ) ;
 
     return 0 ;
 }
@@ -1132,15 +1132,15 @@ int delsetcols (CPXLPptr cplex, int *del)
 #endif
 
     int                i ;
-    SPxCPLEX*        solve = (SPxCPLEX*)cplex ;
+    SPxCPLEX*        optimize = (SPxCPLEX*)cplex ;
 
-    for( i = solve->nCols()-1 ; i >= 0 ; --i )
+    for( i = optimize->nCols()-1 ; i >= 0 ; --i )
         if( del[i] )
             del[i] = -1 ;
 
-    solve->removeCols( del ) ;
+    optimize->removeCols( del ) ;
 
-    for( i = solve->nCols()-1 ; i >= 0 ; --i )
+    for( i = optimize->nCols()-1 ; i >= 0 ; --i )
         del[i] = ( del[i] < 0 ) ? 1 : 0 ;
 
     return 0 ;
@@ -1152,11 +1152,11 @@ int lpwrite   (CPXLPptr cplex, char *name)
     cout << "SPxCPLEX:        lpwrite\n" ;
 #endif
 
-    SPxCPLEX*        solve = (SPxCPLEX*)cplex ;
+    SPxCPLEX*        optimize = (SPxCPLEX*)cplex ;
     ofstream        out( name ) ;
     if( out.good() )
     {
-        out << *solve ;
+        out << *optimize ;
         return 0 ;
     }
 
