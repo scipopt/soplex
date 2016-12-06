@@ -27,7 +27,7 @@ if not len(sys.argv) == 2:
 
 # specify columns for the output (can be modified)
 columns = ['name','rows','cols','pviol','dviol','iters','algiter','ppiv','dpiv','avgpdegen','avgddegen','polish','refs',\
-        'solvetime','value','status']
+        'solvetime','value','redprob','compprob','status']
 
 outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
@@ -224,6 +224,12 @@ for idx, outline in enumerate(outlines):
 
         elif outline.startswith('Algorithm Iterations'):
             instances[instancename]['algiter'] = int(outline.split()[2])
+
+        elif outline.startswith('Red. Problem Status'):
+            instances[instancename]['redprob'] = int(outline.split()[4])
+
+        elif outline.startswith('Comp. Problem Status'):
+            instances[instancename]['compprob'] = int(outline.split()[3])
 
 
 # try parsing solution file
