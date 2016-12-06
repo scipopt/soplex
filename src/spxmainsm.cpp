@@ -12,7 +12,7 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
+#define SOPLEX_DEBUG
 #include <iostream>
 
 #include "spxmainsm.h"
@@ -627,8 +627,10 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
    }
 
    for(int k = 0; k < m_col.size(); ++k)
+   {
       s[m_col.index(k)] = slack[k] + m_col.value(k) * x[m_j];
-
+      std::cout << "s[m_col.index(k)]: " << s[m_col.index(k)] << std::endl;
+   }
    // dual:
    r[m_j] = 0.0;
 
@@ -658,6 +660,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
          cStatus[m_j] = SPxSolver::ON_LOWER;
    }
 
+   std::cout << "x[m_j]: " << x[m_j] << " stat: " <<  cStatus[m_j] << std::endl;
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
    {
@@ -4676,9 +4679,9 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
       {
          m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
       }
-      catch( ... )
+      catch( const SPxException& ex )
       {
-         MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ".\n" );
+         MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ":\n" << ex.what() << "\n" );
          throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
       }
 
