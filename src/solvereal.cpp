@@ -125,7 +125,6 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
-         _hasBasis = true;
          _storeSolutionReal(!_isRealLPLoaded);
          break;
 
@@ -142,7 +141,6 @@ namespace soplex
          }
          else
          {
-            _hasBasis = true;
             _storeSolutionReal(false);
          }
          break;
@@ -172,7 +170,6 @@ namespace soplex
       case SPxSolver::ABORT_VALUE:
       case SPxSolver::REGULAR:
       case SPxSolver::RUNNING:
-         _hasBasis = true;
          _storeSolutionReal(false);
          break;
 
@@ -474,6 +471,8 @@ namespace soplex
       _solver.getDual(_solReal._dual);
       _solver.getRedCost(_solReal._redCost);
 
+      _hasBasis = true;
+
       // get primal and/or dual objective function value depending on status
       _solver.forceRecompNonbasicValue();
       Real objvalue = _solver.objValue();
@@ -505,7 +504,9 @@ namespace soplex
          catch( const SPxException& E )
          {
             MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
+            return;
          }
 
          // copy unsimplified solution data from simplifier (size and dimension is adapted during copy)
