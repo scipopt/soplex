@@ -235,6 +235,7 @@ namespace soplex
       _hasBasis = false;
       bool hasRedBasis = false;
       bool redProbError = false;
+      bool noRedprobIter = false;
       bool explicitviol = boolParam(SoPlex::EXPLICITVIOL);
       int algIterCount = 0;
 
@@ -305,6 +306,7 @@ namespace soplex
             MSG_WARNING( spxout,
                spxout << "WIMDSM02: reduced problem performed zero iterations. Terminating." << std::endl; );
 
+            noRedprobIter = true;
             stop = true;
             break;
          }
@@ -506,7 +508,7 @@ namespace soplex
 
       // if there is a reduced problem error in the first iteration the complementary problme has not been
       // set up. In this case no memory has been allocated for _decompCompProbColIDsIdx and _fixedOrigVars.
-      if( !redProbError || algIterCount > 0 )
+      if( (!redProbError && !noRedprobIter) || algIterCount > 0 )
       {
          spx_free(_decompCompProbColIDsIdx);
          spx_free(_fixedOrigVars);
@@ -575,9 +577,6 @@ namespace soplex
 
          _preprocessAndSolveReal(false);
       }
-
-      // storing the solution from the reduced problem
-      _storeSolutionReal();
 
       // stop timing
       _statistics->solvingTime->stop();
@@ -1063,12 +1062,12 @@ namespace soplex
             solver.getRedCost(redCost);
 
             // unscale vectors
-            if( _scaler != 0 )
+            if( _scaler && solver.isScaled() )
             {
-               _scaler->unscalePrimal(_solver, primal);
-               _scaler->unscaleSlacks(_solver, slacks);
-               _scaler->unscaleDual(_solver, dual);
-               _scaler->unscaleRedCost(_solver, redCost);
+               _scaler->unscalePrimal(solver, primal);
+               _scaler->unscaleSlacks(solver, slacks);
+               _scaler->unscaleDual(solver, dual);
+               _scaler->unscaleRedCost(solver, redCost);
             }
 
             // get basis of transformed problem

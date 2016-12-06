@@ -2788,6 +2788,7 @@ namespace soplex
          setIntParam(SoPlex::SOLVEMODE, SOLVEMODE_REAL);
          setIntParam(SoPlex::REPRESENTATION, REPRESENTATION_ROW);
          setIntParam(SoPlex::ALGORITHM, ALGORITHM_DUAL);
+         //setBoolParam(SoPlex::PERSISTENTSCALING, false);
 
          _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
