@@ -530,6 +530,12 @@ namespace soplex
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = true;
       }
+      // load realLP into the solver again (internal scaling was applied)
+      else if( _realLP != &_solver )
+      {
+         assert(_solver.isScaled());
+         _loadRealLP(false);
+      }
 
       // unscale stored solution (removes persistent scaling)
       if( _isRealLPScaled )
