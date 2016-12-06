@@ -333,7 +333,7 @@ void SPxDevexPR::left4(int n, SPxId id)
 #ifndef NDEBUG
       if (spxAbs(rhoVec[n]) < theeps)
       {
-         MSG_ERROR( std::cerr << "WDEVEX01: rhoVec = "
+         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WDEVEX01: rhoVec = "
                            << rhoVec[n] << " with smaller absolute value than theeps = " << theeps << std::endl; )
       }
 #endif  // NDEBUG
