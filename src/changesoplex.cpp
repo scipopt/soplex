@@ -820,7 +820,7 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
 
 void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 {
-   Real oldLower = lower(i);
+   Real oldLower = lowerUnscaled(i);
 
    if (NE(newLower, oldLower))
    {
@@ -925,7 +925,7 @@ void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
 
 void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 {
-   Real oldUpper = upper(i);
+   Real oldUpper = upperUnscaled(i);
 
    if (newUpper != oldUpper)
    {
@@ -1041,7 +1041,7 @@ void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
 
 void SPxSolver::changeLhs(int i, const Real& newLhs, bool scale)
 {
-   Real oldLhs = lhs(i);
+   Real oldLhs = lhsUnscaled(i);
 
    if (newLhs != oldLhs)
    {
@@ -1143,7 +1143,7 @@ void SPxSolver::changeRhs(const Vector& newRhs, bool scale)
 
 void SPxSolver::changeRhs(int i, const Real& newRhs, bool scale)
 {
-   Real oldRhs = rhs(i);
+   Real oldRhs = rhsUnscaled(i);
 
    if (newRhs != oldRhs)
    {

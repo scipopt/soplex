@@ -41,9 +41,6 @@ void SPxLPBase<Real>::unscaleLP()
       lp_scaler->unscale(*this);
    else
       MSG_INFO3( (*spxout), (*spxout) << "no LP scaler available" << std::endl; )
-
-   LPColSetBase<Real>::scaleExp.clear();
-   LPRowSetBase<Real>::scaleExp.clear();
 }
 
 template<>
