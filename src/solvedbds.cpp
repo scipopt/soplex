@@ -414,7 +414,7 @@ namespace soplex
 
             // updating the reduced problem with the original problem violated rows
             if( !stop )
-               _updateDecompReducedProblemViol(true);
+               _updateDecompReducedProblemViol(false);
          }
 
 
@@ -1326,8 +1326,8 @@ namespace soplex
       Real bestrownorm = infinity;
       Real percenttoadd = 1;
 
-      int nrowstoadd = 1;  // adding the most violated row
-      //if( allrows )
+      int nrowstoadd = MINIMUM(intParam(SoPlex::DECOMP_MAXADDEDROWS), _nDecompViolRows);
+      if( allrows )
          nrowstoadd = _nDecompViolRows;   // adding all violated rows
 
       SSVector y(_solver.nCols());
