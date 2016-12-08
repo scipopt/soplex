@@ -97,7 +97,7 @@ namespace soplex
       case SPxSimplifier::INFEASIBLE:
       case SPxSimplifier::DUAL_INFEASIBLE:
       case SPxSimplifier::UNBOUNDED:
-         MSG_INFO3( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
+         MSG_INFO1( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
          _hasBasis = false;
          _preprocessAndSolveReal(false);
          return;
