@@ -134,12 +134,12 @@ public:
    /// returns the maximal index.
    int dim() const;
 
-   /// returns the position number of index \p i.
-   /** Returns the number of the first index \p i. If no index \p i is
+   /// returns the position of index \p i.
+   /** Returns the position of the first index \p i. If no index \p i is
        available in the #IdxSet, -1 is returned. Otherwise,
-       index(number(\p i)) == \p i holds.
+       index(pos(\p i)) == \p i holds.
     */
-   int number(int i) const;
+   int pos(int i) const;
    //@}
 
    //---------------------------------------

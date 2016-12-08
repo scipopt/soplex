@@ -29,7 +29,7 @@ int IdxSet::dim() const
    return ddim; 
 }
 
-int IdxSet::number(int i) const
+int IdxSet::pos(int i) const
 {
    for(int n = 0; n < size(); n++)
       if (idx[n] == i)

@@ -187,12 +187,12 @@ public:
       return VectorBase<R>::val[idx[n]];
    }
 
-   /// Returns the position number of index \p i, or -1 if \p i doesn't exist.
-   int number(int i) const
+   /// Returns the position of index \p i, or -1 if \p i doesn't exist.
+   int pos(int i) const
    {
       assert(isSetup());
 
-      return IdxSet::number(i);
+      return IdxSet::pos(i);
    }
 
    /// Returns the number of nonzeros.
@@ -208,7 +208,7 @@ public:
    void add(int i, R x)
    {
       assert(VectorBase<R>::val[i] == R(0));
-      assert(number(i) < 0);
+      assert(pos(i) < 0);
 
       addIdx(i);
       VectorBase<R>::val[i] = x;
@@ -222,7 +222,7 @@ public:
 
       if( isSetup() )
       {
-         int n = number(i);
+         int n = pos(i);
 
          if( n < 0 )
          {
@@ -254,7 +254,7 @@ public:
    {
       if( isSetup() )
       {
-         int n = number(i);
+         int n = pos(i);
 
          if( n >= 0 )
             remove(n);
@@ -626,7 +626,7 @@ public:
       {
          for( int i = 0; i < VectorBase<R>::dim(); ++i )
          {
-            int j = number(i);
+            int j = pos(i);
 
             if( j < 0 && spxAbs(VectorBase<R>::val[i]) > 0 )
             {
