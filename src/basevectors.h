@@ -80,7 +80,10 @@ inline
 VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
 {
    for( int i = vec.size() - 1; i >= 0; --i )
+   {
+      assert(vec.index(i) < dim());
       val[vec.index(i)] = vec.value(i);
+   }
 
    assert(isConsistent());
 
@@ -376,7 +379,9 @@ template < class S >
 inline
 DVectorBase<R>& DVectorBase<R>::operator=(const SVectorBase<S>& vec)
 {
-   if( vec.dim() != VectorBase<R>::dim() )
+   // dim() of SVector is not the actual dimension, rather the largest index plus 1
+   // avoiding the reDim() saves unnecessary clearing of values
+   if( vec.dim() > VectorBase<R>::dim() )
       reDim(vec.dim());
 
    VectorBase<R>::operator=(vec);
