@@ -89,27 +89,17 @@ namespace soplex
    /// checks result of the solving process and solves again without preprocessing if necessary
    void SoPlex::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
    {
-      // if the simplifier detected infeasibility or unboundedness we don't optimize again
-      // just to get the proof (primal or dual ray) but instead terminate
+      // if the simplifier detected infeasibility or unboundedness we optimize again
+      // just to get the proof (primal or dual ray)
       // todo get infeasibility proof from simplifier
       switch( simplificationStatus )
       {
       case SPxSimplifier::INFEASIBLE:
-         _status = SPxSolver::INFEASIBLE;
-         _loadRealLP(false);
-         _hasBasis = false;
-         return;
-
       case SPxSimplifier::DUAL_INFEASIBLE:
-         _status = SPxSolver::INForUNBD;
-         _loadRealLP(false);
-         _hasBasis = false;
-         return;
-
       case SPxSimplifier::UNBOUNDED:
-         _status = SPxSolver::UNBOUNDED;
-         _loadRealLP(false);
+         MSG_INFO1( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
          _hasBasis = false;
+         _preprocessAndSolveReal(false);
          return;
 
       case SPxSimplifier::VANISHED:
