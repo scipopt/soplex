@@ -3375,8 +3375,6 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
    DVector upLocks(lp.nCols());
    DVector downLocks(lp.nCols());
 
-   lp.writeFile("debug.lp");
-
    for(int j = lp.nCols()-1; j >= 0; --j)
    {
       // setting the locks on the variables
