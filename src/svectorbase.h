@@ -179,7 +179,7 @@ public:
    }
 
    /// Position of index \p i.
-   /** @return The position of the first index \p i. If no index \p i is available in the IdxSet, -1 is
+   /** @return Finds the position of the first index \p i in the #IdxSet. If no index \p i is available in the #IdxSet, -1 is
     *          returned. Otherwise, index(pos(i)) == i holds.
     */
    int pos(int i) const

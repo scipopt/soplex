@@ -187,7 +187,7 @@ public:
       return VectorBase<R>::val[idx[n]];
    }
 
-   /// Returns the position of index \p i, or -1 if \p i doesn't exist.
+   /// Finds the position of index \p i in the #IdxSet, or -1 if \p i doesn't exist.
    int pos(int i) const
    {
       assert(isSetup());

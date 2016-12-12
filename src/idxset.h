@@ -135,7 +135,7 @@ public:
    int dim() const;
 
    /// returns the position of index \p i.
-   /** Returns the position of the first index \p i. If no index \p i is
+   /** Finds the position of the first index \p i in the #IdxSet. If no index \p i is
        available in the #IdxSet, -1 is returned. Otherwise,
        index(pos(\p i)) == \p i holds.
     */
