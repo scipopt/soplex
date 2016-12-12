@@ -3481,8 +3481,8 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
                   assert(LE(minVal, maxVal));
 
                   // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
-                  if ((minVal > -infinity && GT(minVal, lower, opttol()))
-                     && (maxVal < infinity && LT(maxVal, upper, opttol())))
+                  if ((minVal > -infinity && GT(minVal, lower, feastol()))
+                     && (maxVal < infinity && LT(maxVal, upper, feastol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = true;
@@ -3501,8 +3501,8 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
 
                   assert(LE(minVal, maxVal));
 
-                  if ((minVal > -infinity && GT(minVal, lower, opttol()))
-                     && (maxVal < infinity && LT(maxVal, upper, opttol())))
+                  if ((minVal > -infinity && GT(minVal, lower, feastol()))
+                     && (maxVal < infinity && LT(maxVal, upper, feastol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = false;
