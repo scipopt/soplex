@@ -300,7 +300,7 @@ namespace soplex
       defaultValue[SoPlex::DECOMP_MAXADDEDROWS] = 500;
 
       // maximum number of violated rows added in each iteration of the decomposition simplex
-      name[SoPlex::DECOMP_DISPLAYFREQ] = "decompdisplayfreq";
+      name[SoPlex::DECOMP_DISPLAYFREQ] = "decomp_displayfreq";
       description[SoPlex::DECOMP_DISPLAYFREQ] = "the frequency that the decomposition based simplex status output is displayed.";
       lower[SoPlex::DECOMP_DISPLAYFREQ] = 1;
       upper[SoPlex::DECOMP_DISPLAYFREQ] = INT_MAX;
