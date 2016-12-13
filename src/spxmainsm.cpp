@@ -682,7 +682,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       s[m_i] = 0.0;
    else if (s[m_i] >= soplex::infinity)
       // this is a fix for a highly ill conditioned instance that is "solved" in presolving (ilaser0 from MINLP, mittelmann)
-      throw SPxException("Simplifier: scaling factor is too big - aborting unsimplification");
+      throw SPxException("Simplifier: infinite activities - aborting unsimplification");
 
    Real scale1 = maxAbs(m_lhs, s[m_i]);
    Real scale2 = maxAbs(m_rhs, s[m_i]);
