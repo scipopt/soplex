@@ -177,7 +177,7 @@ do
             fi
         fi
 
-        if "$DECOMP" = "1"
+        if test "$DECOMP" = "1"
         then
             ./evaluation.py -d $OUTFILE | tee $RESFILE
         else
