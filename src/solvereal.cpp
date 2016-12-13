@@ -576,6 +576,7 @@ namespace soplex
       {
          MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
          _preprocessAndSolveReal(false);
+         return;
       }
 
       // copy unsimplified solution data from simplifier
