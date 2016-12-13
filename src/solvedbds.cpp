@@ -224,6 +224,12 @@ namespace soplex
       //spxout.setVerbosity( SPxOut::DEBUG );
       MSG_INFO2(spxout, spxout << "Creating the Reduced and Complementary problems." << std::endl );
 
+      // setting the verbosity level
+      const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
+      const SPxOut::Verbosity decomp_verbosity = (SPxOut::Verbosity)intParam(SoPlex::DECOMP_VERBOSITY);
+      if( decomp_verbosity < orig_verbosity )
+         spxout.setVerbosity( decomp_verbosity );
+
       // creating copies of the original problem that will be manipulated to form the reduced and complementary
       // problems.
       _createDecompReducedAndComplementaryProblems();
@@ -248,10 +254,6 @@ namespace soplex
          _statistics->redProbStatus = SPxSolver::NOT_INIT;
       }
 
-      // setting the verbosity level
-      const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      spxout.setVerbosity( spxout.getDecompVerbosity() );
-
       // the main solving loop of the decomposition simplex.
       // This loop solves the Reduced problem, and if the problem is feasible, the complementary problem is solved.
       while( !stop )
@@ -262,6 +264,7 @@ namespace soplex
          _currentProb = DECOMP_RED;
 
          // solve the reduced problem
+
          MSG_INFO2(spxout,
             spxout << std::endl
             << "=========================" << std::endl
@@ -753,6 +756,7 @@ namespace soplex
          SPxLPReal compDualLP;
          _compSolver.buildDualProblem(compDualLP, _decompPrimalRowIDs.get_ptr(), _decompPrimalColIDs.get_ptr(),
                _decompDualRowIDs.get_ptr(), _decompDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
+         compDualLP.setOutstream(spxout);
 
          // setting the id index array for the complementary problem
          for( int i = 0; i < _nPrimalRows; i++ )

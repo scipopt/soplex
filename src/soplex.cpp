@@ -5849,27 +5849,6 @@ namespace soplex
       case DECOMP_DISPLAYFREQ:
          break;
       case DECOMP_VERBOSITY:
-         switch(value)
-         {
-         case 0:
-            spxout.setDecompVerbosity(SPxOut::ERROR);
-            break;
-         case 1:
-            spxout.setDecompVerbosity(SPxOut::WARNING);
-            break;
-         case 2:
-            spxout.setDecompVerbosity(SPxOut::DEBUG);
-            break;
-         case 3:
-            spxout.setDecompVerbosity(SPxOut::INFO1);
-            break;
-         case 4:
-            spxout.setDecompVerbosity(SPxOut::INFO2);
-            break;
-         case 5:
-            spxout.setDecompVerbosity(SPxOut::INFO3);
-            break;
-         }
          break;
       default:
          return false;

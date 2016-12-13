@@ -120,18 +120,6 @@ public:
       return m_verbosity;
    }
 
-   virtual void
-   setDecompVerbosity( const Verbosity& v )
-   {
-      m_decompverbosity = v;
-   }
-   ///
-   inline Verbosity
-   getDecompVerbosity()
-      const
-   {
-      return m_decompverbosity;
-   }
    //@}
 
    //----------------------------------------
@@ -187,8 +175,6 @@ private:
    //@{
    /// verbosity level
    Verbosity               m_verbosity;
-   /// the verbosity level for the decomposition based simplex
-   Verbosity               m_decompverbosity;
    /// array of pointers to internal streams, indexed by verbosity level
    std::ostream**          m_streams;
    //@}
