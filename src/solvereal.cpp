@@ -89,27 +89,17 @@ namespace soplex
    /// checks result of the solving process and solves again without preprocessing if necessary
    void SoPlex::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
    {
-      // if the simplifier detected infeasibility or unboundedness we don't optimize again
-      // just to get the proof (primal or dual ray) but instead terminate
+      // if the simplifier detected infeasibility or unboundedness we optimize again
+      // just to get the proof (primal or dual ray)
       // todo get infeasibility proof from simplifier
       switch( simplificationStatus )
       {
       case SPxSimplifier::INFEASIBLE:
-         _status = SPxSolver::INFEASIBLE;
-         _loadRealLP(false);
-         _hasBasis = false;
-         return;
-
       case SPxSimplifier::DUAL_INFEASIBLE:
-         _status = SPxSolver::INForUNBD;
-         _loadRealLP(false);
-         _hasBasis = false;
-         return;
-
       case SPxSimplifier::UNBOUNDED:
-         _status = SPxSolver::UNBOUNDED;
-         _loadRealLP(false);
+         MSG_INFO1( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
          _hasBasis = false;
+         _preprocessAndSolveReal(false);
          return;
 
       case SPxSimplifier::VANISHED:
@@ -125,7 +115,6 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
-         _hasBasis = true;
          _storeSolutionReal(!_isRealLPLoaded);
          break;
 
@@ -142,7 +131,6 @@ namespace soplex
          }
          else
          {
-            _hasBasis = true;
             _storeSolutionReal(false);
          }
          break;
@@ -172,7 +160,6 @@ namespace soplex
       case SPxSolver::ABORT_VALUE:
       case SPxSolver::REGULAR:
       case SPxSolver::RUNNING:
-         _hasBasis = true;
          _storeSolutionReal(false);
          break;
 
@@ -474,6 +461,8 @@ namespace soplex
       _solver.getDual(_solReal._dual);
       _solver.getRedCost(_solReal._redCost);
 
+      _hasBasis = true;
+
       // get primal and/or dual objective function value depending on status
       _solver.forceRecompNonbasicValue();
       Real objvalue = _solver.objValue();
@@ -505,7 +494,9 @@ namespace soplex
          catch( const SPxException& E )
          {
             MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> during unsimplification. Resolving without simplifier and scaler.\n" );
+            _hasBasis = false;
             _preprocessAndSolveReal(false);
+            return;
          }
 
          // copy unsimplified solution data from simplifier (size and dimension is adapted during copy)
@@ -528,6 +519,12 @@ namespace soplex
          _solver.setBasisStatus(SPxBasis::REGULAR);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = true;
+      }
+      // load realLP into the solver again (internal scaling was applied)
+      else if( _realLP != &_solver )
+      {
+         assert(_solver.isScaled());
+         _loadRealLP(false);
       }
 
       // unscale stored solution (removes persistent scaling)

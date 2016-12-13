@@ -65,7 +65,7 @@ void SPxSolver::computeFrhs()
                   continue;
 
                case (SPxBasis::Desc::P_FIXED) :
-                  assert(lhs(i) == rhs(i));
+                  assert(EQ(lhs(i), rhs(i)));
                   //lint -fallthrough
                case SPxBasis::Desc::P_ON_UPPER :
                   x = rhs(i);
@@ -166,7 +166,7 @@ void SPxSolver::computeFrhsXtra()
             continue;
 
          case (SPxBasis::Desc::P_FIXED) :
-            assert(SPxLP::lower(i) == SPxLP::upper(i));
+            assert(EQ(SPxLP::lower(i), SPxLP::upper(i)));
             //lint -fallthrough
          case SPxBasis::Desc::P_ON_UPPER :
             x = SPxLP::upper(i);
@@ -227,7 +227,7 @@ void SPxSolver::computeFrhs1(
             break;
 
          case (SPxBasis::Desc::P_FIXED) :
-            assert(lfb[i] == ufb[i]);
+            assert(EQ(lfb[i], ufb[i]));
          case (SPxBasis::Desc::D_ON_BOTH) :
             x = lfb[i];
             break;
@@ -288,7 +288,7 @@ void SPxSolver::computeFrhs2(
                MSG_WARNING( (*spxout), (*spxout) << "WSVECS04 Frhs2[" << i << "]: " << stat << " "
                                    << colfb[i] << " " << coufb[i]
                                    << " shouldn't be" << std::endl; )
-               if( colfb[i] == 0.0 || coufb[i] == 0.0 )
+               if( isZero(colfb[i]) || isZero(coufb[i]) )
                   colfb[i] = coufb[i] = 0.0;
                else
                {
@@ -296,7 +296,7 @@ void SPxSolver::computeFrhs2(
                   colfb[i] = coufb[i] = mid;
                }
             }
-            assert(colfb[i] == coufb[i]);
+            assert(EQ(colfb[i], coufb[i]));
             x = colfb[i];
             break;
 
@@ -343,7 +343,7 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
    // rowwise representation:
    case SPxBasis::Desc::P_FIXED :
       assert(lhs(n) > -infinity);
-      assert(rhs(n) == lhs(n));
+      assert(EQ(rhs(n), lhs(n)));
       //lint -fallthrough
    case SPxBasis::Desc::P_ON_UPPER :
       assert(rep() == ROW);
@@ -372,7 +372,7 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
    {
       // rowwise representation:
    case SPxBasis::Desc::P_FIXED :
-      assert(SPxLP::upper(n) == SPxLP::lower(n));
+      assert(EQ(SPxLP::upper(n), SPxLP::lower(n)));
       assert(SPxLP::lower(n) > -infinity);
       //lint -fallthrough
    case SPxBasis::Desc::P_ON_UPPER :
@@ -425,7 +425,7 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
    case SPxBasis::Desc::D_ON_BOTH :
    case SPxBasis::Desc::P_FIXED :
       assert(theLRbound[n] > -infinity);
-      assert(theURbound[n] == theLRbound[n]);
+      assert(EQ(theURbound[n], theLRbound[n]));
       //lint -fallthrough
    case SPxBasis::Desc::D_ON_UPPER :
    case SPxBasis::Desc::P_ON_UPPER :
@@ -455,7 +455,7 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
    case SPxBasis::Desc::D_ON_BOTH :
    case SPxBasis::Desc::P_FIXED :
       assert(theLCbound[n] > -infinity);
-      assert(theUCbound[n] == theLCbound[n]);
+      assert(EQ(theUCbound[n], theLCbound[n]));
       //lint -fallthrough
    case SPxBasis::Desc::D_ON_LOWER :
    case SPxBasis::Desc::P_ON_UPPER :

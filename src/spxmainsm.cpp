@@ -1511,7 +1511,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
                SVector& row = lp.rowVector_w(col.index(i));
 
                // this changes col.size()
-               row.remove(row.number(j));
+               row.remove(row.pos(j));
                col.remove(i);
 
                MSG_INFO3( (*spxout), (*spxout) << "IMAISM04 aij=" << aij
@@ -3481,8 +3481,8 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
                   assert(LE(minVal, maxVal));
 
                   // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
-                  if ((minVal > -infinity && GT(minVal, lower, opttol()))
-                     && (maxVal < infinity && LT(maxVal, upper, opttol())))
+                  if ((minVal > -infinity && GT(minVal, lower, feastol()))
+                     && (maxVal < infinity && LT(maxVal, upper, feastol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = true;
@@ -3501,8 +3501,8 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
 
                   assert(LE(minVal, maxVal));
 
-                  if ((minVal > -infinity && GT(minVal, lower, opttol()))
-                     && (maxVal < infinity && LT(maxVal, upper, opttol())))
+                  if ((minVal > -infinity && GT(minVal, lower, feastol()))
+                     && (maxVal < infinity && LT(maxVal, upper, feastol())))
                   {
                      bestpos = col.index(k);
                      bestislhs = false;
@@ -3547,7 +3547,7 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
                   {
                      if(bestRow.index(l) != j)
                      {
-                        if(lp.rowVector(rowNumber).number(bestRow.index(l)) >= 0)
+                        if(lp.rowVector(rowNumber).pos(bestRow.index(l)) >= 0)
                            lp.changeElement(rowNumber, bestRow.index(l), updateRow[bestRow.index(l)]
                               - updateRow[j]*bestRow.value(l)/aggAij);
                         else
@@ -4676,9 +4676,9 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
       {
          m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
       }
-      catch( ... )
+      catch( const SPxException& ex )
       {
-         MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ".\n" );
+         MSG_INFO1( (*spxout), (*spxout) << "Exception thrown while unsimplifying " << m_hist[k]->getName() << ":\n" << ex.what() << "\n" );
          throw SPxInternalCodeException("XMAISM00 Exception thrown during unsimply().");
       }
 
