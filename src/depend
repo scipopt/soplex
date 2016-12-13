@@ -7,20 +7,20 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h src/spxdefines.h \
  src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
  src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h src/spxgithash.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h src/spxgithash.h
 $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -30,20 +30,20 @@ $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/spxdefines.h \
  src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
  src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h
 $(LIBOBJDIR)/changesoplex.o: src/changesoplex.cpp src/spxdefines.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
@@ -54,10 +54,11 @@ $(LIBOBJDIR)/changesoplex.o: src/changesoplex.cpp src/spxdefines.h src/spxsolver
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxpricer.h src/sorter.h src/spxratiotester.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxpricer.h src/sorter.h \
+ src/spxratiotester.h
 $(LIBOBJDIR)/clufactor.o: src/clufactor.cpp src/spxdefines.h src/clufactor.h \
  src/slinsolver.h src/svector.h src/basevectors.h src/rational.h \
  src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
@@ -87,10 +88,10 @@ $(LIBOBJDIR)/enter.o: src/enter.cpp src/spxdefines.h src/spxratiotester.h \
  src/dataset.h src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxpricer.h src/sorter.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxpricer.h src/sorter.h
 $(LIBOBJDIR)/gzstream.o: src/gzstream.cpp src/gzstream.h
 $(LIBOBJDIR)/idxset.o: src/idxset.cpp src/idxset.h src/spxdefines.h src/spxalloc.h \
  src/spxout.h src/exceptions.h
@@ -104,10 +105,10 @@ $(LIBOBJDIR)/leave.o: src/leave.cpp src/spxdefines.h src/spxpricer.h src/spxsolv
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h src/spxratiotester.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h src/spxratiotester.h
 $(LIBOBJDIR)/mpsinput.o: src/mpsinput.cpp src/spxdefines.h src/mpsinput.h src/spxout.h
 $(LIBOBJDIR)/nameset.o: src/nameset.cpp src/spxdefines.h src/nameset.h src/dataset.h \
  src/dataarray.h src/spxalloc.h src/spxout.h src/exceptions.h \
@@ -124,11 +125,11 @@ $(LIBOBJDIR)/ratrecon.o: src/ratrecon.cpp src/spxdefines.h src/ratrecon.h \
  src/notimer.h src/usertimer.h src/wallclocktimer.h src/spxlp.h \
  src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/slufactor.o: src/slufactor.cpp src/spxdefines.h src/slufactor.h \
  src/timerfactory.h src/spxalloc.h src/spxout.h src/exceptions.h \
  src/notimer.h src/timer.h src/usertimer.h src/wallclocktimer.h \
@@ -157,21 +158,20 @@ $(LIBOBJDIR)/solverational.o: src/solverational.cpp src/soplex.h src/spxdefines.
  src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
  src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h src/statistics.h \
- src/ratrecon.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h src/statistics.h src/ratrecon.h
 $(LIBOBJDIR)/solvereal.o: src/solvereal.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -181,20 +181,20 @@ $(LIBOBJDIR)/solvereal.o: src/solvereal.cpp src/soplex.h src/spxdefines.h \
  src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
  src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h src/statistics.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h src/statistics.h
 $(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h src/spxdefines.h src/basevectors.h \
  src/rational.h src/idlist.h src/islist.h src/vectorbase.h \
  src/dvectorbase.h src/spxalloc.h src/spxout.h src/exceptions.h \
@@ -204,21 +204,20 @@ $(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h src/spxdefines.h src/basevect
  src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
  src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h src/spxgithash.h \
- src/statistics.h src/mpsinput.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h src/spxgithash.h src/statistics.h src/mpsinput.h
 $(LIBOBJDIR)/soplexlegacy.o: src/soplexlegacy.cpp src/soplexlegacy.h src/spxsolver.h \
  src/spxdefines.h src/timer.h src/timerfactory.h src/spxalloc.h \
  src/spxout.h src/exceptions.h src/notimer.h src/usertimer.h \
@@ -229,10 +228,10 @@ $(LIBOBJDIR)/soplexlegacy.o: src/soplexlegacy.cpp src/soplexlegacy.h src/spxsolv
  src/dataset.h src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxscaler.h src/spxsimplifier.h src/spxsteeppr.h \
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxsimplifier.h src/spxsteeppr.h \
  src/spxpricer.h src/sorter.h src/spxboundflippingrt.h \
  src/spxratiotester.h src/spxfastrt.h src/spxweightst.h src/spxstarter.h \
  src/slufactor.h src/clufactor.h
@@ -246,11 +245,12 @@ $(LIBOBJDIR)/spxautopr.o: src/spxautopr.cpp src/spxdefines.h src/spxautopr.h \
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h src/spxdevexpr.h src/spxsteeppr.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h src/spxdevexpr.h \
+ src/spxsteeppr.h
 $(LIBOBJDIR)/spxbasis.o: src/spxbasis.cpp src/spxdefines.h src/spxbasis.h src/spxlp.h \
  src/spxlpbase.h src/basevectors.h src/rational.h src/idlist.h \
  src/islist.h src/vectorbase.h src/dvectorbase.h src/spxalloc.h \
@@ -259,12 +259,12 @@ $(LIBOBJDIR)/spxbasis.o: src/spxbasis.cpp src/spxdefines.h src/spxbasis.h src/sp
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/ssvector.h src/slinsolver.h src/dsvector.h src/dvector.h \
- src/timerfactory.h src/notimer.h src/timer.h src/usertimer.h \
- src/wallclocktimer.h src/spxsolver.h src/array.h src/random.h \
- src/unitvector.h src/updatevector.h src/mpsinput.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/ssvector.h \
+ src/slinsolver.h src/timerfactory.h src/notimer.h src/timer.h \
+ src/usertimer.h src/wallclocktimer.h src/spxsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h src/mpsinput.h
 $(LIBOBJDIR)/spxboundflippingrt.o: src/spxboundflippingrt.cpp src/spxdefines.h \
  src/spxboundflippingrt.h src/spxratiotester.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
@@ -276,10 +276,10 @@ $(LIBOBJDIR)/spxboundflippingrt.o: src/spxboundflippingrt.cpp src/spxdefines.h \
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxfastrt.h src/sorter.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxfastrt.h src/sorter.h
 $(LIBOBJDIR)/spxbounds.o: src/spxbounds.cpp src/spxdefines.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
@@ -290,10 +290,10 @@ $(LIBOBJDIR)/spxbounds.o: src/spxbounds.cpp src/spxdefines.h src/spxsolver.h \
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxchangebasis.o: src/spxchangebasis.cpp src/spxdefines.h src/spxbasis.h \
  src/spxlp.h src/spxlpbase.h src/basevectors.h src/rational.h \
  src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
@@ -302,12 +302,12 @@ $(LIBOBJDIR)/spxchangebasis.o: src/spxchangebasis.cpp src/spxdefines.h src/spxba
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/ssvector.h src/slinsolver.h src/dsvector.h src/dvector.h \
- src/timerfactory.h src/notimer.h src/timer.h src/usertimer.h \
- src/wallclocktimer.h src/spxsolver.h src/array.h src/random.h \
- src/unitvector.h src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/ssvector.h \
+ src/slinsolver.h src/timerfactory.h src/notimer.h src/timer.h \
+ src/usertimer.h src/wallclocktimer.h src/spxsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxdantzigpr.o: src/spxdantzigpr.cpp src/spxdefines.h src/spxdantzigpr.h \
  src/spxpricer.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -318,11 +318,11 @@ $(LIBOBJDIR)/spxdantzigpr.o: src/spxdantzigpr.cpp src/spxdefines.h src/spxdantzi
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h
 $(LIBOBJDIR)/spxdefaultrt.o: src/spxdefaultrt.cpp src/spxdefines.h src/spxdefaultrt.h \
  src/spxratiotester.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -333,11 +333,11 @@ $(LIBOBJDIR)/spxdefaultrt.o: src/spxdefaultrt.cpp src/spxdefines.h src/spxdefaul
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxdefines.o: src/spxdefines.cpp src/spxdefines.h src/spxout.h
 $(LIBOBJDIR)/spxdesc.o: src/spxdesc.cpp src/spxdefines.h src/spxbasis.h src/spxlp.h \
  src/spxlpbase.h src/basevectors.h src/rational.h src/idlist.h \
@@ -347,12 +347,12 @@ $(LIBOBJDIR)/spxdesc.o: src/spxdesc.cpp src/spxdefines.h src/spxbasis.h src/spxl
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/ssvector.h src/slinsolver.h src/dsvector.h src/dvector.h \
- src/timerfactory.h src/notimer.h src/timer.h src/usertimer.h \
- src/wallclocktimer.h src/spxsolver.h src/array.h src/random.h \
- src/unitvector.h src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/ssvector.h \
+ src/slinsolver.h src/timerfactory.h src/notimer.h src/timer.h \
+ src/usertimer.h src/wallclocktimer.h src/spxsolver.h src/array.h \
+ src/random.h src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxdevexpr.o: src/spxdevexpr.cpp src/spxdefines.h src/spxdevexpr.h \
  src/spxpricer.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -363,21 +363,34 @@ $(LIBOBJDIR)/spxdevexpr.o: src/spxdevexpr.cpp src/spxdefines.h src/spxdevexpr.h 
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h
 $(LIBOBJDIR)/spxequilisc.o: src/spxequilisc.cpp src/spxequilisc.h src/spxdefines.h \
  src/spxscaler.h src/dataarray.h src/spxalloc.h src/spxout.h \
- src/exceptions.h src/spxlp.h src/spxlpbase.h src/basevectors.h \
- src/rational.h src/idlist.h src/islist.h src/vectorbase.h \
- src/dvectorbase.h src/ssvectorbase.h src/idxset.h src/svectorbase.h \
- src/dsvectorbase.h src/unitvectorbase.h src/svsetbase.h src/classarray.h \
- src/dataset.h src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
+ src/exceptions.h src/vector.h src/basevectors.h src/rational.h \
+ src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
+ src/ssvectorbase.h src/idxset.h src/svectorbase.h src/dsvectorbase.h \
+ src/unitvectorbase.h src/svsetbase.h src/classarray.h src/dataset.h \
+ src/datakey.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxlp.h src/lprowset.h \
+ src/lpcolset.h src/lprow.h src/lpcol.h src/soplex.h src/spxsolver.h \
+ src/timer.h src/timerfactory.h src/notimer.h src/usertimer.h \
+ src/wallclocktimer.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
+ src/array.h src/random.h src/unitvector.h src/updatevector.h \
+ src/slufactor.h src/clufactor.h src/slufactor_rational.h \
+ src/slinsolver_rational.h src/clufactor_rational.h src/spxsimplifier.h \
+ src/spxmainsm.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h
 $(LIBOBJDIR)/spxleastsqsc.o: src/spxleastsqsc.cpp src/spxleastsqsc.h src/spxsolver.h \
  src/spxdefines.h src/timer.h src/timerfactory.h src/spxalloc.h \
  src/spxout.h src/exceptions.h src/notimer.h src/usertimer.h \
@@ -388,10 +401,10 @@ $(LIBOBJDIR)/spxleastsqsc.o: src/spxleastsqsc.cpp src/spxleastsqsc.h src/spxsolv
  src/dataset.h src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxscaler.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxfastrt.o: src/spxfastrt.cpp src/spxdefines.h src/spxfastrt.h \
  src/spxratiotester.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -402,11 +415,11 @@ $(LIBOBJDIR)/spxfastrt.o: src/spxfastrt.cpp src/spxdefines.h src/spxfastrt.h \
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxfileio.o: src/spxfileio.cpp src/spxdefines.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
@@ -417,20 +430,20 @@ $(LIBOBJDIR)/spxfileio.o: src/spxfileio.cpp src/spxdefines.h src/spxsolver.h \
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxgeometsc.o: src/spxgeometsc.cpp src/spxgeometsc.h src/spxdefines.h \
  src/spxscaler.h src/dataarray.h src/spxalloc.h src/spxout.h \
- src/exceptions.h src/spxlp.h src/spxlpbase.h src/basevectors.h \
- src/rational.h src/idlist.h src/islist.h src/vectorbase.h \
- src/dvectorbase.h src/ssvectorbase.h src/idxset.h src/svectorbase.h \
- src/dsvectorbase.h src/unitvectorbase.h src/svsetbase.h src/classarray.h \
- src/dataset.h src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
+ src/exceptions.h src/vector.h src/basevectors.h src/rational.h \
+ src/idlist.h src/islist.h src/vectorbase.h src/dvectorbase.h \
+ src/ssvectorbase.h src/idxset.h src/svectorbase.h src/dsvectorbase.h \
+ src/unitvectorbase.h src/svsetbase.h src/classarray.h src/dataset.h \
+ src/datakey.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h
+ src/didxset.h src/spxfileio.h src/gzstream.h
 $(LIBOBJDIR)/spxgithash.o: src/spxgithash.cpp src/spxgithash.h src/git_hash.cpp
 $(LIBOBJDIR)/spxharrisrt.o: src/spxharrisrt.cpp src/spxdefines.h src/spxharrisrt.h \
  src/spxratiotester.h src/spxsolver.h src/timer.h src/timerfactory.h \
@@ -442,11 +455,11 @@ $(LIBOBJDIR)/spxharrisrt.o: src/spxharrisrt.cpp src/spxdefines.h src/spxharrisrt
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxhybridpr.o: src/spxhybridpr.cpp src/spxdefines.h src/spxhybridpr.h \
  src/spxpricer.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -457,12 +470,12 @@ $(LIBOBJDIR)/spxhybridpr.o: src/spxhybridpr.cpp src/spxdefines.h src/spxhybridpr
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h src/spxdevexpr.h src/spxparmultpr.h \
- src/spxsteeppr.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h src/spxdevexpr.h \
+ src/spxparmultpr.h src/spxsteeppr.h
 $(LIBOBJDIR)/spxid.o: src/spxid.cpp src/spxid.h src/datakey.h src/exceptions.h
 $(LIBOBJDIR)/spxlpbase_rational.o: src/spxlpbase_rational.cpp src/spxdefines.h \
  src/spxlpbase.h src/basevectors.h src/rational.h src/idlist.h \
@@ -472,7 +485,9 @@ $(LIBOBJDIR)/spxlpbase_rational.o: src/spxlpbase_rational.cpp src/spxdefines.h \
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/mpsinput.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/mpsinput.h
 $(LIBOBJDIR)/spxlpbase_real.o: src/spxlpbase_real.cpp src/spxdefines.h src/spxlpbase.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -481,7 +496,8 @@ $(LIBOBJDIR)/spxlpbase_real.o: src/spxlpbase_real.cpp src/spxdefines.h src/spxlp
  src/dataset.h src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/mpsinput.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/mpsinput.h
 $(LIBOBJDIR)/spxmainsm.o: src/spxmainsm.cpp src/spxmainsm.h src/spxdefines.h \
  src/spxsimplifier.h src/timerfactory.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/notimer.h src/timer.h src/usertimer.h \
@@ -492,10 +508,11 @@ $(LIBOBJDIR)/spxmainsm.o: src/spxmainsm.cpp src/spxmainsm.h src/spxdefines.h \
  src/dataset.h src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxsolver.h src/spxbasis.h src/ssvector.h \
- src/slinsolver.h src/dsvector.h src/dvector.h src/array.h src/random.h \
- src/unitvector.h src/updatevector.h src/sorter.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxsolver.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
+ src/array.h src/random.h src/unitvector.h src/updatevector.h \
+ src/sorter.h
 $(LIBOBJDIR)/spxout.o: src/spxout.cpp src/spxout.h src/spxdefines.h src/exceptions.h \
  src/spxalloc.h
 $(LIBOBJDIR)/spxparmultpr.o: src/spxparmultpr.cpp src/spxdefines.h src/spxparmultpr.h \
@@ -508,11 +525,11 @@ $(LIBOBJDIR)/spxparmultpr.o: src/spxparmultpr.cpp src/spxdefines.h src/spxparmul
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h
 $(LIBOBJDIR)/spxquality.o: src/spxquality.cpp src/spxdefines.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
@@ -523,19 +540,20 @@ $(LIBOBJDIR)/spxquality.o: src/spxquality.cpp src/spxdefines.h src/spxsolver.h \
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxscaler.o: src/spxscaler.cpp src/spxscaler.h src/spxdefines.h \
- src/dataarray.h src/spxalloc.h src/spxout.h src/exceptions.h src/spxlp.h \
- src/spxlpbase.h src/basevectors.h src/rational.h src/idlist.h \
- src/islist.h src/vectorbase.h src/dvectorbase.h src/ssvectorbase.h \
- src/idxset.h src/svectorbase.h src/dsvectorbase.h src/unitvectorbase.h \
- src/svsetbase.h src/classarray.h src/dataset.h src/datakey.h src/spxid.h \
- src/lprowbase.h src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h \
- src/nameset.h src/datahashtable.h src/didxset.h src/spxfileio.h \
- src/gzstream.h src/vector.h src/svector.h src/svset.h src/lprowset.h \
+ src/dataarray.h src/spxalloc.h src/spxout.h src/exceptions.h \
+ src/vector.h src/basevectors.h src/rational.h src/idlist.h src/islist.h \
+ src/vectorbase.h src/dvectorbase.h src/ssvectorbase.h src/idxset.h \
+ src/svectorbase.h src/dsvectorbase.h src/unitvectorbase.h \
+ src/svsetbase.h src/classarray.h src/dataset.h src/datakey.h \
+ src/svector.h src/svset.h src/dsvector.h src/dvector.h src/spxlp.h \
+ src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
+ src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/lprowset.h \
  src/lpcolset.h src/lprow.h src/lpcol.h
 $(LIBOBJDIR)/spxshift.o: src/spxshift.cpp src/spxdefines.h src/spxsolver.h src/timer.h \
  src/timerfactory.h src/spxalloc.h src/spxout.h src/exceptions.h \
@@ -546,11 +564,11 @@ $(LIBOBJDIR)/spxshift.o: src/spxshift.cpp src/spxdefines.h src/spxsolver.h src/t
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxsolve.o: src/spxsolve.cpp src/spxdefines.h src/rational.h src/idlist.h \
  src/islist.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -560,12 +578,12 @@ $(LIBOBJDIR)/spxsolve.o: src/spxsolve.cpp src/spxdefines.h src/rational.h src/id
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxpricer.h src/sorter.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxstarter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxpricer.h src/sorter.h \
+ src/spxratiotester.h src/spxdefaultrt.h src/spxstarter.h
 $(LIBOBJDIR)/spxsolver.o: src/spxsolver.cpp src/spxdefines.h src/soplex.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -575,20 +593,20 @@ $(LIBOBJDIR)/spxsolver.o: src/spxsolver.cpp src/spxdefines.h src/soplex.h \
  src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
  src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h
 $(LIBOBJDIR)/spxstarter.o: src/spxstarter.cpp src/spxdefines.h src/spxstarter.h \
  src/spxsolver.h src/timer.h src/timerfactory.h src/spxalloc.h \
  src/spxout.h src/exceptions.h src/notimer.h src/usertimer.h \
@@ -599,10 +617,10 @@ $(LIBOBJDIR)/spxstarter.o: src/spxstarter.cpp src/spxdefines.h src/spxstarter.h 
  src/dataset.h src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxsteeppr.o: src/spxsteeppr.cpp src/spxdefines.h src/spxsteeppr.h \
  src/spxpricer.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -613,11 +631,11 @@ $(LIBOBJDIR)/spxsteeppr.o: src/spxsteeppr.cpp src/spxdefines.h src/spxsteeppr.h 
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h
 $(LIBOBJDIR)/spxsumst.o: src/spxsumst.cpp src/spxdefines.h src/spxsumst.h \
  src/spxvectorst.h src/spxweightst.h src/spxstarter.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
@@ -629,10 +647,10 @@ $(LIBOBJDIR)/spxsumst.o: src/spxsumst.cpp src/spxdefines.h src/spxsumst.h \
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxvecs.o: src/spxvecs.cpp src/spxdefines.h src/spxsolver.h src/timer.h \
  src/timerfactory.h src/spxalloc.h src/spxout.h src/exceptions.h \
  src/notimer.h src/usertimer.h src/wallclocktimer.h src/spxlp.h \
@@ -642,11 +660,11 @@ $(LIBOBJDIR)/spxvecs.o: src/spxvecs.cpp src/spxdefines.h src/spxsolver.h src/tim
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxvectorst.o: src/spxvectorst.cpp src/spxdefines.h src/spxvectorst.h \
  src/spxweightst.h src/spxstarter.h src/spxsolver.h src/timer.h \
  src/timerfactory.h src/spxalloc.h src/spxout.h src/exceptions.h \
@@ -657,11 +675,11 @@ $(LIBOBJDIR)/spxvectorst.o: src/spxvectorst.cpp src/spxdefines.h src/spxvectorst
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h
 $(LIBOBJDIR)/spxweightpr.o: src/spxweightpr.cpp src/spxdefines.h src/spxweightpr.h \
  src/spxpricer.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -672,11 +690,11 @@ $(LIBOBJDIR)/spxweightpr.o: src/spxweightpr.cpp src/spxdefines.h src/spxweightpr
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h
 $(LIBOBJDIR)/spxweightst.o: src/spxweightst.cpp src/spxdefines.h src/spxweightst.h \
  src/spxstarter.h src/spxsolver.h src/timer.h src/timerfactory.h \
  src/spxalloc.h src/spxout.h src/exceptions.h src/notimer.h \
@@ -687,11 +705,11 @@ $(LIBOBJDIR)/spxweightst.o: src/spxweightst.cpp src/spxdefines.h src/spxweightst
  src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
  src/datakey.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/sorter.h
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/sorter.h
 $(LIBOBJDIR)/spxwritestate.o: src/spxwritestate.cpp src/spxdefines.h src/spxsolver.h \
  src/timer.h src/timerfactory.h src/spxalloc.h src/spxout.h \
  src/exceptions.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
@@ -702,11 +720,11 @@ $(LIBOBJDIR)/spxwritestate.o: src/spxwritestate.cpp src/spxdefines.h src/spxsolv
  src/dataarray.h src/datakey.h src/spxid.h src/lprowbase.h \
  src/lpcolbase.h src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h \
  src/datahashtable.h src/didxset.h src/spxfileio.h src/gzstream.h \
- src/vector.h src/svector.h src/svset.h src/lprowset.h src/lpcolset.h \
- src/lprow.h src/lpcol.h src/spxbasis.h src/ssvector.h src/slinsolver.h \
- src/dsvector.h src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/spxpricer.h src/sorter.h src/spxratiotester.h \
- src/spxstarter.h src/slufactor.h src/clufactor.h
+ src/spxscaler.h src/vector.h src/svector.h src/svset.h src/dsvector.h \
+ src/dvector.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
+ src/spxbasis.h src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/spxpricer.h src/sorter.h \
+ src/spxratiotester.h src/spxstarter.h src/slufactor.h src/clufactor.h
 $(LIBOBJDIR)/statistics.o: src/statistics.cpp src/statistics.h src/soplex.h \
  src/spxdefines.h src/basevectors.h src/rational.h src/idlist.h \
  src/islist.h src/vectorbase.h src/dvectorbase.h src/spxalloc.h \
@@ -717,20 +735,20 @@ $(LIBOBJDIR)/statistics.o: src/statistics.cpp src/statistics.h src/soplex.h \
  src/notimer.h src/usertimer.h src/wallclocktimer.h src/spxlp.h \
  src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
  src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
- src/didxset.h src/spxfileio.h src/gzstream.h src/vector.h src/svector.h \
- src/svset.h src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h \
- src/spxbasis.h src/ssvector.h src/slinsolver.h src/dsvector.h \
- src/dvector.h src/array.h src/random.h src/unitvector.h \
- src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
  src/slufactor_rational.h src/slinsolver_rational.h \
  src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
- src/spxscaler.h src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h \
- src/spxstarter.h src/spxweightst.h src/spxsumst.h src/spxvectorst.h \
- src/spxpricer.h src/sorter.h src/spxautopr.h src/spxdevexpr.h \
- src/spxsteeppr.h src/spxdantzigpr.h src/spxparmultpr.h \
- src/spxsteepexpr.h src/spxhybridpr.h src/spxratiotester.h \
- src/spxdefaultrt.h src/spxharrisrt.h src/spxfastrt.h \
- src/spxboundflippingrt.h src/sol.h src/solbase.h
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h
 $(LIBOBJDIR)/usertimer.o: src/usertimer.cpp src/spxdefines.h src/usertimer.h \
  src/timer.h
 $(LIBOBJDIR)/wallclocktimer.o: src/wallclocktimer.cpp src/spxdefines.h \
@@ -741,3 +759,26 @@ $(LIBOBJDIR)/updatevector.o: src/updatevector.cpp src/updatevector.h src/spxdefi
  src/exceptions.h src/ssvectorbase.h src/idxset.h src/svectorbase.h \
  src/dsvectorbase.h src/unitvectorbase.h src/svsetbase.h src/classarray.h \
  src/dataset.h src/dataarray.h src/datakey.h src/vector.h src/ssvector.h
+$(LIBOBJDIR)/testsoplex.o: src/testsoplex.cpp src/soplex.h src/spxdefines.h \
+ src/basevectors.h src/rational.h src/idlist.h src/islist.h \
+ src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
+ src/exceptions.h src/ssvectorbase.h src/idxset.h src/svectorbase.h \
+ src/dsvectorbase.h src/unitvectorbase.h src/svsetbase.h src/classarray.h \
+ src/dataset.h src/dataarray.h src/datakey.h src/spxsolver.h src/timer.h \
+ src/timerfactory.h src/notimer.h src/usertimer.h src/wallclocktimer.h \
+ src/spxlp.h src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
+ src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxdantzigpr.h src/spxparmultpr.h src/spxsteepexpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h src/statistics.h
