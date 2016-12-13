@@ -25,7 +25,7 @@ features:
     decomp_maxaddedrows: the maximum number of rows added to the reduced problem in each algorithm iteration.
     decomp_displayfreq: the frequency of output for the decomposition based simplex.
     decomp_verbosity: the verbosity level of the decomposition based simplex.
-- computing the degeneracg of a basis in each iteration:
+- computing the degeneracy of a basis in each iteration:
   - the parameter computedegen, when set to true will compute the degeneracy of each basis.
 - write dual formulation to file: additional command line option "--writedual" is provided to write the dual formulation
   to a file. When providing this option only the file is output, the problem is not solved.
