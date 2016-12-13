@@ -1068,13 +1068,6 @@ private:
       {
          assert(m_row[m_j] != 0.0);
          simplifier.addObjoffset(m_obj*m_const/m_row[m_j]);
-#if 0
-         printf("%d: ", m_j);
-         for(int i = 0; i < m_row.size(); i++)
-            printf("(%d,%f) ", m_row.index(i), m_row.value(i));
-         printf("Const: %f", m_const);
-         printf("\n");
-#endif
       }
       /// copy constructor
       MultiAggregationPS(const MultiAggregationPS& old)

@@ -21,14 +21,31 @@ def typeofvalue(text):
 
     return str
 
-if not len(sys.argv) == 2:
+if len(sys.argv) > 2:
+    if not len(sys.argv) == 3:
+        print('usage (for decomposition solve output): '+sys.argv[0]+'-d <soplex_test_run>.out')
+        quit()
+elif not len(sys.argv) == 2:
     print('usage: '+sys.argv[0]+' <soplex_test_run>.out')
     quit()
 
+# if the -d flag is provided, then we must produce the decomposition solve output
+decomp = False
+if sys.argv[1] == '-d':
+    decomp = True
+
 # specify columns for the output (can be modified)
 columns = ['name','rows','cols','pviol','dviol','iters','polish','refs','solvetime','value','status']
+ncolumns = len(columns)
 
-outname = sys.argv[1]
+if decomp:
+    decompcolumns = ['ppiv','dpiv','avgpdegen','avgddegen','redprob','compprob','rediter','compiter','algiter']
+    columns.extend(decompcolumns)
+
+if decomp:
+    outname = sys.argv[2]
+else:
+    outname = sys.argv[1]
 dataname = outname.replace('.out','.json')
 
 outfile = open(outname,'r')
@@ -213,6 +230,29 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['lusolves'] = int(outline.split()[3])
             instances[instancename]['lusolvetime'] = float(outlines[idx+2].split()[3])
 
+        elif decomp:
+            if outline.startswith('Degeneracy'):
+                instances[instancename]['ppiv'] = int(outlines[idx + 1].split()[3])
+                instances[instancename]['dpiv'] = int(outlines[idx + 2].split()[3])
+                instances[instancename]['primcand'] = int(outlines[idx + 3].split()[3])
+                instances[instancename]['dualcand'] = int(outlines[idx + 4].split()[3])
+                instances[instancename]['avgpdegen'] = float(outlines[idx + 5].split()[3])
+                instances[instancename]['avgddegen'] = float(outlines[idx + 6].split()[3])
+
+            elif outline.startswith('Algorithm Iterations'):
+                instances[instancename]['algiter'] = int(outline.split()[2])
+
+            elif outline.startswith('Decomp. Iterations'):
+                instances[instancename]['rediter'] = int(outlines[idx + 3].split()[3])
+                instances[instancename]['compiter'] = int(outlines[idx + 4].split()[3])
+
+            elif outline.startswith('Red. Problem Status'):
+                instances[instancename]['redprob'] = int(outline.split()[4])
+
+            elif outline.startswith('Comp. Problem Status'):
+                instances[instancename]['compprob'] = int(outline.split()[3])
+
+
 # try parsing solution file
 check_solu = False
 try:
@@ -269,6 +309,8 @@ for i,c in enumerate(columns):
     length.append(len(c))
     for name in instances:
         length[i] = max(length[i],len(str(instances[name].get(c,''))))
+    if i == ncolumns:
+        output = output + '  |'
     output = output + ' ' + c.rjust(length[i] + 1)
 
 # print column header
@@ -279,6 +321,8 @@ print('-'*len(output))
 for name in sorted(instances):
     output = ''
     for i,c in enumerate(columns):
+        if i == ncolumns:
+            output = output + '  |'
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print(output)
 

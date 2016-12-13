@@ -113,6 +113,28 @@ namespace soplex
       int feasRefinements; ///< number of refinement steps during infeasibility test
       int unbdRefinements; ///< number of refinement steps during undboundedness test
 
+      // Improved dual simplex statistics
+      int callsReducedProb;      ///< number of times the reduced problem is solved. This includes the initial solve.
+      int iterationsInit;        ///< number of iterations in the initial LP
+      int iterationsRedProb;     ///< number of iterations of the reduced problem
+      int iterationsCompProb;    ///< number of iterations of the complementary problem
+      int numRedProbRows;        ///< number of rows in the reduced problem
+      int numRedProbCols;        ///< number of columns in the reduced problem
+      int degenPivotsPrimal;     ///< number of primal degenerate pivots
+      int degenPivotsDual;       ///< number of dual degenerate pivots
+      int degenPivotCandPrimal;  ///< number of pivoting candidates that will produce a degenerate step in the primal
+      int degenPivotCandDual;    ///< number of pivoting candidates that will produce a degenerate step in the dual
+      Real sumDualDegen;         ///< the sum of the rate of dual degeneracy at each iteration
+      Real sumPrimalDegen;       ///< the sum of the rate of primal degeneracy at each iteration
+      Real decompBasisCondNum;   ///< the condition number for the basis used to perform the decomposition
+      Real totalBoundViol;       ///< the sum of the bound violations in the original problem using the red prob sol
+      Real totalRowViol;         ///< the sum of the row violations in the original problem using the red prob sol
+      Real maxBoundViol;         ///< the max bound violation in the original problem using the red prob sol
+      Real maxRowViol;           ///< the max row violations in the original problem using the red prob sol
+      int  redProbStatus;        ///< status of the reduced problem
+      int  compProbStatus;       ///< status of the complementary problem
+      Real finalCompObj;         ///< the final objective function of the complementary problem
+
       //@}
    };
 } // namespace soplex

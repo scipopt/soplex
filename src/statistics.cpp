@@ -121,6 +121,25 @@ namespace soplex
       pivotRefinements = 0;
       feasRefinements = 0;
       unbdRefinements = 0;
+
+      callsReducedProb = 0;
+      iterationsInit = 0;
+      iterationsRedProb = 0;
+      iterationsCompProb = 0;
+      numRedProbRows = 0;
+      numRedProbCols = 0;
+      degenPivotsPrimal = 0;
+      degenPivotsDual = 0;
+      degenPivotCandPrimal = 0;
+      degenPivotCandDual = 0;
+      sumDualDegen = 0;
+      sumPrimalDegen = 0;
+      decompBasisCondNum = 0;
+      totalBoundViol = 0;
+      totalRowViol = 0;
+      maxBoundViol = 0;
+      maxRowViol = 0;
+      compProbStatus = 0;
    }
 
    /// prints statistics
@@ -129,6 +148,10 @@ namespace soplex
       Real solTime = solvingTime->time();
       Real totTime = readingTime->time() + solTime;
       Real otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() - simplexTime->time() - rationalTime->time();
+
+      Real avgPrimalDegeneracy = iterationsPrimal > 0 ? sumPrimalDegen / iterationsPrimal : 0.0;
+      Real avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?
+         (sumDualDegen / (iterations - iterationsPrimal)) : 0.0;
 
       os << std::fixed << std::setprecision(2);
 
@@ -198,6 +221,43 @@ namespace soplex
 
       os << "Rat. reconstructions: " << rationalReconstructions << "\n"
          << "  Rat. rec. time    : " << reconstructionTime->time() << "\n";
+
+      os << "Degeneracy          : \n";
+      os << "  Primal Pivots     : " << degenPivotsPrimal << "\n";
+      os << "  Dual Pivots       : " << degenPivotsDual << "\n";
+      os << "  Primal Candidates : " << degenPivotCandPrimal << "\n";
+      os << "  Dual Candidates   : " << degenPivotCandDual << "\n";
+      os << "  Average Primal    : " << avgPrimalDegeneracy << "\n";
+      os << "  Average Dual      : " << avgDualDegeneracy << "\n";
+
+      if( iterationsInit > 0 )
+      {
+         os << "Algorithm Iterations: " << callsReducedProb << "\n";
+         os << "Decomp. Iterations  : \n";
+         os << "  Total             : " << iterationsInit + iterationsRedProb << "\n";
+         os << "  Initial           : " << iterationsInit << "\n";
+         os << "  Reduced Problem   : " << iterationsRedProb << "\n";
+         os << "  Comp. Problem     : " << iterationsCompProb << "\n";
+         os << "Red. Problem Size   : \n";
+         os << "  Rows              : " << numRedProbRows << "\n";
+         os << "  Columns           : " << numRedProbCols << "\n";
+
+         os << std::scientific << std::setprecision(20);
+         os << "Decomp. Basis Cond. : " << decompBasisCondNum << "\n";
+         os << "Decomp Violations   : \n";
+         os << "  Sum Bound         : " << totalBoundViol << "\n";
+         os << "  Sum Row           : " << totalRowViol << "\n";
+         os << "  Max Bound         : " << maxBoundViol << "\n";
+         os << "  Max Row           : " << maxRowViol << "\n";
+
+         os << std::fixed << std::setprecision(2);
+
+         os << "Red. Problem Status : " << redProbStatus << "\n";
+         os << "Comp. Problem Status: " << compProbStatus << "\n";
+
+         os << std::scientific << std::setprecision(20);
+         os << "Comp. Problem Obj.  : " << finalCompObj << "\n";
+      }
    }
 } // namespace soplex
 #endif

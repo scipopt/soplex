@@ -172,6 +172,18 @@ public:
       PARTIAL
    };
 
+   /// Improved dual simplex status
+   /** The improved dual simplex requires a starting basis to perform the problem partitioning. This flag sets the
+    * status of the improved dual simplex to indicate whether the starting basis must be found or not.
+    */
+   enum DecompStatus
+   {
+      /// Starting basis has not been found yet
+      FINDSTARTBASIS = 0,
+      /// Starting basis has been found and the simplex can be executed as normal
+      DONTFINDSTARTBASIS = 1
+   };
+
    enum VarStatus
    {
       ON_UPPER,      ///< variable set to its upper bound.
@@ -187,11 +199,13 @@ public:
      */
    enum Status
    {
-      ERROR          = -13, ///< an error occured.
-      NO_RATIOTESTER = -12, ///< No ratiotester loaded
-      NO_PRICER      = -11, ///< No pricer loaded
-      NO_SOLVER      = -10, ///< No linear solver loaded
-      NOT_INIT       = -9,  ///< not initialised error
+      ERROR          = -15, ///< an error occured.
+      NO_RATIOTESTER = -14, ///< No ratiotester loaded
+      NO_PRICER      = -13, ///< No pricer loaded
+      NO_SOLVER      = -12, ///< No linear solver loaded
+      NOT_INIT       = -11, ///< not initialised error
+      ABORT_EXDECOMP = -10, ///< solve() aborted to exit decomposition simplex
+      ABORT_DECOMP   = -9,  ///< solve() aborted due to commence decomposition simplex
       ABORT_CYCLING  = -8,  ///< solve() aborted due to detection of cycling.
       ABORT_TIME     = -7,  ///< solve() aborted due to time limit.
       ABORT_ITER     = -6,  ///< solve() aborted due to iteration limit.
@@ -245,13 +259,13 @@ private:
    Real           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
    bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
 
-   Real           m_entertol;  ///< feasibility tolerance maintained during entering algorithm
-   Real           m_leavetol;  ///< feasibility tolerance maintained during leaving algorithm
-   Real           theShift;    ///< sum of all shifts applied to any bound.
-   Real           lastShift;   ///< for forcing feasibility.
-   int            m_maxCycle;  ///< maximum steps before cycling is detected.
-   int            m_numCycle;  ///< actual number of degenerate steps so far.
-   bool           initialized; ///< true, if all vectors are setup.
+   Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
+   Real           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
+   Real           theShift;      ///< sum of all shifts applied to any bound.
+   Real           lastShift;     ///< for forcing feasibility.
+   int            m_maxCycle;    ///< maximum steps before cycling is detected.
+   int            m_numCycle;    ///< actual number of degenerate steps so far.
+   bool           initialized;   ///< true, if all vectors are setup.
 
    SSVector*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
    SSVector*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
@@ -283,7 +297,10 @@ private:
    int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
-
+   bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
+   bool           computeDegeneracy;
+   int            degenCompIterOffset; ///< the number of iterations performed before the degeneracy level is computed
+   int            decompIterationLimit; ///< the maximum number of iterations before the decomposition simplex is aborted.
    //@}
 
 protected:
@@ -345,6 +362,13 @@ protected:
 
    int             boundflips;          ///< number of performed bound flips
    int             totalboundflips;     ///< total number of bound flips
+
+   int            enterCycles;      ///< the number of degenerate steps during the entering algorithm
+   int            leaveCycles;      ///< the number of degenerate steps during the leaving algorithm
+   int            enterDegenCand;   ///< the number of degenerate candidates in the entering algorithm
+   int            leaveDegenCand;   ///< the number of degenerate candidates in the leaving algorithm
+   Real           primalDegenSum;   ///< the sum of the primal degeneracy percentage
+   Real           dualDegenSum;     ///< the sum of the dual degeneracy percentage
 
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
@@ -516,6 +540,8 @@ public:
    void setType(Type tp);
    /// set \ref soplex::SPxSolver::FULL "FULL" or \ref soplex::SPxSolver::PARTIAL "PARTIAL" pricing.
    void setPricing(Pricing pr);
+   /// turn on or off the improved dual simplex.
+   void setDecompStatus(DecompStatus decomp_stat);
 
    /// reload LP.
    virtual void reLoad();
@@ -694,7 +720,7 @@ public:
    virtual Status getDualfarkas (Vector& vector) const;
 
    /// print display line of flying table
-   virtual void printDisplayLine(const bool force = false);
+   virtual void printDisplayLine(const bool force = false, const bool forceHead = false);
 
    /// Termination criterion.
    /** This method is called in each Simplex iteration to determine, if
@@ -788,6 +814,13 @@ public:
    {
       displayFreq = freq;
    }
+
+   /// get display frequency
+   int getDisplayFreq()
+   {
+      return displayFreq;
+   }
+
    // enable sparse pricing when viols < fac * dim()
    void setSparsePricingFactor(Real fac)
    {
@@ -1962,6 +1995,16 @@ public:
       SPxBasis::setStatus( stat );
    }
 
+   /// setting the solver status external from the solve loop.
+   void setSolverStatus( SPxSolver::Status stat )
+   {
+      m_status = stat;
+   }
+
+   /// get level of dual degeneracy
+   // this function is used for the improved dual simplex
+   Real getDegeneracyLevel(Vector degenvec);
+
    /// get number of dual norms
    void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
 
@@ -1984,6 +2027,30 @@ public:
    int boundFlips() const
    {
       return totalboundflips;
+   }
+
+   /// get number of dual degenerate pivots
+   int dualDegeneratePivots()
+   {
+      return (rep() == ROW) ? enterCycles : leaveCycles;
+   }
+
+   /// get number of primal degenerate pivots
+   int primalDegeneratePivots()
+   {
+      return (rep() == ROW) ? leaveCycles : enterCycles;
+   }
+
+   /// get the sum of dual degeneracy
+   Real sumDualDegeneracy()
+   {
+      return dualDegenSum;
+   }
+
+   /// get the sum of primal degeneracy
+   Real sumPrimalDegeneracy()
+   {
+      return primalDegenSum;
    }
 
    /// get number of iterations of current solution.
@@ -2021,11 +2088,24 @@ public:
    ///
    bool isTimeLimitReached(const bool forceCheck = false);
 
+   /// the maximum runtime
+   Real getMaxTime()
+   {
+      return maxTime;
+   }
+
    /// cumulative time spent in all calls to method solve().
    Real cumulativeTime() const
    {
       return theCumulativeTime;
    }
+
+   /// the maximum number of iterations
+   int getMaxIters()
+   {
+      return maxIters;
+   }
+
    /// return const lp's rows if available.
    const LPRowSet& rows() const
    {
@@ -2076,6 +2156,54 @@ public:
         << "Iterations         : " << std::setw(10) << iterations() << std::endl;
 
       return s.str();
+   }
+
+   /// returns whether a basis needs to be found for the improved dual simplex
+   DecompStatus getDecompStatus() const
+   {
+      if( getStartingDecompBasis )
+         return FINDSTARTBASIS;
+      else
+         return DONTFINDSTARTBASIS;
+   }
+
+   /// sets whether the degeneracy is computed at each iteration
+   void setComputeDegenFlag(bool computeDegen)
+   {
+      computeDegeneracy = computeDegen;
+   }
+
+
+   /// returns whether the degeneracy is computed in each iteration
+   bool getComputeDegeneracy() const
+   {
+      return computeDegeneracy;
+   }
+
+
+   /// sets the offset for the number of iterations before the degeneracy is computed
+   void setDegenCompOffset(int iterOffset)
+   {
+      degenCompIterOffset = iterOffset;
+   }
+
+
+   /// gets the offset for the number of iterations before the degeneracy is computed
+   int getDegenCompOffset() const
+   {
+      return degenCompIterOffset;
+   }
+
+   /// sets the iteration limit for the decomposition simplex initialisation
+   void setDecompIterationLimit(int iterationLimit)
+   {
+      decompIterationLimit = iterationLimit;
+   }
+
+   /// returns the iteration limit for the decomposition simplex initialisation
+   int getDecompIterationLimit() const
+   {
+      return decompIterationLimit;
    }
    //@}
 

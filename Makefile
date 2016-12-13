@@ -225,6 +225,7 @@ LIBOBJ		= 	changesoplex.o \
 			rational.o \
 			ratrecon.o \
 			slufactor.o \
+			solvedbds.o \
 			slufactor_rational.o \
 			solverational.o \
 			solvereal.o \

@@ -17,6 +17,7 @@
 export LANG=C
 
 REMOVE=0
+DECOMP=0
 AWKARGS=""
 FILES=""
 
@@ -29,6 +30,11 @@ do
             REMOVE=1
         else
             AWKARGS="$AWKARGS $i"
+        fi
+
+        if test "$i" = "-d"
+        then
+            DECOMP=1
         fi
     else
         FILES="$FILES $i"
@@ -171,7 +177,12 @@ do
             fi
         fi
 
-        ./evaluation.py $OUTFILE | tee $RESFILE
+        if test "$DECOMP" = "1"
+        then
+            ./evaluation.py -d $OUTFILE | tee $RESFILE
+        else
+            ./evaluation.py $OUTFILE | tee $RESFILE
+        fi
 
     fi
 done

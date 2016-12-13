@@ -445,6 +445,14 @@ void SPxSolver::setPricing(Pricing pr)
    }
 }
 
+void SPxSolver::setDecompStatus(DecompStatus decomp_stat)
+{
+   if( decomp_stat == FINDSTARTBASIS )
+      getStartingDecompBasis = true;
+   else
+      getStartingDecompBasis = false;
+}
+
 /*
     The following method resizes all vectors and arrays of |SoPlex|
     (excluding inherited vectors).
@@ -997,6 +1005,9 @@ SPxSolver::SPxSolver(
    , displayLine (0)
    , displayFreq (200)
    , sparsePricingFactor(SPARSITYFACTOR)
+   , getStartingDecompBasis(false)
+   , computeDegeneracy(false)
+   , degenCompIterOffset(0)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -1054,6 +1065,7 @@ SPxSolver::~SPxSolver()
    }
 
    // free timer
+   assert(theTime);
    theTime->~Timer();
    spx_free(theTime);
 }
@@ -1093,6 +1105,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       instableEnter = base.instableEnter;
       displayFreq = base.displayFreq;
       sparsePricingFactor = base.sparsePricingFactor;
+      getStartingDecompBasis = base.getStartingDecompBasis;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -1836,6 +1849,72 @@ void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
 {
    assert(thepricer != NULL);
    return thepricer->getNdualNorms(nnormsRow, nnormsCol);
+}
+
+// NOTE: This only works for the row representation. Need to update to account for column representation.
+// The degenvec differs relative to the algorithm being used.
+// For the primal simplex, degenvec is the primal solution values.
+// For the dual simplex, the degenvec is the feasvec (ROW) and pVec (COLUMN).
+Real SPxSolver::getDegeneracyLevel(Vector degenvec)
+{
+   int numDegenerate = 0;
+   Real degeneracyLevel = 0;
+
+   // iterating over all columns in the basis matrix
+   // this identifies the basis indices and those that have a zero dual multiplier (rows) or zero reduced cost (cols).
+   if( rep() == ROW )
+   {
+      for( int i = 0; i < nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
+      {
+         // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
+         // reduced costs. This requirement is regardless of the objective sense.
+         if( isZero(degenvec[i], feastol()) )
+            numDegenerate++;
+      }
+
+      if( type() == ENTER )   // dual simplex
+         degeneracyLevel = Real(numDegenerate)/nCols();
+      else                    // primal simplex
+      {
+         assert(type() == LEAVE);
+         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate - (nCols() - nRows())) : 0.0;
+         degeneracyLevel = degenVars/nRows();
+      }
+   }
+   else
+   {
+      assert(rep() == COLUMN);
+
+      for( int i = 0; i < nCols(); i++ )
+      {
+         if( type() == LEAVE )   // dual simplex
+         {
+            if( isZero(maxObj()[i] - degenvec[i], feastol()) )
+               numDegenerate++;
+         }
+         else                    // primal simplex
+         {
+            assert( type() == ENTER );
+            if( isZero(degenvec[i], feastol()) )
+               numDegenerate++;
+         }
+      }
+
+
+      if( type() == LEAVE )   // dual simplex
+      {
+         Real degenVars = nRows() > numDegenerate ? Real(nRows() - numDegenerate) : 0.0;
+         degeneracyLevel = degenVars/nCols();
+      }
+      else                    // primal simplex
+      {
+         assert(type() == ENTER);
+         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate - (nCols() - nRows())) : 0.0;
+         degeneracyLevel = degenVars/nRows();
+      }
+   }
+
+   return degeneracyLevel;
 }
 
 bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const

@@ -219,16 +219,20 @@ for ic,c in enumerate(compareValues):
     output1 += str(round(sumValue[c][default],2)).rjust(length[ic])
     output2 += str(round(meanValue[c][default],2)).rjust(length[ic])
     output3 += str(round(shmeanValue[c][default],2)).rjust(length[ic])
-# padding to next setting
-output1 += '  '
-output2 += '  '
-output3 += '  '
+    # padding to next setting
+    output1 += '  '
+    output2 += '  '
+    output3 += '  '
 for ids, s in enumerate(settings[1:]):
     # values of other settings
     for ic,c in enumerate(compareValues):
         output1 += str(round(sumValue[c][s],2)).rjust(length[ic])
         output2 += str(round(meanValue[c][s],2)).rjust(length[ic])
         output3 += str(round(shmeanValue[c][s],2)).rjust(length[ic])
+        # padding to next setting
+        output1 += '  '
+        output2 += '  '
+        output3 += '  '
     # padding to next setting
     output1 += ' '*(len(compareValues)*factorlength + 2)
     output2 += ' '*(len(compareValues)*factorlength + 2)

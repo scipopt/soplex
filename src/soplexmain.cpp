@@ -53,6 +53,7 @@ void printUsage(const char* const argv[], int idx)
       "  --readbas=<basfile>    read starting basis from file\n"
       "  --writebas=<basfile>   write terminal basis to file\n"
       "  --writefile=<lpfile>   write LP to file in LP or MPS format depending on extension\n"
+      "  --writedual=<lpfile>   write the dual LP to a file in LP or MPS formal depending on extension\n"
       "  --<type>:<name>=<val>  change parameter value using syntax of settings file entries\n"
       "  --loadset=<setfile>    load parameters from settings file (overruled by command line parameters)\n"
       "  --saveset=<setfile>    save parameters to settings file\n"
@@ -274,6 +275,7 @@ int main(int argc, char* argv[])
    char* readbasname = 0;
    char* writebasname = 0;
    char* writefilename = 0;
+   char* writedualfilename = 0;
    char* loadsetname = 0;
    char* savesetname = 0;
    char* diffsetname = 0;
@@ -355,6 +357,15 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[10];
                      writefilename = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                  }
+               }
+               // --writedual=<lpfile> : write dual LP to a file
+               else if( strncmp(option, "writedual=", 10) == 0 )
+               {
+                  if( writedualfilename == 0 )
+                  {
+                     char* dualfilename = &option[10];
+                     writedualfilename = strncpy(new char[strlen(dualfilename) + 1], dualfilename, strlen(dualfilename) + 1);
                   }
                }
                // --loadset=<setfile> : load parameters from settings file
@@ -644,6 +655,21 @@ int main(int argc, char* argv[])
          else
          {
             MSG_INFO1( soplex->spxout, soplex->spxout << "Written LP to file <" << writefilename << ">.\n\n" );
+         }
+      }
+
+      // write dual LP if specified
+      if( writedualfilename != 0 )
+      {
+         if( !soplex->writeDualFileReal(writedualfilename) )
+         {
+            MSG_ERROR( std::cerr << "Error while writing dual file <" << writedualfilename << ">.\n\n" );
+            returnValue = 1;
+            goto TERMINATE_FREESTRINGS;
+         }
+         else
+         {
+            MSG_INFO1( soplex->spxout, soplex->spxout << "Written dual LP to file <" << writedualfilename << ">.\n\n" );
          }
       }
 

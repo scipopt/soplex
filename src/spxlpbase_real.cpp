@@ -2627,6 +2627,296 @@ void SPxLPBase<Real>::writeMPS(
 
 
 
+/// Building the dual problem from a given LP
+/// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
+///       dualCols must have the identical size to the primal rows.
+template < >
+void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[],
+      SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols)
+{
+   // Setting up the primalrowids and dualcolids arrays if not given as parameters
+   if( primalRowIds == 0 || primalColIds == 0 || dualRowIds == 0 || dualColIds == 0 )
+   {
+      DataArray < SPxRowId > primalrowids(2*nRows());
+      DataArray < SPxColId > primalcolids(2*nCols());
+      DataArray < SPxRowId > dualrowids(2*nCols());
+      DataArray < SPxColId > dualcolids(2*nRows());
+      int numprimalrows = 0;
+      int numprimalcols = 0;
+      int numdualrows = 0;
+      int numdualcols = 0;
+
+      buildDualProblem(dualLP, primalrowids.get_ptr(), primalcolids.get_ptr(), dualrowids.get_ptr(),
+            dualcolids.get_ptr(), &numprimalrows, &numprimalcols, &numdualrows, &numdualcols);
+
+      if( primalRowIds != 0 )
+      {
+         primalRowIds = primalrowids.get_ptr();
+         (*nprimalrows) = numprimalrows;
+      }
+
+      if( primalColIds != 0 )
+      {
+         primalColIds = primalcolids.get_ptr();
+         (*nprimalcols) = numprimalcols;
+      }
+
+      if( dualRowIds != 0 )
+      {
+         dualRowIds = dualrowids.get_ptr();
+         (*ndualrows) = numdualrows;
+      }
+
+      if( dualColIds != 0 )
+      {
+         dualColIds = dualcolids.get_ptr();
+         (*ndualcols) = numdualcols;
+      }
+
+      return;
+   }
+
+   // setting the sense of the dual LP
+   if( spxSense() == MINIMIZE )
+      dualLP.changeSense(MAXIMIZE);
+   else
+      dualLP.changeSense(MINIMIZE);
+
+   LPRowSetBase<Real> dualrows(nCols());
+   LPColSetBase<Real> dualcols(nRows());
+   DSVectorBase<Real> col(1);
+
+   int numAddedRows = 0;
+   int numVarBoundCols = 0;
+   int primalrowsidx = 0;
+   int primalcolsidx = 0;
+
+   for( int i = 0; i < nCols(); ++i )
+   {
+      primalColIds[primalcolsidx] = cId(i);
+      primalcolsidx++;
+      if( lower(i) <= -infinity && upper(i) >= infinity ) // unrestricted variables
+      {
+         dualrows.create(0, obj(i), obj(i));
+         numAddedRows++;
+      }
+      else if( lower(i) <= -infinity ) // no lower bound is set, indicating a <= 0 variable
+      {
+         if( isZero(upper(i)) ) // standard bound variable
+         {
+            if( spxSense() == MINIMIZE )
+               dualrows.create(0, obj(i), infinity);
+            else
+               dualrows.create(0, -infinity, obj(i));
+         }
+         else // additional upper bound on the variable
+         {
+            col.add(numAddedRows, 1.0);
+            if( spxSense() == MINIMIZE )
+            {
+               dualrows.create(0, obj(i), obj(i));
+               dualcols.add(upper(i), -infinity, col, 0.0);
+            }
+            else
+            {
+               dualrows.create(0, obj(i), obj(i));
+               dualcols.add(upper(i), 0.0, col, infinity);
+            }
+            col.clear();
+
+            numVarBoundCols++;
+         }
+         numAddedRows++;
+      }
+      else if( upper(i) >= infinity ) // no upper bound set, indicating a >= 0 variable
+      {
+         if( isZero(lower(i)) ) // standard bound variable
+         {
+            if( spxSense() == MINIMIZE )
+               dualrows.create(0, -infinity, obj(i));
+            else
+               dualrows.create(0, obj(i), infinity);
+         }
+         else // additional lower bound on the variable
+         {
+            col.add(numAddedRows, 1.0);
+            if( spxSense() == MINIMIZE )
+            {
+               dualrows.create(0, obj(i), obj(i));
+               dualcols.add(lower(i), 0.0, col, infinity);
+            }
+            else
+            {
+               dualrows.create(0, obj(i), obj(i));
+               dualcols.add(lower(i), -infinity, col, 0.0);
+            }
+            col.clear();
+
+            numVarBoundCols++;
+         }
+         numAddedRows++;
+      }
+      else if ( NE(lower(i), upper(i)) )// a boxed variable
+      {
+         if( isZero(lower(i)) ) // variable bounded between 0 and upper(i)
+         {
+            col.add(numAddedRows, 1.0);
+            if( spxSense() == MINIMIZE )
+            {
+               dualrows.create(0, -infinity, obj(i));
+               dualcols.add(upper(i), -infinity, col, 0.0);
+            }
+            else
+            {
+               dualrows.create(0, obj(i), infinity);
+               dualcols.add(upper(i), 0.0, col, infinity);
+            }
+            col.clear();
+
+            numVarBoundCols++;
+         }
+         else if( isZero(upper(i)) ) // variable bounded between lower(i) and 0
+         {
+            col.add(numAddedRows, 1.0);
+            if( spxSense() == MINIMIZE )
+            {
+               dualrows.create(0, obj(i), infinity);
+               dualcols.add(lower(i), 0.0, col, infinity);
+            }
+            else
+            {
+               dualrows.create(0, -infinity, obj(i));
+               dualcols.add(lower(i), -infinity, col, 0.0);
+            }
+            col.clear();
+
+            numVarBoundCols++;
+         }
+         else // variable bounded between lower(i) and upper(i)
+         {
+            dualrows.create(0, obj(i), obj(i));
+
+            col.add(numAddedRows, 1.0);
+            if( spxSense() == MINIMIZE )
+            {
+               dualcols.add(lower(i), 0.0, col, infinity);
+               dualcols.add(upper(i), -infinity, col, 0.0);
+            }
+            else
+            {
+               dualcols.add(lower(i), -infinity, col, 0.0);
+               dualcols.add(upper(i), 0.0, col, infinity);
+            }
+            col.clear();
+
+            numVarBoundCols += 2;
+         }
+         numAddedRows++;
+      }
+      else
+      {
+         assert(lower(i) == upper(i));
+
+         dualrows.create(0, obj(i), obj(i));
+
+         col.add(numAddedRows, 1.0);
+         dualcols.add(lower(i), 0, col, infinity);
+         dualcols.add(lower(i), -infinity, col, 0);
+         col.clear();
+
+         numVarBoundCols += 2;
+         numAddedRows++;
+      }
+   }
+
+   // adding the empty rows to the dual LP
+   dualLP.addRows(dualrows);
+
+   // setting the dual row ids for the related primal cols.
+   // this assumes that the rows are added in sequential order.
+   for( int i = 0; i < primalcolsidx; i++ )
+      dualRowIds[i] = dualLP.rId(i);
+
+   (*nprimalcols) = primalcolsidx;
+   (*ndualrows) = primalcolsidx;
+
+   // iterating over each of the rows to create dual columns
+   for( int i = 0; i < nRows(); ++i )
+   {
+      // checking the type of the row
+      switch( rowType(i) )
+      {
+         case LPRowBase<Real>::RANGE: // range constraint, requires the addition of two dual variables
+            assert(lhs(i) > -infinity);
+            assert(rhs(i) < infinity);
+            if( spxSense() == MINIMIZE )
+            {
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
+               dualcols.add(lhs(i), 0.0, rowVector(i), infinity);
+
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
+               dualcols.add(rhs(i), -infinity, rowVector(i), 0.0);
+            }
+            else
+            {
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
+               dualcols.add(lhs(i), -infinity, rowVector(i), 0.0);
+
+               primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+               primalrowsidx++;
+               dualcols.add(rhs(i), 0.0, rowVector(i), infinity);
+            }
+            break;
+
+         case LPRowBase<Real>::GREATER_EQUAL: // >= constraint
+            assert( lhs(i) > -infinity );
+            primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+            primalrowsidx++;
+            if( spxSense() == MINIMIZE )
+               dualcols.add(lhs(i), 0.0, rowVector(i), infinity);
+            else
+               dualcols.add(lhs(i), -infinity, rowVector(i), 0.0);
+            break;
+
+         case LPRowBase<Real>::LESS_EQUAL: // <= constriant
+            assert( rhs(i) < infinity );
+            primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+            primalrowsidx++;
+            if( spxSense() == MINIMIZE )
+               dualcols.add(rhs(i), -infinity, rowVector(i), 0.0);
+            else
+               dualcols.add(rhs(i), 0.0, rowVector(i), infinity);
+            break;
+
+         case LPRowBase<Real>::EQUAL: // Equality constraint
+            assert( EQ(lhs(i), rhs(i)) );
+            primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
+            primalrowsidx++;
+            dualcols.add(rhs(i), -infinity, rowVector(i), infinity);
+            break;
+
+         default:
+            throw SPxInternalCodeException("XLPFRD01 This should never happen.");
+      }
+   }
+
+   // adding the filled columns to the dual LP
+   dualLP.addCols(dualcols);
+
+   // setting the dual column ids for the related primal rows.
+   // this assumes that the columns are added in sequential order.
+   for( int i = 0; i < primalrowsidx; i++ )
+      dualColIds[i] = dualLP.cId(i + numVarBoundCols);
+
+   (*nprimalrows) = primalrowsidx;
+   (*ndualcols) = primalrowsidx;
+}
+
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 //  Explicit instantiation
 // ---------------------------------------------------------------------------------------------------------------------

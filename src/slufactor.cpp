@@ -753,6 +753,9 @@ void SLUFactor::assign(const SLUFactor& old)
 {
    spxout = old.spxout;
 
+   solveTime = TimerFactory::createTimer(old.solveTime->type());
+   factorTime = TimerFactory::createTimer(old.factorTime->type());
+
    // slufactor
    uptype        = old.uptype;
    minThreshold  = old.minThreshold;

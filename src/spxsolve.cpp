@@ -113,6 +113,8 @@ SPxSolver::Status SPxSolver::solve()
 
    m_numCycle = 0;
    iterCount  = 0;
+   lastIterCount = 0;
+   iterDegenCheck = 0;
    if (!isInitialized())
    {
       /*
@@ -166,6 +168,10 @@ SPxSolver::Status SPxSolver::solve()
    polishCount = 0;
    boundflips = 0;
    totalboundflips = 0;
+   enterCycles = 0;
+   leaveCycles = 0;
+   primalDegenSum = 0;
+   dualDegenSum = 0;
 
    stallNumRecovers = 0;
 
@@ -1226,14 +1232,14 @@ void SPxSolver::testVecs()
 
 
 /// print display line of flying table
-void SPxSolver::printDisplayLine(const bool force)
+void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
 {
    MSG_INFO1( (*spxout),
-      if( displayLine % (displayFreq*30) == 0 )
+      if( forceHead || displayLine % (displayFreq*30) == 0 )
       {
          (*spxout) << "type |   time |   iters | facts |  shift   |violation |    value\n";
       }
-      if( force || (displayLine % displayFreq == 0) )
+      if( (force || (displayLine % displayFreq == 0)) && !forceHead )
       {
          (type() == LEAVE) ? (*spxout) << "  L  |" : (*spxout) << "  E  |";
          (*spxout) << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
@@ -1242,8 +1248,10 @@ void SPxSolver::printDisplayLine(const bool force)
          << std::setw(5) << slinSolver()->getFactorCount() << " | "
          << shift() << " | "
          << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
-         << std::setprecision(8) << value()
-         << std::endl;
+         << std::setprecision(8) << value();
+         if( getStartingDecompBasis && rep() == SPxSolver::ROW )
+            (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
+         (*spxout) << std::endl;
       }
       displayLine++;
    );
@@ -1364,6 +1372,80 @@ bool SPxSolver::terminate()
          }
       }
    }
+
+
+
+   if( getComputeDegeneracy() && iteration() > prevIteration() )
+   {
+      DVector degenvec(nCols());
+      if( rep() == ROW )
+      {
+         if( type() == ENTER )   // dual simplex
+            dualDegenSum += getDegeneracyLevel(fVec());
+         else                    // primal simplex
+         {
+            getPrimal(degenvec);
+            primalDegenSum += getDegeneracyLevel(degenvec);
+         }
+      }
+      else
+      {
+         assert(rep() == COLUMN);
+         if( type() == LEAVE )   // dual simplex
+            dualDegenSum += getDegeneracyLevel(pVec());
+         else
+         {
+            getPrimal(degenvec);
+            primalDegenSum += getDegeneracyLevel(degenvec);
+         }
+      }
+   }
+
+
+   // the improved dual simplex requires a starting basis
+   // if the flag getStartingDecompBasis is set to true the simplex will terminate when a dual basis is found
+   if( getStartingDecompBasis )
+   {
+      Real iterationFrac = 0.6;
+      if( type() == ENTER && SPxBasis::status() == SPxBasis::DUAL &&
+         iteration() - lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
+      {
+         iterDegenCheck = iterCount;
+
+         if( SPxBasis::status() >= SPxBasis::OPTIMAL )
+         {
+            m_status = RUNNING;
+            return true;
+         }
+
+         Real degeneracyLevel = 0;
+         Real degeneracyLB = 0.1;
+         Real degeneracyUB = 0.9;
+         degeneracyLevel = getDegeneracyLevel(fVec());
+         if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) && iteration() > nRows()*0.2 )
+         {
+            m_status = ABORT_DECOMP;
+            return true;
+         }
+
+         if( degeneracyLevel < degeneracyLB && iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
+         {
+            setDecompIterationLimit(0);
+            setDegenCompOffset(0);
+            m_status = ABORT_EXDECOMP;
+            return true;
+         }
+      }
+      else if( type() == LEAVE && iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
+      {
+         setDecompIterationLimit(0);
+         setDegenCompOffset(0);
+         m_status = ABORT_EXDECOMP;
+         return true;
+      }
+   }
+
+   lastIterCount = iterCount;
 
    return false;
 }
@@ -1714,6 +1796,8 @@ SPxSolver::Status SPxSolver::status() const
    case OPTIMAL :
       assert( SPxBasis::status() == SPxBasis::OPTIMAL );
       /*lint -fallthrough*/
+   case ABORT_EXDECOMP :
+   case ABORT_DECOMP :
    case ABORT_CYCLING :
    case ABORT_TIME :
    case ABORT_ITER :

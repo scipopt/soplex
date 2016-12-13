@@ -13,6 +13,22 @@ features:
   - modifications to LP are correctly transformed
   - access to (inverse of) basis matrix is correctly handled
   - enabled by default
+- decomposition based dual simplex:
+  - an experimental version of the a decomposition based approach to avoid degeneracy in the dual simplex method
+  - activated by setting the parameter bool:decompositiondualsimplex to true.
+    - this sets the basis representation to 'row', the solve mode to 'real', and the algorithm to 'dual'.
+  - additional parameters include:
+    usecompdual: setting to true using the dual formulation of the complementary problem, default is false.
+    explicitviol: setting to true explicitly computes the violation of the reduced problem solution instead of using the
+      complementary problem to identify violated rows, default is false.
+    decomp_iterlimit: the number of algorithm iterations for the decomposition based simplex.
+    decomp_maxaddedrows: the maximum number of rows added to the reduced problem in each algorithm iteration.
+    decomp_displayfreq: the frequency of output for the decomposition based simplex.
+    decomp_verbosity: the verbosity level of the decomposition based simplex.
+- computing the degeneracy of a basis in each iteration:
+  - the parameter computedegen, when set to true will compute the degeneracy of each basis.
+- write dual formulation to file: additional command line option "--writedual" is provided to write the dual formulation
+  to a file. When providing this option only the file is output, the problem is not solved.
 
 performance:
 - more efficient SoPlex class with better usability:
