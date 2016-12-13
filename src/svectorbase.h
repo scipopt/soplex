@@ -178,11 +178,11 @@ public:
       return d+1;
    }
 
-   /// Number of index \p i.
-   /** @return The number of the first index \p i. If no index \p i is available in the IdxSet, -1 is
-    *          returned. Otherwise, index(number(i)) == i holds.
+   /// Position of index \p i.
+   /** @return Finds the position of the first index \p i in the #IdxSet. If no index \p i is available in the #IdxSet, -1 is
+    *          returned. Otherwise, index(pos(i)) == i holds.
     */
-   int number(int i) const
+   int pos(int i) const
    {
       if( m_elem != 0 )
       {
@@ -206,7 +206,7 @@ public:
    /// Value to index \p i.
    R operator[](int i) const
    {
-      int n = number(i);
+      int n = pos(i);
 
       if( n >= 0 )
          return m_elem[n].val;

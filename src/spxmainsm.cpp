@@ -1511,7 +1511,7 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
                SVector& row = lp.rowVector_w(col.index(i));
 
                // this changes col.size()
-               row.remove(row.number(j));
+               row.remove(row.pos(j));
                col.remove(i);
 
                MSG_INFO3( (*spxout), (*spxout) << "IMAISM04 aij=" << aij
@@ -3547,7 +3547,7 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
                   {
                      if(bestRow.index(l) != j)
                      {
-                        if(lp.rowVector(rowNumber).number(bestRow.index(l)) >= 0)
+                        if(lp.rowVector(rowNumber).pos(bestRow.index(l)) >= 0)
                            lp.changeElement(rowNumber, bestRow.index(l), updateRow[bestRow.index(l)]
                               - updateRow[j]*bestRow.value(l)/aggAij);
                         else

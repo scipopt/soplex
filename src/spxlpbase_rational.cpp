@@ -860,7 +860,7 @@ bool SPxLPBase<Rational>::readLPF(
                   if( val != 0 )
                   {
                      // Do we have this index already in the row?
-                     int n = vec.number(colidx);
+                     int n = vec.pos(colidx);
 
                      // if not, add it
                      if( n < 0 )
@@ -1607,7 +1607,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
 
                // if the variable has appeared in the MARKER section of the COLUMNS section then its default bounds were
                // set to 0,1; the first time it is declared integer we need to change to default bounds 0,infinity
-               if( oldbinvars.number(idx) < 0 )
+               if( oldbinvars.pos(idx) < 0 )
                {
                   cset.upper_w(idx) = infinity;
                   oldbinvars.addIdx(idx);
@@ -2098,7 +2098,7 @@ static void LPFwriteGenerals(
    p_output << "Generals\n";
 
    for( int j = 0; j < p_lp.nCols(); ++j )
-      if( p_intvars->number(j) >= 0 )
+      if( p_intvars->pos(j) >= 0 )
          p_output << "  " << getColName(p_lp, j, p_cnames, name) << "\n";
 }
 
@@ -2270,7 +2270,7 @@ void SPxLPBase<Rational>::writeMPS(
 
       for( i = 0; i < nCols(); i++ )
       {
-         bool is_intvar = has_intvars && (p_intvars->number(i) >= 0);
+         bool is_intvar = has_intvars && (p_intvars->pos(i) >= 0);
 
          if( ( is_intrun && !is_intvar) || (!is_intrun &&  is_intvar) )
              continue;
@@ -2377,7 +2377,7 @@ void SPxLPBase<Rational>::writeMPS(
             MPSwriteRecord(p_output, "MI", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
       }
 
-      if( has_intvars && (p_intvars->number(i) >= 0) )
+      if( has_intvars && (p_intvars->pos(i) >= 0) )
       {
          // Integer variables have default upper bound 1, but we should write
          // it nevertheless since CPLEX seems to assume infinity otherwise.

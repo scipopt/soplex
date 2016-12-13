@@ -1553,7 +1553,7 @@ public:
       for( j = row.size() - 1; j >= 0; --j )
       {
          SVectorBase<R>& col = colVector_w(row.index(j));
-         col.remove(col.number(n));
+         col.remove(col.pos(n));
       }
 
       row.clear();
@@ -1593,7 +1593,7 @@ public:
       for( j = col.size() - 1; j >= 0; --j )
       {
          SVectorBase<R>& row = rowVector_w(col.index(j));
-         row.remove(row.number(n));
+         row.remove(row.pos(n));
       }
 
       col.clear();
@@ -1644,10 +1644,10 @@ public:
          else
             newVal = val;
 
-         if( row.number(j) >= 0 )
+         if( row.pos(j) >= 0 )
          {
-            row.value(row.number(j)) = newVal;
-            col.value(col.number(i)) = newVal;
+            row.value(row.pos(j)) = newVal;
+            col.value(col.pos(i)) = newVal;
          }
          else
          {
@@ -1655,10 +1655,10 @@ public:
             LPColSetBase<R>::add2(j, 1, &i, &newVal);
          }
       }
-      else if( row.number(j) >= 0 )
+      else if( row.pos(j) >= 0 )
       {
-         row.remove(row.number(j));
-         col.remove(col.number(i));
+         row.remove(row.pos(j));
+         col.remove(col.pos(i));
       }
 
       assert(isConsistent());
@@ -1676,10 +1676,10 @@ public:
 
       if( mpq_get_d(*val) != R(0) )
       {
-         if( row.number(j) >= 0 )
+         if( row.pos(j) >= 0 )
          {
-            row.value(row.number(j)) = *val;
-            col.value(col.number(i)) = *val;
+            row.value(row.pos(j)) = *val;
+            col.value(col.pos(i)) = *val;
          }
          else
          {
@@ -1687,10 +1687,10 @@ public:
             LPColSetBase<R>::add2(j, 1, &i, val);
          }
       }
-      else if( row.number(j) >= 0 )
+      else if( row.pos(j) >= 0 )
       {
-         row.remove(row.number(j));
-         col.remove(col.number(i));
+         row.remove(row.pos(j));
+         col.remove(col.pos(i));
       }
 
       assert(isConsistent());
@@ -1805,7 +1805,7 @@ public:
          for( int j = v.size() - 1; j >= 0; --j )
          {
             const SVectorBase<R>& w = rowVector(v.index(j));
-            int n = w.number(i);
+            int n = w.pos(i);
 
             if( n < 0 )
                return MSGinconsistent("SPxLPBase");
@@ -1822,7 +1822,7 @@ public:
          for( int j = v.size() - 1; j >= 0; --j )
          {
             const SVectorBase<R>& w = colVector(v.index(j));
-            int n = w.number(i);
+            int n = w.pos(i);
 
             if( n < 0 )
                return MSGinconsistent("SPxLPBase");
@@ -1910,7 +1910,7 @@ protected:
       for( int i = vec.size() - 1; i >= 0; --i )
       {
          SVectorBase<R>& remvec = colVector_w(vec.index(i));
-         remvec.remove(remvec.number(j));
+         remvec.remove(remvec.pos(j));
       }
 
       // move last row to removed position
@@ -1921,7 +1921,7 @@ protected:
          for( int i = l_vec.size() - 1; i >= 0; --i )
          {
             SVectorBase<R>& movevec = colVector_w(l_vec.index(i));
-            movevec.index(movevec.number(idx)) = j;
+            movevec.index(movevec.pos(idx)) = j;
          }
       }
 
@@ -1960,7 +1960,7 @@ protected:
       for( i = vec.size() - 1; i >= 0; --i )
       {
          SVectorBase<R>& remvec = rowVector_w(vec.index(i));
-         remvec.remove(remvec.number(j));
+         remvec.remove(remvec.pos(j));
       }
 
       // move last column to removed position
@@ -1971,7 +1971,7 @@ protected:
          for( i = l_vec.size() - 1; i >= 0; --i )
          {
             SVectorBase<R>& movevec = rowVector_w(l_vec.index(i));
-            movevec.index(movevec.number(idx)) = j;
+            movevec.index(movevec.pos(idx)) = j;
          }
       }
 
