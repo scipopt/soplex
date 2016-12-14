@@ -3370,7 +3370,12 @@ namespace soplex
          {
             sumviol += viol;
             if( viol > maxviol )
+            {
                maxviol = viol;
+               MSG_DEBUG( std::cout << "increased bound violation for column " << i << ": " << rationalToString(viol)
+                  << " lower: " << rationalToString(lowerRational(i))
+                  << ", primal: " << rationalToString(primal[i]) << "\n" );
+            }
          }
 
          viol = primal[i] - upperRational(i);
@@ -3378,7 +3383,12 @@ namespace soplex
          {
             sumviol += viol;
             if( viol > maxviol )
+            {
                maxviol = viol;
+               MSG_DEBUG( std::cout << "increased bound violation for column " << i << ": " << rationalToString(viol)
+                  << " upper: " << rationalToString(upperRational(i))
+                  << ", primal: " << rationalToString(primal[i]) << "\n" );
+            }
          }
       }
 
@@ -3413,7 +3423,12 @@ namespace soplex
          {
             sumviol += viol;
             if( viol > maxviol )
+            {
                maxviol = viol;
+               MSG_DEBUG( std::cout << "increased constraint violation for row " << i << ": " << rationalToString(viol)
+                  << " lhs: " << rationalToString(lhsRational(i))
+                  << ", activity: " << rationalToString(activity[i]) << "\n" );
+            }
          }
 
          viol = activity[i] - rhsRational(i);
@@ -3421,7 +3436,12 @@ namespace soplex
          {
             sumviol += viol;
             if( viol > maxviol )
+            {
                maxviol = viol;
+               MSG_DEBUG( std::cout << "increased constraint violation for row " << i << ": " << rationalToString(viol)
+                  << " rhs: " << rationalToString(rhsRational(i))
+                  << ", activity: " << rationalToString(activity[i]) << "\n" );
+            }
          }
       }
 
@@ -8130,7 +8150,7 @@ namespace soplex
       // copy LP
       _ensureRationalLP();
       *_rationalLP = *_realLP;
-      _recomputeRangeTypesReal();
+      _recomputeRangeTypesRational();
 
       // stop timing
       if( time )
