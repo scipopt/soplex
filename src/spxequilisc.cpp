@@ -108,8 +108,6 @@ void SPxEquiliSC::scale(SPxLP& lp, bool persistent)
     */
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
-//   DataArray < int > colscaleExp = *m_activeColscaleExp;
-//   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
 
    bool colFirst = colratio < rowratio;
 

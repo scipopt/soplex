@@ -2091,10 +2091,12 @@ private:
 
       SVectorBase<R>& vec = rowVector_w(idx);
 
-      // fixme compute new row scaling factor and apply it to the sides
-      if( false && scale )
+      DataArray <int>& colscaleExp = LPColSetBase<R>::scaleExp;
+
+      // compute new row scaling factor and apply it to the sides
+      if( scale )
       {
-         newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
+         newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
          if( rhs(idx) < infinity )
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
@@ -2113,7 +2115,7 @@ private:
 
          // apply new row and existing column scaling factors to new values in RowSet
          if( scale )
-            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[i]);
+            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + colscaleExp[i]);
 
          R val = vec.value(j);
 
@@ -2142,10 +2144,12 @@ private:
 
       LPRowSetBase<R>::add(lhsValue, rowVec, rhsValue);
 
-      // fixme compute new row scaling factor and apply it to the sides
-      if( false && scale )
+      DataArray <int>& colscaleExp = LPColSetBase<R>::scaleExp;
+
+      // compute new row scaling factor and apply it to the sides
+      if( scale )
       {
-         newRowScaleExp = lp_scaler->computeScaleExp(rowVec, LPColSetBase<R>::scaleExp);
+         newRowScaleExp = lp_scaler->computeScaleExp(rowVec, colscaleExp);
 
          if( rhs(idx) < infinity )
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
@@ -2166,7 +2170,7 @@ private:
 
          // apply new row and existing column scaling factors to new values in RowSet
          if( scale )
-            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[i]);
+            vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + colscaleExp[i]);
 
          R val = vec.value(j);
 
@@ -2248,10 +2252,12 @@ private:
          SVectorBase<R>& vec = rowVector_w(i);
          int newRowScaleExp = 0;
 
-         // fixme compute new row scaling factor and apply it to the sides
-         if( false && scale )
+         DataArray <int>& colscaleExp = LPColSetBase<R>::scaleExp;
+
+         // compute new row scaling factor and apply it to the sides
+         if( scale )
          {
-            newRowScaleExp = lp_scaler->computeScaleExp(vec, LPColSetBase<R>::scaleExp);
+            newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
             if( rhs(i) < infinity )
                rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
@@ -2274,7 +2280,7 @@ private:
             col->index(idx) = i;
             // apply new row and existing column scaling factors to both ColSet and RowSet
             if( scale )
-               vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + LPColSetBase<R>::scaleExp[k]);
+               vec.value(j) = spxLdexp(vec.value(j), newRowScaleExp + colscaleExp[k]);
 
             col->value(idx) = vec.value(j);
          }
@@ -2305,10 +2311,12 @@ private:
 
       SVectorBase<R>& vec = colVector_w(idx);
 
-      // fixme compute new column scaling factor and apply it to the bounds
-      if( false && scale )
+      DataArray <int>& rowscaleExp = LPRowSetBase<R>::scaleExp;
+
+      // compute new column scaling factor and apply it to the bounds
+      if( scale )
       {
-         newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
+         newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
          if( upper(idx) < infinity )
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
@@ -2327,7 +2335,7 @@ private:
 
          // apply new column and existing row scaling factors to new values in ColSet
          if( scale )
-            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[i]);
+            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + rowscaleExp[i]);
 
          R val = vec.value(j);
 
@@ -2358,10 +2366,12 @@ private:
       if( thesense != MAXIMIZE )
          LPColSetBase<R>::maxObj_w(idx) *= -1;
 
-      // fixme compute new column scaling factor and apply it to the bounds
-      if( false && scale )
+      DataArray <int>& rowscaleExp = LPRowSetBase<R>::scaleExp;
+
+      // compute new column scaling factor and apply it to the bounds
+      if( scale )
       {
-         newColScaleExp = lp_scaler->computeScaleExp(colVec, LPRowSetBase<R>::scaleExp);
+         newColScaleExp = lp_scaler->computeScaleExp(colVec, rowscaleExp);
 
          if( upper(idx) < infinity )
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
@@ -2381,7 +2391,7 @@ private:
          int i = vec.index(j);
 
          if( scale )
-            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[i]);
+            vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + rowscaleExp[i]);
 
          R val = vec.value(j);
 
@@ -2462,10 +2472,12 @@ private:
          SVectorBase<R>& vec = colVector_w(i);
          int newColScaleExp = 0;
 
-         // fixme compute new column scaling factor and apply it to the bounds
-         if( false && scale )
+         DataArray <int>& rowscaleExp = LPRowSetBase<R>::scaleExp;
+
+         // compute new column scaling factor and apply it to the bounds
+         if( scale )
          {
-            newColScaleExp = lp_scaler->computeScaleExp(vec, LPRowSetBase<R>::scaleExp);
+            newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
             if( upper(i) < infinity )
                upper_w(i) = spxLdexp(upper_w(i), - newColScaleExp);
@@ -2487,7 +2499,7 @@ private:
             row.index(idx) = i;
             // apply new column and existing row scaling factors to both ColSet and RowSet
             if( scale )
-               vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + LPRowSetBase<R>::scaleExp[k]);
+               vec.value(j) = spxLdexp(vec.value(j), newColScaleExp + rowscaleExp[k]);
 
             row.value(idx) = vec.value(j);
          }
