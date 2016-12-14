@@ -239,6 +239,8 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
       x = fTest[idx];
       if (x < -feastol)
       {
+         // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
+         thesolver->isInfeasible[idx] = VIOLATED;
          price.val = computePrice(x, cpen[idx], feastol);
          price.idx = idx;
          prices.append(price);
@@ -523,7 +525,8 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
       x = coTest[idx];
       if ( x < -feastol)
       {
-         assert(thesolver->isInfeasible[idx] == VIOLATED || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
+         // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
+         thesolver->isInfeasible[idx] = VIOLATED;
          price.val = computePrice(x, coWeights_ptr[idx], feastol);
          price.idx = idx;
          prices.append(price);
@@ -575,7 +578,8 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
       x = test[idx];
       if ( x < -feastol)
       {
-         assert(thesolver->isInfeasibleCo[idx] == VIOLATED || thesolver->isInfeasibleCo[idx] == VIOLATED_AND_CHECKED);
+         // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
+         thesolver->isInfeasibleCo[idx] = VIOLATED;
          price.val = computePrice(x, weights_ptr[idx], feastol);
          price.idx = idx;
          pricesCo.append(price);
