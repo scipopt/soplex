@@ -1103,7 +1103,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
    else if (cStatus[m_k] == SPxSolver::ZERO)
    {
       /* we only aggregate duplicate columns if 0 is contained in their bounds, so we can handle this case properly */
-      assert(x[m_k] == 0.0);
+      assert(isZero(x[m_k]));
       assert(LErel(m_loJ, 0.0));
       assert(GErel(m_upJ, 0.0));
       assert(LErel(m_loK, 0.0));
