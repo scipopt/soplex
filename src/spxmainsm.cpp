@@ -898,7 +898,7 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector& x, DVector& y, DVector&, D
          cStatus[m_j] = SPxSolver::FIXED;
       else
       {
-         if( r[m_j] > 0 || (r[m_j] == 0 && x[m_j] == m_Lo_j) )
+         if( GT(r[m_j], 0) || (isZero(r[m_j]) && EQ(x[m_j], m_Lo_j)) )
             cStatus[m_j] = SPxSolver::ON_LOWER;
          else
             cStatus[m_j] = SPxSolver::ON_UPPER;
