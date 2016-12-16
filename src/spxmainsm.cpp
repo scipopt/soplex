@@ -682,7 +682,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
       s[m_i] = 0.0;
    else if (s[m_i] >= soplex::infinity)
       // this is a fix for a highly ill conditioned instance that is "solved" in presolving (ilaser0 from MINLP, mittelmann)
-      throw SPxException("Simplifier: infinite activities - aborting unsimplification");
+      throw SPxException("Simplifier: scaling factor is too big - aborting unsimplification");
 
    Real scale1 = maxAbs(m_lhs, s[m_i]);
    Real scale2 = maxAbs(m_rhs, s[m_i]);
@@ -865,7 +865,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
 #endif
 }
 
-void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVector& r,
+void SPxMainSM::DoubletonEquationPS::execute(DVector& x, DVector& y, DVector&, DVector& r,
                                              DataArray<SPxSolver::VarStatus>& cStatus,
                                              DataArray<SPxSolver::VarStatus>& rStatus) const
 {
@@ -897,7 +897,12 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       if( m_jFixed)
          cStatus[m_j] = SPxSolver::FIXED;
       else
-         cStatus[m_j] = (r[m_j] > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+      {
+         if( r[m_j] > 0 || (r[m_j] == 0 && x[m_j] == m_Lo_j) )
+            cStatus[m_j] = SPxSolver::ON_LOWER;
+         else
+            cStatus[m_j] = SPxSolver::ON_UPPER;
+      }
 
       cStatus[m_k] = SPxSolver::BASIC;
    }
@@ -1277,8 +1282,10 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
          val += m_row.value(k) * x[m_row.index(k)];
    }
 
-   Real scale;
-   scale = 1.0;
+   Real scale = maxAbs(m_const, val);
+
+   if (scale < 1.0)
+      scale = 1.0;
 
    Real z = (m_const / scale) - (val / scale);
 
