@@ -865,7 +865,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
 #endif
 }
 
-void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVector& r,
+void SPxMainSM::DoubletonEquationPS::execute(DVector& x, DVector& y, DVector&, DVector& r,
                                              DataArray<SPxSolver::VarStatus>& cStatus,
                                              DataArray<SPxSolver::VarStatus>& rStatus) const
 {
@@ -897,7 +897,12 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector&, DVector& y, DVector&, DVe
       if( m_jFixed)
          cStatus[m_j] = SPxSolver::FIXED;
       else
-         cStatus[m_j] = (r[m_j] > 0) ? SPxSolver::ON_LOWER : SPxSolver::ON_UPPER;
+      {
+         if( GT(r[m_j], 0) || (isZero(r[m_j]) && EQ(x[m_j], m_Lo_j)) )
+            cStatus[m_j] = SPxSolver::ON_LOWER;
+         else
+            cStatus[m_j] = SPxSolver::ON_UPPER;
+      }
 
       cStatus[m_k] = SPxSolver::BASIC;
    }
@@ -1277,8 +1282,10 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
          val += m_row.value(k) * x[m_row.index(k)];
    }
 
-   Real scale;
-   scale = 1.0;
+   Real scale = maxAbs(m_const, val);
+
+   if (scale < 1.0)
+      scale = 1.0;
 
    Real z = (m_const / scale) - (val / scale);
 
