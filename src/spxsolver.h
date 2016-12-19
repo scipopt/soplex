@@ -299,8 +299,11 @@ private:
    Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
    bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
-   int            degenCompIterOffset; ///< the number of iterations performed before the degeneracy level is computed
-   int            decompIterationLimit; ///< the maximum number of iterations before the decomposition simplex is aborted.
+   int            degenCompIterOffset;    ///< the number of iterations performed before the degeneracy level is computed
+   int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
+
+   bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
+
    //@}
 
 protected:
@@ -849,6 +852,13 @@ public:
    {
       return m_numCycle;
    }
+
+   /// perturb entire problem or only the bounds relevant to the current pivot
+   void useFullPerturbation(bool full)
+   {
+      fullPerturbation = full;
+   }
+
    //@}
 
 private:

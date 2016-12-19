@@ -1008,6 +1008,7 @@ SPxSolver::SPxSolver(
    , getStartingDecompBasis(false)
    , computeDegeneracy(false)
    , degenCompIterOffset(0)
+   , fullPerturbation(false)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -1106,6 +1107,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       displayFreq = base.displayFreq;
       sparsePricingFactor = base.sparsePricingFactor;
       getStartingDecompBasis = base.getStartingDecompBasis;
+      fullPerturbation = base.fullPerturbation;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -1286,6 +1288,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , displayLine(base.displayLine)
    , displayFreq(base.displayFreq)
    , sparsePricingFactor(base.sparsePricingFactor)
+   , fullPerturbation(base.fullPerturbation)
    , unitVecs(base.unitVecs)
    , primRhs(base.primRhs)
    , primVec(base.primVec)
