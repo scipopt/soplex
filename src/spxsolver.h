@@ -296,7 +296,8 @@ private:
 
    int            displayLine;
    int            displayFreq;
-   Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
+   Real           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
+
    bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
    int            degenCompIterOffset;    ///< the number of iterations performed before the degeneracy level is computed
@@ -358,13 +359,13 @@ protected:
    DSVector       primalRay;      ///< stores primal ray in case of unboundedness
    DSVector       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
 
-   int             leaveCount;    ///< number of LEAVE iterations
-   int             enterCount;    ///< number of ENTER iterations
-   int             primalCount;   ///< number of primal iterations
-   int             polishCount;   ///< number of solution polishing iterations
+   int            leaveCount;    ///< number of LEAVE iterations
+   int            enterCount;    ///< number of ENTER iterations
+   int            primalCount;   ///< number of primal iterations
+   int            polishCount;   ///< number of solution polishing iterations
 
-   int             boundflips;          ///< number of performed bound flips
-   int             totalboundflips;     ///< total number of bound flips
+   int            boundflips;          ///< number of performed bound flips
+   int            totalboundflips;     ///< total number of bound flips
 
    int            enterCycles;      ///< the number of degenerate steps during the entering algorithm
    int            leaveCycles;      ///< the number of degenerate steps during the leaving algorithm

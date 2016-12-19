@@ -1102,11 +1102,17 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       initialized = base.initialized;
       instableLeaveNum = base.instableLeaveNum;
       instableLeave = base.instableLeave;
+      instableLeaveVal = base.instableLeaveVal;
       instableEnterId = base.instableEnterId;
       instableEnter = base.instableEnter;
+      instableEnterVal = base.instableEnterVal;
+      displayLine = base.displayLine;
       displayFreq = base.displayFreq;
       sparsePricingFactor = base.sparsePricingFactor;
       getStartingDecompBasis = base.getStartingDecompBasis;
+      computeDegeneracy = base.computeDegeneracy;
+      degenCompIterOffset = base.degenCompIterOffset;
+      decompIterationLimit = base.decompIterationLimit;
       fullPerturbation = base.fullPerturbation;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
@@ -1127,6 +1133,15 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       leaveCount = base.leaveCount;
       enterCount = base.enterCount;
       theCumulativeTime = base.theCumulativeTime;
+      primalCount = base.primalCount;
+      polishCount = base.polishCount;
+      boundflips = base.boundflips;
+      totalboundflips = base.totalboundflips;
+      enterCycles = base.enterCycles;
+      leaveCycles = base.leaveCycles;
+      enterDegenCand = base.enterDegenCand;
+      leaveDegenCand = base.leaveDegenCand;
+      primalDegenSum = base.primalDegenSum;
       infeasibilities = base.infeasibilities;
       infeasibilitiesCo = base.infeasibilitiesCo;
       isInfeasible = base.isInfeasible;
@@ -1140,6 +1155,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
+      spxout = base.spxout;
       integerVariables = base.integerVariables;
 
       if (base.theRep == COLUMN)
@@ -1288,6 +1304,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , displayLine(base.displayLine)
    , displayFreq(base.displayFreq)
    , sparsePricingFactor(base.sparsePricingFactor)
+   , getStartingDecompBasis(base.getStartingDecompBasis)
+   , computeDegeneracy(base.computeDegeneracy)
+   , degenCompIterOffset(base.degenCompIterOffset)
+   , decompIterationLimit(base.decompIterationLimit)
    , fullPerturbation(base.fullPerturbation)
    , unitVecs(base.unitVecs)
    , primRhs(base.primRhs)
@@ -1311,6 +1331,12 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , polishCount(base.polishCount)
    , boundflips(base.boundflips)
    , totalboundflips(base.totalboundflips)
+   , enterCycles(base.enterCycles)
+   , leaveCycles(base.leaveCycles)
+   , enterDegenCand(base.enterDegenCand)
+   , leaveDegenCand(base.leaveDegenCand)
+   , primalDegenSum(base.primalDegenSum)
+   , dualDegenSum(base.dualDegenSum)
    , infeasibilities(base.infeasibilities)
    , infeasibilitiesCo(base.infeasibilitiesCo)
    , isInfeasible(base.isInfeasible)
