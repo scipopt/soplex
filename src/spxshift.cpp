@@ -160,35 +160,38 @@ void SPxSolver::perturbMin(
    assert(uvec.dim() == p_up.dim());
 
    const Real* vec = uvec.get_const_ptr();
-   const Real* upd = uvec.delta().values();
-   const IdxSet& idx = uvec.delta().indices();
    Real minrandom = 10.0 * p_delta;
    Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
-   int i, j;
+   int i;
 
 #ifdef  FULL_SHIFT
    eps = p_delta;
+   Real tol = feastol();
 
-   for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
+   for( i = uvec.dim() - start - 1; i >= 0; i -= incr )
    {
       u = p_up[i];
       l = p_low[i];
+      x = vec[i];
 
-      if (p_up[i] <= vec[i] + eps)
+      if( NE(u, l, tol) && u <= x + eps )
       {
-         p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+         p_up[i] = x + random.next(minrandom,maxrandom);
          theShift += p_up[i] - u;
       }
-      if (p_low[i] >= vec[i] - eps)
+      if( NE(u, l, tol) && l >= x - eps )
       {
-         p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+         p_low[i] = x - random.next(minrandom,maxrandom);
          theShift -= p_low[i] - l;
       }
    }
 
 #else   // !FULL_SHIFT
-   for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
+   const Real* upd = uvec.delta().values();
+   const IdxSet& idx = uvec.delta().indices();
+
+   for( int j = uvec.delta().size() - start - 1; j >= 0; j -= incr )
    {
       i = idx.index(j);
       x = upd[i];
@@ -234,12 +237,10 @@ void SPxSolver::perturbMax(
    assert(uvec.dim() == p_up.dim());
 
    const Real* vec = uvec.get_const_ptr();
-   const Real* upd = uvec.delta().values();
-   const IdxSet& idx = uvec.delta().indices();
    Real minrandom = 10.0 * p_delta;
    Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
-   int i, j;
+   int i;
 
 #ifdef  FULL_SHIFT
    eps = p_delta;
@@ -247,20 +248,25 @@ void SPxSolver::perturbMax(
    {
       u = p_up[i];
       l = p_low[i];
-      if (p_up[i] <= vec[i] + eps)
+      x = vec[i];
+
+      if( p_up[i] <= x + eps )
       {
-         p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+         p_up[i] = x + random.next(minrandom,maxrandom);
          theShift += p_up[i] - u;
       }
-      if (p_low[i] >= vec[i] - eps)
+      if( p_low[i] >= x - eps )
       {
-         p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+         p_low[i] = x - random.next(minrandom,maxrandom);
          theShift -= p_low[i] - l;
       }
    }
 
 #else   // !FULL_SHIFT
-   for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
+   const Real* upd = uvec.delta().values();
+   const IdxSet& idx = uvec.delta().indices();
+
+   for( int j = uvec.delta().size() - start - 1; j >= 0; j -= incr )
    {
       i = idx.index(j);
       x = upd[i];
@@ -325,26 +331,26 @@ Real SPxSolver::perturbMin(
    assert(uvec.dim() == p_up.dim());
 
    const Real* vec = uvec.get_const_ptr();
-   const Real* upd = uvec.delta().values();
-   const IdxSet& idx = uvec.delta().indices();
    Real minrandom = 10.0 * p_delta;
    Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
-   int i, j;
+   int i;
    Real l_theShift = 0;
 
 #ifdef  FULL_SHIFT
    eps = p_delta;
-   for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
+   for( i = uvec.dim() - start - 1; i >= 0; i -= incr )
    {
       u = p_up[i];
       l = p_low[i];
-      if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
+      x = vec[i];
+
+      if( l <= x + eps && rep() * stat[i] < 0 )
       {
          p_up[i] = vec[i] + random.next(minrandom,maxrandom);
          l_theShift += p_up[i] - u;
       }
-      if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
+      if( l >= x - eps && rep() * stat[i] < 0 )
       {
          p_low[i] = vec[i] - random.next(minrandom,maxrandom);
          l_theShift -= p_low[i] - l;
@@ -352,7 +358,10 @@ Real SPxSolver::perturbMin(
    }
 
 #else   // !FULL_SHIFT
-   for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
+   const Real* upd = uvec.delta().values();
+   const IdxSet& idx = uvec.delta().indices();
+
+   for( int j = uvec.delta().size() - start - 1; j >= 0; j -= incr )
    {
       i = idx.index(j);
       x = upd[i];
@@ -393,26 +402,26 @@ Real SPxSolver::perturbMax(
    assert(uvec.dim() == p_up.dim());
 
    const Real* vec = uvec.get_const_ptr();
-   const Real* upd = uvec.delta().values();
-   const IdxSet& idx = uvec.delta().indices();
    Real minrandom = 10.0 * p_delta;
    Real maxrandom = 100.0 * p_delta;
    Real x, l, u;
-   int i, j;
+   int i;
    Real l_theShift = 0;
 
 #ifdef  FULL_SHIFT
    eps = p_delta;
-   for (i = uvec.dim() - start - 1; i >= 0; i -= incr)
+   for( i = uvec.dim() - start - 1; i >= 0; i -= incr )
    {
       u = p_up[i];
       l = p_low[i];
-      if (p_up[i] <= vec[i] + eps && rep()*stat[i] < 0)
+      x = vec[i];
+
+      if( u <= x + eps && rep() * stat[i] < 0 )
       {
          p_up[i] = vec[i] + random.next(minrandom,maxrandom);
          l_theShift += p_up[i] - u;
       }
-      if (p_low[i] >= vec[i] - eps && rep()*stat[i] < 0)
+      if( l >= x - eps && rep()*stat[i] < 0 )
       {
          p_low[i] = vec[i] - random.next(minrandom,maxrandom);
          l_theShift -= p_low[i] - l;
@@ -420,7 +429,10 @@ Real SPxSolver::perturbMax(
    }
 
 #else   // !FULL_SHIFT
-   for (j = uvec.delta().size() - start - 1; j >= 0; j -= incr)
+   const Real* upd = uvec.delta().values();
+   const IdxSet& idx = uvec.delta().indices();
+
+   for( int j = uvec.delta().size() - start - 1; j >= 0; j -= incr )
    {
       i = idx.index(j);
       x = upd[i];
