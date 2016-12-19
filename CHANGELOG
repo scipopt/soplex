@@ -52,6 +52,8 @@ interface & parameters:
 - solve() is now called optimize() to distinguish it from solves with the basis matrix; solve() is deprecated
 - LPs can be loaded into the solver w/o setting up a slack basis (new default param in loadLP() method)
 - persistent scaling can be disabled by setting bool:persistentscaling to 0
+- new bool parameter 'fullperturbation' to perturb the entire problem instead of only the bounds relevant
+  for the current pivot
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver

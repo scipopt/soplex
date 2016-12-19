@@ -113,6 +113,11 @@ namespace soplex
       name[SoPlex::PERSISTENTSCALING] = "persistentscaling";
       description[SoPlex::PERSISTENTSCALING] = "should persistent scaling be used?";
       defaultValue[SoPlex::PERSISTENTSCALING] = true;
+
+      // perturb the entire problem or only the relevant bounds of s single pivot?
+      name[SoPlex::FULLPERTURBATION] = "fullperturbation";
+      description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
+      defaultValue[SoPlex::FULLPERTURBATION] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -5527,6 +5532,9 @@ namespace soplex
          _ratiotesterBoundFlipping.useBoundFlipsRow(value);
          break;
       case PERSISTENTSCALING:
+         break;
+      case FULLPERTURBATION:
+         _solver.useFullPerturbation(value);
          break;
       default:
          return false;
