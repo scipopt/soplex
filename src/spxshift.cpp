@@ -168,7 +168,6 @@ void SPxSolver::perturbMin(
    if( fullPerturbation )
    {
       eps = p_delta;
-      Real tol = feastol();
 
       for( i = uvec.dim() - start - 1; i >= 0; i -= incr )
       {
@@ -176,12 +175,12 @@ void SPxSolver::perturbMin(
          l = p_low[i];
          x = vec[i];
 
-         if( NE(u, l, tol) && u <= x + eps )
+         if( LT(u, infinity) && NE(l, u) && u <= x + eps )
          {
             p_up[i] = x + random.next(minrandom,maxrandom);
             theShift += p_up[i] - u;
          }
-         if( NE(u, l, tol) && l >= x - eps )
+         if( GT(l, -infinity) && NE(l, u) && l >= x - eps )
          {
             p_low[i] = x - random.next(minrandom,maxrandom);
             theShift -= p_low[i] - l;
@@ -208,7 +207,7 @@ void SPxSolver::perturbMin(
 
          if (x < -eps)
          {
-            if (u != l && vec[i] >= u - eps)
+            if( LT(u, infinity) && NE(l, u) && vec[i] >= u - eps )
             {
                p_up[i] = vec[i] + random.next(minrandom,maxrandom);
                theShift += p_up[i] - u;
@@ -216,7 +215,7 @@ void SPxSolver::perturbMin(
          }
          else if (x > eps)
          {
-            if (u != l && vec[i] <= l + eps)
+            if( GT(l, -infinity) && NE(l, u) && vec[i] <= l + eps )
             {
                p_low[i] = vec[i] - random.next(minrandom,maxrandom);
                theShift -= p_low[i] - l;
@@ -253,12 +252,12 @@ void SPxSolver::perturbMax(
          l = p_low[i];
          x = vec[i];
 
-         if( p_up[i] <= x + eps )
+         if( LT(u, infinity) && NE(l, u) && u <= x + eps )
          {
             p_up[i] = x + random.next(minrandom,maxrandom);
             theShift += p_up[i] - u;
          }
-         if( p_low[i] >= x - eps )
+         if( GT(l, -infinity) && NE(l, u) && l >= x - eps )
          {
             p_low[i] = x - random.next(minrandom,maxrandom);
             theShift -= p_low[i] - l;
@@ -285,7 +284,7 @@ void SPxSolver::perturbMax(
 
          if (x > eps)
          {
-            if (u != l && vec[i] >= u - eps)
+            if( LT(u, infinity) && NE(l, u) && vec[i] >= u - eps )
             {
                p_up[i] = vec[i] + random.next(minrandom,maxrandom);
                theShift += p_up[i] - u;
@@ -293,7 +292,7 @@ void SPxSolver::perturbMax(
          }
          else if (x < -eps)
          {
-            if (u != l && vec[i] <= l + eps)
+            if( GT(l, -infinity) && NE(l, u) && vec[i] <= l + eps )
             {
                p_low[i] = vec[i] - random.next(minrandom,maxrandom);
                theShift -= p_low[i] - l;
@@ -350,12 +349,12 @@ Real SPxSolver::perturbMin(
          l = p_low[i];
          x = vec[i];
 
-         if( l <= x + eps && rep() * stat[i] < 0 )
+         if( LT(u, infinity) && NE(l, u) && l <= x + eps && rep() * stat[i] < 0 )
          {
             p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             l_theShift += p_up[i] - u;
          }
-         if( l >= x - eps && rep() * stat[i] < 0 )
+         if( GT(l, -infinity) && NE(l, u) && l >= x - eps && rep() * stat[i] < 0 )
          {
             p_low[i] = vec[i] - random.next(minrandom,maxrandom);
             l_theShift -= p_low[i] - l;
@@ -375,7 +374,7 @@ Real SPxSolver::perturbMin(
          l = p_low[i];
          if (x < -eps)
          {
-            if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
+            if( LT(u, infinity) && NE(l, u) && vec[i] >= u - eps && rep() * stat[i] < 0 )
             {
                p_up[i] = vec[i] + random.next(minrandom,maxrandom);
                l_theShift += p_up[i] - u;
@@ -383,7 +382,7 @@ Real SPxSolver::perturbMin(
          }
          else if (x > eps)
          {
-            if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
+            if( GT(l, -infinity) && NE(l, u) && vec[i] <= l + eps && rep() * stat[i] < 0 )
             {
                p_low[i] = vec[i] - random.next(minrandom,maxrandom);
                l_theShift -= p_low[i] - l;
@@ -423,12 +422,12 @@ Real SPxSolver::perturbMax(
          l = p_low[i];
          x = vec[i];
 
-         if( u <= x + eps && rep() * stat[i] < 0 )
+         if( LT(u, infinity) && NE(l, u) && u <= x + eps && rep() * stat[i] < 0 )
          {
             p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             l_theShift += p_up[i] - u;
          }
-         if( l >= x - eps && rep()*stat[i] < 0 )
+         if( GT(l, -infinity) && NE(l, u) && l >= x - eps && rep() * stat[i] < 0 )
          {
             p_low[i] = vec[i] - random.next(minrandom,maxrandom);
             l_theShift -= p_low[i] - l;
@@ -446,17 +445,17 @@ Real SPxSolver::perturbMax(
          x = upd[i];
          u = p_up[i];
          l = p_low[i];
-         if (x > eps)
+         if( x > eps )
          {
-            if (u != l && vec[i] >= u - eps && rep()*stat[i] < 0)
+            if( LT(u, infinity) && NE(l, u) && vec[i] >= u - eps && rep() * stat[i] < 0 )
             {
                p_up[i] = vec[i] + random.next(minrandom,maxrandom);
                l_theShift += p_up[i] - u;
             }
          }
-         else if (x < -eps)
+         else if( x < -eps )
          {
-            if (u != l && vec[i] <= l + eps && rep()*stat[i] < 0)
+            if( GT(l, -infinity) && NE(l, u) && vec[i] <= l + eps && rep() * stat[i] < 0 )
             {
                p_low[i] = vec[i] - random.next(minrandom,maxrandom);
                l_theShift -= p_low[i] - l;
