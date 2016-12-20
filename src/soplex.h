@@ -902,8 +902,11 @@ public:
       /// use persistent scaling?
       PERSISTENTSCALING = 13,
 
+      /// perturb the entire problem or only the relevant bounds of s single pivot?
+      FULLPERTURBATION = 14,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 14
+      BOOLPARAM_COUNT = 15
    } BoolParam;
 
    /// integer parameters

@@ -296,11 +296,15 @@ private:
 
    int            displayLine;
    int            displayFreq;
-   Real           sparsePricingFactor; ///< enable sparse pricing when viols < factor * dim()
+   Real           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
+
    bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
-   int            degenCompIterOffset; ///< the number of iterations performed before the degeneracy level is computed
-   int            decompIterationLimit; ///< the maximum number of iterations before the decomposition simplex is aborted.
+   int            degenCompIterOffset;    ///< the number of iterations performed before the degeneracy level is computed
+   int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
+
+   bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
+
    //@}
 
 protected:
@@ -355,13 +359,13 @@ protected:
    DSVector       primalRay;      ///< stores primal ray in case of unboundedness
    DSVector       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
 
-   int             leaveCount;    ///< number of LEAVE iterations
-   int             enterCount;    ///< number of ENTER iterations
-   int             primalCount;   ///< number of primal iterations
-   int             polishCount;   ///< number of solution polishing iterations
+   int            leaveCount;    ///< number of LEAVE iterations
+   int            enterCount;    ///< number of ENTER iterations
+   int            primalCount;   ///< number of primal iterations
+   int            polishCount;   ///< number of solution polishing iterations
 
-   int             boundflips;          ///< number of performed bound flips
-   int             totalboundflips;     ///< total number of bound flips
+   int            boundflips;          ///< number of performed bound flips
+   int            totalboundflips;     ///< total number of bound flips
 
    int            enterCycles;      ///< the number of degenerate steps during the entering algorithm
    int            leaveCycles;      ///< the number of degenerate steps during the leaving algorithm
@@ -849,6 +853,13 @@ public:
    {
       return m_numCycle;
    }
+
+   /// perturb entire problem or only the bounds relevant to the current pivot
+   void useFullPerturbation(bool full)
+   {
+      fullPerturbation = full;
+   }
+
    //@}
 
 private:
