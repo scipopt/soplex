@@ -170,10 +170,7 @@ ACCOUNT="mip"
 
 if test $CLUSTERQUEUE = "dbg"
 then
-    CLUSTERQUEUE="mip-dbg,telecom-dbg"
-    ACCOUNT="mip-dbg"
-elif test $CLUSTERQUEUE = "telecom-dbg"
-then
+    CLUSTERQUEUE="mip-dbg"
     ACCOUNT="mip-dbg"
 elif test $CLUSTERQUEUE = "mip-dbg"
 then
