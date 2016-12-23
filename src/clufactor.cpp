@@ -5350,7 +5350,7 @@ int CLUFactor::vSolveUright2(
                   i = deQueueMax( ridx, &rn );
                else
                {
-                  (int) deQueueMax( ridx, &rn );
+                  (void) deQueueMax( ridx, &rn );
                   i = deQueueMax( ridx2, &rn2 );
                }
 
