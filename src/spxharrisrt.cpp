@@ -362,7 +362,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
          pnr = -1;
          cnr = -1;
          max = val;
-         sel = val;
          lastshift = solver()->shift();
          assert(delta > epsilon);
 
@@ -557,7 +556,6 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int)
          pnr = -1;
          cnr = -1;
          max = val;
-         sel = val;
          lastshift = solver()->shift();
          assert(delta > epsilon);
 

@@ -717,7 +717,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
    int *lidx;
    int *lbeg = l.start;
 
-   Real *cval = u.col.val;
+   Real *cval;
    int *cidx = u.col.idx;
    int *cmax = u.col.max;
    int *clen = u.col.len;
@@ -5350,7 +5350,7 @@ int CLUFactor::vSolveUright2(
                   i = deQueueMax( ridx, &rn );
                else
                {
-                  i = deQueueMax( ridx, &rn );
+                  (int) deQueueMax( ridx, &rn );
                   i = deQueueMax( ridx2, &rn2 );
                }
 

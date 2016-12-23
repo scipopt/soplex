@@ -127,7 +127,6 @@ namespace soplex
 
                mpq_set_num(resvec[j].getMpqRef_w(),tn);
                mpq_set_den(resvec[j].getMpqRef_w(),td);
-               done=1;
             }
             else
             {

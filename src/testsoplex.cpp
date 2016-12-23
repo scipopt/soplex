@@ -99,11 +99,12 @@ namespace soplex
       DVector** binvrow = 0;
       int* inds = 0;
       int basisdim = _solver.nRows(); // do all operations with regard to the column basis
+      bool colrep = (_solver.rep() == SPxSolver::COLUMN);
       spx_alloc(binvcol, basisdim);
       spx_alloc(binvrow, basisdim);
       spx_alloc(inds, basisdim);
 
-      if( _solver.rep() == SPxSolver::COLUMN )
+      if( colrep )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: computing columns of inverted basis matrix\n";)
          // collect columns of the basis inverse
@@ -123,7 +124,7 @@ namespace soplex
          assert(getBasisInverseRowReal(i, binvrow[i]->get_ptr(), 0, 0, true));
       }
 
-      if( _solver.rep() == SPxSolver::COLUMN )
+      if( colrep )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: checking columns for identity after multiplying with basis matrix\n";)
          // multiply with (unscaled) basis matrix and check result (should be unitvecs)
@@ -179,7 +180,7 @@ namespace soplex
          spx_alloc(binvcol2, basisdim);
          spx_alloc(binvrow2, basisdim);
 
-         if( _solver.rep() == SPxSolver::COLUMN )
+         if( colrep )
          {
             MSG_INFO1( spxout, spxout << "DEBUG: computing columns of inverted basis matrix again\n";)
             // collect columns of the basis inverse
@@ -206,7 +207,7 @@ namespace soplex
             Real sumerror = 0.0;
             for( int j = 0; j < basisdim; ++j)
             {
-               if( _solver.rep() == SPxSolver::COLUMN )
+               if( colrep )
                {
                   if( NE((*binvcol[i])[j], (*binvcol2[i])[j], _solver.feastol()) )
                   {
@@ -222,6 +223,9 @@ namespace soplex
             }
             assert(sumerror < _solver.feastol());
          }
+
+         spx_free(binvcol2);
+         spx_free(binvrow2);
       }
 
       spx_free(inds);

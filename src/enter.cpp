@@ -1116,7 +1116,6 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
-      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
       MSG_DEBUG( std::cout << "DENTER08 rejecting false enter pivot" << std::endl; )
 
@@ -1304,8 +1303,6 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          variable. We store this leaving variable for later if we are not already in the
          instable case */
 
-      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
-
       if (!instable)
       {
          instableEnterId = enterId;
@@ -1362,8 +1359,6 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
        */
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
-
-      objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
       if (polish)
          return false;
