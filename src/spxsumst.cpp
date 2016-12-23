@@ -29,9 +29,12 @@ void SPxSumST::setupWeights(SPxSolver& base)
    Real x;
    DVector work, delta, rowLen;
 
-   rowLen.reDim( base.nRows() );
-   work.reDim (base.nCols());
-   delta.reDim (base.nCols());
+   assert(base.nRows() > 0);
+   assert(base.nCols() > 0);
+
+   rowLen.reDim(base.nRows(), true);
+   work.reDim(base.nCols(), true);
+   delta.reDim(base.nCols(), true);
 
    Real* wrk = work.get_ptr();
    const Real* lhs = base.lhs().get_const_ptr();

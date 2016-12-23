@@ -5268,7 +5268,7 @@ int CLUFactorRational::vSolveUright2( Rational* vec, int* vidx, Rational* rhs, i
                   i = deQueueMax( ridx, &rn );
                else
                {
-                  i = deQueueMax( ridx, &rn );
+                  (void) deQueueMax( ridx, &rn );
                   i = deQueueMax( ridx2, &rn2 );
                }
 
