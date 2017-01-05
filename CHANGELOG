@@ -54,6 +54,7 @@ interface & parameters:
 - persistent scaling can be disabled by setting bool:persistentscaling to 0
 - new bool parameter 'fullperturbation' to perturb the entire problem instead of only the bounds relevant
   for the current pivot
+- new bool parameter 'feasible' for unsimplify() to disable some debug checks that are only valid for feasible solutions
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver

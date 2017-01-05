@@ -1295,7 +1295,7 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
 
-   assert(GE(x[m_j], m_lower) && LE(x[m_j], m_upper));
+   assert(!m_feasible || (GE(x[m_j], m_lower) && LE(x[m_j], m_upper)));
 
    // dual:
    Real dualVal = 0.0;
@@ -4649,7 +4649,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 }
 
 void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
-                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[])
+                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[], bool feasible)
 {
    MSG_INFO1( (*spxout), (*spxout) << " --- unsimplifying solution and basis" << std::endl; )
    assert(x.dim() <= m_prim.dim());
@@ -4657,6 +4657,8 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
    assert(x.dim() == r.dim());
    assert(y.dim() == s.dim());
 
+   // set the feasibility flag for debug checks
+   m_feasible = feasible;
 
    // assign values of variables in reduced LP
    // NOTE: for maximization problems, we have to switch signs of dual and reduced cost values,

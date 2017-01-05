@@ -1217,6 +1217,7 @@ private:
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
    int                             m_addedcols;  ///< columns added by handleRowObjectives()
    Result                          m_result;     ///< result of the simplification.
+   bool                            m_feasible;   ///< status of the simplified simplex run (used for debug checks in the unsimplify method)
 
    Real                            m_cutoffbound;  ///< the cutoff bound that is found by heuristics
    Real                            m_pseudoobj;    ///< the pseudo objective function value
@@ -1331,6 +1332,7 @@ public:
       , m_keepbounds(false)
       , m_addedcols(0)
       , m_result(OKAY)
+      , m_feasible(true)
       , m_cutoffbound(-infinity)
       , m_pseudoobj(-infinity)
    {}
@@ -1354,6 +1356,7 @@ public:
       , m_keepbounds(old.m_keepbounds)
       , m_addedcols(old.m_addedcols)
       , m_result(old.m_result)
+      , m_feasible(old.m_feasible)
       , m_cutoffbound(old.m_cutoffbound)
       , m_pseudoobj(old.m_pseudoobj)
    {
@@ -1390,6 +1393,7 @@ public:
          m_keepbounds = rhs.m_keepbounds;
          m_addedcols = rhs.m_addedcols;
          m_result = rhs.m_result;
+         m_feasible = rhs.m_feasible;
          m_cutoffbound = rhs.m_cutoffbound;
          m_pseudoobj = rhs.m_pseudoobj;
 
@@ -1447,7 +1451,7 @@ public:
 
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
-                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
+                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[], bool feasible = true);
 
    /// returns result status of the simplification
    virtual Result result() const
