@@ -795,7 +795,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    // dual:
    r[m_j] = -1.0 * aij * y[m_i];
 
-   assert(cStatus[m_j] != SPxSolver::BASIC || isZero(r[m_j], eps()));
+   assert(!isOptimal || (cStatus[m_j] != SPxSolver::BASIC || isZero(r[m_j], eps())));
 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
