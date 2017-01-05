@@ -112,7 +112,7 @@ private:
       virtual PostStep* clone() const = 0;
       /// executes the postsolving.
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const = 0;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const = 0;
 
       virtual bool checkBasisDim(DataArray<SPxSolver::VarStatus> rows,  DataArray<SPxSolver::VarStatus> cols) const;
 
@@ -157,7 +157,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -208,7 +208,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -255,7 +255,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -343,7 +343,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves forcing constraints.
@@ -433,7 +433,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves variable fixing.
@@ -496,7 +496,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves variable bound fixing.
@@ -553,7 +553,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief Postsolves the case when constraints are removed due to a
@@ -638,7 +638,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves column singletons with zero objective.
@@ -701,7 +701,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves free column singletons.
@@ -770,7 +770,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves doubleton equations combined with a column singleton.
@@ -866,7 +866,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves duplicate rows.
@@ -961,7 +961,7 @@ private:
          return new (DuplicateRowsPSptr) DuplicateRowsPS(*this);
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves duplicate columns.
@@ -1027,7 +1027,7 @@ private:
          return new (DuplicateColsPSptr) DuplicateColsPS(*this);
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves multi aggregation.
@@ -1106,7 +1106,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves variable bound tightening from pseudo objective propagation.
@@ -1149,7 +1149,7 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
    // friends
    friend class FreeConstraintPS;
@@ -1217,7 +1217,6 @@ private:
    bool                            m_keepbounds;  ///< keep some bounds (for boundflipping)
    int                             m_addedcols;  ///< columns added by handleRowObjectives()
    Result                          m_result;     ///< result of the simplification.
-
    Real                            m_cutoffbound;  ///< the cutoff bound that is found by heuristics
    Real                            m_pseudoobj;    ///< the pseudo objective function value
    //@}
@@ -1447,7 +1446,7 @@ public:
 
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
-                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
+                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[], bool isOptimal = true);
 
    /// returns result status of the simplification
    virtual Result result() const

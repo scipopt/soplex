@@ -308,7 +308,7 @@ namespace soplex
 
          try
          {
-            _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+            _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), false);
             _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
             _hasBasis = true;
          }
@@ -489,7 +489,7 @@ namespace soplex
          {
             // pass solution data of transformed problem to simplifier
             _simplifier->unsimplify(_solReal._primal, _solReal._dual, _solReal._slacks, _solReal._redCost,
-                                    _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
+                                    _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), status() == SPxSolver::OPTIMAL);
          }
          catch( const SPxException& E )
          {

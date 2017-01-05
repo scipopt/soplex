@@ -187,7 +187,7 @@ public:
    virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false) = 0;
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
-                           const SPxSolver::VarStatus[], const SPxSolver::VarStatus[]) {}
+                           const SPxSolver::VarStatus[], const SPxSolver::VarStatus[], bool isOptimal = true) = 0;
    /// returns result status of the simplification
    virtual Result result() const = 0;
    /// specifies whether an optimal solution has already been unsimplified.
