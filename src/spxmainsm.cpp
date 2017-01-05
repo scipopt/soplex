@@ -84,7 +84,7 @@ bool SPxMainSM::PostStep::checkBasisDim(DataArray<SPxSolver::VarStatus> rows,
 
 void SPxMainSM::RowObjPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
                                           DataArray<SPxSolver::VarStatus>& cStatus,
-                                          DataArray<SPxSolver::VarStatus>& rStatus) const
+                                          DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    assert(isZero(s[m_i], 1e-9));
    s[m_i] = -x[m_j];
@@ -124,7 +124,7 @@ void SPxMainSM::RowObjPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
 
 void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
                                           DataArray<SPxSolver::VarStatus>& cStatus,
-                                          DataArray<SPxSolver::VarStatus>& rStatus) const
+                                          DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
    s[m_old_i] = s[m_i];
@@ -155,7 +155,7 @@ void SPxMainSM::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DV
 
 void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVector&,
                                            DataArray<SPxSolver::VarStatus>& cStatus,
-                                           DataArray<SPxSolver::VarStatus>& rStatus) const
+                                           DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
    s[m_old_i] = s[m_i];
@@ -181,7 +181,7 @@ void SPxMainSM::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVe
 
 void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                         DataArray<SPxSolver::VarStatus>& cStatus,
-                                        DataArray<SPxSolver::VarStatus>& rStatus) const
+                                        DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
    s[m_old_i] = s[m_i];
@@ -357,7 +357,7 @@ void SPxMainSM::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVec
 
 void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                            DataArray<SPxSolver::VarStatus>& cStatus,
-                                           DataArray<SPxSolver::VarStatus>& rStatus) const
+                                           DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
    s[m_old_i] = s[m_i];
@@ -458,7 +458,7 @@ void SPxMainSM::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, D
 
 void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                        DataArray<SPxSolver::VarStatus>& cStatus,
-                                       DataArray<SPxSolver::VarStatus>& rStatus) const
+                                       DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // update the index mapping; if m_correctIdx is false, we assume that this has happened already
    if(m_correctIdx)
@@ -509,7 +509,7 @@ void SPxMainSM::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVect
 
 void SPxMainSM::FixBoundsPS::execute(DVector&, DVector&, DVector&, DVector&,
                                      DataArray<SPxSolver::VarStatus>& cStatus,
-                                     DataArray<SPxSolver::VarStatus>& ) const
+                                     DataArray<SPxSolver::VarStatus>&, bool isOptimal) const
 {
    // basis:
    cStatus[m_j] = m_status;
@@ -517,7 +517,7 @@ void SPxMainSM::FixBoundsPS::execute(DVector&, DVector&, DVector&, DVector&,
 
 void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                                DataArray<SPxSolver::VarStatus>& cStatus,
-                                               DataArray<SPxSolver::VarStatus>& rStatus) const
+                                               DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the column and corresponding rows:
    x[m_old_j] = x[m_j];
@@ -668,7 +668,7 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
 
 void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                                DataArray<SPxSolver::VarStatus>& cStatus,
-                                               DataArray<SPxSolver::VarStatus>& rStatus) const
+                                               DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the column and corresponding rows:
    x[m_old_j] = x[m_j];
@@ -807,7 +807,7 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 
 void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                             DataArray<SPxSolver::VarStatus>& cStatus,
-                                            DataArray<SPxSolver::VarStatus>& rStatus) const
+                                            DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
 
    // correcting the change of idx by deletion of the row:
@@ -867,7 +867,7 @@ void SPxMainSM::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, 
 
 void SPxMainSM::DoubletonEquationPS::execute(DVector& x, DVector& y, DVector&, DVector& r,
                                              DataArray<SPxSolver::VarStatus>& cStatus,
-                                             DataArray<SPxSolver::VarStatus>& rStatus) const
+                                             DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // dual:
    if ((cStatus[m_k]  != SPxSolver::BASIC) &&
@@ -917,7 +917,7 @@ void SPxMainSM::DoubletonEquationPS::execute(DVector& x, DVector& y, DVector&, D
 
 void SPxMainSM::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVector&,
                                          DataArray<SPxSolver::VarStatus>& cStatus,
-                                         DataArray<SPxSolver::VarStatus>& rStatus) const
+                                         DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the duplicated rows:
    if(m_isLast)
@@ -1029,7 +1029,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
                                          DVector&,
                                          DVector& r,
                                          DataArray<SPxSolver::VarStatus>& cStatus,
-                                         DataArray<SPxSolver::VarStatus>& rStatus) const
+                                         DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
 
    if(m_isFirst)
@@ -1259,7 +1259,7 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 
 void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                             DataArray<SPxSolver::VarStatus>& cStatus,
-                                            DataArray<SPxSolver::VarStatus>& rStatus) const
+                                            DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
 
    // correcting the change of idx by deletion of the row:
@@ -1295,7 +1295,7 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
 
-   assert(!m_feasible || (GE(x[m_j], m_lower) && LE(x[m_j], m_upper)));
+   assert(!isOptimal || (GE(x[m_j], m_lower) && LE(x[m_j], m_upper)));
 
    // dual:
    Real dualVal = 0.0;
@@ -1331,7 +1331,7 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
 
 void SPxMainSM::TightenBoundsPS::execute(DVector& x, DVector&, DVector&, DVector&,
                                      DataArray<SPxSolver::VarStatus>& cStatus,
-                                     DataArray<SPxSolver::VarStatus>& rStatus) const
+                                     DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // basis:
    switch(cStatus[m_j])
@@ -4649,16 +4649,13 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 }
 
 void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
-                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[], bool feasible)
+                           const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[], bool isOptimal)
 {
    MSG_INFO1( (*spxout), (*spxout) << " --- unsimplifying solution and basis" << std::endl; )
    assert(x.dim() <= m_prim.dim());
    assert(y.dim() <= m_dual.dim());
    assert(x.dim() == r.dim());
    assert(y.dim() == s.dim());
-
-   // set the feasibility flag for debug checks
-   m_feasible = feasible;
 
    // assign values of variables in reduced LP
    // NOTE: for maximization problems, we have to switch signs of dual and reduced cost values,
@@ -4683,7 +4680,7 @@ void SPxMainSM::unsimplify(const Vector& x, const Vector& y, const Vector& s, co
 
       try
       {
-         m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat);
+         m_hist[k]->execute(m_prim, m_dual, m_slack, m_redCost, m_cBasisStat, m_rBasisStat, isOptimal);
       }
       catch( const SPxException& ex )
       {
