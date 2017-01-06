@@ -2797,16 +2797,6 @@ namespace soplex
 
          _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-         //This is here for debugging purposes. Will need to remove in the future.
-         //
-         //SPxLPReal dualLP;
-         //_solver.buildDualProblem(dualLP);
-
-         //char buffer[50];
-         //sprintf(buffer, "origprobdual.lp");
-         //printf("Writing the dual lp to a file\n");
-         //dualLP.writeFile(buffer);
-
          _solveDecompositionDualSimplex();
       }
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
@@ -5053,21 +5043,18 @@ namespace soplex
    {
       ///@todo implement return value
 
-      ///@todo implement for scaled LP
-#if 0
-      if( unscale && boolParam(SoPlex::PERSISTENTSCALING) )
+      if( unscale && _realLP->isScaled() )
       {
          SPxLPReal* origLP;
          origLP = 0;
          spx_alloc(origLP);
-         origLP = new (origLP) SPxLPReal(_realLP);
-         _scaler->unscale(origLP);
+         origLP = new (origLP) SPxLPReal(*_realLP);
+         origLP->unscaleLP();
          origLP->writeFile(filename, rowNames, colNames, intVars);
-         origLP->~SdPxLPReal();
+         origLP->~SPxLPReal();
          spx_free(origLP);
       }
       else
-#endif
          _realLP->writeFile(filename, rowNames, colNames, intVars);
 
       return true;
