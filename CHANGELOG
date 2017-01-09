@@ -34,6 +34,7 @@ performance:
 - more efficient SoPlex class with better usability:
   - avoid unnecessary resolves of problem after unsimplifying
   - access to solution data also when suboptimal
+- use exact weight initialization when switching to steepest edge in auto pricing
 
 interface & parameters:
 - new parameters to control refactorization triggers
