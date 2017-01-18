@@ -349,7 +349,7 @@ Real SPxSolver::perturbMin(
          l = p_low[i];
          x = vec[i];
 
-         if( LT(u, infinity) && NE(l, u) && l <= x + eps && rep() * stat[i] < 0 )
+         if( LT(u, infinity) && NE(l, u) && u <= x + eps && rep() * stat[i] < 0 )
          {
             p_up[i] = vec[i] + random.next(minrandom,maxrandom);
             l_theShift += p_up[i] - u;
