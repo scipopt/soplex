@@ -252,7 +252,7 @@ public:
       nrows = 0;
       ncols = 0;
 
-      if( weightsAreSetup )
+      if( weightsAreSetup && thesolver != NULL )
       {
          if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN )
          {
@@ -278,7 +278,7 @@ public:
       nrows = 0;
       ncols = 0;
 
-      if( !weightsAreSetup )
+      if( !weightsAreSetup || thesolver == NULL )
          return false;
 
       if( thesolver->type() == SPxSolver::LEAVE && thesolver->rep() == SPxSolver::COLUMN )
