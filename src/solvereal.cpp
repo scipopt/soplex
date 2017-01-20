@@ -618,6 +618,7 @@ namespace soplex
       _realLP->~SPxLPReal();
       spx_free(_realLP);
       _realLP = &_solver;
+      _solver.init();
    }
 
 
