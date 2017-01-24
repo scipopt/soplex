@@ -4164,23 +4164,14 @@ namespace soplex
             assert(!_solver.isRowBasic(index));
 
             // get row vector
-            if( unscale && _solver.isScaled() )
-               _solver.getRowVectorUnscaled(index, rhs);
-            else
-               rhs = _solver.rowVector(index);
+            rhs = _solver.rowVector(index);
+            rhs *= -1.0;
 
             if( unscale && _solver.isScaled() )
             {
                for( int i = 0; i < rhs.size(); ++i)
-               {
-                  if( bind[rhs.index(i)] >= 0 )
-                     rhs.value(i) = spxLdexp(rhs.value(i), _scaler->getColScaleExp(rhs.index(i)));
-                  else
-                     rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(rhs.index(i)));
-               }
+                  rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(index));
             }
-
-            rhs *= -1.0;
          }
          // r corresponds to a column vector
          else
@@ -4221,10 +4212,11 @@ namespace soplex
                assert(_solver.number(id) < numRowsReal());
                assert(bind[r] >= 0 || _solver.number(id) != index);
 
-               coef[_solver.number(id)] = y[i];
+               int rowindex = _solver.number(id);
+               coef[rowindex] = y[i];
 
                if( unscale && _solver.isScaled() )
-                  coef[_solver.number(id)] = spxLdexp(y[i], _scaler->getRowScaleExp(_solver.number(id)));
+                  coef[rowindex] = spxLdexp(y[i], _scaler->getRowScaleExp(rowindex));
             }
          }
 
