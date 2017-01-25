@@ -4447,7 +4447,7 @@ namespace soplex
 
 
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
-   bool SoPlex::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
+   bool SoPlex::getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale)
    {
       VectorReal v(numRowsReal(), rhs);
       VectorReal x(numRowsReal(), sol);
@@ -4465,10 +4465,44 @@ namespace soplex
       // the existing factorization
       if( _solver.rep() == SPxSolver::COLUMN )
       {
-         // solve system "x = B^-1 * A_c" to get c'th column of B^-1 * A
+         // solve system "x = B^-1 * v"
          try
          {
-            _solver.basis().solve(x, v);
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+            {
+               /* for information on the unscaling procedure see spxscaler.h */
+               int scaleExp;
+               int idx;
+
+               for( int i = 0; i < v.dim(); ++i)
+               {
+                  if( isNotZero(v[i]) )
+                  {
+                     scaleExp =_scaler->getRowScaleExp(i);
+                     v[i] = spxLdexp(v[i], scaleExp);
+                  }
+               }
+
+               _solver.basis().solve(x, v);
+
+               for( int i = 0; i < x.dim(); i++ )
+               {
+                  if( isNotZero(x[i]) )
+                  {
+                     idx = _solver.number(_solver.basis().baseId(i));
+                     if( _solver.basis().baseId(i).isSPxColId() )
+                        scaleExp = _scaler->getColScaleExp(idx);
+                     else
+                        scaleExp = - _scaler->getRowScaleExp(idx);
+                     x[i] = spxLdexp(x[i], scaleExp);
+                  }
+               }
+            }
+            else
+            {
+               _solver.basis().solve(x, v);
+            }
          }
          catch( const SPxException& E )
          {
@@ -4479,11 +4513,14 @@ namespace soplex
       else
       {
          assert(_solver.rep() == SPxSolver::ROW);
-         assert(!_solver.isScaled());
 
          DSVectorReal rowrhs(numColsReal());
          SSVectorReal y(numColsReal());
          int* bind = 0;
+
+         bool adaptScaling = unscale && _realLP->isScaled();
+         int scaleExp;
+         int idx;
 
          // get ordering of column basis matrix
          spx_alloc(bind, numRowsReal());
@@ -4499,7 +4536,14 @@ namespace soplex
                assert(_solver.number(id) >= 0);
                assert(_solver.number(id) < numRowsReal());
 
-               rowrhs.add(i, v[_solver.number(id)]);
+               if( adaptScaling )
+               {
+                  idx = _solver.number(id);
+                  scaleExp = _scaler->getRowScaleExp(idx);
+                  rowrhs.add(i, spxLdexp(v[idx], scaleExp));
+               }
+               else
+                  rowrhs.add(i, v[_solver.number(id)]);
             }
             else
             {
@@ -4534,8 +4578,13 @@ namespace soplex
                assert(index < numRowsReal());
                assert(!_solver.isRowBasic(index));
 
-               // todo this needs to respect persistent scaling!
                x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numColsReal(), y.get_ptr()));
+
+               if( adaptScaling )
+               {
+                  scaleExp = -_scaler->getRowScaleExp(index);
+                  x[i] = spxLdexp(x[i], scaleExp);
+               }
             }
             else
             {
@@ -4544,7 +4593,13 @@ namespace soplex
                assert(index < numColsReal());
                assert(!_solver.isColBasic(index));
 
-               x[i] = y[index];
+               if( adaptScaling )
+               {
+                  scaleExp = _scaler->getColScaleExp(index);
+                  x[i] = spxLdexp(y[index], scaleExp);
+               }
+               else
+                  x[i] = y[index];
             }
          }
 
