@@ -115,7 +115,7 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
-         _storeSolutionReal(!_isRealLPLoaded);
+         _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
          break;
 
       case SPxSolver::UNBOUNDED:
