@@ -67,7 +67,10 @@ namespace soplex
 
       // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
       // scratch, apply preprocessing according to parameter settings
-      _preprocessAndSolveReal(!_hasBasis);
+      if( !_hasBasis && realParam(SoPlex::OBJLIMIT_LOWER) == -realParam(SoPlex::INFTY) && realParam(SoPlex::OBJLIMIT_UPPER) == realParam(SoPlex::INFTY) )
+         _preprocessAndSolveReal(true);
+      else
+         _preprocessAndSolveReal(false);
 
       // stop timing
       _statistics->solvingTime->stop();
@@ -115,7 +118,7 @@ namespace soplex
       switch( _status )
       {
       case SPxSolver::OPTIMAL:
-         _storeSolutionReal(!_isRealLPLoaded);
+         _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
          break;
 
       case SPxSolver::UNBOUNDED:
@@ -618,6 +621,7 @@ namespace soplex
       _realLP->~SPxLPReal();
       spx_free(_realLP);
       _realLP = &_solver;
+      _solver.init();
    }
 
 

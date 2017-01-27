@@ -75,7 +75,7 @@ private:
    ///
    int last;
    /// Set size for partial pricing.
-   static int partialSize;
+   int partialSize;
    //@}
 
 public:
@@ -90,6 +90,7 @@ public:
       , used(0)
       , min(0)
       , last(0)
+      , partialSize(17)
    {}
    /// copy constructor
    SPxParMultPR( const SPxParMultPR& old)
@@ -99,9 +100,8 @@ public:
       , used(old.used)
       , min(old.min)
       , last(old.last)
-   {
-      partialSize = old.partialSize;
-   }
+      , partialSize(old.partialSize)
+   {}
    /// assignment operator
    SPxParMultPR& operator=( const SPxParMultPR& rhs)
    {
@@ -117,7 +117,7 @@ public:
       }
 
       return *this;
-   }  
+   }
    /// destructor
    virtual ~SPxParMultPR()
    {}
@@ -142,7 +142,6 @@ public:
    //@}
 
 };
-
 
 } // namespace soplex
 #endif // _SPXPARMULTPRR_H_

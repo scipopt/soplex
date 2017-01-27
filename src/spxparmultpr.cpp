@@ -21,9 +21,6 @@
 
 namespace soplex
 {
-// #define EQ_PREF 1000
-
-int SPxParMultPR::partialSize = 17;
 
 void SPxParMultPR::setType(SPxSolver::Type tp)
 {

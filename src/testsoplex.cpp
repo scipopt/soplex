@@ -141,7 +141,7 @@ namespace soplex
                else
                   error = spxAbs(result[j] - 1.0);
                if( error > _solver.feastol() )
-                  MSG_INFO1( spxout, spxout << "ERROR: " << j << ", " << result[j] << std::endl );
+                  MSG_INFO1( spxout, spxout << "ERROR: col " << i << " " << j << ", " << result[j] << std::endl );
                sumerror += error;
             }
             assert(_solver.rep() == SPxSolver::ROW || sumerror < _solver.feastol());
@@ -162,7 +162,7 @@ namespace soplex
             else
                error = spxAbs(result[j] - 1.0);
             if( error > _solver.feastol() )
-               MSG_INFO1( spxout, spxout << "ERROR: " << i << " " << j << ", " << result[j] << std::endl );
+               MSG_INFO1( spxout, spxout << "ERROR: row " << i << " " << j << ", " << result[j] << std::endl );
             sumerror += error;
          }
          assert(sumerror < _solver.feastol());
@@ -171,6 +171,7 @@ namespace soplex
       if( _solver.isScaled() )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: unscaling LP\n"; )
+//         _solver.setRep(SPxSolver::COLUMN);
          _solver.unscaleLPandReloadBasis();
 //         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 //         _solver.solve();

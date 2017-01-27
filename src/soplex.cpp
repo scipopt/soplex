@@ -2797,16 +2797,6 @@ namespace soplex
 
          _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-         //This is here for debugging purposes. Will need to remove in the future.
-         //
-         //SPxLPReal dualLP;
-         //_solver.buildDualProblem(dualLP);
-
-         //char buffer[50];
-         //sprintf(buffer, "origprobdual.lp");
-         //printf("Writing the dual lp to a file\n");
-         //dualLP.writeFile(buffer);
-
          _solveDecompositionDualSimplex();
       }
       // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
@@ -4174,23 +4164,14 @@ namespace soplex
             assert(!_solver.isRowBasic(index));
 
             // get row vector
-            if( unscale && _solver.isScaled() )
-               _solver.getRowVectorUnscaled(index, rhs);
-            else
-               rhs = _solver.rowVector(index);
+            rhs = _solver.rowVector(index);
+            rhs *= -1.0;
 
             if( unscale && _solver.isScaled() )
             {
                for( int i = 0; i < rhs.size(); ++i)
-               {
-                  if( bind[rhs.index(i)] >= 0 )
-                     rhs.value(i) = spxLdexp(rhs.value(i), _scaler->getColScaleExp(rhs.index(i)));
-                  else
-                     rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(rhs.index(i)));
-               }
+                  rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(index));
             }
-
-            rhs *= -1.0;
          }
          // r corresponds to a column vector
          else
@@ -4231,10 +4212,11 @@ namespace soplex
                assert(_solver.number(id) < numRowsReal());
                assert(bind[r] >= 0 || _solver.number(id) != index);
 
-               coef[_solver.number(id)] = y[i];
+               int rowindex = _solver.number(id);
+               coef[rowindex] = y[i];
 
                if( unscale && _solver.isScaled() )
-                  coef[_solver.number(id)] = spxLdexp(y[i], _scaler->getRowScaleExp(_solver.number(id)));
+                  coef[rowindex] = spxLdexp(y[i], _scaler->getRowScaleExp(rowindex));
             }
          }
 
@@ -4465,7 +4447,7 @@ namespace soplex
 
 
    /// computes dense solution of basis matrix B * sol = rhs; returns true on success
-   bool SoPlex::getBasisInverseTimesVecReal(Real* rhs, Real* sol)
+   bool SoPlex::getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale)
    {
       VectorReal v(numRowsReal(), rhs);
       VectorReal x(numRowsReal(), sol);
@@ -4483,10 +4465,44 @@ namespace soplex
       // the existing factorization
       if( _solver.rep() == SPxSolver::COLUMN )
       {
-         // solve system "x = B^-1 * A_c" to get c'th column of B^-1 * A
+         // solve system "x = B^-1 * v"
          try
          {
-            _solver.basis().solve(x, v);
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+            {
+               /* for information on the unscaling procedure see spxscaler.h */
+               int scaleExp;
+               int idx;
+
+               for( int i = 0; i < v.dim(); ++i)
+               {
+                  if( isNotZero(v[i]) )
+                  {
+                     scaleExp =_scaler->getRowScaleExp(i);
+                     v[i] = spxLdexp(v[i], scaleExp);
+                  }
+               }
+
+               _solver.basis().solve(x, v);
+
+               for( int i = 0; i < x.dim(); i++ )
+               {
+                  if( isNotZero(x[i]) )
+                  {
+                     idx = _solver.number(_solver.basis().baseId(i));
+                     if( _solver.basis().baseId(i).isSPxColId() )
+                        scaleExp = _scaler->getColScaleExp(idx);
+                     else
+                        scaleExp = - _scaler->getRowScaleExp(idx);
+                     x[i] = spxLdexp(x[i], scaleExp);
+                  }
+               }
+            }
+            else
+            {
+               _solver.basis().solve(x, v);
+            }
          }
          catch( const SPxException& E )
          {
@@ -4497,11 +4513,14 @@ namespace soplex
       else
       {
          assert(_solver.rep() == SPxSolver::ROW);
-         assert(!_solver.isScaled());
 
          DSVectorReal rowrhs(numColsReal());
          SSVectorReal y(numColsReal());
          int* bind = 0;
+
+         bool adaptScaling = unscale && _realLP->isScaled();
+         int scaleExp;
+         int idx;
 
          // get ordering of column basis matrix
          spx_alloc(bind, numRowsReal());
@@ -4517,7 +4536,14 @@ namespace soplex
                assert(_solver.number(id) >= 0);
                assert(_solver.number(id) < numRowsReal());
 
-               rowrhs.add(i, v[_solver.number(id)]);
+               if( adaptScaling )
+               {
+                  idx = _solver.number(id);
+                  scaleExp = _scaler->getRowScaleExp(idx);
+                  rowrhs.add(i, spxLdexp(v[idx], scaleExp));
+               }
+               else
+                  rowrhs.add(i, v[_solver.number(id)]);
             }
             else
             {
@@ -4552,8 +4578,13 @@ namespace soplex
                assert(index < numRowsReal());
                assert(!_solver.isRowBasic(index));
 
-               // todo this needs to respect persistent scaling!
                x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numColsReal(), y.get_ptr()));
+
+               if( adaptScaling )
+               {
+                  scaleExp = -_scaler->getRowScaleExp(index);
+                  x[i] = spxLdexp(x[i], scaleExp);
+               }
             }
             else
             {
@@ -4562,7 +4593,13 @@ namespace soplex
                assert(index < numColsReal());
                assert(!_solver.isColBasic(index));
 
-               x[i] = y[index];
+               if( adaptScaling )
+               {
+                  scaleExp = _scaler->getColScaleExp(index);
+                  x[i] = spxLdexp(y[index], scaleExp);
+               }
+               else
+                  x[i] = y[index];
             }
          }
 
@@ -4675,6 +4712,7 @@ namespace soplex
                }
             }
          }
+         spx_free(bind);
          x = y;
       }
 
@@ -4782,6 +4820,7 @@ namespace soplex
                   y.add(i, x * _solver.colVector(index));
             }
          }
+         spx_free(bind);
          x = y;
       }
 
@@ -5053,21 +5092,18 @@ namespace soplex
    {
       ///@todo implement return value
 
-      ///@todo implement for scaled LP
-#if 0
-      if( unscale && boolParam(SoPlex::PERSISTENTSCALING) )
+      if( unscale && _realLP->isScaled() )
       {
          SPxLPReal* origLP;
          origLP = 0;
          spx_alloc(origLP);
-         origLP = new (origLP) SPxLPReal(_realLP);
-         _scaler->unscale(origLP);
+         origLP = new (origLP) SPxLPReal(*_realLP);
+         origLP->unscaleLP();
          origLP->writeFile(filename, rowNames, colNames, intVars);
-         origLP->~SdPxLPReal();
+         origLP->~SPxLPReal();
          spx_free(origLP);
       }
       else
-#endif
          _realLP->writeFile(filename, rowNames, colNames, intVars);
 
       return true;
@@ -6538,6 +6574,7 @@ namespace soplex
    /// prints solution statistics
    void SoPlex::printSolutionStatistics(std::ostream& os)
    {
+      int prec = (int) os.precision();
       if( _lastSolveMode == SOLVEMODE_REAL )
       {
          os << std::scientific << std::setprecision(8)
@@ -6593,22 +6630,23 @@ namespace soplex
 
          os << "Violations (real)   : \n";
          if( getBoundViolationReal(maxviol, sumviol) )
-            os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum bound     : - / -\n";
          if( getRowViolationReal(maxviol, sumviol) )
-            os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum row       : - / -\n";
          if( getRedCostViolationReal(maxviol, sumviol) )
-            os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum redcost   : - / -\n";
          if( getDualViolationReal(maxviol, sumviol) )
-            os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum dual      : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum dual      : - / -\n";
       }
+      os << std::setprecision(prec);
    }
 
 
@@ -6636,6 +6674,7 @@ namespace soplex
    /// prints complete statistics
    void SoPlex::printStatistics(std::ostream& os)
    {
+      int prec = (int) os.precision();
       os << std::setprecision(2);
 
       printStatus(os, _status);
@@ -6654,6 +6693,7 @@ namespace soplex
       os << "Objective sense     : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
       printSolutionStatistics(os);
       printSolvingStatistics(os);
+      os << std::setprecision(prec);
    }
 
 

@@ -24,6 +24,7 @@
 #include "spxpricer.h"
 #include "spxdevexpr.h"
 #include "spxsteeppr.h"
+#include "spxsteepexpr.h"
 
 
 namespace soplex
@@ -44,7 +45,7 @@ private:
    int            switchIters;   ///< number of iterations before switching pricers
    SPxPricer*     activepricer;  ///< pointer to currently selected pricer
    SPxDevexPR     devex;         ///< internal Devex pricer
-   SPxSteepPR     steep;         ///< internal Steepest edge pricer
+   SPxSteepExPR     steep;         ///< internal Steepest edge pricer
 
    bool setActivePricer(SPxSolver::Type type);          ///< switches active pricing method
 

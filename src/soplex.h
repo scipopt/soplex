@@ -745,7 +745,7 @@ public:
    bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
-   bool getBasisInverseTimesVecReal(Real* rhs, Real* sol);
+   bool getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale = true);
 
    /// multiply with basis matrix; B * \p vec (inplace)
    /// @param unscale determines whether the result should be unscaled according to the original LP data
