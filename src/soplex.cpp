@@ -6574,6 +6574,7 @@ namespace soplex
    /// prints solution statistics
    void SoPlex::printSolutionStatistics(std::ostream& os)
    {
+      int prec = (int) os.precision();
       if( _lastSolveMode == SOLVEMODE_REAL )
       {
          os << std::scientific << std::setprecision(8)
@@ -6629,22 +6630,23 @@ namespace soplex
 
          os << "Violations (real)   : \n";
          if( getBoundViolationReal(maxviol, sumviol) )
-            os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum bound     : - / -\n";
          if( getRowViolationReal(maxviol, sumviol) )
-            os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum row       : - / -\n";
          if( getRedCostViolationReal(maxviol, sumviol) )
-            os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum redcost   : - / -\n";
          if( getDualViolationReal(maxviol, sumviol) )
-            os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+            os << "  Max/sum dual      : " << maxviol << " / " << sumviol << "\n";
          else
             os << "  Max/sum dual      : - / -\n";
       }
+      os << std::setprecision(prec);
    }
 
 
@@ -6672,6 +6674,7 @@ namespace soplex
    /// prints complete statistics
    void SoPlex::printStatistics(std::ostream& os)
    {
+      int prec = (int) os.precision();
       os << std::setprecision(2);
 
       printStatus(os, _status);
@@ -6690,6 +6693,7 @@ namespace soplex
       os << "Objective sense     : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
       printSolutionStatistics(os);
       printSolvingStatistics(os);
+      os << std::setprecision(prec);
    }
 
 
