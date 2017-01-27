@@ -4712,6 +4712,7 @@ namespace soplex
                }
             }
          }
+         spx_free(bind);
          x = y;
       }
 
@@ -4819,6 +4820,7 @@ namespace soplex
                   y.add(i, x * _solver.colVector(index));
             }
          }
+         spx_free(bind);
          x = y;
       }
 
