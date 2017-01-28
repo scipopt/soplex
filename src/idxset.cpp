@@ -78,7 +78,7 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
 
       if (idx == 0)
       {
-         len = (int)sizeof(rhs.idx)/(int)sizeof(int);
+         len = rhs.size();
          spx_alloc(idx, len);
          freeArray = true;
       }
