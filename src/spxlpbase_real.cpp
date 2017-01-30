@@ -227,6 +227,7 @@ void SPxLPBase<Real>::getObjUnscaled(VectorBase<Real>& pobj) const
 template<>
 void SPxLPBase<Real>::getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const
 {
+   assert(i >= 0 && i < nRows());
    if( _isScaled )
       lp_scaler->getRowUnscaled(*this, i, vec);
    else
@@ -247,6 +248,7 @@ void SPxLPBase<Real>::getRhsUnscaled(VectorBase<Real>& vec) const
 template<>
 Real SPxLPBase<Real>::rhsUnscaled(int i) const
 {
+   assert(i >= 0 && i < nRows());
    if( _isScaled )
       return lp_scaler->rhsUnscaled(*this, i);
    else
@@ -257,6 +259,7 @@ Real SPxLPBase<Real>::rhsUnscaled(int i) const
 template<>
 Real SPxLPBase<Real>::rhsUnscaled(const SPxRowId& id) const
 {
+   assert(id.isValid());
    return rhsUnscaled(number(id));
 }
 
@@ -274,6 +277,7 @@ void SPxLPBase<Real>::getLhsUnscaled(VectorBase<Real>& vec) const
 template<>
 Real SPxLPBase<Real>::lhsUnscaled(int i) const
 {
+   assert(i >= 0 && i < nRows());
    if( _isScaled )
       return lp_scaler->lhsUnscaled(*this,i);
    else
@@ -284,6 +288,7 @@ Real SPxLPBase<Real>::lhsUnscaled(int i) const
 template<>
 Real SPxLPBase<Real>::lhsUnscaled(const SPxRowId& id) const
 {
+   assert(id.isValid());
    return lhsUnscaled(number(id));
 }
 
@@ -291,6 +296,7 @@ Real SPxLPBase<Real>::lhsUnscaled(const SPxRowId& id) const
 template<>
 void SPxLPBase<Real>::getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const
 {
+   assert(i >= 0 && i < nCols());
    if( _isScaled )
       lp_scaler->getColUnscaled(*this, i, vec);
    else
@@ -301,6 +307,7 @@ void SPxLPBase<Real>::getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const
 template<>
 void SPxLPBase<Real>::getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const
 {
+   assert(id.isValid());
    getColVectorUnscaled(number(id), vec);
 }
 
@@ -308,6 +315,7 @@ void SPxLPBase<Real>::getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real
 template<>
 Real SPxLPBase<Real>::objUnscaled(int i) const
 {
+   assert(i >= 0 && i < nCols());
    Real res;
 
    if( _isScaled )
@@ -328,6 +336,7 @@ Real SPxLPBase<Real>::objUnscaled(int i) const
 template<>
 Real SPxLPBase<Real>::objUnscaled(const SPxColId& id) const
 {
+   assert(id.isValid());
    return objUnscaled(number(id));
 }
 
@@ -345,6 +354,7 @@ void SPxLPBase<Real>::maxObjUnscaled(VectorBase<Real>& vec) const
 template<>
 Real SPxLPBase<Real>::maxObjUnscaled(int i) const
 {
+   assert(i >= 0 && i < nCols());
    if( _isScaled )
       return lp_scaler->maxObjUnscaled(*this, i);
    else
@@ -355,6 +365,7 @@ Real SPxLPBase<Real>::maxObjUnscaled(int i) const
 template<>
 Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const
 {
+   assert(id.isValid());
    return maxObjUnscaled(number(id));
 }
 
@@ -372,6 +383,7 @@ void SPxLPBase<Real>::getUpperUnscaled(DVector& vec) const
 template<>
 Real SPxLPBase<Real>::upperUnscaled(int i) const
 {
+   assert(i >= 0 && i < nCols());
    if( _isScaled )
       return lp_scaler->upperUnscaled(*this, i);
    else
@@ -382,6 +394,7 @@ Real SPxLPBase<Real>::upperUnscaled(int i) const
 template<>
 Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const
 {
+   assert(id.isValid());
    return upperUnscaled(number(id));
 }
 
@@ -399,6 +412,7 @@ void SPxLPBase<Real>::getLowerUnscaled(DVector& vec) const
 template<>
 Real SPxLPBase<Real>::lowerUnscaled(int i) const
 {
+   assert(i >= 0 && i < nCols());
    if( _isScaled )
       return lp_scaler->lowerUnscaled(*this, i);
    else
@@ -409,6 +423,7 @@ Real SPxLPBase<Real>::lowerUnscaled(int i) const
 template<>
 Real SPxLPBase<Real>::lowerUnscaled(const SPxColId& id) const
 {
+   assert(id.isValid());
    return lowerUnscaled(number(id));
 }
 
