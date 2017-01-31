@@ -139,7 +139,9 @@ namespace soplex
       totalRowViol = 0;
       maxBoundViol = 0;
       maxRowViol = 0;
+      redProbStatus = 0;
       compProbStatus = 0;
+      finalCompObj = 0;
    }
 
    /// prints statistics
