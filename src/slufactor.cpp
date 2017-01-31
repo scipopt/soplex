@@ -587,6 +587,18 @@ Real SLUFactor::stability() const
    return initMaxabs / maxabs;
 }
 
+Real SLUFactor::conditionEstimate() const
+{
+   Real traceprod = 0.0;
+
+   for( int i = 0; i < dim(); ++i)
+   {
+      traceprod += spxAbs(diag[i]);
+   }
+
+   return traceprod;
+}
+
 std::string SLUFactor::statistics() const
 {
    std::stringstream s;
