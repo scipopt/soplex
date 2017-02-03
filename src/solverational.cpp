@@ -1188,11 +1188,13 @@ namespace soplex
          {
             _rationalLP->addPrimalActivity(_primalDualDiff, sol._slacks);
 #ifndef NDEBUG
+#ifdef SOPLEX_WITH_GMP
             {
                DVectorRational activity(numRowsRational());
                _rationalLP->computePrimalActivity(sol._primal, activity);
                assert(sol._slacks == activity);
             }
+#endif
 #endif
          }
          else
@@ -2743,8 +2745,10 @@ namespace soplex
          bool shifted = (_lowerFinite(_colTypes[c]) && _feasLower[c] > 0) || (_upperFinite(_colTypes[c]) && _feasUpper[c] < 0);
          assert(shifted || !_lowerFinite(_colTypes[c]) || _feasLower[c] == lowerRational(c));
          assert(shifted || !_upperFinite(_colTypes[c]) || _feasUpper[c] == upperRational(c));
+#ifdef SOPLEX_WITH_GMP
          assert(upperRational(c) >= _rationalPosInfty || lowerRational(c) <= _rationalNegInfty
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
+#endif
 
          if( shifted )
          {
@@ -2808,12 +2812,14 @@ namespace soplex
       _statistics->transformTime->stop();
 
 #ifndef NDEBUG
+#ifdef SOPLEX_WITH_GMP
       if( sol._isPrimalFeasible)
       {
          DVectorRational activity(numRowsRational());
          _rationalLP->computePrimalActivity(sol._primal, activity);
          assert(sol._slacks == activity);
       }
+#endif
 #endif
    }
 
@@ -3858,7 +3864,9 @@ namespace soplex
             basisStatusCols[i] = SPxSolver::FIXED;
          }
 
+#ifdef SOPLEX_WITH_GMP
          assert(basisStatusCols[i] != SPxSolver::BASIC || basicDual * colVectorRational(i) == objRational(i));
+#endif
          if( basisStatusCols[i] == SPxSolver::BASIC || basisStatusCols[i] == SPxSolver::FIXED )
             continue;
          else
