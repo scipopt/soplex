@@ -564,6 +564,9 @@ namespace soplex
       , _hasBasis(false)
       , _hasSolReal(false)
       , _hasSolRational(false)
+      , _rationalPosone(1)
+      , _rationalNegone(-1)
+      , _rationalZero(0)
    {
       // transfer message handler
       _solver.setOutstream(spxout);
@@ -701,6 +704,11 @@ namespace soplex
          _hasSolReal = rhs._hasSolReal;
          _hasSolRational = rhs._hasSolRational;
          _hasBasis = rhs._hasBasis;
+
+         // rational constants do not need to be assigned
+         _rationalPosone = 1;
+         _rationalNegone = -1;
+         _rationalZero = 0;
       }
 
       assert(_isConsistent());
@@ -3246,7 +3254,7 @@ namespace soplex
          return _solRational._dualObjVal;
       }
       else
-         return Rational::ZERO;
+         return _rationalZero;
    }
 
 
@@ -5941,11 +5949,27 @@ namespace soplex
       {
       // primal feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::FEASTOL:
+#ifndef SOPLEX_WITH_GMP
+         if( value < DEFAULT_EPS_ZERO )
+         {
+            MSG_WARNING( spxout, spxout << "Cannot set feasibility tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_ZERO << ".\n");
+            _rationalFeastol = DEFAULT_EPS_ZERO;
+            break;
+         }
+#endif
          _rationalFeastol = value;
          break;
 
       // dual feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::OPTTOL:
+#ifndef SOPLEX_WITH_GMP
+         if( value < DEFAULT_EPS_ZERO )
+         {
+            MSG_WARNING( spxout, spxout << "Cannot set optimality tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_ZERO << ".\n");
+            _rationalOpttol = DEFAULT_EPS_ZERO;
+            break;
+         }
+#endif
          _rationalOpttol = value;
          break;
 

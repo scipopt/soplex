@@ -48,14 +48,13 @@ namespace soplex
       class Private;
       Private* dpointer;
 
+#ifdef SOPLEX_WITH_GMP
       thread_local static IdList< Private > unusedPrivateList;
       thread_local static bool useListMem;
 
       /// special constructor only for initializing static rational variables; this is necessary since we need a
       /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
       Rational(const int& i, const bool& dummy);
-
-   public:
 
       //**@name Static variables for special rational values */
       //@{
@@ -65,7 +64,9 @@ namespace soplex
       static const Rational NEGONE;
 
       //@}
+#endif
 
+   public:
 
       //**@name Construction and destruction */
       //@{

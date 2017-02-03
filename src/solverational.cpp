@@ -510,8 +510,8 @@ namespace soplex
       _rationalLP->subDualActivity(sol._dual, sol._redCost);
 
       // initial scaling factors are one
-      primalScale = Rational::POSONE;
-      dualScale = Rational::POSONE;
+      primalScale = _rationalPosone;
+      dualScale = _rationalPosone;
 
       // control progress
       Rational maxViolation;
@@ -1188,11 +1188,13 @@ namespace soplex
          {
             _rationalLP->addPrimalActivity(_primalDualDiff, sol._slacks);
 #ifndef NDEBUG
+#ifdef SOPLEX_WITH_GMP
             {
                DVectorRational activity(numRowsRational());
                _rationalLP->computePrimalActivity(sol._primal, activity);
                assert(sol._slacks == activity);
             }
+#endif
 #endif
          }
          else
@@ -1457,7 +1459,7 @@ namespace soplex
 
          // because the right-hand side and all bounds (but tau's upper bound) are zero, tau should be approximately
          // zero if basic; otherwise at its upper bound 1
-         error = !(tau >= Rational::POSONE || tau <= _rationalFeastol);
+         error = !(tau >= _rationalPosone || tau <= _rationalFeastol);
          assert(!error);
 
          hasUnboundedRay = (tau >= 1);
@@ -1535,8 +1537,8 @@ namespace soplex
             assert(tau >= -realParam(SoPlex::FEASTOL));
             assert(tau <= 1.0 + realParam(SoPlex::FEASTOL));
 
-            error = (tau < -_rationalFeastol || tau > Rational::POSONE + _rationalFeastol);
-            withDualFarkas = (tau < Rational::POSONE);
+            error = (tau < -_rationalFeastol || tau > _rationalPosone + _rationalFeastol);
+            withDualFarkas = (tau < _rationalPosone);
 
             if( withDualFarkas )
             {
@@ -1936,11 +1938,11 @@ namespace soplex
          assert((lhsRational(i) == rhsRational(i)) == (_rowTypes[i] == RANGETYPE_FIXED));
          if( _rowTypes[i] != RANGETYPE_FIXED )
          {
-            _slackCols.add(Rational::ZERO, -rhsRational(i), *_unitVectorRational(i), -lhsRational(i));
+            _slackCols.add(_rationalZero, -rhsRational(i), *_unitVectorRational(i), -lhsRational(i));
             if( _rationalLP->lhs(i) != 0 )
-               _rationalLP->changeLhs(i, Rational::ZERO);
+               _rationalLP->changeLhs(i, _rationalZero);
             if( _rationalLP->rhs(i) != 0 )
-               _rationalLP->changeRhs(i, Rational::ZERO);
+               _rationalLP->changeRhs(i, _rationalZero);
             assert(_rationalLP->lhs(i) == 0);
             assert(_rationalLP->rhs(i) == 0);
             _realLP->changeRange(i, 0.0, 0.0);
@@ -2245,7 +2247,7 @@ namespace soplex
       // adjust solution and basis
       if( unbounded )
       {
-         assert(tau >= Rational::POSONE);
+         assert(tau >= _rationalPosone);
 
          sol._isPrimalFeasible= false;
          sol._hasPrimalRay = true;
@@ -2267,7 +2269,7 @@ namespace soplex
          const Rational& alpha = sol._dual[numOrigRows];
 
          assert(sol._isDualFeasible);
-         assert(alpha <= _rationalFeastol - Rational::POSONE);
+         assert(alpha <= _rationalFeastol - _rationalPosone);
 
          sol._isPrimalFeasible= false;
          sol._hasPrimalRay = false;
@@ -2627,7 +2629,7 @@ namespace soplex
       SPxColId id;
       _tauColVector *= -1;
       _rationalLP->addCol(id,
-         LPColRational((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? Rational::POSONE : Rational::NEGONE),
+         LPColRational((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? _rationalPosone : _rationalNegone),
             _tauColVector, 1, 0));
       _realLP->addCol(id,
          LPColReal((intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
@@ -2743,8 +2745,10 @@ namespace soplex
          bool shifted = (_lowerFinite(_colTypes[c]) && _feasLower[c] > 0) || (_upperFinite(_colTypes[c]) && _feasUpper[c] < 0);
          assert(shifted || !_lowerFinite(_colTypes[c]) || _feasLower[c] == lowerRational(c));
          assert(shifted || !_upperFinite(_colTypes[c]) || _feasUpper[c] == upperRational(c));
+#ifdef SOPLEX_WITH_GMP
          assert(upperRational(c) >= _rationalPosInfty || lowerRational(c) <= _rationalNegInfty
             || _feasLower[c] - lowerRational(c) == _feasUpper[c] - upperRational(c));
+#endif
 
          if( shifted )
          {
@@ -2808,12 +2812,14 @@ namespace soplex
       _statistics->transformTime->stop();
 
 #ifndef NDEBUG
+#ifdef SOPLEX_WITH_GMP
       if( sol._isPrimalFeasible)
       {
          DVectorRational activity(numRowsRational());
          _rationalLP->computePrimalActivity(sol._primal, activity);
          assert(sol._slacks == activity);
       }
+#endif
 #endif
    }
 
@@ -3858,7 +3864,9 @@ namespace soplex
             basisStatusCols[i] = SPxSolver::FIXED;
          }
 
+#ifdef SOPLEX_WITH_GMP
          assert(basisStatusCols[i] != SPxSolver::BASIC || basicDual * colVectorRational(i) == objRational(i));
+#endif
          if( basisStatusCols[i] == SPxSolver::BASIC || basisStatusCols[i] == SPxSolver::FIXED )
             continue;
          else
