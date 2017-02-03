@@ -1801,6 +1801,10 @@ private:
    int  _optimizeCalls;
    int  _unscaleCalls;
 
+   Rational _rationalPosone;
+   Rational _rationalNegone;
+   Rational _rationalZero;
+
    //@}
 
    //**@name Constant helper methods */
