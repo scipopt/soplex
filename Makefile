@@ -525,8 +525,7 @@ endif
 
 .PHONY: doc
 doc:
-		$(BINFILE) --saveset=doc/parameters.set
-		cd doc; $(DOXY) $(NAME).dxy
+		cd doc; $(SHELL) builddoc.sh
 
 .PHONY: test
 test:		#$(BINFILE)

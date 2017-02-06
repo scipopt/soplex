@@ -20,6 +20,7 @@ tca.*
 *.result
 check/LP/
 doc/html/
+doc/parameters.set
 doc/latex/
 license/*.log
 license/*.lot
