@@ -381,7 +381,7 @@ namespace soplex
 
          if( _isRealLPScaled )
          {
-            _realLP->unscaleLP();
+            _solver.unscaleLPandReloadBasis();
             _isRealLPScaled = false;
             ++_unscaleCalls;
          }
