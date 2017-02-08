@@ -8506,7 +8506,7 @@ namespace soplex
          {
             unsigned int value;
 
-            if( sscanf(paramValueString, "%lu", &value) == 1 )
+            if( sscanf(paramValueString, "%u", &value) == 1 )
             {
                setRandomSeed(value);
                return true;
