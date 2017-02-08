@@ -394,10 +394,10 @@ void SPxSolver::init()
       }
       catch( const SPxException& x )
       {
-         // we need to abort in case the factorization failed
+         // reload inital slack basis in case the factorization failed
          assert(SPxBasis::status() <= SPxBasis::SINGULAR);
-         m_status = SINGULAR;
-         throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
+         SPxBasis::restoreInitialBasis();
+         SPxBasis::factorize();
       }
    }
 
