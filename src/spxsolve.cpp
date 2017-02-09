@@ -1017,13 +1017,6 @@ void SPxSolver::performSolutionPolishing()
    if( polishObj == SolutionPolish::OFF || rep() == ROW || status() != OPTIMAL )
       return;
 
-   // only run when integrality information is present and correct
-   if( integerVariables.size() == 0 || integerVariables.size() != nCols() )
-   {
-      integerVariables.reSize(0);
-      return;
-   }
-
    // the current objective value must not be changed
 #ifndef NDEBUG
    Real objVal = value();
@@ -1067,17 +1060,19 @@ void SPxSolver::performSolutionPolishing()
                   {
                      MSG_DEBUG( std::cout << " -> success!"; )
                      ++nSuccessfulPivots;
-                     if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                     if( maxIters >= 0 && iterations() >= maxIters )
+                     {
                         stop = true;
+                        break;
+                     }
                   }
                   MSG_DEBUG( std::cout << std::endl; )
                }
             }
          }
          // identify nonbasic variables that may be moved into the basis
-         if( integerVariables.size() != 0 )
+         if( integerVariables.size() == nCols() )
          {
-            assert(integerVariables.size() == nCols());
             for( int i = 0; i < coDim(); ++i )
             {
                stat = ds.status(i);
@@ -1089,7 +1084,7 @@ void SPxSolver::performSolutionPolishing()
                         (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
                   {
                      MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
-                        polishId = id(i);
+                     polishId = id(i);
                      success = enter(polishId, true);
                      clearUpdateVecs();
                      assert(EQrel(objVal, value(), entertol()));
@@ -1097,9 +1092,12 @@ void SPxSolver::performSolutionPolishing()
                      if( success )
                      {
                         MSG_DEBUG( std::cout << " -> success!"; )
-                           ++nSuccessfulPivots;
-                        if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                        ++nSuccessfulPivots;
+                        if( maxIters >= 0 && iterations() >= maxIters )
+                        {
                            stop = true;
+                           break;
+                        }
                      }
                      MSG_DEBUG( std::cout << std::endl; )
                   }
@@ -1139,8 +1137,11 @@ void SPxSolver::performSolutionPolishing()
                   {
                      MSG_DEBUG( std::cout << " -> success!"; )
                         ++nSuccessfulPivots;
-                     if( maxIters >= 0 && iterations() + nSuccessfulPivots >= maxIters )
+                     if( maxIters >= 0 && iterations() >= maxIters )
+                     {
                         stop = true;
+                        break;
+                     }
                   }
                   MSG_DEBUG( std::cout << std::endl; )
                }
