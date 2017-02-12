@@ -2,8 +2,12 @@
 
 ### START SHELL TUTORIAL
 
-DOXYFILE=soplex.dxy
-if [ -z $1 ]; then DOXYFILE=$1; fi
+if [ $1 != "" ]
+then
+    DOXYFILE=$1
+else
+    DOXYFILE=soplex.dxy
+fi
 
 # build a fresh version of SoPlex
 make -j clean -C ../

@@ -970,9 +970,8 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
          // only allow (integer) variables to leave the basis
          if( leaveId.isSPxRowId() )
             return -1;
-         else if( thesolver->integerVariables.size() > 0 )
+         else if( thesolver->integerVariables.size() == thesolver->nCols() )
          {
-            assert(thesolver->integerVariables.size() == thesolver->nCols());
             if( leaveId.isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 0 )
                return -1;
          }
@@ -980,9 +979,8 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
       else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
       {
          // only allow slacks and continuous variables to leave the basis
-         if( thesolver->integerVariables.size() > 0 )
+         if( thesolver->integerVariables.size() == thesolver->nCols() )
          {
-            assert(thesolver->integerVariables.size() == thesolver->nCols());
             if( thesolver->baseId(leave).isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 1 )
                return -1;
          }
