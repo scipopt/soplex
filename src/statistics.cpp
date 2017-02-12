@@ -212,7 +212,7 @@ namespace soplex
 
       os << "LU solves           : " << luSolvesReal << "\n"
          << "  Solve frequency   : ";
-      if( luSolvesReal > 0 )
+      if( iterations > 0 )
          os << double(luSolvesReal) / double(iterations) << " solves per iteration\n";
       else
          os << "-\n";
