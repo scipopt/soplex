@@ -335,7 +335,29 @@ void SPxSolver::init()
    if( SPxBasis::status() == SPxBasis::SINGULAR )
       return;
 
-   //factorized = false;
+   // catch pathological case for LPs with zero constraints
+   if( dim() == 0 )
+   {
+      factorized = true;
+   }
+
+   // we better factorize explicitly before solving
+   if( !factorized )
+   {
+      try
+      {
+         SPxBasis::factorize();
+      }
+      catch( const SPxException& x )
+      {
+         // reload inital slack basis in case the factorization failed
+         assert(SPxBasis::status() <= SPxBasis::SINGULAR);
+         SPxBasis::restoreInitialBasis();
+         SPxBasis::factorize();
+         assert(factorized);
+      }
+   }
+
    m_numCycle = 0;
 
    if (type() == ENTER)
@@ -377,28 +399,6 @@ void SPxSolver::init()
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
       theratiotester->setDelta(leavetol());
-   }
-
-   // catch pathological case for LPs with zero constraints
-   if( dim() == 0 )
-   {
-      factorized = true;
-   }
-
-   // we better factorize explicitly before solving
-   if( !factorized )
-   {
-      try
-      {
-         SPxBasis::factorize();
-      }
-      catch( const SPxException& x )
-      {
-         // reload inital slack basis in case the factorization failed
-         assert(SPxBasis::status() <= SPxBasis::SINGULAR);
-         SPxBasis::restoreInitialBasis();
-         SPxBasis::factorize();
-      }
    }
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
