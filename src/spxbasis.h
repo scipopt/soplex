@@ -623,6 +623,11 @@ public:
    ///
    void solve(Vector& x, const Vector& rhs)
    {
+      if( rhs.dim() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -630,6 +635,11 @@ public:
    ///
    void solve(SSVector& x, const SVector& rhs)
    {
+      if( rhs.size() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -646,6 +656,11 @@ public:
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
+      if( rhs.size() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight4update(x, rhs);
@@ -653,6 +668,8 @@ public:
    /// solves two systems in one call.
    void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
       if (!factorized)
          SPxBasis::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
@@ -660,6 +677,8 @@ public:
    /// solves two systems in one call using only sparse data structures
    void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
       if (!factorized)
          SPxBasis::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
@@ -668,6 +687,9 @@ public:
    void solve4update(SSVector& x, Vector& y, Vector& y2,
                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
+      assert(rhsy2.size() > 0);
       if (!factorized) 
          SPxBasis::factorize();
       assert(rhsy.isSetup());
@@ -678,6 +700,9 @@ public:
    void solve4update(SSVector& x, SSVector& y, SSVector& y2,
                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
+      assert(rhsy2.size() > 0);
       if (!factorized)
          SPxBasis::factorize();
       assert(rhsy.isSetup());
@@ -696,6 +721,11 @@ public:
     */
    void coSolve(Vector& x, const Vector& rhs)
    {
+      if( rhs.dim() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -703,6 +733,11 @@ public:
    /// Sparse version of coSolve
    void coSolve(SSVector& x, const SVector& rhs)
    {
+      if( rhs.size() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -710,6 +745,8 @@ public:
    /// solves two systems in one call.
    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
       if (!factorized)
          SPxBasis::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
@@ -717,6 +754,8 @@ public:
    /// Sparse version of solving two systems in one call.
    void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
@@ -724,6 +763,9 @@ public:
    /// solves three systems in one call. May be improved by using just one pass through the basis.
    void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
+      assert(rhsz.size() > 0);
       if (!factorized)
          SPxBasis::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
@@ -731,6 +773,9 @@ public:
    /// Sparse version of solving three systems in one call.
    void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
    {
+      assert(rhsx.size() > 0);
+      assert(rhsy.size() > 0);
+      assert(rhsz.size() > 0);
       if (!factorized)
          SPxBasis::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);

@@ -437,7 +437,7 @@ bool SPxBasis::readBasis(
 
    /* load default basis if necessary */
    if (status() == NO_PROBLEM)
-      load(theLP);
+      load(theLP, false);
 
    /* initialize with standard settings */
    Desc l_desc(thedesc);

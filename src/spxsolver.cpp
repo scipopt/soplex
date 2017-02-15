@@ -93,9 +93,11 @@ void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
 {
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
-      SPxBasis::load(this);
-   SPxBasis::loadDesc(p_desc);
+   {
+      SPxBasis::load(this, false);
+   }
    setBasisStatus(SPxBasis::REGULAR);
+   SPxBasis::loadDesc(p_desc);
 }
 
 void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
@@ -1857,9 +1859,8 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
 
 void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
-
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
-      SPxBasis::load(this);
+      SPxBasis::load(this, false);
 
    SPxBasis::Desc ds = desc();
    int i;
