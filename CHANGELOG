@@ -72,6 +72,7 @@ fixed bugs:
 - cleaned up and corrected steepest edge pricing implementation
 - check for very small weights in devex pricing (just like for steepest edge)
 - forbid setting termination tolerances to zero when not compiled with rational GMP support
+- fixed and simplified updating of range types for the rational LP
 
 code quality:
 - SoPlex is thread-safe by using the storage class specifier thread-local for static variables
