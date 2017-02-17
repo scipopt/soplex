@@ -1967,6 +1967,9 @@ private:
    /// integer variables if desired
    bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
+   /// completes range type arrays after adding columns and/or rows
+   void _completeRangeTypesRational();
+
    /// recomputes range types from scratch using real LP
    void _recomputeRangeTypesReal();
 

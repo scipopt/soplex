@@ -1308,7 +1308,7 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
          _rationalLP->addRow(lprow);
-         _rowTypes.append(_rangeTypeReal(lprow.lhs(), lprow.rhs()));
+         _completeRangeTypesRational();
       }
 
       _invalidateSolution();
@@ -1326,8 +1326,7 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
          _rationalLP->addRows(lprowset);
-         for( int i = 0; i < lprowset.num(); i++ )
-            _rowTypes.append(_rangeTypeReal(lprowset.lhs(i), lprowset.rhs(i)));
+         _completeRangeTypesRational();
       }
 
       _invalidateSolution();
@@ -1345,7 +1344,7 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
          _rationalLP->addCol(lpcol);
-         _colTypes.append(_rangeTypeReal(lpcol.lower(), lpcol.upper()));
+         _completeRangeTypesRational();
       }
 
       _invalidateSolution();
@@ -1363,8 +1362,7 @@ namespace soplex
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
          _rationalLP->addCols(lpcolset);
-         for( int i = 0; i < lpcolset.num(); i++ )
-            _colTypes.append(_rangeTypeReal(lpcolset.lower(i), lpcolset.upper(i)));
+         _completeRangeTypesRational();
       }
 
       _invalidateSolution();
@@ -1383,6 +1381,7 @@ namespace soplex
       {
          _rationalLP->changeRow(i, lprow);
          _rowTypes[i] = _rangeTypeReal(lprow.lhs(), lprow.rhs());
+         _completeRangeTypesRational();
       }
 
       _invalidateSolution();
@@ -1512,6 +1511,7 @@ namespace soplex
       {
          _rationalLP->changeCol(i, lpcol);
          _colTypes[i] = _rangeTypeReal(lpcol.lower(), lpcol.upper());
+         _completeRangeTypesRational();
       }
 
       _invalidateSolution();
@@ -1902,7 +1902,7 @@ namespace soplex
          return;
 
       _rationalLP->addRow(lprow);
-      _rowTypes.append(_rangeTypeRational(lprow.lhs(), lprow.rhs()));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowReal(lprow);
@@ -1922,9 +1922,9 @@ namespace soplex
          return;
 
       _rationalLP->addRow(lhs, rowValues, rowIndices, rowSize, rhs);
-      int i = numRowsRational() - 1;
-      _rowTypes.append(_rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i)));
+      _completeRangeTypesRational();
 
+      int i = numRowsRational() - 1;
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowReal(Real(lhsRational(i)), DSVectorReal(_rationalLP->rowVector(i)), Real(rhsRational(i)));
 
@@ -1942,8 +1942,7 @@ namespace soplex
          return;
 
       _rationalLP->addRows(lhs, rowValues, rowIndices, rowStarts, rowLengths, numRows, numValues, rhs);
-      for( int i = numRowsRational() - numRows; i < numRowsRational(); i++ )
-         _rowTypes.append(_rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i)));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
@@ -1968,8 +1967,7 @@ namespace soplex
          return;
 
       _rationalLP->addRows(lprowset);
-      for( int i = 0; i < lprowset.num(); i++ )
-         _rowTypes.append(_rangeTypeRational(lprowset.lhs(i), lprowset.rhs(i)));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addRowsReal(lprowset);
@@ -1988,7 +1986,7 @@ namespace soplex
          return;
 
       _rationalLP->addCol(lpcol);
-      _colTypes.append(_rangeTypeRational(lpcol.lower(), lpcol.upper()));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addColReal(lpcol);
@@ -2009,7 +2007,7 @@ namespace soplex
 
       _rationalLP->addCol(obj, lower, colValues, colIndices, colSize, upper);
       int i = numColsRational() - 1;
-      _colTypes.append(_rangeTypeRational(lowerRational(i), upperRational(i)));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addColReal(Real(maxObjRational(i)) * (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
@@ -2029,8 +2027,7 @@ namespace soplex
          return;
 
       _rationalLP->addCols(obj, lower, colValues, colIndices, colStarts, colLengths, numCols, numValues, upper);
-      for( int i = numColsRational() - numCols; i < numColsRational(); i++ )
-         _colTypes.append(_rangeTypeRational(lowerRational(i), upperRational(i)));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
       {
@@ -2056,8 +2053,7 @@ namespace soplex
          return;
 
       _rationalLP->addCols(lpcolset);
-      for( int i = 0; i < lpcolset.num(); i++ )
-         _colTypes.append(_rangeTypeRational(lpcolset.lower(i), lpcolset.upper(i)));
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _addColsReal(lpcolset);
@@ -2077,6 +2073,7 @@ namespace soplex
 
       _rationalLP->changeRow(i, lprow);
       _rowTypes[i] = _rangeTypeRational(lprow.lhs(), lprow.rhs());
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeRowReal(i, lprow);
@@ -2279,6 +2276,7 @@ namespace soplex
 
       _rationalLP->changeCol(i, lpcol);
       _colTypes[i] = _rangeTypeRational(lpcol.lower(), lpcol.upper());
+      _completeRangeTypesRational();
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeColReal(i, lpcol);
@@ -7164,6 +7162,9 @@ namespace soplex
       assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
       assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == numRowsRational());
 
+      assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
+      assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
+
       return true;
    }
 
@@ -8158,6 +8159,19 @@ namespace soplex
          clearLPRational();
 
       return success;
+   }
+
+
+
+   /// completes range type arrays after adding columns and/or rows
+   void SoPlex::_completeRangeTypesRational()
+   {
+      // we use one method for bot columns and rows, because during column/row addition, rows/columns can be added
+      // implicitly
+      for( int i = _colTypes.size(); i < numColsRational(); i++ )
+         _colTypes.append(_rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i)));
+      for( int i = _rowTypes.size(); i < numRowsRational(); i++ )
+         _rowTypes.append(_rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i)));
    }
 
 
