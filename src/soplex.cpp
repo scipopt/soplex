@@ -2278,7 +2278,7 @@ namespace soplex
          return;
 
       _rationalLP->changeCol(i, lpcol);
-      _rowTypes[i] = _rangeTypeRational(lpcol.lower(), lpcol.upper());
+      _colTypes[i] = _rangeTypeRational(lpcol.lower(), lpcol.upper());
 
       if( intParam(SoPlex::SYNCMODE) == SYNCMODE_AUTO )
          _changeColReal(i, lpcol);
