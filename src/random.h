@@ -20,6 +20,7 @@
 #define _RANDOM_H_
 
 #include <assert.h>
+#include <algorithm>
 
 namespace soplex
 {
