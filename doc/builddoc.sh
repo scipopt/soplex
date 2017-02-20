@@ -17,5 +17,16 @@ make -j -C ../
 
 ../bin/soplex --saveset=parameters.set
 
+if [ "$HTML_FILE_EXTENSION" = "" ]
+then
+    HTML_FILE_EXTENSION=shtml
+fi
+
+cd inc
+python parser.py --linkext $HTML_FILE_EXTENSION  && php localfaq.php > faq.inc
+cd ../
+
+### FINISHED FAQ GENERATION
+
 # finally build the soplex documentation
 doxygen $DOXYFILE

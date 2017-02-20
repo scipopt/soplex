@@ -256,15 +256,16 @@ private:
    ///
    void solveUpdateLeft2(Real* vec1, Real* vec2);
 
+   void inline updateSolutionVectorLright(Real change, int j, Real& vec, int* idx, int& nnz);
    ///
-   int vSolveLright(Real* vec, int* ridx, int rn, Real eps);
+   void vSolveLright(Real* vec, int* ridx, int& rn, Real eps);
    ///
-   void vSolveLright2(Real* vec, int* ridx, int* rnptr, Real eps,
-      Real* vec2, int* ridx2, int* rn2ptr, Real eps2);
+   void vSolveLright2(Real* vec, int* ridx, int& rn, Real eps,
+      Real* vec2, int* ridx2, int& rn2, Real eps2);
    ///
-   void vSolveLright3(Real* vec, int* ridx, int* rnptr, Real eps,
-      Real* vec2, int* ridx2, int* rn2ptr, Real eps2,
-      Real* vec3, int* ridx3, int* rn3ptr, Real eps3);
+   void vSolveLright3(Real* vec, int* ridx, int& rn, Real eps,
+      Real* vec2, int* ridx2, int& rn2, Real eps2,
+      Real* vec3, int* ridx3, int& rn3, Real eps3);
    ///
    int vSolveUright(Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps);
    ///
@@ -433,8 +434,8 @@ protected:
       Real* rhs3, int* ridx3, int& rn3, /* rhs3    */
       Real* forest, int* forestNum, int* forestIdx);
    ///
-   void vSolveRightNoNZ(Real* vec2, Real eps2,              /* result2 */
-      Real* rhs2, int* ridx2, int rn2);   /* rhs2    */
+   void vSolveRightNoNZ(Real* vec, Real eps,    /* result */
+      Real* rhs, int* ridx, int rn);            /* rhs    */
    ///
    int vSolveLeft(Real eps,
       Real* vec, int* idx,                      /* result */
