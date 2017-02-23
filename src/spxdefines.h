@@ -130,6 +130,16 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 
 
 /*-----------------------------------------------------------------------------
+ * multi-thread support
+ *-----------------------------------------------------------------------------
+ */
+#ifdef _MSC_VER
+#define THREADLOCAL __declspec( thread )
+#else
+#define THREADLOCAL thread_local
+#endif
+
+/*-----------------------------------------------------------------------------
  * Long double support, Parameters and Epsilons
  *-----------------------------------------------------------------------------
  */
@@ -229,7 +239,7 @@ typedef double Real;
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 #define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
 
-thread_local extern const Real infinity;
+THREADLOCAL extern const Real infinity;
 
 class Param
 {
@@ -239,13 +249,13 @@ private:
    /**@name Data */
    //@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   thread_local static Real s_epsilon;
+   THREADLOCAL static Real s_epsilon;
    /// epsilon for factorization
-   thread_local static Real s_epsilon_factorization;
+   THREADLOCAL static Real s_epsilon_factorization;
    /// epsilon for factorization update
-   thread_local static Real s_epsilon_update;
+   THREADLOCAL static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   thread_local static Real s_epsilon_pivot;
+   THREADLOCAL static Real s_epsilon_pivot;
    //@}
 
 public:
