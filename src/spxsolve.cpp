@@ -1013,7 +1013,7 @@ SPxSolver::Status SPxSolver::solve()
 
 void SPxSolver::performSolutionPolishing()
 {
-   // only run in column representation at an optimal basis
+   // only polish an already optimal basis
    if( polishObj == SolutionPolish::OFF || status() != OPTIMAL )
       return;
 
@@ -1174,7 +1174,8 @@ void SPxSolver::performSolutionPolishing()
                   stat = ds.rowStatus(number(polishId));
                else
                {
-                  if( !useIntegrality || integerVariables[number(SPxColId(polishId))] == 0 )
+                  // skip (integer) variables
+                  if( !useIntegrality || integerVariables[number(SPxColId(polishId))] == 1 )
                      continue;
                   stat = ds.colStatus(number(polishId));
                }

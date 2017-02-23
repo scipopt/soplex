@@ -777,7 +777,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       }
 
       /* do not exit with status infeasible or unbounded if there is only a very small violation */
-      if (!polish && spxAbs(enterVal) < leavetol())
+      if (spxAbs(enterVal) < leavetol())
       {
          MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
 
@@ -789,9 +789,6 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       }
       MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
                            << "in leave()" << std::endl; )
-
-      if( polish )
-         return false;
 
       if (rep() != COLUMN)
       {
