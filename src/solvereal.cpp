@@ -119,6 +119,13 @@ namespace soplex
       {
       case SPxSolver::OPTIMAL:
          _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
+         // apply polishing on original problem
+         if( _applyPolishing )
+         {
+            int polishing = intParam(SoPlex::SOLUTION_POLISHING);
+            setIntParam(SoPlex::SOLUTION_POLISHING, polishing);
+            _preprocessAndSolveReal(false);
+         }
          break;
 
       case SPxSolver::UNBOUNDED:
@@ -179,6 +186,8 @@ namespace soplex
    {
       _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
+
+      _applyPolishing = false;
 
       if( applySimplifier )
          _enableSimplifierAndScaler();
@@ -247,6 +256,8 @@ namespace soplex
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
          _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
          _solver.setScalingInfo(false);
+         _applyPolishing = true;
+         _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
       }
 
       _statistics->preprocessingTime->stop();

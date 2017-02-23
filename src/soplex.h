@@ -1569,6 +1569,7 @@ private:
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
                          // are performed on the original LP.
    bool _isRealLPScaled;
+   bool _applyPolishing;
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
