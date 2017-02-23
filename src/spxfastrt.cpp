@@ -963,6 +963,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
 
    if( polish && leave >= 0 )
    {
+      assert( thesolver->rep() == SPxSolver::COLUMN );
       SPxId leaveId = thesolver->baseId(leave);
       // decide whether the chosen leave index contributes to the polishing objective
       if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
@@ -1214,7 +1215,7 @@ bool SPxFastRT::shortEnter(
    return false;
 }
 
-SPxId SPxFastRT::selectEnter(Real& val, int)
+SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
 {
    SPxId enterId;
    Real max, sel;
@@ -1329,6 +1330,31 @@ SPxId SPxFastRT::selectEnter(Real& val, int)
          std::cout << "DFSTRT04 " << thesolver->basis().iteration()
                 << ": skipping instable pivot" << std::endl;
    )
+
+   if( polish && enterId.isValid() )
+   {
+      assert( thesolver->rep() == SPxSolver::ROW );
+      // decide whether the chosen entering index contributes to the polishing objective
+      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
+      {
+         // only allow (integer) variables to enter the basis
+         if( enterId.isSPxRowId() )
+            return SPxId();
+         else if( thesolver->integerVariables.size() == thesolver->nCols() && thesolver->integerVariables[thesolver->number(enterId)] == 0)
+            return SPxId();
+      }
+      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
+      {
+         // only allow slacks and continuous variables to enter the basis
+         if( thesolver->integerVariables.size() == thesolver->nCols() )
+         {
+            if( enterId.isSPxColId() && thesolver->integerVariables[thesolver->number(enterId)] == 1 )
+               return SPxId();
+         }
+         else if( enterId.isSPxColId() )
+            return SPxId();
+      }
+   }
 
 
    if (enterId.isValid() || minStab > 2*epsilon)

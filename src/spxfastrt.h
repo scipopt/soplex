@@ -224,7 +224,7 @@ public:
    ///
    virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
-   virtual SPxId selectEnter(Real& val, int);
+   virtual SPxId selectEnter(Real& val, int, bool polish = false);
    ///
    virtual void setType(SPxSolver::Type type);
    ///

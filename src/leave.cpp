@@ -641,7 +641,7 @@ void SPxSolver::computeDualfarkas4Col(Real direction)
       dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
 }
 
-bool SPxSolver::leave(int leaveIdx)
+bool SPxSolver::leave(int leaveIdx, bool polish)
 {
    assert(leaveIdx < dim() && leaveIdx >= 0);
    assert(type() == LEAVE);
@@ -691,7 +691,7 @@ bool SPxSolver::leave(int leaveIdx)
 
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum, objChange);
 
-   if (m_numCycle > m_maxCycle)
+   if (!polish && m_numCycle > m_maxCycle)
    {
       if (leaveMax > 0)
          perturbMaxLeave();
@@ -706,7 +706,7 @@ bool SPxSolver::leave(int leaveIdx)
    Real enterVal = leaveMax;
    boundflips = 0;
    Real oldShift = theShift;
-   SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx);
+   SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx, polish);
    if (NE(theShift, oldShift))
    {
       MSG_DEBUG( std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest" << std::endl; )
@@ -730,6 +730,9 @@ bool SPxSolver::leave(int leaveIdx)
       rejectLeave(leaveNum, leaveId, leaveStat);
       change(-1, none, 0);
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
+
+      if (polish)
+         return false;
 
       if (NE(enterVal, leaveMax))
       {
@@ -774,7 +777,7 @@ bool SPxSolver::leave(int leaveIdx)
       }
 
       /* do not exit with status infeasible or unbounded if there is only a very small violation */
-      if (spxAbs(enterVal) < leavetol())
+      if (!polish && spxAbs(enterVal) < leavetol())
       {
          MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
 
@@ -786,6 +789,9 @@ bool SPxSolver::leave(int leaveIdx)
       }
       MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
                            << "in leave()" << std::endl; )
+
+      if( polish )
+         return false;
 
       if (rep() != COLUMN)
       {

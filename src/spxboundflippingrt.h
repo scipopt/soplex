@@ -240,7 +240,8 @@ public:
    ///
    virtual SPxId selectEnter(
       Real&              val,
-      int                leaveIdx
+      int                leaveIdx,
+      bool               polish = false
       );
 
    void useBoundFlips(bool bf)
