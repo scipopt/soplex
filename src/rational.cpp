@@ -85,13 +85,8 @@ THREADLOCAL bool Rational::useListMem = true;
 
 /// list of unused Private objects
 
-// older versions of MSVC complains about objects that have a destructor
 #ifdef SOPLEX_WITH_GMP
-#if defined(_MSC_VER) && _MSC_VER < 1900
-   IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
-#else
    THREADLOCAL IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
-#endif
 #endif
 
 /// Defines the "Pimpl"-class Private

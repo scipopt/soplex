@@ -48,14 +48,8 @@ namespace soplex
       class Private;
       Private* dpointer;
 
-      // older versions of MSVC complains about objects that have a destructor
 #ifdef SOPLEX_WITH_GMP
-#if defined(_MSC_VER) && _MSC_VER < 1900
-      static IdList< Private > unusedPrivateList;
-#else
       THREADLOCAL static IdList< Private > unusedPrivateList;
-#endif
-
       THREADLOCAL static bool useListMem;
 
 
