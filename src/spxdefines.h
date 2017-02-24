@@ -133,7 +133,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  * multi-thread support
  *-----------------------------------------------------------------------------
  */
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define THREADLOCAL __declspec( thread )
 #else
 #define THREADLOCAL thread_local
