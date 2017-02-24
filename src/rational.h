@@ -48,9 +48,16 @@ namespace soplex
       class Private;
       Private* dpointer;
 
+      // older versions of MSVC complains about objects that have a destructor
 #ifdef SOPLEX_WITH_GMP
-      thread_local static IdList< Private > unusedPrivateList;
-      thread_local static bool useListMem;
+#if defined(_MSC_VER) && _MSC_VER < 1900
+      static IdList< Private > unusedPrivateList;
+#else
+      THREADLOCAL static IdList< Private > unusedPrivateList;
+#endif
+
+      THREADLOCAL static bool useListMem;
+
 
       /// special constructor only for initializing static rational variables; this is necessary since we need a
       /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
