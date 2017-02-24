@@ -75,17 +75,24 @@ const Rational Rational::NEGONE(-1, true);
 /// Private class has no member next() and prev()
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
-thread_local bool Rational::useListMem = false;
+THREADLOCAL bool Rational::useListMem = false;
 #else
-thread_local bool Rational::useListMem = true;
+THREADLOCAL bool Rational::useListMem = true;
 #endif
 
 
 
 
 /// list of unused Private objects
-thread_local IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
+// older versions of MSVC complains about objects that have a destructor
+#ifdef SOPLEX_WITH_GMP
+#if defined(_MSC_VER) && _MSC_VER < 1900
+   IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+#else
+   THREADLOCAL IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+#endif
+#endif
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
