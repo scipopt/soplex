@@ -23,12 +23,12 @@
 namespace soplex
 {
 
-thread_local const Real infinity                 = DEFAULT_INFINITY;
+THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-thread_local Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
-thread_local Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-thread_local Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-thread_local Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
+THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 bool msginconsistent(const char* name, const char* file, int line)
 {
