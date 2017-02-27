@@ -9,10 +9,6 @@ rm -f $NAME.tgz
 # compile to create the correct GiTHash
 make githash
 
-echo generating default setting files
-make OPT=opt ZLIB=false -j4
-bin/soplex --saveset=doc/inc/parameters.set
-
 # Before we create a tarball change the directory and file rights in a command way
 echo adjust file modes
 find ./ -type d -exec chmod 750 {} \;
@@ -46,14 +42,14 @@ $NAME/check/testset/netlib.solu \
 $NAME/check/testset/quick.solu \
 $NAME/check/testset/mittelmann.solu \
 $NAME/check/testset/infeas.solu \
+$NAME/doc/inc/localfaq.php $NAME/doc/inc/faqtext.txt $NAME/doc/inc/parser.py \
+$NAME/doc/builddoc.sh \
 $NAME/doc/soplex.dxy \
 $NAME/doc/soplex.css \
 $NAME/doc/soplexfooter.html \
 $NAME/doc/soplexheader.html \
 $NAME/doc/soplexlayout.xml \
 $NAME/doc/xternal.cpp \
-$NAME/doc/inc/faq.inc \
-$NAME/doc/inc/faqcss.inc \
 $NAME/make/make* \
 $NAME/settings/exact.set \
 $NAME/settings/devex.set \
