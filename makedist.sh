@@ -28,8 +28,10 @@ $NAME/COPYING \
 $NAME/INSTALL \
 $NAME/CHANGELOG \
 $NAME/Makefile \
+$NAME/check/check.awk \
 $NAME/check/check.sh \
 $NAME/check/check_legacy.sh \
+$NAME/check/compare.py \
 $NAME/check/evaluation.py \
 $NAME/check/evaluation.sh \
 $NAME/check/instances/* \
