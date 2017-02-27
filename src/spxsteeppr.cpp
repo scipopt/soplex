@@ -210,13 +210,7 @@ void SPxSteepPR::left4(int n, SPxId id)
 Real inline computePrice(Real viol, Real weight, Real tol)
 {
    if( weight < tol )
-   {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-      MSG_WARNING( spxout, spxout << "WSTEEP02 pricing weight too small ("
-                                  << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
       return viol * viol / tol;
-   }
    else
       return viol * viol / weight;
 }
@@ -458,7 +452,7 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
       const IdxSet& coPidx = thesolver->coPvec().idx();
       Real xi_p = 1 / thesolver->fVec().delta()[n];
       int i, j;
-      Real xi_ip, x;
+      Real xi_ip;
 
       assert(thesolver->fVec().delta()[n] > thesolver->epsilon()
               || thesolver->fVec().delta()[n] < -thesolver->epsilon());
@@ -467,15 +461,15 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
       {
          i = coPidx.index(j);
          xi_ip = xi_p * coPvec[i];
-         x = coWeights_ptr[i] += xi_ip * (xi_ip * pi_p - 2 * workVec_ptr[i]);
+         coWeights_ptr[i] += xi_ip * (xi_ip * pi_p - 2.0 * workVec_ptr[i]);
          /*
-         if(x < 1)
+         if(coWeights_ptr[i] < 1)
              coWeights_ptr[i] = 1 / (2-x);
          */
-         if (x < delta)
+         if (coWeights_ptr[i] < delta)
             coWeights_ptr[i] = delta;
          // coWeights_ptr[i] = 1;
-         else if (x > infinity)
+         else if (coWeights_ptr[i] > infinity)
             coWeights_ptr[i] = 1 / thesolver->epsilon();
       }
 
@@ -483,15 +477,15 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
       {
          i = pIdx.index(j);
          xi_ip = xi_p * pVec[i];
-         x = weights_ptr[i] += xi_ip * (xi_ip * pi_p - 2.0 * (thesolver->vector(i) * workVec));
+         weights_ptr[i] += xi_ip * (xi_ip * pi_p - 2.0 * (thesolver->vector(i) * workVec));
          /*
-         if(x < 1)
+         if(weights_ptr[i] < 1)
              weights_ptr[i] = 1 / (2-x);
          */
-         if (x < delta)
+         if (weights_ptr[i] < delta)
             weights_ptr[i] = delta;
          // weights_ptr[i] = 1;
-         else if (x > infinity)
+         else if (weights_ptr[i] > infinity)
             weights_ptr[i] = 1.0 / thesolver->epsilon();
       }
    }
