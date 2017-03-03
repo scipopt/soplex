@@ -102,13 +102,7 @@ void SPxDevexPR::setRep(SPxSolver::Representation)
 Real inline computePrice(Real viol, Real weight, Real tol)
 {
    if( weight < tol )
-   {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-      MSG_WARNING( spxout, spxout << "WDEVEX02 pricing weight too small ("
-                                  << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
       return viol * viol / tol;
-   }
    else
       return viol * viol / weight;
 }

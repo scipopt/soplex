@@ -1112,7 +1112,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    getEnterVals(enterId, enterTest, enterUB, enterLB,
       enterVal, enterMax, enterPric, enterStat, enterRO, objChange);
 
-   if (polishObj == SolutionPolish::OFF && enterTest > -epsilon())
+   if (!polish && enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
@@ -1151,7 +1151,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   if (polishObj == SolutionPolish::OFF && m_numCycle > m_maxCycle)
+   if (!polish && m_numCycle > m_maxCycle)
    {
       if (-enterMax > 0)
          perturbMaxEnter();

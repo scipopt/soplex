@@ -119,6 +119,13 @@ namespace soplex
       {
       case SPxSolver::OPTIMAL:
          _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
+         // apply polishing on original problem
+         if( _applyPolishing )
+         {
+            int polishing = intParam(SoPlex::SOLUTION_POLISHING);
+            setIntParam(SoPlex::SOLUTION_POLISHING, polishing);
+            _preprocessAndSolveReal(false);
+         }
          break;
 
       case SPxSolver::UNBOUNDED:
@@ -179,6 +186,8 @@ namespace soplex
    {
       _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
+
+      _applyPolishing = false;
 
       if( applySimplifier )
          _enableSimplifierAndScaler();
@@ -242,11 +251,17 @@ namespace soplex
       if( _simplifier )
       {
          assert(!_isRealLPLoaded);
-         // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
+         // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used; also respect row-boundflip parameter
          bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
+         if( intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_ROW
+             || (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_AUTO
+                 && (_solver.nCols() + 1) * realParam(SoPlex::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)) )
+            keepbounds &= boolParam(SoPlex::ROWBOUNDFLIPS);
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
          _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
          _solver.setScalingInfo(false);
+         _applyPolishing = true;
+         _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
       }
 
       _statistics->preprocessingTime->stop();

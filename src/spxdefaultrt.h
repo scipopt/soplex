@@ -80,7 +80,7 @@ public:
    ///
    virtual int selectLeave(Real& val, Real, bool);
    ///
-   virtual SPxId selectEnter(Real& val, int);
+   virtual SPxId selectEnter(Real& val, int, bool);
 };
 
 } // namespace soplex

@@ -584,6 +584,7 @@ namespace soplex
       _realLP = &_solver;
       _isRealLPLoaded = true;
       _isRealLPScaled = false;
+      _applyPolishing = false;
       _optimizeCalls = 0;
       _unscaleCalls = 0;
       _realLP->setOutstream(spxout);
@@ -704,6 +705,7 @@ namespace soplex
          _hasSolReal = rhs._hasSolReal;
          _hasSolRational = rhs._hasSolRational;
          _hasBasis = rhs._hasBasis;
+         _applyPolishing = rhs._applyPolishing;
 
          // rational constants do not need to be assigned
          _rationalPosone = 1;

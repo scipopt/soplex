@@ -738,7 +738,7 @@ Real SPxSolver::nonbasicValue()
    Real val = 0;
    const SPxBasis::Desc& ds = desc();
 
-#ifndef ADDITIONAL_CHECKS
+#ifndef ENABLE_ADDITIONAL_CHECKS
    // if the value is available we don't need to recompute it
    if ( m_nonbasicValueUpToDate )
       return m_nonbasicValue;
@@ -867,11 +867,13 @@ Real SPxSolver::nonbasicValue()
       }
    }
 
-#ifdef ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
    if( m_nonbasicValueUpToDate && NE(m_nonbasicValue, val) )
    {
-      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue << ", correct nonbasic value: " << val << std::endl; )
-      assert(EQrel(m_nonbasicValue, val,1e-14));
+      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue
+                 << ", correct nonbasic value: " << val
+                 << ", violation: " << val - m_nonbasicValue << std::endl; )
+      assert(EQrel(m_nonbasicValue, val, 1e-12));
    }
 #endif
 
