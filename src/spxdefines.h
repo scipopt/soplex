@@ -133,10 +133,13 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  * multi-thread support
  *-----------------------------------------------------------------------------
  */
+// enable the user to compile without thread_local by setting USRCXXFLAGS=-DTHREADLOCAL=""
+#if !defined(THREADLOCAL)
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define THREADLOCAL
 #else
 #define THREADLOCAL thread_local
+#endif
 #endif
 
 /*-----------------------------------------------------------------------------
