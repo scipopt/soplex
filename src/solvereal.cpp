@@ -251,8 +251,12 @@ namespace soplex
       if( _simplifier )
       {
          assert(!_isRealLPLoaded);
-         // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
+         // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used; also respect row-boundflip parameter
          bool keepbounds = intParam(SoPlex::RATIOTESTER) == SoPlex::RATIOTESTER_BOUNDFLIPPING;
+         if( intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_ROW
+             || (intParam(SoPlex::REPRESENTATION) == SoPlex::REPRESENTATION_AUTO
+                 && (_solver.nCols() + 1) * realParam(SoPlex::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)) )
+            keepbounds &= boolParam(SoPlex::ROWBOUNDFLIPS);
          simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex::EPSILON_ZERO), realParam(SoPlex::FEASTOL), realParam(SoPlex::OPTTOL), keepbounds);
          _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
          _solver.setScalingInfo(false);
