@@ -118,6 +118,11 @@ namespace soplex
       name[SoPlex::FULLPERTURBATION] = "fullperturbation";
       description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
       defaultValue[SoPlex::FULLPERTURBATION] = false;
+
+      // print condition number during the solve?
+      name[SoPlex::PRINTCONDITION] = "printcondition";
+      description[SoPlex::PRINTCONDITION] = "print condition number during the solve?";
+      defaultValue[SoPlex::PRINTCONDITION] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -5579,6 +5584,9 @@ namespace soplex
          break;
       case FULLPERTURBATION:
          _solver.useFullPerturbation(value);
+         break;
+      case PRINTCONDITION:
+         _solver.setConditionInformation(value);
          break;
       default:
          return false;

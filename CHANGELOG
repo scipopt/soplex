@@ -57,6 +57,7 @@ interface & parameters:
   for the current pivot
 - new bool parameter 'isOptimal' for unsimplify() to disable some debug checks that are only valid for optimal solutions
 - remove static members Rational::{ZERO,POSONE,NEGONE} when compiling without GMP; make private when compiling with GMP
+- new bool parameter 'printcondition' to print condition number in iteration log
 
 fixed bugs:
 - fix inconsistent basis status in Basis and Solver

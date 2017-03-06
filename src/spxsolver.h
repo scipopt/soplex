@@ -304,6 +304,7 @@ private:
    int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
    bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
+   bool           printCondition;         ///< whether to also compute and print the current condition number in the log
 
    //@}
 
@@ -823,6 +824,12 @@ public:
    int getDisplayFreq()
    {
       return displayFreq;
+   }
+
+   /// print condition number within the usual output
+   void setConditionInformation(bool condInfo)
+   {
+      printCondition = condInfo;
    }
 
    // enable sparse pricing when viols < fac * dim()

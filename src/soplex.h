@@ -905,8 +905,11 @@ public:
       /// perturb the entire problem or only the relevant bounds of s single pivot?
       FULLPERTURBATION = 14,
 
+      /// print condition number during the solve?
+      PRINTCONDITION = 15,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 15
+      BOOLPARAM_COUNT = 16
    } BoolParam;
 
    /// integer parameters
