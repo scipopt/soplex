@@ -962,10 +962,12 @@ void SPxBasis::multWithBase(SSVector& x, SSVector& result) const
    if (!matrixIsSetup)
       (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
 
+   result.clear();
+
    assert(matrixIsSetup);
 
    for( int i = 0; i < x.dim(); ++i )
-      result.setValue(i, (*matrix[i]) * x);
+      result.add(i, (*matrix[i]) * x);
 
    return;
 }
@@ -1059,14 +1061,17 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
 
       // x = B^T*y and normalize
       multWithBase(y, x);
-      x *= 1.0 / x.length();
+      norm2 = 1.0 / x.length();
+      x *= norm2;
    }
    norm = norm1;
 
    // reinitialize vectors
+   x.clear();
+   y.clear();
    norm1 = 1.0 / (Real) dimension;
    for( i = 0; i < dimension; i++ )
-      x.setValue(i, norm1);
+      x.add(i, norm1);
    y = x;
 
    // compute norm of B^-1
@@ -1084,7 +1089,8 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
 
       // x = B^-T*y and normalize
       factor->solveLeft(y, x);
-      y *= 1.0 / y.length();
+      norm2 = 1.0 / y.length();
+      y *= norm2;
    }
    norminv = norm1;
 
