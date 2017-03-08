@@ -22,7 +22,7 @@ check/LP/
 doc/html/
 faq.inc
 faqdata.php
-doc/inc/parameters.set
+parameters.set
 doc/latex/
 license/*.log
 license/*.lot
