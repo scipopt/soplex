@@ -75,7 +75,7 @@ private:
    gzFile           file;               ///< file handle for compressed file
    char             buffer[bufferSize]; ///< data buffer
    char             opened;             ///< open/close state of stream
-   int              mode;               ///< I/O mode
+   unsigned int     mode;               ///< I/O mode
    //@}
 
    //------------------------------------
