@@ -304,7 +304,7 @@ private:
    int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
    bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
-   bool           printCondition;         ///< whether to also compute and print the current condition number in the log
+   int            printCondition;         ///< printing the current condition number in the log (0 - off, 1 - estimate, 2 - exact)
 
    //@}
 
@@ -827,7 +827,7 @@ public:
    }
 
    /// print condition number within the usual output
-   void setConditionInformation(bool condInfo)
+   void setConditionInformation(int condInfo)
    {
       printCondition = condInfo;
    }

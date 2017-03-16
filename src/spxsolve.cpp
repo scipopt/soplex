@@ -1336,7 +1336,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
       if( forceHead || displayLine % (displayFreq*30) == 0 )
       {
          (*spxout) << "type |   time |   iters | facts |    shift | violation |     obj value ";
-         if( printCondition)
+         if( printCondition > 0 )
             (*spxout) << " | condition";
          (*spxout) << std::endl;
       }
@@ -1352,7 +1352,9 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          << std::setprecision(8) << value();
          if( getStartingDecompBasis && rep() == SPxSolver::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
-         if( printCondition )
+         if( printCondition == 1 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
+         if( printCondition == 2 )
             (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
          (*spxout) << std::endl;
       }

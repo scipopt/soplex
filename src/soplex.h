@@ -905,11 +905,8 @@ public:
       /// perturb the entire problem or only the relevant bounds of s single pivot?
       FULLPERTURBATION = 14,
 
-      /// print condition number during the solve?
-      PRINTCONDITION = 15,
-
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 16
+      BOOLPARAM_COUNT = 15
    } BoolParam;
 
    /// integer parameters
@@ -999,8 +996,11 @@ public:
       /// the verbosity of the decomposition based simplex
       DECOMP_VERBOSITY = 27,
 
+      /// print condition number during the solve
+      PRINTCONDITION = 28,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 28
+      INTPARAM_COUNT = 29
    } IntParam;
 
    /// values for parameter OBJSENSE

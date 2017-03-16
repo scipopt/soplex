@@ -118,11 +118,6 @@ namespace soplex
       name[SoPlex::FULLPERTURBATION] = "fullperturbation";
       description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
       defaultValue[SoPlex::FULLPERTURBATION] = false;
-
-      // print condition number during the solve?
-      name[SoPlex::PRINTCONDITION] = "printcondition";
-      description[SoPlex::PRINTCONDITION] = "print condition number during the solve?";
-      defaultValue[SoPlex::PRINTCONDITION] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -322,6 +317,13 @@ namespace soplex
       lower[SoPlex::DECOMP_VERBOSITY] = 1;
       upper[SoPlex::DECOMP_VERBOSITY] = 5;
       defaultValue[SoPlex::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
+
+      // printing condition number during the solve
+      name[SoPlex::PRINTCONDITION] = "printcondition";
+      description[SoPlex::PRINTCONDITION] = "printing condition number during the solve (0 - off, 1 - estimate, 2 - exact)";
+      lower[SoPlex::PRINTCONDITION] = 0;
+      upper[SoPlex::PRINTCONDITION] = 2;
+      defaultValue[SoPlex::PRINTCONDITION] = 0;
    }
 
    SoPlex::Settings::RealParam::RealParam() {
@@ -5585,9 +5587,6 @@ namespace soplex
       case FULLPERTURBATION:
          _solver.useFullPerturbation(value);
          break;
-      case PRINTCONDITION:
-         _solver.setConditionInformation(value);
-         break;
       default:
          return false;
       }
@@ -5930,6 +5929,12 @@ namespace soplex
          break;
       case DECOMP_VERBOSITY:
          break;
+
+      // printing of condition n
+      case PRINTCONDITION:
+         _solver.setConditionInformation(value);
+         break;
+
       default:
          return false;
       }
