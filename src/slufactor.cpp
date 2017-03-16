@@ -589,14 +589,19 @@ Real SLUFactor::stability() const
 
 Real SLUFactor::conditionEstimate() const
 {
-   Real traceprod = 0.0;
+   Real mindiag = spxAbs(diag[0]);
+   Real maxdiag = spxAbs(diag[0]);
 
-   for( int i = 0; i < dim(); ++i)
+   for( int i = 1; i < dim(); ++i)
    {
-      traceprod += spxAbs(diag[i]);
+      Real absdiag = spxAbs(diag[i]);
+      if( absdiag < mindiag )
+         mindiag = absdiag;
+      if( absdiag > maxdiag )
+         maxdiag = absdiag;
    }
 
-   return traceprod;
+   return maxdiag/mindiag;
 }
 
 std::string SLUFactor::statistics() const

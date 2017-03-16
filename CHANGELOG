@@ -29,7 +29,7 @@ features:
   - the parameter computedegen, when set to true will compute the degeneracy of each basis.
 - write dual formulation to file: additional command line option "--writedual" is provided to write the dual formulation
   to a file. When providing this option only the file is output, the problem is not solved.
-- new and fast way of computing a condition number estimate based on the trace of the LU factorization
+- new condition number estimate based on the quotient of max and min diagonal element of LU factorization
 
 performance:
 - more efficient SoPlex class with better usability:
