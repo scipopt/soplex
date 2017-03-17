@@ -2880,6 +2880,7 @@ namespace soplex
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
+
       return status();
    }
 
@@ -4039,6 +4040,20 @@ namespace soplex
    }
 
 
+   /// compute condition number estimate based on the trace of the LU factorization; returns true on success
+   bool SoPlex::getFastCondition(Real& condition)
+   {
+      _ensureRealLPLoaded();
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
+         return false;
+
+      condition = _solver.basis().getFastCondition();
+
+      return true;
+   }
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
    bool SoPlex::getEstimatedCondition(Real& condition)

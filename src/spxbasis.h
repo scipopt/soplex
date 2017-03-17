@@ -615,6 +615,9 @@ public:
       return condition(1000, 1e-9);
    }
 
+   /* compute condition number estimation based on the diagonal of the LU factorization */
+   Real getFastCondition();
+
    /// returns the stability of the basis matrix.
    Real stability() const
    {

@@ -95,6 +95,9 @@ public:
    */
    virtual Real stability() const = 0;
 
+   /// return estimate for the condition number
+   virtual Real conditionEstimate() const = 0;
+
    /// returns statistical information in form of a string.
    virtual std::string statistics() const = 0;
 

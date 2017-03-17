@@ -587,6 +587,23 @@ Real SLUFactor::stability() const
    return initMaxabs / maxabs;
 }
 
+Real SLUFactor::conditionEstimate() const
+{
+   Real mindiag = 1.0;
+   Real maxdiag = 1.0;
+
+   for( int i = 0; i < dim(); ++i)
+   {
+      Real absdiag = spxAbs(diag[i]);
+      if( absdiag < mindiag )
+         mindiag = absdiag;
+      if( absdiag > maxdiag )
+         maxdiag = absdiag;
+   }
+
+   return maxdiag/mindiag;
+}
+
 std::string SLUFactor::statistics() const
 {
    std::stringstream s;
