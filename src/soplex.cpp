@@ -4040,7 +4040,7 @@ namespace soplex
    }
 
 
-   /// compute condition number estimate based on the trace of the LU factorization; returns true on success
+   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
    bool SoPlex::getFastCondition(Real& condition)
    {
       _ensureRealLPLoaded();

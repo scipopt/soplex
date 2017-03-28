@@ -730,7 +730,7 @@ public:
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind) const;
 
-   /// compute condition number estimate based on the trace of the LU factorization; returns true on success
+   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
    bool getFastCondition(Real& condition);
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
