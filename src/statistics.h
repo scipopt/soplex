@@ -135,6 +135,9 @@ namespace soplex
       int  compProbStatus;       ///< status of the complementary problem
       Real finalCompObj;         ///< the final objective function of the complementary problem
 
+      // Numerics
+      Real finalBasisCondition;  ///< condition number estimate of the optimal basis matrix
+
       //@}
    };
 } // namespace soplex

@@ -142,6 +142,7 @@ namespace soplex
       redProbStatus = 0;
       compProbStatus = 0;
       finalCompObj = 0;
+      finalBasisCondition = 0;
    }
 
    /// prints statistics
@@ -261,6 +262,11 @@ namespace soplex
          os << std::scientific << std::setprecision(20);
          os << "Comp. Problem Obj.  : " << finalCompObj << "\n";
       }
+
+      os << std::scientific << std::setprecision(2);
+      os << "Numerics            :\n";
+      os << "  Condition Number  : " << finalBasisCondition << "\n";
+
       os << std::scientific << std::setprecision(prec);
    }
 } // namespace soplex

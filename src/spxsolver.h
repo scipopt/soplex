@@ -867,6 +867,11 @@ public:
       fullPerturbation = full;
    }
 
+   virtual Real getFastCondition()
+   {
+      return basis().getFastCondition();
+   }
+
    //@}
 
 private:
