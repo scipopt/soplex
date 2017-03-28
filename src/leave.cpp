@@ -768,7 +768,16 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       {
          MSG_INFO3( (*spxout), (*spxout) << "ILEAVE01 factorization triggered in "
                               << "leave() for feasibility test" << std::endl; )
-         factorize();
+         try
+         {
+            factorize();
+         }
+         catch( const SPxStatusException& E )
+         {
+            // don't exit immediately but handle the singularity correctly
+            assert(SPxBasis::status() == SPxBasis::SINGULAR);
+            MSG_INFO3( (*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
+         }
 
          /* after a factorization, the leaving column/row might not be infeasible or suboptimal anymore, hence we do
           * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again

@@ -47,7 +47,7 @@ namespace GZSTREAM_NAMESPACE {
 gzstreambuf* gzstreambuf::open( const char* _name, int _open_mode) {
     if ( is_open())
         return 0;
-    mode = _open_mode;
+    mode = static_cast<unsigned int>(_open_mode);
     // no append nor read/write mode
     if ((mode & std::ios::ate) || (mode & std::ios::app)
         || ((mode & std::ios::in) && (mode & std::ios::out)))

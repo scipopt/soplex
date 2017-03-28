@@ -1,5 +1,21 @@
-developer version
+Developer Version
 =================
+
+features:
+
+performance:
+
+interface & parameters:
+
+fixed bugs:
+
+code quality:
+
+
+
+
+08 March 2017 - Release 3.0.0
+=============================
 
 features:
 - new scaler: Least Squares, aka Curtis-Reid-Scaling
