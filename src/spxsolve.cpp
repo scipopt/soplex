@@ -1353,8 +1353,12 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          if( getStartingDecompBasis && rep() == SPxSolver::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          if( printCondition == 1 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition();
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(0);
          if( printCondition == 2 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(1);
+         if( printCondition == 3 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(2);
+         if( printCondition == 4 )
             (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
          (*spxout) << std::endl;
       }

@@ -1013,7 +1013,7 @@ SPxSolver::SPxSolver(
    , computeDegeneracy(false)
    , degenCompIterOffset(0)
    , fullPerturbation(false)
-   , printCondition(false)
+   , printCondition(0)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
