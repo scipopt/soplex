@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -626,6 +626,11 @@ public:
    ///
    void solve(Vector& x, const Vector& rhs)
    {
+      if( rhs.dim() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -633,6 +638,11 @@ public:
    ///
    void solve(SSVector& x, const SVector& rhs)
    {
+      if( rhs.size() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight(x, rhs);
@@ -649,6 +659,11 @@ public:
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
+      if( rhs.size() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveRight4update(x, rhs);
@@ -699,6 +714,11 @@ public:
     */
    void coSolve(Vector& x, const Vector& rhs)
    {
+      if( rhs.dim() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);
@@ -706,6 +726,11 @@ public:
    /// Sparse version of coSolve
    void coSolve(SSVector& x, const SVector& rhs)
    {
+      if( rhs.size() == 0 )
+      {
+         x.clear();
+         return;
+      }
       if (!factorized) 
          SPxBasis::factorize();
       factor->solveLeft(x, rhs);

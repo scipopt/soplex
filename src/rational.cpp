@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -60,38 +60,34 @@
 namespace soplex
 {
 
+#ifdef SOPLEX_WITH_GMP
+
 /// rational zero
 const Rational Rational::ZERO(0, true);
-
-
 
 /// rational plus one
 const Rational Rational::POSONE(1, true);
 
-
-
 /// rational minus one
 const Rational Rational::NEGONE(-1, true);
-
-
-
-#ifdef SOPLEX_WITH_GMP
 
 /// list of unused Private objects; note that this cannot be used if SOPLEX_WITH_GMP is not defined, since then the
 /// Private class has no member next() and prev()
 /// should list memory be used?
 #ifdef SOPLEX_NOLISTMEM
-thread_local bool Rational::useListMem = false;
+THREADLOCAL bool Rational::useListMem = false;
 #else
-thread_local bool Rational::useListMem = true;
+THREADLOCAL bool Rational::useListMem = true;
 #endif
 
 
 
 
 /// list of unused Private objects
-thread_local IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
 
+#ifdef SOPLEX_WITH_GMP
+   THREADLOCAL IdList< Rational::Private > Rational::unusedPrivateList(0, 0, true);
+#endif
 
 /// Defines the "Pimpl"-class Private
 class Rational::Private
@@ -2986,18 +2982,6 @@ public:
       return *this;
    }
 };
-
-
-
-/// special constructor only for initializing static rational variables; this is necessary since we need a constructor
-/// for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
-Rational::Rational(const int& i, const bool& dummy)
-{
-   // if SOPLEX_WITH_GMP is not defined we don't need anything special here
-   dpointer = 0;
-   spx_alloc(dpointer);
-   dpointer = new (dpointer) Private(i);
-}
 
 
 

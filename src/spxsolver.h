@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1743,7 +1743,7 @@ private:
 
    /** let index \p i leave the basis and manage entering of another one.
        @returns \c false if LP is unbounded/infeasible. */
-   bool leave(int i);
+   bool leave(int i, bool polish = false);
    /** let id enter the basis and manage leaving of another one.
        @returns \c false if LP is unbounded/infeasible. */
    bool enter(SPxId& id, bool polish = false);

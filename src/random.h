@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -20,23 +20,21 @@
 #define _RANDOM_H_
 
 #include <assert.h>
+#include <stdint.h>
+#include <algorithm>
 
 namespace soplex
 {
 
 /* initial seeds for KISS random number generator */
-#define  DEFAULT_LIN  123456789
-#define  DEFAULT_XOR  362436000
-#define  DEFAULT_MWC  521288629
-#define  DEFAULT_CST  7654321
+#define  DEFAULT_LIN  UINT32_C(123456789)
+#define  DEFAULT_XOR  UINT32_C(362436000)
+#define  DEFAULT_MWC  UINT32_C(521288629)
+#define  DEFAULT_CST  UINT32_C(7654321)
 
 /* defines for linear congruential generator */
-#define  RSTEP    1103515245
-#define  RADD     12345
-
-/* defines for shifting an unsigned integer into [0,1) */
-#define  RDIVIDE  65536
-#define  RMULT    32768
+#define  RSTEP    UINT64_C(1103515245)
+#define  RADD     UINT64_C(12345)
 
 /**@brief   Random numbers.
    @ingroup Elementary
@@ -62,23 +60,23 @@ private:
    //--------------------------------------
    /**@name Data */
    //@{
-   unsigned long seedshift;  ///< initial shift for random seeds.
-   unsigned long lin_seed;   ///< random seed for linear congruential RNS.
-   unsigned long xor_seed;   ///< random seed for XOR-shift RNS.
-   unsigned long mwc_seed;   ///< random seed Multiple-with-carry RNS.
-   unsigned long cst_seed;   ///< random seed shifted for mwc_seed.
+   uint32_t seedshift;  ///< initial shift for random seeds.
+   uint32_t lin_seed;   ///< random seed for linear congruential RNS.
+   uint32_t xor_seed;   ///< random seed for XOR-shift RNS.
+   uint32_t mwc_seed;   ///< random seed Multiple-with-carry RNS.
+   uint32_t cst_seed;   ///< random seed shifted for mwc_seed.
    //@}
 
    //--------------------------------------
    /**@name Helpers */
    //@{
-   /// executes KISS random number generator and returns a pseudo random Real value in [0,1).
+   /// executes KISS random number generator and returns a pseudo random Real value in [0,1].
    Real next_random()
    {
-      unsigned long long t;
+      uint64_t t;
 
       /* linear congruential */
-      lin_seed = lin_seed * RSTEP + RADD;
+      lin_seed = (uint32_t) (lin_seed * RSTEP + RADD);
 
       /* Xorshift */
       xor_seed ^= (xor_seed << 13);
@@ -86,12 +84,11 @@ private:
       xor_seed ^= (xor_seed << 5);
 
       /* Multiply-with-carry */
-      t = 698769069ULL * mwc_seed + cst_seed;
-      cst_seed = (unsigned long) (t >> 32);
-      mwc_seed = (unsigned long) t;
+      t = UINT64_C(698769069) * mwc_seed + cst_seed;
+      cst_seed = (uint32_t) (t >> 32);
+      mwc_seed = (uint32_t) t;
 
-      Real i = (Real) (((lin_seed + xor_seed + mwc_seed) / RDIVIDE) % RMULT);
-      return ( i / RMULT );
+      return (lin_seed + xor_seed + mwc_seed) / (Real)UINT32_MAX;
    }
 
    //@}
@@ -104,11 +101,16 @@ public:
    /// returns next random number.
    Real next(Real minimum = 0.0, Real maximum = 1.0)
    {
-      return (minimum + (maximum - minimum) * next_random());
+      Real randnumber = next_random();
+
+      /* we multiply minimum and maximum separately by randnumber in order to avoid overflow if they are more than
+       * std::numeric_limits<Real>::max() apart
+       */
+      return minimum*(1.0 - randnumber) + maximum*randnumber;
    }
 
    /// returns the initial seed shift
-   unsigned long getSeed() const
+   uint32_t getSeed() const
    {
       return seedshift;
    }
@@ -119,13 +121,22 @@ public:
    /**@name Modification */
    //@{
    /// initialize all seeds of the random number generator.
-   void setSeed(unsigned long initshift)
+   void setSeed(uint32_t initshift)
    {
       seedshift = initshift;
-      lin_seed = (unsigned long)(DEFAULT_LIN + initshift);
-      xor_seed = (unsigned long)(DEFAULT_XOR + initshift);
-      mwc_seed = (unsigned long)(DEFAULT_MWC + initshift);
-      cst_seed = (unsigned long)(DEFAULT_CST + initshift);
+
+      /* use std::max to avoid zero after over flowing */
+      lin_seed = std::max(DEFAULT_LIN + initshift, 1u);
+      xor_seed = std::max(DEFAULT_XOR + initshift, 1u);
+      mwc_seed = std::max(DEFAULT_MWC + initshift, 1u);
+      cst_seed = DEFAULT_CST + initshift;
+
+      assert(lin_seed > 0);
+      assert(xor_seed > 0);
+      assert(mwc_seed > 0);
+
+      /* advance state once to have more random values */
+      (void) next_random();
    }
 
    //@}
@@ -139,7 +150,7 @@ public:
        variable's sequence.
    */
    explicit
-   Random(unsigned long randomseed = 0)
+   Random(uint32_t randomseed = 0)
    {
       setSeed(randomseed);
    }

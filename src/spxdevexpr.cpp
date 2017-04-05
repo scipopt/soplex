@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -102,13 +102,7 @@ void SPxDevexPR::setRep(SPxSolver::Representation)
 Real inline computePrice(Real viol, Real weight, Real tol)
 {
    if( weight < tol )
-   {
-#ifdef ENABLE_ADDITIONAL_CHECKS
-      MSG_WARNING( spxout, spxout << "WDEVEX02 pricing weight too small ("
-                                  << coPen[idx] << "), assuming epsilon (" << tol << ")!" << std::endl; )
-#endif
       return viol * viol / tol;
-   }
    else
       return viol * viol / weight;
 }

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -4708,7 +4708,24 @@ void CLUFactor::solveLleftNoNZ( Real* vec )
 #endif
 }
 
-int CLUFactor::vSolveLright( Real* vec, int* ridx, int rn, Real eps )
+void inline CLUFactor::updateSolutionVectorLright(Real change, int j, Real& vec, int* idx, int& nnz)
+{
+   // create a new entry in #ridx
+   if( vec == 0.0 )
+   {
+      assert(nnz < thedim);
+      idx[nnz] = j;
+      ++nnz;
+   }
+   vec -= change;
+   // mark the entry where exact eliminiation occurred
+   if( vec == 0.0 )
+      vec = SOPLEX_FACTOR_MARKER;
+}
+
+// solve Lz = b, inplace, using and preserving sparisity structure in the rhs and solution vector
+// arrays #vec and #ridx must be large enough to hold #thedim entries!
+void CLUFactor::vSolveLright( Real* vec, int* ridx, int& rn, Real eps )
 {
    int i, j, k, n;
    int end;
@@ -4724,69 +4741,66 @@ int CLUFactor::vSolveLright( Real* vec, int* ridx, int rn, Real eps )
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   // loop through columns of L
+   for( i = 0; i < end; ++i )
    {
       x = vec[lrow[i]];
 
-      if ( isNotZero( x, eps ) )
+      // check whether there is a corresponding value in the rhs vector; skipping/ignoring FACTOR_MARKER
+      if( isNotZero(x, eps) )
       {
          k = lbeg[i];
          idx = &( lidx[k] );
          val = &( lval[k] );
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         // apply \f$- x * L_{k,i}\f$ to all corresponding values in rhs/solution vector
+         for( j = lbeg[i + 1]; j > k; --j )
          {
-            assert( *idx >= 0 && *idx < thedim );
-            ridx[rn] = n = *idx++;
-            rn += ( vec[n] == 0 ) ? 1 : 0;
-            vec[n] -= x * ( *val++ );
-            vec[n] += ( vec[n] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+            assert(*idx >= 0 && *idx < thedim);
+            n = *idx++;
+            updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+            ++val;
          }
       }
    }
 
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
+   if( l.updateType )                   /* Forest-Tomlin Updates */
    {
       end = l.firstUnused;
 
-      for ( ; i < end; ++i )
+      for( ; i < end; ++i )
       {
-         x = 0;
+         x = 0.0;
          k = lbeg[i];
          idx = &( lidx[k] );
          val = &( lval[k] );
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for( j = lbeg[i + 1]; j > k; --j )
          {
-            assert( *idx >= 0 && *idx < thedim );
+            assert(*idx >= 0 && *idx < thedim);
             x += vec[*idx++] * ( *val++ );
          }
 
-         ridx[rn] = j = lrow[i];
+         j = lrow[i];
 
-         rn += ( vec[j] == 0 ) ? 1 : 0;
-         vec[j] -= x;
-         vec[j] += ( vec[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+         if( isNotZero(x, eps) )
+            updateSolutionVectorLright(x, j, vec[j], ridx, rn);
       }
    }
-
-   return rn;
 }
 
+// solve with L for two right hand sides
+// see above methods for documentation
 void CLUFactor::vSolveLright2(
-   Real* vec, int* ridx, int* rnptr, Real eps,
-   Real* vec2, int* ridx2, int* rn2ptr, Real eps2 )
+   Real* vec, int* ridx, int& rn, Real eps,
+   Real* vec2, int* ridx2, int& rn2, Real eps2 )
 {
    int i, j, k, n;
    int end;
-   Real x, y;
-   Real x2, y2;
+   Real x, x2;
    Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
-
-   int rn = *rnptr;
-   int rn2 = *rn2ptr;
 
    lval = l.val;
    lidx = l.idx;
@@ -4795,117 +4809,103 @@ void CLUFactor::vSolveLright2(
 
    end = l.firstUpdate;
 
+   // loop through columns of L
    for ( i = 0; i < end; ++i )
    {
       j = lrow[i];
       x2 = vec2[j];
       x = vec[j];
 
-      if ( isNotZero( x, eps ) )
+      // check whether there is a corresponding value in the first rhs vector; skipping/ignoring FACTOR_MARKER
+      if( isNotZero(x, eps) )
       {
          k = lbeg[i];
          idx = &( lidx[k] );
          val = &( lval[k] );
 
-         if ( isNotZero( x2, eps2 ) )
+         // check whether there is  also a corresponding value in the second rhs vector; skipping/ignoring FACTOR_MARKER
+         if( isNotZero(x2, eps2) )
          {
-            for ( j = lbeg[i + 1]; j > k; --j )
+            for( j = lbeg[i + 1]; j > k; --j )
             {
-               assert( *idx >= 0 && *idx < thedim );
-               ridx[rn] = ridx2[rn2] = n = *idx++;
-               y = vec[n];
-               y2 = vec2[n];
-               rn += ( y == 0 ) ? 1 : 0;
-               rn2 += ( y2 == 0 ) ? 1 : 0;
-               y -= x * ( *val );
-               y2 -= x2 * ( *val++ );
-               vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-               vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+               assert(*idx >= 0 && *idx < thedim);
+               n = *idx++;
+               updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+               updateSolutionVectorLright(x2 * (*val), n, vec2[n], ridx2, rn2);
+               ++val;
             }
          }
+         // only the first vector needs to be modified
          else
          {
-            for ( j = lbeg[i + 1]; j > k; --j )
+            for( j = lbeg[i + 1]; j > k; --j )
             {
-               assert( *idx >= 0 && *idx < thedim );
-               ridx[rn] = n = *idx++;
-               y = vec[n];
-               rn += ( y == 0 ) ? 1 : 0;
-               y -= x * ( *val++ );
-               vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+               assert(*idx >= 0 && *idx < thedim);
+               n = *idx++;
+               updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+               ++val;
             }
          }
       }
-      else
-         if ( isNotZero( x2, eps2 ) )
-         {
-            k = lbeg[i];
-            idx = &( lidx[k] );
-            val = &( lval[k] );
-
-            for ( j = lbeg[i + 1]; j > k; --j )
-            {
-               assert( *idx >= 0 && *idx < thedim );
-               ridx2[rn2] = n = *idx++;
-               y2 = vec2[n];
-               rn2 += ( y2 == 0 ) ? 1 : 0;
-               y2 -= x2 * ( *val++ );
-               vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-            }
-         }
-   }
-
-   if ( l.updateType )                   /* Forest-Tomlin Updates */
-   {
-      end = l.firstUnused;
-
-      for ( ; i < end; ++i )
+      // only the second vector needs to be modified
+      else if( isNotZero( x2, eps2 ) )
       {
-         x = x2 = 0;
          k = lbeg[i];
          idx = &( lidx[k] );
          val = &( lval[k] );
 
-         for ( j = lbeg[i + 1]; j > k; --j )
+         for( j = lbeg[i + 1]; j > k; --j )
+         {
+            assert(*idx >= 0 && *idx < thedim);
+            n = *idx++;
+            updateSolutionVectorLright(x2 * (*val), n, vec2[n], ridx2, rn2);
+            ++val;
+         }
+      }
+   }
+
+   if( l.updateType )                   /* Forest-Tomlin Updates */
+   {
+      end = l.firstUnused;
+
+      for( ; i < end; ++i )
+      {
+         x = x2 = 0.0;
+         k = lbeg[i];
+         idx = &( lidx[k] );
+         val = &( lval[k] );
+
+         for( j = lbeg[i + 1]; j > k; --j )
          {
             assert( *idx >= 0 && *idx < thedim );
             x += vec[*idx] * ( *val );
             x2 += vec2[*idx++] * ( *val++ );
          }
 
-         ridx[rn] = ridx2[rn2] = j = lrow[i];
+         j = lrow[i];
 
-         rn += ( vec[j] == 0 ) ? 1 : 0;
-         rn2 += ( vec2[j] == 0 ) ? 1 : 0;
-         vec[j] -= x;
-         vec2[j] -= x2;
-         vec[j] += ( vec[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
-         vec2[j] += ( vec2[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+         if( isNotZero(x, eps) )
+            updateSolutionVectorLright(x, j, vec[j], ridx, rn);
+
+         if( isNotZero(x2, eps2) )
+            updateSolutionVectorLright(x2, j, vec2[j], ridx2, rn2);
       }
    }
-
-   *rnptr = rn;
-
-   *rn2ptr = rn2;
 }
 
+// solve with L for three right hand sides
+// see above methods for documentation
 void CLUFactor::vSolveLright3(
-   Real* vec, int* ridx, int* rnptr, Real eps,
-   Real* vec2, int* ridx2, int* rn2ptr, Real eps2,
-   Real* vec3, int* ridx3, int* rn3ptr, Real eps3 )
+   Real* vec, int* ridx, int& rn, Real eps,
+   Real* vec2, int* ridx2, int& rn2, Real eps2,
+   Real* vec3, int* ridx3, int& rn3, Real eps3 )
 {
    int i, j, k, n;
    int end;
-   Real x, y;
-   Real x2, y2;
-   Real x3, y3;
+   Real x, x2, x3;
    Real *lval, *val;
    int *lrow, *lidx, *idx;
    int *lbeg;
-
-   int rn = *rnptr;
-   int rn2 = *rn2ptr;
-   int rn3 = *rn3ptr;
 
    lval = l.val;
    lidx = l.idx;
@@ -4914,148 +4914,116 @@ void CLUFactor::vSolveLright3(
 
    end = l.firstUpdate;
 
-   for ( i = 0; i < end; ++i )
+   for( i = 0; i < end; ++i )
    {
       j = lrow[i];
-      x3 = vec3[j];
-      x2 = vec2[j];
       x = vec[j];
+      x2 = vec2[j];
+      x3 = vec3[j];
 
-      if ( isNotZero( x, eps ) )
+      if( isNotZero(x, eps) )
       {
          k = lbeg[i];
          idx = &( lidx[k] );
          val = &( lval[k] );
 
-         if ( isNotZero( x2, eps2 ) )
+         if( isNotZero(x2, eps2) )
          {
-            if ( isNotZero( x3, eps3 ) )
+            if( isNotZero(x3, eps3) )
             {
                // case 1: all three vectors are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
+               for( j = lbeg[i + 1]; j > k; --j )
                {
                   assert( *idx >= 0 && *idx < thedim );
-                  ridx[rn] = ridx2[rn2] = ridx3[rn3] = n = *idx++;
-                  y = vec[n];
-                  y2 = vec2[n];
-                  y3 = vec3[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y -= x * ( *val );
-                  y2 -= x2 * ( *val );
-                  y3 -= x3 * ( *val++ );
-                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  n = *idx++;
+                  updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+                  updateSolutionVectorLright(x2 * (*val), n, vec2[n], ridx2, rn2);
+                  updateSolutionVectorLright(x3 * (*val), n, vec3[n], ridx3, rn3);
+                  ++val;
                }
             }
             else
             {
                // case 2: 1 and 2 are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
+               for( j = lbeg[i + 1]; j > k; --j )
                {
                   assert( *idx >= 0 && *idx < thedim );
-                  ridx[rn] = ridx2[rn2] = n = *idx++;
-                  y = vec[n];
-                  y2 = vec2[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  y -= x * ( *val );
-                  y2 -= x2 * ( *val++ );
-                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
+                  n = *idx++;
+                  updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+                  updateSolutionVectorLright(x2 * (*val), n, vec2[n], ridx2, rn2);
+                  ++val;
                }
             }
          }
-         else
-            if ( isNotZero( x3, eps3 ) )
-            {
-               // case 3: 1 and 3 are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx[rn] = ridx3[rn3] = n = *idx++;
-                  y = vec[n];
-                  y3 = vec3[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y -= x * ( *val );
-                  y3 -= x3 * ( *val++ );
-                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-               }
-            }
-            else
-            {
-               // case 4: only 1 is nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx[rn] = n = *idx++;
-                  y = vec[n];
-                  rn += ( y == 0 ) ? 1 : 0;
-                  y -= x * ( *val++ );
-                  vec[n] = y + ( y == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-               }
-            }
-      }
-      else
-         if ( isNotZero( x2, eps2 ) )
+         else if( isNotZero(x3, eps3) )
          {
-            k = lbeg[i];
-            idx = &( lidx[k] );
-            val = &( lval[k] );
-
-            if ( isNotZero( x3, eps3 ) )
+            // case 3: 1 and 3 are nonzero at j
+            for ( j = lbeg[i + 1]; j > k; --j )
             {
-               // case 5: 2 and 3 are nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx2[rn2] = ridx3[rn3] = n = *idx++;
-                  y2 = vec2[n];
-                  y3 = vec3[n];
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y2 -= x2 * ( *val );
-                  y3 -= x3 * ( *val++ );
-                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-               }
-            }
-            else
-            {
-               // case 6: only 2 is nonzero at j
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx2[rn2] = n = *idx++;
-                  y2 = vec2[n];
-                  rn2 += ( y2 == 0 ) ? 1 : 0;
-                  y2 -= x2 * ( *val++ );
-                  vec2[n] = y2 + ( y2 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-               }
+               assert( *idx >= 0 && *idx < thedim );
+               n = *idx++;
+               updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+               updateSolutionVectorLright(x3 * (*val), n, vec3[n], ridx3, rn3);
+               ++val;
             }
          }
          else
-            if ( isNotZero( x3, eps3 ) )
+         {
+            // case 4: only 1 is nonzero at j
+            for ( j = lbeg[i + 1]; j > k; --j )
             {
-               // case 7: only 3 is nonzero at j
-               k = lbeg[i];
-               idx = &( lidx[k] );
-               val = &( lval[k] );
-
-               for ( j = lbeg[i + 1]; j > k; --j )
-               {
-                  assert( *idx >= 0 && *idx < thedim );
-                  ridx3[rn3] = n = *idx++;
-                  y3 = vec3[n];
-                  rn3 += ( y3 == 0 ) ? 1 : 0;
-                  y3 -= x3 * ( *val++ );
-                  vec3[n] = y3 + ( y3 == 0 ? SOPLEX_FACTOR_MARKER : 0 );
-               }
+               assert( *idx >= 0 && *idx < thedim );
+               n = *idx++;
+               updateSolutionVectorLright(x * (*val), n, vec[n], ridx, rn);
+               ++val;
             }
+         }
+      }
+      else if( isNotZero(x2, eps2) )
+      {
+         k = lbeg[i];
+         idx = &( lidx[k] );
+         val = &( lval[k] );
+
+         if( isNotZero(x3, eps3) )
+         {
+            // case 5: 2 and 3 are nonzero at j
+            for( j = lbeg[i + 1]; j > k; --j )
+            {
+               assert( *idx >= 0 && *idx < thedim );
+               n = *idx++;
+               updateSolutionVectorLright(x2 * (*val), n, vec2[n], ridx2, rn2);
+               updateSolutionVectorLright(x3 * (*val), n, vec3[n], ridx3, rn3);
+               ++val;
+            }
+         }
+         else
+         {
+            // case 6: only 2 is nonzero at j
+            for( j = lbeg[i + 1]; j > k; --j )
+            {
+               assert( *idx >= 0 && *idx < thedim );
+               n = *idx++;
+               updateSolutionVectorLright(x2 * (*val), n, vec2[n], ridx2, rn2);
+               ++val;
+            }
+         }
+      }
+      else if( isNotZero(x3, eps3) )
+      {
+         // case 7: only 3 is nonzero at j
+         k = lbeg[i];
+         idx = &( lidx[k] );
+         val = &( lval[k] );
+
+         for ( j = lbeg[i + 1]; j > k; --j )
+         {
+            assert( *idx >= 0 && *idx < thedim );
+            n = *idx++;
+            updateSolutionVectorLright(x3 * (*val), n, vec3[n], ridx3, rn3);
+            ++val;
+         }
+      }
    }
 
    if ( l.updateType )                   /* Forest-Tomlin Updates */
@@ -5077,24 +5045,18 @@ void CLUFactor::vSolveLright3(
             x3 += vec3[*idx++] * ( *val++ );
          }
 
-         ridx[rn] = ridx2[rn2] = ridx3[rn3] = j = lrow[i];
+         j = lrow[i];
 
-         rn += ( vec[j] == 0 ) ? 1 : 0;
-         rn2 += ( vec2[j] == 0 ) ? 1 : 0;
-         rn3 += ( vec3[j] == 0 ) ? 1 : 0;
-         vec[j] -= x;
-         vec2[j] -= x2;
-         vec3[j] -= x3;
-         vec[j] += ( vec[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
-         vec2[j] += ( vec2[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
-         vec3[j] += ( vec3[j] == 0 ) ? SOPLEX_FACTOR_MARKER : 0;
+         if( isNotZero(x, eps) )
+            updateSolutionVectorLright(x, j, vec[j], ridx, rn);
+
+         if( isNotZero(x2, eps2) )
+            updateSolutionVectorLright(x2, j, vec2[j], ridx2, rn2);
+
+         if( isNotZero(x3, eps3) )
+            updateSolutionVectorLright(x3, j, vec3[j], ridx3, rn3);
       }
    }
-
-   *rnptr = rn;
-
-   *rn2ptr = rn2;
-   *rn3ptr = rn3;
 }
 
 int CLUFactor::vSolveUright( Real* vec, int* vidx,
@@ -5639,7 +5601,8 @@ int CLUFactor::vSolveRight4update( Real eps,
                                    Real* rhs, int* ridx, int rn,              /* rhs    */
                                    Real* forest, int* forestNum, int* forestIdx )
 {
-   rn = vSolveLright( rhs, ridx, rn, eps );
+   vSolveLright(rhs, ridx, rn, eps);
+   assert(rn >= 0 && rn <= thedim);
 
    /*  turn index list into a heap
     */
@@ -5708,11 +5671,9 @@ int CLUFactor::vSolveRight4update2( Real eps,
                                     Real* rhs2, int* ridx2, int rn2,      /* rhs2    */
                                     Real* forest, int* forestNum, int* forestIdx )
 {
-   /*
-    *  rn  = vSolveLright(rhs,  ridx,  rn,  eps);
-    *  rn2 = vSolveLright(rhs2, ridx2, rn2, eps2);
-    */
-   vSolveLright2( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2 );
+   vSolveLright2(rhs, ridx, rn, eps, rhs2, ridx2, rn2, eps2);
+   assert(rn >= 0 && rn <= thedim);
+   assert(rn2 >= 0 && rn2 <= thedim);
 
    /*  turn index list into a heap
     */
@@ -5831,7 +5792,9 @@ void CLUFactor::vSolveRight4update2sparse( Real eps, Real* vec, int* idx,       
                                            Real* forest, int* forestNum, int* forestIdx )
 {
    /* solve with L */
-   vSolveLright2( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2 );
+   vSolveLright2(rhs, ridx, rn, eps, rhs2, ridx2, rn2, eps2);
+   assert(rn >= 0 && rn <= thedim);
+   assert(rn2 >= 0 && rn2 <= thedim);
 
    Real x;
    int i, j, k;
@@ -5912,10 +5875,10 @@ int CLUFactor::vSolveRight4update3( Real eps,
                                     Real* forest, int* forestNum, int* forestIdx )
 {
 
-   vSolveLright3( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3 );
-   assert( rn >= 0 && rn <= thedim );
-   assert( rn2 >= 0 && rn2 <= thedim );
-   assert( rn3 >= 0 && rn3 <= thedim );
+   vSolveLright3(rhs, ridx, rn, eps, rhs2, ridx2, rn2, eps2, rhs3, ridx3, rn3, eps3);
+   assert(rn >= 0 && rn <= thedim);
+   assert(rn2 >= 0 && rn2 <= thedim);
+   assert(rn3 >= 0 && rn3 <= thedim);
 
    /*  turn index list into a heap
     */
@@ -6060,7 +6023,7 @@ void CLUFactor::vSolveRight4update3sparse( Real eps, Real* vec, int* idx,       
                                            Real* rhs3, int* ridx3, int& rn3,     /* rhs3    */
                                            Real* forest, int* forestNum, int* forestIdx )
 {
-   vSolveLright3( rhs, ridx, &rn, eps, rhs2, ridx2, &rn2, eps2, rhs3, ridx3, &rn3, eps3 );
+   vSolveLright3( rhs, ridx, rn, eps, rhs2, ridx2, rn2, eps2, rhs3, ridx3, rn3, eps3 );
    assert( rn >= 0 && rn <= thedim );
    assert( rn2 >= 0 && rn2 <= thedim );
    assert( rn3 >= 0 && rn3 <= thedim );
@@ -6149,15 +6112,15 @@ void CLUFactor::vSolveRight4update3sparse( Real eps, Real* vec, int* idx,       
 }
 
 void CLUFactor::vSolveRightNoNZ(
-   Real* vec2, Real eps2,              /* result2 */
-   Real* rhs2, int* ridx2, int rn2 )   /* rhs2    */
+   Real* vec, Real eps,             /* result */
+   Real* rhs, int* ridx, int rn )   /* rhs    */
 {
-   rn2 = vSolveLright( rhs2, ridx2, rn2, eps2 );
-   assert( rn2 >= 0 && rn2 <= thedim );
+   vSolveLright(rhs, ridx, rn, eps);
+   assert( rn >= 0 && rn <= thedim );
 
-   if ( rn2 > thedim*verySparseFactor4right )
+   if ( rn > thedim*verySparseFactor4right )
    {
-      *ridx2 = thedim - 1;
+      *ridx = thedim - 1;
    }
    else
    {
@@ -6169,36 +6132,36 @@ void CLUFactor::vSolveRightNoNZ(
       /*      maxabs = 1;    */
       rperm = row.perm;
 
-      for ( i = j = 0; i < rn2; ++i )
+      for ( i = j = 0; i < rn; ++i )
       {
-         k = ridx2[i];
+         k = ridx[i];
          assert( k >= 0 && k < thedim );
-         x = rhs2[k];
+         x = rhs[k];
 
-         if ( x < -eps2 )
+         if ( x < -eps )
          {
             /*              maxabs = (maxabs < -x) ? -x : maxabs;  */
-            enQueueMax( ridx2, &j, rperm[k] );
+            enQueueMax( ridx, &j, rperm[k] );
          }
          else
-            if ( x > eps2 )
+            if ( x > eps )
             {
                /*              maxabs = (maxabs < x) ? x : maxabs;    */
-               enQueueMax( ridx2, &j, rperm[k] );
+               enQueueMax( ridx, &j, rperm[k] );
             }
             else
-               rhs2[k] = 0;
+               rhs[k] = 0;
       }
 
-      rn2 = j;
+      rn = j;
 
       /*      eps2 = maxabs * eps2;  */
    }
 
-   vSolveUrightNoNZ( vec2, rhs2, ridx2, rn2, eps2 );
+   vSolveUrightNoNZ( vec, rhs, ridx, rn, eps );
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
-      vSolveUpdateRightNoNZ( vec2, eps2 );
+      vSolveUpdateRightNoNZ( vec, eps );
 }
 
 int CLUFactor::vSolveLeft( Real eps,

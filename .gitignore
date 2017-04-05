@@ -20,6 +20,9 @@ tca.*
 *.result
 check/LP/
 doc/html/
+faq.inc
+faqdata.php
+parameters.set
 doc/latex/
 license/*.log
 license/*.lot

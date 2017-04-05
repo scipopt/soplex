@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -23,12 +23,12 @@
 namespace soplex
 {
 
-thread_local const Real infinity                 = DEFAULT_INFINITY;
+THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-thread_local Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
-thread_local Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-thread_local Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-thread_local Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
+THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 bool msginconsistent(const char* name, const char* file, int line)
 {

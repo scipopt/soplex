@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -437,7 +437,7 @@ bool SPxBasis::readBasis(
 
    /* load default basis if necessary */
    if (status() == NO_PROBLEM)
-      load(theLP);
+      load(theLP, false);
 
    /* initialize with standard settings */
    Desc l_desc(thedesc);
@@ -962,10 +962,12 @@ void SPxBasis::multWithBase(SSVector& x, SSVector& result) const
    if (!matrixIsSetup)
       (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
 
+   result.clear();
+
    assert(matrixIsSetup);
 
    for( int i = 0; i < x.dim(); ++i )
-      result.setValue(i, (*matrix[i]) * x);
+      result.add(i, (*matrix[i]) * x);
 
    return;
 }
@@ -1059,14 +1061,17 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
 
       // x = B^T*y and normalize
       multWithBase(y, x);
-      x *= 1.0 / x.length();
+      norm2 = 1.0 / x.length();
+      x *= norm2;
    }
    norm = norm1;
 
    // reinitialize vectors
+   x.clear();
+   y.clear();
    norm1 = 1.0 / (Real) dimension;
    for( i = 0; i < dimension; i++ )
-      x.setValue(i, norm1);
+      x.add(i, norm1);
    y = x;
 
    // compute norm of B^-1
@@ -1084,7 +1089,8 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
 
       // x = B^-T*y and normalize
       factor->solveLeft(y, x);
-      y *= 1.0 / y.length();
+      norm2 = 1.0 / y.length();
+      y *= norm2;
    }
    norminv = norm1;
 

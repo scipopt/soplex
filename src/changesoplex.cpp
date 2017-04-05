@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -820,10 +820,9 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
 
 void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 {
-   Real oldLower = lowerUnscaled(i);
-
-   if (NE(newLower, oldLower))
+   if( NE(newLower, lowerUnscaled(i)) )
    {
+      Real oldLower = lower(i);
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.
       SPxLP::changeLower(i, newLower, scale);
@@ -925,10 +924,9 @@ void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
 
 void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 {
-   Real oldUpper = upperUnscaled(i);
-
-   if (newUpper != oldUpper)
+   if( newUpper != upperUnscaled(i) )
    {
+      Real oldUpper = upper(i);
       SPxLP::changeUpper(i, newUpper, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -941,14 +939,12 @@ void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 
 void SPxSolver::changeBounds(const Vector& newLower, const Vector& newUpper, bool scale)
 {
-
    changeLower(newLower, scale);
    changeUpper(newUpper, scale);
 }
 
 void SPxSolver::changeBounds(int i, const Real& newLower, const Real& newUpper, bool scale)
 {
-
    changeLower(i, newLower, scale);
    changeUpper(i, newUpper, scale);
 }
@@ -1041,10 +1037,9 @@ void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
 
 void SPxSolver::changeLhs(int i, const Real& newLhs, bool scale)
 {
-   Real oldLhs = lhsUnscaled(i);
-
-   if (newLhs != oldLhs)
+   if( newLhs != lhsUnscaled(i) )
    {
+      Real oldLhs = lhs(i);
       SPxLP::changeLhs(i, newLhs, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
@@ -1143,10 +1138,9 @@ void SPxSolver::changeRhs(const Vector& newRhs, bool scale)
 
 void SPxSolver::changeRhs(int i, const Real& newRhs, bool scale)
 {
-   Real oldRhs = rhsUnscaled(i);
-
-   if (newRhs != oldRhs)
+   if( newRhs != rhsUnscaled(i) )
    {
+      Real oldRhs = rhs(i);
       SPxLP::changeRhs(i, newRhs, scale);
 
       if (SPxBasis::status() > SPxBasis::NO_PROBLEM)

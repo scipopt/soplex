@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -113,7 +113,7 @@ public:
    ///
    virtual int selectLeave(Real& val, Real, bool);
    ///
-   virtual SPxId selectEnter(Real& val, int);
+   virtual SPxId selectEnter(Real& val, int, bool);
    //@}
 
 };

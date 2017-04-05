@@ -4,6 +4,7 @@
 import sys
 import math
 import json
+import fractions
 
 # this function checks for the type of parsed string
 def typeofvalue(text):
@@ -19,7 +20,20 @@ def typeofvalue(text):
     except ValueError:
         pass
 
+    try:
+        fractions.Fraction(text)
+        return fractions.Fraction
+    except ValueError:
+        pass
+
     return str
+
+def fracttofloat(value):
+    try:
+        float(value)
+        return float(value)
+    except ValueError:
+        return float(fractions.Fraction(value))
 
 if len(sys.argv) > 2:
     if not len(sys.argv) == 3:
@@ -164,7 +178,7 @@ for idx, outline in enumerate(outlines):
                 instances[instancename]['status'] = outline.split()[-1].strip('[]')
 
         elif outline.startswith('Solution'):
-            instances[instancename]['value'] = float(outlines[idx+1].split()[-1])
+            instances[instancename]['value'] = fracttofloat(outlines[idx+1].split()[-1])
 
         elif outline.startswith('Original problem'):
             instances[instancename]['cols'] = int(outlines[idx+1].split()[2])
@@ -187,9 +201,9 @@ for idx, outline in enumerate(outlines):
         elif outline.startswith('Violation'):
             primviol = outlines[idx+2].split()[3]
             dualviol = outlines[idx+3].split()[3]
-            if typeofvalue(primviol) in [int,float] and typeofvalue(dualviol) in [int,float]:
-                instances[instancename]['pviol'] = float("{:.2e}".format(float(primviol)))
-                instances[instancename]['dviol'] = float("{:.2e}".format(float(dualviol)))
+            if typeofvalue(primviol) in [int,float,fractions.Fraction] and typeofvalue(dualviol) in [int,float,fractions.Fraction]:
+                instances[instancename]['pviol'] = float("{:.2e}".format(fracttofloat(primviol)))
+                instances[instancename]['dviol'] = float("{:.2e}".format(fracttofloat(dualviol)))
             else:
                 instances[instancename]['pviol'] = '-'
                 instances[instancename]['dviol'] = '-'

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -48,14 +48,14 @@ namespace soplex
       class Private;
       Private* dpointer;
 
-      thread_local static IdList< Private > unusedPrivateList;
-      thread_local static bool useListMem;
+#ifdef SOPLEX_WITH_GMP
+      THREADLOCAL static IdList< Private > unusedPrivateList;
+      THREADLOCAL static bool useListMem;
+
 
       /// special constructor only for initializing static rational variables; this is necessary since we need a
       /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
       Rational(const int& i, const bool& dummy);
-
-   public:
 
       //**@name Static variables for special rational values */
       //@{
@@ -65,7 +65,9 @@ namespace soplex
       static const Rational NEGONE;
 
       //@}
+#endif
 
+   public:
 
       //**@name Construction and destruction */
       //@{

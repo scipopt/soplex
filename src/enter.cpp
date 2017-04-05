@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1112,7 +1112,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    getEnterVals(enterId, enterTest, enterUB, enterLB,
       enterVal, enterMax, enterPric, enterStat, enterRO, objChange);
 
-   if (polishObj == SolutionPolish::OFF && enterTest > -epsilon())
+   if (!polish && enterTest > -epsilon())
    {
       rejectEnter(enterId, enterTest, enterStat);
       change(-1, none, 0);
@@ -1151,7 +1151,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   if (polishObj == SolutionPolish::OFF && m_numCycle > m_maxCycle)
+   if (!polish && m_numCycle > m_maxCycle)
    {
       if (-enterMax > 0)
          perturbMaxEnter();
@@ -1370,7 +1370,16 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
       {
          MSG_INFO3( (*spxout), (*spxout) << "IENTER01 factorization triggered in "
                               << "enter() for feasibility test" << std::endl; )
-         factorize();
+         try
+         {
+            factorize();
+         }
+         catch( const SPxStatusException& E )
+         {
+            // don't exit immediately but handle the singularity correctly
+            assert(SPxBasis::status() == SPxBasis::SINGULAR);
+            MSG_INFO3( (*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
+         }
 
          /* after a factorization, the entering column/row might not be infeasible or suboptimal anymore, hence we do
           * not try to call leave(leaveIdx), but rather return to the main solving loop and call the pricer again

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -93,9 +93,11 @@ void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
 {
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
-      SPxBasis::load(this);
-   SPxBasis::loadDesc(p_desc);
+   {
+      SPxBasis::load(this, false);
+   }
    setBasisStatus(SPxBasis::REGULAR);
+   SPxBasis::loadDesc(p_desc);
 }
 
 void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
@@ -335,7 +337,29 @@ void SPxSolver::init()
    if( SPxBasis::status() == SPxBasis::SINGULAR )
       return;
 
-   //factorized = false;
+   // catch pathological case for LPs with zero constraints
+   if( dim() == 0 )
+   {
+      factorized = true;
+   }
+
+   // we better factorize explicitly before solving
+   if( !factorized )
+   {
+      try
+      {
+         SPxBasis::factorize();
+      }
+      catch( const SPxException& x )
+      {
+         // reload inital slack basis in case the factorization failed
+         assert(SPxBasis::status() <= SPxBasis::SINGULAR);
+         SPxBasis::restoreInitialBasis();
+         SPxBasis::factorize();
+         assert(factorized);
+      }
+   }
+
    m_numCycle = 0;
 
    if (type() == ENTER)
@@ -377,28 +401,6 @@ void SPxSolver::init()
       infeasibilities.setMax(dim());
       isInfeasible.reSize(dim());
       theratiotester->setDelta(leavetol());
-   }
-
-   // catch pathological case for LPs with zero constraints
-   if( dim() == 0 )
-   {
-      factorized = true;
-   }
-
-   // we better factorize explicitly before solving
-   if( !factorized )
-   {
-      try
-      {
-         SPxBasis::factorize();
-      }
-      catch( const SPxException& x )
-      {
-         // we need to abort in case the factorization failed
-         assert(SPxBasis::status() <= SPxBasis::SINGULAR);
-         m_status = SINGULAR;
-         throw SPxStatusException("XINIT01 Singular basis in initialization detected.");
-      }
    }
 
    SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
@@ -736,7 +738,7 @@ Real SPxSolver::nonbasicValue()
    Real val = 0;
    const SPxBasis::Desc& ds = desc();
 
-#ifndef ADDITIONAL_CHECKS
+#ifndef ENABLE_ADDITIONAL_CHECKS
    // if the value is available we don't need to recompute it
    if ( m_nonbasicValueUpToDate )
       return m_nonbasicValue;
@@ -865,11 +867,13 @@ Real SPxSolver::nonbasicValue()
       }
    }
 
-#ifdef ADDITIONAL_CHECKS
+#ifdef ENABLE_ADDITIONAL_CHECKS
    if( m_nonbasicValueUpToDate && NE(m_nonbasicValue, val) )
    {
-      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue << ", correct nonbasic value: " << val << std::endl; )
-      assert(EQrel(m_nonbasicValue, val,1e-14));
+      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue
+                 << ", correct nonbasic value: " << val
+                 << ", violation: " << val - m_nonbasicValue << std::endl; )
+      assert(EQrel(m_nonbasicValue, val, 1e-12));
    }
 #endif
 
@@ -1857,9 +1861,8 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
 
 void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
-
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
-      SPxBasis::load(this);
+      SPxBasis::load(this, false);
 
    SPxBasis::Desc ds = desc();
    int i;

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -212,7 +212,7 @@ namespace soplex
 
       os << "LU solves           : " << luSolvesReal << "\n"
          << "  Solve frequency   : ";
-      if( luSolvesReal > 0 )
+      if( iterations > 0 )
          os << double(luSolvesReal) / double(iterations) << " solves per iteration\n";
       else
          os << "-\n";

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1503,10 +1503,10 @@ public:
    bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
 
    /// set the random seeds of the solver instance
-   void setRandomSeed(unsigned long seed);
+   void setRandomSeed(unsigned int seed);
 
    /// returns the current random seed of the solver instance
-   unsigned long randomSeed() const;
+   unsigned int randomSeed() const;
 
    //@}
 
@@ -1572,6 +1572,7 @@ private:
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
                          // are performed on the original LP.
    bool _isRealLPScaled;
+   bool _applyPolishing;
 
    DVectorReal _manualLower;
    DVectorReal _manualUpper;
@@ -1804,6 +1805,10 @@ private:
    int  _optimizeCalls;
    int  _unscaleCalls;
 
+   Rational _rationalPosone;
+   Rational _rationalNegone;
+   Rational _rationalZero;
+
    //@}
 
    //**@name Constant helper methods */
@@ -1965,6 +1970,9 @@ private:
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
    bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+
+   /// completes range type arrays after adding columns and/or rows
+   void _completeRangeTypesRational();
 
    /// recomputes range types from scratch using real LP
    void _recomputeRangeTypesReal();

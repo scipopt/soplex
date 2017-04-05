@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -40,8 +40,8 @@
 namespace soplex
 {
 #define SOPLEX_VERSION         300
-#define SOPLEX_SUBVERSION        0
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2016 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_SUBVERSION        1
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2017 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -128,6 +128,19 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #define MSG_DEBUG(x) /**/
 #endif //!SOPLEX_DEBUG
 
+
+/*-----------------------------------------------------------------------------
+ * multi-thread support
+ *-----------------------------------------------------------------------------
+ */
+// enable the user to compile without thread_local by setting USRCXXFLAGS=-DTHREADLOCAL=""
+#if !defined(THREADLOCAL)
+#if defined(_MSC_VER) && _MSC_VER < 1900
+#define THREADLOCAL
+#else
+#define THREADLOCAL thread_local
+#endif
+#endif
 
 /*-----------------------------------------------------------------------------
  * Long double support, Parameters and Epsilons
@@ -229,7 +242,7 @@ typedef double Real;
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 #define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
 
-thread_local extern const Real infinity;
+THREADLOCAL extern const Real infinity;
 
 class Param
 {
@@ -239,13 +252,13 @@ private:
    /**@name Data */
    //@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   thread_local static Real s_epsilon;
+   THREADLOCAL static Real s_epsilon;
    /// epsilon for factorization
-   thread_local static Real s_epsilon_factorization;
+   THREADLOCAL static Real s_epsilon_factorization;
    /// epsilon for factorization update
-   thread_local static Real s_epsilon_update;
+   THREADLOCAL static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   thread_local static Real s_epsilon_pivot;
+   THREADLOCAL static Real s_epsilon_pivot;
    //@}
 
 public:

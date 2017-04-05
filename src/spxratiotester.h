@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2016 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -152,7 +152,7 @@ public:
        element of pVec() or coPvec(), that reaches one of its bounds
        with this update.
     */
-   virtual SPxId selectEnter(Real& val, int leaveIdx) = 0;
+   virtual SPxId selectEnter(Real& val, int leaveIdx, bool polish = false) = 0;
 
    /// sets Simplex type.
    /** Informs pricer about (a change of) the loaded SoPlex's Type. In
