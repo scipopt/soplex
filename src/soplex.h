@@ -731,7 +731,10 @@ public:
    void getBasisInd(int* bind) const;
 
    /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
-   bool getFastCondition(Real& condition);
+   /// type = 0: max/min ratio
+   /// type = 1: trace of U (sum of diagonal elements)
+   /// type = 2: product of diagonal elements
+   bool getFastCondition(Real& condition, int type = 0);
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
    bool getEstimatedCondition(Real& condition);

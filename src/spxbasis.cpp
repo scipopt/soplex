@@ -1098,12 +1098,12 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
 }
 
 /* compute condition number estimation based on the diagonal of the LU factorization */
-Real SPxBasis::getFastCondition()
+Real SPxBasis::getFastCondition(int type)
 {
    Real cond = infinity;
 
    if( factorized )
-      cond = factor->conditionEstimate();
+      cond = factor->conditionEstimate(type);
 
    return cond;
 }
