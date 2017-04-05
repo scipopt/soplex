@@ -174,8 +174,8 @@ public:
    }
    ///
    Real stability() const;
-   /// return condition number estimate
-   Real conditionEstimate() const;
+   /// return condition number estimate based on the diagonal of U
+   Real conditionEstimate(int type = 0) const;
    ///
    std::string statistics() const;
    ///

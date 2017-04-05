@@ -4033,8 +4033,11 @@ namespace soplex
    }
 
 
-   /// compute condition number estimate based on the trace of the LU factorization; returns true on success
-   bool SoPlex::getFastCondition(Real& condition)
+   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
+   /// type = 0: max/min ratio
+   /// type = 1: trace of U (sum of diagonal elements)
+   /// type = 2: product of diagonal elements
+   bool SoPlex::getFastCondition(Real& condition, int type)
    {
       _ensureRealLPLoaded();
       if( !_isRealLPLoaded )
@@ -4043,7 +4046,7 @@ namespace soplex
       if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
          return false;
 
-      condition = _solver.basis().getFastCondition();
+      condition = _solver.basis().getFastCondition(type);
 
       return true;
    }
