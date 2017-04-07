@@ -34,6 +34,8 @@
 
 /// maximum length of lines in settings file
 #define SET_MAX_LINE_LEN 500
+/// default setting for LU refactorization interval
+#define DEFAULT_REFACTOR_INTERVAL 200
 
 #ifdef _MSC_VER
 #define strncasecmp _strnicmp
@@ -151,10 +153,10 @@ namespace soplex
 
       // maximum number of updates without fresh factorization
       name[SoPlex::FACTOR_UPDATE_MAX] = "factor_update_max";
-      description[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization";
+      description[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization (0 - auto)";
       lower[SoPlex::FACTOR_UPDATE_MAX] = 0;
       upper[SoPlex::FACTOR_UPDATE_MAX] = INT_MAX;
-      defaultValue[SoPlex::FACTOR_UPDATE_MAX] = 200;
+      defaultValue[SoPlex::FACTOR_UPDATE_MAX] = 0;
 
       // iteration limit (-1 if unlimited)
       name[SoPlex::ITERLIMIT] = "iterlimit";
@@ -5661,7 +5663,10 @@ namespace soplex
 
       // maximum number of updates before fresh factorization
       case SoPlex::FACTOR_UPDATE_MAX:
-         _solver.basis().setMaxUpdates(value);
+         if( value == 0 )
+            _solver.basis().setMaxUpdates(DEFAULT_REFACTOR_INTERVAL);
+         else
+            _solver.basis().setMaxUpdates(value);
          break;
 
       // iteration limit (-1 if unlimited)
