@@ -176,13 +176,13 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
       int i;
       for( i = 0; i < lp.nCols(); ++i )
       {
-          frexp(colscale[i], &(colscaleExp[i]));
+          frexp(double(colscale[i]), &(colscaleExp[i]));
           colscaleExp[i] -= 1;
       }
 
       for( i = 0; i < lp.nRows(); ++i )
       {
-          frexp(rowscale[i], &(rowscaleExp[i]));
+          frexp(double(rowscale[i]), &(rowscaleExp[i]));
           rowscaleExp[i] -= 1;
       }
 

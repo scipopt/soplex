@@ -8,6 +8,7 @@ performance:
 interface & parameters:
 
 fixed bugs:
+- fixed compilation error with WITH_LONG_DOUBLE
 
 code quality:
 

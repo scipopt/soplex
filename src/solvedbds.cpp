@@ -2771,8 +2771,8 @@ namespace soplex
                assert(_realLP->lhs(_decompPrimalRowIDs[i]) == _realLP->rhs(_decompPrimalRowIDs[i]));
                _compSolver.changeLower(_decompDualColIDs[i], 0.0);   // setting the lower bound of the dual column to zero.
 
-               LPColBase<Real> addEqualityCol(-1.0*_realLP->rhs(_decompPrimalRowIDs[i]),
-                     -1.0*_compSolver.colVector(_decompDualColIDs[i]), infinity, 0.0);    // adding a new column to the dual
+               LPColBase<Real> addEqualityCol(-_realLP->rhs(_decompPrimalRowIDs[i]),
+                  Real(-1.0)*_compSolver.colVector(_decompDualColIDs[i]), infinity, 0.0);    // adding a new column to the dual
 
                SPxColId newDualCol;
                _compSolver.addCol(newDualCol, addEqualityCol);
