@@ -8247,7 +8247,7 @@ namespace soplex
 
 
 
-   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
+   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    void SoPlex::_syncRealSolution()
    {
       if( _hasSolRational && !_hasSolReal )
@@ -8259,7 +8259,7 @@ namespace soplex
 
 
 
-   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
+   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
    void SoPlex::_syncRationalSolution()
    {
       if( _hasSolReal && !_hasSolRational )
