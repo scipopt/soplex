@@ -289,13 +289,16 @@ void SPxBasis::loadDesc(const Desc& ds)
    if( j < matrix.size() )
       consistent = false;  // not enough basic variables
 
-   /* if dimensions are inconsistent, restore slack basis */
+   /* if dimensions are inconsistent, restore slack basis
+    * if dimensions are consistent, then we have setup a correct matrix
+    */
    if( !consistent )
       restoreInitialBasis();
+   else
+      matrixIsSetup = true;
 
    assert(isDescValid(thedesc));
 
-   matrixIsSetup = true;
    factorized = false;
    if (factor != 0)
       factor->clear();
