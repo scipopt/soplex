@@ -153,7 +153,7 @@ static void initConstVecs(
 
          if( !isZero(a) )
          {
-            sum += log2(a);
+            sum += log2(double(a));
             nnzeros++;
          }
       }

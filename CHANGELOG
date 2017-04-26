@@ -11,6 +11,7 @@ interface & parameters:
 - new bool parameter 'printcondition' to print condition number in iteration log
 
 fixed bugs:
+- fixed compilation error with WITH_LONG_DOUBLE
 
 code quality:
 

@@ -710,7 +710,7 @@ int main(int argc, char* argv[])
 
       int printprec;
       int printwidth;
-      printprec = (int) log10(1/Param::epsilon());
+      printprec = (int) -log10(double(Param::epsilon()));
       printwidth = printprec + 10;
 
       // print solution, check solution, and display statistics

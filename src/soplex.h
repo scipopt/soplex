@@ -1992,10 +1992,10 @@ private:
    /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
    void _syncLPRational(bool time = true);
 
-   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
+   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    void _syncRealSolution();
 
-   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
+   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
    void _syncRationalSolution();
 
    /// returns pointer to a constant unit vector available until destruction of the SoPlex class
