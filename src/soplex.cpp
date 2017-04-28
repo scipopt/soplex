@@ -322,7 +322,7 @@ namespace soplex
 
       // printing condition number during the solve
       name[SoPlex::PRINTCONDITION] = "printcondition";
-      description[SoPlex::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - exact, 2 - ratio estimate , 3 - sum estimate, 4 - product estimate)";
+      description[SoPlex::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - ratio estimate , 2 - sum estimate, 3 - product estimate, 4 - exact)";
       lower[SoPlex::PRINTCONDITION] = 0;
       upper[SoPlex::PRINTCONDITION] = 4;
       defaultValue[SoPlex::PRINTCONDITION] = 0;
