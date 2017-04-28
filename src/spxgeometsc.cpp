@@ -24,10 +24,6 @@
 
 namespace soplex
 {
-/**@param maxIters   arbitrary small number, we choose 8
-   @param minImpr    Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value.
-   @param goodEnough if the max/min ratio is already less then 1000/1 we do not scale.
-*/ 
 
 static Real computeScalingVec(
       const SVSet*           vecset,

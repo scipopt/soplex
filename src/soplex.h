@@ -737,10 +737,18 @@ public:
    bool getExactCondition(Real& condition);
 
    /// computes row \p r of basis inverse; returns true on success
+   /// @param r which row of the basis inverse is computed
+   /// @param coef values of result vector (not packed but scattered)
+   /// @param inds indices of result vector (NULL if not to be used)
+   /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes column \p c of basis inverse; returns true on success
+   /// @param c which column of the basis inverse is computed
+   /// @param coef values of result vector (not packed but scattered)
+   /// @param inds indices of result vector (NULL if not to be used)
+   /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
@@ -748,10 +756,12 @@ public:
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale = true);
 
    /// multiply with basis matrix; B * \p vec (inplace)
+   /// @param vec (dense) vector to be multiplied with
    /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool multBasis(Real* vec, bool unscale = true);
 
    /// multiply with transpose of basis matrix; \p vec * B^T (inplace)
+   /// @param vec (dense) vector to be multiplied with
    /// @param unscale determines whether the result should be unscaled according to the original LP data
    bool multBasisTranspose(Real* vec, bool unscale = true);
 

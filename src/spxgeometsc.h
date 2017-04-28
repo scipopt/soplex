@@ -40,7 +40,7 @@ protected:
    /**@name Data */
    //@{
    const int  m_maxIterations;    ///< maximum number of scaling iterations.
-   const Real m_minImprovement;   ///< improvement necessary to carry on.
+   const Real m_minImprovement;   ///< improvement necessary to carry on. (Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value)
    const Real m_goodEnoughRatio;  ///< no scaling needed if ratio is less than this.
    //@}
 

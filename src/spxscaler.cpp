@@ -403,7 +403,7 @@ void SPxScaler::getUpperUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 }
 
 
-/// returns unscaled upper bound vector of LP \lp
+/// returns unscaled upper bound vector of \p lp
 Real SPxScaler::lowerUnscaled(const SPxLPBase<Real>& lp, int i) const
 {
    assert(lp.isScaled());
@@ -420,7 +420,7 @@ Real SPxScaler::lowerUnscaled(const SPxLPBase<Real>& lp, int i) const
 }
 
 
-/// returns unscaled lower bound vector of LP \lp
+/// returns unscaled lower bound vector of \p lp
 void SPxScaler::getLowerUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
@@ -563,7 +563,7 @@ void SPxScaler::getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 }
 
 
-/// returns unscaled left hand side \p i of LP \lp
+/// returns unscaled left hand side \p i of \p lp
 Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
 {
    assert(lp.isScaled());
@@ -579,7 +579,7 @@ Real SPxScaler::lhsUnscaled(const SPxLPBase<Real>& lp, int i) const
       return lp.LPRowSet::lhs(i);
 }
 
-/// returns unscaled left hand side vector of LP \lp
+/// returns unscaled left hand side vector of \p lp
 void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
 {
    assert(lp.isScaled());
@@ -591,7 +591,7 @@ void SPxScaler::getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const
       vec[i] = spxLdexp(lp.LPRowSet::lhs()[i], -rowscaleExp[i]);
 }
 
-/// returns unscaled coefficient of LP \lp
+/// returns unscaled coefficient of \p lp
 Real SPxScaler::getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) const
 {
    assert(lp.isScaled());
