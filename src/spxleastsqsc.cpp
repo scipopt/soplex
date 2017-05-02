@@ -195,11 +195,11 @@ static const char* makename()
 }
 
 SPxLeastSqSC::SPxLeastSqSC()
-   : SPxScaler(makename(), false, false)
+   : SPxScaler(makename(), false, false), acrcydivisor(ACCURACY_DIVISOR), maxrounds(MAX_ROUNDS)
 {}
 
 SPxLeastSqSC::SPxLeastSqSC(const SPxLeastSqSC& old)
-   : SPxScaler(old)
+   : SPxScaler(old), acrcydivisor(old.acrcydivisor), maxrounds(old.maxrounds)
 {}
 
 SPxLeastSqSC& SPxLeastSqSC::operator=(const SPxLeastSqSC& rhs)
