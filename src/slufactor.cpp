@@ -591,6 +591,10 @@ Real SLUFactor::conditionEstimate(int type) const
 {
    Real result = 0.0;
 
+   // catch corner case of empty matrix
+   if( dim() == 0 )
+      return 1.0;
+
    switch( type )
    {
    // compute estimate by ratio of max/min of elements on the diagonal

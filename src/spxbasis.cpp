@@ -1033,6 +1033,10 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    Real norm1;
    Real norm2;
 
+   // catch corner case of empty matrix
+   if( dimension == 0 )
+      return 1.0;
+
    SSVector x(dimension);
    SSVector y(dimension);
 
@@ -1040,8 +1044,11 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    if( status() < REGULAR )
       return 0;
 
-   if (!matrixIsSetup)
+   if( !matrixIsSetup )
       (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
+   if( !factorized )
+      factorize();
 
    // initialize vectors
    norm1 = 1.0 / (Real) dimension;
