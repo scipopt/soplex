@@ -163,7 +163,7 @@ public:
    virtual Real getColMinAbsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// returns unscaled upper bound \p i
    virtual Real upperUnscaled(const SPxLPBase<Real>& lp, int i) const;
-   /// returns unscaled upper bound vector of LP \lp
+   /// returns unscaled upper bound vector of \p lp
    virtual void getUpperUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
    /// returns unscaled lower bound \p i
    virtual Real lowerUnscaled(const SPxLPBase<Real>& lp, int i) const;
@@ -183,11 +183,11 @@ public:
    virtual Real rhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
    /// gets unscaled right hand side vector
    virtual void getRhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
-   /// returns unscaled left hand side \p i of LP \lp
+   /// returns unscaled left hand side \p i of \p lp
    virtual Real lhsUnscaled(const SPxLPBase<Real>& lp, int i) const;
-   /// returns unscaled left hand side vector of LP \lp
+   /// returns unscaled left hand side vector of \p lp
    virtual void getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
-   /// returns unscaled coefficient of LP \lp
+   /// returns unscaled coefficient of \p lp
    virtual Real getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) const;
    /// unscale dense primal solution vector given in \p x. 
    virtual void unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const;
