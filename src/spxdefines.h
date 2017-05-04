@@ -267,32 +267,20 @@ public:
    /**@name Access / modification */
    //@{
    ///
-   inline static Real epsilon()
-   {
-      return s_epsilon;
-   }
+   static Real epsilon();
    ///
    static void setEpsilon(Real eps);
    ///
-   inline static Real epsilonFactorization()
-   {
-      return s_epsilon_factorization;
-   }
+   static Real epsilonFactorization();
    ///
    static void setEpsilonFactorization(Real eps);
    ///
-   inline static Real epsilonUpdate()
-   {
-      return s_epsilon_update;
-   }
+   static Real epsilonUpdate();
    ///
    static void setEpsilonUpdate(Real eps);
    ///
-   inline static Real epsilonPivot()
-      {
-         return s_epsilon_pivot;
-      }
-      ///
+   static Real epsilonPivot();
+   ///
    static void setEpsilonPivot(Real eps);
    //@}
 };

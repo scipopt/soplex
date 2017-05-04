@@ -42,9 +42,19 @@ bool msginconsistent(const char* name, const char* file, int line)
    return 0;
 }
 
+Real Param::epsilon()
+{
+	return s_epsilon;
+}
+
 void Param::setEpsilon(Real eps)
 {
    s_epsilon = eps;
+}
+
+Real Param::epsilonFactorization()
+{
+	return s_epsilon_factorization;
 }
 
 void Param::setEpsilonFactorization(Real eps)
@@ -52,9 +62,19 @@ void Param::setEpsilonFactorization(Real eps)
    s_epsilon_factorization = eps;
 }
 
+Real Param::epsilonUpdate()
+{
+	return s_epsilon_update;
+}
+
 void Param::setEpsilonUpdate(Real eps)
 {
    s_epsilon_update = eps;
+}
+
+Real Param::epsilonPivot()
+{
+	return s_epsilon_pivot;
 }
 
 void Param::setEpsilonPivot(Real eps)
