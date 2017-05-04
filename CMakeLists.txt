@@ -18,6 +18,7 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
