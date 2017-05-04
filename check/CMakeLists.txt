@@ -95,7 +95,7 @@ foreach(instance ${${instances}})
     #
     # add a test and test properties
     #
-    add_test(${instance}-${setting} soplex ${inst} $loadCommand)
+    add_test(NAME ${instance}-${setting} COMMAND soplex ${inst} $loadCommand)
     set_tests_properties (${instance}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "problem is solved \\[${status}\\]")
     endforeach(setting)
 endforeach(instance)
