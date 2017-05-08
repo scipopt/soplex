@@ -1026,6 +1026,7 @@ void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
 Real SPxBasis::condition(int maxiters, Real tolerance)
 {
    int dimension = matrix.size();
+   int miniters = 3;    // minimum number of power method iterations
    int i;
    int c;
    Real norm;
@@ -1066,7 +1067,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = y.length();
 
       // stop if converged
-      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
+      if( c >= miniters && spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^T*y and normalize
@@ -1094,7 +1095,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = x.length();
 
       // stop if converged
-      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
+      if( c >= miniters && spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^-T*y and normalize
