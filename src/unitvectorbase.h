@@ -51,6 +51,12 @@ private:
    typename SVectorBase<R>::Element themem;  ///< memory for sparse vector entry
    //@}
 
+   using SVectorBase<R>::mem;
+
+   using SVectorBase<R>::size;
+
+   using SVectorBase<R>::max;
+
 public:
 
    //------------------------------------
