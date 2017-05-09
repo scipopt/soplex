@@ -83,7 +83,7 @@ namespace soplex
       /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
       // simplex
       name[SoPlex::EXPLICITVIOL] = "explicitviol";
-      description[SoPlex::EXPLICITVIOL] = "Should be violations of the original problem be explicitly computed in the decomposition simplex?";
+      description[SoPlex::EXPLICITVIOL] = "Should violations of the original problem be explicitly computed in the decomposition simplex?";
       defaultValue[SoPlex::EXPLICITVIOL] = false;
 
       // should cycling solutions be accepted during iterative refinement?

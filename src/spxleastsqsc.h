@@ -75,8 +75,8 @@ public:
 
 
 protected:
-   Real acrcydivisor = ACCURACY_DIVISOR;
-   int maxrounds = MAX_ROUNDS;
+   Real acrcydivisor;
+   int maxrounds;
 
 };
 } // namespace soplex
