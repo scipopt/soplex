@@ -182,11 +182,15 @@ if(NOT LEGACY EQUAL ON)
     target_link_libraries(example libsoplex)
 endif()
 
-# we cannot have the same name for library and binary, so we redefine it here
-# also we set the install rpath to the installed destination
+# set the install rpath to the installed destination
 set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set_target_properties(libsoplex PROPERTIES OUTPUT_NAME "soplex")
-set_target_properties(libsoplex-pic PROPERTIES OUTPUT_NAME "soplex-pic")
+# on UNIX system the 'lib' prefix is automatically added
+set_target_properties(libsoplex PROPERTIES
+    OUTPUT_NAME "soplex"
+    MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set_target_properties(libsoplex-pic PROPERTIES
+    OUTPUT_NAME "soplex-pic"
+    MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
 install(FILES ${headers} DESTINATION include)
