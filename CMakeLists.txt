@@ -36,6 +36,11 @@ endif()
 # path to e.g. findGMP module
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
+# make 'Release' the default build type
+if(CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 # use C++11 standard
 set(CMAKE_CXX_STANDARD 11)
 
