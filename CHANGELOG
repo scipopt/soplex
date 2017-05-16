@@ -9,6 +9,7 @@ interface & parameters:
 
 fixed bugs:
 - fixed compilation error with WITH_LONG_DOUBLE
+- fixed wrong objective value when using an obj offset
 
 code quality:
 
