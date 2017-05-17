@@ -2941,12 +2941,12 @@ namespace soplex
       else if( hasPrimal() )
       {
          _syncRealSolution();
-         return _solReal._primalObjVal + realParam(SoPlex::OBJ_OFFSET);
+         return _solReal._primalObjVal;
       }
       else if( hasDual() )
       {
          _syncRealSolution();
-         return _solReal._dualObjVal + realParam(SoPlex::OBJ_OFFSET);
+         return _solReal._dualObjVal;
       }
       else
          return 0.0;
