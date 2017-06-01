@@ -7,7 +7,7 @@ project(SoPlex)
 
 set(SoPlex_VERSION_MAJOR 3)
 set(SoPlex_VERSION_MINOR 0)
-set(SoPlex_VERSION_PATCH 0)
+set(SoPlex_VERSION_PATCH 1)
 set(SoPlex_VERSION_SUB 0)
 set(SoPlex_VERSION_API 0)
 
