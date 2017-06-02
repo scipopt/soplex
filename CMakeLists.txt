@@ -7,7 +7,7 @@ project(SoPlex)
 
 set(SoPlex_VERSION_MAJOR 3)
 set(SoPlex_VERSION_MINOR 0)
-set(SoPlex_VERSION_PATCH 0)
+set(SoPlex_VERSION_PATCH 1)
 set(SoPlex_VERSION_SUB 0)
 set(SoPlex_VERSION_API 0)
 
@@ -96,6 +96,17 @@ if(GMP_FOUND)
     add_definitions(-DSOPLEX_WITH_GMP)
     include_directories(${GMP_INCLUDE_DIRS})
     set(libs ${libs} ${GMP_LIBRARIES})
+endif()
+
+# enable all warnings and explicitly switch on colored output for ninja
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall")
+    if(CMAKE_GENERATOR STREQUAL "Ninja")
+        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+    endif()
+endif()
+if(MSVC)
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
 endif()
 
 add_subdirectory(src)
