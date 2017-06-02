@@ -767,7 +767,7 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
          objChange = theLCbound[i] * (newLower - oldLower);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newLower == currUpper)
+      if (EQ(newLower, currUpper))
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
@@ -866,7 +866,7 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
                objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
          }
       }
-      else if (newUpper == currLower)
+      else if (EQ(newUpper, currLower))
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -975,7 +975,7 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
                objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
          }
       }
-      else if (newLhs == currRhs)
+      else if( EQ(newLhs, currRhs) )
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -985,7 +985,7 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
          objChange = theURbound[i] * (newLhs - oldLhs);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newLhs == currRhs)
+      if( EQ(newLhs, currRhs) )
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
@@ -1076,7 +1076,7 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
                objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
          }
       }
-      else if (newRhs == currLhs)
+      else if( EQ(newRhs, currLhs) )
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -1086,7 +1086,7 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
          objChange = theLRbound[i] * (newRhs - oldRhs);
       break;
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newRhs == currLhs)
+      if( EQ(newRhs, currLhs) )
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
