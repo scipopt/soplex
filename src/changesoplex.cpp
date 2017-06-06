@@ -757,7 +757,7 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
                objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
          }
       }
-      else if (EQ(newLower, currUpper))
+      else if( EQ(newLower, currUpper) )
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -767,7 +767,7 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
          objChange = theLCbound[i] * (newLower - oldLower);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newLower == currUpper)
+      if( EQ(newLower, currUpper) )
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
@@ -779,8 +779,11 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
       }
       break;
    case SPxBasis::Desc::P_FIXED:
-      if (NE(newLower, currUpper))
+      if( NE(newLower, currUpper) )
+      {
          stat = SPxBasis::Desc::P_ON_UPPER;
+         theUCbound[i] = maxObj(i);
+      }
       break;
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
@@ -866,7 +869,7 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
                objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
          }
       }
-      else if (newUpper == currLower)
+      else if (EQ(newUpper, currLower))
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -884,8 +887,11 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
       }
       break;
    case SPxBasis::Desc::P_FIXED:
-      if (newUpper != currLower)
+      if( NE(newUpper, currLower) )
+      {
          stat = SPxBasis::Desc::P_ON_LOWER;
+         theLCbound[i] = maxObj(i);
+      }
       break;
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
@@ -975,7 +981,7 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
                objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
          }
       }
-      else if (newLhs == currRhs)
+      else if( EQ(newLhs, currRhs) )
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -985,7 +991,7 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
          objChange = theURbound[i] * (newLhs - oldLhs);
       break;
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newLhs == currRhs)
+      if( EQ(newLhs, currRhs) )
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
@@ -997,8 +1003,11 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
       }
       break;
    case SPxBasis::Desc::P_FIXED:
-      if (newLhs != currRhs)
+      if( NE(newLhs, currRhs) )
+      {
          stat = SPxBasis::Desc::P_ON_UPPER;
+         theLRbound[i] = maxRowObj(i);
+      }
       break;
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
@@ -1076,7 +1085,7 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
                objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
          }
       }
-      else if (newRhs == currLhs)
+      else if( EQ(newRhs, currLhs) )
       {
          stat = SPxBasis::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -1086,7 +1095,7 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
          objChange = theLRbound[i] * (newRhs - oldRhs);
       break;
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newRhs == currLhs)
+      if( EQ(newRhs, currLhs) )
          stat = SPxBasis::Desc::P_FIXED;
       break;
    case SPxBasis::Desc::P_FREE:
@@ -1098,8 +1107,11 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
       }
       break;
    case SPxBasis::Desc::P_FIXED:
-      if (newRhs != currLhs)
+      if( NE(newRhs, currLhs) )
+      {
          stat = SPxBasis::Desc::P_ON_LOWER;
+         theURbound[i] = maxRowObj(i);
+      }
       break;
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
