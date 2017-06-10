@@ -23,6 +23,7 @@ option(GMP "Use GMP" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(COVERAGE "enable coverage support" OFF)
+SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
@@ -89,8 +90,8 @@ if( COVERAGE )
     APPEND_COVERAGE_COMPILER_FLAGS()
     set(COVERAGE_EXCLUDES '/usr*')
     SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
-                          EXECUTABLE ctest
-                          DEPENDENCIES scip-bin)
+                          EXECUTABLE bash -c "ctest ${COVERAGE_CTEST_ARGS}"
+                          DEPENDENCIES soplex)
 endif()
 
 if(ZLIB)
