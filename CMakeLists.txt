@@ -89,7 +89,7 @@ if( COVERAGE )
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
     set(COVERAGE_EXCLUDES '/usr*')
-    SETUP_TARGET_FOR_COVERAGE(NAME test_coverage
+    SETUP_TARGET_FOR_COVERAGE(NAME coverage
                           EXECUTABLE bash -c "ctest ${COVERAGE_CTEST_ARGS}"
                           DEPENDENCIES soplex)
 endif()
