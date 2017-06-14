@@ -86,7 +86,7 @@ foreach(instance ${${instances}})
     # specify the instance and the settings load command for soplex
     #
     set(inst "${PROJECT_SOURCE_DIR}/check/instances/${instance}.mps")
-    if($setting STREQUAL "")
+    if(${setting} STREQUAL "")
         set(loadCommand "")
     else()
         set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
@@ -95,7 +95,7 @@ foreach(instance ${${instances}})
     #
     # add a test and test properties
     #
-    add_test(NAME ${instance}-${setting} COMMAND soplex ${inst} $loadCommand)
+    add_test(NAME ${instance}-${setting} COMMAND soplex ${loadCommand} ${inst})
     set_tests_properties (${instance}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "problem is solved \\[${status}\\]")
     endforeach(setting)
 endforeach(instance)
