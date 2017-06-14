@@ -44,6 +44,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+#set the correct rpath for OS X
+set(CMAKE_MACOSX_RPATH ON)
+
 # use C++11 standard
 set(CMAKE_CXX_STANDARD 11)
 
