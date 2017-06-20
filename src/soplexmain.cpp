@@ -661,7 +661,7 @@ int main(int argc, char* argv[])
       // write dual LP if specified
       if( writedualfilename != 0 )
       {
-         if( !soplex->writeDualFileReal(writedualfilename) )
+         if( !soplex->writeDualFileReal(writedualfilename, &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while writing dual file <" << writedualfilename << ">.\n\n" );
             returnValue = 1;
