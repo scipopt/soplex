@@ -5174,7 +5174,8 @@ namespace soplex
       _realLP->buildDualProblem(dualLP);
       dualLP.setOutstream(spxout);
 
-      dualLP.writeFile(filename);
+      // swap colnames and rownames
+      dualLP.writeFile(filename, colNames, rowNames);
       return true;
    }
 

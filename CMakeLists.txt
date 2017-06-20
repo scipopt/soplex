@@ -22,6 +22,8 @@ option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
+option(COVERAGE "enable coverage support" OFF)
+SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
@@ -43,6 +45,9 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE Release)
 endif()
+
+#set the correct rpath for OS X
+set(CMAKE_MACOSX_RPATH ON)
 
 # use C++11 standard
 set(CMAKE_CXX_STANDARD 11)
@@ -78,6 +83,18 @@ endif()
 
 if(LEGACY)
     add_definitions(-DSOPLEX_LEGACY)
+endif()
+
+#
+# enable coverage support
+#
+if( COVERAGE )
+    include(CodeCoverage)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+    set(COVERAGE_EXCLUDES '/usr*')
+    SETUP_TARGET_FOR_COVERAGE(NAME coverage
+                          EXECUTABLE bash -c "ctest ${COVERAGE_CTEST_ARGS}"
+                          DEPENDENCIES soplex)
 endif()
 
 if(ZLIB)
