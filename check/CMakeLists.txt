@@ -86,7 +86,7 @@ foreach(instance ${${instances}})
     # specify the instance and the settings load command for soplex
     #
     set(inst "${PROJECT_SOURCE_DIR}/check/instances/${instance}.mps")
-    if(${setting} STREQUAL "")
+    if(${setting} STREQUAL "default")
         set(loadCommand "")
     else()
         set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
