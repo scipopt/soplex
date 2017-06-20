@@ -782,7 +782,8 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
       if( NE(newLower, currUpper) )
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         theUCbound[i] = maxObj(i);
+         if( isInitialized() )
+            theUCbound[i] = maxObj(i);
       }
       break;
    case SPxBasis::Desc::D_FREE:
@@ -890,7 +891,8 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
       if( NE(newUpper, currLower) )
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         theLCbound[i] = maxObj(i);
+         if( isInitialized() )
+            theLCbound[i] = maxObj(i);
       }
       break;
    case SPxBasis::Desc::D_FREE:
@@ -1006,7 +1008,8 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
       if( NE(newLhs, currRhs) )
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         theLRbound[i] = maxRowObj(i);
+         if( isInitialized() )
+            theLRbound[i] = maxRowObj(i);
       }
       break;
    case SPxBasis::Desc::D_FREE:
@@ -1110,7 +1113,8 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
       if( NE(newRhs, currLhs) )
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         theURbound[i] = maxRowObj(i);
+         if( isInitialized() )
+            theURbound[i] = maxRowObj(i);
       }
       break;
    case SPxBasis::Desc::D_FREE:
