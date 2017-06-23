@@ -5951,10 +5951,10 @@ namespace soplex
       // primal feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::FEASTOL:
 #ifndef SOPLEX_WITH_GMP
-         if( value < DEFAULT_EPS_ZERO )
+         if( value < DEFAULT_EPS_PIVOT )
          {
             MSG_WARNING( spxout, spxout << "Cannot set feasibility tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_ZERO << ".\n");
-            _rationalFeastol = DEFAULT_EPS_ZERO;
+            _rationalFeastol = DEFAULT_EPS_PIVOT;
             break;
          }
 #endif
@@ -5964,10 +5964,10 @@ namespace soplex
       // dual feasibility tolerance; passed to the floating point solver only when calling solve()
       case SoPlex::OPTTOL:
 #ifndef SOPLEX_WITH_GMP
-         if( value < DEFAULT_EPS_ZERO )
+         if( value < DEFAULT_EPS_PIVOT )
          {
             MSG_WARNING( spxout, spxout << "Cannot set optimality tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_ZERO << ".\n");
-            _rationalOpttol = DEFAULT_EPS_ZERO;
+            _rationalOpttol = DEFAULT_EPS_PIVOT;
             break;
          }
 #endif
