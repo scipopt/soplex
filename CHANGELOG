@@ -6,6 +6,7 @@ features:
 performance:
 
 interface & parameters:
+- allow arbitrary order of inputs/parameters, esp. filename is not required to be last
 
 fixed bugs:
 - fixed compilation error with WITH_LONG_DOUBLE
