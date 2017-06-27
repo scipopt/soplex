@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
    Timer* readingTime;
    int optidx;
 
-   const char* lpfilename;
+   const char* lpfilename = 0;
    char* readbasname = 0;
    char* writebasname = 0;
    char* writefilename = 0;
@@ -314,7 +314,10 @@ int main(int argc, char* argv[])
 
          // we reached <lpfile>
          if( option[0] != '-' )
-            break;
+         {
+            lpfilename = argv[optidx];
+            continue;
+         }
 
          // option string must start with '-', must contain at least two characters, and exactly two characters if and
          // only if it is -x, -y, -q, or -c
@@ -576,7 +579,7 @@ int main(int argc, char* argv[])
       MSG_INFO1( soplex->spxout, soplex->printUserSettings(); )
 
       // no LP file was given and no settings files are written
-      if( optidx >= argc && savesetname == 0 && diffsetname == 0 )
+      if( lpfilename == 0 && savesetname == 0 && diffsetname == 0 )
       {
          printUsage(argv, 0);
          returnValue = 1;
@@ -610,7 +613,7 @@ int main(int argc, char* argv[])
       }
 
       // no LP file given: exit after saving settings
-      if( optidx >= argc )
+      if( lpfilename == 0 )
       {
          if( loadsetname != 0 || savesetname != 0 || diffsetname != 0 )
          {
@@ -631,7 +634,6 @@ int main(int argc, char* argv[])
       }
 
       // read LP from input file
-      lpfilename = argv[optidx];
       MSG_INFO1( soplex->spxout, soplex->spxout << "Reading "
          << (soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL ? "(real)" : "(rational)")
          << " LP file <" << lpfilename << "> . . .\n" );
