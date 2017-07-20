@@ -20,14 +20,13 @@ include(CPack)
 
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(COVERAGE "enable coverage support" OFF)
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
 
 # update the cmake submodule
 if(EXISTS ${PROJECT_SOURCE_DIR}/.git AND NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/.git)
