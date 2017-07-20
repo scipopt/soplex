@@ -48,9 +48,6 @@ endif()
 #set the correct rpath for OS X
 set(CMAKE_MACOSX_RPATH ON)
 
-# use C++11 standard
-set(CMAKE_CXX_STANDARD 11)
-
 #create target to update the githash
 file(WRITE ${CMAKE_BINARY_DIR}/update_githash.cmake "
 find_program(GIT git)
@@ -82,12 +79,13 @@ endif()
 
 if(LEGACY)
     add_definitions(-DSOPLEX_LEGACY)
+    add_definitions(-DTHREADLOCAL=)
 endif()
 
 #
 # enable coverage support
 #
-if( COVERAGE )
+if(COVERAGE)
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
     set(COVERAGE_EXCLUDES '/usr*')
@@ -97,7 +95,7 @@ if( COVERAGE )
 endif()
 
 if(ZLIB)
-    find_package(ZLIB QUIET)
+    find_package(ZLIB)
 endif()
 if(ZLIB_FOUND)
     add_definitions(-DSOPLEX_WITH_ZLIB)
@@ -106,7 +104,7 @@ if(ZLIB_FOUND)
 endif()
 
 if(GMP AND NOT LEGACY)
-    find_package(GMP QUIET)
+    find_package(GMP)
 endif()
 if(GMP_FOUND)
     add_definitions(-DSOPLEX_WITH_GMP)
