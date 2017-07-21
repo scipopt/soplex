@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
 
-project(SoPlex)
+project(SoPlex
+    LANGUAGES CXX)
 
 set(SoPlex_VERSION_MAJOR 3)
 set(SoPlex_VERSION_MINOR 0)
@@ -120,7 +121,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
     endif()
 endif()
 if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
+    add_definitions(/W4)
+    add_definitions(/wd4100)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 add_subdirectory(src)
