@@ -348,7 +348,7 @@ void SPxSolver::init()
       {
          SPxBasis::factorize();
       }
-      catch( const SPxException& x )
+      catch( const SPxException& )
       {
          // reload inital slack basis in case the factorization failed
          assert(SPxBasis::status() <= SPxBasis::SINGULAR);
@@ -553,7 +553,7 @@ void SPxSolver::factorize()
    {
       SPxBasis::factorize();
    }
-   catch( const SPxStatusException& E )
+   catch( const SPxStatusException& )
    {
       assert(SPxBasis::status() == SPxBasis::SINGULAR);
       m_status = SINGULAR;
