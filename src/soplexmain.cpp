@@ -566,6 +566,14 @@ int main(int argc, char* argv[])
             checkSol = true;
             break;
 
+         case 'h' :
+            // -h : display all parameters
+            if( !soplex->saveSettingsFile(0, false) )
+            {
+               MSG_ERROR( std::cerr << "Error printing parameters\n" );
+            }
+            break;
+
             //lint -fallthrough
          default :
             {

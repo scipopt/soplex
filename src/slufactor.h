@@ -30,7 +30,7 @@
 namespace soplex
 {
 /// maximum nr. of factorization updates allowed before refactorization.
-#define MAXUPDATES      1000     
+#define MAXUPDATES      1000
 
 /**@brief   Implementation of Sparse Linear Solver.
  * @ingroup Algo
@@ -174,6 +174,8 @@ public:
    }
    ///
    Real stability() const;
+   /// return condition number estimate based on the diagonal of U
+   Real conditionEstimate(int type = 0) const;
    ///
    std::string statistics() const;
    ///

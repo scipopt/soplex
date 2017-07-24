@@ -2,11 +2,14 @@ Developer Version
 =================
 
 features:
+- new condition number estimate based on the quotient of max and min diagonal element of LU factorization
+  (final condition number is also printed in statistics)
 
 performance:
 
 interface & parameters:
 - allow arbitrary order of inputs/parameters, esp. filename is not required to be last
+- new bool parameter 'printcondition' to print condition number in iteration log
 
 fixed bugs:
 - fixed compilation error with WITH_LONG_DOUBLE
@@ -49,6 +52,7 @@ features:
   - the parameter computedegen, when set to true will compute the degeneracy of each basis.
 - write dual formulation to file: additional command line option "--writedual" is provided to write the dual formulation
   to a file. When providing this option only the file is output, the problem is not solved.
+- new condition number estimate based on the quotient of max and min diagonal element of LU factorization
 
 performance:
 - more efficient SoPlex class with better usability:

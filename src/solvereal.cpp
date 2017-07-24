@@ -72,6 +72,8 @@ namespace soplex
       else
          _preprocessAndSolveReal(false);
 
+      _statistics->finalBasisCondition = _solver.getFastCondition();
+
       // stop timing
       _statistics->solvingTime->stop();
    }

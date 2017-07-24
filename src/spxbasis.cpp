@@ -1026,12 +1026,17 @@ void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
 Real SPxBasis::condition(int maxiters, Real tolerance)
 {
    int dimension = matrix.size();
+   int miniters = 3;    // minimum number of power method iterations
    int i;
    int c;
    Real norm;
    Real norminv;
    Real norm1;
    Real norm2;
+
+   // catch corner case of empty matrix
+   if( dimension == 0 )
+      return 1.0;
 
    SSVector x(dimension);
    SSVector y(dimension);
@@ -1040,8 +1045,11 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    if( status() < REGULAR )
       return 0;
 
-   if (!matrixIsSetup)
+   if( !matrixIsSetup )
       (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+
+   if( !factorized )
+      factorize();
 
    // initialize vectors
    norm1 = 1.0 / (Real) dimension;
@@ -1059,7 +1067,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = y.length();
 
       // stop if converged
-      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
+      if( c >= miniters && spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^T*y and normalize
@@ -1087,7 +1095,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       norm1 = x.length();
 
       // stop if converged
-      if( spxAbs(norm1 - norm2) < tolerance * norm1 )
+      if( c >= miniters && spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
       // x = B^-T*y and normalize
@@ -1098,6 +1106,17 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    norminv = norm1;
 
    return norm * norminv;
+}
+
+/* compute condition number estimation based on the diagonal of the LU factorization */
+Real SPxBasis::getFastCondition(int type)
+{
+   Real cond = infinity;
+
+   if( factorized )
+      cond = factor->conditionEstimate(type);
+
+   return cond;
 }
 
 void SPxBasis::dump()

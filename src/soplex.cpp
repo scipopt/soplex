@@ -34,6 +34,8 @@
 
 /// maximum length of lines in settings file
 #define SET_MAX_LINE_LEN 500
+/// default setting for LU refactorization interval
+#define DEFAULT_REFACTOR_INTERVAL 200
 
 #ifdef _MSC_VER
 #define strncasecmp _strnicmp
@@ -151,10 +153,10 @@ namespace soplex
 
       // maximum number of updates without fresh factorization
       name[SoPlex::FACTOR_UPDATE_MAX] = "factor_update_max";
-      description[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization";
+      description[SoPlex::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization (0 - auto)";
       lower[SoPlex::FACTOR_UPDATE_MAX] = 0;
       upper[SoPlex::FACTOR_UPDATE_MAX] = INT_MAX;
-      defaultValue[SoPlex::FACTOR_UPDATE_MAX] = 200;
+      defaultValue[SoPlex::FACTOR_UPDATE_MAX] = 0;
 
       // iteration limit (-1 if unlimited)
       name[SoPlex::ITERLIMIT] = "iterlimit";
@@ -317,6 +319,13 @@ namespace soplex
       lower[SoPlex::DECOMP_VERBOSITY] = 1;
       upper[SoPlex::DECOMP_VERBOSITY] = 5;
       defaultValue[SoPlex::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
+
+      // printing condition number during the solve
+      name[SoPlex::PRINTCONDITION] = "printcondition";
+      description[SoPlex::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - ratio estimate , 2 - sum estimate, 3 - product estimate, 4 - exact)";
+      lower[SoPlex::PRINTCONDITION] = 0;
+      upper[SoPlex::PRINTCONDITION] = 4;
+      defaultValue[SoPlex::PRINTCONDITION] = 0;
    }
 
    SoPlex::Settings::RealParam::RealParam() {
@@ -2873,6 +2882,7 @@ namespace soplex
          printShortStatistics(spxout.getStream(SPxOut::INFO1));
          spxout << "\n" );
 
+
       return status();
    }
 
@@ -4032,6 +4042,23 @@ namespace soplex
    }
 
 
+   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
+   /// type = 0: max/min ratio
+   /// type = 1: trace of U (sum of diagonal elements)
+   /// type = 2: product of diagonal elements
+   bool SoPlex::getFastCondition(Real& condition, int type)
+   {
+      _ensureRealLPLoaded();
+      if( !_isRealLPLoaded )
+         return false;
+
+      if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
+         return false;
+
+      condition = _solver.basis().getFastCondition(type);
+
+      return true;
+   }
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
    bool SoPlex::getEstimatedCondition(Real& condition)
@@ -5637,7 +5664,10 @@ namespace soplex
 
       // maximum number of updates before fresh factorization
       case SoPlex::FACTOR_UPDATE_MAX:
-         _solver.basis().setMaxUpdates(value);
+         if( value == 0 )
+            _solver.basis().setMaxUpdates(DEFAULT_REFACTOR_INTERVAL);
+         else
+            _solver.basis().setMaxUpdates(value);
          break;
 
       // iteration limit (-1 if unlimited)
@@ -5923,6 +5953,12 @@ namespace soplex
          break;
       case DECOMP_VERBOSITY:
          break;
+
+      // printing of condition n
+      case PRINTCONDITION:
+         _solver.setConditionInformation(value);
+         break;
+
       default:
          return false;
       }
