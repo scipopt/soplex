@@ -22,6 +22,7 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
+option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(COVERAGE "enable coverage support" OFF)
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
@@ -124,6 +125,12 @@ if(MSVC)
     add_definitions(/W4)
     add_definitions(/wd4100)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+    # set MT or MTd flag when using the static VS runtime libraries
+    if(MT)
+        set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+        set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    endif()
 endif()
 
 add_subdirectory(src)
