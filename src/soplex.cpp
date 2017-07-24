@@ -2896,10 +2896,18 @@ namespace soplex
 
 
 
+   /// is stored primal solution feasible?
+   bool SoPlex::isPrimalFeasible() const
+   {
+      return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
+   }
+
+
+
    /// is a primal feasible solution available?
    bool SoPlex::hasPrimal() const
    {
-      return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
+      return _hasSolReal || _hasSolRational;
    }
 
 
@@ -2912,10 +2920,18 @@ namespace soplex
 
 
 
+   /// is stored dual solution feasible?
+   bool SoPlex::isDualFeasible() const
+   {
+      return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
+   }
+
+
+
    /// is a dual feasible solution available?
    bool SoPlex::hasDual() const
    {
-      return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
+      return _hasSolReal || _hasSolRational;
    }
 
 
