@@ -157,7 +157,7 @@ set(headers
     wallclocktimer.h)
 
 # create soplex library with pic
-add_library(libsoplex-pic ${sources})
+add_library(libsoplex-pic STATIC ${sources})
 set_target_properties(libsoplex-pic PROPERTIES
     POSITION_INDEPENDENT_CODE on
     VERSION ${SoPlex_VERSION_MAJOR}.${SoPlex_VERSION_MINOR}.${SoPlex_VERSION_PATCH}.${SoPlex_VERSION_SUB}
@@ -166,7 +166,7 @@ add_dependencies(libsoplex-pic update_githash)
 target_link_libraries(libsoplex-pic ${libs})
 
 # create soplex library without pic
-add_library(libsoplex ${sources})
+add_library(libsoplex STATIC ${sources})
 set_target_properties(libsoplex PROPERTIES
     VERSION ${SoPlex_VERSION_MAJOR}.${SoPlex_VERSION_MINOR}.${SoPlex_VERSION_PATCH}.${SoPlex_VERSION_SUB}
     SOVERSION ${SoPlex_VERSION_MAJOR}.${SoPlex_VERSION_MINOR}.${SoPlex_VERSION_PATCH})
@@ -177,9 +177,12 @@ target_link_libraries(libsoplex ${libs})
 add_executable(soplex soplexmain.cpp)
 target_link_libraries(soplex libsoplex)
 
+
 if(NOT LEGACY EQUAL ON)
     add_executable(example EXCLUDE_FROM_ALL example.cpp)
     target_link_libraries(example libsoplex)
+    target_compile_features(libsoplex PUBLIC cxx_thread_local)
+    target_compile_features(libsoplex-pic PUBLIC cxx_thread_local)
 endif()
 
 # set the install rpath to the installed destination

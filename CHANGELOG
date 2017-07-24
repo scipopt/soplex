@@ -8,6 +8,7 @@ features:
 performance:
 
 interface & parameters:
+- allow arbitrary order of inputs/parameters, esp. filename is not required to be last
 - new bool parameter 'printcondition' to print condition number in iteration log
 
 fixed bugs:

@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
 
-project(SoPlex)
+project(SoPlex
+    LANGUAGES CXX)
 
 set(SoPlex_VERSION_MAJOR 3)
 set(SoPlex_VERSION_MINOR 0)
@@ -20,14 +21,13 @@ include(CPack)
 
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(COVERAGE "enable coverage support" OFF)
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
 
 # update the cmake submodule
 if(EXISTS ${PROJECT_SOURCE_DIR}/.git AND NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/.git)
@@ -48,9 +48,6 @@ endif()
 
 #set the correct rpath for OS X
 set(CMAKE_MACOSX_RPATH ON)
-
-# use C++11 standard
-set(CMAKE_CXX_STANDARD 11)
 
 #create target to update the githash
 file(WRITE ${CMAKE_BINARY_DIR}/update_githash.cmake "
@@ -83,12 +80,13 @@ endif()
 
 if(LEGACY)
     add_definitions(-DSOPLEX_LEGACY)
+    add_definitions(-DTHREADLOCAL=)
 endif()
 
 #
 # enable coverage support
 #
-if( COVERAGE )
+if(COVERAGE)
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()
     set(COVERAGE_EXCLUDES '/usr*')
@@ -98,7 +96,7 @@ if( COVERAGE )
 endif()
 
 if(ZLIB)
-    find_package(ZLIB QUIET)
+    find_package(ZLIB)
 endif()
 if(ZLIB_FOUND)
     add_definitions(-DSOPLEX_WITH_ZLIB)
@@ -107,7 +105,7 @@ if(ZLIB_FOUND)
 endif()
 
 if(GMP AND NOT LEGACY)
-    find_package(GMP QUIET)
+    find_package(GMP)
 endif()
 if(GMP_FOUND)
     add_definitions(-DSOPLEX_WITH_GMP)
@@ -123,7 +121,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
     endif()
 endif()
 if(MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
+    add_definitions(/W4)
+    add_definitions(/wd4100)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 add_subdirectory(src)

@@ -129,7 +129,6 @@ void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
 
 void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
 {
-
    assert(!freeRatioTester || theratiotester != 0);
 
    if(freeRatioTester)
@@ -138,17 +137,16 @@ void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
       theratiotester = 0;
    }
 
-   if (x)
-   {
-      if (isInitialized() && x != theratiotester)
-         x->load(this);
-      else
-         x->clear();
-   }
-
-   if (theratiotester !=0 && theratiotester != x)
-      theratiotester->clear();
    theratiotester = x;
+
+   // set the solver pointer inside the ratiotester
+   if( theratiotester != 0 )
+   {
+      if( isInitialized() )
+         theratiotester->load(this);
+      else
+         theratiotester->clear();
+   }
 
    freeRatioTester = destroy;
 }
@@ -350,7 +348,7 @@ void SPxSolver::init()
       {
          SPxBasis::factorize();
       }
-      catch( const SPxException& x )
+      catch( const SPxException& )
       {
          // reload inital slack basis in case the factorization failed
          assert(SPxBasis::status() <= SPxBasis::SINGULAR);
@@ -555,7 +553,7 @@ void SPxSolver::factorize()
    {
       SPxBasis::factorize();
    }
-   catch( const SPxStatusException& E )
+   catch( const SPxStatusException& )
    {
       assert(SPxBasis::status() == SPxBasis::SINGULAR);
       m_status = SINGULAR;
