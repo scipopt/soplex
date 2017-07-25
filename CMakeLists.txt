@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0.0)
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
@@ -22,21 +22,13 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
+option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(COVERAGE "enable coverage support" OFF)
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
-
-# update the cmake submodule
-if(EXISTS ${PROJECT_SOURCE_DIR}/.git AND NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/.git)
-   find_program(GIT git)
-   if(GIT)
-      execute_process(
-         COMMAND ${GIT} submodule update --init ${PROJECT_SOURCE_DIR}/cmake)
-   endif()
-endif()
 
 # path to e.g. findGMP module
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -50,11 +42,12 @@ endif()
 set(CMAKE_MACOSX_RPATH ON)
 
 #create target to update the githash
-file(WRITE ${CMAKE_BINARY_DIR}/update_githash.cmake "
+file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
 find_program(GIT git)
 if(GIT)
    execute_process(
       COMMAND \${GIT} describe --always --dirty
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE GITHASH OUTPUT_STRIP_TRAILING_WHITESPACE)
    if(GITHASH STREQUAL \"\")
       set(GITHASH \"000000\")
@@ -67,9 +60,9 @@ file(WRITE \${DST} \"#define SPX_GITHASH \\\"\${GITHASH}\\\"\")
 message(STATUS \"Git hash: \" \${GITHASH})
 ")
 # encode the current git hash into the binary
-add_custom_target(update_githash
+add_custom_target(soplex_update_githash
                   COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/git_hash.cpp
-                                           -P ${CMAKE_BINARY_DIR}/update_githash.cmake)
+                                           -P ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake)
 
 option(LEGACY "Build SoPlex in legacy mode" OFF)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -124,6 +117,12 @@ if(MSVC)
     add_definitions(/W4)
     add_definitions(/wd4100)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+    # set MT or MTd flag when using the static VS runtime libraries
+    if(MT)
+        set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+        set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    endif()
 endif()
 
 add_subdirectory(src)
