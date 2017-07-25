@@ -30,15 +30,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SoPlex_BINARY_DIR}/lib)
 
-# update the cmake submodule
-if(EXISTS ${PROJECT_SOURCE_DIR}/.git AND NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/.git)
-   find_program(GIT git)
-   if(GIT)
-      execute_process(
-         COMMAND ${GIT} submodule update --init ${PROJECT_SOURCE_DIR}/cmake)
-   endif()
-endif()
-
 # path to e.g. findGMP module
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
@@ -51,7 +42,7 @@ endif()
 set(CMAKE_MACOSX_RPATH ON)
 
 #create target to update the githash
-file(WRITE ${CMAKE_BINARY_DIR}/update_githash.cmake "
+file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
 find_program(GIT git)
 if(GIT)
    execute_process(
@@ -68,9 +59,9 @@ file(WRITE \${DST} \"#define SPX_GITHASH \\\"\${GITHASH}\\\"\")
 message(STATUS \"Git hash: \" \${GITHASH})
 ")
 # encode the current git hash into the binary
-add_custom_target(update_githash
+add_custom_target(soplex_update_githash
                   COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/git_hash.cpp
-                                           -P ${CMAKE_BINARY_DIR}/update_githash.cmake)
+                                           -P ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake)
 
 option(LEGACY "Build SoPlex in legacy mode" OFF)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
