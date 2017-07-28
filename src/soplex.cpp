@@ -2954,15 +2954,10 @@ namespace soplex
          return realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE);
       else if( status() == SPxSolver::INFEASIBLE )
          return -realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE);
-      else if( isPrimalFeasible() )
+      else if( hasPrimal() || hasDual() )
       {
          _syncRealSolution();
-         return _solReal._primalObjVal;
-      }
-      else if( isDualFeasible() )
-      {
-         _syncRealSolution();
-         return _solReal._dualObjVal;
+         return _solReal._objVal;
       }
       else
          return 0.0;
@@ -3269,15 +3264,10 @@ namespace soplex
          else
             return _rationalPosInfty;
       }
-      else if( hasPrimal() )
+      else if( hasPrimal() || hasDual() )
       {
          _syncRationalSolution();
-         return _solRational._primalObjVal;
-      }
-      else if( hasDual() )
-      {
-         _syncRationalSolution();
-         return _solRational._dualObjVal;
+         return _solRational._objVal;
       }
       else
          return _rationalZero;

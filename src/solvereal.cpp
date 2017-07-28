@@ -485,11 +485,7 @@ namespace soplex
 
       // get primal and/or dual objective function value depending on status
       _solver.forceRecompNonbasicValue();
-      Real objvalue = _solver.objValue();
-      if( _solReal.isPrimalFeasible() )
-         _solReal._primalObjVal = objvalue;
-      if( _solReal.isDualFeasible() )
-         _solReal._dualObjVal = objvalue;
+      _solReal._objVal = _solver.objValue();
 
       // infeasible solutions shall also be stored and be accessible
       _hasSolReal = true;
@@ -610,11 +606,9 @@ namespace soplex
          _unscaleSolutionReal(*_realLP, true);
 
       // compute the original objective function value
-      _solReal._primalObjVal = realParam(SoPlex::OBJ_OFFSET);
+      _solReal._objVal = realParam(SoPlex::OBJ_OFFSET);
       for( int i = 0; i < numColsReal(); ++i )
-         _solReal._primalObjVal += _solReal._primal[i] * objReal(i);
-
-      _solReal._dualObjVal = _solReal._primalObjVal;
+         _solReal._objVal += _solReal._primal[i] * objReal(i);
 
       // store the unsimplified basis
       _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
@@ -622,7 +616,6 @@ namespace soplex
       _hasSolReal = true;
       _solReal._isPrimalFeasible = true;
       _solReal._isDualFeasible = true;
-
 
       // check solution for violations and solve again if necessary
       _verifySolutionReal();

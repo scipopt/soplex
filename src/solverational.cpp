@@ -1387,13 +1387,12 @@ namespace soplex
       }
 
       // compute objective function values
-      assert(sol._isPrimalFeasible== sol._isDualFeasible);
+      assert(sol._isPrimalFeasible == sol._isDualFeasible);
       if( sol._isPrimalFeasible)
       {
-         sol._primalObjVal = sol._primal * _rationalLP->maxObj();
+         sol._objVal = sol._primal * _rationalLP->maxObj();
          if( intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE )
-            sol._primalObjVal *= -1;
-         sol._dualObjVal = sol._primalObjVal;
+            sol._objVal *= -1;
       }
 
       // set objective coefficients for all rows to zero
