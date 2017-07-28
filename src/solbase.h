@@ -222,8 +222,7 @@ private:
    DVectorBase<R> _redCost;
    DVectorBase<R> _dualFarkas;
 
-   R _primalObjVal;
-   R _dualObjVal;
+   R _objVal;
 
    unsigned int _isPrimalFeasible:1;
    unsigned int _hasPrimalRay:1;
@@ -232,8 +231,7 @@ private:
 
    /// default constructor only for friends
    SolBase<R>()
-      : _primalObjVal(0)
-      , _dualObjVal(0)
+      : _objVal(0)
    {
       invalidate();
    }
@@ -247,7 +245,7 @@ private:
          _isPrimalFeasible = sol._isPrimalFeasible;
          _primal = sol._primal;
          _slacks = sol._slacks;
-         _primalObjVal = sol._primalObjVal;
+         _objVal = sol._objVal;
 
          _hasPrimalRay = sol._hasPrimalRay;
          if( _hasPrimalRay )
@@ -256,7 +254,6 @@ private:
          _isDualFeasible = sol._isDualFeasible;
          _dual = sol._dual;
          _redCost = sol._redCost;
-         _dualObjVal = sol._dualObjVal;
 
          _hasDualFarkas = sol._hasDualFarkas;
          if( _hasDualFarkas )
@@ -276,7 +273,7 @@ private:
          _isPrimalFeasible = sol._isPrimalFeasible;
          _primal = sol._primal;
          _slacks = sol._slacks;
-         _primalObjVal = R(sol._primalObjVal);
+         _objVal = R(sol._objVal);
 
          _hasPrimalRay = sol._hasPrimalRay;
          if( _hasPrimalRay )
@@ -285,7 +282,6 @@ private:
          _isDualFeasible = sol._isDualFeasible;
          _dual = sol._dual;
          _redCost = sol._redCost;
-         _dualObjVal = R(sol._dualObjVal);
 
          _hasDualFarkas = sol._hasDualFarkas;
          if( _hasDualFarkas )
