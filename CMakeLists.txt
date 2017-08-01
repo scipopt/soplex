@@ -76,6 +76,10 @@ if(LEGACY)
     add_definitions(-DTHREADLOCAL=)
 endif()
 
+if(NOT "${CMAKE_CXX_COMPILE_FEATURES}" MATCHES "cxx_thread_local")
+    add_definitions(-DTHREADLOCAL=)
+endif()
+
 #
 # enable coverage support
 #
