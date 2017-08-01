@@ -263,7 +263,7 @@ namespace soplex
          _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex::OBJ_OFFSET));
          _solver.setScalingInfo(false);
          _applyPolishing = true;
-         _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
+         _solver.setSolutionPolishing(SPxSolver::POLISH_OFF);
       }
 
       _statistics->preprocessingTime->stop();

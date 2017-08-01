@@ -977,7 +977,7 @@ SPxSolver::SPxSolver(
    : theType (p_type)
    , thePricing(FULL)
    , theRep(p_rep)
-   , polishObj(SolutionPolish::OFF)
+   , polishObj(POLISH_OFF)
    , theTime(0)
    , timerType(ttype)
    , theCumulativeTime(0.0)

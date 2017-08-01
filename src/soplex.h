@@ -1258,10 +1258,10 @@ public:
       POLISHING_OFF = 0,
 
       /// maximize number of basic slack variables, i.e. more variables on bounds
-      POLISHING_MAXBASICSLACK = 1,
+      POLISHING_INTEGRALITY = 1,
 
       /// minimize number of basic slack variables, i.e. more variables between bounds
-      POLISHING_MINBASICSLACK = 2
+      POLISHING_FRACTIONALITY = 2
    };
 
    /// real parameters

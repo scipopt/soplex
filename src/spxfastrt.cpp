@@ -1000,7 +1000,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
       assert( thesolver->rep() == SPxSolver::COLUMN );
       SPxId leaveId = thesolver->baseId(leave);
       // decide whether the chosen leave index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
+      if( thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY )
       {
          // only allow (integer) variables to leave the basis
          if( leaveId.isSPxRowId() )
@@ -1011,7 +1011,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
                return -1;
          }
       }
-      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
+      else if( thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY )
       {
          // only allow slacks and continuous variables to leave the basis
          if( thesolver->integerVariables.size() == thesolver->nCols() )
@@ -1369,7 +1369,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
    {
       assert( thesolver->rep() == SPxSolver::ROW );
       // decide whether the chosen entering index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
+      if( thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY )
       {
          // only allow (integer) variables to enter the basis
          if( enterId.isSPxRowId() )
@@ -1377,7 +1377,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
          else if( thesolver->integerVariables.size() == thesolver->nCols() && thesolver->integerVariables[thesolver->number(enterId)] == 0)
             return SPxId();
       }
-      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
+      else if( thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY )
       {
          // only allow slacks and continuous variables to enter the basis
          if( thesolver->integerVariables.size() == thesolver->nCols() )

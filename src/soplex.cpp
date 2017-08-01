@@ -5937,13 +5937,13 @@ namespace soplex
          switch( value )
          {
          case POLISHING_OFF:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
+            _solver.setSolutionPolishing(SPxSolver::POLISH_OFF);
             break;
-         case POLISHING_MAXBASICSLACK:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MAXBASICSLACK);
+         case POLISHING_INTEGRALITY:
+            _solver.setSolutionPolishing(SPxSolver::POLISH_INTEGRALITY);
             break;
-         case POLISHING_MINBASICSLACK:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MINBASICSLACK);
+         case POLISHING_FRACTIONALITY:
+            _solver.setSolutionPolishing(SPxSolver::POLISH_FRACTIONALITY);
             break;
          default:
             return false;
