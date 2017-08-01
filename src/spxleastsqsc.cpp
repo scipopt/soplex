@@ -134,6 +134,7 @@ static void initConstVecs(
    Real a;
    Real x;
    Real sum;
+   Real log2_inv = 1.0/log(2.0);
    int l;
    int size;
    int nvec = vecset->num();
@@ -153,7 +154,7 @@ static void initConstVecs(
 
          if( !isZero(a) )
          {
-            sum += log2(double(a));
+            sum += log(double(a)) * log2_inv;
             nnzeros++;
          }
       }

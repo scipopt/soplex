@@ -1014,7 +1014,7 @@ SPxSolver::Status SPxSolver::solve()
 void SPxSolver::performSolutionPolishing()
 {
    // only polish an already optimal basis
-   if( polishObj == SolutionPolish::OFF || status() != OPTIMAL )
+   if( polishObj == POLISH_OFF || status() != OPTIMAL )
       return;
 
    // the current objective value must not be changed
@@ -1038,7 +1038,7 @@ void SPxSolver::performSolutionPolishing()
       init();
       instableEnter = false;
       theratiotester->setType(type());
-      if( polishObj == SolutionPolish::MAXBASICSLACK )
+      if( polishObj == POLISH_INTEGRALITY )
       {
          while( !stop )
          {
@@ -1109,7 +1109,7 @@ void SPxSolver::performSolutionPolishing()
       }
       else
       {
-         assert(polishObj == SolutionPolish::MINBASICSLACK);
+         assert(polishObj == POLISH_FRACTIONALITY);
          while( !stop )
          {
             nSuccessfulPivots = 0;
@@ -1160,7 +1160,7 @@ void SPxSolver::performSolutionPolishing()
          useIntegrality = true;
 
       // in ROW rep: pivot slack out of the basis
-      if( polishObj == SolutionPolish::MAXBASICSLACK )
+      if( polishObj == POLISH_INTEGRALITY )
       {
          while( !stop )
          {
@@ -1205,7 +1205,7 @@ void SPxSolver::performSolutionPolishing()
       }
       else
       {
-         assert(polishObj == SolutionPolish::MINBASICSLACK);
+         assert(polishObj == POLISH_FRACTIONALITY);
          while( !stop )
          {
             nSuccessfulPivots = 0;

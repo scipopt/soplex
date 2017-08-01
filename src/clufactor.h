@@ -89,7 +89,7 @@ protected:
       int     stage;        ///< stage of the structure
       Pring   pivots;       ///< ring of selected pivot rows 
       Pring*  pivot_col;    ///< column index handlers for Real linked list 
-      Pring*  pivot_colNZ;  ///< lists for columns to number of nonzeros      
+      Pring*  pivot_colNZ;  ///< lists for columns to number of nonzeros
       Pring*  pivot_row;    ///< row index handlers for Real linked list 
       Pring*  pivot_rowNZ;  ///< lists for rows to number of nonzeros
 

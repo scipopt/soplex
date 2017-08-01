@@ -2954,15 +2954,10 @@ namespace soplex
          return realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE);
       else if( status() == SPxSolver::INFEASIBLE )
          return -realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE);
-      else if( hasPrimal() )
+      else if( hasPrimal() || hasDual() )
       {
          _syncRealSolution();
-         return _solReal._primalObjVal;
-      }
-      else if( hasDual() )
-      {
-         _syncRealSolution();
-         return _solReal._dualObjVal;
+         return _solReal._objVal;
       }
       else
          return 0.0;
@@ -3269,15 +3264,10 @@ namespace soplex
          else
             return _rationalPosInfty;
       }
-      else if( hasPrimal() )
+      else if( hasPrimal() || hasDual() )
       {
          _syncRationalSolution();
-         return _solRational._primalObjVal;
-      }
-      else if( hasDual() )
-      {
-         _syncRationalSolution();
-         return _solRational._dualObjVal;
+         return _solRational._objVal;
       }
       else
          return _rationalZero;
@@ -5947,13 +5937,13 @@ namespace soplex
          switch( value )
          {
          case POLISHING_OFF:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
+            _solver.setSolutionPolishing(SPxSolver::POLISH_OFF);
             break;
-         case POLISHING_MAXBASICSLACK:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MAXBASICSLACK);
+         case POLISHING_INTEGRALITY:
+            _solver.setSolutionPolishing(SPxSolver::POLISH_INTEGRALITY);
             break;
-         case POLISHING_MINBASICSLACK:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MINBASICSLACK);
+         case POLISHING_FRACTIONALITY:
+            _solver.setSolutionPolishing(SPxSolver::POLISH_FRACTIONALITY);
             break;
          default:
             return false;

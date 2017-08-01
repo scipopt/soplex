@@ -204,8 +204,8 @@ install(TARGETS soplex libsoplex libsoplex-pic EXPORT soplex-targets
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
 
-# Add all targets to the build-tree export set
-export(TARGETS soplex libsoplex libsoplex-pic
+# Add library targets to the build-tree export set
+export(TARGETS libsoplex libsoplex-pic
   FILE "${PROJECT_BINARY_DIR}/soplex-targets.cmake")
 
 #configure the config file for the build tree
