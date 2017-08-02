@@ -40,22 +40,22 @@ set(feasibleInstances
 # define the set of infeasible instances
 #
 set(infeasibleInstances
-    "bgetam\;infeasible"
-    "box1\;infeasible"
-    "ex72a\;infeasible"
-    "forest6\;infeasible"
-    "galenet\;infeasible"
-    "gams10am\;infeasible"
-    "klein1\;infeasible"
-    "refinery\;infeasible"
-    "woodinfe\;infeasible"
+    "bgetam\;+infinity"
+    "box1\;+infinity"
+    "ex72a\;+infinity"
+    "forest6\;+infinity"
+    "galenet\;+infinity"
+    "gams10am\;+infinity"
+    "klein1\;+infinity"
+    "refinery\;+infinity"
+    "woodinfe\;+infinity"
     )
 
 #
 # define the set of unbounded instances
 #
 set(unboundedInstances
-    "gas11\;unbounded"
+    "gas11\;-infinity"
     )
 
 #
