@@ -121,7 +121,7 @@ namespace soplex
       description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
       defaultValue[SoPlex::FULLPERTURBATION] = false;
 
-      // perturb the entire problem or only the relevant bounds of s single pivot?
+      // should the solution be validated by an external objective value?
       name[SoPlex::VALIDATEEXT] = "validateexternal";
       description[SoPlex::VALIDATEEXT] = "should the solution be validated against an external objective value?";
       defaultValue[SoPlex::VALIDATEEXT] = false;
@@ -514,6 +514,13 @@ namespace soplex
       lower[SoPlex::EXTOBJVAL] = -DEFAULT_INFINITY;
       upper[SoPlex::EXTOBJVAL] = DEFAULT_INFINITY;
       defaultValue[SoPlex::EXTOBJVAL] = 0.0;
+
+      // validation tolerance
+      name[SoPlex::EPSILON_VALIDATION] = "validation_tolerance";
+      description[SoPlex::EPSILON_VALIDATION] = "tolerance for validating external results";
+      lower[SoPlex::EPSILON_VALIDATION] = 0.0;
+      upper[SoPlex::EPSILON_VALIDATION] = 1.0;
+      defaultValue[SoPlex::EPSILON_VALIDATION] = 1e-6;
 
    }
 
@@ -6751,12 +6758,12 @@ namespace soplex
    /// prints short statistics
    void SoPlex::printShortStatistics(std::ostream& os)
    {
-      if( boolParam(SoPlex::VALIDATEEXT) )
-         validateSolveReal(os);
       printStatus(os, _status);
       os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime->time() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
          << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
+      if( boolParam(SoPlex::VALIDATEEXT) )
+         validateSolveReal(os);
    }
 
 
@@ -6766,9 +6773,6 @@ namespace soplex
    {
       int prec = (int) os.precision();
       os << std::setprecision(2);
-
-      if( boolParam(SoPlex::VALIDATEEXT) )
-         validateSolveReal(os);
 
       printStatus(os, _status);
 
@@ -6787,6 +6791,9 @@ namespace soplex
       printSolutionStatistics(os);
       printSolvingStatistics(os);
       os << std::setprecision(prec);
+
+      if( boolParam(SoPlex::VALIDATEEXT) )
+         validateSolveReal(os);
    }
 
 
@@ -6795,6 +6802,8 @@ namespace soplex
    bool SoPlex::validateSolveReal(std::ostream& os)
    {
       bool passedValidation = true;
+      std::string reason = "";
+      Real objViolation;
       Real maxBoundViolation;
       Real maxRowViolation;
       Real maxRedCostViolation;
@@ -6804,36 +6813,54 @@ namespace soplex
       Real sumRedCostViolation;
       Real sumDualViolation;
 
-      if( ! EQ(realParam(SoPlex::EXTOBJVAL), SoPlex::objValueReal(), realParam(SoPlex::FEASTOL)) )
+      objViolation = spxAbs(realParam(SoPlex::EXTOBJVAL) - objValueReal());
+      if( ! EQ(objViolation, 0.0, realParam(SoPlex::EPSILON_VALIDATION)) )
       {
          passedValidation = false;
+         reason += "Objective Violation; ";
       }
-
       if( SPxSolver::OPTIMAL == _status )
       {
          SoPlex::getBoundViolationReal(maxBoundViolation, sumBoundViolation);
          SoPlex::getRowViolationReal(maxRowViolation, sumRowViolation);
          SoPlex::getRedCostViolationReal(maxRedCostViolation, sumRedCostViolation);
          SoPlex::getDualViolationReal(maxDualViolation, sumDualViolation);
-
-         if( ! LE(maxBoundViolation, realParam(SoPlex::FEASTOL) ) ||
-             ! LE(maxRowViolation, realParam(SoPlex::FEASTOL) ) ||
-             ! LE(maxRedCostViolation, realParam(SoPlex::FEASTOL) ) ||
-             ! LE(maxDualViolation, realParam(SoPlex::FEASTOL) )
-             )
+         if( ! LE(maxBoundViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
          {
             passedValidation = false;
+            reason += "Bound Violation; ";
+         }
+         if( ! LE(maxRowViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
+         {
+            passedValidation = false;
+            reason += "Row Violation; ";
+         }
+         if( ! LE(maxRedCostViolation, realParam(SoPlex::EPSILON_VALIDATION)))
+         {
+            passedValidation = false;
+            reason += "Reduced Cost Violation; ";
+         }
+         if( ! LE(maxDualViolation, realParam(SoPlex::EPSILON_VALIDATION)))
+         {
+            passedValidation = false;
+            reason += "Dual Violation; ";
          }
       }
 
-      if( intParam(SoPlex::SOLVEMODE) == 2 )
-         passedValidation = true;
-
-      if(passedValidation)
-         os << "Solution successfully validated against external value";
-      else
-         os << "Solution does not equal external value";
       os << "\n";
+      os << "Validation          :";
+      if(passedValidation)
+         os << " Success";
+      else
+      {
+         reason[reason.length()-2] = ']';
+         os << " Fail [" + reason + "\n";
+      }
+      os << "   Objective        : " << std::scientific << std::setprecision(8) << objViolation << std::fixed << "\n";
+      os << "   Bound            : " << std::scientific << std::setprecision(8) << maxBoundViolation << std::fixed << "\n";
+      os << "   Row              : " << std::scientific << std::setprecision(8) << maxRowViolation << std::fixed << "\n";
+      os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
+      os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
 
       return passedValidation;
    }

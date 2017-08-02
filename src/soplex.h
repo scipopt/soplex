@@ -1349,8 +1349,11 @@ public:
       /// external objective value
       EXTOBJVAL = 24,
 
+      /// validation tolerance
+      EPSILON_VALIDATION = 25,
+
       /// number of real parameters
-      REALPARAM_COUNT = 25
+      REALPARAM_COUNT = 26
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
