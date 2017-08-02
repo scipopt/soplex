@@ -395,7 +395,6 @@ namespace soplex
       upper[SoPlex::TIMELIMIT] = DEFAULT_INFINITY;
       defaultValue[SoPlex::TIMELIMIT] = DEFAULT_INFINITY;
 
-
       // lower limit on objective value
       name[SoPlex::OBJLIMIT_LOWER] = "objlimit_lower";
       description[SoPlex::OBJLIMIT_LOWER] = "lower limit on objective value";
@@ -6141,7 +6140,6 @@ namespace soplex
 
       // external objective value
       case SoPlex::EXTOBJVAL:
-
          break;
 
       default:

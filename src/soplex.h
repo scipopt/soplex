@@ -638,7 +638,6 @@ public:
    /// gets violation of dual multipliers; returns true on success
    bool getDualViolationReal(Real& maxviol, Real& sumviol);
 
-
    //@}
 
 

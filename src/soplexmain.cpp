@@ -48,7 +48,6 @@ int main(int argc, char* argv[]);
 static
 void printUsage(const char* const argv[], int idx)
 {
-
    const char* usage =
       "general options:\n"
       "  --readbas=<basfile>    read starting basis from file\n"
@@ -603,7 +602,6 @@ int main(int argc, char* argv[])
                MSG_ERROR( std::cerr << "Error printing parameters\n" );
             }
             break;
-
 
             //lint -fallthrough
          default :
