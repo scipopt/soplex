@@ -1814,16 +1814,24 @@ void SPxMainSM::propagatePseudoobj(SPxLP& lp)
 {
    Real pseudoObj = m_objoffset;
 
-   for(int j = lp.nCols()-1; j >= 0; --j)
+   for( int j = lp.nCols()-1; j >= 0; --j )
    {
       Real val = lp.maxObj(j);
-      if(val < 0)
+      if( val < 0 )
+      {
+         if( lp.lower(j) <= -infinity )
+            return;
          pseudoObj += val*lp.lower(j);
-      else if(val > 0)
+      }
+      else if( val > 0 )
+      {
+         if( lp.upper(j) >= -infinity )
+            return;
          pseudoObj += val*lp.upper(j);
+      }
    }
 
-   if(LT(pseudoObj, infinity) && GT(pseudoObj, -infinity) && GT(m_cutoffbound, -infinity) && LT(m_cutoffbound, infinity))
+   if( GT(m_cutoffbound, -infinity) && LT(m_cutoffbound, infinity) )
    {
       if(pseudoObj > m_pseudoobj)
          m_pseudoobj = pseudoObj;
