@@ -6794,13 +6794,50 @@ namespace soplex
    /// validates solution against external primal and dual reference values
    bool SoPlex::validateSolveReal(std::ostream& os)
    {
-      if( EQ(realParam(SoPlex::EXTOBJVAL), SoPlex::objValueReal(), realParam(SoPlex::FEASTOL)) )
+      bool passedValidation = true;
+      Real maxBoundViolation;
+      Real maxRowViolation;
+      Real maxRedCostViolation;
+      Real maxDualViolation;
+      Real sumBoundViolation;
+      Real sumRowViolation;
+      Real sumRedCostViolation;
+      Real sumDualViolation;
+
+      if( ! EQ(realParam(SoPlex::EXTOBJVAL), SoPlex::objValueReal(), realParam(SoPlex::FEASTOL)) )
+      {
+         printf("Interne und externe Loesung unterschiedlich!\n");
+         passedValidation = false;
+      }
+
+      if( SPxSolver::OPTIMAL == _status )
+      {
+         SoPlex::getBoundViolationReal(maxBoundViolation, sumBoundViolation);
+         SoPlex::getRowViolationReal(maxRowViolation, sumRowViolation);
+         SoPlex::getRedCostViolationReal(maxRedCostViolation, sumRedCostViolation);
+         SoPlex::getDualViolationReal(maxDualViolation, sumDualViolation);
+
+         if( ! LE(maxBoundViolation, realParam(SoPlex::FEASTOL) ) ||
+             ! LE(maxRowViolation, realParam(SoPlex::FEASTOL) ) ||
+             ! LE(maxRedCostViolation, realParam(SoPlex::FEASTOL) ) ||
+             ! LE(maxDualViolation, realParam(SoPlex::FEASTOL) )
+             )
+         {
+            printf("Violation groesser als feastol!\n");
+             passedValidation = false;
+         }
+      }
+
+      if( intParam(SoPlex::SOLVEMODE) == 2 )
+         passedValidation = true;
+
+      if(passedValidation)
          os << "Solution successfully validated against external value";
       else
          os << "Solution does not equal external value";
       os << "\n";
 
-      return true;
+      return passedValidation;
    }
 
 
