@@ -442,19 +442,20 @@ int main(int argc, char* argv[])
                {
                   Real val;
                   char* input = &option[7];
-                  if( strncmp(input, "unbounded", 9 ) == 0 )
-                     val = -DEFAULT_INFINITY;
-                  else if ( strncmp(input, "infeasible", 10) == 0 )
+                  if( strncmp(input, "+infinity", 9 ) == 0 )
                      val = DEFAULT_INFINITY;
+                  else if ( strncmp(input, "-infinity", 9) == 0 )
+                     val = -DEFAULT_INFINITY;
                   else
-                     val = atof(input);
-
-                  //TODO: check whether input makes sense
-                  if( false )
                   {
-                     printUsage(argv, optidx);
-                     returnValue = 1;
-                     goto TERMINATE_FREESTRINGS;
+                     char* tailptr;
+                     val = strtod(input, &tailptr);
+                     if (*tailptr) {
+                        //conversion failed because the input wasn't a number
+                        printUsage(argv, optidx);
+                        returnValue = 1;
+                        goto TERMINATE_FREESTRINGS;
+                     }
                   }
 
                   if( !soplex->setRealParam(SoPlex::EXTOBJVAL, val) ||

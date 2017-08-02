@@ -6806,7 +6806,6 @@ namespace soplex
 
       if( ! EQ(realParam(SoPlex::EXTOBJVAL), SoPlex::objValueReal(), realParam(SoPlex::FEASTOL)) )
       {
-         printf("Interne und externe Loesung unterschiedlich!\n");
          passedValidation = false;
       }
 
@@ -6823,8 +6822,7 @@ namespace soplex
              ! LE(maxDualViolation, realParam(SoPlex::FEASTOL) )
              )
          {
-            printf("Violation groesser als feastol!\n");
-             passedValidation = false;
+            passedValidation = false;
          }
       }
 
