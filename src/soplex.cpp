@@ -6848,7 +6848,7 @@ namespace soplex
       os << "\n";
       os << "Validation          :";
       if(passedValidation)
-         os << " Success";
+         os << " Success\n";
       else
       {
          reason[reason.length()-2] = ']';
