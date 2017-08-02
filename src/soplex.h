@@ -605,6 +605,9 @@ public:
    /// returns the objective value if a primal solution is available
    Real objValueReal();
 
+   /// validates solution against external primal and dual reference values
+   bool validateSolveReal(std::ostream& os);
+
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalReal(VectorReal& vector);
 
@@ -634,6 +637,7 @@ public:
 
    /// gets violation of dual multipliers; returns true on success
    bool getDualViolationReal(Real& maxviol, Real& sumviol);
+
 
    //@}
 
@@ -927,8 +931,11 @@ public:
       /// perturb the entire problem or only the relevant bounds of s single pivot?
       FULLPERTURBATION = 14,
 
+      /// validate against external objective value
+      VALIDATEEXT = 15,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 15
+      BOOLPARAM_COUNT = 16
    } BoolParam;
 
    /// integer parameters
@@ -1339,8 +1346,11 @@ public:
       /// objective offset
       OBJ_OFFSET = 23,
 
+      /// external objective value
+      EXTOBJVAL = 24,
+
       /// number of real parameters
-      REALPARAM_COUNT = 24
+      REALPARAM_COUNT = 25
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM

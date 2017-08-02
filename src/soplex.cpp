@@ -120,6 +120,11 @@ namespace soplex
       name[SoPlex::FULLPERTURBATION] = "fullperturbation";
       description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
       defaultValue[SoPlex::FULLPERTURBATION] = false;
+
+      // perturb the entire problem or only the relevant bounds of s single pivot?
+      name[SoPlex::VALIDATEEXT] = "validateexternal";
+      description[SoPlex::VALIDATEEXT] = "should the solution be validated against an external objective value?";
+      defaultValue[SoPlex::VALIDATEEXT] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -390,6 +395,7 @@ namespace soplex
       upper[SoPlex::TIMELIMIT] = DEFAULT_INFINITY;
       defaultValue[SoPlex::TIMELIMIT] = DEFAULT_INFINITY;
 
+
       // lower limit on objective value
       name[SoPlex::OBJLIMIT_LOWER] = "objlimit_lower";
       description[SoPlex::OBJLIMIT_LOWER] = "lower limit on objective value";
@@ -501,6 +507,14 @@ namespace soplex
       lower[SoPlex::OBJ_OFFSET] = -DEFAULT_INFINITY;
       upper[SoPlex::OBJ_OFFSET] = DEFAULT_INFINITY;
       defaultValue[SoPlex::OBJ_OFFSET] = 0.0;
+
+      // external objective value
+      name[SoPlex::EXTOBJVAL] = "external_objective_value";
+      description[SoPlex::EXTOBJVAL] = "external objective value";
+      lower[SoPlex::EXTOBJVAL] = -DEFAULT_INFINITY;
+      upper[SoPlex::EXTOBJVAL] = DEFAULT_INFINITY;
+      defaultValue[SoPlex::EXTOBJVAL] = 0.0;
+
    }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -5614,6 +5628,8 @@ namespace soplex
       case FULLPERTURBATION:
          _solver.useFullPerturbation(value);
          break;
+      case VALIDATEEXT:
+         break;
       default:
          return false;
       }
@@ -6114,6 +6130,11 @@ namespace soplex
             _realLP->changeObjOffset(value);
          if( _rationalLP )
             _rationalLP->changeObjOffset(value);
+         break;
+
+      // external objective value
+      case SoPlex::EXTOBJVAL:
+
          break;
 
       default:
@@ -6730,6 +6751,8 @@ namespace soplex
    /// prints short statistics
    void SoPlex::printShortStatistics(std::ostream& os)
    {
+      if( boolParam(SoPlex::VALIDATEEXT) )
+         validateSolveReal(os);
       printStatus(os, _status);
       os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime->time() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
@@ -6743,6 +6766,9 @@ namespace soplex
    {
       int prec = (int) os.precision();
       os << std::setprecision(2);
+
+      if( boolParam(SoPlex::VALIDATEEXT) )
+         validateSolveReal(os);
 
       printStatus(os, _status);
 
@@ -6761,6 +6787,20 @@ namespace soplex
       printSolutionStatistics(os);
       printSolvingStatistics(os);
       os << std::setprecision(prec);
+   }
+
+
+
+   /// validates solution against external primal and dual reference values
+   bool SoPlex::validateSolveReal(std::ostream& os)
+   {
+      if( EQ(realParam(SoPlex::EXTOBJVAL), SoPlex::objValueReal(), realParam(SoPlex::FEASTOL)) )
+         os << "Solution successfully validated against external value";
+      else
+         os << "Solution does not equal external value";
+      os << "\n";
+
+      return true;
    }
 
 

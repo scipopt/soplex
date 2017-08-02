@@ -48,6 +48,7 @@ int main(int argc, char* argv[]);
 static
 void printUsage(const char* const argv[], int idx)
 {
+
    const char* usage =
       "general options:\n"
       "  --readbas=<basfile>    read starting basis from file\n"
@@ -436,6 +437,34 @@ int main(int argc, char* argv[])
                      soplex->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
                   }
                }
+               // --extsol=<value> : external solution for soplex to validate against
+               else if( strncmp(option, "extsol=", 7) == 0 )
+               {
+                  Real val;
+                  char* input = &option[7];
+                  if( strncmp(input, "unbounded", 9 ) == 0 )
+                     val = -DEFAULT_INFINITY;
+                  else if ( strncmp(input, "infeasible", 10) == 0 )
+                     val = DEFAULT_INFINITY;
+                  else
+                     val = atof(input);
+
+                  //TODO: check whether input makes sense
+                  if( false )
+                  {
+                     printUsage(argv, optidx);
+                     returnValue = 1;
+                     goto TERMINATE_FREESTRINGS;
+                  }
+
+                  if( !soplex->setRealParam(SoPlex::EXTOBJVAL, val) ||
+                      !soplex->setBoolParam(SoPlex::VALIDATEEXT, true))
+                  {
+                     printUsage(argv, optidx);
+                     returnValue = 1;
+                     goto TERMINATE_FREESTRINGS;
+                  }
+               }
                // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
                else if( !soplex->parseSettingsString(option) )
                {
@@ -573,6 +602,7 @@ int main(int argc, char* argv[])
                MSG_ERROR( std::cerr << "Error printing parameters\n" );
             }
             break;
+
 
             //lint -fallthrough
          default :
