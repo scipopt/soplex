@@ -1077,7 +1077,7 @@ void SPxSolver::performSolutionPolishing()
             for( int i = slackcandidates.size() - 1; i >= 0 && !stop; --i )
             {
                polishId = coId(slackcandidates.index(i));
-               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
+               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
                assert(EQrel(objVal, value(), entertol()));
@@ -1098,7 +1098,7 @@ void SPxSolver::performSolutionPolishing()
             for( int i = continuousvars.size() - 1; i >= 0 && !stop; --i )
             {
                polishId = id(continuousvars.index(i));
-               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
+               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[continuousvars.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
                assert(EQrel(objVal, value(), entertol()));
