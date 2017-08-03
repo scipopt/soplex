@@ -111,7 +111,7 @@ int SPxFastRT::maxDelta(
    Real x, y, max;
    Real u, l;
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && thesolver->theRep == SPxSolver::ROW;
 
    Real mabs = maxabs;
 
@@ -136,7 +136,7 @@ int SPxFastRT::maxDelta(
             continue;
 
          /* in the row representation we must not select fixed indices to leave the basis */
-         if( rowrep && EQrel(up[i], low[i]) )
+         if( enterrowrep && EQrel(up[i], low[i]) )
             continue;
 
          x = upd[i];
@@ -209,7 +209,7 @@ int SPxFastRT::maxDelta(
                continue;
 
             /* in the row representation we must not select fixed indices to leave the basis */
-            if( rowrep && EQrel(up[i], low[i]) )
+            if( enterrowrep && EQrel(up[i], low[i]) )
                continue;
 
             if (x > epsilon)
@@ -276,7 +276,7 @@ int SPxFastRT::minDelta(
    Real u, l;
 
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && thesolver->theRep == SPxSolver::ROW;
 
    Real mabs = maxabs;
 
@@ -302,7 +302,7 @@ int SPxFastRT::minDelta(
             continue;
 
          /* in the row representation we must not select fixed indices to leave the basis */
-         if( rowrep && EQrel(up[i], low[i]) )
+         if( enterrowrep && EQrel(up[i], low[i]) )
             continue;
 
          if (x > epsilon)
@@ -374,7 +374,7 @@ int SPxFastRT::minDelta(
                continue;
 
             /* in the row representation we must not select fixed indices to leave the basis */
-            if( rowrep && EQrel(up[i], low[i]) )
+            if( enterrowrep && EQrel(up[i], low[i]) )
                continue;
 
             if (x > epsilon)
@@ -519,7 +519,7 @@ int SPxFastRT::minSelect(
    int i;
    Real x, y;
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && thesolver->theRep == SPxSolver::ROW;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -541,7 +541,7 @@ int SPxFastRT::minSelect(
          continue;
 
       /* in the row representation we must not select fixed indices to leave the basis */
-      if( rowrep && EQrel(up[i], low[i]) )
+      if( enterrowrep && EQrel(up[i], low[i]) )
          continue;
 
       if (x > stab)
@@ -603,7 +603,7 @@ int SPxFastRT::maxSelect(
    int i;
    Real x, y;
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
+   bool enterrowrep = !leaving && thesolver->theRep == SPxSolver::ROW;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -625,7 +625,7 @@ int SPxFastRT::maxSelect(
          continue;
 
       /* in the row representation we must not select fixed indices to leave the basis */
-      if( rowrep && EQrel(up[i], low[i]) )
+      if( enterrowrep && EQrel(up[i], low[i]) )
          continue;
 
       if (x > stab)
