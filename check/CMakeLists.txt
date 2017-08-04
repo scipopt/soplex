@@ -64,6 +64,8 @@ set(settings
     steep
     exact
     default
+    default-col
+    default-row
     )
 
 #
@@ -72,7 +74,7 @@ set(settings
 # add_instancetests takes an instance group and a status
 # that SoPlex should report as arguments
 #
-macro(add_instancetests instances status)
+macro(add_instancetests instances solutionstatus)
 #
 # loop over the instances
 #
@@ -96,7 +98,7 @@ foreach(instance ${${instances}})
     # add a test and test properties
     #
     add_test(NAME ${instance}-${setting} COMMAND soplex ${loadCommand} ${inst})
-    set_tests_properties (${instance}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "problem is solved \\[${status}\\]")
+    set_tests_properties (${instance}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "problem is solved \\[${solutionstatus}\\]")
     endforeach(setting)
 endforeach(instance)
 endmacro(add_instancetests)
