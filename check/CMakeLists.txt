@@ -103,7 +103,7 @@ macro(add_instancetests instances status)
         # add a test and test properties
         #
         add_test(NAME ${name}-${setting} COMMAND soplex ${optvalCommand} ${loadCommand} ${inst})
-        set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Solution successfully validated against external value")
+        set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : Success")
         endforeach(setting)
     endforeach(instance)
 endmacro(add_instancetests)
