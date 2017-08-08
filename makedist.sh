@@ -62,7 +62,6 @@ $NAME/src/*.cpp \
 $NAME/CMakeLists.txt              \
 $NAME/settings/default-col.set    \
 $NAME/settings/default-row.set    \
-$NAME/settings/default.set        \
 $NAME/soplex-config.cmake.in      \
 $NAME/src/CMakeLists.txt         \
 $NAME/check/CMakeLists.txt \
