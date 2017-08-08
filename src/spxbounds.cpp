@@ -176,7 +176,10 @@ void SPxSolver::setEnterBound4Row(int i, int n)
       theLBbound[i] = theLRbound[n];
       theUBbound[i] = infinity;
       break;
-
+   case SPxBasis::Desc::P_FIXED:
+      theLBbound[i] = -infinity;
+      theUBbound[i] = infinity;
+      break;
    default:
       theUBbound[i] = theURbound[n];
       theLBbound[i] = theLRbound[n];
@@ -198,7 +201,10 @@ void SPxSolver::setEnterBound4Col(int i, int n)
       theLBbound[i] = theLCbound[n];
       theUBbound[i] = infinity;
       break;
-
+   case SPxBasis::Desc::P_FIXED:
+      theLBbound[i] = -infinity;
+      theUBbound[i] = infinity;
+      break;
    default:
       theUBbound[i] = theUCbound[n];
       theLBbound[i] = theLCbound[n];

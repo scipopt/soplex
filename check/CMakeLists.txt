@@ -45,8 +45,8 @@ set(infeasibleInstances
     ex72a
     forest6
     galenet
-    gams10am
     klein1
+    gams10am
     refinery
     woodinfe)
 
@@ -97,7 +97,7 @@ foreach(instance ${${instances}})
     #
     # add a test and test properties
     #
-    add_test(NAME ${instance}-${setting} COMMAND soplex ${loadCommand} ${inst})
+    add_test(NAME ${instance}-${setting} COMMAND $<TARGET_FILE:soplex> ${loadCommand} ${inst})
     set_tests_properties (${instance}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "problem is solved \\[${solutionstatus}\\]")
     endforeach(setting)
 endforeach(instance)
