@@ -15,6 +15,7 @@ find ./ -type d -exec chmod 750 {} \;
 find ./ -type f -exec chmod 640 {} \;
 find ./ -name "*.sh" -exec chmod 750 {} \;
 find ./ -name "*.py" -exec chmod 750 {} \;
+find ./ -name "*.cmake" -exec chmod 750 {} \;
 chmod 750 bin/*
 
 tar -cvzhf $NAME.tgz \
@@ -47,7 +48,6 @@ $NAME/check/testset/infeas.solu \
 $NAME/doc/inc/localfaq.php $NAME/doc/inc/faqtext.txt $NAME/doc/inc/parser.py \
 $NAME/doc/builddoc.sh \
 $NAME/doc/soplex.dxy \
-$NAME/doc/soplex.css \
 $NAME/doc/soplexfooter.html \
 $NAME/doc/soplexheader.html \
 $NAME/doc/soplexlayout.xml \
@@ -58,7 +58,16 @@ $NAME/settings/devex.set \
 $NAME/settings/steep.set \
 $NAME/src/depend* \
 $NAME/src/*h \
-$NAME/src/*cpp
+$NAME/src/*.cpp \
+$NAME/CMakeLists.txt              \
+$NAME/settings/default-col.set    \
+$NAME/settings/default-row.set    \
+$NAME/settings/default.set        \
+$NAME/soplex-config.cmake.in      \
+$NAME/src/CMakeLists.txt         \
+$NAME/check/CMakeLists.txt \
+$NAME/cmake/Modules
+
 rm -f $NAME
 
 echo ""
