@@ -1,9 +1,10 @@
 include(CTest)
 
+
 #
 # define the set of feasible instances
 #
-set(instances
+set(successInstances
     "adlittle\;0.22549496316238038228101176621492e6"
     "afiro\;-0.46475314285714285714285714285714e3"
     "agg\;-0.35991767286576506712640824319636e8"
@@ -31,9 +32,6 @@ set(instances
     "scsd1\;0.86666666743333647292533502995263e1"
     "seba\;0.157116e5"
     "share1b\;-0.7658931857918568112797274346007e5"
-    "share2b\;-0.41573224074141948654519910873841e3"
-    "shell\;0.1208825346e10"
-    "vtp-base\;0.1298314624613613657395984384889e6"
     "bgetam\;+infinity"
     "box1\;+infinity"
     "ex72a\;+infinity"
@@ -45,6 +43,13 @@ set(instances
     "woodinfe\;+infinity"
     "gas11\;-infinity"
     )
+    
+set(failInstances
+    "share2b\;0.123456789e5"
+    "shell\;+infinity"
+    "vtp-base\;-infinity"
+    )
+    
 
 #
 # define the set of settings
@@ -58,38 +63,68 @@ set(settings
     default-row
     )
 
-#
-# add_instancetests takes an instance group and a status
-# that SoPlex should report as arguments
-#
+
 #
 # loop over the instances
 #
-foreach(instance ${instances})
+foreach(instance ${successInstances})
     #
     # loop over all settings
     #
     foreach(setting ${settings})
-    #
-    # treat the instance as a tuple (list) of two values
-    #
-    list(GET instance 0 name)
-    list(GET instance 1 optval)
-    #
-    # specify the instance and the settings load command for soplex
-    #
-    set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.mps")
-    set(optvalCommand "--extsol=${optval}")
-    if(${setting} STREQUAL "default")
-        set(loadCommand "")
-    else()
-        set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
-    endif()
+        #
+        # treat the instance as a tuple (list) of two values
+        #
+        list(GET instance 0 name)
+        list(GET instance 1 optval)
+        #
+        # specify the instance and the settings load command for soplex
+        #
+        set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.mps")
+        set(optvalCommand "--extsol=${optval}")
+        if(${setting} STREQUAL "default")
+            set(loadCommand "")
+        else()
+            set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
+        endif()
 
+        #
+        # add a test and test properties
+        #
+        add_test(NAME ${name}-${setting} COMMAND $<TARGET_FILE:soplex> ${optvalCommand} ${loadCommand} ${inst})
+        set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : Success")
+    endforeach(setting)
+endforeach(instance)
+
+
+#
+# loop over the instances
+#
+foreach(instance ${failInstances})
     #
-    # add a test and test properties
+    # loop over all settings
     #
-    add_test(NAME ${name}-${setting} COMMAND $<TARGET_FILE:soplex> ${optvalCommand} ${loadCommand} ${inst})
-    set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : Success")
+    foreach(setting ${settings})
+        #
+        # treat the instance as a tuple (list) of two values
+        #
+        list(GET instance 0 name)
+        list(GET instance 1 optval)
+        #
+        # specify the instance and the settings load command for soplex
+        #
+        set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.mps")
+        set(optvalCommand "--extsol=${optval}")
+        if(${setting} STREQUAL "default")
+            set(loadCommand "")
+        else()
+            set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
+        endif()
+
+        #
+        # add a test and test properties
+        #
+        add_test(NAME ${name}-${setting} COMMAND $<TARGET_FILE:soplex> ${optvalCommand} ${loadCommand} ${inst})
+        set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : Fail")
     endforeach(setting)
 endforeach(instance)
