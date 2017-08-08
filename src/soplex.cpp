@@ -519,7 +519,7 @@ namespace soplex
       description[SoPlex::EPSILON_VALIDATION] = "tolerance for validating external results";
       lower[SoPlex::EPSILON_VALIDATION] = 0.0;
       upper[SoPlex::EPSILON_VALIDATION] = 1.0;
-      defaultValue[SoPlex::EPSILON_VALIDATION] = 1e-6;
+      defaultValue[SoPlex::EPSILON_VALIDATION] = 1e-5;
 
    }
 
