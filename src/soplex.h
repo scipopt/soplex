@@ -605,7 +605,7 @@ public:
    /// returns the objective value if a primal solution is available
    Real objValueReal();
 
-   /// validates solution against external primal and dual reference values
+   /// validates solution using external primal and dual reference values
    bool validateSolveReal(std::ostream& os);
 
    /// gets the primal solution vector if available; returns true on success
@@ -930,7 +930,7 @@ public:
       /// perturb the entire problem or only the relevant bounds of s single pivot?
       FULLPERTURBATION = 14,
 
-      /// validate against external objective value
+      /// validate using external objective value
       VALIDATEEXT = 15,
 
       /// number of boolean parameters

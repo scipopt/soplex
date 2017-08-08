@@ -436,7 +436,7 @@ int main(int argc, char* argv[])
                      soplex->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
                   }
                }
-               // --extsol=<value> : external solution for soplex to validate against
+               // --extsol=<value> : external solution for soplex to use for validation
                else if( strncmp(option, "extsol=", 7) == 0 )
                {
                   Real val;

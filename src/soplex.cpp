@@ -123,7 +123,7 @@ namespace soplex
 
       // should the solution be validated by an external objective value?
       name[SoPlex::VALIDATEEXT] = "validateexternal";
-      description[SoPlex::VALIDATEEXT] = "should the solution be validated against an external objective value?";
+      description[SoPlex::VALIDATEEXT] = "should the solution be validated using an external objective value?";
       defaultValue[SoPlex::VALIDATEEXT] = false;
    }
 
@@ -6796,7 +6796,7 @@ namespace soplex
 
 
 
-   /// validates solution against external primal and dual reference values
+   /// validates solution using external primal and dual reference values
    bool SoPlex::validateSolveReal(std::ostream& os)
    {
       bool passedValidation = true;
