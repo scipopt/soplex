@@ -6805,15 +6805,15 @@ namespace soplex
    {
       bool passedValidation = true;
       std::string reason = "";
-      Real objViolation;
-      Real maxBoundViolation;
-      Real maxRowViolation;
-      Real maxRedCostViolation;
-      Real maxDualViolation;
-      Real sumBoundViolation;
-      Real sumRowViolation;
-      Real sumRedCostViolation;
-      Real sumDualViolation;
+      Real objViolation = 0.0;
+      Real maxBoundViolation = 0.0;
+      Real maxRowViolation = 0.0;
+      Real maxRedCostViolation = 0.0;
+      Real maxDualViolation = 0.0;
+      Real sumBoundViolation = 0.0;
+      Real sumRowViolation = 0.0;
+      Real sumRedCostViolation = 0.0;
+      Real sumDualViolation = 0.0;
 
       objViolation = spxAbs(realParam(SoPlex::EXTOBJVAL) - objValueReal());
       if( ! EQ(objViolation, 0.0, realParam(SoPlex::EPSILON_VALIDATION)) )
