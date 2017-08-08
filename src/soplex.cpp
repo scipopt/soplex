@@ -6142,6 +6142,10 @@ namespace soplex
       case SoPlex::EXTOBJVAL:
          break;
 
+      // working tolerance for external validation
+      case SoPlex::EPSILON_VALIDATION:
+         break;
+
       default:
          return false;
       }
@@ -6833,12 +6837,12 @@ namespace soplex
             passedValidation = false;
             reason += "Row Violation; ";
          }
-         if( ! LE(maxRedCostViolation, realParam(SoPlex::EPSILON_VALIDATION)))
+         if( ! LE(maxRedCostViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
          {
             passedValidation = false;
             reason += "Reduced Cost Violation; ";
          }
-         if( ! LE(maxDualViolation, realParam(SoPlex::EPSILON_VALIDATION)))
+         if( ! LE(maxDualViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
          {
             passedValidation = false;
             reason += "Dual Violation; ";
