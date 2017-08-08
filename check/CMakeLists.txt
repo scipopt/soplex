@@ -45,8 +45,8 @@ set(infeasibleInstances
     ex72a
     forest6
     galenet
-    gams10am
     klein1
+    gams10am
     refinery
     woodinfe)
 
