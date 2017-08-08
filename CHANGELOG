@@ -10,6 +10,8 @@ performance:
 interface & parameters:
 - allow arbitrary order of inputs/parameters, esp. filename is not required to be last
 - new bool parameter 'printcondition' to print condition number in iteration log
+- new real parameter 'extsol' to validate objective value using an external solution
+- new real parameter 'l' to adjust the tolerance used in the external validation process
 
 fixed bugs:
 - fixed compilation error with WITH_LONG_DOUBLE
