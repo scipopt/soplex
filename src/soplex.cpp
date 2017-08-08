@@ -3078,7 +3078,7 @@ namespace soplex
    /// gets violation of bounds; returns true on success
    bool SoPlex::getBoundViolationReal(Real& maxviol, Real& sumviol)
    {
-      if( !hasPrimal() )
+      if( !isPrimalFeasible() )
          return false;
 
       _syncRealSolution();
@@ -3117,7 +3117,7 @@ namespace soplex
    /// gets violation of constraints; returns true on success
    bool SoPlex::getRowViolationReal(Real& maxviol, Real& sumviol)
    {
-      if( !hasPrimal() )
+      if( !isPrimalFeasible() )
          return false;
 
       _syncRealSolution();
@@ -3159,7 +3159,7 @@ namespace soplex
    /// gets violation of reduced costs; returns true on success
    bool SoPlex::getRedCostViolationReal(Real& maxviol, Real& sumviol)
    {
-      if( !hasDual() || !hasBasis() )
+      if( !isDualFeasible() || !hasBasis() )
          return false;
 
       _syncRealSolution();
@@ -3213,7 +3213,7 @@ namespace soplex
    /// gets violation of dual multipliers; returns true on success
    bool SoPlex::getDualViolationReal(Real& maxviol, Real& sumviol)
    {
-      if( !hasDual() || !hasBasis() )
+      if( !isDualFeasible() || !hasBasis() )
          return false;
 
       _syncRealSolution();
@@ -3388,7 +3388,7 @@ namespace soplex
    /// gets violation of bounds; returns true on success
    bool SoPlex::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasPrimal() )
+      if( !isPrimalFeasible() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -3439,7 +3439,7 @@ namespace soplex
    /// gets violation of constraints; returns true on success
    bool SoPlex::getRowViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasPrimal() )
+      if( !isPrimalFeasible() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -3492,7 +3492,7 @@ namespace soplex
    /// gets violation of reduced costs; returns true on success
    bool SoPlex::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasDual() || !hasPrimal() )
+      if( !isPrimalFeasible() || !isDualFeasible() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -3573,7 +3573,7 @@ namespace soplex
    /// gets violation of dual multipliers; returns true on success
    bool SoPlex::getDualViolationRational(Rational& maxviol, Rational& sumviol)
    {
-      if( !hasDual() || !hasPrimal() )
+      if( !isDualFeasible() || !isPrimalFeasible() )
          return false;
 
       // if we have to synchronize, we do not measure time, because this would affect the solving statistics
@@ -5959,13 +5959,13 @@ namespace soplex
          switch( value )
          {
          case POLISHING_OFF:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::OFF);
+            _solver.setSolutionPolishing(SPxSolver::POLISH_OFF);
             break;
-         case POLISHING_MAXBASICSLACK:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MAXBASICSLACK);
+         case POLISHING_INTEGRALITY:
+            _solver.setSolutionPolishing(SPxSolver::POLISH_INTEGRALITY);
             break;
-         case POLISHING_MINBASICSLACK:
-            _solver.setSolutionPolishing(SPxSolver::SolutionPolish::MINBASICSLACK);
+         case POLISHING_FRACTIONALITY:
+            _solver.setSolutionPolishing(SPxSolver::POLISH_FRACTIONALITY);
             break;
          default:
             return false;

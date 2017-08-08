@@ -224,9 +224,9 @@ public:
    /// objective for solution polishing
    enum SolutionPolish
    {
-      OFF,                  ///< don't perform modifications on optimal basis
-      MAXBASICSLACK,        ///< maximize number of basic slack variables, i.e. more variables on bounds
-      MINBASICSLACK         ///< minimize number of basic slack variables, i.e. more variables between bounds
+      POLISH_OFF,           ///< don't perform modifications on optimal basis
+      POLISH_INTEGRALITY,   ///< maximize number of basic slack variables, i.e. more variables on bounds
+      POLISH_FRACTIONALITY, ///< minimize number of basic slack variables, i.e. more variables in between bounds
    };
 
 

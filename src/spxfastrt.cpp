@@ -111,7 +111,6 @@ int SPxFastRT::maxDelta(
    Real x, y, max;
    Real u, l;
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
 
    Real mabs = maxabs;
 
@@ -133,10 +132,6 @@ int SPxFastRT::maxDelta(
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
          if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
-            continue;
-
-         /* in the row representation we must not select fixed indices to leave the basis */
-         if( rowrep && EQrel(up[i], low[i]) )
             continue;
 
          x = upd[i];
@@ -206,10 +201,6 @@ int SPxFastRT::maxDelta(
 
             /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
             if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
-               continue;
-
-            /* in the row representation we must not select fixed indices to leave the basis */
-            if( rowrep && EQrel(up[i], low[i]) )
                continue;
 
             if (x > epsilon)
@@ -274,9 +265,7 @@ int SPxFastRT::minDelta(
    int i, sel;
    Real x, y, max;
    Real u, l;
-
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
 
    Real mabs = maxabs;
 
@@ -299,10 +288,6 @@ int SPxFastRT::minDelta(
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
          if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
-            continue;
-
-         /* in the row representation we must not select fixed indices to leave the basis */
-         if( rowrep && EQrel(up[i], low[i]) )
             continue;
 
          if (x > epsilon)
@@ -371,10 +356,6 @@ int SPxFastRT::minDelta(
 
             /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
             if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
-               continue;
-
-            /* in the row representation we must not select fixed indices to leave the basis */
-            if( rowrep && EQrel(up[i], low[i]) )
                continue;
 
             if (x > epsilon)
@@ -519,7 +500,6 @@ int SPxFastRT::minSelect(
    int i;
    Real x, y;
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -538,10 +518,6 @@ int SPxFastRT::minSelect(
 
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
       if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
-         continue;
-
-      /* in the row representation we must not select fixed indices to leave the basis */
-      if( rowrep && EQrel(up[i], low[i]) )
          continue;
 
       if (x > stab)
@@ -603,7 +579,6 @@ int SPxFastRT::maxSelect(
    int i;
    Real x, y;
    bool leaving = m_type == SPxSolver::LEAVE;
-   bool rowrep = thesolver->theRep == SPxSolver::ROW;
 
    const Real* up = upBound.get_const_ptr();
    const Real* low = lowBound.get_const_ptr();
@@ -622,10 +597,6 @@ int SPxFastRT::maxSelect(
 
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
       if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
-         continue;
-
-      /* in the row representation we must not select fixed indices to leave the basis */
-      if( rowrep && EQrel(up[i], low[i]) )
          continue;
 
       if (x > stab)
@@ -1000,7 +971,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
       assert( thesolver->rep() == SPxSolver::COLUMN );
       SPxId leaveId = thesolver->baseId(leave);
       // decide whether the chosen leave index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
+      if( thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY )
       {
          // only allow (integer) variables to leave the basis
          if( leaveId.isSPxRowId() )
@@ -1011,7 +982,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
                return -1;
          }
       }
-      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
+      else if( thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY )
       {
          // only allow slacks and continuous variables to leave the basis
          if( thesolver->integerVariables.size() == thesolver->nCols() )
@@ -1369,7 +1340,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
    {
       assert( thesolver->rep() == SPxSolver::ROW );
       // decide whether the chosen entering index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::SolutionPolish::MAXBASICSLACK )
+      if( thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY )
       {
          // only allow (integer) variables to enter the basis
          if( enterId.isSPxRowId() )
@@ -1377,7 +1348,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
          else if( thesolver->integerVariables.size() == thesolver->nCols() && thesolver->integerVariables[thesolver->number(enterId)] == 0)
             return SPxId();
       }
-      else if( thesolver->polishObj == SPxSolver::SolutionPolish::MINBASICSLACK )
+      else if( thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY )
       {
          // only allow slacks and continuous variables to enter the basis
          if( thesolver->integerVariables.size() == thesolver->nCols() )

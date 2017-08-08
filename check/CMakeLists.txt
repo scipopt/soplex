@@ -3,7 +3,7 @@ include(CTest)
 #
 # define the set of feasible instances
 #
-set(feasibleInstances
+set(instances
     "adlittle\;0.22549496316238038228101176621492e6"
     "afiro\;-0.46475314285714285714285714285714e3"
     "agg\;-0.35991767286576506712640824319636e8"
@@ -34,12 +34,6 @@ set(feasibleInstances
     "share2b\;-0.41573224074141948654519910873841e3"
     "shell\;0.1208825346e10"
     "vtp-base\;0.1298314624613613657395984384889e6"
-    )
-
-#
-# define the set of infeasible instances
-#
-set(infeasibleInstances
     "bgetam\;+infinity"
     "box1\;+infinity"
     "ex72a\;+infinity"
@@ -49,12 +43,6 @@ set(infeasibleInstances
     "klein1\;+infinity"
     "refinery\;+infinity"
     "woodinfe\;+infinity"
-    )
-
-#
-# define the set of unbounded instances
-#
-set(unboundedInstances
     "gas11\;-infinity"
     )
 
@@ -66,51 +54,42 @@ set(settings
     steep
     exact
     default
+    default-col
+    default-row
     )
 
-#
-# define a macro to add tests
 #
 # add_instancetests takes an instance group and a status
 # that SoPlex should report as arguments
 #
-macro(add_instancetests instances status)
-    #
-    # loop over the instances
-    #
-    foreach(instance ${${instances}})
-        #
-        # loop over all settings
-        #
-        foreach(setting ${settings})
-        #
-        # treat the instance as a tuple (list) of two values
-        #
-        list(GET instance 0 name)
-        list(GET instance 1 optval)
-        #
-        # specify the instance and the settings load command for soplex
-        #
-        set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.mps")
-        set(optvalCommand "--extsol=${optval}")
-        if(${setting} STREQUAL "default")
-            set(loadCommand "")
-        else()
-            set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
-        endif()
-
-        #
-        # add a test and test properties
-        #
-        add_test(NAME ${name}-${setting} COMMAND soplex ${optvalCommand} ${loadCommand} ${inst})
-        set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : Success")
-        endforeach(setting)
-    endforeach(instance)
-endmacro(add_instancetests)
-
 #
-# add tests for infeasible, feasible and unbounded instances
+# loop over the instances
 #
-add_instancetests( feasibleInstances "optimal" )
-add_instancetests( infeasibleInstances "infeasible" )
-add_instancetests( unboundedInstances "unbounded" )
+foreach(instance ${instances})
+    #
+    # loop over all settings
+    #
+    foreach(setting ${settings})
+    #
+    # treat the instance as a tuple (list) of two values
+    #
+    list(GET instance 0 name)
+    list(GET instance 1 optval)
+    #
+    # specify the instance and the settings load command for soplex
+    #
+    set(inst "${PROJECT_SOURCE_DIR}/check/instances/${name}.mps")
+    set(optvalCommand "--extsol=${optval}")
+    if(${setting} STREQUAL "default")
+        set(loadCommand "")
+    else()
+        set(loadCommand "--loadset=${PROJECT_SOURCE_DIR}/settings/${setting}.set")
+    endif()
+
+    #
+    # add a test and test properties
+    #
+    add_test(NAME ${name}-${setting} COMMAND $<TARGET_FILE:soplex> ${optvalCommand} ${loadCommand} ${inst})
+    set_tests_properties (${name}-${setting} PROPERTIES PASS_REGULAR_EXPRESSION "Validation          : Success")
+    endforeach(setting)
+endforeach(instance)
