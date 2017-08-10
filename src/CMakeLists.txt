@@ -211,7 +211,7 @@ export(TARGETS libsoplex libsoplex-pic
 #configure the config file for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
 configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
-  "${PROJECT_BINARY_DIR}/soplex-config.cmake" @ONLY)
+  "${CMAKE_BINARY_DIR}/soplex-config.cmake" @ONLY)
 
 #configure the config file for the install
 set(CONF_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
