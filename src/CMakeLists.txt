@@ -180,8 +180,6 @@ target_link_libraries(soplex libsoplex)
 if(NOT LEGACY EQUAL ON)
     add_executable(example EXCLUDE_FROM_ALL example.cpp)
     target_link_libraries(example libsoplex)
-    target_compile_features(libsoplex PUBLIC cxx_thread_local)
-    target_compile_features(libsoplex-pic PUBLIC cxx_thread_local)
 endif()
 
 # set the install rpath to the installed destination
