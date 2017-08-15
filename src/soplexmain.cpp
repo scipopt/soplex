@@ -441,28 +441,8 @@ int main(int argc, char* argv[])
                // --extsol=<value> : external solution for soplex to use for validation
                else if( strncmp(option, "extsol=", 7) == 0 )
                {
-                  Real val;
                   char* input = &option[7];
-                  if( strncmp(input, "+infinity", 9 ) == 0 )
-                     val = DEFAULT_INFINITY;
-                  else if ( strncmp(input, "-infinity", 9) == 0 )
-                     val = -DEFAULT_INFINITY;
-                  else
-                  {
-                     char* tailptr;
-                     val = strtod(input, &tailptr);
-                     if (*tailptr) {
-                        //conversion failed because the input wasn't a number
-                        printUsage(argv, optidx);
-                        returnValue = 1;
-                        goto TERMINATE_FREESTRINGS;
-                     }
-                  }
-
-
-
-                  if( !soplex->setRealParam(SoPlex::EXTOBJVAL, val) ||
-                      !soplex->setBoolParam(SoPlex::VALIDATEEXT, true) )
+                  if( !soplex->setValidationSolution(input) )
                   {
                      printUsage(argv, optidx);
                      returnValue = 1;
@@ -521,7 +501,7 @@ int main(int argc, char* argv[])
 
          case 'l' :
             // l<eps> : set validation tolerance to <eps>
-            if( !soplex->setRealParam(SoPlex::EPSILON_VALIDATION, atof(&option[2])) )
+            if( !soplex->setValidationTolerance(atof(&option[2])) )
             {
                printUsage(argv, optidx);
                returnValue = 1;

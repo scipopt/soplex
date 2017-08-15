@@ -120,11 +120,6 @@ namespace soplex
       name[SoPlex::FULLPERTURBATION] = "fullperturbation";
       description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
       defaultValue[SoPlex::FULLPERTURBATION] = false;
-
-      // should the solution be validated by an external objective value?
-      name[SoPlex::VALIDATEEXT] = "validateexternal";
-      description[SoPlex::VALIDATEEXT] = "should the solution be validated using an external objective value?";
-      defaultValue[SoPlex::VALIDATEEXT] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -506,21 +501,6 @@ namespace soplex
       lower[SoPlex::OBJ_OFFSET] = -DEFAULT_INFINITY;
       upper[SoPlex::OBJ_OFFSET] = DEFAULT_INFINITY;
       defaultValue[SoPlex::OBJ_OFFSET] = 0.0;
-
-      // external objective value
-      name[SoPlex::EXTOBJVAL] = "external_objective_value";
-      description[SoPlex::EXTOBJVAL] = "external objective value";
-      lower[SoPlex::EXTOBJVAL] = -DEFAULT_INFINITY;
-      upper[SoPlex::EXTOBJVAL] = DEFAULT_INFINITY;
-      defaultValue[SoPlex::EXTOBJVAL] = 0.0;
-
-      // validation tolerance
-      name[SoPlex::EPSILON_VALIDATION] = "validation_tolerance";
-      description[SoPlex::EPSILON_VALIDATION] = "tolerance for validating external results";
-      lower[SoPlex::EPSILON_VALIDATION] = 0.0;
-      upper[SoPlex::EPSILON_VALIDATION] = 1.0;
-      defaultValue[SoPlex::EPSILON_VALIDATION] = 1e-5;
-
    }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -596,6 +576,7 @@ namespace soplex
       , _rationalPosone(1)
       , _rationalNegone(-1)
       , _rationalZero(0)
+      , _validation()
    {
       // transfer message handler
       _solver.setOutstream(spxout);
@@ -740,6 +721,8 @@ namespace soplex
          _rationalPosone = 1;
          _rationalNegone = -1;
          _rationalZero = 0;
+
+         _validation = rhs._validation;
       }
 
       assert(_isConsistent());
@@ -5634,8 +5617,6 @@ namespace soplex
       case FULLPERTURBATION:
          _solver.useFullPerturbation(value);
          break;
-      case VALIDATEEXT:
-         break;
       default:
          return false;
       }
@@ -6136,14 +6117,6 @@ namespace soplex
             _realLP->changeObjOffset(value);
          if( _rationalLP )
             _rationalLP->changeObjOffset(value);
-         break;
-
-      // external objective value
-      case SoPlex::EXTOBJVAL:
-         break;
-
-      // working tolerance for external validation
-      case SoPlex::EPSILON_VALIDATION:
          break;
 
       default:
@@ -6764,7 +6737,7 @@ namespace soplex
       os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime->time() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
          << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
-      if( boolParam(SoPlex::VALIDATEEXT) )
+      if( _validation.validate )
          validateSolveReal(os);
    }
 
@@ -6794,8 +6767,24 @@ namespace soplex
       printSolvingStatistics(os);
       os << std::setprecision(prec);
 
-      if( boolParam(SoPlex::VALIDATEEXT) )
+      if( _validation.validate )
          validateSolveReal(os);
+   }
+
+
+
+   /// sets the external validation solution
+   bool SoPlex::setValidationSolution(char* solstr)
+   {
+      return _validation.updateExternalSolution(solstr);
+   }
+
+
+
+   /// sets the external validation tolerance
+   bool SoPlex::setValidationTolerance(Real eps)
+   {
+      return _validation.updateValidationTolerance(eps);
    }
 
 
@@ -6815,8 +6804,25 @@ namespace soplex
       Real sumRedCostViolation = 0.0;
       Real sumDualViolation = 0.0;
 
-      objViolation = spxAbs(realParam(SoPlex::EXTOBJVAL) - objValueReal());
-      if( ! EQ(objViolation, 0.0, realParam(SoPlex::EPSILON_VALIDATION)) )
+      char* solstr = _validation.validatesolution;
+      double eps = _validation.validatetolerance;
+      Real sol;
+
+      if( strncmp(solstr, "+infinity", 9 ) == 0 )
+         sol = DEFAULT_INFINITY;
+      else if ( strncmp(solstr, "-infinity", 9) == 0 )
+         sol = -DEFAULT_INFINITY;
+      else
+      {
+         char* tailptr;
+         sol = strtod(solstr, &tailptr);
+         if (*tailptr) {
+            //conversion failed because the input wasn't a number
+         }
+      }
+
+      objViolation = spxAbs(sol - objValueReal());
+      if( ! EQ(objViolation, 0.0, eps) )
       {
          passedValidation = false;
          reason += "Objective Violation; ";
@@ -6827,22 +6833,22 @@ namespace soplex
          SoPlex::getRowViolationReal(maxRowViolation, sumRowViolation);
          SoPlex::getRedCostViolationReal(maxRedCostViolation, sumRedCostViolation);
          SoPlex::getDualViolationReal(maxDualViolation, sumDualViolation);
-         if( ! LE(maxBoundViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
+         if( ! LE(maxBoundViolation, eps) )
          {
             passedValidation = false;
             reason += "Bound Violation; ";
          }
-         if( ! LE(maxRowViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
+         if( ! LE(maxRowViolation, eps) )
          {
             passedValidation = false;
             reason += "Row Violation; ";
          }
-         if( ! LE(maxRedCostViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
+         if( ! LE(maxRedCostViolation, eps) )
          {
             passedValidation = false;
             reason += "Reduced Cost Violation; ";
          }
-         if( ! LE(maxDualViolation, realParam(SoPlex::EPSILON_VALIDATION)) )
+         if( ! LE(maxDualViolation, eps) )
          {
             passedValidation = false;
             reason += "Dual Violation; ";

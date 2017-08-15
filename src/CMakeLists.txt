@@ -59,6 +59,7 @@ set(sources
     testsoplex.cpp
     updatevector.cpp
     usertimer.cpp
+    validation.cpp
     wallclocktimer.cpp)
 
 set(headers
@@ -152,6 +153,7 @@ set(headers
     unitvector.h
     updatevector.h
     usertimer.h
+    validation.h
     vectorbase.h
     vector.h
     wallclocktimer.h)

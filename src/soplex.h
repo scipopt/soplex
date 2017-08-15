@@ -29,6 +29,7 @@
 #include "spxsolver.h"
 #include "slufactor.h"
 #include "slufactor_rational.h"
+#include "validation.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "spxsimplifier.h"
@@ -608,6 +609,12 @@ public:
    /// validates solution using external primal and dual reference values
    bool validateSolveReal(std::ostream& os);
 
+   /// sets the external validation solution
+   bool setValidationSolution(char* solstr);
+
+   /// sets the external validation tolerance
+   bool setValidationTolerance(Real eps);
+
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalReal(VectorReal& vector);
 
@@ -930,11 +937,8 @@ public:
       /// perturb the entire problem or only the relevant bounds of s single pivot?
       FULLPERTURBATION = 14,
 
-      /// validate using external objective value
-      VALIDATEEXT = 15,
-
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 16
+      BOOLPARAM_COUNT = 15
    } BoolParam;
 
    /// integer parameters
@@ -1345,14 +1349,8 @@ public:
       /// objective offset
       OBJ_OFFSET = 23,
 
-      /// external objective value
-      EXTOBJVAL = 24,
-
-      /// validation tolerance
-      EPSILON_VALIDATION = 25,
-
       /// number of real parameters
-      REALPARAM_COUNT = 26
+      REALPARAM_COUNT = 24
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1842,6 +1840,8 @@ private:
    Rational _rationalPosone;
    Rational _rationalNegone;
    Rational _rationalZero;
+
+   Validation _validation;
 
    //@}
 
