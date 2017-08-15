@@ -1254,7 +1254,7 @@ void SPxSolver::performSolutionPolishing()
    MSG_INFO1( (*spxout),
       (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
 
-   setStatus(SPxStatus::OPTIMAL);
+   setStatus(SPxBasis::OPTIMAL);
 }
 
 
