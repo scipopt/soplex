@@ -605,15 +605,6 @@ public:
    /// returns the objective value if a primal solution is available
    Real objValueReal();
 
-   /// validates solution using external primal and dual reference values
-   bool validateSolveReal(std::ostream& os);
-
-   /// sets the external validation solution
-   bool setValidationSolution(char* solstr);
-
-   /// sets the external validation tolerance
-   bool setValidationTolerance(Real eps);
-
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalReal(VectorReal& vector);
 
