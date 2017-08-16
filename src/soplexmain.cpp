@@ -30,6 +30,8 @@
 #include "spxgithash.h"
 #include "timerfactory.h"
 
+#include "validation.h"
+
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
 #include "EGlib.h"
@@ -271,6 +273,7 @@ int main(int argc, char* argv[])
    NameSet rownames;
    NameSet colnames;
    Timer* readingTime;
+   Validation* validation;
    int optidx;
 
    const char* lpfilename = 0;
@@ -298,6 +301,10 @@ int main(int argc, char* argv[])
 
    soplex->printVersion();
    MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
+
+   validation = 0;
+   spx_alloc(validation);
+   new (validation) Validation();
 
    try
    {
@@ -442,7 +449,7 @@ int main(int argc, char* argv[])
                else if( strncmp(option, "extsol=", 7) == 0 )
                {
                   char* input = &option[7];
-                  if( !soplex->setValidationSolution(input) )
+                  if( !validation->updateExternalSolution(input) )
                   {
                      printUsage(argv, optidx);
                      returnValue = 1;
@@ -501,7 +508,7 @@ int main(int argc, char* argv[])
 
          case 'l' :
             // l<eps> : set validation tolerance to <eps>
-            if( !soplex->setValidationTolerance(atof(&option[2])) )
+            if( !validation->updateValidationTolerance(atof(&option[2])) )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -870,6 +877,9 @@ int main(int argc, char* argv[])
          soplex->printStatistics(soplex->spxout.getStream(SPxOut::INFO1));
       }
 
+      if(validation->validate)
+         validation->validateSolveReal(soplex);
+
       // write basis file if specified
       if( writebasname != 0 )
       {
@@ -905,6 +915,8 @@ int main(int argc, char* argv[])
    // spx_alloc() and freed here; disabling the list memory is crucial
    soplex->~SoPlex();
    spx_free(soplex);
+   validation->~Validation();
+   spx_free(validation);
    Rational::disableListMem();
    EGlpNumClear();
    readingTime->~Timer();

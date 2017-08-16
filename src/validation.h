@@ -8,7 +8,7 @@
 #ifndef SRC_VALIDATION_H_
 #define SRC_VALIDATION_H_
 
-#include "spxdefines.h"
+#include "soplex.h"
 
 namespace soplex {
 
@@ -30,6 +30,7 @@ public:
    }
    bool updateExternalSolution(char* solution);
    bool updateValidationTolerance(Real tolerance);
+   bool validateSolveReal(SoPlex* soplex);
 };
 
 } /* namespace soplex */

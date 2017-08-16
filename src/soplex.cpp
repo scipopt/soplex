@@ -576,7 +576,6 @@ namespace soplex
       , _rationalPosone(1)
       , _rationalNegone(-1)
       , _rationalZero(0)
-      , _validation()
    {
       // transfer message handler
       _solver.setOutstream(spxout);
@@ -721,8 +720,6 @@ namespace soplex
          _rationalPosone = 1;
          _rationalNegone = -1;
          _rationalZero = 0;
-
-         _validation = rhs._validation;
       }
 
       assert(_isConsistent());
@@ -6737,8 +6734,6 @@ namespace soplex
       os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime->time() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n"
          << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
-      if( _validation.validate )
-         validateSolveReal(os);
    }
 
 
@@ -6766,111 +6761,6 @@ namespace soplex
       printSolutionStatistics(os);
       printSolvingStatistics(os);
       os << std::setprecision(prec);
-
-      if( _validation.validate )
-         validateSolveReal(os);
-   }
-
-
-
-   /// sets the external validation solution
-   bool SoPlex::setValidationSolution(char* solstr)
-   {
-      return _validation.updateExternalSolution(solstr);
-   }
-
-
-
-   /// sets the external validation tolerance
-   bool SoPlex::setValidationTolerance(Real eps)
-   {
-      return _validation.updateValidationTolerance(eps);
-   }
-
-
-
-   /// validates solution using external primal and dual reference values
-   bool SoPlex::validateSolveReal(std::ostream& os)
-   {
-      bool passedValidation = true;
-      std::string reason = "";
-      Real objViolation = 0.0;
-      Real maxBoundViolation = 0.0;
-      Real maxRowViolation = 0.0;
-      Real maxRedCostViolation = 0.0;
-      Real maxDualViolation = 0.0;
-      Real sumBoundViolation = 0.0;
-      Real sumRowViolation = 0.0;
-      Real sumRedCostViolation = 0.0;
-      Real sumDualViolation = 0.0;
-
-      char* solstr = _validation.validatesolution;
-      double eps = _validation.validatetolerance;
-      Real sol;
-
-      if( strncmp(solstr, "+infinity", 9 ) == 0 )
-         sol = DEFAULT_INFINITY;
-      else if ( strncmp(solstr, "-infinity", 9) == 0 )
-         sol = -DEFAULT_INFINITY;
-      else
-      {
-         char* tailptr;
-         sol = strtod(solstr, &tailptr);
-         if (*tailptr) {
-            //conversion failed because the input wasn't a number
-         }
-      }
-
-      objViolation = spxAbs(sol - objValueReal());
-      if( ! EQ(objViolation, 0.0, eps) )
-      {
-         passedValidation = false;
-         reason += "Objective Violation; ";
-      }
-      if( SPxSolver::OPTIMAL == _status )
-      {
-         SoPlex::getBoundViolationReal(maxBoundViolation, sumBoundViolation);
-         SoPlex::getRowViolationReal(maxRowViolation, sumRowViolation);
-         SoPlex::getRedCostViolationReal(maxRedCostViolation, sumRedCostViolation);
-         SoPlex::getDualViolationReal(maxDualViolation, sumDualViolation);
-         if( ! LE(maxBoundViolation, eps) )
-         {
-            passedValidation = false;
-            reason += "Bound Violation; ";
-         }
-         if( ! LE(maxRowViolation, eps) )
-         {
-            passedValidation = false;
-            reason += "Row Violation; ";
-         }
-         if( ! LE(maxRedCostViolation, eps) )
-         {
-            passedValidation = false;
-            reason += "Reduced Cost Violation; ";
-         }
-         if( ! LE(maxDualViolation, eps) )
-         {
-            passedValidation = false;
-            reason += "Dual Violation; ";
-         }
-      }
-
-      os << "\n";
-      os << "Validation          :";
-      if(passedValidation)
-         os << " Success\n";
-      else
-      {
-         reason[reason.length()-2] = ']';
-         os << " Fail [" + reason + "\n";
-      }
-      os << "   Objective        : " << std::scientific << std::setprecision(8) << objViolation << std::fixed << "\n";
-      os << "   Bound            : " << std::scientific << std::setprecision(8) << maxBoundViolation << std::fixed << "\n";
-      os << "   Row              : " << std::scientific << std::setprecision(8) << maxRowViolation << std::fixed << "\n";
-      os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
-      os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
-
-      return passedValidation;
    }
 
 

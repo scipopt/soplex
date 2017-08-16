@@ -29,7 +29,6 @@
 #include "spxsolver.h"
 #include "slufactor.h"
 #include "slufactor_rational.h"
-#include "validation.h"
 
 ///@todo try to move to cpp file by forward declaration
 #include "spxsimplifier.h"
@@ -1840,8 +1839,6 @@ private:
    Rational _rationalPosone;
    Rational _rationalNegone;
    Rational _rationalZero;
-
-   Validation _validation;
 
    //@}
 
