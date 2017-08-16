@@ -209,6 +209,7 @@ LIBHEADER	=	array.h \
 			unitvector.h \
 			usertimer.h \
 			updatevector.h \
+			validation.h \
 			vectorbase.h \
 			vector.h \
 			wallclocktimer.h
@@ -270,6 +271,7 @@ LIBOBJ		= 	changesoplex.o \
 			spxwritestate.o \
 			statistics.o \
 			usertimer.o \
+			validation.o \
 			wallclocktimer.o \
 			updatevector.o \
 			testsoplex.o
