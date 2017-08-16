@@ -22,18 +22,19 @@
 namespace soplex {
 
 /// updates the external solution used for validation
-bool Validation::updateExternalSolution(char* solutionstr)
+bool Validation::updateExternalSolution(char* solution)
 {
    validate = true;
+   validatesolution = solution;
 
-   if( strncmp(solutionstr, "+infinity", 9 ) == 0 )
-      validatesolution = DEFAULT_INFINITY;
-   else if ( strncmp(solutionstr, "-infinity", 9) == 0 )
-      validatesolution = -DEFAULT_INFINITY;
+   if( strncmp(solution, "+infinity", 9 ) == 0 )
+      return true;
+   else if ( strncmp(solution, "-infinity", 9) == 0 )
+      return true;
    else
    {
       char* tailptr;
-      validatesolution = strtod(solutionstr, &tailptr);
+      strtod(solution, &tailptr);
       if (*tailptr) {
          //conversion failed because the input wasn't a number
          return false;
@@ -45,10 +46,10 @@ bool Validation::updateExternalSolution(char* solutionstr)
 
 
 /// updates the tolerance used for validation
-bool Validation::updateValidationTolerance(char* tolerancestr)
+bool Validation::updateValidationTolerance(char* tolerance)
 {
    char* tailptr;
-   validatetolerance = strtod(tolerancestr, &tailptr);
+   validatetolerance = strtod(tolerance, &tailptr);
    if (*tailptr) {
       //conversion failed because the input wasn't a number
       return false;
@@ -73,10 +74,20 @@ void Validation::validateSolveReal(SoPlex& soplex)
    Real sumRowViolation = 0.0;
    Real sumRedCostViolation = 0.0;
    Real sumDualViolation = 0.0;
+   Real sol;
 
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
-   objViolation = spxAbs(validatesolution - soplex.objValueReal());
+   if( strncmp(validatesolution, "+infinity", 9 ) == 0 )
+      sol =  soplex.realParam(SoPlex::INFTY);
+   else if ( strncmp(validatesolution, "-infinity", 9) == 0 )
+      sol =  -soplex.realParam(SoPlex::INFTY);
+   else
+   {
+      sol = atof(validatesolution);
+   }
+
+   objViolation = spxAbs(sol - soplex.objValueReal());
    if( ! EQ(objViolation, 0.0, validatetolerance) )
    {
       passedValidation = false;
