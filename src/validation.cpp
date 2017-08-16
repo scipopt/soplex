@@ -61,6 +61,7 @@ bool Validation::updateValidationTolerance(char* tolerancestr)
 /// validates the soplex solution using the external solution
 bool Validation::validateSolveReal(SoPlex& soplex)
 {
+#ifndef SOPLEX_LEGACY
    bool passedValidation = true;
    std::string reason = "";
    Real objViolation = 0.0;
@@ -73,8 +74,6 @@ bool Validation::validateSolveReal(SoPlex& soplex)
    Real sumRedCostViolation = 0.0;
    Real sumDualViolation = 0.0;
 
-
-#ifndef SOPLEX_LEGACY
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
    objViolation = spxAbs(validatesolution - soplex.objValueReal());
