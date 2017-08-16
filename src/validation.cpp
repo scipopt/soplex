@@ -110,7 +110,6 @@ bool Validation::validateSolveReal(SoPlex& soplex)
          reason += "Dual Violation; ";
       }
    }
-#endif
 
    os << "\n";
    os << "Validation          :";
@@ -126,6 +125,7 @@ bool Validation::validateSolveReal(SoPlex& soplex)
    os << "   Row              : " << std::scientific << std::setprecision(8) << maxRowViolation << std::fixed << "\n";
    os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
    os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
+#endif
 
    return passedValidation;
 }
