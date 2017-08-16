@@ -41,7 +41,7 @@ bool Validation::updateValidationTolerance(Real tolerance)
 
 
 /// validates the soplex solution using the external solution
-bool Validation::validateSolveReal(SoPlex* soplex)
+bool Validation::validateSolveReal(SoPlex* soplexptr)
 {
    bool passedValidation = true;
    std::string reason = "";
@@ -55,9 +55,10 @@ bool Validation::validateSolveReal(SoPlex* soplex)
    Real sumRedCostViolation = 0.0;
    Real sumDualViolation = 0.0;
 
+   SoPlex soplex = *soplexptr;
    char* solstr = validatesolution;
    Real sol;
-   std::ostream& os = soplex->spxout.getStream(SPxOut::INFO1);
+   std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
    if( strncmp(solstr, "+infinity", 9 ) == 0 )
       sol = DEFAULT_INFINITY;
@@ -72,18 +73,18 @@ bool Validation::validateSolveReal(SoPlex* soplex)
       }
    }
 
-   objViolation = spxAbs(sol - soplex->objValueReal());
+   objViolation = spxAbs(sol - soplex.objValueReal());
    if( ! EQ(objViolation, 0.0, validatetolerance) )
    {
       passedValidation = false;
       reason += "Objective Violation; ";
    }
-   if( SPxSolver::OPTIMAL == soplex->status() )
+   if( SPxSolver::OPTIMAL == soplex.status() )
    {
-      soplex->getBoundViolationReal(maxBoundViolation, sumBoundViolation);
-      soplex->getRowViolationReal(maxRowViolation, sumRowViolation);
-      soplex->getRedCostViolationReal(maxRedCostViolation, sumRedCostViolation);
-      soplex->getDualViolationReal(maxDualViolation, sumDualViolation);
+      soplex.getBoundViolationReal(maxBoundViolation, sumBoundViolation);
+      soplex.getRowViolationReal(maxRowViolation, sumRowViolation);
+      soplex.getRedCostViolationReal(maxRedCostViolation, sumRedCostViolation);
+      soplex.getDualViolationReal(maxDualViolation, sumDualViolation);
       if( ! LE(maxBoundViolation, validatetolerance) )
       {
          passedValidation = false;
