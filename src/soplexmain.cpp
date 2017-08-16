@@ -877,8 +877,10 @@ int main(int argc, char* argv[])
          soplex->printStatistics(soplex->spxout.getStream(SPxOut::INFO1));
       }
 
+#ifndef SOPLEX_LEGACY
       if(validation->validate)
          validation->validateSolveReal(*soplex);
+#endif
 
       // write basis file if specified
       if( writebasname != 0 )
