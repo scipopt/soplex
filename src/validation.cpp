@@ -1,16 +1,27 @@
-/*
- * validation.cpp
- *
- *  Created on: 15.08.2017
- *      Author: bzfviern
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                           */
+/*                  This file is part of the class library                   */
+/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*                                                                           */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*                            fuer Informationstechnik Berlin                */
+/*                                                                           */
+/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*                                                                           */
+/*  You should have received a copy of the ZIB Academic License              */
+/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*                                                                           */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**@file  validation.cpp
+ * @brief Validation object for soplex solutions
  */
 
 #include "validation.h"
 
 namespace soplex {
 
-
-
+/// updates the external solution used for validation
 bool Validation::updateExternalSolution(char* solution)
 {
    validatesolution = solution;
@@ -20,6 +31,7 @@ bool Validation::updateExternalSolution(char* solution)
 
 
 
+/// updates the tolerance used for validation
 bool Validation::updateValidationTolerance(Real tolerance)
 {
    validatetolerance = tolerance;
@@ -28,7 +40,7 @@ bool Validation::updateValidationTolerance(Real tolerance)
 
 
 
-/// validates solution using external primal and dual reference values
+/// validates the soplex solution using the external solution
 bool Validation::validateSolveReal(SoPlex* soplex)
 {
    bool passedValidation = true;
@@ -111,7 +123,5 @@ bool Validation::validateSolveReal(SoPlex* soplex)
 
    return passedValidation;
 }
-
-
 
 } /* namespace soplex */

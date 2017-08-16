@@ -1,8 +1,20 @@
-/*
- * validation.h
- *
- *  Created on: 15.08.2017
- *      Author: bzfviern
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*                                                                           */
+/*                  This file is part of the class library                   */
+/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*                                                                           */
+/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*                            fuer Informationstechnik Berlin                */
+/*                                                                           */
+/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*                                                                           */
+/*  You should have received a copy of the ZIB Academic License              */
+/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*                                                                           */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+/**@file  validation.h
+ * @brief Validation object for soplex solutions
  */
 
 #ifndef SRC_VALIDATION_H_
@@ -15,21 +27,37 @@ namespace soplex {
 class Validation
 {
 public:
+
+   /// should the soplex solution be validated?
    bool           validate;
-   double         validatetolerance;
+
+   /// external solution used for validation
    char*          validatesolution;
+
+   /// tolerance used for validation
+   double         validatetolerance;
+
+   /// default constructor
    Validation()
    {
       validate = false;
       validatetolerance = 1e-5;
       validatesolution = 0;
    }
+
+   /// default destructor
    ~Validation()
    {
       ;
    }
+
+   /// updates the external solution used for validation
    bool updateExternalSolution(char* solution);
+
+   /// updates the tolerance used for validation
    bool updateValidationTolerance(Real tolerance);
+
+   /// validates the soplex solution using the external solution
    bool validateSolveReal(SoPlex* soplex);
 };
 
