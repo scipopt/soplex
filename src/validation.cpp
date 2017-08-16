@@ -59,7 +59,7 @@ bool Validation::updateValidationTolerance(char* tolerancestr)
 
 
 /// validates the soplex solution using the external solution
-bool Validation::validateSolveReal(SoPlex& soplex)
+void Validation::validateSolveReal(SoPlex& soplex)
 {
 #ifndef SOPLEX_LEGACY
    bool passedValidation = true;
@@ -125,8 +125,6 @@ bool Validation::validateSolveReal(SoPlex& soplex)
    os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
    os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
 #endif
-
-   return passedValidation;
 }
 
 } /* namespace soplex */
