@@ -58,7 +58,7 @@ public:
    bool updateValidationTolerance(Real tolerance);
 
    /// validates the soplex solution using the external solution
-   bool validateSolveReal(SoPlex* soplex);
+   bool validateSolveReal(SoPlex& soplex);
 };
 
 } /* namespace soplex */

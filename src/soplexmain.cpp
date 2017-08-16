@@ -878,7 +878,7 @@ int main(int argc, char* argv[])
       }
 
       if(validation->validate)
-         validation->validateSolveReal(soplex);
+         validation->validateSolveReal(*soplex);
 
       // write basis file if specified
       if( writebasname != 0 )

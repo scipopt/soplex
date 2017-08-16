@@ -41,7 +41,7 @@ bool Validation::updateValidationTolerance(Real tolerance)
 
 
 /// validates the soplex solution using the external solution
-bool Validation::validateSolveReal(SoPlex* soplexptr)
+bool Validation::validateSolveReal(SoPlex& soplex)
 {
    bool passedValidation = true;
    std::string reason = "";
@@ -55,7 +55,6 @@ bool Validation::validateSolveReal(SoPlex* soplexptr)
    Real sumRedCostViolation = 0.0;
    Real sumDualViolation = 0.0;
 
-   SoPlex soplex = *soplexptr;
    char* solstr = validatesolution;
    Real sol;
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
