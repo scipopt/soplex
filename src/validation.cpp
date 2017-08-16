@@ -73,6 +73,8 @@ bool Validation::validateSolveReal(SoPlex& soplex)
    Real sumRedCostViolation = 0.0;
    Real sumDualViolation = 0.0;
 
+
+#ifndef SOPLEX_LEGACY
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
    objViolation = spxAbs(validatesolution - soplex.objValueReal());
@@ -108,6 +110,7 @@ bool Validation::validateSolveReal(SoPlex& soplex)
          reason += "Dual Violation; ";
       }
    }
+#endif
 
    os << "\n";
    os << "Validation          :";
