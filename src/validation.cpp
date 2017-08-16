@@ -22,19 +22,37 @@
 namespace soplex {
 
 /// updates the external solution used for validation
-bool Validation::updateExternalSolution(char* solution)
+bool Validation::updateExternalSolution(char* solutionstr)
 {
-   validatesolution = solution;
    validate = true;
+
+   if( strncmp(solutionstr, "+infinity", 9 ) == 0 )
+      validatesolution = DEFAULT_INFINITY;
+   else if ( strncmp(solutionstr, "-infinity", 9) == 0 )
+      validatesolution = -DEFAULT_INFINITY;
+   else
+   {
+      char* tailptr;
+      validatesolution = strtod(solutionstr, &tailptr);
+      if (*tailptr) {
+         //conversion failed because the input wasn't a number
+         return false;
+      }
+   }
    return true;
 }
 
 
 
 /// updates the tolerance used for validation
-bool Validation::updateValidationTolerance(Real tolerance)
+bool Validation::updateValidationTolerance(char* tolerancestr)
 {
-   validatetolerance = tolerance;
+   char* tailptr;
+   validatetolerance = strtod(tolerancestr, &tailptr);
+   if (*tailptr) {
+      //conversion failed because the input wasn't a number
+      return false;
+   }
    return true;
 }
 
@@ -55,24 +73,9 @@ bool Validation::validateSolveReal(SoPlex& soplex)
    Real sumRedCostViolation = 0.0;
    Real sumDualViolation = 0.0;
 
-   char* solstr = validatesolution;
-   Real sol;
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
-   if( strncmp(solstr, "+infinity", 9 ) == 0 )
-      sol = DEFAULT_INFINITY;
-   else if ( strncmp(solstr, "-infinity", 9) == 0 )
-      sol = -DEFAULT_INFINITY;
-   else
-   {
-      char* tailptr;
-      sol = strtod(solstr, &tailptr);
-      if (*tailptr) {
-         //conversion failed because the input wasn't a number
-      }
-   }
-
-   objViolation = spxAbs(sol - soplex.objValueReal());
+   objViolation = spxAbs(validatesolution - soplex.objValueReal());
    if( ! EQ(objViolation, 0.0, validatetolerance) )
    {
       passedValidation = false;

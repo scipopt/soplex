@@ -32,7 +32,7 @@ public:
    bool           validate;
 
    /// external solution used for validation
-   char*          validatesolution;
+   double         validatesolution;
 
    /// tolerance used for validation
    double         validatetolerance;
@@ -52,10 +52,10 @@ public:
    }
 
    /// updates the external solution used for validation
-   bool updateExternalSolution(char* solution);
+   bool updateExternalSolution(char* solutionstr);
 
    /// updates the tolerance used for validation
-   bool updateValidationTolerance(Real tolerance);
+   bool updateValidationTolerance(char* tolerancestr);
 
    /// validates the soplex solution using the external solution
    bool validateSolveReal(SoPlex& soplex);

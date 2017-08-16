@@ -508,7 +508,7 @@ int main(int argc, char* argv[])
 
          case 'l' :
             // l<eps> : set validation tolerance to <eps>
-            if( !validation->updateValidationTolerance(atof(&option[2])) )
+            if( !validation->updateValidationTolerance(&option[2]) )
             {
                printUsage(argv, optidx);
                returnValue = 1;
