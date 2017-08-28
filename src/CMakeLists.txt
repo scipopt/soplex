@@ -59,6 +59,7 @@ set(sources
     testsoplex.cpp
     updatevector.cpp
     usertimer.cpp
+    validation.cpp
     wallclocktimer.cpp)
 
 set(headers
@@ -152,6 +153,7 @@ set(headers
     unitvector.h
     updatevector.h
     usertimer.h
+    validation.h
     vectorbase.h
     vector.h
     wallclocktimer.h)
@@ -180,8 +182,6 @@ target_link_libraries(soplex libsoplex)
 if(NOT LEGACY EQUAL ON)
     add_executable(example EXCLUDE_FROM_ALL example.cpp)
     target_link_libraries(example libsoplex)
-    target_compile_features(libsoplex PUBLIC cxx_thread_local)
-    target_compile_features(libsoplex-pic PUBLIC cxx_thread_local)
 endif()
 
 # set the install rpath to the installed destination
@@ -206,7 +206,7 @@ install(TARGETS soplex libsoplex libsoplex-pic EXPORT soplex-targets
 
 # Add library targets to the build-tree export set
 export(TARGETS libsoplex libsoplex-pic
-  FILE "${PROJECT_BINARY_DIR}/soplex-targets.cmake")
+  FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
 
 #configure the config file for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")

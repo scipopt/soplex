@@ -226,7 +226,7 @@ public:
    {
       POLISH_OFF,           ///< don't perform modifications on optimal basis
       POLISH_INTEGRALITY,   ///< maximize number of basic slack variables, i.e. more variables on bounds
-      POLISH_FRACTIONALITY, ///< minimize number of basic slack variables, i.e. more variables in between bounds
+      POLISH_FRACTIONALITY  ///< minimize number of basic slack variables, i.e. more variables in between bounds
    };
 
 

@@ -26,9 +26,9 @@ option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(COVERAGE "enable coverage support" OFF)
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SOPLEX_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SOPLEX_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${SOPLEX_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # path to e.g. findGMP module
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -38,10 +38,13 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-#set the correct rpath for OS X
+# set the correct rpath for OS X
 set(CMAKE_MACOSX_RPATH ON)
 
-#create target to update the githash
+# use C++11 standard
+set(CMAKE_CXX_STANDARD 11)
+
+# create target to update the githash
 file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
 find_program(GIT git)
 if(GIT)
@@ -80,9 +83,7 @@ if(NOT "${CMAKE_CXX_COMPILE_FEATURES}" MATCHES "cxx_thread_local")
     add_definitions(-DTHREADLOCAL=)
 endif()
 
-#
 # enable coverage support
-#
 if(COVERAGE)
     include(CodeCoverage)
     APPEND_COVERAGE_COMPILER_FLAGS()

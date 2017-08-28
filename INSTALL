@@ -29,7 +29,28 @@
 
         Read the documentation!
 
-        For the impatient:
+
+   a)   New CMake system:
+
+        CMake is the recommended build system. It should configure your
+        build automatically according to your environment and the available
+        third-party libraries.
+        Follow the guidelines of a typical CMake project (http://cmake.org/):
+
+        create a build directory:
+        `mkdir build`
+
+        configure the build from within that directory (cd build):
+        `cmake <SoPlex-root>`
+
+        compile according to the set options:
+        `make` or `cmake --build .`
+
+        List available options and corresponding descriptions for CMake:
+        cmake <SoPlex-root> -LH
+
+
+   b)   Old Makefile system:
 
         On systems with GNU g++   :  make COMP=gnu OPT=opt (default)
         Linux/x86 with Intel C++  :  make COMP=intel OPT=opt
