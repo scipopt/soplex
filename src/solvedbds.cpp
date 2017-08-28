@@ -3024,6 +3024,7 @@ namespace soplex
          {
             case 0:
                _decompVarBoundDualIDs[i*2] = tempId;
+               // FALLTHROUGH
             case 1:
                _decompVarBoundDualIDs[i*2 + 1] = tempId;
                break;
@@ -3586,6 +3587,7 @@ namespace soplex
                _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum+1]))) ||
                (primalRowNum > 0 && _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum-1])) ==
                _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum]))));
+               // FALLTHROUGH
          case LPRowBase<Real>::LESS_EQUAL:
             return SLACKCOEFF;
             break;
