@@ -4,6 +4,7 @@ Developer Version
 features:
 - new condition number estimate based on the quotient of max and min diagonal element of LU factorization
   (final condition number is also printed in statistics)
+- new CMake build system alongside existing Makefiles
 
 performance:
 
