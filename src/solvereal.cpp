@@ -166,7 +166,7 @@ namespace soplex
             _preprocessAndSolveReal(false);
             return;
          }
-         // no break
+         // FALLTHROUGH
       case SPxSolver::ABORT_TIME:
       case SPxSolver::ABORT_ITER:
       case SPxSolver::ABORT_VALUE:
