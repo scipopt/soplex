@@ -1,12 +1,10 @@
-Developer Version
-=================
+01 September 2017 - Release 3.0.1
+=================================
 
 features:
 - new condition number estimate based on the quotient of max and min diagonal element of LU factorization
   (final condition number is also printed in statistics)
 - new CMake build system alongside existing Makefiles
-
-performance:
 
 interface & parameters:
 - allow arbitrary order of inputs/parameters, esp. filename is not required to be last
@@ -18,10 +16,6 @@ fixed bugs:
 - fixed compilation error with WITH_LONG_DOUBLE
 - fixed wrong objective value when using an obj offset
 - use correct row and column names when writing the dual problem
-
-code quality:
-
-
 
 
 08 March 2017 - Release 3.0.0
