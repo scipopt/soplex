@@ -122,12 +122,11 @@
 7.      Publications
 
         Any publication for which SoPlex has been used must include an
-        acknowledgement and a reference to the Ph.D. thesis:
+        acknowledgement and a reference to the latest SCIP Optimization Suite report:
 
-        Roland Wunderling,
-        "Paralleler und Objekt-orientierter Simplex-Algorithmus",
-        Ph.D. thesis, TU Berlin, 1996, available as ZIB-Report 96-09
-        under http://nbn-resolving.de/urn:nbn:de:0297-zib-5386
+        Maher et al.
+        "The SCIP Optimization Suite 4.0",
+        http://www.optimization-online.org/DB_HTML/2017/03/5895.html
 
         If you use SoPlex as an exact rational LP solver, please cite
         the references
