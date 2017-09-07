@@ -47,19 +47,13 @@ set(CMAKE_CXX_STANDARD 11)
 # create target to update the githash
 file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
 find_program(GIT git)
-if(GIT)
+if((GIT) AND (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git))
    execute_process(
       COMMAND \${GIT} describe --always --dirty
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE GITHASH OUTPUT_STRIP_TRAILING_WHITESPACE)
-   if(GITHASH STREQUAL \"\")
-      set(GITHASH \"------\")
-   endif()
    string(REGEX REPLACE \"^.*-g\" \"\" GITHASH \${GITHASH})
 else()
-   set(GITHASH \"------\")
-endif()
-if(GITHASH STREQUAL \"------\")
    # read stored hash from file
    file(STRINGS \${DST} GITHASH)
    string(REGEX REPLACE \"#define SPX_GITHASH \" \"\" GITHASH \${GITHASH})
