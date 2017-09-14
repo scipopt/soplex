@@ -1,3 +1,14 @@
+Developer Version
+=================
+
+features:
+
+interface & parameters:
+
+fixed bugs:
+ - correct API method for multiplication with basis matrix for sparse vectors
+
+
 01 September 2017 - Release 3.0.1
 =================================
 
