@@ -44,6 +44,7 @@ void SLUFactor::solveRight(Vector& x, const Vector& b) //const
    solveTime->start();
 
    vec = b;
+   x.clear();
    CLUFactor::solveRight(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
@@ -366,7 +367,6 @@ void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
    solveTime->start();
 
    vec = b;
-   ///@todo Why is x.clear() here used and not with solveRight() ?
    x.clear();
    CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
 

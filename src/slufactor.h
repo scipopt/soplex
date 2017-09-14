@@ -189,6 +189,11 @@ public:
    //@{
    /// Solves \f$Ax=b\f$.
    void solveRight (Vector& x, const Vector& b);
+   void solveRight(SSVector& x, const SSVector& b)
+   {
+      x.unSetup();
+      solveRight((Vector&) x, (const Vector&) b);
+   }
    /// Solves \f$Ax=b\f$.
    void solveRight (SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$.
@@ -205,6 +210,11 @@ public:
                            const SVector& b, SSVector& d, SSVector& e);
    /// sparse version of solving one system of equations with transposed basis matrix
    void solveLeft(Vector& x, const Vector& b);
+   void solveLeft(SSVector& x, const SSVector& b)
+   {
+      x.unSetup();
+      solveLeft((Vector&) x, (const Vector&) b);
+   }
    /// Solves \f$Ax=b\f$.
    void solveLeft(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
