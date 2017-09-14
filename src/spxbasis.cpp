@@ -1099,16 +1099,18 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    {
       norm2 = norm1;
 
-      // y = B^-1*x
+      // x = B^-1*y
       factor->solveRight(x, y);
+      x.setup();
       norm1 = x.length();
 
       // stop if converged
       if( c >= miniters && spxAbs(norm1 - norm2) < tolerance * norm1 )
          break;
 
-      // x = B^-T*y and normalize
+      // y = B^-T*x and normalize
       factor->solveLeft(y, x);
+      y.setup();
       norm2 = 1.0 / y.length();
       y *= norm2;
    }
