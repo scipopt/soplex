@@ -356,6 +356,7 @@ public:
    template < class S >
    SSVectorBase<R>& operator+=(const SSVectorBase<S>& vec)
    {
+      assert(vec.isSetup());
       for( int i = vec.size() - 1; i >= 0; --i )
          VectorBase<R>::val[vec.index(i)] += vec.value(i);
 

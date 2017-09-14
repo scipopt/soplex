@@ -8,9 +8,9 @@ project(SOPLEX
 
 set(SOPLEX_VERSION_MAJOR 3)
 set(SOPLEX_VERSION_MINOR 0)
-set(SOPLEX_VERSION_PATCH 0)
-set(SOPLEX_VERSION_SUB 1)
-set(SOPLEX_VERSION_API 1)
+set(SOPLEX_VERSION_PATCH 1)
+set(SOPLEX_VERSION_SUB 0)
+set(SOPLEX_VERSION_API 0)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${SOPLEX_VERSION_MAJOR}")
@@ -47,19 +47,18 @@ set(CMAKE_CXX_STANDARD 11)
 # create target to update the githash
 file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
 find_program(GIT git)
-if(GIT)
+if((GIT) AND (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git))
    execute_process(
       COMMAND \${GIT} describe --always --dirty
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE GITHASH OUTPUT_STRIP_TRAILING_WHITESPACE)
-   if(GITHASH STREQUAL \"\")
-      set(GITHASH \"000000\")
-   endif()
    string(REGEX REPLACE \"^.*-g\" \"\" GITHASH \${GITHASH})
+   file(WRITE \${DST} \"#define SPX_GITHASH \\\"\${GITHASH}\\\"\")
 else()
-   set(GITHASH \"000000\")
+   # read stored hash from file
+   file(STRINGS \${DST} GITHASH)
+   string(REGEX REPLACE \"#define SPX_GITHASH \" \"\" GITHASH \${GITHASH})
 endif()
-file(WRITE \${DST} \"#define SPX_GITHASH \\\"\${GITHASH}\\\"\")
 message(STATUS \"Git hash: \" \${GITHASH})
 ")
 # encode the current git hash into the binary

@@ -1011,9 +1011,18 @@ void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
    assert(matrixIsSetup);
 
    result.clear();
-   for( int i = 0; i < x.size(); ++i )
+   if( x.isSetup() )
    {
-      result.multAdd(x[i], (*matrix[i]));
+      for( int i = 0; i < x.size(); ++i )
+      {
+         int idx = x.index(i);
+         result.multAdd(x[idx], (*matrix[idx]));
+      }
+   }
+   else
+   {
+      for( int i = 0; i < x.dim(); ++i )
+         result.multAdd(x[i], (*matrix[i]));
    }
 
    return;

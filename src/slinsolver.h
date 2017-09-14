@@ -139,6 +139,7 @@ public:
    /// Solves \f$Ax=b\f$.
    virtual void solveRight (Vector& x, const Vector& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
+   virtual void solveRight (SSVector& x, const SSVector& b) /* const */ = 0;
    virtual void solveRight (SSVector& x, const SVector& b) /* const */ = 0;
 
    /** @brief Solves \f$Ax=b\f$.
@@ -173,6 +174,7 @@ public:
                                    SSVector& e) = 0;
    /// solves \f$x^TA=b^T\f$.
    virtual void solveLeft (Vector& x, const Vector& b) /* const */ = 0;
+   virtual void solveLeft (SSVector& x, const SSVector& b) /* const */ = 0;
    /// sparse version of solving one system of equations with transposed basis matrix
    virtual void solveLeft (SSVector& x, const SVector& b) /* const */ = 0;
    /// solves \f$x^TA=b^T\f$ and \f$x^TA=rhs2^T\f$ internally using \f$rhs2\f$.
