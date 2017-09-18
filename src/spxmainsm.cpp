@@ -633,7 +633,10 @@ void SPxMainSM::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& 
    r[m_j] = 0.0;
 
    for(int k = 0; k < m_col.size(); ++k)
-      y[m_col.index(k)] = m_rowObj.value(k);
+   {
+      int idx = m_col.index(k);
+      y[idx] = m_rowObj[idx];
+   }
 
    // basis:
    for(int k = 0; k < m_col.size(); ++k)
