@@ -606,7 +606,7 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
-         int zeros = 0;
+         int nzeros = 0;
          Nonzero<R>* e = m_elem;
          const Nonzero<R>* s = sv.m_elem;
 
@@ -614,12 +614,13 @@ public:
          {
             assert(e != 0);
             if( s->val != 0.0 )
-               *e++ = *s++;
+               *e++ = *s;
             else
-               ++zeros;
+               ++nzeros;
+            ++s;
          }
 
-         set_size(sv.size() - zeros);
+         set_size(sv.size() - nzeros);
       }
 
       return *this;
@@ -634,7 +635,7 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
-         int zeros = 0;
+         int nzeros = 0;
          Nonzero<R>* e = m_elem;
          const Nonzero<S>* s = sv.m_elem;
 
@@ -642,12 +643,13 @@ public:
          {
             assert(e != 0);
             if( s->val != 0.0 )
-               *e++ = *s++;
+               *e++ = *s;
             else
-               ++zeros;
+               ++nzeros;
+            ++s;
          }
 
-         set_size(sv.size() - zeros);
+         set_size(sv.size() - nzeros);
       }
 
       return *this;
