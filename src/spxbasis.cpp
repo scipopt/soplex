@@ -710,7 +710,7 @@ void SPxBasis::printMatrixMTX(int number)
 
    dim = matrix.size();
    nnz = nzCount;
-   sprintf(filename, "basis/basis%d.mtx",number);
+   spxSnprintf(filename, SPX_MAXSTRLEN, "basis/basis%d.mtx", number);
    std::cout << "printing basis matrix to file " << filename << "\n";
    FILE * basisfile;
    basisfile = fopen (filename,"w");

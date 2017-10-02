@@ -1020,8 +1020,7 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 }
 
 SLUFactor::SLUFactor()
-   : CLUFactor() 
-   , vec (1)
+   : vec (1)
    , ssvec (1)
    , usetup (false)
    , uptype (FOREST_TOMLIN)
@@ -1157,7 +1156,6 @@ SLUFactor::SLUFactor()
 
 SLUFactor::SLUFactor(const SLUFactor& old)
    : SLinSolver( old )
-   , CLUFactor()
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
    , usetup(old.usetup)

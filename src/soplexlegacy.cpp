@@ -25,7 +25,6 @@ SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver:
    , m_postScaler(0)
    , m_simplifier(0)
    , m_vanished(false)
-   , m_freePreScaler(false)
    , m_freePostScaler(false)
    , m_freeSimplifier(false)
 {

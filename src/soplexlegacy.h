@@ -51,7 +51,6 @@ protected:
    SPxScaler*      m_postScaler; ///< post-scaler
    SPxSimplifier*  m_simplifier; ///< simplifier
    bool            m_vanished;   ///< did the presolver solve the problem ?
-   bool            m_freePreScaler;   ///< true iff m_preScaler should be freed inside of this object
    bool            m_freePostScaler;  ///< true iff m_postScaler should be freed inside of this object
    bool            m_freeSimplifier;  ///< true iff m_simplifier should be freed inside of this object
    DataArray<SPxSolver::VarStatus> m_colsbasisstatus;
@@ -281,7 +280,7 @@ public:
          if (cnames->has(key))
             return (*cnames)[key];
       }
-      std::sprintf(buf, "x%d", idx);
+      spxSnprintf(buf, SPX_MAXSTRLEN, "x%d", idx);
 
       return buf;
    }
@@ -302,7 +301,7 @@ public:
          if (rnames->has(key))
             return (*rnames)[key];
       }
-      std::sprintf(buf, "C%d", idx);
+      spxSnprintf(buf, SPX_MAXSTRLEN, "C%d", idx);
 
       return buf;
    }

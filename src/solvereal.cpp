@@ -491,7 +491,7 @@ namespace soplex
       _hasSolReal = true;
 
       // unscale vectors
-      if( _scaler && _solver.isScaled() && !_isRealLPLoaded )
+      if( _solver.isScaled() && !_isRealLPLoaded )
          _unscaleSolutionReal(_solver, false);
 
       // get unsimplified solution data from simplifier

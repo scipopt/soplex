@@ -377,7 +377,7 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
                         << std::endl; )
       if (cnum >= 0)
          solver()->coPvec().delta().clearNum(cnum);
-      else
+      else if( pnum >= 0 )
          solver()->pVec().delta().clearNum(pnum);
       return SPxDefaultRT::selectEnter(max, 0, false);
    }
