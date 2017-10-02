@@ -363,28 +363,7 @@ private:
    }
    //@}
 
-   //----------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy construtor.
-   CLUFactorRational(const CLUFactorRational&);
-   /// assignment operator.
-   CLUFactorRational& operator=(const CLUFactorRational&);
-   //@}
-
 protected:
-
-   //----------------------------------------
-   /**@name Construction / destruction */
-   //@{
-   /// default construtor.
-   /** Since there is no sense in constructing a CLUFactor object
-    *  per se, this is protected.
-    */
-
-   CLUFactorRational()
-   {}
-   //@}
 
    //----------------------------------------
    /**@name Solver methods */

@@ -6647,6 +6647,7 @@ namespace soplex
    void SoPlex::printSolutionStatistics(std::ostream& os)
    {
       int prec = (int) os.precision();
+      std::ios_base::fmtflags floatfield = os.floatfield;
       if( _lastSolveMode == SOLVEMODE_REAL )
       {
          os << std::scientific << std::setprecision(8)
@@ -6718,7 +6719,9 @@ namespace soplex
          else
             os << "  Max/sum dual      : - / -\n";
       }
+      // restore previous stream state
       os << std::setprecision(prec);
+      os << std::setiosflags(floatfield);
    }
 
 

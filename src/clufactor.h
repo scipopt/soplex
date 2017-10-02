@@ -351,28 +351,7 @@ private:
    int makeLvec(int p_len, int p_row);
    //@}
 
-   //----------------------------------------
-   /**@name Blocked */
-   //@{
-   /// copy construtor.
-   CLUFactor(const CLUFactor&);
-   /// assignment operator.
-   CLUFactor& operator=(const CLUFactor&);
-   //@}
-
 protected:
-
-   //----------------------------------------
-   /**@name Construction / destruction */
-   //@{
-   /// default construtor. 
-   /** Since there is no sense in constructing a CLUFactor object
-    *  per se, this is protected.
-    */
-
-   CLUFactor()
-   {}
-   //@}
 
    //----------------------------------------
    /**@name Solver methods */

@@ -879,8 +879,11 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
          assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) ||
             thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
 
-         if (max == val)
+         if( max == val || leave == -1 )
+         {
+            assert(max == val && leave == -1);
             return -1;
+         }
 
          if (!maxShortLeave(sel, leave, maxabs))
          {
@@ -917,8 +920,11 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
          assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) ||
             thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
 
-         if (max == val)
+         if( max == val || leave == -1 )
+         {
+            assert(max == val && leave == -1);
             return -1;
+         }
 
          if (!minShortLeave(sel, leave, maxabs))
          {

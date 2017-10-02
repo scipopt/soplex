@@ -20,7 +20,7 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h src/spxdefines.h \
  src/spxsteepexpr.h src/spxdantzigpr.h src/spxparmultpr.h \
  src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
  src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
- src/solbase.h src/spxgithash.h
+ src/solbase.h src/spxgithash.h src/validation.h
 $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/spxdefines.h \
  src/basevectors.h src/rational.h src/idlist.h src/islist.h \
  src/vectorbase.h src/dvectorbase.h src/spxalloc.h src/spxout.h \
@@ -774,6 +774,30 @@ $(LIBOBJDIR)/statistics.o: src/statistics.cpp src/statistics.h src/soplex.h \
  src/solbase.h
 $(LIBOBJDIR)/usertimer.o: src/usertimer.cpp src/spxdefines.h src/usertimer.h \
  src/timer.h
+$(LIBOBJDIR)/validation.o: src/validation.cpp src/validation.h src/soplex.h \
+ src/spxdefines.h src/basevectors.h src/rational.h src/idlist.h \
+ src/islist.h src/vectorbase.h src/dvectorbase.h src/spxalloc.h \
+ src/spxout.h src/exceptions.h src/ssvectorbase.h src/idxset.h \
+ src/svectorbase.h src/dsvectorbase.h src/unitvectorbase.h \
+ src/svsetbase.h src/classarray.h src/dataset.h src/dataarray.h \
+ src/datakey.h src/spxsolver.h src/timer.h src/timerfactory.h \
+ src/notimer.h src/usertimer.h src/wallclocktimer.h src/spxlp.h \
+ src/spxlpbase.h src/spxid.h src/lprowbase.h src/lpcolbase.h \
+ src/lprowsetbase.h src/lpcolsetbase.h src/nameset.h src/datahashtable.h \
+ src/didxset.h src/spxfileio.h src/gzstream.h src/spxscaler.h \
+ src/vector.h src/svector.h src/svset.h src/dsvector.h src/dvector.h \
+ src/lprowset.h src/lpcolset.h src/lprow.h src/lpcol.h src/spxbasis.h \
+ src/ssvector.h src/slinsolver.h src/array.h src/random.h \
+ src/unitvector.h src/updatevector.h src/slufactor.h src/clufactor.h \
+ src/slufactor_rational.h src/slinsolver_rational.h \
+ src/clufactor_rational.h src/spxsimplifier.h src/spxmainsm.h \
+ src/spxequilisc.h src/spxleastsqsc.h src/spxgeometsc.h src/spxstarter.h \
+ src/spxweightst.h src/spxsumst.h src/spxvectorst.h src/spxpricer.h \
+ src/sorter.h src/spxautopr.h src/spxdevexpr.h src/spxsteeppr.h \
+ src/spxsteepexpr.h src/spxdantzigpr.h src/spxparmultpr.h \
+ src/spxhybridpr.h src/spxratiotester.h src/spxdefaultrt.h \
+ src/spxharrisrt.h src/spxfastrt.h src/spxboundflippingrt.h src/sol.h \
+ src/solbase.h
 $(LIBOBJDIR)/wallclocktimer.o: src/wallclocktimer.cpp src/spxdefines.h \
  src/wallclocktimer.h src/timer.h
 $(LIBOBJDIR)/updatevector.o: src/updatevector.cpp src/updatevector.h src/spxdefines.h \

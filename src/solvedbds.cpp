@@ -2227,13 +2227,15 @@ namespace soplex
             //
             // 22.06.2015 Testing keeping all constraints in the complementary problem.
             // This requires a dual column to be fixed to zero for the range and equality rows.
+#ifdef KEEP_ALL_ROWS_IN_COMP_PROB
             bool incrementI = false;
+#endif
             if( i + 1 < prevPrimalRowIds
                   && _realLP->number(_decompPrimalRowIDs[i]) == _realLP->number(_decompPrimalRowIDs[i+1]) )
             {
                assert(_decompPrimalRowIDs[i].idx == _decompPrimalRowIDs[i+1].idx);
 
-#if 0 // 22.06.2015
+#ifdef KEEP_ALL_ROWS_IN_COMP_PROB // 22.06.2015
                if( _realLP->rowType(_decompPrimalRowIDs[i]) == LPRowBase<Real>::RANGE )
                {
                   _compSolver.changeObj(_decompDualColIDs[i + 1], 0.0);
@@ -2279,7 +2281,7 @@ namespace soplex
                //assert(isZero(dualVector[solverRowNum], 0.0));
 
                // 22.06.2015 Testing keeping all rows in the complementary problem
-#if 0
+#ifdef KEEP_ALL_ROWS_IN_COMP_PROB
                switch( _realLP->rowType(_decompPrimalRowIDs[i]) )
                {
                   case LPRowBase<Real>::RANGE:
@@ -2325,9 +2327,10 @@ namespace soplex
                prevPrimalRowIds--;
 #endif
             }
-
+#ifdef KEEP_ALL_ROWS_IN_COMP_PROB
             if( incrementI )
                i++;
+#endif
          }
          else
          {
@@ -3594,8 +3597,6 @@ namespace soplex
          default:
             throw SPxInternalCodeException("XDECOMPSL01 This should never happen.");
       }
-
-      return 0;
    }
 
 
