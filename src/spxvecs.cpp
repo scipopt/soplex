@@ -228,6 +228,7 @@ void SPxSolver::computeFrhs1(
 
          case (SPxBasis::Desc::P_FIXED) :
             assert(EQ(lfb[i], ufb[i]));
+            //lint -fallthrough
          case (SPxBasis::Desc::D_ON_BOTH) :
             x = lfb[i];
             break;

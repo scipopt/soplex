@@ -54,7 +54,7 @@ void NameSet::add(DataKey& p_key, const char* str)
       char* tmp = &(mem[idx]);
       memused  += int(strlen(str)) + 1;
 
-      strcpy(tmp, str);
+      spxSnprintf(tmp, SPX_MAXSTRLEN, str);
       *(set.create(p_key)) = idx;
       Name memname(tmp);
       hashtab.add(memname, p_key);
@@ -165,7 +165,7 @@ void NameSet::memPack()
    for(i = 0; i < num(); i++)
    {
       const char* t = &mem[set[i]];
-      strcpy(&newmem[newlast], t);
+      spxSnprintf(&newmem[newlast], SPX_MAXSTRLEN, t);
       set[i] = newlast;
       newlast += int(strlen(t)) + 1;      
    }

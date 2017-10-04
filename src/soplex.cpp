@@ -5988,6 +5988,9 @@ namespace soplex
       if( value < _currentSettings->realParam.lower[param] || value > _currentSettings->realParam.upper[param] )
          return false;
 
+      // required to set a different feastol or opttol
+      Real tmp_value = value;
+
       switch( param )
       {
       // primal feasibility tolerance; passed to the floating point solver only when calling solve()
@@ -5995,7 +5998,8 @@ namespace soplex
 #ifndef SOPLEX_WITH_GMP
          if( value < DEFAULT_EPS_PIVOT )
          {
-            MSG_WARNING( spxout, spxout << "Cannot set feasibility tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_ZERO << ".\n");
+            MSG_WARNING( spxout, spxout << "Cannot set feasibility tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
+            tmp_value = DEFAULT_EPS_PIVOT;
             _rationalFeastol = DEFAULT_EPS_PIVOT;
             break;
          }
@@ -6008,7 +6012,8 @@ namespace soplex
 #ifndef SOPLEX_WITH_GMP
          if( value < DEFAULT_EPS_PIVOT )
          {
-            MSG_WARNING( spxout, spxout << "Cannot set optimality tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_ZERO << ".\n");
+            MSG_WARNING( spxout, spxout << "Cannot set optimality tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
+            tmp_value = DEFAULT_EPS_PIVOT;
             _rationalOpttol = DEFAULT_EPS_PIVOT;
             break;
          }
@@ -6120,7 +6125,7 @@ namespace soplex
          return false;
       }
 
-      _currentSettings->_realParamValues[param] = value;
+      _currentSettings->_realParamValues[param] = tmp_value;
       return true;
    }
 
@@ -6642,6 +6647,7 @@ namespace soplex
    void SoPlex::printSolutionStatistics(std::ostream& os)
    {
       int prec = (int) os.precision();
+      std::ios_base::fmtflags floatfield = os.floatfield;
       if( _lastSolveMode == SOLVEMODE_REAL )
       {
          os << std::scientific << std::setprecision(8)
@@ -6713,7 +6719,9 @@ namespace soplex
          else
             os << "  Max/sum dual      : - / -\n";
       }
+      // restore previous stream state
       os << std::setprecision(prec);
+      os << std::setiosflags(floatfield);
    }
 
 

@@ -35,7 +35,10 @@
 #include <float.h>
 #endif
 
-
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <iostream>
 
 namespace soplex
 {
@@ -242,6 +245,8 @@ typedef double Real;
 
 #define MAXIMUM(x,y)        ((x)>(y) ? (x) : (y))
 #define MINIMUM(x,y)        ((x)<(y) ? (x) : (y))
+
+#define SPX_MAXSTRLEN       1024 /**< maximum string length in SoPlex */
 
 THREADLOCAL extern const Real infinity;
 
@@ -453,6 +458,43 @@ inline bool GTrel(Real a, Real b, Real eps = Param::epsilon())
 inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
 {
    return relDiff(a, b) > -eps;
+}
+
+/// safe version of snprintf
+inline int spxSnprintf(
+   char*                 t,                  /**< target string */
+   int                   len,                /**< length of the string to copy */
+   const char*           s,                  /**< source string */
+   ...                                       /**< further parameters */
+   )
+{
+   va_list ap;
+   int n;
+
+   assert(t != NULL);
+   assert(len > 0);
+
+   va_start(ap, s); /*lint !e826*/
+
+#if defined(_WIN32) || defined(_WIN64)
+   n = _vsnprintf(t, (size_t) len, s, ap);
+#else
+   n = vsnprintf(t, (size_t) len, s, ap); /*lint !e571*/
+#endif
+   va_end(ap);
+
+   if( n < 0 || n >= len )
+   {
+#ifndef NDEBUG
+      if( n < 0 )
+      {
+         MSG_ERROR( std::cerr << "vsnprintf returned " << n << std::endl; )
+      }
+#endif
+      t[len-1] = '\0';
+      n = len-1;
+   }
+   return n;
 }
 
 } // namespace soplex

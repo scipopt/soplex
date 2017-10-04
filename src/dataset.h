@@ -410,31 +410,19 @@ public:
    /// if it doesn't exist.
    int number(const DataKey& k) const
    {
-      return (k.idx < 0 || k.idx >= size()) ? -1
-          : theitem[k.idx].info;
+      if( k.idx < 0 || k.idx >= size() )
+         throw SPxException("Invalid index");
+      return theitem[k.idx].info;
    }
 
    /**@todo Please check whether this is correctly implemented! */
-   /// returns the number of element \p item in DataSet or -1, 
-   /// if it doesn't exist.
+   /// returns the number of element \p item in DataSet,
+   /// throws exception if it doesn't exist.
    int number(const DATA* item) const
-   {      
+   {
       ptrdiff_t idx = reinterpret_cast<const struct Item*>(item) - theitem;
-
-      if( idx < 0 || idx >= size())
-         return -1;
-
-      /* ??? old code:
-         if ((reinterpret_cast<unsigned long>(item) < 
-              reinterpret_cast<unsigned long>(theitem) )
-             || 
-             ( reinterpret_cast<unsigned long>(item) >= 
-               reinterpret_cast<unsigned long>(&(theitem[size()]))))
-            return -1;
-         long idx = ((reinterpret_cast<long>(item)) 
-                  - (reinterpret_cast<long>(theitem))) 
-                    / sizeof(Item);
-      */
+      if( idx < 0 || idx >= size() )
+         throw SPxException("Invalid index");
       return theitem[idx].info;
    }
 
@@ -453,7 +441,16 @@ public:
    /// Does \p item belong to DataSet?
    bool has(const DATA* item) const
    {
-      return number(item) >= 0;
+      int n;
+      try
+      {
+         n = number(item);
+      }
+      catch(const SPxException &x)
+      {
+         return false;
+      }
+      return n >= 0;
    }
    //@}
 

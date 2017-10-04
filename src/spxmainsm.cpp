@@ -1516,9 +1516,11 @@ void SPxMainSM::handleExtremes(SPxLP& lp)
             if (isZero(aij * absBnd, tol))
             {
                SVector& row = lp.rowVector_w(col.index(i));
+               int row_j = row.pos(j);
 
                // this changes col.size()
-               row.remove(row.pos(j));
+               if( row_j >= 0 )
+                  row.remove(row_j);
                col.remove(i);
 
                MSG_DEBUG( (*spxout) << "IMAISM04 aij=" << aij
