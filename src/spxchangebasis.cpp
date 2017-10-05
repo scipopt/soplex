@@ -147,7 +147,7 @@ void SPxBasis::removedRow(int i)
          {
             SPxId id = baseId(j);
 
-            if (id.isSPxRowId() && theLP->has(SPxRowId(id)))
+            if (id.isSPxRowId() && !theLP->has(SPxRowId(id)))
             {
                baseId(j) = baseId(theLP->dim());
 
@@ -332,7 +332,7 @@ void SPxBasis::removedCol(int i)
          for (int j = theLP->dim(); j >= 0; --j)
          {
             SPxId id = baseId(j);
-            if (id.isSPxColId() && theLP->has(SPxColId(id)))
+            if (id.isSPxColId() && !theLP->has(SPxColId(id)))
             {
                baseId(j) = baseId(theLP->dim());
                if ( matrixIsSetup &&
