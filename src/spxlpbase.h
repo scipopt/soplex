@@ -538,6 +538,26 @@ public:
          : LPRowSetBase<R>::number(id);
    }
 
+   /// Returns the row number of the row with identifier \p id.
+   bool has(const SPxRowId& id) const
+   {
+      return LPRowSetBase<R>::has(id);
+   }
+
+   /// Returns the column number of the column with identifier \p id.
+   bool has(const SPxColId& id) const
+   {
+      return LPColSetBase<R>::has(id);
+   }
+
+   /// Returns the row or column number for identifier \p id.
+   bool has(const SPxId& id) const
+   {
+      return (id.type() == SPxId::COL_ID)
+         ? LPColSetBase<R>::has(id)
+         : LPRowSetBase<R>::has(id);
+   }
+
    /// Returns the row identifier for row \p n.
    SPxRowId rId(int n) const
    {
