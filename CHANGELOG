@@ -8,6 +8,7 @@ interface & parameters:
 fixed bugs:
 - correct API method for multiplication with basis matrix for sparse vectors
 - correct behavior for constraints/variables with infinite sides/bounds (relaxed rows/cols)
+- fixed bug when setting and getting dual pricing norms
 
 
 01 September 2017 - Release 3.0.1

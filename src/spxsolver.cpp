@@ -1031,6 +1031,9 @@ SPxSolver::SPxSolver(
    , remainingRoundsLeave(0)
    , remainingRoundsEnter(0)
    , remainingRoundsEnterCo(0)
+   , weights(0)
+   , coWeights(0)
+   , weightsAreSetup(false)
    , integerVariables(0)
 {
    theTime = TimerFactory::createTimer(timerType);
@@ -1159,6 +1162,9 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       remainingRoundsLeave = base.remainingRoundsLeave;
       remainingRoundsEnter = base.remainingRoundsEnter;
       remainingRoundsEnterCo = base.remainingRoundsEnterCo;
+      weights = base.weights;
+      coWeights = base.coWeights;
+      weightsAreSetup = base.weightsAreSetup;
       spxout = base.spxout;
       integerVariables = base.integerVariables;
 
@@ -1354,6 +1360,9 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , remainingRoundsLeave(base.remainingRoundsLeave)
    , remainingRoundsEnter(base.remainingRoundsEnter)
    , remainingRoundsEnterCo(base.remainingRoundsEnterCo)
+   , weights(base.weights)
+   , coWeights(base.coWeights)
+   , weightsAreSetup(base.weightsAreSetup)
    , spxout(base.spxout)
    , integerVariables(base.integerVariables)
 {
@@ -1878,12 +1887,6 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
    forceRecompNonbasicValue();
 }
 
-void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
-{
-   assert(thepricer != NULL);
-   return thepricer->getNdualNorms(nnormsRow, nnormsCol);
-}
-
 // NOTE: This only works for the row representation. Need to update to account for column representation.
 // The degenvec differs relative to the algorithm being used.
 // For the primal simplex, degenvec is the primal solution values.
@@ -1950,16 +1953,101 @@ Real SPxSolver::getDegeneracyLevel(Vector degenvec)
    return degeneracyLevel;
 }
 
+void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+{
+   nnormsRow = 0;
+   nnormsCol = 0;
+
+   if( weightsAreSetup )
+   {
+      if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN )
+      {
+         nnormsRow = coWeights.dim();
+         nnormsCol = 0;
+
+         assert(nnormsRow == dim());
+      }
+      else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW )
+      {
+         nnormsRow = weights.dim();
+         nnormsCol = coWeights.dim();
+
+         assert(nnormsRow == coDim());
+         assert(nnormsCol == dim());
+      }
+   }
+   std::cout << "getNDualNorms: nnormsRow=" << nnormsRow << ", nnormsCol=" << nnormsCol << std::endl;
+}
+
 bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
 {
-   assert(thepricer != NULL);
-   return thepricer->getDualNorms(nnormsRow, nnormsCol, norms);
+   nnormsRow = 0;
+   nnormsCol = 0;
+
+   std::cout << "getDualNorms" << std::endl;
+   if( !weightsAreSetup )
+      return false;
+
+   if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN )
+   {
+      nnormsCol = 0;
+      nnormsRow = coWeights.dim();
+
+      assert(nnormsRow == dim());
+
+      for( int i = 0; i < nnormsRow; ++i)
+         norms[i] = coWeights[i];
+   }
+   else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW )
+   {
+      nnormsRow = weights.dim();
+      nnormsCol = coWeights.dim();
+
+      assert(nnormsCol == dim());
+      assert(nnormsRow == coDim());
+
+      for( int i = 0; i < nnormsRow; ++i )
+         norms[i] = weights[i];
+
+      for( int i = 0; i < nnormsCol; ++i )
+         norms[nnormsRow + i] = coWeights[i];
+   }
+   else
+      return false;
+
+   std::cout << "getDualNorms success: nnormsRow=" << nnormsRow << ", nnormsCol=" << nnormsCol << std::endl;
+   return true;
 }
 
 bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
 {
-   assert(thepricer != NULL);
-   return thepricer->setDualNorms(nnormsRow, nnormsCol, norms);
+   std::cout << "setDualNorms: nrows=" << nnormsRow << ", ncols=" << nnormsCol << std::endl;
+   weightsAreSetup = false;
+
+   if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
+   {
+      coWeights.reDim(dim(), false);
+      assert(coWeights.dim() >= nnormsRow);
+      for( int i = 0; i < nnormsRow; ++i )
+         coWeights[i] = norms[i];
+      weightsAreSetup = true;
+   }
+   else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW)
+   {
+      weights.reDim(coDim(), false);
+      coWeights.reDim(dim(), false);
+      assert(weights.dim() >= nnormsRow);
+      assert(coWeights.dim() >= nnormsCol);
+      for( int i = 0; i < nnormsRow; ++i )
+         weights[i] = norms[i];
+      for( int i = 0; i < nnormsCol; ++i )
+         coWeights[i] = norms[nnormsRow + i];
+      weightsAreSetup = true;
+   }
+   else
+      return false;
+   std::cout << "setDualNorms success: dim=" << dim() << ", coDim=" << coDim() << std::endl;
+   return true;
 }
 
 void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)

@@ -33,7 +33,6 @@ namespace soplex
 void SPxSteepPR::clear()
 {
    thesolver = 0;
-   weightsAreSetup = false;
 }
 
 void SPxSteepPR::load(SPxSolver* base)
@@ -85,12 +84,14 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    int i;
    int endDim = 0;
    int endCoDim = 0;
+   DVector& weights = thesolver->weights;
+   DVector& coWeights = thesolver->coWeights;
 
    if( setup == DEFAULT )
    {
       if( type == SPxSolver::ENTER )
       {
-         if( weightsAreSetup )
+         if( thesolver->weightsAreSetup )
          {
             // check for added/removed rows and adapt norms accordingly
             if (coWeights.dim() < thesolver->dim())
@@ -114,7 +115,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
       {
          assert(type == SPxSolver::LEAVE);
 
-         if( weightsAreSetup )
+         if( thesolver->weightsAreSetup )
          {
             // check for added/removed rows and adapt norms accordingly
             if (coWeights.dim() < thesolver->dim())
@@ -153,16 +154,16 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
          }
       }
    }
-   weightsAreSetup = true;
+   thesolver->weightsAreSetup = true;
 }
 
 void SPxSteepPR::setRep(SPxSolver::Representation)
 {
    if (workVec.dim() != thesolver->dim())
    {
-      DVector tmp = weights;
-      weights = coWeights;
-      coWeights = tmp;
+      DVector tmp = thesolver->weights;
+      thesolver->weights = thesolver->coWeights;
+      thesolver->coWeights = tmp;
 
       workVec.clear();
       workVec.reDim(thesolver->dim());
@@ -176,7 +177,7 @@ void SPxSteepPR::left4(int n, SPxId id)
    if (id.isValid())
    {
       Real        delta         = 0.1 + 1.0 / thesolver->basis().iteration();
-      Real*       coWeights_ptr = coWeights.get_ptr();
+      Real*       coWeights_ptr = thesolver->coWeights.get_ptr();
       const Real* workVec_ptr   = workVec.get_const_ptr();
       const Real* rhoVec        = thesolver->fVec().delta().values();
       Real        rhov_1        = 1.0 / rhoVec[n];
@@ -221,7 +222,7 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
    int nsorted;
    Real x;
    const Real* fTest = thesolver->fTest().get_const_ptr();
-   const Real* cpen = coWeights.get_const_ptr();
+   const Real* cpen = thesolver->coWeights.get_const_ptr();
    IdxElement price;
    prices.clear();
    bestPrices.clear();
@@ -305,7 +306,7 @@ int SPxSteepPR::selectLeave()
 
 int SPxSteepPR::selectLeaveX(Real tol)
 {
-   const Real* coWeights_ptr = coWeights.get_const_ptr();
+   const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
    Real best = -infinity;
    Real x;
@@ -332,7 +333,7 @@ int SPxSteepPR::selectLeaveX(Real tol)
 
 int SPxSteepPR::selectLeaveSparse(Real tol)
 {
-   const Real* coWeights_ptr = coWeights.get_const_ptr();
+   const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
    const Real* fTest         = thesolver->fTest().get_const_ptr();
    Real best = -infinity;
    Real x;
@@ -367,7 +368,7 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
 
 int SPxSteepPR::selectLeaveHyper(Real tol)
 {
-   const Real* coPen = coWeights.get_const_ptr();
+   const Real* coPen = thesolver->coWeights.get_const_ptr();
    const Real* fTest = thesolver->fTest().get_const_ptr();
    Real leastBest = infinity;
    Real best = -infinity;
@@ -443,8 +444,8 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
    if (n >= 0 && n < thesolver->dim())
    {
       Real delta = 2 + 1.0 / thesolver->basis().iteration();
-      Real* coWeights_ptr = coWeights.get_ptr();
-      Real* weights_ptr = weights.get_ptr();
+      Real* coWeights_ptr = thesolver->coWeights.get_ptr();
+      Real* weights_ptr = thesolver->weights.get_ptr();
       const Real* workVec_ptr = workVec.get_const_ptr();
       const Real* pVec = thesolver->pVec().delta().values();
       const IdxSet& pIdx = thesolver->pVec().idx();
@@ -503,7 +504,7 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
 SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
 {
    const Real* coTest        = thesolver->coTest().get_const_ptr();
-   const Real* coWeights_ptr = coWeights.get_const_ptr();
+   const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
    int idx;
    int nsorted;
    Real x;
@@ -556,7 +557,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
 SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
 {
    const Real* test        = thesolver->test().get_const_ptr();
-   const Real* weights_ptr = weights.get_const_ptr();
+   const Real* weights_ptr = thesolver->weights.get_const_ptr();
    int idx;
    int nsorted;
    Real x;
@@ -675,7 +676,7 @@ SPxId SPxSteepPR::selectEnterX(Real tol)
 SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
 {
    const Real* coTest        = thesolver->coTest().get_const_ptr();
-   const Real* coWeights_ptr = coWeights.get_const_ptr();
+   const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
 
    Real leastBest = infinity;
    Real x;
@@ -752,7 +753,7 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
 SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
 {
    const Real* test        = thesolver->test().get_const_ptr();
-   const Real* weights_ptr = weights.get_const_ptr();
+   const Real* weights_ptr = thesolver->weights.get_const_ptr();
 
    Real leastBest = infinity;
    Real x;
@@ -830,7 +831,7 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* coTest        = thesolver->coTest().get_const_ptr();
-   const Real* coWeights_ptr = coWeights.get_const_ptr();
+   const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
 
    int idx;
    Real x;
@@ -862,7 +863,7 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* test          = thesolver->test().get_const_ptr();
-   const Real* weights_ptr   = weights.get_const_ptr();
+   const Real* weights_ptr   = thesolver->weights.get_const_ptr();
 
    int idx;
    Real x;
@@ -894,7 +895,7 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* coTest        = thesolver->coTest().get_const_ptr();
-   const Real* coWeights_ptr = coWeights.get_const_ptr();
+   const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
 
    Real x;
 
@@ -918,7 +919,7 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* test          = thesolver->test().get_const_ptr();
-   const Real* weights_ptr   = weights.get_const_ptr();
+   const Real* weights_ptr   = thesolver->weights.get_const_ptr();
 
    Real x;
 
@@ -941,6 +942,7 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
 
 void SPxSteepPR::addedVecs(int n)
 {
+   DVector& weights = thesolver->weights;
    n = weights.dim();
    weights.reDim(thesolver->coDim());
 
@@ -953,6 +955,7 @@ void SPxSteepPR::addedVecs(int n)
 
 void SPxSteepPR::addedCoVecs(int n)
 {
+   DVector& coWeights = thesolver->coWeights;
    n = coWeights.dim();
    workVec.reDim (thesolver->dim());
    coWeights.reDim (thesolver->dim());
@@ -963,13 +966,15 @@ void SPxSteepPR::addedCoVecs(int n)
 void SPxSteepPR::removedVec(int i)
 {
    assert(thesolver != 0);
+   DVector& weights = thesolver->weights;
    weights[i] = weights[weights.dim()];
-   weights.reDim(thesolver->coDim());
+   weights.reDim(thesolver->dim());
 }
 
 void SPxSteepPR::removedVecs(const int perm[])
 {
    assert(thesolver != 0);
+   DVector& weights = thesolver->weights;
    if (thesolver->type() == SPxSolver::ENTER)
    {
       int i;
@@ -986,6 +991,7 @@ void SPxSteepPR::removedVecs(const int perm[])
 void SPxSteepPR::removedCoVec(int i)
 {
    assert(thesolver != 0);
+   DVector& coWeights = thesolver->coWeights;
    coWeights[i] = coWeights[coWeights.dim()];
    coWeights.reDim(thesolver->dim());
 }
@@ -993,6 +999,7 @@ void SPxSteepPR::removedCoVec(int i)
 void SPxSteepPR::removedCoVecs(const int perm[])
 {
    assert(thesolver != 0);
+   DVector& coWeights = thesolver->coWeights;
    int i;
    int j = coWeights.dim();
    for (i = 0; i < j; ++i)
@@ -1006,6 +1013,8 @@ void SPxSteepPR::removedCoVecs(const int perm[])
 bool SPxSteepPR::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
+   DVector& w = thesolver->weights;
+   DVector& coW = thesolver->coWeights;
    if (thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
    {
       int i;
@@ -1014,7 +1023,7 @@ bool SPxSteepPR::isConsistent() const
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {
          thesolver->basis().coSolve(tmp, thesolver->unitVector(i));
-         x = coWeights[i] - tmp.length2();
+         x = coW[i] - tmp.length2();
          if (x > thesolver->leavetol() || -x > thesolver->leavetol())
          {
             MSG_ERROR( std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
@@ -1027,13 +1036,13 @@ bool SPxSteepPR::isConsistent() const
       int i;
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {
-         if (coWeights[i] < thesolver->epsilon())
+         if (coW[i] < thesolver->epsilon())
             return MSGinconsistent("SPxSteepPR");
       }
 
       for (i = thesolver->coDim() - 1; i >= 0; --i)
       {
-         if (weights[i] < thesolver->epsilon())
+         if (w[i] < thesolver->epsilon())
             return MSGinconsistent("SPxSteepPR");
       }
    }
