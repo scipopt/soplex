@@ -5135,6 +5135,7 @@ namespace soplex
 
       if( unscale && _realLP->isScaled() )
       {
+         MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
          SPxLPReal* origLP;
          origLP = 0;
          spx_alloc(origLP);
