@@ -1976,7 +1976,6 @@ void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
          assert(nnormsCol == dim());
       }
    }
-   std::cout << "getNDualNorms: nnormsRow=" << nnormsRow << ", nnormsCol=" << nnormsCol << std::endl;
 }
 
 bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
@@ -1984,7 +1983,6 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
    nnormsRow = 0;
    nnormsCol = 0;
 
-   std::cout << "getDualNorms" << std::endl;
    if( !weightsAreSetup )
       return false;
 
@@ -2015,13 +2013,11 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
    else
       return false;
 
-   std::cout << "getDualNorms success: nnormsRow=" << nnormsRow << ", nnormsCol=" << nnormsCol << std::endl;
    return true;
 }
 
 bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
 {
-   std::cout << "setDualNorms: nrows=" << nnormsRow << ", ncols=" << nnormsCol << std::endl;
    weightsAreSetup = false;
 
    if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
@@ -2046,7 +2042,6 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
    }
    else
       return false;
-   std::cout << "setDualNorms success: dim=" << dim() << ", coDim=" << coDim() << std::endl;
    return true;
 }
 
