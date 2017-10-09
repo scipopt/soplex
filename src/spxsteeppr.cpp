@@ -968,7 +968,7 @@ void SPxSteepPR::removedVec(int i)
    assert(thesolver != 0);
    DVector& weights = thesolver->weights;
    weights[i] = weights[weights.dim()];
-   weights.reDim(thesolver->dim());
+   weights.reDim(thesolver->coDim());
 }
 
 void SPxSteepPR::removedVecs(const int perm[])

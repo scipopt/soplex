@@ -69,7 +69,7 @@ void SPxDevexPR::setupWeights(SPxSolver::Type tp)
          coWeights[i] = 2.0;
       weights.reDim(thesolver->coDim(), false);
       for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
-         weights[i] = 1.0;
+         weights[i] = 2.0;
    }
    else
    {
@@ -83,7 +83,7 @@ void SPxDevexPR::setupWeights(SPxSolver::Type tp)
       }
       coWeights.reDim(thesolver->dim(), false);
       for (i = thesolver->dim() - 1; i >= endDim; --i )
-         coWeights[i] = 1.0;
+         coWeights[i] = 2.0;
    }
    thesolver->weightsAreSetup = true;
 }
