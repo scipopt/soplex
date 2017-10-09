@@ -9,6 +9,7 @@ fixed bugs:
 - correct API method for multiplication with basis matrix for sparse vectors
 - correct behavior for constraints/variables with infinite sides/bounds (relaxed rows/cols)
 - don't print infeasible primal/dual solutions
+- properly clear update vectors in initialization step
 
 01 September 2017 - Release 3.0.1
 =================================

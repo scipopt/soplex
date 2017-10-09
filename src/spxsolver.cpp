@@ -323,6 +323,7 @@ void SPxSolver::init()
    if (!initialized)
    {
       initialized = true;
+      clearUpdateVecs();
       reDim();
       if (SPxBasis::status() <= SPxBasis::NO_PROBLEM || solver() != this)
          SPxBasis::load(this);
