@@ -43,8 +43,8 @@ bool SPxDevexPR::isConsistent() const
 void SPxDevexPR::setupWeights(SPxSolver::Type tp)
 {
    int i;
-   int endDim = 0;
-   int endCoDim = 0;
+   int coWeightSize = 0;
+   int weightSize = 0;
 
    DVector& weights = thesolver->weights;
    DVector& coWeights = thesolver->coWeights;
@@ -55,20 +55,21 @@ void SPxDevexPR::setupWeights(SPxSolver::Type tp)
       {
          // check for added/removed rows and adapt norms accordingly
          if (coWeights.dim() < thesolver->dim())
-            endDim = coWeights.dim();
+            coWeightSize = coWeights.dim();
          else
-            endDim = thesolver->dim();
+            coWeightSize = thesolver->dim();
          if (weights.dim() < thesolver->coDim())
-            endCoDim = weights.dim();
+            weightSize = weights.dim();
          else
-            endCoDim = thesolver->coDim();
+            weightSize = thesolver->coDim();
       }
 
       coWeights.reDim(thesolver->dim(), false);
-      for (i = thesolver->dim() - 1; i >= endDim; --i)
+      for( i = thesolver->dim() - 1; i >= coWeightSize; --i )
          coWeights[i] = 2.0;
+
       weights.reDim(thesolver->coDim(), false);
-      for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
+      for( i = thesolver->coDim() - 1; i >= weightSize; --i )
          weights[i] = 2.0;
    }
    else
@@ -76,14 +77,14 @@ void SPxDevexPR::setupWeights(SPxSolver::Type tp)
       if( thesolver->weightsAreSetup )
       {
          // check for added/removed rows and adapt norms accordingly
-         if (coWeights.dim() < thesolver->dim())
-            endDim = coWeights.dim();
+         if( coWeights.dim() < thesolver->dim() )
+            coWeightSize = coWeights.dim();
          else
-            endDim = thesolver->dim();
+            coWeightSize = thesolver->dim();
       }
       coWeights.reDim(thesolver->dim(), false);
-      for (i = thesolver->dim() - 1; i >= endDim; --i )
-         coWeights[i] = 2.0;
+      for( i = thesolver->dim() - 1; i >= coWeightSize; --i )
+         coWeights[i] = 1.0;
    }
    thesolver->weightsAreSetup = true;
 }
@@ -348,7 +349,7 @@ int SPxDevexPR::selectLeaveHyper(Real feastol)
 
 void SPxDevexPR::left4(int n, SPxId id)
 {
-   DVector coWeights = thesolver->coWeights;
+   DVector& coWeights = thesolver->coWeights;
    if (id.isValid())
    {
       int i, j;
