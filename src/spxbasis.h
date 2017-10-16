@@ -945,6 +945,13 @@ protected:
    //--------------------------------------
    /**@name Protected helpers */
    //@{
+
+   /// increase the number of nonbasic indices in the rowwise representation of the problem matrix
+   void updateLPAddedBasic(const SVector& basisvec, int newBaseIdx);
+
+   /// reduce the number of nonbasic indices in the rowwise representation of the problem matrix
+   void updateLPRemovedBasic(const SVector& basisvec, int oldBaseIdx);
+
    /// loads \ref soplex::SPxBasis::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis::theBaseId "theBaseId".
    /** This method must  be called whenever there is a chance, that the vector
        pointers may have changed due to manipulations of the LP.

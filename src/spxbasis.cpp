@@ -88,6 +88,24 @@ SPxBasis::dualColStatus(int i) const
       return Desc::D_UNDEFINED;
 }
 
+void SPxBasis::updateLPAddedBasic(const SVector& basisvec, int newBaseIdx)
+{
+   for( int i = 0; i < basisvec.size(); ++i )
+   {
+      SVector& coVec_i = const_cast <SVector&> (theLP->coVector(basisvec.index(i)));
+      coVec_i.markBasic(newBaseIdx);
+   }
+}
+
+void SPxBasis::updateLPRemovedBasic(const SVector& basisvec, int oldBaseIdx)
+{
+   for( int i = 0; i < basisvec.size(); ++i )
+   {
+      SVector& coVec_i = const_cast <SVector&> (theLP->coVector(basisvec.index(i)));
+      coVec_i.markNonbasic(oldBaseIdx);
+   }
+}
+
 void SPxBasis::loadMatrixVecs()
 {
    assert(theLP != 0);
@@ -97,10 +115,20 @@ void SPxBasis::loadMatrixVecs()
 
    int i;
    nzCount = 0;
+
+   // initialize nonbasic counters in coVectors
+   for( int i = 0; i < theLP->dim(); ++i)
+   {
+      SVector& coVec_i = const_cast<SVector&> (theLP->coVector(i));
+      coVec_i.setNNonbasic(-1);
+   }
+
    for (i = theLP->dim() - 1; i >= 0; --i)
    {
       matrix[i] = &theLP->vector(baseId(i));
       nzCount += matrix[i]->size();
+      if( theLP->rep() == SPxSolver::COLUMN && baseId(i).isSPxColId() )
+         updateLPAddedBasic(*matrix[i], theLP->number((SPxColId) baseId(i)));
    }
    matrixIsSetup = true;
    factorized = false;
@@ -248,6 +276,13 @@ void SPxBasis::loadDesc(const Desc& ds)
          matrix[j] = &theLP->vector(id);
          nzCount += matrix[j++]->size();
       }
+
+      // initialize nonbasic counters in coVectors
+      if( theLP->rep() == SPxSolver::COLUMN )
+      {
+         SVector& coVec_i = const_cast<SVector&> (theLP->coVector(i));
+         coVec_i.setNNonbasic(-1);
+      }
    }
 
    for (i = 0; i < theLP->nCols(); ++i)
@@ -282,6 +317,10 @@ void SPxBasis::loadDesc(const Desc& ds)
          SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
+
+         if( theLP->rep() == SPxSolver::COLUMN )
+            updateLPAddedBasic(*matrix[j], theLP->number(id));
+
          nzCount += matrix[j++]->size();
       }
    }
@@ -751,12 +790,24 @@ void SPxBasis::change(
    {
       assert(enterVec != 0);
 
+      // update the basis information in the rowwise representation of A
+      if( theBaseId[i].isSPxColId() && theLP->rep() == SPxSolver::COLUMN )
+      {
+         updateLPRemovedBasic(*matrix[i], theLP->number((SPxColId) theBaseId[i]));
+      }
+
       // update the counter for nonzeros in the basis matrix
       nzCount      = nzCount - matrix[i]->size() + enterVec->size();
       // let the new id enter the basis
       matrix[i]    = enterVec;
       lastout      = theBaseId[i];
       theBaseId[i] = id;
+
+      // update the basis information in the rowwise representation of A
+      if( id.isSPxColId() && theLP->rep() == SPxSolver::COLUMN )
+      {
+         updateLPAddedBasic(*matrix[i], theLP->number((SPxColId) id));
+      }
 
       ++iterCount;
       ++updateCount;

@@ -10,6 +10,7 @@ fixed bugs:
 
 features:
 - new scaling method combining geometric and equilibrium scaling (command line option '-g6')
+- faster matrix-vector multiplication (PRICE step) by only regarding nonbasic indices (COL representation)
 
 interface & parameters:
 - also print reduced cost values when passing '-y' on the command line

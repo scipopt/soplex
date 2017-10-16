@@ -647,7 +647,9 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
       clear();    // this := zero vector
    else
    {
-      num = Ai.size();
+      num = Ai.nnonbasic();
+      if( num == -1 )
+         num = Ai.size();
       for( int j = num - 1; j >= 0; --j )
       {
          const Nonzero<S>& Aij = Ai.element(j);
@@ -685,7 +687,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    int xsize = x.size();
    int Aisize;
 
-   num = A0.size();
+   num = A0.nnonbasic();
+   if( num == -1 )
+      num = A0.size();
+
+   assert(num >= 0);
    if( isZero(x0, epsilon) || num == 0 )
    {
       // A[0] == 0 or x[0] == 0 => this := zero vector
@@ -716,7 +722,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
       const SVectorBase<S>& Ai = A[curidx];
 
       // If A[i] == 0 or x[i] == 0, do nothing.
-      Aisize = Ai.size();
+      Aisize = Ai.nnonbasic();
+      if( Aisize == -1 )
+         Aisize = Ai.size();
+
+      assert(Aisize >= 0);
       if ( isNotZero(xi, epsilon) || Aisize == 0 )
       {
          // Compute x[i] * A[i] and add it to the existing vector.
@@ -797,7 +807,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
       const int curidx = x.idx[i];
       const T xi = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
-      Aisize = Ai.size();
+      Aisize = Ai.nnonbasic();
+      if( Aisize == -1 )
+         Aisize = Ai.size();
+
+      assert(Aisize >= 0);
 
       if( A_is_zero && Aisize > 0 )
          A_is_zero = false;
@@ -850,8 +864,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
+               int num = Ai.nnonbasic();
+               if( num == -1 )
+                  num = Ai.size();
 
-               for( int j = Ai.size() - 1; j >= 0; --j )
+               for( int j = 0; j < num; ++j )
                {
                   const Nonzero<S>& elt = Ai.element(j);
                   VectorBase<R>::val[elt.idx] += xval * elt.val;

@@ -137,6 +137,7 @@ private:
    Nonzero<R>* m_elem;
    int memsize;
    int memused;
+   int numnonbasic; // counter to track number of nonbasic indices
 
    //@}
 
@@ -160,6 +161,13 @@ public:
    {
       assert(m_elem != 0 || memused == 0);
       return memsize;
+   }
+
+   /// Number of nonbasic indices.
+   int nnonbasic() const
+   {
+      assert(m_elem != 0 || memused == 0);
+      return numnonbasic;
    }
 
    /// Dimension of the vector defined as maximal index + 1
@@ -455,6 +463,56 @@ public:
       }
    }
 
+   /// store new basis information in vector by swapping values accordingly
+   void markBasic(const int newBasicIdx = -1)
+   {
+      // nothing changed
+      if( newBasicIdx == -1 )
+         return;
+
+      // initialize nonbasic counter
+      if( numnonbasic == -1 )
+         numnonbasic = memused;
+
+      int newBasicPos = pos(newBasicIdx);
+      assert(newBasicPos < numnonbasic);
+
+      // swap the new basic nonzeros with the last nonbasic one and deincrement nnonbasic
+      assert(numnonbasic > 0);
+      --numnonbasic;
+      if( newBasicPos < numnonbasic )
+      {
+         Nonzero<R> tmp = m_elem[numnonbasic];
+         m_elem[numnonbasic] = m_elem[newBasicPos];
+         m_elem[newBasicPos] = tmp;
+      }
+   }
+
+   /// store new basis information in vector by swapping values accordingly
+   void markNonbasic(const int newNonbasicIdx = -1)
+   {
+      // nothing changed
+      if( newNonbasicIdx == -1 )
+         return;
+
+      // initialize nonbasic counter
+      if( numnonbasic == -1 )
+         numnonbasic = memused;
+
+      int newNonbasicPos = pos(newNonbasicIdx);
+      assert(newNonbasicPos >= numnonbasic);
+
+      // swap the new basic nonzeros with the last nonbasic one and increment nnonbasic
+      assert(numnonbasic < size());
+      if( newNonbasicPos > numnonbasic )
+      {
+         Nonzero<R> tmp = m_elem[numnonbasic];
+         m_elem[numnonbasic] = m_elem[newNonbasicPos];
+         m_elem[newNonbasicPos] = tmp;
+      }
+      ++numnonbasic;
+   }
+
    //@}
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -592,8 +650,12 @@ public:
     *  beginning of the memory block. Once this memory has been passed, it shall not be modified until the SVectorBase
     *  is no longer used.
     */
-   explicit SVectorBase<R>(int n = 0, Nonzero<R>* p_mem = 0)
+   explicit SVectorBase<R>(int n = 0, Nonzero<R>* p_mem = 0, int nnb = -1)
    {
+      numnonbasic = nnb;
+      memsize = 0;
+      memused = 0;
+      m_elem = 0;
       setMem(n, p_mem);
    }
 
@@ -625,6 +687,7 @@ public:
          }
 
          set_size(nnz);
+         numnonbasic = sv.numnonbasic;
       }
 
       return *this;
@@ -655,6 +718,7 @@ public:
          }
 
          set_size(nnz);
+         numnonbasic = sv.numnonbasic;
       }
 
       return *this;
@@ -673,6 +737,7 @@ public:
             m_elem[i].idx = sv.index(i);
          }
 
+         numnonbasic = sv.numnonbasic;
          assert(isConsistent());
       }
 
@@ -703,6 +768,7 @@ public:
             }
          }
 
+         numnonbasic = sv.numnonbasic;
          assert(isConsistent());
       }
 
@@ -767,6 +833,13 @@ public:
       m_elem = elmem;
       set_size(0);
       set_max(n);
+   }
+
+   /// Set number of nonbasic indices.
+   void setNNonbasic(int nnb)
+   {
+      assert(nnb <= size());
+      numnonbasic = nnb;
    }
 
    //@}
