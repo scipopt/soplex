@@ -51,19 +51,6 @@ void SPxDevexPR::setupWeights(SPxSolver::Type tp)
 
    if( tp == SPxSolver::ENTER )
    {
-      if( thesolver->weightsAreSetup )
-      {
-         // check for added/removed rows and adapt norms accordingly
-         if (coWeights.dim() < thesolver->dim())
-            coWeightSize = coWeights.dim();
-         else
-            coWeightSize = thesolver->dim();
-         if (weights.dim() < thesolver->coDim())
-            weightSize = weights.dim();
-         else
-            weightSize = thesolver->coDim();
-      }
-
       coWeights.reDim(thesolver->dim(), false);
       for( i = thesolver->dim() - 1; i >= coWeightSize; --i )
          coWeights[i] = 2.0;
@@ -74,14 +61,6 @@ void SPxDevexPR::setupWeights(SPxSolver::Type tp)
    }
    else
    {
-      if( thesolver->weightsAreSetup )
-      {
-         // check for added/removed rows and adapt norms accordingly
-         if( coWeights.dim() < thesolver->dim() )
-            coWeightSize = coWeights.dim();
-         else
-            coWeightSize = thesolver->dim();
-      }
       coWeights.reDim(thesolver->dim(), false);
       for( i = thesolver->dim() - 1; i >= coWeightSize; --i )
          coWeights[i] = 1.0;
