@@ -650,7 +650,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
       num = Ai.nnonbasic();
       if( num == -1 )
          num = Ai.size();
-      for( int j = num - 1; j >= 0; --j )
+      for( int j = 0; j < num; ++j )
       {
          const Nonzero<S>& Aij = Ai.element(j);
          idx[j] = Aij.idx;
