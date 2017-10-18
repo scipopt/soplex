@@ -1041,8 +1041,8 @@ void SPxSolver::performSolutionPolishing()
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
       {
-         DIdxSet slackcandidates(100);
-         DIdxSet continuousvars(100);
+         DIdxSet slackcandidates(nRows());
+         DIdxSet continuousvars(nCols());
          const SPxBasis::Desc::Status* rowstatus = ds.rowStatus();
          const SPxBasis::Desc::Status* colstatus = ds.colStatus();
 
@@ -1127,7 +1127,7 @@ void SPxSolver::performSolutionPolishing()
       else
       {
          assert(polishObj == POLISH_FRACTIONALITY);
-         DIdxSet candidates(100);
+         DIdxSet candidates(dim());
          const SPxBasis::Desc::Status* colstatus = ds.colStatus();
 
          // identify nonbasic variables, i.e. columns, that may be moved into the basis

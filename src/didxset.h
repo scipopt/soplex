@@ -75,7 +75,7 @@ public:
    void addIdx(int i)
    {
       if (max() <= size())
-         setMax(size() + (int)(0.1*size()));
+         setMax(size() + 1);
       IdxSet::addIdx(i);
    }
 
