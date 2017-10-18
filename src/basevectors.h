@@ -1030,18 +1030,28 @@ template < class S >
 inline
 SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
 {
+   assert(sv.isSetup());
    assert(max() >= sv.size());
 
-   set_size(sv.size());
+   int nzeros = 0;
+   int nnz = size();
+   int idx;
 
    Nonzero<R> *e = m_elem;
 
-   for( int i = size() - 1; i >= 0; --i )
+   for( int i = 0; i < nnz; ++i )
    {
-      e->idx = sv.index(i);
-      e->val = sv[e->idx];
-      ++e;
+      idx = sv.index(i);
+      if( sv.value(idx) != 0.0 )
+      {
+         e->idx = idx;
+         e->val = sv[idx];
+         ++e;
+      }
+      else
+         ++nzeros;
    }
+   set_size(nnz - nzeros);
 
    return *this;
 }

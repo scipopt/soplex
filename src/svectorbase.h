@@ -274,13 +274,16 @@ public:
       assert(m_elem != 0);
       assert(size() < max());
 
-      int n = size();
+      if( v != 0.0 )
+      {
+         int n = size();
 
-      m_elem[n].idx = i;
-      m_elem[n].val = v;
-      set_size( n + 1 );
+         m_elem[n].idx = i;
+         m_elem[n].val = v;
+         set_size( n + 1 );
 
-      assert(size() <= max());
+         assert(size() <= max());
+      }
    }
 
    /// Append one uninitialized nonzero.
@@ -311,15 +314,21 @@ public:
       if( n <= 0 )
          return;
 
+      int newnnz = 0;
+
       Nonzero<R>* e = m_elem + size();
 
-      set_size( size() + n );
       while( n-- )
       {
-         e->idx = *i++;
-         e->val = *v++;
-         e++;
+         if( *v != 0.0 )
+         {
+            e->idx = *i++;
+            e->val = *v++;
+            e++;
+            ++newnnz;
+         }
       }
+      set_size(size() + newnnz);
    }
 
    /// Append \p n nonzeros.
@@ -331,15 +340,21 @@ public:
       if( n <= 0 )
          return;
 
+      int newnnz = 0;
+
       Nonzero<R>* e = m_elem + size();
 
-      set_size( size() + n );
       while( n-- )
       {
-         e->idx = *i++;
-         e->val = *v++;
-         e++;
+         if( *v != R(0.0) )
+         {
+            e->idx = *i++;
+            e->val = *v++;
+            e++;
+            ++newnnz;
+         }
       }
+      set_size(size() + newnnz);
    }
 
    /// Append \p n nonzeros.
@@ -350,11 +365,19 @@ public:
       if( n <= 0 )
          return;
 
+      int newnnz = 0;
+
       Nonzero<R>* ee = m_elem + size();
 
-      set_size( size() + n );
       while( n-- )
-         *ee++ = *e++;
+      {
+         if( e->val != 0.0 )
+         {
+            *ee++ = *e++;
+            ++newnnz;
+         }
+      }
+      set_size(size() + newnnz);
    }
 
    /// Remove nonzeros \p n thru \p m.
@@ -583,16 +606,21 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
+         int nzeros = 0;
          Nonzero<R>* e = m_elem;
          const Nonzero<R>* s = sv.m_elem;
 
          while( i-- )
          {
             assert(e != 0);
-            *e++ = *s++;
+            if( s->val != 0.0 )
+               *e++ = *s;
+            else
+               ++nzeros;
+            ++s;
          }
 
-         set_size(sv.size());
+         set_size(sv.size() - nzeros);
       }
 
       return *this;
@@ -607,16 +635,21 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
+         int nzeros = 0;
          Nonzero<R>* e = m_elem;
          const Nonzero<S>* s = sv.m_elem;
 
          while( i-- )
          {
             assert(e != 0);
-            *e++ = *s++;
+            if( s->val != 0.0 )
+               *e++ = *s;
+            else
+               ++nzeros;
+            ++s;
          }
 
-         set_size(sv.size());
+         set_size(sv.size() - nzeros);
       }
 
       return *this;

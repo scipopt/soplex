@@ -262,6 +262,178 @@ void checkSolution(SoPlex& soplex)
    MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
+static
+void printPrimalSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
+{
+   int printprec;
+   int printwidth;
+   printprec = (int) -log10(double(Param::epsilon()));
+   printwidth = printprec + 10;
+
+   if( real )
+   {
+      DVector primal(soplex.numColsReal());
+      if( soplex.getPrimalRayReal(primal) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
+         for( int i = 0; i < soplex.numColsReal(); ++i )
+         {
+            if ( isNotZero( primal[i] ) )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t"
+                           << std::setw(printwidth) << std::setprecision(printprec)
+                           << primal[i] << std::endl; )
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero (within "
+                     << std::setprecision(1) << std::scientific << Param::epsilon()
+                     << std::setprecision(8) << std::fixed
+                     << ")." << std::endl; )
+      }
+      else if( soplex.isPrimalFeasible() && soplex.getPrimalReal(primal) )
+      {
+         int nNonzeros = 0;
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
+         for( int i = 0; i < soplex.numColsReal(); ++i )
+         {
+            if ( isNotZero( primal[i] ) )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t"
+                           << std::setw(printwidth) << std::setprecision(printprec)
+                           << primal[i] << std::endl; )
+               ++nNonzeros;
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other variables are zero (within "
+                     << std::setprecision(1) << std::scientific << Param::epsilon()
+                     << std::setprecision(8) << std::fixed
+                     << "). Solution has " << nNonzeros << " nonzero entries." << std::endl; )
+      }
+      else
+         MSG_INFO1( soplex.spxout, soplex.spxout << "No primal information available.\n")
+   }
+   if( rational )
+   {
+      DVectorRational primal(soplex.numColsReal());
+
+      if( soplex.getPrimalRayRational(primal) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
+         for( int i = 0; i < soplex.numColsReal(); ++i )
+         {
+            if( primal[i] != (Rational) 0 )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t"
+                           << std::setw(printwidth) << std::setprecision(printprec)
+                           << primal[i] << std::endl; )
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
+      }
+
+      if( soplex.isPrimalFeasible() && soplex.getPrimalRational(primal) )
+      {
+         int nNonzeros = 0;
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
+         for( int i = 0; i < soplex.numColsRational(); ++i )
+         {
+            if ( primal[i] != (Rational) 0 )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << primal[i] << std::endl; )
+               ++nNonzeros;
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other variables are zero. Solution has "
+                     << nNonzeros << " nonzero entries." << std::endl; )
+      }
+      else
+         MSG_INFO1( soplex.spxout, soplex.spxout << "No primal (rational) solution available.\n")
+
+   }
+}
+
+static
+void printDualSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
+{
+   int printprec;
+   int printwidth;
+   printprec = (int) -log10(double(Param::epsilon()));
+   printwidth = printprec + 10;
+
+   if( real )
+   {
+      DVector dual(soplex.numRowsReal());
+      if( soplex.getDualFarkasReal(dual) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
+         for( int i = 0; i < soplex.numRowsReal(); ++i )
+         {
+            if ( isNotZero( dual[i] ) )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t"
+                          << std::setw(printwidth) << std::setprecision(printprec)
+                          << dual[i] << std::endl; )
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero (within "
+                     << std::setprecision(1) << std::scientific << Param::epsilon()
+                     << std::setprecision(8) << std::fixed << ")." << std::endl; )
+      }
+      else if( soplex.isDualFeasible() && soplex.getDualReal(dual) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
+         for( int i = 0; i < soplex.numRowsReal(); ++i )
+         {
+            if ( isNotZero( dual[i] ) )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t"
+                          << std::setw(printwidth) << std::setprecision(printprec)
+                          << dual[i] << std::endl; )
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero (within "
+                     << std::setprecision(1) << std::scientific << Param::epsilon()
+                     << std::setprecision(8) << std::fixed << ")." << std::endl; )
+      }
+      else
+         MSG_INFO1( soplex.spxout, soplex.spxout << "No dual information available.\n")
+   }
+
+   if( rational )
+   {
+      DVectorRational dual(soplex.numRowsReal());
+      if( soplex.getDualFarkasRational(dual) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
+         for( int i = 0; i < soplex.numRowsReal(); ++i )
+         {
+            if( dual[i] != (Rational) 0 )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t"
+                          << std::setw(printwidth)
+                          << std::setprecision(printprec)
+                          << dual[i] << std::endl; )
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
+      }
+      if( soplex.isDualFeasible() && soplex.getDualRational(dual) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
+         for( int i = 0; i < soplex.numRowsRational(); ++i )
+         {
+            if ( dual[i] != (Rational) 0 )
+               MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t" << dual[i] << std::endl; )
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
+      }
+      else
+         MSG_INFO1( soplex.spxout, soplex.spxout << "No dual (rational) solution available.\n")
+   }
+}
+
+
+
 /// runs SoPlex command line
 int main(int argc, char* argv[])
 {
@@ -740,133 +912,9 @@ int main(int argc, char* argv[])
       // solve the LP
       soplex->optimize();
 
-      int printprec;
-      int printwidth;
-      printprec = (int) -log10(double(Param::epsilon()));
-      printwidth = printprec + 10;
-
       // print solution, check solution, and display statistics
-      if( printPrimal )
-      {
-         DVector primal(soplex->numColsReal());
-         if( soplex->getPrimalRayReal(primal) )
-         {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal ray (name, value):\n"; )
-            for( int i = 0; i < soplex->numColsReal(); ++i )
-            {
-               if ( isNotZero( primal[i] ) )
-                  MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
-                                    << std::setw(printwidth)
-                                    << std::setprecision(printprec)
-                                    << primal[i] << std::endl; )
-            }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
-                              << std::setprecision(1) << std::scientific << Param::epsilon()
-                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
-         }
-         else if( soplex->getPrimalReal(primal) )
-         {
-            int nNonzeros = 0;
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
-            for( int i = 0; i < soplex->numColsReal(); ++i )
-            {
-               if ( isNotZero( primal[i] ) )
-               {
-                  MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t"
-                             << std::setw(printwidth)
-                             << std::setprecision(printprec)
-                             << primal[i] << std::endl; )
-                  ++nNonzeros;
-               }
-            }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero (within "
-                              << std::setprecision(1) << std::scientific << Param::epsilon()
-                              << std::setprecision(8) << std::fixed << "). Solution has " << nNonzeros << " nonzero entries." << std::endl; )
-         }
-         else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal information available.\n")
-
-      }
-
-
-      if( printPrimalRational )
-      {
-         DVectorRational primal(soplex->numColsReal());
-         if( soplex->getPrimalRational(primal) )
-         {
-            int nNonzeros = 0;
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\nPrimal solution (name, value):\n"; )
-                for( int i = 0; i < soplex->numColsRational(); ++i )
-                {
-                  if ( primal[i] != (Rational) 0 )
-                  {
-                     MSG_INFO1( soplex->spxout, soplex->spxout << colnames[i] << "\t" << primal[i] << std::endl; )
-                     ++nNonzeros;
-                  }
-                }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other variables are zero. Solution has " << nNonzeros << " nonzero entries." << std::endl; )
-         }
-         else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No primal (rational) solution available.\n")
-      }
-
-
-      if( printDual )
-      {
-         DVector dual(soplex->numRowsReal());
-         if( soplex->getDualFarkasReal(dual) )
-         {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual ray (name, value):\n"; )
-            for( int i = 0; i < soplex->numRowsReal(); ++i )
-            {
-               if ( isNotZero( dual[i] ) )
-                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t"
-                             << std::setw(printwidth)
-                             << std::setprecision(printprec)
-                             << dual[i] << std::endl; )
-            }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other entries are zero (within "
-                              << std::setprecision(1) << std::scientific << Param::epsilon()
-                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
-         }
-         else if( soplex->getDualReal(dual) )
-         {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual solution (name, value):\n"; )
-            for( int i = 0; i < soplex->numRowsReal(); ++i )
-            {
-               if ( isNotZero( dual[i] ) )
-                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t"
-                             << std::setw(printwidth)
-                             << std::setprecision(printprec)
-                             << dual[i] << std::endl; )
-            }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero (within "
-                              << std::setprecision(1) << std::scientific << Param::epsilon()
-                              << std::setprecision(8) << std::fixed << ")." << std::endl; )
-         }
-         else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual information available.\n")
-
-      }
-
-
-      if( printDualRational )
-      {
-         DVectorRational dual(soplex->numRowsReal());
-         if( soplex->getDualRational(dual) )
-         {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\nDual multipliers (name, value):\n"; )
-            for( int i = 0; i < soplex->numRowsRational(); ++i )
-            {
-               if ( dual[i] != (Rational) 0 )
-                  MSG_INFO1( soplex->spxout, soplex->spxout << rownames[i] << "\t" << dual[i] << std::endl; )
-            }
-            MSG_INFO1( soplex->spxout, soplex->spxout << "All other dual values are zero." << std::endl; )
-         }
-         else
-            MSG_INFO1( soplex->spxout, soplex->spxout << "No dual (rational) solution available.\n")
-      }
-
+      printPrimalSolution(*soplex, colnames, rownames, printPrimal, printPrimalRational);
+      printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
 
       if( checkSol )
          checkSolution(*soplex);

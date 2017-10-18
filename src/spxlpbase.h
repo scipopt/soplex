@@ -1943,7 +1943,9 @@ protected:
       for( int i = vec.size() - 1; i >= 0; --i )
       {
          SVectorBase<R>& remvec = colVector_w(vec.index(i));
-         remvec.remove(remvec.pos(j));
+         int position = remvec.pos(j);
+         if( position >= 0 )
+            remvec.remove(position);
       }
 
       // move last row to removed position

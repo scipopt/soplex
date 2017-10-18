@@ -337,7 +337,7 @@ public:
    {
       assert(vec.dim() == dimen);
 
-      R x = 0;
+      R x = 0.0;
 
       for( int i = 0; i < dimen; i++ )
          x += val[i] * vec.val[i];
@@ -357,7 +357,7 @@ public:
       assert(dim() > 0);
       assert(dim() == dimen);
 
-      R maxi = 0;
+      R maxi = 0.0;
 
       for( int i = 0; i < dimen; i++ )
       {
@@ -367,7 +367,7 @@ public:
             maxi = x;
       }
 
-      assert(maxi >= 0);
+      assert(maxi >= 0.0);
 
       return maxi;
    }
@@ -388,7 +388,7 @@ public:
             mini = x;
       }
 
-      assert(mini >= 0);
+      assert(mini >= 0.0);
 
       return mini;
    }
@@ -468,18 +468,6 @@ public:
 
    //@}
 
-private:
-
-   // ------------------------------------------------------------------------------------------------------------------
-   /**@name Blocked */
-   //@{
-
-   /// Blocked default constructor.
-   VectorBase()
-   {
-   }
-
-   //@}
 };
 
 
