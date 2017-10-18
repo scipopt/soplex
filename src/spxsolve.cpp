@@ -340,19 +340,6 @@ SPxSolver::Status SPxSolver::solve()
                                           << thepricer->epsilon()
                                           << std::endl; )
                   }
-                  // solution seems good, no check whether we are precise enough
-                  else if (lastUpdate() == 0)
-                  {
-                     priced = true;
-                     break;
-                  }
-                  // We have an iterationlimit and everything looks good? Then stop!
-                  // 6 is just a number picked.
-                  else if (!(instableEnterId.isValid()) && maxIters > 0 && lastUpdate() < 6)
-                  {
-                     priced = true;
-                     break;
-                  }
                }
                MSG_INFO3( (*spxout), (*spxout) << " --- solve(enter) triggers refactorization" << std::endl; )
 
@@ -615,19 +602,6 @@ SPxSolver::Status SPxSolver::solve()
                      MSG_INFO2( (*spxout), (*spxout) << " --- setting pricer tolerance to "
                                           << thepricer->epsilon()
                                           << std::endl; );
-                  }
-                  // solution seems good, no check whether we are precise enough
-                  else if (lastUpdate() == 0)
-                  {
-                     priced = true;
-                     break;
-                  }
-                  // We have an iteration limit and everything looks good? Then stop!
-                  // 6 is just a number picked.
-                  else if (instableLeaveNum == -1 && maxIters > 0 && lastUpdate() < 6)
-                  {
-                     priced = true;
-                     break;
                   }
                }
                MSG_INFO3( (*spxout), (*spxout) << " --- solve(leave) triggers refactorization" << std::endl; )
