@@ -34,6 +34,10 @@ void SPxParMultPR::setType(SPxSolver::Type tp)
       thesolver->setPricing(SPxSolver::FULL);
    }
 
+   thesolver->weights.reDim(0);
+   thesolver->coWeights.reDim(0);
+   thesolver->weightsAreSetup = false;
+
    last = 0;
    min = partialSize / 2;
 }
