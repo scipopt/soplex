@@ -59,7 +59,7 @@ private:
    /**@name Private helpers */
    //@{
    /// set entering/leaving algorithm
-   void init(SPxSolver::Type);
+   void setupWeights(SPxSolver::Type);
    /// build up vector of pricing values for later use
    int buildBestPriceVectorLeave(Real feastol);
    /// internal implementation of SPxPricer::selectLeave()
