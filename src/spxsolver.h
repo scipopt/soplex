@@ -422,6 +422,11 @@ public:
    int      remainingRoundsEnter;
    int      remainingRoundsEnterCo;
 
+   /// dual pricing norms
+   DVector     weights;                ///< store dual norms
+   DVector     coWeights;              ///< store dual norms
+   bool        weightsAreSetup;        ///< are the dual norms already set up?
+
    SPxOut* spxout;                     ///< message handler
 
    DataArray<int> integerVariables;    ///< supplementary variable information, 0: continous variable, 1: integer variable

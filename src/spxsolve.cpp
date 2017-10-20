@@ -987,8 +987,11 @@ SPxSolver::Status SPxSolver::solve()
 
 void SPxSolver::performSolutionPolishing()
 {
+   // catch rare case that the iteration limit is exactly reached at optimality
+   bool stop = (maxIters >= 0 && iterations() >= maxIters);
+
    // only polish an already optimal basis
-   if( polishObj == POLISH_OFF || status() != OPTIMAL )
+   if( stop || polishObj == POLISH_OFF || status() != OPTIMAL )
       return;
 
    // the current objective value must not be changed
@@ -1001,8 +1004,6 @@ void SPxSolver::performSolutionPolishing()
    SPxBasis::Desc::Status stat;
    SPxId polishId;
    bool success = false;
-   // catch rare case that the iteration limit is exactly reached at optimality
-   bool stop = (maxIters >= 0 && iterations() >= maxIters);
 
    MSG_INFO2( (*spxout), (*spxout) << " --- perform solution polishing" << std::endl; )
 
@@ -1014,67 +1015,83 @@ void SPxSolver::performSolutionPolishing()
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
       {
+         DIdxSet slackcandidates(nRows());
+         DIdxSet continuousvars(nCols());
+         const SPxBasis::Desc::Status* rowstatus = ds.rowStatus();
+         const SPxBasis::Desc::Status* colstatus = ds.colStatus();
+
+         // collect nonbasic slack variables that could be made basic
+         for( int i = 0; i < nRows(); ++i )
+         {
+            // only check nonbasic rows, skip equations
+            if( rowstatus[i] == SPxBasis::Desc::P_ON_LOWER || rowstatus[i] == SPxBasis::Desc::P_ON_UPPER )
+            {
+               // only consider rows with zero dual multiplier to preserve optimality
+               if( EQrel((*theCoPvec)[i], 0) )
+                  slackcandidates.addIdx(i);
+            }
+         }
+
+         // collect continuous variables that could be made basic
+         if( integerVariables.size() == nCols() )
+         {
+            for( int i = 0; i < nCols(); ++i )
+            {
+               // skip fixed variables
+               if( colstatus[i] == SPxBasis::Desc::P_ON_LOWER || colstatus[i] == SPxBasis::Desc::P_ON_UPPER )
+               {
+                  // only consider continuous variables with zero dual multiplier to preserve optimality
+                  if( EQrel(maxObj(i) - (*thePvec)[i], 0) && integerVariables[i] == 0 )
+                     continuousvars.addIdx(i);
+               }
+            }
+         }
+
          while( !stop )
          {
             nSuccessfulPivots = 0;
             // identify nonbasic slack variables, i.e. rows, that may be moved into the basis
-            for( int i = 0; i < dim() && !stop; ++i )
+            for( int i = slackcandidates.size() - 1; i >= 0 && !stop; --i )
             {
-               stat = ds.coStatus(i);
-               if( !isBasic(stat) )
+               polishId = coId(slackcandidates.index(i));
+               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
+               success = enter(polishId, true);
+               clearUpdateVecs();
+               assert(EQrel(objVal, value(), entertol()));
+               assert(EQrel(shift(), 0.0, entertol()));
+               if( success )
                {
-                  // only consider rows with zero dual multiplier to preserve optimality
-                  if( EQrel((*theCoPvec)[i], 0) &&
-                        (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
-                  {
-                     polishId = coId(i);
-                     MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
-                     success = enter(polishId, true);
-                     clearUpdateVecs();
-                     assert(EQrel(objVal, value(), entertol()));
-                     assert(EQrel(shift(), 0.0, entertol()));
-                     if( success )
-                     {
-                        MSG_DEBUG( std::cout << " -> success!"; )
-                        ++nSuccessfulPivots;
-                        if( maxIters >= 0 && iterations() >= maxIters )
-                           stop = true;
-                     }
-                     MSG_DEBUG( std::cout << std::endl; )
-                  }
+                  MSG_DEBUG( std::cout << " -> success!"; )
+                  ++nSuccessfulPivots;
+                  slackcandidates.remove(i);
+
+                  if( maxIters >= 0 && iterations() >= maxIters )
+                     stop = true;
                }
+               MSG_DEBUG( std::cout << std::endl; )
             }
+
             // identify nonbasic variables that may be moved into the basis
-            if( !stop && integerVariables.size() == nCols() )
+            for( int i = continuousvars.size() - 1; i >= 0 && !stop; --i )
             {
-               for( int i = 0; i < coDim() && !stop; ++i )
+               polishId = id(continuousvars.index(i));
+               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[continuousvars.index(i)]; )
+               success = enter(polishId, true);
+               clearUpdateVecs();
+               assert(EQrel(objVal, value(), entertol()));
+               assert(EQrel(shift(), 0.0, entertol()));
+               if( success )
                {
-                  stat = ds.status(i);
-                  if( !isBasic(stat) )
-                  {
-                     // only consider continuous variables with zero dual multiplier to preserve optimality
-                     if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
-                           integerVariables[i] == 0 &&
-                           (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER) )
-                     {
-                        polishId = id(i);
-                        MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
-                        success = enter(polishId, true);
-                        clearUpdateVecs();
-                        assert(EQrel(objVal, value(), entertol()));
-                        assert(EQrel(shift(), 0.0, entertol()));
-                        if( success )
-                        {
-                           MSG_DEBUG( std::cout << " -> success!"; )
-                           ++nSuccessfulPivots;
-                           if( maxIters >= 0 && iterations() >= maxIters )
-                              stop = true;
-                        }
-                        MSG_DEBUG( std::cout << std::endl; )
-                     }
-                  }
+                  MSG_DEBUG( std::cout << " -> success!"; )
+                  ++nSuccessfulPivots;
+                  continuousvars.remove(i);
+
+                  if( maxIters >= 0 && iterations() >= maxIters )
+                     stop = true;
                }
+               MSG_DEBUG( std::cout << std::endl; )
             }
+
             // terminate if in the last round no more polishing steps were performed
             if( nSuccessfulPivots == 0 )
                stop = true;
@@ -1084,41 +1101,46 @@ void SPxSolver::performSolutionPolishing()
       else
       {
          assert(polishObj == POLISH_FRACTIONALITY);
+         DIdxSet candidates(dim());
+         const SPxBasis::Desc::Status* colstatus = ds.colStatus();
+
+         // identify nonbasic variables, i.e. columns, that may be moved into the basis
+         for( int i = 0; i < nCols() && !stop; ++i )
+         {
+            if( colstatus[i] == SPxBasis::Desc::P_ON_LOWER || colstatus[i] == SPxBasis::Desc::P_ON_UPPER )
+            {
+               // only consider variables with zero reduced costs to preserve optimality
+               if( EQrel(maxObj(i) - (*thePvec)[i], 0) )
+                  candidates.addIdx(i);
+            }
+         }
+
          while( !stop )
          {
-            nSuccessfulPivots = 0;
-            // identify nonbasic variables, i.e. columns, that may be moved into the basis
-            for( int i = 0; i < coDim() && !stop; ++i )
+            for( int i = candidates.size() - 1; i >= 0 && !stop; --i )
             {
-               // only look for columns, i.e. variables
-               stat = ds.status(i);
-               if( !isBasic(stat) )
+               nSuccessfulPivots = 0;
+               polishId = id(candidates.index(i));
+               MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(i)]; )
+               success = enter(polishId, true);
+               clearUpdateVecs();
+               assert(EQrel(objVal, value(), entertol()));
+               assert(EQrel(shift(), 0.0, entertol()));
+               if( success )
                {
-                  // only consider variables with zero reduced costs to preserve optimality
-                  if( EQrel(maxObj(i) - (*thePvec)[i], 0) &&
-                        (stat == SPxBasis::Desc::P_ON_LOWER || stat == SPxBasis::Desc::P_ON_UPPER))
-                  {
-                     polishId = id(i);
-                     MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << stat; )
-                     success = enter(polishId, true);
-                     clearUpdateVecs();
-                     assert(EQrel(objVal, value(), entertol()));
-                     assert(EQrel(shift(), 0.0, entertol()));
-                     if( success )
-                     {
-                        MSG_DEBUG( std::cout << " -> success!"; )
-                        ++nSuccessfulPivots;
-                        if( maxIters >= 0 && iterations() >= maxIters )
-                           stop = true;
-                     }
-                     MSG_DEBUG( std::cout << std::endl; )
-                  }
+                  MSG_DEBUG( std::cout << " -> success!"; )
+                  ++nSuccessfulPivots;
+                  candidates.remove(i);
+
+                  if( maxIters >= 0 && iterations() >= maxIters )
+                     stop = true;
                }
+               MSG_DEBUG( std::cout << std::endl; )
+               // terminate if in the last round no more polishing steps were performed
+               if( nSuccessfulPivots == 0 )
+                  stop = true;
+               polishCount += nSuccessfulPivots;
             }
-            // terminate if in the last round no more polishing steps were performed
-            if( nSuccessfulPivots == 0 )
-               stop = true;
-            polishCount += nSuccessfulPivots;
          }
       }
    }

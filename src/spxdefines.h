@@ -43,8 +43,8 @@
 namespace soplex
 {
 #define SOPLEX_VERSION         301
-#define SOPLEX_SUBVERSION        0
-#define SOPLEX_APIVERSION        0
+#define SOPLEX_SUBVERSION        1
+#define SOPLEX_APIVERSION        1
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2017 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
@@ -488,7 +488,7 @@ inline int spxSnprintf(
 #ifndef NDEBUG
       if( n < 0 )
       {
-         MSG_ERROR( std::cerr << "vsnprintf returned " << n << std::endl; )
+         MSG_ERROR( std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl; )
       }
 #endif
       t[len-1] = '\0';
