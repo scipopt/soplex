@@ -488,7 +488,7 @@ inline int spxSnprintf(
 #ifndef NDEBUG
       if( n < 0 )
       {
-         MSG_ERROR( std::cerr << "vsnprintf returned " << n << std::endl; )
+         MSG_ERROR( std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl; )
       }
 #endif
       t[len-1] = '\0';
