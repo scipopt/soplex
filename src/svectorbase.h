@@ -322,11 +322,13 @@ public:
       {
          if( *v != 0.0 )
          {
-            e->idx = *i++;
-            e->val = *v++;
+            e->idx = *i;
+            e->val = *v;
             e++;
             ++newnnz;
          }
+         i++;
+         v++;
       }
       set_size(size() + newnnz);
    }
@@ -348,11 +350,13 @@ public:
       {
          if( *v != R(0.0) )
          {
-            e->idx = *i++;
-            e->val = *v++;
+            e->idx = *i;
+            e->val = *v;
             e++;
             ++newnnz;
          }
+         i++;
+         v++;
       }
       set_size(size() + newnnz);
    }
@@ -373,9 +377,10 @@ public:
       {
          if( e->val != 0.0 )
          {
-            *ee++ = *e++;
+            *ee++ = *e;
             ++newnnz;
          }
+         e++;
       }
       set_size(size() + newnnz);
    }
@@ -606,7 +611,7 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
-         int nzeros = 0;
+         int nnz = 0;
          Nonzero<R>* e = m_elem;
          const Nonzero<R>* s = sv.m_elem;
 
@@ -614,13 +619,14 @@ public:
          {
             assert(e != 0);
             if( s->val != 0.0 )
+            {
                *e++ = *s;
-            else
-               ++nzeros;
+               ++nnz;
+            }
             ++s;
          }
 
-         set_size(sv.size() - nzeros);
+         set_size(nnz);
       }
 
       return *this;
@@ -635,7 +641,7 @@ public:
          assert(max() >= sv.size());
 
          int i = sv.size();
-         int nzeros = 0;
+         int nnz = 0;
          Nonzero<R>* e = m_elem;
          const Nonzero<S>* s = sv.m_elem;
 
@@ -643,13 +649,14 @@ public:
          {
             assert(e != 0);
             if( s->val != 0.0 )
+            {
                *e++ = *s;
-            else
-               ++nzeros;
+               ++nnz;
+            }
             ++s;
          }
 
-         set_size(sv.size() - nzeros);
+         set_size(nnz);
       }
 
       return *this;
