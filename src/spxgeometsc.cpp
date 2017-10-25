@@ -33,7 +33,6 @@ static Real computeScalingVec(
    {
 
       Real pmax = 0.0;
-
       for( int i = 0; i < vecset->num(); ++i )
       {
          const SVector& vec = (*vecset)[i];
@@ -43,7 +42,7 @@ static Real computeScalingVec(
 
          for( int j = 0; j < vec.size(); ++j )
          {
-            Real x = spxAbs(vec.value(j) * coScaleval[vec.index(j)]);
+            const Real x = spxAbs(vec.value(j) * coScaleval[vec.index(j)]);
 
             if (!isZero(x))
             {
@@ -64,7 +63,7 @@ static Real computeScalingVec(
 
          scaleval[i] = 1.0 / spxSqrt(mini * maxi);
 
-         Real p = maxi / mini;
+         const Real p = maxi / mini;
 
          if (p > pmax)
             pmax = p;
@@ -102,22 +101,29 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 
    MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
 
-   Real pstart = 0.0;
-   Real p0     = 0.0;
-   Real p1     = 0.0;
-
    setup(lp);
 
    /* We want to do that direction first, with the lower ratio.
     * See SPxEquiliSC::scale() for a reasoning.
     */
-   Real colratio = maxColRatio(lp);
-   Real rowratio = maxRowRatio(lp);
-
-   std::vector<Real> rowscale(lp.nRows(), 1.0);
-   std::vector<Real> colscale(lp.nCols(), 1.0);
+   const Real colratio = maxColRatio(lp);
+   const Real rowratio = maxRowRatio(lp);
 
    bool colFirst = colratio < rowratio;
+
+   Real p0start;
+   Real p1start;
+
+   if( colFirst )
+   {
+     p0start = colratio;
+     p1start = rowratio;
+   }
+   else
+   {
+     p0start = rowratio;
+     p1start = colratio;
+   }
 
    MSG_INFO2( (*spxout), (*spxout) << "before scaling:"
                         << " min= " << lp.minAbsNzo()
@@ -126,10 +132,26 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                         << " row-ratio= " << rowratio
                         << std::endl; )
 
+   // are we already good enough ?
+   if( p1start < m_goodEnoughRatio )
+   {
+      MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
+      lp.setScalingInfo(true);
+      return;
+   }
+
+   std::vector<Real> rowscale(lp.nRows(), 1.0);
+   std::vector<Real> colscale(lp.nCols(), 1.0);
+
+   Real p0 = 0.0;
+   Real p1 = 0.0;
+   Real p0prev = p0start;
+   Real p1prev = p1start;
+
    // We make at most maxIterations.
    for( int count = 0; count < m_maxIterations; count++ )
    {
-      if (colFirst)
+      if( colFirst )
       {
          p0 = computeScalingVec(lp.colSet(), rowscale, colscale);
          p1 = computeScalingVec(lp.rowSet(), colscale, rowscale);
@@ -139,45 +161,37 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
          p0 = computeScalingVec(lp.rowSet(), colscale, rowscale);
          p1 = computeScalingVec(lp.colSet(), rowscale, colscale);
       }
+
       MSG_INFO3( (*spxout), (*spxout) << "Geometric scaling round " << count
                            << " col-ratio= " << (colFirst ? p0 : p1)
                            << " row-ratio= " << (colFirst ? p1 : p0)
                            << std::endl; )
 
-      // record start value, this is done with m_col/rowscale = 1.0, so it is the
-      // value from the "original" (as passed to the scaler) LP.
-      if (count == 0)
-      {
-         pstart = p0;
-         // are we already good enough ?
-         if (pstart < m_goodEnoughRatio)
+      if( p0 > m_minImprovement * p0prev && p1 > m_minImprovement * p1prev )
             break;
-      }
-      else // do not test at the first iteration, then abort if no improvement.
-         if (p1 > m_minImprovement * p0)
-            break;
+
+      p0prev = p0;
+      p1prev = p1;
    }
 
-   // we scale only if either:
-   // - we had at the beginning a ratio worse than 1000/1
-   // - we have at least a 15% improvement.
-   if( pstart < m_goodEnoughRatio || p1 > pstart * m_minImprovement )
+   // we scale only if we have enough (15%) improvement.
+   if( p0 > m_minImprovement * p0start && p1 > m_minImprovement * p1start )
    {
       MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
+      lp.setScalingInfo(true);
    }
    else
    {
-      DataArray < int > colscaleExp = *m_activeColscaleExp;
-      DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+      DataArray < int >& colscaleExp = *m_activeColscaleExp;
+      DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-      int i;
-      for( i = 0; i < lp.nCols(); ++i )
+      for( int i = 0; i < lp.nCols(); ++i )
       {
           frexp(double(colscale[i]), &(colscaleExp[i]));
           colscaleExp[i] -= 1;
       }
 
-      for( i = 0; i < lp.nRows(); ++i )
+      for( int i = 0; i < lp.nRows(); ++i )
       {
           frexp(double(rowscale[i]), &(rowscaleExp[i]));
           rowscaleExp[i] -= 1;
