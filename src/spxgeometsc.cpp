@@ -21,14 +21,15 @@
 #include "spxgeometsc.h"
 #include "spxout.h"
 #include "spxlpbase.h"
+#include <vector>
 
 namespace soplex
 {
 
 static Real computeScalingVec(
-      const SVSet*           vecset,
-      const DataArray<Real>& coScaleval,
-      DataArray<Real>&       scaleval)
+      const SVSet*             vecset,
+      const std::vector<Real>& coScaleval,
+      std::vector<Real>&       scaleval)
    {
 
       Real pmax = 0.0;
@@ -113,8 +114,8 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
    Real colratio = maxColRatio(lp);
    Real rowratio = maxRowRatio(lp);
 
-   DataArray < Real >  rowscale(lp.nRows(), lp.nRows(), 1.2);
-   DataArray < Real >  colscale(lp.nCols(), lp.nCols(), 1.2);
+   std::vector<Real> rowscale(lp.nRows(), 1.0);
+   std::vector<Real> colscale(lp.nCols(), 1.0);
 
    bool colFirst = colratio < rowratio;
 
