@@ -1036,6 +1036,11 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
+      if( shift() > entertol() )
+      {
+         MSG_INFO2( (*spxout), (*spxout) << " --- abort solution polishing (shift too large)" << std::endl; )
+         stop = true;
+      }
       instableEnter = false;
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
@@ -1152,6 +1157,11 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
+      if( shift() > leavetol() )
+      {
+         MSG_INFO2( (*spxout), (*spxout) << " --- abort solution polishing (shift too large)" << std::endl; )
+         stop = true;
+      }
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
