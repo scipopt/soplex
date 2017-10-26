@@ -1033,8 +1033,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
    assert(sv.isSetup());
    assert(max() >= sv.size());
 
-   int nzeros = 0;
-   int nnz = size();
+   int nnz = 0;
    int idx;
 
    Nonzero<R> *e = m_elem;
@@ -1047,11 +1046,10 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
          e->idx = idx;
          e->val = sv[idx];
          ++e;
+         ++nnz;
       }
-      else
-         ++nzeros;
    }
-   set_size(nnz - nzeros);
+   set_size(nnz);
 
    return *this;
 }
