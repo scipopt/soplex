@@ -187,16 +187,16 @@ public:
       if( m_elem != 0 )
       {
          int n = size();
-         Nonzero<R>* e = &(m_elem[n]);
+         Nonzero<R>* e = &m_elem[0];
 
          while( n-- )
          {
-            --e;
             if( e->idx == i )
             {
                assert(index(n) == i);
                return n;
             }
+            e++;
          }
       }
 
