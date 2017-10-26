@@ -28,6 +28,7 @@ then
 
     echo "new version:"
     grep -e SOPLEX_VERSION -e SOPLEX_SUBVERSION -e SOPLEX_APIVERSION src/spxdefines.h
+    grep "set(SOPLEX_VERSION" CMakeLists.txt
 elif [[ $# -eq 3 ]]
 then
     sed -i "s/^VERSION.*/VERSION		:=	$1.$2.$3/" Makefile
