@@ -1020,11 +1020,6 @@ void SPxSolver::performSolutionPolishing()
    if( stop || polishObj == POLISH_OFF || status() != OPTIMAL )
       return;
 
-   // the current objective value must not be changed
-#ifndef NDEBUG
-   Real objVal = value();
-#endif
-
    int nSuccessfulPivots;
    const SPxBasis::Desc& ds = desc();
    SPxBasis::Desc::Status stat;
@@ -1037,6 +1032,13 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
+
+#ifndef NDEBUG
+      // the current objective value and shift must not be changed
+      Real objVal = value();
+      Real oldshift = shift();
+#endif
+
       instableEnter = false;
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
@@ -1084,7 +1086,7 @@ void SPxSolver::performSolutionPolishing()
                success = enter(polishId, true);
                clearUpdateVecs();
                assert(EQrel(objVal, value(), entertol()));
-               assert(EQrel(shift(), 0.0, entertol()));
+               assert(LErel(oldshift, shift(), entertol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1105,7 +1107,7 @@ void SPxSolver::performSolutionPolishing()
                success = enter(polishId, true);
                clearUpdateVecs();
                assert(EQrel(objVal, value(), entertol()));
-               assert(EQrel(shift(), 0.0, entertol()));
+               assert(LErel(oldshift, shift(), entertol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1151,7 +1153,7 @@ void SPxSolver::performSolutionPolishing()
                success = enter(polishId, true);
                clearUpdateVecs();
                assert(EQrel(objVal, value(), entertol()));
-               assert(EQrel(shift(), 0.0, entertol()));
+               assert(LErel(oldshift, shift(), entertol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1174,6 +1176,13 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
+
+#ifndef NDEBUG
+      // the current objective value and shift must not be changed
+      Real objVal = value();
+      Real oldshift = shift();
+#endif
+
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
@@ -1208,7 +1217,7 @@ void SPxSolver::performSolutionPolishing()
                   success = leave(i, true);
                   clearUpdateVecs();
                   assert(EQrel(objVal, value(), leavetol()));
-                  assert(EQrel(shift(), 0.0, leavetol()));
+                  assert(LErel(oldshift, shift(), leavetol()));
                   if( success )
                   {
                      MSG_DEBUG( std::cout << " -> success!"; )
@@ -1251,7 +1260,7 @@ void SPxSolver::performSolutionPolishing()
                   success = leave(i, true);
                   clearUpdateVecs();
                   assert(EQrel(objVal, value(), leavetol()));
-                  assert(EQrel(shift(), 0.0, leavetol()));
+                  assert(LErel(oldshift, shift(), leavetol()));
                   if( success )
                   {
                      MSG_DEBUG( std::cout << " -> success!"; )

@@ -187,15 +187,13 @@ public:
       if( m_elem != 0 )
       {
          int n = size();
-         Nonzero<R>* e = &(m_elem[n]);
 
-         while( n-- )
+         for( int p = 0; p < n; ++p )
          {
-            --e;
-            if( e->idx == i )
+            if( m_elem[p].idx == i )
             {
-               assert(index(n) == i);
-               return n;
+               assert(index(p) == i);
+               return p;
             }
          }
       }
