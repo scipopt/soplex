@@ -1,6 +1,5 @@
 include(CTest)
 
-
 #
 # define the set of feasible instances
 #
@@ -43,13 +42,12 @@ set(successInstances
     "woodinfe\;+infinity"
     "gas11\;-infinity"
     )
-    
+
 set(failInstances
     "share2b\;0.123456789e5"
     "shell\;+infinity"
     "vtp-base\;-infinity"
     )
-    
 
 #
 # define the set of settings
@@ -61,10 +59,11 @@ set(settings
     default
     default-col
     default-row
+    polish1
+    polish2
     )
 
-    
-    #
+#
 # define a macro to add tests
 #
 # add_instancetests takes an instance group and a status
