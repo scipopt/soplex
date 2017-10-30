@@ -42,7 +42,7 @@ static Real computeScalingVec(
 
          for( int j = 0; j < vec.size(); ++j )
          {
-            const Real x = spxAbs(vec.value(j) * coScaleval[vec.index(j)]);
+            const Real x = spxAbs(vec.value(j) * coScaleval[unsigned(vec.index(j))]);
 
             if (!isZero(x))
             {
@@ -61,7 +61,7 @@ static Real computeScalingVec(
          assert(mini < infinity);
          assert(maxi > 0.0);
 
-         scaleval[i] = 1.0 / spxSqrt(mini * maxi);
+         scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);
 
          const Real p = maxi / mini;
 
@@ -140,8 +140,8 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
       return;
    }
 
-   std::vector<Real> rowscale(lp.nRows(), 1.0);
-   std::vector<Real> colscale(lp.nCols(), 1.0);
+   std::vector<Real> rowscale(unsigned(lp.nRows()), 1.0);
+   std::vector<Real> colscale(unsigned(lp.nCols()), 1.0);
 
    Real p0 = 0.0;
    Real p1 = 0.0;
@@ -187,13 +187,13 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 
       for( int i = 0; i < lp.nCols(); ++i )
       {
-          frexp(double(colscale[i]), &(colscaleExp[i]));
+          frexp(double(colscale[unsigned(i)]), &(colscaleExp[i]));
           colscaleExp[i] -= 1;
       }
 
       for( int i = 0; i < lp.nRows(); ++i )
       {
-          frexp(double(rowscale[i]), &(rowscaleExp[i]));
+          frexp(double(rowscale[unsigned(i)]), &(rowscaleExp[i]));
           rowscaleExp[i] -= 1;
       }
 
