@@ -11,6 +11,7 @@ fixed bugs:
 - fixed bug when setting and getting dual pricing norms
 - don't print infeasible primal/dual solutions
 - properly clear update vectors in initialization step
+- fix bug in geometric scaling
 
 
 01 September 2017 - Release 3.0.1
