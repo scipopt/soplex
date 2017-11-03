@@ -72,11 +72,12 @@ static Real computeScalingVec(
    }
 
 
-SPxGeometSC::SPxGeometSC(int maxIters, Real minImpr, Real goodEnough)
+SPxGeometSC::SPxGeometSC(int maxIters, Real minImpr, Real goodEnough, bool equilibrate)
    : SPxScaler("Geometric")
    , m_maxIterations(maxIters)
    , m_minImprovement(minImpr)
    , m_goodEnoughRatio(goodEnough)
+   , postequilibration(equilibrate)
 {}
 
 SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
@@ -84,6 +85,7 @@ SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
    , m_maxIterations(old.m_maxIterations)
    , m_minImprovement(old.m_minImprovement)
    , m_goodEnoughRatio(old.m_goodEnoughRatio)
+   , postequilibration(old.postequilibration)
 {}
 
 SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
