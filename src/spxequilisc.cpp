@@ -31,35 +31,36 @@ static const char* makename(bool doBoth)
    return doBoth ? "bi-Equilibrium" : "uni-Equilibrium";
 }
 
-static void computeScalingExpVec(
+
+void SPxEquiliSC::computeScalingExpVec(
       const SVSet*           vecset,
       const DataArray<int>& coScaleExp,
       DataArray<int>&       scaleExp)
+{
+   for( int i = 0; i < vecset->num(); ++i )
    {
-      for( int i = 0; i < vecset->num(); ++i )
+      const SVector& vec = (*vecset)[i];
+
+      Real maxi = 0.0;
+
+      for( int j = 0; j < vec.size(); ++j )
       {
-         const SVector& vec = (*vecset)[i];
+         Real x = spxAbs(spxLdexp(vec.value(j), coScaleExp[vec.index(j)]));
 
-         Real maxi = 0.0;
-
-         for( int j = 0; j < vec.size(); ++j )
-         {
-            Real x = spxAbs(spxLdexp(vec.value(j), coScaleExp[vec.index(j)]));
-
-            if( GT(x, maxi) )
-               maxi = x;
-         }
-         // empty rows/cols are possible
-         if( maxi == 0.0 )
-            maxi = 1.0;
-
-         assert(maxi > 0.0);
-
-         spxFrexp(1.0 / maxi, &(scaleExp[i]));
-
-         scaleExp[i] -= 1;
+         if( GT(x, maxi) )
+            maxi = x;
       }
+      // empty rows/cols are possible
+      if( maxi == 0.0 )
+         maxi = 1.0;
+
+      assert(maxi > 0.0);
+
+      spxFrexp(1.0 / maxi, &(scaleExp[i]));
+
+      scaleExp[i] -= 1;
    }
+}
 
 SPxEquiliSC::SPxEquiliSC(bool doBoth)
    : SPxScaler(makename(doBoth), false, doBoth)

@@ -227,6 +227,10 @@ public:
    virtual Real maxColRatio(const SPxLPBase<Real>& lp) const;
    /// maximum ratio between absolute biggest and smallest element in any row.
    virtual Real maxRowRatio(const SPxLPBase<Real>& lp) const;
+   /// maximum ratio between absolute biggest and smallest element in any (scaled) column.
+   virtual Real maxColRatio(const SPxLPBase<Real>& lp, const DataArray<Real>& coScaleval) const;
+   /// maximum ratio between absolute biggest and smallest element in any (scaled) row.
+   virtual Real maxRowRatio(const SPxLPBase<Real>& lp, const DataArray<Real>& coScaleval) const;
    //@}
 
    //-------------------------------------

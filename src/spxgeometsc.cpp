@@ -72,20 +72,20 @@ static Real computeScalingVec(
    }
 
 
-SPxGeometSC::SPxGeometSC(int maxIters, Real minImpr, Real goodEnough, bool equilibrate)
+SPxGeometSC::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real goodEnough)
    : SPxScaler("Geometric")
+   , postequilibration(equilibrate)
    , m_maxIterations(maxIters)
    , m_minImprovement(minImpr)
    , m_goodEnoughRatio(goodEnough)
-   , postequilibration(equilibrate)
 {}
 
 SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
    : SPxScaler(old)
+   , postequilibration(old.postequilibration)
    , m_maxIterations(old.m_maxIterations)
    , m_minImprovement(old.m_minImprovement)
    , m_goodEnoughRatio(old.m_goodEnoughRatio)
-   , postequilibration(old.postequilibration)
 {}
 
 SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
@@ -187,16 +187,24 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
       DataArray < int >& colscaleExp = *m_activeColscaleExp;
       DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-      for( int i = 0; i < lp.nCols(); ++i )
+      if( postequilibration )
       {
-          frexp(double(colscale[unsigned(i)]), &(colscaleExp[i]));
-          colscaleExp[i] -= 1;
+         std::cout << "post " << std::endl;
+         exit(1);
       }
-
-      for( int i = 0; i < lp.nRows(); ++i )
+      else
       {
-          frexp(double(rowscale[unsigned(i)]), &(rowscaleExp[i]));
-          rowscaleExp[i] -= 1;
+         for( int i = 0; i < lp.nCols(); ++i )
+         {
+             frexp(double(colscale[unsigned(i)]), &(colscaleExp[i]));
+             colscaleExp[i] -= 1;
+         }
+
+         for( int i = 0; i < lp.nRows(); ++i )
+         {
+             frexp(double(rowscale[unsigned(i)]), &(rowscaleExp[i]));
+             rowscaleExp[i] -= 1;
+         }
       }
 
       applyScaling(lp);
@@ -216,5 +224,6 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                            << std::endl; )
    }
 }
+
 
 } // namespace soplex

@@ -35,6 +35,12 @@ namespace soplex
 class SPxEquiliSC : public SPxScaler
 {
 public:
+   /// compute equilibrium scaling rounded to power of 2
+   static
+   void computeScalingExpVec(
+          const SVSet*           vecset,
+          const DataArray<int>& coScaleExp,
+          DataArray<int>&       scaleExp);
 
    //-------------------------------------
    /**@name Construction / destruction */
@@ -59,7 +65,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false);
+   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false) override;
    //@}
 };
 } // namespace soplex

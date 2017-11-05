@@ -22,6 +22,7 @@
 #include <iostream>
 #include <assert.h>
 
+#include <limits>
 #include "spxscaler.h"
 #include "spxlp.h"
 #include "dsvector.h"
@@ -791,7 +792,7 @@ Real SPxScaler::minAbsRowscale() const
 {
    const DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-   int mini = INT_MAX;
+   int mini = std::numeric_limits<int>::max();
 
    for( int i = 0; i < rowscaleExp.size(); ++i )
       if( rowscaleExp[i] < mini )
@@ -804,7 +805,7 @@ Real SPxScaler::maxAbsRowscale() const
 {
    const DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-   int maxi = -INT_MAX;
+   int maxi = std::numeric_limits<int>::min();
 
    for( int i = 0; i < rowscaleExp.size(); ++i )
       if( rowscaleExp[i] > maxi )
@@ -839,6 +840,10 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
          if( x > maxi )
             maxi = x;
       }
+
+      if( mini == infinity )
+         continue;
+
       Real p = maxi / mini;
 
       if (p > pmax)
@@ -865,6 +870,83 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
       for(int j = 0; j < vec.size(); ++j)
       {
          Real x = spxAbs(vec.value(j));
+
+         if( isZero(x) )
+            continue;
+         if( x < mini )
+            mini = x;
+         if( x > maxi )
+            maxi = x;
+      }
+
+      if( mini == infinity )
+         continue;
+
+      Real p = maxi / mini;
+
+      if (p > pmax)
+         pmax = p;
+   }
+   return pmax;
+}
+
+
+/** \f$\max_{j\in\mbox{ cols}}
+ *   \left(\frac{\max_{i\in\mbox{ rows}}|a_ij|}
+ *              {\min_{i\in\mbox{ rows}}|a_ij|}\right)\f$
+ */
+Real SPxScaler::maxColRatio(const SPxLP& lp, const DataArray<Real>& coScaleval) const
+{
+
+   Real pmax = 0.0;
+
+   for(int i = 0; i < lp.nCols(); ++i )
+   {
+      const SVector& vec  = lp.colVector(i);
+      Real           mini = infinity;
+      Real           maxi = 0.0;
+
+      for(int j = 0; j < vec.size(); ++j)
+      {
+         const Real x = spxAbs(vec.value(j)) * coScaleval[vec.index(j)];
+
+         if( isZero(x) )
+            continue;
+         if( x < mini )
+            mini = x;
+         if( x > maxi )
+            maxi = x;
+      }
+
+      if( mini == infinity )
+         continue;
+
+      const Real p = maxi / mini;
+
+      if (p > pmax)
+         pmax = p;
+   }
+   return pmax;
+}
+
+/** \f$\max_{i\in\mbox{ rows}}
+ *   \left(\frac{\max_{j\in\mbox{ cols}}|a_ij|}
+ *              {\min_{j\in\mbox{ cols}}|a_ij|}\right)\f$
+ */
+Real SPxScaler::maxRowRatio(const SPxLP& lp, const DataArray<Real>& coScaleval) const
+{
+
+   Real pmax = 0.0;
+
+   for(int i = 0; i < lp.nRows(); ++i )
+   {
+      const SVector& vec  = lp.rowVector(i);
+      Real           mini = infinity;
+      Real           maxi = 0.0;
+
+      for(int j = 0; j < vec.size(); ++j)
+      {
+         const Real x = spxAbs(vec.value(j)) * coScaleval[vec.index(j)];
 
          if( isZero(x) )
             continue;
