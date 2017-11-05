@@ -60,7 +60,7 @@ public:
    virtual ~SPxGeometSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler* clone() const
+   inline virtual SPxScaler* clone() const override
    {
       return new SPxGeometSC(*this);
    }

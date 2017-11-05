@@ -21,12 +21,11 @@
 
 #include <iostream>
 #include <assert.h>
-
-#include <limits>
 #include "spxscaler.h"
 #include "spxlp.h"
 #include "dsvector.h"
 #include "dvector.h"
+#include <limits>
 
 namespace soplex
 {
@@ -296,7 +295,6 @@ int SPxScaler::getRowScaleExp(int i) const
 {
    return (*m_activeRowscaleExp)[i];
 }
-
 
 /// gets unscaled column \p i
 void SPxScaler::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
@@ -605,8 +603,6 @@ Real SPxScaler::getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) con
    return spxLdexp(lp.colVector(col)[row], - rowscaleExp[row] - colscaleExp[col]);
 }
 
-
-
 void SPxScaler::unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const
 {
    assert(lp.isScaled());
@@ -890,77 +886,15 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
    return pmax;
 }
 
-
-/** \f$\max_{j\in\mbox{ cols}}
- *   \left(\frac{\max_{i\in\mbox{ rows}}|a_ij|}
- *              {\min_{i\in\mbox{ rows}}|a_ij|}\right)\f$
- */
-Real SPxScaler::maxColRatio(const SPxLP& lp, const DataArray<Real>& coScaleval) const
+void SPxScaler::computeExpVec(const std::vector<Real>& vec, DataArray<int>& vecExp)
 {
+   assert(vec.size() == unsigned(vecExp.size()));
 
-   Real pmax = 0.0;
-
-   for(int i = 0; i < lp.nCols(); ++i )
+   for( unsigned i = 0; i < vec.size(); ++i )
    {
-      const SVector& vec  = lp.colVector(i);
-      Real           mini = infinity;
-      Real           maxi = 0.0;
-
-      for(int j = 0; j < vec.size(); ++j)
-      {
-         const Real x = spxAbs(vec.value(j)) * coScaleval[vec.index(j)];
-
-         if( isZero(x) )
-            continue;
-         if( x < mini )
-            mini = x;
-         if( x > maxi )
-            maxi = x;
-      }
-
-      if( mini == infinity )
-         continue;
-
-      const Real p = maxi / mini;
-
-      if (p > pmax)
-         pmax = p;
+       frexp(vec[i], &(vecExp[int(i)]));
+       vecExp[int(i)] -= 1;
    }
-   return pmax;
-}
-
-/** \f$\max_{i\in\mbox{ rows}}
- *   \left(\frac{\max_{j\in\mbox{ cols}}|a_ij|}
- *              {\min_{j\in\mbox{ cols}}|a_ij|}\right)\f$
- */
-Real SPxScaler::maxRowRatio(const SPxLP& lp, const DataArray<Real>& coScaleval) const
-{
-
-   Real pmax = 0.0;
-
-   for(int i = 0; i < lp.nRows(); ++i )
-   {
-      const SVector& vec  = lp.rowVector(i);
-      Real           mini = infinity;
-      Real           maxi = 0.0;
-
-      for(int j = 0; j < vec.size(); ++j)
-      {
-         const Real x = spxAbs(vec.value(j)) * coScaleval[vec.index(j)];
-
-         if( isZero(x) )
-            continue;
-         if( x < mini )
-            mini = x;
-         if( x > maxi )
-            maxi = x;
-      }
-      Real p = maxi / mini;
-
-      if (p > pmax)
-         pmax = p;
-   }
-   return pmax;
 }
 
 bool SPxScaler::isConsistent() const
@@ -971,5 +905,6 @@ bool SPxScaler::isConsistent() const
    return true;
 #endif
 }
+
 
 } // namespace soplex

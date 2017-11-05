@@ -21,7 +21,7 @@
 #include "spxgeometsc.h"
 #include "spxout.h"
 #include "spxlpbase.h"
-#include <vector>
+#include "spxequilisc.h"
 
 namespace soplex
 {
@@ -111,7 +111,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
    const Real colratio = maxColRatio(lp);
    const Real rowratio = maxRowRatio(lp);
 
-   bool colFirst = colratio < rowratio;
+   const bool colFirst = colratio < rowratio;
 
    Real p0start;
    Real p1start;
@@ -134,10 +134,10 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                         << " row-ratio= " << rowratio
                         << std::endl; )
 
-   // are we already good enough ?
+   // are we already good enough? todo don't stop with active postequilibration?
    if( p1start < m_goodEnoughRatio )
    {
-      MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
+      MSG_INFO2( (*spxout), (*spxout) << "No geometric scaling done, ratio good enough" << std::endl; )
       lp.setScalingInfo(true);
       return;
    }
@@ -177,34 +177,31 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
    }
 
    // we scale only if we have enough (15%) improvement.
-   if( p0 > m_minImprovement * p0start && p1 > m_minImprovement * p1start )
+   const bool nogeoscale = p0 > m_minImprovement * p0start && p1 > m_minImprovement * p1start;
+
+   if( nogeoscale && !postequilibration )
    {
-      MSG_INFO2( (*spxout), (*spxout) << "No scaling done." << std::endl; )
+      MSG_INFO2( (*spxout), (*spxout) << "No geometric scaling done." << std::endl; )
       lp.setScalingInfo(true);
    }
    else
    {
-      DataArray < int >& colscaleExp = *m_activeColscaleExp;
-      DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
+      DataArray<int>& colscaleExp = *m_activeColscaleExp;
+      DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
 
       if( postequilibration )
       {
-         std::cout << "post " << std::endl;
-         exit(1);
+         if( nogeoscale )
+         {
+            std::fill(rowscale.begin(), rowscale.end(), 1.0);
+            std::fill(colscale.begin(), colscale.end(), 1.0);
+         }
+         SPxEquiliSC::computePostequiExpVecs(lp, rowscale, colscale, rowscaleExp, colscaleExp);
       }
       else
       {
-         for( int i = 0; i < lp.nCols(); ++i )
-         {
-             frexp(double(colscale[unsigned(i)]), &(colscaleExp[i]));
-             colscaleExp[i] -= 1;
-         }
-
-         for( int i = 0; i < lp.nRows(); ++i )
-         {
-             frexp(double(rowscale[unsigned(i)]), &(rowscaleExp[i]));
-             rowscaleExp[i] -= 1;
-         }
+         computeExpVec(colscale, colscaleExp);
+         computeExpVec(rowscale, rowscaleExp);
       }
 
       applyScaling(lp);
