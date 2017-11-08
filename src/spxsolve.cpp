@@ -325,6 +325,10 @@ SPxSolver::Status SPxSolver::solve()
                   computeTest();
                   computeCoTest();
 
+                  // re-compute Fvec to get a more precise solution and obj value
+                  computeFrhs();
+                  SPxBasis::solve(*theFvec, *theFrhs);
+
                   // is the solution good enough ?
                   // max three times reduced
                   if ((thepricer->epsilon() > minpricertol) && !precisionReached(newpricertol))
