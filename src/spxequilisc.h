@@ -35,7 +35,15 @@ namespace soplex
 class SPxEquiliSC : public SPxScaler
 {
 public:
+   /// compute equilibrium scaling vector rounded to power of two
+   static void computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp);
 
+   /// compute equilibrium scaling vector rounded to power of two
+   static void computeEquiExpVec(const SVSet* vecset, const std::vector<Real>& coScaleVal, DataArray<int>& scaleExp);
+
+   /// compute equilibrium scaling rounded to power of 2 for existing Real scaling factors (preRowscale, preColscale)
+   static void computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale, const std::vector<Real>& preColscale,
+         DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
    //-------------------------------------
    /**@name Construction / destruction */
    //@{
@@ -49,7 +57,7 @@ public:
    virtual ~SPxEquiliSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler* clone() const
+   inline virtual SPxScaler* clone() const override
    {
       return new SPxEquiliSC(*this);
    }
@@ -59,7 +67,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false);
+   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false) override;
    //@}
 };
 } // namespace soplex

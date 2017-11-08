@@ -73,7 +73,7 @@ void printUsage(const char* const argv[], int idx)
       "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
       "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
       "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
-      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)\n"
+      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)\n"
       "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
       "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3* - boundflipping)\n"
       "\n"
@@ -699,7 +699,7 @@ int main(int argc, char* argv[])
             break;
 
          case 'g' :
-            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares)
+            // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares, 6 - geometric-equilibrium)
             if( !soplex->setIntParam(SoPlex::SCALER, option[2] - '0') )
             {
                printUsage(argv, optidx);

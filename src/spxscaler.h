@@ -28,6 +28,7 @@
 #include "svset.h"
 #include "dsvector.h"
 #include "dvector.h"
+#include <vector>
 
 namespace soplex
 {
@@ -227,6 +228,8 @@ public:
    virtual Real maxColRatio(const SPxLPBase<Real>& lp) const;
    /// maximum ratio between absolute biggest and smallest element in any row.
    virtual Real maxRowRatio(const SPxLPBase<Real>& lp) const;
+   /// round vector entries to power of 2
+   void computeExpVec(const std::vector<Real>& vec, DataArray<int>& vecExp);
    //@}
 
    //-------------------------------------

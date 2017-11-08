@@ -203,9 +203,9 @@ namespace soplex
 
       // type of scaler
       name[SoPlex::SCALER] = "scaler";
-      description[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares)";
+      description[SoPlex::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)";
       lower[SoPlex::SCALER] = 0;
-      upper[SoPlex::SCALER] = 5;
+      upper[SoPlex::SCALER] = 6;
       defaultValue[SoPlex::SCALER] = SoPlex::SCALER_BIEQUI;
 
       // type of starter used to create crash basis
@@ -561,8 +561,9 @@ namespace soplex
       , _currentSettings(0)
       , _scalerUniequi(false)
       , _scalerBiequi(true)
-      , _scalerGeo1(1)
-      , _scalerGeo8(8)
+      , _scalerGeo1(false, 1)
+      , _scalerGeo8(false, 8)
+      , _scalerGeoequi(true)
       , _scalerLeastsq()
       , _simplifier(0)
       , _scaler(0)
@@ -583,6 +584,7 @@ namespace soplex
       _scalerBiequi.setOutstream(spxout);
       _scalerGeo1.setOutstream(spxout);
       _scalerGeo8.setOutstream(spxout);
+      _scalerGeoequi.setOutstream(spxout);
       _scalerLeastsq.setOutstream(spxout);
 
       // give lu factorization to solver
@@ -637,6 +639,7 @@ namespace soplex
          _scalerBiequi = rhs._scalerBiequi;
          _scalerGeo1 = rhs._scalerGeo1;
          _scalerGeo8 = rhs._scalerGeo8;
+         _scalerGeoequi = rhs._scalerGeoequi;
          _scalerLeastsq = rhs._scalerLeastsq;
          _starterWeight = rhs._starterWeight;
          _starterSum = rhs._starterSum;
@@ -670,6 +673,7 @@ namespace soplex
          _scalerBiequi.setOutstream(spxout);
          _scalerGeo1.setOutstream(spxout);
          _scalerGeo8.setOutstream(spxout);
+         _scalerGeoequi.setOutstream(spxout);
          _scalerLeastsq.setOutstream(spxout);
 
          // transfer the lu solver
@@ -5757,6 +5761,9 @@ namespace soplex
          case SCALER_LEASTSQ:
             _scaler = &_scalerLeastsq;
             break;
+         case SCALER_GEOEQUI:
+            _scaler = &_scalerGeoequi;
+            break;
          default:
             return false;
          }
@@ -7962,6 +7969,9 @@ namespace soplex
          break;
       case SCALER_LEASTSQ:
          _scaler = &_scalerLeastsq;
+         break;
+      case SCALER_GEOEQUI:
+         _scaler = &_scalerGeoequi;
          break;
       default:
          break;
