@@ -1029,9 +1029,9 @@ void SPxSolver::performSolutionPolishing()
    bool success = false;
 
 #ifndef NDEBUG
-      // the current objective value and shift must not be changed
-      Real objVal = value();
-      Real oldshift = shift();
+   // the current objective value and shift must not be changed
+   Real objVal = value();
+   Real oldshift = shift();
 #endif
 
    MSG_INFO2( (*spxout), (*spxout) << " --- perform solution polishing" << std::endl; )
