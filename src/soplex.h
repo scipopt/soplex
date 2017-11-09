@@ -1119,7 +1119,10 @@ public:
       SCALER_GEO8 = 4,
 
        /// least square scaling
-      SCALER_LEASTSQ = 5
+      SCALER_LEASTSQ = 5,
+
+      /// geometric mean scaling (max 8 rounds) followed by equilibrium scaling (rows and columns)
+      SCALER_GEOEQUI = 6
    };
 
    /// values for parameter STARTER
@@ -1570,6 +1573,7 @@ private:
    SPxEquiliSC _scalerBiequi;
    SPxGeometSC _scalerGeo1;
    SPxGeometSC _scalerGeo8;
+   SPxGeometSC _scalerGeoequi;
    SPxLeastSqSC _scalerLeastsq;
    SPxWeightST _starterWeight;
    SPxSumST _starterSum;

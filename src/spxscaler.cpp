@@ -21,11 +21,11 @@
 
 #include <iostream>
 #include <assert.h>
-
 #include "spxscaler.h"
 #include "spxlp.h"
 #include "dsvector.h"
 #include "dvector.h"
+#include <limits>
 
 namespace soplex
 {
@@ -295,7 +295,6 @@ int SPxScaler::getRowScaleExp(int i) const
 {
    return (*m_activeRowscaleExp)[i];
 }
-
 
 /// gets unscaled column \p i
 void SPxScaler::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
@@ -604,8 +603,6 @@ Real SPxScaler::getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) con
    return spxLdexp(lp.colVector(col)[row], - rowscaleExp[row] - colscaleExp[col]);
 }
 
-
-
 void SPxScaler::unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const
 {
    assert(lp.isScaled());
@@ -791,7 +788,7 @@ Real SPxScaler::minAbsRowscale() const
 {
    const DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-   int mini = INT_MAX;
+   int mini = std::numeric_limits<int>::max();
 
    for( int i = 0; i < rowscaleExp.size(); ++i )
       if( rowscaleExp[i] < mini )
@@ -804,7 +801,7 @@ Real SPxScaler::maxAbsRowscale() const
 {
    const DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
 
-   int maxi = -INT_MAX;
+   int maxi = std::numeric_limits<int>::min();
 
    for( int i = 0; i < rowscaleExp.size(); ++i )
       if( rowscaleExp[i] > maxi )
@@ -839,6 +836,10 @@ Real SPxScaler::maxColRatio(const SPxLP& lp) const
          if( x > maxi )
             maxi = x;
       }
+
+      if( mini == infinity )
+         continue;
+
       Real p = maxi / mini;
 
       if (p > pmax)
@@ -873,12 +874,27 @@ Real SPxScaler::maxRowRatio(const SPxLP& lp) const
          if( x > maxi )
             maxi = x;
       }
+
+      if( mini == infinity )
+         continue;
+
       Real p = maxi / mini;
 
       if (p > pmax)
          pmax = p;
    }
    return pmax;
+}
+
+void SPxScaler::computeExpVec(const std::vector<Real>& vec, DataArray<int>& vecExp)
+{
+   assert(vec.size() == unsigned(vecExp.size()));
+
+   for( unsigned i = 0; i < vec.size(); ++i )
+   {
+       frexp(vec[i], &(vecExp[int(i)]));
+       vecExp[int(i)] -= 1;
+   }
 }
 
 bool SPxScaler::isConsistent() const
@@ -889,5 +905,6 @@ bool SPxScaler::isConsistent() const
    return true;
 #endif
 }
+
 
 } // namespace soplex
