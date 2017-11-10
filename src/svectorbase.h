@@ -477,7 +477,7 @@ public:
       int newBasicPos = pos(newBasicIdx);
       assert(newBasicPos < numnonbasic);
 
-      // swap the new basic nonzeros with the last nonbasic one and deincrement nnonbasic
+      // swap the new basic nonzeros with the last nonbasic one and decrement nnonbasic
       assert(numnonbasic > 0);
       --numnonbasic;
       if( newBasicPos < numnonbasic )
