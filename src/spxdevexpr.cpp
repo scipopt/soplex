@@ -73,27 +73,14 @@ void SPxDevexPR::setType(SPxSolver::Type tp)
    setupWeights(tp);
    refined = false;
 
-   if( tp == SPxSolver::ENTER && thesolver->hyperPricingEnter )
-   {
-      if( thesolver->sparsePricingEnter )
-      {
-         bestPrices.clear();
-         bestPrices.setMax(thesolver->dim());
-         prices.reMax(thesolver->dim());
-      }
-      if( thesolver->sparsePricingEnterCo )
-      {
-         bestPricesCo.clear();
-         bestPricesCo.setMax(thesolver->coDim());
-         pricesCo.reMax(thesolver->coDim());
-      }
-   }
-   if( tp == SPxSolver::LEAVE && thesolver->sparsePricingLeave && thesolver->hyperPricingLeave )
-   {
-      bestPrices.clear();
-      bestPrices.setMax(thesolver->dim());
-      prices.reMax(thesolver->dim());
-   }
+   bestPrices.clear();
+   bestPrices.setMax(thesolver->dim());
+   prices.reMax(thesolver->dim());
+
+   bestPricesCo.clear();
+   bestPricesCo.setMax(thesolver->coDim());
+   pricesCo.reMax(thesolver->coDim());
+
    assert(isConsistent());
 }
 
