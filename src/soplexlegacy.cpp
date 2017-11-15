@@ -560,7 +560,7 @@ bool SoPlexLegacy::writeBasisFile(
    }
 
    /* start writing */
-   char buf[255];
+   char buf[SPX_MAXSTRLEN];
    int row = 0;
    for( int col = 0; col < nCols(); col++ )
    {
