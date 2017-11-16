@@ -572,7 +572,7 @@ static const char* getRowName(
       if (rnames->has(key))
          return (*rnames)[key];
    }
-   std::sprintf(buf, "C%d", idx);
+   spxSnprintf(buf, 16, "C%d", idx);
    
    return buf;
 }
@@ -598,7 +598,7 @@ static const char* getColName(
       if (cnames->has(key))
          return (*cnames)[key];
    }
-   std::sprintf(buf, "x%d", idx);
+   spxSnprintf(buf, 16, "x%d", idx);
    
    return buf;
 }

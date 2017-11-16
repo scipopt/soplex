@@ -837,7 +837,7 @@ bool SPxLPBase<Rational>::readLPF(
                   else
                   {
                      char name[16];
-                     sprintf(name, "C%d", rset.num());
+                     spxSnprintf(name, 16, "C%d", rset.num());
                      rnames->add(name);
                   }
                   have_value = true;
@@ -1354,7 +1354,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          if( strcmp(addname, mps.field1()) )
          {
             assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
-            strcpy(addname, mps.field1());
+            strncpy(addname, mps.field1(), MPSInput::MAX_LINE_LEN);
             MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
          }
       }
@@ -1435,8 +1435,8 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
 
       if( *rngname == '\0' )
       {
-         assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
-         strcpy(rngname, mps.field1());
+         assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
+         strncpy(rngname, mps.field1(), MPSInput::MAX_LINE_LEN);
       }
 
       /* The rules are:
@@ -1576,7 +1576,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       if( *bndname == '\0' )
       {
          assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
-         strcpy(bndname, mps.field2());
+         strncpy(bndname, mps.field2(), MPSInput::MAX_LINE_LEN);
       }
 
       // Only read the first Bound in section
@@ -1814,7 +1814,7 @@ static const char* LPFgetRowName(
          return (*p_rnames)[key];
    }
 
-   sprintf(p_buf, "C%d", p_num_written_rows);
+   spxSnprintf(p_buf, 16, "C%d", p_num_written_rows);
 
    return p_buf;
 }
@@ -1841,7 +1841,7 @@ static const char* getColName(
          return (*p_cnames)[key];
    }
 
-   sprintf(p_buf, "x%d", p_idx);
+   spxSnprintf(p_buf, 16, "x%d", p_idx);
 
    return p_buf;
 }
@@ -2148,11 +2148,11 @@ static void MPSwriteRecord(
 
    if( name1 != 0 )
    {
-      sprintf(buf, " %-8.8s ", name1);
+      spxSnprintf(buf, 81, " %-8.8s ", name1);
       os << buf << value1;
       if( name2 != 0 )
       {
-         sprintf(buf, " %-8.8s ", name2);
+         spxSnprintf(buf, 81, " %-8.8s ", name2);
          os << buf << value2;
       }
    }
@@ -2202,7 +2202,7 @@ static const char* MPSgetRowName(
          return (*rnames)[key];
    }
 
-   sprintf(buf, "C%d", idx);
+   spxSnprintf(buf, 16, "C%d", idx);
 
    return buf;
 }
