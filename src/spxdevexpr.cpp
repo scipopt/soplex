@@ -77,9 +77,12 @@ void SPxDevexPR::setType(SPxSolver::Type tp)
    bestPrices.setMax(thesolver->dim());
    prices.reMax(thesolver->dim());
 
-   bestPricesCo.clear();
-   bestPricesCo.setMax(thesolver->coDim());
-   pricesCo.reMax(thesolver->coDim());
+   if( tp == SPxSolver::ENTER )
+   {
+      bestPricesCo.clear();
+      bestPricesCo.setMax(thesolver->coDim());
+      pricesCo.reMax(thesolver->coDim());
+   }
 
    assert(isConsistent());
 }
