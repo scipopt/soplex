@@ -442,31 +442,32 @@ int main(int argc, char* argv[])
    EGlpNumStart();
 
    SoPlex* soplex;
+   Timer* readingTime;
+   Validation* validation;
+
+   int optidx;
+
+   const char* lpfilename = 0;
+   char* readbasname = 0;
+   char* writebasname = 0;
+   char* writefilename = 0;
+   char* writedualfilename = 0;
+   char* loadsetname = 0;
+   char* savesetname = 0;
+   char* diffsetname = 0;
+   bool printPrimal = false;
+   bool printPrimalRational = false;
+   bool printDual = false;
+   bool printDualRational = false;
+   bool displayStatistics = false;
+   bool checkSol = false;
+
+   int returnValue = 0;
 
    try
    {
       NameSet rownames;
       NameSet colnames;
-      Timer* readingTime;
-      Validation* validation;
-      int optidx;
-
-      const char* lpfilename = 0;
-      char* readbasname = 0;
-      char* writebasname = 0;
-      char* writefilename = 0;
-      char* writedualfilename = 0;
-      char* loadsetname = 0;
-      char* savesetname = 0;
-      char* diffsetname = 0;
-      bool printPrimal = false;
-      bool printPrimalRational = false;
-      bool printDual = false;
-      bool printDualRational = false;
-      bool displayStatistics = false;
-      bool checkSol = false;
-
-      int returnValue = 0;
 
       // create default timer (CPU time)
       readingTime = TimerFactory::createTimer(Timer::USER_TIME);
