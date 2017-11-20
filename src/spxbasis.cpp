@@ -706,7 +706,7 @@ void SPxBasis::printMatrixMTX(int number)
 {
    int dim;
    int nnz;
-   char filename[30];
+   char filename[SPX_MAXSTRLEN];
 
    dim = matrix.size();
    nnz = nzCount;
