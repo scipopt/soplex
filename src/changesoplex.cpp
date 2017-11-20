@@ -824,7 +824,7 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
 
 void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 {
-   if( NE(newLower, lowerUnscaled(i)) )
+   if( newLower != lowerUnscaled(i) )
    {
       Real oldLower = lower(i);
       // This has to be done before calling changeLowerStatus() because that is calling
