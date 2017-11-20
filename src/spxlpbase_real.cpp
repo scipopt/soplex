@@ -2362,7 +2362,7 @@ void SPxLPBase<Real>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
    ) const
 {
-
+   int oldprecision = (int) p_output.precision();
    p_output << std::setprecision(15);
    LPFwriteObjective(*this, p_output, p_cnames);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames);
@@ -2370,6 +2370,7 @@ void SPxLPBase<Real>::writeLPF(
    LPFwriteGenerals(*this, p_output, p_cnames, p_intvars);
 
    p_output << "End" << std::endl;
+   p_output << std::setprecision(oldprecision);
 }
 
 

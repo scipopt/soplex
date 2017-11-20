@@ -442,44 +442,45 @@ int main(int argc, char* argv[])
    EGlpNumStart();
 
    SoPlex* soplex;
-   NameSet rownames;
-   NameSet colnames;
-   Timer* readingTime;
-   Validation* validation;
-   int optidx;
-
-   const char* lpfilename = 0;
-   char* readbasname = 0;
-   char* writebasname = 0;
-   char* writefilename = 0;
-   char* writedualfilename = 0;
-   char* loadsetname = 0;
-   char* savesetname = 0;
-   char* diffsetname = 0;
-   bool printPrimal = false;
-   bool printPrimalRational = false;
-   bool printDual = false;
-   bool printDualRational = false;
-   bool displayStatistics = false;
-   bool checkSol = false;
-
-   int returnValue = 0;
-
-   // create default timer (CPU time)
-   readingTime = TimerFactory::createTimer(Timer::USER_TIME);
-   soplex = 0;
-   spx_alloc(soplex);
-   new (soplex) SoPlex();
-
-   soplex->printVersion();
-   MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
-
-   validation = 0;
-   spx_alloc(validation);
-   new (validation) Validation();
 
    try
    {
+      NameSet rownames;
+      NameSet colnames;
+      Timer* readingTime;
+      Validation* validation;
+      int optidx;
+
+      const char* lpfilename = 0;
+      char* readbasname = 0;
+      char* writebasname = 0;
+      char* writefilename = 0;
+      char* writedualfilename = 0;
+      char* loadsetname = 0;
+      char* savesetname = 0;
+      char* diffsetname = 0;
+      bool printPrimal = false;
+      bool printPrimalRational = false;
+      bool printDual = false;
+      bool printDualRational = false;
+      bool displayStatistics = false;
+      bool checkSol = false;
+
+      int returnValue = 0;
+
+      // create default timer (CPU time)
+      readingTime = TimerFactory::createTimer(Timer::USER_TIME);
+      soplex = 0;
+      spx_alloc(soplex);
+      new (soplex) SoPlex();
+
+      soplex->printVersion();
+      MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
+
+      validation = 0;
+      spx_alloc(validation);
+      new (validation) Validation();
+
       // no options were given
       if( argc <= 1 )
       {
