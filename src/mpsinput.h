@@ -176,13 +176,13 @@ public:
    void setProbName(const char* p_probname)
    {
       assert(strlen(p_probname) < MAX_LINE_LEN);
-      strcpy(m_probname, p_probname);
+      strncpy(m_probname, p_probname, MAX_LINE_LEN);
    }
    ///
    void setObjName(const char* p_objname)
    {
       assert(strlen(p_objname) < MAX_LINE_LEN);
-      strcpy(m_objname, p_objname);
+      strncpy(m_objname, p_objname, MAX_LINE_LEN);
    }
    ///
    void setObjSense(Sense sense)

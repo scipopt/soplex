@@ -441,11 +441,10 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlex* soplex;
-   NameSet rownames;
-   NameSet colnames;
-   Timer* readingTime;
-   Validation* validation;
+   SoPlex* soplex = 0;
+
+   Timer* readingTime = 0;
+   Validation* validation = 0;
    int optidx;
 
    const char* lpfilename = 0;
@@ -465,21 +464,24 @@ int main(int argc, char* argv[])
 
    int returnValue = 0;
 
-   // create default timer (CPU time)
-   readingTime = TimerFactory::createTimer(Timer::USER_TIME);
-   soplex = 0;
-   spx_alloc(soplex);
-   new (soplex) SoPlex();
-
-   soplex->printVersion();
-   MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
-
-   validation = 0;
-   spx_alloc(validation);
-   new (validation) Validation();
-
    try
    {
+      NameSet rownames;
+      NameSet colnames;
+
+      // create default timer (CPU time)
+      readingTime = TimerFactory::createTimer(Timer::USER_TIME);
+      soplex = 0;
+      spx_alloc(soplex);
+      new (soplex) SoPlex();
+
+      soplex->printVersion();
+      MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
+
+      validation = 0;
+      spx_alloc(validation);
+      new (validation) Validation();
+
       // no options were given
       if( argc <= 1 )
       {
@@ -960,15 +962,24 @@ int main(int argc, char* argv[])
  TERMINATE:
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
-   // spx_alloc() and freed here; disabling the list memory is crucial
-   soplex->~SoPlex();
-   spx_free(soplex);
-   validation->~Validation();
-   spx_free(validation);
-   Rational::disableListMem();
-   EGlpNumClear();
-   readingTime->~Timer();
-   spx_free(readingTime);
+ // spx_alloc() and freed here; disabling the list memory is crucial
+ if( 0 != soplex )
+ {
+    soplex->~SoPlex();
+    spx_free(soplex);
+ }
+ if( 0 != validation )
+ {
+    validation->~Validation();
+    spx_free(validation);
+ }
+ Rational::disableListMem();
+ EGlpNumClear();
+ if( 0 != readingTime )
+ {
+    readingTime->~Timer();
+    spx_free(readingTime);
+ }
 
    return returnValue;
 }

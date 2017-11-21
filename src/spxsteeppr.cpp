@@ -56,26 +56,16 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    workVec.clear();
    workRhs.clear();
    refined = false;
-   if( type == SPxSolver::ENTER && thesolver->hyperPricingEnter )
+
+   bestPrices.clear();
+   bestPrices.setMax(thesolver->dim());
+   prices.reMax(thesolver->dim());
+
+   if( type == SPxSolver::ENTER )
    {
-      if( thesolver->sparsePricingEnter )
-      {
-         bestPrices.clear();
-         bestPrices.setMax(thesolver->dim());
-         prices.reMax(thesolver->dim());
-      }
-      if( thesolver->sparsePricingEnterCo )
-      {
-         bestPricesCo.clear();
-         bestPricesCo.setMax(thesolver->coDim());
-         pricesCo.reMax(thesolver->coDim());
-      }
-   }
-   if( type == SPxSolver::LEAVE && thesolver->sparsePricingLeave && thesolver->hyperPricingLeave )
-   {
-      bestPrices.clear();
-      bestPrices.setMax(thesolver->dim());
-      prices.reMax(thesolver->dim());
+      bestPricesCo.clear();
+      bestPricesCo.setMax(thesolver->coDim());
+      pricesCo.reMax(thesolver->coDim());
    }
 }
 

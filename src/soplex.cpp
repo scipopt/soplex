@@ -6631,9 +6631,12 @@ namespace soplex
          if( strncmp(paramName, "random_seed", 11) == 0 )
          {
             unsigned int value;
+            char format[SPX_MAXSTRLEN];
+            snprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
 
-            if( sscanf(paramValueString, "%u", &value) == 1 )
+            if( sscanf(paramValueString, format, &value) == 1 )
             {
+
                setRandomSeed(value);
                return true;
             }
@@ -8583,8 +8586,10 @@ namespace soplex
          if( strncmp(paramName, "random_seed", 11) == 0 )
          {
             unsigned int value;
+            char format[SPX_MAXSTRLEN];
+            snprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
 
-            if( sscanf(paramValueString, "%u", &value) == 1 )
+            if( sscanf(paramValueString, format, &value) == 1 )
             {
                setRandomSeed(value);
                return true;
