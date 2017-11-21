@@ -1574,6 +1574,9 @@ public:
       {
          SVectorBase<R>& col = colVector_w(row.index(j));
          int position = col.pos(n);
+
+         assert(position != -1);
+
          if( position >= 0 )
             col.remove(position);
       }
@@ -1616,6 +1619,9 @@ public:
       {
          SVectorBase<R>& row = rowVector_w(col.index(j));
          int position = row.pos(n);
+
+         assert(position != -1);
+
          if( position >= 0 )
             row.remove(position);
       }
@@ -1961,6 +1967,9 @@ protected:
          {
             SVectorBase<R>& movevec = colVector_w(l_vec.index(i));
             int position = movevec.pos(idx);
+
+            assert(position != -1);
+
             if( position >= 0 )
                movevec.index(position) = j;
          }
@@ -2002,6 +2011,9 @@ protected:
       {
          SVectorBase<R>& remvec = rowVector_w(vec.index(i));
          int position = remvec.pos(j);
+
+         assert(position != -1);
+
          if( position >= 0 )
             remvec.remove(position);
       }
@@ -2015,6 +2027,9 @@ protected:
          {
             SVectorBase<R>& movevec = rowVector_w(l_vec.index(i));
             int position = movevec.pos(idx);
+
+            assert(position != -1);
+
             if( position >= 0 )
                movevec.index(position) = j;
          }
