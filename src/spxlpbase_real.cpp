@@ -1169,7 +1169,7 @@ bool SPxLPBase<Real>::readLPF(
                   else
                   {
                      char name[16];
-                     sprintf(name, "C%d", rset.num());
+                     spxSnprintf(name, 16, "C%d", rset.num());
                      rnames->add(name);
                   }
                   have_value = true;
@@ -1682,7 +1682,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Real>& rset, const NameSet& r
          if( strcmp(addname, mps.field1()) )
          {
             assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
-            strcpy(addname, mps.field1());
+            strncpy(addname, mps.field1(), MPSInput::MAX_LINE_LEN);
             MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
          }
       }
@@ -1758,7 +1758,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Real>& rset, const NameSe
       if( *rngname == '\0' )
       {
          assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
-         strcpy(rngname, mps.field1());
+         strncpy(rngname, mps.field1(), MPSInput::MAX_LINE_LEN);
       }
 
       /* The rules are:
@@ -1880,7 +1880,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Real>& cset, const NameSet
       if( *bndname == '\0' )
       {
          assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
-         strcpy(bndname, mps.field2());
+         strncpy(bndname, mps.field2(), MPSInput::MAX_LINE_LEN);
       }
 
       // Only read the first Bound in section
@@ -2114,7 +2114,7 @@ static const char* LPFgetRowName(
          return (*p_rnames)[key];
    }
 
-   sprintf(p_buf, "C%d", p_num_written_rows);
+   spxSnprintf(p_buf, 16, "C%d", p_num_written_rows);
 
    return p_buf;
 }
@@ -2141,7 +2141,7 @@ static const char* getColName(
          return (*p_cnames)[key];
    }
 
-   sprintf(p_buf, "x%d", p_idx);
+   spxSnprintf(p_buf, 16, "x%d", p_idx);
 
    return p_buf;
 }
@@ -2362,7 +2362,7 @@ void SPxLPBase<Real>::writeLPF(
    const DIdxSet* p_intvars          ///< integer variables
    ) const
 {
-
+   int oldprecision = (int) p_output.precision();
    p_output << std::setprecision(15);
    LPFwriteObjective(*this, p_output, p_cnames);
    LPFwriteRows(*this, p_output, p_rnames, p_cnames);
@@ -2370,6 +2370,7 @@ void SPxLPBase<Real>::writeLPF(
    LPFwriteGenerals(*this, p_output, p_cnames, p_intvars);
 
    p_output << "End" << std::endl;
+   p_output << std::setprecision(oldprecision);
 }
 
 
@@ -2395,12 +2396,12 @@ static void MPSwriteRecord(
 
    if( name1 != 0 )
    {
-      sprintf(buf, "  %-8.8s  %.15" REAL_FORMAT, name1, value1);
+      spxSnprintf(buf, 81, "  %-8.8s  %.15" REAL_FORMAT, name1, value1);
       os << buf;
 
       if( name2 != 0 )
       {
-         sprintf(buf, "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
+         spxSnprintf(buf, 81, "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
          os << buf;
       }
    }
@@ -2445,7 +2446,7 @@ static const char* MPSgetRowName(
          return (*rnames)[key];
    }
 
-   sprintf(buf, "C%d", idx);
+   spxSnprintf(buf, 16, "C%d", idx);
 
    return buf;
 }

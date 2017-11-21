@@ -1573,7 +1573,12 @@ public:
       for( j = row.size() - 1; j >= 0; --j )
       {
          SVectorBase<R>& col = colVector_w(row.index(j));
-         col.remove(col.pos(n));
+         int position = col.pos(n);
+
+         assert(position != -1);
+
+         if( position >= 0 )
+            col.remove(position);
       }
 
       row.clear();
@@ -1613,7 +1618,12 @@ public:
       for( j = col.size() - 1; j >= 0; --j )
       {
          SVectorBase<R>& row = rowVector_w(col.index(j));
-         row.remove(row.pos(n));
+         int position = row.pos(n);
+
+         assert(position != -1);
+
+         if( position >= 0 )
+            row.remove(position);
       }
 
       col.clear();
@@ -1664,7 +1674,7 @@ public:
          else
             newVal = val;
 
-         if( row.pos(j) >= 0 )
+         if( row.pos(j) >= 0 && col.pos(i) >= 0 )
          {
             row.value(row.pos(j)) = newVal;
             col.value(col.pos(i)) = newVal;
@@ -1675,7 +1685,7 @@ public:
             LPColSetBase<R>::add2(j, 1, &i, &newVal);
          }
       }
-      else if( row.pos(j) >= 0 )
+      else if( row.pos(j) >= 0 && col.pos(i) >= 0 )
       {
          row.remove(row.pos(j));
          col.remove(col.pos(i));
@@ -1696,7 +1706,7 @@ public:
 
       if( mpq_get_d(*val) != R(0) )
       {
-         if( row.pos(j) >= 0 )
+         if( row.pos(j) >= 0 && col.pos(i) >= 0 )
          {
             row.value(row.pos(j)) = *val;
             col.value(col.pos(i)) = *val;
@@ -1707,7 +1717,7 @@ public:
             LPColSetBase<R>::add2(j, 1, &i, val);
          }
       }
-      else if( row.pos(j) >= 0 )
+      else if( row.pos(j) >= 0 && col.pos(i) >= 0 )
       {
          row.remove(row.pos(j));
          col.remove(col.pos(i));
@@ -1956,7 +1966,12 @@ protected:
          for( int i = l_vec.size() - 1; i >= 0; --i )
          {
             SVectorBase<R>& movevec = colVector_w(l_vec.index(i));
-            movevec.index(movevec.pos(idx)) = j;
+            int position = movevec.pos(idx);
+
+            assert(position != -1);
+
+            if( position >= 0 )
+               movevec.index(position) = j;
          }
       }
 
@@ -1995,7 +2010,12 @@ protected:
       for( i = vec.size() - 1; i >= 0; --i )
       {
          SVectorBase<R>& remvec = rowVector_w(vec.index(i));
-         remvec.remove(remvec.pos(j));
+         int position = remvec.pos(j);
+
+         assert(position != -1);
+
+         if( position >= 0 )
+            remvec.remove(position);
       }
 
       // move last column to removed position
@@ -2006,7 +2026,12 @@ protected:
          for( i = l_vec.size() - 1; i >= 0; --i )
          {
             SVectorBase<R>& movevec = rowVector_w(l_vec.index(i));
-            movevec.index(movevec.pos(idx)) = j;
+            int position = movevec.pos(idx);
+
+            assert(position != -1);
+
+            if( position >= 0 )
+               movevec.index(position) = j;
          }
       }
 
