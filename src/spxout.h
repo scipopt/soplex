@@ -166,6 +166,16 @@ public:
    {
       return getStream( getVerbosity() );
    }
+
+   static inline void setScientific( std::ostream& stream )
+   {
+      stream << std::setprecision(16) << std::scientific;
+   }
+
+   static inline void setIntuitive( std::ostream& stream )
+   {
+      stream << std::setprecision(8) << std::fixed;
+   }
    //@}
 
 private:

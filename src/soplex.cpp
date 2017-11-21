@@ -6275,6 +6275,8 @@ namespace soplex
       assert(filename != 0);
 
       std::ofstream file(filename);
+      SPxOut::setScientific(file);
+
       if( !file.good() )
          return false;
 
