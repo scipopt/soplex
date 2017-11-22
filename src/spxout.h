@@ -167,14 +167,16 @@ public:
       return getStream( getVerbosity() );
    }
 
-   static inline void setScientific( std::ostream& stream )
+   /// Sets the precision of the stream to 16 and the floatfield to scientifix.
+   static inline void setScientific( std::ostream& stream, int precision = 8 )
    {
-      stream << std::setprecision(16) << std::scientific;
+      stream << std::setprecision(precision) << std::scientific;
    }
 
-   static inline void setIntuitive( std::ostream& stream )
+   /// Sets the precision of the stream to 8 and the floatfield to fixed.
+   static inline void setIntuitive( std::ostream& stream, int precision = 8 )
    {
-      stream << std::setprecision(8) << std::fixed;
+      stream << std::setprecision(precision) << std::fixed;
    }
    //@}
 

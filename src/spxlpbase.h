@@ -1249,6 +1249,7 @@ public:
             countFreeRow++;
       }
 
+      SPxOut::setIntuitive(os);
       os << "  Columns           : " << nCols() << "\n"
          << "              boxed : " << countBoxed << "\n"
          << "        lower bound : " << countLower << "\n"
