@@ -156,8 +156,7 @@ namespace soplex
       Real avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?
          (sumDualDegen / (iterations - iterationsPrimal)) : 0.0;
 
-      int prec = (int) os.precision();
-      os << std::fixed << std::setprecision(2);
+      SPxOut::setFixed(os, 2);
 
       os << "Total time          : " << totTime << "\n"
          << "  Reading           : " << readingTime->time() << "\n"
@@ -246,7 +245,8 @@ namespace soplex
          os << "  Rows              : " << numRedProbRows << "\n";
          os << "  Columns           : " << numRedProbCols << "\n";
 
-         os << std::scientific << std::setprecision(20);
+         SPxOut::setScientific(os, 16);
+
          os << "Decomp. Basis Cond. : " << decompBasisCondNum << "\n";
          os << "Decomp Violations   : \n";
          os << "  Sum Bound         : " << totalBoundViol << "\n";
@@ -254,20 +254,21 @@ namespace soplex
          os << "  Max Bound         : " << maxBoundViol << "\n";
          os << "  Max Row           : " << maxRowViol << "\n";
 
-         os << std::fixed << std::setprecision(2);
+         SPxOut::setFixed(os, 2);
 
          os << "Red. Problem Status : " << redProbStatus << "\n";
          os << "Comp. Problem Status: " << compProbStatus << "\n";
 
-         os << std::scientific << std::setprecision(20);
+         SPxOut::setScientific(os, 16);
+
          os << "Comp. Problem Obj.  : " << finalCompObj << "\n";
       }
 
-      os << std::scientific << std::setprecision(2);
+      SPxOut::setScientific(os);
+
       os << "Numerics            :\n";
       os << "  Condition Number  : " << finalBasisCondition << "\n";
 
-      os << std::scientific << std::setprecision(prec);
    }
 } // namespace soplex
 #endif
