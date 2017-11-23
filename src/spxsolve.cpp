@@ -397,7 +397,7 @@ SPxSolver::Status SPxSolver::solve()
              */
             if( lastEntered().isValid() )
                enterCycleCount = 0;
-            else if( basis().status() != SPxBasis::INFEASIBLE )
+            else if( basis().status() != SPxBasis::INFEASIBLE && basis().status() != SPxBasis::UNBOUNDED )
             {
                enterCycleCount++;
                if( enterCycleCount > MAXCYCLES )
@@ -660,7 +660,7 @@ SPxSolver::Status SPxSolver::solve()
              */
             if( lastIndex() >= 0 )
                leaveCycleCount = 0;
-            else if( basis().status() != SPxBasis::INFEASIBLE)
+            else if( basis().status() != SPxBasis::INFEASIBLE && basis().status() != SPxBasis::UNBOUNDED )
             {
                leaveCycleCount++;
                if( leaveCycleCount > MAXCYCLES )
