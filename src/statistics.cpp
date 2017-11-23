@@ -156,7 +156,7 @@ namespace soplex
       Real avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?
          (sumDualDegen / (iterations - iterationsPrimal)) : 0.0;
 
-      SPxOut::setIntuitive(os, 2);
+      SPxOut::setFixed(os, 2);
 
       os << "Total time          : " << totTime << "\n"
          << "  Reading           : " << readingTime->time() << "\n"
@@ -254,7 +254,7 @@ namespace soplex
          os << "  Max Bound         : " << maxBoundViol << "\n";
          os << "  Max Row           : " << maxRowViol << "\n";
 
-         SPxOut::setIntuitive(os, 2);
+         SPxOut::setFixed(os, 2);
 
          os << "Red. Problem Status : " << redProbStatus << "\n";
          os << "Comp. Problem Status: " << compProbStatus << "\n";

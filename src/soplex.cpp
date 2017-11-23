@@ -6218,7 +6218,7 @@ namespace soplex
    {
       bool printedValue = false;
 
-      SPxOut::setIntuitive(spxout.getCurrentStream());
+      SPxOut::setFixed(spxout.getCurrentStream());
 
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
       {
@@ -6285,7 +6285,7 @@ namespace soplex
 
       file.setf(std::ios::left);
 
-      SPxOut::setIntuitive(file);
+      SPxOut::setFixed(file);
 
       file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
 #if SOPLEX_SUBVERSION > 0
@@ -6316,7 +6316,7 @@ namespace soplex
          file << "int:" << _currentSettings->intParam.name[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
       }
 
-      SPxOut::setIntuitive(file);
+      SPxOut::setScientific(file);
 
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
       {
@@ -6754,7 +6754,7 @@ namespace soplex
    void SoPlex::printShortStatistics(std::ostream& os)
    {
       printStatus(os, _status);
-      SPxOut::setIntuitive(os, 2);
+      SPxOut::setFixed(os, 2);
       os << "Solving time (sec)  : " << _statistics->solvingTime->time() << "\n"
          << "Iterations          : " << _statistics->iterations << "\n";
       SPxOut::setScientific(os);
@@ -6766,7 +6766,7 @@ namespace soplex
    /// prints complete statistics
    void SoPlex::printStatistics(std::ostream& os)
    {
-      SPxOut::setIntuitive(os, 2);
+      SPxOut::setFixed(os, 2);
 
       printStatus(os, _status);
 
