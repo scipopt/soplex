@@ -321,13 +321,17 @@ SPxSolver::Status SPxSolver::solve()
                {
                   Real newpricertol = minpricertol;
 
+                  // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
+                  computeFrhs();
+                  SPxBasis::solve(*theFvec, *theFrhs);
+
+                  computeEnterCoPrhs();
+                  SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+                  computePvec();
+
                   MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
                   computeTest();
                   computeCoTest();
-
-                  // re-compute Fvec to get a more precise solution and obj value
-                  computeFrhs();
-                  SPxBasis::solve(*theFvec, *theFrhs);
 
                   // is the solution good enough ?
                   // max three times reduced
@@ -588,6 +592,14 @@ SPxSolver::Status SPxSolver::solve()
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   Real newpricertol = minpricertol;
+
+                  // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
+                  computeFrhs();
+                  SPxBasis::solve(*theFvec, *theFrhs);
+
+                  computeLeaveCoPrhs();
+                  SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+                  computePvec();
 
                   MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
                   computeFtest();
