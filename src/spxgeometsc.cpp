@@ -30,46 +30,48 @@ static Real computeScalingVec(
       const SVSet*             vecset,
       const std::vector<Real>& coScaleval,
       std::vector<Real>&       scaleval)
+{
+   Real pmax = 0.0;
+
+   assert(scaleval.size() == unsigned(vecset->num()));
+
+   for( int i = 0; i < vecset->num(); ++i )
    {
+      const SVector& vec = (*vecset)[i];
 
-      Real pmax = 0.0;
-      for( int i = 0; i < vecset->num(); ++i )
+      Real maxi = 0.0;
+      Real mini = infinity;
+
+      for( int j = 0; j < vec.size(); ++j )
       {
-         const SVector& vec = (*vecset)[i];
+         const Real x = spxAbs(vec.value(j) * coScaleval[unsigned(vec.index(j))]);
 
-         Real maxi = 0.0;
-         Real mini = infinity;
-
-         for( int j = 0; j < vec.size(); ++j )
+         if (!isZero(x))
          {
-            const Real x = spxAbs(vec.value(j) * coScaleval[unsigned(vec.index(j))]);
-
-            if (!isZero(x))
-            {
-               if (x > maxi)
-                  maxi = x;
-               if (x < mini)
-                  mini = x;
-            }
+            if (x > maxi)
+               maxi = x;
+            if (x < mini)
+               mini = x;
          }
-         // empty rows/cols are possible
-         if (mini == infinity || maxi == 0.0)
-         {
-            mini = 1.0;
-            maxi = 1.0;
-         }
-         assert(mini < infinity);
-         assert(maxi > 0.0);
-
-         scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);
-
-         const Real p = maxi / mini;
-
-         if (p > pmax)
-            pmax = p;
       }
-      return pmax;
+      // empty rows/cols are possible
+      if (mini == infinity || maxi == 0.0)
+      {
+         mini = 1.0;
+         maxi = 1.0;
+      }
+      assert(mini < infinity);
+      assert(maxi > 0.0);
+
+      scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);
+
+      const Real p = maxi / mini;
+
+      if (p > pmax)
+         pmax = p;
    }
+   return pmax;
+}
 
 
 SPxGeometSC::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real goodEnough)
@@ -78,7 +80,11 @@ SPxGeometSC::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real good
    , m_maxIterations(maxIters)
    , m_minImprovement(minImpr)
    , m_goodEnoughRatio(goodEnough)
-{}
+{
+   assert(maxIters > 0);
+   assert(minImpr > 0.0 && minImpr <= 1.0);
+   assert(goodEnough >= 0.0);
+}
 
 SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
    : SPxScaler(old)
@@ -86,7 +92,11 @@ SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
    , m_maxIterations(old.m_maxIterations)
    , m_minImprovement(old.m_minImprovement)
    , m_goodEnoughRatio(old.m_goodEnoughRatio)
-{}
+{
+   assert(m_maxIterations > 0);
+   assert(m_minImprovement > 0.0 && m_minImprovement <= 1.0);
+   assert(m_goodEnoughRatio >= 0.0);
+}
 
 SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 {
@@ -134,12 +144,19 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                         << " row-ratio= " << rowratio
                         << std::endl; )
 
-   // are we already good enough? todo don't stop with active postequilibration?
+   bool geoscale = true;
+
+   // are we already good enough?
    if( p1start < m_goodEnoughRatio )
    {
       MSG_INFO2( (*spxout), (*spxout) << "No geometric scaling done, ratio good enough" << std::endl; )
-      lp.setScalingInfo(true);
-      return;
+
+      if( !postequilibration )
+      {
+         lp.setScalingInfo(true);
+         return;
+      }
+      geoscale = false;
    }
 
    std::vector<Real> rowscale(unsigned(lp.nRows()), 1.0);
@@ -147,39 +164,43 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 
    Real p0 = 0.0;
    Real p1 = 0.0;
-   Real p0prev = p0start;
-   Real p1prev = p1start;
 
-   // We make at most maxIterations.
-   for( int count = 0; count < m_maxIterations; count++ )
+   if( geoscale )
    {
-      if( colFirst )
-      {
-         p0 = computeScalingVec(lp.colSet(), rowscale, colscale);
-         p1 = computeScalingVec(lp.rowSet(), colscale, rowscale);
-      }
-      else
-      {
-         p0 = computeScalingVec(lp.rowSet(), colscale, rowscale);
-         p1 = computeScalingVec(lp.colSet(), rowscale, colscale);
-      }
+      Real p0prev = p0start;
+      Real p1prev = p1start;
 
-      MSG_INFO3( (*spxout), (*spxout) << "Geometric scaling round " << count
-                           << " col-ratio= " << (colFirst ? p0 : p1)
-                           << " row-ratio= " << (colFirst ? p1 : p0)
-                           << std::endl; )
+      // We make at most maxIterations.
+      for( int count = 0; count < m_maxIterations; count++ )
+      {
+         if( colFirst )
+         {
+            p0 = computeScalingVec(lp.colSet(), rowscale, colscale);
+            p1 = computeScalingVec(lp.rowSet(), colscale, rowscale);
+         }
+         else
+         {
+            p0 = computeScalingVec(lp.rowSet(), colscale, rowscale);
+            p1 = computeScalingVec(lp.colSet(), rowscale, colscale);
+         }
 
-      if( p0 > m_minImprovement * p0prev && p1 > m_minImprovement * p1prev )
+         MSG_INFO3( (*spxout), (*spxout) << "Geometric scaling round " << count
+                              << " col-ratio= " << (colFirst ? p0 : p1)
+                              << " row-ratio= " << (colFirst ? p1 : p0)
+                              << std::endl; )
+
+         if( p0 > m_minImprovement * p0prev && p1 > m_minImprovement * p1prev )
             break;
 
-      p0prev = p0;
-      p1prev = p1;
+         p0prev = p0;
+         p1prev = p1;
+      }
    }
 
-   // we scale only if we have enough (15%) improvement.
-   const bool nogeoscale = p0 > m_minImprovement * p0start && p1 > m_minImprovement * p1start;
+   // we scale only if we have enough (default 15%) improvement.
+   geoscale = geoscale && (p0 <= m_minImprovement * p0start || p1 <= m_minImprovement * p1start);
 
-   if( nogeoscale && !postequilibration )
+   if( !geoscale && !postequilibration )
    {
       MSG_INFO2( (*spxout), (*spxout) << "No geometric scaling done." << std::endl; )
       lp.setScalingInfo(true);
@@ -191,7 +212,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 
       if( postequilibration )
       {
-         if( nogeoscale )
+         if( !geoscale )
          {
             std::fill(rowscale.begin(), rowscale.end(), 1.0);
             std::fill(colscale.begin(), colscale.end(), 1.0);
