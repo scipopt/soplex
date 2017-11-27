@@ -144,10 +144,10 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
                         << " row-ratio= " << rowratio
                         << std::endl; )
 
-   bool geoscale = true;
+   // perform geometric scaling only if maximum ratio is above threshold
+   bool geoscale = p1start > m_goodEnoughRatio;
 
-   // are we already good enough?
-   if( p1start < m_goodEnoughRatio )
+   if( !geoscale )
    {
       MSG_INFO2( (*spxout), (*spxout) << "No geometric scaling done, ratio good enough" << std::endl; )
 
@@ -156,7 +156,8 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
          lp.setScalingInfo(true);
          return;
       }
-      geoscale = false;
+
+      MSG_INFO2( (*spxout), (*spxout) << " ... but will still perform equilibrium scaling" << std::endl; )
    }
 
    std::vector<Real> rowscale(unsigned(lp.nRows()), 1.0);
@@ -170,7 +171,7 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
       Real p0prev = p0start;
       Real p1prev = p1start;
 
-      // We make at most maxIterations.
+      // we make at most maxIterations.
       for( int count = 0; count < m_maxIterations; count++ )
       {
          if( colFirst )
@@ -195,10 +196,10 @@ void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
          p0prev = p0;
          p1prev = p1;
       }
-   }
 
-   // we scale only if we have enough (default 15%) improvement.
-   geoscale = geoscale && (p0 <= m_minImprovement * p0start || p1 <= m_minImprovement * p1start);
+      // perform geometric scaling only if there is enough (default 15%) improvement.
+      geoscale = (p0 <= m_minImprovement * p0start || p1 <= m_minImprovement * p1start);
+   }
 
    if( !geoscale && !postequilibration )
    {
