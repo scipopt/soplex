@@ -24,6 +24,7 @@
 #include "svsetbase.h"
 #include "svectorbase.h"
 #include "ssvectorbase.h"
+#include <array>
 
 namespace soplex
 {
@@ -232,19 +233,9 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    setup(lp);
 
-   Real tmp;
-   Real smax;
-   Real qcurr;
-   Real qprev;
-   Real scurr;
-   Real sprev;
-   Real eprev[3];
-   int k;
-   int l;
-   int nrows = lp.nRows();
-   int ncols = lp.nCols();
-   int nnzeroes = lp.nNzos();
-   int maxscrounds = maxrounds;
+   const int nrows = lp.nRows();
+   const int ncols = lp.nCols();
+   const int nnzeroes = lp.nNzos();
 
    /* constant factor matrices */
    SVSet facnrows(nrows, nrows, 1.1, 1.2);
@@ -293,12 +284,11 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    /* initialize scalars, vectors and matrices */
 
-   smax = nnzeroes / acrcydivisor;
-   qcurr = 1.0;
-   qprev = 0.0;
+   const Real smax = nnzeroes / acrcydivisor;
+   Real qcurr = 1.0;
+   Real qprev = 0.0;
 
-   for(k = 0; k < 3; ++k )
-      eprev[k] = 0.0;
+   std::array<Real, 3> eprev = {0.0, 0.0, 0.0};
 
    initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzeroes);
    initConstVecs(lp.colSet(), facncols, collogs, colnnzeroes);
@@ -319,12 +309,14 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    rowscale1.assignPWproduct4setup(rownnzeroes, rowlogs);
    rowscale2 = rowscale1;
 
-   scurr = resncols * tmpcols.assignPWproduct4setup(colnnzeroes, resncols);
+   Real scurr = resncols * tmpcols.assignPWproduct4setup(colnnzeroes, resncols);
+
+   int k;
 
    /* conjugate gradient loop */
-   for( k = 0; k < maxscrounds; ++k )
+   for( k = 0; k < maxrounds; ++k )
    {
-      sprev = scurr;
+      const Real sprev = scurr;
 
       // is k even?
       if( (k % 2) == 0 )
@@ -347,12 +339,12 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
       }
 
       // shift eprev entries one to the right
-      for( l = 2; l > 0; --l)
+      for( int l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
       eprev[0] = (qcurr * scurr) / sprev;
 
-      tmp = qcurr;
+      const Real tmp = qcurr;
       qcurr = 1.0 - eprev[0];
       qprev = tmp;
 
@@ -377,8 +369,8 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    SSVector rowscale = *rsccurr;
    SSVector colscale = *csccurr;
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   DataArray<int>& colscaleExp = *m_activeColscaleExp;
+   DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
 
    for( k = 0; k < nrows; ++k )
       rowscaleExp[k] = int( rowscale[k] + ((rowscale[k] >= 0)? (+0.5) : (-0.5)) );
