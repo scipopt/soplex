@@ -329,6 +329,8 @@ SPxSolver::Status SPxSolver::solve()
                   SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
                   computePvec();
 
+                  forceRecompNonbasicValue();
+
                   MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
                   computeTest();
                   computeCoTest();
@@ -600,6 +602,8 @@ SPxSolver::Status SPxSolver::solve()
                   computeLeaveCoPrhs();
                   SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
                   computePvec();
+
+                  forceRecompNonbasicValue();
 
                   MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
                   computeFtest();
