@@ -111,7 +111,7 @@ SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
 void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
 {
 
-   MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
+   MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << (postequilibration ? " with post-equilibration" : "") << std::endl; )
 
    setup(lp);
 
