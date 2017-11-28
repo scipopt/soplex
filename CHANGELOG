@@ -12,6 +12,7 @@ fixed bugs:
 - don't print infeasible primal/dual solutions
 - properly clear update vectors in initialization step
 - fix bug in geometric scaling
+- respect the time limit during solution polishing
 
 
 01 September 2017 - Release 3.0.1
