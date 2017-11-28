@@ -30,7 +30,7 @@ namespace soplex
 {
 
 /* update scaling vector */
-static inline void updateScale(
+static void updateScale(
    const SSVector vecnnzeroes,
    const SSVector resnvec,
    SSVector& tmpvec,
@@ -68,7 +68,7 @@ static inline void updateScale(
 }
 
 /* update scaling vector after main loop */
-static inline void updateScaleFinal(
+static void updateScaleFinal(
    const SSVector vecnnzeroes,
    const SSVector resnvec,
    SSVector& tmpvec,
@@ -190,7 +190,7 @@ static const char* makename()
 }
 
 SPxLeastSqSC::SPxLeastSqSC()
-   : SPxScaler(makename(), false, false), acrcydivisor(ACCURACY_DIVISOR), maxrounds(MAX_ROUNDS)
+   : SPxScaler(makename(), false, false)
 {}
 
 SPxLeastSqSC::SPxLeastSqSC(const SPxLeastSqSC& old)
@@ -281,11 +281,14 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    /* initialize scalars, vectors and matrices */
 
+   assert(acrcydivisor > 0.0);
+
    const Real smax = lpnnz / acrcydivisor;
    Real qcurr = 1.0;
    Real qprev = 0.0;
 
-   std::array<Real, 3> eprev = {0.0, 0.0, 0.0};
+   std::array<Real, 3> eprev;
+   eprev.fill(0.0);
 
    initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv);
    initConstVecs(lp.colSet(), facncols, collogs, colnnzinv);
@@ -323,7 +326,6 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
             updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr);
-
          scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzinv);
       }
       else // k is odd
@@ -332,11 +334,11 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
          updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr);
-         scurr = resncols * (tmpcols.assignPWproduct4setup(resncols, colnnzinv) );
+         scurr = resncols * tmpcols.assignPWproduct4setup(resncols, colnnzinv);
       }
 
       // shift eprev entries one to the right
-      for( int l = 2; l > 0; --l)
+      for( unsigned l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
       eprev[0] = (qcurr * scurr) / sprev;
@@ -364,16 +366,17 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    /* compute actual scaling factors */
 
-   SSVector rowscale = *rsccurr;
-   SSVector colscale = *csccurr;
+   const SSVector& rowscale = *rsccurr;
+   const SSVector& colscale = *csccurr;
+
    DataArray<int>& colscaleExp = *m_activeColscaleExp;
    DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
 
    for( k = 0; k < nrows; ++k )
-      rowscaleExp[k] = int( rowscale[k] + ((rowscale[k] >= 0.0)? (+0.5) : (-0.5)) );
+      rowscaleExp[k] = -int( rowscale[k] + ((rowscale[k] >= 0.0)? (+0.5) : (-0.5)) );
 
    for( k = 0; k < ncols; ++k )
-      colscaleExp[k] = int( colscale[k] + ((colscale[k] >= 0.0)? (+0.5) : (-0.5)) );
+      colscaleExp[k] = -int( colscale[k] + ((colscale[k] >= 0.0)? (+0.5) : (-0.5)) );
 
    // scale
    applyScaling(lp);
