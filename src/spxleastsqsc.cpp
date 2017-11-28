@@ -161,7 +161,7 @@ static void initConstVecs(
       else
       {
          /* all-0 entries */
-         logsum = 1.0; // todo
+         logsum = 1.0;
          nnzinv = 1.0;
       }
 
