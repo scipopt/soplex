@@ -66,7 +66,7 @@ endif()
 message(STATUS \"Git hash: \" \${GITHASH})
 ")
 add_custom_target(soplex_update_githash
-                  COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/soplex/githash.c
+                  COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/git_hash.cpp
                                            -P ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake)
 
 option(LEGACY "Build SoPlex in legacy mode" OFF)
