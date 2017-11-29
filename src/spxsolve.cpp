@@ -1008,7 +1008,7 @@ SPxSolver::Status SPxSolver::solve()
 void SPxSolver::performSolutionPolishing()
 {
    // catch rare case that the iteration limit is exactly reached at optimality
-   bool stop = (maxIters >= 0 && iterations() >= maxIters);
+   bool stop = (maxIters >= 0 && iterations() >= maxIters && !isTimeLimitReached());
 
    // only polish an already optimal basis
    if( stop || polishObj == POLISH_OFF || status() != OPTIMAL )
@@ -1089,6 +1089,8 @@ void SPxSolver::performSolutionPolishing()
                      stop = true;
                }
                MSG_DEBUG( std::cout << std::endl; )
+               if( isTimeLimitReached() )
+                  stop = true;
             }
 
             // identify nonbasic variables that may be moved into the basis
@@ -1109,6 +1111,8 @@ void SPxSolver::performSolutionPolishing()
                      stop = true;
                }
                MSG_DEBUG( std::cout << std::endl; )
+               if( isTimeLimitReached() )
+                  stop = true;
             }
 
             // terminate if in the last round no more polishing steps were performed
@@ -1153,6 +1157,8 @@ void SPxSolver::performSolutionPolishing()
                      stop = true;
                }
                MSG_DEBUG( std::cout << std::endl; )
+               if( isTimeLimitReached() )
+                  stop = true;
             }
             // terminate if in the last round no more polishing steps were performed
             if( nSuccessfulPivots == 0 )
@@ -1219,6 +1225,8 @@ void SPxSolver::performSolutionPolishing()
                      stop = true;
                }
                MSG_DEBUG( std::cout << std::endl; )
+               if( isTimeLimitReached() )
+                  stop = true;
             }
             // terminate if in the last round no more polishing steps were performed
             if( nSuccessfulPivots == 0 )
@@ -1271,6 +1279,8 @@ void SPxSolver::performSolutionPolishing()
                      stop = true;
                }
                MSG_DEBUG( std::cout << std::endl; )
+               if( isTimeLimitReached() )
+                  stop = true;
             }
             // terminate if in the last round no more polishing steps were performed
             if( nSuccessfulPivots == 0 )
