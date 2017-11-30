@@ -394,6 +394,24 @@ void printDualSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, boo
          MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero (within "
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
+
+         DVector redcost(soplex.numColsReal());
+         if( soplex.getRedCostReal(redcost) )
+         {
+            MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
+            for( int i = 0; i < soplex.numColsReal(); ++i )
+            {
+               if ( isNotZero( redcost[i] ) )
+               {
+                  MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t"
+                             << std::setw(printwidth) << std::setprecision(printprec)
+                             << redcost[i] << std::endl; )
+               }
+            }
+            MSG_INFO1( soplex.spxout, soplex.spxout << "All other reduced costs are zero (within "
+                        << std::setprecision(1) << std::scientific << Param::epsilon()
+                        << std::setprecision(8) << std::fixed << ")." << std::endl; )
+         }
       }
       else
          MSG_INFO1( soplex.spxout, soplex.spxout << "No dual information available.\n")
@@ -426,6 +444,18 @@ void printDualSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, boo
                MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t" << dual[i] << std::endl; )
          }
          MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
+
+         DVectorRational redcost(soplex.numColsReal());
+         if( soplex.getRedCostRational(redcost) )
+         {
+            MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
+            for( int i = 0; i < soplex.numColsReal(); ++i )
+            {
+               if ( redcost[i] != (Rational) 0 )
+                  MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl; )
+            }
+            MSG_INFO1( soplex.spxout, soplex.spxout << "All other reduced costs are zero." << std::endl; )
+         }
       }
       else
          MSG_INFO1( soplex.spxout, soplex.spxout << "No dual (rational) solution available.\n")
