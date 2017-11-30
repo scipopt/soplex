@@ -4,6 +4,7 @@ Developer Version
 features:
 
 interface & parameters:
+- also print reduced values when passing '-y' on the command line
 
 fixed bugs:
 - correct API method for multiplication with basis matrix for sparse vectors
