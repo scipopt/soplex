@@ -113,7 +113,7 @@ public:
           variables and covariables. This assignment is maintained by the
           basis #Desc%riptor.
           
-          Variables and covariables may have a primal or dual Status. The
+          Variables and covariables (slackvariables) may have a primal or dual Status. The
           first type specifies that a variable is set on a primal bound, while
           the latter type indicates a dual variable to be set on a bound.
           If a row variable has a primal status, say #P_ON_UPPER, this means
@@ -178,7 +178,7 @@ public:
           \f]
 
           Note that unbounded primal variables are reflected by an #D_UNDEFINED
-          dual variable, since no dual variables exist for them. To facilitate
+          dual variable, since no reduced costs exist for them. To facilitate
           the assignment of dual #Status%es, class SPxBasis provides methods
           #dualStatus(), #dualColStatus() and #dualRowStatus)().
       */
@@ -192,7 +192,7 @@ public:
          D_ON_UPPER  = 2,   ///< dual variable is set to its upper bound
          D_ON_LOWER  = 4,   ///< dual variable is set to its lower bound
          D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,  ///< dual variable has two bounds
-         D_UNDEFINED = 8    ///< primal or dual variable has no status
+         D_UNDEFINED = 8    ///< primal or dual variable is undefined
       };
       //@}
 
