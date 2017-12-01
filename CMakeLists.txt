@@ -121,8 +121,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
     endif()
 endif()
 if(MSVC)
-    add_definitions(/W4)
+#    add_definitions(/W4)
     add_definitions(/wd4100)
+    add_definitions(/wd4661)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
     # set MT or MTd flag when using the static VS runtime libraries
