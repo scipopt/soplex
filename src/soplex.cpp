@@ -6642,7 +6642,7 @@ namespace soplex
          {
             unsigned int value;
             char format[SPX_MAXSTRLEN];
-            snprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
 
             if( sscanf(paramValueString, format, &value) == 1 )
             {
@@ -8589,7 +8589,7 @@ namespace soplex
          {
             unsigned int value;
             char format[SPX_MAXSTRLEN];
-            snprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
 
             if( sscanf(paramValueString, format, &value) == 1 )
             {
