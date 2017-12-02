@@ -336,11 +336,15 @@ protected:
    DVector        theUBbound;  ///< Upper Basic Feasibility bound
    DVector        theLBbound;  ///< Lower Basic Feasibility bound
 
+   /** The values of the rhs corresponding to the current basis.*/
    DVector*       theFrhs;
+   /** The values of all basis variables. */
    UpdateVector*  theFvec;
 
+   /* The Copricing rhs and vector */
    DVector*       theCoPrhs;
    UpdateVector*  theCoPvec;
+   /** The pricing vector */
    UpdateVector*  thePvec;
 
    UpdateVector*  theRPvec;    ///< row pricing vector

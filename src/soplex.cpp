@@ -5136,7 +5136,6 @@ namespace soplex
    bool SoPlex::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
    {
       ///@todo implement return value
-
       if( unscale && _realLP->isScaled() )
       {
          MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
@@ -6219,6 +6218,8 @@ namespace soplex
    {
       bool printedValue = false;
 
+      SPxOut::setFixed(spxout.getCurrentStream());
+
       for( int i = 0; i < SoPlex::BOOLPARAM_COUNT; i++ )
       {
          if( _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
@@ -6236,6 +6237,8 @@ namespace soplex
          spxout << "int:" << _currentSettings->intParam.name[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
          printedValue = true;
       }
+
+      SPxOut::setScientific(spxout.getCurrentStream());
 
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
       {
@@ -6275,10 +6278,15 @@ namespace soplex
       assert(filename != 0);
 
       std::ofstream file(filename);
+      SPxOut::setScientific(file, 16);
+
       if( !file.good() )
          return false;
 
       file.setf(std::ios::left);
+
+      SPxOut::setFixed(file);
+
       file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
 #if SOPLEX_SUBVERSION > 0
       file << "." << SOPLEX_SUBVERSION;
@@ -6307,6 +6315,8 @@ namespace soplex
             << "], default " << _currentSettings->intParam.defaultValue[i] << "\n";
          file << "int:" << _currentSettings->intParam.name[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
       }
+
+      SPxOut::setScientific(file);
 
       for( int i = 0; i < SoPlex::REALPARAM_COUNT; i++ )
       {
@@ -6632,7 +6642,7 @@ namespace soplex
          {
             unsigned int value;
             char format[SPX_MAXSTRLEN];
-            snprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
 
             if( sscanf(paramValueString, format, &value) == 1 )
             {
@@ -6657,12 +6667,10 @@ namespace soplex
    /// prints solution statistics
    void SoPlex::printSolutionStatistics(std::ostream& os)
    {
-      int prec = (int) os.precision();
-      std::ios_base::fmtflags floatfield = os.floatfield;
+      SPxOut::setScientific(os);
       if( _lastSolveMode == SOLVEMODE_REAL )
       {
-         os << std::scientific << std::setprecision(8)
-            << "Solution (real)     : \n"
+         os << "Solution (real)     : \n"
             << "  Objective value   : " << objValueReal() << "\n";
       }
       else if( _lastSolveMode == SOLVEMODE_RATIONAL )
@@ -6730,11 +6738,7 @@ namespace soplex
          else
             os << "  Max/sum dual      : - / -\n";
       }
-      // restore previous stream state
-      os << std::setprecision(prec);
-      os << std::setiosflags(floatfield);
    }
-
 
 
    /// prints statistics on solving process
@@ -6750,9 +6754,11 @@ namespace soplex
    void SoPlex::printShortStatistics(std::ostream& os)
    {
       printStatus(os, _status);
-      os << "Solving time (sec)  : " << std::fixed << std::setprecision(2) << _statistics->solvingTime->time() << "\n"
-         << "Iterations          : " << _statistics->iterations << "\n"
-         << "Objective value     : " << std::scientific << std::setprecision(8) << objValueReal() << std::fixed << "\n";
+      SPxOut::setFixed(os, 2);
+      os << "Solving time (sec)  : " << _statistics->solvingTime->time() << "\n"
+         << "Iterations          : " << _statistics->iterations << "\n";
+      SPxOut::setScientific(os);
+      os << "Objective value     : " << objValueReal() << "\n";
    }
 
 
@@ -6760,8 +6766,7 @@ namespace soplex
    /// prints complete statistics
    void SoPlex::printStatistics(std::ostream& os)
    {
-      int prec = (int) os.precision();
-      os << std::setprecision(2);
+      SPxOut::setFixed(os, 2);
 
       printStatus(os, _status);
 
@@ -6779,10 +6784,7 @@ namespace soplex
       os << "Objective sense     : " << (intParam(SoPlex::OBJSENSE) == SoPlex::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
       printSolutionStatistics(os);
       printSolvingStatistics(os);
-      os << std::setprecision(prec);
    }
-
-
 
    /// prints status
    void SoPlex::printStatus(std::ostream& os, SPxSolver::Status stat)
@@ -8587,7 +8589,7 @@ namespace soplex
          {
             unsigned int value;
             char format[SPX_MAXSTRLEN];
-            snprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
 
             if( sscanf(paramValueString, format, &value) == 1 )
             {

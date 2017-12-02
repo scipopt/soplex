@@ -4,14 +4,15 @@ Developer Version
 features:
 
 interface & parameters:
+- also print reduced values when passing '-y' on the command line
 
 fixed bugs:
 - correct API method for multiplication with basis matrix for sparse vectors
-- correct behavior for constraints/variables with infinite sides/bounds (relaxed rows/cols)
 - fixed bug when setting and getting dual pricing norms
 - don't print infeasible primal/dual solutions
 - properly clear update vectors in initialization step
 - fix bug in geometric scaling
+- respect the time limit during solution polishing
 
 
 01 September 2017 - Release 3.0.1

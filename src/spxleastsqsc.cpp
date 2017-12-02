@@ -24,12 +24,13 @@
 #include "svsetbase.h"
 #include "svectorbase.h"
 #include "ssvectorbase.h"
+#include <array>
 
 namespace soplex
 {
 
 /* update scaling vector */
-static inline void updateScale(
+static void updateScale(
    const SSVector vecnnzeroes,
    const SSVector resnvec,
    SSVector& tmpvec,
@@ -67,7 +68,7 @@ static inline void updateScale(
 }
 
 /* update scaling vector after main loop */
-static inline void updateScaleFinal(
+static void updateScaleFinal(
    const SSVector vecnnzeroes,
    const SSVector resnvec,
    SSVector& tmpvec,
@@ -106,7 +107,7 @@ static inline void updateRes(
    Real eprev,
    Real qcurr)
 {
-   assert(qcurr != 0);
+   assert(qcurr != 0.0);
 
    if( isZero(eprev) )
       resvec.clear();
@@ -127,66 +128,59 @@ static void initConstVecs(
    const SVSet* vecset,
    SVSet& facset,
    SSVector& veclogs,
-   SSVector& vecnnzeroes)
+   SSVector& vecnnzinv)
 {
    assert(vecset != NULL);
 
-   Real a;
-   Real x;
-   Real sum;
-   Real log2_inv = 1.0/log(2.0);
-   int l;
-   int size;
-   int nvec = vecset->num();
-   int nnzeros;
+   const int nvec = vecset->num();
 
-   for(int k = 0; k < nvec; ++k )
+   for( int k = 0; k < nvec; ++k )
    {
-      sum = 0.0;
-      nnzeros = 0;
+      Real logsum = 0.0;
+      int nnz = 0;
+      // get kth row or column of LP
       const SVector& lpvec = (*vecset)[k];
+      const int size = lpvec.size();
 
-      size = lpvec.size();
-
-      for( l = 0; l < size; ++l)
+      for( int i = 0; i < size; ++i )
       {
-         a = spxAbs(lpvec.value(l));
+         const Real a = lpvec.value(i);
 
          if( !isZero(a) )
          {
-            sum += log(double(a)) * log2_inv;
-            nnzeros++;
+            logsum += log2(double(spxAbs(a))); // todo spxLog2?
+            nnz++;
          }
       }
 
-      if( nnzeros > 0)
+      Real nnzinv;
+      if( nnz > 0)
       {
-         x = (1.0 / nnzeros);
+         nnzinv = 1.0 / nnz;
       }
       else
       {
-         /* all-0 entries, so assume row is already scaled (all-1) */
-         sum = (Real) size;
-         x = 1.0 / size;
+         /* all-0 entries */
+         logsum = 1.0;
+         nnzinv = 1.0;
       }
 
-      veclogs.add(k, sum);
-
-      vecnnzeroes.add(k, x);
+      veclogs.add(k, logsum);
+      vecnnzinv.add(k, nnzinv);
 
       /* create new vector for facset */
-      SVector& vecnew = (*(facset.create(nnzeros)));
+      SVector& vecnew = (*(facset.create(nnz)));
 
-      for( l = 0; l < size; ++l)
+      for( int i = 0; i < size; ++i )
       {
-         if( !isZero(lpvec.value(l)) )
-            vecnew.add(lpvec.index(l), x);
+         if( !isZero(lpvec.value(i)) )
+            vecnew.add(lpvec.index(i), nnzinv);
       }
       vecnew.sort();
    }
 
    assert(veclogs.isSetup());
-   assert(vecnnzeroes.isSetup());
+   assert(vecnnzinv.isSetup());
 }
 
 /* return name of scaler */
@@ -196,7 +190,7 @@ static const char* makename()
 }
 
 SPxLeastSqSC::SPxLeastSqSC()
-   : SPxScaler(makename(), false, false), acrcydivisor(ACCURACY_DIVISOR), maxrounds(MAX_ROUNDS)
+   : SPxScaler(makename(), false, false)
 {}
 
 SPxLeastSqSC::SPxLeastSqSC(const SPxLeastSqSC& old)
@@ -232,21 +226,15 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    setup(lp);
 
-   Real tmp;
-   Real smax;
-   Real qcurr;
-   Real qprev;
-   Real scurr;
-   Real sprev;
-   Real eprev[3];
-   int k;
-   int l;
-   int nrows = lp.nRows();
-   int ncols = lp.nCols();
-   int nnzeroes = lp.nNzos();
-   int maxscrounds = maxrounds;
+   const int nrows = lp.nRows();
+   const int ncols = lp.nCols();
+   const int lpnnz = lp.nNzos();
 
-   /* constant factor matrices */
+   /* constant factor matrices;
+    * in Curtis-Reid article
+    * facnrows equals E^T M^(-1)
+    * facncols equals E N^(-1)
+    * */
    SVSet facnrows(nrows, nrows, 1.1, 1.2);
    SVSet facncols(ncols, ncols, 1.1, 1.2);
 
@@ -275,8 +263,8 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    /* vectors storing the inverted number of non-zeros in each row and column
     *(respectively) of left hand matrix of LP
     */
-   SSVector rownnzeroes(nrows);
-   SSVector colnnzeroes(ncols);
+   SSVector rownnzinv(nrows);
+   SSVector colnnzinv(ncols);
 
    /* vector pointers */
    SSVector* csccurr = &colscale1;
@@ -293,15 +281,17 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 
    /* initialize scalars, vectors and matrices */
 
-   smax = nnzeroes / acrcydivisor;
-   qcurr = 1.0;
-   qprev = 0.0;
+   assert(acrcydivisor > 0.0);
 
-   for(k = 0; k < 3; ++k )
-      eprev[k] = 0.0;
+   const Real smax = lpnnz / acrcydivisor;
+   Real qcurr = 1.0;
+   Real qprev = 0.0;
 
-   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzeroes);
-   initConstVecs(lp.colSet(), facncols, collogs, colnnzeroes);
+   std::array<Real, 3> eprev;
+   eprev.fill(0.0);
+
+   initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv);
+   initConstVecs(lp.colSet(), facncols, collogs, colnnzinv);
 
    assert(tmprows.isSetup());
    assert(tmpcols.isSetup());
@@ -310,49 +300,50 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    assert(colscale1.isSetup());
    assert(colscale2.isSetup());
 
-   // compute first residual vector
+   // compute first residual vector r0
    resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs);
 
    resncols.setup();
    resnrows.setup();
 
-   rowscale1.assignPWproduct4setup(rownnzeroes, rowlogs);
+   rowscale1.assignPWproduct4setup(rownnzinv, rowlogs);
    rowscale2 = rowscale1;
 
-   scurr = resncols * tmpcols.assignPWproduct4setup(colnnzeroes, resncols);
+   Real scurr = resncols * tmpcols.assignPWproduct4setup(colnnzinv, resncols);
+
+   int k;
 
    /* conjugate gradient loop */
-   for( k = 0; k < maxscrounds; ++k )
+   for( k = 0; k < maxrounds; ++k )
    {
-      sprev = scurr;
+      const Real sprev = scurr;
 
       // is k even?
       if( (k % 2) == 0 )
       {
          // not in first iteration?
          if( k != 0 ) // true, then update row scaling factor vector
-            updateScale(rownnzeroes, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2]);
+            updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr);
-
-         scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzeroes);
+         scurr = resnrows * tmprows.assignPWproduct4setup(resnrows, rownnzinv);
       }
       else // k is odd
       {
          // update column scaling factor vector
-         updateScale(colnnzeroes, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]);
+         updateScale(colnnzinv, resncols, tmpcols, csccurr, cscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facnrows, resnrows, resncols, tmpcols, eprev[0], qcurr);
-         scurr = resncols * (tmpcols.assignPWproduct4setup(resncols, colnnzeroes) );
+         scurr = resncols * tmpcols.assignPWproduct4setup(resncols, colnnzinv);
       }
 
       // shift eprev entries one to the right
-      for( l = 2; l > 0; --l)
+      for( unsigned l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
       eprev[0] = (qcurr * scurr) / sprev;
 
-      tmp = qcurr;
+      const Real tmp = qcurr;
       qcurr = 1.0 - eprev[0];
       qprev = tmp;
 
@@ -365,26 +356,27 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    if( (k % 2) == 0 )
    {
       // update column scaling factor vector
-      updateScaleFinal(colnnzeroes, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
+      updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
    }
    else // k is odd
    {
       // update row scaling factor vector
-      updateScaleFinal(rownnzeroes, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2]);
+      updateScaleFinal(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qprev, eprev[1], eprev[2]);
    }
 
    /* compute actual scaling factors */
 
-   SSVector rowscale = *rsccurr;
-   SSVector colscale = *csccurr;
-   DataArray < int > colscaleExp = *m_activeColscaleExp;
-   DataArray < int > rowscaleExp = *m_activeRowscaleExp;
+   const SSVector& rowscale = *rsccurr;
+   const SSVector& colscale = *csccurr;
+
+   DataArray<int>& colscaleExp = *m_activeColscaleExp;
+   DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
 
    for( k = 0; k < nrows; ++k )
-      rowscaleExp[k] = int( rowscale[k] + ((rowscale[k] >= 0)? (+0.5) : (-0.5)) );
+      rowscaleExp[k] = -int( rowscale[k] + ((rowscale[k] >= 0.0)? (+0.5) : (-0.5)) );
 
    for( k = 0; k < ncols; ++k )
-      colscaleExp[k] = int( colscale[k] + ((colscale[k] >= 0)? (+0.5) : (-0.5)) );
+      colscaleExp[k] = -int( colscale[k] + ((colscale[k] >= 0.0)? (+0.5) : (-0.5)) );
 
    // scale
    applyScaling(lp);

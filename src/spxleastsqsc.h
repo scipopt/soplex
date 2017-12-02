@@ -24,11 +24,9 @@
 #include "spxscaler.h"
 #include "spxlp.h"
 
-#define MAX_ROUNDS 50
-#define ACCURACY_DIVISOR 1000.0
-
 namespace soplex
 {
+
 /**@brief Least squares scaling.
    @ingroup Algo
 
@@ -75,8 +73,8 @@ public:
 
 
 protected:
-   Real acrcydivisor;
-   int maxrounds;
+   Real acrcydivisor = 1000.0;
+   int maxrounds = 20;
 
 };
 } // namespace soplex

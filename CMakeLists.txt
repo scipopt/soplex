@@ -44,24 +44,27 @@ set(CMAKE_MACOSX_RPATH ON)
 # use C++11 standard
 set(CMAKE_CXX_STANDARD 11)
 
-# create target to update the githash
+# create a target for updating the current git hash
 file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
 find_program(GIT git)
+if(EXISTS \${DST})
+   file(STRINGS \${DST} GITHASH_OLD)
+   string(REGEX REPLACE \"#define SPX_GITHASH \\\"(.*)\\\"\" \"\\\\1\" GITHASH_OLD \${GITHASH_OLD})
+endif()
 if((GIT) AND (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git))
    execute_process(
       COMMAND \${GIT} describe --always --dirty
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       OUTPUT_VARIABLE GITHASH OUTPUT_STRIP_TRAILING_WHITESPACE)
    string(REGEX REPLACE \"^.*-g\" \"\" GITHASH \${GITHASH})
-   file(WRITE \${DST} \"#define SPX_GITHASH \\\"\${GITHASH}\\\"\")
+   if(NOT \${GITHASH} STREQUAL \"\${GITHASH_OLD}\")
+      file(WRITE \${DST} \"#define SPX_GITHASH \\\"\${GITHASH}\\\"\n\")
+   endif()
 else()
-   # read stored hash from file
-   file(STRINGS \${DST} GITHASH)
-   string(REGEX REPLACE \"#define SPX_GITHASH \" \"\" GITHASH \${GITHASH})
+   set(GITHASH \${GITHASH_OLD})
 endif()
 message(STATUS \"Git hash: \" \${GITHASH})
 ")
-# encode the current git hash into the binary
 add_custom_target(soplex_update_githash
                   COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/git_hash.cpp
                                            -P ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake)
@@ -118,8 +121,9 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
     endif()
 endif()
 if(MSVC)
-    add_definitions(/W4)
+#    add_definitions(/W4)
     add_definitions(/wd4100)
+    add_definitions(/wd4661)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
     # set MT or MTd flag when using the static VS runtime libraries

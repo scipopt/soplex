@@ -62,7 +62,7 @@ SPxBasis::dualRowStatus(int i) const
    else if (theLP->lhs(i) > -infinity)
       return Desc::D_ON_UPPER;
    else
-      return Desc::D_ON_BOTH;
+      return Desc::D_UNDEFINED;
 }
 
 SPxBasis::Desc::Status
@@ -85,7 +85,7 @@ SPxBasis::dualColStatus(int i) const
    else if (theLP->SPxLP::lower(i) > -infinity)
       return Desc::D_ON_UPPER;
    else
-      return Desc::D_ON_BOTH;
+      return Desc::D_UNDEFINED;
 }
 
 void SPxBasis::loadMatrixVecs()
