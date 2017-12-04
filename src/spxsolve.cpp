@@ -321,6 +321,10 @@ SPxSolver::Status SPxSolver::solve()
                {
                   Real newpricertol = minpricertol;
 
+                  // refactorize to eliminate accumulated errors from LU updates
+                  if( lastUpdate() > 0 )
+                     factorize();
+
                   // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
                   computeFrhs();
                   SPxBasis::solve(*theFvec, *theFrhs);
@@ -594,6 +598,10 @@ SPxSolver::Status SPxSolver::solve()
                      || SPxBasis::status() == SPxBasis::PRIMAL))
                {
                   Real newpricertol = minpricertol;
+
+                  // refactorize to eliminate accumulated errors from LU updates
+                  if( lastUpdate() > 0 )
+                     factorize();
 
                   // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
                   computeFrhs();
