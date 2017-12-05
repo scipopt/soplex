@@ -137,7 +137,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
          assert(type == SPxSolver::LEAVE);
          coWeights.reDim(thesolver->dim(), false);
          SSVector tmp(thesolver->dim(), thesolver->epsilon());
-         for (i = thesolver->dim() - 1; i >= endDim; --i)
+         for( i = thesolver->dim() - 1; i >= endDim && !thesolver->isTimeLimitReached(); --i )
          {
             thesolver->basis().coSolve(tmp, thesolver->unitVector(i));
             coWeights[i] = tmp.length2();
