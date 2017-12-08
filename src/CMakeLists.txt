@@ -179,7 +179,7 @@ target_link_libraries(libsoplex ${libs})
 add_executable(soplex soplexmain.cpp)
 target_link_libraries(soplex libsoplex)
 
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE EQUAL "Debug")
     find_package(Sanitizers)
     add_sanitizers(soplex)
 endif()
