@@ -182,8 +182,6 @@ target_link_libraries(soplex libsoplex)
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     find_package(Sanitizers)
     add_sanitizers(soplex)
-    add_sanitizers(libsoplex)
-    add_sanitizers(libsoplex-pic)
 endif()
 
 if(NOT LEGACY EQUAL ON)
