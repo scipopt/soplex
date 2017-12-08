@@ -128,6 +128,7 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
+                  assert(lhs(i) <= -infinity && rhs(i) >= infinity);
                   x = 0.0;
                   break;
                }
