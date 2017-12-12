@@ -1030,12 +1030,6 @@ void SPxSolver::performSolutionPolishing()
    SPxId polishId;
    bool success = false;
 
-#ifndef NDEBUG
-   // the current objective value and shift must not be changed
-   Real objVal = value();
-   Real oldshift = shift();
-#endif
-
    MSG_INFO2( (*spxout), (*spxout) << " --- perform solution polishing" << std::endl; )
 
    if( rep() == COLUMN )
@@ -1086,8 +1080,7 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(EQrel(objVal, value(), entertol()));
-               assert(LErel(oldshift, shift(), entertol()));
+               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1108,8 +1101,7 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[continuousvars.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(EQrel(objVal, value(), entertol()));
-               assert(LErel(oldshift, shift(), entertol()));
+               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1154,8 +1146,7 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(EQrel(objVal, value(), entertol()));
-               assert(LErel(oldshift, shift(), entertol()));
+               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1222,8 +1213,7 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-               assert(EQrel(objVal, value(), leavetol()));
-               assert(LErel(oldshift, shift(), leavetol()));
+               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1276,8 +1266,7 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-               assert(EQrel(objVal, value(), leavetol()));
-               assert(LErel(oldshift, shift(), leavetol()));
+               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
