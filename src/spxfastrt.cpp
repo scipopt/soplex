@@ -1018,7 +1018,8 @@ bool SPxFastRT::maxReEnter(
    Real& sel,
    Real maxabs,
    const SPxId& id,
-   int nr)
+   int nr,
+   bool polish)
 {
    Real x, d;
    Vector* up;
@@ -1077,30 +1078,35 @@ bool SPxFastRT::maxReEnter(
    {
       if (sel < -fastDelta / maxabs)
       {
-         if (d > 0.0)
+         sel = 0.0;
+         if( !polish )
          {
-            thesolver->theShift -= (*up)[nr];
-            sel = 0.0;
-            (*up)[nr] = x + sel * d;
-            thesolver->theShift += (*up)[nr];
-         }
-         else
-         {
-            thesolver->theShift += (*low)[nr];
-            sel = 0.0;
-            (*low)[nr] = x + sel * d;
-            thesolver->theShift -= (*low)[nr];
+            if (d > 0.0)
+            {
+               thesolver->theShift -= (*up)[nr];
+               (*up)[nr] = x;
+               thesolver->theShift += (*up)[nr];
+            }
+            else
+            {
+               thesolver->theShift += (*low)[nr];
+               (*low)[nr] = x;
+               thesolver->theShift -= (*low)[nr];
+            }
          }
       }
    }
    else
    {
       sel = 0.0;
-      if (x > (*up)[nr])
-         thesolver->theShift += x - (*up)[nr];
-      else
-         thesolver->theShift += (*low)[nr] - x;
-      (*up)[nr] = (*low)[nr] = x;
+      if( !polish )
+      {
+         if (x > (*up)[nr])
+            thesolver->theShift += x - (*up)[nr];
+         else
+            thesolver->theShift += (*low)[nr] - x;
+         (*up)[nr] = (*low)[nr] = x;
+      }
    }
 
    return false;
@@ -1110,7 +1116,8 @@ bool SPxFastRT::minReEnter(
    Real& sel,
    Real maxabs,
    const SPxId& id,
-   int nr)
+   int nr,
+   bool polish)
 {
    Real x, d;
    Vector* up;
@@ -1167,30 +1174,35 @@ bool SPxFastRT::minReEnter(
    {
       if (sel > fastDelta / maxabs)
       {
-         if (d < 0.0)
+         sel = 0.0;
+         if( !polish )
          {
-            thesolver->theShift -= (*up)[nr];
-            sel = 0.0;
-            (*up)[nr] = x + sel * d;
-            thesolver->theShift += (*up)[nr];
-         }
-         else
-         {
-            thesolver->theShift += (*low)[nr];
-            sel = 0.0;
-            (*low)[nr] = x + sel * d;
-            thesolver->theShift -= (*low)[nr];
+            if (d < 0.0)
+            {
+               thesolver->theShift -= (*up)[nr];
+               (*up)[nr] = x;
+               thesolver->theShift += (*up)[nr];
+            }
+            else
+            {
+               thesolver->theShift += (*low)[nr];
+               (*low)[nr] = x;
+               thesolver->theShift -= (*low)[nr];
+            }
          }
       }
    }
    else
    {
       sel = 0.0;
-      if (x > (*up)[nr])
-         thesolver->theShift += x - (*up)[nr];
-      else
-         thesolver->theShift += (*low)[nr] - x;
-      (*up)[nr] = (*low)[nr] = x;
+      if( !polish )
+      {
+         if (x > (*up)[nr])
+            thesolver->theShift += x - (*up)[nr];
+         else
+            thesolver->theShift += (*low)[nr] - x;
+         (*up)[nr] = (*low)[nr] = x;
+      }
    }
 
    return false;
@@ -1278,7 +1290,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
             else
                cnt += TRIES;
          }
-         if (!maxReEnter(sel, maxabs, enterId, nr))
+         if (!maxReEnter(sel, maxabs, enterId, nr, polish))
             break;
          relax();
       }
@@ -1317,7 +1329,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
             else
                cnt += TRIES;
          }
-         if (!minReEnter(sel, maxabs, enterId, nr))
+         if (!minReEnter(sel, maxabs, enterId, nr, polish))
             break;
          relax();
       }
