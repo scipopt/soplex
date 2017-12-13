@@ -792,6 +792,7 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
       if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
          if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
             if (x < 0.0)
@@ -804,6 +805,7 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
    else
    {
       sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
       if( !polish )
       {
          thesolver->shiftLBbound(leave, vec[leave]);
@@ -830,6 +832,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
       if (sel > fastDelta / maxabs)
       {
          sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
          if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
             if (x > 0.0)
@@ -842,6 +845,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
    else
    {
       sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
       if( !polish )
       {
          thesolver->shiftLBbound(leave, vec[leave]);
@@ -1079,6 +1083,7 @@ bool SPxFastRT::maxReEnter(
       if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
          if( !polish )
          {
             if (d > 0.0)
@@ -1099,6 +1104,7 @@ bool SPxFastRT::maxReEnter(
    else
    {
       sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
       if( !polish )
       {
          if (x > (*up)[nr])
@@ -1175,6 +1181,7 @@ bool SPxFastRT::minReEnter(
       if (sel > fastDelta / maxabs)
       {
          sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
          if( !polish )
          {
             if (d < 0.0)
@@ -1195,6 +1202,7 @@ bool SPxFastRT::minReEnter(
    else
    {
       sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
       if( !polish )
       {
          if (x > (*up)[nr])
