@@ -1080,7 +1080,6 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1101,7 +1100,6 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[continuousvars.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1146,7 +1144,6 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1213,7 +1210,6 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1266,7 +1262,6 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
