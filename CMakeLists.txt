@@ -23,6 +23,10 @@ option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
+option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
+option(SANITIZE_MEMORY "should the memory sanitizer be enabled in debug mode if available" OFF)
+option(SANITIZE_UNDEFINED "should the undefined behavior sanitizer be enabled in debug mode if available" ON)
+option(SANITIZE_THREAD "should the thread sanitizer be enabled in debug mode if available" OFF)
 option(COVERAGE "enable coverage support" OFF)
 SET(COVERAGE_CTEST_ARGS "" CACHE STRING "additional ctest arguments for coverage")
 
@@ -34,7 +38,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 # make 'Release' the default build type
-if(CMAKE_BUILD_TYPE STREQUAL "")
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 

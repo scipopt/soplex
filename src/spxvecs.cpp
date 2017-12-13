@@ -128,10 +128,9 @@ void SPxSolver::computeFrhs()
                   break;
 
                default:
-                  MSG_ERROR( std::cerr << "ESVECS04 ERROR: "
-                     << "inconsistent basis must not happen!"
-                     << std::endl; )
-                     throw SPxInternalCodeException("XSVECS06 This should never happen.");
+                  assert(lhs(i) <= -infinity && rhs(i) >= infinity);
+                  x = 0.0;
+                  break;
                }
                assert(x < infinity);
                assert(x > -infinity);
