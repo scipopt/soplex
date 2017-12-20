@@ -12,7 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 #include <assert.h>
 #include <iostream>
 
@@ -775,9 +774,9 @@ SPxSolver::Status SPxSolver::solve()
                )
             }
 
-            /**@todo technically it would be ok to finish already when (priced && maxinfeas + shift() <= entertol()) is
-             *  satisfied; maybe at least in the case when SoPlex keeps jumping back between ENTER and LEAVE always
-             *  shifting (looping), we may relax this condition here;
+            /** Claim optimality when (priced && maxinfeas + shift() <= entertol()) is
+             *  satisfied; at least in the case when SoPlex keeps jumping back between ENTER and LEAVE always
+             *  shifting (looping),
              *  note also that unShift may increase shift() slightly due to roundoff errors
              */
             if (shift() <= epsilon())
