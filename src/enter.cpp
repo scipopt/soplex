@@ -122,6 +122,7 @@ Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
       }
       x = maxObj(i) - (*thePvec)[i];
       return (x < 0) ? x : -x;
+
    default:
       return 0;
    }
@@ -255,7 +256,6 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
             return 0;
       }
       return (*theCoPvec)[i] - SPxLP::lower(i);
-
    case SPxBasis::Desc::P_ON_UPPER:
       assert(rep() == COLUMN);
       if( (*theCoPvec)[i] > 1e9 || (*theCoPvec)[i] < -1e9 )
