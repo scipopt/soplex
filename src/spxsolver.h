@@ -81,7 +81,7 @@ namespace soplex
   */
 
   template <class R>
-    class SPxSolver R : public SPxLP R, protected SPxBasis R // @todo templatify this
+    class SPxSolver : public SPxLPBase<R>, protected SPxBasis<R> // @todo templatify this
   {
     friend class SoPlexLegacy;
     friend class SPxFastRT;

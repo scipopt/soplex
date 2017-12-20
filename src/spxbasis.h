@@ -79,6 +79,7 @@ namespace soplex
      Instead, a SLinSolver object must be #load%ed to a SPxBasis which will
      be called for solving linear systems.
   */
+  template <class R> // theLP gets templated
   class SPxBasis
   {
   public:
@@ -340,7 +341,7 @@ namespace soplex
     */
     //@{
     /// the LP
-    SPxSolver* theLP;
+    SPxSolver <R>* theLP;
     /// SPxId%s of basic vectors.
     DataArray < SPxId > theBaseId;
     /// pointers to the vectors of the basis matrix.
