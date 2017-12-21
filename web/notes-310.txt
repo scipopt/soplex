@@ -1,0 +1,11 @@
+Notes for SoPlex Release 3.1.0
+
+What's new
+----------
+
+ - new scaling method combining geometric and equilibrium scaling (command line option '-g6')
+ - also print reduced cost values when passing '-y' on the command line
+ - automatically remove zeros in sparse vector class SVector
+ - some bugfixes
+
+For details see the CHANGELOG file and the online documentation.
