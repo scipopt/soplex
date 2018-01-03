@@ -154,9 +154,9 @@ protected:
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
-   bool minReEnter(Real& sel, Real maxabs, const SPxId& id, int nr);
+   bool minReEnter(Real& sel, Real maxabs, const SPxId& id, int nr, bool polish = false);
    ///
-   bool maxReEnter(Real& sel, Real maxabs, const SPxId& id, int nr);
+   bool maxReEnter(Real& sel, Real maxabs, const SPxId& id, int nr, bool polish = false);
 
    /// Tests and returns whether a shortcut after phase 1 is feasible for the
    /// selected enter pivot.
