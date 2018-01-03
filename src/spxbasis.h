@@ -975,8 +975,9 @@ namespace soplex
   //
 
   /// Pretty-printing of basis status.
+  template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const SPxBasis::SPxStatus& status );
+                            const typename SPxBasis<R>::SPxStatus& status );
 
 
 } // namespace soplex
