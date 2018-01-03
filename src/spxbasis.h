@@ -198,7 +198,7 @@ namespace soplex
       //@}
 
       friend class SPxBasis;
-      friend std::ostream& operator<<(std::ostream& os, const Status& stat);
+      friend std::ostream& operator<< <>(std::ostream& os, const Status& stat); //@todo is the <> required here?
 
     private:
 
@@ -341,7 +341,7 @@ namespace soplex
     */
     //@{
     /// the LP
-    SPxSolver <R>* theLP;
+    SPxSolver* theLP;
     /// SPxId%s of basic vectors.
     DataArray < SPxId > theBaseId;
     /// pointers to the vectors of the basis matrix.
@@ -472,23 +472,23 @@ namespace soplex
       }
 
     /// dual Status for the \p i'th column variable of the loaded LP.
-    Desc::Status dualColStatus(int i) const;
+    typename Desc::Status dualColStatus(int i) const;
 
     /// dual Status for the column variable with ID \p id of the loaded LP.
-    Desc::Status dualStatus(const SPxColId& id) const;
+    typename Desc::Status dualStatus(const SPxColId& id) const;
 
     /// dual Status for the \p i'th row variable of the loaded LP.
-    Desc::Status dualRowStatus(int i) const;
+    typename Desc::Status dualRowStatus(int i) const;
 
     /// dual Status for the row variable with ID \p id of the loaded LP.
-    Desc::Status dualStatus(const SPxRowId& id) const;
+    typename Desc::Status dualStatus(const SPxRowId& id) const;
 
     /// dual Status for the variable with ID \p id of the loaded LP.
     /** It is automatically detected, whether the \p id is one of a 
         row or a column variable, and the correct row or column status
         is returned.
     */
-    Desc::Status dualStatus(const SPxId& id) const
+    typename Desc::Status dualStatus(const SPxId& id) const
       {
         return id.isSPxRowId()
           ? dualStatus(SPxRowId(id))
