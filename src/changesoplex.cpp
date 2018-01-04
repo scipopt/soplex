@@ -26,7 +26,7 @@ namespace soplex
 {
 
 #if 0
-void SPxSolver::localAddRows(int start)
+  void SPxSolver::localAddRows(int start)
 {
    assert( start <= SPxLP::nRows() );
 
@@ -201,8 +201,8 @@ void SPxSolver::addedRows(int n)
    /* we must not assert consistency here, since addedCols() might be still necessary to obtain a consistent basis */
 }
 #endif //0
-
-void SPxSolver::addedRows(int n)
+  template <class R>
+  void SPxSolver<R>::addedRows(int n)
 {
 
    if( n > 0 )
@@ -212,8 +212,8 @@ void SPxSolver::addedRows(int n)
       unInit();
       reDim();
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
-         SPxBasis::addedRows(n);
+      if (SPxBasis<R>::status() > SPxBasis<R>::NO_PROBLEM)
+        SPxBasis<R>::addedRows(n);
    }
 
    /* we must not assert consistency here, since addedCols() might be still necessary to obtain a consistent basis */
@@ -413,7 +413,8 @@ void SPxSolver::addedCols(int n)
 }
 #endif //0
 
-void SPxSolver::addedCols(int n)
+  template <class R>
+  void SPxSolver<R>::addedCols(int n)
 {
 
    if( n > 0 )
@@ -423,23 +424,24 @@ void SPxSolver::addedCols(int n)
       unInit();
       reDim();
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
-         SPxBasis::addedCols(n);
+      if (SPxBasis<R>::status() > SPxBasis<R>::NO_PROBLEM)
+        SPxBasis<R>::addedCols(n);
    }
 
    /* we must not assert consistency here, since addedRows() might be still necessary to obtain a consistent basis */
 }
-   
-void SPxSolver::doRemoveRow(int i)
+
+  template <class R>
+  void SPxSolver<R>::doRemoveRow(int i)
 {
 
    SPxLP::doRemoveRow(i);
 
    unInit();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if (SPxBasis<R>::status() > SPxBasis<R>::NO_PROBLEM)
    {
-      removedRow(i);
+      this->removedRow(i);
 
 #if 0
       if (isInitialized())
@@ -465,22 +467,23 @@ void SPxSolver::doRemoveRow(int i)
       }
 #endif // 0
 
-      switch (SPxBasis::status())
-      {
-      case SPxBasis::DUAL:
-      case SPxBasis::INFEASIBLE:
-         setBasisStatus(SPxBasis::REGULAR);
-         break;
-      case SPxBasis::OPTIMAL:
-         setBasisStatus(SPxBasis::PRIMAL);
-         break;
-      default:
-         break;
-      }
+      switch (SPxBasis<R>::status())
+        {
+        case SPxBasis<R>::DUAL:
+        case SPxBasis<R>::INFEASIBLE:
+          setBasisStatus(SPxBasis<R>::REGULAR);
+          break;
+        case SPxBasis<R>::OPTIMAL:
+          setBasisStatus(SPxBasis<R>::PRIMAL);
+          break;
+        default:
+          break;
+        }
    }
 }
 
-void SPxSolver::doRemoveRows(int perm[])
+  template <class R>
+  void SPxSolver<R>::doRemoveRows(int perm[])
 {
 
    SPxLP::doRemoveRows(perm);
