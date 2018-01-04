@@ -1046,7 +1046,7 @@ namespace soplex
       changeElement(number(rid), number(cid), val, scale);
     }
     ///
-    virtual void changeSense(SPxSense sns);
+    virtual void changeSense(typename SPxLPBase<R>::SPxSense sns);
     //@}
 
     //------------------------------------

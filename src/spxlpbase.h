@@ -81,7 +81,7 @@ namespace soplex
     class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
   {
     template < class S > friend class SPxLPBase;
-    friend class SPxBasis;
+    template <class T> friend class SPxBasis;
     friend class SPxScaler;
     friend class SPxEquiliSC;
     friend class SPxLeastSqSC;
