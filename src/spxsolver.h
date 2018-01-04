@@ -46,7 +46,8 @@
 #define NINITCALLS               200      /**< the number of clock updates in isTimelimitReached() before clock skipping starts */
 namespace soplex
 {
-  class SPxPricer;
+  template <class R>
+    class SPxPricer;
   class SPxRatioTester;
   class SPxStarter;
 
@@ -381,7 +382,7 @@ namespace soplex
     Real           primalDegenSum;   ///< the sum of the primal degeneracy percentage
     Real           dualDegenSum;     ///< the sum of the dual degeneracy percentage
 
-    SPxPricer*      thepricer;
+    SPxPricer<R>*      thepricer;
     SPxRatioTester* theratiotester;
     SPxStarter*     thestarter;
     //@}
@@ -540,7 +541,7 @@ namespace soplex
     /// setup linear solver to use. If \p destroy is true, \p slusolver will be freed in destructor.
     virtual void setBasisSolver(SLinSolver* slu, const bool destroy = false);
     /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.
-    virtual void setPricer(SPxPricer* pricer, const bool destroy = false);
+    virtual void setPricer(SPxPricer<R>* pricer, const bool destroy = false);
     /// setup ratio-tester to use. If \p destroy is true, \p tester will be freed in destructor.
     virtual void setTester(SPxRatioTester* tester, const bool destroy = false);
     /// setup starting basis generator to use. If \p destroy is true, \p starter will be freed in destructor.
@@ -936,7 +937,7 @@ namespace soplex
     ///
     virtual void changeObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeObj(this->number(p_id), p_newVal, scale); //@todo the function number needs to work with templates
+      changeObj(this->number(p_id), p_newVal, scale);
     }
     ///
     virtual void changeMaxObj(const Vector& newObj, bool scale = false);
@@ -945,7 +946,7 @@ namespace soplex
     ///
     virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeMaxObj(this->number(p_id), p_newVal, scale); //@todo the function number needs to work with templates. 
+      changeMaxObj(this->number(p_id), p_newVal, scale);
     }
     ///
     virtual void changeRowObj(const Vector& newObj, bool scale = false);
@@ -1743,7 +1744,7 @@ namespace soplex
         return *this;
       }
     /// return loaded SPxPricer.
-    const SPxPricer* pricer() const
+    const SPxPricer<R>* pricer() const
     {
       return thepricer;
     }
