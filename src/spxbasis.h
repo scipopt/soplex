@@ -45,7 +45,8 @@
 
 namespace soplex
 {
-  class SPxSolver;
+  template <class R>
+    class SPxSolver;
 
   /**@class SPxBasis
      @brief   Simplex basis.

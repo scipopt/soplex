@@ -2292,8 +2292,9 @@ namespace soplex
   //
 
   /// Pretty-printing of variable status.
+  template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const SPxSolver::VarStatus& status );
+                            const SPxSolver<R>::VarStatus& status );
 
   /// Pretty-printing of solver status.
   std::ostream& operator<<( std::ostream& os,

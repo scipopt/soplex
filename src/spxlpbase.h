@@ -47,7 +47,8 @@
 
 namespace soplex
 {
-  class SPxSolver;
+  template <class R>
+    class SPxSolver;
 
   /**@brief   Saving LPs in a form suitable for SoPlex.
    * @ingroup Algo
