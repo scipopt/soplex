@@ -81,7 +81,7 @@ namespace soplex
   */
 
   template <class R>
-    class SPxSolver : public SPxLPBase<R>, protected SPxBasis<R> // @todo templatify this
+    class SPxSolver : public SPxLPBase<R>, protected SPxBasis<R>
   {
     friend class SoPlexLegacy;
     friend class SPxFastRT;
@@ -936,7 +936,7 @@ namespace soplex
     ///
     virtual void changeObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeObj(number(p_id), p_newVal, scale); //@todo the function number needs to work with templates
+      changeObj(this->number(p_id), p_newVal, scale); //@todo the function number needs to work with templates
     }
     ///
     virtual void changeMaxObj(const Vector& newObj, bool scale = false);
@@ -945,7 +945,7 @@ namespace soplex
     ///
     virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeMaxObj(number(p_id), p_newVal, scale); //@todo the function number needs to work with templates. 
+      changeMaxObj(this->number(p_id), p_newVal, scale); //@todo the function number needs to work with templates. 
     }
     ///
     virtual void changeRowObj(const Vector& newObj, bool scale = false);
@@ -954,7 +954,7 @@ namespace soplex
     ///
     virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeRowObj(number(p_id), p_newVal);
+      changeRowObj(this->number(p_id), p_newVal);
     }
     ///
     virtual void clearRowObjs()
@@ -971,7 +971,7 @@ namespace soplex
     ///
     virtual void changeLower(SPxColId p_id, const Real& p_newLower, bool scale = false)
     {
-      changeLower(number(p_id), p_newLower, scale);
+      changeLower(this->number(p_id), p_newLower, scale);
     }
     ///
     virtual void changeUpperStatus(int i, Real newUpper, Real oldLower = 0.0);
@@ -982,7 +982,7 @@ namespace soplex
     ///
     virtual void changeUpper(SPxColId p_id, const Real& p_newUpper, bool scale = false)
     {
-      changeUpper(number(p_id), p_newUpper, scale);
+      changeUpper(this->number(p_id), p_newUpper, scale);
     }
     ///
     virtual void changeBounds(const Vector& newLower, const Vector& newUpper, bool scale = false);
@@ -991,7 +991,7 @@ namespace soplex
     ///
     virtual void changeBounds(SPxColId p_id, const Real& p_newLower, const Real& p_newUpper, bool scale = false)
     {
-      changeBounds(number(p_id), p_newLower, p_newUpper, scale);
+      changeBounds(this->number(p_id), p_newLower, p_newUpper, scale);
     }
     ///
     virtual void changeLhsStatus(int i, Real newLhs, Real oldLhs = 0.0);
@@ -1002,7 +1002,7 @@ namespace soplex
     ///
     virtual void changeLhs(SPxRowId p_id, const Real& p_newLhs, bool scale = false)
     {
-      changeLhs(number(p_id), p_newLhs, scale);
+      changeLhs(this->number(p_id), p_newLhs, scale);
     }
     ///
     virtual void changeRhsStatus(int i, Real newRhs, Real oldRhs = 0.0);
@@ -1013,7 +1013,7 @@ namespace soplex
     ///
     virtual void changeRhs(SPxRowId p_id, const Real& p_newRhs, bool scale = false)
     {
-      changeRhs(number(p_id), p_newRhs, scale);
+      changeRhs(this->number(p_id), p_newRhs, scale);
     }
     ///
     virtual void changeRange(const Vector& newLhs, const Vector& newRhs, bool scale = false);
@@ -1022,28 +1022,28 @@ namespace soplex
     ///
     virtual void changeRange(SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs, bool scale = false)
     {
-      changeRange(number(p_id), p_newLhs, p_newRhs, scale);
+      changeRange(this->number(p_id), p_newLhs, p_newRhs, scale);
     }
     ///
     virtual void changeRow(int i, const LPRow& newRow, bool scale = false);
     ///
     virtual void changeRow(SPxRowId p_id, const LPRow& p_newRow, bool scale = false)
     {
-      changeRow(number(p_id), p_newRow, scale);
+      changeRow(this->number(p_id), p_newRow, scale);
     }
     ///
     virtual void changeCol(int i, const LPCol& newCol, bool scale = false);
     ///
     virtual void changeCol(SPxColId p_id, const LPCol& p_newCol, bool scale = false)
     {
-      changeCol(number(p_id), p_newCol, scale);
+      changeCol(this->number(p_id), p_newCol, scale);
     }
     ///
     virtual void changeElement(int i, int j, const Real& val, bool scale = false);
     ///
     virtual void changeElement(SPxRowId rid, SPxColId cid, const Real& val, bool scale = false)
     {
-      changeElement(number(rid), number(cid), val, scale);
+      changeElement(this->number(rid), this->number(cid), val, scale);
     }
     ///
     virtual void changeSense(typename SPxLPBase<R>::SPxSense sns);
@@ -1145,16 +1145,16 @@ namespace soplex
     {
       assert(rid.isValid());
       return (rep() == ROW)
-        ? (*thevectors)[number(rid)]
-        : static_cast<const SVector&>(unitVecs[number(rid)]);
+        ? (*thevectors)[this->number(rid)]
+        : static_cast<const SVector&>(unitVecs[this->number(rid)]);
     }
     ///
     const SVector& vector(const SPxColId& cid) const
     {
       assert(cid.isValid());
       return (rep() == COLUMN)
-        ? (*thevectors)[number(cid)]
-        : static_cast<const SVector&>(unitVecs[number(cid)]);
+        ? (*thevectors)[this->number(cid)]
+        : static_cast<const SVector&>(unitVecs[this->number(cid)]);
     }
 
     /// vector associated to \p p_id.
@@ -1188,16 +1188,16 @@ namespace soplex
     {
       assert(rid.isValid());
       return (rep() == COLUMN)
-        ? (*thecovectors)[number(rid)]
-        : static_cast<const SVector&>(unitVecs[number(rid)]);
+        ? (*thecovectors)[this->number(rid)]
+        : static_cast<const SVector&>(unitVecs[this->number(rid)]);
     }
     ///
     const SVector& coVector(const SPxColId& cid) const
     {
       assert(cid.isValid());
       return (rep() == ROW)
-        ? (*thecovectors)[number(cid)]
-        : static_cast<const SVector&>(unitVecs[number(cid)]);
+        ? (*thecovectors)[this->number(cid)]
+        : static_cast<const SVector&>(unitVecs[this->number(cid)]);
     }
     /// coVector associated to \p p_id.
     /**@return a reference to the covector of the loaded LP
@@ -1231,13 +1231,13 @@ namespace soplex
     /// Status of \p i 'th variable.
     typename SPxBasis<R>::Desc::Status varStatus(int i) const
       {
-        return desc().status(i);
+        return this->desc().status(i);
       }
 
     /// Status of \p i 'th covariable.
     typename SPxBasis<R>::Desc::Status covarStatus(int i) const
       {
-        return desc().coStatus(i);
+        return this->desc().coStatus(i);
       }
 
     /// does \p stat describe a basic index ?
@@ -1258,37 +1258,37 @@ namespace soplex
     /// is the \p rid 'th vector basic ?
     bool isBasic(const SPxRowId& rid) const
     {
-      return isBasic(desc().rowStatus(number(rid)));
+      return isBasic(this->desc().rowStatus(this->number(rid)));
     }
 
     /// is the \p cid 'th vector basic ?
     bool isBasic(const SPxColId& cid) const
     {
-      return isBasic(desc().colStatus(number(cid)));
+      return isBasic(this->desc().colStatus(this->number(cid)));
     }
 
     /// is the \p i 'th row vector basic ?
     bool isRowBasic(int i) const
     {
-      return isBasic(desc().rowStatus(i));
+      return isBasic(this->desc().rowStatus(i));
     }
 
     /// is the \p i 'th column vector basic ?
     bool isColBasic(int i) const
     {
-      return isBasic(desc().colStatus(i));
+      return isBasic(this->desc().colStatus(i));
     }
 
     /// is the \p i 'th vector basic ?
     bool isBasic(int i) const
     {
-      return isBasic(desc().status(i));
+      return isBasic(this->desc().status(i));
     }
 
     /// is the \p i 'th covector basic ?
     bool isCoBasic(int i) const
     {
-      return isBasic(desc().coStatus(i));
+      return isBasic(this->desc().coStatus(i));
     }
     //@}
 
