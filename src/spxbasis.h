@@ -319,7 +319,7 @@ namespace soplex
       : stat(0)
         , costat(0)
         {}
-      explicit Desc(const SPxSolver& base);
+      explicit Desc(const SPxSolver<R>& base);
 
       /// copy constructor
       Desc(const Desc& old);
@@ -342,7 +342,7 @@ namespace soplex
     */
     //@{
     /// the LP
-    SPxSolver* theLP;
+    SPxSolver<R>* theLP;
     /// SPxId%s of basic vectors.
     DataArray < SPxId > theBaseId;
     /// pointers to the vectors of the basis matrix.
@@ -562,7 +562,7 @@ namespace soplex
     }
 
     /// returns loaded solver.
-    inline SPxSolver* solver() const
+    inline SPxSolver<R>* solver() const
     {
       return theLP;
     }
@@ -869,7 +869,7 @@ namespace soplex
     /** This involves resetting all counters to 0 and setting up a regular
         default basis consisting of slacks, artificial variables or bounds.
     */
-    virtual void load(SPxSolver* lp, bool initSlackBasis = true);
+    virtual void load(SPxSolver<R>* lp, bool initSlackBasis = true);
 
     /// unloads the LP from the basis.
     virtual void unLoad()
