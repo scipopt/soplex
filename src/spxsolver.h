@@ -546,7 +546,7 @@ namespace soplex
     /// setup starting basis generator to use. If \p destroy is true, \p starter will be freed in destructor.
     virtual void setStarter(SPxStarter* starter, const bool destroy = false);
     /// set a start basis.
-    virtual void loadBasis(const SPxBasis::Desc&);
+    virtual void loadBasis(const typename SPxBasis<R>::Desc&);
 
     /// initialize #ROW or #COLUMN representation.
     void initRep (Representation p_rep);
@@ -1229,19 +1229,19 @@ namespace soplex
      */
     //@{
     /// Status of \p i 'th variable.
-    SPxBasis::Desc::Status varStatus(int i) const
+    typename SPxBasis<R>::Desc::Status varStatus(int i) const
       {
         return desc().status(i);
       }
 
     /// Status of \p i 'th covariable.
-    SPxBasis::Desc::Status covarStatus(int i) const
+    typename SPxBasis<R>::Desc::Status covarStatus(int i) const
       {
         return desc().coStatus(i);
       }
 
     /// does \p stat describe a basic index ?
-    bool isBasic(SPxBasis::Desc::Status stat) const
+    bool isBasic(typename SPxBasis<R>::Desc::Status stat) const
     {
       return (stat * rep() > 0);
     }
@@ -1632,11 +1632,11 @@ namespace soplex
     ///
     Real perturbMin(const UpdateVector& uvec,
                     Vector& low, Vector& up, Real eps, Real delta,
-                    const SPxBasis::Desc::Status* stat, int start, int incr);
+                    const typename SPxBasis<R>::Desc::Status* stat, int start, int incr);
     ///
     Real perturbMax(const UpdateVector& uvec,
                     Vector& low, Vector& up, Real eps, Real delta,
-                    const SPxBasis::Desc::Status* stat, int start, int incr);
+                    const typename SPxBasis<R>::Desc::Status* stat, int start, int incr);
     //@}
 
     //------------------------------------
@@ -1733,12 +1733,12 @@ namespace soplex
      *  to use methods #setup4solve() and #setup4coSolve() for solving
      *  systems, since this is likely to have perfomance advantages.
      */
-    const SPxBasis& basis() const
+    const SPxBasis<R>& basis() const
     {
       return *this;
     }
     ///
-    SPxBasis& basis()
+    SPxBasis<R>& basis()
       {
         return *this;
       }
@@ -1772,14 +1772,14 @@ namespace soplex
     bool enter(SPxId& id, bool polish = false);
 
     /// test coVector \p i with status \p stat.
-    Real coTest(int i, SPxBasis::Desc::Status stat) const;
+    Real coTest(int i, typename SPxBasis<R>::Desc::Status stat) const;
     /// compute coTest vector.
     void computeCoTest();
     /// recompute coTest vector.
     void updateCoTest();
 
     /// test vector \p i with status \p stat.
-    Real test(int i, SPxBasis::Desc::Status stat) const;
+    Real test(int i, typename SPxBasis<R>::Desc::Status stat) const;
     /// recompute test vector.
     void updateTest();
 
@@ -1876,7 +1876,7 @@ namespace soplex
     }
     ///
     virtual void getLeaveVals(int i,
-                              SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
+                              typename SPxBasis<R>::Desc::Status& leaveStat, SPxId& leaveId,
                               Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
     ///
     virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
@@ -1885,19 +1885,19 @@ namespace soplex
     ///
     virtual void getEnterVals(SPxId id, Real& enterTest,
                               Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-                              Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
+                              Real& enterPric, typename SPxBasis<R>::Desc::Status& enterStat, Real& enterRO, Real& objChange);
     ///
     virtual void getEnterVals2(int leaveIdx,
                                Real enterMax, Real& leaveBound, Real& objChange);
     ///
-    virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
+    virtual void ungetEnterVal(SPxId enterId, typename SPxBasis<R>::Desc::Status enterStat,
                                Real leaveVal, const SVector& vec, Real& objChange);
     ///
     virtual void rejectEnter(SPxId enterId,
-                             Real enterTest, SPxBasis::Desc::Status enterStat);
+                             Real enterTest, typename SPxBasis<R>::Desc::Status enterStat);
     ///
     virtual void rejectLeave(int leaveNum, SPxId leaveId,
-                             SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
+                             typename SPxBasis<R>::Desc::Status leaveStat, const SVector* newVec = 0);
     ///
     virtual void setupPupdate(void);
     ///
@@ -1920,7 +1920,7 @@ namespace soplex
      */
     //@{
     ///
-    void clearDualBounds(SPxBasis::Desc::Status, Real&, Real&) const;
+    void clearDualBounds(typename SPxBasis<R>::Desc::Status, Real&, Real&) const;
     ///
     void setDualColBounds();
     ///
@@ -1988,14 +1988,14 @@ namespace soplex
 
     /**@todo put the following basis methods near the variable status methods!*/
     /// converts basis status to VarStatus
-    VarStatus basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const;
+    VarStatus basisStatusToVarStatus( typename SPxBasis<R>::Desc::Status stat ) const;
 
     /// converts VarStatus to basis status for rows
-    SPxBasis::Desc::Status varStatusToBasisStatusRow( int row, VarStatus stat )
+    typename SPxBasis<R>::Desc::Status varStatusToBasisStatusRow( int row, VarStatus stat )
       const;
 
     /// converts VarStatus to basis status for columns
-    SPxBasis::Desc::Status varStatusToBasisStatusCol( int col, VarStatus stat )
+    typename SPxBasis<R>::Desc::Status varStatusToBasisStatusCol( int col, VarStatus stat )
       const;
 
   public:
@@ -2010,7 +2010,7 @@ namespace soplex
     Status getBasis(VarStatus rows[], VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const;
 
     /// gets basis status
-    SPxBasis::SPxStatus getBasisStatus() const
+    typename SPxBasis<R>::SPxStatus getBasisStatus() const
       {
         return SPxBasis::status();
       }
@@ -2022,7 +2022,7 @@ namespace soplex
     void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
     /// set the lp solver's basis status.
-    void setBasisStatus( SPxBasis::SPxStatus stat )
+    void setBasisStatus( typename SPxBasis<R>::SPxStatus stat )
     {
       if( m_status == OPTIMAL )
         m_status = UNKNOWN;
@@ -2176,7 +2176,7 @@ namespace soplex
     }
 
     /// optimization sense.
-    SPxSense sense() const
+    typename SPxLPBase<R>::SPxSense sense() const
     {
       return spxSense();
     }
