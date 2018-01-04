@@ -1750,7 +1750,7 @@ namespace soplex
     /// return loaded SLinSolver.
     const SLinSolver* slinSolver() const
     {
-      return SPxBasis::factor;
+      return SPxBasis<R>::factor;
     }
     /// return loaded SPxRatioTester.
     const SPxRatioTester* ratiotester() const
@@ -2012,7 +2012,7 @@ namespace soplex
     /// gets basis status
     typename SPxBasis<R>::SPxStatus getBasisStatus() const
       {
-        return SPxBasis::status();
+        return SPxBasis<R>::status();
       }
 
     /// check a given basis for validity.
@@ -2026,7 +2026,7 @@ namespace soplex
     {
       if( m_status == OPTIMAL )
         m_status = UNKNOWN;
-      SPxBasis::setStatus( stat );
+      SPxBasis<R>::setStatus( stat );
     }
 
     /// setting the solver status external from the solve loop.
@@ -2143,13 +2143,13 @@ namespace soplex
     /// return const lp's rows if available.
     const LPRowSet& rows() const
     {
-      return *lprowset();
+      return *this->lprowset();
     }
 
     /// return const lp's cols if available.
     const LPColSet& cols() const
     {
-      return *lpcolset();
+      return *this->lpcolset();
     }
 
     /// copy lower bound vector to \p p_low.
@@ -2178,7 +2178,7 @@ namespace soplex
     /// optimization sense.
     typename SPxLPBase<R>::SPxSense sense() const
     {
-      return spxSense();
+      return this->spxSense();
     }
 
     /// returns statistical information in form of a string.
@@ -2247,12 +2247,12 @@ namespace soplex
     /// RowId of \p i 'th inequality.
     SPxRowId rowId(int i) const
     {
-      return rId(i);
+      return this->rId(i);
     }
     /// ColId of \p i 'th column.
     SPxColId colId(int i) const
     {
-      return cId(i);
+      return this->cId(i);
     }
     //@}
 
@@ -2294,19 +2294,22 @@ namespace soplex
   /// Pretty-printing of variable status.
   template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const SPxSolver<R>::VarStatus& status );
+                            const typename SPxSolver<R>::VarStatus& status );
 
   /// Pretty-printing of solver status.
+  template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const SPxSolver::Status& status );
+                            const typename SPxSolver<R>::Status& status );
 
   /// Pretty-printing of algorithm.
+  template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const SPxSolver::Type& status );
+                            const typename SPxSolver<R>::Type& status );
 
   /// Pretty-printing of representation.
+  template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const SPxSolver::Representation& status );
+                            const typename SPxSolver<R>::Representation& status );
 
 
 } // namespace soplex
