@@ -447,19 +447,19 @@ namespace soplex
     /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
     void setNonzeroFactor( Real f )
     {
-      SPxBasis::nonzeroFactor = f;
+      SPxBasis<R>::nonzeroFactor = f;
     }
 
     /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
     void setFillFactor( Real f )
     {
-      SPxBasis::fillFactor = f;
+      SPxBasis<R>::fillFactor = f;
     }
 
     /// set refactor threshold for memory growth in current factor update compared to the last factorization
     void setMemFactor( Real f )
     {
-      SPxBasis::memFactor = f;
+      SPxBasis<R>::memFactor = f;
     }
 
     /**@name Access */
@@ -936,7 +936,7 @@ namespace soplex
     ///
     virtual void changeObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeObj(number(p_id), p_newVal, scale);
+      changeObj(number(p_id), p_newVal, scale); //@todo the function number needs to work with templates
     }
     ///
     virtual void changeMaxObj(const Vector& newObj, bool scale = false);
@@ -945,7 +945,7 @@ namespace soplex
     ///
     virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
-      changeMaxObj(number(p_id), p_newVal, scale);
+      changeMaxObj(number(p_id), p_newVal, scale); //@todo the function number needs to work with templates. 
     }
     ///
     virtual void changeRowObj(const Vector& newObj, bool scale = false);
