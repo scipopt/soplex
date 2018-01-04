@@ -48,7 +48,8 @@ namespace soplex
 {
   template <class R>
     class SPxPricer;
-  class SPxRatioTester;
+  template <class R>
+    class SPxRatioTester;
   class SPxStarter;
 
   /**@brief   Sequential object-oriented SimPlex.
@@ -383,7 +384,7 @@ namespace soplex
     Real           dualDegenSum;     ///< the sum of the dual degeneracy percentage
 
     SPxPricer<R>*      thepricer;
-    SPxRatioTester* theratiotester;
+    SPxRatioTester<R>* theratiotester;
     SPxStarter*     thestarter;
     //@}
 
@@ -543,7 +544,7 @@ namespace soplex
     /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.
     virtual void setPricer(SPxPricer<R>* pricer, const bool destroy = false);
     /// setup ratio-tester to use. If \p destroy is true, \p tester will be freed in destructor.
-    virtual void setTester(SPxRatioTester* tester, const bool destroy = false);
+    virtual void setTester(SPxRatioTester<R>* tester, const bool destroy = false);
     /// setup starting basis generator to use. If \p destroy is true, \p starter will be freed in destructor.
     virtual void setStarter(SPxStarter* starter, const bool destroy = false);
     /// set a start basis.
@@ -1754,7 +1755,7 @@ namespace soplex
       return SPxBasis<R>::factor;
     }
     /// return loaded SPxRatioTester.
-    const SPxRatioTester* ratiotester() const
+    const SPxRatioTester<R>* ratiotester() const
     {
       return theratiotester;
     }
