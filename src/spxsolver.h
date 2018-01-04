@@ -1555,42 +1555,48 @@ public:
    void shiftUBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      theShift += to - theUBbound[i];
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(to - theUBbound[i], 0.0);
       theUBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
    void shiftLBbound(int i, Real to)
    {
       assert(theType == ENTER);
-      theShift += theLBbound[i] - to;
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(theLBbound[i] - to, 0.0);
       theLBbound[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
    void shiftUPbound(int i, Real to)
    {
       assert(theType == LEAVE);
-      theShift += to - (*theUbound)[i];
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(to - (*theUbound)[i], 0.0);
       (*theUbound)[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lpBound "lpBound" to \p to.
    void shiftLPbound(int i, Real to)
    {
       assert(theType == LEAVE);
-      theShift += (*theLbound)[i] - to;
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM((*theLbound)[i] - to, 0.0);
       (*theLbound)[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::ucBound "ucBound" to \p to.
    void shiftUCbound(int i, Real to)
    {
       assert(theType == LEAVE);
-      theShift += to - (*theCoUbound)[i];
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(to - (*theCoUbound)[i], 0.0);
       (*theCoUbound)[i] = to;
    }
    /// shift \p i 'th \ref soplex::SPxSolver::lcBound "lcBound" to \p to.
    void shiftLCbound(int i, Real to)
    {
       assert(theType == LEAVE);
-      theShift += (*theCoLbound)[i] - to;
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM((*theCoLbound)[i] - to, 0.0);
       (*theCoLbound)[i] = to;
    }
    ///

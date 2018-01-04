@@ -1,3 +1,10 @@
+developer version
+=================
+
+fixed bugs:
+- correct accumulation of shifted or relaxed bounds
+
+
 21 December 2017 - Release 3.1.0
 ================================
 
