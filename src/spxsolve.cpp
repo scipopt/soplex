@@ -1037,6 +1037,8 @@ void SPxSolver::performSolutionPolishing()
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
 #ifndef NDEBUG
+      // allow a tiny relative deviation from the original values
+      Real alloweddeviation = epsilon() * 1e2;
       Real origval = value();
       Real origshift = shift();
 #endif
@@ -1085,8 +1087,8 @@ void SPxSolver::performSolutionPolishing()
                success = enter(polishId, true);
                clearUpdateVecs();
 #ifndef NDEBUG
-               assert(EQrel(value(), origval));
-               assert(LErel(shift(), origshift));
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
 #endif
                if( success )
                {
@@ -1109,8 +1111,8 @@ void SPxSolver::performSolutionPolishing()
                success = enter(polishId, true);
                clearUpdateVecs();
 #ifndef NDEBUG
-               assert(EQrel(value(), origval));
-               assert(LErel(shift(), origshift));
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
 #endif
                if( success )
                {
@@ -1157,8 +1159,8 @@ void SPxSolver::performSolutionPolishing()
                success = enter(polishId, true);
                clearUpdateVecs();
 #ifndef NDEBUG
-               assert(EQrel(value(), origval));
-               assert(LErel(shift(), origshift));
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
 #endif
                if( success )
                {
@@ -1184,6 +1186,8 @@ void SPxSolver::performSolutionPolishing()
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
 #ifndef NDEBUG
+      // allow a tiny relative deviation from the original values
+      Real alloweddeviation = epsilon() * 1e2;
       Real origval = value();
       Real origshift = shift();
 #endif
@@ -1231,8 +1235,8 @@ void SPxSolver::performSolutionPolishing()
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
 #ifndef NDEBUG
-               assert(EQrel(value(), origval));
-               assert(LErel(shift(), origshift));
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
 #endif
                if( success )
                {
@@ -1287,8 +1291,8 @@ void SPxSolver::performSolutionPolishing()
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
 #ifndef NDEBUG
-               assert(EQrel(value(), origval));
-               assert(LErel(shift(), origshift));
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
 #endif
                if( success )
                {
