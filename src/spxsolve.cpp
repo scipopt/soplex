@@ -1036,6 +1036,10 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
+#ifndef NDEBUG
+      Real origval = value();
+      Real origshift = shift();
+#endif
       instableEnter = false;
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
@@ -1080,7 +1084,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
+#ifndef NDEBUG
+               assert(EQrel(value(), origval));
+               assert(LErel(shift(), origshift));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1101,7 +1108,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[continuousvars.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
+#ifndef NDEBUG
+               assert(EQrel(value(), origval));
+               assert(LErel(shift(), origshift));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1146,7 +1156,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
+#ifndef NDEBUG
+               assert(EQrel(value(), origval));
+               assert(LErel(shift(), origshift));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1170,6 +1183,10 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
+#ifndef NDEBUG
+      Real origval = value();
+      Real origshift = shift();
+#endif
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
@@ -1213,7 +1230,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
+#ifndef NDEBUG
+               assert(EQrel(value(), origval));
+               assert(LErel(shift(), origshift));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1266,7 +1286,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
-               assert(isZero(shift(), feastol()));
+#ifndef NDEBUG
+               assert(EQrel(value(), origval));
+               assert(LErel(shift(), origshift));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
