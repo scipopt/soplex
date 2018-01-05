@@ -35,7 +35,8 @@ namespace soplex
     Values of |fTest| $<0$ represent infeasible variables, which are eligible
     for leaving the basis in the simplex loop.
   */
-  void SPxSolver::computeFtest()
+  template <class R>
+  void SPxSolver<R>::computeFtest()
   {
 
     assert(type() == LEAVE);
@@ -61,11 +62,11 @@ namespace soplex
               {
                 m_pricingViol -= theCoTest[i];
                 infeasibilities.addIdx(i);
-                isInfeasible[i] = SPxPricer::VIOLATED;
+                isInfeasible[i] = SPxPricer<R>::VIOLATED;
                 ++ninfeasibilities;
               }
             else
-              isInfeasible[i] = SPxPricer::NOT_VIOLATED;
+              isInfeasible[i] = SPxPricer<R>::NOT_VIOLATED;
             if( ninfeasibilities > sparsitythreshold )
               {
                 MSG_INFO2( (*spxout), (*spxout) << " --- using dense pricing"
@@ -101,7 +102,8 @@ namespace soplex
       }
   }
 
-  void SPxSolver::updateFtest()
+  template <class R>
+  void SPxSolver<R>::updateFtest()
   {
     const IdxSet& idx = theFvec->idx();
     Vector& ftest = theCoTest;      // |== fTest()|
@@ -128,13 +130,13 @@ namespace soplex
             assert(remainingRoundsLeave == 0);
             if( m_pricingViolUpToDate )
               m_pricingViol -= ftest[i];
-            if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
+            if( isInfeasible[i] == SPxPricer<R>::NOT_VIOLATED )
               {
                 // this can cause problems - we cannot keep on adding indeces to infeasibilities,
                 // because they are not deleted in hyper mode...
                 //             if( !hyperPricingLeave )
                 infeasibilities.addIdx(i);
-                isInfeasible[i] = SPxPricer::VIOLATED;
+                isInfeasible[i] = SPxPricer<R>::VIOLATED;
               }
             if( hyperPricingLeave )
               updateViols.addIdx(i);
@@ -181,89 +183,90 @@ namespace soplex
      Compute a set of statistical values on the variable selected for leaving the
      basis.
   */
-  void SPxSolver::getLeaveVals(
+  template <class R>
+  void SPxSolver<R>::getLeaveVals(
                                int leaveIdx,
-                               SPxBasis::Desc::Status& leaveStat,
+                               typename SPxBasis<R>::Desc::Status& leaveStat,
                                SPxId& leaveId,
                                Real& leaveMax,
                                Real& leavebound,
                                int& leaveNum,
                                Real& objChange)
   {
-    SPxBasis::Desc& ds = desc();
-    leaveId = baseId(leaveIdx);
+    typename SPxBasis<R>::Desc& ds = this->desc();
+    leaveId = this->baseId(leaveIdx);
 
     if (leaveId.isSPxRowId())
       {
-        leaveNum = number(SPxRowId(leaveId));
+        leaveNum = this->number(SPxRowId(leaveId));
         leaveStat = ds.rowStatus(leaveNum);
 
         assert(isBasic(leaveStat));
         switch (leaveStat)
           {
-          case SPxBasis::Desc::P_ON_UPPER :
+          case SPxBasis<R>::Desc::P_ON_UPPER :
             assert( rep() == ROW );
-            ds.rowStatus(leaveNum) = dualRowStatus(leaveNum);
+            ds.rowStatus(leaveNum) = this->dualRowStatus(leaveNum);
             leavebound = 0;
             leaveMax = -infinity;
             break;
-          case SPxBasis::Desc::P_ON_LOWER :
+          case SPxBasis<R>::Desc::P_ON_LOWER :
             assert( rep() == ROW );
-            ds.rowStatus(leaveNum) = dualRowStatus(leaveNum);
+            ds.rowStatus(leaveNum) = this->dualRowStatus(leaveNum);
             leavebound = 0;
             leaveMax = infinity;
             break;
-          case SPxBasis::Desc::P_FREE :
+          case SPxBasis<R>::Desc::P_FREE :
             assert( rep() == ROW );
             throw SPxInternalCodeException("XLEAVE01 This should never happen.");
-          case SPxBasis::Desc::D_FREE :
+          case SPxBasis<R>::Desc::D_FREE :
             assert( rep() == COLUMN );
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
+            ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_FIXED;
             assert(lhs(leaveNum) == rhs(leaveNum));
-            leavebound = -rhs(leaveNum);
+            leavebound = -this->rhs(leaveNum);
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
               leaveMax = infinity;
             else
               leaveMax = -infinity;
             break;
-          case SPxBasis::Desc::D_ON_LOWER :
+          case SPxBasis<R>::Desc::D_ON_LOWER :
             assert( rep() == COLUMN );
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
-            leavebound = -rhs(leaveNum);                // slack !!
+            ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_UPPER;
+            leavebound = -this->rhs(leaveNum);                // slack !!
             leaveMax = infinity;
-            objChange += theLRbound[leaveNum] * rhs(leaveNum);
+            objChange += theLRbound[leaveNum] * this->rhs(leaveNum);
             break;
-          case SPxBasis::Desc::D_ON_UPPER :
+          case SPxBasis<R>::Desc::D_ON_UPPER :
             assert( rep() == COLUMN );
-            ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
-            leavebound = -lhs(leaveNum);                // slack !!
+            ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_LOWER;
+            leavebound = -this->lhs(leaveNum);                // slack !!
             leaveMax = -infinity;
-            objChange += theURbound[leaveNum] * lhs(leaveNum);
+            objChange += theURbound[leaveNum] * this->lhs(leaveNum);
             break;
-          case SPxBasis::Desc::D_ON_BOTH :
+          case SPxBasis<R>::Desc::D_ON_BOTH :
             assert( rep() == COLUMN );
             if ((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
               {
-                ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+                ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_LOWER;
                 theLRbound[leaveNum] = -infinity;
-                leavebound = -lhs(leaveNum);            // slack !!
+                leavebound = -this->lhs(leaveNum);            // slack !!
                 leaveMax = -infinity;
-                objChange += theURbound[leaveNum] * lhs(leaveNum);
+                objChange += theURbound[leaveNum] * this->lhs(leaveNum);
               }
             else
               {
-                ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+                ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_UPPER;
                 theURbound[leaveNum] = infinity;
-                leavebound = -rhs(leaveNum);            // slack !!
+                leavebound = -this->rhs(leaveNum);            // slack !!
                 leaveMax = infinity;
-                objChange += theLRbound[leaveNum] * rhs(leaveNum);
+                objChange += theLRbound[leaveNum] * this->rhs(leaveNum);
               }
             break;
 
           default:
             throw SPxInternalCodeException("XLEAVE02 This should never happen.");
           }
-        MSG_DEBUG( std::cout << "DLEAVE51 SPxSolver::getLeaveVals() : row " << leaveNum
+        MSG_DEBUG( std::cout << "DLEAVE51 SPxSolver<R>::getLeaveVals() : row " << leaveNum
                    << ": " << leaveStat
                    << " -> " << ds.rowStatus(leaveNum)
                    << " objChange: " << objChange
@@ -273,27 +276,27 @@ namespace soplex
     else
       {
         assert(leaveId.isSPxColId());
-        leaveNum = number(SPxColId(leaveId));
+        leaveNum = this->number(SPxColId(leaveId));
         leaveStat = ds.colStatus(leaveNum);
 
         assert(isBasic(leaveStat));
         switch (leaveStat)
           {
-          case SPxBasis::Desc::P_ON_UPPER :
+          case SPxBasis<R>::Desc::P_ON_UPPER :
             assert( rep() == ROW );
-            ds.colStatus(leaveNum) = dualColStatus(leaveNum);
+            ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
             leavebound = 0;
             leaveMax = -infinity;
             break;
-          case SPxBasis::Desc::P_ON_LOWER :
+          case SPxBasis<R>::Desc::P_ON_LOWER :
             assert( rep() == ROW );
-            ds.colStatus(leaveNum) = dualColStatus(leaveNum);
+            ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
             leavebound = 0;
             leaveMax = infinity;
             break;
-          case SPxBasis::Desc::P_FREE :
+          case SPxBasis<R>::Desc::P_FREE :
             assert( rep() == ROW );
-            ds.colStatus(leaveNum) = dualColStatus(leaveNum);
+            ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
               {
                 leavebound = theLBbound[leaveIdx];
@@ -306,32 +309,32 @@ namespace soplex
               }
             break;
 
-          case SPxBasis::Desc::D_FREE :
+          case SPxBasis<R>::Desc::D_FREE :
             assert( rep() == COLUMN );
             assert(SPxLP::upper(leaveNum) == SPxLP::lower(leaveNum));
-            ds.colStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
-            leavebound = SPxLP::upper(leaveNum);
-            objChange += maxObj(leaveNum) * leavebound;
+            ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_FIXED;
+            leavebound = SPxLP::upper(leaveNum); 
+            objChange += this->maxObj(leaveNum) * leavebound;
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
               leaveMax = infinity;
             else
               leaveMax = -infinity;
             break;
-          case SPxBasis::Desc::D_ON_LOWER :
+          case SPxBasis<R>::Desc::D_ON_LOWER :
             assert( rep() == COLUMN );
-            ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+            ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_UPPER;
             leavebound = SPxLP::upper(leaveNum);
             objChange += theUCbound[leaveNum] * leavebound;
             leaveMax = -infinity;
             break;
-          case SPxBasis::Desc::D_ON_UPPER :
+          case SPxBasis<R>::Desc::D_ON_UPPER :
             assert( rep() == COLUMN );
-            ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+            ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_LOWER;
             leavebound = SPxLP::lower(leaveNum);
             objChange += theLCbound[leaveNum] * leavebound;
             leaveMax = infinity;
             break;
-          case SPxBasis::Desc::D_ON_BOTH :
+          case SPxBasis<R>::Desc::D_ON_BOTH :
             assert( rep() == COLUMN );
             if ((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
               {
@@ -339,7 +342,7 @@ namespace soplex
                 leavebound = SPxLP::upper(leaveNum);
                 objChange += theUCbound[leaveNum] * leavebound;
                 theLCbound[leaveNum] = -infinity;
-                ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+                ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_UPPER;
               }
             else
               {
@@ -347,13 +350,13 @@ namespace soplex
                 leavebound = SPxLP::lower(leaveNum);
                 objChange += theLCbound[leaveNum] * leavebound;
                 theUCbound[leaveNum] = infinity;
-                ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+                ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_LOWER;
               }
             break;
           default:
             throw SPxInternalCodeException("XLEAVE03 This should never happen.");
           }
-        MSG_DEBUG( std::cout << "DLEAVE52 SPxSolver::getLeaveVals() : col " << leaveNum
+        MSG_DEBUG( std::cout << "DLEAVE52 SPxSolver<R>::getLeaveVals() : col " << leaveNum
                    << ": " << leaveStat
                    << " -> " << ds.colStatus(leaveNum)
                    << " objChange: " << objChange
@@ -361,7 +364,8 @@ namespace soplex
           }
   }
 
-  void SPxSolver::getLeaveVals2(
+  template <class R>
+  void SPxSolver<R>::getLeaveVals2(
                                 Real leaveMax,
                                 SPxId enterId,
                                 Real& enterBound,
@@ -371,17 +375,17 @@ namespace soplex
                                 Real& objChange
                                 )
   {
-    SPxBasis::Desc& ds = desc();
+    typename SPxBasis<R>::Desc& ds = this->desc();
 
     enterBound = 0;
     if (enterId.isSPxRowId())
       {
-        int idx = number(SPxRowId(enterId));
-        SPxBasis::Desc::Status enterStat = ds.rowStatus(idx);
+        int idx = this->number(SPxRowId(enterId));
+        typename SPxBasis<R>::Desc::Status enterStat = ds.rowStatus(idx);
 
         switch (enterStat)
           {
-          case SPxBasis::Desc::D_FREE :
+          case SPxBasis<R>::Desc::D_FREE :
             assert(rep() == ROW);
             if (thePvec->delta()[idx] * leaveMax < 0)
               newCoPrhs = theLRbound[idx];
@@ -389,88 +393,88 @@ namespace soplex
               newCoPrhs = theURbound[idx];
             newUBbound = infinity;
             newLBbound = -infinity;
-            ds.rowStatus(idx) = SPxBasis::Desc::P_FIXED;
+            ds.rowStatus(idx) = SPxBasis<R>::Desc::P_FIXED;
             break;
-          case SPxBasis::Desc::D_ON_UPPER :
+          case SPxBasis<R>::Desc::D_ON_UPPER :
             assert(rep() == ROW);
             newUBbound = 0;
             newLBbound = -infinity;
-            ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
+            ds.rowStatus(idx) = SPxBasis<R>::Desc::P_ON_LOWER;
             newCoPrhs = theLRbound[idx];
             break;
-          case SPxBasis::Desc::D_ON_LOWER :
+          case SPxBasis<R>::Desc::D_ON_LOWER :
             assert(rep() == ROW);
             newUBbound = infinity;
             newLBbound = 0;
-            ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
+            ds.rowStatus(idx) = SPxBasis<R>::Desc::P_ON_UPPER;
             newCoPrhs = theURbound[idx];
             break;
-          case SPxBasis::Desc::D_ON_BOTH :
+          case SPxBasis<R>::Desc::D_ON_BOTH :
             assert(rep() == ROW);
             if (leaveMax * thePvec->delta()[idx] < 0)
               {
                 newUBbound = 0;
                 newLBbound = -infinity;
-                ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
+                ds.rowStatus(idx) = SPxBasis<R>::Desc::P_ON_LOWER;
                 newCoPrhs = theLRbound[idx];
               }
             else
               {
                 newUBbound = infinity;
                 newLBbound = 0;
-                ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
+                ds.rowStatus(idx) = SPxBasis<R>::Desc::P_ON_UPPER;
                 newCoPrhs = theURbound[idx];
               }
             break;
 
-          case SPxBasis::Desc::P_ON_UPPER :
+          case SPxBasis<R>::Desc::P_ON_UPPER :
             assert(rep() == COLUMN);
-            ds.rowStatus(idx) = dualRowStatus(idx);
-            if (lhs(idx) > -infinity)
+            ds.rowStatus(idx) = this->dualRowStatus(idx);
+            if (this->lhs(idx) > -infinity)
               theURbound[idx] = theLRbound[idx];
             newCoPrhs = theLRbound[idx];        // slack !!
-            newUBbound = -lhs(idx);
-            newLBbound = -rhs(idx);
-            enterBound = -rhs(idx);
-            objChange -= newCoPrhs * rhs(idx);
+            newUBbound = -this->lhs(idx);
+            newLBbound = -this->rhs(idx);
+            enterBound = -this->rhs(idx);
+            objChange -= newCoPrhs * this->rhs(idx);
             break;
-          case SPxBasis::Desc::P_ON_LOWER :
+          case SPxBasis<R>::Desc::P_ON_LOWER :
             assert(rep() == COLUMN);
-            ds.rowStatus(idx) = dualRowStatus(idx);
-            if (rhs(idx) < infinity)
+            ds.rowStatus(idx) = this->dualRowStatus(idx);
+            if (this->rhs(idx) < infinity)
               theLRbound[idx] = theURbound[idx];
             newCoPrhs = theURbound[idx];        // slack !!
-            newLBbound = -rhs(idx);
-            newUBbound = -lhs(idx);
-            enterBound = -lhs(idx);
-            objChange -= newCoPrhs * lhs(idx);
+            newLBbound = -this->rhs(idx);
+            newUBbound = -this->lhs(idx);
+            enterBound = -this->lhs(idx);
+            objChange -= newCoPrhs * this->lhs(idx);
             break;
-          case SPxBasis::Desc::P_FREE :
+          case SPxBasis<R>::Desc::P_FREE :
             assert(rep() == COLUMN);
 #if 1
             throw SPxInternalCodeException("XLEAVE04 This should never happen.");
 #else
             MSG_ERROR( std::cerr << "ELEAVE53 ERROR: not yet debugged!" << std::endl; )
-              ds.rowStatus(idx) = dualRowStatus(idx);
+              ds.rowStatus(idx) = this->dualRowStatus(idx);
             newCoPrhs = theURbound[idx];        // slack !!
             newUBbound = infinity;
             newLBbound = -infinity;
             enterBound = 0;
 #endif
             break;
-          case SPxBasis::Desc::P_FIXED :
+          case SPxBasis<R>::Desc::P_FIXED :
             assert(rep() == COLUMN);
             MSG_ERROR( std::cerr << "ELEAVE54 "
                        << "ERROR! Tried to put a fixed row variable into the basis: "
                        << "idx="   << idx
-                       << ", lhs=" << lhs(idx)
-                       << ", rhs=" << rhs(idx) << std::endl; )
+                       << ", lhs=" << this->lhs(idx)
+                       << ", rhs=" << this->rhs(idx) << std::endl; )
               throw SPxInternalCodeException("XLEAVE05 This should never happen.");
 
           default:
             throw SPxInternalCodeException("XLEAVE06 This should never happen.");
           }
-        MSG_DEBUG( std::cout << "DLEAVE55 SPxSolver::getLeaveVals2(): row " << idx
+        MSG_DEBUG( std::cout << "DLEAVE55 SPxSolver<R>::getLeaveVals2(): row " << idx
                    << ": " << enterStat
                    << " -> " << ds.rowStatus(idx)
                    << " objChange: " << objChange
@@ -480,53 +484,53 @@ namespace soplex
     else
       {
         assert(enterId.isSPxColId());
-        int idx = number(SPxColId(enterId));
-        SPxBasis::Desc::Status enterStat = ds.colStatus(idx);
+        int idx = this->number(SPxColId(enterId));
+        typename SPxBasis<R>::Desc::Status enterStat = ds.colStatus(idx);
 
         switch (enterStat)
           {
-          case SPxBasis::Desc::D_ON_UPPER :
+          case SPxBasis<R>::Desc::D_ON_UPPER :
             assert(rep() == ROW);
             newUBbound = 0;
             newLBbound = -infinity;
-            ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
+            ds.colStatus(idx) = SPxBasis<R>::Desc::P_ON_LOWER;
             newCoPrhs = theLCbound[idx];
             break;
-          case SPxBasis::Desc::D_ON_LOWER :
+          case SPxBasis<R>::Desc::D_ON_LOWER :
             assert(rep() == ROW);
             newUBbound = infinity;
             newLBbound = 0;
-            ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
+            ds.colStatus(idx) = SPxBasis<R>::Desc::P_ON_UPPER;
             newCoPrhs = theUCbound[idx];
             break;
-          case SPxBasis::Desc::D_FREE :
+          case SPxBasis<R>::Desc::D_FREE :
             assert(rep() == ROW);
             newUBbound = infinity;
             newLBbound = -infinity;
             newCoPrhs = theLCbound[idx];
-            ds.colStatus(idx) = SPxBasis::Desc::P_FIXED;
+            ds.colStatus(idx) = SPxBasis<R>::Desc::P_FIXED;
             break;
-          case SPxBasis::Desc::D_ON_BOTH :
+          case SPxBasis<R>::Desc::D_ON_BOTH :
             assert(rep() == ROW);
             if (leaveMax * theCoPvec->delta()[idx] < 0)
               {
                 newUBbound = 0;
                 newLBbound = -infinity;
-                ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
+                ds.colStatus(idx) = SPxBasis<R>::Desc::P_ON_LOWER;
                 newCoPrhs = theLCbound[idx];
               }
             else
               {
                 newUBbound = infinity;
                 newLBbound = 0;
-                ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
+                ds.colStatus(idx) = SPxBasis<R>::Desc::P_ON_UPPER;
                 newCoPrhs = theUCbound[idx];
               }
             break;
 
-          case SPxBasis::Desc::P_ON_UPPER :
+          case SPxBasis<R>::Desc::P_ON_UPPER :
             assert(rep() == COLUMN);
-            ds.colStatus(idx) = dualColStatus(idx);
+            ds.colStatus(idx) = this->dualColStatus(idx);
             if (SPxLP::lower(idx) > -infinity)
               theLCbound[idx] = theUCbound[idx];
             newCoPrhs = theUCbound[idx];
@@ -535,9 +539,9 @@ namespace soplex
             enterBound = SPxLP::upper(idx);
             objChange -= newCoPrhs * enterBound;
             break;
-          case SPxBasis::Desc::P_ON_LOWER :
+          case SPxBasis<R>::Desc::P_ON_LOWER :
             assert(rep() == COLUMN);
-            ds.colStatus(idx) = dualColStatus(idx);
+            ds.colStatus(idx) = this->dualColStatus(idx);
             if (SPxLP::upper(idx) < infinity)
               theUCbound[idx] = theLCbound[idx];
             newCoPrhs = theLCbound[idx];
@@ -546,9 +550,9 @@ namespace soplex
             enterBound = SPxLP::lower(idx);
             objChange -= newCoPrhs * enterBound;
             break;
-          case SPxBasis::Desc::P_FREE :
+          case SPxBasis<R>::Desc::P_FREE :
             assert(rep() == COLUMN);
-            ds.colStatus(idx) = dualColStatus(idx);
+            ds.colStatus(idx) = this->dualColStatus(idx);
             if (thePvec->delta()[idx] * leaveMax > 0)
               newCoPrhs = theUCbound[idx];
             else
@@ -557,19 +561,19 @@ namespace soplex
             newLBbound = SPxLP::lower(idx);
             enterBound = 0;
             break;
-          case SPxBasis::Desc::P_FIXED :
+          case SPxBasis<R>::Desc::P_FIXED :
             assert(rep() == COLUMN);
             MSG_ERROR( std::cerr << "ELEAVE56 "
                        << "ERROR! Tried to put a fixed column variable into the basis. "
                        << "idx="     << idx
-                       << ", lower=" << lower(idx)
-                       << ", upper=" << upper(idx) << std::endl; )
+                       << ", lower=" << this->lower(idx)
+                       << ", upper=" << this->upper(idx) << std::endl; )
               throw SPxInternalCodeException("XLEAVE07 This should never happen.");
           default:
             throw SPxInternalCodeException("XLEAVE08 This should never happen.");
           }
 
-        MSG_DEBUG( std::cout << "DLEAVE57 SPxSolver::getLeaveVals2(): col " << idx
+        MSG_DEBUG( std::cout << "DLEAVE57 SPxSolver<R>::getLeaveVals2(): col " << idx
                    << ": " << enterStat
                    << " -> " << ds.colStatus(idx)
                    << " objChange: " << objChange
@@ -578,23 +582,24 @@ namespace soplex
 
   }
 
-  void SPxSolver::rejectLeave(
+  template <class R>
+  void SPxSolver<R>::rejectLeave(
                               int leaveNum,
                               SPxId leaveId,
-                              SPxBasis::Desc::Status leaveStat,
+                              typename SPxBasis<R>::Desc::Status leaveStat,
                               const SVector* //newVec
                               )
   {
-    SPxBasis::Desc& ds = desc();
+    typename SPxBasis<R>::Desc& ds = this->desc();
     if (leaveId.isSPxRowId())
       {
         MSG_DEBUG( std::cout << "DLEAVE58 rejectLeave()  : row " << leaveNum
                    << ": " << ds.rowStatus(leaveNum)
                    << " -> " << leaveStat << std::endl; )
 
-          if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
+          if (leaveStat == SPxBasis<R>::Desc::D_ON_BOTH)
             {
-              if (ds.rowStatus(leaveNum) == SPxBasis::Desc::P_ON_LOWER)
+              if (ds.rowStatus(leaveNum) == SPxBasis<R>::Desc::P_ON_LOWER)
                 theLRbound[leaveNum] = theURbound[leaveNum];
               else
                 theURbound[leaveNum] = theLRbound[leaveNum];
@@ -607,9 +612,9 @@ namespace soplex
                    << ": " << ds.colStatus(leaveNum)
                    << " -> " << leaveStat << std::endl; )
 
-          if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
+          if (leaveStat == SPxBasis<R>::Desc::D_ON_BOTH)
             {
-              if (ds.colStatus(leaveNum) == SPxBasis::Desc::P_ON_UPPER)
+              if (ds.colStatus(leaveNum) == SPxBasis<R>::Desc::P_ON_UPPER)
                 theLCbound[leaveNum] = theUCbound[leaveNum];
               else
                 theUCbound[leaveNum] = theLCbound[leaveNum];
@@ -619,7 +624,8 @@ namespace soplex
   }
 
 
-  void SPxSolver::computePrimalray4Row(Real direction)
+  template <class R>
+  void SPxSolver<R>::computePrimalray4Row(Real direction)
   {
     Real sign = (direction > 0 ? 1.0 : -1.0);
 
@@ -630,7 +636,8 @@ namespace soplex
       primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
   }
 
-  void SPxSolver::computeDualfarkas4Col(Real direction)
+  template <class R>
+  void SPxSolver<R>::computeDualfarkas4Col(Real direction)
   {
     Real sign = (direction > 0 ? -1.0 : 1.0);
 
@@ -641,7 +648,8 @@ namespace soplex
       dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
   }
 
-  bool SPxSolver::leave(int leaveIdx, bool polish)
+  template <class R>
+  bool SPxSolver<R>::leave(int leaveIdx, bool polish)
   {
     assert(leaveIdx < dim() && leaveIdx >= 0);
     assert(type() == LEAVE);
@@ -657,7 +665,7 @@ namespace soplex
     */
     if (theCoPvec->delta().isSetup() && theCoPvec->delta().size() == 0)
       {
-        coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
+        this->coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
       }
 #ifdef ENABLE_ADDITIONAL_CHECKS
     else
@@ -681,7 +689,7 @@ namespace soplex
     assert(thePvec->isConsistent());
     assert(theCoPvec->isConsistent());
 
-    SPxBasis::Desc::Status leaveStat;      // status of leaving var
+    typename SPxBasis<R>::Desc::Status leaveStat;      // status of leaving var
     SPxId leaveId;        // id of leaving var
     SPxId none;           // invalid id used if leave fails
     Real leaveMax;       // maximium lambda of leaving var
@@ -728,7 +736,7 @@ namespace soplex
            we need it in the unbounded/infeasible case, too, to have the
            correct basis size */
         rejectLeave(leaveNum, leaveId, leaveStat);
-        change(-1, none, 0);
+        this->change(-1, none, 0);
         objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
         if (polish)
@@ -764,7 +772,7 @@ namespace soplex
                 }
           }
 
-        if (lastUpdate() > 1)
+        if (this->lastUpdate() > 1)
           {
             MSG_INFO3( (*spxout), (*spxout) << "ILEAVE01 factorization triggered in "
                        << "leave() for feasibility test" << std::endl; )
@@ -775,7 +783,7 @@ namespace soplex
               catch( const SPxStatusException& E )
                 {
                   // don't exit immediately but handle the singularity correctly
-                  assert(SPxBasis::status() == SPxBasis::SINGULAR);
+                  assert(SPxBasis<R>::status() == SPxBasis<R>::SINGULAR);
                   MSG_INFO3( (*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
                     }
 
@@ -791,7 +799,7 @@ namespace soplex
             MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
 
               computeFrhs();
-            SPxBasis::solve(*theFvec, *theFrhs);
+            SPxBasis<R>::solve(*theFvec, *theFrhs);
             computeFtest();
 
             return true;
@@ -802,12 +810,12 @@ namespace soplex
           if (rep() != COLUMN)
             {
               computePrimalray4Row(enterVal);
-              setBasisStatus(SPxBasis::UNBOUNDED);
+              setBasisStatus(SPxBasis<R>::UNBOUNDED);
             }
           else
             {
               computeDualfarkas4Col(enterVal);
-              setBasisStatus(SPxBasis::INFEASIBLE);
+              setBasisStatus(SPxBasis<R>::INFEASIBLE);
             }
         return false;
       }
@@ -817,7 +825,7 @@ namespace soplex
           If an entering variable has been found, a regular basis update is to
           be performed.
         */
-        if (enterId != baseId(leaveIdx))
+        if (enterId != this->baseId((leaveIdx)))
           {
             const SVector& newVector = *enterVector(enterId);
             // update feasibility vectors
@@ -828,7 +836,7 @@ namespace soplex
                 assert(solveVector3->isConsistent());
                 assert(solveVector3rhs->isSetup());
                 assert(boundflips > 0);
-                SPxBasis::solve4update(theFvec->delta(),
+                SPxBasis<R>::solve4update(theFvec->delta(),
                                        *solveVector2,
                                        *solveVector3,
                                        newVector,
@@ -845,7 +853,7 @@ namespace soplex
                 assert(solveVector2->isConsistent());
                 assert(solveVector2rhs->isSetup());
 
-                SPxBasis::solve4update(theFvec->delta(),
+                SPxBasis<R>::solve4update(theFvec->delta(),
                                        *solveVector2,
                                        newVector,
                                        *solveVector2rhs);
@@ -855,7 +863,7 @@ namespace soplex
                 assert(solveVector3->isConsistent());
                 assert(solveVector3rhs->isSetup());
                 assert(boundflips > 0);
-                SPxBasis::solve4update(theFvec->delta(),
+                SPxBasis<R>::solve4update(theFvec->delta(),
                                        *solveVector3,
                                        newVector,
                                        *solveVector3rhs);
@@ -866,12 +874,12 @@ namespace soplex
                   totalboundflips += boundflips;
               }
             else
-              SPxBasis::solve4update (theFvec->delta(), newVector);
+              SPxBasis<R>::solve4update (theFvec->delta(), newVector);
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
             {
               SSVector tmp(dim(), epsilon());
-              SPxBasis::solve(tmp, newVector);
+              SPxBasis<R>::solve(tmp, newVector);
               tmp -= fVec().delta();
               if (tmp.length() > entertol()) {
                 // This happens very frequently and does usually not hurt, so print
@@ -894,19 +902,19 @@ namespace soplex
                                << "in leave()" << std::endl; )
 
                       rejectLeave(leaveNum, leaveId, leaveStat);
-                    change(-1, none, 0);
+                    this->change(-1, none, 0);
                     objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
                     /**@todo if shift() is not zero we must not conclude unboundedness */
                     if (rep() == ROW)
                       {
                         computePrimalray4Row(enterVal);
-                        setBasisStatus(SPxBasis::UNBOUNDED);
+                        setBasisStatus(SPxBasis<R>::UNBOUNDED);
                       }
                     else
                       {
                         computeDualfarkas4Col(enterVal);
-                        setBasisStatus(SPxBasis::INFEASIBLE);
+                        setBasisStatus(SPxBasis<R>::INFEASIBLE);
                       }
 
                     return false;
@@ -915,7 +923,7 @@ namespace soplex
                   {
                     theFvec->delta().clear();
                     rejectLeave(leaveNum, leaveId, leaveStat, &newVector);
-                    change(-1, none, 0);
+                    this->change(-1, none, 0);
                     objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
                     MSG_DEBUG( std::cout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
@@ -931,7 +939,7 @@ namespace soplex
 
             //      process leaving variable
             if (leavebound > epsilon() || leavebound < -epsilon())
-              theFrhs->multAdd(-leavebound, baseVec(leaveIdx));
+              theFrhs->multAdd(-leavebound, this->baseVec(leaveIdx));
 
             //      process entering variable
             Real enterBound;
@@ -946,7 +954,7 @@ namespace soplex
             catch( const SPxException& F )
               {
                 rejectLeave(leaveNum, leaveId, leaveStat);
-                change(-1, none, 0);
+                this->change(-1, none, 0);
                 objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
                 throw F;
               }
@@ -975,7 +983,7 @@ namespace soplex
             updateNonbasicValue(objChange);
 
             //  change basis matrix
-            change(leaveIdx, enterId, &newVector, &(theFvec->delta()));
+            this->change(leaveIdx, enterId, &newVector, &(theFvec->delta()));
           }
 
         /*
@@ -990,20 +998,20 @@ namespace soplex
           {
             // @todo update obj function value here!!!
             assert(rep() == ROW);
-            SPxBasis::Desc& ds = desc();
+            typename SPxBasis<R>::Desc& ds = this->desc();
 
-            change(leaveIdx, none, 0);
+            this->change(leaveIdx, none, 0);
 
-            if (leaveStat == SPxBasis::Desc::P_ON_UPPER)
+            if (leaveStat == SPxBasis<R>::Desc::P_ON_UPPER)
               {
                 if (leaveId.isSPxRowId())
                   {
-                    ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+                    ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_LOWER;
                     (*theCoPrhs)[leaveIdx] = theLRbound[leaveNum];
                   }
                 else
                   {
-                    ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
+                    ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_LOWER;
                     (*theCoPrhs)[leaveIdx] = theLCbound[leaveNum];
                   }
                 theUBbound[leaveIdx] = 0;
@@ -1011,15 +1019,15 @@ namespace soplex
               }
             else
               {
-                assert( leaveStat == SPxBasis::Desc::P_ON_LOWER );
+                assert( leaveStat == SPxBasis<R>::Desc::P_ON_LOWER );
                 if (leaveId.isSPxRowId())
                   {
-                    ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+                    ds.rowStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_UPPER;
                     (*theCoPrhs)[leaveIdx] = theURbound[leaveNum];
                   }
                 else
                   {
-                    ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
+                    ds.colStatus(leaveNum) = SPxBasis<R>::Desc::P_ON_UPPER;
                     (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
                   }
                 theUBbound[leaveIdx] = infinity;
@@ -1042,8 +1050,8 @@ namespace soplex
         if ((leaveMax > entertol() && enterVal <= entertol()) || (leaveMax < -entertol() && enterVal >= -entertol()))
           {
             if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
-                && leaveStat != SPxBasis::Desc::P_FREE
-                && leaveStat != SPxBasis::Desc::D_FREE)
+                && leaveStat != SPxBasis<R>::Desc::P_FREE
+                && leaveStat != SPxBasis<R>::Desc::D_FREE)
               {
                 m_numCycle++;
                 leaveCycles++;
@@ -1063,7 +1071,7 @@ namespace soplex
               // these warnings only with verbose level INFO2 and higher.
               MSG_INFO2( (*spxout), (*spxout) << "WLEAVE64\t" << basis().iteration()
                          << ": fVec error = " << tmp.length() << std::endl; )
-                SPxBasis::solve(tmp, fRhs());
+                SPxBasis<R>::solve(tmp, fRhs());
               tmp -= fVec();
               MSG_INFO2( (*spxout), (*spxout) << "WLEAVE65\t(" << tmp.length() << ")\n"; )
                 }
