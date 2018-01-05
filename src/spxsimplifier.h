@@ -123,7 +123,7 @@ public:
       , m_keptBnds(old.m_keptBnds)
       , m_keptLRhs(old.m_keptLRhs)
       , m_objoffset(old.m_objoffset)
-      , m_minReduction(1e-4)
+      , m_minReduction(old.m_minReduction)
       , spxout(old.spxout)
    {
       m_timeUsed = TimerFactory::createTimer(m_timerType);
