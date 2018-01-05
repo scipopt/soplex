@@ -38,6 +38,7 @@ namespace soplex
      but given an primal/dual solution for the simplified SPxLP, the simplifier
      can reconstruct the primal/dual solution of the unsimplified LP.
   */
+  template <class R>
   class SPxSimplifier
   {
   protected:
@@ -187,7 +188,7 @@ namespace soplex
     virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false) = 0;
     /// reconstructs an optimal solution for the unsimplified LP.
     virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
-                            const SPxSolver::VarStatus[], const SPxSolver::VarStatus[], bool isOptimal = true) = 0;
+                            const typename SPxSolver<R>::VarStatus[], const typename SPxSolver<R>::VarStatus[], bool isOptimal = true) = 0;
     /// returns result status of the simplification
     virtual Result result() const = 0;
     /// specifies whether an optimal solution has already been unsimplified.
@@ -208,13 +209,13 @@ namespace soplex
     virtual const Vector& unsimplifiedRedCost() = 0;
 
     /// gets basis status for a single row.
-    virtual SPxSolver::VarStatus getBasisRowStatus(int) const = 0;
+    virtual typename SPxSolver<R>::VarStatus getBasisRowStatus(int) const = 0;
 
     /// gets basis status for a single column.
-    virtual SPxSolver::VarStatus getBasisColStatus(int) const = 0;
+    virtual typename SPxSolver<R>::VarStatus getBasisColStatus(int) const = 0;
 
     /// get optimal basis.
-    virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[], const int rowsSize = -1, const int colsSize = -1) const = 0;
+    virtual void getBasis(typename SPxSolver<R>::VarStatus[], typename SPxSolver<R>::VarStatus[], const int rowsSize = -1, const int colsSize = -1) const = 0;
 
     /// get objective offset.
     virtual Real getObjoffset() const
@@ -249,7 +250,8 @@ namespace soplex
   };
 
   /// Pretty-printing of simplifier status
-  std::ostream& operator<<( std::ostream& os, const SPxSimplifier::Result& status );
+  template <class R>
+    std::ostream& operator<<( std::ostream& os, const typename SPxSimplifier<R>::Result& status );
 
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_
