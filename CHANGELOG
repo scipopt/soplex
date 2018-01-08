@@ -1,6 +1,9 @@
 developer version
 =================
 
+features:
+- new simplifier step to perform variable aggregation for equations with two variables
+
 fixed bugs:
 - correct accumulation of shifted or relaxed bounds
 
