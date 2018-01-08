@@ -43,7 +43,7 @@
 namespace soplex
 {
 #define SOPLEX_VERSION         310
-#define SOPLEX_SUBVERSION        2
+#define SOPLEX_SUBVERSION        3
 #define SOPLEX_APIVERSION        1
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2018 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
