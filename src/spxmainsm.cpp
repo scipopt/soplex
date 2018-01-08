@@ -4906,8 +4906,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
                      << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
                      << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
-                     << m_stat[AGGREGATION]          << " aggregation of variables\n"
-                     << m_stat[MULTI_AGG]            << " multi aggregation of variables\n"
+                     << m_stat[AGGREGATION]          << " variable aggregations\n"
+                     << m_stat[MULTI_AGG]            << " multi aggregations\n"
                      << std::endl; );
 
    m_timeUsed->stop();
