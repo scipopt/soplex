@@ -1262,8 +1262,8 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
 }
 
 void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                            DataArray<SPxSolver::VarStatus>& cStatus,
-                                            DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
+                                       DataArray<SPxSolver::VarStatus>& cStatus,
+                                       DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
    s[m_old_i] = s[m_i];
@@ -1305,7 +1305,7 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
 
-   assert(!isOptimal || (GE(x[m_j], m_lower, 1e-8) && LE(x[m_j], m_upper, 1e-8)));
+   assert(!isOptimal || (GE(x[m_j], m_lower, eps()) && LE(x[m_j], m_upper, eps())));
 
    // dual:
    Real dualVal = 0.0;
@@ -1328,10 +1328,10 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
          && NErel(x[active_idx], m_oldlower))  )
    {
       cStatus[active_idx] = SPxSolver::BASIC;
-      assert(NErel(m_upper, m_lower));
-      if( EQrel(x[m_j], m_upper) )
+      assert(NE(m_upper, m_lower, eps()));
+      if( EQ(x[m_j], m_upper, eps()) )
          cStatus[m_j] = SPxSolver::ON_UPPER;
-      else if( EQrel(x[m_j], m_lower) )
+      else if( EQ(x[m_j], m_lower, eps()) )
          cStatus[m_j] = SPxSolver::ON_LOWER;
       else
          throw SPxInternalCodeException("XMAISM unexpected basis status in aggregation unsimplifier.");
@@ -2272,13 +2272,13 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    // change bounds of x_j if the new ones are tighter
    Real oldlower_j = lp.lower(j);
    Real oldupper_j = lp.upper(j);
-   if (GTrel(lo, lp.lower(j), epsZero()))
+   if (GT(lo, lp.lower(j), epsZero()))
    {
       lp.changeLower(j, lo);
       m_chgBnds++;
    }
 
-   if (LTrel(up, lp.upper(j), epsZero()))
+   if (LT(up, lp.upper(j), epsZero()))
    {
       lp.changeUpper(j, up);
       m_chgBnds++;
@@ -2286,7 +2286,7 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
 
    AggregationPS* AggregationPSptr = 0;
    spx_alloc(AggregationPSptr);
-   m_hist.append(new (AggregationPSptr) AggregationPS(lp, i, k, rhs, oldlower_j, oldupper_j));
+   m_hist.append(new (AggregationPSptr) AggregationPS(lp, i, k, rhs, oldupper_j, oldlower_j));
 
    removeRow(lp, i);
    removeCol(lp, k);

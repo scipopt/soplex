@@ -1051,7 +1051,7 @@ private:
 
    public:
       ///
-      AggregationPS(const SPxLP& lp, int _i, int _j, Real constant, Real oldlower, Real oldupper)
+      AggregationPS(const SPxLP& lp, int _i, int _j, Real constant, Real oldupper, Real oldlower)
          : PostStep("Aggregation", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
@@ -1105,7 +1105,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis,
+                           DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves multi aggregation.
@@ -1379,6 +1380,10 @@ private:
    {
       return m_cIdx[j];
    }
+   //@}
+
+protected:
+
    ///
    Real epsZero() const
    {
@@ -1394,7 +1399,6 @@ private:
    {
       return m_opttol;
    }
-   //@}
 
 public:
 
