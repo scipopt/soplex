@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -792,6 +792,7 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
       if (sel < -fastDelta / maxabs)
       {
          sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
          if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
             if (x < 0.0)
@@ -804,6 +805,7 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
    else
    {
       sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
       if( !polish )
       {
          thesolver->shiftLBbound(leave, vec[leave]);
@@ -830,6 +832,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
       if (sel > fastDelta / maxabs)
       {
          sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
          if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
          {
             if (x > 0.0)
@@ -842,6 +845,7 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
    else
    {
       sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
       if( !polish )
       {
          thesolver->shiftLBbound(leave, vec[leave]);
@@ -1018,7 +1022,8 @@ bool SPxFastRT::maxReEnter(
    Real& sel,
    Real maxabs,
    const SPxId& id,
-   int nr)
+   int nr,
+   bool polish)
 {
    Real x, d;
    Vector* up;
@@ -1077,30 +1082,37 @@ bool SPxFastRT::maxReEnter(
    {
       if (sel < -fastDelta / maxabs)
       {
-         if (d > 0.0)
+         sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+         if( !polish )
          {
-            thesolver->theShift -= (*up)[nr];
-            sel = 0.0;
-            (*up)[nr] = x + sel * d;
-            thesolver->theShift += (*up)[nr];
-         }
-         else
-         {
-            thesolver->theShift += (*low)[nr];
-            sel = 0.0;
-            (*low)[nr] = x + sel * d;
-            thesolver->theShift -= (*low)[nr];
+            if (d > 0.0)
+            {
+               thesolver->theShift -= (*up)[nr];
+               (*up)[nr] = x;
+               thesolver->theShift += (*up)[nr];
+            }
+            else
+            {
+               thesolver->theShift += (*low)[nr];
+               (*low)[nr] = x;
+               thesolver->theShift -= (*low)[nr];
+            }
          }
       }
    }
    else
    {
       sel = 0.0;
-      if (x > (*up)[nr])
-         thesolver->theShift += x - (*up)[nr];
-      else
-         thesolver->theShift += (*low)[nr] - x;
-      (*up)[nr] = (*low)[nr] = x;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+      if( !polish )
+      {
+         if (x > (*up)[nr])
+            thesolver->theShift += x - (*up)[nr];
+         else
+            thesolver->theShift += (*low)[nr] - x;
+         (*up)[nr] = (*low)[nr] = x;
+      }
    }
 
    return false;
@@ -1110,7 +1122,8 @@ bool SPxFastRT::minReEnter(
    Real& sel,
    Real maxabs,
    const SPxId& id,
-   int nr)
+   int nr,
+   bool polish)
 {
    Real x, d;
    Vector* up;
@@ -1167,30 +1180,37 @@ bool SPxFastRT::minReEnter(
    {
       if (sel > fastDelta / maxabs)
       {
-         if (d < 0.0)
+         sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+         if( !polish )
          {
-            thesolver->theShift -= (*up)[nr];
-            sel = 0.0;
-            (*up)[nr] = x + sel * d;
-            thesolver->theShift += (*up)[nr];
-         }
-         else
-         {
-            thesolver->theShift += (*low)[nr];
-            sel = 0.0;
-            (*low)[nr] = x + sel * d;
-            thesolver->theShift -= (*low)[nr];
+            if (d < 0.0)
+            {
+               thesolver->theShift -= (*up)[nr];
+               (*up)[nr] = x;
+               thesolver->theShift += (*up)[nr];
+            }
+            else
+            {
+               thesolver->theShift += (*low)[nr];
+               (*low)[nr] = x;
+               thesolver->theShift -= (*low)[nr];
+            }
          }
       }
    }
    else
    {
       sel = 0.0;
-      if (x > (*up)[nr])
-         thesolver->theShift += x - (*up)[nr];
-      else
-         thesolver->theShift += (*low)[nr] - x;
-      (*up)[nr] = (*low)[nr] = x;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+      if( !polish )
+      {
+         if (x > (*up)[nr])
+            thesolver->theShift += x - (*up)[nr];
+         else
+            thesolver->theShift += (*low)[nr] - x;
+         (*up)[nr] = (*low)[nr] = x;
+      }
    }
 
    return false;
@@ -1278,7 +1298,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
             else
                cnt += TRIES;
          }
-         if (!maxReEnter(sel, maxabs, enterId, nr))
+         if (!maxReEnter(sel, maxabs, enterId, nr, polish))
             break;
          relax();
       }
@@ -1317,7 +1337,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
             else
                cnt += TRIES;
          }
-         if (!minReEnter(sel, maxabs, enterId, nr))
+         if (!minReEnter(sel, maxabs, enterId, nr, polish))
             break;
          relax();
       }

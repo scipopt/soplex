@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -1036,6 +1036,12 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
+#ifndef NDEBUG
+      // allow a tiny relative deviation from the original values
+      Real alloweddeviation = epsilon() * 1e2;
+      Real origval = value();
+      Real origshift = shift();
+#endif
       instableEnter = false;
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
@@ -1080,6 +1086,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1100,6 +1110,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[continuousvars.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1144,6 +1158,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(i)]; )
                success = enter(polishId, true);
                clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1167,6 +1185,12 @@ void SPxSolver::performSolutionPolishing()
    {
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
+#ifndef NDEBUG
+      // allow a tiny relative deviation from the original values
+      Real alloweddeviation = epsilon() * 1e2;
+      Real origval = value();
+      Real origshift = shift();
+#endif
       instableLeave = false;
       theratiotester->setType(type());
       bool useIntegrality = false;
@@ -1210,6 +1234,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
@@ -1262,6 +1290,10 @@ void SPxSolver::performSolutionPolishing()
                MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                if( success )
                {
                   MSG_DEBUG( std::cout << " -> success!"; )
