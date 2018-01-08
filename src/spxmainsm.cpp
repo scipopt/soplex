@@ -4791,6 +4791,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    while(again && m_result == OKAY)
    {
       nrounds++;
+      MSG_INFO3((*spxout), (*spxout) << "Round " << nrounds << ":" << std::endl; )
       again = false;
 
 #if ROWS
@@ -4833,8 +4834,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
          m_result = multiaggregation(lp, again);
 #endif
       }
-      MSG_INFO3((*spxout), (*spxout) << "round " << nrounds << std::endl; )
    }
+   MSG_INFO3((*spxout), (*spxout) << "Simplification finished" << std::endl; )
 
    // preprocessing detected infeasibility or unboundedness
    if (m_result != OKAY)
