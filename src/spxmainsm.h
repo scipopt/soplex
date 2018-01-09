@@ -1045,13 +1045,13 @@ private:
       const Real m_obj;
       const Real m_oldupper;
       const Real m_oldlower;
-      const Real m_const;
+      const Real m_rhs;
       DSVector   m_row;
       DSVector   m_col;
 
    public:
       ///
-      AggregationPS(const SPxLP& lp, int _i, int _j, Real constant, Real oldupper, Real oldlower)
+      AggregationPS(const SPxLP& lp, int _i, int _j, Real rhs, Real oldupper, Real oldlower)
          : PostStep("Aggregation", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
@@ -1062,7 +1062,7 @@ private:
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_oldupper(oldupper)
          , m_oldlower(oldlower)
-         , m_const(constant)
+         , m_rhs(rhs)
          , m_row(lp.rowVector(_i))
          , m_col(lp.colVector(_j))
       {
@@ -1080,7 +1080,7 @@ private:
          , m_obj(old.m_obj)
          , m_oldupper(old.m_oldupper)
          , m_oldlower(old.m_oldlower)
-         , m_const(old.m_const)
+         , m_rhs(old.m_rhs)
          , m_row(old.m_row)
          , m_col(old.m_col)
       {}
@@ -1334,7 +1334,7 @@ private:
    /// remove row singletons.
    Result removeRowSingleton(SPxLP& lp, const SVector& row, int& i);
 
-   /// remove row doubletons.
+   /// aggregate two variables that appear in an equation.
    Result aggregateVars(SPxLP& lp, const SVector& row, int& i);
 
    /// performs simplification steps on the rows of the LP.
