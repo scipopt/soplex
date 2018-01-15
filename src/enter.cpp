@@ -59,7 +59,11 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
 /*
     Testing all values of |pVec| against its bounds. If $i$, say, is violated
     the violation is saved as negative value in |theTest[i]|.
- */
+    For each case, we compute relative differences if the the absolute calue of the
+    Pvector is greater than 1e9.
+    If the relative difference between thePVec and the corresponding bound is greater than
+    -1e-15, then we return 0.
+*/
 Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
 {
    assert(type() == ENTER);
