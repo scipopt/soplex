@@ -86,7 +86,7 @@ namespace soplex
     friend class SPxEquiliSC;
     friend class SPxLeastSqSC;
     friend class SPxGeometSC;
-    friend class SPxMainSM;
+    template <class U> friend class SPxMainSM;
 
   public:
 
