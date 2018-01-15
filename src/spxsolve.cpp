@@ -1038,7 +1038,7 @@ void SPxSolver::performSolutionPolishing()
       init();
 #ifndef NDEBUG
       // allow a tiny relative deviation from the original values
-      Real alloweddeviation = epsilon() * 1e2;
+      Real alloweddeviation = 1e-9;
       Real origval = value();
       Real origshift = shift();
 #endif
@@ -1187,7 +1187,7 @@ void SPxSolver::performSolutionPolishing()
       init();
 #ifndef NDEBUG
       // allow a tiny relative deviation from the original values
-      Real alloweddeviation = epsilon() * 1e2;
+      Real alloweddeviation = 1e-9;
       Real origval = value();
       Real origshift = shift();
 #endif
