@@ -50,7 +50,8 @@ namespace soplex
     class SPxPricer;
   template <class R>
     class SPxRatioTester;
-  class SPxStarter;
+  template <class R>
+    class SPxStarter;
 
   /**@brief   Sequential object-oriented SimPlex.
      @ingroup Algo
@@ -385,7 +386,7 @@ namespace soplex
 
     SPxPricer<R>*      thepricer;
     SPxRatioTester<R>* theratiotester;
-    SPxStarter*     thestarter;
+    SPxStarter<R>*     thestarter;
     //@}
 
     //-----------------------------
@@ -495,7 +496,7 @@ namespace soplex
     }
 
     /// return current starter.
-    SPxStarter* starter() const
+    SPxStarter<R>* starter() const
     {
       return thestarter;
     }
@@ -546,7 +547,7 @@ namespace soplex
     /// setup ratio-tester to use. If \p destroy is true, \p tester will be freed in destructor.
     virtual void setTester(SPxRatioTester<R>* tester, const bool destroy = false);
     /// setup starting basis generator to use. If \p destroy is true, \p starter will be freed in destructor.
-    virtual void setStarter(SPxStarter* starter, const bool destroy = false);
+    virtual void setStarter(SPxStarter<R>* starter, const bool destroy = false);
     /// set a start basis.
     virtual void loadBasis(const typename SPxBasis<R>::Desc&);
 
