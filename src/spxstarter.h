@@ -96,7 +96,7 @@ public:
    /**@name Starting */
    //@{
    /// generates start basis for loaded basis.
-   virtual void generate(typename SPxSolver<R>& base) = 0;
+   virtual void generate(SPxSolver<R>& base) = 0;
    //@}
 
    //-------------------------------------
