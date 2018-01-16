@@ -41,7 +41,8 @@ namespace soplex
    starting basis. If more than one call of method #primal() or #dual()
    occurred only the most recent one is valid for generating the starting base.
 */
-class SPxVectorST : public SPxWeightST
+  template <class R>
+class SPxVectorST : public SPxWeightST<R>
 {
 private:
 
@@ -65,7 +66,7 @@ protected:
    /**@name Protected helpers */
    //@{
    /// sets up variable weights.
-   void setupWeights(SPxSolver& base);
+   void setupWeights(SPxSolver<R>& base);
    //@}
 
 public:
@@ -77,11 +78,11 @@ public:
    SPxVectorST() 
       : state(NONE)
    {
-      m_name = "Vector";
+      this->m_name = "Vector";
    }
    /// copy constructor
    SPxVectorST( const SPxVectorST& old)
-      : SPxWeightST(old)
+      : SPxWeightST<R>(old)
       , state(old.state)
       , vec(old.vec)
    {
@@ -92,7 +93,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxWeightST::operator=(rhs);
+         SPxWeightST<R>::operator=(rhs);
          state = rhs.state;
          vec = rhs.vec;
 
@@ -105,7 +106,7 @@ public:
    virtual ~SPxVectorST()
    {}  
    /// clone function for polymorphism
-   inline virtual SPxStarter* clone() const
+   inline virtual SPxStarter<R>* clone() const
    {
       return new SPxVectorST(*this);
    }
