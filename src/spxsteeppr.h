@@ -38,7 +38,8 @@ namespace soplex
    
    See SPxPricer for a class documentation.
 */
-class SPxSteepPR : public SPxPricer
+  template <class R>
+class SPxSteepPR : public SPxPricer<R>
 {
 public:
 
@@ -56,7 +57,7 @@ public:
    };
    //@}
    /// setup steepest edge weights
-   void setupWeights(SPxSolver::Type type);
+   void setupWeights(typename SPxSolver<R>::Type type);
 
 private:
 
@@ -68,9 +69,9 @@ private:
    /// working vector
    SSVector workRhs;
    /// temporary array of precomputed pricing values
-   DataArray<IdxElement> prices;
+   DataArray<typename SPxPricer<R>::IdxElement> prices;
    /// temporary array of precomputed pricing values
-   DataArray<IdxElement> pricesCo;
+   DataArray<typename SPxPricer<R>::IdxElement> pricesCo;
    /// array of best pricing candidates
    DIdxSet bestPrices;
    /// array of best pricing candidates
@@ -117,7 +118,7 @@ public:
    //@{
    ///
    SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
-      : SPxPricer(name)
+      : SPxPricer<R>(name)
       , workVec (0)
       , workRhs (0)
       , pi_p(1.0)
@@ -128,7 +129,7 @@ public:
    }
    /// copy constructor
    SPxSteepPR( const SPxSteepPR& old)
-      : SPxPricer(old)
+      : SPxPricer<R>(old)
       , workVec(old.workVec)
       , workRhs(old.workRhs)
       , pi_p(old.pi_p)
@@ -142,7 +143,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxPricer::operator=(rhs);
+         SPxPricer<R>::operator=(rhs);
          workVec = rhs.workVec;
          workRhs = rhs.workRhs;
          pi_p = rhs.pi_p;
@@ -158,7 +159,7 @@ public:
    virtual ~SPxSteepPR()
    {}
    /// clone function for polymorphism
-   inline virtual SPxPricer* clone()  const 
+   inline virtual SPxPricer<R>* clone()  const 
    {
       return new SPxSteepPR(*this);
    }
@@ -168,13 +169,13 @@ public:
    /**@name Access / modification */
    //@{
    /// sets the solver
-   virtual void load(SPxSolver* base);
+   virtual void load(SPxSolver<R>* base);
    /// clear solver and preferences
    virtual void clear();
    /// set entering/leaving algorithm
-   virtual void setType(SPxSolver::Type);
+   virtual void setType(typename SPxSolver<R>::Type);
    /// set row/column representation
-   virtual void setRep(SPxSolver::Representation rep);
+   virtual void setRep(typename SPxSolver<R>::Representation rep);
    ///
    virtual int selectLeave();
    ///
