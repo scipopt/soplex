@@ -37,7 +37,8 @@ namespace soplex
    See SPxRatioTester for a class documentation.
 */
 /**@todo HarrisRT leads to cycling in dcmulti.sub.lp */
-class SPxHarrisRT : public SPxRatioTester
+  template <class R>
+class SPxHarrisRT : public SPxRatioTester<R>
 {
 private:
 
@@ -81,18 +82,18 @@ public:
    //@{
    /// default constructor
    SPxHarrisRT() 
-      : SPxRatioTester("Harris")
+      : SPxRatioTester<R>("Harris")
    {}
    /// copy constructor
    SPxHarrisRT(const SPxHarrisRT& old) 
-      : SPxRatioTester(old)
+      : SPxRatioTester<R>(old)
    {}
    /// assignment operator
    SPxHarrisRT& operator=( const SPxHarrisRT& rhs)
    {
       if(this != &rhs)
       {
-         SPxRatioTester::operator=(rhs);
+         SPxRatioTester<R>::operator=(rhs);
       }
 
       return *this;
@@ -101,7 +102,7 @@ public:
    virtual ~SPxHarrisRT()
    {}
    /// clone function for polymorphism
-   inline virtual SPxRatioTester* clone() const
+   inline virtual SPxRatioTester<R>* clone() const
    {
       return new SPxHarrisRT(*this);
    }
