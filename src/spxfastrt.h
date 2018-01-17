@@ -38,7 +38,8 @@ namespace soplex
 
    See SPxRatioTester for a class documentation.
 */
-class SPxFastRT : public SPxRatioTester
+template <class R>
+class SPxFastRT : public SPxRatioTester<R>
 {
 protected:
    //-------------------------------------
@@ -170,7 +171,7 @@ public:
    //@{
    /// default constructor
    SPxFastRT()
-      : SPxRatioTester("Fast")
+      : SPxRatioTester<R>("Fast")
       , minStab(DEFAULT_BND_VIOL)
       , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
@@ -178,7 +179,7 @@ public:
    {}
    /// copy constructor
    SPxFastRT(const SPxFastRT& old)
-      : SPxRatioTester(old)
+      : SPxRatioTester<R>(old)
       , minStab(old.minStab)
       , epsilon(old.epsilon)
       , fastDelta(old.fastDelta)
@@ -189,7 +190,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxRatioTester::operator=(rhs);
+         SPxRatioTester<R>::operator=(rhs);
          minStab = rhs.minStab;
          epsilon = rhs.epsilon;
          fastDelta = rhs.fastDelta;
@@ -200,7 +201,7 @@ public:
    }
    /// bound flipping constructor
    SPxFastRT(const char* name)
-      : SPxRatioTester(name)
+      : SPxRatioTester<R>(name)
       , minStab(DEFAULT_BND_VIOL)
       , epsilon(DEFAULT_EPS_ZERO)
       , fastDelta(DEFAULT_BND_VIOL)
@@ -210,7 +211,7 @@ public:
    virtual ~SPxFastRT()
    {}
    /// clone function for polymorphism
-   inline virtual SPxRatioTester* clone() const
+   inline virtual SPxRatioTester<R>* clone() const
    {
       return new SPxFastRT(*this);
    }
@@ -220,19 +221,19 @@ public:
    /**@name Access / modification */
    //@{
    ///
-   virtual void load(SPxSolver* solver);
+   virtual void load(SPxSolver<R>* solver);
    ///
    virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
    virtual SPxId selectEnter(Real& val, int, bool polish = false);
    ///
-   virtual void setType(SPxSolver::Type type);
+   virtual void setType(typename SPxSolver<R>::Type type);
    ///
    virtual void setDelta(Real newDelta)
    {
       if( newDelta <= DEFAULT_EPS_ZERO )
          newDelta = DEFAULT_EPS_ZERO;
-      delta = newDelta;
+      this->delta = newDelta;
       fastDelta = newDelta;
    }
    ///
