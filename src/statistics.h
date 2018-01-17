@@ -32,7 +32,7 @@ namespace soplex
     * @ingroup Algo
     */
   template <class R>
-   class SoPlex::Statistics
+   class SoPlex<R>::Statistics
    {
 
    public:
