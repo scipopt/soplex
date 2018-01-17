@@ -31,6 +31,7 @@ namespace soplex
     * @brief   Class for collecting statistical information
     * @ingroup Algo
     */
+  template <class R>
    class SoPlex::Statistics
    {
 

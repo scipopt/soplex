@@ -43,7 +43,7 @@ namespace soplex
 template< class R >
 class SolBase
 {
-   friend class SoPlex;
+   template <class T>  friend class SoPlex;
    template < class S > friend class SolBase;
 
 public:
