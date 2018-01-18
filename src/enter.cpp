@@ -60,9 +60,9 @@ all $j \ne i^*$ $f^{(i^*)}_j$ remains within its bounds $l_j$ and $u_j$.
     Testing all values of |pVec| against its bounds. If $i$, say, is violated
     the violation is saved as negative value in |theTest[i]|.
     For each case, we compute relative differences if the the absolute calue of the
-    Pvector is greater than 1e9.
+    Pvector is greater than 1e8.
     If the relative difference between thePVec and the corresponding bound is greater than
-    -1e-15, then we return 0.
+    -1e-14, then we return 0.
 */
 Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
 {
@@ -76,9 +76,9 @@ Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_BOTH:
       assert(rep() == ROW);
-      if( (*thePvec)[i] > 1e9 || (*thePvec)[i] < -1e9 )
+      if( (*thePvec)[i] > 1e8 || (*thePvec)[i] < -1e8 )
       {
-         if( GE(relDiff((*thePvec)[i],lhs(i)), -1e-15) )
+         if( GE(relDiff((*thePvec)[i],lhs(i)), -1e-14) )
             return 0;
       }
       x = (*thePvec)[i] - lhs(i);
@@ -88,40 +88,40 @@ Real SPxSolver::test(int i, SPxBasis::Desc::Status stat) const
       //lint -fallthrough
    case SPxBasis::Desc::D_ON_LOWER:
       assert(rep() == ROW);
-      if( (*thePvec)[i] > 1e9 || (*thePvec)[i] < -1e9 )
+      if( (*thePvec)[i] > 1e8 || (*thePvec)[i] < -1e8 )
       {
-         if( GE(relDiff(rhs(i),(*thePvec)[i]), -1e-15) )
+         if( GE(relDiff(rhs(i),(*thePvec)[i]), -1e-14) )
             return 0;
       }
       return rhs(i) - (*thePvec)[i];
    case SPxBasis::Desc::D_ON_UPPER:
       assert(rep() == ROW);
-      if( (*thePvec)[i] > 1e9 || (*thePvec)[i] < -1e9 )
+      if( (*thePvec)[i] > 1e8 || (*thePvec)[i] < -1e8 )
       {
-         if( GE(relDiff((*thePvec)[i],lhs(i)), -1e-15) )
+         if( GE(relDiff((*thePvec)[i],lhs(i)), -1e-14) )
             return 0;
       }
       return (*thePvec)[i] - lhs(i);
    case SPxBasis::Desc::P_ON_UPPER:
       assert(rep() == COLUMN);
-      if( (*thePvec)[i] > 1e9 || (*thePvec)[i] < -1e9 )
+      if( (*thePvec)[i] > 1e8 || (*thePvec)[i] < -1e8 )
       {
-         if( GE(relDiff(maxObj(i),(*thePvec)[i]), -1e-15) )
+         if( GE(relDiff(maxObj(i),(*thePvec)[i]), -1e-14) )
             return 0;
       }
       return maxObj(i) - (*thePvec)[i];
    case SPxBasis::Desc::P_ON_LOWER:
       assert(rep() == COLUMN);
-      if( (*thePvec)[i] > 1e9 || (*thePvec)[i] < -1e9 )
+      if( (*thePvec)[i] > 1e8 || (*thePvec)[i] < -1e8 )
       {
-         if( GE(relDiff((*thePvec)[i],maxObj(i)), -1e-15) )
+         if( GE(relDiff((*thePvec)[i],maxObj(i)), -1e-14) )
             return 0;
       }
       return (*thePvec)[i] - maxObj(i);
    case SPxBasis::Desc::P_FREE :
-      if( (*thePvec)[i] > 1e9 || (*thePvec)[i] < -1e9 )
+      if( (*thePvec)[i] > 1e8 || (*thePvec)[i] < -1e8 )
       {
-         if( GE(relDiff(maxObj(i),(*thePvec)[i]), -1e-15) )
+         if( GE(relDiff(maxObj(i),(*thePvec)[i]), -1e-14) )
             return 0;
       }
       x = maxObj(i) - (*thePvec)[i];
@@ -234,9 +234,9 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_BOTH :
       assert(rep() == ROW);
-      if( (*theCoPvec)[i] > 1e9 || (*theCoPvec)[i] < -1e9 )
+      if( (*theCoPvec)[i] > 1e8 || (*theCoPvec)[i] < -1e8 )
       {
-         if( GE(relDiff((*theCoPvec)[i], SPxLP::lower(i)), -1e-15) )
+         if( GE(relDiff((*theCoPvec)[i], SPxLP::lower(i)), -1e-14) )
             return 0;
       }
       x = (*theCoPvec)[i] - SPxLP::lower(i);
@@ -246,33 +246,33 @@ Real SPxSolver::coTest(int i, SPxBasis::Desc::Status stat) const
       //lint -fallthrough
    case SPxBasis::Desc::D_ON_LOWER:
       assert(rep() == ROW);
-      if( (*theCoPvec)[i] > 1e9 || (*theCoPvec)[i] < -1e9 )
+      if( (*theCoPvec)[i] > 1e8 || (*theCoPvec)[i] < -1e8 )
       {
-         if( GE(relDiff(SPxLP::upper(i), (*theCoPvec)[i]), -1e-15) )
+         if( GE(relDiff(SPxLP::upper(i), (*theCoPvec)[i]), -1e-14) )
             return 0;
       }
       return SPxLP::upper(i) - (*theCoPvec)[i];
    case SPxBasis::Desc::D_ON_UPPER:
       assert(rep() == ROW);
-      if( (*theCoPvec)[i] > 1e9 || (*theCoPvec)[i] < -1e9 )
+      if( (*theCoPvec)[i] > 1e8 || (*theCoPvec)[i] < -1e8 )
       {
-         if( GE(relDiff((*theCoPvec)[i], SPxLP::lower(i)), -1e-15) )
+         if( GE(relDiff((*theCoPvec)[i], SPxLP::lower(i)), -1e-14) )
             return 0;
       }
       return (*theCoPvec)[i] - SPxLP::lower(i);
    case SPxBasis::Desc::P_ON_UPPER:
       assert(rep() == COLUMN);
-      if( (*theCoPvec)[i] > 1e9 || (*theCoPvec)[i] < -1e9 )
+      if( (*theCoPvec)[i] > 1e8 || (*theCoPvec)[i] < -1e8 )
       {
-         if( GE(relDiff((*theCoPvec)[i], maxRowObj(i)), -1e-15) )
+         if( GE(relDiff((*theCoPvec)[i], maxRowObj(i)), -1e-14) )
             return 0;
       }
       return (*theCoPvec)[i] - maxRowObj(i);             // slacks !
    case SPxBasis::Desc::P_ON_LOWER:
       assert(rep() == COLUMN);
-      if( (*theCoPvec)[i] > 1e9 || (*theCoPvec)[i] < -1e9 )
+      if( (*theCoPvec)[i] > 1e8 || (*theCoPvec)[i] < -1e8 )
       {
-         if( GE(relDiff(maxRowObj(i), (*theCoPvec)[i]), -1e-15) )
+         if( GE(relDiff(maxRowObj(i), (*theCoPvec)[i]), -1e-14) )
             return 0;
       }
       return maxRowObj(i) - (*theCoPvec)[i];             // slacks !

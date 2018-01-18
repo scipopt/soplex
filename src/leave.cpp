@@ -37,18 +37,18 @@ Real SPxSolver::testBasis(int i) const
 {
   assert( type() == LEAVE);
   // if theFvec has large values, we check relative differences.
-  if( (*theFvec)[i] > 1e9 || (*theFvec)[i] < -1e9 )
+  if( (*theFvec)[i] > 1e8 || (*theFvec)[i] < -1e8 )
   {
     if( (*theFvec)[i] > theUBbound[i] )
     {
-      if( GE(relDiff(theUBbound[i], (*theFvec)[i]), -1e-15) )
+      if( GE(relDiff(theUBbound[i], (*theFvec)[i]), -1e-14) )
         return 0;
       else
         return theUBbound[i] - (*theFvec)[i];
     }
     else
     {
-      if( GE(relDiff((*theFvec)[i], theLBbound[i]), -1e-15) )
+      if( GE(relDiff((*theFvec)[i], theLBbound[i]), -1e-14) )
         return 0;
       else
         return (*theFvec)[i] - theLBbound[i];
