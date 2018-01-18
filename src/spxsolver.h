@@ -382,6 +382,10 @@ protected:
    SPxPricer*      thepricer;
    SPxRatioTester* theratiotester;
    SPxStarter*     thestarter;
+
+   Real           boundrange;       ///< absolute range of all bounds in the problem
+   Real           siderange;        ///< absolute range of all side in the problem
+   Real           objrange;         ///< absolute range of all objective coefficients in the problem
    //@}
 
    //-----------------------------
@@ -389,6 +393,9 @@ protected:
    //@{
    /// is the solution precise enough, or should we increase delta() ?
    virtual bool precisionReached(Real& newpricertol) const;
+
+   /// determine ranges of problem values for bounds, sides and objective to assess numerical difficulties
+   void calculateProblemRanges();
    //@}
 
 public:
