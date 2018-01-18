@@ -1777,6 +1777,10 @@ private:
 
    /// test coVector \p i with status \p stat.
    Real coTest(int i, SPxBasis::Desc::Status stat) const;
+
+   /// test Fvector of i against bounds.
+   Real testBasis(int i) const;
+
    /// compute coTest vector.
    void computeCoTest();
    /// recompute coTest vector.

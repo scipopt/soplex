@@ -29,6 +29,38 @@ namespace soplex
 {
 static const Real reject_leave_tol = 1e-10; // = LOWSTAB as defined in spxfastrt.cpp
 
+
+/*
+ * Test the bound violation of theFvec[i].
+ */
+Real SPxSolver::testBasis(int i) const
+{
+  assert( type() == LEAVE);
+  // if theFvec has large values, we check relative differences.
+  if( (*theFvec)[i] > 1e8 || (*theFvec)[i] < -1e8 )
+  {
+    if( (*theFvec)[i] > theUBbound[i] )
+    {
+      if( GE(relDiff(theUBbound[i], (*theFvec)[i]), -1e-14) )
+        return 0;
+      else
+        return theUBbound[i] - (*theFvec)[i];
+    }
+    else
+    {
+      if( GE(relDiff((*theFvec)[i], theLBbound[i]), -1e-14) )
+        return 0;
+      else
+        return (*theFvec)[i] - theLBbound[i];
+    }
+  }
+  // In the normal case, we return the bound-violation.
+  else
+    return ((*theFvec)[i] > theUBbound[i])
+      ? theUBbound[i] - (*theFvec)[i]
+      : (*theFvec)[i] - theLBbound[i];
+}
+
 /*
     Vector |fTest| gives the feasibility test of all basic variables. For its
     computation |fVec|, |theUBbound| and |theLBbound| must be setup correctly.
@@ -51,9 +83,7 @@ void SPxSolver::computeFtest()
 
    for( int i = 0; i < dim(); ++i )
    {
-      theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
-         ? theUBbound[i] - (*theFvec)[i]
-         : (*theFvec)[i] - theLBbound[i];
+     theCoTest[i] = testBasis(i);
 
       if( remainingRoundsLeave == 0 )
       {
@@ -118,10 +148,7 @@ void SPxSolver::updateFtest()
       if( m_pricingViolUpToDate && ftest[i] < -theeps )
          m_pricingViol += ftest[i];
 
-      ftest[i] = ((*theFvec)[i] > theUBbound[i])
-         ? theUBbound[i] - (*theFvec)[i]
-         : (*theFvec)[i] - theLBbound[i];
-
+      ftest[i] = testBasis(i);
 
       if( sparsePricingLeave && ftest[i] < -theeps )
       {
@@ -156,7 +183,7 @@ void SPxSolver::updateFtest()
             if( m_pricingViolUpToDate && ftest[i] < -theeps )
                m_pricingViol += ftest[i];
 
-            ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
+            ftest[i] = testBasis(i);
 
             if( sparsePricingLeave && ftest[i] < -theeps )
             {

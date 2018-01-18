@@ -492,7 +492,7 @@ void SPxSolver::perturbMaxLeave(void)
    MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
-
+//* This method actually just recomputes the shift for the most part. It only unshifts for basic variables where the shift is not needed anymore */
 void SPxSolver::unShift(void)
 {
    MSG_INFO3( (*spxout), (*spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
@@ -530,6 +530,7 @@ void SPxSolver::unShift(void)
                   if ((*theFvec)[i] < t_up + eps) // check allowed violation
                      theUBbound[i] = t_up; // reset shifted bound to original
                   else if ((*theFvec)[i] > t_up) // shifted bound is required for feasibility
+                     // theUBbound[i] = theFvec[i] ?
                      theShift += theUBbound[i] - t_up;
                   if ((*theFvec)[i] > t_low - eps) // check allowed violation
                      theLBbound[i] = t_low; // reset shifted bound to original
@@ -538,6 +539,9 @@ void SPxSolver::unShift(void)
                }
                else
                {
+                  assert(EQ((*theFvec)[i], theUBbound[i], entertol()));
+                  assert(EQ((*theFvec)[i], theLBbound[i], entertol()));
+
                   if (theUBbound[i] > t_up)
                      theShift += theUBbound[i] - t_up;
                   else if (theLBbound[i] < t_low)
