@@ -559,7 +559,7 @@ SPxSolver::Status SPxSolver::solve()
                   m_status = OPTIMAL;
                   break;
                }
-               else if( loopCount > 10 )
+               else if( loopCount > 2 )
                {
                   // calculate problem ranges if not done already
                   if( boundrange == 0.0 || siderange == 0.0 || objrange == 0.0 )
