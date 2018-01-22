@@ -2680,6 +2680,146 @@ public:
    //@}
 };
 
+
+// Declaration of Real specializations found in spxlpbase_real.cpp
+
+template <>
+void SPxLPBase<Real>::unscaleLP();
+
+template <>
+void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, VectorBase<Real>& activity, const bool unscaled) const;
+
+template <>
+void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBase<Real>& activity, const bool unscaled) const;
+
+template <>
+Real SPxLPBase<Real>::maxAbsNzo(bool unscaled) const;
+
+template <>
+Real SPxLPBase<Real>::minAbsNzo(bool unscaled) const;
+
+template <>
+void SPxLPBase<Real>::getObjUnscaled(VectorBase<Real>& pobj) const;
+
+template <>
+void SPxLPBase<Real>::getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+
+template <>
+void SPxLPBase<Real>::getRhsUnscaled(VectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::rhsUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::rhsUnscaled(const SPxRowId& id) const;
+
+template <>
+void SPxLPBase<Real>::getLhsUnscaled(VectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::lhsUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::lhsUnscaled(const SPxRowId& id) const;
+
+template <>
+void SPxLPBase<Real>::getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+
+template <>
+void SPxLPBase<Real>::getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::objUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::objUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::maxObjUnscaled(VectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::maxObjUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::getUpperUnscaled(DVector& vec) const;
+
+template <>
+Real SPxLPBase<Real>::upperUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::getLowerUnscaled(DVector& vec) const;
+
+template <>
+Real SPxLPBase<Real>::lowerUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::lowerUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::changeMaxObj(const VectorBase<Real>& newObj, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeLower(const VectorBase<Real>& newLower, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeUpper(const VectorBase<Real>& newUpper, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeLhs(const VectorBase<Real>& newLhs, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeRhs(const VectorBase<Real>& newRhs, bool scale);
+
+template <>
+bool SPxLPBase<Real>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+bool SPxLPBase<Real>::readMPS(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+void SPxLPBase<Real>::writeLPF(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Real>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
+
+// Declaration of Rational specializations found in spxlpbase_real.cpp
+
+template <>
+void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity, const bool unscaled) const;
+
+template <>
+void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, VectorBase<Rational>& activity, const bool unscaled) const;
+
+template <>
+Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const;
+
+template <>
+Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const;
+
+template <>
+bool SPxLPBase<Rational>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+bool SPxLPBase<Rational>::readMPS(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+void SPxLPBase<Rational>::writeLPF(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Rational>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
+
 } // namespace soplex
 
 /* reset the SOPLEX_DEBUG flag to its original value */
