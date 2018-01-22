@@ -2791,7 +2791,8 @@ void SPxLPBase<Real>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, 
 template <>
 void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
 
-// Declaration of Rational specializations found in spxlpbase_real.cpp
+#ifndef SOPLEX_LEGACY
+// Declaration of Rational specializations found in spxlpbase_rational.cpp
 
 template <>
 void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity, const bool unscaled) const;
@@ -2819,6 +2820,7 @@ void SPxLPBase<Rational>::writeMPS(std::ostream& p_output, const NameSet* p_rnam
 
 template <>
 void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
+#endif
 
 } // namespace soplex
 
