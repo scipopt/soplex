@@ -3103,7 +3103,7 @@ namespace soplex
       assert(primal.dim() == numColsRational());
       assert(dual.dim() == numRowsRational());
 
-      SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
+      typename SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
 
 #ifndef SOPLEX_MANUAL_ALT
       if( fromscratch || !_hasBasis )
@@ -3136,7 +3136,7 @@ namespace soplex
       try
       {
          // apply problem simplification
-         SPxSimplifier::Result simplificationStatus = SPxSimplifier::OKAY;
+         typename SPxSimplifier<R>::Result simplificationStatus = SPxSimplifier<R>::OKAY;
          if( _simplifier != 0 )
          {
             // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used
@@ -3145,11 +3145,11 @@ namespace soplex
          }
 
          // apply scaling after the simplification
-         if( _scaler != 0 && simplificationStatus == SPxSimplifier::OKAY )
+         if( _scaler != 0 && simplificationStatus == SPxSimplifier<R>::OKAY )
             _scaler->scale(_solver, false);
 
          // run the simplex method if problem has not been solved by the simplifier
-         if( simplificationStatus == SPxSimplifier::OKAY )
+         if( simplificationStatus == SPxSimplifier<R>::OKAY )
          {
             MSG_INFO1( spxout, spxout << std::endl );
 
@@ -3160,15 +3160,15 @@ namespace soplex
 
          ///@todo move to private helper methods
          // evaluate status flag
-         if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+         if( simplificationStatus == SPxSimplifier<R>::INFEASIBLE )
             result = SPxSolver<R>::INFEASIBLE;
-         else if( simplificationStatus == SPxSimplifier::DUAL_INFEASIBLE )
+         else if( simplificationStatus == SPxSimplifier<R>::DUAL_INFEASIBLE )
             result = SPxSolver<R>::INForUNBD;
-         else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
+         else if( simplificationStatus == SPxSimplifier<R>::UNBOUNDED )
             result = SPxSolver<R>::UNBOUNDED;
-         else if( simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY )
+         else if( simplificationStatus == SPxSimplifier<R>::VANISHED || simplificationStatus == SPxSimplifier<R>::OKAY )
          {
-            result = simplificationStatus == SPxSimplifier::VANISHED ? SPxSolver<R>::OPTIMAL : _solver.status();
+            result = simplificationStatus == SPxSimplifier<R>::VANISHED ? SPxSolver<R>::OPTIMAL : _solver.status();
 
             ///@todo move to private helper methods
             // process result
@@ -3180,9 +3180,9 @@ namespace soplex
                if( _simplifier != 0 )
                {
                   assert(!_simplifier->isUnsimplified());
-                  assert(simplificationStatus == SPxSimplifier::VANISHED || simplificationStatus == SPxSimplifier::OKAY);
+                  assert(simplificationStatus == SPxSimplifier<R>::VANISHED || simplificationStatus == SPxSimplifier<R>::OKAY);
 
-                  bool vanished = simplificationStatus == SPxSimplifier::VANISHED;
+                  bool vanished = simplificationStatus == SPxSimplifier<R>::VANISHED;
 
                   // get solution vectors for transformed problem
                   DVectorReal tmpPrimal(vanished ? 0 : _solver.nCols());
@@ -3324,9 +3324,10 @@ namespace soplex
 
 
    /// solves real LP with recovery mechanism
-   SPxSolver<R>::Status SoPlex<R>::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< SPxSolver<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier)
+  template <class R>
+    typename SPxSolver<R>::Status SoPlex<R>::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier)
    {
-      SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
+      typename SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
 
       bool fromScratch = false;
       bool solved = false;
@@ -3488,7 +3489,7 @@ namespace soplex
             MSG_INFO1( spxout, spxout << "Switching ratio test." << std::endl );
 
             _solver.setType(_solver.type() == SPxSolver<R>::LEAVE ? SPxSolver<R>::ENTER : SPxSolver<R>::LEAVE);
-            if( _solver.ratiotester() != (SPxRatioTester*)&_ratiotesterTextbook )
+            if( _solver.ratiotester() != (SPxRatioTester<R>*)&_ratiotesterTextbook )
                setIntParam(SoPlex<R>::RATIOTESTER, RATIOTESTER_TEXTBOOK);
             else
                setIntParam(SoPlex<R>::RATIOTESTER, RATIOTESTER_FAST);
@@ -3502,7 +3503,7 @@ namespace soplex
             MSG_INFO1( spxout, spxout << "Switching pricer." << std::endl );
 
             _solver.setType(_solver.type() == SPxSolver<R>::LEAVE ? SPxSolver<R>::ENTER : SPxSolver<R>::LEAVE);
-            if( _solver.pricer() != (SPxPricer*)&_pricerDevex )
+            if( _solver.pricer() != (SPxPricer<R>*)&_pricerDevex )
                setIntParam(SoPlex<R>::PRICER, PRICER_DEVEX);
             else
                setIntParam(SoPlex<R>::PRICER, PRICER_STEEP);
@@ -3587,7 +3588,7 @@ namespace soplex
 
    /// factorizes rational basis matrix in column representation
   template <class R>
-   void SoPlex<R>::_factorizeColumnRational(SolRational& sol, DataArray< SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< SPxSolver<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal)
+   void SoPlex<R>::_factorizeColumnRational(SolRational& sol, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal)
    {
       // start rational solving time
       _statistics->rationalTime->start();
@@ -3992,7 +3993,8 @@ namespace soplex
    }
 
    /// attempts rational reconstruction of primal-dual solution
-   bool SoPlex<R>::_reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< SPxSolver<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared)
+  template <class R>
+   bool SoPlex<R>::_reconstructSolutionRational(SolRational& sol, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared)
    {
       bool success;
       bool isSolBasic;
@@ -4031,7 +4033,7 @@ namespace soplex
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
-         SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+         typename SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
          if( (basisStatusCol == SPxSolver<R>::FIXED && _workSol._primal[c] != lowerRational(c))
             || (basisStatusCol == SPxSolver<R>::ON_LOWER && _workSol._primal[c] != lowerRational(c))
             || (basisStatusCol == SPxSolver<R>::ON_UPPER && _workSol._primal[c] != upperRational(c))
@@ -4067,7 +4069,7 @@ namespace soplex
       for( int r = numRowsRational() - 1; r >= 0; r-- )
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
-         SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+         typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
          if( (basisStatusRow == SPxSolver<R>::FIXED && _workSol._slacks[r] != lhsRational(r))
             || (basisStatusRow == SPxSolver<R>::ON_LOWER && _workSol._slacks[r] != lhsRational(r))
             || (basisStatusRow == SPxSolver<R>::ON_UPPER && _workSol._slacks[r] != rhsRational(r))
