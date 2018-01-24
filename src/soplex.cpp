@@ -4126,7 +4126,7 @@ void SoPlex<R>::syncLPRational()
 
    /// gets current basis
    template <class R>
-void SoPlex<R>::getBasis(SPxSolver<R>::VarStatus rows[], SPxSolver<R>::VarStatus cols[]) const
+   void SoPlex<R>::getBasis(typename SPxSolver<R>::VarStatus rows[], typename SPxSolver<R>::VarStatus cols[]) const
    {
       // if no basis is available, return slack basis
       if( !hasBasis() )
@@ -5198,7 +5198,7 @@ void SoPlex<R>::getBasisInd(int* bind) const
 
    /// sets starting basis via arrays of statuses
    template <class R>
-void SoPlex<R>::setBasis(const SPxSolver<R>::VarStatus rows[], const SPxSolver<R>::VarStatus cols[])
+   void SoPlex<R>::setBasis(const typename SPxSolver<R>::VarStatus rows[], const typename SPxSolver<R>::VarStatus cols[])
    {
       _rationalLUSolver.clear();
 
@@ -5249,7 +5249,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// time spent in last call to solve
-   Real SoPlex<R>::solveTime() const
+  template <class R>
+  Real SoPlex<R>::solveTime() const
    {
        return _statistics->solvingTime->time();
    }
@@ -5257,7 +5258,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// statistical information in form of a string
-   std::string SoPlex<R>::statisticString() const
+  template <class R>
+  std::string SoPlex<R>::statisticString() const
    {
       std::stringstream s;
       s  << "Factorizations     : " << std::setw(10) << _statistics->luFactorizationsReal << std::endl
@@ -5273,7 +5275,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// name of starter
-   const char* SoPlex<R>::getStarterName()
+  template <class R>
+  const char* SoPlex<R>::getStarterName()
    {
       if( _starter )
          return _starter->getName();
@@ -5284,7 +5287,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// name of simplifier
-   const char* SoPlex<R>::getSimplifierName()
+  template <class R>
+  const char* SoPlex<R>::getSimplifierName()
    {
       if( _simplifier )
          return _simplifier->getName();
@@ -5295,7 +5299,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// name of scaling method after simplifier
-   const char* SoPlex<R>::getScalerName()
+  template <class R>
+  const char* SoPlex<R>::getScalerName()
    {
       if( _scaler )
          return _scaler->getName();
@@ -5306,7 +5311,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// name of currently loaded pricer
-   const char* SoPlex<R>::getPricerName()
+  template <class R>
+  const char* SoPlex<R>::getPricerName()
    {
       return _solver.pricer()->getName();
    }
@@ -5314,7 +5320,8 @@ void SoPlex<R>::clearBasis()
 
 
    /// name of currently loaded ratiotester
-   const char* SoPlex<R>::getRatiotesterName()
+  template <class R>
+  const char* SoPlex<R>::getRatiotesterName()
    {
       return _solver.ratiotester()->getName();
    }
@@ -5763,7 +5770,8 @@ void SoPlex<R>::writeStateRational(const char* filename, const NameSet* rowNames
 
 
    /// returns real parameter value
-   Real SoPlex<R>::realParam(const RealParam param) const
+  template <class R>
+  Real SoPlex<R>::realParam(const RealParam param) const
    {
       assert(param >= 0);
       assert(param < REALPARAM_COUNT);
@@ -5785,7 +5793,8 @@ void SoPlex<R>::writeStateRational(const char* filename, const NameSet* rowNames
 
 
    /// returns current parameter settings
-   const SoPlex<R>::Settings& SoPlex<R>::settings() const
+  template <class R>
+  const typename SoPlex<R>::Settings& SoPlex<R>::settings() const
    {
       return *_currentSettings;
    }
@@ -7020,7 +7029,7 @@ void SoPlex<R>::printStatistics(std::ostream& os)
 
    /// prints status
    template <class R>
-void SoPlex<R>::printStatus(std::ostream& os, SPxSolver<R>::Status stat)
+   void SoPlex<R>::printStatus(std::ostream& os, typename SPxSolver<R>::Status stat)
    {
       os << "SoPlex status       : ";
 
@@ -7396,7 +7405,8 @@ void SoPlex<R>::setRandomSeed(unsigned int seed)
 
 
    /// returns the current random seed of the solver instance or the one stored in the settings
-   unsigned int SoPlex<R>::randomSeed() const
+  template <class R>
+  unsigned int  SoPlex<R>::randomSeed() const
    {
       return _solver.random.getSeed();
    }
@@ -7493,7 +7503,8 @@ void SoPlex<R>::_rangeToPerm(int start, int end, int* perm, int permSize) const
 
 
    /// determines RangeType from real bounds
-   SoPlex<R>::RangeType SoPlex<R>::_rangeTypeReal(const Real& lower, const Real& upper) const
+  template <class R>
+  typename SoPlex<R>::RangeType SoPlex<R>::_rangeTypeReal(const Real& lower, const Real& upper) const
    {
       assert(lower <= upper);
 
@@ -7518,7 +7529,8 @@ void SoPlex<R>::_rangeToPerm(int start, int end, int* perm, int permSize) const
 
 
    /// determines RangeType from rational bounds
-   SoPlex<R>::RangeType SoPlex<R>::_rangeTypeRational(const Rational& lower, const Rational& upper) const
+  template <class R>
+  typename SoPlex<R>::RangeType SoPlex<R>::_rangeTypeRational(const Rational& lower, const Rational& upper) const
    {
       assert(lower <= upper);
 
@@ -7543,7 +7555,8 @@ void SoPlex<R>::_rangeToPerm(int start, int end, int* perm, int permSize) const
 
 
    /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
-   SoPlex<R>::RangeType SoPlex<R>::_switchRangeType(const SoPlex<R>::RangeType& rangeType) const
+  template <class R>
+  typename SoPlex<R>::RangeType SoPlex<R>::_switchRangeType(const SoPlex<R>::RangeType& rangeType) const
    {
       if( rangeType == RANGETYPE_LOWER )
          return RANGETYPE_UPPER;
@@ -8622,7 +8635,8 @@ void SoPlex<R>::_syncRealSolution()
 
 
    /// returns pointer to a constant unit vector available until destruction of the SoPlex class
-   const UnitVectorRational* SoPlex<R>::_unitVectorRational(const int i)
+  template <class R>
+  const UnitVectorRational* SoPlex<R>::_unitVectorRational(const int i)
    {
       assert(i >= 0);
 
