@@ -18,6 +18,8 @@
 #include "soplexlegacy.h"
 #include "exceptions.h"
 
+#ifndef _SOPLEXLEGACY_H_ // added to remove legacy parts from the compilation
+
 namespace soplex
 {
 SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver::Representation p_rep)
@@ -691,3 +693,4 @@ void SoPlexLegacy::unsimplify() const
    }
 }
 } // namespace soplex
+#endif

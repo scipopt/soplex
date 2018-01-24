@@ -16,8 +16,9 @@
 /**@file  soplexlegacy.h
  * @brief preconfigured \ref soplex::SoPlexLegacy "SoPlexLegacy" LP-solver.
  */
+#define _SOPLEXLEGACY_H_ // flipped the place to remove the legacy parts from the compiliation
 #ifndef _SOPLEXLEGACY_H_
-#define _SOPLEXLEGACY_H_
+
 
 #include <assert.h>
 #include <string.h>
