@@ -529,7 +529,7 @@ namespace soplex
    }
 
   template <class R>
-  typename SoPlex<R>::Settings::Settings(const Settings& settings)
+  SoPlex<R>::Settings::Settings(const Settings& settings)
    {
       *this = settings;
    }
@@ -555,18 +555,19 @@ namespace soplex
    }
 
   template <class R>
-  SoPlex<R>::Settings::BoolParam SoPlex<R>::Settings::boolParam;
+  typename SoPlex<R>::Settings::BoolParam SoPlex<R>::Settings::boolParam;
   template <class R>
-  SoPlex<R>::Settings::IntParam SoPlex<R>::Settings::intParam;
+  typename SoPlex<R>::Settings::IntParam SoPlex<R>::Settings::intParam;
   template <class R>
-  SoPlex<R>::Settings::RealParam SoPlex<R>::Settings::realParam;
+  typename SoPlex<R>::Settings::RealParam SoPlex<R>::Settings::realParam;
 #ifdef SOPLEX_WITH_RATIONALPARAM
   template <class R>
   SoPlex<R>::Settings::RationalParam SoPlex<R>::Settings::rationalParam;
 #endif
 
    /// default constructor
-   SoPlex<R>::SoPlex()
+  template <class R>
+  SoPlex<R>::SoPlex()
       : _statistics(0)
       , _currentSettings(0)
       , _scalerUniequi(false)
@@ -580,7 +581,7 @@ namespace soplex
       , _starter(0)
       , _rationalLP(0)
       , _unitMatrixRational(0)
-      , _status(SPxSolver::UNKNOWN)
+      , _status(SPxSolver<R>::UNKNOWN)
       , _hasBasis(false)
       , _hasSolReal(false)
       , _hasSolRational(false)
@@ -629,7 +630,7 @@ namespace soplex
 
    /// assignment operator
   template <class R>
-  SoPlex& SoPlex<R>::operator=(const SoPlex& rhs)
+  SoPlex<R>& SoPlex<R>::operator=(const SoPlex<R>& rhs)
    {
       if( this != &rhs )
       {
@@ -1261,7 +1262,7 @@ namespace soplex
 
    /// gets column \p i
    template <class R>
-void SoPlex<R>getColRational(int i, LPColRational& lpcol) const
+   void SoPlex<R>::getColRational(int i, LPColRational& lpcol) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->getCol(i, lpcol);
@@ -1271,7 +1272,7 @@ void SoPlex<R>getColRational(int i, LPColRational& lpcol) const
 
    /// gets columns \p start, ..., \p end
    template <class R>
-void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) const
+   void SoPlex<R>::getColsRational(int start, int end, LPColSetRational& lpcolset) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->getCols(start, end, lpcolset);
@@ -1280,7 +1281,8 @@ void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) co
 
 
    /// returns vector of column \p i
-   const SVectorRational& SoPlex<R>::colVectorRational(int i) const
+  template <class R>
+  const SVectorRational& SoPlex<R>::colVectorRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->colVector(i);
@@ -1289,7 +1291,8 @@ void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) co
 
 
    /// returns upper bound vector
-   const VectorRational& SoPlex<R>::upperRational() const
+  template <class R>
+  const VectorRational& SoPlex<R>::upperRational() const
    {
       assert(_rationalLP != 0);
       return _rationalLP->upper();
@@ -1298,7 +1301,8 @@ void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) co
 
 
    /// returns upper bound of column \p i
-   const Rational& SoPlex<R>::upperRational(int i) const
+  template <class R>
+  const Rational& SoPlex<R>::upperRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->upper(i);
@@ -1307,7 +1311,8 @@ void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) co
 
 
    /// returns lower bound vector
-   const VectorRational& SoPlex<R>::lowerRational() const
+  template <class R>
+  const VectorRational& SoPlex<R>::lowerRational() const
    {
       assert(_rationalLP != 0);
       return _rationalLP->lower();
@@ -1316,7 +1321,8 @@ void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) co
 
 
    /// returns lower bound of column \p i
-   const Rational& SoPlex<R>::lowerRational(int i) const
+  template <class R>
+  const Rational& SoPlex<R>::lowerRational(int i) const
    {
       assert(_rationalLP != 0);
       return _rationalLP->lower(i);
@@ -1326,7 +1332,7 @@ void SoPlex<R>getColsRational(int start, int end, LPColSetRational& lpcolset) co
 
    /// gets objective function vector
    template <class R>
-void SoPlex<R>getObjRational(VectorRational& obj) const
+   void SoPlex<R>::getObjRational(VectorRational& obj) const
    {
       assert(_rationalLP != 0);
       _rationalLP->getObj(obj);
@@ -1336,7 +1342,7 @@ void SoPlex<R>getObjRational(VectorRational& obj) const
 
    /// gets objective value of column \p i
    template <class R>
-void SoPlex<R>getObjRational(int i, Rational& obj) const
+void SoPlex<R>::getObjRational(int i, Rational& obj) const
    {
       obj = maxObjRational(i);
       if( intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE )
@@ -1376,7 +1382,7 @@ void SoPlex<R>getObjRational(int i, Rational& obj) const
 
    /// adds a single row
    template <class R>
-void SoPlex<R>addRowReal(const LPRowReal& lprow)
+void SoPlex<R>::addRowReal(const LPRowReal& lprow)
    {
       assert(_realLP != 0);
 
@@ -1395,7 +1401,7 @@ void SoPlex<R>addRowReal(const LPRowReal& lprow)
 
    /// adds multiple rows
    template <class R>
-void SoPlex<R>addRowsReal(const LPRowSetReal& lprowset)
+void SoPlex<R>::addRowsReal(const LPRowSetReal& lprowset)
    {
       assert(_realLP != 0);
 
@@ -1414,7 +1420,7 @@ void SoPlex<R>addRowsReal(const LPRowSetReal& lprowset)
 
    /// adds a single column
    template <class R>
-void SoPlex<R>addColReal(const LPColReal& lpcol)
+void SoPlex<R>::addColReal(const LPColReal& lpcol)
    {
       assert(_realLP != 0);
 
@@ -1433,7 +1439,7 @@ void SoPlex<R>addColReal(const LPColReal& lpcol)
 
    /// adds multiple columns
    template <class R>
-void SoPlex<R>addColsReal(const LPColSetReal& lpcolset)
+void SoPlex<R>::addColsReal(const LPColSetReal& lpcolset)
    {
       assert(_realLP != 0);
 
@@ -1452,7 +1458,7 @@ void SoPlex<R>addColsReal(const LPColSetReal& lpcolset)
 
    /// replaces row \p i with \p lprow
    template <class R>
-void SoPlex<R>changeRowReal(int i, const LPRowReal& lprow)
+void SoPlex<R>::changeRowReal(int i, const LPRowReal& lprow)
    {
       assert(_realLP != 0);
 
@@ -1472,7 +1478,7 @@ void SoPlex<R>changeRowReal(int i, const LPRowReal& lprow)
 
    /// changes left-hand side vector for constraints to \p lhs
    template <class R>
-void SoPlex<R>changeLhsReal(const VectorReal& lhs)
+void SoPlex<R>::changeLhsReal(const VectorReal& lhs)
    {
       assert(_realLP != 0);
 
@@ -1492,7 +1498,7 @@ void SoPlex<R>changeLhsReal(const VectorReal& lhs)
 
    /// changes left-hand side of row \p i to \p lhs
    template <class R>
-void SoPlex<R>changeLhsReal(int i, const Real& lhs)
+void SoPlex<R>::changeLhsReal(int i, const Real& lhs)
    {
       assert(_realLP != 0);
 
@@ -1511,7 +1517,7 @@ void SoPlex<R>changeLhsReal(int i, const Real& lhs)
 
    /// changes right-hand side vector to \p rhs
    template <class R>
-void SoPlex<R>changeRhsReal(const VectorReal& rhs)
+void SoPlex<R>::changeRhsReal(const VectorReal& rhs)
    {
       assert(_realLP != 0);
 
@@ -1531,7 +1537,7 @@ void SoPlex<R>changeRhsReal(const VectorReal& rhs)
 
    /// changes right-hand side of row \p i to \p rhs
    template <class R>
-void SoPlex<R>changeRhsReal(int i, const Real& rhs)
+void SoPlex<R>::changeRhsReal(int i, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -1550,7 +1556,7 @@ void SoPlex<R>changeRhsReal(int i, const Real& rhs)
 
    /// changes left- and right-hand side vectors
    template <class R>
-void SoPlex<R>changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
+void SoPlex<R>::changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
    {
       assert(_realLP != 0);
 
@@ -1570,7 +1576,7 @@ void SoPlex<R>changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
 
    /// changes left- and right-hand side of row \p i
    template <class R>
-void SoPlex<R>changeRangeReal(int i, const Real& lhs, const Real& rhs)
+void SoPlex<R>::changeRangeReal(int i, const Real& lhs, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -1589,7 +1595,7 @@ void SoPlex<R>changeRangeReal(int i, const Real& lhs, const Real& rhs)
 
    /// replaces column \p i with \p lpcol
    template <class R>
-void SoPlex<R>changeColReal(int i, const LPColReal& lpcol)
+void SoPlex<R>::changeColReal(int i, const LPColReal& lpcol)
    {
       assert(_realLP != 0);
 
@@ -1609,7 +1615,7 @@ void SoPlex<R>changeColReal(int i, const LPColReal& lpcol)
 
    /// changes vector of lower bounds to \p lower
    template <class R>
-void SoPlex<R>changeLowerReal(const VectorReal& lower)
+void SoPlex<R>::changeLowerReal(const VectorReal& lower)
    {
       assert(_realLP != 0);
 
@@ -1630,7 +1636,7 @@ void SoPlex<R>changeLowerReal(const VectorReal& lower)
 
    /// changes lower bound of column i to \p lower
    template <class R>
-void SoPlex<R>changeLowerReal(int i, const Real& lower)
+void SoPlex<R>::changeLowerReal(int i, const Real& lower)
    {
       assert(_realLP != 0);
 
@@ -1649,7 +1655,7 @@ void SoPlex<R>changeLowerReal(int i, const Real& lower)
 
    /// changes vector of upper bounds to \p upper
    template <class R>
-void SoPlex<R>changeUpperReal(const VectorReal& upper)
+void SoPlex<R>::changeUpperReal(const VectorReal& upper)
    {
       assert(_realLP != 0);
 
@@ -1669,7 +1675,7 @@ void SoPlex<R>changeUpperReal(const VectorReal& upper)
 
    /// changes \p i 'th upper bound to \p upper
    template <class R>
-void SoPlex<R>changeUpperReal(int i, const Real& upper)
+void SoPlex<R>::changeUpperReal(int i, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -1688,7 +1694,7 @@ void SoPlex<R>changeUpperReal(int i, const Real& upper)
 
    /// changes vectors of column bounds to \p lower and \p upper
    template <class R>
-void SoPlex<R>changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
+void SoPlex<R>::changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
    {
       assert(_realLP != 0);
 
@@ -1708,7 +1714,7 @@ void SoPlex<R>changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
 
    /// changes bounds of column \p i to \p lower and \p upper
    template <class R>
-void SoPlex<R>changeBoundsReal(int i, const Real& lower, const Real& upper)
+void SoPlex<R>::changeBoundsReal(int i, const Real& lower, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -1726,7 +1732,7 @@ void SoPlex<R>changeBoundsReal(int i, const Real& lower, const Real& upper)
 
    /// changes objective function vector to \p obj
    template <class R>
-void SoPlex<R>changeObjReal(const VectorReal& obj)
+void SoPlex<R>::changeObjReal(const VectorReal& obj)
    {
       assert(_realLP != 0);
 
@@ -1743,7 +1749,7 @@ void SoPlex<R>changeObjReal(const VectorReal& obj)
 
    /// changes objective coefficient of column i to \p obj
    template <class R>
-void SoPlex<R>changeObjReal(int i, const Real& obj)
+void SoPlex<R>::changeObjReal(int i, const Real& obj)
    {
       assert(_realLP != 0);
 
@@ -1760,7 +1766,7 @@ void SoPlex<R>changeObjReal(int i, const Real& obj)
 
    /// changes matrix entry in row \p i and column \p j to \p val
    template <class R>
-void SoPlex<R>changeElementReal(int i, int j, const Real& val)
+void SoPlex<R>::changeElementReal(int i, int j, const Real& val)
    {
       assert(_realLP != 0);
 
@@ -1776,7 +1782,7 @@ void SoPlex<R>changeElementReal(int i, int j, const Real& val)
 
    /// removes row \p i
    template <class R>
-void SoPlex<R>removeRowReal(int i)
+void SoPlex<R>::removeRowReal(int i)
    {
       assert(_realLP != 0);
 
@@ -1803,7 +1809,7 @@ void SoPlex<R>removeRowReal(int i)
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numRowsReal()
    template <class R>
-void SoPlex<R>removeRowsReal(int perm[])
+void SoPlex<R>::removeRowsReal(int perm[])
    {
       assert(_realLP != 0);
 
@@ -1833,7 +1839,7 @@ void SoPlex<R>removeRowsReal(int perm[])
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
    /// as buffer memory
    template <class R>
-void SoPlex<R>removeRowsReal(int idx[], int n, int perm[])
+void SoPlex<R>::removeRowsReal(int idx[], int n, int perm[])
    {
       if( perm == 0 )
       {
@@ -1853,7 +1859,7 @@ void SoPlex<R>removeRowsReal(int idx[], int n, int perm[])
    /// removes rows \p start to \p end including both; an array \p perm of size #numRowsReal() may be passed as buffer
    /// memory
    template <class R>
-void SoPlex<R>removeRowRangeReal(int start, int end, int perm[])
+void SoPlex<R>::removeRowRangeReal(int start, int end, int perm[])
    {
       if( perm == 0 )
       {
@@ -1872,7 +1878,7 @@ void SoPlex<R>removeRowRangeReal(int start, int end, int perm[])
 
    /// removes column i
    template <class R>
-void SoPlex<R>removeColReal(int i)
+void SoPlex<R>::removeColReal(int i)
    {
       assert(_realLP != 0);
 
@@ -1899,7 +1905,7 @@ void SoPlex<R>removeColReal(int i)
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsReal()
    template <class R>
-void SoPlex<R>removeColsReal(int perm[])
+void SoPlex<R>::removeColsReal(int perm[])
    {
       assert(_realLP != 0);
 
@@ -1929,7 +1935,7 @@ void SoPlex<R>removeColsReal(int perm[])
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
    /// passed as buffer memory
    template <class R>
-void SoPlex<R>removeColsReal(int idx[], int n, int perm[])
+void SoPlex<R>::removeColsReal(int idx[], int n, int perm[])
    {
       if( perm == 0 )
       {
@@ -1949,7 +1955,7 @@ void SoPlex<R>removeColsReal(int idx[], int n, int perm[])
    /// removes columns \p start to \p end including both; an array \p perm of size #numColsReal() may be passed as
    /// buffer memory
    template <class R>
-void SoPlex<R>removeColRangeReal(int start, int end, int perm[])
+void SoPlex<R>::removeColRangeReal(int start, int end, int perm[])
    {
       if( perm == 0 )
       {
@@ -1968,7 +1974,7 @@ void SoPlex<R>removeColRangeReal(int start, int end, int perm[])
 
    /// clears the LP
    template <class R>
-void SoPlex<R>clearLPReal()
+void SoPlex<R>::clearLPReal()
    {
       assert(_realLP != 0);
 
@@ -1990,7 +1996,7 @@ void SoPlex<R>clearLPReal()
 
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, if sync mode is manual
    template <class R>
-void SoPlex<R>syncLPReal()
+void SoPlex<R>::syncLPReal()
    {
       assert(_isConsistent());
 
@@ -2002,7 +2008,7 @@ void SoPlex<R>syncLPReal()
 
    /// adds a single row
    template <class R>
-void SoPlex<R>addRowRational(const LPRowRational& lprow)
+void SoPlex<R>::addRowRational(const LPRowRational& lprow)
    {
       assert(_rationalLP != 0);
 
@@ -2023,7 +2029,7 @@ void SoPlex<R>addRowRational(const LPRowRational& lprow)
 #ifdef SOPLEX_WITH_GMP
    /// adds a single row
    template <class R>
-void SoPlex<R>addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs)
+void SoPlex<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2044,7 +2050,7 @@ void SoPlex<R>addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int
 
    /// adds a set of rows
    template <class R>
-void SoPlex<R>addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs)
+void SoPlex<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2070,7 +2076,7 @@ void SoPlex<R>addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const in
 
    /// adds multiple rows
    template <class R>
-void SoPlex<R>addRowsRational(const LPRowSetRational& lprowset)
+void SoPlex<R>::addRowsRational(const LPRowSetRational& lprowset)
    {
       assert(_rationalLP != 0);
 
@@ -2090,7 +2096,7 @@ void SoPlex<R>addRowsRational(const LPRowSetRational& lprowset)
 
    /// adds a single column
    template <class R>
-void SoPlex<R>addColRational(const LPColRational& lpcol)
+void SoPlex<R>::addColRational(const LPColRational& lpcol)
    {
       assert(_rationalLP != 0);
 
@@ -2111,7 +2117,7 @@ void SoPlex<R>addColRational(const LPColRational& lpcol)
 #ifdef SOPLEX_WITH_GMP
    /// adds a single column
    template <class R>
-void SoPlex<R>addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper)
+void SoPlex<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper)
    {
       assert(_rationalLP != 0);
 
@@ -2133,7 +2139,7 @@ void SoPlex<R>addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* 
 
    /// adds a set of columns
    template <class R>
-void SoPlex<R>addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper)
+void SoPlex<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper)
    {
       assert(_rationalLP != 0);
 
@@ -2160,7 +2166,7 @@ void SoPlex<R>addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t*
 
    /// adds multiple columns
    template <class R>
-void SoPlex<R>addColsRational(const LPColSetRational& lpcolset)
+void SoPlex<R>::addColsRational(const LPColSetRational& lpcolset)
    {
       assert(_rationalLP != 0);
 
@@ -2180,7 +2186,7 @@ void SoPlex<R>addColsRational(const LPColSetRational& lpcolset)
 
    /// replaces row \p i with \p lprow
    template <class R>
-void SoPlex<R>changeRowRational(int i, const LPRowRational& lprow)
+void SoPlex<R>::changeRowRational(int i, const LPRowRational& lprow)
    {
       assert(_rationalLP != 0);
 
@@ -2201,7 +2207,7 @@ void SoPlex<R>changeRowRational(int i, const LPRowRational& lprow)
 
    /// changes left-hand side vector for constraints to \p lhs
    template <class R>
-void SoPlex<R>changeLhsRational(const VectorRational& lhs)
+void SoPlex<R>::changeLhsRational(const VectorRational& lhs)
    {
       assert(_rationalLP != 0);
 
@@ -2222,7 +2228,7 @@ void SoPlex<R>changeLhsRational(const VectorRational& lhs)
 
    /// changes left-hand side of row \p i to \p lhs
    template <class R>
-void SoPlex<R>changeLhsRational(int i, const Rational& lhs)
+void SoPlex<R>::changeLhsRational(int i, const Rational& lhs)
    {
       assert(_rationalLP != 0);
 
@@ -2243,7 +2249,7 @@ void SoPlex<R>changeLhsRational(int i, const Rational& lhs)
 #ifdef SOPLEX_WITH_GMP
    /// changes left-hand side of row \p i to \p lhs
    template <class R>
-void SoPlex<R>changeLhsRational(int i, const mpq_t* lhs)
+void SoPlex<R>::changeLhsRational(int i, const mpq_t* lhs)
    {
       assert(_rationalLP != 0);
 
@@ -2264,7 +2270,7 @@ void SoPlex<R>changeLhsRational(int i, const mpq_t* lhs)
 
    /// changes right-hand side vector to \p rhs
    template <class R>
-void SoPlex<R>changeRhsRational(const VectorRational& rhs)
+void SoPlex<R>::changeRhsRational(const VectorRational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2286,7 +2292,7 @@ void SoPlex<R>changeRhsRational(const VectorRational& rhs)
 #ifdef SOPLEX_WITH_GMP
    /// changes right-hand side vector to \p rhs
    template <class R>
-void SoPlex<R>changeRhsRational(const mpq_t* rhs, int rhsSize)
+void SoPlex<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
    {
       assert(_rationalLP != 0);
 
@@ -2310,7 +2316,7 @@ void SoPlex<R>changeRhsRational(const mpq_t* rhs, int rhsSize)
 
    /// changes right-hand side of row \p i to \p rhs
    template <class R>
-void SoPlex<R>changeRhsRational(int i, const Rational& rhs)
+void SoPlex<R>::changeRhsRational(int i, const Rational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2330,7 +2336,7 @@ void SoPlex<R>changeRhsRational(int i, const Rational& rhs)
 
    /// changes left- and right-hand side vectors
    template <class R>
-void SoPlex<R>changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
+void SoPlex<R>::changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2351,7 +2357,7 @@ void SoPlex<R>changeRangeRational(const VectorRational& lhs, const VectorRationa
 
    /// changes left- and right-hand side of row \p i
    template <class R>
-void SoPlex<R>changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
+void SoPlex<R>::changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2372,7 +2378,7 @@ void SoPlex<R>changeRangeRational(int i, const Rational& lhs, const Rational& rh
 #ifdef SOPLEX_WITH_GMP
    /// changes left-hand side of row \p i to \p lhs
    template <class R>
-void SoPlex<R>changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
+void SoPlex<R>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
    {
       assert(_rationalLP != 0);
 
@@ -2393,7 +2399,7 @@ void SoPlex<R>changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
 
    /// replaces column \p i with \p lpcol
    template <class R>
-void SoPlex<R>changeColRational(int i, const LPColRational& lpcol)
+void SoPlex<R>::changeColRational(int i, const LPColRational& lpcol)
    {
       assert(_rationalLP != 0);
 
@@ -2414,7 +2420,7 @@ void SoPlex<R>changeColRational(int i, const LPColRational& lpcol)
 
    /// changes vector of lower bounds to \p lower
    template <class R>
-void SoPlex<R>changeLowerRational(const VectorRational& lower)
+void SoPlex<R>::changeLowerRational(const VectorRational& lower)
    {
       assert(_rationalLP != 0);
 
@@ -2435,7 +2441,7 @@ void SoPlex<R>changeLowerRational(const VectorRational& lower)
 
    /// changes lower bound of column i to \p lower
    template <class R>
-void SoPlex<R>changeLowerRational(int i, const Rational& lower)
+void SoPlex<R>::changeLowerRational(int i, const Rational& lower)
    {
       assert(_rationalLP != 0);
 
@@ -2456,7 +2462,7 @@ void SoPlex<R>changeLowerRational(int i, const Rational& lower)
 #ifdef SOPLEX_WITH_GMP
    /// changes lower bound of column i to \p lower
    template <class R>
-void SoPlex<R>changeLowerRational(int i, const mpq_t* lower)
+void SoPlex<R>::changeLowerRational(int i, const mpq_t* lower)
    {
       assert(_rationalLP != 0);
 
@@ -2477,7 +2483,7 @@ void SoPlex<R>changeLowerRational(int i, const mpq_t* lower)
 
    /// changes vector of upper bounds to \p upper
    template <class R>
-void SoPlex<R>changeUpperRational(const VectorRational& upper)
+void SoPlex<R>::changeUpperRational(const VectorRational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -2498,7 +2504,7 @@ void SoPlex<R>changeUpperRational(const VectorRational& upper)
 
    /// changes \p i 'th upper bound to \p upper
    template <class R>
-void SoPlex<R>changeUpperRational(int i, const Rational& upper)
+void SoPlex<R>::changeUpperRational(int i, const Rational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -2519,7 +2525,7 @@ void SoPlex<R>changeUpperRational(int i, const Rational& upper)
 #ifdef SOPLEX_WITH_GMP
    /// changes upper bound of column i to \p upper
    template <class R>
-void SoPlex<R>changeUpperRational(int i, const mpq_t* upper)
+void SoPlex<R>::changeUpperRational(int i, const mpq_t* upper)
    {
       assert(_rationalLP != 0);
 
@@ -2540,7 +2546,7 @@ void SoPlex<R>changeUpperRational(int i, const mpq_t* upper)
 
    /// changes vectors of column bounds to \p lower and \p upper
    template <class R>
-void SoPlex<R>changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
+void SoPlex<R>::changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -2561,7 +2567,7 @@ void SoPlex<R>changeBoundsRational(const VectorRational& lower, const VectorRati
 
    /// changes bounds of column \p i to \p lower and \p upper
    template <class R>
-void SoPlex<R>changeBoundsRational(int i, const Rational& lower, const Rational& upper)
+void SoPlex<R>::changeBoundsRational(int i, const Rational& lower, const Rational& upper)
    {
       assert(_rationalLP != 0);
 
@@ -2582,7 +2588,7 @@ void SoPlex<R>changeBoundsRational(int i, const Rational& lower, const Rational&
 #ifdef SOPLEX_WITH_GMP
    /// changes bounds of column \p i to \p lower and \p upper
    template <class R>
-void SoPlex<R>changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
+void SoPlex<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
    {
       assert(_rationalLP != 0);
 
@@ -2603,7 +2609,7 @@ void SoPlex<R>changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper
 
    /// changes objective function vector to \p obj
    template <class R>
-void SoPlex<R>changeObjRational(const VectorRational& obj)
+void SoPlex<R>::changeObjRational(const VectorRational& obj)
    {
       assert(_rationalLP != 0);
 
@@ -2622,7 +2628,7 @@ void SoPlex<R>changeObjRational(const VectorRational& obj)
 
    /// changes objective coefficient of column i to \p obj
    template <class R>
-void SoPlex<R>changeObjRational(int i, const Rational& obj)
+void SoPlex<R>::changeObjRational(int i, const Rational& obj)
    {
       assert(_rationalLP != 0);
 
@@ -2642,7 +2648,7 @@ void SoPlex<R>changeObjRational(int i, const Rational& obj)
 #ifdef SOPLEX_WITH_GMP
    /// changes objective coefficient of column i to \p obj
    template <class R>
-void SoPlex<R>changeObjRational(int i, const mpq_t* obj)
+void SoPlex<R>::changeObjRational(int i, const mpq_t* obj)
    {
       assert(_rationalLP != 0);
 
@@ -2662,7 +2668,7 @@ void SoPlex<R>changeObjRational(int i, const mpq_t* obj)
 
    /// changes matrix entry in row \p i and column \p j to \p val
    template <class R>
-void SoPlex<R>changeElementRational(int i, int j, const Rational& val)
+void SoPlex<R>::changeElementRational(int i, int j, const Rational& val)
    {
       assert(_rationalLP != 0);
 
@@ -2681,7 +2687,7 @@ void SoPlex<R>changeElementRational(int i, int j, const Rational& val)
 #ifdef SOPLEX_WITH_GMP
    /// changes matrix entry in row \p i and column \p j to \p val
    template <class R>
-void SoPlex<R>changeElementRational(int i, int j, const mpq_t* val)
+void SoPlex<R>::changeElementRational(int i, int j, const mpq_t* val)
    {
       assert(_rationalLP != 0);
 
@@ -2700,7 +2706,7 @@ void SoPlex<R>changeElementRational(int i, int j, const mpq_t* val)
 
    /// removes row \p i
    template <class R>
-void SoPlex<R>removeRowRational(int i)
+void SoPlex<R>::removeRowRational(int i)
    {
       assert(_rationalLP != 0);
 
@@ -2728,7 +2734,7 @@ void SoPlex<R>removeRowRational(int i)
    /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numRowsRational()
    template <class R>
-void SoPlex<R>removeRowsRational(int perm[])
+void SoPlex<R>::removeRowsRational(int perm[])
    {
       assert(_rationalLP != 0);
 
@@ -2760,7 +2766,7 @@ void SoPlex<R>removeRowsRational(int perm[])
    /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
    /// passed as buffer memory
    template <class R>
-void SoPlex<R>removeRowsRational(int idx[], int n, int perm[])
+void SoPlex<R>::removeRowsRational(int idx[], int n, int perm[])
    {
       if( perm == 0 )
       {
@@ -2780,7 +2786,7 @@ void SoPlex<R>removeRowsRational(int idx[], int n, int perm[])
    /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
    /// buffer memory
    template <class R>
-void SoPlex<R>removeRowRangeRational(int start, int end, int perm[])
+void SoPlex<R>::removeRowRangeRational(int start, int end, int perm[])
    {
       if( perm == 0 )
       {
@@ -2799,7 +2805,7 @@ void SoPlex<R>removeRowRangeRational(int start, int end, int perm[])
 
    /// removes column i
    template <class R>
-void SoPlex<R>removeColRational(int i)
+void SoPlex<R>::removeColRational(int i)
    {
       assert(_rationalLP != 0);
 
@@ -2827,7 +2833,7 @@ void SoPlex<R>removeColRational(int i)
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsRational()
    template <class R>
-void SoPlex<R>removeColsRational(int perm[])
+void SoPlex<R>::removeColsRational(int perm[])
    {
       assert(_rationalLP != 0);
 
@@ -2858,7 +2864,7 @@ void SoPlex<R>removeColsRational(int perm[])
    /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
    /// passed as buffer memory
    template <class R>
-void SoPlex<R>removeColsRational(int idx[], int n, int perm[])
+void SoPlex<R>::removeColsRational(int idx[], int n, int perm[])
    {
       if( perm == 0 )
       {
@@ -2878,7 +2884,7 @@ void SoPlex<R>removeColsRational(int idx[], int n, int perm[])
    /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
    /// buffer memory
    template <class R>
-void SoPlex<R>removeColRangeRational(int start, int end, int perm[])
+void SoPlex<R>::removeColRangeRational(int start, int end, int perm[])
    {
       if( perm == 0 )
       {
@@ -2897,7 +2903,7 @@ void SoPlex<R>removeColRangeRational(int start, int end, int perm[])
 
    /// clears the LP
    template <class R>
-void SoPlex<R>clearLPRational()
+void SoPlex<R>::clearLPRational()
    {
       assert(_rationalLP != 0);
 
@@ -2922,7 +2928,7 @@ void SoPlex<R>clearLPRational()
 
    /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, if sync mode is manual
    template <class R>
-void SoPlex<R>syncLPRational()
+void SoPlex<R>::syncLPRational()
    {
       assert(_isConsistent());
 
@@ -4104,7 +4110,7 @@ void SoPlex<R>syncLPRational()
 
    /// gets current basis
    template <class R>
-void SoPlex<R>getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+void SoPlex<R>::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
    {
       // if no basis is available, return slack basis
       if( !hasBasis() )
@@ -4145,7 +4151,7 @@ void SoPlex<R>getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
 
    /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    template <class R>
-void SoPlex<R>getBasisInd(int* bind) const
+void SoPlex<R>::getBasisInd(int* bind) const
    {
       // if no basis is available, return slack basis
       if( !hasBasis() )
@@ -5176,7 +5182,7 @@ void SoPlex<R>getBasisInd(int* bind) const
 
    /// sets starting basis via arrays of statuses
    template <class R>
-void SoPlex<R>setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[])
+void SoPlex<R>::setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[])
    {
       _rationalLUSolver.clear();
 
@@ -5207,7 +5213,7 @@ void SoPlex<R>setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarSt
 
    /// clears starting basis
    template <class R>
-void SoPlex<R>clearBasis()
+void SoPlex<R>::clearBasis()
    {
       _solver.reLoad();
       _status = _solver.status();
@@ -5676,7 +5682,7 @@ void SoPlex<R>clearBasis()
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
    template <class R>
-void SoPlex<R>writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+void SoPlex<R>::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
    {
       std::string ofname;
 
@@ -5698,7 +5704,7 @@ void SoPlex<R>writeStateReal(const char* filename, const NameSet* rowNames, cons
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
    template <class R>
-void SoPlex<R>writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+void SoPlex<R>::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
    {
       std::string ofname;
 
@@ -6395,7 +6401,7 @@ void SoPlex<R>writeStateRational(const char* filename, const NameSet* rowNames, 
 
    /// resets default parameter settings
    template <class R>
-void SoPlex<R>resetSettings(const bool quiet, const bool init)
+void SoPlex<R>::resetSettings(const bool quiet, const bool init)
    {
       for( int i = 0; i < SoPlex<R>::BOOLPARAM_COUNT; i++ )
          setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], init);
@@ -6415,7 +6421,7 @@ void SoPlex<R>resetSettings(const bool quiet, const bool init)
 
    /// print non-default parameter values
    template <class R>
-void SoPlex<R>printUserSettings()
+void SoPlex<R>::printUserSettings()
    {
       bool printedValue = false;
 
@@ -6870,7 +6876,7 @@ void SoPlex<R>printUserSettings()
 
    /// prints solution statistics
    template <class R>
-void SoPlex<R>printSolutionStatistics(std::ostream& os)
+void SoPlex<R>::printSolutionStatistics(std::ostream& os)
    {
       SPxOut::setScientific(os);
       if( _lastSolveMode == SOLVEMODE_REAL )
@@ -6948,7 +6954,7 @@ void SoPlex<R>printSolutionStatistics(std::ostream& os)
 
    /// prints statistics on solving process
    template <class R>
-void SoPlex<R>printSolvingStatistics(std::ostream& os)
+void SoPlex<R>::printSolvingStatistics(std::ostream& os)
    {
       assert(_statistics != 0);
       _statistics->print(os);
@@ -6958,7 +6964,7 @@ void SoPlex<R>printSolvingStatistics(std::ostream& os)
 
    /// prints short statistics
    template <class R>
-void SoPlex<R>printShortStatistics(std::ostream& os)
+void SoPlex<R>::printShortStatistics(std::ostream& os)
    {
       printStatus(os, _status);
       SPxOut::setFixed(os, 2);
@@ -6972,7 +6978,7 @@ void SoPlex<R>printShortStatistics(std::ostream& os)
 
    /// prints complete statistics
    template <class R>
-void SoPlex<R>printStatistics(std::ostream& os)
+void SoPlex<R>::printStatistics(std::ostream& os)
    {
       SPxOut::setFixed(os, 2);
 
@@ -6996,7 +7002,7 @@ void SoPlex<R>printStatistics(std::ostream& os)
 
    /// prints status
    template <class R>
-void SoPlex<R>printStatus(std::ostream& os, SPxSolver::Status stat)
+void SoPlex<R>::printStatus(std::ostream& os, SPxSolver::Status stat)
    {
       os << "SoPlex status       : ";
 
@@ -7063,7 +7069,7 @@ void SoPlex<R>printStatus(std::ostream& os, SPxSolver::Status stat)
 
    /// prints version and compilation options
    template <class R>
-void SoPlex<R>printVersion() const
+void SoPlex<R>::printVersion() const
    {
       // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
@@ -7364,7 +7370,7 @@ void SoPlex<R>printVersion() const
 
    /// set the random seed of the solver instance
    template <class R>
-void SoPlex<R>setRandomSeed(unsigned int seed)
+void SoPlex<R>::setRandomSeed(unsigned int seed)
    {
       _solver.random.setSeed(seed);
    }
@@ -7381,7 +7387,7 @@ void SoPlex<R>setRandomSeed(unsigned int seed)
 
    /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
    template <class R>
-void SoPlex<R>_ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const
+void SoPlex<R>::_ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const
    {
       assert(newmax > vec.size());
       if( vec.size() >= vec.max() )
@@ -7392,7 +7398,7 @@ void SoPlex<R>_ensureDSVectorRationalMemory(DSVectorRational& vec, const int new
 
    /// creates a permutation for removing rows/columns from an array of indices
    template <class R>
-void SoPlex<R>_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
+void SoPlex<R>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
    {
       assert(idx != 0);
       assert(idxSize >= 0);
@@ -7414,7 +7420,7 @@ void SoPlex<R>_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
 
    /// creates a permutation for removing rows/columns from a range of indices
    template <class R>
-void SoPlex<R>_rangeToPerm(int start, int end, int* perm, int permSize) const
+void SoPlex<R>::_rangeToPerm(int start, int end, int* perm, int permSize) const
    {
       assert(perm != 0);
       assert(permSize >= 0);
@@ -7551,7 +7557,7 @@ void SoPlex<R>_rangeToPerm(int start, int end, int* perm, int permSize) const
 
    /// adds a single row to the real LP and adjusts basis
    template <class R>
-void SoPlex<R>_addRowReal(const LPRowReal& lprow)
+void SoPlex<R>::_addRowReal(const LPRowReal& lprow)
    {
       assert(_realLP != 0);
 
@@ -7570,7 +7576,7 @@ void SoPlex<R>_addRowReal(const LPRowReal& lprow)
 
    /// adds a single row to the real LP and adjusts basis
    template <class R>
-void SoPlex<R>_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs)
+void SoPlex<R>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs)
    {
       assert(_realLP != 0);
 
@@ -7589,7 +7595,7 @@ void SoPlex<R>_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs)
 
    /// adds multiple rows to the real LP and adjusts basis
    template <class R>
-void SoPlex<R>_addRowsReal(const LPRowSetReal& lprowset)
+void SoPlex<R>::_addRowsReal(const LPRowSetReal& lprowset)
    {
       assert(_realLP != 0);
 
@@ -7607,7 +7613,7 @@ void SoPlex<R>_addRowsReal(const LPRowSetReal& lprowset)
 
    /// adds a single column to the real LP and adjusts basis
    template <class R>
-void SoPlex<R>_addColReal(const LPColReal& lpcol)
+void SoPlex<R>::_addColReal(const LPColReal& lpcol)
    {
       assert(_realLP != 0);
 
@@ -7633,7 +7639,7 @@ void SoPlex<R>_addColReal(const LPColReal& lpcol)
 
    /// adds a single column to the real LP and adjusts basis
    template <class R>
-void SoPlex<R>_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper)
+void SoPlex<R>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper)
    {
       assert(_realLP != 0);
 
@@ -7652,7 +7658,7 @@ void SoPlex<R>_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real u
 
    /// adds multiple columns to the real LP and adjusts basis
    template <class R>
-void SoPlex<R>_addColsReal(const LPColSetReal& lpcolset)
+void SoPlex<R>::_addColsReal(const LPColSetReal& lpcolset)
    {
       assert(_realLP != 0);
 
@@ -7680,7 +7686,7 @@ void SoPlex<R>_addColsReal(const LPColSetReal& lpcolset)
 
    /// replaces row \p i with \p lprow and adjusts basis
    template <class R>
-void SoPlex<R>_changeRowReal(int i, const LPRowReal& lprow)
+void SoPlex<R>::_changeRowReal(int i, const LPRowReal& lprow)
    {
       assert(_realLP != 0);
 
@@ -7706,7 +7712,7 @@ void SoPlex<R>_changeRowReal(int i, const LPRowReal& lprow)
 
    /// changes left-hand side vector for constraints to \p lhs and adjusts basis
    template <class R>
-void SoPlex<R>_changeLhsReal(const VectorReal& lhs)
+void SoPlex<R>::_changeLhsReal(const VectorReal& lhs)
    {
       assert(_realLP != 0);
 
@@ -7729,7 +7735,7 @@ void SoPlex<R>_changeLhsReal(const VectorReal& lhs)
 
    /// changes left-hand side of row \p i to \p lhs and adjusts basis
    template <class R>
-void SoPlex<R>_changeLhsReal(int i, const Real& lhs)
+void SoPlex<R>::_changeLhsReal(int i, const Real& lhs)
    {
       assert(_realLP != 0);
 
@@ -7749,7 +7755,7 @@ void SoPlex<R>_changeLhsReal(int i, const Real& lhs)
 
    /// changes right-hand side vector to \p rhs and adjusts basis
    template <class R>
-void SoPlex<R>_changeRhsReal(const VectorReal& rhs)
+void SoPlex<R>::_changeRhsReal(const VectorReal& rhs)
    {
       assert(_realLP != 0);
 
@@ -7774,7 +7780,7 @@ void SoPlex<R>_changeRhsReal(const VectorReal& rhs)
 
    /// changes right-hand side of row \p i to \p rhs and adjusts basis
    template <class R>
-void SoPlex<R>_changeRhsReal(int i, const Real& rhs)
+void SoPlex<R>::_changeRhsReal(int i, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -7793,7 +7799,7 @@ void SoPlex<R>_changeRhsReal(int i, const Real& rhs)
 
    /// changes left- and right-hand side vectors and adjusts basis
    template <class R>
-void SoPlex<R>_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
+void SoPlex<R>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
    {
       assert(_realLP != 0);
 
@@ -7820,7 +7826,7 @@ void SoPlex<R>_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
 
    /// changes left- and right-hand side of row \p i and adjusts basis
    template <class R>
-void SoPlex<R>_changeRangeReal(int i, const Real& lhs, const Real& rhs)
+void SoPlex<R>::_changeRangeReal(int i, const Real& lhs, const Real& rhs)
    {
       assert(_realLP != 0);
 
@@ -7844,7 +7850,7 @@ void SoPlex<R>_changeRangeReal(int i, const Real& lhs, const Real& rhs)
 
    /// replaces column \p i with \p lpcol and adjusts basis
    template <class R>
-void SoPlex<R>_changeColReal(int i, const LPColReal& lpcol)
+void SoPlex<R>::_changeColReal(int i, const LPColReal& lpcol)
    {
       assert(_realLP != 0);
 
@@ -7872,7 +7878,7 @@ void SoPlex<R>_changeColReal(int i, const LPColReal& lpcol)
 
    /// changes vector of lower bounds to \p lower and adjusts basis
    template <class R>
-void SoPlex<R>_changeLowerReal(const VectorReal& lower)
+void SoPlex<R>::_changeLowerReal(const VectorReal& lower)
    {
       assert(_realLP != 0);
 
@@ -7897,7 +7903,7 @@ void SoPlex<R>_changeLowerReal(const VectorReal& lower)
 
    /// changes lower bound of column i to \p lower and adjusts basis
    template <class R>
-void SoPlex<R>_changeLowerReal(int i, const Real& lower)
+void SoPlex<R>::_changeLowerReal(int i, const Real& lower)
    {
       assert(_realLP != 0);
 
@@ -7916,7 +7922,7 @@ void SoPlex<R>_changeLowerReal(int i, const Real& lower)
 
    /// changes vector of upper bounds to \p upper and adjusts basis
    template <class R>
-void SoPlex<R>_changeUpperReal(const VectorReal& upper)
+void SoPlex<R>::_changeUpperReal(const VectorReal& upper)
    {
       assert(_realLP != 0);
 
@@ -7941,7 +7947,7 @@ void SoPlex<R>_changeUpperReal(const VectorReal& upper)
 
    /// changes \p i 'th upper bound to \p upper and adjusts basis
    template <class R>
-void SoPlex<R>_changeUpperReal(int i, const Real& upper)
+void SoPlex<R>::_changeUpperReal(int i, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -7960,7 +7966,7 @@ void SoPlex<R>_changeUpperReal(int i, const Real& upper)
 
    /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
    template <class R>
-void SoPlex<R>_changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
+void SoPlex<R>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
    {
       assert(_realLP != 0);
 
@@ -7987,7 +7993,7 @@ void SoPlex<R>_changeBoundsReal(const VectorReal& lower, const VectorReal& upper
 
    /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
    template <class R>
-void SoPlex<R>_changeBoundsReal(int i, const Real& lower, const Real& upper)
+void SoPlex<R>::_changeBoundsReal(int i, const Real& lower, const Real& upper)
    {
       assert(_realLP != 0);
 
@@ -8011,7 +8017,7 @@ void SoPlex<R>_changeBoundsReal(int i, const Real& lower, const Real& upper)
 
    /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
    template <class R>
-void SoPlex<R>_changeElementReal(int i, int j, const Real& val)
+void SoPlex<R>::_changeElementReal(int i, int j, const Real& val)
    {
       assert(_realLP != 0);
 
@@ -8035,7 +8041,7 @@ void SoPlex<R>_changeElementReal(int i, int j, const Real& val)
 
    /// removes row \p i and adjusts basis
    template <class R>
-void SoPlex<R>_removeRowReal(int i)
+void SoPlex<R>::_removeRowReal(int i)
    {
       assert(_realLP != 0);
 
@@ -8065,7 +8071,7 @@ void SoPlex<R>_removeRowReal(int i)
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numRowsReal()
    template <class R>
-void SoPlex<R>_removeRowsReal(int perm[])
+void SoPlex<R>::_removeRowsReal(int perm[])
    {
       assert(_realLP != 0);
 
@@ -8101,7 +8107,7 @@ void SoPlex<R>_removeRowsReal(int perm[])
 
    /// removes column i
    template <class R>
-void SoPlex<R>_removeColReal(int i)
+void SoPlex<R>::_removeColReal(int i)
    {
       assert(_realLP != 0);
 
@@ -8131,7 +8137,7 @@ void SoPlex<R>_removeColReal(int i)
    /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
    /// #numColsReal()
    template <class R>
-void SoPlex<R>_removeColsReal(int perm[])
+void SoPlex<R>::_removeColsReal(int perm[])
    {
       assert(_realLP != 0);
 
@@ -8167,7 +8173,7 @@ void SoPlex<R>_removeColsReal(int perm[])
 
    /// invalidates solution
    template <class R>
-void SoPlex<R>_invalidateSolution()
+void SoPlex<R>::_invalidateSolution()
    {
       ///@todo maybe this should be done individually at the places when this method is called
       _status = SPxSolver::UNKNOWN;
@@ -8183,7 +8189,7 @@ void SoPlex<R>_invalidateSolution()
 
    /// enables simplifier and scaler
    template <class R>
-void SoPlex<R>_enableSimplifierAndScaler()
+void SoPlex<R>::_enableSimplifierAndScaler()
    {
       // type of simplifier
       switch( intParam(SoPlex<R>::SIMPLIFIER) )
@@ -8233,7 +8239,7 @@ void SoPlex<R>_enableSimplifierAndScaler()
 
    /// disables simplifier and scaler
    template <class R>
-void SoPlex<R>_disableSimplifierAndScaler()
+void SoPlex<R>::_disableSimplifierAndScaler()
    {
       _simplifier = 0;
 
@@ -8248,7 +8254,7 @@ void SoPlex<R>_disableSimplifierAndScaler()
 
    /// ensures that the rational LP is available; performs no sync
    template <class R>
-void SoPlex<R>_ensureRationalLP()
+void SoPlex<R>::_ensureRationalLP()
    {
       if( _rationalLP == 0 )
       {
@@ -8262,7 +8268,7 @@ void SoPlex<R>_ensureRationalLP()
 
    /// ensures that the real LP and the basis are loaded in the solver; performs no sync
    template <class R>
-void SoPlex<R>_ensureRealLPLoaded()
+void SoPlex<R>::_ensureRealLPLoaded()
    {
       if( !_isRealLPLoaded )
       {
@@ -8290,7 +8296,7 @@ void SoPlex<R>_ensureRealLPLoaded()
 
    /// call floating-point solver and update statistics on iterations etc.
    template <class R>
-void SoPlex<R>_solveRealLPAndRecordStatistics()
+void SoPlex<R>::_solveRealLPAndRecordStatistics()
    {
       bool _hadBasis = _hasBasis;
 
@@ -8486,7 +8492,7 @@ void SoPlex<R>_solveRealLPAndRecordStatistics()
 
    /// completes range type arrays after adding columns and/or rows
    template <class R>
-void SoPlex<R>_completeRangeTypesRational()
+void SoPlex<R>::_completeRangeTypesRational()
    {
       // we use one method for bot columns and rows, because during column/row addition, rows/columns can be added
       // implicitly
@@ -8500,7 +8506,7 @@ void SoPlex<R>_completeRangeTypesRational()
 
    /// recomputes range types from scratch using real LP
    template <class R>
-void SoPlex<R>_recomputeRangeTypesReal()
+void SoPlex<R>::_recomputeRangeTypesReal()
    {
       _rowTypes.reSize(numRowsReal());
       for( int i = 0; i < numRowsReal(); i++ )
@@ -8514,7 +8520,7 @@ void SoPlex<R>_recomputeRangeTypesReal()
 
    /// recomputes range types from scratch using rational LP
    template <class R>
-void SoPlex<R>_recomputeRangeTypesRational()
+void SoPlex<R>::_recomputeRangeTypesRational()
    {
       _rowTypes.reSize(numRowsRational());
       for( int i = 0; i < numRowsRational(); i++ )
@@ -8528,7 +8534,7 @@ void SoPlex<R>_recomputeRangeTypesRational()
 
    /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
    template <class R>
-void SoPlex<R>_syncLPReal(bool time)
+void SoPlex<R>::_syncLPReal(bool time)
    {
       // start timing
       if( time )
@@ -8553,7 +8559,7 @@ void SoPlex<R>_syncLPReal(bool time)
 
    /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
    template <class R>
-void SoPlex<R>_syncLPRational(bool time)
+void SoPlex<R>::_syncLPRational(bool time)
    {
       // start timing
       if( time )
@@ -8573,7 +8579,7 @@ void SoPlex<R>_syncLPRational(bool time)
 
    /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
    template <class R>
-void SoPlex<R>_syncRealSolution()
+void SoPlex<R>::_syncRealSolution()
    {
       if( _hasSolRational && !_hasSolReal )
       {
