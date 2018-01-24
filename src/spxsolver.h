@@ -87,7 +87,8 @@ namespace soplex
     class SPxSolver : public SPxLPBase<R>, protected SPxBasis<R>
   {
     friend class SoPlexLegacy;
-    friend class SPxFastRT;
+
+    template <class S> friend class SPxFastRT;
     friend class SPxBoundFlippingRT;
 
   public:
