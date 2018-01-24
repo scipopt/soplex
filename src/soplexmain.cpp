@@ -2253,7 +2253,6 @@ int main(int argc, char* argv[])
          simplifying = 0;
 
       if ( read_basis || write_basis )
-      {
          basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
 
       // set some algorithm parameters
