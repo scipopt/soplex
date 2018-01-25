@@ -4,6 +4,8 @@ developer version
 fixed bugs:
 - correct accumulation of shifted or relaxed bounds
 - allow termination despite violations to prevent cycling on numerically difficult models
+- changed all string copy methods to use spxSnprintf which is both safe and more efficient
+  than strncpy.
 
 
 21 December 2017 - Release 3.1.0
