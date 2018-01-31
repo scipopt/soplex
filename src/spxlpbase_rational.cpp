@@ -1252,7 +1252,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          }
 
          // save copy of string (make sure string ends with \0)
-         strncpy(colname, mps.field1(), MPSInput::MAX_LINE_LEN-1);
+         spxSnprintf(colname, MPSInput::MAX_LINE_LEN-1, mps.field1());
          colname[MPSInput::MAX_LINE_LEN-1] = '\0';
          cnames.add(colname);
          vec.clear();
@@ -1347,14 +1347,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          break;
 
       if( *rhsname == '\0' )
-         strcpy(rhsname, mps.field1());
+         spxSnprintf(rhsname, MPSInput::MAX_LINE_LEN , mps.field1());
 
       if( strcmp(rhsname, mps.field1()) )
       {
          if( strcmp(addname, mps.field1()) )
          {
             assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
-            strncpy(addname, mps.field1(), MPSInput::MAX_LINE_LEN);
+            spxSnprintf(addname, MPSInput::MAX_LINE_LEN, mps.field1());
             MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
          }
       }
@@ -1436,7 +1436,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
       if( *rngname == '\0' )
       {
          assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
-         strncpy(rngname, mps.field1(), MPSInput::MAX_LINE_LEN);
+         spxSnprintf(rngname, MPSInput::MAX_LINE_LEN, mps.field1());
       }
 
       /* The rules are:
@@ -1576,7 +1576,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       if( *bndname == '\0' )
       {
          assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
-         strncpy(bndname, mps.field2(), MPSInput::MAX_LINE_LEN);
+         spxSnprintf(bndname, MPSInput::MAX_LINE_LEN, mps.field2());
       }
 
       // Only read the first Bound in section
