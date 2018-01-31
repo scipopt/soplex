@@ -5,7 +5,7 @@ fixed bugs:
 - correct accumulation of shifted or relaxed bounds
 - allow termination despite violations to prevent cycling on numerically difficult models
 - add missing forward declarations of template specializations to spxlpbase.h
-
+- set correct basis status for removed free variables (e.g. column singletons without objective)
 
 21 December 2017 - Release 3.1.0
 ================================
