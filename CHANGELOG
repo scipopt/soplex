@@ -1,5 +1,5 @@
-developer version
-=================
+Release 3.1.1
+=============
 
 fixed bugs:
 - correct accumulation of shifted or relaxed bounds
@@ -8,6 +8,7 @@ fixed bugs:
 - changed all string copy methods to use spxSnprintf which is both safe and more efficient
   than strncpy.
 - set correct basis status for removed free variables (e.g. column singletons without objective)
+
 
 21 December 2017 - Release 3.1.0
 ================================

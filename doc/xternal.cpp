@@ -61,8 +61,7 @@
  * href="http://soplex.zib.de">SoPlex</a> web page or contact us for more
  * information.
  *
- * For help with installation please consult the \ref INSTALL "INSTALL" file in
- * the distribution.
+ * For help with the installation please consult the \ref INSTALL "INSTALL" file.
  *
  * @section GETTINGSTARTED Getting started
  *
@@ -77,6 +76,8 @@
  * - \ref PROG     "Programming with SoPlex"
  *
  * - \ref EXACT    "How to use SoPlex as an exact LP solver"
+ *
+ * - \ref CHANGELOG "CHANGELOG"
  *
  * A tutorial article for getting started with the SCIP Optimization Suite,
  * which includes SoPlex, is available as <a
@@ -163,6 +164,10 @@
  * \verbinclude INSTALL
  */
 
+/**@page CHANGELOG CHANGELOG
+ *
+ * \verbinclude CHANGELOG
+ */
 
 /**@page FAQ Frequently Asked Questions
  * \htmlinclude faq.inc

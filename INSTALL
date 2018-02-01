@@ -19,22 +19,14 @@
 
         http://soplex.zib.de
 
-        You can also generate it, if you have Doxygen installed by
-        typing 'make doc'. It will then be in doc/html/index.html.
-        On some systems, it might be necessary to use 'gmake' instead
-        of 'make'.
-
-
 2.      Compiling
 
-        Read the documentation!
+        There are two build systems for SoPlex. It is recommended to use CMake.
 
+   a)   CMake:
 
-   a)   New CMake system:
-
-        CMake is the recommended build system. It should configure your
-        build automatically according to your environment and the available
-        third-party libraries.
+        CMake should configure your build automatically according to your
+        environment and the available third-party libraries.
         Follow the guidelines of a typical CMake project (http://cmake.org/):
 
         create a build directory:
