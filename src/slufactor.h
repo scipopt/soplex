@@ -35,8 +35,8 @@ namespace soplex
 /**@brief   Implementation of Sparse Linear Solver.
  * @ingroup Algo
  * 
- * This class implements a #SLinSolver interface by using the sparse LU
- * factorization implementet in #CLUFactor.
+ * This class implements a SLinSolver interface by using the sparse LU
+ * factorization implemented in CLUFactor.
  */
 class SLUFactor : public SLinSolver, protected CLUFactor
 {

@@ -159,15 +159,11 @@
  */
 
 
-/**@page INSTALL Installation
- *
- * \verbinclude INSTALL
- */
-
 /**@page CHANGELOG CHANGELOG
  *
  * \verbinclude CHANGELOG
  */
+
 
 /**@page FAQ Frequently Asked Questions
  * \htmlinclude faq.inc

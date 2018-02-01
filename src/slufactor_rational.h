@@ -36,8 +36,8 @@ namespace soplex
 /**@brief   Implementation of Sparse Linear Solver with Rational precision.
  * @ingroup Algo
  *
- * This class implements a #SLinSolverRational interface by using the sparse LU
- * factorization implemented in #CLUFactorRational.
+ * This class implements a SLinSolverRational interface by using the sparse LU
+ * factorization implemented in CLUFactorRational.
  */
 class SLUFactorRational : public SLinSolverRational, protected CLUFactorRational
 {

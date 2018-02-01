@@ -26,7 +26,7 @@ tar -cvzhf $NAME.tgz \
 --exclude="*/local/*" \
 --exclude="TODO" \
 $NAME/COPYING \
-$NAME/INSTALL \
+$NAME/INSTALL.md \
 $NAME/CHANGELOG \
 $NAME/Makefile \
 $NAME/check/check.awk \
