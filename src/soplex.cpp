@@ -6564,8 +6564,9 @@ namespace soplex
             else if( strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
             {
                int value;
+               value = std::stoi(paramValueString);
 
-               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value, false) )
+               if(  setIntParam((SoPlex::IntParam)param, value, false) )
                   break;
                else
                {
@@ -6591,8 +6592,17 @@ namespace soplex
             else if( strncmp(paramName, _currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
             {
                Real value;
+#ifdef WITH_LONG_DOUBLE
+               value = std::stold(paramValueString);
+#else
+#ifdef WITH_FLOAT
+               value = std::stof(paramValueString);
+#else
+               value = std::stod(paramValueString);
+#endif
+#endif
 
-               if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex::RealParam)param, value) )
+               if( setRealParam((SoPlex::RealParam)param, value) )
                   break;
                else
                {
@@ -6640,15 +6650,19 @@ namespace soplex
          if( strncmp(paramName, "random_seed", 11) == 0 )
          {
             unsigned int value;
-            char format[SPX_MAXSTRLEN];
-            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            unsigned long parseval;
 
-            if( sscanf(paramValueString, format, &value) == 1 )
+            parseval = std::stoul(paramValueString);
+            if( parseval > UINT_MAX )
             {
-
-               setRandomSeed(value);
-               return true;
+               value = UINT_MAX;
+               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
             }
+            else
+               value = (unsigned int) parseval;
+
+            setRandomSeed(value);
+            return true;
          }
 
          MSG_INFO1( spxout, spxout << "Error parsing setting string for uint parameter <random_seed>.\n" );
@@ -8511,8 +8525,9 @@ namespace soplex
             else if( strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
             {
                int value;
+               value = std::stoi(paramValueString);
 
-               if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex::IntParam)param, value, false) )
+               if( setIntParam((SoPlex::IntParam)param, value, false) )
                   break;
                else
                {
@@ -8539,7 +8554,16 @@ namespace soplex
             {
                Real value;
 
-               if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex::RealParam)param, value) )
+#ifdef WITH_LONG_DOUBLE
+               value = std::stold(paramValueString);
+#else
+#ifdef WITH_FLOAT
+               value = std::stof(paramValueString);
+#else
+               value = std::stod(paramValueString);
+#endif
+#endif
+               if( setRealParam((SoPlex::RealParam)param, value) )
                   break;
                else
                {
@@ -8587,14 +8611,19 @@ namespace soplex
          if( strncmp(paramName, "random_seed", 11) == 0 )
          {
             unsigned int value;
-            char format[SPX_MAXSTRLEN];
-            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            unsigned long parseval;
 
-            if( sscanf(paramValueString, format, &value) == 1 )
+            parseval = std::stoul(paramValueString);
+            if( parseval > UINT_MAX )
             {
-               setRandomSeed(value);
-               return true;
+               value = UINT_MAX;
+               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
             }
+            else
+               value = (unsigned int) parseval;
+
+            setRandomSeed(value);
+            return true;
          }
 
          MSG_INFO1( spxout, spxout << "Error parsing settings file for uint parameter <random_seed>.\n" );
