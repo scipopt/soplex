@@ -8617,7 +8617,7 @@ namespace soplex
             if( parseval > UINT_MAX )
             {
                value = UINT_MAX;
-               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to unit.\n");
+               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
             }
             else
                value = (unsigned int) parseval;
