@@ -6656,7 +6656,7 @@ namespace soplex
             if( parseval > UINT_MAX )
             {
                value = UINT_MAX;
-               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to unit.\n");
+               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
             }
             else
                value = (unsigned int) parseval;
@@ -8591,7 +8591,7 @@ namespace soplex
             {
                Rational value;
 
-               if( readstringrational(paramValueString, value) && setRationalParam((SoPlex::RationalParam)param, value) )
+               if( readStringRational(paramValueString, value) && setRationalParam((SoPlex::RationalParam)param, value) )
                   break;
                else
                {
