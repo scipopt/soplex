@@ -1993,7 +1993,6 @@ static void LPFwriteRows(
 
    p_output << "Subject To\n";
 
-   int num_written_rows = 0;  // num_written_rows > nRows with ranged rows
    for( int i = 0; i < p_lp.nRows(); ++i )
    {
       const Rational lhs = p_lp.lhs(i);
@@ -2002,15 +2001,15 @@ static void LPFwriteRows(
       if( double(lhs) > -double(infinity) && double(rhs) < double(infinity) && lhs != rhs )
       {
          // ranged row -> write two non-ranged rows
-         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << "_1 : ";
+         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_1 : ";
          LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, infinity, spxout);
 
-         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << "_2 : ";
+         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_2 : ";
          LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -infinity, rhs, spxout);
       }
       else
       {
-         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << " : ";
+         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << " : ";
          LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, rhs, spxout);
       }
    }
