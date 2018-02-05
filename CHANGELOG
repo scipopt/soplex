@@ -10,6 +10,7 @@ fixed bugs:
 - set correct basis status for removed free variables (e.g. column singletons without objective)
 - use consistent generic constraint names when writing .mps files
 
+
 21 December 2017 - Release 3.1.0
 ================================
 
