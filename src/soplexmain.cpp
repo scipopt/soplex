@@ -554,7 +554,8 @@ int main(int argc, char* argv[])
                   if( readbasname == 0 )
                   {
                      char* filename = &option[8];
-                     readbasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                     readbasname = new char[strlen(filename) + 1];
+                     spxSnprintf(readbasname, strlen(filename) + 1, filename);
                   }
                }
                // --writebas=<basfile> : write terminal basis to file
@@ -563,7 +564,8 @@ int main(int argc, char* argv[])
                   if( writebasname == 0 )
                   {
                      char* filename = &option[9];
-                     writebasname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                     writebasname =  new char[strlen(filename) + 1];
+                     spxSnprintf(writebasname, strlen(filename) + 1, filename);
                   }
                }
                // --writefile=<lpfile> : write LP to file
@@ -572,7 +574,8 @@ int main(int argc, char* argv[])
                   if( writefilename == 0 )
                   {
                      char* filename = &option[10];
-                     writefilename = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                     writefilename = new char[strlen(filename) + 1];
+                     spxSnprintf(writefilename, strlen(filename) + 1, filename);
                   }
                }
                // --writedual=<lpfile> : write dual LP to a file
@@ -581,7 +584,8 @@ int main(int argc, char* argv[])
                   if( writedualfilename == 0 )
                   {
                      char* dualfilename = &option[10];
-                     writedualfilename = strncpy(new char[strlen(dualfilename) + 1], dualfilename, strlen(dualfilename) + 1);
+                     writedualfilename = new char[strlen(dualfilename) + 1];
+                     spxSnprintf(writedualfilename, strlen(dualfilename) + 1, dualfilename);
                   }
                }
                // --loadset=<setfile> : load parameters from settings file
@@ -590,7 +594,8 @@ int main(int argc, char* argv[])
                   if( loadsetname == 0 )
                   {
                      char* filename = &option[8];
-                     loadsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                     loadsetname = new char[strlen(filename) + 1];
+                     spxSnprintf(loadsetname, strlen(filename) + 1, filename);
                      if( !soplex->loadSettingsFile(loadsetname) )
                      {
                         printUsage(argv, optidx);
@@ -610,7 +615,8 @@ int main(int argc, char* argv[])
                   if( savesetname == 0 )
                   {
                      char* filename = &option[8];
-                     savesetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                     savesetname = new char[strlen(filename) + 1];
+                     spxSnprintf(savesetname, strlen(filename) + 1, filename);
                   }
                }
                // --diffset=<setfile> : save modified parameters to settings file
@@ -619,7 +625,8 @@ int main(int argc, char* argv[])
                   if( diffsetname == 0 )
                   {
                      char* filename = &option[8];
-                     diffsetname = strncpy(new char[strlen(filename) + 1], filename, strlen(filename) + 1);
+                     diffsetname = new char[strlen(filename) + 1];
+                     spxSnprintf(diffsetname, strlen(filename) + 1, filename);
                   }
                }
                // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)

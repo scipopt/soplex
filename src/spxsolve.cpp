@@ -1138,8 +1138,8 @@ void SPxSolver::performSolutionPolishing()
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
 #ifndef NDEBUG
-      // allow a tiny relative deviation from the original values
-      Real alloweddeviation = 1e-9;
+      // allow a small relative deviation from the original values
+      Real alloweddeviation = entertol();
       Real origval = value();
       Real origshift = shift();
 #endif
@@ -1287,8 +1287,8 @@ void SPxSolver::performSolutionPolishing()
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
 #ifndef NDEBUG
-      // allow a tiny relative deviation from the original values
-      Real alloweddeviation = 1e-9;
+      // allow a small relative deviation from the original values
+      Real alloweddeviation = leavetol();
       Real origval = value();
       Real origshift = shift();
 #endif
