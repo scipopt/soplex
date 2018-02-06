@@ -32,8 +32,8 @@ namespace soplex
  */
 Real SPxHarrisRT::degenerateEps() const
 {
-   return solver()->delta() 
-      * (1.0 - solver()->numCycle() / solver()->maxCycle());
+   return this->solver()->delta() 
+      * (1.0 - this->solver()->numCycle() / this->solver()->maxCycle());
 }
 
 int SPxHarrisRT::maxDelta(
@@ -157,23 +157,23 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
    int leave = -1;
    Real maxabs = 1;
 
-   Real epsilon  = solver()->epsilon();
+   Real epsilon  = this->solver()->epsilon();
    Real degeneps = degenerateEps();
 
-   SSVector& upd = solver()->fVec().delta();
-   Vector& vec = solver()->fVec();
+   SSVector& upd = this->solver()->fVec().delta();
+   Vector& vec = this->solver()->fVec();
 
-   const Vector& up = solver()->ubBound();
-   const Vector& low = solver()->lbBound();
+   const Vector& up = this->solver()->ubBound();
+   const Vector& low = this->solver()->lbBound();
 
    assert(delta > epsilon);
    assert(epsilon > 0);
-   assert(solver()->maxCycle() > 0);
+   assert(this->solver()->maxCycle() > 0);
 
    max = val;
-   lastshift = solver()->shift();
+   lastshift = this->solver()->shift();
 
-   solver()->fVec().delta().setup();
+   this->solver()->fVec().delta().setup();
 
    if (max > epsilon)
    {
@@ -207,7 +207,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
          {
             y = up[i] - vec[i];
             if (y < -degeneps)
-               solver()->shiftUBbound(i, vec[i]); // ensure simplex improvement
+               this->solver()->shiftUBbound(i, vec[i]); // ensure simplex improvement
             else
             {
                y /= x;
@@ -223,7 +223,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
          {
             y = low[i] - vec[i];
             if (y > degeneps)
-               solver()->shiftLBbound(i, vec[i]); // ensure simplex improvement
+               this->solver()->shiftLBbound(i, vec[i]); // ensure simplex improvement
             else
             {
                y /= x;
@@ -272,7 +272,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
          {
             y = up[i] - vec[i];
             if (y < -degeneps)
-               solver()->shiftUBbound(i, vec[i]);   // ensure simplex improvement
+               this->solver()->shiftUBbound(i, vec[i]);   // ensure simplex improvement
             else
             {
                y /= x;
@@ -288,7 +288,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
          {
             y = low[i] - vec[i];
             if (y > degeneps)
-               solver()->shiftLBbound(i, vec[i]); // ensure simplex improvement
+               this->solver()->shiftLBbound(i, vec[i]); // ensure simplex improvement
             else
             {
                y /= x;
@@ -309,7 +309,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
       return -1;
 
 
-   if (lastshift != solver()->shift())
+   if (lastshift != this->solver()->shift())
       return selectLeave(val, 0, false);
 
    assert(leave >= 0);
@@ -334,26 +334,26 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
    int pnr, cnr;
 
    Real minStability = 0.0001;
-   Real epsilon      = solver()->epsilon();
+   Real epsilon      = this->solver()->epsilon();
    Real degeneps     = degenerateEps();
 
-   Vector& pvec = solver()->pVec();
-   SSVector& pupd = solver()->pVec().delta();
+   Vector& pvec = this->solver()->pVec();
+   SSVector& pupd = this->solver()->pVec().delta();
 
-   Vector& cvec = solver()->coPvec();
-   SSVector& cupd = solver()->coPvec().delta();
+   Vector& cvec = this->solver()->coPvec();
+   SSVector& cupd = this->solver()->coPvec().delta();
 
-   const Vector& upb = solver()->upBound();
-   const Vector& lpb = solver()->lpBound();
-   const Vector& ucb = solver()->ucBound();
-   const Vector& lcb = solver()->lcBound();
+   const Vector& upb = this->solver()->upBound();
+   const Vector& lpb = this->solver()->lpBound();
+   const Vector& ucb = this->solver()->ucBound();
+   const Vector& lcb = this->solver()->lcBound();
 
    assert(delta > epsilon);
    assert(epsilon > 0);
-   assert(solver()->maxCycle() > 0);
+   assert(this->solver()->maxCycle() > 0);
 
-   solver()->coPvec().delta().setup();
-   solver()->pVec().delta().setup();
+   this->solver()->coPvec().delta().setup();
+   this->solver()->pVec().delta().setup();
 
    if (val > epsilon)
    {
@@ -362,7 +362,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
          pnr = -1;
          cnr = -1;
          max = val;
-         lastshift = solver()->shift();
+         lastshift = this->solver()->shift();
          assert(delta > epsilon);
 
          // phase 1:
@@ -409,13 +409,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = upb[i] - pvec[i];
                if (y < -degeneps)
-                  solver()->shiftUPbound(i, pvec[i] - degeneps);
+                  this->solver()->shiftUPbound(i, pvec[i] - degeneps);
                else
                {
                   y /= x;
                   if (y <= max && x >= stab)       // &&  y > sel-epsilon
                   {
-                     enterId = solver()->id(i);
+                     enterId = this->solver()->id(i);
                      sel = y;
                      pnr = i;
                      stab = x;
@@ -426,13 +426,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = lpb[i] - pvec[i];
                if (y > degeneps)
-                  solver()->shiftLPbound(i, pvec[i] + degeneps);
+                  this->solver()->shiftLPbound(i, pvec[i] + degeneps);
                else
                {
                   y /= x;
                   if (y <= max && -x >= stab)      // &&  y > sel-epsilon
                   {
-                     enterId = solver()->id(i);
+                     enterId = this->solver()->id(i);
                      sel = y;
                      pnr = i;
                      stab = -x;
@@ -453,13 +453,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = ucb[i] - cvec[i];
                if (y < -degeneps)
-                  solver()->shiftUCbound(i, cvec[i] - degeneps);
+                  this->solver()->shiftUCbound(i, cvec[i] - degeneps);
                else
                {
                   y /= x;
                   if (y <= max && x >= stab)       // &&  y > sel-epsilon
                   {
-                     enterId = solver()->coId(i);
+                     enterId = this->solver()->coId(i);
                      sel = y;
                      cnr = j;
                      stab = x;
@@ -470,13 +470,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = lcb[i] - cvec[i];
                if (y > degeneps)
-                  solver()->shiftLCbound(i, cvec[i] + degeneps);
+                  this->solver()->shiftLCbound(i, cvec[i] + degeneps);
                else
                {
                   y /= x;
                   if (y <= max && -x >= stab)      // &&  y > sel-epsilon
                   {
-                     enterId = solver()->coId(i);
+                     enterId = this->solver()->coId(i);
                      sel = y;
                      cnr = j;
                      stab = -x;
@@ -490,11 +490,11 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             }
          }
 
-         if (lastshift == solver()->shift())
+         if (lastshift == this->solver()->shift())
          {
             if (cnr >= 0)
             {
-               if (solver()->isBasic(enterId))
+               if (this->solver()->isBasic(enterId))
                {
                   cupd.clearNum(cnr);
                   continue;
@@ -504,8 +504,8 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             }
             else if (pnr >= 0)
             {
-               pvec[pnr] = solver()->vector(pnr) * cvec;
-               if (solver()->isBasic(enterId))
+               pvec[pnr] = this->solver()->vector(pnr) * cvec;
+               if (this->solver()->isBasic(enterId))
                {
                   pupd.setValue(pnr, 0.0);
                   continue;
@@ -519,7 +519,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                      if (x < minStability && sel < delta)
                      {
                         minStability /= 2.0;
-                        solver()->shiftUPbound(pnr, pvec[pnr]);
+                        this->solver()->shiftUPbound(pnr, pvec[pnr]);
                         continue;
                      }
                   }
@@ -529,7 +529,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                      if (-x < minStability && -sel < delta)
                      {
                         minStability /= 2.0;
-                        solver()->shiftLPbound(pnr, pvec[pnr]);
+                        this->solver()->shiftLPbound(pnr, pvec[pnr]);
                         continue;
                      }
                   }
@@ -556,7 +556,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
          pnr = -1;
          cnr = -1;
          max = val;
-         lastshift = solver()->shift();
+         lastshift = this->solver()->shift();
          assert(delta > epsilon);
 
 
@@ -602,13 +602,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = lpb[i] - pvec[i];
                if (y > degeneps)
-                  solver()->shiftLPbound(i, pvec[i]);  // ensure simplex improvement
+                  this->solver()->shiftLPbound(i, pvec[i]);  // ensure simplex improvement
                else
                {
                   y /= x;
                   if (y >= max && x > stab)        // &&  y < sel+epsilon
                   {
-                     enterId = solver()->id(i);
+                     enterId = this->solver()->id(i);
                      sel = y;
                      pnr = i;
                      stab = x;
@@ -619,13 +619,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = upb[i] - pvec[i];
                if (y < -degeneps)
-                  solver()->shiftUPbound(i, pvec[i]);  // ensure simplex improvement
+                  this->solver()->shiftUPbound(i, pvec[i]);  // ensure simplex improvement
                else
                {
                   y /= x;
                   if (y >= max && -x > stab)       // &&  y < sel+epsilon
                   {
-                     enterId = solver()->id(i);
+                     enterId = this->solver()->id(i);
                      sel = y;
                      pnr = i;
                      stab = -x;
@@ -646,13 +646,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = lcb[i] - cvec[i];
                if (y > degeneps)
-                  solver()->shiftLCbound(i, cvec[i]);  // ensure simplex improvement
+                  this->solver()->shiftLCbound(i, cvec[i]);  // ensure simplex improvement
                else
                {
                   y /= x;
                   if (y >= max && x > stab)        // &&  y < sel+epsilon
                   {
-                     enterId = solver()->coId(i);
+                     enterId = this->solver()->coId(i);
                      sel = y;
                      cnr = j;
                      stab = x;
@@ -663,13 +663,13 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             {
                y = ucb[i] - cvec[i];
                if (y < -degeneps)
-                  solver()->shiftUCbound(i, cvec[i]);  // ensure simplex improvement
+                  this->solver()->shiftUCbound(i, cvec[i]);  // ensure simplex improvement
                else
                {
                   y /= x;
                   if (y >= max && -x > stab)       // &&  y < sel+epsilon
                   {
-                     enterId = solver()->coId(i);
+                     enterId = this->solver()->coId(i);
                      sel = y;
                      cnr = j;
                      stab = -x;
@@ -683,11 +683,11 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             }
          }
 
-         if (lastshift == solver()->shift())
+         if (lastshift == this->solver()->shift())
          {
             if (cnr >= 0)
             {
-               if (solver()->isBasic(enterId))
+               if (this->solver()->isBasic(enterId))
                {
                   cupd.clearNum(cnr);
                   continue;
@@ -697,8 +697,8 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
             }
             else if (pnr >= 0)
             {
-               pvec[pnr] = solver()->vector(pnr) * cvec;
-               if (solver()->isBasic(enterId))
+               pvec[pnr] = this->solver()->vector(pnr) * cvec;
+               if (this->solver()->isBasic(enterId))
                {
                   pupd.setValue(pnr, 0.0);
                   continue;
@@ -712,7 +712,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                      if (x < minStability && -sel < delta)
                      {
                         minStability /= 2;
-                        solver()->shiftLPbound(pnr, pvec[pnr]);
+                        this->solver()->shiftLPbound(pnr, pvec[pnr]);
                         continue;
                      }
                   }
@@ -722,7 +722,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                      if (-x < minStability && sel < delta)
                      {
                         minStability /= 2;
-                        solver()->shiftUPbound(pnr, pvec[pnr]);
+                        this->solver()->shiftUPbound(pnr, pvec[pnr]);
                         continue;
                      }
                   }

@@ -47,7 +47,7 @@ void SPxWeightPR::setType(SPxSolver<R>::Type tp)
 
 void SPxWeightPR::computeLeavePenalty(int start, int end)
 {
-   const SPxBasis& basis = solver()->basis();
+   const SPxBasis& basis = this->solver()->basis();
 
    for (int i = start; i < end; ++i)
    {
@@ -64,15 +64,15 @@ void SPxWeightPR::computeRP(int start, int end)
    for (int i = start; i < end; ++i)
    {
       /**@todo TK04NOV98 here is a bug.
-       *       solver()->rowVector(i).length() could be zero, so
-       *       solver()->rowVector(i).length2() is also zero and we
+       *       this->solver()->rowVector(i).length() could be zero, so
+       *       this->solver()->rowVector(i).length2() is also zero and we
        *       get an arithmetic exception.
        */
-      assert(solver()->rowVector(i).length() > 0);
+      assert(this->solver()->rowVector(i).length() > 0);
 
-      rPenalty[i] = (solver()->rowVector(i) * solver()->maxObj()) * objlength
-                    / solver()->rowVector(i).length2();
-      ASSERT_WARN( "WWGTPR01", rPenalty[i] > -1 - solver()->epsilon() );
+      rPenalty[i] = (this->solver()->rowVector(i) * this->solver()->maxObj()) * objlength
+                    / this->solver()->rowVector(i).length2();
+      ASSERT_WARN( "WWGTPR01", rPenalty[i] > -1 - this->solver()->epsilon() );
    }
 }
 
@@ -80,8 +80,8 @@ void SPxWeightPR::computeCP(int start, int end)
 {
    for (int i = start; i < end; ++i)
    {
-      cPenalty[i] = solver()->maxObj(i) * objlength;
-      ASSERT_WARN( "WWGTPR02", cPenalty[i] > -1 - solver()->epsilon() );
+      cPenalty[i] = this->solver()->maxObj(i) * objlength;
+      ASSERT_WARN( "WWGTPR02", cPenalty[i] > -1 - this->solver()->epsilon() );
    }
 }
 
@@ -92,7 +92,7 @@ void SPxWeightPR::load(SPxSolver* base)
    rPenalty.reDim(base->nRows());
    cPenalty.reDim(base->nCols());
 
-   objlength = 1 / solver()->maxObj().length();
+   objlength = 1 / this->solver()->maxObj().length();
    computeCP(0, base->nCols());
    computeRP(0, base->nRows());
 }
@@ -106,7 +106,7 @@ int SPxWeightPR::selectLeave()
    Real x;
    int i;
 
-   for (i = solver()->dim() - 1; i >= 0; --i)
+   for (i = this->solver()->dim() - 1; i >= 0; --i)
    {
       x = test[i];
       if (x < -theeps)
@@ -135,7 +135,7 @@ int SPxWeightPR::selectLeave()
    Real x;
    int i;
 
-   for (i = solver()->dim() - 1; i >= 0; --i)
+   for (i = this->solver()->dim() - 1; i >= 0; --i)
    {
       x = test[i];
       if (x < -theeps)
@@ -155,17 +155,17 @@ int SPxWeightPR::selectLeave()
 
 SPxId SPxWeightPR::selectEnter()
 {
-   const Vector& rTest = (solver()->rep() == SPxSolver<R>::ROW)
-                         ? solver()->test() : solver()->coTest();
-   const Vector& cTest = (solver()->rep() == SPxSolver<R>::ROW)
-                         ? solver()->coTest() : solver()->test();
-   const SPxBasis<R>::Desc& ds = solver()->basis().desc();
+   const Vector& rTest = (this->solver()->rep() == SPxSolver<R>::ROW)
+                         ? this->solver()->test() : this->solver()->coTest();
+   const Vector& cTest = (this->solver()->rep() == SPxSolver<R>::ROW)
+                         ? this->solver()->coTest() : this->solver()->test();
+   const SPxBasis<R>::Desc& ds = this->solver()->basis().desc();
    Real best = infinity;
    SPxId lastId;
    Real x;
    int i;
 
-   for (i = solver()->nRows() - 1; i >= 0; --i)
+   for (i = this->solver()->nRows() - 1; i >= 0; --i)
    {
       x = rTest[i];
       if (x < -theeps)
@@ -183,9 +183,9 @@ SPxId SPxWeightPR::selectEnter()
             break;
          case SPxBasis<R>::Desc::P_FREE :
          case SPxBasis<R>::Desc::D_FREE :
-            return SPxId(solver()->rId(i));
+            return SPxId(this->solver()->rId(i));
          case SPxBasis<R>::Desc::D_ON_BOTH :
-            if (solver()->pVec()[i] > solver()->upBound()[i])
+            if (this->solver()->pVec()[i] > this->solver()->upBound()[i])
                x *= 1 + rPenalty[i];
             else
                x *= 1 - rPenalty[i];
@@ -198,12 +198,12 @@ SPxId SPxWeightPR::selectEnter()
          if (x < best)
          {
             best = x;
-            lastId = solver()->rId(i);
+            lastId = this->solver()->rId(i);
          }
       }
    }
 
-   for (i = solver()->nCols() - 1; i >= 0; --i)
+   for (i = this->solver()->nCols() - 1; i >= 0; --i)
    {
       x = cTest[i];
       if (x < -theeps)
@@ -221,9 +221,9 @@ SPxId SPxWeightPR::selectEnter()
             break;
          case SPxBasis<R>::Desc::P_FREE :
          case SPxBasis<R>::Desc::D_FREE :
-            return SPxId(solver()->cId(i));
+            return SPxId(this->solver()->cId(i));
          case SPxBasis<R>::Desc::D_ON_BOTH :
-            if (solver()->coPvec()[i] > solver()->ucBound()[i])
+            if (this->solver()->coPvec()[i] > this->solver()->ucBound()[i])
                x *= 1 + cPenalty[i];
             else
                x *= 1 - cPenalty[i];
@@ -236,7 +236,7 @@ SPxId SPxWeightPR::selectEnter()
          if (x < best)
          {
             best = x;
-            lastId = solver()->cId(i);
+            lastId = this->solver()->cId(i);
          }
       }
    }
@@ -246,69 +246,69 @@ SPxId SPxWeightPR::selectEnter()
 
 void SPxWeightPR::addedVecs(int)
 {
-   if (solver()->rep() == SPxSolver<R>::ROW)
+   if (this->solver()->rep() == SPxSolver<R>::ROW)
    {
       int start = rPenalty.dim();
-      rPenalty.reDim(solver()->nRows());
-      computeRP(start, solver()->nRows());
+      rPenalty.reDim(this->solver()->nRows());
+      computeRP(start, this->solver()->nRows());
    }
    else
    {
       int start = cPenalty.dim();
-      cPenalty.reDim(solver()->nCols());
-      computeCP(start, solver()->nCols());
+      cPenalty.reDim(this->solver()->nCols());
+      computeCP(start, this->solver()->nCols());
    }
-   if (solver()->type() == SPxSolver<R>::LEAVE)
+   if (this->solver()->type() == SPxSolver<R>::LEAVE)
    {
       int start = leavePenalty.dim();
-      leavePenalty.reDim( solver()->dim() );
-      computeLeavePenalty( start, solver()->dim() );
+      leavePenalty.reDim( this->solver()->dim() );
+      computeLeavePenalty( start, this->solver()->dim() );
    }
 }
 
 void SPxWeightPR::addedCoVecs(int)
 {
-   if (solver()->rep() == SPxSolver<R>::COLUMN)
+   if (this->solver()->rep() == SPxSolver<R>::COLUMN)
    {
       int start = rPenalty.dim();
-      rPenalty.reDim(solver()->nRows());
-      computeRP(start, solver()->nRows());
+      rPenalty.reDim(this->solver()->nRows());
+      computeRP(start, this->solver()->nRows());
    }
    else
    {
       int start = cPenalty.dim();
-      cPenalty.reDim(solver()->nCols());
-      computeCP(start, solver()->nCols());
+      cPenalty.reDim(this->solver()->nCols());
+      computeCP(start, this->solver()->nCols());
    }
-   if (solver()->type() == SPxSolver<R>::LEAVE)
+   if (this->solver()->type() == SPxSolver<R>::LEAVE)
    {
       int start = leavePenalty.dim();
-      leavePenalty.reDim( solver()->dim() );
-      computeLeavePenalty( start, solver()->dim() );
+      leavePenalty.reDim( this->solver()->dim() );
+      computeLeavePenalty( start, this->solver()->dim() );
    }
 }
 
 void SPxWeightPR::removedVec(int i)
 {
-   assert(solver() != 0);
+   assert(this->solver() != 0);
 
-   if (solver()->rep() == SPxSolver<R>::ROW)
+   if (this->solver()->rep() == SPxSolver<R>::ROW)
    {
       rPenalty[i] = rPenalty[rPenalty.dim()];
-      rPenalty.reDim(solver()->nRows());
+      rPenalty.reDim(this->solver()->nRows());
    }
    else
    {
       cPenalty[i] = cPenalty[cPenalty.dim()];
-      cPenalty.reDim(solver()->nCols());
+      cPenalty.reDim(this->solver()->nCols());
    }
 }
 
 void SPxWeightPR::removedVecs(const int perm[])
 {
-   assert(solver() != 0);
+   assert(this->solver() != 0);
 
-   if (solver()->rep() == SPxSolver<R>::ROW)
+   if (this->solver()->rep() == SPxSolver<R>::ROW)
    {
       int j = rPenalty.dim();
       for (int i = 0; i < j; ++i)
@@ -316,7 +316,7 @@ void SPxWeightPR::removedVecs(const int perm[])
          if (perm[i] >= 0)
             rPenalty[perm[i]] = rPenalty[i];
       }
-      rPenalty.reDim(solver()->nRows());
+      rPenalty.reDim(this->solver()->nRows());
    }
    else
    {
@@ -326,31 +326,31 @@ void SPxWeightPR::removedVecs(const int perm[])
          if (perm[i] >= 0)
             cPenalty[perm[i]] = cPenalty[i];
       }
-      cPenalty.reDim(solver()->nCols());
+      cPenalty.reDim(this->solver()->nCols());
    }
 }
 
 void SPxWeightPR::removedCoVec(int i)
 {
-   assert(solver() != 0);
+   assert(this->solver() != 0);
 
-   if (solver()->rep() == SPxSolver<R>::COLUMN)
+   if (this->solver()->rep() == SPxSolver<R>::COLUMN)
    {
       rPenalty[i] = rPenalty[rPenalty.dim()];
-      rPenalty.reDim(solver()->nRows());
+      rPenalty.reDim(this->solver()->nRows());
    }
    else
    {
       cPenalty[i] = cPenalty[cPenalty.dim()];
-      cPenalty.reDim(solver()->nCols());
+      cPenalty.reDim(this->solver()->nCols());
    }
 }
 
 void SPxWeightPR::removedCoVecs(const int perm[])
 {
-   assert(solver() != 0);
+   assert(this->solver() != 0);
 
-   if (solver()->rep() == SPxSolver<R>::COLUMN)
+   if (this->solver()->rep() == SPxSolver<R>::COLUMN)
    {
       int j = rPenalty.dim();
       for (int i = 0; i < j; ++i)
@@ -358,7 +358,7 @@ void SPxWeightPR::removedCoVecs(const int perm[])
          if (perm[i] >= 0)
             rPenalty[perm[i]] = rPenalty[i];
       }
-      rPenalty.reDim(solver()->nRows());
+      rPenalty.reDim(this->solver()->nRows());
    }
    else
    {
@@ -368,18 +368,18 @@ void SPxWeightPR::removedCoVecs(const int perm[])
          if (perm[i] >= 0)
             cPenalty[perm[i]] = cPenalty[i];
       }
-      cPenalty.reDim(solver()->nCols());
+      cPenalty.reDim(this->solver()->nCols());
    }
 }
 
 bool SPxWeightPR::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (solver() != 0)
+   if (this->solver() != 0)
    {
-      if (rPenalty.dim() != solver()->nRows())
+      if (rPenalty.dim() != this->solver()->nRows())
          return MSGinconsistent("SPxWeightPR");
-      if (cPenalty.dim() != solver()->nCols())
+      if (cPenalty.dim() != this->solver()->nCols())
          return MSGinconsistent("SPxWeightPR");
    }
 #endif
