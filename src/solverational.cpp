@@ -39,7 +39,7 @@ namespace soplex
       // remember that last solve was rational
       _lastSolveMode = SOLVEMODE_RATIONAL;
 
-      // ensure that the solver has the original problem
+      // ensure that the solver has the original problemo
       if( !_isRealLPLoaded )
       {
          assert(_realLP != &_solver);

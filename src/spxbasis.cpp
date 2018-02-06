@@ -30,20 +30,22 @@
 
 namespace soplex
 {
-SPxBasis::Desc::Status
-SPxBasis::dualStatus(const SPxColId& id) const
+  template <class R> typename SPxBasis<R>::Desc::Status
+SPxBasis<R>::dualStatus(const SPxColId& id) const
 {
    return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
 }
 
-SPxBasis::Desc::Status
-SPxBasis::dualStatus(const SPxRowId& id) const
+template <class R>
+typename SPxBasis<R>::Desc::Status
+SPxBasis<R>::dualStatus(const SPxRowId& id) const
 {
    return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
 }
 
-SPxBasis::Desc::Status
-SPxBasis::dualRowStatus(int i) const
+template <class R>
+typename SPxBasis<R>::Desc::Status
+SPxBasis<R>::dualRowStatus(int i) const
 {
    assert(theLP != 0);
 
@@ -65,8 +67,9 @@ SPxBasis::dualRowStatus(int i) const
       return Desc::D_UNDEFINED;
 }
 
-SPxBasis::Desc::Status
-SPxBasis::dualColStatus(int i) const
+template <class R>
+typename SPxBasis<R>::Desc::Status
+SPxBasis<R>::dualColStatus(int i) const
 {
    assert(theLP != 0);
 
@@ -88,7 +91,8 @@ SPxBasis::dualColStatus(int i) const
       return Desc::D_UNDEFINED;
 }
 
-void SPxBasis::loadMatrixVecs()
+template <class R>
+void SPxBasis<R>::loadMatrixVecs()
 {
    assert(theLP != 0);
    assert(theLP->dim() == matrix.size());
@@ -108,7 +112,8 @@ void SPxBasis::loadMatrixVecs()
       factor->clear();
 }
 
-bool SPxBasis::isDescValid(const Desc& ds)
+template <class R>
+bool SPxBasis<R>::isDescValid(const Desc& ds)
 {
 
    assert(status() > NO_PROBLEM);
@@ -179,13 +184,14 @@ bool SPxBasis::isDescValid(const Desc& ds)
    return true;
 }
 
+template <class R>
 /*
     Loading a #Desc# into the basis can be done more efficiently, by
     explicitely programming both cases, for the rowwise and for the columnwise
     representation. This implementation hides this distinction in the use of
     methods #isBasic()# and #vector()#.
  */
-void SPxBasis::loadDesc(const Desc& ds)
+void SPxBasis<R>::loadDesc(const Desc& ds)
 {
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
@@ -221,14 +227,14 @@ void SPxBasis::loadDesc(const Desc& ds)
        */
       if (thedesc.rowStatus(i) >= 0)
          thedesc.rowStatus(i) = dualRowStatus(i);
-      else if (thedesc.rowStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
+      else if (thedesc.rowStatus(i) == SPxBasis<R>::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
       {
          if (theLP->SPxLP::lhs(i) > -infinity && theLP->SPxLP::maxRowObj(i) < 0.0)
-            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+            thedesc.rowStatus(i) = SPxBasis<R>::Desc::P_ON_LOWER;
          else if (theLP->SPxLP::rhs(i) < infinity)
-            thedesc.rowStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+            thedesc.rowStatus(i) = SPxBasis<R>::Desc::P_ON_UPPER;
          else
-            thedesc.rowStatus(i) = SPxBasis::Desc::P_FREE;
+            thedesc.rowStatus(i) = SPxBasis<R>::Desc::P_FREE;
       }
 
       if (theLP->isBasic(thedesc.rowStatus(i)))
@@ -257,14 +263,14 @@ void SPxBasis::loadDesc(const Desc& ds)
        */
       if (thedesc.colStatus(i) >= 0)
          thedesc.colStatus(i) = dualColStatus(i);
-      else if (thedesc.colStatus(i) == SPxBasis::Desc::P_FIXED && theLP->SPxLP::lower(i) != theLP->SPxLP::upper(i))
+      else if (thedesc.colStatus(i) == SPxBasis<R>::Desc::P_FIXED && theLP->SPxLP::lower(i) != theLP->SPxLP::upper(i))
       {
          if (theLP->SPxLP::lower(i) <= -infinity && theLP->SPxLP::upper(i) >= infinity)
-            thedesc.colStatus(i) = SPxBasis::Desc::P_FREE;
+            thedesc.colStatus(i) = SPxBasis<R>::Desc::P_FREE;
          else if (theLP->SPxLP::upper(i) >= infinity || (theLP->SPxLP::lower(i) > -infinity && theLP->SPxLP::maxObj(i) < 0.0))
-            thedesc.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+            thedesc.colStatus(i) = SPxBasis<R>::Desc::P_ON_LOWER;
          else
-            thedesc.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+            thedesc.colStatus(i) = SPxBasis<R>::Desc::P_ON_UPPER;
       }
 
       if (theLP->isBasic(thedesc.colStatus(i)))
@@ -304,14 +310,15 @@ void SPxBasis::loadDesc(const Desc& ds)
       factor->clear();
 }
 
-void SPxBasis::setRep()
+template <class R>
+void SPxBasis<R>::setRep()
 {
    assert(theLP != 0);
 
    reDim();
    minStab = 0.0;
 
-   if (theLP->rep() == SPxSolver::ROW)
+   if (theLP->rep() == SPxSolver<R>::ROW)
    {
       thedesc.stat   = &thedesc.rowstat;
       thedesc.costat = &thedesc.colstat;
@@ -323,7 +330,8 @@ void SPxBasis::setRep()
    }
 }
 
-void SPxBasis::load(SPxSolver* lp, bool initSlackBasis)
+template <class R>
+void SPxBasis<R>::load(SPxSolver<R>* lp, bool initSlackBasis)
 {
    assert(lp != 0);
    theLP = lp;
@@ -339,7 +347,8 @@ void SPxBasis::load(SPxSolver* lp, bool initSlackBasis)
    }
 }
 
-void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
+template <class R>
+void SPxBasis<R>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
 {
    assert(!freeSlinSolver || factor != 0);
 
@@ -360,6 +369,7 @@ void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
    freeSlinSolver = destroy;
 }
 
+template <class R>
 
 
 
@@ -390,7 +400,7 @@ void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
  *  - at their upper bound if finite,
  *  - at zero if free.
  */
-bool SPxBasis::readBasis(
+bool SPxBasis<R>::readBasis(
    std::istream&  is, 
    const NameSet* rowNames, 
    const NameSet* colNames)
@@ -550,6 +560,7 @@ bool SPxBasis::readBasis(
    return !mps.hasError();
 }
 
+template <class R>
 
 /* Get row name - copied from spxmpswrite.cpp 
  *
@@ -605,9 +616,10 @@ static const char* getColName(
 
 /* writes a file in MPS basis format to \p os.
  *
- * See SPxBasis::readBasis() for a short description of the format.
+ * See SPxBasis<R>::readBasis() for a short description of the format.
  */
-void SPxBasis::writeBasis(
+  template <class R>
+void SPxBasis<R>::writeBasis(
    std::ostream&  os, 
    const NameSet* rowNames, 
    const NameSet* colNames,
@@ -691,7 +703,8 @@ void SPxBasis::writeBasis(
    os << "ENDATA" << std::endl;
 }
 
-void SPxBasis::printMatrix() const
+template <class R>
+void SPxBasis<R>::printMatrix() const
 {
 
    assert(matrixIsSetup);
@@ -702,7 +715,8 @@ void SPxBasis::printMatrix() const
    }
 }
 
-void SPxBasis::printMatrixMTX(int number)
+template <class R>
+void SPxBasis<R>::printMatrixMTX(int number)
 {
    int dim;
    int nnz;
@@ -733,7 +747,8 @@ void SPxBasis::printMatrixMTX(int number)
    return;
 }
 
-void SPxBasis::change(
+template <class R>
+void SPxBasis<R>::change(
    int i,
    SPxId& id,
    const SVector* enterVec,
@@ -842,7 +857,7 @@ void SPxBasis::change(
 
             // if factorize() detects singularity, an exception is thrown, hence at this point we have a regular basis
             // and can try the update again
-            assert(status() >= SPxBasis::REGULAR);
+            assert(status() >= SPxBasis<R>::REGULAR);
             try
             {
 #ifdef MEASUREUPDATETIME
@@ -886,7 +901,8 @@ void SPxBasis::change(
       lastout = id;
 }
 
-void SPxBasis::factorize()
+template <class R>
+void SPxBasis<R>::factorize()
 {
 
    assert(factor != 0);
@@ -937,7 +953,8 @@ void SPxBasis::factorize()
    }
 }
 
-Vector& SPxBasis::multWithBase(Vector& x) const
+template <class R>
+Vector& SPxBasis<R>::multWithBase(Vector& x) const
 {
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
@@ -946,7 +963,7 @@ Vector& SPxBasis::multWithBase(Vector& x) const
    DVector tmp(x);
 
    if (!matrixIsSetup)
-      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasis<R>*>(this))->loadDesc(thedesc);
 
    assert( matrixIsSetup );
 
@@ -956,14 +973,15 @@ Vector& SPxBasis::multWithBase(Vector& x) const
    return x;
 }
 
-void SPxBasis::multWithBase(SSVector& x, SSVector& result) const
+template <class R>
+void SPxBasis<R>::multWithBase(SSVector& x, SSVector& result) const
 {
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
    assert(x.dim() == result.dim());
 
    if (!matrixIsSetup)
-      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasis<R>*>(this))->loadDesc(thedesc);
 
    result.clear();
 
@@ -975,8 +993,9 @@ void SPxBasis::multWithBase(SSVector& x, SSVector& result) const
    return;
 }
 
+template <class R>
 
-Vector& SPxBasis::multBaseWith(Vector& x) const
+Vector& SPxBasis<R>::multBaseWith(Vector& x) const
 {
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
@@ -985,7 +1004,7 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    DVector tmp(x);
 
    if (!matrixIsSetup)
-      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasis<R>*>(this))->loadDesc(thedesc);
 
    assert( matrixIsSetup );
 
@@ -999,14 +1018,15 @@ Vector& SPxBasis::multBaseWith(Vector& x) const
    return x;
 }
 
-void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
+template <class R>
+void SPxBasis<R>::multBaseWith(SSVector& x, SSVector& result) const
 {
    assert(status() > SINGULAR);
    assert(theLP->dim() == x.dim());
    assert(x.dim() == result.dim());
 
    if (!matrixIsSetup)
-      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasis<R>*>(this))->loadDesc(thedesc);
 
    assert(matrixIsSetup);
 
@@ -1028,11 +1048,12 @@ void SPxBasis::multBaseWith(SSVector& x, SSVector& result) const
    return;
 }
 
+template <class R>
 /* compute an estimated condition number for the current basis matrix
  * by computing estimates of the norms of B and B^-1 using the power method.
  * maxiters and tolerance control the accuracy of the estimate.
  */
-Real SPxBasis::condition(int maxiters, Real tolerance)
+Real SPxBasis<R>::condition(int maxiters, Real tolerance)
 {
    int dimension = matrix.size();
    int miniters = 3;    // minimum number of power method iterations
@@ -1055,7 +1076,7 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
       return 0;
 
    if( !matrixIsSetup )
-      (const_cast<SPxBasis*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasis<R>*>(this))->loadDesc(thedesc);
 
    if( !factorized )
       factorize();
@@ -1119,8 +1140,9 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    return norm * norminv;
 }
 
+template <class R>
 /* compute condition number estimation based on the diagonal of the LU factorization */
-Real SPxBasis::getFastCondition(int type)
+Real SPxBasis<R>::getFastCondition(int type)
 {
    Real cond = infinity;
 
@@ -1130,7 +1152,8 @@ Real SPxBasis::getFastCondition(int type)
    return cond;
 }
 
-void SPxBasis::dump()
+template <class R>
+void SPxBasis<R>::dump()
 {
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
@@ -1172,8 +1195,9 @@ void SPxBasis::dump()
    assert(basesize == matrix.size());
 }
 
+template <class R>
 
-bool SPxBasis::isConsistent() const
+bool SPxBasis<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    int primals = 0;
@@ -1182,20 +1206,20 @@ bool SPxBasis::isConsistent() const
    if (status() > NO_PROBLEM)
    {
       if (theLP == 0)
-         return MSGinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis<R>");
 
       if (theBaseId.size() != theLP->dim() || matrix.size() != theLP->dim())
-         return MSGinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis<R>");
 
       if (thedesc.nCols() != theLP->nCols() || thedesc.nRows() != theLP->nRows())
-         return MSGinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis<R>");
 
       for (i = 0; i < thedesc.nRows(); ++i)
       {
          if (thedesc.rowStatus(i) >= 0)
          {
             if (thedesc.rowStatus(i) != dualRowStatus(i))
-               return MSGinconsistent("SPxBasis");
+               return MSGinconsistent("SPxBasis<R>");
          }
          else
             ++primals;
@@ -1206,13 +1230,13 @@ bool SPxBasis::isConsistent() const
          if (thedesc.colStatus(i) >= 0)
          {
             if (thedesc.colStatus(i) != dualColStatus(i))
-               return MSGinconsistent("SPxBasis");
+               return MSGinconsistent("SPxBasis<R>");
          }
          else
             ++primals;
       }
       if (primals != thedesc.nCols())
-         return MSGinconsistent("SPxBasis");
+         return MSGinconsistent("SPxBasis<R>");
    }
    return thedesc.isConsistent() && theBaseId.isConsistent() 
       && matrix.isConsistent() && factor->isConsistent();
@@ -1221,7 +1245,8 @@ bool SPxBasis::isConsistent() const
 #endif // CONSISTENCY_CHECKS
 }
 
-SPxBasis::SPxBasis(Timer::TYPE ttype)
+template <class R>
+SPxBasis<R>::SPxBasis(Timer::TYPE ttype)
    : theLP (0)
    , matrixIsSetup (false)
    , factor (0)
@@ -1252,12 +1277,14 @@ SPxBasis::SPxBasis(Timer::TYPE ttype)
    theTime = TimerFactory::createTimer(timerType);
 }
 
+
 /**@warning Do not change the LP object.
  *  Only pointer to that object is copied.
  *  Hint: no problem, we use this function for copy
- *   constructor of SPxSolver
+ *   constructor of SPxSolver<R>
  */
-SPxBasis::SPxBasis(const SPxBasis& old)
+  template <class R>
+  SPxBasis<R>::SPxBasis(const SPxBasis<R>& old)
    : theLP(old.theLP)
    , theBaseId(old.theBaseId)
    , matrix(old.matrix)
@@ -1291,10 +1318,11 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    this->factor = old.factor->clone();
    freeSlinSolver = true;
 
-   assert(SPxBasis::isConsistent());
+   assert(SPxBasis<R>::isConsistent());
 }
 
-SPxBasis::~SPxBasis()
+template <class R>
+SPxBasis<R>::~SPxBasis<R>()
 {
 
    assert(!freeSlinSolver || factor != 0);
@@ -1308,11 +1336,12 @@ SPxBasis::~SPxBasis()
    spx_free(theTime);
 }
 
+template <class R>
 
-/**@warning  Note that we do not create a deep copy of the corresponding SPxSolver object.
+/**@warning  Note that we do not create a deep copy of the corresponding SPxSolver<R> object.
  *  Only the reference to that object is copied.
  */
-SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
+SPxBasis<R>& SPxBasis<R>::operator=(const SPxBasis<R>& rhs)
 {
 
    assert(!freeSlinSolver || factor != 0);
@@ -1348,12 +1377,13 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       thestatus     = rhs.thestatus;
       thedesc       = rhs.thedesc;
 
-      assert(SPxBasis::isConsistent());
+      assert(SPxBasis<R>::isConsistent());
    }
 
    return *this;
 }
 
+template <class R>
 
 //
 // Auxiliary functions.
@@ -1361,32 +1391,32 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
 
 // Pretty-printing of basis status.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxBasis::SPxStatus& status )
+                          const typename SPxBasis<R>::SPxStatus& status )
 {
    switch ( status )
       {
-      case SPxBasis::NO_PROBLEM:
+      case SPxBasis<R>::NO_PROBLEM:
          os << "NO_PROBLEM";
          break;
-      case SPxBasis::SINGULAR:
+      case SPxBasis<R>::SINGULAR:
          os << "SINGULAR";
          break;
-      case SPxBasis::REGULAR:
+      case SPxBasis<R>::REGULAR:
          os << "REGULAR";
          break;
-      case SPxBasis::DUAL:
+      case SPxBasis<R>::DUAL:
          os << "DUAL";
          break;
-      case SPxBasis::PRIMAL:
+      case SPxBasis<R>::PRIMAL:
          os << "PRIMAL";
          break;
-      case SPxBasis::OPTIMAL:
+      case SPxBasis<R>::OPTIMAL:
          os << "OPTIMAL";
          break;
-      case SPxBasis::UNBOUNDED:
+      case SPxBasis<R>::UNBOUNDED:
          os << "UNBOUNDED";
          break;
-      case SPxBasis::INFEASIBLE:
+      case SPxBasis<R>::INFEASIBLE:
          os << "INFEASIBLE";
          break;
       default:
