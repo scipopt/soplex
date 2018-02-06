@@ -60,7 +60,7 @@ bool SPxWeightST::isConsistent() const
     respectively.
  */
 void SPxWeightST::setPrimalStatus(
-   SPxBasis::Desc& desc, 
+   SPxBasis<R>::Desc& desc, 
    const SPxSolver& base, 
    const SPxId& id)
 {
@@ -71,20 +71,20 @@ void SPxWeightST::setPrimalStatus(
       if (base.rhs(n) >= infinity)
       {
          if (base.lhs(n) <= -infinity)
-            desc.rowStatus(n) = SPxBasis::Desc::P_FREE;
+            desc.rowStatus(n) = SPxBasis<R>::Desc::P_FREE;
          else
-            desc.rowStatus(n) = SPxBasis::Desc::P_ON_LOWER;
+            desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
       }
       else
       {
          if (base.lhs(n) <= -infinity)
-            desc.rowStatus(n) = SPxBasis::Desc::P_ON_UPPER;
+            desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
          else if (base.lhs(n) >= base.rhs(n) - base.epsilon())
-            desc.rowStatus(n) = SPxBasis::Desc::P_FIXED;
+            desc.rowStatus(n) = SPxBasis<R>::Desc::P_FIXED;
          else if (rowRight[n])
-            desc.rowStatus(n) = SPxBasis::Desc::P_ON_UPPER;
+            desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
          else
-            desc.rowStatus(n) = SPxBasis::Desc::P_ON_LOWER;
+            desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
       }
    }
    else
@@ -93,27 +93,27 @@ void SPxWeightST::setPrimalStatus(
       if (base.SPxLP::upper(n) >= infinity)
       {
          if (base.SPxLP::lower(n) <= -infinity)
-            desc.colStatus(n) = SPxBasis::Desc::P_FREE;
+            desc.colStatus(n) = SPxBasis<R>::Desc::P_FREE;
          else
-            desc.colStatus(n) = SPxBasis::Desc::P_ON_LOWER;
+            desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
       }
       else
       {
          if (base.SPxLP::lower(n) <= -infinity)
-            desc.colStatus(n) = SPxBasis::Desc::P_ON_UPPER;
+            desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
          else if (base.SPxLP::lower(n) >= base.SPxLP::upper(n) - base.epsilon())
-            desc.colStatus(n) = SPxBasis::Desc::P_FIXED;
+            desc.colStatus(n) = SPxBasis<R>::Desc::P_FIXED;
          else if (colUp[n])
-            desc.colStatus(n) = SPxBasis::Desc::P_ON_UPPER;
+            desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
          else
-            desc.colStatus(n) = SPxBasis::Desc::P_ON_LOWER;
+            desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
       }
    }
 }
 
 // ----------------------------------------------------------------
 static void setDualStatus(
-   SPxBasis::Desc& desc, 
+   SPxBasis<R>::Desc& desc, 
    const SPxSolver& base, 
    const SPxId& id)
 {
@@ -236,7 +236,7 @@ void SPxWeightST::generate(SPxSolver& base)
 
    setupWeights(base);
 
-   SPxBasis::Desc desc(base);
+   SPxBasis<R>::Desc desc(base);
    //   desc.reSize(base.nRows(), base.nCols());
 
    DataArray < SPxId > pref(base.nRows() + base.nCols());
@@ -389,17 +389,17 @@ void SPxWeightST::generate(SPxSolver& base)
    const Vector& pvec = base.pVec();
    for (i = pvec.dim() - 1; i >= 0; --i)
    {
-      if (desc.colStatus(i) == SPxBasis::Desc::P_ON_UPPER
+      if (desc.colStatus(i) == SPxBasis<R>::Desc::P_ON_UPPER
          && base.lower(i) > -infinity && pvec[i] > base.maxObj(i))
       {
          changed = 1;
-         desc.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+         desc.colStatus(i) = SPxBasis<R>::Desc::P_ON_LOWER;
       }
-      else if (desc.colStatus(i) == SPxBasis::Desc::P_ON_LOWER
+      else if (desc.colStatus(i) == SPxBasis<R>::Desc::P_ON_LOWER
          && base.upper(i) < infinity && pvec[i] < base.maxObj(i))
       {
          changed = 1;
-         desc.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+         desc.colStatus(i) = SPxBasis<R>::Desc::P_ON_UPPER;
       }
    }
 

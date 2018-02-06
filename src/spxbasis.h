@@ -247,7 +247,7 @@ namespace soplex
       {
         return rowstat[i];
       }
-      /// returns the array of row  \ref soplex::SPxBasis::Desc::Status "Status"es.
+      /// returns the array of row  \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
       const Status* rowStatus(void) const
       {
         return rowstat.get_const_ptr();
@@ -262,7 +262,7 @@ namespace soplex
       {
         return colstat[i];
       }
-      /// returns the array of column \ref soplex::SPxBasis::Desc::Status "Status"es.
+      /// returns the array of column \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
       const Status* colStatus(void) const
       {
         return colstat.get_const_ptr();
@@ -277,7 +277,7 @@ namespace soplex
       {
         return (*stat)[i];
       }
-      /// returns the array of variable \ref soplex::SPxBasis::Desc::Status "Status"es.
+      /// returns the array of variable \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
       const Status* status(void) const
       {
         return stat->get_const_ptr();
@@ -292,7 +292,7 @@ namespace soplex
       {
         return (*costat)[i];
       }
-      /// returns the array of covariable \ref soplex::SPxBasis::Desc::Status "Status"es.
+      /// returns the array of covariable \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
       const Status* coStatus(void) const
       {
         return costat->get_const_ptr();
@@ -347,7 +347,7 @@ namespace soplex
     DataArray < SPxId > theBaseId;
     /// pointers to the vectors of the basis matrix.
     DataArray < const SVector* > matrix;
-    /// \c true iff the pointers in \ref soplex::SPxBasis::matrix "matrix" are set up correctly.
+    /// \c true iff the pointers in \ref soplex::SPxBasis<R>::matrix "matrix" are set up correctly.
     bool matrixIsSetup;
 
     /* @brief LU factorization of basis matrix
@@ -355,7 +355,7 @@ namespace soplex
        Otherwise #factor is undefined.
     */
     SLinSolver* factor;
-    /// \c true iff \ref soplex::SPxBasis::factor "factor" = \ref soplex::SPxBasis::matrix "matrix" \f$^{-1}\f$.
+    /// \c true iff \ref soplex::SPxBasis<R>::factor "factor" = \ref soplex::SPxBasis<R>::matrix "matrix" \f$^{-1}\f$.
     bool factorized;
 
     /// number of updates before refactorization.
@@ -436,7 +436,7 @@ namespace soplex
       if( thestatus != stat )
         {
 #ifdef SOPLEX_DEBUG
-          MSG_DEBUG( std::cout << "DBSTAT01 SPxBasis::setStatus(): status: "
+          MSG_DEBUG( std::cout << "DBSTAT01 SPxBasis<R>::setStatus(): status: "
                      << int(thestatus) << " (" << thestatus << ") -> "
                      << int(stat) << " (" << stat << ")" << std::endl; )
 #endif
@@ -543,7 +543,7 @@ namespace soplex
       return updateCount;
     }
 
-    /// returns number of basis changes since last \ref soplex::SPxBasis::load() "load()".
+    /// returns number of basis changes since last \ref soplex::SPxBasis<R>::load() "load()".
     inline int iteration() const
     {
       return iterCount;
@@ -638,7 +638,7 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveRight(x, rhs);
     }
     ///
@@ -650,7 +650,7 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveRight(x, rhs);
     }
     /// solves linear system with basis matrix.
@@ -671,21 +671,21 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveRight4update(x, rhs);
     }
     /// solves two systems in one call.
     void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized)
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
     }
     /// solves two systems in one call using only sparse data structures
     void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized)
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
     }
     /// solves three systems in one call.
@@ -693,7 +693,7 @@ namespace soplex
                       const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
     {
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
@@ -703,7 +703,7 @@ namespace soplex
                       const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
     {
       if (!factorized)
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
@@ -726,7 +726,7 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveLeft(x, rhs);
     }
     /// Sparse version of coSolve
@@ -738,35 +738,35 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveLeft(x, rhs);
     }
     /// solves two systems in one call.
     void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized)
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
     /// Sparse version of solving two systems in one call.
     void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized) 
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
     /// solves three systems in one call. May be improved by using just one pass through the basis.
     void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
     {
       if (!factorized)
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
     }
     /// Sparse version of solving three systems in one call.
     void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
     {
       if (!factorized)
-        SPxBasis::factorize();
+        SPxBasis<R>::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
     }
     //@}
@@ -947,7 +947,7 @@ namespace soplex
     //--------------------------------------
     /**@name Protected helpers */
     //@{
-    /// loads \ref soplex::SPxBasis::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis::theBaseId "theBaseId".
+    /// loads \ref soplex::SPxBasis<R>::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis<R>::theBaseId "theBaseId".
     /** This method must  be called whenever there is a chance, that the vector
         pointers may have changed due to manipulations of the LP.
     */

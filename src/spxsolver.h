@@ -521,7 +521,7 @@ namespace soplex
      *  -# Optionally setup an start basis generation method by loading an
      *     \ref soplex::SPxStarter "SPxStarter" object.
      *  -# Optionally setup a start basis by loading a
-     *     \ref soplex::SPxBasis::Desc "SPxBasis::Desc" object.
+     *     \ref soplex::SPxBasis<R>::Desc "SPxBasis<R>::Desc" object.
      *  -# Optionally switch to another basis
      *     \ref soplex::SPxSolver<R>::Representation "Representation"
      *     by calling method \ref soplex::SPxSolver<R>::setRep() "setRep()".
@@ -1226,7 +1226,7 @@ namespace soplex
 
     //------------------------------------
     /**@name Variable status
-     *  The Simplex basis assigns a \ref soplex::SPxBasis::Desc::Status
+     *  The Simplex basis assigns a \ref soplex::SPxBasis<R>::Desc::Status
      *  "Status" to each variable and covariable. Depending on the
      *  representation, the status indicates that the corresponding
      *  vector is in the basis matrix or not.

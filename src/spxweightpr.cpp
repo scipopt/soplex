@@ -159,7 +159,7 @@ SPxId SPxWeightPR::selectEnter()
                          ? solver()->test() : solver()->coTest();
    const Vector& cTest = (solver()->rep() == SPxSolver<R>::ROW)
                          ? solver()->coTest() : solver()->test();
-   const SPxBasis::Desc& ds = solver()->basis().desc();
+   const SPxBasis<R>::Desc& ds = solver()->basis().desc();
    Real best = infinity;
    SPxId lastId;
    Real x;
@@ -173,25 +173,25 @@ SPxId SPxWeightPR::selectEnter()
          x *= -x;
          switch (ds.rowStatus(i))
          {
-         case SPxBasis::Desc::P_ON_LOWER :
-         case SPxBasis::Desc::D_ON_LOWER :
+         case SPxBasis<R>::Desc::P_ON_LOWER :
+         case SPxBasis<R>::Desc::D_ON_LOWER :
             x *= 1 + rPenalty[i];
             break;
-         case SPxBasis::Desc::P_ON_UPPER :
-         case SPxBasis::Desc::D_ON_UPPER :
+         case SPxBasis<R>::Desc::P_ON_UPPER :
+         case SPxBasis<R>::Desc::D_ON_UPPER :
             x *= 1 - rPenalty[i];
             break;
-         case SPxBasis::Desc::P_FREE :
-         case SPxBasis::Desc::D_FREE :
+         case SPxBasis<R>::Desc::P_FREE :
+         case SPxBasis<R>::Desc::D_FREE :
             return SPxId(solver()->rId(i));
-         case SPxBasis::Desc::D_ON_BOTH :
+         case SPxBasis<R>::Desc::D_ON_BOTH :
             if (solver()->pVec()[i] > solver()->upBound()[i])
                x *= 1 + rPenalty[i];
             else
                x *= 1 - rPenalty[i];
             break;
-         case SPxBasis::Desc::D_UNDEFINED :
-         case SPxBasis::Desc::P_FIXED :
+         case SPxBasis<R>::Desc::D_UNDEFINED :
+         case SPxBasis<R>::Desc::P_FIXED :
          default:
             throw SPxInternalCodeException("XWGTPR01 This should never happen.");
          }
@@ -211,25 +211,25 @@ SPxId SPxWeightPR::selectEnter()
          x *= -x;
          switch (ds.colStatus(i))
          {
-         case SPxBasis::Desc::P_ON_LOWER :
-         case SPxBasis::Desc::D_ON_LOWER :
+         case SPxBasis<R>::Desc::P_ON_LOWER :
+         case SPxBasis<R>::Desc::D_ON_LOWER :
             x *= 1 + cPenalty[i];
             break;
-         case SPxBasis::Desc::P_ON_UPPER :
-         case SPxBasis::Desc::D_ON_UPPER :
+         case SPxBasis<R>::Desc::P_ON_UPPER :
+         case SPxBasis<R>::Desc::D_ON_UPPER :
             x *= 1 - cPenalty[i];
             break;
-         case SPxBasis::Desc::P_FREE :
-         case SPxBasis::Desc::D_FREE :
+         case SPxBasis<R>::Desc::P_FREE :
+         case SPxBasis<R>::Desc::D_FREE :
             return SPxId(solver()->cId(i));
-         case SPxBasis::Desc::D_ON_BOTH :
+         case SPxBasis<R>::Desc::D_ON_BOTH :
             if (solver()->coPvec()[i] > solver()->ucBound()[i])
                x *= 1 + cPenalty[i];
             else
                x *= 1 - cPenalty[i];
             break;
-         case SPxBasis::Desc::P_FIXED :
-         case SPxBasis::Desc::D_UNDEFINED :
+         case SPxBasis<R>::Desc::P_FIXED :
+         case SPxBasis<R>::Desc::D_UNDEFINED :
          default:
             throw SPxInternalCodeException("XWGTPR02 This should never happen.");
          }

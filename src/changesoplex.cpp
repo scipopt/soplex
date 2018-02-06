@@ -41,7 +41,7 @@ namespace soplex
     if( start == SPxLP::nRows() )
       return;
 
-    const SPxBasis::Desc& ds = desc();
+    const SPxBasis<R>::Desc& ds = desc();
 
     if (type() == ENTER)
       {
@@ -75,8 +75,8 @@ namespace soplex
                       }
                   }
               }
-            SPxBasis::solve (*theFvec, *theFrhs);
-            SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+            SPxBasis<R>::solve (*theFvec, *theFrhs);
+            SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
             for (i = start; i < SPxLP::nRows(); ++i)
               {
                 /* we need to compare with tolerance (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal
@@ -158,8 +158,8 @@ namespace soplex
                       }
                   }
               }
-            SPxBasis::solve (*theFvec, *theFrhs);
-            SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+            SPxBasis<R>::solve (*theFvec, *theFrhs);
+            SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
             for (i = start; i < SPxLP::nRows(); ++i)
               {
                 if ((*theFvec)[i] > theUBbound[i])
@@ -180,9 +180,9 @@ namespace soplex
       {
         reDim();
       
-        if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+        if (SPxBasis<R>::status() > SPxBasis<R>::NO_PROBLEM)
           {
-            SPxBasis::addedRows(n);
+            SPxBasis<R>::addedRows(n);
 
             if (isInitialized())
               {
@@ -235,7 +235,7 @@ namespace soplex
     if( start == SPxLP::nCols() )
       return;
 
-    const SPxBasis::Desc& ds = desc();
+    const SPxBasis<R>::Desc& ds = desc();
 
     if (type() == ENTER)
       {
@@ -252,13 +252,13 @@ namespace soplex
                 theLCbound[i] = SPxLP::lower(i);
                 switch (ds.colStatus(i))
                   {
-                  case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+                  case SPxBasis<R>::Desc::P_ON_LOWER + SPxBasis<R>::Desc::P_ON_UPPER :
                     assert(SPxLP::lower(i) == SPxLP::upper(i));
                     /*FALLTHROUGH*/
-                  case SPxBasis::Desc::P_ON_UPPER :
+                  case SPxBasis<R>::Desc::P_ON_UPPER :
                     x = SPxLP::upper(i);
                     break;
-                  case SPxBasis::Desc::P_ON_LOWER :
+                  case SPxBasis<R>::Desc::P_ON_LOWER :
                     x = SPxLP::lower(i);
                     break;
                   default:
@@ -273,7 +273,7 @@ namespace soplex
               }
             if (reSolve)
               {
-                SPxBasis::solve(*theFvec, *theFrhs);
+                SPxBasis<R>::solve(*theFvec, *theFrhs);
                 shiftFvec();
               }
           }
@@ -289,11 +289,11 @@ namespace soplex
                 setEnterBound4Col(i, i);
                 computeEnterCoPrhs4Col(i, i);
               }
-            SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+            SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
             computePvec();
             computeCoTest();
             computeTest();
-            SPxBasis::solve(*theFvec, *theFrhs);
+            SPxBasis<R>::solve(*theFvec, *theFrhs);
             for (i = start; i < SPxLP::nCols(); ++i)
               {
                 /* we need to compare with tolerance (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal
@@ -320,10 +320,10 @@ namespace soplex
                 setLeaveBound4Col(i, i);
                 computeLeaveCoPrhs4Col(i, i);
               }
-            SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
+            SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
             computePvec();
             //          shiftPvec();
-            SPxBasis::solve(*theFvec, *theFrhs);
+            SPxBasis<R>::solve(*theFvec, *theFrhs);
             for (i = start; i < SPxLP::nCols(); ++i)
               {
                 if ((*theFvec)[i] > theUBbound[i])
@@ -358,13 +358,13 @@ namespace soplex
 
                 switch (ds.colStatus(i))
                   {
-                  case SPxBasis::Desc::P_ON_LOWER + SPxBasis::Desc::P_ON_UPPER :
+                  case SPxBasis<R>::Desc::P_ON_LOWER + SPxBasis<R>::Desc::P_ON_UPPER :
                     assert(SPxLP::lower(i) == SPxLP::upper(i));
                     /*FALLTHROUGH*/
-                  case SPxBasis::Desc::P_ON_UPPER :
+                  case SPxBasis<R>::Desc::P_ON_UPPER :
                     x = SPxLP::upper(i);
                     break;
-                  case SPxBasis::Desc::P_ON_LOWER :
+                  case SPxBasis<R>::Desc::P_ON_LOWER :
                     x = SPxLP::lower(i);
                     break;
                   default:
@@ -379,7 +379,7 @@ namespace soplex
               }
             if (reSolve)
               {
-                SPxBasis::solve(*theFvec, *theFrhs);
+                SPxBasis<R>::solve(*theFvec, *theFrhs);
                 computeFtest();
               }
           }
@@ -394,9 +394,9 @@ namespace soplex
       {
         reDim();
       
-        if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+        if (SPxBasis<R>::status() > SPxBasis<R>::NO_PROBLEM)
           {
-            SPxBasis::addedCols(n);
+            SPxBasis<R>::addedCols(n);
             if (isInitialized())
               {
                 localAddCols(nCols() - n);

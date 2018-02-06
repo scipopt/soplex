@@ -200,7 +200,7 @@ void SPxSolver<R>::perturbMin(
          l = p_low[i];
 
          // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
-         if( dualStatus(baseId(i)) == SPxBasis::Desc::D_ON_BOTH )
+         if( dualStatus(baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
          {
             continue;
          }
@@ -277,7 +277,7 @@ void SPxSolver<R>::perturbMax(
          l = p_low[i];
 
          // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
-         if( dualStatus(baseId(i)) == SPxBasis::Desc::D_ON_BOTH )
+         if( dualStatus(baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
          {
             continue;
          }
@@ -326,7 +326,7 @@ Real SPxSolver<R>::perturbMin(
    Vector& p_up,
    Real eps,
    Real p_delta,
-   const SPxBasis::Desc::Status* stat,
+   const SPxBasis<R>::Desc::Status* stat,
    int start,
    int incr)
 {
@@ -399,7 +399,7 @@ Real SPxSolver<R>::perturbMax(
    Vector& p_up,
    Real eps,
    Real p_delta,
-   const SPxBasis::Desc::Status* stat,
+   const SPxBasis<R>::Desc::Status* stat,
    int start,
    int incr)
 {
@@ -501,7 +501,7 @@ void SPxSolver<R>::unShift(void)
    {
       int i;
       Real t_up, t_low;
-      const SPxBasis::Desc& ds = desc();
+      const SPxBasis<R>::Desc& ds = desc();
 
       theShift = 0;
       if (type() == ENTER)

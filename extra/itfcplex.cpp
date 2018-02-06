@@ -80,14 +80,14 @@ public:
          spx_free(m_probname);
    }
    // This is public in SPxBasis, but protected inherted from SoPlex.
-   SPxBasis::Desc::Status dualColStatus(int i) const
+   SPxBasis<R>::Desc::Status dualColStatus(int i) const
    {
-      return SPxBasis::dualColStatus(i);
+      return SPxBasis<R>::dualColStatus(i);
    }
    // This is public in SPxBasis, but protected inherted from SoPlex.
-   SPxBasis::Desc::Status dualRowStatus(int i) const
+   SPxBasis<R>::Desc::Status dualRowStatus(int i) const
    {
-      return SPxBasis::dualRowStatus(i);
+      return SPxBasis<R>::dualRowStatus(i);
    }
    void setProbname(const char* p_probname)
    {
@@ -251,7 +251,7 @@ extern "C" int CPXcopybase(
     
    SPxCPlex* spx = reinterpret_cast<SPxCPlex*>(env);
 
-   SPxBasis::Desc  desc;
+   SPxBasis<R>::Desc  desc;
 
    desc.reSize(spx->nRows(), spx->nCols()) ;
 
@@ -267,16 +267,16 @@ extern "C" int CPXcopybase(
       case CPX_AT_LOWER :
       case CPX_AT_UPPER :
          if (spx->rhs(i + 1) == spx->lhs(i + 1))
-            desc.rowStatus(i + 1) = SPxBasis::Desc::P_FIXED;
+            desc.rowStatus(i + 1) = SPxBasis<R>::Desc::P_FIXED;
          else if (spx->rhs(i + 1) >= SPxLP::infinity)
          {
             assert(spx->lhs(i + 1) > -SPxLP::infinity);
-            desc.rowStatus(i + 1) = SPxBasis::Desc::P_ON_LOWER;
+            desc.rowStatus(i + 1) = SPxBasis<R>::Desc::P_ON_LOWER;
          }
          else if (spx->lhs(i + 1) <= -SPxLP::infinity)
          {
             assert(spx->rhs(i + 1) < SPxLP::infinity) ;
-            desc.rowStatus(i + 1) = SPxBasis::Desc::P_ON_UPPER;
+            desc.rowStatus(i + 1) = SPxBasis<R>::Desc::P_ON_UPPER;
          }
          else
             abort();
@@ -296,21 +296,21 @@ extern "C" int CPXcopybase(
       {
       case 0:
          if (spx->upper(i) == spx->lower(i))
-            desc.colStatus(i) = SPxBasis::Desc::P_FIXED;
+            desc.colStatus(i) = SPxBasis<R>::Desc::P_FIXED;
          else
-            desc.colStatus(i) = SPxBasis::Desc::P_ON_LOWER;
+            desc.colStatus(i) = SPxBasis<R>::Desc::P_ON_LOWER;
          break;
       case 2:
          if (spx->upper(i) == spx->lower(i))
-            desc.colStatus(i) = SPxBasis::Desc::P_FIXED;
+            desc.colStatus(i) = SPxBasis<R>::Desc::P_FIXED;
          else
-            desc.colStatus(i) = SPxBasis::Desc::P_ON_UPPER;
+            desc.colStatus(i) = SPxBasis<R>::Desc::P_ON_UPPER;
          break;
       case 1:
          desc.colStatus(i) = spx->dualColStatus(i);
          break;
       case 3:
-         desc.colStatus(i) = SPxBasis::Desc::P_FREE;
+         desc.colStatus(i) = SPxBasis<R>::Desc::P_FREE;
          break;
       default:
          return CPXERR_BAD_ARGUMENT;
@@ -330,7 +330,7 @@ extern "C" int CPXgetbase(
       return CPXERR_NULL_POINTER;
     
    SPxCPlex*             spx  = reinterpret_cast<SPxCPlex*>(env);
-   const SPxBasis::Desc& desc = spx->basis().desc();
+   const SPxBasis<R>::Desc& desc = spx->basis().desc();
 
    if (cstat != 0)
    {
@@ -338,21 +338,21 @@ extern "C" int CPXgetbase(
       {
          switch(desc.colStatus(i))
          {
-         case SPxBasis::Desc::P_ON_LOWER:
+         case SPxBasis<R>::Desc::P_ON_LOWER:
             cstat[i] = CPX_AT_LOWER;
             break ;
-         case SPxBasis::Desc::P_ON_UPPER:
-         case SPxBasis::Desc::P_FIXED:
+         case SPxBasis<R>::Desc::P_ON_UPPER:
+         case SPxBasis<R>::Desc::P_FIXED:
             cstat[i] = CPX_AT_UPPER;
             break ;
-         case SPxBasis::Desc::P_FREE:
+         case SPxBasis<R>::Desc::P_FREE:
             cstat[i] = CPX_FREE_SUPER;
             break ;
-         case SPxBasis::Desc::D_ON_UPPER:
-         case SPxBasis::Desc::D_ON_LOWER:
-         case SPxBasis::Desc::D_ON_BOTH:
-         case SPxBasis::Desc::D_UNDEFINED:
-         case SPxBasis::Desc::D_FREE:
+         case SPxBasis<R>::Desc::D_ON_UPPER:
+         case SPxBasis<R>::Desc::D_ON_LOWER:
+         case SPxBasis<R>::Desc::D_ON_BOTH:
+         case SPxBasis<R>::Desc::D_UNDEFINED:
+         case SPxBasis<R>::Desc::D_FREE:
             cstat[i] = CPX_BASIC;
             break ;
          default:
@@ -366,17 +366,17 @@ extern "C" int CPXgetbase(
       {
          switch(desc.rowStatus(i + 1))
          {
-         case SPxBasis::Desc::P_ON_LOWER:
-         case SPxBasis::Desc::P_ON_UPPER:
-         case SPxBasis::Desc::P_FIXED:
-         case SPxBasis::Desc::P_FREE:
+         case SPxBasis<R>::Desc::P_ON_LOWER:
+         case SPxBasis<R>::Desc::P_ON_UPPER:
+         case SPxBasis<R>::Desc::P_FIXED:
+         case SPxBasis<R>::Desc::P_FREE:
             rstat[i] = CPX_AT_LOWER;
             break ;
-         case SPxBasis::Desc::D_ON_UPPER:
-         case SPxBasis::Desc::D_ON_LOWER:
-         case SPxBasis::Desc::D_ON_BOTH:
-         case SPxBasis::Desc::D_UNDEFINED:
-         case SPxBasis::Desc::D_FREE:
+         case SPxBasis<R>::Desc::D_ON_UPPER:
+         case SPxBasis<R>::Desc::D_ON_LOWER:
+         case SPxBasis<R>::Desc::D_ON_BOTH:
+         case SPxBasis<R>::Desc::D_UNDEFINED:
+         case SPxBasis<R>::Desc::D_FREE:
             rstat[i] = CPX_BASIC;
             break ;
          default:

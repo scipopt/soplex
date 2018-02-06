@@ -54,23 +54,23 @@ void SPxSolver<R>::computeFrhs()
          {
             Real x;
 
-            SPxBasis::Desc::Status stat = desc().rowStatus(i);
+            SPxBasis<R>::Desc::Status stat = desc().rowStatus(i);
 
             if (!isBasic(stat))
             {
                switch (stat)
                {
                   // columnwise cases:
-               case SPxBasis::Desc::P_FREE :
+               case SPxBasis<R>::Desc::P_FREE :
                   continue;
 
-               case (SPxBasis::Desc::P_FIXED) :
+               case (SPxBasis<R>::Desc::P_FIXED) :
                   assert(EQ(lhs(i), rhs(i)));
                   //lint -fallthrough
-               case SPxBasis::Desc::P_ON_UPPER :
+               case SPxBasis<R>::Desc::P_ON_UPPER :
                   x = rhs(i);
                   break;
-               case SPxBasis::Desc::P_ON_LOWER :
+               case SPxBasis<R>::Desc::P_ON_LOWER :
                   x = lhs(i);
                   break;
 
@@ -107,10 +107,10 @@ void SPxSolver<R>::computeFrhs()
       {
          ///@todo put this into a separate method
          *theFrhs = maxObj();
-         const SPxBasis::Desc& ds = desc();
+         const SPxBasis<R>::Desc& ds = desc();
          for (int i = 0; i < nRows(); ++i)
          {
-            SPxBasis::Desc::Status stat = ds.rowStatus(i);
+            SPxBasis<R>::Desc::Status stat = ds.rowStatus(i);
 
             if (!isBasic(stat))
             {
@@ -118,12 +118,12 @@ void SPxSolver<R>::computeFrhs()
 
                switch (stat)
                {
-               case SPxBasis::Desc::D_FREE :
+               case SPxBasis<R>::Desc::D_FREE :
                   continue;
 
-               case SPxBasis::Desc::D_ON_UPPER :
-               case SPxBasis::Desc::D_ON_LOWER :
-               case (SPxBasis::Desc::D_ON_BOTH) :
+               case SPxBasis<R>::Desc::D_ON_UPPER :
+               case SPxBasis<R>::Desc::D_ON_LOWER :
+               case (SPxBasis<R>::Desc::D_ON_BOTH) :
                   x = maxRowObj(i);
                   break;
 
@@ -152,7 +152,7 @@ void SPxSolver<R>::computeFrhsXtra()
 
    for (int i = 0; i < nCols(); ++i)
    {
-      SPxBasis::Desc::Status stat = desc().colStatus(i);
+      SPxBasis<R>::Desc::Status stat = desc().colStatus(i);
 
       if (!isBasic(stat))
       {
@@ -161,16 +161,16 @@ void SPxSolver<R>::computeFrhsXtra()
          switch (stat)
          {
             // columnwise cases:
-         case SPxBasis::Desc::P_FREE :
+         case SPxBasis<R>::Desc::P_FREE :
             continue;
 
-         case (SPxBasis::Desc::P_FIXED) :
+         case (SPxBasis<R>::Desc::P_FIXED) :
             assert(EQ(SPxLP::lower(i), SPxLP::upper(i)));
             //lint -fallthrough
-         case SPxBasis::Desc::P_ON_UPPER :
+         case SPxBasis<R>::Desc::P_ON_UPPER :
             x = SPxLP::upper(i);
             break;
-         case SPxBasis::Desc::P_ON_LOWER :
+         case SPxBasis<R>::Desc::P_ON_LOWER :
             x = SPxLP::lower(i);
             break;
 
@@ -199,11 +199,11 @@ void SPxSolver<R>::computeFrhs1(
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
 
-   const SPxBasis::Desc& ds = desc();
+   const SPxBasis<R>::Desc& ds = desc();
 
    for (int i = 0; i < coDim(); ++i)
    {
-      SPxBasis::Desc::Status stat = ds.status(i);
+      SPxBasis<R>::Desc::Status stat = ds.status(i);
 
       if (!isBasic(stat))
       {
@@ -211,24 +211,24 @@ void SPxSolver<R>::computeFrhs1(
 
          switch (stat)
          {
-         case SPxBasis::Desc::D_FREE :
-         case SPxBasis::Desc::D_UNDEFINED :
-         case SPxBasis::Desc::P_FREE :
+         case SPxBasis<R>::Desc::D_FREE :
+         case SPxBasis<R>::Desc::D_UNDEFINED :
+         case SPxBasis<R>::Desc::P_FREE :
             continue;
 
-         case SPxBasis::Desc::P_ON_UPPER :
-         case SPxBasis::Desc::D_ON_UPPER :
+         case SPxBasis<R>::Desc::P_ON_UPPER :
+         case SPxBasis<R>::Desc::D_ON_UPPER :
             x = ufb[i];
             break;
-         case SPxBasis::Desc::P_ON_LOWER :
-         case SPxBasis::Desc::D_ON_LOWER :
+         case SPxBasis<R>::Desc::P_ON_LOWER :
+         case SPxBasis<R>::Desc::D_ON_LOWER :
             x = lfb[i];
             break;
 
-         case (SPxBasis::Desc::P_FIXED) :
+         case (SPxBasis<R>::Desc::P_FIXED) :
             assert(EQ(lfb[i], ufb[i]));
             //lint -fallthrough
-         case (SPxBasis::Desc::D_ON_BOTH) :
+         case (SPxBasis<R>::Desc::D_ON_BOTH) :
             x = lfb[i];
             break;
 
@@ -255,11 +255,11 @@ void SPxSolver<R>::computeFrhs2(
    Vector& coufb,   ///< upper feasibility bound for covariables
    Vector& colfb)   ///< lower feasibility bound for covariables
 {
-   const SPxBasis::Desc& ds = desc();
+   const SPxBasis<R>::Desc& ds = desc();
 
    for(int i = 0; i < dim(); ++i)
    {
-      SPxBasis::Desc::Status stat = ds.coStatus(i);
+      SPxBasis<R>::Desc::Status stat = ds.coStatus(i);
 
       if (!isBasic(stat))
       {
@@ -267,21 +267,21 @@ void SPxSolver<R>::computeFrhs2(
 
          switch (stat)
          {
-         case SPxBasis::Desc::D_FREE :
-         case SPxBasis::Desc::D_UNDEFINED :
-         case SPxBasis::Desc::P_FREE :
+         case SPxBasis<R>::Desc::D_FREE :
+         case SPxBasis<R>::Desc::D_UNDEFINED :
+         case SPxBasis<R>::Desc::P_FREE :
             continue;
 
-         case SPxBasis::Desc::P_ON_LOWER :            // negative slack bounds!
-         case SPxBasis::Desc::D_ON_UPPER :
+         case SPxBasis<R>::Desc::P_ON_LOWER :            // negative slack bounds!
+         case SPxBasis<R>::Desc::D_ON_UPPER :
             x = coufb[i];
             break;
-         case SPxBasis::Desc::P_ON_UPPER :            // negative slack bounds!
-         case SPxBasis::Desc::D_ON_LOWER :
+         case SPxBasis<R>::Desc::P_ON_UPPER :            // negative slack bounds!
+         case SPxBasis<R>::Desc::D_ON_LOWER :
             x = colfb[i];
             break;
-         case SPxBasis::Desc::P_FIXED :
-         case SPxBasis::Desc::D_ON_BOTH :
+         case SPxBasis<R>::Desc::P_FIXED :
+         case SPxBasis<R>::Desc::D_ON_BOTH :
 
             if (colfb[i] != coufb[i])
             {
@@ -341,16 +341,16 @@ void SPxSolver<R>::computeEnterCoPrhs4Row(int i, int n)
    switch (desc().rowStatus(n))
    {
    // rowwise representation:
-   case SPxBasis::Desc::P_FIXED :
+   case SPxBasis<R>::Desc::P_FIXED :
       assert(lhs(n) > -infinity);
       assert(EQ(rhs(n), lhs(n)));
       //lint -fallthrough
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       assert(rep() == ROW);
       assert(rhs(n) < infinity);
       (*theCoPrhs)[i] = rhs(n);
       break;
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       assert(rep() == ROW);
       assert(lhs(n) > -infinity);
       (*theCoPrhs)[i] = lhs(n);
@@ -371,27 +371,27 @@ void SPxSolver<R>::computeEnterCoPrhs4Col(int i, int n)
    switch (desc().colStatus(n))
    {
       // rowwise representation:
-   case SPxBasis::Desc::P_FIXED :
+   case SPxBasis<R>::Desc::P_FIXED :
       assert(EQ(SPxLP::upper(n), SPxLP::lower(n)));
       assert(SPxLP::lower(n) > -infinity);
       //lint -fallthrough
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       assert(rep() == ROW);
       assert(SPxLP::upper(n) < infinity);
       (*theCoPrhs)[i] = SPxLP::upper(n);
       break;
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       assert(rep() == ROW);
       assert(SPxLP::lower(n) > -infinity);
       (*theCoPrhs)[i] = SPxLP::lower(n);
       break;
 
       // columnwise representation:
-   case SPxBasis::Desc::D_UNDEFINED :
-   case SPxBasis::Desc::D_ON_BOTH :
-   case SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::D_ON_LOWER :
-   case SPxBasis::Desc::D_FREE :
+   case SPxBasis<R>::Desc::D_UNDEFINED :
+   case SPxBasis<R>::Desc::D_ON_BOTH :
+   case SPxBasis<R>::Desc::D_ON_UPPER :
+   case SPxBasis<R>::Desc::D_ON_LOWER :
+   case SPxBasis<R>::Desc::D_FREE :
       assert(rep() == COLUMN);
       (*theCoPrhs)[i] = maxObj(n);
       break;
@@ -422,19 +422,19 @@ void SPxSolver<R>::computeLeaveCoPrhs4Row(int i, int n)
    assert(number(SPxRowId(baseId(i))) == n);
    switch (desc().rowStatus(n))
    {
-   case SPxBasis::Desc::D_ON_BOTH :
-   case SPxBasis::Desc::P_FIXED :
+   case SPxBasis<R>::Desc::D_ON_BOTH :
+   case SPxBasis<R>::Desc::P_FIXED :
       assert(theLRbound[n] > -infinity);
       assert(EQ(theURbound[n], theLRbound[n]));
       //lint -fallthrough
-   case SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::D_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       assert(theURbound[n] < infinity);
       (*theCoPrhs)[i] = theURbound[n];
       break;
 
-   case SPxBasis::Desc::D_ON_LOWER :
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::D_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       assert(theLRbound[n] > -infinity);
       (*theCoPrhs)[i] = theLRbound[n];
       break;
@@ -451,19 +451,19 @@ void SPxSolver<R>::computeLeaveCoPrhs4Col(int i, int n)
    assert(number(SPxColId(baseId(i))) == n);
    switch (desc().colStatus(n))
    {
-   case SPxBasis::Desc::D_UNDEFINED :
-   case SPxBasis::Desc::D_ON_BOTH :
-   case SPxBasis::Desc::P_FIXED :
+   case SPxBasis<R>::Desc::D_UNDEFINED :
+   case SPxBasis<R>::Desc::D_ON_BOTH :
+   case SPxBasis<R>::Desc::P_FIXED :
       assert(theLCbound[n] > -infinity);
       assert(EQ(theUCbound[n], theLCbound[n]));
       //lint -fallthrough
-   case SPxBasis::Desc::D_ON_LOWER :
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::D_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       assert(theUCbound[n] < infinity);
       (*theCoPrhs)[i] = theUCbound[n];
       break;
-   case SPxBasis::Desc::D_ON_UPPER :
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::D_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       assert(theLCbound[n] > -infinity);
       (*theCoPrhs)[i] = theLCbound[n];
       break;

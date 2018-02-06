@@ -55,7 +55,7 @@ SPxId SPxParMultPR::selectEnter()
    Real x;
    int i;
    int best = -1;
-   //    const SPxBasis::Desc& ds   = this->thesolver->basis().desc();
+   //    const SPxBasis<R>::Desc& ds   = this->thesolver->basis().desc();
 
    assert(thesolver != 0);
    int lastlast = -1;
@@ -147,8 +147,8 @@ SPxId SPxParMultPR::selectEnter()
       for (i = this->thesolver->dim() - 1; i >= 0; --i)
       {
          x = this->thesolver->coTest()[i];
-         // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
-         //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
+         // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
+         //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
          if (x < bestx)
          {
             id = this->thesolver->coId(i);
@@ -159,8 +159,8 @@ SPxId SPxParMultPR::selectEnter()
       for (i = this->thesolver->coDim() - 1; i >= 0; --i)
       {
          x = this->thesolver->test()[i];
-         // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis::Desc::P_FREE
-         //                || ds.status(i) == SPxBasis::Desc::D_FREE));
+         // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<R>::Desc::P_FREE
+         //                || ds.status(i) == SPxBasis<R>::Desc::D_FREE));
          if (x < bestx)
          {
             id = this->thesolver->id(i);

@@ -92,7 +92,7 @@ namespace soplex
   {
     assert(thesolver != 0);
 
-    // const SPxBasis::Desc&    ds   = this->thesolver->basis().desc();
+    // const SPxBasis<R>::Desc&    ds   = this->thesolver->basis().desc();
 
     SPxId enterId;
     enterId = selectEnterX();
@@ -136,8 +136,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
             if (x < best)
               {
                 enterId = this->thesolver->coId(idx);
@@ -170,8 +170,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
             if (x < best)
               {
                 enterId = this->thesolver->id(idx);
@@ -201,8 +201,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
             if (x < best)
               {
                 enterId   = this->thesolver->coId(i);
@@ -226,8 +226,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis::Desc::P_FREE
-            //                || ds.status(i) == SPxBasis::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<R>::Desc::P_FREE
+            //                || ds.status(i) == SPxBasis<R>::Desc::D_FREE));
             if (x < best)
               {
                 enterId   = this->thesolver->id(i);

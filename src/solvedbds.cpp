@@ -3926,12 +3926,12 @@ void SoPlex<R>::printDecompDisplayLine(SPxSolver<R>& solver, const SPxOut::Verbo
                      //_compSolver.obj(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))))
                   //{
                      //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                        //SPxBasis::Desc::D_ON_LOWER )
+                        //SPxBasis<R>::Desc::D_ON_LOWER )
                      //{
                         //_basisStatusRows[rowNumber] = SPxSolver<R>::ON_LOWER;
                      //}
                      //else if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))) ==
-                        //SPxBasis::Desc::D_ON_UPPER )
+                        //SPxBasis<R>::Desc::D_ON_UPPER )
                      //{
                         //_basisStatusRows[rowNumber] = SPxSolver<R>::ON_UPPER;
                      //}
@@ -3944,12 +3944,12 @@ void SoPlex<R>::printDecompDisplayLine(SPxSolver<R>& solver, const SPxOut::Verbo
                   //else
                   //{
                      //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                        //SPxBasis::Desc::D_ON_UPPER )
+                        //SPxBasis<R>::Desc::D_ON_UPPER )
                      //{
                         //_basisStatusRows[rowNumber] = SPxSolver<R>::ON_UPPER;
                      //}
                      //else if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))) ==
-                        //SPxBasis::Desc::D_ON_LOWER )
+                        //SPxBasis<R>::Desc::D_ON_LOWER )
                      //{
                         //_basisStatusRows[rowNumber] = SPxSolver<R>::ON_LOWER;
                      //}
@@ -3972,7 +3972,7 @@ void SoPlex<R>::printDecompDisplayLine(SPxSolver<R>& solver, const SPxOut::Verbo
                   break;
                case LPRowBase<Real>::GREATER_EQUAL:
                   //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                     //SPxBasis::Desc::D_ON_LOWER )
+                     //SPxBasis<R>::Desc::D_ON_LOWER )
                   //{
                      //_basisStatusRows[rowNumber] = SPxSolver<R>::ON_LOWER;
                   //}
@@ -3985,7 +3985,7 @@ void SoPlex<R>::printDecompDisplayLine(SPxSolver<R>& solver, const SPxOut::Verbo
                   break;
                case LPRowBase<Real>::LESS_EQUAL:
                   //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                     //SPxBasis::Desc::D_ON_UPPER )
+                     //SPxBasis<R>::Desc::D_ON_UPPER )
                   //{
                      //_basisStatusRows[rowNumber] = SPxSolver<R>::ON_UPPER;
                   //}
