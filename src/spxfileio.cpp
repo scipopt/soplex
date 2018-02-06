@@ -23,34 +23,34 @@ namespace soplex
 {
   template <class R>
   bool SPxSolver<R>::readBasisFile(
-   const char*    filename, 
-   const NameSet* rowNames,
-   const NameSet* colNames)
-{
+                                   const char*    filename, 
+                                   const NameSet* rowNames,
+                                   const NameSet* colNames)
+  {
 
-   spxifstream file(filename);
+    spxifstream file(filename);
 
-   if (!file)
+    if (!file)
       return false;
  
-   return this->readBasis(file, rowNames, colNames);
-}
+    return this->readBasis(file, rowNames, colNames);
+  }
 
   template <class R>
-bool SPxSolver<R>::writeBasisFile
-   ( const char*    filename, 
-     const NameSet* rowNames,
-     const NameSet* colNames,
-     const bool cpxFormat ) const
-{
-   std::ofstream file(filename);
+  bool SPxSolver<R>::writeBasisFile
+  ( const char*    filename, 
+    const NameSet* rowNames,
+    const NameSet* colNames,
+    const bool cpxFormat ) const
+  {
+    std::ofstream file(filename);
 
-   if (!file)
+    if (!file)
       return false;
  
-   this->writeBasis(file, rowNames, colNames);
+    this->writeBasis(file, rowNames, colNames);
 
-   return true;
-}
+    return true;
+  }
 
 } // namespace soplex
