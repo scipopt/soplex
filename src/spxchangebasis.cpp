@@ -22,13 +22,13 @@
 
 namespace soplex
 {
-
-void SPxBasis::reDim()
+  template <class R>
+void SPxBasis<R>::reDim()
 {
 
    assert(theLP != 0);
 
-   MSG_DEBUG( std::cout << "DCHBAS01 SPxBasis::reDim():"
+   MSG_DEBUG( std::cout << "DCHBAS01 SPxBasis<R>::reDim():"
                      << " matrixIsSetup=" << matrixIsSetup
                      << " fatorized=" << factorized
                      << std::endl; )
@@ -46,7 +46,7 @@ void SPxBasis::reDim()
       factorized    = false;
    }
 
-   MSG_DEBUG( std::cout << "DCHBAS03 SPxBasis::reDim(): -->"
+   MSG_DEBUG( std::cout << "DCHBAS03 SPxBasis<R>::reDim(): -->"
                      << " matrixIsSetup=" << matrixIsSetup
                      << " fatorized=" << factorized
                      << std::endl; )
@@ -56,7 +56,8 @@ void SPxBasis::reDim()
 }
 
 /* adapt basis and basis descriptor to added rows */
-void SPxBasis::addedRows(int n)
+  template <class R>
+void SPxBasis<R>::addedRows(int n)
 {
    assert(theLP != 0);
 
@@ -64,7 +65,7 @@ void SPxBasis::addedRows(int n)
    {
       reDim();
 
-      if (theLP->rep() == SPxSolver::COLUMN)
+      if (theLP->rep() == SPxSolver<R>::COLUMN)
       {
          /* after adding rows in column representation, reDim() should set these bools to false. */
          assert( !matrixIsSetup && !factorized );
@@ -77,7 +78,7 @@ void SPxBasis::addedRows(int n)
       }
       else
       {
-         assert(theLP->rep() == SPxSolver::ROW);
+         assert(theLP->rep() == SPxSolver<R>::ROW);
 
          for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
@@ -116,13 +117,14 @@ void SPxBasis::addedRows(int n)
    }
 }
 
-void SPxBasis::removedRow(int i)
+  template <class R>
+void SPxBasis<R>::removedRow(int i)
 {
 
    assert(status() >  NO_PROBLEM);
    assert(theLP    != 0);
 
-   if (theLP->rep() == SPxSolver::ROW)
+   if (theLP->rep() == SPxSolver<R>::ROW)
    {
       if (theLP->isBasic(thedesc.rowStatus(i)))
       {
@@ -134,7 +136,7 @@ void SPxBasis::removedRow(int i)
    }
    else
    {
-      assert(theLP->rep() == SPxSolver::COLUMN);
+      assert(theLP->rep() == SPxSolver<R>::COLUMN);
       factorized = false;
       if (!theLP->isBasic(thedesc.rowStatus(i)))
       {
@@ -162,7 +164,8 @@ void SPxBasis::removedRow(int i)
    reDim();
 }
 
-void SPxBasis::removedRows(const int perm[])
+  template <class R>
+void SPxBasis<R>::removedRows(const int perm[])
 {
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
@@ -170,7 +173,7 @@ void SPxBasis::removedRows(const int perm[])
    int i;
    int n = thedesc.nRows();
 
-   if (theLP->rep() == SPxSolver::ROW)
+   if (theLP->rep() == SPxSolver<R>::ROW)
    {
       for (i = 0; i < n; ++i)
       {
@@ -192,7 +195,7 @@ void SPxBasis::removedRows(const int perm[])
    }
    else
    {
-      assert(theLP->rep() == SPxSolver::COLUMN);
+      assert(theLP->rep() == SPxSolver<R>::COLUMN);
 
       factorized    = false;
       matrixIsSetup = false;
@@ -214,8 +217,8 @@ void SPxBasis::removedRows(const int perm[])
    reDim();
 }
 
-
-static SPxBasis::Desc::Status
+  template <class R>
+static typename SPxBasis<R>::Desc::Status
 primalColStatus(int i, const SPxLP* theLP)
 {
    assert(theLP != 0);
@@ -225,34 +228,35 @@ primalColStatus(int i, const SPxLP* theLP)
       if (theLP->lower(i) > -infinity)
       {
          if (theLP->lower(i) == theLP->SPxLP::upper(i))
-            return SPxBasis::Desc::P_FIXED;
+            return SPxBasis<R>::Desc::P_FIXED;
          /*
              else
                  return (-theLP->lower(i) < theLP->upper(i))
-                             ? SPxBasis::Desc::P_ON_LOWER
-                          : SPxBasis::Desc::P_ON_UPPER;
+                             ? SPxBasis<R>::Desc::P_ON_LOWER
+                          : SPxBasis<R>::Desc::P_ON_UPPER;
          */
          else if (theLP->maxObj(i) == 0)
             return (-theLP->lower(i) < theLP->upper(i))
-               ? SPxBasis::Desc::P_ON_LOWER
-               : SPxBasis::Desc::P_ON_UPPER;
+               ? SPxBasis<R>::Desc::P_ON_LOWER
+               : SPxBasis<R>::Desc::P_ON_UPPER;
          else
             return (theLP->maxObj(i) < 0)
-               ? SPxBasis::Desc::P_ON_LOWER
-               : SPxBasis::Desc::P_ON_UPPER;
+               ? SPxBasis<R>::Desc::P_ON_LOWER
+               : SPxBasis<R>::Desc::P_ON_UPPER;
       }
       else
-         return SPxBasis::Desc::P_ON_UPPER;
+         return SPxBasis<R>::Desc::P_ON_UPPER;
    }
    else if (theLP->lower(i) > -infinity)
-      return SPxBasis::Desc::P_ON_LOWER;
+      return SPxBasis<R>::Desc::P_ON_LOWER;
    else
-      return SPxBasis::Desc::P_FREE;
+      return SPxBasis<R>::Desc::P_FREE;
 }
 
 
 /* adapt basis and basis descriptor to added columns */
-void SPxBasis::addedCols(int n)
+  template <class R>
+void SPxBasis<R>::addedCols(int n)
 {
    assert(theLP != 0);
 
@@ -260,7 +264,7 @@ void SPxBasis::addedCols(int n)
    {
       reDim();
 
-      if (theLP->rep() == SPxSolver::ROW)
+      if (theLP->rep() == SPxSolver<R>::ROW)
       {
          /* after adding columns in row representation, reDim() should set these bools to false. */
          assert( !matrixIsSetup && !factorized );
@@ -273,7 +277,7 @@ void SPxBasis::addedCols(int n)
       }
       else
       {
-         assert(theLP->rep() == SPxSolver::COLUMN);
+         assert(theLP->rep() == SPxSolver<R>::COLUMN);
 
          for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
             thedesc.colStatus(i) = primalColStatus(i, theLP);
@@ -311,19 +315,20 @@ void SPxBasis::addedCols(int n)
    }
 }
 
-void SPxBasis::removedCol(int i)
+  template <class R>
+void SPxBasis<R>::removedCol(int i)
 {
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
-   if (theLP->rep() == SPxSolver::COLUMN)
+   if (theLP->rep() == SPxSolver<R>::COLUMN)
    {
       if (theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
    }
    else
    {
-      assert(theLP->rep() == SPxSolver::ROW);
+      assert(theLP->rep() == SPxSolver<R>::ROW);
       factorized = false;
       if (!theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
@@ -348,7 +353,8 @@ void SPxBasis::removedCol(int i)
    reDim();
 }
 
-void SPxBasis::removedCols(const int perm[])
+  template <class R>
+void SPxBasis<R>::removedCols(const int perm[])
 {
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
@@ -356,7 +362,7 @@ void SPxBasis::removedCols(const int perm[])
    int i;
    int n = thedesc.nCols();
 
-   if (theLP->rep() == SPxSolver::COLUMN)
+   if (theLP->rep() == SPxSolver<R>::COLUMN)
    {
       for (i = 0; i < n; ++i)
       {
@@ -371,7 +377,7 @@ void SPxBasis::removedCols(const int perm[])
    }
    else
    {
-      assert(theLP->rep() == SPxSolver::ROW);
+      assert(theLP->rep() == SPxSolver<R>::ROW);
       factorized = matrixIsSetup = false;
       for (i = 0; i < n; ++i)
       {
@@ -395,7 +401,8 @@ void SPxBasis::removedCols(const int perm[])
 /**
  * mark the basis as not factorized
  */
-void SPxBasis::invalidate()
+template <class R>
+void SPxBasis<R>::invalidate()
 {
    if( factorized || matrixIsSetup )
    {
@@ -409,15 +416,16 @@ void SPxBasis::invalidate()
 
 /**
  * Create the initial slack basis descriptor and set up the basis matrix accordingly.
- * This code has been adapted from SPxBasis::addedRows() and SPxBasis::addedCols().
+ * This code has been adapted from SPxBasis<R>::addedRows() and SPxBasis<R>::addedCols().
  */
-void SPxBasis::restoreInitialBasis()
+template <class R>
+void SPxBasis<R>::restoreInitialBasis()
 {
    assert(!factorized);
 
    MSG_INFO3( (*spxout), (*spxout) << "ICHBAS10 setup slack basis" << std::endl; )
 
-   if (theLP->rep() == SPxSolver::COLUMN)
+   if (theLP->rep() == SPxSolver<R>::COLUMN)
    {
       for (int i = 0; i < theLP->nRows(); ++i)
       {
@@ -430,7 +438,7 @@ void SPxBasis::restoreInitialBasis()
    }
    else
    {
-      assert(theLP->rep() == SPxSolver::ROW);
+      assert(theLP->rep() == SPxSolver<R>::ROW);
 
       for (int i = 0; i < theLP->nRows(); ++i)
          thedesc.rowStatus(i) = dualRowStatus(i);
@@ -464,7 +472,8 @@ void SPxBasis::restoreInitialBasis()
 
 /**@todo is this correctly implemented?
  */
-void SPxBasis::changedRow(int /*row*/)
+template <class R>
+void SPxBasis<R>::changedRow(int /*row*/)
 {
    invalidate();
    restoreInitialBasis();
@@ -472,7 +481,8 @@ void SPxBasis::changedRow(int /*row*/)
 
 /**@todo is this correctly implemented?
  */
-void SPxBasis::changedCol(int /*col*/)
+template <class R>
+void SPxBasis<R>::changedCol(int /*col*/)
 {
    invalidate();
    restoreInitialBasis();
@@ -480,7 +490,8 @@ void SPxBasis::changedCol(int /*col*/)
 
 /**@todo is this correctly implemented?
  */
-void SPxBasis::changedElement(int /*row*/, int /*col*/)
+template <class R>
+void SPxBasis<R>::changedElement(int /*row*/, int /*col*/)
 {
    invalidate();
    restoreInitialBasis();
