@@ -26,7 +26,7 @@ namespace soplex
 {
 
 #if 0
-  void SPxSolver::localAddRows(int start)
+  void SPxSolver<R>::localAddRows(int start)
   {
     assert( start <= SPxLP::nRows() );
 
@@ -171,7 +171,7 @@ namespace soplex
       }
   }
 
-  void SPxSolver::addedRows(int n)
+  void SPxSolver<R>::addedRows(int n)
   {
 
     SPxLP::addedRows(n);
@@ -220,7 +220,7 @@ namespace soplex
   }
 
 #if 0
-  void SPxSolver::localAddCols(int start)
+  void SPxSolver<R>::localAddCols(int start)
   {
     assert( start <= SPxLP::nCols() );
 
@@ -386,7 +386,7 @@ namespace soplex
       }
   }
 
-  void SPxSolver::addedCols(int n)
+  void SPxSolver<R>::addedCols(int n)
   {
     SPxLP::addedCols(n);
 

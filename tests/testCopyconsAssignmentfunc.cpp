@@ -134,7 +134,7 @@ int main(int argc, const char* const argv[])
 
 
 
-        SoPlex lp_ori(SPxSolver::LEAVE, SPxSolver::COLUMN);
+        SoPlex lp_ori(SPxSolver<R>::LEAVE, SPxSolver<R>::COLUMN);
         set_s_g_c_p_t(lp_ori, 1, 1, 0, 4, 2);
 
 
@@ -144,17 +144,17 @@ int main(int argc, const char* const argv[])
         lp[0][1][2] = SoPlex(lp_ori);
         set_s_g_c_p_t(lp[0][1][0], 1, 1, 0, 0, 0); 
  
-        lp[0][0][0] = SoPlex(SPxSolver::LEAVE, SPxSolver::ROW);
-        lp[0][0][1] = SoPlex(SPxSolver::ENTER, SPxSolver::COLUMN);
-        lp[0][0][2] = SoPlex(SPxSolver::ENTER, SPxSolver::ROW);
+        lp[0][0][0] = SoPlex(SPxSolver<R>::LEAVE, SPxSolver<R>::ROW);
+        lp[0][0][1] = SoPlex(SPxSolver<R>::ENTER, SPxSolver<R>::COLUMN);
+        lp[0][0][2] = SoPlex(SPxSolver<R>::ENTER, SPxSolver<R>::ROW);
         lp[0][0][0] = lp_ori;
         lp[0][0][1] = lp_ori;
         lp[0][0][2] = lp_ori;
         set_s_g_c_p_t(lp[0][0][0], 0, 4, 3, 3, 0); 
         set_s_g_c_p_t(lp[0][0][2], 0, 0, 2, 4/*5*/, 2); 
 
-        lp[0][1][1].setType(SPxSolver::ENTER);
-        lp[0][0][0].setRep(SPxSolver::ROW);
+        lp[0][1][1].setType(SPxSolver<R>::ENTER);
+        lp[0][0][0].setRep(SPxSolver<R>::ROW);
 
         if(!lp_ori.readFile(fname.c_str(), 0, 0, 0))
         {
@@ -168,7 +168,7 @@ int main(int argc, const char* const argv[])
         try{
 
            lp_cp_pr->optimize();
-           if(lp_cp_pr->status() == SPxSolver::OPTIMAL)
+           if(lp_cp_pr->status() == SPxSolver<R>::OPTIMAL)
            {
               std::cout << "Lp has been solved to optimality with default settings, objValue is " << lp_cp_pr->objValue() << std::endl;
            }
@@ -200,9 +200,9 @@ int main(int argc, const char* const argv[])
         set_s_g_c_p_t(lp[0][0][1], 0, 0, 2, 4/*5*/, 2); 
         //set_s_g_c_p_t(lp[0][0][1], 1, 2, 0, 4, 1); 
 
-        lp[0][1][2].setType(SPxSolver::ENTER);
-        lp[0][0][1].setRep(SPxSolver::ROW);
-        lp[0][0][1].setType(SPxSolver::LEAVE);
+        lp[0][1][2].setType(SPxSolver<R>::ENTER);
+        lp[0][0][1].setRep(SPxSolver<R>::ROW);
+        lp[0][0][1].setType(SPxSolver<R>::LEAVE);
 
         /** test copy constructor and assignment function before soplex reads a lp    */
 
@@ -216,7 +216,7 @@ int main(int argc, const char* const argv[])
               try{
                  (cnt[stat_idx])++;
                  lp[current_timepoint][n_type][n_time].optimize();
-                 if(lp[current_timepoint][n_type][n_time].status() == SPxSolver::OPTIMAL)
+                 if(lp[current_timepoint][n_type][n_time].status() == SPxSolver<R>::OPTIMAL)
                  {
                     double absError = abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue);
                     if(absError < lp[current_timepoint][n_type][n_time].delta() )
@@ -266,9 +266,9 @@ int main(int argc, const char* const argv[])
         set_s_g_c_p_t(lp[1][1][1], 0, 4, 3, 3, 0); 
         set_s_g_c_p_t(lp[1][1][2], 0, 0, 2, 4/*5*/, 2);
 
-        lp[1][0][0] = SoPlex(SPxSolver::LEAVE, SPxSolver::ROW);
-        lp[1][0][1] = SoPlex(SPxSolver::ENTER, SPxSolver::COLUMN);
-        lp[1][0][2] = SoPlex(SPxSolver::ENTER, SPxSolver::ROW);
+        lp[1][0][0] = SoPlex(SPxSolver<R>::LEAVE, SPxSolver<R>::ROW);
+        lp[1][0][1] = SoPlex(SPxSolver<R>::ENTER, SPxSolver<R>::COLUMN);
+        lp[1][0][2] = SoPlex(SPxSolver<R>::ENTER, SPxSolver<R>::ROW);
         set_s_g_c_p_t(lp[1][0][0], 1, 1, 0, 0, 0); 
         lp[1][0][0] = lp_ori;
         lp[1][0][1] = lp_ori;
@@ -277,10 +277,10 @@ int main(int argc, const char* const argv[])
         set_s_g_c_p_t(lp[1][0][2], 1, 2, 0, 4, 1); 
         
 
-        lp[1][0][2].setType(SPxSolver::ENTER); // see above
-        lp[1][1][2].setType(SPxSolver::ENTER);
-        lp[1][0][0].setRep(SPxSolver::ROW);
-        lp[1][0][1].setRep(SPxSolver::ROW);
+        lp[1][0][2].setType(SPxSolver<R>::ENTER); // see above
+        lp[1][1][2].setType(SPxSolver<R>::ENTER);
+        lp[1][0][0].setRep(SPxSolver<R>::ROW);
+        lp[1][0][1].setRep(SPxSolver<R>::ROW);
 
 
         current_timepoint = 1;
@@ -292,7 +292,7 @@ int main(int argc, const char* const argv[])
               try{
                  (cnt[stat_idx])++;
                  lp[current_timepoint][n_type][n_time].optimize();
-                 if(lp[current_timepoint][n_type][n_time].status() == SPxSolver::OPTIMAL)
+                 if(lp[current_timepoint][n_type][n_time].status() == SPxSolver<R>::OPTIMAL)
                  {
                     double absError = abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue);
                     if(absError < lp[current_timepoint][n_type][n_time].delta() )
@@ -339,7 +339,7 @@ int main(int argc, const char* const argv[])
         try{
            
            lp_ori.optimize();
-           if(lp_ori.status() == SPxSolver::OPTIMAL)
+           if(lp_ori.status() == SPxSolver<R>::OPTIMAL)
            {
               std::cout << "The original lp has been solved to optimality with default settings, num of iterations is " 
                         << lp_ori.iteration() << std::endl;
@@ -369,9 +369,9 @@ int main(int argc, const char* const argv[])
         set_s_g_c_p_t(lp[2][1][2], 1, 2, 0, 4, 1);
 
 
-        lp[2][0][0] = SoPlex(SPxSolver::LEAVE, SPxSolver::ROW);
-        lp[2][0][1] = SoPlex(SPxSolver::ENTER, SPxSolver::COLUMN);
-        lp[2][0][2] = SoPlex(SPxSolver::ENTER, SPxSolver::ROW);
+        lp[2][0][0] = SoPlex(SPxSolver<R>::LEAVE, SPxSolver<R>::ROW);
+        lp[2][0][1] = SoPlex(SPxSolver<R>::ENTER, SPxSolver<R>::COLUMN);
+        lp[2][0][2] = SoPlex(SPxSolver<R>::ENTER, SPxSolver<R>::ROW);
         set_s_g_c_p_t(lp[2][0][0], 1, 1, 0, 0, 0); 
 
         lp[2][0][0] = lp_ori;
@@ -380,9 +380,9 @@ int main(int argc, const char* const argv[])
         set_s_g_c_p_t(lp[2][0][1], 0, 2, 2, 1, 1); 
         set_s_g_c_p_t(lp[2][0][2], 0, 0, 2, 4/*5*/, 2); 
 
-        lp[2][1][0].setType(SPxSolver::ENTER);
-        lp[2][0][2].setRep(SPxSolver::ROW);
-        lp[2][0][1].setRep(SPxSolver::ROW);
+        lp[2][1][0].setType(SPxSolver<R>::ENTER);
+        lp[2][0][2].setRep(SPxSolver<R>::ROW);
+        lp[2][0][1].setRep(SPxSolver<R>::ROW);
 
         
         current_timepoint = 2;
@@ -394,7 +394,7 @@ int main(int argc, const char* const argv[])
               try{
                  (cnt[stat_idx])++;
                  lp[current_timepoint][n_type][n_time].optimize();
-                 if(lp[current_timepoint][n_type][n_time].status() == SPxSolver::OPTIMAL)
+                 if(lp[current_timepoint][n_type][n_time].status() == SPxSolver<R>::OPTIMAL)
                  {
                     double absError = abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue);
                     if(absError < lp[current_timepoint][n_type][n_time].delta() )

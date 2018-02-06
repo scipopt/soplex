@@ -22,16 +22,16 @@
 namespace soplex
 {
 
-void SPxParMultPR::setType(SPxSolver::Type tp)
+void SPxParMultPR::setType(SPxSolver<R>::Type tp)
 {
-   if (tp == SPxSolver::ENTER)
+   if (tp == SPxSolver<R>::ENTER)
    {
       used = 0;
-      thesolver->setPricing(SPxSolver::PARTIAL);
+      thesolver->setPricing(SPxSolver<R>::PARTIAL);
    }
    else
    {
-      thesolver->setPricing(SPxSolver::FULL);
+      thesolver->setPricing(SPxSolver<R>::FULL);
    }
 
    thesolver->weights.reDim(0);
@@ -60,7 +60,7 @@ SPxId SPxParMultPR::selectEnter()
    assert(thesolver != 0);
    int lastlast = -1;
 
-   if (thesolver->pricing() == SPxSolver::PARTIAL)
+   if (thesolver->pricing() == SPxSolver<R>::PARTIAL)
    {
       Real val;
       Real eps = -theeps;
@@ -142,7 +142,7 @@ SPxId SPxParMultPR::selectEnter()
 
    else
    {
-      assert(thesolver->pricing() == SPxSolver::FULL);
+      assert(thesolver->pricing() == SPxSolver<R>::FULL);
       Real bestx = -theeps;
       for (i = thesolver->dim() - 1; i >= 0; --i)
       {

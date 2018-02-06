@@ -28,7 +28,7 @@
 namespace soplex
 {
 
-bool SPxSolver::read(std::istream& in, NameSet* rowNames, 
+bool SPxSolver<R>::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
 {
    if( initialized )
@@ -52,20 +52,20 @@ bool SPxSolver::read(std::istream& in, NameSet* rowNames,
    return true;
 }
 
-void SPxSolver::reLoad()
+void SPxSolver<R>::reLoad()
 {
    forceRecompNonbasicValue();
    unInit();
    unLoad();
    theLP = this;
-   m_status = SPxSolver::UNKNOWN;
+   m_status = SPxSolver<R>::UNKNOWN;
    if (thepricer)
       thepricer->clear();
    if (theratiotester)
       theratiotester->clear();
 }
 
-void SPxSolver::loadLP(const SPxLP& lp, bool initSlackBasis)
+void SPxSolver<R>::loadLP(const SPxLP& lp, bool initSlackBasis)
 {
    clear();
    unInit();
@@ -80,7 +80,7 @@ void SPxSolver::loadLP(const SPxLP& lp, bool initSlackBasis)
    SPxBasis::load(this, initSlackBasis);
 }
 
-void SPxSolver::setBasisSolver(SLinSolver* slu, const bool destroy)
+void SPxSolver<R>::setBasisSolver(SLinSolver* slu, const bool destroy)
 {
    // we need to set the outstream before we load the solver to ensure that the basis
    // can be initialized with this pointer in loadSolver()
@@ -89,7 +89,7 @@ void SPxSolver::setBasisSolver(SLinSolver* slu, const bool destroy)
    SPxBasis::loadBasisSolver(slu, destroy);
 }
 
-void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
+void SPxSolver<R>::loadBasis(const SPxBasis::Desc& p_desc)
 {
    unInit();
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
@@ -100,7 +100,7 @@ void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
    SPxBasis::loadDesc(p_desc);
 }
 
-void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
+void SPxSolver<R>::setPricer(SPxPricer* x, const bool destroy)
 {
    
    assert(!freePricer || thepricer != 0);
@@ -127,7 +127,7 @@ void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
    freePricer = destroy;
 }
 
-void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
+void SPxSolver<R>::setTester(SPxRatioTester* x, const bool destroy)
 {
    assert(!freeRatioTester || theratiotester != 0);
 
@@ -151,7 +151,7 @@ void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
    freeRatioTester = destroy;
 }
 
-void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
+void SPxSolver<R>::setStarter(SPxStarter* x, const bool destroy)
 {
 
    assert(!freeStarter || thestarter != 0);
@@ -166,7 +166,7 @@ void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
    freeStarter = destroy;
 }
 
-void SPxSolver::setType(Type tp)
+void SPxSolver<R>::setType(Type tp)
 {
 
    if (theType != tp)
@@ -195,7 +195,7 @@ void SPxSolver::setType(Type tp)
    }
 }
 
-void SPxSolver::initRep(Representation p_rep)
+void SPxSolver<R>::initRep(Representation p_rep)
 {
 
    Real tmpfeastol = feastol();
@@ -253,7 +253,7 @@ void SPxSolver::initRep(Representation p_rep)
       thepricer->setRep(p_rep);
 }
 
-void SPxSolver::setRep(Representation p_rep)
+void SPxSolver<R>::setRep(Representation p_rep)
 {
 
    if (p_rep != theRep)
@@ -261,7 +261,7 @@ void SPxSolver::setRep(Representation p_rep)
 }
 
 // needed for strongbranching. use carefully
-void SPxSolver::reinitializeVecs()
+void SPxSolver<R>::reinitializeVecs()
 {
    
    initialized = true;
@@ -307,14 +307,14 @@ void SPxSolver::reinitializeVecs()
    assert((testBounds(), 1));
 }
 
-void SPxSolver::resetClockStats()
+void SPxSolver<R>::resetClockStats()
 {
    nClckSkipsLeft = 0;
    nCallsToTimelim = 0;
    theCumulativeTime = 0.0;
 }
 
-void SPxSolver::init()
+void SPxSolver<R>::init()
 {
 
    assert(thepricer      != 0);
@@ -435,7 +435,7 @@ void SPxSolver::init()
    }
 }
 
-void SPxSolver::setPricing(Pricing pr)
+void SPxSolver<R>::setPricing(Pricing pr)
 {
    thePricing = pr;
    if (initialized && type() == ENTER)
@@ -446,7 +446,7 @@ void SPxSolver::setPricing(Pricing pr)
    }
 }
 
-void SPxSolver::setDecompStatus(DecompStatus decomp_stat)
+void SPxSolver<R>::setDecompStatus(DecompStatus decomp_stat)
 {
    if( decomp_stat == FINDSTARTBASIS )
       getStartingDecompBasis = true;
@@ -458,7 +458,7 @@ void SPxSolver::setDecompStatus(DecompStatus decomp_stat)
     The following method resizes all vectors and arrays of |SoPlex|
     (excluding inherited vectors).
  */
-void SPxSolver::reDim()
+void SPxSolver<R>::reDim()
 {
 
    int newsize = SPxLP::nCols() > SPxLP::nRows() ? SPxLP::nCols() : SPxLP::nRows();
@@ -492,7 +492,7 @@ void SPxSolver::reDim()
    }
 }
 
-void SPxSolver::clear()
+void SPxSolver<R>::clear()
 {
    unitVecs.reSize(0);
 
@@ -522,7 +522,7 @@ void SPxSolver::clear()
    isInfeasibleCo.clear();
 }
 
-void SPxSolver::unscaleLPandReloadBasis()
+void SPxSolver<R>::unscaleLPandReloadBasis()
 {
    SPxLPBase<Real>::unscaleLP();
    SPxBasis::invalidate();
@@ -530,7 +530,7 @@ void SPxSolver::unscaleLPandReloadBasis()
    init();
 }
 
-void SPxSolver::clearUpdateVecs(void)
+void SPxSolver<R>::clearUpdateVecs(void)
 {
    theFvec->clearUpdate();
    thePvec->clearUpdate();
@@ -545,7 +545,7 @@ void SPxSolver::clearUpdateVecs(void)
     When the basis matrix factorization is recomputed from scratch, 
     we also recompute the vectors.
  */
-void SPxSolver::factorize()
+void SPxSolver<R>::factorize()
 {
 
    MSG_INFO3( (*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl; )
@@ -650,7 +650,7 @@ void SPxSolver::factorize()
    row/enter or column/leave algorithm the maximum violation of dual feasibility is
    computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
    Additionally, the violation from pricing is taken into account. */
-Real SPxSolver::maxInfeas() const
+Real SPxSolver<R>::maxInfeas() const
 {
    Real inf = 0.0;
 
@@ -695,7 +695,7 @@ Real SPxSolver::maxInfeas() const
 
 /* check for (dual) violations above tol and immediately return false w/o checking the remaining values
    This method is useful for verifying whether an objective limit can be used as termination criterion */
-bool SPxSolver::noViols(Real tol) const
+bool SPxSolver<R>::noViols(Real tol) const
 {
    assert(tol >= 0.0);
 
@@ -731,7 +731,7 @@ bool SPxSolver::noViols(Real tol) const
    return true;
 }
 
-Real SPxSolver::nonbasicValue()
+Real SPxSolver<R>::nonbasicValue()
 {
    int i;
    Real val = 0;
@@ -885,7 +885,7 @@ Real SPxSolver::nonbasicValue()
    return val;
 }
 
-Real SPxSolver::value()
+Real SPxSolver<R>::value()
 {
    assert(isInitialized());
 
@@ -908,7 +908,7 @@ Real SPxSolver::value()
    return x + objOffset();
 }
 
-bool SPxSolver::updateNonbasicValue(Real objChange)
+bool SPxSolver<R>::updateNonbasicValue(Real objChange)
 {
    if( m_nonbasicValueUpToDate )
       m_nonbasicValue += objChange;
@@ -926,7 +926,7 @@ bool SPxSolver::updateNonbasicValue(Real objChange)
 
 
 
-void SPxSolver::setFeastol(Real d)
+void SPxSolver<R>::setFeastol(Real d)
 {
 
    if( d <= 0.0 )
@@ -938,7 +938,7 @@ void SPxSolver::setFeastol(Real d)
       m_leavetol = d;
 }
 
-void SPxSolver::setOpttol(Real d)
+void SPxSolver<R>::setOpttol(Real d)
 {
 
    if( d <= 0.0 )
@@ -950,7 +950,7 @@ void SPxSolver::setOpttol(Real d)
       m_entertol = d;
 }
 
-void SPxSolver::setDelta(Real d)
+void SPxSolver<R>::setDelta(Real d)
 {
 
    if( d <= 0.0 )
@@ -960,7 +960,7 @@ void SPxSolver::setDelta(Real d)
    m_leavetol = d;
 }
 
-void SPxSolver::hyperPricing(bool h)
+void SPxSolver<R>::hyperPricing(bool h)
 {
    hyperPricingEnter = h;
    hyperPricingLeave = h;
@@ -971,7 +971,7 @@ void SPxSolver::hyperPricing(bool h)
    }
 }
 
-SPxSolver::SPxSolver(
+SPxSolver<R>::SPxSolver(
    Type            p_type, 
    Representation  p_rep,
    Timer::TYPE     ttype)
@@ -1045,10 +1045,10 @@ SPxSolver::SPxSolver(
    initRep(p_rep);
 
    // info: SPxBasis is not consistent in this moment.
-   //assert(SPxSolver::isConsistent());
+   //assert(SPxSolver<R>::isConsistent());
 }
 
-SPxSolver::~SPxSolver()
+SPxSolver<R>::~SPxSolver()
 {
    assert(!freePricer || thepricer != 0);
    assert(!freeRatioTester || theratiotester != 0);
@@ -1079,7 +1079,7 @@ SPxSolver::~SPxSolver()
 }
 
 
-SPxSolver& SPxSolver::operator=(const SPxSolver& base)
+SPxSolver& SPxSolver<R>::operator=(const SPxSolver& base)
 {
    if(this != &base)
    {
@@ -1263,14 +1263,14 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
          freeStarter = true;
       }
 
-      assert(SPxSolver::isConsistent());
+      assert(SPxSolver<R>::isConsistent());
    }
 
    return *this;
 }
 
 
-SPxSolver::SPxSolver(const SPxSolver& base)
+SPxSolver<R>::SPxSolver(const SPxSolver& base)
    : SPxLP (base)
    , SPxBasis(base)
    , theType(base.theType)
@@ -1443,10 +1443,10 @@ SPxSolver::SPxSolver(const SPxSolver& base)
       freeStarter = true;
    }
 
-   assert(SPxSolver::isConsistent());
+   assert(SPxSolver<R>::isConsistent());
 }
 
-bool SPxSolver::isConsistent() const
+bool SPxSolver<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    if (epsilon() < 0)
@@ -1553,32 +1553,32 @@ bool SPxSolver::isConsistent() const
 }
 
 
-void SPxSolver::setTerminationTime(Real p_time)
+void SPxSolver<R>::setTerminationTime(Real p_time)
 {
    if( p_time < 0.0 )
       p_time = 0.0;
    maxTime = p_time;
 }
 
-Real SPxSolver::terminationTime() const
+Real SPxSolver<R>::terminationTime() const
 {
    return maxTime;
 }
 
-void SPxSolver::setTerminationIter(int p_iteration)
+void SPxSolver<R>::setTerminationIter(int p_iteration)
 {
    if( p_iteration < 0 )
       p_iteration = -1;
    maxIters = p_iteration;
 }
 
-int SPxSolver::terminationIter() const
+int SPxSolver<R>::terminationIter() const
 {
    return maxIters;
 }
 
 // returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
-bool SPxSolver::isTimeLimitReached(const bool forceCheck)
+bool SPxSolver<R>::isTimeLimitReached(const bool forceCheck)
 {
    // always update the number of calls, since the user might set a time limit later in the solving process
    ++nCallsToTimelim;
@@ -1617,18 +1617,18 @@ bool SPxSolver::isTimeLimitReached(const bool forceCheck)
  *       value in case of bound violations (shifting) but in this case it
  *       is quite difficult to determine if we already reached the limit.
  */
-void SPxSolver::setTerminationValue(Real p_value)
+void SPxSolver<R>::setTerminationValue(Real p_value)
 {
    objLimit = p_value;
 }
 
-Real SPxSolver::terminationValue() const
+Real SPxSolver<R>::terminationValue() const
 {
    return objLimit;
 }
    
-SPxSolver::VarStatus
-SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
+SPxSolver<R>::VarStatus
+SPxSolver<R>::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 {
    VarStatus vstat;
 
@@ -1662,7 +1662,7 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
 }
 
 SPxBasis::Desc::Status
-SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
+SPxSolver<R>::varStatusToBasisStatusRow( int row, SPxSolver<R>::VarStatus stat ) const
 {
    SPxBasis::Desc::Status rstat;
 
@@ -1721,7 +1721,7 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
 }
 
 SPxBasis::Desc::Status 
-SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
+SPxSolver<R>::varStatusToBasisStatusCol( int col, SPxSolver<R>::VarStatus stat ) const
 {
    SPxBasis::Desc::Status cstat;
 
@@ -1785,19 +1785,19 @@ SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
    return cstat;
 }
 
-SPxSolver::VarStatus SPxSolver::getBasisRowStatus( int row ) const
+SPxSolver<R>::VarStatus SPxSolver<R>::getBasisRowStatus( int row ) const
 {
    assert( 0 <= row && row < nRows() );
    return basisStatusToVarStatus( desc().rowStatus( row ) );
 }
 
-SPxSolver::VarStatus SPxSolver::getBasisColStatus( int col ) const
+SPxSolver<R>::VarStatus SPxSolver<R>::getBasisColStatus( int col ) const
 {
    assert( 0 <= col && col < nCols() );
    return basisStatusToVarStatus( desc().colStatus( col ) );
 }
 
-SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
+SPxSolver<R>::Status SPxSolver<R>::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
 {
    const SPxBasis::Desc& d = desc();
    int i;
@@ -1816,7 +1816,7 @@ SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[], const in
    return status();
 }
 
-bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
+bool SPxSolver<R>::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
 {
 
    int basisdim;
@@ -1870,7 +1870,7 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
    return true;
 }
 
-void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
+void SPxSolver<R>::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
    if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this, false);
@@ -1892,7 +1892,7 @@ void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 // The degenvec differs relative to the algorithm being used.
 // For the primal simplex, degenvec is the primal solution values.
 // For the dual simplex, the degenvec is the feasvec (ROW) and pVec (COLUMN).
-Real SPxSolver::getDegeneracyLevel(Vector degenvec)
+Real SPxSolver<R>::getDegeneracyLevel(Vector degenvec)
 {
    int numDegenerate = 0;
    Real degeneracyLevel = 0;
@@ -1954,21 +1954,21 @@ Real SPxSolver::getDegeneracyLevel(Vector degenvec)
    return degeneracyLevel;
 }
 
-void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+void SPxSolver<R>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
 {
    nnormsRow = 0;
    nnormsCol = 0;
 
    if( weightsAreSetup )
    {
-      if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN )
+      if( type() == SPxSolver<R>::LEAVE && rep() == SPxSolver<R>::COLUMN )
       {
          nnormsRow = coWeights.dim();
          nnormsCol = 0;
 
          assert(nnormsRow == dim());
       }
-      else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW )
+      else if( type() == SPxSolver<R>::ENTER && rep() == SPxSolver<R>::ROW )
       {
          nnormsRow = weights.dim();
          nnormsCol = coWeights.dim();
@@ -1979,7 +1979,7 @@ void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
    }
 }
 
-bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
+bool SPxSolver<R>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
 {
    nnormsRow = 0;
    nnormsCol = 0;
@@ -1987,7 +1987,7 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
    if( !weightsAreSetup )
       return false;
 
-   if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN )
+   if( type() == SPxSolver<R>::LEAVE && rep() == SPxSolver<R>::COLUMN )
    {
       nnormsCol = 0;
       nnormsRow = coWeights.dim();
@@ -1997,7 +1997,7 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
       for( int i = 0; i < nnormsRow; ++i)
          norms[i] = coWeights[i];
    }
-   else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW )
+   else if( type() == SPxSolver<R>::ENTER && rep() == SPxSolver<R>::ROW )
    {
       nnormsRow = weights.dim();
       nnormsCol = coWeights.dim();
@@ -2017,11 +2017,11 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
    return true;
 }
 
-bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
+bool SPxSolver<R>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
 {
    weightsAreSetup = false;
 
-   if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
+   if( type() == SPxSolver<R>::LEAVE && rep() == SPxSolver<R>::COLUMN)
    {
       coWeights.reDim(dim(), false);
       assert(coWeights.dim() >= nnormsRow);
@@ -2029,7 +2029,7 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
          coWeights[i] = norms[i];
       weightsAreSetup = true;
    }
-   else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW)
+   else if( type() == SPxSolver<R>::ENTER && rep() == SPxSolver<R>::ROW)
    {
       weights.reDim(coDim(), false);
       coWeights.reDim(dim(), false);
@@ -2046,7 +2046,7 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
    return true;
 }
 
-void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
+void SPxSolver<R>::setIntegralityInformation(int ncols, int* intInfo)
 {
    assert(ncols == nCols() || (ncols == 0 && intInfo == NULL));
 
@@ -2065,26 +2065,26 @@ void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
 
 // Pretty-printing of variable status.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::VarStatus& status )
+                          const SPxSolver<R>::VarStatus& status )
 {
    switch( status )
       {
-      case SPxSolver::BASIC:
+      case SPxSolver<R>::BASIC:
          os << "BASIC";
          break;
-      case SPxSolver::FIXED:
+      case SPxSolver<R>::FIXED:
          os << "FIXED";
          break;
-      case SPxSolver::ON_LOWER:
+      case SPxSolver<R>::ON_LOWER:
          os << "ON_LOWER";
          break;
-      case SPxSolver::ON_UPPER:
+      case SPxSolver<R>::ON_UPPER:
          os << "ON_UPPER";
          break;
-      case SPxSolver::ZERO:
+      case SPxSolver<R>::ZERO:
          os << "ZERO";
          break;
-      case SPxSolver::UNDEFINED:
+      case SPxSolver<R>::UNDEFINED:
          os << "UNDEFINED";
          break;
       default:
@@ -2096,59 +2096,59 @@ std::ostream& operator<<( std::ostream& os,
 
 // Pretty-printing of solver status.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Status& status )
+                          const SPxSolver<R>::Status& status )
 {
    switch ( status )
       {
-      case SPxSolver::ERROR:
+      case SPxSolver<R>::ERROR:
          os << "ERROR";
          break;
-      case SPxSolver::NO_RATIOTESTER:
+      case SPxSolver<R>::NO_RATIOTESTER:
          os << "NO_RATIOTESTER";
          break;
-      case SPxSolver::NO_PRICER:
+      case SPxSolver<R>::NO_PRICER:
          os << "NO_PRICER";
          break;
-      case SPxSolver::NO_SOLVER:
+      case SPxSolver<R>::NO_SOLVER:
          os << "NO_SOLVER";
          break;
-      case SPxSolver::NOT_INIT:
+      case SPxSolver<R>::NOT_INIT:
          os << "NOT_INIT";
          break;
-      case SPxSolver::ABORT_CYCLING:
+      case SPxSolver<R>::ABORT_CYCLING:
          os << "ABORT_CYCLING";
          break;
-      case SPxSolver::ABORT_TIME:
+      case SPxSolver<R>::ABORT_TIME:
          os << "ABORT_TIME";
          break;
-      case SPxSolver::ABORT_ITER:
+      case SPxSolver<R>::ABORT_ITER:
          os << "ABORT_ITER";
          break;
-      case SPxSolver::ABORT_VALUE:
+      case SPxSolver<R>::ABORT_VALUE:
          os << "ABORT_VALUE";
          break;
-      case SPxSolver::SINGULAR:
+      case SPxSolver<R>::SINGULAR:
          os << "SINGULAR";
          break;
-      case SPxSolver::NO_PROBLEM:
+      case SPxSolver<R>::NO_PROBLEM:
          os << "NO_PROBLEM";
          break;
-      case SPxSolver::REGULAR:
+      case SPxSolver<R>::REGULAR:
          os << "REGULAR";
          break;
-      case SPxSolver::RUNNING:
+      case SPxSolver<R>::RUNNING:
          os << "RUNNING";
          break;
-      case SPxSolver::UNKNOWN:
+      case SPxSolver<R>::UNKNOWN:
          os << "UNKNOWN";
          break;
-      case SPxSolver::OPTIMAL:
+      case SPxSolver<R>::OPTIMAL:
          os << "OPTIMAL";
          break;
-      case SPxSolver::UNBOUNDED:
+      case SPxSolver<R>::UNBOUNDED:
          os << "UNBOUNDED";
          break;
-      case SPxSolver::INFEASIBLE:
+      case SPxSolver<R>::INFEASIBLE:
          os << "INFEASIBLE";
          break;
       default:
@@ -2160,14 +2160,14 @@ std::ostream& operator<<( std::ostream& os,
 
 // Pretty-printing of algorithm.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Type& status )
+                          const SPxSolver<R>::Type& status )
 {
    switch ( status )
       {
-      case SPxSolver::ENTER:
+      case SPxSolver<R>::ENTER:
          os << "ENTER";
          break;
-      case SPxSolver::LEAVE:
+      case SPxSolver<R>::LEAVE:
          os << "LEAVE";
          break;
       default:
@@ -2179,14 +2179,14 @@ std::ostream& operator<<( std::ostream& os,
 
 // Pretty-printing of representation.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Representation& status )
+                          const SPxSolver<R>::Representation& status )
 {
    switch ( status )
       {
-      case SPxSolver::ROW:
+      case SPxSolver<R>::ROW:
          os << "ROW";
          break;
-      case SPxSolver::COLUMN:
+      case SPxSolver<R>::COLUMN:
          os << "COLUMN";
          break;
       default:

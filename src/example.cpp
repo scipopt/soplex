@@ -50,13 +50,13 @@ int main()
    mysoplex.writeFileReal("dump.lp", NULL, NULL, NULL);
 
    /* solve LP */
-   SPxSolver::Status stat;
+   SPxSolver<R>::Status stat;
    DVector prim(2);
    DVector dual(1);
    stat = mysoplex.optimize();
 
    /* get solution */
-   if( stat == SPxSolver::OPTIMAL )
+   if( stat == SPxSolver<R>::OPTIMAL )
    {
       mysoplex.getPrimalReal(prim);
       mysoplex.getDualReal(dual);

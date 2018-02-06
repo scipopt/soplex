@@ -93,8 +93,8 @@ public:
    //@{
    /// Default constructor.
    explicit
-   TestSolver( const SPxSolver::Type type_, 
-               const SPxSolver::Representation representation_ )
+   TestSolver( const SPxSolver<R>::Type type_, 
+               const SPxSolver<R>::Representation representation_ )
       : SPxSolver( type_, 
                    representation_ )
    {
@@ -162,8 +162,8 @@ public:
    /// Default constructor.
    explicit
    ChangeExerciser( const std::string& instance_name,
-                    const SPxSolver::Type type,
-                    const SPxSolver::Representation representation )
+                    const SPxSolver<R>::Type type,
+                    const SPxSolver<R>::Representation representation )
       : _asserts_failed( 0 )
       , _instance_name( instance_name )
       , _type( type )
@@ -241,9 +241,9 @@ private:
    ///
    std::string _instance_name;
    ///
-   const SPxSolver::Type _type;
+   const SPxSolver<R>::Type _type;
    ///
-   const SPxSolver::Representation _representation;
+   const SPxSolver<R>::Representation _representation;
    //@}   
 };
 
@@ -270,8 +270,8 @@ bool verbose = false;
    Returns the number of failed asserts.
 */
 long run_tests( const std::string& filename, 
-                const SPxSolver::Type type,
-                const SPxSolver::Representation representation )
+                const SPxSolver<R>::Type type,
+                const SPxSolver<R>::Representation representation )
 {
    ChangeExerciser tester( filename,
                            type,
@@ -383,7 +383,7 @@ int main( int argc,
          std::cout << filename << ": " << std::endl;
 
          // Double-check that instance exists and is readable.
-         TestSolver work( SPxSolver::ENTER, SPxSolver::COLUMN );
+         TestSolver work( SPxSolver<R>::ENTER, SPxSolver<R>::COLUMN );
 
          if ( !work.readFile( filename.c_str(), 0, 0 ) )
             {
@@ -393,10 +393,10 @@ int main( int argc,
             }
 
          // Do testing.
-         total_asserts_failed += run_tests( filename, SPxSolver::LEAVE, SPxSolver::COLUMN );
-         total_asserts_failed += run_tests( filename, SPxSolver::LEAVE, SPxSolver::ROW );
-         total_asserts_failed += run_tests( filename, SPxSolver::ENTER, SPxSolver::COLUMN );
-         total_asserts_failed += run_tests( filename, SPxSolver::ENTER, SPxSolver::ROW );
+         total_asserts_failed += run_tests( filename, SPxSolver<R>::LEAVE, SPxSolver<R>::COLUMN );
+         total_asserts_failed += run_tests( filename, SPxSolver<R>::LEAVE, SPxSolver<R>::ROW );
+         total_asserts_failed += run_tests( filename, SPxSolver<R>::ENTER, SPxSolver<R>::COLUMN );
+         total_asserts_failed += run_tests( filename, SPxSolver<R>::ENTER, SPxSolver<R>::ROW );
 
          std::cout << std::endl;
       }

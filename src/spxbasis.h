@@ -805,12 +805,12 @@ namespace soplex
     /** Changes the \p i 'th vector of the basis with the vector associated to
         \p id. This includes:
         - updating the factorization, or recomputing it from scratch by
-        calling   \ref soplex::SPxSolver::factorize()   "factorize()",
-        - resetting \ref soplex::SPxSolver::lastEntered() "lastEntered()",
-        - resetting \ref soplex::SPxSolver::lastIndex()   "lastIndex()",
-        - resetting \ref soplex::SPxSolver::lastLeft()    "lastLeft()",
-        - resetting \ref soplex::SPxSolver::lastUpdate()  "lastUpdate()",
-        - resetting \ref soplex::SPxSolver::iterations()  "iterations()".
+        calling   \ref soplex::SPxSolver<R>::factorize()   "factorize()",
+        - resetting \ref soplex::SPxSolver<R>::lastEntered() "lastEntered()",
+        - resetting \ref soplex::SPxSolver<R>::lastIndex()   "lastIndex()",
+        - resetting \ref soplex::SPxSolver<R>::lastLeft()    "lastLeft()",
+        - resetting \ref soplex::SPxSolver<R>::lastUpdate()  "lastUpdate()",
+        - resetting \ref soplex::SPxSolver<R>::iterations()  "iterations()".
 
         The basis descriptor is \em not \em modified, since #factor()
         cannot know about how to set up the status of the involved variables

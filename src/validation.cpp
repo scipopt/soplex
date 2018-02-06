@@ -93,7 +93,7 @@ void Validation::validateSolveReal(SoPlex& soplex)
       passedValidation = false;
       reason += "Objective Violation; ";
    }
-   if( SPxSolver::OPTIMAL == soplex.status() )
+   if( SPxSolver<R>::OPTIMAL == soplex.status() )
    {
       soplex.getBoundViolationReal(maxBoundViolation, sumBoundViolation);
       soplex.getRowViolationReal(maxRowViolation, sumRowViolation);

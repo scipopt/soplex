@@ -34,7 +34,7 @@ namespace soplex
 {
 
 /**@todo check separately for ENTER and LEAVE algorithm */
-bool SPxSolver::precisionReached(Real& newpricertol) const
+bool SPxSolver<R>::precisionReached(Real& newpricertol) const
 {
    Real maxViolRedCost;
    Real sumViolRedCost;
@@ -70,7 +70,7 @@ bool SPxSolver::precisionReached(Real& newpricertol) const
    return reached;
 }
 
-SPxSolver::Status SPxSolver::solve()
+SPxSolver<R>::Status SPxSolver<R>::solve()
 {
 
    SPxId enterId;
@@ -176,7 +176,7 @@ SPxSolver::Status SPxSolver::solve()
    stallNumRecovers = 0;
 
    /* if we run into a singular basis, we will retry from regulardesc with tighter tolerance in the ratio test */
-   SPxSolver::Type tightenedtype = type();
+   SPxSolver<R>::Type tightenedtype = type();
    bool tightened = false;
 
    while (!stop)
@@ -245,7 +245,7 @@ SPxSolver::Status SPxSolver::solve()
             {
                /* no entering variable was found, but because of valid instableEnterId we know
                   that this is due to the scaling of the test values. Thus, we use
-                  instableEnterId and SPxFastRT::selectEnter shall accept even an instable
+                  instableEnterId and SPxFastRT<R>::selectEnter shall accept even an instable
                   leaving variable. */
                MSG_INFO3( (*spxout), (*spxout) << " --- trying instable enter iteration" << std::endl; )
 
@@ -561,7 +561,7 @@ SPxSolver::Status SPxSolver::solve()
             {
                /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
                   that this is due to the scaling of theCoTest[...]. Thus, we use 
-                  instableLeaveNum and SPxFastRT::selectEnter shall accept even an instable
+                  instableLeaveNum and SPxFastRT<R>::selectEnter shall accept even an instable
                   entering variable. */
                MSG_INFO3( (*spxout),
                   (*spxout) << " --- trying instable leave iteration" << std::endl;
@@ -1003,7 +1003,7 @@ SPxSolver::Status SPxSolver::solve()
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   primalCount = ( rep() == SPxSolver::COLUMN )
+   primalCount = ( rep() == SPxSolver<R>::COLUMN )
      ? enterCount
      : leaveCount;
 
@@ -1013,7 +1013,7 @@ SPxSolver::Status SPxSolver::solve()
    return status();
 }
 
-void SPxSolver::performSolutionPolishing()
+void SPxSolver<R>::performSolutionPolishing()
 {
    // catch rare case that the iteration limit is exactly reached at optimality
    bool stop = (maxIters >= 0 && iterations() >= maxIters && !isTimeLimitReached());
@@ -1289,7 +1289,7 @@ void SPxSolver::performSolutionPolishing()
 }
 
 
-void SPxSolver::testVecs()
+void SPxSolver<R>::testVecs()
 {
 
    assert(SPxBasis::status() > SPxBasis::SINGULAR);
@@ -1361,7 +1361,7 @@ void SPxSolver::testVecs()
 
 
 /// print display line of flying table
-void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
+void SPxSolver<R>::printDisplayLine(const bool force, const bool forceHead)
 {
    MSG_INFO1( (*spxout),
       if( forceHead || displayLine % (displayFreq*30) == 0 )
@@ -1381,7 +1381,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          << shift() << " |  "
          << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
          << std::setprecision(8) << value();
-         if( getStartingDecompBasis && rep() == SPxSolver::ROW )
+         if( getStartingDecompBasis && rep() == SPxSolver<R>::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          if( printCondition == 1 )
             (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(0);
@@ -1398,7 +1398,7 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
 }
 
 
-bool SPxSolver::terminate()
+bool SPxSolver<R>::terminate()
 {
 #ifdef ENABLE_ADDITIONAL_CHECKS
    if (SPxBasis::status() > SPxBasis::SINGULAR)
@@ -1590,7 +1590,7 @@ bool SPxSolver::terminate()
    return false;
 }
 
-SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
+SPxSolver<R>::Status SPxSolver<R>::getPrimal (Vector& p_vector) const
 {
 
    if (!isInitialized())
@@ -1639,7 +1639,7 @@ SPxSolver::Status SPxSolver::getPrimal (Vector& p_vector) const
    return status();
 }
 
-SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
+SPxSolver<R>::Status SPxSolver<R>::getDual (Vector& p_vector) const
 {
 
    assert(isInitialized());
@@ -1670,7 +1670,7 @@ SPxSolver::Status SPxSolver::getDual (Vector& p_vector) const
    return status();
 }
 
-SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
+SPxSolver<R>::Status SPxSolver<R>::getRedCost (Vector& p_vector) const
 {
 
    assert(isInitialized());
@@ -1713,7 +1713,7 @@ SPxSolver::Status SPxSolver::getRedCost (Vector& p_vector) const
    return status();
 }
 
-SPxSolver::Status SPxSolver::getPrimalray (Vector& p_vector) const
+SPxSolver<R>::Status SPxSolver<R>::getPrimalray (Vector& p_vector) const
 {
 
    assert(isInitialized());
@@ -1731,7 +1731,7 @@ SPxSolver::Status SPxSolver::getPrimalray (Vector& p_vector) const
    return status();
 }
 
-SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
+SPxSolver<R>::Status SPxSolver<R>::getDualfarkas (Vector& p_vector) const
 {
 
    assert(isInitialized());
@@ -1749,7 +1749,7 @@ SPxSolver::Status SPxSolver::getDualfarkas (Vector& p_vector) const
    return status();
 }
 
-SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
+SPxSolver<R>::Status SPxSolver<R>::getSlacks (Vector& p_vector) const
 {
 
    assert(isInitialized());
@@ -1800,7 +1800,7 @@ SPxSolver::Status SPxSolver::getSlacks (Vector& p_vector) const
    return status();
 }
 
-void SPxSolver::setPrimal(Vector& p_vector)
+void SPxSolver<R>::setPrimal(Vector& p_vector)
 {
 
    if (!isInitialized())
@@ -1820,7 +1820,7 @@ void SPxSolver::setPrimal(Vector& p_vector)
    }
 }
 
-void SPxSolver::setDual(Vector& p_vector)
+void SPxSolver<R>::setDual(Vector& p_vector)
 {
 
    assert(isInitialized());
@@ -1851,7 +1851,7 @@ void SPxSolver::setDual(Vector& p_vector)
    }
 }
 
-void SPxSolver::setRedCost(Vector& p_vector)
+void SPxSolver<R>::setRedCost(Vector& p_vector)
 {
 
    assert(isInitialized());
@@ -1885,7 +1885,7 @@ void SPxSolver::setRedCost(Vector& p_vector)
    }
 }
 
-void SPxSolver::setSlacks(Vector& p_vector)
+void SPxSolver<R>::setSlacks(Vector& p_vector)
 {
 
    assert(isInitialized());
@@ -1907,7 +1907,7 @@ void SPxSolver::setSlacks(Vector& p_vector)
       pVec() = p_vector;
 }
 
-SPxSolver::Status SPxSolver::status() const
+SPxSolver<R>::Status SPxSolver<R>::status() const
 {
    switch( m_status )
    {
@@ -1955,7 +1955,7 @@ SPxSolver::Status SPxSolver::status() const
    }
 }
 
-SPxSolver::Status SPxSolver::getResult(
+SPxSolver<R>::Status SPxSolver<R>::getResult(
    Real* p_value,
    Vector* p_primal,
    Vector* p_slacks,

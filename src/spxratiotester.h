@@ -109,10 +109,10 @@ namespace soplex
           computing the entering simplex algorithm. Its task is to select and
           return the index of the basis variable that is to leave the basis.
           When being called, 
-          \ref SPxSolver::fVec() "fVec()" fullfills the basic bounds 
-          \ref SPxSolver::lbBound() "lbBound()" and
-          \ref SPxSolver::ubBound() "ubBound()" within 
-          \ref SPxSolver::entertol() "entertol()".
+          \ref SPxSolver<R>::fVec() "fVec()" fullfills the basic bounds 
+          \ref SPxSolver<R>::lbBound() "lbBound()" and
+          \ref SPxSolver<R>::ubBound() "ubBound()" within 
+          \ref SPxSolver<R>::entertol() "entertol()".
           fVec().delta() is the vector by
           which fVec() will be updated in this simplex step. Its nonzero
           indices are stored in sorted order in fVec().idx().
@@ -131,15 +131,15 @@ namespace soplex
           computing the leaving simplex algorithm. It's task is to select and
           return the Id of the basis variable that is to enter the basis.
           When being called, 
-          \ref SPxSolver::pVec() "pVec()" fullfills the bounds 
-          \ref SPxSolver::lbBound() "lbBound()" and
-          \ref SPxSolver::ubBound() "ubBound()" within 
-          \ref SPxSolver::leavetol() "leavetol()".
+          \ref SPxSolver<R>::pVec() "pVec()" fullfills the bounds 
+          \ref SPxSolver<R>::lbBound() "lbBound()" and
+          \ref SPxSolver<R>::ubBound() "ubBound()" within 
+          \ref SPxSolver<R>::leavetol() "leavetol()".
           Similarly, 
-          \ref SPxSolver::coPvec() "coPvec()" fulfills the bounds
-          \ref SPxSolver::lbBound() "lbBound()" and
-          \ref SPxSolver::ubBound() "ubBound()" within
-          \ref SPxSolver::leavetol() "leavetol()".
+          \ref SPxSolver<R>::coPvec() "coPvec()" fulfills the bounds
+          \ref SPxSolver<R>::lbBound() "lbBound()" and
+          \ref SPxSolver<R>::ubBound() "ubBound()" within
+          \ref SPxSolver<R>::leavetol() "leavetol()".
           pVec().delta() and coPvec().delta() are
           the vectors by which pVec() and coPvec() will be updated in this
           simplex step. Their nonzero indices are stored in sorted order in

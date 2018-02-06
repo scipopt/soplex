@@ -39,7 +39,7 @@ namespace soplex
     variables are altered. In entering type algorithm they are changed and,
     hence, retreived from the column or row upper or lower bound vectors.
  */
-void SPxSolver::computeFrhs()
+void SPxSolver<R>::computeFrhs()
 {
 
    if (rep() == COLUMN)
@@ -144,7 +144,7 @@ void SPxSolver::computeFrhs()
    }
 }
 
-void SPxSolver::computeFrhsXtra()
+void SPxSolver<R>::computeFrhsXtra()
 {
 
    assert(rep()  == COLUMN);
@@ -194,7 +194,7 @@ void SPxSolver::computeFrhsXtra()
     specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
     \f$\pi_N\f$ are taken from the passed arrays.
  */
-void SPxSolver::computeFrhs1(
+void SPxSolver<R>::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
@@ -251,7 +251,7 @@ void SPxSolver::computeFrhs1(
     specified by the |Status| of all nonbasic variables. The values of 
     \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
  */
-void SPxSolver::computeFrhs2(
+void SPxSolver<R>::computeFrhs2(
    Vector& coufb,   ///< upper feasibility bound for covariables
    Vector& colfb)   ///< lower feasibility bound for covariables
 {
@@ -333,7 +333,7 @@ void SPxSolver::computeFrhs2(
     |...4Col(i,n)|, respectively. They do their job for the |i|-th basis
     variable, being the |n|-th row or column.  
 */
-void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
+void SPxSolver<R>::computeEnterCoPrhs4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
@@ -364,7 +364,7 @@ void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
    }
 }
 
-void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
+void SPxSolver<R>::computeEnterCoPrhs4Col(int i, int n)
 {
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
@@ -402,7 +402,7 @@ void SPxSolver::computeEnterCoPrhs4Col(int i, int n)
    }
 }
 
-void SPxSolver::computeEnterCoPrhs()
+void SPxSolver<R>::computeEnterCoPrhs()
 {
    assert(type() == ENTER);
 
@@ -416,7 +416,7 @@ void SPxSolver::computeEnterCoPrhs()
    }
 }
 
-void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
+void SPxSolver<R>::computeLeaveCoPrhs4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
@@ -445,7 +445,7 @@ void SPxSolver::computeLeaveCoPrhs4Row(int i, int n)
    }
 }
 
-void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
+void SPxSolver<R>::computeLeaveCoPrhs4Col(int i, int n)
 {
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
@@ -475,7 +475,7 @@ void SPxSolver::computeLeaveCoPrhs4Col(int i, int n)
    }
 }
 
-void SPxSolver::computeLeaveCoPrhs()
+void SPxSolver<R>::computeLeaveCoPrhs()
 {
    assert(type() == LEAVE);
 
@@ -495,7 +495,7 @@ void SPxSolver::computeLeaveCoPrhs()
     computing all scalar products of the pricing vector with the vectors of the
     LPs constraint matrix.
  */
-void SPxSolver::computePvec()
+void SPxSolver<R>::computePvec()
 {
    int i;
 
@@ -503,7 +503,7 @@ void SPxSolver::computePvec()
       (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-void SPxSolver::setupPupdate(void)
+void SPxSolver<R>::setupPupdate(void)
 {
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
@@ -523,7 +523,7 @@ void SPxSolver::setupPupdate(void)
    p.setup();
 }
 
-void SPxSolver::doPupdate(void)
+void SPxSolver<R>::doPupdate(void)
 {
    theCoPvec->update();
    if (pricing() == FULL)

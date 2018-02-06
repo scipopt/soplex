@@ -37,10 +37,10 @@ namespace soplex
      enter or leave the simplex basis, depending on the chosen simplex type.
    
      An SPxPricer first #load%s the SoPlex object for which pricing is to
-     be performed. Then, depending of the SPxSolver::Type, methods
+     be performed. Then, depending of the SPxSolver<R>::Type, methods
      #selectEnter() and #entered4() (for entering Simplex) or #selectLeave()
      and #left4() (for leaving Simplex) are called by SoPlex. The SPxPricer
-     object is informed of a change of the SPxSolver::Type by calling method
+     object is informed of a change of the SPxSolver<R>::Type by calling method
      #setType().
   */
   template <class R>
@@ -179,7 +179,7 @@ namespace soplex
           the basis for \p id to come in at this position. When being called,
           all vectors of SoPlex involved in such an entering update are
           setup correctly and may be accessed via the corresponding methods
-          (\ref SPxSolver::fVec() "fVec()", \ref SPxSolver::pVec() "pVec()", 
+          (\ref SPxSolver<R>::fVec() "fVec()", \ref SPxSolver<R>::pVec() "pVec()", 
           etc.). In general, argument \p n will be the one returned by the
           SPxPricer at the previous call to #selectLeave(). However, one can not
           rely on this.
@@ -194,10 +194,10 @@ namespace soplex
 
           Note:
           When method #selectEnter() is called by the loaded SoPlex
-          object, all values from \ref SPxSolver::coTest() "coTest()" are 
+          object, all values from \ref SPxSolver<R>::coTest() "coTest()" are 
           up to date. However, whether the elements of 
-          \ref SPxSolver::test() "test()" are up to date depends on the 
-          SPxSolver::Pricing type.
+          \ref SPxSolver<R>::test() "test()" are up to date depends on the 
+          SPxSolver<R>::Pricing type.
       */
       virtual SPxId selectEnter() = 0;
 
@@ -207,7 +207,7 @@ namespace soplex
           at the \p n 'th position. When being called, all vectors of SoPlex
           involved in such an entering update are setup correctly and may be
           accessed via the corresponding methods 
-          (\ref SPxSolver::fVec() "fVec()", \ref SPxSolver::pVec() "pVec()",
+          (\ref SPxSolver<R>::fVec() "fVec()", \ref SPxSolver<R>::pVec() "pVec()",
           etc.). In general, argument \p id will be the one returned by the
           SPxPricer at the previous call to #selectEnter(). However, one can not
           rely on this.

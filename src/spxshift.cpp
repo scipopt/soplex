@@ -22,7 +22,7 @@
 
 namespace soplex
 {
-void SPxSolver::shiftFvec()
+void SPxSolver<R>::shiftFvec()
 {
 
    /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal vector in COLUMN
@@ -76,7 +76,7 @@ void SPxSolver::shiftFvec()
     vectors for leaving simplex. Then it checks all values of |pVec| and
     |coPvec| to obey these bounds and enlarges them if neccessary.
  */
-void SPxSolver::shiftPvec()
+void SPxSolver<R>::shiftPvec()
 {
 
    /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal vector in ROW and the
@@ -147,7 +147,7 @@ void SPxSolver::shiftPvec()
 #endif
 }
 // -----------------------------------------------------------------
-void SPxSolver::perturbMin(
+void SPxSolver<R>::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -225,7 +225,7 @@ void SPxSolver::perturbMin(
    }
 }
 // -----------------------------------------------------------------
-void SPxSolver::perturbMax(
+void SPxSolver<R>::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -302,7 +302,7 @@ void SPxSolver::perturbMax(
    }
 }
 
-void SPxSolver::perturbMinEnter(void)
+void SPxSolver<R>::perturbMinEnter(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
@@ -311,7 +311,7 @@ void SPxSolver::perturbMinEnter(void)
 }
 
 
-void SPxSolver::perturbMaxEnter(void)
+void SPxSolver<R>::perturbMaxEnter(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
    fVec().delta().setup();
@@ -320,7 +320,7 @@ void SPxSolver::perturbMaxEnter(void)
 }
 
 
-Real SPxSolver::perturbMin(
+Real SPxSolver<R>::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -393,7 +393,7 @@ Real SPxSolver::perturbMin(
    return l_theShift;
 }
 
-Real SPxSolver::perturbMax(
+Real SPxSolver<R>::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
@@ -467,7 +467,7 @@ Real SPxSolver::perturbMax(
 }
 
 
-void SPxSolver::perturbMinLeave(void)
+void SPxSolver<R>::perturbMinLeave(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
@@ -480,7 +480,7 @@ void SPxSolver::perturbMinLeave(void)
 }
 
 
-void SPxSolver::perturbMaxLeave(void)
+void SPxSolver<R>::perturbMaxLeave(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
@@ -493,7 +493,7 @@ void SPxSolver::perturbMaxLeave(void)
 }
 
 
-void SPxSolver::unShift(void)
+void SPxSolver<R>::unShift(void)
 {
    MSG_INFO3( (*spxout), (*spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
 

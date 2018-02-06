@@ -1071,8 +1071,8 @@ class MySoPlex : public SoPlex
 public:
    /// default constructor
    MySoPlex( SPxOut&                   outstream,
-             SPxSolver::Type           p_type = SPxSolver::LEAVE,
-             SPxSolver::Representation p_rep  = SPxSolver::COLUMN )
+             SPxSolver<R>::Type           p_type = SPxSolver<R>::LEAVE,
+             SPxSolver<R>::Representation p_rep  = SPxSolver<R>::COLUMN )
       : SoPlex(outstream, p_type, p_rep)
    {}
    //------------------------------------------------------------------------
@@ -1187,7 +1187,7 @@ public:
    //------------------------------------------------------------------------
    void displayInfeasibility() const
    {
-      assert(m_solver.status() == SPxSolver::INFEASIBLE);
+      assert(m_solver.status() == SPxSolver<R>::INFEASIBLE);
 
 #if 0
       if ( checkMode )
@@ -1402,7 +1402,7 @@ void check_parameter(const char param, const char* const argv[])
 static
 void print_algorithm_parameters(
    MySoPlex&                       work,
-   const SPxSolver::Representation representation,
+   const SPxSolver<R>::Representation representation,
    const SLUFactor::UpdateType     update
    )
 {
@@ -1420,10 +1420,10 @@ void print_algorithm_parameters(
 	 << "IEXAMP38 Epsilon Update = "
 	 << std::setw(16) << Param::epsilonUpdate() << std::endl
 	 << "IEXAMP14 "
-	 << (work.type() == SPxSolver::ENTER ? "Entering" : "Leaving")
+	 << (work.type() == SPxSolver<R>::ENTER ? "Entering" : "Leaving")
 	 << " algorithm" << std::endl
 	 << "IEXAMP15 "
-	 << (representation == SPxSolver::ROW ? "Row" : "Column")
+	 << (representation == SPxSolver<R>::ROW ? "Row" : "Column")
 	 << " representation" << std::endl
 	 << "IEXAMP16 "
 	 << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
@@ -1444,9 +1444,9 @@ void print_algorithm_parameters(
 	 << "Epsilon Update = "
 	 << std::setw(16) << Param::epsilonUpdate() << std::endl
 	 << std::endl
-	 << "algorithm      = " << (work.type() == SPxSolver::ENTER ? "Entering" : "Leaving")
+	 << "algorithm      = " << (work.type() == SPxSolver<R>::ENTER ? "Entering" : "Leaving")
 	 << std::endl
-	 << "representation = " << (representation == SPxSolver::ROW ? "Row" : "Column")
+	 << "representation = " << (representation == SPxSolver<R>::ROW ? "Row" : "Column")
 	 << std::endl
 	 << "update         = " << (update == SLUFactor::ETA ? "Eta" : "Forest-Tomlin")
 	 << std::endl; )
@@ -1759,13 +1759,13 @@ void print_solution_and_status(
    )
 {
    // get the solution status
-   SPxSolver::Status stat = work.status();
+   SPxSolver<R>::Status stat = work.status();
 
    if ( ! checkMode )
       MSG_INFO1( (*work.spxout), (*work.spxout) << std::endl; )
    switch (stat)
    {
-   case SPxSolver::OPTIMAL:
+   case SPxSolver<R>::OPTIMAL:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "IEXAMP29 solution value is: " << std::setprecision( precision ) << work.objValue() << std::endl; )
       else
@@ -1778,7 +1778,7 @@ void print_solution_and_status(
       {
          DVector objx(work.nCols());
 
-         if( work.getPrimal(objx) != SPxSolver::ERROR )
+         if( work.getPrimal(objx) != SPxSolver<R>::ERROR )
          {
             MSG_INFO1( (*work.spxout), (*work.spxout) << std::endl << "Primal solution (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
@@ -1798,7 +1798,7 @@ void print_solution_and_status(
          DVector objy(work.nRows());
          bool allzero = true;
 
-         if( work.getDual(objy) != SPxSolver::ERROR )
+         if( work.getDual(objy) != SPxSolver<R>::ERROR )
          {
             MSG_INFO1( (*work.spxout), (*work.spxout) << std::endl << "Dual multipliers (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nRows(); ++i )
@@ -1844,7 +1844,7 @@ void print_solution_and_status(
          }
       }
       break;
-   case SPxSolver::UNBOUNDED:
+   case SPxSolver<R>::UNBOUNDED:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "IEXAMP31 LP is unbounded" << std::endl; )
       else
@@ -1853,7 +1853,7 @@ void print_solution_and_status(
       if ( print_solution )
       {
          DVector objx(work.nCols());
-         if( work.getPrimal(objx) != SPxSolver::ERROR )
+         if( work.getPrimal(objx) != SPxSolver<R>::ERROR )
          {
             MSG_INFO1( (*work.spxout), (*work.spxout) << std::endl << "Primal solution (name, id, value):" << std::endl; )
             for( int i = 0; i < work.nCols(); ++i )
@@ -1870,7 +1870,7 @@ void print_solution_and_status(
 
          DVector objcoef(work.nCols());
          DVector ray(work.nCols());
-         if( work.getPrimalray(ray) != SPxSolver::ERROR )
+         if( work.getPrimalray(ray) != SPxSolver<R>::ERROR )
          {
             Real rayobjval = 0.0;
 
@@ -1895,7 +1895,7 @@ void print_solution_and_status(
          }
       }
       break;
-   case SPxSolver::INFEASIBLE:
+   case SPxSolver<R>::INFEASIBLE:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "IEXAMP32 LP is infeasible" << std::endl; )
       else
@@ -1904,7 +1904,7 @@ void print_solution_and_status(
       {
          DVector farkasx(work.nRows());
 
-         if( work.getDualfarkas(farkasx) != SPxSolver::ERROR )
+         if( work.getDualfarkas(farkasx) != SPxSolver<R>::ERROR )
          {
             DVector proofvec(work.nCols());
             double lhs;
@@ -1995,31 +1995,31 @@ void print_solution_and_status(
 	       MSG_INFO1( (*work.spxout), (*work.spxout) << "Error while writing file \"" << basisname << "\"" << std::endl; )
          }
       break;
-   case SPxSolver::ABORT_CYCLING:
+   case SPxSolver<R>::ABORT_CYCLING:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "EEXAMP40 aborted due to cycling" << std::endl; )
       else
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "Aborted due to cycling" << std::endl; )
       break;
-   case SPxSolver::ABORT_TIME:
+   case SPxSolver<R>::ABORT_TIME:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "IEXAMP33 aborted due to time limit" << std::endl; )
       else
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "Aborted due to time limit" << std::endl; )
       break;
-   case SPxSolver::ABORT_ITER:
+   case SPxSolver<R>::ABORT_ITER:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "IEXAMP34 aborted due to iteration limit" << std::endl; )
       else
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "Aborted due to iteration limit" << std::endl; )
       break;
-   case SPxSolver::ABORT_VALUE:
+   case SPxSolver<R>::ABORT_VALUE:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "IEXAMP35 aborted due to objective value limit" << std::endl; )
       else
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "Aborted due to objective value limit" << std::endl; )
       break;
-   case SPxSolver::SINGULAR:
+   case SPxSolver<R>::SINGULAR:
       if ( checkMode )
 	 MSG_INFO1( (*work.spxout), (*work.spxout) << "EEXAMP39 basis is singular" << std::endl; )
       else
@@ -2083,8 +2083,8 @@ int main(int argc, char* argv[])
 {
    const char*               filename;
    char*                     basisname      = 0;
-   SPxSolver::Type           type           = SPxSolver::LEAVE;
-   SPxSolver::Representation representation = SPxSolver::COLUMN;
+   SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
+   SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
    SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
    SPxSimplifier*            simplifier     = 0;
    SPxStarter*               starter        = 0;
@@ -2150,7 +2150,7 @@ int main(int argc, char* argv[])
             opttol = atof(&argv[optidx][2]);
             break;
          case 'e':
-            type = SPxSolver::ENTER;
+            type = SPxSolver<R>::ENTER;
             break;
          case 'g' :
             check_parameter(argv[optidx][2], argv); // use -g[0-5], not -g
@@ -2177,7 +2177,7 @@ int main(int argc, char* argv[])
             print_quality = true;
             break;
          case 'r' :
-            representation = SPxSolver::ROW;
+            representation = SPxSolver<R>::ROW;
             break;
          case 's' :
             check_parameter(argv[optidx][2], argv); // use -s[0-4], not -s

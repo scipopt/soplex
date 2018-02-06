@@ -48,7 +48,7 @@ void SPxSteepPR::load(SPxSolver* base)
    }
 }
 
-void SPxSteepPR::setType(SPxSolver::Type type)
+void SPxSteepPR::setType(SPxSolver<R>::Type type)
 {
    workRhs.setEpsilon(thesolver->epsilon());
 
@@ -61,7 +61,7 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    bestPrices.setMax(thesolver->dim());
    prices.reMax(thesolver->dim());
 
-   if( type == SPxSolver::ENTER )
+   if( type == SPxSolver<R>::ENTER )
    {
       bestPricesCo.clear();
       bestPricesCo.setMax(thesolver->coDim());
@@ -69,7 +69,7 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    }
 }
 
-void SPxSteepPR::setupWeights(SPxSolver::Type type)
+void SPxSteepPR::setupWeights(SPxSolver<R>::Type type)
 {
    int i;
    int endDim = 0;
@@ -79,7 +79,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
 
    if( setup == DEFAULT )
    {
-      if( type == SPxSolver::ENTER )
+      if( type == SPxSolver<R>::ENTER )
       {
          if( thesolver->weightsAreSetup )
          {
@@ -103,7 +103,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
       }
       else
       {
-         assert(type == SPxSolver::LEAVE);
+         assert(type == SPxSolver<R>::LEAVE);
 
          if( thesolver->weightsAreSetup )
          {
@@ -123,7 +123,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    {
       MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl; )
 
-      if (type == SPxSolver::ENTER)
+      if (type == SPxSolver<R>::ENTER)
       {
          coWeights.reDim(thesolver->dim(), false);
          for (i = thesolver->dim() - 1; i >= endDim; --i)
@@ -134,7 +134,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
       }
       else
       {
-         assert(type == SPxSolver::LEAVE);
+         assert(type == SPxSolver<R>::LEAVE);
          coWeights.reDim(thesolver->dim(), false);
          SSVector tmp(thesolver->dim(), thesolver->epsilon());
          for( i = thesolver->dim() - 1; i >= endDim && !thesolver->isTimeLimitReached(); --i )
@@ -147,7 +147,7 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    thesolver->weightsAreSetup = true;
 }
 
-void SPxSteepPR::setRep(SPxSolver::Representation)
+void SPxSteepPR::setRep(SPxSolver<R>::Representation)
 {
    if (workVec.dim() != thesolver->dim())
    {
@@ -162,7 +162,7 @@ void SPxSteepPR::setRep(SPxSolver::Representation)
 
 void SPxSteepPR::left4(int n, SPxId id)
 {
-   assert(thesolver->type() == SPxSolver::LEAVE);
+   assert(thesolver->type() == SPxSolver<R>::LEAVE);
 
    if (id.isValid())
    {
@@ -429,7 +429,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
  */
 void SPxSteepPR::entered4(SPxId /* id */, int n)
 {
-   assert(thesolver->type() == SPxSolver::ENTER);
+   assert(thesolver->type() == SPxSolver<R>::ENTER);
 
    if (n >= 0 && n < thesolver->dim())
    {
@@ -936,7 +936,7 @@ void SPxSteepPR::addedVecs(int n)
    n = weights.dim();
    weights.reDim(thesolver->coDim());
 
-   if (thesolver->type() == SPxSolver::ENTER)
+   if (thesolver->type() == SPxSolver<R>::ENTER)
    {
       for (; n < weights.dim(); ++n)
          weights[n] = 2;
@@ -965,7 +965,7 @@ void SPxSteepPR::removedVecs(const int perm[])
 {
    assert(thesolver != 0);
    DVector& weights = thesolver->weights;
-   if (thesolver->type() == SPxSolver::ENTER)
+   if (thesolver->type() == SPxSolver<R>::ENTER)
    {
       int i;
       int j = weights.dim();
@@ -1005,7 +1005,7 @@ bool SPxSteepPR::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
    DVector& w = thesolver->weights;
    DVector& coW = thesolver->coWeights;
-   if (thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
+   if (thesolver != 0 && thesolver->type() == SPxSolver<R>::LEAVE && setup == EXACT)
    {
       int i;
       SSVector tmp(thesolver->dim(), thesolver->epsilon());
@@ -1021,7 +1021,7 @@ bool SPxSteepPR::isConsistent() const
       }
    }
 
-   if (thesolver != 0 && thesolver->type() == SPxSolver::ENTER)
+   if (thesolver != 0 && thesolver->type() == SPxSolver<R>::ENTER)
    {
       int i;
       for (i = thesolver->dim() - 1; i >= 0; --i)

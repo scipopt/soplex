@@ -221,7 +221,7 @@ void SPxWeightST::generate(SPxSolver& base)
    rowRight.reSize (base.nRows());
    colUp.reSize (base.nCols());
 
-   if (base.rep() == SPxSolver::COLUMN)
+   if (base.rep() == SPxSolver<R>::COLUMN)
    {
       weight   = &colWeight;
       coWeight = &rowWeight;
@@ -250,7 +250,7 @@ void SPxWeightST::generate(SPxSolver& base)
    for(i = 0; i < base.dim(); ++i)
       forbidden[i] = 0;
 
-   if (base.rep() == SPxSolver::COLUMN)
+   if (base.rep() == SPxSolver<R>::COLUMN)
    {
       // in COLUMN rep we scan from beginning to end
       i      = 0;
@@ -318,7 +318,7 @@ void SPxWeightST::generate(SPxSolver& base)
          forbidden[sel] = 2;
 
          // put current column/row into basis
-         if (base.rep() == SPxSolver::COLUMN)
+         if (base.rep() == SPxSolver<R>::COLUMN)
             setDualStatus(desc, base, pref[i]);
          else
             setPrimalStatus(desc, base, pref[i]);
@@ -338,7 +338,7 @@ void SPxWeightST::generate(SPxSolver& base)
          if (--dim == 0)
          {
             //@ for(++i; i < pref.size(); ++i)
-            if (base.rep() == SPxSolver::COLUMN)
+            if (base.rep() == SPxSolver<R>::COLUMN)
             {
                // set all remaining indeces to nonbasic status
                for (i += stepi; i >= 0 && i < pref.size(); i += stepi)
@@ -366,7 +366,7 @@ void SPxWeightST::generate(SPxSolver& base)
          }
       }
       // sel == -1
-      else if (base.rep() == SPxSolver::COLUMN)
+      else if (base.rep() == SPxSolver<R>::COLUMN)
          setPrimalStatus(desc, base, pref[i]);
       else
          setDualStatus(desc, base, pref[i]);

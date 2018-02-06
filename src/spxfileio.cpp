@@ -21,7 +21,7 @@
 
 namespace soplex
 {
-bool SPxSolver::readBasisFile(
+bool SPxSolver<R>::readBasisFile(
    const char*    filename, 
    const NameSet* rowNames,
    const NameSet* colNames)
@@ -35,7 +35,7 @@ bool SPxSolver::readBasisFile(
    return readBasis(file, rowNames, colNames);
 }
 
-bool SPxSolver::writeBasisFile
+bool SPxSolver<R>::writeBasisFile
    ( const char*    filename, 
      const NameSet* rowNames,
      const NameSet* colNames,

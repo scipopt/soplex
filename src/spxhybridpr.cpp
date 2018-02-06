@@ -63,12 +63,12 @@ void SPxHybridPR::setEpsilon(Real eps)
    parmult.setEpsilon(eps);
 }
 
-void SPxHybridPR::setType(SPxSolver::Type tp)
+void SPxHybridPR::setType(SPxSolver<R>::Type tp)
 {
-   if (tp == SPxSolver::LEAVE)
+   if (tp == SPxSolver<R>::LEAVE)
    {
       thepricer = &steep;
-      thesolver->setPricing(SPxSolver::FULL);
+      thesolver->setPricing(SPxSolver<R>::FULL);
    }
    else
    {
@@ -80,12 +80,12 @@ void SPxHybridPR::setType(SPxSolver::Type tp)
           */
          // thepricer = &devex;
          thepricer = &steep;
-         thesolver->setPricing(SPxSolver::FULL);
+         thesolver->setPricing(SPxSolver<R>::FULL);
       }
       else
       {
          thepricer = &parmult;
-         thesolver->setPricing(SPxSolver::PARTIAL);
+         thesolver->setPricing(SPxSolver<R>::PARTIAL);
       }
    }
    
@@ -95,7 +95,7 @@ void SPxHybridPR::setType(SPxSolver::Type tp)
    thepricer->setType(tp);
 }
 
-void SPxHybridPR::setRep(SPxSolver::Representation rep)
+void SPxHybridPR::setRep(SPxSolver<R>::Representation rep)
 {
    steep.setRep(rep);
    devex.setRep(rep);

@@ -66,7 +66,7 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
       range = 0;
       if( breakpoints[i].src == PVEC )
       {
-         assert(this->thesolver->rep() == SPxSolver::COLUMN);
+         assert(this->thesolver->rep() == SPxSolver<R>::COLUMN);
          stat = ds.status(idx);
          upper = this->thesolver->upper(idx);
          lower = this->thesolver->lower(idx);
@@ -116,7 +116,7 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
       }
       else if( breakpoints[i].src == COPVEC )
       {
-         assert(this->thesolver->rep() == SPxSolver::COLUMN);
+         assert(this->thesolver->rep() == SPxSolver<R>::COLUMN);
          stat = ds.coStatus(idx);
          upper = this->thesolver->rhs(idx);
          lower = this->thesolver->lhs(idx);
@@ -166,7 +166,7 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
       }
       else if( breakpoints[i].src == FVEC )
       {
-         assert(this->thesolver->rep() == SPxSolver::ROW);
+         assert(this->thesolver->rep() == SPxSolver<R>::ROW);
          SPxId baseId = this->thesolver->basis().baseId(idx);
          int IdNumber;
 
