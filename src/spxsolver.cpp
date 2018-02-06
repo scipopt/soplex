@@ -2179,7 +2179,7 @@ std::ostream& operator<<( std::ostream& os,
 
 // Pretty-printing of representation.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver<R>::Representation& status )
+                          const typename SPxSolver<R>::Representation& status )
 {
    switch ( status )
       {

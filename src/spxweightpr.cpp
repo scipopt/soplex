@@ -22,7 +22,7 @@
 namespace soplex
 {
 
-void SPxWeightPR::setRep(SPxSolver<R>::Representation rep)
+void SPxWeightPR::setRep(typename SPxSolver<R>::Representation rep)
 {
    if (rep == SPxSolver<R>::ROW)
    {

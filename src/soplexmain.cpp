@@ -1072,7 +1072,7 @@ public:
    /// default constructor
    MySoPlex( SPxOut&                   outstream,
              typename SPxSolver<R>::Type           p_type = SPxSolver<R>::LEAVE,
-             SPxSolver<R>::Representation p_rep  = SPxSolver<R>::COLUMN )
+             typename SPxSolver<R>::Representation p_rep  = SPxSolver<R>::COLUMN )
       : SoPlex(outstream, p_type, p_rep)
    {}
    //------------------------------------------------------------------------
@@ -1402,7 +1402,7 @@ void check_parameter(const char param, const char* const argv[])
 static
 void print_algorithm_parameters(
    MySoPlex&                       work,
-   const SPxSolver<R>::Representation representation,
+   const typename SPxSolver<R>::Representation representation,
    const SLUFactor::UpdateType     update
    )
 {
@@ -2084,7 +2084,7 @@ int main(int argc, char* argv[])
    const char*               filename;
    char*                     basisname      = 0;
    typename SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
-   SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
+   typename SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
    SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
    SPxSimplifier*            simplifier     = 0;
    SPxStarter*               starter        = 0;

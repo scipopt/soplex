@@ -94,7 +94,7 @@ public:
    /// Default constructor.
    explicit
    TestSolver( const SPxSolver<R>::Type type_, 
-               const SPxSolver<R>::Representation representation_ )
+               const typename SPxSolver<R>::Representation representation_ )
       : SPxSolver( type_, 
                    representation_ )
    {
@@ -163,7 +163,7 @@ public:
    explicit
    ChangeExerciser( const std::string& instance_name,
                     const SPxSolver<R>::Type type,
-                    const SPxSolver<R>::Representation representation )
+                    const typename SPxSolver<R>::Representation representation )
       : _asserts_failed( 0 )
       , _instance_name( instance_name )
       , _type( type )
@@ -243,7 +243,7 @@ private:
    ///
    const SPxSolver<R>::Type _type;
    ///
-   const SPxSolver<R>::Representation _representation;
+   const typename SPxSolver<R>::Representation _representation;
    //@}   
 };
 
@@ -271,7 +271,7 @@ bool verbose = false;
 */
 long run_tests( const std::string& filename, 
                 const SPxSolver<R>::Type type,
-                const SPxSolver<R>::Representation representation )
+                const typename SPxSolver<R>::Representation representation )
 {
    ChangeExerciser tester( filename,
                            type,

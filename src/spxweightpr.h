@@ -147,7 +147,7 @@ public:
    /// set entering/leaving algorithm
    void setType(typename SPxSolver<R>::Type tp);
    /// set row/column representation
-   void setRep(SPxSolver<R>::Representation rep);
+   void setRep(typename SPxSolver<R>::Representation rep);
    ///
    virtual int selectLeave();
    ///

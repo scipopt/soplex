@@ -147,7 +147,7 @@ void SPxSteepPR::setupWeights(typename SPxSolver<R>::Type type)
    this->thesolver->weightsAreSetup = true;
 }
 
-void SPxSteepPR::setRep(SPxSolver<R>::Representation)
+void SPxSteepPR::setRep(typename SPxSolver<R>::Representation)
 {
    if (workVec.dim() != this->thesolver->dim())
    {
