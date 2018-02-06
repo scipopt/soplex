@@ -40,8 +40,8 @@ void SPxWeightPR::setType(SPxSolver<R>::Type tp)
 {
    if (thesolver && tp == SPxSolver<R>::LEAVE)
    {
-      leavePenalty.reDim( thesolver->dim() );
-      computeLeavePenalty( 0, thesolver->dim() );
+      leavePenalty.reDim( this->thesolver->dim() );
+      computeLeavePenalty( 0, this->thesolver->dim() );
    }
 }
 
@@ -53,9 +53,9 @@ void SPxWeightPR::computeLeavePenalty(int start, int end)
    {
       SPxId id = basis.baseId(i);
       if (id.type() == SPxId::ROW_ID)
-         leavePenalty[i] = rPenalty[ thesolver->number(id) ];
+         leavePenalty[i] = rPenalty[ this->thesolver->number(id) ];
       else
-         leavePenalty[i] = cPenalty[ thesolver->number(id) ];
+         leavePenalty[i] = cPenalty[ this->thesolver->number(id) ];
    }
 }
 
@@ -99,8 +99,8 @@ void SPxWeightPR::load(SPxSolver* base)
 
 int SPxWeightPR::selectLeave()
 {
-   const Real* test = thesolver->fTest().get_const_ptr();
-   Real type = 1 - 2 * (thesolver->rep() == SPxSolver<R>::COLUMN ? 1 : 0);
+   const Real* test = this->thesolver->fTest().get_const_ptr();
+   Real type = 1 - 2 * (this->thesolver->rep() == SPxSolver<R>::COLUMN ? 1 : 0);
    Real best = type * infinity;
    int lastIdx = -1;
    Real x;
@@ -128,8 +128,8 @@ int SPxWeightPR::selectLeave()
 // ??? This is the old (buggy) version
 int SPxWeightPR::selectLeave()
 {
-   const Real* test = thesolver->fTest().get_const_ptr();
-   Real type = 1 - 2 * (thesolver->rep() == SPxSolver<R>::COLUMN);
+   const Real* test = this->thesolver->fTest().get_const_ptr();
+   Real type = 1 - 2 * (this->thesolver->rep() == SPxSolver<R>::COLUMN);
    Real best = type * infinity;
    int lastIdx = -1;
    Real x;

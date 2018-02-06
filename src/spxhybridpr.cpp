@@ -68,11 +68,11 @@ void SPxHybridPR::setType(SPxSolver<R>::Type tp)
    if (tp == SPxSolver<R>::LEAVE)
    {
       thepricer = &steep;
-      thesolver->setPricing(SPxSolver<R>::FULL);
+      this->thesolver->setPricing(SPxSolver<R>::FULL);
    }
    else
    {
-      if (thesolver->dim() > hybridFactor * thesolver->coDim())
+      if (this->thesolver->dim() > hybridFactor * this->thesolver->coDim())
       {
          /**@todo I changed from devex to steepest edge pricing here 
           *       because of numerical difficulties, this should be 
@@ -80,16 +80,16 @@ void SPxHybridPR::setType(SPxSolver<R>::Type tp)
           */
          // thepricer = &devex;
          thepricer = &steep;
-         thesolver->setPricing(SPxSolver<R>::FULL);
+         this->thesolver->setPricing(SPxSolver<R>::FULL);
       }
       else
       {
          thepricer = &parmult;
-         thesolver->setPricing(SPxSolver<R>::PARTIAL);
+         this->thesolver->setPricing(SPxSolver<R>::PARTIAL);
       }
    }
    
-   MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << "IPRHYB01 switching to "
+   MSG_INFO1( (*this->thesolver->spxout), (*this->thesolver->spxout) << "IPRHYB01 switching to "
                         << thepricer->getName() << std::endl; )
 
    thepricer->setType(tp);

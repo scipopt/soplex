@@ -150,9 +150,9 @@ namespace soplex
       */
       virtual void setType(typename SPxSolver<R>::Type)
       {
-        thesolver->weights.reDim(0);
-        thesolver->coWeights.reDim(0);
-        thesolver->weightsAreSetup = false;
+        this->thesolver->weights.reDim(0);
+        this->thesolver->coWeights.reDim(0);
+        this->thesolver->weightsAreSetup = false;
       }
 
       /// sets basis representation.
