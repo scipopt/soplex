@@ -37,17 +37,18 @@ namespace soplex
  * basis selected to leave the basis. -1 indicates that no variable could be
  * selected. Otherwise, parameter \p val contains the chosen fVec.value().
  */
-int SPxDefaultRT::selectLeave(Real& val, Real, bool)
+  template <class R>
+int SPxDefaultRT<R>::selectLeave(Real& val, Real, bool)
 {
-   solver()->fVec().delta().setup();
+   this->solver()->fVec().delta().setup();
 
-   const Real*   vec = solver()->fVec().get_const_ptr();
-   const Real*   upd = solver()->fVec().delta().values();
-   const IdxSet& idx = solver()->fVec().idx();
-   const Real*   ub  = solver()->ubBound().get_const_ptr();
-   const Real*   lb  = solver()->lbBound().get_const_ptr();
+   const Real*   vec = this->solver()->fVec().get_const_ptr();
+   const Real*   upd = this->solver()->fVec().delta().values();
+   const IdxSet& idx = this->solver()->fVec().idx();
+   const Real*   ub  = this->solver()->ubBound().get_const_ptr();
+   const Real*   lb  = this->solver()->lbBound().get_const_ptr();
 
-   Real epsilon = solver()->epsilon();
+   Real epsilon = this->solver()->epsilon();
    int  leave   = -1;
 
    Real x;
@@ -67,7 +68,7 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          {
             if (ub[i] < infinity)
             {
-               Real y = (ub[i] - vec[i] + delta) / x;
+               Real y = (ub[i] - vec[i] + this->delta) / x;
 
                if (y < val)
                {
@@ -80,7 +81,7 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          {
             if (lb[i] > -infinity)
             {
-               Real y = (lb[i] - vec[i] - delta) / x;
+               Real y = (lb[i] - vec[i] - this->delta) / x;
 
                if (y < val)
                {
@@ -95,7 +96,7 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          x   = upd[leave];
 
          // BH 2005-11-30: It may well happen that the basis is degenerate and the
-         // selected leaving variable is (at most delta) beyond its bound. (This
+         // selected leaving variable is (at most this->delta) beyond its bound. (This
          // happens for instance on LP/netlib/adlittle.mps with setting -r -t0.) 
          // In that case we do a pivot step with length zero to avoid difficulties.
          if ( ( x > epsilon  && vec[leave] >= ub[leave] ) ||
@@ -123,7 +124,7 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          {
             if (ub[i] < infinity)
             {
-               Real y = (ub[i] - vec[i] + delta) / x;
+               Real y = (ub[i] - vec[i] + this->delta) / x;
 
                if (y > val)
                {
@@ -136,7 +137,7 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          {
             if (lb[i] > -infinity)
             {
-               Real y = (lb[i] - vec[i] - delta) / x;
+               Real y = (lb[i] - vec[i] - this->delta) / x;
 
                if (y > val)
                {
@@ -169,27 +170,28 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
 }
 
 /**
- Here comes the ratio test. It is assumed that theCoPvec.delta() and
+ Here comes the ratio test. It is assumed that theCoPvec.this->delta() and
  theCoPvec.idx() have been setup correctly!
  */
-SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
+  template <class R>
+SPxId SPxDefaultRT<R>::selectEnter(Real& max, int, bool)
 {
-   solver()->coPvec().delta().setup();
-   solver()->pVec().delta().setup();
+  this->solver()->coPvec().delta().setup();
+   this->solver()->pVec().delta().setup();
 
-   const Real*   pvec = solver()->pVec().get_const_ptr();
-   const Real*   pupd = solver()->pVec().delta().values();
-   const IdxSet& pidx = solver()->pVec().idx();
-   const Real*   lpb  = solver()->lpBound().get_const_ptr();
-   const Real*   upb  = solver()->upBound().get_const_ptr();
+   const Real*   pvec = this->solver()->pVec().get_const_ptr();
+   const Real*   pupd = this->solver()->pVec().delta().values();
+   const IdxSet& pidx = this->solver()->pVec().idx();
+   const Real*   lpb  = this->solver()->lpBound().get_const_ptr();
+   const Real*   upb  = this->solver()->upBound().get_const_ptr();
 
-   const Real*   cvec = solver()->coPvec().get_const_ptr();
-   const Real*   cupd = solver()->coPvec().delta().values();
-   const IdxSet& cidx = solver()->coPvec().idx();
-   const Real*   lcb  = solver()->lcBound().get_const_ptr();
-   const Real*   ucb  = solver()->ucBound().get_const_ptr();
+   const Real*   cvec = this->solver()->coPvec().get_const_ptr();
+   const Real*   cupd = this->solver()->coPvec().delta().values();
+   const IdxSet& cidx = this->solver()->coPvec().idx();
+   const Real*   lcb  = this->solver()->lcBound().get_const_ptr();
+   const Real*   ucb  = this->solver()->ucBound().get_const_ptr();
 
-   Real epsilon = solver()->epsilon();
+   Real epsilon = this->solver()->epsilon();
    Real val     = max;
    int  pnum    = -1;
    int  cnum    = -1;
@@ -211,11 +213,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (upb[i] < infinity)
             {
-               Real y = (upb[i] - pvec[i] + delta) / x;
+               Real y = (upb[i] - pvec[i] + this->delta) / x;
                         
                if (y < val)
                {
-                  enterId = solver()->id(i);
+                  enterId = this->solver()->id(i);
                   val     = y;
                   pnum    = j;
                }
@@ -225,11 +227,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (lpb[i] > -infinity)
             {
-               Real y = (lpb[i] - pvec[i] - delta) / x;
+               Real y = (lpb[i] - pvec[i] - this->delta) / x;
 
                if (y < val)
                {
-                  enterId = solver()->id(i);
+                  enterId = this->solver()->id(i);
                   val     = y;
                   pnum    = j;
                }
@@ -245,11 +247,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (ucb[i] < infinity)
             {
-               Real y = (ucb[i] - cvec[i] + delta) / x;
+               Real y = (ucb[i] - cvec[i] + this->delta) / x;
 
                if (y < val)
                {
-                  enterId = solver()->coId(i);
+                  enterId = this->solver()->coId(i);
                   val     = y;
                   cnum    = j;
                }
@@ -259,11 +261,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (lcb[i] > -infinity)
             {
-               Real y = (lcb[i] - cvec[i] - delta) / x;
+               Real y = (lcb[i] - cvec[i] - this->delta) / x;
 
                if (y < val)
                {
-                  enterId = solver()->coId(i);
+                  enterId = this->solver()->coId(i);
                   val     = y;
                   cnum    = j;
                }
@@ -296,11 +298,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (lpb[i] > -infinity)
             {
-               Real y = (lpb[i] - pvec[i] - delta) / x;
+               Real y = (lpb[i] - pvec[i] - this->delta) / x;
 
                if (y > val)
                {
-                  enterId = solver()->id(i);
+                  enterId = this->solver()->id(i);
                   val     = y;
                   pnum    = j;
                }
@@ -310,11 +312,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (upb[i] < infinity)
             {
-               Real y = (upb[i] - pvec[i] + delta) / x;
+               Real y = (upb[i] - pvec[i] + this->delta) / x;
 
                if (y > val)
                {
-                  enterId = solver()->id(i);
+                  enterId = this->solver()->id(i);
                   val     = y;
                   pnum    = j;
                }
@@ -330,11 +332,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (lcb[i] > -infinity)
             {
-               Real y = (lcb[i] - cvec[i] - delta) / x;
+               Real y = (lcb[i] - cvec[i] - this->delta) / x;
 
                if (y > val)
                {
-                  enterId = solver()->coId(i);
+                  enterId = this->solver()->coId(i);
                   val     = y;
                   cnum    = j;
                }
@@ -344,11 +346,11 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
          {
             if (ucb[i] < infinity)
             {
-               Real y = (ucb[i] - cvec[i] + delta) / x;
+               Real y = (ucb[i] - cvec[i] + this->delta) / x;
 
                if (y > val)
                {
-                  enterId = solver()->coId(i);
+                  enterId = this->solver()->coId(i);
                   val     = y;
                   cnum    = j;
                }
@@ -371,15 +373,15 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
       }
    }
 
-   if (enterId.isValid() && solver()->isBasic(enterId))
+   if (enterId.isValid() && this->solver()->isBasic(enterId))
    {
       MSG_DEBUG( std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
                         << std::endl; )
       if (cnum >= 0)
-         solver()->coPvec().delta().clearNum(cnum);
+         this->solver()->coPvec().delta().clearNum(cnum);
       else if( pnum >= 0 )
-         solver()->pVec().delta().clearNum(pnum);
-      return SPxDefaultRT::selectEnter(max, 0, false);
+         this->solver()->pVec().delta().clearNum(pnum);
+      return SPxDefaultRT<R>::selectEnter(max, 0, false);
    }
 
    MSG_DEBUG(
