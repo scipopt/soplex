@@ -176,7 +176,7 @@ SPxSolver<R>::Status SPxSolver<R>::solve()
    stallNumRecovers = 0;
 
    /* if we run into a singular basis, we will retry from regulardesc with tighter tolerance in the ratio test */
-   SPxSolver<R>::Type tightenedtype = type();
+   typename SPxSolver<R>::Type tightenedtype = type();
    bool tightened = false;
 
    while (!stop)

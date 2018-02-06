@@ -145,7 +145,7 @@ public:
    /// sets the solver
    virtual void load(SPxSolver* base);
    /// set entering/leaving algorithm
-   void setType(SPxSolver<R>::Type tp);
+   void setType(typename SPxSolver<R>::Type tp);
    /// set row/column representation
    void setRep(SPxSolver<R>::Representation rep);
    ///

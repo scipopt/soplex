@@ -2160,7 +2160,7 @@ std::ostream& operator<<( std::ostream& os,
 
 // Pretty-printing of algorithm.
 std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver<R>::Type& status )
+                          const typename SPxSolver<R>::Type& status )
 {
    switch ( status )
       {

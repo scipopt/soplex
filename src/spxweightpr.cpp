@@ -36,7 +36,7 @@ void SPxWeightPR::setRep(SPxSolver<R>::Representation rep)
    }
 }
 
-void SPxWeightPR::setType(SPxSolver<R>::Type tp)
+void SPxWeightPR::setType(typename SPxSolver<R>::Type tp)
 {
    if (thesolver && tp == SPxSolver<R>::LEAVE)
    {

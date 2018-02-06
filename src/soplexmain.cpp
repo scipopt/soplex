@@ -1071,7 +1071,7 @@ class MySoPlex : public SoPlex
 public:
    /// default constructor
    MySoPlex( SPxOut&                   outstream,
-             SPxSolver<R>::Type           p_type = SPxSolver<R>::LEAVE,
+             typename SPxSolver<R>::Type           p_type = SPxSolver<R>::LEAVE,
              SPxSolver<R>::Representation p_rep  = SPxSolver<R>::COLUMN )
       : SoPlex(outstream, p_type, p_rep)
    {}
@@ -2083,7 +2083,7 @@ int main(int argc, char* argv[])
 {
    const char*               filename;
    char*                     basisname      = 0;
-   SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
+   typename SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
    SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
    SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
    SPxSimplifier*            simplifier     = 0;

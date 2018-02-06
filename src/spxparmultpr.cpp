@@ -22,7 +22,7 @@
 namespace soplex
 {
 
-void SPxParMultPR::setType(SPxSolver<R>::Type tp)
+void SPxParMultPR::setType(typename SPxSolver<R>::Type tp)
 {
    if (tp == SPxSolver<R>::ENTER)
    {

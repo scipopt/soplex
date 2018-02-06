@@ -48,7 +48,7 @@ void SPxSteepPR::load(SPxSolver* base)
    }
 }
 
-void SPxSteepPR::setType(SPxSolver<R>::Type type)
+void SPxSteepPR::setType(typename SPxSolver<R>::Type type)
 {
    workRhs.setEpsilon(this->thesolver->epsilon());
 
@@ -69,7 +69,7 @@ void SPxSteepPR::setType(SPxSolver<R>::Type type)
    }
 }
 
-void SPxSteepPR::setupWeights(SPxSolver<R>::Type type)
+void SPxSteepPR::setupWeights(typename SPxSolver<R>::Type type)
 {
    int i;
    int endDim = 0;
