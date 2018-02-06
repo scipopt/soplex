@@ -21,19 +21,19 @@
 
 namespace soplex
 {
-
-SPxBasis::Desc::Desc(const SPxSolver& base)
+  template <class R>
+  SPxBasis<R>::Desc::Desc(const SPxSolver<R>& base)
 {
    reSize(base.nRows(), base.nCols());
 
-   if (base.rep() == SPxSolver::ROW)
+   if (base.rep() == SPxSolver<R>::ROW)
    {
       stat   = &rowstat;
       costat = &colstat;
    }
    else
    {
-      assert(base.rep() == SPxSolver::COLUMN);
+      assert(base.rep() == SPxSolver<R>::COLUMN);
 
       stat   = &colstat;
       costat = &rowstat;
@@ -42,7 +42,8 @@ SPxBasis::Desc::Desc(const SPxSolver& base)
    assert(Desc::isConsistent());
 }
 
-SPxBasis::Desc::Desc(const Desc& old)
+  template <class R>
+SPxBasis<R>::Desc::Desc(const Desc& old)
    : rowstat(old.rowstat)
    , colstat(old.colstat)
 {
@@ -64,7 +65,8 @@ SPxBasis::Desc::Desc(const Desc& old)
    assert(Desc::isConsistent());
 }
 
-SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
+  template <class R>
+typename SPxBasis<R>::Desc& SPxBasis<R>::Desc::operator=(const SPxBasis<R>::Desc& rhs)
 {
    if (this != &rhs)
    {
@@ -91,7 +93,8 @@ SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
    return *this;
 }
 
-void SPxBasis::Desc::reSize(int rowDim, int colDim)
+  template <class R>
+void SPxBasis<R>::Desc::reSize(int rowDim, int colDim)
 {
 
    assert(rowDim >= 0);
@@ -110,7 +113,8 @@ void SPxBasis::Desc::reSize(int rowDim, int colDim)
       colstat[i] = D_UNDEFINED;
 }
 
-void SPxBasis::Desc::dump() const
+  template <class R>
+void SPxBasis<R>::Desc::dump() const
 {
    int i;
 
@@ -127,7 +131,8 @@ void SPxBasis::Desc::dump() const
    std::cout << std::endl;
 }
 
-bool SPxBasis::Desc::isConsistent() const
+  template <class R>
+bool SPxBasis<R>::Desc::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    return rowstat.isConsistent() && colstat.isConsistent();
@@ -136,37 +141,38 @@ bool SPxBasis::Desc::isConsistent() const
 #endif
 }
 
-std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
+  template <class R>
+std::ostream& operator<<(std::ostream& os, const typename SPxBasis<R>::Desc::Status& stat)
 {
    char text;
    
    switch(stat)
    {
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       text = 'L';
       break;
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       text = 'U';
       break;
-   case SPxBasis::Desc::P_FREE :
+   case SPxBasis<R>::Desc::P_FREE :
       text = 'F';
       break;
-   case SPxBasis::Desc::P_FIXED :
+   case SPxBasis<R>::Desc::P_FIXED :
       text = 'X';
       break;
-   case SPxBasis::Desc::D_FREE :
+   case SPxBasis<R>::Desc::D_FREE :
       text = 'f';
       break;
-   case SPxBasis::Desc::D_ON_UPPER :
+   case SPxBasis<R>::Desc::D_ON_UPPER :
       text = 'u';
       break;
-   case SPxBasis::Desc::D_ON_LOWER :
+   case SPxBasis<R>::Desc::D_ON_LOWER :
       text = 'l';
       break;
-   case SPxBasis::Desc::D_ON_BOTH :
+   case SPxBasis<R>::Desc::D_ON_BOTH :
       text = 'x';
       break;
-   case SPxBasis::Desc::D_UNDEFINED :
+   case SPxBasis<R>::Desc::D_UNDEFINED :
       text = '.';
       break;
    default :
