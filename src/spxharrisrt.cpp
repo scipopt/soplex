@@ -30,13 +30,15 @@ namespace soplex
  * 0 until numCycle >= 2 * maxCycle, after wich it becomes
  * negative. This does not look ok.
  */
-Real SPxHarrisRT::degenerateEps() const
+  template <class R>
+Real SPxHarrisRT<R>::degenerateEps() const
 {
    return this->solver()->delta() 
       * (1.0 - this->solver()->numCycle() / this->solver()->maxCycle());
 }
 
-int SPxHarrisRT::maxDelta(
+  template <class R>
+int SPxHarrisRT<R>::maxDelta(
    Real* /*max*/,             /* max abs value in upd */
    Real* val,             /* initial and chosen value */
    int num,             /* # of indices in idx */
@@ -67,14 +69,14 @@ int SPxHarrisRT::maxDelta(
       if (x > epsilon)
       {
          themax = (x > themax) ? x : themax;
-         x = (up[i] - vec[i] + delta) / x;
+         x = (up[i] - vec[i] + this->delta) / x;
          if (x < theval && up[i] < infinity)
             theval = x;
       }
       else if (x < -epsilon)
       {
          themax = (-x > themax) ? -x : themax;
-         x = (low[i] - vec[i] - delta) / x;
+         x = (low[i] - vec[i] - this->delta) / x;
          if (x < theval && low[i] > -infinity)
             theval = x;
       }
@@ -87,7 +89,8 @@ int SPxHarrisRT::maxDelta(
     (with the default setting *max=1)
     in selectLeave and selectEnter
 */
-int SPxHarrisRT::minDelta(
+  template <class R>
+int SPxHarrisRT<R>::minDelta(
    Real* /*max*/,             /* max abs value in upd */
    Real* val,             /* initial and chosen value */
    int num,             /* # of indices in idx */
@@ -118,14 +121,14 @@ int SPxHarrisRT::minDelta(
       if (x > epsilon)
       {
          themax = (x > themax) ? x : themax;
-         x = (low[i] - vec[i] - delta) / x;
+         x = (low[i] - vec[i] - this->delta) / x;
          if (x > theval && low[i] > -infinity)
             theval = x;
       }
       else if (x < -epsilon)
       {
          themax = (-x > themax) ? -x : themax;
-         x = (up[i] - vec[i] + delta) / x;
+         x = (up[i] - vec[i] + this->delta) / x;
          if (x > theval && up[i] < infinity)
             theval = x;
       }
@@ -146,7 +149,8 @@ int SPxHarrisRT::minDelta(
     allways yield an improvement. In that case, we shift the variable toward
     infeasibility and retry. This avoids cycling in the shifted LP.
  */
-int SPxHarrisRT::selectLeave(Real& val, Real, bool)
+  template <class R>
+int SPxHarrisRT<R>::selectLeave(Real& val, Real, bool)
 {
    int i, j;
    Real stab, x, y;
@@ -166,7 +170,7 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
    const Vector& up = this->solver()->ubBound();
    const Vector& low = this->solver()->lbBound();
 
-   assert(delta > epsilon);
+   assert(this->delta > epsilon);
    assert(epsilon > 0);
    assert(this->solver()->maxCycle() > 0);
 
@@ -318,8 +322,8 @@ int SPxHarrisRT::selectLeave(Real& val, Real, bool)
    return leave;
 }
 
-
-SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
+  template <class R>
+SPxId SPxHarrisRT<R>::selectEnter(Real& val, int, bool)
 {
    int i, j;
    SPxId enterId;
@@ -348,7 +352,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
    const Vector& ucb = this->solver()->ucBound();
    const Vector& lcb = this->solver()->lcBound();
 
-   assert(delta > epsilon);
+   assert(this->delta > epsilon);
    assert(epsilon > 0);
    assert(this->solver()->maxCycle() > 0);
 
@@ -363,7 +367,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
          cnr = -1;
          max = val;
          lastshift = this->solver()->shift();
-         assert(delta > epsilon);
+         assert(this->delta > epsilon);
 
          // phase 1:
          maxDelta(
@@ -516,7 +520,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                   if (x > 0)
                   {
                      sel = upb[pnr] - pvec[pnr];
-                     if (x < minStability && sel < delta)
+                     if (x < minStability && sel < this->delta)
                      {
                         minStability /= 2.0;
                         this->solver()->shiftUPbound(pnr, pvec[pnr]);
@@ -526,7 +530,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                   else
                   {
                      sel = lpb[pnr] - pvec[pnr];
-                     if (-x < minStability && -sel < delta)
+                     if (-x < minStability && -sel < this->delta)
                      {
                         minStability /= 2.0;
                         this->solver()->shiftLPbound(pnr, pvec[pnr]);
@@ -557,7 +561,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
          cnr = -1;
          max = val;
          lastshift = this->solver()->shift();
-         assert(delta > epsilon);
+         assert(this->delta > epsilon);
 
 
          // phase 1:
@@ -709,7 +713,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                   if (x > 0)
                   {
                      sel = lpb[pnr] - pvec[pnr];
-                     if (x < minStability && -sel < delta)
+                     if (x < minStability && -sel < this->delta)
                      {
                         minStability /= 2;
                         this->solver()->shiftLPbound(pnr, pvec[pnr]);
@@ -719,7 +723,7 @@ SPxId SPxHarrisRT::selectEnter(Real& val, int, bool)
                   else
                   {
                      sel = upb[pnr] - pvec[pnr];
-                     if (-x < minStability && sel < delta)
+                     if (-x < minStability && sel < this->delta)
                      {
                         minStability /= 2;
                         this->solver()->shiftUPbound(pnr, pvec[pnr]);
