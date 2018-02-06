@@ -22,7 +22,8 @@
 namespace soplex
 {
 
-bool SPxHybridPR::isConsistent() const
+    template <class R>
+bool SPxHybridPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    if (thesolver != 0 &&
@@ -39,31 +40,35 @@ bool SPxHybridPR::isConsistent() const
 #endif
 }
 
-void SPxHybridPR::load(SPxSolver* p_solver)
+  template <class R>
+  void SPxHybridPR<R>::load(SPxSolver<R>* p_solver)
 {
    steep.load(p_solver);
    devex.load(p_solver);
    parmult.load(p_solver);
-   thesolver = p_solver;
+   this->thesolver = p_solver;
    setType(p_solver->type());
 }
 
-void SPxHybridPR::clear()
+  template <class R>
+void SPxHybridPR<R>::clear()
 {
    steep.clear();
    devex.clear();
    parmult.clear();
-   thesolver = 0;
+   this->thesolver = 0;
 }
 
-void SPxHybridPR::setEpsilon(Real eps)
+  template <class R>
+void SPxHybridPR<R>::setEpsilon(Real eps)
 {
    steep.setEpsilon(eps);
    devex.setEpsilon(eps);
    parmult.setEpsilon(eps);
 }
 
-void SPxHybridPR::setType(SPxSolver<R>::Type tp)
+  template <class R>
+void SPxHybridPR<R>::setType(typename SPxSolver<R>::Type tp)
 {
    if (tp == SPxSolver<R>::LEAVE)
    {
@@ -95,41 +100,48 @@ void SPxHybridPR::setType(SPxSolver<R>::Type tp)
    thepricer->setType(tp);
 }
 
-void SPxHybridPR::setRep(SPxSolver<R>::Representation rep)
+  template <class R>
+void SPxHybridPR<R>::setRep(typename SPxSolver<R>::Representation rep)
 {
    steep.setRep(rep);
    devex.setRep(rep);
    parmult.setRep(rep);
 }
 
-int SPxHybridPR::selectLeave()
+  template <class R>
+int SPxHybridPR<R>::selectLeave()
 {
    return thepricer->selectLeave();
 }
 
-void SPxHybridPR::left4(int n, SPxId id)
+  template <class R>
+void SPxHybridPR<R>::left4(int n, SPxId id)
 {
    thepricer->left4(n, id);
 }
 
-SPxId SPxHybridPR::selectEnter()
+  template <class R>
+SPxId SPxHybridPR<R>::selectEnter()
 {
    return thepricer->selectEnter();
 }
 
-void SPxHybridPR::entered4(SPxId id, int n)
+  template <class R>
+void SPxHybridPR<R>::entered4(SPxId id, int n)
 {
    thepricer->entered4(id, n);
 }
 
-void SPxHybridPR::addedVecs (int n)
+  template <class R>
+void SPxHybridPR<R>::addedVecs (int n)
 {
    steep.addedVecs(n);
    devex.addedVecs(n);
    parmult.addedVecs(n);
 }
 
-void SPxHybridPR::addedCoVecs(int n)
+  template <class R>
+void SPxHybridPR<R>::addedCoVecs(int n)
 {
    steep.addedCoVecs(n);
    devex.addedCoVecs(n);
