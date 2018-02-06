@@ -29,7 +29,8 @@ namespace soplex
     -l_i\f$. Hence, with this definition of slack variables \f$s_i\f$, we
     can directly use vectors \f$l\f$ and \f$u\f$ as feasibility bounds.  
  */
-void SPxSolver::setPrimalBounds()
+  template <class R>
+  void SPxSolver<R>::setPrimalBounds()
 {
 
    theUCbound = SPxLP::upper();
@@ -37,13 +38,13 @@ void SPxSolver::setPrimalBounds()
 
    if (rep() == ROW)
    {
-      theURbound = rhs();
-      theLRbound = lhs();
+      theURbound = this->rhs();
+      theLRbound = this->lhs();
    }
    else
    {
-      theURbound = lhs();
-      theLRbound = rhs();
+      theURbound = this->lhs();
+      theLRbound = this->rhs();
       theURbound *= -1.0;
       theLRbound *= -1.0;
    }
@@ -73,25 +74,26 @@ void SPxSolver::setPrimalBounds()
    this function clears the bounds according to |stat| by setting them to
    \f$\infty\f$ or \f$-\infty\f$, respectively.
  */
-void SPxSolver::clearDualBounds(
-   SPxBasis::Desc::Status stat,
+  template <class R>
+void SPxSolver<R>::clearDualBounds(
+   typename SPxBasis<R>::Desc::Status stat,
    Real&                  upp,
    Real&                  lw) const
 {
 
    switch (stat)
    {
-   case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
-   case SPxBasis::Desc::D_FREE :
+   case SPxBasis<R>::Desc::P_ON_UPPER + SPxBasis<R>::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::D_FREE :
       upp = infinity;
       lw  = -infinity;
       break;
-   case SPxBasis::Desc::P_ON_UPPER :
-   case SPxBasis::Desc::D_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::D_ON_LOWER :
       upp = infinity;
       break;
-   case SPxBasis::Desc::P_ON_LOWER :
-   case SPxBasis::Desc::D_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::D_ON_UPPER :
       lw  = -infinity;
       break;
 
@@ -100,27 +102,28 @@ void SPxSolver::clearDualBounds(
    }
 }
 
-void SPxSolver::setDualColBounds()
+  template <class R>
+void SPxSolver<R>::setDualColBounds()
 {
 
    assert(rep() == COLUMN);
 
-   const SPxBasis::Desc& ds = desc();
+   const typename SPxBasis<R>::Desc& ds = this->desc();
 
    int i;
 
-   for(i = 0; i < nRows(); ++i)
+   for(i = 0; i < this->nRows(); ++i)
    {
-      theURbound[i] = maxRowObj(i);
-      theLRbound[i] = maxRowObj(i);
+      theURbound[i] = this->maxRowObj(i);
+      theLRbound[i] = this->maxRowObj(i);
 
       clearDualBounds(ds.rowStatus(i), theURbound[i], theLRbound[i]);
    }
 
-   for(i = 0; i < nCols(); ++i)
+   for(i = 0; i < this->Cols(); ++i)
    {
-      theUCbound[i] = -maxObj(i);
-      theLCbound[i] = -maxObj(i);
+      theUCbound[i] = -this->maxObj(i);
+      theLCbound[i] = -this->maxObj(i);
 
       // exchanged ...                 due to definition of slacks!
       clearDualBounds(ds.colStatus(i), theLCbound[i], theUCbound[i]);
@@ -130,27 +133,28 @@ void SPxSolver::setDualColBounds()
    }
 }
 
-void SPxSolver::setDualRowBounds()
+  template <class R>
+void SPxSolver<R>::setDualRowBounds()
 {
 
    assert(rep() == ROW);
 
    int i;
 
-   for(i = 0; i < nRows(); ++i)
+   for(i = 0; i < this->nRows(); ++i)
    {
       theURbound[i] = 0.0;
       theLRbound[i] = 0.0;
 
-      clearDualBounds(dualRowStatus(i), theURbound[i], theLRbound[i]);
+      clearDualBounds(this->dualRowStatus(i), theURbound[i], theLRbound[i]);
    }
 
-   for(i = 0; i < nCols(); ++i)
+   for(i = 0; i < this->nCols(); ++i)
    {
       theUCbound[i] = 0.0;
       theLCbound[i] = 0.0;
 
-      clearDualBounds(dualColStatus(i), theUCbound[i], theLCbound[i]);
+      clearDualBounds(this->dualColStatus(i), theUCbound[i], theLCbound[i]);
    }
 }
 
@@ -162,21 +166,22 @@ void SPxSolver::setDualRowBounds()
     |setEnterBound4Col(i, n)| does so for the |i|-th basis variable being
     column index |n|.
  */
-void SPxSolver::setEnterBound4Row(int i, int n)
+  template <class R>
+void SPxSolver<R>::setEnterBound4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
-   switch (desc().rowStatus(n))
+   switch (this->desc().rowStatus(n))
    {
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = theURbound[n];
       break;
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       theLBbound[i] = theLRbound[n];
       theUBbound[i] = infinity;
       break;
-   case SPxBasis::Desc::P_FIXED:
+   case SPxBasis<R>::Desc::P_FIXED:
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
@@ -187,21 +192,22 @@ void SPxSolver::setEnterBound4Row(int i, int n)
    }
 }
 
-void SPxSolver::setEnterBound4Col(int i, int n)
+  template <class R>
+void SPxSolver<R>::setEnterBound4Col(int i, int n)
 {
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
-   switch (desc().colStatus(n))
+   switch (this->desc().colStatus(n))
    {
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = theUCbound[n];
       break;
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       theLBbound[i] = theLCbound[n];
       theUBbound[i] = infinity;
       break;
-   case SPxBasis::Desc::P_FIXED:
+   case SPxBasis<R>::Desc::P_FIXED:
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
@@ -211,18 +217,18 @@ void SPxSolver::setEnterBound4Col(int i, int n)
       break;
    }
 }
-
-void SPxSolver::setEnterBounds()
+  template <class R>
+void SPxSolver<R>::setEnterBounds()
 {
 
    for (int i = 0; i < dim(); ++i)
    {
-      SPxId base_id = baseId(i);
+      SPxId base_id = this->baseId(i);
 
       if (base_id.isSPxRowId())
-         setEnterBound4Row(i, number(SPxRowId(base_id)));
+         setEnterBound4Row(i, this->number(SPxRowId(base_id)));
       else
-         setEnterBound4Col(i, number(SPxColId(base_id)));
+         setEnterBound4Col(i, this->number(SPxColId(base_id)));
    }
 }
 
@@ -232,58 +238,59 @@ void SPxSolver::setEnterBounds()
     being the |n|-th row, |setLeaveBound4Col(i,n)| does so for the |i|-th basic
     variable being the |n|-th column.
  */
-void SPxSolver::setLeaveBound4Row(int i, int n)
+  template <class R>
+void SPxSolver<R>::setLeaveBound4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
-   assert(number(SPxRowId(baseId(i))) == n);
-   switch (desc().rowStatus(n))
+   assert(this->number(SPxRowId(baseId(i))) == n);
+   switch (this->desc().rowStatus(n))
    {
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
-      theUBbound[i] = -maxRowObj(n);
+      theUBbound[i] = -this->maxRowObj(n);
       break;
-   case SPxBasis::Desc::P_ON_UPPER :
-      theLBbound[i] = -maxRowObj(n);
+   case SPxBasis<R>::Desc::P_ON_UPPER :
+      theLBbound[i] = -this->maxRowObj(n);
       theUBbound[i] = infinity;
       break;
-   case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_UPPER + SPxBasis<R>::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
-   case SPxBasis::Desc::P_FREE :
-      theLBbound[i] = -maxRowObj(n);
-      theUBbound[i] = -maxRowObj(n);
+   case SPxBasis<R>::Desc::P_FREE :
+      theLBbound[i] = -this->maxRowObj(n);
+      theUBbound[i] = -this->maxRowObj(n);
       break;
 
    default:
       assert(rep() == COLUMN);
-      theLBbound[i] = -rhs(n);                // slacks !
-      theUBbound[i] = -lhs(n);                // slacks !
+      theLBbound[i] = -this->rhs(n);                // slacks !
+      theUBbound[i] = -this->lhs(n);                // slacks !
       break;
    }
 }
-
-void SPxSolver::setLeaveBound4Col(int i, int n)
+  template <class R>
+void SPxSolver<R>::setLeaveBound4Col(int i, int n)
 {
 
    assert(baseId(i).isSPxColId());
-   assert(number(SPxColId(baseId(i))) == n);
+   assert(this->number(SPxColId(baseId(i))) == n);
 
-   switch (desc().colStatus(n))
+   switch (this->desc().colStatus(n))
    {
-   case SPxBasis::Desc::P_ON_LOWER :
+   case SPxBasis<R>::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = 0;
       break;
-   case SPxBasis::Desc::P_ON_UPPER :
+   case SPxBasis<R>::Desc::P_ON_UPPER :
       theLBbound[i] = 0;
       theUBbound[i] = infinity;
       break;
-   case SPxBasis::Desc::P_FIXED :
+   case SPxBasis<R>::Desc::P_FIXED :
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
-   case SPxBasis::Desc::P_FREE :
+   case SPxBasis<R>::Desc::P_FREE :
       theLBbound[i] = theUBbound[i] = 0;
       break;
 
@@ -294,26 +301,28 @@ void SPxSolver::setLeaveBound4Col(int i, int n)
    }
 }
 
-void SPxSolver::setLeaveBounds()
+template <class R>
+void SPxSolver<R>::setLeaveBounds()
 {
 
    for (int i = 0; i < dim(); ++i)
    {
-      SPxId base_id = baseId(i);
+      SPxId base_id = this->baseId(i);
 
       if (base_id.isSPxRowId())
-         setLeaveBound4Row(i, number(SPxRowId(base_id)));
+         setLeaveBound4Row(i, this->number(SPxRowId(base_id)));
       else
-         setLeaveBound4Col(i, number(SPxColId(base_id)));
+         setLeaveBound4Col(i, this->number(SPxColId(base_id)));
    }
 }
 
-void SPxSolver::testBounds() const
+template <class R>
+void SPxSolver<R>::testBounds() const
 {
 
    if (type() == ENTER)
    {
-      Real viol_max = (1 + iterCount) * entertol();
+      Real viol_max = (1 + this->iterCount) * entertol();
       int nlinesprinted = 0;
       int m = dim();
 
@@ -348,7 +357,7 @@ void SPxSolver::testBounds() const
    }
    else
    {
-      Real viol_max = (1 + iterCount) * leavetol();
+      Real viol_max = (1 + this->iterCount) * leavetol();
       int nlinesprinted = 0;
       int m = dim();
       int n = coDim();
