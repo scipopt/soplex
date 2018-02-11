@@ -1306,7 +1306,7 @@ SPxSolver<R>& SPxSolver<R>::operator=(const SPxSolver& base)
 template <class R>
 SPxSolver<R>::SPxSolver(const SPxSolver<R>& base)
    : SPxLP (base)
-   , SPxBasis(this->basSe)
+   , SPxBasis<R>(this->basSe)
    , theType(base.theType)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
@@ -1768,7 +1768,7 @@ template <class R>
 typename SPxBasis<R>::Desc::Status 
 SPxSolver<R>::varStatusToBasisStatusCol( int col, SPxSolver<R>::VarStatus stat ) const
 {
-   SPxBasis<R>::Desc::Status cstat;
+   typename SPxBasis<R>::Desc::Status cstat;
 
    switch( stat )
    {
@@ -1820,7 +1820,7 @@ SPxSolver<R>::varStatusToBasisStatusCol( int col, SPxSolver<R>::VarStatus stat )
       }
       break;
    case BASIC :
-      cstat = dualColStatus(col);
+      cstat = this->dualColStatus(col);
       break;
    default:
       MSG_ERROR( std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
@@ -1847,7 +1847,7 @@ typename SPxSolver<R>::VarStatus SPxSolver<R>::getBasisColStatus( int col ) cons
 template <class R>
 typename SPxSolver<R>::Status SPxSolver<R>::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
 {
-   const SPxBasis<R>::Desc& d = this->desc();
+   const typename SPxBasis<R>::Desc& d = this->desc();
    int i;
 
    assert(rowsSize < 0 || rowsSize >= this->nRows());
