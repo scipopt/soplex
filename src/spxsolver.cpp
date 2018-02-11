@@ -28,6 +28,7 @@
 namespace soplex
 {
 
+  template <class R>
 bool SPxSolver<R>::read(std::istream& in, NameSet* rowNames, 
                   NameSet* colNames, DIdxSet* intVars)
 {
@@ -52,6 +53,7 @@ bool SPxSolver<R>::read(std::istream& in, NameSet* rowNames,
    return true;
 }
 
+  template <class R>
 void SPxSolver<R>::reLoad()
 {
    forceRecompNonbasicValue();
@@ -65,6 +67,7 @@ void SPxSolver<R>::reLoad()
       theratiotester->clear();
 }
 
+  template <class R>
 void SPxSolver<R>::loadLP(const SPxLP& lp, bool initSlackBasis)
 {
    clear();
@@ -80,6 +83,7 @@ void SPxSolver<R>::loadLP(const SPxLP& lp, bool initSlackBasis)
    SPxBasis<R>::load(this, initSlackBasis);
 }
 
+  template <class R>
 void SPxSolver<R>::setBasisSolver(SLinSolver* slu, const bool destroy)
 {
    // we need to set the outstream before we load the solver to ensure that the basis
@@ -89,6 +93,7 @@ void SPxSolver<R>::setBasisSolver(SLinSolver* slu, const bool destroy)
    SPxBasis<R>::loadBasisSolver(slu, destroy);
 }
 
+  template <class R>
 void SPxSolver<R>::loadBasis(const SPxBasis<R>::Desc& p_desc)
 {
    unInit();
@@ -100,6 +105,7 @@ void SPxSolver<R>::loadBasis(const SPxBasis<R>::Desc& p_desc)
    SPxBasis<R>::loadDesc(p_desc);
 }
 
+  template <class R>
 void SPxSolver<R>::setPricer(SPxPricer* x, const bool destroy)
 {
    
@@ -127,6 +133,7 @@ void SPxSolver<R>::setPricer(SPxPricer* x, const bool destroy)
    freePricer = destroy;
 }
 
+  template <class R>
 void SPxSolver<R>::setTester(SPxRatioTester* x, const bool destroy)
 {
    assert(!freeRatioTester || theratiotester != 0);
@@ -151,6 +158,7 @@ void SPxSolver<R>::setTester(SPxRatioTester* x, const bool destroy)
    freeRatioTester = destroy;
 }
 
+  template <class R>
 void SPxSolver<R>::setStarter(SPxStarter* x, const bool destroy)
 {
 
@@ -166,6 +174,7 @@ void SPxSolver<R>::setStarter(SPxStarter* x, const bool destroy)
    freeStarter = destroy;
 }
 
+  template <class R>
 void SPxSolver<R>::setType(Type tp)
 {
 
@@ -195,6 +204,7 @@ void SPxSolver<R>::setType(Type tp)
    }
 }
 
+   template <class R>
 void SPxSolver<R>::initRep(Representation p_rep)
 {
 
@@ -253,6 +263,7 @@ void SPxSolver<R>::initRep(Representation p_rep)
       thepricer->setRep(p_rep);
 }
 
+   template <class R>
 void SPxSolver<R>::setRep(Representation p_rep)
 {
 
@@ -261,6 +272,7 @@ void SPxSolver<R>::setRep(Representation p_rep)
 }
 
 // needed for strongbranching. use carefully
+   template <class R>
 void SPxSolver<R>::reinitializeVecs()
 {
    
@@ -307,6 +319,7 @@ void SPxSolver<R>::reinitializeVecs()
    assert((testBounds(), 1));
 }
 
+   template <class R>
 void SPxSolver<R>::resetClockStats()
 {
    nClckSkipsLeft = 0;
@@ -314,6 +327,7 @@ void SPxSolver<R>::resetClockStats()
    theCumulativeTime = 0.0;
 }
 
+   template <class R>
 void SPxSolver<R>::init()
 {
 
@@ -435,6 +449,7 @@ void SPxSolver<R>::init()
    }
 }
 
+   template <class R>
 void SPxSolver<R>::setPricing(Pricing pr)
 {
    thePricing = pr;
@@ -446,6 +461,7 @@ void SPxSolver<R>::setPricing(Pricing pr)
    }
 }
 
+template <class R>
 void SPxSolver<R>::setDecompStatus(DecompStatus decomp_stat)
 {
    if( decomp_stat == FINDSTARTBASIS )
@@ -458,6 +474,7 @@ void SPxSolver<R>::setDecompStatus(DecompStatus decomp_stat)
     The following method resizes all vectors and arrays of |SoPlex|
     (excluding inherited vectors).
  */
+template <class R>
 void SPxSolver<R>::reDim()
 {
 
@@ -492,6 +509,7 @@ void SPxSolver<R>::reDim()
    }
 }
 
+template <class R>
 void SPxSolver<R>::clear()
 {
    unitVecs.reSize(0);
@@ -522,6 +540,7 @@ void SPxSolver<R>::clear()
    isInfeasibleCo.clear();
 }
 
+template <class R>
 void SPxSolver<R>::unscaleLPandReloadBasis()
 {
    SPxLPBase<Real>::unscaleLP();
@@ -530,6 +549,7 @@ void SPxSolver<R>::unscaleLPandReloadBasis()
    init();
 }
 
+template <class R>
 void SPxSolver<R>::clearUpdateVecs(void)
 {
    theFvec->clearUpdate();
@@ -545,6 +565,7 @@ void SPxSolver<R>::clearUpdateVecs(void)
     When the basis matrix factorization is recomputed from scratch, 
     we also recompute the vectors.
  */
+template <class R>
 void SPxSolver<R>::factorize()
 {
 
@@ -650,6 +671,7 @@ void SPxSolver<R>::factorize()
    row/enter or column/leave algorithm the maximum violation of dual feasibility is
    computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
    Additionally, the violation from pricing is taken into account. */
+template <class R>
 Real SPxSolver<R>::maxInfeas() const
 {
    Real inf = 0.0;
@@ -695,6 +717,7 @@ Real SPxSolver<R>::maxInfeas() const
 
 /* check for (dual) violations above tol and immediately return false w/o checking the remaining values
    This method is useful for verifying whether an objective limit can be used as termination criterion */
+template <class R>
 bool SPxSolver<R>::noViols(Real tol) const
 {
    assert(tol >= 0.0);
@@ -731,6 +754,7 @@ bool SPxSolver<R>::noViols(Real tol) const
    return true;
 }
 
+template <class R>
 Real SPxSolver<R>::nonbasicValue()
 {
    int i;
@@ -885,6 +909,7 @@ Real SPxSolver<R>::nonbasicValue()
    return val;
 }
 
+template <class R>
 Real SPxSolver<R>::value()
 {
    assert(isInitialized());
@@ -908,6 +933,7 @@ Real SPxSolver<R>::value()
    return x + objOffset();
 }
 
+template <class R>
 bool SPxSolver<R>::updateNonbasicValue(Real objChange)
 {
    if( m_nonbasicValueUpToDate )
@@ -926,6 +952,7 @@ bool SPxSolver<R>::updateNonbasicValue(Real objChange)
 
 
 
+template <class R>
 void SPxSolver<R>::setFeastol(Real d)
 {
 
@@ -938,6 +965,7 @@ void SPxSolver<R>::setFeastol(Real d)
       m_leavetol = d;
 }
 
+template <class R>
 void SPxSolver<R>::setOpttol(Real d)
 {
 
@@ -950,6 +978,7 @@ void SPxSolver<R>::setOpttol(Real d)
       m_entertol = d;
 }
 
+template <class R>
 void SPxSolver<R>::setDelta(Real d)
 {
 
@@ -960,6 +989,7 @@ void SPxSolver<R>::setDelta(Real d)
    m_leavetol = d;
 }
 
+template <class R>
 void SPxSolver<R>::hyperPricing(bool h)
 {
    hyperPricingEnter = h;
@@ -971,6 +1001,7 @@ void SPxSolver<R>::hyperPricing(bool h)
    }
 }
 
+template <class R>
 SPxSolver<R>::SPxSolver(
    Type            p_type, 
    Representation  p_rep,
@@ -1048,6 +1079,7 @@ SPxSolver<R>::SPxSolver(
    //assert(SPxSolver<R>::isConsistent());
 }
 
+template <class R>
 SPxSolver<R>::~SPxSolver()
 {
    assert(!freePricer || thepricer != 0);
@@ -1079,6 +1111,7 @@ SPxSolver<R>::~SPxSolver()
 }
 
 
+template <class R>
 SPxSolver& SPxSolver<R>::operator=(const SPxSolver& base)
 {
    if(this != &base)
@@ -1270,9 +1303,10 @@ SPxSolver& SPxSolver<R>::operator=(const SPxSolver& base)
 }
 
 
+template <class R>
 SPxSolver<R>::SPxSolver(const SPxSolver& base)
    : SPxLP (base)
-   , SPxBasis(base)
+   , SPxBasis(basSe)
    , theType(base.theType)
    , thePricing(base.thePricing)
    , theRep(base.theRep)
@@ -1443,9 +1477,11 @@ SPxSolver<R>::SPxSolver(const SPxSolver& base)
       freeStarter = true;
    }
 
+   template <class R>
    assert(SPxSolver<R>::isConsistent());
 }
 
+template <class R>
 bool SPxSolver<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
@@ -1553,6 +1589,7 @@ bool SPxSolver<R>::isConsistent() const
 }
 
 
+template <class R>
 void SPxSolver<R>::setTerminationTime(Real p_time)
 {
    if( p_time < 0.0 )
@@ -1560,11 +1597,13 @@ void SPxSolver<R>::setTerminationTime(Real p_time)
    maxTime = p_time;
 }
 
+template <class R>
 Real SPxSolver<R>::terminationTime() const
 {
    return maxTime;
 }
 
+template <class R>
 void SPxSolver<R>::setTerminationIter(int p_iteration)
 {
    if( p_iteration < 0 )
@@ -1572,12 +1611,14 @@ void SPxSolver<R>::setTerminationIter(int p_iteration)
    maxIters = p_iteration;
 }
 
+template <class R>
 int SPxSolver<R>::terminationIter() const
 {
    return maxIters;
 }
 
 // returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
+template <class R>
 bool SPxSolver<R>::isTimeLimitReached(const bool forceCheck)
 {
    // always update the number of calls, since the user might set a time limit later in the solving process
@@ -1617,16 +1658,19 @@ bool SPxSolver<R>::isTimeLimitReached(const bool forceCheck)
  *       value in case of bound violations (shifting) but in this case it
  *       is quite difficult to determine if we already reached the limit.
  */
+template <class R>
 void SPxSolver<R>::setTerminationValue(Real p_value)
 {
    objLimit = p_value;
 }
 
+template <class R>
 Real SPxSolver<R>::terminationValue() const
 {
    return objLimit;
 }
    
+template <class R>
 SPxSolver<R>::VarStatus
 SPxSolver<R>::basisStatusToVarStatus( SPxBasis<R>::Desc::Status stat ) const
 {
@@ -1662,6 +1706,7 @@ SPxSolver<R>::basisStatusToVarStatus( SPxBasis<R>::Desc::Status stat ) const
 }
 
 SPxBasis<R>::Desc::Status
+template <class R>
 SPxSolver<R>::varStatusToBasisStatusRow( int row, SPxSolver<R>::VarStatus stat ) const
 {
    SPxBasis<R>::Desc::Status rstat;
@@ -1721,6 +1766,7 @@ SPxSolver<R>::varStatusToBasisStatusRow( int row, SPxSolver<R>::VarStatus stat )
 }
 
 SPxBasis<R>::Desc::Status 
+template <class R>
 SPxSolver<R>::varStatusToBasisStatusCol( int col, SPxSolver<R>::VarStatus stat ) const
 {
    SPxBasis<R>::Desc::Status cstat;
@@ -1785,18 +1831,21 @@ SPxSolver<R>::varStatusToBasisStatusCol( int col, SPxSolver<R>::VarStatus stat )
    return cstat;
 }
 
+template <class R>
 SPxSolver<R>::VarStatus SPxSolver<R>::getBasisRowStatus( int row ) const
 {
    assert( 0 <= row && row < nRows() );
    return basisStatusToVarStatus( desc().rowStatus( row ) );
 }
 
+template <class R>
 SPxSolver<R>::VarStatus SPxSolver<R>::getBasisColStatus( int col ) const
 {
    assert( 0 <= col && col < nCols() );
    return basisStatusToVarStatus( desc().colStatus( col ) );
 }
 
+template <class R>
 SPxSolver<R>::Status SPxSolver<R>::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
 {
    const SPxBasis<R>::Desc& d = desc();
@@ -1816,6 +1865,7 @@ SPxSolver<R>::Status SPxSolver<R>::getBasis(VarStatus row[], VarStatus col[], co
    return status();
 }
 
+template <class R>
 bool SPxSolver<R>::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
 {
 
@@ -1870,6 +1920,7 @@ bool SPxSolver<R>::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus
    return true;
 }
 
+template <class R>
 void SPxSolver<R>::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
    if (SPxBasis<R>::status() == SPxBasis<R>::NO_PROBLEM)
@@ -1892,6 +1943,7 @@ void SPxSolver<R>::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 // The degenvec differs relative to the algorithm being used.
 // For the primal simplex, degenvec is the primal solution values.
 // For the dual simplex, the degenvec is the feasvec (ROW) and pVec (COLUMN).
+template <class R>
 Real SPxSolver<R>::getDegeneracyLevel(Vector degenvec)
 {
    int numDegenerate = 0;
@@ -1954,6 +2006,7 @@ Real SPxSolver<R>::getDegeneracyLevel(Vector degenvec)
    return degeneracyLevel;
 }
 
+template <class R>
 void SPxSolver<R>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
 {
    nnormsRow = 0;
@@ -1979,6 +2032,7 @@ void SPxSolver<R>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
    }
 }
 
+template <class R>
 bool SPxSolver<R>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
 {
    nnormsRow = 0;
@@ -2017,6 +2071,7 @@ bool SPxSolver<R>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) con
    return true;
 }
 
+template <class R>
 bool SPxSolver<R>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
 {
    weightsAreSetup = false;
@@ -2046,6 +2101,7 @@ bool SPxSolver<R>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
    return true;
 }
 
+template <class R>
 void SPxSolver<R>::setIntegralityInformation(int ncols, int* intInfo)
 {
    assert(ncols == nCols() || (ncols == 0 && intInfo == NULL));
@@ -2064,6 +2120,7 @@ void SPxSolver<R>::setIntegralityInformation(int ncols, int* intInfo)
 //
 
 // Pretty-printing of variable status.
+template <class R>
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver<R>::VarStatus& status )
 {
@@ -2095,6 +2152,7 @@ std::ostream& operator<<( std::ostream& os,
 }
 
 // Pretty-printing of solver status.
+template <class R>
 std::ostream& operator<<( std::ostream& os,
                           const SPxSolver<R>::Status& status )
 {
@@ -2159,6 +2217,7 @@ std::ostream& operator<<( std::ostream& os,
 }
 
 // Pretty-printing of algorithm.
+template <class R>
 std::ostream& operator<<( std::ostream& os,
                           const typename SPxSolver<R>::Type& status )
 {
@@ -2178,6 +2237,7 @@ std::ostream& operator<<( std::ostream& os,
 }
 
 // Pretty-printing of representation.
+template <class R>
 std::ostream& operator<<( std::ostream& os,
                           const typename SPxSolver<R>::Representation& status )
 {
