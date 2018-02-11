@@ -2676,7 +2676,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
             if (lp.upper(j) >= infinity)
             {
                MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
-               return UNBOUNDED;
+               return this->UNBOUNDED;
             }
             val = lp.upper(j);
          }
@@ -2685,7 +2685,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
             if (lp.lower(j) <= -infinity)
             {
                MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
-               return UNBOUNDED;
+               return this->UNBOUNDED;
             }
             val = lp.lower(j);
          }
@@ -2767,7 +2767,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
             {
                MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
 
-               return UNBOUNDED;
+               return this->UNBOUNDED;
             }
             MSG_DEBUG( (*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl; )
 
@@ -2788,7 +2788,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
             {
                MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
 
-               return UNBOUNDED;
+               return this->UNBOUNDED;
             }
             MSG_DEBUG( (*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl; )
 
@@ -3028,7 +3028,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
             {
                MSG_DEBUG( (*this->spxout) << "new bounds are infeasible"
                                  << std::endl; )
-               return INFEASIBLE;
+               return this->INFEASIBLE;
             }
 
             DoubletonEquationPS* DoubletonEquationPSptr = 0;
@@ -3072,7 +3072,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
                   if (sUp >= infinity)
                   {
                      MSG_DEBUG( (*this->spxout) << " -> problem unbounded" << std::endl; )
-                     return UNBOUNDED;
+                     return this->UNBOUNDED;
                   }
                   slackVal = sUp;
                }
@@ -3081,7 +3081,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
                   if (sLo <= -infinity)
                   {
                      MSG_DEBUG( (*this->spxout) << " -> problem unbounded" << std::endl; )
-                     return UNBOUNDED;
+                     return this->UNBOUNDED;
                   }
                   slackVal = sLo;
                }
@@ -3135,7 +3135,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
    if (remCols + remRows > 0)
    {
       this->m_remRows += remRows;
-      m_remCols += remCols;
+      this->m_remCols += remCols;
       this->m_remNzos += remNzos;
       this->m_chgBnds += chgBnds;
 
@@ -3145,10 +3145,10 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLP& lp, bool& ag
                         << remNzos << " non-zeros, "
                         << chgBnds << " col bounds"
                         << std::endl; )
-      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+      if( remCols + remRows > this->m_minReduction * (oldCols + oldRows) )
          again = true;
    }
-   return OKAY;
+   return this->OKAY;
 }
 
 template <class R>
@@ -3287,7 +3287,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLP& lp, bool& ag
          MSG_DEBUG( (*this->spxout) << "IMAISM46 col " << j
                            << ": dual infeasible -> dual lhs bound=" << dualConsLo[j]
                            << " dual rhs bound=" << dualConsUp[j] << std::endl; )
-         return DUAL_INFEASIBLE;
+         return this->DUAL_INFEASIBLE;
       }
 
       Real obj = lp.maxObj(j);
@@ -3304,7 +3304,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLP& lp, bool& ag
          if (lp.upper(j) >= infinity)
          {
             MSG_INFO2( (*this->spxout), (*this->spxout) << " unbounded" << std::endl; )
-            return UNBOUNDED;
+            return this->UNBOUNDED;
          }
 
          MSG_DEBUG( (*this->spxout) << " fixed at upper=" << lp.upper(j) << std::endl; )
@@ -3327,7 +3327,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLP& lp, bool& ag
          if (lp.lower(j) <= -infinity)
          {
             MSG_INFO2( (*this->spxout), (*this->spxout) << " unbounded" << std::endl; )
-            return UNBOUNDED;
+            return this->UNBOUNDED;
          }
 
          MSG_DEBUG( (*this->spxout) << " fixed at lower=" << lp.lower(j) << std::endl; )
@@ -3394,7 +3394,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLP& lp, bool& ag
    if (remCols + remRows > 0)
    {
       this->m_remRows += remRows;
-      m_remCols += remCols;
+      this->m_remCols += remCols;
       this->m_remNzos += remNzos;
 
       MSG_INFO2( (*this->spxout), (*this->spxout) << "Simplifier (dual) removed "
@@ -3402,10 +3402,10 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLP& lp, bool& ag
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
-      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+      if( remCols + remRows > this->m_minReduction * (oldCols + oldRows) )
          again = true;
    }
-   return OKAY;
+   return this->OKAY;
 }
 
 
@@ -3639,7 +3639,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLP& lp, bool
    if (remCols + remRows > 0)
    {
       this->m_remRows += remRows;
-      m_remCols += remCols;
+      this->m_remCols += remCols;
       this->m_remNzos += remNzos;
 
       MSG_INFO2( (*this->spxout), (*this->spxout) << "Simplifier (multi-aggregation) removed "
@@ -3647,10 +3647,10 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLP& lp, bool
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
-      if( remCols + remRows > m_minReduction * (oldCols + oldRows) )
+      if( remCols + remRows > this->m_minReduction * (oldCols + oldRows) )
          again = true;
    }
-   return OKAY;
+   return this->OKAY;
 }
 
 
@@ -3671,8 +3671,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLP& lp, bool& a
    int oldRows = lp.nRows();
 
    // remove empty rows and columns
-   SPxSimplifier<R>::Result ret = removeEmpty(lp);
-   if (ret != OKAY)
+   typename SPxSimplifier<R>::Result ret = removeEmpty(lp);
+   if (ret != this->OKAY)
       return ret;
 
 #if ROW_SINGLETON
@@ -3698,7 +3698,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLP& lp, bool& a
 #endif
 
    if (lp.nRows() < 2)
-      return OKAY;
+      return this->OKAY;
 
    DataArray<int>    pClass(lp.nRows());           // class of parallel rows
    DataArray<int>    classSize(lp.nRows());        // size of each class
@@ -3944,7 +3944,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLP& lp, bool& a
                                     << " lhs=" << newLhs
                                     << " rhs=" << newRhs << std::endl; )
                   spx_free(perm_tmp);
-                  return INFEASIBLE;
+                  return this->INFEASIBLE;
                }
                // if we accept the infeasibility we should clean up the values to avoid problems later
                if( newRhs < newLhs )
@@ -4003,11 +4003,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLP& lp, bool& a
                         << remRows << " rows, "
                         << remNzos << " non-zeros"
                         << std::endl; )
-      if( remRows > m_minReduction * oldRows )
+      if( remRows > this->m_minReduction * oldRows )
          again = true;
 
    }
-   return OKAY;
+   return this->OKAY;
 }
 
 template <class R>
@@ -4021,12 +4021,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLP& lp, bool& a
    int remNzos = 0;
 
    // remove empty rows and columns
-   SPxSimplifier<R>::Result ret = removeEmpty(lp);
-   if (ret != OKAY)
+   typename SPxSimplifier<R>::Result ret = removeEmpty(lp);
+   if (ret != this->OKAY)
       return ret;
 
    if (lp.nCols() < 2)
-      return OKAY;
+      return this->OKAY;
 
    DataArray<int>    pClass(lp.nCols());          // class of parallel columns
    DataArray<int>    classSize(lp.nCols());       // size of each class
@@ -4232,7 +4232,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLP& lp, bool& a
                            if (lp.upper(j1) >= infinity)
                            {
                               MSG_DEBUG( (*this->spxout) << "IMAISM75 LP unbounded" << std::endl; )
-                              return UNBOUNDED;
+                              return this->UNBOUNDED;
                            }
 
                            // fix j1 at upper bound
@@ -4250,7 +4250,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLP& lp, bool& a
                            if (lp.lower(j1) <= -infinity)
                            {
                               MSG_DEBUG( (*this->spxout) << "IMAISM76 LP unbounded" << std::endl; )
-                              return UNBOUNDED;
+                              return this->UNBOUNDED;
                            }
 
                            // fix j1 at lower bound
@@ -4272,7 +4272,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLP& lp, bool& a
                            if (lp.upper(j1) >= infinity)
                            {
                               MSG_DEBUG( (*this->spxout) << "IMAISM77 LP unbounded" << std::endl; )
-                              return UNBOUNDED;
+                              return this->UNBOUNDED;
                            }
 
                            // fix j1 at upper bound
@@ -4292,7 +4292,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLP& lp, bool& a
                            if (lp.lower(j1) <= -infinity)
                            {
                               MSG_DEBUG( (*this->spxout) << "IMAISM78 LP unbounded" << std::endl; )
-                              return UNBOUNDED;
+                              return this->UNBOUNDED;
                            }
 
                            // fix j1 at lower bound
@@ -4374,17 +4374,17 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLP& lp, bool& a
 
    if (remCols > 0)
    {
-      m_remCols += remCols;
+      this->m_remCols += remCols;
       this->m_remNzos += remNzos;
 
       MSG_INFO2( (*this->spxout), (*this->spxout) << "Simplifier (duplicate columns) removed "
                         << remCols << " cols, "
                         << remNzos << " non-zeros"
                         << std::endl; )
-      if( remCols > m_minReduction * nColsOld )
+      if( remCols > this->m_minReduction * nColsOld )
          again = true;
    }
-   return OKAY;
+   return this->OKAY;
 }
 
 template <class R>
@@ -4468,26 +4468,26 @@ template <class R>
 typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
 {
    // transfer message handler
-   this->spxout = lp.this->spxout;
+   this->spxout = lp.spxout;
    assert(this->spxout != 0);
 
    m_thesense = lp.spxSense();
-   m_timeUsed->reset();
-   m_timeUsed->start();
+   this->m_timeUsed->reset();
+   this->m_timeUsed->start();
 
    this->m_objoffset = 0.0;
    m_cutoffbound = -infinity;
    m_pseudoobj = -infinity;
 
    this->m_remRows = 0;
-   m_remCols = 0;
+   this->m_remCols = 0;
    this->m_remNzos = 0;
    this->m_chgBnds = 0;
    this->m_chgLRhs = 0;
-   m_keptBnds = 0;
-   m_keptLRhs = 0;
+   this->m_keptBnds = 0;
+   this->m_keptLRhs = 0;
 
-   m_result     = OKAY;
+   m_result     = this->OKAY;
    bool   again = true;
 
    if(m_hist.size() > 0)
@@ -4571,32 +4571,32 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Re
 #endif
 
    // main presolving loop
-   while(again && m_result == OKAY)
+   while(again && m_result == this->OKAY)
    {
       again = false;
 
 #if ROWS
-      if (m_result == OKAY)
+      if (m_result == this->OKAY)
          m_result = simplifyRows(lp, again);
 #endif
 
 #if COLS
-      if (m_result == OKAY)
+      if (m_result == this->OKAY)
          m_result = simplifyCols(lp, again);
 #endif
 
 #if DUAL
-      if (m_result == OKAY)
+      if (m_result == this->OKAY)
          m_result = simplifyDual(lp, again);
 #endif
 
 #if DUPLICATE_ROWS
-      if (m_result == OKAY)
+      if (m_result == this->OKAY)
          m_result = duplicateRows(lp, again);
 #endif
 
 #if DUPLICATE_COLS
-      if (m_result == OKAY)
+      if (m_result == this->OKAY)
          m_result = duplicateCols(lp, again);
 #endif
 
@@ -4611,7 +4611,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Re
 #endif
 
 #if MULTI_AGGREGATE
-      if (m_result == OKAY)
+      if (m_result == this->OKAY)
          m_result = multiaggregation(lp, again);
 #endif
       }
@@ -4619,17 +4619,17 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Re
    }
 
    // preprocessing detected infeasibility or unboundedness
-   if (m_result != OKAY)
+   if (m_result != this->OKAY)
    {
       MSG_INFO1( (*this->spxout), (*this->spxout) << "Simplifier result: " << m_result << std::endl; )
       return m_result;
    }
 
-   m_remCols -= m_addedcols;
+   this->m_remCols -= m_addedcols;
    this->m_remNzos -= m_addedcols;
    MSG_INFO1( (*this->spxout), (*this->spxout) << "Simplifier removed "
                      << this->m_remRows << " rows, "
-                     << m_remCols << " columns, "
+                     << this->m_remCols << " columns, "
                      << this->m_remNzos << " nonzeros, "
                      << this->m_chgBnds << " col bounds, "
                      << this->m_chgLRhs << " row bounds"
@@ -4637,8 +4637,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Re
 
    if (keepbounds)
       MSG_INFO2( (*this->spxout), (*this->spxout) << "Simplifier kept "
-                        << m_keptBnds << " column bounds, "
-                        << m_keptLRhs << " row bounds"
+                        << this->m_keptBnds << " column bounds, "
+                        << this->m_keptLRhs << " row bounds"
                         << std::endl; )
 
    MSG_INFO1( (*this->spxout), (*this->spxout) << "Reduced LP has "
@@ -4668,7 +4668,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Re
    if (lp.nCols() == 0 && lp.nRows() == 0)
    {
       MSG_INFO1( (*this->spxout), (*this->spxout) << "Simplifier removed all rows and columns" << std::endl; )
-      m_result = VANISHED;
+      m_result = this->VANISHED;
    }
 
    MSG_INFO2( (*this->spxout), (*this->spxout) << "\nSimplifier performed:\n"
@@ -4690,7 +4690,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLP& lp, Real eps, Re
                      << m_stat[MULTI_AGG]            << " multi aggregation of variables\n"
                      << std::endl; );
 
-   m_timeUsed->stop();
+   this->m_timeUsed->stop();
 
    return m_result;
 }
@@ -4785,7 +4785,8 @@ void SPxMainSM<R>::unsimplify(const Vector& x, const Vector& y, const Vector& s,
 }
 
 // Pretty-printing of solver status.
-std::ostream& operator<<(std::ostream& os, const SPxSimplifier<R>::Result& status)
+template <class R>
+std::ostream& operator<<(std::ostream& os, const typename SPxSimplifier<R>::Result& status)
 {
    switch( status )
    {
