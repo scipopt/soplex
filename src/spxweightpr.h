@@ -109,7 +109,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxPricer::operator=(rhs);
+         SPxPricer<R>::operator=(rhs);
          cPenalty = rhs.cPenalty;
          rPenalty = rhs.rPenalty;
          leavePenalty = rhs.leavePenalty;
