@@ -22,6 +22,7 @@
 
 namespace soplex
 {
+  template <class R>
 void SPxSolver<R>::shiftFvec()
 {
 
@@ -76,6 +77,7 @@ void SPxSolver<R>::shiftFvec()
     vectors for leaving simplex. Then it checks all values of |pVec| and
     |coPvec| to obey these bounds and enlarges them if neccessary.
  */
+  template <class R>
 void SPxSolver<R>::shiftPvec()
 {
 
@@ -147,6 +149,7 @@ void SPxSolver<R>::shiftPvec()
 #endif
 }
 // -----------------------------------------------------------------
+  template <class R>
 void SPxSolver<R>::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
@@ -200,7 +203,7 @@ void SPxSolver<R>::perturbMin(
          l = p_low[i];
 
          // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
-         if( dualStatus(baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
+         if( dualStatus(this->baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
          {
             continue;
          }
@@ -225,6 +228,7 @@ void SPxSolver<R>::perturbMin(
    }
 }
 // -----------------------------------------------------------------
+  template <class R>
 void SPxSolver<R>::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
@@ -277,7 +281,7 @@ void SPxSolver<R>::perturbMax(
          l = p_low[i];
 
          // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
-         if( dualStatus(baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
+         if( dualStatus(this->baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
          {
             continue;
          }
@@ -302,6 +306,7 @@ void SPxSolver<R>::perturbMax(
    }
 }
 
+  template <class R>
 void SPxSolver<R>::perturbMinEnter(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
@@ -311,6 +316,7 @@ void SPxSolver<R>::perturbMinEnter(void)
 }
 
 
+  template <class R>
 void SPxSolver<R>::perturbMaxEnter(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
@@ -320,13 +326,14 @@ void SPxSolver<R>::perturbMaxEnter(void)
 }
 
 
+  template <class R>
 Real SPxSolver<R>::perturbMin(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
    Real eps,
    Real p_delta,
-   const SPxBasis<R>::Desc::Status* stat,
+   const typename SPxBasis<R>::Desc::Status* stat,
    int start,
    int incr)
 {
@@ -393,13 +400,14 @@ Real SPxSolver<R>::perturbMin(
    return l_theShift;
 }
 
+  template <class R>
 Real SPxSolver<R>::perturbMax(
    const UpdateVector& uvec,
    Vector& p_low,
    Vector& p_up,
    Real eps,
    Real p_delta,
-   const SPxBasis<R>::Desc::Status* stat,
+   const typename SPxBasis<R>::Desc::Status* stat,
    int start,
    int incr)
 {
@@ -467,32 +475,35 @@ Real SPxSolver<R>::perturbMax(
 }
 
 
+  template <class R>
 void SPxSolver<R>::perturbMinLeave(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMin(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
-      desc().status(), 0, 1);
+      this->desc().status(), 0, 1);
    theShift += perturbMin(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
-      desc().coStatus(), 0, 1);
+      this->desc().coStatus(), 0, 1);
    MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
 
+  template <class R>
 void SPxSolver<R>::perturbMaxLeave(void)
 {
    MSG_DEBUG( std::cout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
    pVec().delta().setup();
    coPvec().delta().setup();
    theShift += perturbMax(pVec(), lpBound(), upBound(), epsilon(), leavetol(),
-      desc().status(), 0, 1);
+      this->desc().status(), 0, 1);
    theShift += perturbMax(coPvec(), lcBound(), ucBound(), epsilon(), leavetol(),
-      desc().coStatus(), 0, 1);
+      this->desc().coStatus(), 0, 1);
    MSG_DEBUG( std::cout << "\t->" << shift() << std::endl; )
 }
 
 
+  template <class R>
 void SPxSolver<R>::unShift(void)
 {
    MSG_INFO3( (*spxout), (*spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
@@ -501,7 +512,7 @@ void SPxSolver<R>::unShift(void)
    {
       int i;
       Real t_up, t_low;
-      const SPxBasis<R>::Desc& ds = desc();
+      const typename SPxBasis<R>::Desc& ds = this->desc();
 
       theShift = 0;
       if (type() == ENTER)
@@ -512,18 +523,18 @@ void SPxSolver<R>::unShift(void)
          {
             for (i = dim(); i-- > 0;)
             {
-               SPxId l_id = baseId(i);
-               int l_num = number(l_id);
+               SPxId l_id = this->baseId(i);
+               int l_num = this->number(l_id);
                if (l_id.type() == SPxId::ROW_ID)
                {
-                  t_up = -lhs(l_num);
-                  t_low = -rhs(l_num);
+                  t_up = -this->lhs(l_num);
+                  t_low = -this->rhs(l_num);
                }
                else
                {
                   assert(l_id.type() == SPxId::COL_ID);
-                  t_up = upper(l_num);
-                  t_low = lower(l_num);
+                  t_up = this->upper(l_num);
+                  t_low = this->lower(l_num);
                }
                if (t_up != t_low)
                {
@@ -544,24 +555,24 @@ void SPxSolver<R>::unShift(void)
                      theShift += t_low - theLBbound[i];
                }
             }
-            for (i = nRows(); i-- > 0;)
+            for (i = this->nRows(); i-- > 0;)
             {
                if (!isBasic(ds.rowStatus(i)))
                {
-                  t_up = -lhs(i);
-                  t_low = -rhs(i);
+                  t_up = -this->lhs(i);
+                  t_low = -this->rhs(i);
                   if (theURbound[i] > t_up) // what about t_up == t_low ?
                      theShift += theURbound[i] - t_up;
                   if (t_low > theLRbound[i]) // what about t_up == t_low ?
                      theShift += t_low - theLRbound[i];
                }
             }
-            for (i = nCols(); i-- > 0;)
+            for (i = this->nCols(); i-- > 0;)
             {
                if (!isBasic(ds.colStatus(i)))
                {
-                  t_up = upper(i);
-                  t_low = lower(i);
+                  t_up = this->upper(i);
+                  t_low = this->lower(i);
                   if (theUCbound[i] > t_up) // what about t_up == t_low ?
                      theShift += theUCbound[i] - t_up;
                   if (t_low > theLCbound[i]) // what about t_up == t_low ?
@@ -574,8 +585,8 @@ void SPxSolver<R>::unShift(void)
             assert(rep() == ROW);
             for (i = dim(); i-- > 0;)
             {
-               SPxId l_id = baseId(i);
-               int l_num = number(l_id);
+               SPxId l_id = this->baseId(i);
+               int l_num = this->number(l_id);
                t_up = t_low = 0;
                if (l_id.type() == SPxId::ROW_ID)
                   clearDualBounds(ds.rowStatus(l_num), t_up, t_low);
@@ -607,7 +618,7 @@ void SPxSolver<R>::unShift(void)
                      theShift -= theLBbound[i] - t_low;
                }
             }
-            for (i = nRows(); i-- > 0;)
+            for (i = this->nRows(); i-- > 0;)
             {
                if (!isBasic(ds.rowStatus(i)))
                {
@@ -619,7 +630,7 @@ void SPxSolver<R>::unShift(void)
                      theShift += t_low - theLRbound[i];
                }
             }
-            for (i = nCols(); i-- > 0;)
+            for (i = this->nCols(); i-- > 0;)
             {
                if (!isBasic(ds.colStatus(i)))
                {
@@ -641,9 +652,9 @@ void SPxSolver<R>::unShift(void)
 
          if (rep() == COLUMN)
          {
-            for (i = nRows(); i-- > 0;)
+            for (i = this->nRows(); i-- > 0;)
             {
-               t_up = t_low = maxRowObj(i);
+               t_up = t_low = this->maxRowObj(i);
                clearDualBounds(ds.rowStatus(i), t_up, t_low);
                if (!isBasic(ds.rowStatus(i)))
                {
@@ -669,9 +680,9 @@ void SPxSolver<R>::unShift(void)
                else if (theLRbound[i] < t_low)
                   theShift += t_low - theLRbound[i];
             }
-            for (i = nCols(); i-- > 0;)
+            for (i = this->nCols(); i-- > 0;)
             {
-               t_up = t_low = -maxObj(i);
+               t_up = t_low = -this->maxObj(i);
                clearDualBounds(ds.colStatus(i), t_low, t_up);
                if (!isBasic(ds.colStatus(i)))
                {
@@ -701,10 +712,10 @@ void SPxSolver<R>::unShift(void)
          else
          {
             assert(rep() == ROW);
-            for (i = nRows(); i-- > 0;)
+            for (i = this->nRows(); i-- > 0;)
             {
-               t_up = rhs(i);
-               t_low = lhs(i);
+               t_up = this->rhs(i);
+               t_low = this->lhs(i);
                if (t_up == t_low)
                {
                   if (theURbound[i] > t_up)
@@ -729,10 +740,10 @@ void SPxSolver<R>::unShift(void)
                   else if (theLRbound[i] < t_low)
                      theShift += t_low - theLRbound[i];
             }
-            for (i = nCols(); i-- > 0;)
+            for (i = this->nCols(); i-- > 0;)
             {
-               t_up = upper(i);
-               t_low = lower(i);
+               t_up = this->upper(i);
+               t_low = this->lower(i);
                if (t_up == t_low)
                {
                   if (theUCbound[i] > t_up)
