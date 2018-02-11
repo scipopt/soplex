@@ -400,14 +400,14 @@ typename SPxSolver<R>::Status SPxSolver<R>::solve()
 
             enter(enterId);
             assert((testBounds(), 1));
-            thepricer->entered4(lastEntered(), lastIndex());
+            thepricer->entered4(this->lastEntered(), this->lastIndex());
             stop = terminate();
             clearUpdateVecs();
 
             /* if a successful pivot was performed or a nonbasic variable was flipped to its other bound, we reset the
              * cycle counter
              */
-            if( lastEntered().isValid() )
+            if( this->lastEntered().isValid() )
                enterCycleCount = 0;
             else if( basis().status() != SPxBasis<R>::INFEASIBLE && basis().status() != SPxBasis<R>::UNBOUNDED )
             {
@@ -424,10 +424,10 @@ typename SPxSolver<R>::Status SPxSolver<R>::solve()
             /* only if the basis has really changed, we increase the iterations counter; this is not the case when only
              * a nonbasic variable was flipped to its other bound
              */
-            if( lastIndex() >= 0 )
+            if( this->lastIndex() >= 0 )
             {
                enterCount++;
-               assert(lastEntered().isValid());
+               assert(this->lastEntered().isValid());
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
@@ -677,14 +677,14 @@ typename SPxSolver<R>::Status SPxSolver<R>::solve()
 
             leave(leaveNum);
             assert((testBounds(), 1));
-            thepricer->left4(lastIndex(), lastLeft());
+            thepricer->left4(this->lastIndex(), this->lastLeft());
             stop = terminate();
             clearUpdateVecs();
 
             /* if a successful pivot was performed or a nonbasic variable was flipped to its other bound, we reset the
              * cycle counter
              */
-            if( lastIndex() >= 0 )
+            if( this->lastIndex() >= 0 )
                leaveCycleCount = 0;
             else if( basis().status() != SPxBasis<R>::INFEASIBLE && basis().status() != SPxBasis<R>::UNBOUNDED )
             {
@@ -700,10 +700,10 @@ typename SPxSolver<R>::Status SPxSolver<R>::solve()
             /* only if the basis has really changed, we increase the iterations counter; this is not the case when only
              * a nonbasic variable was flipped to its other bound
              */
-            if( lastEntered().isValid() )
+            if( this->lastEntered().isValid() )
             {
                leaveCount++;
-               assert(lastIndex() >= 0);
+               assert(this->lastIndex() >= 0);
             }
 
             /* check every MAXSTALLS iterations whether shift and objective value have not changed */
@@ -1044,14 +1044,14 @@ void SPxSolver<R>::performSolutionPolishing()
       theratiotester->setType(type());
       if( polishObj == POLISH_INTEGRALITY )
       {
-         DIdxSet slackcandidates(nRows());
-         DIdxSet continuousvars(nCols());
+         DIdxSet slackcandidates(this->nRows());
+         DIdxSet continuousvars(this->nCols());
 
          // collect nonbasic slack variables that could be made basic
-         for( int i = 0; i < nRows(); ++i )
+         for( int i = 0; i < this->nRows(); ++i )
          {
             // only check nonbasic rows, skip equations
-            if( rowstatus[i] == typename SPxBasis<R>::Desc::P_ON_LOWER || rowstatus[i] == typename SPxBasis<R>::Desc::P_ON_UPPER )
+            if( rowstatus[i] ==  SPxBasis<R>::Desc::P_ON_LOWER || rowstatus[i] == SPxBasis<R>::Desc::P_ON_UPPER )
             {
                // only consider rows with zero dual multiplier to preserve optimality
                if( EQrel((*theCoPvec)[i], 0) )
@@ -1060,15 +1060,15 @@ void SPxSolver<R>::performSolutionPolishing()
          }
 
          // collect continuous variables that could be made basic
-         if( integerVariables.size() == nCols() )
+         if( integerVariables.size() == this->nCols() )
          {
-            for( int i = 0; i < nCols(); ++i )
+            for( int i = 0; i < this->nCols(); ++i )
             {
                // skip fixed variables
-               if( colstatus[i] == typename SPxBasis<R>::Desc::P_ON_LOWER || colstatus[i] == typename SPxBasis<R>::Desc::P_ON_UPPER )
+               if( colstatus[i] == SPxBasis<R>::Desc::P_ON_LOWER || colstatus[i] ==  SPxBasis<R>::Desc::P_ON_UPPER )
                {
                   // only consider continuous variables with zero dual multiplier to preserve optimality
-                  if( EQrel(maxObj(i) - (*thePvec)[i], 0) && integerVariables[i] == 0 )
+                  if( EQrel(this->maxObj(i) - (*thePvec)[i], 0) && integerVariables[i] == 0 )
                      continuousvars.addIdx(i);
                }
             }
@@ -1129,12 +1129,12 @@ void SPxSolver<R>::performSolutionPolishing()
          DIdxSet candidates(dim());
 
          // identify nonbasic variables, i.e. columns, that may be moved into the basis
-         for( int i = 0; i < nCols() && !stop; ++i )
+         for( int i = 0; i < this->nCols() && !stop; ++i )
          {
-            if( colstatus[i] == typename SPxBasis<R>::Desc::P_ON_LOWER || colstatus[i] == typename SPxBasis<R>::Desc::P_ON_UPPER )
+            if( colstatus[i] == SPxBasis<R>::Desc::P_ON_LOWER || colstatus[i] == SPxBasis<R>::Desc::P_ON_UPPER )
             {
                // only consider variables with zero reduced costs to preserve optimality
-               if( EQrel(maxObj(i) - (*thePvec)[i], 0) )
+               if( EQrel(this->maxObj(i) - (*thePvec)[i], 0) )
                   candidates.addIdx(i);
             }
          }
@@ -1175,7 +1175,7 @@ void SPxSolver<R>::performSolutionPolishing()
       theratiotester->setType(type());
       bool useIntegrality = false;
 
-      if( integerVariables.size() == nCols() )
+      if( integerVariables.size() == this->nCols() )
          useIntegrality = true;
 
       // in ROW rep: pivot slack out of the basis
@@ -1186,7 +1186,7 @@ void SPxSolver<R>::performSolutionPolishing()
          // collect basic candidates that may be moved out of the basis
          for( int i = 0; i < dim(); ++i )
          {
-            polishId = baseId(i);
+            polishId = this->baseId(i);
 
             if( polishId.isSPxRowId() )
                stat = ds.rowStatus(this->number(polishId));
@@ -1198,7 +1198,7 @@ void SPxSolver<R>::performSolutionPolishing()
                stat = ds.colStatus(this->number(polishId));
             }
 
-            if( stat == typename SPxBasis<R>::Desc::P_ON_LOWER || stat == typename SPxBasis<R>::Desc::P_ON_UPPER )
+            if( stat == SPxBasis<R>::Desc::P_ON_LOWER || stat ==  SPxBasis<R>::Desc::P_ON_UPPER )
             {
                if( EQrel((*theFvec)[i], 0) )
                   basiccandidates.addIdx(i);
@@ -1211,7 +1211,7 @@ void SPxSolver<R>::performSolutionPolishing()
             for( int i = basiccandidates.size() - 1; i >= 0 && !stop; --i)
             {
 
-               MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
+               MSG_DEBUG( std::cout << "try pivoting: " << this->baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
                if( success )
@@ -1240,7 +1240,7 @@ void SPxSolver<R>::performSolutionPolishing()
          // collect basic (integer) variables, that may be moved out of the basis
          for( int i = 0; i < dim(); ++i )
          {
-            polishId = baseId(i);
+            polishId = this->baseId(i);
 
             if( polishId.isSPxRowId() )
                continue;
@@ -1251,7 +1251,7 @@ void SPxSolver<R>::performSolutionPolishing()
                stat = ds.colStatus(i);
             }
 
-            if( stat == typename SPxBasis<R>::Desc::P_ON_LOWER || stat == typename SPxBasis<R>::Desc::P_ON_UPPER )
+            if( stat == SPxBasis<R>::Desc::P_ON_LOWER || stat ==  SPxBasis<R>::Desc::P_ON_UPPER )
             {
                if( EQrel((*theFvec)[i], 0) )
                   basiccandidates.addIdx(i);
@@ -1263,7 +1263,7 @@ void SPxSolver<R>::performSolutionPolishing()
             nSuccessfulPivots = 0;
             for( int i = basiccandidates.size() - 1; i >= 0 && !stop; --i )
             {
-               MSG_DEBUG( std::cout << "try pivoting: " << baseId(basiccandidates.index(i)); )
+               MSG_DEBUG( std::cout << "try pivoting: " << this->baseId(basiccandidates.index(i)); )
                success = leave(basiccandidates.index(i), true);
                clearUpdateVecs();
                if( success )
@@ -1302,7 +1302,7 @@ void SPxSolver<R>::testVecs()
    DVector tmp(dim());
 
    tmp = *theCoPvec;
-   multWithBase(tmp);
+   this->multWithBase(tmp);
    tmp -= *theCoPrhs;
    if (tmp.length() > leavetol())
    {
@@ -1311,7 +1311,7 @@ void SPxSolver<R>::testVecs()
 
       tmp.clear();
       SPxBasis<R>::coSolve(tmp, *theCoPrhs);
-      multWithBase(tmp);
+      this->multWithBase(tmp);
       tmp -= *theCoPrhs;
       MSG_INFO3( (*spxout), (*spxout) << "ISOLVE94\t\t" << tmp.length() << std::endl; )
 
@@ -1322,7 +1322,7 @@ void SPxSolver<R>::testVecs()
    }
 
    tmp = *theFvec;
-   multBaseWith(tmp);
+   this->multBaseWith(tmp);
    tmp -= *theFrhs;
    if (tmp.length() > entertol())
    {
@@ -1387,7 +1387,6 @@ void SPxSolver<R>::printDisplayLine(const bool force, const bool forceHead)
          << shift() << " |  "
          << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
          << std::setprecision(8) << value();
-         template <class R>
          if( getStartingDecompBasis && rep() == SPxSolver<R>::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          if( printCondition == 1 )
@@ -1442,7 +1441,7 @@ bool SPxSolver<R>::terminate()
                              << fr.length() << std::endl; )
 #endif
 
-      if (updateCount > 1)
+      if (this->updateCount > 1)
       {
          MSG_INFO3( (*spxout), (*spxout) << " --- terminate triggers refactorization"
                            << std::endl; )
@@ -1502,7 +1501,7 @@ bool SPxSolver<R>::terminate()
       if( shift() < epsilon() && noViols(opttol() - shift()) )
       {
          // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-         if( spxSense() * value() <= spxSense() * objLimit )
+         if( this->spxSense() * value() <= this->spxSense() * objLimit )
          {
             MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
                << ") reached" << std::endl; )
@@ -1523,9 +1522,9 @@ bool SPxSolver<R>::terminate()
 
 
 
-   if( getComputeDegeneracy() && this->iteration() > prevIteration() )
+   if( getComputeDegeneracy() && this->iteration() > this->prevIteration() )
    {
-      DVector degenvec(nCols());
+      DVector degenvec(this->nCols());
       if( rep() == ROW )
       {
          if( type() == ENTER )   // dual simplex
@@ -1556,7 +1555,7 @@ bool SPxSolver<R>::terminate()
    {
       Real iterationFrac = 0.6;
       if( type() == ENTER && SPxBasis<R>::status() == SPxBasis<R>::DUAL &&
-         this->iteration() - lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
+         this->iteration() - this->lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
       {
          this->iterDegenCheck = this->iterCount;
 
@@ -1570,13 +1569,13 @@ bool SPxSolver<R>::terminate()
          Real degeneracyLB = 0.1;
          Real degeneracyUB = 0.9;
          degeneracyLevel = getDegeneracyLevel(fVec());
-         if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) && this->iteration() > nRows()*0.2 )
+         if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) && this->iteration() > this->nRows()*0.2 )
          {
             m_status = ABORT_DECOMP;
             return true;
          }
 
-         if( degeneracyLevel < degeneracyLB && this->iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
+         if( degeneracyLevel < degeneracyLB && this->iteration() > MINIMUM(getDecompIterationLimit(), int(this->nCols()*iterationFrac)) )
          {
             setDecompIterationLimit(0);
             setDegenCompOffset(0);
@@ -1584,7 +1583,7 @@ bool SPxSolver<R>::terminate()
             return true;
          }
       }
-      else if( type() == LEAVE && this->iteration() > MINIMUM(getDecompIterationLimit(), int(nCols()*iterationFrac)) )
+      else if( type() == LEAVE && this->iteration() > MINIMUM(getDecompIterationLimit(), int(this->nCols()*iterationFrac)) )
       {
          setDecompIterationLimit(0);
          setDegenCompOffset(0);
@@ -1615,25 +1614,25 @@ typename SPxSolver<R>::Status SPxSolver<R>::getPrimal (Vector& p_vector) const
    {
       const typename SPxBasis<R>::Desc& ds = this->desc();
 
-      for (int i = 0; i < nCols(); ++i)
+      for (int i = 0; i < this->nCols(); ++i)
       {
          switch (ds.colStatus(i))
          {
-         case typename SPxBasis<R>::Desc::P_ON_LOWER :
+         case SPxBasis<R>::Desc::P_ON_LOWER :
             p_vector[i] = SPxLP::lower(i);
             break;
-         case typename SPxBasis<R>::Desc::P_ON_UPPER :
-         case typename SPxBasis<R>::Desc::P_FIXED :
+         case SPxBasis<R>::Desc::P_ON_UPPER :
+         case SPxBasis<R>::Desc::P_FIXED :
             p_vector[i] = SPxLP::upper(i);
             break;
-         case typename SPxBasis<R>::Desc::P_FREE :
+         case SPxBasis<R>::Desc::P_FREE :
             p_vector[i] = 0;
             break;
-         case typename SPxBasis<R>::Desc::D_FREE :
-         case typename SPxBasis<R>::Desc::D_ON_UPPER :
-         case typename SPxBasis<R>::Desc::D_ON_LOWER :
-         case typename SPxBasis<R>::Desc::D_ON_BOTH :
-         case typename SPxBasis<R>::Desc::D_UNDEFINED :
+         case SPxBasis<R>::Desc::D_FREE :
+         case SPxBasis<R>::Desc::D_ON_UPPER :
+         case SPxBasis<R>::Desc::D_ON_LOWER :
+         case SPxBasis<R>::Desc::D_ON_BOTH :
+         case SPxBasis<R>::Desc::D_UNDEFINED :
             break;
          default:
             throw SPxInternalCodeException("XSOLVE07 This should never happen.");
@@ -1641,8 +1640,8 @@ typename SPxSolver<R>::Status SPxSolver<R>::getPrimal (Vector& p_vector) const
       }
       for (int j = 0; j < dim(); ++j)
       {
-         if (baseId(j).isSPxColId())
-            p_vector[ this->number(SPxColId(baseId(j))) ] = fVec()[j];
+         if (this->baseId(j).isSPxColId())
+            p_vector[ this->number(SPxColId(this->baseId(j))) ] = fVec()[j];
       }
    }
    return status();
@@ -1665,17 +1664,17 @@ typename SPxSolver<R>::Status SPxSolver<R>::getDual (Vector& p_vector) const
    if (rep() == ROW)
    {
       int i;
-      p_vector = maxRowObj();
-      for (i = nCols() - 1; i >= 0; --i)
+      p_vector = this->maxRowObj();
+      for (i = this->nCols() - 1; i >= 0; --i)
       {
-         if (baseId(i).isSPxRowId())
-            p_vector[ this->number(SPxRowId(baseId(i))) ] = fVec()[i];
+         if (this->baseId(i).isSPxRowId())
+            p_vector[ this->number(SPxRowId(this->baseId(i))) ] = fVec()[i];
       }
    }
    else
       p_vector = coPvec();
 
-   p_vector *= Real(spxSense());
+   p_vector *= Real(this->spxSense());
 
    return status();
 }
@@ -1696,28 +1695,28 @@ typename SPxSolver<R>::Status SPxSolver<R>::getRedCost (Vector& p_vector) const
    {
       int i;
       p_vector.clear();
-      if (spxSense() == SPxLP::MINIMIZE)
+      if (this->spxSense() == SPxLP::MINIMIZE)
       {
          for (i = dim() - 1; i >= 0; --i)
          {
-            if (baseId(i).isSPxColId())
-               p_vector[ this->number(SPxColId(baseId(i))) ] = -fVec()[i];
+            if (this->baseId(i).isSPxColId())
+               p_vector[ this->number(SPxColId(this->baseId(i))) ] = -fVec()[i];
          }
       }
       else
       {
          for (i = dim() - 1; i >= 0; --i)
          {
-            if (baseId(i).isSPxColId())
-               p_vector[ this->number(SPxColId(baseId(i))) ] = fVec()[i];
+            if (this->baseId(i).isSPxColId())
+               p_vector[ this->number(SPxColId(this->baseId(i))) ] = fVec()[i];
          }
       }
    }
    else
    {
-      p_vector = maxObj();
+      p_vector = this->maxObj();
       p_vector -= pVec();
-      if (spxSense() == SPxLP::MINIMIZE)
+      if (this->spxSense() == SPxLP::MINIMIZE)
          p_vector *= -1.0;
    }
 
@@ -1778,25 +1777,25 @@ typename SPxSolver<R>::Status SPxSolver<R>::getSlacks (Vector& p_vector) const
    {
       int i;
       const typename SPxBasis<R>::Desc& ds = this->desc();
-      for (i = nRows() - 1; i >= 0; --i)
+      for (i = this->nRows() - 1; i >= 0; --i)
       {
          switch (ds.rowStatus(i))
          {
-         case typename SPxBasis<R>::Desc::P_ON_LOWER :
-            p_vector[i] = lhs(i);
+         case SPxBasis<R>::Desc::P_ON_LOWER :
+            p_vector[i] = this->lhs(i);
             break;
-         case typename SPxBasis<R>::Desc::P_ON_UPPER :
-         case typename SPxBasis<R>::Desc::P_FIXED :
-            p_vector[i] = rhs(i);
+         case SPxBasis<R>::Desc::P_ON_UPPER :
+         case SPxBasis<R>::Desc::P_FIXED :
+            p_vector[i] = this->rhs(i);
             break;
-         case typename SPxBasis<R>::Desc::P_FREE :
+         case SPxBasis<R>::Desc::P_FREE :
             p_vector[i] = 0;
             break;
-         case typename SPxBasis<R>::Desc::D_FREE :
-         case typename SPxBasis<R>::Desc::D_ON_UPPER :
-         case typename SPxBasis<R>::Desc::D_ON_LOWER :
-         case typename SPxBasis<R>::Desc::D_ON_BOTH :
-         case typename SPxBasis<R>::Desc::D_UNDEFINED :
+         case SPxBasis<R>::Desc::D_FREE :
+         case SPxBasis<R>::Desc::D_ON_UPPER :
+         case SPxBasis<R>::Desc::D_ON_LOWER :
+         case SPxBasis<R>::Desc::D_ON_BOTH :
+         case SPxBasis<R>::Desc::D_UNDEFINED :
             break;
          default:
             throw SPxInternalCodeException("XSOLVE12 This should never happen.");
@@ -1804,8 +1803,8 @@ typename SPxSolver<R>::Status SPxSolver<R>::getSlacks (Vector& p_vector) const
       }
       for (i = dim() - 1; i >= 0; --i)
       {
-         if (baseId(i).isSPxRowId())
-            p_vector[ this->number(SPxRowId(baseId(i))) ] = -(*theFvec)[i];
+         if (this->baseId(i).isSPxRowId())
+            p_vector[ this->number(SPxRowId(this->baseId(i))) ] = -(*theFvec)[i];
       }
    }
    else
@@ -1829,8 +1828,8 @@ void SPxSolver<R>::setPrimal(Vector& p_vector)
    {
       for (int j = 0; j < dim(); ++j)
       {
-         if (baseId(j).isSPxColId())
-            fVec()[j] = p_vector[ this->number(SPxColId(baseId(j))) ];
+         if (this->baseId(j).isSPxColId())
+            fVec()[j] = p_vector[ this->number(SPxColId(this->baseId(j))) ];
       }
    }
 }
@@ -1848,21 +1847,21 @@ void SPxSolver<R>::setDual(Vector& p_vector)
 
    if (rep() == ROW)
    {
-      for (int i = nCols() - 1; i >= 0; --i)
+      for (int i = this->nCols() - 1; i >= 0; --i)
       {
-         if (baseId(i).isSPxRowId())
+         if (this->baseId(i).isSPxRowId())
          {
-            if (spxSense() == SPxLP::MAXIMIZE)
-               fVec()[i] = p_vector[ this->number(SPxRowId(baseId(i))) ];
+            if (this->spxSense() == SPxLP::MAXIMIZE)
+               fVec()[i] = p_vector[ this->number(SPxRowId(this->baseId(i))) ];
             else
-               fVec()[i] = -p_vector[ this->number(SPxRowId(baseId(i))) ];
+               fVec()[i] = -p_vector[ this->number(SPxRowId(this->baseId(i))) ];
          }
       }
    }
    else
    {
       coPvec() = p_vector;
-      if (spxSense() == SPxLP::MINIMIZE)
+      if (this->spxSense() == SPxLP::MINIMIZE)
          coPvec() *= -1.0;
    }
 }
@@ -1882,20 +1881,20 @@ void SPxSolver<R>::setRedCost(Vector& p_vector)
    {
       for (int i = dim() - 1; i >= 0; --i)
       {
-         if (baseId(i).isSPxColId())
+         if (this->baseId(i).isSPxColId())
          {
-            if (spxSense() == SPxLP::MINIMIZE)
-               fVec()[i] = -p_vector[ this->number(SPxColId(baseId(i))) ];
+            if (this->spxSense() == SPxLP::MINIMIZE)
+               fVec()[i] = -p_vector[ this->number(SPxColId(this->baseId(i))) ];
             else
-               fVec()[i] = p_vector[ this->number(SPxColId(baseId(i))) ];
+               fVec()[i] = p_vector[ this->number(SPxColId(this->baseId(i))) ];
          }
       }
    }
    else
    {
-      pVec() = maxObj();
+      pVec() = this->maxObj();
 
-      if (spxSense() == SPxLP::MINIMIZE)
+      if (this->spxSense() == SPxLP::MINIMIZE)
          pVec() += p_vector;
       else
          pVec() -= p_vector;
@@ -1917,8 +1916,8 @@ void SPxSolver<R>::setSlacks(Vector& p_vector)
    {
       for (int i = dim() - 1; i >= 0; --i)
       {
-         if (baseId(i).isSPxRowId())
-            (*theFvec)[i] = -p_vector[ this->number(SPxRowId(baseId(i))) ];
+         if (this->baseId(i).isSPxRowId())
+            (*theFvec)[i] = -p_vector[ this->number(SPxRowId(this->baseId(i))) ];
       }
    }
    else
