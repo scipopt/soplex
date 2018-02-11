@@ -30,14 +30,16 @@ namespace soplex
 
 // #define EQ_PREF 1000
 
-void SPxSteepPR::clear()
+  template <class R>
+void SPxSteepPR<R>::clear()
 {
-   thesolver = 0;
+   this->thesolver = 0;
 }
 
-void SPxSteepPR::load(SPxSolver* base)
+  template <class R>
+  void SPxSteepPR<R>::load(SPxSolver<R>* base)
 {
-   thesolver = base;
+   this->thesolver = base;
 
    if (base)
    {
@@ -48,7 +50,8 @@ void SPxSteepPR::load(SPxSolver* base)
    }
 }
 
-void SPxSteepPR::setType(typename SPxSolver<R>::Type type)
+  template <class R>
+void SPxSteepPR<R>::setType(typename SPxSolver<R>::Type type)
 {
    workRhs.setEpsilon(this->thesolver->epsilon());
 
@@ -69,7 +72,8 @@ void SPxSteepPR::setType(typename SPxSolver<R>::Type type)
    }
 }
 
-void SPxSteepPR::setupWeights(typename SPxSolver<R>::Type type)
+  template <class R>
+void SPxSteepPR<R>::setupWeights(typename SPxSolver<R>::Type type)
 {
    int i;
    int endDim = 0;
@@ -147,7 +151,8 @@ void SPxSteepPR::setupWeights(typename SPxSolver<R>::Type type)
    this->thesolver->weightsAreSetup = true;
 }
 
-void SPxSteepPR::setRep(typename SPxSolver<R>::Representation)
+  template <class R>
+void SPxSteepPR<R>::setRep(typename SPxSolver<R>::Representation)
 {
    if (workVec.dim() != this->thesolver->dim())
    {
@@ -160,7 +165,8 @@ void SPxSteepPR::setRep(typename SPxSolver<R>::Representation)
    }
 }
 
-void SPxSteepPR::left4(int n, SPxId id)
+  template <class R>
+void SPxSteepPR<R>::left4(int n, SPxId id)
 {
    assert(this->thesolver->type() == SPxSolver<R>::LEAVE);
 
@@ -192,7 +198,7 @@ void SPxSteepPR::left4(int n, SPxId id)
          if (coWeights_ptr[j] < delta)
             coWeights_ptr[j] = delta; // coWeights_ptr[j] = delta / (1+delta-x);
          else if (coWeights_ptr[j] >= infinity)
-            coWeights_ptr[j] = 1.0 / theeps;
+            coWeights_ptr[j] = 1.0 / this->theeps;
       }
       coWeights_ptr[n] = beta_q;
    }
@@ -206,14 +212,15 @@ Real inline computePrice(Real viol, Real weight, Real tol)
       return viol * viol / weight;
 }
 
-int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
+  template <class R>
+int SPxSteepPR<R>::buildBestPriceVectorLeave( Real feastol )
 {
    int idx;
    int nsorted;
    Real x;
    const Real* fTest = this->thesolver->fTest().get_const_ptr();
    const Real* cpen = this->thesolver->coWeights.get_const_ptr();
-   IdxElement price;
+   typename SPxPricer<R>::IdxElement price;
    prices.clear();
    bestPrices.clear();
 
@@ -225,17 +232,17 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
       if (x < -feastol)
       {
          // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
-         this->thesolver->isInfeasible[idx] = VIOLATED;
+         this->thesolver->isInfeasible[idx] = this->VIOLATED;
          price.val = computePrice(x, cpen[idx], feastol);
          price.idx = idx;
          prices.append(price);
       }
    }
    // set up structures for the quicksort implementation
-   compare.elements = prices.get_const_ptr();
+   this->compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
-   nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), HYPERPRICINGSIZE);
+   nsorted = SPxQuicksortPart(prices.get_ptr(), this->compare, 0, prices.size(), HYPERPRICINGSIZE);
    // copy indices of best values to bestPrices
    for( int i = 0; i < nsorted; ++i )
    {
@@ -250,7 +257,8 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
 }
 
 
-int SPxSteepPR::selectLeave()
+  template <class R>
+int SPxSteepPR<R>::selectLeave()
 {
    assert(isConsistent());
 
@@ -261,21 +269,21 @@ int SPxSteepPR::selectLeave()
       if ( bestPrices.size() < 2 || this->thesolver->basis().lastUpdate() == 0 )
       {
          // call init method to build up price-vector and return index of largest price
-         retid = buildBestPriceVectorLeave(theeps);
+         retid = buildBestPriceVectorLeave(this->theeps);
       }
       else
-         retid = selectLeaveHyper(theeps);
+         retid = selectLeaveHyper(this->theeps);
    }
    else if (this->thesolver->sparsePricingLeave)
-      retid = selectLeaveSparse(theeps);
+      retid = selectLeaveSparse(this->theeps);
    else
-      retid = selectLeaveX(theeps);
+      retid = selectLeaveX(this->theeps);
 
    if( retid < 0 && !refined )
    {
       refined = true;
       MSG_INFO3( (*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP03 trying refinement step..\n"; )
-      retid = selectLeaveX(theeps/STEEP_REFINETOL);
+      retid = selectLeaveX(this->theeps/STEEP_REFINETOL);
    }
 
    if( retid >= 0 )
@@ -294,7 +302,8 @@ int SPxSteepPR::selectLeave()
    return retid;
 }
 
-int SPxSteepPR::selectLeaveX(Real tol)
+  template <class R>
+int SPxSteepPR<R>::selectLeaveX(Real tol)
 {
    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
    const Real* fTest         = this->thesolver->fTest().get_const_ptr();
@@ -321,7 +330,8 @@ int SPxSteepPR::selectLeaveX(Real tol)
    return lastIdx;
 }
 
-int SPxSteepPR::selectLeaveSparse(Real tol)
+  template <class R>
+int SPxSteepPR<R>::selectLeaveSparse(Real tol)
 {
    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
    const Real* fTest         = this->thesolver->fTest().get_const_ptr();
@@ -348,7 +358,7 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
       else
       {
          this->thesolver->infeasibilities.remove(i);
-         assert(this->thesolver->isInfeasible[idx] == VIOLATED || this->thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
+         assert(this->thesolver->isInfeasible[idx] == this->VIOLATED || this->thesolver->isInfeasible[idx] == this->VIOLATED_AND_CHECKED);
          this->thesolver->isInfeasible[idx] = NOT_VIOLATED;
       }
    }
@@ -356,7 +366,8 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
    return lastIdx;
 }
 
-int SPxSteepPR::selectLeaveHyper(Real tol)
+  template <class R>
+int SPxSteepPR<R>::selectLeaveHyper(Real tol)
 {
    const Real* coPen = this->thesolver->coWeights.get_const_ptr();
    const Real* fTest = this->thesolver->fTest().get_const_ptr();
@@ -373,7 +384,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
       x = fTest[idx];
       if( x < -tol )
       {
-         assert(this->thesolver->isInfeasible[idx] == VIOLATED || this->thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
+         assert(this->thesolver->isInfeasible[idx] == this->VIOLATED || this->thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
          x = computePrice(x, coPen[idx], tol);
 
          if( x > best )
@@ -403,7 +414,7 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
    {
       idx = this->thesolver->updateViols.index(i);
       // is this index a candidate for bestPrices?
-      if( this->thesolver->isInfeasible[idx] == VIOLATED )
+      if( this->thesolver->isInfeasible[idx] == this->VIOLATED )
       {
          x = fTest[idx];
          assert(x < -tol);
@@ -427,7 +438,8 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
 
 /* Entering Simplex
  */
-void SPxSteepPR::entered4(SPxId /* id */, int n)
+  template <class R>
+void SPxSteepPR<R>::entered4(SPxId /* id */, int n)
 {
    assert(this->thesolver->type() == SPxSolver<R>::ENTER);
 
@@ -491,7 +503,8 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
 }
 
 
-SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
+  template <class R>
+SPxId SPxSteepPR<R>::buildBestPriceVectorEnterDim( Real& best, Real feastol )
 {
    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
@@ -511,7 +524,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
       if ( x < -feastol)
       {
          // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
-         this->thesolver->isInfeasible[idx] = VIOLATED;
+         this->thesolver->isInfeasible[idx] = this->VIOLATED;
          price.val = computePrice(x, coWeights_ptr[idx], feastol);
          price.idx = idx;
          prices.append(price);
@@ -531,7 +544,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
    for( int i = 0; i < nsorted; ++i )
    {
       bestPrices.addIdx(prices[i].idx);
-      this->thesolver->isInfeasible[prices[i].idx] = VIOLATED_AND_CHECKED;
+      this->thesolver->isInfeasible[prices[i].idx] = this->VIOLATED_AND_CHECKED;
    }
 
    if( nsorted > 0 )
@@ -544,7 +557,8 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
 }
 
 
-SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
+  template <class R>
+SPxId SPxSteepPR<R>::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
 {
    const Real* test        = this->thesolver->test().get_const_ptr();
    const Real* weights_ptr = this->thesolver->weights.get_const_ptr();
@@ -564,7 +578,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
       if ( x < -feastol)
       {
          // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
-         this->thesolver->isInfeasibleCo[idx] = VIOLATED;
+         this->thesolver->isInfeasibleCo[idx] = this->VIOLATED;
          price.val = computePrice(x, weights_ptr[idx], feastol);
          price.idx = idx;
          pricesCo.append(price);
@@ -584,7 +598,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
    for( int i = 0; i < nsorted; ++i )
    {
       bestPricesCo.addIdx(pricesCo[i].idx);
-      this->thesolver->isInfeasibleCo[pricesCo[i].idx] = VIOLATED_AND_CHECKED;
+      this->thesolver->isInfeasibleCo[pricesCo[i].idx] = this->VIOLATED_AND_CHECKED;
    }
 
    if( nsorted > 0 )
@@ -597,18 +611,19 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
 }
 
 
-SPxId SPxSteepPR::selectEnter()
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnter()
 {
    assert(thesolver != 0);
    SPxId enterId;
 
-   enterId = selectEnterX(theeps);
+   enterId = selectEnterX(this->theeps);
 
    if( !enterId.isValid() && !refined )
    {
       refined = true;
       MSG_INFO3( (*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP05 trying refinement step..\n"; )
-      enterId = selectEnterX(theeps/STEEP_REFINETOL);
+      enterId = selectEnterX(this->theeps/STEEP_REFINETOL);
    }
 
    assert(isConsistent());
@@ -627,7 +642,8 @@ SPxId SPxSteepPR::selectEnter()
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterX(Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterX(Real tol)
 {
    SPxId enterId;
    SPxId enterCoId;
@@ -663,7 +679,8 @@ SPxId SPxSteepPR::selectEnterX(Real tol)
 }
 
 
-SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterHyperDim(Real& best, Real tol)
 {
    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
@@ -708,7 +725,7 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
    {
       idx = this->thesolver->updateViols.index(i);
       // only look at indices that were not checked already
-      if( this->thesolver->isInfeasible[idx] == VIOLATED )
+      if( this->thesolver->isInfeasible[idx] == this->VIOLATED )
       {
          x = coTest[idx];
          if( x < -tol )
@@ -740,7 +757,8 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
 }
 
 
-SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterHyperCoDim(Real& best, Real tol)
 {
    const Real* test        = this->thesolver->test().get_const_ptr();
    const Real* weights_ptr = this->thesolver->weights.get_const_ptr();
@@ -785,7 +803,7 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
    {
       idx = this->thesolver->updateViolsCo.index(i);
       // only look at indices that were not checked already
-      if( this->thesolver->isInfeasibleCo[idx] == VIOLATED )
+      if( this->thesolver->isInfeasibleCo[idx] == this->VIOLATED )
       {
          x = test[idx];
          if( x < -tol )
@@ -817,7 +835,8 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
 }
 
 
-SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterSparseDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
@@ -849,7 +868,8 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterSparseCoDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* test          = this->thesolver->test().get_const_ptr();
@@ -881,7 +901,8 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterDenseDim(Real& best, Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterDenseDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
@@ -905,7 +926,8 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, Real tol)
    return enterId;
 }
 
-SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
+  template <class R>
+SPxId SPxSteepPR<R>::selectEnterDenseCoDim(Real& best, Real tol)
 {
    SPxId enterId;
    const Real* test          = this->thesolver->test().get_const_ptr();
@@ -930,7 +952,8 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
 }
 
 
-void SPxSteepPR::addedVecs(int n)
+  template <class R>
+void SPxSteepPR<R>::addedVecs(int n)
 {
    DVector& weights = this->thesolver->weights;
    n = weights.dim();
@@ -943,7 +966,8 @@ void SPxSteepPR::addedVecs(int n)
    }
 }
 
-void SPxSteepPR::addedCoVecs(int n)
+  template <class R>
+void SPxSteepPR<R>::addedCoVecs(int n)
 {
    DVector& coWeights = this->thesolver->coWeights;
    n = coWeights.dim();
@@ -953,7 +977,8 @@ void SPxSteepPR::addedCoVecs(int n)
       coWeights[n] = 1;
 }
 
-void SPxSteepPR::removedVec(int i)
+  template <class R>
+void SPxSteepPR<R>::removedVec(int i)
 {
    assert(thesolver != 0);
    DVector& weights = this->thesolver->weights;
@@ -961,7 +986,8 @@ void SPxSteepPR::removedVec(int i)
    weights.reDim(this->thesolver->coDim());
 }
 
-void SPxSteepPR::removedVecs(const int perm[])
+  template <class R>
+void SPxSteepPR<R>::removedVecs(const int perm[])
 {
    assert(thesolver != 0);
    DVector& weights = this->thesolver->weights;
@@ -978,7 +1004,8 @@ void SPxSteepPR::removedVecs(const int perm[])
    weights.reDim(this->thesolver->coDim());
 }
 
-void SPxSteepPR::removedCoVec(int i)
+  template <class R>
+void SPxSteepPR<R>::removedCoVec(int i)
 {
    assert(thesolver != 0);
    DVector& coWeights = this->thesolver->coWeights;
@@ -986,7 +1013,8 @@ void SPxSteepPR::removedCoVec(int i)
    coWeights.reDim(this->thesolver->dim());
 }
 
-void SPxSteepPR::removedCoVecs(const int perm[])
+  template <class R>
+void SPxSteepPR<R>::removedCoVecs(const int perm[])
 {
    assert(thesolver != 0);
    DVector& coWeights = this->thesolver->coWeights;
@@ -1000,7 +1028,8 @@ void SPxSteepPR::removedCoVecs(const int perm[])
    coWeights.reDim(this->thesolver->dim());
 }
 
-bool SPxSteepPR::isConsistent() const
+  template <class R>
+bool SPxSteepPR<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    DVector& w = this->thesolver->weights;
