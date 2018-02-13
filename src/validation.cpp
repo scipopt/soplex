@@ -22,7 +22,8 @@
 namespace soplex {
 
 /// updates the external solution used for validation
-bool Validation::updateExternalSolution(char* solution)
+  template <class R>
+  bool Validation<R>::updateExternalSolution(char* solution)
 {
    validate = true;
    validatesolution = solution;
@@ -46,7 +47,8 @@ bool Validation::updateExternalSolution(char* solution)
 
 
 /// updates the tolerance used for validation
-bool Validation::updateValidationTolerance(char* tolerance)
+  template <class R>
+  bool Validation<R>::updateValidationTolerance(char* tolerance)
 {
    char* tailptr;
    validatetolerance = strtod(tolerance, &tailptr);
@@ -60,7 +62,8 @@ bool Validation::updateValidationTolerance(char* tolerance)
 
 
 /// validates the soplex solution using the external solution
-void Validation::validateSolveReal(SoPlex<R>& soplex)
+  template <class R>
+void Validation<R>::validateSolveReal(SoPlex<R>& soplex)
 {
 #ifndef SOPLEX_LEGACY
    bool passedValidation = true;
