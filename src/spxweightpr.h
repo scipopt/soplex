@@ -38,7 +38,8 @@ namespace soplex
    
    See SPxPricer for a class documentation.
 */
-class SPxWeightPR : public SPxPricer
+  template <class R>
+    class SPxWeightPR : public SPxPricer<R>
 {
 private:
 
@@ -77,14 +78,14 @@ public:
    //@{
    /// default constructor
    SPxWeightPR()
-      : SPxPricer("Weight")
+      : SPxPricer<R>("Weight")
       , penalty(0)
       , coPenalty(0)
       , objlength(0)
    {}
    /// copy constructor
    SPxWeightPR( const SPxWeightPR& old)
-      : SPxPricer(old)
+      : SPxPricer<R>(old)
       , cPenalty(old.cPenalty)
       , rPenalty(old.rPenalty)
       , leavePenalty(old.leavePenalty)
@@ -133,7 +134,7 @@ public:
    virtual ~SPxWeightPR()
    {}
    /// clone function for polymorphism
-   inline virtual SPxPricer* clone()  const 
+   inline virtual SPxPricer<R>* clone()  const 
    {
       return new SPxWeightPR(*this);
    }
@@ -143,7 +144,7 @@ public:
    /**@name Access / modification */
    //@{
    /// sets the solver
-   virtual void load(SPxSolver* base);
+   virtual void load(SPxSolver<R>* base);
    /// set entering/leaving algorithm
    void setType(typename SPxSolver<R>::Type tp);
    /// set row/column representation
