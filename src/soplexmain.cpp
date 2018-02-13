@@ -134,6 +134,7 @@ void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 
 /// performs external feasibility check with real type
 ///@todo implement external check; currently we use the internal methods for convenience
+template <class R>
 static
 void checkSolutionReal(SoPlex<R>& soplex)
 {
@@ -192,6 +193,7 @@ void checkSolutionReal(SoPlex<R>& soplex)
 
 /// performs external feasibility check with rational type
 ///@todo implement external check; currently we use the internal methods for convenience
+template <class R>
 static
 void checkSolutionRational(SoPlex<R>& soplex)
 {
@@ -245,6 +247,7 @@ void checkSolutionRational(SoPlex<R>& soplex)
 }
 
 /// performs external feasibility check according to check mode
+template <class R>
 static
 void checkSolution(SoPlex<R>& soplex)
 {
@@ -262,6 +265,7 @@ void checkSolution(SoPlex<R>& soplex)
    MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
+template <class R>
 static
 void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {
@@ -352,6 +356,7 @@ void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames
    }
 }
 
+template <class R>
 static
 void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {
@@ -471,10 +476,10 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlex* soplex = 0;
+   SoPlex<double>* soplex = 0;
 
    Timer* readingTime = 0;
-   Validation* validation = 0;
+   Validation<double>* validation = 0;
    int optidx;
 
    const char* lpfilename = 0;
