@@ -24,6 +24,7 @@
 
 namespace soplex {
 
+
 class Validation
 {
 public:
@@ -58,7 +59,7 @@ public:
    bool updateValidationTolerance(char* tolerance);
 
    /// validates the soplex solution using the external solution
-   void validateSolveReal(SoPlex& soplex);
+   void validateSolveReal(SoPlex<double>& soplex);
 };
 
 } /* namespace soplex */
