@@ -22,13 +22,14 @@
 namespace soplex
 {
 
-void SPxVectorST::setupWeights(SPxSolver& base)
+  template <class R>
+  void SPxVectorST<R>::setupWeights(SPxSolver<R>& base)
 {
    if (state == PVEC)
    {
       if (vec.dim() != base.nCols())
       {
-         SPxWeightST::setupWeights(base);
+        SPxWeightST<R>::setupWeights(base);
          return;
       }
 
@@ -45,13 +46,13 @@ void SPxVectorST::setupWeights(SPxSolver& base)
          y = base.SPxLP::upper(i) - vec[i];
          if (x < y)
          {
-            colWeight[i] = -x - bias * obj[i];
-            colUp[i] = 0;
+            this->colWeight[i] = -x - bias * obj[i];
+            this->colUp[i] = 0;
          }
          else
          {
-            colWeight[i] = -y + bias * obj[i];
-            colUp[i] = 1;
+            this->colWeight[i] = -y + bias * obj[i];
+            this->colUp[i] = 1;
          }
          MSG_DEBUG( std::cout << colWeight[i] << " "; )
       }
@@ -66,13 +67,13 @@ void SPxVectorST::setupWeights(SPxSolver& base)
          y = (base.rhs(i) - y);
          if (x < y)
          {
-            rowWeight[i] = -x - eps * row.size() - bias * (obj * row);
-            rowRight[i] = 0;
+            this->rowWeight[i] = -x - eps * row.size() - bias * (obj * row);
+            this->rowRight[i] = 0;
          }
          else
          {
-            rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
-            rowRight[i] = 1;
+            this->rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
+            this->rowRight[i] = 1;
          }
          MSG_DEBUG( std::cout << rowWeight[i] << " "; )
       }
@@ -83,14 +84,14 @@ void SPxVectorST::setupWeights(SPxSolver& base)
    {
       if (vec.dim() != base.nRows())
       {
-         SPxWeightST::setupWeights(base);
+        SPxWeightST<R>::setupWeights(base);
          return;
       }
 
       Real x, y, len;
       int i, j;
       for (i = base.nRows(); i--;)
-         rowWeight[i] += spxAbs(vec[i]);
+         this->rowWeight[i] += spxAbs(vec[i]);
 
       for (i = base.nCols(); i--;)
       {
@@ -102,10 +103,10 @@ void SPxVectorST::setupWeights(SPxSolver& base)
             len += x * x;
          }
          if (len > 0)
-            colWeight[i] += spxAbs(y / len - base.maxObj(i));
+            this->colWeight[i] += spxAbs(y / len - base.maxObj(i));
       }
    }
    else
-      SPxWeightST::setupWeights(base);
+     SPxWeightST<R>::setupWeights(base);
 }
 } // namespace soplex
