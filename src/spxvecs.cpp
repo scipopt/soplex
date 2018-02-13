@@ -39,6 +39,7 @@ namespace soplex
     variables are altered. In entering type algorithm they are changed and,
     hence, retreived from the column or row upper or lower bound vectors.
  */
+  template <class R>
 void SPxSolver<R>::computeFrhs()
 {
 
@@ -50,15 +51,15 @@ void SPxSolver<R>::computeFrhs()
       {
          computeFrhsXtra();
 
-         for(int i = 0; i < nRows(); i++)
+         for(int i = 0; i < this->nRows(); i++)
          {
             Real x;
 
-            SPxBasis<R>::Desc::Status stat = desc().rowStatus(i);
+            typename SPxBasis<R>::Desc::Status stat = this->desc().rowStatus(i);
 
-            if (!isBasic(stat))
+            if (!isBasic(this->stat))
             {
-               switch (stat)
+               switch (this->stat)
                {
                   // columnwise cases:
                case SPxBasis<R>::Desc::P_FREE :
@@ -68,10 +69,10 @@ void SPxSolver<R>::computeFrhs()
                   assert(EQ(lhs(i), rhs(i)));
                   //lint -fallthrough
                case SPxBasis<R>::Desc::P_ON_UPPER :
-                  x = rhs(i);
+                  x = this->rhs(i);
                   break;
                case SPxBasis<R>::Desc::P_ON_LOWER :
-                  x = lhs(i);
+                  x = this->lhs(i);
                   break;
 
                default:
@@ -101,22 +102,22 @@ void SPxSolver<R>::computeFrhs()
          theFrhs->clear();
          computeFrhs1(*theUbound, *theLbound);
          computeFrhs2(*theCoUbound, *theCoLbound);
-         *theFrhs += maxObj();
+         *theFrhs += this->maxObj();
       }
       else
       {
          ///@todo put this into a separate method
-         *theFrhs = maxObj();
-         const SPxBasis<R>::Desc& ds = desc();
-         for (int i = 0; i < nRows(); ++i)
+         *theFrhs = this->maxObj();
+         const typename SPxBasis<R>::Desc& ds = this->desc();
+         for (int i = 0; i < this->nRows(); ++i)
          {
-            SPxBasis<R>::Desc::Status stat = ds.rowStatus(i);
+            typename SPxBasis<R>::Desc::Status stat = ds.rowStatus(i);
 
-            if (!isBasic(stat))
+            if (!isBasic(this->stat))
             {
                Real x;
 
-               switch (stat)
+               switch (this->stat)
                {
                case SPxBasis<R>::Desc::D_FREE :
                   continue;
@@ -124,11 +125,11 @@ void SPxSolver<R>::computeFrhs()
                case SPxBasis<R>::Desc::D_ON_UPPER :
                case SPxBasis<R>::Desc::D_ON_LOWER :
                case (SPxBasis<R>::Desc::D_ON_BOTH) :
-                  x = maxRowObj(i);
+                  x = this->maxRowObj(i);
                   break;
 
                default:
-                  assert(lhs(i) <= -infinity && rhs(i) >= infinity);
+                  assert(this->lhs(i) <= -infinity && this->rhs(i) >= infinity);
                   x = 0.0;
                   break;
                }
@@ -144,21 +145,22 @@ void SPxSolver<R>::computeFrhs()
    }
 }
 
+  template <class R>
 void SPxSolver<R>::computeFrhsXtra()
 {
 
    assert(rep()  == COLUMN);
    assert(type() == LEAVE);
 
-   for (int i = 0; i < nCols(); ++i)
+   for (int i = 0; i < this->nCols(); ++i)
    {
-      SPxBasis<R>::Desc::Status stat = desc().colStatus(i);
+      typename SPxBasis<R>::Desc::Status stat = this->desc().colStatus(i);
 
-      if (!isBasic(stat))
+      if (!isBasic(this->stat))
       {
          Real x;
 
-         switch (stat)
+         switch (this->stat)
          {
             // columnwise cases:
          case SPxBasis<R>::Desc::P_FREE :
@@ -194,18 +196,19 @@ void SPxSolver<R>::computeFrhsXtra()
     specified by the |Status| of all nonbasic variables. The values of \f$x_N\f$ or
     \f$\pi_N\f$ are taken from the passed arrays.
  */
+  template <class R>
 void SPxSolver<R>::computeFrhs1(
    const Vector& ufb,    ///< upper feasibility bound for variables
    const Vector& lfb)    ///< lower feasibility bound for variables
 {
 
-   const SPxBasis<R>::Desc& ds = desc();
+   const typename SPxBasis<R>::Desc& ds = this->desc();
 
    for (int i = 0; i < coDim(); ++i)
    {
-      SPxBasis<R>::Desc::Status stat = ds.status(i);
+      typename SPxBasis<R>::Desc::Status stat = ds.status(i);
 
-      if (!isBasic(stat))
+      if (!isBasic(this->stat))
       {
          Real x;
 
@@ -251,17 +254,18 @@ void SPxSolver<R>::computeFrhs1(
     specified by the |Status| of all nonbasic variables. The values of 
     \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
  */
+  template <class R>
 void SPxSolver<R>::computeFrhs2(
    Vector& coufb,   ///< upper feasibility bound for covariables
    Vector& colfb)   ///< lower feasibility bound for covariables
 {
-   const SPxBasis<R>::Desc& ds = desc();
+   const typename SPxBasis<R>::Desc& ds = this->desc();
 
    for(int i = 0; i < dim(); ++i)
    {
-      SPxBasis<R>::Desc::Status stat = ds.coStatus(i);
+      typename SPxBasis<R>::Desc::Status stat = ds.coStatus(i);
 
-      if (!isBasic(stat))
+      if (!isBasic(this->stat))
       {
          Real x;
 
@@ -333,42 +337,44 @@ void SPxSolver<R>::computeFrhs2(
     |...4Col(i,n)|, respectively. They do their job for the |i|-th basis
     variable, being the |n|-th row or column.  
 */
+  template <class R>
 void SPxSolver<R>::computeEnterCoPrhs4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
 
-   switch (desc().rowStatus(n))
+   switch (this->desc().rowStatus(n))
    {
    // rowwise representation:
    case SPxBasis<R>::Desc::P_FIXED :
-      assert(lhs(n) > -infinity);
-      assert(EQ(rhs(n), lhs(n)));
+      assert(this->lhs(n) > -infinity);
+      assert(EQ(this->rhs(n), this->lhs(n)));
       //lint -fallthrough
    case SPxBasis<R>::Desc::P_ON_UPPER :
       assert(rep() == ROW);
-      assert(rhs(n) < infinity);
-      (*theCoPrhs)[i] = rhs(n);
+      assert(this->rhs(n) < infinity);
+      (*theCoPrhs)[i] = this->rhs(n);
       break;
    case SPxBasis<R>::Desc::P_ON_LOWER :
       assert(rep() == ROW);
-      assert(lhs(n) > -infinity);
-      (*theCoPrhs)[i] = lhs(n);
+      assert(this->lhs(n) > -infinity);
+      (*theCoPrhs)[i] = this->lhs(n);
       break;
 
       // columnwise representation:
       // slacks must be left 0!
    default:
-      (*theCoPrhs)[i] = maxRowObj(n);
+      (*theCoPrhs)[i] = this->maxRowObj(n);
       break;
    }
 }
 
+  template <class R>
 void SPxSolver<R>::computeEnterCoPrhs4Col(int i, int n)
 {
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
-   switch (desc().colStatus(n))
+   switch (this->desc().colStatus(n))
    {
       // rowwise representation:
    case SPxBasis<R>::Desc::P_FIXED :
@@ -393,7 +399,7 @@ void SPxSolver<R>::computeEnterCoPrhs4Col(int i, int n)
    case SPxBasis<R>::Desc::D_ON_LOWER :
    case SPxBasis<R>::Desc::D_FREE :
       assert(rep() == COLUMN);
-      (*theCoPrhs)[i] = maxObj(n);
+      (*theCoPrhs)[i] = this->maxObj(n);
       break;
 
    default:             // variable left 0
@@ -402,25 +408,27 @@ void SPxSolver<R>::computeEnterCoPrhs4Col(int i, int n)
    }
 }
 
+  template <class R>
 void SPxSolver<R>::computeEnterCoPrhs()
 {
    assert(type() == ENTER);
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      SPxId l_id = baseId(i);
+      SPxId l_id = this->baseId(i);
       if (l_id.isSPxRowId())
-         computeEnterCoPrhs4Row(i, number(SPxRowId(l_id)));
+         computeEnterCoPrhs4Row(i, this->number(SPxRowId(l_id)));
       else
-         computeEnterCoPrhs4Col(i, number(SPxColId(l_id)));
+         computeEnterCoPrhs4Col(i, this->number(SPxColId(l_id)));
    }
 }
 
+  template <class R>
 void SPxSolver<R>::computeLeaveCoPrhs4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
-   assert(number(SPxRowId(baseId(i))) == n);
-   switch (desc().rowStatus(n))
+   assert(this->number(SPxRowId(baseId(i))) == n);
+   switch (this->desc().rowStatus(n))
    {
    case SPxBasis<R>::Desc::D_ON_BOTH :
    case SPxBasis<R>::Desc::P_FIXED :
@@ -440,16 +448,17 @@ void SPxSolver<R>::computeLeaveCoPrhs4Row(int i, int n)
       break;
 
    default:
-      (*theCoPrhs)[i] = maxRowObj(n);
+      (*theCoPrhs)[i] = this->maxRowObj(n);
       break;
    }
 }
 
+  template <class R>
 void SPxSolver<R>::computeLeaveCoPrhs4Col(int i, int n)
 {
    assert(baseId(i).isSPxColId());
-   assert(number(SPxColId(baseId(i))) == n);
-   switch (desc().colStatus(n))
+   assert(this->number(SPxColId(baseId(i))) == n);
+   switch (this->desc().colStatus(n))
    {
    case SPxBasis<R>::Desc::D_UNDEFINED :
    case SPxBasis<R>::Desc::D_ON_BOTH :
@@ -469,23 +478,24 @@ void SPxSolver<R>::computeLeaveCoPrhs4Col(int i, int n)
       break;
 
    default:
-      (*theCoPrhs)[i] = maxObj(n);
+      (*theCoPrhs)[i] = this->maxObj(n);
       //      (*theCoPrhs)[i] = 0;
       break;
    }
 }
 
+  template <class R>
 void SPxSolver<R>::computeLeaveCoPrhs()
 {
    assert(type() == LEAVE);
 
    for (int i = dim() - 1; i >= 0; --i)
    {
-      SPxId l_id = baseId(i);
+      SPxId l_id = this->baseId(i);
       if (l_id.isSPxRowId())
-         computeLeaveCoPrhs4Row(i, number(SPxRowId(l_id)));
+         computeLeaveCoPrhs4Row(i, this->number(SPxRowId(l_id)));
       else
-         computeLeaveCoPrhs4Col(i, number(SPxColId(l_id)));
+         computeLeaveCoPrhs4Col(i, this->number(SPxColId(l_id)));
    }
 }
 
@@ -495,6 +505,7 @@ void SPxSolver<R>::computeLeaveCoPrhs()
     computing all scalar products of the pricing vector with the vectors of the
     LPs constraint matrix.
  */
+  template <class R>
 void SPxSolver<R>::computePvec()
 {
    int i;
@@ -503,6 +514,7 @@ void SPxSolver<R>::computePvec()
       (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
+  template <class R>
 void SPxSolver<R>::setupPupdate(void)
 {
    SSVector& p = thePvec->delta();
@@ -523,6 +535,7 @@ void SPxSolver<R>::setupPupdate(void)
    p.setup();
 }
 
+  template <class R>
 void SPxSolver<R>::doPupdate(void)
 {
    theCoPvec->update();
