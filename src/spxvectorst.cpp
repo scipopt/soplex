@@ -24,89 +24,89 @@ namespace soplex
 
   template <class R>
   void SPxVectorST<R>::setupWeights(SPxSolver<R>& base)
-{
-   if (state == PVEC)
-   {
-      if (vec.dim() != base.nCols())
+  {
+    if (state == PVEC)
       {
-        SPxWeightST<R>::setupWeights(base);
-         return;
-      }
+        if (vec.dim() != base.nCols())
+          {
+            SPxWeightST<R>::setupWeights(base);
+            return;
+          }
 
-      const Vector& obj = base.maxObj();
-      Real eps = base.epsilon();
-      Real bias = 10000 * eps;
-      Real x, y;
-      int i;
+        const Vector& obj = base.maxObj();
+        Real eps = base.epsilon();
+        Real bias = 10000 * eps;
+        Real x, y;
+        int i;
 
-      MSG_DEBUG( std::cout << "DVECST01 colWeight[]: "; )
-      for (i = base.nCols(); i--;)
+        MSG_DEBUG( std::cout << "DVECST01 colWeight[]: "; )
+          for (i = base.nCols(); i--;)
+            {
+              x = vec[i] - base.SPxLP::lower(i);
+              y = base.SPxLP::upper(i) - vec[i];
+              if (x < y)
+                {
+                  this->colWeight[i] = -x - bias * obj[i];
+                  this->colUp[i] = 0;
+                }
+              else
+                {
+                  this->colWeight[i] = -y + bias * obj[i];
+                  this->colUp[i] = 1;
+                }
+              MSG_DEBUG( std::cout << colWeight[i] << " "; )
+                }
+        MSG_DEBUG( std::cout << std::endl << std::endl; )
+
+          MSG_DEBUG( std::cout << "DVECST02 rowWeight[]: "; )
+          for (i = base.nRows(); i--;)
+            {
+              const SVector& row = base.rowVector(i);
+              y = vec * row;
+              x = (y - base.lhs(i));
+              y = (base.rhs(i) - y);
+              if (x < y)
+                {
+                  this->rowWeight[i] = -x - eps * row.size() - bias * (obj * row);
+                  this->rowRight[i] = 0;
+                }
+              else
+                {
+                  this->rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
+                  this->rowRight[i] = 1;
+                }
+              MSG_DEBUG( std::cout << rowWeight[i] << " "; )
+                }
+        MSG_DEBUG( std::cout << std::endl; )
+          }
+
+    else if (state == DVEC)
       {
-         x = vec[i] - base.SPxLP::lower(i);
-         y = base.SPxLP::upper(i) - vec[i];
-         if (x < y)
-         {
-            this->colWeight[i] = -x - bias * obj[i];
-            this->colUp[i] = 0;
-         }
-         else
-         {
-            this->colWeight[i] = -y + bias * obj[i];
-            this->colUp[i] = 1;
-         }
-         MSG_DEBUG( std::cout << colWeight[i] << " "; )
-      }
-      MSG_DEBUG( std::cout << std::endl << std::endl; )
+        if (vec.dim() != base.nRows())
+          {
+            SPxWeightST<R>::setupWeights(base);
+            return;
+          }
 
-      MSG_DEBUG( std::cout << "DVECST02 rowWeight[]: "; )
-      for (i = base.nRows(); i--;)
-      {
-         const SVector& row = base.rowVector(i);
-         y = vec * row;
-         x = (y - base.lhs(i));
-         y = (base.rhs(i) - y);
-         if (x < y)
-         {
-            this->rowWeight[i] = -x - eps * row.size() - bias * (obj * row);
-            this->rowRight[i] = 0;
-         }
-         else
-         {
-            this->rowWeight[i] = -y - eps * row.size() + bias * (obj * row);
-            this->rowRight[i] = 1;
-         }
-         MSG_DEBUG( std::cout << rowWeight[i] << " "; )
-      }
-      MSG_DEBUG( std::cout << std::endl; )
-   }
+        Real x, y, len;
+        int i, j;
+        for (i = base.nRows(); i--;)
+          this->rowWeight[i] += spxAbs(vec[i]);
 
-   else if (state == DVEC)
-   {
-      if (vec.dim() != base.nRows())
-      {
-        SPxWeightST<R>::setupWeights(base);
-         return;
+        for (i = base.nCols(); i--;)
+          {
+            const SVector& col = base.colVector(i);
+            for (y = len = 0, j = col.size(); j--;)
+              {
+                x = col.value(j);
+                y += vec[col.index(j)] * x;
+                len += x * x;
+              }
+            if (len > 0)
+              this->colWeight[i] += spxAbs(y / len - base.maxObj(i));
+          }
       }
-
-      Real x, y, len;
-      int i, j;
-      for (i = base.nRows(); i--;)
-         this->rowWeight[i] += spxAbs(vec[i]);
-
-      for (i = base.nCols(); i--;)
-      {
-         const SVector& col = base.colVector(i);
-         for (y = len = 0, j = col.size(); j--;)
-         {
-            x = col.value(j);
-            y += vec[col.index(j)] * x;
-            len += x * x;
-         }
-         if (len > 0)
-            this->colWeight[i] += spxAbs(y / len - base.maxObj(i));
-      }
-   }
-   else
-     SPxWeightST<R>::setupWeights(base);
-}
+    else
+      SPxWeightST<R>::setupWeights(base);
+  }
 } // namespace soplex
