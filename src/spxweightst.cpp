@@ -28,7 +28,8 @@ namespace soplex
 #define EPS     1e-6
 #define STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
 
-bool SPxWeightST::isConsistent() const
+  template <class R>
+bool SPxWeightST<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    return rowWeight.isConsistent()
@@ -59,9 +60,10 @@ bool SPxWeightST::isConsistent() const
     The following two functions set the status of |id| to primal or dual,
     respectively.
  */
-void SPxWeightST::setPrimalStatus(
-   SPxBasis<R>::Desc& desc, 
-   const SPxSolver& base, 
+  template <class R>
+  void SPxWeightST<R>::setPrimalStatus(
+   typename SPxBasis<R>::Desc& desc, 
+   const SPxSolver<R>& base, 
    const SPxId& id)
 {
    if (id.isSPxRowId())
@@ -112,9 +114,10 @@ void SPxWeightST::setPrimalStatus(
 }
 
 // ----------------------------------------------------------------
-static void setDualStatus(
-   SPxBasis<R>::Desc& desc, 
-   const SPxSolver& base, 
+  template <class R>
+  static void setDualStatus(
+   typename SPxBasis<R>::Desc& desc, 
+   const SPxSolver<R>& base, 
    const SPxId& id)
 {
    if (id.isSPxRowId())
@@ -154,9 +157,10 @@ public:
    we sort the rows, then the columns.  Finally we perform a mergesort
    of both.
  */
+  template <class R>
 static void initPrefs(
    DataArray<SPxId>&      pref,
-   const SPxSolver&       base,
+   const SPxSolver<R>&       base,
    const DataArray<Real>& rowWeight,
    const DataArray<Real>& colWeight)
 {
@@ -211,7 +215,8 @@ static void initPrefs(
 }
 
 // ----------------------------------------------------------------
-void SPxWeightST::generate(SPxSolver& base)
+  template <class R>
+  void SPxWeightST<R>::generate(SPxSolver<R>& base)
 {
    SPxId tmpId;
 
@@ -236,7 +241,7 @@ void SPxWeightST::generate(SPxSolver& base)
 
    setupWeights(base);
 
-   SPxBasis<R>::Desc desc(base);
+   typename SPxBasis<R>::Desc desc(base);
    //   desc.reSize(base.nRows(), base.nCols());
 
    DataArray < SPxId > pref(base.nRows() + base.nCols());
@@ -417,7 +422,8 @@ void SPxWeightST::generate(SPxSolver& base)
 
 /* Computation of Weights
  */
-void SPxWeightST::setupWeights(SPxSolver& base)
+  template <class R>
+  void SPxWeightST<R>::setupWeights(SPxSolver<R>& base)
 {
    const Vector& obj  = base.maxObj();
    const Vector& low  = base.lower();
