@@ -23,8 +23,9 @@
 namespace soplex
 {
 
-   /// default constructor
-   SoPlex::Statistics::Statistics(Timer::TYPE ttype)
+  /// default constructor
+  template <class R>
+  SoPlex<R>::Statistics::Statistics(Timer::TYPE ttype)
    {
       timerType = ttype;
       readingTime = TimerFactory::createTimer(timerType);
@@ -39,7 +40,8 @@ namespace soplex
    }
 
    /// copy constructor
-   SoPlex::Statistics::Statistics(const Statistics& base)
+  template <class R>
+   SoPlex<R>::Statistics::Statistics(const Statistics& base)
    {
       timerType = base.timerType;
       readingTime = TimerFactory::createTimer(timerType);
@@ -54,7 +56,8 @@ namespace soplex
    }
 
    /// assignment operator
-   SoPlex::Statistics& SoPlex::Statistics::operator=(const Statistics &rhs)
+  template <class R>
+   typename SoPlex<R>::Statistics& SoPlex<R>::Statistics::operator=(const Statistics &rhs)
    {
       *readingTime = *(rhs.readingTime);
       *solvingTime = *(rhs.solvingTime);
@@ -87,14 +90,16 @@ namespace soplex
    }
 
    /// clears all statistics
-   void SoPlex::Statistics::clearAllData()
+  template <class R>
+   void SoPlex<R>::Statistics::clearAllData()
    {
       readingTime->reset();
       clearSolvingData();
    }
 
    /// clears statistics on solving process
-   void SoPlex::Statistics::clearSolvingData()
+  template <class R>
+   void SoPlex<R>::Statistics::clearSolvingData()
    {
       solvingTime->reset();
       preprocessingTime->reset();
@@ -146,7 +151,8 @@ namespace soplex
    }
 
    /// prints statistics
-   void SoPlex::Statistics::print(std::ostream& os)
+  template <class R>
+   void SoPlex<R>::Statistics::print(std::ostream& os)
    {
       Real solTime = solvingTime->time();
       Real totTime = readingTime->time() + solTime;
