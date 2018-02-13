@@ -135,7 +135,7 @@ void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 /// performs external feasibility check with real type
 ///@todo implement external check; currently we use the internal methods for convenience
 static
-void checkSolutionReal(SoPlex& soplex)
+void checkSolutionReal(SoPlex<R>& soplex)
 {
    if( soplex.hasPrimal() )
    {
@@ -193,7 +193,7 @@ void checkSolutionReal(SoPlex& soplex)
 /// performs external feasibility check with rational type
 ///@todo implement external check; currently we use the internal methods for convenience
 static
-void checkSolutionRational(SoPlex& soplex)
+void checkSolutionRational(SoPlex<R>& soplex)
 {
    if( soplex.hasPrimal() )
    {
@@ -246,7 +246,7 @@ void checkSolutionRational(SoPlex& soplex)
 
 /// performs external feasibility check according to check mode
 static
-void checkSolution(SoPlex& soplex)
+void checkSolution(SoPlex<R>& soplex)
 {
    if( soplex.intParam(SoPlex<R>::CHECKMODE) == SoPlex<R>::CHECKMODE_RATIONAL
       || (soplex.intParam(SoPlex<R>::CHECKMODE) == SoPlex<R>::CHECKMODE_AUTO
@@ -263,7 +263,7 @@ void checkSolution(SoPlex& soplex)
 }
 
 static
-void printPrimalSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
+void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {
    int printprec;
    int printwidth;
@@ -353,7 +353,7 @@ void printPrimalSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, b
 }
 
 static
-void printDualSolution(SoPlex& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
+void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {
    int printprec;
    int printwidth;

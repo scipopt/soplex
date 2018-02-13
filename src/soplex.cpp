@@ -748,7 +748,7 @@ namespace soplex
   /// copy constructor
   ///@todo improve performance by implementing a separate copy constructor
   template <class R>
-  SoPlex<R>::SoPlex(const SoPlex& rhs)
+  SoPlex<R>::SoPlex(const SoPlex<R>& rhs)
   {
     // allocate memory as in default constructor
     _statistics = 0;

@@ -99,10 +99,10 @@ public:
    SoPlex();
 
    /// assignment operator
-   SoPlex& operator=(const SoPlex& rhs);
+   SoPlex<R>& operator=(const SoPlex<R>& rhs);
 
    /// copy constructor
-   SoPlex(const SoPlex& rhs);
+   SoPlex(const SoPlex<R>& rhs);
 
    /// destructor
    virtual ~SoPlex();

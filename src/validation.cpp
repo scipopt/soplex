@@ -60,7 +60,7 @@ bool Validation::updateValidationTolerance(char* tolerance)
 
 
 /// validates the soplex solution using the external solution
-void Validation::validateSolveReal(SoPlex& soplex)
+void Validation::validateSolveReal(SoPlex<R>& soplex)
 {
 #ifndef SOPLEX_LEGACY
    bool passedValidation = true;
