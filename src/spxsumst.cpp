@@ -23,61 +23,61 @@ namespace soplex
 {
   template <class R>
   void SPxSumST<R>::setupWeights(SPxSolver<R>& base)
-{
-   int count;
-   int i;
-   Real x;
-   DVector work, delta, rowLen;
+  {
+    int count;
+    int i;
+    Real x;
+    DVector work, delta, rowLen;
 
-   assert(base.nRows() > 0);
-   assert(base.nCols() > 0);
+    assert(base.nRows() > 0);
+    assert(base.nCols() > 0);
 
-   rowLen.reDim(base.nRows(), true);
-   work.reDim(base.nCols(), true);
-   delta.reDim(base.nCols(), true);
+    rowLen.reDim(base.nRows(), true);
+    work.reDim(base.nCols(), true);
+    delta.reDim(base.nCols(), true);
 
-   Real* wrk = work.get_ptr();
-   const Real* lhs = base.lhs().get_const_ptr();
-   const Real* rhs = base.rhs().get_const_ptr();
-   const Real* up = base.upper().get_const_ptr();
-   const Real* low = base.lower().get_const_ptr();
+    Real* wrk = work.get_ptr();
+    const Real* lhs = base.lhs().get_const_ptr();
+    const Real* rhs = base.rhs().get_const_ptr();
+    const Real* up = base.upper().get_const_ptr();
+    const Real* low = base.lower().get_const_ptr();
 
-   for (i = base.nRows(); --i >= 0;)
-   {
-      rowLen[i] = base.rowVector(i).length2();
-      if (lhs[i] > 0)
-         delta.multAdd(lhs[i] / rowLen[i], base.rowVector(i));
-      else if (rhs[i] < 0)
-         delta.multAdd(rhs[i] / rowLen[i], base.rowVector(i));
-   }
-
-   for (count = 0;; count++)
-   {
-      work += delta;
-      for (i = base.nCols(); --i >= 0;)
+    for (i = base.nRows(); --i >= 0;)
       {
-         if (wrk[i] > up[i])
-            wrk[i] = up[i];
-         if (wrk[i] < low[i])
-            wrk[i] = low[i];
+        rowLen[i] = base.rowVector(i).length2();
+        if (lhs[i] > 0)
+          delta.multAdd(lhs[i] / rowLen[i], base.rowVector(i));
+        else if (rhs[i] < 0)
+          delta.multAdd(rhs[i] / rowLen[i], base.rowVector(i));
       }
 
-      //      std::cout << -(work * base.maxObj()) << std::endl;
-      if (count >= 12)
-         break;
-
-      delta.clear();
-      for (i = base.nRows(); --i >= 0;)
+    for (count = 0;; count++)
       {
-         x = base.rowVector(i) * work;
-         if (lhs[i] > x)
-            delta.multAdd((lhs[i] - x) / rowLen[i], base.rowVector(i));
-         else if (rhs[i] < x)
-            delta.multAdd((rhs[i] - x) / rowLen[i], base.rowVector(i));
-      }
-   }
+        work += delta;
+        for (i = base.nCols(); --i >= 0;)
+          {
+            if (wrk[i] > up[i])
+              wrk[i] = up[i];
+            if (wrk[i] < low[i])
+              wrk[i] = low[i];
+          }
 
-   this->primal(work);
-   SPxVectorST<R>::setupWeights(base);
-}
+        //      std::cout << -(work * base.maxObj()) << std::endl;
+        if (count >= 12)
+          break;
+
+        delta.clear();
+        for (i = base.nRows(); --i >= 0;)
+          {
+            x = base.rowVector(i) * work;
+            if (lhs[i] > x)
+              delta.multAdd((lhs[i] - x) / rowLen[i], base.rowVector(i));
+            else if (rhs[i] < x)
+              delta.multAdd((rhs[i] - x) / rowLen[i], base.rowVector(i));
+          }
+      }
+
+    this->primal(work);
+    SPxVectorST<R>::setupWeights(base);
+  }
 } // namespace soplex
