@@ -934,9 +934,9 @@ namespace soplex
     /// default constructor.
     SPxBasis<R>(Timer::TYPE ttype = Timer::USER_TIME);
     /// copy constructor
-    SPxBasis<R>(const SPxBasis& old);
+    SPxBasis<R>(const SPxBasis<R>& old);
     /// assignment operator
-    SPxBasis<R>& operator=(const SPxBasis& rhs);
+    SPxBasis<R>& operator=(const SPxBasis<R>& rhs);
     /// destructor.
     virtual ~SPxBasis<R>();
     //@}

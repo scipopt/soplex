@@ -1112,7 +1112,7 @@ namespace soplex
 
 
     template <class R>
-      SPxSolver<R>& SPxSolver<R>::operator=(const SPxSolver& base)
+      SPxSolver<R>& SPxSolver<R>::operator=(const SPxSolver<R>& base)
       {
         if(this != &base)
           {

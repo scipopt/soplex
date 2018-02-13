@@ -2283,9 +2283,9 @@ namespace soplex
     /** assignment operator and copy constructor */
     //@{
     /// assignment operator
-    SPxSolver& operator=(const SPxSolver& base);
+    SPxSolver<R>& operator=(const SPxSolver<R>& base);
     /// copy constructor
-    SPxSolver(const SPxSolver& base);
+    SPxSolver(const SPxSolver<R>& base);
     //@}
 
     void testVecs();
