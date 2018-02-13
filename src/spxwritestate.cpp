@@ -28,6 +28,7 @@
 
 namespace soplex
 {
+  template <class R>
 bool SPxSolver<R>::writeState(
    const char*    filename,
    const NameSet* rowNames,
@@ -88,7 +89,7 @@ bool SPxSolver<R>::writeState(
    if (!ofs)
       return false;
 
-   writeMPS(ofs, rowNames, colNames, NULL);
+   this->writeMPS(ofs, rowNames, colNames, NULL);
    ofs.close();
 
    // write basis
