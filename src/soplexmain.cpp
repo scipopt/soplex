@@ -147,7 +147,7 @@ void checkSolutionReal(SoPlex& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex::FEASTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
                           << std::setprecision(8) << std::fixed << ").\n"
@@ -173,7 +173,7 @@ void checkSolutionReal(SoPlex& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex::OPTTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
                           << std::setprecision(8) << std::fixed << ").\n"
@@ -205,7 +205,7 @@ void checkSolutionRational(SoPlex& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex::FEASTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -229,7 +229,7 @@ void checkSolutionRational(SoPlex& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex::OPTTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -248,9 +248,9 @@ void checkSolutionRational(SoPlex& soplex)
 static
 void checkSolution(SoPlex& soplex)
 {
-   if( soplex.intParam(SoPlex::CHECKMODE) == SoPlex::CHECKMODE_RATIONAL
-      || (soplex.intParam(SoPlex::CHECKMODE) == SoPlex::CHECKMODE_AUTO
-         && soplex.intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL) )
+   if( soplex.intParam(SoPlex<R>::CHECKMODE) == SoPlex<R>::CHECKMODE_RATIONAL
+      || (soplex.intParam(SoPlex<R>::CHECKMODE) == SoPlex<R>::CHECKMODE_AUTO
+         && soplex.intParam(SoPlex<R>::READMODE) == SoPlex<R>::READMODE_RATIONAL) )
    {
       checkSolutionRational(soplex);
    }
@@ -625,7 +625,7 @@ int main(int argc, char* argv[])
                // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
                else if( strncmp(option, "readmode=", 9) == 0 )
                {
-                  if( !soplex->setIntParam(SoPlex::READMODE, option[9] - '0') )
+                  if( !soplex->setIntParam(SoPlex<R>::READMODE, option[9] - '0') )
                   {
                      printUsage(argv, optidx);
                      returnValue = 1;
@@ -635,7 +635,7 @@ int main(int argc, char* argv[])
                // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
                else if( strncmp(option, "solvemode=", 10) == 0 )
                {
-                  if( !soplex->setIntParam(SoPlex::SOLVEMODE, option[10] - '0') )
+                  if( !soplex->setIntParam(SoPlex<R>::SOLVEMODE, option[10] - '0') )
                   {
                      printUsage(argv, optidx);
                      returnValue = 1;
@@ -643,10 +643,10 @@ int main(int argc, char* argv[])
                   }
                   // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
                   // the rational LP is kept after reading
-                  else if( soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
-                     && soplex->intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+                  else if( soplex->intParam(SoPlex<R>::READMODE) == SoPlex<R>::READMODE_RATIONAL
+                     && soplex->intParam(SoPlex<R>::SOLVEMODE) != SoPlex<R>::SOLVEMODE_REAL )
                   {
-                     soplex->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+                     soplex->setIntParam(SoPlex<R>::SYNCMODE, SoPlex<R>::SYNCMODE_AUTO);
                   }
                }
                // --extsol=<value> : external solution for soplex to use for validation
@@ -672,7 +672,7 @@ int main(int argc, char* argv[])
 
          case 't' :
             // -t<s> : set time limit to <s> seconds
-            if( !soplex->setRealParam(SoPlex::TIMELIMIT, atoi(&option[2])) )
+            if( !soplex->setRealParam(SoPlex<R>::TIMELIMIT, atoi(&option[2])) )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -682,7 +682,7 @@ int main(int argc, char* argv[])
 
          case 'i' :
             // -i<n> : set iteration limit to <n>
-            if( !soplex->setIntParam(SoPlex::ITERLIMIT, atoi(&option[2])) )
+            if( !soplex->setIntParam(SoPlex<R>::ITERLIMIT, atoi(&option[2])) )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -692,7 +692,7 @@ int main(int argc, char* argv[])
 
          case 'f' :
             // -f<eps> : set primal feasibility tolerance to <eps>
-            if( !soplex->setRealParam(SoPlex::FEASTOL, atof(&option[2])) )
+            if( !soplex->setRealParam(SoPlex<R>::FEASTOL, atof(&option[2])) )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -702,7 +702,7 @@ int main(int argc, char* argv[])
 
          case 'o' :
             // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
-            if( !soplex->setRealParam(SoPlex::OPTTOL, atof(&option[2])) )
+            if( !soplex->setRealParam(SoPlex<R>::OPTTOL, atof(&option[2])) )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -722,7 +722,7 @@ int main(int argc, char* argv[])
 
          case 's' :
             // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
-            if( !soplex->setIntParam(SoPlex::SIMPLIFIER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex<R>::SIMPLIFIER, option[2] - '0') )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -732,7 +732,7 @@ int main(int argc, char* argv[])
 
          case 'g' :
             // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares, 6 - geometric-equilibrium)
-            if( !soplex->setIntParam(SoPlex::SCALER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex<R>::SCALER, option[2] - '0') )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -742,7 +742,7 @@ int main(int argc, char* argv[])
 
          case 'p' :
             // -p<value> : choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
-            if( !soplex->setIntParam(SoPlex::PRICER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex<R>::PRICER, option[2] - '0') )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -752,7 +752,7 @@ int main(int argc, char* argv[])
 
          case 'r' :
             // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
-            if( !soplex->setIntParam(SoPlex::RATIOTESTER, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex<R>::RATIOTESTER, option[2] - '0') )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -762,7 +762,7 @@ int main(int argc, char* argv[])
 
          case 'v' :
             // -v<level> : set verbosity to <level> (0 - error, 3 - normal, 5 - high)
-            if( !soplex->setIntParam(SoPlex::VERBOSITY, option[2] - '0') )
+            if( !soplex->setIntParam(SoPlex<R>::VERBOSITY, option[2] - '0') )
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -829,7 +829,7 @@ int main(int argc, char* argv[])
       }
 
       // ensure that syncmode is not manual
-      if( soplex->intParam(SoPlex::SYNCMODE) == SoPlex::SYNCMODE_MANUAL )
+      if( soplex->intParam(SoPlex<R>::SYNCMODE) == SoPlex<R>::SYNCMODE_MANUAL )
       {
          MSG_ERROR( std::cerr << "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n" );
          returnValue = 1;
@@ -869,15 +869,15 @@ int main(int argc, char* argv[])
 
       // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
       // the rational LP is kept after reading
-      if( soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_RATIONAL
-         && soplex->intParam(SoPlex::SOLVEMODE) != SoPlex::SOLVEMODE_REAL )
+      if( soplex->intParam(SoPlex<R>::READMODE) == SoPlex<R>::READMODE_RATIONAL
+         && soplex->intParam(SoPlex<R>::SOLVEMODE) != SoPlex<R>::SOLVEMODE_REAL )
       {
-         soplex->setIntParam(SoPlex::SYNCMODE, SoPlex::SYNCMODE_AUTO);
+         soplex->setIntParam(SoPlex<R>::SYNCMODE, SoPlex<R>::SYNCMODE_AUTO);
       }
 
       // read LP from input file
       MSG_INFO1( soplex->spxout, soplex->spxout << "Reading "
-         << (soplex->intParam(SoPlex::READMODE) == SoPlex::READMODE_REAL ? "(real)" : "(rational)")
+         << (soplex->intParam(SoPlex<R>::READMODE) == SoPlex<R>::READMODE_REAL ? "(real)" : "(rational)")
          << " LP file <" << lpfilename << "> . . .\n" );
 
       if( !soplex->readFile(lpfilename, &rownames, &colnames) )

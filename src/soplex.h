@@ -1364,41 +1364,41 @@ public:
          /// constructor
          BoolParam();
          /// array of names for boolean parameters
-         std::string name[SoPlex::BOOLPARAM_COUNT];
+         std::string name[SoPlex<R>::BOOLPARAM_COUNT];
          /// array of descriptions for boolean parameters
-         std::string description[SoPlex::BOOLPARAM_COUNT];
+         std::string description[SoPlex<R>::BOOLPARAM_COUNT];
          /// array of default values for boolean parameters
-         bool defaultValue[SoPlex::BOOLPARAM_COUNT];
+         bool defaultValue[SoPlex<R>::BOOLPARAM_COUNT];
       } boolParam;
 
       static struct IntParam {
          /// constructor
          IntParam();
           /// array of names for integer parameters
-         std::string name[SoPlex::INTPARAM_COUNT];
+         std::string name[SoPlex<R>::INTPARAM_COUNT];
          /// array of descriptions for integer parameters
-         std::string description[SoPlex::INTPARAM_COUNT];
+         std::string description[SoPlex<R>::INTPARAM_COUNT];
          /// array of default values for integer parameters
-         int defaultValue[SoPlex::INTPARAM_COUNT];
+         int defaultValue[SoPlex<R>::INTPARAM_COUNT];
          /// array of lower bounds for int parameter values
-         int lower[SoPlex::INTPARAM_COUNT];
+         int lower[SoPlex<R>::INTPARAM_COUNT];
          /// array of upper bounds for int parameter values
-         int upper[SoPlex::INTPARAM_COUNT];
+         int upper[SoPlex<R>::INTPARAM_COUNT];
       } intParam;
 
       static struct RealParam {
          /// constructor
          RealParam();
          /// array of names for real parameters
-         std::string name[SoPlex::REALPARAM_COUNT];
+         std::string name[SoPlex<R>::REALPARAM_COUNT];
          /// array of descriptions for real parameters
-         std::string description[SoPlex::REALPARAM_COUNT];
+         std::string description[SoPlex<R>::REALPARAM_COUNT];
          /// array of default values for real parameters
-         Real defaultValue[SoPlex::REALPARAM_COUNT];
+         Real defaultValue[SoPlex<R>::REALPARAM_COUNT];
          /// array of lower bounds for real parameter values
-         Real lower[SoPlex::REALPARAM_COUNT];
+         Real lower[SoPlex<R>::REALPARAM_COUNT];
          /// array of upper bounds for real parameter values
-         Real upper[SoPlex::REALPARAM_COUNT];
+         Real upper[SoPlex<R>::REALPARAM_COUNT];
       } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1406,30 +1406,30 @@ public:
          /// constructor
          RationalParam();
          /// array of names for rational parameters
-         std::string name[SoPlex::RATIONALPARAM_COUNT];
+         std::string name[SoPlex<R>::RATIONALPARAM_COUNT];
          /// array of descriptions for rational parameters
-         std::string description[SoPlex::RATIONALPARAM_COUNT];
+         std::string description[SoPlex<R>::RATIONALPARAM_COUNT];
          /// array of default values for rational parameters
-         Rational defaultValue[SoPlex::RATIONALPARAM_COUNT];
+         Rational defaultValue[SoPlex<R>::RATIONALPARAM_COUNT];
          /// array of lower bounds for rational parameter values
-         Rational lower[SoPlex::RATIONALPARAM_COUNT];
+         Rational lower[SoPlex<R>::RATIONALPARAM_COUNT];
          /// array of upper bounds for rational parameter values
-         Rational upper[SoPlex::RATIONALPARAM_COUNT];
+         Rational upper[SoPlex<R>::RATIONALPARAM_COUNT];
       } rationalParam;
 #endif
 
       /// array of current boolean parameter values
-      bool _boolParamValues[SoPlex::BOOLPARAM_COUNT];
+      bool _boolParamValues[SoPlex<R>::BOOLPARAM_COUNT];
 
       /// array of current integer parameter values
-      int _intParamValues[SoPlex::INTPARAM_COUNT];
+      int _intParamValues[SoPlex<R>::INTPARAM_COUNT];
 
       /// array of current real parameter values
-      Real _realParamValues[SoPlex::REALPARAM_COUNT];
+      Real _realParamValues[SoPlex<R>::REALPARAM_COUNT];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of current rational parameter values
-      Rational _rationalParamValues[SoPlex::RATIONALPARAM_COUNT];
+      Rational _rationalParamValues[SoPlex<R>::RATIONALPARAM_COUNT];
 #endif
 
       /// default constructor initializing default settings

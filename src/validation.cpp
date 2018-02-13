@@ -79,9 +79,9 @@ void Validation::validateSolveReal(SoPlex& soplex)
    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
    if( strncmp(validatesolution, "+infinity", 9 ) == 0 )
-      sol =  soplex.realParam(SoPlex::INFTY);
+      sol =  soplex.realParam(SoPlex<R>::INFTY);
    else if ( strncmp(validatesolution, "-infinity", 9) == 0 )
-      sol =  -soplex.realParam(SoPlex::INFTY);
+      sol =  -soplex.realParam(SoPlex<R>::INFTY);
    else
    {
       sol = atof(validatesolution);
