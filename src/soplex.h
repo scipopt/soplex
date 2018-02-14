@@ -98,7 +98,7 @@ namespace soplex
  * @ingroup Algo
  */
   template <class R>
-    class SoPlex : SoPlexBase
+    class SoPlex : public SoPlexBase
 {
 public:
 

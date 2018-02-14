@@ -89,7 +89,7 @@ namespace soplex
     friend class SoPlexLegacy;
 
     template <class S> friend class SPxFastRT;
-    friend class SPxBoundFlippingRT;
+    template <class T> friend class SPxBoundFlippingRT;
 
   public:
 
