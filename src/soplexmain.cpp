@@ -476,7 +476,7 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlex<double>* soplex = nullptr;
+   SoPlexBase* soplex = nullptr; // The pointer to base class that will be used to access SoPlex 
 
    Timer* readingTime = nullptr;
    Validation<double>* validation = nullptr;
@@ -508,7 +508,7 @@ int main(int argc, char* argv[])
       readingTime = TimerFactory::createTimer(Timer::USER_TIME);
       soplex = 0;
       spx_alloc(soplex);
-      new (soplex) SoPlex();
+      new (soplex) SoPlex<Real>();
 
       soplex->printVersion();
       MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
@@ -677,7 +677,7 @@ int main(int argc, char* argv[])
 
          case 't' :
             // -t<s> : set time limit to <s> seconds
-            if( !soplex->setRealParam(SoPlex<R>::TIMELIMIT, atoi(&option[2])) )
+           if( !soplex->setRealParam(SoPlex<R>::TIMELIMIT, atoi(&option[2])) ) // #template 
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -687,7 +687,7 @@ int main(int argc, char* argv[])
 
          case 'i' :
             // -i<n> : set iteration limit to <n>
-            if( !soplex->setIntParam(SoPlex<R>::ITERLIMIT, atoi(&option[2])) )
+           if( !soplex->setIntParam(SoPlex<R>::ITERLIMIT, atoi(&option[2])) ) // #template 
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -697,7 +697,7 @@ int main(int argc, char* argv[])
 
          case 'f' :
             // -f<eps> : set primal feasibility tolerance to <eps>
-            if( !soplex->setRealParam(SoPlex<R>::FEASTOL, atof(&option[2])) )
+           if( !soplex->setRealParam(SoPlex<R>::FEASTOL, atof(&option[2])) ) // #template 
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -707,7 +707,7 @@ int main(int argc, char* argv[])
 
          case 'o' :
             // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
-            if( !soplex->setRealParam(SoPlex<R>::OPTTOL, atof(&option[2])) )
+           if( !soplex->setRealParam(SoPlex<R>::OPTTOL, atof(&option[2])) ) // #template 
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -727,7 +727,7 @@ int main(int argc, char* argv[])
 
          case 's' :
             // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
-            if( !soplex->setIntParam(SoPlex<R>::SIMPLIFIER, option[2] - '0') )
+           if( !soplex->setIntParam(SoPlex<R>::SIMPLIFIER, option[2] - '0') ) // #template 
             {
                printUsage(argv, optidx);
                returnValue = 1;

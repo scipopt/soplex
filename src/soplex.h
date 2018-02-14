@@ -83,12 +83,22 @@
 namespace soplex
 {
 
+  /**@class SoPlexBase
+   * @brief   A non-templated base class for the templated SoPlex
+   * @ingroup Algo
+   */
+
+  class SoPlexBase
+  {
+    
+  };
+
 /**@class SoPlex
  * @brief   Preconfigured SoPlex LP-solver.
  * @ingroup Algo
  */
   template <class R>
-class SoPlex 
+    class SoPlex : SoPlexBase
 {
 public:
 

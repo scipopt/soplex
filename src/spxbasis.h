@@ -199,7 +199,7 @@ namespace soplex
       //@}
 
       template <class S> friend class SPxBasis;
-      friend std::ostream& operator<< <>(std::ostream& os, const Status& stat); //@todo is the <> required here?
+      template <class T> friend std::ostream& operator<< (std::ostream& os, const Status& stat); //@todo is the <> required here?
 
     private:
 
