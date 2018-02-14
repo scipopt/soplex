@@ -476,20 +476,20 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlex<double>* soplex = 0;
+   SoPlex<double>* soplex = nullptr;
 
-   Timer* readingTime = 0;
-   Validation<double>* validation = 0;
+   Timer* readingTime = nullptr;
+   Validation<double>* validation = nullptr;
    int optidx;
 
-   const char* lpfilename = 0;
-   char* readbasname = 0;
-   char* writebasname = 0;
-   char* writefilename = 0;
-   char* writedualfilename = 0;
-   char* loadsetname = 0;
-   char* savesetname = 0;
-   char* diffsetname = 0;
+   const char* lpfilename = nullptr;
+   char* readbasname = nullptr;
+   char* writebasname = nullptr;
+   char* writefilename = nullptr;
+   char* writedualfilename = nullptr;
+   char* loadsetname = nullptr;
+   char* savesetname = nullptr;
+   char* diffsetname = nullptr;
    bool printPrimal = false;
    bool printPrimalRational = false;
    bool printDual = false;
