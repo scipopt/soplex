@@ -2087,15 +2087,15 @@ void clean_up(
 int main(int argc, char* argv[])
 {
    const char*               filename;
-   char*                     basisname      = 0;
+   char*                     basisname      = nullptr;
    typename SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
    typename SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
    SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
-   SPxSimplifier*            simplifier     = 0;
-   SPxStarter*               starter        = 0;
-   SPxPricer*                pricer         = 0;
-   SPxRatioTester*           ratiotester    = 0;
-   SPxScaler*                postscaler     = 0;
+   SPxSimplifier*            simplifier     = nullptr;
+   SPxStarter*               starter        = nullptr;
+   SPxPricer*                pricer         = nullptr;
+   SPxRatioTester*           ratiotester    = nullptr;
+   SPxScaler*                postscaler     = nullptr;
 
    SPxOut                    spxout;
 
