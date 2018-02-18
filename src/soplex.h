@@ -632,7 +632,7 @@ public:
    bool getRedCostReal(VectorReal& vector);
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualFarkasReal(VectorReal& vector);
+   bool getDualFarkasT(VectorBase<R>& vector);
 
    /// gets violation of bounds; returns true on success
    bool getBoundViolationReal(Real& maxviol, Real& sumviol);
@@ -669,9 +669,6 @@ public:
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCostRational(VectorRational& vector);
-
-   /// gets the Farkas proof if LP is infeasible; returns true on success
-   bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
    bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);

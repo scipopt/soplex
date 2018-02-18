@@ -425,7 +425,7 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
    if( rational )
    {
       DVectorRational dual(soplex.numRowsReal());
-      if( soplex.getDualFarkasRational(dual) )
+      if( soplex.getDualFarkasT(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
          for( int i = 0; i < soplex.numRowsReal(); ++i )

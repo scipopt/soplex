@@ -3203,8 +3203,8 @@ namespace soplex
 
 
   /// gets the Farkas proof if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getDualFarkasReal(VectorReal& vector)
+  template <>
+	bool SoPlex<Real>::getDualFarkasT(VectorBase<Real>& vector)
   {
     if( hasDualFarkas() && vector.dim() >= numRowsReal() )
       {
@@ -3522,10 +3522,10 @@ namespace soplex
   }
 
 
-
+  /// #template
   /// gets the Farkas proof if LP is infeasible; returns true on success
-  template <class R>
-	bool SoPlex<R>::getDualFarkasRational(VectorRational& vector)
+  template <>
+	bool SoPlex<Rational>::getDualFarkasT(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational() )
       {
