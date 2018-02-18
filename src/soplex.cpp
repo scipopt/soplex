@@ -807,9 +807,9 @@ namespace soplex
 
 
 
-  /// returns number of rows
-  template <class R>
-  int SoPlex<R>::numRowsReal() const
+  /// returns number of rows #template
+  template <>
+  int SoPlex<Real>::numRowsReal() const
   {
     assert(_realLP != 0);
     return _realLP->nRows();
