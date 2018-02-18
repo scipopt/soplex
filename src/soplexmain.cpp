@@ -2085,247 +2085,247 @@ void clean_up(
 //    main program
 //------------------------------------------------------------------------
 
-int main(int argc, char* argv[])
-{
-   const char*               filename;
-   char*                     basisname      = nullptr;
-   typename SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
-   typename SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
-   SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
-   SPxSimplifier*            simplifier     = nullptr;
-   SPxStarter*               starter        = nullptr;
-   SPxPricer*                pricer         = nullptr;
-   SPxRatioTester*           ratiotester    = nullptr;
-   SPxScaler*                postscaler     = nullptr;
+// int main(int argc, char* argv[])
+// {
+//    const char*               filename;
+//    char*                     basisname      = nullptr;
+//    typename SPxSolver<R>::Type           type           = SPxSolver<R>::LEAVE;
+//    typename SPxSolver<R>::Representation representation = SPxSolver<R>::COLUMN;
+//    SLUFactor::UpdateType     update         = SLUFactor::FOREST_TOMLIN;
+//    SPxSimplifier*            simplifier     = nullptr;
+//    SPxStarter*               starter        = nullptr;
+//    SPxPricer*                pricer         = nullptr;
+//    SPxRatioTester*           ratiotester    = nullptr;
+//    SPxScaler*                postscaler     = nullptr;
 
-   SPxOut                    spxout;
+//    SPxOut                    spxout;
 
-   try {
-      NameSet                   rownames;
-      NameSet                   colnames;
-      int                       starting       = 0;
-      int                       pricing        = 4;
-      int                       ratiotest      = 3;
-      int                       scaling        = 2;
-      int                       simplifying    = 1;
-      int                       iterlimit      = -1;
-      Real                      timelimit      = DEFAULT_INFINITY;
-      Real                      delta          = DEFAULT_BND_VIOL;
-      Real                      feastol        = DEFAULT_BND_VIOL;
-      Real                      opttol         = DEFAULT_BND_VIOL;
-      Real                      epsilon        = DEFAULT_EPS_ZERO;
-      Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
-      Real                      epsilon_update = DEFAULT_EPS_UPDATE;
-      int                       verbose        = SPxOut::INFO1;
-      bool                      print_solution = false;
-      bool                      print_dual     = false;
-      bool                      print_quality  = false;
-      bool                      read_basis     = false;
-      bool                      write_basis    = false;
-      int                       precision;
-      int                       optidx;
+//    try {
+//       NameSet                   rownames;
+//       NameSet                   colnames;
+//       int                       starting       = 0;
+//       int                       pricing        = 4;
+//       int                       ratiotest      = 3;
+//       int                       scaling        = 2;
+//       int                       simplifying    = 1;
+//       int                       iterlimit      = -1;
+//       Real                      timelimit      = DEFAULT_INFINITY;
+//       Real                      delta          = DEFAULT_BND_VIOL;
+//       Real                      feastol        = DEFAULT_BND_VIOL;
+//       Real                      opttol         = DEFAULT_BND_VIOL;
+//       Real                      epsilon        = DEFAULT_EPS_ZERO;
+//       Real                      epsilon_factor = DEFAULT_EPS_FACTOR;
+//       Real                      epsilon_update = DEFAULT_EPS_UPDATE;
+//       int                       verbose        = SPxOut::INFO1;
+//       bool                      print_solution = false;
+//       bool                      print_dual     = false;
+//       bool                      print_quality  = false;
+//       bool                      read_basis     = false;
+//       bool                      write_basis    = false;
+//       int                       precision;
+//       int                       optidx;
 
-      for(optidx = 1; optidx < argc; optidx++)
-      {
-         if (*argv[optidx] != '-')
-            break;
+//       for(optidx = 1; optidx < argc; optidx++)
+//       {
+//          if (*argv[optidx] != '-')
+//             break;
 
-         switch(argv[optidx][1])
-         {
-         case 'b' :
-            check_parameter(argv[optidx][2], argv); // use -b{r,w}, not -b
-            if (argv[optidx][2] == 'r')
-               read_basis = true;
-            if (argv[optidx][2] == 'w')
-               write_basis = true;
-            break;
-         case 'c' :
-            check_parameter(argv[optidx][2], argv); // use -c[0-3], not -c
-            starting = atoi(&argv[optidx][2]);
-            break;
-         case 'd' :
-            check_parameter(argv[optidx][2], argv); // use -dx, not -d
-            delta = atof(&argv[optidx][2]);
-            break;
-         case 'f' :
-            check_parameter(argv[optidx][2], argv); // use -fx, not -f
-            feastol = atof(&argv[optidx][2]);
-            break;
-         case 'o' :
-            check_parameter(argv[optidx][2], argv); // use -ox, not -o
-            opttol = atof(&argv[optidx][2]);
-            break;
-         case 'e':
-            type = SPxSolver<R>::ENTER;
-            break;
-         case 'g' :
-            check_parameter(argv[optidx][2], argv); // use -g[0-5], not -g
-            scaling = atoi(&argv[optidx][2]);
-            break;
-         case 'i' :
-            update = SLUFactor::ETA;
-            break;
-         case 'l' :
-            if (argv[optidx][2] == '\0' )  // use -lx, not -l
-               print_usage_and_exit( argv );
-            timelimit = atof(&argv[optidx][2]);
-            break;
-         case 'L' :
-            if (argv[optidx][2] == '\0' )  // use -Lx, not -L
-               print_usage_and_exit( argv );
-            iterlimit = atoi(&argv[optidx][2]);
-            break;
-         case 'p' :
-            check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
-            pricing = atoi(&argv[optidx][2]);
-            break;
-         case 'q' :
-            print_quality = true;
-            break;
-         case 'r' :
-            representation = SPxSolver<R>::ROW;
-            break;
-         case 's' :
-            check_parameter(argv[optidx][2], argv); // use -s[0-4], not -s
-            simplifying = atoi(&argv[optidx][2]);
-            break;
-         case 't' :
-            check_parameter(argv[optidx][2], argv); // use -r[0-2], not -r
-            ratiotest = atoi(&argv[optidx][2]);
-            break;
-         case 'v' :
-            check_parameter(argv[optidx][2], argv); // use -v[0-5], not -v
-            if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
-               verbose = argv[optidx][2] - '0';
-            break;
-         case 'V' :
-            print_version_info();
-            exit(0);
-         case 'x' :
-            print_solution = true;
-            break;
-         case 'y' :
-            print_dual = true;
-            break;
-         case 'z' :
-            check_parameter(argv[optidx][2], argv); // must not be empty
-            check_parameter(argv[optidx][3], argv); // must not be empty
-            switch(argv[optidx][2])
-            {
-            case 'z' :
-               epsilon = atof(&argv[optidx][3]);
-               break;
-            case 'f' :
-               epsilon_factor = atof(&argv[optidx][3]);
-               break;
-            case 'u' :
-               epsilon_update = atof(&argv[optidx][3]);
-               break;
-            default :
-               print_usage_and_exit( argv );
-            }
-            break;
-         case 'C' :
-            checkMode = true;
-            break;
-         case 'h' :
-         case '?' :
-            print_version_info();
-            //lint -fallthrough
-         default :
-            print_usage_and_exit( argv );
-         }
-      }
+//          switch(argv[optidx][1])
+//          {
+//          case 'b' :
+//             check_parameter(argv[optidx][2], argv); // use -b{r,w}, not -b
+//             if (argv[optidx][2] == 'r')
+//                read_basis = true;
+//             if (argv[optidx][2] == 'w')
+//                write_basis = true;
+//             break;
+//          case 'c' :
+//             check_parameter(argv[optidx][2], argv); // use -c[0-3], not -c
+//             starting = atoi(&argv[optidx][2]);
+//             break;
+//          case 'd' :
+//             check_parameter(argv[optidx][2], argv); // use -dx, not -d
+//             delta = atof(&argv[optidx][2]);
+//             break;
+//          case 'f' :
+//             check_parameter(argv[optidx][2], argv); // use -fx, not -f
+//             feastol = atof(&argv[optidx][2]);
+//             break;
+//          case 'o' :
+//             check_parameter(argv[optidx][2], argv); // use -ox, not -o
+//             opttol = atof(&argv[optidx][2]);
+//             break;
+//          case 'e':
+//             type = SPxSolver<R>::ENTER;
+//             break;
+//          case 'g' :
+//             check_parameter(argv[optidx][2], argv); // use -g[0-5], not -g
+//             scaling = atoi(&argv[optidx][2]);
+//             break;
+//          case 'i' :
+//             update = SLUFactor::ETA;
+//             break;
+//          case 'l' :
+//             if (argv[optidx][2] == '\0' )  // use -lx, not -l
+//                print_usage_and_exit( argv );
+//             timelimit = atof(&argv[optidx][2]);
+//             break;
+//          case 'L' :
+//             if (argv[optidx][2] == '\0' )  // use -Lx, not -L
+//                print_usage_and_exit( argv );
+//             iterlimit = atoi(&argv[optidx][2]);
+//             break;
+//          case 'p' :
+//             check_parameter(argv[optidx][2], argv); // use -p[0-5], not -p
+//             pricing = atoi(&argv[optidx][2]);
+//             break;
+//          case 'q' :
+//             print_quality = true;
+//             break;
+//          case 'r' :
+//             representation = SPxSolver<R>::ROW;
+//             break;
+//          case 's' :
+//             check_parameter(argv[optidx][2], argv); // use -s[0-4], not -s
+//             simplifying = atoi(&argv[optidx][2]);
+//             break;
+//          case 't' :
+//             check_parameter(argv[optidx][2], argv); // use -r[0-2], not -r
+//             ratiotest = atoi(&argv[optidx][2]);
+//             break;
+//          case 'v' :
+//             check_parameter(argv[optidx][2], argv); // use -v[0-5], not -v
+//             if (argv[optidx][2] >= '0' && argv[optidx][2] <= '9')
+//                verbose = argv[optidx][2] - '0';
+//             break;
+//          case 'V' :
+//             print_version_info();
+//             exit(0);
+//          case 'x' :
+//             print_solution = true;
+//             break;
+//          case 'y' :
+//             print_dual = true;
+//             break;
+//          case 'z' :
+//             check_parameter(argv[optidx][2], argv); // must not be empty
+//             check_parameter(argv[optidx][3], argv); // must not be empty
+//             switch(argv[optidx][2])
+//             {
+//             case 'z' :
+//                epsilon = atof(&argv[optidx][3]);
+//                break;
+//             case 'f' :
+//                epsilon_factor = atof(&argv[optidx][3]);
+//                break;
+//             case 'u' :
+//                epsilon_update = atof(&argv[optidx][3]);
+//                break;
+//             default :
+//                print_usage_and_exit( argv );
+//             }
+//             break;
+//          case 'C' :
+//             checkMode = true;
+//             break;
+//          case 'h' :
+//          case '?' :
+//             print_version_info();
+//             //lint -fallthrough
+//          default :
+//             print_usage_and_exit( argv );
+//          }
+//       }
 
-      // print version
-      print_version_info();
+//       // print version
+//       print_version_info();
 
-      // enough arguments?
-      if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
-         print_usage_and_exit( argv );
-      filename  = argv[optidx];
+//       // enough arguments?
+//       if ((argc - optidx) < 1 + (read_basis ? 1 : 0) + (write_basis ? 1 : 0))
+//          print_usage_and_exit( argv );
+//       filename  = argv[optidx];
 
-      ++optidx;
+//       ++optidx;
 
-      // switch off simplifier when using a starting basis
-      if ( read_basis )
-         simplifying = 0;
+//       // switch off simplifier when using a starting basis
+//       if ( read_basis )
+//          simplifying = 0;
 
-      if ( read_basis || write_basis )
-         basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
+//       if ( read_basis || write_basis )
+//          basisname = strcpy( new char[strlen(argv[optidx]) + 1], argv[optidx] );
 
-      // set some algorithm parameters
-      Param::setEpsilon             ( epsilon );
-      Param::setEpsilonFactorization( epsilon_factor );
-      Param::setEpsilonUpdate       ( epsilon_update );
-      spxout.setVerbosity           ( (SPxOut::Verbosity) verbose );
+//       // set some algorithm parameters
+//       Param::setEpsilon             ( epsilon );
+//       Param::setEpsilonFactorization( epsilon_factor );
+//       Param::setEpsilonUpdate       ( epsilon_update );
+//       spxout.setVerbosity           ( (SPxOut::Verbosity) verbose );
 
-      // Set the output precision.
-      precision = int(-log10(MINIMUM(feastol, opttol))) + 1;
+//       // Set the output precision.
+//       precision = int(-log10(MINIMUM(feastol, opttol))) + 1;
 
-      std::cout.setf( std::ios::scientific | std::ios::showpoint );
-      std::cerr.setf( std::ios::scientific | std::ios::showpoint );
+//       std::cout.setf( std::ios::scientific | std::ios::showpoint );
+//       std::cerr.setf( std::ios::scientific | std::ios::showpoint );
 
-#ifdef SEND_ALL_OUTPUT_TO_FILES
-      // Example of redirecting output to different files.
-      // Default is cerr for errors and warnings, cout for everything else.
-      std::ofstream  myerrstream ( "errwarn.txt" );
-      std::ofstream  myinfostream( "infos.txt" );
-      redirect_output(myerrstream, myinfostream);
-#endif
+// #ifdef SEND_ALL_OUTPUT_TO_FILES
+//       // Example of redirecting output to different files.
+//       // Default is cerr for errors and warnings, cout for everything else.
+//       std::ofstream  myerrstream ( "errwarn.txt" );
+//       std::ofstream  myinfostream( "infos.txt" );
+//       redirect_output(myerrstream, myinfostream);
+// #endif
 
-      // create an instance of MySoPlex
-      MySoPlex work( spxout, type, representation );
-      work.setOutstream         ( spxout );
-      work.setUtype             ( update );
-      work.setFeastol           ( MINIMUM(feastol, delta) );
-      work.setOpttol            ( MINIMUM(opttol, delta) );
-      work.setTerminationTime   ( timelimit );
-      work.setTerminationIter   ( iterlimit );
-      print_algorithm_parameters( work, representation, update );
-      assert( work.isConsistent() );
+//       // create an instance of MySoPlex
+//       MySoPlex work( spxout, type, representation );
+//       work.setOutstream         ( spxout );
+//       work.setUtype             ( update );
+//       work.setFeastol           ( MINIMUM(feastol, delta) );
+//       work.setOpttol            ( MINIMUM(opttol, delta) );
+//       work.setTerminationTime   ( timelimit );
+//       work.setTerminationIter   ( iterlimit );
+//       print_algorithm_parameters( work, representation, update );
+//       assert( work.isConsistent() );
 
-      // set pricer, starter, simplifier, and ratio tester
-      work.setPricer    ( pricer      = get_pricer      (pricing, work.spxout) );
-      work.setStarter   ( starter     = get_starter     (starting, work.spxout) );
-      work.setSimplifier( simplifier  = get_simplifier  (simplifying, work.spxout) );
-      work.setTester    ( ratiotester = get_ratio_tester(ratiotest, work.spxout) );
-      assert(work.isConsistent());
+//       // set pricer, starter, simplifier, and ratio tester
+//       work.setPricer    ( pricer      = get_pricer      (pricing, work.spxout) );
+//       work.setStarter   ( starter     = get_starter     (starting, work.spxout) );
+//       work.setSimplifier( simplifier  = get_simplifier  (simplifying, work.spxout) );
+//       work.setTester    ( ratiotester = get_ratio_tester(ratiotest, work.spxout) );
+//       assert(work.isConsistent());
 
-      // set pre- and postscaler
-      get_scalers(postscaler, scaling, work.spxout);
-      work.setPostScaler(postscaler);
-      assert(work.isConsistent());
+//       // set pre- and postscaler
+//       get_scalers(postscaler, scaling, work.spxout);
+//       work.setPostScaler(postscaler);
+//       assert(work.isConsistent());
 
-      // read the LP from an input file (.lp or .mps)
-      read_input_file(work, filename, rownames, colnames);
+//       // read the LP from an input file (.lp or .mps)
+//       read_input_file(work, filename, rownames, colnames);
 
-      // read a basis file if specified
-      if (read_basis)
-         read_basis_file(work, basisname, &rownames, &colnames);
+//       // read a basis file if specified
+//       if (read_basis)
+//          read_basis_file(work, basisname, &rownames, &colnames);
 
-      // solve the LP
-      solve_LP(work);
+//       // solve the LP
+//       solve_LP(work);
 
-      // print solution, status, infeasibility system,...
-      print_solution_and_status(work, rownames, colnames, precision, print_quality,
-                                print_solution, print_dual, write_basis, basisname);
+//       // print solution, status, infeasibility system,...
+//       print_solution_and_status(work, rownames, colnames, precision, print_quality,
+//                                 print_solution, print_dual, write_basis, basisname);
 
-      // clean up
-      clean_up(postscaler, simplifier, starter, pricer, ratiotester, basisname);
+//       // clean up
+//       clean_up(postscaler, simplifier, starter, pricer, ratiotester, basisname);
 
-      return 0;
-   }
-   catch( const SPxException& x )
-   {
-      std::cout << "exception caught : " << x.what() << std::endl;
-      delete [] basisname;
-      if (simplifier)
-         delete simplifier;
-      delete starter;
-      delete pricer;
-      delete ratiotester;
-      delete postscaler;
-   }
-}
-#endif
+//       return 0;
+//    }
+//    catch( const SPxException& x )
+//    {
+//       std::cout << "exception caught : " << x.what() << std::endl;
+//       delete [] basisname;
+//       if (simplifier)
+//          delete simplifier;
+//       delete starter;
+//       delete pricer;
+//       delete ratiotester;
+//       delete postscaler;
+//    }
+// }
+#endif  // 
