@@ -126,8 +126,9 @@ public:
    /// returns number of rows
    int numRowsReal() const;
 
+   /// Templated function that
    /// returns number of columns
-   int numColsReal() const;
+   int numColsT() const;
 
    /// returns number of nonzeros
    int numNonzerosReal() const;
@@ -226,9 +227,6 @@ public:
 
    /// returns number of rows
    int numRowsRational() const;
-
-   /// returns number of columns
-   int numColsRational() const;
 
    /// returns number of nonzeros
    int numNonzerosRational() const;

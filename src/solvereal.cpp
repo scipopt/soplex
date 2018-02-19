@@ -309,7 +309,7 @@ namespace soplex
          DVectorReal redCost(_solver.nCols());
 
          _basisStatusRows.reSize(numRowsReal());
-         _basisStatusCols.reSize(numColsReal());
+         _basisStatusCols.reSize(numColsT());
          assert(_basisStatusRows.size() >= _solver.nRows());
          assert(_basisStatusCols.size() >= _solver.nCols());
 
@@ -347,7 +347,7 @@ namespace soplex
       else if( _scaler != 0 )
       {
          _basisStatusRows.reSize(numRowsReal());
-         _basisStatusCols.reSize(numColsReal());
+         _basisStatusCols.reSize(numColsT());
          assert(_basisStatusRows.size() == _solver.nRows());
          assert(_basisStatusCols.size() == _solver.nCols());
 
@@ -420,7 +420,7 @@ namespace soplex
    {
       // prepare storage for basis (enough to fit the original basis)
       _basisStatusRows.reSize(numRowsReal());
-      _basisStatusCols.reSize(numColsReal());
+      _basisStatusCols.reSize(numColsT());
 
       // prepare storage for the solution data (only in transformed space due to unscaling), w/o setting it to zero
       _solReal._primal.reDim(_solver.nCols(), false);
@@ -572,13 +572,13 @@ namespace soplex
 
       // prepare storage for basis (enough to fit the original basis)
       _basisStatusRows.reSize(numRowsReal());
-      _basisStatusCols.reSize(numColsReal());
+      _basisStatusCols.reSize(numColsT());
 
       // prepare storage for the solution data and initialize it to zero
-      _solReal._primal.reDim(numColsReal(), true);
+      _solReal._primal.reDim(numColsT(), true);
       _solReal._slacks.reDim(numRowsReal(), true);
       _solReal._dual.reDim(numRowsReal(), true);
-      _solReal._redCost.reDim(numColsReal(), true);
+      _solReal._redCost.reDim(numColsT(), true);
 
       // load original LP and setup slack basis for unsimplifying
       _loadRealLP(true);
@@ -615,7 +615,7 @@ namespace soplex
 
       // compute the original objective function value
       _solReal._objVal = realParam(SoPlex<R>::OBJ_OFFSET);
-      for( int i = 0; i < numColsReal(); ++i )
+      for( int i = 0; i < numColsT(); ++i )
          _solReal._objVal += _solReal._primal[i] * objReal(i);
 
       // store the unsimplified basis
