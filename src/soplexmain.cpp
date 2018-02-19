@@ -368,7 +368,7 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
    if( real )
    {
       DVector dual(soplex.numRowsReal());
-      if( soplex.getDualFarkasReal(dual) )
+      if( soplex.getDualFarkasT(dual) ) // #template
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
          for( int i = 0; i < soplex.numRowsReal(); ++i )
@@ -422,49 +422,50 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
          MSG_INFO1( soplex.spxout, soplex.spxout << "No dual information available.\n")
    }
 
-   if( rational )
-   {
-      DVectorRational dual(soplex.numRowsReal());
-      if( soplex.getDualFarkasT(dual) )
-      {
-         MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsReal(); ++i )
-         {
-            if( dual[i] != (Rational) 0 )
-            {
-               MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t"
-                          << std::setw(printwidth)
-                          << std::setprecision(printprec)
-                          << dual[i] << std::endl; )
-            }
-         }
-         MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
-      }
-      if( soplex.isDualFeasible() && soplex.getDualRational(dual) )
-      {
-         MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsRational(); ++i )
-         {
-            if ( dual[i] != (Rational) 0 )
-               MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t" << dual[i] << std::endl; )
-         }
-         MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
+   // #template temporary comments
+   // if( rational )
+   // {
+   //    DVectorRational dual(soplex.numRowsReal()); #template
+   //    if( soplex.getDualFarkasT(dual) ) // #template
+   //    {
+   //       MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
+   //       for( int i = 0; i < soplex.numRowsReal(); ++i )
+   //       {
+   //          if( dual[i] != (Rational) 0 )
+   //          {
+   //             MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t"
+   //                        << std::setw(printwidth)
+   //                        << std::setprecision(printprec)
+   //                        << dual[i] << std::endl; )
+   //          }
+   //       }
+   //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
+   //    }
+   //    if( soplex.isDualFeasible() && soplex.getDualRational(dual) )
+   //    {
+   //       MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
+   //       for( int i = 0; i < soplex.numRowsRational(); ++i )
+   //       {
+   //          if ( dual[i] != (Rational) 0 )
+   //             MSG_INFO1( soplex.spxout, soplex.spxout << rownames[i] << "\t" << dual[i] << std::endl; )
+   //       }
+   //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
 
-         DVectorRational redcost(soplex.numColsReal());
-         if( soplex.getRedCostRational(redcost) )
-         {
-            MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
-            for( int i = 0; i < soplex.numColsReal(); ++i )
-            {
-               if ( redcost[i] != (Rational) 0 )
-                  MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl; )
-            }
-            MSG_INFO1( soplex.spxout, soplex.spxout << "All other reduced costs are zero." << std::endl; )
-         }
-      }
-      else
-         MSG_INFO1( soplex.spxout, soplex.spxout << "No dual (rational) solution available.\n")
-   }
+   //       DVectorRational redcost(soplex.numColsReal());
+   //       if( soplex.getRedCostRational(redcost) )
+   //       {
+   //          MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
+   //          for( int i = 0; i < soplex.numColsReal(); ++i )
+   //          {
+   //             if ( redcost[i] != (Rational) 0 )
+   //                MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl; )
+   //          }
+   //          MSG_INFO1( soplex.spxout, soplex.spxout << "All other reduced costs are zero." << std::endl; )
+   //       }
+      // }
+      // else
+    //    MSG_INFO1( soplex.spxout, soplex.spxout << "No dual (rational) solution available.\n")
+   // }
 }
 
 

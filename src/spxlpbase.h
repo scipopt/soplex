@@ -1304,7 +1304,7 @@ namespace soplex
     /// Changes objective value of column with identifier \p id to \p newVal. \p scale determines whether the new data should be scaled
     virtual void changeObj(SPxColId id, const R& newVal, bool scale = false)
     {
-      changeObj(number(id), newVal, scale);
+      this->changeObj(number(id), newVal, scale);
     }
 
     /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
