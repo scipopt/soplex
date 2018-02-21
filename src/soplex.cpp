@@ -7095,8 +7095,45 @@ namespace soplex
 
 
   /// prints version and compilation options
-  template <class R>
-  void SoPlex<R>::printVersion() const
+  template <>
+  void SoPlex<Real>::printVersion() const
+  {
+    // do not use preprocessor directives within the MSG_INFO1 macro
+#if (SOPLEX_SUBVERSION > 0)
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+               << "." << (SOPLEX_VERSION % 100)/10
+               << "." << SOPLEX_VERSION % 10
+               << "." << SOPLEX_SUBVERSION );
+#else
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+               << "." << (SOPLEX_VERSION % 100)/10
+               << "." << SOPLEX_VERSION % 10 );
+#endif
+
+#ifndef NDEBUG
+    MSG_INFO1( spxout, spxout << " [mode: debug]" );
+#else
+    MSG_INFO1( spxout, spxout << " [mode: optimized]" );
+#endif
+
+    MSG_INFO1( spxout, spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
+
+#ifdef SOPLEX_WITH_GMP
+#ifdef mpir_version
+    MSG_INFO1( spxout, spxout << " [rational: MPIR " << mpir_version << "]" );
+#else
+    MSG_INFO1( spxout, spxout << " [rational: GMP " << gmp_version << "]" );
+#endif
+#else
+    MSG_INFO1( spxout, spxout << " [rational: long double]" );
+#endif
+
+    MSG_INFO1( spxout, spxout << " [githash: " << getGitHash() << "]\n" );
+  }
+
+
+    template <>
+  void SoPlex<Rational>::printVersion() const
   {
     // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
