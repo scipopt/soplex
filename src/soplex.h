@@ -621,7 +621,7 @@ public:
    bool getSlacksReal(VectorReal& vector);
 
    /// gets the primal ray if available; returns true on success
-   bool getPrimalRayReal(VectorReal& vector);
+   bool getPrimalRayT(VectorBase<R>& vector);
 
    /// gets the dual solution vector if available; returns true on success
    bool getDualReal(VectorReal& vector);
@@ -658,9 +658,6 @@ public:
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
-
-   /// gets the primal ray if LP is unbounded; returns true on success
-   bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
    bool getDualRational(VectorRational& vector);

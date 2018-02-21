@@ -3155,8 +3155,8 @@ namespace soplex
 
 
   /// gets the primal ray if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getPrimalRayReal(VectorReal& vector)
+  template <>
+	bool SoPlex<Real>::getPrimalRayT(VectorBase<Real>& vector)
   {
     if( hasPrimalRay() && vector.dim() >= numColsT() )
       {
@@ -3476,8 +3476,8 @@ namespace soplex
 
 
   /// gets the primal ray if LP is unbounded; returns true on success
-  template <class R>
-	bool SoPlex<R>::getPrimalRayRational(VectorRational& vector)
+  template <>
+	bool SoPlex<Rational>::getPrimalRayT(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
       {

@@ -276,8 +276,8 @@ void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames
 
    if( real )
    {
-      DVector primal(soplex.numColsT());
-      if( soplex.getPrimalRayReal(primal) )
+     DVectorBase<Real> primal(soplex.numColsT());
+      if( soplex.getPrimalRayT(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
          for( int i = 0; i < soplex.numColsT(); ++i )
