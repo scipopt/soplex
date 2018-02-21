@@ -3171,8 +3171,8 @@ namespace soplex
 
 
   /// gets the dual solution vector if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getDualReal(VectorReal& vector)
+  template <>
+	bool SoPlex<Real>::getDualT(VectorBase<Real>& vector)
   {
     if( hasDual() && vector.dim() >= numRowsReal() )
       {
@@ -3492,8 +3492,8 @@ namespace soplex
 
 
   /// gets the dual solution vector if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getDualRational(VectorRational& vector)
+  template <>
+	bool SoPlex<Rational>::getDualT(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
       {

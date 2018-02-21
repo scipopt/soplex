@@ -386,7 +386,7 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
       }
-      else if( soplex.isDualFeasible() && soplex.getDualReal(dual) )
+      else if( soplex.isDualFeasible() && soplex.getDualT(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
          for( int i = 0; i < soplex.numRowsReal(); ++i )
@@ -443,7 +443,7 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
    //       }
    //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
    //    }
-   //    if( soplex.isDualFeasible() && soplex.getDualRational(dual) )
+   //    if( soplex.isDualFeasible() && soplex.getDualT(dual) )
    //    {
    //       MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
    //       for( int i = 0; i < soplex.numRowsRational(); ++i )

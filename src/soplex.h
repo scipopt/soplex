@@ -624,7 +624,7 @@ public:
    bool getPrimalRayT(VectorBase<R>& vector);
 
    /// gets the dual solution vector if available; returns true on success
-   bool getDualReal(VectorReal& vector);
+   bool getDualT(VectorBase<R>& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCostReal(VectorReal& vector);
@@ -658,9 +658,6 @@ public:
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
-
-   /// gets the dual solution vector if available; returns true on success
-   bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCostRational(VectorRational& vector);
