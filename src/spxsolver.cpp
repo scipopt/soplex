@@ -798,7 +798,7 @@ Real SPxSolver::nonbasicValue()
                val += maxObj(i) * theLCbound[i];
                break;
             case SPxBasis::Desc::P_FIXED :
-               assert(theLCbound[i] == theUCbound[i]);
+               assert(EQ(theLCbound[i], theUCbound[i]));
                val += maxObj(i) * theLCbound[i];
                break;
             default:
