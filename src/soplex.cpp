@@ -6520,8 +6520,9 @@ namespace soplex
 
 
   /// writes settings file; returns true on success
-  template <class R>
-	bool SoPlex<R>::saveSettingsFile(const char* filename, const bool onlyChanged) const
+  // #template #baseclass
+  template <>
+	bool SoPlex<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const
   {
     assert(filename != 0);
 
@@ -6541,7 +6542,7 @@ namespace soplex
 #endif
     file << "\n";
 
-    for( int i = 0; i < SoPlex<R>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
           continue;
@@ -6552,7 +6553,7 @@ namespace soplex
         file << "bool:" << _currentSettings->boolParam.name[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
       }
 
-    for( int i = 0; i < SoPlex<R>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_intParamValues[i] == _currentSettings->intParam.defaultValue[i] )
           continue;
@@ -6566,7 +6567,7 @@ namespace soplex
 
     SPxOut::setScientific(file);
 
-    for( int i = 0; i < SoPlex<R>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_realParamValues[i] == _currentSettings->realParam.defaultValue[i] )
           continue;
@@ -6579,7 +6580,7 @@ namespace soplex
       }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<R>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Rational>::RATIONALPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
           continue;
