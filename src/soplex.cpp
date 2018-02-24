@@ -3199,8 +3199,8 @@ namespace soplex
 
 
   /// gets the vector of reduced cost values if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getRedCostReal(VectorReal& vector)
+  template <>
+	bool SoPlex<Real>::getRedCostT(VectorBase<Real>& vector)
   {
     if( hasDual() && vector.dim() >= numColsT() )
       {
@@ -3520,8 +3520,8 @@ namespace soplex
 
 
   /// gets the vector of reduced cost values if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getRedCostRational(VectorRational& vector)
+  template <>
+	bool SoPlex<Rational>::getRedCostT(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsT() )
       {

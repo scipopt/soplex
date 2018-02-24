@@ -627,7 +627,7 @@ public:
    bool getDualT(VectorBase<R>& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedCostReal(VectorReal& vector);
+   bool getRedCostT(VectorBase<R>& vector);
 
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkasT(VectorBase<R>& vector);
@@ -658,9 +658,6 @@ public:
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
-
-   /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedCostRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
    bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);

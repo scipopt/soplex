@@ -403,7 +403,7 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
 
          DVector redcost(soplex.numColsT());
-         if( soplex.getRedCostReal(redcost) )
+         if( soplex.getRedCostT(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
             for( int i = 0; i < soplex.numColsT(); ++i )
@@ -454,7 +454,7 @@ void printDualSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, 
    //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
 
    //       DVectorRational redcost(soplex.numColsT());
-   //       if( soplex.getRedCostRational(redcost) )
+   //       if( soplex.getRedCostT(redcost) )
    //       {
    //          MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
    //          for( int i = 0; i < soplex.numColsT(); ++i )
