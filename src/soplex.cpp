@@ -5771,8 +5771,9 @@ namespace soplex
 
 
   /// returns integer parameter value
-  template <class R>
-	int SoPlex<R>::intParam(const IntParam param) const
+  // #template #baseclass
+  template <>
+	int SoPlex<Real>::intParam(const IntParam param) const
   {
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
