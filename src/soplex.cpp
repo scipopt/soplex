@@ -5857,8 +5857,8 @@ namespace soplex
 
 
   /// sets integer parameter value; returns true on success
-  template <class R>
-	bool SoPlex<R>::setIntParam(const IntParam param, const int value, const bool init)
+  template <>
+	bool SoPlex<Real>::setIntParam(const IntParam param, const int value, const bool init)
   {
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
@@ -5874,35 +5874,35 @@ namespace soplex
     switch( param )
       {
         // objective sense
-      case SoPlex<R>::OBJSENSE:
-        if( value != SoPlex<R>::OBJSENSE_MAXIMIZE && value != SoPlex<R>::OBJSENSE_MINIMIZE )
+      case SoPlex<Real>::OBJSENSE:
+        if( value != SoPlex<Real>::OBJSENSE_MAXIMIZE && value != SoPlex<Real>::OBJSENSE_MINIMIZE )
           return false;
-        _realLP->changeSense(value == SoPlex<R>::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
+        _realLP->changeSense(value == SoPlex<Real>::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
         if( _rationalLP != 0 )
-          _rationalLP->changeSense(value == SoPlex<R>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+          _rationalLP->changeSense(value == SoPlex<Real>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
         _invalidateSolution();
         break;
 
         // type of computational form, i.e., column or row representation
-      case SoPlex<R>::REPRESENTATION:
-        if( value != SoPlex<R>::REPRESENTATION_COLUMN && value != SoPlex<R>::REPRESENTATION_ROW && value != SoPlex<R>::REPRESENTATION_AUTO )
+      case SoPlex<Real>::REPRESENTATION:
+        if( value != SoPlex<Real>::REPRESENTATION_COLUMN && value != SoPlex<Real>::REPRESENTATION_ROW && value != SoPlex<Real>::REPRESENTATION_AUTO )
           return false;
         break;
 
         // type of algorithm, i.e., primal or dual
-      case SoPlex<R>::ALGORITHM:
+      case SoPlex<Real>::ALGORITHM:
         // decide upon entering/leaving at solve time depending on representation
         break;
 
         // type of LU update
-      case SoPlex<R>::FACTOR_UPDATE_TYPE:
-        if( value != SoPlex<R>::FACTOR_UPDATE_TYPE_ETA && value != SoPlex<R>::FACTOR_UPDATE_TYPE_FT )
+      case SoPlex<Real>::FACTOR_UPDATE_TYPE:
+        if( value != SoPlex<Real>::FACTOR_UPDATE_TYPE_ETA && value != SoPlex<Real>::FACTOR_UPDATE_TYPE_FT )
           return false;
-        _slufactor.setUtype(value == SoPlex<R>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
+        _slufactor.setUtype(value == SoPlex<Real>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
         break;
 
         // maximum number of updates before fresh factorization
-      case SoPlex<R>::FACTOR_UPDATE_MAX:
+      case SoPlex<Real>::FACTOR_UPDATE_MAX:
         if( value == 0 )
           _solver.basis().setMaxUpdates(DEFAULT_REFACTOR_INTERVAL);
         else
@@ -5910,24 +5910,24 @@ namespace soplex
         break;
 
         // iteration limit (-1 if unlimited)
-      case SoPlex<R>::ITERLIMIT:
+      case SoPlex<Real>::ITERLIMIT:
         break;
 
         // refinement limit (-1 if unlimited)
-      case SoPlex<R>::REFLIMIT:
+      case SoPlex<Real>::REFLIMIT:
         break;
 
         // stalling refinement limit (-1 if unlimited)
-      case SoPlex<R>::STALLREFLIMIT:
+      case SoPlex<Real>::STALLREFLIMIT:
         break;
 
         // display frequency
-      case SoPlex<R>::DISPLAYFREQ:
+      case SoPlex<Real>::DISPLAYFREQ:
         _solver.setDisplayFreq(value);
         break;
 
         // verbosity level
-      case SoPlex<R>::VERBOSITY:
+      case SoPlex<Real>::VERBOSITY:
         switch(value)
           {
           case 0:
@@ -5952,7 +5952,7 @@ namespace soplex
         break;
 
         // type of simplifier
-      case SoPlex<R>::SIMPLIFIER:
+      case SoPlex<Real>::SIMPLIFIER:
         switch( value )
           {
           case SIMPLIFIER_OFF:
@@ -5968,7 +5968,7 @@ namespace soplex
         break;
 
         // type of scaler
-      case SoPlex<R>::SCALER:
+      case SoPlex<Real>::SCALER:
         switch( value )
           {
           case SCALER_OFF:
@@ -5998,7 +5998,7 @@ namespace soplex
         break;
 
         // type of starter used to create crash basis
-      case SoPlex<R>::STARTER:
+      case SoPlex<Real>::STARTER:
         switch( value )
           {
           case STARTER_OFF:
@@ -6019,7 +6019,7 @@ namespace soplex
         break;
 
         // type of pricer
-      case SoPlex<R>::PRICER:
+      case SoPlex<Real>::PRICER:
         switch( value )
           {
           case PRICER_AUTO:
@@ -6046,7 +6046,7 @@ namespace soplex
         break;
 
         // mode for synchronizing real and rational LP
-      case SoPlex<R>::SYNCMODE:
+      case SoPlex<Real>::SYNCMODE:
         switch( value )
           {
           case SYNCMODE_ONLYREAL:
@@ -6069,7 +6069,7 @@ namespace soplex
         break;
 
         // mode for reading LP files; nothing to do but change the value if valid
-      case SoPlex<R>::READMODE:
+      case SoPlex<Real>::READMODE:
         switch( value )
           {
           case READMODE_REAL:
@@ -6081,7 +6081,7 @@ namespace soplex
         break;
 
         // mode for iterative refinement strategy; nothing to do but change the value if valid
-      case SoPlex<R>::SOLVEMODE:
+      case SoPlex<Real>::SOLVEMODE:
         switch( value )
           {
           case SOLVEMODE_REAL:
@@ -6094,7 +6094,7 @@ namespace soplex
         break;
 
         // mode for a posteriori feasibility checks; nothing to do but change the value if valid
-      case SoPlex<R>::CHECKMODE:
+      case SoPlex<Real>::CHECKMODE:
         switch( value )
           {
           case CHECKMODE_REAL:
@@ -6107,7 +6107,7 @@ namespace soplex
         break;
 
         // type of ratio test
-      case SoPlex<R>::RATIOTESTER:
+      case SoPlex<Real>::RATIOTESTER:
         switch( value )
           {
           case RATIOTESTER_TEXTBOOK:
@@ -6128,7 +6128,7 @@ namespace soplex
         break;
 
         // type of timer
-      case SoPlex<R>::TIMER:
+      case SoPlex<Real>::TIMER:
         switch( value )
           {
           case TIMER_OFF:
@@ -6146,7 +6146,7 @@ namespace soplex
         break;
 
         // mode of hyper pricing
-      case SoPlex<R>::HYPER_PRICING:
+      case SoPlex<Real>::HYPER_PRICING:
         switch( value )
           {
           case HYPER_PRICING_OFF:
@@ -6159,27 +6159,27 @@ namespace soplex
         break;
 
         // minimum number of stalling refinements since last pivot to trigger rational factorization
-      case SoPlex<R>::RATFAC_MINSTALLS:
+      case SoPlex<Real>::RATFAC_MINSTALLS:
         break;
 
         // maximum number of conjugate gradient iterations in least square scaling
-      case SoPlex<R>::LEASTSQ_MAXROUNDS:
+      case SoPlex<Real>::LEASTSQ_MAXROUNDS:
         if( _scaler )
           _scaler->setIntParam(value);
         break;
 
         // mode of solution polishing
-      case SoPlex<R>::SOLUTION_POLISHING:
+      case SoPlex<Real>::SOLUTION_POLISHING:
         switch( value )
           {
           case POLISHING_OFF:
-            _solver.setSolutionPolishing(SPxSolver<R>::POLISH_OFF);
+            _solver.setSolutionPolishing(SPxSolver<Real>::POLISH_OFF);
             break;
           case POLISHING_INTEGRALITY:
-            _solver.setSolutionPolishing(SPxSolver<R>::POLISH_INTEGRALITY);
+            _solver.setSolutionPolishing(SPxSolver<Real>::POLISH_INTEGRALITY);
             break;
           case POLISHING_FRACTIONALITY:
-            _solver.setSolutionPolishing(SPxSolver<R>::POLISH_FRACTIONALITY);
+            _solver.setSolutionPolishing(SPxSolver<Real>::POLISH_FRACTIONALITY);
             break;
           default:
             return false;
