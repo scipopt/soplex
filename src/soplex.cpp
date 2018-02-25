@@ -5454,8 +5454,9 @@ namespace soplex
 
   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
   /// default names are assumed; returns true on success
-  template <class R>
-	bool SoPlex<R>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+  /// #template #baseclass
+  template <>
+	bool SoPlex<Real>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
   {
     clearBasis();
 
@@ -5478,7 +5479,7 @@ namespace soplex
         _isRealLPLoaded = true;
       }
     _hasBasis = _solver.readBasisFile(filename, rowNames, colNames);
-    assert(_hasBasis == (_solver.basis().status() > SPxBasis<R>::NO_PROBLEM));
+    assert(_hasBasis == (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM));
 
     // stop timing
     _statistics->readingTime->stop();
@@ -5546,18 +5547,18 @@ namespace soplex
     _basisStatusCols.reSize(numCols);
 
     for( int i = 0; i < numRows; i++ )
-      _basisStatusRows[i] = SPxSolver<R>::BASIC;
+      _basisStatusRows[i] = SPxSolver<Real>::BASIC;
 
     for( int i = 0; i < numCols; i++ )
       {
         if( lowerRealInternal(i) == upperRealInternal(i) )
-          _basisStatusCols[i] = SPxSolver<R>::FIXED;
-        else if( lowerRealInternal(i) <= double(-realParam(SoPlex<R>::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlex<R>::INFTY)) )
-          _basisStatusCols[i] = SPxSolver<R>::ZERO;
-        else if( lowerRealInternal(i) <= double(-realParam(SoPlex<R>::INFTY)) )
-          _basisStatusCols[i] = SPxSolver<R>::ON_UPPER;
+          _basisStatusCols[i] = SPxSolver<Real>::FIXED;
+        else if( lowerRealInternal(i) <= double(-realParam(SoPlex<Real>::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlex<Real>::INFTY)) )
+          _basisStatusCols[i] = SPxSolver<Real>::ZERO;
+        else if( lowerRealInternal(i) <= double(-realParam(SoPlex<Real>::INFTY)) )
+          _basisStatusCols[i] = SPxSolver<Real>::ON_UPPER;
         else
-          _basisStatusCols[i] = SPxSolver<R>::ON_LOWER;
+          _basisStatusCols[i] = SPxSolver<Real>::ON_LOWER;
       }
 
     // read basis
@@ -5589,31 +5590,31 @@ namespace soplex
 
             if( !strcmp(mps.field1(), "XU") )
               {
-                _basisStatusCols[c] = SPxSolver<R>::BASIC;
-                if( _rowTypes[r] == SoPlex<R>::RANGETYPE_LOWER )
-                  _basisStatusRows[r] = SPxSolver<R>::ON_LOWER;
-                else if( _rowTypes[r] == SoPlex<R>::RANGETYPE_FIXED )
-                  _basisStatusRows[r] = SPxSolver<R>::FIXED;
+                _basisStatusCols[c] = SPxSolver<Real>::BASIC;
+                if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_LOWER )
+                  _basisStatusRows[r] = SPxSolver<Real>::ON_LOWER;
+                else if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_FIXED )
+                  _basisStatusRows[r] = SPxSolver<Real>::FIXED;
                 else
-                  _basisStatusRows[r] = SPxSolver<R>::ON_UPPER;
+                  _basisStatusRows[r] = SPxSolver<Real>::ON_UPPER;
               }
             else if( !strcmp(mps.field1(), "XL") )
               {
-                _basisStatusCols[c] = SPxSolver<R>::BASIC;
-                if( _rowTypes[r] == SoPlex<R>::RANGETYPE_UPPER )
-                  _basisStatusRows[r] = SPxSolver<R>::ON_UPPER;
-                else if( _rowTypes[r] == SoPlex<R>::RANGETYPE_FIXED )
-                  _basisStatusRows[r] = SPxSolver<R>::FIXED;
+                _basisStatusCols[c] = SPxSolver<Real>::BASIC;
+                if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_UPPER )
+                  _basisStatusRows[r] = SPxSolver<Real>::ON_UPPER;
+                else if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_FIXED )
+                  _basisStatusRows[r] = SPxSolver<Real>::FIXED;
                 else
-                  _basisStatusRows[r] = SPxSolver<R>::ON_LOWER;
+                  _basisStatusRows[r] = SPxSolver<Real>::ON_LOWER;
               }
             else if( !strcmp(mps.field1(), "UL") )
               {
-                _basisStatusCols[c] = SPxSolver<R>::ON_UPPER;
+                _basisStatusCols[c] = SPxSolver<Real>::ON_UPPER;
               }
             else if( !strcmp(mps.field1(), "LL") )
               {
-                _basisStatusCols[c] = SPxSolver<R>::ON_LOWER;
+                _basisStatusCols[c] = SPxSolver<Real>::ON_LOWER;
               }
             else
               {
