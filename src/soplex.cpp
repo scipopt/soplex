@@ -4407,8 +4407,15 @@ namespace soplex
 
 
   /// is an advanced starting basis available?
-  template <class R>
-	bool SoPlex<R>::hasBasis() const
+  /// #template #baseclass
+  template <>
+	bool SoPlex<Real>::hasBasis() const
+  {
+    return _hasBasis;
+  }
+
+  template <>
+	bool SoPlex<Rational>::hasBasis() const
   {
     return _hasBasis;
   }
