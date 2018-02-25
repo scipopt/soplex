@@ -5342,14 +5342,29 @@ namespace soplex
 
   /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
   /// integer variables if desired; returns true on success
-  template <class R>
-	bool SoPlex<R>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+
+  // template <>
+	// bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+  // {
+  //   bool success = false;
+  //   if( intParam(SoPlex<Real>::READMODE) == READMODE_REAL )
+  //     success = _readFileReal(filename, rowNames, colNames, intVars);
+  //   else
+  //     success = _readFileRational(filename, rowNames, colNames, intVars);
+
+  //   // storing the row and column names for use in the DBDS print basis methods
+  //   _rowNames = rowNames;
+  //   _colNames = colNames;
+
+  //   return success;
+  // }
+
+  template <>
+	bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   {
     bool success = false;
-    if( intParam(SoPlex<R>::READMODE) == READMODE_REAL )
-      success = _readFileReal(filename, rowNames, colNames, intVars);
-    else
-      success = _readFileRational(filename, rowNames, colNames, intVars);
+
+    success = _readFileReal(filename, rowNames, colNames, intVars);
 
     // storing the row and column names for use in the DBDS print basis methods
     _rowNames = rowNames;
@@ -5357,6 +5372,20 @@ namespace soplex
 
     return success;
   }
+
+  template <>
+	bool SoPlex<Rational>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+  {
+    bool success = false;
+    success = _readFileRational(filename, rowNames, colNames, intVars);
+
+    // storing the row and column names for use in the DBDS print basis methods
+    _rowNames = rowNames;
+    _colNames = colNames;
+
+    return success;
+  }
+
 
   /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
