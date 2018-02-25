@@ -899,7 +899,7 @@ int main(int argc, char* argv[])
       // write LP if specified
       if( writefilename != 0 )
       {
-         if( !soplex->writeFileReal(writefilename, &rownames, &colnames) )
+         if( !soplex->writeFileT(writefilename, &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while writing file <" << writefilename << ">.\n\n" );
             returnValue = 1;

@@ -5390,8 +5390,8 @@ namespace soplex
   /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
   /// marked as integer; returns true on success
-  template <class R>
-	bool SoPlex<R>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+  template <>
+	bool SoPlex<Real>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
     ///@todo implement return value
     if( unscale && _realLP->isScaled() )
@@ -5417,10 +5417,11 @@ namespace soplex
   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
   /// marked as integer; returns true on success
-  template <class R>
-	bool SoPlex<R>::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+  /// Here unscale is just a junk variable that is used to match the type with the real write function
+  template <>
+	bool SoPlex<Rational>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
-    if( intParam(SoPlex<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return false;
     else
       {
@@ -5757,7 +5758,7 @@ namespace soplex
 
     // write problem in MPS/LP format
     ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-    writeFileReal(ofname.c_str(), rowNames, colNames, 0);
+    writeFileT(ofname.c_str(), rowNames, colNames, 0);
 
     // write basis
     ofname = std::string(filename) + ".bas";
@@ -5779,7 +5780,7 @@ namespace soplex
 
     // write problem in MPS/LP format
     ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-    writeFileRational(ofname.c_str(), rowNames, colNames, 0);
+    writeFileT(ofname.c_str(), rowNames, colNames, 0);
 
     // write basis
     ofname = std::string(filename) + ".bas";
