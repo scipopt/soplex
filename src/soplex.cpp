@@ -6021,8 +6021,9 @@ namespace soplex
 
   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
   /// returns true on success
-  template <class R>
-	bool SoPlex<R>::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+  /// #baseclass
+  template <>
+	bool SoPlex<Real>::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
   {
     assert(filename != 0);
 
@@ -6051,21 +6052,21 @@ namespace soplex
 
         for( int col = 0; col < numCols; col++ )
           {
-            assert(_basisStatusCols[col] != SPxSolver<R>::UNDEFINED);
+            assert(_basisStatusCols[col] != SPxSolver<Real>::UNDEFINED);
 
-            if( _basisStatusCols[col] == SPxSolver<R>::BASIC )
+            if( _basisStatusCols[col] == SPxSolver<Real>::BASIC )
               {
                 // find nonbasic row
                 for( ; row < numRows; row++ )
                   {
-                    assert(_basisStatusRows[row] != SPxSolver<R>::UNDEFINED);
-                    if( _basisStatusRows[row] != SPxSolver<R>::BASIC )
+                    assert(_basisStatusRows[row] != SPxSolver<Real>::UNDEFINED);
+                    if( _basisStatusRows[row] != SPxSolver<Real>::BASIC )
                       break;
                   }
 
                 assert(row != numRows);
 
-                if( _basisStatusRows[row] == SPxSolver<R>::ON_UPPER && (!cpxFormat || _rowTypes[row] == SoPlex<R>::RANGETYPE_BOXED) )
+                if( _basisStatusRows[row] == SPxSolver<Real>::ON_UPPER && (!cpxFormat || _rowTypes[row] == SoPlex<Real>::RANGETYPE_BOXED) )
                   file << " XU ";
                 else
                   file << " XL ";
@@ -6087,7 +6088,7 @@ namespace soplex
               }
             else
               {
-                if( _basisStatusCols[col] == SPxSolver<R>::ON_UPPER )
+                if( _basisStatusCols[col] == SPxSolver<Real>::ON_UPPER )
                   {
                     file << " UL ";
 
@@ -6108,7 +6109,7 @@ namespace soplex
         // check that the remaining rows are basic
         for( ; row < numRows; row++ )
           {
-            assert(_basisStatusRows[row] == SPxSolver<R>::BASIC);
+            assert(_basisStatusRows[row] == SPxSolver<Real>::BASIC);
           }
 #endif
 
