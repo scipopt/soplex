@@ -828,8 +828,9 @@ namespace soplex
 
 
   /// returns number of nonzeros
-  template <class R>
-  int SoPlex<R>::numNonzerosReal() const
+
+  template <>
+  int SoPlex<Real>::numNonzerosT() const
   {
     assert(_realLP != 0);
     return _realLP->nNzos();
@@ -1151,8 +1152,8 @@ namespace soplex
 
 
   /// returns number of nonzeros
-  template <class R>
-  int SoPlex<R>::numNonzerosRational() const
+  template <>
+  int SoPlex<Rational>::numNonzerosT() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nNzos();

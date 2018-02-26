@@ -131,7 +131,7 @@ public:
    int numColsT() const;
 
    /// returns number of nonzeros
-   int numNonzerosReal() const;
+   int numNonzerosT() const;
 
    /// returns smallest non-zero element in absolute value
    Real minAbsNonzeroReal() const;
@@ -227,9 +227,6 @@ public:
 
    /// returns number of rows
    int numRowsRational() const;
-
-   /// returns number of nonzeros
-   int numNonzerosRational() const;
 
    /// returns smallest non-zero element in absolute value
    Rational minAbsNonzeroRational() const;
