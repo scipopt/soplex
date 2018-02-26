@@ -6662,8 +6662,9 @@ namespace soplex
 
 
   /// reads settings file; returns true on success
-  template <class R>
-	bool SoPlex<R>::loadSettingsFile(const char* filename)
+  /// #template #baseclass
+  template <>
+	bool SoPlex<Real>::loadSettingsFile(const char* filename)
   {
     assert(filename != 0);
 
