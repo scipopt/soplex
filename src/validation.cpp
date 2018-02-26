@@ -47,8 +47,9 @@ namespace soplex {
 
 
   /// updates the tolerance used for validation
-  template <class R>
-  bool Validation<R>::updateValidationTolerance(char* tolerance)
+  /// #template #temp
+  template <>
+  bool Validation<double>::updateValidationTolerance(char* tolerance)
   {
     char* tailptr;
     validatetolerance = strtod(tolerance, &tailptr);
