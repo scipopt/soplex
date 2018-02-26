@@ -197,6 +197,7 @@ template <class R>
 static
 void checkSolutionRational(SoPlex<R>& soplex)
 {
+  #ifdef rationaltemplate
    if( soplex.hasPrimal() )
    {
       Rational boundviol;
@@ -244,6 +245,7 @@ void checkSolutionRational(SoPlex<R>& soplex)
    {
       MSG_INFO1( soplex.spxout, soplex.spxout << "No dual solution available.\n" );
    }
+   #endif
 }
 
 /// performs external feasibility check according to check mode

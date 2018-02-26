@@ -7005,6 +7005,8 @@ namespace soplex
            << "  Objective value   : -\n";
       }
 
+    // #template #temp
+    #ifdef rationaltemplate
     if( intParam(CHECKMODE) == CHECKMODE_RATIONAL
         || (intParam(CHECKMODE) == CHECKMODE_AUTO && intParam(READMODE) == READMODE_RATIONAL) )
       {
@@ -7052,6 +7054,7 @@ namespace soplex
         else
           os << "  Max/sum dual      : - / -\n";
       }
+    #endif
   }
 
 
