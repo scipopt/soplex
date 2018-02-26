@@ -630,7 +630,7 @@ public:
    bool getDualFarkasT(VectorBase<R>& vector);
 
    /// gets violation of bounds; returns true on success
-   bool getBoundViolationReal(Real& maxviol, Real& sumviol);
+   bool getBoundViolationT(R& maxviol, R& sumviol);
 
    /// gets violation of constraints; returns true on success
    bool getRowViolationReal(Real& maxviol, Real& sumviol);
@@ -655,9 +655,6 @@ public:
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
-
-   /// gets violation of bounds; returns true on success
-   bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of constraints; returns true on success
    bool getRowViolationRational(Rational& maxviol, Rational& sumviol);

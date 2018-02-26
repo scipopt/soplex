@@ -3610,8 +3610,8 @@ namespace soplex
 
 
   /// gets violation of bounds; returns true on success
-  template <class R>
-	bool SoPlex<R>::getBoundViolationReal(Real& maxviol, Real& sumviol)
+  template <>
+	bool SoPlex<Real>::getBoundViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
@@ -3931,14 +3931,14 @@ namespace soplex
 
 
   /// gets violation of bounds; returns true on success
-  template <class R>
-	bool SoPlex<R>::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
+  template <>
+	bool SoPlex<Rational>::getBoundViolationT(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -7005,14 +7005,14 @@ namespace soplex
            << "  Objective value   : -\n";
       }
 
-    if( intParam(SoPlex<R>::CHECKMODE) == CHECKMODE_RATIONAL
-        || (intParam(SoPlex<R>::CHECKMODE) == CHECKMODE_AUTO && intParam(SoPlex<R>::READMODE) == READMODE_RATIONAL) )
+    if( intParam(CHECKMODE) == CHECKMODE_RATIONAL
+        || (intParam(CHECKMODE) == CHECKMODE_AUTO && intParam(READMODE) == READMODE_RATIONAL) )
       {
         Rational maxviol;
         Rational sumviol;
 
         os << "Violation (rational): \n";
-        if( getBoundViolationRational(maxviol, sumviol) )
+        if( getBoundViolationT(maxviol, sumviol) )
           os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum bound     : - / -\n";
@@ -7035,7 +7035,7 @@ namespace soplex
         Real sumviol;
 
         os << "Violations (real)   : \n";
-        if( getBoundViolationReal(maxviol, sumviol) )
+        if( getBoundViolationT(maxviol, sumviol) )
           os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum bound     : - / -\n";
