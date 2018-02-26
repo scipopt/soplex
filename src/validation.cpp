@@ -63,8 +63,9 @@ namespace soplex {
 
 
   /// validates the soplex solution using the external solution
-  template <class R>
-  void Validation<R>::validateSolveReal(SoPlex<R>& soplex)
+  /// #template Is there a rational equivalent of this function?
+  template <>
+  void Validation<Real>::validateSolveReal(SoPlex<Real>& soplex)
   {
 #ifndef SOPLEX_LEGACY
     bool passedValidation = true;
@@ -83,9 +84,9 @@ namespace soplex {
     std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
     if( strncmp(validatesolution, "+infinity", 9 ) == 0 )
-      sol =  soplex.realParam(SoPlex<R>::INFTY);
+      sol =  soplex.realParam(SoPlex<Real>::INFTY);
     else if ( strncmp(validatesolution, "-infinity", 9) == 0 )
-      sol =  -soplex.realParam(SoPlex<R>::INFTY);
+      sol =  -soplex.realParam(SoPlex<Real>::INFTY);
     else
       {
         sol = atof(validatesolution);
@@ -97,7 +98,7 @@ namespace soplex {
         passedValidation = false;
         reason += "Objective Violation; ";
       }
-    if( SPxSolver<R>::OPTIMAL == soplex.status() )
+    if( SPxSolver<Real>::OPTIMAL == soplex.status() )
       {
         soplex.getBoundViolationReal(maxBoundViolation, sumBoundViolation);
         soplex.getRowViolationReal(maxRowViolation, sumRowViolation);
