@@ -3421,13 +3421,17 @@ namespace soplex
 
 
   /// is a primal feasible solution available?
-  template <class R>
-	bool SoPlex<R>::hasPrimal() const
+  template <>
+	bool SoPlex<Real>::hasPrimal() const
   {
-    return _hasSolReal || _hasSolRational;
+    return _hasSolReal;
   }
 
-
+  template <>
+	bool SoPlex<Rational>::hasPrimal() const
+  {
+    return _hasSolRational;
+  }
 
   /// is a primal unbounded ray available?
   template <class R>
