@@ -6269,8 +6269,8 @@ namespace soplex
   }
 
   /// sets real parameter value; returns true on success
-  template <class R>
-	bool SoPlex<R>::setRealParam(const RealParam param, const Real value, const bool init)
+  template <>
+	bool SoPlex<Real>::setRealParam(const RealParam param, const Real value, const bool init)
   {
     assert(param >= 0);
     assert(param < REALPARAM_COUNT);
@@ -6288,7 +6288,7 @@ namespace soplex
     switch( param )
       {
         // primal feasibility tolerance; passed to the floating point solver only when calling solve()
-      case SoPlex<R>::FEASTOL:
+      case SoPlex<Real>::FEASTOL:
 #ifndef SOPLEX_WITH_GMP
         if( value < DEFAULT_EPS_PIVOT )
           {
@@ -6302,7 +6302,7 @@ namespace soplex
         break;
 
         // dual feasibility tolerance; passed to the floating point solver only when calling solve()
-      case SoPlex<R>::OPTTOL:
+      case SoPlex<Real>::OPTTOL:
 #ifndef SOPLEX_WITH_GMP
         if( value < DEFAULT_EPS_PIVOT )
           {
@@ -6316,99 +6316,99 @@ namespace soplex
         break;
 
         // general zero tolerance
-      case SoPlex<R>::EPSILON_ZERO:
+      case SoPlex<Real>::EPSILON_ZERO:
         Param::setEpsilon(value);
         break;
 
         // zero tolerance used in factorization
-      case SoPlex<R>::EPSILON_FACTORIZATION:
+      case SoPlex<Real>::EPSILON_FACTORIZATION:
         Param::setEpsilonFactorization(value);
         break;
 
         // zero tolerance used in update of the factorization
-      case SoPlex<R>::EPSILON_UPDATE:
+      case SoPlex<Real>::EPSILON_UPDATE:
         Param::setEpsilonUpdate(value);
         break;
 
         // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
-      case SoPlex<R>::EPSILON_PIVOT:
+      case SoPlex<Real>::EPSILON_PIVOT:
         Param::setEpsilonPivot(value);
         break;
 
         // infinity threshold
-      case SoPlex<R>::INFTY:
+      case SoPlex<Real>::INFTY:
         _rationalPosInfty = value;
         _rationalNegInfty = -value;
-        if( intParam(SoPlex<R>::SYNCMODE) != SYNCMODE_ONLYREAL )
+        if( intParam(SoPlex<Real>::SYNCMODE) != SYNCMODE_ONLYREAL )
           _recomputeRangeTypesRational();
         break;
 
         // time limit in seconds (INFTY if unlimited)
-      case SoPlex<R>::TIMELIMIT:
+      case SoPlex<Real>::TIMELIMIT:
         break;
 
         // lower limit on objective value is set in solveReal()
-      case SoPlex<R>::OBJLIMIT_LOWER:
+      case SoPlex<Real>::OBJLIMIT_LOWER:
         break;
 
         // upper limit on objective value is set in solveReal()
-      case SoPlex<R>::OBJLIMIT_UPPER:
+      case SoPlex<Real>::OBJLIMIT_UPPER:
         break;
 
         // working tolerance for feasibility in floating-point solver
-      case SoPlex<R>::FPFEASTOL:
+      case SoPlex<Real>::FPFEASTOL:
         break;
 
         // working tolerance for optimality in floating-point solver
-      case SoPlex<R>::FPOPTTOL:
+      case SoPlex<Real>::FPOPTTOL:
         break;
 
         // maximum increase of scaling factors between refinements
-      case SoPlex<R>::MAXSCALEINCR:
+      case SoPlex<Real>::MAXSCALEINCR:
         _rationalMaxscaleincr = value;
         break;
 
         // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
-      case SoPlex<R>::LIFTMINVAL:
+      case SoPlex<Real>::LIFTMINVAL:
         break;
 
         // upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
-      case SoPlex<R>::LIFTMAXVAL:
+      case SoPlex<Real>::LIFTMAXVAL:
         break;
 
         // threshold for sparse pricing
-      case SoPlex<R>::SPARSITY_THRESHOLD:
+      case SoPlex<Real>::SPARSITY_THRESHOLD:
         break;
 
         // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
-      case SoPlex<R>::REPRESENTATION_SWITCH:
+      case SoPlex<Real>::REPRESENTATION_SWITCH:
         break;
 
         // geometric frequency at which to apply rational reconstruction
-      case SoPlex<R>::RATREC_FREQ:
+      case SoPlex<Real>::RATREC_FREQ:
         break;
 
         // minimal reduction (sum of removed rows/cols) to continue simplification
-      case SoPlex<R>::MINRED:
+      case SoPlex<Real>::MINRED:
         break;
 
-      case SoPlex<R>::REFAC_BASIS_NNZ:
+      case SoPlex<Real>::REFAC_BASIS_NNZ:
         break;
 
-      case SoPlex<R>::REFAC_UPDATE_FILL:
+      case SoPlex<Real>::REFAC_UPDATE_FILL:
         break;
 
-      case SoPlex<R>::REFAC_MEM_FACTOR:
+      case SoPlex<Real>::REFAC_MEM_FACTOR:
         break;
 
         // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
-      case SoPlex<R>::LEASTSQ_ACRCY:
+      case SoPlex<Real>::LEASTSQ_ACRCY:
         if( _scaler )
           _scaler->setRealParam(value);
         break;
 
         // objective offset
-      case SoPlex<R>::OBJ_OFFSET:
+      case SoPlex<Real>::OBJ_OFFSET:
         if( _realLP )
           _realLP->changeObjOffset(value);
         if( _rationalLP )
@@ -6423,7 +6423,7 @@ namespace soplex
     return true;
   }
 
-
+  /// #template #temp
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
   /// sets rational parameter value; returns true on success
