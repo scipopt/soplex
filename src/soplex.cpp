@@ -6512,7 +6512,7 @@ namespace soplex
 
     SPxOut::setFixed(spxout.getCurrentStream());
 
-    for( int i = 0; i < SoPlex<R>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
       {
         if( _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
           continue;
@@ -6521,7 +6521,7 @@ namespace soplex
         printedValue = true;
       }
 
-    for( int i = 0; i < SoPlex<R>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
       {
         if( _currentSettings->_intParamValues[i] == _currentSettings->intParam.defaultValue[i] )
           continue;
@@ -6532,7 +6532,7 @@ namespace soplex
 
     SPxOut::setScientific(spxout.getCurrentStream());
 
-    for( int i = 0; i < SoPlex<R>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
       {
         if( _currentSettings->_realParamValues[i] == _currentSettings->realParam.defaultValue[i] )
           continue;
@@ -6542,7 +6542,7 @@ namespace soplex
       }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<R>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
       {
         if( _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
           continue;
