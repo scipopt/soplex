@@ -3412,10 +3412,16 @@ namespace soplex
 
 
   /// is stored primal solution feasible?
-  template <class R>
-	bool SoPlex<R>::isPrimalFeasible() const
+  template <>
+	bool SoPlex<Real>::isPrimalFeasible() const
   {
-    return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
+    return (_hasSolReal && _solReal.isPrimalFeasible());
+  }
+
+  template <>
+	bool SoPlex<Rational>::isPrimalFeasible() const
+  {
+    return (_hasSolRational && _solRational.isPrimalFeasible());
   }
 
 
