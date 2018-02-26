@@ -7063,25 +7063,26 @@ namespace soplex
 
 
   /// prints complete statistics
-  template <class R>
-  void SoPlex<R>::printStatistics(std::ostream& os)
+  /// #template #baseclass
+  template <>
+  void SoPlex<Real>::printStatistics(std::ostream& os)
   {
     SPxOut::setFixed(os, 2);
 
     printStatus(os, _status);
 
     os << "Original problem    : \n";
-    if ( boolParam(SoPlex<R>::USEDECOMPDUALSIMPLEX) )
+    if ( boolParam(SoPlex<Real>::USEDECOMPDUALSIMPLEX) )
       printOriginalProblemStatistics(os);
     else
       {
-        if( intParam(SoPlex<R>::READMODE) == READMODE_REAL )
+        if( intParam(SoPlex<Real>::READMODE) == READMODE_REAL )
           _realLP->printProblemStatistics(os);
         else
           _rationalLP->printProblemStatistics(os);
       }
 
-    os << "Objective sense     : " << (intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
+    os << "Objective sense     : " << (intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
     printSolutionStatistics(os);
     printSolvingStatistics(os);
   }
