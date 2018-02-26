@@ -6504,8 +6504,9 @@ namespace soplex
 
 
   /// print non-default parameter values
-  template <class R>
-  void SoPlex<R>::printUserSettings()
+  /// #template #baseclass
+  template <>
+  void SoPlex<Real>::printUserSettings()
   {
     bool printedValue = false;
 
