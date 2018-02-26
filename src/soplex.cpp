@@ -3464,13 +3464,17 @@ namespace soplex
   }
 
   /// is a dual feasible solution available?
-  template <class R>
-	bool SoPlex<R>::hasDual() const
+  template <>
+	bool SoPlex<Real>::hasDual() const
   {
-    return _hasSolReal || _hasSolRational;
+    return _hasSolReal;
   }
 
-
+  template <>
+	bool SoPlex<Rational>::hasDual() const
+  {
+    return _hasSolRational;
+  }
 
   /// is Farkas proof of infeasibility available?
   template <class R>
