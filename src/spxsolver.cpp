@@ -1830,8 +1830,9 @@ namespace soplex
       return cstat;
     }
 
-    template <class R>
-      typename SPxSolver<R>::VarStatus SPxSolver<R>::getBasisRowStatus( int row ) const
+    /// #template #temp #baseclass
+    template <>
+      typename SPxSolver<Real>::VarStatus SPxSolver<Real>::getBasisRowStatus( int row ) const
     {
       assert( 0 <= row && row < this->nRows() );
       return basisStatusToVarStatus( this->desc().rowStatus( row ) );
