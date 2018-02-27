@@ -3650,8 +3650,8 @@ namespace soplex
 
 
   /// gets violation of constraints; returns true on success
-  template <class R>
-	bool SoPlex<R>::getRowViolationReal(Real& maxviol, Real& sumviol)
+  template <>
+	bool SoPlex<Real>::getRowViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
@@ -3995,14 +3995,14 @@ namespace soplex
 
 
   /// gets violation of constraints; returns true on success
-  template <class R>
-	bool SoPlex<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol)
+  template <>
+	bool SoPlex<Rational>::getRowViolationT(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -7012,7 +7012,7 @@ namespace soplex
           os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum bound     : - / -\n";
-        if( getRowViolationRational(maxviol, sumviol) )
+        if( getRowViolationT(maxviol, sumviol) )
           os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum row       : - / -\n";
@@ -7035,7 +7035,7 @@ namespace soplex
           os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum bound     : - / -\n";
-        if( getRowViolationReal(maxviol, sumviol) )
+        if( getRowViolationT(maxviol, sumviol) )
           os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum row       : - / -\n";

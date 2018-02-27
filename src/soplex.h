@@ -633,7 +633,7 @@ public:
    bool getBoundViolationT(R& maxviol, R& sumviol);
 
    /// gets violation of constraints; returns true on success
-   bool getRowViolationReal(Real& maxviol, Real& sumviol);
+   bool getRowViolationT(R& maxviol, R& sumviol);
 
    /// gets violation of reduced costs; returns true on success
    bool getRedCostViolationT(R& maxviol, R& sumviol);
@@ -656,9 +656,6 @@ public:
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
 
-   /// gets violation of constraints; returns true on success
-   bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
-   
 #ifdef SOPLEX_WITH_GMP
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalRational(mpq_t* vector, const int size);

@@ -144,7 +144,7 @@ void checkSolutionReal(SoPlex<R>& soplex)
       Real rowviol;
       Real sumviol;
 
-      if( soplex.getBoundViolationT(boundviol, sumviol) && soplex.getRowViolationReal(rowviol, sumviol) )
+      if( soplex.getBoundViolationT(boundviol, sumviol) && soplex.getRowViolationT(rowviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = boundviol > rowviol ? boundviol : rowviol;
@@ -204,7 +204,7 @@ void checkSolutionRational(SoPlex<R>& soplex)
       Rational rowviol;
       Rational sumviol;
 
-      if( soplex.getBoundViolationT(boundviol, sumviol) && soplex.getRowViolationRational(rowviol, sumviol) )
+      if( soplex.getBoundViolationT(boundviol, sumviol) && soplex.getRowViolationT(rowviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
