@@ -6709,8 +6709,9 @@ namespace soplex
   }
 
   /// parses one setting string and returns true on success
-  template <class R>
-	bool SoPlex<R>::parseSettingsString(char* string)
+  /// #template #temp #baseclass
+  template <>
+	bool SoPlex<Real>::parseSettingsString(char* string)
   {
     assert(string != 0);
     if( string == 0 )
@@ -6819,7 +6820,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<R>::BOOLPARAM_COUNT )
+            if( param >= BOOLPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                 return false;
@@ -6832,7 +6833,7 @@ namespace soplex
                     || strncasecmp(paramValueString, "T", 4) == 0
                     || strtol(paramValueString, NULL, 4) == 1 )
                   {
-                    setBoolParam((SoPlex<R>::BoolParam)param, true);
+                    setBoolParam((BoolParam)param, true);
                     break;
                   }
                 else if( strncasecmp(paramValueString, "false", 5) == 0
@@ -6841,7 +6842,7 @@ namespace soplex
                          || strncasecmp(paramValueString, "F", 5) == 0
                          || strtol(paramValueString, NULL, 5) == 0 )
                   {
-                    setBoolParam((SoPlex<R>::BoolParam)param, false);
+                    setBoolParam((BoolParam)param, false);
                     break;
                   }
                 else
@@ -6860,7 +6861,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<R>::INTPARAM_COUNT )
+            if( param >= INTPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                 return false;
@@ -6869,7 +6870,7 @@ namespace soplex
               {
                 int value;
 
-                if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex<R>::IntParam)param, value, false) )
+                if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((IntParam)param, value, false) )
                   break;
                 else
                   {
@@ -6887,7 +6888,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<R>::REALPARAM_COUNT )
+            if( param >= REALPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                 return false;
@@ -6896,7 +6897,7 @@ namespace soplex
               {
                 Real value;
 
-                if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex<R>::RealParam)param, value) )
+                if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((RealParam)param, value) )
                   break;
                 else
                   {
@@ -6915,7 +6916,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<R>::RATIONALPARAM_COUNT )
+            if( param >= RATIONALPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
                 return false;
@@ -6924,7 +6925,7 @@ namespace soplex
               {
                 Rational value;
 
-                if( readStringRational(paramValueString, value) && setRationalParam((SoPlex<R>::RationalParam)param, value) )
+                if( readStringRational(paramValueString, value) && setRationalParam((RationalParam)param, value) )
                   break;
                 else
                   {
