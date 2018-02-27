@@ -124,7 +124,7 @@ public:
    //@{
 
    /// returns number of rows
-   int numRowsReal() const;
+   int numRowsT() const;
 
    /// Templated function that
    /// returns number of columns
@@ -224,9 +224,6 @@ public:
 
    //**@name Access to the rational LP */
    //@{
-
-   /// returns number of rows
-   int numRowsRational() const;
 
    /// returns smallest non-zero element in absolute value
    Rational minAbsNonzeroRational() const;
@@ -370,14 +367,14 @@ public:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsReal()
+   /// #numRowsT()
    void removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
    /// as buffer memory
    void removeRowsReal(int idx[], int n, int perm[] = 0);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsReal() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
    /// memory
    void removeRowRangeReal(int start, int end, int perm[] = 0);
 
@@ -533,14 +530,14 @@ public:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
    /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsRational()
+   /// #numRowsT()
    void removeRowsRational(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be
    /// passed as buffer memory
    void removeRowsRational(int idx[], int n, int perm[] = 0);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as
    /// buffer memory
    void removeRowRangeRational(int start, int end, int perm[] = 0);
 
@@ -1925,14 +1922,14 @@ private:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsReal()
+   /// #numRowsT()
    void _removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
    /// as buffer memory
    void _removeRowsReal(int idx[], int n, int perm[]);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsReal() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
    /// memory
    void _removeRowRangeReal(int start, int end, int perm[]);
 

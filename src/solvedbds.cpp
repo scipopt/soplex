@@ -195,7 +195,7 @@ namespace soplex
       // if the original problem has a basis, this will be stored
       if( _hasBasis )
       {
-         basisStatusRows.reSize(numRowsReal());
+         basisStatusRows.reSize(numRowsT());
          basisStatusCols.reSize(numColsT());
          _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
             basisStatusCols.size());
@@ -601,7 +601,7 @@ namespace soplex
 
       // allocating memory for the reduced problem rows and cols flag array
       _decompReducedProbRows = 0;
-      spx_alloc(_decompReducedProbRows, numRowsReal());
+      spx_alloc(_decompReducedProbRows, numRowsT());
       _decompReducedProbCols = 0;
       spx_alloc(_decompReducedProbCols, numColsT());
 
@@ -615,7 +615,7 @@ namespace soplex
       _decompViolatedBounds = 0;
       _decompViolatedRows = 0;
       spx_alloc(_decompViolatedBounds, numColsT());
-      spx_alloc(_decompViolatedRows, numRowsReal());
+      spx_alloc(_decompViolatedRows, numRowsT());
       _nDecompViolBounds = 0;
       _nDecompViolRows = 0;
    }
@@ -635,7 +635,7 @@ namespace soplex
       int ncompatind = 0;
 
       assert(_solver.nCols() == numColsT());
-      assert(_solver.nRows() == numRowsReal());
+      assert(_solver.nRows() == numRowsT());
 
       // capturing the basis used for the transformation
       _decompTransBasis = _solver.basis();
@@ -649,7 +649,7 @@ namespace soplex
       _decompLP = new (_decompLP) SPxLPReal(_solver);
 
       // retreiving the basis information
-      _basisStatusRows.reSize(numRowsReal());
+      _basisStatusRows.reSize(numRowsT());
       _basisStatusCols.reSize(numColsT());
       _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
@@ -740,7 +740,7 @@ namespace soplex
       }
 
       int naddedrows = 0;
-      DataArray< SPxRowId > rangedRowIds(numRowsReal());
+      DataArray< SPxRowId > rangedRowIds(numRowsT());
       _deleteAndUpdateRowsComplementaryProblem(rangedRowIds.get_ptr(), naddedrows);
 
       if( boolParam(SoPlex<R>::USECOMPDUAL) )   // if we use the dual formulation of the complementary problem, we must
@@ -1103,7 +1103,7 @@ namespace soplex
       // if the original problem is not in the solver because of scaling, we also need to store the basis
       else if( _scaler != 0 )
       {
-         _basisStatusRows.reSize(numRowsReal());
+         _basisStatusRows.reSize(numRowsT());
          _basisStatusCols.reSize(numColsT());
          assert(_basisStatusRows.size() == solver.nRows());
          assert(_basisStatusCols.size() == solver.nCols());
@@ -1396,7 +1396,7 @@ namespace soplex
 
 
             // adding the violated row
-            if( isZero(norm, feastol) && LT(nnewrowidx/Real(numRowsReal()), percenttoadd) )
+            if( isZero(norm, feastol) && LT(nnewrowidx/Real(numRowsT()), percenttoadd) )
             {
                updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
                   _transformedRows.rhs(rowNumber));
@@ -1662,9 +1662,9 @@ namespace soplex
 #ifndef NDEBUG
       int bind = 0;
       bool* activerows = 0;
-      spx_alloc(activerows, numRowsReal());
+      spx_alloc(activerows, numRowsT());
 
-      for( int i = 0; i < numRowsReal(); ++i )
+      for( int i = 0; i < numRowsT(); ++i )
          activerows[i] = false;
 
       for( int i = 0; i < numColsT(); ++i )
@@ -1675,7 +1675,7 @@ namespace soplex
             {
                bind = _realLP->number(SPxRowId(_solver.basis().baseId(i))); // getting the corresponding row
                                                                                    // for the original LP.
-               assert(bind >= 0 && bind < numRowsReal());
+               assert(bind >= 0 && bind < numRowsT());
                activerows[bind] = true;
             }
          }
@@ -1690,7 +1690,7 @@ namespace soplex
          _decompReducedProbColRowIDs.reSize(_solver.nRows());
       }
 
-      for( int i = 0; i < numRowsReal(); ++i )
+      for( int i = 0; i < numRowsT(); ++i )
       {
          rowsforremoval[i] = i;
          if( formRedProb )
@@ -2039,7 +2039,7 @@ void SoPlex<R>::_deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[]
          LPRowSet addrangedrows;    // the row set of ranged and equality rows that must be added to the complementary problem.
          naddedrows = 0;
          // finding all of the ranged and equality rows and creating two <= constraints.
-         for( int i = 0; i < numRowsReal(); i++ )
+         for( int i = 0; i < numRowsT(); i++ )
          {
             if( _realLP->rowType(i) == LPRowBase<Real>::RANGE || _realLP->rowType(i) == LPRowBase<Real>::EQUAL )
             {

@@ -52,7 +52,7 @@ namespace soplex
       // during the rational solve, we always store basis information in the basis arrays
       else if( _hasBasis )
       {
-         _basisStatusRows.reSize(numRowsReal());
+         _basisStatusRows.reSize(numRowsT());
          _basisStatusCols.reSize(numColsT());
          _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
       }
@@ -385,12 +385,12 @@ namespace soplex
 
       _modLower.reDim(numColsT(), false);
       _modUpper.reDim(numColsT(), false);
-      _modLhs.reDim(numRowsRational(), false);
-      _modRhs.reDim(numRowsRational(), false);
+      _modLhs.reDim(numRowsT(), false);
+      _modRhs.reDim(numRowsT(), false);
       _modObj.reDim(numColsT(), false);
 
       DVectorReal primalReal(numColsT());
-      DVectorReal dualReal(numRowsRational());
+      DVectorReal dualReal(numRowsT());
 
       Rational boundsViolation;
       Rational sideViolation;
@@ -405,13 +405,13 @@ namespace soplex
 
       if( _hasBasis )
       {
-         assert(_basisStatusRows.size() == numRowsRational());
+         assert(_basisStatusRows.size() == numRowsT());
          assert(_basisStatusCols.size() == numColsT());
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = (_solver.basis().status() > SPxBasis<R>::NO_PROBLEM);
       }
 
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          assert(_solver.maxRowObj(r) == 0.0);
       }
@@ -458,8 +458,8 @@ namespace soplex
       // store floating-point solution of original LP as current rational solution and ensure that solution vectors have
       // right dimension; ensure that solution is aligned with basis
       sol._primal.reDim(numColsT(), false);
-      sol._slacks.reDim(numRowsRational(), false);
-      sol._dual.reDim(numRowsRational(), false);
+      sol._slacks.reDim(numRowsT(), false);
+      sol._dual.reDim(numRowsT(), false);
       sol._redCost.reDim(numColsT(), false);
       sol._isPrimalFeasible= true;
       sol._isDualFeasible = true;
@@ -488,7 +488,7 @@ namespace soplex
       _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
 
       int dualSize = 0;
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
@@ -529,7 +529,7 @@ namespace soplex
 
       // refinement loop
       const bool maximizing = (intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MAXIMIZE);
-      const int maxDimRational = numColsT() > numRowsRational() ? numColsT() : numRowsRational();
+      const int maxDimRational = numColsT() > numRowsT() ? numColsT() : numRowsT();
       SolRational factorSol;
       bool factorSolNewBasis = true;
       int lastStallRefinements = 0;
@@ -588,7 +588,7 @@ namespace soplex
 
          // compute violation of sides
          sideViolation = 0;
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         for( int r = numRowsT() - 1; r >= 0; r-- )
          {
             const typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
@@ -676,7 +676,7 @@ namespace soplex
 
          // compute dual violation
          dualViolation = 0;
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         for( int r = numRowsT() - 1; r >= 0; r-- )
          {
             if( _rowTypes[r] == RANGETYPE_FIXED )
                continue;
@@ -896,7 +896,7 @@ namespace soplex
          assert(primalScale >= 1);
          if( primalScale == 1 )
          {
-            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            for( int r = numRowsT() - 1; r >= 0; r-- )
             {
                if( _lowerFinite(_rowTypes[r]) )
                {
@@ -916,7 +916,7 @@ namespace soplex
          }
          else
          {
-            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            for( int r = numRowsT() - 1; r >= 0; r-- )
             {
                if( _lowerFinite(_rowTypes[r]) )
                {
@@ -980,7 +980,7 @@ namespace soplex
             else
                _solver.changeObj(c, Real(_modObj[c]));
          }
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         for( int r = numRowsT() - 1; r >= 0; r-- )
          {
             Rational newRowObj;
             if( _rowTypes[r] == RANGETYPE_FIXED )
@@ -1013,7 +1013,7 @@ namespace soplex
                int col = numOrigCols + i;
 
                assert(row >= 0);
-               assert(row < numRowsRational());
+               assert(row < numRowsT());
 
                if( _basisStatusRows[row] == SPxSolver<R>::BASIC && _basisStatusCols[col] != SPxSolver<R>::BASIC )
                {
@@ -1192,7 +1192,7 @@ namespace soplex
 #ifndef NDEBUG
 #ifdef SOPLEX_WITH_GMP
             {
-               DVectorRational activity(numRowsRational());
+               DVectorRational activity(numRowsT());
                _rationalLP->computePrimalActivity(sol._primal, activity);
                assert(sol._slacks == activity);
             }
@@ -1251,7 +1251,7 @@ namespace soplex
             // compute dual violation
             Rational debugDualViolation = 0;
             Rational debugBasicDualViolation = 0;
-            for( int r = numRowsRational() - 1; r >= 0; r-- )
+            for( int r = numRowsT() - 1; r >= 0; r-- )
             {
                if( _rowTypes[r] == RANGETYPE_FIXED )
                   continue;
@@ -1313,7 +1313,7 @@ namespace soplex
          dualScaleInverseNeg *= -1;
          _primalDualDiff.clear();
          dualSize = 0;
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         for( int r = numRowsT() - 1; r >= 0; r-- )
          {
             typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
@@ -1378,7 +1378,7 @@ namespace soplex
       // correct basis status for restricted inequalities
       if( _hasBasis )
       {
-         for( int r = numRowsRational() - 1; r >= 0; r-- )
+         for( int r = numRowsT() - 1; r >= 0; r-- )
          {
             assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
             if( _rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolver<R>::FIXED )
@@ -1587,7 +1587,7 @@ namespace soplex
 
       // remember unlifted state
       _beforeLiftCols = numColsT();
-      _beforeLiftRows = numRowsRational();
+      _beforeLiftRows = numRowsT();
 
       // allocate vector memory
       DSVectorRational colVector;
@@ -1732,10 +1732,10 @@ namespace soplex
       if( _hasBasis )
       {
          assert(numColsT() >= _beforeLiftCols);
-         assert(numRowsRational() >= _beforeLiftRows);
+         assert(numRowsT() >= _beforeLiftRows);
 
          _basisStatusCols.append(numColsT() - _beforeLiftCols, SPxSolver<R>::BASIC);
-         _basisStatusRows.append(numRowsRational() - _beforeLiftRows, SPxSolver<R>::FIXED);
+         _basisStatusRows.append(numRowsT() - _beforeLiftRows, SPxSolver<R>::FIXED);
          _rationalLUSolver.clear();
       }
 
@@ -1744,10 +1744,10 @@ namespace soplex
       // stop timing
       _statistics->transformTime->stop();
 
-      if( numColsT() > _beforeLiftCols || numRowsRational() > _beforeLiftRows )
+      if( numColsT() > _beforeLiftCols || numRowsT() > _beforeLiftRows )
       {
          MSG_INFO1( spxout, spxout << "Added " << numColsT() - _beforeLiftCols << " columns and "
-            << numRowsRational() - _beforeLiftRows << " rows to reduce large matrix coefficients\n." );
+            << numRowsT() - _beforeLiftRows << " rows to reduce large matrix coefficients\n." );
       }
    }
 
@@ -1764,15 +1764,15 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("beforeProject.lp", 0, 0, 0) );
 
       assert(numColsT() >= _beforeLiftCols);
-      assert(numRowsRational() >= _beforeLiftRows);
+      assert(numRowsT() >= _beforeLiftRows);
 
       // shrink rational LP to original size
       _rationalLP->removeColRange(_beforeLiftCols, numColsT() - 1);
-      _rationalLP->removeRowRange(_beforeLiftRows, numRowsRational() - 1);
+      _rationalLP->removeRowRange(_beforeLiftRows, numRowsT() - 1);
 
       // shrink real LP to original size
       _realLP->removeColRange(_beforeLiftCols, numColsT() - 1);
-      _realLP->removeRowRange(_beforeLiftRows, numRowsReal() - 1);
+      _realLP->removeRowRange(_beforeLiftRows, numRowsT() - 1);
 
       // adjust solution
       if( sol.isPrimalFeasible() )
@@ -1822,7 +1822,7 @@ namespace soplex
          }
       }
 
-      for( int i = _beforeLiftRows; i < numRowsRational() && _hasBasis; i++ )
+      for( int i = _beforeLiftRows; i < numRowsT() && _hasBasis; i++ )
       {
          if( _basisStatusRows[i] == SPxSolver<R>::BASIC )
          {
@@ -1941,7 +1941,7 @@ namespace soplex
       _slackCols.clear();
 
       // add artificial slack variables to convert inequality to equality constraints
-      for( int i = 0; i < numRowsRational(); i++ )
+      for( int i = 0; i < numRowsT(); i++ )
       {
          assert((lhsRational(i) == rhsRational(i)) == (_rowTypes[i] == RANGETYPE_FIXED));
          if( _rowTypes[i] != RANGETYPE_FIXED )
@@ -1970,7 +1970,7 @@ namespace soplex
             int row = _slackCols.colVector(i).index(0);
 
             assert(row >= 0);
-            assert(row < numRowsRational());
+            assert(row < numRowsT());
 
             switch( _basisStatusRows[row] )
             {
@@ -2028,7 +2028,7 @@ namespace soplex
             int row = _slackCols.colVector(i).index(0);
 
             assert(row >= 0);
-            assert(row < numRowsRational());
+            assert(row < numRowsT());
 
             sol._slacks[row] -= sol._primal[col];
          }
@@ -2050,7 +2050,7 @@ namespace soplex
             int row = _slackCols.colVector(i).index(0);
 
             assert(row >= 0);
-            assert(row < numRowsRational());
+            assert(row < numRowsT());
             assert(_basisStatusRows[row] != SPxSolver<R>::UNDEFINED);
             assert(_basisStatusRows[row] != SPxSolver<R>::ZERO || lhsRational(row) == 0);
             assert(_basisStatusRows[row] != SPxSolver<R>::ZERO || rhsRational(row) == 0);
@@ -2147,9 +2147,9 @@ namespace soplex
       }
 
       // store sides
-      _unboundedLhs.reDim(numRowsRational());
-      _unboundedRhs.reDim(numRowsRational());
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      _unboundedLhs.reDim(numRowsT());
+      _unboundedRhs.reDim(numRowsT());
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          if( _lowerFinite(_rowTypes[r]) )
             _unboundedLhs[r] = lhsRational(r);
@@ -2158,7 +2158,7 @@ namespace soplex
       }
 
       // make right-hand side zero
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
          if( _lowerFinite(_rowTypes[r]) )
@@ -2252,7 +2252,7 @@ namespace soplex
       MSG_DEBUG( _realLP->writeFile("beforeUntransUnbounded.lp", 0, 0, 0) );
 
       int numOrigCols = numColsT() - 1;
-      int numOrigRows = numRowsRational() - 1;
+      int numOrigRows = numRowsT() - 1;
       const Rational& tau = sol._primal[numOrigCols];
 
       // adjust solution and basis
@@ -2320,7 +2320,7 @@ namespace soplex
       _colTypes.reSize(numOrigCols);
 
       // restore objective, sides and bounds
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          if( _lowerFinite(_rowTypes[r]) )
          {
@@ -2430,9 +2430,9 @@ namespace soplex
       }
 
       // store sides
-      _feasLhs.reDim(numRowsRational());
-      _feasRhs.reDim(numRowsRational());
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      _feasLhs.reDim(numRowsT());
+      _feasRhs.reDim(numRowsT());
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          if( _lowerFinite(_rowTypes[r]) )
             _feasLhs[r] = lhsRational(r);
@@ -2582,7 +2582,7 @@ namespace soplex
 
       // homogenize sides
       _tauColVector.clear();
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          if( lhsRational(r) > 0 )
          {
@@ -2725,7 +2725,7 @@ namespace soplex
       }
 
       // restore right-hand side
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          assert(rhsRational(r) >= _rationalPosInfty || lhsRational(r) <= _rationalNegInfty
             || _feasLhs[r] - lhsRational(r) == _feasRhs[r] - rhsRational(r));
@@ -2830,7 +2830,7 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
       if( sol._isPrimalFeasible)
       {
-         DVectorRational activity(numRowsRational());
+         DVectorRational activity(numRowsT());
          _rationalLP->computePrimalActivity(sol._primal, activity);
          assert(sol._slacks == activity);
       }
@@ -2876,7 +2876,7 @@ namespace soplex
       const VectorRational& rhs = transformed ? _feasRhs : rhsRational();
       const VectorRational& y = sol._dualFarkas;
 
-      const int numRows = numRowsRational();
+      const int numRows = numRowsT();
       const int numCols = transformed ? numColsT() - 1 : numColsT();
 
       SSVectorRational ytransA(numColsT());
@@ -3098,10 +3098,10 @@ namespace soplex
    {
       assert(_isConsistent());
 
-      assert(_solver.nRows() == numRowsRational());
+      assert(_solver.nRows() == numRowsT());
       assert(_solver.nCols() == numColsT());
       assert(primal.dim() == numColsT());
-      assert(dual.dim() == numRowsRational());
+      assert(dual.dim() == numRowsT());
 
       typename SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
 
@@ -3218,7 +3218,7 @@ namespace soplex
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                   // store basis for original problem
-                  basisStatusRows.reSize(numRowsRational());
+                  basisStatusRows.reSize(numRowsT());
                   basisStatusCols.reSize(numColsT());
                   _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
                   returnedBasis = true;
@@ -3539,7 +3539,7 @@ namespace soplex
       assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED
          || _rationalLUSolver.status() == SLinSolverRational::TIME);
 
-      const int matrixdim = numRowsRational();
+      const int matrixdim = numRowsT();
       assert(_rationalLUSolverBind.size() == matrixdim);
 
       DataArray< const SVectorRational* > matrix(matrixdim);
@@ -3555,7 +3555,7 @@ namespace soplex
          else
          {
             assert(-1 - _rationalLUSolverBind[i] >= 0);
-            assert(-1 - _rationalLUSolverBind[i] < numRowsRational());
+            assert(-1 - _rationalLUSolverBind[i] < numRowsT());
             matrix[i] = _unitVectorRational(-1 - _rationalLUSolverBind[i]);
          }
       }
@@ -3599,7 +3599,7 @@ namespace soplex
       optimal = false;
 
       const bool maximizing = (intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MAXIMIZE);
-      const int matrixdim = numRowsRational();
+      const int matrixdim = numRowsT();
       bool loadMatrix = (_rationalLUSolver.status() == SLinSolverRational::UNLOADED
          || _rationalLUSolver.status() == SLinSolverRational::TIME);
       int numBasicRows;
@@ -3631,7 +3631,7 @@ namespace soplex
       bool dualFeasible = false;
 
       assert(basisStatusCols.size() == numColsT());
-      assert(basisStatusRows.size() == numRowsRational());
+      assert(basisStatusRows.size() == numRowsT());
 
       int j = 0;
       for( int i = 0; i < basisStatusRows.size(); i++ )
@@ -3965,7 +3965,7 @@ namespace soplex
                goto TERMINATE;
             }
          }
-         sol._slacks.reDim(numRowsRational());
+         sol._slacks.reDim(numRowsT());
          _rationalLP->computePrimalActivity(sol._primal, sol._slacks);
          sol._isPrimalFeasible= true;
 
@@ -4062,11 +4062,11 @@ namespace soplex
 
       // compute slacks
       ///@todo we should compute them one by one so we can abort when encountering an infeasibility
-      _workSol._slacks.reDim(numRowsRational());
+      _workSol._slacks.reDim(numRowsT());
       _rationalLP->computePrimalActivity(_workSol._primal, _workSol._slacks);
 
       // check violation of sides
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
          typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
@@ -4113,7 +4113,7 @@ namespace soplex
       // check dual multipliers before reduced costs because this check is faster since it does not require the
       // computation of reduced costs
       const bool maximizing = (intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MAXIMIZE);
-      for( int r = numRowsRational() - 1; r >= 0; r-- )
+      for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          int sig = sign(_workSol._dual[r]);
 
