@@ -1329,6 +1329,14 @@ namespace soplex
     return _currentSettings->_intParamValues[param];
   }
 
+  template <>
+	int SoPlex<Rational>::intParam(const IntParam param) const
+  {
+    assert(param >= 0);
+    assert(param < INTPARAM_COUNT);
+    return _currentSettings->_intParamValues[param];
+  }
+
   /// sets integer parameter value; returns true on success
   // #template #baseclass
   template <>
