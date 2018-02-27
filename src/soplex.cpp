@@ -3768,8 +3768,8 @@ namespace soplex
 
 
   /// gets violation of dual multipliers; returns true on success
-  template <class R>
-	bool SoPlex<R>::getDualViolationReal(Real& maxviol, Real& sumviol)
+  template <>
+	bool SoPlex<Real>::getDualViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
@@ -3783,17 +3783,17 @@ namespace soplex
 
     for( int r = numRowsReal() - 1; r >= 0; r-- )
       {
-        typename SPxSolver<R>::VarStatus rowStatus = basisRowStatus(r);
+        typename SPxSolver<Real>::VarStatus rowStatus = basisRowStatus(r);
 
-        if( intParam(SoPlex<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
-            if( rowStatus != SPxSolver<R>::ON_UPPER && rowStatus != SPxSolver<R>::FIXED && dual[r] < 0.0 )
+            if( rowStatus != SPxSolver<Real>::ON_UPPER && rowStatus != SPxSolver<Real>::FIXED && dual[r] < 0.0 )
               {
                 sumviol += -dual[r];
                 if( dual[r] < -maxviol )
                   maxviol = -dual[r];
               }
-            if( rowStatus != SPxSolver<R>::ON_LOWER && rowStatus != SPxSolver<R>::FIXED && dual[r] > 0.0 )
+            if( rowStatus != SPxSolver<Real>::ON_LOWER && rowStatus != SPxSolver<Real>::FIXED && dual[r] > 0.0 )
               {
                 sumviol += dual[r];
                 if( dual[r] > maxviol )
@@ -3802,13 +3802,13 @@ namespace soplex
           }
         else
           {
-            if( rowStatus != SPxSolver<R>::ON_UPPER && rowStatus != SPxSolver<R>::FIXED && dual[r] > 0.0 )
+            if( rowStatus != SPxSolver<Real>::ON_UPPER && rowStatus != SPxSolver<Real>::FIXED && dual[r] > 0.0 )
               {
                 sumviol += dual[r];
                 if( dual[r] > maxviol )
                   maxviol = dual[r];
               }
-            if( rowStatus != SPxSolver<R>::ON_LOWER && rowStatus != SPxSolver<R>::FIXED && dual[r] < 0.0 )
+            if( rowStatus != SPxSolver<Real>::ON_LOWER && rowStatus != SPxSolver<Real>::FIXED && dual[r] < 0.0 )
               {
                 sumviol += -dual[r];
                 if( dual[r] < -maxviol )
@@ -4139,14 +4139,14 @@ namespace soplex
 
 
   /// gets violation of dual multipliers; returns true on success
-  template <class R>
-	bool SoPlex<R>::getDualViolationRational(Rational& maxviol, Rational& sumviol)
+  template <>
+	bool SoPlex<Rational>::getDualViolationT(Rational& maxviol, Rational& sumviol)
   {
     if( !isDualFeasible() || !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4158,7 +4158,7 @@ namespace soplex
 
     for( int r = numRowsReal() - 1; r >= 0; r-- )
       {
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<R>::UNDEFINED);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::UNDEFINED);
 
         if( _rowTypes[r] == RANGETYPE_FIXED )
           {
@@ -4166,12 +4166,12 @@ namespace soplex
             continue;
           }
 
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<R>::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<R>::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<R>::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<R>::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
 
-        if( intParam(SoPlex<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlex<Rational>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] < 0 )
               {
@@ -7017,7 +7017,7 @@ namespace soplex
           os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";
-        if( getDualViolationRational(maxviol, sumviol) )
+        if( getDualViolationT(maxviol, sumviol) )
           os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum dual      : - / -\n";
@@ -7040,7 +7040,7 @@ namespace soplex
           os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";
-        if( getDualViolationReal(maxviol, sumviol) )
+        if( getDualViolationT(maxviol, sumviol) )
           os << "  Max/sum dual      : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum dual      : - / -\n";

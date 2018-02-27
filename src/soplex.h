@@ -639,10 +639,7 @@ public:
    bool getRedCostViolationT(R& maxviol, R& sumviol);
 
    /// gets violation of dual multipliers; returns true on success
-   bool getDualViolationReal(Real& maxviol, Real& sumviol);
-
-   /// gets violation of dual multipliers; returns true on success
-   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
+   bool getDualViolationT(R& maxviol, R& sumviol);
 
    //@}
 

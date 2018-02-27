@@ -104,7 +104,7 @@ namespace soplex {
         soplex.getBoundViolationT(maxBoundViolation, sumBoundViolation);
         soplex.getRowViolationT(maxRowViolation, sumRowViolation);
         soplex.getRedCostViolationT(maxRedCostViolation, sumRedCostViolation);
-        soplex.getDualViolationReal(maxDualViolation, sumDualViolation);
+        soplex.getDualViolationT(maxDualViolation, sumDualViolation);
         if( ! LE(maxBoundViolation, validatetolerance) )
           {
             passedValidation = false;
