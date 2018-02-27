@@ -22,8 +22,9 @@
 namespace soplex {
 
   /// updates the external solution used for validation
-  template <class R>
-  bool Validation<R>::updateExternalSolution(char* solution)
+  /// #template 
+  template <>
+  bool Validation<double>::updateExternalSolution(char* solution)
   {
     validate = true;
     validatesolution = solution;
