@@ -3565,9 +3565,9 @@ void SoPlex<R>::printDecompDisplayLine(SPxSolver<R>& solver, const SPxOut::Verbo
       }
    }
 
-
-   template <class R>
-   void SoPlex<R>::printOriginalProblemStatistics(std::ostream& os)
+  /// #template #baseclass #temp
+   template <>
+   void SoPlex<Real>::printOriginalProblemStatistics(std::ostream& os)
    {
       os << "  Columns           : " << numProbCols << "\n"
          << "              boxed : " << origCountBoxed << "\n"
