@@ -3303,7 +3303,15 @@ namespace soplex
       _syncLPRational();
   }
 
-
+  /// returns real parameter value
+  /// #template #temp
+  template <>
+  Real SoPlex<Real>::realParam(const RealParam param) const
+  {
+    assert(param >= 0);
+    assert(param < REALPARAM_COUNT);
+    return _currentSettings->_realParamValues[param];
+  }
 
   /// solves the LP
   /// #template needs to be rewritten #temp
@@ -6191,18 +6199,6 @@ namespace soplex
   //   assert(param < INTPARAM_COUNT);
   //   return _currentSettings->_intParamValues[param];
   // }
-
-
-  /// returns real parameter value
-  template <class R>
-  Real SoPlex<R>::realParam(const RealParam param) const
-  {
-    assert(param >= 0);
-    assert(param < REALPARAM_COUNT);
-    return _currentSettings->_realParamValues[param];
-  }
-
-
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
   /// returns rational parameter value
