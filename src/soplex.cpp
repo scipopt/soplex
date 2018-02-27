@@ -3690,11 +3690,23 @@ namespace soplex
     return true;
   }
 
+  /// is an advanced starting basis available?
+  /// #template #baseclass
+  template <>
+	bool SoPlex<Real>::hasBasis() const
+  {
+    return _hasBasis;
+  }
 
+  template <>
+	bool SoPlex<Rational>::hasBasis() const
+  {
+    return _hasBasis;
+  }
 
   /// gets violation of reduced costs; returns true on success
-  template <class R>
-	bool SoPlex<R>::getRedCostViolationReal(Real& maxviol, Real& sumviol)
+  template <>
+	bool SoPlex<Real>::getRedCostViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
@@ -3708,17 +3720,17 @@ namespace soplex
 
     for( int c = numColsT() - 1; c >= 0; c-- )
       {
-        typename SPxSolver<R>::VarStatus colStatus = basisColStatus(c);
+        typename SPxSolver<Real>::VarStatus colStatus = basisColStatus(c);
 
-        if( intParam(SoPlex<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
-            if( colStatus != SPxSolver<R>::ON_UPPER && colStatus != SPxSolver<R>::FIXED && redcost[c] < 0.0 )
+            if( colStatus != SPxSolver<Real>::ON_UPPER && colStatus != SPxSolver<Real>::FIXED && redcost[c] < 0.0 )
               {
                 sumviol += -redcost[c];
                 if( redcost[c] < -maxviol )
                   maxviol = -redcost[c];
               }
-            if( colStatus != SPxSolver<R>::ON_LOWER && colStatus != SPxSolver<R>::FIXED && redcost[c] > 0.0 )
+            if( colStatus != SPxSolver<Real>::ON_LOWER && colStatus != SPxSolver<Real>::FIXED && redcost[c] > 0.0 )
               {
                 sumviol += redcost[c];
                 if( redcost[c] > maxviol )
@@ -3727,13 +3739,13 @@ namespace soplex
           }
         else
           {
-            if( colStatus != SPxSolver<R>::ON_UPPER && colStatus != SPxSolver<R>::FIXED && redcost[c] > 0.0 )
+            if( colStatus != SPxSolver<Real>::ON_UPPER && colStatus != SPxSolver<Real>::FIXED && redcost[c] > 0.0 )
               {
                 sumviol += redcost[c];
                 if( redcost[c] > maxviol )
                   maxviol = redcost[c];
               }
-            if( colStatus != SPxSolver<R>::ON_LOWER && colStatus != SPxSolver<R>::FIXED && redcost[c] < 0.0 )
+            if( colStatus != SPxSolver<Real>::ON_LOWER && colStatus != SPxSolver<Real>::FIXED && redcost[c] < 0.0 )
               {
                 sumviol += -redcost[c];
                 if( redcost[c] < -maxviol )
@@ -4037,14 +4049,14 @@ namespace soplex
 
 
   /// gets violation of reduced costs; returns true on success
-  template <class R>
-	bool SoPlex<R>::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
+  template <>
+	bool SoPlex<Rational>::getRedCostViolationT(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() || !isDualFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4056,7 +4068,7 @@ namespace soplex
 
     for( int c = numColsT() - 1; c >= 0; c-- )
       {
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<R>::UNDEFINED);
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::UNDEFINED);
 
         if( _colTypes[c] == RANGETYPE_FIXED )
           {
@@ -4064,12 +4076,12 @@ namespace soplex
             continue;
           }
 
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<R>::ON_LOWER || _solRational._primal[c] == lowerRational(c));
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<R>::ON_UPPER || _solRational._primal[c] == upperRational(c));
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<R>::FIXED || _solRational._primal[c] == lowerRational(c));
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<R>::FIXED || _solRational._primal[c] == upperRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::ON_LOWER || _solRational._primal[c] == lowerRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::ON_UPPER || _solRational._primal[c] == upperRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::FIXED || _solRational._primal[c] == lowerRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::FIXED || _solRational._primal[c] == upperRational(c));
 
-        if( intParam(SoPlex<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlex<Rational>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( _solRational._primal[c] != upperRational(c) && redcost[c] < 0 )
               {
@@ -4418,24 +4430,6 @@ namespace soplex
     else
       return 0;
   }
-
-
-
-  /// is an advanced starting basis available?
-  /// #template #baseclass
-  template <>
-	bool SoPlex<Real>::hasBasis() const
-  {
-    return _hasBasis;
-  }
-
-  template <>
-	bool SoPlex<Rational>::hasBasis() const
-  {
-    return _hasBasis;
-  }
-
-
 
   /// returns the current basis status
   template <class R>
@@ -7022,7 +7016,7 @@ namespace soplex
           os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum row       : - / -\n";
-        if( getRedCostViolationRational(maxviol, sumviol) )
+        if( getRedCostViolationT(maxviol, sumviol) )
           os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";
@@ -7045,7 +7039,7 @@ namespace soplex
           os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum row       : - / -\n";
-        if( getRedCostViolationReal(maxviol, sumviol) )
+        if( getRedCostViolationT(maxviol, sumviol) )
           os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";

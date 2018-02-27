@@ -170,7 +170,7 @@ void checkSolutionReal(SoPlex<R>& soplex)
       Real dualviol;
       Real sumviol;
 
-      if( soplex.getRedCostViolationReal(redcostviol, sumviol) && soplex.getDualViolationReal(dualviol, sumviol) )
+      if( soplex.getRedCostViolationT(redcostviol, sumviol) && soplex.getDualViolationReal(dualviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
@@ -228,7 +228,7 @@ void checkSolutionRational(SoPlex<R>& soplex)
       Rational dualviol;
       Rational sumviol;
 
-      if( soplex.getRedCostViolationRational(redcostviol, sumviol) && soplex.getDualViolationRational(dualviol, sumviol) )
+      if( soplex.getRedCostViolationT(redcostviol, sumviol) && soplex.getDualViolationRational(dualviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;

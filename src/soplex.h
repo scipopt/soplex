@@ -636,10 +636,13 @@ public:
    bool getRowViolationReal(Real& maxviol, Real& sumviol);
 
    /// gets violation of reduced costs; returns true on success
-   bool getRedCostViolationReal(Real& maxviol, Real& sumviol);
+   bool getRedCostViolationT(R& maxviol, R& sumviol);
 
    /// gets violation of dual multipliers; returns true on success
    bool getDualViolationReal(Real& maxviol, Real& sumviol);
+
+   /// gets violation of dual multipliers; returns true on success
+   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
    //@}
 
@@ -658,13 +661,7 @@ public:
 
    /// gets violation of constraints; returns true on success
    bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
-
-   /// gets violation of reduced costs; returns true on success
-   bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
-
-   /// gets violation of dual multipliers; returns true on success
-   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
-
+   
 #ifdef SOPLEX_WITH_GMP
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalRational(mpq_t* vector, const int size);
