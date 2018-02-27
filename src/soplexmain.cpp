@@ -296,7 +296,7 @@ void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames
                      << std::setprecision(8) << std::fixed
                      << ")." << std::endl; )
       }
-      else if( soplex.isPrimalFeasible() && soplex.getPrimalReal(primal) )
+      else if( soplex.isPrimalFeasible() && soplex.getPrimalT(primal) )
       {
          int nNonzeros = 0;
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
@@ -339,7 +339,7 @@ void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames
    //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
    //    }
 
-   //    if( soplex.isPrimalFeasible() && soplex.getPrimalRational(primal) )
+   //    if( soplex.isPrimalFeasible() && soplex.getPrimalT(primal) )
    //    {
    //       int nNonzeros = 0;
    //       MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )

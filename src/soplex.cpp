@@ -3514,8 +3514,8 @@ namespace soplex
 
 
   /// gets the primal solution vector if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getPrimalReal(VectorReal& vector)
+  template <>
+	bool SoPlex<Real>::getPrimalT(VectorBase<Real>& vector)
   {
     if( hasPrimal() && vector.dim() >= numColsT() )
       {
@@ -3847,8 +3847,8 @@ namespace soplex
 
 
   /// gets the primal solution vector if available; returns true on success
-  template <class R>
-	bool SoPlex<R>::getPrimalRational(VectorRational& vector)
+  template <>
+	bool SoPlex<Rational>::getPrimalT(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsT() )
       {

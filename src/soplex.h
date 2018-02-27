@@ -612,7 +612,7 @@ public:
    Real objValueReal();
 
    /// gets the primal solution vector if available; returns true on success
-   bool getPrimalReal(VectorReal& vector);
+   bool getPrimalT(VectorBase<R>& vector);
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorReal& vector);
@@ -652,9 +652,6 @@ public:
 
    /// returns the objective value if a primal solution is available
    Rational objValueRational();
-
-   /// gets the primal solution vector if available; returns true on success
-   bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
