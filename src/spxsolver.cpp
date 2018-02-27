@@ -1837,8 +1837,9 @@ namespace soplex
       return basisStatusToVarStatus( this->desc().rowStatus( row ) );
     }
 
-    template <class R>
-      typename SPxSolver<R>::VarStatus SPxSolver<R>::getBasisColStatus( int col ) const
+    /// #template #temp #baseclass
+    template <>
+      typename SPxSolver<Real>::VarStatus SPxSolver<Real>::getBasisColStatus( int col ) const
     {
       assert( 0 <= col && col < this->nCols() );
       return basisStatusToVarStatus( this->desc().colStatus( col ) );
