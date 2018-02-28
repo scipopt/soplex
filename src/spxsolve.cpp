@@ -1762,8 +1762,9 @@ namespace soplex
     return status();
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::getSlacks (Vector& p_vector) const
+  /// #typename #temp 
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::getSlacks (Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1777,26 +1778,26 @@ namespace soplex
     if (rep() == COLUMN)
       {
         int i;
-        const typename SPxBasis<R>::Desc& ds = this->desc();
+        const typename SPxBasis<Real>::Desc& ds = this->desc();
         for (i = this->nRows() - 1; i >= 0; --i)
           {
             switch (ds.rowStatus(i))
               {
-              case SPxBasis<R>::Desc::P_ON_LOWER :
+              case SPxBasis<Real>::Desc::P_ON_LOWER :
                 p_vector[i] = this->lhs(i);
                 break;
-              case SPxBasis<R>::Desc::P_ON_UPPER :
-              case SPxBasis<R>::Desc::P_FIXED :
+              case SPxBasis<Real>::Desc::P_ON_UPPER :
+              case SPxBasis<Real>::Desc::P_FIXED :
                 p_vector[i] = this->rhs(i);
                 break;
-              case SPxBasis<R>::Desc::P_FREE :
+              case SPxBasis<Real>::Desc::P_FREE :
                 p_vector[i] = 0;
                 break;
-              case SPxBasis<R>::Desc::D_FREE :
-              case SPxBasis<R>::Desc::D_ON_UPPER :
-              case SPxBasis<R>::Desc::D_ON_LOWER :
-              case SPxBasis<R>::Desc::D_ON_BOTH :
-              case SPxBasis<R>::Desc::D_UNDEFINED :
+              case SPxBasis<Real>::Desc::D_FREE :
+              case SPxBasis<Real>::Desc::D_ON_UPPER :
+              case SPxBasis<Real>::Desc::D_ON_LOWER :
+              case SPxBasis<Real>::Desc::D_ON_BOTH :
+              case SPxBasis<Real>::Desc::D_UNDEFINED :
                 break;
               default:
                 throw SPxInternalCodeException("XSOLVE12 This should never happen.");
