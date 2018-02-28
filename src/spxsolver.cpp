@@ -67,8 +67,9 @@ namespace soplex
       theratiotester->clear();
   }
 
-  template <class R>
-  void SPxSolver<R>::loadLP(const SPxLP& lp, bool initSlackBasis)
+  /// #template #temp
+  template <>
+  void SPxSolver<Real>::loadLP(const SPxLP& lp, bool initSlackBasis)
   {
     clear();
     unInit();
@@ -80,7 +81,7 @@ namespace soplex
       theratiotester->clear();
     SPxLP::operator=(lp);
     reDim();
-    SPxBasis<R>::load(this, initSlackBasis);
+    SPxBasis<Real>::load(this, initSlackBasis);
   }
 
   template <class R>
