@@ -636,7 +636,13 @@ namespace soplex
     assert(_isConsistent());
   }
 
-
+  /// returns the current solver status
+  /// #template #temp 
+  template <>
+  typename SPxSolver<Real>::Status SoPlex<Real>::status() const
+  {
+    return _status;
+  }
 
   /// assignment operator
   template <class R>
@@ -3423,17 +3429,6 @@ namespace soplex
 
     return status();
   }
-
-
-
-  /// returns the current solver status
-  template <class R>
-  typename SPxSolver<R>::Status SoPlex<R>::status() const
-  {
-    return _status;
-  }
-
-
 
   /// is stored primal solution feasible?
   template <>
