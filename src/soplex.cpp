@@ -4536,23 +4536,24 @@ namespace soplex
 
 
   /// gets current basis
-  template <class R>
-  void SoPlex<R>::getBasis(typename SPxSolver<R>::VarStatus rows[], typename SPxSolver<R>::VarStatus cols[]) const
+  /// #template #temp
+  template <>
+  void SoPlex<Real>::getBasis(typename SPxSolver<Real>::VarStatus rows[], typename SPxSolver<Real>::VarStatus cols[]) const
   {
     // if no basis is available, return slack basis
     if( !hasBasis() )
       {
         for( int i = numRowsT() - 1; i >= 0; i-- )
-          rows[i] = SPxSolver<R>::BASIC;
+          rows[i] = SPxSolver<Real>::BASIC;
 
         for( int i = numColsT() - 1; i >= 0; i-- )
           {
-            if( lowerReal(i) > -realParam(SoPlex<R>::INFTY) )
-              cols[i] = SPxSolver<R>::ON_LOWER;
-            else if( upperReal(i) < realParam(SoPlex<R>::INFTY) )
-              cols[i] = SPxSolver<R>::ON_UPPER;
+            if( lowerReal(i) > -realParam(SoPlex<Real>::INFTY) )
+              cols[i] = SPxSolver<Real>::ON_LOWER;
+            else if( upperReal(i) < realParam(SoPlex<Real>::INFTY) )
+              cols[i] = SPxSolver<Real>::ON_UPPER;
             else
-              cols[i] = SPxSolver<R>::ZERO;
+              cols[i] = SPxSolver<Real>::ZERO;
           }
       }
     // if the real LP is loaded, ask solver
