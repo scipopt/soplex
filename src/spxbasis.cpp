@@ -1140,9 +1140,9 @@ Real SPxBasis<R>::condition(int maxiters, Real tolerance)
    return norm * norminv;
 }
 
-template <class R>
+template <>
 /* compute condition number estimation based on the diagonal of the LU factorization */
-Real SPxBasis<R>::getFastCondition(int type)
+Real SPxBasis<Real>::getFastCondition(int type)
 {
    Real cond = infinity;
 
