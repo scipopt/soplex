@@ -25,6 +25,7 @@
 namespace soplex
 {
    /// solves rational LP
+  #ifdef rationaltemplate
   template <>
   void SoPlex<Rational>::_optimizeT()
    {
@@ -347,6 +348,7 @@ namespace soplex
       // stop timing
       _statistics->solvingTime->stop();
    }
+  #endif
 
 
 
