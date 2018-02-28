@@ -98,8 +98,9 @@ namespace soplex
   }
 
   /// clears statistics on solving process
-  template <class R>
-  void SoPlex<R>::Statistics::clearSolvingData()
+  /// #template #baseclass? 
+  template <>
+  void SoPlex<Real>::Statistics::clearSolvingData()
   {
     solvingTime->reset();
     preprocessingTime->reset();
