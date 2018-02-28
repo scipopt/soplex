@@ -133,8 +133,9 @@ namespace soplex
     freePricer = destroy;
   }
 
-  template <class R>
-  void SPxSolver<R>::setTester(SPxRatioTester<R>* x, const bool destroy)
+  /// #template #temp 
+  template <>
+  void SPxSolver<Real>::setTester(SPxRatioTester<Real>* x, const bool destroy)
   {
     assert(!freeRatioTester || theratiotester != 0);
 
