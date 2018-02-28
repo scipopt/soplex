@@ -4664,14 +4664,15 @@ namespace soplex
   /// type = 0: max/min ratio
   /// type = 1: trace of U (sum of diagonal elements)
   /// type = 2: product of diagonal elements
-  template <class R>
-	bool SoPlex<R>::getFastCondition(Real& condition, int type)
+  /// #template #temp 
+  template <>
+	bool SoPlex<Real>::getFastCondition(Real& condition, int type)
   {
     _ensureRealLPLoaded();
     if( !_isRealLPLoaded )
       return false;
 
-    if( _solver.basis().status() == SPxBasis<R>::NO_PROBLEM )
+    if( _solver.basis().status() == SPxBasis<Real>::NO_PROBLEM )
       return false;
 
     condition = _solver.basis().getFastCondition(type);
