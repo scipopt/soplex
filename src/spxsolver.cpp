@@ -1719,7 +1719,7 @@ namespace soplex
         {
         case FIXED :
           assert(this->rhs(row) == this->lhs(row));
-          this->rstat = SPxBasis<R>::Desc::P_FIXED;
+          rstat = SPxBasis<R>::Desc::P_FIXED;
           break;
         case ON_UPPER :
           assert(this->rhs(row) < infinity);
@@ -1766,7 +1766,7 @@ namespace soplex
                      << std::endl; )
             throw SPxInternalCodeException("XSOLVE23 This should never happen.");
         }
-      return this->rstat;
+      return rstat;
     }
 
     template <class R>
@@ -1927,22 +1927,22 @@ namespace soplex
       return true;
     }
 
-    template <class R>
-      void SPxSolver<R>::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
+    template <>
+      void SPxSolver<Real>::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
     {
-      if (SPxBasis<R>::status() == SPxBasis<R>::NO_PROBLEM)
-        SPxBasis<R>::load(this, false);
+      if (SPxBasis<Real>::status() == SPxBasis<Real>::NO_PROBLEM)
+        SPxBasis<Real>::load(this, false);
 
-      typename SPxBasis<R>::Desc ds = this->desc();
+      typename SPxBasis<Real>::Desc ds = this->desc();
       int i;
 
       for(i = 0; i < this->nRows(); i++)
-        this->ds.rowStatus(i) = varStatusToBasisStatusRow( i, p_rows[i] );
+        ds.rowStatus(i) = varStatusToBasisStatusRow( i, p_rows[i] );
 
       for(i = 0; i < this->nCols(); i++)
-        this->ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
+        ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
 
-      loadBasis(this->ds);
+      loadBasis(ds);
       forceRecompNonbasicValue();
     }
 
