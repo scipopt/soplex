@@ -105,8 +105,9 @@ namespace soplex
     SPxBasis<R>::loadDesc(p_desc);
   }
 
-  template <class R>
-  void SPxSolver<R>::setPricer(SPxPricer<R>* x, const bool destroy)
+  /// #template #temp
+  template <>
+  void SPxSolver<Real>::setPricer(SPxPricer<Real>* x, const bool destroy)
   {
    
     assert(!freePricer || thepricer != 0);
