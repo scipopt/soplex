@@ -3369,7 +3369,7 @@ namespace soplex
 
         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-        _optimizeReal();
+        _optimizeT();
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
         _checkBasisScaling();
 #endif
@@ -3377,7 +3377,7 @@ namespace soplex
     else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       {
         _syncLPRational();
-        _optimizeRational();
+        _optimizeT();
       }
     else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_MANUAL )
       {
@@ -3387,7 +3387,7 @@ namespace soplex
         assert(areLPsInSync(true, false, false));
 #endif
 
-        _optimizeRational();
+        _optimizeT();
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
         assert(areLPsInSync(true, true, false));
@@ -3403,7 +3403,7 @@ namespace soplex
         assert(areLPsInSync(true, false, false));
 #endif
 
-        _optimizeRational();
+        _optimizeT();
       }
 
     MSG_INFO1( spxout, spxout << "\n";

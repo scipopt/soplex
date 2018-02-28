@@ -2008,9 +2008,6 @@ private:
    //**@name Private solving methods implemented in solverational.cpp */
    //@{
 
-   /// solves rational LP
-   void _optimizeRational();
-
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
       bool acceptUnbounded,
@@ -2122,8 +2119,8 @@ private:
    //**@name Private solving methods implemented in solvereal.cpp */
    //@{
 
-   /// solves real LP
-   void _optimizeReal();
+   /// solves the templated LP
+   void _optimizeT();
 
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus);

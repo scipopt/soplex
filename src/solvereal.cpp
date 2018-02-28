@@ -26,8 +26,8 @@
 namespace soplex
 {
    /// solves real LP
-  template <class R>
-  void SoPlex<R>::_optimizeReal()
+  template <>
+  void SoPlex<Real>::_optimizeT()
    {
       assert(_realLP != 0);
       assert(_realLP == &_solver);
@@ -38,7 +38,7 @@ namespace soplex
       // start timing
       _statistics->solvingTime->start();
 
-      if( boolParam(SoPlex<R>::PERSISTENTSCALING) )
+      if( boolParam(SoPlex<Real>::PERSISTENTSCALING) )
       {
          // scale original problem; overwriting _realLP
          if( _scaler && !_realLP->isScaled() && _reapplyPersistentScaling() )
@@ -68,7 +68,7 @@ namespace soplex
 
       // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
       // scratch, apply preprocessing according to parameter settings
-      if( !_hasBasis && realParam(SoPlex<R>::OBJLIMIT_LOWER) == -realParam(SoPlex<R>::INFTY) && realParam(SoPlex<R>::OBJLIMIT_UPPER) == realParam(SoPlex<R>::INFTY) )
+      if( !_hasBasis && realParam(SoPlex<Real>::OBJLIMIT_LOWER) == -realParam(SoPlex<Real>::INFTY) && realParam(SoPlex<Real>::OBJLIMIT_UPPER) == realParam(SoPlex<Real>::INFTY) )
          _preprocessAndSolveReal(true);
       else
          _preprocessAndSolveReal(false);
