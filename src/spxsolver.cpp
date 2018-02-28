@@ -330,8 +330,9 @@ namespace soplex
       theCumulativeTime = 0.0;
     }
 
-    template <class R>
-      void SPxSolver<R>::init()
+    /// #temp #template
+    template <>
+      void SPxSolver<Real>::init()
     {
 
       assert(thepricer      != 0);
@@ -342,15 +343,15 @@ namespace soplex
           initialized = true;
           clearUpdateVecs();
           reDim();
-          if (SPxBasis<R>::status() <= SPxBasis<R>::NO_PROBLEM || this->solver() != this)
-            SPxBasis<R>::load(this);
+          if (SPxBasis<Real>::status() <= SPxBasis<Real>::NO_PROBLEM || this->solver() != this)
+            SPxBasis<Real>::load(this);
           initialized = false;
         }
       if (!this->matrixIsSetup)
-        SPxBasis<R>::loadDesc(this->desc());
+        SPxBasis<Real>::loadDesc(this->desc());
 
       // Inna/Tobi: don't "upgrade" a singular basis to a regular one
-      if( SPxBasis<R>::status() == SPxBasis<R>::SINGULAR )
+      if( SPxBasis<Real>::status() == SPxBasis<Real>::SINGULAR )
         return;
 
       // catch pathological case for LPs with zero constraints
@@ -364,14 +365,14 @@ namespace soplex
         {
           try
             {
-              SPxBasis<R>::factorize();
+              SPxBasis<Real>::factorize();
             }
           catch( const SPxException& )
             {
               // reload inital slack basis in case the factorization failed
-              assert(SPxBasis<R>::status() <= SPxBasis<R>::SINGULAR);
-              SPxBasis<R>::restoreInitialBasis();
-              SPxBasis<R>::factorize();
+              assert(SPxBasis<Real>::status() <= SPxBasis<Real>::SINGULAR);
+              SPxBasis<Real>::restoreInitialBasis();
+              SPxBasis<Real>::factorize();
               assert(this->factorized);
             }
         }
@@ -383,12 +384,12 @@ namespace soplex
           if (rep() == COLUMN)
             {
               setPrimalBounds();
-              setBasisStatus(SPxBasis<R>::PRIMAL);
+              setBasisStatus(SPxBasis<Real>::PRIMAL);
             }
           else
             {
               setDualRowBounds();
-              setBasisStatus(SPxBasis<R>::DUAL);
+              setBasisStatus(SPxBasis<Real>::DUAL);
             }
           setEnterBounds();
           computeEnterCoPrhs();
@@ -404,12 +405,12 @@ namespace soplex
           if (rep() == ROW)
             {
               setPrimalBounds();
-              setBasisStatus(SPxBasis<R>::PRIMAL);
+              setBasisStatus(SPxBasis<Real>::PRIMAL);
             }
           else
             {
               setDualColBounds();
-              setBasisStatus(SPxBasis<R>::DUAL);
+              setBasisStatus(SPxBasis<Real>::DUAL);
             }
           setLeaveBounds();
           computeLeaveCoPrhs();
@@ -419,10 +420,10 @@ namespace soplex
           theratiotester->setDelta(leavetol());
         }
 
-      SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
+      SPxBasis<Real>::coSolve(*theCoPvec, *theCoPrhs);
       computePvec();
       computeFrhs();
-      SPxBasis<R>::solve(*theFvec, *theFrhs);
+      SPxBasis<Real>::solve(*theFvec, *theFrhs);
 
       theShift = 0.0;
 
