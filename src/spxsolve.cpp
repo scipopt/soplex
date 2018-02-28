@@ -1745,8 +1745,10 @@ namespace soplex
     return status();
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::getDualfarkas (Vector& p_vector) const
+  /// #template #temp
+  /// There are three getDualFarkas now. getDualFarkasT, getDualFarkas, and getDualfarkas. Wow!
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::getDualfarkas (Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1757,7 +1759,7 @@ namespace soplex
         // return NOT_INIT;
       }
 
-    assert(SPxBasis<R>::status() == SPxBasis<R>::INFEASIBLE);
+    assert(SPxBasis<Real>::status() == SPxBasis<Real>::INFEASIBLE);
     p_vector.clear();
     p_vector = dualFarkas;
 
