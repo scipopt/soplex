@@ -1648,8 +1648,9 @@ namespace soplex
     return status();
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::getDual (Vector& p_vector) const
+  /// #template #temp 
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::getDual (Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1680,8 +1681,9 @@ namespace soplex
     return status();
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::getRedCost (Vector& p_vector) const
+  /// #template #temp
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::getRedCost (Vector& p_vector) const
   {
 
     assert(isInitialized());
