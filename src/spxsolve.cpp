@@ -1597,8 +1597,9 @@ namespace soplex
     return false;
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::getPrimal (Vector& p_vector) const
+  /// #template #temp 
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::getPrimal (Vector& p_vector) const
   {
 
     if (!isInitialized())
@@ -1612,27 +1613,27 @@ namespace soplex
       p_vector = coPvec();
     else
       {
-        const typename SPxBasis<R>::Desc& ds = this->desc();
+        const typename SPxBasis<Real>::Desc& ds = this->desc();
 
         for (int i = 0; i < this->nCols(); ++i)
           {
             switch (ds.colStatus(i))
               {
-              case SPxBasis<R>::Desc::P_ON_LOWER :
+              case SPxBasis<Real>::Desc::P_ON_LOWER :
                 p_vector[i] = SPxLP::lower(i);
                 break;
-              case SPxBasis<R>::Desc::P_ON_UPPER :
-              case SPxBasis<R>::Desc::P_FIXED :
+              case SPxBasis<Real>::Desc::P_ON_UPPER :
+              case SPxBasis<Real>::Desc::P_FIXED :
                 p_vector[i] = SPxLP::upper(i);
                 break;
-              case SPxBasis<R>::Desc::P_FREE :
+              case SPxBasis<Real>::Desc::P_FREE :
                 p_vector[i] = 0;
                 break;
-              case SPxBasis<R>::Desc::D_FREE :
-              case SPxBasis<R>::Desc::D_ON_UPPER :
-              case SPxBasis<R>::Desc::D_ON_LOWER :
-              case SPxBasis<R>::Desc::D_ON_BOTH :
-              case SPxBasis<R>::Desc::D_UNDEFINED :
+              case SPxBasis<Real>::Desc::D_FREE :
+              case SPxBasis<Real>::Desc::D_ON_UPPER :
+              case SPxBasis<Real>::Desc::D_ON_LOWER :
+              case SPxBasis<Real>::Desc::D_ON_BOTH :
+              case SPxBasis<Real>::Desc::D_UNDEFINED :
                 break;
               default:
                 throw SPxInternalCodeException("XSOLVE07 This should never happen.");
