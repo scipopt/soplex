@@ -113,13 +113,22 @@ public:
    }
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualFarkas(VectorBase<R>& vector) const
+   bool getDualFarkas(VectorBase<Real>& vector) const
    {
       if( _hasDualFarkas )
          vector = _dualFarkas;
 
       return _hasDualFarkas;
    }
+
+   bool getDualFarkas(VectorBase<Rational>& vector) const
+   {
+     if( _hasDualFarkas )
+       vector = _dualFarkas;
+
+     return _hasDualFarkas;
+   }
+
 
    /// returns total size of primal solution
    int totalSizePrimal(const int base = 2) const
