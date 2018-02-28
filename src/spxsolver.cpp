@@ -542,11 +542,12 @@ namespace soplex
       isInfeasibleCo.clear();
     }
 
-    template <class R>
-      void SPxSolver<R>::unscaleLPandReloadBasis()
+    /// #template #temp
+    template <>
+      void SPxSolver<Real>::unscaleLPandReloadBasis()
     {
       SPxLPBase<Real>::unscaleLP();
-      SPxBasis<R>::invalidate();
+      SPxBasis<Real>::invalidate();
       unInit();
       init();
     }
