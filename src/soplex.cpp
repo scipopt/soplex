@@ -510,6 +510,16 @@ namespace soplex
   SoPlex<R>::Settings::RationalParam::RationalParam() {}
 #endif
 
+  /// returns boolean parameter value
+  /// #template #temp
+  template <>
+	bool SoPlex<Real>::boolParam(const BoolParam param) const
+  {
+    assert(param >= 0);
+    assert(param < SoPlex<Real>::BOOLPARAM_COUNT);
+    return _currentSettings->_boolParamValues[param];
+  }
+
   template <class R>
   SoPlex<R>::Settings::Settings()
   {
@@ -6182,19 +6192,6 @@ namespace soplex
     ofname = std::string(filename) + ".bas";
     writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
   }
-
-
-
-  /// returns boolean parameter value
-  template <class R>
-	bool SoPlex<R>::boolParam(const BoolParam param) const
-  {
-    assert(param >= 0);
-    assert(param < SoPlex<R>::BOOLPARAM_COUNT);
-    return _currentSettings->_boolParamValues[param];
-  }
-
-
 
   // /// returns integer parameter value
   // // #template #baseclass
