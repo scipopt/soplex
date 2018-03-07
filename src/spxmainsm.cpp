@@ -2165,18 +2165,6 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    int k = row.index(1);
    Real aij = row.value(0);
    Real aik = row.value(1);
-
-   // select variable which appears less often in other constraints to be aggregated
-   if( lp.colVector(k).size() < lp.colVector(j).size() )
-   {
-      int _j = j;
-      Real _aij = aij;
-      j = k;
-      k = _j;
-      aij = aik;
-      aik = _aij;
-   }
-
    Real lower_j = lp.lower(j);
    Real upper_j = lp.upper(j);
    Real lower_k = lp.lower(k);
@@ -2189,28 +2177,69 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    assert(isNotZero(aij, epsZero()) && isNotZero(aik, epsZero()));
 
    MSG_DEBUG( (*spxout) << "IMAISM22 row " << i << ": doubleton equation -> "
-      << aik << " x_" << k << " + " << aij << " x_" << j << " = " << rhs; )
+      << aij << " x_" << j << " + " << aik << " x_" << k << " = " << rhs; )
 
    // determine which variable can be aggregated without requiring bound tightening of the other variable
-   Real new_lo;
-   Real new_up;
+   Real new_lo_j;
+   Real new_up_j;
+   Real new_lo_k;
+   Real new_up_k;
    if( aij * aik < 0.0 )
    {
       // orientation persists
-      new_lo = (upper_j >=  infinity) ? -infinity : (rhs - aij * upper_j) / aik;
-      new_up = (lower_j <= -infinity) ?  infinity : (rhs - aij * lower_j) / aik;
+      new_lo_j = (upper_k >=  infinity) ? -infinity : (rhs - aik * upper_k) / aij;
+      new_up_j = (lower_k <= -infinity) ?  infinity : (rhs - aik * lower_k) / aij;
+      new_lo_k = (upper_j >=  infinity) ? -infinity : (rhs - aij * upper_j) / aik;
+      new_up_k = (lower_j <= -infinity) ?  infinity : (rhs - aij * lower_j) / aik;
    }
    else if( aij * aik > 0.0 )
    {
       // orientation is reversed
-      new_lo = (lower_j <= -infinity) ? -infinity : (rhs - aij * lower_j) / aik;
-      new_up = (upper_j >=  infinity) ?  infinity : (rhs - aij * upper_j) / aik;
+      new_lo_j = (lower_k <= -infinity) ? -infinity : (rhs - aik * lower_k) / aij;
+      new_up_j = (upper_k >=  infinity) ?  infinity : (rhs - aik * upper_k) / aij;
+      new_lo_k = (lower_j <= -infinity) ? -infinity : (rhs - aij * lower_j) / aik;
+      new_up_k = (upper_j >=  infinity) ?  infinity : (rhs - aij * upper_j) / aik;
    }
    else
       throw SPxInternalCodeException("XMAISM12 This should never happen.");
 
-   // avoid bound tightening and numerical issues by swapping the aggregation
-   if( GT(new_lo, lower_k, epsZero()) || LT(new_up, upper_k, epsZero()) )
+   bool flip_jk = false;
+   if( new_lo_j <= -infinity && new_up_j >= infinity )
+   {
+      // no bound tightening on x_j when x_k is aggregated
+      flip_jk = true;
+   }
+   else if( new_lo_k <= -infinity && new_up_k >= infinity )
+   {
+      // no bound tightening on x_k when x_j is aggregated
+      flip_jk = false;
+   }
+   else if( LE(new_lo_j, lower_j) && GE(new_up_j, upper_j) )
+   {
+      if( LE(new_lo_k, lower_k) && GE(new_up_k, upper_k) )
+      {
+         // both variables' bounds are not affected by aggregation; choose the better aggregation coeff (aik/aij)
+         if( spxAbs(aij) > spxAbs(aik) )
+            flip_jk = false;
+         else
+            flip_jk = true;
+      }
+      else
+         flip_jk = false;
+   }
+   else if( LE(new_lo_k, lower_k) && GE(new_up_k, upper_k) )
+   {
+      flip_jk = true;
+   }
+   else
+   {
+      if( spxAbs(aij) > spxAbs(aik) )
+         flip_jk = false;
+      else
+         flip_jk = true;
+   }
+
+   if( flip_jk )
    {
       int _j = j;
       Real _aij = aij;
@@ -2305,13 +2334,13 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    // determine which side has to be used for the bounds comparison below
    if( GT(aik * aij, 0.0, epsZero()) )
    {
-      new_lo = (upper_j >=  infinity) ? -infinity : z1 * scale1 / aik;
-      new_up = (lower_j <= -infinity) ?  infinity : z2 * scale2 / aik;
+      new_lo_k = (upper_j >=  infinity) ? -infinity : z1 * scale1 / aik;
+      new_up_k = (lower_j <= -infinity) ?  infinity : z2 * scale2 / aik;
    }
    else if( LT(aik * aij, 0.0, epsZero()) )
    {
-      new_lo = (lower_j <= -infinity) ? -infinity : z2 * scale2 / aik;
-      new_up = (upper_j >=  infinity) ?  infinity : z1 * scale1 / aik;
+      new_lo_k = (lower_j <= -infinity) ? -infinity : z2 * scale2 / aik;
+      new_up_k = (upper_j >=  infinity) ?  infinity : z1 * scale1 / aik;
    }
    else
       throw SPxInternalCodeException("XMAISM12 This should never happen.");
@@ -2319,15 +2348,15 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    // change bounds of x_k if the new ones are tighter
    Real oldlower_k = lower_k;
    Real oldupper_k = upper_k;
-   if( GT(new_lo, lower_k, epsZero()) )
+   if( GT(new_lo_k, lower_k, epsZero()) )
    {
-      lp.changeLower(k, new_lo);
+      lp.changeLower(k, new_lo_k);
       m_chgBnds++;
    }
 
-   if( LT(new_up, upper_k, epsZero()) )
+   if( LT(new_up_k, upper_k, epsZero()) )
    {
-      lp.changeUpper(k, new_up);
+      lp.changeUpper(k, new_up_k);
       m_chgBnds++;
    }
 
