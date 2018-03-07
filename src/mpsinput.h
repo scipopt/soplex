@@ -176,13 +176,13 @@ public:
    void setProbName(const char* p_probname)
    {
       assert(strlen(p_probname) < MAX_LINE_LEN);
-      strncpy(m_probname, p_probname, MAX_LINE_LEN);
+      spxSnprintf(m_probname, MAX_LINE_LEN, p_probname);
    }
    ///
    void setObjName(const char* p_objname)
    {
       assert(strlen(p_objname) < MAX_LINE_LEN);
-      strncpy(m_objname, p_objname, MAX_LINE_LEN);
+      spxSnprintf(m_objname, MAX_LINE_LEN, p_objname);
    }
    ///
    void setObjSense(Sense sense)

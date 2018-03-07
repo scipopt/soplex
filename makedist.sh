@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="3.1.0.3"
+VERSION="3.1.1.3"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
@@ -26,7 +26,7 @@ tar -cvzhf $NAME.tgz \
 --exclude="*/local/*" \
 --exclude="TODO" \
 $NAME/COPYING \
-$NAME/INSTALL \
+$NAME/INSTALL.md \
 $NAME/CHANGELOG \
 $NAME/Makefile \
 $NAME/check/check.awk \

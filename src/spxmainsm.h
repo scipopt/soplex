@@ -111,8 +111,15 @@ private:
       /// clone function for polymorphism
       virtual PostStep* clone() const = 0;
       /// executes the postsolving.
-      virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const = 0;
+      virtual void execute(
+        DVector& x,                                 //*< Primal solution vector */
+        DVector& y,                                 //*< Dual solution vector */
+        DVector& s,                                 //*< Vector of slacks */
+        DVector& r,                                 //*< Reduced cost vector */
+        DataArray<SPxSolver::VarStatus>& cBasis,    //*< Basis status of column basis */
+        DataArray<SPxSolver::VarStatus>& rBasis,    //*< Basis status of row basis */
+        bool isOptimal
+        ) const = 0;
 
       virtual bool checkBasisDim(DataArray<SPxSolver::VarStatus> rows,  DataArray<SPxSolver::VarStatus> cols) const;
 

@@ -151,7 +151,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
-            MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without simplifying" << std::endl; )
+            MSG_INFO1( spxout, spxout << "encountered singularity - trying to solve again without simplifying" << std::endl; )
             _preprocessAndSolveReal(false);
             return;
          }
@@ -162,7 +162,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
-            MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without simplifying" << std::endl; )
+            MSG_INFO1( spxout, spxout << "encountered cycling - trying to solve again without simplifying" << std::endl; )
             _preprocessAndSolveReal(false);
             return;
          }

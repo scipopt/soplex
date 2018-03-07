@@ -42,7 +42,7 @@
 
 namespace soplex
 {
-#define SOPLEX_VERSION         310
+#define SOPLEX_VERSION         311
 #define SOPLEX_SUBVERSION        3
 #define SOPLEX_APIVERSION        1
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2018 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
@@ -463,7 +463,7 @@ inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
 /// safe version of snprintf
 inline int spxSnprintf(
    char*                 t,                  /**< target string */
-   int                   len,                /**< length of the string to copy */
+   size_t                len,                /**< length of the string to copy */
    const char*           s,                  /**< source string */
    ...                                       /**< further parameters */
    )
@@ -477,13 +477,13 @@ inline int spxSnprintf(
    va_start(ap, s); /*lint !e826*/
 
 #if defined(_WIN32) || defined(_WIN64)
-   n = _vsnprintf(t, (size_t) len, s, ap);
+   n = _vsnprintf(t, len, s, ap);
 #else
-   n = vsnprintf(t, (size_t) len, s, ap); /*lint !e571*/
+   n = vsnprintf(t, len, s, ap); /*lint !e571*/
 #endif
    va_end(ap);
 
-   if( n < 0 || n >= len )
+   if( n < 0 || (size_t) n >= len )
    {
 #ifndef NDEBUG
       if( n < 0 )
@@ -492,7 +492,7 @@ inline int spxSnprintf(
       }
 #endif
       t[len-1] = '\0';
-      n = len-1;
+      n = (int) len-1;
    }
    return n;
 }

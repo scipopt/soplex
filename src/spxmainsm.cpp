@@ -717,7 +717,12 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
 
    if (rStatus[m_i] == SPxSolver::ON_LOWER)
    {
-      if ( m_lower == m_upper )
+      if ( m_lower <= -infinity && m_upper >= infinity )
+      {
+         x[m_j] = 0.0;
+         cStatus[m_j] = SPxSolver::ZERO;
+      }
+      else if ( m_lower == m_upper )
       {
          x[m_j]       = m_lower;
          cStatus[m_j] = SPxSolver::FIXED;
@@ -737,7 +742,12 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    }
    else if (rStatus[m_i] == SPxSolver::ON_UPPER)
    {
-      if ( m_lower == m_upper )
+      if ( m_lower <= -infinity && m_upper >= infinity )
+      {
+         x[m_j] = 0.0;
+         cStatus[m_j] = SPxSolver::ZERO;
+      }
+      else if ( m_lower == m_upper )
       {
          x[m_j]       = m_lower;
          cStatus[m_j] = SPxSolver::FIXED;
@@ -757,10 +767,18 @@ void SPxMainSM::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& 
    }
    else if (rStatus[m_i] == SPxSolver::FIXED)
    {
-      assert(EQrel(m_lower, m_upper));
+      if ( m_lower <= -infinity && m_upper >= infinity )
+      {
+         x[m_j] = 0.0;
+         cStatus[m_j] = SPxSolver::ZERO;
+      }
+      else
+      {
+         assert(EQrel(m_lower, m_upper));
 
-      x[m_j]        = m_lower;
-      cStatus[m_j]  = SPxSolver::FIXED;
+         x[m_j]        = m_lower;
+         cStatus[m_j]  = SPxSolver::FIXED;
+      }
    }
    else if (rStatus[m_i] == SPxSolver::BASIC)
    {

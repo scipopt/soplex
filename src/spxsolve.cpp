@@ -70,6 +70,63 @@ bool SPxSolver::precisionReached(Real& newpricertol) const
    return reached;
 }
 
+void SPxSolver::calculateProblemRanges()
+{
+   // only collect absolute values
+   Real minobj = infinity;
+   Real maxobj = 0.0;
+   Real minbound = infinity;
+   Real maxbound = 0.0;
+   Real minside = infinity;
+   Real maxside = 0.0;
+
+   // get min and max absolute values of bounds and objective
+   for( int j = 0; j < nCols(); ++j )
+   {
+      Real abslow = spxAbs(lower(j));
+      Real absupp = spxAbs(lower(j));
+      Real absobj = spxAbs(obj(j));
+
+      if( abslow < infinity )
+      {
+         minbound = MINIMUM(minbound, abslow);
+         maxbound = MAXIMUM(maxbound, abslow);
+      }
+
+      if( absupp < infinity)
+      {
+         minbound = MINIMUM(minbound, absupp);
+         maxbound = MAXIMUM(maxbound, absupp);
+      }
+
+      minobj = MINIMUM(minobj, absobj);
+      maxobj = MAXIMUM(maxobj, absobj);
+   }
+
+   // get min and max absoute values of sides
+   for( int i = 0; i < nRows(); ++i )
+   {
+      Real abslhs = spxAbs(lhs(i));
+      Real absrhs = spxAbs(rhs(i));
+
+      if(  abslhs > infinity )
+      {
+         minside = MINIMUM(minside, abslhs);
+         maxside = MAXIMUM(maxside, abslhs);
+      }
+
+      if(  absrhs < infinity )
+      {
+         minside = MINIMUM(minside, absrhs);
+         maxside = MAXIMUM(maxside, absrhs);
+      }
+   }
+
+   boundrange = maxbound - minbound;
+   siderange = maxside - minside;
+   objrange = maxobj - minobj;
+}
+
 SPxSolver::Status SPxSolver::solve()
 {
 
@@ -502,6 +559,31 @@ SPxSolver::Status SPxSolver::solve()
                   m_status = OPTIMAL;
                   break;
                }
+               else if( loopCount > 2 )
+               {
+                  // calculate problem ranges if not done already
+                  if( boundrange == 0.0 || siderange == 0.0 || objrange == 0.0 )
+                     calculateProblemRanges();
+
+                  if( MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 )
+                  {
+                     SPxOut::setScientific(spxout->getCurrentStream(), 0);
+                     MSG_INFO1( (*spxout), (*spxout) << " --- termination despite violations (numerical difficulties,"
+                           << " bound range = " << boundrange
+                           << ", side range = " << siderange
+                           << ", obj range = " << objrange
+                           << ")" << std::endl; )
+                     setBasisStatus(SPxBasis::OPTIMAL);
+                     m_status = OPTIMAL;
+                     break;
+                  }
+                  else
+                  {
+                     m_status = ABORT_CYCLING;
+                     throw SPxStatusException("XSOLVE14 Abort solving due to looping");
+                  }
+               }
+               loopCount++;
             }
             setType(LEAVE);
             init();
@@ -797,16 +879,35 @@ SPxSolver::Status SPxSolver::solve()
                // We stop if we are indeed optimal, or if we have already been
                // two times at this place. In this case it seems futile to
                // continue.
-               if (loopCount > 2)
-               {
-                  m_status = ABORT_CYCLING;
-                  throw SPxStatusException("XSOLVE14 Abort solving due to looping");
-               }
-               else if (priced && maxinfeas + shift() <= leavetol())
+               if (priced && maxinfeas + shift() <= leavetol())
                {
                   setBasisStatus(SPxBasis::OPTIMAL);
                   m_status = OPTIMAL;
                   break;
+               }
+               else if (loopCount > 2)
+               {
+                  // calculate problem ranges if not done already
+                  if( boundrange == 0.0 || siderange == 0.0 || objrange == 0.0 )
+                     calculateProblemRanges();
+
+                  if( MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 )
+                  {
+                     SPxOut::setScientific(spxout->getCurrentStream(), 0);
+                     MSG_INFO1( (*spxout), (*spxout) << " --- termination despite violations (numerical difficulties,"
+                           << " bound range = " << boundrange
+                           << ", side range = " << siderange
+                           << ", obj range = " << objrange
+                           << ")" << std::endl; )
+                     setBasisStatus(SPxBasis::OPTIMAL);
+                     m_status = OPTIMAL;
+                     break;
+                  }
+                  else
+                  {
+                     m_status = ABORT_CYCLING;
+                     throw SPxStatusException("XSOLVE14 Abort solving due to looping");
+                  }
                }
                loopCount++;
             }
@@ -1037,8 +1138,8 @@ void SPxSolver::performSolutionPolishing()
       setType(ENTER); // use primal simplex to preserve feasibility
       init();
 #ifndef NDEBUG
-      // allow a tiny relative deviation from the original values
-      Real alloweddeviation = epsilon() * 1e2;
+      // allow a small relative deviation from the original values
+      Real alloweddeviation = entertol();
       Real origval = value();
       Real origshift = shift();
 #endif
@@ -1186,8 +1287,8 @@ void SPxSolver::performSolutionPolishing()
       setType(LEAVE); // use primal simplex to preserve feasibility
       init();
 #ifndef NDEBUG
-      // allow a tiny relative deviation from the original values
-      Real alloweddeviation = epsilon() * 1e2;
+      // allow a small relative deviation from the original values
+      Real alloweddeviation = leavetol();
       Real origval = value();
       Real origshift = shift();
 #endif
