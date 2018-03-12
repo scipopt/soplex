@@ -2170,6 +2170,7 @@ SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& ro
    return OKAY;
 }
 
+/// aggregate variable x_j to x_j = (rhs - aik * x_k) / aij from row i: aij * x_j + aik * x_k = rhs
 SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, int& i)
 {
    assert(row.size() == 2);
@@ -2178,7 +2179,6 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    Real rhs = lp.rhs(i);
    assert(rhs < infinity && rhs > -infinity);
 
-   // x_j is supposed to be aggregated to x_j = (rhs - aik * x_k) / aij
    int j = row.index(0);
    int k = row.index(1);
    Real aij = row.value(0);
