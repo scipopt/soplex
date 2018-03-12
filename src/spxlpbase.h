@@ -1309,6 +1309,7 @@ public:
    /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
    virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
    {
+      assert(scale == false);
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
       assert(isConsistent());
@@ -1345,6 +1346,7 @@ public:
    /// Changes vector of lower bounds to \p newLower. \p scale determines whether the new data should be scaled
    virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
    {
+      assert(scale == false);
       assert(lower().dim() == newLower.dim());
       LPColSetBase<R>::lower_w() = newLower;
       assert(isConsistent());
@@ -1381,6 +1383,7 @@ public:
    /// Changes vector of upper bounds to \p newUpper. \p scale determines whether the new data should be scaled
    virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
    {
+      assert(scale == false);
       assert(upper().dim() == newUpper.dim());
       LPColSetBase<R>::upper_w() = newUpper;
       assert(isConsistent());
@@ -1448,6 +1451,7 @@ public:
    /// Changes left hand side vector for constraints to \p newLhs. \p scale determines whether the new data should be scaled
    virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
    {
+      assert(scale == false);
       assert(lhs().dim() == newLhs.dim());
       LPRowSetBase<R>::lhs_w() = newLhs;
       assert(isConsistent());
@@ -1457,7 +1461,11 @@ public:
    virtual void changeLhs(int i, const R& newLhs, bool scale = false)
    {
       if( scale && newLhs > -infinity )
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
          LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs);
+      }
       else
          LPRowSetBase<R>::lhs_w(i) = newLhs;
       assert(isConsistent());
@@ -1480,6 +1488,7 @@ public:
    /// Changes right hand side vector for constraints to \p newRhs. \p scale determines whether the new data should be scaled
    virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
    {
+      assert(scale == false);
       assert(rhs().dim() == newRhs.dim());
       LPRowSetBase<R>::rhs_w() = newRhs;
       assert(isConsistent());
@@ -1489,7 +1498,11 @@ public:
    virtual void changeRhs(int i, const R& newRhs, bool scale = false)
    {
       if( scale && newRhs < infinity )
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
          LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs);
+      }
       else
          LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
@@ -2666,6 +2679,148 @@ public:
 
    //@}
 };
+
+
+// Declaration of Real specializations found in spxlpbase_real.cpp
+
+template <>
+void SPxLPBase<Real>::unscaleLP();
+
+template <>
+void SPxLPBase<Real>::computePrimalActivity(const VectorBase<Real>& primal, VectorBase<Real>& activity, const bool unscaled) const;
+
+template <>
+void SPxLPBase<Real>::computeDualActivity(const VectorBase<Real>& dual, VectorBase<Real>& activity, const bool unscaled) const;
+
+template <>
+Real SPxLPBase<Real>::maxAbsNzo(bool unscaled) const;
+
+template <>
+Real SPxLPBase<Real>::minAbsNzo(bool unscaled) const;
+
+template <>
+void SPxLPBase<Real>::getObjUnscaled(VectorBase<Real>& pobj) const;
+
+template <>
+void SPxLPBase<Real>::getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+
+template <>
+void SPxLPBase<Real>::getRhsUnscaled(VectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::rhsUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::rhsUnscaled(const SPxRowId& id) const;
+
+template <>
+void SPxLPBase<Real>::getLhsUnscaled(VectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::lhsUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::lhsUnscaled(const SPxRowId& id) const;
+
+template <>
+void SPxLPBase<Real>::getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+
+template <>
+void SPxLPBase<Real>::getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::objUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::objUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::maxObjUnscaled(VectorBase<Real>& vec) const;
+
+template <>
+Real SPxLPBase<Real>::maxObjUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::getUpperUnscaled(DVector& vec) const;
+
+template <>
+Real SPxLPBase<Real>::upperUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::getLowerUnscaled(DVector& vec) const;
+
+template <>
+Real SPxLPBase<Real>::lowerUnscaled(int i) const;
+
+template <>
+Real SPxLPBase<Real>::lowerUnscaled(const SPxColId& id) const;
+
+template <>
+void SPxLPBase<Real>::changeMaxObj(const VectorBase<Real>& newObj, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeLower(const VectorBase<Real>& newLower, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeUpper(const VectorBase<Real>& newUpper, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeLhs(const VectorBase<Real>& newLhs, bool scale);
+
+template <>
+void SPxLPBase<Real>::changeRhs(const VectorBase<Real>& newRhs, bool scale);
+
+template <>
+bool SPxLPBase<Real>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+bool SPxLPBase<Real>::readMPS(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+void SPxLPBase<Real>::writeLPF(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Real>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
+
+#ifndef SOPLEX_LEGACY
+// Declaration of Rational specializations found in spxlpbase_rational.cpp
+
+template <>
+void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity, const bool unscaled) const;
+
+template <>
+void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, VectorBase<Rational>& activity, const bool unscaled) const;
+
+template <>
+Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const;
+
+template <>
+Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const;
+
+template <>
+bool SPxLPBase<Rational>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+bool SPxLPBase<Rational>::readMPS(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
+
+template <>
+void SPxLPBase<Rational>::writeLPF(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Rational>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
+
+template <>
+void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
+#endif
 
 } // namespace soplex
 
