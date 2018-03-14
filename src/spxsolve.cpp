@@ -1726,8 +1726,9 @@ namespace soplex
     return status();
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::getPrimalray (Vector& p_vector) const
+  /// #template #baseclass
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::getPrimalray (Vector& p_vector) const
   {
 
     assert(isInitialized());
