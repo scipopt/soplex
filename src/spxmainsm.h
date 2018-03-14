@@ -1037,6 +1037,85 @@ private:
                            DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
    };
 
+   /**@brief   Postsolves aggregation.
+      @ingroup Algo
+   */
+   class AggregationPS : public PostStep
+   {
+   private:
+      const int  m_j;
+      const int  m_i;
+      const int  m_old_j;
+      const int  m_old_i;
+      const Real m_upper;
+      const Real m_lower;
+      const Real m_obj;
+      const Real m_oldupper;
+      const Real m_oldlower;
+      const Real m_rhs;
+      DSVector   m_row;
+      DSVector   m_col;
+
+   public:
+      ///
+      AggregationPS(const SPxLP& lp, int _i, int _j, Real rhs, Real oldupper, Real oldlower)
+         : PostStep("Aggregation", lp.nRows(), lp.nCols())
+         , m_j(_j)
+         , m_i(_i)
+         , m_old_j(lp.nCols()-1)
+         , m_old_i(lp.nRows()-1)
+         , m_upper(lp.upper(_j))
+         , m_lower(lp.lower(_j))
+         , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
+         , m_oldupper(oldupper)
+         , m_oldlower(oldlower)
+         , m_rhs(rhs)
+         , m_row(lp.rowVector(_i))
+         , m_col(lp.colVector(_j))
+      {
+         assert(m_row[m_j] != 0.0);
+      }
+      /// copy constructor
+      AggregationPS(const AggregationPS& old)
+         : PostStep(old)
+         , m_j(old.m_j)
+         , m_i(old.m_i)
+         , m_old_j(old.m_old_j)
+         , m_old_i(old.m_old_i)
+         , m_upper(old.m_upper)
+         , m_lower(old.m_lower)
+         , m_obj(old.m_obj)
+         , m_oldupper(old.m_oldupper)
+         , m_oldlower(old.m_oldlower)
+         , m_rhs(old.m_rhs)
+         , m_row(old.m_row)
+         , m_col(old.m_col)
+      {}
+      /// assignment operator
+      AggregationPS& operator=( const AggregationPS& rhs)
+      {
+         if(this != &rhs)
+         {
+            PostStep::operator=(rhs);
+            m_row = rhs.m_row;
+            m_col = rhs.m_col;
+         }
+
+         return *this;
+      }
+      /// clone function for polymorphism
+      inline virtual PostStep* clone() const
+      {
+         AggregationPS* AggregationPSptr = 0;
+         spx_alloc(AggregationPSptr);
+         return new (AggregationPSptr) AggregationPS(*this);
+      }
+      ///
+      virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
+                           DataArray<SPxSolver::VarStatus>& cBasis,
+                           DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+   };
+
    /**@brief   Postsolves multi aggregation.
       @ingroup Algo
    */
@@ -1171,6 +1250,7 @@ private:
    friend class DoubletonEquationPS;
    friend class DuplicateRowsPS;
    friend class DuplicateColsPS;
+   friend class AggregationPS;
 
 private:
    //------------------------------------
@@ -1194,7 +1274,8 @@ private:
       DUPLICATE_ROW        = 12,
       FIX_DUPLICATE_COL    = 13,
       SUB_DUPLICATE_COL    = 14,
-      MULTI_AGG            = 15
+      AGGREGATION          = 15,
+      MULTI_AGG            = 16
    };
    //@}
 
@@ -1260,6 +1341,9 @@ private:
    /// remove row singletons.
    Result removeRowSingleton(SPxLP& lp, const SVector& row, int& i);
 
+   /// aggregate two variables that appear in an equation.
+   Result aggregateVars(SPxLP& lp, const SVector& row, int& i);
+
    /// performs simplification steps on the rows of the LP.
    Result simplifyRows(SPxLP& lp, bool& again);
 
@@ -1303,6 +1387,10 @@ private:
    {
       return m_cIdx[j];
    }
+   //@}
+
+protected:
+
    ///
    Real epsZero() const
    {
@@ -1318,7 +1406,6 @@ private:
    {
       return m_opttol;
    }
-   //@}
 
 public:
 

@@ -191,7 +191,7 @@ bool SPxBasis::isDescValid(const Desc& ds)
               || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLP::upper(col) >= infinity)
               || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLP::lower(col) <= -infinity) )
          {
-            MSG_DEBUG( std::cout << "IBASIS24 Nonbasic column with incorrect status: lower=" << theLP->SPxLP::lower(col) << ", upper=" << theLP->SPxLP::upper(col) << ", stat=" << ds.colstat[col] << "\n");
+            MSG_DEBUG( std::cout << "IBASIS24 Nonbasic column " << col << " with incorrect status: lower=" << theLP->SPxLP::lower(col) << ", upper=" << theLP->SPxLP::upper(col) << ", stat=" << ds.colstat[col] << "\n");
             return false;
          }
       }

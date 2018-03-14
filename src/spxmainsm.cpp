@@ -30,6 +30,7 @@
 #define FREE_CONSTRAINT         1
 #define EMPTY_CONSTRAINT        1
 #define ROW_SINGLETON           1
+#define AGGREGATE_VARS          1
 #define FORCE_CONSTRAINT        1
 //cols
 #define FREE_BOUNDS             1
@@ -1278,6 +1279,99 @@ void SPxMainSM::DuplicateColsPS::execute(DVector& x,
    r[m_j] = m_scale * r[m_k];
 }
 
+void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
+                                       DataArray<SPxSolver::VarStatus>& cStatus,
+                                       DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
+{
+   // correcting the change of idx by deletion of the row:
+   s[m_old_i] = s[m_i];
+   y[m_old_i] = y[m_i];
+   rStatus[m_old_i] = rStatus[m_i];
+
+   // correcting the change of idx by deletion of the column:
+   x[m_old_j] = x[m_j];
+   r[m_old_j] = r[m_j];
+   cStatus[m_old_j] = cStatus[m_j];
+
+   // primal:
+   Real val = 0.0;
+   Real aij = m_row[m_j];
+   int active_idx = -1;
+
+   assert(m_row.size() == 2);
+   for( int k = 0; k < 2; ++k )
+   {
+      if( m_row.index(k) != m_j )
+      {
+         active_idx = m_row.index(k);
+         val = m_row.value(k) * x[active_idx];
+      }
+   }
+
+   assert(active_idx >= 0);
+
+   Real scale = maxAbs(m_rhs, val);
+
+   if (scale < 1.0)
+      scale = 1.0;
+
+   Real z = (m_rhs / scale) - (val / scale);
+
+   if (isZero(z))
+      z = 0.0;
+
+   x[m_j] = z * scale / aij;
+   s[m_i] = 0.0;
+
+   assert(!isOptimal || (GE(x[m_j], m_lower, eps()) && LE(x[m_j], m_upper, eps())));
+
+   // dual:
+   Real dualVal = 0.0;
+
+   for(int k = 0; k < m_col.size(); ++k)
+   {
+      if(m_col.index(k) != m_i)
+         dualVal += m_col.value(k) * y[m_col.index(k)];
+   }
+
+   z = m_obj - dualVal;
+
+   y[m_i] = z / aij;
+   r[m_j] = 0.0;
+
+   // basis:
+   if( ((cStatus[active_idx] == SPxSolver::ON_UPPER || cStatus[active_idx] == SPxSolver::FIXED)
+         && NE(x[active_idx], m_oldupper, eps())) ||
+         ((cStatus[active_idx] == SPxSolver::ON_LOWER || cStatus[active_idx] == SPxSolver::FIXED)
+         && NE(x[active_idx], m_oldlower, eps()))  )
+   {
+      cStatus[active_idx] = SPxSolver::BASIC;
+      r[active_idx] = 0.0;
+      assert(NE(m_upper, m_lower, eps()));
+      if( EQ(x[m_j], m_upper, eps()) )
+         cStatus[m_j] = SPxSolver::ON_UPPER;
+      else if( EQ(x[m_j], m_lower, eps()) )
+         cStatus[m_j] = SPxSolver::ON_LOWER;
+      else if( m_upper >= infinity && m_lower <= -infinity )
+         cStatus[m_j] = SPxSolver::ZERO;
+      else
+         throw SPxInternalCodeException("XMAISM unexpected basis status in aggregation unsimplifier.");
+   }
+   else
+   {
+      cStatus[m_j] = SPxSolver::BASIC;
+   }
+
+   rStatus[m_i] = SPxSolver::FIXED;
+
+#ifdef CHECK_BASIC_DIM
+   if (!checkBasisDim(rStatus, cStatus))
+   {
+      throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
+   }
+#endif
+}
+
 void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
                                             DataArray<SPxSolver::VarStatus>& cStatus,
                                             DataArray<SPxSolver::VarStatus>& rStatus, bool isOptimal) const
@@ -2076,6 +2170,230 @@ SPxSimplifier::Result SPxMainSM::removeRowSingleton(SPxLP& lp, const SVector& ro
    return OKAY;
 }
 
+/// aggregate variable x_j to x_j = (rhs - aik * x_k) / aij from row i: aij * x_j + aik * x_k = rhs
+SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, int& i)
+{
+   assert(row.size() == 2);
+   assert(EQrel(lp.lhs(i), lp.rhs(i), feastol()));
+
+   Real rhs = lp.rhs(i);
+   assert(rhs < infinity && rhs > -infinity);
+
+   int j = row.index(0);
+   int k = row.index(1);
+   Real aij = row.value(0);
+   Real aik = row.value(1);
+   Real lower_j = lp.lower(j);
+   Real upper_j = lp.upper(j);
+   Real lower_k = lp.lower(k);
+   Real upper_k = lp.upper(k);
+
+   // fixed variables should be removed by simplifyCols()
+   if( EQrel(lower_j, upper_j, feastol()) || EQrel(lower_k, upper_k, feastol()) )
+      return OKAY;
+
+   assert(isNotZero(aij, epsZero()) && isNotZero(aik, epsZero()));
+
+   MSG_DEBUG( (*spxout) << "IMAISM22 row " << i << ": doubleton equation -> "
+      << aij << " x_" << j << " + " << aik << " x_" << k << " = " << rhs; )
+
+   // determine which variable can be aggregated without requiring bound tightening of the other variable
+   Real new_lo_j;
+   Real new_up_j;
+   Real new_lo_k;
+   Real new_up_k;
+   if( aij * aik < 0.0 )
+   {
+      // orientation persists
+      new_lo_j = (upper_k >=  infinity) ? -infinity : (rhs - aik * upper_k) / aij;
+      new_up_j = (lower_k <= -infinity) ?  infinity : (rhs - aik * lower_k) / aij;
+      new_lo_k = (upper_j >=  infinity) ? -infinity : (rhs - aij * upper_j) / aik;
+      new_up_k = (lower_j <= -infinity) ?  infinity : (rhs - aij * lower_j) / aik;
+   }
+   else if( aij * aik > 0.0 )
+   {
+      // orientation is reversed
+      new_lo_j = (lower_k <= -infinity) ? -infinity : (rhs - aik * lower_k) / aij;
+      new_up_j = (upper_k >=  infinity) ?  infinity : (rhs - aik * upper_k) / aij;
+      new_lo_k = (lower_j <= -infinity) ? -infinity : (rhs - aij * lower_j) / aik;
+      new_up_k = (upper_j >=  infinity) ?  infinity : (rhs - aij * upper_j) / aik;
+   }
+   else
+      throw SPxInternalCodeException("XMAISM12 This should never happen.");
+
+   bool flip_jk = false;
+   if( new_lo_j <= -infinity && new_up_j >= infinity )
+   {
+      // no bound tightening on x_j when x_k is aggregated
+      flip_jk = true;
+   }
+   else if( new_lo_k <= -infinity && new_up_k >= infinity )
+   {
+      // no bound tightening on x_k when x_j is aggregated
+      flip_jk = false;
+   }
+   else if( LE(new_lo_j, lower_j) && GE(new_up_j, upper_j) )
+   {
+      if( LE(new_lo_k, lower_k) && GE(new_up_k, upper_k) )
+      {
+         // both variables' bounds are not affected by aggregation; choose the better aggregation coeff (aik/aij)
+         if( spxAbs(aij) > spxAbs(aik) )
+            flip_jk = false;
+         else
+            flip_jk = true;
+      }
+      else
+         flip_jk = false;
+   }
+   else if( LE(new_lo_k, lower_k) && GE(new_up_k, upper_k) )
+   {
+      flip_jk = true;
+   }
+   else
+   {
+      if( spxAbs(aij) > spxAbs(aik) )
+         flip_jk = false;
+      else
+         flip_jk = true;
+   }
+
+   if( flip_jk )
+   {
+      int _j = j;
+      Real _aij = aij;
+      Real _lower_j = lower_j;
+      Real _upper_j = upper_j;
+      j = k;
+      k = _j;
+      aij = aik;
+      aik = _aij;
+      lower_j = lower_k;
+      lower_k = _lower_j;
+      upper_j = upper_k;
+      upper_k = _upper_j;
+   }
+
+   const SVector& col_j = lp.colVector(j);
+   const SVector& col_k = lp.colVector(k);
+
+   // aggregation coefficients (x_j = aggr_coef * x_k + aggr_const)
+   Real aggr_coef = - (aik / aij);
+   Real aggr_const = rhs / aij;
+
+   MSG_DEBUG( (*spxout) << " removed, replacing x_" << j << " with "
+      << aggr_const << " + " << aggr_coef << " * x_" << k << std::endl; )
+
+   // replace all occurrences of x_j
+   for( int r = 0; r < col_j.size(); ++r )
+   {
+      int row_r = col_j.index(r);
+      Real arj = col_j.value(r);
+
+      // skip row i
+      if( row_r == i )
+         continue;
+
+      // adapt sides of row r
+      Real lhs_r = lp.lhs(row_r);
+      Real rhs_r = lp.rhs(row_r);
+      if( lhs_r > -infinity )
+      {
+         lp.changeLhs(row_r, lhs_r - aggr_const * arj);
+         m_chgLRhs++;
+      }
+      if( rhs_r < infinity )
+      {
+         lp.changeRhs(row_r, rhs_r - aggr_const * arj);
+         m_chgLRhs++;
+      }
+
+      Real newcoef = aggr_coef * arj;
+      int pos_rk = col_k.pos(row_r);
+
+      // check whether x_k is also present in row r and get its coefficient
+      if( pos_rk >= 0 )
+      {
+         Real ark = col_k.value(pos_rk);
+         newcoef += ark;
+         m_remNzos++;
+      }
+
+      // add new column k to row r or adapt the coefficient a_rk
+      lp.changeElement(row_r, k, newcoef);
+   }
+
+   // adapt objective function
+   Real obj_j = (m_thesense == SPxLP::MINIMIZE) ? lp.obj(j) : -lp.obj(j);
+   if( isNotZero(obj_j, epsZero()) )
+   {
+      addObjoffset(aggr_const * obj_j);
+      Real obj_k = lp.obj(k);
+      lp.changeObj(k, obj_k + aggr_coef * obj_j);
+   }
+
+   // adapt bounds of x_k
+   Real scale1 = maxAbs(rhs, aij * upper_j);
+   Real scale2 = maxAbs(rhs, aij * lower_j);
+
+   if( scale1 < 1.0 )
+      scale1 = 1.0;
+   if( scale2 < 1.0 )
+      scale2 = 1.0;
+
+   Real z1 = (rhs / scale1) - (aij * upper_j / scale1);
+   Real z2 = (rhs / scale2) - (aij * lower_j / scale2);
+
+   // just some rounding
+   if( isZero(z1, epsZero()) )
+      z1 = 0.0;
+   if( isZero(z2, epsZero()) )
+      z2 = 0.0;
+
+   // determine which side has to be used for the bounds comparison below
+   if( GT(aik * aij, 0.0, epsZero()) )
+   {
+      new_lo_k = (upper_j >=  infinity) ? -infinity : z1 * scale1 / aik;
+      new_up_k = (lower_j <= -infinity) ?  infinity : z2 * scale2 / aik;
+   }
+   else if( LT(aik * aij, 0.0, epsZero()) )
+   {
+      new_lo_k = (lower_j <= -infinity) ? -infinity : z2 * scale2 / aik;
+      new_up_k = (upper_j >=  infinity) ?  infinity : z1 * scale1 / aik;
+   }
+   else
+      throw SPxInternalCodeException("XMAISM12 This should never happen.");
+
+   // change bounds of x_k if the new ones are tighter
+   Real oldlower_k = lower_k;
+   Real oldupper_k = upper_k;
+   if( GT(new_lo_k, lower_k, epsZero()) )
+   {
+      lp.changeLower(k, new_lo_k);
+      m_chgBnds++;
+   }
+
+   if( LT(new_up_k, upper_k, epsZero()) )
+   {
+      lp.changeUpper(k, new_up_k);
+      m_chgBnds++;
+   }
+
+   AggregationPS* AggregationPSptr = 0;
+   spx_alloc(AggregationPSptr);
+   m_hist.append(new (AggregationPSptr) AggregationPS(lp, i, j, rhs, oldupper_k, oldlower_k));
+
+   removeRow(lp, i);
+   removeCol(lp, j);
+
+   m_remRows++;
+   m_remCols++;
+   m_remNzos += 2;
+
+   ++m_stat[AGGREGATION];
+
+   return OKAY;
+}
+
 SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
 {
 
@@ -2088,7 +2406,8 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
    // 4. remove unconstrained constraints
    // 5. remove empty constraints
    // 6. remove row singletons and tighten the corresponding variable bounds if necessary
-   // 7. detect forcing rows and fix the corresponding variables
+   // 7. remove doubleton equation, aka aggregation
+   // 8. detect forcing rows and fix the corresponding variables
 
    int remRows = 0;
    int remNzos = 0;
@@ -2496,8 +2815,17 @@ SPxSimplifier::Result SPxMainSM::simplifyRows(SPxLP& lp, bool& again)
       }
 #endif
 
+#if AGGREGATE_VARS
+      // 7. row doubleton, aka. simple aggregation of two variables in an equation
+      if( row.size() == 2 && EQrel(lp.lhs(i), lp.rhs(i), feastol()) )
+      {
+         aggregateVars(lp, row, i);
+         continue;
+      }
+#endif
+
 #if FORCE_CONSTRAINT
-      // 7. forcing constraint (postsolving)
+      // 8. forcing constraint (postsolving)
       // fix variables to obtain the upper bound on constraint value
       if (rhsCnt == 0 && EQrel(rhsBnd, lp.lhs(i), feastol()))
       {
@@ -2623,7 +2951,7 @@ SPxSimplifier::Result SPxMainSM::simplifyCols(SPxLP& lp, bool& again)
    //    and fix corresponding variables or remove involved constraints
    // 3. fix variables
    // 4. use column singleton variables with zero objective to adjust constraint bounds
-   // 5. free column singleton combined with doubleton equation are
+   // 5. (not free) column singleton combined with doubleton equation are
    //    used to make the column singleton variable free
    // 6. substitute (implied) free column singletons
 
@@ -3458,8 +3786,6 @@ SPxSimplifier::Result SPxMainSM::multiaggregation(SPxLP& lp, bool& again)
          int maxOtherLocks;
          int bestpos = -1;
          bool bestislhs = true;
-
-
 
          for(int k = 0; k < col.size(); ++k)
          {
@@ -4473,6 +4799,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    m_result     = OKAY;
    bool   again = true;
+   int nrounds = 0;
 
    if(m_hist.size() > 0)
    {
@@ -4519,7 +4846,7 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                 << std::endl;
    )
 
-   m_stat.reSize(16);
+   m_stat.reSize(17);
 
    for(int k = 0; k < m_stat.size(); ++k)
       m_stat[k] = 0;
@@ -4557,6 +4884,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    // main presolving loop
    while(again && m_result == OKAY)
    {
+      nrounds++;
+      MSG_INFO3((*spxout), (*spxout) << "Round " << nrounds << ":" << std::endl; )
       again = false;
 
 #if ROWS
@@ -4599,8 +4928,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
          m_result = multiaggregation(lp, again);
 #endif
       }
-
    }
+   MSG_INFO3((*spxout), (*spxout) << "Simplification finished" << std::endl; )
 
    // preprocessing detected infeasibility or unboundedness
    if (m_result != OKAY)
@@ -4671,7 +5000,8 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
                      << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
                      << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
                      << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
-                     << m_stat[MULTI_AGG]            << " multi aggregation of variables\n"
+                     << m_stat[AGGREGATION]          << " variable aggregations\n"
+                     << m_stat[MULTI_AGG]            << " multi aggregations\n"
                      << std::endl; );
 
    m_timeUsed->stop();
