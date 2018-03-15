@@ -6414,7 +6414,7 @@ namespace soplex
          return false;
 
       char parseString[SET_MAX_LINE_LEN];
-      spxSnprintf(parseString, SET_MAX_LINE_LEN-1, string);
+      spxSnprintf(parseString, SET_MAX_LINE_LEN-1, "%s", string);
 
       char* line = parseString;
 
