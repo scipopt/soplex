@@ -555,7 +555,7 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[8];
                      readbasname = new char[strlen(filename) + 1];
-                     spxSnprintf(readbasname, strlen(filename) + 1, filename);
+                     spxSnprintf(readbasname, strlen(filename) + 1, "%s", filename);
                   }
                }
                // --writebas=<basfile> : write terminal basis to file
@@ -565,7 +565,7 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[9];
                      writebasname =  new char[strlen(filename) + 1];
-                     spxSnprintf(writebasname, strlen(filename) + 1, filename);
+                     spxSnprintf(writebasname, strlen(filename) + 1, "%s", filename);
                   }
                }
                // --writefile=<lpfile> : write LP to file
@@ -575,7 +575,7 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[10];
                      writefilename = new char[strlen(filename) + 1];
-                     spxSnprintf(writefilename, strlen(filename) + 1, filename);
+                     spxSnprintf(writefilename, strlen(filename) + 1, "%s", filename);
                   }
                }
                // --writedual=<lpfile> : write dual LP to a file
@@ -585,7 +585,7 @@ int main(int argc, char* argv[])
                   {
                      char* dualfilename = &option[10];
                      writedualfilename = new char[strlen(dualfilename) + 1];
-                     spxSnprintf(writedualfilename, strlen(dualfilename) + 1, dualfilename);
+                     spxSnprintf(writedualfilename, strlen(dualfilename) + 1, "%s", dualfilename);
                   }
                }
                // --loadset=<setfile> : load parameters from settings file
@@ -595,7 +595,7 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[8];
                      loadsetname = new char[strlen(filename) + 1];
-                     spxSnprintf(loadsetname, strlen(filename) + 1, filename);
+                     spxSnprintf(loadsetname, strlen(filename) + 1, "%s", filename);
                      if( !soplex->loadSettingsFile(loadsetname) )
                      {
                         printUsage(argv, optidx);
@@ -616,7 +616,7 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[8];
                      savesetname = new char[strlen(filename) + 1];
-                     spxSnprintf(savesetname, strlen(filename) + 1, filename);
+                     spxSnprintf(savesetname, strlen(filename) + 1, "%s", filename);
                   }
                }
                // --diffset=<setfile> : save modified parameters to settings file
@@ -626,7 +626,7 @@ int main(int argc, char* argv[])
                   {
                      char* filename = &option[8];
                      diffsetname = new char[strlen(filename) + 1];
-                     spxSnprintf(diffsetname, strlen(filename) + 1, filename);
+                     spxSnprintf(diffsetname, strlen(filename) + 1, "%s", filename);
                   }
                }
                // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
