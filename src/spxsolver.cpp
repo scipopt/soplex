@@ -914,8 +914,8 @@ namespace soplex
       return val;
     }
 
-    template <class R>
-      Real SPxSolver<R>::value()
+    template <>
+      Real SPxSolver<Real>::value()
     {
       assert(isInitialized());
 
@@ -938,8 +938,8 @@ namespace soplex
       return x + this->objOffset();
     }
 
-    template <class R>
-      bool SPxSolver<R>::updateNonbasicValue(Real objChange)
+    template <>
+      bool SPxSolver<Real>::updateNonbasicValue(Real objChange)
     {
       if( m_nonbasicValueUpToDate )
         m_nonbasicValue += objChange;
@@ -970,8 +970,8 @@ namespace soplex
         m_leavetol = d;
     }
 
-    template <class R>
-      void SPxSolver<R>::setOpttol(Real d)
+    template <>
+      void SPxSolver<Real>::setOpttol(Real d)
     {
 
       if( d <= 0.0 )
@@ -983,8 +983,8 @@ namespace soplex
         m_entertol = d;
     }
 
-    template <class R>
-      void SPxSolver<R>::setDelta(Real d)
+    template <>
+      void SPxSolver<Real>::setDelta(Real d)
     {
 
       if( d <= 0.0 )
@@ -994,8 +994,8 @@ namespace soplex
       m_leavetol = d;
     }
 
-    template <class R>
-      void SPxSolver<R>::hyperPricing(bool h)
+    template <>
+      void SPxSolver<Real>::hyperPricing(bool h)
     {
       hyperPricingEnter = h;
       hyperPricingLeave = h;
