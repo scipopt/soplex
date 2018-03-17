@@ -33,6 +33,10 @@
 namespace soplex
 {
 
+  /// Declaration of type to avoid the 'specialization after instantiation' error
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::status() const; 
+  
   /**@todo check separately for ENTER and LEAVE algorithm */
   template <class R>
   bool SPxSolver<R>::precisionReached(Real& newpricertol) const
@@ -1931,27 +1935,27 @@ namespace soplex
       pVec() = p_vector;
   }
 
-  template <class R>
-  typename SPxSolver<R>::Status SPxSolver<R>::status() const
+  template <>
+  typename SPxSolver<Real>::Status SPxSolver<Real>::status() const
   {
     switch( m_status )
       {
       case UNKNOWN :      
-        switch (SPxBasis<R>::status())
+        switch (SPxBasis<Real>::status())
           {
-          case SPxBasis<R>::NO_PROBLEM :
+          case SPxBasis<Real>::NO_PROBLEM :
             return NO_PROBLEM;
-          case SPxBasis<R>::SINGULAR :
+          case SPxBasis<Real>::SINGULAR :
             return SINGULAR;
-          case SPxBasis<R>::REGULAR :
-          case SPxBasis<R>::DUAL :
-          case SPxBasis<R>::PRIMAL :
+          case SPxBasis<Real>::REGULAR :
+          case SPxBasis<Real>::DUAL :
+          case SPxBasis<Real>::PRIMAL :
             return UNKNOWN;
-          case SPxBasis<R>::OPTIMAL :
+          case SPxBasis<Real>::OPTIMAL :
             return OPTIMAL;
-          case SPxBasis<R>::UNBOUNDED :
+          case SPxBasis<Real>::UNBOUNDED :
             return UNBOUNDED;
-          case SPxBasis<R>::INFEASIBLE :
+          case SPxBasis<Real>::INFEASIBLE :
             return INFEASIBLE;
           default:
             return ERROR;
@@ -1959,7 +1963,7 @@ namespace soplex
       case SINGULAR : 
         return m_status;
       case OPTIMAL :
-        assert( SPxBasis<R>::status() == SPxBasis<R>::OPTIMAL );
+        assert( SPxBasis<Real>::status() == SPxBasis<Real>::OPTIMAL );
         /*lint -fallthrough*/
       case ABORT_EXDECOMP :
       case ABORT_DECOMP :
