@@ -957,8 +957,8 @@ namespace soplex
 
 
 
-    template <class R>
-      void SPxSolver<R>::setFeastol(Real d)
+    template <>
+      void SPxSolver<Real>::setFeastol(Real d)
     {
 
       if( d <= 0.0 )

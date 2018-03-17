@@ -1077,8 +1077,8 @@ namespace soplex
 
 
   /// returns objective value of column \p i
-  template <class R>
-  Real SoPlex<R>::objReal(int i) const
+  template <>
+  Real SoPlex<Real>::objReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->objUnscaled(i);
