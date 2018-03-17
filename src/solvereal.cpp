@@ -25,7 +25,13 @@
 
 namespace soplex
 {
-   /// solves real LP
+  /// Definitions to avoid the 'specialization after instantiation' error
+  template <>
+  void SoPlex<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus);
+  template <>
+  void SoPlex<Real>::_storeSolutionReal(bool verify);
+  
+  /// solves real LP
   template <>
   void SoPlex<Real>::_optimizeT()
    {
@@ -94,53 +100,53 @@ namespace soplex
 
 
    /// checks result of the solving process and solves again without preprocessing if necessary
-  template <class R>
-  void SoPlex<R>::_evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus)
+  template <>
+  void SoPlex<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus)
    {
       // if the simplifier detected infeasibility or unboundedness we optimize again
       // just to get the proof (primal or dual ray)
       // todo get infeasibility proof from simplifier
       switch( simplificationStatus )
       {
-      case SPxSimplifier<R>::INFEASIBLE:
-      case SPxSimplifier<R>::DUAL_INFEASIBLE:
-      case SPxSimplifier<R>::UNBOUNDED:
+      case SPxSimplifier<Real>::INFEASIBLE:
+      case SPxSimplifier<Real>::DUAL_INFEASIBLE:
+      case SPxSimplifier<Real>::UNBOUNDED:
          MSG_INFO1( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
          _hasBasis = false;
          _preprocessAndSolveReal(false);
          return;
 
-      case SPxSimplifier<R>::VANISHED:
-         _status = SPxSolver<R>::OPTIMAL;
+      case SPxSimplifier<Real>::VANISHED:
+         _status = SPxSolver<Real>::OPTIMAL;
          _storeSolutionRealFromPresol();
          return;
 
-      case SPxSimplifier<R>::OKAY:
+      case SPxSimplifier<Real>::OKAY:
          _status = _solver.status();
       }
 
       // process result
       switch( _status )
       {
-      case SPxSolver<R>::OPTIMAL:
+      case SPxSolver<Real>::OPTIMAL:
          _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
          // apply polishing on original problem
          if( _applyPolishing )
          {
-            int polishing = intParam(SoPlex<R>::SOLUTION_POLISHING);
-            setIntParam(SoPlex<R>::SOLUTION_POLISHING, polishing);
+            int polishing = intParam(SoPlex<Real>::SOLUTION_POLISHING);
+            setIntParam(SoPlex<Real>::SOLUTION_POLISHING, polishing);
             _preprocessAndSolveReal(false);
          }
          break;
 
-      case SPxSolver<R>::UNBOUNDED:
-      case SPxSolver<R>::INFEASIBLE:
-      case SPxSolver<R>::INForUNBD:
+      case SPxSolver<Real>::UNBOUNDED:
+      case SPxSolver<Real>::INFEASIBLE:
+      case SPxSolver<Real>::INForUNBD:
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
          if( !_isRealLPLoaded )
          {
             MSG_INFO1( spxout, spxout << " --- loading original problem" << std::endl; )
-            _solver.changeObjOffset(realParam(SoPlex<R>::OBJ_OFFSET));
+            _solver.changeObjOffset(realParam(SoPlex<Real>::OBJ_OFFSET));
             // we cannot do more to remove violations
             _resolveWithoutPreprocessing(simplificationStatus);
          }
@@ -150,7 +156,7 @@ namespace soplex
          }
          break;
 
-      case SPxSolver<R>::SINGULAR:
+      case SPxSolver<Real>::SINGULAR:
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
@@ -161,7 +167,7 @@ namespace soplex
          _hasBasis = false;
          break;
 
-      case SPxSolver<R>::ABORT_CYCLING:
+      case SPxSolver<Real>::ABORT_CYCLING:
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
@@ -170,11 +176,11 @@ namespace soplex
             return;
          }
          // FALLTHROUGH
-      case SPxSolver<R>::ABORT_TIME:
-      case SPxSolver<R>::ABORT_ITER:
-      case SPxSolver<R>::ABORT_VALUE:
-      case SPxSolver<R>::REGULAR:
-      case SPxSolver<R>::RUNNING:
+      case SPxSolver<Real>::ABORT_TIME:
+      case SPxSolver<Real>::ABORT_ITER:
+      case SPxSolver<Real>::ABORT_VALUE:
+      case SPxSolver<Real>::REGULAR:
+      case SPxSolver<Real>::RUNNING:
          _storeSolutionReal(false);
          break;
 
