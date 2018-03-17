@@ -8434,20 +8434,20 @@ namespace soplex
 
 
   /// call floating-point solver and update statistics on iterations etc.
-  template <class R>
-  void SoPlex<R>::_solveRealLPAndRecordStatistics()
+  template <>
+  void SoPlex<Real>::_solveRealLPAndRecordStatistics()
   {
     bool _hadBasis = _hasBasis;
 
     // set time and iteration limit
-    if( intParam(SoPlex<R>::ITERLIMIT) < realParam(SoPlex<R>::INFTY) )
-      _solver.setTerminationIter(intParam(SoPlex<R>::ITERLIMIT) - _statistics->iterations);
+    if( intParam(SoPlex<Real>::ITERLIMIT) < realParam(SoPlex<Real>::INFTY) )
+      _solver.setTerminationIter(intParam(SoPlex<Real>::ITERLIMIT) - _statistics->iterations);
     else
       _solver.setTerminationIter(-1);
-    if( realParam(SoPlex<R>::TIMELIMIT) < realParam(SoPlex<R>::INFTY) )
-      _solver.setTerminationTime(realParam(SoPlex<R>::TIMELIMIT) - _statistics->solvingTime->time());
+    if( realParam(SoPlex<Real>::TIMELIMIT) < realParam(SoPlex<Real>::INFTY) )
+      _solver.setTerminationTime(realParam(SoPlex<Real>::TIMELIMIT) - _statistics->solvingTime->time());
     else
-      _solver.setTerminationTime(realParam(SoPlex<R>::INFTY));
+      _solver.setTerminationTime(realParam(SoPlex<Real>::INFTY));
 
     // ensure that tolerances are not too small
     if( _solver.feastol() < 1e-12 )
@@ -8456,45 +8456,45 @@ namespace soplex
       _solver.setOpttol(1e-12);
 
     // set correct representation
-    if( (intParam(SoPlex<R>::REPRESENTATION) == SoPlex<R>::REPRESENTATION_COLUMN
-         || (intParam(SoPlex<R>::REPRESENTATION) == SoPlex<R>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex<R>::REPRESENTATION_SWITCH) >= (_solver.nRows() + 1)))
-        && _solver.rep() != SPxSolver<R>::COLUMN )
+    if( (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_COLUMN
+         || (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex<Real>::REPRESENTATION_SWITCH) >= (_solver.nRows() + 1)))
+        && _solver.rep() != SPxSolver<Real>::COLUMN )
       {
-        _solver.setRep(SPxSolver<R>::COLUMN);
+        _solver.setRep(SPxSolver<Real>::COLUMN);
       }
-    else if( (intParam(SoPlex<R>::REPRESENTATION) == SoPlex<R>::REPRESENTATION_ROW
-              || (intParam(SoPlex<R>::REPRESENTATION) == SoPlex<R>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex<R>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)))
-             &&_solver.rep() != SPxSolver<R>::ROW )
+    else if( (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_ROW
+              || (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex<Real>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)))
+             &&_solver.rep() != SPxSolver<Real>::ROW )
       {
-        _solver.setRep(SPxSolver<R>::ROW);
+        _solver.setRep(SPxSolver<Real>::ROW);
       }
 
     // set correct type
-    if( ((intParam(ALGORITHM) == SoPlex<R>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<R>::COLUMN)
-         || (intParam(ALGORITHM) == SoPlex<R>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<R>::ROW))
-        && _solver.type() != SPxSolver<R>::ENTER )
+    if( ((intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<Real>::COLUMN)
+         || (intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<Real>::ROW))
+        && _solver.type() != SPxSolver<Real>::ENTER )
       {
-        _solver.setType(SPxSolver<R>::ENTER);
+        _solver.setType(SPxSolver<Real>::ENTER);
       }
-    else if( ((intParam(ALGORITHM) == SoPlex<R>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<R>::COLUMN)
-              || (intParam(ALGORITHM) == SoPlex<R>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<R>::ROW))
-             && _solver.type() != SPxSolver<R>::LEAVE )
+    else if( ((intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<Real>::COLUMN)
+              || (intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<Real>::ROW))
+             && _solver.type() != SPxSolver<Real>::LEAVE )
       {
-        _solver.setType(SPxSolver<R>::LEAVE);
+        _solver.setType(SPxSolver<Real>::LEAVE);
       }
 
     // set pricing modes
-    _solver.setSparsePricingFactor(realParam(SoPlex<R>::SPARSITY_THRESHOLD));
-    if( (intParam(SoPlex<R>::HYPER_PRICING) == SoPlex<R>::HYPER_PRICING_ON)
-        || ((intParam(SoPlex<R>::HYPER_PRICING) == SoPlex<R>::HYPER_PRICING_AUTO)
+    _solver.setSparsePricingFactor(realParam(SoPlex<Real>::SPARSITY_THRESHOLD));
+    if( (intParam(SoPlex<Real>::HYPER_PRICING) == SoPlex<Real>::HYPER_PRICING_ON)
+        || ((intParam(SoPlex<Real>::HYPER_PRICING) == SoPlex<Real>::HYPER_PRICING_AUTO)
             && (_solver.nRows() + _solver.nCols() > HYPERPRICINGTHRESHOLD )) )
       _solver.hyperPricing(true);
-    else if( intParam(SoPlex<R>::HYPER_PRICING) == SoPlex<R>::HYPER_PRICING_OFF )
+    else if( intParam(SoPlex<Real>::HYPER_PRICING) == SoPlex<Real>::HYPER_PRICING_OFF )
       _solver.hyperPricing(false);
 
-    _solver.setNonzeroFactor(realParam(SoPlex<R>::REFAC_BASIS_NNZ));
-    _solver.setFillFactor(realParam(SoPlex<R>::REFAC_UPDATE_FILL));
-    _solver.setMemFactor(realParam(SoPlex<R>::REFAC_MEM_FACTOR));
+    _solver.setNonzeroFactor(realParam(SoPlex<Real>::REFAC_BASIS_NNZ));
+    _solver.setFillFactor(realParam(SoPlex<Real>::REFAC_UPDATE_FILL));
+    _solver.setMemFactor(realParam(SoPlex<Real>::REFAC_MEM_FACTOR));
 
     // call floating-point solver and catch exceptions
     _statistics->simplexTime->start();
@@ -8505,12 +8505,12 @@ namespace soplex
     catch( const SPxException& E )
       {
         MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while solving real LP.\n" );
-        _status = SPxSolver<R>::ERROR;
+        _status = SPxSolver<Real>::ERROR;
       }
     catch( ... )
       {
         MSG_INFO1( spxout, spxout << "Caught unknown exception while solving real LP.\n" );
-        _status = SPxSolver<R>::ERROR;
+        _status = SPxSolver<Real>::ERROR;
       }
     _statistics->simplexTime->stop();
 
