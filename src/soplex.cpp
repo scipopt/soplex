@@ -8377,8 +8377,8 @@ namespace soplex
 
 
   /// disables simplifier and scaler
-  template <class R>
-  void SoPlex<R>::_disableSimplifierAndScaler()
+  template <>
+  void SoPlex<Real>::_disableSimplifierAndScaler()
   {
     _simplifier = 0;
 
@@ -8386,7 +8386,7 @@ namespace soplex
     if( !_isRealLPScaled )
       _scaler = 0;
     else
-      assert(boolParam(SoPlex<R>::PERSISTENTSCALING));
+      assert(boolParam(SoPlex<Real>::PERSISTENTSCALING));
   }
 
 
