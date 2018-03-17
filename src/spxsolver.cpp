@@ -1662,8 +1662,8 @@ namespace soplex
      *       value in case of bound violations (shifting) but in this case it
      *       is quite difficult to determine if we already reached the limit.
      */
-    template <class R>
-      void SPxSolver<R>::setTerminationValue(Real p_value)
+    template <>
+      void SPxSolver<Real>::setTerminationValue(Real p_value)
     {
       objLimit = p_value;
     }
