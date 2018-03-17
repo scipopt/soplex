@@ -8327,11 +8327,11 @@ namespace soplex
 
 
   /// enables simplifier and scaler
-  template <class R>
-  void SoPlex<R>::_enableSimplifierAndScaler()
+  template <>
+  void SoPlex<Real>::_enableSimplifierAndScaler()
   {
     // type of simplifier
-    switch( intParam(SoPlex<R>::SIMPLIFIER) )
+    switch( intParam(SoPlex<Real>::SIMPLIFIER) )
       {
       case SIMPLIFIER_OFF:
         _simplifier = 0;
@@ -8346,7 +8346,7 @@ namespace soplex
       }
 
     // type of scaler
-    switch( intParam(SoPlex<R>::SCALER) )
+    switch( intParam(SoPlex<Real>::SCALER) )
       {
       case SCALER_OFF:
         _scaler = 0;
