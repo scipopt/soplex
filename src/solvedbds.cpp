@@ -45,17 +45,17 @@ namespace soplex
 
 
    /// solves LP using the decomposition dual simplex
-  template <class R>
-  void SoPlex<R>::_solveDecompositionDualSimplex()
+  template <>
+  void SoPlex<Real>::_solveDecompositionDualSimplex()
    {
-      assert(_solver.rep() == SPxSolver<R>::ROW);
-      assert(_solver.type() == SPxSolver<R>::LEAVE);
+      assert(_solver.rep() == SPxSolver<Real>::ROW);
+      assert(_solver.type() == SPxSolver<Real>::LEAVE);
 
       // flag to indicate that the algorithm must terminate
       bool stop = false;
 
       // setting the initial status of the reduced problem
-      _statistics->redProbStatus = SPxSolver<R>::NO_PROBLEM;
+      _statistics->redProbStatus = SPxSolver<Real>::NO_PROBLEM;
 
       // start timing
       _statistics->solvingTime->start();
@@ -69,7 +69,7 @@ namespace soplex
       // setting the sense to maximise. This is to make all matrix operations more consistent.
       // @todo if the objective sense is changed, the output of the current objective value is the negative of the
       // actual value. This needs to be corrected in future versions.
-      if( intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE )
+      if( intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE )
       {
          assert(_solver.spxSense() == SPxLPBase<Real>::MINIMIZE);
 
@@ -78,10 +78,10 @@ namespace soplex
       }
 
       // it is necessary to solve the initial problem to find a starting basis
-      _solver.setDecompStatus(SPxSolver<R>::FINDSTARTBASIS);
+      _solver.setDecompStatus(SPxSolver<Real>::FINDSTARTBASIS);
 
       // setting the decomposition iteration limit to the parameter setting
-      _solver.setDecompIterationLimit(intParam(SoPlex<R>::DECOMP_ITERLIMIT));
+      _solver.setDecompIterationLimit(intParam(SoPlex<Real>::DECOMP_ITERLIMIT));
 
       // variables used in the initialisation phase of the decomposition solve.
       int numDegenCheck = 0;
@@ -95,8 +95,8 @@ namespace soplex
       /************************/
 
       // arrays to store the basis status for the rows and columns at the interruption of the original problem solve.
-      DataArray< typename SPxSolver<R>::VarStatus > basisStatusRows;
-      DataArray< typename SPxSolver<R>::VarStatus > basisStatusCols;
+      DataArray< typename SPxSolver<Real>::VarStatus > basisStatusRows;
+      DataArray< typename SPxSolver<Real>::VarStatus > basisStatusCols;
       // since the original LP may have been shifted, the dual multiplier will not be correct for the original LP. This
       // loop will recheck the degeneracy level and compute the proper dual multipliers.
       do
@@ -106,13 +106,13 @@ namespace soplex
          initSolveFromScratch = false;
 
          // checking whether the initialisation must terminate and the original problem is solved using the dual simplex.
-         if( _solver.type() == SPxSolver<R>::LEAVE || _solver.status() >= SPxSolver<R>::OPTIMAL
-               || _solver.status() == SPxSolver<R>::ABORT_EXDECOMP || numDegenCheck > MAX_DEGENCHECK )
+         if( _solver.type() == SPxSolver<Real>::LEAVE || _solver.status() >= SPxSolver<Real>::OPTIMAL
+               || _solver.status() == SPxSolver<Real>::ABORT_EXDECOMP || numDegenCheck > MAX_DEGENCHECK )
          {
             // decomposition is deemed not useful. Solving the original problem using regular SoPlex.
 
             // returning the sense to minimise
-            if( intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE )
+            if( intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE )
             {
                assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
 
@@ -121,10 +121,10 @@ namespace soplex
             }
 
             // switching off the starting basis check. This is only required to initialise the decomposition simplex.
-            _solver.setDecompStatus(SPxSolver<R>::DONTFINDSTARTBASIS);
+            _solver.setDecompStatus(SPxSolver<Real>::DONTFINDSTARTBASIS);
 
             // the basis is not computed correctly is the problem was unfeasible or unbounded.
-            if( _solver.status() == SPxSolver<R>::UNBOUNDED || _solver.status() == SPxSolver<R>::INFEASIBLE )
+            if( _solver.status() == SPxSolver<Real>::UNBOUNDED || _solver.status() == SPxSolver<Real>::INFEASIBLE )
                _hasBasis = false;
 
 
@@ -144,8 +144,8 @@ namespace soplex
             _statistics->solvingTime->stop();
             return;
          }
-         else if( _solver.status() == SPxSolver<R>::ABORT_TIME || _solver.status() == SPxSolver<R>::ABORT_ITER
-            || _solver.status() == SPxSolver<R>::ABORT_VALUE )
+         else if( _solver.status() == SPxSolver<Real>::ABORT_TIME || _solver.status() == SPxSolver<Real>::ABORT_ITER
+            || _solver.status() == SPxSolver<Real>::ABORT_VALUE )
          {
             // This cleans up the problem is an abort is reached.
 
@@ -160,7 +160,7 @@ namespace soplex
             }
 
             // returning the sense to minimise
-            if( intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE )
+            if( intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE )
             {
                assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
 
@@ -190,7 +190,7 @@ namespace soplex
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_decompFeasVector) );
 
       // decomposition simplex will commence, so the start basis does not need to be found
-      _solver.setDecompStatus(SPxSolver<R>::DONTFINDSTARTBASIS);
+      _solver.setDecompStatus(SPxSolver<Real>::DONTFINDSTARTBASIS);
 
       // if the original problem has a basis, this will be stored
       if( _hasBasis )
@@ -227,7 +227,7 @@ namespace soplex
 
       // setting the verbosity level
       const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-      const SPxOut::Verbosity decomp_verbosity = (SPxOut::Verbosity)intParam(SoPlex<R>::DECOMP_VERBOSITY);
+      const SPxOut::Verbosity decomp_verbosity = (SPxOut::Verbosity)intParam(SoPlex<Real>::DECOMP_VERBOSITY);
       if( decomp_verbosity < orig_verbosity )
          spxout.setVerbosity( decomp_verbosity );
 
@@ -243,7 +243,7 @@ namespace soplex
       bool hasRedBasis = false;
       bool redProbError = false;
       bool noRedprobIter = false;
-      bool explicitviol = boolParam(SoPlex<R>::EXPLICITVIOL);
+      bool explicitviol = boolParam(SoPlex<Real>::EXPLICITVIOL);
       int algIterCount = 0;
 
 
@@ -252,7 +252,7 @@ namespace soplex
       {
          MSG_INFO1( spxout, spxout << "==== Error constructing the reduced problem ====" << std::endl );
          redProbError = true;
-         _statistics->redProbStatus = SPxSolver<R>::NOT_INIT;
+         _statistics->redProbStatus = SPxSolver<Real>::NOT_INIT;
       }
 
       // the main solving loop of the decomposition simplex.
@@ -277,7 +277,7 @@ namespace soplex
          // solving the reduced problem
          _decompSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
 
-         stop = decompTerminate(realParam(SoPlex<R>::TIMELIMIT));  // checking whether the algorithm should terminate
+         stop = decompTerminate(realParam(SoPlex<Real>::TIMELIMIT));  // checking whether the algorithm should terminate
 
          // updating the algorithm iterations statistics
          _statistics->callsReducedProb++;
@@ -291,11 +291,11 @@ namespace soplex
          // It is expected that infeasibility and unboundedness will be found in the initialisation solve. If this is
          // not the case and the reduced problem is infeasible or unbounded the decomposition simplex will terminate.
          // If the decomposition simplex terminates, then the original problem will be solved using the stored basis.
-         if( _solver.status() != SPxSolver<R>::OPTIMAL )
+         if( _solver.status() != SPxSolver<Real>::OPTIMAL )
          {
-            if( _solver.status() == SPxSolver<R>::UNBOUNDED )
+            if( _solver.status() == SPxSolver<Real>::UNBOUNDED )
                MSG_INFO2(spxout, spxout << "Unbounded reduced problem." << std::endl );
-            if( _solver.status() == SPxSolver<R>::INFEASIBLE )
+            if( _solver.status() == SPxSolver<Real>::INFEASIBLE )
                MSG_INFO2(spxout, spxout << "Infeasible reduced problem." << std::endl );
 
             MSG_INFO2(spxout, spxout << "Reduced problem status: " << _solver.status() << std::endl );
@@ -332,7 +332,7 @@ namespace soplex
             _formDecompComplementaryProblem();
          else
          {
-            if( boolParam(SoPlex<R>::USECOMPDUAL) )
+            if( boolParam(SoPlex<Real>::USECOMPDUAL) )
                _updateDecompComplementaryDualProblem(false);
             else
                _updateDecompComplementaryPrimalProblem(false);
@@ -367,17 +367,17 @@ namespace soplex
          // Check whether the complementary problem is solved with a non-negative objective function, is infeasible or
          // unbounded. If true, then stop the algorithm.
          if( !explicitviol && (GE(_compSolver.objValue(), 0.0, 1e-20)
-            || _compSolver.status() == SPxSolver<R>::INFEASIBLE
-            || _compSolver.status() == SPxSolver<R>::UNBOUNDED) )
+            || _compSolver.status() == SPxSolver<Real>::INFEASIBLE
+            || _compSolver.status() == SPxSolver<Real>::UNBOUNDED) )
          {
             _statistics->compProbStatus = _compSolver.status();
             _statistics->finalCompObj = _compSolver.objValue();
-            if( _compSolver.status() == SPxSolver<R>::UNBOUNDED )
+            if( _compSolver.status() == SPxSolver<Real>::UNBOUNDED )
                MSG_INFO2(spxout, spxout << "Unbounded complementary problem." << std::endl );
-            if( _compSolver.status() == SPxSolver<R>::INFEASIBLE )
+            if( _compSolver.status() == SPxSolver<Real>::INFEASIBLE )
                MSG_INFO2(spxout, spxout << "Infeasible complementary problem." << std::endl );
 
-            if( _compSolver.status() == SPxSolver<R>::INFEASIBLE || _compSolver.status() == SPxSolver<R>::UNBOUNDED )
+            if( _compSolver.status() == SPxSolver<Real>::INFEASIBLE || _compSolver.status() == SPxSolver<Real>::UNBOUNDED )
                explicitviol = true;
 
             stop = true;
@@ -399,8 +399,8 @@ namespace soplex
          }
          // if the complementary problem is infeasible or unbounded, it is possible that the algorithm can continue.
          // a check of the original problem is required to determine whether there are any violations.
-         else if( _compSolver.status() == SPxSolver<R>::INFEASIBLE
-            || _compSolver.status() == SPxSolver<R>::UNBOUNDED
+         else if( _compSolver.status() == SPxSolver<Real>::INFEASIBLE
+            || _compSolver.status() == SPxSolver<Real>::UNBOUNDED
             || explicitviol )
          {
             // getting the primal vector from the reduced problem
@@ -450,7 +450,7 @@ namespace soplex
          // This is only used for debugging
 #ifdef PERFORM_COMPPROB_CHECK
          // solving the complementary problem with the original objective function
-         if( boolParam(SoPlex<R>::USECOMPDUAL) )
+         if( boolParam(SoPlex<Real>::USECOMPDUAL) )
             _setComplementaryDualOriginalObjective();
          else
             _setComplementaryPrimalOriginalObjective();
@@ -461,7 +461,7 @@ namespace soplex
          // the basis has to be set to false
          _hasBasis = false;
 
-         if( boolParam(SoPlex<R>::USECOMPDUAL) )
+         if( boolParam(SoPlex<Real>::USECOMPDUAL) )
          {
             SPxLPReal compDualLP;
             _compSolver.buildDualProblem(compDualLP, _decompPrimalRowIDs.get_ptr(), _decompPrimalColIDs.get_ptr(),
@@ -545,7 +545,7 @@ namespace soplex
          _isRealLPLoaded = true;
 
          // returning the sense to minimise
-         if( intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE )
+         if( intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE )
          {
             assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
 
@@ -569,7 +569,7 @@ namespace soplex
          _isRealLPLoaded = true;
 
          // returning the sense to minimise
-         if( intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE )
+         if( intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE )
          {
             assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
 
@@ -961,15 +961,15 @@ namespace soplex
       // apply problem simplification
       if( _simplifier != 0 )
       {
-         this->result = _simplifier->simplify(solver, realParam(SoPlex<R>::EPSILON_ZERO), realParam(SoPlex<R>::FEASTOL),
-               realParam(SoPlex<R>::OPTTOL));
+         result = _simplifier->simplify(solver, realParam(SoPlex<Real>::EPSILON_ZERO), realParam(SoPlex<Real>::FEASTOL),
+               realParam(SoPlex<Real>::OPTTOL));
          solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex<R>::OBJ_OFFSET));
       }
 
       _statistics->preprocessingTime->stop();
 
       // run the simplex method if problem has not been solved by the simplifier
-      if( result == SPxSimplifier<R>::OKAY )
+      if( result == SPxSimplifier<Real>::OKAY )
       {
          if( _scaler != 0 )
             _scaler->scale(solver);
@@ -984,12 +984,12 @@ namespace soplex
          catch( const SPxException& E )
          {
             MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while solving real LP.\n" );
-            _status = SPxSolver<R>::ERROR;
+            _status = SPxSolver<Real>::ERROR;
          }
          catch( ... )
          {
             MSG_ERROR( std::cerr << "Caught unknown exception while solving real LP.\n" );
-            _status = SPxSolver<R>::ERROR;
+            _status = SPxSolver<Real>::ERROR;
          }
          _statistics->simplexTime->stop();
 
