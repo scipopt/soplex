@@ -5857,10 +5857,10 @@ namespace soplex
   /// default names are assumed; returns true on success
   /// #template #baseclass
   template <>
-	bool SoPlex<Real>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+  bool SoPlex<Real>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
   {
     clearBasis();
-
+    /// @todo can't we just remove the else code?
 #if 1
     assert(filename != 0);
     assert(_realLP != 0);

@@ -21,8 +21,8 @@
 
 namespace soplex
 {
-  template <class R>
-  bool SPxSolver<R>::readBasisFile(
+  template <>
+  bool SPxSolver<Real>::readBasisFile(
                                    const char*    filename, 
                                    const NameSet* rowNames,
                                    const NameSet* colNames)
@@ -36,8 +36,8 @@ namespace soplex
     return this->readBasis(file, rowNames, colNames);
   }
 
-  template <class R>
-  bool SPxSolver<R>::writeBasisFile
+  template <>
+  bool SPxSolver<Real>::writeBasisFile
   ( const char*    filename, 
     const NameSet* rowNames,
     const NameSet* colNames,
