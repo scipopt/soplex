@@ -53,14 +53,14 @@ namespace soplex
     return true;
   }
 
-  template <class R>
-  void SPxSolver<R>::reLoad()
+  template <>
+  void SPxSolver<Real>::reLoad()
   {
     forceRecompNonbasicValue();
     unInit();
     this->unLoad();
     this->theLP = this;
-    m_status = SPxSolver<R>::UNKNOWN;
+    m_status = SPxSolver<Real>::UNKNOWN;
     if (thepricer)
       thepricer->clear();
     if (theratiotester)
