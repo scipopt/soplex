@@ -514,13 +514,6 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
       if (c.size() < 0.95 * theCoPvec->dim())
       {
          p.assign2product4setup(*thecovectors, c);
-         if( rep() == COLUMN )
-         {
-            p.setup();
-            // add a 1.0 corresponding to the identity part of the multiplication
-            if( leaveId->isSPxColId() )
-               p.add(number(SPxColId(*leaveId)), 1.0);
-         }
       }
       else
       {
@@ -548,9 +541,6 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
                      p.add(i, y);
                }
             }
-            // add a 1.0 corresponding to the identity part of the multiplication
-            if( leaveId->isSPxColId() )
-               p.add(number(SPxColId(*leaveId)), 1.0);
          }
       }
    }
@@ -560,6 +550,12 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
    }
 
    p.setup();
+   if( rep() == COLUMN )
+   {
+      // add a 1.0 corresponding to the identity part of the multiplication result
+      if( leaveId->isSPxColId() )
+         p.add(number(SPxColId(*leaveId)), 1.0);
+   }
 }
 
 void SPxSolver::doPupdate(void)
