@@ -27,9 +27,30 @@
 
 namespace soplex
 {
+  /// definition of signature to prevent instantiation before def. error
+  template <>
+  void SPxSolver<Real>::resetClockStats();
+  
+  template <>
+  void SPxSolver<Real>::setPricing(Pricing pr);
 
-  template <class R>
-  bool SPxSolver<R>::read(std::istream& in, NameSet* rowNames, 
+  template <>
+  void SPxSolver<Real>::reDim();
+
+  template <>
+  void SPxSolver<Real>::clear();
+
+  template <>
+  void SPxSolver<Real>::clearUpdateVecs(void);
+
+  template <>
+  void SPxSolver<Real>::setFeastol(Real d);
+
+  template <>
+  void SPxSolver<Real>::setOpttol(Real d);    
+
+  template <>
+  bool SPxSolver<Real>::read(std::istream& in, NameSet* rowNames, 
                           NameSet* colNames, DIdxSet* intVars)
   {
     if( initialized )
@@ -84,26 +105,26 @@ namespace soplex
     SPxBasis<Real>::load(this, initSlackBasis);
   }
 
-  template <class R>
-  void SPxSolver<R>::setBasisSolver(SLinSolver* slu, const bool destroy)
+  template <>
+  void SPxSolver<Real>::setBasisSolver(SLinSolver* slu, const bool destroy)
   {
     // we need to set the outstream before we load the solver to ensure that the basis
     // can be initialized with this pointer in loadSolver()
     assert(spxout != 0);
     slu->spxout = spxout;
-    SPxBasis<R>::loadBasisSolver(slu, destroy);
+    SPxBasis<Real>::loadBasisSolver(slu, destroy);
   }
 
-  template <class R>
-  void SPxSolver<R>::loadBasis(const typename SPxBasis<R>::Desc& p_desc)
+  template <>
+  void SPxSolver<Real>::loadBasis(const typename SPxBasis<Real>::Desc& p_desc)
   {
     unInit();
-    if (SPxBasis<R>::status() == SPxBasis<R>::NO_PROBLEM)
+    if (SPxBasis<Real>::status() == SPxBasis<Real>::NO_PROBLEM)
       {
-        SPxBasis<R>::load(this, false);
+        SPxBasis<Real>::load(this, false);
       }
-    setBasisStatus(SPxBasis<R>::REGULAR);
-    SPxBasis<R>::loadDesc(p_desc);
+    setBasisStatus(SPxBasis<Real>::REGULAR);
+    SPxBasis<Real>::loadDesc(p_desc);
   }
 
   /// #template #temp
@@ -161,8 +182,8 @@ namespace soplex
     freeRatioTester = destroy;
   }
 
-  template <class R>
-  void SPxSolver<R>::setStarter(SPxStarter<R>* x, const bool destroy)
+  template <>
+  void SPxSolver<Real>::setStarter(SPxStarter<Real>* x, const bool destroy)
   {
 
     assert(!freeStarter || thestarter != 0);
@@ -177,8 +198,8 @@ namespace soplex
     freeStarter = destroy;
   }
 
-  template <class R>
-  void SPxSolver<R>::setType(Type tp)
+  template <>
+  void SPxSolver<Real>::setType(Type tp)
   {
 
     if (theType != tp)
@@ -193,8 +214,8 @@ namespace soplex
           {
             if (!matrixIsSetup)
               {
-                SPxBasis<R>::load(this);
-                // SPxBasis<R>::load(desc());
+                SPxBasis<Real>::load(this);
+                // SPxBasis<Real>::load(desc());
                 // not needed, because load(this) allready loads descriptor
               }
             factorized = false;
@@ -207,8 +228,8 @@ namespace soplex
               }
       }
 
-    template <class R>
-      void SPxSolver<R>::initRep(Representation p_rep)
+    template <>
+      void SPxSolver<Real>::initRep(Representation p_rep)
     {
 
       Real tmpfeastol = feastol();
@@ -258,16 +279,16 @@ namespace soplex
       setFeastol(tmpfeastol);
       setOpttol(tmpopttol);
 
-      SPxBasis<R>::setRep();
-      if (SPxBasis<R>::status() > SPxBasis<R>::NO_PROBLEM)
-        SPxBasis<R>::loadDesc(this->desc());
+      SPxBasis<Real>::setRep();
+      if (SPxBasis<Real>::status() > SPxBasis<Real>::NO_PROBLEM)
+        SPxBasis<Real>::loadDesc(this->desc());
 
       if (thepricer && thepricer->solver() == this)
         thepricer->setRep(p_rep);
     }
 
-    template <class R>
-      void SPxSolver<R>::setRep(Representation p_rep)
+    template <>
+      void SPxSolver<Real>::setRep(Representation p_rep)
     {
 
       if (p_rep != theRep)
@@ -275,8 +296,8 @@ namespace soplex
     }
 
     // needed for strongbranching. use carefully
-    template <class R>
-      void SPxSolver<R>::reinitializeVecs()
+    template <>
+      void SPxSolver<Real>::reinitializeVecs()
     {
    
       initialized = true;
@@ -302,10 +323,10 @@ namespace soplex
           computeLeaveCoPrhs();
         }
 
-      SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
+      SPxBasis<Real>::coSolve(*theCoPvec, *theCoPrhs);
       computePvec();
       computeFrhs();
-      SPxBasis<R>::solve(*theFvec, *theFrhs);
+      SPxBasis<Real>::solve(*theFvec, *theFrhs);
 
       theShift  = 0.0;
       lastShift = 0.0;
@@ -322,8 +343,8 @@ namespace soplex
       assert((testBounds(), 1));
     }
 
-    template <class R>
-      void SPxSolver<R>::resetClockStats()
+    template <>
+      void SPxSolver<Real>::resetClockStats()
     {
       nClckSkipsLeft = 0;
       nCallsToTimelim = 0;
@@ -453,8 +474,8 @@ namespace soplex
         }
     }
 
-    template <class R>
-      void SPxSolver<R>::setPricing(Pricing pr)
+    template <>
+      void SPxSolver<Real>::setPricing(Pricing pr)
     {
       thePricing = pr;
       if (initialized && type() == ENTER)
@@ -465,8 +486,8 @@ namespace soplex
         }
     }
 
-    template <class R>
-      void SPxSolver<R>::setDecompStatus(DecompStatus decomp_stat)
+    template <>
+      void SPxSolver<Real>::setDecompStatus(DecompStatus decomp_stat)
     {
       if( decomp_stat == FINDSTARTBASIS )
         getStartingDecompBasis = true;
@@ -478,8 +499,8 @@ namespace soplex
       The following method resizes all vectors and arrays of |SoPlex|
       (excluding inherited vectors).
     */
-    template <class R>
-      void SPxSolver<R>::reDim()
+    template <>
+      void SPxSolver<Real>::reDim()
     {
 
       int newsize = SPxLP::nCols() > SPxLP::nRows() ? SPxLP::nCols() : SPxLP::nRows();
@@ -513,8 +534,8 @@ namespace soplex
         }
     }
 
-    template <class R>
-      void SPxSolver<R>::clear()
+    template <>
+      void SPxSolver<Real>::clear()
     {
       unitVecs.reSize(0);
 
@@ -533,10 +554,10 @@ namespace soplex
       forceRecompNonbasicValue();
       unInit();
       SPxLP::clear();
-      setBasisStatus(SPxBasis<R>::NO_PROBLEM);
+      setBasisStatus(SPxBasis<Real>::NO_PROBLEM);
       // clear the basis only when theLP is present, because LP data (nrows, ncols) is used in reDim()
       if( this->theLP != 0 )
-        SPxBasis<R>::reDim();
+        SPxBasis<Real>::reDim();
 
       infeasibilities.clear();
       infeasibilitiesCo.clear();
@@ -554,8 +575,8 @@ namespace soplex
       init();
     }
 
-    template <class R>
-      void SPxSolver<R>::clearUpdateVecs(void)
+    template <>
+      void SPxSolver<Real>::clearUpdateVecs(void)
     {
       theFvec->clearUpdate();
       thePvec->clearUpdate();
@@ -570,19 +591,19 @@ namespace soplex
       When the basis matrix factorization is recomputed from scratch, 
       we also recompute the vectors.
     */
-    template <class R>
-      void SPxSolver<R>::factorize()
+    template <>
+      void SPxSolver<Real>::factorize()
     {
 
       MSG_INFO3( (*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl; )
 
         try
           {
-            SPxBasis<R>::factorize();
+            SPxBasis<Real>::factorize();
           }
         catch( const SPxStatusException& )
           {
-            assert(SPxBasis<R>::status() == SPxBasis<R>::SINGULAR);
+            assert(SPxBasis<Real>::status() == SPxBasis<Real>::SINGULAR);
             m_status = SINGULAR;
             std::stringstream s;
             s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
@@ -596,7 +617,7 @@ namespace soplex
           return;
         }
 
-      if (SPxBasis<R>::status() >= SPxBasis<R>::REGULAR)
+      if (SPxBasis<Real>::status() >= SPxBasis<Real>::REGULAR)
         {
 #ifndef NDEBUG
           DVector ftmp(fVec());
@@ -610,8 +631,8 @@ namespace soplex
                * columns/rows with large bounds are present
                */
               computeFrhs();
-              SPxBasis<R>::solve (*theFvec, *theFrhs);
-              SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
+              SPxBasis<Real>::solve (*theFvec, *theFrhs);
+              SPxBasis<Real>::coSolve(*theCoPvec, *theCoPrhs);
 
 #ifndef NDEBUG
               ftmp -= fVec();
@@ -649,7 +670,7 @@ namespace soplex
             {
               assert(type() == ENTER);
 
-              SPxBasis<R>::coSolve(*theCoPvec, *theCoPrhs);
+              SPxBasis<Real>::coSolve(*theCoPvec, *theCoPrhs);
               computeCoTest();
 
               if (pricing() == FULL)
@@ -667,7 +688,7 @@ namespace soplex
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
       /* moved this test after the computation of fTest and coTest below, since these vectors might not be set up at top, e.g. for an initial basis */
-      if (SPxBasis<R>::status() > SPxBasis<R>::SINGULAR)
+      if (SPxBasis<Real>::status() > SPxBasis<Real>::SINGULAR)
         testVecs();
 #endif
     }
@@ -676,8 +697,8 @@ namespace soplex
        row/enter or column/leave algorithm the maximum violation of dual feasibility is
        computed. In the row/leave or column/enter algorithm the primal feasibility is checked.
        Additionally, the violation from pricing is taken into account. */
-    template <class R>
-      Real SPxSolver<R>::maxInfeas() const
+    template <>
+      Real SPxSolver<Real>::maxInfeas() const
     {
       Real inf = 0.0;
 
@@ -722,8 +743,8 @@ namespace soplex
 
     /* check for (dual) violations above tol and immediately return false w/o checking the remaining values
        This method is useful for verifying whether an objective limit can be used as termination criterion */
-    template <class R>
-      bool SPxSolver<R>::noViols(Real tol) const
+    template <>
+      bool SPxSolver<Real>::noViols(Real tol) const
     {
       assert(tol >= 0.0);
 
@@ -759,12 +780,12 @@ namespace soplex
       return true;
     }
 
-    template <class R>
-      Real SPxSolver<R>::nonbasicValue()
+    template <>
+      Real SPxSolver<Real>::nonbasicValue()
     {
       int i;
       Real val = 0;
-      const typename SPxBasis<R>::Desc& ds = this->desc();
+      const typename SPxBasis<Real>::Desc& ds = this->desc();
 
 #ifndef ENABLE_ADDITIONAL_CHECKS
       // if the value is available we don't need to recompute it
@@ -780,15 +801,15 @@ namespace soplex
                 {
                   switch (ds.colStatus(i))
                     {
-                    case SPxBasis<R>::Desc::P_ON_UPPER :
+                    case SPxBasis<Real>::Desc::P_ON_UPPER :
                       val += theUCbound[i] * SPxLP::upper(i);
                       //@ val += maxObj(i) * SPxLP::upper(i);
                       break;
-                    case SPxBasis<R>::Desc::P_ON_LOWER :
+                    case SPxBasis<Real>::Desc::P_ON_LOWER :
                       val += theLCbound[i] * SPxLP::lower(i);
                       //@ val += maxObj(i) * SPxLP::lower(i);
                       break;
-                    case SPxBasis<R>::Desc::P_FIXED :
+                    case SPxBasis<Real>::Desc::P_FIXED :
                       val += this->maxObj(i) * SPxLP::lower(i);
                       break;
                     default:
@@ -799,13 +820,13 @@ namespace soplex
                 {
                   switch (ds.rowStatus(i))
                     {
-                    case SPxBasis<R>::Desc::P_ON_UPPER :
+                    case SPxBasis<Real>::Desc::P_ON_UPPER :
                       val += theLRbound[i] * SPxLP::rhs(i);
                       break;
-                    case SPxBasis<R>::Desc::P_ON_LOWER :
+                    case SPxBasis<Real>::Desc::P_ON_LOWER :
                       val += theURbound[i] * SPxLP::lhs(i);
                       break;
-                    case SPxBasis<R>::Desc::P_FIXED :
+                    case SPxBasis<Real>::Desc::P_FIXED :
                       val += this->maxRowObj(i) * SPxLP::lhs(i);
                       break;
                     default:
@@ -820,13 +841,13 @@ namespace soplex
                 {
                   switch (ds.colStatus(i))
                     {
-                    case SPxBasis<R>::Desc::P_ON_UPPER :
+                    case SPxBasis<Real>::Desc::P_ON_UPPER :
                       val += this->maxObj(i) * theUCbound[i];
                       break;
-                    case SPxBasis<R>::Desc::P_ON_LOWER :
+                    case SPxBasis<Real>::Desc::P_ON_LOWER :
                       val += this->maxObj(i) * theLCbound[i];
                       break;
-                    case SPxBasis<R>::Desc::P_FIXED :
+                    case SPxBasis<Real>::Desc::P_FIXED :
                       assert(theLCbound[i] == theUCbound[i]);
                       val += this->maxObj(i) * theLCbound[i];
                       break;
@@ -838,13 +859,13 @@ namespace soplex
                 {
                   switch (ds.rowStatus(i))
                     {
-                    case SPxBasis<R>::Desc::P_ON_UPPER :
+                    case SPxBasis<Real>::Desc::P_ON_UPPER :
                       val += this->maxRowObj(i) * theLRbound[i];
                       break;
-                    case SPxBasis<R>::Desc::P_ON_LOWER :
+                    case SPxBasis<Real>::Desc::P_ON_LOWER :
                       val += this->maxRowObj(i) * theURbound[i];
                       break;
-                    case SPxBasis<R>::Desc::P_FIXED :
+                    case SPxBasis<Real>::Desc::P_FIXED :
                       val += this->maxRowObj(i) * theURbound[i];
                       break;
                     default:
@@ -861,13 +882,13 @@ namespace soplex
             {
               switch (ds.colStatus(i))
                 {
-                case SPxBasis<R>::Desc::D_ON_UPPER :
+                case SPxBasis<Real>::Desc::D_ON_UPPER :
                   val += theUCbound[i] * this->lower(i);
                   break;
-                case SPxBasis<R>::Desc::D_ON_LOWER :
+                case SPxBasis<Real>::Desc::D_ON_LOWER :
                   val += theLCbound[i] * this->upper(i);
                   break;
-                case SPxBasis<R>::Desc::D_ON_BOTH :
+                case SPxBasis<Real>::Desc::D_ON_BOTH :
                   val += theLCbound[i] * this->upper(i);
                   val += theUCbound[i] * this->lower(i);
                   break;
@@ -879,13 +900,13 @@ namespace soplex
             {
               switch (ds.rowStatus(i))
                 {
-                case SPxBasis<R>::Desc::D_ON_UPPER :
+                case SPxBasis<Real>::Desc::D_ON_UPPER :
                   val += theURbound[i] * this->lhs(i);
                   break;
-                case SPxBasis<R>::Desc::D_ON_LOWER :
+                case SPxBasis<Real>::Desc::D_ON_LOWER :
                   val += theLRbound[i] * this->rhs(i);
                   break;
-                case SPxBasis<R>::Desc::D_ON_BOTH :
+                case SPxBasis<Real>::Desc::D_ON_BOTH :
                   val += theLRbound[i] * this->rhs(i);
                   val += theURbound[i] * this->lhs(i);
                   break;
@@ -1006,8 +1027,8 @@ namespace soplex
         }
     }
 
-    template <class R>
-      SPxSolver<R>::SPxSolver(
+    template <>
+      SPxSolver<Real>::SPxSolver(
                               Type            p_type, 
                               Representation  p_rep,
                               Timer::TYPE     ttype)
@@ -1081,7 +1102,7 @@ namespace soplex
         initRep(p_rep);
 
         // info: SPxBasis is not consistent in this moment.
-        //assert(SPxSolver<R>::isConsistent());
+        //assert(SPxSolver<Real>::isConsistent());
       }
 
     template <class R>
@@ -1485,8 +1506,8 @@ namespace soplex
         assert(SPxSolver<R>::isConsistent());
       }
 
-    template <class R>
-      bool SPxSolver<R>::isConsistent() const
+    template <>
+      bool SPxSolver<Real>::isConsistent() const
     {
 #ifdef ENABLE_CONSISTENCY_CHECKS
       if (epsilon() < 0)
@@ -1585,7 +1606,7 @@ namespace soplex
         && theLRbound.isConsistent()
         && theUCbound.isConsistent()
         && theLCbound.isConsistent()
-        && SPxBasis<R>::isConsistent()
+        && SPxBasis<Real>::isConsistent()
         ;
 #else
       return true;
@@ -1668,37 +1689,37 @@ namespace soplex
       objLimit = p_value;
     }
 
-    template <class R>
-      Real SPxSolver<R>::terminationValue() const
+    template <>
+      Real SPxSolver<Real>::terminationValue() const
     {
       return objLimit;
     }
    
-    template <class R>
-      typename SPxSolver<R>::VarStatus
-      SPxSolver<R>::basisStatusToVarStatus( typename SPxBasis<R>::Desc::Status stat ) const
+    template <>
+      typename SPxSolver<Real>::VarStatus
+      SPxSolver<Real>::basisStatusToVarStatus( typename SPxBasis<Real>::Desc::Status stat ) const
     {
       VarStatus vstat;
 
       switch( stat )
         {
-        case SPxBasis<R>::Desc::P_ON_LOWER:
+        case SPxBasis<Real>::Desc::P_ON_LOWER:
           vstat = ON_LOWER;
           break;
-        case SPxBasis<R>::Desc::P_ON_UPPER:
+        case SPxBasis<Real>::Desc::P_ON_UPPER:
           vstat = ON_UPPER;
           break;
-        case SPxBasis<R>::Desc::P_FIXED:
+        case SPxBasis<Real>::Desc::P_FIXED:
           vstat = FIXED;
           break;
-        case SPxBasis<R>::Desc::P_FREE:
+        case SPxBasis<Real>::Desc::P_FREE:
           vstat = ZERO;
           break;
-        case SPxBasis<R>::Desc::D_ON_UPPER:
-        case SPxBasis<R>::Desc::D_ON_LOWER:
-        case SPxBasis<R>::Desc::D_ON_BOTH:
-        case SPxBasis<R>::Desc::D_UNDEFINED:
-        case SPxBasis<R>::Desc::D_FREE:
+        case SPxBasis<Real>::Desc::D_ON_UPPER:
+        case SPxBasis<Real>::Desc::D_ON_LOWER:
+        case SPxBasis<Real>::Desc::D_ON_BOTH:
+        case SPxBasis<Real>::Desc::D_UNDEFINED:
+        case SPxBasis<Real>::Desc::D_FREE:
           vstat = BASIC;
           break;
         default:
@@ -1709,51 +1730,51 @@ namespace soplex
       return vstat;
     }
 
-    template <class R>
-      typename SPxBasis<R>::Desc::Status
-      SPxSolver<R>::varStatusToBasisStatusRow( int row, SPxSolver<R>::VarStatus stat ) const
+    template <>
+      typename SPxBasis<Real>::Desc::Status
+      SPxSolver<Real>::varStatusToBasisStatusRow( int row, SPxSolver<Real>::VarStatus stat ) const
     {
-      typename SPxBasis<R>::Desc::Status rstat;
+      typename SPxBasis<Real>::Desc::Status rstat;
 
       switch( stat )
         {
         case FIXED :
           assert(this->rhs(row) == this->lhs(row));
-          rstat = SPxBasis<R>::Desc::P_FIXED;
+          rstat = SPxBasis<Real>::Desc::P_FIXED;
           break;
         case ON_UPPER :
           assert(this->rhs(row) < infinity);
           rstat = this->lhs(row) < this->rhs(row)
-            ? SPxBasis<R>::Desc::P_ON_UPPER
-            : SPxBasis<R>::Desc::P_FIXED;
+            ? SPxBasis<Real>::Desc::P_ON_UPPER
+            : SPxBasis<Real>::Desc::P_FIXED;
           break;
         case ON_LOWER :
           assert(this->lhs(row) > -infinity);
           rstat = this->lhs(row) < this->rhs(row)
-            ? SPxBasis<R>::Desc::P_ON_LOWER
-            : SPxBasis<R>::Desc::P_FIXED;
+            ? SPxBasis<Real>::Desc::P_ON_LOWER
+            : SPxBasis<Real>::Desc::P_FIXED;
           break;
         case ZERO :
           /* A 'free' row (i.e., infinite lower & upper bounds) does not really make sense. The user
            * might (think to) know better, e.g., when temporarily turning off a row. We therefore apply
            * the same adjustment as in the column case in varStatusToBasisStatusCol(). */
           if (this->lhs(row) <= -infinity && this->rhs(row) >= infinity)
-            rstat = SPxBasis<R>::Desc::P_FREE;
+            rstat = SPxBasis<Real>::Desc::P_FREE;
           else
             {
               if ( this->lhs(row) == this->rhs(row) )
                 {
                   assert( this->rhs(row) < infinity );
-                  rstat = SPxBasis<R>::Desc::P_FIXED;
+                  rstat = SPxBasis<Real>::Desc::P_FIXED;
                 }
               else
                 {
                   if ( this->lhs(row) > -infinity )
-                    rstat = SPxBasis<R>::Desc::P_ON_LOWER;
+                    rstat = SPxBasis<Real>::Desc::P_ON_LOWER;
                   else
                     {
                       assert( this->rhs(row) < infinity );
-                      rstat = SPxBasis<R>::Desc::P_ON_UPPER;
+                      rstat = SPxBasis<Real>::Desc::P_ON_UPPER;
                     }
                 }
             }
@@ -1769,33 +1790,33 @@ namespace soplex
       return rstat;
     }
 
-    template <class R>
-      typename SPxBasis<R>::Desc::Status 
-      SPxSolver<R>::varStatusToBasisStatusCol( int col, SPxSolver<R>::VarStatus stat ) const
+    template <>
+      typename SPxBasis<Real>::Desc::Status 
+      SPxSolver<Real>::varStatusToBasisStatusCol( int col, SPxSolver<Real>::VarStatus stat ) const
     {
-      typename SPxBasis<R>::Desc::Status cstat;
+      typename SPxBasis<Real>::Desc::Status cstat;
 
       switch( stat )
         {
         case FIXED :
           if (this->upper(col) == this->lower(col))
-            cstat = SPxBasis<R>::Desc::P_FIXED;
+            cstat = SPxBasis<Real>::Desc::P_FIXED;
           else if (this->maxObj(col) > 0.0)
-            cstat = SPxBasis<R>::Desc::P_ON_UPPER;
+            cstat = SPxBasis<Real>::Desc::P_ON_UPPER;
           else
-            cstat = SPxBasis<R>::Desc::P_ON_LOWER;
+            cstat = SPxBasis<Real>::Desc::P_ON_LOWER;
           break;
         case ON_UPPER :
           assert(this->upper(col) < infinity);
           cstat = this->lower(col) < this->upper(col)
-            ? SPxBasis<R>::Desc::P_ON_UPPER
-            : SPxBasis<R>::Desc::P_FIXED;
+            ? SPxBasis<Real>::Desc::P_ON_UPPER
+            : SPxBasis<Real>::Desc::P_FIXED;
           break;
         case ON_LOWER :
           assert(this->lower(col) > -infinity);
           cstat = this->lower(col) < this->upper(col)
-            ? SPxBasis<R>::Desc::P_ON_LOWER
-            : SPxBasis<R>::Desc::P_FIXED;
+            ? SPxBasis<Real>::Desc::P_ON_LOWER
+            : SPxBasis<Real>::Desc::P_FIXED;
           break;
         case ZERO :
           /* In this case the upper and lower bounds on the variable should be infinite. The bounds
@@ -1804,22 +1825,22 @@ namespace soplex
            * approach below is consistent with changesoplex.cpp (e.g., changeUpperStatus() and
            * changeLowerStatus() ). */
           if (this->lower(col) <= -infinity && this->upper(col) >= infinity)
-            cstat = SPxBasis<R>::Desc::P_FREE;
+            cstat = SPxBasis<Real>::Desc::P_FREE;
           else
             {
               if ( this->lower(col) == this->upper(col) )
                 {
                   assert( this->upper(col) < infinity );
-                  cstat = SPxBasis<R>::Desc::P_FIXED;
+                  cstat = SPxBasis<Real>::Desc::P_FIXED;
                 }
               else
                 {
                   if ( this->lower(col) > -infinity )
-                    cstat = SPxBasis<R>::Desc::P_ON_LOWER;
+                    cstat = SPxBasis<Real>::Desc::P_ON_LOWER;
                   else
                     {
                       assert( this->upper(col) < infinity );
-                      cstat = SPxBasis<R>::Desc::P_ON_UPPER;
+                      cstat = SPxBasis<Real>::Desc::P_ON_UPPER;
                     }
                 }
             }
@@ -1872,8 +1893,8 @@ namespace soplex
       return status();
     }
 
-    template <class R>
-      bool SPxSolver<R>::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
+    template <>
+      bool SPxSolver<Real>::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p_cols)
     {
 
       int basisdim;
@@ -1950,8 +1971,8 @@ namespace soplex
     // The degenvec differs relative to the algorithm being used.
     // For the primal simplex, degenvec is the primal solution values.
     // For the dual simplex, the degenvec is the feasvec (ROW) and pVec (COLUMN).
-    template <class R>
-      Real SPxSolver<R>::getDegeneracyLevel(Vector degenvec)
+    template <>
+      Real SPxSolver<Real>::getDegeneracyLevel(Vector degenvec)
     {
       int numDegenerate = 0;
       Real degeneracyLevel = 0;
@@ -2013,22 +2034,22 @@ namespace soplex
       return degeneracyLevel;
     }
 
-    template <class R>
-      void SPxSolver<R>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+    template <>
+      void SPxSolver<Real>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
     {
       nnormsRow = 0;
       nnormsCol = 0;
 
       if( weightsAreSetup )
         {
-          if( type() == SPxSolver<R>::LEAVE && rep() == SPxSolver<R>::COLUMN )
+          if( type() == SPxSolver<Real>::LEAVE && rep() == SPxSolver<Real>::COLUMN )
             {
               nnormsRow = coWeights.dim();
               nnormsCol = 0;
 
               assert(nnormsRow == dim());
             }
-          else if( type() == SPxSolver<R>::ENTER && rep() == SPxSolver<R>::ROW )
+          else if( type() == SPxSolver<Real>::ENTER && rep() == SPxSolver<Real>::ROW )
             {
               nnormsRow = weights.dim();
               nnormsCol = coWeights.dim();
@@ -2039,8 +2060,8 @@ namespace soplex
         }
     }
 
-    template <class R>
-      bool SPxSolver<R>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
+    template <>
+      bool SPxSolver<Real>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
     {
       nnormsRow = 0;
       nnormsCol = 0;
@@ -2048,7 +2069,7 @@ namespace soplex
       if( !weightsAreSetup )
         return false;
 
-      if( type() == SPxSolver<R>::LEAVE && rep() == SPxSolver<R>::COLUMN )
+      if( type() == SPxSolver<Real>::LEAVE && rep() == SPxSolver<Real>::COLUMN )
         {
           nnormsCol = 0;
           nnormsRow = coWeights.dim();
@@ -2058,7 +2079,7 @@ namespace soplex
           for( int i = 0; i < nnormsRow; ++i)
             norms[i] = coWeights[i];
         }
-      else if( type() == SPxSolver<R>::ENTER && rep() == SPxSolver<R>::ROW )
+      else if( type() == SPxSolver<Real>::ENTER && rep() == SPxSolver<Real>::ROW )
         {
           nnormsRow = weights.dim();
           nnormsCol = coWeights.dim();
@@ -2078,12 +2099,12 @@ namespace soplex
       return true;
     }
 
-    template <class R>
-      bool SPxSolver<R>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
+    template <>
+      bool SPxSolver<Real>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
     {
       weightsAreSetup = false;
 
-      if( type() == SPxSolver<R>::LEAVE && rep() == SPxSolver<R>::COLUMN)
+      if( type() == SPxSolver<Real>::LEAVE && rep() == SPxSolver<Real>::COLUMN)
         {
           coWeights.reDim(dim(), false);
           assert(coWeights.dim() >= nnormsRow);
@@ -2091,7 +2112,7 @@ namespace soplex
             coWeights[i] = norms[i];
           weightsAreSetup = true;
         }
-      else if( type() == SPxSolver<R>::ENTER && rep() == SPxSolver<R>::ROW)
+      else if( type() == SPxSolver<Real>::ENTER && rep() == SPxSolver<Real>::ROW)
         {
           weights.reDim(coDim(), false);
           coWeights.reDim(dim(), false);
@@ -2108,8 +2129,8 @@ namespace soplex
       return true;
     }
 
-    template <class R>
-      void SPxSolver<R>::setIntegralityInformation(int ncols, int* intInfo)
+    template <>
+      void SPxSolver<Real>::setIntegralityInformation(int ncols, int* intInfo)
     {
       assert(ncols == this->nCols() || (ncols == 0 && intInfo == NULL));
 
@@ -2129,26 +2150,26 @@ namespace soplex
     // Pretty-printing of variable status.
     template <class R>
       std::ostream& operator<<( std::ostream& os,
-                                const typename SPxSolver<R>::VarStatus& status )
+                                const typename SPxSolver<Real>::VarStatus& status )
     {
       switch( status )
         {
-        case SPxSolver<R>::BASIC:
+        case SPxSolver<Real>::BASIC:
           os << "BASIC";
           break;
-        case SPxSolver<R>::FIXED:
+        case SPxSolver<Real>::FIXED:
           os << "FIXED";
           break;
-        case SPxSolver<R>::ON_LOWER:
+        case SPxSolver<Real>::ON_LOWER:
           os << "ON_LOWER";
           break;
-        case SPxSolver<R>::ON_UPPER:
+        case SPxSolver<Real>::ON_UPPER:
           os << "ON_UPPER";
           break;
-        case SPxSolver<R>::ZERO:
+        case SPxSolver<Real>::ZERO:
           os << "ZERO";
           break;
-        case SPxSolver<R>::UNDEFINED:
+        case SPxSolver<Real>::UNDEFINED:
           os << "UNDEFINED";
           break;
         default:
