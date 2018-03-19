@@ -22,6 +22,9 @@
 
 namespace soplex
 {
+  /// definition of signature to prevent the specialization after instantiation error 
+  template <>
+  void SoPlex<Real>::Statistics::clearSolvingData();
 
   /// default constructor
   template <class R>
@@ -90,8 +93,8 @@ namespace soplex
   }
 
   /// clears all statistics
-  template <class R>
-  void SoPlex<R>::Statistics::clearAllData()
+  template <>
+  void SoPlex<Real>::Statistics::clearAllData()
   {
     readingTime->reset();
     clearSolvingData();
