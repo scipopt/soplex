@@ -1593,37 +1593,37 @@ namespace soplex
     }
 
 
-    template <class R>
-      void SPxSolver<R>::setTerminationTime(Real p_time)
+    template <>
+      void SPxSolver<Real>::setTerminationTime(Real p_time)
     {
       if( p_time < 0.0 )
         p_time = 0.0;
       maxTime = p_time;
     }
 
-    template <class R>
-      Real SPxSolver<R>::terminationTime() const
+    template <>
+      Real SPxSolver<Real>::terminationTime() const
     {
       return maxTime;
     }
 
-    template <class R>
-      void SPxSolver<R>::setTerminationIter(int p_iteration)
+    template <>
+      void SPxSolver<Real>::setTerminationIter(int p_iteration)
     {
       if( p_iteration < 0 )
         p_iteration = -1;
       maxIters = p_iteration;
     }
 
-    template <class R>
-      int SPxSolver<R>::terminationIter() const
+    template <>
+      int SPxSolver<Real>::terminationIter() const
     {
       return maxIters;
     }
 
     // returns whether current time limit is reached; call to time() may be skipped unless \p forceCheck is true
-    template <class R>
-      bool SPxSolver<R>::isTimeLimitReached(const bool forceCheck)
+    template <>
+      bool SPxSolver<Real>::isTimeLimitReached(const bool forceCheck)
     {
       // always update the number of calls, since the user might set a time limit later in the solving process
       ++nCallsToTimelim;
