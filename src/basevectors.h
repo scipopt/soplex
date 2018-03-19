@@ -865,11 +865,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
-               int num = Ai.nnonbasic();
-               if( num == -1 )
-                  num = Ai.size();
+               int Aisize = Ai.nnonbasic();
+               if( Aisize == -1 )
+                  Aisize = Ai.size();
 
-               for( int j = 0; j < num; ++j )
+               for( int j = 0; j < Aisize; ++j )
                {
                   const Nonzero<S>& elt = Ai.element(j);
                   VectorBase<R>::val[elt.idx] += xval * elt.val;
