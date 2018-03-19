@@ -509,7 +509,6 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
 
-   c.setup(); // delete me!
    if (c.isSetup())
    {
       if (c.size() < 0.95 * theCoPvec->dim())
