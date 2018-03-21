@@ -774,9 +774,9 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
          idx[nz_counter] = curidx;
          ++nz_counter;
       }
-
-      num = nz_counter;
    }
+
+   num = nz_counter;
 
    assert(isConsistent());
 
