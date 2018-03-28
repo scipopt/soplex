@@ -100,6 +100,13 @@ namespace soplex
     clearSolvingData();
   }
 
+  template <>
+  void SoPlex<Rational>::Statistics::clearAllData()
+  {
+    readingTime->reset();
+    clearSolvingData();
+  }
+
   /// clears statistics on solving process
   /// #template #baseclass? 
   template <>
@@ -155,8 +162,8 @@ namespace soplex
   }
 
   /// prints statistics
-  template <class R>
-  void SoPlex<R>::Statistics::print(std::ostream& os)
+  template <>
+  void SoPlex<Real>::Statistics::print(std::ostream& os)
   {
     Real solTime = solvingTime->time();
     Real totTime = readingTime->time() + solTime;

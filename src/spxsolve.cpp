@@ -1998,6 +1998,55 @@ namespace soplex
   }
 
   template <>
+  typename SPxSolver<Rational>::Status SPxSolver<Rational>::status() const
+  {
+    switch( m_status )
+      {
+      case UNKNOWN :      
+        switch (SPxBasis<Rational>::status())
+          {
+          case SPxBasis<Rational>::NO_PROBLEM :
+            return NO_PROBLEM;
+          case SPxBasis<Rational>::SINGULAR :
+            return SINGULAR;
+          case SPxBasis<Rational>::REGULAR :
+          case SPxBasis<Rational>::DUAL :
+          case SPxBasis<Rational>::PRIMAL :
+            return UNKNOWN;
+          case SPxBasis<Rational>::OPTIMAL :
+            return OPTIMAL;
+          case SPxBasis<Rational>::UNBOUNDED :
+            return UNBOUNDED;
+          case SPxBasis<Rational>::INFEASIBLE :
+            return INFEASIBLE;
+          default:
+            return ERROR;
+          }
+      case SINGULAR : 
+        return m_status;
+      case OPTIMAL :
+        assert( SPxBasis<Rational>::status() == SPxBasis<Rational>::OPTIMAL );
+        /*lint -fallthrough*/
+      case ABORT_EXDECOMP :
+      case ABORT_DECOMP :
+      case ABORT_CYCLING :
+      case ABORT_TIME :
+      case ABORT_ITER :
+      case ABORT_VALUE :
+      case RUNNING :
+      case REGULAR :
+      case NOT_INIT :
+      case NO_SOLVER :
+      case NO_PRICER :
+      case NO_RATIOTESTER :
+      case ERROR:
+        return m_status;
+      default:
+        return ERROR;
+      }
+  }
+  
+  template <>
   typename SPxSolver<Real>::Status SPxSolver<Real>::getResult(
                                                         Real* p_value,
                                                         Vector* p_primal,

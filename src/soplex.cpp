@@ -1705,6 +1705,358 @@ namespace soplex
     return true;
   }
 
+    template <>
+	bool SoPlex<Rational>::setIntParam(const IntParam param, const int value, const bool init)
+  {
+    assert(param >= 0);
+    assert(param < INTPARAM_COUNT);
+    assert(init || _isConsistent());
+
+    if( !init && value == intParam(param) )
+      return true;
+
+    // check for a valid parameter value wrt bounds
+    if( value < _currentSettings->intParam.lower[param] || value > _currentSettings->intParam.upper[param] )
+      return false;
+
+    switch( param )
+      {
+        // objective sense
+      case SoPlex<Rational>::OBJSENSE:
+        if( value != SoPlex<Rational>::OBJSENSE_MAXIMIZE && value != SoPlex<Rational>::OBJSENSE_MINIMIZE )
+          return false;
+        _realLP->changeSense(value == SoPlex<Rational>::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
+        if( _rationalLP != 0 )
+          _rationalLP->changeSense(value == SoPlex<Rational>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+        _invalidateSolution();
+        break;
+
+        // type of computational form, i.e., column or row representation
+      case SoPlex<Rational>::REPRESENTATION:
+        if( value != SoPlex<Rational>::REPRESENTATION_COLUMN && value != SoPlex<Rational>::REPRESENTATION_ROW && value != SoPlex<Rational>::REPRESENTATION_AUTO )
+          return false;
+        break;
+
+        // type of algorithm, i.e., primal or dual
+      case SoPlex<Rational>::ALGORITHM:
+        // decide upon entering/leaving at solve time depending on representation
+        break;
+
+        // type of LU update
+      case SoPlex<Rational>::FACTOR_UPDATE_TYPE:
+        if( value != SoPlex<Rational>::FACTOR_UPDATE_TYPE_ETA && value != SoPlex<Rational>::FACTOR_UPDATE_TYPE_FT )
+          return false;
+        _slufactor.setUtype(value == SoPlex<Rational>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
+        break;
+
+        // maximum number of updates before fresh factorization
+      case SoPlex<Rational>::FACTOR_UPDATE_MAX:
+        if( value == 0 )
+          _solver.basis().setMaxUpdates(DEFAULT_REFACTOR_INTERVAL);
+        else
+          _solver.basis().setMaxUpdates(value);
+        break;
+
+        // iteration limit (-1 if unlimited)
+      case SoPlex<Rational>::ITERLIMIT:
+        break;
+
+        // refinement limit (-1 if unlimited)
+      case SoPlex<Rational>::REFLIMIT:
+        break;
+
+        // stalling refinement limit (-1 if unlimited)
+      case SoPlex<Rational>::STALLREFLIMIT:
+        break;
+
+        // display frequency
+      case SoPlex<Rational>::DISPLAYFREQ:
+        _solver.setDisplayFreq(value);
+        break;
+
+        // verbosity level
+      case SoPlex<Rational>::VERBOSITY:
+        switch(value)
+          {
+          case 0:
+            spxout.setVerbosity(SPxOut::ERROR);
+            break;
+          case 1:
+            spxout.setVerbosity(SPxOut::WARNING);
+            break;
+          case 2:
+            spxout.setVerbosity(SPxOut::DEBUG);
+            break;
+          case 3:
+            spxout.setVerbosity(SPxOut::INFO1);
+            break;
+          case 4:
+            spxout.setVerbosity(SPxOut::INFO2);
+            break;
+          case 5:
+            spxout.setVerbosity(SPxOut::INFO3);
+            break;
+          }
+        break;
+
+        // type of simplifier
+      case SoPlex<Rational>::SIMPLIFIER:
+        switch( value )
+          {
+          case SIMPLIFIER_OFF:
+            _simplifier = 0;
+            break;
+          case SIMPLIFIER_AUTO:
+            _simplifier = &_simplifierMainSM;
+            assert(_simplifier != 0);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of scaler
+      case SoPlex<Rational>::SCALER:
+        switch( value )
+          {
+          case SCALER_OFF:
+            _scaler = 0;
+            break;
+          case SCALER_UNIEQUI:
+            _scaler = &_scalerUniequi;
+            break;
+          case SCALER_BIEQUI:
+            _scaler = &_scalerBiequi;
+            break;
+          case SCALER_GEO1:
+            _scaler = &_scalerGeo1;
+            break;
+          case SCALER_GEO8:
+            _scaler = &_scalerGeo8;
+            break;
+          case SCALER_LEASTSQ:
+            _scaler = &_scalerLeastsq;
+            break;
+          case SCALER_GEOEQUI:
+            _scaler = &_scalerGeoequi;
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of starter used to create crash basis
+      case SoPlex<Rational>::STARTER:
+        switch( value )
+          {
+          case STARTER_OFF:
+            _starter = 0;
+            break;
+          case STARTER_WEIGHT:
+            _starter = &_starterWeight;
+            break;
+          case STARTER_SUM:
+            _starter = &_starterSum;
+            break;
+          case STARTER_VECTOR:
+            _starter = &_starterVector;
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of pricer
+      case SoPlex<Rational>::PRICER:
+        switch( value )
+          {
+          case PRICER_AUTO:
+            _solver.setPricer(&_pricerAuto);
+            break;
+          case PRICER_DANTZIG:
+            _solver.setPricer(&_pricerDantzig);
+            break;
+          case PRICER_PARMULT:
+            _solver.setPricer(&_pricerParMult);
+            break;
+          case PRICER_DEVEX:
+            _solver.setPricer(&_pricerDevex);
+            break;
+          case PRICER_QUICKSTEEP:
+            _solver.setPricer(&_pricerQuickSteep);
+            break;
+          case PRICER_STEEP:
+            _solver.setPricer(&_pricerSteep);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for synchronizing real and rational LP
+      case SoPlex<Rational>::SYNCMODE:
+        switch( value )
+          {
+          case SYNCMODE_ONLYREAL:
+            if( _rationalLP != 0 )
+              {
+                _rationalLP->~SPxLPRational();
+                spx_free(_rationalLP);
+              }
+            break;
+          case SYNCMODE_AUTO:
+            if( intParam(param) == SYNCMODE_ONLYREAL )
+              _syncLPRational();
+            break;
+          case SYNCMODE_MANUAL:
+            _ensureRationalLP();
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for reading LP files; nothing to do but change the value if valid
+      case SoPlex<Rational>::READMODE:
+        switch( value )
+          {
+          case READMODE_REAL:
+          case READMODE_RATIONAL:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for iterative refinement strategy; nothing to do but change the value if valid
+      case SoPlex<Rational>::SOLVEMODE:
+        switch( value )
+          {
+          case SOLVEMODE_REAL:
+          case SOLVEMODE_AUTO:
+          case SOLVEMODE_RATIONAL:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for a posteriori feasibility checks; nothing to do but change the value if valid
+      case SoPlex<Rational>::CHECKMODE:
+        switch( value )
+          {
+          case CHECKMODE_REAL:
+          case CHECKMODE_AUTO:
+          case CHECKMODE_RATIONAL:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of ratio test
+      case SoPlex<Rational>::RATIOTESTER:
+        switch( value )
+          {
+          case RATIOTESTER_TEXTBOOK:
+            _solver.setTester(&_ratiotesterTextbook);
+            break;
+          case RATIOTESTER_HARRIS:
+            _solver.setTester(&_ratiotesterHarris);
+            break;
+          case RATIOTESTER_FAST:
+            _solver.setTester(&_ratiotesterFast);
+            break;
+          case RATIOTESTER_BOUNDFLIPPING:
+            _solver.setTester(&_ratiotesterBoundFlipping);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of timer
+      case SoPlex<Rational>::TIMER:
+        switch( value )
+          {
+          case TIMER_OFF:
+            _solver.setTiming( Timer::OFF);
+            break;
+          case TIMER_CPU:
+            _solver.setTiming( Timer::USER_TIME );
+            break;
+          case TIMER_WALLCLOCK:
+            _solver.setTiming( Timer::WALLCLOCK_TIME);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode of hyper pricing
+      case SoPlex<Rational>::HYPER_PRICING:
+        switch( value )
+          {
+          case HYPER_PRICING_OFF:
+          case HYPER_PRICING_AUTO:
+          case HYPER_PRICING_ON:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // minimum number of stalling refinements since last pivot to trigger rational factorization
+      case SoPlex<Rational>::RATFAC_MINSTALLS:
+        break;
+
+        // maximum number of conjugate gradient iterations in least square scaling
+      case SoPlex<Rational>::LEASTSQ_MAXROUNDS:
+        if( _scaler )
+          _scaler->setIntParam(value);
+        break;
+
+        // mode of solution polishing
+      case SoPlex<Rational>::SOLUTION_POLISHING:
+        switch( value )
+          {
+          case POLISHING_OFF:
+            _solver.setSolutionPolishing(SPxSolver<Rational>::POLISH_OFF);
+            break;
+          case POLISHING_INTEGRALITY:
+            _solver.setSolutionPolishing(SPxSolver<Rational>::POLISH_INTEGRALITY);
+            break;
+          case POLISHING_FRACTIONALITY:
+            _solver.setSolutionPolishing(SPxSolver<Rational>::POLISH_FRACTIONALITY);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // the decomposition based simplex parameter settings
+      case DECOMP_ITERLIMIT:
+        break;
+      case DECOMP_MAXADDEDROWS:
+        break;
+      case DECOMP_DISPLAYFREQ:
+        break;
+      case DECOMP_VERBOSITY:
+        break;
+
+        // printing of condition n
+      case PRINTCONDITION:
+        _solver.setConditionInformation(value);
+        break;
+
+      default:
+        return false;
+      }
+
+    _currentSettings->_intParamValues[param] = value;
+    return true;
+  }
+
 
   /// returns lower bound of column \p i
   template <class R>

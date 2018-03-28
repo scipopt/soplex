@@ -88,6 +88,21 @@ namespace soplex
       theratiotester->clear();
   }
 
+  template <>
+  void SPxSolver<Rational>::reLoad()
+  {
+    forceRecompNonbasicValue();
+    unInit();
+    this->unLoad();
+    this->theLP = this;
+    m_status = SPxSolver<Rational>::UNKNOWN;
+    if (thepricer)
+      thepricer->clear();
+    if (theratiotester)
+      theratiotester->clear();
+  }
+
+  
   /// #template #temp
   template <>
   void SPxSolver<Real>::loadLP(const SPxLP& lp, bool initSlackBasis)
