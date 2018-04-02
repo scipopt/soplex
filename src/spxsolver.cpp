@@ -171,9 +171,62 @@ namespace soplex
     freePricer = destroy;
   }
 
+  template <>
+  void SPxSolver<Rational>::setPricer(SPxPricer<Rational>* x, const bool destroy)
+  {
+   
+    assert(!freePricer || thepricer != 0);
+
+    if(freePricer)
+      {
+        delete thepricer;
+        thepricer = 0;
+      }
+
+    if (x != 0 && x != thepricer)
+      {
+        setPricing(FULL);
+        if (isInitialized())
+          x->load(this);
+        else
+          x->clear();
+      }
+
+    if (thepricer && thepricer != x)
+      thepricer->clear();
+    thepricer = x;
+
+    freePricer = destroy;
+  }
+
   /// #template #temp 
   template <>
   void SPxSolver<Real>::setTester(SPxRatioTester<Real>* x, const bool destroy)
+  {
+    assert(!freeRatioTester || theratiotester != 0);
+
+    if(freeRatioTester)
+      {
+        delete theratiotester;
+        theratiotester = 0;
+      }
+
+    theratiotester = x;
+
+    // set the solver pointer inside the ratiotester
+    if( theratiotester != 0 )
+      {
+        if( isInitialized() )
+          theratiotester->load(this);
+        else
+          theratiotester->clear();
+      }
+
+    freeRatioTester = destroy;
+  }
+
+  template <>
+  void SPxSolver<Rational>::setTester(SPxRatioTester<Rational>* x, const bool destroy)
   {
     assert(!freeRatioTester || theratiotester != 0);
 
