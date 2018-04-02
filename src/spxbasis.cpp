@@ -330,8 +330,8 @@ void SPxBasis<R>::setRep()
    }
 }
 
-template <class R>
-void SPxBasis<R>::load(SPxSolver<R>* lp, bool initSlackBasis)
+template <>
+void SPxBasis<Real>::load(SPxSolver<Real>* lp, bool initSlackBasis)
 {
    assert(lp != 0);
    theLP = lp;
@@ -347,8 +347,8 @@ void SPxBasis<R>::load(SPxSolver<R>* lp, bool initSlackBasis)
    }
 }
 
-template <class R>
-void SPxBasis<R>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
+template <>
+void SPxBasis<Real>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
 {
    assert(!freeSlinSolver || factor != 0);
 
@@ -368,10 +368,6 @@ void SPxBasis<R>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
    factor->clear();
    freeSlinSolver = destroy;
 }
-
-template <class R>
-
-
 
 /** 
  *  The specification is taken from the
@@ -400,6 +396,7 @@ template <class R>
  *  - at their upper bound if finite,
  *  - at zero if free.
  */
+template <class R>
 bool SPxBasis<R>::readBasis(
    std::istream&  is, 
    const NameSet* rowNames, 
