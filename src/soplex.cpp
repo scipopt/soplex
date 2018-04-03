@@ -120,6 +120,11 @@ namespace soplex
       name[SoPlex::FULLPERTURBATION] = "fullperturbation";
       description[SoPlex::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
       defaultValue[SoPlex::FULLPERTURBATION] = false;
+
+      /// re-optimize the original problem to get a proof of infeasibility/unboundedness?
+      name[SoPlex::PROOFORIGINAL] = "prooforiginal";
+      description[SoPlex::PROOFORIGINAL] = "re-optimize the original problem to get a proof of infeasibility/unboundedness?";
+      defaultValue[SoPlex::PROOFORIGINAL] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -5617,6 +5622,8 @@ namespace soplex
          break;
       case FULLPERTURBATION:
          _solver.useFullPerturbation(value);
+         break;
+      case PROOFORIGINAL:
          break;
       default:
          return false;
