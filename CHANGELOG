@@ -4,6 +4,10 @@ Developer version
 features:
 - new simplifier step to perform variable aggregation for equations with two variables
 
+interface & parameters:
+- new option bool:prooforiginal to re-solve the original problem in case of
+  infeasibility/unboundedness to get a valid proof (default: false)
+
 05 February 2018 - Release 3.1.1
 ================================
 
