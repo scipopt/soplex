@@ -22,8 +22,8 @@
 
 namespace soplex
 {
-  template <class R>
-  void SPxSolver<R>::shiftFvec()
+  template <>
+  void SPxSolver<Real>::shiftFvec()
   {
 
     /* the allowed tolerance is (rep() == COLUMN) ? feastol() : opttol() because theFvec is the primal vector in COLUMN
@@ -77,8 +77,8 @@ namespace soplex
     vectors for leaving simplex. Then it checks all values of |pVec| and
     |coPvec| to obey these bounds and enlarges them if neccessary.
   */
-  template <class R>
-  void SPxSolver<R>::shiftPvec()
+  template <>
+  void SPxSolver<Real>::shiftPvec()
   {
 
     /* the allowed tolerance is (rep() == ROW) ? feastol() : opttol() because thePvec is the primal vector in ROW and the
@@ -149,8 +149,8 @@ namespace soplex
 #endif
       }
   // -----------------------------------------------------------------
-  template <class R>
-  void SPxSolver<R>::perturbMin(
+  template <>
+  void SPxSolver<Real>::perturbMin(
                                 const UpdateVector& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
@@ -203,7 +203,7 @@ namespace soplex
             l = p_low[i];
 
             // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
-            if( dualStatus(this->baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
+            if( dualStatus(this->baseId(i)) == SPxBasis<Real>::Desc::D_ON_BOTH )
               {
                 continue;
               }
@@ -228,8 +228,8 @@ namespace soplex
       }
   }
   // -----------------------------------------------------------------
-  template <class R>
-  void SPxSolver<R>::perturbMax(
+  template <>
+  void SPxSolver<Real>::perturbMax(
                                 const UpdateVector& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
@@ -281,7 +281,7 @@ namespace soplex
             l = p_low[i];
 
             // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
-            if( dualStatus(this->baseId(i)) == SPxBasis<R>::Desc::D_ON_BOTH )
+            if( dualStatus(this->baseId(i)) == SPxBasis<Real>::Desc::D_ON_BOTH )
               {
                 continue;
               }
@@ -306,8 +306,8 @@ namespace soplex
       }
   }
 
-  template <class R>
-  void SPxSolver<R>::perturbMinEnter(void)
+  template <>
+  void SPxSolver<Real>::perturbMinEnter(void)
   {
     MSG_DEBUG( std::cout << "DSHIFT03 iteration= " << iteration() << ": perturbing " << shift(); )
       fVec().delta().setup();
@@ -316,8 +316,8 @@ namespace soplex
       }
 
 
-  template <class R>
-  void SPxSolver<R>::perturbMaxEnter(void)
+  template <>
+  void SPxSolver<Real>::perturbMaxEnter(void)
   {
     MSG_DEBUG( std::cout << "DSHIFT04 iteration= " << iteration() << ": perturbing " << shift(); )
       fVec().delta().setup();
@@ -326,14 +326,14 @@ namespace soplex
       }
 
 
-  template <class R>
-  Real SPxSolver<R>::perturbMin(
+  template <>
+  Real SPxSolver<Real>::perturbMin(
                                 const UpdateVector& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
                                 Real eps,
                                 Real p_delta,
-                                const typename SPxBasis<R>::Desc::Status* stat,
+                                const typename SPxBasis<Real>::Desc::Status* stat,
                                 int start,
                                 int incr)
   {
@@ -400,14 +400,14 @@ namespace soplex
     return l_theShift;
   }
 
-  template <class R>
-  Real SPxSolver<R>::perturbMax(
+  template <>
+  Real SPxSolver<Real>::perturbMax(
                                 const UpdateVector& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
                                 Real eps,
                                 Real p_delta,
-                                const typename SPxBasis<R>::Desc::Status* stat,
+                                const typename SPxBasis<Real>::Desc::Status* stat,
                                 int start,
                                 int incr)
   {
@@ -475,8 +475,8 @@ namespace soplex
   }
 
 
-  template <class R>
-  void SPxSolver<R>::perturbMinLeave(void)
+  template <>
+  void SPxSolver<Real>::perturbMinLeave(void)
   {
     MSG_DEBUG( std::cout << "DSHIFT05 iteration= " << iteration() << ": perturbing " << shift(); )
       pVec().delta().setup();
@@ -489,8 +489,8 @@ namespace soplex
       }
 
 
-  template <class R>
-  void SPxSolver<R>::perturbMaxLeave(void)
+  template <>
+  void SPxSolver<Real>::perturbMaxLeave(void)
   {
     MSG_DEBUG( std::cout << "DSHIFT06 iteration= " << iteration() << ": perturbing " << shift(); )
       pVec().delta().setup();
@@ -503,8 +503,8 @@ namespace soplex
       }
 
 
-  template <class R>
-  void SPxSolver<R>::unShift(void)
+  template <>
+  void SPxSolver<Real>::unShift(void)
   {
     MSG_INFO3( (*spxout), (*spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
 
@@ -512,7 +512,7 @@ namespace soplex
       {
         int i;
         Real t_up, t_low;
-        const typename SPxBasis<R>::Desc& ds = this->desc();
+        const typename SPxBasis<Real>::Desc& ds = this->desc();
 
         theShift = 0;
         if (type() == ENTER)
