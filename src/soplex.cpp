@@ -3863,16 +3863,16 @@ namespace soplex
 
 
   /// returns the objective value if a primal or dual solution is available
-  template <class R>
-  Real SoPlex<R>::objValueReal()
+  template <>
+  Real SoPlex<Real>::objValueReal()
   {
     assert(OBJSENSE_MAXIMIZE == 1);
     assert(OBJSENSE_MINIMIZE == -1);
 
-    if( status() == SPxSolver<R>::UNBOUNDED )
-      return realParam(SoPlex<R>::INFTY) * intParam(SoPlex<R>::OBJSENSE);
-    else if( status() == SPxSolver<R>::INFEASIBLE )
-      return -realParam(SoPlex<R>::INFTY) * intParam(SoPlex<R>::OBJSENSE);
+    if( status() == SPxSolver<Real>::UNBOUNDED )
+      return realParam(SoPlex<Real>::INFTY) * intParam(SoPlex<Real>::OBJSENSE);
+    else if( status() == SPxSolver<Real>::INFEASIBLE )
+      return -realParam(SoPlex<Real>::INFTY) * intParam(SoPlex<Real>::OBJSENSE);
     else if( hasPrimal() || hasDual() )
       {
         _syncRealSolution();
