@@ -6014,8 +6014,8 @@ namespace soplex
 
 
   /// time spent in last call to solve
-  template <class R>
-  Real SoPlex<R>::solveTime() const
+  template <>
+  Real SoPlex<Real>::solveTime() const
   {
     return _statistics->solvingTime->time();
   }
