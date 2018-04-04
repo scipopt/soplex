@@ -1205,13 +1205,13 @@ namespace soplex
     }
 
 
-    template <class R>
-      SPxSolver<R>& SPxSolver<R>::operator=(const SPxSolver<R>& base)
+    template <>
+      SPxSolver<Real>& SPxSolver<Real>::operator=(const SPxSolver<Real>& base)
       {
         if(this != &base)
           {
             SPxLP::operator=(base);
-            SPxBasis<R>::operator=(base);
+            SPxBasis<Real>::operator=(base);
             theType = base.theType;
             thePricing = base.thePricing;
             theRep = base.theRep;
@@ -1331,7 +1331,7 @@ namespace soplex
                 theCoLbound  = &theLCbound;
               }
 
-            SPxBasis<R>::theLP = this;
+            SPxBasis<Real>::theLP = this;
 
             assert(!freePricer || thepricer != 0);
             assert(!freeRatioTester || theratiotester != 0);
@@ -1390,7 +1390,7 @@ namespace soplex
                 freeStarter = true;
               }
 
-            assert(SPxSolver<R>::isConsistent());
+            assert(SPxSolver<Real>::isConsistent());
           }
 
         return *this;
