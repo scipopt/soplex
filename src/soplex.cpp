@@ -288,6 +288,11 @@ namespace soplex
     name[SoPlexBase<Real>::FULLPERTURBATION] = "fullperturbation";
     description[SoPlexBase<Real>::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
     defaultValue[SoPlexBase<Real>::FULLPERTURBATION] = false;
+
+    /// re-optimize the original problem to get a proof of infeasibility/unboundedness?
+    name[SoPlexBase<Real>::PROOFORIGINAL] = "prooforiginal";
+    description[SoPlexBase<Real>::PROOFORIGINAL] = "re-optimize the original problem to get a proof of infeasibility/unboundedness?";
+    defaultValue[SoPlexBase<Real>::PROOFORIGINAL] = false;
   }
 
   template <class R>
