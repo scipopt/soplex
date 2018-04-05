@@ -134,7 +134,7 @@ namespace soplex
       case SPxSolver::INFEASIBLE:
       case SPxSolver::INForUNBD:
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
-         if( !_isRealLPLoaded && boolParam(SoPlex::PROOFORIGINAL) )
+         if( !_isRealLPLoaded && boolParam(SoPlex::ENSURERAY) )
          {
             MSG_INFO1( spxout, spxout << " --- loading original problem" << std::endl; )
             _solver.changeObjOffset(realParam(SoPlex::OBJ_OFFSET));

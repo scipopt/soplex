@@ -927,8 +927,8 @@ public:
       /// perturb the entire problem or only the relevant bounds of s single pivot?
       FULLPERTURBATION = 14,
 
-      /// re-optimize the original problem to get a proof of infeasibility/unboundedness?
-      PROOFORIGINAL = 15,
+      /// re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?
+      ENSURERAY = 15,
 
       /// number of boolean parameters
       BOOLPARAM_COUNT = 16

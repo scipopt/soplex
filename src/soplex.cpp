@@ -122,9 +122,9 @@ namespace soplex
       defaultValue[SoPlex::FULLPERTURBATION] = false;
 
       /// re-optimize the original problem to get a proof of infeasibility/unboundedness?
-      name[SoPlex::PROOFORIGINAL] = "prooforiginal";
-      description[SoPlex::PROOFORIGINAL] = "re-optimize the original problem to get a proof of infeasibility/unboundedness?";
-      defaultValue[SoPlex::PROOFORIGINAL] = false;
+      name[SoPlex::ENSURERAY] = "ensureray";
+      description[SoPlex::ENSURERAY] = "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?";
+      defaultValue[SoPlex::ENSURERAY] = false;
    }
 
    SoPlex::Settings::IntParam::IntParam() {
@@ -5623,7 +5623,7 @@ namespace soplex
       case FULLPERTURBATION:
          _solver.useFullPerturbation(value);
          break;
-      case PROOFORIGINAL:
+      case ENSURERAY:
          break;
       default:
          return false;
