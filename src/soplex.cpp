@@ -43,6 +43,9 @@
 
 namespace soplex
 {
+  template <>
+  int SoPlex<Real>::intParam(const IntParam param) const;
+
   template <class R>
   SoPlex<R>::Settings::BoolParam::BoolParam() {
     // should lifting be used to reduce range of nonzero matrix coefficients?
@@ -576,8 +579,8 @@ namespace soplex
 #endif
 
   /// default constructor
-  template <class R>
-  SoPlex<R>::SoPlex()
+  template <>
+  SoPlex<Real>::SoPlex()
     : _statistics(0)
     , _currentSettings(0)
     , _scalerUniequi(false)
@@ -591,7 +594,7 @@ namespace soplex
     , _starter(0)
     , _rationalLP(0)
     , _unitMatrixRational(0)
-    , _status(SPxSolver<R>::UNKNOWN)
+    , _status(SPxSolver<Real>::UNKNOWN)
     , _hasBasis(false)
     , _hasSolReal(false)
     , _hasSolRational(false)
@@ -631,7 +634,7 @@ namespace soplex
     _currentSettings = new (_currentSettings) Settings();
     setSettings(*_currentSettings, true);
 
-    _lastSolveMode = intParam(SoPlex<R>::SOLVEMODE);
+    _lastSolveMode = intParam(SoPlex<Real>::SOLVEMODE);
 
     assert(_isConsistent());
   }
