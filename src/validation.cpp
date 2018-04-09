@@ -88,6 +88,10 @@ void Validation::validateSolveReal(SoPlex& soplex)
    }
 
    objViolation = spxAbs(sol - soplex.objValueReal());
+   // skip check in case presolving detected infeasibility/unboundedness
+   if( SPxSolver::INForUNBD == soplex.status() &&
+       (sol == soplex.realParam(SoPlex::INFTY) || sol == -soplex.realParam(SoPlex::INFTY)) )
+      objViolation = 0.0;
    if( ! EQ(objViolation, 0.0, validatetolerance) )
    {
       passedValidation = false;
