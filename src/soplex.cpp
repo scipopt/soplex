@@ -7461,6 +7461,9 @@ namespace soplex
       case SPxSolverBase<Real>::INForUNBD:
         os << "problem is solved [infeasible or unbounded]";
         break;
+      case SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS:
+         os << "problem is solved [optimal with unscaled violations]";
+         break;
       default:
       case SPxSolverBase<Real>::UNKNOWN:
         os << "unknown";

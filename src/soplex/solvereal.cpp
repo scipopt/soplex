@@ -175,6 +175,9 @@ namespace soplex
             _preprocessAndSolveReal(false);
             return;
          }
+         else if( _solReal.isPrimalFeasible() && _solReal.isDualFeasible() )
+           _status = SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS;
+         break;
          // FALLTHROUGH
       case SPxSolverBase<Real>::ABORT_TIME:
       case SPxSolverBase<Real>::ABORT_ITER:
