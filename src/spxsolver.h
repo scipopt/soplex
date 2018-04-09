@@ -218,7 +218,8 @@ public:
       OPTIMAL        =  1,  ///< LP has been solved to optimality.
       UNBOUNDED      =  2,  ///< LP has been proven to be primal unbounded.
       INFEASIBLE     =  3,  ///< LP has been proven to be primal infeasible.
-      INForUNBD      =  4   ///< LP is primal infeasible or unbounded.
+      INForUNBD      =  4,  ///< LP is primal infeasible or unbounded.
+      OPTIMAL_UNSCALED_VIOLATIONS = 5 ///< LP has beed solved to optimality but unscaled solution contains violations.
    };
 
    /// objective for solution polishing
