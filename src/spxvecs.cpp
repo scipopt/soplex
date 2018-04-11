@@ -503,7 +503,9 @@ void SPxSolver::computePvec()
       (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-/// compute P.delta^T = coP.delta^T * A
+/** compute P.delta^T = coP.delta^T * A, assuming coP.delta = e_leaveId * B^-1.
+ *  The basic part of the multiplication is skipped because it can only be 0 or 1.
+ */
 void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
 {
    SSVector& p = thePvec->delta();
@@ -521,22 +523,25 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
             p.assign2product(c, *thevectors);
          else
          {
-            Real eps = p.getEpsilon();
-            int codim = p.dim();
-            int enterIdx = -1;
+            const Real eps = p.getEpsilon();
+            const int codim = p.dim();
             p.clear();
 
-            // add another check to also compute the product for the current enterId
-            // because this is already marked to be basic
+            // compute product for current enterId because it is already marked basic
             if( type() == ENTER && enterId->isSPxColId() )
-               enterIdx = number(SPxColId(*enterId));
+            {
+               const int enterIdx = number(SPxColId(*enterId));
+               const Real y = (*thevectors)[enterIdx ] * c;
+               if (isNotZero(y, eps))
+                  p.add(enterIdx , y);
+            }
 
             for( int i = 0; i < codim; ++i )
             {
                // skip product involving basic vectors
-               if( !isBasic(i) || enterIdx == i )
+               if( !isBasic(i) )
                {
-                  Real y = (*thevectors)[i] * c;
+                  const Real y = (*thevectors)[i] * c;
                   if (isNotZero(y, eps))
                      p.add(i, y);
                }

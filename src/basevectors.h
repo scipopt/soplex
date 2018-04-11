@@ -594,7 +594,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
 
 
-/// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
+/// Assigns SSVectorBase to \f$A_N \cdot x\f$ for a setup \p x.
 #define shortProductFactor 0.5
 template < class R >
 template < class S, class T >
@@ -832,7 +832,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
 
 
 
-/// Assigns SSVectorBase to \f$A \cdot x\f$ thereby setting up \p x.
+/// Assigns SSVectorBase to \f$A_N \cdot x\f$ thereby setting up \p x.
 template < class R >
 template < class S, class T >
 inline

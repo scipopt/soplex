@@ -481,11 +481,7 @@ public:
       assert(numnonbasic > 0);
       --numnonbasic;
       if( newBasicPos < numnonbasic )
-      {
-         Nonzero<R> tmp = m_elem[numnonbasic];
-         m_elem[numnonbasic] = m_elem[newBasicPos];
-         m_elem[newBasicPos] = tmp;
-      }
+         std::swap(m_elem[numnonbasic], m_elem[newBasicPos]);
    }
 
    /// store new basis information in vector by swapping values accordingly
@@ -505,11 +501,8 @@ public:
       // swap the new basic nonzeros with the last nonbasic one and increment nnonbasic
       assert(numnonbasic < size());
       if( newNonbasicPos > numnonbasic )
-      {
-         Nonzero<R> tmp = m_elem[numnonbasic];
-         m_elem[numnonbasic] = m_elem[newNonbasicPos];
-         m_elem[newNonbasicPos] = tmp;
-      }
+         std::swap(m_elem[numnonbasic], m_elem[newNonbasicPos]);
+
       ++numnonbasic;
    }
 
@@ -838,7 +831,7 @@ public:
    /// Set number of nonbasic indices.
    void setNNonbasic(int nnb)
    {
-      assert(nnb <= size());
+      assert(nnb <= size() && nnb >= -1);
       numnonbasic = nnb;
    }
 
