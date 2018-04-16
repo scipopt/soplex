@@ -109,9 +109,11 @@ namespace soplex
             _preprocessAndSolveReal(false);
          }
          else
+         {
             _status = SPxSolver::INForUNBD;
             // load original LP to restore clean solver state
             _loadRealLP(false);
+         }
          return;
 
       case SPxSimplifier::VANISHED:
