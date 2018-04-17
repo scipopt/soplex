@@ -199,26 +199,27 @@ public:
      */
    enum Status
    {
-      ERROR          = -15, ///< an error occured.
-      NO_RATIOTESTER = -14, ///< No ratiotester loaded
-      NO_PRICER      = -13, ///< No pricer loaded
-      NO_SOLVER      = -12, ///< No linear solver loaded
-      NOT_INIT       = -11, ///< not initialised error
-      ABORT_EXDECOMP = -10, ///< solve() aborted to exit decomposition simplex
-      ABORT_DECOMP   = -9,  ///< solve() aborted due to commence decomposition simplex
-      ABORT_CYCLING  = -8,  ///< solve() aborted due to detection of cycling.
-      ABORT_TIME     = -7,  ///< solve() aborted due to time limit.
-      ABORT_ITER     = -6,  ///< solve() aborted due to iteration limit.
-      ABORT_VALUE    = -5,  ///< solve() aborted due to objective limit.
-      SINGULAR       = -4,  ///< Basis is singular, numerical troubles?
-      NO_PROBLEM     = -3,  ///< No Problem has been loaded.
-      REGULAR        = -2,  ///< LP has a usable Basis (maybe LP is changed).
-      RUNNING        = -1,  ///< algorithm is running
-      UNKNOWN        =  0,  ///< nothing known on loaded problem.
-      OPTIMAL        =  1,  ///< LP has been solved to optimality.
-      UNBOUNDED      =  2,  ///< LP has been proven to be primal unbounded.
-      INFEASIBLE     =  3,  ///< LP has been proven to be primal infeasible.
-      INForUNBD      =  4   ///< LP is primal infeasible or unbounded.
+      ERROR                       = -15, ///< an error occured.
+      NO_RATIOTESTER              = -14, ///< No ratiotester loaded
+      NO_PRICER                   = -13, ///< No pricer loaded
+      NO_SOLVER                   = -12, ///< No linear solver loaded
+      NOT_INIT                    = -11, ///< not initialised error
+      ABORT_EXDECOMP              = -10, ///< solve() aborted to exit decomposition simplex
+      ABORT_DECOMP                = -9,  ///< solve() aborted due to commence decomposition simplex
+      ABORT_CYCLING               = -8,  ///< solve() aborted due to detection of cycling.
+      ABORT_TIME                  = -7,  ///< solve() aborted due to time limit.
+      ABORT_ITER                  = -6,  ///< solve() aborted due to iteration limit.
+      ABORT_VALUE                 = -5,  ///< solve() aborted due to objective limit.
+      SINGULAR                    = -4,  ///< Basis is singular, numerical troubles?
+      NO_PROBLEM                  = -3,  ///< No Problem has been loaded.
+      REGULAR                     = -2,  ///< LP has a usable Basis (maybe LP is changed).
+      RUNNING                     = -1,  ///< algorithm is running
+      UNKNOWN                     =  0,  ///< nothing known on loaded problem.
+      OPTIMAL                     =  1,  ///< LP has been solved to optimality.
+      UNBOUNDED                   =  2,  ///< LP has been proven to be primal unbounded.
+      INFEASIBLE                  =  3,  ///< LP has been proven to be primal infeasible.
+      INForUNBD                   =  4,  ///< LP is primal infeasible or unbounded.
+      OPTIMAL_UNSCALED_VIOLATIONS =  5   ///< LP has beed solved to optimality but unscaled solution contains violations.
    };
 
    /// objective for solution polishing

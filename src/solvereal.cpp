@@ -175,6 +175,9 @@ namespace soplex
             _preprocessAndSolveReal(false);
             return;
          }
+         else if( _solReal.isPrimalFeasible() && _solReal.isDualFeasible() )
+            _status = SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS;
+         break;
          // FALLTHROUGH
       case SPxSolver::ABORT_TIME:
       case SPxSolver::ABORT_ITER:
@@ -403,7 +406,7 @@ namespace soplex
                                    << ", row violation: " << rowviol
                                    << ", dual violation: " << dualviol
                                    << ", redcost violation: " << redcostviol << std::endl; )
-         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again without presolving" << std::endl; )
+         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again without presolving/scaling" << std::endl; )
 
          if( _isRealLPScaled )
          {
