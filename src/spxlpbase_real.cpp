@@ -2939,4 +2939,13 @@ namespace soplex
 
   template class SPxLPBase < Real >;
 
+
+  /// Functions lifted from the .h file
+
+  SVectorBase<Real>& colVector_w(int i)
+  {
+    return LPColSetBase<Real>::colVector_w(i);
+  }
+
+
 } // namespace soplex

@@ -2131,11 +2131,8 @@ namespace soplex
     //@{
 
     /// Returns the LP as an LPRowSet.
-    SVectorBase<R>& colVector_w(int i)
-      {
-        return LPColSetBase<R>::colVector_w(i);
-      }
-
+    SVectorBase<R>& colVector_w(int i);
+    
     ///
     SVectorBase<R>& rowVector_w(int i)
       {

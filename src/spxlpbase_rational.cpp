@@ -2420,5 +2420,15 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 // ---------------------------------------------------------------------------------------------------------------------
 
 template class SPxLPBase < Rational >;
+
+
+// Functions lifted from the .h file
+
+SVectorBase<Rational>& colVector_w(int i)
+{
+  return LPColSetBase<Rational>::colVector_w(i);
+}
+
 } // namespace soplex
+
 #endif
