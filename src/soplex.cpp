@@ -3862,7 +3862,7 @@ namespace soplex
    {
       if( !hasBasis() )
          return SPxBasis::NO_PROBLEM;
-      else if( status() == SPxSolver::OPTIMAL )
+      else if( status() == SPxSolver::OPTIMAL || status() == SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS )
          return SPxBasis::OPTIMAL;
       else if( status() == SPxSolver::UNBOUNDED )
          return SPxBasis::UNBOUNDED;
