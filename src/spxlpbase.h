@@ -49,6 +49,8 @@ namespace soplex
 {
   template <class R>
     class SPxSolver;
+  template <class R>
+    class SPxMainSM;
 
   /**@brief   Saving LPs in a form suitable for SoPlex.
    * @ingroup Algo
@@ -77,16 +79,16 @@ namespace soplex
    */
 
 
-  template < class R >
+  template <class R>
     class SPxLPBase : protected LPRowSetBase<R>, protected LPColSetBase<R>
   {
-    template < class S > friend class SPxLPBase;
-    template <class T> friend class SPxBasis;
+    template <class> friend class SPxLPBase;
+    template <class> friend class SPxBasis;
     friend class SPxScaler;
     friend class SPxEquiliSC;
     friend class SPxLeastSqSC;
     friend class SPxGeometSC;
-    template <class U> friend class SPxMainSM;
+    friend SPxMainSM<R>;
 
   public:
 
