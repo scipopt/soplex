@@ -20,17 +20,57 @@
 
 namespace soplex
 {
+  // Definition of signature to avoid the specialization after instantiation error
 
-  template <class R>
-  void SPxDevexPR<R>::load(SPxSolver<R>* base)
+  template <>
+  void SPxDevexPR<Real>::setRep(typename SPxSolver<Real>::Representation);
+
+  template <>
+  int SPxDevexPR<Real>::selectLeaveX(Real feastol, int start, int incr);
+
+  template <>
+  int SPxDevexPR<Real>::selectLeaveSparse(Real feastol);
+
+  template <>
+  int SPxDevexPR<Real>::selectLeaveHyper(Real feastol);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterX(Real tol);
+
+  template <>
+  void SPxDevexPR<Real>::addedVecs (int n);
+
+  template <>
+  void SPxDevexPR<Real>::addedCoVecs(int n);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterHyperDim(Real& best, Real feastol);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterHyperCoDim(Real& best, Real feastol);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterSparseDim(Real& best, Real feastol);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterSparseCoDim(Real& best, Real feastol);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterDenseDim(Real& best, Real feastol, int start, int incr);
+
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterDenseCoDim(Real& best, Real feastol, int start, int incr);
+
+  template <>
+  void SPxDevexPR<Real>::load(SPxSolver<Real>* base)
   {
     this->thesolver = base;
     setRep(base->rep());
     assert(isConsistent());
   }
 
-  template <class R>
-  bool SPxDevexPR<R>::isConsistent() const
+  template <>
+  bool SPxDevexPR<Real>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     if (this->thesolver != 0)
@@ -42,8 +82,8 @@ namespace soplex
     return true;
   }
 
-  template <class R>
-  void SPxDevexPR<R>::setupWeights(typename SPxSolver<R>::Type tp)
+  template <>
+  void SPxDevexPR<Real>::setupWeights(typename SPxSolver<Real>::Type tp)
   {
     int i;
     int coWeightSize = 0;
@@ -52,7 +92,7 @@ namespace soplex
     DVector& weights = this->thesolver->weights;
     DVector& coWeights = this->thesolver->coWeights;
 
-    if( tp == SPxSolver<R>::ENTER )
+    if( tp == SPxSolver<Real>::ENTER )
       {
         coWeights.reDim(this->thesolver->dim(), false);
         for( i = this->thesolver->dim() - 1; i >= coWeightSize; --i )
@@ -71,8 +111,8 @@ namespace soplex
     this->thesolver->weightsAreSetup = true;
   }
 
-  template <class R>
-  void SPxDevexPR<R>::setType(typename SPxSolver<R>::Type tp)
+  template <>
+  void SPxDevexPR<Real>::setType(typename SPxSolver<Real>::Type tp)
   {
     setupWeights(tp);
     refined = false;
@@ -81,7 +121,7 @@ namespace soplex
     bestPrices.setMax(this->thesolver->dim());
     prices.reMax(this->thesolver->dim());
 
-    if( tp == SPxSolver<R>::ENTER )
+    if( tp == SPxSolver<Real>::ENTER )
       {
         bestPricesCo.clear();
         bestPricesCo.setMax(this->thesolver->coDim());
@@ -94,8 +134,8 @@ namespace soplex
   /**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, 
    *       and CoVecs be influenced by the representation ?
    */
-  template <class R>
-  void SPxDevexPR<R>::setRep(typename SPxSolver<R>::Representation)
+  template <>
+  void SPxDevexPR<Real>::setRep(typename SPxSolver<Real>::Representation)
   {
     if (this->thesolver != 0)
       {
@@ -114,15 +154,15 @@ namespace soplex
       return viol * viol / weight;
   }
 
-  template <class R>
-  int SPxDevexPR<R>::buildBestPriceVectorLeave( Real feastol )
+  template <>
+  int SPxDevexPR<Real>::buildBestPriceVectorLeave( Real feastol )
   {
     int idx;
     int nsorted;
     Real fTesti;
     const Real* fTest = this->thesolver->fTest().get_const_ptr();
     const Real* cpen = this->thesolver->coWeights.get_const_ptr();
-    typename SPxPricer<R>::IdxElement price;
+    typename SPxPricer<Real>::IdxElement price;
     prices.clear();
     bestPrices.clear();
 
@@ -159,8 +199,8 @@ namespace soplex
       return -1;
   }
 
-  template <class R>
-  int SPxDevexPR<R>::selectLeave()
+  template <>
+  int SPxDevexPR<Real>::selectLeave()
   {
     int retid;
 
@@ -191,8 +231,8 @@ namespace soplex
     return retid;
   }
 
-  template <class R>
-  int SPxDevexPR<R>::selectLeaveX(Real feastol, int start, int incr)
+  template <>
+  int SPxDevexPR<Real>::selectLeaveX(Real feastol, int start, int incr)
   {
     Real x;
 
@@ -218,8 +258,8 @@ namespace soplex
     return bstI;
   }
 
-  template <class R>
-  int SPxDevexPR<R>::selectLeaveSparse(Real feastol)
+  template <>
+  int SPxDevexPR<Real>::selectLeaveSparse(Real feastol)
   {
     Real x;
 
@@ -253,8 +293,8 @@ namespace soplex
     return bstI;
   }
 
-  template <class R>
-  int SPxDevexPR<R>::selectLeaveHyper(Real feastol)
+  template <>
+  int SPxDevexPR<Real>::selectLeaveHyper(Real feastol)
   {
     Real x;
 
@@ -325,8 +365,8 @@ namespace soplex
     return bstI;
   }
 
-  template <class R>
-  void SPxDevexPR<R>::left4(int n, SPxId id)
+  template <>
+  void SPxDevexPR<Real>::left4(int n, SPxId id)
   {
     DVector& coWeights = this->thesolver->coWeights;
     if (id.isValid())
@@ -360,15 +400,15 @@ namespace soplex
       }
   }
 
-  template <class R>
-  SPxId SPxDevexPR<R>::buildBestPriceVectorEnterDim( Real& best, Real feastol )
+  template <>
+  SPxId SPxDevexPR<Real>::buildBestPriceVectorEnterDim( Real& best, Real feastol )
   {
     int idx;
     int nsorted;
     Real x;
     const Real* coTest = this->thesolver->coTest().get_const_ptr();
     const Real* cpen = this->thesolver->coWeights.get_const_ptr();
-    typename SPxPricer<R>::IdxElement price;
+    typename SPxPricer<Real>::IdxElement price;
     prices.clear();
     bestPrices.clear();
 
@@ -411,15 +451,15 @@ namespace soplex
       return SPxId();
   }
 
-  template <class R>
-  SPxId SPxDevexPR<R>::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
+  template <>
+  SPxId SPxDevexPR<Real>::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
   {
     int idx;
     int nsorted;
     Real x;
     const Real* test = this->thesolver->test().get_const_ptr();
     const Real* pen = this->thesolver->weights.get_const_ptr();
-    typename SPxPricer<R>::IdxElement price;
+    typename SPxPricer<Real>::IdxElement price;
     pricesCo.clear();
     bestPricesCo.clear();
 
@@ -462,8 +502,8 @@ namespace soplex
       return SPxId();
   }
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnter()
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnter()
   {
     assert(this->thesolver != 0);
 
@@ -482,8 +522,8 @@ namespace soplex
   }
 
   // choose the best entering index among columns and rows but prefer sparsity
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterX(Real tol)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterX(Real tol)
   {
     SPxId enterId;
     SPxId enterCoId;
@@ -522,8 +562,8 @@ namespace soplex
       return enterId;
   }
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterHyperDim(Real& best, Real feastol)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterHyperDim(Real& best, Real feastol)
   {
     const Real* cTest = this->thesolver->coTest().get_const_ptr();
     const Real* cpen = this->thesolver->coWeights.get_const_ptr();
@@ -600,8 +640,8 @@ namespace soplex
       return SPxId();
   }
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterHyperCoDim(Real& best, Real feastol)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterHyperCoDim(Real& best, Real feastol)
   {
     const Real* test = this->thesolver->test().get_const_ptr();
     const Real* pen = this->thesolver->weights.get_const_ptr();
@@ -678,8 +718,8 @@ namespace soplex
   }
 
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterSparseDim(Real& best, Real feastol)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterSparseDim(Real& best, Real feastol)
   {
     const Real* cTest = this->thesolver->coTest().get_const_ptr();
     const Real* cpen = this->thesolver->coWeights.get_const_ptr();
@@ -715,8 +755,8 @@ namespace soplex
   }
 
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterSparseCoDim(Real& best, Real feastol)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterSparseCoDim(Real& best, Real feastol)
   {
     const Real* test = this->thesolver->test().get_const_ptr();
     const Real* pen = this->thesolver->weights.get_const_ptr();
@@ -753,8 +793,8 @@ namespace soplex
   }
 
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterDenseDim(Real& best, Real feastol, int start, int incr)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterDenseDim(Real& best, Real feastol, int start, int incr)
   {
     const Real* cTest = this->thesolver->coTest().get_const_ptr();
     const Real* cpen = this->thesolver->coWeights.get_const_ptr();
@@ -784,8 +824,8 @@ namespace soplex
     return SPxId();
   }
 
-  template <class R>
-  SPxId SPxDevexPR<R>::selectEnterDenseCoDim(Real& best, Real feastol, int start, int incr)
+  template <>
+  SPxId SPxDevexPR<Real>::selectEnterDenseCoDim(Real& best, Real feastol, int start, int incr)
   {
     const Real* test = this->thesolver->test().get_const_ptr();
     const Real* pen = this->thesolver->weights.get_const_ptr();
@@ -820,8 +860,8 @@ namespace soplex
      has entered the basis at position n, but the id is not used here 
      (this is true for all pricers)
   */
-  template <class R>
-  void SPxDevexPR<R>::entered4(SPxId /*id*/, int n)
+  template <>
+  void SPxDevexPR<Real>::entered4(SPxId /*id*/, int n)
   {
     DVector& weights = this->thesolver->weights;
     DVector& coWeights = this->thesolver->coWeights;
@@ -846,7 +886,7 @@ namespace soplex
             coWeights[i] += xi_p * coPvec[i] * coPvec[i];
             if (coWeights[i] <= 1 || coWeights[i] > 1e+6)
               {
-                setupWeights(SPxSolver<R>::ENTER);
+                setupWeights(SPxSolver<Real>::ENTER);
                 return;
               }
           }
@@ -857,17 +897,17 @@ namespace soplex
             weights[i] += xi_p * pVec[i] * pVec[i];
             if (weights[i] <= 1 || weights[i] > 1e+6)
               {
-                setupWeights(SPxSolver<R>::ENTER);
+                setupWeights(SPxSolver<Real>::ENTER);
                 return;
               }
           }
       }
   }
  
-  template <class R>
-  void SPxDevexPR<R>::addedVecs (int n)
+  template <>
+  void SPxDevexPR<Real>::addedVecs (int n)
   {
-    int initval = (this->thesolver->type() == SPxSolver<R>::ENTER) ? 2 : 1;
+    int initval = (this->thesolver->type() == SPxSolver<Real>::ENTER) ? 2 : 1;
     DVector& weights = this->thesolver->weights;
     n = weights.dim();
     weights.reDim (this->thesolver->coDim());
@@ -875,10 +915,10 @@ namespace soplex
       weights[i] = initval;
   }
 
-  template <class R>
-  void SPxDevexPR<R>::addedCoVecs(int n)
+  template <>
+  void SPxDevexPR<Real>::addedCoVecs(int n)
   {
-    int initval = (this->thesolver->type() == SPxSolver<R>::ENTER) ? 2 : 1;
+    int initval = (this->thesolver->type() == SPxSolver<Real>::ENTER) ? 2 : 1;
     DVector& coWeights = this->thesolver->coWeights;
     n = coWeights.dim();
     coWeights.reDim(this->thesolver->dim());
