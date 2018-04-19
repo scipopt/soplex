@@ -22,17 +22,17 @@
 namespace soplex
 {
 
-  template <class R>
-  void SPxParMultPR<R>::setType(typename SPxSolver<R>::Type tp)
+  template <>
+  void SPxParMultPR<Real>::setType(typename SPxSolver<Real>::Type tp)
   {
-    if (tp == SPxSolver<R>::ENTER)
+    if (tp == SPxSolver<Real>::ENTER)
       {
         used = 0;
-        this->thesolver->setPricing(SPxSolver<R>::PARTIAL);
+        this->thesolver->setPricing(SPxSolver<Real>::PARTIAL);
       }
     else
       {
-        this->thesolver->setPricing(SPxSolver<R>::FULL);
+        this->thesolver->setPricing(SPxSolver<Real>::FULL);
       }
 
     this->thesolver->weights.reDim(0);
@@ -43,27 +43,27 @@ namespace soplex
     min = partialSize / 2;
   }
 
-  template <class R>
-  void SPxParMultPR<R>::load(SPxSolver<R>* p_solver)
+  template <>
+  void SPxParMultPR<Real>::load(SPxSolver<Real>* p_solver)
   {
     this->thesolver = p_solver;
     multiParts = (this->thesolver->dim() + this->thesolver->coDim()) / partialSize + 1;
     pricSet.reSize(10 * partialSize);
   }
 
-  template <class R>
-  SPxId SPxParMultPR<R>::selectEnter()
+  template <>
+  SPxId SPxParMultPR<Real>::selectEnter()
   {
     SPxId id;
     Real x;
     int i;
     int best = -1;
-    //    const SPxBasis<R>::Desc& ds   = this->thesolver->basis().desc();
+    //    const SPxBasis<Real>::Desc& ds   = this->thesolver->basis().desc();
 
     assert(thesolver != 0);
     int lastlast = -1;
 
-    if (this->thesolver->pricing() == SPxSolver<R>::PARTIAL)
+    if (this->thesolver->pricing() == SPxSolver<Real>::PARTIAL)
       {
         Real val;
         Real eps = -this->theeps;
@@ -145,13 +145,13 @@ namespace soplex
 
     else
       {
-        assert(this->thesolver->pricing() == SPxSolver<R>::FULL);
+        assert(this->thesolver->pricing() == SPxSolver<Real>::FULL);
         Real bestx = -this->theeps;
         for (i = this->thesolver->dim() - 1; i >= 0; --i)
           {
             x = this->thesolver->coTest()[i];
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<Real>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<Real>::Desc::D_FREE));
             if (x < bestx)
               {
                 id = this->thesolver->coId(i);
@@ -162,8 +162,8 @@ namespace soplex
         for (i = this->thesolver->coDim() - 1; i >= 0; --i)
           {
             x = this->thesolver->test()[i];
-            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<R>::Desc::P_FREE
-            //                || ds.status(i) == SPxBasis<R>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<Real>::Desc::P_FREE
+            //                || ds.status(i) == SPxBasis<Real>::Desc::D_FREE));
             if (x < bestx)
               {
                 id = this->thesolver->id(i);
@@ -175,8 +175,8 @@ namespace soplex
       }
   }
 
-  template <class R>
-  int SPxParMultPR<R>::selectLeave()
+  template <>
+  int SPxParMultPR<Real>::selectLeave()
   {
     int i, n;
     Real x;

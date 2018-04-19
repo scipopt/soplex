@@ -37,8 +37,8 @@ namespace soplex
    * basis selected to leave the basis. -1 indicates that no variable could be
    * selected. Otherwise, parameter \p val contains the chosen fVec.value().
    */
-  template <class R>
-  int SPxDefaultRT<R>::selectLeave(Real& val, Real, bool)
+  template <>
+  int SPxDefaultRT<Real>::selectLeave(Real& val, Real, bool)
   {
     this->solver()->fVec().delta().setup();
 
@@ -173,8 +173,8 @@ namespace soplex
      Here comes the ratio test. It is assumed that theCoPvec.this->delta() and
      theCoPvec.idx() have been setup correctly!
   */
-  template <class R>
-  SPxId SPxDefaultRT<R>::selectEnter(Real& max, int, bool)
+  template <>
+  SPxId SPxDefaultRT<Real>::selectEnter(Real& max, int, bool)
   {
     this->solver()->coPvec().delta().setup();
     this->solver()->pVec().delta().setup();
@@ -381,7 +381,7 @@ namespace soplex
             this->solver()->coPvec().delta().clearNum(cnum);
           else if( pnum >= 0 )
             this->solver()->pVec().delta().clearNum(pnum);
-        return SPxDefaultRT<R>::selectEnter(max, 0, false);
+        return SPxDefaultRT<Real>::selectEnter(max, 0, false);
       }
 
     MSG_DEBUG(
