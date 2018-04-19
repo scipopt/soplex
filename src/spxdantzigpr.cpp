@@ -23,9 +23,26 @@
 
 namespace soplex
 {
+  template <>
+  int SPxDantzigPR<Real>::selectLeaveSparse();
 
-  template <class R>
-  int SPxDantzigPR<R>::selectLeave()
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterX();
+
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterSparseDim(Real& best,SPxId& enterId);
+
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterSparseCoDim(Real& best,SPxId& enterId);
+
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterDenseCoDim(Real& best,SPxId& enterId);
+
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterDenseDim(Real& best,SPxId& enterId);
+
+  template <>
+  int SPxDantzigPR<Real>::selectLeave()
   {
     assert(thesolver != 0);
 
@@ -55,8 +72,8 @@ namespace soplex
     return n;
   }
 
-  template <class R>
-  int SPxDantzigPR<R>::selectLeaveSparse()
+  template <>
+  int SPxDantzigPR<Real>::selectLeaveSparse()
   {
     assert(thesolver != 0);
 
@@ -87,12 +104,12 @@ namespace soplex
     return n;
   }
 
-  template <class R>
-  SPxId SPxDantzigPR<R>::selectEnter()
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnter()
   {
     assert(thesolver != 0);
 
-    // const SPxBasis<R>::Desc&    ds   = this->thesolver->basis().desc();
+    // const SPxBasis<Real>::Desc&    ds   = this->thesolver->basis().desc();
 
     SPxId enterId;
     enterId = selectEnterX();
@@ -100,8 +117,8 @@ namespace soplex
     return enterId;
   }
 
-  template <class R>
-  SPxId SPxDantzigPR<R>::selectEnterX()
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterX()
   {
     SPxId enterId;
     SPxId enterIdCo;
@@ -121,8 +138,8 @@ namespace soplex
   }
 
 
-  template <class R>
-  SPxId SPxDantzigPR<R>::selectEnterSparseDim(Real& best,SPxId& enterId)
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterSparseDim(Real& best,SPxId& enterId)
   {
     assert(thesolver != 0);
 
@@ -136,8 +153,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<Real>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<Real>::Desc::D_FREE));
             if (x < best)
               {
                 enterId = this->thesolver->coId(idx);
@@ -155,8 +172,8 @@ namespace soplex
     return enterId;
   }
 
-  template <class R>
-  SPxId SPxDantzigPR<R>::selectEnterSparseCoDim(Real& best,SPxId& enterId)
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterSparseCoDim(Real& best,SPxId& enterId)
   {
     assert(thesolver != 0);
 
@@ -170,8 +187,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<Real>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<Real>::Desc::D_FREE));
             if (x < best)
               {
                 enterId = this->thesolver->id(idx);
@@ -188,8 +205,8 @@ namespace soplex
     return enterId;
   }
 
-  template <class R>
-  SPxId SPxDantzigPR<R>::selectEnterDenseDim(Real& best,SPxId& enterId)
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterDenseDim(Real& best,SPxId& enterId)
   {
     assert(thesolver != 0);
 
@@ -201,8 +218,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<R>::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis<R>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<Real>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasis<Real>::Desc::D_FREE));
             if (x < best)
               {
                 enterId   = this->thesolver->coId(i);
@@ -213,8 +230,8 @@ namespace soplex
     return enterId;
   }
 
-  template <class R>
-  SPxId SPxDantzigPR<R>::selectEnterDenseCoDim(Real& best,SPxId& enterId)
+  template <>
+  SPxId SPxDantzigPR<Real>::selectEnterDenseCoDim(Real& best,SPxId& enterId)
   {
     assert(thesolver != 0);
 
@@ -226,8 +243,8 @@ namespace soplex
 
         if (x < -this->theeps)
           {
-            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<R>::Desc::P_FREE
-            //                || ds.status(i) == SPxBasis<R>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<Real>::Desc::P_FREE
+            //                || ds.status(i) == SPxBasis<Real>::Desc::D_FREE));
             if (x < best)
               {
                 enterId   = this->thesolver->id(i);
