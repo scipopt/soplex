@@ -28,8 +28,14 @@ namespace soplex
 #define EPS     1e-6
 #define STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
 
-  template <class R>
-  bool SPxWeightST<R>::isConsistent() const
+  // Signatures of functions to prevent the specialization after instantiation error
+
+  template <>
+  void SPxWeightST<Real>::setupWeights(SPxSolver<Real>& base);
+
+
+  template <>
+  bool SPxWeightST<Real>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     return rowWeight.isConsistent()
@@ -60,10 +66,10 @@ namespace soplex
     The following two functions set the status of |id| to primal or dual,
     respectively.
   */
-  template <class R>
-  void SPxWeightST<R>::setPrimalStatus(
-                                       typename SPxBasis<R>::Desc& desc, 
-                                       const SPxSolver<R>& base, 
+  template <>
+  void SPxWeightST<Real>::setPrimalStatus(
+                                       typename SPxBasis<Real>::Desc& desc, 
+                                       const SPxSolver<Real>& base, 
                                        const SPxId& id)
   {
     if (id.isSPxRowId())
@@ -73,20 +79,20 @@ namespace soplex
         if (base.rhs(n) >= infinity)
           {
             if (base.lhs(n) <= -infinity)
-              desc.rowStatus(n) = SPxBasis<R>::Desc::P_FREE;
+              desc.rowStatus(n) = SPxBasis<Real>::Desc::P_FREE;
             else
-              desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
+              desc.rowStatus(n) = SPxBasis<Real>::Desc::P_ON_LOWER;
           }
         else
           {
             if (base.lhs(n) <= -infinity)
-              desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
+              desc.rowStatus(n) = SPxBasis<Real>::Desc::P_ON_UPPER;
             else if (base.lhs(n) >= base.rhs(n) - base.epsilon())
-              desc.rowStatus(n) = SPxBasis<R>::Desc::P_FIXED;
+              desc.rowStatus(n) = SPxBasis<Real>::Desc::P_FIXED;
             else if (rowRight[n])
-              desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
+              desc.rowStatus(n) = SPxBasis<Real>::Desc::P_ON_UPPER;
             else
-              desc.rowStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
+              desc.rowStatus(n) = SPxBasis<Real>::Desc::P_ON_LOWER;
           }
       }
     else
@@ -95,29 +101,28 @@ namespace soplex
         if (base.SPxLP::upper(n) >= infinity)
           {
             if (base.SPxLP::lower(n) <= -infinity)
-              desc.colStatus(n) = SPxBasis<R>::Desc::P_FREE;
+              desc.colStatus(n) = SPxBasis<Real>::Desc::P_FREE;
             else
-              desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
+              desc.colStatus(n) = SPxBasis<Real>::Desc::P_ON_LOWER;
           }
         else
           {
             if (base.SPxLP::lower(n) <= -infinity)
-              desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
+              desc.colStatus(n) = SPxBasis<Real>::Desc::P_ON_UPPER;
             else if (base.SPxLP::lower(n) >= base.SPxLP::upper(n) - base.epsilon())
-              desc.colStatus(n) = SPxBasis<R>::Desc::P_FIXED;
+              desc.colStatus(n) = SPxBasis<Real>::Desc::P_FIXED;
             else if (colUp[n])
-              desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_UPPER;
+              desc.colStatus(n) = SPxBasis<Real>::Desc::P_ON_UPPER;
             else
-              desc.colStatus(n) = SPxBasis<R>::Desc::P_ON_LOWER;
+              desc.colStatus(n) = SPxBasis<Real>::Desc::P_ON_LOWER;
           }
       }
   }
 
   // ----------------------------------------------------------------
-  template <class R>
   static void setDualStatus(
-                            typename SPxBasis<R>::Desc& desc, 
-                            const SPxSolver<R>& base, 
+                            typename SPxBasis<Real>::Desc& desc, 
+                            const SPxSolver<Real>& base, 
                             const SPxId& id)
   {
     if (id.isSPxRowId())
@@ -157,10 +162,9 @@ namespace soplex
      we sort the rows, then the columns.  Finally we perform a mergesort
      of both.
   */
-  template <class R>
   static void initPrefs(
                         DataArray<SPxId>&      pref,
-                        const SPxSolver<R>&       base,
+                        const SPxSolver<Real>&       base,
                         const DataArray<Real>& rowWeight,
                         const DataArray<Real>& colWeight)
   {
@@ -215,8 +219,8 @@ namespace soplex
   }
 
   // ----------------------------------------------------------------
-  template <class R>
-  void SPxWeightST<R>::generate(SPxSolver<R>& base)
+  template <>
+  void SPxWeightST<Real>::generate(SPxSolver<Real>& base)
   {
     SPxId tmpId;
 
@@ -226,7 +230,7 @@ namespace soplex
     rowRight.reSize (base.nRows());
     colUp.reSize (base.nCols());
 
-    if (base.rep() == SPxSolver<R>::COLUMN)
+    if (base.rep() == SPxSolver<Real>::COLUMN)
       {
         weight   = &colWeight;
         coWeight = &rowWeight;
@@ -241,7 +245,7 @@ namespace soplex
 
     setupWeights(base);
 
-    typename SPxBasis<R>::Desc desc(base);
+    typename SPxBasis<Real>::Desc desc(base);
     //   desc.reSize(base.nRows(), base.nCols());
 
     DataArray < SPxId > pref(base.nRows() + base.nCols());
@@ -255,7 +259,7 @@ namespace soplex
     for(i = 0; i < base.dim(); ++i)
       forbidden[i] = 0;
 
-    if (base.rep() == SPxSolver<R>::COLUMN)
+    if (base.rep() == SPxSolver<Real>::COLUMN)
       {
         // in COLUMN rep we scan from beginning to end
         i      = 0;
@@ -323,7 +327,7 @@ namespace soplex
               forbidden[sel] = 2;
 
             // put current column/row into basis
-            if (base.rep() == SPxSolver<R>::COLUMN)
+            if (base.rep() == SPxSolver<Real>::COLUMN)
               setDualStatus(desc, base, pref[i]);
             else
               setPrimalStatus(desc, base, pref[i]);
@@ -343,7 +347,7 @@ namespace soplex
             if (--dim == 0)
               {
                 //@ for(++i; i < pref.size(); ++i)
-                if (base.rep() == SPxSolver<R>::COLUMN)
+                if (base.rep() == SPxSolver<Real>::COLUMN)
                   {
                     // set all remaining indeces to nonbasic status
                     for (i += stepi; i >= 0 && i < pref.size(); i += stepi)
@@ -371,7 +375,7 @@ namespace soplex
               }
           }
         // sel == -1
-        else if (base.rep() == SPxSolver<R>::COLUMN)
+        else if (base.rep() == SPxSolver<Real>::COLUMN)
           setPrimalStatus(desc, base, pref[i]);
         else
           setDualStatus(desc, base, pref[i]);
@@ -394,17 +398,17 @@ namespace soplex
     const Vector& pvec = base.pVec();
     for (i = pvec.dim() - 1; i >= 0; --i)
       {
-        if (desc.colStatus(i) == SPxBasis<R>::Desc::P_ON_UPPER
+        if (desc.colStatus(i) == SPxBasis<Real>::Desc::P_ON_UPPER
             && base.lower(i) > -infinity && pvec[i] > base.maxObj(i))
           {
             changed = 1;
-            desc.colStatus(i) = SPxBasis<R>::Desc::P_ON_LOWER;
+            desc.colStatus(i) = SPxBasis<Real>::Desc::P_ON_LOWER;
           }
-        else if (desc.colStatus(i) == SPxBasis<R>::Desc::P_ON_LOWER
+        else if (desc.colStatus(i) == SPxBasis<Real>::Desc::P_ON_LOWER
                  && base.upper(i) < infinity && pvec[i] < base.maxObj(i))
           {
             changed = 1;
-            desc.colStatus(i) = SPxBasis<R>::Desc::P_ON_UPPER;
+            desc.colStatus(i) = SPxBasis<Real>::Desc::P_ON_UPPER;
           }
       }
 
@@ -422,8 +426,8 @@ namespace soplex
 
   /* Computation of Weights
    */
-  template <class R>
-  void SPxWeightST<R>::setupWeights(SPxSolver<R>& base)
+  template <>
+  void SPxWeightST<Real>::setupWeights(SPxSolver<Real>& base)
   {
     const Vector& obj  = base.maxObj();
     const Vector& low  = base.lower();
