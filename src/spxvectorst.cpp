@@ -22,14 +22,14 @@
 namespace soplex
 {
 
-  template <class R>
-  void SPxVectorST<R>::setupWeights(SPxSolver<R>& base)
+  template <>
+  void SPxVectorST<Real>::setupWeights(SPxSolver<Real>& base)
   {
     if (state == PVEC)
       {
         if (vec.dim() != base.nCols())
           {
-            SPxWeightST<R>::setupWeights(base);
+            SPxWeightST<Real>::setupWeights(base);
             return;
           }
 
@@ -84,7 +84,7 @@ namespace soplex
       {
         if (vec.dim() != base.nRows())
           {
-            SPxWeightST<R>::setupWeights(base);
+            SPxWeightST<Real>::setupWeights(base);
             return;
           }
 
@@ -107,6 +107,6 @@ namespace soplex
           }
       }
     else
-      SPxWeightST<R>::setupWeights(base);
+      SPxWeightST<Real>::setupWeights(base);
   }
 } // namespace soplex
