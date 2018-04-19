@@ -515,11 +515,11 @@ private:
          : PostStep("FixBounds", lp.nRows(), lp.nCols())
          , m_j(j)
       {
-         if (EQrel(lp.lower(j), lp.upper(j), this->esp()))
+         if (EQrel(lp.lower(j), lp.upper(j), this->eps()))
             m_status = SPxSolver<R>::FIXED;
-         else if (EQrel(val, lp.lower(j), this->esp()))
+         else if (EQrel(val, lp.lower(j), this->eps()))
             m_status = SPxSolver<R>::ON_LOWER;
-         else if (EQrel(val, lp.upper(j), this->esp()))
+         else if (EQrel(val, lp.upper(j), this->eps()))
             m_status = SPxSolver<R>::ON_UPPER;
          else if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
             m_status = SPxSolver<R>::ZERO;
