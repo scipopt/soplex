@@ -21,8 +21,9 @@
 
 namespace soplex
 {
-  template <class R>
-  void SPxSumST<R>::setupWeights(SPxSolver<R>& base)
+
+  template <>
+  void SPxSumST<Real>::setupWeights(SPxSolver<Real>& base)
   {
     int count;
     int i;
@@ -78,6 +79,6 @@ namespace soplex
       }
 
     this->primal(work);
-    SPxVectorST<R>::setupWeights(base);
+    SPxVectorST<Real>::setupWeights(base);
   }
 } // namespace soplex
