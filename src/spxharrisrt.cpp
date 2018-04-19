@@ -30,15 +30,15 @@ namespace soplex
    * 0 until numCycle >= 2 * maxCycle, after wich it becomes
    * negative. This does not look ok.
    */
-  template <class R>
-  Real SPxHarrisRT<R>::degenerateEps() const
+  template <>
+  Real SPxHarrisRT<Real>::degenerateEps() const
   {
     return this->solver()->delta() 
       * (1.0 - this->solver()->numCycle() / this->solver()->maxCycle());
   }
 
-  template <class R>
-  int SPxHarrisRT<R>::maxDelta(
+  template <>
+  int SPxHarrisRT<Real>::maxDelta(
                                Real* /*max*/,             /* max abs value in upd */
                                Real* val,             /* initial and chosen value */
                                int num,             /* # of indices in idx */
@@ -89,8 +89,8 @@ namespace soplex
      (with the default setting *max=1)
      in selectLeave and selectEnter
   */
-  template <class R>
-  int SPxHarrisRT<R>::minDelta(
+  template <>
+  int SPxHarrisRT<Real>::minDelta(
                                Real* /*max*/,             /* max abs value in upd */
                                Real* val,             /* initial and chosen value */
                                int num,             /* # of indices in idx */
@@ -149,8 +149,8 @@ namespace soplex
      allways yield an improvement. In that case, we shift the variable toward
      infeasibility and retry. This avoids cycling in the shifted LP.
   */
-  template <class R>
-  int SPxHarrisRT<R>::selectLeave(Real& val, Real, bool)
+  template <>
+  int SPxHarrisRT<Real>::selectLeave(Real& val, Real, bool)
   {
     int i, j;
     Real stab, x, y;
@@ -322,8 +322,8 @@ namespace soplex
     return leave;
   }
 
-  template <class R>
-  SPxId SPxHarrisRT<R>::selectEnter(Real& val, int, bool)
+  template <>
+  SPxId SPxHarrisRT<Real>::selectEnter(Real& val, int, bool)
   {
     int i, j;
     SPxId enterId;
