@@ -50,7 +50,7 @@ namespace soplex
             _scaler->scale(*_realLP, true);
             _isRealLPScaled = _realLP->isScaled(); // a scaler might decide not to apply scaling
 #ifdef SOPLEX_DEBUG
-            _checkScalingReal(origLP);
+            _checkScaling(origLP);
 #endif
          }
          // unscale previously scaled problem, overwriting _realLP
