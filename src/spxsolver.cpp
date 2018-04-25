@@ -555,6 +555,18 @@ namespace soplex
     }
 
     template <>
+      void SPxSolver<Rational>::setPricing(Pricing pr)
+    {
+      thePricing = pr;
+      if (initialized && type() == ENTER)
+        {
+          computePvec();
+          computeCoTest();
+          computeTest();
+        }
+    }
+
+    template <>
       void SPxSolver<Real>::setDecompStatus(DecompStatus decomp_stat)
     {
       if( decomp_stat == FINDSTARTBASIS )
