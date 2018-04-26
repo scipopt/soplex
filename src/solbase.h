@@ -43,8 +43,8 @@ namespace soplex
 template< class R >
 class SolBase
 {
-   template <class T>  friend class SoPlex;
-   template < class S > friend class SolBase;
+   friend class SoPlex<R>;
+   friend class SolBase<R>;
 
 public:
    /// is the stored solution primal feasible?
