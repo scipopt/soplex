@@ -47,7 +47,10 @@ namespace soplex
   void SPxSolver<Real>::setFeastol(Real d);
 
   template <>
-  void SPxSolver<Real>::setOpttol(Real d);    
+  void SPxSolver<Real>::setOpttol(Real d);
+
+  template <>
+  void SPxSolver<Rational>::setPricing(Pricing pr);
 
   template <>
   bool SPxSolver<Real>::read(std::istream& in, NameSet* rowNames, 
