@@ -240,6 +240,43 @@ namespace soplex
   }
 
   template <>
+  Real SPxSolver<Rational>::coTest(int i, typename SPxBasis<Rational>::Desc::Status stat) const
+  {
+    assert(type() == ENTER);
+    assert(!isBasic(stat));
+
+    Real x;
+
+    switch (stat)
+      {
+      case SPxBasis<Rational>::Desc::D_FREE:
+      case SPxBasis<Rational>::Desc::D_ON_BOTH :
+        assert(rep() == ROW);
+        x = (*theCoPvec)[i] - SPxLPBase<Rational>::lower(i);
+        if (x < 0)
+          return x;
+        // no break: next is else case
+        //lint -fallthrough
+      case SPxBasis<Rational>::Desc::D_ON_LOWER:
+        assert(rep() == ROW);
+        return SPxLPBase<Rational>::upper(i) - (*theCoPvec)[i];
+      case SPxBasis<Rational>::Desc::D_ON_UPPER:
+        assert(rep() == ROW);
+        return (*theCoPvec)[i] - SPxLPBase<Rational>::lower(i);
+
+      case SPxBasis<Rational>::Desc::P_ON_UPPER:
+        assert(rep() == COLUMN);
+        return (*theCoPvec)[i] - this->maxRowObj(i);             // slacks !
+      case SPxBasis<Rational>::Desc::P_ON_LOWER:
+        assert(rep() == COLUMN);
+        return this->maxRowObj(i) - (*theCoPvec)[i];             // slacks !
+
+      default:
+        return 0;
+      }
+  }
+  
+  template <>
   void SPxSolver<Real>::computeCoTest()
   {
     int i;
