@@ -3690,6 +3690,12 @@ namespace soplex
     return _currentSettings->_realParamValues[param];
   }
 
+  template <>
+  Real SoPlex<Rational>::realParam(const RealParam param) const
+  {
+    std::exit(EXIT_FAILURE);
+  }
+
   /// solves the LP
   /// #template needs to be rewritten #temp
   template <>
