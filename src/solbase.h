@@ -36,6 +36,11 @@
 
 namespace soplex
 {
+  template <class R>
+    class SoPlex;
+  template <class R>
+    class SolBase;
+  
 /**@class   SolBase
  * @brief   Class for storing a primal-dual solution with basis information
  * @ingroup Algo
@@ -43,8 +48,8 @@ namespace soplex
 template< class R >
 class SolBase
 {
-   friend class SoPlex<R>;
-   friend class SolBase<R>;
+   friend SoPlex<R>;
+   template <class S> friend class SolBase;
 
 public:
    /// is the stored solution primal feasible?

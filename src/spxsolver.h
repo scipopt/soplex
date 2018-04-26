@@ -52,6 +52,10 @@ namespace soplex
     class SPxRatioTester;
   template <class R>
     class SPxStarter;
+  template <class R>
+    class SPxFastRT;
+  template <class R>
+    class SPxBoundFlippingRT;
 
   /**@brief   Sequential object-oriented SimPlex.
      @ingroup Algo
