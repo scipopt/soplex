@@ -36,17 +36,14 @@
 
 namespace soplex
 {
-  template <class R>
-    class SoPlex;
-
   /**@class   SolBase
    * @brief   Class for storing a primal-dual solution with basis information
    * @ingroup Algo
    */
-  template< class R >
+  template <class R>
     class SolBase
     {
-      friend SoPlex<R>;
+      template <class T> friend class SoPlex;
       template <class S> friend class SolBase;
 
     public:
@@ -276,7 +273,7 @@ namespace soplex
 	}
 
       /// assignment operator only for friends
-      template < class S >
+      template <class S>
 	SolBase<R>& operator=(const SolBase<S>& sol)
 	{
 	  if( (SolBase<S>*)this != &sol )
