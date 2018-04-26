@@ -942,6 +942,7 @@ namespace soplex
     ///
     virtual void changeObj(int i, const Real& newVal, bool scale = false);
     ///
+    using SPxLPBase<R>::changeObj; /// overloading a virtual function
     virtual void changeObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
       changeObj(this->number(p_id), p_newVal, scale);
@@ -951,6 +952,7 @@ namespace soplex
     ///
     virtual void changeMaxObj(int i, const Real& newVal, bool scale = false);
     ///
+    using SPxLPBase<R>::changeMaxObj; /// overloading a virtual function
     virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
     {
       changeMaxObj(this->number(p_id), p_newVal, scale);
@@ -960,6 +962,7 @@ namespace soplex
     ///
     virtual void changeRowObj(int i, const Real& newVal, bool scale = false);
     ///
+    using SPxLPBase<R>::changeRowObj;
     virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal, bool scale = false)
     {
       changeRowObj(this->number(p_id), p_newVal);
@@ -977,6 +980,7 @@ namespace soplex
     ///
     virtual void changeLower(int i, const Real& newLower, bool scale = false);
     ///
+    using SPxLPBase<R>::changeLower;
     virtual void changeLower(SPxColId p_id, const Real& p_newLower, bool scale = false)
     {
       changeLower(this->number(p_id), p_newLower, scale);
@@ -988,6 +992,7 @@ namespace soplex
     ///
     virtual void changeUpper(int i, const Real& newUpper, bool scale = false);
     ///
+    using SPxLPBase<R>::changeUpper; /// overloading virtual function
     virtual void changeUpper(SPxColId p_id, const Real& p_newUpper, bool scale = false)
     {
       changeUpper(this->number(p_id), p_newUpper, scale);
@@ -997,6 +1002,7 @@ namespace soplex
     ///
     virtual void changeBounds(int i, const Real& newLower, const Real& newUpper, bool scale = false);
     ///
+    using SPxLPBase<R>::changeBounds;
     virtual void changeBounds(SPxColId p_id, const Real& p_newLower, const Real& p_newUpper, bool scale = false)
     {
       changeBounds(this->number(p_id), p_newLower, p_newUpper, scale);
@@ -1008,6 +1014,7 @@ namespace soplex
     ///
     virtual void changeLhs(int i, const Real& newLhs, bool scale = false);
     ///
+    using SPxLPBase<R>::changeLhs;
     virtual void changeLhs(SPxRowId p_id, const Real& p_newLhs, bool scale = false)
     {
       changeLhs(this->number(p_id), p_newLhs, scale);
@@ -1019,6 +1026,7 @@ namespace soplex
     ///
     virtual void changeRhs(int i, const Real& newRhs, bool scale = false);
     ///
+    using SPxLPBase<R>::changeRhs;
     virtual void changeRhs(SPxRowId p_id, const Real& p_newRhs, bool scale = false)
     {
       changeRhs(this->number(p_id), p_newRhs, scale);
@@ -1028,6 +1036,7 @@ namespace soplex
     ///
     virtual void changeRange(int i, const Real& newLhs, const Real& newRhs, bool scale = false);
     ///
+    using SPxLPBase<R>::changeRange;
     virtual void changeRange(SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs, bool scale = false)
     {
       changeRange(this->number(p_id), p_newLhs, p_newRhs, scale);
@@ -1035,6 +1044,7 @@ namespace soplex
     ///
     virtual void changeRow(int i, const LPRow& newRow, bool scale = false);
     ///
+    using SPxLPBase<R>::changeRow;
     virtual void changeRow(SPxRowId p_id, const LPRow& p_newRow, bool scale = false)
     {
       changeRow(this->number(p_id), p_newRow, scale);
@@ -1042,6 +1052,7 @@ namespace soplex
     ///
     virtual void changeCol(int i, const LPCol& newCol, bool scale = false);
     ///
+    using SPxLPBase<R>::changeCol;
     virtual void changeCol(SPxColId p_id, const LPCol& p_newCol, bool scale = false)
     {
       changeCol(this->number(p_id), p_newCol, scale);
@@ -1049,6 +1060,7 @@ namespace soplex
     ///
     virtual void changeElement(int i, int j, const Real& val, bool scale = false);
     ///
+    using SPxLPBase<R>::changeElement;
     virtual void changeElement(SPxRowId rid, SPxColId cid, const Real& val, bool scale = false)
     {
       changeElement(this->number(rid), this->number(cid), val, scale);
