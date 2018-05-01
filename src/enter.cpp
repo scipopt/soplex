@@ -174,6 +174,12 @@ namespace soplex
   }
 
   template <>
+  void SPxSolver<Rational>::computeTest()
+  {
+    exit(0);
+  }
+  
+  template <>
   Real SPxSolver<Real>::computePvec(int i)
   {
 
