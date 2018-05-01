@@ -25,10 +25,13 @@ namespace soplex
   /// definition of signature to prevent the specialization after instantiation error 
   template <>
   void SoPlex<Real>::Statistics::clearSolvingData();
+  template <>
+  void SoPlex<Real>::Statistics::clearAllData();
+
 
   /// default constructor
-  template <class R>
-  SoPlex<R>::Statistics::Statistics(Timer::TYPE ttype)
+  template <>
+  SoPlex<Real>::Statistics::Statistics(Timer::TYPE ttype)
   {
     timerType = ttype;
     readingTime = TimerFactory::createTimer(timerType);
@@ -43,8 +46,8 @@ namespace soplex
   }
 
   /// copy constructor
-  template <class R>
-  SoPlex<R>::Statistics::Statistics(const Statistics& base)
+  template <>
+  SoPlex<Real>::Statistics::Statistics(const Statistics& base)
   {
     timerType = base.timerType;
     readingTime = TimerFactory::createTimer(timerType);
@@ -59,8 +62,8 @@ namespace soplex
   }
 
   /// assignment operator
-  template <class R>
-  typename SoPlex<R>::Statistics& SoPlex<R>::Statistics::operator=(const Statistics &rhs)
+  template <>
+  typename SoPlex<Real>::Statistics& SoPlex<Real>::Statistics::operator=(const Statistics &rhs)
   {
     *readingTime = *(rhs.readingTime);
     *solvingTime = *(rhs.solvingTime);
