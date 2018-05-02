@@ -110,7 +110,12 @@ namespace soplex
          }
          else
          {
-            _status = SPxSolver::INForUNBD;
+            if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+               _status = SPxSolver::INFEASIBLE;
+            else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
+               _status = SPxSolver::UNBOUNDED;
+            else
+               _status = SPxSolver::INForUNBD;
             // load original LP to restore clean solver state
             _loadRealLP(false);
          }
