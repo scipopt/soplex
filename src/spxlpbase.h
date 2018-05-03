@@ -1196,6 +1196,7 @@ public:
       int countBoxed = 0;
       int countFreeCol = 0;
 
+      int countEqual = 0;
       int countLhs = 0;
       int countRhs = 0;
       int countRanged = 0;
@@ -1219,7 +1220,11 @@ public:
          }
 
          if( hasUpper && hasLower )
+         {
             countBoxed++;
+            countLower--;
+            countUpper--;
+         }
 
          if( !hasUpper && !hasLower )
             countFreeCol++;
@@ -1243,7 +1248,16 @@ public:
          }
 
          if( hasRhs && hasLhs )
-            countRanged++;
+         {
+            if( EQ(lhs(i), rhs(i)) )
+            {
+               countRanged++;
+               countLhs--;
+               countRhs--;
+            }
+            else
+               countEqual++;
+         }
 
          if( !hasRhs && !hasLhs )
             countFreeRow++;
@@ -1256,6 +1270,7 @@ public:
          << "        upper bound : " << countUpper << "\n"
          << "               free : " << countFreeCol << "\n"
          << "  Rows              : " << nRows() << "\n"
+         << "              equal : " << countEqual << "\n"
          << "             ranged : " << countRanged << "\n"
          << "                lhs : " << countLhs << "\n"
          << "                rhs : " << countRhs << "\n"

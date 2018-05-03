@@ -9,6 +9,8 @@ interface & parameters:
   infeasibility/unboundedness to get a valid proof/ray (default: false)
 - new status OPTIMAL_UNSCALED_VIOLATIONS to signal unresolved violations in original space
   (use method SoPlex::ignoreUnscaledViolations() to reset the status to OPTIMAL)
+- problem statistics distinguish ranged rows from equalities and show intuitive type counters
+  for variables and constraints
 
 05 February 2018 - Release 3.1.1
 ================================

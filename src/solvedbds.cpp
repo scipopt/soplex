@@ -3525,7 +3525,16 @@ namespace soplex
          }
 
          if( hasRhs && hasLhs )
-            origCountRanged++;
+         {
+            if( EQ(_realLP->rhs(i), _realLP->lhs(i)) )
+            {
+               origCountRanged++;
+               origCountLhs--;
+               origCountRhs--;
+            }
+            else
+               origCountEqual++;
+         }
 
          if( !hasRhs && !hasLhs )
             origCountFreeRow++;
@@ -3541,6 +3550,7 @@ namespace soplex
          << "        upper bound : " << origCountUpper << "\n"
          << "               free : " << origCountFreeCol << "\n"
          << "  Rows              : " << numProbRows << "\n"
+         << "              equal : " << origCountEqual << "\n"
          << "             ranged : " << origCountRanged << "\n"
          << "                lhs : " << origCountLhs << "\n"
          << "                rhs : " << origCountRhs << "\n"
