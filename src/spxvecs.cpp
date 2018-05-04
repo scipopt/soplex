@@ -23,17 +23,17 @@
 namespace soplex
 {
 /** Initialize Vectors
- 
+
     Computing the right hand side vector for the feasibility vector depends on
     the chosen representation and type of the basis.
- 
+
     In columnwise case, |theFvec| = \f$x_B = A_B^{-1} (- A_N x_N)\f$, where \f$x_N\f$
     are either upper or lower bounds for the nonbasic variables (depending on
     the variables |Status|). If these values remain unchanged throughout the
     simplex algorithm, they may be taken directly from LP. However, in the
     entering type algorith they are changed and, hence, retreived from the
     column or row upper or lower bound vectors.
- 
+
     In rowwise case, |theFvec| = \f$\pi^T_B = (c^T - 0^T A_N) A_B^{-1}\f$. However,
     this applies only to leaving type algorithm, where no bounds on dual
     variables are altered. In entering type algorithm they are changed and,
@@ -76,7 +76,7 @@ void SPxSolver::computeFrhs()
 
                default:
                   MSG_ERROR( std::cerr << "ESVECS01 ERROR: "
-                                    << "inconsistent basis must not happen!" 
+                                    << "inconsistent basis must not happen!"
                                     << std::endl; )
                   throw SPxInternalCodeException("XSVECS01 This should never happen.");
                }
@@ -176,7 +176,7 @@ void SPxSolver::computeFrhsXtra()
 
          default:
             MSG_ERROR( std::cerr << "ESVECS02 ERROR: "
-                              << "inconsistent basis must not happen!" 
+                              << "inconsistent basis must not happen!"
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS02 This should never happen.");
          }
@@ -234,7 +234,7 @@ void SPxSolver::computeFrhs1(
 
          default:
             MSG_ERROR( std::cerr << "ESVECS03 ERROR: "
-                              << "inconsistent basis must not happen!" 
+                              << "inconsistent basis must not happen!"
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS04 This should never happen.");
          }
@@ -248,7 +248,7 @@ void SPxSolver::computeFrhs1(
 }
 
 /** This methods subtracts \f$A_N x_N\f$ or \f$\pi_N^T A_N\f$ from |theFrhs| as
-    specified by the |Status| of all nonbasic variables. The values of 
+    specified by the |Status| of all nonbasic variables. The values of
     \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
  */
 void SPxSolver::computeFrhs2(
@@ -302,7 +302,7 @@ void SPxSolver::computeFrhs2(
 
          default:
             MSG_ERROR( std::cerr << "ESVECS05 ERROR: "
-                              << "inconsistent basis must not happen!" 
+                              << "inconsistent basis must not happen!"
                               << std::endl; )
             throw SPxInternalCodeException("XSVECS05 This should never happen.");
          }
@@ -318,20 +318,20 @@ void SPxSolver::computeFrhs2(
     the type of the simplex algorithm. In entering algorithms, the
     values are taken from the inequality's right handside or the
     column's objective value.
-    
+
     In contrast to this leaving algorithms take the values from vectors
     |theURbound| and so on.
-    
+
     We reflect this difference by providing two pairs of methods
     |computeEnterCoPrhs(n, stat)| and |computeLeaveCoPrhs(n, stat)|. The first
     pair operates for entering algorithms, while the second one is intended for
     leaving algorithms.  The return value of these methods is the right hand
     side value for the \f$n\f$-th row or column id, respectively, if it had the
     passed |Status| for both.
- 
+
     Both methods are again split up into two methods named |...4Row(i,n)| and
     |...4Col(i,n)|, respectively. They do their job for the |i|-th basis
-    variable, being the |n|-th row or column.  
+    variable, being the |n|-th row or column.
 */
 void SPxSolver::computeEnterCoPrhs4Row(int i, int n)
 {
@@ -503,7 +503,12 @@ void SPxSolver::computePvec()
       (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-void SPxSolver::setupPupdate(void)
+/** compute P.delta^T = coP.delta^T * A, assuming coP.delta = e_leaveId * B^-1.
+ *  This actually performs a truncated multiplication based on the assumption that
+ *  the coP.delta vector is the result of a solve with A_B^T. Hence the basic part
+ *  of the multiplication with A is known to be I and does not need to be computed.
+ */
+void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
 {
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
@@ -511,15 +516,46 @@ void SPxSolver::setupPupdate(void)
    if (c.isSetup())
    {
       if (c.size() < 0.95 * theCoPvec->dim())
+      {
          p.assign2product4setup(*thecovectors, c);
+      }
       else
-         p.assign2product(c, *thevectors);
+      {
+         Real eps = p.getEpsilon();
+         int codim = p.dim();
+         int enterIdx = -1;
+         p.clear();
+
+         // add another check to also compute the product for the current enterId
+         // because this is already marked to be basic
+         if( type() == ENTER )
+         {
+            if( (rep() == COLUMN && enterId->isSPxColId()) || (rep() == ROW && enterId->isSPxRowId()) )
+               enterIdx = number(*enterId);
+         }
+
+         for( int i = 0; i < codim; ++i )
+         {
+            // skip product involving basic vectors
+            if( !isBasic(i) || enterIdx == i )
+            {
+               Real y = (*thevectors)[i] * c;
+               if (isNotZero(y, eps))
+                  p.add(i, y);
+            }
+         }
+      }
    }
    else
    {
       p.assign2productAndSetup(*thecovectors, c);
    }
 
+   // add a 1.0 corresponding to the identity part of the multiplication result
+   if( rep() == COLUMN && leaveId->isSPxColId() )
+      p.setValue(number(SPxColId(*leaveId)), 1.0);
+   else if( rep() == ROW && leaveId->isSPxRowId() )
+      p.setValue(number(SPxRowId(*leaveId)), 1.0);
    p.setup();
 }
 

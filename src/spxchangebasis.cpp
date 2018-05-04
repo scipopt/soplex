@@ -423,6 +423,13 @@ void SPxBasis::restoreInitialBasis()
       {
          thedesc.rowStatus(i) = dualRowStatus(i);
          baseId(i) = theLP->SPxLP::rId(i);
+
+         // initialize nonbasic counters in coVectors
+         if( theLP->rep() == SPxSolver::COLUMN )
+         {
+            SVector& coVec_i = const_cast<SVector&> (theLP->coVector(i));
+            coVec_i.setNNonbasic(-1);
+         }
       }
 
       for (int i = 0; i < theLP->nCols(); ++i)

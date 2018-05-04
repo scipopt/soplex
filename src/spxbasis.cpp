@@ -88,6 +88,24 @@ SPxBasis::dualColStatus(int i) const
       return Desc::D_UNDEFINED;
 }
 
+void SPxBasis::updateLPAddedBasic(const SVector& basisvec, int newBaseIdx)
+{
+   for( int i = 0; i < basisvec.size(); ++i )
+   {
+      SVector& coVec_i = const_cast <SVector&> (theLP->coVector(basisvec.index(i)));
+      coVec_i.markBasic(newBaseIdx);
+   }
+}
+
+void SPxBasis::updateLPRemovedBasic(const SVector& basisvec, int oldBaseIdx)
+{
+   for( int i = 0; i < basisvec.size(); ++i )
+   {
+      SVector& coVec_i = const_cast <SVector&> (theLP->coVector(basisvec.index(i)));
+      coVec_i.markNonbasic(oldBaseIdx);
+   }
+}
+
 void SPxBasis::loadMatrixVecs()
 {
    assert(theLP != 0);
@@ -97,10 +115,20 @@ void SPxBasis::loadMatrixVecs()
 
    int i;
    nzCount = 0;
+
+   // initialize nonbasic counters in coVectors
+   for( i = theLP->dim() - 1; i >= 0; --i )
+   {
+      SVector& coVec_i = const_cast<SVector&> (theLP->coVector(i));
+      coVec_i.setNNonbasic(-1);
+   }
+
    for (i = theLP->dim() - 1; i >= 0; --i)
    {
       matrix[i] = &theLP->vector(baseId(i));
       nzCount += matrix[i]->size();
+      if( (theLP->rep() == SPxSolver::COLUMN && baseId(i).isSPxColId()) || (theLP->rep() == SPxSolver::ROW && baseId(i).isSPxRowId()) )
+         updateLPAddedBasic(*matrix[i], theLP->number(baseId(i)));
    }
    matrixIsSetup = true;
    factorized = false;
@@ -213,6 +241,17 @@ void SPxBasis::loadDesc(const Desc& ds)
 
    assert(theLP->dim() == matrix.size());
 
+   // initialize nonbasic counters in coVectors
+   // for COLUMN representation this is done later
+   if( theLP->rep() == SPxSolver::ROW )
+   {
+      for( j = 0; j < theLP->nCols(); ++j )
+      {
+         SVector& coVec_j = const_cast<SVector&> (theLP->coVector(j));
+         coVec_j.setNNonbasic(-1);
+      }
+   }
+
    nzCount = 0;
    for (j = i = 0; i < theLP->nRows(); ++i)
    {
@@ -246,7 +285,18 @@ void SPxBasis::loadDesc(const Desc& ds)
          SPxRowId id = theLP->SPxLP::rId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
+
+         if( theLP->rep() == SPxSolver::ROW )
+            updateLPAddedBasic(*matrix[j], theLP->number(id));
+
          nzCount += matrix[j++]->size();
+      }
+
+      // initialize nonbasic counters in coVectors
+      if( theLP->rep() == SPxSolver::COLUMN )
+      {
+         SVector& coVec_i = const_cast<SVector&> (theLP->coVector(i));
+         coVec_i.setNNonbasic(-1);
       }
    }
 
@@ -282,6 +332,10 @@ void SPxBasis::loadDesc(const Desc& ds)
          SPxColId id = theLP->SPxLP::cId(i);
          theBaseId[j] = id;
          matrix[j] = &theLP->vector(id);
+
+         if( theLP->rep() == SPxSolver::COLUMN )
+            updateLPAddedBasic(*matrix[j], theLP->number(id));
+
          nzCount += matrix[j++]->size();
       }
    }
@@ -363,12 +417,12 @@ void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
 
 
 
-/** 
+/**
  *  The specification is taken from the
  *
  *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 543.
  *
- *  This routine should read valid BAS format files. 
+ *  This routine should read valid BAS format files.
  *
  *  @return true if the file was read correctly.
  *
@@ -379,8 +433,8 @@ void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
  *  differences to this rule are given. Each data line contains an indicator, a variable name and
  *  possibly a row/constraint name. The following meaning applies with respect to the indicators:
  *
- *  - XU: the variable is basic, the row is nonbasic at its upper bound 
- *  - XL: the variable is basic, the row is nonbasic at its lower bound 
+ *  - XU: the variable is basic, the row is nonbasic at its upper bound
+ *  - XL: the variable is basic, the row is nonbasic at its lower bound
  *  - UL: the variable is nonbasic and at its upper bound
  *  - LL: the variable is nonbasic and at its lower bound
  *
@@ -391,8 +445,8 @@ void SPxBasis::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
  *  - at zero if free.
  */
 bool SPxBasis::readBasis(
-   std::istream&  is, 
-   const NameSet* rowNames, 
+   std::istream&  is,
+   const NameSet* rowNames,
    const NameSet* colNames)
 {
    assert(theLP != 0);
@@ -551,21 +605,21 @@ bool SPxBasis::readBasis(
 }
 
 
-/* Get row name - copied from spxmpswrite.cpp 
+/* Get row name - copied from spxmpswrite.cpp
  *
  * @todo put this in a common file and unify accross different formats (mps, lp, basis).
  */
 static const char* getRowName(
    const SPxLP*   lp,
    int            idx,
-   const NameSet* rnames, 
+   const NameSet* rnames,
    char*          buf)
 {
    assert(buf != 0);
    assert(idx >= 0);
    assert(idx < lp->nRows());
 
-   if (rnames != 0) 
+   if (rnames != 0)
    {
       DataKey key = lp->rId(idx);
 
@@ -573,25 +627,25 @@ static const char* getRowName(
          return (*rnames)[key];
    }
    spxSnprintf(buf, 16, "C%d", idx);
-   
+
    return buf;
 }
-   
-/* Get column name - copied from spxmpswrite.cpp 
+
+/* Get column name - copied from spxmpswrite.cpp
  *
  * @todo put this in a common file and unify accross different formats (mps, lp, basis).
  */
 static const char* getColName(
    const SPxLP*   lp,
    int            idx,
-   const NameSet* cnames, 
+   const NameSet* cnames,
    char*          buf)
 {
    assert(buf != 0);
    assert(idx >= 0);
    assert(idx < lp->nCols());
 
-   if (cnames != 0) 
+   if (cnames != 0)
    {
       DataKey key = lp->cId(idx);
 
@@ -599,7 +653,7 @@ static const char* getColName(
          return (*cnames)[key];
    }
    spxSnprintf(buf, 16, "x%d", idx);
-   
+
    return buf;
 }
 
@@ -608,8 +662,8 @@ static const char* getColName(
  * See SPxBasis::readBasis() for a short description of the format.
  */
 void SPxBasis::writeBasis(
-   std::ostream&  os, 
-   const NameSet* rowNames, 
+   std::ostream&  os,
+   const NameSet* rowNames,
    const NameSet* colNames,
    const bool cpxFormat
    ) const
@@ -650,7 +704,7 @@ void SPxBasis::writeBasis(
          os << std::setw(8) << getColName(theLP, col, colNames, buf);
 
          /* break in two parts since buf is reused */
-         os << "       " 
+         os << "       "
             << getRowName(theLP, row, rowNames, buf)
             << std::endl;
 
@@ -751,12 +805,26 @@ void SPxBasis::change(
    {
       assert(enterVec != 0);
 
+      // update the basis information in the rowwise/columnwise storage of A
+      if( (theBaseId[i].isSPxColId() && theLP->rep() == SPxSolver::COLUMN) ||
+          (theBaseId[i].isSPxRowId() && theLP->rep() == SPxSolver::ROW) )
+      {
+         updateLPRemovedBasic(*matrix[i], theLP->number(theBaseId[i]));
+      }
+
       // update the counter for nonzeros in the basis matrix
       nzCount      = nzCount - matrix[i]->size() + enterVec->size();
       // let the new id enter the basis
       matrix[i]    = enterVec;
       lastout      = theBaseId[i];
       theBaseId[i] = id;
+
+      // update the basis information in the rowwise representation of A
+      if( (id.isSPxColId() && theLP->rep() == SPxSolver::COLUMN) ||
+          (id.isSPxRowId() && theLP->rep() == SPxSolver::ROW) )
+      {
+         updateLPAddedBasic(*matrix[i], theLP->number(id));
+      }
 
       ++iterCount;
       ++updateCount;
@@ -1200,7 +1268,7 @@ bool SPxBasis::isConsistent() const
          else
             ++primals;
       }
-      
+
       for (i = 0; i < thedesc.nCols(); ++i)
       {
          if (thedesc.colStatus(i) >= 0)
@@ -1214,7 +1282,7 @@ bool SPxBasis::isConsistent() const
       if (primals != thedesc.nCols())
          return MSGinconsistent("SPxBasis");
    }
-   return thedesc.isConsistent() && theBaseId.isConsistent() 
+   return thedesc.isConsistent() && theBaseId.isConsistent()
       && matrix.isConsistent() && factor->isConsistent();
 #else
    return true;
@@ -1331,7 +1399,7 @@ SPxBasis& SPxBasis::operator=(const SPxBasis& rhs)
       }
       factor = rhs.factor->clone();
       freeSlinSolver = true;
-      
+
       factorized    = rhs.factorized;
       maxUpdates    = rhs.maxUpdates;
       nonzeroFactor = rhs.nonzeroFactor;

@@ -1911,7 +1911,7 @@ protected:
    virtual void rejectLeave(int leaveNum, SPxId leaveId,
       SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
    ///
-   virtual void setupPupdate(void);
+   virtual void setupPupdate(const SPxId* enterId = NULL, const SPxId* leaveId = NULL);
    ///
    virtual void doPupdate(void);
    ///
