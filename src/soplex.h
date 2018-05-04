@@ -1809,11 +1809,11 @@ private:
    int origCountBoxed;
    int origCountFreeCol;
 
+   int origCountEqual;
    int origCountLhs;
    int origCountRhs;
    int origCountRanged;
    int origCountFreeRow;
-
 
    decompStatus _currentProb;
 

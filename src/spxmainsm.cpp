@@ -4832,15 +4832,24 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
    MSG_INFO2( (*spxout),
       int numRangedRows = 0;
       int numBoxedCols = 0;
+      int numEqualities = 0;
 
-      for(int i = 0; i < lp.nRows(); ++i)
-         if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
-            ++numRangedRows;
+      for( int i = 0; i < lp.nRows(); ++i )
+      {
+         if( lp.lhs(i) > -infinity && lp.rhs(i) < infinity )
+         {
+            if( EQ(lp.lhs(i), lp.rhs(i)) )
+               ++numEqualities;
+            else
+               ++numRangedRows;
+         }
+      }
       for(int j = 0; j < lp.nCols(); ++j)
          if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
             ++numBoxedCols;
 
       (*spxout) << "LP has "
+                << numEqualities << " equations, "
                 << numRangedRows << " ranged rows, "
                 << numBoxedCols << " boxed columns"
                 << std::endl;
@@ -4962,17 +4971,25 @@ SPxSimplifier::Result SPxMainSM::simplify(SPxLP& lp, Real eps, Real ftol, Real o
 
    MSG_INFO2( (*spxout),
       int numRangedRows = 0;
-      int numBoxedCols  = 0;
+      int numBoxedCols = 0;
+      int numEqualities = 0;
 
-      for(int i = 0; i < lp.nRows(); ++i)
-         if (lp.lhs(i) > -infinity && lp.rhs(i) < infinity)
-            ++numRangedRows;
-
+      for( int i = 0; i < lp.nRows(); ++i )
+      {
+         if( lp.lhs(i) > -infinity && lp.rhs(i) < infinity )
+         {
+            if( EQ(lp.lhs(i), lp.rhs(i)) )
+               ++numEqualities;
+            else
+               ++numRangedRows;
+         }
+      }
       for(int j = 0; j < lp.nCols(); ++j)
          if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
             ++numBoxedCols;
 
       (*spxout) << "Reduced LP has "
+                << numEqualities << " equations, "
                 << numRangedRows << " ranged rows, "
                 << numBoxedCols << " boxed columns"
                 << std::endl;
