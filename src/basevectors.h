@@ -594,7 +594,10 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
 
 
-/// Assigns SSVectorBase to \f$A_N \cdot x\f$ for a setup \p x.
+/** Assigns SSVectorBase to \f$A_N \cdot x\f$ for a setup \p x.
+ * This only performs a truncated multiplication as explained
+ * in the documentation of \p SPxSolver::setupPupdate.
+ */
 #define shortProductFactor 0.5
 template < class R >
 template < class S, class T >
@@ -648,6 +651,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
    else
    {
       num = Ai.nnonbasic();
+      assert(Ai.nnonbasic() <= Ai.size());
       if( num == -1 )
          num = Ai.size();
       assert(num >= 0 && num <= Ai.size());
@@ -689,6 +693,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    int Aisize;
 
    Aisize = A0.nnonbasic();
+   assert(A0.nnonbasic() <= A0.size());
    if(Aisize == -1 )
       Aisize = A0.size();
    assert(Aisize >= 0 && Aisize <= A0.size());
@@ -723,6 +728,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
       const SVectorBase<S>& Ai = A[curidx];
 
       Aisize = Ai.nnonbasic();
+      assert(Ai.nnonbasic() <= Ai.size());
       if( Aisize == -1 )
          Aisize = Ai.size();
       assert(Aisize >= 0 && Aisize <= Ai.size());
@@ -810,6 +816,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
       const SVectorBase<S>& Ai = A[curidx];
 
       Aisize = Ai.nnonbasic();
+      assert(Ai.nnonbasic() <= Ai.size());
       if( Aisize == -1 )
          Aisize = Ai.size();
       assert(Aisize >= 0 && Aisize <= Ai.size());
@@ -866,6 +873,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
                int Aisize = Ai.nnonbasic();
+               assert(Ai.nnonbasic() <= Ai.size());
                if( Aisize == -1 )
                   Aisize = Ai.size();
 

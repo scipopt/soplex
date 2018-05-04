@@ -1973,6 +1973,8 @@ protected:
       }
 
       // move last row to removed position
+      // get all columns that have an index in the last row and rename all these indices to j
+      // so that afterwards there is no nRows-1 index in any of the columns
       int idx = nRows() - 1;
       if( j != idx )
       {
@@ -2033,6 +2035,8 @@ protected:
       }
 
       // move last column to removed position
+      // get all rows that have an index in the last column and rename all these indices to j
+      // so that afterwards there is no nCols-1 index in any of the rows
       int idx = nCols() - 1;
       if( j != idx )
       {

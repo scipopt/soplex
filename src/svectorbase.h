@@ -288,6 +288,10 @@ public:
          m_elem[n].val = v;
          set_size( n + 1 );
 
+         // new basis status is unknown, so it's safe to mark as nonbasic
+         if( numnonbasic > -1 )
+            markNonbasic(i, n);
+
          assert(size() <= max());
       }
    }
@@ -302,6 +306,9 @@ public:
 
       m_elem[n].idx = i;
       set_size( n + 1 );
+
+      // this might destroy the basis partitioning so we uninitialize it right away
+      setNNonbasic(-1);
 
       assert(size() <= max());
    }
@@ -321,8 +328,9 @@ public:
          return;
 
       int newnnz = 0;
+      int oldsize = size();
 
-      Nonzero<R>* e = m_elem + size();
+      Nonzero<R>* e = m_elem + oldsize;
 
       while( n-- )
       {
@@ -330,13 +338,16 @@ public:
          {
             e->idx = *i;
             e->val = *v;
+            // new basis status is unknown, so it's safe to mark as nonbasic
+            if( numnonbasic > -1 )
+               markNonbasic(*i, oldsize + newnnz);
             e++;
             ++newnnz;
          }
          i++;
          v++;
       }
-      set_size(size() + newnnz);
+      set_size(oldsize + newnnz);
    }
 
    /// Append \p n nonzeros.
@@ -349,8 +360,9 @@ public:
          return;
 
       int newnnz = 0;
+      int oldsize = size();
 
-      Nonzero<R>* e = m_elem + size();
+      Nonzero<R>* e = m_elem + oldsize;
 
       while( n-- )
       {
@@ -358,13 +370,16 @@ public:
          {
             e->idx = *i;
             e->val = *v;
+            // new basis status is unknown, so it's safe to mark as nonbasic
+            if( numnonbasic > -1 )
+               markNonbasic(*i, oldsize + newnnz);
             e++;
             ++newnnz;
          }
          i++;
          v++;
       }
-      set_size(size() + newnnz);
+      set_size(oldsize + newnnz);
    }
 
    /// Append \p n nonzeros.
@@ -376,19 +391,23 @@ public:
          return;
 
       int newnnz = 0;
+      int oldsize = size();
 
-      Nonzero<R>* ee = m_elem + size();
+      Nonzero<R>* ee = m_elem + oldsize;
 
       while( n-- )
       {
          if( e->val != 0.0 )
          {
+            // new basis status is unknown, so it's safe to mark as nonbasic
+            if( numnonbasic > -1 )
+               markNonbasic(e->idx, oldsize + newnnz);
             *ee++ = *e;
             ++newnnz;
          }
          e++;
       }
-      set_size(size() + newnnz);
+      set_size(oldsize + newnnz);
    }
 
    /// Remove nonzeros \p n thru \p m.
@@ -424,12 +443,20 @@ public:
       set_size(newsize);
       if( n < newsize )
          m_elem[n] = m_elem[newsize];
+
+      // basis information is available and needs to be updated if removed index was nonbasic
+      if( numnonbasic > -1 && n < numnonbasic )
+      {
+         std::swap(m_elem[n], m_elem[numnonbasic - 1]);
+         setNNonbasic(numnonbasic - 1);
+      }
    }
 
    /// Remove all indices.
    void clear()
    {
       set_size(0);
+      setNNonbasic(-1);
    }
 
    /// Sort nonzeros to increasing indices.
@@ -460,11 +487,12 @@ public:
                l[1] = dummy;
             }
          }
+         setNNonbasic(-1);
       }
    }
 
    /// store new basis information in vector by swapping values accordingly
-   void markBasic(const int newBasicIdx = -1)
+   void markBasic(const int newBasicIdx = -1, int newBasicPos = -1)
    {
       // nothing changed
       if( newBasicIdx == -1 )
@@ -474,7 +502,8 @@ public:
       if( numnonbasic == -1 )
          numnonbasic = memused;
 
-      int newBasicPos = pos(newBasicIdx);
+      if( newBasicPos == -1 )
+         newBasicPos = pos(newBasicIdx);
       assert(newBasicPos < numnonbasic);
 
       // swap the new basic nonzeros with the last nonbasic one and decrement nnonbasic
@@ -485,7 +514,7 @@ public:
    }
 
    /// store new basis information in vector by swapping values accordingly
-   void markNonbasic(const int newNonbasicIdx = -1)
+   void markNonbasic(const int newNonbasicIdx = -1, int newNonbasicPos = -1)
    {
       // nothing changed
       if( newNonbasicIdx == -1 )
@@ -495,11 +524,11 @@ public:
       if( numnonbasic == -1 )
          numnonbasic = memused;
 
-      int newNonbasicPos = pos(newNonbasicIdx);
+      if( newNonbasicPos == -1 )
+         newNonbasicPos = pos(newNonbasicIdx);
       assert(newNonbasicPos >= numnonbasic);
 
       // swap the new basic nonzeros with the last nonbasic one and increment nnonbasic
-      assert(numnonbasic < size());
       if( newNonbasicPos > numnonbasic )
          std::swap(m_elem[numnonbasic], m_elem[newNonbasicPos]);
 

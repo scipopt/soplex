@@ -3,7 +3,7 @@ Developer version
 
 features:
 - new simplifier step to perform variable aggregation for equations with two variables
-- faster matrix-vector multiplication (PRICE step) by only regarding nonbasic indices (COLUMN representation)
+- faster matrix-vector multiplication (PRICE step) by only regarding nonbasic indices
 
 05 February 2018 - Release 3.1.1
 ================================
