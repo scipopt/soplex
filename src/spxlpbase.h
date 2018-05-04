@@ -1250,13 +1250,11 @@ public:
          if( hasRhs && hasLhs )
          {
             if( EQ(lhs(i), rhs(i)) )
-            {
-               countRanged++;
-               countLhs--;
-               countRhs--;
-            }
-            else
                countEqual++;
+            else
+               countRanged++;
+            countLhs--;
+            countRhs--;
          }
 
          if( !hasRhs && !hasLhs )

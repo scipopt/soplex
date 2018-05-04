@@ -3501,7 +3501,11 @@ namespace soplex
          }
 
          if( hasUpper && hasLower )
+         {
             origCountBoxed++;
+            origCountUpper--;
+            origCountLower--;
+         }
 
          if( !hasUpper && !hasLower )
             origCountFreeCol++;
@@ -3527,13 +3531,11 @@ namespace soplex
          if( hasRhs && hasLhs )
          {
             if( EQ(_realLP->rhs(i), _realLP->lhs(i)) )
-            {
-               origCountRanged++;
-               origCountLhs--;
-               origCountRhs--;
-            }
-            else
                origCountEqual++;
+            else
+               origCountRanged++;
+            origCountLhs--;
+            origCountRhs--;
          }
 
          if( !hasRhs && !hasLhs )
