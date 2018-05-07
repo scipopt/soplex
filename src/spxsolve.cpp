@@ -138,6 +138,9 @@ SPxSolver::Status SPxSolver::solve()
    bool  priced = false;
    Real  lastDelta = 1;
 
+   /* allow clean up step only once */
+   recomputedVectors = false;
+
    /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
    Real  stallRefValue;
    Real  stallRefShift;

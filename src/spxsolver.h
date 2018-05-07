@@ -294,6 +294,8 @@ private:
    bool           instableEnter;
    Real           instableEnterVal;
 
+   bool           recomputedVectors;      ///< flag to perform clean up step to reduce numerical errors only once
+
    int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
