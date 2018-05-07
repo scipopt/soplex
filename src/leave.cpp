@@ -786,7 +786,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       }
 
       /* do not exit with status infeasible or unbounded if there is only a very small violation */
-      if (spxAbs(enterVal) < leavetol())
+      if( !recomputedVectors && spxAbs(enterVal) < leavetol() )
       {
          MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
 
@@ -794,8 +794,12 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          SPxBasis::solve(*theFvec, *theFrhs);
          computeFtest();
 
+         /* only do this once per solve */
+         recomputedVectors = true;
+
          return true;
       }
+
       MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
                            << "in leave()" << std::endl; )
 

@@ -1390,7 +1390,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
       /* do not exit with status infeasible or unbounded if there is only a very small violation
        * ROW: recompute the primal variables and activities for another, more precise, round of pricing
        */
-      else if (spxAbs(enterTest) < entertol())
+      else if( !recomputedVectors && spxAbs(enterTest) < entertol() )
       {
          MSG_INFO3( (*spxout), (*spxout) << "IENTER11 clean up step to reduce numerical errors" << std::endl; )
 
@@ -1398,6 +1398,9 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          computePvec();
          computeCoTest();
          computeTest();
+
+         /* only do this once per solve */
+         recomputedVectors = true;
 
          return false;
       }

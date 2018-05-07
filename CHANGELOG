@@ -13,6 +13,10 @@ interface & parameters:
 - problem statistics distinguish ranged rows from equalities and show intuitive type counters
   for variables and constraints
 
+fixed bugs:
+- allow only one clean up round to avoid cycling on numerically difficult infeasible/unbounded instances
+
+
 05 February 2018 - Release 3.1.1
 ================================
 
