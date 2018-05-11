@@ -551,6 +551,7 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
       p.assign2productAndSetup(*thecovectors, c);
    }
 
+   p.unSetup();
    // add a 1.0 corresponding to the identity part of the multiplication result
    if( rep() == COLUMN && leaveId->isSPxColId() )
       p.setValue(number(SPxColId(*leaveId)), 1.0);
