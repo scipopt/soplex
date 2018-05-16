@@ -13,7 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -670,4 +669,3 @@ namespace soplex
          _scaler->unscaleDualray(LP, _solReal._dualFarkas);
    }
 } // namespace soplex
-#endif

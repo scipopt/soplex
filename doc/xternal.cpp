@@ -177,11 +177,7 @@
  * using option \-\-saveset=FILENAME.set.  After changing parameter values in this
  * file you can use it by with \-\-loadset=FILENAME.set.  The most frequently used
  * parameters have abbreviations.
- *
- * For compatibility the command line interface of SoPlex versions 1.x is
- * available when you compile SoPlex with "make LEGACY=true" (using the provided
- * Makefile) or compile with the preprocessor define SOPLEX_LEGACY.
- */
+*/
 
 
 /**@page LIB How to use SoPlex as a callable library
@@ -204,10 +200,7 @@
  *@section LIB3 Deprecated 1.x interface
  *
  * With version 2.0, the SoPlex class has been updated significantly compared to
- * the 1.x version.  Although this is deprecated, it is still possible to use
- * the 1.x interface class by compiling with LEGACY=true (using the provided
- * Makefile) or compiling with the preprocessor flag SOPLEX_LEGACY.  This
- * deactivates the functionalities to solve LPs exactly.
+ * the 1.x version.  Since version 4.0, the old version cannot be used anymore.
 */
 
 

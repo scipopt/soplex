@@ -13,7 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -271,4 +270,3 @@ namespace soplex
 
    }
 } // namespace soplex
-#endif

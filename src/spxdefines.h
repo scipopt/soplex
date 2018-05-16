@@ -44,7 +44,7 @@ namespace soplex
 {
 #define SOPLEX_VERSION         311
 #define SOPLEX_SUBVERSION        4
-#define SOPLEX_APIVERSION        4
+#define SOPLEX_APIVERSION        5
 #define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2018 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
@@ -305,12 +305,10 @@ inline Real spxSqrt(Real a)
 }
 
 // returns the next representable value after x in the direction of y
-#ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafterl(x,y);
 }
-#endif
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
@@ -337,7 +335,6 @@ inline Real spxSqrt(Real a)
 }
 
 // returns the next representable value after x in the direction of y
-#ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
 #ifndef _MSC_VER
@@ -346,7 +343,6 @@ inline Real spxNextafter(Real x, Real y)
    return _nextafter(x,y);
 #endif
 }
-#endif
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)

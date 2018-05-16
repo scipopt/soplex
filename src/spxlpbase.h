@@ -2808,37 +2808,6 @@ void SPxLPBase<Real>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, 
 template <>
 void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
 
-#ifndef SOPLEX_LEGACY
-// Declaration of Rational specializations found in spxlpbase_rational.cpp
-
-template <>
-void SPxLPBase<Rational>::computePrimalActivity(const VectorBase<Rational>& primal, VectorBase<Rational>& activity, const bool unscaled) const;
-
-template <>
-void SPxLPBase<Rational>::computeDualActivity(const VectorBase<Rational>& dual, VectorBase<Rational>& activity, const bool unscaled) const;
-
-template <>
-Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const;
-
-template <>
-Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const;
-
-template <>
-bool SPxLPBase<Rational>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
-
-template <>
-bool SPxLPBase<Rational>::readMPS(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
-
-template <>
-void SPxLPBase<Rational>::writeLPF(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
-
-template <>
-void SPxLPBase<Rational>::writeMPS(std::ostream& p_output, const NameSet* p_rnames, const NameSet* p_cnames, const DIdxSet* p_intvars) const;
-
-template <>
-void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
-#endif
-
 } // namespace soplex
 
 /* reset the SOPLEX_DEBUG flag to its original value */

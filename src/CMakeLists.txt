@@ -17,7 +17,6 @@ set(sources
     solverational.cpp
     solvereal.cpp
     soplex.cpp
-    soplexlegacy.cpp
     spxautopr.cpp
     spxbasis.cpp
     spxboundflippingrt.cpp
@@ -104,7 +103,6 @@ set(headers
     solbase.h
     sol.h
     soplex.h
-    soplexlegacy.h
     sorter.h
     spxalloc.h
     spxautopr.h
@@ -184,10 +182,8 @@ if(CMAKE_BUILD_TYPE EQUAL "Debug")
     add_sanitizers(soplex)
 endif()
 
-if(NOT LEGACY EQUAL ON)
-    add_executable(example EXCLUDE_FROM_ALL example.cpp)
-    target_link_libraries(example libsoplex)
-endif()
+add_executable(example EXCLUDE_FROM_ALL example.cpp)
+target_link_libraries(example libsoplex)
 
 # set the install rpath to the installed destination
 set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")

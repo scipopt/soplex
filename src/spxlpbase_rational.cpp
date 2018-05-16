@@ -17,7 +17,6 @@
  * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 
-#ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -2420,4 +2419,3 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 
 template class SPxLPBase < Rational >;
 } // namespace soplex
-#endif

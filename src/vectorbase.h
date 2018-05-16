@@ -522,7 +522,6 @@ void VectorBase<Real>::clear()
 
 
 
-#ifndef SOPLEX_LEGACY
 /// Inner product.
 template<>
 inline
@@ -541,7 +540,6 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
 
    return x;
 }
-#endif
 
 } // namespace soplex
 #endif // _VECTORBASE_H_

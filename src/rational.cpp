@@ -17,7 +17,6 @@
  * @brief Wrapper for GMP types.
  */
 
-#ifndef SOPLEX_LEGACY
 #include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
@@ -3979,4 +3978,3 @@ int dmaxSizeRational(const Rational* vector, const int length, const int base)
 
 #endif // SOPLEX_WITH_GMP
 } // namespace soplex
-#endif
