@@ -594,10 +594,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
 
 
-/** Assigns SSVectorBase to \f$A_N \cdot x\f$ for a setup \p x.
- * This only performs a truncated multiplication as explained
- * in the documentation of \p SPxSolver::setupPupdate.
- */
+/// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
 #define shortProductFactor 0.5
 template < class R >
 template < class S, class T >
@@ -650,12 +647,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
       clear();    // this := zero vector
    else
    {
-      num = Ai.nnonbasic();
-      assert(Ai.nnonbasic() <= Ai.size());
-      if( num == -1 )
-         num = Ai.size();
-      assert(num >= 0 && num <= Ai.size());
-      for( int j = 0; j < num; ++j )
+      num = Ai.size();
+      for( int j = num - 1; j >= 0; --j )
       {
          const Nonzero<S>& Aij = Ai.element(j);
          idx[j] = Aij.idx;
@@ -692,20 +685,15 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    int xsize = x.size();
    int Aisize;
 
-   Aisize = A0.nnonbasic();
-   assert(A0.nnonbasic() <= A0.size());
-   if(Aisize == -1 )
-      Aisize = A0.size();
-   assert(Aisize >= 0 && Aisize <= A0.size());
-
-   if( isZero(x0, epsilon) || Aisize == 0 )
+   num = A0.size();
+   if( isZero(x0, epsilon) || num == 0 )
    {
       // A[0] == 0 or x[0] == 0 => this := zero vector
       clear();
    }
    else
    {
-      for( int j = 0; j < Aisize; ++j )
+      for( int j = 0; j < num; ++j )
       {
          const Nonzero<S>& elt = A0.element(j);
          const R product = x0 * elt.val;
@@ -727,14 +715,9 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
       const T xi     = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
 
-      Aisize = Ai.nnonbasic();
-      assert(Ai.nnonbasic() <= Ai.size());
-      if( Aisize == -1 )
-         Aisize = Ai.size();
-      assert(Aisize >= 0 && Aisize <= Ai.size());
-
-      // If x[i] == 0, do nothing.
-      if( isNotZero(xi, epsilon) )
+      // If A[i] == 0 or x[i] == 0, do nothing.
+      Aisize = Ai.size();
+      if ( isNotZero(xi, epsilon) || Aisize == 0 )
       {
          // Compute x[i] * A[i] and add it to the existing vector.
          for( int j = 0; j < Aisize; ++j )
@@ -780,9 +763,9 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
          idx[nz_counter] = curidx;
          ++nz_counter;
       }
-   }
 
-   num = nz_counter;
+      num = nz_counter;
+   }
 
    assert(isConsistent());
 
@@ -814,12 +797,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
       const int curidx = x.idx[i];
       const T xi = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
-
-      Aisize = Ai.nnonbasic();
-      assert(Ai.nnonbasic() <= Ai.size());
-      if( Aisize == -1 )
-         Aisize = Ai.size();
-      assert(Aisize >= 0 && Aisize <= Ai.size());
+      Aisize = Ai.size();
 
       if( A_is_zero && Aisize > 0 )
          A_is_zero = false;
@@ -839,7 +817,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
 
 
 
-/// Assigns SSVectorBase to \f$A_N \cdot x\f$ thereby setting up \p x.
+/// Assigns SSVectorBase to \f$A \cdot x\f$ thereby setting up \p x.
 template < class R >
 template < class S, class T >
 inline
@@ -872,12 +850,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
-               int Aisize = Ai.nnonbasic();
-               assert(Ai.nnonbasic() <= Ai.size());
-               if( Aisize == -1 )
-                  Aisize = Ai.size();
 
-               for( int j = 0; j < Aisize; ++j )
+               for( int j = Ai.size() - 1; j >= 0; --j )
                {
                   const Nonzero<S>& elt = Ai.element(j);
                   VectorBase<R>::val[elt.idx] += xval * elt.val;

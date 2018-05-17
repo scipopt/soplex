@@ -676,7 +676,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
    }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
-   setupPupdate(NULL, &baseId(leaveIdx));
+   setupPupdate();
 
    assert(thePvec->isConsistent());
    assert(theCoPvec->isConsistent());

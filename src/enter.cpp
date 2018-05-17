@@ -1239,7 +1239,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
          if (pricing() == FULL)
          {
             thePvec->value() = theCoPvec->value();
-            setupPupdate(&enterId, &baseId(leaveIdx));
+            setupPupdate();
          }
          doPupdate();
       }

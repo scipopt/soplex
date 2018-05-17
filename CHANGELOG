@@ -3,7 +3,6 @@ Developer version
 
 features:
 - new simplifier step to perform variable aggregation for equations with two variables
-- faster matrix-vector multiplication (PRICE step) by only regarding nonbasic indices
 
 interface & parameters:
 - new option bool:ensureray to re-solve the original problem in case of
