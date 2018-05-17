@@ -137,7 +137,6 @@ private:
    Nonzero<R>* m_elem;
    int memsize;
    int memused;
-   int numnonbasic; // counter to track number of nonbasic indices
 
    //@}
 
@@ -161,13 +160,6 @@ public:
    {
       assert(m_elem != 0 || memused == 0);
       return memsize;
-   }
-
-   /// Number of nonbasic indices.
-   int nnonbasic() const
-   {
-      assert(m_elem != 0 || memused == 0);
-      return numnonbasic;
    }
 
    /// Dimension of the vector defined as maximal index + 1
@@ -288,10 +280,6 @@ public:
          m_elem[n].val = v;
          set_size( n + 1 );
 
-         // new basis status is unknown, so it's safe to mark as nonbasic
-         if( numnonbasic > -1 )
-            markNonbasic(i, n);
-
          assert(size() <= max());
       }
    }
@@ -306,9 +294,6 @@ public:
 
       m_elem[n].idx = i;
       set_size( n + 1 );
-
-      // this might destroy the basis partitioning so we uninitialize it right away
-      setNNonbasic(-1);
 
       assert(size() <= max());
    }
@@ -328,9 +313,8 @@ public:
          return;
 
       int newnnz = 0;
-      int oldsize = size();
 
-      Nonzero<R>* e = m_elem + oldsize;
+      Nonzero<R>* e = m_elem + size();
 
       while( n-- )
       {
@@ -338,16 +322,13 @@ public:
          {
             e->idx = *i;
             e->val = *v;
-            // new basis status is unknown, so it's safe to mark as nonbasic
-            if( numnonbasic > -1 )
-               markNonbasic(*i, oldsize + newnnz);
             e++;
             ++newnnz;
          }
          i++;
          v++;
       }
-      set_size(oldsize + newnnz);
+      set_size(size() + newnnz);
    }
 
    /// Append \p n nonzeros.
@@ -360,9 +341,8 @@ public:
          return;
 
       int newnnz = 0;
-      int oldsize = size();
 
-      Nonzero<R>* e = m_elem + oldsize;
+      Nonzero<R>* e = m_elem + size();
 
       while( n-- )
       {
@@ -370,16 +350,13 @@ public:
          {
             e->idx = *i;
             e->val = *v;
-            // new basis status is unknown, so it's safe to mark as nonbasic
-            if( numnonbasic > -1 )
-               markNonbasic(*i, oldsize + newnnz);
             e++;
             ++newnnz;
          }
          i++;
          v++;
       }
-      set_size(oldsize + newnnz);
+      set_size(size() + newnnz);
    }
 
    /// Append \p n nonzeros.
@@ -391,23 +368,19 @@ public:
          return;
 
       int newnnz = 0;
-      int oldsize = size();
 
-      Nonzero<R>* ee = m_elem + oldsize;
+      Nonzero<R>* ee = m_elem + size();
 
       while( n-- )
       {
          if( e->val != 0.0 )
          {
-            // new basis status is unknown, so it's safe to mark as nonbasic
-            if( numnonbasic > -1 )
-               markNonbasic(e->idx, oldsize + newnnz);
             *ee++ = *e;
             ++newnnz;
          }
          e++;
       }
-      set_size(oldsize + newnnz);
+      set_size(size() + newnnz);
    }
 
    /// Remove nonzeros \p n thru \p m.
@@ -443,20 +416,12 @@ public:
       set_size(newsize);
       if( n < newsize )
          m_elem[n] = m_elem[newsize];
-
-      // basis information is available and needs to be updated if removed index was nonbasic
-      if( numnonbasic > -1 && n < numnonbasic )
-      {
-         std::swap(m_elem[n], m_elem[numnonbasic - 1]);
-         setNNonbasic(numnonbasic - 1);
-      }
    }
 
    /// Remove all indices.
    void clear()
    {
       set_size(0);
-      setNNonbasic(-1);
    }
 
    /// Sort nonzeros to increasing indices.
@@ -487,52 +452,7 @@ public:
                l[1] = dummy;
             }
          }
-         setNNonbasic(-1);
       }
-   }
-
-   /// store new basis information in vector by swapping values accordingly
-   void markBasic(const int newBasicIdx = -1, int newBasicPos = -1)
-   {
-      // nothing changed
-      if( newBasicIdx == -1 )
-         return;
-
-      // initialize nonbasic counter
-      if( numnonbasic == -1 )
-         numnonbasic = memused;
-
-      if( newBasicPos == -1 )
-         newBasicPos = pos(newBasicIdx);
-      assert(newBasicPos < numnonbasic);
-
-      // swap the new basic nonzeros with the last nonbasic one and decrement nnonbasic
-      assert(numnonbasic > 0);
-      --numnonbasic;
-      if( newBasicPos < numnonbasic )
-         std::swap(m_elem[numnonbasic], m_elem[newBasicPos]);
-   }
-
-   /// store new basis information in vector by swapping values accordingly
-   void markNonbasic(const int newNonbasicIdx = -1, int newNonbasicPos = -1)
-   {
-      // nothing changed
-      if( newNonbasicIdx == -1 )
-         return;
-
-      // initialize nonbasic counter
-      if( numnonbasic == -1 )
-         numnonbasic = memused;
-
-      if( newNonbasicPos == -1 )
-         newNonbasicPos = pos(newNonbasicIdx);
-      assert(newNonbasicPos >= numnonbasic);
-
-      // swap the new basic nonzeros with the last nonbasic one and increment nnonbasic
-      if( newNonbasicPos > numnonbasic )
-         std::swap(m_elem[numnonbasic], m_elem[newNonbasicPos]);
-
-      ++numnonbasic;
    }
 
    //@}
@@ -672,12 +592,8 @@ public:
     *  beginning of the memory block. Once this memory has been passed, it shall not be modified until the SVectorBase
     *  is no longer used.
     */
-   explicit SVectorBase<R>(int n = 0, Nonzero<R>* p_mem = 0, int nnb = -1)
+   explicit SVectorBase<R>(int n = 0, Nonzero<R>* p_mem = 0)
    {
-      numnonbasic = nnb;
-      memsize = 0;
-      memused = 0;
-      m_elem = 0;
       setMem(n, p_mem);
    }
 
@@ -709,7 +625,6 @@ public:
          }
 
          set_size(nnz);
-         numnonbasic = sv.numnonbasic;
       }
 
       return *this;
@@ -740,7 +655,6 @@ public:
          }
 
          set_size(nnz);
-         numnonbasic = sv.numnonbasic;
       }
 
       return *this;
@@ -759,7 +673,6 @@ public:
             m_elem[i].idx = sv.index(i);
          }
 
-         numnonbasic = sv.numnonbasic;
          assert(isConsistent());
       }
 
@@ -790,7 +703,6 @@ public:
             }
          }
 
-         numnonbasic = sv.numnonbasic;
          assert(isConsistent());
       }
 
@@ -855,13 +767,6 @@ public:
       m_elem = elmem;
       set_size(0);
       set_max(n);
-   }
-
-   /// Set number of nonbasic indices.
-   void setNNonbasic(int nnb)
-   {
-      assert(nnb <= size() && nnb >= -1);
-      numnonbasic = nnb;
    }
 
    //@}

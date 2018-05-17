@@ -503,12 +503,7 @@ void SPxSolver::computePvec()
       (*thePvec)[i] = vector(i) * (*theCoPvec);
 }
 
-/** compute P.delta^T = coP.delta^T * A, assuming coP.delta = e_leaveId * B^-1.
- *  This actually performs a truncated multiplication based on the assumption that
- *  the coP.delta vector is the result of a solve with A_B^T. Hence the basic part
- *  of the multiplication with A is known to be I and does not need to be computed.
- */
-void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
+void SPxSolver::setupPupdate(void)
 {
    SSVector& p = thePvec->delta();
    SSVector& c = theCoPvec->delta();
@@ -516,47 +511,15 @@ void SPxSolver::setupPupdate(const SPxId* enterId, const SPxId* leaveId)
    if (c.isSetup())
    {
       if (c.size() < 0.95 * theCoPvec->dim())
-      {
          p.assign2product4setup(*thecovectors, c);
-      }
       else
-      {
-         Real eps = p.getEpsilon();
-         int codim = p.dim();
-         int enterIdx = -1;
-         p.clear();
-
-         // add another check to also compute the product for the current enterId
-         // because this is already marked to be basic
-         if( type() == ENTER )
-         {
-            if( (rep() == COLUMN && enterId->isSPxColId()) || (rep() == ROW && enterId->isSPxRowId()) )
-               enterIdx = number(*enterId);
-         }
-
-         for( int i = 0; i < codim; ++i )
-         {
-            // skip product involving basic vectors
-            if( !isBasic(i) || enterIdx == i )
-            {
-               Real y = (*thevectors)[i] * c;
-               if (isNotZero(y, eps))
-                  p.add(i, y);
-            }
-         }
-      }
+         p.assign2product(c, *thevectors);
    }
    else
    {
       p.assign2productAndSetup(*thecovectors, c);
    }
 
-   p.unSetup();
-   // add a 1.0 corresponding to the identity part of the multiplication result
-   if( rep() == COLUMN && leaveId->isSPxColId() )
-      p.setValue(number(SPxColId(*leaveId)), 1.0);
-   else if( rep() == ROW && leaveId->isSPxRowId() )
-      p.setValue(number(SPxRowId(*leaveId)), 1.0);
    p.setup();
 }
 
