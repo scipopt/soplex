@@ -12,6 +12,7 @@ interface & parameters:
   (use method SoPlex::ignoreUnscaledViolations() to reset the status to OPTIMAL)
 - problem statistics distinguish ranged rows from equalities and show intuitive type counters
   for variables and constraints
+- remove LEGACY mode (C++11 standard is mandatory)
 
 fixed bugs:
 - allow only one clean up round to avoid cycling on numerically difficult infeasible/unbounded instances

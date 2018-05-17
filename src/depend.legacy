@@ -1,1 +1,0 @@
-src/soplexmain.cpp src/rational.cpp src/ratrecon.cpp src/solvedbds.cpp src/solverational.cpp src/solvereal.cpp src/soplex.cpp src/spxlpbase_rational.cpp src/spxscaler.cpp src/statistics.cpp src/validation.cpp src/testsoplex.cpp src/basevectors.h src/rational.h src/ratrecon.h src/soplex.h src/spxdefines.h src/spxscaler.h src/statistics.h src/vectorbase.h

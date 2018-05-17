@@ -101,9 +101,7 @@ public:
    /// compute a single scaling vector , e.g. of a newly added row
    virtual int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
 
-#ifndef SOPLEX_LEGACY
    virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
-#endif
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);

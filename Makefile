@@ -67,9 +67,6 @@ LINKSINFO	=
 MEM		=	2000
 CONTINUE	=	false
 
-# will this be compiled with the 1.x interface?
-LEGACY		=	false
-
 # is it allowed to link to external open source libraries?
 OPENSOURCE	=	true
 
@@ -160,7 +157,6 @@ LIBHEADER	=	array.h \
 			solbase.h \
 			sol.h \
 			soplex.h \
-			soplexlegacy.h \
 			sorter.h \
 			spxalloc.h \
 			spxautopr.h \
@@ -231,7 +227,6 @@ LIBOBJ		= 	changesoplex.o \
 			solverational.o \
 			solvereal.o \
 			soplex.o \
-			soplexlegacy.o \
 			spxautopr.o \
 			spxbasis.o \
 			spxboundflippingrt.o \
@@ -337,17 +332,6 @@ ARFLAGS		+=	$(USRARFLAGS)
 DFLAGS		+=	$(USRDFLAGS)
 
 #-----------------------------------------------------------------------------
-# LEGACY
-#-----------------------------------------------------------------------------
-
-LEGACYDEP	:=	$(SRCDIR)/depend.legacy
-LEGACYSRC	:=	$(shell cat $(LEGACYDEP))
-
-ifeq ($(LEGACY),true)
-CPPFLAGS	+=	-DSOPLEX_LEGACY
-endif
-
-#-----------------------------------------------------------------------------
 # Main Program
 #-----------------------------------------------------------------------------
 
@@ -392,10 +376,8 @@ endif
 GMPDEP	:=	$(SRCDIR)/depend.gmp
 GMPSRC	:=	$(shell cat $(GMPDEP))
 ifeq ($(GMP),true)
-ifeq ($(LEGACY),false)
 CPPFLAGS	+= -DSOPLEX_WITH_GMP $(GMP_CPPFLAGS)
 LDFLAGS	+= $(GMP_LDFLAGS)
-endif
 else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
@@ -417,12 +399,10 @@ endif
 EGLIBDEP	:=	$(SRCDIR)/depend.eglib
 EGLIBSRC	:=	$(shell cat $(EGLIBDEP))
 ifeq ($(EGLIB),true)
-ifeq ($(LEGACY),false)
 CPPFLAGS	+=	-DSOPLEX_WITH_EGLIB -I$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/include
 LDFLAGS		+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a
 SOFTLINKS	+=	$(LIBDIR)/eglib.$(OSTYPE).$(ARCH).$(COMP)
 LINKSINFO	+=	"\n  -> \"eglib.$(OSTYPE).$(ARCH).$(COMP)\" is a directory containing the EGlib installation, i.e., \"eglib.$(OSTYPE).$(ARCH).$(COMP)/include/EGlib.h\" and \"eglib.$(OSTYPE).$(ARCH).$(COMP)/lib/EGlib.a\" should exist.\n"
-endif
 endif
 
 ifeq ($(GMP),true)
@@ -531,20 +511,11 @@ doc:
 
 .PHONY: test
 test:		#$(BINFILE)
-ifeq ($(LEGACY),false)
 		cd check; ./test.sh $(TEST) ../$(BINFILE) $(SETTINGS) $(TIME) $(RESDIR)
-endif
-ifeq ($(LEGACY),true)
-		cd check; ./check_legacy.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
-endif
+
 .PHONY: check
 check:	#$(BINFILE)
-ifeq ($(LEGACY),false)
 		cd check; ./check.sh ../$(BINFILE) $(RESDIR)
-endif
-ifeq ($(LEGACY),true)
-		cd check; ./check_legacy.sh $(TEST).test ../$(BINFILE) '$(ALGO)' $(LIMIT)
-endif
 
 valgrind-check:	$(BINFILE)
 		cd check; \
@@ -604,22 +575,21 @@ $(LIBDIR):
 
 .PHONY: depend
 depend:
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(BINSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(EXAMPLESRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(BINOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
-		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) \
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(ALLSRC)` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
 		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
-		@echo `grep -l "SOPLEX_LEGACY" $(ALLSRC)` >$(LEGACYDEP)
 
 -include	$(DEPEND)
 
@@ -637,7 +607,7 @@ $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 -include $(LASTSETTINGS)
 
 .PHONY: touchexternal
-touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) $(LEGACYDEP) | $(OBJDIR)
+touchexternal:	$(GMPDEP) $(ZLIBDEP) $(EGLIBDEP) | $(OBJDIR)
 ifneq ($(SPXGITHASH),$(LAST_SPXGITHASH))
 		@-$(MAKE) githash
 endif
@@ -654,9 +624,6 @@ ifneq ($(ZLIB),$(LAST_ZLIB))
 endif
 ifneq ($(EGLIB),$(LAST_EGLIB))
 		@-touch $(EGLIBSRC)
-endif
-ifneq ($(LEGACY),$(LAST_LEGACY))
-		@-touch $(LEGACYSRC)
 endif
 ifneq ($(SHARED),$(LAST_SHARED))
 		@-touch $(LIBSRC)
@@ -685,7 +652,6 @@ endif
 		@echo "LAST_GMP=$(GMP)" >> $(LASTSETTINGS)
 		@echo "LAST_ZLIB=$(ZLIB)" >> $(LASTSETTINGS)
 		@echo "LAST_EGLIB=$(EGLIB)" >> $(LASTSETTINGS)
-		@echo "LAST_LEGACY=$(LEGACY)" >> $(LASTSETTINGS)
 		@echo "LAST_SHARED=$(SHARED)" >> $(LASTSETTINGS)
 		@echo "LAST_SANITIZE=$(SANITIZE)" >> $(LASTSETTINGS)
 		@echo "LAST_USRCXXFLAGS=$(USRCXXFLAGS)" >> $(LASTSETTINGS)
@@ -764,11 +730,6 @@ endif
 ifneq ($(EGLIB),true)
 ifneq ($(EGLIB),false)
 		$(error invalid EGLIB flag selected: EGLIB=$(EGLIB). Possible options are: true false)
-endif
-endif
-ifneq ($(LEGACY),true)
-ifneq ($(LEGACY),false)
-		$(error invalid LEGACY flag selected: LEGACY=$(LEGACY). Possible options are: true false)
 endif
 endif
 

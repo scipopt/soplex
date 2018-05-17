@@ -161,12 +161,10 @@ int SPxScaler::computeScaleExp(const SVector& vec, const DataArray<int>& oldScal
    }
 }
 
-#ifndef SOPLEX_LEGACY
 int SPxScaler::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const
 {
    return 0;
 }
-#endif
 
 void SPxScaler::applyScaling(SPxLPBase<Real>& lp)
 {

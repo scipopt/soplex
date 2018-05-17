@@ -107,23 +107,6 @@ Note for building SCIP with SoPlex:  If SoPlex was built with GMP, then SCIP
 also needs to be built with GMP (default).
 
 
-LEGACY mode (SoPlex 1.x interface, no C++11)
-============================================
-
-We use the feature of explicit conversion operators introduced by the
-C++11 standard.  If your compiler does not support this, or if for other
-reasons you wish to use the old SoPlex 1.x interface, you can build with
-
-    cmake <SoPlex-root> -DLEGACY=on
-
-or using the Makefile
-
-    make COMP=<as before> OPT=<as before> LEGACY=true
-
-or define `SOPLEX_LEGACY` for the compiler preprocessor.  Note that this will
-deactivate iterative refinement.
-
-
 Using the Library
 =================
 

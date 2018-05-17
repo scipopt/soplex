@@ -10,7 +10,7 @@ set(SOPLEX_VERSION_MAJOR 3)
 set(SOPLEX_VERSION_MINOR 1)
 set(SOPLEX_VERSION_PATCH 1)
 set(SOPLEX_VERSION_SUB 4)
-set(SOPLEX_VERSION_API 4)
+set(SOPLEX_VERSION_API 5)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${SOPLEX_VERSION_MAJOR}")
@@ -73,18 +73,6 @@ add_custom_target(soplex_update_githash
                   COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/git_hash.cpp
                                            -P ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake)
 
-option(LEGACY "Build SoPlex in legacy mode" OFF)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7")
-        set(LEGACY ON)
-    endif()
-endif()
-
-if(LEGACY)
-    add_definitions(-DSOPLEX_LEGACY)
-    add_definitions(-DTHREADLOCAL=)
-endif()
-
 if(NOT "${CMAKE_CXX_COMPILE_FEATURES}" MATCHES "cxx_thread_local")
     add_definitions(-DTHREADLOCAL=)
 endif()
@@ -108,7 +96,7 @@ if(ZLIB_FOUND)
     include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
-if(GMP AND NOT LEGACY)
+if(GMP)
     find_package(GMP)
 endif()
 if(GMP_FOUND)

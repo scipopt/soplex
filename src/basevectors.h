@@ -303,42 +303,6 @@ VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
 
 
 
-#ifndef SOPLEX_LEGACY
-/// Addition of scaled vector, specialization for rationals
-template <>
-template <>
-inline
-VectorBase<Rational>& VectorBase<Rational>::multAdd(const Rational& x, const SVectorBase<Rational>& vec)
-{
-   for( int i = vec.size() - 1; i >= 0; --i )
-   {
-      assert(vec.index(i) < dim());
-      val[vec.index(i)].addProduct(x, vec.value(i));
-   }
-
-   return *this;
-}
-
-
-
-/// Subtraction of scaled vector, specialization for rationals
-template <>
-template <>
-inline
-VectorBase<Rational>& VectorBase<Rational>::multSub(const Rational& x, const SVectorBase<Rational>& vec)
-{
-   for( int i = vec.size() - 1; i >= 0; --i )
-   {
-      assert(vec.index(i) < dim());
-      val[vec.index(i)].subProduct(x, vec.value(i));
-   }
-
-   return *this;
-}
-#endif
-
-
-
 /// Addition of scaled vector.
 template < class R >
 template < class S, class T >

@@ -19,7 +19,6 @@
 #ifndef _STATISTICS_H_
 #define _STATISTICS_H_
 
-#ifndef SOPLEX_LEGACY
 #include <iostream>
 
 #include "soplex.h"
@@ -141,5 +140,4 @@ namespace soplex
       //@}
    };
 } // namespace soplex
-#endif
 #endif // _STATISTICS_H_

@@ -17,7 +17,6 @@
  * @brief Preconfigured SoPlex LP solver
  */
 
-#ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include "limits.h"
 #include <iostream>
@@ -8645,4 +8644,3 @@ namespace soplex
       return false;
    }
 } // namespace soplex
-#endif

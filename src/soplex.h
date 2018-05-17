@@ -20,7 +20,6 @@
 #ifndef _SOPLEX_H_
 #define _SOPLEX_H_
 
-#ifndef SOPLEX_LEGACY
 #include <string.h>
 
 ///@todo SoPlex should also have an spxout object to avoid using a global one
@@ -2332,12 +2331,4 @@ private:
    //@}
 };
 }
-#else
-#include "soplexlegacy.h"
-
-namespace soplex
-{
-   typedef SoPlexLegacy SoPlex;
-}
-#endif
 #endif // _SOPLEX_H_

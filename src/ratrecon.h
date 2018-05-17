@@ -21,8 +21,6 @@
 #ifndef _RATRECON_H_
 #define _RATRECON_H_
 
-#ifndef SOPLEX_LEGACY
-
 #include "spxdefines.h"
 #include "rational.h"
 #include "sol.h"
@@ -37,5 +35,4 @@ namespace soplex
    /** reconstruct a rational solution */
    bool reconstructSol(SolRational& solution);
 } // namespace soplex
-#endif
 #endif // _RATRECON_H_

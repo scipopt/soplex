@@ -12,7 +12,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -4085,4 +4084,3 @@ namespace soplex
       _isRealLPLoaded = wasRealLPLoaded;
    }
 } // namespace soplex
-#endif
