@@ -10,7 +10,7 @@ set(SOPLEX_VERSION_MAJOR 3)
 set(SOPLEX_VERSION_MINOR 1)
 set(SOPLEX_VERSION_PATCH 1)
 set(SOPLEX_VERSION_SUB 4)
-set(SOPLEX_VERSION_API 5)
+set(SOPLEX_VERSION_API 6)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${SOPLEX_VERSION_MAJOR}")
@@ -70,7 +70,7 @@ endif()
 message(STATUS \"Git hash: \" \${GITHASH})
 ")
 add_custom_target(soplex_update_githash
-                  COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/git_hash.cpp
+                  COMMAND ${CMAKE_COMMAND} -DDST=${PROJECT_SOURCE_DIR}/src/soplex/git_hash.cpp
                                            -P ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake)
 
 if(NOT "${CMAKE_CXX_COMPILE_FEATURES}" MATCHES "cxx_thread_local")
