@@ -156,7 +156,6 @@ LIBHEADER	=	soplex/array.h \
 				soplex/slufactor_rational.h \
 				soplex/solbase.h \
 				soplex/sol.h \
-				soplex/soplex.h \
 				soplex/sorter.h \
 				soplex/spxalloc.h \
 				soplex/spxautopr.h \
@@ -208,7 +207,8 @@ LIBHEADER	=	soplex/array.h \
 				soplex/validation.h \
 				soplex/vectorbase.h \
 				soplex/vector.h \
-				soplex/wallclocktimer.h
+				soplex/wallclocktimer.h \
+				soplex.h
 LIBOBJ		= 	soplex/changesoplex.o \
 				soplex/clufactor.o \
 				soplex/clufactor_rational.o \
@@ -226,7 +226,6 @@ LIBOBJ		= 	soplex/changesoplex.o \
 				soplex/slufactor_rational.o \
 				soplex/solverational.o \
 				soplex/solvereal.o \
-				soplex/soplex.o \
 				soplex/spxautopr.o \
 				soplex/spxbasis.o \
 				soplex/spxboundflippingrt.o \
@@ -269,7 +268,8 @@ LIBOBJ		= 	soplex/changesoplex.o \
 				soplex/validation.o \
 				soplex/wallclocktimer.o \
 				soplex/updatevector.o \
-				soplex/testsoplex.o
+				soplex/testsoplex.o \
+				soplex.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o

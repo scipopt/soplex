@@ -446,7 +446,7 @@ public:
       {
          n = number(item);
       }
-      catch(const SPxException &x)
+      catch(...)
       {
          return false;
       }

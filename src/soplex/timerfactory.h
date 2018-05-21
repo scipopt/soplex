@@ -22,6 +22,7 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/spxalloc.h"
+#include "soplex/timer.h"
 #include "soplex/notimer.h"
 #include "soplex/usertimer.h"
 #include "soplex/wallclocktimer.h"

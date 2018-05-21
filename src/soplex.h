@@ -22,7 +22,7 @@
 
 #include <string.h>
 
-///@todo SoPlex should also have an spxout object to avoid using a global one
+#include "soplex/spxgithash.h"
 #include "soplex/spxdefines.h"
 #include "soplex/basevectors.h"
 #include "soplex/spxsolver.h"
