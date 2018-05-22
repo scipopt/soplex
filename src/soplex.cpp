@@ -7357,31 +7357,31 @@ namespace soplex
            << "  Objective value   : -\n";
       }
 
-    // #template #temp
-    #ifdef rationaltemplate
     if( intParam(CHECKMODE) == CHECKMODE_RATIONAL
         || (intParam(CHECKMODE) == CHECKMODE_AUTO && intParam(READMODE) == READMODE_RATIONAL) )
       {
         Rational maxviol;
         Rational sumviol;
 
-        os << "Violation (rational): \n";
-        if( getBoundViolationT(maxviol, sumviol) )
-          os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
-        else
-          os << "  Max/sum bound     : - / -\n";
-        if( getRowViolationT(maxviol, sumviol) )
-          os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
-        else
-          os << "  Max/sum row       : - / -\n";
-        if( getRedCostViolationT(maxviol, sumviol) )
-          os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
-        else
-          os << "  Max/sum redcost   : - / -\n";
-        if( getDualViolationT(maxviol, sumviol) )
-          os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
-        else
-          os << "  Max/sum dual      : - / -\n";
+        /// TODO: The following parts should be uncommented when the Rational parts needs to get implemented
+
+        // os << "Violation (rational): \n";
+        // if( getBoundViolationT(maxviol, sumviol) )
+        //   os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+        // else
+        //   os << "  Max/sum bound     : - / -\n";
+        // if( getRowViolationT(maxviol, sumviol) )
+        //   os << "  Max/sum row       : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+        // else
+        //   os << "  Max/sum row       : - / -\n";
+        // if( getRedCostViolationT(maxviol, sumviol) )
+        //   os << "  Max/sum redcost   : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+        // else
+        //   os << "  Max/sum redcost   : - / -\n";
+        // if( getDualViolationT(maxviol, sumviol) )
+        //   os << "  Max/sum dual      : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
+        // else
+        //   os << "  Max/sum dual      : - / -\n";
       }
     else
       {
@@ -7406,7 +7406,6 @@ namespace soplex
         else
           os << "  Max/sum dual      : - / -\n";
       }
-    #endif
   }
 
 
