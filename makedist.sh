@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash -e
 
 VERSION="3.1.1.4"
 NAME="soplex-$VERSION"
@@ -6,11 +6,12 @@ rm -f $NAME
 ln -s . $NAME
 rm -f $NAME.tgz
 
-# compile to create the correct GiTHash
-make githash
+echo "store git hash"
+GITHASH=`git describe --always --dirty  | sed 's/^.*-g//'`
+echo "#define SPX_GITHASH \"$GITHASH\"" > src/soplex/git_hash.cpp
 
 # Before we create a tarball change the directory and file rights in a command way
-echo adjust file modes
+echo "adjust file modes"
 find ./ -type d -exec chmod 750 {} \;
 find ./ -type f -exec chmod 640 {} \;
 find ./ -name "*.sh" -exec chmod 750 {} \;
@@ -19,7 +20,6 @@ find ./ -name "*.cmake" -exec chmod 750 {} \;
 chmod 750 bin/*
 
 tar -cvzhf $NAME.tgz \
---exclude="*CVS*" \
 --exclude="*~" \
 --exclude=".?*" \
 --exclude="*exercise_LP_changes.cpp" \
@@ -60,9 +60,16 @@ $NAME/settings/polish2.set \
 $NAME/src/depend* \
 $NAME/src/*h \
 $NAME/src/*.cpp \
+$NAME/src/soplex/*h \
+$NAME/src/soplex/*.cpp \
 $NAME/CMakeLists.txt              \
 $NAME/settings/default-col.set    \
 $NAME/settings/default-row.set    \
+$NAME/settings/devex.set          \
+$NAME/settings/steep.set          \
+$NAME/settings/exact.set          \
+$NAME/settings/polish1.set        \
+$NAME/settings/polish2.set        \
 $NAME/soplex-config.cmake.in      \
 $NAME/src/CMakeLists.txt         \
 $NAME/check/CMakeLists.txt \
@@ -71,12 +78,13 @@ $NAME/cmake/Modules
 rm -f $NAME
 
 echo ""
-echo "check version numbers in src/spxdefines.h, doc/xternal.cpp, Makefile, Makefile.nmake, and makedist.sh ($VERSION):"
-grep "VERSION" src/spxdefines.h
+echo "check version numbers in src/soplex/spxdefines.h, doc/xternal.cpp, CMakeLists.txt, Makefile, Makefile.nmake, and makedist.sh ($VERSION):"
+grep "VERSION" src/soplex/spxdefines.h
 grep "@version" doc/xternal.cpp
+grep "SOPLEX_VERSION" CMakeLists.txt
 grep "^VERSION" Makefile
 grep "^VERSION" Makefile.nmake
 grep "^VERSION" makedist.sh
 echo "check copyright info in doxygen documentation:"
-grep "2003" doc/soplexfooter.html
-tail src/git_hash.cpp
+grep "1996" doc/soplexfooter.html
+tail src/soplex/git_hash.cpp
