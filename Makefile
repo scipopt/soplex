@@ -279,7 +279,7 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX).$(EGLIB)
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
-SPXGITHASHFILE	=	$(SRCDIR)/git_hash.cpp
+SPXGITHASHFILE	=	$(SRCDIR)/soplex/git_hash.cpp
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
