@@ -17,7 +17,7 @@
 #include <iostream>
 
 #include "soplex/spxdefines.h"
-#include "soplex/spxdefa ultrt.h"
+#include "soplex/spxdefaultrt.h"
 
 namespace soplex
 {
