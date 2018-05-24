@@ -23,9 +23,9 @@
 #include <assert.h>
 
 
-#include "spxdefines.h"
-#include "dvector.h"
-#include "ssvector.h"
+#include "soplex/spxdefines.h"
+#include "soplex/dvector.h"
+#include "soplex/ssvector.h"
 
 namespace soplex
 {

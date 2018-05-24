@@ -16,8 +16,8 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "spxdefines.h"
-#include "spxfastrt.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxfastrt.h"
 
 
 /*

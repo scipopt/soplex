@@ -21,7 +21,7 @@
 
 #include <assert.h>
 
-#include "svectorbase.h"
+#include "soplex/svectorbase.h"
 
 namespace soplex
 {

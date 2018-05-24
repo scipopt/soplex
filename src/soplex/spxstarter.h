@@ -22,8 +22,8 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxsolver.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsolver.h"
 
 namespace soplex
 {

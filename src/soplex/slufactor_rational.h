@@ -21,12 +21,12 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "timerfactory.h"
-#include "dvector.h"
-#include "slinsolver_rational.h"
-#include "clufactor_rational.h"
-#include "rational.h"
+#include "soplex/spxdefines.h"
+#include "soplex/timerfactory.h"
+#include "soplex/dvector.h"
+#include "soplex/slinsolver_rational.h"
+#include "soplex/clufactor_rational.h"
+#include "soplex/rational.h"
 
 namespace soplex
 {

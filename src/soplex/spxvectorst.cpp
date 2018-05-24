@@ -16,8 +16,8 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxvectorst.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxvectorst.h"
 
 namespace soplex
 {

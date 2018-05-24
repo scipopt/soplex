@@ -28,7 +28,7 @@
 // Standard C++ Library".
 // ============================================================================
 
-#include "gzstream.h"
+#include "soplex/gzstream.h"
 #include <iostream>
 #include <string.h>  // for memcpy
 

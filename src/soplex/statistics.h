@@ -23,7 +23,7 @@
 #include <iostream>
 
 #include "soplex.h"
-#include "timer.h"
+#include "soplex/timer.h"
 
 namespace soplex
 {

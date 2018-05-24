@@ -32,7 +32,7 @@
  *-----------------------------------------------------------------------------
  */
 #ifdef SOPLEX_WITH_ZLIB
-#include "gzstream.h"
+#include "soplex/gzstream.h"
 #endif // WITH_GSZSTREAM
 
 namespace soplex

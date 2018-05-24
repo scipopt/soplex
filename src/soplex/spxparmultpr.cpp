@@ -16,8 +16,8 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxparmultpr.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxparmultpr.h"
 
 namespace soplex
 {

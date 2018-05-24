@@ -23,7 +23,7 @@
 
 #include <assert.h>
 
-#include "spxvectorst.h"
+#include "soplex/spxvectorst.h"
 
 namespace soplex
 {

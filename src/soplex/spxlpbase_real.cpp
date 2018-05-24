@@ -22,12 +22,12 @@
 #include <ctype.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxlpbase.h"
-#include "spxout.h"
-#include "mpsinput.h"
-#include "exceptions.h"
-#include "spxscaler.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxlpbase.h"
+#include "soplex/spxout.h"
+#include "soplex/mpsinput.h"
+#include "soplex/exceptions.h"
+#include "soplex/spxscaler.h"
 
 namespace soplex
 {

@@ -13,8 +13,8 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "spxdefines.h"
-#include "spxdevexpr.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxdevexpr.h"
 
 #define DEVEX_REFINETOL 2.0
 

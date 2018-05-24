@@ -16,8 +16,8 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxdefaultrt.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxdefa ultrt.h"
 
 namespace soplex
 {

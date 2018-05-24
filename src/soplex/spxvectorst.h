@@ -21,8 +21,8 @@
 
 #include <assert.h>
 
-#include "spxweightst.h"
-#include "vector.h"
+#include "soplex/spxweightst.h"
+#include "soplex/vector.h"
 
 namespace soplex
 {

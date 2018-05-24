@@ -23,7 +23,7 @@
 #include <iomanip>
 #include <assert.h>
 
-#include "spxdefines.h"
+#include "soplex/spxdefines.h"
 
 // ----------------------------------------------------------------------
 //    class SPxOut

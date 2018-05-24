@@ -13,8 +13,8 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "spxgithash.h"
-#include "git_hash.cpp"
+#include "soplex/spxgithash.h"
+#include "soplex/git_hash.cpp"
 
 namespace soplex
 {

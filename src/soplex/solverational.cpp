@@ -18,9 +18,9 @@
 #include <assert.h>
 
 #include "soplex.h"
-#include "statistics.h"
-#include "slufactor_rational.h"
-#include "ratrecon.h"
+#include "soplex/statistics.h"
+#include "soplex/slufactor_rational.h"
+#include "soplex/ratrecon.h"
 
 namespace soplex
 {

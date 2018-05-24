@@ -18,8 +18,8 @@
 #include <iostream>
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "ratrecon.h"
+#include "soplex/spxdefines.h"
+#include "soplex/ratrecon.h"
 
 namespace soplex
 {

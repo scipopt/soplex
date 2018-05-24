@@ -14,9 +14,9 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <string.h>
-#include "spxdefines.h"
-#include "nameset.h"
-#include "spxalloc.h"
+#include "soplex/spxdefines.h"
+#include "soplex/nameset.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {

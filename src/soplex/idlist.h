@@ -22,8 +22,8 @@
 #include <assert.h>
 #include <stddef.h>
 
-#include "spxdefines.h"
-#include "islist.h"
+#include "soplex/spxdefines.h"
+#include "soplex/islist.h"
 
 namespace soplex
 {

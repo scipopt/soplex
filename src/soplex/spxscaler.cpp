@@ -21,10 +21,10 @@
 
 #include <iostream>
 #include <assert.h>
-#include "spxscaler.h"
-#include "spxlp.h"
-#include "dsvector.h"
-#include "dvector.h"
+#include "soplex/spxscaler.h"
+#include "soplex/spxlp.h"
+#include "soplex/dsvector.h"
+#include "soplex/dvector.h"
 #include <limits>
 
 namespace soplex

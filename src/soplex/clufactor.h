@@ -19,10 +19,10 @@
 #ifndef _CLUFACTOR_H_
 #define _CLUFACTOR_H_
 
-#include "spxdefines.h"
-#include "slinsolver.h"
-#include "timer.h"
-#include "svector.h"
+#include "soplex/spxdefines.h"
+#include "soplex/slinsolver.h"
+#include "soplex/timer.h"
+#include "soplex/svector.h"
 
 #define WITH_L_ROWS 1
 

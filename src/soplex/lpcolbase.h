@@ -21,8 +21,8 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "basevectors.h"
+#include "soplex/spxdefines.h"
+#include "soplex/basevectors.h"
 
 namespace soplex
 {

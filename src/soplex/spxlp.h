@@ -20,15 +20,15 @@
 #ifndef _SPXLP_H_
 #define _SPXLP_H_
 
-#include "spxdefines.h"
-#include "spxlpbase.h"
-#include "vector.h" // for compatibility
-#include "svector.h" // for compatibility
-#include "svset.h" // for compatibility
-#include "lprowset.h" // for compatibility
-#include "lpcolset.h" // for compatibility
-#include "lprow.h" // for compatibility
-#include "lpcol.h" // for compatibility
+#include "soplex/spxdefines.h"
+#include "soplex/spxlpbase.h"
+#include "soplex/vector.h" // for compatibility
+#include "soplex/svector.h" // for compatibility
+#include "soplex/svset.h" // for compatibility
+#include "soplex/lprowset.h" // for compatibility
+#include "soplex/lpcolset.h" // for compatibility
+#include "soplex/lprow.h" // for compatibility
+#include "soplex/lpcol.h" // for compatibility
 
 namespace soplex
 {

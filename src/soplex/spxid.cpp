@@ -16,8 +16,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "spxid.h"
-#include "exceptions.h"
+#include "soplex/spxid.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

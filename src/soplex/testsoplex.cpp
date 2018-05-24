@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include "soplex.h"
-#include "statistics.h"
+#include "soplex/statistics.h"
 
 namespace soplex
 {

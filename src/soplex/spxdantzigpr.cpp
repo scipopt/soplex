@@ -18,8 +18,8 @@
 
 // #define EQ_PREF 1000 
 
-#include "spxdefines.h"
-#include "spxdantzigpr.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxdantzigpr.h"
 
 namespace soplex
 {

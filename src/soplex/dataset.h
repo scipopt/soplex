@@ -23,10 +23,10 @@
 #include <string.h>
 #include <assert.h>
 
-#include "dataarray.h"
-#include "datakey.h"
-#include "spxalloc.h"
-#include "exceptions.h"
+#include "soplex/dataarray.h"
+#include "soplex/datakey.h"
+#include "soplex/spxalloc.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

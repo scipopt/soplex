@@ -18,13 +18,13 @@
 #include <string.h>
 #include <sstream>
 
-#include "spxdefines.h"
-#include "spxsolver.h"
-#include "spxpricer.h"
-#include "spxratiotester.h"
-#include "spxstarter.h"
-#include "slinsolver.h"
-#include "slufactor.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsolver.h"
+#include "soplex/spxpricer.h"
+#include "soplex/spxratiotester.h"
+#include "soplex/spxstarter.h"
+#include "soplex/slinsolver.h"
+#include "soplex/slufactor.h"
 
 namespace soplex
 {

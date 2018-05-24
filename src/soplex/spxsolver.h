@@ -24,15 +24,15 @@
 #include <iomanip>
 #include <sstream>
 
-#include "spxdefines.h"
-#include "timer.h"
-#include "timerfactory.h"
-#include "spxlp.h"
-#include "spxbasis.h"
-#include "array.h"
-#include "random.h"
-#include "unitvector.h"
-#include "updatevector.h"
+#include "soplex/spxdefines.h"
+#include "soplex/timer.h"
+#include "soplex/timerfactory.h"
+#include "soplex/spxlp.h"
+#include "soplex/spxbasis.h"
+#include "soplex/array.h"
+#include "soplex/random.h"
+#include "soplex/unitvector.h"
+#include "soplex/updatevector.h"
 
 #define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
 #define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */

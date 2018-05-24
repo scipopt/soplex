@@ -23,8 +23,8 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxsteeppr.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsteeppr.h"
 
 namespace soplex
 {

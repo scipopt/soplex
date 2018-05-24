@@ -14,12 +14,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include <assert.h>
-#include "spxdefines.h"
-#include "spxboundflippingrt.h"
-#include "sorter.h"
-#include "spxsolver.h"
-#include "spxout.h"
-#include "spxid.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxboundflippingrt.h"
+#include "soplex/sorter.h"
+#include "soplex/spxsolver.h"
+#include "soplex/spxout.h"
+#include "soplex/spxid.h"
 
 namespace soplex
 {

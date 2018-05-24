@@ -21,11 +21,11 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxpricer.h"
-#include "dataarray.h"
-#include "array.h"
-#include "ssvector.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxpricer.h"
+#include "soplex/dataarray.h"
+#include "soplex/array.h"
+#include "soplex/ssvector.h"
 
 namespace soplex
 {

@@ -17,13 +17,13 @@
 #include <iostream>
 #include <sstream>
 
-#include "spxdefines.h"
+#include "soplex/spxdefines.h"
 #include "soplex.h"
-#include "spxpricer.h"
-#include "spxratiotester.h"
-#include "spxstarter.h"
-#include "spxout.h"
-#include "timerfactory.h"
+#include "soplex/spxpricer.h"
+#include "soplex/spxratiotester.h"
+#include "soplex/spxstarter.h"
+#include "soplex/spxout.h"
+#include "soplex/timerfactory.h"
 
 namespace soplex
 {

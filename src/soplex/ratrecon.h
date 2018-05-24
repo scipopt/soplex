@@ -23,11 +23,11 @@
 
 #ifndef SOPLEX_LEGACY
 
-#include "spxdefines.h"
-#include "rational.h"
-#include "sol.h"
-#include "basevectors.h"
-#include "didxset.h"
+#include "soplex/spxdefines.h"
+#include "soplex/rational.h"
+#include "soplex/sol.h"
+#include "soplex/basevectors.h"
+#include "soplex/didxset.h"
 
 namespace soplex
 {

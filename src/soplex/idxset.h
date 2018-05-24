@@ -19,8 +19,8 @@
 #ifndef _IDXSET_H_
 #define _IDXSET_H_
 
-#include "spxdefines.h"
-#include "spxalloc.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxalloc.h"
 #include <assert.h>
 
 namespace soplex

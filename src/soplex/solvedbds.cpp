@@ -17,8 +17,8 @@
 #include <assert.h>
 
 #include "soplex.h"
-#include "statistics.h"
-#include "sorter.h"
+#include "soplex/statistics.h"
+#include "soplex/sorter.h"
 
 //#define NO_TOL
 #define USE_FEASTOL

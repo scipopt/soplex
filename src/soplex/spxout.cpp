@@ -13,9 +13,9 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "spxout.h"
-#include "exceptions.h"
-#include "spxalloc.h"
+#include "soplex/spxout.h"
+#include "soplex/exceptions.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {

@@ -21,8 +21,8 @@
 #define _UNITVECTORBASE_H_
 
 #include <assert.h>
-#include "spxdefines.h"
-#include "svectorbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/svectorbase.h"
 
 namespace soplex
 {

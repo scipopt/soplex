@@ -31,8 +31,8 @@
 #include <math.h>
 #include <iostream>
 
-#include "basevectors.h"
-#include "spxsolver.h" // needed for basis information
+#include "soplex/basevectors.h"
+#include "soplex/spxsolver.h" // needed for basis information
 
 namespace soplex
 {

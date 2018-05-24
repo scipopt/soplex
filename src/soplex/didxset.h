@@ -21,7 +21,7 @@
 
 #include <assert.h>
 
-#include "idxset.h"
+#include "soplex/idxset.h"
 
 namespace soplex
 {

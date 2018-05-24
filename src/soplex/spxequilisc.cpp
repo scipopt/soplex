@@ -18,10 +18,10 @@
  */
 #include <assert.h>
 
-#include "spxequilisc.h"
-#include "spxout.h"
-#include "spxlpbase.h"
-#include "spxlp.h"
+#include "soplex/spxequilisc.h"
+#include "soplex/spxout.h"
+#include "soplex/spxlpbase.h"
+#include "soplex/spxlp.h"
 #include "soplex.h"
 
 namespace soplex

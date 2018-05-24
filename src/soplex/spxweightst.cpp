@@ -18,10 +18,10 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxweightst.h"
-#include "svset.h"
-#include "sorter.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxweightst.h"
+#include "soplex/svset.h"
+#include "soplex/sorter.h"
 
 namespace soplex
 {

@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "updatevector.h"
+#include "soplex/updatevector.h"
 
 namespace soplex
 {

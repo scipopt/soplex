@@ -16,9 +16,9 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxsolver.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsolver.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

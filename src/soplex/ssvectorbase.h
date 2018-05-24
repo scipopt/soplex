@@ -22,10 +22,10 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "dvectorbase.h"
-#include "idxset.h"
-#include "spxalloc.h"
+#include "soplex/spxdefines.h"
+#include "soplex/dvectorbase.h"
+#include "soplex/idxset.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {

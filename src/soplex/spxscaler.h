@@ -21,13 +21,13 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "dataarray.h"
-#include "vector.h"
-#include "svector.h"
-#include "svset.h"
-#include "dsvector.h"
-#include "dvector.h"
+#include "soplex/spxdefines.h"
+#include "soplex/dataarray.h"
+#include "soplex/vector.h"
+#include "soplex/svector.h"
+#include "soplex/svset.h"
+#include "soplex/dsvector.h"
+#include "soplex/dvector.h"
 #include <vector>
 
 namespace soplex

@@ -20,8 +20,8 @@
 #ifndef _NO_TIMER_H_
 #define _NO_TIMER_H_
 
-#include "spxdefines.h"
-#include "timer.h"
+#include "soplex/spxdefines.h"
+#include "soplex/timer.h"
 
 namespace soplex
 {

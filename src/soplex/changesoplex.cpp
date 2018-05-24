@@ -16,11 +16,11 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxsolver.h"
-#include "spxpricer.h"
-#include "spxratiotester.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsolver.h"
+#include "soplex/spxpricer.h"
+#include "soplex/spxratiotester.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

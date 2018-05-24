@@ -15,10 +15,10 @@
 
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxbasis.h"
-#include "spxsolver.h"
-#include "spxout.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxbasis.h"
+#include "soplex/spxsolver.h"
+#include "soplex/spxout.h"
 
 namespace soplex
 {

@@ -23,8 +23,8 @@
 #endif
 #include <time.h>
 
-#include "spxdefines.h"
-#include "wallclocktimer.h"
+#include "soplex/spxdefines.h"
+#include "soplex/wallclocktimer.h"
 
 namespace soplex
 {

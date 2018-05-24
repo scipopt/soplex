@@ -28,9 +28,9 @@
 #include <limits.h>
 
 
-#include "rational.h"
-#include "spxalloc.h"
-#include "spxdefines.h"
+#include "soplex/rational.h"
+#include "soplex/spxalloc.h"
+#include "soplex/spxdefines.h"
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"

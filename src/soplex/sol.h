@@ -20,8 +20,8 @@
 #ifndef _SOL_H_
 #define _SOL_H_
 
-#include "spxdefines.h"
-#include "solbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/solbase.h"
 
 namespace soplex
 {

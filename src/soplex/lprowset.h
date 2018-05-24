@@ -19,8 +19,8 @@
 #ifndef _LPROWSET_H_
 #define _LPROWSET_H_
 
-#include "spxdefines.h"
-#include "lprowsetbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/lprowsetbase.h"
 
 namespace soplex
 {

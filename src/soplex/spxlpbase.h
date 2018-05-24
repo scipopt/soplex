@@ -30,19 +30,19 @@
 #include <iomanip>
 #include <typeinfo>
 
-#include "spxdefines.h"
-#include "basevectors.h"
-#include "dataarray.h"
-#include "datakey.h"
-#include "spxid.h"
-#include "lprowbase.h"
-#include "lpcolbase.h"
-#include "lprowsetbase.h"
-#include "lpcolsetbase.h"
-#include "nameset.h"
-#include "didxset.h"
-#include "spxfileio.h"
-#include "spxscaler.h"
+#include "soplex/spxdefines.h"
+#include "soplex/basevectors.h"
+#include "soplex/dataarray.h"
+#include "soplex/datakey.h"
+#include "soplex/spxid.h"
+#include "soplex/lprowbase.h"
+#include "soplex/lpcolbase.h"
+#include "soplex/lprowsetbase.h"
+#include "soplex/lpcolsetbase.h"
+#include "soplex/nameset.h"
+#include "soplex/didxset.h"
+#include "soplex/spxfileio.h"
+#include "soplex/spxscaler.h"
 
 
 namespace soplex

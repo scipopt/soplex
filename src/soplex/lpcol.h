@@ -21,8 +21,8 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "lpcolbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/lpcolbase.h"
 
 namespace soplex
 {

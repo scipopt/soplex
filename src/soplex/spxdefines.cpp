@@ -16,9 +16,9 @@
 /**@file  spxdefines.cpp
  * @brief Debugging, floating point type and parameter definitions.
  */
-#include "spxdefines.h"
+#include "soplex/spxdefines.h"
 #include "assert.h"
-#include "spxout.h"
+#include "soplex/spxout.h"
 
 namespace soplex
 {

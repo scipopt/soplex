@@ -26,15 +26,15 @@
 #undef SOPLEX_DEBUG
 #endif
 
-#include "spxdefines.h"
-#include "rational.h"
-#include "vectorbase.h"
-#include "dvectorbase.h"
-#include "ssvectorbase.h"
-#include "svectorbase.h"
-#include "dsvectorbase.h"
-#include "unitvectorbase.h"
-#include "svsetbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/rational.h"
+#include "soplex/vectorbase.h"
+#include "soplex/dvectorbase.h"
+#include "soplex/ssvectorbase.h"
+#include "soplex/svectorbase.h"
+#include "soplex/dsvectorbase.h"
+#include "soplex/unitvectorbase.h"
+#include "soplex/svsetbase.h"
 
 #define SOPLEX_VECTOR_MARKER   1e-100
 

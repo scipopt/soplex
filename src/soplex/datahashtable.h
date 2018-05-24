@@ -23,7 +23,7 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "spxdefines.h"
+#include "soplex/spxdefines.h"
 
 #define   HASHTABLE_FILLFACTOR   0.7
 

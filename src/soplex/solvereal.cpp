@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include "soplex.h"
-#include "statistics.h"
+#include "soplex/statistics.h"
 
 #define ALLOWED_UNSCALE_PERCENTAGE    0.1
 #define MIN_OPT_CALLS_WITH_SCALING     10

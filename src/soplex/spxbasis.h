@@ -31,15 +31,15 @@
 #include <string.h>
 #include <sstream>
 
-#include "spxdefines.h"
-#include "spxlp.h"
-#include "svector.h"
-#include "ssvector.h"
-#include "dataarray.h"
-#include "slinsolver.h"
-#include "nameset.h"
-#include "spxout.h"
-#include "timerfactory.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxlp.h"
+#include "soplex/svector.h"
+#include "soplex/ssvector.h"
+#include "soplex/dataarray.h"
+#include "soplex/slinsolver.h"
+#include "soplex/nameset.h"
+#include "soplex/spxout.h"
+#include "soplex/timerfactory.h"
 
 //#define MEASUREUPDATETIME
 

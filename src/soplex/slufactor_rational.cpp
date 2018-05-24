@@ -23,13 +23,13 @@
 #include <assert.h>
 #include <sstream>
 
-#include "spxdefines.h"
-#include "slufactor_rational.h"
-#include "cring.h"
-#include "spxalloc.h"
-#include "spxout.h"
-#include "exceptions.h"
-#include "rational.h"
+#include "soplex/spxdefines.h"
+#include "soplex/slufactor_rational.h"
+#include "soplex/cring.h"
+#include "soplex/spxalloc.h"
+#include "soplex/spxout.h"
+#include "soplex/exceptions.h"
+#include "soplex/rational.h"
 
 #ifdef SOPLEX_DEBUG
 #include <stdio.h>

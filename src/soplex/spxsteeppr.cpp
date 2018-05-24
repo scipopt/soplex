@@ -19,9 +19,9 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxsteeppr.h"
-#include "random.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsteeppr.h"
+#include "soplex/random.h"
 
 #define STEEP_REFINETOL 2.0
 

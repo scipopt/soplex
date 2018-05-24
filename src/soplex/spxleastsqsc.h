@@ -20,9 +20,9 @@
 #define _SPXLEASTSQSC_H_
 
 #include <assert.h>
-#include "spxsolver.h"
-#include "spxscaler.h"
-#include "spxlp.h"
+#include "soplex/spxsolver.h"
+#include "soplex/spxscaler.h"
+#include "soplex/spxlp.h"
 
 namespace soplex
 {

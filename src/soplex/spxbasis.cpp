@@ -19,14 +19,14 @@
 #include <iomanip>
 #include <sstream>
 
-#include "spxdefines.h"
-#include "spxbasis.h"
-#include "didxset.h"
-#include "dvector.h"
-#include "spxsolver.h"
-#include "mpsinput.h"
-#include "spxout.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxbasis.h"
+#include "soplex/didxset.h"
+#include "soplex/dvector.h"
+#include "soplex/spxsolver.h"
+#include "soplex/mpsinput.h"
+#include "soplex/spxout.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

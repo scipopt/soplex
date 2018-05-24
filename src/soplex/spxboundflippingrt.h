@@ -23,9 +23,9 @@
 
 
 #include <assert.h>
-#include "spxdefines.h"
-#include "spxratiotester.h"
-#include "spxfastrt.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxratiotester.h"
+#include "soplex/spxfastrt.h"
 
 namespace soplex
 {

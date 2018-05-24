@@ -22,9 +22,9 @@
 #include <iostream>
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxalloc.h"
-#include "vectorbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxalloc.h"
+#include "soplex/vectorbase.h"
 
 namespace soplex
 {

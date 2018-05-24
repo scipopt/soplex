@@ -23,9 +23,9 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxpricer.h"
-#include "random.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxpricer.h"
+#include "soplex/random.h"
 
 namespace soplex
 {

@@ -23,10 +23,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxout.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxout.h"
 
-#include "exceptions.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

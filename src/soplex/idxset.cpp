@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "idxset.h"
+#include "soplex/idxset.h"
 
 namespace soplex
 {

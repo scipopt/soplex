@@ -13,8 +13,8 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#include "didxset.h"
-#include "spxalloc.h"
+#include "soplex/didxset.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {

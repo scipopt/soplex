@@ -21,10 +21,10 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxsimplifier.h"
-#include "array.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsimplifier.h"
+#include "soplex/array.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

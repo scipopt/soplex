@@ -17,11 +17,11 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "clufactor.h"
-#include "cring.h"
-#include "spxalloc.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/clufactor.h"
+#include "soplex/cring.h"
+#include "soplex/spxalloc.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

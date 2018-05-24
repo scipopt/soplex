@@ -20,8 +20,8 @@
 #ifndef _SVSET_H_
 #define _SVSET_H_
 
-#include "spxdefines.h"
-#include "basevectors.h"
+#include "soplex/spxdefines.h"
+#include "soplex/basevectors.h"
 
 namespace soplex
 {

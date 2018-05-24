@@ -15,11 +15,11 @@
 
 #include <iostream>
 
-#include "spxmainsm.h"
-#include "array.h"
-#include "dataarray.h"
-#include "sorter.h"
-#include "spxout.h"
+#include "soplex/spxmainsm.h"
+#include "soplex/array.h"
+#include "soplex/dataarray.h"
+#include "soplex/sorter.h"
+#include "soplex/spxout.h"
 #include <sstream>
 #include <iostream>
 #include <fstream>

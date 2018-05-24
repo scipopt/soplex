@@ -18,12 +18,12 @@
  */
 #include <cmath>
 #include <assert.h>
-#include "spxleastsqsc.h"
-#include "spxout.h"
-#include "basevectors.h"
-#include "svsetbase.h"
-#include "svectorbase.h"
-#include "ssvectorbase.h"
+#include "soplex/spxleastsqsc.h"
+#include "soplex/spxout.h"
+#include "soplex/basevectors.h"
+#include "soplex/svsetbase.h"
+#include "soplex/svectorbase.h"
+#include "soplex/ssvectorbase.h"
 #include <array>
 
 namespace soplex

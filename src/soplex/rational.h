@@ -25,8 +25,8 @@
 #include <string.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "idlist.h"
+#include "soplex/spxdefines.h"
+#include "soplex/idlist.h"
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"

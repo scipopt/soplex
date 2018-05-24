@@ -21,10 +21,10 @@
 
 #include <assert.h>
 
-#include "spxpricer.h"
-#include "spxdevexpr.h"
-#include "spxsteeppr.h"
-#include "spxsteepexpr.h"
+#include "soplex/spxpricer.h"
+#include "soplex/spxdevexpr.h"
+#include "soplex/spxsteeppr.h"
+#include "soplex/spxsteepexpr.h"
 
 
 namespace soplex

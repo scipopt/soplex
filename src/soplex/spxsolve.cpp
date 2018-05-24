@@ -16,14 +16,14 @@
 #include <assert.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "rational.h"
-#include "spxsolver.h"
-#include "spxpricer.h"
-#include "spxratiotester.h"
-#include "spxdefaultrt.h"
-#include "spxstarter.h"
-#include "spxout.h"
+#include "soplex/spxdefines.h"
+#include "soplex/rational.h"
+#include "soplex/spxsolver.h"
+#include "soplex/spxpricer.h"
+#include "soplex/spxratiotester.h"
+#include "soplex/spxdefaultrt.h"
+#include "soplex/spxstarter.h"
+#include "soplex/spxout.h"
 
 #define MAXCYCLES 400
 #define MAXSTALLS 10000

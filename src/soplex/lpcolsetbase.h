@@ -21,10 +21,10 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "basevectors.h"
-#include "datakey.h"
-#include "lpcolbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/basevectors.h"
+#include "soplex/datakey.h"
+#include "soplex/lpcolbase.h"
 
 namespace soplex
 {

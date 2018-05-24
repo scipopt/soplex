@@ -21,10 +21,10 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "dataset.h"
-#include "datahashtable.h"
-#include "datakey.h"
+#include "soplex/spxdefines.h"
+#include "soplex/dataset.h"
+#include "soplex/datahashtable.h"
+#include "soplex/datakey.h"
 
 namespace soplex
 {

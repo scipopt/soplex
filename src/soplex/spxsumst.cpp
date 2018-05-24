@@ -15,9 +15,9 @@
 
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxsumst.h"
-#include "vector.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsumst.h"
+#include "soplex/vector.h"
 
 namespace soplex
 {

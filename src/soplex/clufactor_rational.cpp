@@ -15,13 +15,13 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "clufactor_rational.h"
-#include "cring.h"
-#include "spxalloc.h"
-#include "exceptions.h"
-#include "basevectors.h"
-#include "rational.h"
+#include "soplex/spxdefines.h"
+#include "soplex/clufactor_rational.h"
+#include "soplex/cring.h"
+#include "soplex/spxalloc.h"
+#include "soplex/exceptions.h"
+#include "soplex/basevectors.h"
+#include "soplex/rational.h"
 
 namespace soplex
 {

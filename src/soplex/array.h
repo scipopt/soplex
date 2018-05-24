@@ -21,7 +21,7 @@
 
 #include <assert.h>
 #include <string.h>
-#include "spxalloc.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {

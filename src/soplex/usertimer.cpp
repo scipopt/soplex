@@ -28,8 +28,8 @@
 
 #endif  // !(_WIN32 || _WIN64)
 
-#include "spxdefines.h"
-#include "usertimer.h"
+#include "soplex/spxdefines.h"
+#include "soplex/usertimer.h"
 
 namespace soplex
 {

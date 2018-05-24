@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-#include "spxout.h"
+#include "soplex/spxout.h"
 
 namespace soplex
 { 

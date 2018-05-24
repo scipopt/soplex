@@ -20,7 +20,7 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-#include "spxdefines.h"
+#include "soplex/spxdefines.h"
 
 namespace soplex
 {

@@ -20,11 +20,11 @@
 #ifndef _TIMERFACTORY_H_
 #define _TIMERFACTORY_H_
 
-#include "spxdefines.h"
-#include "spxalloc.h"
-#include "notimer.h"
-#include "usertimer.h"
-#include "wallclocktimer.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxalloc.h"
+#include "soplex/notimer.h"
+#include "soplex/usertimer.h"
+#include "soplex/wallclocktimer.h"
 
 namespace soplex
 {

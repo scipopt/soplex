@@ -23,12 +23,12 @@
 #include <assert.h>
 #include <string.h>
 
-#include "spxdefines.h"
-#include "svector.h"
-#include "ssvector.h"
-#include "dsvector.h"
-#include "dvector.h"
-#include "didxset.h"
+#include "soplex/spxdefines.h"
+#include "soplex/svector.h"
+#include "soplex/ssvector.h"
+#include "soplex/dsvector.h"
+#include "soplex/dvector.h"
+#include "soplex/didxset.h"
 
 namespace soplex
 {

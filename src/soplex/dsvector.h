@@ -19,9 +19,9 @@
 #ifndef _DSVECTOR_H_
 #define _DSVECTOR_H_
 
-#include "spxdefines.h"
-#include "basevectors.h"
-#include "svector.h" // for compatibility
+#include "soplex/spxdefines.h"
+#include "soplex/basevectors.h"
+#include "soplex/svector.h" // for compatibility
 
 namespace soplex
 {

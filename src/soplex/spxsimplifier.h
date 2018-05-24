@@ -21,10 +21,10 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "timerfactory.h"
-#include "spxlp.h"
-#include "spxsolver.h"
+#include "soplex/spxdefines.h"
+#include "soplex/timerfactory.h"
+#include "soplex/spxlp.h"
+#include "soplex/spxsolver.h"
 
 namespace soplex
 {

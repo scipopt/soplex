@@ -15,9 +15,9 @@
 
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxautopr.h"
-#include "spxout.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxautopr.h"
+#include "soplex/spxout.h"
 
 namespace soplex
 {

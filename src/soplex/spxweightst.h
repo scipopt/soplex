@@ -23,9 +23,9 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxstarter.h"
-#include "dataarray.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxstarter.h"
+#include "soplex/dataarray.h"
 
 namespace soplex
 {

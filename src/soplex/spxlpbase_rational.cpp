@@ -23,11 +23,11 @@
 #include <ctype.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxlpbase.h"
-#include "spxout.h"
-#include "mpsinput.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxlpbase.h"
+#include "soplex/spxout.h"
+#include "soplex/mpsinput.h"
+#include "soplex/exceptions.h"
 
 #define MAX_LINE_WRITE_LEN 65536   ///< maximum length allowed for writing lines
 

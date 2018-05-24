@@ -24,42 +24,42 @@
 #include <string.h>
 
 ///@todo SoPlex should also have an spxout object to avoid using a global one
-#include "spxdefines.h"
-#include "basevectors.h"
-#include "spxsolver.h"
-#include "slufactor.h"
-#include "slufactor_rational.h"
+#include "soplex/spxdefines.h"
+#include "soplex/basevectors.h"
+#include "soplex/spxsolver.h"
+#include "soplex/slufactor.h"
+#include "soplex/slufactor_rational.h"
 
 ///@todo try to move to cpp file by forward declaration
-#include "spxsimplifier.h"
-#include "spxmainsm.h"
+#include "soplex/spxsimplifier.h"
+#include "soplex/spxmainsm.h"
 
-#include "spxscaler.h"
-#include "spxequilisc.h"
-#include "spxleastsqsc.h"
-#include "spxgeometsc.h"
+#include "soplex/spxscaler.h"
+#include "soplex/spxequilisc.h"
+#include "soplex/spxleastsqsc.h"
+#include "soplex/spxgeometsc.h"
 
-#include "spxstarter.h"
-#include "spxweightst.h"
-#include "spxsumst.h"
-#include "spxvectorst.h"
+#include "soplex/spxstarter.h"
+#include "soplex/spxweightst.h"
+#include "soplex/spxsumst.h"
+#include "soplex/spxvectorst.h"
 
-#include "spxpricer.h"
-#include "spxautopr.h"
-#include "spxdantzigpr.h"
-#include "spxparmultpr.h"
-#include "spxdevexpr.h"
-#include "spxsteeppr.h"
-#include "spxsteepexpr.h"
-#include "spxhybridpr.h"
+#include "soplex/spxpricer.h"
+#include "soplex/spxautopr.h"
+#include "soplex/spxdantzigpr.h"
+#include "soplex/spxparmultpr.h"
+#include "soplex/spxdevexpr.h"
+#include "soplex/spxsteeppr.h"
+#include "soplex/spxsteepexpr.h"
+#include "soplex/spxhybridpr.h"
 
-#include "spxratiotester.h"
-#include "spxdefaultrt.h"
-#include "spxharrisrt.h"
-#include "spxfastrt.h"
-#include "spxboundflippingrt.h"
+#include "soplex/spxratiotester.h"
+#include "soplex/spxdefaultrt.h"
+#include "soplex/spxharrisrt.h"
+#include "soplex/spxfastrt.h"
+#include "soplex/spxboundflippingrt.h"
 
-#include "sol.h"
+#include "soplex/sol.h"
 
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 

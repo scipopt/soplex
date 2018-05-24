@@ -28,12 +28,12 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "svectorbase.h"
-#include "classarray.h"
-#include "dataset.h"
-#include "datakey.h"
-#include "idlist.h"
+#include "soplex/spxdefines.h"
+#include "soplex/svectorbase.h"
+#include "soplex/classarray.h"
+#include "soplex/dataset.h"
+#include "soplex/datakey.h"
+#include "soplex/idlist.h"
 
 namespace soplex
 {

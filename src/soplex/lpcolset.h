@@ -19,8 +19,8 @@
 #ifndef _LPCOLSET_H_
 #define _LPCOLSET_H_
 
-#include "spxdefines.h"
-#include "lpcolsetbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/lpcolsetbase.h"
 
 namespace soplex
 {

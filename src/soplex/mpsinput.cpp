@@ -21,9 +21,9 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "spxdefines.h"
-#include "mpsinput.h"
-#include "spxout.h"
+#include "soplex/spxdefines.h"
+#include "soplex/mpsinput.h"
+#include "soplex/spxout.h"
 
 #define PATCH_CHAR    '_'
 #define BLANK         ' '

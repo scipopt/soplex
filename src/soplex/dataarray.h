@@ -24,8 +24,8 @@
 #include <string.h>
 #include <iostream>
 
-#include "spxdefines.h"
-#include "spxalloc.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {

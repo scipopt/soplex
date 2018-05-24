@@ -19,8 +19,8 @@
 #ifndef _LPROW_H_
 #define _LPROW_H_
 
-#include "spxdefines.h"
-#include "lprowbase.h"
+#include "soplex/spxdefines.h"
+#include "soplex/lprowbase.h"
 
 namespace soplex
 {

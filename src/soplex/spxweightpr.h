@@ -19,8 +19,8 @@
 #ifndef _SPXWEIGHTPR_H_
 #define _SPXWEIGHTPR_H_
 
-#include "spxdefines.h"
-#include "spxpricer.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxpricer.h"
 
 namespace soplex
 {

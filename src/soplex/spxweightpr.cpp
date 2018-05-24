@@ -15,9 +15,9 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxweightpr.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxweightpr.h"
+#include "soplex/exceptions.h"
 
 namespace soplex
 {

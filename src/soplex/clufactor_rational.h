@@ -19,12 +19,12 @@
 #ifndef _CLUFACTOR_RATIONAL_H_
 #define _CLUFACTOR_RATIONAL_H_
 
-#include "spxdefines.h"
-#include "slinsolver_rational.h"
-#include "timer.h"
-#include "svector.h"
-#include "rational.h"
-#include "basevectors.h"
+#include "soplex/spxdefines.h"
+#include "soplex/slinsolver_rational.h"
+#include "soplex/timer.h"
+#include "soplex/svector.h"
+#include "soplex/rational.h"
+#include "soplex/basevectors.h"
 
 #define WITH_L_ROWS 1
 

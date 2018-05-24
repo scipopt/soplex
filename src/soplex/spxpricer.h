@@ -22,9 +22,9 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "spxsolver.h"
-#include "sorter.h"
+#include "soplex/spxdefines.h"
+#include "soplex/spxsolver.h"
+#include "soplex/sorter.h"
 
 namespace soplex
 {
