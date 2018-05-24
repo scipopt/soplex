@@ -58,7 +58,7 @@ $NAME/settings/steep.set \
 $NAME/settings/polish1.set \
 $NAME/settings/polish2.set \
 $NAME/src/depend* \
-$NAME/src/*h \
+$NAME/src/*.h \
 $NAME/src/*.cpp \
 $NAME/src/soplex/*h \
 $NAME/src/soplex/*.cpp \
