@@ -116,160 +116,160 @@ BINDIR		=	bin
 LIBDIR		=	lib
 INCLUDEDIR	=	include
 NAME		=	soplex
-LIBHEADER	=	array.h \
-			basevectors.h \
-			classarray.h \
-			clufactor.h \
-			clufactor_rational.h \
-			cring.h \
-			dataarray.h \
-			datahashtable.h \
-			datakey.h \
-			dataset.h \
-			didxset.h \
-			dsvectorbase.h \
-			dsvector.h \
-			dvectorbase.h \
-			dvector.h \
-			exceptions.h \
-			gzstream.h \
-			idlist.h \
-			idxset.h \
-			islist.h \
-			lpcolbase.h \
-			lpcol.h \
-			lpcolsetbase.h \
-			lpcolset.h \
-			lprowbase.h \
-			lprow.h \
-			lprowsetbase.h \
-			lprowset.h \
-			mpsinput.h \
-			nameset.h \
-			notimer.h \
-			random.h \
-			rational.h \
-			ratrecon.h \
-			slinsolver.h \
-			slinsolver_rational.h \
-			slufactor.h \
-			slufactor_rational.h \
-			solbase.h \
-			sol.h \
-			soplex.h \
-			sorter.h \
-			spxalloc.h \
-			spxautopr.h \
-			spxbasis.h \
-			spxboundflippingrt.h \
-			spxdantzigpr.h \
-			spxdefaultrt.h \
-			spxdefines.h \
-			spxdevexpr.h \
-			spxequilisc.h \
-			spxleastsqsc.h \
-			spxfastrt.h \
-			spxfileio.h \
-			spxgeometsc.h \
-			spxgithash.h \
-			spxharrisrt.h \
-			spxhybridpr.h \
-			spxid.h \
-			spxlpbase.h \
-			spxlp.h \
-			spxmainsm.h \
-			spxout.h \
-			spxparmultpr.h \
-			spxpricer.h \
-			spxratiotester.h \
-			spxscaler.h \
-			spxsimplifier.h \
-			spxsolver.h \
-			spxstarter.h \
-			spxsteepexpr.h \
-			spxsteeppr.h \
-			spxsumst.h \
-			spxvectorst.h \
-			spxweightpr.h \
-			spxweightst.h \
-			ssvectorbase.h \
-			ssvector.h \
-			statistics.h \
-			svectorbase.h \
-			svector.h \
-			svsetbase.h \
-			svset.h \
-			timer.h \
-			timerfactory.h \
-			unitvectorbase.h \
-			unitvector.h \
-			usertimer.h \
-			updatevector.h \
-			validation.h \
-			vectorbase.h \
-			vector.h \
-			wallclocktimer.h
-LIBOBJ		= 	changesoplex.o \
-			clufactor.o \
-			clufactor_rational.o \
-			didxset.o \
-			enter.o \
-			gzstream.o \
-			idxset.o \
-			leave.o \
-			mpsinput.o \
-			nameset.o \
-			rational.o \
-			ratrecon.o \
-			slufactor.o \
-			solvedbds.o \
-			slufactor_rational.o \
-			solverational.o \
-			solvereal.o \
-			soplex.o \
-			spxautopr.o \
-			spxbasis.o \
-			spxboundflippingrt.o \
-			spxbounds.o \
-			spxchangebasis.o \
-			spxdantzigpr.o \
-			spxdefaultrt.o \
-			spxdefines.o \
-			spxdesc.o \
-			spxdevexpr.o \
-			spxequilisc.o \
-			spxleastsqsc.o \
-			spxfastrt.o \
-			spxfileio.o \
-			spxgeometsc.o \
-			spxgithash.o \
-			spxharrisrt.o \
-			spxhybridpr.o \
-			spxid.o \
-			spxlpbase_rational.o \
-			spxlpbase_real.o \
-			spxmainsm.o \
-			spxout.o \
-			spxparmultpr.o \
-			spxquality.o \
-			spxscaler.o \
-			spxshift.o \
-			spxsolve.o \
-			spxsolver.o \
-			spxstarter.o \
-			spxsteeppr.o \
-			spxsumst.o \
-			spxvecs.o \
-			spxvectorst.o \
-			spxweightpr.o \
-			spxweightst.o \
-			spxwritestate.o \
-			statistics.o \
-			usertimer.o \
-			validation.o \
-			wallclocktimer.o \
-			updatevector.o \
-			testsoplex.o
+LIBHEADER	=	soplex/array.h \
+				soplex/basevectors.h \
+				soplex/classarray.h \
+				soplex/clufactor.h \
+				soplex/clufactor_rational.h \
+				soplex/cring.h \
+				soplex/dataarray.h \
+				soplex/datahashtable.h \
+				soplex/datakey.h \
+				soplex/dataset.h \
+				soplex/didxset.h \
+				soplex/dsvectorbase.h \
+				soplex/dsvector.h \
+				soplex/dvectorbase.h \
+				soplex/dvector.h \
+				soplex/exceptions.h \
+				soplex/gzstream.h \
+				soplex/idlist.h \
+				soplex/idxset.h \
+				soplex/islist.h \
+				soplex/lpcolbase.h \
+				soplex/lpcol.h \
+				soplex/lpcolsetbase.h \
+				soplex/lpcolset.h \
+				soplex/lprowbase.h \
+				soplex/lprow.h \
+				soplex/lprowsetbase.h \
+				soplex/lprowset.h \
+				soplex/mpsinput.h \
+				soplex/nameset.h \
+				soplex/notimer.h \
+				soplex/random.h \
+				soplex/rational.h \
+				soplex/ratrecon.h \
+				soplex/slinsolver.h \
+				soplex/slinsolver_rational.h \
+				soplex/slufactor.h \
+				soplex/slufactor_rational.h \
+				soplex/solbase.h \
+				soplex/sol.h \
+				soplex/sorter.h \
+				soplex/spxalloc.h \
+				soplex/spxautopr.h \
+				soplex/spxbasis.h \
+				soplex/spxboundflippingrt.h \
+				soplex/spxdantzigpr.h \
+				soplex/spxdefaultrt.h \
+				soplex/spxdefines.h \
+				soplex/spxdevexpr.h \
+				soplex/spxequilisc.h \
+				soplex/spxleastsqsc.h \
+				soplex/spxfastrt.h \
+				soplex/spxfileio.h \
+				soplex/spxgeometsc.h \
+				soplex/spxgithash.h \
+				soplex/spxharrisrt.h \
+				soplex/spxhybridpr.h \
+				soplex/spxid.h \
+				soplex/spxlpbase.h \
+				soplex/spxlp.h \
+				soplex/spxmainsm.h \
+				soplex/spxout.h \
+				soplex/spxparmultpr.h \
+				soplex/spxpricer.h \
+				soplex/spxratiotester.h \
+				soplex/spxscaler.h \
+				soplex/spxsimplifier.h \
+				soplex/spxsolver.h \
+				soplex/spxstarter.h \
+				soplex/spxsteepexpr.h \
+				soplex/spxsteeppr.h \
+				soplex/spxsumst.h \
+				soplex/spxvectorst.h \
+				soplex/spxweightpr.h \
+				soplex/spxweightst.h \
+				soplex/ssvectorbase.h \
+				soplex/ssvector.h \
+				soplex/statistics.h \
+				soplex/svectorbase.h \
+				soplex/svector.h \
+				soplex/svsetbase.h \
+				soplex/svset.h \
+				soplex/timer.h \
+				soplex/timerfactory.h \
+				soplex/unitvectorbase.h \
+				soplex/unitvector.h \
+				soplex/usertimer.h \
+				soplex/updatevector.h \
+				soplex/validation.h \
+				soplex/vectorbase.h \
+				soplex/vector.h \
+				soplex/wallclocktimer.h \
+				soplex.h
+LIBOBJ		= 	soplex/changesoplex.o \
+				soplex/clufactor.o \
+				soplex/clufactor_rational.o \
+				soplex/didxset.o \
+				soplex/enter.o \
+				soplex/gzstream.o \
+				soplex/idxset.o \
+				soplex/leave.o \
+				soplex/mpsinput.o \
+				soplex/nameset.o \
+				soplex/rational.o \
+				soplex/ratrecon.o \
+				soplex/slufactor.o \
+				soplex/solvedbds.o \
+				soplex/slufactor_rational.o \
+				soplex/solverational.o \
+				soplex/solvereal.o \
+				soplex/spxautopr.o \
+				soplex/spxbasis.o \
+				soplex/spxboundflippingrt.o \
+				soplex/spxbounds.o \
+				soplex/spxchangebasis.o \
+				soplex/spxdantzigpr.o \
+				soplex/spxdefaultrt.o \
+				soplex/spxdefines.o \
+				soplex/spxdesc.o \
+				soplex/spxdevexpr.o \
+				soplex/spxequilisc.o \
+				soplex/spxleastsqsc.o \
+				soplex/spxfastrt.o \
+				soplex/spxfileio.o \
+				soplex/spxgeometsc.o \
+				soplex/spxgithash.o \
+				soplex/spxharrisrt.o \
+				soplex/spxhybridpr.o \
+				soplex/spxid.o \
+				soplex/spxlpbase_rational.o \
+				soplex/spxlpbase_real.o \
+				soplex/spxmainsm.o \
+				soplex/spxout.o \
+				soplex/spxparmultpr.o \
+				soplex/spxquality.o \
+				soplex/spxscaler.o \
+				soplex/spxshift.o \
+				soplex/spxsolve.o \
+				soplex/spxsolver.o \
+				soplex/spxstarter.o \
+				soplex/spxsteeppr.o \
+				soplex/spxsumst.o \
+				soplex/spxvecs.o \
+				soplex/spxvectorst.o \
+				soplex/spxweightpr.o \
+				soplex/spxweightst.o \
+				soplex/spxwritestate.o \
+				soplex/statistics.o \
+				soplex/usertimer.o \
+				soplex/validation.o \
+				soplex/wallclocktimer.o \
+				soplex/updatevector.o \
+				soplex/testsoplex.o \
+				soplex.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
 REPOSIT		=	# template repository, explicitly empty  #spxproof.o
@@ -279,7 +279,7 @@ BASE		=	$(OSTYPE).$(ARCH).$(COMP).$(OPT)
 LINKSMARKERFILE	=	$(LIBDIR)/linkscreated.$(OSTYPE).$(ARCH).$(COMP)$(LINKLIBSUFFIX).$(EGLIB)
 LASTSETTINGS	=	$(OBJDIR)/make.lastsettings
 
-SPXGITHASHFILE	=	$(SRCDIR)/git_hash.cpp
+SPXGITHASHFILE	=	$(SRCDIR)/soplex/git_hash.cpp
 
 #------------------------------------------------------------------------------
 #--- NOTHING TO CHANGE FROM HERE ON -------------------------------------------
@@ -353,6 +353,7 @@ VSUPPNAME	= 	$(OSTYPE).$(ARCH).$(COMP).supp
 OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
+LIBOBJSUBDIR = 	$(LIBOBJDIR)/soplex
 BINOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(BINOBJ))
 EXAMPLEOBJFILES	=	$(addprefix $(BINOBJDIR)/,$(EXAMPLEOBJ))
 LIBOBJFILES	=	$(addprefix $(LIBOBJDIR)/,$(LIBOBJ))
@@ -540,6 +541,9 @@ cleanlib:	| $(LIBDIR)
 .PHONY: clean
 clean:          cleanlib cleanbin | $(LIBOBJDIR) $(BINOBJDIR) $(OBJDIR)
 		@echo "remove objective files"
+ifneq ($(LIBOBJSUBDIR),)
+		@-rm -f $(LIBOBJSUBDIR)/*.o && rmdir $(LIBOBJSUBDIR)
+endif
 ifneq ($(LIBOBJDIR),)
 		@-rm -f $(LIBOBJDIR)/*.o && rmdir $(LIBOBJDIR)
 endif
@@ -565,7 +569,7 @@ $(BINOBJDIR):	| $(OBJDIR)
 		@-mkdir -p $(BINOBJDIR)
 
 $(LIBOBJDIR):	| $(OBJDIR)
-		@-mkdir -p $(LIBOBJDIR)
+		@-mkdir -p $(LIBOBJSUBDIR)
 
 $(BINDIR):
 		@-mkdir -p $(BINDIR)
@@ -599,7 +603,7 @@ $(BINOBJDIR)/%.o:	$(SRCDIR)/%.cpp
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(BINOFLAGS) $(CXX_c)$< $(CXX_o)$@
 
 $(LIBOBJDIR)/%.o:	$(SRCDIR)/%.cpp
-		@-mkdir -p $(LIBOBJDIR)
+		@-mkdir -p $(LIBOBJSUBDIR)
 		@echo "-> compiling $@"
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBOFLAGS) $(CXX_c)$< $(CXX_o)$@
 

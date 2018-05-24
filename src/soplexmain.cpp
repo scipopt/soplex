@@ -26,14 +26,11 @@
 #include <fstream>
 
 #include "soplex.h"
-#include "spxgithash.h"
-#include "timerfactory.h"
-
-#include "validation.h"
+#include "soplex/validation.h"
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
-#include "EGlib.h"
+#include "soplex/EGlib.h"
 }
 #else
 #define EGlpNumStart() {}

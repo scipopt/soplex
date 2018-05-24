@@ -26,10 +26,9 @@
 #endif
 
 #include "soplex.h"
-#include "spxfileio.h"
-#include "spxgithash.h"
-#include "statistics.h"
-#include "mpsinput.h"
+#include "soplex/spxfileio.h"
+#include "soplex/statistics.h"
+#include "soplex/mpsinput.h"
 
 /// maximum length of lines in settings file
 #define SET_MAX_LINE_LEN 500
