@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-VERSION="4.0.0.0"
+VERSION="4.0.0"
 NAME="soplex-$VERSION"
 rm -f $NAME
 ln -s . $NAME
