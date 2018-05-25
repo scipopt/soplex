@@ -76,12 +76,12 @@ rm -f $NAME
 
 echo ""
 echo "check version numbers ($VERSION):"
-grep "VERSION" src/soplex/spxdefines.h
-grep "@version" doc/xternal.cpp
-grep "SOPLEX_VERSION" CMakeLists.txt
-grep "^VERSION" Makefile
-grep "^VERSION" Makefile.nmake
-grep "^VERSION" makedist.sh
+grep -H "VERSION" src/soplex/spxdefines.h
+grep -H "@version" doc/xternal.cpp
+grep -H "SOPLEX_VERSION" CMakeLists.txt
+grep -H "^VERSION" Makefile
+grep -H "^VERSION" Makefile.nmake
+grep -H "^VERSION" makedist.sh
 echo "check copyright info in doxygen documentation:"
 grep "1996" doc/soplexfooter.html
 tail src/soplex/git_hash.cpp
