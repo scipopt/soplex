@@ -12,14 +12,11 @@ echo "#define SPX_GITHASH \"$GITHASH\"" > src/soplex/git_hash.cpp
 
 # Before we create a tarball change the directory and file rights in a command way
 echo "adjust file modes"
-find ./ -type d -exec chmod 750 {} \;
-find ./ -type f -exec chmod 640 {} \;
-find ./ -name "*.sh" -exec chmod 750 {} \;
-find ./ -name "*.py" -exec chmod 750 {} \;
-find ./ -name "*.cmake" -exec chmod 750 {} \;
-chmod 750 bin/*
+git ls-files | xargs dirname | sort -u | xargs chmod 750
+git ls-files | xargs chmod 640
+git ls-files "*.sh" "*.py" | xargs chmod 750
 
-tar -cvzhf $NAME.tgz \
+tar -czhf $NAME.tgz \
 --exclude="*~" \
 --exclude=".?*" \
 --exclude="*exercise_LP_changes.cpp" \
@@ -78,7 +75,7 @@ $NAME/cmake/Modules
 rm -f $NAME
 
 echo ""
-echo "check version numbers in src/soplex/spxdefines.h, doc/xternal.cpp, CMakeLists.txt, Makefile, Makefile.nmake, and makedist.sh ($VERSION):"
+echo "check version numbers ($VERSION):"
 grep "VERSION" src/soplex/spxdefines.h
 grep "@version" doc/xternal.cpp
 grep "SOPLEX_VERSION" CMakeLists.txt
