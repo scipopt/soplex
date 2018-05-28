@@ -17,8 +17,8 @@ git ls-files "*.sh" "*.py" | xargs chmod 750
 
 # pack files tracked by git and append $NAME to the front
 git ls-files -c | xargs tar --transform "s|^|${NAME}/|" -cvhf $NAME.tar \
---exclude=".*" \
 --exclude="*~" \
+--exclude=".*" \
 --exclude="check/*cluster*" \
 --exclude="check/make_solu*" \
 --exclude="check/testset/*" \
@@ -35,7 +35,8 @@ git ls-files -c | xargs tar --transform "s|^|${NAME}/|" -cvhf $NAME.tar \
 
 # append additional files that were excluded before
 tar --transform "s|^|${NAME}/|" -rvf $NAME.tar \
-check/testset/quick* \
+check/testset/quick.test \
+check/testset/quick.solu \
 src/soplex/git_hash.cpp
 
 # compress the archive
