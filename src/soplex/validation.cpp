@@ -24,7 +24,7 @@ namespace soplex {
   /// updates the external solution used for validation
   /// #template 
   template <>
-  bool Validation<double>::updateExternalSolution(char* solution)
+  bool Validation<Real>::updateExternalSolution(char* solution)
   {
     validate = true;
     validatesolution = solution;
@@ -50,7 +50,7 @@ namespace soplex {
   /// updates the tolerance used for validation
   /// #template #temp
   template <>
-  bool Validation<double>::updateValidationTolerance(char* tolerance)
+  bool Validation<Real>::updateValidationTolerance(char* tolerance)
   {
     char* tailptr;
     validatetolerance = strtod(tolerance, &tailptr);
