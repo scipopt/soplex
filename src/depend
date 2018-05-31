@@ -1,4 +1,4 @@
-$(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex/soplex.h \
+$(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h \
  src/soplex/spxdefines.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
@@ -31,8 +31,8 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex/soplex.h \
  src/soplex/spxratiotester.h src/soplex/spxdefaultrt.h \
  src/soplex/spxharrisrt.h src/soplex/spxfastrt.h \
  src/soplex/spxboundflippingrt.h src/soplex/sol.h src/soplex/solbase.h \
- src/soplex/validation.h src/soplex/soplex.h
-$(BINOBJDIR)/example.o: src/example.cpp src/soplex/soplex.h src/soplex/spxdefines.h \
+ src/soplex/validation.h src/soplex.h
+$(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/soplex/spxdefines.h \
  src/soplex/basevectors.h src/soplex/rational.h src/soplex/idlist.h \
  src/soplex/islist.h src/soplex/vectorbase.h src/soplex/dvectorbase.h \
  src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \
@@ -201,7 +201,7 @@ $(LIBOBJDIR)/slufactor.o: src/soplex/slufactor.cpp src/soplex/spxdefines.h \
  src/soplex/datakey.h src/soplex/vector.h src/soplex/slinsolver.h \
  src/soplex/svector.h src/soplex/ssvector.h src/soplex/dsvector.h \
  src/soplex/didxset.h src/soplex/clufactor.h src/soplex/cring.h
-$(LIBOBJDIR)/solvedbds.o: src/soplex/solvedbds.cpp src/soplex/soplex.h \
+$(LIBOBJDIR)/solvedbds.o: src/soplex/solvedbds.cpp src/soplex.h \
  src/soplex/spxdefines.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
@@ -249,7 +249,7 @@ $(LIBOBJDIR)/slufactor_rational.o: src/soplex/slufactor_rational.cpp \
  src/soplex/slinsolver_rational.h src/soplex/svector.h \
  src/soplex/ssvector.h src/soplex/dsvector.h src/soplex/didxset.h \
  src/soplex/clufactor_rational.h src/soplex/cring.h
-$(LIBOBJDIR)/solverational.o: src/soplex/solverational.cpp src/soplex/soplex.h \
+$(LIBOBJDIR)/solverational.o: src/soplex/solverational.cpp src/soplex.h \
  src/soplex/spxdefines.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
@@ -283,7 +283,7 @@ $(LIBOBJDIR)/solverational.o: src/soplex/solverational.cpp src/soplex/soplex.h \
  src/soplex/spxharrisrt.h src/soplex/spxfastrt.h \
  src/soplex/spxboundflippingrt.h src/soplex/sol.h src/soplex/solbase.h \
  src/soplex/statistics.h src/soplex/ratrecon.h
-$(LIBOBJDIR)/solvereal.o: src/soplex/solvereal.cpp src/soplex/soplex.h \
+$(LIBOBJDIR)/solvereal.o: src/soplex/solvereal.cpp src/soplex.h \
  src/soplex/spxdefines.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
@@ -317,7 +317,7 @@ $(LIBOBJDIR)/solvereal.o: src/soplex/solvereal.cpp src/soplex/soplex.h \
  src/soplex/spxharrisrt.h src/soplex/spxfastrt.h \
  src/soplex/spxboundflippingrt.h src/soplex/sol.h src/soplex/solbase.h \
  src/soplex/statistics.h
-$(LIBOBJDIR)/soplex.o: src/soplex/soplex.cpp src/soplex/soplex.h \
+$(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h \
  src/soplex/spxdefines.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
@@ -559,7 +559,7 @@ $(LIBOBJDIR)/spxequilisc.o: src/soplex/spxequilisc.cpp src/soplex/spxequilisc.h 
  src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxlp.h src/soplex/lprowset.h \
  src/soplex/lpcolset.h src/soplex/lprow.h src/soplex/lpcol.h \
- src/soplex/soplex.h src/soplex/spxsolver.h src/soplex/timer.h \
+ src/soplex.h src/soplex/spxsolver.h src/soplex/timer.h \
  src/soplex/timerfactory.h src/soplex/notimer.h src/soplex/usertimer.h \
  src/soplex/wallclocktimer.h src/soplex/spxbasis.h src/soplex/ssvector.h \
  src/soplex/slinsolver.h src/soplex/array.h src/soplex/random.h \
@@ -855,7 +855,7 @@ $(LIBOBJDIR)/spxsolve.o: src/soplex/spxsolve.cpp src/soplex/spxdefines.h \
  src/soplex/spxpricer.h src/soplex/sorter.h src/soplex/spxratiotester.h \
  src/soplex/spxdefaultrt.h src/soplex/spxstarter.h
 $(LIBOBJDIR)/spxsolver.o: src/soplex/spxsolver.cpp src/soplex/spxdefines.h \
- src/soplex/soplex.h src/soplex/basevectors.h src/soplex/rational.h \
+ src/soplex.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h src/soplex/ssvectorbase.h src/soplex/idxset.h \
@@ -1058,7 +1058,7 @@ $(LIBOBJDIR)/spxwritestate.o: src/soplex/spxwritestate.cpp src/soplex/spxdefines
  src/soplex/spxpricer.h src/soplex/sorter.h src/soplex/spxratiotester.h \
  src/soplex/spxstarter.h src/soplex/slufactor.h src/soplex/clufactor.h
 $(LIBOBJDIR)/statistics.o: src/soplex/statistics.cpp src/soplex/statistics.h \
- src/soplex/soplex.h src/soplex/spxdefines.h src/soplex/basevectors.h \
+ src/soplex.h src/soplex/spxdefines.h src/soplex/basevectors.h \
  src/soplex/rational.h src/soplex/idlist.h src/soplex/islist.h \
  src/soplex/vectorbase.h src/soplex/dvectorbase.h src/soplex/spxalloc.h \
  src/soplex/spxout.h src/soplex/exceptions.h src/soplex/ssvectorbase.h \
@@ -1093,7 +1093,7 @@ $(LIBOBJDIR)/statistics.o: src/soplex/statistics.cpp src/soplex/statistics.h \
 $(LIBOBJDIR)/usertimer.o: src/soplex/usertimer.cpp src/soplex/spxdefines.h \
  src/soplex/usertimer.h src/soplex/timer.h
 $(LIBOBJDIR)/validation.o: src/soplex/validation.cpp src/soplex/validation.h \
- src/soplex/soplex.h src/soplex/spxdefines.h src/soplex/basevectors.h \
+ src/soplex.h src/soplex/spxdefines.h src/soplex/basevectors.h \
  src/soplex/rational.h src/soplex/idlist.h src/soplex/islist.h \
  src/soplex/vectorbase.h src/soplex/dvectorbase.h src/soplex/spxalloc.h \
  src/soplex/spxout.h src/soplex/exceptions.h src/soplex/ssvectorbase.h \
@@ -1136,7 +1136,7 @@ $(LIBOBJDIR)/updatevector.o: src/soplex/updatevector.cpp src/soplex/updatevector
  src/soplex/unitvectorbase.h src/soplex/svsetbase.h \
  src/soplex/classarray.h src/soplex/dataset.h src/soplex/dataarray.h \
  src/soplex/datakey.h src/soplex/vector.h src/soplex/ssvector.h
-$(LIBOBJDIR)/testsoplex.o: src/soplex/testsoplex.cpp src/soplex/soplex.h \
+$(LIBOBJDIR)/testsoplex.o: src/soplex/testsoplex.cpp src/soplex.h \
  src/soplex/spxdefines.h src/soplex/basevectors.h src/soplex/rational.h \
  src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
  src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
