@@ -1347,7 +1347,7 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
    {
       cStatus[active_idx] = SPxSolver::BASIC;
       r[active_idx] = 0.0;
-      assert(NE(m_upper, m_lower, eps()));
+      assert(NE(m_upper, m_lower));
       if( EQ(x[m_j], m_upper, eps()) )
          cStatus[m_j] = SPxSolver::ON_UPPER;
       else if( EQ(x[m_j], m_lower, eps()) )
