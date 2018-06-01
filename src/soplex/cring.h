@@ -36,16 +36,4 @@
 (ring).prev->next = (ring).next;                           \
 }
 
-#if 0 // not used
-#define mergeDR(ring1, ring2)                                   \
-{                                                               \
-Dring       *tmp;                                          \
-tmp = (ring1).next;                                        \
-(ring1).next = (ring2).next;                               \
-(ring2).next = tmp;                                        \
-(ring1).next->prev = &(ring1);                             \
-(ring2).next->prev = &(ring2);                             \
-}
-#endif
-
 #endif // _CRING_H_
