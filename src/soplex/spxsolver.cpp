@@ -176,18 +176,6 @@ void SPxSolver::setType(Type tp)
       forceRecompNonbasicValue();
 
       unInit();
-#if 0
-      else
-      {
-      if (!matrixIsSetup)
-      {
-         SPxBasis::load(this);
-         // SPxBasis::load(desc());
-         // not needed, because load(this) allready loads descriptor
-      }
-      factorized = false;
-      m_numCycle = 0;
-#endif
       MSG_INFO3( (*spxout), (*spxout) << "Switching to "
                         << static_cast<const char*>((tp == LEAVE)
                            ? "leaving" : "entering")
