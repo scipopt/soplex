@@ -824,7 +824,7 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
 
 void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 {
-   if( newLower != lowerUnscaled(i) )
+   if( newLower != (scale ? lowerUnscaled(i) : lower(i)) )
    {
       Real oldLower = lower(i);
       // This has to be done before calling changeLowerStatus() because that is calling
@@ -932,7 +932,7 @@ void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
 
 void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 {
-   if( newUpper != upperUnscaled(i) )
+   if( newUpper != (scale ? upperUnscaled(i) : upper(i)) )
    {
       Real oldUpper = upper(i);
       SPxLP::changeUpper(i, newUpper, scale);
@@ -1049,7 +1049,7 @@ void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
 
 void SPxSolver::changeLhs(int i, const Real& newLhs, bool scale)
 {
-   if( newLhs != lhsUnscaled(i) )
+   if( newLhs != (scale ? lhsUnscaled(i) : lhs(i)) )
    {
       Real oldLhs = lhs(i);
       SPxLP::changeLhs(i, newLhs, scale);
@@ -1154,7 +1154,7 @@ void SPxSolver::changeRhs(const Vector& newRhs, bool scale)
 
 void SPxSolver::changeRhs(int i, const Real& newRhs, bool scale)
 {
-   if( newRhs != rhsUnscaled(i) )
+   if( newRhs != (scale ? rhsUnscaled(i) : rhs(i)) )
    {
       Real oldRhs = rhs(i);
       SPxLP::changeRhs(i, newRhs, scale);
