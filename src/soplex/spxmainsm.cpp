@@ -1323,7 +1323,10 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
 
-   assert(!isOptimal || (GE(x[m_j], m_lower, eps()) && LE(x[m_j], m_upper, eps())));
+   if( isOptimal && (LT(x[m_j], m_lower, eps()) || GT(x[m_j], m_upper, eps())) )
+   {
+      MSG_ERROR( std::cerr << "EMAISM: numerical violation after disaggregating variable" << std::endl; )
+   }
 
    // dual:
    Real dualVal = 0.0;
