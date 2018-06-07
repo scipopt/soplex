@@ -129,9 +129,8 @@ void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 
 /// performs external feasibility check with real type
 ///@todo implement external check; currently we use the internal methods for convenience
-template <class R>
 static
-void checkSolutionReal(SoPlex<R>& soplex)
+void checkSolutionReal(SoPlex<Real>& soplex)
 {
    if( soplex.hasPrimal() )
    {
@@ -143,7 +142,7 @@ void checkSolutionReal(SoPlex<R>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::FEASTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<Real>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
                           << std::setprecision(8) << std::fixed << ").\n"
@@ -169,7 +168,7 @@ void checkSolutionReal(SoPlex<R>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::OPTTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<Real>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
                           << std::setprecision(8) << std::fixed << ").\n"
@@ -188,12 +187,10 @@ void checkSolutionReal(SoPlex<R>& soplex)
 
 /// performs external feasibility check with rational type
 ///@todo implement external check; currently we use the internal methods for convenience
-template <class R>
 static
-void checkSolutionRational(SoPlex<R>& soplex)
+void checkSolutionRational(SoPlex<Rational>& soplex)
 {
-  #ifdef rationaltemplate
-   if( soplex.hasPrimal() )
+  if( soplex.hasPrimal() )
    {
       Rational boundviol;
       Rational rowviol;
@@ -203,7 +200,7 @@ void checkSolutionRational(SoPlex<R>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::FEASTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<Rational>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -227,7 +224,7 @@ void checkSolutionRational(SoPlex<R>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex<R>::OPTTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<Rational>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -244,21 +241,20 @@ void checkSolutionRational(SoPlex<R>& soplex)
 
 /// performs external feasibility check according to check mode
 template <class R>
-static
-void checkSolution(SoPlex<R>& soplex)
-{
-   if( soplex.intParam(SoPlex<R>::CHECKMODE) == SoPlex<R>::CHECKMODE_RATIONAL
-      || (soplex.intParam(SoPlex<R>::CHECKMODE) == SoPlex<R>::CHECKMODE_AUTO
-         && soplex.intParam(SoPlex<R>::READMODE) == SoPlex<R>::READMODE_RATIONAL) )
-   {
-      checkSolutionRational(soplex);
-   }
-   else
-   {
-      checkSolutionReal(soplex);
-   }
+void checkSolution(SoPlex<R>& soplex);
 
-   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
+template <>
+void checkSolution<Real>(SoPlex<Real>& soplex)
+{
+  checkSolutionReal(soplex);
+  MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
+}
+
+template <>
+void checkSolution<Rational>(SoPlex<Rational>& soplex)
+{
+  checkSolutionRational(soplex);
+  MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
 template <class R>
@@ -475,7 +471,9 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlex<Real>* soplex = nullptr; // The pointer to base class that will be used to access SoPlex 
+   // This should be a pointer without a type. 
+   SoPlex<Real>* soplex = nullptr; // The pointer to base class that will be used to access SoPlex
+
 
    Timer* readingTime = nullptr;
    Validation<Real>* validation = nullptr;
@@ -954,7 +952,7 @@ int main(int argc, char* argv[])
       printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
 
       if( checkSol )
-         checkSolution(*soplex);
+        checkSolution<Real>(*soplex); // The type needs to get fixed here
 
       if( displayStatistics )
       {
