@@ -206,114 +206,84 @@ namespace soplex
 	bool SoPlex<Real>::_parseSettingsLine(char* line, const int lineNumber);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  template <class R>
-  SoPlex<R>::Settings::BoolParam::BoolParam() {
+  template <>
+  SoPlex<Real>::Settings::BoolParam::BoolParam() {
     // should lifting be used to reduce range of nonzero matrix coefficients?
-    name[SoPlex<R>::LIFTING] = "lifting";
-    description[SoPlex<R>::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
-    defaultValue[SoPlex<R>::LIFTING] = false;
+    name[SoPlex<Real>::LIFTING] = "lifting";
+    description[SoPlex<Real>::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
+    defaultValue[SoPlex<Real>::LIFTING] = false;
 
     // should LP be transformed to equality form before a rational solve?
-    name[SoPlex<R>::EQTRANS] = "eqtrans";
-    description[SoPlex<R>::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
-    defaultValue[SoPlex<R>::EQTRANS] = false;
+    name[SoPlex<Real>::EQTRANS] = "eqtrans";
+    description[SoPlex<Real>::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
+    defaultValue[SoPlex<Real>::EQTRANS] = false;
 
     // should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
-    name[SoPlex<R>::TESTDUALINF] = "testdualinf";
-    description[SoPlex<R>::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
-    defaultValue[SoPlex<R>::TESTDUALINF] = false;
+    name[SoPlex<Real>::TESTDUALINF] = "testdualinf";
+    description[SoPlex<Real>::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
+    defaultValue[SoPlex<Real>::TESTDUALINF] = false;
 
     // should a rational factorization be performed after iterative refinement?
-    name[SoPlex<R>::RATFAC] = "ratfac";
-    description[SoPlex<R>::RATFAC] = "should a rational factorization be performed after iterative refinement?";
-    defaultValue[SoPlex<R>::RATFAC] = true;
+    name[SoPlex<Real>::RATFAC] = "ratfac";
+    description[SoPlex<Real>::RATFAC] = "should a rational factorization be performed after iterative refinement?";
+    defaultValue[SoPlex<Real>::RATFAC] = true;
 
     // should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
     // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-    name[SoPlex<R>::USEDECOMPDUALSIMPLEX] = "decompositiondualsimplex";
-    description[SoPlex<R>::USEDECOMPDUALSIMPLEX] = "should the decomposition based dual simplex be used to solve the LP?";
-    defaultValue[SoPlex<R>::USEDECOMPDUALSIMPLEX] = false;
+    name[SoPlex<Real>::USEDECOMPDUALSIMPLEX] = "decompositiondualsimplex";
+    description[SoPlex<Real>::USEDECOMPDUALSIMPLEX] = "should the decomposition based dual simplex be used to solve the LP?";
+    defaultValue[SoPlex<Real>::USEDECOMPDUALSIMPLEX] = false;
 
     // should the degeneracy be computed for each basis?
-    name[SoPlex<R>::COMPUTEDEGEN] = "computedegen";
-    description[SoPlex<R>::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
-    defaultValue[SoPlex<R>::COMPUTEDEGEN] = false;
+    name[SoPlex<Real>::COMPUTEDEGEN] = "computedegen";
+    description[SoPlex<Real>::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
+    defaultValue[SoPlex<Real>::COMPUTEDEGEN] = false;
 
     // should the dual of the complementary problem be used in the decomposition simplex?
-    name[SoPlex<R>::USECOMPDUAL] = "usecompdual";
-    description[SoPlex<R>::USECOMPDUAL] = "should the dual of the complementary problem be used in the decomposition simplex?";
-    defaultValue[SoPlex<R>::USECOMPDUAL] = false;
+    name[SoPlex<Real>::USECOMPDUAL] = "usecompdual";
+    description[SoPlex<Real>::USECOMPDUAL] = "should the dual of the complementary problem be used in the decomposition simplex?";
+    defaultValue[SoPlex<Real>::USECOMPDUAL] = false;
 
     /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
     // simplex
-    name[SoPlex<R>::EXPLICITVIOL] = "explicitviol";
-    description[SoPlex<R>::EXPLICITVIOL] = "Should violations of the original problem be explicitly computed in the decomposition simplex?";
-    defaultValue[SoPlex<R>::EXPLICITVIOL] = false;
+    name[SoPlex<Real>::EXPLICITVIOL] = "explicitviol";
+    description[SoPlex<Real>::EXPLICITVIOL] = "Should violations of the original problem be explicitly computed in the decomposition simplex?";
+    defaultValue[SoPlex<Real>::EXPLICITVIOL] = false;
 
     // should cycling solutions be accepted during iterative refinement?
-    name[SoPlex<R>::ACCEPTCYCLING] = "acceptcycling";
-    description[SoPlex<R>::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
-    defaultValue[SoPlex<R>::ACCEPTCYCLING] = false;
+    name[SoPlex<Real>::ACCEPTCYCLING] = "acceptcycling";
+    description[SoPlex<Real>::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
+    defaultValue[SoPlex<Real>::ACCEPTCYCLING] = false;
 
     // apply rational reconstruction after each iterative refinement?
-    name[SoPlex<R>::RATREC] = "ratrec";
-    description[SoPlex<R>::RATREC] = "apply rational reconstruction after each iterative refinement?";
-    defaultValue[SoPlex<R>::RATREC] = true;
+    name[SoPlex<Real>::RATREC] = "ratrec";
+    description[SoPlex<Real>::RATREC] = "apply rational reconstruction after each iterative refinement?";
+    defaultValue[SoPlex<Real>::RATREC] = true;
 
     // round scaling factors for iterative refinement to powers of two?
-    name[SoPlex<R>::POWERSCALING] = "powerscaling";
-    description[SoPlex<R>::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
-    defaultValue[SoPlex<R>::POWERSCALING] = true;
+    name[SoPlex<Real>::POWERSCALING] = "powerscaling";
+    description[SoPlex<Real>::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
+    defaultValue[SoPlex<Real>::POWERSCALING] = true;
 
     // continue iterative refinement with exact basic solution if not optimal?
-    name[SoPlex<R>::RATFACJUMP] = "ratfacjump";
-    description[SoPlex<R>::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
-    defaultValue[SoPlex<R>::RATFACJUMP] = false;
+    name[SoPlex<Real>::RATFACJUMP] = "ratfacjump";
+    description[SoPlex<Real>::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
+    defaultValue[SoPlex<Real>::RATFACJUMP] = false;
 
     // use bound flipping also for row representation?
-    name[SoPlex<R>::ROWBOUNDFLIPS] = "rowboundflips";
-    description[SoPlex<R>::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
-    defaultValue[SoPlex<R>::ROWBOUNDFLIPS] = false;
+    name[SoPlex<Real>::ROWBOUNDFLIPS] = "rowboundflips";
+    description[SoPlex<Real>::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
+    defaultValue[SoPlex<Real>::ROWBOUNDFLIPS] = false;
 
     // use persistent scaling?
-    name[SoPlex<R>::PERSISTENTSCALING] = "persistentscaling";
-    description[SoPlex<R>::PERSISTENTSCALING] = "should persistent scaling be used?";
-    defaultValue[SoPlex<R>::PERSISTENTSCALING] = true;
+    name[SoPlex<Real>::PERSISTENTSCALING] = "persistentscaling";
+    description[SoPlex<Real>::PERSISTENTSCALING] = "should persistent scaling be used?";
+    defaultValue[SoPlex<Real>::PERSISTENTSCALING] = true;
 
     // perturb the entire problem or only the relevant bounds of s single pivot?
-    name[SoPlex<R>::FULLPERTURBATION] = "fullperturbation";
-    description[SoPlex<R>::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
-    defaultValue[SoPlex<R>::FULLPERTURBATION] = false;
+    name[SoPlex<Real>::FULLPERTURBATION] = "fullperturbation";
+    description[SoPlex<Real>::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
+    defaultValue[SoPlex<Real>::FULLPERTURBATION] = false;
   }
 
   template <class R>
