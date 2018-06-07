@@ -45,8 +45,195 @@ namespace soplex
 {
   template <>
   int SoPlex<Real>::intParam(const IntParam param) const;
+
   template <>
   typename SoPlex<Real>::Settings& SoPlex<Real>::Settings::operator=(const Settings& settings);
+
+  template <>
+  const SVectorReal& SoPlex<Real>::colVectorRealInternal(int i) const;
+
+  template <>
+  const Rational& SoPlex<Real>::maxObjRational(int i) const;
+
+  template <>
+  typename SPxSolver<Real>::VarStatus SoPlex<Real>::basisRowStatus(int row) const;
+
+  template <>
+  typename SPxSolver<Real>::VarStatus SoPlex<Real>::basisColStatus(int col) const;
+
+  template <>
+	bool SoPlex<Real>::setSettings(const Settings& newSettings, const bool init);
+
+  template <>
+	bool SoPlex<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const;
+
+  template <>
+  void SoPlex<Real>::printShortStatistics(std::ostream& os);
+
+  template <>
+  void SoPlex<Real>::printStatus(std::ostream& os, typename SPxSolver<Real>::Status stat);
+
+  template <>
+  void SoPlex<Real>::setRandomSeed(unsigned int seed);
+
+  template <>
+  void SoPlex<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
+
+  template <>
+  void SoPlex<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const;
+
+  template <>
+	bool SoPlex<Real>::_isConsistent() const;
+
+  template <>
+  typename SoPlex<Real>::RangeType SoPlex<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
+
+  template <>
+  void SoPlex<Real>::_addRowReal(const LPRowReal& lprow);
+
+  template <>
+	bool SoPlex<Real>::setIntParam(const IntParam param, const int value, const bool init);
+
+  template <>
+  typename SoPlex<Real>::RangeType SoPlex<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const;
+
+  template <>
+  void SoPlex<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
+
+  template <>
+  void SoPlex<Real>::_addRowsReal(const LPRowSetReal& lprowset);
+
+  template <>
+  void SoPlex<Real>::_addColReal(const LPColReal& lpcol);
+
+  template <>
+  void SoPlex<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
+
+  template <>
+  void SoPlex<Real>::_addColsReal(const LPColSetReal& lpcolset);
+
+  template <>
+  void SoPlex<Real>::_changeRowReal(int i, const LPRowReal& lprow);
+
+  template <>
+  void SoPlex<Real>::_changeLhsReal(const VectorReal& lhs);
+
+  template <>
+  void SoPlex<Real>::_changeLhsReal(int i, const Real& lhs);
+
+  template <>
+  void SoPlex<Real>::_changeRhsReal(const VectorReal& rhs);
+
+  template <>
+  void SoPlex<Real>::_changeRhsReal(int i, const Real& rhs);
+
+  template <>
+  void SoPlex<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
+
+  template <>
+  void SoPlex<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs);
+
+  template <>
+  void SoPlex<Real>::_changeColReal(int i, const LPColReal& lpcol);
+
+  template <>
+  void SoPlex<Real>::_changeLowerReal(const VectorReal& lower);
+
+  template <>
+  void SoPlex<Real>::_changeLowerReal(int i, const Real& lower);
+
+  template <>
+  void SoPlex<Real>::_changeUpperReal(const VectorReal& upper);
+
+  template <>
+  void SoPlex<Real>::_changeUpperReal(int i, const Real& upper);
+
+  template <>
+  void SoPlex<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
+
+  template <>
+  void SoPlex<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper);
+
+  template <>
+  void SoPlex<Real>::_changeElementReal(int i, int j, const Real& val);
+
+  template <>
+  void SoPlex<Real>::_removeRowReal(int i);
+
+  template <>
+  void SoPlex<Real>::_removeRowsReal(int perm[]);
+
+  template <>
+  void SoPlex<Real>::_removeColReal(int i);
+
+  template <>
+  void SoPlex<Real>::_removeColsReal(int perm[]);
+
+  template <>
+  void SoPlex<Real>::_invalidateSolution();
+
+  template <>
+  void SoPlex<Real>::_ensureRationalLP();
+
+  template <>
+  void SoPlex<Real>::_ensureRealLPLoaded();
+
+  template <>
+	bool SoPlex<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
+
+  template <>
+  void SoPlex<Real>::_completeRangeTypesRational();
+
+  template <>
+  void SoPlex<Real>::_recomputeRangeTypesRational();
+
+  template <>
+  void SoPlex<Real>::_syncLPReal(bool time);
+
+  template <>
+  void SoPlex<Real>::_syncLPRational(bool time);
+
+  template <>
+  void SoPlex<Real>::_syncRealSolution();
+
+  template <>
+  void SoPlex<Real>::_syncRationalSolution();
+
+  template <>
+  const UnitVectorRational* SoPlex<Real>::_unitVectorRational(const int i);
+
+  template <>
+	bool SoPlex<Real>::_parseSettingsLine(char* line, const int lineNumber);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   template <class R>
