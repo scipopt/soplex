@@ -2122,6 +2122,9 @@ private:
    /// solves the templated LP
    void _optimizeT();
 
+   /// temporary fix for Rational
+   void _optimizeRational();
+
    /// checks result of the solving process and solves again without preprocessing if necessary
    void _evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus);
 

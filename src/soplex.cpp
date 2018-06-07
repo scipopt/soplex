@@ -3754,7 +3754,7 @@ namespace soplex
     else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       {
         _syncLPRational();
-        _optimizeT();
+        _optimizeRational();
       }
     else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_MANUAL )
       {
@@ -3764,7 +3764,7 @@ namespace soplex
         assert(areLPsInSync(true, false, false));
 #endif
 
-        _optimizeT();
+        _optimizeRational();
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
         assert(areLPsInSync(true, true, false));
@@ -3780,7 +3780,7 @@ namespace soplex
         assert(areLPsInSync(true, false, false));
 #endif
 
-        _optimizeT();
+        _optimizeRational();
       }
 
     MSG_INFO1( spxout, spxout << "\n";

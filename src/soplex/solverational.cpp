@@ -25,9 +25,8 @@
 namespace soplex
 {
    /// solves rational LP
-  #ifdef rationaltemplate
   template <>
-  void SoPlex<Rational>::_optimizeT()
+  void SoPlex<Real>::_optimizeRational()
    {
       bool hasUnboundedRay = false;
       bool infeasibilityNotCertified = false;
@@ -62,36 +61,36 @@ namespace soplex
       _storeLPReal();
 
       // deactivate objective limit in floating-point solver
-      if( realParam(SoPlex<Rational>::OBJLIMIT_LOWER) > -realParam(SoPlex<Rational>::INFTY) || realParam(SoPlex<Rational>::OBJLIMIT_UPPER) < realParam(SoPlex<Rational>::INFTY) )
+      if( realParam(SoPlex<Real>::OBJLIMIT_LOWER) > -realParam(SoPlex<Real>::INFTY) || realParam(SoPlex<Real>::OBJLIMIT_UPPER) < realParam(SoPlex<Real>::INFTY) )
       {
          MSG_INFO2( spxout, spxout << "Deactivating objective limit.\n" );
       }
 
-      _solver.setTerminationValue(realParam(SoPlex<Rational>::INFTY));
+      _solver.setTerminationValue(realParam(SoPlex<Real>::INFTY));
 
       _statistics->preprocessingTime->stop();
 
       // apply lifting to reduce range of nonzero matrix coefficients
-      if( boolParam(SoPlex<Rational>::LIFTING) )
+      if( boolParam(SoPlex<Real>::LIFTING) )
          _lift();
 
       // force column representation
       ///@todo implement row objectives with row representation
-      int oldRepresentation = intParam(SoPlex<Rational>::REPRESENTATION);
-      setIntParam(SoPlex<Rational>::REPRESENTATION, SoPlex<Rational>::REPRESENTATION_COLUMN);
+      int oldRepresentation = intParam(SoPlex<Real>::REPRESENTATION);
+      setIntParam(SoPlex<Real>::REPRESENTATION, SoPlex<Real>::REPRESENTATION_COLUMN);
 
       // force ratio test (avoid bound flipping)
-      int oldRatiotester = intParam(SoPlex<Rational>::RATIOTESTER);
-      setIntParam(SoPlex<Rational>::RATIOTESTER, SoPlex<Rational>::RATIOTESTER_FAST);
+      int oldRatiotester = intParam(SoPlex<Real>::RATIOTESTER);
+      setIntParam(SoPlex<Real>::RATIOTESTER, SoPlex<Real>::RATIOTESTER_FAST);
 
       ///@todo implement handling of row objectives in Cplex interface
 #ifdef SOPLEX_WITH_CPX
-      int oldEqtrans = boolParam(SoPlex<Rational>::EQTRANS);
-      setBoolParam(SoPlex<Rational>::EQTRANS, true);
+      int oldEqtrans = boolParam(SoPlex<Real>::EQTRANS);
+      setBoolParam(SoPlex<Real>::EQTRANS, true);
 #endif
 
       // introduce slack variables to transform inequality constraints into equations
-      if( boolParam(SoPlex<Rational>::EQTRANS) )
+      if( boolParam(SoPlex<Real>::EQTRANS) )
          _transformEquality();
 
       _storedBasis = false;
@@ -115,18 +114,18 @@ namespace soplex
          // case: an unrecoverable error occured
          if( error )
          {
-            _status = SPxSolver<Rational>::ERROR;
+            _status = SPxSolver<Real>::ERROR;
             break;
          }
          // case: stopped due to some limit
          else if( stoppedTime )
          {
-            _status = SPxSolver<Rational>::ABORT_TIME;
+            _status = SPxSolver<Real>::ABORT_TIME;
             break;
          }
          else if(  stoppedIter )
          {
-            _status = SPxSolver<Rational>::ABORT_ITER;
+            _status = SPxSolver<Real>::ABORT_ITER;
             break;
          }
          // case: unboundedness detected for the first time
@@ -142,7 +141,7 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout, spxout << "Error while testing for unboundedness.\n" );
-               _status = SPxSolver<Rational>::ERROR;
+               _status = SPxSolver<Real>::ERROR;
                break;
             }
 
@@ -159,12 +158,12 @@ namespace soplex
 
             if( stoppedTime )
             {
-               _status = SPxSolver<Rational>::ABORT_TIME;
+               _status = SPxSolver<Real>::ABORT_TIME;
                break;
             }
             else if( stoppedIter )
             {
-               _status = SPxSolver<Rational>::ABORT_ITER;
+               _status = SPxSolver<Real>::ABORT_ITER;
                break;
             }
 
@@ -180,29 +179,29 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout, spxout << "Error while testing for feasibility.\n" );
-               _status = SPxSolver<Rational>::ERROR;
+               _status = SPxSolver<Real>::ERROR;
                break;
             }
             else if( stoppedTime )
             {
-               _status = SPxSolver<Rational>::ABORT_TIME;
+               _status = SPxSolver<Real>::ABORT_TIME;
                break;
             }
             else if( stoppedIter )
             {
-               _status = SPxSolver<Rational>::ABORT_ITER;
+               _status = SPxSolver<Real>::ABORT_ITER;
                break;
             }
             else if( infeasible )
             {
                MSG_INFO1( spxout, spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
-               _status = SPxSolver<Rational>::INFEASIBLE;
+               _status = SPxSolver<Real>::INFEASIBLE;
                break;
             }
             else if( hasUnboundedRay )
             {
                MSG_INFO1( spxout, spxout << "Primal feasible and unbounded.\n" );
-               _status = SPxSolver<Rational>::UNBOUNDED;
+               _status = SPxSolver<Real>::UNBOUNDED;
                break;
             }
             else
@@ -221,7 +220,7 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout, spxout << "Error while testing for infeasibility.\n" );
-               _status = SPxSolver<Rational>::ERROR;
+               _status = SPxSolver<Real>::ERROR;
                _restoreBasis();
                break;
             }
@@ -230,18 +229,18 @@ namespace soplex
 
             if( stoppedTime )
             {
-               _status = SPxSolver<Rational>::ABORT_TIME;
+               _status = SPxSolver<Real>::ABORT_TIME;
                _restoreBasis();
                break;
             }
             else if( stoppedIter )
             {
-               _status = SPxSolver<Rational>::ABORT_ITER;
+               _status = SPxSolver<Real>::ABORT_ITER;
                _restoreBasis();
                break;
             }
 
-            if( infeasible && boolParam(SoPlex<Rational>::TESTDUALINF) )
+            if( infeasible && boolParam(SoPlex<Real>::TESTDUALINF) )
             {
                SolRational solUnbounded;
 
@@ -253,7 +252,7 @@ namespace soplex
                if( error )
                {
                   MSG_INFO1( spxout, spxout << "Error while testing for dual infeasibility.\n" );
-                  _status = SPxSolver<Rational>::ERROR;
+                  _status = SPxSolver<Real>::ERROR;
                   _restoreBasis();
                   break;
                }
@@ -283,13 +282,13 @@ namespace soplex
             if( infeasible )
             {
                MSG_INFO1( spxout, spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
-               _status = SPxSolver<Rational>::INFEASIBLE;
+               _status = SPxSolver<Real>::INFEASIBLE;
                break;
             }
             else if( hasUnboundedRay )
             {
                MSG_INFO1( spxout, spxout << "Primal feasible and unbounded.\n" );
-               _status = SPxSolver<Rational>::UNBOUNDED;
+               _status = SPxSolver<Real>::UNBOUNDED;
                break;
             }
             else
@@ -301,7 +300,7 @@ namespace soplex
          else if( primalFeasible && dualFeasible )
          {
             MSG_INFO1( spxout, spxout << "Solved to optimality.\n" );
-            _status = SPxSolver<Rational>::OPTIMAL;
+            _status = SPxSolver<Real>::OPTIMAL;
             break;
          }
          else
@@ -314,23 +313,23 @@ namespace soplex
 
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
 
-      if( _status == SPxSolver<Rational>::OPTIMAL || _status == SPxSolver<Rational>::INFEASIBLE || _status == SPxSolver<Rational>::UNBOUNDED )
+      if( _status == SPxSolver<Real>::OPTIMAL || _status == SPxSolver<Real>::INFEASIBLE || _status == SPxSolver<Real>::UNBOUNDED )
          _hasSolRational = true;
 
       // restore original problem
-      if( boolParam(SoPlex<Rational>::EQTRANS) )
+      if( boolParam(SoPlex<Real>::EQTRANS) )
          _untransformEquality(_solRational);
 
 #ifdef SOPLEX_WITH_CPX
-      setBoolParam(SoPlex<Rational>::EQTRANS, oldEqtrans);
+      setBoolParam(SoPlex<Real>::EQTRANS, oldEqtrans);
 #endif
 
       // reset representation and ratio test
-      setIntParam(SoPlex<Rational>::REPRESENTATION, oldRepresentation);
-      setIntParam(SoPlex<Rational>::RATIOTESTER, oldRatiotester);
+      setIntParam(SoPlex<Real>::REPRESENTATION, oldRepresentation);
+      setIntParam(SoPlex<Real>::RATIOTESTER, oldRatiotester);
 
       // undo lifting
-      if( boolParam(SoPlex<Rational>::LIFTING) )
+      if( boolParam(SoPlex<Real>::LIFTING) )
          _project(_solRational);
 
       // restore objective, bounds, and sides of real LP in case they have been modified during iterative refinement
@@ -342,13 +341,12 @@ namespace soplex
       {
          assert(_isRealLPLoaded);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-         _hasBasis = (_solver.basis().status() > SPxBasis<Rational>::NO_PROBLEM);
+         _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
       }
 
       // stop timing
       _statistics->solvingTime->stop();
    }
-  #endif
 
 
 
