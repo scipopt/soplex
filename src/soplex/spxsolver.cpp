@@ -1666,7 +1666,7 @@ SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
    switch( stat )
    {
    case FIXED :
-      assert(rhs(row) == lhs(row));
+      assert(EQ(rhs(row), lhs(row), feastol()));
       rstat = SPxBasis::Desc::P_FIXED;
       break;
    case ON_UPPER :
