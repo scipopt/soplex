@@ -123,36 +123,6 @@ int SPxWeightPR::selectLeave()
    return lastIdx;
 }
 
-#if 0
-/**@todo remove this code */
-// ??? This is the old (buggy) version
-int SPxWeightPR::selectLeave()
-{
-   const Real* test = thesolver->fTest().get_const_ptr();
-   Real type = 1 - 2 * (thesolver->rep() == SPxSolver::COLUMN);
-   Real best = type * infinity;
-   int lastIdx = -1;
-   Real x;
-   int i;
-
-   for (i = solver()->dim() - 1; i >= 0; --i)
-   {
-      x = test[i];
-      if (x < -theeps)
-      {
-         x *= leavePenalty[i];
-         if (x < best)
-         {
-            best = x;
-            lastIdx = i;
-         }
-      }
-   }
-   assert(isConsistent());
-   return lastIdx;
-}
-#endif
-
 SPxId SPxWeightPR::selectEnter()
 {
    const Vector& rTest = (solver()->rep() == SPxSolver::ROW)

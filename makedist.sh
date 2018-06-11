@@ -2,9 +2,8 @@
 
 VERSION="4.0.0.1"
 NAME="soplex-$VERSION"
-rm -f $NAME
-ln -s . $NAME
 rm -f $NAME.tgz
+rm -f $NAME.tar
 
 echo "store git hash"
 GITHASH=`git describe --always --dirty  | sed 's/^.*-g//'`
@@ -12,79 +11,48 @@ echo "#define SPX_GITHASH \"$GITHASH\"" > src/soplex/git_hash.cpp
 
 # Before we create a tarball change the directory and file rights in a command way
 echo "adjust file modes"
-find ./ -type d -exec chmod 750 {} \;
-find ./ -type f -exec chmod 640 {} \;
-find ./ -name "*.sh" -exec chmod 750 {} \;
-find ./ -name "*.py" -exec chmod 750 {} \;
-find ./ -name "*.cmake" -exec chmod 750 {} \;
-chmod 750 bin/*
+git ls-files | xargs dirname | sort -u | xargs chmod 750
+git ls-files | xargs chmod 640
+git ls-files "*.sh" "*.py" | xargs chmod 750
 
-tar -cvzhf $NAME.tgz \
+# pack files tracked by git and append $NAME to the front
+git ls-files -c | xargs tar --transform "s|^|${NAME}/|" -cvhf $NAME.tar \
 --exclude="*~" \
---exclude=".?*" \
---exclude="*exercise_LP_changes.cpp" \
---exclude="*/local/*" \
---exclude="TODO" \
-$NAME/COPYING \
-$NAME/INSTALL.md \
-$NAME/CHANGELOG \
-$NAME/Makefile \
-$NAME/check/check.awk \
-$NAME/check/check.sh \
-$NAME/check/compare.py \
-$NAME/check/evaluation.py \
-$NAME/check/evaluation.sh \
-$NAME/check/instances/* \
-$NAME/check/test.sh \
-$NAME/check/testset/netlib.test \
-$NAME/check/testset/quick.test \
-$NAME/check/testset/mittelmann.test \
-$NAME/check/testset/infeas.test \
-$NAME/check/testset/netlib.solu \
-$NAME/check/testset/quick.solu \
-$NAME/check/testset/mittelmann.solu \
-$NAME/check/testset/infeas.solu \
-$NAME/doc/inc/localfaq.php $NAME/doc/inc/faqtext.txt $NAME/doc/inc/parser.py \
-$NAME/doc/builddoc.sh \
-$NAME/doc/soplex.dxy \
-$NAME/doc/soplexfooter.html \
-$NAME/doc/soplexheader.html \
-$NAME/doc/soplexlayout.xml \
-$NAME/doc/xternal.cpp \
-$NAME/make/make* \
-$NAME/settings/exact.set \
-$NAME/settings/devex.set \
-$NAME/settings/steep.set \
-$NAME/settings/polish1.set \
-$NAME/settings/polish2.set \
-$NAME/src/depend* \
-$NAME/src/*.h \
-$NAME/src/*.cpp \
-$NAME/src/soplex/*h \
-$NAME/src/soplex/*.cpp \
-$NAME/CMakeLists.txt              \
-$NAME/settings/default-col.set    \
-$NAME/settings/default-row.set    \
-$NAME/settings/devex.set          \
-$NAME/settings/steep.set          \
-$NAME/settings/exact.set          \
-$NAME/settings/polish1.set        \
-$NAME/settings/polish2.set        \
-$NAME/soplex-config.cmake.in      \
-$NAME/src/CMakeLists.txt         \
-$NAME/check/CMakeLists.txt \
-$NAME/cmake/Modules
+--exclude=".*" \
+--exclude="check/*cluster*" \
+--exclude="check/make_solu*" \
+--exclude="check/testset/*" \
+--exclude="extra/*" \
+--exclude="lcov/*" \
+--exclude="license/*" \
+--exclude="lint/*" \
+--exclude="make/local/*" \
+--exclude="makedist.sh" \
+--exclude="paper/*" \
+--exclude="tests/*" \
+--exclude="update*.sh" \
+--exclude="web/*"
 
-rm -f $NAME
+# append additional files that were excluded before
+tar --transform "s|^|${NAME}/|" -rvf $NAME.tar \
+check/testset/quick.test \
+check/testset/quick.solu \
+src/soplex/git_hash.cpp
+
+# compress the archive
+gzip -c $NAME.tar > $NAME.tgz
+
+# remove temporary archive
+rm -f $NAME.tar
 
 echo ""
-echo "check version numbers in src/soplex/spxdefines.h, doc/xternal.cpp, CMakeLists.txt, Makefile, Makefile.nmake, and makedist.sh ($VERSION):"
-grep "VERSION" src/soplex/spxdefines.h
-grep "@version" doc/xternal.cpp
-grep "SOPLEX_VERSION" CMakeLists.txt
-grep "^VERSION" Makefile
-grep "^VERSION" Makefile.nmake
-grep "^VERSION" makedist.sh
+echo "check version numbers ($VERSION):"
+grep -H "VERSION" src/soplex/spxdefines.h
+grep -H "@version" doc/xternal.cpp
+grep -H "SOPLEX_VERSION" CMakeLists.txt
+grep -H "^VERSION" Makefile
+grep -H "^VERSION" Makefile.nmake
+grep -H "^VERSION" makedist.sh
 echo "check copyright info in doxygen documentation:"
 grep "1996" doc/soplexfooter.html
 tail src/soplex/git_hash.cpp

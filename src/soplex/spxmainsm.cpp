@@ -1347,7 +1347,7 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
    {
       cStatus[active_idx] = SPxSolver::BASIC;
       r[active_idx] = 0.0;
-      assert(NE(m_upper, m_lower, eps()));
+      assert(NE(m_upper, m_lower));
       if( EQ(x[m_j], m_upper, eps()) )
          cStatus[m_j] = SPxSolver::ON_UPPER;
       else if( EQ(x[m_j], m_lower, eps()) )
@@ -1410,7 +1410,10 @@ void SPxMainSM::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, 
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
 
-   assert(!isOptimal || (GE(x[m_j], m_lower) && LE(x[m_j], m_upper)));
+#ifndef NDEBUG
+   if( isOptimal && (LT(x[m_j], m_lower, eps()) || GT(x[m_j], m_upper, eps())) )
+      MSG_ERROR( std::cerr << "numerical violation in original space due to MultiAggregation\n"; )
+#endif
 
    // dual:
    Real dualVal = 0.0;

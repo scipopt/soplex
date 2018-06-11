@@ -127,15 +127,6 @@ void SPxSolver::qualRedCostViolation(Real& maxviol, Real& sumviol) const
    // DVector y( nRows() );
    // basis().coSolve( x, spx->unitVector( i ) );
    // DVector rdcost( nCols() );
-#if 0 // un-const
-   if (lastUpdate() > 0)
-      factorize();
-
-   computePvec();
-
-   if (type() == ENTER)
-      computeTest();
-#endif
    if (type() == ENTER)
    {
       for(i = 0; i < dim(); ++i)

@@ -25,6 +25,9 @@ Linux or macOS system:
     # optional: run a quick test
     make test
 
+    #optional: run a (slow) memory check
+    ctest -T MemCheck
+
     # optional: install SoPlex executable, library, and headers
     make install
 

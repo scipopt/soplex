@@ -196,54 +196,6 @@ static int NameSetNameHashFunction(const NameSet::Name* str)
    return ((int) res);
 }
 
-#if 0
-NameSet& NameSet::operator=(const NameSet& rhs)
-{
-   if (this != &rhs)
-   {
-      if (max() < rhs.size())
-         reMax(rhs.size());
-      if (memMax() < rhs.memSize())
-         memRemax(rhs.memSize());
-
-      set = rhs.set;
-
-      hashtab.clear();
-      for (int i = 0; i < set.num(); ++i)
-      {
-         Name iname(set[i].name);
-         DataKey ikey = DataKey(set.key(i));
-         hashtab.add(iname, ikey);
-      }
-      memPack();
-   }
-   return *this;
-}
-
-NameSet::NameSet(const NameSet& org)
-   : set(org.set)
-   , mem(0)
-   , hashtab(org.hashtab)
-   , factor(org.factor)
-   , memFactor(org.memFactor)
-{
-   memused = 0;
-   memmax = org.memSize();
-   spx_alloc(mem, memmax);
-
-   list.clear();
-   hashtab.clear();
-   for (int i = 0; i < set.num(); ++i)
-   {
-      list.append(&(set[i]));
-      Name iname = set[i];
-      DataKey k = DataKey(set.key(i));
-      hashtab.add(iname, k);
-   }
-   memPack();
-}
-#endif
-
 NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
    : set(p_max)
    , mem(0)

@@ -89,7 +89,6 @@ AR		=	ar
 AR_o		=
 RANLIB		=	ranlib
 DOXY		=	doxygen
-VALGRIND	=	valgrind
 
 READ		=	read -e
 LN_s		=	ln -s
@@ -105,7 +104,6 @@ LIBOFLAGS	=
 LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
-VFLAGS		=	--tool=memcheck --leak-check=yes --show-reachable=yes #--gen-suppressions=yes
 
 GMP_LDFLAGS	=	-lgmp
 GMP_CPPFLAGS	=
@@ -347,9 +345,6 @@ BINLINK		=	$(BINDIR)/$(NAME).$(BASE)$(EXEEXTENSION)
 BINSHORTLINK	=	$(BINDIR)/$(NAME)$(EXEEXTENSION)
 DEPEND		=	src/depend
 
-# potential valgrind suppression file name
-VSUPPNAME	= 	$(OSTYPE).$(ARCH).$(COMP).supp
-
 OBJDIR		=	obj/O.$(BASE)
 BINOBJDIR	=	$(OBJDIR)/bin
 LIBOBJDIR	=	$(OBJDIR)/lib
@@ -518,16 +513,6 @@ test:		#$(BINFILE)
 check:	#$(BINFILE)
 		cd check; ./check.sh ../$(BINFILE) $(RESDIR)
 
-valgrind-check:	$(BINFILE)
-		cd check; \
-		./valgrind.sh $(TEST).test ../$(BINFILE) $(LIMIT) \
-		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
-
-memory_exception_test: $(BINFILE)
-		cd check; \
-		./exception.sh $(TEST).test ../$(BINFILE) $(LIMIT) \
-		"$(VALGRIND) $(VFLAGS)" $(VSUPPNAME)
-
 .PHONY: cleanbin
 cleanbin:	| $(BINDIR)
 		@echo "remove binary $(BINFILE)"
@@ -557,10 +542,10 @@ endif
 		@-rm -f $(EXAMPLEFILE)
 
 vimtags:
-		-ctags -o TAGS src/*.cpp src/*.h
+		-ctags -o TAGS src/*.cpp src/*.h src/soplex/*.cpp src/soplex/*.h
 
 etags:
-		-ctags -e -o TAGS src/*.cpp src/*.h
+		-ctags -e -o TAGS src/*.cpp src/*.h src/soplex/*.cpp src/soplex/*.h
 
 $(OBJDIR):
 		@-mkdir -p $(OBJDIR)
