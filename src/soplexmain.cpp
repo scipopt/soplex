@@ -257,9 +257,9 @@ void checkSolution<Rational>(SoPlex<Rational>& soplex)
   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
-template <class R>
+template <>
 static
-void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
+void printPrimalSolution<Real>(SoPlex<Real>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {
    int printprec;
    int printwidth;
