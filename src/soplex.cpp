@@ -4385,10 +4385,9 @@ namespace soplex
   }
 
 
-
   /// gets the primal solution vector if available; returns true on success
   template <>
-	bool SoPlex<Rational>::getPrimalT(VectorBase<Rational>& vector)
+	bool SoPlex<Real>::getPrimalRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsT() )
       {
@@ -4399,8 +4398,6 @@ namespace soplex
     else
       return false;
   }
-
-
 
   /// gets the vector of slack values if available; returns true on success
   template <>

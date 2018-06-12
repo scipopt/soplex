@@ -308,46 +308,47 @@ void printPrimalSolution(SoPlex<R>& soplex, NameSet& colnames, NameSet& rownames
       else
          MSG_INFO1( soplex.spxout, soplex.spxout << "No primal information available.\n")
    }
-   // if( rational )
-   // {
-   //   // correct code #template
-   //   //     DVectorBase<Rational> primal(soplex.numColsT()); 
-   //   DVectorBase<Real> primal(soplex.numColsT()); // temporary fix
+   if( rational )
+   {
+     DVectorRational primal(soplex.numColsT());  // used to be numColsReal.
+                                                 // Might cause problem when
+                                                 // soplex rational gets
+                                                 // properly templated
 
-   //    if( soplex.getPrimalRayT(primal) )
-   //    {
-   //       MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
-   //       for( int i = 0; i < soplex.numColsT(); ++i )
-   //       {
-   //          if( primal[i] != (Rational) 0 )
-   //          {
-   //             MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t"
-   //                         << std::setw(printwidth) << std::setprecision(printprec)
-   //                         << primal[i] << std::endl; )
-   //          }
-   //       }
-   //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
-   //    }
+      if( soplex.getPrimalRayRational(primal) )
+      {
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
+         for( int i = 0; i < soplex.numColsT(); ++i )
+         {
+            if( primal[i] != (Rational) 0 )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t"
+                           << std::setw(printwidth) << std::setprecision(printprec)
+                           << primal[i] << std::endl; )
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other entries are zero." << std::endl; )
+      }
 
-   //    if( soplex.isPrimalFeasible() && soplex.getPrimalT(primal) )
-   //    {
-   //       int nNonzeros = 0;
-   //       MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
-   //       for( int i = 0; i < soplex.numColsT(); ++i )
-   //       {
-   //          if ( primal[i] != (Rational) 0 )
-   //          {
-   //             MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << primal[i] << std::endl; )
-   //             ++nNonzeros;
-   //          }
-   //       }
-   //       MSG_INFO1( soplex.spxout, soplex.spxout << "All other variables are zero. Solution has "
-   //                   << nNonzeros << " nonzero entries." << std::endl; )
-   //    }
-   //    else
-   //       MSG_INFO1( soplex.spxout, soplex.spxout << "No primal (rational) solution available.\n")
+      if( soplex.isPrimalFeasible() && soplex.getPrimalRational(primal) )
+      {
+         int nNonzeros = 0;
+         MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
+         for( int i = 0; i < soplex.numColsT(); ++i )
+         {
+            if ( primal[i] != (Rational) 0 )
+            {
+               MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << primal[i] << std::endl; )
+               ++nNonzeros;
+            }
+         }
+         MSG_INFO1( soplex.spxout, soplex.spxout << "All other variables are zero. Solution has "
+                     << nNonzeros << " nonzero entries." << std::endl; )
+      }
+      else
+         MSG_INFO1( soplex.spxout, soplex.spxout << "No primal (rational) solution available.\n")
 
-   // }
+   }
 }
 
 template <class R>
