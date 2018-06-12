@@ -15,6 +15,7 @@ interface & parameters:
 
 fixed bugs:
 - allow only one clean up round to avoid cycling on numerically difficult infeasible/unbounded instances
+- improved numeric stability in fixColumn and aggregation presolving steps
 
 code quality:
 - install all header files except for soplex.h into a subdirectory soplex/
