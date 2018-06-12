@@ -1362,7 +1362,9 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
       cStatus[m_j] = SPxSolver::BASIC;
    }
 
-   rStatus[m_i] = SPxSolver::FIXED;
+   // sides may not be equal and we always only consider the rhs during aggregation, so set ON_UPPER
+   // (in theory and with exact arithmetic setting it to FIXED would be correct)
+   rStatus[m_i] = SPxSolver::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
