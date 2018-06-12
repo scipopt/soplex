@@ -125,10 +125,12 @@ public:
 
    /// returns number of rows
    int numRowsT() const;
+   int numRowsRational() const;
 
    /// Templated function that
    /// returns number of columns
    int numColsT() const;
+   int numColsRational() const;
 
    /// returns number of nonzeros
    int numNonzerosT() const;
@@ -633,6 +635,7 @@ public:
 
    /// gets violation of constraints; returns true on success
    bool getRowViolationT(R& maxviol, R& sumviol);
+   bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of reduced costs; returns true on success
    bool getRedCostViolationT(R& maxviol, R& sumviol);

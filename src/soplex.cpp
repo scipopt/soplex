@@ -1316,7 +1316,12 @@ namespace soplex
     return _rationalLP->nRows();
   }
 
-
+  template <>
+  int SoPlex<Real>::numRowsRational() const
+  {
+    assert(_rationalLP != 0);
+    return _rationalLP->nRows();
+  }
 
   /// returns number of columns
   template <>
@@ -1326,7 +1331,12 @@ namespace soplex
     return _rationalLP->nCols();
   }
 
-
+  template <>
+  int SoPlex<Real>::numColsRational() const
+  {
+    assert(_rationalLP != 0);
+    return _rationalLP->nCols();
+  }
 
   /// returns number of nonzeros
   template <>
@@ -4546,20 +4556,20 @@ namespace soplex
 
   /// gets violation of constraints; returns true on success
   template <>
-	bool SoPlex<Rational>::getRowViolationT(Rational& maxviol, Rational& sumviol)
+	bool SoPlex<Real>::getRowViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
     VectorRational& primal = _solRational._primal;
-    assert(primal.dim() == numColsT());
+    assert(primal.dim() == numColsRational());
 
-    DVectorRational activity(numRowsT());
+    DVectorRational activity(numRowsRational());
     _rationalLP->computePrimalActivity(primal, activity);
     maxviol = 0;
     sumviol = 0;
