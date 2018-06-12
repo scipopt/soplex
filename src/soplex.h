@@ -610,12 +610,14 @@ public:
 
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalT(VectorBase<R>& vector);
+   bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorReal& vector);
 
    /// gets the primal ray if available; returns true on success
    bool getPrimalRayT(VectorBase<R>& vector);
+   bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
    bool getDualT(VectorBase<R>& vector);

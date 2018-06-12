@@ -4432,6 +4432,19 @@ namespace soplex
       return false;
   }
 
+  template <>
+	bool SoPlex<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
+  {
+    if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
+      {
+        _syncRationalSolution();
+        _solRational.getPrimalRay(vector);
+        return true;
+      }
+    else
+      return false;
+  }
+
 
 
   /// gets the dual solution vector if available; returns true on success
