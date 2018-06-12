@@ -188,7 +188,7 @@ void checkSolutionReal(SoPlex<Real>& soplex)
 /// performs external feasibility check with rational type
 ///@todo implement external check; currently we use the internal methods for convenience
 static
-void checkSolutionRational(SoPlex<Rational>& soplex)
+void checkSolutionRational(SoPlex<Real>& soplex)
 {
   if( soplex.hasPrimal() )
    {
@@ -196,11 +196,11 @@ void checkSolutionRational(SoPlex<Rational>& soplex)
       Rational rowviol;
       Rational sumviol;
 
-      if( soplex.getBoundViolationT(boundviol, sumviol) && soplex.getRowViolationT(rowviol, sumviol) )
+      if( soplex.getBoundViolationRational(boundviol, sumviol) && soplex.getRowViolationRational(rowviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex<Rational>::FEASTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<Real>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -220,7 +220,7 @@ void checkSolutionRational(SoPlex<Rational>& soplex)
       Rational dualviol;
       Rational sumviol;
 
-      if( soplex.getRedCostViolationT(redcostviol, sumviol) && soplex.getDualViolationT(dualviol, sumviol) )
+      if( soplex.getRedCostViolationRational(redcostviol, sumviol) && soplex.getDualViolationRational(dualviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
@@ -244,18 +244,36 @@ template <class R>
 void checkSolution(SoPlex<R>& soplex);
 
 template <>
+static
 void checkSolution<Real>(SoPlex<Real>& soplex)
 {
-  checkSolutionReal(soplex);
+  if( soplex.intParam(SoPlex<Real>::CHECKMODE) == SoPlex<Real>::CHECKMODE_RATIONAL
+      || (soplex.intParam(SoPlex<Real>::CHECKMODE) == SoPlex<Real>::CHECKMODE_AUTO
+          && soplex.intParam(SoPlex<Real>::READMODE) == SoPlex<Real>::READMODE_RATIONAL) )
+    {
+      checkSolutionRational(soplex);
+    }
+  else
+    {
+      checkSolutionReal(soplex);
+    }
+
   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
-template <>
-void checkSolution<Rational>(SoPlex<Rational>& soplex)
-{
-  checkSolutionRational(soplex);
-  MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
-}
+// template <>
+// void checkSolution<Real>(SoPlex<Real>& soplex)
+// {
+//   checkSolutionReal(soplex);
+//   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
+// }
+
+// template <>
+// void checkSolution<Rational>(SoPlex<Rational>& soplex)
+// {
+//   checkSolutionRational(soplex);
+//   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
+// }
 
 static
 void printPrimalSolution(SoPlex<Real>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
