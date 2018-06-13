@@ -1,5 +1,5 @@
-Developer version
-=================
+13 June 2018 - Release 4.0.0
+============================
 
 features:
 - new simplifier step to perform variable aggregation for equations with two variables
