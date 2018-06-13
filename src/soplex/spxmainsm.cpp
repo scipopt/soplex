@@ -1362,7 +1362,9 @@ void SPxMainSM::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVect
       cStatus[m_j] = SPxSolver::BASIC;
    }
 
-   rStatus[m_i] = SPxSolver::FIXED;
+   // sides may not be equal and we always only consider the rhs during aggregation, so set ON_UPPER
+   // (in theory and with exact arithmetic setting it to FIXED would be correct)
+   rStatus[m_i] = SPxSolver::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
@@ -4708,9 +4710,11 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    assert(EQrel(lp.lower(j), lp.upper(j), feastol()));
 
    Real lo            = lp.lower(j);
+   Real up            = lp.upper(j);
    const SVector& col = lp.colVector(j);
 
    assert(NE(lo, infinity) && NE(lo, -infinity));
+   assert(NE(up, infinity) && NE(up, -infinity));
 
    MSG_DEBUG( (*spxout) << "IMAISM66 fix variable x" << j
                      << ": lower=" << lp.lower(j)
@@ -4748,7 +4752,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
          }
          if (lp.lhs(i) > -infinity)
          {
-            Real y     = lo * col.value(k);
+            Real y     = up * col.value(k);
             Real scale = maxAbs(lp.lhs(i), y);
 
             if (scale < 1.0)
