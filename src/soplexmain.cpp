@@ -244,7 +244,6 @@ template <class R>
 void checkSolution(SoPlex<R>& soplex);
 
 template <>
-static
 void checkSolution<Real>(SoPlex<Real>& soplex)
 {
   if( soplex.intParam(SoPlex<Real>::CHECKMODE) == SoPlex<Real>::CHECKMODE_RATIONAL
