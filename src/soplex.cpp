@@ -4472,7 +4472,7 @@ namespace soplex
 
   /// gets the vector of reduced cost values if available; returns true on success
   template <>
-	bool SoPlex<Rational>::getRedCostT(VectorBase<Rational>& vector)
+	bool SoPlex<Real>::getRedCostRational(VectorRational& vector)
   {
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsT() )
       {

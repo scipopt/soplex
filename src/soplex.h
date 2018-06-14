@@ -627,6 +627,7 @@ public:
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCostT(VectorBase<R>& vector);
+   bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkasT(VectorBase<R>& vector);
