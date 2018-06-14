@@ -224,7 +224,7 @@ void checkSolutionRational(SoPlex<Real>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlex<Rational>::OPTTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlex<Real>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }

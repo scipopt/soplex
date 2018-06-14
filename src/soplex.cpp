@@ -4610,13 +4610,13 @@ namespace soplex
 
   /// gets violation of reduced costs; returns true on success
   template <>
-	bool SoPlex<Rational>::getRedCostViolationT(Rational& maxviol, Rational& sumviol)
+	bool SoPlex<Real>::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() || !isDualFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4628,7 +4628,7 @@ namespace soplex
 
     for( int c = numColsT() - 1; c >= 0; c-- )
       {
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::UNDEFINED);
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::UNDEFINED);
 
         if( _colTypes[c] == RANGETYPE_FIXED )
           {
@@ -4636,12 +4636,12 @@ namespace soplex
             continue;
           }
 
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::ON_LOWER || _solRational._primal[c] == lowerRational(c));
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::ON_UPPER || _solRational._primal[c] == upperRational(c));
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::FIXED || _solRational._primal[c] == lowerRational(c));
-        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Rational>::FIXED || _solRational._primal[c] == upperRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::ON_LOWER || _solRational._primal[c] == lowerRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::ON_UPPER || _solRational._primal[c] == upperRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::FIXED || _solRational._primal[c] == lowerRational(c));
+        assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::FIXED || _solRational._primal[c] == upperRational(c));
 
-        if( intParam(SoPlex<Rational>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( _solRational._primal[c] != upperRational(c) && redcost[c] < 0 )
               {
@@ -4692,13 +4692,13 @@ namespace soplex
 
   /// gets violation of dual multipliers; returns true on success
   template <>
-	bool SoPlex<Rational>::getDualViolationT(Rational& maxviol, Rational& sumviol)
+	bool SoPlex<Real>::getDualViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isDualFeasible() || !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4710,7 +4710,7 @@ namespace soplex
 
     for( int r = numRowsT() - 1; r >= 0; r-- )
       {
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::UNDEFINED);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::UNDEFINED);
 
         if( _rowTypes[r] == RANGETYPE_FIXED )
           {
@@ -4718,12 +4718,12 @@ namespace soplex
             continue;
           }
 
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
-        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Rational>::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+        assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
 
-        if( intParam(SoPlex<Rational>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] < 0 )
               {

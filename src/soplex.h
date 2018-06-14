@@ -632,6 +632,7 @@ public:
 
    /// gets violation of bounds; returns true on success
    bool getBoundViolationT(R& maxviol, R& sumviol);
+   bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of constraints; returns true on success
    bool getRowViolationT(R& maxviol, R& sumviol);
@@ -639,9 +640,11 @@ public:
 
    /// gets violation of reduced costs; returns true on success
    bool getRedCostViolationT(R& maxviol, R& sumviol);
+   bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of dual multipliers; returns true on success
    bool getDualViolationT(R& maxviol, R& sumviol);
+   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
    //@}
 
