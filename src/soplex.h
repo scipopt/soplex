@@ -623,12 +623,14 @@ public:
 
    /// gets the dual solution vector if available; returns true on success
    bool getDualT(VectorBase<R>& vector);
+   bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCostT(VectorBase<R>& vector);
 
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkasT(VectorBase<R>& vector);
+   bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
    bool getBoundViolationT(R& maxviol, R& sumviol);

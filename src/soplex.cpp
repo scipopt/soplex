@@ -4456,7 +4456,7 @@ namespace soplex
 
   /// gets the dual solution vector if available; returns true on success
   template <>
-	bool SoPlex<Rational>::getDualT(VectorBase<Rational>& vector)
+	bool SoPlex<Real>::getDualRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsT() )
       {
@@ -4484,11 +4484,9 @@ namespace soplex
       return false;
   }
 
-
-  /// #template
   /// gets the Farkas proof if LP is infeasible; returns true on success
   template <>
-	bool SoPlex<Rational>::getDualFarkasT(VectorBase<Rational>& vector)
+	bool SoPlex<Real>::getDualFarkasRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsT() )
       {
