@@ -4426,18 +4426,18 @@ namespace soplex
 
 
   /// gets the primal ray if LP is unbounded; returns true on success
-  template <>
-	bool SoPlex<Rational>::getPrimalRayT(VectorBase<Rational>& vector)
-  {
-    if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
-      {
-        _syncRationalSolution();
-        _solRational.getPrimalRay(vector);
-        return true;
-      }
-    else
-      return false;
-  }
+  // template <>
+	// bool SoPlex<Rational>::getPrimalRayT(VectorBase<Rational>& vector)
+  // {
+  //   if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
+  //     {
+  //       _syncRationalSolution();
+  //       _solRational.getPrimalRay(vector);
+  //       return true;
+  //     }
+  //   else
+  //     return false;
+  // }
 
   template <>
 	bool SoPlex<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
