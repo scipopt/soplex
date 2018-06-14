@@ -205,6 +205,8 @@ namespace soplex
   template <>
 	bool SoPlex<Real>::_parseSettingsLine(char* line, const int lineNumber);
 
+  template <>
+	bool SoPlex<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
 
   template <>
   SoPlex<Real>::Settings::BoolParam::BoolParam() {
@@ -5947,11 +5949,13 @@ namespace soplex
   // }
 
   template <>
-	bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+  bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   {
     bool success = false;
-
-    success = _readFileReal(filename, rowNames, colNames, intVars);
+    if( intParam(SoPlex::READMODE) == READMODE_REAL )
+      success = _readFileReal(filename, rowNames, colNames, intVars);
+    else
+      success = _readFileRational(filename, rowNames, colNames, intVars);
 
     // storing the row and column names for use in the DBDS print basis methods
     _rowNames = rowNames;
@@ -5960,18 +5964,33 @@ namespace soplex
     return success;
   }
 
-  template <>
-	bool SoPlex<Rational>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-  {
-    bool success = false;
-    success = _readFileRational(filename, rowNames, colNames, intVars);
+  // // The proper templated version of the above function
+  // template <>
+	// bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+  // {
+  //   bool success = false;
 
-    // storing the row and column names for use in the DBDS print basis methods
-    _rowNames = rowNames;
-    _colNames = colNames;
+  //   success = _readFileReal(filename, rowNames, colNames, intVars);
 
-    return success;
-  }
+  //   // storing the row and column names for use in the DBDS print basis methods
+  //   _rowNames = rowNames;
+  //   _colNames = colNames;
+
+  //   return success;
+  // }
+
+  // template <>
+	// bool SoPlex<Rational>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+  // {
+  //   bool success = false;
+  //   success = _readFileRational(filename, rowNames, colNames, intVars);
+
+  //   // storing the row and column names for use in the DBDS print basis methods
+  //   _rowNames = rowNames;
+  //   _colNames = colNames;
+
+  //   return success;
+  // }
 
 
   /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
