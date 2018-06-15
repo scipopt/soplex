@@ -4151,18 +4151,18 @@ namespace soplex
 
   /// gets violation of bounds; returns true on success
   template <>
-	bool SoPlex<Rational>::getBoundViolationT(Rational& maxviol, Rational& sumviol)
+	bool SoPlex<Real>::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
     VectorRational& primal = _solRational._primal;
-    assert(primal.dim() == numColsT());
+    assert(primal.dim() == numColsRational());
 
     maxviol = 0;
     sumviol = 0;
