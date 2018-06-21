@@ -6836,7 +6836,7 @@ namespace soplex
       }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Rational>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
           continue;
