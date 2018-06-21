@@ -318,16 +318,22 @@ private:
    inline SPxOut&
    operator<< ( SPxOut&       _spxout, 
                 std::ostream& (*manip)( std::ostream& ) )
-   { PASS_TO_CURRENT_OSTREAM( manip ) }
+   {
+     _spxout.getCurrentStream() << manip;
+     return _spxout;
+   }
 
    //lint -e{818} (pointer could be made const; this is ok.)
    /// Passes everything else to the current stream. In particular, 
    /// this includes structs corresponding to manipulators with arguments, 
    /// such as the struct @c _Setw for the @c setw() manipulator.
-   template< typename T >
+   template <typename T>
    inline SPxOut&
    operator<< ( SPxOut& _spxout, T  t )
-   { PASS_TO_CURRENT_OSTREAM( t ) }
+     {
+       _spxout.getCurrentStream() << t;
+       return _spxout;
+     }
    //@}
 
 }  // namespace soplex
