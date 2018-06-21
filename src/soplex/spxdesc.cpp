@@ -126,12 +126,12 @@ namespace soplex
 
     std::cout << "DBDESC01 column status: ";
     for(i = 0; i < nCols(); i++)
-      std::cout << static_cast<unsigned int>(colStatus(i));
+      std::cout << static_cast<int>(colStatus(i));
     std::cout << std::endl;
 
     std::cout << "DBDESC02 row status:    ";
     for(i = 0; i < nRows(); i++)
-      std::cout << static_cast<unsigned int>(rowStatus(i));
+      std::cout << static_cast<int>(rowStatus(i));
     std::cout << std::endl;
   }
 
