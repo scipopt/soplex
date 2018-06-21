@@ -1806,7 +1806,7 @@ namespace soplex
           vstat = BASIC;
           break;
         default:
-          MSG_ERROR( std::cerr << "ESOLVE26 ERROR: unknown basis status (" << stat << ")"
+          MSG_ERROR( std::cerr << "ESOLVE26 ERROR: unknown basis status (" << static_cast<int>(stat) << ")"
                      << std::endl; )
             throw SPxInternalCodeException("XSOLVE22 This should never happen.");
         }
