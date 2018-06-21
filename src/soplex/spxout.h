@@ -253,7 +253,7 @@ private:
      return _spxout;
    }
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, unsigned int t )
+   inline SPxOut& operator<< ( SPxOut& _spxout, unsigned long t )
    {
      _spxout.getCurrentStream() << t;
      return _spxout;
