@@ -242,10 +242,6 @@ private:
     */
    //@{
    ///
-#define PASS_TO_CURRENT_OSTREAM( t ) \
-   _spxout.getCurrentStream() << t;  \
-      return _spxout;
-
    /// Passes instances of type \p Type to the current stream. 
    inline SPxOut& operator<< ( SPxOut& _spxout, long t )
    {
@@ -328,8 +324,7 @@ private:
    /// this includes structs corresponding to manipulators with arguments, 
    /// such as the struct @c _Setw for the @c setw() manipulator.
    template <typename T>
-   inline SPxOut&
-   operator<< ( SPxOut& _spxout, T  t )
+   inline SPxOut& operator<< ( SPxOut& _spxout, T  t )
      {
        _spxout.getCurrentStream() << t;
        return _spxout;
