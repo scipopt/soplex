@@ -13,8 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#define WITH_WARNINGS
-
 #include <assert.h>
 
 #include "soplex/spxdefines.h"
@@ -3630,36 +3628,25 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 
       Real x  = vec[c];
 
-      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
-      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
-
-#if defined(WITH_WARNINGS) || !defined(NDEBUG)
-      Real y = vec[c];
-#endif
+      ASSERT_WARN( "WSOLVE01", spxAbs( vec[c] ) < 1e40 );
 
       vec[c]  = 0.0;
 
       if ( x != 0.0 )
       {
-         ASSERT_WARN( "WSOLVE03", spxAbs( diag[r] ) < 1e40 );
+         ASSERT_WARN( "WSOLVE02", spxAbs( diag[r] ) < 1e40 );
 
          x        *= diag[r];
          p_work[r] = x;
-
-         ASSERT_WARN( "WSOLVE04", spxAbs( x ) < 1e40 );
 
          int end = u.row.start[r] + u.row.len[r];
 
          for ( int m = u.row.start[r]; m < end; m++ )
          {
-            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
-            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < infinity );
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            ASSERT_WARN( "WSOLVE07", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
+            ASSERT_WARN( "WSOLVE03", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
          }
       }
-
-      ASSERT_WARN( "WSOLVE08", spxAbs( y ) < 1e40 );
    }
 }
 
