@@ -511,13 +511,23 @@ void SPxSolver::setupPupdate(void)
    if (c.isSetup())
    {
       if (c.size() < 0.95 * theCoPvec->dim())
-         p.assign2product4setup(*thecovectors, c);
+         p.assign2product4setup(*thecovectors, c,
+            multTimeSparse, multTimeFull,
+            multSparseCalls, multFullCalls);
       else
+      {
+         multTimeRepwise->start();
          p.assign2product(c, *thevectors);
+         multTimeRepwise->stop();
+         ++multRepwiseCalls;
+      }
    }
    else
    {
+      multTimeUnsetup->start();
       p.assign2productAndSetup(*thecovectors, c);
+      multTimeUnsetup->stop();
+      ++multUnsetupCalls;
    }
 
    p.setup();

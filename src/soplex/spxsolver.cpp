@@ -1026,9 +1026,17 @@ SPxSolver::SPxSolver(
    , weights(0)
    , coWeights(0)
    , weightsAreSetup(false)
+   , multSparseCalls(0)
+   , multFullCalls(0)
+   , multRepwiseCalls(0)
+   , multUnsetupCalls(0)
    , integerVariables(0)
 {
    theTime = TimerFactory::createTimer(timerType);
+   multTimeSparse = TimerFactory::createTimer(timerType);
+   multTimeFull = TimerFactory::createTimer(timerType);
+   multTimeRepwise = TimerFactory::createTimer(timerType);
+   multTimeUnsetup = TimerFactory::createTimer(timerType);
 
    setDelta(DEFAULT_BND_VIOL);
 
@@ -1065,8 +1073,20 @@ SPxSolver::~SPxSolver()
 
    // free timer
    assert(theTime);
+   assert(multTimeSparse);
+   assert(multTimeFull);
+   assert(multTimeRepwise);
+   assert(multTimeUnsetup);
    theTime->~Timer();
+   multTimeSparse->~Timer();
+   multTimeFull->~Timer();
+   multTimeRepwise->~Timer();
+   multTimeUnsetup->~Timer();
    spx_free(theTime);
+   spx_free(multTimeSparse);
+   spx_free(multTimeFull);
+   spx_free(multTimeRepwise);
+   spx_free(multTimeUnsetup);
 }
 
 
@@ -1160,6 +1180,10 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       weights = base.weights;
       coWeights = base.coWeights;
       weightsAreSetup = base.weightsAreSetup;
+      multSparseCalls = base.multSparseCalls;
+      multFullCalls = base.multFullCalls;
+      multRepwiseCalls = base.multRepwiseCalls;
+      multUnsetupCalls = base.multUnsetupCalls;
       spxout = base.spxout;
       integerVariables = base.integerVariables;
 
@@ -1361,10 +1385,18 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , weights(base.weights)
    , coWeights(base.coWeights)
    , weightsAreSetup(base.weightsAreSetup)
+   , multSparseCalls(base.multSparseCalls)
+   , multFullCalls(base.multFullCalls)
+   , multRepwiseCalls(base.multRepwiseCalls)
+   , multUnsetupCalls(base.multUnsetupCalls)
    , spxout(base.spxout)
    , integerVariables(base.integerVariables)
 {
    theTime = TimerFactory::createTimer(timerType);
+   multTimeSparse = TimerFactory::createTimer(timerType);
+   multTimeFull = TimerFactory::createTimer(timerType);
+   multTimeRepwise = TimerFactory::createTimer(timerType);
+   multTimeUnsetup = TimerFactory::createTimer(timerType);
 
    if (base.theRep == COLUMN)
    {

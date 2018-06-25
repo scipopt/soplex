@@ -26,6 +26,7 @@
 #include "soplex/dvectorbase.h"
 #include "soplex/idxset.h"
 #include "soplex/spxalloc.h"
+#include "soplex/timer.h"
 
 namespace soplex
 {
@@ -499,7 +500,7 @@ public:
 
    /// Assigns SSVectorBase to \f$A \cdot x\f$ for a setup \p x.
    template < class S, class T >
-   SSVectorBase<R>& assign2product4setup(const SVSetBase<S>& A, const SSVectorBase<T>& x);
+   SSVectorBase<R>& assign2product4setup(const SVSetBase<S>& A, const SSVectorBase<T>& x, Timer* timeSparse, Timer* timeFull, int& nCallsSparse, int& nCallsFull);
 
 public:
 

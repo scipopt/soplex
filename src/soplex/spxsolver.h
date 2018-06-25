@@ -440,6 +440,15 @@ public:
    DVector     coWeights;              ///< store dual norms
    bool        weightsAreSetup;        ///< are the dual norms already set up?
 
+   Timer*   multTimeSparse;            ///< time spent in setupPupdate()
+   Timer*   multTimeFull;              ///< time spent in setupPupdate()
+   Timer*   multTimeRepwise;           ///< time spent in setupPupdate()
+   Timer*   multTimeUnsetup;           ///< time spent in setupPupdate()
+   int      multSparseCalls;           ///< number of products in sparse mode
+   int      multFullCalls;             ///< number of products losing sparsity
+   int      multRepwiseCalls;          ///< number of products in col/row mode, depending on REP
+   int      multUnsetupCalls;          ///< number of products without using sparsity in source vector
+
    SPxOut* spxout;                     ///< message handler
 
    DataArray<int> integerVariables;    ///< supplementary variable information, 0: continous variable, 1: integer variable
@@ -812,12 +821,20 @@ public:
    void setTiming(Timer::TYPE ttype)
    {
       theTime = TimerFactory::switchTimer(theTime, ttype);
+      multTimeSparse = TimerFactory::switchTimer(multTimeSparse, ttype);
+      multTimeFull = TimerFactory::switchTimer(multTimeFull, ttype);
+      multTimeRepwise = TimerFactory::switchTimer(multTimeRepwise, ttype);
+      multTimeUnsetup = TimerFactory::switchTimer(multTimeUnsetup, ttype);
       timerType = ttype;
    }
    /// set timing type
    Timer::TYPE getTiming()
    {
       assert(timerType == theTime->type());
+      assert(timerType == multTimeSparse->type());
+      assert(timerType == multTimeFull->type());
+      assert(timerType == multTimeRepwise->type());
+      assert(timerType == multTimeUnsetup->type());
       return timerType;
    }
 

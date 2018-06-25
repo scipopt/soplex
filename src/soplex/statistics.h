@@ -93,6 +93,16 @@ namespace soplex
       Timer* rationalTime; ///< time for rational LP solving (included in solving time)
       Timer* reconstructionTime; ///< time for rational reconstructions
       Timer::TYPE timerType; ///< type of timer (user or wallclock)
+
+      Real multTimeSparse; ///< time for computing A*x (setupPupdate(), PRICE step)
+      Real multTimeFull; ///< time for computing A*x (setupPupdate(), PRICE step)
+      Real multTimeRepwise; ///< time for computing A*x (setupPupdate(), PRICE step)
+      Real multTimeUnsetup; ///< time for computing A*x (setupPupdate(), PRICE step)
+      int multSparseCalls; ///< number of products A*x (setupPupdate(), PRICE step)
+      int multFullCalls; ///< number of products A*x (setupPupdate(), PRICE step)
+      int multRepwiseCalls; ///< number of products A*x (setupPupdate(), PRICE step)
+      int multUnsetupCalls; ///< number of products A*x (setupPupdate(), PRICE step)
+
       Real luFactorizationTimeReal; ///< time for factorizing bases matrices in real precision
       Real luSolveTimeReal; ///< time for solving linear systems in real precision
       Real luFactorizationTimeRational; ///< time for factorizing bases matrices in rational precision

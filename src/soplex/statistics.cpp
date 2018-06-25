@@ -64,6 +64,14 @@ namespace soplex
       *rationalTime = *(rhs.rationalTime);
       *reconstructionTime = *(rhs.reconstructionTime);
       timerType = rhs.timerType;
+      multTimeSparse = rhs.multTimeSparse;
+      multTimeFull = rhs.multTimeFull;
+      multTimeRepwise = rhs.multTimeRepwise;
+      multTimeUnsetup = rhs.multTimeUnsetup;
+      multSparseCalls = rhs.multSparseCalls;
+      multFullCalls = rhs.multFullCalls;
+      multRepwiseCalls = rhs.multRepwiseCalls;
+      multUnsetupCalls = rhs.multUnsetupCalls;
       luFactorizationTimeReal = rhs.luFactorizationTimeReal;
       luSolveTimeReal = rhs.luSolveTimeReal;
       luFactorizationTimeRational = rhs.luFactorizationTimeRational;
@@ -102,6 +110,14 @@ namespace soplex
       transformTime->reset();
       rationalTime->reset();
       reconstructionTime->reset();
+      multTimeSparse = 0.0;
+      multTimeFull = 0.0;
+      multTimeRepwise = 0.0;
+      multTimeUnsetup = 0.0;
+      multSparseCalls = 0;
+      multFullCalls = 0;
+      multRepwiseCalls = 0;
+      multUnsetupCalls = 0;
       luFactorizationTimeReal = 0.0;
       luSolveTimeReal = 0.0;
       luFactorizationTimeRational = 0.0;
@@ -217,7 +233,29 @@ namespace soplex
          os << "-\n";
       os << "  Solve time        : " << luSolveTimeReal << "\n";
 
-      os << "Rat. factorizations : " << luFactorizationsRational << "\n"
+      os << "Matrix-Vector ops   : \n"
+         << "  Sparse    time    : " << multTimeSparse;
+      if( solTime > 0 )
+         os << " (" << 100 * (multTimeSparse / solTime) << "% of solving time)";
+      os << "\n            calls   : " << multSparseCalls;
+      os << " (" << 100 * (multSparseCalls / (0.01+iterations)) << "% of iterations)";
+      os << "\n  Full      time    : " << multTimeFull;
+      if( solTime > 0 )
+         os << " (" << 100 * (multTimeFull / solTime) << "% of solving time)";
+      os << "\n            calls   : " << multFullCalls;
+      os << " (" << 100 * (multFullCalls / (0.01+iterations)) << "% of iterations)";
+      os << "\n  Repwise   time    : " << multTimeRepwise;
+      if( solTime > 0 )
+         os << " (" << 100 * (multTimeRepwise / solTime) << "% of solving time)";
+      os << "\n            calls   : " << multRepwiseCalls;
+      os << " (" << 100 * (multRepwiseCalls / (0.01+iterations)) << "% of iterations)";
+      os << "\n  Unsetup   time    : " << multTimeUnsetup;
+      if( solTime > 0 )
+         os << " (" << 100 * (multTimeUnsetup / solTime) << "% of solving time)";
+      os << "\n            calls   : " << multUnsetupCalls;
+      os << " (" << 100 * (multUnsetupCalls / (0.01+iterations)) << "% of iterations)";
+
+      os << "\nRat. factorizations : " << luFactorizationsRational << "\n"
          << "  Rat. factor. time : " << luFactorizationTimeRational << "\n"
          << "  Rat. solve time   : " << luSolveTimeRational << "\n";
 
