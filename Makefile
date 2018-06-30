@@ -576,6 +576,10 @@ depend:
 		$(LIBSRC:.o=.cpp) \
 		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJDIR\)/\1.o|g'\'' \
 		>>$(DEPEND)'
+		$(SHELL) -ec '$(DCXX) $(DFLAGS) $(CPPFLAGS) $(CXXFLAGS)\
+		$(LIBSRC:.o=.cpp) \
+		| sed '\''s|^\([0-9A-Za-z_]\{1,\}\)\.o|$$\(LIBOBJSUBDIR\)/\1.o|g'\'' \
+		>>$(DEPEND)'
 		@echo `grep -l "SOPLEX_WITH_GMP" $(ALLSRC)` >$(GMPDEP)
 		@echo `grep -l "SOPLEX_WITH_ZLIB" $(ALLSRC)` >$(ZLIBDEP)
 		@echo `grep -l "SOPLEX_WITH_EGLIB" $(ALLSRC)` >$(EGLIBDEP)
