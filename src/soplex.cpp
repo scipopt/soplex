@@ -28,7 +28,6 @@
 
 #include "soplex.h"
 #include "soplex/spxfileio.h"
-#include "soplex/spxgithash.h"
 #include "soplex/statistics.h"
 #include "soplex/mpsinput.h"
 
