@@ -491,8 +491,8 @@ namespace soplex
                            << ", opttol: " << opttol()
                            << std::endl
                            << "ISOLVE56 stop: " << stop
-                           << ", basis status: " << SPxBasis<Real>::status() << " (" << int(SPxBasis<Real>::status()) << ")"
-                           << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
+                           << ", basis status: " << static_cast<int>(SPxBasis<Real>::status()) << " (" << static_cast<int>(SPxBasis<Real>::status()) << ")"
+                           << ", solver status: " << static_cast<int>(m_status) << " (" << static_cast<int>(m_status) << ")" << std::endl;
                            )
 
                   if (!stop)
@@ -662,7 +662,7 @@ namespace soplex
                               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                               if (SPxBasis<Real>::status() < SPxBasis<Real>::REGULAR)
                                 {
-                                  MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << SPxBasis<Real>::status() << std::endl; )
+                                  MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasis<Real>::status()) << std::endl; )
                                     stop = true;
                                   break;
                                 }
@@ -767,8 +767,8 @@ namespace soplex
                            << ", opttol: " << opttol()
                            << std::endl
                            << "ISOLVE57 stop: " << stop
-                           << ", basis status: " << SPxBasis<Real>::status() << " (" << int(SPxBasis<Real>::status()) << ")"
-                           << ", solver status: " << m_status << " (" << int(m_status) << ")" << std::endl;
+                           << ", basis status: " << static_cast<int>(SPxBasis<Real>::status()) << " (" << static_cast<int>(SPxBasis<Real>::status()) << ")"
+                           << ", solver status: " << static_cast<int>(m_status) << " (" << static_cast<int>(m_status) << ")" << std::endl;
                            )
 
                   if (!stop)
@@ -936,7 +936,7 @@ namespace soplex
       }
 
     MSG_INFO3( (*spxout),
-               (*spxout) << "Finished solving (status=" << status()
+               (*spxout) << "Finished solving (status=" << static_cast<int>(status())
                << ", iters=" << this->iterCount
                << ", leave=" << leaveCount
                << ", enter=" << enterCount

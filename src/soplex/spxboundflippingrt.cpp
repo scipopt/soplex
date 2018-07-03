@@ -194,7 +194,7 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
                   break;
                default :
                   ++skipped;
-                  MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "unexpected basis status: " << stat
+                  MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "unexpected basis status: " << static_cast<int>(stat)
                                     << " index: " << idx
                                     << " val: " << this->thesolver->fVec()[idx]
                                     << " upd: " << this->thesolver->fVec().delta()[idx]
@@ -230,7 +230,7 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
                   break;
                default :
                   ++skipped;
-                  MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "FVEC unexpected status: " << stat
+                  MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "FVEC unexpected status: " << static_cast<int>(stat)
                                     << " index: " << idx
                                     << " val: " << this->thesolver->fVec()[idx]
                                     << " upd: " << this->thesolver->fVec().delta()[idx]
