@@ -90,7 +90,7 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
                break;
             default :
                ++skipped;
-               MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "PVEC unexpected status: " << stat
+               MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "PVEC unexpected status: " << static_cast<int>(stat)
                                    << " index: " << idx
                                    << " val: " << this->thesolver->pVec()[idx]
                                    << " upd: " << this->thesolver->pVec().delta()[idx]
