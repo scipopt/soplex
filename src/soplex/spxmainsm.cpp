@@ -4628,7 +4628,7 @@ namespace soplex
     // preprocessing detected infeasibility or unboundedness
     if (m_result != this->OKAY)
       {
-        MSG_INFO1( (*this->spxout), (*this->spxout) << "Simplifier result: " << m_result << std::endl; )
+        MSG_INFO1( (*this->spxout), (*this->spxout) << "Simplifier result: " << static_cast<int>(m_result) << std::endl; )
           return m_result;
       }
 

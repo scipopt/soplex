@@ -385,7 +385,7 @@ namespace soplex
                               // if the factorization was found out to be singular, we have to quit
                               if( SPxBasis<Real>::status() < SPxBasis<Real>::REGULAR )
                                 {
-                                  MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << SPxBasis<Real>::status() << std::endl; )
+                                  MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasis<Real>::status()) << std::endl; )
                                     stop = true;
                                   break;
                                 }

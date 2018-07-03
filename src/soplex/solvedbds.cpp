@@ -412,7 +412,7 @@ namespace soplex
             if( _solver.status() == SPxSolver<Real>::INFEASIBLE )
               MSG_INFO2(spxout, spxout << "Infeasible reduced problem." << std::endl );
 
-            MSG_INFO2(spxout, spxout << "Reduced problem status: " << _solver.status() << std::endl );
+            MSG_INFO2(spxout, spxout << "Reduced problem status: " << static_cast<int>(_solver.status()) << std::endl );
 
             redProbError = true;
             break;

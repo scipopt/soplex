@@ -140,7 +140,7 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
                break;
             default :
                ++skipped;
-               MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "COPVEC unexpected status: " << stat
+               MSG_WARNING( (*this->thesolver->spxout), (*this->thesolver->spxout) << "COPVEC unexpected status: " << static_cast<int>(stat)
                                    << " index: " << idx
                                    << " val: " << this->thesolver->coPvec()[idx]
                                    << " upd: " << this->thesolver->coPvec().delta()[idx]
