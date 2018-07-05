@@ -1,7 +1,44 @@
-Developer Version
-=================
+13 June 2018 - Release 4.0.0
+============================
 
 features:
+- new simplifier step to perform variable aggregation for equations with two variables
+
+interface & parameters:
+- new option bool:ensureray to re-solve the original problem in case of
+  infeasibility/unboundedness to get a valid proof/ray (default: false)
+- new status OPTIMAL_UNSCALED_VIOLATIONS to signal unresolved violations in original space
+  (use method SoPlex::ignoreUnscaledViolations() to reset the status to OPTIMAL)
+- problem statistics distinguish ranged rows from equalities and show intuitive type counters
+  for variables and constraints
+- remove LEGACY mode (C++11 standard is mandatory)
+
+fixed bugs:
+- allow only one clean up round to avoid cycling on numerically difficult infeasible/unbounded instances
+- improved numeric stability in fixColumn and aggregation presolving steps
+
+code quality:
+- install all header files except for soplex.h into a subdirectory soplex/
+
+
+05 February 2018 - Release 3.1.1
+================================
+
+fixed bugs:
+- correct accumulation of shifted or relaxed bounds
+- allow termination despite violations to prevent cycling on numerically difficult models
+- add missing forward declarations of template specializations to spxlpbase.h
+- changed all string copy methods to use spxSnprintf which is both safe and more efficient
+  than strncpy.
+- set correct basis status for removed free variables (e.g. column singletons without objective)
+- use consistent generic constraint names when writing .mps files
+
+
+21 December 2017 - Release 3.1.0
+================================
+
+features:
+- new scaling method combining geometric and equilibrium scaling (command line option '-g6')
 
 interface & parameters:
 - also print reduced cost values when passing '-y' on the command line
@@ -13,6 +50,7 @@ fixed bugs:
 - properly clear update vectors in initialization step
 - fix bug in geometric scaling
 - respect the time limit during solution polishing
+- automatically remove zeros in sparse vector class SVector
 
 
 01 September 2017 - Release 3.0.1

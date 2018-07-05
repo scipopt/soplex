@@ -4,7 +4,7 @@
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
 #*    Copyright (C) 1996      Roland Wunderling                              *#
-#*                  1996-2017 Konrad-Zuse-Zentrum                            *#
+#*                  1996-2018 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -30,7 +30,7 @@ ARCH		=	x86
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		=	3.1.0.1
+VERSION		=	4.0.0.2
 VERBOSE		=	0
 OPT			=	opt
 LIBEXT		=	lib
@@ -38,9 +38,6 @@ EXEEXT      =	exe
 
 # will this be compiled for PARASCIP? (disables output because it uses global variables)
 PARASCIP	   =	false
-
-# old 1.x interface?
-LEGACY      =	false
 
 GMP			=	true
 ZLIB		   = 	true
@@ -75,7 +72,6 @@ LIBOBJ		=	$(LIBOBJDIR)\changesoplex.obj \
 				$(LIBOBJDIR)\solverational.obj \
 				$(LIBOBJDIR)\solvereal.obj \
 				$(LIBOBJDIR)\soplex.obj \
-				$(LIBOBJDIR)\soplexlegacy.obj \
 				$(LIBOBJDIR)\spxautopr.obj \
 				$(LIBOBJDIR)\spxbasis.obj \
 				$(LIBOBJDIR)\spxboundflippingrt.obj \
@@ -143,14 +139,6 @@ ARFLAGS		=	$(ARFLAGS) $(USRARFLAGS)
 
 !if "$(PARASCIP)" == "true"
 CPPFLAGS	=	$(CPPFLAGS) /DDISABLE_VERBOSITY
-!endif
-
-#-----------------------------------------------------------------------------
-# LEGACY
-#-----------------------------------------------------------------------------
-
-!if "$(LEGACY)" == "true"
-CPPFLAGS	=	$(CPPFLAGS) /DSOPLEX_LEGACY
 !endif
 
 #-----------------------------------------------------------------------------
