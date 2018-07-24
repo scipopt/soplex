@@ -29,6 +29,9 @@ namespace soplex
   int SPxDevexPR<Real>::selectLeaveX(Real feastol, int start, int incr);
 
   template <>
+  bool SPxDevexPR<Real>::isConsistent() const;
+
+  template <>
   int SPxDevexPR<Real>::selectLeaveSparse(Real feastol);
 
   template <>

@@ -234,7 +234,7 @@ namespace soplex
          if( _hasBasis )
          {
             assert(_basisStatusRows.size() == numRowsT());
-            assert(_basisStatusCols.size() == numColsReal());
+            assert(_basisStatusCols.size() == this->numColsT());
 
             _solver.loadLP(*_realLP, false);
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
@@ -544,7 +544,7 @@ namespace soplex
 
          // load unsimplified basis into solver
          assert(_basisStatusRows.size() == numRowsT());
-         assert(_basisStatusCols.size() == numColsReal());
+         assert(_basisStatusCols.size() == this->numColsT());
          _solver.setBasisStatus(SPxBasis<Real>::REGULAR);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = true;
@@ -564,7 +564,7 @@ namespace soplex
       if( verify )
          _verifySolutionReal();
 
-      assert(_solver.nCols() == numColsReal());
+      assert(_solver.nCols() == this->numColsT());
       assert(_solver.nRows() == numRowsT());
    }
 

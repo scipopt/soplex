@@ -50,13 +50,13 @@ public:
    SPxSteepExPR()
      : SPxSteepPR<R>("SteepEx", SPxSteepPR<R>::EXACT)
    {
-      assert(isConsistent());
+      assert(this->isConsistent());
    }
    /// copy constructor
    SPxSteepExPR( const SPxSteepExPR& old)
       : SPxSteepPR<R>(old)
    {
-      assert(isConsistent());
+      assert(this->isConsistent());
    }
    /// assignment operator
    SPxSteepExPR& operator=( const SPxSteepExPR& rhs)
@@ -65,7 +65,7 @@ public:
       {
          SPxSteepPR<R>::operator=(rhs);
 
-         assert(isConsistent());
+         assert(this->isConsistent());
       }
 
       return *this;

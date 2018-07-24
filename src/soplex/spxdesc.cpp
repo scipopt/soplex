@@ -24,7 +24,10 @@ namespace soplex
   /// Signature defined to avoid the specialization after instantiation error
   template <>
   void SPxBasis<Real>::Desc::reSize(int rowDim, int colDim);
-  
+
+  template <>
+  bool SPxBasis<Real>::Desc::isConsistent() const;
+
   template <>
   SPxBasis<Real>::Desc::Desc(const SPxSolver<Real>& base)
   {

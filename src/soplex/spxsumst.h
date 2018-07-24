@@ -60,7 +60,7 @@ public:
    SPxSumST( const SPxSumST& old)
       : SPxVectorST<R>(old)
    {
-      assert(isConsistent());
+      assert(this->isConsistent());
    }
    /// assignment operator
    SPxSumST& operator=( const SPxSumST& rhs)
@@ -69,7 +69,7 @@ public:
       {
          SPxVectorST<R>::operator=(rhs);
 
-         assert(isConsistent());
+         assert(this->isConsistent());
       }
 
       return *this;

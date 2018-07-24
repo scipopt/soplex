@@ -86,7 +86,7 @@ public:
       , state(old.state)
       , vec(old.vec)
    {
-      assert(isConsistent());
+      assert(this->isConsistent());
    }
    /// assignment operator
    SPxVectorST& operator=( const SPxVectorST& rhs)
@@ -97,7 +97,7 @@ public:
          state = rhs.state;
          vec = rhs.vec;
 
-         assert(isConsistent());
+         assert(this->isConsistent());
       }
 
       return *this;

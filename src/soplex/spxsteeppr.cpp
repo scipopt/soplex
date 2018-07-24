@@ -34,6 +34,9 @@ namespace soplex
   int SPxSteepPR<Real>::selectLeaveX(Real tol);
 
   template <>
+  bool SPxSteepPR<Real>::isConsistent() const;
+
+  template <>
   int SPxSteepPR<Real>::selectLeaveSparse(Real tol);
 
   template <>
@@ -392,7 +395,7 @@ namespace soplex
         else
           {
             this->thesolver->infeasibilities.remove(i);
-            assert(this->thesolver->isInfeasible[idx] == this->VIOLATED || this->thesolver->isInfeasible[idx] == this-VIOLATED_AND_CHECKED);
+            assert(this->thesolver->isInfeasible[idx] == this->VIOLATED || this->thesolver->isInfeasible[idx] == this->VIOLATED_AND_CHECKED);
             this->thesolver->isInfeasible[idx] = this->NOT_VIOLATED;
           }
       }

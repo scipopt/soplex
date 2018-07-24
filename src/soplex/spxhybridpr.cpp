@@ -21,6 +21,8 @@
 
 namespace soplex
 {
+  template <>
+  void SPxHybridPR<Real>::setType(typename SPxSolver<Real>::Type tp);
 
   template <>
   bool SPxHybridPR<Real>::isConsistent() const

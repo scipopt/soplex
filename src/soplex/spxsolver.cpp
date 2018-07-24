@@ -30,7 +30,10 @@ namespace soplex
   /// definition of signature to prevent instantiation before def. error
   template <>
   void SPxSolver<Real>::resetClockStats();
-  
+
+  template <>
+  bool SPxSolver<Real>::isConsistent() const;
+
   template <>
   void SPxSolver<Real>::setPricing(Pricing pr);
 

@@ -1220,7 +1220,7 @@ namespace soplex
                if( _colTypes[c] == RANGETYPE_FIXED )
                   continue;
 
-               const SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+               const SPxSolver<Real>::VarStatus& basisStatusCol = _basisStatusCols[c];
                assert(basisStatusCol != SPxSolver<R>::FIXED);
 
                if( ((maximizing && basisStatusCol != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusCol != SPxSolver<R>::ON_UPPER))
@@ -1256,7 +1256,7 @@ namespace soplex
                if( _rowTypes[r] == RANGETYPE_FIXED )
                   continue;
 
-               const SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+               const SPxSolver<Real>::VarStatus& basisStatusRow = _basisStatusRows[r];
                assert(basisStatusRow != SPxSolver<R>::FIXED);
 
                Rational val = (-dualScale * sol._dual[r]) - Rational(dualReal[r]);

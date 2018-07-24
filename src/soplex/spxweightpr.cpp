@@ -21,6 +21,8 @@
 
 namespace soplex
 {
+  template <>
+  void SPxWeightPR<Real>::computeLeavePenalty(int start, int end);
 
   template <>
   void SPxWeightPR<Real>::setRep(typename SPxSolver<Real>::Representation rep)
