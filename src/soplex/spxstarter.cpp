@@ -21,8 +21,8 @@
 
 namespace soplex
 {
-  template <class R>
-  bool SPxStarter<R>::isConsistent() const
+  template <>
+  bool SPxStarter<Real>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     MSG_ERROR( std::cerr << "ESTART95 Not yet implemented" << std::endl; )
