@@ -46,6 +46,9 @@ namespace soplex
   int SoPlex<Real>::intParam(const IntParam param) const;
 
   template <>
+	bool SoPlex<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
+
+  template <>
   typename SoPlex<Real>::Settings& SoPlex<Real>::Settings::operator=(const Settings& settings);
 
   template <>

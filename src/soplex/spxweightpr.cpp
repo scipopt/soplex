@@ -25,6 +25,9 @@ namespace soplex
   void SPxWeightPR<Real>::computeLeavePenalty(int start, int end);
 
   template <>
+  bool SPxWeightPR<Real>::isConsistent() const;
+
+  template <>
   void SPxWeightPR<Real>::setRep(typename SPxSolver<Real>::Representation rep)
   {
     if (rep == SPxSolver<Real>::ROW)
@@ -56,7 +59,7 @@ namespace soplex
 
     for (int i = start; i < end; ++i)
       {
-        SPxId id = this->basis.baseId(i);
+        SPxId id = basis.baseId(i);
         if (id.type() == SPxId::ROW_ID)
           leavePenalty[i] = rPenalty[ this->thesolver->number(id) ];
         else
@@ -182,7 +185,7 @@ namespace soplex
         if (x < -this->theeps)
           {
             x *= -x;
-            switch (this->ds.rowStatus(i))
+            switch (ds.rowStatus(i))
               {
               case SPxBasis<Real>::Desc::P_ON_LOWER :
               case SPxBasis<Real>::Desc::D_ON_LOWER :
@@ -220,7 +223,7 @@ namespace soplex
         if (x < -this->theeps)
           {
             x *= -x;
-            switch (this->ds.colStatus(i))
+            switch (ds.colStatus(i))
               {
               case SPxBasis<Real>::Desc::P_ON_LOWER :
               case SPxBasis<Real>::Desc::D_ON_LOWER :
