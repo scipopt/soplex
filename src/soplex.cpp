@@ -7792,8 +7792,8 @@ namespace soplex
     assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
     assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == numRowsT());
 
-    assert(_rationalLP == 0 || _colTypes.size() == numColsT());
-    assert(_rationalLP == 0 || _rowTypes.size() == numRowsT());
+    assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
+    assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
 
     return true;
   }
