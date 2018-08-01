@@ -4776,7 +4776,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
             lp.changeLhs(i, lhs);
          }
-         assert(lp.lhs(i) <= lp.rhs(i));
+         assert(lp.lhs(i) <= lp.rhs(i) - feastol());
       }
    }
 
