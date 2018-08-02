@@ -4716,8 +4716,8 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    Real up            = lp.upper(j);
    const SVector& col = lp.colVector(j);
 
-   assert(NE(lo, infinity) && NE(lo, -infinity));
-   assert(NE(up, infinity) && NE(up, -infinity));
+   assert(LT(lo, infinity) && GT(lo, -infinity));
+   assert(LT(up, infinity) && GT(up, -infinity));
 
    MSG_DEBUG( (*spxout) << "IMAISM66 fix variable x" << j
                      << ": lower=" << lp.lower(j)
@@ -4776,7 +4776,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
             lp.changeLhs(i, lhs);
          }
-         assert(lp.lhs(i) <= lp.rhs(i));
+         assert(lp.lhs(i) <= lp.rhs(i) + feastol());
       }
    }
 

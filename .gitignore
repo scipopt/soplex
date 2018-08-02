@@ -44,3 +44,7 @@ soplex.vcproj.VMWARE.Optimierung.user
 soplex.kdev4
 hooks/
 git_hash.cpp
+.vscode/
+release/
+debug/
+build/
