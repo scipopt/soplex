@@ -8841,9 +8841,9 @@ namespace soplex
   {
     // we use one method for bot columns and rows, because during column/row addition, rows/columns can be added
     // implicitly
-    for( int i = _colTypes.size(); i < numColsT(); i++ )
+    for( int i = _colTypes.size(); i < numColsRational(); i++ )
       _colTypes.append(_rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i)));
-    for( int i = _rowTypes.size(); i < numRowsT(); i++ )
+    for( int i = _rowTypes.size(); i < numRowsRational(); i++ )
       _rowTypes.append(_rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i)));
   }
 
@@ -8867,11 +8867,11 @@ namespace soplex
   template <>
   void SoPlex<Real>::_recomputeRangeTypesRational()
   {
-    _rowTypes.reSize(numRowsT());
-    for( int i = 0; i < numRowsT(); i++ )
+    _rowTypes.reSize(numRowsRational());
+    for( int i = 0; i < numRowsRational(); i++ )
       _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
-    _colTypes.reSize(numColsT());
-    for( int i = 0; i < numColsT(); i++ )
+    _colTypes.reSize(numColsRational());
+    for( int i = 0; i < numColsRational(); i++ )
       _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
   }
 
