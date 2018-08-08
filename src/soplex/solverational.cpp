@@ -3218,8 +3218,8 @@ namespace soplex
                   _simplifier->unsimplify(tmpPrimal, tmpDual, tmpSlacks, tmpRedCost, basisStatusRows.get_ptr(), basisStatusCols.get_ptr());
 
                   // store basis for original problem
-                  basisStatusRows.reSize(numRowsT());
-                  basisStatusCols.reSize(numColsT());
+                  basisStatusRows.reSize(numRowsRational());
+                  basisStatusCols.reSize(numColsRational());
                   _simplifier->getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
                   returnedBasis = true;
 

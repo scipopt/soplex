@@ -3631,11 +3631,11 @@ namespace soplex
   template <>
 	bool SoPlex<Real>::hasPrimal() const
   {
-    return _hasSolReal;
+    return _hasSolReal || _hasSolRational;
   }
 
   template <>
-	bool SoPlex<Rational>::hasPrimal() const
+	bool SoPlex<Rational>::hasPrimal() const // might need a fix
   {
     return _hasSolRational;
   }
@@ -3674,11 +3674,11 @@ namespace soplex
   template <>
 	bool SoPlex<Real>::hasDual() const
   {
-    return _hasSolReal;
+    return _hasSolReal || _hasSolRational;
   }
 
   template <>
-	bool SoPlex<Rational>::hasDual() const
+	bool SoPlex<Rational>::hasDual() const // might neeed a fix
   {
     return _hasSolRational;
   }
