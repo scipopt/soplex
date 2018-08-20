@@ -2304,12 +2304,12 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
       // adapt sides of row r
       Real lhs_r = lp.lhs(row_r);
       Real rhs_r = lp.rhs(row_r);
-      if( lhs_r > -infinity && isNotZero(aggr_const, epsZero()) )
+      if( lhs_r > -infinity )
       {
          lp.changeLhs(row_r, lhs_r - aggr_const * arj);
          m_chgLRhs++;
       }
-      if( rhs_r < infinity && isNotZero(aggr_const, epsZero()) )
+      if( rhs_r < infinity )
       {
          lp.changeRhs(row_r, rhs_r - aggr_const * arj);
          m_chgLRhs++;
@@ -2334,8 +2334,7 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    Real obj_j = lp.obj(j);
    if( isNotZero(obj_j, epsZero()) )
    {
-      if( isNotZero(aggr_const, epsZero()) )
-         addObjoffset(aggr_const * obj_j);
+      addObjoffset(aggr_const * obj_j);
       Real obj_k = lp.obj(k);
       lp.changeObj(k, obj_k + aggr_coef * obj_j);
    }
