@@ -2331,7 +2331,7 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    }
 
    // adapt objective function
-   Real obj_j = (m_thesense == SPxLP::MINIMIZE) ? lp.obj(j) : -lp.obj(j);
+   Real obj_j = lp.obj(j);
    if( isNotZero(obj_j, epsZero()) )
    {
       addObjoffset(aggr_const * obj_j);
