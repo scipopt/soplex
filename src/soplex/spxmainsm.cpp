@@ -2334,7 +2334,8 @@ SPxSimplifier::Result SPxMainSM::aggregateVars(SPxLP& lp, const SVector& row, in
    Real obj_j = lp.obj(j);
    if( isNotZero(obj_j, epsZero()) )
    {
-      addObjoffset(aggr_const * obj_j);
+      if( isNotZero(aggr_const, epsZero()) )
+         addObjoffset(aggr_const * obj_j);
       Real obj_k = lp.obj(k);
       lp.changeObj(k, obj_k + aggr_coef * obj_j);
    }
