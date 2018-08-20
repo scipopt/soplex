@@ -4715,13 +4715,19 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
    Real lo            = lp.lower(j);
    Real up            = lp.upper(j);
    const SVector& col = lp.colVector(j);
+   Real mid           = lo;
+
+   // use the center value between slightly different bounds to improve numerics
+   if( NE(lo, up) )
+      mid = (up + lo)/2.0;
 
    assert(LT(lo, infinity) && GT(lo, -infinity));
    assert(LT(up, infinity) && GT(up, -infinity));
 
    MSG_DEBUG( (*spxout) << "IMAISM66 fix variable x" << j
-                     << ": lower=" << lp.lower(j)
-                     << " upper=" << lp.upper(j)
+                     << ": lower=" << lo
+                     << " upper=" << up
+                     << "to new value: " << mid
                      << std::endl; )
 
    if (isNotZero(lo, epsZero()))
@@ -4732,7 +4738,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
 
          if (lp.rhs(i) < infinity)
          {
-            Real y     = lo * col.value(k);
+            Real y     = mid * col.value(k);
             Real scale = maxAbs(lp.rhs(i), y);
 
             if (scale < 1.0)
@@ -4755,7 +4761,7 @@ void SPxMainSM::fixColumn(SPxLP& lp, int j, bool correctIdx)
          }
          if (lp.lhs(i) > -infinity)
          {
-            Real y     = up * col.value(k);
+            Real y     = mid * col.value(k);
             Real scale = maxAbs(lp.lhs(i), y);
 
             if (scale < 1.0)
