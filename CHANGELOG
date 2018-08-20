@@ -1,3 +1,10 @@
+next Bugfix Release
+===================
+
+fixed bugs:
+- correct objective function update in aggregation simplifier
+
+
 13 June 2018 - Release 4.0.0
 ============================
 
