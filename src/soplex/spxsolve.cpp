@@ -1503,8 +1503,8 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
       if( forceHead || displayLine % (displayFreq*30) == 0 )
       {
          (*spxout) << "type |   time |   iters | facts |    shift | violation |     obj value ";
-         if( printCondition > 0 )
-            (*spxout) << " | condition";
+         if( printBasisMetric >= 0 )
+            (*spxout) << " | basis metric";
          (*spxout) << std::endl;
       }
       if( (force || (displayLine % displayFreq == 0)) && !forceHead )
@@ -1519,13 +1519,13 @@ void SPxSolver::printDisplayLine(const bool force, const bool forceHead)
          << std::setprecision(8) << value();
          if( getStartingDecompBasis && rep() == SPxSolver::ROW )
             (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
-         if( printCondition == 1 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(0);
-         if( printCondition == 2 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(1);
-         if( printCondition == 3 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(2);
-         if( printCondition == 4 )
+         if( printBasisMetric == 0 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
+         if( printBasisMetric == 1 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(1);
+         if( printBasisMetric == 2 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(2);
+         if( printBasisMetric == 3 )
             (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
          (*spxout) << std::endl;
       }

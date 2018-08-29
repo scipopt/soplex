@@ -1000,7 +1000,7 @@ SPxSolver::SPxSolver(
    , computeDegeneracy(false)
    , degenCompIterOffset(0)
    , fullPerturbation(false)
-   , printCondition(0)
+   , printBasisMetric(-1)
    , unitVecs (0)
    , primVec (0, Param::epsilon())
    , dualVec (0, Param::epsilon())
@@ -1112,7 +1112,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       degenCompIterOffset = base.degenCompIterOffset;
       decompIterationLimit = base.decompIterationLimit;
       fullPerturbation = base.fullPerturbation;
-      printCondition = base.printCondition;
+      printBasisMetric = base.printBasisMetric;
       unitVecs = base.unitVecs;
       primRhs = base.primRhs;
       primVec = base.primVec;
@@ -1314,7 +1314,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , degenCompIterOffset(base.degenCompIterOffset)
    , decompIterationLimit(base.decompIterationLimit)
    , fullPerturbation(base.fullPerturbation)
-   , printCondition(base.printCondition)
+   , printBasisMetric(base.printBasisMetric)
    , unitVecs(base.unitVecs)
    , primRhs(base.primRhs)
    , primVec(base.primVec)

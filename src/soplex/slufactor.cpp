@@ -587,7 +587,7 @@ Real SLUFactor::stability() const
    return initMaxabs / maxabs;
 }
 
-Real SLUFactor::conditionEstimate(int type) const
+Real SLUFactor::matrixMetric(int type) const
 {
    Real result = 0.0;
 
@@ -597,7 +597,7 @@ Real SLUFactor::conditionEstimate(int type) const
 
    switch( type )
    {
-   // compute estimate by ratio of max/min of elements on the diagonal
+   // compute condition estimate by ratio of max/min of elements on the diagonal
    case 0:
    {
       Real mindiag = spxAbs(diag[0]);
@@ -608,23 +608,23 @@ Real SLUFactor::conditionEstimate(int type) const
          Real absdiag = spxAbs(diag[i]);
          if( absdiag < mindiag )
             mindiag = absdiag;
-         if( absdiag > maxdiag )
+         else if( absdiag > maxdiag )
             maxdiag = absdiag;
       }
       result = maxdiag/mindiag;
       break;
    }
-   // compute estimate by summing up the elements on the diagonal
+   // compute sum of all elements on the diagonal
    case 1:
-      result = diag[0];
-      for( int i = 1; i < dim(); ++i)
-         result += spxAbs(diag[i]);
+      result = 0.0;
+      for( int i = 0; i < dim(); ++i)
+         result += 1.0/diag[i];
       break;
-   // compute estimate by multiplying the elements on the diagonal
+   // compute determinant (product of all diagonal elements of U)
    case 2:
-      result = diag[0];
-      for( int i = 1; i < dim(); ++i)
-         result *= spxAbs(diag[i]);
+      result = 1.0;
+      for( int i = 0; i < dim(); ++i)
+         result *= diag[i];
       break;
    }
 

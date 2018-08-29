@@ -306,7 +306,7 @@ private:
    int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
    bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
-   int            printCondition;         ///< printing the current condition number in the log (0 - off, 1 - estimate,exact, 2 - exact)";ratio estimate , 3 - sum estimate, 4 - product estimate)
+   int            printBasisMetric;       ///< printing the current basis metric in the log (-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
 
    //@}
 
@@ -833,10 +833,10 @@ public:
       return displayFreq;
    }
 
-   /// print condition number within the usual output
-   void setConditionInformation(int condInfo)
+   /// print basis metric within the usual output
+   void setMetricInformation(int type)
    {
-      printCondition = condInfo;
+      printBasisMetric = type;
    }
 
    // enable sparse pricing when viols < fac * dim()
@@ -874,9 +874,9 @@ public:
       fullPerturbation = full;
    }
 
-   virtual Real getFastCondition()
+   virtual Real getBasisMetric(int type)
    {
-      return basis().getFastCondition();
+      return basis().getMatrixMetric(type);
    }
 
    //@}

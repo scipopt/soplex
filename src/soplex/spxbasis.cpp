@@ -1119,15 +1119,15 @@ Real SPxBasis::condition(int maxiters, Real tolerance)
    return norm * norminv;
 }
 
-/* compute condition number estimation based on the diagonal of the LU factorization */
-Real SPxBasis::getFastCondition(int type)
+/* compute one of several matrix metrics based on the diagonal of the LU factorization */
+Real SPxBasis::getMatrixMetric(int type)
 {
-   Real cond = infinity;
+   Real metric = infinity;
 
    if( factorized )
-      cond = factor->conditionEstimate(type);
+      metric = factor->matrixMetric(type);
 
-   return cond;
+   return metric;
 }
 
 void SPxBasis::dump()

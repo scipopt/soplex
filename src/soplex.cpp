@@ -324,11 +324,11 @@ namespace soplex
       defaultValue[SoPlex::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
 
       // printing condition number during the solve
-      name[SoPlex::PRINTCONDITION] = "printcondition";
-      description[SoPlex::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - ratio estimate , 2 - sum estimate, 3 - product estimate, 4 - exact)";
-      lower[SoPlex::PRINTCONDITION] = 0;
-      upper[SoPlex::PRINTCONDITION] = 4;
-      defaultValue[SoPlex::PRINTCONDITION] = 0;
+      name[SoPlex::PRINTBASISMETRIC] = "printbasismetric";
+      description[SoPlex::PRINTBASISMETRIC] = "print basis metric during the solve (-1 - off, 0 - condition estimate , 1 - trace, 2 - determinant, 3 - condition)";
+      lower[SoPlex::PRINTBASISMETRIC] = -1;
+      upper[SoPlex::PRINTBASISMETRIC] = 3;
+      defaultValue[SoPlex::PRINTBASISMETRIC] = -1;
    }
 
    SoPlex::Settings::RealParam::RealParam() {
@@ -4055,11 +4055,12 @@ namespace soplex
    }
 
 
-   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
-   /// type = 0: max/min ratio
-   /// type = 1: trace of U (sum of diagonal elements)
-   /// type = 2: product of diagonal elements
-   bool SoPlex::getFastCondition(Real& condition, int type)
+   /** compute one of several matrix metrics based on the diagonal of the LU factorization
+    *  type = 0: max/min ratio
+    *  type = 1: trace of U (sum of diagonal elements)
+    *  type = 2: determinant (product of diagonal elements)
+    */
+   bool SoPlex::getBasisMetric(Real& condition, int type)
    {
       _ensureRealLPLoaded();
       if( !_isRealLPLoaded )
@@ -4068,7 +4069,7 @@ namespace soplex
       if( _solver.basis().status() == SPxBasis::NO_PROBLEM )
          return false;
 
-      condition = _solver.basis().getFastCondition(type);
+      condition = _solver.getBasisMetric(type);
 
       return true;
    }
@@ -5973,8 +5974,8 @@ namespace soplex
          break;
 
       // printing of condition n
-      case PRINTCONDITION:
-         _solver.setConditionInformation(value);
+      case PRINTBASISMETRIC:
+         _solver.setMetricInformation  (value);
          break;
 
       default:

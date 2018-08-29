@@ -1,5 +1,9 @@
-next Bugfix Release
-===================
+next Release
+============
+
+interface & parameters:
+- new parameter 'int:printbasismetric' to replace 'printcondition'
+  (-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
 
 fixed bugs:
 - correct objective function update in aggregation simplifier

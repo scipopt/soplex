@@ -174,8 +174,12 @@ public:
    }
    ///
    Real stability() const;
-   /// return condition number estimate based on the diagonal of U
-   Real conditionEstimate(int type = 0) const;
+   /** return one of several matrix metrics based on the diagonal of U
+    * 0: condition number estimate by ratio of min/max
+    * 1: trace (sum of diagonal elements)
+    * 2: determinant (product of diagonal elements)
+    */
+   Real matrixMetric(int type = 0) const;
    ///
    std::string statistics() const;
    ///
