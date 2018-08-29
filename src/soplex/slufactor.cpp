@@ -614,7 +614,7 @@ Real SLUFactor::matrixMetric(int type) const
       result = maxdiag/mindiag;
       break;
    }
-   // compute sum of all elements on the diagonal
+   // compute sum of inverses of all elements on the diagonal
    case 1:
       result = 0.0;
       for( int i = 0; i < dim(); ++i)
