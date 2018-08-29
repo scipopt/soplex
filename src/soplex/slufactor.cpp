@@ -625,6 +625,7 @@ Real SLUFactor::matrixMetric(int type) const
       result = 1.0;
       for( int i = 0; i < dim(); ++i)
          result *= diag[i];
+      result = 1.0/result;
       break;
    }
 
