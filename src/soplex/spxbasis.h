@@ -615,12 +615,12 @@ public:
       return condition(1000, 1e-9);
    }
 
-   /* compute condition number estimation based on the diagonal of the LU factorization
-    * type = 0: max/min ratio
-    * type = 1: trace of U (sum of diagonal elements)
-    * type = 2: product of diagonal elements
+   /** compute one of several matrix metrics based on the diagonal of the LU factorization
+    *  type = 0: max/min ratio
+    *  type = 1: trace of U (sum of diagonal elements)
+    *  type = 2: determinant (product of diagonal elements)
     */
-   Real getFastCondition(int type = 0);
+   Real getMatrixMetric(int type = 0);
 
    /// returns the stability of the basis matrix.
    Real stability() const
