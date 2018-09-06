@@ -37,10 +37,10 @@ namespace soplex
      enter or leave the simplex basis, depending on the chosen simplex type.
    
      An SPxPricer first #load%s the SoPlex object for which pricing is to
-     be performed. Then, depending of the SPxSolver<R>::Type, methods
+     be performed. Then, depending of the SPxSolverBase<R>::Type, methods
      #selectEnter() and #entered4() (for entering Simplex) or #selectLeave()
      and #left4() (for leaving Simplex) are called by SoPlex. The SPxPricer
-     object is informed of a change of the SPxSolver<R>::Type by calling method
+     object is informed of a change of the SPxSolverBase<R>::Type by calling method
      #setType().
   */
   template <class R>
@@ -55,7 +55,7 @@ namespace soplex
       const char* m_name;
       /// the solver
 
-      SPxSolver<R>*  thesolver; //@todo The template type should be identified? Do I have to defined two of them?
+      SPxSolverBase<R>*  thesolver; //@todo The template type should be identified? Do I have to defined two of them?
       /// violation bound
       Real        theeps;
       //@}
@@ -111,7 +111,7 @@ namespace soplex
       /// loads LP.
       /** Loads the solver and LP for which pricing steps are to be performed.
        */
-      virtual void load(SPxSolver<R>* p_solver)
+      virtual void load(SPxSolverBase<R>* p_solver)
       {
         thesolver = p_solver;
       }
@@ -122,8 +122,8 @@ namespace soplex
         thesolver = 0;
       }
 
-      /// returns loaded SPxSolver object.
-      virtual SPxSolver<R>* solver() const
+      /// returns loaded SPxSolverBase object.
+      virtual SPxSolverBase<R>* solver() const
       {
         return thesolver;
       }
@@ -148,7 +148,7 @@ namespace soplex
       /** Informs pricer about (a change of) the loaded SoPlex's Type. In
           the sequel, only the corresponding select methods may be called.
       */
-      virtual void setType(typename SPxSolver<R>::Type)
+      virtual void setType(typename SPxSolverBase<R>::Type)
       {
         this->thesolver->weights.reDim(0);
         this->thesolver->coWeights.reDim(0);
@@ -159,7 +159,7 @@ namespace soplex
       /** Informs pricer about (a change of) the loaded SoPlex's
           Representation.
       */
-      virtual void setRep(typename SPxSolver<R>::Representation)
+      virtual void setRep(typename SPxSolverBase<R>::Representation)
       {}
       //@}
 
@@ -179,7 +179,7 @@ namespace soplex
           the basis for \p id to come in at this position. When being called,
           all vectors of SoPlex involved in such an entering update are
           setup correctly and may be accessed via the corresponding methods
-          (\ref SPxSolver<R>::fVec() "fVec()", \ref SPxSolver<R>::pVec() "pVec()", 
+          (\ref SPxSolverBase<R>::fVec() "fVec()", \ref SPxSolverBase<R>::pVec() "pVec()", 
           etc.). In general, argument \p n will be the one returned by the
           SPxPricer at the previous call to #selectLeave(). However, one can not
           rely on this.
@@ -194,10 +194,10 @@ namespace soplex
 
           Note:
           When method #selectEnter() is called by the loaded SoPlex
-          object, all values from \ref SPxSolver<R>::coTest() "coTest()" are 
+          object, all values from \ref SPxSolverBase<R>::coTest() "coTest()" are 
           up to date. However, whether the elements of 
-          \ref SPxSolver<R>::test() "test()" are up to date depends on the 
-          SPxSolver<R>::Pricing type.
+          \ref SPxSolverBase<R>::test() "test()" are up to date depends on the 
+          SPxSolverBase<R>::Pricing type.
       */
       virtual SPxId selectEnter() = 0;
 
@@ -207,7 +207,7 @@ namespace soplex
           at the \p n 'th position. When being called, all vectors of SoPlex
           involved in such an entering update are setup correctly and may be
           accessed via the corresponding methods 
-          (\ref SPxSolver<R>::fVec() "fVec()", \ref SPxSolver<R>::pVec() "pVec()",
+          (\ref SPxSolverBase<R>::fVec() "fVec()", \ref SPxSolverBase<R>::pVec() "pVec()",
           etc.). In general, argument \p id will be the one returned by the
           SPxPricer at the previous call to #selectEnter(). However, one can not
           rely on this.

@@ -35,7 +35,7 @@ namespace soplex
    for the Simplex solver SoPlex. When a SPxStarter object has been loaded
    to a SoPlex solver, the latter will call method #generate() in order to
    have a start basis generated. Implementations of method #generate() must
-   terminate by \ref soplex::SPxSolver<R>::load() "loading" the generated basis to 
+   terminate by \ref soplex::SPxSolverBase<R>::load() "loading" the generated basis to 
    SoPlex. Loaded bases must be nonsingular.
 */
 template <class R>
@@ -96,7 +96,7 @@ public:
    /**@name Starting */
    //@{
    /// generates start basis for loaded basis.
-   virtual void generate(SPxSolver<R>& base) = 0;
+   virtual void generate(SPxSolverBase<R>& base) = 0;
    //@}
 
    //-------------------------------------

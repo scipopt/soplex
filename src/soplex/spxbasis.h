@@ -46,9 +46,9 @@
 namespace soplex
 {
   template <class R>
-    class SPxSolver;
+    class SPxSolverBase;
 
-  /**@class SPxBasis
+  /**@class SPxBasisBase
      @brief   Simplex basis.
      @ingroup Algo
 
@@ -71,22 +71,22 @@ namespace soplex
      whereas the number of vectors belonging to the LP is called the basis'
      \em codimension.
    
-     Class SPxBasis is designed to represent a generic simplex basis, suitable
+     Class SPxBasisBase is designed to represent a generic simplex basis, suitable
      for both representations. At any time the representation can be changed by
      calling method setRep().
    
-     Class SPxBasis provides methods for solving linear systems with the basis
-     matrix. However, SPxBasis does not provide a linear solver by its own.
-     Instead, a SLinSolver object must be #load%ed to a SPxBasis which will
+     Class SPxBasisBase provides methods for solving linear systems with the basis
+     matrix. However, SPxBasisBase does not provide a linear solver by its own.
+     Instead, a SLinSolver object must be #load%ed to a SPxBasisBase which will
      be called for solving linear systems.
   */
   template <class R> // theLP gets templated
-  class SPxBasis
+  class SPxBasisBase
   {
   public:
 
     /// basis status.
-    /** Each SPxBasis is assigned a status flag, which can take on of the
+    /** Each SPxBasisBase is assigned a status flag, which can take on of the
         above values.
     */
     enum SPxStatus
@@ -181,7 +181,7 @@ namespace soplex
 
           Note that unbounded primal variables are reflected by an #D_UNDEFINED
           dual variable, since no reduced costs exist for them. To facilitate
-          the assignment of dual #Status%es, class SPxBasis provides methods
+          the assignment of dual #Status%es, class SPxBasisBase provides methods
           #dualStatus(), #dualColStatus() and #dualRowStatus)().
       */
       enum Status
@@ -198,7 +198,7 @@ namespace soplex
       };
       //@}
 
-      friend SPxBasis<R>;
+      friend SPxBasisBase<R>;
       template <class T> friend std::ostream& operator<< (std::ostream& os, const Status& stat); //@todo is the <> required here?
 
     private:
@@ -247,7 +247,7 @@ namespace soplex
       {
         return rowstat[i];
       }
-      /// returns the array of row  \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
+      /// returns the array of row  \ref soplex::SPxBasisBase<R>::Desc::Status "Status"es.
       const Status* rowStatus(void) const
       {
         return rowstat.get_const_ptr();
@@ -262,7 +262,7 @@ namespace soplex
       {
         return colstat[i];
       }
-      /// returns the array of column \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
+      /// returns the array of column \ref soplex::SPxBasisBase<R>::Desc::Status "Status"es.
       const Status* colStatus(void) const
       {
         return colstat.get_const_ptr();
@@ -277,7 +277,7 @@ namespace soplex
       {
         return (*stat)[i];
       }
-      /// returns the array of variable \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
+      /// returns the array of variable \ref soplex::SPxBasisBase<R>::Desc::Status "Status"es.
       const Status* status(void) const
       {
         return stat->get_const_ptr();
@@ -292,7 +292,7 @@ namespace soplex
       {
         return (*costat)[i];
       }
-      /// returns the array of covariable \ref soplex::SPxBasis<R>::Desc::Status "Status"es.
+      /// returns the array of covariable \ref soplex::SPxBasisBase<R>::Desc::Status "Status"es.
       const Status* coStatus(void) const
       {
         return costat->get_const_ptr();
@@ -319,7 +319,7 @@ namespace soplex
       : stat(0)
         , costat(0)
         {}
-      explicit Desc(const SPxSolver<R>& base);
+      explicit Desc(const SPxSolverBase<R>& base);
 
       /// copy constructor
       Desc(const Desc& old);
@@ -342,12 +342,12 @@ namespace soplex
     */
     //@{
     /// the LP
-    SPxSolver<R>* theLP;
+    SPxSolverBase<R>* theLP;
     /// SPxId%s of basic vectors.
     DataArray < SPxId > theBaseId;
     /// pointers to the vectors of the basis matrix.
     DataArray < const SVector* > matrix;
-    /// \c true iff the pointers in \ref soplex::SPxBasis<R>::matrix "matrix" are set up correctly.
+    /// \c true iff the pointers in \ref soplex::SPxBasisBase<R>::matrix "matrix" are set up correctly.
     bool matrixIsSetup;
 
     /* @brief LU factorization of basis matrix
@@ -355,7 +355,7 @@ namespace soplex
        Otherwise #factor is undefined.
     */
     SLinSolver* factor;
-    /// \c true iff \ref soplex::SPxBasis<R>::factor "factor" = \ref soplex::SPxBasis<R>::matrix "matrix" \f$^{-1}\f$.
+    /// \c true iff \ref soplex::SPxBasisBase<R>::factor "factor" = \ref soplex::SPxBasisBase<R>::matrix "matrix" \f$^{-1}\f$.
     bool factorized;
 
     /// number of updates before refactorization.
@@ -436,7 +436,7 @@ namespace soplex
       if( thestatus != stat )
         {
 #ifdef SOPLEX_DEBUG
-          MSG_DEBUG( std::cout << "DBSTAT01 SPxBasis<R>::setStatus(): status: "
+          MSG_DEBUG( std::cout << "DBSTAT01 SPxBasisBase<R>::setStatus(): status: "
                      << int(thestatus) << " (" << thestatus << ") -> "
                      << int(stat) << " (" << stat << ")" << std::endl; )
 #endif
@@ -543,7 +543,7 @@ namespace soplex
       return updateCount;
     }
 
-    /// returns number of basis changes since last \ref soplex::SPxBasis<R>::load() "load()".
+    /// returns number of basis changes since last \ref soplex::SPxBasisBase<R>::load() "load()".
     inline int iteration() const
     {
       return iterCount;
@@ -562,7 +562,7 @@ namespace soplex
     }
 
     /// returns loaded solver.
-    inline SPxSolver<R>* solver() const
+    inline SPxSolverBase<R>* solver() const
     {
       return theLP;
     }
@@ -572,7 +572,7 @@ namespace soplex
     /**@name Linear Algebra */
     //@{
     /// Basis-vector product.
-    /** Depending on the representation, for an SPxBasis B,
+    /** Depending on the representation, for an SPxBasisBase B,
         B.multBaseWith(x) computes
         - \f$x \leftarrow Bx\f$    in the columnwise case, and
         - \f$x \leftarrow x^TB\f$  in the rowwise case.
@@ -586,7 +586,7 @@ namespace soplex
     void multBaseWith(SSVector& x, SSVector& result) const;
 
     /// Vector-basis product.
-    /** Depending on the representation, for a #SPxBasis B,
+    /** Depending on the representation, for a #SPxBasisBase B,
         B.multWithBase(x) computes
         - \f$x \leftarrow x^TB\f$  in the columnwise case and
         - \f$x \leftarrow Bx\f$    in the rowwise case.
@@ -638,7 +638,7 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveRight(x, rhs);
     }
     ///
@@ -650,11 +650,11 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveRight(x, rhs);
     }
     /// solves linear system with basis matrix.
-    /** Depending on the representation, for a SPxBasis B,
+    /** Depending on the representation, for a SPxBasisBase B,
         B.solve(x) computes
         - \f$x \leftarrow B^{-1}rhs\f$       in the columnwise case and
         - \f$x \leftarrow rhs^TB^{-1}\f$     in the rowwise case.
@@ -671,21 +671,21 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveRight4update(x, rhs);
     }
     /// solves two systems in one call.
     void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized)
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
     }
     /// solves two systems in one call using only sparse data structures
     void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized)
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
     }
     /// solves three systems in one call.
@@ -693,7 +693,7 @@ namespace soplex
                       const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
     {
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
@@ -703,13 +703,13 @@ namespace soplex
                       const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
     {
       if (!factorized)
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
     }
     /// Cosolves linear system with basis matrix.
-    /** Depending on the representation, for a SPxBasis B,
+    /** Depending on the representation, for a SPxBasisBase B,
         B.coSolve(x) computes
         - \f$x \leftarrow rhs^TB^{-1}\f$     in the columnwise case and
         - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
@@ -726,7 +726,7 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveLeft(x, rhs);
     }
     /// Sparse version of coSolve
@@ -738,35 +738,35 @@ namespace soplex
           return;
         }
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveLeft(x, rhs);
     }
     /// solves two systems in one call.
     void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized)
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
     /// Sparse version of solving two systems in one call.
     void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
     {
       if (!factorized) 
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
     /// solves three systems in one call. May be improved by using just one pass through the basis.
     void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
     {
       if (!factorized)
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
     }
     /// Sparse version of solving three systems in one call.
     void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
     {
       if (!factorized)
-        SPxBasis<R>::factorize();
+        SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
     }
     //@}
@@ -777,23 +777,23 @@ namespace soplex
        These methods must be called after the loaded LP has been modified.
     */
     //@{
-    /// inform SPxBasis, that \p n new rows had been added.
+    /// inform SPxBasisBase, that \p n new rows had been added.
     void addedRows(int n);
-    /// inform SPxBasis that row \p i had been removed.
+    /// inform SPxBasisBase that row \p i had been removed.
     void removedRow(int i);
-    /// inform SPxBasis that rows in \p perm with negative entry were removed.
+    /// inform SPxBasisBase that rows in \p perm with negative entry were removed.
     void removedRows(const int perm[]);
-    /// inform SPxBasis that \p n new columns had been added.
+    /// inform SPxBasisBase that \p n new columns had been added.
     void addedCols(int n);
-    /// inform SPxBasis that column \p i had been removed.
+    /// inform SPxBasisBase that column \p i had been removed.
     void removedCol(int i);
-    /// inform SPxBasis that columns in \p perm with negative entry were removed.
+    /// inform SPxBasisBase that columns in \p perm with negative entry were removed.
     void removedCols(const int perm[]);
-    /// inform SPxBasis that a row had been changed.
+    /// inform SPxBasisBase that a row had been changed.
     void changedRow(int);
-    /// inform SPxBasis that a column had been changed.
+    /// inform SPxBasisBase that a column had been changed.
     void changedCol(int);
-    /// inform SPxBasis that a matrix entry had been changed.
+    /// inform SPxBasisBase that a matrix entry had been changed.
     void changedElement(int, int);
     //@}
 
@@ -805,12 +805,12 @@ namespace soplex
     /** Changes the \p i 'th vector of the basis with the vector associated to
         \p id. This includes:
         - updating the factorization, or recomputing it from scratch by
-        calling   \ref soplex::SPxSolver<R>::factorize()   "factorize()",
-        - resetting \ref soplex::SPxSolver<R>::lastEntered() "lastEntered()",
-        - resetting \ref soplex::SPxSolver<R>::lastIndex()   "lastIndex()",
-        - resetting \ref soplex::SPxSolver<R>::lastLeft()    "lastLeft()",
-        - resetting \ref soplex::SPxSolver<R>::lastUpdate()  "lastUpdate()",
-        - resetting \ref soplex::SPxSolver<R>::iterations()  "iterations()".
+        calling   \ref soplex::SPxSolverBase<R>::factorize()   "factorize()",
+        - resetting \ref soplex::SPxSolverBase<R>::lastEntered() "lastEntered()",
+        - resetting \ref soplex::SPxSolverBase<R>::lastIndex()   "lastIndex()",
+        - resetting \ref soplex::SPxSolverBase<R>::lastLeft()    "lastLeft()",
+        - resetting \ref soplex::SPxSolverBase<R>::lastUpdate()  "lastUpdate()",
+        - resetting \ref soplex::SPxSolverBase<R>::iterations()  "iterations()".
 
         The basis descriptor is \em not \em modified, since #factor()
         cannot know about how to set up the status of the involved variables
@@ -869,7 +869,7 @@ namespace soplex
     /** This involves resetting all counters to 0 and setting up a regular
         default basis consisting of slacks, artificial variables or bounds.
     */
-    virtual void load(SPxSolver<R>* lp, bool initSlackBasis = true);
+    virtual void load(SPxSolverBase<R>* lp, bool initSlackBasis = true);
 
     /// unloads the LP from the basis.
     virtual void unLoad()
@@ -932,13 +932,13 @@ namespace soplex
     /**@name Constructors / Destructors */
     //@{
     /// default constructor.
-    SPxBasis<R>(Timer::TYPE ttype = Timer::USER_TIME);
+    SPxBasisBase<R>(Timer::TYPE ttype = Timer::USER_TIME);
     /// copy constructor
-    SPxBasis<R>(const SPxBasis<R>& old);
+    SPxBasisBase<R>(const SPxBasisBase<R>& old);
     /// assignment operator
-    SPxBasis<R>& operator=(const SPxBasis<R>& rhs);
+    SPxBasisBase<R>& operator=(const SPxBasisBase<R>& rhs);
     /// destructor.
-    virtual ~SPxBasis<R>();
+    virtual ~SPxBasisBase<R>();
     //@}
    
 
@@ -947,7 +947,7 @@ namespace soplex
     //--------------------------------------
     /**@name Protected helpers */
     //@{
-    /// loads \ref soplex::SPxBasis<R>::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis<R>::theBaseId "theBaseId".
+    /// loads \ref soplex::SPxBasisBase<R>::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasisBase<R>::theBaseId "theBaseId".
     /** This method must  be called whenever there is a chance, that the vector
         pointers may have changed due to manipulations of the LP.
     */
@@ -978,7 +978,7 @@ namespace soplex
   /// Pretty-printing of basis status.
   template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const typename SPxBasis<R>::SPxStatus& status );
+                            const typename SPxBasisBase<R>::SPxStatus& status );
 
 
 } // namespace soplex

@@ -50,13 +50,13 @@ int main()
    mysoplex.writeFileT("dump.lp", NULL, NULL, NULL);
 
    /* solve LP */
-   SPxSolver<R>::Status stat;
+   SPxSolverBase<R>::Status stat;
    DVector prim(2);
    DVector dual(1);
    stat = mysoplex.optimize();
 
    /* get solution */
-   if( stat == SPxSolver<R>::OPTIMAL )
+   if( stat == SPxSolverBase<R>::OPTIMAL )
    {
       mysoplex.getPrimalT(prim);
       mysoplex.getDualT(dual);

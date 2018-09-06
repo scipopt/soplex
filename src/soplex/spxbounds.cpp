@@ -30,7 +30,7 @@ namespace soplex
       can directly use vectors \f$l\f$ and \f$u\f$ as feasibility bounds.  
   */
   template <>
-  void SPxSolver<Real>::setPrimalBounds()
+  void SPxSolverBase<Real>::setPrimalBounds()
   {
 
     theUCbound = SPxLP::upper();
@@ -75,25 +75,25 @@ namespace soplex
       \f$\infty\f$ or \f$-\infty\f$, respectively.
   */
   template <>
-  void SPxSolver<Real>::clearDualBounds(
-                                     typename SPxBasis<Real>::Desc::Status stat,
+  void SPxSolverBase<Real>::clearDualBounds(
+                                     typename SPxBasisBase<Real>::Desc::Status stat,
                                      Real&                  upp,
                                      Real&                  lw) const
   {
 
     switch (stat)
       {
-      case SPxBasis<Real>::Desc::P_ON_UPPER + SPxBasis<Real>::Desc::P_ON_LOWER :
-      case SPxBasis<Real>::Desc::D_FREE :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER + SPxBasisBase<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::D_FREE :
         upp = infinity;
         lw  = -infinity;
         break;
-      case SPxBasis<Real>::Desc::P_ON_UPPER :
-      case SPxBasis<Real>::Desc::D_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+      case SPxBasisBase<Real>::Desc::D_ON_LOWER :
         upp = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_ON_LOWER :
-      case SPxBasis<Real>::Desc::D_ON_UPPER :
+      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::D_ON_UPPER :
         lw  = -infinity;
         break;
 
@@ -103,12 +103,12 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::setDualColBounds()
+  void SPxSolverBase<Real>::setDualColBounds()
   {
 
     assert(rep() == COLUMN);
 
-    const typename SPxBasis<Real>::Desc& ds = this->desc();
+    const typename SPxBasisBase<Real>::Desc& ds = this->desc();
 
     int i;
 
@@ -134,7 +134,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::setDualRowBounds()
+  void SPxSolverBase<Real>::setDualRowBounds()
   {
 
     assert(rep() == ROW);
@@ -167,21 +167,21 @@ namespace soplex
       column index |n|.
   */
   template <>
-  void SPxSolver<Real>::setEnterBound4Row(int i, int n)
+  void SPxSolverBase<Real>::setEnterBound4Row(int i, int n)
   {
     assert(baseId(i).isSPxRowId());
     assert(number(SPxRowId(baseId(i))) == n);
     switch (this->desc().rowStatus(n))
       {
-      case SPxBasis<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
         theLBbound[i] = -infinity;
         theUBbound[i] = theURbound[n];
         break;
-      case SPxBasis<Real>::Desc::P_ON_UPPER :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = theLRbound[n];
         theUBbound[i] = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_FIXED:
+      case SPxBasisBase<Real>::Desc::P_FIXED:
         theLBbound[i] = -infinity;
         theUBbound[i] = infinity;
         break;
@@ -193,21 +193,21 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::setEnterBound4Col(int i, int n)
+  void SPxSolverBase<Real>::setEnterBound4Col(int i, int n)
   {
     assert(baseId(i).isSPxColId());
     assert(number(SPxColId(baseId(i))) == n);
     switch (this->desc().colStatus(n))
       {
-      case SPxBasis<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
         theLBbound[i] = -infinity;
         theUBbound[i] = theUCbound[n];
         break;
-      case SPxBasis<Real>::Desc::P_ON_UPPER :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = theLCbound[n];
         theUBbound[i] = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_FIXED:
+      case SPxBasisBase<Real>::Desc::P_FIXED:
         theLBbound[i] = -infinity;
         theUBbound[i] = infinity;
         break;
@@ -218,7 +218,7 @@ namespace soplex
       }
   }
   template <>
-  void SPxSolver<Real>::setEnterBounds()
+  void SPxSolverBase<Real>::setEnterBounds()
   {
 
     for (int i = 0; i < dim(); ++i)
@@ -239,25 +239,25 @@ namespace soplex
       variable being the |n|-th column.
   */
   template <>
-  void SPxSolver<Real>::setLeaveBound4Row(int i, int n)
+  void SPxSolverBase<Real>::setLeaveBound4Row(int i, int n)
   {
     assert(baseId(i).isSPxRowId());
     assert(this->number(SPxRowId(baseId(i))) == n);
     switch (this->desc().rowStatus(n))
       {
-      case SPxBasis<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
         theLBbound[i] = -infinity;
         theUBbound[i] = -this->maxRowObj(n);
         break;
-      case SPxBasis<Real>::Desc::P_ON_UPPER :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = -this->maxRowObj(n);
         theUBbound[i] = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_ON_UPPER + SPxBasis<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER + SPxBasisBase<Real>::Desc::P_ON_LOWER :
         theLBbound[i] = -infinity;
         theUBbound[i] = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_FREE :
+      case SPxBasisBase<Real>::Desc::P_FREE :
         theLBbound[i] = -this->maxRowObj(n);
         theUBbound[i] = -this->maxRowObj(n);
         break;
@@ -270,7 +270,7 @@ namespace soplex
       }
   }
   template <>
-  void SPxSolver<Real>::setLeaveBound4Col(int i, int n)
+  void SPxSolverBase<Real>::setLeaveBound4Col(int i, int n)
   {
 
     assert(baseId(i).isSPxColId());
@@ -278,19 +278,19 @@ namespace soplex
 
     switch (this->desc().colStatus(n))
       {
-      case SPxBasis<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
         theLBbound[i] = -infinity;
         theUBbound[i] = 0;
         break;
-      case SPxBasis<Real>::Desc::P_ON_UPPER :
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = 0;
         theUBbound[i] = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_FIXED :
+      case SPxBasisBase<Real>::Desc::P_FIXED :
         theLBbound[i] = -infinity;
         theUBbound[i] = infinity;
         break;
-      case SPxBasis<Real>::Desc::P_FREE :
+      case SPxBasisBase<Real>::Desc::P_FREE :
         theLBbound[i] = theUBbound[i] = 0;
         break;
 
@@ -302,7 +302,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::setLeaveBounds()
+  void SPxSolverBase<Real>::setLeaveBounds()
   {
 
     for (int i = 0; i < dim(); ++i)
@@ -317,7 +317,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::testBounds() const
+  void SPxSolverBase<Real>::testBounds() const
   {
 
     if (type() == ENTER)

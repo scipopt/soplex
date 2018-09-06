@@ -117,7 +117,7 @@ namespace soplex
          return;
 
       case SPxSimplifier<Real>::VANISHED:
-         _status = SPxSolver<Real>::OPTIMAL;
+         _status = SPxSolverBase<Real>::OPTIMAL;
          _storeSolutionRealFromPresol();
          return;
 
@@ -128,7 +128,7 @@ namespace soplex
       // process result
       switch( _status )
       {
-      case SPxSolver<Real>::OPTIMAL:
+      case SPxSolverBase<Real>::OPTIMAL:
          _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
          // apply polishing on original problem
          if( _applyPolishing )
@@ -139,9 +139,9 @@ namespace soplex
          }
          break;
 
-      case SPxSolver<Real>::UNBOUNDED:
-      case SPxSolver<Real>::INFEASIBLE:
-      case SPxSolver<Real>::INForUNBD:
+      case SPxSolverBase<Real>::UNBOUNDED:
+      case SPxSolverBase<Real>::INFEASIBLE:
+      case SPxSolverBase<Real>::INForUNBD:
          // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
          if( !_isRealLPLoaded )
          {
@@ -156,7 +156,7 @@ namespace soplex
          }
          break;
 
-      case SPxSolver<Real>::SINGULAR:
+      case SPxSolverBase<Real>::SINGULAR:
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
@@ -167,7 +167,7 @@ namespace soplex
          _hasBasis = false;
          break;
 
-      case SPxSolver<Real>::ABORT_CYCLING:
+      case SPxSolverBase<Real>::ABORT_CYCLING:
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
@@ -176,11 +176,11 @@ namespace soplex
             return;
          }
          // FALLTHROUGH
-      case SPxSolver<Real>::ABORT_TIME:
-      case SPxSolver<Real>::ABORT_ITER:
-      case SPxSolver<Real>::ABORT_VALUE:
-      case SPxSolver<Real>::REGULAR:
-      case SPxSolver<Real>::RUNNING:
+      case SPxSolverBase<Real>::ABORT_TIME:
+      case SPxSolverBase<Real>::ABORT_ITER:
+      case SPxSolverBase<Real>::ABORT_VALUE:
+      case SPxSolverBase<Real>::REGULAR:
+      case SPxSolverBase<Real>::RUNNING:
          _storeSolutionReal(false);
          break;
 
@@ -273,7 +273,7 @@ namespace soplex
          _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
          _solver.setScalingInfo(false);
          _applyPolishing = true;
-         _solver.setSolutionPolishing(SPxSolver<R>::POLISH_OFF);
+         _solver.setSolutionPolishing(SPxSolverBase<R>::POLISH_OFF);
       }
 
       _statistics->preprocessingTime->stop();
@@ -300,7 +300,7 @@ namespace soplex
    {
       assert(!_isRealLPLoaded || _scaler != 0);
       assert(_simplifier != 0 || _scaler != 0);
-      assert(_status == SPxSolver<R>::INFEASIBLE || _status == SPxSolver<R>::INForUNBD || _status == SPxSolver<R>::UNBOUNDED);
+      assert(_status == SPxSolverBase<R>::INFEASIBLE || _status == SPxSolverBase<R>::INForUNBD || _status == SPxSolverBase<R>::UNBOUNDED);
 
       // if simplifier was active, then we unsimplify to get the basis
       if( _simplifier )
@@ -435,42 +435,42 @@ namespace soplex
       _solReal._redCost.reDim(_solver.nCols(), false);
 
       // check primal status consistency and query solution status
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::ERROR);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis<Real>::PRIMAL || status() != SPxSolver<Real>::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis<Real>::UNBOUNDED || status() == SPxSolver<Real>::UNBOUNDED);
-      assert(_solver.basis().status() == SPxBasis<Real>::UNBOUNDED || _solver.basis().status() == SPxBasis<Real>::NO_PROBLEM || status() != SPxSolver<Real>::UNBOUNDED);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::ERROR);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::NO_RATIOTESTER);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::NO_PRICER);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::NO_SOLVER);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::NOT_INIT);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::SINGULAR);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::NO_PROBLEM);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::UNBOUNDED);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::PRIMAL || status() != SPxSolverBase<Real>::INFEASIBLE);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::UNBOUNDED || status() == SPxSolverBase<Real>::UNBOUNDED);
+      assert(_solver.basis().status() == SPxBasisBase<Real>::UNBOUNDED || _solver.basis().status() == SPxBasisBase<Real>::NO_PROBLEM || status() != SPxSolverBase<Real>::UNBOUNDED);
 
-      _solReal._isPrimalFeasible = (status() == SPxSolver<Real>::OPTIMAL
-         || ((_solver.basis().status() == SPxBasis<Real>::PRIMAL || _solver.basis().status() == SPxBasis<Real>::UNBOUNDED)
+      _solReal._isPrimalFeasible = (status() == SPxSolverBase<Real>::OPTIMAL
+         || ((_solver.basis().status() == SPxBasisBase<Real>::PRIMAL || _solver.basis().status() == SPxBasisBase<Real>::UNBOUNDED)
             && _solver.shift() < 10.0 * realParam(SoPlexBase<Real>::EPSILON_ZERO)));
 
-      _solReal._hasPrimalRay = (status() == SPxSolver<Real>::UNBOUNDED && _isRealLPLoaded);
+      _solReal._hasPrimalRay = (status() == SPxSolverBase<Real>::UNBOUNDED && _isRealLPLoaded);
 
       // check dual status consistency and query solution status
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::ERROR);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::NO_RATIOTESTER);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::NO_PRICER);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::NO_SOLVER);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::NOT_INIT);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::SINGULAR);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::NO_PROBLEM);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::UNBOUNDED);
-      assert(_solver.basis().status() != SPxBasis<Real>::DUAL || status() != SPxSolver<Real>::INFEASIBLE);
-      assert(_solver.basis().status() != SPxBasis<Real>::INFEASIBLE || status() == SPxSolver<Real>::INFEASIBLE);
-      assert(_solver.basis().status() == SPxBasis<Real>::INFEASIBLE || _solver.basis().status() == SPxBasis<Real>::NO_PROBLEM || status() != SPxSolver<Real>::INFEASIBLE);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::ERROR);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::NO_RATIOTESTER);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::NO_PRICER);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::NO_SOLVER);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::NOT_INIT);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::SINGULAR);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::NO_PROBLEM);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::UNBOUNDED);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::DUAL || status() != SPxSolverBase<Real>::INFEASIBLE);
+      assert(_solver.basis().status() != SPxBasisBase<Real>::INFEASIBLE || status() == SPxSolverBase<Real>::INFEASIBLE);
+      assert(_solver.basis().status() == SPxBasisBase<Real>::INFEASIBLE || _solver.basis().status() == SPxBasisBase<Real>::NO_PROBLEM || status() != SPxSolverBase<Real>::INFEASIBLE);
 
-      _solReal._isDualFeasible = (status() == SPxSolver<Real>::OPTIMAL
-         || ((_solver.basis().status() == SPxBasis<Real>::DUAL || _solver.basis().status() == SPxBasis<Real>::INFEASIBLE)
+      _solReal._isDualFeasible = (status() == SPxSolverBase<Real>::OPTIMAL
+         || ((_solver.basis().status() == SPxBasisBase<Real>::DUAL || _solver.basis().status() == SPxBasisBase<Real>::INFEASIBLE)
             && _solver.shift() < 10.0 * realParam(SoPlexBase<Real>::EPSILON_ZERO)));
 
-      _solReal._hasDualFarkas = (status() == SPxSolver<Real>::INFEASIBLE && _isRealLPLoaded);
+      _solReal._hasDualFarkas = (status() == SPxSolverBase<Real>::INFEASIBLE && _isRealLPLoaded);
 
       // get infeasibility or unboundedness proof if available
       if( _solReal._hasPrimalRay )
@@ -518,7 +518,7 @@ namespace soplex
          {
             // pass solution data of transformed problem to simplifier
             _simplifier->unsimplify(_solReal._primal, _solReal._dual, _solReal._slacks, _solReal._redCost,
-                                    _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), status() == SPxSolver<Real>::OPTIMAL);
+                                    _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), status() == SPxSolverBase<Real>::OPTIMAL);
          }
          catch( const SPxException& E )
          {
@@ -545,7 +545,7 @@ namespace soplex
          // load unsimplified basis into solver
          assert(_basisStatusRows.size() == numRowsT());
          assert(_basisStatusCols.size() == this->numColsT());
-         _solver.setBasisStatus(SPxBasis<Real>::REGULAR);
+         _solver.setBasisStatus(SPxBasisBase<Real>::REGULAR);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
          _hasBasis = true;
       }

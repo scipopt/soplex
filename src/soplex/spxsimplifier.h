@@ -188,7 +188,7 @@ namespace soplex
     virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false) = 0;
     /// reconstructs an optimal solution for the unsimplified LP.
     virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
-                            const typename SPxSolver<R>::VarStatus[], const typename SPxSolver<R>::VarStatus[], bool isOptimal = true) = 0;
+                            const typename SPxSolverBase<R>::VarStatus[], const typename SPxSolverBase<R>::VarStatus[], bool isOptimal = true) = 0;
     /// returns result status of the simplification
     virtual Result result() const = 0;
     /// specifies whether an optimal solution has already been unsimplified.
@@ -209,13 +209,13 @@ namespace soplex
     virtual const Vector& unsimplifiedRedCost() = 0;
 
     /// gets basis status for a single row.
-    virtual typename SPxSolver<R>::VarStatus getBasisRowStatus(int) const = 0;
+    virtual typename SPxSolverBase<R>::VarStatus getBasisRowStatus(int) const = 0;
 
     /// gets basis status for a single column.
-    virtual typename SPxSolver<R>::VarStatus getBasisColStatus(int) const = 0;
+    virtual typename SPxSolverBase<R>::VarStatus getBasisColStatus(int) const = 0;
 
     /// get optimal basis.
-    virtual void getBasis(typename SPxSolver<R>::VarStatus[], typename SPxSolver<R>::VarStatus[], const int rowsSize = -1, const int colsSize = -1) const = 0;
+    virtual void getBasis(typename SPxSolverBase<R>::VarStatus[], typename SPxSolverBase<R>::VarStatus[], const int rowsSize = -1, const int colsSize = -1) const = 0;
 
     /// get objective offset.
     virtual Real getObjoffset() const

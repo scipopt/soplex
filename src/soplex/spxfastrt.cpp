@@ -46,7 +46,7 @@ namespace soplex
 #define EPSILON         1e-10
 
   template <>
-  void SPxFastRT<Real>::setType(typename SPxSolver<Real>::Type type);
+  void SPxFastRT<Real>::setType(typename SPxSolverBase<Real>::Type type);
 
 
   template <>
@@ -119,7 +119,7 @@ namespace soplex
     int i, sel;
     Real x, y, max;
     Real u, l;
-    bool leaving = this->m_type == SPxSolver<Real>::LEAVE;
+    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
 
     Real mabs = maxabs;
 
@@ -275,7 +275,7 @@ namespace soplex
     int i, sel;
     Real x, y, max;
     Real u, l;
-    bool leaving = this->m_type == SPxSolver<Real>::LEAVE;
+    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
 
     Real mabs = maxabs;
 
@@ -423,7 +423,7 @@ namespace soplex
                              Real& val,
                              Real& maxabs)
   {
-    assert(m_type == SPxSolver<Real>::ENTER);
+    assert(m_type == SPxSolverBase<Real>::ENTER);
     return maxDelta(val, maxabs,
                     this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(), 0, 1);
   }
@@ -433,7 +433,7 @@ namespace soplex
                              Real& val,
                              Real& maxabs)
   {
-    assert(m_type == SPxSolver<Real>::ENTER);
+    assert(m_type == SPxSolverBase<Real>::ENTER);
     return minDelta(val, maxabs,
                     this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(), 0, 1);
   }
@@ -514,7 +514,7 @@ namespace soplex
   {
     int i;
     Real x, y;
-    bool leaving = this->m_type == SPxSolver<Real>::LEAVE;
+    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
 
     const Real* up = upBound.get_const_ptr();
     const Real* low = lowBound.get_const_ptr();
@@ -594,7 +594,7 @@ namespace soplex
   {
     int i;
     Real x, y;
-    bool leaving = this->m_type == SPxSolver<Real>::LEAVE;
+    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
 
     const Real* up = upBound.get_const_ptr();
     const Real* low = lowBound.get_const_ptr();
@@ -667,7 +667,7 @@ namespace soplex
   {
     Real best = -infinity;
     bestDelta = 0.0;
-    assert(m_type == SPxSolver<Real>::ENTER);
+    assert(m_type == SPxSolverBase<Real>::ENTER);
     return maxSelect(val, stab, best, bestDelta, max,
                      this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(),  0, 1);
   }
@@ -714,7 +714,7 @@ namespace soplex
   {
     Real best = infinity;
     bestDelta = 0.0;
-    assert(m_type == SPxSolver<Real>::ENTER);
+    assert(m_type == SPxSolverBase<Real>::ENTER);
     return minSelect(val, stab, best, bestDelta, max,
                      this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(), 0, 1);
   }
@@ -813,7 +813,7 @@ namespace soplex
         if (sel < -fastDelta / maxabs)
           {
             sel = 0.0;
-            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasis<Real>::Desc::D_ON_BOTH )
+            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
               {
                 if (x < 0.0)
                   this->thesolver->shiftLBbound(leave, vec[leave]);
@@ -852,7 +852,7 @@ namespace soplex
         if (sel > fastDelta / maxabs)
           {
             sel = 0.0;
-            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasis<Real>::Desc::D_ON_BOTH )
+            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
               {
                 if (x > 0.0)
                   this->thesolver->shiftLBbound(leave, vec[leave]);
@@ -881,7 +881,7 @@ namespace soplex
     int leave = -1;
     int cnt = 0;
 
-    assert( m_type == SPxSolver<Real>::ENTER );
+    assert( m_type == SPxSolverBase<Real>::ENTER );
 
     // force instable pivot iff true (see explanation in enter.cpp and spxsolve.cpp)
     bool instable = this->solver()->instableEnter;
@@ -900,7 +900,7 @@ namespace soplex
             leave = maxDelta(max, maxabs);
 
             assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) ||
-                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasis<Real>::Desc::P_FIXED);
+                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
 
             if( max == val || leave == -1 )
               {
@@ -941,7 +941,7 @@ namespace soplex
             leave = minDelta(max, maxabs);
 
             assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) ||
-                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasis<Real>::Desc::P_FIXED);
+                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
 
             if( max == val || leave == -1 )
               {
@@ -962,7 +962,7 @@ namespace soplex
                 else
                   leave = minSelect(sel, stab, bestDelta, max);
 
-                assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasis<Real>::Desc::P_FIXED);
+                assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
 
                 if (bestDelta < DELTA_SHIFT*TRIES)
                   cnt++;
@@ -997,10 +997,10 @@ namespace soplex
 
       if( polish && leave >= 0 )
         {
-          assert( this->thesolver->rep() == SPxSolver<Real>::COLUMN );
+          assert( this->thesolver->rep() == SPxSolverBase<Real>::COLUMN );
           SPxId leaveId = this->thesolver->baseId(leave);
           // decide whether the chosen leave index contributes to the polishing objective
-          if( this->thesolver->polishObj == SPxSolver<Real>::POLISH_INTEGRALITY )
+          if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_INTEGRALITY )
             {
               // only allow (integer) variables to leave the basis
               if( leaveId.isSPxRowId() )
@@ -1011,7 +1011,7 @@ namespace soplex
                     return -1;
                 }
             }
-          else if( this->thesolver->polishObj == SPxSolver<Real>::POLISH_FRACTIONALITY )
+          else if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_FRACTIONALITY )
             {
               // only allow slacks and continuous variables to leave the basis
               if( this->thesolver->integerVariables.size() == this->thesolver->nCols() )
@@ -1031,7 +1031,7 @@ namespace soplex
           tighten();
       }
 
-    assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasis<Real>::Desc::P_FIXED);
+    assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
 
     return leave;
   }
@@ -1261,7 +1261,7 @@ namespace soplex
     int nr;
     int cnt = 0;
 
-    assert( m_type == SPxSolver<Real>::LEAVE );
+    assert( m_type == SPxSolverBase<Real>::LEAVE );
 
     // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
     bool instable = this->solver()->instableLeave;
@@ -1371,9 +1371,9 @@ namespace soplex
 
       if( polish && enterId.isValid() )
         {
-          assert( this->thesolver->rep() == SPxSolver<Real>::ROW );
+          assert( this->thesolver->rep() == SPxSolverBase<Real>::ROW );
           // decide whether the chosen entering index contributes to the polishing objective
-          if( this->thesolver->polishObj == SPxSolver<Real>::POLISH_INTEGRALITY )
+          if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_INTEGRALITY )
             {
               // only allow (integer) variables to enter the basis
               if( enterId.isSPxRowId() )
@@ -1381,7 +1381,7 @@ namespace soplex
               else if( this->thesolver->integerVariables.size() == this->thesolver->nCols() && this->thesolver->integerVariables[this->thesolver->number(enterId)] == 0)
                 return SPxId();
             }
-          else if( this->thesolver->polishObj == SPxSolver<Real>::POLISH_FRACTIONALITY )
+          else if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_FRACTIONALITY )
             {
               // only allow slacks and continuous variables to enter the basis
               if( this->thesolver->integerVariables.size() == this->thesolver->nCols() )
@@ -1408,14 +1408,14 @@ namespace soplex
   }
 
   template <>
-  void SPxFastRT<Real>::load(SPxSolver<Real>* spx)
+  void SPxFastRT<Real>::load(SPxSolverBase<Real>* spx)
   {
     this->thesolver = spx;
     setType(spx->type());
   }
 
   template <>
-  void SPxFastRT<Real>::setType(typename SPxSolver<Real>::Type type)
+  void SPxFastRT<Real>::setType(typename SPxSolverBase<Real>::Type type)
   {
     this->m_type = type;
 

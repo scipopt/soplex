@@ -29,7 +29,7 @@
 namespace soplex
 {
   template <>
-  bool SPxSolver<Real>::writeState(
+  bool SPxSolverBase<Real>::writeState(
                                 const char*    filename,
                                 const NameSet* rowNames,
                                 const NameSet* colNames,
@@ -52,7 +52,7 @@ namespace soplex
         << "." << SOPLEX_SUBVERSION << std::endl << std::endl;
     ofs << "# run SoPlex as follows:" << std::endl;
     ofs << "# bin/soplex --loadset=spxcheck.set --readbas=spxcheck.bas spxcheck.mps\n" << std::endl;
-    ofs << "int:representation = " << ( rep() == SPxSolver<Real>::COLUMN ? "1" : "2" ) << std::endl;
+    ofs << "int:representation = " << ( rep() == SPxSolverBase<Real>::COLUMN ? "1" : "2" ) << std::endl;
     ofs << "int:factor_update_max = " << basis().getMaxUpdates() << std::endl;
     ofs << "int:pricer = ";
     if (!strcmp(pricer()->getName(), "Auto"))

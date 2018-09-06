@@ -99,7 +99,7 @@ namespace soplex {
         passedValidation = false;
         reason += "Objective Violation; ";
       }
-    if( SPxSolver<Real>::OPTIMAL == soplex.status() )
+    if( SPxSolverBase<Real>::OPTIMAL == soplex.status() )
       {
         soplex.getBoundViolationT(maxBoundViolation, sumBoundViolation);
         soplex.getRowViolationT(maxRowViolation, sumRowViolation);

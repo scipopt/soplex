@@ -144,11 +144,11 @@ namespace soplex
       /**@name Access / modification */
       //@{
       /// sets the solver
-      virtual void load(SPxSolver<R>* base);
+      virtual void load(SPxSolverBase<R>* base);
       /// set entering/leaving algorithm
-      void setType(typename SPxSolver<R>::Type tp);
+      void setType(typename SPxSolverBase<R>::Type tp);
       /// set row/column representation
-      void setRep(typename SPxSolver<R>::Representation rep);
+      void setRep(typename SPxSolverBase<R>::Representation rep);
       ///
       virtual int selectLeave();
       ///

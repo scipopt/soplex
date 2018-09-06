@@ -28,7 +28,7 @@
 namespace soplex
 {
   template <>
-  void SPxSteepPR<Real>::setupWeights(typename SPxSolver<Real>::Type type);
+  void SPxSteepPR<Real>::setupWeights(typename SPxSolverBase<Real>::Type type);
 
   template <>
   int SPxSteepPR<Real>::selectLeaveX(Real tol);
@@ -74,7 +74,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSteepPR<Real>::load(SPxSolver<Real>* base)
+  void SPxSteepPR<Real>::load(SPxSolverBase<Real>* base)
   {
     this->thesolver = base;
 
@@ -88,7 +88,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSteepPR<Real>::setType(typename SPxSolver<Real>::Type type)
+  void SPxSteepPR<Real>::setType(typename SPxSolverBase<Real>::Type type)
   {
     workRhs.setEpsilon(this->thesolver->epsilon());
 
@@ -101,7 +101,7 @@ namespace soplex
     bestPrices.setMax(this->thesolver->dim());
     prices.reMax(this->thesolver->dim());
 
-    if( type == SPxSolver<Real>::ENTER )
+    if( type == SPxSolverBase<Real>::ENTER )
       {
         bestPricesCo.clear();
         bestPricesCo.setMax(this->thesolver->coDim());
@@ -110,7 +110,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSteepPR<Real>::setupWeights(typename SPxSolver<Real>::Type type)
+  void SPxSteepPR<Real>::setupWeights(typename SPxSolverBase<Real>::Type type)
   {
     int i;
     int endDim = 0;
@@ -120,7 +120,7 @@ namespace soplex
 
     if( setup == DEFAULT )
       {
-        if( type == SPxSolver<Real>::ENTER )
+        if( type == SPxSolverBase<Real>::ENTER )
           {
             if( this->thesolver->weightsAreSetup )
               {
@@ -144,7 +144,7 @@ namespace soplex
           }
         else
           {
-            assert(type == SPxSolver<Real>::LEAVE);
+            assert(type == SPxSolverBase<Real>::LEAVE);
 
             if( this->thesolver->weightsAreSetup )
               {
@@ -164,7 +164,7 @@ namespace soplex
       {
         MSG_INFO1( (*this->thesolver->spxout), (*this->thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl; )
 
-          if (type == SPxSolver<Real>::ENTER)
+          if (type == SPxSolverBase<Real>::ENTER)
             {
               coWeights.reDim(this->thesolver->dim(), false);
               for (i = this->thesolver->dim() - 1; i >= endDim; --i)
@@ -175,7 +175,7 @@ namespace soplex
             }
           else
             {
-              assert(type == SPxSolver<Real>::LEAVE);
+              assert(type == SPxSolverBase<Real>::LEAVE);
               coWeights.reDim(this->thesolver->dim(), false);
               SSVector tmp(this->thesolver->dim(), this->thesolver->epsilon());
               for( i = this->thesolver->dim() - 1; i >= endDim && !this->thesolver->isTimeLimitReached(); --i )
@@ -189,7 +189,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSteepPR<Real>::setRep(typename SPxSolver<Real>::Representation)
+  void SPxSteepPR<Real>::setRep(typename SPxSolverBase<Real>::Representation)
   {
     if (workVec.dim() != this->thesolver->dim())
       {
@@ -205,7 +205,7 @@ namespace soplex
   template <>
   void SPxSteepPR<Real>::left4(int n, SPxId id)
   {
-    assert(this->thesolver->type() == SPxSolver<Real>::LEAVE);
+    assert(this->thesolver->type() == SPxSolverBase<Real>::LEAVE);
 
     if (id.isValid())
       {
@@ -478,7 +478,7 @@ namespace soplex
   template <>
   void SPxSteepPR<Real>::entered4(SPxId /* id */, int n)
   {
-    assert(this->thesolver->type() == SPxSolver<Real>::ENTER);
+    assert(this->thesolver->type() == SPxSolverBase<Real>::ENTER);
 
     if (n >= 0 && n < this->thesolver->dim())
       {
@@ -996,7 +996,7 @@ namespace soplex
     n = weights.dim();
     weights.reDim(this->thesolver->coDim());
 
-    if (this->thesolver->type() == SPxSolver<Real>::ENTER)
+    if (this->thesolver->type() == SPxSolverBase<Real>::ENTER)
       {
         for (; n < weights.dim(); ++n)
           weights[n] = 2;
@@ -1028,7 +1028,7 @@ namespace soplex
   {
     assert(thesolver != 0);
     DVector& weights = this->thesolver->weights;
-    if (this->thesolver->type() == SPxSolver<Real>::ENTER)
+    if (this->thesolver->type() == SPxSolverBase<Real>::ENTER)
       {
         int i;
         int j = weights.dim();
@@ -1071,7 +1071,7 @@ namespace soplex
 #ifdef ENABLE_CONSISTENCY_CHECKS
     DVector& w = this->thesolver->weights;
     DVector& coW = this->thesolver->coWeights;
-    if (thesolver != 0 && this->thesolver->type() == SPxSolver<Real>::LEAVE && setup == EXACT)
+    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<Real>::LEAVE && setup == EXACT)
       {
         int i;
         SSVector tmp(this->thesolver->dim(), this->thesolver->epsilon());
@@ -1087,7 +1087,7 @@ namespace soplex
           }
       }
 
-    if (thesolver != 0 && this->thesolver->type() == SPxSolver<Real>::ENTER)
+    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<Real>::ENTER)
       {
         int i;
         for (i = this->thesolver->dim() - 1; i >= 0; --i)

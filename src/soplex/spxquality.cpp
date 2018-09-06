@@ -23,7 +23,7 @@ namespace soplex
 {
 
   template <>
-  void SPxSolver<Real>::qualConstraintViolation(Real& maxviol, Real& sumviol) const
+  void SPxSolverBase<Real>::qualConstraintViolation(Real& maxviol, Real& sumviol) const
   {
     maxviol = 0.0;
     sumviol = 0.0;
@@ -59,7 +59,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::qualBoundViolation(
+  void SPxSolverBase<Real>::qualBoundViolation(
                                         Real& maxviol, Real& sumviol) const
   {
     maxviol = 0.0;
@@ -89,7 +89,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::qualSlackViolation(Real& maxviol, Real& sumviol) const
+  void SPxSolverBase<Real>::qualSlackViolation(Real& maxviol, Real& sumviol) const
   {
     maxviol = 0.0;
     sumviol = 0.0;
@@ -119,7 +119,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolver<Real>::qualRedCostViolation(Real& maxviol, Real& sumviol) const
+  void SPxSolverBase<Real>::qualRedCostViolation(Real& maxviol, Real& sumviol) const
   {   
     maxviol = 0.0;
     sumviol = 0.0;

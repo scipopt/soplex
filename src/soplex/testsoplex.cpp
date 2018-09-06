@@ -89,7 +89,7 @@ namespace soplex
   template <class R>
    void SoPlexBase<R>::_checkBasisScaling()
    {
-      if( _status != SPxSolver<R>::OPTIMAL )
+      if( _status != SPxSolverBase<R>::OPTIMAL )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: skipping test on non optimal bases\n" );
          return;
@@ -100,7 +100,7 @@ namespace soplex
       DVector** binvrow = 0;
       int* inds = 0;
       int basisdim = _solver.nRows(); // do all operations with regard to the column basis
-      bool colrep = (_solver.rep() == SPxSolver<R>::COLUMN);
+      bool colrep = (_solver.rep() == SPxSolverBase<R>::COLUMN);
       spx_alloc(binvcol, basisdim);
       spx_alloc(binvrow, basisdim);
       spx_alloc(inds, basisdim);
@@ -145,7 +145,7 @@ namespace soplex
                   MSG_INFO1( spxout, spxout << "ERROR: col " << i << " " << j << ", " << result[j] << std::endl );
                sumerror += error;
             }
-            assert(_solver.rep() == SPxSolver<R>::ROW || sumerror < _solver.feastol());
+            assert(_solver.rep() == SPxSolverBase<R>::ROW || sumerror < _solver.feastol());
          }
       }
 
@@ -172,7 +172,7 @@ namespace soplex
       if( _solver.isScaled() )
       {
          MSG_INFO1( spxout, spxout << "DEBUG: unscaling LP\n"; )
-//         _solver.setRep(SPxSolver<R>::COLUMN);
+//         _solver.setRep(SPxSolverBase<R>::COLUMN);
          _solver.unscaleLPandReloadBasis();
 //         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 //         _solver.solve();

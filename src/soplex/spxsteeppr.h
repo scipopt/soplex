@@ -57,7 +57,7 @@ public:
    };
    //@}
    /// setup steepest edge weights
-   void setupWeights(typename SPxSolver<R>::Type type);
+   void setupWeights(typename SPxSolverBase<R>::Type type);
 
 private:
 
@@ -169,13 +169,13 @@ public:
    /**@name Access / modification */
    //@{
    /// sets the solver
-   virtual void load(SPxSolver<R>* base);
+   virtual void load(SPxSolverBase<R>* base);
    /// clear solver and preferences
    virtual void clear();
    /// set entering/leaving algorithm
-   virtual void setType(typename SPxSolver<R>::Type);
+   virtual void setType(typename SPxSolverBase<R>::Type);
    /// set row/column representation
-   virtual void setRep(typename SPxSolver<R>::Representation rep);
+   virtual void setRep(typename SPxSolverBase<R>::Representation rep);
    ///
    virtual int selectLeave();
    ///

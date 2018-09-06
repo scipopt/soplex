@@ -563,16 +563,16 @@ public:
    //@{
 
    /// optimize the given LP
-   typename SPxSolver<R>::Status optimize();
+   typename SPxSolverBase<R>::Status optimize();
 
    // old name for backwards compatibility
-   typename SPxSolver<R>::Status solve()
+   typename SPxSolverBase<R>::Status solve()
    {
       return optimize();
    }
 
    /// returns the current solver status
-   typename SPxSolver<R>::Status status() const;
+   typename SPxSolverBase<R>::Status status() const;
 
    /// is stored primal solution feasible?
    bool isPrimalFeasible() const;
@@ -700,16 +700,16 @@ public:
    bool hasBasis() const;
 
    /// returns the current basis status
-   typename SPxBasis<R>::SPxStatus basisStatus() const;
+   typename SPxBasisBase<R>::SPxStatus basisStatus() const;
 
    /// returns basis status for a single row
-   typename  SPxSolver<R>::VarStatus basisRowStatus(int row) const;
+   typename  SPxSolverBase<R>::VarStatus basisRowStatus(int row) const;
 
    /// returns basis status for a single column
-   typename SPxSolver<R>::VarStatus basisColStatus(int col) const;
+   typename SPxSolverBase<R>::VarStatus basisColStatus(int col) const;
 
    /// gets current basis via arrays of statuses
-   void getBasis(typename SPxSolver<R>::VarStatus rows[], typename SPxSolver<R>::VarStatus cols[]) const;
+   void getBasis(typename SPxSolverBase<R>::VarStatus rows[], typename SPxSolverBase<R>::VarStatus cols[]) const;
 
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind) const;
@@ -774,7 +774,7 @@ public:
    bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
 
    /// sets starting basis via arrays of statuses
-   void setBasis(const typename SPxSolver<R>::VarStatus rows[], const typename SPxSolver<R>::VarStatus cols[]);
+   void setBasis(const typename SPxSolverBase<R>::VarStatus rows[], const typename SPxSolverBase<R>::VarStatus cols[]);
 
    /// clears starting basis
    void clearBasis();
@@ -1491,7 +1491,7 @@ public:
 
    /// prints status
 
-   void printStatus(std::ostream& os, typename SPxSolver<R>::Status status);
+   void printStatus(std::ostream& os, typename SPxSolverBase<R>::Status status);
 
    //@}
 
@@ -1546,7 +1546,7 @@ private:
    //**@name Data for the real LP */
    //@{
 
-   SPxSolver<R> _solver;
+   SPxSolverBase<R> _solver;
    SLUFactor _slufactor;
    SPxMainSM<R> _simplifierMainSM;
    SPxEquiliSC _scalerUniequi;
@@ -1614,8 +1614,8 @@ private:
    DVectorRational _modRhs;
    DVectorRational _modObj;
    DSVectorRational _primalDualDiff;
-   DataArray< typename SPxSolver<R>::VarStatus > _storedBasisStatusRows;
-   DataArray< typename SPxSolver<R>::VarStatus > _storedBasisStatusCols;
+   DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusRows;
+   DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusCols;
    DataArray< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
@@ -1701,13 +1701,13 @@ private:
       IS_FREE = 2
    };
 
-   SPxSolver<R> _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
+   SPxSolverBase<R> _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
                           // problem will be stored in _solver and the complementary problem will be stored in
                           // _compSolver.
    SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
-   SPxBasis<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
+   SPxBasisBase<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
    DVector _transformedObj;       // the objective coefficients of the transformed problem
    DVector _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
@@ -1789,11 +1789,11 @@ private:
    //**@name Solution data */
    //@{
 
-   typename SPxSolver<R>::Status _status;
+   typename SPxSolverBase<R>::Status _status;
    int _lastSolveMode;
 
-   DataArray<typename SPxSolver<R>::VarStatus > _basisStatusRows;
-   DataArray<typename  SPxSolver<R>::VarStatus > _basisStatusCols;
+   DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
    SolReal _solReal;
    SolRational _solRational;
@@ -2098,23 +2098,23 @@ private:
    void _computeInfeasBox(SolRational& sol, bool transformed);
 
    /// solves real LP during iterative refinement
-   typename SPxSolver<R>::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
-                                           DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows,
-                                           DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& returnedBasis);
+   typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
+                                           DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+                                           DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// solves real LP with recovery mechanism
-   typename SPxSolver<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
-                                      DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows,
-                                      DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
+   typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
+                                      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+                                      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
+   void _factorizeColumnRational(SolRational& sol, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
    //@}
 
 
@@ -2176,10 +2176,10 @@ private:
    void _formDecompComplementaryProblem();
 
    /// simplifies the problem and solves
-   void _decompSimplifyAndSolve(SPxSolver<R>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
+   void _decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _decompResolveWithoutPreprocessing(SPxSolver<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
+   void _decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
    void _getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
@@ -2204,7 +2204,7 @@ private:
    void _deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
 
    /// evaluates the solution of the reduced problem for the DBDS
-   void _evaluateSolutionDecomp(SPxSolver<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
+   void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// update the reduced problem with additional columns and rows
    void _updateDecompReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
@@ -2265,7 +2265,7 @@ private:
    DualSign getOrigProbDualVariableSign(int rowNumber);
 
    /// prints a display line of the flying table for the DBDS 
-   void printDecompDisplayLine(SPxSolver<R>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
+   void printDecompDisplayLine(SPxSolverBase<R>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
 
    /// stores the problem statistics of the original problem
    void getOriginalProblemStatistics();
@@ -2290,7 +2290,7 @@ private:
 
    /// function to retrieve the original problem row basis status from the reduced and complementary problems
    void getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
-      DataArray< typename SPxSolver<R>::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
+      DataArray< typename SPxSolverBase<R>::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
 
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);

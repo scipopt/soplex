@@ -22,7 +22,7 @@
 
 namespace soplex
 {
-SoPlexBaseLegacy::SoPlexBaseLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver::Representation p_rep)
+SoPlexBaseLegacy::SoPlexBaseLegacy(SPxOut& outstream, SPxSolverBase::Type p_type, SPxSolverBase::Representation p_rep)
    : m_solver(p_type, p_rep)
    , m_postScaler(0)
    , m_simplifier(0)
@@ -65,7 +65,7 @@ SoPlexBaseLegacy& SoPlexBaseLegacy::operator=(const SoPlexBaseLegacy& base)
    if(this != &base)
    {
       SPxLP::operator=(base);
-      m_slu = base.m_slu;  // call of SLinSolver::clone() SPxBasis assignment operator not necessary (done by m_solver.setSolver(&m_slu) below)
+      m_slu = base.m_slu;  // call of SLinSolver::clone() SPxBasisBase assignment operator not necessary (done by m_solver.setSolver(&m_slu) below)
       m_solver = base.m_solver;
       m_vanished = base.m_vanished;
       m_solver.setBasisSolver(&m_slu);
@@ -113,7 +113,7 @@ SoPlexBaseLegacy& SoPlexBaseLegacy::operator=(const SoPlexBaseLegacy& base)
 
 SoPlexBaseLegacy::SoPlexBaseLegacy(const SoPlexBaseLegacy& old)
    : SPxLP(old)
-   , m_slu(old.m_slu)  // call of SLinSolver::clone() SPxBasis copy constructor not necessary (done by m_solver.setSolver(&m_slu) below)
+   , m_slu(old.m_slu)  // call of SLinSolver::clone() SPxBasisBase copy constructor not necessary (done by m_solver.setSolver(&m_slu) below)
    , m_solver(old.m_solver)
    , m_vanished(old.m_vanished)
 {
@@ -186,7 +186,7 @@ Real SoPlexBaseLegacy::objValue() const
    return x * maxObj() * Real(spxSense());
 }
 
-SPxSolver::Status SoPlexBaseLegacy::solve()
+SPxSolverBase::Status SoPlexBaseLegacy::solve()
 {
 
    if (nRows() <= 0 && nCols() <= 0) // no problem loaded
@@ -208,14 +208,14 @@ SPxSolver::Status SoPlexBaseLegacy::solve()
       switch(m_simplifier->simplify(work, m_solver.epsilon(), m_solver.feastol(), m_solver.opttol(), keepbounds))
       {
       case SPxSimplifier::UNBOUNDED :
-         m_solver.setBasisStatus(SPxBasis::UNBOUNDED);
-         return SPxSolver::UNBOUNDED;
+         m_solver.setBasisStatus(SPxBasisBase::UNBOUNDED);
+         return SPxSolverBase::UNBOUNDED;
       case SPxSimplifier::INFEASIBLE :
-         m_solver.setBasisStatus(SPxBasis::INFEASIBLE);
-         return SPxSolver::INFEASIBLE;
+         m_solver.setBasisStatus(SPxBasisBase::INFEASIBLE);
+         return SPxSolverBase::INFEASIBLE;
       case SPxSimplifier::VANISHED :
          m_vanished = true;
-         return SPxSolver::OPTIMAL;
+         return SPxSolverBase::OPTIMAL;
       case SPxSimplifier::OKAY:
          break;
       default:
@@ -242,13 +242,13 @@ SPxSolver::Status SoPlexBaseLegacy::solve()
     * or available from previous simplex run), we check whether it can be (re)used
     * for the newly loaded LP.
     */
-   else if ( m_solver.basis().status() <= SPxBasis::SINGULAR )
+   else if ( m_solver.basis().status() <= SPxBasisBase::SINGULAR )
    {
       m_solver.loadLP(work);
    }
    else
    {
-      SPxBasis::Desc oldbasisdesc(m_solver.basis().desc());
+      SPxBasisBase::Desc oldbasisdesc(m_solver.basis().desc());
       m_solver.loadLP(work);
       if(m_solver.basis().isDescValid(oldbasisdesc))
          m_solver.loadBasis(oldbasisdesc);
@@ -257,7 +257,7 @@ SPxSolver::Status SoPlexBaseLegacy::solve()
    return m_solver.solve();
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getPrimal(Vector& x) const
+SPxSolverBase::Status SoPlexBaseLegacy::getPrimal(Vector& x) const
 {
 
    if (has_simplifier())
@@ -268,13 +268,13 @@ SPxSolver::Status SoPlexBaseLegacy::getPrimal(Vector& x) const
       x = m_simplifier->unsimplifiedPrimal();
 
       if (m_vanished)
-         return SPxSolver::OPTIMAL;
+         return SPxSolverBase::OPTIMAL;
       else
          return m_solver.status();
    }
 
    // else
-   SPxSolver::Status stat = m_solver.getPrimal(x);
+   SPxSolverBase::Status stat = m_solver.getPrimal(x);
 
    // unscale postscaling
    if (m_postScaler != 0)
@@ -283,7 +283,7 @@ SPxSolver::Status SoPlexBaseLegacy::getPrimal(Vector& x) const
    return stat;
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getSlacks(Vector& s) const
+SPxSolverBase::Status SoPlexBaseLegacy::getSlacks(Vector& s) const
 {
 
    if (has_simplifier())
@@ -294,13 +294,13 @@ SPxSolver::Status SoPlexBaseLegacy::getSlacks(Vector& s) const
       s = m_simplifier->unsimplifiedSlacks();
 
       if (m_vanished)
-         return SPxSolver::OPTIMAL;
+         return SPxSolverBase::OPTIMAL;
       else
          return m_solver.status();
    }
 
    // else
-   SPxSolver::Status stat = m_solver.getSlacks(s);
+   SPxSolverBase::Status stat = m_solver.getSlacks(s);
 
    // unscale postscaling
    if (m_postScaler != 0)
@@ -309,7 +309,7 @@ SPxSolver::Status SoPlexBaseLegacy::getSlacks(Vector& s) const
    return stat;
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getDual(Vector& pi) const
+SPxSolverBase::Status SoPlexBaseLegacy::getDual(Vector& pi) const
 {
 
    if (has_simplifier())
@@ -320,13 +320,13 @@ SPxSolver::Status SoPlexBaseLegacy::getDual(Vector& pi) const
       pi = m_simplifier->unsimplifiedDual();
 
       if (m_vanished)
-         return SPxSolver::OPTIMAL;
+         return SPxSolverBase::OPTIMAL;
       else
          return m_solver.status();
    }
 
    // else
-   SPxSolver::Status stat = m_solver.getDual(pi);
+   SPxSolverBase::Status stat = m_solver.getDual(pi);
 
    // unscale postscaling
    if (m_postScaler != 0)
@@ -335,7 +335,7 @@ SPxSolver::Status SoPlexBaseLegacy::getDual(Vector& pi) const
    return stat;
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getRedCost(Vector& rdcost) const
+SPxSolverBase::Status SoPlexBaseLegacy::getRedCost(Vector& rdcost) const
 {
 
    if (has_simplifier())
@@ -346,13 +346,13 @@ SPxSolver::Status SoPlexBaseLegacy::getRedCost(Vector& rdcost) const
       rdcost = m_simplifier->unsimplifiedRedCost();
 
       if (m_vanished)
-         return SPxSolver::OPTIMAL;
+         return SPxSolverBase::OPTIMAL;
       else
          return m_solver.status();
    }
 
    // else
-   SPxSolver::Status stat = m_solver.getRedCost(rdcost);
+   SPxSolverBase::Status stat = m_solver.getRedCost(rdcost);
 
    // unscale postscaling
    if (m_postScaler != 0)
@@ -361,11 +361,11 @@ SPxSolver::Status SoPlexBaseLegacy::getRedCost(Vector& rdcost) const
    return stat;
 }
 
-SPxSolver::VarStatus SoPlexBaseLegacy::getBasisRowStatus(int i) const
+SPxSolverBase::VarStatus SoPlexBaseLegacy::getBasisRowStatus(int i) const
 {
-   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
-      return SPxSolver::UNDEFINED;
+   SPxBasisBase::SPxStatus b_status = m_solver.getBasisStatus();
+   if((b_status == SPxBasisBase::NO_PROBLEM || (has_simplifier() && b_status == SPxBasisBase::SINGULAR)) && !m_vanished)
+      return SPxSolverBase::UNDEFINED;
 
    if (has_simplifier())
    {
@@ -378,11 +378,11 @@ SPxSolver::VarStatus SoPlexBaseLegacy::getBasisRowStatus(int i) const
       return m_solver.getBasisRowStatus(i);
 }
 
-SPxSolver::VarStatus SoPlexBaseLegacy::getBasisColStatus(int j) const
+SPxSolverBase::VarStatus SoPlexBaseLegacy::getBasisColStatus(int j) const
 {
-   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
-      return SPxSolver::UNDEFINED;
+   SPxBasisBase::SPxStatus b_status = m_solver.getBasisStatus();
+   if((b_status == SPxBasisBase::NO_PROBLEM || (has_simplifier() && b_status == SPxBasisBase::SINGULAR)) && !m_vanished)
+      return SPxSolverBase::UNDEFINED;
 
    if (has_simplifier())
    {
@@ -395,20 +395,20 @@ SPxSolver::VarStatus SoPlexBaseLegacy::getBasisColStatus(int j) const
       return m_solver.getBasisColStatus(j);
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+SPxSolverBase::Status SoPlexBaseLegacy::getBasis(SPxSolverBase::VarStatus rows[], SPxSolverBase::VarStatus cols[]) const
 {
-   SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
-   if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
+   SPxBasisBase::SPxStatus b_status = m_solver.getBasisStatus();
+   if((b_status == SPxBasisBase::NO_PROBLEM || (has_simplifier() && b_status == SPxBasisBase::SINGULAR)) && !m_vanished)
    {
       int i;
 
       if (cols)
          for (i = nCols() - 1; i >= 0; --i)
-            cols[i] = SPxSolver::UNDEFINED;
+            cols[i] = SPxSolverBase::UNDEFINED;
 
       if (rows)
          for (i = nRows() - 1; i >= 0; --i)
-            rows[i] = SPxSolver::UNDEFINED;
+            rows[i] = SPxSolverBase::UNDEFINED;
 
       return m_solver.status();
    }
@@ -426,7 +426,7 @@ SPxSolver::Status SoPlexBaseLegacy::getBasis(SPxSolver::VarStatus rows[], SPxSol
       return m_solver.getBasis(rows, cols);
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getPrimalray(Vector& primalray) const
+SPxSolverBase::Status SoPlexBaseLegacy::getPrimalray(Vector& primalray) const
 {
    /// Does not work yet with presolve
    if (has_simplifier())
@@ -434,7 +434,7 @@ SPxSolver::Status SoPlexBaseLegacy::getPrimalray(Vector& primalray) const
       MSG_ERROR( std::cerr << "ESOLVR02 Primal ray with presolving not yet implemented" << std::endl; )
       throw SPxStatusException("XSOLVR02 Primal ray with presolving not yet implemented");
    }
-   SPxSolver::Status stat = m_solver.getPrimalray(primalray);
+   SPxSolverBase::Status stat = m_solver.getPrimalray(primalray);
 
    if (m_postScaler != 0)
       m_postScaler->unscalePrimal(m_solver, primalray);
@@ -442,16 +442,16 @@ SPxSolver::Status SoPlexBaseLegacy::getPrimalray(Vector& primalray) const
    return stat;
 }
 
-SPxSolver::Status SoPlexBaseLegacy::getDualfarkas(Vector& dualfarkas) const
+SPxSolverBase::Status SoPlexBaseLegacy::getDualfarkas(Vector& dualfarkas) const
 {
    /// Does not work yet with presolve
    if (has_simplifier())
    {
       MSG_ERROR( std::cerr << "ESOLVR02 Dual farkas with presolving not yet implemented" << std::endl; )
       throw SPxStatusException("XSOLVR03 Dual farkas with presolving not yet implemented");
-      //      return SPxSolver::ERROR;
+      //      return SPxSolverBase::ERROR;
    }
-   SPxSolver::Status stat = m_solver.getDualfarkas(dualfarkas);
+   SPxSolverBase::Status stat = m_solver.getDualfarkas(dualfarkas);
 
    if (m_postScaler != 0)
       m_postScaler->unscaleDual(m_solver, dualfarkas);
@@ -543,7 +543,7 @@ bool SoPlexBaseLegacy::writeBasisFile(
    const NameSet* colNames
    )
 {
-   assert(rep() == SPxSolver::COLUMN);
+   assert(rep() == SPxSolverBase::COLUMN);
 
    /* make sure the basis of the original problem is written */
    unsimplify();
@@ -555,7 +555,7 @@ bool SoPlexBaseLegacy::writeBasisFile(
    os << "NAME  soplex.bas\n";
 
    /* do not write basis if there is none */
-   if( status() == SPxSolver::NO_PROBLEM )
+   if( status() == SPxSolverBase::NO_PROBLEM )
    {
       os << "ENDATA" << std::endl;
       return true;
@@ -566,18 +566,18 @@ bool SoPlexBaseLegacy::writeBasisFile(
    int row = 0;
    for( int col = 0; col < nCols(); col++ )
    {
-      if( getBasisColStatus(col) == SPxSolver::BASIC )
+      if( getBasisColStatus(col) == SPxSolverBase::BASIC )
       {
          /* Find non basic row */
          for( ; row < nRows(); row++ )
          {
-            if( getBasisRowStatus(row) != SPxSolver::BASIC )
+            if( getBasisRowStatus(row) != SPxSolverBase::BASIC )
                break;
          }
 
          assert(row != nRows());
 
-         os << ( getBasisRowStatus(row) == SPxSolver::ON_UPPER ? " XU " : " XL " )
+         os << ( getBasisRowStatus(row) == SPxSolverBase::ON_UPPER ? " XU " : " XL " )
          << std::setw(8) << getColName(col, colNames, buf);
 
          /* break in two parts since buf is reused */
@@ -589,7 +589,7 @@ bool SoPlexBaseLegacy::writeBasisFile(
       }
       else
       {
-         if ( getBasisColStatus(col) == SPxSolver::ON_UPPER )
+         if ( getBasisColStatus(col) == SPxSolverBase::ON_UPPER )
          {
             os << " UL "
             << getColName(col, colNames, buf)
@@ -602,7 +602,7 @@ bool SoPlexBaseLegacy::writeBasisFile(
    // Check that we covered all nonbasic rows - the remaining should be basic.
    for( ; row < nRows(); row++ )
    {
-      if( getBasisRowStatus(row) != SPxSolver::BASIC )
+      if( getBasisRowStatus(row) != SPxSolverBase::BASIC )
          break;
    }
    assert(row == nRows());
@@ -633,8 +633,8 @@ void SoPlexBaseLegacy::unsimplify() const
 
    if (! m_vanished) {
       // If solver status is not regular or optimal, do nothing.
-      const SPxSolver::Status stat = status();
-      if( stat != SPxSolver::OPTIMAL && stat != SPxSolver::REGULAR )
+      const SPxSolverBase::Status stat = status();
+      if( stat != SPxSolverBase::OPTIMAL && stat != SPxSolverBase::REGULAR )
          return;
 
       m_solver.getPrimal(psp_x);
@@ -653,8 +653,8 @@ void SoPlexBaseLegacy::unsimplify() const
    }
    else {
       // If there is no sensible solution, do nothing.
-      const SPxSolver::Status  stat = status();
-      if (stat != SPxSolver::OPTIMAL)
+      const SPxSolverBase::Status  stat = status();
+      if (stat != SPxSolverBase::OPTIMAL)
          return;
 
       psp_x.reDim(0);
@@ -670,7 +670,7 @@ void SoPlexBaseLegacy::unsimplify() const
    }
    else
    {
-      SPxSolver::VarStatus *rows, *cols;
+      SPxSolverBase::VarStatus *rows, *cols;
       rows = NULL;
       cols = NULL;
       try

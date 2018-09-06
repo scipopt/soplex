@@ -46,11 +46,11 @@ namespace soplex
       /**@name Data */
       //@{
       /// the solver
-      SPxSolver<R>*  thesolver;
+      SPxSolverBase<R>*  thesolver;
       /// name of the ratio tester
       const char* m_name;
       /// internal storage of type
-      typename SPxSolver<R>::Type m_type;
+      typename SPxSolverBase<R>::Type m_type;
       /// allowed bound violation
       Real delta;
       //@}
@@ -68,7 +68,7 @@ namespace soplex
       /// loads LP.
       /** Load the solver and LP for which pricing steps are to be performed.
        */
-      virtual void load(SPxSolver<R>* p_solver)
+      virtual void load(SPxSolverBase<R>* p_solver)
       {
         thesolver = p_solver;
       }
@@ -80,7 +80,7 @@ namespace soplex
       }
 
       /// returns loaded LP solver.
-      virtual SPxSolver<R>* solver() const
+      virtual SPxSolverBase<R>* solver() const
       {
         return thesolver;
       }
@@ -109,10 +109,10 @@ namespace soplex
           computing the entering simplex algorithm. Its task is to select and
           return the index of the basis variable that is to leave the basis.
           When being called, 
-          \ref SPxSolver<R>::fVec() "fVec()" fullfills the basic bounds 
-          \ref SPxSolver<R>::lbBound() "lbBound()" and
-          \ref SPxSolver<R>::ubBound() "ubBound()" within 
-          \ref SPxSolver<R>::entertol() "entertol()".
+          \ref SPxSolverBase<R>::fVec() "fVec()" fullfills the basic bounds 
+          \ref SPxSolverBase<R>::lbBound() "lbBound()" and
+          \ref SPxSolverBase<R>::ubBound() "ubBound()" within 
+          \ref SPxSolverBase<R>::entertol() "entertol()".
           fVec().delta() is the vector by
           which fVec() will be updated in this simplex step. Its nonzero
           indices are stored in sorted order in fVec().idx().
@@ -131,15 +131,15 @@ namespace soplex
           computing the leaving simplex algorithm. It's task is to select and
           return the Id of the basis variable that is to enter the basis.
           When being called, 
-          \ref SPxSolver<R>::pVec() "pVec()" fullfills the bounds 
-          \ref SPxSolver<R>::lbBound() "lbBound()" and
-          \ref SPxSolver<R>::ubBound() "ubBound()" within 
-          \ref SPxSolver<R>::leavetol() "leavetol()".
+          \ref SPxSolverBase<R>::pVec() "pVec()" fullfills the bounds 
+          \ref SPxSolverBase<R>::lbBound() "lbBound()" and
+          \ref SPxSolverBase<R>::ubBound() "ubBound()" within 
+          \ref SPxSolverBase<R>::leavetol() "leavetol()".
           Similarly, 
-          \ref SPxSolver<R>::coPvec() "coPvec()" fulfills the bounds
-          \ref SPxSolver<R>::lbBound() "lbBound()" and
-          \ref SPxSolver<R>::ubBound() "ubBound()" within
-          \ref SPxSolver<R>::leavetol() "leavetol()".
+          \ref SPxSolverBase<R>::coPvec() "coPvec()" fulfills the bounds
+          \ref SPxSolverBase<R>::lbBound() "lbBound()" and
+          \ref SPxSolverBase<R>::ubBound() "ubBound()" within
+          \ref SPxSolverBase<R>::leavetol() "leavetol()".
           pVec().delta() and coPvec().delta() are
           the vectors by which pVec() and coPvec() will be updated in this
           simplex step. Their nonzero indices are stored in sorted order in
@@ -159,7 +159,7 @@ namespace soplex
       /** Informs pricer about (a change of) the loaded SoPlex's Type. In
           the sequel, only the corresponding select methods may be called.
       */
-      virtual void setType(typename SPxSolver<R>::Type)
+      virtual void setType(typename SPxSolverBase<R>::Type)
       {}
       //@}
 
@@ -170,7 +170,7 @@ namespace soplex
       explicit SPxRatioTester(const char* name)
         : thesolver(0)
         , m_name(name)
-        , m_type(SPxSolver<R>::LEAVE)
+        , m_type(SPxSolverBase<R>::LEAVE)
         , delta(1e-6)
         {}
       /// copy constructor

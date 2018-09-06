@@ -48,14 +48,14 @@ protected:
    //@{
    //   SPxWeightST st;  ///< weight starter
    SLUFactor       m_slu;        ///< LU Factorisation
-   SPxSolver       m_solver;     ///< solver
+   SPxSolverBase       m_solver;     ///< solver
    SPxScaler*      m_postScaler; ///< post-scaler
    SPxSimplifier*  m_simplifier; ///< simplifier
    bool            m_vanished;   ///< did the presolver solve the problem ?
    bool            m_freePostScaler;  ///< true iff m_postScaler should be freed inside of this object
    bool            m_freeSimplifier;  ///< true iff m_simplifier should be freed inside of this object
-   DataArray<SPxSolver::VarStatus> m_colsbasisstatus;
-   DataArray<SPxSolver::VarStatus> m_rowsbasisstatus;
+   DataArray<SPxSolverBase::VarStatus> m_colsbasisstatus;
+   DataArray<SPxSolverBase::VarStatus> m_rowsbasisstatus;
    //@}
 
 public:
@@ -66,8 +66,8 @@ public:
    /// default construtor.
    explicit SoPlexBaseLegacy(
       SPxOut&                   outstream,
-      SPxSolver::Type           type = SPxSolver::LEAVE,
-      SPxSolver::Representation rep  = SPxSolver::COLUMN );
+      SPxSolverBase::Type           type = SPxSolverBase::LEAVE,
+      SPxSolverBase::Representation rep  = SPxSolverBase::COLUMN );
    virtual ~SoPlexBaseLegacy();
    /// assignment operator.
    SoPlexBaseLegacy& operator=(const SoPlexBaseLegacy& rhs);
@@ -95,32 +95,32 @@ public:
       m_slu.setUtype(tp);
    }
    /// return current Pricing.
-   inline SPxSolver::Pricing pricing() const
+   inline SPxSolverBase::Pricing pricing() const
    {
       return m_solver.pricing();
    }
    /// set FULL or PARTIAL pricing.
-   virtual void setPricing(SPxSolver::Pricing pr)
+   virtual void setPricing(SPxSolverBase::Pricing pr)
    {
       m_solver.setPricing(pr);
    }
    /// return current Type.
-   inline SPxSolver::Type type() const
+   inline SPxSolverBase::Type type() const
    {
       return m_solver.type();
    }
    /// return current basis representation.
-   inline SPxSolver::Representation rep() const
+   inline SPxSolverBase::Representation rep() const
    {
       return m_solver.rep();
    }
    /// set LEAVE or ENTER algorithm.
-   virtual void setType(SPxSolver::Type tp)
+   virtual void setType(SPxSolverBase::Type tp)
    {
       m_solver.setType(tp);
    }
    /// set ROW or COLUMN representation.
-   virtual void setRep (SPxSolver::Representation p_rep)
+   virtual void setRep (SPxSolverBase::Representation p_rep)
    {
       m_solver.setRep(p_rep);
    }
@@ -155,7 +155,7 @@ public:
    }
    /// @throw SPxStatusException if simplifier loaded, this is not yet implemented
    /// set starting basis
-   virtual void setBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[])
+   virtual void setBasis(SPxSolverBase::VarStatus rows[], SPxSolverBase::VarStatus cols[])
    {
       if (has_simplifier())
       {
@@ -244,26 +244,26 @@ public:
    //**@name Solving and solution query */
    //@{
    /// @throw SPxStatusException if no problem loaded
-   virtual SPxSolver::Status solve();
+   virtual SPxSolverBase::Status solve();
    ///
    virtual Real objValue() const;
    ///
-   virtual SPxSolver::Status getPrimal(Vector& vector) const;
+   virtual SPxSolverBase::Status getPrimal(Vector& vector) const;
    ///
-   virtual SPxSolver::Status getSlacks(Vector& vector) const;
+   virtual SPxSolverBase::Status getSlacks(Vector& vector) const;
    ///
-   virtual SPxSolver::Status getDual(Vector& vector) const;
+   virtual SPxSolverBase::Status getDual(Vector& vector) const;
    ///
-   virtual SPxSolver::Status getRedCost(Vector& vector) const;
+   virtual SPxSolverBase::Status getRedCost(Vector& vector) const;
 
    /// gets basis status for a single row.
-   SPxSolver::VarStatus getBasisRowStatus(int row) const;
+   SPxSolverBase::VarStatus getBasisRowStatus(int row) const;
 
    /// gets basis status for a single column.
-   SPxSolver::VarStatus getBasisColStatus(int col) const;
+   SPxSolverBase::VarStatus getBasisColStatus(int col) const;
 
    /// get current basis, and return solver status.
-   SPxSolver::Status getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
+   SPxSolverBase::Status getBasis(SPxSolverBase::VarStatus rows[], SPxSolverBase::VarStatus cols[]) const;
 
    const char* getColName(
       int            idx,
@@ -309,11 +309,11 @@ public:
 
    /// @throw SPxStatusException if simplifier loaded, this is not yet
    /// implemented
-   virtual SPxSolver::Status getPrimalray(Vector& vector) const;
+   virtual SPxSolverBase::Status getPrimalray(Vector& vector) const;
 
    /// @throw SPxStatusException if simplifier loaded, this is not yet
    /// implemented
-   virtual SPxSolver::Status getDualfarkas(Vector& vector) const;
+   virtual SPxSolverBase::Status getDualfarkas(Vector& vector) const;
 
    /// get violation of constraints.
    virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
@@ -356,10 +356,10 @@ public:
       return m_solver.terminate();
    }
    /// returns the current status
-   virtual SPxSolver::Status status() const
+   virtual SPxSolverBase::Status status() const
    {
       if (m_vanished)
-         return SPxSolver::OPTIMAL;
+         return SPxSolverBase::OPTIMAL;
 
       return m_solver.status();
    }
@@ -383,7 +383,7 @@ public:
    virtual bool writeBasisFile(const char* filename,
       const NameSet* rowNames, const NameSet* colNames);
 
-   /** Write LP, basis and parameter settings of the current SPxSolver object
+   /** Write LP, basis and parameter settings of the current SPxSolverBase object
     *  (i.e. after simplifying and scaling).
     *  LP is written in MPS format to "\p filename".mps, basis is written in
     *  "\p filename".bas, and parameters are written to "\p filename".set.

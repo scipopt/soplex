@@ -60,28 +60,28 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
       Real upper;
       Real lower;
       Real objChange = 0.0;
-      typename SPxBasis<Real>::Desc::Status stat;
-      typename SPxBasis<Real>::Desc& ds = this->thesolver->basis().desc();
+      typename SPxBasisBase<Real>::Desc::Status stat;
+      typename SPxBasisBase<Real>::Desc& ds = this->thesolver->basis().desc();
 
       range = 0;
       if( breakpoints[i].src == PVEC )
       {
-         assert(this->thesolver->rep() == SPxSolver<Real>::COLUMN);
+         assert(this->thesolver->rep() == SPxSolverBase<Real>::COLUMN);
          stat = ds.status(idx);
          upper = this->thesolver->upper(idx);
          lower = this->thesolver->lower(idx);
          switch( stat )
          {
-            case SPxBasis<Real>::Desc::P_ON_UPPER :
-               ds.status(idx) = SPxBasis<Real>::Desc::P_ON_LOWER;
+            case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+               ds.status(idx) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
                range = lower - upper;
                assert((*thesolver->theLbound)[idx] == -infinity);
                (*this->thesolver->theLbound)[idx] = (*this->thesolver->theUbound)[idx];
                (*this->thesolver->theUbound)[idx] = infinity;
                objChange = range * (*this->thesolver->theLbound)[idx];
                break;
-            case SPxBasis<Real>::Desc::P_ON_LOWER :
-               ds.status(idx) = SPxBasis<Real>::Desc::P_ON_UPPER;
+            case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+               ds.status(idx) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
                range = upper - lower;
                assert((*this->thesolver->theUbound)[idx] == infinity);
                (*this->thesolver->theUbound)[idx] = (*this->thesolver->theLbound)[idx];
@@ -116,22 +116,22 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
       }
       else if( breakpoints[i].src == COPVEC )
       {
-         assert(this->thesolver->rep() == SPxSolver<Real>::COLUMN);
+         assert(this->thesolver->rep() == SPxSolverBase<Real>::COLUMN);
          stat = ds.coStatus(idx);
          upper = this->thesolver->rhs(idx);
          lower = this->thesolver->lhs(idx);
          switch( stat )
          {
-            case SPxBasis<Real>::Desc::P_ON_UPPER :
-               ds.coStatus(idx) = SPxBasis<Real>::Desc::P_ON_LOWER;
+            case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+               ds.coStatus(idx) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
                range = lower - upper;
                assert((*this->thesolver->theCoUbound)[idx] == infinity);
                (*this->thesolver->theCoUbound)[idx] = -(*this->thesolver->theCoLbound)[idx];
                (*this->thesolver->theCoLbound)[idx] = -infinity;
                objChange = range * (*this->thesolver->theCoUbound)[idx];
                break;
-            case SPxBasis<Real>::Desc::P_ON_LOWER :
-               ds.coStatus(idx) = SPxBasis<Real>::Desc::P_ON_UPPER;
+            case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+               ds.coStatus(idx) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
                range = upper - lower;
                assert((*this->thesolver->theCoLbound)[idx] == -infinity);
                (*this->thesolver->theCoLbound)[idx] = -(*this->thesolver->theCoUbound)[idx];
@@ -166,7 +166,7 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
       }
       else if( breakpoints[i].src == FVEC )
       {
-         assert(this->thesolver->rep() == SPxSolver<Real>::ROW);
+         assert(this->thesolver->rep() == SPxSolverBase<Real>::ROW);
          SPxId baseId = this->thesolver->basis().baseId(idx);
          int IdNumber;
 
@@ -178,15 +178,15 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
             lower = this->thesolver->lhs(IdNumber);
             switch( stat )
             {
-               case SPxBasis<Real>::Desc::P_ON_UPPER :
-                  ds.rowStatus(IdNumber) = SPxBasis<Real>::Desc::P_ON_LOWER;
+               case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+                  ds.rowStatus(IdNumber) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
                   range = upper - lower;
                   assert(thesolver->theUBbound[idx] == infinity);
                   this->thesolver->theUBbound[idx] = -this->thesolver->theLBbound[idx];
                   this->thesolver->theLBbound[idx] = -infinity;
                   break;
-               case SPxBasis<Real>::Desc::P_ON_LOWER :
-                  ds.rowStatus(IdNumber) = SPxBasis<Real>::Desc::P_ON_UPPER;
+               case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+                  ds.rowStatus(IdNumber) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
                   range = lower - upper;
                   assert(thesolver->theLBbound[idx] == -infinity);
                   this->thesolver->theLBbound[idx] = -this->thesolver->theUBbound[idx];
@@ -214,15 +214,15 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
 
             switch( stat )
             {
-               case SPxBasis<Real>::Desc::P_ON_UPPER :
-                  ds.colStatus(IdNumber) = SPxBasis<Real>::Desc::P_ON_LOWER;
+               case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+                  ds.colStatus(IdNumber) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
                   range = upper - lower;
                   assert(thesolver->theUBbound[idx] == infinity);
                   this->thesolver->theUBbound[idx] = -this->thesolver->theLBbound[idx];
                   this->thesolver->theLBbound[idx] = -infinity;
                   break;
-               case SPxBasis<Real>::Desc::P_ON_LOWER :
-                  ds.colStatus(IdNumber) = SPxBasis<Real>::Desc::P_ON_UPPER;
+               case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+                  ds.colStatus(IdNumber) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
                   range = lower - upper;
                   assert(thesolver->theLBbound[idx] == -infinity);
                   this->thesolver->theLBbound[idx] = -this->thesolver->theUBbound[idx];
@@ -256,16 +256,16 @@ void SPxBoundFlippingRT<Real>::flipAndUpdate(
    nflips -= skipped;
    if( nflips > 0 )
    {
-      if(this->thesolver->rep() == SPxSolver<Real>::ROW)
+      if(this->thesolver->rep() == SPxSolverBase<Real>::ROW)
       {
-         assert(m_type == SPxSolver<Real>::ENTER);
+         assert(m_type == SPxSolverBase<Real>::ENTER);
          (*this->thesolver->theCoPrhs) -= updPrimRhs;
          this->thesolver->setup4coSolve2(&updPrimVec, &updPrimRhs);
       }
       else
       {
-         assert(this->thesolver->rep() == SPxSolver<Real>::COLUMN);
-         assert(m_type == SPxSolver<Real>::LEAVE);
+         assert(this->thesolver->rep() == SPxSolverBase<Real>::COLUMN);
+         assert(m_type == SPxSolverBase<Real>::LEAVE);
          (*this->thesolver->theFrhs) -= updPrimRhs;
          this->thesolver->setup4solve2(&updPrimVec, &updPrimRhs);
       }
@@ -536,7 +536,7 @@ bool SPxBoundFlippingRT<Real>::getData(
    else if( (max > 0 && val < -degeneps) || (max < 0 && val > degeneps) )
    {
       val = 0.0;
-      if( this->thesolver->dualStatus(this->thesolver->baseId(idx)) != SPxBasis<Real>::Desc::D_ON_BOTH )
+      if( this->thesolver->dualStatus(this->thesolver->baseId(idx)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
       {
          if( max * x > 0 )
             this->thesolver->shiftUBbound(idx, vec[idx]);
@@ -555,7 +555,7 @@ SPxId SPxBoundFlippingRT<Real>::selectEnter(
    bool                  polish
    )
 {
-   assert( m_type == SPxSolver<Real>::LEAVE );
+   assert( m_type == SPxSolverBase<Real>::LEAVE );
    assert(thesolver->boundflips == 0);
 
    // reset the history and try again to do some long steps
@@ -564,7 +564,7 @@ SPxId SPxBoundFlippingRT<Real>::selectEnter(
       MSG_DEBUG( std::cout << "DLBFRT06 resetting long step history" << std::endl; )
       flipPotential = 1;
    }
-   if( !enableBoundFlips || polish || this->thesolver->rep() == SPxSolver<Real>::ROW || flipPotential <= 0 )
+   if( !enableBoundFlips || polish || this->thesolver->rep() == SPxSolverBase<Real>::ROW || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DLBFRT07 switching to fast ratio test" << std::endl; )
         return SPxFastRT<Real>::selectEnter(val, leaveIdx, polish);
@@ -899,7 +899,7 @@ int SPxBoundFlippingRT<Real>::selectLeave(
    bool                  polish
    )
 {
-   assert( m_type == SPxSolver<Real>::ENTER );
+   assert( m_type == SPxSolverBase<Real>::ENTER );
    assert(this->thesolver->boundflips == 0);
 
    // reset the history and try again to do some long steps
@@ -909,7 +909,7 @@ int SPxBoundFlippingRT<Real>::selectLeave(
       flipPotential = 1;
    }
 
-   if( polish || !enableBoundFlips || !enableRowBoundFlips || this->thesolver->rep() == SPxSolver<Real>::COLUMN || flipPotential <= 0 )
+   if( polish || !enableBoundFlips || !enableRowBoundFlips || this->thesolver->rep() == SPxSolverBase<Real>::COLUMN || flipPotential <= 0 )
    {
       MSG_DEBUG( std::cout << "DEBFRT07 switching to fast ratio test" << std::endl; )
         return SPxFastRT<Real>::selectLeave(val, enterTest, polish);

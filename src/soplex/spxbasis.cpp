@@ -33,15 +33,15 @@ namespace soplex
 
   /// Signatures of functions to avoid the specialization after instantiation issue
   template <>
-  typename SPxBasis<Real>::Desc::Status
-  SPxBasis<Real>::dualRowStatus(int i) const;
+  typename SPxBasisBase<Real>::Desc::Status
+  SPxBasisBase<Real>::dualRowStatus(int i) const;
 
   template <>
-  typename SPxBasis<Real>::Desc::Status
-  SPxBasis<Real>::dualColStatus(int i) const;
+  typename SPxBasisBase<Real>::Desc::Status
+  SPxBasisBase<Real>::dualColStatus(int i) const;
   
   template <>
-  void SPxBasis<Real>::setRep();
+  void SPxBasisBase<Real>::setRep();
 
   static const char* getRowName(
 				const SPxLP*   lp,
@@ -50,24 +50,24 @@ namespace soplex
 				char*          buf);
 
   template <>
-  void SPxBasis<Real>::factorize();
+  void SPxBasisBase<Real>::factorize();
 
-  template <> typename SPxBasis<Real>::Desc::Status
-  SPxBasis<Real>::dualStatus(const SPxColId& id) const
+  template <> typename SPxBasisBase<Real>::Desc::Status
+  SPxBasisBase<Real>::dualStatus(const SPxColId& id) const
   {
     return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
   }
 
   template <>
-  typename SPxBasis<Real>::Desc::Status
-  SPxBasis<Real>::dualStatus(const SPxRowId& id) const
+  typename SPxBasisBase<Real>::Desc::Status
+  SPxBasisBase<Real>::dualStatus(const SPxRowId& id) const
   {
     return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
   }
 
   template <>
-  typename SPxBasis<Real>::Desc::Status
-  SPxBasis<Real>::dualRowStatus(int i) const
+  typename SPxBasisBase<Real>::Desc::Status
+  SPxBasisBase<Real>::dualRowStatus(int i) const
   {
     assert(theLP != 0);
 
@@ -90,8 +90,8 @@ namespace soplex
   }
 
   template <>
-  typename SPxBasis<Real>::Desc::Status
-  SPxBasis<Real>::dualColStatus(int i) const
+  typename SPxBasisBase<Real>::Desc::Status
+  SPxBasisBase<Real>::dualColStatus(int i) const
   {
     assert(theLP != 0);
 
@@ -114,7 +114,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::loadMatrixVecs()
+  void SPxBasisBase<Real>::loadMatrixVecs()
   {
     assert(theLP != 0);
     assert(theLP->dim() == matrix.size());
@@ -135,7 +135,7 @@ namespace soplex
   }
 
   template <>
-  bool SPxBasis<Real>::isDescValid(const Desc& ds)
+  bool SPxBasisBase<Real>::isDescValid(const Desc& ds)
   {
 
     assert(status() > NO_PROBLEM);
@@ -213,7 +213,7 @@ namespace soplex
     representation. This implementation hides this distinction in the use of
     methods #isBasic()# and #vector()#.
   */
-  void SPxBasis<Real>::loadDesc(const Desc& ds)
+  void SPxBasisBase<Real>::loadDesc(const Desc& ds)
   {
     assert(status() > NO_PROBLEM);
     assert(theLP != 0);
@@ -249,14 +249,14 @@ namespace soplex
 	 */
 	if (thedesc.rowStatus(i) >= 0)
 	  thedesc.rowStatus(i) = dualRowStatus(i);
-	else if (thedesc.rowStatus(i) == SPxBasis<Real>::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
+	else if (thedesc.rowStatus(i) == SPxBasisBase<Real>::Desc::P_FIXED && theLP->SPxLP::lhs(i) != theLP->SPxLP::rhs(i))
 	  {
 	    if (theLP->SPxLP::lhs(i) > -infinity && theLP->SPxLP::maxRowObj(i) < 0.0)
-	      thedesc.rowStatus(i) = SPxBasis<Real>::Desc::P_ON_LOWER;
+	      thedesc.rowStatus(i) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
 	    else if (theLP->SPxLP::rhs(i) < infinity)
-	      thedesc.rowStatus(i) = SPxBasis<Real>::Desc::P_ON_UPPER;
+	      thedesc.rowStatus(i) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
 	    else
-	      thedesc.rowStatus(i) = SPxBasis<Real>::Desc::P_FREE;
+	      thedesc.rowStatus(i) = SPxBasisBase<Real>::Desc::P_FREE;
 	  }
 
 	if (theLP->isBasic(thedesc.rowStatus(i)))
@@ -285,14 +285,14 @@ namespace soplex
 	 */
 	if (thedesc.colStatus(i) >= 0)
 	  thedesc.colStatus(i) = dualColStatus(i);
-	else if (thedesc.colStatus(i) == SPxBasis<Real>::Desc::P_FIXED && theLP->SPxLP::lower(i) != theLP->SPxLP::upper(i))
+	else if (thedesc.colStatus(i) == SPxBasisBase<Real>::Desc::P_FIXED && theLP->SPxLP::lower(i) != theLP->SPxLP::upper(i))
 	  {
 	    if (theLP->SPxLP::lower(i) <= -infinity && theLP->SPxLP::upper(i) >= infinity)
-	      thedesc.colStatus(i) = SPxBasis<Real>::Desc::P_FREE;
+	      thedesc.colStatus(i) = SPxBasisBase<Real>::Desc::P_FREE;
 	    else if (theLP->SPxLP::upper(i) >= infinity || (theLP->SPxLP::lower(i) > -infinity && theLP->SPxLP::maxObj(i) < 0.0))
-	      thedesc.colStatus(i) = SPxBasis<Real>::Desc::P_ON_LOWER;
+	      thedesc.colStatus(i) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
 	    else
-	      thedesc.colStatus(i) = SPxBasis<Real>::Desc::P_ON_UPPER;
+	      thedesc.colStatus(i) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
 	  }
 
 	if (theLP->isBasic(thedesc.colStatus(i)))
@@ -333,14 +333,14 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::setRep()
+  void SPxBasisBase<Real>::setRep()
   {
     assert(theLP != 0);
 
     reDim();
     minStab = 0.0;
 
-    if (theLP->rep() == SPxSolver<Real>::ROW)
+    if (theLP->rep() == SPxSolverBase<Real>::ROW)
       {
 	thedesc.stat   = &thedesc.rowstat;
 	thedesc.costat = &thedesc.colstat;
@@ -353,7 +353,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::load(SPxSolver<Real>* lp, bool initSlackBasis)
+  void SPxBasisBase<Real>::load(SPxSolverBase<Real>* lp, bool initSlackBasis)
   {
     assert(lp != 0);
     theLP = lp;
@@ -370,7 +370,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
+  void SPxBasisBase<Real>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
   {
     assert(!freeSlinSolver || factor != 0);
 
@@ -419,7 +419,7 @@ namespace soplex
    *  - at zero if free.
    */
   template <>
-  bool SPxBasis<Real>::readBasis(
+  bool SPxBasisBase<Real>::readBasis(
 			      std::istream&  is, 
 			      const NameSet* rowNames, 
 			      const NameSet* colNames)
@@ -634,10 +634,10 @@ namespace soplex
 
   /* writes a file in MPS basis format to \p os.
    *
-   * See SPxBasis<Real>::readBasis() for a short description of the format.
+   * See SPxBasisBase<Real>::readBasis() for a short description of the format.
    */
   template <>
-  void SPxBasis<Real>::writeBasis(
+  void SPxBasisBase<Real>::writeBasis(
 			       std::ostream&  os, 
 			       const NameSet* rowNames, 
 			       const NameSet* colNames,
@@ -722,7 +722,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::printMatrix() const
+  void SPxBasisBase<Real>::printMatrix() const
   {
 
     assert(matrixIsSetup);
@@ -734,7 +734,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::printMatrixMTX(int number)
+  void SPxBasisBase<Real>::printMatrixMTX(int number)
   {
     int dim;
     int nnz;
@@ -766,7 +766,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::change(
+  void SPxBasisBase<Real>::change(
 			   int i,
 			   SPxId& id,
 			   const SVector* enterVec,
@@ -875,7 +875,7 @@ namespace soplex
 
 		  // if factorize() detects singularity, an exception is thrown, hence at this point we have a regular basis
 		  // and can try the update again
-		  assert(status() >= SPxBasis<Real>::REGULAR);
+		  assert(status() >= SPxBasisBase<Real>::REGULAR);
 		  try
 		    {
 #ifdef MEASUREUPDATETIME
@@ -920,7 +920,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::factorize()
+  void SPxBasisBase<Real>::factorize()
   {
 
     assert(factor != 0);
@@ -972,7 +972,7 @@ namespace soplex
   }
 
   template <>
-  Vector& SPxBasis<Real>::multWithBase(Vector& x) const
+  Vector& SPxBasisBase<Real>::multWithBase(Vector& x) const
   {
     assert(status() > SINGULAR);
     assert(theLP->dim() == x.dim());
@@ -981,7 +981,7 @@ namespace soplex
     DVector tmp(x);
 
     if (!matrixIsSetup)
-      (const_cast<SPxBasis<Real>*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasisBase<Real>*>(this))->loadDesc(thedesc);
 
     assert( matrixIsSetup );
 
@@ -992,14 +992,14 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::multWithBase(SSVector& x, SSVector& result) const
+  void SPxBasisBase<Real>::multWithBase(SSVector& x, SSVector& result) const
   {
     assert(status() > SINGULAR);
     assert(theLP->dim() == x.dim());
     assert(x.dim() == result.dim());
 
     if (!matrixIsSetup)
-      (const_cast<SPxBasis<Real>*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasisBase<Real>*>(this))->loadDesc(thedesc);
 
     result.clear();
 
@@ -1013,7 +1013,7 @@ namespace soplex
 
   template <>
 
-  Vector& SPxBasis<Real>::multBaseWith(Vector& x) const
+  Vector& SPxBasisBase<Real>::multBaseWith(Vector& x) const
   {
     assert(status() > SINGULAR);
     assert(theLP->dim() == x.dim());
@@ -1022,7 +1022,7 @@ namespace soplex
     DVector tmp(x);
 
     if (!matrixIsSetup)
-      (const_cast<SPxBasis<Real>*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasisBase<Real>*>(this))->loadDesc(thedesc);
 
     assert( matrixIsSetup );
 
@@ -1037,14 +1037,14 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::multBaseWith(SSVector& x, SSVector& result) const
+  void SPxBasisBase<Real>::multBaseWith(SSVector& x, SSVector& result) const
   {
     assert(status() > SINGULAR);
     assert(theLP->dim() == x.dim());
     assert(x.dim() == result.dim());
 
     if (!matrixIsSetup)
-      (const_cast<SPxBasis<Real>*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasisBase<Real>*>(this))->loadDesc(thedesc);
 
     assert(matrixIsSetup);
 
@@ -1071,7 +1071,7 @@ namespace soplex
    * by computing estimates of the norms of B and B^-1 using the power method.
    * maxiters and tolerance control the accuracy of the estimate.
    */
-  Real SPxBasis<Real>::condition(int maxiters, Real tolerance)
+  Real SPxBasisBase<Real>::condition(int maxiters, Real tolerance)
   {
     int dimension = matrix.size();
     int miniters = 3;    // minimum number of power method iterations
@@ -1094,7 +1094,7 @@ namespace soplex
       return 0;
 
     if( !matrixIsSetup )
-      (const_cast<SPxBasis<Real>*>(this))->loadDesc(thedesc);
+      (const_cast<SPxBasisBase<Real>*>(this))->loadDesc(thedesc);
 
     if( !factorized )
       factorize();
@@ -1160,7 +1160,7 @@ namespace soplex
 
   template <>
   /* compute condition number estimation based on the diagonal of the LU factorization */
-  Real SPxBasis<Real>::getFastCondition(int type)
+  Real SPxBasisBase<Real>::getFastCondition(int type)
   {
     Real cond = infinity;
 
@@ -1171,7 +1171,7 @@ namespace soplex
   }
 
   template <>
-  void SPxBasis<Real>::dump()
+  void SPxBasisBase<Real>::dump()
   {
     assert(status() > NO_PROBLEM);
     assert(theLP != 0);
@@ -1215,7 +1215,7 @@ namespace soplex
 
   template <>
 
-  bool SPxBasis<Real>::isConsistent() const
+  bool SPxBasisBase<Real>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     int primals = 0;
@@ -1224,20 +1224,20 @@ namespace soplex
     if (status() > NO_PROBLEM)
       {
 	if (theLP == 0)
-	  return MSGinconsistent("SPxBasis<Real>");
+	  return MSGinconsistent("SPxBasisBase<Real>");
 
 	if (theBaseId.size() != theLP->dim() || matrix.size() != theLP->dim())
-	  return MSGinconsistent("SPxBasis<Real>");
+	  return MSGinconsistent("SPxBasisBase<Real>");
 
 	if (thedesc.nCols() != theLP->nCols() || thedesc.nRows() != theLP->nRows())
-	  return MSGinconsistent("SPxBasis<Real>");
+	  return MSGinconsistent("SPxBasisBase<Real>");
 
 	for (i = 0; i < thedesc.nRows(); ++i)
 	  {
 	    if (thedesc.rowStatus(i) >= 0)
 	      {
 		if (thedesc.rowStatus(i) != dualRowStatus(i))
-		  return MSGinconsistent("SPxBasis<Real>");
+		  return MSGinconsistent("SPxBasisBase<Real>");
 	      }
 	    else
 	      ++primals;
@@ -1248,13 +1248,13 @@ namespace soplex
 	    if (thedesc.colStatus(i) >= 0)
 	      {
 		if (thedesc.colStatus(i) != dualColStatus(i))
-		  return MSGinconsistent("SPxBasis<Real>");
+		  return MSGinconsistent("SPxBasisBase<Real>");
 	      }
 	    else
 	      ++primals;
 	  }
 	if (primals != thedesc.nCols())
-	  return MSGinconsistent("SPxBasis<Real>");
+	  return MSGinconsistent("SPxBasisBase<Real>");
       }
     return thedesc.isConsistent() && theBaseId.isConsistent() 
       && matrix.isConsistent() && factor->isConsistent();
@@ -1264,7 +1264,7 @@ namespace soplex
   }
 
   template <>
-  SPxBasis<Real>::SPxBasis(Timer::TYPE ttype)
+  SPxBasisBase<Real>::SPxBasisBase(Timer::TYPE ttype)
     : theLP (0)
     , matrixIsSetup (false)
     , factor (0)
@@ -1299,10 +1299,10 @@ namespace soplex
   /**@warning Do not change the LP object.
    *  Only pointer to that object is copied.
    *  Hint: no problem, we use this function for copy
-   *   constructor of SPxSolver<Real>
+   *   constructor of SPxSolverBase<Real>
    */
   template <>
-  SPxBasis<Real>::SPxBasis(const SPxBasis<Real>& old)
+  SPxBasisBase<Real>::SPxBasisBase(const SPxBasisBase<Real>& old)
     : theLP(old.theLP)
     , theBaseId(old.theBaseId)
     , matrix(old.matrix)
@@ -1336,11 +1336,11 @@ namespace soplex
     this->factor = old.factor->clone();
     freeSlinSolver = true;
 
-    assert(SPxBasis<Real>::isConsistent());
+    assert(SPxBasisBase<Real>::isConsistent());
   }
 
   template <>
-  SPxBasis<Real>::~SPxBasis<Real>()
+  SPxBasisBase<Real>::~SPxBasisBase<Real>()
   {
 
     assert(!freeSlinSolver || factor != 0);
@@ -1356,10 +1356,10 @@ namespace soplex
 
   template <>
 
-  /**@warning  Note that we do not create a deep copy of the corresponding SPxSolver<Real> object.
+  /**@warning  Note that we do not create a deep copy of the corresponding SPxSolverBase<Real> object.
    *  Only the reference to that object is copied.
    */
-  SPxBasis<Real>& SPxBasis<Real>::operator=(const SPxBasis<Real>& rhs)
+  SPxBasisBase<Real>& SPxBasisBase<Real>::operator=(const SPxBasisBase<Real>& rhs)
   {
 
     assert(!freeSlinSolver || factor != 0);
@@ -1395,7 +1395,7 @@ namespace soplex
 	thestatus     = rhs.thestatus;
 	thedesc       = rhs.thedesc;
 
-	assert(SPxBasis<Real>::isConsistent());
+	assert(SPxBasisBase<Real>::isConsistent());
       }
 
     return *this;
@@ -1410,32 +1410,32 @@ namespace soplex
   // Pretty-printing of basis status.
   template <class R> // Why can't we remove the class R and make it empty?
   std::ostream& operator<<( std::ostream& os,
-			    const typename SPxBasis<Real>::SPxStatus& status )
+			    const typename SPxBasisBase<Real>::SPxStatus& status )
   {
     switch ( status )
       {
-      case SPxBasis<Real>::NO_PROBLEM:
+      case SPxBasisBase<Real>::NO_PROBLEM:
 	os << "NO_PROBLEM";
 	break;
-      case SPxBasis<Real>::SINGULAR:
+      case SPxBasisBase<Real>::SINGULAR:
 	os << "SINGULAR";
 	break;
-      case SPxBasis<Real>::REGULAR:
+      case SPxBasisBase<Real>::REGULAR:
 	os << "REGULAR";
 	break;
-      case SPxBasis<Real>::DUAL:
+      case SPxBasisBase<Real>::DUAL:
 	os << "DUAL";
 	break;
-      case SPxBasis<Real>::PRIMAL:
+      case SPxBasisBase<Real>::PRIMAL:
 	os << "PRIMAL";
 	break;
-      case SPxBasis<Real>::OPTIMAL:
+      case SPxBasisBase<Real>::OPTIMAL:
 	os << "OPTIMAL";
 	break;
-      case SPxBasis<Real>::UNBOUNDED:
+      case SPxBasisBase<Real>::UNBOUNDED:
 	os << "UNBOUNDED";
 	break;
-      case SPxBasis<Real>::INFEASIBLE:
+      case SPxBasisBase<Real>::INFEASIBLE:
 	os << "INFEASIBLE";
 	break;
       default:

@@ -22,7 +22,7 @@
 namespace soplex
 {
   template <>
-  void SPxHybridPR<Real>::setType(typename SPxSolver<Real>::Type tp);
+  void SPxHybridPR<Real>::setType(typename SPxSolverBase<Real>::Type tp);
 
   template <>
   bool SPxHybridPR<Real>::isConsistent() const
@@ -43,7 +43,7 @@ namespace soplex
   }
 
   template <>
-  void SPxHybridPR<Real>::load(SPxSolver<Real>* p_solver)
+  void SPxHybridPR<Real>::load(SPxSolverBase<Real>* p_solver)
   {
     steep.load(p_solver);
     devex.load(p_solver);
@@ -70,12 +70,12 @@ namespace soplex
   }
 
   template <>
-  void SPxHybridPR<Real>::setType(typename SPxSolver<Real>::Type tp)
+  void SPxHybridPR<Real>::setType(typename SPxSolverBase<Real>::Type tp)
   {
-    if (tp == SPxSolver<Real>::LEAVE)
+    if (tp == SPxSolverBase<Real>::LEAVE)
       {
         thepricer = &steep;
-        this->thesolver->setPricing(SPxSolver<Real>::FULL);
+        this->thesolver->setPricing(SPxSolverBase<Real>::FULL);
       }
     else
       {
@@ -87,12 +87,12 @@ namespace soplex
              */
             // thepricer = &devex;
             thepricer = &steep;
-            this->thesolver->setPricing(SPxSolver<Real>::FULL);
+            this->thesolver->setPricing(SPxSolverBase<Real>::FULL);
           }
         else
           {
             thepricer = &parmult;
-            this->thesolver->setPricing(SPxSolver<Real>::PARTIAL);
+            this->thesolver->setPricing(SPxSolverBase<Real>::PARTIAL);
           }
       }
    
@@ -103,7 +103,7 @@ namespace soplex
   }
 
   template <>
-  void SPxHybridPR<Real>::setRep(typename SPxSolver<Real>::Representation rep)
+  void SPxHybridPR<Real>::setRep(typename SPxSolverBase<Real>::Representation rep)
   {
     steep.setRep(rep);
     devex.setRep(rep);

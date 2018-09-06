@@ -221,13 +221,13 @@ public:
    /**@name Access / modification */
    //@{
    ///
-   virtual void load(SPxSolver<R>* solver);
+   virtual void load(SPxSolverBase<R>* solver);
    ///
    virtual int selectLeave(Real& val, Real, bool polish = false);
    ///
    virtual SPxId selectEnter(Real& val, int, bool polish = false);
    ///
-   virtual void setType(typename SPxSolver<R>::Type type);
+   virtual void setType(typename SPxSolverBase<R>::Type type);
    ///
    virtual void setDelta(Real newDelta)
    {

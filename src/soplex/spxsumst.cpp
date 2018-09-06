@@ -23,7 +23,7 @@ namespace soplex
 {
 
   template <>
-  void SPxSumST<Real>::setupWeights(SPxSolver<Real>& base)
+  void SPxSumST<Real>::setupWeights(SPxSolverBase<Real>& base)
   {
     int count;
     int i;

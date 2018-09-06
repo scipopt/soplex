@@ -23,16 +23,16 @@ namespace soplex
 {
 
   template <>
-  void SPxParMultPR<Real>::setType(typename SPxSolver<Real>::Type tp)
+  void SPxParMultPR<Real>::setType(typename SPxSolverBase<Real>::Type tp)
   {
-    if (tp == SPxSolver<Real>::ENTER)
+    if (tp == SPxSolverBase<Real>::ENTER)
       {
         used = 0;
-        this->thesolver->setPricing(SPxSolver<Real>::PARTIAL);
+        this->thesolver->setPricing(SPxSolverBase<Real>::PARTIAL);
       }
     else
       {
-        this->thesolver->setPricing(SPxSolver<Real>::FULL);
+        this->thesolver->setPricing(SPxSolverBase<Real>::FULL);
       }
 
     this->thesolver->weights.reDim(0);
@@ -44,7 +44,7 @@ namespace soplex
   }
 
   template <>
-  void SPxParMultPR<Real>::load(SPxSolver<Real>* p_solver)
+  void SPxParMultPR<Real>::load(SPxSolverBase<Real>* p_solver)
   {
     this->thesolver = p_solver;
     multiParts = (this->thesolver->dim() + this->thesolver->coDim()) / partialSize + 1;
@@ -58,12 +58,12 @@ namespace soplex
     Real x;
     int i;
     int best = -1;
-    //    const SPxBasis<Real>::Desc& ds   = this->thesolver->basis().desc();
+    //    const SPxBasisBase<Real>::Desc& ds   = this->thesolver->basis().desc();
 
     assert(thesolver != 0);
     int lastlast = -1;
 
-    if (this->thesolver->pricing() == SPxSolver<Real>::PARTIAL)
+    if (this->thesolver->pricing() == SPxSolverBase<Real>::PARTIAL)
       {
         Real val;
         Real eps = -this->theeps;
@@ -145,13 +145,13 @@ namespace soplex
 
     else
       {
-        assert(this->thesolver->pricing() == SPxSolver<Real>::FULL);
+        assert(this->thesolver->pricing() == SPxSolverBase<Real>::FULL);
         Real bestx = -this->theeps;
         for (i = this->thesolver->dim() - 1; i >= 0; --i)
           {
             x = this->thesolver->coTest()[i];
-            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis<Real>::Desc::P_FREE
-            //                || ds.coStatus(i) == SPxBasis<Real>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasisBase<Real>::Desc::P_FREE
+            //                || ds.coStatus(i) == SPxBasisBase<Real>::Desc::D_FREE));
             if (x < bestx)
               {
                 id = this->thesolver->coId(i);
@@ -162,8 +162,8 @@ namespace soplex
         for (i = this->thesolver->coDim() - 1; i >= 0; --i)
           {
             x = this->thesolver->test()[i];
-            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis<Real>::Desc::P_FREE
-            //                || ds.status(i) == SPxBasis<Real>::Desc::D_FREE));
+            // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasisBase<Real>::Desc::P_FREE
+            //                || ds.status(i) == SPxBasisBase<Real>::Desc::D_FREE));
             if (x < bestx)
               {
                 id = this->thesolver->id(i);

@@ -23,7 +23,7 @@ namespace soplex
   // Definition of signature to avoid the specialization after instantiation error
 
   template <>
-  void SPxDevexPR<Real>::setRep(typename SPxSolver<Real>::Representation);
+  void SPxDevexPR<Real>::setRep(typename SPxSolverBase<Real>::Representation);
 
   template <>
   int SPxDevexPR<Real>::selectLeaveX(Real feastol, int start, int incr);
@@ -65,7 +65,7 @@ namespace soplex
   SPxId SPxDevexPR<Real>::selectEnterDenseCoDim(Real& best, Real feastol, int start, int incr);
 
   template <>
-  void SPxDevexPR<Real>::load(SPxSolver<Real>* base)
+  void SPxDevexPR<Real>::load(SPxSolverBase<Real>* base)
   {
     this->thesolver = base;
     setRep(base->rep());
@@ -86,7 +86,7 @@ namespace soplex
   }
 
   template <>
-  void SPxDevexPR<Real>::setupWeights(typename SPxSolver<Real>::Type tp)
+  void SPxDevexPR<Real>::setupWeights(typename SPxSolverBase<Real>::Type tp)
   {
     int i;
     int coWeightSize = 0;
@@ -95,7 +95,7 @@ namespace soplex
     DVector& weights = this->thesolver->weights;
     DVector& coWeights = this->thesolver->coWeights;
 
-    if( tp == SPxSolver<Real>::ENTER )
+    if( tp == SPxSolverBase<Real>::ENTER )
       {
         coWeights.reDim(this->thesolver->dim(), false);
         for( i = this->thesolver->dim() - 1; i >= coWeightSize; --i )
@@ -115,7 +115,7 @@ namespace soplex
   }
 
   template <>
-  void SPxDevexPR<Real>::setType(typename SPxSolver<Real>::Type tp)
+  void SPxDevexPR<Real>::setType(typename SPxSolverBase<Real>::Type tp)
   {
     setupWeights(tp);
     refined = false;
@@ -124,7 +124,7 @@ namespace soplex
     bestPrices.setMax(this->thesolver->dim());
     prices.reMax(this->thesolver->dim());
 
-    if( tp == SPxSolver<Real>::ENTER )
+    if( tp == SPxSolverBase<Real>::ENTER )
       {
         bestPricesCo.clear();
         bestPricesCo.setMax(this->thesolver->coDim());
@@ -138,7 +138,7 @@ namespace soplex
    *       and CoVecs be influenced by the representation ?
    */
   template <>
-  void SPxDevexPR<Real>::setRep(typename SPxSolver<Real>::Representation)
+  void SPxDevexPR<Real>::setRep(typename SPxSolverBase<Real>::Representation)
   {
     if (this->thesolver != 0)
       {
@@ -889,7 +889,7 @@ namespace soplex
             coWeights[i] += xi_p * coPvec[i] * coPvec[i];
             if (coWeights[i] <= 1 || coWeights[i] > 1e+6)
               {
-                setupWeights(SPxSolver<Real>::ENTER);
+                setupWeights(SPxSolverBase<Real>::ENTER);
                 return;
               }
           }
@@ -900,7 +900,7 @@ namespace soplex
             weights[i] += xi_p * pVec[i] * pVec[i];
             if (weights[i] <= 1 || weights[i] > 1e+6)
               {
-                setupWeights(SPxSolver<Real>::ENTER);
+                setupWeights(SPxSolverBase<Real>::ENTER);
                 return;
               }
           }
@@ -910,7 +910,7 @@ namespace soplex
   template <>
   void SPxDevexPR<Real>::addedVecs (int n)
   {
-    int initval = (this->thesolver->type() == SPxSolver<Real>::ENTER) ? 2 : 1;
+    int initval = (this->thesolver->type() == SPxSolverBase<Real>::ENTER) ? 2 : 1;
     DVector& weights = this->thesolver->weights;
     n = weights.dim();
     weights.reDim (this->thesolver->coDim());
@@ -921,7 +921,7 @@ namespace soplex
   template <>
   void SPxDevexPR<Real>::addedCoVecs(int n)
   {
-    int initval = (this->thesolver->type() == SPxSolver<Real>::ENTER) ? 2 : 1;
+    int initval = (this->thesolver->type() == SPxSolverBase<Real>::ENTER) ? 2 : 1;
     DVector& coWeights = this->thesolver->coWeights;
     n = coWeights.dim();
     coWeights.reDim(this->thesolver->dim());

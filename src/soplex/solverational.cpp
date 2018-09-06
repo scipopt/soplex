@@ -114,18 +114,18 @@ namespace soplex
          // case: an unrecoverable error occured
          if( error )
          {
-            _status = SPxSolver<Real>::ERROR;
+            _status = SPxSolverBase<Real>::ERROR;
             break;
          }
          // case: stopped due to some limit
          else if( stoppedTime )
          {
-            _status = SPxSolver<Real>::ABORT_TIME;
+            _status = SPxSolverBase<Real>::ABORT_TIME;
             break;
          }
          else if(  stoppedIter )
          {
-            _status = SPxSolver<Real>::ABORT_ITER;
+            _status = SPxSolverBase<Real>::ABORT_ITER;
             break;
          }
          // case: unboundedness detected for the first time
@@ -141,7 +141,7 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout, spxout << "Error while testing for unboundedness.\n" );
-               _status = SPxSolver<Real>::ERROR;
+               _status = SPxSolverBase<Real>::ERROR;
                break;
             }
 
@@ -158,12 +158,12 @@ namespace soplex
 
             if( stoppedTime )
             {
-               _status = SPxSolver<Real>::ABORT_TIME;
+               _status = SPxSolverBase<Real>::ABORT_TIME;
                break;
             }
             else if( stoppedIter )
             {
-               _status = SPxSolver<Real>::ABORT_ITER;
+               _status = SPxSolverBase<Real>::ABORT_ITER;
                break;
             }
 
@@ -179,29 +179,29 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout, spxout << "Error while testing for feasibility.\n" );
-               _status = SPxSolver<Real>::ERROR;
+               _status = SPxSolverBase<Real>::ERROR;
                break;
             }
             else if( stoppedTime )
             {
-               _status = SPxSolver<Real>::ABORT_TIME;
+               _status = SPxSolverBase<Real>::ABORT_TIME;
                break;
             }
             else if( stoppedIter )
             {
-               _status = SPxSolver<Real>::ABORT_ITER;
+               _status = SPxSolverBase<Real>::ABORT_ITER;
                break;
             }
             else if( infeasible )
             {
                MSG_INFO1( spxout, spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
-               _status = SPxSolver<Real>::INFEASIBLE;
+               _status = SPxSolverBase<Real>::INFEASIBLE;
                break;
             }
             else if( hasUnboundedRay )
             {
                MSG_INFO1( spxout, spxout << "Primal feasible and unbounded.\n" );
-               _status = SPxSolver<Real>::UNBOUNDED;
+               _status = SPxSolverBase<Real>::UNBOUNDED;
                break;
             }
             else
@@ -220,7 +220,7 @@ namespace soplex
             if( error )
             {
                MSG_INFO1( spxout, spxout << "Error while testing for infeasibility.\n" );
-               _status = SPxSolver<Real>::ERROR;
+               _status = SPxSolverBase<Real>::ERROR;
                _restoreBasis();
                break;
             }
@@ -229,13 +229,13 @@ namespace soplex
 
             if( stoppedTime )
             {
-               _status = SPxSolver<Real>::ABORT_TIME;
+               _status = SPxSolverBase<Real>::ABORT_TIME;
                _restoreBasis();
                break;
             }
             else if( stoppedIter )
             {
-               _status = SPxSolver<Real>::ABORT_ITER;
+               _status = SPxSolverBase<Real>::ABORT_ITER;
                _restoreBasis();
                break;
             }
@@ -252,7 +252,7 @@ namespace soplex
                if( error )
                {
                   MSG_INFO1( spxout, spxout << "Error while testing for dual infeasibility.\n" );
-                  _status = SPxSolver<Real>::ERROR;
+                  _status = SPxSolverBase<Real>::ERROR;
                   _restoreBasis();
                   break;
                }
@@ -282,13 +282,13 @@ namespace soplex
             if( infeasible )
             {
                MSG_INFO1( spxout, spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
-               _status = SPxSolver<Real>::INFEASIBLE;
+               _status = SPxSolverBase<Real>::INFEASIBLE;
                break;
             }
             else if( hasUnboundedRay )
             {
                MSG_INFO1( spxout, spxout << "Primal feasible and unbounded.\n" );
-               _status = SPxSolver<Real>::UNBOUNDED;
+               _status = SPxSolverBase<Real>::UNBOUNDED;
                break;
             }
             else
@@ -300,7 +300,7 @@ namespace soplex
          else if( primalFeasible && dualFeasible )
          {
             MSG_INFO1( spxout, spxout << "Solved to optimality.\n" );
-            _status = SPxSolver<Real>::OPTIMAL;
+            _status = SPxSolverBase<Real>::OPTIMAL;
             break;
          }
          else
@@ -313,7 +313,7 @@ namespace soplex
 
       ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
 
-      if( _status == SPxSolver<Real>::OPTIMAL || _status == SPxSolver<Real>::INFEASIBLE || _status == SPxSolver<Real>::UNBOUNDED )
+      if( _status == SPxSolverBase<Real>::OPTIMAL || _status == SPxSolverBase<Real>::INFEASIBLE || _status == SPxSolverBase<Real>::UNBOUNDED )
          _hasSolRational = true;
 
       // restore original problem
@@ -341,7 +341,7 @@ namespace soplex
       {
          assert(_isRealLPLoaded);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-         _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
+         _hasBasis = (_solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
       }
 
       // stop timing
@@ -381,7 +381,7 @@ namespace soplex
       _solver.setOpttol(realParam(SoPlexBase<R>::FPOPTTOL));
 
       // declare vectors and variables
-      typename SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
+      typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
 
       _modLower.reDim(numColsT(), false);
       _modUpper.reDim(numColsT(), false);
@@ -408,7 +408,7 @@ namespace soplex
          assert(_basisStatusRows.size() == numRowsT());
          assert(_basisStatusCols.size() == numColsT());
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-         _hasBasis = (_solver.basis().status() > SPxBasis<R>::NO_PROBLEM);
+         _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
       }
 
       for( int r = numRowsT() - 1; r >= 0; r-- )
@@ -422,10 +422,10 @@ namespace soplex
       // evaluate result
       switch( result )
       {
-      case SPxSolver<R>::OPTIMAL:
+      case SPxSolverBase<R>::OPTIMAL:
          MSG_INFO1( spxout, spxout << "Floating-point optimal.\n" );
          break;
-      case SPxSolver<R>::INFEASIBLE:
+      case SPxSolverBase<R>::INFEASIBLE:
          MSG_INFO1( spxout, spxout << "Floating-point infeasible.\n" );
          // the floating-point solve returns a Farkas ray if and only if the simplifier was not used, which is exactly
          // the case when a basis could be returned
@@ -438,14 +438,14 @@ namespace soplex
             sol._hasDualFarkas = false;
          infeasible = true;
          return;
-      case SPxSolver<R>::UNBOUNDED:
+      case SPxSolverBase<R>::UNBOUNDED:
          MSG_INFO1( spxout, spxout << "Floating-point unbounded.\n" );
          unbounded = true;
          return;
-      case SPxSolver<R>::ABORT_TIME:
+      case SPxSolverBase<R>::ABORT_TIME:
          stoppedTime = true;
          return;
-      case SPxSolver<R>::ABORT_ITER:
+      case SPxSolverBase<R>::ABORT_ITER:
          stoppedIter = true;
          return;
       default:
@@ -466,21 +466,21 @@ namespace soplex
 
       for( int c = numColsT() - 1; c >= 0; c-- )
       {
-         typename SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+         typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
 
-         if( basisStatusCol == SPxSolver<R>::ON_LOWER )
+         if( basisStatusCol == SPxSolverBase<R>::ON_LOWER )
             sol._primal[c] = lowerRational(c);
-         else if( basisStatusCol == SPxSolver<R>::ON_UPPER )
+         else if( basisStatusCol == SPxSolverBase<R>::ON_UPPER )
             sol._primal[c] = upperRational(c);
-         else if( basisStatusCol == SPxSolver<R>::FIXED )
+         else if( basisStatusCol == SPxSolverBase<R>::FIXED )
          {
             // it may happen that lower and upper are only equal in the real LP but different in the rational LP; we do
             // not check this to avoid rational comparisons, but simply switch the basis status to the lower bound; this
             // is necessary, because for fixed variables any reduced cost is feasible
             sol._primal[c] = lowerRational(c);
-            basisStatusCol = SPxSolver<R>::ON_LOWER;
+            basisStatusCol = SPxSolverBase<R>::ON_LOWER;
          }
-         else if( basisStatusCol == SPxSolver<R>::ZERO )
+         else if( basisStatusCol == SPxSolverBase<R>::ZERO )
             sol._primal[c] = 0;
          else
             sol._primal[c] = primalReal[c];
@@ -490,14 +490,14 @@ namespace soplex
       int dualSize = 0;
       for( int r = numRowsT() - 1; r >= 0; r-- )
       {
-         typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+         typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
          // it may happen that left-hand and right-hand side are different in the rational, but equal in the real LP,
          // leading to a fixed basis status; this is critical because rows with fixed basis status are ignored in the
          // computation of the dual violation; to avoid rational comparisons we do not check this but simply switch to
          // the left-hand side status
-         if( basisStatusRow == SPxSolver<R>::FIXED )
-            basisStatusRow = SPxSolver<R>::ON_LOWER;
+         if( basisStatusRow == SPxSolverBase<R>::FIXED )
+            basisStatusRow = SPxSolverBase<R>::ON_LOWER;
 
          {
             sol._dual[r] = dualReal[r];
@@ -524,8 +524,8 @@ namespace soplex
       int numFailedRefinements = 0;
 
       // store basis status in case solving modified problem failed
-      DataArray< typename SPxSolver<R>::VarStatus > basisStatusRowsFirst;
-      DataArray< typename SPxSolver<R>::VarStatus > basisStatusColsFirst;
+      DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusRowsFirst;
+      DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusColsFirst;
 
       // refinement loop
       const bool maximizing = (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE);
@@ -590,7 +590,7 @@ namespace soplex
          sideViolation = 0;
          for( int r = numRowsT() - 1; r >= 0; r-- )
          {
-            const typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+            const typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
             // left-hand side
             assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
@@ -611,7 +611,7 @@ namespace soplex
                   sideViolation = _modLhs[r];
                // if the activity is feasible, but too far from the bound, this violates complementary slackness; we
                // count it as side violation here
-               else if( basisStatusRow == SPxSolver<R>::ON_LOWER && _modLhs[r] < -sideViolation )
+               else if( basisStatusRow == SPxSolverBase<R>::ON_LOWER && _modLhs[r] < -sideViolation )
                   sideViolation = -_modLhs[r];
             }
 
@@ -634,7 +634,7 @@ namespace soplex
                   sideViolation = -_modRhs[r];
                // if the activity is feasible, but too far from the bound, this violates complementary slackness; we
                // count it as side violation here
-               else if( basisStatusRow == SPxSolver<R>::ON_UPPER && _modRhs[r] > sideViolation )
+               else if( basisStatusRow == SPxSolverBase<R>::ON_UPPER && _modRhs[r] > sideViolation )
                   sideViolation = _modRhs[r];
             }
          }
@@ -648,10 +648,10 @@ namespace soplex
             if( _colTypes[c] == RANGETYPE_FIXED )
                continue;
 
-            const typename SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
-            assert(basisStatusCol != SPxSolver<R>::FIXED);
+            const typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+            assert(basisStatusCol != SPxSolverBase<R>::FIXED);
 
-            if( ((maximizing && basisStatusCol != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusCol != SPxSolver<R>::ON_UPPER))
+            if( ((maximizing && basisStatusCol != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusCol != SPxSolverBase<R>::ON_UPPER))
                && sol._redCost[c] < -redCostViolation )
             {
                MSG_DEBUG( std::cout << "basisStatusCol = " << basisStatusCol
@@ -662,7 +662,7 @@ namespace soplex
                redCostViolation = -sol._redCost[c];
             }
 
-            if( ((maximizing && basisStatusCol != SPxSolver<R>::ON_UPPER) || (!maximizing && basisStatusCol != SPxSolver<R>::ON_LOWER))
+            if( ((maximizing && basisStatusCol != SPxSolverBase<R>::ON_UPPER) || (!maximizing && basisStatusCol != SPxSolverBase<R>::ON_LOWER))
                && sol._redCost[c] > redCostViolation )
             {
                MSG_DEBUG( std::cout << "basisStatusCol = " << basisStatusCol
@@ -681,10 +681,10 @@ namespace soplex
             if( _rowTypes[r] == RANGETYPE_FIXED )
                continue;
 
-            const typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
-            assert(basisStatusRow != SPxSolver<R>::FIXED);
+            const typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+            assert(basisStatusRow != SPxSolverBase<R>::FIXED);
 
-            if( ((maximizing && basisStatusRow != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusRow != SPxSolver<R>::ON_UPPER))
+            if( ((maximizing && basisStatusRow != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusRow != SPxSolverBase<R>::ON_UPPER))
                && sol._dual[r] < -dualViolation )
             {
                MSG_DEBUG( std::cout << "basisStatusRow = " << basisStatusRow
@@ -695,7 +695,7 @@ namespace soplex
                dualViolation = -sol._dual[r];
             }
 
-            if( ((maximizing && basisStatusRow != SPxSolver<R>::ON_UPPER) || (!maximizing && basisStatusRow != SPxSolver<R>::ON_LOWER))
+            if( ((maximizing && basisStatusRow != SPxSolverBase<R>::ON_UPPER) || (!maximizing && basisStatusRow != SPxSolverBase<R>::ON_LOWER))
                && sol._dual[r] > dualViolation )
             {
                MSG_DEBUG( std::cout << "basisStatusRow = " << basisStatusRow
@@ -1015,23 +1015,23 @@ namespace soplex
                assert(row >= 0);
                assert(row < numRowsT());
 
-               if( _basisStatusRows[row] == SPxSolver<R>::BASIC && _basisStatusCols[col] != SPxSolver<R>::BASIC )
+               if( _basisStatusRows[row] == SPxSolverBase<R>::BASIC && _basisStatusCols[col] != SPxSolverBase<R>::BASIC )
                {
                   _basisStatusRows[row] = _basisStatusCols[col];
-                  _basisStatusCols[col] = SPxSolver<R>::BASIC;
+                  _basisStatusCols[col] = SPxSolverBase<R>::BASIC;
                   _rationalLUSolver.clear();
                }
             }
          }
 
          // load basis
-         if( _hasBasis && _solver.basis().status() < SPxBasis<R>::REGULAR )
+         if( _hasBasis && _solver.basis().status() < SPxBasisBase<R>::REGULAR )
          {
             MSG_DEBUG( spxout << "basis (status = " << _solver.basis().status() << ") desc before set:\n"; _solver.basis().desc().dump() );
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
             MSG_DEBUG( spxout << "basis (status = " << _solver.basis().status() << ") desc after set:\n"; _solver.basis().desc().dump() );
 
-            _hasBasis = _solver.basis().status() > SPxBasis<R>::NO_PROBLEM;
+            _hasBasis = _solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM;
             MSG_DEBUG( spxout << "setting basis in solver " << (_hasBasis ? "successful" : "failed") << " (3)\n" );
          }
 
@@ -1057,25 +1057,25 @@ namespace soplex
          // evaluate result; if modified problem was not solved to optimality, stop refinement
          switch( result )
          {
-         case SPxSolver<R>::OPTIMAL:
+         case SPxSolverBase<R>::OPTIMAL:
             MSG_INFO1( spxout, spxout << "Floating-point optimal.\n" );
             break;
-         case SPxSolver<R>::INFEASIBLE:
+         case SPxSolverBase<R>::INFEASIBLE:
             MSG_INFO1( spxout, spxout << "Floating-point infeasible.\n" );
             sol._dualFarkas = dualReal;
             sol._hasDualFarkas = true;
             infeasible = true;
             _solver.clearRowObjs();
             return;
-         case SPxSolver<R>::UNBOUNDED:
+         case SPxSolverBase<R>::UNBOUNDED:
             MSG_INFO1( spxout, spxout << "Floating-point unbounded.\n" );
             unbounded = true;
             _solver.clearRowObjs();
             return;
-         case SPxSolver<R>::ABORT_TIME:
+         case SPxSolverBase<R>::ABORT_TIME:
             stoppedTime = true;
             return;
-         case SPxSolver<R>::ABORT_ITER:
+         case SPxSolverBase<R>::ABORT_ITER:
             stoppedIter = true;
             _solver.clearRowObjs();
             return;
@@ -1097,9 +1097,9 @@ namespace soplex
          for( int c = numColsT() - 1; c >= 0; c-- )
          {
             // force values of nonbasic variables to bounds
-            typename SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+            typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
 
-            if( basisStatusCol == SPxSolver<R>::ON_LOWER )
+            if( basisStatusCol == SPxSolverBase<R>::ON_LOWER )
             {
                if( sol._primal[c] != lowerRational(c) )
                {
@@ -1111,7 +1111,7 @@ namespace soplex
                   sol._primal[c] = lowerRational(c);
                }
             }
-            else if( basisStatusCol == SPxSolver<R>::ON_UPPER )
+            else if( basisStatusCol == SPxSolverBase<R>::ON_UPPER )
             {
                if( sol._primal[c] != upperRational(c) )
                {
@@ -1123,12 +1123,12 @@ namespace soplex
                   sol._primal[c] = upperRational(c);
                }
             }
-            else if( basisStatusCol == SPxSolver<R>::FIXED )
+            else if( basisStatusCol == SPxSolverBase<R>::FIXED )
             {
                // it may happen that lower and upper are only equal in the real LP but different in the rational LP; we
                // do not check this to avoid rational comparisons, but simply switch the basis status to the lower
                // bound; this is necessary, because for fixed variables any reduced cost is feasible
-               basisStatusCol = SPxSolver<R>::ON_LOWER;
+               basisStatusCol = SPxSolverBase<R>::ON_LOWER;
                if( sol._primal[c] != lowerRational(c) )
                {
                   int i = _primalDualDiff.size();
@@ -1139,7 +1139,7 @@ namespace soplex
                   sol._primal[c] = lowerRational(c);
                }
             }
-            else if( basisStatusCol == SPxSolver<R>::ZERO )
+            else if( basisStatusCol == SPxSolverBase<R>::ZERO )
             {
                if( sol._primal[c] != 0 )
                {
@@ -1220,10 +1220,10 @@ namespace soplex
                if( _colTypes[c] == RANGETYPE_FIXED )
                   continue;
 
-               const SPxSolver<Real>::VarStatus& basisStatusCol = _basisStatusCols[c];
-               assert(basisStatusCol != SPxSolver<R>::FIXED);
+               const SPxSolverBase<Real>::VarStatus& basisStatusCol = _basisStatusCols[c];
+               assert(basisStatusCol != SPxSolverBase<R>::FIXED);
 
-               if( ((maximizing && basisStatusCol != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusCol != SPxSolver<R>::ON_UPPER))
+               if( ((maximizing && basisStatusCol != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusCol != SPxSolverBase<R>::ON_UPPER))
                   && debugRedCost[c] < -debugRedCostViolation )
                {
                   MSG_DEBUG( std::cout << "basisStatusCol = " << basisStatusCol
@@ -1235,7 +1235,7 @@ namespace soplex
                   debugRedCostViolation = -debugRedCost[c];
                }
 
-               if( ((maximizing && basisStatusCol != SPxSolver<R>::ON_UPPER) || (!maximizing && basisStatusCol != SPxSolver<R>::ON_LOWER))
+               if( ((maximizing && basisStatusCol != SPxSolverBase<R>::ON_UPPER) || (!maximizing && basisStatusCol != SPxSolverBase<R>::ON_LOWER))
                   && debugRedCost[c] > debugRedCostViolation )
                {
                   MSG_DEBUG( std::cout << "basisStatusCol = " << basisStatusCol
@@ -1256,12 +1256,12 @@ namespace soplex
                if( _rowTypes[r] == RANGETYPE_FIXED )
                   continue;
 
-               const SPxSolver<Real>::VarStatus& basisStatusRow = _basisStatusRows[r];
-               assert(basisStatusRow != SPxSolver<R>::FIXED);
+               const SPxSolverBase<Real>::VarStatus& basisStatusRow = _basisStatusRows[r];
+               assert(basisStatusRow != SPxSolverBase<R>::FIXED);
 
                Rational val = (-dualScale * sol._dual[r]) - Rational(dualReal[r]);
 
-               if( ((maximizing && basisStatusRow != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusRow != SPxSolver<R>::ON_UPPER))
+               if( ((maximizing && basisStatusRow != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusRow != SPxSolverBase<R>::ON_UPPER))
                   && val > debugDualViolation )
                {
                   MSG_DEBUG( std::cout << "basisStatusRow = " << basisStatusRow
@@ -1273,7 +1273,7 @@ namespace soplex
                   debugDualViolation = val;
                }
 
-               if( ((maximizing && basisStatusRow != SPxSolver<R>::ON_UPPER) || (!maximizing && basisStatusRow != SPxSolver<R>::ON_LOWER))
+               if( ((maximizing && basisStatusRow != SPxSolverBase<R>::ON_UPPER) || (!maximizing && basisStatusRow != SPxSolverBase<R>::ON_LOWER))
                   && val < -debugDualViolation )
                {
                   MSG_DEBUG( std::cout << "basisStatusRow = " << basisStatusRow
@@ -1285,7 +1285,7 @@ namespace soplex
                   debugDualViolation = -val;
                }
 
-               if( basisStatusRow == SPxSolver<R>::BASIC && spxAbs(val) > debugBasicDualViolation )
+               if( basisStatusRow == SPxSolverBase<R>::BASIC && spxAbs(val) > debugBasicDualViolation )
                {
                   MSG_DEBUG( std::cout << "basisStatusRow = " << basisStatusRow
                      << ", lower tight = " << bool(sol._slacks[r] <= lhsRational(r))
@@ -1315,14 +1315,14 @@ namespace soplex
          dualSize = 0;
          for( int r = numRowsT() - 1; r >= 0; r-- )
          {
-            typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+            typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
 
             // it may happen that left-hand and right-hand side are different in the rational, but equal in the real LP,
             // leading to a fixed basis status; this is critical because rows with fixed basis status are ignored in the
             // computation of the dual violation; to avoid rational comparisons we do not check this but simply switch
             // to the left-hand side status
-            if( basisStatusRow == SPxSolver<R>::FIXED )
-               basisStatusRow = SPxSolver<R>::ON_LOWER;
+            if( basisStatusRow == SPxSolverBase<R>::FIXED )
+               basisStatusRow = SPxSolverBase<R>::ON_LOWER;
 
             {
                if( dualReal[r] != 0 )
@@ -1381,10 +1381,10 @@ namespace soplex
          for( int r = numRowsT() - 1; r >= 0; r-- )
          {
             assert((lhsRational(r) == rhsRational(r)) == (_rowTypes[r] == RANGETYPE_FIXED));
-            if( _rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolver<R>::FIXED )
+            if( _rowTypes[r] != RANGETYPE_FIXED && _basisStatusRows[r] == SPxSolverBase<R>::FIXED )
                _basisStatusRows[r] = (maximizing == (sol._dual[r] < 0))
-                  ? SPxSolver<R>::ON_LOWER
-                  : SPxSolver<R>::ON_UPPER;
+                  ? SPxSolverBase<R>::ON_LOWER
+                  : SPxSolverBase<R>::ON_UPPER;
          }
       }
 
@@ -1734,8 +1734,8 @@ namespace soplex
          assert(numColsT() >= _beforeLiftCols);
          assert(numRowsT() >= _beforeLiftRows);
 
-         _basisStatusCols.append(numColsT() - _beforeLiftCols, SPxSolver<R>::BASIC);
-         _basisStatusRows.append(numRowsT() - _beforeLiftRows, SPxSolver<R>::FIXED);
+         _basisStatusCols.append(numColsT() - _beforeLiftCols, SPxSolverBase<R>::BASIC);
+         _basisStatusRows.append(numRowsT() - _beforeLiftRows, SPxSolverBase<R>::FIXED);
          _rationalLUSolver.clear();
       }
 
@@ -1814,7 +1814,7 @@ namespace soplex
       // adjust basis
       for( int i = _beforeLiftCols; i < numColsT() && _hasBasis; i++ )
       {
-         if( _basisStatusCols[i] != SPxSolver<R>::BASIC )
+         if( _basisStatusCols[i] != SPxSolverBase<R>::BASIC )
          {
             MSG_INFO1( spxout, spxout << "Warning: lost basis during project phase because of nonbasic lifting column.\n" );
             _hasBasis = false;
@@ -1824,7 +1824,7 @@ namespace soplex
 
       for( int i = _beforeLiftRows; i < numRowsT() && _hasBasis; i++ )
       {
-         if( _basisStatusRows[i] == SPxSolver<R>::BASIC )
+         if( _basisStatusRows[i] == SPxSolverBase<R>::BASIC )
          {
             MSG_INFO1( spxout, spxout << "Warning: lost basis during project phase because of basic lifting row.\n" );
             _hasBasis = false;
@@ -1893,24 +1893,24 @@ namespace soplex
             // left-hand side and rounding up the right-hand side; if the basis status is fixed, we need to adjust it
             for( int i = 0; i < _solver.nRows(); i++ )
             {
-               if( _basisStatusRows[i] == SPxSolver<R>::FIXED && _solver.lhs(i) != _solver.rhs(i) )
+               if( _basisStatusRows[i] == SPxSolverBase<R>::FIXED && _solver.lhs(i) != _solver.rhs(i) )
                {
                   assert(_solver.rhs(i) == spxNextafter(_solver.lhs(i), infinity));
                   if( _hasSolRational && _solRational.isDualFeasible()
                      && ((intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE && _solRational._dual[i] > 0)
                         || (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE && _solRational._dual[i] < 0)) )
                   {
-                     _basisStatusRows[i] = SPxSolver<R>::ON_UPPER;
+                     _basisStatusRows[i] = SPxSolverBase<R>::ON_UPPER;
                   }
                   else
                   {
-                     _basisStatusRows[i] = SPxSolver<R>::ON_LOWER;
+                     _basisStatusRows[i] = SPxSolverBase<R>::ON_LOWER;
                   }
                }
             }
 
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
-            _hasBasis = (_solver.basis().status() > SPxBasis<R>::NO_PROBLEM);
+            _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
          }
       }
       else
@@ -1974,20 +1974,20 @@ namespace soplex
 
             switch( _basisStatusRows[row] )
             {
-            case SPxSolver<R>::ON_LOWER:
-               _basisStatusCols.append(SPxSolver<R>::ON_UPPER);
+            case SPxSolverBase<R>::ON_LOWER:
+               _basisStatusCols.append(SPxSolverBase<R>::ON_UPPER);
                break;
-            case SPxSolver<R>::ON_UPPER:
-               _basisStatusCols.append(SPxSolver<R>::ON_LOWER);
+            case SPxSolverBase<R>::ON_UPPER:
+               _basisStatusCols.append(SPxSolverBase<R>::ON_LOWER);
                break;
-            case SPxSolver<R>::BASIC:
-            case SPxSolver<R>::FIXED:
+            case SPxSolverBase<R>::BASIC:
+            case SPxSolverBase<R>::FIXED:
             default:
                _basisStatusCols.append(_basisStatusRows[row]);
                break;
             }
 
-            _basisStatusRows[row] = SPxSolver<R>::FIXED;
+            _basisStatusRows[row] = SPxSolverBase<R>::FIXED;
          }
 
          _rationalLUSolver.clear();
@@ -2051,10 +2051,10 @@ namespace soplex
 
             assert(row >= 0);
             assert(row < numRowsT());
-            assert(_basisStatusRows[row] != SPxSolver<R>::UNDEFINED);
-            assert(_basisStatusRows[row] != SPxSolver<R>::ZERO || lhsRational(row) == 0);
-            assert(_basisStatusRows[row] != SPxSolver<R>::ZERO || rhsRational(row) == 0);
-            assert(_basisStatusRows[row] != SPxSolver<R>::BASIC || _basisStatusCols[col] != SPxSolver<R>::BASIC);
+            assert(_basisStatusRows[row] != SPxSolverBase<R>::UNDEFINED);
+            assert(_basisStatusRows[row] != SPxSolverBase<R>::ZERO || lhsRational(row) == 0);
+            assert(_basisStatusRows[row] != SPxSolverBase<R>::ZERO || rhsRational(row) == 0);
+            assert(_basisStatusRows[row] != SPxSolverBase<R>::BASIC || _basisStatusCols[col] != SPxSolverBase<R>::BASIC);
 
             MSG_DEBUG( std::cout << "slack column " << col << " for row " << row
                << ": col status=" << _basisStatusCols[col]
@@ -2062,18 +2062,18 @@ namespace soplex
                << ", redcost=" << rationalToString(sol._redCost[col])
                << ", dual=" << rationalToString(sol._dual[row]) << "\n" );
 
-            if( _basisStatusRows[row] != SPxSolver<R>::BASIC )
+            if( _basisStatusRows[row] != SPxSolverBase<R>::BASIC )
             {
                switch( _basisStatusCols[col] )
                {
-               case SPxSolver<R>::ON_LOWER:
-                  _basisStatusRows[row] = SPxSolver<R>::ON_UPPER;
+               case SPxSolverBase<R>::ON_LOWER:
+                  _basisStatusRows[row] = SPxSolverBase<R>::ON_UPPER;
                   break;
-               case SPxSolver<R>::ON_UPPER:
-                  _basisStatusRows[row] = SPxSolver<R>::ON_LOWER;
+               case SPxSolverBase<R>::ON_UPPER:
+                  _basisStatusRows[row] = SPxSolverBase<R>::ON_LOWER;
                   break;
-               case SPxSolver<R>::BASIC:
-               case SPxSolver<R>::FIXED:
+               case SPxSolverBase<R>::BASIC:
+               case SPxSolverBase<R>::FIXED:
                default:
                   _basisStatusRows[row] = _basisStatusCols[col];
                   break;
@@ -2227,8 +2227,8 @@ namespace soplex
       // adjust basis
       if( _hasBasis )
       {
-         _basisStatusCols.append(SPxSolver<R>::ON_UPPER);
-         _basisStatusRows.append(SPxSolver<R>::BASIC);
+         _basisStatusCols.append(SPxSolverBase<R>::ON_UPPER);
+         _basisStatusRows.append(SPxSolverBase<R>::BASIC);
          _rationalLUSolver.clear();
       }
 
@@ -2271,7 +2271,7 @@ namespace soplex
          sol._primalRay = sol._primal;
          sol._primalRay.reDim(numOrigCols);
 
-         _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver<R>::BASIC && _basisStatusRows[numOrigRows] == SPxSolver<R>::BASIC);
+         _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolverBase<R>::BASIC && _basisStatusRows[numOrigRows] == SPxSolverBase<R>::BASIC);
          _basisStatusCols.reSize(numOrigCols);
          _basisStatusRows.reSize(numOrigRows);
       }
@@ -2653,7 +2653,7 @@ namespace soplex
       // adjust basis
       if( _hasBasis )
       {
-         _basisStatusCols.append(SPxSolver<R>::ON_UPPER);
+         _basisStatusCols.append(SPxSolverBase<R>::ON_UPPER);
       }
 
       // invalidate rational basis factorization
@@ -2715,7 +2715,7 @@ namespace soplex
          sol._primal.reDim(numOrigCols);
          sol._slacks -= _rationalLP->colVector(numOrigCols);
 
-         _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolver<R>::BASIC);
+         _hasBasis = (_basisStatusCols[numOrigCols] != SPxSolverBase<R>::BASIC);
          _basisStatusCols.reSize(numOrigCols);
       }
       else
@@ -3094,7 +3094,7 @@ namespace soplex
 
    /// solves real LP during iterative refinement
   template <class R>
-   typename SPxSolver<R>::Status SoPlexBase<R>::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& returnedBasis)
+   typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis)
    {
       assert(_isConsistent());
 
@@ -3103,7 +3103,7 @@ namespace soplex
       assert(primal.dim() == numColsT());
       assert(dual.dim() == numRowsT());
 
-      typename SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
+      typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
 
 #ifndef SOPLEX_MANUAL_ALT
       if( fromscratch || !_hasBasis )
@@ -3161,20 +3161,20 @@ namespace soplex
          ///@todo move to private helper methods
          // evaluate status flag
          if( simplificationStatus == SPxSimplifier<R>::INFEASIBLE )
-            result = SPxSolver<R>::INFEASIBLE;
+            result = SPxSolverBase<R>::INFEASIBLE;
          else if( simplificationStatus == SPxSimplifier<R>::DUAL_INFEASIBLE )
-            result = SPxSolver<R>::INForUNBD;
+            result = SPxSolverBase<R>::INForUNBD;
          else if( simplificationStatus == SPxSimplifier<R>::UNBOUNDED )
-            result = SPxSolver<R>::UNBOUNDED;
+            result = SPxSolverBase<R>::UNBOUNDED;
          else if( simplificationStatus == SPxSimplifier<R>::VANISHED || simplificationStatus == SPxSimplifier<R>::OKAY )
          {
-            result = simplificationStatus == SPxSimplifier<R>::VANISHED ? SPxSolver<R>::OPTIMAL : _solver.status();
+            result = simplificationStatus == SPxSimplifier<R>::VANISHED ? SPxSolverBase<R>::OPTIMAL : _solver.status();
 
             ///@todo move to private helper methods
             // process result
             switch( result )
             {
-            case SPxSolver<R>::OPTIMAL:
+            case SPxSolverBase<R>::OPTIMAL:
                // unsimplify if simplifier is active and LP is solved to optimality; this must be done here and not at solution
                // query, because we want to have the basis for the original problem
                if( _simplifier != 0 )
@@ -3192,7 +3192,7 @@ namespace soplex
 
                   if( !vanished )
                   {
-                     assert(_solver.status() == SPxSolver<R>::OPTIMAL);
+                     assert(_solver.status() == SPxSolverBase<R>::OPTIMAL);
 
                      _solver.getPrimal(tmpPrimal);
                      _solver.getSlacks(tmpSlacks);
@@ -3247,7 +3247,7 @@ namespace soplex
                }
                break;
 
-            case SPxSolver<R>::ABORT_CYCLING:
+            case SPxSolverBase<R>::ABORT_CYCLING:
                if( _simplifier == 0 && boolParam(SoPlexBase<R>::ACCEPTCYCLING) )
                {
                   _solver.getPrimal(primal);
@@ -3265,17 +3265,17 @@ namespace soplex
                   basisStatusCols.reSize(_solver.nCols());
                   _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(), basisStatusCols.size());
                   returnedBasis = true;
-                  result = SPxSolver<R>::OPTIMAL;
+                  result = SPxSolverBase<R>::OPTIMAL;
                }
                break;
-            case SPxSolver<R>::ABORT_TIME:
-            case SPxSolver<R>::ABORT_ITER:
-            case SPxSolver<R>::ABORT_VALUE:
-            case SPxSolver<R>::REGULAR:
-            case SPxSolver<R>::RUNNING:
-            case SPxSolver<R>::UNBOUNDED:
+            case SPxSolverBase<R>::ABORT_TIME:
+            case SPxSolverBase<R>::ABORT_ITER:
+            case SPxSolverBase<R>::ABORT_VALUE:
+            case SPxSolverBase<R>::REGULAR:
+            case SPxSolverBase<R>::RUNNING:
+            case SPxSolverBase<R>::UNBOUNDED:
                break;
-            case SPxSolver<R>::INFEASIBLE:
+            case SPxSolverBase<R>::INFEASIBLE:
                // if simplifier is active we cannot return a Farkas ray currently
                if( _simplifier != 0 )
                   break;
@@ -3294,8 +3294,8 @@ namespace soplex
                returnedBasis = true;
                break;
 
-            case SPxSolver<R>::INForUNBD:
-            case SPxSolver<R>::SINGULAR:
+            case SPxSolverBase<R>::INForUNBD:
+            case SPxSolverBase<R>::SINGULAR:
             default:
                break;
             }
@@ -3304,7 +3304,7 @@ namespace soplex
       catch( ... )
       {
          MSG_INFO1( spxout, spxout << "Exception thrown during floating-point solve.\n" );
-         result = SPxSolver<R>::ERROR;
+         result = SPxSolverBase<R>::ERROR;
       }
 
       // restore original LP if necessary
@@ -3325,9 +3325,9 @@ namespace soplex
 
    /// solves real LP with recovery mechanism
   template <class R>
-    typename SPxSolver<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier)
+    typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier)
    {
-      typename SPxSolver<R>::Status result = SPxSolver<R>::UNKNOWN;
+      typename SPxSolverBase<R>::Status result = SPxSolverBase<R>::UNKNOWN;
 
       bool fromScratch = false;
       bool solved = false;
@@ -3358,9 +3358,9 @@ namespace soplex
 
          result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols, returnedBasis);
 
-         solved = (result == SPxSolver<R>::OPTIMAL)
-            || (result == SPxSolver<R>::INFEASIBLE && acceptInfeasible)
-            || (result == SPxSolver<R>::UNBOUNDED && acceptUnbounded);
+         solved = (result == SPxSolverBase<R>::OPTIMAL)
+            || (result == SPxSolverBase<R>::INFEASIBLE && acceptInfeasible)
+            || (result == SPxSolverBase<R>::UNBOUNDED && acceptUnbounded);
 
          if( solved )
             break;
@@ -3471,7 +3471,7 @@ namespace soplex
             continue;
          }
 
-         if( !tightenedTolerances && result != SPxSolver<R>::INFEASIBLE )
+         if( !tightenedTolerances && result != SPxSolverBase<R>::INFEASIBLE )
          {
             MSG_INFO1( spxout, spxout << "Tightening tolerances." << std::endl );
 
@@ -3488,7 +3488,7 @@ namespace soplex
          {
             MSG_INFO1( spxout, spxout << "Switching ratio test." << std::endl );
 
-            _solver.setType(_solver.type() == SPxSolver<R>::LEAVE ? SPxSolver<R>::ENTER : SPxSolver<R>::LEAVE);
+            _solver.setType(_solver.type() == SPxSolverBase<R>::LEAVE ? SPxSolverBase<R>::ENTER : SPxSolverBase<R>::LEAVE);
             if( _solver.ratiotester() != (SPxRatioTester<R>*)&_ratiotesterTextbook )
                setIntParam(SoPlexBase<R>::RATIOTESTER, RATIOTESTER_TEXTBOOK);
             else
@@ -3502,7 +3502,7 @@ namespace soplex
          {
             MSG_INFO1( spxout, spxout << "Switching pricer." << std::endl );
 
-            _solver.setType(_solver.type() == SPxSolver<R>::LEAVE ? SPxSolver<R>::ENTER : SPxSolver<R>::LEAVE);
+            _solver.setType(_solver.type() == SPxSolverBase<R>::LEAVE ? SPxSolverBase<R>::ENTER : SPxSolverBase<R>::LEAVE);
             if( _solver.pricer() != (SPxPricer<R>*)&_pricerDevex )
                setIntParam(SoPlexBase<R>::PRICER, PRICER_DEVEX);
             else
@@ -3588,7 +3588,7 @@ namespace soplex
 
    /// factorizes rational basis matrix in column representation
   template <class R>
-   void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal)
+   void SoPlexBase<R>::_factorizeColumnRational(SolRational& sol, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal)
    {
       // start rational solving time
       _statistics->rationalTime->start();
@@ -3636,7 +3636,7 @@ namespace soplex
       int j = 0;
       for( int i = 0; i < basisStatusRows.size(); i++ )
       {
-         if( basisStatusRows[i] == SPxSolver<R>::BASIC && j < matrixdim )
+         if( basisStatusRows[i] == SPxSolverBase<R>::BASIC && j < matrixdim )
          {
             basicPrimalRhs[i] = 0;
             basicDualRhs[j] = 0;
@@ -3644,18 +3644,18 @@ namespace soplex
                _rationalLUSolverBind[j] = -1 - i;
             j++;
          }
-         else if( basisStatusRows[i] == SPxSolver<R>::ON_LOWER )
+         else if( basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER )
             basicPrimalRhs[i] = lhsRational(i);
-         else if( basisStatusRows[i] == SPxSolver<R>::ON_UPPER )
+         else if( basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER )
             basicPrimalRhs[i] = rhsRational(i);
-         else if( basisStatusRows[i] == SPxSolver<R>::ZERO )
+         else if( basisStatusRows[i] == SPxSolverBase<R>::ZERO )
             basicPrimalRhs[i] = 0;
-         else if( basisStatusRows[i] == SPxSolver<R>::FIXED )
+         else if( basisStatusRows[i] == SPxSolverBase<R>::FIXED )
          {
             assert(lhsRational(i) == rhsRational(i));
             basicPrimalRhs[i] = lhsRational(i);
          }
-         else if( basisStatusRows[i] == SPxSolver<R>::UNDEFINED )
+         else if( basisStatusRows[i] == SPxSolverBase<R>::UNDEFINED )
          {
             MSG_INFO1( spxout, spxout << "Undefined basis status of row in rational factorization.\n" );
             error = true;
@@ -3663,7 +3663,7 @@ namespace soplex
          }
          else
          {
-            assert(basisStatusRows[i] == SPxSolver<R>::BASIC);
+            assert(basisStatusRows[i] == SPxSolverBase<R>::BASIC);
             MSG_INFO1( spxout, spxout << "Too many basic rows in rational factorization.\n" );
             error = true;
             goto TERMINATE;
@@ -3673,25 +3673,25 @@ namespace soplex
 
       for( int i = 0; i < basisStatusCols.size(); i++ )
       {
-         if( basisStatusCols[i] == SPxSolver<R>::BASIC && j < matrixdim )
+         if( basisStatusCols[i] == SPxSolverBase<R>::BASIC && j < matrixdim )
          {
             basicDualRhs[j] = objRational(i);
             if( loadMatrix )
                _rationalLUSolverBind[j] = i;
             j++;
          }
-         else if( basisStatusCols[i] == SPxSolver<R>::ON_LOWER )
+         else if( basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER )
             basicPrimalRhs.multAdd(-lowerRational(i), colVectorRational(i));
-         else if( basisStatusCols[i] == SPxSolver<R>::ON_UPPER )
+         else if( basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER )
             basicPrimalRhs.multAdd(-upperRational(i), colVectorRational(i));
-         else if( basisStatusCols[i] == SPxSolver<R>::ZERO )
+         else if( basisStatusCols[i] == SPxSolverBase<R>::ZERO )
          {}
-         else if( basisStatusCols[i] == SPxSolver<R>::FIXED )
+         else if( basisStatusCols[i] == SPxSolverBase<R>::FIXED )
          {
             assert(lowerRational(i) == upperRational(i));
             basicPrimalRhs.multAdd(-lowerRational(i), colVectorRational(i));
          }
-         else if( basisStatusCols[i] == SPxSolver<R>::UNDEFINED )
+         else if( basisStatusCols[i] == SPxSolverBase<R>::UNDEFINED )
          {
             MSG_INFO1( spxout, spxout << "Undefined basis status of column in rational factorization.\n" );
             error = true;
@@ -3699,7 +3699,7 @@ namespace soplex
          }
          else
          {
-            assert(basisStatusCols[i] == SPxSolver<R>::BASIC);
+            assert(basisStatusCols[i] == SPxSolverBase<R>::BASIC);
             MSG_INFO1( spxout, spxout << "Too many basic columns in rational factorization.\n" );
             error = true;
             goto TERMINATE;
@@ -3752,7 +3752,7 @@ namespace soplex
       primalFeasible = true;
       for( int i = 0; i < basisStatusRows.size(); i++ )
       {
-         if( basisStatusRows[i] == SPxSolver<R>::BASIC )
+         if( basisStatusRows[i] == SPxSolverBase<R>::BASIC )
          {
             assert(j < matrixdim);
             assert(_rationalLUSolverBind[j] == -1 - i);
@@ -3776,7 +3776,7 @@ namespace soplex
       }
       for( int i = 0; i < basisStatusCols.size(); i++ )
       {
-         if( basisStatusCols[i] == SPxSolver<R>::BASIC )
+         if( basisStatusCols[i] == SPxSolverBase<R>::BASIC )
          {
             assert(j < matrixdim);
             assert(_rationalLUSolverBind[j] == i);
@@ -3832,19 +3832,19 @@ namespace soplex
       for( int i = 0; i < basisStatusRows.size(); i++ )
       {
          if( _rowTypes[i] == RANGETYPE_FIXED
-            && (basisStatusRows[i] == SPxSolver<R>::ON_LOWER || basisStatusRows[i] == SPxSolver<R>::ON_UPPER) )
+            && (basisStatusRows[i] == SPxSolverBase<R>::ON_LOWER || basisStatusRows[i] == SPxSolverBase<R>::ON_UPPER) )
          {
             assert(lhsRational(i) == rhsRational(i));
-            basisStatusRows[i] = SPxSolver<R>::FIXED;
+            basisStatusRows[i] = SPxSolverBase<R>::FIXED;
          }
 
-         assert(basisStatusRows[i] != SPxSolver<R>::BASIC || basicDual[i] == 0);
-         if( basisStatusRows[i] == SPxSolver<R>::BASIC || basisStatusRows[i] == SPxSolver<R>::FIXED )
+         assert(basisStatusRows[i] != SPxSolverBase<R>::BASIC || basicDual[i] == 0);
+         if( basisStatusRows[i] == SPxSolverBase<R>::BASIC || basisStatusRows[i] == SPxSolverBase<R>::FIXED )
             continue;
          else if( basicDual[i] < 0 )
          {
-            if( ((maximizing && basisStatusRows[i] != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusRows[i] != SPxSolver<R>::ON_UPPER))
-               && (basisStatusRows[i] != SPxSolver<R>::ZERO || rhsRational(i) != 0) )
+            if( ((maximizing && basisStatusRows[i] != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusRows[i] != SPxSolverBase<R>::ON_UPPER))
+               && (basisStatusRows[i] != SPxSolverBase<R>::ZERO || rhsRational(i) != 0) )
             {
                dualFeasible = false;
                violation = -basicDual[i];
@@ -3859,8 +3859,8 @@ namespace soplex
          }
          else if( basicDual[i] > 0 )
          {
-            if( ((maximizing && basisStatusRows[i] != SPxSolver<R>::ON_UPPER) || (!maximizing && basisStatusRows[i] != SPxSolver<R>::ON_LOWER))
-               && (basisStatusRows[i] != SPxSolver<R>::ZERO || lhsRational(i) == 0) )
+            if( ((maximizing && basisStatusRows[i] != SPxSolverBase<R>::ON_UPPER) || (!maximizing && basisStatusRows[i] != SPxSolverBase<R>::ON_LOWER))
+               && (basisStatusRows[i] != SPxSolverBase<R>::ZERO || lhsRational(i) == 0) )
             {
                dualFeasible = false;
                if( basicDual[i] > dualViolation )
@@ -3878,16 +3878,16 @@ namespace soplex
       for( int i = 0; i < basisStatusCols.size(); i++ )
       {
          if( _colTypes[i] == RANGETYPE_FIXED
-            && (basisStatusCols[i] == SPxSolver<R>::ON_LOWER || basisStatusCols[i] == SPxSolver<R>::ON_UPPER) )
+            && (basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER || basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER) )
          {
             assert(lowerRational(i) == upperRational(i));
-            basisStatusCols[i] = SPxSolver<R>::FIXED;
+            basisStatusCols[i] = SPxSolverBase<R>::FIXED;
          }
 
 #ifdef SOPLEX_WITH_GMP
-         assert(basisStatusCols[i] != SPxSolver<R>::BASIC || basicDual * colVectorRational(i) == objRational(i));
+         assert(basisStatusCols[i] != SPxSolverBase<R>::BASIC || basicDual * colVectorRational(i) == objRational(i));
 #endif
-         if( basisStatusCols[i] == SPxSolver<R>::BASIC || basisStatusCols[i] == SPxSolver<R>::FIXED )
+         if( basisStatusCols[i] == SPxSolverBase<R>::BASIC || basisStatusCols[i] == SPxSolverBase<R>::FIXED )
             continue;
          else
          {
@@ -3895,8 +3895,8 @@ namespace soplex
             _workSol._redCost[i] -= objRational(i);
             if( _workSol._redCost[i] > 0 )
             {
-               if( ((maximizing && basisStatusCols[i] != SPxSolver<R>::ON_LOWER) || (!maximizing && basisStatusCols[i] != SPxSolver<R>::ON_UPPER))
-                  && (basisStatusCols[i] != SPxSolver<R>::ZERO || upperRational(i) != 0) )
+               if( ((maximizing && basisStatusCols[i] != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusCols[i] != SPxSolverBase<R>::ON_UPPER))
+                  && (basisStatusCols[i] != SPxSolverBase<R>::ZERO || upperRational(i) != 0) )
                {
                   dualFeasible = false;
                   if( _workSol._redCost[i] > dualViolation )
@@ -3907,8 +3907,8 @@ namespace soplex
             else if( _workSol._redCost[i] < 0 )
             {
                _workSol._redCost[i] *= -1;
-               if( ((maximizing && basisStatusCols[i] != SPxSolver<R>::ON_UPPER) || (!maximizing && basisStatusCols[i] != SPxSolver<R>::ON_LOWER))
-                  && (basisStatusCols[i] != SPxSolver<R>::ZERO || lowerRational(i) != 0) )
+               if( ((maximizing && basisStatusCols[i] != SPxSolverBase<R>::ON_UPPER) || (!maximizing && basisStatusCols[i] != SPxSolverBase<R>::ON_LOWER))
+                  && (basisStatusCols[i] != SPxSolverBase<R>::ZERO || lowerRational(i) != 0) )
                {
                   dualFeasible = false;
                   if( _workSol._redCost[i] > dualViolation )
@@ -3939,27 +3939,27 @@ namespace soplex
          j = numBasicRows;
          for( int i = 0; i < basisStatusCols.size(); i++ )
          {
-            if( basisStatusCols[i] == SPxSolver<R>::BASIC )
+            if( basisStatusCols[i] == SPxSolverBase<R>::BASIC )
             {
                assert(j < matrixdim);
                assert(_rationalLUSolverBind[j] == i);
                sol._primal[i] = basicPrimal[j];
                j++;
             }
-            else if( basisStatusCols[i] == SPxSolver<R>::ON_LOWER )
+            else if( basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER )
                sol._primal[i] = lowerRational(i);
-            else if( basisStatusCols[i] == SPxSolver<R>::ON_UPPER )
+            else if( basisStatusCols[i] == SPxSolverBase<R>::ON_UPPER )
                sol._primal[i] = upperRational(i);
-            else if( basisStatusCols[i] == SPxSolver<R>::ZERO )
+            else if( basisStatusCols[i] == SPxSolverBase<R>::ZERO )
                sol._primal[i] = 0;
-            else if( basisStatusCols[i] == SPxSolver<R>::FIXED )
+            else if( basisStatusCols[i] == SPxSolverBase<R>::FIXED )
             {
                assert(lowerRational(i) == upperRational(i));
                sol._primal[i] = lowerRational(i);
             }
             else
             {
-               assert(basisStatusCols[i] == SPxSolver<R>::UNDEFINED);
+               assert(basisStatusCols[i] == SPxSolverBase<R>::UNDEFINED);
                MSG_INFO1( spxout, spxout << "Undefined basis status of column in rational factorization.\n" );
                error = true;
                goto TERMINATE;
@@ -3972,9 +3972,9 @@ namespace soplex
          sol._dual = basicDual;
          for( int i = 0; i < numColsT(); i++ )
          {
-            if( basisStatusCols[i] == SPxSolver<R>::BASIC )
+            if( basisStatusCols[i] == SPxSolverBase<R>::BASIC )
                sol._redCost[i] = 0;
-            else if( basisStatusCols[i] == SPxSolver<R>::FIXED )
+            else if( basisStatusCols[i] == SPxSolverBase<R>::FIXED )
             {
                sol._redCost[i] = basicDual * colVectorRational(i);
                sol._redCost[i] -= objRational(i);
@@ -3994,7 +3994,7 @@ namespace soplex
 
    /// attempts rational reconstruction of primal-dual solution
   template <class R>
-   bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolver<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared)
+   bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared)
    {
       bool success;
       bool isSolBasic;
@@ -4014,7 +4014,7 @@ namespace soplex
       _workSol._primal = sol._primal;
       for( int j = 0; j < numColsT(); ++j )
       {
-         if( basisStatusCols[j] == SPxSolver<R>::BASIC )
+         if( basisStatusCols[j] == SPxSolverBase<R>::BASIC )
             basicIndices.addIdx(j);
       }
 
@@ -4033,12 +4033,12 @@ namespace soplex
       for( int c = numColsT() - 1; c >= 0; c-- )
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
-         typename SPxSolver<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
-         if( (basisStatusCol == SPxSolver<R>::FIXED && _workSol._primal[c] != lowerRational(c))
-            || (basisStatusCol == SPxSolver<R>::ON_LOWER && _workSol._primal[c] != lowerRational(c))
-            || (basisStatusCol == SPxSolver<R>::ON_UPPER && _workSol._primal[c] != upperRational(c))
-            || (basisStatusCol == SPxSolver<R>::ZERO && _workSol._primal[c] != 0)
-            || (basisStatusCol == SPxSolver<R>::UNDEFINED) )
+         typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+         if( (basisStatusCol == SPxSolverBase<R>::FIXED && _workSol._primal[c] != lowerRational(c))
+            || (basisStatusCol == SPxSolverBase<R>::ON_LOWER && _workSol._primal[c] != lowerRational(c))
+            || (basisStatusCol == SPxSolverBase<R>::ON_UPPER && _workSol._primal[c] != upperRational(c))
+            || (basisStatusCol == SPxSolverBase<R>::ZERO && _workSol._primal[c] != 0)
+            || (basisStatusCol == SPxSolverBase<R>::UNDEFINED) )
          {
             isSolBasic = false;
          }
@@ -4069,12 +4069,12 @@ namespace soplex
       for( int r = numRowsT() - 1; r >= 0; r-- )
       {
          // we want to notify the user whether the reconstructed solution is basic; otherwise, this would be redundant
-         typename SPxSolver<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
-         if( (basisStatusRow == SPxSolver<R>::FIXED && _workSol._slacks[r] != lhsRational(r))
-            || (basisStatusRow == SPxSolver<R>::ON_LOWER && _workSol._slacks[r] != lhsRational(r))
-            || (basisStatusRow == SPxSolver<R>::ON_UPPER && _workSol._slacks[r] != rhsRational(r))
-            || (basisStatusRow == SPxSolver<R>::ZERO && _workSol._slacks[r] != 0)
-            || (basisStatusRow == SPxSolver<R>::UNDEFINED) )
+         typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+         if( (basisStatusRow == SPxSolverBase<R>::FIXED && _workSol._slacks[r] != lhsRational(r))
+            || (basisStatusRow == SPxSolverBase<R>::ON_LOWER && _workSol._slacks[r] != lhsRational(r))
+            || (basisStatusRow == SPxSolverBase<R>::ON_UPPER && _workSol._slacks[r] != rhsRational(r))
+            || (basisStatusRow == SPxSolverBase<R>::ZERO && _workSol._slacks[r] != 0)
+            || (basisStatusRow == SPxSolverBase<R>::UNDEFINED) )
          {
             isSolBasic = false;
          }
@@ -4131,12 +4131,12 @@ namespace soplex
                return false;
             }
 
-            if( _basisStatusRows[r] != SPxSolver<R>::ON_LOWER && _basisStatusRows[r] != SPxSolver<R>::FIXED )
+            if( _basisStatusRows[r] != SPxSolverBase<R>::ON_LOWER && _basisStatusRows[r] != SPxSolverBase<R>::FIXED )
             {
-               if( _basisStatusRows[r] == SPxSolver<R>::BASIC || _basisStatusRows[r] == SPxSolver<R>::UNDEFINED )
+               if( _basisStatusRows[r] == SPxSolverBase<R>::BASIC || _basisStatusRows[r] == SPxSolverBase<R>::UNDEFINED )
                   isSolBasic = false;
                else
-                  _basisStatusRows[r] = SPxSolver<R>::ON_LOWER;
+                  _basisStatusRows[r] = SPxSolverBase<R>::ON_LOWER;
             }
          }
          else if( (!maximizing && sig < 0) || (maximizing && sig > 0) )
@@ -4153,12 +4153,12 @@ namespace soplex
                return false;
             }
 
-            if( _basisStatusRows[r] != SPxSolver<R>::ON_UPPER && _basisStatusRows[r] != SPxSolver<R>::FIXED )
+            if( _basisStatusRows[r] != SPxSolverBase<R>::ON_UPPER && _basisStatusRows[r] != SPxSolverBase<R>::FIXED )
             {
-               if( _basisStatusRows[r] == SPxSolver<R>::BASIC || _basisStatusRows[r] == SPxSolver<R>::UNDEFINED )
+               if( _basisStatusRows[r] == SPxSolverBase<R>::BASIC || _basisStatusRows[r] == SPxSolverBase<R>::UNDEFINED )
                   isSolBasic = false;
                else
-                  _basisStatusRows[r] = SPxSolver<R>::ON_UPPER;
+                  _basisStatusRows[r] = SPxSolverBase<R>::ON_UPPER;
             }
          }
       }
@@ -4190,12 +4190,12 @@ namespace soplex
                return false;
             }
 
-            if( _basisStatusCols[c] != SPxSolver<R>::ON_LOWER && _basisStatusCols[c] != SPxSolver<R>::FIXED )
+            if( _basisStatusCols[c] != SPxSolverBase<R>::ON_LOWER && _basisStatusCols[c] != SPxSolverBase<R>::FIXED )
             {
-               if( _basisStatusCols[c] == SPxSolver<R>::BASIC || _basisStatusCols[c] == SPxSolver<R>::UNDEFINED )
+               if( _basisStatusCols[c] == SPxSolverBase<R>::BASIC || _basisStatusCols[c] == SPxSolverBase<R>::UNDEFINED )
                   isSolBasic = false;
                else
-                  _basisStatusCols[c] = SPxSolver<R>::ON_LOWER;
+                  _basisStatusCols[c] = SPxSolverBase<R>::ON_LOWER;
             }
          }
          else if( (!maximizing && sig < 0) || (maximizing && sig > 0) )
@@ -4212,12 +4212,12 @@ namespace soplex
                return false;
             }
 
-            if( _basisStatusCols[c] != SPxSolver<R>::ON_UPPER && _basisStatusCols[c] != SPxSolver<R>::FIXED )
+            if( _basisStatusCols[c] != SPxSolverBase<R>::ON_UPPER && _basisStatusCols[c] != SPxSolverBase<R>::FIXED )
             {
-               if( _basisStatusCols[c] == SPxSolver<R>::BASIC || _basisStatusCols[c] == SPxSolver<R>::UNDEFINED )
+               if( _basisStatusCols[c] == SPxSolverBase<R>::BASIC || _basisStatusCols[c] == SPxSolverBase<R>::UNDEFINED )
                   isSolBasic = false;
                else
-                  _basisStatusCols[c] = SPxSolver<R>::ON_UPPER;
+                  _basisStatusCols[c] = SPxSolverBase<R>::ON_UPPER;
             }
          }
       }

@@ -23,7 +23,7 @@ namespace soplex
 {
 
   template <>
-  void SPxVectorST<Real>::setupWeights(SPxSolver<Real>& base)
+  void SPxVectorST<Real>::setupWeights(SPxSolverBase<Real>& base)
   {
     if (state == PVEC)
       {

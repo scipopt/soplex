@@ -66,13 +66,13 @@ public:
    /// sets the epsilon
    virtual void setEpsilon(Real eps);
    /// sets the solver
-   virtual void load(SPxSolver<R>* solver);
+   virtual void load(SPxSolverBase<R>* solver);
    /// clears all pricers and unselects the current pricer
    virtual void clear();
    /// sets entering or leaving algorithm
-   virtual void setType(typename SPxSolver<R>::Type tp);
+   virtual void setType(typename SPxSolverBase<R>::Type tp);
    /// sets row or column representation
-   virtual void setRep(typename SPxSolver<R>::Representation rep);
+   virtual void setRep(typename SPxSolverBase<R>::Representation rep);
    /// selects the leaving algorithm
    virtual int selectLeave();
    /// selects the entering algorithm

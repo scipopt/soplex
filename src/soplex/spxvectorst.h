@@ -66,7 +66,7 @@ protected:
    /**@name Protected helpers */
    //@{
    /// sets up variable weights.
-   void setupWeights(SPxSolver<R>& base);
+   void setupWeights(SPxSolverBase<R>& base);
    //@}
 
 public:

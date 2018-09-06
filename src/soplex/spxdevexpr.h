@@ -60,7 +60,7 @@ private:
    /**@name Private helpers */
    //@{
    /// set entering/leaving algorithm
-   void setupWeights(typename SPxSolver<R>::Type);
+   void setupWeights(typename SPxSolverBase<R>::Type);
    /// build up vector of pricing values for later use
    int buildBestPriceVectorLeave(Real feastol);
    /// internal implementation of SPxPricer::selectLeave()
@@ -130,11 +130,11 @@ public:
    /**@name Access / modification */
    //@{
    /// sets the solver
-   virtual void load(SPxSolver<R>* base);
+   virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
-   virtual void setType(typename SPxSolver<R>::Type);
+   virtual void setType(typename SPxSolverBase<R>::Type);
    /// set row/column representation
-   virtual void setRep(typename SPxSolver<R>::Representation);
+   virtual void setRep(typename SPxSolverBase<R>::Representation);
    ///
    virtual int selectLeave();
    ///

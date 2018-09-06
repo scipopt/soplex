@@ -48,7 +48,7 @@ private:
    SPxDevexPR<R>     devex;         ///< internal Devex pricer
    SPxSteepExPR<R>     steep;         ///< internal Steepest edge pricer
 
-   bool setActivePricer(typename SPxSolver<R>::Type type);          ///< switches active pricing method
+   bool setActivePricer(typename SPxSolverBase<R>::Type type);          ///< switches active pricing method
 
 public:
 
@@ -115,11 +115,11 @@ public:
    /// set epsilon of internal pricers
    void setEpsilon(Real eps);
    /// set the solver
-   virtual void load(SPxSolver<R>* base);
+   virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
-   virtual void setType(typename SPxSolver<R>::Type);
+   virtual void setType(typename SPxSolverBase<R>::Type);
    /// set row/column representation
-   virtual void setRep(typename SPxSolver<R>::Representation);
+   virtual void setRep(typename SPxSolverBase<R>::Representation);
    ///
    virtual int selectLeave();
    ///

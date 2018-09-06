@@ -133,9 +133,9 @@ public:
    /**@name Interface */
    //@{
    /// set the solver
-   virtual void load(SPxSolver<R>* solver);
+   virtual void load(SPxSolverBase<R>* solver);
    /// set entering or leaving algorithm
-   virtual void setType(typename SPxSolver<R>::Type tp);
+   virtual void setType(typename SPxSolverBase<R>::Type tp);
    /// 
    virtual int selectLeave();
    ///

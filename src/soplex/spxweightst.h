@@ -73,7 +73,7 @@ private:
    /**@name Private helpers */
    //@{
    ///
-   void setPrimalStatus(typename SPxBasis<R>::Desc&, const SPxSolver<R>&, const SPxId&);
+   void setPrimalStatus(typename SPxBasisBase<R>::Desc&, const SPxSolverBase<R>&, const SPxId&);
    //@}
 
 protected:
@@ -99,7 +99,7 @@ protected:
        variables. It has been declared \c virtual in order to allow for
        derived classes to compute other weight values.
    */
-   virtual void setupWeights(SPxSolver<R>& base);
+   virtual void setupWeights(SPxSolverBase<R>& base);
    //@}
 
 public:
@@ -189,7 +189,7 @@ public:
    /**@name Generation of a start basis */
    //@{
    /// generates start basis for loaded basis.
-   void generate(SPxSolver<R>& base);
+   void generate(SPxSolverBase<R>& base);
    //@}
 
    //-----------------------------------

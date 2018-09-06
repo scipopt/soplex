@@ -60,20 +60,20 @@ namespace soplex
   /**@brief   Sequential object-oriented SimPlex.
      @ingroup Algo
 
-     SPxSolver is an LP solver class using the revised Simplex algorithm. It
+     SPxSolverBase is an LP solver class using the revised Simplex algorithm. It
      provides two basis representations, namely a column basis and a row basis
      (see #Representation). For both representations, a primal and
      dual algorithm is available (see \ref Type).
 
-     In addition, SPxSolver can be customized with various respects:
+     In addition, SPxSolverBase can be customized with various respects:
      - pricing algorithms using SPxPricer
      - ratio test using class SPxRatioTester
      - computation of a start basis using class SPxStarter
      - preprocessing of the LP using class SPxSimplifier
      - termination criteria by overriding
 
-     SPxSolver is derived from SPxLP that is used to store the LP to be solved.
-     Hence, the LPs solved with SPxSolver have the general format
+     SPxSolverBase is derived from SPxLP that is used to store the LP to be solved.
+     Hence, the LPs solved with SPxSolverBase have the general format
 
      \f[
      \begin{array}{rl}
@@ -84,11 +84,11 @@ namespace soplex
      \f]
 
      Also, SPxLP provide all manipulation methods for the LP. They allow
-     SPxSolver to be used within cutting plane algorithms.
+     SPxSolverBase to be used within cutting plane algorithms.
   */
 
   template <class R>
-    class SPxSolver : public SPxLPBase<R>, protected SPxBasis<R>
+    class SPxSolverBase : public SPxLPBase<R>, protected SPxBasisBase<R>
   {
     friend class SoPlexLegacy;
 
@@ -107,7 +107,7 @@ namespace soplex
      *  the first case as the \em columnwise representation and the latter
      *  case will be called the \em rowwise representation.
      *
-     *  Type Representation determines the representation of SPxSolver, i.e.
+     *  Type Representation determines the representation of SPxSolverBase, i.e.
      *  a columnwise (#COLUMN == 1) or rowwise (#ROW == -1) one.
      */
     enum Representation
@@ -117,7 +117,7 @@ namespace soplex
     };
 
     /// Algorithmic type.
-    /** SPxSolver uses the reviesed Simplex algorithm to solve LPs.
+    /** SPxSolverBase uses the reviesed Simplex algorithm to solve LPs.
      *  Mathematically, one distinguishes the \em primal from the
      *  \em dual algorihm. Algorithmically, these relate to the two
      *  types #ENTER or #LEAVE. How they relate, depends on the chosen
@@ -162,22 +162,22 @@ namespace soplex
       /// Full pricing.
       /** If #FULL pricing in selected for the #ENTER%ing Simplex,
        *  vectors #pVec() and #test() are kept up to date by
-       *  SPxSolver. An SPxPricer only needs to select an Id such
+       *  SPxSolverBase. An SPxPricer only needs to select an Id such
        *  that the #test() or #coTest() value is < 0.
        */
       FULL,
       /// Partial pricing.
       /** When #PARTIAL pricing in selected for the #ENTER%ing
        *  Simplex, vectors #pVec() and #test() are not set up and
-       *  updated by SPxSolver. However, vectors #coPvec() and
-       *  #coTest() are still kept up to date by SPxSolver.
+       *  updated by SPxSolverBase. However, vectors #coPvec() and
+       *  #coTest() are still kept up to date by SPxSolverBase.
        *  An SPxPricer object needs to compute the values for
        *  #pVec() and #test() itself in order to select an
        *  appropriate pivot with #test() < 0. Methods \ref computePvec(int)
        *  "computePvec(i)" and \ref computeTest(int) "computeTest(i)"
        *  will assist the used to do so. Note
        *  that it may be feasible for a pricer to return an Id with
-       *  #test() > 0; such will be rejected by SPxSolver.
+       *  #test() > 0; such will be rejected by SPxSolverBase.
        */
       PARTIAL
     };
@@ -455,29 +455,29 @@ namespace soplex
     /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
     void setNonzeroFactor( Real f )
     {
-      SPxBasis<R>::nonzeroFactor = f;
+      SPxBasisBase<R>::nonzeroFactor = f;
     }
 
     /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
     void setFillFactor( Real f )
     {
-      SPxBasis<R>::fillFactor = f;
+      SPxBasisBase<R>::fillFactor = f;
     }
 
     /// set refactor threshold for memory growth in current factor update compared to the last factorization
     void setMemFactor( Real f )
     {
-      SPxBasis<R>::memFactor = f;
+      SPxBasisBase<R>::memFactor = f;
     }
 
     /**@name Access */
     //@{
-    /// return the version of SPxSolver as number like 123 for 1.2.3
+    /// return the version of SPxSolverBase as number like 123 for 1.2.3
     int version() const
     {
       return SOPLEX_VERSION;
     }
-    /// return the internal subversion of SPxSolver as number
+    /// return the internal subversion of SPxSolverBase as number
     int subversion() const
     {
       return SOPLEX_SUBVERSION;
@@ -509,7 +509,7 @@ namespace soplex
 
     //-----------------------------
     /**@name Setup
-     *  Before solving an LP with an instance of SPxSolver,
+     *  Before solving an LP with an instance of SPxSolverBase,
      *  the following steps must be performed:
      *
      *  -# Load the LP by copying an external LP or reading it from an
@@ -525,18 +525,18 @@ namespace soplex
      *  -# Optionally setup an start basis generation method by loading an
      *     \ref soplex::SPxStarter "SPxStarter" object.
      *  -# Optionally setup a start basis by loading a
-     *     \ref soplex::SPxBasis<R>::Desc "SPxBasis<R>::Desc" object.
+     *     \ref soplex::SPxBasisBase<R>::Desc "SPxBasisBase<R>::Desc" object.
      *  -# Optionally switch to another basis
-     *     \ref soplex::SPxSolver<R>::Representation "Representation"
-     *     by calling method \ref soplex::SPxSolver<R>::setRep() "setRep()".
+     *     \ref soplex::SPxSolverBase<R>::Representation "Representation"
+     *     by calling method \ref soplex::SPxSolverBase<R>::setRep() "setRep()".
      *  -# Optionally switch to another algorithm
-     *     \ref soplex::SPxSolver<R>::Type "Type"
-     *     by calling method \ref soplex::SPxSolver<R>::setType() "setType()".
+     *     \ref soplex::SPxSolverBase<R>::Type "Type"
+     *     by calling method \ref soplex::SPxSolverBase<R>::setType() "setType()".
      *
      *  Now the solver is ready for execution. If the loaded LP is to be solved
      *  again from scratch, this can be done with method
-     *  \ref soplex::SPxSolver<R>::reLoad() "reLoad()". Finally,
-     *  \ref soplex::SPxSolver<R>::clear() "clear()" removes the LP from the solver.
+     *  \ref soplex::SPxSolverBase<R>::reLoad() "reLoad()". Finally,
+     *  \ref soplex::SPxSolverBase<R>::clear() "clear()" removes the LP from the solver.
      */
     //@{
     /// read LP from input stream.
@@ -554,15 +554,15 @@ namespace soplex
     /// setup starting basis generator to use. If \p destroy is true, \p starter will be freed in destructor.
     virtual void setStarter(SPxStarter<R>* starter, const bool destroy = false);
     /// set a start basis.
-    virtual void loadBasis(const typename SPxBasis<R>::Desc&);
+    virtual void loadBasis(const typename SPxBasisBase<R>::Desc&);
 
     /// initialize #ROW or #COLUMN representation.
     void initRep (Representation p_rep);
     /// switch to #ROW or #COLUMN representation if not already used.
     void setRep (Representation p_rep);
-    /// set \ref soplex::SPxSolver<R>::LEAVE "LEAVE" or \ref soplex::SPxSolver<R>::ENTER "ENTER" algorithm.
+    /// set \ref soplex::SPxSolverBase<R>::LEAVE "LEAVE" or \ref soplex::SPxSolverBase<R>::ENTER "ENTER" algorithm.
     void setType(Type tp);
-    /// set \ref soplex::SPxSolver<R>::FULL "FULL" or \ref soplex::SPxSolver<R>::PARTIAL "PARTIAL" pricing.
+    /// set \ref soplex::SPxSolverBase<R>::FULL "FULL" or \ref soplex::SPxSolverBase<R>::PARTIAL "PARTIAL" pricing.
     void setPricing(Pricing pr);
     /// turn on or off the improved dual simplex.
     void setDecompStatus(DecompStatus decomp_stat);
@@ -682,7 +682,7 @@ namespace soplex
      *  to the argument \p vector. Hence, \p vector must be of dimension
      *  #nRows().
      *
-     *  @warning Because SPxSolver supports range constraints as its
+     *  @warning Because SPxSolverBase supports range constraints as its
      *     default, slack variables are defined in a nonstandard way:
      *     Let \em x be the current solution vector and \em A the constraint
      *     matrix. Then the vector of slack variables is defined as
@@ -755,7 +755,7 @@ namespace soplex
      *  other stopping criteria or using it as callback method within the
      *  Simplex loop, by overriding the method in a derived class.
      *  However, all implementations must terminate with the
-     *  statement \c return SPxSolver<R>::#terminate(), if no own termination
+     *  statement \c return SPxSolverBase<R>::#terminate(), if no own termination
      *  criteria is encountered.
      *
      *  Note, that the Simplex loop stopped even when #terminate()
@@ -859,9 +859,9 @@ namespace soplex
     /// enable or disable hyper sparse pricing
     void hyperPricing(bool h);
 
-    /** SPxSolver considers a Simplex step as degenerate if the
+    /** SPxSolverBase considers a Simplex step as degenerate if the
      *  steplength does not exceed #epsilon(). Cycling occurs if only
-     *  degenerate steps are taken. To prevent this situation, SPxSolver
+     *  degenerate steps are taken. To prevent this situation, SPxSolverBase
      *  perturbs the problem such that nondegenerate steps are ensured.
      *
      *  maxCycle() controls how agressive such perturbation is
@@ -1087,7 +1087,7 @@ namespace soplex
     //------------------------------------
     /**@name Variables and Covariables
      *  Class SPxLP introduces \ref soplex::SPxId "SPxIds" to identify
-     *  row or column data of an LP. SPxSolver uses this concept to
+     *  row or column data of an LP. SPxSolverBase uses this concept to
      *  access data with respect to the chosen representation.
      */
     //@{
@@ -1242,26 +1242,26 @@ namespace soplex
 
     //------------------------------------
     /**@name Variable status
-     *  The Simplex basis assigns a \ref soplex::SPxBasis<R>::Desc::Status
+     *  The Simplex basis assigns a \ref soplex::SPxBasisBase<R>::Desc::Status
      *  "Status" to each variable and covariable. Depending on the
      *  representation, the status indicates that the corresponding
      *  vector is in the basis matrix or not.
      */
     //@{
     /// Status of \p i 'th variable.
-    typename SPxBasis<R>::Desc::Status varStatus(int i) const
+    typename SPxBasisBase<R>::Desc::Status varStatus(int i) const
       {
         return this->desc().status(i);
       }
 
     /// Status of \p i 'th covariable.
-    typename SPxBasis<R>::Desc::Status covarStatus(int i) const
+    typename SPxBasisBase<R>::Desc::Status covarStatus(int i) const
       {
         return this->desc().coStatus(i);
       }
 
     /// does \p stat describe a basic index ?
-    bool isBasic(typename SPxBasis<R>::Desc::Status stat) const
+    bool isBasic(typename SPxBasisBase<R>::Desc::Status stat) const
     {
       return (stat * rep() > 0);
     }
@@ -1325,7 +1325,7 @@ namespace soplex
       {
         return *theFvec;
       }
-    /// right-hand side vector for \ref soplex::SPxSolver<R>::fVec "fVec"
+    /// right-hand side vector for \ref soplex::SPxSolverBase<R>::fVec "fVec"
     /** The feasibility vector is computed by solving a linear system with the
      *  basis matrix. The right-hand side vector of this system is referred
      *  to as \em feasibility, \em right-hand \em side \em vector #fRhs().
@@ -1338,7 +1338,7 @@ namespace soplex
     {
       return *theFrhs;
     }
-    /// upper bound for \ref soplex::SPxSolver<R>::fVec "fVec".
+    /// upper bound for \ref soplex::SPxSolverBase<R>::fVec "fVec".
     const Vector& ubBound() const
     {
       return theUBbound;
@@ -1356,7 +1356,7 @@ namespace soplex
       {
         return theUBbound;
       }
-    /// lower bound for \ref soplex::SPxSolver<R>::fVec "fVec".
+    /// lower bound for \ref soplex::SPxSolverBase<R>::fVec "fVec".
     const Vector& lbBound() const
     {
       return theLBbound;
@@ -1375,7 +1375,7 @@ namespace soplex
         return theLBbound;
       }
 
-    /// Violations of \ref soplex::SPxSolver<R>::fVec "fVec"
+    /// Violations of \ref soplex::SPxSolverBase<R>::fVec "fVec"
     /** For the leaving Simplex algorithm, pricing involves selecting a
      *  variable from #fVec that violates its bounds that is to leave
      *  the basis. When a SPxPricer is called to select such a
@@ -1401,7 +1401,7 @@ namespace soplex
         return *theCoPvec;
       }
 
-    /// Right-hand side vector for \ref soplex::SPxSolver<R>::coPvec "coPvec".
+    /// Right-hand side vector for \ref soplex::SPxSolverBase<R>::coPvec "coPvec".
     /** The vector #coPvec is computed by solving a linear system with the
      *  basis matrix and #coPrhs as the right-hand side vector. For
      *  column basis representation, #coPrhs is build up of the
@@ -1456,7 +1456,7 @@ namespace soplex
         return *theCoLbound;
       }
 
-    /// violations of \ref soplex::SPxSolver<R>::coPvec "coPvec".
+    /// violations of \ref soplex::SPxSolverBase<R>::coPvec "coPvec".
     /** In entering Simplex pricing selects checks vectors #coPvec()
      *  and #pVec() for violation of its bounds. #coTest() contains
      *  the violations for #coPvec() which are indicated by a negative
@@ -1522,7 +1522,7 @@ namespace soplex
         return *theLbound;
       }
 
-    /// Violations of \ref soplex::SPxSolver<R>::pVec "pVec".
+    /// Violations of \ref soplex::SPxSolverBase<R>::pVec "pVec".
     /** In entering Simplex pricing selects checks vectors #coPvec()
      *  and #pVec() for violation of its bounds. Vector #test()
      *  contains the violations for #pVec(), i.e., if #test()[i] < 0,
@@ -1535,13 +1535,13 @@ namespace soplex
       return theTest;
     }
 
-    /// compute and return \ref soplex::SPxSolver<R>::pVec() "pVec()"[i].
+    /// compute and return \ref soplex::SPxSolverBase<R>::pVec() "pVec()"[i].
     Real computePvec(int i);
-    /// compute entire \ref soplex::SPxSolver<R>::pVec() "pVec()".
+    /// compute entire \ref soplex::SPxSolverBase<R>::pVec() "pVec()".
     void computePvec();
-    /// compute and return \ref soplex::SPxSolver<R>::test() "test()"[i] in \ref soplex::SPxSolver<R>::ENTER "ENTER"ing Simplex.
+    /// compute and return \ref soplex::SPxSolverBase<R>::test() "test()"[i] in \ref soplex::SPxSolverBase<R>::ENTER "ENTER"ing Simplex.
     Real computeTest(int i);
-    /// compute test vector in \ref soplex::SPxSolver<R>::ENTER "ENTER"ing Simplex.
+    /// compute test vector in \ref soplex::SPxSolverBase<R>::ENTER "ENTER"ing Simplex.
     void computeTest();
 
     //------------------------------------
@@ -1562,7 +1562,7 @@ namespace soplex
      *  These methods serve for shifting feasibility bounds, either in order
      *  to maintain numerical stability or initially for computation of
      *  phase 1. The sum of all shifts applied to any bound is stored in
-     *  \ref soplex::SPxSolver<R>::theShift "theShift".
+     *  \ref soplex::SPxSolverBase<R>::theShift "theShift".
      *
      *  The following methods are used to shift individual bounds. They are
      *  mainly intended for stable implenentations of SPxRatioTester.
@@ -1573,42 +1573,42 @@ namespace soplex
     /// Perform initial shifting to optain an feasible or pricable basis.
     void shiftPvec();
 
-    /// shift \p i 'th \ref soplex::SPxSolver<R>::ubBound "ubBound" to \p to.
+    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::ubBound "ubBound" to \p to.
     void shiftUBbound(int i, Real to)
     {
       assert(theType == ENTER);
       theShift += to - theUBbound[i];
       theUBbound[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolver<R>::lbBound "lbBound" to \p to.
+    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::lbBound "lbBound" to \p to.
     void shiftLBbound(int i, Real to)
     {
       assert(theType == ENTER);
       theShift += theLBbound[i] - to;
       theLBbound[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolver<R>::upBound "upBound" to \p to.
+    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::upBound "upBound" to \p to.
     void shiftUPbound(int i, Real to)
     {
       assert(theType == LEAVE);
       theShift += to - (*theUbound)[i];
       (*theUbound)[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolver<R>::lpBound "lpBound" to \p to.
+    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::lpBound "lpBound" to \p to.
     void shiftLPbound(int i, Real to)
     {
       assert(theType == LEAVE);
       theShift += (*theLbound)[i] - to;
       (*theLbound)[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolver<R>::ucBound "ucBound" to \p to.
+    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::ucBound "ucBound" to \p to.
     void shiftUCbound(int i, Real to)
     {
       assert(theType == LEAVE);
       theShift += to - (*theCoUbound)[i];
       (*theCoUbound)[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolver<R>::lcBound "lcBound" to \p to.
+    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::lcBound "lcBound" to \p to.
     void shiftLCbound(int i, Real to)
     {
       assert(theType == LEAVE);
@@ -1652,18 +1652,18 @@ namespace soplex
     ///
     Real perturbMin(const UpdateVector& uvec,
                     Vector& low, Vector& up, Real eps, Real delta,
-                    const typename SPxBasis<R>::Desc::Status* stat, int start, int incr);
+                    const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
     ///
     Real perturbMax(const UpdateVector& uvec,
                     Vector& low, Vector& up, Real eps, Real delta,
-                    const typename SPxBasis<R>::Desc::Status* stat, int start, int incr);
+                    const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
     //@}
 
     //------------------------------------
     /**@name The Simplex Loop
      *  We now present a set of methods that may be usefull when implementing
      *  own SPxPricer or SPxRatioTester classes. Here is, how
-     *  SPxSolver will call methods from its loaded SPxPricer and
+     *  SPxSolverBase will call methods from its loaded SPxPricer and
      *  SPxRatioTester.
      *
      *  For the entering Simplex:
@@ -1680,7 +1680,7 @@ namespace soplex
   public:
     /// Setup vectors to be solved within Simplex loop.
     /** Load vector \p y to be #solve%d with the basis matrix during the
-     *  #LEAVE Simplex. The system will be solved after #SPxSolver%'s call
+     *  #LEAVE Simplex. The system will be solved after #SPxSolverBase%'s call
      *  to SPxRatioTester.  The system will be solved along with
      *  another system. Solving two linear system at a time has
      *  performance advantages over solving the two linear systems
@@ -1695,7 +1695,7 @@ namespace soplex
     /// Setup vectors to be solved within Simplex loop.
     /** Load a second additional vector \p y2 to be #solve%d with the
      *  basis matrix during the #LEAVE Simplex. The system will be
-     *  solved after #SPxSolver%'s call to SPxRatioTester.
+     *  solved after #SPxSolverBase%'s call to SPxRatioTester.
      *  The system will be solved along with at least one
      *  other system. Solving several linear system at a time has
      *  performance advantages over solving them seperately.
@@ -1708,7 +1708,7 @@ namespace soplex
     }
     /// Setup vectors to be cosolved within Simplex loop.
     /** Load vector \p y to be #coSolve%d with the basis matrix during
-     *  the #ENTER Simplex. The system will be solved after #SPxSolver%'s
+     *  the #ENTER Simplex. The system will be solved after #SPxSolverBase%'s
      *  call to SPxRatioTester.  The system will be solved along
      *  with another system. Solving two linear system at a time has
      *  performance advantages over solving the two linear systems
@@ -1722,7 +1722,7 @@ namespace soplex
     }
     /// Setup vectors to be cosolved within Simplex loop.
     /** Load a second vector \p z to be #coSolve%d with the basis matrix during
-     *  the #ENTER Simplex. The system will be solved after #SPxSolver%'s
+     *  the #ENTER Simplex. The system will be solved after #SPxSolverBase%'s
      *  call to SPxRatioTester. The system will be solved along
      *  with two other systems.
      */
@@ -1753,12 +1753,12 @@ namespace soplex
      *  to use methods #setup4solve() and #setup4coSolve() for solving
      *  systems, since this is likely to have perfomance advantages.
      */
-    const SPxBasis<R>& basis() const
+    const SPxBasisBase<R>& basis() const
     {
       return *this;
     }
     ///
-    SPxBasis<R>& basis()
+    SPxBasisBase<R>& basis()
       {
         return *this;
       }
@@ -1770,7 +1770,7 @@ namespace soplex
     /// return loaded SLinSolver.
     const SLinSolver* slinSolver() const
     {
-      return SPxBasis<R>::factor;
+      return SPxBasisBase<R>::factor;
     }
     /// return loaded SPxRatioTester.
     const SPxRatioTester<R>* ratiotester() const
@@ -1792,14 +1792,14 @@ namespace soplex
     bool enter(SPxId& id, bool polish = false);
 
     /// test coVector \p i with status \p stat.
-    Real coTest(int i, typename SPxBasis<R>::Desc::Status stat) const;
+    Real coTest(int i, typename SPxBasisBase<R>::Desc::Status stat) const;
     /// compute coTest vector.
     void computeCoTest();
     /// recompute coTest vector.
     void updateCoTest();
 
     /// test vector \p i with status \p stat.
-    Real test(int i, typename SPxBasis<R>::Desc::Status stat) const;
+    Real test(int i, typename SPxBasisBase<R>::Desc::Status stat) const;
     /// recompute test vector.
     void updateTest();
 
@@ -1814,7 +1814,7 @@ namespace soplex
     /**@name Parallelization
      *  In this section we present the methods, that are provided in order to
      *  allow a parallel version to be implemented as a derived class, thereby
-     *  inheriting most of the code of SPxSolver.
+     *  inheriting most of the code of SPxSolverBase.
      *
      *  @par Initialization
      *  These methods are used to setup all the vectors used in the Simplex
@@ -1823,20 +1823,20 @@ namespace soplex
     //@{
   public:
     /// intialize data structures.
-    /** If SPxSolver is not \ref isInitialized() "initialized", the method
+    /** If SPxSolverBase is not \ref isInitialized() "initialized", the method
      *  #solve() calls #init() to setup all vectors and internal data structures.
      *  Most of the other methods within this section are called by #init().
      *
      *  Derived classes should add the initialization of additional
      *  data structures by overriding this method. Don't forget,
-     *  however, to call SPxSolver<R>::init().
+     *  however, to call SPxSolverBase<R>::init().
      */
     virtual void init();
 
   protected:
 
     /// has the internal data been initialized?
-    /** As long as an instance of SPxSolver is not initialized, no member
+    /** As long as an instance of SPxSolverBase is not initialized, no member
      *  contains setup data. Initialization is performed via method
      *  #init().  Afterwards all data structures are kept up to date (even
      *  for all manipulation methods), until #unInit() is called. However,
@@ -1867,13 +1867,13 @@ namespace soplex
     virtual void computeFrhs1(const Vector&, const Vector&);
     ///
     void computeFrhs2(Vector&, Vector&);
-    /// compute \ref soplex::SPxSolver<R>::theCoPrhs "theCoPrhs" for entering Simplex.
+    /// compute \ref soplex::SPxSolverBase<R>::theCoPrhs "theCoPrhs" for entering Simplex.
     virtual void computeEnterCoPrhs();
     ///
     void computeEnterCoPrhs4Row(int i, int n);
     ///
     void computeEnterCoPrhs4Col(int i, int n);
-    /// compute \ref soplex::SPxSolver<R>::theCoPrhs "theCoPrhs" for leaving Simplex.
+    /// compute \ref soplex::SPxSolverBase<R>::theCoPrhs "theCoPrhs" for leaving Simplex.
     virtual void computeLeaveCoPrhs();
     ///
     void computeLeaveCoPrhs4Row(int i, int n);
@@ -1896,7 +1896,7 @@ namespace soplex
     }
     ///
     virtual void getLeaveVals(int i,
-                              typename SPxBasis<R>::Desc::Status& leaveStat, SPxId& leaveId,
+                              typename SPxBasisBase<R>::Desc::Status& leaveStat, SPxId& leaveId,
                               Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
     ///
     virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
@@ -1905,19 +1905,19 @@ namespace soplex
     ///
     virtual void getEnterVals(SPxId id, Real& enterTest,
                               Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-                              Real& enterPric, typename SPxBasis<R>::Desc::Status& enterStat, Real& enterRO, Real& objChange);
+                              Real& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, Real& enterRO, Real& objChange);
     ///
     virtual void getEnterVals2(int leaveIdx,
                                Real enterMax, Real& leaveBound, Real& objChange);
     ///
-    virtual void ungetEnterVal(SPxId enterId, typename SPxBasis<R>::Desc::Status enterStat,
+    virtual void ungetEnterVal(SPxId enterId, typename SPxBasisBase<R>::Desc::Status enterStat,
                                Real leaveVal, const SVector& vec, Real& objChange);
     ///
     virtual void rejectEnter(SPxId enterId,
-                             Real enterTest, typename SPxBasis<R>::Desc::Status enterStat);
+                             Real enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);
     ///
     virtual void rejectLeave(int leaveNum, SPxId leaveId,
-                             typename SPxBasis<R>::Desc::Status leaveStat, const SVector* newVec = 0);
+                             typename SPxBasisBase<R>::Desc::Status leaveStat, const SVector* newVec = 0);
     ///
     virtual void setupPupdate(void);
     ///
@@ -1940,7 +1940,7 @@ namespace soplex
      */
     //@{
     ///
-    void clearDualBounds(typename SPxBasis<R>::Desc::Status, Real&, Real&) const;
+    void clearDualBounds(typename SPxBasisBase<R>::Desc::Status, Real&, Real&) const;
     ///
     void setDualColBounds();
     ///
@@ -2008,14 +2008,14 @@ namespace soplex
 
     /**@todo put the following basis methods near the variable status methods!*/
     /// converts basis status to VarStatus
-    VarStatus basisStatusToVarStatus( typename SPxBasis<R>::Desc::Status stat ) const;
+    VarStatus basisStatusToVarStatus( typename SPxBasisBase<R>::Desc::Status stat ) const;
 
     /// converts VarStatus to basis status for rows
-    typename SPxBasis<R>::Desc::Status varStatusToBasisStatusRow( int row, VarStatus stat )
+    typename SPxBasisBase<R>::Desc::Status varStatusToBasisStatusRow( int row, VarStatus stat )
       const;
 
     /// converts VarStatus to basis status for columns
-    typename SPxBasis<R>::Desc::Status varStatusToBasisStatusCol( int col, VarStatus stat )
+    typename SPxBasisBase<R>::Desc::Status varStatusToBasisStatusCol( int col, VarStatus stat )
       const;
 
   public:
@@ -2030,9 +2030,9 @@ namespace soplex
     Status getBasis(VarStatus rows[], VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const;
 
     /// gets basis status
-    typename SPxBasis<R>::SPxStatus getBasisStatus() const
+    typename SPxBasisBase<R>::SPxStatus getBasisStatus() const
       {
-        return SPxBasis<R>::status();
+        return SPxBasisBase<R>::status();
       }
 
     /// check a given basis for validity.
@@ -2042,15 +2042,15 @@ namespace soplex
     void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
     /// set the lp solver's basis status.
-    void setBasisStatus( typename SPxBasis<R>::SPxStatus stat )
+    void setBasisStatus( typename SPxBasisBase<R>::SPxStatus stat )
     {
       if( m_status == OPTIMAL )
         m_status = UNKNOWN;
-      SPxBasis<R>::setStatus( stat );
+      SPxBasisBase<R>::setStatus( stat );
     }
 
     /// setting the solver status external from the solve loop.
-    void setSolverStatus( SPxSolver<R>::Status stat )
+    void setSolverStatus( SPxSolverBase<R>::Status stat )
     {
       m_status = stat;
     }
@@ -2281,11 +2281,11 @@ namespace soplex
     //@{
     /// default constructor.
     explicit
-      SPxSolver( Type            type  = LEAVE,
+      SPxSolverBase( Type            type  = LEAVE,
                  Representation  rep   = ROW,
                  Timer::TYPE     ttype = Timer::USER_TIME);
     // virtual destructor
-    virtual ~SPxSolver();
+    virtual ~SPxSolverBase();
     //@}
 
     //------------------------------------
@@ -2299,9 +2299,9 @@ namespace soplex
     /** assignment operator and copy constructor */
     //@{
     /// assignment operator
-    SPxSolver<R>& operator=(const SPxSolver<R>& base);
+    SPxSolverBase<R>& operator=(const SPxSolverBase<R>& base);
     /// copy constructor
-    SPxSolver(const SPxSolver<R>& base);
+    SPxSolverBase(const SPxSolverBase<R>& base);
     //@}
 
     void testVecs();
@@ -2314,22 +2314,22 @@ namespace soplex
   /// Pretty-printing of variable status.
   template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const typename SPxSolver<R>::VarStatus& status );
+                            const typename SPxSolverBase<R>::VarStatus& status );
 
   /// Pretty-printing of solver status.
   template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const typename SPxSolver<R>::Status& status );
+                            const typename SPxSolverBase<R>::Status& status );
 
   /// Pretty-printing of algorithm.
   template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const typename SPxSolver<R>::Type& status );
+                            const typename SPxSolverBase<R>::Type& status );
 
   /// Pretty-printing of representation.
   template <class R>
   std::ostream& operator<<( std::ostream& os,
-                            const typename SPxSolver<R>::Representation& status );
+                            const typename SPxSolverBase<R>::Representation& status );
 
 
 } // namespace soplex
