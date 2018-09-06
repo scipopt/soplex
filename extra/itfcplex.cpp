@@ -31,7 +31,7 @@
 
 using namespace soplex;
 
-class SPxCPlex : public SoPlex
+class SPxCPlex : public SoPlexBase
 {
    SLUFactor    m_slu;
    SPxSteepPR   m_price;
@@ -45,7 +45,7 @@ class SPxCPlex : public SoPlex
 public:
     void factorize( )
     {
-       SoPlex::factorize();
+       SoPlexBase::factorize();
 
        if (m_verbose)
        {
@@ -65,7 +65,7 @@ public:
     */
 
    SPxCPlex() 
-      : SoPlex(LEAVE, COLUMN)
+      : SoPlexBase(LEAVE, COLUMN)
       , m_verbose(true)
       , m_probname(0)
    {
@@ -79,12 +79,12 @@ public:
       if (m_probname != 0)
          spx_free(m_probname);
    }
-   // This is public in SPxBasis, but protected inherted from SoPlex.
+   // This is public in SPxBasis, but protected inherted from SoPlexBase.
    SPxBasis<R>::Desc::Status dualColStatus(int i) const
    {
       return SPxBasis<R>::dualColStatus(i);
    }
-   // This is public in SPxBasis, but protected inherted from SoPlex.
+   // This is public in SPxBasis, but protected inherted from SoPlexBase.
    SPxBasis<R>::Desc::Status dualRowStatus(int i) const
    {
       return SPxBasis<R>::dualRowStatus(i);
@@ -127,7 +127,7 @@ extern "C" char* CPXversion(CPXENVptr env)
 {
    assert(env != 0);
 
-   static char* version = "SoPlex 1.3";
+   static char* version = "SoPlexBase 1.3";
 
    return version;
 }
@@ -397,7 +397,7 @@ extern "C" int CPXdualopt(CPXENVptr env, CPXLPptr lp)
    SPxCPlex* spx  = reinterpret_cast<SPxCPlex*>(env);
 
    if (spx->basis().status() <= 0)
-      spx->setType(SoPlex::ENTER);
+      spx->setType(SoPlexBase::ENTER);
 
    spx->optimize();
 
@@ -531,7 +531,7 @@ extern "C" int CPXgetpahse1cnt(CPXENVptr env, CPXLPptr lp)
    if (lp == 0)
       return CPXERR_NULL_POINTER;
 
-   // SoPlex does not have a "real" Phase I. So we declare
+   // SoPlexBase does not have a "real" Phase I. So we declare
    // one fifth of the iterations as Phase I.
    return reinterpret_cast<SPxCPlex*>(env)->basis().iteration() / 5;
 }

@@ -24,7 +24,7 @@ namespace soplex
 {
    /// check scaling of LP
   template <class R>
-   void SoPlex<R>::_checkScaling(SPxLPReal* origLP) const
+   void SoPlexBase<R>::_checkScaling(SPxLPReal* origLP) const
    {
       MSG_INFO1( spxout, spxout << "DEBUG: checking correctness of scaled LP" << std::endl; )
       assert(_realLP->nCols() == origLP->nCols());
@@ -87,7 +87,7 @@ namespace soplex
 
 
   template <class R>
-   void SoPlex<R>::_checkBasisScaling()
+   void SoPlexBase<R>::_checkBasisScaling()
    {
       if( _status != SPxSolver<R>::OPTIMAL )
       {

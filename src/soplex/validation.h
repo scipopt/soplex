@@ -59,7 +59,7 @@ namespace soplex {
       bool updateValidationTolerance(char* tolerance);
 
       /// validates the soplex solution using the external solution
-      void validateSolveReal(SoPlex<R>& soplex);
+      void validateSolveReal(SoPlexBase<R>& soplex);
     };
 
 } /* namespace soplex */
