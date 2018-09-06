@@ -27,13 +27,13 @@ namespace soplex
 {
   /// Definitions to avoid the 'specialization after instantiation' error
   template <>
-  void SoPlex<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus);
+  void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus);
   template <>
-  void SoPlex<Real>::_storeSolutionReal(bool verify);
+  void SoPlexBase<Real>::_storeSolutionReal(bool verify);
   
   /// solves real LP
   template <>
-  void SoPlex<Real>::_optimizeT()
+  void SoPlexBase<Real>::_optimizeT()
    {
       assert(_realLP != 0);
       assert(_realLP == &_solver);
@@ -44,7 +44,7 @@ namespace soplex
       // start timing
       _statistics->solvingTime->start();
 
-      if( boolParam(SoPlex<Real>::PERSISTENTSCALING) )
+      if( boolParam(SoPlexBase<Real>::PERSISTENTSCALING) )
       {
          // scale original problem; overwriting _realLP
          if( _scaler && !_realLP->isScaled() && _reapplyPersistentScaling() )
@@ -74,7 +74,7 @@ namespace soplex
 
       // solve and store solution; if we have a starting basis, do not apply preprocessing; if we are solving from
       // scratch, apply preprocessing according to parameter settings
-      if( !_hasBasis && realParam(SoPlex<Real>::OBJLIMIT_LOWER) == -realParam(SoPlex<Real>::INFTY) && realParam(SoPlex<Real>::OBJLIMIT_UPPER) == realParam(SoPlex<Real>::INFTY) )
+      if( !_hasBasis && realParam(SoPlexBase<Real>::OBJLIMIT_LOWER) == -realParam(SoPlexBase<Real>::INFTY) && realParam(SoPlexBase<Real>::OBJLIMIT_UPPER) == realParam(SoPlexBase<Real>::INFTY) )
          _preprocessAndSolveReal(true);
       else
          _preprocessAndSolveReal(false);
@@ -89,7 +89,7 @@ namespace soplex
 
    /// check whether persistent scaling is supposed to be reapplied again after unscaling
   template <class R>
-  bool SoPlex<R>::_reapplyPersistentScaling() const
+  bool SoPlexBase<R>::_reapplyPersistentScaling() const
    {
       if( (_unscaleCalls > _optimizeCalls * ALLOWED_UNSCALE_PERCENTAGE) && _optimizeCalls > MIN_OPT_CALLS_WITH_SCALING )
          return false;
@@ -101,7 +101,7 @@ namespace soplex
 
    /// checks result of the solving process and solves again without preprocessing if necessary
   template <>
-  void SoPlex<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus)
+  void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus)
    {
       // if the simplifier detected infeasibility or unboundedness we optimize again
       // just to get the proof (primal or dual ray)
@@ -133,8 +133,8 @@ namespace soplex
          // apply polishing on original problem
          if( _applyPolishing )
          {
-            int polishing = intParam(SoPlex<Real>::SOLUTION_POLISHING);
-            setIntParam(SoPlex<Real>::SOLUTION_POLISHING, polishing);
+            int polishing = intParam(SoPlexBase<Real>::SOLUTION_POLISHING);
+            setIntParam(SoPlexBase<Real>::SOLUTION_POLISHING, polishing);
             _preprocessAndSolveReal(false);
          }
          break;
@@ -146,7 +146,7 @@ namespace soplex
          if( !_isRealLPLoaded )
          {
             MSG_INFO1( spxout, spxout << " --- loading original problem" << std::endl; )
-            _solver.changeObjOffset(realParam(SoPlex<Real>::OBJ_OFFSET));
+            _solver.changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
             // we cannot do more to remove violations
             _resolveWithoutPreprocessing(simplificationStatus);
          }
@@ -194,9 +194,9 @@ namespace soplex
 
    /// solves real LP with/without preprocessing
   template <class R>
-  void SoPlex<R>::_preprocessAndSolveReal(bool applySimplifier)
+  void SoPlexBase<R>::_preprocessAndSolveReal(bool applySimplifier)
    {
-      _solver.changeObjOffset(realParam(SoPlex<R>::OBJ_OFFSET));
+      _solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
       _statistics->preprocessingTime->start();
 
       _applyPolishing = false;
@@ -209,8 +209,8 @@ namespace soplex
       // create a copy of the LP when simplifying or when using internal scaling, i.e. w/o persistent scaling
       bool copyLP = (_simplifier != 0 || (_scaler && !_isRealLPScaled));
 
-      _solver.setTerminationValue(intParam(SoPlex<R>::OBJSENSE) == SoPlex<R>::OBJSENSE_MINIMIZE
-                                  ? realParam(SoPlex<R>::OBJLIMIT_UPPER) : realParam(SoPlex<R>::OBJLIMIT_LOWER));
+      _solver.setTerminationValue(intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE
+                                  ? realParam(SoPlexBase<R>::OBJLIMIT_UPPER) : realParam(SoPlexBase<R>::OBJLIMIT_LOWER));
 
       if( _isRealLPLoaded )
       {
@@ -264,13 +264,13 @@ namespace soplex
       {
          assert(!_isRealLPLoaded);
          // do not remove bounds of boxed variables or sides of ranged rows if bound flipping is used; also respect row-boundflip parameter
-         bool keepbounds = intParam(SoPlex<R>::RATIOTESTER) == SoPlex<R>::RATIOTESTER_BOUNDFLIPPING;
-         if( intParam(SoPlex<R>::REPRESENTATION) == SoPlex<R>::REPRESENTATION_ROW
-             || (intParam(SoPlex<R>::REPRESENTATION) == SoPlex<R>::REPRESENTATION_AUTO
-                 && (_solver.nCols() + 1) * realParam(SoPlex<R>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)) )
-            keepbounds &= boolParam(SoPlex<R>::ROWBOUNDFLIPS);
-         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlex<R>::EPSILON_ZERO), realParam(SoPlex<R>::FEASTOL), realParam(SoPlex<R>::OPTTOL), keepbounds);
-         _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlex<R>::OBJ_OFFSET));
+         bool keepbounds = intParam(SoPlexBase<R>::RATIOTESTER) == SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
+         if( intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_ROW
+             || (intParam(SoPlexBase<R>::REPRESENTATION) == SoPlexBase<R>::REPRESENTATION_AUTO
+                 && (_solver.nCols() + 1) * realParam(SoPlexBase<R>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)) )
+            keepbounds &= boolParam(SoPlexBase<R>::ROWBOUNDFLIPS);
+         simplificationStatus = _simplifier->simplify(_solver, realParam(SoPlexBase<R>::EPSILON_ZERO), realParam(SoPlexBase<R>::FEASTOL), realParam(SoPlexBase<R>::OPTTOL), keepbounds);
+         _solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
          _solver.setScalingInfo(false);
          _applyPolishing = true;
          _solver.setSolutionPolishing(SPxSolver<R>::POLISH_OFF);
@@ -296,7 +296,7 @@ namespace soplex
 
    /// loads original problem into solver and solves again after it has been solved to infeasibility or unboundedness with preprocessing
   template <class R>
-  void SoPlex<R>::_resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus)
+  void SoPlexBase<R>::_resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus)
    {
       assert(!_isRealLPLoaded || _scaler != 0);
       assert(_simplifier != 0 || _scaler != 0);
@@ -370,7 +370,7 @@ namespace soplex
 
    /// verify computed solution based on status and resolve if claimed primal or dual feasibility is not fulfilled
   template <class R>
-  void SoPlex<R>::_verifySolutionReal()
+  void SoPlexBase<R>::_verifySolutionReal()
    {
       assert(_hasSolReal);
       if( !_solReal._isPrimalFeasible && !_solReal._isDualFeasible )
@@ -422,7 +422,7 @@ namespace soplex
 
    /// stores solution data from the solver, possibly after applying unscaling and unsimplifying
   template <>
-  void SoPlex<Real>::_storeSolutionReal(bool verify)
+  void SoPlexBase<Real>::_storeSolutionReal(bool verify)
    {
       // prepare storage for basis (enough to fit the original basis)
       _basisStatusRows.reSize(numRowsT());
@@ -449,7 +449,7 @@ namespace soplex
 
       _solReal._isPrimalFeasible = (status() == SPxSolver<Real>::OPTIMAL
          || ((_solver.basis().status() == SPxBasis<Real>::PRIMAL || _solver.basis().status() == SPxBasis<Real>::UNBOUNDED)
-            && _solver.shift() < 10.0 * realParam(SoPlex<Real>::EPSILON_ZERO)));
+            && _solver.shift() < 10.0 * realParam(SoPlexBase<Real>::EPSILON_ZERO)));
 
       _solReal._hasPrimalRay = (status() == SPxSolver<Real>::UNBOUNDED && _isRealLPLoaded);
 
@@ -468,7 +468,7 @@ namespace soplex
 
       _solReal._isDualFeasible = (status() == SPxSolver<Real>::OPTIMAL
          || ((_solver.basis().status() == SPxBasis<Real>::DUAL || _solver.basis().status() == SPxBasis<Real>::INFEASIBLE)
-            && _solver.shift() < 10.0 * realParam(SoPlex<Real>::EPSILON_ZERO)));
+            && _solver.shift() < 10.0 * realParam(SoPlexBase<Real>::EPSILON_ZERO)));
 
       _solReal._hasDualFarkas = (status() == SPxSolver<Real>::INFEASIBLE && _isRealLPLoaded);
 
@@ -571,7 +571,7 @@ namespace soplex
 
 
   template <class R>
-  void SoPlex<R>::_storeSolutionRealFromPresol()
+  void SoPlexBase<R>::_storeSolutionRealFromPresol()
    {
       assert(_simplifier);
       assert(_simplifier->result() == SPxSimplifier<R>::VANISHED);
@@ -620,7 +620,7 @@ namespace soplex
          _unscaleSolutionReal(*_realLP, true);
 
       // compute the original objective function value
-      _solReal._objVal = realParam(SoPlex<R>::OBJ_OFFSET);
+      _solReal._objVal = realParam(SoPlexBase<R>::OBJ_OFFSET);
       for( int i = 0; i < numColsT(); ++i )
          _solReal._objVal += _solReal._primal[i] * objReal(i);
 
@@ -639,7 +639,7 @@ namespace soplex
 
    /// load original LP and possibly setup a slack basis
   template <class R>
-  void SoPlex<R>::_loadRealLP(bool initBasis)
+  void SoPlexBase<R>::_loadRealLP(bool initBasis)
    {
       _solver.loadLP(*_realLP, initBasis);
       _isRealLPLoaded = true;
@@ -654,11 +654,11 @@ namespace soplex
 
    /// unscales stored solution to remove internal or external scaling of LP
   template <class R>
-  void SoPlex<R>::_unscaleSolutionReal(SPxLPReal& LP, bool persistent)
+  void SoPlexBase<R>::_unscaleSolutionReal(SPxLPReal& LP, bool persistent)
    {
       MSG_INFO1( spxout, spxout << " --- unscaling " << (persistent ? "external" : "internal") <<" solution" << std::endl; )
       assert(_scaler);
-      assert(!persistent || (boolParam(SoPlex<R>::PERSISTENTSCALING) && _isRealLPScaled));
+      assert(!persistent || (boolParam(SoPlexBase<R>::PERSISTENTSCALING) && _isRealLPScaled));
       _scaler->unscalePrimal(LP, _solReal._primal);
       _scaler->unscaleSlacks(LP, _solReal._slacks);
       _scaler->unscaleDual(LP, _solReal._dual);

@@ -1,20 +1,20 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                           */
 /*                  This file is part of the class library                   */
-/*       SoPlex --- the Sequential object-oriented simPlex.                  */
+/*       SoPlexBase --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
-/*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
+/*  SoPlexBase is distributed under the terms of the ZIB Academic Licence.       */
 /*                                                                           */
 /*  You should have received a copy of the ZIB Academic License              */
-/*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
+/*  along with SoPlexBase; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  soplexlegacy.h
- * @brief preconfigured \ref soplex::SoPlexLegacy "SoPlexLegacy" LP-solver.
+ * @brief preconfigured \ref soplex::SoPlexBaseLegacy "SoPlexBaseLegacy" LP-solver.
  */
 #define _SOPLEXLEGACY_H_ // flipped the place to remove the legacy parts from the compiliation
 #ifndef _SOPLEXLEGACY_H_
@@ -35,11 +35,11 @@
 namespace soplex
 {
 
-/**@class SoPlexLegacy
-   @brief   Preconfigured SoPlexLegacy LP-solver.
+/**@class SoPlexBaseLegacy
+   @brief   Preconfigured SoPlexBaseLegacy LP-solver.
    @ingroup Algo
 */
-class SoPlexLegacy : public SPxLP
+class SoPlexBaseLegacy : public SPxLP
 {
 protected:
 
@@ -64,15 +64,15 @@ public:
    //**@name Construction / destruction */
    //@{
    /// default construtor.
-   explicit SoPlexLegacy(
+   explicit SoPlexBaseLegacy(
       SPxOut&                   outstream,
       SPxSolver::Type           type = SPxSolver::LEAVE,
       SPxSolver::Representation rep  = SPxSolver::COLUMN );
-   virtual ~SoPlexLegacy();
+   virtual ~SoPlexBaseLegacy();
    /// assignment operator.
-   SoPlexLegacy& operator=(const SoPlexLegacy& rhs);
+   SoPlexBaseLegacy& operator=(const SoPlexBaseLegacy& rhs);
    /// copy constructor.
-   SoPlexLegacy(const SoPlexLegacy&);
+   SoPlexBaseLegacy(const SoPlexBaseLegacy&);
    //@}
 
    /// message handler

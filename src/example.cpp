@@ -27,10 +27,10 @@ using namespace soplex;
 
 int main()
 {
-   SoPlex mysoplex;
+   SoPlexBase mysoplex;
 
    /* set the objective sense */
-   mysoplex.setIntParam(SoPlex::OBJSENSE, SoPlex::OBJSENSE_MINIMIZE);
+   mysoplex.setIntParam(SoPlexBase::OBJSENSE, SoPlexBase::OBJSENSE_MINIMIZE);
 
    /* we first add variables */
    DSVector dummycol(0);

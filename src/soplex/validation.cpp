@@ -66,7 +66,7 @@ namespace soplex {
   /// validates the soplex solution using the external solution
   /// #template Is there a rational equivalent of this function?
   template <>
-  void Validation<Real>::validateSolveReal(SoPlex<Real>& soplex)
+  void Validation<Real>::validateSolveReal(SoPlexBase<Real>& soplex)
   {
 #ifndef SOPLEX_LEGACY
     bool passedValidation = true;
@@ -85,9 +85,9 @@ namespace soplex {
     std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
 
     if( strncmp(validatesolution, "+infinity", 9 ) == 0 )
-      sol =  soplex.realParam(SoPlex<Real>::INFTY);
+      sol =  soplex.realParam(SoPlexBase<Real>::INFTY);
     else if ( strncmp(validatesolution, "-infinity", 9) == 0 )
-      sol =  -soplex.realParam(SoPlex<Real>::INFTY);
+      sol =  -soplex.realParam(SoPlexBase<Real>::INFTY);
     else
       {
         sol = atof(validatesolution);

@@ -24,16 +24,16 @@ namespace soplex
 {
   /// definition of signature to prevent the specialization after instantiation error 
   template <>
-  void SoPlex<Real>::Statistics::clearSolvingData();
+  void SoPlexBase<Real>::Statistics::clearSolvingData();
   template <>
-  void SoPlex<Rational>::Statistics::clearSolvingData();
+  void SoPlexBase<Rational>::Statistics::clearSolvingData();
   template <>
-  void SoPlex<Real>::Statistics::clearAllData();
+  void SoPlexBase<Real>::Statistics::clearAllData();
 
 
   /// default constructor
   template <>
-  SoPlex<Real>::Statistics::Statistics(Timer::TYPE ttype)
+  SoPlexBase<Real>::Statistics::Statistics(Timer::TYPE ttype)
   {
     timerType = ttype;
     readingTime = TimerFactory::createTimer(timerType);
@@ -49,7 +49,7 @@ namespace soplex
 
   /// copy constructor
   template <>
-  SoPlex<Real>::Statistics::Statistics(const Statistics& base)
+  SoPlexBase<Real>::Statistics::Statistics(const Statistics& base)
   {
     timerType = base.timerType;
     readingTime = TimerFactory::createTimer(timerType);
@@ -65,7 +65,7 @@ namespace soplex
 
   /// assignment operator
   template <>
-  typename SoPlex<Real>::Statistics& SoPlex<Real>::Statistics::operator=(const Statistics &rhs)
+  typename SoPlexBase<Real>::Statistics& SoPlexBase<Real>::Statistics::operator=(const Statistics &rhs)
   {
     *readingTime = *(rhs.readingTime);
     *solvingTime = *(rhs.solvingTime);
@@ -99,14 +99,14 @@ namespace soplex
 
   /// clears all statistics
   template <>
-  void SoPlex<Real>::Statistics::clearAllData()
+  void SoPlexBase<Real>::Statistics::clearAllData()
   {
     readingTime->reset();
     clearSolvingData();
   }
 
   template <>
-  void SoPlex<Rational>::Statistics::clearAllData()
+  void SoPlexBase<Rational>::Statistics::clearAllData()
   {
     readingTime->reset();
     clearSolvingData();
@@ -115,7 +115,7 @@ namespace soplex
   /// clears statistics on solving process
   /// #template #baseclass? 
   template <>
-  void SoPlex<Real>::Statistics::clearSolvingData()
+  void SoPlexBase<Real>::Statistics::clearSolvingData()
   {
     solvingTime->reset();
     preprocessingTime->reset();
@@ -167,7 +167,7 @@ namespace soplex
   }
 
   template <>
-  void SoPlex<Rational>::Statistics::clearSolvingData()
+  void SoPlexBase<Rational>::Statistics::clearSolvingData()
   {
     solvingTime->reset();
     preprocessingTime->reset();
@@ -221,7 +221,7 @@ namespace soplex
   
   /// prints statistics
   template <>
-  void SoPlex<Real>::Statistics::print(std::ostream& os)
+  void SoPlexBase<Real>::Statistics::print(std::ostream& os)
   {
     Real solTime = solvingTime->time();
     Real totTime = readingTime->time() + solTime;

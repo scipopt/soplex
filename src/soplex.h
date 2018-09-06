@@ -84,22 +84,12 @@
 namespace soplex
 {
 
-  /**@class SoPlexBase
-   * @brief   A non-templated base class for the templated SoPlex
-   * @ingroup Algo
-   */
-
-  class SoPlexBase
-  {
-    
-  };
-
 /**@class SoPlex
  * @brief   Preconfigured SoPlex LP-solver.
  * @ingroup Algo
  */
   template <class R>
-    class SoPlex : public SoPlexBase
+    class SoPlexBase
 {
 public:
 
@@ -107,16 +97,16 @@ public:
    //@{
 
    /// default constructor
-   SoPlex();
+   SoPlexBase();
 
    /// assignment operator
-   SoPlex<R>& operator=(const SoPlex<R>& rhs);
+   SoPlexBase<R>& operator=(const SoPlexBase<R>& rhs);
 
    /// copy constructor
-   SoPlex(const SoPlex<R>& rhs);
+   SoPlexBase(const SoPlexBase<R>& rhs);
 
    /// destructor
-   virtual ~SoPlex();
+   virtual ~SoPlexBase();
 
    //@}
 
@@ -1352,41 +1342,41 @@ public:
          /// constructor
          BoolParam();
          /// array of names for boolean parameters
-         std::string name[SoPlex<R>::BOOLPARAM_COUNT];
+         std::string name[SoPlexBase<R>::BOOLPARAM_COUNT];
          /// array of descriptions for boolean parameters
-         std::string description[SoPlex<R>::BOOLPARAM_COUNT];
+         std::string description[SoPlexBase<R>::BOOLPARAM_COUNT];
          /// array of default values for boolean parameters
-         bool defaultValue[SoPlex<R>::BOOLPARAM_COUNT];
+         bool defaultValue[SoPlexBase<R>::BOOLPARAM_COUNT];
       } boolParam;
 
       static struct IntParam {
          /// constructor
          IntParam();
           /// array of names for integer parameters
-         std::string name[SoPlex<R>::INTPARAM_COUNT];
+         std::string name[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of descriptions for integer parameters
-         std::string description[SoPlex<R>::INTPARAM_COUNT];
+         std::string description[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of default values for integer parameters
-         int defaultValue[SoPlex<R>::INTPARAM_COUNT];
+         int defaultValue[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of lower bounds for int parameter values
-         int lower[SoPlex<R>::INTPARAM_COUNT];
+         int lower[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of upper bounds for int parameter values
-         int upper[SoPlex<R>::INTPARAM_COUNT];
+         int upper[SoPlexBase<R>::INTPARAM_COUNT];
       } intParam;
 
       static struct RealParam {
          /// constructor
          RealParam();
          /// array of names for real parameters
-         std::string name[SoPlex<R>::REALPARAM_COUNT];
+         std::string name[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of descriptions for real parameters
-         std::string description[SoPlex<R>::REALPARAM_COUNT];
+         std::string description[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of default values for real parameters
-         Real defaultValue[SoPlex<R>::REALPARAM_COUNT];
+         Real defaultValue[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of lower bounds for real parameter values
-         Real lower[SoPlex<R>::REALPARAM_COUNT];
+         Real lower[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of upper bounds for real parameter values
-         Real upper[SoPlex<R>::REALPARAM_COUNT];
+         Real upper[SoPlexBase<R>::REALPARAM_COUNT];
       } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1394,30 +1384,30 @@ public:
          /// constructor
          RationalParam();
          /// array of names for rational parameters
-         std::string name[SoPlex<R>::RATIONALPARAM_COUNT];
+         std::string name[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of descriptions for rational parameters
-         std::string description[SoPlex<R>::RATIONALPARAM_COUNT];
+         std::string description[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of default values for rational parameters
-         Rational defaultValue[SoPlex<R>::RATIONALPARAM_COUNT];
+         Rational defaultValue[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of lower bounds for rational parameter values
-         Rational lower[SoPlex<R>::RATIONALPARAM_COUNT];
+         Rational lower[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of upper bounds for rational parameter values
-         Rational upper[SoPlex<R>::RATIONALPARAM_COUNT];
+         Rational upper[SoPlexBase<R>::RATIONALPARAM_COUNT];
       } rationalParam;
 #endif
 
       /// array of current boolean parameter values
-      bool _boolParamValues[SoPlex<R>::BOOLPARAM_COUNT];
+      bool _boolParamValues[SoPlexBase<R>::BOOLPARAM_COUNT];
 
       /// array of current integer parameter values
-      int _intParamValues[SoPlex<R>::INTPARAM_COUNT];
+      int _intParamValues[SoPlexBase<R>::INTPARAM_COUNT];
 
       /// array of current real parameter values
-      Real _realParamValues[SoPlex<R>::REALPARAM_COUNT];
+      Real _realParamValues[SoPlexBase<R>::REALPARAM_COUNT];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of current rational parameter values
-      Rational _rationalParamValues[SoPlex<R>::RATIONALPARAM_COUNT];
+      Rational _rationalParamValues[SoPlexBase<R>::RATIONALPARAM_COUNT];
 #endif
 
       /// default constructor initializing default settings
@@ -2008,7 +1998,7 @@ private:
    /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
    void _syncRationalSolution();
 
-   /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+   /// returns pointer to a constant unit vector available until destruction of the SoPlexBase class
    const UnitVectorRational* _unitVectorRational(const int i);
 
    /// parses one line in a settings file and returns true on success; note that the string is modified
@@ -2313,7 +2303,7 @@ private:
 
 namespace soplex
 {
-   typedef SoPlexLegacy SoPlex;
+   typedef SoPlexBaseLegacy SoPlexBase;
 }
 #endif
 #endif // _SOPLEX_H_

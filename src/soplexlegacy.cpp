@@ -22,7 +22,7 @@
 
 namespace soplex
 {
-SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver::Representation p_rep)
+SoPlexBaseLegacy::SoPlexBaseLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver::Representation p_rep)
    : m_solver(p_type, p_rep)
    , m_postScaler(0)
    , m_simplifier(0)
@@ -36,10 +36,10 @@ SoPlexLegacy::SoPlexLegacy(SPxOut& outstream, SPxSolver::Type p_type, SPxSolver:
    m_solver.setPricer(new SPxSteepPR(), true);
    m_solver.setStarter(0);
 
-   assert(SoPlexLegacy::isConsistent());
+   assert(SoPlexBaseLegacy::isConsistent());
 }
 
-SoPlexLegacy::~SoPlexLegacy()
+SoPlexBaseLegacy::~SoPlexBaseLegacy()
 {
    assert(!m_freePostScaler || m_postScaler != 0);
    assert(!m_freeSimplifier || m_simplifier != 0);
@@ -57,7 +57,7 @@ SoPlexLegacy::~SoPlexLegacy()
    }
 }
 
-SoPlexLegacy& SoPlexLegacy::operator=(const SoPlexLegacy& base)
+SoPlexBaseLegacy& SoPlexBaseLegacy::operator=(const SoPlexBaseLegacy& base)
 {
    assert(!m_freePostScaler || m_postScaler != 0);
    assert(!m_freeSimplifier || m_simplifier != 0);
@@ -111,7 +111,7 @@ SoPlexLegacy& SoPlexLegacy::operator=(const SoPlexLegacy& base)
 }
 
 
-SoPlexLegacy::SoPlexLegacy(const SoPlexLegacy& old)
+SoPlexBaseLegacy::SoPlexBaseLegacy(const SoPlexBaseLegacy& old)
    : SPxLP(old)
    , m_slu(old.m_slu)  // call of SLinSolver::clone() SPxBasis copy constructor not necessary (done by m_solver.setSolver(&m_slu) below)
    , m_solver(old.m_solver)
@@ -146,7 +146,7 @@ SoPlexLegacy::SoPlexLegacy(const SoPlexLegacy& old)
 
 
 
-void SoPlexLegacy::setPostScaler(SPxScaler* x, const bool destroy)
+void SoPlexBaseLegacy::setPostScaler(SPxScaler* x, const bool destroy)
 {
 
    assert(!m_freePostScaler || m_postScaler != 0);
@@ -162,7 +162,7 @@ void SoPlexLegacy::setPostScaler(SPxScaler* x, const bool destroy)
    m_freePostScaler = destroy;
 }
 
-void SoPlexLegacy::setSimplifier(SPxSimplifier* x, const bool destroy)
+void SoPlexBaseLegacy::setSimplifier(SPxSimplifier* x, const bool destroy)
 {
 
    assert(!m_freeSimplifier || m_simplifier != 0);
@@ -176,7 +176,7 @@ void SoPlexLegacy::setSimplifier(SPxSimplifier* x, const bool destroy)
    m_freeSimplifier = destroy;
 }
 
-Real SoPlexLegacy::objValue() const
+Real SoPlexBaseLegacy::objValue() const
 {
 
    DVector x(nCols());
@@ -186,7 +186,7 @@ Real SoPlexLegacy::objValue() const
    return x * maxObj() * Real(spxSense());
 }
 
-SPxSolver::Status SoPlexLegacy::solve()
+SPxSolver::Status SoPlexBaseLegacy::solve()
 {
 
    if (nRows() <= 0 && nCols() <= 0) // no problem loaded
@@ -257,7 +257,7 @@ SPxSolver::Status SoPlexLegacy::solve()
    return m_solver.solve();
 }
 
-SPxSolver::Status SoPlexLegacy::getPrimal(Vector& x) const
+SPxSolver::Status SoPlexBaseLegacy::getPrimal(Vector& x) const
 {
 
    if (has_simplifier())
@@ -283,7 +283,7 @@ SPxSolver::Status SoPlexLegacy::getPrimal(Vector& x) const
    return stat;
 }
 
-SPxSolver::Status SoPlexLegacy::getSlacks(Vector& s) const
+SPxSolver::Status SoPlexBaseLegacy::getSlacks(Vector& s) const
 {
 
    if (has_simplifier())
@@ -309,7 +309,7 @@ SPxSolver::Status SoPlexLegacy::getSlacks(Vector& s) const
    return stat;
 }
 
-SPxSolver::Status SoPlexLegacy::getDual(Vector& pi) const
+SPxSolver::Status SoPlexBaseLegacy::getDual(Vector& pi) const
 {
 
    if (has_simplifier())
@@ -335,7 +335,7 @@ SPxSolver::Status SoPlexLegacy::getDual(Vector& pi) const
    return stat;
 }
 
-SPxSolver::Status SoPlexLegacy::getRedCost(Vector& rdcost) const
+SPxSolver::Status SoPlexBaseLegacy::getRedCost(Vector& rdcost) const
 {
 
    if (has_simplifier())
@@ -361,7 +361,7 @@ SPxSolver::Status SoPlexLegacy::getRedCost(Vector& rdcost) const
    return stat;
 }
 
-SPxSolver::VarStatus SoPlexLegacy::getBasisRowStatus(int i) const
+SPxSolver::VarStatus SoPlexBaseLegacy::getBasisRowStatus(int i) const
 {
    SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
    if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
@@ -378,7 +378,7 @@ SPxSolver::VarStatus SoPlexLegacy::getBasisRowStatus(int i) const
       return m_solver.getBasisRowStatus(i);
 }
 
-SPxSolver::VarStatus SoPlexLegacy::getBasisColStatus(int j) const
+SPxSolver::VarStatus SoPlexBaseLegacy::getBasisColStatus(int j) const
 {
    SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
    if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
@@ -395,7 +395,7 @@ SPxSolver::VarStatus SoPlexLegacy::getBasisColStatus(int j) const
       return m_solver.getBasisColStatus(j);
 }
 
-SPxSolver::Status SoPlexLegacy::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
+SPxSolver::Status SoPlexBaseLegacy::getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const
 {
    SPxBasis::SPxStatus b_status = m_solver.getBasisStatus();
    if((b_status == SPxBasis::NO_PROBLEM || (has_simplifier() && b_status == SPxBasis::SINGULAR)) && !m_vanished)
@@ -426,7 +426,7 @@ SPxSolver::Status SoPlexLegacy::getBasis(SPxSolver::VarStatus rows[], SPxSolver:
       return m_solver.getBasis(rows, cols);
 }
 
-SPxSolver::Status SoPlexLegacy::getPrimalray(Vector& primalray) const
+SPxSolver::Status SoPlexBaseLegacy::getPrimalray(Vector& primalray) const
 {
    /// Does not work yet with presolve
    if (has_simplifier())
@@ -442,7 +442,7 @@ SPxSolver::Status SoPlexLegacy::getPrimalray(Vector& primalray) const
    return stat;
 }
 
-SPxSolver::Status SoPlexLegacy::getDualfarkas(Vector& dualfarkas) const
+SPxSolver::Status SoPlexBaseLegacy::getDualfarkas(Vector& dualfarkas) const
 {
    /// Does not work yet with presolve
    if (has_simplifier())
@@ -459,7 +459,7 @@ SPxSolver::Status SoPlexLegacy::getDualfarkas(Vector& dualfarkas) const
    return stat;
 }
 
-void SoPlexLegacy::qualConstraintViolation(
+void SoPlexBaseLegacy::qualConstraintViolation(
    Real& maxviol,
    Real& sumviol) const
 {
@@ -496,7 +496,7 @@ void SoPlexLegacy::qualConstraintViolation(
    }
 }
 
-void SoPlexLegacy::qualBoundViolation(
+void SoPlexBaseLegacy::qualBoundViolation(
    Real& maxviol,
    Real& sumviol) const
 {
@@ -526,7 +526,7 @@ void SoPlexLegacy::qualBoundViolation(
    }
 }
 
-bool SoPlexLegacy::readBasisFile(
+bool SoPlexBaseLegacy::readBasisFile(
    const char*    filename,
    const NameSet* rowNames,
    const NameSet* colNames
@@ -537,7 +537,7 @@ bool SoPlexLegacy::readBasisFile(
    return m_solver.readBasisFile(filename, rowNames, colNames);
 }
 
-bool SoPlexLegacy::writeBasisFile(
+bool SoPlexBaseLegacy::writeBasisFile(
    const char*    filename,
    const NameSet* rowNames,
    const NameSet* colNames
@@ -612,7 +612,7 @@ bool SoPlexLegacy::writeBasisFile(
    return true;
 }
 
-bool SoPlexLegacy::writeState(
+bool SoPlexBaseLegacy::writeState(
    const char*    filename,
    const NameSet* rowNames,
    const NameSet* colNames ) const
@@ -621,7 +621,7 @@ bool SoPlexLegacy::writeState(
    return m_solver.writeState(filename, rowNames, colNames);
 }
 
-void SoPlexLegacy::unsimplify() const
+void SoPlexBaseLegacy::unsimplify() const
 {
    if (!has_simplifier() || m_simplifier->isUnsimplified())
       return;

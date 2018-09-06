@@ -43,688 +43,688 @@
 namespace soplex
 {
   template <>
-  int SoPlex<Real>::intParam(const IntParam param) const;
+  int SoPlexBase<Real>::intParam(const IntParam param) const;
 
   template <>
-	bool SoPlex<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
+	bool SoPlexBase<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
 
   template <>
-  typename SoPlex<Real>::Settings& SoPlex<Real>::Settings::operator=(const Settings& settings);
+  typename SoPlexBase<Real>::Settings& SoPlexBase<Real>::Settings::operator=(const Settings& settings);
 
   template <>
-  const SVectorReal& SoPlex<Real>::colVectorRealInternal(int i) const;
+  const SVectorReal& SoPlexBase<Real>::colVectorRealInternal(int i) const;
 
   template <>
-  const Rational& SoPlex<Real>::maxObjRational(int i) const;
+  const Rational& SoPlexBase<Real>::maxObjRational(int i) const;
 
   template <>
-  typename SPxSolver<Real>::VarStatus SoPlex<Real>::basisRowStatus(int row) const;
+  typename SPxSolver<Real>::VarStatus SoPlexBase<Real>::basisRowStatus(int row) const;
 
   template <>
-  typename SPxSolver<Real>::VarStatus SoPlex<Real>::basisColStatus(int col) const;
+  typename SPxSolver<Real>::VarStatus SoPlexBase<Real>::basisColStatus(int col) const;
 
   template <>
-	bool SoPlex<Real>::setSettings(const Settings& newSettings, const bool init);
+	bool SoPlexBase<Real>::setSettings(const Settings& newSettings, const bool init);
 
   template <>
-	bool SoPlex<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const;
+	bool SoPlexBase<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const;
 
   template <>
-  void SoPlex<Real>::printShortStatistics(std::ostream& os);
+  void SoPlexBase<Real>::printShortStatistics(std::ostream& os);
 
   template <>
-  void SoPlex<Real>::printStatus(std::ostream& os, typename SPxSolver<Real>::Status stat);
+  void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolver<Real>::Status stat);
 
   template <>
-  void SoPlex<Real>::setRandomSeed(unsigned int seed);
+  void SoPlexBase<Real>::setRandomSeed(unsigned int seed);
 
   template <>
-  void SoPlex<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
+  void SoPlexBase<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
 
   template <>
-  void SoPlex<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const;
+  void SoPlexBase<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const;
 
   template <>
-	bool SoPlex<Real>::_isConsistent() const;
+	bool SoPlexBase<Real>::_isConsistent() const;
 
   template <>
-  typename SoPlex<Real>::RangeType SoPlex<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
+  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
 
   template <>
-  void SoPlex<Real>::_addRowReal(const LPRowReal& lprow);
+  void SoPlexBase<Real>::_addRowReal(const LPRowReal& lprow);
 
   template <>
-	bool SoPlex<Real>::setIntParam(const IntParam param, const int value, const bool init);
+	bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const bool init);
 
   template <>
-  typename SoPlex<Real>::RangeType SoPlex<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const;
+  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const;
 
   template <>
-  void SoPlex<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
+  void SoPlexBase<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
 
   template <>
-  void SoPlex<Real>::_addRowsReal(const LPRowSetReal& lprowset);
+  void SoPlexBase<Real>::_addRowsReal(const LPRowSetReal& lprowset);
 
   template <>
-  void SoPlex<Real>::_addColReal(const LPColReal& lpcol);
+  void SoPlexBase<Real>::_addColReal(const LPColReal& lpcol);
 
   template <>
-  void SoPlex<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
+  void SoPlexBase<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
 
   template <>
-  void SoPlex<Real>::_addColsReal(const LPColSetReal& lpcolset);
+  void SoPlexBase<Real>::_addColsReal(const LPColSetReal& lpcolset);
 
   template <>
-  void SoPlex<Real>::_changeRowReal(int i, const LPRowReal& lprow);
+  void SoPlexBase<Real>::_changeRowReal(int i, const LPRowReal& lprow);
 
   template <>
-  void SoPlex<Real>::_changeLhsReal(const VectorReal& lhs);
+  void SoPlexBase<Real>::_changeLhsReal(const VectorReal& lhs);
 
   template <>
-  void SoPlex<Real>::_changeLhsReal(int i, const Real& lhs);
+  void SoPlexBase<Real>::_changeLhsReal(int i, const Real& lhs);
 
   template <>
-  void SoPlex<Real>::_changeRhsReal(const VectorReal& rhs);
+  void SoPlexBase<Real>::_changeRhsReal(const VectorReal& rhs);
 
   template <>
-  void SoPlex<Real>::_changeRhsReal(int i, const Real& rhs);
+  void SoPlexBase<Real>::_changeRhsReal(int i, const Real& rhs);
 
   template <>
-  void SoPlex<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
+  void SoPlexBase<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
 
   template <>
-  void SoPlex<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs);
+  void SoPlexBase<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs);
 
   template <>
-  void SoPlex<Real>::_changeColReal(int i, const LPColReal& lpcol);
+  void SoPlexBase<Real>::_changeColReal(int i, const LPColReal& lpcol);
 
   template <>
-  void SoPlex<Real>::_changeLowerReal(const VectorReal& lower);
+  void SoPlexBase<Real>::_changeLowerReal(const VectorReal& lower);
 
   template <>
-  void SoPlex<Real>::_changeLowerReal(int i, const Real& lower);
+  void SoPlexBase<Real>::_changeLowerReal(int i, const Real& lower);
 
   template <>
-  void SoPlex<Real>::_changeUpperReal(const VectorReal& upper);
+  void SoPlexBase<Real>::_changeUpperReal(const VectorReal& upper);
 
   template <>
-  void SoPlex<Real>::_changeUpperReal(int i, const Real& upper);
+  void SoPlexBase<Real>::_changeUpperReal(int i, const Real& upper);
 
   template <>
-  void SoPlex<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
+  void SoPlexBase<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
 
   template <>
-  void SoPlex<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper);
+  void SoPlexBase<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper);
 
   template <>
-  void SoPlex<Real>::_changeElementReal(int i, int j, const Real& val);
+  void SoPlexBase<Real>::_changeElementReal(int i, int j, const Real& val);
 
   template <>
-  void SoPlex<Real>::_removeRowReal(int i);
+  void SoPlexBase<Real>::_removeRowReal(int i);
 
   template <>
-  void SoPlex<Real>::_removeRowsReal(int perm[]);
+  void SoPlexBase<Real>::_removeRowsReal(int perm[]);
 
   template <>
-  void SoPlex<Real>::_removeColReal(int i);
+  void SoPlexBase<Real>::_removeColReal(int i);
 
   template <>
-  void SoPlex<Real>::_removeColsReal(int perm[]);
+  void SoPlexBase<Real>::_removeColsReal(int perm[]);
 
   template <>
-  void SoPlex<Real>::_invalidateSolution();
+  void SoPlexBase<Real>::_invalidateSolution();
 
   template <>
-  void SoPlex<Real>::_ensureRationalLP();
+  void SoPlexBase<Real>::_ensureRationalLP();
 
   template <>
-  void SoPlex<Real>::_ensureRealLPLoaded();
+  void SoPlexBase<Real>::_ensureRealLPLoaded();
 
   template <>
-	bool SoPlex<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
+	bool SoPlexBase<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
 
   template <>
-  void SoPlex<Real>::_completeRangeTypesRational();
+  void SoPlexBase<Real>::_completeRangeTypesRational();
 
   template <>
-  void SoPlex<Real>::_recomputeRangeTypesRational();
+  void SoPlexBase<Real>::_recomputeRangeTypesRational();
 
   template <>
-  void SoPlex<Real>::_syncLPReal(bool time);
+  void SoPlexBase<Real>::_syncLPReal(bool time);
 
   template <>
-  void SoPlex<Real>::_syncLPRational(bool time);
+  void SoPlexBase<Real>::_syncLPRational(bool time);
 
   template <>
-  void SoPlex<Real>::_syncRealSolution();
+  void SoPlexBase<Real>::_syncRealSolution();
 
   template <>
-  void SoPlex<Real>::_syncRationalSolution();
+  void SoPlexBase<Real>::_syncRationalSolution();
 
   template <>
-  const UnitVectorRational* SoPlex<Real>::_unitVectorRational(const int i);
+  const UnitVectorRational* SoPlexBase<Real>::_unitVectorRational(const int i);
 
   template <>
-	bool SoPlex<Real>::_parseSettingsLine(char* line, const int lineNumber);
+	bool SoPlexBase<Real>::_parseSettingsLine(char* line, const int lineNumber);
 
   template <>
-	bool SoPlex<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
+	bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
 
   template <>
-  SoPlex<Real>::Settings::BoolParam::BoolParam() {
+  SoPlexBase<Real>::Settings::BoolParam::BoolParam() {
     // should lifting be used to reduce range of nonzero matrix coefficients?
-    name[SoPlex<Real>::LIFTING] = "lifting";
-    description[SoPlex<Real>::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
-    defaultValue[SoPlex<Real>::LIFTING] = false;
+    name[SoPlexBase<Real>::LIFTING] = "lifting";
+    description[SoPlexBase<Real>::LIFTING] = "should lifting be used to reduce range of nonzero matrix coefficients?";
+    defaultValue[SoPlexBase<Real>::LIFTING] = false;
 
     // should LP be transformed to equality form before a rational solve?
-    name[SoPlex<Real>::EQTRANS] = "eqtrans";
-    description[SoPlex<Real>::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
-    defaultValue[SoPlex<Real>::EQTRANS] = false;
+    name[SoPlexBase<Real>::EQTRANS] = "eqtrans";
+    description[SoPlexBase<Real>::EQTRANS] = "should LP be transformed to equality form before a rational solve?";
+    defaultValue[SoPlexBase<Real>::EQTRANS] = false;
 
     // should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?
-    name[SoPlex<Real>::TESTDUALINF] = "testdualinf";
-    description[SoPlex<Real>::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
-    defaultValue[SoPlex<Real>::TESTDUALINF] = false;
+    name[SoPlexBase<Real>::TESTDUALINF] = "testdualinf";
+    description[SoPlexBase<Real>::TESTDUALINF] = "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?";
+    defaultValue[SoPlexBase<Real>::TESTDUALINF] = false;
 
     // should a rational factorization be performed after iterative refinement?
-    name[SoPlex<Real>::RATFAC] = "ratfac";
-    description[SoPlex<Real>::RATFAC] = "should a rational factorization be performed after iterative refinement?";
-    defaultValue[SoPlex<Real>::RATFAC] = true;
+    name[SoPlexBase<Real>::RATFAC] = "ratfac";
+    description[SoPlexBase<Real>::RATFAC] = "should a rational factorization be performed after iterative refinement?";
+    defaultValue[SoPlexBase<Real>::RATFAC] = true;
 
     // should the decomposition based dual simplex be used to solve the LP? Setting this to true forces the solve mode to
     // SOLVEMODE_REAL and the basis representation to REPRESENTATION_ROW
-    name[SoPlex<Real>::USEDECOMPDUALSIMPLEX] = "decompositiondualsimplex";
-    description[SoPlex<Real>::USEDECOMPDUALSIMPLEX] = "should the decomposition based dual simplex be used to solve the LP?";
-    defaultValue[SoPlex<Real>::USEDECOMPDUALSIMPLEX] = false;
+    name[SoPlexBase<Real>::USEDECOMPDUALSIMPLEX] = "decompositiondualsimplex";
+    description[SoPlexBase<Real>::USEDECOMPDUALSIMPLEX] = "should the decomposition based dual simplex be used to solve the LP?";
+    defaultValue[SoPlexBase<Real>::USEDECOMPDUALSIMPLEX] = false;
 
     // should the degeneracy be computed for each basis?
-    name[SoPlex<Real>::COMPUTEDEGEN] = "computedegen";
-    description[SoPlex<Real>::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
-    defaultValue[SoPlex<Real>::COMPUTEDEGEN] = false;
+    name[SoPlexBase<Real>::COMPUTEDEGEN] = "computedegen";
+    description[SoPlexBase<Real>::COMPUTEDEGEN] = "should the degeneracy be computed for each basis?";
+    defaultValue[SoPlexBase<Real>::COMPUTEDEGEN] = false;
 
     // should the dual of the complementary problem be used in the decomposition simplex?
-    name[SoPlex<Real>::USECOMPDUAL] = "usecompdual";
-    description[SoPlex<Real>::USECOMPDUAL] = "should the dual of the complementary problem be used in the decomposition simplex?";
-    defaultValue[SoPlex<Real>::USECOMPDUAL] = false;
+    name[SoPlexBase<Real>::USECOMPDUAL] = "usecompdual";
+    description[SoPlexBase<Real>::USECOMPDUAL] = "should the dual of the complementary problem be used in the decomposition simplex?";
+    defaultValue[SoPlexBase<Real>::USECOMPDUAL] = false;
 
     /// should row and bound violations be computed explicitly in the update of reduced problem in the decomposition
     // simplex
-    name[SoPlex<Real>::EXPLICITVIOL] = "explicitviol";
-    description[SoPlex<Real>::EXPLICITVIOL] = "Should violations of the original problem be explicitly computed in the decomposition simplex?";
-    defaultValue[SoPlex<Real>::EXPLICITVIOL] = false;
+    name[SoPlexBase<Real>::EXPLICITVIOL] = "explicitviol";
+    description[SoPlexBase<Real>::EXPLICITVIOL] = "Should violations of the original problem be explicitly computed in the decomposition simplex?";
+    defaultValue[SoPlexBase<Real>::EXPLICITVIOL] = false;
 
     // should cycling solutions be accepted during iterative refinement?
-    name[SoPlex<Real>::ACCEPTCYCLING] = "acceptcycling";
-    description[SoPlex<Real>::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
-    defaultValue[SoPlex<Real>::ACCEPTCYCLING] = false;
+    name[SoPlexBase<Real>::ACCEPTCYCLING] = "acceptcycling";
+    description[SoPlexBase<Real>::ACCEPTCYCLING] = "should cycling solutions be accepted during iterative refinement?";
+    defaultValue[SoPlexBase<Real>::ACCEPTCYCLING] = false;
 
     // apply rational reconstruction after each iterative refinement?
-    name[SoPlex<Real>::RATREC] = "ratrec";
-    description[SoPlex<Real>::RATREC] = "apply rational reconstruction after each iterative refinement?";
-    defaultValue[SoPlex<Real>::RATREC] = true;
+    name[SoPlexBase<Real>::RATREC] = "ratrec";
+    description[SoPlexBase<Real>::RATREC] = "apply rational reconstruction after each iterative refinement?";
+    defaultValue[SoPlexBase<Real>::RATREC] = true;
 
     // round scaling factors for iterative refinement to powers of two?
-    name[SoPlex<Real>::POWERSCALING] = "powerscaling";
-    description[SoPlex<Real>::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
-    defaultValue[SoPlex<Real>::POWERSCALING] = true;
+    name[SoPlexBase<Real>::POWERSCALING] = "powerscaling";
+    description[SoPlexBase<Real>::POWERSCALING] = "round scaling factors for iterative refinement to powers of two?";
+    defaultValue[SoPlexBase<Real>::POWERSCALING] = true;
 
     // continue iterative refinement with exact basic solution if not optimal?
-    name[SoPlex<Real>::RATFACJUMP] = "ratfacjump";
-    description[SoPlex<Real>::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
-    defaultValue[SoPlex<Real>::RATFACJUMP] = false;
+    name[SoPlexBase<Real>::RATFACJUMP] = "ratfacjump";
+    description[SoPlexBase<Real>::RATFACJUMP] = "continue iterative refinement with exact basic solution if not optimal?";
+    defaultValue[SoPlexBase<Real>::RATFACJUMP] = false;
 
     // use bound flipping also for row representation?
-    name[SoPlex<Real>::ROWBOUNDFLIPS] = "rowboundflips";
-    description[SoPlex<Real>::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
-    defaultValue[SoPlex<Real>::ROWBOUNDFLIPS] = false;
+    name[SoPlexBase<Real>::ROWBOUNDFLIPS] = "rowboundflips";
+    description[SoPlexBase<Real>::ROWBOUNDFLIPS] = "use bound flipping also for row representation?";
+    defaultValue[SoPlexBase<Real>::ROWBOUNDFLIPS] = false;
 
     // use persistent scaling?
-    name[SoPlex<Real>::PERSISTENTSCALING] = "persistentscaling";
-    description[SoPlex<Real>::PERSISTENTSCALING] = "should persistent scaling be used?";
-    defaultValue[SoPlex<Real>::PERSISTENTSCALING] = true;
+    name[SoPlexBase<Real>::PERSISTENTSCALING] = "persistentscaling";
+    description[SoPlexBase<Real>::PERSISTENTSCALING] = "should persistent scaling be used?";
+    defaultValue[SoPlexBase<Real>::PERSISTENTSCALING] = true;
 
     // perturb the entire problem or only the relevant bounds of s single pivot?
-    name[SoPlex<Real>::FULLPERTURBATION] = "fullperturbation";
-    description[SoPlex<Real>::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
-    defaultValue[SoPlex<Real>::FULLPERTURBATION] = false;
+    name[SoPlexBase<Real>::FULLPERTURBATION] = "fullperturbation";
+    description[SoPlexBase<Real>::FULLPERTURBATION] = "should perturbation be applied to the entire problem?";
+    defaultValue[SoPlexBase<Real>::FULLPERTURBATION] = false;
   }
 
   template <class R>
-  SoPlex<R>::Settings::IntParam::IntParam() {
+  SoPlexBase<R>::Settings::IntParam::IntParam() {
     // objective sense
-    name[SoPlex<R>::OBJSENSE] = "objsense";
-    description[SoPlex<R>::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
-    lower[SoPlex<R>::OBJSENSE] = -1;
-    upper[SoPlex<R>::OBJSENSE] = 1;
-    defaultValue[SoPlex<R>::OBJSENSE] = SoPlex<R>::OBJSENSE_MAXIMIZE;
+    name[SoPlexBase<R>::OBJSENSE] = "objsense";
+    description[SoPlexBase<R>::OBJSENSE] = "objective sense (-1 - minimize, +1 - maximize)";
+    lower[SoPlexBase<R>::OBJSENSE] = -1;
+    upper[SoPlexBase<R>::OBJSENSE] = 1;
+    defaultValue[SoPlexBase<R>::OBJSENSE] = SoPlexBase<R>::OBJSENSE_MAXIMIZE;
 
     // type of computational form, i.e., column or row representation
-    name[SoPlex<R>::REPRESENTATION] = "representation";
-    description[SoPlex<R>::REPRESENTATION] = "type of computational form (0 - auto, 1 - column representation, 2 - row representation)";
-    lower[SoPlex<R>::REPRESENTATION] = 0;
-    upper[SoPlex<R>::REPRESENTATION] = 2;
-    defaultValue[SoPlex<R>::REPRESENTATION] = SoPlex<R>::REPRESENTATION_AUTO;
+    name[SoPlexBase<R>::REPRESENTATION] = "representation";
+    description[SoPlexBase<R>::REPRESENTATION] = "type of computational form (0 - auto, 1 - column representation, 2 - row representation)";
+    lower[SoPlexBase<R>::REPRESENTATION] = 0;
+    upper[SoPlexBase<R>::REPRESENTATION] = 2;
+    defaultValue[SoPlexBase<R>::REPRESENTATION] = SoPlexBase<R>::REPRESENTATION_AUTO;
 
     // type of algorithm, i.e., primal or dual
-    name[SoPlex<R>::ALGORITHM] = "algorithm";
-    description[SoPlex<R>::ALGORITHM] = "type of algorithm (0 - primal, 1 - dual)";
-    lower[SoPlex<R>::ALGORITHM] = 0;
-    upper[SoPlex<R>::ALGORITHM] = 1;
-    defaultValue[SoPlex<R>::ALGORITHM] = SoPlex<R>::ALGORITHM_DUAL;
+    name[SoPlexBase<R>::ALGORITHM] = "algorithm";
+    description[SoPlexBase<R>::ALGORITHM] = "type of algorithm (0 - primal, 1 - dual)";
+    lower[SoPlexBase<R>::ALGORITHM] = 0;
+    upper[SoPlexBase<R>::ALGORITHM] = 1;
+    defaultValue[SoPlexBase<R>::ALGORITHM] = SoPlexBase<R>::ALGORITHM_DUAL;
 
     // type of LU update
-    name[SoPlex<R>::FACTOR_UPDATE_TYPE] = "factor_update_type";
-    description[SoPlex<R>::FACTOR_UPDATE_TYPE] = "type of LU update (0 - eta update, 1 - Forrest-Tomlin update)";
-    lower[SoPlex<R>::FACTOR_UPDATE_TYPE] = 0;
-    upper[SoPlex<R>::FACTOR_UPDATE_TYPE] = 1;
-    defaultValue[SoPlex<R>::FACTOR_UPDATE_TYPE] = SoPlex<R>::FACTOR_UPDATE_TYPE_FT;
+    name[SoPlexBase<R>::FACTOR_UPDATE_TYPE] = "factor_update_type";
+    description[SoPlexBase<R>::FACTOR_UPDATE_TYPE] = "type of LU update (0 - eta update, 1 - Forrest-Tomlin update)";
+    lower[SoPlexBase<R>::FACTOR_UPDATE_TYPE] = 0;
+    upper[SoPlexBase<R>::FACTOR_UPDATE_TYPE] = 1;
+    defaultValue[SoPlexBase<R>::FACTOR_UPDATE_TYPE] = SoPlexBase<R>::FACTOR_UPDATE_TYPE_FT;
 
     // maximum number of updates without fresh factorization
-    name[SoPlex<R>::FACTOR_UPDATE_MAX] = "factor_update_max";
-    description[SoPlex<R>::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization (0 - auto)";
-    lower[SoPlex<R>::FACTOR_UPDATE_MAX] = 0;
-    upper[SoPlex<R>::FACTOR_UPDATE_MAX] = INT_MAX;
-    defaultValue[SoPlex<R>::FACTOR_UPDATE_MAX] = 0;
+    name[SoPlexBase<R>::FACTOR_UPDATE_MAX] = "factor_update_max";
+    description[SoPlexBase<R>::FACTOR_UPDATE_MAX] = "maximum number of LU updates without fresh factorization (0 - auto)";
+    lower[SoPlexBase<R>::FACTOR_UPDATE_MAX] = 0;
+    upper[SoPlexBase<R>::FACTOR_UPDATE_MAX] = INT_MAX;
+    defaultValue[SoPlexBase<R>::FACTOR_UPDATE_MAX] = 0;
 
     // iteration limit (-1 if unlimited)
-    name[SoPlex<R>::ITERLIMIT] = "iterlimit";
-    description[SoPlex<R>::ITERLIMIT] = "iteration limit (-1 - no limit)";
-    lower[SoPlex<R>::ITERLIMIT] = -1;
-    upper[SoPlex<R>::ITERLIMIT] = INT_MAX;
-    defaultValue[SoPlex<R>::ITERLIMIT] = -1;
+    name[SoPlexBase<R>::ITERLIMIT] = "iterlimit";
+    description[SoPlexBase<R>::ITERLIMIT] = "iteration limit (-1 - no limit)";
+    lower[SoPlexBase<R>::ITERLIMIT] = -1;
+    upper[SoPlexBase<R>::ITERLIMIT] = INT_MAX;
+    defaultValue[SoPlexBase<R>::ITERLIMIT] = -1;
 
     // refinement limit (-1 if unlimited)
-    name[SoPlex<R>::REFLIMIT] = "reflimit";
-    description[SoPlex<R>::REFLIMIT] = "refinement limit (-1 - no limit)";
-    lower[SoPlex<R>::REFLIMIT] = -1;
-    upper[SoPlex<R>::REFLIMIT] = INT_MAX;
-    defaultValue[SoPlex<R>::REFLIMIT] = -1;
+    name[SoPlexBase<R>::REFLIMIT] = "reflimit";
+    description[SoPlexBase<R>::REFLIMIT] = "refinement limit (-1 - no limit)";
+    lower[SoPlexBase<R>::REFLIMIT] = -1;
+    upper[SoPlexBase<R>::REFLIMIT] = INT_MAX;
+    defaultValue[SoPlexBase<R>::REFLIMIT] = -1;
 
     // stalling refinement limit (-1 if unlimited)
-    name[SoPlex<R>::STALLREFLIMIT] = "stallreflimit";
-    description[SoPlex<R>::STALLREFLIMIT] = "stalling refinement limit (-1 - no limit)";
-    lower[SoPlex<R>::STALLREFLIMIT] = -1;
-    upper[SoPlex<R>::STALLREFLIMIT] = INT_MAX;
-    defaultValue[SoPlex<R>::STALLREFLIMIT] = -1;
+    name[SoPlexBase<R>::STALLREFLIMIT] = "stallreflimit";
+    description[SoPlexBase<R>::STALLREFLIMIT] = "stalling refinement limit (-1 - no limit)";
+    lower[SoPlexBase<R>::STALLREFLIMIT] = -1;
+    upper[SoPlexBase<R>::STALLREFLIMIT] = INT_MAX;
+    defaultValue[SoPlexBase<R>::STALLREFLIMIT] = -1;
 
     // display frequency
-    name[SoPlex<R>::DISPLAYFREQ] = "displayfreq";
-    description[SoPlex<R>::DISPLAYFREQ] = "display frequency";
-    lower[SoPlex<R>::DISPLAYFREQ] = 1;
-    upper[SoPlex<R>::DISPLAYFREQ] = INT_MAX;
-    defaultValue[SoPlex<R>::DISPLAYFREQ] = 200;
+    name[SoPlexBase<R>::DISPLAYFREQ] = "displayfreq";
+    description[SoPlexBase<R>::DISPLAYFREQ] = "display frequency";
+    lower[SoPlexBase<R>::DISPLAYFREQ] = 1;
+    upper[SoPlexBase<R>::DISPLAYFREQ] = INT_MAX;
+    defaultValue[SoPlexBase<R>::DISPLAYFREQ] = 200;
 
     // verbosity level
-    name[SoPlex<R>::VERBOSITY] = "verbosity";
-    description[SoPlex<R>::VERBOSITY] = "verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)";
-    lower[SoPlex<R>::VERBOSITY] = 0;
-    upper[SoPlex<R>::VERBOSITY] = 5;
-    defaultValue[SoPlex<R>::VERBOSITY] = SoPlex<R>::VERBOSITY_NORMAL;
-    //_intParamDefault[SoPlex<R>::VERBOSITY] = SoPlex<R>::VERBOSITY_FULL;
+    name[SoPlexBase<R>::VERBOSITY] = "verbosity";
+    description[SoPlexBase<R>::VERBOSITY] = "verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)";
+    lower[SoPlexBase<R>::VERBOSITY] = 0;
+    upper[SoPlexBase<R>::VERBOSITY] = 5;
+    defaultValue[SoPlexBase<R>::VERBOSITY] = SoPlexBase<R>::VERBOSITY_NORMAL;
+    //_intParamDefault[SoPlexBase<R>::VERBOSITY] = SoPlexBase<R>::VERBOSITY_FULL;
 
     // type of simplifier
-    name[SoPlex<R>::SIMPLIFIER] = "simplifier";
-    description[SoPlex<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
-    lower[SoPlex<R>::SIMPLIFIER] = 0;
-    upper[SoPlex<R>::SIMPLIFIER] = 1;
-    defaultValue[SoPlex<R>::SIMPLIFIER] = SoPlex<R>::SIMPLIFIER_AUTO;
+    name[SoPlexBase<R>::SIMPLIFIER] = "simplifier";
+    description[SoPlexBase<R>::SIMPLIFIER] = "simplifier (0 - off, 1 - auto)";
+    lower[SoPlexBase<R>::SIMPLIFIER] = 0;
+    upper[SoPlexBase<R>::SIMPLIFIER] = 1;
+    defaultValue[SoPlexBase<R>::SIMPLIFIER] = SoPlexBase<R>::SIMPLIFIER_AUTO;
 
     // type of scaler
-    name[SoPlex<R>::SCALER] = "scaler";
-    description[SoPlex<R>::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)";
-    lower[SoPlex<R>::SCALER] = 0;
-    upper[SoPlex<R>::SCALER] = 6;
-    defaultValue[SoPlex<R>::SCALER] = SoPlex<R>::SCALER_BIEQUI;
+    name[SoPlexBase<R>::SCALER] = "scaler";
+    description[SoPlexBase<R>::SCALER] = "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)";
+    lower[SoPlexBase<R>::SCALER] = 0;
+    upper[SoPlexBase<R>::SCALER] = 6;
+    defaultValue[SoPlexBase<R>::SCALER] = SoPlexBase<R>::SCALER_BIEQUI;
 
     // type of starter used to create crash basis
-    name[SoPlex<R>::STARTER] = "starter";
-    description[SoPlex<R>::STARTER] = "crash basis generated when starting from scratch (0 - none, 1 - weight, 2 - sum, 3 - vector)";
-    lower[SoPlex<R>::STARTER] = 0;
-    upper[SoPlex<R>::STARTER] = 3;
-    defaultValue[SoPlex<R>::STARTER] = SoPlex<R>::STARTER_OFF;
+    name[SoPlexBase<R>::STARTER] = "starter";
+    description[SoPlexBase<R>::STARTER] = "crash basis generated when starting from scratch (0 - none, 1 - weight, 2 - sum, 3 - vector)";
+    lower[SoPlexBase<R>::STARTER] = 0;
+    upper[SoPlexBase<R>::STARTER] = 3;
+    defaultValue[SoPlexBase<R>::STARTER] = SoPlexBase<R>::STARTER_OFF;
 
     // type of pricer
-    name[SoPlex<R>::PRICER] = "pricer";
-    description[SoPlex<R>::PRICER] = "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)";
-    lower[SoPlex<R>::PRICER] = 0;
-    upper[SoPlex<R>::PRICER] = 5;
-    defaultValue[SoPlex<R>::PRICER] = SoPlex<R>::PRICER_AUTO;
+    name[SoPlexBase<R>::PRICER] = "pricer";
+    description[SoPlexBase<R>::PRICER] = "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)";
+    lower[SoPlexBase<R>::PRICER] = 0;
+    upper[SoPlexBase<R>::PRICER] = 5;
+    defaultValue[SoPlexBase<R>::PRICER] = SoPlexBase<R>::PRICER_AUTO;
 
     // type of ratio test
-    name[SoPlex<R>::RATIOTESTER] = "ratiotester";
-    description[SoPlex<R>::RATIOTESTER] = "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)";
-    lower[SoPlex<R>::RATIOTESTER] = 0;
-    upper[SoPlex<R>::RATIOTESTER] = 3;
-    defaultValue[SoPlex<R>::RATIOTESTER] = SoPlex<R>::RATIOTESTER_BOUNDFLIPPING;
+    name[SoPlexBase<R>::RATIOTESTER] = "ratiotester";
+    description[SoPlexBase<R>::RATIOTESTER] = "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)";
+    lower[SoPlexBase<R>::RATIOTESTER] = 0;
+    upper[SoPlexBase<R>::RATIOTESTER] = 3;
+    defaultValue[SoPlexBase<R>::RATIOTESTER] = SoPlexBase<R>::RATIOTESTER_BOUNDFLIPPING;
 
     // mode for synchronizing real and rational LP
-    name[SoPlex<R>::SYNCMODE] = "syncmode";
-    description[SoPlex<R>::SYNCMODE] = "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)";
-    lower[SoPlex<R>::SYNCMODE] = 0;
-    upper[SoPlex<R>::SYNCMODE] = 2;
-    defaultValue[SoPlex<R>::SYNCMODE] = SoPlex<R>::SYNCMODE_ONLYREAL;
+    name[SoPlexBase<R>::SYNCMODE] = "syncmode";
+    description[SoPlexBase<R>::SYNCMODE] = "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)";
+    lower[SoPlexBase<R>::SYNCMODE] = 0;
+    upper[SoPlexBase<R>::SYNCMODE] = 2;
+    defaultValue[SoPlexBase<R>::SYNCMODE] = SoPlexBase<R>::SYNCMODE_ONLYREAL;
 
     // mode for reading LP files
-    name[SoPlex<R>::READMODE] = "readmode";
-    description[SoPlex<R>::READMODE] = "mode for reading LP files (0 - floating-point, 1 - rational)";
-    lower[SoPlex<R>::READMODE] = 0;
-    upper[SoPlex<R>::READMODE] = 1;
-    defaultValue[SoPlex<R>::READMODE] = SoPlex<R>::READMODE_REAL;
+    name[SoPlexBase<R>::READMODE] = "readmode";
+    description[SoPlexBase<R>::READMODE] = "mode for reading LP files (0 - floating-point, 1 - rational)";
+    lower[SoPlexBase<R>::READMODE] = 0;
+    upper[SoPlexBase<R>::READMODE] = 1;
+    defaultValue[SoPlexBase<R>::READMODE] = SoPlexBase<R>::READMODE_REAL;
 
     // mode for iterative refinement strategy
-    name[SoPlex<R>::SOLVEMODE] = "solvemode";
-    description[SoPlex<R>::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - exact rational solve)";
-    lower[SoPlex<R>::SOLVEMODE] = 0;
-    upper[SoPlex<R>::SOLVEMODE] = 2;
-    defaultValue[SoPlex<R>::SOLVEMODE] = SoPlex<R>::SOLVEMODE_AUTO;
+    name[SoPlexBase<R>::SOLVEMODE] = "solvemode";
+    description[SoPlexBase<R>::SOLVEMODE] = "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - exact rational solve)";
+    lower[SoPlexBase<R>::SOLVEMODE] = 0;
+    upper[SoPlexBase<R>::SOLVEMODE] = 2;
+    defaultValue[SoPlexBase<R>::SOLVEMODE] = SoPlexBase<R>::SOLVEMODE_AUTO;
 
     // mode for iterative refinement strategy
-    name[SoPlex<R>::CHECKMODE] = "checkmode";
-    description[SoPlex<R>::CHECKMODE] = "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - exact rational check)";
-    lower[SoPlex<R>::CHECKMODE] = 0;
-    upper[SoPlex<R>::CHECKMODE] = 2;
-    defaultValue[SoPlex<R>::CHECKMODE] = SoPlex<R>::CHECKMODE_AUTO;
+    name[SoPlexBase<R>::CHECKMODE] = "checkmode";
+    description[SoPlexBase<R>::CHECKMODE] = "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - exact rational check)";
+    lower[SoPlexBase<R>::CHECKMODE] = 0;
+    upper[SoPlexBase<R>::CHECKMODE] = 2;
+    defaultValue[SoPlexBase<R>::CHECKMODE] = SoPlexBase<R>::CHECKMODE_AUTO;
 
     // type of timing
-    name[SoPlex<R>::TIMER] = "timer";
-    description[SoPlex<R>::TIMER] = "type of timer (1 - cputime, aka. usertime, 2 - wallclock time, 0 - no timing)";
-    lower[SoPlex<R>::TIMER] = 0;
-    upper[SoPlex<R>::TIMER] = 2;
-    defaultValue[SoPlex<R>::TIMER] = SoPlex<R>::TIMER_CPU;
+    name[SoPlexBase<R>::TIMER] = "timer";
+    description[SoPlexBase<R>::TIMER] = "type of timer (1 - cputime, aka. usertime, 2 - wallclock time, 0 - no timing)";
+    lower[SoPlexBase<R>::TIMER] = 0;
+    upper[SoPlexBase<R>::TIMER] = 2;
+    defaultValue[SoPlexBase<R>::TIMER] = SoPlexBase<R>::TIMER_CPU;
 
     // mode for hyper sparse pricing
-    name[SoPlex<R>::HYPER_PRICING] = "hyperpricing";
-    description[SoPlex<R>::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
-    lower[SoPlex<R>::HYPER_PRICING] = 0;
-    upper[SoPlex<R>::HYPER_PRICING] = 2;
-    defaultValue[SoPlex<R>::HYPER_PRICING] = SoPlex<R>::HYPER_PRICING_AUTO;
+    name[SoPlexBase<R>::HYPER_PRICING] = "hyperpricing";
+    description[SoPlexBase<R>::HYPER_PRICING] = "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)";
+    lower[SoPlexBase<R>::HYPER_PRICING] = 0;
+    upper[SoPlexBase<R>::HYPER_PRICING] = 2;
+    defaultValue[SoPlexBase<R>::HYPER_PRICING] = SoPlexBase<R>::HYPER_PRICING_AUTO;
 
     // minimum number of stalling refinements since last pivot to trigger rational factorization
-    name[SoPlex<R>::RATFAC_MINSTALLS] = "ratfac_minstalls";
-    description[SoPlex<R>::RATFAC_MINSTALLS] = "minimum number of stalling refinements since last pivot to trigger rational factorization";
-    lower[SoPlex<R>::RATFAC_MINSTALLS] = 0;
-    upper[SoPlex<R>::RATFAC_MINSTALLS] = INT_MAX;
-    defaultValue[SoPlex<R>::RATFAC_MINSTALLS] = 2;
+    name[SoPlexBase<R>::RATFAC_MINSTALLS] = "ratfac_minstalls";
+    description[SoPlexBase<R>::RATFAC_MINSTALLS] = "minimum number of stalling refinements since last pivot to trigger rational factorization";
+    lower[SoPlexBase<R>::RATFAC_MINSTALLS] = 0;
+    upper[SoPlexBase<R>::RATFAC_MINSTALLS] = INT_MAX;
+    defaultValue[SoPlexBase<R>::RATFAC_MINSTALLS] = 2;
 
     // maximum number of conjugate gradient iterations in least square scaling
-    name[SoPlex<R>::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
-    description[SoPlex<R>::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
-    lower[SoPlex<R>::LEASTSQ_MAXROUNDS] = 0;
-    upper[SoPlex<R>::LEASTSQ_MAXROUNDS] = INT_MAX;
-    defaultValue[SoPlex<R>::LEASTSQ_MAXROUNDS] = 50;
+    name[SoPlexBase<R>::LEASTSQ_MAXROUNDS] = "leastsq_maxrounds";
+    description[SoPlexBase<R>::LEASTSQ_MAXROUNDS] = "maximum number of conjugate gradient iterations in least square scaling";
+    lower[SoPlexBase<R>::LEASTSQ_MAXROUNDS] = 0;
+    upper[SoPlexBase<R>::LEASTSQ_MAXROUNDS] = INT_MAX;
+    defaultValue[SoPlexBase<R>::LEASTSQ_MAXROUNDS] = 50;
 
     // mode for solution polishing
-    name[SoPlex<R>::SOLUTION_POLISHING] = "solution_polishing";
-    description[SoPlex<R>::SOLUTION_POLISHING] = "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)";
-    lower[SoPlex<R>::SOLUTION_POLISHING] = 0;
-    upper[SoPlex<R>::SOLUTION_POLISHING] = 2;
-    defaultValue[SoPlex<R>::SOLUTION_POLISHING] = SoPlex<R>::POLISHING_OFF;
+    name[SoPlexBase<R>::SOLUTION_POLISHING] = "solution_polishing";
+    description[SoPlexBase<R>::SOLUTION_POLISHING] = "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)";
+    lower[SoPlexBase<R>::SOLUTION_POLISHING] = 0;
+    upper[SoPlexBase<R>::SOLUTION_POLISHING] = 2;
+    defaultValue[SoPlexBase<R>::SOLUTION_POLISHING] = SoPlexBase<R>::POLISHING_OFF;
 
     // the number of iterations before the decomposition simplex initialisation is terminated.
-    name[SoPlex<R>::DECOMP_ITERLIMIT] = "decomp_iterlimit";
-    description[SoPlex<R>::DECOMP_ITERLIMIT] = "the number of iterations before the decomposition simplex initialisation solve is terminated";
-    lower[SoPlex<R>::DECOMP_ITERLIMIT] = 1;
-    upper[SoPlex<R>::DECOMP_ITERLIMIT] = INT_MAX;
-    defaultValue[SoPlex<R>::DECOMP_ITERLIMIT] = 100;
+    name[SoPlexBase<R>::DECOMP_ITERLIMIT] = "decomp_iterlimit";
+    description[SoPlexBase<R>::DECOMP_ITERLIMIT] = "the number of iterations before the decomposition simplex initialisation solve is terminated";
+    lower[SoPlexBase<R>::DECOMP_ITERLIMIT] = 1;
+    upper[SoPlexBase<R>::DECOMP_ITERLIMIT] = INT_MAX;
+    defaultValue[SoPlexBase<R>::DECOMP_ITERLIMIT] = 100;
 
     // maximum number of violated rows added in each iteration of the decomposition simplex
-    name[SoPlex<R>::DECOMP_MAXADDEDROWS] = "decomp_maxaddedrows";
-    description[SoPlex<R>::DECOMP_MAXADDEDROWS] = "maximum number of rows that are added to the reduced problem when using the decomposition based simplex";
-    lower[SoPlex<R>::DECOMP_MAXADDEDROWS] = 1;
-    upper[SoPlex<R>::DECOMP_MAXADDEDROWS] = INT_MAX;
-    defaultValue[SoPlex<R>::DECOMP_MAXADDEDROWS] = 500;
+    name[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = "decomp_maxaddedrows";
+    description[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = "maximum number of rows that are added to the reduced problem when using the decomposition based simplex";
+    lower[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = 1;
+    upper[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = INT_MAX;
+    defaultValue[SoPlexBase<R>::DECOMP_MAXADDEDROWS] = 500;
 
     // maximum number of violated rows added in each iteration of the decomposition simplex
-    name[SoPlex<R>::DECOMP_DISPLAYFREQ] = "decomp_displayfreq";
-    description[SoPlex<R>::DECOMP_DISPLAYFREQ] = "the frequency that the decomposition based simplex status output is displayed.";
-    lower[SoPlex<R>::DECOMP_DISPLAYFREQ] = 1;
-    upper[SoPlex<R>::DECOMP_DISPLAYFREQ] = INT_MAX;
-    defaultValue[SoPlex<R>::DECOMP_DISPLAYFREQ] = 50;
+    name[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = "decomp_displayfreq";
+    description[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = "the frequency that the decomposition based simplex status output is displayed.";
+    lower[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = 1;
+    upper[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = INT_MAX;
+    defaultValue[SoPlexBase<R>::DECOMP_DISPLAYFREQ] = 50;
 
     // the verbosity of the decomposition based simplex
-    name[SoPlex<R>::DECOMP_VERBOSITY] = "decomp_verbosity";
-    description[SoPlex<R>::DECOMP_VERBOSITY] = "the verbosity of decomposition based simplex (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full).";
-    lower[SoPlex<R>::DECOMP_VERBOSITY] = 1;
-    upper[SoPlex<R>::DECOMP_VERBOSITY] = 5;
-    defaultValue[SoPlex<R>::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
+    name[SoPlexBase<R>::DECOMP_VERBOSITY] = "decomp_verbosity";
+    description[SoPlexBase<R>::DECOMP_VERBOSITY] = "the verbosity of decomposition based simplex (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full).";
+    lower[SoPlexBase<R>::DECOMP_VERBOSITY] = 1;
+    upper[SoPlexBase<R>::DECOMP_VERBOSITY] = 5;
+    defaultValue[SoPlexBase<R>::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
 
     // printing condition number during the solve
-    name[SoPlex<R>::PRINTCONDITION] = "printcondition";
-    description[SoPlex<R>::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - ratio estimate , 2 - sum estimate, 3 - product estimate, 4 - exact)";
-    lower[SoPlex<R>::PRINTCONDITION] = 0;
-    upper[SoPlex<R>::PRINTCONDITION] = 4;
-    defaultValue[SoPlex<R>::PRINTCONDITION] = 0;
+    name[SoPlexBase<R>::PRINTCONDITION] = "printcondition";
+    description[SoPlexBase<R>::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - ratio estimate , 2 - sum estimate, 3 - product estimate, 4 - exact)";
+    lower[SoPlexBase<R>::PRINTCONDITION] = 0;
+    upper[SoPlexBase<R>::PRINTCONDITION] = 4;
+    defaultValue[SoPlexBase<R>::PRINTCONDITION] = 0;
   }
 
   template <class R>
-  SoPlex<R>::Settings::RealParam::RealParam() {
+  SoPlexBase<R>::Settings::RealParam::RealParam() {
     // primal feasibility tolerance
-    name[SoPlex<R>::FEASTOL] = "feastol";
-    description[SoPlex<R>::FEASTOL] = "primal feasibility tolerance";
-    lower[SoPlex<R>::FEASTOL] = 0.0;
-    upper[SoPlex<R>::FEASTOL] = 1.0;
-    defaultValue[SoPlex<R>::FEASTOL] = 1e-6;
+    name[SoPlexBase<R>::FEASTOL] = "feastol";
+    description[SoPlexBase<R>::FEASTOL] = "primal feasibility tolerance";
+    lower[SoPlexBase<R>::FEASTOL] = 0.0;
+    upper[SoPlexBase<R>::FEASTOL] = 1.0;
+    defaultValue[SoPlexBase<R>::FEASTOL] = 1e-6;
 
     // dual feasibility tolerance
-    name[SoPlex<R>::OPTTOL] = "opttol";
-    description[SoPlex<R>::OPTTOL] = "dual feasibility tolerance";
-    lower[SoPlex<R>::OPTTOL] = 0.0;
-    upper[SoPlex<R>::OPTTOL] = 1.0;
-    defaultValue[SoPlex<R>::OPTTOL] = 1e-6;
+    name[SoPlexBase<R>::OPTTOL] = "opttol";
+    description[SoPlexBase<R>::OPTTOL] = "dual feasibility tolerance";
+    lower[SoPlexBase<R>::OPTTOL] = 0.0;
+    upper[SoPlexBase<R>::OPTTOL] = 1.0;
+    defaultValue[SoPlexBase<R>::OPTTOL] = 1e-6;
 
     ///@todo define suitable values depending on Real type
     // general zero tolerance
-    name[SoPlex<R>::EPSILON_ZERO] = "epsilon_zero";
-    description[SoPlex<R>::EPSILON_ZERO] = "general zero tolerance";
-    lower[SoPlex<R>::EPSILON_ZERO] = 0.0;
-    upper[SoPlex<R>::EPSILON_ZERO] = 1.0;
-    defaultValue[SoPlex<R>::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
+    name[SoPlexBase<R>::EPSILON_ZERO] = "epsilon_zero";
+    description[SoPlexBase<R>::EPSILON_ZERO] = "general zero tolerance";
+    lower[SoPlexBase<R>::EPSILON_ZERO] = 0.0;
+    upper[SoPlexBase<R>::EPSILON_ZERO] = 1.0;
+    defaultValue[SoPlexBase<R>::EPSILON_ZERO] = DEFAULT_EPS_ZERO;
 
     ///@todo define suitable values depending on Real type
     // zero tolerance used in factorization
-    name[SoPlex<R>::EPSILON_FACTORIZATION] = "epsilon_factorization";
-    description[SoPlex<R>::EPSILON_FACTORIZATION] = "zero tolerance used in factorization";
-    lower[SoPlex<R>::EPSILON_FACTORIZATION] = 0.0;
-    upper[SoPlex<R>::EPSILON_FACTORIZATION] = 1.0;
-    defaultValue[SoPlex<R>::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
+    name[SoPlexBase<R>::EPSILON_FACTORIZATION] = "epsilon_factorization";
+    description[SoPlexBase<R>::EPSILON_FACTORIZATION] = "zero tolerance used in factorization";
+    lower[SoPlexBase<R>::EPSILON_FACTORIZATION] = 0.0;
+    upper[SoPlexBase<R>::EPSILON_FACTORIZATION] = 1.0;
+    defaultValue[SoPlexBase<R>::EPSILON_FACTORIZATION] = DEFAULT_EPS_FACTOR;
 
     ///@todo define suitable values depending on Real type
     // zero tolerance used in update of the factorization
-    name[SoPlex<R>::EPSILON_UPDATE] = "epsilon_update";
-    description[SoPlex<R>::EPSILON_UPDATE] = "zero tolerance used in update of the factorization";
-    lower[SoPlex<R>::EPSILON_UPDATE] = 0.0;
-    upper[SoPlex<R>::EPSILON_UPDATE] = 1.0;
-    defaultValue[SoPlex<R>::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
+    name[SoPlexBase<R>::EPSILON_UPDATE] = "epsilon_update";
+    description[SoPlexBase<R>::EPSILON_UPDATE] = "zero tolerance used in update of the factorization";
+    lower[SoPlexBase<R>::EPSILON_UPDATE] = 0.0;
+    upper[SoPlexBase<R>::EPSILON_UPDATE] = 1.0;
+    defaultValue[SoPlexBase<R>::EPSILON_UPDATE] = DEFAULT_EPS_UPDATE;
 
     ///@todo define suitable values depending on Real type
     // pivot zero tolerance used in factorization
-    name[SoPlex<R>::EPSILON_PIVOT] = "epsilon_pivot";
-    description[SoPlex<R>::EPSILON_PIVOT] = "pivot zero tolerance used in factorization";
-    lower[SoPlex<R>::EPSILON_PIVOT] = 0.0;
-    upper[SoPlex<R>::EPSILON_PIVOT] = 1.0;
-    defaultValue[SoPlex<R>::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
+    name[SoPlexBase<R>::EPSILON_PIVOT] = "epsilon_pivot";
+    description[SoPlexBase<R>::EPSILON_PIVOT] = "pivot zero tolerance used in factorization";
+    lower[SoPlexBase<R>::EPSILON_PIVOT] = 0.0;
+    upper[SoPlexBase<R>::EPSILON_PIVOT] = 1.0;
+    defaultValue[SoPlexBase<R>::EPSILON_PIVOT] = DEFAULT_EPS_PIVOT;
 
     ///@todo define suitable values depending on Real type
     // infinity threshold
-    name[SoPlex<R>::INFTY] = "infty";
-    description[SoPlex<R>::INFTY] = "infinity threshold";
-    lower[SoPlex<R>::INFTY] = 1e10;
-    upper[SoPlex<R>::INFTY] = 1e100;
-    defaultValue[SoPlex<R>::INFTY] = DEFAULT_INFINITY;
+    name[SoPlexBase<R>::INFTY] = "infty";
+    description[SoPlexBase<R>::INFTY] = "infinity threshold";
+    lower[SoPlexBase<R>::INFTY] = 1e10;
+    upper[SoPlexBase<R>::INFTY] = 1e100;
+    defaultValue[SoPlexBase<R>::INFTY] = DEFAULT_INFINITY;
 
     // time limit in seconds (INFTY if unlimited)
-    name[SoPlex<R>::TIMELIMIT] = "timelimit";
-    description[SoPlex<R>::TIMELIMIT] = "time limit in seconds";
-    lower[SoPlex<R>::TIMELIMIT] = 0.0;
-    upper[SoPlex<R>::TIMELIMIT] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::TIMELIMIT] = DEFAULT_INFINITY;
+    name[SoPlexBase<R>::TIMELIMIT] = "timelimit";
+    description[SoPlexBase<R>::TIMELIMIT] = "time limit in seconds";
+    lower[SoPlexBase<R>::TIMELIMIT] = 0.0;
+    upper[SoPlexBase<R>::TIMELIMIT] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::TIMELIMIT] = DEFAULT_INFINITY;
 
     // lower limit on objective value
-    name[SoPlex<R>::OBJLIMIT_LOWER] = "objlimit_lower";
-    description[SoPlex<R>::OBJLIMIT_LOWER] = "lower limit on objective value";
-    lower[SoPlex<R>::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
-    upper[SoPlex<R>::OBJLIMIT_LOWER] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
+    name[SoPlexBase<R>::OBJLIMIT_LOWER] = "objlimit_lower";
+    description[SoPlexBase<R>::OBJLIMIT_LOWER] = "lower limit on objective value";
+    lower[SoPlexBase<R>::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
+    upper[SoPlexBase<R>::OBJLIMIT_LOWER] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::OBJLIMIT_LOWER] = -DEFAULT_INFINITY;
 
     // upper limit on objective value
-    name[SoPlex<R>::OBJLIMIT_UPPER] = "objlimit_upper";
-    description[SoPlex<R>::OBJLIMIT_UPPER] = "upper limit on objective value";
-    lower[SoPlex<R>::OBJLIMIT_UPPER] = -DEFAULT_INFINITY;
-    upper[SoPlex<R>::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
+    name[SoPlexBase<R>::OBJLIMIT_UPPER] = "objlimit_upper";
+    description[SoPlexBase<R>::OBJLIMIT_UPPER] = "upper limit on objective value";
+    lower[SoPlexBase<R>::OBJLIMIT_UPPER] = -DEFAULT_INFINITY;
+    upper[SoPlexBase<R>::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::OBJLIMIT_UPPER] = DEFAULT_INFINITY;
 
     // working tolerance for feasibility in floating-point solver during iterative refinement
-    name[SoPlex<R>::FPFEASTOL] = "fpfeastol";
-    description[SoPlex<R>::FPFEASTOL] = "working tolerance for feasibility in floating-point solver during iterative refinement";
-    lower[SoPlex<R>::FPFEASTOL] = 1e-12;
-    upper[SoPlex<R>::FPFEASTOL] = 1.0;
-    defaultValue[SoPlex<R>::FPFEASTOL] = 1e-9;
+    name[SoPlexBase<R>::FPFEASTOL] = "fpfeastol";
+    description[SoPlexBase<R>::FPFEASTOL] = "working tolerance for feasibility in floating-point solver during iterative refinement";
+    lower[SoPlexBase<R>::FPFEASTOL] = 1e-12;
+    upper[SoPlexBase<R>::FPFEASTOL] = 1.0;
+    defaultValue[SoPlexBase<R>::FPFEASTOL] = 1e-9;
 
     // working tolerance for optimality in floating-point solver during iterative refinement
-    name[SoPlex<R>::FPOPTTOL] = "fpopttol";
-    description[SoPlex<R>::FPOPTTOL] = "working tolerance for optimality in floating-point solver during iterative refinement";
-    lower[SoPlex<R>::FPOPTTOL] = 1e-12;
-    upper[SoPlex<R>::FPOPTTOL] = 1.0;
-    defaultValue[SoPlex<R>::FPOPTTOL] = 1e-9;
+    name[SoPlexBase<R>::FPOPTTOL] = "fpopttol";
+    description[SoPlexBase<R>::FPOPTTOL] = "working tolerance for optimality in floating-point solver during iterative refinement";
+    lower[SoPlexBase<R>::FPOPTTOL] = 1e-12;
+    upper[SoPlexBase<R>::FPOPTTOL] = 1.0;
+    defaultValue[SoPlexBase<R>::FPOPTTOL] = 1e-9;
 
     // maximum increase of scaling factors between refinements
-    name[SoPlex<R>::MAXSCALEINCR] = "maxscaleincr";
-    description[SoPlex<R>::MAXSCALEINCR] = "maximum increase of scaling factors between refinements";
-    lower[SoPlex<R>::MAXSCALEINCR] = 1.0;
-    upper[SoPlex<R>::MAXSCALEINCR] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::MAXSCALEINCR] = 1e25;
+    name[SoPlexBase<R>::MAXSCALEINCR] = "maxscaleincr";
+    description[SoPlexBase<R>::MAXSCALEINCR] = "maximum increase of scaling factors between refinements";
+    lower[SoPlexBase<R>::MAXSCALEINCR] = 1.0;
+    upper[SoPlexBase<R>::MAXSCALEINCR] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::MAXSCALEINCR] = 1e25;
 
     // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
-    name[SoPlex<R>::LIFTMINVAL] = "liftminval";
-    description[SoPlex<R>::LIFTMINVAL] = "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)";
-    lower[SoPlex<R>::LIFTMINVAL] = 0.0;
-    upper[SoPlex<R>::LIFTMINVAL] = 0.1;
-    defaultValue[SoPlex<R>::LIFTMINVAL] = 0.000976562; // = 1/1024
+    name[SoPlexBase<R>::LIFTMINVAL] = "liftminval";
+    description[SoPlexBase<R>::LIFTMINVAL] = "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)";
+    lower[SoPlexBase<R>::LIFTMINVAL] = 0.0;
+    upper[SoPlexBase<R>::LIFTMINVAL] = 0.1;
+    defaultValue[SoPlexBase<R>::LIFTMINVAL] = 0.000976562; // = 1/1024
 
     // upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
-    name[SoPlex<R>::LIFTMAXVAL] = "liftmaxval";
-    description[SoPlex<R>::LIFTMAXVAL] = "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)";
-    lower[SoPlex<R>::LIFTMAXVAL] = 10.0;
-    upper[SoPlex<R>::LIFTMAXVAL] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::LIFTMAXVAL] = 1024.0;
+    name[SoPlexBase<R>::LIFTMAXVAL] = "liftmaxval";
+    description[SoPlexBase<R>::LIFTMAXVAL] = "lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)";
+    lower[SoPlexBase<R>::LIFTMAXVAL] = 10.0;
+    upper[SoPlexBase<R>::LIFTMAXVAL] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::LIFTMAXVAL] = 1024.0;
 
     // threshold for using sparse pricing (no. of violations need to be smaller than threshold * dimension of problem)
-    name[SoPlex<R>::SPARSITY_THRESHOLD] = "sparsity_threshold";
-    description[SoPlex<R>::SPARSITY_THRESHOLD] = "sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)";
-    lower[SoPlex<R>::SPARSITY_THRESHOLD] = 0.0;
-    upper[SoPlex<R>::SPARSITY_THRESHOLD] = 1.0;
-    defaultValue[SoPlex<R>::SPARSITY_THRESHOLD] = 0.6;
+    name[SoPlexBase<R>::SPARSITY_THRESHOLD] = "sparsity_threshold";
+    description[SoPlexBase<R>::SPARSITY_THRESHOLD] = "sparse pricing threshold (#violations < dimension * SPARSITY_THRESHOLD activates sparse pricing)";
+    lower[SoPlexBase<R>::SPARSITY_THRESHOLD] = 0.0;
+    upper[SoPlexBase<R>::SPARSITY_THRESHOLD] = 1.0;
+    defaultValue[SoPlexBase<R>::SPARSITY_THRESHOLD] = 0.6;
 
     // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
-    name[SoPlex<R>::REPRESENTATION_SWITCH] = "representation_switch";
-    description[SoPlex<R>::REPRESENTATION_SWITCH] = "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode";
-    lower[SoPlex<R>::REPRESENTATION_SWITCH] = 0.0;
-    upper[SoPlex<R>::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::REPRESENTATION_SWITCH] = 1.2;
+    name[SoPlexBase<R>::REPRESENTATION_SWITCH] = "representation_switch";
+    description[SoPlexBase<R>::REPRESENTATION_SWITCH] = "threshold on number of rows vs. number of columns for switching from column to row representations in auto mode";
+    lower[SoPlexBase<R>::REPRESENTATION_SWITCH] = 0.0;
+    upper[SoPlexBase<R>::REPRESENTATION_SWITCH] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::REPRESENTATION_SWITCH] = 1.2;
 
     // geometric frequency at which to apply rational reconstruction
-    name[SoPlex<R>::RATREC_FREQ] = "ratrec_freq";
-    description[SoPlex<R>::RATREC_FREQ] = "geometric frequency at which to apply rational reconstruction";
-    lower[SoPlex<R>::RATREC_FREQ] = 1.0;
-    upper[SoPlex<R>::RATREC_FREQ] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::RATREC_FREQ] = 1.2;
+    name[SoPlexBase<R>::RATREC_FREQ] = "ratrec_freq";
+    description[SoPlexBase<R>::RATREC_FREQ] = "geometric frequency at which to apply rational reconstruction";
+    lower[SoPlexBase<R>::RATREC_FREQ] = 1.0;
+    upper[SoPlexBase<R>::RATREC_FREQ] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::RATREC_FREQ] = 1.2;
 
     // minimal reduction (sum of removed rows/cols) to continue simplification
-    name[SoPlex<R>::MINRED] = "minred";
-    description[SoPlex<R>::MINRED] = "minimal reduction (sum of removed rows/cols) to continue simplification";
-    lower[SoPlex<R>::MINRED] = 0.0;
-    upper[SoPlex<R>::MINRED] = 1.0;
-    defaultValue[SoPlex<R>::MINRED] = 1e-4;
+    name[SoPlexBase<R>::MINRED] = "minred";
+    description[SoPlexBase<R>::MINRED] = "minimal reduction (sum of removed rows/cols) to continue simplification";
+    lower[SoPlexBase<R>::MINRED] = 0.0;
+    upper[SoPlexBase<R>::MINRED] = 1.0;
+    defaultValue[SoPlexBase<R>::MINRED] = 1e-4;
 
     // refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
-    name[SoPlex<R>::REFAC_BASIS_NNZ] = "refac_basis_nnz";
-    description[SoPlex<R>::REFAC_BASIS_NNZ] = "refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix";
-    lower[SoPlex<R>::REFAC_BASIS_NNZ] = 1.0;
-    upper[SoPlex<R>::REFAC_BASIS_NNZ] = 100.0;
-    defaultValue[SoPlex<R>::REFAC_BASIS_NNZ] = 10.0;
+    name[SoPlexBase<R>::REFAC_BASIS_NNZ] = "refac_basis_nnz";
+    description[SoPlexBase<R>::REFAC_BASIS_NNZ] = "refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix";
+    lower[SoPlexBase<R>::REFAC_BASIS_NNZ] = 1.0;
+    upper[SoPlexBase<R>::REFAC_BASIS_NNZ] = 100.0;
+    defaultValue[SoPlexBase<R>::REFAC_BASIS_NNZ] = 10.0;
 
     // refactor threshold for fill-in in current factor update compared to fill-in in last factorization
-    name[SoPlex<R>::REFAC_UPDATE_FILL] = "refac_update_fill";
-    description[SoPlex<R>::REFAC_UPDATE_FILL] = "refactor threshold for fill-in in current factor update compared to fill-in in last factorization";
-    lower[SoPlex<R>::REFAC_UPDATE_FILL] = 1.0;
-    upper[SoPlex<R>::REFAC_UPDATE_FILL] = 100.0;
-    defaultValue[SoPlex<R>::REFAC_UPDATE_FILL] = 5.0;
+    name[SoPlexBase<R>::REFAC_UPDATE_FILL] = "refac_update_fill";
+    description[SoPlexBase<R>::REFAC_UPDATE_FILL] = "refactor threshold for fill-in in current factor update compared to fill-in in last factorization";
+    lower[SoPlexBase<R>::REFAC_UPDATE_FILL] = 1.0;
+    upper[SoPlexBase<R>::REFAC_UPDATE_FILL] = 100.0;
+    defaultValue[SoPlexBase<R>::REFAC_UPDATE_FILL] = 5.0;
 
     // refactor threshold for memory growth in factorization since last refactorization
-    name[SoPlex<R>::REFAC_MEM_FACTOR] = "refac_mem_factor";
-    description[SoPlex<R>::REFAC_MEM_FACTOR] = "refactor threshold for memory growth in factorization since last refactorization";
-    lower[SoPlex<R>::REFAC_MEM_FACTOR] = 1.0;
-    upper[SoPlex<R>::REFAC_MEM_FACTOR] = 10.0;
-    defaultValue[SoPlex<R>::REFAC_MEM_FACTOR] = 1.5;
+    name[SoPlexBase<R>::REFAC_MEM_FACTOR] = "refac_mem_factor";
+    description[SoPlexBase<R>::REFAC_MEM_FACTOR] = "refactor threshold for memory growth in factorization since last refactorization";
+    lower[SoPlexBase<R>::REFAC_MEM_FACTOR] = 1.0;
+    upper[SoPlexBase<R>::REFAC_MEM_FACTOR] = 10.0;
+    defaultValue[SoPlexBase<R>::REFAC_MEM_FACTOR] = 1.5;
 
     // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
-    name[SoPlex<R>::LEASTSQ_ACRCY] = "leastsq_acrcy";
-    description[SoPlex<R>::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
-    lower[SoPlex<R>::LEASTSQ_ACRCY] = 1.0;
-    upper[SoPlex<R>::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::LEASTSQ_ACRCY] = 1000.0;
+    name[SoPlexBase<R>::LEASTSQ_ACRCY] = "leastsq_acrcy";
+    description[SoPlexBase<R>::LEASTSQ_ACRCY] = "accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)";
+    lower[SoPlexBase<R>::LEASTSQ_ACRCY] = 1.0;
+    upper[SoPlexBase<R>::LEASTSQ_ACRCY] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::LEASTSQ_ACRCY] = 1000.0;
 
     // objective offset
-    name[SoPlex<R>::OBJ_OFFSET] = "obj_offset";
-    description[SoPlex<R>::OBJ_OFFSET] = "objective offset to be used";
-    lower[SoPlex<R>::OBJ_OFFSET] = -DEFAULT_INFINITY;
-    upper[SoPlex<R>::OBJ_OFFSET] = DEFAULT_INFINITY;
-    defaultValue[SoPlex<R>::OBJ_OFFSET] = 0.0;
+    name[SoPlexBase<R>::OBJ_OFFSET] = "obj_offset";
+    description[SoPlexBase<R>::OBJ_OFFSET] = "objective offset to be used";
+    lower[SoPlexBase<R>::OBJ_OFFSET] = -DEFAULT_INFINITY;
+    upper[SoPlexBase<R>::OBJ_OFFSET] = DEFAULT_INFINITY;
+    defaultValue[SoPlexBase<R>::OBJ_OFFSET] = 0.0;
   }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-  SoPlex<R>::Settings::RationalParam::RationalParam() {}
+  SoPlexBase<R>::Settings::RationalParam::RationalParam() {}
 #endif
 
   /// returns boolean parameter value
   /// #template #temp
   template <>
-	bool SoPlex<Real>::boolParam(const BoolParam param) const
+	bool SoPlexBase<Real>::boolParam(const BoolParam param) const
   {
     assert(param >= 0);
-    assert(param < SoPlex<Real>::BOOLPARAM_COUNT);
+    assert(param < SoPlexBase<Real>::BOOLPARAM_COUNT);
     return _currentSettings->_boolParamValues[param];
   }
 
   template <>
-  SoPlex<Real>::Settings::Settings()
+  SoPlexBase<Real>::Settings::Settings()
   {
-    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::BOOLPARAM_COUNT; i++ )
       _boolParamValues[i] = boolParam.defaultValue[i];
 
-    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::INTPARAM_COUNT; i++ )
       _intParamValues[i] = intParam.defaultValue[i];
 
-    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::REALPARAM_COUNT; i++ )
       _realParamValues[i] = realParam.defaultValue[i];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::RATIONALPARAM_COUNT; i++ )
       _rationalParamValues[i] = rationalParam.defaultValue[i];
 #endif
   }
 
   template <>
-  SoPlex<Real>::Settings::Settings(const Settings& settings)
+  SoPlexBase<Real>::Settings::Settings(const Settings& settings)
   {
     *this = settings;
   }
 
   template <>
-  typename SoPlex<Real>::Settings& SoPlex<Real>::Settings::operator=(const Settings& settings)
+  typename SoPlexBase<Real>::Settings& SoPlexBase<Real>::Settings::operator=(const Settings& settings)
   {
-    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::BOOLPARAM_COUNT; i++ )
       _boolParamValues[i] = settings._boolParamValues[i];
 
-    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::INTPARAM_COUNT; i++ )
       _intParamValues[i] = settings._intParamValues[i];
 
-    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::REALPARAM_COUNT; i++ )
       _realParamValues[i] = settings._realParamValues[i];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::RATIONALPARAM_COUNT; i++ )
       _rationalParamValues[i] = settings._rationalParamValues[i];
 #endif
 
@@ -732,19 +732,19 @@ namespace soplex
   }
 
   template <>
-  typename SoPlex<Real>::Settings::BoolParam SoPlex<Real>::Settings::boolParam = BoolParam();
+  typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
   template <>
-  typename SoPlex<Real>::Settings::IntParam SoPlex<Real>::Settings::intParam = IntParam();
+  typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam = IntParam();
   template <>
-  typename SoPlex<Real>::Settings::RealParam SoPlex<Real>::Settings::realParam = RealParam();
+  typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam = RealParam();
 #ifdef SOPLEX_WITH_RATIONALPARAM
   template <>
-  SoPlex<Real>::Settings::RationalParam SoPlex<Real>::Settings::rationalParam;
+  SoPlexBase<Real>::Settings::RationalParam SoPlexBase<Real>::Settings::rationalParam;
 #endif
 
   /// default constructor
   template <>
-  SoPlex<Real>::SoPlex()
+  SoPlexBase<Real>::SoPlexBase()
     : _statistics(0)
     , _currentSettings(0)
     , _scalerUniequi(false)
@@ -798,7 +798,7 @@ namespace soplex
     _currentSettings = new (_currentSettings) Settings();
     setSettings(*_currentSettings, true);
 
-    _lastSolveMode = intParam(SoPlex<Real>::SOLVEMODE);
+    _lastSolveMode = intParam(SoPlexBase<Real>::SOLVEMODE);
 
     assert(_isConsistent());
   }
@@ -806,14 +806,14 @@ namespace soplex
   /// returns the current solver status
   /// #template #temp 
   template <>
-  typename SPxSolver<Real>::Status SoPlex<Real>::status() const
+  typename SPxSolver<Real>::Status SoPlexBase<Real>::status() const
   {
     return _status;
   }
 
   /// assignment operator
   template <>
-  SoPlex<Real>& SoPlex<Real>::operator=(const SoPlex<Real>& rhs)
+  SoPlexBase<Real>& SoPlexBase<Real>::operator=(const SoPlexBase<Real>& rhs)
   {
     if( this != &rhs )
       {
@@ -875,9 +875,9 @@ namespace soplex
         _solver.setBasisSolver(&_slufactor);
 
         // initialize pointers for simplifier, scaler, and starter
-        setIntParam(SoPlex<Real>::SIMPLIFIER, intParam(SoPlex<Real>::SIMPLIFIER), true);
-        setIntParam(SoPlex<Real>::SCALER, intParam(SoPlex<Real>::SCALER), true);
-        setIntParam(SoPlex<Real>::STARTER, intParam(SoPlex<Real>::STARTER), true);
+        setIntParam(SoPlexBase<Real>::SIMPLIFIER, intParam(SoPlexBase<Real>::SIMPLIFIER), true);
+        setIntParam(SoPlexBase<Real>::SCALER, intParam(SoPlexBase<Real>::SCALER), true);
+        setIntParam(SoPlexBase<Real>::STARTER, intParam(SoPlexBase<Real>::STARTER), true);
 
         // copy real LP if different from the LP in the solver
         if( rhs._realLP != &(rhs._solver) )
@@ -892,12 +892,12 @@ namespace soplex
         // copy rational LP
         if( rhs._rationalLP == 0 )
           {
-            assert(intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL);
+            assert(intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL);
             _rationalLP = 0;
           }
         else
           {
-            assert(intParam(SoPlex<Real>::SYNCMODE) != SYNCMODE_ONLYREAL);
+            assert(intParam(SoPlexBase<Real>::SYNCMODE) != SYNCMODE_ONLYREAL);
             _rationalLP = 0;
             spx_alloc(_rationalLP);
             _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
@@ -931,7 +931,7 @@ namespace soplex
   /// copy constructor
   ///@todo improve performance by implementing a separate copy constructor
   template <>
-  SoPlex<Real>::SoPlex(const SoPlex<Real>& rhs)
+  SoPlexBase<Real>::SoPlexBase(const SoPlexBase<Real>& rhs)
   {
     // allocate memory as in default constructor
     _statistics = 0;
@@ -950,7 +950,7 @@ namespace soplex
 
   /// destructor
   template <>
-  SoPlex<Real>::~SoPlex()
+  SoPlexBase<Real>::~SoPlexBase()
   {
     assert(_isConsistent());
 
@@ -992,7 +992,7 @@ namespace soplex
 
   /// returns number of rows #template #temp
   template <>
-  int SoPlex<Real>::numRowsT() const
+  int SoPlexBase<Real>::numRowsT() const
   {
     assert(_realLP != 0);
     return _realLP->nRows();
@@ -1000,7 +1000,7 @@ namespace soplex
 
   /// returns number of columns
   template <>
-  int SoPlex<Real>::numColsT() const
+  int SoPlexBase<Real>::numColsT() const
   {
     assert(_realLP != 0);
     return _realLP->nCols();
@@ -1011,7 +1011,7 @@ namespace soplex
   /// returns number of nonzeros
 
   template <>
-  int SoPlex<Real>::numNonzerosT() const
+  int SoPlexBase<Real>::numNonzerosT() const
   {
     assert(_realLP != 0);
     return _realLP->nNzos();
@@ -1021,7 +1021,7 @@ namespace soplex
 
   /// returns smallest non-zero element in absolute value
   template <>
-  Real SoPlex<Real>::minAbsNonzeroReal() const
+  Real SoPlexBase<Real>::minAbsNonzeroReal() const
   {
     assert(_realLP != 0);
     return _realLP->minAbsNzo();
@@ -1031,7 +1031,7 @@ namespace soplex
 
   /// returns biggest non-zero element in absolute value
   template <>
-  Real SoPlex<Real>::maxAbsNonzeroReal() const
+  Real SoPlexBase<Real>::maxAbsNonzeroReal() const
   {
     assert(_realLP != 0);
     return _realLP->maxAbsNzo();
@@ -1041,7 +1041,7 @@ namespace soplex
 
   /// returns (unscaled) coefficient
   template <>
-  Real SoPlex<Real>::coefReal(int row, int col) const
+  Real SoPlexBase<Real>::coefReal(int row, int col) const
   {
     if( _realLP->isScaled() )
       {
@@ -1056,7 +1056,7 @@ namespace soplex
 
   /// returns vector of row \p i, ignoring scaling
   template <>
-  const SVectorReal& SoPlex<Real>::rowVectorRealInternal(int i) const
+  const SVectorReal& SoPlexBase<Real>::rowVectorRealInternal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->rowVector(i);
@@ -1066,7 +1066,7 @@ namespace soplex
 
   /// gets vector of row \p i
   template <>
-  void SoPlex<Real>::getRowVectorReal(int i, DSVectorReal& row) const
+  void SoPlexBase<Real>::getRowVectorReal(int i, DSVectorReal& row) const
   {
     assert(_realLP);
 
@@ -1084,7 +1084,7 @@ namespace soplex
 
   /// returns right-hand side vector, ignoring scaling
   template <>
-  const VectorReal& SoPlex<Real>::rhsRealInternal() const
+  const VectorReal& SoPlexBase<Real>::rhsRealInternal() const
   {
     assert(_realLP != 0);
     return _realLP->rhs();
@@ -1094,7 +1094,7 @@ namespace soplex
 
   /// gets right-hand side vector
   template <>
-  void SoPlex<Real>::getRhsReal(DVectorReal& rhs) const
+  void SoPlexBase<Real>::getRhsReal(DVectorReal& rhs) const
   {
     assert(_realLP);
     _realLP->getRhsUnscaled(rhs);
@@ -1104,7 +1104,7 @@ namespace soplex
 
   /// returns right-hand side of row \p i
   template <>
-  Real SoPlex<Real>::rhsReal(int i) const
+  Real SoPlexBase<Real>::rhsReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->rhsUnscaled(i);
@@ -1114,7 +1114,7 @@ namespace soplex
 
   /// returns left-hand side vector, ignoring scaling
   template <>
-  const VectorReal& SoPlex<Real>::lhsRealInternal() const
+  const VectorReal& SoPlexBase<Real>::lhsRealInternal() const
   {
     assert(_realLP != 0);
     return _realLP->lhs();
@@ -1124,7 +1124,7 @@ namespace soplex
 
   /// gets left-hand side vector
   template <>
-  void SoPlex<Real>::getLhsReal(DVectorReal& lhs) const
+  void SoPlexBase<Real>::getLhsReal(DVectorReal& lhs) const
   {
     assert(_realLP);
     _realLP->getLhsUnscaled(lhs);
@@ -1134,7 +1134,7 @@ namespace soplex
 
   /// returns left-hand side of row \p i
   template <>
-  Real SoPlex<Real>::lhsReal(int i) const
+  Real SoPlexBase<Real>::lhsReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->lhsUnscaled(i);
@@ -1144,7 +1144,7 @@ namespace soplex
 
   /// returns inequality type of row \p i
   template <>
-  LPRowReal::Type SoPlex<Real>::rowTypeReal(int i) const
+  LPRowReal::Type SoPlexBase<Real>::rowTypeReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->rowType(i);
@@ -1154,7 +1154,7 @@ namespace soplex
 
   /// returns vector of col \p i, ignoring scaling
   template <>
-  const SVectorReal& SoPlex<Real>::colVectorRealInternal(int i) const
+  const SVectorReal& SoPlexBase<Real>::colVectorRealInternal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->colVector(i);
@@ -1164,7 +1164,7 @@ namespace soplex
 
   /// gets vector of col \p i
   template <>
-  void SoPlex<Real>::getColVectorReal(int i, DSVectorReal& col) const
+  void SoPlexBase<Real>::getColVectorReal(int i, DSVectorReal& col) const
   {
     assert(_realLP);
     _realLP->getColVectorUnscaled(i, col);
@@ -1174,7 +1174,7 @@ namespace soplex
 
   /// returns upper bound vector
   template <>
-  const VectorReal& SoPlex<Real>::upperRealInternal() const
+  const VectorReal& SoPlexBase<Real>::upperRealInternal() const
   {
     assert(_realLP != 0);
     return _realLP->upper();
@@ -1184,7 +1184,7 @@ namespace soplex
 
   /// returns upper bound of column \p i
   template <>
-  Real SoPlex<Real>::upperReal(int i) const
+  Real SoPlexBase<Real>::upperReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->upperUnscaled(i);
@@ -1194,7 +1194,7 @@ namespace soplex
 
   /// gets upper bound vector
   template <>
-  void SoPlex<Real>::getUpperReal(DVectorReal& upper) const
+  void SoPlexBase<Real>::getUpperReal(DVectorReal& upper) const
   {
     assert(_realLP != 0);
     return _realLP->getUpperUnscaled(upper);
@@ -1204,7 +1204,7 @@ namespace soplex
 
   /// returns lower bound vector
   template <>
-  const VectorReal& SoPlex<Real>::lowerRealInternal() const
+  const VectorReal& SoPlexBase<Real>::lowerRealInternal() const
   {
     assert(_realLP != 0);
     return _realLP->lower();
@@ -1214,7 +1214,7 @@ namespace soplex
 
   /// returns lower bound of column \p i
   template <>
-  Real SoPlex<Real>::lowerReal(int i) const
+  Real SoPlexBase<Real>::lowerReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->lowerUnscaled(i);
@@ -1224,7 +1224,7 @@ namespace soplex
 
   /// gets lower bound vector
   template <>
-  void SoPlex<Real>::getLowerReal(DVectorReal& lower) const
+  void SoPlexBase<Real>::getLowerReal(DVectorReal& lower) const
   {
     assert(_realLP != 0);
     return _realLP->getLowerUnscaled(lower);
@@ -1235,7 +1235,7 @@ namespace soplex
 
   /// gets objective function vector
   template <>
-  void SoPlex<Real>::getObjReal(VectorReal& obj) const
+  void SoPlexBase<Real>::getObjReal(VectorReal& obj) const
   {
     assert(_realLP != 0);
     _realLP->getObjUnscaled(obj);
@@ -1245,7 +1245,7 @@ namespace soplex
 
   /// returns objective value of column \p i
   template <>
-  Real SoPlex<Real>::objReal(int i) const
+  Real SoPlexBase<Real>::objReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->objUnscaled(i);
@@ -1256,7 +1256,7 @@ namespace soplex
   /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
   /// internally, this is generally faster
   template <>
-  const VectorReal& SoPlex<Real>::maxObjRealInternal() const
+  const VectorReal& SoPlexBase<Real>::maxObjRealInternal() const
   {
     assert(_realLP != 0);
     return _realLP->maxObj();
@@ -1267,7 +1267,7 @@ namespace soplex
   /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
   /// stored internally, this is generally faster
   template <>
-  Real SoPlex<Real>::maxObjReal(int i) const
+  Real SoPlexBase<Real>::maxObjReal(int i) const
   {
     assert(_realLP != 0);
     return _realLP->maxObjUnscaled(i);
@@ -1277,7 +1277,7 @@ namespace soplex
 
   /// gets number of available dual norms
   template <>
-  void SoPlex<Real>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+  void SoPlexBase<Real>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
   {
     _solver.getNdualNorms(nnormsRow, nnormsCol);
   }
@@ -1286,7 +1286,7 @@ namespace soplex
 
   /// gets steepest edge norms and returns false if they are not available
   template <>
-  bool SoPlex<Real>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
+  bool SoPlexBase<Real>::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
   {
     return _solver.getDualNorms(nnormsRow, nnormsCol, norms);
   }
@@ -1295,7 +1295,7 @@ namespace soplex
 
   /// sets steepest edge norms and returns false if that's not possible
   template <>
-  bool SoPlex<Real>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
+  bool SoPlexBase<Real>::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
   {
     return _solver.setDualNorms(nnormsRow, nnormsCol, norms);
   }
@@ -1304,7 +1304,7 @@ namespace soplex
 
   /// pass integrality information about the variables to the solver
   template <>
-  void SoPlex<Real>::setIntegralityInformation( int ncols, int* intInfo)
+  void SoPlexBase<Real>::setIntegralityInformation( int ncols, int* intInfo)
   {
     assert(ncols == _solver.nCols() || (ncols == 0 && intInfo == NULL));
     _solver.setIntegralityInformation(ncols, intInfo);
@@ -1314,14 +1314,14 @@ namespace soplex
 
   /// returns number of rows
   template <>
-  int SoPlex<Rational>::numRowsT() const
+  int SoPlexBase<Rational>::numRowsT() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nRows();
   }
 
   template <>
-  int SoPlex<Real>::numRowsRational() const
+  int SoPlexBase<Real>::numRowsRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nRows();
@@ -1329,14 +1329,14 @@ namespace soplex
 
   /// returns number of columns
   template <>
-  int SoPlex<Rational>::numColsT() const
+  int SoPlexBase<Rational>::numColsT() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nCols();
   }
 
   template <>
-  int SoPlex<Real>::numColsRational() const
+  int SoPlexBase<Real>::numColsRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nCols();
@@ -1344,7 +1344,7 @@ namespace soplex
 
   /// returns number of nonzeros
   template <>
-  int SoPlex<Rational>::numNonzerosT() const
+  int SoPlexBase<Rational>::numNonzerosT() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nNzos();
@@ -1354,7 +1354,7 @@ namespace soplex
 
   /// returns smallest non-zero element in absolute value
   template <>
-  Rational SoPlex<Real>::minAbsNonzeroRational() const
+  Rational SoPlexBase<Real>::minAbsNonzeroRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->minAbsNzo();
@@ -1364,7 +1364,7 @@ namespace soplex
 
   /// returns biggest non-zero element in absolute value
   template <>
-  Rational SoPlex<Real>::maxAbsNonzeroRational() const
+  Rational SoPlexBase<Real>::maxAbsNonzeroRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->maxAbsNzo();
@@ -1374,7 +1374,7 @@ namespace soplex
 
   /// gets row \p i
   template <>
-  void SoPlex<Real>::getRowRational(int i, LPRowRational& lprow) const
+  void SoPlexBase<Real>::getRowRational(int i, LPRowRational& lprow) const
   {
     assert(_rationalLP != 0);
     _rationalLP->getRow(i, lprow);
@@ -1384,7 +1384,7 @@ namespace soplex
 
   /// gets rows \p start, ..., \p end.
   template <>
-  void SoPlex<Real>::getRowsRational(int start, int end, LPRowSetRational& lprowset) const
+  void SoPlexBase<Real>::getRowsRational(int start, int end, LPRowSetRational& lprowset) const
   {
     assert(_rationalLP != 0);
     _rationalLP->getRows(start, end, lprowset);
@@ -1394,7 +1394,7 @@ namespace soplex
 
   /// returns vector of row \p i
   template <>
-  const SVectorRational& SoPlex<Real>::rowVectorRational(int i) const
+  const SVectorRational& SoPlexBase<Real>::rowVectorRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->rowVector(i);
@@ -1404,7 +1404,7 @@ namespace soplex
 
   /// returns right-hand side vector
   template <>
-  const VectorRational& SoPlex<Real>::rhsRational() const
+  const VectorRational& SoPlexBase<Real>::rhsRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->rhs();
@@ -1414,7 +1414,7 @@ namespace soplex
 
   /// returns right-hand side of row \p i
   template <>
-  const Rational& SoPlex<Real>::rhsRational(int i) const
+  const Rational& SoPlexBase<Real>::rhsRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->rhs(i);
@@ -1424,7 +1424,7 @@ namespace soplex
 
   /// returns left-hand side vector
   template <>
-  const VectorRational& SoPlex<Real>::lhsRational() const
+  const VectorRational& SoPlexBase<Real>::lhsRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->lhs();
@@ -1434,7 +1434,7 @@ namespace soplex
 
   /// returns left-hand side of row \p i
   template <>
-  const Rational& SoPlex<Real>::lhsRational(int i) const
+  const Rational& SoPlexBase<Real>::lhsRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->lhs(i);
@@ -1444,7 +1444,7 @@ namespace soplex
 
   /// returns inequality type of row \p i
   template <>
-  LPRowRational::Type SoPlex<Real>::rowTypeRational(int i) const
+  LPRowRational::Type SoPlexBase<Real>::rowTypeRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->rowType(i);
@@ -1454,7 +1454,7 @@ namespace soplex
 
   /// gets column \p i
   template <>
-  void SoPlex<Real>::getColRational(int i, LPColRational& lpcol) const
+  void SoPlexBase<Real>::getColRational(int i, LPColRational& lpcol) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->getCol(i, lpcol);
@@ -1464,7 +1464,7 @@ namespace soplex
 
   /// gets columns \p start, ..., \p end
   template <>
-  void SoPlex<Real>::getColsRational(int start, int end, LPColSetRational& lpcolset) const
+  void SoPlexBase<Real>::getColsRational(int start, int end, LPColSetRational& lpcolset) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->getCols(start, end, lpcolset);
@@ -1474,7 +1474,7 @@ namespace soplex
 
   /// returns vector of column \p i
   template <>
-  const SVectorRational& SoPlex<Real>::colVectorRational(int i) const
+  const SVectorRational& SoPlexBase<Real>::colVectorRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->colVector(i);
@@ -1484,7 +1484,7 @@ namespace soplex
 
   /// returns upper bound vector
   template <>
-  const VectorRational& SoPlex<Real>::upperRational() const
+  const VectorRational& SoPlexBase<Real>::upperRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->upper();
@@ -1494,7 +1494,7 @@ namespace soplex
 
   /// returns upper bound of column \p i
   template <>
-  const Rational& SoPlex<Real>::upperRational(int i) const
+  const Rational& SoPlexBase<Real>::upperRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->upper(i);
@@ -1504,7 +1504,7 @@ namespace soplex
 
   /// returns lower bound vector
   template <>
-  const VectorRational& SoPlex<Real>::lowerRational() const
+  const VectorRational& SoPlexBase<Real>::lowerRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->lower();
@@ -1513,7 +1513,7 @@ namespace soplex
   /// returns integer parameter value
   // #template #baseclass
   template <>
-	int SoPlex<Real>::intParam(const IntParam param) const
+	int SoPlexBase<Real>::intParam(const IntParam param) const
   {
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
@@ -1521,7 +1521,7 @@ namespace soplex
   }
 
   template <>
-	int SoPlex<Rational>::intParam(const IntParam param) const
+	int SoPlexBase<Rational>::intParam(const IntParam param) const
   {
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
@@ -1531,7 +1531,7 @@ namespace soplex
   /// sets integer parameter value; returns true on success
   // #template #baseclass
   template <>
-	bool SoPlex<Real>::setIntParam(const IntParam param, const int value, const bool init)
+	bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const bool init)
   {
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
@@ -1547,35 +1547,35 @@ namespace soplex
     switch( param )
       {
         // objective sense
-      case SoPlex<Real>::OBJSENSE:
-        if( value != SoPlex<Real>::OBJSENSE_MAXIMIZE && value != SoPlex<Real>::OBJSENSE_MINIMIZE )
+      case SoPlexBase<Real>::OBJSENSE:
+        if( value != SoPlexBase<Real>::OBJSENSE_MAXIMIZE && value != SoPlexBase<Real>::OBJSENSE_MINIMIZE )
           return false;
-        _realLP->changeSense(value == SoPlex<Real>::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
+        _realLP->changeSense(value == SoPlexBase<Real>::OBJSENSE_MAXIMIZE ? SPxLPReal::MAXIMIZE : SPxLPReal::MINIMIZE);
         if( _rationalLP != 0 )
-          _rationalLP->changeSense(value == SoPlex<Real>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+          _rationalLP->changeSense(value == SoPlexBase<Real>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
         _invalidateSolution();
         break;
 
         // type of computational form, i.e., column or row representation
-      case SoPlex<Real>::REPRESENTATION:
-        if( value != SoPlex<Real>::REPRESENTATION_COLUMN && value != SoPlex<Real>::REPRESENTATION_ROW && value != SoPlex<Real>::REPRESENTATION_AUTO )
+      case SoPlexBase<Real>::REPRESENTATION:
+        if( value != SoPlexBase<Real>::REPRESENTATION_COLUMN && value != SoPlexBase<Real>::REPRESENTATION_ROW && value != SoPlexBase<Real>::REPRESENTATION_AUTO )
           return false;
         break;
 
         // type of algorithm, i.e., primal or dual
-      case SoPlex<Real>::ALGORITHM:
+      case SoPlexBase<Real>::ALGORITHM:
         // decide upon entering/leaving at solve time depending on representation
         break;
 
         // type of LU update
-      case SoPlex<Real>::FACTOR_UPDATE_TYPE:
-        if( value != SoPlex<Real>::FACTOR_UPDATE_TYPE_ETA && value != SoPlex<Real>::FACTOR_UPDATE_TYPE_FT )
+      case SoPlexBase<Real>::FACTOR_UPDATE_TYPE:
+        if( value != SoPlexBase<Real>::FACTOR_UPDATE_TYPE_ETA && value != SoPlexBase<Real>::FACTOR_UPDATE_TYPE_FT )
           return false;
-        _slufactor.setUtype(value == SoPlex<Real>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
+        _slufactor.setUtype(value == SoPlexBase<Real>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
         break;
 
         // maximum number of updates before fresh factorization
-      case SoPlex<Real>::FACTOR_UPDATE_MAX:
+      case SoPlexBase<Real>::FACTOR_UPDATE_MAX:
         if( value == 0 )
           _solver.basis().setMaxUpdates(DEFAULT_REFACTOR_INTERVAL);
         else
@@ -1583,24 +1583,24 @@ namespace soplex
         break;
 
         // iteration limit (-1 if unlimited)
-      case SoPlex<Real>::ITERLIMIT:
+      case SoPlexBase<Real>::ITERLIMIT:
         break;
 
         // refinement limit (-1 if unlimited)
-      case SoPlex<Real>::REFLIMIT:
+      case SoPlexBase<Real>::REFLIMIT:
         break;
 
         // stalling refinement limit (-1 if unlimited)
-      case SoPlex<Real>::STALLREFLIMIT:
+      case SoPlexBase<Real>::STALLREFLIMIT:
         break;
 
         // display frequency
-      case SoPlex<Real>::DISPLAYFREQ:
+      case SoPlexBase<Real>::DISPLAYFREQ:
         _solver.setDisplayFreq(value);
         break;
 
         // verbosity level
-      case SoPlex<Real>::VERBOSITY:
+      case SoPlexBase<Real>::VERBOSITY:
         switch(value)
           {
           case 0:
@@ -1625,7 +1625,7 @@ namespace soplex
         break;
 
         // type of simplifier
-      case SoPlex<Real>::SIMPLIFIER:
+      case SoPlexBase<Real>::SIMPLIFIER:
         switch( value )
           {
           case SIMPLIFIER_OFF:
@@ -1641,7 +1641,7 @@ namespace soplex
         break;
 
         // type of scaler
-      case SoPlex<Real>::SCALER:
+      case SoPlexBase<Real>::SCALER:
         switch( value )
           {
           case SCALER_OFF:
@@ -1671,7 +1671,7 @@ namespace soplex
         break;
 
         // type of starter used to create crash basis
-      case SoPlex<Real>::STARTER:
+      case SoPlexBase<Real>::STARTER:
         switch( value )
           {
           case STARTER_OFF:
@@ -1692,7 +1692,7 @@ namespace soplex
         break;
 
         // type of pricer
-      case SoPlex<Real>::PRICER:
+      case SoPlexBase<Real>::PRICER:
         switch( value )
           {
           case PRICER_AUTO:
@@ -1719,7 +1719,7 @@ namespace soplex
         break;
 
         // mode for synchronizing real and rational LP
-      case SoPlex<Real>::SYNCMODE:
+      case SoPlexBase<Real>::SYNCMODE:
         switch( value )
           {
           case SYNCMODE_ONLYREAL:
@@ -1742,7 +1742,7 @@ namespace soplex
         break;
 
         // mode for reading LP files; nothing to do but change the value if valid
-      case SoPlex<Real>::READMODE:
+      case SoPlexBase<Real>::READMODE:
         switch( value )
           {
           case READMODE_REAL:
@@ -1754,7 +1754,7 @@ namespace soplex
         break;
 
         // mode for iterative refinement strategy; nothing to do but change the value if valid
-      case SoPlex<Real>::SOLVEMODE:
+      case SoPlexBase<Real>::SOLVEMODE:
         switch( value )
           {
           case SOLVEMODE_REAL:
@@ -1767,7 +1767,7 @@ namespace soplex
         break;
 
         // mode for a posteriori feasibility checks; nothing to do but change the value if valid
-      case SoPlex<Real>::CHECKMODE:
+      case SoPlexBase<Real>::CHECKMODE:
         switch( value )
           {
           case CHECKMODE_REAL:
@@ -1780,7 +1780,7 @@ namespace soplex
         break;
 
         // type of ratio test
-      case SoPlex<Real>::RATIOTESTER:
+      case SoPlexBase<Real>::RATIOTESTER:
         switch( value )
           {
           case RATIOTESTER_TEXTBOOK:
@@ -1801,7 +1801,7 @@ namespace soplex
         break;
 
         // type of timer
-      case SoPlex<Real>::TIMER:
+      case SoPlexBase<Real>::TIMER:
         switch( value )
           {
           case TIMER_OFF:
@@ -1819,7 +1819,7 @@ namespace soplex
         break;
 
         // mode of hyper pricing
-      case SoPlex<Real>::HYPER_PRICING:
+      case SoPlexBase<Real>::HYPER_PRICING:
         switch( value )
           {
           case HYPER_PRICING_OFF:
@@ -1832,17 +1832,17 @@ namespace soplex
         break;
 
         // minimum number of stalling refinements since last pivot to trigger rational factorization
-      case SoPlex<Real>::RATFAC_MINSTALLS:
+      case SoPlexBase<Real>::RATFAC_MINSTALLS:
         break;
 
         // maximum number of conjugate gradient iterations in least square scaling
-      case SoPlex<Real>::LEASTSQ_MAXROUNDS:
+      case SoPlexBase<Real>::LEASTSQ_MAXROUNDS:
         if( _scaler )
           _scaler->setIntParam(value);
         break;
 
         // mode of solution polishing
-      case SoPlex<Real>::SOLUTION_POLISHING:
+      case SoPlexBase<Real>::SOLUTION_POLISHING:
         switch( value )
           {
           case POLISHING_OFF:
@@ -1884,7 +1884,7 @@ namespace soplex
 
   /// returns lower bound of column \p i
   template <>
-  const Rational& SoPlex<Real>::lowerRational(int i) const
+  const Rational& SoPlexBase<Real>::lowerRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->lower(i);
@@ -1894,7 +1894,7 @@ namespace soplex
 
   /// gets objective function vector
   template <>
-  void SoPlex<Real>::getObjRational(VectorRational& obj) const
+  void SoPlexBase<Real>::getObjRational(VectorRational& obj) const
   {
     assert(_rationalLP != 0);
     _rationalLP->getObj(obj);
@@ -1904,10 +1904,10 @@ namespace soplex
 
   /// gets objective value of column \p i
   template <>
-  void SoPlex<Real>::getObjRational(int i, Rational& obj) const
+  void SoPlexBase<Real>::getObjRational(int i, Rational& obj) const
   {
     obj = maxObjRational(i);
-    if( intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE )
+    if( intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE )
       obj *= -1;
   }
 
@@ -1915,7 +1915,7 @@ namespace soplex
 
   /// returns objective value of column \p i
   template <>
-  Rational SoPlex<Real>::objRational(int i) const
+  Rational SoPlexBase<Real>::objRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->obj(i);
@@ -1926,7 +1926,7 @@ namespace soplex
   /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
   /// internally, this is generally faster
   template <>
-  const VectorRational& SoPlex<Real>::maxObjRational() const
+  const VectorRational& SoPlexBase<Real>::maxObjRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->maxObj();
@@ -1937,7 +1937,7 @@ namespace soplex
   /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
   /// stored internally, this is generally faster
   template <>
-  const Rational& SoPlex<Real>::maxObjRational(int i) const
+  const Rational& SoPlexBase<Real>::maxObjRational(int i) const
   {
     assert(_rationalLP != 0);
     return _rationalLP->maxObj(i);
@@ -1947,13 +1947,13 @@ namespace soplex
 
   /// adds a single row
   template <>
-  void SoPlex<Real>::addRowReal(const LPRowReal& lprow)
+  void SoPlexBase<Real>::addRowReal(const LPRowReal& lprow)
   {
     assert(_realLP != 0);
 
     _addRowReal(lprow);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->addRow(lprow);
         _completeRangeTypesRational();
@@ -1966,13 +1966,13 @@ namespace soplex
 
   /// adds multiple rows
   template <>
-  void SoPlex<Real>::addRowsReal(const LPRowSetReal& lprowset)
+  void SoPlexBase<Real>::addRowsReal(const LPRowSetReal& lprowset)
   {
     assert(_realLP != 0);
 
     _addRowsReal(lprowset);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->addRows(lprowset);
         _completeRangeTypesRational();
@@ -1985,13 +1985,13 @@ namespace soplex
 
   /// adds a single column
   template <>
-  void SoPlex<Real>::addColReal(const LPColReal& lpcol)
+  void SoPlexBase<Real>::addColReal(const LPColReal& lpcol)
   {
     assert(_realLP != 0);
 
     _addColReal(lpcol);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->addCol(lpcol);
         _completeRangeTypesRational();
@@ -2004,13 +2004,13 @@ namespace soplex
 
   /// adds multiple columns
   template <>
-  void SoPlex<Real>::addColsReal(const LPColSetReal& lpcolset)
+  void SoPlexBase<Real>::addColsReal(const LPColSetReal& lpcolset)
   {
     assert(_realLP != 0);
 
     _addColsReal(lpcolset);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->addCols(lpcolset);
         _completeRangeTypesRational();
@@ -2023,13 +2023,13 @@ namespace soplex
 
   /// replaces row \p i with \p lprow
   template <>
-  void SoPlex<Real>::changeRowReal(int i, const LPRowReal& lprow)
+  void SoPlexBase<Real>::changeRowReal(int i, const LPRowReal& lprow)
   {
     assert(_realLP != 0);
 
     _changeRowReal(i, lprow);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeRow(i, lprow);
         _rowTypes[i] = _rangeTypeReal(lprow.lhs(), lprow.rhs());
@@ -2043,13 +2043,13 @@ namespace soplex
 
   /// changes left-hand side vector for constraints to \p lhs
   template <>
-  void SoPlex<Real>::changeLhsReal(const VectorReal& lhs)
+  void SoPlexBase<Real>::changeLhsReal(const VectorReal& lhs)
   {
     assert(_realLP != 0);
 
     _changeLhsReal(lhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeLhs(DVectorRational(lhs));
         for( int i = 0; i < numRowsT(); i++ )
@@ -2063,13 +2063,13 @@ namespace soplex
 
   /// changes left-hand side of row \p i to \p lhs
   template <>
-  void SoPlex<Real>::changeLhsReal(int i, const Real& lhs)
+  void SoPlexBase<Real>::changeLhsReal(int i, const Real& lhs)
   {
     assert(_realLP != 0);
 
     _changeLhsReal(i, lhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeLhs(i, lhs);
         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
@@ -2082,13 +2082,13 @@ namespace soplex
 
   /// changes right-hand side vector to \p rhs
   template <>
-  void SoPlex<Real>::changeRhsReal(const VectorReal& rhs)
+  void SoPlexBase<Real>::changeRhsReal(const VectorReal& rhs)
   {
     assert(_realLP != 0);
 
     _changeRhsReal(rhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeRhs(DVectorRational(rhs));
         for( int i = 0; i < numRowsT(); i++ )
@@ -2102,13 +2102,13 @@ namespace soplex
 
   /// changes right-hand side of row \p i to \p rhs
   template <>
-  void SoPlex<Real>::changeRhsReal(int i, const Real& rhs)
+  void SoPlexBase<Real>::changeRhsReal(int i, const Real& rhs)
   {
     assert(_realLP != 0);
 
     _changeRhsReal(i, rhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeRhs(i, rhs);
         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
@@ -2121,13 +2121,13 @@ namespace soplex
 
   /// changes left- and right-hand side vectors
   template <>
-  void SoPlex<Real>::changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
+  void SoPlexBase<Real>::changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
   {
     assert(_realLP != 0);
 
     _changeRangeReal(lhs, rhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeRange(DVectorRational(lhs), DVectorRational(rhs));
         for( int i = 0; i < numRowsT(); i++ )
@@ -2141,13 +2141,13 @@ namespace soplex
 
   /// changes left- and right-hand side of row \p i
   template <>
-  void SoPlex<Real>::changeRangeReal(int i, const Real& lhs, const Real& rhs)
+  void SoPlexBase<Real>::changeRangeReal(int i, const Real& lhs, const Real& rhs)
   {
     assert(_realLP != 0);
 
     _changeRangeReal(i,lhs, rhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeRange(i, lhs, rhs);
         _rowTypes[i] = _rangeTypeReal(lhs, rhs);
@@ -2160,13 +2160,13 @@ namespace soplex
 
   /// replaces column \p i with \p lpcol
   template <>
-  void SoPlex<Real>::changeColReal(int i, const LPColReal& lpcol)
+  void SoPlexBase<Real>::changeColReal(int i, const LPColReal& lpcol)
   {
     assert(_realLP != 0);
 
     _changeColReal(i, lpcol);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeCol(i, lpcol);
         _colTypes[i] = _rangeTypeReal(lpcol.lower(), lpcol.upper());
@@ -2180,13 +2180,13 @@ namespace soplex
 
   /// changes vector of lower bounds to \p lower
   template <>
-  void SoPlex<Real>::changeLowerReal(const VectorReal& lower)
+  void SoPlexBase<Real>::changeLowerReal(const VectorReal& lower)
   {
     assert(_realLP != 0);
 
     _changeLowerReal(lower);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeLower(DVectorRational(lower));
         for( int i = 0; i < numColsT(); i++ )
@@ -2201,13 +2201,13 @@ namespace soplex
 
   /// changes lower bound of column i to \p lower
   template <>
-  void SoPlex<Real>::changeLowerReal(int i, const Real& lower)
+  void SoPlexBase<Real>::changeLowerReal(int i, const Real& lower)
   {
     assert(_realLP != 0);
 
     _changeLowerReal(i, lower);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeLower(i, lower);
         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
@@ -2220,13 +2220,13 @@ namespace soplex
 
   /// changes vector of upper bounds to \p upper
   template <>
-  void SoPlex<Real>::changeUpperReal(const VectorReal& upper)
+  void SoPlexBase<Real>::changeUpperReal(const VectorReal& upper)
   {
     assert(_realLP != 0);
 
     _changeUpperReal(upper);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeUpper(DVectorRational(upper));
         for( int i = 0; i < numColsT(); i++ )
@@ -2240,13 +2240,13 @@ namespace soplex
 
   /// changes \p i 'th upper bound to \p upper
   template <>
-  void SoPlex<Real>::changeUpperReal(int i, const Real& upper)
+  void SoPlexBase<Real>::changeUpperReal(int i, const Real& upper)
   {
     assert(_realLP != 0);
 
     _changeUpperReal(i, upper);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeUpper(i, upper);
         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
@@ -2259,13 +2259,13 @@ namespace soplex
 
   /// changes vectors of column bounds to \p lower and \p upper
   template <>
-  void SoPlex<Real>::changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
+  void SoPlexBase<Real>::changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
   {
     assert(_realLP != 0);
 
     _changeBoundsReal(lower, upper);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeBounds(DVectorRational(lower), DVectorRational(upper));
         for( int i = 0; i < numColsT(); i++ )
@@ -2279,13 +2279,13 @@ namespace soplex
 
   /// changes bounds of column \p i to \p lower and \p upper
   template <>
-  void SoPlex<Real>::changeBoundsReal(int i, const Real& lower, const Real& upper)
+  void SoPlexBase<Real>::changeBoundsReal(int i, const Real& lower, const Real& upper)
   {
     assert(_realLP != 0);
 
     _changeBoundsReal(i, lower, upper);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->changeBounds(i, lower, upper);
         _colTypes[i] = _rangeTypeReal(lower, upper);
@@ -2297,14 +2297,14 @@ namespace soplex
 
   /// changes objective function vector to \p obj
   template <>
-  void SoPlex<Real>::changeObjReal(const VectorReal& obj)
+  void SoPlexBase<Real>::changeObjReal(const VectorReal& obj)
   {
     assert(_realLP != 0);
 
     bool scale = _realLP->isScaled();
     _realLP->changeObj(obj, scale);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _rationalLP->changeObj(DVectorRational(obj));
 
     _invalidateSolution();
@@ -2314,14 +2314,14 @@ namespace soplex
 
   /// changes objective coefficient of column i to \p obj
   template <>
-  void SoPlex<Real>::changeObjReal(int i, const Real& obj)
+  void SoPlexBase<Real>::changeObjReal(int i, const Real& obj)
   {
     assert(_realLP != 0);
 
     bool scale = _realLP->isScaled();
     _realLP->changeObj(i, obj, scale);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _rationalLP->changeObj(i, obj);
 
     _invalidateSolution();
@@ -2331,13 +2331,13 @@ namespace soplex
 
   /// changes matrix entry in row \p i and column \p j to \p val
   template <>
-  void SoPlex<Real>::changeElementReal(int i, int j, const Real& val)
+  void SoPlexBase<Real>::changeElementReal(int i, int j, const Real& val)
   {
     assert(_realLP != 0);
 
     _changeElementReal(i, j, val);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _rationalLP->changeElement(i, j, val);
 
     _invalidateSolution();
@@ -2347,13 +2347,13 @@ namespace soplex
 
   /// removes row \p i
   template <>
-  void SoPlex<Real>::removeRowReal(int i)
+  void SoPlexBase<Real>::removeRowReal(int i)
   {
     assert(_realLP != 0);
 
     _removeRowReal(i);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->removeRow(i);
         // only swap elements if not the last one was removed
@@ -2374,14 +2374,14 @@ namespace soplex
   /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
   /// #numRowsT()
   template <>
-  void SoPlex<Real>::removeRowsReal(int perm[])
+  void SoPlexBase<Real>::removeRowsReal(int perm[])
   {
     assert(_realLP != 0);
 
     const int oldsize = numRowsT();
     _removeRowsReal(perm);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->removeRows(perm);
         for( int i = 0; i < oldsize; i++ )
@@ -2404,18 +2404,18 @@ namespace soplex
   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
   /// as buffer memory
   template <>
-  void SoPlex<Real>::removeRowsReal(int idx[], int n, int perm[])
+  void SoPlexBase<Real>::removeRowsReal(int idx[], int n, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numRowsT());
         _idxToPerm(idx, n, p.get_ptr(), numRowsT());
-        SoPlex<Real>::removeRowsReal(p.get_ptr());
+        SoPlexBase<Real>::removeRowsReal(p.get_ptr());
       }
     else
       {
         _idxToPerm(idx, n, perm, numRowsT());
-        SoPlex<Real>::removeRowsReal(perm);
+        SoPlexBase<Real>::removeRowsReal(perm);
       }
   }
 
@@ -2424,18 +2424,18 @@ namespace soplex
   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
   /// memory
   template <>
-  void SoPlex<Real>::removeRowRangeReal(int start, int end, int perm[])
+  void SoPlexBase<Real>::removeRowRangeReal(int start, int end, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numRowsT());
         _rangeToPerm(start, end, p.get_ptr(), numRowsT());
-        SoPlex<Real>::removeRowsReal(p.get_ptr());
+        SoPlexBase<Real>::removeRowsReal(p.get_ptr());
       }
     else
       {
         _rangeToPerm(start, end, perm, numRowsT());
-        SoPlex<Real>::removeRowsReal(perm);
+        SoPlexBase<Real>::removeRowsReal(perm);
       }
   }
 
@@ -2443,13 +2443,13 @@ namespace soplex
 
   /// removes column i
   template <>
-  void SoPlex<Real>::removeColReal(int i)
+  void SoPlexBase<Real>::removeColReal(int i)
   {
     assert(_realLP != 0);
 
     _removeColReal(i);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->removeCol(i);
         // only swap elements if not the last one was removed
@@ -2470,14 +2470,14 @@ namespace soplex
   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
   /// #numColsReal()
   template <>
-  void SoPlex<Real>::removeColsReal(int perm[])
+  void SoPlexBase<Real>::removeColsReal(int perm[])
   {
     assert(_realLP != 0);
 
     const int oldsize = numColsT();
     _removeColsReal(perm);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->removeCols(perm);
         for( int i = 0; i < oldsize; i++ )
@@ -2500,18 +2500,18 @@ namespace soplex
   /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
   /// passed as buffer memory
   template <>
-  void SoPlex<Real>::removeColsReal(int idx[], int n, int perm[])
+  void SoPlexBase<Real>::removeColsReal(int idx[], int n, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numColsT());
         _idxToPerm(idx, n, p.get_ptr(), numColsT());
-        SoPlex<Real>::removeColsReal(p.get_ptr());
+        SoPlexBase<Real>::removeColsReal(p.get_ptr());
       }
     else
       {
         _idxToPerm(idx, n, perm, numColsT());
-        SoPlex<Real>::removeColsReal(perm);
+        SoPlexBase<Real>::removeColsReal(perm);
       }
   }
 
@@ -2520,18 +2520,18 @@ namespace soplex
   /// removes columns \p start to \p end including both; an array \p perm of size #numColsT() may be passed as
   /// buffer memory
   template <>
-  void SoPlex<Real>::removeColRangeReal(int start, int end, int perm[])
+  void SoPlexBase<Real>::removeColRangeReal(int start, int end, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numColsT());
         _rangeToPerm(start, end, p.get_ptr(), numColsT());
-        SoPlex<Real>::removeColsReal(p.get_ptr());
+        SoPlexBase<Real>::removeColsReal(p.get_ptr());
       }
     else
       {
         _rangeToPerm(start, end, perm, numColsT());
-        SoPlex<Real>::removeColsReal(perm);
+        SoPlexBase<Real>::removeColsReal(perm);
       }
   }
 
@@ -2539,7 +2539,7 @@ namespace soplex
 
   /// clears the LP
   template <>
-  void SoPlex<Real>::clearLPReal()
+  void SoPlexBase<Real>::clearLPReal()
   {
     assert(_realLP != 0);
 
@@ -2547,7 +2547,7 @@ namespace soplex
     _hasBasis = false;
     _rationalLUSolver.clear();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _rationalLP->clear();
         _rowTypes.clear();
@@ -2561,11 +2561,11 @@ namespace soplex
 
   /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, if sync mode is manual
   template <>
-  void SoPlex<Real>::syncLPReal()
+  void SoPlexBase<Real>::syncLPReal()
   {
     assert(_isConsistent());
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_MANUAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_MANUAL )
       _syncLPReal();
   }
 
@@ -2573,17 +2573,17 @@ namespace soplex
 
   /// adds a single row
   template <>
-  void SoPlex<Real>::addRowRational(const LPRowRational& lprow)
+  void SoPlexBase<Real>::addRowRational(const LPRowRational& lprow)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addRow(lprow);
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _addRowReal(lprow);
 
     _invalidateSolution();
@@ -2594,18 +2594,18 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// adds a single row
   template <>
-  void SoPlex<Real>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs)
+  void SoPlexBase<Real>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addRow(lhs, rowValues, rowIndices, rowSize, rhs);
     _completeRangeTypesRational();
 
     int i = numRowsT() - 1;
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _addRowReal(Real(lhsRational(i)), DSVectorReal(_rationalLP->rowVector(i)), Real(rhsRational(i)));
 
     _invalidateSolution();
@@ -2615,17 +2615,17 @@ namespace soplex
 
   /// adds a set of rows
   template <>
-  void SoPlex<Real>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs)
+  void SoPlexBase<Real>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addRows(lhs, rowValues, rowIndices, rowStarts, rowLengths, numRows, numValues, rhs);
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         LPRowSetReal lprowset;
         for( int i = numRowsT() - numRows; i < numRowsT(); i++ )
@@ -2641,17 +2641,17 @@ namespace soplex
 
   /// adds multiple rows
   template <>
-  void SoPlex<Real>::addRowsRational(const LPRowSetRational& lprowset)
+  void SoPlexBase<Real>::addRowsRational(const LPRowSetRational& lprowset)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addRows(lprowset);
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _addRowsReal(lprowset);
 
     _invalidateSolution();
@@ -2661,17 +2661,17 @@ namespace soplex
 
   /// adds a single column
   template <>
-  void SoPlex<Real>::addColRational(const LPColRational& lpcol)
+  void SoPlexBase<Real>::addColRational(const LPColRational& lpcol)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addCol(lpcol);
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _addColReal(lpcol);
 
     _invalidateSolution();
@@ -2682,19 +2682,19 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// adds a single column
   template <>
-  void SoPlex<Real>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper)
+  void SoPlexBase<Real>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addCol(obj, lower, colValues, colIndices, colSize, upper);
     int i = numColsT() - 1;
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _addColReal(Real(maxObjRational(i)) * (intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
+      _addColReal(Real(maxObjRational(i)) * (intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
                   Real(lowerRational(i)), DSVectorReal(_rationalLP->colVector(i)), Real(upperRational(i)));
 
     _invalidateSolution();
@@ -2704,21 +2704,21 @@ namespace soplex
 
   /// adds a set of columns
   template <>
-  void SoPlex<Real>::addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper)
+  void SoPlexBase<Real>::addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addCols(obj, lower, colValues, colIndices, colStarts, colLengths, numCols, numValues, upper);
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         LPColSetReal lpcolset;
         for( int i = numColsT() - numCols; i < numColsT(); i++ )
-          lpcolset.add(Real(maxObjRational(i)) * (intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+          lpcolset.add(Real(maxObjRational(i)) * (intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
                        Real(lowerRational(i)), DSVectorReal(_rationalLP->colVector(i)), Real(upperRational(i)));
         _addColsReal(lpcolset);
       }
@@ -2731,17 +2731,17 @@ namespace soplex
 
   /// adds multiple columns
   template <>
-  void SoPlex<Real>::addColsRational(const LPColSetRational& lpcolset)
+  void SoPlexBase<Real>::addColsRational(const LPColSetRational& lpcolset)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->addCols(lpcolset);
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _addColsReal(lpcolset);
 
     _invalidateSolution();
@@ -2751,18 +2751,18 @@ namespace soplex
 
   /// replaces row \p i with \p lprow
   template <>
-  void SoPlex<Real>::changeRowRational(int i, const LPRowRational& lprow)
+  void SoPlexBase<Real>::changeRowRational(int i, const LPRowRational& lprow)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeRow(i, lprow);
     _rowTypes[i] = _rangeTypeRational(lprow.lhs(), lprow.rhs());
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRowReal(i, lprow);
 
     _invalidateSolution();
@@ -2772,18 +2772,18 @@ namespace soplex
 
   /// changes left-hand side vector for constraints to \p lhs
   template <>
-  void SoPlex<Real>::changeLhsRational(const VectorRational& lhs)
+  void SoPlexBase<Real>::changeLhsRational(const VectorRational& lhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeLhs(lhs);
     for( int i = 0; i < numRowsT(); i++ )
       _rowTypes[i] = _rangeTypeRational(lhs[i], _rationalLP->rhs(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeLhsReal(DVectorReal(lhs));
 
     _invalidateSolution();
@@ -2793,17 +2793,17 @@ namespace soplex
 
   /// changes left-hand side of row \p i to \p lhs
   template <>
-  void SoPlex<Real>::changeLhsRational(int i, const Rational& lhs)
+  void SoPlexBase<Real>::changeLhsRational(int i, const Rational& lhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeLhs(i, lhs);
     _rowTypes[i] = _rangeTypeRational(lhs, _rationalLP->rhs(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeLhsReal(i, Real(lhs));
 
     _invalidateSolution();
@@ -2814,17 +2814,17 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes left-hand side of row \p i to \p lhs
   template <>
-  void SoPlex<Real>::changeLhsRational(int i, const mpq_t* lhs)
+  void SoPlexBase<Real>::changeLhsRational(int i, const mpq_t* lhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeLhs(i, lhs);
     _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeLhsReal(i, Real(lhsRational(i)));
 
     _invalidateSolution();
@@ -2835,18 +2835,18 @@ namespace soplex
 
   /// changes right-hand side vector to \p rhs
   template <>
-  void SoPlex<Real>::changeRhsRational(const VectorRational& rhs)
+  void SoPlexBase<Real>::changeRhsRational(const VectorRational& rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeRhs(rhs);
     for( int i = 0; i < numRowsT(); i++ )
       _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), rhs[i]);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRhsReal(DVectorReal(rhs));
 
     _invalidateSolution();
@@ -2857,11 +2857,11 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes right-hand side vector to \p rhs
   template <>
-  void SoPlex<Real>::changeRhsRational(const mpq_t* rhs, int rhsSize)
+  void SoPlexBase<Real>::changeRhsRational(const mpq_t* rhs, int rhsSize)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     for( int i = 0; i < rhsSize; i++ )
@@ -2870,7 +2870,7 @@ namespace soplex
         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
       }
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRhsReal(DVectorReal(rhsRational()));
 
     _invalidateSolution();
@@ -2881,17 +2881,17 @@ namespace soplex
 
   /// changes right-hand side of row \p i to \p rhs
   template <>
-  void SoPlex<Real>::changeRhsRational(int i, const Rational& rhs)
+  void SoPlexBase<Real>::changeRhsRational(int i, const Rational& rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeRhs(i, rhs);
     _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), rhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRhsReal(i, Real(rhs));
 
     _invalidateSolution();
@@ -2901,18 +2901,18 @@ namespace soplex
 
   /// changes left- and right-hand side vectors
   template <>
-  void SoPlex<Real>::changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
+  void SoPlexBase<Real>::changeRangeRational(const VectorRational& lhs, const VectorRational& rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeRange(lhs, rhs);
     for( int i = 0; i < numRowsT(); i++ )
       _rowTypes[i] = _rangeTypeRational(lhs[i], rhs[i]);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRangeReal(DVectorReal(lhs), DVectorReal(rhs));
 
     _invalidateSolution();
@@ -2922,17 +2922,17 @@ namespace soplex
 
   /// changes left- and right-hand side of row \p i
   template <>
-  void SoPlex<Real>::changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
+  void SoPlexBase<Real>::changeRangeRational(int i, const Rational& lhs, const Rational& rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeRange(i, lhs, rhs);
     _rowTypes[i] = _rangeTypeRational(lhs, rhs);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRangeReal(i, Real(lhs), Real(rhs));
 
     _invalidateSolution();
@@ -2943,17 +2943,17 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes left-hand side of row \p i to \p lhs
   template <>
-  void SoPlex<Real>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
+  void SoPlexBase<Real>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeRange(i, lhs, rhs);
     _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeRangeReal(i, Real(lhsRational(i)), Real(rhsRational(i)));
 
     _invalidateSolution();
@@ -2964,18 +2964,18 @@ namespace soplex
 
   /// replaces column \p i with \p lpcol
   template <>
-  void SoPlex<Real>::changeColRational(int i, const LPColRational& lpcol)
+  void SoPlexBase<Real>::changeColRational(int i, const LPColRational& lpcol)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeCol(i, lpcol);
     _colTypes[i] = _rangeTypeRational(lpcol.lower(), lpcol.upper());
     _completeRangeTypesRational();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeColReal(i, lpcol);
 
     _invalidateSolution();
@@ -2985,18 +2985,18 @@ namespace soplex
 
   /// changes vector of lower bounds to \p lower
   template <>
-  void SoPlex<Real>::changeLowerRational(const VectorRational& lower)
+  void SoPlexBase<Real>::changeLowerRational(const VectorRational& lower)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeLower(lower);
     for( int i = 0; i < numColsT(); i++ )
       _colTypes[i] = _rangeTypeRational(lower[i], _rationalLP->upper(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeLowerReal(DVectorReal(lower));
 
     _invalidateSolution();
@@ -3006,17 +3006,17 @@ namespace soplex
 
   /// changes lower bound of column i to \p lower
   template <>
-  void SoPlex<Real>::changeLowerRational(int i, const Rational& lower)
+  void SoPlexBase<Real>::changeLowerRational(int i, const Rational& lower)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeLower(i, lower);
     _colTypes[i] = _rangeTypeRational(lower, _rationalLP->upper(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeLowerReal(i, Real(lower));
 
     _invalidateSolution();
@@ -3027,17 +3027,17 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes lower bound of column i to \p lower
   template <>
-  void SoPlex<Real>::changeLowerRational(int i, const mpq_t* lower)
+  void SoPlexBase<Real>::changeLowerRational(int i, const mpq_t* lower)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeLower(i, lower);
     _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeLowerReal(i, Real(lowerRational(i)));
 
     _invalidateSolution();
@@ -3048,18 +3048,18 @@ namespace soplex
 
   /// changes vector of upper bounds to \p upper
   template <>
-  void SoPlex<Real>::changeUpperRational(const VectorRational& upper)
+  void SoPlexBase<Real>::changeUpperRational(const VectorRational& upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeUpper(upper);
     for( int i = 0; i < numColsT(); i++ )
       _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), upper[i]);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeUpperReal(DVectorReal(upper));
 
     _invalidateSolution();
@@ -3069,17 +3069,17 @@ namespace soplex
 
   /// changes \p i 'th upper bound to \p upper
   template <>
-  void SoPlex<Real>::changeUpperRational(int i, const Rational& upper)
+  void SoPlexBase<Real>::changeUpperRational(int i, const Rational& upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeUpper(i, upper);
     _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), upper);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeUpperReal(i, Real(upper));
 
     _invalidateSolution();
@@ -3090,17 +3090,17 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes upper bound of column i to \p upper
   template <>
-  void SoPlex<Real>::changeUpperRational(int i, const mpq_t* upper)
+  void SoPlexBase<Real>::changeUpperRational(int i, const mpq_t* upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeUpper(i, upper);
     _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeUpperReal(i, Real(upperRational(i)));
 
     _invalidateSolution();
@@ -3111,18 +3111,18 @@ namespace soplex
 
   /// changes vectors of column bounds to \p lower and \p upper
   template <>
-  void SoPlex<Real>::changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
+  void SoPlexBase<Real>::changeBoundsRational(const VectorRational& lower, const VectorRational& upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeBounds(lower, upper);
     for( int i = 0; i < numColsT(); i++ )
       _colTypes[i] = _rangeTypeRational(lower[i], upper[i]);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeBoundsReal(DVectorReal(lower), DVectorReal(upper));
 
     _invalidateSolution();
@@ -3132,17 +3132,17 @@ namespace soplex
 
   /// changes bounds of column \p i to \p lower and \p upper
   template <>
-  void SoPlex<Real>::changeBoundsRational(int i, const Rational& lower, const Rational& upper)
+  void SoPlexBase<Real>::changeBoundsRational(int i, const Rational& lower, const Rational& upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeBounds(i, lower, upper);
     _colTypes[i] = _rangeTypeRational(lower, upper);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeBoundsReal(i, Real(lower), Real(upper));
 
     _invalidateSolution();
@@ -3153,17 +3153,17 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes bounds of column \p i to \p lower and \p upper
   template <>
-  void SoPlex<Real>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
+  void SoPlexBase<Real>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeBounds(i, lower, upper);
     _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeBoundsReal(i, Real(lowerRational(i)), Real(upperRational(i)));
 
     _invalidateSolution();
@@ -3174,16 +3174,16 @@ namespace soplex
 
   /// changes objective function vector to \p obj
   template <>
-  void SoPlex<Real>::changeObjRational(const VectorRational& obj)
+  void SoPlexBase<Real>::changeObjRational(const VectorRational& obj)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeObj(obj);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _realLP->changeObj(DVectorReal(obj));
 
     _invalidateSolution();
@@ -3193,16 +3193,16 @@ namespace soplex
 
   /// changes objective coefficient of column i to \p obj
   template <>
-  void SoPlex<Real>::changeObjRational(int i, const Rational& obj)
+  void SoPlexBase<Real>::changeObjRational(int i, const Rational& obj)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeObj(i, obj);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _realLP->changeObj(i, Real(obj));
 
     _invalidateSolution();
@@ -3213,16 +3213,16 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes objective coefficient of column i to \p obj
   template <>
-  void SoPlex<Real>::changeObjRational(int i, const mpq_t* obj)
+  void SoPlexBase<Real>::changeObjRational(int i, const mpq_t* obj)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeObj(i, obj);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _realLP->changeObj(i, Real(objRational(i)));
 
     _invalidateSolution();
@@ -3233,16 +3233,16 @@ namespace soplex
 
   /// changes matrix entry in row \p i and column \p j to \p val
   template <>
-  void SoPlex<Real>::changeElementRational(int i, int j, const Rational& val)
+  void SoPlexBase<Real>::changeElementRational(int i, int j, const Rational& val)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeElement(i, j, val);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeElementReal(i, j, Real(val));
 
     _invalidateSolution();
@@ -3252,16 +3252,16 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// changes matrix entry in row \p i and column \p j to \p val
   template <>
-  void SoPlex<Real>::changeElementRational(int i, int j, const mpq_t* val)
+  void SoPlexBase<Real>::changeElementRational(int i, int j, const mpq_t* val)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->changeElement(i, j, val);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _changeElementReal(i, j, mpq_get_d(*val));
 
     _invalidateSolution();
@@ -3271,11 +3271,11 @@ namespace soplex
 
   /// removes row \p i
   template <>
-  void SoPlex<Real>::removeRowRational(int i)
+  void SoPlexBase<Real>::removeRowRational(int i)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->removeRow(i);
@@ -3287,7 +3287,7 @@ namespace soplex
       }
     _rowTypes.reSize(_rationalLP->nRows());
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _removeRowReal(i);
 
     _invalidateSolution();
@@ -3299,11 +3299,11 @@ namespace soplex
   /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
   /// #numRowsT()
   template <>
-  void SoPlex<Real>::removeRowsRational(int perm[])
+  void SoPlexBase<Real>::removeRowsRational(int perm[])
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     const int oldsize = numRowsT();
@@ -3320,7 +3320,7 @@ namespace soplex
       }
 
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _removeRowsReal(perm);
 
     _invalidateSolution();
@@ -3331,18 +3331,18 @@ namespace soplex
   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be
   /// passed as buffer memory
   template <>
-  void SoPlex<Real>::removeRowsRational(int idx[], int n, int perm[])
+  void SoPlexBase<Real>::removeRowsRational(int idx[], int n, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numRowsT());
         _idxToPerm(idx, n, p.get_ptr(), numRowsT());
-        SoPlex<Real>::removeRowsRational(p.get_ptr());
+        SoPlexBase<Real>::removeRowsRational(p.get_ptr());
       }
     else
       {
         _idxToPerm(idx, n, perm, numRowsT());
-        SoPlex<Real>::removeRowsRational(perm);
+        SoPlexBase<Real>::removeRowsRational(perm);
       }
   }
 
@@ -3351,18 +3351,18 @@ namespace soplex
   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as
   /// buffer memory
   template <>
-  void SoPlex<Real>::removeRowRangeRational(int start, int end, int perm[])
+  void SoPlexBase<Real>::removeRowRangeRational(int start, int end, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numRowsT());
         _rangeToPerm(start, end, p.get_ptr(), numRowsT());
-        SoPlex<Real>::removeRowsRational(p.get_ptr());
+        SoPlexBase<Real>::removeRowsRational(p.get_ptr());
       }
     else
       {
         _rangeToPerm(start, end, perm, numRowsT());
-        SoPlex<Real>::removeRowsRational(perm);
+        SoPlexBase<Real>::removeRowsRational(perm);
       }
   }
 
@@ -3370,11 +3370,11 @@ namespace soplex
 
   /// removes column i
   template <>
-  void SoPlex<Real>::removeColRational(int i)
+  void SoPlexBase<Real>::removeColRational(int i)
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->removeCol(i);
@@ -3386,7 +3386,7 @@ namespace soplex
       }
     _colTypes.reSize(_rationalLP->nCols());
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _removeColReal(i);
 
     _invalidateSolution();
@@ -3398,11 +3398,11 @@ namespace soplex
   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
   /// #numColsT()
   template <>
-  void SoPlex<Real>::removeColsRational(int perm[])
+  void SoPlexBase<Real>::removeColsRational(int perm[])
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     const int oldsize = numColsT();
@@ -3418,7 +3418,7 @@ namespace soplex
         assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
       }
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       _removeColsReal(perm);
 
     _invalidateSolution();
@@ -3429,18 +3429,18 @@ namespace soplex
   /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsT() may be
   /// passed as buffer memory
   template <>
-  void SoPlex<Real>::removeColsRational(int idx[], int n, int perm[])
+  void SoPlexBase<Real>::removeColsRational(int idx[], int n, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numColsT());
         _idxToPerm(idx, n, p.get_ptr(), numColsT());
-        SoPlex<Real>::removeColsRational(p.get_ptr());
+        SoPlexBase<Real>::removeColsRational(p.get_ptr());
       }
     else
       {
         _idxToPerm(idx, n, perm, numColsT());
-        SoPlex<Real>::removeColsRational(perm);
+        SoPlexBase<Real>::removeColsRational(perm);
       }
   }
 
@@ -3449,18 +3449,18 @@ namespace soplex
   /// removes columns \p start to \p end including both; an array \p perm of size #numColsT() may be passed as
   /// buffer memory
   template <>
-  void SoPlex<Real>::removeColRangeRational(int start, int end, int perm[])
+  void SoPlexBase<Real>::removeColRangeRational(int start, int end, int perm[])
   {
     if( perm == 0 )
       {
         DataArray< int > p(numColsT());
         _rangeToPerm(start, end, p.get_ptr(), numColsT());
-        SoPlex<Real>::removeColsRational(p.get_ptr());
+        SoPlexBase<Real>::removeColsRational(p.get_ptr());
       }
     else
       {
         _rangeToPerm(start, end, perm, numColsT());
-        SoPlex<Real>::removeColsRational(perm);
+        SoPlexBase<Real>::removeColsRational(perm);
       }
   }
 
@@ -3468,11 +3468,11 @@ namespace soplex
 
   /// clears the LP
   template <>
-  void SoPlex<Real>::clearLPRational()
+  void SoPlexBase<Real>::clearLPRational()
   {
     assert(_rationalLP != 0);
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return;
 
     _rationalLP->clear();
@@ -3480,7 +3480,7 @@ namespace soplex
     _rowTypes.clear();
     _colTypes.clear();
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
       {
         _realLP->clear();
         _hasBasis = false;
@@ -3493,18 +3493,18 @@ namespace soplex
 
   /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, if sync mode is manual
   template <>
-  void SoPlex<Real>::syncLPRational()
+  void SoPlexBase<Real>::syncLPRational()
   {
     assert(_isConsistent());
 
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_MANUAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_MANUAL )
       _syncLPRational();
   }
 
   /// returns real parameter value
   /// #template #temp
   template <>
-  Real SoPlex<Real>::realParam(const RealParam param) const
+  Real SoPlexBase<Real>::realParam(const RealParam param) const
   {
     assert(param >= 0);
     assert(param < REALPARAM_COUNT);
@@ -3512,7 +3512,7 @@ namespace soplex
   }
 
   template <>
-  Real SoPlex<Rational>::realParam(const RealParam param) const
+  Real SoPlexBase<Rational>::realParam(const RealParam param) const
   {
     std::exit(EXIT_FAILURE);
   }
@@ -3520,7 +3520,7 @@ namespace soplex
   /// solves the LP
   /// #template needs to be rewritten #temp
   template <>
-  typename SPxSolver<Real>::Status SoPlex<Real>::optimize()
+  typename SPxSolver<Real>::Status SoPlexBase<Real>::optimize()
   {
     assert(_isConsistent());
 
@@ -3531,39 +3531,39 @@ namespace soplex
     _invalidateSolution();
 
     // if the decomposition based dual simplex flag is set to true
-    if ( boolParam(SoPlex<Real>::USEDECOMPDUALSIMPLEX) )
+    if ( boolParam(SoPlexBase<Real>::USEDECOMPDUALSIMPLEX) )
       {
-        setIntParam(SoPlex<Real>::SOLVEMODE, SOLVEMODE_REAL);
-        setIntParam(SoPlex<Real>::REPRESENTATION, REPRESENTATION_ROW);
-        setIntParam(SoPlex<Real>::ALGORITHM, ALGORITHM_DUAL);
-        //setBoolParam(SoPlex<Real>::PERSISTENTSCALING, false);
+        setIntParam(SoPlexBase<Real>::SOLVEMODE, SOLVEMODE_REAL);
+        setIntParam(SoPlexBase<Real>::REPRESENTATION, REPRESENTATION_ROW);
+        setIntParam(SoPlexBase<Real>::ALGORITHM, ALGORITHM_DUAL);
+        //setBoolParam(SoPlexBase<Real>::PERSISTENTSCALING, false);
 
         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
         _solveDecompositionDualSimplex();
       }
     // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-    else if( intParam(SoPlex<Real>::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlex<Real>::SOLVEMODE) == SOLVEMODE_AUTO
-                                                                  && GE(realParam(SoPlex<Real>::FEASTOL), 1e-9) && GE(realParam(SoPlex<Real>::OPTTOL), 1e-9)) )
+    else if( intParam(SoPlexBase<Real>::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlexBase<Real>::SOLVEMODE) == SOLVEMODE_AUTO
+                                                                  && GE(realParam(SoPlexBase<Real>::FEASTOL), 1e-9) && GE(realParam(SoPlexBase<Real>::OPTTOL), 1e-9)) )
       {
         // ensure that tolerances are reasonable for the floating-point solver
-        if( realParam(SoPlex<Real>::FEASTOL) < _currentSettings->realParam.lower[SoPlex<Real>::FPFEASTOL] )
+        if( realParam(SoPlexBase<Real>::FEASTOL) < _currentSettings->realParam.lower[SoPlexBase<Real>::FPFEASTOL] )
           {
             MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with feasibility tolerance below "
-                         << _currentSettings->realParam.lower[SoPlex<Real>::FPFEASTOL] << " - relaxing tolerance\n");
-            _solver.setFeastol(_currentSettings->realParam.lower[SoPlex<Real>::FPFEASTOL]);
+                         << _currentSettings->realParam.lower[SoPlexBase<Real>::FPFEASTOL] << " - relaxing tolerance\n");
+            _solver.setFeastol(_currentSettings->realParam.lower[SoPlexBase<Real>::FPFEASTOL]);
           }
         else
-          _solver.setFeastol(realParam(SoPlex<Real>::FEASTOL));
+          _solver.setFeastol(realParam(SoPlexBase<Real>::FEASTOL));
 
-        if( realParam(SoPlex<Real>::OPTTOL) < _currentSettings->realParam.lower[SoPlex<Real>::FPOPTTOL] )
+        if( realParam(SoPlexBase<Real>::OPTTOL) < _currentSettings->realParam.lower[SoPlexBase<Real>::FPOPTTOL] )
           {
             MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with optimality tolerance below "
-                         << _currentSettings->realParam.lower[SoPlex<Real>::FPOPTTOL] << " - relaxing tolerance\n");
-            _solver.setOpttol(_currentSettings->realParam.lower[SoPlex<Real>::FPOPTTOL]);
+                         << _currentSettings->realParam.lower[SoPlexBase<Real>::FPOPTTOL] << " - relaxing tolerance\n");
+            _solver.setOpttol(_currentSettings->realParam.lower[SoPlexBase<Real>::FPOPTTOL]);
           }
         else
-          _solver.setOpttol(realParam(SoPlex<Real>::OPTTOL));
+          _solver.setOpttol(realParam(SoPlexBase<Real>::OPTTOL));
 
         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
@@ -3572,12 +3572,12 @@ namespace soplex
         _checkBasisScaling();
 #endif
       }
-    else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    else if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       {
         _syncLPRational();
         _optimizeRational();
       }
-    else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_MANUAL )
+    else if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_MANUAL )
       {
 #ifdef ENABLE_ADDITIONAL_CHECKS
         assert(areLPsInSync(true, true, false));
@@ -3614,13 +3614,13 @@ namespace soplex
 
   /// is stored primal solution feasible?
   template <>
-	bool SoPlex<Real>::isPrimalFeasible() const
+	bool SoPlexBase<Real>::isPrimalFeasible() const
   {
     return (_hasSolReal && _solReal.isPrimalFeasible());
   }
 
   template <>
-	bool SoPlex<Rational>::isPrimalFeasible() const
+	bool SoPlexBase<Rational>::isPrimalFeasible() const
   {
     return (_hasSolRational && _solRational.isPrimalFeasible());
   }
@@ -3629,20 +3629,20 @@ namespace soplex
 
   /// is a primal feasible solution available?
   template <>
-	bool SoPlex<Real>::hasPrimal() const
+	bool SoPlexBase<Real>::hasPrimal() const
   {
     return _hasSolReal || _hasSolRational;
   }
 
   template <>
-	bool SoPlex<Rational>::hasPrimal() const // might need a fix
+	bool SoPlexBase<Rational>::hasPrimal() const // might need a fix
   {
     return _hasSolRational;
   }
 
   /// is a primal unbounded ray available?
   template <>
-	bool SoPlex<Real>::hasPrimalRay() const
+	bool SoPlexBase<Real>::hasPrimalRay() const
   {
     return (_hasSolReal && _solReal.hasPrimalRay()) || (_hasSolRational && _solRational.hasPrimalRay());
   }
@@ -3651,7 +3651,7 @@ namespace soplex
 
   /// Old code for isDualFeasible() #template remove later
   // template <>
-	// bool SoPlex<Real>::isDualFeasible() const
+	// bool SoPlexBase<Real>::isDualFeasible() const
   // {
   //   return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
 
@@ -3659,33 +3659,33 @@ namespace soplex
 
   /// is stored dual solution feasible?
   template<>
-  bool SoPlex<Real>::isDualFeasible() const
+  bool SoPlexBase<Real>::isDualFeasible() const
   {
     return (_hasSolReal && _solReal.isDualFeasible());
   }
 
   template <>
-  bool SoPlex<Rational>::isDualFeasible() const
+  bool SoPlexBase<Rational>::isDualFeasible() const
   {
     return (_hasSolRational && _solRational.isDualFeasible());
   }
 
   /// is a dual feasible solution available?
   template <>
-	bool SoPlex<Real>::hasDual() const
+	bool SoPlexBase<Real>::hasDual() const
   {
     return _hasSolReal || _hasSolRational;
   }
 
   template <>
-	bool SoPlex<Rational>::hasDual() const // might neeed a fix
+	bool SoPlexBase<Rational>::hasDual() const // might neeed a fix
   {
     return _hasSolRational;
   }
 
   /// is Farkas proof of infeasibility available?
   template <>
-	bool SoPlex<Real>::hasDualFarkas() const
+	bool SoPlexBase<Real>::hasDualFarkas() const
   {
     return (_hasSolReal && _solReal.hasDualFarkas()) || (_hasSolRational && _solRational.hasDualFarkas());
   }
@@ -3694,15 +3694,15 @@ namespace soplex
 
   /// returns the objective value if a primal or dual solution is available
   template <>
-  Real SoPlex<Real>::objValueReal()
+  Real SoPlexBase<Real>::objValueReal()
   {
     assert(OBJSENSE_MAXIMIZE == 1);
     assert(OBJSENSE_MINIMIZE == -1);
 
     if( status() == SPxSolver<Real>::UNBOUNDED )
-      return realParam(SoPlex<Real>::INFTY) * intParam(SoPlex<Real>::OBJSENSE);
+      return realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
     else if( status() == SPxSolver<Real>::INFEASIBLE )
-      return -realParam(SoPlex<Real>::INFTY) * intParam(SoPlex<Real>::OBJSENSE);
+      return -realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
     else if( hasPrimal() || hasDual() )
       {
         _syncRealSolution();
@@ -3716,7 +3716,7 @@ namespace soplex
 
   /// gets the primal solution vector if available; returns true on success
   template <>
-	bool SoPlex<Real>::getPrimalT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getPrimalT(VectorBase<Real>& vector)
   {
     if( hasPrimal() && vector.dim() >= numColsT() )
       {
@@ -3732,7 +3732,7 @@ namespace soplex
 
   /// gets the vector of slack values if available; returns true on success
   template <>
-	bool SoPlex<Real>::getSlacksReal(VectorReal& vector)
+	bool SoPlexBase<Real>::getSlacksReal(VectorReal& vector)
   {
     if( hasPrimal() && vector.dim() >= numRowsT() )
       {
@@ -3748,7 +3748,7 @@ namespace soplex
 
   /// gets the primal ray if available; returns true on success
   template <>
-	bool SoPlex<Real>::getPrimalRayT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getPrimalRayT(VectorBase<Real>& vector)
   {
     if( hasPrimalRay() && vector.dim() >= numColsT() )
       {
@@ -3764,7 +3764,7 @@ namespace soplex
 
   /// gets the dual solution vector if available; returns true on success
   template <>
-	bool SoPlex<Real>::getDualT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getDualT(VectorBase<Real>& vector)
   {
     if( hasDual() && vector.dim() >= numRowsT() )
       {
@@ -3780,7 +3780,7 @@ namespace soplex
 
   /// gets the vector of reduced cost values if available; returns true on success
   template <>
-	bool SoPlex<Real>::getRedCostT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getRedCostT(VectorBase<Real>& vector)
   {
     if( hasDual() && vector.dim() >= numColsT() )
       {
@@ -3796,7 +3796,7 @@ namespace soplex
 
   /// gets the Farkas proof if available; returns true on success
   template <>
-	bool SoPlex<Real>::getDualFarkasT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getDualFarkasT(VectorBase<Real>& vector)
   {
     if( hasDualFarkas() && vector.dim() >= numRowsT() )
       {
@@ -3812,7 +3812,7 @@ namespace soplex
 
   /// gets violation of bounds; returns true on success
   template <>
-	bool SoPlex<Real>::getBoundViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getBoundViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
@@ -3852,7 +3852,7 @@ namespace soplex
 
   /// gets violation of constraints; returns true on success
   template <>
-	bool SoPlex<Real>::getRowViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getRowViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
@@ -3894,20 +3894,20 @@ namespace soplex
   /// is an advanced starting basis available?
   /// #template #baseclass
   template <>
-	bool SoPlex<Real>::hasBasis() const
+	bool SoPlexBase<Real>::hasBasis() const
   {
     return _hasBasis;
   }
 
   template <>
-	bool SoPlex<Rational>::hasBasis() const
+	bool SoPlexBase<Rational>::hasBasis() const
   {
     return _hasBasis;
   }
 
   /// gets violation of reduced costs; returns true on success
   template <>
-	bool SoPlex<Real>::getRedCostViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getRedCostViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
@@ -3923,7 +3923,7 @@ namespace soplex
       {
         typename SPxSolver<Real>::VarStatus colStatus = basisColStatus(c);
 
-        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( colStatus != SPxSolver<Real>::ON_UPPER && colStatus != SPxSolver<Real>::FIXED && redcost[c] < 0.0 )
               {
@@ -3962,7 +3962,7 @@ namespace soplex
 
   /// gets violation of dual multipliers; returns true on success
   template <>
-	bool SoPlex<Real>::getDualViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getDualViolationT(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
@@ -3978,7 +3978,7 @@ namespace soplex
       {
         typename SPxSolver<Real>::VarStatus rowStatus = basisRowStatus(r);
 
-        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( rowStatus != SPxSolver<Real>::ON_UPPER && rowStatus != SPxSolver<Real>::FIXED && dual[r] < 0.0 )
               {
@@ -4017,21 +4017,21 @@ namespace soplex
 
   /// returns the objective value if a primal or dual solution is available
   template <>
-  Rational SoPlex<Real>::objValueRational()
+  Rational SoPlexBase<Real>::objValueRational()
   {
     assert(OBJSENSE_MAXIMIZE == 1);
     assert(OBJSENSE_MINIMIZE == -1);
 
     if( status() == SPxSolver<Real>::UNBOUNDED )
       {
-        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
+        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
           return _rationalPosInfty;
         else
           return _rationalNegInfty;
       }
     else if( status() == SPxSolver<Real>::INFEASIBLE )
       {
-        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
+        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
           return _rationalNegInfty;
         else
           return _rationalPosInfty;
@@ -4048,7 +4048,7 @@ namespace soplex
 
   /// gets the primal solution vector if available; returns true on success
   template <>
-	bool SoPlex<Real>::getPrimalRational(VectorBase<Rational>& vector)
+	bool SoPlexBase<Real>::getPrimalRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsT() )
       {
@@ -4062,7 +4062,7 @@ namespace soplex
 
   /// gets the vector of slack values if available; returns true on success
   template <>
-	bool SoPlex<Real>::getSlacksRational(VectorRational& vector)
+	bool SoPlexBase<Real>::getSlacksRational(VectorRational& vector)
   {
     if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsT() )
       {
@@ -4078,7 +4078,7 @@ namespace soplex
 
   /// gets the primal ray if LP is unbounded; returns true on success
   // template <>
-	// bool SoPlex<Rational>::getPrimalRayT(VectorBase<Rational>& vector)
+	// bool SoPlexBase<Rational>::getPrimalRayT(VectorBase<Rational>& vector)
   // {
   //   if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
   //     {
@@ -4091,7 +4091,7 @@ namespace soplex
   // }
 
   template <>
-	bool SoPlex<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
+	bool SoPlexBase<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
       {
@@ -4107,7 +4107,7 @@ namespace soplex
 
   /// gets the dual solution vector if available; returns true on success
   template <>
-	bool SoPlex<Real>::getDualRational(VectorBase<Rational>& vector)
+	bool SoPlexBase<Real>::getDualRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsT() )
       {
@@ -4123,7 +4123,7 @@ namespace soplex
 
   /// gets the vector of reduced cost values if available; returns true on success
   template <>
-	bool SoPlex<Real>::getRedCostRational(VectorRational& vector)
+	bool SoPlexBase<Real>::getRedCostRational(VectorRational& vector)
   {
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsT() )
       {
@@ -4137,7 +4137,7 @@ namespace soplex
 
   /// gets the Farkas proof if LP is infeasible; returns true on success
   template <>
-	bool SoPlex<Real>::getDualFarkasRational(VectorBase<Rational>& vector)
+	bool SoPlexBase<Real>::getDualFarkasRational(VectorBase<Rational>& vector)
   {
     if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsT() )
       {
@@ -4153,13 +4153,13 @@ namespace soplex
 
   /// gets violation of bounds; returns true on success
   template <>
-	bool SoPlex<Real>::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
+	bool SoPlexBase<Real>::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4205,13 +4205,13 @@ namespace soplex
 
   /// gets violation of constraints; returns true on success
   template <>
-	bool SoPlex<Real>::getRowViolationRational(Rational& maxviol, Rational& sumviol)
+	bool SoPlexBase<Real>::getRowViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4259,13 +4259,13 @@ namespace soplex
 
   /// gets violation of reduced costs; returns true on success
   template <>
-	bool SoPlex<Real>::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
+	bool SoPlexBase<Real>::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isPrimalFeasible() || !isDualFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4290,7 +4290,7 @@ namespace soplex
         assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::FIXED || _solRational._primal[c] == lowerRational(c));
         assert(!_hasBasis || basisColStatus(c) != SPxSolver<Real>::FIXED || _solRational._primal[c] == upperRational(c));
 
-        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( _solRational._primal[c] != upperRational(c) && redcost[c] < 0 )
               {
@@ -4341,13 +4341,13 @@ namespace soplex
 
   /// gets violation of dual multipliers; returns true on success
   template <>
-	bool SoPlex<Real>::getDualViolationRational(Rational& maxviol, Rational& sumviol)
+	bool SoPlexBase<Real>::getDualViolationRational(Rational& maxviol, Rational& sumviol)
   {
     if( !isDualFeasible() || !isPrimalFeasible() )
       return false;
 
     // if we have to synchronize, we do not measure time, because this would affect the solving statistics
-    if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       _syncLPRational(false);
 
     _syncRationalSolution();
@@ -4372,7 +4372,7 @@ namespace soplex
         assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
         assert(!_hasBasis || basisRowStatus(r) != SPxSolver<Real>::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
 
-        if( intParam(SoPlex<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MINIMIZE )
           {
             if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] < 0 )
               {
@@ -4440,7 +4440,7 @@ namespace soplex
 #ifdef SOPLEX_WITH_GMP
   /// gets the primal solution vector if available; returns true on success
   template <>
-	bool SoPlex<Real>::getPrimalRational(mpq_t* vector, const int size)
+	bool SoPlexBase<Real>::getPrimalRational(mpq_t* vector, const int size)
   {
     assert(size >= numColsT());
 
@@ -4458,7 +4458,7 @@ namespace soplex
 
   /// gets the vector of slack values if available; returns true on success
   template <>
-	bool SoPlex<Real>::getSlacksRational(mpq_t* vector, const int size)
+	bool SoPlexBase<Real>::getSlacksRational(mpq_t* vector, const int size)
   {
     assert(size >= numRowsT());
 
@@ -4477,7 +4477,7 @@ namespace soplex
 
   /// gets the primal ray if LP is unbounded; returns true on success
   template <>
-	bool SoPlex<Real>::getPrimalRayRational(mpq_t* vector, const int size)
+	bool SoPlexBase<Real>::getPrimalRayRational(mpq_t* vector, const int size)
   {
     assert(size >= numColsT());
 
@@ -4496,7 +4496,7 @@ namespace soplex
 
   /// gets the dual solution vector if available; returns true on success
   template <>
-	bool SoPlex<Real>::getDualRational(mpq_t* vector, const int size)
+	bool SoPlexBase<Real>::getDualRational(mpq_t* vector, const int size)
   {
     assert(size >= numRowsT());
 
@@ -4515,7 +4515,7 @@ namespace soplex
 
   /// gets the vector of reduced cost values if available; returns true on success
   template <>
-	bool SoPlex<Real>::getRedCostRational(mpq_t* vector, const int size)
+	bool SoPlexBase<Real>::getRedCostRational(mpq_t* vector, const int size)
   {
     assert(size >= numColsT());
 
@@ -4534,7 +4534,7 @@ namespace soplex
 
   /// gets the Farkas proof if LP is infeasible; returns true on success
   template <>
-	bool SoPlex<Real>::getDualFarkasRational(mpq_t* vector, const int size)
+	bool SoPlexBase<Real>::getDualFarkasRational(mpq_t* vector, const int size)
   {
     assert(size >= numRowsT());
 
@@ -4554,7 +4554,7 @@ namespace soplex
 
   /// get size of primal solution
   template <>
-  int SoPlex<Real>::totalSizePrimalRational(const int base)
+  int SoPlexBase<Real>::totalSizePrimalRational(const int base)
   {
     if( hasPrimal() || hasPrimalRay() )
       {
@@ -4569,7 +4569,7 @@ namespace soplex
 
   /// get size of dual solution
   template <>
-  int SoPlex<Real>::totalSizeDualRational(const int base)
+  int SoPlexBase<Real>::totalSizeDualRational(const int base)
   {
     if( hasDual() || hasDualFarkas() )
       {
@@ -4584,7 +4584,7 @@ namespace soplex
 
   /// get size of least common multiple of denominators in primal solution
   template <>
-  int SoPlex<Real>::dlcmSizePrimalRational(const int base)
+  int SoPlexBase<Real>::dlcmSizePrimalRational(const int base)
   {
     if( hasPrimal() || hasPrimalRay() )
       {
@@ -4599,7 +4599,7 @@ namespace soplex
 
   /// get size of least common multiple of denominators in dual solution
   template <>
-  int SoPlex<Real>::dlcmSizeDualRational(const int base)
+  int SoPlexBase<Real>::dlcmSizeDualRational(const int base)
   {
     if( hasDual() || hasDualFarkas() )
       {
@@ -4614,7 +4614,7 @@ namespace soplex
 
   /// get size of largest denominator in primal solution
   template <>
-  int SoPlex<Real>::dmaxSizePrimalRational(const int base)
+  int SoPlexBase<Real>::dmaxSizePrimalRational(const int base)
   {
     if( hasPrimal() || hasPrimalRay() )
       {
@@ -4629,7 +4629,7 @@ namespace soplex
 
   /// get size of largest denominator in dual solution
   template <>
-	int SoPlex<Real>::dmaxSizeDualRational(const int base)
+	int SoPlexBase<Real>::dmaxSizeDualRational(const int base)
   {
     if( hasDual() || hasDualFarkas() )
       {
@@ -4642,7 +4642,7 @@ namespace soplex
 
   /// returns the current basis status
   template <>
-  typename SPxBasis<Real>::SPxStatus SoPlex<Real>::basisStatus() const
+  typename SPxBasis<Real>::SPxStatus SoPlexBase<Real>::basisStatus() const
   {
     if( !hasBasis() )
       return SPxBasis<Real>::NO_PROBLEM;
@@ -4664,7 +4664,7 @@ namespace soplex
 
   /// returns basis status for a single row
   template <>
-  typename SPxSolver<Real>::VarStatus SoPlex<Real>::basisRowStatus(int row) const
+  typename SPxSolver<Real>::VarStatus SoPlexBase<Real>::basisRowStatus(int row) const
   {
     assert(row >= 0);
     assert(row < numRowsT());
@@ -4690,7 +4690,7 @@ namespace soplex
 
   /// returns basis status for a single column
   template <>
-  typename SPxSolver<Real>::VarStatus SoPlex<Real>::basisColStatus(int col) const
+  typename SPxSolver<Real>::VarStatus SoPlexBase<Real>::basisColStatus(int col) const
   {
     assert(col >= 0);
     assert(col < numColsT());
@@ -4703,9 +4703,9 @@ namespace soplex
     // if no basis is available, return slack basis
     else if( !hasBasis() )
       {
-        if( lowerReal(col) > -realParam(SoPlex<Real>::INFTY) )
+        if( lowerReal(col) > -realParam(SoPlexBase<Real>::INFTY) )
           return SPxSolver<Real>::ON_LOWER;
-        else if( upperReal(col) < realParam(SoPlex<Real>::INFTY) )
+        else if( upperReal(col) < realParam(SoPlexBase<Real>::INFTY) )
           return SPxSolver<Real>::ON_UPPER;
         else
           return SPxSolver<Real>::ZERO;
@@ -4728,7 +4728,7 @@ namespace soplex
   /// gets current basis
   /// #template #temp
   template <>
-  void SoPlex<Real>::getBasis(typename SPxSolver<Real>::VarStatus rows[], typename SPxSolver<Real>::VarStatus cols[]) const
+  void SoPlexBase<Real>::getBasis(typename SPxSolver<Real>::VarStatus rows[], typename SPxSolver<Real>::VarStatus cols[]) const
   {
     // if no basis is available, return slack basis
     if( !hasBasis() )
@@ -4738,9 +4738,9 @@ namespace soplex
 
         for( int i = numColsT() - 1; i >= 0; i-- )
           {
-            if( lowerReal(i) > -realParam(SoPlex<Real>::INFTY) )
+            if( lowerReal(i) > -realParam(SoPlexBase<Real>::INFTY) )
               cols[i] = SPxSolver<Real>::ON_LOWER;
-            else if( upperReal(i) < realParam(SoPlex<Real>::INFTY) )
+            else if( upperReal(i) < realParam(SoPlexBase<Real>::INFTY) )
               cols[i] = SPxSolver<Real>::ON_UPPER;
             else
               cols[i] = SPxSolver<Real>::ZERO;
@@ -4769,7 +4769,7 @@ namespace soplex
 
   /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
   template <>
-  void SoPlex<Real>::getBasisInd(int* bind) const
+  void SoPlexBase<Real>::getBasisInd(int* bind) const
   {
     // if no basis is available, return slack basis
     if( !hasBasis() )
@@ -4852,7 +4852,7 @@ namespace soplex
   /// type = 2: product of diagonal elements
   /// #template #temp 
   template <>
-	bool SoPlex<Real>::getFastCondition(Real& condition, int type)
+	bool SoPlexBase<Real>::getFastCondition(Real& condition, int type)
   {
     _ensureRealLPLoaded();
     if( !_isRealLPLoaded )
@@ -4868,7 +4868,7 @@ namespace soplex
 
   /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
   template <>
-	bool SoPlex<Real>::getEstimatedCondition(Real& condition)
+	bool SoPlexBase<Real>::getEstimatedCondition(Real& condition)
   {
     _ensureRealLPLoaded();
     if( !_isRealLPLoaded )
@@ -4884,7 +4884,7 @@ namespace soplex
 
   /// computes the exact condition number for the current basis matrix using the power method; returns true on success
   template <>
-	bool SoPlex<Real>::getExactCondition(Real& condition)
+	bool SoPlexBase<Real>::getExactCondition(Real& condition)
   {
     _ensureRealLPLoaded();
     if( !_isRealLPLoaded )
@@ -4900,7 +4900,7 @@ namespace soplex
 
   /// computes row r of basis inverse; returns true on success
   template <>
-	bool SoPlex<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int* ninds, bool unscale)
+	bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int* ninds, bool unscale)
   {
     assert(r >= 0);
     assert(r < numRowsT());
@@ -4960,7 +4960,7 @@ namespace soplex
         // copy sparse data to dense result vector based on coef array
         if( ninds != 0 && inds != 0 )
           {
-            // during solving SoPlex may have destroyed the sparsity structure so we need to restore it
+            // during solving SoPlexBase may have destroyed the sparsity structure so we need to restore it
             x.setup();
             *ninds = x.size();
             for( int i = 0; i < *ninds; ++i )
@@ -5087,7 +5087,7 @@ namespace soplex
   /// computes column c of basis inverse; returns true on success
   /// @todo does not work correctly for the row representation
   template <>
-	bool SoPlex<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
+	bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
   {
     assert(c >= 0);
     assert(c < numRowsT());
@@ -5152,7 +5152,7 @@ namespace soplex
         // copy sparse data to dense result vector based on coef array
         if( ninds != 0 && inds != 0 )
           {
-            // SoPlex may have destroyed the sparsity structure so we need to restore it
+            // SoPlexBase may have destroyed the sparsity structure so we need to restore it
             x.setup();
             *ninds = x.size();
             for( int i = 0; i < *ninds; ++i )
@@ -5293,7 +5293,7 @@ namespace soplex
 
   /// computes dense solution of basis matrix B * sol = rhs; returns true on success
   template <>
-	bool SoPlex<Real>::getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale)
+	bool SoPlexBase<Real>::getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale)
   {
     VectorReal v(numRowsT(), rhs);
     VectorReal x(numRowsT(), sol);
@@ -5459,7 +5459,7 @@ namespace soplex
 
   /// multiply with basis matrix; B * vec (inplace)
   template <>
-	bool SoPlex<Real>::multBasis(Real* vec, bool unscale)
+	bool SoPlexBase<Real>::multBasis(Real* vec, bool unscale)
   {
     if( !hasBasis() )
       return false;
@@ -5570,7 +5570,7 @@ namespace soplex
 
   /// multiply with transpose of basis matrix; vec * B^T (inplace)
   template <>
-	bool SoPlex<Real>::multBasisTranspose(Real* vec, bool unscale)
+	bool SoPlexBase<Real>::multBasisTranspose(Real* vec, bool unscale)
   {
     if( !hasBasis() )
       return false;
@@ -5679,7 +5679,7 @@ namespace soplex
 
   /// compute rational basis inverse; returns true on success
   template <>
-	bool SoPlex<Real>::computeBasisInverseRational()
+	bool SoPlexBase<Real>::computeBasisInverseRational()
   {
     if( !hasBasis() )
       {
@@ -5708,7 +5708,7 @@ namespace soplex
   /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
   /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
   template <>
-	bool SoPlex<Real>::getBasisIndRational(DataArray<int>& bind)
+	bool SoPlexBase<Real>::getBasisIndRational(DataArray<int>& bind)
   {
     if( _rationalLUSolver.status() != SLinSolverRational::OK )
       computeBasisInverseRational();
@@ -5725,7 +5725,7 @@ namespace soplex
 
   /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
   template <>
-	bool SoPlex<Real>::getBasisInverseRowRational(const int r, SSVectorRational& vec)
+	bool SoPlexBase<Real>::getBasisInverseRowRational(const int r, SSVectorRational& vec)
   {
     if( _rationalLUSolver.status() != SLinSolverRational::OK )
       computeBasisInverseRational();
@@ -5750,7 +5750,7 @@ namespace soplex
 
   /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
   template <>
-	bool SoPlex<Real>::getBasisInverseColRational(const int c, SSVectorRational& vec)
+	bool SoPlexBase<Real>::getBasisInverseColRational(const int c, SSVectorRational& vec)
   {
     if( _rationalLUSolver.status() != SLinSolverRational::OK )
       computeBasisInverseRational();
@@ -5776,7 +5776,7 @@ namespace soplex
   /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
   /// on success
   template <>
-	bool SoPlex<Real>::getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol)
+	bool SoPlexBase<Real>::getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol)
   {
     if( _rationalLUSolver.status() != SLinSolverRational::OK )
       computeBasisInverseRational();
@@ -5801,7 +5801,7 @@ namespace soplex
 
   /// sets starting basis via arrays of statuses
   template <>
-  void SoPlex<Real>::setBasis(const typename SPxSolver<Real>::VarStatus rows[], const typename SPxSolver<Real>::VarStatus cols[])
+  void SoPlexBase<Real>::setBasis(const typename SPxSolver<Real>::VarStatus rows[], const typename SPxSolver<Real>::VarStatus cols[])
   {
     _rationalLUSolver.clear();
 
@@ -5832,7 +5832,7 @@ namespace soplex
 
   /// clears starting basis
   template <>
-  void SoPlex<Real>::clearBasis()
+  void SoPlexBase<Real>::clearBasis()
   {
     _solver.reLoad();
     _status = _solver.status();
@@ -5844,7 +5844,7 @@ namespace soplex
 
   /// number of iterations since last call to solve
   template <>
-	int SoPlex<Real>::numIterations() const
+	int SoPlexBase<Real>::numIterations() const
   {
     return _statistics->iterations;
   }
@@ -5853,7 +5853,7 @@ namespace soplex
 
   /// time spent in last call to solve
   template <>
-  Real SoPlex<Real>::solveTime() const
+  Real SoPlexBase<Real>::solveTime() const
   {
     return _statistics->solvingTime->time();
   }
@@ -5862,7 +5862,7 @@ namespace soplex
 
   /// statistical information in form of a string
   template <>
-  std::string SoPlex<Real>::statisticString() const
+  std::string SoPlexBase<Real>::statisticString() const
   {
     std::stringstream s;
     s  << "Factorizations     : " << std::setw(10) << _statistics->luFactorizationsReal << std::endl
@@ -5879,7 +5879,7 @@ namespace soplex
 
   /// name of starter
   template <>
-  const char* SoPlex<Real>::getStarterName()
+  const char* SoPlexBase<Real>::getStarterName()
   {
     if( _starter )
       return _starter->getName();
@@ -5891,7 +5891,7 @@ namespace soplex
 
   /// name of simplifier
   template <>
-  const char* SoPlex<Real>::getSimplifierName()
+  const char* SoPlexBase<Real>::getSimplifierName()
   {
     if( _simplifier )
       return _simplifier->getName();
@@ -5903,7 +5903,7 @@ namespace soplex
 
   /// name of scaling method after simplifier
   template <>
-  const char* SoPlex<Real>::getScalerName()
+  const char* SoPlexBase<Real>::getScalerName()
   {
     if( _scaler )
       return _scaler->getName();
@@ -5915,7 +5915,7 @@ namespace soplex
 
   /// name of currently loaded pricer
   template <>
-  const char* SoPlex<Real>::getPricerName()
+  const char* SoPlexBase<Real>::getPricerName()
   {
     return _solver.pricer()->getName();
   }
@@ -5924,7 +5924,7 @@ namespace soplex
 
   /// name of currently loaded ratiotester
   template <>
-  const char* SoPlex<Real>::getRatiotesterName()
+  const char* SoPlexBase<Real>::getRatiotesterName()
   {
     return _solver.ratiotester()->getName();
   }
@@ -5935,10 +5935,10 @@ namespace soplex
   /// integer variables if desired; returns true on success
 
   // template <>
-	// bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+	// bool SoPlexBase<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   // {
   //   bool success = false;
-  //   if( intParam(SoPlex<Real>::READMODE) == READMODE_REAL )
+  //   if( intParam(SoPlexBase<Real>::READMODE) == READMODE_REAL )
   //     success = _readFileReal(filename, rowNames, colNames, intVars);
   //   else
   //     success = _readFileRational(filename, rowNames, colNames, intVars);
@@ -5951,10 +5951,10 @@ namespace soplex
   // }
 
   template <>
-  bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+  bool SoPlexBase<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   {
     bool success = false;
-    if( intParam(SoPlex::READMODE) == READMODE_REAL )
+    if( intParam(SoPlexBase::READMODE) == READMODE_REAL )
       success = _readFileReal(filename, rowNames, colNames, intVars);
     else
       success = _readFileRational(filename, rowNames, colNames, intVars);
@@ -5968,7 +5968,7 @@ namespace soplex
 
   // // The proper templated version of the above function
   // template <>
-	// bool SoPlex<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+	// bool SoPlexBase<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   // {
   //   bool success = false;
 
@@ -5982,7 +5982,7 @@ namespace soplex
   // }
 
   // template <>
-	// bool SoPlex<Rational>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+	// bool SoPlexBase<Rational>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   // {
   //   bool success = false;
   //   success = _readFileRational(filename, rowNames, colNames, intVars);
@@ -5999,7 +5999,7 @@ namespace soplex
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
   /// marked as integer; returns true on success
   template <>
-	bool SoPlex<Real>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<Real>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
     ///@todo implement return value
     if( unscale && _realLP->isScaled() )
@@ -6027,9 +6027,9 @@ namespace soplex
   /// marked as integer; returns true on success
   /// Here unscale is just a junk variable that is used to match the type with the real write function
   template <>
-	bool SoPlex<Rational>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<Rational>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
-    if( intParam(SoPlex<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return false;
     else
       {
@@ -6047,7 +6047,7 @@ namespace soplex
   /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
   /// the variables contained in it are marked as integer; returns true on success
   template <>
-	bool SoPlex<Real>::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+	bool SoPlexBase<Real>::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
   {
     SPxLPReal dualLP;
     _realLP->buildDualProblem(dualLP);
@@ -6064,7 +6064,7 @@ namespace soplex
   /// default names are assumed; returns true on success
   /// #template #baseclass
   template <>
-  bool SoPlex<Real>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+  bool SoPlexBase<Real>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
   {
     clearBasis();
     /// @todo can't we just remove the else code?
@@ -6161,9 +6161,9 @@ namespace soplex
       {
         if( lowerRealInternal(i) == upperRealInternal(i) )
           _basisStatusCols[i] = SPxSolver<Real>::FIXED;
-        else if( lowerRealInternal(i) <= double(-realParam(SoPlex<Real>::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlex<Real>::INFTY)) )
+        else if( lowerRealInternal(i) <= double(-realParam(SoPlexBase<Real>::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlexBase<Real>::INFTY)) )
           _basisStatusCols[i] = SPxSolver<Real>::ZERO;
-        else if( lowerRealInternal(i) <= double(-realParam(SoPlex<Real>::INFTY)) )
+        else if( lowerRealInternal(i) <= double(-realParam(SoPlexBase<Real>::INFTY)) )
           _basisStatusCols[i] = SPxSolver<Real>::ON_UPPER;
         else
           _basisStatusCols[i] = SPxSolver<Real>::ON_LOWER;
@@ -6199,9 +6199,9 @@ namespace soplex
             if( !strcmp(mps.field1(), "XU") )
               {
                 _basisStatusCols[c] = SPxSolver<Real>::BASIC;
-                if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_LOWER )
+                if( _rowTypes[r] == SoPlexBase<Real>::RANGETYPE_LOWER )
                   _basisStatusRows[r] = SPxSolver<Real>::ON_LOWER;
-                else if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_FIXED )
+                else if( _rowTypes[r] == SoPlexBase<Real>::RANGETYPE_FIXED )
                   _basisStatusRows[r] = SPxSolver<Real>::FIXED;
                 else
                   _basisStatusRows[r] = SPxSolver<Real>::ON_UPPER;
@@ -6209,9 +6209,9 @@ namespace soplex
             else if( !strcmp(mps.field1(), "XL") )
               {
                 _basisStatusCols[c] = SPxSolver<Real>::BASIC;
-                if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_UPPER )
+                if( _rowTypes[r] == SoPlexBase<Real>::RANGETYPE_UPPER )
                   _basisStatusRows[r] = SPxSolver<Real>::ON_UPPER;
-                else if( _rowTypes[r] == SoPlex<Real>::RANGETYPE_FIXED )
+                else if( _rowTypes[r] == SoPlexBase<Real>::RANGETYPE_FIXED )
                   _basisStatusRows[r] = SPxSolver<Real>::FIXED;
                 else
                   _basisStatusRows[r] = SPxSolver<Real>::ON_LOWER;
@@ -6259,7 +6259,7 @@ namespace soplex
   /// returns true on success
   /// #baseclass
   template <>
-	bool SoPlex<Real>::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+	bool SoPlexBase<Real>::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
   {
     assert(filename != 0);
 
@@ -6302,7 +6302,7 @@ namespace soplex
 
                 assert(row != numRows);
 
-                if( _basisStatusRows[row] == SPxSolver<Real>::ON_UPPER && (!cpxFormat || _rowTypes[row] == SoPlex<Real>::RANGETYPE_BOXED) )
+                if( _basisStatusRows[row] == SPxSolver<Real>::ON_UPPER && (!cpxFormat || _rowTypes[row] == SoPlexBase<Real>::RANGETYPE_BOXED) )
                   file << " XU ";
                 else
                   file << " XL ";
@@ -6358,7 +6358,7 @@ namespace soplex
   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
   /// default names are used
   template <>
-  void SoPlex<Real>::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+  void SoPlexBase<Real>::writeStateReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
   {
     std::string ofname;
 
@@ -6380,7 +6380,7 @@ namespace soplex
   /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
   /// default names are used
   template <>
-  void SoPlex<Real>::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+  void SoPlexBase<Real>::writeStateRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
   {
     std::string ofname;
 
@@ -6400,7 +6400,7 @@ namespace soplex
   // /// returns integer parameter value
   // // #template #baseclass
   // template <>
-	// int SoPlex<Real>::intParam(const IntParam param) const
+	// int SoPlexBase<Real>::intParam(const IntParam param) const
   // {
   //   assert(param >= 0);
   //   assert(param < INTPARAM_COUNT);
@@ -6409,7 +6409,7 @@ namespace soplex
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
   /// returns rational parameter value
-  Rational SoPlex<Real>::rationalParam(const RationalParam param) const
+  Rational SoPlexBase<Real>::rationalParam(const RationalParam param) const
   {
     assert(param >= 0);
     assert(param < RATIONALPARAM_COUNT);
@@ -6421,7 +6421,7 @@ namespace soplex
 
   /// returns current parameter settings
   template <>
-  const typename SoPlex<Real>::Settings& SoPlex<Real>::settings() const
+  const typename SoPlexBase<Real>::Settings& SoPlexBase<Real>::settings() const
   {
     return *_currentSettings;
   }
@@ -6430,10 +6430,10 @@ namespace soplex
 
   /// sets boolean parameter value; returns true on success
   template <>
-	bool SoPlex<Real>::setBoolParam(const BoolParam param, const bool value, const bool init)
+	bool SoPlexBase<Real>::setBoolParam(const BoolParam param, const bool value, const bool init)
   {
     assert(param >= 0);
-    assert(param < SoPlex<Real>::BOOLPARAM_COUNT);
+    assert(param < SoPlexBase<Real>::BOOLPARAM_COUNT);
     assert(init || _isConsistent());
 
     if( !init && value == boolParam(param) )
@@ -6483,7 +6483,7 @@ namespace soplex
 
   /// sets real parameter value; returns true on success
   template <>
-	bool SoPlex<Real>::setRealParam(const RealParam param, const Real value, const bool init)
+	bool SoPlexBase<Real>::setRealParam(const RealParam param, const Real value, const bool init)
   {
     assert(param >= 0);
     assert(param < REALPARAM_COUNT);
@@ -6501,7 +6501,7 @@ namespace soplex
     switch( param )
       {
         // primal feasibility tolerance; passed to the floating point solver only when calling solve()
-      case SoPlex<Real>::FEASTOL:
+      case SoPlexBase<Real>::FEASTOL:
 #ifndef SOPLEX_WITH_GMP
         if( value < DEFAULT_EPS_PIVOT )
           {
@@ -6515,7 +6515,7 @@ namespace soplex
         break;
 
         // dual feasibility tolerance; passed to the floating point solver only when calling solve()
-      case SoPlex<Real>::OPTTOL:
+      case SoPlexBase<Real>::OPTTOL:
 #ifndef SOPLEX_WITH_GMP
         if( value < DEFAULT_EPS_PIVOT )
           {
@@ -6529,99 +6529,99 @@ namespace soplex
         break;
 
         // general zero tolerance
-      case SoPlex<Real>::EPSILON_ZERO:
+      case SoPlexBase<Real>::EPSILON_ZERO:
         Param::setEpsilon(value);
         break;
 
         // zero tolerance used in factorization
-      case SoPlex<Real>::EPSILON_FACTORIZATION:
+      case SoPlexBase<Real>::EPSILON_FACTORIZATION:
         Param::setEpsilonFactorization(value);
         break;
 
         // zero tolerance used in update of the factorization
-      case SoPlex<Real>::EPSILON_UPDATE:
+      case SoPlexBase<Real>::EPSILON_UPDATE:
         Param::setEpsilonUpdate(value);
         break;
 
         // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
-      case SoPlex<Real>::EPSILON_PIVOT:
+      case SoPlexBase<Real>::EPSILON_PIVOT:
         Param::setEpsilonPivot(value);
         break;
 
         // infinity threshold
-      case SoPlex<Real>::INFTY:
+      case SoPlexBase<Real>::INFTY:
         _rationalPosInfty = value;
         _rationalNegInfty = -value;
-        if( intParam(SoPlex<Real>::SYNCMODE) != SYNCMODE_ONLYREAL )
+        if( intParam(SoPlexBase<Real>::SYNCMODE) != SYNCMODE_ONLYREAL )
           _recomputeRangeTypesRational();
         break;
 
         // time limit in seconds (INFTY if unlimited)
-      case SoPlex<Real>::TIMELIMIT:
+      case SoPlexBase<Real>::TIMELIMIT:
         break;
 
         // lower limit on objective value is set in solveReal()
-      case SoPlex<Real>::OBJLIMIT_LOWER:
+      case SoPlexBase<Real>::OBJLIMIT_LOWER:
         break;
 
         // upper limit on objective value is set in solveReal()
-      case SoPlex<Real>::OBJLIMIT_UPPER:
+      case SoPlexBase<Real>::OBJLIMIT_UPPER:
         break;
 
         // working tolerance for feasibility in floating-point solver
-      case SoPlex<Real>::FPFEASTOL:
+      case SoPlexBase<Real>::FPFEASTOL:
         break;
 
         // working tolerance for optimality in floating-point solver
-      case SoPlex<Real>::FPOPTTOL:
+      case SoPlexBase<Real>::FPOPTTOL:
         break;
 
         // maximum increase of scaling factors between refinements
-      case SoPlex<Real>::MAXSCALEINCR:
+      case SoPlexBase<Real>::MAXSCALEINCR:
         _rationalMaxscaleincr = value;
         break;
 
         // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
-      case SoPlex<Real>::LIFTMINVAL:
+      case SoPlexBase<Real>::LIFTMINVAL:
         break;
 
         // upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
-      case SoPlex<Real>::LIFTMAXVAL:
+      case SoPlexBase<Real>::LIFTMAXVAL:
         break;
 
         // threshold for sparse pricing
-      case SoPlex<Real>::SPARSITY_THRESHOLD:
+      case SoPlexBase<Real>::SPARSITY_THRESHOLD:
         break;
 
         // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
-      case SoPlex<Real>::REPRESENTATION_SWITCH:
+      case SoPlexBase<Real>::REPRESENTATION_SWITCH:
         break;
 
         // geometric frequency at which to apply rational reconstruction
-      case SoPlex<Real>::RATREC_FREQ:
+      case SoPlexBase<Real>::RATREC_FREQ:
         break;
 
         // minimal reduction (sum of removed rows/cols) to continue simplification
-      case SoPlex<Real>::MINRED:
+      case SoPlexBase<Real>::MINRED:
         break;
 
-      case SoPlex<Real>::REFAC_BASIS_NNZ:
+      case SoPlexBase<Real>::REFAC_BASIS_NNZ:
         break;
 
-      case SoPlex<Real>::REFAC_UPDATE_FILL:
+      case SoPlexBase<Real>::REFAC_UPDATE_FILL:
         break;
 
-      case SoPlex<Real>::REFAC_MEM_FACTOR:
+      case SoPlexBase<Real>::REFAC_MEM_FACTOR:
         break;
 
         // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
-      case SoPlex<Real>::LEASTSQ_ACRCY:
+      case SoPlexBase<Real>::LEASTSQ_ACRCY:
         if( _scaler )
           _scaler->setRealParam(value);
         break;
 
         // objective offset
-      case SoPlex<Real>::OBJ_OFFSET:
+      case SoPlexBase<Real>::OBJ_OFFSET:
         if( _realLP )
           _realLP->changeObjOffset(value);
         if( _rationalLP )
@@ -6641,7 +6641,7 @@ namespace soplex
 #ifdef SOPLEX_WITH_RATIONALPARAM
   /// sets rational parameter value; returns true on success
   template <>
-	bool SoPlex<Real>::setRationalParam(const RationalParam param, const Rational value, const bool init)
+	bool SoPlexBase<Real>::setRationalParam(const RationalParam param, const Rational value, const bool init)
   {
     assert(param >= 0);
     assert(param < RATIONALPARAM_COUNT);
@@ -6669,7 +6669,7 @@ namespace soplex
 
   /// sets parameter settings; returns true on success
   template <>
-	bool SoPlex<Real>::setSettings(const Settings& newSettings, const bool init)
+	bool SoPlexBase<Real>::setSettings(const Settings& newSettings, const bool init)
   {
     assert(init || _isConsistent());
 
@@ -6677,17 +6677,17 @@ namespace soplex
 
     *_currentSettings = newSettings;
 
-    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::BOOLPARAM_COUNT; i++ )
       success &= setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], init);
 
-    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::INTPARAM_COUNT; i++ )
       success &= setIntParam((IntParam)i, _currentSettings->_intParamValues[i], init);
 
-    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::REALPARAM_COUNT; i++ )
       success &= setRealParam((RealParam)i, _currentSettings->_realParamValues[i], init);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::RATIONALPARAM_COUNT; i++ )
       success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], init);
 #endif
 
@@ -6698,19 +6698,19 @@ namespace soplex
 
   /// resets default parameter settings
   template <>
-  void SoPlex<Real>::resetSettings(const bool quiet, const bool init)
+  void SoPlexBase<Real>::resetSettings(const bool quiet, const bool init)
   {
-    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::BOOLPARAM_COUNT; i++ )
       setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], init);
 
-    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::INTPARAM_COUNT; i++ )
       setIntParam((IntParam)i, _currentSettings->intParam.defaultValue[i], init);
 
-    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::REALPARAM_COUNT; i++ )
       setRealParam((RealParam)i, _currentSettings->realParam.defaultValue[i], init);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::RATIONALPARAM_COUNT; i++ )
       success &= setRationalParam((RationalParam)i, _currentSettings->rationalParam.defaultValue[i], init);
 #endif
   }
@@ -6719,13 +6719,13 @@ namespace soplex
   /// print non-default parameter values
   /// #template #baseclass
   template <>
-  void SoPlex<Real>::printUserSettings()
+  void SoPlexBase<Real>::printUserSettings()
   {
     bool printedValue = false;
 
     SPxOut::setFixed(spxout.getCurrentStream());
 
-    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::BOOLPARAM_COUNT; i++ )
       {
         if( _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
           continue;
@@ -6734,7 +6734,7 @@ namespace soplex
         printedValue = true;
       }
 
-    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::INTPARAM_COUNT; i++ )
       {
         if( _currentSettings->_intParamValues[i] == _currentSettings->intParam.defaultValue[i] )
           continue;
@@ -6745,7 +6745,7 @@ namespace soplex
 
     SPxOut::setScientific(spxout.getCurrentStream());
 
-    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::REALPARAM_COUNT; i++ )
       {
         if( _currentSettings->_realParamValues[i] == _currentSettings->realParam.defaultValue[i] )
           continue;
@@ -6755,7 +6755,7 @@ namespace soplex
       }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::RATIONALPARAM_COUNT; i++ )
       {
         if( _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
           continue;
@@ -6780,7 +6780,7 @@ namespace soplex
   /// writes settings file; returns true on success
   // #template #baseclass
   template <>
-	bool SoPlex<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const
+	bool SoPlexBase<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const
   {
     assert(filename != 0);
 
@@ -6794,13 +6794,13 @@ namespace soplex
 
     SPxOut::setFixed(file);
 
-    file << "# SoPlex version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
+    file << "# SoPlexBase version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
 #if SOPLEX_SUBVERSION > 0
     file << "." << SOPLEX_SUBVERSION;
 #endif
     file << "\n";
 
-    for( int i = 0; i < SoPlex<Real>::BOOLPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::BOOLPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
           continue;
@@ -6811,7 +6811,7 @@ namespace soplex
         file << "bool:" << _currentSettings->boolParam.name[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
       }
 
-    for( int i = 0; i < SoPlex<Real>::INTPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::INTPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_intParamValues[i] == _currentSettings->intParam.defaultValue[i] )
           continue;
@@ -6825,7 +6825,7 @@ namespace soplex
 
     SPxOut::setScientific(file);
 
-    for( int i = 0; i < SoPlex<Real>::REALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::REALPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_realParamValues[i] == _currentSettings->realParam.defaultValue[i] )
           continue;
@@ -6838,7 +6838,7 @@ namespace soplex
       }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-    for( int i = 0; i < SoPlex<Real>::RATIONALPARAM_COUNT; i++ )
+    for( int i = 0; i < SoPlexBase<Real>::RATIONALPARAM_COUNT; i++ )
       {
         if( onlyChanged && _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
           continue;
@@ -6867,7 +6867,7 @@ namespace soplex
   /// reads settings file; returns true on success
   /// #template #baseclass
   template <>
-	bool SoPlex<Real>::loadSettingsFile(const char* filename)
+	bool SoPlexBase<Real>::loadSettingsFile(const char* filename)
   {
     assert(filename != 0);
 
@@ -6918,7 +6918,7 @@ namespace soplex
   /// parses one setting string and returns true on success
   /// #template #temp #baseclass
   template <>
-	bool SoPlex<Real>::parseSettingsString(char* string)
+	bool SoPlexBase<Real>::parseSettingsString(char* string)
   {
     assert(string != 0);
     if( string == 0 )
@@ -7177,7 +7177,7 @@ namespace soplex
 
   /// prints solution statistics
   template <>
-  void SoPlex<Real>::printSolutionStatistics(std::ostream& os)
+  void SoPlexBase<Real>::printSolutionStatistics(std::ostream& os)
   {
     SPxOut::setScientific(os);
     if( _lastSolveMode == SOLVEMODE_REAL )
@@ -7257,7 +7257,7 @@ namespace soplex
 
   /// prints statistics on solving process
   template <>
-  void SoPlex<Real>::printSolvingStatistics(std::ostream& os)
+  void SoPlexBase<Real>::printSolvingStatistics(std::ostream& os)
   {
     assert(_statistics != 0);
     _statistics->print(os);
@@ -7267,7 +7267,7 @@ namespace soplex
 
   /// prints short statistics
   template <>
-  void SoPlex<Real>::printShortStatistics(std::ostream& os)
+  void SoPlexBase<Real>::printShortStatistics(std::ostream& os)
   {
     printStatus(os, _status);
     SPxOut::setFixed(os, 2);
@@ -7282,33 +7282,33 @@ namespace soplex
   /// prints complete statistics
   /// #template #baseclass
   template <>
-  void SoPlex<Real>::printStatistics(std::ostream& os)
+  void SoPlexBase<Real>::printStatistics(std::ostream& os)
   {
     SPxOut::setFixed(os, 2);
 
     printStatus(os, _status);
 
     os << "Original problem    : \n";
-    if ( boolParam(SoPlex<Real>::USEDECOMPDUALSIMPLEX) )
+    if ( boolParam(SoPlexBase<Real>::USEDECOMPDUALSIMPLEX) )
       printOriginalProblemStatistics(os);
     else
       {
-        if( intParam(SoPlex<Real>::READMODE) == READMODE_REAL )
+        if( intParam(SoPlexBase<Real>::READMODE) == READMODE_REAL )
           _realLP->printProblemStatistics(os);
         else
           _rationalLP->printProblemStatistics(os);
       }
 
-    os << "Objective sense     : " << (intParam(SoPlex<Real>::OBJSENSE) == SoPlex<Real>::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
+    os << "Objective sense     : " << (intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
     printSolutionStatistics(os);
     printSolvingStatistics(os);
   }
 
   /// prints status
   template <>
-  void SoPlex<Real>::printStatus(std::ostream& os, typename SPxSolver<Real>::Status stat)
+  void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolver<Real>::Status stat)
   {
-    os << "SoPlex status       : ";
+    os << "SoPlexBase status       : ";
 
     switch( stat )
       {
@@ -7373,16 +7373,16 @@ namespace soplex
 
   /// prints version and compilation options
   template <>
-  void SoPlex<Real>::printVersion() const
+  void SoPlexBase<Real>::printVersion() const
   {
     // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
-    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10
                << "." << SOPLEX_SUBVERSION );
 #else
-    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10 );
 #endif
@@ -7410,16 +7410,16 @@ namespace soplex
 
 
     template <>
-  void SoPlex<Rational>::printVersion() const
+  void SoPlexBase<Rational>::printVersion() const
   {
     // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
-    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10
                << "." << SOPLEX_SUBVERSION );
 #else
-    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10 );
 #endif
@@ -7451,7 +7451,7 @@ namespace soplex
   /// vector and matrix values only if the respective parameter is set to true.
   /// If quiet is set to true the function will only display which vectors are different.
   template <>
-	bool SoPlex<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const
+	bool SoPlexBase<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const
   {
     bool result = true;
     bool nRowsMatch = true;
@@ -7557,8 +7557,8 @@ namespace soplex
           {
             for( int i = 0; i < _realLP->rhs().dim(); i++ )
               {
-                if( (GE(_realLP->rhs()[i], realParam(SoPlex<Real>::INFTY)) != (_rationalLP->rhs()[i] >= _rationalPosInfty))
-                    || (LT(_realLP->rhs()[i], realParam(SoPlex<Real>::INFTY)) && _rationalLP->rhs()[i] < _rationalPosInfty
+                if( (GE(_realLP->rhs()[i], realParam(SoPlexBase<Real>::INFTY)) != (_rationalLP->rhs()[i] >= _rationalPosInfty))
+                    || (LT(_realLP->rhs()[i], realParam(SoPlexBase<Real>::INFTY)) && _rationalLP->rhs()[i] < _rationalPosInfty
                         && !_rationalLP->rhs()[i].isAdjacentTo((double)_realLP->rhs()[i])) )
                   {
                     if( !quiet )
@@ -7582,8 +7582,8 @@ namespace soplex
           {
             for( int i = 0; i < _realLP->lhs().dim(); i++ )
               {
-                if( (LE(_realLP->lhs()[i], -realParam(SoPlex<Real>::INFTY)) != (_rationalLP->lhs()[i] <= _rationalNegInfty))
-                    || (GT(_realLP->lhs()[i], -realParam(SoPlex<Real>::INFTY)) && _rationalLP->lhs()[i] > _rationalNegInfty
+                if( (LE(_realLP->lhs()[i], -realParam(SoPlexBase<Real>::INFTY)) != (_rationalLP->lhs()[i] <= _rationalNegInfty))
+                    || (GT(_realLP->lhs()[i], -realParam(SoPlexBase<Real>::INFTY)) && _rationalLP->lhs()[i] > _rationalNegInfty
                         && !_rationalLP->lhs()[i].isAdjacentTo((double)_realLP->lhs()[i])) )
                   {
                     if( !quiet )
@@ -7630,8 +7630,8 @@ namespace soplex
           {
             for( int i = 0; i < _realLP->upper().dim(); i++ )
               {
-                if( (GE(_realLP->upper()[i], realParam(SoPlex<Real>::INFTY)) != (_rationalLP->upper()[i] >= _rationalPosInfty))
-                    || (LT(_realLP->upper()[i], realParam(SoPlex<Real>::INFTY)) && _rationalLP->upper()[i] < _rationalPosInfty
+                if( (GE(_realLP->upper()[i], realParam(SoPlexBase<Real>::INFTY)) != (_rationalLP->upper()[i] >= _rationalPosInfty))
+                    || (LT(_realLP->upper()[i], realParam(SoPlexBase<Real>::INFTY)) && _rationalLP->upper()[i] < _rationalPosInfty
                         && !_rationalLP->upper()[i].isAdjacentTo((double)_realLP->upper()[i])) )
                   {
                     if( !quiet )
@@ -7655,8 +7655,8 @@ namespace soplex
           {
             for( int i = 0; i < _realLP->lower().dim(); i++ )
               {
-                if( (LE(_realLP->lower()[i], -realParam(SoPlex<Real>::INFTY)) != (_rationalLP->lower()[i] <= _rationalNegInfty))
-                    || (GT(_realLP->lower()[i], -realParam(SoPlex<Real>::INFTY)) && _rationalLP->lower()[i] > _rationalNegInfty
+                if( (LE(_realLP->lower()[i], -realParam(SoPlexBase<Real>::INFTY)) != (_rationalLP->lower()[i] <= _rationalNegInfty))
+                    || (GT(_realLP->lower()[i], -realParam(SoPlexBase<Real>::INFTY)) && _rationalLP->lower()[i] > _rationalNegInfty
                         && !_rationalLP->lower()[i].isAdjacentTo((double)_realLP->lower()[i])) )
                   {
                     if( !quiet )
@@ -7711,7 +7711,7 @@ namespace soplex
 
   /// set the random seed of the solver instance
   template <>
-  void SoPlex<Real>::setRandomSeed(unsigned int seed)
+  void SoPlexBase<Real>::setRandomSeed(unsigned int seed)
   {
     _solver.random.setSeed(seed);
   }
@@ -7720,7 +7720,7 @@ namespace soplex
 
   /// returns the current random seed of the solver instance or the one stored in the settings
   template <>
-  unsigned int  SoPlex<Real>::randomSeed() const
+  unsigned int  SoPlexBase<Real>::randomSeed() const
   {
     return _solver.random.getSeed();
   }
@@ -7729,7 +7729,7 @@ namespace soplex
 
   /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
   template <>
-  void SoPlex<Real>::_ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const
+  void SoPlexBase<Real>::_ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const
   {
     assert(newmax > vec.size());
     if( vec.size() >= vec.max() )
@@ -7740,7 +7740,7 @@ namespace soplex
 
   /// creates a permutation for removing rows/columns from an array of indices
   template <>
-  void SoPlex<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
+  void SoPlexBase<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
   {
     assert(idx != 0);
     assert(idxSize >= 0);
@@ -7762,7 +7762,7 @@ namespace soplex
 
   /// creates a permutation for removing rows/columns from a range of indices
   template <>
-  void SoPlex<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const
+  void SoPlexBase<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const
   {
     assert(perm != 0);
     assert(permSize >= 0);
@@ -7775,13 +7775,13 @@ namespace soplex
 
   /// checks consistency
   template <>
-	bool SoPlex<Real>::_isConsistent() const
+	bool SoPlexBase<Real>::_isConsistent() const
   {
     assert(_statistics != 0);
     assert(_currentSettings != 0);
 
     assert(_realLP != 0);
-    assert(_rationalLP != 0 || intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL);
+    assert(_rationalLP != 0 || intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL);
 
     assert(_realLP != &_solver || _isRealLPLoaded);
     assert(_realLP == &_solver || !_isRealLPLoaded);
@@ -7802,7 +7802,7 @@ namespace soplex
 
   /// should solving process be stopped?
   template <>
-	bool SoPlex<Real>::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
+	bool SoPlexBase<Real>::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
   {
     assert(_statistics != 0);
 
@@ -7818,7 +7818,7 @@ namespace soplex
 
   /// determines RangeType from real bounds
   template <>
-  typename SoPlex<Real>::RangeType SoPlex<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const
+  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const
   {
     assert(lower <= upper);
 
@@ -7844,7 +7844,7 @@ namespace soplex
 
   /// determines RangeType from rational bounds
   template <>
-  typename SoPlex<Real>::RangeType SoPlex<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const
+  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const
   {
     assert(lower <= upper);
 
@@ -7870,7 +7870,7 @@ namespace soplex
 
   /// switches RANGETYPE_LOWER to RANGETYPE_UPPER and vice versa
   template <>
-  typename SoPlex<Real>::RangeType SoPlex<Real>::_switchRangeType(const SoPlex<Real>::RangeType& rangeType) const
+  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_switchRangeType(const SoPlexBase<Real>::RangeType& rangeType) const
   {
     if( rangeType == RANGETYPE_LOWER )
       return RANGETYPE_UPPER;
@@ -7884,7 +7884,7 @@ namespace soplex
 
   /// checks whether RangeType corresponds to finite lower bound
   template <>
-	bool SoPlex<Real>::_lowerFinite(const RangeType& rangeType) const
+	bool SoPlexBase<Real>::_lowerFinite(const RangeType& rangeType) const
   {
     return (rangeType == RANGETYPE_LOWER || rangeType == RANGETYPE_BOXED || rangeType == RANGETYPE_FIXED);
   }
@@ -7893,7 +7893,7 @@ namespace soplex
 
   /// checks whether RangeType corresponds to finite upper bound
   template <>
-	bool SoPlex<Real>::_upperFinite(const RangeType& rangeType) const
+	bool SoPlexBase<Real>::_upperFinite(const RangeType& rangeType) const
   {
     return (rangeType == RANGETYPE_UPPER || rangeType == RANGETYPE_BOXED || rangeType == RANGETYPE_FIXED);
   }
@@ -7902,7 +7902,7 @@ namespace soplex
 
   /// adds a single row to the real LP and adjusts basis
   template <>
-  void SoPlex<Real>::_addRowReal(const LPRowReal& lprow)
+  void SoPlexBase<Real>::_addRowReal(const LPRowReal& lprow)
   {
     assert(_realLP != 0);
 
@@ -7921,7 +7921,7 @@ namespace soplex
 
   /// adds a single row to the real LP and adjusts basis
   template <>
-  void SoPlex<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs)
+  void SoPlexBase<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs)
   {
     assert(_realLP != 0);
 
@@ -7940,7 +7940,7 @@ namespace soplex
 
   /// adds multiple rows to the real LP and adjusts basis
   template <>
-  void SoPlex<Real>::_addRowsReal(const LPRowSetReal& lprowset)
+  void SoPlexBase<Real>::_addRowsReal(const LPRowSetReal& lprowset)
   {
     assert(_realLP != 0);
 
@@ -7958,7 +7958,7 @@ namespace soplex
 
   /// adds a single column to the real LP and adjusts basis
   template <>
-  void SoPlex<Real>::_addColReal(const LPColReal& lpcol)
+  void SoPlexBase<Real>::_addColReal(const LPColReal& lpcol)
   {
     assert(_realLP != 0);
 
@@ -7969,9 +7969,9 @@ namespace soplex
       _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
     else if( _hasBasis )
       {
-        if( lpcol.lower() > -realParam(SoPlex<Real>::INFTY) )
+        if( lpcol.lower() > -realParam(SoPlexBase<Real>::INFTY) )
           _basisStatusCols.append(SPxSolver<Real>::ON_LOWER);
-        else if( lpcol.upper() < realParam(SoPlex<Real>::INFTY) )
+        else if( lpcol.upper() < realParam(SoPlexBase<Real>::INFTY) )
           _basisStatusCols.append(SPxSolver<Real>::ON_UPPER);
         else
           _basisStatusCols.append(SPxSolver<Real>::ZERO);
@@ -7984,7 +7984,7 @@ namespace soplex
 
   /// adds a single column to the real LP and adjusts basis
   template <>
-  void SoPlex<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper)
+  void SoPlexBase<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper)
   {
     assert(_realLP != 0);
 
@@ -8003,7 +8003,7 @@ namespace soplex
 
   /// adds multiple columns to the real LP and adjusts basis
   template <>
-  void SoPlex<Real>::_addColsReal(const LPColSetReal& lpcolset)
+  void SoPlexBase<Real>::_addColsReal(const LPColSetReal& lpcolset)
   {
     assert(_realLP != 0);
 
@@ -8016,9 +8016,9 @@ namespace soplex
       {
         for( int i = 0; i < lpcolset.num(); i++ )
           {
-            if( lpcolset.lower(i) > -realParam(SoPlex<Real>::INFTY) )
+            if( lpcolset.lower(i) > -realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusCols.append(SPxSolver<Real>::ON_LOWER);
-            else if( lpcolset.upper(i) < realParam(SoPlex<Real>::INFTY) )
+            else if( lpcolset.upper(i) < realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusCols.append(SPxSolver<Real>::ON_UPPER);
             else
               _basisStatusCols.append(SPxSolver<Real>::ZERO);
@@ -8031,7 +8031,7 @@ namespace soplex
 
   /// replaces row \p i with \p lprow and adjusts basis
   template <>
-  void SoPlex<Real>::_changeRowReal(int i, const LPRowReal& lprow)
+  void SoPlexBase<Real>::_changeRowReal(int i, const LPRowReal& lprow)
   {
     assert(_realLP != 0);
 
@@ -8044,10 +8044,10 @@ namespace soplex
       {
         if( _basisStatusRows[i] != SPxSolver<Real>::BASIC )
           _hasBasis = false;
-        else if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lprow.lhs() <= -realParam(SoPlex<Real>::INFTY) )
-          _basisStatusRows[i] = (lprow.rhs() < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
-        else if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && lprow.rhs() >= realParam(SoPlex<Real>::INFTY) )
-          _basisStatusRows[i] = (lprow.lhs() > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+        else if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lprow.lhs() <= -realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusRows[i] = (lprow.rhs() < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+        else if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && lprow.rhs() >= realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusRows[i] = (lprow.lhs() > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
       }
 
     _rationalLUSolver.clear();
@@ -8057,7 +8057,7 @@ namespace soplex
 
   /// changes left-hand side vector for constraints to \p lhs and adjusts basis
   template <>
-  void SoPlex<Real>::_changeLhsReal(const VectorReal& lhs)
+  void SoPlexBase<Real>::_changeLhsReal(const VectorReal& lhs)
   {
     assert(_realLP != 0);
 
@@ -8070,8 +8070,8 @@ namespace soplex
       {
         for( int i = numRowsT() - 1; i >= 0; i-- )
           {
-            if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs[i] <= -realParam(SoPlex<Real>::INFTY) )
-              _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+            if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs[i] <= -realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
           }
       }
   }
@@ -8080,7 +8080,7 @@ namespace soplex
 
   /// changes left-hand side of row \p i to \p lhs and adjusts basis
   template <>
-  void SoPlex<Real>::_changeLhsReal(int i, const Real& lhs)
+  void SoPlexBase<Real>::_changeLhsReal(int i, const Real& lhs)
   {
     assert(_realLP != 0);
 
@@ -8091,8 +8091,8 @@ namespace soplex
       {
         _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
       }
-    else if( _hasBasis && _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs <= -realParam(SoPlex<Real>::INFTY) )
-      _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+    else if( _hasBasis && _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs <= -realParam(SoPlexBase<Real>::INFTY) )
+      _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
 
   }
 
@@ -8100,7 +8100,7 @@ namespace soplex
 
   /// changes right-hand side vector to \p rhs and adjusts basis
   template <>
-  void SoPlex<Real>::_changeRhsReal(const VectorReal& rhs)
+  void SoPlexBase<Real>::_changeRhsReal(const VectorReal& rhs)
   {
     assert(_realLP != 0);
 
@@ -8115,8 +8115,8 @@ namespace soplex
       {
         for( int i = numRowsT() - 1; i >= 0; i-- )
           {
-            if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs[i] >= realParam(SoPlex<Real>::INFTY) )
-              _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+            if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs[i] >= realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
           }
       }
   }
@@ -8125,7 +8125,7 @@ namespace soplex
 
   /// changes right-hand side of row \p i to \p rhs and adjusts basis
   template <>
-  void SoPlex<Real>::_changeRhsReal(int i, const Real& rhs)
+  void SoPlexBase<Real>::_changeRhsReal(int i, const Real& rhs)
   {
     assert(_realLP != 0);
 
@@ -8136,15 +8136,15 @@ namespace soplex
       {
         _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
       }
-    else if( _hasBasis && _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs >= realParam(SoPlex<Real>::INFTY) )
-      _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+    else if( _hasBasis && _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs >= realParam(SoPlexBase<Real>::INFTY) )
+      _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
   }
 
 
 
   /// changes left- and right-hand side vectors and adjusts basis
   template <>
-  void SoPlex<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
+  void SoPlexBase<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs)
   {
     assert(_realLP != 0);
 
@@ -8159,10 +8159,10 @@ namespace soplex
       {
         for( int i = numRowsT() - 1; i >= 0; i-- )
           {
-            if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs[i] <= -realParam(SoPlex<Real>::INFTY) )
-              _basisStatusRows[i] = (rhs[i] < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
-            else if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs[i] >= realParam(SoPlex<Real>::INFTY) )
-              _basisStatusRows[i] = (lhs[i] > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+            if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs[i] <= -realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusRows[i] = (rhs[i] < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+            else if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs[i] >= realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusRows[i] = (lhs[i] > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
           }
       }
   }
@@ -8171,7 +8171,7 @@ namespace soplex
 
   /// changes left- and right-hand side of row \p i and adjusts basis
   template <>
-  void SoPlex<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs)
+  void SoPlexBase<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs)
   {
     assert(_realLP != 0);
 
@@ -8184,10 +8184,10 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs <= -realParam(SoPlex<Real>::INFTY) )
-          _basisStatusRows[i] = (rhs < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
-        else if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs >= realParam(SoPlex<Real>::INFTY) )
-          _basisStatusRows[i] = (lhs > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+        if( _basisStatusRows[i] == SPxSolver<Real>::ON_LOWER && lhs <= -realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusRows[i] = (rhs < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+        else if( _basisStatusRows[i] == SPxSolver<Real>::ON_UPPER && rhs >= realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusRows[i] = (lhs > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
       }
   }
 
@@ -8195,7 +8195,7 @@ namespace soplex
 
   /// replaces column \p i with \p lpcol and adjusts basis
   template <>
-  void SoPlex<Real>::_changeColReal(int i, const LPColReal& lpcol)
+  void SoPlexBase<Real>::_changeColReal(int i, const LPColReal& lpcol)
   {
     assert(_realLP != 0);
 
@@ -8210,10 +8210,10 @@ namespace soplex
       {
         if( _basisStatusCols[i] == SPxSolver<Real>::BASIC )
           _hasBasis = false;
-        else if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lpcol.lower() <= -realParam(SoPlex<Real>::INFTY) )
-          _basisStatusCols[i] = (lpcol.upper() < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
-        else if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && lpcol.upper() >= realParam(SoPlex<Real>::INFTY) )
-          _basisStatusCols[i] = (lpcol.lower() > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+        else if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lpcol.lower() <= -realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusCols[i] = (lpcol.upper() < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+        else if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && lpcol.upper() >= realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusCols[i] = (lpcol.lower() > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
       }
 
     _rationalLUSolver.clear();
@@ -8223,7 +8223,7 @@ namespace soplex
 
   /// changes vector of lower bounds to \p lower and adjusts basis
   template <>
-  void SoPlex<Real>::_changeLowerReal(const VectorReal& lower)
+  void SoPlexBase<Real>::_changeLowerReal(const VectorReal& lower)
   {
     assert(_realLP != 0);
 
@@ -8238,8 +8238,8 @@ namespace soplex
       {
         for( int i = numColsT() - 1; i >= 0; i-- )
           {
-            if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower[i] <= -realParam(SoPlex<Real>::INFTY) )
-              _basisStatusCols[i] = (upperReal(i) < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+            if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower[i] <= -realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
           }
       }
   }
@@ -8248,7 +8248,7 @@ namespace soplex
 
   /// changes lower bound of column i to \p lower and adjusts basis
   template <>
-  void SoPlex<Real>::_changeLowerReal(int i, const Real& lower)
+  void SoPlexBase<Real>::_changeLowerReal(int i, const Real& lower)
   {
     assert(_realLP != 0);
 
@@ -8259,15 +8259,15 @@ namespace soplex
       {
         _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
       }
-    else if( _hasBasis && _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower <= -realParam(SoPlex<Real>::INFTY) )
-      _basisStatusCols[i] = (upperReal(i) < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+    else if( _hasBasis && _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower <= -realParam(SoPlexBase<Real>::INFTY) )
+      _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
   }
 
 
 
   /// changes vector of upper bounds to \p upper and adjusts basis
   template <>
-  void SoPlex<Real>::_changeUpperReal(const VectorReal& upper)
+  void SoPlexBase<Real>::_changeUpperReal(const VectorReal& upper)
   {
     assert(_realLP != 0);
 
@@ -8282,8 +8282,8 @@ namespace soplex
       {
         for( int i = numColsT() - 1; i >= 0; i-- )
           {
-            if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper[i] >= realParam(SoPlex<Real>::INFTY) )
-              _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+            if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper[i] >= realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
           }
       }
   }
@@ -8292,7 +8292,7 @@ namespace soplex
 
   /// changes \p i 'th upper bound to \p upper and adjusts basis
   template <>
-  void SoPlex<Real>::_changeUpperReal(int i, const Real& upper)
+  void SoPlexBase<Real>::_changeUpperReal(int i, const Real& upper)
   {
     assert(_realLP != 0);
 
@@ -8303,15 +8303,15 @@ namespace soplex
       {
         _hasBasis = (_solver.basis().status() > SPxBasis<Real>::NO_PROBLEM);
       }
-    else if( _hasBasis &&  _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper >= realParam(SoPlex<Real>::INFTY) )
-      _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+    else if( _hasBasis &&  _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper >= realParam(SoPlexBase<Real>::INFTY) )
+      _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
   }
 
 
 
   /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
   template <>
-  void SoPlex<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
+  void SoPlexBase<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper)
   {
     assert(_realLP != 0);
 
@@ -8326,10 +8326,10 @@ namespace soplex
       {
         for( int i = numColsT() - 1; i >= 0; i-- )
           {
-            if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower[i] <= -realParam(SoPlex<Real>::INFTY) )
-              _basisStatusCols[i] = (upper[i] < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
-            else if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper[i] >= realParam(SoPlex<Real>::INFTY) )
-              _basisStatusCols[i] = (lower[i] > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+            if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower[i] <= -realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusCols[i] = (upper[i] < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+            else if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper[i] >= realParam(SoPlexBase<Real>::INFTY) )
+              _basisStatusCols[i] = (lower[i] > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
           }
       }
   }
@@ -8338,7 +8338,7 @@ namespace soplex
 
   /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
   template <>
-  void SoPlex<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper)
+  void SoPlexBase<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper)
   {
     assert(_realLP != 0);
 
@@ -8351,10 +8351,10 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower <= -realParam(SoPlex<Real>::INFTY) )
-          _basisStatusCols[i] = (upper < realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
-        else if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper >= realParam(SoPlex<Real>::INFTY) )
-          _basisStatusCols[i] = (lower > -realParam(SoPlex<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
+        if( _basisStatusCols[i] == SPxSolver<Real>::ON_LOWER && lower <= -realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusCols[i] = (upper < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_UPPER : SPxSolver<Real>::ZERO;
+        else if( _basisStatusCols[i] == SPxSolver<Real>::ON_UPPER && upper >= realParam(SoPlexBase<Real>::INFTY) )
+          _basisStatusCols[i] = (lower > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolver<Real>::ON_LOWER : SPxSolver<Real>::ZERO;
       }
   }
 
@@ -8362,7 +8362,7 @@ namespace soplex
 
   /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
   template <>
-  void SoPlex<Real>::_changeElementReal(int i, int j, const Real& val)
+  void SoPlexBase<Real>::_changeElementReal(int i, int j, const Real& val)
   {
     assert(_realLP != 0);
 
@@ -8386,7 +8386,7 @@ namespace soplex
 
   /// removes row \p i and adjusts basis
   template <>
-  void SoPlex<Real>::_removeRowReal(int i)
+  void SoPlexBase<Real>::_removeRowReal(int i)
   {
     assert(_realLP != 0);
 
@@ -8416,7 +8416,7 @@ namespace soplex
   /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
   /// #numRowsT()
   template <>
-  void SoPlex<Real>::_removeRowsReal(int perm[])
+  void SoPlexBase<Real>::_removeRowsReal(int perm[])
   {
     assert(_realLP != 0);
 
@@ -8452,7 +8452,7 @@ namespace soplex
 
   /// removes column i
   template <>
-  void SoPlex<Real>::_removeColReal(int i)
+  void SoPlexBase<Real>::_removeColReal(int i)
   {
     assert(_realLP != 0);
 
@@ -8482,7 +8482,7 @@ namespace soplex
   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
   /// #numColsT()
   template <>
-  void SoPlex<Real>::_removeColsReal(int perm[])
+  void SoPlexBase<Real>::_removeColsReal(int perm[])
   {
     assert(_realLP != 0);
 
@@ -8518,7 +8518,7 @@ namespace soplex
 
   /// invalidates solution
   template <>
-  void SoPlex<Real>::_invalidateSolution()
+  void SoPlexBase<Real>::_invalidateSolution()
   {
     ///@todo maybe this should be done individually at the places when this method is called
     _status = SPxSolver<Real>::UNKNOWN;
@@ -8534,10 +8534,10 @@ namespace soplex
 
   /// enables simplifier and scaler
   template <>
-  void SoPlex<Real>::_enableSimplifierAndScaler()
+  void SoPlexBase<Real>::_enableSimplifierAndScaler()
   {
     // type of simplifier
-    switch( intParam(SoPlex<Real>::SIMPLIFIER) )
+    switch( intParam(SoPlexBase<Real>::SIMPLIFIER) )
       {
       case SIMPLIFIER_OFF:
         _simplifier = 0;
@@ -8552,7 +8552,7 @@ namespace soplex
       }
 
     // type of scaler
-    switch( intParam(SoPlex<Real>::SCALER) )
+    switch( intParam(SoPlexBase<Real>::SCALER) )
       {
       case SCALER_OFF:
         _scaler = 0;
@@ -8584,7 +8584,7 @@ namespace soplex
 
   /// disables simplifier and scaler
   template <>
-  void SoPlex<Real>::_disableSimplifierAndScaler()
+  void SoPlexBase<Real>::_disableSimplifierAndScaler()
   {
     _simplifier = 0;
 
@@ -8592,14 +8592,14 @@ namespace soplex
     if( !_isRealLPScaled )
       _scaler = 0;
     else
-      assert(boolParam(SoPlex<Real>::PERSISTENTSCALING));
+      assert(boolParam(SoPlexBase<Real>::PERSISTENTSCALING));
   }
 
 
 
   /// ensures that the rational LP is available; performs no sync
   template <>
-  void SoPlex<Real>::_ensureRationalLP()
+  void SoPlexBase<Real>::_ensureRationalLP()
   {
     if( _rationalLP == 0 )
       {
@@ -8613,7 +8613,7 @@ namespace soplex
 
   /// ensures that the real LP and the basis are loaded in the solver; performs no sync
   template <>
-  void SoPlex<Real>::_ensureRealLPLoaded()
+  void SoPlexBase<Real>::_ensureRealLPLoaded()
   {
     if( !_isRealLPLoaded )
       {
@@ -8641,19 +8641,19 @@ namespace soplex
 
   /// call floating-point solver and update statistics on iterations etc.
   template <>
-  void SoPlex<Real>::_solveRealLPAndRecordStatistics()
+  void SoPlexBase<Real>::_solveRealLPAndRecordStatistics()
   {
     bool _hadBasis = _hasBasis;
 
     // set time and iteration limit
-    if( intParam(SoPlex<Real>::ITERLIMIT) < realParam(SoPlex<Real>::INFTY) )
-      _solver.setTerminationIter(intParam(SoPlex<Real>::ITERLIMIT) - _statistics->iterations);
+    if( intParam(SoPlexBase<Real>::ITERLIMIT) < realParam(SoPlexBase<Real>::INFTY) )
+      _solver.setTerminationIter(intParam(SoPlexBase<Real>::ITERLIMIT) - _statistics->iterations);
     else
       _solver.setTerminationIter(-1);
-    if( realParam(SoPlex<Real>::TIMELIMIT) < realParam(SoPlex<Real>::INFTY) )
-      _solver.setTerminationTime(realParam(SoPlex<Real>::TIMELIMIT) - _statistics->solvingTime->time());
+    if( realParam(SoPlexBase<Real>::TIMELIMIT) < realParam(SoPlexBase<Real>::INFTY) )
+      _solver.setTerminationTime(realParam(SoPlexBase<Real>::TIMELIMIT) - _statistics->solvingTime->time());
     else
-      _solver.setTerminationTime(realParam(SoPlex<Real>::INFTY));
+      _solver.setTerminationTime(realParam(SoPlexBase<Real>::INFTY));
 
     // ensure that tolerances are not too small
     if( _solver.feastol() < 1e-12 )
@@ -8662,45 +8662,45 @@ namespace soplex
       _solver.setOpttol(1e-12);
 
     // set correct representation
-    if( (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_COLUMN
-         || (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex<Real>::REPRESENTATION_SWITCH) >= (_solver.nRows() + 1)))
+    if( (intParam(SoPlexBase<Real>::REPRESENTATION) == SoPlexBase<Real>::REPRESENTATION_COLUMN
+         || (intParam(SoPlexBase<Real>::REPRESENTATION) == SoPlexBase<Real>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlexBase<Real>::REPRESENTATION_SWITCH) >= (_solver.nRows() + 1)))
         && _solver.rep() != SPxSolver<Real>::COLUMN )
       {
         _solver.setRep(SPxSolver<Real>::COLUMN);
       }
-    else if( (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_ROW
-              || (intParam(SoPlex<Real>::REPRESENTATION) == SoPlex<Real>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlex<Real>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)))
+    else if( (intParam(SoPlexBase<Real>::REPRESENTATION) == SoPlexBase<Real>::REPRESENTATION_ROW
+              || (intParam(SoPlexBase<Real>::REPRESENTATION) == SoPlexBase<Real>::REPRESENTATION_AUTO && (_solver.nCols() + 1) * realParam(SoPlexBase<Real>::REPRESENTATION_SWITCH) < (_solver.nRows() + 1)))
              &&_solver.rep() != SPxSolver<Real>::ROW )
       {
         _solver.setRep(SPxSolver<Real>::ROW);
       }
 
     // set correct type
-    if( ((intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<Real>::COLUMN)
-         || (intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<Real>::ROW))
+    if( ((intParam(ALGORITHM) == SoPlexBase<Real>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<Real>::COLUMN)
+         || (intParam(ALGORITHM) == SoPlexBase<Real>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<Real>::ROW))
         && _solver.type() != SPxSolver<Real>::ENTER )
       {
         _solver.setType(SPxSolver<Real>::ENTER);
       }
-    else if( ((intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<Real>::COLUMN)
-              || (intParam(ALGORITHM) == SoPlex<Real>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<Real>::ROW))
+    else if( ((intParam(ALGORITHM) == SoPlexBase<Real>::ALGORITHM_DUAL && _solver.rep() == SPxSolver<Real>::COLUMN)
+              || (intParam(ALGORITHM) == SoPlexBase<Real>::ALGORITHM_PRIMAL && _solver.rep() == SPxSolver<Real>::ROW))
              && _solver.type() != SPxSolver<Real>::LEAVE )
       {
         _solver.setType(SPxSolver<Real>::LEAVE);
       }
 
     // set pricing modes
-    _solver.setSparsePricingFactor(realParam(SoPlex<Real>::SPARSITY_THRESHOLD));
-    if( (intParam(SoPlex<Real>::HYPER_PRICING) == SoPlex<Real>::HYPER_PRICING_ON)
-        || ((intParam(SoPlex<Real>::HYPER_PRICING) == SoPlex<Real>::HYPER_PRICING_AUTO)
+    _solver.setSparsePricingFactor(realParam(SoPlexBase<Real>::SPARSITY_THRESHOLD));
+    if( (intParam(SoPlexBase<Real>::HYPER_PRICING) == SoPlexBase<Real>::HYPER_PRICING_ON)
+        || ((intParam(SoPlexBase<Real>::HYPER_PRICING) == SoPlexBase<Real>::HYPER_PRICING_AUTO)
             && (_solver.nRows() + _solver.nCols() > HYPERPRICINGTHRESHOLD )) )
       _solver.hyperPricing(true);
-    else if( intParam(SoPlex<Real>::HYPER_PRICING) == SoPlex<Real>::HYPER_PRICING_OFF )
+    else if( intParam(SoPlexBase<Real>::HYPER_PRICING) == SoPlexBase<Real>::HYPER_PRICING_OFF )
       _solver.hyperPricing(false);
 
-    _solver.setNonzeroFactor(realParam(SoPlex<Real>::REFAC_BASIS_NNZ));
-    _solver.setFillFactor(realParam(SoPlex<Real>::REFAC_UPDATE_FILL));
-    _solver.setMemFactor(realParam(SoPlex<Real>::REFAC_MEM_FACTOR));
+    _solver.setNonzeroFactor(realParam(SoPlexBase<Real>::REFAC_BASIS_NNZ));
+    _solver.setFillFactor(realParam(SoPlexBase<Real>::REFAC_UPDATE_FILL));
+    _solver.setMemFactor(realParam(SoPlexBase<Real>::REFAC_MEM_FACTOR));
 
     // call floating-point solver and catch exceptions
     _statistics->simplexTime->start();
@@ -8747,7 +8747,7 @@ namespace soplex
   /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
   /// integer variables if desired
   template <>
-	bool SoPlex<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+	bool SoPlexBase<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   {
     assert(_realLP != 0);
 
@@ -8770,12 +8770,12 @@ namespace soplex
 
     if( success )
       {
-        setIntParam(SoPlex<Real>::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlex<Real>::OBJSENSE_MAXIMIZE : SoPlex<Real>::OBJSENSE_MINIMIZE), true);
-        _realLP->changeObjOffset(realParam(SoPlex<Real>::OBJ_OFFSET));
+        setIntParam(SoPlexBase<Real>::OBJSENSE, (_realLP->spxSense() == SPxLPReal::MAXIMIZE ? SoPlexBase<Real>::OBJSENSE_MAXIMIZE : SoPlexBase<Real>::OBJSENSE_MINIMIZE), true);
+        _realLP->changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
 
         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
         // and not to reading time
-        if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+        if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
           _syncLPRational();
       }
     else
@@ -8789,7 +8789,7 @@ namespace soplex
   /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
   /// integer variables if desired
   template <>
-	bool SoPlex<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+	bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   {
     // clear statistics
     _statistics->clearAllData();
@@ -8811,16 +8811,16 @@ namespace soplex
 
     if( success )
       {
-        setIntParam(SoPlex<Real>::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlex<Real>::OBJSENSE_MAXIMIZE : SoPlex<Real>::OBJSENSE_MINIMIZE), true);
-        _rationalLP->changeObjOffset(realParam(SoPlex<Real>::OBJ_OFFSET));
+        setIntParam(SoPlexBase<Real>::OBJSENSE, (_rationalLP->spxSense() == SPxLPRational::MAXIMIZE ? SoPlexBase<Real>::OBJSENSE_MAXIMIZE : SoPlexBase<Real>::OBJSENSE_MINIMIZE), true);
+        _rationalLP->changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
         _recomputeRangeTypesRational();
 
         // if sync mode is auto, we have to copy the (rounded) real LP to the rational LP; this is counted to sync time
         // and not to reading time
-        if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_AUTO )
+        if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
           _syncLPReal();
         // if a rational LP file is read, but only the (rounded) real LP should be kept, we have to free the rational LP
-        else if( intParam(SoPlex<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
+        else if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
           {
             _syncLPReal();
             _rationalLP->~SPxLPRational();
@@ -8837,7 +8837,7 @@ namespace soplex
 
   /// completes range type arrays after adding columns and/or rows
   template <>
-  void SoPlex<Real>::_completeRangeTypesRational()
+  void SoPlexBase<Real>::_completeRangeTypesRational()
   {
     // we use one method for bot columns and rows, because during column/row addition, rows/columns can be added
     // implicitly
@@ -8851,7 +8851,7 @@ namespace soplex
 
   /// recomputes range types from scratch using real LP
   template <>
-  void SoPlex<Real>::_recomputeRangeTypesReal()
+  void SoPlexBase<Real>::_recomputeRangeTypesReal()
   {
     _rowTypes.reSize(numRowsT());
     for( int i = 0; i < numRowsT(); i++ )
@@ -8865,7 +8865,7 @@ namespace soplex
 
   /// recomputes range types from scratch using rational LP
   template <>
-  void SoPlex<Real>::_recomputeRangeTypesRational()
+  void SoPlexBase<Real>::_recomputeRangeTypesRational()
   {
     _rowTypes.reSize(numRowsRational());
     for( int i = 0; i < numRowsRational(); i++ )
@@ -8879,7 +8879,7 @@ namespace soplex
 
   /// synchronizes real LP with rational LP, i.e., copies (rounded) rational LP into real LP, without looking at the sync mode
   template <>
-  void SoPlex<Real>::_syncLPReal(bool time)
+  void SoPlexBase<Real>::_syncLPReal(bool time)
   {
     // start timing
     if( time )
@@ -8904,7 +8904,7 @@ namespace soplex
 
   /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, without looking at the sync mode
   template <>
-  void SoPlex<Real>::_syncLPRational(bool time)
+  void SoPlexBase<Real>::_syncLPRational(bool time)
   {
     // start timing
     if( time )
@@ -8924,7 +8924,7 @@ namespace soplex
 
   /// synchronizes rational solution with real solution, i.e., copies (rounded) rational solution to real solution
   template <>
-  void SoPlex<Real>::_syncRealSolution()
+  void SoPlexBase<Real>::_syncRealSolution()
   {
     if( _hasSolRational && !_hasSolReal )
       {
@@ -8937,7 +8937,7 @@ namespace soplex
 
   /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
   template <>
-  void SoPlex<Real>::_syncRationalSolution()
+  void SoPlexBase<Real>::_syncRationalSolution()
   {
     if( _hasSolReal && !_hasSolRational )
       {
@@ -8948,9 +8948,9 @@ namespace soplex
 
 
 
-  /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+  /// returns pointer to a constant unit vector available until destruction of the SoPlexBase class
   template <>
-  const UnitVectorRational* SoPlex<Real>::_unitVectorRational(const int i)
+  const UnitVectorRational* SoPlexBase<Real>::_unitVectorRational(const int i)
   {
     assert(i >= 0);
 
@@ -8974,7 +8974,7 @@ namespace soplex
 
   /// parses one line in a settings file and returns true on success; note that the string is modified
   template <>
-	bool SoPlex<Real>::_parseSettingsLine(char* line, const int lineNumber)
+	bool SoPlexBase<Real>::_parseSettingsLine(char* line, const int lineNumber)
   {
     assert(line != 0);
 
@@ -9075,7 +9075,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<Real>::BOOLPARAM_COUNT )
+            if( param >= SoPlexBase<Real>::BOOLPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                 return false;
@@ -9088,7 +9088,7 @@ namespace soplex
                     || strncasecmp(paramValueString, "T", 4) == 0
                     || strtol(paramValueString, NULL, 4) == 1 )
                   {
-                    setBoolParam((SoPlex<Real>::BoolParam)param, true);
+                    setBoolParam((SoPlexBase<Real>::BoolParam)param, true);
                     break;
                   }
                 else if( strncasecmp(paramValueString, "false", 5) == 0
@@ -9097,7 +9097,7 @@ namespace soplex
                          || strncasecmp(paramValueString, "F", 5) == 0
                          || strtol(paramValueString, NULL, 5) == 0 )
                   {
-                    setBoolParam((SoPlex<Real>::BoolParam)param, false);
+                    setBoolParam((SoPlexBase<Real>::BoolParam)param, false);
                     break;
                   }
                 else
@@ -9116,7 +9116,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<Real>::INTPARAM_COUNT )
+            if( param >= SoPlexBase<Real>::INTPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                 return false;
@@ -9125,7 +9125,7 @@ namespace soplex
               {
                 int value;
 
-                if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlex<Real>::IntParam)param, value, false) )
+                if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlexBase<Real>::IntParam)param, value, false) )
                   break;
                 else
                   {
@@ -9143,7 +9143,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<Real>::REALPARAM_COUNT )
+            if( param >= SoPlexBase<Real>::REALPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                 return false;
@@ -9152,7 +9152,7 @@ namespace soplex
               {
                 Real value;
 
-                if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlex<Real>::RealParam)param, value) )
+                if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlexBase<Real>::RealParam)param, value) )
                   break;
                 else
                   {
@@ -9171,7 +9171,7 @@ namespace soplex
       {
         for( int param = 0; ; param++ )
           {
-            if( param >= SoPlex<Real>::RATIONALPARAM_COUNT )
+            if( param >= SoPlexBase<Real>::RATIONALPARAM_COUNT )
               {
                 MSG_INFO1( spxout, spxout << "Error parsing settings file: unknown parameter name <" << paramName << "> in line " << lineNumber << ".\n" );
                 return false;
@@ -9180,7 +9180,7 @@ namespace soplex
               {
                 Rational value;
 
-                if( readStringRational(paramValueString, value) && setRationalParam((SoPlex<Real>::RationalParam)param, value) )
+                if( readStringRational(paramValueString, value) && setRationalParam((SoPlexBase<Real>::RationalParam)param, value) )
                   break;
                 else
                   {
