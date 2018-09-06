@@ -127,7 +127,7 @@ extern "C" char* CPXversion(CPXENVptr env)
 {
    assert(env != 0);
 
-   static char* version = "SoPlexBase 1.3";
+   static char* version = "SoPlex 1.3";
 
    return version;
 }
