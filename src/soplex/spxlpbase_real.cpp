@@ -2433,17 +2433,17 @@ static void MPSwriteRecord(
 {
    char buf[81];
 
-   sprintf(buf, " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
+   spxSnprintf(buf, sizeof(buf), " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
    os << buf;
 
    if( name1 != 0 )
    {
-      spxSnprintf(buf, 81, "  %-8.8s  %.15" REAL_FORMAT, name1, value1);
+      spxSnprintf(buf, sizeof(buf), "%-8.8s  %.15" REAL_FORMAT, name1, value1);
       os << buf;
 
       if( name2 != 0 )
       {
-         spxSnprintf(buf, 81, "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
+         spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
          os << buf;
       }
    }
