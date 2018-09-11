@@ -2297,6 +2297,12 @@ private:
 
    //@}
 };
+
+  /* SCIP compatibility */
+  typedef SoPlexBase<Real> SoPlex;
+  typedef SPxSolverBase<Real> SPxSolver;
+  typedef SPxBasisBase<Real> SPxBasis;
+
 }
 #else
 #include "soplexlegacy.h"
