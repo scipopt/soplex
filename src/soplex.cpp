@@ -998,9 +998,24 @@ namespace soplex
     return _realLP->nRows();
   }
 
+  // For SCIP compatibility
+  template <>
+  int SoPlexBase<Real>::numRowsReal() const
+  {
+    assert(_realLP != 0);
+    return _realLP->nRows();
+  }
+
   /// returns number of columns
   template <>
   int SoPlexBase<Real>::numColsT() const
+  {
+    assert(_realLP != 0);
+    return _realLP->nCols();
+  }
+
+  template <>
+  int SoPlexBase<Real>::numColsReal() const
   {
     assert(_realLP != 0);
     return _realLP->nCols();
@@ -3728,6 +3743,19 @@ namespace soplex
       return false;
   }
 
+  template <>
+	bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
+  {
+    if( hasPrimal() && vector.dim() >= numColsT() )
+      {
+        _syncRealSolution();
+        _solReal.getPrimal(vector);
+        return true;
+      }
+    else
+      return false;
+  }
+
 
 
   /// gets the vector of slack values if available; returns true on success
@@ -3760,11 +3788,37 @@ namespace soplex
       return false;
   }
 
+  template <>
+  bool SoPlexBase<Real>::getPrimalRayReal(VectorBase<Real>& vector)
+  {
+    if( hasPrimalRay() && vector.dim() >= numColsT() )
+      {
+        _syncRealSolution();
+        _solReal.getPrimalRay(vector);
+        return true;
+      }
+    else
+      return false;
+  }
+
 
 
   /// gets the dual solution vector if available; returns true on success
   template <>
 	bool SoPlexBase<Real>::getDualT(VectorBase<Real>& vector)
+  {
+    if( hasDual() && vector.dim() >= numRowsT() )
+      {
+        _syncRealSolution();
+        _solReal.getDual(vector);
+        return true;
+      }
+    else
+      return false;
+  }
+
+  template <>
+	bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP 
   {
     if( hasDual() && vector.dim() >= numRowsT() )
       {
@@ -3792,11 +3846,37 @@ namespace soplex
       return false;
   }
 
+  template <>
+	bool SoPlexBase<Real>::getRedCostReal(VectorBase<Real>& vector) // For SCIP compatibility
+  {
+    if( hasDual() && vector.dim() >= numColsT() )
+      {
+        _syncRealSolution();
+        _solReal.getRedCost(vector);
+        return true;
+      }
+    else
+      return false;
+  }
+
 
 
   /// gets the Farkas proof if available; returns true on success
   template <>
 	bool SoPlexBase<Real>::getDualFarkasT(VectorBase<Real>& vector)
+  {
+    if( hasDualFarkas() && vector.dim() >= numRowsT() )
+      {
+        _syncRealSolution();
+        _solReal.getDualFarkas(vector);
+        return true;
+      }
+    else
+      return false;
+  }
+
+  template <>
+	bool SoPlexBase<Real>::getDualFarkasReal(VectorBase<Real>& vector)
   {
     if( hasDualFarkas() && vector.dim() >= numRowsT() )
       {
@@ -6020,7 +6100,28 @@ namespace soplex
     return true;
   }
 
+  // Alias for writeFileT; SCIP
+  template <>
+	bool SoPlexBase<Real>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+  {
+    ///@todo implement return value
+    if( unscale && _realLP->isScaled() )
+      {
+        MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
+          SPxLPReal* origLP;
+        origLP = 0;
+        spx_alloc(origLP);
+        origLP = new (origLP) SPxLPReal(*_realLP);
+        origLP->unscaleLP();
+        origLP->writeFile(filename, rowNames, colNames, intVars);
+        origLP->~SPxLPReal();
+        spx_free(origLP);
+      }
+    else
+      _realLP->writeFile(filename, rowNames, colNames, intVars);
 
+    return true;
+  }
 
   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are

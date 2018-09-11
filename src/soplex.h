@@ -116,11 +116,13 @@ public:
 
    /// returns number of rows
    int numRowsT() const;
+   int numRowsReal() const;     /* For SCIP compatibility */
    int numRowsRational() const;
 
    /// Templated function that
    /// returns number of columns
    int numColsT() const;
+   int numColsReal() const;     /* For SCIP compatibility */
    int numColsRational() const;
 
    /// returns number of nonzeros
@@ -603,6 +605,7 @@ public:
 
    /// gets the primal solution vector if available; returns true on success
    bool getPrimalT(VectorBase<R>& vector);
+   bool getPrimalReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
@@ -610,18 +613,22 @@ public:
 
    /// gets the primal ray if available; returns true on success
    bool getPrimalRayT(VectorBase<R>& vector);
+   bool getPrimalRayReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
    bool getDualT(VectorBase<R>& vector);
+   bool getDualReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCostT(VectorBase<R>& vector);
+   bool getRedCostReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkasT(VectorBase<R>& vector);
+   bool getDualFarkasReal(VectorBase<Real>& vector);
    bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
@@ -829,6 +836,8 @@ public:
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
    bool writeFileT(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
+   /* For SCIP compatibility */
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
    /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
