@@ -53,5 +53,8 @@ else
     echo ""
     echo "$0 -a"
     echo " -- only increase API version"
+    echo ""
+    echo "current version (from spxdefines.h): "
+    grep -e SOPLEX_VERSION -e SOPLEX_SUBVERSION -e SOPLEX_APIVERSION src/soplex/spxdefines.h
     exit 1;
 fi

@@ -1,3 +1,15 @@
+next Release
+============
+
+interface & parameters:
+- new parameter 'int:printbasismetric' to replace 'printcondition'
+  (-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
+
+fixed bugs:
+- correct objective function update in aggregation simplifier
+- use center value when fixing variables with slightly different bounds
+
+
 13 June 2018 - Release 4.0.0
 ============================
 
