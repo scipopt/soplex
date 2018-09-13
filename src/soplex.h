@@ -597,9 +597,9 @@ public:
    /// sets the status to OPTIMAL in case the LP has been solved with unscaled violations
    bool ignoreUnscaledViolations()
    {
-      if( _status == SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS )
+      if( _status == SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS )
       {
-         _status = SPxSolver::OPTIMAL;
+         _status = SPxSolverBase<R>::OPTIMAL;
          return true;
       }
       else
