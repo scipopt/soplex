@@ -290,9 +290,9 @@ namespace soplex
     defaultValue[SoPlexBase<Real>::FULLPERTURBATION] = false;
 
     /// re-optimize the original problem to get a proof of infeasibility/unboundedness?
-    name[SoPlexBase<Real>::PROOFORIGINAL] = "prooforiginal";
-    description[SoPlexBase<Real>::PROOFORIGINAL] = "re-optimize the original problem to get a proof of infeasibility/unboundedness?";
-    defaultValue[SoPlexBase<Real>::PROOFORIGINAL] = false;
+    name[SoPlexBase<Real>::ENSURERAY] = "prooforiginal";
+    description[SoPlexBase<Real>::ENSURERAY] = "re-optimize the original problem to get a proof of infeasibility/unboundedness?";
+    defaultValue[SoPlexBase<Real>::ENSURERAY] = false;
   }
 
   template <class R>
