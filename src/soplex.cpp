@@ -7414,7 +7414,7 @@ namespace soplex
   template <>
   void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolverBase<Real>::Status stat)
   {
-    os << "SoPlexBase status       : ";
+    os << "SoPlex status       : ";
 
     switch( stat )
       {
