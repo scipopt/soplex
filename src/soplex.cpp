@@ -7486,12 +7486,12 @@ namespace soplex
   {
     // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
-    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10
                << "." << SOPLEX_SUBVERSION );
 #else
-    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10 );
 #endif
@@ -7523,12 +7523,12 @@ namespace soplex
   {
     // do not use preprocessor directives within the MSG_INFO1 macro
 #if (SOPLEX_SUBVERSION > 0)
-    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10
                << "." << SOPLEX_SUBVERSION );
 #else
-    MSG_INFO1( spxout, spxout << "SoPlexBase version " << SOPLEX_VERSION/100
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
                << "." << (SOPLEX_VERSION % 100)/10
                << "." << SOPLEX_VERSION % 10 );
 #endif
