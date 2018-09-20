@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -36,14 +36,14 @@ namespace soplex
       preventing memory leaks
     - checking of array bound when accessing elements with the
       indexing operator[]() (only when compiled without \c -DNDEBUG).
- 
+
     Moreover, #Array%s may easily be extended by #insert%ing or
-    #append%ing elements to the Array or shrunken by 
+    #append%ing elements to the Array or shrunken by
     \ref remove() "removing"
     elements. Method reSize(int n) resets the Array's length to \p n,
     thereby appending elements or truncating the Array to the
     required size.
- 
+
     An Array is implemented in a C++-compliant way with respect to
     how memory is managed: Only operators new and delete are
     used for allocating memory. This involves some overhead for all
@@ -51,12 +51,12 @@ namespace soplex
     insert(), append(), remove() and reSize(). This involves
     allocating a new C++ array of the new size and copying all
     elements with the template parameters operator=().
- 
+
     For this reason, it is not convenient to use class Array if its elements
-    are \ref DataObjects "Data Objects". In this case use class DataArray 
+    are \ref DataObjects "Data Objects". In this case use class DataArray
     instead.
- 
-    @see DataArray, \ref DataObjects "Data Objects" 
+
+    @see DataArray, \ref DataObjects "Data Objects"
 */
 template < class T >
 class Array
@@ -66,7 +66,7 @@ protected:
    //----------------------------------------
    /**@name Data */
    //@{
-   int num;     ///< the length of array data 
+   int num;     ///< the length of array data
    T*  data;    ///< the array of elements
    //@}
 
@@ -287,7 +287,7 @@ public:
    /** The constructor allocates an Array of \p n uninitialized elements.
     */
    explicit
-   Array(int n = 0) 
+   Array(int n = 0)
       : data(0)
    {
       assert(n >= 0);
@@ -306,7 +306,7 @@ public:
    }
 
    /// copy constructor
-   Array(const Array<T>& old) 
+   Array(const Array<T>& old)
       : num(old.num)
    {
       if (num > 0)

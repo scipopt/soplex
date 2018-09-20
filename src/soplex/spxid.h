@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-#include "datakey.h"
+#include "soplex/datakey.h"
 
 namespace soplex
 {
@@ -30,14 +30,14 @@ class SPxId;
 /**@brief   Ids for LP columns.
  * @ingroup Algo
  *
- *  Class SPxColId provides #DataKey%s for the 
+ *  Class SPxColId provides #DataKey%s for the
  *  column indices of an SPxLP.
  */
 class SPxColId : public DataKey
 {
 public:
    /// default constructor.
-   SPxColId() 
+   SPxColId()
    {}
    /// copy constructor from DataKey.
    explicit SPxColId(const DataKey& p_key);
@@ -49,14 +49,14 @@ public:
 /**@brief   Ids for LP rows.
  * @ingroup Algo
  *
- *  Class SPxRowId provides #DataKey%s for the row 
+ *  Class SPxRowId provides #DataKey%s for the row
  *  indices of an SPxLP.
  */
 class SPxRowId : public DataKey
 {
 public:
    /// default constructor.
-   SPxRowId() 
+   SPxRowId()
    {}
    /// copy constructor from DataKey.
    explicit SPxRowId(const DataKey& p_key);
@@ -69,12 +69,12 @@ public:
  *
  *  Both \ref soplex::SPxColId "SPxColIds" and \ref soplex::SPxRowId
  *  "SPxRowIds" may be treated uniformly as #SPxId%s:
- *  
+ *
  *  Rows and columns are numbered from 0 to num()-1 and 0 to dim()-1
  *  respectively.  These numbers may be used to select individual rows or
  *  columns. However, these numbers may change if other rows or columns are
  *  added or removed.
- *  
+ *
  *  Further, each row or column of the problem matrix is assigned a \ref
  *  soplex::SPxRowId "SPxRowId" or \ref soplex::SPxColId "SPxColId",
  *  respectively. They are be used to select individual rows or columns just
@@ -87,7 +87,7 @@ class SPxId : public DataKey
    friend std::ostream& operator<<(std::ostream& os, const SPxId& id);
 
 public:
-   
+
    //--------------------------------
    /**@name Types */
    //@{
@@ -106,14 +106,14 @@ public:
    /// default constructor. Constructs an invalid id.
    SPxId()
       : DataKey(INVALID, -1)
-   {} 
+   {}
    /// constructs an id out of a column identifier \p cid.
    explicit SPxId(const SPxColId& cid)
       : DataKey(COL_ID, cid.idx)
    {}
    /// constructs an id out of a row identifier \p rid.
    explicit SPxId(const SPxRowId& rid)
-      : DataKey(ROW_ID, rid.idx) 
+      : DataKey(ROW_ID, rid.idx)
    {}
    /// assignment operator
    SPxId& operator=(const SPxId& id)

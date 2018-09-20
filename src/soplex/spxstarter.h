@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,12 +30,12 @@ namespace soplex
 
 /**@brief   SoPlex start basis generation base class.
    @ingroup Algo
-   
+
    SPxStarter is the virtual base class for classes generating a starter basis
    for the Simplex solver SoPlex. When a SPxStarter object has been loaded
    to a SoPlex solver, the latter will call method #generate() in order to
    have a start basis generated. Implementations of method #generate() must
-   terminate by \ref soplex::SPxSolverBase<R>::load() "loading" the generated basis to 
+   terminate by \ref soplex::SPxSolver::load() "loading" the generated basis to
    SoPlex. Loaded bases must be nonsingular.
 */
 template <class R>

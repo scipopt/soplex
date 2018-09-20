@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -155,9 +155,9 @@ protected:
    /** Tests whether the selected enter \p id needs to be discarded (and do so)
        and the ratio test is to be recomputed.
    */
-   bool minReEnter(Real& sel, Real maxabs, const SPxId& id, int nr);
+   bool minReEnter(Real& sel, Real maxabs, const SPxId& id, int nr, bool polish = false);
    ///
-   bool maxReEnter(Real& sel, Real maxabs, const SPxId& id, int nr);
+   bool maxReEnter(Real& sel, Real maxabs, const SPxId& id, int nr, bool polish = false);
 
    /// Tests and returns whether a shortcut after phase 1 is feasible for the
    /// selected enter pivot.

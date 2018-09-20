@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -45,7 +45,7 @@ namespace soplex
 #define SOPLEX_VERSION         400
 #define SOPLEX_SUBVERSION        2
 #define SOPLEX_APIVERSION        7
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2017 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2018 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
@@ -305,12 +305,10 @@ inline Real spxSqrt(Real a)
 }
 
 // returns the next representable value after x in the direction of y
-#ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafterl(x,y);
 }
-#endif
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
@@ -337,7 +335,6 @@ inline Real spxSqrt(Real a)
 }
 
 // returns the next representable value after x in the direction of y
-#ifndef SOPLEX_LEGACY
 inline Real spxNextafter(Real x, Real y)
 {
 #ifndef _MSC_VER
@@ -346,7 +343,6 @@ inline Real spxNextafter(Real x, Real y)
    return _nextafter(x,y);
 #endif
 }
-#endif
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
@@ -463,7 +459,7 @@ inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
 /// safe version of snprintf
 inline int spxSnprintf(
    char*                 t,                  /**< target string */
-   int                   len,                /**< length of the string to copy */
+   size_t                len,                /**< length of the string to copy */
    const char*           s,                  /**< source string */
    ...                                       /**< further parameters */
    )
@@ -477,13 +473,13 @@ inline int spxSnprintf(
    va_start(ap, s); /*lint !e826*/
 
 #if defined(_WIN32) || defined(_WIN64)
-   n = _vsnprintf(t, (size_t) len, s, ap);
+   n = _vsnprintf(t, len, s, ap);
 #else
-   n = vsnprintf(t, (size_t) len, s, ap); /*lint !e571*/
+   n = vsnprintf(t, len, s, ap); /*lint !e571*/
 #endif
    va_end(ap);
 
-   if( n < 0 || n >= len )
+   if( n < 0 || (size_t) n >= len )
    {
 #ifndef NDEBUG
       if( n < 0 )
@@ -492,7 +488,7 @@ inline int spxSnprintf(
       }
 #endif
       t[len-1] = '\0';
-      n = len-1;
+      n = (int) len-1;
    }
    return n;
 }

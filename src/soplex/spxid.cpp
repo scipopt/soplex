@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,13 +21,13 @@
 
 namespace soplex
 {
-SPxColId::SPxColId(const DataKey& p_key) 
+SPxColId::SPxColId(const DataKey& p_key)
    : DataKey(p_key)
 {
    info = SPxId::COL_ID;
 }
 
-SPxColId::SPxColId(const SPxId& p_key) 
+SPxColId::SPxColId(const SPxId& p_key)
    : DataKey(p_key)
 {
    assert(!p_key.isSPxRowId());
@@ -35,13 +35,13 @@ SPxColId::SPxColId(const SPxId& p_key)
    info = SPxId::COL_ID;
 }
 
-SPxRowId::SPxRowId(const DataKey& p_key) 
+SPxRowId::SPxRowId(const DataKey& p_key)
    : DataKey(p_key)
 {
    info = SPxId::ROW_ID;
 }
 
-SPxRowId::SPxRowId(const SPxId& p_key) 
+SPxRowId::SPxRowId(const SPxId& p_key)
    : DataKey(p_key)
 {
    assert(!p_key.isSPxColId());

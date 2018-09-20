@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -44,7 +44,7 @@ namespace soplex
  */
 /* The use of this->the_last and this->the_first instead of just the_last
  * and the_first is bcause the HP aCC Compiler claims that according to the
- * Standard these otherwise could not be seen. And since I was not able to 
+ * Standard these otherwise could not be seen. And since I was not able to
  * even identify a hint on this in the Draft Standard we just do it, so
  * the HP compiler is happy since it will not hurt the others.
  */
@@ -344,7 +344,7 @@ public:
    IdList(T* pfirst = 0, T* plast = 0, bool pDestroyElements = false)
       : IsList<T>(pfirst, plast, pDestroyElements)
    {
-      assert(isConsistent());  
+      assert(isConsistent());
    }
    //@}
 };

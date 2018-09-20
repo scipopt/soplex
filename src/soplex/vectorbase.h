@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2017 Konrad-Zuse-Zentrum                            */
+/*                  1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -522,7 +522,6 @@ void VectorBase<Real>::clear()
 
 
 
-#ifndef SOPLEX_LEGACY
 /// Inner product.
 template<>
 inline
@@ -541,7 +540,6 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
 
    return x;
 }
-#endif
 
 } // namespace soplex
 #endif // _VECTORBASE_H_

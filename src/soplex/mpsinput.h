@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -24,10 +24,10 @@
 #include "soplex/spxout.h"
 
 namespace soplex
-{ 
+{
 
 /**@class MPSInput
-   
+
    Reads MPS input files. A right-hand side for the objective function is
    allowed but ignored.
  */
@@ -124,7 +124,7 @@ public:
       m_objname [0] = '\0';
    }
    ///
-   virtual 
+   virtual
    ~MPSInput()
    {
       // only to signal to flexelint that the pointers do
@@ -132,7 +132,7 @@ public:
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
    }
    //@}
-   
+
    //-----------------------------------
    /**@name Access */
    //@{
@@ -176,13 +176,13 @@ public:
    void setProbName(const char* p_probname)
    {
       assert(strlen(p_probname) < MAX_LINE_LEN);
-      strncpy(m_probname, p_probname, MAX_LINE_LEN);
+      spxSnprintf(m_probname, MAX_LINE_LEN, "%s", p_probname);
    }
    ///
    void setObjName(const char* p_objname)
    {
       assert(strlen(p_objname) < MAX_LINE_LEN);
-      strncpy(m_objname, p_objname, MAX_LINE_LEN);
+      spxSnprintf(m_objname, MAX_LINE_LEN, "%s", p_objname);
    }
    ///
    void setObjSense(Sense sense)
@@ -195,7 +195,7 @@ public:
    /**@name Warnings and Errors */
    //@{
    ///
-   void syntaxError() 
+   void syntaxError()
    {
       MSG_ERROR( std::cerr << "Syntax error in line " << m_lineno << std::endl; )
       m_section = ENDATA;
@@ -203,7 +203,7 @@ public:
    }
    ///
    void entryIgnored(
-      const char* what, const char* what_name, 
+      const char* what, const char* what_name,
       const char* entity, const char* entity_name)
    {
       if ( m_ignored < m_max_ignore )
@@ -228,7 +228,7 @@ public:
    /// reads an MPS format data line and parse the fields.
    bool readLine();
    /// Inserts \p name as field 1 and shifts all other fields up.
-   void insertName( const char* name, 
+   void insertName( const char* name,
                     bool second = false );
    //@}
 };

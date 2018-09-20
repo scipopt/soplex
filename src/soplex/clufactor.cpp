@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -12,8 +12,6 @@
 /*  along with SoPlex; see the file COPYING. If not email to soplex@zib.de.  */
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-#define WITH_WARNINGS
 
 #include <assert.h>
 
@@ -3080,29 +3078,6 @@ bool CLUFactor::isConsistent() const
          }
       }
    }
-
-#if 0 // Stimmt leider nicht
-   /* Test on L
-    */
-   if ( l.rval != 0 && l.firstUnused > 0 )
-   {
-      for ( i = 0; i < thedim; i++ )
-      {
-         assert( l.rbeg[i] >= 0 );
-         assert( l.rbeg[i] <= l.firstUpdate );
-         assert( l.rbeg[i] <= l.rbeg[i + 1] );
-
-         assert( l.rorig[i] >= 0 );
-         assert( l.rorig[i] <  thedim );
-         assert( l.rperm[i] >= 0 );
-         assert( l.rperm[i] <  thedim );
-
-         assert( l.ridx[i] >= 0 );
-         assert( l.ridx[i] <  thedim );
-      }
-   }
-
-#endif
 #endif // CONSISTENCY_CHECKS
 
    return true;
@@ -3641,63 +3616,8 @@ void CLUFactor::solveRight2(
 }
 
 /*****************************************************************************/
-#if 0
 void CLUFactor::solveUleft( Real* p_work, Real* vec )
 {
-   Real x;
-   int i, k, r, c;
-   int *rorig, *corig;
-   int *ridx, *rlen, *rbeg, *idx;
-   Real *rval, *val;
-
-   rorig = row.orig;
-   corig = col.orig;
-
-   ridx = u.row.idx;
-   rval = u.row.val;
-   rlen = u.row.len;
-   rbeg = u.row.start;
-
-   for ( i = 0; i < thedim; ++i )
-   {
-      c = corig[i];
-      r = rorig[i];
-      x = vec[c];
-      vec[c] = 0;
-
-      if ( x != 0.0 )
-      {
-         x *= diag[r];
-         p_work[r] = x;
-         k = rbeg[r];
-         idx = &ridx[k];
-         val = &rval[k];
-
-         for ( int m = rlen[r]; m != 0; --m )
-            vec[*idx++] -= x * ( *val++ );
-      }
-   }
-}
-
-#else
-void CLUFactor::solveUleft( Real* p_work, Real* vec )
-{
-#if 0
-
-   for ( int i = 0; i < thedim; ++i )
-   {
-      int  r  = row.orig[i];
-      int end = u.row.start[r] + u.row.len[r];
-
-      for ( int m = u.row.start[r]; m < end; m++ )
-      {
-         std::cout << u.row.val[m] << " ";
-      }
-
-      std::cout << "\n";
-   }
-
-#endif
    for ( int i = 0; i < thedim; ++i )
    {
       int  c  = col.orig[i];
@@ -3708,40 +3628,27 @@ void CLUFactor::solveUleft( Real* p_work, Real* vec )
 
       Real x  = vec[c];
 
-      ASSERT_WARN( "WSOLVE01", spxAbs( x ) < 1e40 );
-      ASSERT_WARN( "WSOLVE02", spxAbs( vec[c] ) < 1e40 );
-
-#if defined(WITH_WARNINGS) || !defined(NDEBUG)
-      Real y = vec[c];
-#endif
+      ASSERT_WARN( "WSOLVE01", spxAbs( vec[c] ) < 1e40 );
 
       vec[c]  = 0.0;
 
       if ( x != 0.0 )
       {
-         ASSERT_WARN( "WSOLVE03", spxAbs( diag[r] ) < 1e40 );
+         ASSERT_WARN( "WSOLVE02", spxAbs( diag[r] ) < 1e40 );
 
          x        *= diag[r];
          p_work[r] = x;
-
-         ASSERT_WARN( "WSOLVE04", spxAbs( x ) < 1e40 );
 
          int end = u.row.start[r] + u.row.len[r];
 
          for ( int m = u.row.start[r]; m < end; m++ )
          {
-            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
-            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < infinity );
             vec[u.row.idx[m]] -= x * u.row.val[m];
-            ASSERT_WARN( "WSOLVE07", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
+            ASSERT_WARN( "WSOLVE03", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
          }
       }
-
-      ASSERT_WARN( "WSOLVE08", spxAbs( y ) < 1e40 );
    }
 }
-
-#endif
 
 void CLUFactor::solveUleft2(
    Real* p_work1, Real* vec1, Real* p_work2, Real* vec2 )

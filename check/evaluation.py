@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import sys
 import math
 import json
@@ -67,6 +69,8 @@ testset = outname.split('/')[-1].split('.')[1]
 testname = 'testset/'+testset+'.test'
 soluname = 'testset/'+testset+'.solu'
 
+settings = outname.split('/')[-1].split('.')[-2]
+
 # maximum length of instance names
 namelength = 18
 
@@ -98,6 +102,8 @@ for idx, outline in enumerate(outlines):
         instances[instancename] = {}
         instances[instancename]['status'] = 'abort'
         instances[instancename]['name'] = shortname
+        instances[instancename]['settings'] = settings
+        instances[instancename]['testset'] = testset
         # wait for statistics block
         stats = False
 
@@ -184,16 +190,17 @@ for idx, outline in enumerate(outlines):
             instances[instancename]['ubcols'] = int(outlines[idx+4].split()[3])
             instances[instancename]['freecols'] = int(outlines[idx+5].split()[2])
             instances[instancename]['rows'] = int(outlines[idx+6].split()[2])
-            instances[instancename]['rangedrows'] = int(outlines[idx+7].split()[2])
-            instances[instancename]['lhsrows'] = int(outlines[idx+8].split()[2])
-            instances[instancename]['rhsrows'] = int(outlines[idx+9].split()[2])
-            instances[instancename]['freerows'] = int(outlines[idx+10].split()[2])
-            instances[instancename]['nonzeros'] = int(outlines[idx+11].split()[2])
-            instances[instancename]['colnonzeros'] = float(outlines[idx+12].split()[3])
-            instances[instancename]['rownonzeros'] = float(outlines[idx+13].split()[3])
-            instances[instancename]['sparsity'] = float(outlines[idx+14].split()[2])
-            instances[instancename]['minabsval'] = float(outlines[idx+15].split()[4])
-            instances[instancename]['maxabsval'] = float(outlines[idx+16].split()[4])
+            instances[instancename]['equalrows'] = int(outlines[idx+7].split()[2])
+            instances[instancename]['rangedrows'] = int(outlines[idx+8].split()[2])
+            instances[instancename]['lhsrows'] = int(outlines[idx+9].split()[2])
+            instances[instancename]['rhsrows'] = int(outlines[idx+10].split()[2])
+            instances[instancename]['freerows'] = int(outlines[idx+11].split()[2])
+            instances[instancename]['nonzeros'] = int(outlines[idx+12].split()[2])
+            instances[instancename]['colnonzeros'] = float(outlines[idx+13].split()[3])
+            instances[instancename]['rownonzeros'] = float(outlines[idx+14].split()[3])
+            instances[instancename]['sparsity'] = float(outlines[idx+15].split()[2])
+            instances[instancename]['minabsval'] = float(outlines[idx+16].split()[4])
+            instances[instancename]['maxabsval'] = float(outlines[idx+17].split()[4])
 
         elif outline.startswith('Violation'):
             primviol = outlines[idx+2].split()[3]
@@ -337,7 +344,7 @@ for name in sorted(instances):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print(output)
 
-print('\nResults (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):')
+print('\nResults (testset '+testset+', settings '+settings+'):')
 print('{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts))
 
 # try to check for missing files

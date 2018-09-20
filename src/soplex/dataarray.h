@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -35,7 +35,7 @@ namespace soplex
    Class DataArray provides safe arrays of \ref DataObjects. For general
    C++ objects (in contrast to data objects) class Array is provided which
    manages memory in a C++ compliant way.
- 
+
    The elements of an instance of DataArray can be accessed just like
    ordinary C++ array elements by means of the index operator[](). Safety is
    provided by
@@ -44,15 +44,15 @@ namespace soplex
       preventing memory leaks
     - checking of array bounds when accessing elements with the
       indexing operator[]() (only when compiled without \c -DNDEBUG).
- 
+
    Moreover, #DataArray%s may easily be extended by #insert%ing or #append%ing
-   elements to the DataArray or shrunken by \ref remove() "removing" elements. 
+   elements to the DataArray or shrunken by \ref remove() "removing" elements.
    Method reSize(int n) resets the DataArray%s length to \p n thereby possibly
    appending elements or truncating the DataArray to the required size.
- 
+
    A DataArray may be used as arguments for standard C functions requiring
    pointers through the use of get_ptr() and get_const_ptr().
- 
+
    Internally, a DataArray object allocates a block of memory that fits up
    to max() elements, only size() of them are used. This makes extension
    and shrinking methods perform better.

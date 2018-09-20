@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -13,7 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef SOPLEX_LEGACY
 #include <iostream>
 #include <assert.h>
 
@@ -57,7 +56,7 @@ namespace soplex
             _scaler->scale(*_realLP, true);
             _isRealLPScaled = _realLP->isScaled(); // a scaler might decide not to apply scaling
 #ifdef SOPLEX_DEBUG
-            _checkScalingReal(origLP);
+            _checkScaling(origLP);
 #endif
          }
          // unscale previously scaled problem, overwriting _realLP
@@ -79,7 +78,7 @@ namespace soplex
       else
          _preprocessAndSolveReal(false);
 
-      _statistics->finalBasisCondition = _solver.getFastCondition();
+      _statistics->finalBasisCondition = _solver.getBasisMetric(0);
 
       // stop timing
       _statistics->solvingTime->stop();
@@ -111,9 +110,23 @@ namespace soplex
       case SPxSimplifier<Real>::INFEASIBLE:
       case SPxSimplifier<Real>::DUAL_INFEASIBLE:
       case SPxSimplifier<Real>::UNBOUNDED:
-         MSG_INFO1( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
          _hasBasis = false;
-         _preprocessAndSolveReal(false);
+         if( boolParam(SoPlexBase<Real>::ENSURERAY) )
+         {
+            MSG_INFO1( spxout, spxout << "simplifier detected infeasibility or unboundedness - solve again without simplifying" << std::endl; )
+            _preprocessAndSolveReal(false);
+         }
+         else
+         {
+            if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+              _status = SPxSolverBase<Real>::INFEASIBLE;
+            else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
+              _status = SPxSolverBase<Real>::UNBOUNDED;
+            else
+              _status = SPxSolverBase<Real>::INForUNBD;
+            // load original LP to restore clean solver state
+            _loadRealLP(false);
+         }
          return;
 
       case SPxSimplifier<Real>::VANISHED:
@@ -160,7 +173,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid singularity
          if( !_isRealLPLoaded )
          {
-            MSG_INFO3( spxout, spxout << "encountered singularity - trying to solve again without simplifying" << std::endl; )
+            MSG_INFO1( spxout, spxout << "encountered singularity - trying to solve again without simplifying" << std::endl; )
             _preprocessAndSolveReal(false);
             return;
          }
@@ -171,7 +184,7 @@ namespace soplex
          // if preprocessing was applied, try to run again without to avoid cycling
          if( !_isRealLPLoaded )
          {
-            MSG_INFO3( spxout, spxout << "encountered cycling - trying to solve again without simplifying" << std::endl; )
+            MSG_INFO1( spxout, spxout << "encountered cycling - trying to solve again without simplifying" << std::endl; )
             _preprocessAndSolveReal(false);
             return;
          }
@@ -409,7 +422,7 @@ namespace soplex
                                    << ", row violation: " << rowviol
                                    << ", dual violation: " << dualviol
                                    << ", redcost violation: " << redcostviol << std::endl; )
-         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again without presolving" << std::endl; )
+         MSG_INFO1( spxout, spxout << " --- detected violations in original problem space -- solve again without presolving/scaling" << std::endl; )
 
          if( _isRealLPScaled )
          {
@@ -672,4 +685,3 @@ namespace soplex
          _scaler->unscaleDualray(LP, _solReal._dualFarkas);
    }
 } // namespace soplex
-#endif

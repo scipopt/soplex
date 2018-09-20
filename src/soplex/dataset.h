@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -35,21 +35,21 @@ namespace soplex
    @ingroup Elementary
 
    Class DataSet manages of sets of data objects  of a
-   template type DATA. For constructing a DataSet the maximum number 
-   of entries must be given. The current maximum number may be inquired 
+   template type DATA. For constructing a DataSet the maximum number
+   of entries must be given. The current maximum number may be inquired
    with method max().
 
    Adding more then max() elements to a DataSet will core dump. However,
    method reMax() allows to reset max() without loss of elements currently
    in the DataSet. The current number of elements in a DataSet is returned
    by method num().
-   
+
    Adding elements to a DataSet is done via methods add() or create(),
    while remove() removes elements from a DataSet. When adding an element
    to a DataSet the new element is assigned a DataKey. DataKeys serve to
    access DATA elements in a set via a version of the subscript
    operator[](DataKey).
-   
+
    For convenience all elements in a DataSet are implicitely numbered
    from 0 through num()-1 and can be accessed with these numbers
    using a 2nd subscript operator[](int). The reason for providing
@@ -67,18 +67,18 @@ namespace soplex
    In #thekey only elements 0 thru thenum-1 contain DataKey::idx%'s of
    valid elements, i.e., elements currently in the DataSet.
    The current number of elements in the DataSet is counted in thenum.
-   
+
    In #theitem only elements 0 thru thesize-1 are used, but only some of
    them actually contain real data elements of the DataSet. They are
    recognized by having info >= 0, which gives the number of that
    element. Otherwise info < 0 indicates an unused element. Unused
    elements are linked in a single linked list: starting with element
    <tt>-firstfree-1</tt>, the next free element is given by
-   <tt>-info-1.</tt> The last free element in the list is marked by 
-   <tt>info == -themax-1.</tt> Finally all elements in theitem with 
-   <tt>index >= thesize</tt> are unused as well.  
+   <tt>-info-1.</tt> The last free element in the list is marked by
+   <tt>info == -themax-1.</tt> Finally all elements in theitem with
+   <tt>index >= thesize</tt> are unused as well.
 
-   @warning malloc/realloc and memcpy are used to handle the members 
+   @warning malloc/realloc and memcpy are used to handle the members
       of the set. If you use DataSet with something that is not
       a \ref DataObjects "Data Object" you will be in severe trouble.
 */
@@ -94,7 +94,7 @@ protected:
    struct Item
    {
       DATA data;       ///< data element
-      int  info;       ///< element number. info \f$\in\f$ [0,thesize-1] 
+      int  info;       ///< element number. info \f$\in\f$ [0,thesize-1]
                        ///< iff element is used
    }* theitem;         ///< array of elements in the DataSet
    //@}
@@ -214,13 +214,13 @@ public:
     * When elements are removed from a DataSet, the remaining ones are
     * renumbered from 0 through the new size()-1. How this renumbering is
     * performed will not be revealed, since it might be target of future
-    * changes. However, some methods provide a parameter 
+    * changes. However, some methods provide a parameter
     * <tt>int* perm</tt>, which
-    * returns the new order after the removal: If <tt>perm[i] < 0</tt>, 
-    * the element numbered i prior to the removal operation has been removed 
-    * from the set. Otherwise, <tt>perm[i] = j >= 0</tt> means that the 
+    * returns the new order after the removal: If <tt>perm[i] < 0</tt>,
+    * the element numbered i prior to the removal operation has been removed
+    * from the set. Otherwise, <tt>perm[i] = j >= 0</tt> means that the
     * element with number i prior to the removal operation has been
-    * renumbered to j. Removing a single element from a DataSet yields a 
+    * renumbered to j. Removing a single element from a DataSet yields a
     * simple renumbering of the elements: The last element in the set
     * (i.e., element num()-1) is moved to the index of the removed element.
     */
@@ -337,7 +337,7 @@ public:
    //@}
 
    //-----------------------------------
-   /**@name Access   
+   /**@name Access
     * When accessing elements from a DataSet with one of the index
     * operators, it must be ensured that the index is valid for the
     * DataSet. If this is not known afore, it is the programmers
@@ -406,7 +406,7 @@ public:
       return thekey[number(item)];
    }
 
-   /// returns the number of the element with DataKey \p k in DataSet or -1, 
+   /// returns the number of the element with DataKey \p k in DataSet or -1,
    /// if it doesn't exist.
    int number(const DataKey& k) const
    {
@@ -446,7 +446,7 @@ public:
       {
          n = number(item);
       }
-      catch(const SPxException &x)
+      catch(...)
       {
          return false;
       }
@@ -479,7 +479,7 @@ public:
       spx_realloc(theitem, themax);
       spx_realloc(thekey,  themax);
 
-      return reinterpret_cast<char*>(theitem) 
+      return reinterpret_cast<char*>(theitem)
          - reinterpret_cast<char*>(old_theitem);
    }
 
@@ -517,14 +517,14 @@ public:
       : theitem( 0 )
       , thekey ( 0 )
       , themax ( pmax < 1 ? 8 : pmax )
-      , thesize( 0 ) 
+      , thesize( 0 )
       , thenum ( 0 )
-      
+
    {
       firstfree = -themax - 1;
-      
+
       spx_alloc(theitem, themax);
-      
+
       try
       {
          spx_alloc(thekey, themax);
@@ -537,7 +537,7 @@ public:
 
       assert(isConsistent());
    }
-   
+
    /// copy constructor.
    DataSet(const DataSet& old)
       : theitem( 0 )

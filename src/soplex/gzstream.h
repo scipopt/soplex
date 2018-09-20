@@ -23,8 +23,8 @@
 // Revision      : $Revision: 1.8 $
 // Revision_date : $Date: 2005/11/09 13:53:50 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
-// 
-// Standard streambuf implementation following Nicolai Josuttis, "The 
+//
+// Standard streambuf implementation following Nicolai Josuttis, "The
 // Standard C++ Library".
 // ============================================================================
 
@@ -56,8 +56,8 @@ namespace GZSTREAM_NAMESPACE {
 /**@class gzstreambuf
    @brief Internal class to implement gzstream.
 */
-class gzstreambuf 
-   : public std::streambuf 
+class gzstreambuf
+   : public std::streambuf
 {
 private:
 
@@ -99,13 +99,13 @@ public:
       setp( buffer, buffer + (bufferSize-1));
       setg( buffer + 4,     // beginning of putback area
             buffer + 4,     // read position
-            buffer + 4);    // end position      
+            buffer + 4);    // end position
       // ASSERT: both input & output capabilities will not be used together
    }
    /// destructor
-   ~gzstreambuf() 
-   { 
-      close(); 
+   ~gzstreambuf()
+   {
+      close();
    }
    //@}
 
@@ -113,9 +113,9 @@ public:
    /**@name Interface */
    //@{
    ///
-   int is_open() 
-   { 
-      return opened; 
+   int is_open()
+   {
+      return opened;
    }
    ///
    gzstreambuf* open( const char* name, int open_mode );
@@ -137,8 +137,8 @@ public:
 /**@class gzstreambase
    @brief Internal class to implement gzstream.
 */
-class gzstreambase 
-   : virtual public std::ios 
+class gzstreambase
+   : virtual public std::ios
 {
 protected:
 
@@ -155,9 +155,9 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   gzstreambase() 
-   { 
-      init(&buf); 
+   gzstreambase()
+   {
+      init(&buf);
    }
    /// full constructor
    gzstreambase( const char* _name, int _open_mode );
@@ -173,16 +173,16 @@ public:
    ///
    void close();
    ///
-   gzstreambuf* rdbuf() 
-   { 
-      return &buf; 
+   gzstreambuf* rdbuf()
+   {
+      return &buf;
    }
    //@}
 };
 
 // ----------------------------------------------------------------------------
 // User classes. Use igzstream and ogzstream analogously to ifstream and
-// ofstream respectively. They read and write files based on the gz* 
+// ofstream respectively. They read and write files based on the gz*
 // function interface of the zlib. Files are compatible with gzip compression.
 // ----------------------------------------------------------------------------
 
@@ -193,9 +193,9 @@ public:
 /**@class igzstream
    @brief Class to implement a gzip'd input stream.
 */
-class igzstream 
+class igzstream
    : public std::istream
-   , public gzstreambase 
+   , public gzstreambase
 {
 public:
 
@@ -203,27 +203,27 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   igzstream() 
-      : std::istream( &buf) 
-   {} 
+   igzstream()
+      : std::istream( &buf)
+   {}
    /// full constructor
-   igzstream( const char*  _name, 
+   igzstream( const char*  _name,
               int          _open_mode = std::ios::in )
       : std::istream( &buf )
       , gzstreambase( _name, _open_mode )
-   {}  
+   {}
    //@}
 
    //------------------------------------
    /**@name Interface */
    //@{
    ///
-   gzstreambuf* rdbuf() 
-   { 
-      return gzstreambase::rdbuf(); 
+   gzstreambuf* rdbuf()
+   {
+      return gzstreambase::rdbuf();
    }
    ///
-   void open( const char*  _name, 
+   void open( const char*  _name,
               int          _open_mode = std::ios::in )
    {
        gzstreambase::open( _name, _open_mode );
@@ -238,9 +238,9 @@ public:
 /**@class ogzstream
    @brief Class to implement a gzip'd output stream.
 */
-class ogzstream 
+class ogzstream
    : public gzstreambase
-   , public std::ostream 
+   , public std::ostream
 {
 public:
 
@@ -248,29 +248,29 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   ogzstream() 
-      : std::ostream( &buf) 
+   ogzstream()
+      : std::ostream( &buf)
    {}
    /// full constructor
    explicit
-   ogzstream( const char* _name, 
+   ogzstream( const char* _name,
               int         _open_mode = std::ios::out )
       : gzstreambase( _name, _open_mode )
-      , std::ostream( &buf) 
-   {}  
+      , std::ostream( &buf)
+   {}
    //@}
 
    //------------------------------------
    /**@name Interface */
    //@{
    ///
-   gzstreambuf* rdbuf() 
-   { 
-      return gzstreambase::rdbuf(); 
+   gzstreambuf* rdbuf()
+   {
+      return gzstreambase::rdbuf();
    }
    ///
-   void open( const char*  _name, 
-              int          _open_mode = std::ios::out ) 
+   void open( const char*  _name,
+              int          _open_mode = std::ios::out )
    {
       gzstreambase::open( _name, _open_mode );
    }

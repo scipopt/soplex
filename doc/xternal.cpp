@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -61,8 +61,7 @@
  * href="http://soplex.zib.de">SoPlex</a> web page or contact us for more
  * information.
  *
- * For help with installation please consult the \ref INSTALL "INSTALL" file in
- * the distribution.
+ * For help with the installation please consult the \ref INSTALL "INSTALL" file.
  *
  * @section GETTINGSTARTED Getting started
  *
@@ -78,6 +77,8 @@
  *
  * - \ref EXACT    "How to use SoPlex as an exact LP solver"
  *
+ * - \ref CHANGELOG "CHANGELOG"
+ *
  * A tutorial article for getting started with the SCIP Optimization Suite,
  * which includes SoPlex, is available as <a
  * href="http://scip.zib.de/doc/ZR-12-27.pdf">ZIB-Report 12-27</a>.
@@ -92,7 +93,7 @@
  * <a href="http://soplex.zib.de">SoPlex</a> web page for a comprehensive list
  * of all contributors.
  *
- * @version  3.1.0.1
+ * @version  4.0.0.2
  */
 
 
@@ -158,9 +159,9 @@
  */
 
 
-/**@page INSTALL Installation
+/**@page CHANGELOG CHANGELOG
  *
- * \verbinclude INSTALL
+ * \verbinclude CHANGELOG
  */
 
 
@@ -176,11 +177,7 @@
  * using option \-\-saveset=FILENAME.set.  After changing parameter values in this
  * file you can use it by with \-\-loadset=FILENAME.set.  The most frequently used
  * parameters have abbreviations.
- *
- * For compatibility the command line interface of SoPlex versions 1.x is
- * available when you compile SoPlex with "make LEGACY=true" (using the provided
- * Makefile) or compile with the preprocessor define SOPLEX_LEGACY.
- */
+*/
 
 
 /**@page LIB How to use SoPlex as a callable library
@@ -203,10 +200,7 @@
  *@section LIB3 Deprecated 1.x interface
  *
  * With version 2.0, the SoPlex class has been updated significantly compared to
- * the 1.x version.  Although this is deprecated, it is still possible to use
- * the 1.x interface class by compiling with LEGACY=true (using the provided
- * Makefile) or compiling with the preprocessor flag SOPLEX_LEGACY.  This
- * deactivates the functionalities to solve LPs exactly.
+ * the 1.x version.  Since version 4.0, the old version cannot be used anymore.
 */
 
 

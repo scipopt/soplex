@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -17,7 +17,6 @@
  * @brief Preconfigured SoPlex LP solver
  */
 
-#ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include "limits.h"
 #include <iostream>
@@ -290,8 +289,8 @@ namespace soplex
     defaultValue[SoPlexBase<Real>::FULLPERTURBATION] = false;
 
     /// re-optimize the original problem to get a proof of infeasibility/unboundedness?
-    name[SoPlexBase<Real>::ENSURERAY] = "prooforiginal";
-    description[SoPlexBase<Real>::ENSURERAY] = "re-optimize the original problem to get a proof of infeasibility/unboundedness?";
+    name[SoPlexBase<Real>::ENSURERAY] = "ensureray";
+    description[SoPlexBase<Real>::ENSURERAY] = "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?";
     defaultValue[SoPlexBase<Real>::ENSURERAY] = false;
   }
 
@@ -495,11 +494,11 @@ namespace soplex
     defaultValue[SoPlexBase<R>::DECOMP_VERBOSITY] = VERBOSITY_ERROR;
 
     // printing condition number during the solve
-    name[SoPlexBase<R>::PRINTCONDITION] = "printcondition";
-    description[SoPlexBase<R>::PRINTCONDITION] = "print condition number during the solve (0 - off, 1 - ratio estimate , 2 - sum estimate, 3 - product estimate, 4 - exact)";
-    lower[SoPlexBase<R>::PRINTCONDITION] = 0;
-    upper[SoPlexBase<R>::PRINTCONDITION] = 4;
-    defaultValue[SoPlexBase<R>::PRINTCONDITION] = 0;
+    name[SoPlexBase<Real>::PRINTBASISMETRIC] = "printbasismetric";
+    description[SoPlexBase<Real>::PRINTBASISMETRIC] = "print basis metric during the solve (-1 - off, 0 - condition estimate , 1 - trace, 2 - determinant, 3 - condition)";
+    lower[SoPlexBase<Real>::PRINTBASISMETRIC] = -1;
+    upper[SoPlexBase<Real>::PRINTBASISMETRIC] = 3;
+    defaultValue[SoPlexBase<Real>::PRINTBASISMETRIC] = -1;
   }
 
   template <class R>
@@ -1890,8 +1889,8 @@ namespace soplex
         break;
 
         // printing of condition n
-      case PRINTCONDITION:
-        _solver.setConditionInformation(value);
+      case PRINTBASISMETRIC:
+        _solver.setMetricInformation  (value);
         break;
 
       default:
@@ -4731,7 +4730,7 @@ namespace soplex
   {
     if( !hasBasis() )
       return SPxBasisBase<Real>::NO_PROBLEM;
-    else if( status() == SPxSolverBase<Real>::OPTIMAL )
+    else if( status() == SPxSolverBase<Real>::OPTIMAL || status() == SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS )
       return SPxBasisBase<Real>::OPTIMAL;
     else if( status() == SPxSolverBase<Real>::UNBOUNDED )
       return SPxBasisBase<Real>::UNBOUNDED;
@@ -4920,33 +4919,33 @@ namespace soplex
         for( int j = 0; j < numColsT(); ++j )
           {
             if( !_solver.isColBasic(j) )
-              {
-                bind[k] = j;
-                k++;
-              }
-          }
+            {
+               bind[k] = j;
+               k++;
+            }
+         }
 
-        assert(k == numRowsT());
+         assert(k == numRowsT());
       }
-  }
+   }
 
 
-  /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
-  /// type = 0: max/min ratio
-  /// type = 1: trace of U (sum of diagonal elements)
-  /// type = 2: product of diagonal elements
-  /// #template #temp 
+   /** compute one of several matrix metrics based on the diagonal of the LU factorization
+    *  type = 0: max/min ratio
+    *  type = 1: trace of U (sum of diagonal elements)
+    *  type = 2: determinant (product of diagonal elements)
+    */
   template <>
-	bool SoPlexBase<Real>::getFastCondition(Real& condition, int type)
-  {
-    _ensureRealLPLoaded();
-    if( !_isRealLPLoaded )
-      return false;
+  bool SoPlexBase<Real>::getBasisMetric(Real& condition, int type)
+   {
+      _ensureRealLPLoaded();
+      if( !_isRealLPLoaded )
+         return false;
 
     if( _solver.basis().status() == SPxBasisBase<Real>::NO_PROBLEM )
       return false;
 
-    condition = _solver.basis().getFastCondition(type);
+      condition = _solver.getBasisMetric(type);
 
     return true;
   }
@@ -6353,11 +6352,11 @@ namespace soplex
     _hasBasis = !mps.hasError();
 
     // stop timing
-    _statistics->readingTime->stop();
+  _statistics->readingTime->stop();
 
     return _hasBasis;
 #endif
-  }
+}
 
 
 
@@ -6578,6 +6577,8 @@ namespace soplex
         break;
       case FULLPERTURBATION:
         _solver.useFullPerturbation(value);
+        break;
+      case ENSURERAY:
         break;
       default:
         return false;
@@ -7030,9 +7031,8 @@ namespace soplex
     if( string == 0 )
       return false;
 
-    char parseString[SET_MAX_LINE_LEN];
-    strncpy(parseString, string, SET_MAX_LINE_LEN-1);
-    parseString[SET_MAX_LINE_LEN-1] = '\0';
+      char parseString[SET_MAX_LINE_LEN];
+      spxSnprintf(parseString, SET_MAX_LINE_LEN-1, "%s", string);
 
     char* line = parseString;
 
@@ -7180,10 +7180,11 @@ namespace soplex
                 return false;
               }
             else if( strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-              {
-                int value;
+            {
+               int value;
+               value = std::stoi(paramValueString);
 
-                if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((IntParam)param, value, false) )
+               if(  setIntParam((SoPlex::IntParam)param, value, false) )
                   break;
                 else
                   {
@@ -7207,10 +7208,19 @@ namespace soplex
                 return false;
               }
             else if( strncmp(paramName, _currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-              {
-                Real value;
+            {
+               Real value;
+#ifdef WITH_LONG_DOUBLE
+               value = std::stold(paramValueString);
+#else
+#ifdef WITH_FLOAT
+               value = std::stof(paramValueString);
+#else
+               value = std::stod(paramValueString);
+#endif
+#endif
 
-                if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((RealParam)param, value) )
+               if( setRealParam((SoPlexBase<Real>::RealParam)param, value) )
                   break;
                 else
                   {
@@ -7258,16 +7268,20 @@ namespace soplex
         if( strncmp(paramName, "random_seed", 11) == 0 )
           {
             unsigned int value;
-            char format[SPX_MAXSTRLEN];
-            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            unsigned long parseval;
 
-            if( sscanf(paramValueString, format, &value) == 1 )
-              {
+            parseval = std::stoul(paramValueString);
+            if( parseval > UINT_MAX )
+            {
+               value = UINT_MAX;
+               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
+            }
+            else
+               value = (unsigned int) parseval;
 
-                setRandomSeed(value);
-                return true;
-              }
-          }
+            setRandomSeed(value);
+            return true;
+         }
 
         MSG_INFO1( spxout, spxout << "Error parsing setting string for uint parameter <random_seed>.\n" );
         return false;
@@ -7467,6 +7481,9 @@ namespace soplex
         os << "problem is solved [infeasible or unbounded]";
         break;
       case SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS:
+         os << "problem is solved [optimal with unscaled violations]";
+         break;
+      case SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS:
          os << "problem is solved [optimal with unscaled violations]";
          break;
       default:
@@ -9231,10 +9248,11 @@ namespace soplex
                 return false;
               }
             else if( strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
-              {
-                int value;
+            {
+               int value;
+               value = std::stoi(paramValueString);
 
-                if( sscanf(paramValueString, "%d", &value) == 1 && setIntParam((SoPlexBase<Real>::IntParam)param, value, false) )
+               if( setIntParam((SoPlex::IntParam)param, value, false) )
                   break;
                 else
                   {
@@ -9261,7 +9279,16 @@ namespace soplex
               {
                 Real value;
 
-                if( sscanf(paramValueString, "%" REAL_FORMAT, &value) == 1 && setRealParam((SoPlexBase<Real>::RealParam)param, value) )
+#ifdef WITH_LONG_DOUBLE
+               value = std::stold(paramValueString);
+#else
+#ifdef WITH_FLOAT
+               value = std::stof(paramValueString);
+#else
+               value = std::stod(paramValueString);
+#endif
+#endif
+               if( setRealParam((SoPlex::RealParam)param, value) )
                   break;
                 else
                   {
@@ -9309,15 +9336,20 @@ namespace soplex
         if( strncmp(paramName, "random_seed", 11) == 0 )
           {
             unsigned int value;
-            char format[SPX_MAXSTRLEN];
-            spxSnprintf(format, sizeof(format), "%%%du", (int) sizeof(value)-1);
+            unsigned long parseval;
 
-            if( sscanf(paramValueString, format, &value) == 1 )
-              {
-                setRandomSeed(value);
-                return true;
-              }
-          }
+            parseval = std::stoul(paramValueString);
+            if( parseval > UINT_MAX )
+            {
+               value = UINT_MAX;
+               MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
+            }
+            else
+               value = (unsigned int) parseval;
+
+            setRandomSeed(value);
+            return true;
+         }
 
         MSG_INFO1( spxout, spxout << "Error parsing settings file for uint parameter <random_seed>.\n" );
         return false;
@@ -9328,4 +9360,3 @@ namespace soplex
     return false;
   }
 } // namespace soplex
-#endif

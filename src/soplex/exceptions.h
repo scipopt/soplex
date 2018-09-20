@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -25,7 +25,7 @@ namespace soplex
 {
    /**@brief   Exception base class.
     * @ingroup Elementary
-    * 
+    *
     * This class implements a base class for our SoPlex exceptions
     * We provide a what() function which returns the exception message.
     */
@@ -49,7 +49,7 @@ namespace soplex
       /// destructor
       virtual ~SPxException() {}
       //@}
-      
+
       //----------------------------------------
       /**@name Access / modification */
       //@{
@@ -63,11 +63,11 @@ namespace soplex
 
    /**@brief   Exception class for out of memory exceptions.
     * @ingroup Elementary
-    * 
+    *
     * This class is derived from the SoPlex exception base class.
     * It does not provide any new functionality.
     */
-   class SPxMemoryException : public SPxException 
+   class SPxMemoryException : public SPxException
    {
    public:
      //----------------------------------------
@@ -82,7 +82,7 @@ namespace soplex
 
    /**@brief   Exception class for status exceptions during the computations
     * @ingroup Elementary
-    * 
+    *
     * This class is derived from the SoPlex exception base class.
     * It does not provide any new functionality.
     */
@@ -101,7 +101,7 @@ namespace soplex
 
    /**@brief   Exception class for things that should NEVER happen.
     * @ingroup Elementary
-    * 
+    *
     * This class is derived from the SoPlex exception base class.
     * It does not provide any new functionality. Most often it is used to replace
     * assert(false) terms in earlier code.

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -36,8 +36,8 @@ namespace soplex
 
    See SPxPricer for a class documentation.
 
-   @todo There seem to be problems with this pricer especially on the 
-         greenbe[ab] problems with the entering algorithm 
+   @todo There seem to be problems with this pricer especially on the
+         greenbe[ab] problems with the entering algorithm
          (row representation?).
 */
   template <class R>
@@ -94,7 +94,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxDevexPR() 
+   SPxDevexPR()
       : SPxPricer<R>("Devex")
       , last(0)
       , refined(false)
@@ -115,12 +115,12 @@ public:
       }
 
       return *this;
-   }  
+   }
    /// destructor
    virtual ~SPxDevexPR()
    {}
    /// clone function for polymorphism
-   inline virtual SPxPricer<R>* clone()  const 
+   inline virtual SPxPricer<R>* clone()  const
    {
       return new SPxDevexPR(*this);
    }

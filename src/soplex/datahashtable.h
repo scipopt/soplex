@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -32,28 +32,28 @@ namespace soplex
 /**@brief   Generic hash table for data objects.
    @ingroup Elementary
 
-   Class DataHashTable provides a generic hash table for 
+   Class DataHashTable provides a generic hash table for
    \ref DataObjects "Data Objects",
    i.e., a map that maps arguments called \a HashItems to values called \a Infos.
    HashItem and Info types are passed as template arguments. HashItems
    must provide a comparison operator==().  Furthermore, both the HashItem and
    Info must be data objects in the sense that the assignment operator is
-   equivalent to a <tt>memcpy()</tt> of the structure and no destructor is 
+   equivalent to a <tt>memcpy()</tt> of the structure and no destructor is
    required.
-   
+
    The construction of a DataHashTable requires a \em hash \em function that
    assigns an integer value to every HashItem.  Provided this, pairs of a
    HashItem and a Info can be added to the DataHashTable. No more
    than one Info can be assigned to the same HashItem at a time. The Info
    to a HashItem can be accessed through the subscript operator[]() with
    the Info object as a subscript.
-   
+
    The maximum number of elemens a DataHashTable can hold can be
    specified upon construction and may be reset with reMax() later on.
-   Further, a value hash size value is required. This value must be less then 
-   the maximum number of elements and must not have a common dominator with 
+   Further, a value hash size value is required. This value must be less then
+   the maximum number of elements and must not have a common dominator with
    the maximum number of elements. If not specified explicitely, it
-   is set automatically to a reasonable value. 
+   is set automatically to a reasonable value.
 
    The implementation relies on an array of DataHashTable::Element%s, from
    now on referred to as elements. Upon construction, all elements are
@@ -63,12 +63,12 @@ namespace soplex
    taken right away. Otherwise, the array index is incremented by
    the hash size (modulo the element array size()) until an unused element
    is found.
-   
+
    Removing elements is simply done by marking it as \c RELEASED. Hence,
    when searching for an element, the search loop may not stop, when a
    \c RELEASED element is encountered. However, such an element may be
-   reused when adding a new element to the DataHashTable. 
-   
+   reused when adding a new element to the DataHashTable.
+
    Further, memory management with resizing of the element array is
    straight forward.
 */
@@ -104,15 +104,15 @@ private:
    /**@name Data */
    //@{
    /// stores all elements of the hash table
-   DataArray < Elem > m_elem;   
+   DataArray < Elem > m_elem;
    /// increment added to hash index, if allready used
-   int m_hashsize;        
+   int m_hashsize;
    /// current number of entries in the hash table
-   int m_used;            
+   int m_used;
    /// pointer to hash function (mapping: \a HashItem -> int)
-   int (*m_hashfun) (const HashItem*);  
+   int (*m_hashfun) (const HashItem*);
    /// memory is \ref soplex::DataHashTable::reMax() "reMax()"ed by this factor if a new element does't fit
-   Real m_memfactor;  
+   Real m_memfactor;
    /// some prime numbers for fast access
    int primes[50];
    /// number of stored prime numbers
@@ -131,7 +131,7 @@ public:
       return index(h) >= 0;
    }
 
-   /// returns const pointer to \a Info of \a HashItem \p h or 0, 
+   /// returns const pointer to \a Info of \a HashItem \p h or 0,
    /// if item is not found.
    /** Returns a pointer to \a Info component of hash element \p h or a zero
     *  pointer if element \p h is not in the table.
@@ -207,8 +207,8 @@ public:
    }
    /// reset size of the DataHashTable.
    /** Reset the maximum number of elements of a DataHashTable to \p newSize.
-    *  However, if \p newSize < #m_used, it is resized to #m_used only. 
-    *  If \p newHashSize < 1, a new hash size is computed automatically. 
+    *  However, if \p newSize < #m_used, it is resized to #m_used only.
+    *  If \p newHashSize < 1, a new hash size is computed automatically.
     *  Otherwise, the specified value will be taken.
     */
    void reMax (int newSize = -1, int newHashSize = 0)
@@ -260,10 +260,10 @@ public:
    //@{
    /// default constructor.
    /** Allocates a DataHashTable for \p maxsize entries using \p hashfun
-    *  as hash function. If \p hashsize > 0, #m_hashsize is set to the 
-    *  specified value, otherwise a suitable hash size is computed 
-    *  automatically. Parameter \p factor is used for memory management: 
-    *  If more than \p maxsize entries are added to the DataHashTable, it 
+    *  as hash function. If \p hashsize > 0, #m_hashsize is set to the
+    *  specified value, otherwise a suitable hash size is computed
+    *  automatically. Parameter \p factor is used for memory management:
+    *  If more than \p maxsize entries are added to the DataHashTable, it
     *  will automatically be #reMax()%ed by a factor of \p factor.
     *
     *  @param hashfun      pointer to hash function.
@@ -272,9 +272,9 @@ public:
     *  @param factor       factor for increasing data block.
     */
    explicit DataHashTable(
-      int (*hashfun)(const HashItem*), 
+      int (*hashfun)(const HashItem*),
       int maxsize  = 265,
-      int hashsize = 0, 
+      int hashsize = 0,
       Real factor  = 2.0)
       : m_elem(maxsize)
       , m_hashfun(hashfun)
@@ -443,13 +443,13 @@ private:
    }
 
    /// returns hash index of \a HashItem \p h or -1, if \p h is not present.
-   /** Using the hash function #m_hashfun, the hash value of \p h 
+   /** Using the hash function #m_hashfun, the hash value of \p h
     *  is calculated.
     *  Starting with this hash index, every #m_hashsize%-th element is
     *  compared with \p h until \p h is found or all elements have been checked.
     *
     *  @param  h  \a HashItem, for which the hash index should be calculated
-    *  @return hash index of \p h or -1, 
+    *  @return hash index of \p h or -1,
     *          if \p h is not a member of the hash table
     */
    int index(const HashItem& h) const
@@ -461,7 +461,7 @@ private:
 
       int i = (*m_hashfun)(&h) % m_elem.size();
       int j = i;
-      
+
       while(m_elem[i].stat != Elem::FREE)
       {
          if (  (m_elem[i].stat == Elem::USED)

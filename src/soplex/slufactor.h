@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -21,11 +21,11 @@
 
 #include <assert.h>
 
-#include "spxdefines.h"
-#include "timerfactory.h"
-#include "dvector.h"
-#include "slinsolver.h"
-#include "clufactor.h"
+#include "soplex/spxdefines.h"
+#include "soplex/timerfactory.h"
+#include "soplex/dvector.h"
+#include "soplex/slinsolver.h"
+#include "soplex/clufactor.h"
 
 namespace soplex
 {
@@ -34,9 +34,9 @@ namespace soplex
 
 /**@brief   Implementation of Sparse Linear Solver.
  * @ingroup Algo
- * 
- * This class implements a #SLinSolver interface by using the sparse LU
- * factorization implementet in #CLUFactor.
+ *
+ * This class implements a SLinSolver interface by using the sparse LU
+ * factorization implemented in CLUFactor.
  */
 class SLUFactor : public SLinSolver, protected CLUFactor
 {
@@ -71,7 +71,7 @@ protected:
    //@{
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current \ref soplex::SLUFactor::UpdateType "UpdateType".
-   SSVector   eta;           ///< 
+   SSVector   eta;           ///<
    SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Real       lastThreshold; ///< pivoting threshold of last factorization
    //@}
@@ -146,7 +146,7 @@ public:
 
    //--------------------------------
    /**@name Derived from SLinSolver
-      See documentation of \ref soplex::SLinSolver "SLinSolver" for a 
+      See documentation of \ref soplex::SLinSolver "SLinSolver" for a
       documentation of these methods.
    */
    //@{
@@ -174,8 +174,12 @@ public:
    }
    ///
    Real stability() const;
-   /// return condition number estimate based on the diagonal of U
-   Real conditionEstimate(int type = 0) const;
+   /** return one of several matrix metrics based on the diagonal of U
+    * 0: condition number estimate by ratio of min/max
+    * 1: trace (sum of diagonal elements)
+    * 2: determinant (product of diagonal elements)
+    */
+   Real matrixMetric(int type = 0) const;
    ///
    std::string statistics() const;
    ///

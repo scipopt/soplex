@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -20,10 +20,8 @@
 #ifndef _SOPLEX_H_
 #define _SOPLEX_H_
 
-#ifndef SOPLEX_LEGACY
 #include <string.h>
 
-///@todo SoPlex should also have an spxout object to avoid using a global one
 #include "soplex/spxgithash.h"
 #include "soplex/spxdefines.h"
 #include "soplex/basevectors.h"
@@ -732,11 +730,12 @@ public:
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind) const;
 
-   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
-   /// type = 0: max/min ratio
-   /// type = 1: trace of U (sum of diagonal elements)
-   /// type = 2: product of diagonal elements
-   bool getFastCondition(Real& condition, int type = 0);
+   /** compute one of several matrix metrics based on the diagonal of the LU factorization
+    *  type = 0: max/min ratio
+    *  type = 1: trace of U (sum of diagonal elements)
+    *  type = 2: determinant (product of diagonal elements)
+    */
+   bool getBasisMetric(Real& metric, int type = 0);
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
    bool getEstimatedCondition(Real& condition);
@@ -928,6 +927,7 @@ public:
 
       /// re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?
       ENSURERAY = 15,
+
       /// number of boolean parameters
       BOOLPARAM_COUNT = 16
    } BoolParam;
@@ -1020,7 +1020,7 @@ public:
       DECOMP_VERBOSITY = 27,
 
       /// print condition number during the solve
-      PRINTCONDITION = 28,
+      PRINTBASISMETRIC = 28,
 
       /// number of integer parameters
       INTPARAM_COUNT = 29
@@ -1797,11 +1797,11 @@ private:
    int origCountBoxed;
    int origCountFreeCol;
 
+   int origCountEqual;
    int origCountLhs;
    int origCountRhs;
    int origCountRanged;
    int origCountFreeRow;
-
 
    decompStatus _currentProb;
 
@@ -2326,12 +2326,4 @@ private:
   typedef SPxBasisBase<Real> SPxBasis;
 
 }
-#else
-#include "soplexlegacy.h"
-
-namespace soplex
-{
-   typedef SoPlexBaseLegacy SoPlexBase;
-}
-#endif
 #endif // _SOPLEX_H_

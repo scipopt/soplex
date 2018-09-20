@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -38,17 +38,17 @@ namespace soplex
     x, a scalar \f$\alpha\f$ and another vector \f$\delta\f$, the
     update to \c x constists of substituting it by \f$x \leftarrow x +
     \alpha\cdot\delta\f$.
- 
+
     While the update itself can easily be expressed with methods of
     the class Vector, it is often desirable to save the last update
     vector \f$\delta\f$ and value \f$\alpha\f$. This is provided by
     class UpdateVector.
- 
+
     UpdateVectors are derived from DVector and provide additional
     methods for saving and setting the multiplicator \f$\alpha\f$ and
     the update vector \f$\delta\f$. Further, it allows for efficient
     sparse updates, by providing an IdxSet idx() containing the
-    nonzero indices of \f$\delta\f$.  
+    nonzero indices of \f$\delta\f$.
 */
 class UpdateVector : public DVector
 {
@@ -57,7 +57,7 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   Real     theval;      ///< update multiplicator 
+   Real     theval;      ///< update multiplicator
    SSVector thedelta;    ///< update vector
    //@}
 
@@ -140,7 +140,7 @@ public:
    /**@name Modification */
    //@{
    /// Perform the update
-   /**  Add \c value() * \c delta() to the UpdateVector. Only the indices 
+   /**  Add \c value() * \c delta() to the UpdateVector. Only the indices
     *  in idx() are affected. For all other indices, delta() is asumed
     *  to be 0.
     */
@@ -174,7 +174,7 @@ public:
    //------------------------------------
    /**@name Consistency check */
    //@{
-   /// 
+   ///
    bool isConsistent() const;
    //@}
 };

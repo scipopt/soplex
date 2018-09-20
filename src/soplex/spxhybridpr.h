@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -55,7 +55,7 @@ class SPxHybridPR : public SPxPricer<R>
    /// the currently used pricer
    SPxPricer<R>*   thepricer;
    /// factor between dim and coDim of the problem to decide about the pricer
-   Real hybridFactor; 
+   Real hybridFactor;
    //@}
 
 public:
@@ -123,7 +123,7 @@ public:
       {
          thepricer = &devex;
       }
-      else // old.thepricer should be 0 
+      else // old.thepricer should be 0
       {
          thepricer = 0;
       }
@@ -150,14 +150,14 @@ public:
          {
             thepricer = &devex;
          }
-         else // rhs.thepricer should be 0 
+         else // rhs.thepricer should be 0
          {
             thepricer = 0;
          }
       }
 
       return *this;
-   }  
+   }
    /// destructor
    virtual ~SPxHybridPR()
    {}

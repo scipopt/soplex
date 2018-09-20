@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -83,7 +83,7 @@ protected:
    const char*        m_name;      ///< Name of the scaler
    DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
    DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
-   bool               m_colFirst;  ///< do column scaling first 
+   bool               m_colFirst;  ///< do column scaling first
    bool               m_doBoth;    ///< do columns and rows
    SPxOut*            spxout;      ///< message handler
    //@}
@@ -101,9 +101,7 @@ public:
    /// compute a single scaling vector , e.g. of a newly added row
    virtual int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
 
-#ifndef SOPLEX_LEGACY
    virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
-#endif
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
@@ -131,9 +129,9 @@ public:
    /// get name of scaler
    virtual const char* getName() const;
    /// set scaling order
-   virtual void setOrder(bool colFirst); 
+   virtual void setOrder(bool colFirst);
    /// set wether column and row scaling should be performed
-   virtual void setBoth(bool both); 
+   virtual void setBoth(bool both);
    /// set message handler
    virtual void setOutstream(SPxOut& newOutstream)
    {
@@ -190,11 +188,11 @@ public:
    virtual void getLhsUnscaled(const SPxLPBase<Real>& lp, Vector& vec) const;
    /// returns unscaled coefficient of \p lp
    virtual Real getCoefUnscaled(const SPxLPBase<Real>& lp, int row, int col) const;
-   /// unscale dense primal solution vector given in \p x. 
+   /// unscale dense primal solution vector given in \p x.
    virtual void unscalePrimal(const SPxLPBase<Real>& lp, Vector& x) const;
    /// unscale dense slack vector given in \p s.
    virtual void unscaleSlacks(const SPxLPBase<Real>& lp, Vector& s) const;
-   /// unscale dense dual solution vector given in \p pi. 
+   /// unscale dense dual solution vector given in \p pi.
    virtual void unscaleDual(const SPxLPBase<Real>& lp, Vector& pi) const;
    /// unscale dense reduced cost vector given in \p r.
    virtual void unscaleRedCost(const SPxLPBase<Real>& lp, Vector& r) const;

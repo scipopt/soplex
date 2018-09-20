@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -33,9 +33,9 @@ namespace soplex
    This property may be used to build arrays with additional information to
    the elements of a DataSet.
 
-   In addition, #DataKey%s provide a member #info which can be used to store 
+   In addition, #DataKey%s provide a member #info which can be used to store
    further information.
-   
+
    Each DataKey is unique for one DataSet but different DataSets may (and
    generally will) manage the same #DataKey%s. When an element is removed from
    a DataSet its DataKey may (and generally will) be reused for other
@@ -62,8 +62,8 @@ public:
    /**@name Constructors / destructors */
    //@{
    /// Default constructor. Constructs an invalid DataKey.
-   DataKey() 
-      : info(0), idx(-1) 
+   DataKey()
+      : info(0), idx(-1)
    {}
    // Full constructor
    DataKey(int p_info, int p_idx)
@@ -79,12 +79,12 @@ public:
          info = rhs.info;
          idx  = rhs.idx;
       }
-      
+
       return *this;
    }
    /// Copy constructor.
-   DataKey(const DataKey& old) 
-      : info(old.info) 
+   DataKey(const DataKey& old)
+      : info(old.info)
       , idx(old.idx)
    {}
    //@}
@@ -98,10 +98,10 @@ public:
       return idx;
    }
    /// sets the index number (\ref soplex::DataKey::idx "idx") of the DataKey.
-   inline void setIdx(int p_idx) 
+   inline void setIdx(int p_idx)
    {
       idx = p_idx;
-   }   
+   }
    /// returns TRUE, iff the DataKey is valid.
    inline bool isValid() const
    {

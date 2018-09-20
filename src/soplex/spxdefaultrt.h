@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,7 +30,7 @@ namespace soplex
 
 /**@brief   Textbook ratio test for SoPlex.
    @ingroup Algo
-   
+
    Class SPxDefaultRT provides an implementation of the textbook ratio test
    as a derived class of SPxRatioTester. This class is not intended for
    reliably solving LPs (even though it does the job for ``numerically simple''
@@ -48,11 +48,11 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxDefaultRT() 
+   SPxDefaultRT()
       : SPxRatioTester<R>("Default")
    {}
    /// copy constructor
-   SPxDefaultRT(const SPxDefaultRT& old) 
+   SPxDefaultRT(const SPxDefaultRT& old)
       : SPxRatioTester<R>(old)
    {}
    /// assignment operator

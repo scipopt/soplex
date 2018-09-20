@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -23,22 +23,21 @@ namespace soplex
 {
   template <>
   bool SPxSolverBase<Real>::readBasisFile(
-                                   const char*    filename, 
+                                   const char*    filename,
                                    const NameSet* rowNames,
                                    const NameSet* colNames)
   {
-
     spxifstream file(filename);
 
     if (!file)
       return false;
- 
+
     return this->readBasis(file, rowNames, colNames);
   }
 
   template <>
   bool SPxSolverBase<Real>::writeBasisFile
-  ( const char*    filename, 
+  ( const char*    filename,
     const NameSet* rowNames,
     const NameSet* colNames,
     const bool cpxFormat ) const
@@ -47,9 +46,8 @@ namespace soplex
 
     if (!file)
       return false;
- 
-    this->writeBasis(file, rowNames, colNames);
 
+    this->writeBasis(file, rowNames, colNames);
     return true;
   }
 

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -14,7 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file slufactor.cpp
- * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C). 
+ * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C).
  *       This should be properly integrated and demangled.
  * @todo Does is make sense, to call x.clear() when next x.altValues()
  *       is called.
@@ -23,12 +23,12 @@
 #include <assert.h>
 #include <sstream>
 
-#include "spxdefines.h"
-#include "slufactor.h"
-#include "cring.h"
-#include "spxalloc.h"
-#include "spxout.h"
-#include "exceptions.h"
+#include "soplex/spxdefines.h"
+#include "soplex/slufactor.h"
+#include "soplex/cring.h"
+#include "soplex/spxalloc.h"
+#include "soplex/spxout.h"
+#include "soplex/exceptions.h"
 
 #ifdef SOPLEX_DEBUG
 #include <stdio.h>
@@ -37,7 +37,7 @@
 namespace soplex
 {
 #define MINSTABILITY    REAL(4e-2)
- 
+
 void SLUFactor::solveRight(Vector& x, const Vector& b) //const
 {
 
@@ -130,7 +130,7 @@ void SLUFactor::solve2right4update(
    if (l.updateType == ETA)
    {
       n = ssvec.size();
-      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
+      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
       x.setSize(m);
@@ -142,7 +142,7 @@ void SLUFactor::solve2right4update(
    {
       forest.clear();
       n = ssvec.size();
-      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(), 
+      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
          forest.altValues(), &f, forest.altIndexMem());
@@ -587,7 +587,7 @@ Real SLUFactor::stability() const
    return initMaxabs / maxabs;
 }
 
-Real SLUFactor::conditionEstimate(int type) const
+Real SLUFactor::matrixMetric(int type) const
 {
    Real result = 0.0;
 
@@ -597,7 +597,7 @@ Real SLUFactor::conditionEstimate(int type) const
 
    switch( type )
    {
-   // compute estimate by ratio of max/min of elements on the diagonal
+   // compute condition estimate by ratio of max/min of elements on the diagonal
    case 0:
    {
       Real mindiag = spxAbs(diag[0]);
@@ -608,23 +608,24 @@ Real SLUFactor::conditionEstimate(int type) const
          Real absdiag = spxAbs(diag[i]);
          if( absdiag < mindiag )
             mindiag = absdiag;
-         if( absdiag > maxdiag )
+         else if( absdiag > maxdiag )
             maxdiag = absdiag;
       }
       result = maxdiag/mindiag;
       break;
    }
-   // compute estimate by summing up the elements on the diagonal
+   // compute sum of inverses of all elements on the diagonal
    case 1:
-      result = diag[0];
-      for( int i = 1; i < dim(); ++i)
-         result += spxAbs(diag[i]);
+      result = 0.0;
+      for( int i = 0; i < dim(); ++i)
+         result += 1.0/diag[i];
       break;
-   // compute estimate by multiplying the elements on the diagonal
+   // compute determinant (product of all diagonal elements of U)
    case 2:
-      result = diag[0];
-      for( int i = 1; i < dim(); ++i)
-         result *= spxAbs(diag[i]);
+      result = 1.0;
+      for( int i = 0; i < dim(); ++i)
+         result *= diag[i];
+      result = 1.0/result;
       break;
    }
 
@@ -657,7 +658,7 @@ SLUFactor::Status SLUFactor::change(
    const SSVector* e)
 {
 
-   // BH 2005-08-23: The boolean usetup indicates that an "update vector" 
+   // BH 2005-08-23: The boolean usetup indicates that an "update vector"
    // has been set up. I suppose that SSVector forest is this
    // update vector, which is set up by solveRight4update() and
    // solve2right4update() in order to optimize the basis update.
@@ -676,7 +677,7 @@ SLUFactor::Status SLUFactor::change(
          forest.setSize(0);
          forest.forceSetup();
       }
-      else                               
+      else
       {
          assert(l.updateType == ETA);
          changeEta(idx, eta);
@@ -710,7 +711,7 @@ SLUFactor::Status SLUFactor::change(
 
    MSG_DEBUG( std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
                      << std::endl; )
-   
+
    return status();
 }
 
@@ -725,7 +726,7 @@ void SLUFactor::clear()
    l.firstUnused = 0;
    thedim        = 0;
 
-   epsilon       = Param::epsilonFactorization(); 
+   epsilon       = Param::epsilonFactorization();
    usetup        = false;
    maxabs        = 1;
    initMaxabs    = 1;
@@ -852,7 +853,7 @@ void SLUFactor::assign(const SLUFactor& old)
 
    // need to make row list ok ?
    if (thedim > 0 && stat == OK)
-   { 
+   {
       u.row.list.idx = old.u.row.list.idx; // .idx neu
 
       const Dring* oring = &old.u.row.list;
@@ -894,7 +895,7 @@ void SLUFactor::assign(const SLUFactor& old)
 
    // need to make col list ok
    if (thedim > 0 && stat == OK)
-   {           
+   {
       u.col.list.idx = old.u.col.list.idx; // .idx neu
 
       const Dring* oring = &old.u.col.list;
@@ -911,7 +912,7 @@ void SLUFactor::assign(const SLUFactor& old)
       ring->next->prev = ring;
    }
 
-   /* Setup L 
+   /* Setup L
     */
    l.size        = old.l.size;
    l.startSize   = old.l.startSize;
@@ -1099,14 +1100,14 @@ SLUFactor::SLUFactor()
       u.col.len[thedim]   = 0;
 
       l.size = 1;
-      
+
       spx_alloc(l.val, l.size);
       spx_alloc(l.idx, l.size);
-      
+
       l.startSize   = 1;
       l.firstUpdate = 0;
       l.firstUnused = 0;
-      
+
       spx_alloc(l.start, l.startSize);
       spx_alloc(l.row,   l.startSize);
    }
@@ -1228,7 +1229,7 @@ void SLUFactor::freeAll()
    if(l.idx) spx_free(l.idx);
    if(l.start) spx_free(l.start);
    if(l.row) spx_free(l.row);
-  
+
  if(diag) spx_free(diag);
 
  if (u.col.val) spx_free(u.col.val);

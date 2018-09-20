@@ -23,8 +23,8 @@
 // Revision      : $Revision: 1.8 $
 // Revision_date : $Date: 2005/12/07 18:03:25 $
 // Author(s)     : Deepak Bandyopadhyay, Lutz Kettner
-// 
-// Standard streambuf implementation following Nicolai Josuttis, "The 
+//
+// Standard streambuf implementation following Nicolai Josuttis, "The
 // Standard C++ Library".
 // ============================================================================
 
@@ -99,7 +99,7 @@ int gzstreambuf::underflow() { // used for input buffer only
           buffer + 4 + num);          // end of buffer
 
     // return next character
-    return * reinterpret_cast<unsigned char *>( gptr());    
+    return * reinterpret_cast<unsigned char *>( gptr());
 }
 
 int gzstreambuf::flush_buffer() {

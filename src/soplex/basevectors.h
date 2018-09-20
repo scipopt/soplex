@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2017 Konrad-Zuse-Zentrum                            */
+/*                  1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -300,42 +300,6 @@ VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
 
    return *this;
 }
-
-
-
-#ifndef SOPLEX_LEGACY
-/// Addition of scaled vector, specialization for rationals
-template <>
-template <>
-inline
-VectorBase<Rational>& VectorBase<Rational>::multAdd(const Rational& x, const SVectorBase<Rational>& vec)
-{
-   for( int i = vec.size() - 1; i >= 0; --i )
-   {
-      assert(vec.index(i) < dim());
-      val[vec.index(i)].addProduct(x, vec.value(i));
-   }
-
-   return *this;
-}
-
-
-
-/// Subtraction of scaled vector, specialization for rationals
-template <>
-template <>
-inline
-VectorBase<Rational>& VectorBase<Rational>::multSub(const Rational& x, const SVectorBase<Rational>& vec)
-{
-   for( int i = vec.size() - 1; i >= 0; --i )
-   {
-      assert(vec.index(i) < dim());
-      val[vec.index(i)].subProduct(x, vec.value(i));
-   }
-
-   return *this;
-}
-#endif
 
 
 

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,7 +30,7 @@ namespace soplex
 {
 /**@brief   Implementation of sparse LU factorization.
  * @ingroup Algo
- * 
+ *
  * This class implements a sparse LU factorization with either
  * FOREST-TOMLIN or ETA updates, using dynamic Markowitz pivoting.
  */
@@ -45,8 +45,8 @@ public:
     *  row file in working matrix.
     */
    struct Dring
-   {  
-      Dring* next; 
+   {
+      Dring* next;
       Dring* prev;
       int    idx;
    };
@@ -58,8 +58,8 @@ public:
       Pring* next;                ///<
       Pring* prev;                ///<
       int    idx;                 ///< index of pivot row
-      int    pos;                 ///< position of pivot column in row 
-      int    mkwtz;               ///< markowitz number of pivot 
+      int    pos;                 ///< position of pivot column in row
+      int    mkwtz;               ///< markowitz number of pivot
 
       Pring() : next(0), prev(0)  ///< constructor
       {
@@ -80,17 +80,17 @@ protected:
    /**@name Protected types */
    //@{
    /// Temporary data structures.
-   class Temp 
+   class Temp
    {
-   public: 
+   public:
       int*    s_mark;       ///< marker
-      Real*   s_max;        ///< maximum absolute value per row (or -1) 
-      int*    s_cact;       ///< lengths of columns of active submatrix 
+      Real*   s_max;        ///< maximum absolute value per row (or -1)
+      int*    s_cact;       ///< lengths of columns of active submatrix
       int     stage;        ///< stage of the structure
-      Pring   pivots;       ///< ring of selected pivot rows 
-      Pring*  pivot_col;    ///< column index handlers for Real linked list 
+      Pring   pivots;       ///< ring of selected pivot rows
+      Pring*  pivot_col;    ///< column index handlers for Real linked list
       Pring*  pivot_colNZ;  ///< lists for columns to number of nonzeros
-      Pring*  pivot_row;    ///< row index handlers for Real linked list 
+      Pring*  pivot_row;    ///< row index handlers for Real linked list
       Pring*  pivot_rowNZ;  ///< lists for rows to number of nonzeros
 
       Temp();               ///< constructor
@@ -106,8 +106,8 @@ protected:
    /// Data structures for saving the row and column permutations.
    struct Perm
    {
-      int* orig;          ///< orig[p] original index from p 
-      int* perm;          ///< perm[i] permuted index from i 
+      int* orig;          ///< orig[p] original index from p
+      int* perm;          ///< perm[i] permuted index from i
    };
 
    /// Data structures for saving the working matrix and U factor.
@@ -116,18 +116,18 @@ protected:
       ///
       struct Row
       {
-         Dring list;         /*!< \brief Double linked ringlist of vector 
+         Dring list;         /*!< \brief Double linked ringlist of vector
                                indices in the order they appear
                                in the row file                      */
          Dring* elem;        ///< %Array of ring elements.
          int    size;        ///< size of arrays val and idx
          int    used;        ///< used entries of arrays idx and val
          Real*  val;         ///< hold nonzero values
-         int*   idx;         ///< hold column indices of nonzeros 
+         int*   idx;         ///< hold column indices of nonzeros
          int*   start;       ///< starting positions in val and idx
          int*   len;         ///< used nonzeros per row vectors
          int*   max;         /*!< \brief maximum available nonzeros per row:
-                               start[i] + max[i] == start[elem[i].next->idx] 
+                               start[i] + max[i] == start[elem[i].next->idx]
                                len[i] <= max[i].                    */
       } row;
 
@@ -147,7 +147,7 @@ protected:
          int *start;         ///< starting positions in val and idx
          int *len;           ///< used nonzeros per column vector
          int *max;           /*!< \brief maximum available nonzeros per colunn:
-                               start[i] + max[i] == start[elem[i].next->idx] 
+                               start[i] + max[i] == start[elem[i].next->idx]
                                len[i] <= max[i].                    */
       } col;
    };
@@ -183,23 +183,23 @@ protected:
    //@{
    SLinSolver::Status stat;   ///< Status indicator.
 
-   int     thedim;            ///< dimension of factorized matrix   
-   int     nzCnt;             ///< number of nonzeros in U      
-   Real    initMaxabs;        ///< maximum abs number in initail Matrix 
-   Real    maxabs;            ///< maximum abs number in L and U        
+   int     thedim;            ///< dimension of factorized matrix
+   int     nzCnt;             ///< number of nonzeros in U
+   Real    initMaxabs;        ///< maximum abs number in initail Matrix
+   Real    maxabs;            ///< maximum abs number in L and U
 
-   Real    rowMemMult;        ///< factor of minimum Memory * number of nonzeros 
-   Real    colMemMult;        ///< factor of minimum Memory * number of nonzeros 
-   Real    lMemMult;          ///< factor of minimum Memory * number of nonzeros 
+   Real    rowMemMult;        ///< factor of minimum Memory * number of nonzeros
+   Real    colMemMult;        ///< factor of minimum Memory * number of nonzeros
+   Real    lMemMult;          ///< factor of minimum Memory * number of nonzeros
 
-   Perm    row;               ///< row permutation matrices 
-   Perm    col;               ///< column permutation matrices 
+   Perm    row;               ///< row permutation matrices
+   Perm    col;               ///< column permutation matrices
 
-   L       l;                 ///< L matrix 
-   Real*   diag;              ///< Array of pivot elements          
-   U       u;                 ///< U matrix 
+   L       l;                 ///< L matrix
+   Real*   diag;              ///< Array of pivot elements
+   U       u;                 ///< U matrix
 
-   Real*   work;              ///< Working array: must always be left as 0! 
+   Real*   work;              ///< Working array: must always be left as 0!
 
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
@@ -214,8 +214,8 @@ private:
    //@}
 
    //----------------------------------------
-   /**@name Solving 
-      These helper methods are used during the factorization process. 
+   /**@name Solving
+      These helper methods are used during the factorization process.
       The solve*-methods solve lower and upper triangular systems from
       the left or from the right, respectively  The methods with '2' in
       the end solve two systems at the same time.  The methods with
@@ -316,7 +316,7 @@ private:
    void initFactorRings();
    ///
    void freeFactorRings();
-      
+
    ///
    int setupColVals();
    ///
@@ -376,7 +376,7 @@ protected:
    int solveLeft2(Real* vec1, int* nonz, Real* vec2, Real eps, Real* rhs1, Real* rhs2);
 
    ///
-   int vSolveRight4update(Real eps, 
+   int vSolveRight4update(Real eps,
       Real* vec, int* idx,               /* result       */
       Real* rhs, int* ridx, int rn,      /* rhs & Forest */
       Real* forest, int* forestNum, int* forestIdx);
@@ -458,9 +458,9 @@ protected:
    void updateNoClear(int p_col, const Real* p_work, const int* p_idx, int num);
 
    ///
-   void factor(const SVector** vec,   ///< Array of column vector pointers  
-               Real threshold,    ///< pivoting threshold                
-               Real eps);         ///< epsilon for zero detection        
+   void factor(const SVector** vec,   ///< Array of column vector pointers
+               Real threshold,    ///< pivoting threshold
+               Real eps);         ///< epsilon for zero detection
    //@}
 
    //----------------------------------------

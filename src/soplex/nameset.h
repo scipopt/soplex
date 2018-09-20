@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -35,17 +35,17 @@ namespace soplex
    Class NameSet implements a symbol or name table. It allows to store or
    remove names (i.e., \c char*), but does not provide means for manipulating
    stored names.
-   
+
    Names in a NameSet may be accessed via numbers from 0 through num()-1
-   and via \ref soplex::DataKey "DataKeys". See DataSet for a description of 
+   and via \ref soplex::DataKey "DataKeys". See DataSet for a description of
    these concepts.
-   
+
    At a time a NameSet can hold a maximum of max() entries. This can be
    reset with method reMax(). If more than max() names are added to a
    NameSet, it adjusts itself automatically to the required size.  This
    implies, that references to names within a NameSet may become invalid if
    the NameSet is expanded.
-   
+
    All names (i.e., the actual char strings) in a NameSet are stored in one
    continuous memory block of size memMax(). At one time memSize() bytes of
    it are used for actually saving names; the remaining memory is free to hold
@@ -67,7 +67,7 @@ public:
     *
     *  Class Name provides the handles (i.e., char*s) of names in a
     *  NameSet.
-    */   
+    */
    class Name
    {
    private:
@@ -115,17 +115,17 @@ public:
       /**@name Constructors / destructors */
       //@{
       /// default constructor.
-      Name() 
+      Name()
          : name(&deflt)
       {}
       /// copy constructor.
       /** Only the pointer to the name is copied, but not the name itself.
        */
-      Name (const Name& str) 
+      Name (const Name& str)
          : name(str.name)
       {}
       /// implictly constructs a Name out of a C style character string.
-      Name (const char* str) 
+      Name (const char* str)
          : name(str)
       {}
       //@}

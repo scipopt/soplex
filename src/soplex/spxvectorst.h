@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -34,7 +34,7 @@ namespace soplex
    an LP to be solved with SoPlex if an approximate solution vector or dual
    vector (possibly optained by a heuristic) is available. This is done by
    setting up weights for the SPxWeightST it is derived from.
-   
+
    The primal vector to be used is loaded by calling method #primal() while
    #dual() setups for the dual vector. Methods #primal() or #dual() must be
    called \em before #generate() is called by SoPlex to set up a
@@ -75,7 +75,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor.
-   SPxVectorST() 
+   SPxVectorST()
       : state(NONE)
    {
       this->m_name = "Vector";
@@ -104,7 +104,7 @@ public:
    }
    /// destructor.
    virtual ~SPxVectorST()
-   {}  
+   {}
    /// clone function for polymorphism
    inline virtual SPxStarter<R>* clone() const
    {

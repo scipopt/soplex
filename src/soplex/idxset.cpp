@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -26,7 +26,7 @@ int IdxSet::dim() const
       if (ddim < idx[i])
          ddim = idx[i];
 
-   return ddim; 
+   return ddim;
 }
 
 int IdxSet::pos(int i) const
@@ -104,7 +104,7 @@ IdxSet::IdxSet(const IdxSet& old)
       idx[num] = old.idx[num];
 
    freeArray = true;
-   
+
    assert(size() == old.size());
    assert(size() <= max());
    assert(isConsistent());

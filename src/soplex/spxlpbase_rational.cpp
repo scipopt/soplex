@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -17,7 +17,6 @@
  * @brief Saving LPs with Rational values in a form suitable for SoPlex.
  */
 
-#ifndef SOPLEX_LEGACY
 #include <assert.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -1252,7 +1251,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          }
 
          // save copy of string (make sure string ends with \0)
-         strncpy(colname, mps.field1(), MPSInput::MAX_LINE_LEN-1);
+         spxSnprintf(colname, MPSInput::MAX_LINE_LEN-1, "%s", mps.field1());
          colname[MPSInput::MAX_LINE_LEN-1] = '\0';
          cnames.add(colname);
          vec.clear();
@@ -1347,14 +1346,14 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          break;
 
       if( *rhsname == '\0' )
-         strcpy(rhsname, mps.field1());
+         spxSnprintf(rhsname, MPSInput::MAX_LINE_LEN, "%s", mps.field1());
 
       if( strcmp(rhsname, mps.field1()) )
       {
          if( strcmp(addname, mps.field1()) )
          {
             assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
-            strncpy(addname, mps.field1(), MPSInput::MAX_LINE_LEN);
+            spxSnprintf(addname, MPSInput::MAX_LINE_LEN, "%s", mps.field1());
             MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
          }
       }
@@ -1436,7 +1435,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
       if( *rngname == '\0' )
       {
          assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
-         strncpy(rngname, mps.field1(), MPSInput::MAX_LINE_LEN);
+         spxSnprintf(rngname, MPSInput::MAX_LINE_LEN, "%s", mps.field1());
       }
 
       /* The rules are:
@@ -1576,7 +1575,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
       if( *bndname == '\0' )
       {
          assert(strlen(mps.field2()) < MPSInput::MAX_LINE_LEN);
-         strncpy(bndname, mps.field2(), MPSInput::MAX_LINE_LEN);
+         spxSnprintf(bndname, MPSInput::MAX_LINE_LEN, "%s", mps.field2());
       }
 
       // Only read the first Bound in section
@@ -1993,7 +1992,6 @@ static void LPFwriteRows(
 
    p_output << "Subject To\n";
 
-   int num_written_rows = 0;  // num_written_rows > nRows with ranged rows
    for( int i = 0; i < p_lp.nRows(); ++i )
    {
       const Rational lhs = p_lp.lhs(i);
@@ -2002,15 +2000,15 @@ static void LPFwriteRows(
       if( double(lhs) > -double(infinity) && double(rhs) < double(infinity) && lhs != rhs )
       {
          // ranged row -> write two non-ranged rows
-         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << "_1 : ";
+         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_1 : ";
          LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, infinity, spxout);
 
-         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << "_2 : ";
+         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_2 : ";
          LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -infinity, rhs, spxout);
       }
       else
       {
-         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, ++num_written_rows) << " : ";
+         p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << " : ";
          LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, rhs, spxout);
       }
    }
@@ -2421,4 +2419,3 @@ void SPxLPBase<Rational>::buildDualProblem(SPxLPBase<Rational>& dualLP, SPxRowId
 
 template class SPxLPBase < Rational >;
 } // namespace soplex
-#endif

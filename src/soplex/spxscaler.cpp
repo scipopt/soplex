@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -51,8 +51,8 @@ std::ostream& operator<<(std::ostream& s, const SPxScaler& sc)
 
 
 SPxScaler::SPxScaler(
-   const char* name, 
-   bool        colFirst, 
+   const char* name,
+   bool        colFirst,
    bool        doBoth,
    SPxOut*     outstream)
    : m_name(name)
@@ -161,12 +161,10 @@ int SPxScaler::computeScaleExp(const SVector& vec, const DataArray<int>& oldScal
    }
 }
 
-#ifndef SOPLEX_LEGACY
 int SPxScaler::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const
 {
    return 0;
 }
-#endif
 
 void SPxScaler::applyScaling(SPxLPBase<Real>& lp)
 {

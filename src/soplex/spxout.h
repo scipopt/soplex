@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -29,27 +29,27 @@
 //    class SPxOut
 // ----------------------------------------------------------------------
 
-namespace soplex 
+namespace soplex
 {
 
 /**@class SPxOut
    @ingroup Elementary
 
-   @brief Wrapper for several output streams. 
+   @brief Wrapper for several output streams.
    A verbosity level is used to decide which stream to use and whether to
    really print a given message. Regardless of whether the verbosity level
    is set via a manipulator or via the member function, it is persistent
    until a new value is set.
 
-   Most ostream member functions are not provided here; use the corresponding 
-   stream manipulators (e.g., @c setprecision()) instead. These are passed on 
-   to the <em>current</em> ostream, which is chosen according to the verbosity 
+   Most ostream member functions are not provided here; use the corresponding
+   stream manipulators (e.g., @c setprecision()) instead. These are passed on
+   to the <em>current</em> ostream, which is chosen according to the verbosity
    level. In particular, this means that the first element in an output stream
    should always be the verbosity. For instance, use
    @code
       spxout << verb( SPxOut::WARNING ) << std::setw( 15 ) << 42 << std::endl;
    @endcode
-   or 
+   or
    @code
       spxout.setVerbosity( SPxOut::WARNING );
       spxout << std::setw( 15 ) << 42 << std::endl;
@@ -69,12 +69,12 @@ public:
    /**@name Output control types */
    //@{
    /// Verbosity level
-   typedef enum 
+   typedef enum
    {
-      // Note: the implementation uses the fact that ERROR == 0 
+      // Note: the implementation uses the fact that ERROR == 0
       // and that the verbosity levels are subsequent numbers.
       // If you change this, change the implementation as well.
-      ERROR    = 0, 
+      ERROR    = 0,
       WARNING  = 1,
       DEBUG    = 2,
       INFO1    = 3,
@@ -83,10 +83,10 @@ public:
    } Verbosity;
 
    /// helper struct for the output operator
-   struct struct_Verbosity 
-   { 
+   struct struct_Verbosity
+   {
       /// verbosity level
-      Verbosity v_; 
+      Verbosity v_;
    };
    //@}
 
@@ -107,7 +107,7 @@ public:
    /**@name Verbosity */
    //@{
    ///
-   virtual void 
+   virtual void
    setVerbosity( const Verbosity& v )
    {
       m_verbosity = v;
@@ -137,7 +137,7 @@ public:
    }
    ///
    inline std::streamsize precision() const
-   { 
+   {
       return getCurrentStream().precision();
    }
    //@}
@@ -199,18 +199,18 @@ private:
 
    //-------------------------------------------
    /**@name Verbosity manipulator
-       Manipulators are implemented in a similar way as done for @c setw(), 
-       @c setprecision(), etc. in the standard library file iomanip. For 
-       instance, the non-member function \ref verb() "verb(v)" returns a 
-       struct struct_Severity which contains only the verbosity level. 
-       Calling 
+       Manipulators are implemented in a similar way as done for @c setw(),
+       @c setprecision(), etc. in the standard library file iomanip. For
+       instance, the non-member function \ref verb() "verb(v)" returns a
+       struct struct_Severity which contains only the verbosity level.
+       Calling
        @code
             SPxOut spxout;
             spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
        @endcode
        passes such a struct to the output operator defined below, which
-       extracts the verbosity level from the struct and passes it to the 
-       member function SPxOut::setVerbosity(). 
+       extracts the verbosity level from the struct and passes it to the
+       member function SPxOut::setVerbosity().
    */
    //@{
    /// manipulator to be used in an output statement
@@ -223,8 +223,8 @@ private:
    }
 
    /// output operator with verbosity level struct
-   inline SPxOut& 
-   operator<< ( SPxOut& stream, 
+   inline SPxOut&
+   operator<< ( SPxOut& stream,
                 const SPxOut::struct_Verbosity&  verbosity )
    {
       stream.setVerbosity( verbosity.v_ );
@@ -242,7 +242,7 @@ private:
     */
    //@{
    ///
-   /// Passes instances of type \p Type to the current stream. 
+   /// Passes instances of type \p Type to the current stream.
    inline SPxOut& operator<< ( SPxOut& _spxout, long t )
    {
     _spxout.getCurrentStream() << t;
@@ -312,7 +312,7 @@ private:
    /// Passes standard manipulators without arguments, like @c std::endl
    /// or @c std::ios::right to the current stream.
    inline SPxOut&
-   operator<< ( SPxOut&       _spxout, 
+   operator<< ( SPxOut&       _spxout,
                 std::ostream& (*manip)( std::ostream& ) )
    {
      _spxout.getCurrentStream() << manip;
@@ -320,8 +320,8 @@ private:
    }
 
    //lint -e{818} (pointer could be made const; this is ok.)
-   /// Passes everything else to the current stream. In particular, 
-   /// this includes structs corresponding to manipulators with arguments, 
+   /// Passes everything else to the current stream. In particular,
+   /// this includes structs corresponding to manipulators with arguments,
    /// such as the struct @c _Setw for the @c setw() manipulator.
    template <typename T>
    inline SPxOut& operator<< ( SPxOut& _spxout, T  t )

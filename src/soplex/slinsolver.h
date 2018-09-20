@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -34,7 +34,7 @@ namespace soplex
 {
 /**@brief   Sparse Linear Solver virtual base class.
    @ingroup Algo
-   
+
    Class SLinSolver provides a class for solving sparse linear systems with
    a matrix \f$A\f$ and arbitrary right-hand side vectors. For doing so, the
    matrix must be first #load%ed to an #SLinSolver object as an array of
@@ -88,7 +88,7 @@ public:
        with the matrix consisting of \p dim column vectors given in \p vec.
    */
    virtual Status load(const SVector* vec[], int dim) = 0;
-   
+
    /// returns a stability number (0: singularity, 1: perfect stability).
    /** Returns a stability parameter between 0 and 1, where 0 indicates
        singularity, while 1 indicates perfect stability.
@@ -96,7 +96,7 @@ public:
    virtual Real stability() const = 0;
 
    /// return estimate for the condition number based on the diagonal of U
-   virtual Real conditionEstimate(int type = 0) const = 0;
+   virtual Real matrixMetric(int type = 0) const = 0;
 
    /// returns statistical information in form of a string.
    virtual std::string statistics() const = 0;
@@ -120,18 +120,18 @@ public:
    /**@name Solving linear systems
       For solving linear systems with an SLinSolver object, it must
       have previously been loaded with the matrix to use.
-      
+
       Two types of systems can be solved \f$A x = b\f$ and \f$x^T A = b^T\f$.
       Method names related to the first and second type are solveRight() and
       solveLeft(), respectively.
-      
+
       The methods receive their right hand-side vector \f$b\f$ as a
       \c const parameter, that will hence be unchanged after termination.
-      
+
       Some methods are available with two parameters for right hand-side
       vectors. Then two system are solved in one method invocation. This
       should generally be faster than solving two systems seperately.
-      
+
       The result vector(s) are allways given as the first parameter(s). Two
       types of result vectors are supported, Vector and SSVector.
    */
@@ -147,7 +147,7 @@ public:
        subsequent change() call with \f$b\f$ as entering column.
    */
    virtual void solveRight4update(SSVector& x, const SVector& b) = 0;
-   
+
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
    virtual void solve2right4update(SSVector& x,
                                    Vector& y,

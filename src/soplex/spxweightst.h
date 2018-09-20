@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -38,13 +38,13 @@ namespace soplex
    #weight and #coWeight, or equivalently #rowWeight and #colWeight.
    (#rowWeight and #colWeight are just pointers initialized to #weight and
    #coWeight according to the representation of SoPlex \p base passed to
-   method #generate().) 
-   
+   method #generate().)
+
    The weight values are then used to setup a starting basis for the LP:
    vectors with low values are likely to become dual (i.e. basic for a column
    basis) and such with high values are likely to become primal (i.e. nonbasic
    for a column basis).
-   
+
    However, if a variable having an upper and lower bound is to become primal,
    there is still a choice for setting it either to its upper or lower bound.
    Members #rowRight and #colUp are used to determine where to set a primal
@@ -153,7 +153,7 @@ public:
          colWeight = rhs.colWeight;
          rowRight = rhs.rowRight;
          colUp = rhs.colUp;
-         
+
          if (rhs.weight == &rhs.colWeight)
          {
             weight   = &colWeight;
@@ -174,10 +174,10 @@ public:
    }
    /// destructor.
    virtual ~SPxWeightST()
-   { 
-      weight   = 0; 
-      coWeight = 0; 
-   }  
+   {
+      weight   = 0;
+      coWeight = 0;
+   }
    /// clone function for polymorphism
    inline virtual SPxStarter<R>* clone() const
    {

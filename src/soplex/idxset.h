@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -31,15 +31,15 @@ namespace soplex
    Class IdxSet provides a set of indices. At construction it must be given
    an array of int where to store the indice and its length. The array will
    from then on be managed by the IdxSet.
-   
+
    Indices are implicitely numbered from 0 thru size()-1. They can be
    accessed (and altered) via method index() with the desired index number as
    argument.  Range checking is performed in the debug version.
-   
+
    Indices may be added or removed from the set, by calling add() or
    remove() methods, respectively. However, no IdxSet can hold more then
    max() indices, i.e. the number given at the constructor.
-   
+
    When removing indices, the remaining ones are renumbered. However, all
    indices before the first removed index keep their number unchanged.
 
@@ -50,7 +50,7 @@ namespace soplex
 
    An IdxSet cannot be extended to fit more than max() elements. If
    necessary, the user must explicitely provide the IdxSet with a
-   suitable memory. Alternatively, one can use \ref DIdxSet "DIdxSets" 
+   suitable memory. Alternatively, one can use \ref DIdxSet "DIdxSets"
    which provide the required memory managemant.
 */
 class IdxSet
@@ -93,7 +93,7 @@ public:
    {
       assert(isConsistent());
    }
-   
+
    /// destructor.
    virtual ~IdxSet()
    {
@@ -176,7 +176,7 @@ public:
 //      /**@todo Shouldn't this be an assert instead of an if (see add()) */
 //      if (n < size() && n >= 0)
 //         idx[n] = idx[--num];
-      assert(n >= 0 && n < size()); 
+      assert(n >= 0 && n < size());
       idx[n] = idx[--num];
    }
 

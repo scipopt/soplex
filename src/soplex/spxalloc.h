@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -35,7 +35,7 @@ namespace soplex
  * Here we have cover functions for malloc/realloc/free, to make sure
  * that we allays succeed. Otherwise an exception is thrown.
  *
- * We use templates to get the types right, otherwise casts would have 
+ * We use templates to get the types right, otherwise casts would have
  * been neccessary.
  */
 //@{
@@ -110,7 +110,7 @@ inline void spx_free(T& p)
 {
    assert(p != 0);
    free(p);
-   
+
    p = 0;
 }
 

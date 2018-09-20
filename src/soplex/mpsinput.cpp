@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -29,7 +29,7 @@
 #define BLANK         ' '
 
 namespace soplex
-{ 
+{
 
 /// fill the line from \p pos up to column 80 with blanks.
 static void clear_from(char* buf, int pos)
@@ -66,7 +66,7 @@ bool MPSInput::readLine()
    {
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
       is_marker = false;
-   
+
       // Read until we have a non-empty, non-comment line.
       do
       {
@@ -124,10 +124,10 @@ bool MPSInput::readLine()
 
          /* Test for fixed format
           */
-         space = m_buf[12] | m_buf[13] 
-            | m_buf[22] | m_buf[23] 
+         space = m_buf[12] | m_buf[13]
+            | m_buf[22] | m_buf[23]
             | m_buf[36] | m_buf[37] | m_buf[38]
-            | m_buf[47] | m_buf[48] 
+            | m_buf[47] | m_buf[48]
             | m_buf[61] | m_buf[62] | m_buf[63];
 
          if (space == BLANK || len < 13)
@@ -136,14 +136,14 @@ bool MPSInput::readLine()
              * But are there also the non space where they
              * should be ?
              */
-            bool number = isdigit(m_buf[24]) || isdigit(m_buf[25]) 
-               || isdigit(m_buf[26]) || isdigit(m_buf[27]) 
-               || isdigit(m_buf[28]) || isdigit(m_buf[29]) 
-               || isdigit(m_buf[30]) || isdigit(m_buf[31]) 
-               || isdigit(m_buf[32]) || isdigit(m_buf[33]) 
-               || isdigit(m_buf[34]) || isdigit(m_buf[35]); 
-            
-            /* len < 13 is handle ROW lines with embedded spaces 
+            bool number = isdigit(m_buf[24]) || isdigit(m_buf[25])
+               || isdigit(m_buf[26]) || isdigit(m_buf[27])
+               || isdigit(m_buf[28]) || isdigit(m_buf[29])
+               || isdigit(m_buf[30]) || isdigit(m_buf[31])
+               || isdigit(m_buf[32]) || isdigit(m_buf[33])
+               || isdigit(m_buf[34]) || isdigit(m_buf[35]);
+
+            /* len < 13 is handle ROW lines with embedded spaces
              * in the names correctly
              */
             if (number || len < 13)
@@ -167,11 +167,11 @@ bool MPSInput::readLine()
          }
       }
       s = &m_buf[1];
-      
+
       /* At this point it is not clear if we have a indicator field.
        * If there is none (e.g. empty) f1 will be the first name field.
        * If there is one, f2 will be the first name field.
-       * 
+       *
        * Initially comment marks '$' ar only allowed in the beginning
        * of the 2nd and 3rd name field. We test all fields but the first.
        * This makes no difference, since if the $ is at the start of a value
@@ -181,19 +181,19 @@ bool MPSInput::readLine()
       {
          if (0 == (m_f1 = strtok(s, " ")))
             break;
-         
+
          if ((0 == (m_f2 = strtok(0, " "))) || (*m_f2 == '$'))
          {
             m_f2 = 0;
-            break;      
+            break;
          }
          if (!strcmp(m_f2, "'MARKER'"))
             is_marker = true;
-            
+
          if ((0 == (m_f3 = strtok(0, " "))) || (*m_f3 == '$'))
          {
             m_f3 = 0;
-            break;      
+            break;
          }
          if (is_marker)
          {
@@ -211,7 +211,7 @@ bool MPSInput::readLine()
          if ((0 == (m_f4 = strtok(0, " "))) || (*m_f4 == '$'))
          {
             m_f4 = 0;
-            break;      
+            break;
          }
          if (is_marker)
          {
@@ -239,7 +239,7 @@ bool MPSInput::readLine()
              << "DMPSIN06 f3=" << ((m_f3 == 0) ? "nil" : m_f3) << std::endl
              << "DMPSIN07 f4=" << ((m_f4 == 0) ? "nil" : m_f4) << std::endl
              << "DMPSIN08 f5=" << ((m_f5 == 0) ? "nil" : m_f5) << std::endl
-             << "DMPSIN09 -----------------------------------------------" 
+             << "DMPSIN09 -----------------------------------------------"
              << std::endl;
    )
 

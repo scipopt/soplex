@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -167,7 +167,7 @@ void NameSet::memPack()
       const char* t = &mem[set[i]];
       spxSnprintf(&newmem[newlast], SPX_MAXSTRLEN, "%s", t);
       set[i] = newlast;
-      newlast += int(strlen(t)) + 1;      
+      newlast += int(strlen(t)) + 1;
    }
    memcpy(mem, newmem, static_cast<size_t>(newlast));
    memused = newlast;
@@ -195,54 +195,6 @@ static int NameSetNameHashFunction(const NameSet::Name* str)
    res %= 0x0fffffff;
    return ((int) res);
 }
-
-#if 0
-NameSet& NameSet::operator=(const NameSet& rhs)
-{
-   if (this != &rhs)
-   {
-      if (max() < rhs.size())
-         reMax(rhs.size());
-      if (memMax() < rhs.memSize())
-         memRemax(rhs.memSize());
-
-      set = rhs.set;
-
-      hashtab.clear();
-      for (int i = 0; i < set.num(); ++i)
-      {
-         Name iname(set[i].name);
-         DataKey ikey = DataKey(set.key(i));
-         hashtab.add(iname, ikey);
-      }
-      memPack();
-   }
-   return *this;
-}
-
-NameSet::NameSet(const NameSet& org)
-   : set(org.set)
-   , mem(0)
-   , hashtab(org.hashtab)
-   , factor(org.factor)
-   , memFactor(org.memFactor)
-{
-   memused = 0;
-   memmax = org.memSize();
-   spx_alloc(mem, memmax);
-
-   list.clear();
-   hashtab.clear();
-   for (int i = 0; i < set.num(); ++i)
-   {
-      list.append(&(set[i]));
-      Name iname = set[i];
-      DataKey k = DataKey(set.key(i));
-      hashtab.add(iname, k);
-   }
-   memPack();
-}
-#endif
 
 NameSet::NameSet(int p_max, int mmax, Real fac, Real memFac)
    : set(p_max)
@@ -289,10 +241,10 @@ std::ostream& operator<<(std::ostream& s, const NameSet& nset)
 {
    for(int i = 0; i < nset.num(); i++)
    {
-      s << i << " " 
+      s << i << " "
         << nset.key(i).info << "."
         << nset.key(i).idx << "= "
-        << nset[i] 
+        << nset[i]
         << std::endl;
    }
    return s;
