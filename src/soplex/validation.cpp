@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -94,6 +94,10 @@ namespace soplex {
       }
 
     objViolation = spxAbs(sol - soplex.objValueReal());
+   // skip check in case presolving detected infeasibility/unboundedness
+   if( SPxSolverBase<Real>::INForUNBD == soplex.status() &&
+       (sol == soplex.realParam(SoPlexBase<Real>::INFTY) || sol == -soplex.realParam(SoPlexBase<Real>::INFTY)) )
+      objViolation = 0.0;
     if( ! EQ(objViolation, 0.0, validatetolerance) )
       {
         passedValidation = false;
