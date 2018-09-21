@@ -2141,16 +2141,17 @@ static void MPSwriteRecord(
    char buf[81];
    long long pos;
    pos = os.tellp();
-   sprintf(buf, " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
+
+   spxSnprintf(buf, sizeof(buf), " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
    os << buf;
 
    if( name1 != 0 )
    {
-      spxSnprintf(buf, 81, " %-8.8s ", name1);
+      spxSnprintf(buf, sizeof(buf), " %-8.8s ", name1);
       os << buf << value1;
       if( name2 != 0 )
       {
-         spxSnprintf(buf, 81, " %-8.8s ", name2);
+         spxSnprintf(buf, sizeof(buf), " %-8.8s ", name2);
          os << buf << value2;
       }
    }
