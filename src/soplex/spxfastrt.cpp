@@ -1305,7 +1305,7 @@ namespace soplex
                 else
                   cnt += TRIES;
               }
-            if (!maxReEnter(sel, maxabs, enterId, nr))
+         if (!maxReEnter(sel, maxabs, enterId, nr, polish))
               break;
             relax();
           }
@@ -1344,7 +1344,7 @@ namespace soplex
                 else
                   cnt += TRIES;
               }
-            if (!minReEnter(sel, maxabs, enterId, nr))
+         if (!minReEnter(sel, maxabs, enterId, nr, polish))
               break;
             relax();
           }

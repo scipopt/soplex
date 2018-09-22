@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2017 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -30,6 +30,7 @@
 #define FREE_CONSTRAINT         1
 #define EMPTY_CONSTRAINT        1
 #define ROW_SINGLETON           1
+#define AGGREGATE_VARS          1
 #define FORCE_CONSTRAINT        1
 //cols
 #define FREE_BOUNDS             1
