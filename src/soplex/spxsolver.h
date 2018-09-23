@@ -305,6 +305,8 @@ namespace soplex
     bool           instableEnter;
     Real           instableEnterVal;
 
+   bool           recomputedVectors;      ///< flag to perform clean up step to reduce numerical errors only once
+
     int            displayLine;
     int            displayFreq;
     Real           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
@@ -315,7 +317,7 @@ namespace soplex
     int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
     bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
-    int            printCondition;         ///< printing the current condition number in the log (0 - off, 1 - estimate,exact, 2 - exact)";ratio estimate , 3 - sum estimate, 4 - product estimate)
+   int            printBasisMetric;       ///< printing the current basis metric in the log (-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
 
     //@}
 
@@ -393,6 +395,10 @@ namespace soplex
     SPxPricer<R>*      thepricer;
     SPxRatioTester<R>* theratiotester;
     SPxStarter<R>*     thestarter;
+
+   Real           boundrange;       ///< absolute range of all bounds in the problem
+   Real           siderange;        ///< absolute range of all side in the problem
+   Real           objrange;         ///< absolute range of all objective coefficients in the problem
     //@}
 
     //-----------------------------
@@ -846,10 +852,10 @@ namespace soplex
       return displayFreq;
     }
 
-    /// print condition number within the usual output
-    void setConditionInformation(int condInfo)
+   /// print basis metric within the usual output
+   void setMetricInformation(int type)
     {
-      printCondition = condInfo;
+      printBasisMetric = type;
     }
 
     // enable sparse pricing when viols < fac * dim()
@@ -887,9 +893,9 @@ namespace soplex
       fullPerturbation = full;
     }
 
-    virtual Real getFastCondition()
+   virtual Real getBasisMetric(int type)
     {
-      return basis().getFastCondition();
+      return basis().getMatrixMetric(type);
     }
 
     //@}
@@ -1574,46 +1580,52 @@ namespace soplex
     /// Perform initial shifting to optain an feasible or pricable basis.
     void shiftPvec();
 
-    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::ubBound "ubBound" to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::ubBound "ubBound" to \p to.
     void shiftUBbound(int i, Real to)
     {
       assert(theType == ENTER);
-      theShift += to - theUBbound[i];
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(to - theUBbound[i], 0.0);
       theUBbound[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::lbBound "lbBound" to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
     void shiftLBbound(int i, Real to)
     {
       assert(theType == ENTER);
-      theShift += theLBbound[i] - to;
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(theLBbound[i] - to, 0.0);
       theLBbound[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::upBound "upBound" to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
     void shiftUPbound(int i, Real to)
     {
       assert(theType == LEAVE);
-      theShift += to - (*theUbound)[i];
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(to - (*theUbound)[i], 0.0);
       (*theUbound)[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::lpBound "lpBound" to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::lpBound "lpBound" to \p to.
     void shiftLPbound(int i, Real to)
     {
       assert(theType == LEAVE);
-      theShift += (*theLbound)[i] - to;
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM((*theLbound)[i] - to, 0.0);
       (*theLbound)[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::ucBound "ucBound" to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::ucBound "ucBound" to \p to.
     void shiftUCbound(int i, Real to)
     {
       assert(theType == LEAVE);
-      theShift += to - (*theCoUbound)[i];
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM(to - (*theCoUbound)[i], 0.0);
       (*theCoUbound)[i] = to;
     }
-    /// shift \p i 'th \ref soplex::SPxSolverBase<R>::lcBound "lcBound" to \p to.
+   /// shift \p i 'th \ref soplex::SPxSolver::lcBound "lcBound" to \p to.
     void shiftLCbound(int i, Real to)
     {
       assert(theType == LEAVE);
-      theShift += (*theCoLbound)[i] - to;
+      // use maximum to not count tightened bounds in case of equality shifts
+      theShift += MAXIMUM((*theCoLbound)[i] - to, 0.0);
       (*theCoLbound)[i] = to;
     }
     ///

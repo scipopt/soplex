@@ -68,7 +68,6 @@ namespace soplex {
   template <>
   void Validation<Real>::validateSolveReal(SoPlexBase<Real>& soplex)
   {
-#ifndef SOPLEX_LEGACY
     bool passedValidation = true;
     std::string reason = "";
     Real objViolation = 0.0;
@@ -145,7 +144,6 @@ namespace soplex {
     os << "   Row              : " << std::scientific << std::setprecision(8) << maxRowViolation << std::fixed << "\n";
     os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
     os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
-#endif
   }
 
 } /* namespace soplex */

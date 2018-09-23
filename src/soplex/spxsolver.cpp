@@ -1825,7 +1825,7 @@ namespace soplex
       switch( stat )
         {
         case FIXED :
-          assert(this->rhs(row) == this->lhs(row));
+          assert(EQ(this->rhs(row), this->lhs(row), feastol()));
           rstat = SPxBasisBase<Real>::Desc::P_FIXED;
           break;
         case ON_UPPER :
