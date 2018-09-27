@@ -735,7 +735,12 @@ namespace soplex
 
     if (rStatus[m_i] == SPxSolverBase<Real>::ON_LOWER)
       {
-        if ( m_lower == m_upper )
+      if ( m_lower <= -infinity && m_upper >= infinity )
+      {
+         x[m_j] = 0.0;
+         cStatus[m_j] = SPxSolver::ZERO;
+      }
+      else if ( m_lower == m_upper )
           {
             x[m_j]       = m_lower;
             cStatus[m_j] = SPxSolverBase<Real>::FIXED;
@@ -756,6 +761,12 @@ namespace soplex
     else if (rStatus[m_i] == SPxSolverBase<Real>::ON_UPPER)
       {
         if ( m_lower == m_upper )
+      if ( m_lower <= -infinity && m_upper >= infinity )
+      {
+         x[m_j] = 0.0;
+         cStatus[m_j] = SPxSolver::ZERO;
+      }
+      else if ( m_lower == m_upper )
           {
             x[m_j]       = m_lower;
             cStatus[m_j] = SPxSolverBase<Real>::FIXED;
@@ -774,23 +785,31 @@ namespace soplex
           throw SPxInternalCodeException("XMAISM02 This should never happen.");
       }
     else if (rStatus[m_i] == SPxSolverBase<Real>::FIXED)
+   {
+      if ( m_lower <= -infinity && m_upper >= infinity )
+      {
+         x[m_j] = 0.0;
+         cStatus[m_j] = SPxSolver::ZERO;
+      }
+      else
       {
         assert(EQrel(m_lower, m_upper));
 
         x[m_j]        = m_lower;
-        cStatus[m_j]  = SPxSolverBase<Real>::FIXED;
+         cStatus[m_j]  = SPxSolver::FIXED;
       }
-    else if (rStatus[m_i] == SPxSolverBase<Real>::BASIC)
+   }
+   else if (rStatus[m_i] == SPxSolver::BASIC)
       {
-        if (GErel(m_lower, lo, this->eps()) && m_lower > -infinity)
+      if (GErel(m_lower, lo, eps()) && m_lower > -infinity)
           {
             x[m_j]       = m_lower;
-            cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+         cStatus[m_j] = (m_lower == m_upper) ? SPxSolver::FIXED : SPxSolver::ON_LOWER;
           }
-        else if (LErel(m_upper, up, this->eps()) && m_upper < infinity)
+      else if (LErel(m_upper, up, eps()) && m_upper < infinity)
           {
             x[m_j]       = m_upper;
-            cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+         cStatus[m_j] = (m_lower == m_upper) ? SPxSolver::FIXED : SPxSolver::ON_UPPER;
           }
         else if (lo > -infinity)
           {

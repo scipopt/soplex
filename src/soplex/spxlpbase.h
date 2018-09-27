@@ -1203,6 +1203,7 @@ namespace soplex
       int countBoxed = 0;
       int countFreeCol = 0;
 
+      int countEqual = 0;
       int countLhs = 0;
       int countRhs = 0;
       int countRanged = 0;
@@ -1226,7 +1227,11 @@ namespace soplex
             }
 
           if( hasUpper && hasLower )
+         {
             countBoxed++;
+            countLower--;
+            countUpper--;
+         }
 
           if( !hasUpper && !hasLower )
             countFreeCol++;
@@ -1250,7 +1255,14 @@ namespace soplex
             }
 
           if( hasRhs && hasLhs )
+         {
+            if( EQ(lhs(i), rhs(i)) )
+               countEqual++;
+            else
             countRanged++;
+            countLhs--;
+            countRhs--;
+         }
 
           if( !hasRhs && !hasLhs )
             countFreeRow++;
@@ -1263,6 +1275,7 @@ namespace soplex
          << "        upper bound : " << countUpper << "\n"
          << "               free : " << countFreeCol << "\n"
          << "  Rows              : " << nRows() << "\n"
+         << "              equal : " << countEqual << "\n"
          << "             ranged : " << countRanged << "\n"
          << "                lhs : " << countLhs << "\n"
          << "                rhs : " << countRhs << "\n"
@@ -1316,6 +1329,7 @@ namespace soplex
     /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
     virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false)
     {
+      assert(scale == false);
       assert(maxObj().dim() == newObj.dim());
       LPColSetBase<R>::maxObj_w() = newObj;
       assert(isConsistent());
@@ -1352,6 +1366,7 @@ namespace soplex
     /// Changes vector of lower bounds to \p newLower. \p scale determines whether the new data should be scaled
     virtual void changeLower(const VectorBase<R>& newLower, bool scale = false)
     {
+      assert(scale == false);
       assert(lower().dim() == newLower.dim());
       LPColSetBase<R>::lower_w() = newLower;
       assert(isConsistent());
@@ -1388,6 +1403,7 @@ namespace soplex
     /// Changes vector of upper bounds to \p newUpper. \p scale determines whether the new data should be scaled
     virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false)
     {
+      assert(scale == false);
       assert(upper().dim() == newUpper.dim());
       LPColSetBase<R>::upper_w() = newUpper;
       assert(isConsistent());
@@ -1455,6 +1471,7 @@ namespace soplex
     /// Changes left hand side vector for constraints to \p newLhs. \p scale determines whether the new data should be scaled
     virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false)
     {
+      assert(scale == false);
       assert(lhs().dim() == newLhs.dim());
       LPRowSetBase<R>::lhs_w() = newLhs;
       assert(isConsistent());
@@ -1464,7 +1481,11 @@ namespace soplex
     virtual void changeLhs(int i, const R& newLhs, bool scale = false)
     {
       if( scale && newLhs > -infinity )
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
         LPRowSetBase<R>::lhs_w(i) = lp_scaler->scaleLhs(*this, i, newLhs);
+      }
       else
         LPRowSetBase<R>::lhs_w(i) = newLhs;
       assert(isConsistent());
@@ -1487,6 +1508,7 @@ namespace soplex
     /// Changes right hand side vector for constraints to \p newRhs. \p scale determines whether the new data should be scaled
     virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false)
     {
+      assert(scale == false);
       assert(rhs().dim() == newRhs.dim());
       LPRowSetBase<R>::rhs_w() = newRhs;
       assert(isConsistent());
@@ -1496,7 +1518,11 @@ namespace soplex
     virtual void changeRhs(int i, const R& newRhs, bool scale = false)
     {
       if( scale && newRhs < infinity )
+      {
+         assert(_isScaled);
+         assert(lp_scaler);
         LPRowSetBase<R>::rhs_w(i) = lp_scaler->scaleRhs(*this, i, newRhs);
+      }
       else
         LPRowSetBase<R>::rhs_w(i) = newRhs;
       assert(isConsistent());
