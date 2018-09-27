@@ -100,6 +100,9 @@ namespace soplex
     bool  priced = false;
     Real  lastDelta = 1;
 
+   /* allow clean up step only once */
+   recomputedVectors = false;
+
     /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
     Real  stallRefValue;
     Real  stallRefShift;
@@ -521,6 +524,31 @@ namespace soplex
                                 m_status = OPTIMAL;
                                 break;
                               }
+               else if( loopCount > 2 )
+               {
+                  // calculate problem ranges if not done already
+                  if( boundrange == 0.0 || siderange == 0.0 || objrange == 0.0 )
+                     calculateProblemRanges();
+
+                  if( MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 )
+                  {
+                     SPxOut::setScientific(spxout->getCurrentStream(), 0);
+                     MSG_INFO1( (*spxout), (*spxout) << " --- termination despite violations (numerical difficulties,"
+                           << " bound range = " << boundrange
+                           << ", side range = " << siderange
+                           << ", obj range = " << objrange
+                           << ")" << std::endl; )
+                       setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                     m_status = OPTIMAL;
+                     break;
+                  }
+                  else
+                  {
+                     m_status = ABORT_CYCLING;
+                     throw SPxStatusException("XSOLVE14 Abort solving due to looping");
+                  }
+               }
+               loopCount++;
                         }
                       setType(LEAVE);
                       init();
@@ -816,17 +844,36 @@ namespace soplex
                             // We stop if we are indeed optimal, or if we have already been
                             // two times at this place. In this case it seems futile to
                             // continue.
-                            if (loopCount > 2)
+               if (priced && maxinfeas + shift() <= leavetol())
                               {
-                                m_status = ABORT_CYCLING;
-                                throw SPxStatusException("XSOLVE14 Abort solving due to looping");
+                 setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                  m_status = OPTIMAL;
+                  break;
                               }
-                            else if (priced && maxinfeas + shift() <= leavetol())
+               else if (loopCount > 2)
                               {
-                                setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                  // calculate problem ranges if not done already
+                  if( boundrange == 0.0 || siderange == 0.0 || objrange == 0.0 )
+                     calculateProblemRanges();
+
+                  if( MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 )
+                  {
+                     SPxOut::setScientific(spxout->getCurrentStream(), 0);
+                     MSG_INFO1( (*spxout), (*spxout) << " --- termination despite violations (numerical difficulties,"
+                           << " bound range = " << boundrange
+                           << ", side range = " << siderange
+                           << ", obj range = " << objrange
+                           << ")" << std::endl; )
+                     setBasisStatus(SPxBasis::OPTIMAL);
                                 m_status = OPTIMAL;
                                 break;
                               }
+                  else
+                  {
+                     m_status = ABORT_CYCLING;
+                     throw SPxStatusException("XSOLVE14 Abort solving due to looping");
+                  }
+               }
                           loopCount++;
                         }
                       setType(ENTER);
@@ -1057,6 +1104,12 @@ namespace soplex
         {
           setType(ENTER); // use primal simplex to preserve feasibility
           init();
+#ifndef NDEBUG
+      // allow a small relative deviation from the original values
+      Real alloweddeviation = entertol();
+      Real origval = value();
+      Real origshift = shift();
+#endif
           instableEnter = false;
           theratiotester->setType(type());
           if( polishObj == POLISH_INTEGRALITY )
@@ -1101,6 +1154,10 @@ namespace soplex
                       MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << rowstatus[slackcandidates.index(i)]; )
                         success = enter(polishId, true);
                       clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                       if( success )
                         {
                           MSG_DEBUG( std::cout << " -> success!"; )
@@ -1165,6 +1222,10 @@ namespace soplex
                       MSG_DEBUG( std::cout << "try pivoting: " << polishId << " stat: " << colstatus[candidates.index(i)]; )
                         success = enter(polishId, true);
                       clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                       if( success )
                         {
                           MSG_DEBUG( std::cout << " -> success!"; )
@@ -1188,11 +1249,17 @@ namespace soplex
         {
           setType(LEAVE); // use primal simplex to preserve feasibility
           init();
+#ifndef NDEBUG
+      // allow a small relative deviation from the original values
+      Real alloweddeviation = leavetol();
+      Real origval = value();
+      Real origshift = shift();
+#endif
           instableLeave = false;
           theratiotester->setType(type());
           bool useIntegrality = false;
 
-          if( integerVariables.size() == this->nCols() )
+      if( integerVariables.size() == nCols() )
             useIntegrality = true;
 
           // in ROW rep: pivot slack out of the basis
@@ -1231,6 +1298,10 @@ namespace soplex
                       MSG_DEBUG( std::cout << "try pivoting: " << this->baseId(basiccandidates.index(i)); )
                         success = leave(basiccandidates.index(i), true);
                       clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                       if( success )
                         {
                           MSG_DEBUG( std::cout << " -> success!"; )
@@ -1283,6 +1354,10 @@ namespace soplex
                       MSG_DEBUG( std::cout << "try pivoting: " << this->baseId(basiccandidates.index(i)); )
                         success = leave(basiccandidates.index(i), true);
                       clearUpdateVecs();
+#ifndef NDEBUG
+               assert(EQrel(value(), origval, alloweddeviation));
+               assert(LErel(shift(), origshift, alloweddeviation));
+#endif
                       if( success )
                         {
                           MSG_DEBUG( std::cout << " -> success!"; )
@@ -1390,8 +1465,8 @@ namespace soplex
                if( forceHead || displayLine % (displayFreq*30) == 0 )
                  {
                    (*spxout) << "type |   time |   iters | facts |    shift | violation |     obj value ";
-                   if( printCondition > 0 )
-                     (*spxout) << " | condition";
+         if( printBasisMetric >= 0 )
+            (*spxout) << " | basis metric";
                    (*spxout) << std::endl;
                  }
                if( (force || (displayLine % displayFreq == 0)) && !forceHead )
@@ -1406,13 +1481,13 @@ namespace soplex
                              << std::setprecision(8) << value();
                    if( getStartingDecompBasis && rep() == SPxSolverBase<Real>::ROW )
                      (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
-                   if( printCondition == 1 )
-                     (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(0);
-                   if( printCondition == 2 )
-                     (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(1);
-                   if( printCondition == 3 )
-                     (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getFastCondition(2);
-                   if( printCondition == 4 )
+         if( printBasisMetric == 0 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
+         if( printBasisMetric == 1 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(1);
+         if( printBasisMetric == 2 )
+            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(2);
+         if( printBasisMetric == 3 )
                      (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
                    (*spxout) << std::endl;
                  }
