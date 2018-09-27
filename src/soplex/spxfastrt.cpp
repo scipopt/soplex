@@ -813,6 +813,7 @@ namespace soplex
         if (sel < -fastDelta / maxabs)
           {
             sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
             if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
               {
                 if (x < 0.0)
@@ -825,6 +826,7 @@ namespace soplex
     else
       {
         sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
         if( !polish )
           {
             this->thesolver->shiftLBbound(leave, vec[leave]);
@@ -853,6 +855,7 @@ namespace soplex
           {
             sel = 0.0;
             if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
               {
                 if (x > 0.0)
                   this->thesolver->shiftLBbound(leave, vec[leave]);
@@ -864,6 +867,7 @@ namespace soplex
     else
       {
         sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
         if( !polish )
           {
             this->thesolver->shiftLBbound(leave, vec[leave]);
@@ -1100,32 +1104,39 @@ namespace soplex
     if ((*up)[nr] != (*low)[nr])
       {
         if (sel < -fastDelta / maxabs)
+      {
+         sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+         if( !polish )
           {
             if (d > 0.0)
               {
                 this->thesolver->theShift -= (*up)[nr];
-                sel = 0.0;
-                (*up)[nr] = x + sel * d;
+               (*up)[nr] = x;
                 this->thesolver->theShift += (*up)[nr];
               }
             else
               {
                 this->thesolver->theShift += (*low)[nr];
-                sel = 0.0;
-                (*low)[nr] = x + sel * d;
+               (*low)[nr] = x;
                 this->thesolver->theShift -= (*low)[nr];
               }
           }
       }
+   }
     else
       {
         sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+      if( !polish )
+      {
         if (x > (*up)[nr])
           this->thesolver->theShift += x - (*up)[nr];
         else
           this->thesolver->theShift += (*low)[nr] - x;
         (*up)[nr] = (*low)[nr] = x;
       }
+   }
 
     return false;
   }
@@ -1191,32 +1202,39 @@ namespace soplex
     if ((*up)[nr] != (*low)[nr])
       {
         if (sel > fastDelta / maxabs)
+      {
+         sel = 0.0;
+         // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+         if( !polish )
           {
             if (d < 0.0)
               {
                 this->thesolver->theShift -= (*up)[nr];
-                sel = 0.0;
-                (*up)[nr] = x + sel * d;
+               (*up)[nr] = x;
                 this->thesolver->theShift += (*up)[nr];
               }
             else
               {
                 this->thesolver->theShift += (*low)[nr];
-                sel = 0.0;
-                (*low)[nr] = x + sel * d;
+               (*low)[nr] = x;
                 this->thesolver->theShift -= (*low)[nr];
               }
           }
       }
+   }
     else
       {
         sel = 0.0;
+      // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
+      if( !polish )
+      {
         if (x > (*up)[nr])
           this->thesolver->theShift += x - (*up)[nr];
         else
           this->thesolver->theShift += (*low)[nr] - x;
         (*up)[nr] = (*low)[nr] = x;
       }
+   }
 
     return false;
   }
