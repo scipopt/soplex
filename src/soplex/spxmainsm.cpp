@@ -1341,7 +1341,10 @@ namespace soplex
     x[m_j] = z * scale / aij;
     s[m_i] = 0.0;
 
-    assert(!isOptimal || (GE(x[m_j], m_lower) && LE(x[m_j], m_upper)));
+#ifndef NDEBUG
+   if( isOptimal && (LT(x[m_j], m_lower, eps()) || GT(x[m_j], m_upper, eps())) )
+      MSG_ERROR( std::cerr << "numerical violation in original space due to MultiAggregation\n"; )
+#endif
 
     // dual:
     Real dualVal = 0.0;
@@ -2124,7 +2127,8 @@ namespace soplex
     // 4. remove unconstrained constraints
     // 5. remove empty constraints
     // 6. remove row singletons and tighten the corresponding variable bounds if necessary
-    // 7. detect forcing rows and fix the corresponding variables
+   // 7. remove doubleton equation, aka aggregation
+   // 8. detect forcing rows and fix the corresponding variables
 
     int remRows = 0;
     int remNzos = 0;
@@ -2532,8 +2536,17 @@ namespace soplex
           }
 #endif
 
+#if AGGREGATE_VARS
+      // 7. row doubleton, aka. simple aggregation of two variables in an equation
+      if( row.size() == 2 && EQrel(lp.lhs(i), lp.rhs(i), feastol()) )
+      {
+         aggregateVars(lp, row, i);
+         continue;
+      }
+#endif
+
 #if FORCE_CONSTRAINT
-        // 7. forcing constraint (postsolving)
+      // 8. forcing constraint (postsolving)
         // fix variables to obtain the upper bound on constraint value
         if (rhsCnt == 0 && EQrel(rhsBnd, lp.lhs(i), feastol()))
           {
@@ -2660,7 +2673,7 @@ namespace soplex
     //    and fix corresponding variables or remove involved constraints
     // 3. fix variables
     // 4. use column singleton variables with zero objective to adjust constraint bounds
-    // 5. free column singleton combined with doubleton equation are
+   // 5. (not free) column singleton combined with doubleton equation are
     //    used to make the column singleton variable free
     // 6. substitute (implied) free column singletons
 
@@ -3497,8 +3510,6 @@ namespace soplex
             int maxOtherLocks;
             int bestpos = -1;
             bool bestislhs = true;
-
-
 
             for(int k = 0; k < col.size(); ++k)
               {
@@ -4421,13 +4432,21 @@ namespace soplex
     assert(EQrel(lp.lower(j), lp.upper(j), feastol()));
 
     Real lo            = lp.lower(j);
+   Real up            = lp.upper(j);
     const SVector& col = lp.colVector(j);
+   Real mid           = lo;
 
-    assert(NE(lo, infinity) && NE(lo, -infinity));
+   // use the center value between slightly different bounds to improve numerics
+   if( NE(lo, up) )
+      mid = (up + lo)/2.0;
+
+   assert(LT(lo, infinity) && GT(lo, -infinity));
+   assert(LT(up, infinity) && GT(up, -infinity));
 
     MSG_DEBUG( (*this->spxout) << "IMAISM66 fix variable x" << j
-               << ": lower=" << lp.lower(j)
-               << " upper=" << lp.upper(j)
+                     << ": lower=" << lo
+                     << " upper=" << up
+                     << "to new value: " << mid
                << std::endl; )
 
       if (isNotZero(lo, epsZero()))
@@ -4438,7 +4457,7 @@ namespace soplex
 
               if (lp.rhs(i) < infinity)
                 {
-                  Real y     = lo * col.value(k);
+            Real y     = mid * col.value(k);
                   Real scale = maxAbs(lp.rhs(i), y);
 
                   if (scale < 1.0)
@@ -4461,7 +4480,7 @@ namespace soplex
                 }
               if (lp.lhs(i) > -infinity)
                 {
-                  Real y     = lo * col.value(k);
+            Real y     = mid * col.value(k);
                   Real scale = maxAbs(lp.lhs(i), y);
 
                   if (scale < 1.0)
@@ -4482,7 +4501,7 @@ namespace soplex
 
                     lp.changeLhs(i, lhs);
                 }
-              assert(lp.lhs(i) <= lp.rhs(i));
+         assert(lp.lhs(i) <= lp.rhs(i) + feastol());
             }
         }
 
@@ -4557,12 +4576,13 @@ namespace soplex
                    ++numBoxedCols;
 
                (*this->spxout) << "LP has "
+                << numEqualities << " equations, "
                << numRangedRows << " ranged rows, "
                << numBoxedCols << " boxed columns"
                << std::endl;
                )
 
-      m_stat.reSize(16);
+   m_stat.reSize(17);
 
     for(int k = 0; k < m_stat.size(); ++k)
       m_stat[k] = 0;
@@ -4600,6 +4620,8 @@ namespace soplex
     // main presolving loop
     while(again && m_result == this->OKAY)
       {
+      nrounds++;
+      MSG_INFO3((*spxout), (*spxout) << "Round " << nrounds << ":" << std::endl; )
         again = false;
 
 #if ROWS
@@ -4687,6 +4709,7 @@ namespace soplex
                          ++numBoxedCols;
 
                      (*this->spxout) << "Reduced LP has "
+                << numEqualities << " equations, "
                      << numRangedRows << " ranged rows, "
                      << numBoxedCols << " boxed columns"
                      << std::endl;
@@ -4714,7 +4737,8 @@ namespace soplex
                << m_stat[DUPLICATE_ROW]        << " duplicate rows\n"
                << m_stat[FIX_DUPLICATE_COL]    << " duplicate columns (fixed)\n"
                << m_stat[SUB_DUPLICATE_COL]    << " duplicate columns (substituted)\n"
-               << m_stat[MULTI_AGG]            << " multi aggregation of variables\n"
+                     << m_stat[AGGREGATION]          << " variable aggregations\n"
+                     << m_stat[MULTI_AGG]            << " multi aggregations\n"
                << std::endl; );
 
     this->m_timeUsed->stop();

@@ -406,6 +406,9 @@ namespace soplex
     //@{
     /// is the solution precise enough, or should we increase delta() ?
     virtual bool precisionReached(Real& newpricertol) const;
+
+   /// determine ranges of problem values for bounds, sides and objective to assess numerical difficulties
+   void calculateProblemRanges();
     //@}
 
   public:
