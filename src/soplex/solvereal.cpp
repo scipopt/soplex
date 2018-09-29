@@ -118,9 +118,9 @@ namespace soplex
          }
          else
          {
-            if( simplificationStatus == SPxSimplifier::INFEASIBLE )
+           if( simplificationStatus == SPxSimplifier<Real>::INFEASIBLE )
               _status = SPxSolverBase<Real>::INFEASIBLE;
-            else if( simplificationStatus == SPxSimplifier::UNBOUNDED )
+           else if( simplificationStatus == SPxSimplifier<Real>::UNBOUNDED )
               _status = SPxSolverBase<Real>::UNBOUNDED;
             else
               _status = SPxSolverBase<Real>::INForUNBD;

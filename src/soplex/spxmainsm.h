@@ -1113,8 +1113,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis,
-                           DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<typename SPxSolverBase<Real>::VarStatus>& cBasis,
+                           DataArray<typename SPxSolverBase<Real>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
    /**@brief   Postsolves multi aggregation.
@@ -1343,7 +1343,7 @@ private:
    typename SPxSimplifier<R>::Result removeRowSingleton(SPxLP& lp, const SVector& row, int& i);
 
    /// aggregate two variables that appear in an equation.
-   Result aggregateVars(SPxLP& lp, const SVector& row, int& i);
+   typename SPxSimplifier<R>::Result aggregateVars(SPxLP& lp, const SVector& row, int& i);
 
    /// performs simplification steps on the rows of the LP.
   typename SPxSimplifier<R>::Result simplifyRows(SPxLP& lp, bool& again);
