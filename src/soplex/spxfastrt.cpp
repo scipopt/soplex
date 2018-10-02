@@ -1042,12 +1042,12 @@ namespace soplex
 
 
   template <>
-  bool SPxFastRT<Real>::maxReEnter(
-                                Real& sel,
+  bool SPxFastRT<Real>::maxReEnter(Real& sel,
                                 Real maxabs,
                                 const SPxId& id,
-                                int nr)
-  {
+                                   int nr,
+                                   bool polish)
+{
     Real x, d;
     Vector* up;
     Vector* low;
@@ -1146,8 +1146,9 @@ namespace soplex
                                 Real& sel,
                                 Real maxabs,
                                 const SPxId& id,
-                                int nr)
-  {
+   int nr,
+   bool polish)
+{
     Real x, d;
     Vector* up;
     Vector* low;

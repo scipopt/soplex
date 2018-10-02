@@ -86,7 +86,65 @@ namespace soplex
                    << std::endl; );
       }
     return reached;
+}
+
+  template <>
+  void SPxSolverBase<Real>::calculateProblemRanges()
+{
+   // only collect absolute values
+   Real minobj = infinity;
+   Real maxobj = 0.0;
+   Real minbound = infinity;
+   Real maxbound = 0.0;
+   Real minside = infinity;
+   Real maxside = 0.0;
+
+   // get min and max absolute values of bounds and objective
+   for( int j = 0; j < nCols(); ++j )
+   {
+      Real abslow = spxAbs(lower(j));
+      Real absupp = spxAbs(lower(j));
+      Real absobj = spxAbs(obj(j));
+
+      if( abslow < infinity )
+      {
+         minbound = MINIMUM(minbound, abslow);
+         maxbound = MAXIMUM(maxbound, abslow);
+      }
+
+      if( absupp < infinity)
+      {
+         minbound = MINIMUM(minbound, absupp);
+         maxbound = MAXIMUM(maxbound, absupp);
+      }
+
+      minobj = MINIMUM(minobj, absobj);
+      maxobj = MAXIMUM(maxobj, absobj);
+   }
+
+   // get min and max absoute values of sides
+   for( int i = 0; i < nRows(); ++i )
+   {
+      Real abslhs = spxAbs(lhs(i));
+      Real absrhs = spxAbs(rhs(i));
+
+      if(  abslhs > infinity )
+      {
+         minside = MINIMUM(minside, abslhs);
+         maxside = MAXIMUM(maxside, abslhs);
   }
+
+      if(  absrhs < infinity )
+      {
+         minside = MINIMUM(minside, absrhs);
+         maxside = MAXIMUM(maxside, absrhs);
+      }
+   }
+
+   boundrange = maxbound - minbound;
+   siderange = maxside - minside;
+   objrange = maxobj - minobj;
+}
 
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::solve()
@@ -864,7 +922,7 @@ namespace soplex
                            << ", side range = " << siderange
                            << ", obj range = " << objrange
                            << ")" << std::endl; )
-                     setBasisStatus(SPxBasis::OPTIMAL);
+                       setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
                                 m_status = OPTIMAL;
                                 break;
                               }

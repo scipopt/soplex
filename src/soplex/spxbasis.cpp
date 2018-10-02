@@ -1158,17 +1158,17 @@ namespace soplex
     return norm * norminv;
   }
 
-  template <>
-  /* compute condition number estimation based on the diagonal of the LU factorization */
-  Real SPxBasisBase<Real>::getFastCondition(int type)
-  {
-    Real cond = infinity;
+/* compute one of several matrix metrics based on the diagonal of the LU factorization */
+template <>
+Real SPxBasisBase<Real>::getMatrixMetric(int type)
+{
+   Real metric = infinity;
 
     if( factorized )
-      cond = factor->conditionEstimate(type);
+      metric = factor->matrixMetric(type);
 
-    return cond;
-  }
+   return metric;
+}
 
   template <>
   void SPxBasisBase<Real>::dump()
