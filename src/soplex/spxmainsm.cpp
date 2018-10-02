@@ -4858,6 +4858,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
     m_result     = this->OKAY;
     bool   again = true;
+   int nrounds=0;
 
     if(m_hist.size() > 0)
       {
