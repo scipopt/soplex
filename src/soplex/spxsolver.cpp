@@ -1155,7 +1155,7 @@ namespace soplex
       , computeDegeneracy(false)
       , degenCompIterOffset(0)
       , fullPerturbation(false)
-      , printCondition(0)
+      , printBasisMetric(0)
       , unitVecs (0)
       , primVec (0, Param::epsilon())
       , dualVec (0, Param::epsilon())
@@ -1266,7 +1266,7 @@ namespace soplex
             degenCompIterOffset = base.degenCompIterOffset;
             decompIterationLimit = base.decompIterationLimit;
             fullPerturbation = base.fullPerturbation;
-            printCondition = base.printCondition;
+            printBasisMetric = base.printBasisMetric;
             unitVecs = base.unitVecs;
             primRhs = base.primRhs;
             primVec = base.primVec;
@@ -1466,7 +1466,7 @@ namespace soplex
       , degenCompIterOffset(base.degenCompIterOffset)
       , decompIterationLimit(base.decompIterationLimit)
       , fullPerturbation(base.fullPerturbation)
-      , printCondition(base.printCondition)
+      , printBasisMetric(base.printBasisMetric)
       , unitVecs(base.unitVecs)
       , primRhs(base.primRhs)
       , primVec(base.primVec)

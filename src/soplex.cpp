@@ -7487,9 +7487,6 @@ namespace soplex
       case SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS:
          os << "problem is solved [optimal with unscaled violations]";
          break;
-      case SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS:
-         os << "problem is solved [optimal with unscaled violations]";
-         break;
       default:
       case SPxSolverBase<Real>::UNKNOWN:
         os << "unknown";
