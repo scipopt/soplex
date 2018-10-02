@@ -210,6 +210,22 @@ namespace soplex
 	bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
 
   template <>
+  SoPlexBase<Real>::Settings::BoolParam::BoolParam();
+  template <>
+  typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
+
+  // template <>
+  // SoPlexBase<Real>::Settings::IntParam::IntParam();
+  template <>
+  typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam = IntParam();
+
+  // template <>
+  // SoPlexBase<Real>::Settings::RealParam::RealParam();
+  template <>
+  typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam = RealParam();
+
+
+  template <>
   SoPlexBase<Real>::Settings::BoolParam::BoolParam() {
     // should lifting be used to reduce range of nonzero matrix coefficients?
     name[SoPlexBase<Real>::LIFTING] = "lifting";
@@ -735,21 +751,6 @@ namespace soplex
     return *this;
   }
 
-  template <>
-  typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam;
-
-  template <>
-  typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam;
-
-  template <>
-  typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam;
-
-  template <>
-  typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
-  template <>
-  typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam = IntParam();
-  template <>
-  typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam = RealParam();
 #ifdef SOPLEX_WITH_RATIONALPARAM
   template <>
   SoPlexBase<Real>::Settings::RationalParam SoPlexBase<Real>::Settings::rationalParam;
