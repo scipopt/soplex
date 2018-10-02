@@ -2446,6 +2446,7 @@ static void MPSwriteRecord(
             spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
             os << buf;
           }
+   }
 
     os << std::endl;
   }
