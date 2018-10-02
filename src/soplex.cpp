@@ -736,6 +736,15 @@ namespace soplex
   }
 
   template <>
+  typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam;
+
+  template <>
+  typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam;
+
+  template <>
+  typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam;
+
+  template <>
   typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
   template <>
   typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam = IntParam();
