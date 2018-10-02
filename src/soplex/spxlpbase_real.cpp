@@ -2440,16 +2440,16 @@ static void MPSwriteRecord(
    {
       spxSnprintf(buf, sizeof(buf), "%-8.8s  %.15" REAL_FORMAT, name1, value1);
       os << buf;
-      
-        if( name2 != 0 )
-          {
-            spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
-            os << buf;
-          }
+
+      if( name2 != 0 )
+      {
+         spxSnprintf(buf, sizeof(buf), "   %-8.8s  %.15" REAL_FORMAT, name2, value2);
+         os << buf;
+      }
    }
 
     os << std::endl;
-  }
+}
 
 
 
