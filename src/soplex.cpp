@@ -4943,7 +4943,9 @@ namespace soplex
          return false;
 
     if( _solver.basis().status() == SPxBasisBase<Real>::NO_PROBLEM )
+      {
       return false;
+      }
 
       condition = _solver.getBasisMetric(type);
 
@@ -7029,7 +7031,9 @@ namespace soplex
   {
     assert(string != 0);
     if( string == 0 )
+      {
       return false;
+      }
 
       char parseString[SET_MAX_LINE_LEN];
       spxSnprintf(parseString, SET_MAX_LINE_LEN-1, "%s", string);
