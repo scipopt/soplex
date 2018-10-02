@@ -2698,7 +2698,9 @@ namespace soplex
       }
 
     //@}
-  };
+};
+
+
 // Declaration of Real specializations found in spxlpbase_real.cpp
 
 template <>
