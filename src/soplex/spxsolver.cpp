@@ -1191,8 +1191,8 @@ namespace soplex
         //assert(SPxSolverBase<Real>::isConsistent());
       }
 
-    template <class R>
-      SPxSolverBase<R>::~SPxSolverBase()
+    template <>
+      SPxSolverBase<Real>::~SPxSolverBase()
     {
       assert(!freePricer || thepricer != 0);
       assert(!freeRatioTester || theratiotester != 0);
