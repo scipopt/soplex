@@ -7343,8 +7343,6 @@ namespace soplex
         Rational maxviol;
         Rational sumviol;
 
-        /// TODO: The following parts should be uncommented when the Rational parts needs to get implemented
-
         os << "Violation (rational): \n";
         if( getBoundViolationRational(maxviol, sumviol) )
           os << "  Max/sum bound     : " << rationalToString(maxviol) << " / " << rationalToString(sumviol) << "\n";
