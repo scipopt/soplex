@@ -474,9 +474,7 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   // This should be a pointer without a type.
-   SoPlexBase<Real>* soplex = nullptr; // The pointer to base class that will be used to access SoPlexBase
-
+   SoPlexBase<Real>* soplex = nullptr;
 
    Timer* readingTime = nullptr;
    Validation<Real>* validation = nullptr;
