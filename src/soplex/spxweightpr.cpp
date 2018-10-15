@@ -135,37 +135,6 @@ namespace soplex
     return lastIdx;
   }
 
-#if 0
-  /**@todo remove this code */
-  // ??? This is the old (buggy) version
-  template <>
-  int SPxWeightPR<Real>::selectLeave()
-  {
-    const Real* test = this->thesolver->fTest().get_const_ptr();
-    Real type = 1 - 2 * (this->thesolver->rep() == SPxSolverBase<Real>::COLUMN);
-    Real best = type * infinity;
-    int lastIdx = -1;
-    Real x;
-    int i;
-
-    for (i = this->solver()->dim() - 1; i >= 0; --i)
-      {
-        x = test[i];
-        if (x < -theeps)
-          {
-            x *= leavePenalty[i];
-            if (x < best)
-              {
-                best = x;
-                lastIdx = i;
-              }
-          }
-      }
-    assert(isConsistent());
-    return lastIdx;
-  }
-#endif
-
   template <>
   SPxId SPxWeightPR<Real>::selectEnter()
   {
