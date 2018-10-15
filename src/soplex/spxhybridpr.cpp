@@ -81,8 +81,8 @@ namespace soplex
       {
         if (this->thesolver->dim() > hybridFactor * this->thesolver->coDim())
           {
-            /**@todo I changed from devex to steepest edge pricing here 
-             *       because of numerical difficulties, this should be 
+            /**@todo I changed from devex to steepest edge pricing here
+             *       because of numerical difficulties, this should be
              *       investigated.
              */
             // thepricer = &devex;
@@ -95,7 +95,7 @@ namespace soplex
             this->thesolver->setPricing(SPxSolverBase<Real>::PARTIAL);
           }
       }
-   
+
     MSG_INFO1( (*this->thesolver->spxout), (*this->thesolver->spxout) << "IPRHYB01 switching to "
                << thepricer->getName() << std::endl; )
 

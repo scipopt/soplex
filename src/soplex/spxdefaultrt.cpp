@@ -22,7 +22,7 @@
 namespace soplex
 {
   /**
-   * Here comes the ratio test for selecting a variable to leave the basis. 
+   * Here comes the ratio test for selecting a variable to leave the basis.
    * It is assumed that Vec.delta() and fVec.idx() have been setup
    * correctly!
    *
@@ -63,7 +63,7 @@ namespace soplex
           {
             i = idx.index(j);
             x = upd[i];
- 
+
             if (x > epsilon)
               {
                 if (ub[i] < infinity)
@@ -97,14 +97,14 @@ namespace soplex
 
             // BH 2005-11-30: It may well happen that the basis is degenerate and the
             // selected leaving variable is (at most this->delta) beyond its bound. (This
-            // happens for instance on LP/netlib/adlittle.mps with setting -r -t0.) 
+            // happens for instance on LP/netlib/adlittle.mps with setting -r -t0.)
             // In that case we do a pivot step with length zero to avoid difficulties.
             if ( ( x > epsilon  && vec[leave] >= ub[leave] ) ||
                  ( x < -epsilon && vec[leave] <= lb[leave] ) )
               {
                 val = 0.0;
               }
-            else 
+            else
               {
                 val = (x > epsilon) ? ub[leave] : lb[leave];
                 val = (val - vec[leave]) / x;
@@ -152,12 +152,12 @@ namespace soplex
             x   = upd[leave];
 
             // See comment above.
-            if ( ( x < -epsilon && vec[leave] >= ub[leave] ) || 
+            if ( ( x < -epsilon && vec[leave] >= ub[leave] ) ||
                  ( x > epsilon  && vec[leave] <= lb[leave] ) )
               {
                 val = 0.0;
               }
-            else 
+            else
               {
                 val = (x < epsilon) ? ub[leave] : lb[leave];
                 val = (val - vec[leave]) / x;
@@ -214,7 +214,7 @@ namespace soplex
                 if (upb[i] < infinity)
                   {
                     Real y = (upb[i] - pvec[i] + this->delta) / x;
-                        
+
                     if (y < val)
                       {
                         enterId = this->solver()->id(i);

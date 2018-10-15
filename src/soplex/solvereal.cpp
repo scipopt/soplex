@@ -29,7 +29,7 @@ namespace soplex
   void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Result simplificationStatus);
   template <>
   void SoPlexBase<Real>::_storeSolutionReal(bool verify);
-  
+
   /// solves real LP
   template <>
   void SoPlexBase<Real>::_optimizeT()

@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <iostream>
 
-// #define EQ_PREF 1000 
+// #define EQ_PREF 1000
 
 #include "soplex/spxdefines.h"
 #include "soplex/spxdantzigpr.h"

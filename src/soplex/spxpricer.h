@@ -35,7 +35,7 @@ namespace soplex
      Class SPxPricer is a pure virtual class defining the interface for pricer
      classes to be used by SoPlex. The pricer's task is to select a vector to
      enter or leave the simplex basis, depending on the chosen simplex type.
-   
+
      An SPxPricer first #load%s the SoPlex object for which pricing is to
      be performed. Then, depending of the SPxSolverBase<R>::Type, methods
      #selectEnter() and #entered4() (for entering Simplex) or #selectLeave()
@@ -179,7 +179,7 @@ namespace soplex
           the basis for \p id to come in at this position. When being called,
           all vectors of SoPlex involved in such an entering update are
           setup correctly and may be accessed via the corresponding methods
-          (\ref SPxSolverBase<R>::fVec() "fVec()", \ref SPxSolverBase<R>::pVec() "pVec()", 
+          (\ref SPxSolverBase<R>::fVec() "fVec()", \ref SPxSolverBase<R>::pVec() "pVec()",
           etc.). In general, argument \p n will be the one returned by the
           SPxPricer at the previous call to #selectLeave(). However, one can not
           rely on this.
@@ -194,9 +194,9 @@ namespace soplex
 
           Note:
           When method #selectEnter() is called by the loaded SoPlex
-          object, all values from \ref SPxSolverBase<R>::coTest() "coTest()" are 
-          up to date. However, whether the elements of 
-          \ref SPxSolverBase<R>::test() "test()" are up to date depends on the 
+          object, all values from \ref SPxSolverBase<R>::coTest() "coTest()" are
+          up to date. However, whether the elements of
+          \ref SPxSolverBase<R>::test() "test()" are up to date depends on the
           SPxSolverBase<R>::Pricing type.
       */
       virtual SPxId selectEnter() = 0;
@@ -206,13 +206,13 @@ namespace soplex
           mode. It informs the SPxPricer that variable \p id has entered
           at the \p n 'th position. When being called, all vectors of SoPlex
           involved in such an entering update are setup correctly and may be
-          accessed via the corresponding methods 
+          accessed via the corresponding methods
           (\ref SPxSolverBase<R>::fVec() "fVec()", \ref SPxSolverBase<R>::pVec() "pVec()",
           etc.). In general, argument \p id will be the one returned by the
           SPxPricer at the previous call to #selectEnter(). However, one can not
           rely on this.
       */
-      virtual void entered4(SPxId /*id*/, int /*n*/) 
+      virtual void entered4(SPxId /*id*/, int /*n*/)
       {}
       //@}
 
@@ -248,7 +248,7 @@ namespace soplex
       //-------------------------------------
       /**@name Debugging */
       //@{
-      virtual bool isConsistent() const 
+      virtual bool isConsistent() const
       {
 #ifdef ENABLE_CONSISTENCY_CHECKS
         return thesolver != 0;
@@ -270,7 +270,7 @@ namespace soplex
 
       /// copy constructor
     SPxPricer(const SPxPricer& old)
-      : m_name(old.m_name) 
+      : m_name(old.m_name)
         , thesolver(old.thesolver)
         , theeps(old.theeps)
         {}
@@ -280,7 +280,7 @@ namespace soplex
         {
           if(this != &rhs)
             {
-              m_name = rhs.m_name; 
+              m_name = rhs.m_name;
               thesolver = rhs.thesolver;
               theeps = rhs.theeps;
               assert(isConsistent());

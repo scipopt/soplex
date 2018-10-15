@@ -28,7 +28,7 @@ namespace soplex
 
   template <>
   void SPxSolverBase<Real>::computeFrhs1(
-				     const Vector& ufb, 
+				     const Vector& ufb,
 				     const Vector& lfb);
 
   template <>
@@ -38,17 +38,17 @@ namespace soplex
 
 
   /** Initialize Vectors
- 
+
       Computing the right hand side vector for the feasibility vector depends on
       the chosen representation and type of the basis.
- 
+
       In columnwise case, |theFvec| = \f$x_B = A_B^{-1} (- A_N x_N)\f$, where \f$x_N\f$
       are either upper or lower bounds for the nonbasic variables (depending on
       the variables |Status|). If these values remain unchanged throughout the
       simplex algorithm, they may be taken directly from LP. However, in the
       entering type algorith they are changed and, hence, retreived from the
       column or row upper or lower bound vectors.
- 
+
       In rowwise case, |theFvec| = \f$\pi^T_B = (c^T - 0^T A_N) A_B^{-1}\f$. However,
       this applies only to leaving type algorithm, where no bounds on dual
       variables are altered. In entering type algorithm they are changed and,
@@ -92,7 +92,7 @@ namespace soplex
 
                       default:
                         MSG_ERROR( std::cerr << "ESVECS01 ERROR: "
-                                   << "inconsistent basis must not happen!" 
+                                   << "inconsistent basis must not happen!"
                                    << std::endl; )
                           throw SPxInternalCodeException("XSVECS01 This should never happen.");
                       }
@@ -193,7 +193,7 @@ namespace soplex
 
               default:
                 MSG_ERROR( std::cerr << "ESVECS02 ERROR: "
-                           << "inconsistent basis must not happen!" 
+                           << "inconsistent basis must not happen!"
                            << std::endl; )
                   throw SPxInternalCodeException("XSVECS02 This should never happen.");
               }
@@ -252,7 +252,7 @@ namespace soplex
 
               default:
                 MSG_ERROR( std::cerr << "ESVECS03 ERROR: "
-                           << "inconsistent basis must not happen!" 
+                           << "inconsistent basis must not happen!"
                            << std::endl; )
                   throw SPxInternalCodeException("XSVECS04 This should never happen.");
               }
@@ -266,7 +266,7 @@ namespace soplex
   }
 
   /** This methods subtracts \f$A_N x_N\f$ or \f$\pi_N^T A_N\f$ from |theFrhs| as
-      specified by the |Status| of all nonbasic variables. The values of 
+      specified by the |Status| of all nonbasic variables. The values of
       \f$x_N\f$ or \f$\pi_N\f$ are taken from the passed arrays.
   */
   template <>
@@ -321,7 +321,7 @@ namespace soplex
 
               default:
                 MSG_ERROR( std::cerr << "ESVECS05 ERROR: "
-                           << "inconsistent basis must not happen!" 
+                           << "inconsistent basis must not happen!"
                            << std::endl; )
                   throw SPxInternalCodeException("XSVECS05 This should never happen.");
               }
@@ -337,20 +337,20 @@ namespace soplex
       the type of the simplex algorithm. In entering algorithms, the
       values are taken from the inequality's right handside or the
       column's objective value.
-    
+
       In contrast to this leaving algorithms take the values from vectors
       |theURbound| and so on.
-    
+
       We reflect this difference by providing two pairs of methods
       |computeEnterCoPrhs(n, stat)| and |computeLeaveCoPrhs(n, stat)|. The first
       pair operates for entering algorithms, while the second one is intended for
       leaving algorithms.  The return value of these methods is the right hand
       side value for the \f$n\f$-th row or column id, respectively, if it had the
       passed |Status| for both.
- 
+
       Both methods are again split up into two methods named |...4Row(i,n)| and
       |...4Col(i,n)|, respectively. They do their job for the |i|-th basis
-      variable, being the |n|-th row or column.  
+      variable, being the |n|-th row or column.
   */
   template <>
   void SPxSolverBase<Real>::computeEnterCoPrhs4Row(int i, int n)

@@ -56,7 +56,7 @@ namespace soplex
   void SPxSolverBase<Rational>::setPricing(Pricing pr);
 
   template <>
-  bool SPxSolverBase<Real>::read(std::istream& in, NameSet* rowNames, 
+  bool SPxSolverBase<Real>::read(std::istream& in, NameSet* rowNames,
                           NameSet* colNames, DIdxSet* intVars)
   {
     if( initialized )
@@ -108,7 +108,7 @@ namespace soplex
       theratiotester->clear();
   }
 
-  
+
   /// #template #temp
   template <>
   void SPxSolverBase<Real>::loadLP(const SPxLP& lp, bool initSlackBasis)
@@ -152,7 +152,7 @@ namespace soplex
   template <>
   void SPxSolverBase<Real>::setPricer(SPxPricer<Real>* x, const bool destroy)
   {
-   
+
     assert(!freePricer || thepricer != 0);
 
     if(freePricer)
@@ -180,7 +180,7 @@ namespace soplex
   template <>
   void SPxSolverBase<Rational>::setPricer(SPxPricer<Rational>* x, const bool destroy)
   {
-   
+
     assert(!freePricer || thepricer != 0);
 
     if(freePricer)
@@ -205,7 +205,7 @@ namespace soplex
     freePricer = destroy;
   }
 
-  /// #template #temp 
+  /// #template #temp
   template <>
   void SPxSolverBase<Real>::setTester(SPxRatioTester<Real>* x, const bool destroy)
   {
@@ -314,7 +314,7 @@ namespace soplex
       if (theRep == COLUMN)
         {
           thevectors   = this->colSet();
-          thecovectors = this->rowSet(); 
+          thecovectors = this->rowSet();
           theFrhs      = &primRhs;
           theFvec      = &primVec;
           theCoPrhs    = &dualRhs;
@@ -331,7 +331,7 @@ namespace soplex
         {
           assert(theRep == ROW);
 
-          thevectors   = this->rowSet(); 
+          thevectors   = this->rowSet();
           thecovectors = this->colSet();
           theFrhs      = &dualRhs;
           theFvec      = &dualVec;
@@ -373,7 +373,7 @@ namespace soplex
     template <>
       void SPxSolverBase<Real>::reinitializeVecs()
     {
-   
+
       initialized = true;
 
       if (type() == ENTER)
@@ -674,7 +674,7 @@ namespace soplex
     }
 
     /*
-      When the basis matrix factorization is recomputed from scratch, 
+      When the basis matrix factorization is recomputed from scratch,
       we also recompute the vectors.
     */
     template <>
@@ -1115,7 +1115,7 @@ namespace soplex
 
     template <>
       SPxSolverBase<Real>::SPxSolverBase(
-                              Type            p_type, 
+                              Type            p_type,
                               Representation  p_rep,
                               Timer::TYPE     ttype)
       : theType (p_type)
@@ -1317,7 +1317,7 @@ namespace soplex
             if (base.theRep == COLUMN)
               {
                 thevectors   = this->colSet();
-                thecovectors = this->rowSet(); 
+                thecovectors = this->rowSet();
                 theFrhs      = &primRhs;
                 theFvec      = &primVec;
                 theCoPrhs    = &dualRhs;
@@ -1333,8 +1333,8 @@ namespace soplex
             else
               {
                 assert(base.theRep == ROW);
-         
-                thevectors   = this->rowSet(); 
+
+                thevectors   = this->rowSet();
                 thecovectors = this->colSet();
                 theFrhs      = &dualRhs;
                 theFvec      = &dualVec;
@@ -1518,7 +1518,7 @@ namespace soplex
         if (base.theRep == COLUMN)
           {
             thevectors   = this->colSet();
-            thecovectors = this->rowSet(); 
+            thecovectors = this->rowSet();
             theFrhs      = &primRhs;
             theFvec      = &primVec;
             theCoPrhs    = &dualRhs;
@@ -1535,7 +1535,7 @@ namespace soplex
           {
             assert(base.theRep == ROW);
 
-            thevectors   = this->rowSet(); 
+            thevectors   = this->rowSet();
             thecovectors = this->colSet();
             theFrhs      = &dualRhs;
             theFvec      = &dualVec;
@@ -1643,10 +1643,10 @@ namespace soplex
 
       if (rep() == COLUMN)
         {
-          if(thecovectors != 
-             reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this)) 
-             || thevectors != 
-             reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this)) 
+          if(thecovectors !=
+             reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
+             || thevectors !=
+             reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
              || theFrhs != &primRhs ||
              theFvec != &primVec ||
              theCoPrhs != &dualRhs ||
@@ -1662,9 +1662,9 @@ namespace soplex
         }
       else
         {
-          if (thecovectors 
+          if (thecovectors
               != reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
-              || thevectors 
+              || thevectors
               != reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
               || theFrhs != &dualRhs ||
               theFvec != &dualVec ||
@@ -1780,7 +1780,7 @@ namespace soplex
     {
       return objLimit;
     }
-   
+
     template <>
       typename SPxSolverBase<Real>::VarStatus
       SPxSolverBase<Real>::basisStatusToVarStatus( typename SPxBasisBase<Real>::Desc::Status stat ) const
@@ -1877,7 +1877,7 @@ namespace soplex
     }
 
     template <>
-      typename SPxBasisBase<Real>::Desc::Status 
+      typename SPxBasisBase<Real>::Desc::Status
       SPxSolverBase<Real>::varStatusToBasisStatusCol( int col, SPxSolverBase<Real>::VarStatus stat ) const
     {
       typename SPxBasisBase<Real>::Desc::Status cstat;
@@ -1958,7 +1958,7 @@ namespace soplex
       return basisStatusToVarStatus( this->desc().colStatus( col ) );
     }
 
-    /// #template #temp 
+    /// #template #temp
     template <>
       typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
     {

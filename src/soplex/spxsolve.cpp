@@ -48,8 +48,8 @@ namespace soplex
 
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimal (Vector& p_vector) const;
-  
-  
+
+
   /**@todo check separately for ENTER and LEAVE algorithm */
   template <>
   bool SPxSolverBase<Real>::precisionReached(Real& newpricertol) const
@@ -395,8 +395,8 @@ namespace soplex
                       {
                         // we are not infeasible and have no shift
                         if (  shift() <= epsilon()
-                              && ( SPxBasisBase<Real>::status() == SPxBasisBase<Real>::REGULAR 
-                                   || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL 
+                              && ( SPxBasisBase<Real>::status() == SPxBasisBase<Real>::REGULAR
+                                   || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL
                                    || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::PRIMAL))
                           {
                             Real newpricertol = minpricertol;
@@ -665,13 +665,13 @@ namespace soplex
                     if (leaveNum < 0 && instableLeaveNum >= 0 && this->lastUpdate() == 0)
                       {
                         /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
-                           that this is due to the scaling of theCoTest[...]. Thus, we use 
+                           that this is due to the scaling of theCoTest[...]. Thus, we use
                            instableLeaveNum and SPxFastRT<Real>::selectEnter shall accept even an instable
                            entering variable. */
                         MSG_INFO3( (*spxout),
                                    (*spxout) << " --- trying instable leave iteration" << std::endl;
                                    )
-            
+
                           leaveNum = instableLeaveNum;
                         instableLeave = true;
                         // we also need to reset the fTest() value for getLeaveVals()
@@ -698,8 +698,8 @@ namespace soplex
                       {
                         // we are not infeasible and have no shift
                         if (  shift() <= epsilon()
-                              && (  SPxBasisBase<Real>::status() == SPxBasisBase<Real>::REGULAR 
-                                    || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL 
+                              && (  SPxBasisBase<Real>::status() == SPxBasisBase<Real>::REGULAR
+                                    || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL
                                     || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::PRIMAL))
                           {
                             Real newpricertol = minpricertol;
@@ -1064,7 +1064,7 @@ namespace soplex
           for(int row = 0; row < nRows(); ++row )
             {
               const SVector& rowvec = rowVector( row );
-              val = 0.0;         
+              val = 0.0;
               for( c = 0; c < rowvec.size(); ++c )
                 val += rowvec.value( c ) * sol[rowvec.index( c )];
 
@@ -1083,7 +1083,7 @@ namespace soplex
                       {
                         // find basis variable
                         for( c = 0; c < nRows(); ++c )
-                          if (basis().baseId(c).isSPxRowId()     
+                          if (basis().baseId(c).isSPxRowId()
                               && (this->number(basis().baseId(c)) == row))
                             break;
 
@@ -1112,7 +1112,7 @@ namespace soplex
                     if( type() == LEAVE && isColBasic( col ) )
                       {
                         for( c = 0; c < nRows() ; ++c)
-                          if ( basis().baseId( c ).isSPxColId()    
+                          if ( basis().baseId( c ).isSPxColId()
                                && ( this->number( basis().baseId( c ) ) == col ))
                             break;
 
@@ -1571,7 +1571,7 @@ namespace soplex
 #ifdef ENABLE_ADDITIONAL_CHECKS
         DVector cr(*theCoPrhs);
         DVector fr(*theFrhs);
-#endif 
+#endif
 
         if (type() == ENTER)
           computeEnterCoPrhs();
@@ -1639,7 +1639,7 @@ namespace soplex
     //   We want stop the solving process if
     //   objLimit <= current objective value of the DUAL LP
     // - MAXIMIZATION Problem
-    //   We want stop the solving process if 
+    //   We want stop the solving process if
     //   objLimit >= current objective value of the DUAL LP
     if( objLimit < infinity && type() * rep() > 0 )
       {
@@ -1747,7 +1747,7 @@ namespace soplex
     return false;
   }
 
-  /// #template #temp 
+  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimal (Vector& p_vector) const
   {
@@ -1798,14 +1798,14 @@ namespace soplex
     return status();
   }
 
-  /// #template #temp 
+  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDual (Vector& p_vector) const
   {
 
     assert(isInitialized());
 
-    if (!isInitialized()) 
+    if (!isInitialized())
       {
         /* exit if presolving/simplifier cleared the problem */
         if (status() == NO_PROBLEM)
@@ -1840,7 +1840,7 @@ namespace soplex
 
     if (!isInitialized())
       {
-        throw SPxStatusException("XSOLVE09 No Problem loaded");    
+        throw SPxStatusException("XSOLVE09 No Problem loaded");
         // return NOT_INIT;
       }
 
@@ -1917,7 +1917,7 @@ namespace soplex
     return status();
   }
 
-  /// #typename #temp 
+  /// #typename #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getSlacks (Vector& p_vector) const
   {
@@ -2086,7 +2086,7 @@ namespace soplex
   {
     switch( m_status )
       {
-      case UNKNOWN :      
+      case UNKNOWN :
         switch (SPxBasisBase<Real>::status())
           {
           case SPxBasisBase<Real>::NO_PROBLEM :
@@ -2106,7 +2106,7 @@ namespace soplex
           default:
             return ERROR;
           }
-      case SINGULAR : 
+      case SINGULAR :
         return m_status;
       case OPTIMAL :
         assert( SPxBasisBase<Real>::status() == SPxBasisBase<Real>::OPTIMAL );
@@ -2135,7 +2135,7 @@ namespace soplex
   {
     switch( m_status )
       {
-      case UNKNOWN :      
+      case UNKNOWN :
         switch (SPxBasisBase<Rational>::status())
           {
           case SPxBasisBase<Rational>::NO_PROBLEM :
@@ -2155,7 +2155,7 @@ namespace soplex
           default:
             return ERROR;
           }
-      case SINGULAR : 
+      case SINGULAR :
         return m_status;
       case OPTIMAL :
         assert( SPxBasisBase<Rational>::status() == SPxBasisBase<Rational>::OPTIMAL );
@@ -2178,7 +2178,7 @@ namespace soplex
         return ERROR;
       }
   }
-  
+
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getResult(
                                                         Real* p_value,

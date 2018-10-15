@@ -55,7 +55,7 @@ namespace soplex
      checked wheter its vector is linearly dependend of the vectors of the #Id#s
      allready selected.  If not, it is added to them. This is iterated until a
      full matrix has been constructed.
- 
+
      Testing for linear independence is done very much along the lines of LU
      factorization. A vector is taken, and updated with all previous L-vectors.
      Then the maximal absolut element is selected as pivot element for computing
@@ -68,8 +68,8 @@ namespace soplex
   */
   template <>
   void SPxWeightST<Real>::setPrimalStatus(
-                                       typename SPxBasisBase<Real>::Desc& desc, 
-                                       const SPxSolverBase<Real>& base, 
+                                       typename SPxBasisBase<Real>::Desc& desc,
+                                       const SPxSolverBase<Real>& base,
                                        const SPxId& id)
   {
     if (id.isSPxRowId())
@@ -121,8 +121,8 @@ namespace soplex
 
   // ----------------------------------------------------------------
   static void setDualStatus(
-                            typename SPxBasisBase<Real>::Desc& desc, 
-                            const SPxSolverBase<Real>& base, 
+                            typename SPxBasisBase<Real>::Desc& desc,
+                            const SPxSolverBase<Real>& base,
                             const SPxId& id)
   {
     if (id.isSPxRowId())
@@ -444,7 +444,7 @@ namespace soplex
       {
         if ((up[i] < infinity) && (spxAbs(up[i]) > maxabs))
           maxabs = spxAbs(up[i]);
-      
+
         if ((low[i] > -infinity) && (spxAbs(low[i]) > maxabs))
           maxabs = spxAbs(low[i]);
       }
@@ -452,7 +452,7 @@ namespace soplex
       {
         if ((rhs[i] < infinity) && (spxAbs(rhs[i]) > maxabs))
           maxabs = spxAbs(rhs[i]);
-      
+
         if ((lhs[i] > -infinity) && (spxAbs(lhs[i]) > maxabs))
           maxabs = spxAbs(lhs[i]);
       }

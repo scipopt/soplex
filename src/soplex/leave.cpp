@@ -179,7 +179,7 @@ namespace soplex
   }
 
 
-  /* compute statistics on leaving variable 
+  /* compute statistics on leaving variable
      Compute a set of statistical values on the variable selected for leaving the
      basis.
   */
@@ -313,7 +313,7 @@ namespace soplex
             assert( rep() == COLUMN );
             assert(SPxLP::upper(leaveNum) == SPxLP::lower(leaveNum));
             ds.colStatus(leaveNum) = SPxBasisBase<Real>::Desc::P_FIXED;
-            leavebound = SPxLP::upper(leaveNum); 
+            leavebound = SPxLP::upper(leaveNum);
             objChange += this->maxObj(leaveNum) * leavebound;
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
               leaveMax = infinity;
@@ -678,7 +678,7 @@ namespace soplex
           // This happens very frequently and does usually not hurt, so print
           // these warnings only with verbose level INFO2 and higher.
           MSG_INFO2( (*spxout), (*spxout) << "WLEAVE60 iteration=" << basis().iteration()
-                     << ": coPvec.delta error = " << tmp.length() 
+                     << ": coPvec.delta error = " << tmp.length()
                      << std::endl; )
             }
       }

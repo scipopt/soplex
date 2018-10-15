@@ -83,7 +83,7 @@ namespace soplex
         activepricer->setType(type);
         return true;
       }
-  
+
     return false;
   }
 

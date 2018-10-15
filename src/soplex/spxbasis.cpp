@@ -39,14 +39,14 @@ namespace soplex
   template <>
   typename SPxBasisBase<Real>::Desc::Status
   SPxBasisBase<Real>::dualColStatus(int i) const;
-  
+
   template <>
   void SPxBasisBase<Real>::setRep();
 
   static const char* getRowName(
 				const SPxLP*   lp,
 				int            idx,
-				const NameSet* rnames, 
+				const NameSet* rnames,
 				char*          buf);
 
   template <>
@@ -391,12 +391,12 @@ namespace soplex
     freeSlinSolver = destroy;
   }
 
-  /** 
+  /**
    *  The specification is taken from the
    *
    *  ILOG CPLEX 7.0 Reference Manual, Appendix E, Page 543.
    *
-   *  This routine should read valid BAS format files. 
+   *  This routine should read valid BAS format files.
    *
    *  @return true if the file was read correctly.
    *
@@ -407,8 +407,8 @@ namespace soplex
    *  differences to this rule are given. Each data line contains an indicator, a variable name and
    *  possibly a row/constraint name. The following meaning applies with respect to the indicators:
    *
-   *  - XU: the variable is basic, the row is nonbasic at its upper bound 
-   *  - XL: the variable is basic, the row is nonbasic at its lower bound 
+   *  - XU: the variable is basic, the row is nonbasic at its upper bound
+   *  - XL: the variable is basic, the row is nonbasic at its lower bound
    *  - UL: the variable is nonbasic and at its upper bound
    *  - LL: the variable is nonbasic and at its lower bound
    *
@@ -420,8 +420,8 @@ namespace soplex
    */
   template <>
   bool SPxBasisBase<Real>::readBasis(
-			      std::istream&  is, 
-			      const NameSet* rowNames, 
+			      std::istream&  is,
+			      const NameSet* rowNames,
 			      const NameSet* colNames)
   {
     assert(theLP != 0);
@@ -580,21 +580,21 @@ namespace soplex
   }
 
 
-  /* Get row name - copied from spxmpswrite.cpp 
+  /* Get row name - copied from spxmpswrite.cpp
    *
    * @todo put this in a common file and unify accross different formats (mps, lp, basis).
    */
   static const char* getRowName(
 				const SPxLP*   lp,
 				int            idx,
-				const NameSet* rnames, 
+				const NameSet* rnames,
 				char*          buf)
   {
     assert(buf != 0);
     assert(idx >= 0);
     assert(idx < lp->nRows());
 
-    if (rnames != 0) 
+    if (rnames != 0)
       {
 	DataKey key = lp->rId(idx);
 
@@ -602,25 +602,25 @@ namespace soplex
 	  return (*rnames)[key];
       }
     spxSnprintf(buf, 16, "C%d", idx);
-   
+
     return buf;
   }
-   
-  /* Get column name - copied from spxmpswrite.cpp 
+
+  /* Get column name - copied from spxmpswrite.cpp
    *
    * @todo put this in a common file and unify accross different formats (mps, lp, basis).
    */
   static const char* getColName(
 				const SPxLP*   lp,
 				int            idx,
-				const NameSet* cnames, 
+				const NameSet* cnames,
 				char*          buf)
   {
     assert(buf != 0);
     assert(idx >= 0);
     assert(idx < lp->nCols());
 
-    if (cnames != 0) 
+    if (cnames != 0)
       {
 	DataKey key = lp->cId(idx);
 
@@ -628,7 +628,7 @@ namespace soplex
 	  return (*cnames)[key];
       }
     spxSnprintf(buf, 16, "x%d", idx);
-   
+
     return buf;
   }
 
@@ -638,8 +638,8 @@ namespace soplex
    */
   template <>
   void SPxBasisBase<Real>::writeBasis(
-			       std::ostream&  os, 
-			       const NameSet* rowNames, 
+			       std::ostream&  os,
+			       const NameSet* rowNames,
 			       const NameSet* colNames,
 			       const bool cpxFormat
 			       ) const
@@ -680,7 +680,7 @@ namespace soplex
 	    os << std::setw(8) << getColName(theLP, col, colNames, buf);
 
 	    /* break in two parts since buf is reused */
-	    os << "       " 
+	    os << "       "
 	       << getRowName(theLP, row, rowNames, buf)
 	       << std::endl;
 
@@ -1242,7 +1242,7 @@ Real SPxBasisBase<Real>::getMatrixMetric(int type)
 	    else
 	      ++primals;
 	  }
-      
+
 	for (i = 0; i < thedesc.nCols(); ++i)
 	  {
 	    if (thedesc.colStatus(i) >= 0)
@@ -1256,7 +1256,7 @@ Real SPxBasisBase<Real>::getMatrixMetric(int type)
 	if (primals != thedesc.nCols())
 	  return MSGinconsistent("SPxBasisBase<Real>");
       }
-    return thedesc.isConsistent() && theBaseId.isConsistent() 
+    return thedesc.isConsistent() && theBaseId.isConsistent()
       && matrix.isConsistent() && factor->isConsistent();
 #else
     return true;
@@ -1378,7 +1378,7 @@ Real SPxBasisBase<Real>::getMatrixMetric(int type)
 	  }
 	factor = rhs.factor->clone();
 	freeSlinSolver = true;
-      
+
 	factorized    = rhs.factorized;
 	maxUpdates    = rhs.maxUpdates;
 	nonzeroFactor = rhs.nonzeroFactor;

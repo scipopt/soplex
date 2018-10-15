@@ -134,7 +134,7 @@ namespace soplex
     assert(isConsistent());
   }
 
-  /**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs, 
+  /**@todo suspicious: Shouldn't the relation between dim, coDim, Vecs,
    *       and CoVecs be influenced by the representation ?
    */
   template <>
@@ -859,8 +859,8 @@ namespace soplex
   }
 
 
-  /**@todo suspicious: the pricer should be informed, that variable id 
-     has entered the basis at position n, but the id is not used here 
+  /**@todo suspicious: the pricer should be informed, that variable id
+     has entered the basis at position n, but the id is not used here
      (this is true for all pricers)
   */
   template <>
@@ -906,7 +906,7 @@ namespace soplex
           }
       }
   }
- 
+
   template <>
   void SPxDevexPR<Real>::addedVecs (int n)
   {

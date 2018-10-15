@@ -33,7 +33,7 @@ namespace soplex
 
      Instances of classes derived from SPxSimplifier may be loaded to SoPlex in
      order to simplify LPs before solving them. SoPlex will call #simplify()
-     on itself. Generally any SPxLP can be given to 
+     on itself. Generally any SPxLP can be given to
      a SPxSimplifier for #simplify()%ing it. The simplification cannot be undone,
      but given an primal/dual solution for the simplified SPxLP, the simplifier
      can reconstruct the primal/dual solution of the unsimplified LP.

@@ -818,7 +818,7 @@ namespace soplex
   }
 
   /// returns the current solver status
-  /// #template #temp 
+  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const
   {
@@ -3832,7 +3832,7 @@ namespace soplex
   }
 
   template <>
-	bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP 
+	bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP
   {
     if( hasDual() && vector.dim() >= numRowsT() )
       {

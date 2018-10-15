@@ -1597,7 +1597,7 @@ private:
    SPxScaler* _scaler;
    SPxStarter<R>* _starter;
 
-   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
+   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
                          // are performed on the original LP.
    bool _isRealLPScaled;
    bool _applyPolishing;
@@ -2286,7 +2286,7 @@ private:
    /// returns the expected sign of the dual variables for the original problem
    DualSign getOrigProbDualVariableSign(int rowNumber);
 
-   /// prints a display line of the flying table for the DBDS 
+   /// prints a display line of the flying table for the DBDS
    void printDecompDisplayLine(SPxSolverBase<R>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
 
    /// stores the problem statistics of the original problem

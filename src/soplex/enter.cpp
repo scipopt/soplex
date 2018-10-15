@@ -178,7 +178,7 @@ namespace soplex
   {
     exit(0);
   }
-  
+
   template <>
   Real SPxSolverBase<Real>::computePvec(int i)
   {
@@ -281,7 +281,7 @@ namespace soplex
         return 0;
       }
   }
-  
+
   template <>
   void SPxSolverBase<Real>::computeCoTest()
   {

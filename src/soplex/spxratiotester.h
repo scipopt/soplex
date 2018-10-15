@@ -108,15 +108,15 @@ namespace soplex
       /** Method #selectLeave() is called by the loaded SoPlex solver when
           computing the entering simplex algorithm. Its task is to select and
           return the index of the basis variable that is to leave the basis.
-          When being called, 
-          \ref SPxSolverBase<R>::fVec() "fVec()" fullfills the basic bounds 
+          When being called,
+          \ref SPxSolverBase<R>::fVec() "fVec()" fullfills the basic bounds
           \ref SPxSolverBase<R>::lbBound() "lbBound()" and
-          \ref SPxSolverBase<R>::ubBound() "ubBound()" within 
+          \ref SPxSolverBase<R>::ubBound() "ubBound()" within
           \ref SPxSolverBase<R>::entertol() "entertol()".
           fVec().delta() is the vector by
           which fVec() will be updated in this simplex step. Its nonzero
           indices are stored in sorted order in fVec().idx().
-       
+
           If \p val > 0, \p val is the maximum allowed update value for fVec(),
           otherwise the minimum. Method #selectLeave() must chose \p val of the
           same sign as passed, such that updating fVec() by \p val yields a
@@ -130,12 +130,12 @@ namespace soplex
       /** Method #selectEnter() is called by the loaded SoPlex solver, when
           computing the leaving simplex algorithm. It's task is to select and
           return the Id of the basis variable that is to enter the basis.
-          When being called, 
-          \ref SPxSolverBase<R>::pVec() "pVec()" fullfills the bounds 
+          When being called,
+          \ref SPxSolverBase<R>::pVec() "pVec()" fullfills the bounds
           \ref SPxSolverBase<R>::lbBound() "lbBound()" and
-          \ref SPxSolverBase<R>::ubBound() "ubBound()" within 
+          \ref SPxSolverBase<R>::ubBound() "ubBound()" within
           \ref SPxSolverBase<R>::leavetol() "leavetol()".
-          Similarly, 
+          Similarly,
           \ref SPxSolverBase<R>::coPvec() "coPvec()" fulfills the bounds
           \ref SPxSolverBase<R>::lbBound() "lbBound()" and
           \ref SPxSolverBase<R>::ubBound() "ubBound()" within
@@ -144,7 +144,7 @@ namespace soplex
           the vectors by which pVec() and coPvec() will be updated in this
           simplex step. Their nonzero indices are stored in sorted order in
           pVec().idx() and coPvec().idx().
-       
+
           If \p val > 0, \p val is the maximum allowed update value for pVec()
           and coPvec(), otherwise the minimum. Method #selectEnter() must
           chose \p val of the same sign as passed, such that updating pVec()

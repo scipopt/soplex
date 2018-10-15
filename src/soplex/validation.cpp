@@ -22,7 +22,7 @@
 namespace soplex {
 
   /// updates the external solution used for validation
-  /// #template 
+  /// #template
   template <>
   bool Validation<Real>::updateExternalSolution(char* solution)
   {

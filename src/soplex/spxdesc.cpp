@@ -57,14 +57,14 @@ namespace soplex
     if (old.stat == &old.rowstat)
       {
         assert(old.costat == &old.colstat);
-      
+
         stat   = &rowstat;
         costat = &colstat;
       }
     else
       {
         assert(old.costat == &old.rowstat);
-      
+
         stat   = &colstat;
         costat = &rowstat;
       }
@@ -79,18 +79,18 @@ namespace soplex
       {
         rowstat = rhs.rowstat;
         colstat = rhs.colstat;
-      
+
         if (rhs.stat == &rhs.rowstat)
           {
             assert(rhs.costat == &rhs.colstat);
-         
+
             stat   = &rowstat;
             costat = &colstat;
           }
         else
           {
             assert(rhs.costat == &rhs.rowstat);
-         
+
             stat   = &colstat;
             costat = &rowstat;
           }
@@ -152,7 +152,7 @@ namespace soplex
   std::ostream& operator<<(std::ostream& os, const typename SPxBasisBase<Real>::Desc::Status& stat)
   {
     char text;
-   
+
     switch(stat)
       {
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :

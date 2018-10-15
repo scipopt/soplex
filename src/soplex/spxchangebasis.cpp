@@ -471,13 +471,13 @@ namespace soplex
 
   /**
    * @todo Implement changedRow(), changedCol(), changedElement() in a more clever
-   * way. For instance, the basis won't be singular (but maybe infeasible) if the 
+   * way. For instance, the basis won't be singular (but maybe infeasible) if the
    * change doesn't affect the basis rows/columns.
    *
    * The following methods (changedRow(), changedCol(), changedElement()) radically
-   * change the current basis to the original (slack) basis also present after 
+   * change the current basis to the original (slack) basis also present after
    * loading the LP. The reason is that through the changes, the current basis may
-   * become singular. Going back to the initial basis is quite inefficient, but 
+   * become singular. Going back to the initial basis is quite inefficient, but
    * correct.
    */
 

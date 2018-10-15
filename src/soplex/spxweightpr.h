@@ -27,15 +27,15 @@ namespace soplex
 
   /**@brief   Weighted pricing.
      @ingroup Algo
-      
+
      Class SPxWeightPR is an implemantation class of SPxPricer that uses
      weights for columns and rows for selecting the Simplex pivots. The weights
      are computed by methods #computeCP() and #computeRP() which may be
      overridden by derived classes.
-   
+
      The weights are interpreted as follows: The higher a value is, the more
      likely the corresponding row or column is set on one of its bounds.
-   
+
      See SPxPricer for a class documentation.
   */
   template <class R>
@@ -47,7 +47,7 @@ namespace soplex
       /**@name Data */
       //@{
       /// column penalties
-      DVector cPenalty;              
+      DVector cPenalty;
       /// row penalties
       DVector rPenalty;
       /// penalties for leaving alg
@@ -129,12 +129,12 @@ namespace soplex
             }
 
           return *this;
-        } 
+        }
       /// destructor
       virtual ~SPxWeightPR()
         {}
       /// clone function for polymorphism
-      inline virtual SPxPricer<R>* clone()  const 
+      inline virtual SPxPricer<R>* clone()  const
       {
         return new SPxWeightPR(*this);
       }

@@ -21,7 +21,7 @@
 
 namespace soplex
 {
-  /// definition of signature to prevent the specialization after instantiation error 
+  /// definition of signature to prevent the specialization after instantiation error
   template <>
   void SoPlexBase<Real>::Statistics::clearSolvingData();
   template <>
@@ -112,7 +112,7 @@ namespace soplex
   }
 
   /// clears statistics on solving process
-  /// #template #baseclass? 
+  /// #template #baseclass?
   template <>
   void SoPlexBase<Real>::Statistics::clearSolvingData()
   {
@@ -217,7 +217,7 @@ namespace soplex
     finalBasisCondition = 0;
   }
 
-  
+
   /// prints statistics
   template <>
   void SoPlexBase<Real>::Statistics::print(std::ostream& os)

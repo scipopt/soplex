@@ -436,7 +436,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( rational )
    {
-      DVectorRational dual(soplex.numRowsT()); 
+      DVectorRational dual(soplex.numRowsT());
       if( soplex.getDualFarkasRational(dual) ) // #template
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
@@ -488,7 +488,7 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   // This should be a pointer without a type. 
+   // This should be a pointer without a type.
    SoPlexBase<Real>* soplex = nullptr; // The pointer to base class that will be used to access SoPlexBase
 
 
@@ -525,7 +525,7 @@ int main(int argc, char* argv[])
       new (soplex) SoPlexBase<Real>();
 
       // #baseclass
-      soplex->printVersion(); 
+      soplex->printVersion();
       MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
 
       validation = 0;
@@ -699,7 +699,7 @@ int main(int argc, char* argv[])
 
          case 't' :
             // -t<s> : set time limit to <s> seconds
-           if( !soplex->setRealParam(soplex->TIMELIMIT, atoi(&option[2])) ) // #template 
+           if( !soplex->setRealParam(soplex->TIMELIMIT, atoi(&option[2])) ) // #template
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -709,7 +709,7 @@ int main(int argc, char* argv[])
 
          case 'i' :
             // -i<n> : set iteration limit to <n>
-           if( !soplex->setIntParam(soplex->ITERLIMIT, atoi(&option[2])) ) // #template 
+           if( !soplex->setIntParam(soplex->ITERLIMIT, atoi(&option[2])) ) // #template
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -719,7 +719,7 @@ int main(int argc, char* argv[])
 
          case 'f' :
             // -f<eps> : set primal feasibility tolerance to <eps>
-           if( !soplex->setRealParam(soplex->FEASTOL, atof(&option[2])) ) // #template 
+           if( !soplex->setRealParam(soplex->FEASTOL, atof(&option[2])) ) // #template
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -729,7 +729,7 @@ int main(int argc, char* argv[])
 
          case 'o' :
             // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
-           if( !soplex->setRealParam(soplex->OPTTOL, atof(&option[2])) ) // #template 
+           if( !soplex->setRealParam(soplex->OPTTOL, atof(&option[2])) ) // #template
             {
                printUsage(argv, optidx);
                returnValue = 1;
@@ -749,7 +749,7 @@ int main(int argc, char* argv[])
 
          case 's' :
             // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
-           if( !soplex->setIntParam(soplex->SIMPLIFIER, option[2] - '0') ) // #template 
+           if( !soplex->setIntParam(soplex->SIMPLIFIER, option[2] - '0') ) // #template
             {
                printUsage(argv, optidx);
                returnValue = 1;

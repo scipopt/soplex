@@ -85,7 +85,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxParMultPR() 
+   SPxParMultPR()
       : SPxPricer<R>("ParMult")
       , multiParts(0)
       , used(0)
@@ -136,7 +136,7 @@ public:
    virtual void load(SPxSolverBase<R>* solver);
    /// set entering or leaving algorithm
    virtual void setType(typename SPxSolverBase<R>::Type tp);
-   /// 
+   ///
    virtual int selectLeave();
    ///
    virtual SPxId selectEnter();

@@ -236,7 +236,7 @@ namespace soplex
                                 Real eps,
                                 Real p_delta,
                                 int start,
-                                int incr) 
+                                int incr)
   {
     assert(uvec.dim() == p_low.dim());
     assert(uvec.dim() == p_up.dim());

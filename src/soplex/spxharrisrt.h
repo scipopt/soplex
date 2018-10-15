@@ -81,11 +81,11 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxHarrisRT() 
+   SPxHarrisRT()
       : SPxRatioTester<R>("Harris")
    {}
    /// copy constructor
-   SPxHarrisRT(const SPxHarrisRT& old) 
+   SPxHarrisRT(const SPxHarrisRT& old)
       : SPxRatioTester<R>(old)
    {}
    /// assignment operator

@@ -36,7 +36,7 @@ namespace soplex
       {
         const SVector& rowvec = this->rowVector( row );
 
-        Real val = 0.0;         
+        Real val = 0.0;
 
         for( int col = 0; col < rowvec.size(); ++col )
           val += rowvec.value( col ) * solu[rowvec.index( col )];
@@ -45,7 +45,7 @@ namespace soplex
 
         assert(lhs( row ) <= rhs( row ) + (100 * epsilon()));
 
-        if (val < this->lhs( row )) 
+        if (val < this->lhs( row ))
           viol = spxAbs(val - this->lhs( row ));
         else
           if (val > this->rhs( row ))
@@ -80,7 +80,7 @@ namespace soplex
         else
           if (solu[col] > this->upper( col ))
             viol = spxAbs( solu[col] - this->upper( col ));
-         
+
         if (viol > maxviol)
           maxviol = viol;
 
@@ -104,7 +104,7 @@ namespace soplex
       {
         const SVector& rowvec = this->rowVector( row );
 
-        Real val = 0.0;         
+        Real val = 0.0;
 
         for( int col = 0; col < rowvec.size(); ++col )
           val += rowvec.value( col ) * solu[rowvec.index( col )];
@@ -120,13 +120,13 @@ namespace soplex
 
   template <>
   void SPxSolverBase<Real>::qualRedCostViolation(Real& maxviol, Real& sumviol) const
-  {   
+  {
     maxviol = 0.0;
     sumviol = 0.0;
 
     int i;
     // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
-    //         redcost = c_N - yA_N 
+    //         redcost = c_N - yA_N
     // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
     // DVector y( this->nRows() );
     // basis().coSolve( x, spx->unitVector( i ) );
@@ -136,11 +136,11 @@ namespace soplex
         for(i = 0; i < dim(); ++i)
           {
             Real x = coTest()[i];
-         
+
             if (x < 0.0)
               {
                 sumviol -= x;
-            
+
                 if (x < maxviol)
                   maxviol = x;
               }
@@ -148,15 +148,15 @@ namespace soplex
         for(i = 0; i < coDim(); ++i)
           {
             Real x = test()[i];
-         
+
             if (x < 0.0)
               {
                 sumviol -= x;
-            
+
                 if (x < maxviol)
                   maxviol = x;
               }
-          } 
+          }
       }
     else
       {
@@ -165,11 +165,11 @@ namespace soplex
         for(i = 0; i < dim(); ++i)
           {
             Real x = fTest()[i];
-         
+
             if (x < 0.0)
               {
                 sumviol -= x;
-            
+
                 if (x < maxviol)
                   maxviol = x;
               }

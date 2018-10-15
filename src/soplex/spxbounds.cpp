@@ -27,7 +27,7 @@ namespace soplex
       textbook versions. Let \f$l_i \le A_i^T x \le u_i\f$. This can be
       transformed to \f$A_i^Tx + s_i = 0\f$, with \f$-u_i \le s_i \le
       -l_i\f$. Hence, with this definition of slack variables \f$s_i\f$, we
-      can directly use vectors \f$l\f$ and \f$u\f$ as feasibility bounds.  
+      can directly use vectors \f$l\f$ and \f$u\f$ as feasibility bounds.
   */
   template <>
   void SPxSolverBase<Real>::setPrimalBounds()
@@ -53,7 +53,7 @@ namespace soplex
   /** Setting up the basis for dual simplex requires to install upper and lower
       feasibility bounds for dual variables (|Lbound| and |Ubound|). Here is a
       list of how these must be set for inequalities of type \f$l \le a^Tx \le u\f$:
- 
+
       \f[
       \begin{tabular}{cccc}
       $l$         &       $u$     & |Lbound|      & |Ubound|      \\
@@ -69,7 +69,7 @@ namespace soplex
       \f]
       The case \f$l = -\infty\f$, \f$u = \infty\f$ occurs for unbounded primal variables.
       Such must be treated differently from the general case.
- 
+
       Given possible upper and lower bounds to a dual variable with |Status stat|,
       this function clears the bounds according to |stat| by setting them to
       \f$\infty\f$ or \f$-\infty\f$, respectively.

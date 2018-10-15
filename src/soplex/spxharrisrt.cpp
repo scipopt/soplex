@@ -21,11 +21,11 @@
 
 namespace soplex
 {
-  /**@todo suspicious: *max is not set, but it is used 
+  /**@todo suspicious: *max is not set, but it is used
    * (with the default setting *max=1) in selectLeave and selectEnter
    * The question might be if max shouldn't be updated with themax?
    *
-   * numCycle and maxCycle are integers. So degeneps will be 
+   * numCycle and maxCycle are integers. So degeneps will be
    * exactly delta until numCycle >= maxCycle. Then it will be
    * 0 until numCycle >= 2 * maxCycle, after wich it becomes
    * negative. This does not look ok.
@@ -33,7 +33,7 @@ namespace soplex
   template <>
   Real SPxHarrisRT<Real>::degenerateEps() const
   {
-    return this->solver()->delta() 
+    return this->solver()->delta()
       * (1.0 - this->solver()->numCycle() / this->solver()->maxCycle());
   }
 
@@ -85,7 +85,7 @@ namespace soplex
     return sel;
   }
 
-  /**@todo suspicious: *max is not set, but it is used 
+  /**@todo suspicious: *max is not set, but it is used
      (with the default setting *max=1)
      in selectLeave and selectEnter
   */
@@ -141,7 +141,7 @@ namespace soplex
      Here comes our implementation of the Harris procedure improved by shifting
      bounds. The basic idea is to used the tolerated infeasibility within
      solver()->entertol() for searching numerically stable pivots.
- 
+
      The algorithms operates in two phases. In a first phase, the maximum \p val
      is determined, when infeasibility within solver()->entertol() is allowed. In the second
      phase, between all variables with values < \p val the one is selected which
@@ -258,7 +258,7 @@ namespace soplex
                  low.get_const_ptr(),                 /* lower bounds for vec */
                  up.get_const_ptr(),                  /* upper bounds for vec */
                  epsilon);             /* what is 0? */
-    
+
         if (max == val)
           return -1;
 
@@ -380,7 +380,7 @@ namespace soplex
                      lpb.get_const_ptr(),                 /* lower bounds for vec */
                      upb.get_const_ptr(),                 /* upper bounds for vec */
                      epsilon);             /* what is 0? */
-            
+
             maxDelta(
                      &cmaxabs,            /* max abs value in upd */
                      &max,                /* initial and chosen value */

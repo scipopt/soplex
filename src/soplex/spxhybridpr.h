@@ -98,7 +98,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor
-   SPxHybridPR() 
+   SPxHybridPR()
       : SPxPricer<R>("Hybrid")
       , thepricer(0)
       , hybridFactor(3.0) // we want the ParMult pricer

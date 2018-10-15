@@ -70,11 +70,11 @@ namespace soplex
      dimension of the vectors is referred to as the basis' \em dimension,
      whereas the number of vectors belonging to the LP is called the basis'
      \em codimension.
-   
+
      Class SPxBasisBase is designed to represent a generic simplex basis, suitable
      for both representations. At any time the representation can be changed by
      calling method setRep().
-   
+
      Class SPxBasisBase provides methods for solving linear systems with the basis
      matrix. However, SPxBasisBase does not provide a linear solver by its own.
      Instead, a SLinSolver object must be #load%ed to a SPxBasisBase which will
@@ -114,7 +114,7 @@ namespace soplex
       /** A basis is described by assigning a Status to all of the LP
           variables and covariables. This assignment is maintained by the
           basis #Desc%riptor.
-          
+
           Variables and covariables (slackvariables) may have a primal or dual Status. The
           first type specifies that a variable is set on a primal bound, while
           the latter type indicates a dual variable to be set on a bound.
@@ -164,7 +164,7 @@ namespace soplex
           to use only one dual #Status. However, for performance reasons it
           is advisable to introduce various dual status types, reflecting
           the structure of the bounds. Given an upper bound \f$u\f$ and a lower
-          bound \f$l\f$ of a constraint or variable, the following table 
+          bound \f$l\f$ of a constraint or variable, the following table
           indicates the setting of the dual Status of this variable.
 
           \f[
@@ -331,7 +331,7 @@ namespace soplex
   protected:
 
     //------------------------------------
-    //**@name Protected data 
+    //**@name Protected data
     /**
        For storing the basis matrix we keep two arrays: Array #theBaseId
        contains the SPxId%s of the basis vectors, and #matrix the pointers to
@@ -377,7 +377,7 @@ namespace soplex
     /// allowed increase in relative fill before refactorization
     /** When the real relative fill is bigger than fillFactor times lastFill
      *  the Basis will be refactorized.
-     */ 
+     */
     Real   fillFactor;
 
     /// allowed total increase in memory consumption before refactorization
@@ -485,7 +485,7 @@ namespace soplex
     typename Desc::Status dualStatus(const SPxRowId& id) const;
 
     /// dual Status for the variable with ID \p id of the loaded LP.
-    /** It is automatically detected, whether the \p id is one of a 
+    /** It is automatically detected, whether the \p id is one of a
         row or a column variable, and the correct row or column status
         is returned.
     */
@@ -501,7 +501,7 @@ namespace soplex
     //-----------------------------------
     /**@name Inquiry Methods */
     //@{
-    /// 
+    ///
     inline SPxId& baseId(int i)
     {
       return theBaseId[i];
@@ -637,7 +637,7 @@ namespace soplex
           x.clear();
           return;
         }
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveRight(x, rhs);
     }
@@ -649,7 +649,7 @@ namespace soplex
           x.clear();
           return;
         }
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveRight(x, rhs);
     }
@@ -670,7 +670,7 @@ namespace soplex
           x.clear();
           return;
         }
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveRight4update(x, rhs);
     }
@@ -692,7 +692,7 @@ namespace soplex
     void solve4update(SSVector& x, Vector& y, Vector& y2,
                       const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
     {
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
@@ -725,7 +725,7 @@ namespace soplex
           x.clear();
           return;
         }
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveLeft(x, rhs);
     }
@@ -737,7 +737,7 @@ namespace soplex
           x.clear();
           return;
         }
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveLeft(x, rhs);
     }
@@ -751,7 +751,7 @@ namespace soplex
     /// Sparse version of solving two systems in one call.
     void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
     {
-      if (!factorized) 
+      if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
@@ -823,14 +823,14 @@ namespace soplex
         denotes the basis matrix. This can be computed using method #solve().
         When using FAST updates, a vector \p eta may be passed for
         improved performance. It must be initialized by a call to
-        factor->solveRightUpdate() as described in SLinSolver. The 
+        factor->solveRightUpdate() as described in SLinSolver. The
         implementation hidden behind FAST updates depends on the
         SLinSolver implementation class.
     */
     virtual void change(int i, SPxId& id,
                         const SVector* enterVec, const SSVector* eta = 0);
 
-    /** Load basis from \p in in MPS format. If \p rowNames and \p colNames 
+    /** Load basis from \p in in MPS format. If \p rowNames and \p colNames
      *  are \c NULL, default names are used for the constraints and variables.
      */
     virtual bool readBasis(std::istream& in,
@@ -839,7 +839,7 @@ namespace soplex
     /** Write basis to \p os in MPS format. If \p rowNames and \p colNames are
      *  \c NULL, default names are used for the constraints and variables.
      */
-    virtual void writeBasis(std::ostream& os, 
+    virtual void writeBasis(std::ostream& os,
                             const NameSet* rownames, const NameSet* colnames, const bool cpxFormat = false) const;
 
     virtual void printMatrix() const;
@@ -886,14 +886,14 @@ namespace soplex
 
     /// Restores initial basis.
     /** This method changes the basis to that present just after loading the LP
-        (see addedRows() and addedCols()). This may be necessary if a row or a 
+        (see addedRows() and addedCols()). This may be necessary if a row or a
         column is changed, since then the current basis may become singular.
     */
     void restoreInitialBasis();
 
     /// output basis entries.
     void dump();
-   
+
     /// consistency check.
     bool isConsistent() const;
 
@@ -940,7 +940,7 @@ namespace soplex
     /// destructor.
     virtual ~SPxBasisBase<R>();
     //@}
-   
+
 
   protected:
 
