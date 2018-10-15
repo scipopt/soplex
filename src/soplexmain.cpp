@@ -313,11 +313,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
    }
    if( rational )
    {
-     DVectorRational primal(soplex.numColsT());  // used to be numColsReal.
-                                                 // Might cause problem when
-                                                 // soplex rational gets
-                                                 // properly templated
-
+     DVectorRational primal(soplex.numColsT());
       if( soplex.getPrimalRayRational(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
