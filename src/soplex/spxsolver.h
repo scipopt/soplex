@@ -663,17 +663,6 @@ namespace soplex
       m_nonbasicValueUpToDate = false;
     }
 
-#if 0
-    /// returns dualsol^T b + min{(objvec^T - dualsol^T A) x} calculated in interval arithmetics
-    Real provedBound(Vector& dualsol, const Vector& objvec) const;
-
-    /// proved dual bound for objective value.
-    virtual Real provedDualbound() const;
-
-    /// returns whether an infeasible LP is proven to be infeasible.
-    virtual bool isProvenInfeasible() const;
-#endif
-
     /// get solution vector for primal variables.
     /** This method returns the Status of the basis.
      *  If it is #REGULAR or better,
