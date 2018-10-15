@@ -698,7 +698,6 @@ namespace soplex
 #endif
 
   /// returns boolean parameter value
-  /// #template #temp
   template <>
 	bool SoPlexBase<Real>::boolParam(const BoolParam param) const
   {
@@ -818,7 +817,6 @@ namespace soplex
   }
 
   /// returns the current solver status
-  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const
   {
@@ -1004,7 +1002,7 @@ namespace soplex
 
 
 
-  /// returns number of rows #template #temp
+  /// returns number of rows
   template <>
   int SoPlexBase<Real>::numRowsT() const
   {
@@ -1540,7 +1538,6 @@ namespace soplex
   }
 
   /// returns integer parameter value
-  // #template #baseclass
   template <>
 	int SoPlexBase<Real>::intParam(const IntParam param) const
   {
@@ -1558,7 +1555,6 @@ namespace soplex
   }
 
   /// sets integer parameter value; returns true on success
-  // #template #baseclass
   template <>
 	bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const bool init)
   {
@@ -3531,7 +3527,6 @@ namespace soplex
   }
 
   /// returns real parameter value
-  /// #template #temp
   template <>
   Real SoPlexBase<Real>::realParam(const RealParam param) const
   {
@@ -3547,7 +3542,6 @@ namespace soplex
   }
 
   /// solves the LP
-  /// #template needs to be rewritten #temp
   template <>
   typename SPxSolverBase<Real>::Status SoPlexBase<Real>::optimize()
   {
@@ -3972,7 +3966,6 @@ namespace soplex
   }
 
   /// is an advanced starting basis available?
-  /// #template #baseclass
   template <>
 	bool SoPlexBase<Real>::hasBasis() const
   {
@@ -4806,7 +4799,6 @@ namespace soplex
 
 
   /// gets current basis
-  /// #template #temp
   template <>
   void SoPlexBase<Real>::getBasis(typename SPxSolverBase<Real>::VarStatus rows[], typename SPxSolverBase<Real>::VarStatus cols[]) const
   {
@@ -6165,7 +6157,6 @@ namespace soplex
 
   /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
   /// default names are assumed; returns true on success
-  /// #template #baseclass
   template <>
   bool SoPlexBase<Real>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
   {
@@ -6501,7 +6492,6 @@ namespace soplex
   }
 
   // /// returns integer parameter value
-  // // #template #baseclass
   // template <>
 	// int SoPlexBase<Real>::intParam(const IntParam param) const
   // {
@@ -6741,7 +6731,6 @@ namespace soplex
     return true;
   }
 
-  /// #template #temp
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
   /// sets rational parameter value; returns true on success
