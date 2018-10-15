@@ -3677,26 +3677,12 @@ namespace soplex
   }
 
 
-
-  /// Old code for isDualFeasible() #template remove later
-  // template <>
-	// bool SoPlexBase<Real>::isDualFeasible() const
-  // {
-  //   return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
-
-  // }
-
   /// is stored dual solution feasible?
-  template<>
-  bool SoPlexBase<Real>::isDualFeasible() const
-  {
-    return (_hasSolReal && _solReal.isDualFeasible());
-  }
-
   template <>
-  bool SoPlexBase<Rational>::isDualFeasible() const
+	bool SoPlexBase<Real>::isDualFeasible() const
   {
-    return (_hasSolRational && _solRational.isDualFeasible());
+    return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
+
   }
 
   /// is a dual feasible solution available?
