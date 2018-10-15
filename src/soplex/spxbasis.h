@@ -981,6 +981,9 @@ namespace soplex
                             const typename SPxBasisBase<R>::SPxStatus& status );
 
 
+  /* For backwards compatibility */
+  typedef SPxBasisBase<Real> SPxBasis;
+
 } // namespace soplex
 
 /* reset the SOPLEX_DEBUG flag to its original value */

@@ -2347,6 +2347,8 @@ namespace soplex
   std::ostream& operator<<( std::ostream& os,
                             const typename SPxSolverBase<R>::Representation& status );
 
+  /* For Backwards compatibility */
+  typedef SPxSolverBase<Real> SPxSolver;
 
 } // namespace soplex
 #endif // _SPXSOLVER_H_
