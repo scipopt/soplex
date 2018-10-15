@@ -846,6 +846,9 @@ public:
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
    bool writeFileT(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
+
+   bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+
    /* For SCIP compatibility */
    bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
 

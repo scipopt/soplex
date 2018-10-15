@@ -6010,7 +6010,7 @@ namespace soplex
   /// marked as integer; returns true on success
   /// Here unscale is just a junk variable that is used to match the type with the real write function
   template <>
-	bool SoPlexBase<Real>::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<Real>::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
   {
     if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return false;
