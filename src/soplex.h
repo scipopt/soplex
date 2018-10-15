@@ -2323,7 +2323,7 @@ private:
    //@}
 };
 
-  /* SCIP compatibility */
+  /* Backwards compatibility */
   typedef SoPlexBase<Real> SoPlex;
 
 }
