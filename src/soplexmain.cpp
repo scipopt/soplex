@@ -504,7 +504,7 @@ int main(int argc, char* argv[])
 
       // create default timer (CPU time)
       readingTime = TimerFactory::createTimer(Timer::USER_TIME);
-      soplex = 0;
+      soplex = nullptr;
       spx_alloc(soplex);
       new (soplex) SoPlexBase<Real>();
 
@@ -512,7 +512,7 @@ int main(int argc, char* argv[])
       soplex->printVersion();
       MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
 
-      validation = 0;
+      validation = nullptr;
       spx_alloc(validation);
       new (validation) Validation<Real>();
 
@@ -555,7 +555,7 @@ int main(int argc, char* argv[])
                // --readbas=<basfile> : read starting basis from file
                if( strncmp(option, "readbas=", 8) == 0 )
                {
-                  if( readbasname == 0 )
+                  if( readbasname == nullptr )
                   {
                      char* filename = &option[8];
                      readbasname = new char[strlen(filename) + 1];
@@ -565,7 +565,7 @@ int main(int argc, char* argv[])
                // --writebas=<basfile> : write terminal basis to file
                else if( strncmp(option, "writebas=", 9) == 0 )
                {
-                  if( writebasname == 0 )
+                  if( writebasname == nullptr )
                   {
                      char* filename = &option[9];
                      writebasname =  new char[strlen(filename) + 1];
@@ -575,7 +575,7 @@ int main(int argc, char* argv[])
                // --writefile=<lpfile> : write LP to file
                else if( strncmp(option, "writefile=", 10) == 0 )
                {
-                  if( writefilename == 0 )
+                  if( writefilename == nullptr )
                   {
                      char* filename = &option[10];
                      writefilename = new char[strlen(filename) + 1];
@@ -585,7 +585,7 @@ int main(int argc, char* argv[])
                // --writedual=<lpfile> : write dual LP to a file
                else if( strncmp(option, "writedual=", 10) == 0 )
                {
-                  if( writedualfilename == 0 )
+                  if( writedualfilename == nullptr )
                   {
                      char* dualfilename = &option[10];
                      writedualfilename = new char[strlen(dualfilename) + 1];
@@ -595,7 +595,7 @@ int main(int argc, char* argv[])
                // --loadset=<setfile> : load parameters from settings file
                else if( strncmp(option, "loadset=", 8) == 0 )
                {
-                  if( loadsetname == 0 )
+                  if( loadsetname == nullptr )
                   {
                      char* filename = &option[8];
                      loadsetname = new char[strlen(filename) + 1];
@@ -616,7 +616,7 @@ int main(int argc, char* argv[])
                // --saveset=<setfile> : save parameters to settings file
                else if( strncmp(option, "saveset=", 8) == 0 )
                {
-                  if( savesetname == 0 )
+                  if( savesetname == nullptr )
                   {
                      char* filename = &option[8];
                      savesetname = new char[strlen(filename) + 1];
@@ -626,7 +626,7 @@ int main(int argc, char* argv[])
                // --diffset=<setfile> : save modified parameters to settings file
                else if( strncmp(option, "diffset=", 8) == 0 )
                {
-                  if( diffsetname == 0 )
+                  if( diffsetname == nullptr )
                   {
                      char* filename = &option[8];
                      diffsetname = new char[strlen(filename) + 1];
@@ -832,7 +832,7 @@ int main(int argc, char* argv[])
       MSG_INFO1( soplex->spxout, soplex->printUserSettings(); )
 
       // no LP file was given and no settings files are written
-      if( lpfilename == 0 && savesetname == 0 && diffsetname == 0 )
+      if( lpfilename == nullptr && savesetname == nullptr && diffsetname == nullptr )
       {
          printUsage(argv, 0);
          returnValue = 1;
@@ -848,7 +848,7 @@ int main(int argc, char* argv[])
       }
 
       // save settings files
-      if( savesetname != 0 )
+      if( savesetname != nullptr )
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
          if( !soplex->saveSettingsFile(savesetname, false) )
@@ -856,7 +856,7 @@ int main(int argc, char* argv[])
             MSG_ERROR( std::cerr << "Error writing parameters to file <" << savesetname << ">\n" );
          }
       }
-      if( diffsetname != 0 )
+      if( diffsetname != nullptr )
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
          if( !soplex->saveSettingsFile(diffsetname, true) )
@@ -866,9 +866,9 @@ int main(int argc, char* argv[])
       }
 
       // no LP file given: exit after saving settings
-      if( lpfilename == 0 )
+      if( lpfilename == nullptr )
       {
-         if( loadsetname != 0 || savesetname != 0 || diffsetname != 0 )
+         if( loadsetname != nullptr || savesetname != nullptr || diffsetname != nullptr )
          {
             MSG_INFO1( soplex->spxout, soplex->spxout << "\n" );
          }
@@ -899,7 +899,7 @@ int main(int argc, char* argv[])
       }
 
       // write LP if specified
-      if( writefilename != 0 )
+      if( writefilename != nullptr )
       {
          if( !soplex->writeFileT(writefilename, &rownames, &colnames) )
          {
@@ -914,7 +914,7 @@ int main(int argc, char* argv[])
       }
 
       // write dual LP if specified
-      if( writedualfilename != 0 )
+      if( writedualfilename != nullptr )
       {
          if( !soplex->writeDualFileReal(writedualfilename, &rownames, &colnames) )
          {
@@ -929,7 +929,7 @@ int main(int argc, char* argv[])
       }
 
       // read basis file if specified
-      if( readbasname != 0 )
+      if( readbasname != nullptr )
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Reading basis file <" << readbasname << "> . . . " );
          if( !soplex->readBasisFile(readbasname, &rownames, &colnames) )
@@ -972,7 +972,7 @@ int main(int argc, char* argv[])
          validation->validateSolveReal(*soplex);
 
       // write basis file if specified
-      if( writebasname != 0 )
+      if( writebasname != nullptr )
       {
          if( !soplex->hasBasis() )
          {
@@ -1004,19 +1004,19 @@ TERMINATE:
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
    // spx_alloc() and freed here; disabling the list memory is crucial
- if( 0 != soplex )
+ if( nullptr != soplex )
  {
     soplex->~SoPlexBase();
     spx_free(soplex);
  }
- if( 0 != validation )
+ if( nullptr != validation )
  {
     validation->~Validation();
     spx_free(validation);
  }
  Rational::disableListMem();
  EGlpNumClear();
- if( 0 != readingTime )
+ if( nullptr != readingTime )
  {
     readingTime->~Timer();
     spx_free(readingTime);
