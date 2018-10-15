@@ -1078,6 +1078,9 @@ namespace soplex
       , thepricer (0)
       , theratiotester (0)
       , thestarter (0)
+      , boundrange(0.0)
+      , siderange(0.0)
+      , objrange(0.0)
       , infeasibilities(0)
       , infeasibilitiesCo(0)
       , isInfeasible(0)
@@ -1210,6 +1213,9 @@ namespace soplex
             enterDegenCand = base.enterDegenCand;
             leaveDegenCand = base.leaveDegenCand;
             primalDegenSum = base.primalDegenSum;
+            boundrange = base.boundrange;
+            siderange = base.siderange;
+            objrange = base.objrange;
             infeasibilities = base.infeasibilities;
             infeasibilitiesCo = base.infeasibilitiesCo;
             isInfeasible = base.isInfeasible;
@@ -1410,6 +1416,9 @@ namespace soplex
       , leaveDegenCand(base.leaveDegenCand)
       , primalDegenSum(base.primalDegenSum)
       , dualDegenSum(base.dualDegenSum)
+      , boundrange(base.boundrange)
+      , siderange(base.siderange)
+      , objrange(base.objrange)
       , infeasibilities(base.infeasibilities)
       , infeasibilitiesCo(base.infeasibilitiesCo)
       , isInfeasible(base.isInfeasible)
