@@ -261,20 +261,6 @@ void checkSolution<Real>(SoPlexBase<Real>& soplex)
   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
-// template <>
-// void checkSolution<Real>(SoPlexBase<Real>& soplex)
-// {
-//   checkSolutionReal(soplex);
-//   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
-// }
-
-// template <>
-// void checkSolution<Rational>(SoPlexBase<Rational>& soplex)
-// {
-//   checkSolutionRational(soplex);
-//   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
-// }
-
 static
 void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {

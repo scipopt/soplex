@@ -530,15 +530,6 @@ namespace soplex
   }
 
   template <>
-  void SPxSolverBase<Rational>::computePvec()
-  {
-    int i;
-
-    for (i = coDim() - 1; i >= 0; --i)
-      (*thePvec)[i] = vector(i) * (*theCoPvec);
-  }
-
-  template <>
   void SPxSolverBase<Real>::setupPupdate(void)
   {
     SSVector& p = thePvec->delta();

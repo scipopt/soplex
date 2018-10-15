@@ -412,19 +412,6 @@ namespace soplex
     matrixIsSetup = false;
   }
 
-  template <>
-  void SPxBasisBase<Rational>::invalidate()
-  {
-    if( factorized || matrixIsSetup )
-      {
-        MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
-          }
-
-    factorized    = false;
-    matrixIsSetup = false;
-  }
-
-
   /**
    * Create the initial slack basis descriptor and set up the basis matrix accordingly.
    * This code has been adapted from SPxBasisBase<Real>::addedRows() and SPxBasisBase<Real>::addedCols().

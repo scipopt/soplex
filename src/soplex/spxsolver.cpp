@@ -53,9 +53,6 @@ namespace soplex
   void SPxSolverBase<Real>::setOpttol(Real d);
 
   template <>
-  void SPxSolverBase<Rational>::setPricing(Pricing pr);
-
-  template <>
   bool SPxSolverBase<Real>::read(std::istream& in, NameSet* rowNames,
                           NameSet* colNames, DIdxSet* intVars)
   {
@@ -94,22 +91,6 @@ namespace soplex
       theratiotester->clear();
   }
 
-  template <>
-  void SPxSolverBase<Rational>::reLoad()
-  {
-    forceRecompNonbasicValue();
-    unInit();
-    this->unLoad();
-    this->theLP = this;
-    m_status = SPxSolverBase<Rational>::UNKNOWN;
-    if (thepricer)
-      thepricer->clear();
-    if (theratiotester)
-      theratiotester->clear();
-  }
-
-
-  /// #template #temp
   template <>
   void SPxSolverBase<Real>::loadLP(const SPxLP& lp, bool initSlackBasis)
   {
@@ -178,61 +159,7 @@ namespace soplex
   }
 
   template <>
-  void SPxSolverBase<Rational>::setPricer(SPxPricer<Rational>* x, const bool destroy)
-  {
-
-    assert(!freePricer || thepricer != 0);
-
-    if(freePricer)
-      {
-        delete thepricer;
-        thepricer = 0;
-      }
-
-    if (x != 0 && x != thepricer)
-      {
-        setPricing(FULL);
-        if (isInitialized())
-          x->load(this);
-        else
-          x->clear();
-      }
-
-    if (thepricer && thepricer != x)
-      thepricer->clear();
-    thepricer = x;
-
-    freePricer = destroy;
-  }
-
-  /// #template #temp
-  template <>
   void SPxSolverBase<Real>::setTester(SPxRatioTester<Real>* x, const bool destroy)
-  {
-    assert(!freeRatioTester || theratiotester != 0);
-
-    if(freeRatioTester)
-      {
-        delete theratiotester;
-        theratiotester = 0;
-      }
-
-    theratiotester = x;
-
-    // set the solver pointer inside the ratiotester
-    if( theratiotester != 0 )
-      {
-        if( isInitialized() )
-          theratiotester->load(this);
-        else
-          theratiotester->clear();
-      }
-
-    freeRatioTester = destroy;
-  }
-
-  template <>
-  void SPxSolverBase<Rational>::setTester(SPxRatioTester<Rational>* x, const bool destroy)
   {
     assert(!freeRatioTester || theratiotester != 0);
 
@@ -550,18 +477,6 @@ namespace soplex
 
     template <>
       void SPxSolverBase<Real>::setPricing(Pricing pr)
-    {
-      thePricing = pr;
-      if (initialized && type() == ENTER)
-        {
-          computePvec();
-          computeCoTest();
-          computeTest();
-        }
-    }
-
-    template <>
-      void SPxSolverBase<Rational>::setPricing(Pricing pr)
     {
       thePricing = pr;
       if (initialized && type() == ENTER)

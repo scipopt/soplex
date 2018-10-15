@@ -174,25 +174,11 @@ namespace soplex
   }
 
   template <>
-  void SPxSolverBase<Rational>::computeTest()
-  {
-    exit(0);
-  }
-
-  template <>
   Real SPxSolverBase<Real>::computePvec(int i)
   {
 
     return (*thePvec)[i] = vector(i) * (*theCoPvec);
   }
-
-  template <>
-  Real SPxSolverBase<Rational>::computePvec(int i)
-  {
-
-    return (*thePvec)[i] = vector(i) * (*theCoPvec);
-  }
-
 
   template <>
   Real SPxSolverBase<Real>::computeTest(int i)
@@ -237,43 +223,6 @@ namespace soplex
         assert(rep() == COLUMN);
         return (*theCoPvec)[i] - this->maxRowObj(i);             // slacks !
       case SPxBasisBase<Real>::Desc::P_ON_LOWER:
-        assert(rep() == COLUMN);
-        return this->maxRowObj(i) - (*theCoPvec)[i];             // slacks !
-
-      default:
-        return 0;
-      }
-  }
-
-  template <>
-  Real SPxSolverBase<Rational>::coTest(int i, typename SPxBasisBase<Rational>::Desc::Status stat) const
-  {
-    assert(type() == ENTER);
-    assert(!isBasic(stat));
-
-    Real x;
-
-    switch (stat)
-      {
-      case SPxBasisBase<Rational>::Desc::D_FREE:
-      case SPxBasisBase<Rational>::Desc::D_ON_BOTH :
-        assert(rep() == ROW);
-        x = (*theCoPvec)[i] - SPxLPBase<Rational>::lower(i);
-        if (x < 0)
-          return x;
-        // no break: next is else case
-        //lint -fallthrough
-      case SPxBasisBase<Rational>::Desc::D_ON_LOWER:
-        assert(rep() == ROW);
-        return SPxLPBase<Rational>::upper(i) - (*theCoPvec)[i];
-      case SPxBasisBase<Rational>::Desc::D_ON_UPPER:
-        assert(rep() == ROW);
-        return (*theCoPvec)[i] - SPxLPBase<Rational>::lower(i);
-
-      case SPxBasisBase<Rational>::Desc::P_ON_UPPER:
-        assert(rep() == COLUMN);
-        return (*theCoPvec)[i] - this->maxRowObj(i);             // slacks !
-      case SPxBasisBase<Rational>::Desc::P_ON_LOWER:
         assert(rep() == COLUMN);
         return this->maxRowObj(i) - (*theCoPvec)[i];             // slacks !
 
@@ -350,77 +299,6 @@ namespace soplex
           sparsePricingEnter = true;
       }
   }
-
-  template <>
-  void SPxSolverBase<Rational>::computeCoTest()
-  {
-    int i;
-    Rational pricingTol = leavetol();
-    m_pricingViolUpToDate = true;
-    m_pricingViol = 0;
-    infeasibilities.clear();
-    int ninfeasibilities = 0;
-    int sparsitythreshold = (int) (sparsePricingFactor * dim());
-    const typename SPxBasisBase<Rational>::Desc& ds = this->desc();
-
-    for (i = dim() - 1; i >= 0; --i)
-      {
-        typename SPxBasisBase<Rational>::Desc::Status stat = ds.coStatus(i);
-        if (isBasic(stat))
-          {
-            theCoTest[i] = 0;
-            if( remainingRoundsEnter == 0 )
-              isInfeasible[i] = SPxPricer<Rational>::NOT_VIOLATED;
-          }
-        else
-          {
-            theCoTest[i] = coTest(i, stat);
-            if( remainingRoundsEnter == 0 )
-              {
-                if( theCoTest[i] < -pricingTol )
-                  {
-                    assert(infeasibilities.size() < infeasibilities.max());
-                    m_pricingViol -= theCoTest[i];
-                    infeasibilities.addIdx(i);
-                    isInfeasible[i] = SPxPricer<Rational>::VIOLATED;
-                    ++ninfeasibilities;
-                  }
-                else
-                  isInfeasible[i] = SPxPricer<Rational>::NOT_VIOLATED;
-                if( ninfeasibilities > sparsitythreshold )
-                  {
-                    MSG_INFO2( (*spxout), (*spxout) << " --- using dense pricing"
-                               << std::endl; )
-                      remainingRoundsEnter = DENSEROUNDS;
-                    sparsePricingEnter = false;
-                    ninfeasibilities = 0;
-                  }
-              }
-            else if( theCoTest[i] < -pricingTol )
-              m_pricingViol -= theCoTest[i];
-          }
-      }
-    if( ninfeasibilities == 0 && !sparsePricingEnter )
-      --remainingRoundsEnter;
-    else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnter )
-      {
-        MSG_INFO2( (*spxout),
-                   std::streamsize prec = spxout->precision();
-                   if( hyperPricingEnter )
-                     (*spxout) << " --- using hypersparse pricing, ";
-                   else
-                     (*spxout) << " --- using sparse pricing, ";
-                   (*spxout) << "sparsity: "
-                   << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (Rational) ninfeasibilities/dim()
-                   << std::scientific << std::setprecision(int(prec))
-                   << std::endl;
-                   )
-          sparsePricingEnter = true;
-      }
-  }
-
-
 
   /*
     The following methods require propersy initialized vectors |fVec| and

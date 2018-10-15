@@ -25,8 +25,6 @@ namespace soplex
   template <>
   void SoPlexBase<Real>::Statistics::clearSolvingData();
   template <>
-  void SoPlexBase<Rational>::Statistics::clearSolvingData();
-  template <>
   void SoPlexBase<Real>::Statistics::clearAllData();
 
 
@@ -104,13 +102,6 @@ namespace soplex
     clearSolvingData();
   }
 
-  template <>
-  void SoPlexBase<Rational>::Statistics::clearAllData()
-  {
-    readingTime->reset();
-    clearSolvingData();
-  }
-
   /// clears statistics on solving process
   /// #template #baseclass?
   template <>
@@ -164,59 +155,6 @@ namespace soplex
     finalCompObj = 0;
     finalBasisCondition = 0;
   }
-
-  template <>
-  void SoPlexBase<Rational>::Statistics::clearSolvingData()
-  {
-    solvingTime->reset();
-    preprocessingTime->reset();
-    simplexTime->reset();
-    syncTime->reset();
-    transformTime->reset();
-    rationalTime->reset();
-    reconstructionTime->reset();
-    luFactorizationTimeReal = 0.0;
-    luSolveTimeReal = 0.0;
-    luFactorizationTimeRational = 0.0;
-    luSolveTimeRational = 0.0;
-    iterations = 0;
-    iterationsPrimal = 0;
-    iterationsFromBasis = 0;
-    iterationsPolish = 0;
-    boundflips = 0;
-    luFactorizationsReal = 0;
-    luSolvesReal = 0;
-    luFactorizationsRational = 0;
-    rationalReconstructions = 0;
-    refinements = 0;
-    stallRefinements = 0;
-    pivotRefinements = 0;
-    feasRefinements = 0;
-    unbdRefinements = 0;
-
-    callsReducedProb = 0;
-    iterationsInit = 0;
-    iterationsRedProb = 0;
-    iterationsCompProb = 0;
-    numRedProbRows = 0;
-    numRedProbCols = 0;
-    degenPivotsPrimal = 0;
-    degenPivotsDual = 0;
-    degenPivotCandPrimal = 0;
-    degenPivotCandDual = 0;
-    sumDualDegen = 0;
-    sumPrimalDegen = 0;
-    decompBasisCondNum = 0;
-    totalBoundViol = 0;
-    totalRowViol = 0;
-    maxBoundViol = 0;
-    maxRowViol = 0;
-    redProbStatus = 0;
-    compProbStatus = 0;
-    finalCompObj = 0;
-    finalBasisCondition = 0;
-  }
-
 
   /// prints statistics
   template <>

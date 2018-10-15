@@ -1337,29 +1337,11 @@ namespace soplex
     _solver.setIntegralityInformation(ncols, intInfo);
   }
 
-
-
-  /// returns number of rows
-  template <>
-  int SoPlexBase<Rational>::numRowsT() const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->nRows();
-  }
-
   template <>
   int SoPlexBase<Real>::numRowsRational() const
   {
     assert(_rationalLP != 0);
     return _rationalLP->nRows();
-  }
-
-  /// returns number of columns
-  template <>
-  int SoPlexBase<Rational>::numColsT() const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->nCols();
   }
 
   template <>
@@ -1368,16 +1350,6 @@ namespace soplex
     assert(_rationalLP != 0);
     return _rationalLP->nCols();
   }
-
-  /// returns number of nonzeros
-  template <>
-  int SoPlexBase<Rational>::numNonzerosT() const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->nNzos();
-  }
-
-
 
   /// returns smallest non-zero element in absolute value
   template <>
@@ -1540,14 +1512,6 @@ namespace soplex
   /// returns integer parameter value
   template <>
 	int SoPlexBase<Real>::intParam(const IntParam param) const
-  {
-    assert(param >= 0);
-    assert(param < INTPARAM_COUNT);
-    return _currentSettings->_intParamValues[param];
-  }
-
-  template <>
-	int SoPlexBase<Rational>::intParam(const IntParam param) const
   {
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
@@ -3535,12 +3499,6 @@ namespace soplex
     return _currentSettings->_realParamValues[param];
   }
 
-  template <>
-  Real SoPlexBase<Rational>::realParam(const RealParam param) const
-  {
-    std::exit(EXIT_FAILURE);
-  }
-
   /// solves the LP
   template <>
   typename SPxSolverBase<Real>::Status SoPlexBase<Real>::optimize()
@@ -3637,17 +3595,10 @@ namespace soplex
 
   /// is stored primal solution feasible?
   template <>
-	bool SoPlexBase<Real>::isPrimalFeasible() const
+  bool SoPlexBase<Real>::isPrimalFeasible() const
   {
-    return (_hasSolReal && _solReal.isPrimalFeasible());
+    return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
   }
-
-  template <>
-	bool SoPlexBase<Rational>::isPrimalFeasible() const
-  {
-    return (_hasSolRational && _solRational.isPrimalFeasible());
-  }
-
 
 
   /// is a primal feasible solution available?
@@ -3655,12 +3606,6 @@ namespace soplex
 	bool SoPlexBase<Real>::hasPrimal() const
   {
     return _hasSolReal || _hasSolRational;
-  }
-
-  template <>
-	bool SoPlexBase<Rational>::hasPrimal() const // might need a fix
-  {
-    return _hasSolRational;
   }
 
   /// is a primal unbounded ray available?
@@ -3684,12 +3629,6 @@ namespace soplex
 	bool SoPlexBase<Real>::hasDual() const
   {
     return _hasSolReal || _hasSolRational;
-  }
-
-  template <>
-	bool SoPlexBase<Rational>::hasDual() const // might neeed a fix
-  {
-    return _hasSolRational;
   }
 
   /// is Farkas proof of infeasibility available?
@@ -3972,12 +3911,6 @@ namespace soplex
     return _hasBasis;
   }
 
-  template <>
-	bool SoPlexBase<Rational>::hasBasis() const
-  {
-    return _hasBasis;
-  }
-
   /// gets violation of reduced costs; returns true on success
   template <>
 	bool SoPlexBase<Real>::getRedCostViolationT(Real& maxviol, Real& sumviol)
@@ -4146,22 +4079,6 @@ namespace soplex
     else
       return false;
   }
-
-
-
-  /// gets the primal ray if LP is unbounded; returns true on success
-  // template <>
-	// bool SoPlexBase<Rational>::getPrimalRayT(VectorBase<Rational>& vector)
-  // {
-  //   if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsT() )
-  //     {
-  //       _syncRationalSolution();
-  //       _solRational.getPrimalRay(vector);
-  //       return true;
-  //     }
-  //   else
-  //     return false;
-  // }
 
   template <>
 	bool SoPlexBase<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
@@ -6040,35 +5957,6 @@ namespace soplex
     return success;
   }
 
-  // // The proper templated version of the above function
-  // template <>
-	// bool SoPlexBase<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-  // {
-  //   bool success = false;
-
-  //   success = _readFileReal(filename, rowNames, colNames, intVars);
-
-  //   // storing the row and column names for use in the DBDS print basis methods
-  //   _rowNames = rowNames;
-  //   _colNames = colNames;
-
-  //   return success;
-  // }
-
-  // template <>
-	// bool SoPlexBase<Rational>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-  // {
-  //   bool success = false;
-  //   success = _readFileRational(filename, rowNames, colNames, intVars);
-
-  //   // storing the row and column names for use in the DBDS print basis methods
-  //   _rowNames = rowNames;
-  //   _colNames = colNames;
-
-  //   return success;
-  // }
-
-
   /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
   /// marked as integer; returns true on success
@@ -6122,9 +6010,9 @@ namespace soplex
   /// marked as integer; returns true on success
   /// Here unscale is just a junk variable that is used to match the type with the real write function
   template <>
-	bool SoPlexBase<Rational>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<Real>::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
-    if( intParam(SoPlexBase<Rational>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return false;
     else
       {
@@ -6484,7 +6372,7 @@ namespace soplex
 
     // write problem in MPS/LP format
     ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-    writeFileT(ofname.c_str(), rowNames, colNames, 0);
+    writeFileRational(ofname.c_str(), rowNames, colNames, 0);
 
     // write basis
     ofname = std::string(filename) + ".bas";
@@ -7517,45 +7405,6 @@ namespace soplex
 
     MSG_INFO1( spxout, spxout << " [githash: " << getGitHash() << "]\n" );
   }
-
-
-    template <>
-  void SoPlexBase<Rational>::printVersion() const
-  {
-    // do not use preprocessor directives within the MSG_INFO1 macro
-#if (SOPLEX_SUBVERSION > 0)
-    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
-               << "." << (SOPLEX_VERSION % 100)/10
-               << "." << SOPLEX_VERSION % 10
-               << "." << SOPLEX_SUBVERSION );
-#else
-    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
-               << "." << (SOPLEX_VERSION % 100)/10
-               << "." << SOPLEX_VERSION % 10 );
-#endif
-
-#ifndef NDEBUG
-    MSG_INFO1( spxout, spxout << " [mode: debug]" );
-#else
-    MSG_INFO1( spxout, spxout << " [mode: optimized]" );
-#endif
-
-    MSG_INFO1( spxout, spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
-
-#ifdef SOPLEX_WITH_GMP
-#ifdef mpir_version
-    MSG_INFO1( spxout, spxout << " [rational: MPIR " << mpir_version << "]" );
-#else
-    MSG_INFO1( spxout, spxout << " [rational: GMP " << gmp_version << "]" );
-#endif
-#else
-    MSG_INFO1( spxout, spxout << " [rational: long double]" );
-#endif
-
-    MSG_INFO1( spxout, spxout << " [githash: " << getGitHash() << "]\n" );
-  }
-
-
 
   /// checks if real LP and rational LP are in sync; dimensions will always be compared,
   /// vector and matrix values only if the respective parameter is set to true.
