@@ -42,7 +42,7 @@ int main(int argc, char **argv)
    const char* usage =
    "[options] input-file\n\n"
    "          input-file can be either in MPS or LPF format\n\n"
-   "options:  (*) indicates default\n" 
+   "options:  (*) indicates default\n"
    " -s        output only one line\n"
    " -vLevel   set verbosity Level [0-3], default 1\n"
    " -V        show program version\n"
@@ -136,11 +136,11 @@ int main(int argc, char **argv)
       }
    }
    if (short_output)
-      std::cout << inpfile << " " 
-               << vars    << " " 
-               << vbins   << " " 
-               << vints   << " " 
-               << boxed   << " " 
+      std::cout << inpfile << " "
+               << vars    << " "
+               << vbins   << " "
+               << vints   << " "
+               << boxed   << " "
                << frees   << " ";
    else
       std::cout << "Variables  : " << std::setw(8) << vars  << std::endl
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
       for(int j = 0; j < row.size(); ++j)
       {
          int k = row.index(j);
-                  
+
          if (is_int[k])
             int_cnt++;
          else if (is_bin[k])
@@ -234,8 +234,3 @@ int main(int argc, char **argv)
 
    return 0;
 }
-
-
-
-
-

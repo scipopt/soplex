@@ -46,7 +46,7 @@
 
 using namespace soplex;
 
-class StatusExceptionCheck 
+class StatusExceptionCheck
 {
    bool checkXSOLVR01();
    bool checkXSOLVE01();
@@ -57,12 +57,12 @@ class StatusExceptionCheck
 public:
    bool noProblemCheck();
    bool noSolverCheck();
-   bool noPricerCheck(); 
+   bool noPricerCheck();
    bool noRatioTesterCheck();
    bool notInitialized();
 };
 
-bool StatusExceptionCheck::noProblemCheck() 
+bool StatusExceptionCheck::noProblemCheck()
 {
    std::cout<<std::endl<<"Test for No Problem:"<<std::endl;
    bool success = true;
@@ -118,7 +118,7 @@ bool StatusExceptionCheck::checkXSOLVR01()
       solver->optimize();
    }catch(SPxStatusException& x)
    {
-      delete solver;      
+      delete solver;
       if(x.what().find("XSOLVR01") == 0)
          return true;
       return false;
@@ -168,7 +168,7 @@ bool StatusExceptionCheck::checkXSOLVE09()
       solver->getRedCost(*p_primal);
    }catch(SPxStatusException& x)
    {
-      delete solver; 
+      delete solver;
       if(x.what().find("XSOLVE09") == 0)
          return true;
       return false;
@@ -332,7 +332,7 @@ bool StatusExceptionCheck::notInitialized()
    return false;
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
    StatusExceptionCheck checks;
 

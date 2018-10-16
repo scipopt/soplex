@@ -55,7 +55,7 @@ int main(int argc, const char* const argv[])
    std::cout << "Initial problem:" << std::endl << std::endl;
    work.writeLPF(std::cout, NULL, NULL);
    std::cout << std::endl;
-   
+
    work.changeElement(work.rowId(0), work.colId(0), 2.0);
 
    assert( work.isConsistent() );

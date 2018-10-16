@@ -18,7 +18,7 @@
  *
  *  Some of the CPLEX interface functions are provided by this module. This
  *  makes it possible to use SoPlex as a replacement for CPLEX, when only a
- *  subset of its API is used. 
+ *  subset of its API is used.
  */
 #ifndef _ITFCPLEX_H_
 #define _ITFCPLEX_H_
@@ -101,7 +101,7 @@ CPXLPptr loadlp(char   *probname,
         int    matsz) ;
 
 /* @ManMemo:
-void unloadprob (CPXLPptr*);  
+void unloadprob (CPXLPptr*);
 */
 
 /** */

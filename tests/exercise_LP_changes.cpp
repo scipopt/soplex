@@ -93,9 +93,9 @@ public:
    //@{
    /// Default constructor.
    explicit
-   TestSolver( const SPxSolver<R>::Type type_, 
+   TestSolver( const SPxSolver<R>::Type type_,
                const typename SPxSolver<R>::Representation representation_ )
-      : SPxSolver( type_, 
+      : SPxSolver( type_,
                    representation_ )
    {
       setDelta( delta  );
@@ -134,18 +134,18 @@ const int TestSolver::precision;
 //    class ChangeExerciser
 //------------------------------------------------------------------------
 
-/** 
+/**
     Class implementing the tests for the LP-changing interface.
 
     All tests are designed such that the number of calls to solve() does not
     depend on the size of the LP. However, one can increase the "resolution"
-    of the tests at the cost of a higher running time by increasing 
+    of the tests at the cost of a higher running time by increasing
     \p calls_solve.
  */
 class ChangeExerciser
 {
    /**
-      Precision used in (relative) equality checks for differing but logically 
+      Precision used in (relative) equality checks for differing but logically
       equivalent LP solutions.
    */
    static const Real epsilon_solution_equal;
@@ -223,13 +223,13 @@ private:
       if ( !EQrel( ref, val, epsilon_solution_equal ) )
          {
             ++_asserts_failed;
-            std::cout << "check '" << description << "' failed: expected " 
+            std::cout << "check '" << description << "' failed: expected "
                       << ref << ", got " << val << std::endl;
          }
    }
 
    ///
-   TestSolver* _prepare_Solver() const 
+   TestSolver* _prepare_Solver() const
    {
       TestSolver* work_ptr = new TestSolver( _type, _representation );
       work_ptr->readFile( _instance_name.c_str(), 0, 0 );
@@ -244,7 +244,7 @@ private:
    const SPxSolver<R>::Type _type;
    ///
    const typename SPxSolver<R>::Representation _representation;
-   //@}   
+   //@}
 };
 
 //
@@ -269,7 +269,7 @@ bool verbose = false;
    Wrapper to run all tests for  fixed representation and algorithm.
    Returns the number of failed asserts.
 */
-long run_tests( const std::string& filename, 
+long run_tests( const std::string& filename,
                 const SPxSolver<R>::Type type,
                 const typename SPxSolver<R>::Representation representation )
 {
@@ -281,7 +281,7 @@ long run_tests( const std::string& filename,
    tester.test_add_delete_rows();
    tester.test_add_delete_col();
    tester.test_add_delete_cols();
-   
+
    tester.test_change_obj();
    tester.test_change_lower();
    tester.test_change_upper();
@@ -293,15 +293,15 @@ long run_tests( const std::string& filename,
    tester.test_change_col();
    tester.test_change_element();
    tester.test_change_sense();
-  
-   std::cout << representation << ", " << type << ": " << tester.asserts_failed() 
+
+   std::cout << representation << ", " << type << ": " << tester.asserts_failed()
              << " asserts failed." << std::endl;
 
    return tester.asserts_failed();
 }
 
 
-int main( int argc, 
+int main( int argc,
           const char* const argv[] )
 {
    const char* usage =
@@ -387,7 +387,7 @@ int main( int argc,
 
          if ( !work.readFile( filename.c_str(), 0, 0 ) )
             {
-               std::cout << "error while reading file \"" 
+               std::cout << "error while reading file \""
                          << filename << "\"" << std::endl;
                break;
             }
@@ -443,7 +443,7 @@ void ChangeExerciser::test_add_delete_row()
       else
       {
          const SPxRowId& row_ID = work_ptr->rId( row_idx );
-         work_ptr->getRow( row_ID, current_row );               
+         work_ptr->getRow( row_ID, current_row );
          work_ptr->removeRow( row_ID );
          work_ptr->solve();
 
@@ -476,9 +476,9 @@ void ChangeExerciser::test_add_delete_row()
    for ( int block = 0; block < calls_solve + 1; ++block )
    {
       int first_block_row_idx = block * solve_interval;
-      int last_block_row_idx = std::min( work_ptr->nRows() - 1, 
+      int last_block_row_idx = std::min( work_ptr->nRows() - 1,
                                          (block+1) * solve_interval - 1 );
-      
+
       // Save-and-delete loop.
       for( int row_idx = first_block_row_idx; row_idx <= last_block_row_idx; ++row_idx )
       {
@@ -632,7 +632,7 @@ void ChangeExerciser::test_add_delete_rows()
 
 //
 // The following two routines are the analogue of the above for columns.
-// In fact they have been obtained by a replace and it is a good idea to keep 
+// In fact they have been obtained by a replace and it is a good idea to keep
 // them in sync.
 //
 
@@ -667,7 +667,7 @@ void ChangeExerciser::test_add_delete_col()
       else
       {
          const SPxColId& col_ID = work_ptr->cId( col_idx );
-         work_ptr->getCol( col_ID, current_col );               
+         work_ptr->getCol( col_ID, current_col );
          work_ptr->removeCol( col_ID );
          work_ptr->solve();
 
@@ -700,9 +700,9 @@ void ChangeExerciser::test_add_delete_col()
    for ( int block = 0; block < calls_solve + 1; ++block )
    {
       int first_block_col_idx = block * solve_interval;
-      int last_block_col_idx = std::min( work_ptr->nCols() - 1, 
+      int last_block_col_idx = std::min( work_ptr->nCols() - 1,
                                          (block+1) * solve_interval - 1 );
-      
+
       // Save-and-delete loop.
       for( int col_idx = first_block_col_idx; col_idx <= last_block_col_idx; ++col_idx )
       {
@@ -750,7 +750,7 @@ void ChangeExerciser::test_add_delete_col()
          else
          {
             const SPxColId& col_ID = work_ptr->cId( col_idx );
-            work_ptr->getCol( col_ID, current_col );               
+            work_ptr->getCol( col_ID, current_col );
             work_ptr->removeCol( col_ID );
             work_ptr->solve();
 
@@ -901,7 +901,7 @@ void ChangeExerciser::test_add_delete_cols()
 void ChangeExerciser::test_change_obj()
 {
    MSG( std::cout << "Testing changeObj()" << std::endl; );
-   
+
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
    const Real original_obj = work_ptr->objValue();
@@ -913,7 +913,7 @@ void ChangeExerciser::test_change_obj()
          coeff *= 2.0;
          // use changeObj(int, Real)
          work_ptr->changeObj( col_idx, coeff );
-         _assert( "objective entry changed by index", work_ptr->obj( col_idx ) == coeff );        
+         _assert( "objective entry changed by index", work_ptr->obj( col_idx ) == coeff );
       }
 
    work_ptr->solve();
@@ -929,9 +929,9 @@ void ChangeExerciser::test_change_obj()
 
          // use changeObj(int, Real)
          work_ptr->changeObj( col_ID, coeff );
-         _assert( "objective entry changed by ID", work_ptr->obj( col_ID ) == coeff );        
+         _assert( "objective entry changed by ID", work_ptr->obj( col_ID ) == coeff );
       }
-   
+
    work_ptr->solve();
    _assert_EQrel( "change objective entry by ID", original_obj, work_ptr->objValue() );
 
@@ -950,7 +950,7 @@ void ChangeExerciser::test_change_obj()
 
    original*=0.5;
    work_ptr->changeObj(original);
-   work_ptr->solve();   
+   work_ptr->solve();
    _assert_EQrel( "change objective entry by vector", original_obj, work_ptr->objValue() );
 
    delete[] v; v = 0;
@@ -971,7 +971,7 @@ void ChangeExerciser::test_change_lower()
 
    // First test : Mupltiply lower vector by 1.0
    Vector original_lower = work_ptr->lower();
-   
+
    work_ptr->changeLower(original_lower*=1.0);
 
    work_ptr->solve();
@@ -1015,7 +1015,7 @@ void ChangeExerciser::test_change_upper()
 
    // First test : Mupltiply lower vector by 1.0
    Vector original_upper = work_ptr->upper();
-   
+
    work_ptr->changeUpper(original_upper*=1.0);
 
    work_ptr->solve();
@@ -1028,10 +1028,10 @@ void ChangeExerciser::test_change_upper()
 
    for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
    {
-      if( work_ptr->upper( col_idx ) > solution[col_idx] ) 
+      if( work_ptr->upper( col_idx ) > solution[col_idx] )
       {
          const Real new_upper = std::max< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
-      
+
          const SPxColId& col_ID = work_ptr->cId( col_idx );
          work_ptr->changeUpper( col_ID, new_upper );
          _assert( "upper value changed", EQ( work_ptr->upper( col_idx ), new_upper ) );
@@ -1073,14 +1073,14 @@ void ChangeExerciser::test_change_bounds()
    {
       Real upper = work_ptr->upper(col_idx);
       Real lower = work_ptr->lower(col_idx);
-  
+
       // slack is bigger than 0
       if(upper > solution[col_idx])
          upper = std::max< Real >( solution[col_idx], work_ptr->lower( col_idx ) );
-      
+
       if(solution[col_idx] > lower)
          lower = std::min< Real >( solution[col_idx], work_ptr->upper( col_idx) );
-      
+
       // get ID
       const SPxColId& col_ID = work_ptr->cId( col_idx );
       work_ptr->changeBounds( col_ID, lower, upper );
@@ -1106,13 +1106,13 @@ void ChangeExerciser::test_change_lhs()
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   Real original_obj = work_ptr->objValue();    
+   Real original_obj = work_ptr->objValue();
 
    // First test: change lhs by vector
 
    // store lhs vector
    Vector lhs = work_ptr->lhs();
-   
+
    // change lhs to original
    work_ptr->changeLhs( lhs );
    work_ptr->solve();
@@ -1120,10 +1120,10 @@ void ChangeExerciser::test_change_lhs()
 
    delete work_ptr; work_ptr = 0;
 
-   // Second test: set new lhs to solution*rowVector  
+   // Second test: set new lhs to solution*rowVector
    work_ptr = _prepare_Solver();
    work_ptr->solve();
-   original_obj = work_ptr->objValue();    
+   original_obj = work_ptr->objValue();
 
    Real* val = new Real[ work_ptr->nCols() ];
    Vector solution( work_ptr->nCols(), val );
@@ -1132,7 +1132,7 @@ void ChangeExerciser::test_change_lhs()
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
       {
          const SPxRowId& row_ID = work_ptr->rId( row_idx );
-                     
+
          const Real row_prod = solution * work_ptr->rowVector( row_ID );
 
          // The new LHS must not be larger than the RHS.
@@ -1140,14 +1140,14 @@ void ChangeExerciser::test_change_lhs()
                                                  work_ptr->rhs(row_idx) );
 
          work_ptr->changeLhs( row_ID, new_lhs );
-         
+
          _assert( "lhs updated", work_ptr->lhs( row_idx ) == new_lhs );
          _assert( "lhs validity ", work_ptr->lhs( row_idx ) <= work_ptr->rhs( row_idx ) );
       }
-   
+
    work_ptr->solve();
    _assert_EQrel( "lhs changed by ID", original_obj, work_ptr->objValue() );
-   
+
    delete[] val; val = 0;
    delete work_ptr; work_ptr = 0;
 }
@@ -1162,13 +1162,13 @@ void ChangeExerciser::test_change_rhs()
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   Real original_obj = work_ptr->objValue();    
+   Real original_obj = work_ptr->objValue();
 
    // First test: change rhs by vector
 
    // store rhs vector
    Vector rhs = work_ptr->rhs();
-   
+
    // change rhs to original
    work_ptr->changeRhs( rhs );
    work_ptr->solve();
@@ -1176,10 +1176,10 @@ void ChangeExerciser::test_change_rhs()
 
    delete work_ptr; work_ptr = 0;
 
-   // Second test: set new rhs to solution*rowVector  
+   // Second test: set new rhs to solution*rowVector
    work_ptr = _prepare_Solver();
    work_ptr->solve();
-   original_obj = work_ptr->objValue();    
+   original_obj = work_ptr->objValue();
 
    Real* val = new Real[ work_ptr->nCols() ];
    Vector solution( work_ptr->nCols(), val );
@@ -1188,7 +1188,7 @@ void ChangeExerciser::test_change_rhs()
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
       {
          const SPxRowId& row_ID = work_ptr->rId( row_idx );
-                     
+
          const Real row_prod = solution * work_ptr->rowVector( row_ID );
 
          // The new RHS must not be smaller than the LHS.
@@ -1196,14 +1196,14 @@ void ChangeExerciser::test_change_rhs()
                                                  work_ptr->lhs(row_idx) );
 
          work_ptr->changeRhs( row_ID, new_rhs );
-         
+
          _assert( "rhs updated", work_ptr->rhs( row_idx ) == new_rhs );
          _assert( "rhs validity ", work_ptr->rhs( row_idx ) <= work_ptr->rhs( row_idx ) );
       }
-   
+
    work_ptr->solve();
    _assert_EQrel( "rhs changed by ID", original_obj, work_ptr->objValue() );
-   
+
    delete[] val; val = 0;
    delete work_ptr; work_ptr = 0;
 }
@@ -1215,10 +1215,10 @@ void ChangeExerciser::test_change_rhs()
 void ChangeExerciser::test_change_range()
 {
    MSG( std::cout << "Testing changeRange()" << std::endl; );
-   
+
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   Real original_obj = work_ptr->objValue();    
+   Real original_obj = work_ptr->objValue();
 
    // First test: change range by vector
    Real* val = new Real[ work_ptr->nCols() ];
@@ -1229,7 +1229,7 @@ void ChangeExerciser::test_change_range()
    Vector new_rhs = work_ptr->rhs();
    Vector new_lhs = work_ptr->lhs();
 
-   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) 
+   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
    {
       const Real row_prod = solution * (work_ptr->rowVector( row_idx ) );
 
@@ -1238,15 +1238,15 @@ void ChangeExerciser::test_change_range()
    }
    work_ptr->changeRange( new_lhs, new_rhs );
 
-   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) 
+   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
    {
       _assert( "range changed by vector: lhs", EQ( new_lhs[ row_idx ], work_ptr->lhs( row_idx ) ) );
       _assert( "range changed by vector: rhs", EQ( new_rhs[ row_idx ], work_ptr->rhs( row_idx ) ) );
    }
-   
+
    work_ptr->solve();
    _assert_EQrel( "range changed by vector: objective", original_obj, work_ptr->objValue() );
-  
+
    delete[] val; val = 0;
    delete work_ptr; work_ptr = 0;
 
@@ -1259,7 +1259,7 @@ void ChangeExerciser::test_change_range()
    Vector rhs = work_ptr->rhs();
    Vector lhs = work_ptr->lhs();
 
-   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) 
+   for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
    {
       const Real newl = 0.5 * lhs[ row_idx ];
       const Real newr = 2.0 * rhs[ row_idx ];
@@ -1291,11 +1291,11 @@ void ChangeExerciser::test_change_range()
    work_ptr = _prepare_Solver();
    work_ptr->solve();
    original_obj = work_ptr->objValue();
-   
+
    val = new Real[ work_ptr->nCols() ];
    Vector solution3( work_ptr->nCols(), val );
    work_ptr->getPrimal( solution3 );
-   
+
    for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
    {
       const SPxRowId& row_ID = work_ptr->rId( row_idx );
@@ -1322,10 +1322,10 @@ void ChangeExerciser::test_change_row()
    //
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   Real original_obj = work_ptr->objValue();    
+   Real original_obj = work_ptr->objValue();
 
    int solve_interval = std::max< int >( 1, work_ptr->nRows() / calls_solve );
-   
+
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx) {
       Real change_coeff = 1.0;
 
@@ -1333,16 +1333,16 @@ void ChangeExerciser::test_change_row()
          {
             change_coeff = 2.0;
          }
-      else 
+      else
          {
             change_coeff = -1.0;
          }
 
       SVector work_vec( work_ptr->rowVector( row_idx ) );
-            
+
       Real lhs = work_ptr->lhs( row_idx );
       Real rhs = work_ptr->rhs( row_idx );
-            
+
       lhs *= change_coeff;
       rhs *= change_coeff;
       work_vec *= change_coeff;
@@ -1356,11 +1356,11 @@ void ChangeExerciser::test_change_row()
       assert( lhs <= rhs );
 
       const LPRow row( lhs, work_vec, rhs);
-            
+
       // get ID
       const SPxRowId& row_ID = work_ptr->rId( row_idx );
       work_ptr->changeRow( row_ID, row );
-            
+
       if ( row_idx % solve_interval == 0 )
       {
          work_ptr->solve();
@@ -1379,23 +1379,23 @@ void ChangeExerciser::test_change_row()
    work_ptr->solve();
    original_obj = work_ptr->objValue();
 
-   const int nPairs = work_ptr->nRows()/2;  
+   const int nPairs = work_ptr->nRows()/2;
    solve_interval = std::max< int >( 1, nPairs / calls_solve );
 
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx) {
-      const int first_idx = 2 * pair_idx; 
+      const int first_idx = 2 * pair_idx;
       const int second_idx = first_idx + 1;
-      
+
       // Get rows.
       LPRow f_row( work_ptr->rowVector( first_idx ).size() );
       work_ptr->getRow( first_idx, f_row );
-      
+
       LPRow s_row( work_ptr->rowVector( second_idx ).size() );
       work_ptr->getRow( second_idx, s_row);
 
       // Exchange rows and solve.
       work_ptr->changeRow( first_idx, s_row );
-      work_ptr->changeRow( second_idx, f_row ); 
+      work_ptr->changeRow( second_idx, f_row );
 
       if ( pair_idx % solve_interval == 0 )
       {
@@ -1417,15 +1417,15 @@ void ChangeExerciser::test_change_row()
 void ChangeExerciser::test_change_col()
 {
    MSG( std::cout << "Testing changeCol()" << std::endl; );
-   
+
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   Real original_obj = work_ptr->objValue();    
-   
+   Real original_obj = work_ptr->objValue();
+
    //
    // First test: Multiply every column, lhs, and rhs by a non-trivial number.
    //             Set lower and upper bounds for each value closer to optimal solution.
-   // 
+   //
    const Real change_coeff = 2.0;
    Real* val = new Real[ work_ptr->nCols() ];
    Vector solution( work_ptr->nCols(), val );
@@ -1435,7 +1435,7 @@ void ChangeExerciser::test_change_col()
    Vector rhs = work_ptr->rhs(); rhs *= change_coeff;
    work_ptr->changeRange( lhs, rhs );
 
-   for (int col_idx = 0; col_idx < work_ptr->nCols(); ++col_idx) 
+   for (int col_idx = 0; col_idx < work_ptr->nCols(); ++col_idx)
    {
       LPCol current_col( work_ptr->colVector( col_idx ).size() );
       work_ptr->getCol( col_idx, current_col );
@@ -1451,7 +1451,7 @@ void ChangeExerciser::test_change_col()
       new_col *= change_coeff;
 
       LPCol changed_col( current_col.obj(),
-                         new_col, 
+                         new_col,
                          new_ub,
                          new_lb );
 
@@ -1471,14 +1471,14 @@ void ChangeExerciser::test_change_col()
    work_ptr->solve();
    original_obj = work_ptr->objValue();
 
-   const int nPairs = work_ptr->nCols()/2;  
+   const int nPairs = work_ptr->nCols()/2;
    int solve_interval = std::max< int >( 1, nPairs / calls_solve );
 
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx)
    {
-      const int first_idx = 2 * pair_idx; 
+      const int first_idx = 2 * pair_idx;
       const int second_idx = first_idx + 1;
-      
+
       LPCol f_col( work_ptr->colVector( first_idx ).size() );
       work_ptr->getCol( first_idx, f_col );
 
@@ -1506,20 +1506,20 @@ void ChangeExerciser::test_change_col()
    Changes single elements of the matrix.
 */
 void ChangeExerciser::test_change_element()
-{ 
+{
    MSG( std::cout << "Testing changeElement()" << std::endl; );
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   const Real original_obj = work_ptr->objValue();    
-   
+   const Real original_obj = work_ptr->objValue();
+
    // Test: Exchange each pair of rows elementwise
-   int nPairs = work_ptr->nRows()/2;  
+   int nPairs = work_ptr->nRows()/2;
    int solve_interval = std::max< int >( 1, nPairs / calls_solve );
 
    for (int pair_idx = 0; pair_idx < nPairs; ++pair_idx)
    {
-      int first_idx = 2 * pair_idx; 
+      int first_idx = 2 * pair_idx;
       int second_idx = first_idx + 1;
 
       const SVector& first_row = work_ptr->rowVector( first_idx );
@@ -1527,13 +1527,13 @@ void ChangeExerciser::test_change_element()
 
       const SPxRowId& first_row_ID = work_ptr->rId( first_idx );
       const SPxRowId& second_row_ID = work_ptr->rId( second_idx );
-      
+
       for (int col_idx=0; col_idx<work_ptr->nCols(); ++col_idx)
       {
          Real new_f = second_row[col_idx];
          Real new_s = first_row[col_idx];
          const SPxColId& col_ID = work_ptr->cId( col_idx );
-         
+
          work_ptr->changeElement( first_row_ID, col_ID, new_f );
          work_ptr->changeElement( second_row_ID, col_ID, new_s );
 
@@ -1575,19 +1575,19 @@ void ChangeExerciser::test_change_sense()
 
    TestSolver* work_ptr = _prepare_Solver();
    work_ptr->solve();
-   const Real original_obj = work_ptr->objValue();    
-   
+   const Real original_obj = work_ptr->objValue();
+
    // Flip sense.
    if ( work_ptr->sense() == SPxLP::MINIMIZE )
    {
       work_ptr->changeSense( SPxLP::MAXIMIZE );
    }
-   else 
-   {     
+   else
+   {
       assert( work_ptr->sense() == SPxLP::MAXIMIZE );
       work_ptr->changeSense( SPxLP::MINIMIZE );
    }
-   
+
    // Invert objective function.
    Real* val = new Real[ work_ptr->nCols() ];
    Vector original( work_ptr->nCols(), val );
@@ -1598,7 +1598,7 @@ void ChangeExerciser::test_change_sense()
    work_ptr->solve();
 
    _assert_EQrel( "change sense", original_obj, -work_ptr->objValue() );
-   
+
    delete[] val; val = 0;
    delete work_ptr; work_ptr = 0;
 }

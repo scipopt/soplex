@@ -33,7 +33,7 @@ const char lpstr[] =
   " 0 <= x1               \n"
   "End                    \n";
 
-int main() 
+int main()
 {
    SoPlex lp;
    std::istringstream is(lpstr);
