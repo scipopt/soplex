@@ -22,7 +22,6 @@
 namespace soplex {
 
   /// updates the external solution used for validation
-  /// #template
   template <>
   bool Validation<Real>::updateExternalSolution(char* solution)
   {
@@ -48,7 +47,6 @@ namespace soplex {
 
 
   /// updates the tolerance used for validation
-  /// #template #temp
   template <>
   bool Validation<Real>::updateValidationTolerance(char* tolerance)
   {
@@ -64,7 +62,6 @@ namespace soplex {
 
 
   /// validates the soplex solution using the external solution
-  /// #template Is there a rational equivalent of this function?
   template <>
   void Validation<Real>::validateSolveReal(SoPlexBase<Real>& soplex)
   {

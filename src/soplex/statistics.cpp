@@ -103,7 +103,6 @@ namespace soplex
   }
 
   /// clears statistics on solving process
-  /// #template #baseclass?
   template <>
   void SoPlexBase<Real>::Statistics::clearSolvingData()
   {

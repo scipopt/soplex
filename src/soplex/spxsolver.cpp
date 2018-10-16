@@ -129,7 +129,6 @@ namespace soplex
     SPxBasisBase<Real>::loadDesc(p_desc);
   }
 
-  /// #template #temp
   template <>
   void SPxSolverBase<Real>::setPricer(SPxPricer<Real>* x, const bool destroy)
   {
@@ -352,7 +351,6 @@ namespace soplex
       theCumulativeTime = 0.0;
     }
 
-    /// #temp #template
     template <>
       void SPxSolverBase<Real>::init()
     {
@@ -566,7 +564,6 @@ namespace soplex
       isInfeasibleCo.clear();
     }
 
-    /// #template #temp
     template <>
       void SPxSolverBase<Real>::unscaleLPandReloadBasis()
     {
@@ -1866,7 +1863,6 @@ namespace soplex
       return cstat;
     }
 
-    /// #template #temp #baseclass
     template <>
       typename SPxSolverBase<Real>::VarStatus SPxSolverBase<Real>::getBasisRowStatus( int row ) const
     {
@@ -1874,7 +1870,6 @@ namespace soplex
       return basisStatusToVarStatus( this->desc().rowStatus( row ) );
     }
 
-    /// #template #temp #baseclass
     template <>
       typename SPxSolverBase<Real>::VarStatus SPxSolverBase<Real>::getBasisColStatus( int col ) const
     {
@@ -1882,7 +1877,6 @@ namespace soplex
       return basisStatusToVarStatus( this->desc().colStatus( col ) );
     }
 
-    /// #template #temp
     template <>
       typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
     {

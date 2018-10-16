@@ -1747,7 +1747,6 @@ namespace soplex
     return false;
   }
 
-  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimal (Vector& p_vector) const
   {
@@ -1798,7 +1797,6 @@ namespace soplex
     return status();
   }
 
-  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDual (Vector& p_vector) const
   {
@@ -1831,7 +1829,6 @@ namespace soplex
     return status();
   }
 
-  /// #template #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getRedCost (Vector& p_vector) const
   {
@@ -1876,7 +1873,6 @@ namespace soplex
     return status();
   }
 
-  /// #template #baseclass
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalray (Vector& p_vector) const
   {
@@ -1896,7 +1892,6 @@ namespace soplex
     return status();
   }
 
-  /// #template #temp
   /// There are three getDualFarkas now. getDualFarkasT, getDualFarkas, and getDualfarkas. Wow!
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualfarkas (Vector& p_vector) const

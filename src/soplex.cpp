@@ -6239,7 +6239,6 @@ namespace soplex
 
   /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
   /// returns true on success
-  /// #baseclass
   template <>
 	bool SoPlexBase<Real>::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
   {
@@ -6699,7 +6698,6 @@ namespace soplex
 
 
   /// print non-default parameter values
-  /// #template #baseclass
   template <>
   void SoPlexBase<Real>::printUserSettings()
   {
@@ -6760,7 +6758,6 @@ namespace soplex
 
 
   /// writes settings file; returns true on success
-  // #template #baseclass
   template <>
 	bool SoPlexBase<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const
   {
@@ -6847,7 +6844,6 @@ namespace soplex
 
 
   /// reads settings file; returns true on success
-  /// #template #baseclass
   template <>
 	bool SoPlexBase<Real>::loadSettingsFile(const char* filename)
   {
@@ -6898,7 +6894,6 @@ namespace soplex
   }
 
   /// parses one setting string and returns true on success
-  /// #template #temp #baseclass
   template <>
 	bool SoPlexBase<Real>::parseSettingsString(char* string)
   {
@@ -7275,7 +7270,6 @@ namespace soplex
 
 
   /// prints complete statistics
-  /// #template #baseclass
   template <>
   void SoPlexBase<Real>::printStatistics(std::ostream& os)
   {
