@@ -27,10 +27,10 @@ using namespace soplex;
 
 int main()
 {
-   SoPlexBase<Real> mysoplex;
+   SoPlex mysoplex;
 
    /* set the objective sense */
-   mysoplex.setIntParam(SoPlexBase<Real>::OBJSENSE, SoPlexBase<Real>::OBJSENSE_MINIMIZE);
+   mysoplex.setIntParam(SoPlex::OBJSENSE, SoPlex::OBJSENSE_MINIMIZE);
 
    /* we first add variables */
    DSVector dummycol(0);
@@ -50,13 +50,13 @@ int main()
    mysoplex.writeFileT("dump.lp", NULL, NULL, NULL);
 
    /* solve LP */
-   SPxSolverBase<Real>::Status stat;
+   SPxSolver::Status stat;
    DVector prim(2);
    DVector dual(1);
    stat = mysoplex.optimize();
 
    /* get solution */
-   if( stat == SPxSolverBase<Real>::OPTIMAL )
+   if( stat == SPxSolver::OPTIMAL )
    {
       mysoplex.getPrimalT(prim);
       mysoplex.getDualT(dual);
