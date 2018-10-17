@@ -1635,6 +1635,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Real>& rset, const Nam
 
          int ncnames = cnames.size();
          cnames.add(colname);
+         // check whether the new name is unique wrt previous column names
          if( cnames.size() <= ncnames )
          {
             MSG_ERROR( std::cerr << "ERROR: duplicate column name" << std::endl; )
