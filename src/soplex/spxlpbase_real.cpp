@@ -1633,7 +1633,13 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Real>& rset, const Nam
          spxSnprintf(colname, MPSInput::MAX_LINE_LEN-1, "%s", mps.field1());
          colname[MPSInput::MAX_LINE_LEN-1] = '\0';
 
+         int ncnames = cnames.size();
          cnames.add(colname);
+         if( cnames.size() <= ncnames )
+         {
+            MSG_ERROR( std::cerr << "ERROR: duplicate column name" << std::endl; )
+            break;
+         }
          vec.clear();
          col.setObj(0.0);
          col.setLower(0.0);
