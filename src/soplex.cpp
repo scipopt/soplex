@@ -5925,27 +5925,11 @@ namespace soplex
   /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
   /// integer variables if desired; returns true on success
 
-  // template <>
-	// bool SoPlexBase<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-  // {
-  //   bool success = false;
-  //   if( intParam(SoPlexBase<Real>::READMODE) == READMODE_REAL )
-  //     success = _readFileReal(filename, rowNames, colNames, intVars);
-  //   else
-  //     success = _readFileRational(filename, rowNames, colNames, intVars);
-
-  //   // storing the row and column names for use in the DBDS print basis methods
-  //   _rowNames = rowNames;
-  //   _colNames = colNames;
-
-  //   return success;
-  // }
-
   template <>
   bool SoPlexBase<Real>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
   {
     bool success = false;
-    if( intParam(SoPlexBase::READMODE) == READMODE_REAL )
+    if( intParam(SoPlexBase<Real>::READMODE) == READMODE_REAL )
       success = _readFileReal(filename, rowNames, colNames, intVars);
     else
       success = _readFileRational(filename, rowNames, colNames, intVars);
