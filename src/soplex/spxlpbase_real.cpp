@@ -1638,7 +1638,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Real>& rset, const Nam
          // check whether the new name is unique wrt previous column names
          if( cnames.size() <= ncnames )
          {
-            MSG_ERROR( std::cerr << "ERROR: duplicate column name" << std::endl; )
+            MSG_ERROR( std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" << std::endl; )
             break;
          }
          vec.clear();
