@@ -214,6 +214,12 @@ namespace soplex
   template <>
   typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
 
+  template <>
+  typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const;
+
+  template <>
+	bool SoPlexBase<Real>::hasBasis() const;
+
   // template <>
   // SoPlexBase<Real>::Settings::IntParam::IntParam();
   template <>
@@ -814,13 +820,6 @@ namespace soplex
     _lastSolveMode = intParam(SoPlexBase<Real>::SOLVEMODE);
 
     assert(_isConsistent());
-  }
-
-  /// returns the current solver status
-  template <>
-  typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const
-  {
-    return _status;
   }
 
   /// assignment operator
@@ -1507,15 +1506,6 @@ namespace soplex
   {
     assert(_rationalLP != 0);
     return _rationalLP->lower();
-  }
-
-  /// returns integer parameter value
-  template <>
-	int SoPlexBase<Real>::intParam(const IntParam param) const
-  {
-    assert(param >= 0);
-    assert(param < INTPARAM_COUNT);
-    return _currentSettings->_intParamValues[param];
   }
 
   /// sets integer parameter value; returns true on success
@@ -3593,7 +3583,14 @@ namespace soplex
     return status();
   }
 
-  /// is stored primal solution feasible?
+  /// returns the current solver status
+  template <>
+  typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const
+  {
+    return _status;
+  }
+
+  /// Is stored primal solution feasible?
   template <>
   bool SoPlexBase<Real>::isPrimalFeasible() const
   {
@@ -3902,13 +3899,6 @@ namespace soplex
       }
 
     return true;
-  }
-
-  /// is an advanced starting basis available?
-  template <>
-	bool SoPlexBase<Real>::hasBasis() const
-  {
-    return _hasBasis;
   }
 
   /// gets violation of reduced costs; returns true on success
@@ -4628,6 +4618,13 @@ namespace soplex
       }
     else
       return 0;
+  }
+
+  /// is an advanced starting basis available?
+  template <>
+	bool SoPlexBase<Real>::hasBasis() const
+  {
+    return _hasBasis;
   }
 
   /// returns the current basis status
@@ -6362,14 +6359,14 @@ namespace soplex
     writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
   }
 
-  // /// returns integer parameter value
-  // template <>
-	// int SoPlexBase<Real>::intParam(const IntParam param) const
-  // {
-  //   assert(param >= 0);
-  //   assert(param < INTPARAM_COUNT);
-  //   return _currentSettings->_intParamValues[param];
-  // }
+  /// returns integer parameter value
+  template <>
+	int SoPlexBase<Real>::intParam(const IntParam param) const
+  {
+    assert(param >= 0);
+    assert(param < INTPARAM_COUNT);
+    return _currentSettings->_intParamValues[param];
+  }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
   /// returns rational parameter value
