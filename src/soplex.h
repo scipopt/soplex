@@ -126,6 +126,8 @@ public:
    /// returns number of nonzeros
    int numNonzerosT() const;
 
+   int numNonzerosRational() const;
+
    /// returns smallest non-zero element in absolute value
    Real minAbsNonzeroReal() const;
 

@@ -1033,7 +1033,12 @@ namespace soplex
     return _realLP->nNzos();
   }
 
-
+  template <>
+  int SoPlexBase<Real>::numNonzerosRational() const
+  {
+    assert(_rationalLP != 0);
+    return _rationalLP->nNzos();
+  }
 
   /// returns smallest non-zero element in absolute value
   template <>
