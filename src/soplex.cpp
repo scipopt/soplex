@@ -223,13 +223,9 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::hasBasis() const;
 
-  // template <>
-  // SoPlexBase<Real>::Settings::IntParam::IntParam();
   template <>
   typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam = IntParam();
 
-  // template <>
-  // SoPlexBase<Real>::Settings::RealParam::RealParam();
   template <>
   typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam = RealParam();
 
