@@ -26,7 +26,7 @@ using namespace soplex;
 
 int main(int argc, const char* const argv[])
 {
-   SPxSolver work(SPxSolver<R>::LEAVE, SPxSolver<R>::COLUMN);
+   SPxSolver work(SPxSolver::LEAVE, SPxSolver::COLUMN);
 
    /* no starter, no simplifier, no scaler */
    SLUFactor solver;
