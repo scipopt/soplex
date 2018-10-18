@@ -333,7 +333,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
       {
          int nNonzeros = 0;
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numColsRational(); ++i )
          {
             if ( primal[i] != (Rational) 0 )
             {

@@ -525,14 +525,14 @@ public:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
    /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsT()
+   /// #numRowsRational()
    void removeRowsRational(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
    /// passed as buffer memory
    void removeRowsRational(int idx[], int n, int perm[] = 0);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
    /// buffer memory
    void removeRowRangeRational(int start, int end, int perm[] = 0);
 

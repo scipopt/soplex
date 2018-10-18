@@ -2953,7 +2953,7 @@ namespace soplex
 
 
 
-  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be
+  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
   /// passed as buffer memory
   template <>
   void SoPlexBase<Real>::removeRowsRational(int idx[], int n, int perm[])
@@ -3726,7 +3726,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getDualRational(VectorBase<Rational>& vector)
   {
-    if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsT() )
+    if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
       {
         _syncRationalSolution();
         _solRational.getDual(vector);
@@ -3969,7 +3969,7 @@ namespace soplex
 
     _syncRationalSolution();
     VectorRational& dual = _solRational._dual;
-    assert(dual.dim() == numRowRational());
+    assert(dual.dim() == numRowsRational());
 
     maxviol = 0;
     sumviol = 0;
