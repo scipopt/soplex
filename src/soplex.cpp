@@ -210,6 +210,9 @@ namespace soplex
 	bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
 
   template <>
+	bool SoPlexBase<Real>::boolParam(const BoolParam param) const;
+
+  template <>
   SoPlexBase<Real>::Settings::BoolParam::BoolParam();
   template <>
   typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
@@ -702,15 +705,6 @@ namespace soplex
 #ifdef SOPLEX_WITH_RATIONALPARAM
   SoPlexBase<R>::Settings::RationalParam::RationalParam() {}
 #endif
-
-  /// returns boolean parameter value
-  template <>
-	bool SoPlexBase<Real>::boolParam(const BoolParam param) const
-  {
-    assert(param >= 0);
-    assert(param < SoPlexBase<Real>::BOOLPARAM_COUNT);
-    return _currentSettings->_boolParamValues[param];
-  }
 
   template <>
   SoPlexBase<Real>::Settings::Settings()
@@ -6357,6 +6351,15 @@ namespace soplex
     // write basis
     ofname = std::string(filename) + ".bas";
     writeBasisFile(ofname.c_str(), rowNames, colNames, cpxFormat);
+  }
+
+  /// returns boolean parameter value
+  template <>
+	bool SoPlexBase<Real>::boolParam(const BoolParam param) const
+  {
+    assert(param >= 0);
+    assert(param < SoPlexBase<Real>::BOOLPARAM_COUNT);
+    return _currentSettings->_boolParamValues[param];
   }
 
   /// returns integer parameter value
