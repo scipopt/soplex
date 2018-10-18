@@ -229,6 +229,8 @@ namespace soplex
   template <>
   typename SoPlexBase<Real>::Settings::RealParam SoPlexBase<Real>::Settings::realParam = RealParam();
 
+  template <>
+  Real SoPlexBase<Real>::realParam(const RealParam param) const;
 
   template <>
   SoPlexBase<Real>::Settings::BoolParam::BoolParam() {
@@ -2971,7 +2973,7 @@ namespace soplex
 
 
 
-  /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as
+  /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
   /// buffer memory
   template <>
   void SoPlexBase<Real>::removeRowRangeRational(int start, int end, int perm[])
@@ -3019,7 +3021,7 @@ namespace soplex
 
   /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numColsT()
+  /// #numColsRational()
   template <>
   void SoPlexBase<Real>::removeColsRational(int perm[])
   {
@@ -3049,7 +3051,7 @@ namespace soplex
 
 
 
-  /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsT() may be
+  /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
   /// passed as buffer memory
   template <>
   void SoPlexBase<Real>::removeColsRational(int idx[], int n, int perm[])
@@ -3069,7 +3071,7 @@ namespace soplex
 
 
 
-  /// removes columns \p start to \p end including both; an array \p perm of size #numColsT() may be passed as
+  /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
   /// buffer memory
   template <>
   void SoPlexBase<Real>::removeColRangeRational(int start, int end, int perm[])
@@ -3122,15 +3124,6 @@ namespace soplex
 
     if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_MANUAL )
       _syncLPRational();
-  }
-
-  /// returns real parameter value
-  template <>
-  Real SoPlexBase<Real>::realParam(const RealParam param) const
-  {
-    assert(param >= 0);
-    assert(param < REALPARAM_COUNT);
-    return _currentSettings->_realParamValues[param];
   }
 
   /// solves the LP
@@ -6019,6 +6012,15 @@ namespace soplex
     assert(param >= 0);
     assert(param < INTPARAM_COUNT);
     return _currentSettings->_intParamValues[param];
+  }
+
+  /// returns real parameter value
+  template <>
+  Real SoPlexBase<Real>::realParam(const RealParam param) const
+  {
+    assert(param >= 0);
+    assert(param < REALPARAM_COUNT);
+    return _currentSettings->_realParamValues[param];
   }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
