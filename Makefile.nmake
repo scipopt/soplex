@@ -30,7 +30,7 @@ ARCH		=	x86
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		=	4.0.0.2
+VERSION		=	4.0.0.3
 VERBOSE		=	0
 OPT			=	opt
 LIBEXT		=	lib

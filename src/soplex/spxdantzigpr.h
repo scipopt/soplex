@@ -35,7 +35,8 @@ namespace soplex
 
    See SPxPricer for a class documentation.
 */
-class SPxDantzigPR : public SPxPricer
+template <class R>
+class SPxDantzigPR : public SPxPricer<R>
 {
 private:
    int                   selectLeaveSparse();/**< sparse pricing method for leaving Simplex */
@@ -52,18 +53,18 @@ public:
    //@{
    /// default constructor
    SPxDantzigPR()
-      : SPxPricer("Dantzig")
+      : SPxPricer<R>("Dantzig")
    {}
    /// copy constructor
    SPxDantzigPR(const SPxDantzigPR& old )
-      : SPxPricer(old)
+      : SPxPricer<R>(old)
    {}
    /// assignment operator
    SPxDantzigPR& operator=( const SPxDantzigPR& rhs)
    {
       if(this != &rhs)
       {
-         SPxPricer::operator=(rhs);
+         SPxPricer<R>::operator=(rhs);
       }
 
       return *this;
@@ -72,7 +73,7 @@ public:
    virtual ~SPxDantzigPR()
    {}
    /// clone function for polymorphism
-   inline virtual SPxPricer* clone() const
+   inline virtual SPxPricer<R>* clone() const
    {
       return new SPxDantzigPR(*this);
    }

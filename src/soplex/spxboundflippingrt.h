@@ -48,7 +48,8 @@ struct Compare;
 
    See SPxRatioTester for a class documentation.
 */
-class SPxBoundFlippingRT : public SPxFastRT
+ template <class R>
+class SPxBoundFlippingRT : public SPxFastRT<R>
 {
 private:
    /**@name substructures */
@@ -184,7 +185,7 @@ public:
    //@{
    /// default constructor
    SPxBoundFlippingRT()
-      : SPxFastRT("Bound Flipping")
+      : SPxFastRT<R>("Bound Flipping")
       , enableBoundFlips(true)
       , enableRowBoundFlips(false)
       , flipPotential(1)
@@ -195,7 +196,7 @@ public:
    {}
    /// copy constructor
    SPxBoundFlippingRT(const SPxBoundFlippingRT& old)
-      : SPxFastRT(old)
+      : SPxFastRT<R>(old)
       , enableBoundFlips(old.enableBoundFlips)
       , enableRowBoundFlips(old.enableRowBoundFlips)
       , flipPotential(1)
@@ -209,7 +210,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxFastRT::operator=(rhs);
+         SPxFastRT<R>::operator=(rhs);
       }
 
       enableBoundFlips = rhs.enableBoundFlips;
@@ -222,7 +223,7 @@ public:
    virtual ~SPxBoundFlippingRT()
    {}
    /// clone function for polymorphism
-   inline virtual SPxRatioTester* clone() const
+   inline virtual SPxRatioTester<R>* clone() const
    {
       return new SPxBoundFlippingRT(*this);
    }

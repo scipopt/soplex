@@ -26,8 +26,8 @@
 #include "soplex.h"
 #include "spxsolver.h"
 #include <stdio.h>
-#include <sys/types.h> 
-#include <sys/stat.h> 
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "timer.h"
 #include "spxpricer.h"
@@ -55,7 +55,7 @@
 using namespace soplex;
 
 ///see "soplex -help", s means Simplifier, g means Scaler, c means Starter, p for Pricer and t for Ratiotester
-void set_s_g_c_p_t    (SoPlex& work, 
+void set_s_g_c_p_t    (SoPlex& work,
 		       const int simplifying,            // 0 for none and 1 for Main, please see "soplex -help"
 		       const int scaling,                // see above
 		       const int starting,
@@ -68,9 +68,9 @@ void set_pricer       (SoPlex& work, const int pricing    );  // see above
 void set_ratio_tester (SoPlex& work, const int ratiotest  );  // see above
 double abs(double a, double b);
 
-/** Unit test for copy constructors and assignment operators with random combinations of pricer, 
+/** Unit test for copy constructors and assignment operators with random combinations of pricer,
  *  ratiotester, simplifier, scaler, and starter.
- *  
+ *
  *  NOTE: Fails from singular bases usually come from using "bad" pricers or ratiotesters etc.,
  *  not from incorrect copying.   */
 
@@ -142,16 +142,16 @@ int main(int argc, const char* const argv[])
         lp[0][1][0] = SoPlex(lp_ori);
         lp[0][1][1] = SoPlex(lp_ori);
         lp[0][1][2] = SoPlex(lp_ori);
-        set_s_g_c_p_t(lp[0][1][0], 1, 1, 0, 0, 0); 
- 
+        set_s_g_c_p_t(lp[0][1][0], 1, 1, 0, 0, 0);
+
         lp[0][0][0] = SoPlex(SPxSolver::LEAVE, SPxSolver::ROW);
         lp[0][0][1] = SoPlex(SPxSolver::ENTER, SPxSolver::COLUMN);
         lp[0][0][2] = SoPlex(SPxSolver::ENTER, SPxSolver::ROW);
         lp[0][0][0] = lp_ori;
         lp[0][0][1] = lp_ori;
         lp[0][0][2] = lp_ori;
-        set_s_g_c_p_t(lp[0][0][0], 0, 4, 3, 3, 0); 
-        set_s_g_c_p_t(lp[0][0][2], 0, 0, 2, 4/*5*/, 2); 
+        set_s_g_c_p_t(lp[0][0][0], 0, 4, 3, 3, 0);
+        set_s_g_c_p_t(lp[0][0][2], 0, 0, 2, 4/*5*/, 2);
 
         lp[0][1][1].setType(SPxSolver::ENTER);
         lp[0][0][0].setRep(SPxSolver::ROW);
@@ -174,13 +174,13 @@ int main(int argc, const char* const argv[])
            }
            else
            {
-              std::cout << "Lp '"  << fname.c_str() 
-                        << "' has not been solved optimally with default settings -- terminating. (Choose a simpler test set!)" 
+              std::cout << "Lp '"  << fname.c_str()
+                        << "' has not been solved optimally with default settings -- terminating. (Choose a simpler test set!)"
                         << std::endl;
               exit(1);
            }
            optObjValue = lp_cp_pr->objValue();
-           
+
            delete lp_cp_pr;
 
         }catch(SPxException& x) {
@@ -190,15 +190,15 @@ int main(int argc, const char* const argv[])
         lp[0][1][0].readFile(fname.c_str(), 0, 0, 0);
         lp[0][1][1].readFile(fname.c_str(), 0, 0, 0);
         lp[0][1][2].readFile(fname.c_str(), 0, 0, 0);
-        set_s_g_c_p_t(lp[0][1][1], 0, 2, 2, 1, 1); 
+        set_s_g_c_p_t(lp[0][1][1], 0, 2, 2, 1, 1);
         set_s_g_c_p_t(lp[0][1][2], 1, 3, 1, 2, 2);
 
         lp[0][0][0].readFile(fname.c_str(), 0, 0, 0);
         lp[0][0][1].readFile(fname.c_str(), 0, 0, 0);
         lp[0][0][2].readFile(fname.c_str(), 0, 0, 0);
-        set_s_g_c_p_t(lp[0][0][2], 0, 0, 2, 4/*5*/, 2); 
-        set_s_g_c_p_t(lp[0][0][1], 0, 0, 2, 4/*5*/, 2); 
-        //set_s_g_c_p_t(lp[0][0][1], 1, 2, 0, 4, 1); 
+        set_s_g_c_p_t(lp[0][0][2], 0, 0, 2, 4/*5*/, 2);
+        set_s_g_c_p_t(lp[0][0][1], 0, 0, 2, 4/*5*/, 2);
+        //set_s_g_c_p_t(lp[0][0][1], 1, 2, 0, 4, 1);
 
         lp[0][1][2].setType(SPxSolver::ENTER);
         lp[0][0][1].setRep(SPxSolver::ROW);
@@ -206,7 +206,7 @@ int main(int argc, const char* const argv[])
 
         /** test copy constructor and assignment function before soplex reads a lp    */
 
-        
+
         int current_timepoint = 0;
         for(int n_type = 0; n_type < num_type; ++n_type)
         {
@@ -222,8 +222,8 @@ int main(int argc, const char* const argv[])
                     if(absError < lp[current_timepoint][n_type][n_time].delta() )
                     {
                        (pass[stat_idx])++;
-                       std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] 
-                                 << "_" << n_time <<  " solved, num of iterations is " 
+                       std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint]
+                                 << "_" << n_time <<  " solved, num of iterations is "
                                  << lp[current_timepoint][n_type][n_time].iteration() << std::endl;
                     }
                     else
@@ -236,9 +236,9 @@ int main(int argc, const char* const argv[])
                        {
                           (fail[stat_idx])++;
                           (bigErr[stat_idx])++;
-                          std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] << "_" << n_time <<  " solved " 
-                                    << "but does not have the same objValue with original, num of iterations is " 
-                                    << lp[current_timepoint][n_type][n_time].iteration() <<  ", the difference is " 
+                          std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] << "_" << n_time <<  " solved "
+                                    << "but does not have the same objValue with original, num of iterations is "
+                                    << lp[current_timepoint][n_type][n_time].iteration() <<  ", the difference is "
                                     << abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue)  << std::endl;
                        }
                     }
@@ -258,24 +258,24 @@ int main(int argc, const char* const argv[])
         }
 
         /** test copy constructor and assignment function after soplex reads a lp    */
-        
+
         lp[1][1][0] = SoPlex(lp_ori);
         lp[1][1][1] = SoPlex(lp_ori);
         lp[1][1][2] = SoPlex(lp_ori);
-        set_s_g_c_p_t(lp[1][1][0], 0, 2, 2, 1, 1); 
-        set_s_g_c_p_t(lp[1][1][1], 0, 4, 3, 3, 0); 
+        set_s_g_c_p_t(lp[1][1][0], 0, 2, 2, 1, 1);
+        set_s_g_c_p_t(lp[1][1][1], 0, 4, 3, 3, 0);
         set_s_g_c_p_t(lp[1][1][2], 0, 0, 2, 4/*5*/, 2);
 
         lp[1][0][0] = SoPlex(SPxSolver::LEAVE, SPxSolver::ROW);
         lp[1][0][1] = SoPlex(SPxSolver::ENTER, SPxSolver::COLUMN);
         lp[1][0][2] = SoPlex(SPxSolver::ENTER, SPxSolver::ROW);
-        set_s_g_c_p_t(lp[1][0][0], 1, 1, 0, 0, 0); 
+        set_s_g_c_p_t(lp[1][0][0], 1, 1, 0, 0, 0);
         lp[1][0][0] = lp_ori;
         lp[1][0][1] = lp_ori;
         lp[1][0][2] = lp_ori;
-        set_s_g_c_p_t(lp[1][0][1], 1, 3, 1, 2, 2); 
-        set_s_g_c_p_t(lp[1][0][2], 1, 2, 0, 4, 1); 
-        
+        set_s_g_c_p_t(lp[1][0][1], 1, 3, 1, 2, 2);
+        set_s_g_c_p_t(lp[1][0][2], 1, 2, 0, 4, 1);
+
 
         lp[1][0][2].setType(SPxSolver::ENTER); // see above
         lp[1][1][2].setType(SPxSolver::ENTER);
@@ -298,9 +298,9 @@ int main(int argc, const char* const argv[])
                     if(absError < lp[current_timepoint][n_type][n_time].delta() )
                     {
                        (pass[stat_idx])++;
-                       std::cout << "lp_" << type[n_type] << "_" 
-                                 << timepoint[current_timepoint] << "_" << n_time 
-                                 <<  " solved, num of iterations is " 
+                       std::cout << "lp_" << type[n_type] << "_"
+                                 << timepoint[current_timepoint] << "_" << n_time
+                                 <<  " solved, num of iterations is "
                                  << lp[current_timepoint][n_type][n_time].iteration() << std::endl;
                     }
                     else
@@ -313,9 +313,9 @@ int main(int argc, const char* const argv[])
                        {
                           (fail[stat_idx])++;
                           (bigErr[stat_idx])++;
-                          std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] << "_" << n_time <<  " solved " 
-                                    << "but does not have the same objValue with original, num of iterations is " 
-                                    << lp[current_timepoint][n_type][n_time].iteration() <<  ", the difference is " 
+                          std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] << "_" << n_time <<  " solved "
+                                    << "but does not have the same objValue with original, num of iterations is "
+                                    << lp[current_timepoint][n_type][n_time].iteration() <<  ", the difference is "
                                     << abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue)  << std::endl;
                        }
                     }
@@ -335,19 +335,19 @@ int main(int argc, const char* const argv[])
         }
 
         // solve the original problem
-        
+
         try{
-           
+
            lp_ori.optimize();
            if(lp_ori.status() == SPxSolver::OPTIMAL)
            {
-              std::cout << "The original lp has been solved to optimality with default settings, num of iterations is " 
+              std::cout << "The original lp has been solved to optimality with default settings, num of iterations is "
                         << lp_ori.iteration() << std::endl;
            }
            else
            {
-              std::cout << "The original lp '"  << fname.c_str() 
-                        << "' has not been solved optimally with default settings -- terminating. (Choose a simpler test set!)" 
+              std::cout << "The original lp '"  << fname.c_str()
+                        << "' has not been solved optimally with default settings -- terminating. (Choose a simpler test set!)"
                         << std::endl;
               exit(1);
            }
@@ -364,27 +364,27 @@ int main(int argc, const char* const argv[])
         lp[2][1][0] = SoPlex(lp_ori);
         lp[2][1][1] = SoPlex(lp_ori);
         lp[2][1][2] = SoPlex(lp_ori);
-        set_s_g_c_p_t(lp[2][1][0], 1, 3, 1, 2, 2); 
-        set_s_g_c_p_t(lp[2][1][1], 0, 4, 3, 3, 0); 
+        set_s_g_c_p_t(lp[2][1][0], 1, 3, 1, 2, 2);
+        set_s_g_c_p_t(lp[2][1][1], 0, 4, 3, 3, 0);
         set_s_g_c_p_t(lp[2][1][2], 1, 2, 0, 4, 1);
 
 
         lp[2][0][0] = SoPlex(SPxSolver::LEAVE, SPxSolver::ROW);
         lp[2][0][1] = SoPlex(SPxSolver::ENTER, SPxSolver::COLUMN);
         lp[2][0][2] = SoPlex(SPxSolver::ENTER, SPxSolver::ROW);
-        set_s_g_c_p_t(lp[2][0][0], 1, 1, 0, 0, 0); 
+        set_s_g_c_p_t(lp[2][0][0], 1, 1, 0, 0, 0);
 
         lp[2][0][0] = lp_ori;
         lp[2][0][1] = lp_ori;
         lp[2][0][2] = lp_ori;
-        set_s_g_c_p_t(lp[2][0][1], 0, 2, 2, 1, 1); 
-        set_s_g_c_p_t(lp[2][0][2], 0, 0, 2, 4/*5*/, 2); 
+        set_s_g_c_p_t(lp[2][0][1], 0, 2, 2, 1, 1);
+        set_s_g_c_p_t(lp[2][0][2], 0, 0, 2, 4/*5*/, 2);
 
         lp[2][1][0].setType(SPxSolver::ENTER);
         lp[2][0][2].setRep(SPxSolver::ROW);
         lp[2][0][1].setRep(SPxSolver::ROW);
 
-        
+
         current_timepoint = 2;
         for(int n_type = 0; n_type < num_type; ++n_type)
         {
@@ -400,8 +400,8 @@ int main(int argc, const char* const argv[])
                     if(absError < lp[current_timepoint][n_type][n_time].delta() )
                     {
                        (pass[stat_idx])++;
-                       std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] 
-                                 << "_" << n_time <<  " solved, num of iterations is " 
+                       std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint]
+                                 << "_" << n_time <<  " solved, num of iterations is "
                                  << lp[current_timepoint][n_type][n_time].iteration() << std::endl;
                     }
                     else
@@ -414,17 +414,17 @@ int main(int argc, const char* const argv[])
                        {
                           (fail[stat_idx])++;
                           (bigErr[stat_idx])++;
-                          std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] << "_" << n_time <<  " solved " 
-                                    << "but does not have the same objValue with original, num of iterations is " 
-                                    << lp[current_timepoint][n_type][n_time].iteration() <<  ", the difference is " 
+                          std::cout << "lp_" << type[n_type] << "_" << timepoint[current_timepoint] << "_" << n_time <<  " solved "
+                                    << "but does not have the same objValue with original, num of iterations is "
+                                    << lp[current_timepoint][n_type][n_time].iteration() <<  ", the difference is "
                                     << abs(lp[current_timepoint][n_type][n_time].objValue(), optObjValue)  << std::endl;
                        }
                     }
                  }
               }catch(SPxException& x) {
                  (fail[stat_idx])++;
-                 std::cout << "exception caught by" << " lp_" 
-                           << type[n_type] << "_" << timepoint[current_timepoint] << "_" 
+                 std::cout << "exception caught by" << " lp_"
+                           << type[n_type] << "_" << timepoint[current_timepoint] << "_"
                            << n_time << " :"  << x.what() << std::endl;
                  std::string exceptionContent(x.what());
                  if(exceptionContent.find("XSOLVE21") != std::string::npos || exceptionContent.find("singular") != std::string::npos)
@@ -459,7 +459,7 @@ int main(int argc, const char* const argv[])
                   << std::setw(9) << std::right <<  fail[idx]
                   << std::setw(19) << std::right <<  singularBasis[idx]
                   << std::setw(10) << std::right <<  bigErr[idx]
-                  << std::endl;    
+                  << std::endl;
      }
   }
 
@@ -486,7 +486,7 @@ int main(int argc, const char* const argv[])
             << std::setw(9) << std::right <<  sum_fail
             << std::setw(19) << std::right <<  sum_singularBasis
             << std::setw(10) << std::right <<  sum_bigErr
-            << std::endl;    
+            << std::endl;
   std::cout << "---------------------------------------------------------------------------------------\n";
 
 }
@@ -601,7 +601,7 @@ void set_ratio_tester(SoPlex& work, const int ratiotest)
    }
 }
 
-void set_s_g_c_p_t    (SoPlex& work, 
+void set_s_g_c_p_t    (SoPlex& work,
 		       const int simplifying,
 		       const int scaling,
 		       const int starting,
@@ -630,4 +630,4 @@ double abs(double a, double b)
 //Emacs tab-width:8
 //Emacs indent-tabs-mode:nil
 //Emacs End:
-//----------------------------------------------------------------------------- 
+//-----------------------------------------------------------------------------

@@ -39,7 +39,8 @@ namespace soplex
 
    See SPxRatioTester for a class documentation.
 */
-class SPxDefaultRT : public SPxRatioTester
+  template <class R>
+class SPxDefaultRT : public SPxRatioTester<R>
 {
 public:
 
@@ -48,18 +49,18 @@ public:
    //@{
    /// default constructor
    SPxDefaultRT()
-      : SPxRatioTester("Default")
+      : SPxRatioTester<R>("Default")
    {}
    /// copy constructor
    SPxDefaultRT(const SPxDefaultRT& old)
-      : SPxRatioTester(old)
+      : SPxRatioTester<R>(old)
    {}
    /// assignment operator
    SPxDefaultRT& operator=( const SPxDefaultRT& rhs)
    {
       if(this != &rhs)
       {
-         SPxRatioTester::operator=(rhs);
+         SPxRatioTester<R>::operator=(rhs);
       }
 
       return *this;
@@ -68,7 +69,7 @@ public:
    virtual ~SPxDefaultRT()
    {}
    /// clone function for polymorphism
-   inline virtual SPxRatioTester* clone() const
+   inline virtual SPxRatioTester<R>* clone() const
    {
       return new SPxDefaultRT(*this);
    }
