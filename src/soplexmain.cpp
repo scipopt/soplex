@@ -271,11 +271,11 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
 
    if( real )
    {
-     DVectorBase<Real> primal(soplex.numColsT());
+     DVectorBase<Real> primal(soplex.numCols());
       if( soplex.getPrimalRayT(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numCols(); ++i )
          {
             if ( isNotZero( primal[i] ) )
             {
@@ -293,7 +293,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
       {
          int nNonzeros = 0;
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numCols(); ++i )
          {
             if ( isNotZero( primal[i] ) )
             {
@@ -313,11 +313,11 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
    }
    if( rational )
    {
-     DVectorRational primal(soplex.numColsT());
+     DVectorRational primal(soplex.numCols());
       if( soplex.getPrimalRayRational(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numCols(); ++i )
          {
             if( primal[i] != (Rational) 0 )
             {
@@ -394,11 +394,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
 
-         DVector redcost(soplex.numColsT());
+         DVector redcost(soplex.numCols());
          if( soplex.getRedCostT(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
-            for( int i = 0; i < soplex.numColsT(); ++i )
+            for( int i = 0; i < soplex.numCols(); ++i )
             {
                if ( isNotZero( redcost[i] ) )
                {
@@ -444,11 +444,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
          }
          MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
 
-         DVectorRational redcost(soplex.numColsT());
+         DVectorRational redcost(soplex.numCols());
          if( soplex.getRedCostRational(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
-            for( int i = 0; i < soplex.numColsT(); ++i )
+            for( int i = 0; i < soplex.numCols(); ++i )
             {
                if ( redcost[i] != (Rational) 0 )
                   MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl; )
@@ -945,7 +945,7 @@ int main(int argc, char* argv[])
          << " seconds.\n\n" );
 
       MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRowsT() << " rows "
-         << soplex->numColsT() << " columns and " << soplex->numNonzerosT() << " nonzeros.\n\n" );
+         << soplex->numCols() << " columns and " << soplex->numNonzerosT() << " nonzeros.\n\n" );
 
       // solve the LP
       soplex->optimize();

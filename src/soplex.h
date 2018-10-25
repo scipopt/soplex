@@ -119,7 +119,7 @@ public:
 
    /// Templated function that
    /// returns number of columns
-   int numColsT() const;
+   int numCols() const;
    int numColsReal() const;     /* For SCIP compatibility */
    int numColsRational() const;
 

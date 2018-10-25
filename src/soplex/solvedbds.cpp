@@ -309,7 +309,7 @@ namespace soplex
     if( _hasBasis )
       {
         basisStatusRows.reSize(numRowsT());
-        basisStatusCols.reSize(numColsT());
+        basisStatusCols.reSize(numCols());
         _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                          basisStatusCols.size());
       }
@@ -716,7 +716,7 @@ namespace soplex
     _decompReducedProbRows = 0;
     spx_alloc(_decompReducedProbRows, numRowsT());
     _decompReducedProbCols = 0;
-    spx_alloc(_decompReducedProbCols, numColsT());
+    spx_alloc(_decompReducedProbCols, numCols());
 
     // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
     // a positive reduced cost.
@@ -727,7 +727,7 @@ namespace soplex
     // allocating memory for the violated bounds and rows arrays
     _decompViolatedBounds = 0;
     _decompViolatedRows = 0;
-    spx_alloc(_decompViolatedBounds, numColsT());
+    spx_alloc(_decompViolatedBounds, numCols());
     spx_alloc(_decompViolatedRows, numRowsT());
     _nDecompViolBounds = 0;
     _nDecompViolRows = 0;
@@ -747,7 +747,7 @@ namespace soplex
     int nnonposind = 0;
     int ncompatind = 0;
 
-    assert(_solver.nCols() == numColsT());
+    assert(_solver.nCols() == numCols());
     assert(_solver.nRows() == numRowsT());
 
     // capturing the basis used for the transformation
@@ -763,12 +763,12 @@ namespace soplex
 
     // retreiving the basis information
     _basisStatusRows.reSize(numRowsT());
-    _basisStatusCols.reSize(numColsT());
+    _basisStatusCols.reSize(numCols());
     _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
     // get the indices of the rows with positive dual multipliers and columns with positive reduced costs.
-    spx_alloc(nonposind, numColsT());
-    spx_alloc(colsforremoval, numColsT());
+    spx_alloc(nonposind, numCols());
+    spx_alloc(colsforremoval, numCols());
     if( !stop )
       _getZeroDualMultiplierIndices(_decompFeasVector, nonposind, colsforremoval, &nnonposind, stop);
 
@@ -784,7 +784,7 @@ namespace soplex
 
     int* compatboundcons = 0;
     int ncompatboundcons = 0;
-    spx_alloc(compatboundcons, numColsT());
+    spx_alloc(compatboundcons, numCols());
 
     LPRowSet boundcons;
 
@@ -1217,7 +1217,7 @@ namespace soplex
     else if( _scaler != 0 )
       {
         _basisStatusRows.reSize(numRowsT());
-        _basisStatusCols.reSize(numColsT());
+        _basisStatusCols.reSize(numCols());
         assert(_basisStatusRows.size() == solver.nRows());
         assert(_basisStatusCols.size() == solver.nCols());
 
@@ -1490,7 +1490,7 @@ namespace soplex
               }
             else
               {
-                for( int j = 0; j < numColsT(); j++ )
+                for( int j = 0; j < numCols(); j++ )
                   {
                     if( isZero(_solver.fVec()[i], feastol) )
                       norm += spxAbs(y[j])*spxAbs(y[j]);
@@ -1693,7 +1693,7 @@ namespace soplex
 
     bool delCol;
 
-    _decompReducedProbColIDs.reSize(numColsT());
+    _decompReducedProbColIDs.reSize(numCols());
     *nnonposind = 0;
 
     // iterating over all columns in the basis matrix
@@ -1780,7 +1780,7 @@ namespace soplex
     for( int i = 0; i < numRowsT(); ++i )
       activerows[i] = false;
 
-    for( int i = 0; i < numColsT(); ++i )
+    for( int i = 0; i < numCols(); ++i )
       {
         if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
           {
@@ -1852,7 +1852,7 @@ namespace soplex
           }
         else
           {
-            for( int j = 0; j < numColsT(); j++ )
+            for( int j = 0; j < numCols(); j++ )
               {
                 if( !isZero(y[j], feastol) )
                   newRowVector.add(j, y[j]);
@@ -1926,7 +1926,7 @@ namespace soplex
 #endif
 #endif
 
-    SSVector y(numColsT());
+    SSVector y(numCols());
     y.unSetup();
 
     // the rhs of this calculation is the original objective coefficient vector
@@ -1940,11 +1940,11 @@ namespace soplex
         MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
       }
 
-    _transformedObj.reDim(numColsT());
+    _transformedObj.reDim(numCols());
     if( y.isSetup() )
       {
         int ycount = 0;
-        for( int i = 0; i < numColsT(); i++ )
+        for( int i = 0; i < numCols(); i++ )
           {
             if( ycount < y.size() && i == y.index(ycount) )
               {
@@ -1957,7 +1957,7 @@ namespace soplex
       }
     else
       {
-        for( int i = 0; i < numColsT(); i++ )
+        for( int i = 0; i < numCols(); i++ )
           {
             if( isZero(y[i], feastol) )
               _transformedObj[i] = 0.0;
@@ -1995,14 +1995,14 @@ namespace soplex
 #endif
 
     bool compatible;
-    SSVector y(numColsT());
+    SSVector y(numCols());
     y.unSetup();
 
-    _decompReducedProbColRowIDs.reSize(numColsT());
+    _decompReducedProbColRowIDs.reSize(numCols());
 
 
     // identifying the compatible bound constraints
-    for( int i = 0; i < numColsT(); i++ )
+    for( int i = 0; i < numCols(); i++ )
       {
         _decompReducedProbColRowIDs[i].inValidate();
 
@@ -2047,7 +2047,7 @@ namespace soplex
           }
         else
           {
-            for( int j = 0; j < numColsT(); j++ )
+            for( int j = 0; j < numCols(); j++ )
               {
                 if( !isZero(y[j], feastol) )
                   {
@@ -2128,8 +2128,8 @@ namespace soplex
     DSVector slackColCoeff;
 
     // setting the objective coefficients of the original variables to zero
-    DVector newObjCoeff(numColsT());
-    for( int i = 0; i < numColsT(); i++ )
+    DVector newObjCoeff(numCols());
+    for( int i = 0; i < numCols(); i++ )
       {
         _compSolver.changeBounds(_realLP->cId(i), Real(-infinity), Real(infinity));
         newObjCoeff[i] = 0;

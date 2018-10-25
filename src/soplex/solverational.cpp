@@ -52,7 +52,7 @@ namespace soplex
       else if( _hasBasis )
       {
          _basisStatusRows.reSize(numRowsT());
-         _basisStatusCols.reSize(numColsT());
+         _basisStatusCols.reSize(numCols());
          _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
       }
 
@@ -1630,7 +1630,7 @@ namespace soplex
                   _realLP->addRow(LPRowReal(0.0, DSVectorReal(liftingRowVector), 0.0));
 
                   assert(liftingColumnIndex == numColsRational() - 1);
-                  assert(liftingColumnIndex == numColsT() - 1);
+                  assert(liftingColumnIndex == numCols() - 1);
 
                   _rationalLP->changeBounds(liftingColumnIndex, _rationalNegInfty, _rationalPosInfty);
                   _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlexBase<R>::INFTY), realParam(SoPlexBase<R>::INFTY));
@@ -1697,7 +1697,7 @@ namespace soplex
                   _realLP->addRow(LPRowReal(0.0, DSVectorReal(liftingRowVector), 0.0));
 
                   assert(liftingColumnIndex == numColsRational() - 1);
-                  assert(liftingColumnIndex == numColsT() - 1);
+                  assert(liftingColumnIndex == numCols() - 1);
 
                   _rationalLP->changeBounds(liftingColumnIndex, _rationalNegInfty, _rationalPosInfty);
                   _realLP->changeBounds(liftingColumnIndex, -realParam(SoPlexBase<R>::INFTY), realParam(SoPlexBase<R>::INFTY));
