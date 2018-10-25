@@ -3453,7 +3453,7 @@ namespace soplex
 
   /// gets violation of bounds; returns true on success
   template <>
-	bool SoPlexBase<Real>::getBoundViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
@@ -7208,7 +7208,7 @@ namespace soplex
         Real sumviol;
 
         os << "Violations (real)   : \n";
-        if( getBoundViolationT(maxviol, sumviol) )
+        if( getBoundViolation(maxviol, sumviol) )
           os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum bound     : - / -\n";

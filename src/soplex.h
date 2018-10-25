@@ -643,7 +643,7 @@ public:
    bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
-   bool getBoundViolationT(R& maxviol, R& sumviol);
+   bool getBoundViolation(R& maxviol, R& sumviol);
    bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of constraints; returns true on success

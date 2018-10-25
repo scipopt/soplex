@@ -405,7 +405,7 @@ namespace soplex
 
       if( _solReal._isPrimalFeasible )
       {
-         (void) getBoundViolationT(boundviol, sumviol);
+         (void) getBoundViolation(boundviol, sumviol);
          (void) getRowViolationT(rowviol, sumviol);
       }
       if( _solReal._isDualFeasible )
