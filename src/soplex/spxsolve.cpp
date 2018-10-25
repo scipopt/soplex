@@ -1892,7 +1892,6 @@ namespace soplex
     return status();
   }
 
-  /// There are three getDualFarkas now. getDualFarkasT, getDualFarkas, and getDualfarkas. Wow!
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualfarkas (Vector& p_vector) const
   {

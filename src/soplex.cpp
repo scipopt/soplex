@@ -3430,29 +3430,23 @@ namespace soplex
 
   /// gets the Farkas proof if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getDualFarkasT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getDualFarkas(VectorBase<Real>& vector)
   {
     if( hasDualFarkas() && vector.dim() >= numRowsT() )
       {
         _syncRealSolution();
-        _solReal.getDualFarkas(vector);
+        _solReal.getDualFarkasSol(vector);
         return true;
       }
     else
       return false;
   }
 
+  // Wrapping the function for reverse Compatibility
   template <>
 	bool SoPlexBase<Real>::getDualFarkasReal(VectorBase<Real>& vector)
   {
-    if( hasDualFarkas() && vector.dim() >= numRowsT() )
-      {
-        _syncRealSolution();
-        _solReal.getDualFarkas(vector);
-        return true;
-      }
-    else
-      return false;
+    return getDualFarkas(vector);
   }
 
 
@@ -3759,7 +3753,7 @@ namespace soplex
     if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational() )
       {
         _syncRationalSolution();
-        _solRational.getDualFarkas(vector);
+        _solRational.getDualFarkasSol(vector);
         return true;
       }
     else

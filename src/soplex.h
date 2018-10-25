@@ -638,7 +638,7 @@ public:
    bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualFarkasT(VectorBase<R>& vector);
+   bool getDualFarkas(VectorBase<R>& vector);
    bool getDualFarkasReal(VectorBase<Real>& vector);
    bool getDualFarkasRational(VectorRational& vector);
 

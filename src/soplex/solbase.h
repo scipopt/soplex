@@ -113,7 +113,7 @@ namespace soplex
       }
 
       /// gets the Farkas proof if available; returns true on success
-      bool getDualFarkas(VectorBase<R>& vector) const
+      bool getDualFarkasSol(VectorBase<R>& vector) const
       {
 	if( _hasDualFarkas )
 	  vector = _dualFarkas;

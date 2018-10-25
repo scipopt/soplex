@@ -362,7 +362,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
    if( real )
    {
       DVector dual(soplex.numRowsT());
-      if( soplex.getDualFarkasT(dual) )
+      if( soplex.getDualFarkas(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
          for( int i = 0; i < soplex.numRowsT(); ++i )
