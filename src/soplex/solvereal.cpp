@@ -249,7 +249,7 @@ namespace soplex
          // load real LP and basis if available
          if( _hasBasis )
          {
-            assert(_basisStatusRows.size() == numRowsT());
+            assert(_basisStatusRows.size() == numRows());
             assert(_basisStatusCols.size() == this->numCols());
 
             _solver.loadLP(*_realLP, false);
@@ -330,7 +330,7 @@ namespace soplex
          DVectorReal dual(_solver.nRows());
          DVectorReal redCost(_solver.nCols());
 
-         _basisStatusRows.reSize(numRowsT());
+         _basisStatusRows.reSize(numRows());
          _basisStatusCols.reSize(numCols());
          assert(_basisStatusRows.size() >= _solver.nRows());
          assert(_basisStatusCols.size() >= _solver.nCols());
@@ -368,7 +368,7 @@ namespace soplex
       // if the original problem is not in the solver because of scaling, we also need to store the basis
       else if( _scaler != 0 )
       {
-         _basisStatusRows.reSize(numRowsT());
+         _basisStatusRows.reSize(numRows());
          _basisStatusCols.reSize(numCols());
          assert(_basisStatusRows.size() == _solver.nRows());
          assert(_basisStatusCols.size() == _solver.nCols());
@@ -441,7 +441,7 @@ namespace soplex
   void SoPlexBase<Real>::_storeSolutionReal(bool verify)
    {
       // prepare storage for basis (enough to fit the original basis)
-      _basisStatusRows.reSize(numRowsT());
+      _basisStatusRows.reSize(numRows());
       _basisStatusCols.reSize(numCols());
 
       // prepare storage for the solution data (only in transformed space due to unscaling), w/o setting it to zero
@@ -559,7 +559,7 @@ namespace soplex
          assert(_realLP == &_solver);
 
          // load unsimplified basis into solver
-         assert(_basisStatusRows.size() == numRowsT());
+         assert(_basisStatusRows.size() == numRows());
          assert(_basisStatusCols.size() == this->numCols());
          _solver.setBasisStatus(SPxBasisBase<Real>::REGULAR);
          _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
@@ -581,7 +581,7 @@ namespace soplex
          _verifySolutionReal();
 
       assert(_solver.nCols() == this->numCols());
-      assert(_solver.nRows() == numRowsT());
+      assert(_solver.nRows() == numRows());
    }
 
 
@@ -593,13 +593,13 @@ namespace soplex
       assert(_simplifier->result() == SPxSimplifier<R>::VANISHED);
 
       // prepare storage for basis (enough to fit the original basis)
-      _basisStatusRows.reSize(numRowsT());
+      _basisStatusRows.reSize(numRows());
       _basisStatusCols.reSize(numCols());
 
       // prepare storage for the solution data and initialize it to zero
       _solReal._primal.reDim(numCols(), true);
-      _solReal._slacks.reDim(numRowsT(), true);
-      _solReal._dual.reDim(numRowsT(), true);
+      _solReal._slacks.reDim(numRows(), true);
+      _solReal._dual.reDim(numRows(), true);
       _solReal._redCost.reDim(numCols(), true);
 
       // load original LP and setup slack basis for unsimplifying

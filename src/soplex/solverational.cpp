@@ -51,7 +51,7 @@ namespace soplex
       // during the rational solve, we always store basis information in the basis arrays
       else if( _hasBasis )
       {
-         _basisStatusRows.reSize(numRowsT());
+         _basisStatusRows.reSize(numRows());
          _basisStatusCols.reSize(numCols());
          _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
       }

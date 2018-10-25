@@ -113,7 +113,7 @@ public:
    //@{
 
    /// returns number of rows
-   int numRowsT() const;
+   int numRows() const;
    int numRowsReal() const;     /* For SCIP compatibility */
    int numRowsRational() const;
 
@@ -362,14 +362,14 @@ public:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsT()
+   /// #numRows()
    void removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
    void removeRowsReal(int idx[], int n, int perm[] = 0);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
    void removeRowRangeReal(int start, int end, int perm[] = 0);
 
@@ -1951,14 +1951,14 @@ private:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsT()
+   /// #numRows()
    void _removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
    void _removeRowsReal(int idx[], int n, int perm[]);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
    void _removeRowRangeReal(int start, int end, int perm[]);
 

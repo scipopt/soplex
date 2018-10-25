@@ -361,11 +361,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( real )
    {
-      DVector dual(soplex.numRowsT());
+      DVector dual(soplex.numRows());
       if( soplex.getDualFarkas(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsT(); ++i )
+         for( int i = 0; i < soplex.numRows(); ++i )
          {
             if ( isNotZero( dual[i] ) )
             {
@@ -381,7 +381,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
       else if( soplex.isDualFeasible() && soplex.getDualT(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsT(); ++i )
+         for( int i = 0; i < soplex.numRows(); ++i )
          {
             if ( isNotZero( dual[i] ) )
             {
@@ -418,11 +418,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( rational )
    {
-      DVectorRational dual(soplex.numRowsT());
+      DVectorRational dual(soplex.numRows());
       if( soplex.getDualFarkasRational(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsT(); ++i )
+         for( int i = 0; i < soplex.numRows(); ++i )
          {
             if( dual[i] != (Rational) 0 )
             {
@@ -944,7 +944,7 @@ int main(int argc, char* argv[])
          << std::scientific << std::setprecision(int(prec))
          << " seconds.\n\n" );
 
-      MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRowsT() << " rows "
+      MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRows() << " rows "
          << soplex->numCols() << " columns and " << soplex->numNonzerosT() << " nonzeros.\n\n" );
 
       // solve the LP
