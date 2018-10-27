@@ -3400,29 +3400,23 @@ namespace soplex
 
   /// gets the vector of reduced cost values if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getRedCostT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getRedCost(VectorBase<Real>& vector)
   {
     if( hasDual() && vector.dim() >= numCols() )
       {
         _syncRealSolution();
-        _solReal.getRedCost(vector);
+        _solReal.getRedCostSol(vector);
         return true;
       }
     else
       return false;
   }
 
+  /// wrapper for backwards compatibility
   template <>
 	bool SoPlexBase<Real>::getRedCostReal(VectorBase<Real>& vector) // For SCIP compatibility
   {
-    if( hasDual() && vector.dim() >= numCols() )
-      {
-        _syncRealSolution();
-        _solReal.getRedCost(vector);
-        return true;
-      }
-    else
-      return false;
+    return getRedCost(vector);
   }
 
 
@@ -3738,7 +3732,7 @@ namespace soplex
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsRational() )
       {
         _syncRationalSolution();
-        _solRational.getRedCost(vector);
+        _solRational.getRedCostSol(vector);
         return true;
       }
     else

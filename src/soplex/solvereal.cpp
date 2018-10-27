@@ -339,7 +339,7 @@ namespace soplex
          _solver.getPrimal(primal);
          _solver.getSlacks(slacks);
          _solver.getDual(dual);
-         _solver.getRedCost(redCost);
+         _solver.getRedCostSol(redCost);
 
          // unscale vectors
          if( _scaler && _solver.isScaled())
@@ -508,7 +508,7 @@ namespace soplex
       _solver.getPrimal(_solReal._primal);
       _solver.getSlacks(_solReal._slacks);
       _solver.getDual(_solReal._dual);
-      _solver.getRedCost(_solReal._redCost);
+      _solver.getRedCostSol(_solReal._redCost);
 
       _hasBasis = true;
 

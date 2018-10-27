@@ -435,7 +435,7 @@ namespace soplex
         DVector reducedLPDualVector(_solver.nRows());
         DVector reducedLPRedcostVector(_solver.nCols());
         _solver.getDual(reducedLPDualVector);
-        _solver.getRedCost(reducedLPRedcostVector);
+        _solver.getRedCostSol(reducedLPRedcostVector);
 
 
         // Using the solution to the reduced problem:
@@ -1182,7 +1182,7 @@ namespace soplex
             solver.getPrimal(primal);
             solver.getSlacks(slacks);
             solver.getDual(dual);
-            solver.getRedCost(redCost);
+            solver.getRedCostSol(redCost);
 
             // unscale vectors
             if( _scaler && solver.isScaled() )
@@ -1309,7 +1309,7 @@ namespace soplex
     DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
 
     // Retrieving the reduced costs for each original problem row.
-    _compSolver.getRedCost(compProbRedcost);
+    _compSolver.getRedCostSol(compProbRedcost);
 
     LPRowSet updaterows;
 
@@ -1590,7 +1590,7 @@ namespace soplex
     if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
       {
         // Retrieving the slacks for each row.
-        _compSolver.getRedCost(compProbRedcost);
+        _compSolver.getRedCostSol(compProbRedcost);
       }
     else
       {

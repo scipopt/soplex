@@ -395,7 +395,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
 
          DVector redcost(soplex.numCols());
-         if( soplex.getRedCostT(redcost) )
+         if( soplex.getRedCost(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
             for( int i = 0; i < soplex.numCols(); ++i )

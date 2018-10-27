@@ -633,7 +633,7 @@ public:
    bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedCostT(VectorBase<R>& vector);
+   bool getRedCost(VectorBase<R>& vector);
    bool getRedCostReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getRedCostRational(VectorRational& vector);
 

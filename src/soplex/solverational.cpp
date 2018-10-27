@@ -3196,7 +3196,7 @@ namespace soplex
                      _solver.getPrimal(tmpPrimal);
                      _solver.getSlacks(tmpSlacks);
                      _solver.getDual(tmpDual);
-                     _solver.getRedCost(tmpRedCost);
+                     _solver.getRedCostSol(tmpRedCost);
 
                      // unscale vectors
                      if( _scaler != 0 )

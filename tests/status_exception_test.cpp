@@ -165,7 +165,7 @@ bool StatusExceptionCheck::checkXSOLVE09()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getRedCost(*p_primal);
+      solver->getRedCostSol(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;

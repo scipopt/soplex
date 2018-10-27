@@ -732,7 +732,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getRedCost (Vector& vector) const;
+    virtual Status getRedCostSol(Vector& vector) const;
 
     /// get primal ray in case of unboundedness.
     ///  @throw SPxStatusException if no problem loaded

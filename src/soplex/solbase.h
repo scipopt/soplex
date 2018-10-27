@@ -99,7 +99,7 @@ namespace soplex
       }
 
       /// gets the vector of reduced cost values if available; returns true on success
-      bool getRedCost(VectorBase<R>& vector) const
+      bool getRedCostSol(VectorBase<R>& vector) const
       {
 	vector = _redCost;
 
