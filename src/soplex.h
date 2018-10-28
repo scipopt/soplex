@@ -628,7 +628,7 @@ public:
    bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
-   bool getDualT(VectorBase<R>& vector);
+   bool getDual(VectorBase<R>& vector);
    bool getDualReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getDualRational(VectorRational& vector);
 

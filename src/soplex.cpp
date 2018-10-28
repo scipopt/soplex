@@ -3371,7 +3371,7 @@ namespace soplex
 
   /// gets the dual solution vector if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getDualT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getDual(VectorBase<Real>& vector)
   {
     if( hasDual() && vector.dim() >= numRows() )
       {
@@ -3386,14 +3386,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP
   {
-    if( hasDual() && vector.dim() >= numRows() )
-      {
-        _syncRealSolution();
-        _solReal.getDualSol(vector);
-        return true;
-      }
-    else
-      return false;
+    return getDual(vector);
   }
 
 

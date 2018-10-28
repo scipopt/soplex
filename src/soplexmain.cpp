@@ -378,7 +378,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
       }
-      else if( soplex.isDualFeasible() && soplex.getDualT(dual) )
+      else if( soplex.isDualFeasible() && soplex.getDual(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
          for( int i = 0; i < soplex.numRows(); ++i )
