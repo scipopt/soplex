@@ -3582,7 +3582,7 @@ namespace soplex
 
   /// gets violation of dual multipliers; returns true on success
   template <>
-	bool SoPlexBase<Real>::getDualViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getDualViolation(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
@@ -7197,7 +7197,7 @@ namespace soplex
           os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";
-        if( getDualViolationT(maxviol, sumviol) )
+        if( getDualViolation(maxviol, sumviol) )
           os << "  Max/sum dual      : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum dual      : - / -\n";

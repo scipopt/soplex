@@ -410,7 +410,7 @@ namespace soplex
       }
       if( _solReal._isDualFeasible )
       {
-         (void) getDualViolationT(dualviol, sumviol);
+         (void) getDualViolation(dualviol, sumviol);
          (void) getRedCostViolationT(redcostviol, sumviol);
       }
 
