@@ -102,7 +102,7 @@ namespace soplex {
     if( SPxSolverBase<Real>::OPTIMAL == soplex.status() )
       {
         soplex.getBoundViolation(maxBoundViolation, sumBoundViolation);
-        soplex.getRowViolationT(maxRowViolation, sumRowViolation);
+        soplex.getRowViolation(maxRowViolation, sumRowViolation);
         soplex.getRedCostViolationT(maxRedCostViolation, sumRedCostViolation);
         soplex.getDualViolationT(maxDualViolation, sumDualViolation);
         if( ! LE(maxBoundViolation, validatetolerance) )

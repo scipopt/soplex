@@ -3486,7 +3486,7 @@ namespace soplex
 
   /// gets violation of constraints; returns true on success
   template <>
-	bool SoPlexBase<Real>::getRowViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
@@ -7189,7 +7189,7 @@ namespace soplex
           os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum bound     : - / -\n";
-        if( getRowViolationT(maxviol, sumviol) )
+        if( getRowViolation(maxviol, sumviol) )
           os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum row       : - / -\n";
