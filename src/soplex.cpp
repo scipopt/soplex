@@ -5566,7 +5566,7 @@ namespace soplex
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
   /// marked as integer; returns true on success
   template <>
-	bool SoPlexBase<Real>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<Real>::writeFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
     ///@todo implement return value
     if( unscale && _realLP->isScaled() )
@@ -5587,27 +5587,11 @@ namespace soplex
     return true;
   }
 
-  // Alias for writeFileT; SCIP
+  // Alias for writeFile; SCIP
   template <>
 	bool SoPlexBase<Real>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
-    ///@todo implement return value
-    if( unscale && _realLP->isScaled() )
-      {
-        MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
-          SPxLPReal* origLP;
-        origLP = 0;
-        spx_alloc(origLP);
-        origLP = new (origLP) SPxLPReal(*_realLP);
-        origLP->unscaleLP();
-        origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
-        origLP->~SPxLPReal();
-        spx_free(origLP);
-      }
-    else
-      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
-
-    return true;
+    return writeFile(filename, rowNames, colNames, intVars, unscale); 
   }
 
   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
@@ -5954,7 +5938,7 @@ namespace soplex
 
     // write problem in MPS/LP format
     ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-    writeFileT(ofname.c_str(), rowNames, colNames, 0);
+    writeFile(ofname.c_str(), rowNames, colNames, 0);
 
     // write basis
     ofname = std::string(filename) + ".bas";

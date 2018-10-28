@@ -47,7 +47,7 @@ int main()
     * automatically created. */
 
    /* write LP in .lp format */
-   mysoplex.writeFileT("dump.lp", NULL, NULL, NULL);
+   mysoplex.writeFile("dump.lp", NULL, NULL, NULL);
 
    /* solve LP */
    SPxSolver::Status stat;
