@@ -3195,7 +3195,7 @@ namespace soplex
 
                      _solver.getPrimal(tmpPrimal);
                      _solver.getSlacks(tmpSlacks);
-                     _solver.getDual(tmpDual);
+                     _solver.getDualSol(tmpDual);
                      _solver.getRedCostSol(tmpRedCost);
 
                      // unscale vectors
@@ -3229,7 +3229,7 @@ namespace soplex
                else
                {
                   _solver.getPrimal(primal);
-                  _solver.getDual(dual);
+                  _solver.getDualSol(dual);
 
                   // unscale vectors
                   if( _scaler != 0 )
@@ -3250,7 +3250,7 @@ namespace soplex
                if( _simplifier == 0 && boolParam(SoPlexBase<R>::ACCEPTCYCLING) )
                {
                   _solver.getPrimal(primal);
-                  _solver.getDual(dual);
+                  _solver.getDualSol(dual);
 
                   // unscale vectors
                   if( _scaler != 0 )

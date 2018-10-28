@@ -1798,7 +1798,7 @@ namespace soplex
   }
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDual (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualSol(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -2139,7 +2139,7 @@ namespace soplex
     if (p_slacks)
       getSlacks(*p_slacks);
     if (p_dual)
-      getDual(*p_dual);
+      getDualSol(*p_dual);
     if (reduCosts)
       getRedCostSol(*reduCosts);
     return status();

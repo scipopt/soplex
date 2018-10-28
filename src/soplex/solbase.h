@@ -91,7 +91,7 @@ namespace soplex
       }
 
       /// gets the dual solution vector; returns true on success
-      bool getDual(VectorBase<R>& vector) const
+      bool getDualSol(VectorBase<R>& vector) const
       {
 	vector = _dual;
 

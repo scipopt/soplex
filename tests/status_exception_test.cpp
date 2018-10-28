@@ -148,7 +148,7 @@ bool StatusExceptionCheck::checkXSOLVE08()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getDual(*p_primal);
+      solver->getDualSol(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;

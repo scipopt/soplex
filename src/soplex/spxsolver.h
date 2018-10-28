@@ -717,7 +717,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getDual (Vector& vector) const;
+    virtual Status getDualSol(Vector& vector) const;
 
     /// get vector of reduced costs.
     /** This method returns the Status of the basis.

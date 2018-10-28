@@ -434,7 +434,7 @@ namespace soplex
         // get the dual solutions from the reduced problem
         DVector reducedLPDualVector(_solver.nRows());
         DVector reducedLPRedcostVector(_solver.nCols());
-        _solver.getDual(reducedLPDualVector);
+        _solver.getDualSol(reducedLPDualVector);
         _solver.getRedCostSol(reducedLPRedcostVector);
 
 
@@ -504,7 +504,7 @@ namespace soplex
 
             // get the dual solutions from the complementary problem
             DVector compLPDualVector(_compSolver.nRows());
-            _compSolver.getDual(compLPDualVector);
+            _compSolver.getDualSol(compLPDualVector);
 
             // updating the reduced problem
             _updateDecompReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
@@ -1181,7 +1181,7 @@ namespace soplex
 
             solver.getPrimal(primal);
             solver.getSlacks(slacks);
-            solver.getDual(dual);
+            solver.getDualSol(dual);
             solver.getRedCostSol(redCost);
 
             // unscale vectors

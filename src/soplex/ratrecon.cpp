@@ -316,7 +316,7 @@ namespace soplex
       if( solution.hasDual() )
       {
          buffer.reDim((solution._dual).dim());
-         solution.getDual(buffer);
+         solution.getDualSol(buffer);
          reconstructVector(buffer);
          solution._dual = buffer;
 

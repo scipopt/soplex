@@ -338,7 +338,7 @@ namespace soplex
          // get solution data from transformed problem
          _solver.getPrimal(primal);
          _solver.getSlacks(slacks);
-         _solver.getDual(dual);
+         _solver.getDualSol(dual);
          _solver.getRedCostSol(redCost);
 
          // unscale vectors
@@ -507,7 +507,7 @@ namespace soplex
 
       _solver.getPrimal(_solReal._primal);
       _solver.getSlacks(_solReal._slacks);
-      _solver.getDual(_solReal._dual);
+      _solver.getDualSol(_solReal._dual);
       _solver.getRedCostSol(_solReal._redCost);
 
       _hasBasis = true;

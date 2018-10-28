@@ -3376,7 +3376,7 @@ namespace soplex
     if( hasDual() && vector.dim() >= numRows() )
       {
         _syncRealSolution();
-        _solReal.getDual(vector);
+        _solReal.getDualSol(vector);
         return true;
       }
     else
@@ -3389,7 +3389,7 @@ namespace soplex
     if( hasDual() && vector.dim() >= numRows() )
       {
         _syncRealSolution();
-        _solReal.getDual(vector);
+        _solReal.getDualSol(vector);
         return true;
       }
     else
@@ -3716,7 +3716,7 @@ namespace soplex
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
       {
         _syncRationalSolution();
-        _solRational.getDual(vector);
+        _solRational.getDualSol(vector);
         return true;
       }
     else
