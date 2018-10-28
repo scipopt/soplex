@@ -5577,12 +5577,12 @@ namespace soplex
         spx_alloc(origLP);
         origLP = new (origLP) SPxLPReal(*_realLP);
         origLP->unscaleLP();
-        origLP->writeFile(filename, rowNames, colNames, intVars);
+        origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
         origLP->~SPxLPReal();
         spx_free(origLP);
       }
     else
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
+      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
 
     return true;
   }
@@ -5600,12 +5600,12 @@ namespace soplex
         spx_alloc(origLP);
         origLP = new (origLP) SPxLPReal(*_realLP);
         origLP->unscaleLP();
-        origLP->writeFile(filename, rowNames, colNames, intVars);
+        origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
         origLP->~SPxLPReal();
         spx_free(origLP);
       }
     else
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
+      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
 
     return true;
   }
@@ -5622,7 +5622,7 @@ namespace soplex
     else
       {
         assert(_rationalLP != 0);
-        _rationalLP->writeFile(filename, rowNames, colNames, intVars);
+        _rationalLP->writeFileLPBase(filename, rowNames, colNames, intVars);
 
         ///@todo implement return value
         return true;
@@ -5642,7 +5642,7 @@ namespace soplex
     dualLP.setOutstream(spxout);
 
     // swap colnames and rownames
-    dualLP.writeFile(filename, colNames, rowNames);
+    dualLP.writeFileLPBase(filename, colNames, rowNames);
     return true;
   }
 

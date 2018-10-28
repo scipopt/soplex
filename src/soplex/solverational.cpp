@@ -1582,7 +1582,7 @@ namespace soplex
       // start timing
       _statistics->transformTime->start();
 
-      MSG_DEBUG( _realLP->writeFile("beforeLift.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeLift.lp", 0, 0, 0) );
 
       // remember unlifted state
       _beforeLiftCols = numColsRational();
@@ -1738,7 +1738,7 @@ namespace soplex
          _rationalLUSolver.clear();
       }
 
-      MSG_DEBUG( _realLP->writeFile("afterLift.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterLift.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -1760,7 +1760,7 @@ namespace soplex
       _statistics->transformTime->start();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("beforeProject.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeProject.lp", 0, 0, 0) );
 
       assert(numColsRational() >= _beforeLiftCols);
       assert(numRowsRational() >= _beforeLiftRows);
@@ -1839,7 +1839,7 @@ namespace soplex
       }
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("afterProject.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterProject.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -1934,7 +1934,7 @@ namespace soplex
       // start timing
       _statistics->transformTime->start();
 
-      MSG_DEBUG( _realLP->writeFile("beforeTransEqu.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeTransEqu.lp", 0, 0, 0) );
 
       // clear array of slack columns
       _slackCols.clear();
@@ -1992,7 +1992,7 @@ namespace soplex
          _rationalLUSolver.clear();
       }
 
-      MSG_DEBUG( _realLP->writeFile("afterTransEqu.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterTransEqu.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -2013,7 +2013,7 @@ namespace soplex
       _statistics->transformTime->start();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("beforeUntransEqu.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeUntransEqu.lp", 0, 0, 0) );
 
       int numCols = numColsRational();
       int numOrigCols = numColsRational() - _slackCols.num();
@@ -2113,7 +2113,7 @@ namespace soplex
       // objective, bounds, and sides of real LP are restored only after _solveRational()
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("afterUntransEqu.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterUntransEqu.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -2132,7 +2132,7 @@ namespace soplex
       _statistics->transformTime->start();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("beforeTransUnbounded.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeTransUnbounded.lp", 0, 0, 0) );
 
       // store bounds
       _unboundedLower.reDim(numColsRational());
@@ -2232,7 +2232,7 @@ namespace soplex
       }
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("afterTransUnbounded.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterTransUnbounded.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -2248,7 +2248,7 @@ namespace soplex
       _statistics->transformTime->start();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("beforeUntransUnbounded.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeUntransUnbounded.lp", 0, 0, 0) );
 
       int numOrigCols = numColsRational() - 1;
       int numOrigRows = numRowsRational() - 1;
@@ -2358,7 +2358,7 @@ namespace soplex
       _rationalLUSolver.clear();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("afterUntransUnbounded.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterUntransUnbounded.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -2410,7 +2410,7 @@ namespace soplex
       _statistics->transformTime->start();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("beforeTransFeas.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeTransFeas.lp", 0, 0, 0) );
 
       // store objective function
       _feasObj.reDim(numColsRational());
@@ -2659,7 +2659,7 @@ namespace soplex
       _rationalLUSolver.clear();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("afterTransFeas.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterTransFeas.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();
@@ -2675,7 +2675,7 @@ namespace soplex
       _statistics->transformTime->start();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("beforeUntransFeas.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("beforeUntransFeas.lp", 0, 0, 0) );
 
       int numOrigCols = numColsRational() - 1;
 
@@ -2820,7 +2820,7 @@ namespace soplex
       _rationalLUSolver.clear();
 
       // print LP if in debug mode
-      MSG_DEBUG( _realLP->writeFile("afterUntransFeas.lp", 0, 0, 0) );
+      MSG_DEBUG( _realLP->writeFileLPBase("afterUntransFeas.lp", 0, 0, 0) );
 
       // stop timing
       _statistics->transformTime->stop();

@@ -464,7 +464,7 @@ namespace soplex
 
         if( !explicitviol )
           {
-            //_compSolver.writeFile("comp.lp");
+            //_compSolver.writeFileLPBase("comp.lp");
 
             _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
