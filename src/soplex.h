@@ -651,7 +651,7 @@ public:
    bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of reduced costs; returns true on success
-   bool getRedCostViolationT(R& maxviol, R& sumviol);
+   bool getRedCostViolation(R& maxviol, R& sumviol);
    bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of dual multipliers; returns true on success

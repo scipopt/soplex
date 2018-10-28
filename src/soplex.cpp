@@ -3527,7 +3527,7 @@ namespace soplex
 
   /// gets violation of reduced costs; returns true on success
   template <>
-	bool SoPlexBase<Real>::getRedCostViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getRedCostViolation(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
@@ -7193,7 +7193,7 @@ namespace soplex
           os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum row       : - / -\n";
-        if( getRedCostViolationT(maxviol, sumviol) )
+        if( getRedCostViolation(maxviol, sumviol) )
           os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";

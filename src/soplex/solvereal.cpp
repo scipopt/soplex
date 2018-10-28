@@ -411,7 +411,7 @@ namespace soplex
       if( _solReal._isDualFeasible )
       {
          (void) getDualViolation(dualviol, sumviol);
-         (void) getRedCostViolationT(redcostviol, sumviol);
+         (void) getRedCostViolation(redcostviol, sumviol);
       }
 
       if( boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol() || redcostviol >= _solver.opttol())
