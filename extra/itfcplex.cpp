@@ -455,7 +455,7 @@ extern "C" int CPXsolution(
    if (primal != 0)
    {
       Vector tmp(spx->nCols(), primal);
-      spx->getPrimal(tmp);
+      spx->getPrimalSol(tmp);
    }
    if (redcost != 0)
    {
@@ -895,7 +895,7 @@ extern "C" int CPXgetx(
       return CPXERR_BAD_ARGUMENT;
 
    DVector tmp(spx->nCols());
-   spx->getPrimal(tmp);
+   spx->getPrimalSol(tmp);
 
    for(int i = start; i <= end; i++)
       x[i - start] = tmp[i];

@@ -3193,7 +3193,7 @@ namespace soplex
                   {
                      assert(_solver.status() == SPxSolverBase<R>::OPTIMAL);
 
-                     _solver.getPrimal(tmpPrimal);
+                     _solver.getPrimalSol(tmpPrimal);
                      _solver.getSlacks(tmpSlacks);
                      _solver.getDualSol(tmpDual);
                      _solver.getRedCostSol(tmpRedCost);
@@ -3228,7 +3228,7 @@ namespace soplex
                // if the original problem is not in the solver because of scaling, we also need to store the basis
                else
                {
-                  _solver.getPrimal(primal);
+                  _solver.getPrimalSol(primal);
                   _solver.getDualSol(dual);
 
                   // unscale vectors
@@ -3249,7 +3249,7 @@ namespace soplex
             case SPxSolverBase<R>::ABORT_CYCLING:
                if( _simplifier == 0 && boolParam(SoPlexBase<R>::ACCEPTCYCLING) )
                {
-                  _solver.getPrimal(primal);
+                  _solver.getPrimalSol(primal);
                   _solver.getDualSol(dual);
 
                   // unscale vectors

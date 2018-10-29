@@ -315,7 +315,7 @@ bool StatusExceptionCheck::notInitialized()
    solver->setPricer(&pricer);
    solver->setTester(&tester);
    try{
-      solver->getPrimal(*v);
+      solver->getPrimalSol(*v);
    }catch(SPxStatusException& x)
    {
       delete solver;

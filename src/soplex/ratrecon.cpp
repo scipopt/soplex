@@ -295,7 +295,7 @@ namespace soplex
       if( solution.hasPrimal() )
       {
          buffer.reDim((solution._primal).dim());
-         solution.getPrimal(buffer);
+         solution.getPrimalSol(buffer);
          reconstructVector(buffer);
          solution._primal = buffer;
 

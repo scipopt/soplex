@@ -647,7 +647,7 @@ namespace soplex
 
     /// current objective value.
     /**@return Objective value of the current solution vector
-     *         (see #getPrimal()).
+     *         (see #getPrimalSol()).
      */
     virtual Real value();
 
@@ -672,7 +672,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if not initialized
      */
-    virtual Status getPrimal(Vector& vector) const;
+    virtual Status getPrimalSol(Vector& vector) const;
 
     /// get vector of slack variables.
     /** This method returns the Status of the basis.
@@ -736,7 +736,7 @@ namespace soplex
 
     /// get primal ray in case of unboundedness.
     ///  @throw SPxStatusException if no problem loaded
-    virtual Status getPrimalray (Vector& vector) const;
+    virtual Status getPrimalray(Vector& vector) const;
 
     /// get dual farkas proof of infeasibility.
     ///  @throw SPxStatusException if no problem loaded

@@ -685,7 +685,7 @@ const double * OsiSpxSolverInterface::getColSolution() const
 	{
 	  colsol_ = new soplex::DVector( ncols );
 	  if( isProvenOptimal() )
-	    spxsolver_.getPrimal( *colsol_ );
+	    spxsolver_.getPrimalSol( *colsol_ );
 	  else
 	    colsol_->clear();
 	}

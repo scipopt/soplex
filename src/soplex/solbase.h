@@ -54,7 +54,7 @@ namespace soplex
       }
 
       /// gets the primal solution vector; returns true on success
-      bool getPrimal(VectorBase<R>& vector) const
+      bool getPrimalSol(VectorBase<R>& vector) const
       {
 	vector = _primal;
 

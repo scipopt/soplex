@@ -3302,7 +3302,7 @@ namespace soplex
     if( hasPrimal() && vector.dim() >= numCols() )
       {
         _syncRealSolution();
-        _solReal.getPrimal(vector);
+        _solReal.getPrimalSol(vector);
         return true;
       }
     else
@@ -3315,7 +3315,7 @@ namespace soplex
     if( hasPrimal() && vector.dim() >= numCols() )
       {
         _syncRealSolution();
-        _solReal.getPrimal(vector);
+        _solReal.getPrimalSol(vector);
         return true;
       }
     else
@@ -3666,7 +3666,7 @@ namespace soplex
     if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational() )
       {
         _syncRationalSolution();
-        _solRational.getPrimal(vector);
+        _solRational.getPrimalSol(vector);
         return true;
       }
     else

@@ -336,7 +336,7 @@ namespace soplex
          assert(_basisStatusCols.size() >= _solver.nCols());
 
          // get solution data from transformed problem
-         _solver.getPrimal(primal);
+         _solver.getPrimalSol(primal);
          _solver.getSlacks(slacks);
          _solver.getDualSol(dual);
          _solver.getRedCostSol(redCost);
@@ -505,7 +505,7 @@ namespace soplex
       _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
                        _basisStatusRows.size(), _basisStatusCols.size());
 
-      _solver.getPrimal(_solReal._primal);
+      _solver.getPrimalSol(_solReal._primal);
       _solver.getSlacks(_solReal._slacks);
       _solver.getDualSol(_solReal._dual);
       _solver.getRedCostSol(_solReal._redCost);

@@ -500,7 +500,7 @@ namespace soplex
           {
             // get the primal solutions from the complementary problem
             DVector compLPPrimalVector(_compSolver.nCols());
-            _compSolver.getPrimal(compLPPrimalVector);
+            _compSolver.getPrimalSol(compLPPrimalVector);
 
             // get the dual solutions from the complementary problem
             DVector compLPDualVector(_compSolver.nRows());
@@ -518,7 +518,7 @@ namespace soplex
           {
             // getting the primal vector from the reduced problem
             DVector reducedLPPrimalVector(_solver.nCols());
-            _solver.getPrimal(reducedLPPrimalVector);
+            _solver.getPrimalSol(reducedLPPrimalVector);
 
             // checking the optimality of the reduced problem solution with the original problem
             _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
@@ -550,7 +550,7 @@ namespace soplex
 #ifndef NDEBUG
         // computing the solution for the original variables
         DVector reducedLPPrimalVector(_solver.nCols());
-        _solver.getPrimal(reducedLPPrimalVector);
+        _solver.getPrimalSol(reducedLPPrimalVector);
 
         // checking the optimality of the reduced problem solution with the original problem
         _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
@@ -589,7 +589,7 @@ namespace soplex
         _hasSolReal = true;
         // get the primal solutions from the reduced problem
         DVector testPrimalVector(_compSolver.nCols());
-        _compSolver.getPrimal(testPrimalVector);
+        _compSolver.getPrimalSol(testPrimalVector);
         _solReal._primal.reDim(_compSolver.nCols());
         _solReal._primal = testPrimalVector;
 
@@ -1179,7 +1179,7 @@ namespace soplex
           {
             assert(solver.status() == SPxSolverBase<Real>::OPTIMAL || solver.status() == SPxSolverBase<Real>::ABORT_DECOMP || solver.status() == SPxSolverBase<Real>::ABORT_EXDECOMP);
 
-            solver.getPrimal(primal);
+            solver.getPrimalSol(primal);
             solver.getSlacks(slacks);
             solver.getDualSol(dual);
             solver.getRedCostSol(redCost);
@@ -1595,7 +1595,7 @@ namespace soplex
     else
       {
         // Retrieving the primal vector for the complementary problem
-        _compSolver.getPrimal(compProbPrimal);
+        _compSolver.getPrimalSol(compProbPrimal);
         _compSolver.computePrimalActivity(compProbPrimal, compProbActivity);
 
         compProbSlackVal = compProbPrimal[_compSolver.number(_compSlackColId)];
