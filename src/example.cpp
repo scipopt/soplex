@@ -58,7 +58,7 @@ int main()
    /* get solution */
    if( stat == SPxSolver::OPTIMAL )
    {
-      mysoplex.getPrimalT(prim);
+      mysoplex.getPrimal(prim);
       mysoplex.getDual(dual);
       std::cout << "LP solved to optimality.\n";
       std::cout << "Objective value is " << mysoplex.objValueReal() << ".\n";

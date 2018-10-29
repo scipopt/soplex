@@ -615,7 +615,7 @@ public:
    Real objValueReal();
 
    /// gets the primal solution vector if available; returns true on success
-   bool getPrimalT(VectorBase<R>& vector);
+   bool getPrimal(VectorBase<R>& vector);
    bool getPrimalReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getPrimalRational(VectorRational& vector);
 

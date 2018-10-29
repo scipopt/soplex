@@ -3297,7 +3297,7 @@ namespace soplex
 
   /// gets the primal solution vector if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getPrimalT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getPrimal(VectorBase<Real>& vector)
   {
     if( hasPrimal() && vector.dim() >= numCols() )
       {
@@ -3312,14 +3312,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
   {
-    if( hasPrimal() && vector.dim() >= numCols() )
-      {
-        _syncRealSolution();
-        _solReal.getPrimalSol(vector);
-        return true;
-      }
-    else
-      return false;
+    return getPrimalReal(vector);
   }
 
 

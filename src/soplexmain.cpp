@@ -289,7 +289,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
                      << std::setprecision(8) << std::fixed
                      << ")." << std::endl; )
       }
-      else if( soplex.isPrimalFeasible() && soplex.getPrimalT(primal) )
+      else if( soplex.isPrimalFeasible() && soplex.getPrimal(primal) )
       {
          int nNonzeros = 0;
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
