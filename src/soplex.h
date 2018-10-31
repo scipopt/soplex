@@ -124,7 +124,7 @@ public:
    int numColsRational() const;
 
    /// returns number of nonzeros
-   int numNonzerosT() const;
+  int numNonzeros() const;
 
    int numNonzerosRational() const;
 

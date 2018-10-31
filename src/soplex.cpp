@@ -1028,7 +1028,7 @@ namespace soplex
   /// returns number of nonzeros
 
   template <>
-  int SoPlexBase<Real>::numNonzerosT() const
+  int SoPlexBase<Real>::numNonzeros() const
   {
     assert(_realLP != 0);
     return _realLP->nNzos();

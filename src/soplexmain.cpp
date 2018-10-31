@@ -945,7 +945,7 @@ int main(int argc, char* argv[])
          << " seconds.\n\n" );
 
       MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRows() << " rows "
-         << soplex->numCols() << " columns and " << soplex->numNonzerosT() << " nonzeros.\n\n" );
+                 << soplex->numCols() << " columns and " << soplex->numNonzeros() << " nonzeros.\n\n" );
 
       // solve the LP
       soplex->optimize();
