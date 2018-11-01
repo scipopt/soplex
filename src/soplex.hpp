@@ -104,7 +104,7 @@ bool SoPlexBase<R>::getDualFarkas(VectorBase<R>& vector)
 
 /// gets violation of bounds; returns true on success
 template <class R>
-bool SoPlexBase<R>::getBoundViolation(Real& maxviol, Real& sumviol)
+bool SoPlexBase<R>::getBoundViolation(R& maxviol, R& sumviol)
 {
   if( !isPrimalFeasible() )
     return false;
@@ -156,7 +156,7 @@ bool SoPlexBase<R>::getRedCost(VectorBase<R>& vector)
 
 /// gets violation of constraints; returns true on success
 template <class R>
-bool SoPlexBase<R>::getRowViolation(Real& maxviol, Real& sumviol)
+bool SoPlexBase<R>::getRowViolation(R& maxviol, R& sumviol)
 {
   if( !isPrimalFeasible() )
     return false;
@@ -195,3 +195,108 @@ bool SoPlexBase<R>::getRowViolation(Real& maxviol, Real& sumviol)
   return true;
 }
 
+/// gets violation of dual multipliers; returns true on success
+template <class R>
+bool SoPlexBase<R>::getDualViolation(Real& maxviol, Real& sumviol)
+{
+  if( !isDualFeasible() || !hasBasis() )
+    return false;
+
+  _syncRealSolution();
+  VectorBase<R>& dual = _solReal._dual;
+  assert(dual.dim() == numRows());
+
+  maxviol = 0.0;
+  sumviol = 0.0;
+
+  for( int r = numRows() - 1; r >= 0; r-- )
+    {
+      typename SPxSolverBase<R>::VarStatus rowStatus = basisRowStatus(r);
+
+      if( intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        {
+          if( rowStatus != SPxSolverBase<R>::ON_UPPER && rowStatus != SPxSolverBase<R>::FIXED && dual[r] < 0.0 )
+            {
+              sumviol += -dual[r];
+              if( dual[r] < -maxviol )
+                maxviol = -dual[r];
+            }
+          if( rowStatus != SPxSolverBase<R>::ON_LOWER && rowStatus != SPxSolverBase<R>::FIXED && dual[r] > 0.0 )
+            {
+              sumviol += dual[r];
+              if( dual[r] > maxviol )
+                maxviol = dual[r];
+            }
+        }
+      else
+        {
+          if( rowStatus != SPxSolverBase<R>::ON_UPPER && rowStatus != SPxSolverBase<R>::FIXED && dual[r] > 0.0 )
+            {
+              sumviol += dual[r];
+              if( dual[r] > maxviol )
+                maxviol = dual[r];
+            }
+          if( rowStatus != SPxSolverBase<R>::ON_LOWER && rowStatus != SPxSolverBase<R>::FIXED && dual[r] < 0.0 )
+            {
+              sumviol += -dual[r];
+              if( dual[r] < -maxviol )
+                maxviol = -dual[r];
+            }
+        }
+    }
+
+  return true;
+}
+
+/// gets violation of reduced costs; returns true on success
+template <class R>
+bool SoPlexBase<R>::getRedCostViolation(Real& maxviol, Real& sumviol)
+{
+  if( !isDualFeasible() || !hasBasis() )
+    return false;
+
+  _syncRealSolution();
+  VectorBase<R>& redcost = _solReal._redCost;
+  assert(redcost.dim() == numCols());
+
+  maxviol = 0.0;
+  sumviol = 0.0;
+
+  for( int c = numCols() - 1; c >= 0; c-- )
+    {
+      typename SPxSolverBase<R>::VarStatus colStatus = basisColStatus(c);
+
+      if( intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        {
+          if( colStatus != SPxSolverBase<R>::ON_UPPER && colStatus != SPxSolverBase<R>::FIXED && redcost[c] < 0.0 )
+            {
+              sumviol += -redcost[c];
+              if( redcost[c] < -maxviol )
+                maxviol = -redcost[c];
+            }
+          if( colStatus != SPxSolverBase<R>::ON_LOWER && colStatus != SPxSolverBase<R>::FIXED && redcost[c] > 0.0 )
+            {
+              sumviol += redcost[c];
+              if( redcost[c] > maxviol )
+                maxviol = redcost[c];
+            }
+        }
+      else
+        {
+          if( colStatus != SPxSolverBase<R>::ON_UPPER && colStatus != SPxSolverBase<R>::FIXED && redcost[c] > 0.0 )
+            {
+              sumviol += redcost[c];
+              if( redcost[c] > maxviol )
+                maxviol = redcost[c];
+            }
+          if( colStatus != SPxSolverBase<R>::ON_LOWER && colStatus != SPxSolverBase<R>::FIXED && redcost[c] < 0.0 )
+            {
+              sumviol += -redcost[c];
+              if( redcost[c] < -maxviol )
+                maxviol = -redcost[c];
+            }
+        }
+    }
+
+  return true;
+}
