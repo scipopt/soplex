@@ -1893,7 +1893,7 @@ namespace soplex
   }
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualfarkas (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualfarkasSol(Vector& p_vector) const
   {
 
     assert(isInitialized());
