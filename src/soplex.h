@@ -2328,5 +2328,8 @@ private:
   /* Backwards compatibility */
   typedef SoPlexBase<Real> SoPlex;
 
+  // A header file containing all the general templated functions
+  #include "soplex.hpp"
+
 }
 #endif // _SOPLEX_H_
