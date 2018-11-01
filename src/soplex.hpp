@@ -1,4 +1,4 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+4/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                                                           */
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
@@ -34,3 +34,68 @@ int SoPlexBase<R>::numRows() const
   return _realLP->nRows();
 }
 
+/// returns number of nonzeros
+template <class R>
+int SoPlexBase<R>::numNonzeros() const
+{
+  assert(_realLP != 0);
+  return _realLP->nNzos();
+}
+
+/// gets the primal solution vector if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getPrimal(VectorBase<R>& vector)
+{
+  if( hasPrimal() && vector.dim() >= numCols() )
+    {
+      _syncRealSolution();
+      _solReal.getPrimalSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+/// gets the primal ray if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getPrimalRay(VectorBase<R>& vector)
+{
+  if( hasPrimalRay() && vector.dim() >= numCols() )
+    {
+      _syncRealSolution();
+      _solReal.getPrimalRaySol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+/// gets the dual solution vector if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getDual(VectorBase<R>& vector)
+{
+  if( hasDual() && vector.dim() >= numRows() )
+    {
+      _syncRealSolution();
+      _solReal.getDualSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+/// gets the vector of reduced cost values if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getRedCost(VectorBase<R>& vector)
+{
+  if( hasDual() && vector.dim() >= numCols() )
+    {
+      _syncRealSolution();
+      _solReal.getRedCostSol(vector);
+      return true;
+    }
+  else
+    return false;
+}

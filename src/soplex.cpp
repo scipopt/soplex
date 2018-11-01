@@ -1007,16 +1007,6 @@ namespace soplex
   }
 
 
-
-  /// returns number of nonzeros
-
-  template <>
-  int SoPlexBase<Real>::numNonzeros() const
-  {
-    assert(_realLP != 0);
-    return _realLP->nNzos();
-  }
-
   /// returns smallest non-zero element in absolute value
   template <>
   Real SoPlexBase<Real>::minAbsNonzeroReal() const
@@ -3277,21 +3267,6 @@ namespace soplex
   }
 
 
-
-  /// gets the primal solution vector if available; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getPrimal(VectorBase<Real>& vector)
-  {
-    if( hasPrimal() && vector.dim() >= numCols() )
-      {
-        _syncRealSolution();
-        _solReal.getPrimalSol(vector);
-        return true;
-      }
-    else
-      return false;
-  }
-
   template <>
 	bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
   {
@@ -3314,22 +3289,6 @@ namespace soplex
       return false;
   }
 
-
-
-  /// gets the primal ray if available; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getPrimalRay(VectorBase<Real>& vector)
-  {
-    if( hasPrimalRay() && vector.dim() >= numCols() )
-      {
-        _syncRealSolution();
-        _solReal.getPrimalRaySol(vector);
-        return true;
-      }
-    else
-      return false;
-  }
-
   template <>
   bool SoPlexBase<Real>::getPrimalRayReal(VectorBase<Real>& vector)
   {
@@ -3338,20 +3297,6 @@ namespace soplex
 
 
 
-  /// gets the dual solution vector if available; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getDual(VectorBase<Real>& vector)
-  {
-    if( hasDual() && vector.dim() >= numRows() )
-      {
-        _syncRealSolution();
-        _solReal.getDualSol(vector);
-        return true;
-      }
-    else
-      return false;
-  }
-
   template <>
 	bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP
   {
@@ -3359,20 +3304,6 @@ namespace soplex
   }
 
 
-
-  /// gets the vector of reduced cost values if available; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getRedCost(VectorBase<Real>& vector)
-  {
-    if( hasDual() && vector.dim() >= numCols() )
-      {
-        _syncRealSolution();
-        _solReal.getRedCostSol(vector);
-        return true;
-      }
-    else
-      return false;
-  }
 
   /// wrapper for backwards compatibility
   template <>
