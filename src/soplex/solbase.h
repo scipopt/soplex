@@ -76,7 +76,7 @@ namespace soplex
       }
 
       /// gets the primal unbounded ray if available; returns true on success
-      bool getPrimalRay(VectorBase<R>& vector) const
+      bool getPrimalRaySol(VectorBase<R>& vector) const
       {
 	if( _hasPrimalRay )
 	  vector = _primalRay;
