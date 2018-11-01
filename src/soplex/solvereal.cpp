@@ -32,7 +32,7 @@ namespace soplex
 
   /// solves real LP
   template <>
-  void SoPlexBase<Real>::_optimizeT()
+  void SoPlexBase<Real>::_optimize()
    {
       assert(_realLP != 0);
       assert(_realLP == &_solver);

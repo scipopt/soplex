@@ -3174,7 +3174,7 @@ namespace soplex
 
         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-        _optimizeT();
+        _optimize();
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
         _checkBasisScaling();
 #endif

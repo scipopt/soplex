@@ -2149,7 +2149,7 @@ private:
    //@{
 
    /// solves the templated LP
-   void _optimizeT();
+   void _optimize();
 
    /// temporary fix for Rational
    void _optimizeRational();
