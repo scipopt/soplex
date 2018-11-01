@@ -5570,7 +5570,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
-    return writeFile(filename, rowNames, colNames, intVars, unscale); 
+    return writeFile(filename, rowNames, colNames, intVars, unscale);
   }
 
   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
