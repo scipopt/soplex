@@ -738,7 +738,7 @@ namespace soplex
 
     /// get dual farkas proof of infeasibility.
     ///  @throw SPxStatusException if no problem loaded
-    virtual Status getDualfarkas (Vector& vector) const;
+    virtual Status getDualfarkas(Vector& vector) const;
 
     /// print display line of flying table
     virtual void printDisplayLine(const bool force = false, const bool forceHead = false);
