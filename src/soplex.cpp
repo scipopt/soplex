@@ -991,16 +991,6 @@ namespace soplex
       }
   }
 
-
-
-  /// returns number of rows
-  template <>
-  int SoPlexBase<Real>::numRows() const
-  {
-    assert(_realLP != 0);
-    return _realLP->nRows();
-  }
-
   // For SCIP compatibility
   template <>
   int SoPlexBase<Real>::numRowsReal() const
@@ -1008,13 +998,6 @@ namespace soplex
     return numRows();
   }
 
-  /// returns number of columns
-  template <>
-  int SoPlexBase<Real>::numCols() const
-  {
-    assert(_realLP != 0);
-    return _realLP->nCols();
-  }
 
   // Wrapper for reverse compatibility
   template <>

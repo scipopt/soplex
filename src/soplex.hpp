@@ -18,4 +18,19 @@
  */
 
 
+/// returns number of columns
+template <class R>
+int SoPlexBase<R>::numCols() const
+{
+  assert(_realLP != nullptr);
+  return _realLP->nCols();
+}
+
+/// returns number of rows
+template <class R>
+int SoPlexBase<R>::numRows() const
+{
+  assert(_realLP != nullptr);
+  return _realLP->nRows();
+}
 
