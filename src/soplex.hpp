@@ -86,6 +86,60 @@ bool SoPlexBase<R>::getDual(VectorBase<R>& vector)
 }
 
 
+
+/// gets the Farkas proof if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getDualFarkas(VectorBase<R>& vector)
+{
+  if( hasDualFarkas() && vector.dim() >= numRows() )
+    {
+      _syncRealSolution();
+      _solReal.getDualFarkasSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+/// gets violation of bounds; returns true on success
+template <class R>
+bool SoPlexBase<R>::getBoundViolation(Real& maxviol, Real& sumviol)
+{
+  if( !isPrimalFeasible() )
+    return false;
+
+  _syncRealSolution();
+  VectorReal& primal = _solReal._primal;
+  assert(primal.dim() == numCols());
+
+  maxviol = 0.0;
+  sumviol = 0.0;
+
+  for( int i = numCols() - 1; i >= 0; i-- )
+    {
+      Real lower = _realLP->lowerUnscaled(i);
+      Real upper = _realLP->upperUnscaled(i);
+      Real viol = lower - primal[i];
+      if( viol > 0.0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            maxviol = viol;
+        }
+
+      viol = primal[i] - upper;
+      if( viol > 0.0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            maxviol = viol;
+        }
+    }
+
+  return true;
+}
+
 /// gets the vector of reduced cost values if available; returns true on success
 template <class R>
 bool SoPlexBase<R>::getRedCost(VectorBase<R>& vector)
@@ -99,3 +153,45 @@ bool SoPlexBase<R>::getRedCost(VectorBase<R>& vector)
   else
     return false;
 }
+
+/// gets violation of constraints; returns true on success
+template <class R>
+bool SoPlexBase<R>::getRowViolation(Real& maxviol, Real& sumviol)
+{
+  if( !isPrimalFeasible() )
+    return false;
+
+  _syncRealSolution();
+  VectorReal& primal = _solReal._primal;
+  assert(primal.dim() == numCols());
+
+  DVectorReal activity(numRows());
+  _realLP->computePrimalActivity(primal, activity, true);
+  maxviol = 0.0;
+  sumviol = 0.0;
+
+  for( int i = numRows() - 1; i >= 0; i-- )
+    {
+      Real lhs = _realLP->lhsUnscaled(i);
+      Real rhs = _realLP->rhsUnscaled(i);
+
+      Real viol = lhs - activity[i];
+      if( viol > 0.0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            maxviol = viol;
+        }
+
+      viol = activity[i] - rhs;
+      if( viol > 0.0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            maxviol = viol;
+        }
+    }
+
+  return true;
+}
+

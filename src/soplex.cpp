@@ -3314,19 +3314,6 @@ namespace soplex
 
 
 
-  /// gets the Farkas proof if available; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getDualFarkas(VectorBase<Real>& vector)
-  {
-    if( hasDualFarkas() && vector.dim() >= numRows() )
-      {
-        _syncRealSolution();
-        _solReal.getDualFarkasSol(vector);
-        return true;
-      }
-    else
-      return false;
-  }
 
   // Wrapping the function for reverse Compatibility
   template <>
@@ -3337,86 +3324,6 @@ namespace soplex
 
 
 
-  /// gets violation of bounds; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
-  {
-    if( !isPrimalFeasible() )
-      return false;
-
-    _syncRealSolution();
-    VectorReal& primal = _solReal._primal;
-    assert(primal.dim() == numCols());
-
-    maxviol = 0.0;
-    sumviol = 0.0;
-
-    for( int i = numCols() - 1; i >= 0; i-- )
-      {
-        Real lower = _realLP->lowerUnscaled(i);
-        Real upper = _realLP->upperUnscaled(i);
-        Real viol = lower - primal[i];
-        if( viol > 0.0 )
-          {
-            sumviol += viol;
-            if( viol > maxviol )
-              maxviol = viol;
-          }
-
-        viol = primal[i] - upper;
-        if( viol > 0.0 )
-          {
-            sumviol += viol;
-            if( viol > maxviol )
-              maxviol = viol;
-          }
-      }
-
-    return true;
-  }
-
-
-
-  /// gets violation of constraints; returns true on success
-  template <>
-	bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
-  {
-    if( !isPrimalFeasible() )
-      return false;
-
-    _syncRealSolution();
-    VectorReal& primal = _solReal._primal;
-    assert(primal.dim() == numCols());
-
-    DVectorReal activity(numRows());
-    _realLP->computePrimalActivity(primal, activity, true);
-    maxviol = 0.0;
-    sumviol = 0.0;
-
-    for( int i = numRows() - 1; i >= 0; i-- )
-      {
-        Real lhs = _realLP->lhsUnscaled(i);
-        Real rhs = _realLP->rhsUnscaled(i);
-
-        Real viol = lhs - activity[i];
-        if( viol > 0.0 )
-          {
-            sumviol += viol;
-            if( viol > maxviol )
-              maxviol = viol;
-          }
-
-        viol = activity[i] - rhs;
-        if( viol > 0.0 )
-          {
-            sumviol += viol;
-            if( viol > maxviol )
-              maxviol = viol;
-          }
-      }
-
-    return true;
-  }
 
   /// gets violation of reduced costs; returns true on success
   template <>
@@ -3470,8 +3377,6 @@ namespace soplex
 
     return true;
   }
-
-
 
   /// gets violation of dual multipliers; returns true on success
   template <>
