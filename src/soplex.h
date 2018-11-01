@@ -1596,8 +1596,8 @@ private:
    SPxFastRT<R> _ratiotesterFast;
    SPxBoundFlippingRT<R> _ratiotesterBoundFlipping;
 
-   SPxLPReal* _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
-   SPxLPReal* _decompLP; // used to store the original LP for the decomposition dual simplex
+   SPxLPBase<R>* _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
+   SPxLPBase<R>* _decompLP; // used to store the original LP for the decomposition dual simplex
    SPxSimplifier<R>* _simplifier;
    SPxScaler* _scaler;
    SPxStarter<R>* _starter;
