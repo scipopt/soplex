@@ -3312,7 +3312,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
   {
-    return getPrimalReal(vector);
+    return getPrimal(vector);
   }
 
 
