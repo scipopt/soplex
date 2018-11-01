@@ -1793,7 +1793,7 @@ private:
    // problem statistics
    int numProbRows;
    int numProbCols;
-   int numNonzeros;
+   int nNonzeros;
    Real minAbsNonzero;
    Real maxAbsNonzero;
 

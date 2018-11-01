@@ -3615,7 +3615,7 @@ namespace soplex
   {
     numProbRows = _realLP->nRows();
     numProbCols = _realLP->nCols();
-    numNonzeros = _realLP->nNzos();
+    nNonzeros = _realLP->nNzos();
     minAbsNonzero = _realLP->minAbsNzo();
     maxAbsNonzero = _realLP->maxAbsNzo();
 
@@ -3703,10 +3703,10 @@ namespace soplex
        << "                lhs : " << origCountLhs << "\n"
        << "                rhs : " << origCountRhs << "\n"
        << "               free : " << origCountFreeRow << "\n"
-       << "  Nonzeros          : " << numNonzeros << "\n"
-       << "         per column : " << Real(numNonzeros) / Real(numProbCols) << "\n"
-       << "            per row : " << Real(numNonzeros) / Real(numProbRows) << "\n"
-       << "           sparsity : " << Real(numNonzeros) / Real(numProbCols) / Real(numProbRows) << "\n"
+       << "  Nonzeros          : " << nNonzeros << "\n"
+       << "         per column : " << Real(nNonzeros) / Real(numProbCols) << "\n"
+       << "            per row : " << Real(nNonzeros) / Real(numProbRows) << "\n"
+       << "           sparsity : " << Real(nNonzeros) / Real(numProbCols) / Real(numProbRows) << "\n"
        << "    min. abs. value : " << Real(minAbsNonzero) << "\n"
        << "    max. abs. value : " << Real(maxAbsNonzero) << "\n";
   }
