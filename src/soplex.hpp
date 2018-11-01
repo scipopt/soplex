@@ -197,7 +197,7 @@ bool SoPlexBase<R>::getRowViolation(R& maxviol, R& sumviol)
 
 /// gets violation of dual multipliers; returns true on success
 template <class R>
-bool SoPlexBase<R>::getDualViolation(Real& maxviol, Real& sumviol)
+bool SoPlexBase<R>::getDualViolation(R& maxviol, R& sumviol)
 {
   if( !isDualFeasible() || !hasBasis() )
     return false;
@@ -250,7 +250,7 @@ bool SoPlexBase<R>::getDualViolation(Real& maxviol, Real& sumviol)
 
 /// gets violation of reduced costs; returns true on success
 template <class R>
-bool SoPlexBase<R>::getRedCostViolation(Real& maxviol, Real& sumviol)
+bool SoPlexBase<R>::getRedCostViolation(R& maxviol, R& sumviol)
 {
   if( !isDualFeasible() || !hasBasis() )
     return false;
