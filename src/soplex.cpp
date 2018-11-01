@@ -3335,7 +3335,7 @@ namespace soplex
 
   /// gets the primal ray if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getPrimalRayT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getPrimalRay(VectorBase<Real>& vector)
   {
     if( hasPrimalRay() && vector.dim() >= numCols() )
       {
@@ -3350,14 +3350,7 @@ namespace soplex
   template <>
   bool SoPlexBase<Real>::getPrimalRayReal(VectorBase<Real>& vector)
   {
-    if( hasPrimalRay() && vector.dim() >= numCols() )
-      {
-        _syncRealSolution();
-        _solReal.getPrimalRaySol(vector);
-        return true;
-      }
-    else
-      return false;
+    return getPrimalRay(vector);
   }
 
 

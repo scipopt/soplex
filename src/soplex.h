@@ -623,7 +623,7 @@ public:
    bool getSlacksReal(VectorReal& vector);
 
    /// gets the primal ray if available; returns true on success
-   bool getPrimalRayT(VectorBase<R>& vector);
+   bool getPrimalRay(VectorBase<R>& vector);
    bool getPrimalRayReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getPrimalRayRational(VectorRational& vector);
 
