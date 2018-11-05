@@ -30,7 +30,7 @@ namespace soplex
 
     DVector solu( this->nCols() );
 
-    getPrimal( solu );
+    getPrimalSol( solu );
 
     for( int row = 0; row < this->nRows(); ++row )
       {
@@ -67,7 +67,7 @@ namespace soplex
 
     DVector solu( this->nCols() );
 
-    getPrimal( solu );
+    getPrimalSol( solu );
 
     for( int col = 0; col < this->nCols(); ++col )
       {
@@ -97,7 +97,7 @@ namespace soplex
     DVector solu( this->nCols() );
     DVector slacks( this->nRows() );
 
-    getPrimal( solu );
+    getPrimalSol( solu );
     getSlacks( slacks );
 
     for( int row = 0; row < this->nRows(); ++row )

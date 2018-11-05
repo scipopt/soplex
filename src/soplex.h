@@ -113,18 +113,18 @@ public:
    //@{
 
    /// returns number of rows
-   int numRowsT() const;
+   int numRows() const;
    int numRowsReal() const;     /* For SCIP compatibility */
    int numRowsRational() const;
 
    /// Templated function that
    /// returns number of columns
-   int numColsT() const;
+   int numCols() const;
    int numColsReal() const;     /* For SCIP compatibility */
    int numColsRational() const;
 
    /// returns number of nonzeros
-   int numNonzerosT() const;
+  int numNonzeros() const;
 
    int numNonzerosRational() const;
 
@@ -362,14 +362,14 @@ public:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsT()
+   /// #numRows()
    void removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
    void removeRowsReal(int idx[], int n, int perm[] = 0);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
    void removeRowRangeReal(int start, int end, int perm[] = 0);
 
@@ -615,7 +615,7 @@ public:
    Real objValueReal();
 
    /// gets the primal solution vector if available; returns true on success
-   bool getPrimalT(VectorBase<R>& vector);
+   bool getPrimal(VectorBase<R>& vector);
    bool getPrimalReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getPrimalRational(VectorRational& vector);
 
@@ -623,39 +623,39 @@ public:
    bool getSlacksReal(VectorReal& vector);
 
    /// gets the primal ray if available; returns true on success
-   bool getPrimalRayT(VectorBase<R>& vector);
+   bool getPrimalRay(VectorBase<R>& vector);
    bool getPrimalRayReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
-   bool getDualT(VectorBase<R>& vector);
+   bool getDual(VectorBase<R>& vector);
    bool getDualReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedCostT(VectorBase<R>& vector);
+   bool getRedCost(VectorBase<R>& vector);
    bool getRedCostReal(VectorBase<Real>& vector); /* For SCIP compatibility */
    bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualFarkasT(VectorBase<R>& vector);
+   bool getDualFarkas(VectorBase<R>& vector);
    bool getDualFarkasReal(VectorBase<Real>& vector);
    bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
-   bool getBoundViolationT(R& maxviol, R& sumviol);
+   bool getBoundViolation(R& maxviol, R& sumviol);
    bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of constraints; returns true on success
-   bool getRowViolationT(R& maxviol, R& sumviol);
+   bool getRowViolation(R& maxviol, R& sumviol);
    bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of reduced costs; returns true on success
-   bool getRedCostViolationT(R& maxviol, R& sumviol);
+   bool getRedCostViolation(R& maxviol, R& sumviol);
    bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of dual multipliers; returns true on success
-   bool getDualViolationT(R& maxviol, R& sumviol);
+   bool getDualViolation(R& maxviol, R& sumviol);
    bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
    //@}
@@ -847,7 +847,7 @@ public:
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFileT(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
+   bool writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
 
    bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
@@ -1793,7 +1793,7 @@ private:
    // problem statistics
    int numProbRows;
    int numProbCols;
-   int numNonzeros;
+   int nNonzeros;
    Real minAbsNonzero;
    Real maxAbsNonzero;
 
@@ -1951,14 +1951,14 @@ private:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsT()
+   /// #numRows()
    void _removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
    void _removeRowsReal(int idx[], int n, int perm[]);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
    void _removeRowRangeReal(int start, int end, int perm[]);
 
@@ -2149,7 +2149,7 @@ private:
    //@{
 
    /// solves the templated LP
-   void _optimizeT();
+   void _optimize();
 
    /// temporary fix for Rational
    void _optimizeRational();

@@ -47,7 +47,7 @@ int main()
     * automatically created. */
 
    /* write LP in .lp format */
-   mysoplex.writeFileT("dump.lp", NULL, NULL, NULL);
+   mysoplex.writeFile("dump.lp", NULL, NULL, NULL);
 
    /* solve LP */
    SPxSolver::Status stat;
@@ -58,8 +58,8 @@ int main()
    /* get solution */
    if( stat == SPxSolver::OPTIMAL )
    {
-      mysoplex.getPrimalT(prim);
-      mysoplex.getDualT(dual);
+      mysoplex.getPrimal(prim);
+      mysoplex.getDual(dual);
       std::cout << "LP solved to optimality.\n";
       std::cout << "Objective value is " << mysoplex.objValueReal() << ".\n";
       std::cout << "Primal solution is [" << prim[0] << ", " << prim[1] << "].\n";

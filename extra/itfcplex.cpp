@@ -455,7 +455,7 @@ extern "C" int CPXsolution(
    if (primal != 0)
    {
       Vector tmp(spx->nCols(), primal);
-      spx->getPrimal(tmp);
+      spx->getPrimalSol(tmp);
    }
    if (redcost != 0)
    {
@@ -480,7 +480,7 @@ extern "C" int CPXsolution(
       }
       if (dual != 0)
       {
-         spx->getDual(tmp);
+         spx->getDualSol(tmp);
          for(int i = 1; i < rows; i++)
             dual[i - 1] = tmp[i];
       }
@@ -895,7 +895,7 @@ extern "C" int CPXgetx(
       return CPXERR_BAD_ARGUMENT;
 
    DVector tmp(spx->nCols());
-   spx->getPrimal(tmp);
+   spx->getPrimalSol(tmp);
 
    for(int i = start; i <= end; i++)
       x[i - start] = tmp[i];
@@ -917,7 +917,7 @@ extern "C" int CPXgetpi(
       return CPXERR_BAD_ARGUMENT;
 
    DVector tmp(spx->nRows());
-   spx->getDual(tmp);
+   spx->getDualSol(tmp);
 
    for(int i = start; i <= end; i++)
       pi[i - start] = tmp[i + 1];

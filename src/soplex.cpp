@@ -995,7 +995,7 @@ namespace soplex
 
   /// returns number of rows
   template <>
-  int SoPlexBase<Real>::numRowsT() const
+  int SoPlexBase<Real>::numRows() const
   {
     assert(_realLP != 0);
     return _realLP->nRows();
@@ -1005,23 +1005,22 @@ namespace soplex
   template <>
   int SoPlexBase<Real>::numRowsReal() const
   {
-    assert(_realLP != 0);
-    return _realLP->nRows();
+    return numRows();
   }
 
   /// returns number of columns
   template <>
-  int SoPlexBase<Real>::numColsT() const
+  int SoPlexBase<Real>::numCols() const
   {
     assert(_realLP != 0);
     return _realLP->nCols();
   }
 
+  // Wrapper for reverse compatibility
   template <>
   int SoPlexBase<Real>::numColsReal() const
   {
-    assert(_realLP != 0);
-    return _realLP->nCols();
+    return numCols();
   }
 
 
@@ -1029,7 +1028,7 @@ namespace soplex
   /// returns number of nonzeros
 
   template <>
-  int SoPlexBase<Real>::numNonzerosT() const
+  int SoPlexBase<Real>::numNonzeros() const
   {
     assert(_realLP != 0);
     return _realLP->nNzos();
@@ -1997,13 +1996,13 @@ namespace soplex
 
   /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
   /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numRowsT()
+  /// #numRows()
   template <>
   void SoPlexBase<Real>::removeRowsReal(int perm[])
   {
     assert(_realLP != 0);
 
-    const int oldsize = numRowsT();
+    const int oldsize = numRows();
     _removeRowsReal(perm);
 
     if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
@@ -2026,40 +2025,40 @@ namespace soplex
 
 
 
-  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsT() may be passed
+  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
   /// as buffer memory
   template <>
   void SoPlexBase<Real>::removeRowsReal(int idx[], int n, int perm[])
   {
     if( perm == 0 )
       {
-        DataArray< int > p(numRowsT());
-        _idxToPerm(idx, n, p.get_ptr(), numRowsT());
+        DataArray< int > p(numRows());
+        _idxToPerm(idx, n, p.get_ptr(), numRows());
         SoPlexBase<Real>::removeRowsReal(p.get_ptr());
       }
     else
       {
-        _idxToPerm(idx, n, perm, numRowsT());
+        _idxToPerm(idx, n, perm, numRows());
         SoPlexBase<Real>::removeRowsReal(perm);
       }
   }
 
 
 
-  /// removes rows \p start to \p end including both; an array \p perm of size #numRowsT() may be passed as buffer
+  /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
   /// memory
   template <>
   void SoPlexBase<Real>::removeRowRangeReal(int start, int end, int perm[])
   {
     if( perm == 0 )
       {
-        DataArray< int > p(numRowsT());
-        _rangeToPerm(start, end, p.get_ptr(), numRowsT());
+        DataArray< int > p(numRows());
+        _rangeToPerm(start, end, p.get_ptr(), numRows());
         SoPlexBase<Real>::removeRowsReal(p.get_ptr());
       }
     else
       {
-        _rangeToPerm(start, end, perm, numRowsT());
+        _rangeToPerm(start, end, perm, numRows());
         SoPlexBase<Real>::removeRowsReal(perm);
       }
   }
@@ -2099,7 +2098,7 @@ namespace soplex
   {
     assert(_realLP != 0);
 
-    const int oldsize = numColsT();
+    const int oldsize = numCols();
     _removeColsReal(perm);
 
     if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
@@ -2129,33 +2128,33 @@ namespace soplex
   {
     if( perm == 0 )
       {
-        DataArray< int > p(numColsT());
-        _idxToPerm(idx, n, p.get_ptr(), numColsT());
+        DataArray< int > p(numCols());
+        _idxToPerm(idx, n, p.get_ptr(), numCols());
         SoPlexBase<Real>::removeColsReal(p.get_ptr());
       }
     else
       {
-        _idxToPerm(idx, n, perm, numColsT());
+        _idxToPerm(idx, n, perm, numCols());
         SoPlexBase<Real>::removeColsReal(perm);
       }
   }
 
 
 
-  /// removes columns \p start to \p end including both; an array \p perm of size #numColsT() may be passed as
+  /// removes columns \p start to \p end including both; an array \p perm of size #numCols() may be passed as
   /// buffer memory
   template <>
   void SoPlexBase<Real>::removeColRangeReal(int start, int end, int perm[])
   {
     if( perm == 0 )
       {
-        DataArray< int > p(numColsT());
-        _rangeToPerm(start, end, p.get_ptr(), numColsT());
+        DataArray< int > p(numCols());
+        _rangeToPerm(start, end, p.get_ptr(), numCols());
         SoPlexBase<Real>::removeColsReal(p.get_ptr());
       }
     else
       {
-        _rangeToPerm(start, end, perm, numColsT());
+        _rangeToPerm(start, end, perm, numCols());
         SoPlexBase<Real>::removeColsReal(perm);
       }
   }
@@ -3175,7 +3174,7 @@ namespace soplex
 
         _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-        _optimizeT();
+        _optimize();
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
         _checkBasisScaling();
 #endif
@@ -3298,12 +3297,12 @@ namespace soplex
 
   /// gets the primal solution vector if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getPrimalT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getPrimal(VectorBase<Real>& vector)
   {
-    if( hasPrimal() && vector.dim() >= numColsT() )
+    if( hasPrimal() && vector.dim() >= numCols() )
       {
         _syncRealSolution();
-        _solReal.getPrimal(vector);
+        _solReal.getPrimalSol(vector);
         return true;
       }
     else
@@ -3313,14 +3312,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
   {
-    if( hasPrimal() && vector.dim() >= numColsT() )
-      {
-        _syncRealSolution();
-        _solReal.getPrimal(vector);
-        return true;
-      }
-    else
-      return false;
+    return getPrimal(vector);
   }
 
 
@@ -3329,7 +3321,7 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getSlacksReal(VectorReal& vector)
   {
-    if( hasPrimal() && vector.dim() >= numRowsT() )
+    if( hasPrimal() && vector.dim() >= numRows() )
       {
         _syncRealSolution();
         _solReal.getSlacks(vector);
@@ -3343,12 +3335,12 @@ namespace soplex
 
   /// gets the primal ray if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getPrimalRayT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getPrimalRay(VectorBase<Real>& vector)
   {
-    if( hasPrimalRay() && vector.dim() >= numColsT() )
+    if( hasPrimalRay() && vector.dim() >= numCols() )
       {
         _syncRealSolution();
-        _solReal.getPrimalRay(vector);
+        _solReal.getPrimalRaySol(vector);
         return true;
       }
     else
@@ -3358,26 +3350,19 @@ namespace soplex
   template <>
   bool SoPlexBase<Real>::getPrimalRayReal(VectorBase<Real>& vector)
   {
-    if( hasPrimalRay() && vector.dim() >= numColsT() )
-      {
-        _syncRealSolution();
-        _solReal.getPrimalRay(vector);
-        return true;
-      }
-    else
-      return false;
+    return getPrimalRay(vector);
   }
 
 
 
   /// gets the dual solution vector if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getDualT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getDual(VectorBase<Real>& vector)
   {
-    if( hasDual() && vector.dim() >= numRowsT() )
+    if( hasDual() && vector.dim() >= numRows() )
       {
         _syncRealSolution();
-        _solReal.getDual(vector);
+        _solReal.getDualSol(vector);
         return true;
       }
     else
@@ -3387,91 +3372,72 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP
   {
-    if( hasDual() && vector.dim() >= numRowsT() )
-      {
-        _syncRealSolution();
-        _solReal.getDual(vector);
-        return true;
-      }
-    else
-      return false;
+    return getDual(vector);
   }
 
 
 
   /// gets the vector of reduced cost values if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getRedCostT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getRedCost(VectorBase<Real>& vector)
   {
-    if( hasDual() && vector.dim() >= numColsT() )
+    if( hasDual() && vector.dim() >= numCols() )
       {
         _syncRealSolution();
-        _solReal.getRedCost(vector);
+        _solReal.getRedCostSol(vector);
         return true;
       }
     else
       return false;
   }
 
+  /// wrapper for backwards compatibility
   template <>
 	bool SoPlexBase<Real>::getRedCostReal(VectorBase<Real>& vector) // For SCIP compatibility
   {
-    if( hasDual() && vector.dim() >= numColsT() )
-      {
-        _syncRealSolution();
-        _solReal.getRedCost(vector);
-        return true;
-      }
-    else
-      return false;
+    return getRedCost(vector);
   }
 
 
 
   /// gets the Farkas proof if available; returns true on success
   template <>
-	bool SoPlexBase<Real>::getDualFarkasT(VectorBase<Real>& vector)
+	bool SoPlexBase<Real>::getDualFarkas(VectorBase<Real>& vector)
   {
-    if( hasDualFarkas() && vector.dim() >= numRowsT() )
+    if( hasDualFarkas() && vector.dim() >= numRows() )
       {
         _syncRealSolution();
-        _solReal.getDualFarkas(vector);
+        _solReal.getDualFarkasSol(vector);
         return true;
       }
     else
       return false;
   }
 
+  // Wrapping the function for reverse Compatibility
   template <>
 	bool SoPlexBase<Real>::getDualFarkasReal(VectorBase<Real>& vector)
   {
-    if( hasDualFarkas() && vector.dim() >= numRowsT() )
-      {
-        _syncRealSolution();
-        _solReal.getDualFarkas(vector);
-        return true;
-      }
-    else
-      return false;
+    return getDualFarkas(vector);
   }
 
 
 
   /// gets violation of bounds; returns true on success
   template <>
-	bool SoPlexBase<Real>::getBoundViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     _syncRealSolution();
     VectorReal& primal = _solReal._primal;
-    assert(primal.dim() == numColsT());
+    assert(primal.dim() == numCols());
 
     maxviol = 0.0;
     sumviol = 0.0;
 
-    for( int i = numColsT() - 1; i >= 0; i-- )
+    for( int i = numCols() - 1; i >= 0; i-- )
       {
         Real lower = _realLP->lowerUnscaled(i);
         Real upper = _realLP->upperUnscaled(i);
@@ -3499,21 +3465,21 @@ namespace soplex
 
   /// gets violation of constraints; returns true on success
   template <>
-	bool SoPlexBase<Real>::getRowViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
   {
     if( !isPrimalFeasible() )
       return false;
 
     _syncRealSolution();
     VectorReal& primal = _solReal._primal;
-    assert(primal.dim() == numColsT());
+    assert(primal.dim() == numCols());
 
-    DVectorReal activity(numRowsT());
+    DVectorReal activity(numRows());
     _realLP->computePrimalActivity(primal, activity, true);
     maxviol = 0.0;
     sumviol = 0.0;
 
-    for( int i = numRowsT() - 1; i >= 0; i-- )
+    for( int i = numRows() - 1; i >= 0; i-- )
       {
         Real lhs = _realLP->lhsUnscaled(i);
         Real rhs = _realLP->rhsUnscaled(i);
@@ -3540,19 +3506,19 @@ namespace soplex
 
   /// gets violation of reduced costs; returns true on success
   template <>
-	bool SoPlexBase<Real>::getRedCostViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getRedCostViolation(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
 
     _syncRealSolution();
     VectorReal& redcost = _solReal._redCost;
-    assert(redcost.dim() == numColsT());
+    assert(redcost.dim() == numCols());
 
     maxviol = 0.0;
     sumviol = 0.0;
 
-    for( int c = numColsT() - 1; c >= 0; c-- )
+    for( int c = numCols() - 1; c >= 0; c-- )
       {
         typename SPxSolverBase<Real>::VarStatus colStatus = basisColStatus(c);
 
@@ -3595,19 +3561,19 @@ namespace soplex
 
   /// gets violation of dual multipliers; returns true on success
   template <>
-	bool SoPlexBase<Real>::getDualViolationT(Real& maxviol, Real& sumviol)
+	bool SoPlexBase<Real>::getDualViolation(Real& maxviol, Real& sumviol)
   {
     if( !isDualFeasible() || !hasBasis() )
       return false;
 
     _syncRealSolution();
     VectorReal& dual = _solReal._dual;
-    assert(dual.dim() == numRowsT());
+    assert(dual.dim() == numRows());
 
     maxviol = 0.0;
     sumviol = 0.0;
 
-    for( int r = numRowsT() - 1; r >= 0; r-- )
+    for( int r = numRows() - 1; r >= 0; r-- )
       {
         typename SPxSolverBase<Real>::VarStatus rowStatus = basisRowStatus(r);
 
@@ -3686,7 +3652,7 @@ namespace soplex
     if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational() )
       {
         _syncRationalSolution();
-        _solRational.getPrimal(vector);
+        _solRational.getPrimalSol(vector);
         return true;
       }
     else
@@ -3713,7 +3679,7 @@ namespace soplex
     if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsRational() )
       {
         _syncRationalSolution();
-        _solRational.getPrimalRay(vector);
+        _solRational.getPrimalRaySol(vector);
         return true;
       }
     else
@@ -3729,7 +3695,7 @@ namespace soplex
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
       {
         _syncRationalSolution();
-        _solRational.getDual(vector);
+        _solRational.getDualSol(vector);
         return true;
       }
     else
@@ -3745,7 +3711,7 @@ namespace soplex
     if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsRational() )
       {
         _syncRationalSolution();
-        _solRational.getRedCost(vector);
+        _solRational.getRedCostSol(vector);
         return true;
       }
     else
@@ -3759,7 +3725,7 @@ namespace soplex
     if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational() )
       {
         _syncRationalSolution();
-        _solRational.getDualFarkas(vector);
+        _solRational.getDualFarkasSol(vector);
         return true;
       }
     else
@@ -3892,7 +3858,7 @@ namespace soplex
     maxviol = 0;
     sumviol = 0;
 
-    for( int c = numColsT() - 1; c >= 0; c-- )
+    for( int c = numCols() - 1; c >= 0; c-- )
       {
         assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<Real>::UNDEFINED);
 
@@ -3974,7 +3940,7 @@ namespace soplex
     maxviol = 0;
     sumviol = 0;
 
-    for( int r = numRowsT() - 1; r >= 0; r-- )
+    for( int r = numRows() - 1; r >= 0; r-- )
       {
         assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<Real>::UNDEFINED);
 
@@ -4291,11 +4257,11 @@ namespace soplex
   typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisRowStatus(int row) const
   {
     assert(row >= 0);
-    assert(row < numRowsT());
+    assert(row < numRows());
 
     // if no basis is available, return slack basis; if index is out of range, return basic status as for a newly
     // added row
-    if( !hasBasis() || row < 0 || row >= numRowsT() )
+    if( !hasBasis() || row < 0 || row >= numRows() )
       return SPxSolverBase<Real>::BASIC;
     // if the real LP is loaded, ask solver
     else if( _isRealLPLoaded )
@@ -4317,10 +4283,10 @@ namespace soplex
   typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisColStatus(int col) const
   {
     assert(col >= 0);
-    assert(col < numColsT());
+    assert(col < numCols());
 
     // if index is out of range, return nonbasic status as for a newly added unbounded column
-    if( col < 0 || col >= numColsT() )
+    if( col < 0 || col >= numCols() )
       {
         return SPxSolverBase<Real>::ZERO;
       }
@@ -4356,10 +4322,10 @@ namespace soplex
     // if no basis is available, return slack basis
     if( !hasBasis() )
       {
-        for( int i = numRowsT() - 1; i >= 0; i-- )
+        for( int i = numRows() - 1; i >= 0; i-- )
           rows[i] = SPxSolverBase<Real>::BASIC;
 
-        for( int i = numColsT() - 1; i >= 0; i-- )
+        for( int i = numCols() - 1; i >= 0; i-- )
           {
             if( lowerReal(i) > -realParam(SoPlexBase<Real>::INFTY) )
               cols[i] = SPxSolverBase<Real>::ON_LOWER;
@@ -4377,13 +4343,13 @@ namespace soplex
     // if the real LP is not loaded, the basis is stored in the basis arrays of this class
     else
       {
-        assert(numRowsT() == _basisStatusRows.size());
-        assert(numColsT() == _basisStatusCols.size());
+        assert(numRows() == _basisStatusRows.size());
+        assert(numCols() == _basisStatusCols.size());
 
-        for( int i = numRowsT() - 1; i >= 0; i-- )
+        for( int i = numRows() - 1; i >= 0; i-- )
           rows[i] = _basisStatusRows[i];
 
-        for( int i = numColsT() - 1; i >= 0; i-- )
+        for( int i = numCols() - 1; i >= 0; i-- )
           cols[i] = _basisStatusCols[i];
       }
   }
@@ -4397,7 +4363,7 @@ namespace soplex
     // if no basis is available, return slack basis
     if( !hasBasis() )
       {
-        for( int i = 0; i < numRowsT(); ++i )
+        for( int i = 0; i < numRows(); ++i )
           bind[i] = -1 - i;
       }
     // if the real LP is not loaded, the basis is stored in the basis arrays of this class
@@ -4405,10 +4371,10 @@ namespace soplex
       {
         int k = 0;
 
-        assert(numRowsT() == _basisStatusRows.size());
-        assert(numColsT() == _basisStatusCols.size());
+        assert(numRows() == _basisStatusRows.size());
+        assert(numCols() == _basisStatusCols.size());
 
-        for( int i = 0; i < numRowsT(); ++i )
+        for( int i = 0; i < numRows(); ++i )
           {
             if( _basisStatusRows[i] == SPxSolverBase<Real>::BASIC )
               {
@@ -4417,7 +4383,7 @@ namespace soplex
               }
           }
 
-        for( int j = 0; j < numColsT(); ++j )
+        for( int j = 0; j < numCols(); ++j )
           {
             if( _basisStatusCols[j] == SPxSolverBase<Real>::BASIC )
               {
@@ -4426,14 +4392,14 @@ namespace soplex
               }
           }
 
-        assert(k == numRowsT());
+        assert(k == numRows());
       }
     // if the real LP is loaded, the basis is stored in the solver and we need to distinguish between column and row
     // representation; ask the solver itself which representation it has, since the REPRESENTATION parameter of this
     // class might be set to automatic
     else if( _solver.rep() == SPxSolverBase<Real>::COLUMN )
       {
-        for( int i = 0; i < numRowsT(); ++i )
+        for( int i = 0; i < numRows(); ++i )
           {
             SPxId id = _solver.basis().baseId(i);
             bind[i] = (id.isSPxColId() ? _solver.number(id) : - 1 - _solver.number(id));
@@ -4446,7 +4412,7 @@ namespace soplex
 
         int k = 0;
 
-        for( int i = 0; i < numRowsT(); ++i )
+        for( int i = 0; i < numRows(); ++i )
           {
             if( !_solver.isRowBasic(i) )
               {
@@ -4455,7 +4421,7 @@ namespace soplex
               }
           }
 
-        for( int j = 0; j < numColsT(); ++j )
+        for( int j = 0; j < numCols(); ++j )
           {
             if( !_solver.isColBasic(j) )
             {
@@ -4464,7 +4430,7 @@ namespace soplex
             }
          }
 
-         assert(k == numRowsT());
+         assert(k == numRows());
       }
    }
 
@@ -4528,10 +4494,10 @@ namespace soplex
 	bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int* ninds, bool unscale)
   {
     assert(r >= 0);
-    assert(r < numRowsT());
+    assert(r < numRows());
     assert(coef != 0);
 
-    if( !hasBasis() || r < 0 || r >= numRowsT() )
+    if( !hasBasis() || r < 0 || r >= numRows() )
       return false;
 
     _ensureRealLPLoaded();
@@ -4544,7 +4510,7 @@ namespace soplex
     if( _solver.rep() == SPxSolverBase<Real>::COLUMN )
       {
         int idx;
-        SSVectorReal x(numRowsT());
+        SSVectorReal x(numRows());
         try
           {
             /* unscaling required? */
@@ -4598,7 +4564,7 @@ namespace soplex
           }
         else
           {
-            VectorReal y(numRowsT(), coef);
+            VectorReal y(numRows(), coef);
             y = x;
             if( ninds != NULL )
               *ninds = -1;
@@ -4609,13 +4575,13 @@ namespace soplex
         assert(_solver.rep() == SPxSolverBase<Real>::ROW);
 
         // @todo should rhs be a reference?
-        DSVector rhs(numColsT());
-        SSVector y(numColsT());
+        DSVector rhs(numCols());
+        SSVector y(numCols());
         int* bind = 0;
         int index;
 
         // get ordering of column basis matrix
-        spx_alloc(bind, numRowsT());
+        spx_alloc(bind, numRows());
         getBasisInd(bind);
 
         // get vector corresponding to requested index r
@@ -4629,7 +4595,7 @@ namespace soplex
 
             // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
             assert(index >= 0);
-            assert(index < numRowsT());
+            assert(index < numRows());
             assert(!_solver.isRowBasic(index));
 
             // get row vector
@@ -4646,7 +4612,7 @@ namespace soplex
         else
           {
             // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
-            assert(index < numColsT());
+            assert(index < numCols());
             assert(!_solver.isColBasic(index));
 
             // get unit vector
@@ -4668,17 +4634,17 @@ namespace soplex
           }
 
         // initialize result vector x as zero
-        memset(coef, 0, (unsigned int)numRowsT() * sizeof(Real));
+        memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
 
         // add nonzero entries
-        for( int i = 0; i < numColsT(); ++i )
+        for( int i = 0; i < numCols(); ++i )
           {
             SPxId id = _solver.basis().baseId(i);
 
             if( id.isSPxRowId() )
               {
                 assert(_solver.number(id) >= 0);
-                assert(_solver.number(id) < numRowsT());
+                assert(_solver.number(id) < numRows());
                 assert(bind[r] >= 0 || _solver.number(id) != index);
 
                 int rowindex = _solver.number(id);
@@ -4715,10 +4681,10 @@ namespace soplex
 	bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int* ninds, bool unscale)
   {
     assert(c >= 0);
-    assert(c < numRowsT());
+    assert(c < numRows());
     assert(coef != 0);
 
-    if( !hasBasis() || c < 0 || c >= numRowsT() )
+    if( !hasBasis() || c < 0 || c >= numRows() )
       return false;
 
     _ensureRealLPLoaded();
@@ -4731,7 +4697,7 @@ namespace soplex
     if( _solver.rep() == SPxSolverBase<Real>::COLUMN )
       {
         int idx;
-        SSVectorReal x(numRowsT());
+        SSVectorReal x(numRows());
         try
           {
             /* unscaling required? */
@@ -4790,7 +4756,7 @@ namespace soplex
           }
         else
           {
-            VectorReal y(numRowsT(), coef);
+            VectorReal y(numRows(), coef);
             y = x;
             if( ninds != 0 )
               *ninds = -1;
@@ -4801,13 +4767,13 @@ namespace soplex
         assert(_solver.rep() == SPxSolverBase<Real>::ROW);
 
         // @todo should rhs be a reference?
-        DSVectorReal rhs(numColsT());
-        SSVectorReal y(numColsT());
+        DSVectorReal rhs(numCols());
+        SSVectorReal y(numCols());
         int* bind = 0;
         int index;
 
         // get ordering of column basis matrix
-        spx_alloc(bind, numRowsT());
+        spx_alloc(bind, numRows());
         getBasisInd(bind);
 
         // get vector corresponding to requested index c
@@ -4821,7 +4787,7 @@ namespace soplex
 
             // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
             assert(index >= 0);
-            assert(index < numRowsT());
+            assert(index < numRows());
             assert(!_solver.isRowBasic(index));
 
             // get row vector
@@ -4832,7 +4798,7 @@ namespace soplex
         else
           {
             // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
-            assert(index < numColsT());
+            assert(index < numCols());
             assert(!_solver.isColBasic(index));
 
             // get unit vector
@@ -4879,17 +4845,17 @@ namespace soplex
           }
 
         // initialize result vector x as zero
-        memset(coef, 0, (unsigned int)numRowsT() * sizeof(Real));
+        memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
 
         // add nonzero entries
-        for( int i = 0; i < numColsT(); ++i )
+        for( int i = 0; i < numCols(); ++i )
           {
             SPxId id = _solver.basis().baseId(i);
 
             if( id.isSPxRowId() )
               {
                 assert(_solver.number(id) >= 0);
-                assert(_solver.number(id) < numRowsT());
+                assert(_solver.number(id) < numRows());
                 assert(bind[c] >= 0 || _solver.number(id) != index);
 
                 coef[_solver.number(id)] = y[i];
@@ -4920,8 +4886,8 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale)
   {
-    VectorReal v(numRowsT(), rhs);
-    VectorReal x(numRowsT(), sol);
+    VectorReal v(numRows(), rhs);
+    VectorReal x(numRows(), sol);
 
     if( !hasBasis() )
       return false;
@@ -4985,8 +4951,8 @@ namespace soplex
       {
         assert(_solver.rep() == SPxSolverBase<Real>::ROW);
 
-        DSVectorReal rowrhs(numColsT());
-        SSVectorReal y(numColsT());
+        DSVectorReal rowrhs(numCols());
+        SSVectorReal y(numCols());
         int* bind = 0;
 
         bool adaptScaling = unscale && _realLP->isScaled();
@@ -4994,18 +4960,18 @@ namespace soplex
         int idx;
 
         // get ordering of column basis matrix
-        spx_alloc(bind, numRowsT());
+        spx_alloc(bind, numRows());
         getBasisInd(bind);
 
         // fill right-hand side for row-based system
-        for( int i = 0; i < numColsT(); ++i )
+        for( int i = 0; i < numCols(); ++i )
           {
             SPxId id = _solver.basis().baseId(i);
 
             if( id.isSPxRowId() )
               {
                 assert(_solver.number(id) >= 0);
-                assert(_solver.number(id) < numRowsT());
+                assert(_solver.number(id) < numRows());
 
                 if( adaptScaling )
                   {
@@ -5034,7 +5000,7 @@ namespace soplex
           }
 
         // fill result w.r.t. order given by bind
-        for( int i = 0; i < numRowsT(); ++i )
+        for( int i = 0; i < numRows(); ++i )
           {
             int index;
 
@@ -5046,10 +5012,10 @@ namespace soplex
 
                 // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
                 assert(index >= 0);
-                assert(index < numRowsT());
+                assert(index < numRows());
                 assert(!_solver.isRowBasic(index));
 
-                x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numColsT(), y.get_ptr()));
+                x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numCols(), y.get_ptr()));
 
                 if( adaptScaling )
                   {
@@ -5061,7 +5027,7 @@ namespace soplex
               {
                 // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
                 assert(index >= 0);
-                assert(index < numColsT());
+                assert(index < numCols());
                 assert(!_solver.isColBasic(index));
 
                 if( adaptScaling )
@@ -5096,7 +5062,7 @@ namespace soplex
 
     if( _solver.rep() == SPxSolverBase<Real>::COLUMN )
       {
-        int basisdim = numRowsT();
+        int basisdim = numRows();
 
         // create Vector from input values
         Vector x(basisdim, vec);
@@ -5130,7 +5096,7 @@ namespace soplex
       }
     else
       {
-        int colbasisdim = numRowsT();
+        int colbasisdim = numRows();
 
         DSVector y(colbasisdim);
 
@@ -5161,7 +5127,7 @@ namespace soplex
 
                     // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
                     assert(index >= 0);
-                    assert(index < numRowsT());
+                    assert(index < numRows());
                     assert(!_solver.isRowBasic(index));
 
                     y.add(x[i] * UnitVectorReal(index));
@@ -5170,7 +5136,7 @@ namespace soplex
                 else
                   {
                     // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
-                    assert(index < numColsT());
+                    assert(index < numCols());
                     assert(!_solver.isColBasic(index));
 
                     if( unscale && _solver.isScaled() )
@@ -5207,7 +5173,7 @@ namespace soplex
 
     if( _solver.rep() == SPxSolverBase<Real>::COLUMN )
       {
-        int basisdim = numRowsT();
+        int basisdim = numRows();
 
         // create Vector from input values
         Vector x(basisdim, vec);
@@ -5244,7 +5210,7 @@ namespace soplex
       }
     else
       {
-        int colbasisdim = numRowsT();
+        int colbasisdim = numRows();
 
         DSVector y(colbasisdim);
 
@@ -5271,7 +5237,7 @@ namespace soplex
 
                 // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
                 assert(index >= 0);
-                assert(index < numRowsT());
+                assert(index < numRows());
                 assert(!_solver.isRowBasic(index));
 
                 y.add(i, x * UnitVectorReal(index));
@@ -5280,7 +5246,7 @@ namespace soplex
             else
               {
                 // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
-                assert(index < numColsT());
+                assert(index < numCols());
                 assert(!_solver.isColBasic(index));
 
                 if( unscale && _solver.isScaled() )
@@ -5432,21 +5398,21 @@ namespace soplex
 
     if( _isRealLPLoaded )
       {
-        assert(numRowsT() == _solver.nRows());
-        assert(numColsT() == _solver.nCols());
+        assert(numRows() == _solver.nRows());
+        assert(numCols() == _solver.nCols());
 
         _solver.setBasis(rows, cols);
         _hasBasis = (_solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
       }
     else
       {
-        _basisStatusRows.reSize(numRowsT());
-        _basisStatusCols.reSize(numColsT());
+        _basisStatusRows.reSize(numRows());
+        _basisStatusCols.reSize(numCols());
 
-        for( int i = numRowsT() - 1; i >= 0; i-- )
+        for( int i = numRows() - 1; i >= 0; i-- )
           _basisStatusRows[i] = rows[i];
 
-        for( int j = numColsT() - 1; j >= 0; j-- )
+        for( int j = numCols() - 1; j >= 0; j-- )
           _basisStatusCols[j] = cols[j];
 
         _hasBasis = true;
@@ -5579,7 +5545,7 @@ namespace soplex
   /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
   /// marked as integer; returns true on success
   template <>
-	bool SoPlexBase<Real>::writeFileT(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<Real>::writeFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
     ///@todo implement return value
     if( unscale && _realLP->isScaled() )
@@ -5590,37 +5556,21 @@ namespace soplex
         spx_alloc(origLP);
         origLP = new (origLP) SPxLPReal(*_realLP);
         origLP->unscaleLP();
-        origLP->writeFile(filename, rowNames, colNames, intVars);
+        origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
         origLP->~SPxLPReal();
         spx_free(origLP);
       }
     else
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
+      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
 
     return true;
   }
 
-  // Alias for writeFileT; SCIP
+  // Alias for writeFile; SCIP
   template <>
 	bool SoPlexBase<Real>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
   {
-    ///@todo implement return value
-    if( unscale && _realLP->isScaled() )
-      {
-        MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
-          SPxLPReal* origLP;
-        origLP = 0;
-        spx_alloc(origLP);
-        origLP = new (origLP) SPxLPReal(*_realLP);
-        origLP->unscaleLP();
-        origLP->writeFile(filename, rowNames, colNames, intVars);
-        origLP->~SPxLPReal();
-        spx_free(origLP);
-      }
-    else
-      _realLP->writeFile(filename, rowNames, colNames, intVars);
-
-    return true;
+    return writeFile(filename, rowNames, colNames, intVars, unscale);
   }
 
   /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
@@ -5635,7 +5585,7 @@ namespace soplex
     else
       {
         assert(_rationalLP != 0);
-        _rationalLP->writeFile(filename, rowNames, colNames, intVars);
+        _rationalLP->writeFileLPBase(filename, rowNames, colNames, intVars);
 
         ///@todo implement return value
         return true;
@@ -5655,7 +5605,7 @@ namespace soplex
     dualLP.setOutstream(spxout);
 
     // swap colnames and rownames
-    dualLP.writeFile(filename, colNames, rowNames);
+    dualLP.writeFileLPBase(filename, colNames, rowNames);
     return true;
   }
 
@@ -5707,8 +5657,8 @@ namespace soplex
       return false;
 
     // get problem size
-    int numRows = numRowsT();
-    int numCols = numColsT();
+    int numRows = numRows();
+    int numCols = numCols();
 
     // prepare column names
     const NameSet* colNamesPtr = colNames;
@@ -5967,7 +5917,7 @@ namespace soplex
 
     // write problem in MPS/LP format
     ofname = std::string(filename) + ((cpxFormat) ? ".lp" : ".mps");
-    writeFileT(ofname.c_str(), rowNames, colNames, 0);
+    writeFile(ofname.c_str(), rowNames, colNames, 0);
 
     // write basis
     ofname = std::string(filename) + ".bas";
@@ -7214,19 +7164,19 @@ namespace soplex
         Real sumviol;
 
         os << "Violations (real)   : \n";
-        if( getBoundViolationT(maxviol, sumviol) )
+        if( getBoundViolation(maxviol, sumviol) )
           os << "  Max/sum bound     : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum bound     : - / -\n";
-        if( getRowViolationT(maxviol, sumviol) )
+        if( getRowViolation(maxviol, sumviol) )
           os << "  Max/sum row       : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum row       : - / -\n";
-        if( getRedCostViolationT(maxviol, sumviol) )
+        if( getRedCostViolation(maxviol, sumviol) )
           os << "  Max/sum redcost   : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum redcost   : - / -\n";
-        if( getDualViolationT(maxviol, sumviol) )
+        if( getDualViolation(maxviol, sumviol) )
           os << "  Max/sum dual      : " << maxviol << " / " << sumviol << "\n";
         else
           os << "  Max/sum dual      : - / -\n";
@@ -7728,8 +7678,8 @@ namespace soplex
     assert(_realLP != &_solver || _isRealLPLoaded);
     assert(_realLP == &_solver || !_isRealLPLoaded);
 
-    assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRowsT());
-    assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numColsT());
+    assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRows());
+    assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numCols());
     assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
     assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
     assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == numRowsRational());
@@ -8010,7 +7960,7 @@ namespace soplex
       _hasBasis = (_solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
     else if( _hasBasis )
       {
-        for( int i = numRowsT() - 1; i >= 0; i-- )
+        for( int i = numRows() - 1; i >= 0; i-- )
           {
             if( _basisStatusRows[i] == SPxSolverBase<Real>::ON_LOWER && lhs[i] <= -realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusRows[i] = (rhsReal(i) < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ZERO;
@@ -8055,7 +8005,7 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numRowsT() - 1; i >= 0; i-- )
+        for( int i = numRows() - 1; i >= 0; i-- )
           {
             if( _basisStatusRows[i] == SPxSolverBase<Real>::ON_UPPER && rhs[i] >= realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusRows[i] = (lhsReal(i) > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ZERO;
@@ -8099,7 +8049,7 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numRowsT() - 1; i >= 0; i-- )
+        for( int i = numRows() - 1; i >= 0; i-- )
           {
             if( _basisStatusRows[i] == SPxSolverBase<Real>::ON_LOWER && lhs[i] <= -realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusRows[i] = (rhs[i] < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ZERO;
@@ -8178,7 +8128,7 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numColsT() - 1; i >= 0; i-- )
+        for( int i = numCols() - 1; i >= 0; i-- )
           {
             if( _basisStatusCols[i] == SPxSolverBase<Real>::ON_LOWER && lower[i] <= -realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ZERO;
@@ -8222,7 +8172,7 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numColsT() - 1; i >= 0; i-- )
+        for( int i = numCols() - 1; i >= 0; i-- )
           {
             if( _basisStatusCols[i] == SPxSolverBase<Real>::ON_UPPER && upper[i] >= realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusCols[i] = (lowerReal(i) > -realParam(SoPlexBase<Real>::INFTY)) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ZERO;
@@ -8266,7 +8216,7 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numColsT() - 1; i >= 0; i-- )
+        for( int i = numCols() - 1; i >= 0; i-- )
           {
             if( _basisStatusCols[i] == SPxSolverBase<Real>::ON_LOWER && lower[i] <= -realParam(SoPlexBase<Real>::INFTY) )
               _basisStatusCols[i] = (upper[i] < realParam(SoPlexBase<Real>::INFTY)) ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ZERO;
@@ -8356,7 +8306,7 @@ namespace soplex
 
   /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
   /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numRowsT()
+  /// #numRows()
   template <>
   void SoPlexBase<Real>::_removeRowsReal(int perm[])
   {
@@ -8370,13 +8320,13 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numRowsT() - 1; i >= 0 && _hasBasis; i-- )
+        for( int i = numRows() - 1; i >= 0 && _hasBasis; i-- )
           {
             if( perm[i] < 0 && _basisStatusRows[i] != SPxSolverBase<Real>::BASIC )
               _hasBasis = false;
             else if( perm[i] >= 0 && perm[i] != i )
               {
-                assert(perm[i] < numRowsT());
+                assert(perm[i] < numRows());
                 assert(perm[perm[i]] < 0);
 
                 _basisStatusRows[perm[i]] = _basisStatusRows[i];
@@ -8384,7 +8334,7 @@ namespace soplex
           }
 
         if( _hasBasis )
-          _basisStatusRows.reSize(numRowsT());
+          _basisStatusRows.reSize(numRows());
       }
 
     _rationalLUSolver.clear();
@@ -8422,7 +8372,7 @@ namespace soplex
 
   /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
   /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numColsT()
+  /// #numCols()
   template <>
   void SoPlexBase<Real>::_removeColsReal(int perm[])
   {
@@ -8436,13 +8386,13 @@ namespace soplex
       }
     else if( _hasBasis )
       {
-        for( int i = numColsT() - 1; i >= 0 && _hasBasis; i-- )
+        for( int i = numCols() - 1; i >= 0 && _hasBasis; i-- )
           {
             if( perm[i] < 0 && _basisStatusCols[i] == SPxSolverBase<Real>::BASIC )
               _hasBasis = false;
             else if( perm[i] >= 0 && perm[i] != i )
               {
-                assert(perm[i] < numColsT());
+                assert(perm[i] < numCols());
                 assert(perm[perm[i]] < 0);
 
                 _basisStatusCols[perm[i]] = _basisStatusCols[i];
@@ -8450,7 +8400,7 @@ namespace soplex
           }
 
         if( _hasBasis )
-          _basisStatusCols.reSize(numColsT());
+          _basisStatusCols.reSize(numCols());
       }
 
     _rationalLUSolver.clear();
@@ -8571,8 +8521,8 @@ namespace soplex
           {
             ///@todo this should not fail even if the basis is invalid (wrong dimension or wrong number of basic
             ///      entries); fix either in SPxSolverBase or in SPxBasisBase
-            assert(_basisStatusRows.size() == numRowsT());
-            assert(_basisStatusCols.size() == numColsT());
+            assert(_basisStatusRows.size() == numRows());
+            assert(_basisStatusCols.size() == numCols());
             _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
             _hasBasis = (_solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
           }
@@ -8795,11 +8745,11 @@ namespace soplex
   template <>
   void SoPlexBase<Real>::_recomputeRangeTypesReal()
   {
-    _rowTypes.reSize(numRowsT());
-    for( int i = 0; i < numRowsT(); i++ )
+    _rowTypes.reSize(numRows());
+    for( int i = 0; i < numRows(); i++ )
       _rowTypes[i] = _rangeTypeReal(_realLP->lhs(i), _realLP->rhs(i));
-    _colTypes.reSize(numColsT());
-    for( int i = 0; i < numColsT(); i++ )
+    _colTypes.reSize(numCols());
+    for( int i = 0; i < numCols(); i++ )
       _colTypes[i] = _rangeTypeReal(_realLP->lower(i), _realLP->upper(i));
   }
 

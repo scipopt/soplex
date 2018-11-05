@@ -54,7 +54,7 @@ namespace soplex
       }
 
       /// gets the primal solution vector; returns true on success
-      bool getPrimal(VectorBase<R>& vector) const
+      bool getPrimalSol(VectorBase<R>& vector) const
       {
 	vector = _primal;
 
@@ -76,7 +76,7 @@ namespace soplex
       }
 
       /// gets the primal unbounded ray if available; returns true on success
-      bool getPrimalRay(VectorBase<R>& vector) const
+      bool getPrimalRaySol(VectorBase<R>& vector) const
       {
 	if( _hasPrimalRay )
 	  vector = _primalRay;
@@ -91,7 +91,7 @@ namespace soplex
       }
 
       /// gets the dual solution vector; returns true on success
-      bool getDual(VectorBase<R>& vector) const
+      bool getDualSol(VectorBase<R>& vector) const
       {
 	vector = _dual;
 
@@ -99,7 +99,7 @@ namespace soplex
       }
 
       /// gets the vector of reduced cost values if available; returns true on success
-      bool getRedCost(VectorBase<R>& vector) const
+      bool getRedCostSol(VectorBase<R>& vector) const
       {
 	vector = _redCost;
 
@@ -113,7 +113,7 @@ namespace soplex
       }
 
       /// gets the Farkas proof if available; returns true on success
-      bool getDualFarkas(VectorBase<R>& vector) const
+      bool getDualFarkasSol(VectorBase<R>& vector) const
       {
 	if( _hasDualFarkas )
 	  vector = _dualFarkas;

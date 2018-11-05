@@ -148,7 +148,7 @@ bool StatusExceptionCheck::checkXSOLVE08()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getDual(*p_primal);
+      solver->getDualSol(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;
@@ -165,7 +165,7 @@ bool StatusExceptionCheck::checkXSOLVE09()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getRedCost(*p_primal);
+      solver->getRedCostSol(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;
@@ -182,7 +182,7 @@ bool StatusExceptionCheck::checkXSOLVE10()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getDualfarkas(*p_primal);
+      solver->getDualFarkas(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;
@@ -315,7 +315,7 @@ bool StatusExceptionCheck::notInitialized()
    solver->setPricer(&pricer);
    solver->setTester(&tester);
    try{
-      solver->getPrimal(*v);
+      solver->getPrimalSol(*v);
    }catch(SPxStatusException& x)
    {
       delete solver;
