@@ -685,7 +685,7 @@ const double * OsiSpxSolverInterface::getColSolution() const
 	{
 	  colsol_ = new soplex::DVector( ncols );
 	  if( isProvenOptimal() )
-	    spxsolver_.getPrimal( *colsol_ );
+	    spxsolver_.getPrimalSol( *colsol_ );
 	  else
 	    colsol_->clear();
 	}
@@ -704,7 +704,7 @@ const double * OsiSpxSolverInterface::getRowPrice() const
 	{
 	  rowsol_ = new soplex::DVector( nrows );
 	  if( isProvenOptimal() )
-	    spxsolver_.getDual( *rowsol_ );
+	    spxsolver_.getDualSol( *rowsol_ );
 	  else
 	    rowsol_->clear();
 	}

@@ -47,7 +47,7 @@ namespace soplex
   void SPxSolverBase<Real>::performSolutionPolishing();
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimal (Vector& p_vector) const;
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalSol(Vector& p_vector) const;
 
 
   /**@todo check separately for ENTER and LEAVE algorithm */
@@ -1059,7 +1059,7 @@ namespace soplex
           Real    val;
           DVector sol( nCols() );
 
-          getPrimal( sol );
+          getPrimalSol( sol );
 
           for(int row = 0; row < nRows(); ++row )
             {
@@ -1681,7 +1681,7 @@ namespace soplex
               dualDegenSum += getDegeneracyLevel(fVec());
             else                    // primal simplex
               {
-                getPrimal(degenvec);
+                getPrimalSol(degenvec);
                 primalDegenSum += getDegeneracyLevel(degenvec);
               }
           }
@@ -1692,7 +1692,7 @@ namespace soplex
               dualDegenSum += getDegeneracyLevel(pVec());
             else
               {
-                getPrimal(degenvec);
+                getPrimalSol(degenvec);
                 primalDegenSum += getDegeneracyLevel(degenvec);
               }
           }
@@ -1748,7 +1748,7 @@ namespace soplex
   }
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimal (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalSol(Vector& p_vector) const
   {
 
     if (!isInitialized())
@@ -1798,7 +1798,7 @@ namespace soplex
   }
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDual (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualSol(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1830,7 +1830,7 @@ namespace soplex
   }
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getRedCost (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getRedCostSol(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1874,7 +1874,7 @@ namespace soplex
   }
 
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalray (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalray(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1892,9 +1892,8 @@ namespace soplex
     return status();
   }
 
-  /// There are three getDualFarkas now. getDualFarkasT, getDualFarkas, and getDualfarkas. Wow!
   template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualfarkas (Vector& p_vector) const
+  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualFarkas(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -2136,13 +2135,13 @@ namespace soplex
     if (p_value)
       *p_value = this->value();
     if (p_primal)
-      getPrimal(*p_primal);
+      getPrimalSol(*p_primal);
     if (p_slacks)
       getSlacks(*p_slacks);
     if (p_dual)
-      getDual(*p_dual);
+      getDualSol(*p_dual);
     if (reduCosts)
-      getRedCost(*reduCosts);
+      getRedCostSol(*reduCosts);
     return status();
   }
 } // namespace soplex

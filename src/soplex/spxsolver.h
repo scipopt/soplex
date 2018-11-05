@@ -90,8 +90,6 @@ namespace soplex
   template <class R>
     class SPxSolverBase : public SPxLPBase<R>, protected SPxBasisBase<R>
   {
-    friend class SoPlexLegacy;
-
     friend SPxFastRT<R>;
     friend SPxBoundFlippingRT<R>;
 
@@ -647,7 +645,7 @@ namespace soplex
 
     /// current objective value.
     /**@return Objective value of the current solution vector
-     *         (see #getPrimal()).
+     *         (see #getPrimalSol()).
      */
     virtual Real value();
 
@@ -672,7 +670,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if not initialized
      */
-    virtual Status getPrimal(Vector& vector) const;
+    virtual Status getPrimalSol(Vector& vector) const;
 
     /// get vector of slack variables.
     /** This method returns the Status of the basis.
@@ -717,7 +715,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getDual (Vector& vector) const;
+    virtual Status getDualSol(Vector& vector) const;
 
     /// get vector of reduced costs.
     /** This method returns the Status of the basis.
@@ -732,15 +730,15 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getRedCost (Vector& vector) const;
+    virtual Status getRedCostSol(Vector& vector) const;
 
     /// get primal ray in case of unboundedness.
     ///  @throw SPxStatusException if no problem loaded
-    virtual Status getPrimalray (Vector& vector) const;
+    virtual Status getPrimalray(Vector& vector) const;
 
     /// get dual farkas proof of infeasibility.
     ///  @throw SPxStatusException if no problem loaded
-    virtual Status getDualfarkas (Vector& vector) const;
+    virtual Status getDualFarkas(Vector& vector) const;
 
     /// print display line of flying table
     virtual void printDisplayLine(const bool force = false, const bool forceHead = false);

@@ -308,8 +308,8 @@ namespace soplex
     // if the original problem has a basis, this will be stored
     if( _hasBasis )
       {
-        basisStatusRows.reSize(numRowsT());
-        basisStatusCols.reSize(numColsT());
+        basisStatusRows.reSize(numRows());
+        basisStatusCols.reSize(numCols());
         _solver.getBasis(basisStatusRows.get_ptr(), basisStatusCols.get_ptr(), basisStatusRows.size(),
                          basisStatusCols.size());
       }
@@ -434,8 +434,8 @@ namespace soplex
         // get the dual solutions from the reduced problem
         DVector reducedLPDualVector(_solver.nRows());
         DVector reducedLPRedcostVector(_solver.nCols());
-        _solver.getDual(reducedLPDualVector);
-        _solver.getRedCost(reducedLPRedcostVector);
+        _solver.getDualSol(reducedLPDualVector);
+        _solver.getRedCostSol(reducedLPRedcostVector);
 
 
         // Using the solution to the reduced problem:
@@ -464,7 +464,7 @@ namespace soplex
 
         if( !explicitviol )
           {
-            //_compSolver.writeFile("comp.lp");
+            //_compSolver.writeFileLPBase("comp.lp");
 
             _decompSimplifyAndSolve(_compSolver, _compSlufactor, true, true);
 
@@ -500,11 +500,11 @@ namespace soplex
           {
             // get the primal solutions from the complementary problem
             DVector compLPPrimalVector(_compSolver.nCols());
-            _compSolver.getPrimal(compLPPrimalVector);
+            _compSolver.getPrimalSol(compLPPrimalVector);
 
             // get the dual solutions from the complementary problem
             DVector compLPDualVector(_compSolver.nRows());
-            _compSolver.getDual(compLPDualVector);
+            _compSolver.getDualSol(compLPDualVector);
 
             // updating the reduced problem
             _updateDecompReducedProblem(_compSolver.objValue(), reducedLPDualVector, reducedLPRedcostVector,
@@ -518,7 +518,7 @@ namespace soplex
           {
             // getting the primal vector from the reduced problem
             DVector reducedLPPrimalVector(_solver.nCols());
-            _solver.getPrimal(reducedLPPrimalVector);
+            _solver.getPrimalSol(reducedLPPrimalVector);
 
             // checking the optimality of the reduced problem solution with the original problem
             _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
@@ -550,7 +550,7 @@ namespace soplex
 #ifndef NDEBUG
         // computing the solution for the original variables
         DVector reducedLPPrimalVector(_solver.nCols());
-        _solver.getPrimal(reducedLPPrimalVector);
+        _solver.getPrimalSol(reducedLPPrimalVector);
 
         // checking the optimality of the reduced problem solution with the original problem
         _checkOriginalProblemOptimality(reducedLPPrimalVector, true);
@@ -589,7 +589,7 @@ namespace soplex
         _hasSolReal = true;
         // get the primal solutions from the reduced problem
         DVector testPrimalVector(_compSolver.nCols());
-        _compSolver.getPrimal(testPrimalVector);
+        _compSolver.getPrimalSol(testPrimalVector);
         _solReal._primal.reDim(_compSolver.nCols());
         _solReal._primal = testPrimalVector;
 
@@ -714,9 +714,9 @@ namespace soplex
 
     // allocating memory for the reduced problem rows and cols flag array
     _decompReducedProbRows = 0;
-    spx_alloc(_decompReducedProbRows, numRowsT());
+    spx_alloc(_decompReducedProbRows, numRows());
     _decompReducedProbCols = 0;
-    spx_alloc(_decompReducedProbCols, numColsT());
+    spx_alloc(_decompReducedProbCols, numCols());
 
     // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
     // a positive reduced cost.
@@ -727,8 +727,8 @@ namespace soplex
     // allocating memory for the violated bounds and rows arrays
     _decompViolatedBounds = 0;
     _decompViolatedRows = 0;
-    spx_alloc(_decompViolatedBounds, numColsT());
-    spx_alloc(_decompViolatedRows, numRowsT());
+    spx_alloc(_decompViolatedBounds, numCols());
+    spx_alloc(_decompViolatedRows, numRows());
     _nDecompViolBounds = 0;
     _nDecompViolRows = 0;
   }
@@ -747,8 +747,8 @@ namespace soplex
     int nnonposind = 0;
     int ncompatind = 0;
 
-    assert(_solver.nCols() == numColsT());
-    assert(_solver.nRows() == numRowsT());
+    assert(_solver.nCols() == numCols());
+    assert(_solver.nRows() == numRows());
 
     // capturing the basis used for the transformation
     _decompTransBasis = _solver.basis();
@@ -762,13 +762,13 @@ namespace soplex
     _decompLP = new (_decompLP) SPxLPReal(_solver);
 
     // retreiving the basis information
-    _basisStatusRows.reSize(numRowsT());
-    _basisStatusCols.reSize(numColsT());
+    _basisStatusRows.reSize(numRows());
+    _basisStatusCols.reSize(numCols());
     _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 
     // get the indices of the rows with positive dual multipliers and columns with positive reduced costs.
-    spx_alloc(nonposind, numColsT());
-    spx_alloc(colsforremoval, numColsT());
+    spx_alloc(nonposind, numCols());
+    spx_alloc(colsforremoval, numCols());
     if( !stop )
       _getZeroDualMultiplierIndices(_decompFeasVector, nonposind, colsforremoval, &nnonposind, stop);
 
@@ -784,7 +784,7 @@ namespace soplex
 
     int* compatboundcons = 0;
     int ncompatboundcons = 0;
-    spx_alloc(compatboundcons, numColsT());
+    spx_alloc(compatboundcons, numCols());
 
     LPRowSet boundcons;
 
@@ -853,7 +853,7 @@ namespace soplex
       }
 
     int naddedrows = 0;
-    DataArray< SPxRowId > rangedRowIds(numRowsT());
+    DataArray< SPxRowId > rangedRowIds(numRows());
     _deleteAndUpdateRowsComplementaryProblem(rangedRowIds.get_ptr(), naddedrows);
 
     if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )   // if we use the dual formulation of the complementary problem, we must
@@ -1179,10 +1179,10 @@ namespace soplex
           {
             assert(solver.status() == SPxSolverBase<Real>::OPTIMAL || solver.status() == SPxSolverBase<Real>::ABORT_DECOMP || solver.status() == SPxSolverBase<Real>::ABORT_EXDECOMP);
 
-            solver.getPrimal(primal);
+            solver.getPrimalSol(primal);
             solver.getSlacks(slacks);
-            solver.getDual(dual);
-            solver.getRedCost(redCost);
+            solver.getDualSol(dual);
+            solver.getRedCostSol(redCost);
 
             // unscale vectors
             if( _scaler && solver.isScaled() )
@@ -1216,8 +1216,8 @@ namespace soplex
     // if the original problem is not in the solver because of scaling, we also need to store the basis
     else if( _scaler != 0 )
       {
-        _basisStatusRows.reSize(numRowsT());
-        _basisStatusCols.reSize(numColsT());
+        _basisStatusRows.reSize(numRows());
+        _basisStatusCols.reSize(numCols());
         assert(_basisStatusRows.size() == solver.nRows());
         assert(_basisStatusCols.size() == solver.nCols());
 
@@ -1309,7 +1309,7 @@ namespace soplex
     DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
 
     // Retrieving the reduced costs for each original problem row.
-    _compSolver.getRedCost(compProbRedcost);
+    _compSolver.getRedCostSol(compProbRedcost);
 
     LPRowSet updaterows;
 
@@ -1490,7 +1490,7 @@ namespace soplex
               }
             else
               {
-                for( int j = 0; j < numColsT(); j++ )
+                for( int j = 0; j < numCols(); j++ )
                   {
                     if( isZero(_solver.fVec()[i], feastol) )
                       norm += spxAbs(y[j])*spxAbs(y[j]);
@@ -1509,7 +1509,7 @@ namespace soplex
 
 
             // adding the violated row
-            if( isZero(norm, feastol) && LT(nnewrowidx/Real(numRowsT()), percenttoadd) )
+            if( isZero(norm, feastol) && LT(nnewrowidx/Real(numRows()), percenttoadd) )
               {
                 updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
                                _transformedRows.rhs(rowNumber));
@@ -1590,12 +1590,12 @@ namespace soplex
     if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
       {
         // Retrieving the slacks for each row.
-        _compSolver.getRedCost(compProbRedcost);
+        _compSolver.getRedCostSol(compProbRedcost);
       }
     else
       {
         // Retrieving the primal vector for the complementary problem
-        _compSolver.getPrimal(compProbPrimal);
+        _compSolver.getPrimalSol(compProbPrimal);
         _compSolver.computePrimalActivity(compProbPrimal, compProbActivity);
 
         compProbSlackVal = compProbPrimal[_compSolver.number(_compSlackColId)];
@@ -1693,7 +1693,7 @@ namespace soplex
 
     bool delCol;
 
-    _decompReducedProbColIDs.reSize(numColsT());
+    _decompReducedProbColIDs.reSize(numCols());
     *nnonposind = 0;
 
     // iterating over all columns in the basis matrix
@@ -1775,12 +1775,12 @@ namespace soplex
 #ifndef NDEBUG
     int bind = 0;
     bool* activerows = 0;
-    spx_alloc(activerows, numRowsT());
+    spx_alloc(activerows, numRows());
 
-    for( int i = 0; i < numRowsT(); ++i )
+    for( int i = 0; i < numRows(); ++i )
       activerows[i] = false;
 
-    for( int i = 0; i < numColsT(); ++i )
+    for( int i = 0; i < numCols(); ++i )
       {
         if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
           {
@@ -1788,7 +1788,7 @@ namespace soplex
               {
                 bind = _realLP->number(SPxRowId(_solver.basis().baseId(i))); // getting the corresponding row
                 // for the original LP.
-                assert(bind >= 0 && bind < numRowsT());
+                assert(bind >= 0 && bind < numRows());
                 activerows[bind] = true;
               }
           }
@@ -1803,7 +1803,7 @@ namespace soplex
         _decompReducedProbColRowIDs.reSize(_solver.nRows());
       }
 
-    for( int i = 0; i < numRowsT(); ++i )
+    for( int i = 0; i < numRows(); ++i )
       {
         rowsforremoval[i] = i;
         if( formRedProb )
@@ -1852,7 +1852,7 @@ namespace soplex
           }
         else
           {
-            for( int j = 0; j < numColsT(); j++ )
+            for( int j = 0; j < numCols(); j++ )
               {
                 if( !isZero(y[j], feastol) )
                   newRowVector.add(j, y[j]);
@@ -1926,7 +1926,7 @@ namespace soplex
 #endif
 #endif
 
-    SSVector y(numColsT());
+    SSVector y(numCols());
     y.unSetup();
 
     // the rhs of this calculation is the original objective coefficient vector
@@ -1940,11 +1940,11 @@ namespace soplex
         MSG_ERROR( spxout << "Caught exception <" << E.what() << "> while computing compatability.\n" );
       }
 
-    _transformedObj.reDim(numColsT());
+    _transformedObj.reDim(numCols());
     if( y.isSetup() )
       {
         int ycount = 0;
-        for( int i = 0; i < numColsT(); i++ )
+        for( int i = 0; i < numCols(); i++ )
           {
             if( ycount < y.size() && i == y.index(ycount) )
               {
@@ -1957,7 +1957,7 @@ namespace soplex
       }
     else
       {
-        for( int i = 0; i < numColsT(); i++ )
+        for( int i = 0; i < numCols(); i++ )
           {
             if( isZero(y[i], feastol) )
               _transformedObj[i] = 0.0;
@@ -1995,14 +1995,14 @@ namespace soplex
 #endif
 
     bool compatible;
-    SSVector y(numColsT());
+    SSVector y(numCols());
     y.unSetup();
 
-    _decompReducedProbColRowIDs.reSize(numColsT());
+    _decompReducedProbColRowIDs.reSize(numCols());
 
 
     // identifying the compatible bound constraints
-    for( int i = 0; i < numColsT(); i++ )
+    for( int i = 0; i < numCols(); i++ )
       {
         _decompReducedProbColRowIDs[i].inValidate();
 
@@ -2047,7 +2047,7 @@ namespace soplex
           }
         else
           {
-            for( int j = 0; j < numColsT(); j++ )
+            for( int j = 0; j < numCols(); j++ )
               {
                 if( !isZero(y[j], feastol) )
                   {
@@ -2128,8 +2128,8 @@ namespace soplex
     DSVector slackColCoeff;
 
     // setting the objective coefficients of the original variables to zero
-    DVector newObjCoeff(numColsT());
-    for( int i = 0; i < numColsT(); i++ )
+    DVector newObjCoeff(numCols());
+    for( int i = 0; i < numCols(); i++ )
       {
         _compSolver.changeBounds(_realLP->cId(i), Real(-infinity), Real(infinity));
         newObjCoeff[i] = 0;
@@ -2152,7 +2152,7 @@ namespace soplex
         LPRowSet addrangedrows;    // the row set of ranged and equality rows that must be added to the complementary problem.
         naddedrows = 0;
         // finding all of the ranged and equality rows and creating two <= constraints.
-        for( int i = 0; i < numRowsT(); i++ )
+        for( int i = 0; i < numRows(); i++ )
           {
             if( _realLP->rowType(i) == LPRowBase<Real>::RANGE || _realLP->rowType(i) == LPRowBase<Real>::EQUAL )
               {
@@ -3615,7 +3615,7 @@ namespace soplex
   {
     numProbRows = _realLP->nRows();
     numProbCols = _realLP->nCols();
-    numNonzeros = _realLP->nNzos();
+    nNonzeros = _realLP->nNzos();
     minAbsNonzero = _realLP->minAbsNzo();
     maxAbsNonzero = _realLP->maxAbsNzo();
 
@@ -3703,10 +3703,10 @@ namespace soplex
        << "                lhs : " << origCountLhs << "\n"
        << "                rhs : " << origCountRhs << "\n"
        << "               free : " << origCountFreeRow << "\n"
-       << "  Nonzeros          : " << numNonzeros << "\n"
-       << "         per column : " << Real(numNonzeros) / Real(numProbCols) << "\n"
-       << "            per row : " << Real(numNonzeros) / Real(numProbRows) << "\n"
-       << "           sparsity : " << Real(numNonzeros) / Real(numProbCols) / Real(numProbRows) << "\n"
+       << "  Nonzeros          : " << nNonzeros << "\n"
+       << "         per column : " << Real(nNonzeros) / Real(numProbCols) << "\n"
+       << "            per row : " << Real(nNonzeros) / Real(numProbRows) << "\n"
+       << "           sparsity : " << Real(nNonzeros) / Real(numProbCols) / Real(numProbRows) << "\n"
        << "    min. abs. value : " << Real(minAbsNonzero) << "\n"
        << "    max. abs. value : " << Real(maxAbsNonzero) << "\n";
   }

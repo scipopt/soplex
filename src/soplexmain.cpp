@@ -139,7 +139,7 @@ void checkSolutionReal(SoPlexBase<Real>& soplex)
       Real rowviol;
       Real sumviol;
 
-      if( soplex.getBoundViolationT(boundviol, sumviol) && soplex.getRowViolationT(rowviol, sumviol) )
+      if( soplex.getBoundViolation(boundviol, sumviol) && soplex.getRowViolation(rowviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = boundviol > rowviol ? boundviol : rowviol;
@@ -165,7 +165,7 @@ void checkSolutionReal(SoPlexBase<Real>& soplex)
       Real dualviol;
       Real sumviol;
 
-      if( soplex.getRedCostViolationT(redcostviol, sumviol) && soplex.getDualViolationT(dualviol, sumviol) )
+      if( soplex.getRedCostViolation(redcostviol, sumviol) && soplex.getDualViolation(dualviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
             Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
@@ -271,11 +271,11 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
 
    if( real )
    {
-     DVectorBase<Real> primal(soplex.numColsT());
-      if( soplex.getPrimalRayT(primal) )
+     DVectorBase<Real> primal(soplex.numCols());
+      if( soplex.getPrimalRay(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numCols(); ++i )
          {
             if ( isNotZero( primal[i] ) )
             {
@@ -289,11 +289,11 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
                      << std::setprecision(8) << std::fixed
                      << ")." << std::endl; )
       }
-      else if( soplex.isPrimalFeasible() && soplex.getPrimalT(primal) )
+      else if( soplex.isPrimalFeasible() && soplex.getPrimal(primal) )
       {
          int nNonzeros = 0;
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal solution (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numCols(); ++i )
          {
             if ( isNotZero( primal[i] ) )
             {
@@ -313,11 +313,11 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
    }
    if( rational )
    {
-     DVectorRational primal(soplex.numColsT());
+     DVectorRational primal(soplex.numCols());
       if( soplex.getPrimalRayRational(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numColsT(); ++i )
+         for( int i = 0; i < soplex.numCols(); ++i )
          {
             if( primal[i] != (Rational) 0 )
             {
@@ -361,11 +361,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( real )
    {
-      DVector dual(soplex.numRowsT());
-      if( soplex.getDualFarkasT(dual) )
+      DVector dual(soplex.numRows());
+      if( soplex.getDualFarkas(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsT(); ++i )
+         for( int i = 0; i < soplex.numRows(); ++i )
          {
             if ( isNotZero( dual[i] ) )
             {
@@ -378,10 +378,10 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
       }
-      else if( soplex.isDualFeasible() && soplex.getDualT(dual) )
+      else if( soplex.isDualFeasible() && soplex.getDual(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual solution (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsT(); ++i )
+         for( int i = 0; i < soplex.numRows(); ++i )
          {
             if ( isNotZero( dual[i] ) )
             {
@@ -394,11 +394,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
 
-         DVector redcost(soplex.numColsT());
-         if( soplex.getRedCostT(redcost) )
+         DVector redcost(soplex.numCols());
+         if( soplex.getRedCost(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
-            for( int i = 0; i < soplex.numColsT(); ++i )
+            for( int i = 0; i < soplex.numCols(); ++i )
             {
                if ( isNotZero( redcost[i] ) )
                {
@@ -418,11 +418,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( rational )
    {
-      DVectorRational dual(soplex.numRowsT());
+      DVectorRational dual(soplex.numRows());
       if( soplex.getDualFarkasRational(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
-         for( int i = 0; i < soplex.numRowsT(); ++i )
+         for( int i = 0; i < soplex.numRows(); ++i )
          {
             if( dual[i] != (Rational) 0 )
             {
@@ -444,11 +444,11 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
          }
          MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
 
-         DVectorRational redcost(soplex.numColsT());
+         DVectorRational redcost(soplex.numCols());
          if( soplex.getRedCostRational(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
-            for( int i = 0; i < soplex.numColsT(); ++i )
+            for( int i = 0; i < soplex.numCols(); ++i )
             {
                if ( redcost[i] != (Rational) 0 )
                   MSG_INFO1( soplex.spxout, soplex.spxout << colnames[i] << "\t" << redcost[i] << std::endl; )
@@ -896,7 +896,7 @@ int main(int argc, char* argv[])
       // write LP if specified
       if( writefilename != nullptr )
       {
-         if( !soplex->writeFileT(writefilename, &rownames, &colnames) )
+         if( !soplex->writeFile(writefilename, &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while writing file <" << writefilename << ">.\n\n" );
             returnValue = 1;
@@ -944,8 +944,8 @@ int main(int argc, char* argv[])
          << std::scientific << std::setprecision(int(prec))
          << " seconds.\n\n" );
 
-      MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRowsT() << " rows "
-         << soplex->numColsT() << " columns and " << soplex->numNonzerosT() << " nonzeros.\n\n" );
+      MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRows() << " rows "
+                 << soplex->numCols() << " columns and " << soplex->numNonzeros() << " nonzeros.\n\n" );
 
       // solve the LP
       soplex->optimize();

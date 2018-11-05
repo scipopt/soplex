@@ -1179,7 +1179,7 @@ namespace soplex
     virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const;
 
     /// Write loaded LP to \p filename.
-    virtual void writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
+    virtual void writeFileLPBase(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
     {
 
       std::ofstream tmp(filename);

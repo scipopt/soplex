@@ -980,7 +980,7 @@ void ChangeExerciser::test_change_lower()
    // Second test:  get solution vector and compute slacks
    Real* val = new Real[work_ptr->nCols()];
    Vector solution(work_ptr->nCols(), val);
-   work_ptr->getPrimal(solution);
+   work_ptr->getPrimalSol(solution);
 
    for (int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
    {
@@ -1024,7 +1024,7 @@ void ChangeExerciser::test_change_upper()
    // Second test: get solution vector and compute slacks
    Real* val = new Real[work_ptr->nCols()];
    Vector solution(work_ptr->nCols(), val);
-   work_ptr->getPrimal(solution);
+   work_ptr->getPrimalSol(solution);
 
    for(int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
    {
@@ -1067,7 +1067,7 @@ void ChangeExerciser::test_change_bounds()
    // Second test: use positive slacks to change the bounds (see test_change_upper, test_change_lower)
    Real* val = new Real[work_ptr->nCols()];
    Vector solution(work_ptr->nCols(), val);
-   work_ptr->getPrimal(solution);
+   work_ptr->getPrimalSol(solution);
 
    for (int col_idx = 0; col_idx != work_ptr->nCols(); ++col_idx)
    {
@@ -1127,7 +1127,7 @@ void ChangeExerciser::test_change_lhs()
 
    Real* val = new Real[ work_ptr->nCols() ];
    Vector solution( work_ptr->nCols(), val );
-   work_ptr->getPrimal( solution );
+   work_ptr->getPrimalSol( solution );
 
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
       {
@@ -1183,7 +1183,7 @@ void ChangeExerciser::test_change_rhs()
 
    Real* val = new Real[ work_ptr->nCols() ];
    Vector solution( work_ptr->nCols(), val );
-   work_ptr->getPrimal( solution );
+   work_ptr->getPrimalSol( solution );
 
    for (int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
       {
@@ -1224,7 +1224,7 @@ void ChangeExerciser::test_change_range()
    Real* val = new Real[ work_ptr->nCols() ];
 
    Vector solution( work_ptr->nCols(), val );
-   work_ptr->getPrimal( solution );
+   work_ptr->getPrimalSol( solution );
 
    Vector new_rhs = work_ptr->rhs();
    Vector new_lhs = work_ptr->lhs();
@@ -1294,7 +1294,7 @@ void ChangeExerciser::test_change_range()
 
    val = new Real[ work_ptr->nCols() ];
    Vector solution3( work_ptr->nCols(), val );
-   work_ptr->getPrimal( solution3 );
+   work_ptr->getPrimalSol( solution3 );
 
    for(int row_idx = 0; row_idx < work_ptr->nRows(); ++row_idx)
    {
@@ -1429,7 +1429,7 @@ void ChangeExerciser::test_change_col()
    const Real change_coeff = 2.0;
    Real* val = new Real[ work_ptr->nCols() ];
    Vector solution( work_ptr->nCols(), val );
-   work_ptr->getPrimal( solution );
+   work_ptr->getPrimalSol( solution );
 
    Vector lhs = work_ptr->lhs(); lhs *= change_coeff;
    Vector rhs = work_ptr->rhs(); rhs *= change_coeff;
