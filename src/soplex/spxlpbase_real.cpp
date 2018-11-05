@@ -1633,7 +1633,14 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
          spxSnprintf(colname, MPSInput::MAX_LINE_LEN-1, "%s", mps.field1());
             colname[MPSInput::MAX_LINE_LEN-1] = '\0';
 
+            int ncnames = cnames.size();
             cnames.add(colname);
+            // check whether the new name is unique wrt previous column names
+            if( cnames.size() <= ncnames )
+            {
+              MSG_ERROR( std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" << std::endl; )
+              break;
+            }
             vec.clear();
             col.setObj(0.0);
             col.setLower(0.0);

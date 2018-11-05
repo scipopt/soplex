@@ -2797,6 +2797,9 @@ template <>
 void SPxLPBase<Real>::changeRhs(const VectorBase<Real>& newRhs, bool scale);
 
 template <>
+void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale);
+
+template <>
 bool SPxLPBase<Real>::readLPF(std::istream& p_input, NameSet* p_rnames, NameSet* p_cnames, DIdxSet* p_intvars);
 
 template <>
