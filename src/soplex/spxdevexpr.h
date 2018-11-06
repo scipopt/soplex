@@ -40,7 +40,8 @@ namespace soplex
          greenbe[ab] problems with the entering algorithm
          (row representation?).
 */
-class SPxDevexPR : public SPxPricer
+  template <class R>
+class SPxDevexPR : public SPxPricer<R>
 {
 private:
 
@@ -48,8 +49,8 @@ private:
    /**@name Data */
    //@{
    Real  last;           ///< penalty, selected at last iteration.
-   DataArray<IdxElement> prices;   ///< temporary array of precomputed pricing values
-   DataArray<IdxElement> pricesCo; ///< temporary array of precomputed pricing values
+   DataArray<typename SPxPricer<R>::IdxElement> prices;   ///< temporary array of precomputed pricing values
+   DataArray<typename SPxPricer<R>::IdxElement> pricesCo; ///< temporary array of precomputed pricing values
    DIdxSet bestPrices;   ///< set of best pricing candidates
    DIdxSet bestPricesCo; ///< set of best pricing candidates
    bool refined;         ///< has a refinement step already been tried?
@@ -59,7 +60,7 @@ private:
    /**@name Private helpers */
    //@{
    /// set entering/leaving algorithm
-   void setupWeights(SPxSolver::Type);
+   void setupWeights(typename SPxSolverBase<R>::Type);
    /// build up vector of pricing values for later use
    int buildBestPriceVectorLeave(Real feastol);
    /// internal implementation of SPxPricer::selectLeave()
@@ -94,13 +95,13 @@ public:
    //@{
    /// default constructor
    SPxDevexPR()
-      : SPxPricer("Devex")
+      : SPxPricer<R>("Devex")
       , last(0)
       , refined(false)
    {}
    /// copy constructor
    SPxDevexPR( const SPxDevexPR& old)
-      : SPxPricer(old)
+      : SPxPricer<R>(old)
       , last(old.last)
       , refined(false)
    {}
@@ -109,7 +110,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxPricer::operator=(rhs);
+         SPxPricer<R>::operator=(rhs);
          last = rhs.last;
       }
 
@@ -119,7 +120,7 @@ public:
    virtual ~SPxDevexPR()
    {}
    /// clone function for polymorphism
-   inline virtual SPxPricer* clone()  const
+   inline virtual SPxPricer<R>* clone()  const
    {
       return new SPxDevexPR(*this);
    }
@@ -129,11 +130,11 @@ public:
    /**@name Access / modification */
    //@{
    /// sets the solver
-   virtual void load(SPxSolver* base);
+   virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
-   virtual void setType(SPxSolver::Type);
+   virtual void setType(typename SPxSolverBase<R>::Type);
    /// set row/column representation
-   virtual void setRep(SPxSolver::Representation);
+   virtual void setRep(typename SPxSolverBase<R>::Representation);
    ///
    virtual int selectLeave();
    ///

@@ -38,6 +38,7 @@ namespace soplex
    terminate by \ref soplex::SPxSolver::load() "loading" the generated basis to
    SoPlex. Loaded bases must be nonsingular.
 */
+template <class R>
 class SPxStarter
 {
 protected:
@@ -95,7 +96,7 @@ public:
    /**@name Starting */
    //@{
    /// generates start basis for loaded basis.
-   virtual void generate(SPxSolver& base) = 0;
+   virtual void generate(SPxSolverBase<R>& base) = 0;
    //@}
 
    //-------------------------------------

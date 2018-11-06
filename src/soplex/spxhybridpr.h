@@ -40,19 +40,20 @@ namespace soplex
 
    See SPxPricer for a class documentation.
 */
-class SPxHybridPR : public SPxPricer
+  template <class R>
+class SPxHybridPR : public SPxPricer<R>
 {
    //-------------------------------------
    /**@name Data */
    //@{
    /// steepest edge pricer
-   SPxSteepPR   steep;
+   SPxSteepPR<R>   steep;
    /// partial multiple pricer
-   SPxParMultPR parmult;
+   SPxParMultPR<R> parmult;
    /// devex pricer
-   SPxDevexPR   devex;
+   SPxDevexPR<R>   devex;
    /// the currently used pricer
-   SPxPricer*   thepricer;
+   SPxPricer<R>*   thepricer;
    /// factor between dim and coDim of the problem to decide about the pricer
    Real hybridFactor;
    //@}
@@ -65,13 +66,13 @@ public:
    /// sets the epsilon
    virtual void setEpsilon(Real eps);
    /// sets the solver
-   virtual void load(SPxSolver* solver);
+   virtual void load(SPxSolverBase<R>* solver);
    /// clears all pricers and unselects the current pricer
    virtual void clear();
    /// sets entering or leaving algorithm
-   virtual void setType(SPxSolver::Type tp);
+   virtual void setType(typename SPxSolverBase<R>::Type tp);
    /// sets row or column representation
-   virtual void setRep(SPxSolver::Representation rep);
+   virtual void setRep(typename SPxSolverBase<R>::Representation rep);
    /// selects the leaving algorithm
    virtual int selectLeave();
    /// selects the entering algorithm
@@ -98,13 +99,13 @@ public:
    //@{
    /// default constructor
    SPxHybridPR()
-      : SPxPricer("Hybrid")
+      : SPxPricer<R>("Hybrid")
       , thepricer(0)
       , hybridFactor(3.0) // we want the ParMult pricer
    {}
    /// copy constructor
    SPxHybridPR(const SPxHybridPR& old)
-      : SPxPricer(old)
+      : SPxPricer<R>(old)
       , steep(old.steep)
       , parmult(old.parmult)
       , devex(old.devex)
@@ -132,7 +133,7 @@ public:
    {
       if(this != &rhs)
       {
-         SPxPricer::operator=(rhs);
+         SPxPricer<R>::operator=(rhs);
          steep = rhs.steep;
          parmult = rhs.parmult;
          devex = rhs.devex;
@@ -161,7 +162,7 @@ public:
    virtual ~SPxHybridPR()
    {}
    /// clone function for polymorphism
-   inline virtual SPxPricer* clone()  const
+   inline virtual SPxPricer<R>* clone()  const
    {
       return new SPxHybridPR(*this);
    }

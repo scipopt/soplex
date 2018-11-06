@@ -295,7 +295,7 @@ namespace soplex
       if( solution.hasPrimal() )
       {
          buffer.reDim((solution._primal).dim());
-         solution.getPrimal(buffer);
+         solution.getPrimalSol(buffer);
          reconstructVector(buffer);
          solution._primal = buffer;
 
@@ -316,7 +316,7 @@ namespace soplex
       if( solution.hasDual() )
       {
          buffer.reDim((solution._dual).dim());
-         solution.getDual(buffer);
+         solution.getDualSol(buffer);
          reconstructVector(buffer);
          solution._dual = buffer;
 
@@ -329,7 +329,7 @@ namespace soplex
       if( solution.hasDualfarkas() )
       {
          buffer.reDim((solution._dualfarkas).dim());
-         solution.getDualfarkas(buffer);
+         solution.getDualFarkas(buffer);
          reconstructVector(buffer);
          solution._dualfarkas = buffer;
       }

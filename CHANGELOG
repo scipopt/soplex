@@ -1,3 +1,55 @@
+next Release
+============
+
+interface & parameters:
+- new parameter 'int:printbasismetric' to replace 'printcondition'
+	(-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
+- Templated SoPlex, SPxSolver, and SPxBasis.
+- Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
+  SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility
+  (and for SCIP.)
+- Following renames:
+	| From                   | To                    |
+	|------------------------|-----------------------|
+	| `getDualFarkas`        | `getDualFarkasSol`    |
+	| `getDualFarkasT`       | `getDualFarkas`       |
+	| `getBoundViolationT`   | `getBoundViolation`   |
+	| `numColsT`             | `numCols`             |
+	| `numRowsT`             | `numRows`             |
+	| `getRedCost`           | `getRedCostSol`       |
+	| `getRedCostT`          | `getRedCost`          |
+	| `writeFile`            | `writeFileLPBase`     |
+	| `writeFileT`           | `writeFile`           |
+	| `getRowViolationT`     | `getRowViolation`     |
+	| `getDualViolationT`    | `getDualViolation`    |
+	| `getRedCostViolationT` | `getRedCostViolation` |
+	| `getDual`              | `getDualSol`          |
+	| `getDualT`             | `getDual`             |
+	| `getPrimal`            | `getPrimalSol`        |
+	| `getPrimalT`           | `getPrimal`           |
+	| `numNonZerosT`         | `numNonZeros`         |
+	| `_optimizeT`           | `_optimize`           |
+	| `getPrimalRay`         | `getPrimalRaySol`     |
+	| `getPrimalRayT`        | `getPrimalRay`        |
+
+- Wrapped the following functions:
+  1. `getDualFarkasReal`
+  2. `numColsReal`
+  3. `getRedCostReal`
+  4. `getDualReal`
+  5. `getPrimalReal`
+
+- Renamed `int numNonzeros` to `nNonzeros`
+- Renamed `SPxSolverBase<R>::getDualfarkas` to `SPxSolverBase<R>::getDualFarkas`
+  (for consistency.) Note that there is a method with the same name in
+  `SoPlexBase<R>`.
+
+fixed bugs:
+- correct objective function update in aggregation simplifier
+- use center value when fixing variables with slightly different bounds
+- MPS reader: print error message and terminate in case of duplicate column names or not column-wise ordering
+
+
 13 June 2018 - Release 4.0.0
 ============================
 

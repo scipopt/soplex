@@ -21,161 +21,174 @@
 
 namespace soplex
 {
+  /// Signature defined to avoid the specialization after instantiation error
+  template <>
+  void SPxBasisBase<Real>::Desc::reSize(int rowDim, int colDim);
 
-SPxBasis::Desc::Desc(const SPxSolver& base)
-{
-   reSize(base.nRows(), base.nCols());
+  template <>
+  bool SPxBasisBase<Real>::Desc::isConsistent() const;
 
-   if (base.rep() == SPxSolver::ROW)
-   {
-      stat   = &rowstat;
-      costat = &colstat;
-   }
-   else
-   {
-      assert(base.rep() == SPxSolver::COLUMN);
+  template <>
+  SPxBasisBase<Real>::Desc::Desc(const SPxSolverBase<Real>& base)
+  {
+    reSize(base.nRows(), base.nCols());
 
-      stat   = &colstat;
-      costat = &rowstat;
-   }
-
-   assert(Desc::isConsistent());
-}
-
-SPxBasis::Desc::Desc(const Desc& old)
-   : rowstat(old.rowstat)
-   , colstat(old.colstat)
-{
-   if (old.stat == &old.rowstat)
-   {
-      assert(old.costat == &old.colstat);
-
-      stat   = &rowstat;
-      costat = &colstat;
-   }
-   else
-   {
-      assert(old.costat == &old.rowstat);
-
-      stat   = &colstat;
-      costat = &rowstat;
-   }
-
-   assert(Desc::isConsistent());
-}
-
-SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
-{
-   if (this != &rhs)
-   {
-      rowstat = rhs.rowstat;
-      colstat = rhs.colstat;
-
-      if (rhs.stat == &rhs.rowstat)
+    if (base.rep() == SPxSolverBase<Real>::ROW)
       {
-         assert(rhs.costat == &rhs.colstat);
-
-         stat   = &rowstat;
-         costat = &colstat;
+        stat   = &rowstat;
+        costat = &colstat;
       }
-      else
+    else
       {
-         assert(rhs.costat == &rhs.rowstat);
+        assert(base.rep() == SPxSolverBase<Real>::COLUMN);
 
-         stat   = &colstat;
-         costat = &rowstat;
+        stat   = &colstat;
+        costat = &rowstat;
       }
 
-      assert(Desc::isConsistent());
-   }
-   return *this;
-}
+    assert(Desc::isConsistent());
+  }
 
-void SPxBasis::Desc::reSize(int rowDim, int colDim)
-{
+  template <>
+  SPxBasisBase<Real>::Desc::Desc(const Desc& old)
+    : rowstat(old.rowstat)
+    , colstat(old.colstat)
+  {
+    if (old.stat == &old.rowstat)
+      {
+        assert(old.costat == &old.colstat);
 
-   assert(rowDim >= 0);
-   assert(colDim >= 0);
+        stat   = &rowstat;
+        costat = &colstat;
+      }
+    else
+      {
+        assert(old.costat == &old.rowstat);
 
-   int noldrows = rowstat.size();
-   int noldcols = colstat.size();
+        stat   = &colstat;
+        costat = &rowstat;
+      }
 
-   rowstat.reSize(rowDim);
-   colstat.reSize(colDim);
+    assert(Desc::isConsistent());
+  }
 
-   for( int i = rowDim - 1; i >= noldrows; i-- )
+  template <>
+  typename SPxBasisBase<Real>::Desc& SPxBasisBase<Real>::Desc::operator=(const SPxBasisBase<Real>::Desc& rhs)
+  {
+    if (this != &rhs)
+      {
+        rowstat = rhs.rowstat;
+        colstat = rhs.colstat;
+
+        if (rhs.stat == &rhs.rowstat)
+          {
+            assert(rhs.costat == &rhs.colstat);
+
+            stat   = &rowstat;
+            costat = &colstat;
+          }
+        else
+          {
+            assert(rhs.costat == &rhs.rowstat);
+
+            stat   = &colstat;
+            costat = &rowstat;
+          }
+
+        assert(Desc::isConsistent());
+      }
+    return *this;
+  }
+
+  template <>
+  void SPxBasisBase<Real>::Desc::reSize(int rowDim, int colDim)
+  {
+
+    assert(rowDim >= 0);
+    assert(colDim >= 0);
+
+    int noldrows = rowstat.size();
+    int noldcols = colstat.size();
+
+    rowstat.reSize(rowDim);
+    colstat.reSize(colDim);
+
+    for( int i = rowDim - 1; i >= noldrows; i-- )
       rowstat[i] = D_UNDEFINED;
 
-   for( int i = colDim - 1; i >= noldcols; i-- )
+    for( int i = colDim - 1; i >= noldcols; i-- )
       colstat[i] = D_UNDEFINED;
-}
+  }
 
-void SPxBasis::Desc::dump() const
-{
-   int i;
+  template <>
+  void SPxBasisBase<Real>::Desc::dump() const
+  {
+    int i;
 
-   // Dump regardless of the verbosity level if this method is called.
+    // Dump regardless of the verbosity level if this method is called.
 
-   std::cout << "DBDESC01 column status: ";
-   for(i = 0; i < nCols(); i++)
-      std::cout << colStatus(i);
-   std::cout << std::endl;
+    std::cout << "DBDESC01 column status: ";
+    for(i = 0; i < nCols(); i++)
+      std::cout << static_cast<int>(colStatus(i));
+    std::cout << std::endl;
 
-   std::cout << "DBDESC02 row status:    ";
-   for(i = 0; i < nRows(); i++)
-      std::cout << rowStatus(i);
-   std::cout << std::endl;
-}
+    std::cout << "DBDESC02 row status:    ";
+    for(i = 0; i < nRows(); i++)
+      std::cout << static_cast<int>(rowStatus(i));
+    std::cout << std::endl;
+  }
 
-bool SPxBasis::Desc::isConsistent() const
-{
+  template <>
+  bool SPxBasisBase<Real>::Desc::isConsistent() const
+  {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   return rowstat.isConsistent() && colstat.isConsistent();
+    return rowstat.isConsistent() && colstat.isConsistent();
 #else
-   return true;
+    return true;
 #endif
-}
+  }
 
-std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
-{
-   char text;
+  template <class R>
+  std::ostream& operator<<(std::ostream& os, const typename SPxBasisBase<Real>::Desc::Status& stat)
+  {
+    char text;
 
-   switch(stat)
-   {
-   case SPxBasis::Desc::P_ON_LOWER :
-      text = 'L';
-      break;
-   case SPxBasis::Desc::P_ON_UPPER :
-      text = 'U';
-      break;
-   case SPxBasis::Desc::P_FREE :
-      text = 'F';
-      break;
-   case SPxBasis::Desc::P_FIXED :
-      text = 'X';
-      break;
-   case SPxBasis::Desc::D_FREE :
-      text = 'f';
-      break;
-   case SPxBasis::Desc::D_ON_UPPER :
-      text = 'u';
-      break;
-   case SPxBasis::Desc::D_ON_LOWER :
-      text = 'l';
-      break;
-   case SPxBasis::Desc::D_ON_BOTH :
-      text = 'x';
-      break;
-   case SPxBasis::Desc::D_UNDEFINED :
-      text = '.';
-      break;
-   default :
-      os << std::endl << "Invalid status <" << int(stat) << ">" << std::endl;
-      throw SPxInternalCodeException("XSPXDE01 This should never happen.");
-   }
-   os << text;
+    switch(stat)
+      {
+      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+        text = 'L';
+        break;
+      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+        text = 'U';
+        break;
+      case SPxBasisBase<Real>::Desc::P_FREE :
+        text = 'F';
+        break;
+      case SPxBasisBase<Real>::Desc::P_FIXED :
+        text = 'X';
+        break;
+      case SPxBasisBase<Real>::Desc::D_FREE :
+        text = 'f';
+        break;
+      case SPxBasisBase<Real>::Desc::D_ON_UPPER :
+        text = 'u';
+        break;
+      case SPxBasisBase<Real>::Desc::D_ON_LOWER :
+        text = 'l';
+        break;
+      case SPxBasisBase<Real>::Desc::D_ON_BOTH :
+        text = 'x';
+        break;
+      case SPxBasisBase<Real>::Desc::D_UNDEFINED :
+        text = '.';
+        break;
+      default :
+        os << std::endl << "Invalid status <" << int(stat) << ">" << std::endl;
+        throw SPxInternalCodeException("XSPXDE01 This should never happen.");
+      }
+    os << text;
 
-   return os;
-}
+    return os;
+  }
 
 } // namespace soplex

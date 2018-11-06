@@ -86,7 +86,8 @@ namespace soplex
  * @brief   Preconfigured SoPlex LP-solver.
  * @ingroup Algo
  */
-class SoPlex
+  template <class R>
+    class SoPlexBase
 {
 public:
 
@@ -94,16 +95,16 @@ public:
    //@{
 
    /// default constructor
-   SoPlex();
+   SoPlexBase();
 
    /// assignment operator
-   SoPlex& operator=(const SoPlex& rhs);
+   SoPlexBase<R>& operator=(const SoPlexBase<R>& rhs);
 
    /// copy constructor
-   SoPlex(const SoPlex& rhs);
+   SoPlexBase(const SoPlexBase<R>& rhs);
 
    /// destructor
-   virtual ~SoPlex();
+   virtual ~SoPlexBase();
 
    //@}
 
@@ -112,13 +113,20 @@ public:
    //@{
 
    /// returns number of rows
-   int numRowsReal() const;
+   int numRows() const;
+   int numRowsReal() const;     /* For SCIP compatibility */
+   int numRowsRational() const;
 
+   /// Templated function that
    /// returns number of columns
-   int numColsReal() const;
+   int numCols() const;
+   int numColsReal() const;     /* For SCIP compatibility */
+   int numColsRational() const;
 
    /// returns number of nonzeros
-   int numNonzerosReal() const;
+  int numNonzeros() const;
+
+   int numNonzerosRational() const;
 
    /// returns smallest non-zero element in absolute value
    Real minAbsNonzeroReal() const;
@@ -211,15 +219,6 @@ public:
 
    //**@name Access to the rational LP */
    //@{
-
-   /// returns number of rows
-   int numRowsRational() const;
-
-   /// returns number of columns
-   int numColsRational() const;
-
-   /// returns number of nonzeros
-   int numNonzerosRational() const;
 
    /// returns smallest non-zero element in absolute value
    Rational minAbsNonzeroRational() const;
@@ -363,14 +362,14 @@ public:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsReal()
+   /// #numRows()
    void removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
    void removeRowsReal(int idx[], int n, int perm[] = 0);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsReal() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
    void removeRowRangeReal(int start, int end, int perm[] = 0);
 
@@ -562,20 +561,20 @@ public:
    //@}
 
 
-   //**@name Solving and general solution query */
+   //**@name Solving and general solution quer */
    //@{
 
    /// optimize the given LP
-   SPxSolver::Status optimize();
+   typename SPxSolverBase<R>::Status optimize();
 
    // old name for backwards compatibility
-   SPxSolver::Status solve()
+   typename SPxSolverBase<R>::Status solve()
    {
       return optimize();
    }
 
    /// returns the current solver status
-   SPxSolver::Status status() const;
+   typename SPxSolverBase<R>::Status status() const;
 
    /// is stored primal solution feasible?
    bool isPrimalFeasible() const;
@@ -598,9 +597,9 @@ public:
    /// sets the status to OPTIMAL in case the LP has been solved with unscaled violations
    bool ignoreUnscaledViolations()
    {
-      if( _status == SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS )
+      if( _status == SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS )
       {
-         _status = SPxSolver::OPTIMAL;
+         _status = SPxSolverBase<R>::OPTIMAL;
          return true;
       }
       else
@@ -616,34 +615,48 @@ public:
    Real objValueReal();
 
    /// gets the primal solution vector if available; returns true on success
-   bool getPrimalReal(VectorReal& vector);
+   bool getPrimal(VectorBase<R>& vector);
+   bool getPrimalReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksReal(VectorReal& vector);
 
    /// gets the primal ray if available; returns true on success
-   bool getPrimalRayReal(VectorReal& vector);
+   bool getPrimalRay(VectorBase<R>& vector);
+   bool getPrimalRayReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
-   bool getDualReal(VectorReal& vector);
+   bool getDual(VectorBase<R>& vector);
+   bool getDualReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedCostReal(VectorReal& vector);
+   bool getRedCost(VectorBase<R>& vector);
+   bool getRedCostReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
-   bool getDualFarkasReal(VectorReal& vector);
+   bool getDualFarkas(VectorBase<R>& vector);
+   bool getDualFarkasReal(VectorBase<Real>& vector);
+   bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
-   bool getBoundViolationReal(Real& maxviol, Real& sumviol);
+   bool getBoundViolation(R& maxviol, R& sumviol);
+   bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of constraints; returns true on success
-   bool getRowViolationReal(Real& maxviol, Real& sumviol);
+   bool getRowViolation(R& maxviol, R& sumviol);
+   bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of reduced costs; returns true on success
-   bool getRedCostViolationReal(Real& maxviol, Real& sumviol);
+   bool getRedCostViolation(R& maxviol, R& sumviol);
+   bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
 
    /// gets violation of dual multipliers; returns true on success
-   bool getDualViolationReal(Real& maxviol, Real& sumviol);
+   bool getDualViolation(R& maxviol, R& sumviol);
+   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
    //@}
 
@@ -654,35 +667,8 @@ public:
    /// returns the objective value if a primal solution is available
    Rational objValueRational();
 
-   /// gets the primal solution vector if available; returns true on success
-   bool getPrimalRational(VectorRational& vector);
-
    /// gets the vector of slack values if available; returns true on success
    bool getSlacksRational(VectorRational& vector);
-
-   /// gets the primal ray if LP is unbounded; returns true on success
-   bool getPrimalRayRational(VectorRational& vector);
-
-   /// gets the dual solution vector if available; returns true on success
-   bool getDualRational(VectorRational& vector);
-
-   /// gets the vector of reduced cost values if available; returns true on success
-   bool getRedCostRational(VectorRational& vector);
-
-   /// gets the Farkas proof if LP is infeasible; returns true on success
-   bool getDualFarkasRational(VectorRational& vector);
-
-   /// gets violation of bounds; returns true on success
-   bool getBoundViolationRational(Rational& maxviol, Rational& sumviol);
-
-   /// gets violation of constraints; returns true on success
-   bool getRowViolationRational(Rational& maxviol, Rational& sumviol);
-
-   /// gets violation of reduced costs; returns true on success
-   bool getRedCostViolationRational(Rational& maxviol, Rational& sumviol);
-
-   /// gets violation of dual multipliers; returns true on success
-   bool getDualViolationRational(Rational& maxviol, Rational& sumviol);
 
 #ifdef SOPLEX_WITH_GMP
    /// gets the primal solution vector if available; returns true on success
@@ -732,25 +718,26 @@ public:
    bool hasBasis() const;
 
    /// returns the current basis status
-   SPxBasis::SPxStatus basisStatus() const;
+   typename SPxBasisBase<R>::SPxStatus basisStatus() const;
 
    /// returns basis status for a single row
-   SPxSolver::VarStatus basisRowStatus(int row) const;
+   typename  SPxSolverBase<R>::VarStatus basisRowStatus(int row) const;
 
    /// returns basis status for a single column
-   SPxSolver::VarStatus basisColStatus(int col) const;
+   typename SPxSolverBase<R>::VarStatus basisColStatus(int col) const;
 
    /// gets current basis via arrays of statuses
-   void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[]) const;
+   void getBasis(typename SPxSolverBase<R>::VarStatus rows[], typename SPxSolverBase<R>::VarStatus cols[]) const;
 
    /// gets the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
    void getBasisInd(int* bind) const;
 
-   /// compute condition number estimate based on the diagonal of the LU factorization; returns true on success
-   /// type = 0: max/min ratio
-   /// type = 1: trace of U (sum of diagonal elements)
-   /// type = 2: product of diagonal elements
-   bool getFastCondition(Real& condition, int type = 0);
+   /** compute one of several matrix metrics based on the diagonal of the LU factorization
+    *  type = 0: max/min ratio
+    *  type = 1: trace of U (sum of diagonal elements)
+    *  type = 2: determinant (product of diagonal elements)
+    */
+   bool getBasisMetric(Real& metric, int type = 0);
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
    bool getEstimatedCondition(Real& condition);
@@ -806,7 +793,7 @@ public:
    bool getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol);
 
    /// sets starting basis via arrays of statuses
-   void setBasis(const SPxSolver::VarStatus rows[], const SPxSolver::VarStatus cols[]);
+   void setBasis(const typename SPxSolverBase<R>::VarStatus rows[], const typename SPxSolverBase<R>::VarStatus cols[]);
 
    /// clears starting basis
    void clearBasis();
@@ -851,15 +838,21 @@ public:
    /// integer variables if desired; returns true on success
    bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
+   /// Templated write function
+   /// Real
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
-
+   /// Rational
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
+   bool writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
+
    bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+
+   /* For SCIP compatibility */
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
    /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
@@ -1032,7 +1025,7 @@ public:
       DECOMP_VERBOSITY = 27,
 
       /// print condition number during the solve
-      PRINTCONDITION = 28,
+      PRINTBASISMETRIC = 28,
 
       /// number of integer parameters
       INTPARAM_COUNT = 29
@@ -1376,41 +1369,41 @@ public:
          /// constructor
          BoolParam();
          /// array of names for boolean parameters
-         std::string name[SoPlex::BOOLPARAM_COUNT];
+         std::string name[SoPlexBase<R>::BOOLPARAM_COUNT];
          /// array of descriptions for boolean parameters
-         std::string description[SoPlex::BOOLPARAM_COUNT];
+         std::string description[SoPlexBase<R>::BOOLPARAM_COUNT];
          /// array of default values for boolean parameters
-         bool defaultValue[SoPlex::BOOLPARAM_COUNT];
+         bool defaultValue[SoPlexBase<R>::BOOLPARAM_COUNT];
       } boolParam;
 
       static struct IntParam {
          /// constructor
          IntParam();
           /// array of names for integer parameters
-         std::string name[SoPlex::INTPARAM_COUNT];
+         std::string name[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of descriptions for integer parameters
-         std::string description[SoPlex::INTPARAM_COUNT];
+         std::string description[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of default values for integer parameters
-         int defaultValue[SoPlex::INTPARAM_COUNT];
+         int defaultValue[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of lower bounds for int parameter values
-         int lower[SoPlex::INTPARAM_COUNT];
+         int lower[SoPlexBase<R>::INTPARAM_COUNT];
          /// array of upper bounds for int parameter values
-         int upper[SoPlex::INTPARAM_COUNT];
+         int upper[SoPlexBase<R>::INTPARAM_COUNT];
       } intParam;
 
       static struct RealParam {
          /// constructor
          RealParam();
          /// array of names for real parameters
-         std::string name[SoPlex::REALPARAM_COUNT];
+         std::string name[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of descriptions for real parameters
-         std::string description[SoPlex::REALPARAM_COUNT];
+         std::string description[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of default values for real parameters
-         Real defaultValue[SoPlex::REALPARAM_COUNT];
+         Real defaultValue[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of lower bounds for real parameter values
-         Real lower[SoPlex::REALPARAM_COUNT];
+         Real lower[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of upper bounds for real parameter values
-         Real upper[SoPlex::REALPARAM_COUNT];
+         Real upper[SoPlexBase<R>::REALPARAM_COUNT];
       } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1418,30 +1411,30 @@ public:
          /// constructor
          RationalParam();
          /// array of names for rational parameters
-         std::string name[SoPlex::RATIONALPARAM_COUNT];
+         std::string name[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of descriptions for rational parameters
-         std::string description[SoPlex::RATIONALPARAM_COUNT];
+         std::string description[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of default values for rational parameters
-         Rational defaultValue[SoPlex::RATIONALPARAM_COUNT];
+         Rational defaultValue[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of lower bounds for rational parameter values
-         Rational lower[SoPlex::RATIONALPARAM_COUNT];
+         Rational lower[SoPlexBase<R>::RATIONALPARAM_COUNT];
          /// array of upper bounds for rational parameter values
-         Rational upper[SoPlex::RATIONALPARAM_COUNT];
+         Rational upper[SoPlexBase<R>::RATIONALPARAM_COUNT];
       } rationalParam;
 #endif
 
       /// array of current boolean parameter values
-      bool _boolParamValues[SoPlex::BOOLPARAM_COUNT];
+      bool _boolParamValues[SoPlexBase<R>::BOOLPARAM_COUNT];
 
       /// array of current integer parameter values
-      int _intParamValues[SoPlex::INTPARAM_COUNT];
+      int _intParamValues[SoPlexBase<R>::INTPARAM_COUNT];
 
       /// array of current real parameter values
-      Real _realParamValues[SoPlex::REALPARAM_COUNT];
+      Real _realParamValues[SoPlexBase<R>::REALPARAM_COUNT];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of current rational parameter values
-      Rational _rationalParamValues[SoPlex::RATIONALPARAM_COUNT];
+      Rational _rationalParamValues[SoPlexBase<R>::RATIONALPARAM_COUNT];
 #endif
 
       /// default constructor initializing default settings
@@ -1524,7 +1517,8 @@ public:
    void printStatistics(std::ostream& os);
 
    /// prints status
-   void printStatus(std::ostream& os, SPxSolver::Status status);
+
+   void printStatus(std::ostream& os, typename SPxSolverBase<R>::Status status);
 
    //@}
 
@@ -1579,36 +1573,36 @@ private:
    //**@name Data for the real LP */
    //@{
 
-   SPxSolver _solver;
+   SPxSolverBase<R> _solver;
    SLUFactor _slufactor;
-   SPxMainSM _simplifierMainSM;
+   SPxMainSM<R> _simplifierMainSM;
    SPxEquiliSC _scalerUniequi;
    SPxEquiliSC _scalerBiequi;
    SPxGeometSC _scalerGeo1;
    SPxGeometSC _scalerGeo8;
    SPxGeometSC _scalerGeoequi;
    SPxLeastSqSC _scalerLeastsq;
-   SPxWeightST _starterWeight;
-   SPxSumST _starterSum;
-   SPxVectorST _starterVector;
-   SPxAutoPR _pricerAuto;
-   SPxDantzigPR _pricerDantzig;
-   SPxParMultPR _pricerParMult;
-   SPxDevexPR _pricerDevex;
-   SPxSteepPR _pricerQuickSteep;
-   SPxSteepExPR _pricerSteep;
-   SPxDefaultRT _ratiotesterTextbook;
-   SPxHarrisRT _ratiotesterHarris;
-   SPxFastRT _ratiotesterFast;
-   SPxBoundFlippingRT _ratiotesterBoundFlipping;
+   SPxWeightST<R> _starterWeight;
+   SPxSumST<R> _starterSum;
+   SPxVectorST<R> _starterVector;
+   SPxAutoPR<R> _pricerAuto;
+   SPxDantzigPR<R> _pricerDantzig;
+   SPxParMultPR<R> _pricerParMult;
+   SPxDevexPR<R> _pricerDevex;
+   SPxSteepPR<R> _pricerQuickSteep;
+   SPxSteepExPR<R> _pricerSteep;
+   SPxDefaultRT<R> _ratiotesterTextbook;
+   SPxHarrisRT<R> _ratiotesterHarris;
+   SPxFastRT<R> _ratiotesterFast;
+   SPxBoundFlippingRT<R> _ratiotesterBoundFlipping;
 
    SPxLPReal* _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
    SPxLPReal* _decompLP; // used to store the original LP for the decomposition dual simplex
-   SPxSimplifier* _simplifier;
+   SPxSimplifier<R>* _simplifier;
    SPxScaler* _scaler;
-   SPxStarter* _starter;
+   SPxStarter<R>* _starter;
 
-   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
+   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
                          // are performed on the original LP.
    bool _isRealLPScaled;
    bool _applyPolishing;
@@ -1647,8 +1641,8 @@ private:
    DVectorRational _modRhs;
    DVectorRational _modObj;
    DSVectorRational _primalDualDiff;
-   DataArray< SPxSolver::VarStatus > _storedBasisStatusRows;
-   DataArray< SPxSolver::VarStatus > _storedBasisStatusCols;
+   DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusRows;
+   DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusCols;
    DataArray< UnitVectorRational* > _unitMatrixRational;
    bool _storedBasis;
    int _beforeLiftRows;
@@ -1734,13 +1728,13 @@ private:
       IS_FREE = 2
    };
 
-   SPxSolver _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
+   SPxSolverBase<R> _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
                           // problem will be stored in _solver and the complementary problem will be stored in
                           // _compSolver.
    SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
-   SPxBasis _decompTransBasis;   // the basis required for the transformation to form the reduced problem
+   SPxBasisBase<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
    DVector _transformedObj;       // the objective coefficients of the transformed problem
    DVector _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
@@ -1799,7 +1793,7 @@ private:
    // problem statistics
    int numProbRows;
    int numProbCols;
-   int numNonzeros;
+   int nNonzeros;
    Real minAbsNonzero;
    Real maxAbsNonzero;
 
@@ -1822,11 +1816,11 @@ private:
    //**@name Solution data */
    //@{
 
-   SPxSolver::Status _status;
+   typename SPxSolverBase<R>::Status _status;
    int _lastSolveMode;
 
-   DataArray< SPxSolver::VarStatus > _basisStatusRows;
-   DataArray< SPxSolver::VarStatus > _basisStatusCols;
+   DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
+   DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
    SolReal _solReal;
    SolRational _solRational;
@@ -1957,14 +1951,14 @@ private:
 
    /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
    /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
-   /// #numRowsReal()
+   /// #numRows()
    void _removeRowsReal(int perm[]);
 
-   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsReal() may be passed
+   /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
    /// as buffer memory
    void _removeRowsReal(int idx[], int n, int perm[]);
 
-   /// removes rows \p start to \p end including both; an array \p perm of size #numRowsReal() may be passed as buffer
+   /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
    /// memory
    void _removeRowRangeReal(int start, int end, int perm[]);
 
@@ -2031,7 +2025,7 @@ private:
    /// synchronizes real solution with rational solution, i.e., copies real solution to rational solution
    void _syncRationalSolution();
 
-   /// returns pointer to a constant unit vector available until destruction of the SoPlex class
+   /// returns pointer to a constant unit vector available until destruction of the SoPlexBase class
    const UnitVectorRational* _unitVectorRational(const int i);
 
    /// parses one line in a settings file and returns true on success; note that the string is modified
@@ -2042,9 +2036,6 @@ private:
 
    //**@name Private solving methods implemented in solverational.cpp */
    //@{
-
-   /// solves rational LP
-   void _optimizeRational();
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
@@ -2134,40 +2125,43 @@ private:
    void _computeInfeasBox(SolRational& sol, bool transformed);
 
    /// solves real LP during iterative refinement
-   SPxSolver::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
-                                           DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                           DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis);
+   typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
+                                           DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+                                           DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// solves real LP with recovery mechanism
-   SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
-                                      DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
+   typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
+                                      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
+                                      DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
+   void _factorizeColumnRational(SolRational& sol, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
+   bool _reconstructSolutionRational(SolRational& sol, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows, DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
    //@}
 
 
    //**@name Private solving methods implemented in solvereal.cpp */
    //@{
 
-   /// solves real LP
-   void _optimizeReal();
+   /// solves the templated LP
+   void _optimize();
+
+   /// temporary fix for Rational
+   void _optimizeRational();
 
    /// checks result of the solving process and solves again without preprocessing if necessary
-   void _evaluateSolutionReal(SPxSimplifier::Result simplificationStatus);
+   void _evaluateSolutionReal(typename SPxSimplifier<R>::Result simplificationStatus);
 
    /// solves real LP with/without preprocessing
    void _preprocessAndSolveReal(bool applyPreprocessing);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _resolveWithoutPreprocessing(SPxSimplifier::Result simplificationStatus);
+   void _resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus);
 
    /// verify computed solution and resolve if necessary
    void _verifySolutionReal();
@@ -2209,10 +2203,10 @@ private:
    void _formDecompComplementaryProblem();
 
    /// simplifies the problem and solves
-   void _decompSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
+   void _decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _decompResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
+   void _decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
    void _getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
@@ -2237,7 +2231,7 @@ private:
    void _deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
 
    /// evaluates the solution of the reduced problem for the DBDS
-   void _evaluateSolutionDecomp(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
+   void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// update the reduced problem with additional columns and rows
    void _updateDecompReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
@@ -2297,8 +2291,8 @@ private:
    /// returns the expected sign of the dual variables for the original problem
    DualSign getOrigProbDualVariableSign(int rowNumber);
 
-   /// prints a display line of the flying table for the DBDS 
-   void printDecompDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
+   /// prints a display line of the flying table for the DBDS
+   void printDecompDisplayLine(SPxSolverBase<R>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
 
    /// stores the problem statistics of the original problem
    void getOriginalProblemStatistics();
@@ -2323,12 +2317,16 @@ private:
 
    /// function to retrieve the original problem row basis status from the reduced and complementary problems
    void getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
-      DataArray< SPxSolver::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
+      DataArray< typename SPxSolverBase<R>::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
 
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
    //@}
 };
+
+  /* Backwards compatibility */
+  typedef SoPlexBase<Real> SoPlex;
+
 }
 #endif // _SOPLEX_H_

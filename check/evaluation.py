@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import sys
 import math
 import json
@@ -67,6 +69,8 @@ testset = outname.split('/')[-1].split('.')[1]
 testname = 'testset/'+testset+'.test'
 soluname = 'testset/'+testset+'.solu'
 
+settings = outname.split('/')[-1].split('.')[-2]
+
 # maximum length of instance names
 namelength = 18
 
@@ -98,6 +102,8 @@ for idx, outline in enumerate(outlines):
         instances[instancename] = {}
         instances[instancename]['status'] = 'abort'
         instances[instancename]['name'] = shortname
+        instances[instancename]['settings'] = settings
+        instances[instancename]['testset'] = testset
         # wait for statistics block
         stats = False
 
@@ -338,7 +344,7 @@ for name in sorted(instances):
         output = output + ' ' + str(instances[name].get(c, '--')).rjust(length[i] + 1)
     print(output)
 
-print('\nResults (testset '+testname.split('/')[-1].split('.')[-2]+', settings '+outname.split('/')[-1].split('.')[-2]+'):')
+print('\nResults (testset '+testset+', settings '+settings+'):')
 print('{} total: {} optimal, {} infeasible, {} unbounded, {} timeouts, {} inconsistents, {} fails, {} aborts'.format(len(instances),optimal,infeasible,unbounded,timeouts,inconsistents,fails,aborts))
 
 # try to check for missing files

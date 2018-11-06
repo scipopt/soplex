@@ -26,10 +26,10 @@ using namespace soplex;
 // write constraint line in latte format
 //
 static void write_row(
-   const SVector& row, 
-   int            cols, 
-   double         rhs, 
-   double         dir, 
+   const SVector& row,
+   int            cols,
+   double         rhs,
+   double         dir,
    std::ofstream& ofile)
 {
    int idx = 0;
@@ -119,7 +119,7 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
 
          for(int k = 0; k < lp.nCols(); ++k)
             ofile << " " << (k == i) ? 1 : 0;
-            
+
          ofile << std::endl;
       }
 
@@ -129,7 +129,7 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
 
          for(int k = 0; k < lp.nCols(); ++k)
             ofile << " " << (k == i) ? -1 : 0;
-            
+
          ofile << std::endl;
       }
    }
@@ -160,7 +160,7 @@ static void write_latte(const SPxLP& lp, std::ofstream& ofile)
 }
 
 static void read_latte(
-   SPxLP& lp, 
+   SPxLP& lp,
    spxifstream& ifile,
    NameSet& rownames,
    NameSet& colnames,
@@ -230,7 +230,7 @@ static void read_latte(
 
          ifile >> c;
 
-         lp.changeLower(c - 1, 0.0);         
+         lp.changeLower(c - 1, 0.0);
       }
    }
    for(int c = 0; c < cols; ++c)
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
    const char* usage =
    "[options] input-file output-file\n\n"
    "          input-file can be either in MPS or LPF format\n\n"
-   "options:  (*) indicates default\n" 
+   "options:  (*) indicates default\n"
    " -i        Latte input format\n"
    " -l        Latte output format\n"
    " -m        MPS output format\n"
@@ -348,7 +348,7 @@ int main(int argc, char **argv)
    }
 
    std::ofstream ofile(outfile);
-   
+
    if (!ofile)
    {
       std::cerr << "Can't open file: " << outfile << std::endl;
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
    case MPS :
       lp.writeMPS(ofile, &rownames, &colnames, &intvars);
       break;
-   case LPF : 
+   case LPF :
       lp.writeLPF(ofile, &rownames, &colnames, &intvars);
       break;
    case LATTE :
@@ -370,7 +370,3 @@ int main(int argc, char **argv)
    }
    return 0;
 }
-
-
-
-

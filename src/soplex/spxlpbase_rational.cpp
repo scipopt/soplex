@@ -1253,7 +1253,15 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          // save copy of string (make sure string ends with \0)
          spxSnprintf(colname, MPSInput::MAX_LINE_LEN-1, "%s", mps.field1());
          colname[MPSInput::MAX_LINE_LEN-1] = '\0';
+
+         int ncnames = cnames.size();
          cnames.add(colname);
+         // check whether the new name is unique wrt previous column names
+         if( cnames.size() <= ncnames )
+         {
+            MSG_ERROR( std::cerr << "ERROR in COLUMNS: duplicate column name or not column-wise ordering" << std::endl; )
+            break;
+         }
          vec.clear();
          col.setObj(0);
          col.setLower(0);
@@ -2141,16 +2149,17 @@ static void MPSwriteRecord(
    char buf[81];
    long long pos;
    pos = os.tellp();
-   sprintf(buf, " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
+
+   spxSnprintf(buf, sizeof(buf), " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
    os << buf;
 
    if( name1 != 0 )
    {
-      spxSnprintf(buf, 81, " %-8.8s ", name1);
+      spxSnprintf(buf, sizeof(buf), " %-8.8s ", name1);
       os << buf << value1;
       if( name2 != 0 )
       {
-         spxSnprintf(buf, 81, " %-8.8s ", name2);
+         spxSnprintf(buf, sizeof(buf), " %-8.8s ", name2);
          os << buf << value2;
       }
    }

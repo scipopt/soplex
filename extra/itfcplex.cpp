@@ -64,7 +64,7 @@ public:
     * }
     */
 
-   SPxCPlex() 
+   SPxCPlex()
       : SoPlex(LEAVE, COLUMN)
       , m_verbose(true)
       , m_probname(0)
@@ -103,7 +103,7 @@ public:
    }
 };
 
-extern "C" CPXENVptr CPXopenCPLEX(int* status_p) 
+extern "C" CPXENVptr CPXopenCPLEX(int* status_p)
 {
    SPxCPlex* spx = new SPxCPlex;
    *status_p     = 0;
@@ -140,7 +140,7 @@ extern "C" CPXLPptr CPXcreateprob(CPXENVptr env, int* status_p, char* probname)
       return 0;
    }
    SPxCPlex* spx = reinterpret_cast<SPxCPlex*>(env);
-   
+
    if (probname != 0)
       spx->setProbname(probname);
 
@@ -169,15 +169,15 @@ extern "C" int CPXcopylpwnames(
    int       numcols, // mac
    int       numrows, // mar
    int       objsen,
-   double*   objx, 
-   double*   rhsx, 
-   char*     senx, 
+   double*   objx,
+   double*   rhsx,
+   char*     senx,
    int*      matbeg,
-   int*      matcnt, 
-   int*      matind, 
-   double*   matval, 
+   int*      matcnt,
+   int*      matind,
+   double*   matval,
    double*   bdl,
-   double*   bdu, 
+   double*   bdu,
    double*   rngval,
    char**    colname,
    char**    rowname)
@@ -188,11 +188,11 @@ extern "C" int CPXcopylpwnames(
       return CPXERR_NULL_POINTER;
    if ((numcols < 1) || (numrows < 1) || (objsen == 0))
       return CPXERR_BAD_ARGUMENT;
-   if ((objx == 0) || (rhsx == 0) || (senx == 0) 
+   if ((objx == 0) || (rhsx == 0) || (senx == 0)
       || (matbeg == 0) || (matcnt == 0) || (matind == 0) || (matval == 0)
       || (bdl == 0) || (bdu == 0) || (colname == 0) || (rowname == 0))
       return CPXERR_NULL_POINTER;
- 
+
    SPxCPlex* spx = reinterpret_cast<SPxCPlex*>(env);
    LPColSet  cols(numcols);
    LPRowSet  rows(numrows);
@@ -237,7 +237,7 @@ extern "C" int CPXcopylpwnames(
    }
    spx->changeSense(objsen == 1 ? SPxLP::MINIMIZE : SPxLP::MAXIMIZE);
    spx->addCols(cols);
-   
+
    return 0;
 }
 
@@ -248,7 +248,7 @@ extern "C" int CPXcopybase(
       return CPXERR_NO_ENVIRONMENT;
    if ((lp == 0) || (cstat == 0) || (rstat == 0))
       return CPXERR_NULL_POINTER;
-    
+
    SPxCPlex* spx = reinterpret_cast<SPxCPlex*>(env);
 
    SPxBasis::Desc  desc;
@@ -315,9 +315,9 @@ extern "C" int CPXcopybase(
       default:
          return CPXERR_BAD_ARGUMENT;
       }
-   }  
+   }
    spx->load(desc);
-   
+
    return 0;
 }
 
@@ -328,7 +328,7 @@ extern "C" int CPXgetbase(
       return CPXERR_NO_ENVIRONMENT;
    if (lp == 0)
       return CPXERR_NULL_POINTER;
-    
+
    SPxCPlex*             spx  = reinterpret_cast<SPxCPlex*>(env);
    const SPxBasis::Desc& desc = spx->basis().desc();
 
@@ -359,7 +359,7 @@ extern "C" int CPXgetbase(
             abort();
          }
       }
-   }   
+   }
    if (rstat != 0)
    {
       for(int i = 0; i < spx->nRows() - 1; i++)
@@ -393,7 +393,7 @@ extern "C" int CPXdualopt(CPXENVptr env, CPXLPptr lp)
       return CPXERR_NO_ENVIRONMENT;
    if (lp == 0)
       return CPXERR_NULL_POINTER;
-    
+
    SPxCPlex* spx  = reinterpret_cast<SPxCPlex*>(env);
 
    if (spx->basis().status() <= 0)
@@ -404,16 +404,16 @@ extern "C" int CPXdualopt(CPXENVptr env, CPXLPptr lp)
    return 0;
 }
 
-/**@todo The Status codes returned are partly bullshit. 
+/**@todo The Status codes returned are partly bullshit.
  * @todo The return value of CPXsolution is not allways ok.
  */
 extern "C" int CPXsolution(
-   CPXENVptr env, 
-   CPXLPptr  lp, 
-   int*      status, 
-   double*   obj, 
+   CPXENVptr env,
+   CPXLPptr  lp,
+   int*      status,
+   double*   obj,
    double*   primal,
-   double*   dual, 
+   double*   dual,
    double*   slack,
    double*   redcost)
 {
@@ -421,7 +421,7 @@ extern "C" int CPXsolution(
       return CPXERR_NO_ENVIRONMENT;
    if (lp == 0)
       return CPXERR_NULL_POINTER;
-    
+
    SPxCPlex* spx = reinterpret_cast<SPxCPlex*>(env);
 
    if (status != 0)
@@ -455,7 +455,7 @@ extern "C" int CPXsolution(
    if (primal != 0)
    {
       Vector tmp(spx->nCols(), primal);
-      spx->getPrimal(tmp);
+      spx->getPrimalSol(tmp);
    }
    if (redcost != 0)
    {
@@ -475,12 +475,12 @@ extern "C" int CPXsolution(
          {
             double         x = spx->rhs(i);
             double         y = -tmp[i];
-            slack[i - 1] = y + ((x < SPxLP::infinity) ? x : spx->lhs(i)); 
+            slack[i - 1] = y + ((x < SPxLP::infinity) ? x : spx->lhs(i));
          }
       }
       if (dual != 0)
       {
-         spx->getDual(tmp);
+         spx->getDualSol(tmp);
          for(int i = 1; i < rows; i++)
             dual[i - 1] = tmp[i];
       }
@@ -494,7 +494,7 @@ extern "C" int CPXgetnumcols(CPXENVptr env, CPXLPptr lp)
       return CPXERR_NO_ENVIRONMENT;
    if (lp == 0)
       return CPXERR_NULL_POINTER;
-    
+
    return reinterpret_cast<SPxCPlex*>(env)->nCols();
 }
 
@@ -504,7 +504,7 @@ extern "C" int CPXgetnumrows(CPXENVptr env, CPXLPptr lp)
       return CPXERR_NO_ENVIRONMENT;
    if (lp == 0)
       return CPXERR_NULL_POINTER;
-    
+
    return reinterpret_cast<SPxCPlex*>(env)->nRows() - 1;
 }
 
@@ -542,7 +542,7 @@ extern "C" int CPXgetitcnt(CPXENVptr env, CPXLPptr lp)
       return CPXERR_NO_ENVIRONMENT;
    if (lp == 0)
       return CPXERR_NULL_POINTER;
-    
+
    return reinterpret_cast<SPxCPlex*>(env)->basis().iteration();
 }
 
@@ -621,22 +621,22 @@ extern "C" int CPXchgbds(
 /**@todo I suspect, that the case ccnt > 0 is not handled well.
  */
 extern "C" int CPXaddrows(
-   CPXENVptr env, 
-   CPXLPptr  lp, 
-   int       ccnt, 
-   int       rcnt, 
+   CPXENVptr env,
+   CPXLPptr  lp,
+   int       ccnt,
+   int       rcnt,
    int       nzcnt,
-   double*   rhs, 
+   double*   rhs,
    char*     sns,
-   int*      beg, 
-   int*      ind, 
+   int*      beg,
+   int*      ind,
    double*   val,
-   char**    cnames, 
+   char**    cnames,
    char**    rnames)
 {
    if (env == 0)
       return CPXERR_NO_ENVIRONMENT;
-   if ((lp == 0) || (rhs == 0) || (sns == 0) 
+   if ((lp == 0) || (rhs == 0) || (sns == 0)
       || (beg == 0) || (ind == 0) || (val == 0))
       return CPXERR_NULL_POINTER;
    if ((ccnt < 0) || (rcnt < 1) || (nzcnt < 0))
@@ -654,7 +654,7 @@ extern "C" int CPXaddrows(
       row.clear();
 
       int end = (i < rcnt - 1) ? beg[i + 1] : nzcnt;
-      
+
       for(int k = beg[i]; k < end; k++)
          row.add(ind[k], val[k]);
 
@@ -675,20 +675,20 @@ extern "C" int CPXaddrows(
       }
    }
    spx->addRows(rset);
-   
+
    return 0;
 }
 
 extern "C" int CPXgetrows(
    CPXENVptr env,
-   CPXLPptr  lp, 
-   int*      nzcnt, 
-   int*      beg, 
-   int*      ind, 
+   CPXLPptr  lp,
+   int*      nzcnt,
+   int*      beg,
+   int*      ind,
    double*   val,
-   int       size, 
-   int*      surplus, 
-   int       begin, 
+   int       size,
+   int*      surplus,
+   int       begin,
    int       end)
 {
    if (env == 0)
@@ -777,7 +777,7 @@ extern "C" int CPXsetintparam(CPXENVptr env, int whichparam, int newvalue)
       break;
    case CPX_PARAM_ITLIM :
       break;
-   case CPX_PARAM_FASTMIP : 
+   case CPX_PARAM_FASTMIP :
       break;
    case CPX_DPRIIND_FULL :
       break;
@@ -824,7 +824,7 @@ extern "C" int CPXsetlogfile(CPXENVptr env, CPXFILEptr fp)
 {
    if (env == 0)
       return CPXERR_NO_ENVIRONMENT;
-   
+
    return 0;
 }
 
@@ -895,11 +895,11 @@ extern "C" int CPXgetx(
       return CPXERR_BAD_ARGUMENT;
 
    DVector tmp(spx->nCols());
-   spx->getPrimal(tmp);
+   spx->getPrimalSol(tmp);
 
    for(int i = start; i <= end; i++)
       x[i - start] = tmp[i];
-   
+
    return 0;
 }
 
@@ -917,11 +917,11 @@ extern "C" int CPXgetpi(
       return CPXERR_BAD_ARGUMENT;
 
    DVector tmp(spx->nRows());
-   spx->getDual(tmp);
+   spx->getDualSol(tmp);
 
    for(int i = start; i <= end; i++)
       pi[i - start] = tmp[i + 1];
-   
+
    return 0;
 }
 
@@ -945,7 +945,7 @@ extern "C" int CPXgetslack(
    {
       double         x = spx->rhs(i + 1);
       double         y = -tmp[i + 1];
-      slack[i - start] = y + ((x < SPxLP::infinity) ? x : spx->lhs(i + 1)); 
+      slack[i - start] = y + ((x < SPxLP::infinity) ? x : spx->lhs(i + 1));
    }
    return 0;
 }
@@ -968,7 +968,7 @@ extern "C" int CPXgetdj(
 
    for(int i = start; i <= end; i++)
       dj[i - start] = tmp[i];
-   
+
    return 0;
 }
 
@@ -1046,7 +1046,7 @@ extern "C" int CPXdelrows(CPXENVptr env, CPXLPptr lp, int start, int end)
     end++;
 
     int i = 0;
-    
+
     while(i < start)
        del[i++] = 0;
     while(i <= end)
@@ -1062,16 +1062,16 @@ extern "C" int CPXdelrows(CPXENVptr env, CPXLPptr lp, int start, int end)
 #if 0
 
 extern "C" int CPXaddcols(
-   CPXENVptr env, 
-   CPXLPptr cplex, 
-   int ccnt, 
-   int nzcnt, 
-   double* objx,             
-   int *cmatbeg, 
-   int *cmatind, 
+   CPXENVptr env,
+   CPXLPptr cplex,
+   int ccnt,
+   int nzcnt,
+   double* objx,
+   int *cmatbeg,
+   int *cmatind,
    double *cmatval,
-   double *bdl, 
-   double *bdu, 
+   double *bdl,
+   double *bdu,
    char **cname)
 {
     int                i ;

@@ -46,7 +46,7 @@
 
 using namespace soplex;
 
-class StatusExceptionCheck 
+class StatusExceptionCheck
 {
    bool checkXSOLVR01();
    bool checkXSOLVE01();
@@ -57,12 +57,12 @@ class StatusExceptionCheck
 public:
    bool noProblemCheck();
    bool noSolverCheck();
-   bool noPricerCheck(); 
+   bool noPricerCheck();
    bool noRatioTesterCheck();
    bool notInitialized();
 };
 
-bool StatusExceptionCheck::noProblemCheck() 
+bool StatusExceptionCheck::noProblemCheck()
 {
    std::cout<<std::endl<<"Test for No Problem:"<<std::endl;
    bool success = true;
@@ -118,7 +118,7 @@ bool StatusExceptionCheck::checkXSOLVR01()
       solver->optimize();
    }catch(SPxStatusException& x)
    {
-      delete solver;      
+      delete solver;
       if(x.what().find("XSOLVR01") == 0)
          return true;
       return false;
@@ -148,7 +148,7 @@ bool StatusExceptionCheck::checkXSOLVE08()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getDual(*p_primal);
+      solver->getDualSol(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;
@@ -165,10 +165,10 @@ bool StatusExceptionCheck::checkXSOLVE09()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getRedCost(*p_primal);
+      solver->getRedCostSol(*p_primal);
    }catch(SPxStatusException& x)
    {
-      delete solver; 
+      delete solver;
       if(x.what().find("XSOLVE09") == 0)
          return true;
       return false;
@@ -182,7 +182,7 @@ bool StatusExceptionCheck::checkXSOLVE10()
    SPxSolver* solver = new SPxSolver();
    Vector* p_primal = 0;
    try{
-      solver->getDualfarkas(*p_primal);
+      solver->getDualFarkas(*p_primal);
    }catch(SPxStatusException& x)
    {
       delete solver;
@@ -315,7 +315,7 @@ bool StatusExceptionCheck::notInitialized()
    solver->setPricer(&pricer);
    solver->setTester(&tester);
    try{
-      solver->getPrimal(*v);
+      solver->getPrimalSol(*v);
    }catch(SPxStatusException& x)
    {
       delete solver;
@@ -332,7 +332,7 @@ bool StatusExceptionCheck::notInitialized()
    return false;
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
    StatusExceptionCheck checks;
 

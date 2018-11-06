@@ -69,6 +69,6 @@ int main(int argc, const char* const argv[])
 
    // work.writeLPF(std::cout, NULL, NULL);
    // std::cout << std::endl;
-   
+
    return 0;
 }

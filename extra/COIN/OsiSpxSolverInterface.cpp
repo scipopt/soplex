@@ -685,7 +685,7 @@ const double * OsiSpxSolverInterface::getColSolution() const
 	{
 	  colsol_ = new soplex::DVector( ncols );
 	  if( isProvenOptimal() )
-	    spxsolver_.getPrimal( *colsol_ );
+	    spxsolver_.getPrimalSol( *colsol_ );
 	  else
 	    colsol_->clear();
 	}
@@ -704,7 +704,7 @@ const double * OsiSpxSolverInterface::getRowPrice() const
 	{
 	  rowsol_ = new soplex::DVector( nrows );
 	  if( isProvenOptimal() )
-	    spxsolver_.getDual( *rowsol_ );
+	    spxsolver_.getDualSol( *rowsol_ );
 	  else
 	    rowsol_->clear();
 	}
@@ -1357,7 +1357,7 @@ OsiSpxSolverInterface::OsiSpxSolverInterface( const OsiSpxSolverInterface & sour
     matrixByCol_(NULL)
 {
   spxsolver_.loadLP( source.spxsolver_ );
-  if( source.spxsolver_.basis().status() != soplex::SPxBasis::NO_PROBLEM )
+  if( source.spxsolver_.basis().status() != soplex::SPxBasis<Real>::NO_PROBLEM )
      spxsolver_.loadBasis( source.spxsolver_.basis().desc() );
   spxsolver_.setTerminationTime ( source.spxsolver_.terminationTime() );
   spxsolver_.setTerminationIter ( source.spxsolver_.terminationIter() );
