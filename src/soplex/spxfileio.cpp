@@ -29,21 +29,21 @@ bool SPxSolver::readBasisFile(
 
    spxifstream file(filename);
 
-   if (!file)
+   if(!file)
       return false;
 
    return readBasis(file, rowNames, colNames);
 }
 
 bool SPxSolver::writeBasisFile
-   ( const char*    filename,
-     const NameSet* rowNames,
-     const NameSet* colNames,
-     const bool cpxFormat ) const
+(const char*    filename,
+ const NameSet* rowNames,
+ const NameSet* colNames,
+ const bool cpxFormat) const
 {
    std::ofstream file(filename);
 
-   if (!file)
+   if(!file)
       return false;
 
    writeBasis(file, rowNames, colNames);

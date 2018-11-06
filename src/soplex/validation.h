@@ -22,7 +22,8 @@
 
 #include "soplex.h"
 
-namespace soplex {
+namespace soplex
+{
 
 class Validation
 {

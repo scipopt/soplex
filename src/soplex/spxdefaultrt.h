@@ -55,7 +55,7 @@ public:
       : SPxRatioTester(old)
    {}
    /// assignment operator
-   SPxDefaultRT& operator=( const SPxDefaultRT& rhs)
+   SPxDefaultRT& operator=(const SPxDefaultRT& rhs)
    {
       if(this != &rhs)
       {

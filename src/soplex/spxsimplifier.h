@@ -112,7 +112,7 @@ public:
       m_timeUsed = TimerFactory::createTimer(ttype);
    }
    /// copy constructor
-   SPxSimplifier( const SPxSimplifier& old)
+   SPxSimplifier(const SPxSimplifier& old)
       : m_name(old.m_name)
       , m_timerType(old.m_timerType)
       , m_remRows(old.m_remRows)
@@ -130,7 +130,7 @@ public:
       assert(isConsistent());
    }
    /// assignment operator
-   SPxSimplifier& operator=( const SPxSimplifier& rhs)
+   SPxSimplifier& operator=(const SPxSimplifier& rhs)
    {
       if(this != &rhs)
       {
@@ -184,7 +184,8 @@ public:
    /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
    /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
-   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol, bool keepbounds = false) = 0;
+   virtual Result simplify(SPxLP& lp, Real eps, Real feastol, Real opttol,
+                           bool keepbounds = false) = 0;
    /// reconstructs an optimal solution for the unsimplified LP.
    virtual void unsimplify(const Vector&, const Vector&, const Vector&, const Vector&,
                            const SPxSolver::VarStatus[], const SPxSolver::VarStatus[], bool isOptimal = true) = 0;
@@ -214,7 +215,8 @@ public:
    virtual SPxSolver::VarStatus getBasisColStatus(int) const = 0;
 
    /// get optimal basis.
-   virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[], const int rowsSize = -1, const int colsSize = -1) const = 0;
+   virtual void getBasis(SPxSolver::VarStatus[], SPxSolver::VarStatus[], const int rowsSize = -1,
+                         const int colsSize = -1) const = 0;
 
    /// get objective offset.
    virtual Real getObjoffset() const
@@ -249,7 +251,7 @@ public:
 };
 
 /// Pretty-printing of simplifier status
-std::ostream& operator<<( std::ostream& os, const SPxSimplifier::Result& status );
+std::ostream& operator<<(std::ostream& os, const SPxSimplifier::Result& status);
 
 } // namespace soplex
 #endif // _SPXSIMPLIFIER_H_

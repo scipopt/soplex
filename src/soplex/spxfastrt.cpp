@@ -62,17 +62,19 @@ void SPxFastRT::tighten()
        (delta > 1e-4   &&  thesolver->theShift > 1e-4))
     */
    // if(delta > 1.99 * DELTA_SHIFT)
-   if (fastDelta >= delta + DELTA_SHIFT)
+   if(fastDelta >= delta + DELTA_SHIFT)
    {
       fastDelta -= DELTA_SHIFT;
-      if (fastDelta > 1e-4)
+
+      if(fastDelta > 1e-4)
          fastDelta -= 2 * DELTA_SHIFT;
    }
 
-   if (minStab < MINSTAB)
+   if(minStab < MINSTAB)
    {
       minStab /= 0.90;
-      if (minStab < 1e-6)
+
+      if(minStab < 1e-6)
          minStab /= 0.90;
    }
 }
@@ -86,9 +88,10 @@ void SPxFastRT::relax()
 
 Real SPxFastRT::minStability(Real maxabs)
 {
-   if (maxabs < 1000.0)
+   if(maxabs < 1000.0)
       return minStab;
-   return maxabs*minStab / 1000.0;
+
+   return maxabs * minStab / 1000.0;
 }
 
 /* The code below implements phase 1 of the ratio test. It differs from the description in the
@@ -123,53 +126,58 @@ int SPxFastRT::maxDelta(
    sel = -1;
    max = val;
 
-   if (update.delta().isSetup())
+   if(update.delta().isSetup())
    {
       const int* last = idx + update.delta().size();
-      for (idx += start; idx < last; idx += incr)
+
+      for(idx += start; idx < last; idx += incr)
       {
          i = *idx;
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-         if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+         if(leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))))
             continue;
 
          x = upd[i];
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
             u = up[i];
-            if (u < infinity)
+
+            if(u < infinity)
             {
                y = u - vec[i];
-               if (y <= 0)
+
+               if(y <= 0)
                   x = fastDelta / x;
                else
                   x = (y + fastDelta) / x;
 
-               if (x < max)
+               if(x < max)
                {
                   max = x;
                   sel = i;
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
             l = low[i];
-            if (l > -infinity)
+
+            if(l > -infinity)
             {
                y = l - vec[i];
-               if ( y >= 0 )
+
+               if(y >= 0)
                   x = - fastDelta / x;
                else
-                  x = ( y - fastDelta ) / x;
+                  x = (y - fastDelta) / x;
 
-               if (x < max)
+               if(x < max)
                {
                   max = x;
                   sel = i;
@@ -184,14 +192,15 @@ int SPxFastRT::maxDelta(
       int* l_idx = update.delta().altIndexMem();
       Real* uval = update.delta().altValues();
       const Real* uend = uval + update.dim();
-      assert( uval == upd );
+      assert(uval == upd);
 
-      for (i = 0; uval < uend; ++uval, ++i)
+      for(i = 0; uval < uend; ++uval, ++i)
       {
          x = *uval;
-         if (x != 0.0)
+
+         if(x != 0.0)
          {
-            if (x >= -epsilon && x <= epsilon)
+            if(x >= -epsilon && x <= epsilon)
             {
                *uval = 0.0;
                continue;
@@ -200,41 +209,45 @@ int SPxFastRT::maxDelta(
                *l_idx++ = i;
 
             /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-            if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+            if(leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))))
                continue;
 
-            if (x > epsilon)
+            if(x > epsilon)
             {
                mabs = (x > mabs) ? x : mabs;
                u = up[i];
-               if (u < infinity)
+
+               if(u < infinity)
                {
                   y = u - vec[i];
-                  if (y <= 0)
+
+                  if(y <= 0)
                      x = fastDelta / x;
                   else
                      x = (y + fastDelta) / x;
 
-                  if (x < max)
+                  if(x < max)
                   {
                      max = x;
                      sel = i;
                   }
                }
             }
-            else if (x < -epsilon)
+            else if(x < -epsilon)
             {
                mabs = (-x > mabs) ? -x : mabs;
                l = low[i];
-               if (l > -infinity)
+
+               if(l > -infinity)
                {
                   y = l - vec[i];
-                  if ( y >= 0 )
+
+                  if(y >= 0)
                      x = - fastDelta / x;
                   else
-                     x = ( y - fastDelta ) / x;
+                     x = (y - fastDelta) / x;
 
-                  if (x < max)
+                  if(x < max)
                   {
                      max = x;
                      sel = i;
@@ -243,6 +256,7 @@ int SPxFastRT::maxDelta(
             }
          }
       }
+
       update.delta().setSize(int(l_idx - update.delta().indexMem()));
       update.delta().forceSetup();
    }
@@ -278,52 +292,57 @@ int SPxFastRT::minDelta(
    sel = -1;
    max = val;
 
-   if (update.delta().isSetup())
+   if(update.delta().isSetup())
    {
       const int* last = idx + update.delta().size();
-      for (idx += start; idx < last; idx += incr)
+
+      for(idx += start; idx < last; idx += incr)
       {
          i = *idx;
          x = upd[i];
 
          /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-         if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+         if(leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))))
             continue;
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (x > mabs) ? x : mabs;
             l = low[i];
-            if (l > -infinity)
+
+            if(l > -infinity)
             {
                y = l - vec[i];
-               if ( y >= 0 )
+
+               if(y >= 0)
                   x = - fastDelta / x;
                else
-                  x = ( y - fastDelta ) / x;
+                  x = (y - fastDelta) / x;
 
-               if (x > max)
+               if(x > max)
                {
                   max = x;
                   sel = i;
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
             // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
             mabs = (-x > mabs) ? -x : mabs;
             u = up[i];
-            if (u < infinity)
+
+            if(u < infinity)
             {
                y = u - vec[i];
-               if (y <= 0)
+
+               if(y <= 0)
                   x = fastDelta / x;
                else
                   x = (y + fastDelta) / x;
 
-               if (x > max)
+               if(x > max)
                {
                   max = x;
                   sel = i;
@@ -338,15 +357,15 @@ int SPxFastRT::minDelta(
       int* l_idx = update.delta().altIndexMem();
       Real* uval = update.delta().altValues();
       const Real* uend = uval + update.dim();
-      assert( uval == upd );
+      assert(uval == upd);
 
-      for (i = 0; uval < uend; ++uval, ++i)
+      for(i = 0; uval < uend; ++uval, ++i)
       {
          x = *uval;
 
-         if (x != 0.0)
+         if(x != 0.0)
          {
-            if (x >= -epsilon && x <= epsilon)
+            if(x >= -epsilon && x <= epsilon)
             {
                *uval = 0.0;
                continue;
@@ -355,41 +374,45 @@ int SPxFastRT::minDelta(
                *l_idx++ = i;
 
             /* in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables */
-            if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+            if(leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))))
                continue;
 
-            if (x > epsilon)
+            if(x > epsilon)
             {
                mabs = (x > mabs) ? x : mabs;
                l = low[i];
-               if (l > -infinity)
+
+               if(l > -infinity)
                {
                   y = l - vec[i];
-                  if ( y >= 0 )
+
+                  if(y >= 0)
                      x = - fastDelta / x;
                   else
-                     x = ( y - fastDelta ) / x;
+                     x = (y - fastDelta) / x;
 
-                  if (x > max)
+                  if(x > max)
                   {
                      max = x;
                      sel = i;
                   }
                }
             }
-            else if (x < -epsilon)
+            else if(x < -epsilon)
             {
                mabs = (-x > mabs) ? -x : mabs;
                u = up[i];
-               if (u < infinity)
+
+               if(u < infinity)
                {
                   y = u - vec[i];
-                  if (y <= 0)
+
+                  if(y <= 0)
                      x = fastDelta / x;
                   else
                      x = (y + fastDelta) / x;
 
-                  if (x > max)
+                  if(x > max)
                   {
                      max = x;
                      sel = i;
@@ -398,6 +421,7 @@ int SPxFastRT::minDelta(
             }
          }
       }
+
       update.delta().setSize(int(l_idx - update.delta().indexMem()));
       update.delta().forceSetup();
    }
@@ -414,7 +438,7 @@ int SPxFastRT::maxDelta(
 {
    assert(m_type == SPxSolver::ENTER);
    return maxDelta(val, maxabs,
-      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
+                   thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 int SPxFastRT::minDelta(
@@ -423,7 +447,7 @@ int SPxFastRT::minDelta(
 {
    assert(m_type == SPxSolver::ENTER);
    return minDelta(val, maxabs,
-      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
+                   thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 SPxId SPxFastRT::maxDelta(
@@ -435,21 +459,23 @@ SPxId SPxFastRT::maxDelta(
       maxSelect(). We can therefore not move the first function after the (indp >= 0) check. */
    iscoid = true;
    int indc = maxDelta(max, maxabs,
-      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+                       thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    iscoid = false;
    int indp = maxDelta(max, maxabs,
-      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
+                       thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indp >= 0)
+   if(indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
    }
-   if (indc >= 0)
+
+   if(indc >= 0)
    {
       nr = indc;
       return thesolver->coId(indc);
    }
+
    nr = -1;
    return SPxId();
 }
@@ -463,21 +489,23 @@ SPxId SPxFastRT::minDelta(
       minSelect(). We can therefore not move the first function after the (indp >= 0) check. */
    iscoid = true;
    const int indc = minDelta(max, maxabs,
-      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+                             thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    iscoid = false;
    const int indp = minDelta(max, maxabs,
-      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
+                             thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indp >= 0)
+   if(indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
    }
-   if (indc >= 0)
+
+   if(indc >= 0)
    {
       nr = indc;
       return thesolver->coId(indc);
    }
+
    nr = -1;
    return SPxId();
 }
@@ -511,41 +539,42 @@ int SPxFastRT::minSelect(
    int nr = -1;
    int bestNr = -1;
 
-   for (idx += start; idx < last; idx += incr)
+   for(idx += start; idx < last; idx += incr)
    {
       i = *idx;
       x = upd[i];
 
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
-      if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+      if(leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))))
          continue;
 
-      if (x > stab)
+      if(x > stab)
       {
          y = (low[i] - vec[i]) / x;
 
-         if (y >= max)
+         if(y >= max)
          {
             val = y;
             nr = i;
             stab = x;
          }
-         else if (y < best)
+         else if(y < best)
          {
             best = y;
             bestNr = i;
          }
       }
-      else if (x < -stab)
+      else if(x < -stab)
       {
          y = (up[i] - vec[i]) / x;
-         if (y >= max)
+
+         if(y >= max)
          {
             val = y;
             nr = i;
             stab = -x;
          }
-         else if (y < best)
+         else if(y < best)
          {
             best = y;
             bestNr = i;
@@ -553,13 +582,14 @@ int SPxFastRT::minSelect(
       }
    }
 
-   if (nr < 0 && bestNr > 0)
+   if(nr < 0 && bestNr > 0)
    {
-      if (upd[bestNr] < 0)
+      if(upd[bestNr] < 0)
          bestDelta = up[bestNr] - vec[bestNr];
       else
          bestDelta = vec[bestNr] - low[bestNr];
    }
+
    return nr;
 }
 
@@ -590,40 +620,42 @@ int SPxFastRT::maxSelect(
    int nr = -1;
    int bestNr = -1;
 
-   for (idx += start; idx < last; idx += incr)
+   for(idx += start; idx < last; idx += incr)
    {
       i = *idx;
       x = upd[i];
 
       // in the dual algorithm, bound flips cannot happen, hence we only consider nonbasic variables
-      if( leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))) )
+      if(leaving && ((iscoid && thesolver->isCoBasic(i)) || (!iscoid && thesolver->isBasic(i))))
          continue;
 
-      if (x > stab)
+      if(x > stab)
       {
          y = (up[i] - vec[i]) / x;
-         if (y <= max)
+
+         if(y <= max)
          {
             val = y;
             nr = i;
             stab = x;
          }
-         else if (y > best)
+         else if(y > best)
          {
             best = y;
             bestNr = i;
          }
       }
-      else if (x < -stab)
+      else if(x < -stab)
       {
          y = (low[i] - vec[i]) / x;
-         if (y <= max)
+
+         if(y <= max)
          {
             val = y;
             nr = i;
             stab = -x;
          }
-         else if (y > best)
+         else if(y > best)
          {
             best = y;
             bestNr = i;
@@ -631,9 +663,9 @@ int SPxFastRT::maxSelect(
       }
    }
 
-   if (nr < 0 && bestNr > 0)
+   if(nr < 0 && bestNr > 0)
    {
-      if (upd[bestNr] > 0)
+      if(upd[bestNr] > 0)
          bestDelta = up[bestNr] - vec[bestNr];
       else
          bestDelta = vec[bestNr] - low[bestNr];
@@ -653,7 +685,7 @@ int SPxFastRT::maxSelect(
    bestDelta = 0.0;
    assert(m_type == SPxSolver::ENTER);
    return maxSelect(val, stab, best, bestDelta, max,
-      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
+                    thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(),  0, 1);
 }
 
 SPxId SPxFastRT::maxSelect(
@@ -669,21 +701,23 @@ SPxId SPxFastRT::maxSelect(
    bestDelta = 0.0;
    iscoid = true;
    indc = maxSelect(val, stab, best, bestDelta, max,
-      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+                    thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    iscoid = false;
    indp = maxSelect(val, stab, best, bestDelta, max,
-      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
+                    thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indp >= 0)
+   if(indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
    }
-   if (indc >= 0)
+
+   if(indc >= 0)
    {
       nr = indc;
       return thesolver->coId(indc);
    }
+
    nr = -1;
    return SPxId();
 }
@@ -698,7 +732,7 @@ int SPxFastRT::minSelect(
    bestDelta = 0.0;
    assert(m_type == SPxSolver::ENTER);
    return minSelect(val, stab, best, bestDelta, max,
-      thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
+                    thesolver->fVec(), thesolver->lbBound(), thesolver->ubBound(), 0, 1);
 }
 
 SPxId SPxFastRT::minSelect(
@@ -712,21 +746,23 @@ SPxId SPxFastRT::minSelect(
    bestDelta = 0.0;
    iscoid = true;
    int indc = minSelect(val, stab, best, bestDelta, max,
-      thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
+                        thesolver->coPvec(), thesolver->lcBound(), thesolver->ucBound(), 0, 1);
    iscoid = false;
    int indp = minSelect(val, stab, best, bestDelta, max,
-      thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
+                        thesolver->pVec(), thesolver->lpBound(), thesolver->upBound(), 0, 1);
 
-   if (indp >= 0)
+   if(indp >= 0)
    {
       nr = indp;
       return thesolver->id(indp);
    }
-   if (indc >= 0)
+
+   if(indc >= 0)
    {
       nr = indc;
       return thesolver->coId(indc);
    }
+
    nr = -1;
    return SPxId();
 }
@@ -739,13 +775,13 @@ bool SPxFastRT::maxShortLeave(Real& sel, int leave, Real maxabs)
 
    sel = thesolver->fVec().delta()[leave];
 
-   if (sel > maxabs*SHORT)
+   if(sel > maxabs * SHORT)
    {
       sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
       return true;
    }
 
-   if (sel < -maxabs*SHORT)
+   if(sel < -maxabs * SHORT)
    {
       sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
       return true;
@@ -761,13 +797,13 @@ bool SPxFastRT::minShortLeave(Real& sel, int leave, Real maxabs)
 
    sel = thesolver->fVec().delta()[leave];
 
-   if (sel > maxabs*SHORT)
+   if(sel > maxabs * SHORT)
    {
       sel = (thesolver->lbBound()[leave] - thesolver->fVec()[leave]) / sel;
       return true;
    }
 
-   if ( sel < -maxabs*SHORT)
+   if(sel < -maxabs * SHORT)
    {
       sel = (thesolver->ubBound()[leave] - thesolver->fVec()[leave]) / sel;
       return true;
@@ -782,20 +818,21 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
    Vector& low = thesolver->lbBound();
    Vector& up = thesolver->ubBound();
 
-   if (leave < 0)
+   if(leave < 0)
       return true;
 
-   if (up[leave] > low[leave])
+   if(up[leave] > low[leave])
    {
       Real x = vec.delta()[leave];
 
-      if (sel < -fastDelta / maxabs)
+      if(sel < -fastDelta / maxabs)
       {
          sel = 0.0;
+
          // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-         if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         if(!polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH)
          {
-            if (x < 0.0)
+            if(x < 0.0)
                thesolver->shiftLBbound(leave, vec[leave]);
             else
                thesolver->shiftUBbound(leave, vec[leave]);
@@ -805,8 +842,9 @@ bool SPxFastRT::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
    else
    {
       sel = 0.0;
+
       // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-      if( !polish )
+      if(!polish)
       {
          thesolver->shiftLBbound(leave, vec[leave]);
          thesolver->shiftUBbound(leave, vec[leave]);
@@ -822,20 +860,21 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
    Vector& low = thesolver->lbBound();
    Vector& up = thesolver->ubBound();
 
-   if (leave < 0)
+   if(leave < 0)
       return true;
 
-   if (up[leave] > low[leave])
+   if(up[leave] > low[leave])
    {
       Real x = vec.delta()[leave];
 
-      if (sel > fastDelta / maxabs)
+      if(sel > fastDelta / maxabs)
       {
          sel = 0.0;
+
          // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-         if( !polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH )
+         if(!polish && thesolver->dualStatus(thesolver->baseId(leave)) != SPxBasis::Desc::D_ON_BOTH)
          {
-            if (x > 0.0)
+            if(x > 0.0)
                thesolver->shiftLBbound(leave, vec[leave]);
             else
                thesolver->shiftUBbound(leave, vec[leave]);
@@ -845,8 +884,9 @@ bool SPxFastRT::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
    else
    {
       sel = 0.0;
+
       // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-      if( !polish )
+      if(!polish)
       {
          thesolver->shiftLBbound(leave, vec[leave]);
          thesolver->shiftUBbound(leave, vec[leave]);
@@ -862,7 +902,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
    int leave = -1;
    int cnt = 0;
 
-   assert( m_type == SPxSolver::ENTER );
+   assert(m_type == SPxSolver::ENTER);
 
    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.cpp)
    bool instable = solver()->instableEnter;
@@ -871,7 +911,7 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
 
    resetTols();
 
-   if (val > epsilon)
+   if(val > epsilon)
    {
       do
       {
@@ -881,15 +921,16 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
          leave = maxDelta(max, maxabs);
 
          assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) ||
-            thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+                thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(
+                                               leave)))) != SPxBasis::Desc::P_FIXED);
 
-         if( max == val || leave == -1 )
+         if(max == val || leave == -1)
          {
             assert(max == val && leave == -1);
             return -1;
          }
 
-         if (!maxShortLeave(sel, leave, maxabs))
+         if(!maxShortLeave(sel, leave, maxabs))
          {
             // phase 2:
             Real stab, bestDelta;
@@ -897,23 +938,25 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
             stab = 100.0 * minStability(maxabs);
 
             // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.cpp)
-            if (instable)
+            if(instable)
                leave = maxSelect(sel, lowstab, bestDelta, max);
             else
                leave = maxSelect(sel, stab, bestDelta, max);
 
-            if (bestDelta < DELTA_SHIFT*TRIES)
+            if(bestDelta < DELTA_SHIFT * TRIES)
                cnt++;
             else
                cnt += TRIES;
          }
-         if (!maxReLeave(sel, leave, maxabs, polish))
+
+         if(!maxReLeave(sel, leave, maxabs, polish))
             break;
+
          relax();
       }
-      while (cnt < TRIES);
+      while(cnt < TRIES);
    }
-   else if (val < -epsilon)
+   else if(val < -epsilon)
    {
       do
       {
@@ -922,15 +965,16 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
          leave = minDelta(max, maxabs);
 
          assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) ||
-            thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+                thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(
+                                               leave)))) != SPxBasis::Desc::P_FIXED);
 
-         if( max == val || leave == -1 )
+         if(max == val || leave == -1)
          {
             assert(max == val && leave == -1);
             return -1;
          }
 
-         if (!minShortLeave(sel, leave, maxabs))
+         if(!minShortLeave(sel, leave, maxabs))
          {
             // phase 2:
             Real stab, bestDelta;
@@ -938,81 +982,91 @@ int SPxFastRT::selectLeave(Real& val, Real, bool polish)
             stab = 100.0 * minStability(maxabs);
 
             // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.cpp)
-            if (instable)
+            if(instable)
                leave = minSelect(sel, lowstab, bestDelta, max);
             else
                leave = minSelect(sel, stab, bestDelta, max);
 
-            assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+            assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId())
+                   || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(
+                         leave)))) != SPxBasis::Desc::P_FIXED);
 
-            if (bestDelta < DELTA_SHIFT*TRIES)
+            if(bestDelta < DELTA_SHIFT * TRIES)
                cnt++;
             else
                cnt += TRIES;
          }
-         if (!minReLeave(sel, leave, maxabs, polish))
+
+         if(!minReLeave(sel, leave, maxabs, polish))
             break;
+
          relax();
       }
-      while (cnt < TRIES);
+      while(cnt < TRIES);
    }
    else
       return -1;
 
    MSG_DEBUG(
-      if (leave >= 0)
-         std::cout
-           << "DFSTRT01 "
-           << thesolver->basis().iteration() << "("
-           << std::setprecision(6) << thesolver->value() << ","
-           << std::setprecision(2) << thesolver->basis().stability() << "):"
-           << leave << "\t"
-           << std::setprecision(4) << sel << " "
-           << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
-           << std::setprecision(6) << maxabs
-           << std::endl;
+
+      if(leave >= 0)
+      std::cout
+      << "DFSTRT01 "
+      << thesolver->basis().iteration() << "("
+      << std::setprecision(6) << thesolver->value() << ","
+      << std::setprecision(2) << thesolver->basis().stability() << "):"
+      << leave << "\t"
+      << std::setprecision(4) << sel << " "
+      << std::setprecision(4) << thesolver->fVec().delta()[leave] << " "
+      << std::setprecision(6) << maxabs
+      << std::endl;
       else
          std::cout << "DFSTRT02 " << thesolver->basis().iteration()
-                << ": skipping instable pivot" << std::endl;
-   )
+         << ": skipping instable pivot" << std::endl;
+      )
 
-   if( polish && leave >= 0 )
-   {
-      assert( thesolver->rep() == SPxSolver::COLUMN );
-      SPxId leaveId = thesolver->baseId(leave);
-      // decide whether the chosen leave index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY )
-      {
-         // only allow (integer) variables to leave the basis
-         if( leaveId.isSPxRowId() )
-            return -1;
-         else if( thesolver->integerVariables.size() == thesolver->nCols() )
+         if(polish && leave >= 0)
          {
-            if( leaveId.isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 0 )
-               return -1;
-         }
-      }
-      else if( thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY )
-      {
-         // only allow slacks and continuous variables to leave the basis
-         if( thesolver->integerVariables.size() == thesolver->nCols() )
-         {
-            if( thesolver->baseId(leave).isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 1 )
-               return -1;
-         }
-         else if( thesolver->baseId(leave).isSPxColId() )
-            return -1;
-      }
-   }
+            assert(thesolver->rep() == SPxSolver::COLUMN);
+            SPxId leaveId = thesolver->baseId(leave);
 
-   if (leave >= 0 || minStab > 2*solver()->epsilon())
+            // decide whether the chosen leave index contributes to the polishing objective
+            if(thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY)
+            {
+               // only allow (integer) variables to leave the basis
+               if(leaveId.isSPxRowId())
+                  return -1;
+               else if(thesolver->integerVariables.size() == thesolver->nCols())
+               {
+                  if(leaveId.isSPxColId() && thesolver->integerVariables[thesolver->number(leaveId)] == 0)
+                     return -1;
+               }
+            }
+            else if(thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY)
+            {
+               // only allow slacks and continuous variables to leave the basis
+               if(thesolver->integerVariables.size() == thesolver->nCols())
+               {
+                  if(thesolver->baseId(leave).isSPxColId()
+                        && thesolver->integerVariables[thesolver->number(leaveId)] == 1)
+                     return -1;
+               }
+               else if(thesolver->baseId(leave).isSPxColId())
+                  return -1;
+            }
+         }
+
+   if(leave >= 0 || minStab > 2 * solver()->epsilon())
    {
       val = sel;
-      if (leave >= 0)
+
+      if(leave >= 0)
          tighten();
    }
 
-   assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId()) || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(leave)))) != SPxBasis::Desc::P_FIXED);
+   assert(leave < 0 || !(thesolver->baseId(leave).isSPxColId())
+          || thesolver->desc().colStatus(thesolver->number(SPxColId(thesolver->baseId(
+                leave)))) != SPxBasis::Desc::P_FIXED);
 
    return leave;
 }
@@ -1038,9 +1092,9 @@ bool SPxFastRT::maxReEnter(
    Vector& ucb = thesolver->ucBound();
    Vector& lcb = thesolver->lcBound();
 
-   if (thesolver->isCoId(id))
+   if(thesolver->isCoId(id))
    {
-      if (thesolver->isCoBasic(nr))
+      if(thesolver->isCoBasic(nr))
       {
          cupd.clearIdx(nr);
          return true;
@@ -1051,15 +1105,16 @@ bool SPxFastRT::maxReEnter(
       up = &ucb;
       low = &lcb;
 
-      if (d < 0.0)
+      if(d < 0.0)
          sel = (lcb[nr] - cvec[nr]) / d;
       else
          sel = (ucb[nr] - cvec[nr]) / d;
    }
-   else if (thesolver->isId(id))
+   else if(thesolver->isId(id))
    {
       pvec[nr] = thesolver->vector(nr) * cvec;
-      if (thesolver->isBasic(nr))
+
+      if(thesolver->isBasic(nr))
       {
          pupd.clearIdx(nr);
          return true;
@@ -1070,7 +1125,7 @@ bool SPxFastRT::maxReEnter(
       up = &upb;
       low = &lpb;
 
-      if (d < 0.0)
+      if(d < 0.0)
          sel = (lpb[nr] - pvec[nr]) / d;
       else
          sel = (upb[nr] - pvec[nr]) / d;
@@ -1078,15 +1133,16 @@ bool SPxFastRT::maxReEnter(
    else
       return true;
 
-   if ((*up)[nr] != (*low)[nr])
+   if((*up)[nr] != (*low)[nr])
    {
-      if (sel < -fastDelta / maxabs)
+      if(sel < -fastDelta / maxabs)
       {
          sel = 0.0;
+
          // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-         if( !polish )
+         if(!polish)
          {
-            if (d > 0.0)
+            if(d > 0.0)
             {
                thesolver->theShift -= (*up)[nr];
                (*up)[nr] = x;
@@ -1104,13 +1160,15 @@ bool SPxFastRT::maxReEnter(
    else
    {
       sel = 0.0;
+
       // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-      if( !polish )
+      if(!polish)
       {
-         if (x > (*up)[nr])
+         if(x > (*up)[nr])
             thesolver->theShift += x - (*up)[nr];
          else
             thesolver->theShift += (*low)[nr] - x;
+
          (*up)[nr] = (*low)[nr] = x;
       }
    }
@@ -1138,36 +1196,41 @@ bool SPxFastRT::minReEnter(
    Vector& ucb = thesolver->ucBound();
    Vector& lcb = thesolver->lcBound();
 
-   if (thesolver->isCoId(id))
+   if(thesolver->isCoId(id))
    {
-      if (thesolver->isCoBasic(nr))
+      if(thesolver->isCoBasic(nr))
       {
          cupd.clearIdx(nr);
          return true;
       }
+
       x = cvec[nr];
       d = cupd[nr];
       up = &ucb;
       low = &lcb;
-      if (d > 0.0)
+
+      if(d > 0.0)
          sel = (thesolver->lcBound()[nr] - cvec[nr]) / d;
       else
          sel = (thesolver->ucBound()[nr] - cvec[nr]) / d;
    }
 
-   else if (thesolver->isId(id))
+   else if(thesolver->isId(id))
    {
       pvec[nr] = thesolver->vector(nr) * cvec;
-      if (thesolver->isBasic(nr))
+
+      if(thesolver->isBasic(nr))
       {
          pupd.clearIdx(nr);
          return true;
       }
+
       x = pvec[nr];
       d = pupd[nr];
       up = &upb;
       low = &lpb;
-      if (d > 0.0)
+
+      if(d > 0.0)
          sel = (thesolver->lpBound()[nr] - pvec[nr]) / d;
       else
          sel = (thesolver->upBound()[nr] - pvec[nr]) / d;
@@ -1176,15 +1239,16 @@ bool SPxFastRT::minReEnter(
    else
       return true;
 
-   if ((*up)[nr] != (*low)[nr])
+   if((*up)[nr] != (*low)[nr])
    {
-      if (sel > fastDelta / maxabs)
+      if(sel > fastDelta / maxabs)
       {
          sel = 0.0;
+
          // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-         if( !polish )
+         if(!polish)
          {
-            if (d < 0.0)
+            if(d < 0.0)
             {
                thesolver->theShift -= (*up)[nr];
                (*up)[nr] = x;
@@ -1202,13 +1266,15 @@ bool SPxFastRT::minReEnter(
    else
    {
       sel = 0.0;
+
       // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-      if( !polish )
+      if(!polish)
       {
-         if (x > (*up)[nr])
+         if(x > (*up)[nr])
             thesolver->theShift += x - (*up)[nr];
          else
             thesolver->theShift += (*low)[nr] - x;
+
          (*up)[nr] = (*low)[nr] = x;
       }
    }
@@ -1222,24 +1288,28 @@ bool SPxFastRT::shortEnter(
    Real max,
    Real maxabs) const
 {
-   if (thesolver->isCoId(enterId))
+   if(thesolver->isCoId(enterId))
    {
-      if (max != 0.0)
+      if(max != 0.0)
       {
          Real x = thesolver->coPvec().delta()[nr];
-         if (x < maxabs * SHORT && -x < maxabs * SHORT)
+
+         if(x < maxabs * SHORT && -x < maxabs * SHORT)
             return false;
       }
+
       return true;
    }
-   else if (thesolver->isId(enterId))
+   else if(thesolver->isId(enterId))
    {
-      if (max != 0.0)
+      if(max != 0.0)
       {
          Real x = thesolver->pVec().delta()[nr];
-         if (x < maxabs * SHORT && -x < maxabs * SHORT)
+
+         if(x < maxabs * SHORT && -x < maxabs * SHORT)
             return false;
       }
+
       return true;
    }
 
@@ -1254,7 +1324,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
    int nr;
    int cnt = 0;
 
-   assert( m_type == SPxSolver::LEAVE );
+   assert(m_type == SPxSolver::LEAVE);
 
    // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
    bool instable = solver()->instableLeave;
@@ -1264,7 +1334,7 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
    resetTols();
    sel = 0.0;
 
-   if (val > epsilon)
+   if(val > epsilon)
    {
       do
       {
@@ -1272,20 +1342,21 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
          max = val;
 
          enterId = maxDelta(nr, max, maxabs);
-         if (!enterId.isValid())
+
+         if(!enterId.isValid())
             return enterId;
 
          assert(max >= 0.0);
          assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
-         if (!shortEnter(enterId, nr, max, maxabs))
+         if(!shortEnter(enterId, nr, max, maxabs))
          {
             Real bestDelta, stab;
 
             stab = minStability(maxabs);
 
             // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
-            if (instable)
+            if(instable)
             {
                enterId = maxSelect(nr, sel, lowstab, bestDelta, max);
             }
@@ -1293,38 +1364,42 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
             {
                enterId = maxSelect(nr, sel, stab, bestDelta, max);
             }
-            if (bestDelta < DELTA_SHIFT*TRIES)
+
+            if(bestDelta < DELTA_SHIFT * TRIES)
                cnt++;
             else
                cnt += TRIES;
          }
-         if (!maxReEnter(sel, maxabs, enterId, nr, polish))
+
+         if(!maxReEnter(sel, maxabs, enterId, nr, polish))
             break;
+
          relax();
       }
-      while (cnt < TRIES);
+      while(cnt < TRIES);
    }
-   else if (val < -epsilon)
+   else if(val < -epsilon)
    {
       do
       {
          maxabs = 0.0;
          max = val;
          enterId = minDelta(nr, max, maxabs);
-         if (!enterId.isValid())
+
+         if(!enterId.isValid())
             return enterId;
 
          assert(max <= 0.0);
          assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
-         if (!shortEnter(enterId, nr, max, maxabs))
+         if(!shortEnter(enterId, nr, max, maxabs))
          {
             Real bestDelta, stab;
 
             stab = minStability(maxabs);
 
             // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
-            if (instable)
+            if(instable)
             {
                enterId = minSelect(nr, sel, lowstab, bestDelta, max);
             }
@@ -1332,66 +1407,75 @@ SPxId SPxFastRT::selectEnter(Real& val, int, bool polish)
             {
                enterId = minSelect(nr, sel, stab, bestDelta, max);
             }
-            if (bestDelta < DELTA_SHIFT*TRIES)
+
+            if(bestDelta < DELTA_SHIFT * TRIES)
                cnt++;
             else
                cnt += TRIES;
          }
-         if (!minReEnter(sel, maxabs, enterId, nr, polish))
+
+         if(!minReEnter(sel, maxabs, enterId, nr, polish))
             break;
+
          relax();
       }
-      while (cnt < TRIES);
+      while(cnt < TRIES);
    }
 
    MSG_DEBUG(
-      if (enterId.isValid())
-      {
-         assert(!enterId.isValid() || !solver()->isBasic(enterId));
 
-         Real x;
-         if (thesolver->isCoId(enterId))
-            x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
-         else
-            x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
-         std::cout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
-                << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
-      }
+      if(enterId.isValid())
+{
+   assert(!enterId.isValid() || !solver()->isBasic(enterId));
+
+      Real x;
+
+      if(thesolver->isCoId(enterId))
+         x = thesolver->coPvec().delta()[ thesolver->number(enterId) ];
       else
-         std::cout << "DFSTRT04 " << thesolver->basis().iteration()
-                << ": skipping instable pivot" << std::endl;
-   )
+         x = thesolver->pVec().delta()[ thesolver->number(enterId) ];
 
-   if( polish && enterId.isValid() )
-   {
-      assert( thesolver->rep() == SPxSolver::ROW );
-      // decide whether the chosen entering index contributes to the polishing objective
-      if( thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY )
+      std::cout << "DFSTRT03 " << thesolver->basis().iteration() << ": "
+                << sel << '\t' << x << " (" << maxabs << ")" << std::endl;
+   }
+   else
+      std::cout << "DFSTRT04 " << thesolver->basis().iteration()
+                << ": skipping instable pivot" << std::endl;
+      )
+
+      if(polish && enterId.isValid())
       {
-         // only allow (integer) variables to enter the basis
-         if( enterId.isSPxRowId() )
-            return SPxId();
-         else if( thesolver->integerVariables.size() == thesolver->nCols() && thesolver->integerVariables[thesolver->number(enterId)] == 0)
-            return SPxId();
-      }
-      else if( thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY )
-      {
-         // only allow slacks and continuous variables to enter the basis
-         if( thesolver->integerVariables.size() == thesolver->nCols() )
+         assert(thesolver->rep() == SPxSolver::ROW);
+
+         // decide whether the chosen entering index contributes to the polishing objective
+         if(thesolver->polishObj == SPxSolver::POLISH_INTEGRALITY)
          {
-            if( enterId.isSPxColId() && thesolver->integerVariables[thesolver->number(enterId)] == 1 )
+            // only allow (integer) variables to enter the basis
+            if(enterId.isSPxRowId())
+               return SPxId();
+            else if(thesolver->integerVariables.size() == thesolver->nCols()
+                    && thesolver->integerVariables[thesolver->number(enterId)] == 0)
                return SPxId();
          }
-         else if( enterId.isSPxColId() )
-            return SPxId();
+         else if(thesolver->polishObj == SPxSolver::POLISH_FRACTIONALITY)
+         {
+            // only allow slacks and continuous variables to enter the basis
+            if(thesolver->integerVariables.size() == thesolver->nCols())
+            {
+               if(enterId.isSPxColId() && thesolver->integerVariables[thesolver->number(enterId)] == 1)
+                  return SPxId();
+            }
+            else if(enterId.isSPxColId())
+               return SPxId();
+         }
       }
-   }
 
 
-   if (enterId.isValid() || minStab > 2*epsilon)
+   if(enterId.isValid() || minStab > 2 * epsilon)
    {
       val = sel;
-      if (enterId.isValid())
+
+      if(enterId.isValid())
          tighten();
    }
 

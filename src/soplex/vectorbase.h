@@ -110,11 +110,11 @@ public:
    template < class S >
    VectorBase<R>& operator=(const VectorBase<S>& vec)
    {
-      if( (VectorBase<S>*)this != &vec )
+      if((VectorBase<S>*)this != &vec)
       {
          assert(dim() == vec.dim());
 
-         for( int i = 0; i < dimen; i++ )
+         for(int i = 0; i < dimen; i++)
             val[i] = vec[i];
 
          assert(isConsistent());
@@ -126,11 +126,11 @@ public:
    /// Assignment operator.
    VectorBase<R>& operator=(const VectorBase<R>& vec)
    {
-      if( this != &vec )
+      if(this != &vec)
       {
          assert(dim() == vec.dim());
 
-         for( int i = 0; i < dimen; i++ )
+         for(int i = 0; i < dimen; i++)
             val[i] = vec[i];
 
          assert(isConsistent());
@@ -142,11 +142,11 @@ public:
    /// scale and assign
    VectorBase<Real>& scaleAssign(int scaleExp, const VectorBase<Real>& vec)
    {
-      if( this != &vec )
+      if(this != &vec)
       {
          assert(dim() == vec.dim());
 
-         for( int i = 0; i < dimen; i++ )
+         for(int i = 0; i < dimen; i++)
             val[i] = spxLdexp(vec[i], scaleExp);
 
          assert(isConsistent());
@@ -156,20 +156,21 @@ public:
    }
 
    /// scale and assign
-   VectorBase<Real>& scaleAssign(const int* scaleExp, const VectorBase<Real>& vec, bool negateExp = false)
+   VectorBase<Real>& scaleAssign(const int* scaleExp, const VectorBase<Real>& vec,
+                                 bool negateExp = false)
    {
-      if( this != &vec )
+      if(this != &vec)
       {
          assert(dim() == vec.dim());
 
-         if( negateExp)
+         if(negateExp)
          {
-            for( int i = 0; i < dimen; i++ )
+            for(int i = 0; i < dimen; i++)
                val[i] = spxLdexp(vec[i], -scaleExp[i]);
          }
          else
          {
-            for( int i = 0; i < dimen; i++ )
+            for(int i = 0; i < dimen; i++)
                val[i] = spxLdexp(vec[i], scaleExp[i]);
          }
 
@@ -234,15 +235,15 @@ public:
    /// Equality operator.
    friend bool operator==(const VectorBase<R>& vec1, const VectorBase<R>& vec2)
    {
-      if( &vec1 == &vec2 )
+      if(&vec1 == &vec2)
          return true;
-      else if( vec1.dim() != vec2.dim() )
+      else if(vec1.dim() != vec2.dim())
          return false;
       else
       {
-         for( int i = 0; i < vec1.dim(); i++ )
+         for(int i = 0; i < vec1.dim(); i++)
          {
-            if( vec1[i] != vec2[i] )
+            if(vec1[i] != vec2[i])
                return false;
          }
       }
@@ -259,9 +260,9 @@ public:
    /// Set vector to 0.
    void clear()
    {
-      if( dimen > 0 )
+      if(dimen > 0)
       {
-         for( int i = 0; i < dimen; i++ )
+         for(int i = 0; i < dimen; i++)
             val[i] = 0;
       }
    }
@@ -273,7 +274,7 @@ public:
       assert(dim() == vec.dim());
       assert(dim() == dimen);
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
          val[i] += vec[i];
 
       return *this;
@@ -294,7 +295,7 @@ public:
       assert(dim() == vec.dim());
       assert(dim() == dimen);
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
          val[i] -= vec[i];
 
       return *this;
@@ -314,7 +315,7 @@ public:
    {
       assert(dim() == dimen);
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
          val[i] *= x;
 
       return *this;
@@ -326,7 +327,7 @@ public:
    {
       assert(x != 0);
 
-      for( int i = 0; i < dim(); i++ )
+      for(int i = 0; i < dim(); i++)
          val[i] /= x;
 
       return *this;
@@ -339,7 +340,7 @@ public:
 
       R x = 0.0;
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
          x += val[i] * vec.val[i];
 
       return x;
@@ -359,11 +360,11 @@ public:
 
       R maxi = 0.0;
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
       {
          R x = spxAbs(val[i]);
 
-         if( x > maxi )
+         if(x > maxi)
             maxi = x;
       }
 
@@ -380,11 +381,11 @@ public:
 
       R mini = spxAbs(val[0]);
 
-      for( int i = 1; i < dimen; i++ )
+      for(int i = 1; i < dimen; i++)
       {
          R x = spxAbs(val[i]);
 
-         if( x < mini )
+         if(x < mini)
             mini = x;
       }
 
@@ -411,7 +412,7 @@ public:
    {
       assert(vec.dim() == dimen);
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
          val[i] += x * vec.val[i];
 
       return *this;
@@ -459,8 +460,10 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( dim() > 0 && val == 0 )
+
+      if(dim() > 0 && val == 0)
          return MSGinconsistent("VectorBase");
+
 #endif
 
       return true;
@@ -477,14 +480,15 @@ template <>
 inline
 VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
 {
-   if( this != &vec )
+   if(this != &vec)
    {
       assert(dim() == vec.dim());
 
-      memcpy(val, vec.val, (unsigned int)dimen*sizeof(Real));
+      memcpy(val, vec.val, (unsigned int)dimen * sizeof(Real));
 
       assert(isConsistent());
    }
+
    return *this;
 }
 
@@ -496,11 +500,11 @@ template <>
 inline
 VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Rational>& vec)
 {
-   if( (VectorBase<Rational>*)this != &vec )
+   if((VectorBase<Rational>*)this != &vec)
    {
       assert(dim() == vec.dim());
 
-      for( int i = 0; i < dimen; i++ )
+      for(int i = 0; i < dimen; i++)
          val[i] = Real(vec[i]);
 
       assert(isConsistent());
@@ -516,7 +520,7 @@ template<>
 inline
 void VectorBase<Real>::clear()
 {
-   if( dimen > 0 )
+   if(dimen > 0)
       memset(val, 0, (unsigned int)dimen * sizeof(Real));
 }
 
@@ -529,13 +533,13 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
 {
    assert(vec.dim() == dimen);
 
-   if( dimen <= 0 || vec.dim() <= 0 )
+   if(dimen <= 0 || vec.dim() <= 0)
       return 0;
 
    Rational x = val[0];
    x *= vec.val[0];
 
-   for( int i = 1; i < dimen && i < vec.dim(); i++ )
+   for(int i = 1; i < dimen && i < vec.dim(); i++)
       x.addProduct(val[i], vec.val[i]);
 
    return x;

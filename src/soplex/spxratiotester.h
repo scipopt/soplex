@@ -85,9 +85,9 @@ public:
    }
 
    /// set allowed bound violation
-   virtual void setDelta( Real newDelta )
+   virtual void setDelta(Real newDelta)
    {
-      if( newDelta <= DEFAULT_EPS_ZERO )
+      if(newDelta <= DEFAULT_EPS_ZERO)
          delta = DEFAULT_EPS_ZERO;
       else
          delta = newDelta;
@@ -173,14 +173,14 @@ public:
       , delta(1e-6)
    {}
    /// copy constructor
-   SPxRatioTester( const SPxRatioTester& old)
+   SPxRatioTester(const SPxRatioTester& old)
       : thesolver(old.thesolver)
       , m_name(old.m_name)
       , m_type(old.m_type)
       , delta(old.delta)
    {}
    /// assignment operator
-   SPxRatioTester& operator=( const SPxRatioTester& rhs)
+   SPxRatioTester& operator=(const SPxRatioTester& rhs)
    {
       if(this != &rhs)
       {

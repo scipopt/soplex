@@ -112,16 +112,17 @@ private:
       virtual PostStep* clone() const = 0;
       /// executes the postsolving.
       virtual void execute(
-        DVector& x,                                 //*< Primal solution vector */
-        DVector& y,                                 //*< Dual solution vector */
-        DVector& s,                                 //*< Vector of slacks */
-        DVector& r,                                 //*< Reduced cost vector */
-        DataArray<SPxSolver::VarStatus>& cBasis,    //*< Basis status of column basis */
-        DataArray<SPxSolver::VarStatus>& rBasis,    //*< Basis status of row basis */
-        bool isOptimal
-        ) const = 0;
+         DVector& x,                                 //*< Primal solution vector */
+         DVector& y,                                 //*< Dual solution vector */
+         DVector& s,                                 //*< Vector of slacks */
+         DVector& r,                                 //*< Reduced cost vector */
+         DataArray<SPxSolver::VarStatus>& cBasis,    //*< Basis status of column basis */
+         DataArray<SPxSolver::VarStatus>& rBasis,    //*< Basis status of row basis */
+         bool isOptimal
+      ) const = 0;
 
-      virtual bool checkBasisDim(DataArray<SPxSolver::VarStatus> rows,  DataArray<SPxSolver::VarStatus> cols) const;
+      virtual bool checkBasisDim(DataArray<SPxSolver::VarStatus> rows,
+                                 DataArray<SPxSolver::VarStatus> cols) const;
 
       static Real eps()
       {
@@ -140,7 +141,7 @@ private:
 
    public:
       ///
-   RowObjPS(const SPxLP& lp, int _i, int _j)
+      RowObjPS(const SPxLP& lp, int _i, int _j)
          : PostStep("RowObj", lp.nRows(), lp.nCols())
          , m_i(_i)
          , m_j(_j)
@@ -152,7 +153,7 @@ private:
          , m_j(old.m_j)
       {}
       /// assignment operator
-      RowObjPS& operator=( const RowObjPS& rhs)
+      RowObjPS& operator=(const RowObjPS& rhs)
       {
          if(this != &rhs)
          {
@@ -164,7 +165,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -185,10 +187,10 @@ private:
 
    public:
       ///
-   FreeConstraintPS(const SPxLP& lp, int _i)
+      FreeConstraintPS(const SPxLP& lp, int _i)
          : PostStep("FreeConstraint", lp.nRows(), lp.nCols())
          , m_i(_i)
-         , m_old_i(lp.nRows()-1)
+         , m_old_i(lp.nRows() - 1)
          , m_row(lp.rowVector(_i))
          , m_row_obj(lp.rowObj(_i))
       {}
@@ -201,7 +203,7 @@ private:
          , m_row_obj(old.m_row_obj)
       {}
       /// assignment operator
-      FreeConstraintPS& operator=( const FreeConstraintPS& rhs)
+      FreeConstraintPS& operator=(const FreeConstraintPS& rhs)
       {
          if(this != &rhs)
          {
@@ -215,7 +217,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -238,7 +241,7 @@ private:
       EmptyConstraintPS(const SPxLP& lp, int _i)
          : PostStep("EmptyConstraint", lp.nRows(), lp.nCols())
          , m_i(_i)
-         , m_old_i(lp.nRows()-1)
+         , m_old_i(lp.nRows() - 1)
          , m_row_obj(lp.rowObj(_i))
       {}
       /// copy constructor
@@ -249,7 +252,7 @@ private:
          , m_row_obj(old.m_row_obj)
       {}
       /// assignment operator
-      EmptyConstraintPS& operator=( const EmptyConstraintPS& rhs)
+      EmptyConstraintPS& operator=(const EmptyConstraintPS& rhs)
       {
          if(this != &rhs)
          {
@@ -262,7 +265,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
       {
@@ -298,7 +302,7 @@ private:
                      Real newLo, Real newUp, Real oldLo, Real oldUp)
          : PostStep("RowSingleton", lp.nRows(), lp.nCols())
          , m_i(_i)
-         , m_old_i(lp.nRows()-1)
+         , m_old_i(lp.nRows() - 1)
          , m_j(_j)
          , m_lhs(lp.lhs(_i))
          , m_rhs(lp.rhs(_i))
@@ -333,7 +337,7 @@ private:
          , m_row_obj(old.m_row_obj)
       {}
       /// assignment operator
-      RowSingletonPS& operator=( const RowSingletonPS& rhs)
+      RowSingletonPS& operator=(const RowSingletonPS& rhs)
       {
          if(this != &rhs)
          {
@@ -350,7 +354,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves forcing constraints.
@@ -376,10 +381,11 @@ private:
 
    public:
       ///
-      ForceConstraintPS(const SPxLP& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols, DataArray<Real>& lo, DataArray<Real>& up)
+      ForceConstraintPS(const SPxLP& lp, int _i, bool lhsFixed, DataArray<bool>& fixCols,
+                        DataArray<Real>& lo, DataArray<Real>& up)
          : PostStep("ForceConstraint", lp.nRows(), lp.nCols())
          , m_i(_i)
-         , m_old_i(lp.nRows()-1)
+         , m_old_i(lp.nRows() - 1)
          , m_lRhs(lhsFixed ? lp.lhs(_i) : lp.rhs(_i))
          , m_row(lp.rowVector(_i))
          , m_objs(lp.rowVector(_i).size())
@@ -418,7 +424,7 @@ private:
          , m_rowobj(old.m_rowobj)
       {}
       /// assignment operator
-      ForceConstraintPS& operator=( const ForceConstraintPS& rhs)
+      ForceConstraintPS& operator=(const ForceConstraintPS& rhs)
       {
          if(this != &rhs)
          {
@@ -440,7 +446,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves variable fixing.
@@ -460,10 +467,11 @@ private:
 
    public:
       ///
-      FixVariablePS(const SPxLP& lp, SPxMainSM& simplifier, int _j, const Real val, bool correctIdx = true)
+      FixVariablePS(const SPxLP& lp, SPxMainSM& simplifier, int _j, const Real val,
+                    bool correctIdx = true)
          : PostStep("FixVariable", lp.nRows(), lp.nCols())
          , m_j(_j)
-         , m_old_j(lp.nCols()-1)
+         , m_old_j(lp.nCols() - 1)
          , m_val(val)
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lower(lp.lower(_j))
@@ -471,7 +479,7 @@ private:
          , m_correctIdx(correctIdx)
          , m_col(lp.colVector(_j))
       {
-         simplifier.addObjoffset(m_val*lp.obj(m_j));
+         simplifier.addObjoffset(m_val * lp.obj(m_j));
       }
       /// copy constructor
       FixVariablePS(const FixVariablePS& old)
@@ -486,7 +494,7 @@ private:
          , m_col(old.m_col)
       {}
       /// assignment operator
-      FixVariablePS& operator=( const FixVariablePS& rhs)
+      FixVariablePS& operator=(const FixVariablePS& rhs)
       {
          if(this != &rhs)
          {
@@ -503,7 +511,8 @@ private:
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves variable bound fixing.
@@ -521,13 +530,13 @@ private:
          : PostStep("FixBounds", lp.nRows(), lp.nCols())
          , m_j(j)
       {
-         if (EQrel(lp.lower(j), lp.upper(j), eps()))
+         if(EQrel(lp.lower(j), lp.upper(j), eps()))
             m_status = SPxSolver::FIXED;
-         else if (EQrel(val, lp.lower(j), eps()))
+         else if(EQrel(val, lp.lower(j), eps()))
             m_status = SPxSolver::ON_LOWER;
-         else if (EQrel(val, lp.upper(j), eps()))
+         else if(EQrel(val, lp.upper(j), eps()))
             m_status = SPxSolver::ON_UPPER;
-         else if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
+         else if(lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
             m_status = SPxSolver::ZERO;
          else
          {
@@ -541,7 +550,7 @@ private:
          , m_status(old.m_status)
       {}
       /// assignment operator
-      FixBoundsPS& operator=( const FixBoundsPS& rhs)
+      FixBoundsPS& operator=(const FixBoundsPS& rhs)
       {
          if(this != &rhs)
          {
@@ -556,11 +565,12 @@ private:
       {
          FixBoundsPS* FixBoundsPSptr = 0;
          spx_alloc(FixBoundsPSptr);
-         return new (FixBoundsPSptr) FixBoundsPS(*this);
+         return new(FixBoundsPSptr) FixBoundsPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief Postsolves the case when constraints are removed due to a
@@ -585,8 +595,8 @@ private:
       FreeZeroObjVariablePS(const SPxLP& lp, int _j, bool loFree, SVector col_idx_sorted)
          : PostStep("FreeZeroObjVariable", lp.nRows(), lp.nCols())
          , m_j(_j)
-         , m_old_j(lp.nCols()-1)
-         , m_old_i(lp.nRows()-1)
+         , m_old_j(lp.nCols() - 1)
+         , m_old_i(lp.nRows() - 1)
          , m_bnd(loFree ? lp.upper(_j) : lp.lower(_j))
          , m_col(col_idx_sorted)
          , m_lRhs(lp.colVector(_j).size())
@@ -599,8 +609,9 @@ private:
             assert(isNotZero(m_col.value(k)));
 
             int r = m_col.index(k);
-            if ((m_loFree  && m_col.value(k) > 0) ||
-                (!m_loFree && m_col.value(k) < 0))
+
+            if((m_loFree  && m_col.value(k) > 0) ||
+                  (!m_loFree && m_col.value(k) < 0))
                m_lRhs.add(k, lp.rhs(r));
             else
                m_lRhs.add(k, lp.lhs(r));
@@ -623,7 +634,7 @@ private:
          , m_loFree(old.m_loFree)
       {}
       /// assignment operator
-      FreeZeroObjVariablePS& operator=( const FreeZeroObjVariablePS& rhs)
+      FreeZeroObjVariablePS& operator=(const FreeZeroObjVariablePS& rhs)
       {
          if(this != &rhs)
          {
@@ -641,11 +652,12 @@ private:
       {
          FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = 0;
          spx_alloc(FreeZeroObjVariablePSptr);
-         return new (FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(*this);
+         return new(FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves column singletons with zero objective.
@@ -663,13 +675,13 @@ private:
       const Real m_upper;
       DSVector   m_row;
 
-    public:
+   public:
       ///
-      ZeroObjColSingletonPS(const SPxLP& lp, const SPxMainSM& , int _j, int _i)
+      ZeroObjColSingletonPS(const SPxLP& lp, const SPxMainSM&, int _j, int _i)
          : PostStep("ZeroObjColSingleton", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
-         , m_old_j(lp.nCols()-1)
+         , m_old_j(lp.nCols() - 1)
          , m_lhs(lp.lhs(_i))
          , m_rhs(lp.rhs(_i))
          , m_lower(lp.lower(_j))
@@ -689,7 +701,7 @@ private:
          , m_row(old.m_row)
       {}
       /// assignment operator
-      ZeroObjColSingletonPS& operator=( const ZeroObjColSingletonPS& rhs)
+      ZeroObjColSingletonPS& operator=(const ZeroObjColSingletonPS& rhs)
       {
          if(this != &rhs)
          {
@@ -704,11 +716,12 @@ private:
       {
          ZeroObjColSingletonPS* ZeroObjColSingletonPSptr = 0;
          spx_alloc(ZeroObjColSingletonPSptr);
-         return new (ZeroObjColSingletonPSptr) ZeroObjColSingletonPS(*this);
+         return new(ZeroObjColSingletonPSptr) ZeroObjColSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves free column singletons.
@@ -733,8 +746,8 @@ private:
          : PostStep("FreeColSingleton", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
-         , m_old_j(lp.nCols()-1)
-         , m_old_i(lp.nRows()-1)
+         , m_old_j(lp.nCols() - 1)
+         , m_old_i(lp.nRows() - 1)
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
          , m_lRhs(slackVal)
          , m_onLhs(EQ(slackVal, lp.lhs(_i)))
@@ -742,7 +755,7 @@ private:
          , m_row(lp.rowVector(_i))
       {
          assert(m_row[m_j] != 0.0);
-         simplifier.addObjoffset(m_lRhs*(lp.obj(m_j)/m_row[m_j]));
+         simplifier.addObjoffset(m_lRhs * (lp.obj(m_j) / m_row[m_j]));
       }
       /// copy constructor
       FreeColSingletonPS(const FreeColSingletonPS& old)
@@ -758,7 +771,7 @@ private:
          , m_row(old.m_row)
       {}
       /// assignment operator
-      FreeColSingletonPS& operator=( const FreeColSingletonPS& rhs)
+      FreeColSingletonPS& operator=(const FreeColSingletonPS& rhs)
       {
          if(this != &rhs)
          {
@@ -773,11 +786,12 @@ private:
       {
          FreeColSingletonPS* FreeColSingletonPSptr = 0;
          spx_alloc(FreeColSingletonPSptr);
-         return new (FreeColSingletonPSptr) FreeColSingletonPS(*this);
+         return new(FreeColSingletonPSptr) FreeColSingletonPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves doubleton equations combined with a column singleton.
@@ -854,7 +868,7 @@ private:
          , m_col(old.m_col)
       {}
       /// assignment operator
-      DoubletonEquationPS& operator=( const DoubletonEquationPS& rhs)
+      DoubletonEquationPS& operator=(const DoubletonEquationPS& rhs)
       {
          if(this != &rhs)
          {
@@ -869,11 +883,12 @@ private:
       {
          DoubletonEquationPS* DoubletonEquationPSptr = 0;
          spx_alloc(DoubletonEquationPSptr);
-         return new (DoubletonEquationPSptr) DoubletonEquationPS(*this);
+         return new(DoubletonEquationPSptr) DoubletonEquationPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves duplicate rows.
@@ -946,7 +961,7 @@ private:
          , m_isLhsEqualRhs(old.m_isLhsEqualRhs)
       {}
       /// assignment operator
-      DuplicateRowsPS& operator=( const DuplicateRowsPS& rhs)
+      DuplicateRowsPS& operator=(const DuplicateRowsPS& rhs)
       {
          if(this != &rhs)
          {
@@ -965,10 +980,11 @@ private:
       {
          DuplicateRowsPS* DuplicateRowsPSptr = 0;
          spx_alloc(DuplicateRowsPSptr);
-         return new (DuplicateRowsPSptr) DuplicateRowsPS(*this);
+         return new(DuplicateRowsPSptr) DuplicateRowsPS(*this);
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves duplicate columns.
@@ -989,7 +1005,8 @@ private:
       DataArray<int>       m_perm;
 
    public:
-      DuplicateColsPS(const SPxLP& lp, int _j, int _k, Real scale, DataArray<int>  perm, bool isFirst = false, bool isTheLast = false)
+      DuplicateColsPS(const SPxLP& lp, int _j, int _k, Real scale, DataArray<int>  perm,
+                      bool isFirst = false, bool isTheLast = false)
          : PostStep("DuplicateCols", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_k(_k)
@@ -1010,14 +1027,14 @@ private:
          , m_loJ(old.m_loJ)
          , m_upJ(old.m_upJ)
          , m_loK(old.m_loK)
-         , m_upK (old.m_upK)
-         , m_scale (old.m_scale)
+         , m_upK(old.m_upK)
+         , m_scale(old.m_scale)
          , m_isFirst(old.m_isFirst)
          , m_isLast(old.m_isLast)
          , m_perm(old.m_perm)
       {}
       /// assignment operator
-      DuplicateColsPS& operator=( const DuplicateColsPS& rhs)
+      DuplicateColsPS& operator=(const DuplicateColsPS& rhs)
       {
          if(this != &rhs)
          {
@@ -1031,10 +1048,11 @@ private:
       {
          DuplicateColsPS* DuplicateColsPSptr = 0;
          spx_alloc(DuplicateColsPSptr);
-         return new (DuplicateColsPSptr) DuplicateColsPS(*this);
+         return new(DuplicateColsPSptr) DuplicateColsPS(*this);
       }
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves aggregation.
@@ -1062,8 +1080,8 @@ private:
          : PostStep("Aggregation", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
-         , m_old_j(lp.nCols()-1)
-         , m_old_i(lp.nRows()-1)
+         , m_old_j(lp.nCols() - 1)
+         , m_old_i(lp.nRows() - 1)
          , m_upper(lp.upper(_j))
          , m_lower(lp.lower(_j))
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
@@ -1092,7 +1110,7 @@ private:
          , m_col(old.m_col)
       {}
       /// assignment operator
-      AggregationPS& operator=( const AggregationPS& rhs)
+      AggregationPS& operator=(const AggregationPS& rhs)
       {
          if(this != &rhs)
          {
@@ -1108,7 +1126,7 @@ private:
       {
          AggregationPS* AggregationPSptr = 0;
          spx_alloc(AggregationPSptr);
-         return new (AggregationPSptr) AggregationPS(*this);
+         return new(AggregationPSptr) AggregationPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
@@ -1141,8 +1159,8 @@ private:
          : PostStep("MultiAggregation", lp.nRows(), lp.nCols())
          , m_j(_j)
          , m_i(_i)
-         , m_old_j(lp.nCols()-1)
-         , m_old_i(lp.nRows()-1)
+         , m_old_j(lp.nCols() - 1)
+         , m_old_i(lp.nRows() - 1)
          , m_upper(lp.upper(_j))
          , m_lower(lp.lower(_j))
          , m_obj(lp.spxSense() == SPxLP::MINIMIZE ? lp.obj(_j) : -lp.obj(_j))
@@ -1153,7 +1171,7 @@ private:
          , m_col(lp.colVector(_j))
       {
          assert(m_row[m_j] != 0.0);
-         simplifier.addObjoffset(m_obj*m_const/m_row[m_j]);
+         simplifier.addObjoffset(m_obj * m_const / m_row[m_j]);
       }
       /// copy constructor
       MultiAggregationPS(const MultiAggregationPS& old)
@@ -1172,7 +1190,7 @@ private:
          , m_col(old.m_col)
       {}
       /// assignment operator
-      MultiAggregationPS& operator=( const MultiAggregationPS& rhs)
+      MultiAggregationPS& operator=(const MultiAggregationPS& rhs)
       {
          if(this != &rhs)
          {
@@ -1188,11 +1206,12 @@ private:
       {
          MultiAggregationPS* MultiAggregationPSptr = 0;
          spx_alloc(MultiAggregationPSptr);
-         return new (MultiAggregationPSptr) MultiAggregationPS(*this);
+         return new(MultiAggregationPSptr) MultiAggregationPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
 
    /**@brief   Postsolves variable bound tightening from pseudo objective propagation.
@@ -1222,7 +1241,7 @@ private:
          , m_origlower(old.m_origlower)
       {}
       /// assignment operator
-      TightenBoundsPS& operator=( const TightenBoundsPS& rhs)
+      TightenBoundsPS& operator=(const TightenBoundsPS& rhs)
       {
          return *this;
       }
@@ -1231,11 +1250,12 @@ private:
       {
          TightenBoundsPS* TightenBoundsPSptr = 0;
          spx_alloc(TightenBoundsPSptr);
-         return new (TightenBoundsPSptr) TightenBoundsPS(*this);
+         return new(TightenBoundsPSptr) TightenBoundsPS(*this);
       }
       ///
       virtual void execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis, bool isOptimal) const;
+                           DataArray<SPxSolver::VarStatus>& cBasis, DataArray<SPxSolver::VarStatus>& rBasis,
+                           bool isOptimal) const;
    };
    // friends
    friend class FreeConstraintPS;
@@ -1292,10 +1312,13 @@ private:
    DataArray<int>                  m_cIdx;       ///< column index vector in original LP.
    DataArray<int>                  m_rIdx;       ///< row index vector in original LP.
    DataArray<PostStep*>            m_hist;       ///< vector of presolve history.
-   Array<DSVector>                 m_classSetRows; ///< stores parallel classes with non-zero colum entry
+   Array<DSVector>
+   m_classSetRows; ///< stores parallel classes with non-zero colum entry
    Array<DSVector>                 m_classSetCols; ///< stores parallel classes with non-zero row entry
-   Array<DSVector>                 m_dupRows;    ///< arrange duplicate rows using bucket sort w.r.t. their pClass values
-   Array<DSVector>                 m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
+   Array<DSVector>
+   m_dupRows;    ///< arrange duplicate rows using bucket sort w.r.t. their pClass values
+   Array<DSVector>
+   m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
    bool                            m_postsolved; ///< status of postsolving.
    Real                            m_epsilon;    ///< epsilon zero.
    Real                            m_feastol;    ///< primal feasibility tolerance.
@@ -1321,10 +1344,12 @@ private:
 
    /// computes the minimum and maximum residual activity for a given row and column. If colNumber is set to -1, then
    //  the activity of the row is returned.
-   void computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct, Real& maxAct);
+   void computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct,
+                                      Real& maxAct);
 
    /// calculate min/max value for the multi aggregated variables
-   void computeMinMaxValues(SPxLP& lp, Real side, Real val, Real minRes, Real maxRes, Real& minVal, Real& maxVal);
+   void computeMinMaxValues(SPxLP& lp, Real side, Real val, Real minRes, Real maxRes, Real& minVal,
+                            Real& maxVal);
 
    /// tries to find good lower bound solutions by applying some trivial heuristics
    void trivialHeuristic(SPxLP& lp);
@@ -1368,13 +1393,13 @@ private:
    /// removes a row in the LP.
    void removeRow(SPxLP& lp, int i)
    {
-      m_rIdx[i] = m_rIdx[lp.nRows()-1];
+      m_rIdx[i] = m_rIdx[lp.nRows() - 1];
       lp.removeRow(i);
    }
    /// removes a column in the LP.
    void removeCol(SPxLP& lp, int j)
    {
-      m_cIdx[j] = m_cIdx[lp.nCols()-1];
+      m_cIdx[j] = m_cIdx[lp.nCols() - 1];
       lp.removeCol(j);
    }
    /// returns for a given row index of the (reduced) LP the corresponding row index in the unsimplified LP.
@@ -1452,6 +1477,7 @@ public:
    {
       // copy pointers in m_hist
       m_hist.reSize(0);
+
       for(int k = 0; k < old.m_hist.size(); ++k)
       {
          if(old.m_hist[k] != 0)
@@ -1461,7 +1487,7 @@ public:
       }
    }
    /// assignment operator
-   SPxMainSM& operator=( const SPxMainSM& rhs)
+   SPxMainSM& operator=(const SPxMainSM& rhs)
    {
       if(this != &rhs)
       {
@@ -1513,7 +1539,7 @@ public:
       // delete pointers in m_hist
       for(int k = 0; k < m_hist.size(); ++k)
       {
-         if( m_hist[k] != 0 )
+         if(m_hist[k] != 0)
          {
             m_hist[k]->~PostStep();
             spx_free(m_hist[k]);
@@ -1590,7 +1616,8 @@ public:
       return m_cBasisStat[j];
    }
    /// get optimal basis.
-   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const
+   virtual void getBasis(SPxSolver::VarStatus rows[], SPxSolver::VarStatus cols[],
+                         const int rowsSize = -1, const int colsSize = -1) const
    {
       assert(m_postsolved);
       assert(rowsSize < 0 || rowsSize >= m_rBasisStat.size());
@@ -1616,12 +1643,13 @@ private:
 
       int operator()(const SVector::Element& e1, const SVector::Element& e2) const
       {
-	 if (EQ(e1.val, e2.val))
+         if(EQ(e1.val, e2.val))
             return 0;
-         if (e1.val < e2.val)
-	    return -1;
-	 else // (e1.val > e2.val)
-	    return 1;
+
+         if(e1.val < e2.val)
+            return -1;
+         else // (e1.val > e2.val)
+            return 1;
       }
    };
    /// comparator for class SVector::Element: compare nonzeros according to index
@@ -1632,12 +1660,13 @@ private:
 
       int operator()(const SVector::Element& e1, const SVector::Element& e2) const
       {
-	 if (EQ(e1.idx, e2.idx))
+         if(EQ(e1.idx, e2.idx))
             return 0;
-         if (e1.idx < e2.idx)
-	    return -1;
-	 else // (e1.idx > e2.idx)
-	    return 1;
+
+         if(e1.idx < e2.idx)
+            return -1;
+         else // (e1.idx > e2.idx)
+            return 1;
       }
    };
    //@}

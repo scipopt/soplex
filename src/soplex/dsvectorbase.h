@@ -62,8 +62,10 @@ private:
    void allocMem(int n)
    {
       spx_alloc(theelem, n);
-      for( int i = 0; i < n; i++ )
-         new (&(theelem[i])) Nonzero<R>();
+
+      for(int i = 0; i < n; i++)
+         new(&(theelem[i])) Nonzero<R>();
+
       SVectorBase<R>::setMem(n, theelem);
    }
 
@@ -72,7 +74,7 @@ private:
    {
       assert(n >= 0);
 
-      if( SVectorBase<R>::max() - SVectorBase<R>::size() < n )
+      if(SVectorBase<R>::max() - SVectorBase<R>::size() < n)
       {
          assert(SVectorBase<R>::size() + n > 0);
          setMax(SVectorBase<R>::size() + n);
@@ -148,7 +150,7 @@ public:
    template < class S >
    DSVectorBase<R>& operator=(const SVectorBase<S>& vec)
    {
-      if( this != &vec )
+      if(this != &vec)
       {
          SVectorBase<R>::clear();
          makeMem(vec.size());
@@ -161,7 +163,7 @@ public:
    /// Assignment operator.
    DSVectorBase<R>& operator=(const DSVectorBase<R>& vec)
    {
-      if( this != &vec )
+      if(this != &vec)
       {
          SVectorBase<R>::clear();
          makeMem(vec.size());
@@ -175,7 +177,7 @@ public:
    template < class S >
    DSVectorBase<R>& operator=(const DSVectorBase<S>& vec)
    {
-      if( this != (DSVectorBase<R>*)(&vec) )
+      if(this != (DSVectorBase<R>*)(&vec))
       {
          SVectorBase<R>::clear();
          makeMem(vec.size());
@@ -196,9 +198,9 @@ public:
    /// Destructor.
    virtual ~DSVectorBase<R>()
    {
-      if( theelem )
+      if(theelem)
       {
-         for( int i = SVectorBase<R>::max() - 1; i >= 0; i-- )
+         for(int i = SVectorBase<R>::max() - 1; i >= 0; i--)
             theelem[i].~Nonzero<R>();
 
          spx_free(theelem);
@@ -250,7 +252,7 @@ public:
       int siz = SVectorBase<R>::size();
       int len = (newmax < siz) ? siz : newmax;
 
-      if( len == SVectorBase<R>::max() )
+      if(len == SVectorBase<R>::max())
          return;
 
       Nonzero<R>* newmem = 0;
@@ -260,18 +262,19 @@ public:
 
       /* call copy constructor for first elements */
       int i;
-      for( i = 0; i < siz; i++ )
-         new ((&newmem[i])) Nonzero<R>(theelem[i]);
+
+      for(i = 0; i < siz; i++)
+         new((&newmem[i])) Nonzero<R>(theelem[i]);
 
       /* call default constructor for remaining elements */
-      for( ; i < len; i++ )
-         new ((&newmem[i])) Nonzero<R>();
+      for(; i < len; i++)
+         new((&newmem[i])) Nonzero<R>();
 
       /* free old memory */
-      for( i = SVectorBase<R>::max()-1; i >= 0; i-- )
+      for(i = SVectorBase<R>::max() - 1; i >= 0; i--)
          theelem[i].~Nonzero<R>();
 
-      if( theelem != 0 )
+      if(theelem != 0)
          spx_free(theelem);
 
       /* assign new memory */
@@ -290,8 +293,10 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( theelem != 0 && SVectorBase<R>::mem() != theelem )
+
+      if(theelem != 0 && SVectorBase<R>::mem() != theelem)
          return MSGinconsistent("DSVectorBase");
+
 #endif
 
       return true;
@@ -318,7 +323,7 @@ template<>
 inline
 DSVectorBase<Real>::~DSVectorBase()
 {
-   if( theelem )
+   if(theelem)
       spx_free(theelem);
 }
 
@@ -338,7 +343,7 @@ void DSVectorBase<Real>::setMax(int newmax)
    spx_realloc(theelem, len);
    setMem(len, theelem);
    // reset 'size' to old size since the above call to setMem() sets 'size' to 0
-   set_size( siz );
+   set_size(siz);
 }
 } // namespace soplex
 #endif // _DSVECTORBASE_H_

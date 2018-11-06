@@ -69,8 +69,8 @@ public:
    /// default constructor.
    explicit
    UpdateVector(int p_dim /*=0*/, Real p_eps /*=1e-16*/)
-      : DVector (p_dim)
-      , theval (0)
+      : DVector(p_dim)
+      , theval(0)
       , thedelta(p_dim, p_eps)
    {
       assert(isConsistent());
@@ -79,11 +79,11 @@ public:
    ~UpdateVector()
    {}
    /// copy constructor
-   UpdateVector( const UpdateVector& );
+   UpdateVector(const UpdateVector&);
    /// assignment from DVector
    UpdateVector& operator=(const DVector& rhs)
    {
-      if ( this != & rhs )
+      if(this != & rhs)
          DVector::operator=(rhs);
 
       assert(isConsistent());
@@ -93,7 +93,7 @@ public:
    /// assignment from Vector
    UpdateVector& operator=(const Vector& rhs)
    {
-      if ( this != & rhs )
+      if(this != & rhs)
          DVector::operator=(rhs);
 
       assert(isConsistent());

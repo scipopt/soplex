@@ -39,7 +39,7 @@ void SPxSteepPR::load(SPxSolver* base)
 {
    thesolver = base;
 
-   if (base)
+   if(base)
    {
       workVec.clear();
       workVec.reDim(base->dim());
@@ -61,7 +61,7 @@ void SPxSteepPR::setType(SPxSolver::Type type)
    bestPrices.setMax(thesolver->dim());
    prices.reMax(thesolver->dim());
 
-   if( type == SPxSolver::ENTER )
+   if(type == SPxSolver::ENTER)
    {
       bestPricesCo.clear();
       bestPricesCo.setMax(thesolver->coDim());
@@ -77,59 +77,68 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
    DVector& weights = thesolver->weights;
    DVector& coWeights = thesolver->coWeights;
 
-   if( setup == DEFAULT )
+   if(setup == DEFAULT)
    {
-      if( type == SPxSolver::ENTER )
+      if(type == SPxSolver::ENTER)
       {
-         if( thesolver->weightsAreSetup )
+         if(thesolver->weightsAreSetup)
          {
             // check for added/removed rows and adapt norms accordingly
-            if (coWeights.dim() < thesolver->dim())
+            if(coWeights.dim() < thesolver->dim())
                endDim = coWeights.dim();
             else
                endDim = thesolver->dim();
-            if (weights.dim() < thesolver->coDim())
+
+            if(weights.dim() < thesolver->coDim())
                endCoDim = weights.dim();
             else
                endCoDim = thesolver->coDim();
          }
 
          coWeights.reDim(thesolver->dim(), false);
-         for (i = thesolver->dim() - 1; i >= endDim; --i)
+
+         for(i = thesolver->dim() - 1; i >= endDim; --i)
             coWeights[i] = 2.0;
+
          weights.reDim(thesolver->coDim(), false);
-         for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
+
+         for(i = thesolver->coDim() - 1; i >= endCoDim; --i)
             weights[i] = 1.0;
       }
       else
       {
          assert(type == SPxSolver::LEAVE);
 
-         if( thesolver->weightsAreSetup )
+         if(thesolver->weightsAreSetup)
          {
             // check for added/removed rows and adapt norms accordingly
-            if (coWeights.dim() < thesolver->dim())
+            if(coWeights.dim() < thesolver->dim())
                endDim = coWeights.dim();
             else
                endDim = thesolver->dim();
          }
 
          coWeights.reDim(thesolver->dim(), false);
-         for (i = thesolver->dim() - 1; i >= endDim; --i)
+
+         for(i = thesolver->dim() - 1; i >= endDim; --i)
             coWeights[i]   = 1.0;
       }
    }
    else
    {
-      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl; )
+      MSG_INFO1((*thesolver->spxout),
+                (*thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl;)
 
-      if (type == SPxSolver::ENTER)
+      if(type == SPxSolver::ENTER)
       {
          coWeights.reDim(thesolver->dim(), false);
-         for (i = thesolver->dim() - 1; i >= endDim; --i)
+
+         for(i = thesolver->dim() - 1; i >= endDim; --i)
             coWeights[i] = 1.0;
+
          weights.reDim(thesolver->coDim(), false);
-         for (i = thesolver->coDim() - 1; i >= endCoDim; --i)
+
+         for(i = thesolver->coDim() - 1; i >= endCoDim; --i)
             weights[i] = 1.0 + thesolver->vector(i).length2();
       }
       else
@@ -137,19 +146,21 @@ void SPxSteepPR::setupWeights(SPxSolver::Type type)
          assert(type == SPxSolver::LEAVE);
          coWeights.reDim(thesolver->dim(), false);
          SSVector tmp(thesolver->dim(), thesolver->epsilon());
-         for( i = thesolver->dim() - 1; i >= endDim && !thesolver->isTimeLimitReached(); --i )
+
+         for(i = thesolver->dim() - 1; i >= endDim && !thesolver->isTimeLimitReached(); --i)
          {
             thesolver->basis().coSolve(tmp, thesolver->unitVector(i));
             coWeights[i] = tmp.length2();
          }
       }
    }
+
    thesolver->weightsAreSetup = true;
 }
 
 void SPxSteepPR::setRep(SPxSolver::Representation)
 {
-   if (workVec.dim() != thesolver->dim())
+   if(workVec.dim() != thesolver->dim())
    {
       DVector tmp = thesolver->weights;
       thesolver->weights = thesolver->coWeights;
@@ -164,7 +175,7 @@ void SPxSteepPR::left4(int n, SPxId id)
 {
    assert(thesolver->type() == SPxSolver::LEAVE);
 
-   if (id.isValid())
+   if(id.isValid())
    {
       Real        delta         = 0.1 + 1.0 / thesolver->basis().iteration();
       Real*       coWeights_ptr = thesolver->coWeights.get_ptr();
@@ -174,11 +185,13 @@ void SPxSteepPR::left4(int n, SPxId id)
       Real        beta_q        = thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
 #ifndef NDEBUG
-      if (spxAbs(rhoVec[n]) < theeps * 0.5)
+
+      if(spxAbs(rhoVec[n]) < theeps * 0.5)
       {
-         MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP04: rhoVec = "
-                           << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
+         MSG_INFO3((*thesolver->spxout), (*thesolver->spxout) << "WSTEEP04: rhoVec = "
+                   << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5 * theeps << std::endl;)
       }
+
 #endif
 
       const IdxSet& rhoIdx = thesolver->fVec().idx();
@@ -189,24 +202,25 @@ void SPxSteepPR::left4(int n, SPxId id)
          int  j = rhoIdx.index(i);
          coWeights_ptr[j] += rhoVec[j] * (beta_q * rhoVec[j] - 2.0 * rhov_1 * workVec_ptr[j]);
 
-         if (coWeights_ptr[j] < delta)
+         if(coWeights_ptr[j] < delta)
             coWeights_ptr[j] = delta; // coWeights_ptr[j] = delta / (1+delta-x);
-         else if (coWeights_ptr[j] >= infinity)
+         else if(coWeights_ptr[j] >= infinity)
             coWeights_ptr[j] = 1.0 / theeps;
       }
+
       coWeights_ptr[n] = beta_q;
    }
 }
 
 Real inline computePrice(Real viol, Real weight, Real tol)
 {
-   if( weight < tol )
+   if(weight < tol)
       return viol * viol / tol;
    else
       return viol * viol / weight;
 }
 
-int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
+int SPxSteepPR::buildBestPriceVectorLeave(Real feastol)
 {
    int idx;
    int nsorted;
@@ -218,11 +232,12 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
    bestPrices.clear();
 
    // construct vector of all prices
-   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       x = fTest[idx];
-      if (x < -feastol)
+
+      if(x < -feastol)
       {
          // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
          thesolver->isInfeasible[idx] = VIOLATED;
@@ -231,19 +246,21 @@ int SPxSteepPR::buildBestPriceVectorLeave( Real feastol )
          prices.append(price);
       }
    }
+
    // set up structures for the quicksort implementation
    compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
    nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), HYPERPRICINGSIZE);
+
    // copy indices of best values to bestPrices
-   for( int i = 0; i < nsorted; ++i )
+   for(int i = 0; i < nsorted; ++i)
    {
       bestPrices.addIdx(prices[i].idx);
       thesolver->isInfeasible[prices[i].idx] = VIOLATED_AND_CHECKED;
    }
 
-   if( nsorted > 0 )
+   if(nsorted > 0)
       return prices[0].idx;
    else
       return -1;
@@ -256,9 +273,9 @@ int SPxSteepPR::selectLeave()
 
    int retid;
 
-   if (thesolver->hyperPricingLeave && thesolver->sparsePricingLeave)
+   if(thesolver->hyperPricingLeave && thesolver->sparsePricingLeave)
    {
-      if ( bestPrices.size() < 2 || thesolver->basis().lastUpdate() == 0 )
+      if(bestPrices.size() < 2 || thesolver->basis().lastUpdate() == 0)
       {
          // call init method to build up price-vector and return index of largest price
          retid = buildBestPriceVectorLeave(theeps);
@@ -266,27 +283,27 @@ int SPxSteepPR::selectLeave()
       else
          retid = selectLeaveHyper(theeps);
    }
-   else if (thesolver->sparsePricingLeave)
+   else if(thesolver->sparsePricingLeave)
       retid = selectLeaveSparse(theeps);
    else
       retid = selectLeaveX(theeps);
 
-   if( retid < 0 && !refined )
+   if(retid < 0 && !refined)
    {
       refined = true;
-      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP03 trying refinement step..\n"; )
-      retid = selectLeaveX(theeps/STEEP_REFINETOL);
+      MSG_INFO3((*thesolver->spxout), (*thesolver->spxout) << "WSTEEP03 trying refinement step..\n";)
+      retid = selectLeaveX(theeps / STEEP_REFINETOL);
    }
 
-   if( retid >= 0 )
+   if(retid >= 0)
    {
-      assert( thesolver->coPvec().delta().isConsistent() );
+      assert(thesolver->coPvec().delta().isConsistent());
       // coPvec().delta() might be not setup after the solve when it contains too many nonzeros.
       // This is intended and forcing to keep the sparsity information leads to a slowdown
       // TODO implement a dedicated solve method for unitvectors
       thesolver->basis().coSolve(thesolver->coPvec().delta(),
                                  thesolver->unitVector(retid));
-      assert( thesolver->coPvec().delta().isConsistent() );
+      assert(thesolver->coPvec().delta().isConsistent());
       workRhs.setup_and_assign(thesolver->coPvec().delta());
       thesolver->setup4solve(&workVec, &workRhs);
    }
@@ -302,15 +319,15 @@ int SPxSteepPR::selectLeaveX(Real tol)
    Real x;
    int lastIdx = -1;
 
-   for (int i = thesolver->dim() - 1; i >= 0; --i)
+   for(int i = thesolver->dim() - 1; i >= 0; --i)
    {
       x = fTest[i];
 
-      if (x < -tol)
+      if(x < -tol)
       {
          x = computePrice(x, coWeights_ptr[i], tol);
 
-         if (x > best)
+         if(x > best)
          {
             best = x;
             lastIdx = i;
@@ -330,16 +347,16 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
    int lastIdx = -1;
    int idx;
 
-   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       x = fTest[idx];
 
-      if (x < -tol)
+      if(x < -tol)
       {
          x = computePrice(x, coWeights_ptr[idx], tol);
 
-         if (x > best)
+         if(x > best)
          {
             best = x;
             lastIdx = idx;
@@ -348,7 +365,8 @@ int SPxSteepPR::selectLeaveSparse(Real tol)
       else
       {
          thesolver->infeasibilities.remove(i);
-         assert(thesolver->isInfeasible[idx] == VIOLATED || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
+         assert(thesolver->isInfeasible[idx] == VIOLATED
+                || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
          thesolver->isInfeasible[idx] = NOT_VIOLATED;
       }
    }
@@ -367,21 +385,24 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
    int idx = 0;
 
    // find the best price from the short candidate list
-   for( int i = bestPrices.size() - 1; i >= 0; --i )
+   for(int i = bestPrices.size() - 1; i >= 0; --i)
    {
       idx = bestPrices.index(i);
       x = fTest[idx];
-      if( x < -tol )
+
+      if(x < -tol)
       {
-         assert(thesolver->isInfeasible[idx] == VIOLATED || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
+         assert(thesolver->isInfeasible[idx] == VIOLATED
+                || thesolver->isInfeasible[idx] == VIOLATED_AND_CHECKED);
          x = computePrice(x, coPen[idx], tol);
 
-         if( x > best )
+         if(x > best)
          {
             best = x;
             bestIdx = idx;
          }
-         if( x < leastBest )
+
+         if(x < leastBest)
             leastBest = x;
       }
       else
@@ -392,30 +413,32 @@ int SPxSteepPR::selectLeaveHyper(Real tol)
    }
 
    // make sure we do not skip potential candidates due to a high leastBest value
-   if( leastBest == infinity )
+   if(leastBest == infinity)
    {
       assert(bestPrices.size() == 0);
       leastBest = 0;
    }
 
    // scan the updated indices for a better price
-   for( int i = thesolver->updateViols.size() - 1; i >= 0; --i )
+   for(int i = thesolver->updateViols.size() - 1; i >= 0; --i)
    {
       idx = thesolver->updateViols.index(i);
+
       // is this index a candidate for bestPrices?
-      if( thesolver->isInfeasible[idx] == VIOLATED )
+      if(thesolver->isInfeasible[idx] == VIOLATED)
       {
          x = fTest[idx];
          assert(x < -tol);
          x = computePrice(x, coPen[idx], tol);
 
-         if( x > leastBest )
+         if(x > leastBest)
          {
-            if( x > best )
+            if(x > best)
             {
                best = x;
                bestIdx = idx;
             }
+
             thesolver->isInfeasible[idx] = VIOLATED_AND_CHECKED;
             bestPrices.addIdx(idx);
          }
@@ -431,7 +454,7 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
 {
    assert(thesolver->type() == SPxSolver::ENTER);
 
-   if (n >= 0 && n < thesolver->dim())
+   if(n >= 0 && n < thesolver->dim())
    {
       Real delta = 2 + 1.0 / thesolver->basis().iteration();
       Real* coWeights_ptr = thesolver->coWeights.get_ptr();
@@ -446,37 +469,39 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
       Real xi_ip;
 
       assert(thesolver->fVec().delta()[n] > thesolver->epsilon()
-              || thesolver->fVec().delta()[n] < -thesolver->epsilon());
+             || thesolver->fVec().delta()[n] < -thesolver->epsilon());
 
-      for (j = coPidx.size() - 1; j >= 0; --j)
+      for(j = coPidx.size() - 1; j >= 0; --j)
       {
          i = coPidx.index(j);
          xi_ip = xi_p * coPvec[i];
          coWeights_ptr[i] += xi_ip * (xi_ip * pi_p - 2.0 * workVec_ptr[i]);
+
          /*
          if(coWeights_ptr[i] < 1)
              coWeights_ptr[i] = 1 / (2-x);
          */
-         if (coWeights_ptr[i] < delta)
+         if(coWeights_ptr[i] < delta)
             coWeights_ptr[i] = delta;
          // coWeights_ptr[i] = 1;
-         else if (coWeights_ptr[i] > infinity)
+         else if(coWeights_ptr[i] > infinity)
             coWeights_ptr[i] = 1 / thesolver->epsilon();
       }
 
-      for (j = pIdx.size() - 1; j >= 0; --j)
+      for(j = pIdx.size() - 1; j >= 0; --j)
       {
          i = pIdx.index(j);
          xi_ip = xi_p * pVec[i];
          weights_ptr[i] += xi_ip * (xi_ip * pi_p - 2.0 * (thesolver->vector(i) * workVec));
+
          /*
          if(weights_ptr[i] < 1)
              weights_ptr[i] = 1 / (2-x);
          */
-         if (weights_ptr[i] < delta)
+         if(weights_ptr[i] < delta)
             weights_ptr[i] = delta;
          // weights_ptr[i] = 1;
-         else if (weights_ptr[i] > infinity)
+         else if(weights_ptr[i] > infinity)
             weights_ptr[i] = 1.0 / thesolver->epsilon();
       }
    }
@@ -491,7 +516,7 @@ void SPxSteepPR::entered4(SPxId /* id */, int n)
 }
 
 
-SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
+SPxId SPxSteepPR::buildBestPriceVectorEnterDim(Real& best, Real feastol)
 {
    const Real* coTest        = thesolver->coTest().get_const_ptr();
    const Real* coWeights_ptr = thesolver->coWeights.get_const_ptr();
@@ -504,11 +529,12 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
    bestPrices.clear();
 
    // construct vector of all prices
-   for( int i = thesolver->infeasibilities.size() - 1; i >= 0; --i )
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       x = coTest[idx];
-      if ( x < -feastol)
+
+      if(x < -feastol)
       {
          // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
          thesolver->isInfeasible[idx] = VIOLATED;
@@ -522,19 +548,21 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
          thesolver->isInfeasible[idx] = NOT_VIOLATED;
       }
    }
+
    // set up structures for the quicksort implementation
    compare.elements = prices.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
    nsorted = SPxQuicksortPart(prices.get_ptr(), compare, 0, prices.size(), HYPERPRICINGSIZE);
+
    // copy indices of best values to bestPrices
-   for( int i = 0; i < nsorted; ++i )
+   for(int i = 0; i < nsorted; ++i)
    {
       bestPrices.addIdx(prices[i].idx);
       thesolver->isInfeasible[prices[i].idx] = VIOLATED_AND_CHECKED;
    }
 
-   if( nsorted > 0 )
+   if(nsorted > 0)
    {
       best = prices[0].val;
       return thesolver->coId(prices[0].idx);
@@ -544,7 +572,7 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterDim( Real& best, Real feastol )
 }
 
 
-SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
+SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim(Real& best, Real feastol)
 {
    const Real* test        = thesolver->test().get_const_ptr();
    const Real* weights_ptr = thesolver->weights.get_const_ptr();
@@ -557,11 +585,12 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
    bestPricesCo.clear();
 
    // construct vector of all prices
-   for( int i = thesolver->infeasibilitiesCo.size() - 1; i >= 0; --i )
+   for(int i = thesolver->infeasibilitiesCo.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilitiesCo.index(i);
       x = test[idx];
-      if ( x < -feastol)
+
+      if(x < -feastol)
       {
          // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
          thesolver->isInfeasibleCo[idx] = VIOLATED;
@@ -575,19 +604,21 @@ SPxId SPxSteepPR::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
          thesolver->isInfeasibleCo[idx] = NOT_VIOLATED;
       }
    }
+
    // set up structures for the quicksort implementation
    compare.elements = pricesCo.get_const_ptr();
    // do a partial sort to move the best ones to the front
    // TODO this can be done more efficiently, since we only need the indices
    nsorted = SPxQuicksortPart(pricesCo.get_ptr(), compare, 0, pricesCo.size(), HYPERPRICINGSIZE);
+
    // copy indices of best values to bestPrices
-   for( int i = 0; i < nsorted; ++i )
+   for(int i = 0; i < nsorted; ++i)
    {
       bestPricesCo.addIdx(pricesCo[i].idx);
       thesolver->isInfeasibleCo[pricesCo[i].idx] = VIOLATED_AND_CHECKED;
    }
 
-   if( nsorted > 0 )
+   if(nsorted > 0)
    {
       best = pricesCo[0].val;
       return thesolver->id(pricesCo[0].idx);
@@ -604,16 +635,16 @@ SPxId SPxSteepPR::selectEnter()
 
    enterId = selectEnterX(theeps);
 
-   if( !enterId.isValid() && !refined )
+   if(!enterId.isValid() && !refined)
    {
       refined = true;
-      MSG_INFO3( (*thesolver->spxout), (*thesolver->spxout) << "WSTEEP05 trying refinement step..\n"; )
-      enterId = selectEnterX(theeps/STEEP_REFINETOL);
+      MSG_INFO3((*thesolver->spxout), (*thesolver->spxout) << "WSTEEP05 trying refinement step..\n";)
+      enterId = selectEnterX(theeps / STEEP_REFINETOL);
    }
 
    assert(isConsistent());
 
-   if (enterId.isValid())
+   if(enterId.isValid())
    {
       SSVector& delta = thesolver->fVec().delta();
 
@@ -624,6 +655,7 @@ SPxId SPxSteepPR::selectEnter()
 
       thesolver->setup4coSolve(&workVec, &workRhs);
    }
+
    return enterId;
 }
 
@@ -637,26 +669,32 @@ SPxId SPxSteepPR::selectEnterX(Real tol)
    best = -infinity;
    bestCo = -infinity;
 
-   if( thesolver->hyperPricingEnter && !refined )
+   if(thesolver->hyperPricingEnter && !refined)
    {
-      if( bestPrices.size() < 2 || thesolver->basis().lastUpdate() == 0 )
-         enterCoId = (thesolver->sparsePricingEnter) ? buildBestPriceVectorEnterDim(best, tol) : selectEnterDenseDim(best, tol);
+      if(bestPrices.size() < 2 || thesolver->basis().lastUpdate() == 0)
+         enterCoId = (thesolver->sparsePricingEnter) ? buildBestPriceVectorEnterDim(best,
+                     tol) : selectEnterDenseDim(best, tol);
       else
-         enterCoId = (thesolver->sparsePricingEnter) ? selectEnterHyperDim(best, tol) : selectEnterDenseDim(best, tol);
+         enterCoId = (thesolver->sparsePricingEnter) ? selectEnterHyperDim(best,
+                     tol) : selectEnterDenseDim(best, tol);
 
-      if( bestPricesCo.size() < 2 || thesolver->basis().lastUpdate() == 0 )
-         enterId = (thesolver->sparsePricingEnterCo) ? buildBestPriceVectorEnterCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
+      if(bestPricesCo.size() < 2 || thesolver->basis().lastUpdate() == 0)
+         enterId = (thesolver->sparsePricingEnterCo) ? buildBestPriceVectorEnterCoDim(bestCo,
+                   tol) : selectEnterDenseCoDim(bestCo, tol);
       else
-         enterId = (thesolver->sparsePricingEnterCo) ? selectEnterHyperCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
+         enterId = (thesolver->sparsePricingEnterCo) ? selectEnterHyperCoDim(bestCo,
+                   tol) : selectEnterDenseCoDim(bestCo, tol);
    }
    else
    {
-      enterCoId = (thesolver->sparsePricingEnter && !refined) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
-      enterId = (thesolver->sparsePricingEnterCo && !refined) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
+      enterCoId = (thesolver->sparsePricingEnter
+                   && !refined) ? selectEnterSparseDim(best, tol) : selectEnterDenseDim(best, tol);
+      enterId = (thesolver->sparsePricingEnterCo
+                 && !refined) ? selectEnterSparseCoDim(bestCo, tol) : selectEnterDenseCoDim(bestCo, tol);
    }
 
    // prefer slack indices to reduce nonzeros in basis matrix
-   if( enterCoId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterId.isValid()) )
+   if(enterCoId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterId.isValid()))
       return enterCoId;
    else
       return enterId;
@@ -674,19 +712,22 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
    int idx;
 
    // find the best price from short candidate list
-   for( int i = bestPrices.size() - 1; i >= 0; --i )
+   for(int i = bestPrices.size() - 1; i >= 0; --i)
    {
       idx = bestPrices.index(i);
       x = coTest[idx];
-      if( x < -tol )
+
+      if(x < -tol)
       {
          x = computePrice(x, coWeights_ptr[idx], tol);
-         if( x > best )
+
+         if(x > best)
          {
             best = x;
             enterIdx = idx;
          }
-         if( x < leastBest )
+
+         if(x < leastBest)
             leastBest = x;
       }
       else
@@ -697,30 +738,34 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
    }
 
    // make sure we do not skip potential candidates due to a high leastBest value
-   if( leastBest == infinity )
+   if(leastBest == infinity)
    {
       assert(bestPrices.size() == 0);
       leastBest = 0;
    }
 
    // scan the updated indices for a better price
-   for( int i = thesolver->updateViols.size() -1; i >= 0; --i )
+   for(int i = thesolver->updateViols.size() - 1; i >= 0; --i)
    {
       idx = thesolver->updateViols.index(i);
+
       // only look at indices that were not checked already
-      if( thesolver->isInfeasible[idx] == VIOLATED )
+      if(thesolver->isInfeasible[idx] == VIOLATED)
       {
          x = coTest[idx];
-         if( x < -tol )
+
+         if(x < -tol)
          {
             x = computePrice(x, coWeights_ptr[idx], tol);
-            if( x > leastBest )
+
+            if(x > leastBest)
             {
-               if (x > best)
+               if(x > best)
                {
                   best = x;
                   enterIdx = idx;
                }
+
                // put index into candidate list
                thesolver->isInfeasible[idx] = VIOLATED_AND_CHECKED;
                bestPrices.addIdx(idx);
@@ -733,7 +778,7 @@ SPxId SPxSteepPR::selectEnterHyperDim(Real& best, Real tol)
       }
    }
 
-   if( enterIdx >= 0 )
+   if(enterIdx >= 0)
       return thesolver->coId(enterIdx);
    else
       return SPxId();
@@ -751,19 +796,22 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
    int idx;
 
    // find the best price from short candidate list
-   for( int i = bestPricesCo.size() - 1; i >= 0; --i )
+   for(int i = bestPricesCo.size() - 1; i >= 0; --i)
    {
       idx = bestPricesCo.index(i);
       x = test[idx];
-      if( x < -tol )
+
+      if(x < -tol)
       {
          x = computePrice(x, weights_ptr[idx], tol);
-         if( x > best )
+
+         if(x > best)
          {
             best = x;
             enterIdx = idx;
          }
-         if( x < leastBest )
+
+         if(x < leastBest)
             leastBest = x;
       }
       else
@@ -774,30 +822,34 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
    }
 
    // make sure we do not skip potential candidates due to a high leastBest value
-   if( leastBest == infinity )
+   if(leastBest == infinity)
    {
       assert(bestPricesCo.size() == 0);
       leastBest = 0;
    }
 
    // scan the updated indices for a better price
-   for( int i = thesolver->updateViolsCo.size() -1; i >= 0; --i )
+   for(int i = thesolver->updateViolsCo.size() - 1; i >= 0; --i)
    {
       idx = thesolver->updateViolsCo.index(i);
+
       // only look at indices that were not checked already
-      if( thesolver->isInfeasibleCo[idx] == VIOLATED )
+      if(thesolver->isInfeasibleCo[idx] == VIOLATED)
       {
          x = test[idx];
-         if( x < -tol )
+
+         if(x < -tol)
          {
             x = computePrice(x, weights_ptr[idx], tol);
-            if( x > leastBest )
+
+            if(x > leastBest)
             {
-               if (x > best)
+               if(x > best)
                {
                   best = x;
                   enterIdx = idx;
                }
+
                // put index into candidate list
                thesolver->isInfeasibleCo[idx] = VIOLATED_AND_CHECKED;
                bestPricesCo.addIdx(idx);
@@ -810,7 +862,7 @@ SPxId SPxSteepPR::selectEnterHyperCoDim(Real& best, Real tol)
       }
    }
 
-   if( enterIdx >= 0 )
+   if(enterIdx >= 0)
       return thesolver->id(enterIdx);
    else
       return SPxId();
@@ -826,15 +878,16 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
    int idx;
    Real x;
 
-   for (int i = thesolver->infeasibilities.size() -1; i >= 0; --i)
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       x = coTest[idx];
 
-      if (x < -tol)
+      if(x < -tol)
       {
          x = computePrice(x, coWeights_ptr[idx], tol);
-         if (x > best)
+
+         if(x > best)
          {
             best = x;
             enterId = thesolver->coId(idx);
@@ -846,6 +899,7 @@ SPxId SPxSteepPR::selectEnterSparseDim(Real& best, Real tol)
          thesolver->isInfeasible[idx] = NOT_VIOLATED;
       }
    }
+
    return enterId;
 }
 
@@ -858,15 +912,16 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
    int idx;
    Real x;
 
-   for (int i = thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
+   for(int i = thesolver->infeasibilitiesCo.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilitiesCo.index(i);
       x = test[idx];
 
-      if (x < -tol)
+      if(x < -tol)
       {
          x = computePrice(x, weights_ptr[idx], tol);
-         if (x > best)
+
+         if(x > best)
          {
             best   = x;
             enterId = thesolver->id(idx);
@@ -878,6 +933,7 @@ SPxId SPxSteepPR::selectEnterSparseCoDim(Real& best, Real tol)
          thesolver->isInfeasibleCo[idx] = NOT_VIOLATED;
       }
    }
+
    return enterId;
 }
 
@@ -889,19 +945,22 @@ SPxId SPxSteepPR::selectEnterDenseDim(Real& best, Real tol)
 
    Real x;
 
-   for (int i = 0, end = thesolver->dim(); i < end; ++i)
+   for(int i = 0, end = thesolver->dim(); i < end; ++i)
    {
       x = coTest[i];
-      if (x < -tol)
+
+      if(x < -tol)
       {
          x = computePrice(x, coWeights_ptr[i], tol);
-         if (x > best)
+
+         if(x > best)
          {
             best = x;
             enterId = thesolver->coId(i);
          }
       }
    }
+
    return enterId;
 }
 
@@ -916,16 +975,19 @@ SPxId SPxSteepPR::selectEnterDenseCoDim(Real& best, Real tol)
    for(int i = 0, end = thesolver->coDim(); i < end; ++i)
    {
       x = test[i];
-      if (x < -tol)
+
+      if(x < -tol)
       {
          x = computePrice(x, weights_ptr[i], tol);
-         if (x > best)
+
+         if(x > best)
          {
             best   = x;
             enterId = thesolver->id(i);
          }
       }
    }
+
    return enterId;
 }
 
@@ -936,9 +998,9 @@ void SPxSteepPR::addedVecs(int n)
    n = weights.dim();
    weights.reDim(thesolver->coDim());
 
-   if (thesolver->type() == SPxSolver::ENTER)
+   if(thesolver->type() == SPxSolver::ENTER)
    {
-      for (; n < weights.dim(); ++n)
+      for(; n < weights.dim(); ++n)
          weights[n] = 2;
    }
 }
@@ -947,9 +1009,10 @@ void SPxSteepPR::addedCoVecs(int n)
 {
    DVector& coWeights = thesolver->coWeights;
    n = coWeights.dim();
-   workVec.reDim (thesolver->dim());
-   coWeights.reDim (thesolver->dim());
-   for (; n < coWeights.dim(); ++n)
+   workVec.reDim(thesolver->dim());
+   coWeights.reDim(thesolver->dim());
+
+   for(; n < coWeights.dim(); ++n)
       coWeights[n] = 1;
 }
 
@@ -965,16 +1028,19 @@ void SPxSteepPR::removedVecs(const int perm[])
 {
    assert(thesolver != 0);
    DVector& weights = thesolver->weights;
-   if (thesolver->type() == SPxSolver::ENTER)
+
+   if(thesolver->type() == SPxSolver::ENTER)
    {
       int i;
       int j = weights.dim();
-      for (i = 0; i < j; ++i)
+
+      for(i = 0; i < j; ++i)
       {
-         if (perm[i] >= 0)
+         if(perm[i] >= 0)
             weights[perm[i]] = weights[i];
       }
    }
+
    weights.reDim(thesolver->coDim());
 }
 
@@ -992,11 +1058,13 @@ void SPxSteepPR::removedCoVecs(const int perm[])
    DVector& coWeights = thesolver->coWeights;
    int i;
    int j = coWeights.dim();
-   for (i = 0; i < j; ++i)
+
+   for(i = 0; i < j; ++i)
    {
-      if (perm[i] >= 0)
+      if(perm[i] >= 0)
          coWeights[perm[i]] = coWeights[i];
    }
+
    coWeights.reDim(thesolver->dim());
 }
 
@@ -1005,37 +1073,42 @@ bool SPxSteepPR::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
    DVector& w = thesolver->weights;
    DVector& coW = thesolver->coWeights;
-   if (thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
+
+   if(thesolver != 0 && thesolver->type() == SPxSolver::LEAVE && setup == EXACT)
    {
       int i;
       SSVector tmp(thesolver->dim(), thesolver->epsilon());
       Real x;
-      for (i = thesolver->dim() - 1; i >= 0; --i)
+
+      for(i = thesolver->dim() - 1; i >= 0; --i)
       {
          thesolver->basis().coSolve(tmp, thesolver->unitVector(i));
          x = coW[i] - tmp.length2();
-         if (x > thesolver->leavetol() || -x > thesolver->leavetol())
+
+         if(x > thesolver->leavetol() || -x > thesolver->leavetol())
          {
-            MSG_ERROR( std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl; )
+            MSG_ERROR(std::cerr << "ESTEEP03 x[" << i << "] = " << x << std::endl;)
          }
       }
    }
 
-   if (thesolver != 0 && thesolver->type() == SPxSolver::ENTER)
+   if(thesolver != 0 && thesolver->type() == SPxSolver::ENTER)
    {
       int i;
-      for (i = thesolver->dim() - 1; i >= 0; --i)
+
+      for(i = thesolver->dim() - 1; i >= 0; --i)
       {
-         if (coW[i] < thesolver->epsilon())
+         if(coW[i] < thesolver->epsilon())
             return MSGinconsistent("SPxSteepPR");
       }
 
-      for (i = thesolver->coDim() - 1; i >= 0; --i)
+      for(i = thesolver->coDim() - 1; i >= 0; --i)
       {
-         if (w[i] < thesolver->epsilon())
+         if(w[i] < thesolver->epsilon())
             return MSGinconsistent("SPxSteepPR");
       }
    }
+
 #endif
 
    return true;

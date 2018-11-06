@@ -83,7 +83,7 @@ public:
       , objlength(0)
    {}
    /// copy constructor
-   SPxWeightPR( const SPxWeightPR& old)
+   SPxWeightPR(const SPxWeightPR& old)
       : SPxPricer(old)
       , cPenalty(old.cPenalty)
       , rPenalty(old.rPenalty)
@@ -92,20 +92,21 @@ public:
       , coPenalty(0)
       , objlength(old.objlength)
    {
-      if (old.penalty == old.rPenalty.get_const_ptr())
+      if(old.penalty == old.rPenalty.get_const_ptr())
       {
          penalty = rPenalty.get_const_ptr();
          coPenalty = cPenalty.get_const_ptr();
       }
-      else if (old.penalty == old.cPenalty.get_const_ptr())
+      else if(old.penalty == old.cPenalty.get_const_ptr())
       {
          penalty = cPenalty.get_const_ptr();
          coPenalty = rPenalty.get_const_ptr();
       }
+
       // otherwise, old.penalty and old.coPenalty are not set and do not have to be copied
    }
    /// assignment operator
-   SPxWeightPR& operator=( const SPxWeightPR& rhs)
+   SPxWeightPR& operator=(const SPxWeightPR& rhs)
    {
       if(this != &rhs)
       {
@@ -114,16 +115,18 @@ public:
          rPenalty = rhs.rPenalty;
          leavePenalty = rhs.leavePenalty;
          objlength = rhs.objlength;
-         if (rhs.penalty == rhs.rPenalty.get_const_ptr())
+
+         if(rhs.penalty == rhs.rPenalty.get_const_ptr())
          {
             penalty = rPenalty.get_const_ptr();
             coPenalty = cPenalty.get_const_ptr();
          }
-         else if (rhs.penalty == rhs.cPenalty.get_const_ptr())
+         else if(rhs.penalty == rhs.cPenalty.get_const_ptr())
          {
             penalty = cPenalty.get_const_ptr();
             coPenalty = rPenalty.get_const_ptr();
          }
+
          // otherwise, old.penalty and old.coPenalty are not set and do not have to be copied
       }
 
@@ -153,7 +156,7 @@ public:
    ///
    virtual SPxId selectEnter();
    /// \p n vectors have been added to the loaded LP.
-   virtual void addedVecs (int n);
+   virtual void addedVecs(int n);
    /// \p n covectors have been added to the loaded LP.
    virtual void addedCoVecs(int n);
    /// \p the i'th vector has been removed from the loaded LP.

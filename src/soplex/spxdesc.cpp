@@ -26,7 +26,7 @@ SPxBasis::Desc::Desc(const SPxSolver& base)
 {
    reSize(base.nRows(), base.nCols());
 
-   if (base.rep() == SPxSolver::ROW)
+   if(base.rep() == SPxSolver::ROW)
    {
       stat   = &rowstat;
       costat = &colstat;
@@ -46,7 +46,7 @@ SPxBasis::Desc::Desc(const Desc& old)
    : rowstat(old.rowstat)
    , colstat(old.colstat)
 {
-   if (old.stat == &old.rowstat)
+   if(old.stat == &old.rowstat)
    {
       assert(old.costat == &old.colstat);
 
@@ -66,12 +66,12 @@ SPxBasis::Desc::Desc(const Desc& old)
 
 SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
 {
-   if (this != &rhs)
+   if(this != &rhs)
    {
       rowstat = rhs.rowstat;
       colstat = rhs.colstat;
 
-      if (rhs.stat == &rhs.rowstat)
+      if(rhs.stat == &rhs.rowstat)
       {
          assert(rhs.costat == &rhs.colstat);
 
@@ -88,6 +88,7 @@ SPxBasis::Desc& SPxBasis::Desc::operator=(const SPxBasis::Desc& rhs)
 
       assert(Desc::isConsistent());
    }
+
    return *this;
 }
 
@@ -103,10 +104,10 @@ void SPxBasis::Desc::reSize(int rowDim, int colDim)
    rowstat.reSize(rowDim);
    colstat.reSize(colDim);
 
-   for( int i = rowDim - 1; i >= noldrows; i-- )
+   for(int i = rowDim - 1; i >= noldrows; i--)
       rowstat[i] = D_UNDEFINED;
 
-   for( int i = colDim - 1; i >= noldcols; i-- )
+   for(int i = colDim - 1; i >= noldcols; i--)
       colstat[i] = D_UNDEFINED;
 }
 
@@ -117,13 +118,17 @@ void SPxBasis::Desc::dump() const
    // Dump regardless of the verbosity level if this method is called.
 
    std::cout << "DBDESC01 column status: ";
+
    for(i = 0; i < nCols(); i++)
       std::cout << colStatus(i);
+
    std::cout << std::endl;
 
    std::cout << "DBDESC02 row status:    ";
+
    for(i = 0; i < nRows(); i++)
       std::cout << rowStatus(i);
+
    std::cout << std::endl;
 }
 
@@ -145,34 +150,44 @@ std::ostream& operator<<(std::ostream& os, const SPxBasis::Desc::Status& stat)
    case SPxBasis::Desc::P_ON_LOWER :
       text = 'L';
       break;
+
    case SPxBasis::Desc::P_ON_UPPER :
       text = 'U';
       break;
+
    case SPxBasis::Desc::P_FREE :
       text = 'F';
       break;
+
    case SPxBasis::Desc::P_FIXED :
       text = 'X';
       break;
+
    case SPxBasis::Desc::D_FREE :
       text = 'f';
       break;
+
    case SPxBasis::Desc::D_ON_UPPER :
       text = 'u';
       break;
+
    case SPxBasis::Desc::D_ON_LOWER :
       text = 'l';
       break;
+
    case SPxBasis::Desc::D_ON_BOTH :
       text = 'x';
       break;
+
    case SPxBasis::Desc::D_UNDEFINED :
       text = '.';
       break;
+
    default :
       os << std::endl << "Invalid status <" << int(stat) << ">" << std::endl;
       throw SPxInternalCodeException("XSPXDE01 This should never happen.");
    }
+
    os << text;
 
    return os;

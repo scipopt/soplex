@@ -50,23 +50,23 @@ inline void spx_alloc(T& p, int n = 1)
    assert(p == 0);
    assert(n >= 0);
 
-   if (n == 0)
+   if(n == 0)
       n = 1;
 
    try
    {
       p = reinterpret_cast<T>(malloc(sizeof(*p) * (unsigned int) n));
    }
-   catch( const std::bad_alloc& )
+   catch(const std::bad_alloc&)
    {
       throw(SPxMemoryException("Error allocating memory"));
    }
 
-   if (0 == p)
+   if(0 == p)
    {
       std::cerr << "EMALLC01 malloc: Out of memory - cannot allocate "
                 << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
-      throw(SPxMemoryException("XMALLC01 malloc: Could not allocate enough memory") );
+      throw(SPxMemoryException("XMALLC01 malloc: Could not allocate enough memory"));
    }
 }
 
@@ -83,25 +83,26 @@ inline void spx_realloc(T& p, int n)
    /* new pointer to not lose old one in case of problems */
    T pp;
 
-   if (n == 0)
+   if(n == 0)
       n = 1;
 
    try
    {
       pp = reinterpret_cast<T>(realloc(p, sizeof(*p) * (unsigned int) n));
    }
-   catch( const std::bad_alloc& )
+   catch(const std::bad_alloc&)
    {
       throw(SPxMemoryException("Error reallocating memory"));
    }
 
-   if (0 == pp)
+   if(0 == pp)
    {
       std::cerr << "EMALLC02 realloc: Out of memory - cannot allocate "
                 << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
-      throw(SPxMemoryException("XMALLC02 realloc: Could not allocate enough memory") );
+      throw(SPxMemoryException("XMALLC02 realloc: Could not allocate enough memory"));
    }
-   p=pp;
+
+   p = pp;
 }
 
 /// Release memory

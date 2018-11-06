@@ -76,10 +76,11 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    x.clear();
    ssvec = b;
    n = ssvec.size();
-   if (l.updateType == ETA)
+
+   if(l.updateType == ETA)
    {
       m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
-         ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
+                             ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
       x.setSize(m);
       //x.forceSetup();
       x.unSetup();
@@ -89,13 +90,14 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    {
       forest.clear();
       m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
-         ssvec.altValues(), ssvec.altIndexMem(), n,
-         forest.altValues(), &f, forest.altIndexMem());
+                             ssvec.altValues(), ssvec.altIndexMem(), n,
+                             forest.altValues(), &f, forest.altIndexMem());
       forest.setSize(f);
       forest.forceSetup();
       x.setSize(m);
       x.forceSetup();
    }
+
    usetup = true;
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -127,12 +129,12 @@ void SLUFactor::solve2right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if(l.updateType == ETA)
    {
       n = ssvec.size();
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
-         ssvec.get_ptr(), sidx, n, y.get_ptr(),
-         rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
+                              ssvec.get_ptr(), sidx, n, y.get_ptr(),
+                              rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -143,14 +145,15 @@ void SLUFactor::solve2right4update(
       forest.clear();
       n = ssvec.size();
       m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
-         ssvec.get_ptr(), sidx, n, y.get_ptr(),
-         rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
-         forest.altValues(), &f, forest.altIndexMem());
+                              ssvec.get_ptr(), sidx, n, y.get_ptr(),
+                              rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+                              forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
       forest.setSize(f);
       forest.forceSetup();
    }
+
    rhs.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -181,7 +184,7 @@ void SLUFactor::solve2right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if(l.updateType == ETA)
    {
       n = ssvec.size();
       vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
@@ -212,6 +215,7 @@ void SLUFactor::solve2right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+
    rhs.forceSetup();
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -249,14 +253,14 @@ void SLUFactor::solve3right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if(l.updateType == ETA)
    {
       n = ssvec.size();
       m = vSolveRight4update3(x.getEpsilon(),
-         x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
-         y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
-         y2.get_ptr(), rhs2.getEpsilon(),rhs2.altValues(), ridx2, rsize2,
-         0, 0, 0);
+                              x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
+                              y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+                              y2.get_ptr(), rhs2.getEpsilon(), rhs2.altValues(), ridx2, rsize2,
+                              0, 0, 0);
       x.setSize(m);
       //      x.forceSetup();
       x.unSetup();
@@ -267,15 +271,16 @@ void SLUFactor::solve3right4update(
       forest.clear();
       n = ssvec.size();
       m = vSolveRight4update3(x.getEpsilon(),
-         x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
-         y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
-         y2.get_ptr(), rhs2.getEpsilon(),rhs2.altValues(), ridx2, rsize2,
-         forest.altValues(), &f, forest.altIndexMem());
+                              x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
+                              y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
+                              y2.get_ptr(), rhs2.getEpsilon(), rhs2.altValues(), ridx2, rsize2,
+                              forest.altValues(), &f, forest.altIndexMem());
       x.setSize(m);
       x.forceSetup();
       forest.setSize(f);
       forest.forceSetup();
    }
+
    rhs.forceSetup();
    rhs2.forceSetup();
    ssvec.setSize(0);
@@ -311,7 +316,7 @@ void SLUFactor::solve3right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if(l.updateType == ETA)
    {
       n = ssvec.size();
       vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
@@ -351,6 +356,7 @@ void SLUFactor::solve3right4update(
       forest.setSize(f);
       forest.forceSetup();
    }
+
    rhs.forceSetup();
    rhs2.forceSetup();
    ssvec.setSize(0);
@@ -386,9 +392,9 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
    x.clear();
    int sz = ssvec.size(); // see .altValues()
    int n = vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
-      ssvec.altValues(), ssvec.altIndexMem(), sz);
+                      ssvec.altValues(), ssvec.altIndexMem(), sz);
 
-   if (n > 0)
+   if(n > 0)
    {
       x.setSize(n);
       x.forceSetup();
@@ -423,12 +429,12 @@ void SLUFactor::solveLeft(
    ssvec.assign(rhs1);
    n = ssvec.size(); // see altValues();
    n = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
-      y.get_ptr(), rhs2.altValues(), ridx, rn);
+                   y.get_ptr(), rhs2.altValues(), ridx, rn);
 
    // this will unsetup x
    x.setSize(n);
 
-   if (n > 0)
+   if(n > 0)
       x.forceSetup();
 
    ssvec.setSize(0);
@@ -456,7 +462,8 @@ void SLUFactor::solveLeft(
    ssvec.assign(rhs1);
    n1 = ssvec.size(); // see altValues();
    n2 = rhs2.size();
-   if( n2 < 10 )
+
+   if(n2 < 10)
    {
       vSolveLeft2sparse(x.getEpsilon(),
                         x.altValues(), x.altIndexMem(),
@@ -464,21 +471,24 @@ void SLUFactor::solveLeft(
                         y.altValues(), y.altIndexMem(),
                         rhs2.altValues(), rhs2.altIndexMem(), n2);
       y.setSize(n2);
-      if( n2 > 0 )
+
+      if(n2 > 0)
          y.forceSetup();
    }
    else
    {
       n1 = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n1,
-            y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
-//      y.setup();
+                       y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
+      //      y.setup();
    }
+
    x.setSize(n1);
 
-   if (n1 > 0)
+   if(n1 > 0)
       x.forceSetup();
-//   if (n2 > 0)
-//      y.forceSetup();
+
+   //   if (n2 > 0)
+   //      y.forceSetup();
 
    ssvec.setSize(0);
    ssvec.forceSetup();
@@ -517,7 +527,7 @@ void SLUFactor::solveLeft(
 
    x.setSize(n);
 
-   if (n > 0)
+   if(n > 0)
       x.forceSetup();
 
    ssvec.setSize(0);
@@ -560,11 +570,13 @@ void SLUFactor::solveLeft(
    y.setSize(n2);
    z.setSize(n3);
 
-   if (n1 > 0)
+   if(n1 > 0)
       x.forceSetup();
-   if (n2 > 0)
+
+   if(n2 > 0)
       y.forceSetup();
-   if (n3 > 0)
+
+   if(n3 > 0)
       z.forceSetup();
 
    ssvec.setSize(0);
@@ -577,10 +589,10 @@ void SLUFactor::solveLeft(
 
 Real SLUFactor::stability() const
 {
-   if (status() != OK)
+   if(status() != OK)
       return 0;
 
-   if (maxabs < initMaxabs)
+   if(maxabs < initMaxabs)
       return 1;
 
    assert(maxabs != 0.0);
@@ -592,10 +604,10 @@ Real SLUFactor::conditionEstimate(int type) const
    Real result = 0.0;
 
    // catch corner case of empty matrix
-   if( dim() == 0 )
+   if(dim() == 0)
       return 1.0;
 
-   switch( type )
+   switch(type)
    {
    // compute estimate by ratio of max/min of elements on the diagonal
    case 0:
@@ -603,28 +615,37 @@ Real SLUFactor::conditionEstimate(int type) const
       Real mindiag = spxAbs(diag[0]);
       Real maxdiag = spxAbs(diag[0]);
 
-      for( int i = 1; i < dim(); ++i)
+      for(int i = 1; i < dim(); ++i)
       {
          Real absdiag = spxAbs(diag[i]);
-         if( absdiag < mindiag )
+
+         if(absdiag < mindiag)
             mindiag = absdiag;
-         if( absdiag > maxdiag )
+
+         if(absdiag > maxdiag)
             maxdiag = absdiag;
       }
-      result = maxdiag/mindiag;
+
+      result = maxdiag / mindiag;
       break;
    }
+
    // compute estimate by summing up the elements on the diagonal
    case 1:
       result = diag[0];
-      for( int i = 1; i < dim(); ++i)
+
+      for(int i = 1; i < dim(); ++i)
          result += spxAbs(diag[i]);
+
       break;
+
    // compute estimate by multiplying the elements on the diagonal
    case 2:
       result = diag[0];
-      for( int i = 1; i < dim(); ++i)
+
+      for(int i = 1; i < dim(); ++i)
          result *= spxAbs(diag[i]);
+
       break;
    }
 
@@ -635,7 +656,8 @@ std::string SLUFactor::statistics() const
 {
    std::stringstream s;
    s  << "Factorizations     : " << std::setw(10) << getFactorCount() << std::endl
-      << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(2) << getFactorTime() << std::endl
+      << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(
+         2) << getFactorTime() << std::endl
       << "Solves             : " << std::setw(10) << getSolveCount() << std::endl
       << "  Time spent       : " << std::setw(10) << getSolveTime() << std::endl;
 
@@ -662,9 +684,9 @@ SLUFactor::Status SLUFactor::change(
    // update vector, which is set up by solveRight4update() and
    // solve2right4update() in order to optimize the basis update.
 
-   if (usetup)
+   if(usetup)
    {
-      if (l.updateType == FOREST_TOMLIN)              // FOREST_TOMLIN updates
+      if(l.updateType == FOREST_TOMLIN)               // FOREST_TOMLIN updates
       {
          // BH 2005-08-19: The size of a SSVector is the size of the
          // index set, i.e.  the number of nonzeros which is only
@@ -682,16 +704,16 @@ SLUFactor::Status SLUFactor::change(
          changeEta(idx, eta);
       }
    }
-   else if (e != 0)                                   // ETA updates
+   else if(e != 0)                                    // ETA updates
    {
       l.updateType = ETA;
       updateNoClear(idx, e->values(), e->indexMem(), e->size());
       l.updateType = uptype;
    }
-   else if (l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
+   else if(l.updateType == FOREST_TOMLIN)             // FOREST_TOMLIN updates
    {
       assert(0);  // probably this part is never called.
-                  // forestUpdate() with the last parameter set to NULL should fail.
+      // forestUpdate() with the last parameter set to NULL should fail.
       forest = subst;
       CLUFactor::solveLright(forest.altValues());
       forestUpdate(idx, forest.altValues(), 0, 0);
@@ -706,10 +728,11 @@ SLUFactor::Status SLUFactor::change(
       CLUFactor::solveRight(eta.altValues(), vec.get_ptr());
       changeEta(idx, eta);
    }
+
    usetup = false;
 
-   MSG_DEBUG( std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
-                     << std::endl; )
+   MSG_DEBUG(std::cout << "DSLUFA01\tupdated\t\tstability = " << stability()
+             << std::endl;)
 
    return status();
 }
@@ -743,29 +766,39 @@ void SLUFactor::clear()
    l.size        = 100;
    l.startSize   = 100;
 
-   if (l.rval)
+   if(l.rval)
       spx_free(l.rval);
+
    if(l.ridx)
       spx_free(l.ridx);
+
    if(l.rbeg)
       spx_free(l.rbeg);
+
    if(l.rorig)
       spx_free(l.rorig);
+
    if(l.rperm)
       spx_free(l.rperm);
 
    if(u.row.val)
       spx_free(u.row.val);
+
    if(u.row.idx)
       spx_free(u.row.idx);
+
    if(u.col.idx)
       spx_free(u.col.idx);
+
    if(l.val)
       spx_free(l.val);
+
    if(l.idx)
       spx_free(l.idx);
+
    if(l.start)
       spx_free(l.start);
+
    if(l.row)
       spx_free(l.row);
 
@@ -827,7 +860,7 @@ void SLUFactor::assign(const SLUFactor& old)
    memcpy(row.orig, old.row.orig, (unsigned int)thedim * sizeof(*row.orig));
    memcpy(col.perm, old.col.perm, (unsigned int)thedim * sizeof(*col.perm));
    memcpy(col.orig, old.col.orig, (unsigned int)thedim * sizeof(*col.orig));
-   memcpy(diag,     old.diag,     (unsigned int)thedim * sizeof(*diag));
+   memcpy(diag,     old.diag, (unsigned int)thedim * sizeof(*diag));
 
    work = vec.get_ptr();
 
@@ -843,15 +876,15 @@ void SLUFactor::assign(const SLUFactor& old)
    spx_alloc(u.row.len,   thedim + 1);
    spx_alloc(u.row.max,   thedim + 1);
 
-   memcpy(u.row.elem,  old.u.row.elem,  (unsigned int)thedim       * sizeof(*u.row.elem));
-   memcpy(u.row.val,   old.u.row.val,   (unsigned int)u.row.size   * sizeof(*u.row.val));
-   memcpy(u.row.idx,   old.u.row.idx,   (unsigned int)u.row.size   * sizeof(*u.row.idx));
+   memcpy(u.row.elem,  old.u.row.elem, (unsigned int)thedim       * sizeof(*u.row.elem));
+   memcpy(u.row.val,   old.u.row.val, (unsigned int)u.row.size   * sizeof(*u.row.val));
+   memcpy(u.row.idx,   old.u.row.idx, (unsigned int)u.row.size   * sizeof(*u.row.idx));
    memcpy(u.row.start, old.u.row.start, (unsigned int)(thedim + 1) * sizeof(*u.row.start));
-   memcpy(u.row.len,   old.u.row.len,   (unsigned int)(thedim + 1) * sizeof(*u.row.len));
-   memcpy(u.row.max,   old.u.row.max,   (unsigned int)(thedim + 1) * sizeof(*u.row.max));
+   memcpy(u.row.len,   old.u.row.len, (unsigned int)(thedim + 1) * sizeof(*u.row.len));
+   memcpy(u.row.max,   old.u.row.max, (unsigned int)(thedim + 1) * sizeof(*u.row.max));
 
    // need to make row list ok ?
-   if (thedim > 0 && stat == OK)
+   if(thedim > 0 && stat == OK)
    {
       u.row.list.idx = old.u.row.list.idx; // .idx neu
 
@@ -865,6 +898,7 @@ void SLUFactor::assign(const SLUFactor& old)
          oring            = oring->next;
          ring             = ring->next;
       }
+
       ring->next       = &u.row.list;
       ring->next->prev = ring;
    }
@@ -878,7 +912,7 @@ void SLUFactor::assign(const SLUFactor& old)
    spx_alloc(u.col.len,   thedim + 1);
    spx_alloc(u.col.max,   thedim + 1);
 
-   if (old.u.col.val != 0)
+   if(old.u.col.val != 0)
    {
       spx_alloc(u.col.val, u.col.size);
       memcpy(u.col.val, old.u.col.val, (unsigned int)u.col.size * sizeof(*u.col.val));
@@ -886,14 +920,14 @@ void SLUFactor::assign(const SLUFactor& old)
    else
       u.col.val = 0;
 
-   memcpy(u.col.elem,  old.u.col.elem,  (unsigned int)thedim       * sizeof(*u.col.elem));
-   memcpy(u.col.idx,   old.u.col.idx,   (unsigned int)u.col.size   * sizeof(*u.col.idx));
+   memcpy(u.col.elem,  old.u.col.elem, (unsigned int)thedim       * sizeof(*u.col.elem));
+   memcpy(u.col.idx,   old.u.col.idx, (unsigned int)u.col.size   * sizeof(*u.col.idx));
    memcpy(u.col.start, old.u.col.start, (unsigned int)(thedim + 1) * sizeof(*u.col.start));
-   memcpy(u.col.len,   old.u.col.len,   (unsigned int)(thedim + 1) * sizeof(*u.col.len));
-   memcpy(u.col.max,   old.u.col.max,   (unsigned int)(thedim + 1) * sizeof(*u.col.max));
+   memcpy(u.col.len,   old.u.col.len, (unsigned int)(thedim + 1) * sizeof(*u.col.len));
+   memcpy(u.col.max,   old.u.col.max, (unsigned int)(thedim + 1) * sizeof(*u.col.max));
 
    // need to make col list ok
-   if (thedim > 0 && stat == OK)
+   if(thedim > 0 && stat == OK)
    {
       u.col.list.idx = old.u.col.list.idx; // .idx neu
 
@@ -907,6 +941,7 @@ void SLUFactor::assign(const SLUFactor& old)
          oring            = oring->next;
          ring             = ring->next;
       }
+
       ring->next       = &u.col.list;
       ring->next->prev = ring;
    }
@@ -924,12 +959,12 @@ void SLUFactor::assign(const SLUFactor& old)
    spx_alloc(l.start, l.startSize);
    spx_alloc(l.row,   l.startSize);
 
-   memcpy(l.val,   old.l.val,   (unsigned int)l.size      * sizeof(*l.val));
-   memcpy(l.idx,   old.l.idx,   (unsigned int)l.size      * sizeof(*l.idx));
+   memcpy(l.val,   old.l.val, (unsigned int)l.size      * sizeof(*l.val));
+   memcpy(l.idx,   old.l.idx, (unsigned int)l.size      * sizeof(*l.idx));
    memcpy(l.start, old.l.start, (unsigned int)l.startSize * sizeof(*l.start));
-   memcpy(l.row,   old.l.row,   (unsigned int)l.startSize * sizeof(*l.row));
+   memcpy(l.row,   old.l.row, (unsigned int)l.startSize * sizeof(*l.row));
 
-   if (old.l.rval != 0)
+   if(old.l.rval != 0)
    {
       assert(old.l.ridx  != 0);
       assert(old.l.rbeg  != 0);
@@ -944,8 +979,8 @@ void SLUFactor::assign(const SLUFactor& old)
       spx_alloc(l.rorig, thedim);
       spx_alloc(l.rperm, thedim);
 
-      memcpy(l.rval,  old.l.rval,  (unsigned int)memsize     * sizeof(*l.rval));
-      memcpy(l.ridx,  old.l.ridx,  (unsigned int)memsize     * sizeof(*l.ridx));
+      memcpy(l.rval,  old.l.rval, (unsigned int)memsize     * sizeof(*l.rval));
+      memcpy(l.ridx,  old.l.ridx, (unsigned int)memsize     * sizeof(*l.ridx));
       memcpy(l.rbeg,  old.l.rbeg, (unsigned int)(thedim + 1) * sizeof(*l.rbeg));
       memcpy(l.rorig, old.l.rorig, (unsigned int)thedim      * sizeof(*l.rorig));
       memcpy(l.rperm, old.l.rperm, (unsigned int)thedim      * sizeof(*l.rperm));
@@ -993,7 +1028,7 @@ void SLUFactor::assign(const SLUFactor& old)
 SLUFactor& SLUFactor::operator=(const SLUFactor& old)
 {
 
-   if (this != &old)
+   if(this != &old)
    {
       // we don't need to copy them, because they are temporary vectors
       vec.clear();
@@ -1005,6 +1040,7 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
       timerType = old.timerType;
 
       freeAll();
+
       try
       {
          assign(old);
@@ -1014,19 +1050,21 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
          freeAll();
          throw x;
       }
+
       assert(isConsistent());
    }
+
    return *this;
 }
 
 SLUFactor::SLUFactor()
-   : vec (1)
-   , ssvec (1)
-   , usetup (false)
-   , uptype (FOREST_TOMLIN)
-   , eta (1)
-   , forest (1)
-   , minThreshold (0.01)
+   : vec(1)
+   , ssvec(1)
+   , usetup(false)
+   , uptype(FOREST_TOMLIN)
+   , eta(1)
+   , forest(1)
+   , minThreshold(0.01)
    , timerType(Timer::USER_TIME)
 {
    row.perm    = 0;
@@ -1058,6 +1096,7 @@ SLUFactor::SLUFactor()
 
    nzCnt  = 0;
    thedim = 0;
+
    try
    {
       solveTime = TimerFactory::createTimer(timerType);
@@ -1155,11 +1194,11 @@ SLUFactor::SLUFactor()
 }
 
 SLUFactor::SLUFactor(const SLUFactor& old)
-   : SLinSolver( old )
+   : SLinSolver(old)
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
    , usetup(old.usetup)
-   , eta (old.eta)
+   , eta(old.eta)
    , forest(old.forest)
    , timerType(old.timerType)
 {
@@ -1203,41 +1242,90 @@ SLUFactor::SLUFactor(const SLUFactor& old)
       freeAll();
       throw x;
    }
+
    assert(SLUFactor::isConsistent());
 }
 
 void SLUFactor::freeAll()
 {
 
-   if(row.perm) spx_free(row.perm);
-   if(row.orig) spx_free(row.orig);
-   if(col.perm) spx_free(col.perm);
-   if(col.orig) spx_free(col.orig);
-   if(u.row.elem) spx_free(u.row.elem);
-   if(u.row.val) spx_free(u.row.val);
-   if(u.row.idx) spx_free(u.row.idx);
-   if(u.row.start) spx_free(u.row.start);
-   if(u.row.len) spx_free(u.row.len);
-   if(u.row.max) spx_free(u.row.max);
-   if(u.col.elem) spx_free(u.col.elem);
-   if(u.col.idx) spx_free(u.col.idx);
-   if(u.col.start) spx_free(u.col.start);
-   if(u.col.len) spx_free(u.col.len);
-   if(u.col.max) spx_free(u.col.max);
-   if(l.val) spx_free(l.val);
-   if(l.idx) spx_free(l.idx);
-   if(l.start) spx_free(l.start);
-   if(l.row) spx_free(l.row);
+   if(row.perm)
+      spx_free(row.perm);
 
- if(diag) spx_free(diag);
+   if(row.orig)
+      spx_free(row.orig);
 
- if (u.col.val) spx_free(u.col.val);
+   if(col.perm)
+      spx_free(col.perm);
 
-   if (l.rval) spx_free(l.rval);
-   if(l.ridx) spx_free(l.ridx);
-   if(l.rbeg) spx_free(l.rbeg);
-   if(l.rorig) spx_free(l.rorig);
-   if(l.rperm) spx_free(l.rperm);
+   if(col.orig)
+      spx_free(col.orig);
+
+   if(u.row.elem)
+      spx_free(u.row.elem);
+
+   if(u.row.val)
+      spx_free(u.row.val);
+
+   if(u.row.idx)
+      spx_free(u.row.idx);
+
+   if(u.row.start)
+      spx_free(u.row.start);
+
+   if(u.row.len)
+      spx_free(u.row.len);
+
+   if(u.row.max)
+      spx_free(u.row.max);
+
+   if(u.col.elem)
+      spx_free(u.col.elem);
+
+   if(u.col.idx)
+      spx_free(u.col.idx);
+
+   if(u.col.start)
+      spx_free(u.col.start);
+
+   if(u.col.len)
+      spx_free(u.col.len);
+
+   if(u.col.max)
+      spx_free(u.col.max);
+
+   if(l.val)
+      spx_free(l.val);
+
+   if(l.idx)
+      spx_free(l.idx);
+
+   if(l.start)
+      spx_free(l.start);
+
+   if(l.row)
+      spx_free(l.row);
+
+   if(diag)
+      spx_free(diag);
+
+   if(u.col.val)
+      spx_free(u.col.val);
+
+   if(l.rval)
+      spx_free(l.rval);
+
+   if(l.ridx)
+      spx_free(l.ridx);
+
+   if(l.rbeg)
+      spx_free(l.rbeg);
+
+   if(l.rorig)
+      spx_free(l.rorig);
+
+   if(l.rperm)
+      spx_free(l.rperm);
 }
 
 SLUFactor::~SLUFactor()
@@ -1254,11 +1342,11 @@ static Real betterThreshold(Real th)
 {
    assert(th < REAL(1.0));
 
-   if (LT(th, REAL(0.1)))
+   if(LT(th, REAL(0.1)))
       th *= REAL(10.0);
-   else if (LT(th, REAL(0.9)))
+   else if(LT(th, REAL(0.9)))
       th = (th + REAL(1.0)) / REAL(2.0);
-   else if (LT(th, REAL(0.999)))
+   else if(LT(th, REAL(0.999)))
       th = REAL(0.99999);
 
    assert(th < REAL(1.0));
@@ -1281,7 +1369,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    l.firstUpdate = 0;
    l.firstUnused = 0;
 
-   if (dm != thedim)
+   if(dm != thedim)
    {
       clear();
 
@@ -1315,17 +1403,19 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
    // order to favour sparsity
-   else if (lastStability > 2.0 * minStability)
+   else if(lastStability > 2.0 * minStability)
    {
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
       // betterThreshold(betterThreshold(minThreshold)), ...
       Real last   = minThreshold;
       Real better = betterThreshold(last);
-      while (better < lastThreshold)
+
+      while(better < lastThreshold)
       {
          last   = better;
          better = betterThreshold(last);
       }
+
       lastThreshold = last;
 
       // we reset the minimum stability (which might have been decreased below) to ensure that the increased sparsity
@@ -1343,7 +1433,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
    u.col.max[thedim]   = 0;
    u.col.len[thedim]   = 0;
 
-   for (;;)
+   for(;;)
    {
       ///@todo if the factorization fails with stat = SINGULAR, distinuish between proven singularity (e.g., because of
       ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
@@ -1352,7 +1442,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       factor(matrix, lastThreshold, epsilon);
 
       // finish if the factorization is stable
-      if (stability() >= minStability)
+      if(stability() >= minStability)
          break;
 
       // otherwise, we increase the Markowitz threshold
@@ -1360,36 +1450,38 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       lastThreshold = betterThreshold(lastThreshold);
 
       // until it doesn't change anymore at its maximum value
-      if (EQ(x, lastThreshold))
+      if(EQ(x, lastThreshold))
          break;
 
       // we relax the stability requirement
       minStability /= 2.0;
 
-      MSG_INFO3( (*spxout), (*spxout) << "ISLUFA01 refactorizing with increased Markowitz threshold: "
-                        << lastThreshold << std::endl; )
+      MSG_INFO3((*spxout), (*spxout) << "ISLUFA01 refactorizing with increased Markowitz threshold: "
+                << lastThreshold << std::endl;)
    }
-   MSG_DEBUG( std::cout << "DSLUFA02 threshold = " << lastThreshold
-                     << "\tstability = " << stability()
-                     << "\tminStability = " << minStability << std::endl; )
+
+   MSG_DEBUG(std::cout << "DSLUFA02 threshold = " << lastThreshold
+             << "\tstability = " << stability()
+             << "\tminStability = " << minStability << std::endl;)
    MSG_DEBUG(
       int i;
       FILE* fl = fopen("dump.lp", "w");
       std::cout << "DSLUFA03 Basis:\n";
       int j = 0;
-      for (i = 0; i < dim(); ++i)
-         j += matrix[i]->size();
-      for (i = 0; i < dim(); ++i)
-      {
-         for (j = 0; j < matrix[i]->size(); ++j)
+
+      for(i = 0; i < dim(); ++i)
+      j += matrix[i]->size();
+      for(i = 0; i < dim(); ++i)
+   {
+      for(j = 0; j < matrix[i]->size(); ++j)
             fprintf(fl, "%8d  %8d  %16g\n",
                     i + 1, matrix[i]->index(j) + 1, matrix[i]->value(j));
       }
-      fclose(fl);
-      std::cout << "DSLUFA04 LU-Factors:" << std::endl;
-      dump();
+   fclose(fl);
+   std::cout << "DSLUFA04 LU-Factors:" << std::endl;
+             dump();
 
-      std::cout << "DSLUFA05 threshold = " << lastThreshold
+             std::cout << "DSLUFA05 threshold = " << lastThreshold
              << "\tstability = " << stability() << std::endl;
    )
 

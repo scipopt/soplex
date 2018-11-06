@@ -24,7 +24,7 @@ namespace soplex
 
 void SPxParMultPR::setType(SPxSolver::Type tp)
 {
-   if (tp == SPxSolver::ENTER)
+   if(tp == SPxSolver::ENTER)
    {
       used = 0;
       thesolver->setPricing(SPxSolver::PARTIAL);
@@ -60,46 +60,52 @@ SPxId SPxParMultPR::selectEnter()
    assert(thesolver != 0);
    int lastlast = -1;
 
-   if (thesolver->pricing() == SPxSolver::PARTIAL)
+   if(thesolver->pricing() == SPxSolver::PARTIAL)
    {
       Real val;
       Real eps = -theeps;
       lastlast = last;
 
-      for (i = used - 1; i >= 0; --i)
+      for(i = used - 1; i >= 0; --i)
       {
          int n = thesolver->number(pricSet[i].id);
-         if (thesolver->isId(pricSet[i].id))
+
+         if(thesolver->isId(pricSet[i].id))
          {
             thesolver->computePvec(n);
             pricSet[i].test = val = thesolver->computeTest(n);
          }
          else
             pricSet[i].test = val = thesolver->coTest()[n];
-         if (val >= eps)
+
+         if(val >= eps)
             pricSet[i] = pricSet[--used];
       }
 
-      while (pricSet.size() - used < partialSize)
+      while(pricSet.size() - used < partialSize)
       {
          best = 0;
-         for (i = 1; i < used; ++i)
+
+         for(i = 1; i < used; ++i)
          {
-            if (pricSet[i].test > pricSet[best].test)
+            if(pricSet[i].test > pricSet[best].test)
                best = i;
          }
+
          pricSet[best] = pricSet[--used];
       }
 
       do
       {
          last = (last + 1) % multiParts;
-         for (i = thesolver->coDim() - last - 1;
+
+         for(i = thesolver->coDim() - last - 1;
                i >= 0; i -= multiParts)
          {
             thesolver->computePvec(i);
             x = thesolver->computeTest(i);
-            if (x < eps)
+
+            if(x < eps)
             {
                pricSet[used].id = thesolver->id(i);
                pricSet[used].test = x;
@@ -107,36 +113,44 @@ SPxId SPxParMultPR::selectEnter()
             }
          }
 
-         for (i = thesolver->dim() - last - 1;
+         for(i = thesolver->dim() - last - 1;
                i >= 0; i -= multiParts)
          {
             x = thesolver->coTest()[i];
-            if (x < eps)
+
+            if(x < eps)
             {
                pricSet[used].id = thesolver->coId(i);
                pricSet[used].test = x;
                used++;
             }
          }
+
          assert(used < pricSet.size());
       }
-      while (used < min && last != lastlast);
+      while(used < min && last != lastlast);
 
-      if (used > 0)
+      if(used > 0)
       {
          min = (used + 1);
-         if (min < 1)
+
+         if(min < 1)
             min = 1;
-         if (min > partialSize)
+
+         if(min > partialSize)
             min = partialSize;
+
          best = 0;
-         for (i = 1; i < used; ++i)
+
+         for(i = 1; i < used; ++i)
          {
-            if (pricSet[i].test < pricSet[best].test)
+            if(pricSet[i].test < pricSet[best].test)
                best = i;
          }
+
          id = pricSet[best].id;
       }
+
       return id;
    }
 
@@ -144,24 +158,27 @@ SPxId SPxParMultPR::selectEnter()
    {
       assert(thesolver->pricing() == SPxSolver::FULL);
       Real bestx = -theeps;
-      for (i = thesolver->dim() - 1; i >= 0; --i)
+
+      for(i = thesolver->dim() - 1; i >= 0; --i)
       {
          x = thesolver->coTest()[i];
+
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
-         if (x < bestx)
+         if(x < bestx)
          {
             id = thesolver->coId(i);
             bestx = thesolver->coTest()[i];
          }
       }
 
-      for (i = thesolver->coDim() - 1; i >= 0; --i)
+      for(i = thesolver->coDim() - 1; i >= 0; --i)
       {
          x = thesolver->test()[i];
+
          // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis::Desc::P_FREE
          //                || ds.status(i) == SPxBasis::Desc::D_FREE));
-         if (x < bestx)
+         if(x < bestx)
          {
             id = thesolver->id(i);
             bestx = thesolver->test()[i];
@@ -182,11 +199,13 @@ int SPxParMultPR::selectLeave()
 
    assert(thesolver != 0);
    n = -1;
-   for (i = thesolver->dim() - 1; i >= 0; --i)
+
+   for(i = thesolver->dim() - 1; i >= 0; --i)
    {
       x = thesolver->fTest()[i];
+
       // x *= EQ_PREF * (1 + (up[i] == low[i]));
-      if (x < best)
+      if(x < best)
       {
          n = i;
          best = thesolver->fTest()[i];

@@ -58,7 +58,7 @@ void SPxAutoPR::setRep(SPxSolver::Representation rep)
 bool SPxAutoPR::setActivePricer(SPxSolver::Type type)
 {
    // switch to steep as soon as switchIters is reached
-   if( activepricer == &devex && thesolver->iterations() >= switchIters )
+   if(activepricer == &devex && thesolver->iterations() >= switchIters)
    {
       activepricer = &steep;
       activepricer->setType(type);
@@ -66,7 +66,7 @@ bool SPxAutoPR::setActivePricer(SPxSolver::Type type)
    }
 
    // use devex for the iterations < switchIters
-   else if( activepricer == &steep && thesolver->iterations() < switchIters  )
+   else if(activepricer == &steep && thesolver->iterations() < switchIters)
    {
       activepricer = &devex;
       activepricer->setType(type);
@@ -78,10 +78,11 @@ bool SPxAutoPR::setActivePricer(SPxSolver::Type type)
 
 int SPxAutoPR::selectLeave()
 {
-   if( setActivePricer(SPxSolver::LEAVE) )
-      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
+   if(setActivePricer(SPxSolver::LEAVE))
+      MSG_INFO1((*thesolver->spxout),
+                (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
 
-   return activepricer->selectLeave();
+      return activepricer->selectLeave();
 }
 
 void SPxAutoPR::left4(int n, SPxId id)
@@ -91,10 +92,11 @@ void SPxAutoPR::left4(int n, SPxId id)
 
 SPxId SPxAutoPR::selectEnter()
 {
-   if( setActivePricer(SPxSolver::ENTER) )
-      MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
+   if(setActivePricer(SPxSolver::ENTER))
+      MSG_INFO1((*thesolver->spxout),
+                (*thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
 
-   return activepricer->selectEnter();
+      return activepricer->selectEnter();
 }
 
 void SPxAutoPR::entered4(SPxId id, int n)

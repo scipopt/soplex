@@ -23,118 +23,118 @@
 
 namespace soplex
 {
-   /**@brief   Exception base class.
-    * @ingroup Elementary
-    *
-    * This class implements a base class for our SoPlex exceptions
-    * We provide a what() function which returns the exception message.
+/**@brief   Exception base class.
+ * @ingroup Elementary
+ *
+ * This class implements a base class for our SoPlex exceptions
+ * We provide a what() function which returns the exception message.
+ */
+class SPxException
+{
+private:
+   //----------------------------------------
+   /**@name Private data */
+   //@{
+   /// Exception message.
+   std::string msg;
+   //@}
+public:
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// constructor
+   /** The constructor receives an optional string as an exception message.
     */
-   class SPxException
+   SPxException(const std::string& m = "") : msg(m) {}
+   /// destructor
+   virtual ~SPxException() {}
+   //@}
+
+   //----------------------------------------
+   /**@name Access / modification */
+   //@{
+   /// returns exception message
+   virtual const std::string what() const
    {
-   private:
-      //----------------------------------------
-      /**@name Private data */
-      //@{
-      /// Exception message.
-      std::string msg;
-      //@}
-   public:
-      //----------------------------------------
-      /**@name Construction / destruction */
-      //@{
-      /// constructor
-      /** The constructor receives an optional string as an exception message.
-       */
-      SPxException(const std::string& m = "") : msg(m) {}
-      /// destructor
-      virtual ~SPxException() {}
-      //@}
+      return msg;
+   }
+   //@}
+};
 
-      //----------------------------------------
-      /**@name Access / modification */
-      //@{
-      /// returns exception message
-      virtual const std::string what() const
-      {
-         return msg;
-      }
-      //@}
-   };
-
-   /**@brief   Exception class for out of memory exceptions.
-    * @ingroup Elementary
-    *
-    * This class is derived from the SoPlex exception base class.
-    * It does not provide any new functionality.
+/**@brief   Exception class for out of memory exceptions.
+ * @ingroup Elementary
+ *
+ * This class is derived from the SoPlex exception base class.
+ * It does not provide any new functionality.
+ */
+class SPxMemoryException : public SPxException
+{
+public:
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// constructor
+   /** The constructor receives an optional string as an exception message.
     */
-   class SPxMemoryException : public SPxException
-   {
-   public:
-     //----------------------------------------
-      /**@name Construction / destruction */
-      //@{
-      /// constructor
-      /** The constructor receives an optional string as an exception message.
-       */
-      SPxMemoryException(const std::string& m = "") : SPxException(m) {}
-      //@}
-   };
+   SPxMemoryException(const std::string& m = "") : SPxException(m) {}
+   //@}
+};
 
-   /**@brief   Exception class for status exceptions during the computations
-    * @ingroup Elementary
-    *
-    * This class is derived from the SoPlex exception base class.
-    * It does not provide any new functionality.
+/**@brief   Exception class for status exceptions during the computations
+ * @ingroup Elementary
+ *
+ * This class is derived from the SoPlex exception base class.
+ * It does not provide any new functionality.
+ */
+class SPxStatusException : public SPxException
+{
+public:
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// constructor
+   /** The constructor receives an optional string as an exception message.
     */
-   class SPxStatusException : public SPxException
-   {
-   public:
-     //----------------------------------------
-      /**@name Construction / destruction */
-      //@{
-      /// constructor
-      /** The constructor receives an optional string as an exception message.
-       */
-      SPxStatusException(const std::string& m = "") : SPxException(m) {}
-      //@}
-   };
+   SPxStatusException(const std::string& m = "") : SPxException(m) {}
+   //@}
+};
 
-   /**@brief   Exception class for things that should NEVER happen.
-    * @ingroup Elementary
-    *
-    * This class is derived from the SoPlex exception base class.
-    * It does not provide any new functionality. Most often it is used to replace
-    * assert(false) terms in earlier code.
+/**@brief   Exception class for things that should NEVER happen.
+ * @ingroup Elementary
+ *
+ * This class is derived from the SoPlex exception base class.
+ * It does not provide any new functionality. Most often it is used to replace
+ * assert(false) terms in earlier code.
+ */
+class SPxInternalCodeException : public SPxException
+{
+public:
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// constructor
+   /** The constructor receives an optional string as an exception message.
     */
-   class SPxInternalCodeException : public SPxException
-   {
-   public:
-     //----------------------------------------
-      /**@name Construction / destruction */
-      //@{
-      /// constructor
-      /** The constructor receives an optional string as an exception message.
-       */
-      SPxInternalCodeException(const std::string& m = "") : SPxException(m) {}
-      //@}
-   };
+   SPxInternalCodeException(const std::string& m = "") : SPxException(m) {}
+   //@}
+};
 
 
-   /**@brief   Exception class for incorrect usage of interface methods.
-    * @ingroup Elementary
+/**@brief   Exception class for incorrect usage of interface methods.
+ * @ingroup Elementary
+ */
+class SPxInterfaceException : public SPxException
+{
+public:
+   //----------------------------------------
+   /**@name Construction / destruction */
+   //@{
+   /// constructor
+   /** The constructor receives an optional string as an exception message.
     */
-   class SPxInterfaceException : public SPxException
-   {
-   public:
-     //----------------------------------------
-      /**@name Construction / destruction */
-      //@{
-      /// constructor
-      /** The constructor receives an optional string as an exception message.
-       */
-      SPxInterfaceException(const std::string& m = "") : SPxException(m) {}
-      //@}
-   };
+   SPxInterfaceException(const std::string& m = "") : SPxException(m) {}
+   //@}
+};
 
 } //namespace soplex
 

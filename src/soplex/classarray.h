@@ -88,14 +88,14 @@ public:
    T& last()
    {
       assert(thesize > 0);
-      return data[thesize-1];
+      return data[thesize - 1];
    }
 
    /// Reference to last const element.
    const T& last() const
    {
       assert(thesize > 0);
-      return data[thesize-1];
+      return data[thesize - 1];
    }
 
    /// Gets a C pointer to the data.
@@ -135,7 +135,7 @@ public:
       assert(i >= 0);
       assert(i <= thesize);
 
-      if( n > 0 )
+      if(n > 0)
       {
          int j = thesize;
 
@@ -143,7 +143,7 @@ public:
          assert(thesize == j + n);
 
          /// move \p n elements in memory from insert position \p i to the back
-         while( j > i )
+         while(j > i)
          {
             j--;
             data[j + n] = data[j];
@@ -154,11 +154,11 @@ public:
    /// Inserts \p n elements from \p t before \p i 'the element.
    void insert(int i, int n, const T t[])
    {
-      if( n > 0 )
+      if(n > 0)
       {
          insert(i, n);
 
-         for( int j = 0; j < n; j++ )
+         for(int j = 0; j < n; j++)
             data[i + j] = t[j];
       }
    }
@@ -166,11 +166,11 @@ public:
    /// Inserts all elements from \p t before \p i 'th element.
    void insert(int i, const ClassArray<T>& t)
    {
-      if( t.size() )
+      if(t.size())
       {
          insert(i, t.size());
 
-         for( int j = 0; j < t.size(); j++ )
+         for(int j = 0; j < t.size(); j++)
             data[i + j] = t[j];
       }
    }
@@ -183,7 +183,7 @@ public:
       assert(m >= 0);
       assert(n + m <= size());
 
-      for( int j = n + m; j < size(); j++ )
+      for(int j = n + m; j < size(); j++)
          data[j - m] = data[j];
 
       thesize -= m;
@@ -219,9 +219,9 @@ public:
    {
       assert(memFactor >= 1);
 
-      if( newsize > themax )
+      if(newsize > themax)
          reMax(int(memFactor * newsize), newsize);
-      else if( newsize < 0 )
+      else if(newsize < 0)
          thesize = 0;
       else
          thesize = newsize;
@@ -248,17 +248,17 @@ public:
    ptrdiff_t reMax(int newMax = 1, int newSize = -1)
    {
       /* process input */
-      if( newSize < 0 )
+      if(newSize < 0)
          newSize = size();
 
-      if( newMax < 1 )
+      if(newMax < 1)
          newMax = 1;
 
-      if( newMax < newSize )
+      if(newMax < newSize)
          newMax = newSize;
 
       /* nothing to reallocate */
-      if( newMax == themax )
+      if(newMax == themax)
       {
          thesize = newSize;
          return 0;
@@ -270,18 +270,19 @@ public:
 
       /* call copy constructor for first elements */
       int i;
-      for( i = 0; i < size() && i < newSize; i++ )
-         new (&(newMem[i])) T(data[i]);
+
+      for(i = 0; i < size() && i < newSize; i++)
+         new(&(newMem[i])) T(data[i]);
 
       /* call default constructor for remaining elements */
-      for( ; i < newMax; i++ )
-         new (&(newMem[i])) T();
+      for(; i < newMax; i++)
+         new(&(newMem[i])) T();
 
       /* compute pointer difference */
       ptrdiff_t pshift = reinterpret_cast<char*>(newMem) - reinterpret_cast<char*>(data);
 
       /* free old memory */
-      for( i = themax-1; i >= 0; i-- )
+      for(i = themax - 1; i >= 0; i--)
          data[i].~T();
 
       spx_free(data);
@@ -297,11 +298,11 @@ public:
    /// Assignment operator.
    ClassArray& operator=(const ClassArray& rhs)
    {
-      if( this != &rhs )
+      if(this != &rhs)
       {
          reSize(rhs.size());
 
-         for( int i = 0; i < size(); i++ )
+         for(int i = 0; i < size(); i++)
             data[i] = rhs.data[i];
 
          assert(isConsistent());
@@ -314,12 +315,14 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( (data == 0)
-         || (themax < 1)
-         || (themax < thesize)
-         || (thesize < 0)
-         || (memFactor < 1.0) )
+
+      if((data == 0)
+            || (themax < 1)
+            || (themax < thesize)
+            || (thesize < 0)
+            || (memFactor < 1.0))
          return MSGinconsistent("ClassArray");
+
 #endif
       return true;
    }
@@ -336,12 +339,13 @@ public:
 
       /* call copy constructor for first elements */
       int i;
-      for( i = 0; i < size(); i++ )
-         new (&(data[i])) T(old.data[i]);
+
+      for(i = 0; i < size(); i++)
+         new(&(data[i])) T(old.data[i]);
 
       /* call default constructor for remaining elements */
-      for( ; i < max(); i++ )
-         new (&(data[i])) T();
+      for(; i < max(); i++)
+         new(&(data[i])) T();
 
       assert(isConsistent());
    }
@@ -360,7 +364,7 @@ public:
    {
       thesize = (p_size < 0) ? 0 : p_size;
 
-      if( p_max > thesize )
+      if(p_max > thesize)
          themax = p_max;
       else
          themax = (thesize == 0) ? 1 : thesize;
@@ -368,8 +372,8 @@ public:
       spx_alloc(data, max());
 
       /* call default constructor for each element */
-      for( int i = 0; i < max(); i++ )
-         new (&(data[i])) T();
+      for(int i = 0; i < max(); i++)
+         new(&(data[i])) T();
 
       assert(isConsistent());
    }
@@ -377,9 +381,9 @@ public:
    /// Destructor.
    virtual ~ClassArray()
    {
-      if( data )
+      if(data)
       {
-         for( int i = themax-1; i >= 0; i-- )
+         for(int i = themax - 1; i >= 0; i--)
             data[i].~T();
 
          spx_free(data);
