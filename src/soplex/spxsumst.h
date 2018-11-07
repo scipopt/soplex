@@ -34,7 +34,7 @@ namespace soplex
    Testing version of an SPxVectorST using a very simplistic heuristic to
    build up an approximated solution vector.
 */
-  template <class R>
+template <class R>
 class SPxSumST : public SPxVectorST<R>
 {
 protected:
@@ -43,7 +43,7 @@ protected:
    /**@name Protected helpers */
    //@{
    /// sets up variable weights.
-  void setupWeights(SPxSolverBase<R>& base);
+   void setupWeights(SPxSolverBase<R>& base);
    //@}
 
 public:
@@ -57,13 +57,13 @@ public:
       this->m_name = "Sum";
    }
    /// copy constructor
-   SPxSumST( const SPxSumST& old)
+   SPxSumST(const SPxSumST& old)
       : SPxVectorST<R>(old)
    {
       assert(this->isConsistent());
    }
    /// assignment operator
-   SPxSumST& operator=( const SPxSumST& rhs)
+   SPxSumST& operator=(const SPxSumST& rhs)
    {
       if(this != &rhs)
       {

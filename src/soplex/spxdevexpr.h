@@ -40,7 +40,7 @@ namespace soplex
          greenbe[ab] problems with the entering algorithm
          (row representation?).
 */
-  template <class R>
+template <class R>
 class SPxDevexPR : public SPxPricer<R>
 {
 private:
@@ -49,8 +49,10 @@ private:
    /**@name Data */
    //@{
    Real  last;           ///< penalty, selected at last iteration.
-   DataArray<typename SPxPricer<R>::IdxElement> prices;   ///< temporary array of precomputed pricing values
-   DataArray<typename SPxPricer<R>::IdxElement> pricesCo; ///< temporary array of precomputed pricing values
+   DataArray<typename SPxPricer<R>::IdxElement>
+   prices;   ///< temporary array of precomputed pricing values
+   DataArray<typename SPxPricer<R>::IdxElement>
+   pricesCo; ///< temporary array of precomputed pricing values
    DIdxSet bestPrices;   ///< set of best pricing candidates
    DIdxSet bestPricesCo; ///< set of best pricing candidates
    bool refined;         ///< has a refinement step already been tried?
@@ -100,13 +102,13 @@ public:
       , refined(false)
    {}
    /// copy constructor
-   SPxDevexPR( const SPxDevexPR& old)
+   SPxDevexPR(const SPxDevexPR& old)
       : SPxPricer<R>(old)
       , last(old.last)
       , refined(false)
    {}
    /// assignment operator
-   SPxDevexPR& operator=( const SPxDevexPR& rhs)
+   SPxDevexPR& operator=(const SPxDevexPR& rhs)
    {
       if(this != &rhs)
       {
@@ -144,7 +146,7 @@ public:
    ///
    virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.
-   virtual void addedVecs (int n);
+   virtual void addedVecs(int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
    //@}

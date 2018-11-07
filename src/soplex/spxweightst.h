@@ -53,7 +53,7 @@ namespace soplex
    #colUp[j] is nonzero, the \p j 'th variable will be set to its upper bound
    if it becomes primal.
 */
-  template <class R>
+template <class R>
 class SPxWeightST : public SPxStarter<R>
 {
 private:
@@ -64,9 +64,9 @@ private:
    ///
    DataArray < int > forbidden;
    ///
-   DataArray < Real > * weight;
+   DataArray < Real >* weight;
    ///
-   DataArray < Real > * coWeight;
+   DataArray < Real >* coWeight;
    //@}
 
    //-----------------------------------
@@ -116,7 +116,7 @@ public:
       assert(isConsistent());
    }
    /// copy constructor
-   SPxWeightST( const SPxWeightST& old)
+   SPxWeightST(const SPxWeightST& old)
       : SPxStarter<R>(old)
       , forbidden(old.forbidden)
       , rowWeight(old.rowWeight)
@@ -124,12 +124,12 @@ public:
       , rowRight(old.rowRight)
       , colUp(old.colUp)
    {
-      if (old.weight == &old.colWeight)
+      if(old.weight == &old.colWeight)
       {
          weight   = &colWeight;
          coWeight = &rowWeight;
       }
-      else if (old.weight == &old.rowWeight)
+      else if(old.weight == &old.rowWeight)
       {
          weight   = &rowWeight;
          coWeight = &colWeight;
@@ -143,7 +143,7 @@ public:
       assert(isConsistent());
    }
    /// assignment operator
-   SPxWeightST& operator=( const SPxWeightST& rhs)
+   SPxWeightST& operator=(const SPxWeightST& rhs)
    {
       if(this != &rhs)
       {
@@ -154,12 +154,12 @@ public:
          rowRight = rhs.rowRight;
          colUp = rhs.colUp;
 
-         if (rhs.weight == &rhs.colWeight)
+         if(rhs.weight == &rhs.colWeight)
          {
             weight   = &colWeight;
             coWeight = &rowWeight;
          }
-         else if (rhs.weight == &rhs.rowWeight)
+         else if(rhs.weight == &rhs.rowWeight)
          {
             weight   = &rowWeight;
             coWeight = &colWeight;

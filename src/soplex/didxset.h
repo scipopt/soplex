@@ -49,8 +49,9 @@ public:
    /// adds \p n uninitialized indices.
    void add(int n)
    {
-      if (max() - size() < n)
+      if(max() - size() < n)
          setMax(size() + n);
+
       IdxSet::add(n);
    }
 
@@ -58,24 +59,28 @@ public:
    void add(const IdxSet& sv)
    {
       int n = sv.size();
-      if (max() - size() < n)
+
+      if(max() - size() < n)
          setMax(size() + n);
+
       IdxSet::add(sv);
    }
 
    /// adds \p n indices from \p i.
-   void add(int n, const int *i)
+   void add(int n, const int* i)
    {
-      if (max() - size() < n)
+      if(max() - size() < n)
          setMax(size() + n);
+
       IdxSet::add(n, i);
    }
 
    /// adds index \p i to the index set
    void addIdx(int i)
    {
-      if (max() <= size())
+      if(max() <= size())
          setMax(size() + 1);
+
       IdxSet::addIdx(i);
    }
 
@@ -102,21 +107,23 @@ public:
    /// assignment operator from IdxSet
    DIdxSet& operator=(const IdxSet& sv)
    {
-      if (this != &sv)
+      if(this != &sv)
       {
-         setMax( sv.size() );
+         setMax(sv.size());
          IdxSet::operator=(sv);
       }
+
       return *this;
    }
    /// assignment operator from DIdxSet
    DIdxSet& operator=(const DIdxSet& sv)
    {
-      if (this != &sv)
+      if(this != &sv)
       {
-         setMax( sv.size() );
+         setMax(sv.size());
          IdxSet::operator=(sv);
       }
+
       return *this;
    }
    /// destructor.

@@ -22,99 +22,101 @@
 namespace soplex
 {
 
-  template <>
-  void SPxAutoPR<Real>::setType(typename SPxSolverBase<Real>::Type tp);
+template <>
+void SPxAutoPR<Real>::setType(typename SPxSolverBase<Real>::Type tp);
 
 
-  template <>
-  void SPxAutoPR<Real>::load(SPxSolverBase<Real>* p_solver)
-  {
-    steep.load(p_solver);
-    devex.load(p_solver);
-    this->thesolver = p_solver;
-    setType(p_solver->type());
-  }
+template <>
+void SPxAutoPR<Real>::load(SPxSolverBase<Real>* p_solver)
+{
+   steep.load(p_solver);
+   devex.load(p_solver);
+   this->thesolver = p_solver;
+   setType(p_solver->type());
+}
 
-  template <>
-  void SPxAutoPR<Real>::clear()
-  {
-    steep.clear();
-    devex.clear();
-    this->thesolver = 0;
-  }
+template <>
+void SPxAutoPR<Real>::clear()
+{
+   steep.clear();
+   devex.clear();
+   this->thesolver = 0;
+}
 
-  template <>
-  void SPxAutoPR<Real>::setEpsilon(Real eps)
-  {
-    steep.setEpsilon(eps);
-    devex.setEpsilon(eps);
-    this->theeps = eps;
-  }
+template <>
+void SPxAutoPR<Real>::setEpsilon(Real eps)
+{
+   steep.setEpsilon(eps);
+   devex.setEpsilon(eps);
+   this->theeps = eps;
+}
 
-  template <>
-  void SPxAutoPR<Real>::setType(typename SPxSolverBase<Real>::Type tp)
-  {
-    activepricer->setType(tp);
-  }
+template <>
+void SPxAutoPR<Real>::setType(typename SPxSolverBase<Real>::Type tp)
+{
+   activepricer->setType(tp);
+}
 
-  template <>
-  void SPxAutoPR<Real>::setRep(typename SPxSolverBase<Real>::Representation rep)
-  {
-    steep.setRep(rep);
-    devex.setRep(rep);
-  }
+template <>
+void SPxAutoPR<Real>::setRep(typename SPxSolverBase<Real>::Representation rep)
+{
+   steep.setRep(rep);
+   devex.setRep(rep);
+}
 
-  template <>
-  bool SPxAutoPR<Real>::setActivePricer(typename SPxSolverBase<Real>::Type type)
-  {
-    // switch to steep as soon as switchIters is reached
-    if( activepricer == &devex && this->thesolver->iterations() >= switchIters )
-      {
-        activepricer = &steep;
-        activepricer->setType(type);
-        return true;
-      }
+template <>
+bool SPxAutoPR<Real>::setActivePricer(typename SPxSolverBase<Real>::Type type)
+{
+   // switch to steep as soon as switchIters is reached
+   if(activepricer == &devex && this->thesolver->iterations() >= switchIters)
+   {
+      activepricer = &steep;
+      activepricer->setType(type);
+      return true;
+   }
 
 
-    // use devex for the iterations < switchIters
-    else if( activepricer == &steep && this->thesolver->iterations() < switchIters  )
-      {
-        activepricer = &devex;
-        activepricer->setType(type);
-        return true;
-      }
+   // use devex for the iterations < switchIters
+   else if(activepricer == &steep && this->thesolver->iterations() < switchIters)
+   {
+      activepricer = &devex;
+      activepricer->setType(type);
+      return true;
+   }
 
-    return false;
-  }
+   return false;
+}
 
-  template <>
-  int SPxAutoPR<Real>::selectLeave()
-  {
-    if( setActivePricer(SPxSolverBase<Real>::LEAVE) )
-      MSG_INFO1( (*this->thesolver->spxout), (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
+template <>
+int SPxAutoPR<Real>::selectLeave()
+{
+   if(setActivePricer(SPxSolverBase<Real>::LEAVE))
+      MSG_INFO1((*this->thesolver->spxout),
+                (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
 
-        return activepricer->selectLeave();
-  }
+      return activepricer->selectLeave();
+}
 
-  template <>
-  void SPxAutoPR<Real>::left4(int n, SPxId id)
-  {
-    activepricer->left4(n, id);
-  }
+template <>
+void SPxAutoPR<Real>::left4(int n, SPxId id)
+{
+   activepricer->left4(n, id);
+}
 
-  template <>
-  SPxId SPxAutoPR<Real>::selectEnter()
-  {
-    if( setActivePricer(SPxSolverBase<Real>::ENTER) )
-      MSG_INFO1( (*this->thesolver->spxout), (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl; )
+template <>
+SPxId SPxAutoPR<Real>::selectEnter()
+{
+   if(setActivePricer(SPxSolverBase<Real>::ENTER))
+      MSG_INFO1((*this->thesolver->spxout),
+                (*this->thesolver->spxout) << " --- active pricer: " << activepricer->getName() << std::endl;)
 
-        return activepricer->selectEnter();
-  }
+      return activepricer->selectEnter();
+}
 
-  template <>
-  void SPxAutoPR<Real>::entered4(SPxId id, int n)
-  {
-    activepricer->entered4(id, n);
-  }
+template <>
+void SPxAutoPR<Real>::entered4(SPxId id, int n)
+{
+   activepricer->entered4(id, n);
+}
 
 } // namespace soplex

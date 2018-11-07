@@ -30,26 +30,28 @@ void NameSet::add(const char* str)
 
 void NameSet::add(DataKey& p_key, const char* str)
 {
-   const Name nstr (str);
+   const Name nstr(str);
 
-   if (!hashtab.has(nstr))
+   if(!hashtab.has(nstr))
    {
-      if (size() + 1 > max() * HASHTABLE_FILLFACTOR)
+      if(size() + 1 > max() * HASHTABLE_FILLFACTOR)
       {
          assert(factor >= 1);
-         reMax(int(factor*max() + 8));
+         reMax(int(factor * max() + 8));
       }
 
-      if (memSize() + int(strlen(str)) >= memMax())
+      if(memSize() + int(strlen(str)) >= memMax())
       {
          memPack();
-         if (memSize() + int(strlen(str)) >= memMax())
+
+         if(memSize() + int(strlen(str)) >= memMax())
          {
             assert(memFactor >= 1);
-            memRemax(int(memFactor*memMax()) + 9 + int(strlen(str)));
+            memRemax(int(memFactor * memMax()) + 9 + int(strlen(str)));
             assert(memSize() + int(strlen(str)) < memMax());
          }
       }
+
       int   idx = memused;
       char* tmp = &(mem[idx]);
       memused  += int(strlen(str)) + 1;
@@ -63,28 +65,31 @@ void NameSet::add(DataKey& p_key, const char* str)
 
 void NameSet::add(const NameSet& p_set)
 {
-   for (int i = 0; i < p_set.num(); ++i)
+   for(int i = 0; i < p_set.num(); ++i)
    {
       Name iname(p_set[i]);
-      if (!hashtab.has(iname))
+
+      if(!hashtab.has(iname))
          add(p_set[i]);
    }
 }
 
 void NameSet::add(DataKey p_key[], const NameSet& p_set)
 {
-   for (int i = 0; i < p_set.num(); ++i)
+   for(int i = 0; i < p_set.num(); ++i)
    {
       Name iname = Name(p_set[i]);
-      if (!hashtab.has(iname))
+
+      if(!hashtab.has(iname))
          add(p_key[i], p_set[i]);
    }
 }
 
-void NameSet::remove(const char *str)
+void NameSet::remove(const char* str)
 {
    const Name nam(str);
-   if (hashtab.has(nam))
+
+   if(hashtab.has(nam))
    {
       const DataKey* hkey = hashtab.get(nam);
       assert(hkey != 0);
@@ -103,13 +108,13 @@ void NameSet::remove(const DataKey& p_key)
 
 void NameSet::remove(const DataKey keys[], int n)
 {
-   for (int i = 0; i < n; ++i)
+   for(int i = 0; i < n; ++i)
       remove(keys[i]);
 }
 
 void NameSet::remove(const int nums[], int n)
 {
-   for (int i = 0; i < n; ++i)
+   for(int i = 0; i < n; ++i)
       remove(nums[i]);
 }
 
@@ -117,12 +122,13 @@ void NameSet::remove(int dstat[])
 {
    for(int i = 0; i < set.num(); i++)
    {
-      if (dstat[i] < 0)
+      if(dstat[i] < 0)
       {
          const Name nam = &mem[set[i]];
          hashtab.remove(nam);
       }
    }
+
    set.remove(dstat);
 
    assert(isConsistent());
@@ -146,9 +152,9 @@ void NameSet::memRemax(int newmax)
    memmax = (newmax < memSize()) ? memSize() : newmax;
    spx_realloc(mem, memmax);
 
-   hashtab.clear ();
+   hashtab.clear();
 
-   for (int i = num() - 1; i >= 0; --i)
+   for(int i = num() - 1; i >= 0; --i)
       hashtab.add(Name(&mem[set[key(i)]]), key(i));
 }
 
@@ -169,6 +175,7 @@ void NameSet::memPack()
       set[i] = newlast;
       newlast += int(strlen(t)) + 1;
    }
+
    memcpy(mem, newmem, static_cast<size_t>(newlast));
    memused = newlast;
 
@@ -176,7 +183,7 @@ void NameSet::memPack()
 
    spx_free(newmem);
 
-   for (i = 0; i < num(); i++)
+   for(i = 0; i < num(); i++)
       hashtab.add(Name(&mem[set[key(i)]]), key(i));
 }
 
@@ -189,9 +196,10 @@ static int NameSetNameHashFunction(const NameSet::Name* str)
    while(*sptr != '\0')
    {
       res *= 11;
-      res += (unsigned int) (*sptr++);
+      res += (unsigned int)(*sptr++);
 
    }
+
    res %= 0x0fffffff;
    return ((int) res);
 }
@@ -216,7 +224,8 @@ NameSet::~NameSet()
 bool NameSet::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (memused > memmax)
+
+   if(memused > memmax)
       return MSGinconsistent("NameSet");
 
    int i;
@@ -225,12 +234,13 @@ bool NameSet::isConsistent() const
    {
       const char* t = &mem[set[i]];
 
-      if (!has(t))
+      if(!has(t))
          return MSGinconsistent("NameSet");
 
-      if (strcmp(t, operator[](key(t))))
+      if(strcmp(t, operator[](key(t))))
          return MSGinconsistent("NameSet");
    }
+
    return set.isConsistent() && hashtab.isConsistent();
 #else
    return true;
@@ -247,6 +257,7 @@ std::ostream& operator<<(std::ostream& s, const NameSet& nset)
         << nset[i]
         << std::endl;
    }
+
    return s;
 }
 

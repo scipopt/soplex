@@ -36,8 +36,8 @@ bool msginconsistent(const char* name, const char* file, int line)
    assert(file != 0);
    assert(line >= 0);
 
-   MSG_ERROR( std::cerr << file << "(" << line << ") "
-   << "Inconsistency detected in " << name << std::endl; )
+   MSG_ERROR(std::cerr << file << "(" << line << ") "
+             << "Inconsistency detected in " << name << std::endl;)
 
    return 0;
 }

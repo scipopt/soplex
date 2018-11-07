@@ -307,13 +307,13 @@ inline Real spxSqrt(Real a)
 // returns the next representable value after x in the direction of y
 inline Real spxNextafter(Real x, Real y)
 {
-   return nextafterl(x,y);
+   return nextafterl(x, y);
 }
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
 {
-   return ldexpl(x,exp);
+   return ldexpl(x, exp);
 }
 
 // returns x and exp such that y = x * 2^exp
@@ -338,16 +338,16 @@ inline Real spxSqrt(Real a)
 inline Real spxNextafter(Real x, Real y)
 {
 #ifndef _MSC_VER
-   return nextafter(x,y);
+   return nextafter(x, y);
 #else
-   return _nextafter(x,y);
+   return _nextafter(x, y);
 #endif
 }
 
 /// returns x * 2^exp
 inline Real spxLdexp(Real x, int exp)
 {
-   return ldexp(x,exp);
+   return ldexp(x, exp);
 }
 
 // returns x and exp such that y = x * 2^exp
@@ -462,7 +462,7 @@ inline int spxSnprintf(
    size_t                len,                /**< length of the string to copy */
    const char*           s,                  /**< source string */
    ...                                       /**< further parameters */
-   )
+)
 {
    va_list ap;
    int n;
@@ -479,17 +479,20 @@ inline int spxSnprintf(
 #endif
    va_end(ap);
 
-   if( n < 0 || (size_t) n >= len )
+   if(n < 0 || (size_t) n >= len)
    {
 #ifndef NDEBUG
-      if( n < 0 )
+
+      if(n < 0)
       {
-         MSG_ERROR( std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl; )
+         MSG_ERROR(std::cerr << "vsnprintf returned " << n << " while reading: " << s << std::endl;)
       }
+
 #endif
-      t[len-1] = '\0';
-      n = (int) len-1;
+      t[len - 1] = '\0';
+      n = (int) len - 1;
    }
+
    return n;
 }
 

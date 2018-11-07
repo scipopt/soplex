@@ -45,7 +45,7 @@ public:
    /// copy constructor
    SPxLeastSqSC(const SPxLeastSqSC& old);
    /// assignment operator
-   SPxLeastSqSC& operator=(const SPxLeastSqSC& );
+   SPxLeastSqSC& operator=(const SPxLeastSqSC&);
    /// destructor
    virtual ~SPxLeastSqSC()
    {}

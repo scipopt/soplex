@@ -107,15 +107,15 @@ public:
    //@{
    ///
    explicit
-   MPSInput( std::istream& p_input )
-      : m_section       ( NAME )
-      , m_input         ( p_input )
-      , m_lineno        ( 0 )
-      , m_objsense      ( MPSInput::MINIMIZE )
-      , m_has_error     ( false )
-      , m_is_integer    ( false )
-      , m_is_new_format ( false )
-      , m_ignored       ( 0 )
+   MPSInput(std::istream& p_input)
+      : m_section(NAME)
+      , m_input(p_input)
+      , m_lineno(0)
+      , m_objsense(MPSInput::MINIMIZE)
+      , m_has_error(false)
+      , m_is_integer(false)
+      , m_is_new_format(false)
+      , m_ignored(0)
    {
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
 
@@ -137,31 +137,70 @@ public:
    /**@name Access */
    //@{
    ///
-   Section         section()   const { return m_section; }
+   Section         section()   const
+   {
+      return m_section;
+   }
    ///
-   int             lineno()    const { return m_lineno; }
+   int             lineno()    const
+   {
+      return m_lineno;
+   }
    ///
-   const char*     field0()    const { return m_f0; }
+   const char*     field0()    const
+   {
+      return m_f0;
+   }
    ///
-   const char*     field1()    const { return m_f1; }
+   const char*     field1()    const
+   {
+      return m_f1;
+   }
    ///
-   const char*     field2()    const { return m_f2; }
+   const char*     field2()    const
+   {
+      return m_f2;
+   }
    ///
-   const char*     field3()    const { return m_f3; }
+   const char*     field3()    const
+   {
+      return m_f3;
+   }
    ///
-   const char*     field4()    const { return m_f4; }
+   const char*     field4()    const
+   {
+      return m_f4;
+   }
    ///
-   const char*     field5()    const { return m_f5; }
+   const char*     field5()    const
+   {
+      return m_f5;
+   }
    ///
-   const char*     probName()  const { return m_probname; }
+   const char*     probName()  const
+   {
+      return m_probname;
+   }
    ///
-   const char*     objName()   const { return m_objname; }
+   const char*     objName()   const
+   {
+      return m_objname;
+   }
    ///
-   Sense           objSense()  const { return m_objsense; }
+   Sense           objSense()  const
+   {
+      return m_objsense;
+   }
    ///
-   bool            hasError()  const { return m_has_error; }
+   bool            hasError()  const
+   {
+      return m_has_error;
+   }
    ///
-   bool            isInteger() const { return m_is_integer; }
+   bool            isInteger() const
+   {
+      return m_is_integer;
+   }
    //@}
 
    //-----------------------------------
@@ -197,7 +236,7 @@ public:
    ///
    void syntaxError()
    {
-      MSG_ERROR( std::cerr << "Syntax error in line " << m_lineno << std::endl; )
+      MSG_ERROR(std::cerr << "Syntax error in line " << m_lineno << std::endl;)
       m_section = ENDATA;
       m_has_error = true;
    }
@@ -206,19 +245,19 @@ public:
       const char* what, const char* what_name,
       const char* entity, const char* entity_name)
    {
-      if ( m_ignored < m_max_ignore )
+      if(m_ignored < m_max_ignore)
       {
-         MSG_ERROR( std::cerr << "Warning: line " << m_lineno << ": "
-                              << what << " \"" << what_name << "\""
-                              << " for " << entity << " \""
-                              << entity_name << "\" ignored" << std::endl; )
+         MSG_ERROR(std::cerr << "Warning: line " << m_lineno << ": "
+                   << what << " \"" << what_name << "\""
+                   << " for " << entity << " \""
+                   << entity_name << "\" ignored" << std::endl;)
          ++m_ignored;
 
-         if ( m_ignored == m_max_ignore )
-            MSG_ERROR( std::cerr << "Warning: This was the " << m_max_ignore
-                                 << " ignored entry. No further warnings on "
-                                 << "ignored entries will be given." << std::endl; )
-      }
+         if(m_ignored == m_max_ignore)
+            MSG_ERROR(std::cerr << "Warning: This was the " << m_max_ignore
+                      << " ignored entry. No further warnings on "
+                      << "ignored entries will be given." << std::endl;)
+         }
    }
    //@}
 
@@ -228,8 +267,8 @@ public:
    /// reads an MPS format data line and parse the fields.
    bool readLine();
    /// Inserts \p name as field 1 and shifts all other fields up.
-   void insertName( const char* name,
-                    bool second = false );
+   void insertName(const char* name,
+                   bool second = false);
    //@}
 };
 } // namespace soplex

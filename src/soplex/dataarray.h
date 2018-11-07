@@ -97,13 +97,13 @@ public:
    T& last()
    {
       assert(thesize > 0);
-      return data[thesize -1];
+      return data[thesize - 1];
    }
    /// reference last const element.
    const T& last() const
    {
       assert(thesize > 0);
-      return data[thesize -1];
+      return data[thesize - 1];
    }
 
    /// get a C pointer to the data.
@@ -149,17 +149,18 @@ public:
       reSize(thesize + n);
 
       /// move \p n elements in memory from insert position \p i to the back
-      if( j > i )
-         memmove(&(data[i+n]), &(data[i]), (unsigned int) (j - i) * sizeof(T));
+      if(j > i)
+         memmove(&(data[i + n]), &(data[i]), (unsigned int)(j - i) * sizeof(T));
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
    void insert(int i, int n, const T& t)
    {
-      if (n > 0)
+      if(n > 0)
       {
          insert(i, n);
-         for( int j = 0; j < n; j++ )
+
+         for(int j = 0; j < n; j++)
             data[i + j] = t;
       }
    }
@@ -167,7 +168,7 @@ public:
    /// insert \p n elements from \p t before \p i 'the element.
    void insert(int i, int n, const T t[])
    {
-      if (n > 0)
+      if(n > 0)
       {
          insert(i, n);
          memcpy(&(data[i]), t, (unsigned int) n * sizeof(T));
@@ -177,7 +178,7 @@ public:
    /// insert all elements from \p t before \p i 'th element.
    void insert(int i, const DataArray<T>& t)
    {
-      if (t.size())
+      if(t.size())
       {
          insert(i, t.size());
          memcpy(&(data[i]), t.data, (unsigned int)t.size() * sizeof(T));
@@ -188,11 +189,13 @@ public:
    void remove(int n = 0, int m = 1)
    {
       assert(n < size() && n >= 0);
+
       /* use memmove instead of memcopy because the destination and the source might overlap */
-      if (n + m < size())
+      if(n + m < size())
          memmove(&(data[n]), &(data[n + m]), (unsigned int)(size() - (n + m)) * sizeof(T));
       else
          m = size() - n;
+
       thesize -= m;
    }
    /// remove \p m last elements.
@@ -223,9 +226,10 @@ public:
    void reSize(int newsize)
    {
       assert(memFactor >= 1);
-      if (newsize > themax)
+
+      if(newsize > themax)
          reMax(int(memFactor * newsize), newsize);
-      else if (newsize < 0)
+      else if(newsize < 0)
          thesize = 0;
       else
          thesize = newsize;
@@ -253,16 +257,21 @@ public:
     */
    void reMax(int newMax = 1, int newSize = -1)
    {
-      if (newSize >= 0)
+      if(newSize >= 0)
          thesize = newSize;
-      if (newMax < newSize)
+
+      if(newMax < newSize)
          newMax = newSize;
-      if (newMax < 1)
+
+      if(newMax < 1)
          newMax = 1;
-      if (newMax == themax)
+
+      if(newMax == themax)
          return;
+
       themax = newMax;
-      if (thesize <= 0)
+
+      if(thesize <= 0)
       {
          /* no data needs to be copied so do a clean free and alloc */
          spx_free(data);
@@ -274,13 +283,14 @@ public:
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)
    {
-      if (this != &rhs)
+      if(this != &rhs)
       {
          reSize(rhs.size());
          memcpy(data, rhs.data, (unsigned int) size() * sizeof(T));
 
          assert(isConsistent());
       }
+
       return *this;
    }
 
@@ -288,12 +298,14 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if (  (data == 0)
-         || (themax < 1)
-         || (themax < thesize)
-         || (thesize < 0)
-         || (memFactor < 1.0))
+
+      if((data == 0)
+            || (themax < 1)
+            || (themax < thesize)
+            || (thesize < 0)
+            || (memFactor < 1.0))
          return MSGinconsistent("DataArray");
+
 #endif
 
       return true;
@@ -302,15 +314,15 @@ public:
    /// copy constructor
    DataArray(const DataArray& old)
       : thesize(old.thesize)
-      , themax (old.themax)
-      , data (0)
-      , memFactor (old.memFactor)
+      , themax(old.themax)
+      , data(0)
+      , memFactor(old.memFactor)
    {
       spx_alloc(data, max());
 
       assert(thesize >= 0);
 
-      if (thesize)
+      if(thesize)
          memcpy(data, old.data, (unsigned int)thesize * sizeof(T));
 
       assert(isConsistent());
@@ -326,11 +338,12 @@ public:
        @param p_fac  value for memFactor.
     */
    explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
-      : data (0)
+      : data(0)
       , memFactor(p_fac)
    {
       thesize = (p_size < 0) ? 0 : p_size;
-      if (p_max > thesize)
+
+      if(p_max > thesize)
          themax = p_max;
       else
          themax = (thesize == 0) ? 1 : thesize;

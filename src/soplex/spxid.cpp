@@ -56,15 +56,19 @@ std::ostream& operator<<(std::ostream& os, const SPxId& id)
    case SPxId::ROW_ID:
       os << "row ";
       break;
+
    case SPxId::COL_ID :
       os << "col ";
       break;
+
    case SPxId::INVALID :
       os << "Invalid ";
       break;
+
    default :
       throw SPxInternalCodeException("XSPXID01 This should never happen.");
    }
+
    os << id.idx << " (" << id.info << ")";
 
    return os;

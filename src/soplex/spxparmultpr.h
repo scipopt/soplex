@@ -94,7 +94,7 @@ public:
       , partialSize(17)
    {}
    /// copy constructor
-   SPxParMultPR( const SPxParMultPR& old)
+   SPxParMultPR(const SPxParMultPR& old)
       : SPxPricer<R>(old)
       , pricSet(old.pricSet)
       , multiParts(old.multiParts)
@@ -104,7 +104,7 @@ public:
       , partialSize(old.partialSize)
    {}
    /// assignment operator
-   SPxParMultPR& operator=( const SPxParMultPR& rhs)
+   SPxParMultPR& operator=(const SPxParMultPR& rhs)
    {
       if(this != &rhs)
       {

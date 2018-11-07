@@ -33,7 +33,7 @@ namespace soplex
 void WallclockTimer::start()
 {
    // ignore start request if timer is running
-   if (status != RUNNING)
+   if(status != RUNNING)
    {
 #if !defined(_WIN32) && !defined(_WIN64)
       struct timeval tp; /*lint !e86*/
@@ -42,7 +42,8 @@ void WallclockTimer::start()
       sec = -::time(NULL);
 #else
       gettimeofday(&tp, NULL);
-      if( tp.tv_usec > usec ) /*lint !e115 !e40*/
+
+      if(tp.tv_usec > usec)   /*lint !e115 !e40*/
       {
          sec = -(tp.tv_sec + 1); /*lint !e115 !e40*/
          usec = (1000000 - tp.tv_usec); /*lint !e115 !e40*/
@@ -52,9 +53,11 @@ void WallclockTimer::start()
          sec = -tp.tv_sec; /*lint !e115 !e40*/
          usec = -tp.tv_usec; /*lint !e115 !e40*/
       }
+
 #endif
       status = RUNNING;
    }
+
    lasttime = 0.0;
 }
 
@@ -62,7 +65,7 @@ void WallclockTimer::start()
 Real WallclockTimer::stop()
 {
    // status remains unchanged if timer is not running
-   if (status == RUNNING)
+   if(status == RUNNING)
    {
 #if !defined(_WIN32) && !defined(_WIN64)
       struct timeval tp; /*lint !e86*/
@@ -73,7 +76,8 @@ Real WallclockTimer::stop()
       sec += ::time(NULL);
 #else
       gettimeofday(&tp, NULL);
-      if( tp.tv_usec + usec > 1000000 ) /*lint !e115 !e40*/
+
+      if(tp.tv_usec + usec > 1000000)   /*lint !e115 !e40*/
       {
          sec += (tp.tv_sec + 1); /*lint !e115 !e40*/
          usec -= (1000000 - tp.tv_usec); /*lint !e115 !e40*/
@@ -83,10 +87,12 @@ Real WallclockTimer::stop()
          sec += tp.tv_sec; /*lint !e115 !e40*/
          usec += tp.tv_usec; /*lint !e115 !e40*/
       }
+
 #endif
       status = STOPPED;
       lasttime = wall2sec(sec, usec);
    }
+
    return lasttime;
 }
 
@@ -96,23 +102,27 @@ Real WallclockTimer::time() const
 #if !defined(_WIN32) && !defined(_WIN64)
    struct timeval tp; /*lint !e86*/
 #endif
+
    // only update times if timer is still running
-   if( status == RUNNING )
+   if(status == RUNNING)
    {
 #if defined(_WIN32) || defined(_WIN64)
       // we need the blank specifier to distiguish this method from WallclockTimer::time
       lasttime = wall2sec(sec + ::time(NULL), 0);
 #else
       gettimeofday(&tp, NULL);
+
       // check whether the microseconds add up to more than a second
-      if( tp.tv_usec + usec > 1000000 ) /*lint !e115 !e40*/
+      if(tp.tv_usec + usec > 1000000)   /*lint !e115 !e40*/
          lasttime = wall2sec(sec + tp.tv_sec + 1, /*lint !e115 !e40*/
-                         (usec - 1000000) + tp.tv_usec); /*lint !e115 !e40*/
+                             (usec - 1000000) + tp.tv_usec); /*lint !e115 !e40*/
       else
          lasttime = wall2sec(sec + tp.tv_sec, /*lint !e115 !e40*/
-                         usec + tp.tv_usec); /*lint !e115 !e40*/
+                             usec + tp.tv_usec); /*lint !e115 !e40*/
+
 #endif
    }
+
    return lasttime;
 }
 
