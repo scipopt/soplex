@@ -42,37 +42,42 @@ void SPxSumST::setupWeights(SPxSolver& base)
    const Real* up = base.upper().get_const_ptr();
    const Real* low = base.lower().get_const_ptr();
 
-   for (i = base.nRows(); --i >= 0;)
+   for(i = base.nRows(); --i >= 0;)
    {
       rowLen[i] = base.rowVector(i).length2();
-      if (lhs[i] > 0)
+
+      if(lhs[i] > 0)
          delta.multAdd(lhs[i] / rowLen[i], base.rowVector(i));
-      else if (rhs[i] < 0)
+      else if(rhs[i] < 0)
          delta.multAdd(rhs[i] / rowLen[i], base.rowVector(i));
    }
 
-   for (count = 0;; count++)
+   for(count = 0;; count++)
    {
       work += delta;
-      for (i = base.nCols(); --i >= 0;)
+
+      for(i = base.nCols(); --i >= 0;)
       {
-         if (wrk[i] > up[i])
+         if(wrk[i] > up[i])
             wrk[i] = up[i];
-         if (wrk[i] < low[i])
+
+         if(wrk[i] < low[i])
             wrk[i] = low[i];
       }
 
       //      std::cout << -(work * base.maxObj()) << std::endl;
-      if (count >= 12)
+      if(count >= 12)
          break;
 
       delta.clear();
-      for (i = base.nRows(); --i >= 0;)
+
+      for(i = base.nRows(); --i >= 0;)
       {
          x = base.rowVector(i) * work;
-         if (lhs[i] > x)
+
+         if(lhs[i] > x)
             delta.multAdd((lhs[i] - x) / rowLen[i], base.rowVector(i));
-         else if (rhs[i] < x)
+         else if(rhs[i] < x)
             delta.multAdd((rhs[i] - x) / rowLen[i], base.rowVector(i));
       }
    }

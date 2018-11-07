@@ -80,7 +80,7 @@ public:
       m_name = "Vector";
    }
    /// copy constructor
-   SPxVectorST( const SPxVectorST& old)
+   SPxVectorST(const SPxVectorST& old)
       : SPxWeightST(old)
       , state(old.state)
       , vec(old.vec)
@@ -88,7 +88,7 @@ public:
       assert(isConsistent());
    }
    /// assignment operator
-   SPxVectorST& operator=( const SPxVectorST& rhs)
+   SPxVectorST& operator=(const SPxVectorST& rhs)
    {
       if(this != &rhs)
       {

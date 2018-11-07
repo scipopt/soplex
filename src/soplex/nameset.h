@@ -83,7 +83,7 @@ public:
       //------------------------------
       /**@name Public Data */
       //@{
-      const char *name;      ///< pointer to the name string.
+      const char* name;      ///< pointer to the name string.
       //@}
 
       //------------------------------
@@ -92,7 +92,7 @@ public:
       /// equality operator.
       friend int operator==(const Name& n1, const Name& n2)
       {
-         return (strcmp (n1.name, n2.name) == 0);
+         return (strcmp(n1.name, n2.name) == 0);
       }
       /// output operator.
       friend std::ostream& operator<<(std::ostream& out, const Name& n)
@@ -105,7 +105,7 @@ public:
       /**@name Debugging */
       //@{
       /// consistency check.
-      bool isConsistent () const
+      bool isConsistent() const
       {
          return (name != 0);
       }
@@ -121,11 +121,11 @@ public:
       /// copy constructor.
       /** Only the pointer to the name is copied, but not the name itself.
        */
-      Name (const Name& str)
+      Name(const Name& str)
          : name(str.name)
       {}
       /// implictly constructs a Name out of a C style character string.
-      Name (const char* str)
+      Name(const char* str)
          : name(str)
       {}
       //@}
@@ -215,10 +215,11 @@ public:
    }
 
    /// returns number of name \p str in NameSet.
-   int number(const char *str) const
+   int number(const char* str) const
    {
       const Name nam(str);
-      if (hashtab.has(nam))
+
+      if(hashtab.has(nam))
       {
          assert(hashtab.get(nam) != 0);
          return number(*hashtab.get(nam));

@@ -25,7 +25,7 @@ namespace soplex
 
 const char* getGitHash(
    void
-   );
+);
 
 } // namespace soplex
 #endif // _SPXGITHASH_H_

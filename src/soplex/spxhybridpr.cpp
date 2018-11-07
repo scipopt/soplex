@@ -25,10 +25,11 @@ namespace soplex
 bool SPxHybridPR::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (thesolver != 0 &&
-      (thesolver != steep.solver() ||
-         thesolver != devex.solver() ||
-         thesolver != parmult.solver()))
+
+   if(thesolver != 0 &&
+         (thesolver != steep.solver() ||
+          thesolver != devex.solver() ||
+          thesolver != parmult.solver()))
       return MSGinconsistent("SPxHybridPR");
 
    return steep.isConsistent()
@@ -65,14 +66,14 @@ void SPxHybridPR::setEpsilon(Real eps)
 
 void SPxHybridPR::setType(SPxSolver::Type tp)
 {
-   if (tp == SPxSolver::LEAVE)
+   if(tp == SPxSolver::LEAVE)
    {
       thepricer = &steep;
       thesolver->setPricing(SPxSolver::FULL);
    }
    else
    {
-      if (thesolver->dim() > hybridFactor * thesolver->coDim())
+      if(thesolver->dim() > hybridFactor * thesolver->coDim())
       {
          /**@todo I changed from devex to steepest edge pricing here
           *       because of numerical difficulties, this should be
@@ -89,8 +90,8 @@ void SPxHybridPR::setType(SPxSolver::Type tp)
       }
    }
 
-   MSG_INFO1( (*thesolver->spxout), (*thesolver->spxout) << "IPRHYB01 switching to "
-                        << thepricer->getName() << std::endl; )
+   MSG_INFO1((*thesolver->spxout), (*thesolver->spxout) << "IPRHYB01 switching to "
+             << thepricer->getName() << std::endl;)
 
    thepricer->setType(tp);
 }
@@ -122,7 +123,7 @@ void SPxHybridPR::entered4(SPxId id, int n)
    thepricer->entered4(id, n);
 }
 
-void SPxHybridPR::addedVecs (int n)
+void SPxHybridPR::addedVecs(int n)
 {
    steep.addedVecs(n);
    devex.addedVecs(n);

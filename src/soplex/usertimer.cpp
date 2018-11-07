@@ -60,7 +60,7 @@ void UserTimer::updateTicks() const
    struct tms now;
    clock_t    ret = times(&now);
 
-   if (int(ret) == -1)
+   if(int(ret) == -1)
       now.tms_utime = now.tms_stime = ret = 0;
 
    uTicks = long(now.tms_utime);
@@ -72,13 +72,14 @@ void UserTimer::updateTicks() const
 void UserTimer::start()
 {
    // ignore start request if timer is running
-   if (status != RUNNING)
+   if(status != RUNNING)
    {
       updateTicks();
 
       uAccount -= uTicks;
       status    = RUNNING;
    }
+
    lasttime = 0;
 }
 
@@ -86,20 +87,21 @@ void UserTimer::start()
 Real UserTimer::stop()
 {
    // status remains unchanged if timer is not running
-   if (status == RUNNING)
+   if(status == RUNNING)
    {
       updateTicks();
 
       uAccount += uTicks;
       status    = STOPPED;
    }
+
    return ticks2sec(uAccount);
 }
 
 // get accounted user time.
 Real UserTimer::time() const
 {
-   if (status == RUNNING)
+   if(status == RUNNING)
    {
       updateTicks();
       lasttime = ticks2sec(uTicks + uAccount);
@@ -108,6 +110,7 @@ Real UserTimer::time() const
    {
       lasttime = ticks2sec(uAccount);
    }
+
    return lasttime;
 }
 

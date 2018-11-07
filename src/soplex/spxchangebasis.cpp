@@ -28,31 +28,31 @@ void SPxBasis::reDim()
 
    assert(theLP != 0);
 
-   MSG_DEBUG( std::cout << "DCHBAS01 SPxBasis::reDim():"
-                     << " matrixIsSetup=" << matrixIsSetup
-                     << " fatorized=" << factorized
-                     << std::endl; )
+   MSG_DEBUG(std::cout << "DCHBAS01 SPxBasis::reDim():"
+             << " matrixIsSetup=" << matrixIsSetup
+             << " fatorized=" << factorized
+             << std::endl;)
 
-   thedesc.reSize (theLP->nRows(), theLP->nCols());
+   thedesc.reSize(theLP->nRows(), theLP->nCols());
 
-   if (theLP->dim() != matrix.size())
+   if(theLP->dim() != matrix.size())
    {
-      MSG_INFO3( (*spxout), (*spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
-                           << std::endl; )
+      MSG_INFO3((*spxout), (*spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
+                << std::endl;)
 
-      matrix.reSize (theLP->dim());
+      matrix.reSize(theLP->dim());
       theBaseId.reSize(theLP->dim());
       matrixIsSetup = false;
       factorized    = false;
    }
 
-   MSG_DEBUG( std::cout << "DCHBAS03 SPxBasis::reDim(): -->"
-                     << " matrixIsSetup=" << matrixIsSetup
-                     << " fatorized=" << factorized
-                     << std::endl; )
+   MSG_DEBUG(std::cout << "DCHBAS03 SPxBasis::reDim(): -->"
+             << " matrixIsSetup=" << matrixIsSetup
+             << " fatorized=" << factorized
+             << std::endl;)
 
-   assert( matrix.size()    >= theLP->dim() );
-   assert( theBaseId.size() >= theLP->dim() );
+   assert(matrix.size()    >= theLP->dim());
+   assert(theBaseId.size() >= theLP->dim());
 }
 
 /* adapt basis and basis descriptor to added rows */
@@ -60,16 +60,16 @@ void SPxBasis::addedRows(int n)
 {
    assert(theLP != 0);
 
-   if( n > 0 )
+   if(n > 0)
    {
       reDim();
 
-      if (theLP->rep() == SPxSolver::COLUMN)
+      if(theLP->rep() == SPxSolver::COLUMN)
       {
          /* after adding rows in column representation, reDim() should set these bools to false. */
-         assert( !matrixIsSetup && !factorized );
+         assert(!matrixIsSetup && !factorized);
 
-         for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
+         for(int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
          {
             thedesc.rowStatus(i) = dualRowStatus(i);
             baseId(i) = theLP->SPxLP::rId(i);
@@ -79,7 +79,7 @@ void SPxBasis::addedRows(int n)
       {
          assert(theLP->rep() == SPxSolver::ROW);
 
-         for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
+         for(int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
       }
 
@@ -90,27 +90,30 @@ void SPxBasis::addedRows(int n)
        * We therefore have to "reload" the matrix if it is set up. Note that reDim()
        * leaves @c matrixIsSetup untouched if only row have been added, since the basis
        * matrix already has the correct size. */
-      if (status() > NO_PROBLEM && matrixIsSetup)
+      if(status() > NO_PROBLEM && matrixIsSetup)
          loadMatrixVecs();
 
       /* update basis status */
-      switch (status())
+      switch(status())
       {
       case PRIMAL:
       case UNBOUNDED:
          setStatus(REGULAR);
          break;
+
       case OPTIMAL:
       case INFEASIBLE:
          setStatus(DUAL);
          break;
+
       case NO_PROBLEM:
       case SINGULAR:
       case REGULAR:
       case DUAL:
          break;
+
       default:
-         MSG_ERROR( std::cerr << "ECHBAS04 Unknown basis status!" << std::endl; )
+         MSG_ERROR(std::cerr << "ECHBAS04 Unknown basis status!" << std::endl;)
          throw SPxInternalCodeException("XCHBAS01 This should never happen.");
       }
    }
@@ -122,42 +125,45 @@ void SPxBasis::removedRow(int i)
    assert(status() >  NO_PROBLEM);
    assert(theLP    != 0);
 
-   if (theLP->rep() == SPxSolver::ROW)
+   if(theLP->rep() == SPxSolver::ROW)
    {
-      if (theLP->isBasic(thedesc.rowStatus(i)))
+      if(theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
          factorized = false;
 
-         MSG_DEBUG( std::cout << "DCHBAS05 Warning: deleting basic row!\n"; )
+         MSG_DEBUG(std::cout << "DCHBAS05 Warning: deleting basic row!\n";)
       }
    }
    else
    {
       assert(theLP->rep() == SPxSolver::COLUMN);
       factorized = false;
-      if (!theLP->isBasic(thedesc.rowStatus(i)))
+
+      if(!theLP->isBasic(thedesc.rowStatus(i)))
       {
          setStatus(NO_PROBLEM);
-         MSG_DEBUG( std::cout << "DCHBAS06 Warning: deleting nonbasic row!\n"; )
+         MSG_DEBUG(std::cout << "DCHBAS06 Warning: deleting nonbasic row!\n";)
       }
-      else if (status() > NO_PROBLEM && matrixIsSetup)
+      else if(status() > NO_PROBLEM && matrixIsSetup)
       {
-         for (int j = theLP->dim(); j >= 0; --j)
+         for(int j = theLP->dim(); j >= 0; --j)
          {
             SPxId id = baseId(j);
 
-            if (id.isSPxRowId() && !theLP->has(SPxRowId(id)))
+            if(id.isSPxRowId() && !theLP->has(SPxRowId(id)))
             {
                baseId(j) = baseId(theLP->dim());
 
-               if (j < theLP->dim())
+               if(j < theLP->dim())
                   matrix[j] = &theLP->vector(baseId(j));
+
                break;
             }
          }
       }
    }
+
    thedesc.rowStatus(i) = thedesc.rowStatus(theLP->nRows());
    reDim();
 }
@@ -170,19 +176,19 @@ void SPxBasis::removedRows(const int perm[])
    int i;
    int n = thedesc.nRows();
 
-   if (theLP->rep() == SPxSolver::ROW)
+   if(theLP->rep() == SPxSolver::ROW)
    {
-      for (i = 0; i < n; ++i)
+      for(i = 0; i < n; ++i)
       {
-         if (perm[i] != i)
+         if(perm[i] != i)
          {
-            if (perm[i] < 0)               // row got removed
+            if(perm[i] < 0)                // row got removed
             {
-               if (theLP->isBasic(thedesc.rowStatus(i)))
+               if(theLP->isBasic(thedesc.rowStatus(i)))
                {
                   setStatus(NO_PROBLEM);
                   factorized = matrixIsSetup = false;
-                  MSG_DEBUG( std::cout << "DCHBAS07 Warning: deleting basic row!\n"; )
+                  MSG_DEBUG(std::cout << "DCHBAS07 Warning: deleting basic row!\n";)
                }
             }
             else                            // row was moved
@@ -197,13 +203,13 @@ void SPxBasis::removedRows(const int perm[])
       factorized    = false;
       matrixIsSetup = false;
 
-      for (i = 0; i < n; ++i)
+      for(i = 0; i < n; ++i)
       {
-         if (perm[i] != i)
+         if(perm[i] != i)
          {
-            if (perm[i] < 0)               // row got removed
+            if(perm[i] < 0)                // row got removed
             {
-               if (!theLP->isBasic(thedesc.rowStatus(i)))
+               if(!theLP->isBasic(thedesc.rowStatus(i)))
                   setStatus(NO_PROBLEM);
             }
             else                            // row was moved
@@ -211,6 +217,7 @@ void SPxBasis::removedRows(const int perm[])
          }
       }
    }
+
    reDim();
 }
 
@@ -220,11 +227,11 @@ primalColStatus(int i, const SPxLP* theLP)
 {
    assert(theLP != 0);
 
-   if (theLP->upper(i) < infinity)
+   if(theLP->upper(i) < infinity)
    {
-      if (theLP->lower(i) > -infinity)
+      if(theLP->lower(i) > -infinity)
       {
-         if (theLP->lower(i) == theLP->SPxLP::upper(i))
+         if(theLP->lower(i) == theLP->SPxLP::upper(i))
             return SPxBasis::Desc::P_FIXED;
          /*
              else
@@ -232,19 +239,19 @@ primalColStatus(int i, const SPxLP* theLP)
                              ? SPxBasis::Desc::P_ON_LOWER
                           : SPxBasis::Desc::P_ON_UPPER;
          */
-         else if (theLP->maxObj(i) == 0)
+         else if(theLP->maxObj(i) == 0)
             return (-theLP->lower(i) < theLP->upper(i))
-               ? SPxBasis::Desc::P_ON_LOWER
-               : SPxBasis::Desc::P_ON_UPPER;
+                   ? SPxBasis::Desc::P_ON_LOWER
+                   : SPxBasis::Desc::P_ON_UPPER;
          else
             return (theLP->maxObj(i) < 0)
-               ? SPxBasis::Desc::P_ON_LOWER
-               : SPxBasis::Desc::P_ON_UPPER;
+                   ? SPxBasis::Desc::P_ON_LOWER
+                   : SPxBasis::Desc::P_ON_UPPER;
       }
       else
          return SPxBasis::Desc::P_ON_UPPER;
    }
-   else if (theLP->lower(i) > -infinity)
+   else if(theLP->lower(i) > -infinity)
       return SPxBasis::Desc::P_ON_LOWER;
    else
       return SPxBasis::Desc::P_FREE;
@@ -256,16 +263,16 @@ void SPxBasis::addedCols(int n)
 {
    assert(theLP != 0);
 
-   if( n > 0 )
+   if(n > 0)
    {
       reDim();
 
-      if (theLP->rep() == SPxSolver::ROW)
+      if(theLP->rep() == SPxSolver::ROW)
       {
          /* after adding columns in row representation, reDim() should set these bools to false. */
-         assert( !matrixIsSetup && !factorized );
+         assert(!matrixIsSetup && !factorized);
 
-         for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
+         for(int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
          {
             thedesc.colStatus(i) = primalColStatus(i, theLP);
             baseId(i) = theLP->SPxLP::cId(i);
@@ -275,7 +282,7 @@ void SPxBasis::addedCols(int n)
       {
          assert(theLP->rep() == SPxSolver::COLUMN);
 
-         for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
+         for(int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
             thedesc.colStatus(i) = primalColStatus(i, theLP);
       }
 
@@ -286,26 +293,29 @@ void SPxBasis::addedCols(int n)
        * We therefore have to "reload" the matrix if it is set up. Note that reDim()
        * leaves @c matrixIsSetup untouched if only columns have been added, since the
        * basis matrix already has the correct size. */
-      if (status() > NO_PROBLEM && matrixIsSetup)
+      if(status() > NO_PROBLEM && matrixIsSetup)
          loadMatrixVecs();
 
-      switch (status())
+      switch(status())
       {
       case DUAL:
       case INFEASIBLE:
          setStatus(REGULAR);
          break;
+
       case OPTIMAL:
       case UNBOUNDED:
          setStatus(PRIMAL);
          break;
+
       case NO_PROBLEM:
       case SINGULAR:
       case REGULAR:
       case PRIMAL:
          break;
+
       default:
-         MSG_ERROR( std::cerr << "ECHBAS08 Unknown basis status!" << std::endl; )
+         MSG_ERROR(std::cerr << "ECHBAS08 Unknown basis status!" << std::endl;)
          throw SPxInternalCodeException("XCHBAS02 This should never happen.");
       }
    }
@@ -316,28 +326,32 @@ void SPxBasis::removedCol(int i)
    assert(status() > NO_PROBLEM);
    assert(theLP != 0);
 
-   if (theLP->rep() == SPxSolver::COLUMN)
+   if(theLP->rep() == SPxSolver::COLUMN)
    {
-      if (theLP->isBasic(thedesc.colStatus(i)))
+      if(theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
    }
    else
    {
       assert(theLP->rep() == SPxSolver::ROW);
       factorized = false;
-      if (!theLP->isBasic(thedesc.colStatus(i)))
+
+      if(!theLP->isBasic(thedesc.colStatus(i)))
          setStatus(NO_PROBLEM);
-      else if (status() > NO_PROBLEM)
+      else if(status() > NO_PROBLEM)
       {
-         for (int j = theLP->dim(); j >= 0; --j)
+         for(int j = theLP->dim(); j >= 0; --j)
          {
             SPxId id = baseId(j);
-            if (id.isSPxColId() && !theLP->has(SPxColId(id)))
+
+            if(id.isSPxColId() && !theLP->has(SPxColId(id)))
             {
                baseId(j) = baseId(theLP->dim());
-               if ( matrixIsSetup &&
-                    j < theLP->dim() )
+
+               if(matrixIsSetup &&
+                     j < theLP->dim())
                   matrix[j] = &theLP->vector(baseId(j));
+
                break;
             }
          }
@@ -356,13 +370,13 @@ void SPxBasis::removedCols(const int perm[])
    int i;
    int n = thedesc.nCols();
 
-   if (theLP->rep() == SPxSolver::COLUMN)
+   if(theLP->rep() == SPxSolver::COLUMN)
    {
-      for (i = 0; i < n; ++i)
+      for(i = 0; i < n; ++i)
       {
-         if (perm[i] < 0)           // column got removed
+         if(perm[i] < 0)            // column got removed
          {
-            if (theLP->isBasic(thedesc.colStatus(i)))
+            if(theLP->isBasic(thedesc.colStatus(i)))
                setStatus(NO_PROBLEM);
          }
          else                        // column was potentially moved
@@ -373,13 +387,14 @@ void SPxBasis::removedCols(const int perm[])
    {
       assert(theLP->rep() == SPxSolver::ROW);
       factorized = matrixIsSetup = false;
-      for (i = 0; i < n; ++i)
+
+      for(i = 0; i < n; ++i)
       {
-         if (perm[i] != i)
+         if(perm[i] != i)
          {
-            if (perm[i] < 0)               // column got removed
+            if(perm[i] < 0)                // column got removed
             {
-               if (!theLP->isBasic(thedesc.colStatus(i)))
+               if(!theLP->isBasic(thedesc.colStatus(i)))
                   setStatus(NO_PROBLEM);
             }
             else                            // column was moved
@@ -397,9 +412,9 @@ void SPxBasis::removedCols(const int perm[])
  */
 void SPxBasis::invalidate()
 {
-   if( factorized || matrixIsSetup )
+   if(factorized || matrixIsSetup)
    {
-      MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
+      MSG_INFO3((*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl;)
    }
 
    factorized    = false;
@@ -415,27 +430,27 @@ void SPxBasis::restoreInitialBasis()
 {
    assert(!factorized);
 
-   MSG_INFO3( (*spxout), (*spxout) << "ICHBAS10 setup slack basis" << std::endl; )
+   MSG_INFO3((*spxout), (*spxout) << "ICHBAS10 setup slack basis" << std::endl;)
 
-   if (theLP->rep() == SPxSolver::COLUMN)
+   if(theLP->rep() == SPxSolver::COLUMN)
    {
-      for (int i = 0; i < theLP->nRows(); ++i)
+      for(int i = 0; i < theLP->nRows(); ++i)
       {
          thedesc.rowStatus(i) = dualRowStatus(i);
          baseId(i) = theLP->SPxLP::rId(i);
       }
 
-      for (int i = 0; i < theLP->nCols(); ++i)
+      for(int i = 0; i < theLP->nCols(); ++i)
          thedesc.colStatus(i) = primalColStatus(i, theLP);
    }
    else
    {
       assert(theLP->rep() == SPxSolver::ROW);
 
-      for (int i = 0; i < theLP->nRows(); ++i)
+      for(int i = 0; i < theLP->nRows(); ++i)
          thedesc.rowStatus(i) = dualRowStatus(i);
 
-      for (int i = 0; i < theLP->nCols(); ++i)
+      for(int i = 0; i < theLP->nCols(); ++i)
       {
          thedesc.colStatus(i) = primalColStatus(i, theLP);
          baseId(i) = theLP->SPxLP::cId(i);
@@ -443,7 +458,7 @@ void SPxBasis::restoreInitialBasis()
    }
 
    /* if matrix was set up, load new basis vectors to the matrix */
-   if (status() > NO_PROBLEM && matrixIsSetup)
+   if(status() > NO_PROBLEM && matrixIsSetup)
       loadMatrixVecs();
 
    /* update basis status */

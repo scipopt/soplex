@@ -80,7 +80,7 @@ public:
    explicit
    IsElement(const T& old)
       : T(old)
-         , the_next(0)
+      , the_next(0)
    {}
 
    /// copy constructor.
@@ -115,7 +115,7 @@ protected:
    T* the_first;   ///< the first element in the IsList.
    T* the_last;    ///< the last element in the IsList.
    bool destroyElements;
-                   ///< should the destructor be called for each element when the list is destroyed?
+   ///< should the destructor be called for each element when the list is destroyed?
 
 public:
    typedef IsElement<T> Element;
@@ -126,20 +126,22 @@ public:
    /// appends \p elem to IsList.
    void append(T* elem)
    {
-      if (the_last)
+      if(the_last)
          the_last->next() = elem;
       else
          the_first = elem;
+
       the_last = elem;
    }
 
    /// prepends \p elem to IsList.
    void prepend(T* elem)
    {
-      if (the_first)
+      if(the_first)
          elem->next() = the_first;
       else
          the_last = elem;
+
       the_first = elem;
    }
 
@@ -147,7 +149,8 @@ public:
    void insert(T* elem, T* after)
    {
       assert(find(after));
-      if (after == the_last)
+
+      if(after == the_last)
          append(elem);
       else
       {
@@ -165,7 +168,7 @@ public:
     */
    void append(IsList<T>& list)
    {
-      if (list.the_first)
+      if(list.the_first)
       {
          append(list.the_first);
          the_last = list.the_last;
@@ -181,7 +184,7 @@ public:
    */
    void prepend(IsList<T>& list)
    {
-      if (list.the_first)
+      if(list.the_first)
       {
          prepend(list.the_last);
          the_first = list.the_first;
@@ -195,14 +198,16 @@ public:
        concateneted list as well and vice versa. The programmer is
        responsible for such changes not to yield inconsistent lists.
    */
-   void insert(IsList<T>& list, T*after)
+   void insert(IsList<T>& list, T* after)
    {
       assert(find(after));
-      if (list.the_first)
+
+      if(list.the_first)
       {
          list.the_last->next() = after->next();
          after->next() = list.first();
-         if (after == last())
+
+         if(after == last())
             the_last = list.last();
       }
    }
@@ -212,33 +217,37 @@ public:
    /**@name Removal */
    //@{
    /// removes the successor of \p after from an IsList.
-   void remove_next(T *after)
+   void remove_next(T* after)
    {
       assert(find(after));
-      if (after->next())
+
+      if(after->next())
       {
-         if (after->next() == last())
+         if(after->next() == last())
             the_last = after;
+
          after->next() = after->next()->next();
       }
    }
 
    /// removes element \p elem from an IsList.
-   void remove(const T *elem)
+   void remove(const T* elem)
    {
-      if (the_first)
+      if(the_first)
       {
-         if (elem == the_first)
+         if(elem == the_first)
          {
             the_first = next(elem);
-            if (the_first == 0)
+
+            if(the_first == 0)
                the_last = 0;
          }
          else
          {
-            T *after = the_first;
-            for (; after != the_last; after = after->next())
-               if (after->next() == elem)
+            T* after = the_first;
+
+            for(; after != the_last; after = after->next())
+               if(after->next() == elem)
                {
                   remove_next(after);
                   return;
@@ -255,23 +264,26 @@ public:
    */
    void remove(IsList<T>& list)
    {
-      if (the_first != 0 && list.the_first != 0)
+      if(the_first != 0 && list.the_first != 0)
       {
          assert(find(list.first()));
          assert(find(list.last()));
-         if (the_first == list.the_first)
+
+         if(the_first == list.the_first)
          {
-            if (the_last == list.the_last)
+            if(the_last == list.the_last)
                the_first = the_last = 0;
             else
                the_first = list.the_last->next();
          }
          else
          {
-            T *after = the_first;
-            for (; after->next() != list.the_first; after = after->next())
-              ;
-            if (the_last == list.the_last)
+            T* after = the_first;
+
+            for(; after->next() != list.the_first; after = after->next())
+               ;
+
+            if(the_last == list.the_last)
                the_last = after;
             else
                after->next() = list.the_last->next();
@@ -282,10 +294,11 @@ public:
    /// removes all elements from an IsList.
    void clear(bool pDestroyElements = false)
    {
-      if( pDestroyElements )
+      if(pDestroyElements)
       {
          T* nextElement;
-         for( T* it = the_first; it; it = nextElement )
+
+         for(T* it = the_first; it; it = nextElement)
          {
             nextElement = next(it);
             it->~T();
@@ -321,7 +334,7 @@ public:
        elem->next() returns the successor of \p elem in this larger
        IsList.
     */
-   T* next(const T *elem) const
+   T* next(const T* elem) const
    {
       return (elem == the_last) ? 0 : elem->next();
    }
@@ -330,13 +343,17 @@ public:
    int length() const
    {
       int num;
-      if (the_first)
+
+      if(the_first)
       {
-         T *test = the_first;
-         for (num = 1; test != the_last; test = test->next())
+         T* test = the_first;
+
+         for(num = 1; test != the_last; test = test->next())
             ++num;
+
          return num;
       }
+
       return 0;
    }
 
@@ -348,7 +365,7 @@ public:
       assert(elem != 0);
 
       for(test = the_first; test != 0; test = next(test))
-         if (test == elem)
+         if(test == elem)
             return 1;
 
       return 0;
@@ -363,16 +380,19 @@ public:
    IsList<T>sublist(const T* start = 0, const T* end = 0) const
    {
       IsList<T>part = *this;
-      if (start)
+
+      if(start)
       {
          assert(find(start));
          part.the_first = const_cast<T*>(start);
       }
-      if (end)
+
+      if(end)
       {
          assert(part.find(end));
          part.the_last = const_cast<T*>(end);
       }
+
       return part;
    }
    //@}
@@ -391,13 +411,14 @@ public:
    */
    void move(ptrdiff_t delta)
    {
-      if (the_first)
+      if(the_first)
       {
          T* elem;
          the_last  = reinterpret_cast<T*>(reinterpret_cast<char*>(the_last) + delta);
          the_first = reinterpret_cast<T*>(reinterpret_cast<char*>(the_first) + delta);
-         for (elem = first(); elem; elem = next(elem))
-            if (elem != last())
+
+         for(elem = first(); elem; elem = next(elem))
+            if(elem != last())
                elem->next() = reinterpret_cast<T*>(reinterpret_cast<char*>(elem->next()) + delta);
       }
    }
@@ -406,14 +427,16 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if (first() != 0 && last() == 0)
+
+      if(first() != 0 && last() == 0)
          return MSGinconsistent("IsList");
 
-      if (first() == 0 && last() != 0)
+      if(first() == 0 && last() != 0)
          return MSGinconsistent("IsList");
 
-      if (first() && find(last()) == 0)
+      if(first() && find(last()) == 0)
          return MSGinconsistent("IsList");
+
 #endif
 
       return true;
@@ -434,7 +457,7 @@ public:
       , the_last(plast)
       , destroyElements(pDestroyElements)
    {
-      if (pfirst)
+      if(pfirst)
       {
          assert(plast != 0);
          assert(find(plast));

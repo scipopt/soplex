@@ -56,7 +56,7 @@ int main()
    stat = mysoplex.optimize();
 
    /* get solution */
-   if( stat == SPxSolver::OPTIMAL )
+   if(stat == SPxSolver::OPTIMAL)
    {
       mysoplex.getPrimalReal(prim);
       mysoplex.getDualReal(dual);

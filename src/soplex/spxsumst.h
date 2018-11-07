@@ -56,13 +56,13 @@ public:
       m_name = "Sum";
    }
    /// copy constructor
-   SPxSumST( const SPxSumST& old)
+   SPxSumST(const SPxSumST& old)
       : SPxVectorST(old)
    {
       assert(isConsistent());
    }
    /// assignment operator
-   SPxSumST& operator=( const SPxSumST& rhs)
+   SPxSumST& operator=(const SPxSumST& rhs)
    {
       if(this != &rhs)
       {

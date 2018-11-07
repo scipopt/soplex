@@ -55,34 +55,34 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
    int  j;
 
    // PARALLEL the j loop could be parallelized
-   if (val > 0)
+   if(val > 0)
    {
       // Loop over NZEs of delta vector.
-      for( j = 0; j < idx.size(); ++j)
+      for(j = 0; j < idx.size(); ++j)
       {
          i = idx.index(j);
          x = upd[i];
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
-            if (ub[i] < infinity)
+            if(ub[i] < infinity)
             {
                Real y = (ub[i] - vec[i] + delta) / x;
 
-               if (y < val)
+               if(y < val)
                {
                   leave = i;
                   val   = y;
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
-            if (lb[i] > -infinity)
+            if(lb[i] > -infinity)
             {
                Real y = (lb[i] - vec[i] - delta) / x;
 
-               if (y < val)
+               if(y < val)
                {
                   leave = i;
                   val   = y;
@@ -90,7 +90,8 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
             }
          }
       }
-      if (leave >= 0)
+
+      if(leave >= 0)
       {
          x   = upd[leave];
 
@@ -98,8 +99,8 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          // selected leaving variable is (at most delta) beyond its bound. (This
          // happens for instance on LP/netlib/adlittle.mps with setting -r -t0.)
          // In that case we do a pivot step with length zero to avoid difficulties.
-         if ( ( x > epsilon  && vec[leave] >= ub[leave] ) ||
-              ( x < -epsilon && vec[leave] <= lb[leave] ) )
+         if((x > epsilon  && vec[leave] >= ub[leave]) ||
+               (x < -epsilon && vec[leave] <= lb[leave]))
          {
             val = 0.0;
          }
@@ -110,35 +111,35 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          }
       }
 
-      ASSERT_WARN( "WDEFRT01", val > -epsilon );
+      ASSERT_WARN("WDEFRT01", val > -epsilon);
    }
    else
    {
-      for( j = 0; j < idx.size(); ++j)
+      for(j = 0; j < idx.size(); ++j)
       {
          i = idx.index(j);
          x = upd[i];
 
-         if (x < -epsilon)
+         if(x < -epsilon)
          {
-            if (ub[i] < infinity)
+            if(ub[i] < infinity)
             {
                Real y = (ub[i] - vec[i] + delta) / x;
 
-               if (y > val)
+               if(y > val)
                {
                   leave = i;
                   val   = y;
                }
             }
          }
-         else if (x > epsilon)
+         else if(x > epsilon)
          {
-            if (lb[i] > -infinity)
+            if(lb[i] > -infinity)
             {
                Real y = (lb[i] - vec[i] - delta) / x;
 
-               if (y > val)
+               if(y > val)
                {
                   leave = i;
                   val   = y;
@@ -146,13 +147,14 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
             }
          }
       }
-      if (leave >= 0)
+
+      if(leave >= 0)
       {
          x   = upd[leave];
 
          // See comment above.
-         if ( ( x < -epsilon && vec[leave] >= ub[leave] ) ||
-              ( x > epsilon  && vec[leave] <= lb[leave] ) )
+         if((x < -epsilon && vec[leave] >= ub[leave]) ||
+               (x > epsilon  && vec[leave] <= lb[leave]))
          {
             val = 0.0;
          }
@@ -163,8 +165,9 @@ int SPxDefaultRT::selectLeave(Real& val, Real, bool)
          }
       }
 
-      ASSERT_WARN( "WDEFRT02", val < epsilon );
+      ASSERT_WARN("WDEFRT02", val < epsilon);
    }
+
    return leave;
 }
 
@@ -200,20 +203,20 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
    Real  x;
 
    // PARALLEL the j loops could be parallelized
-   if (val > 0)
+   if(val > 0)
    {
-      for( j = 0; j < pidx.size(); ++j )
+      for(j = 0; j < pidx.size(); ++j)
       {
          i = pidx.index(j);
          x = pupd[i];
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
-            if (upb[i] < infinity)
+            if(upb[i] < infinity)
             {
                Real y = (upb[i] - pvec[i] + delta) / x;
 
-               if (y < val)
+               if(y < val)
                {
                   enterId = solver()->id(i);
                   val     = y;
@@ -221,13 +224,13 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
-            if (lpb[i] > -infinity)
+            if(lpb[i] > -infinity)
             {
                Real y = (lpb[i] - pvec[i] - delta) / x;
 
-               if (y < val)
+               if(y < val)
                {
                   enterId = solver()->id(i);
                   val     = y;
@@ -236,18 +239,19 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
             }
          }
       }
-      for( j = 0; j < cidx.size(); ++j )
+
+      for(j = 0; j < cidx.size(); ++j)
       {
          i = cidx.index(j);
          x = cupd[i];
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
-            if (ucb[i] < infinity)
+            if(ucb[i] < infinity)
             {
                Real y = (ucb[i] - cvec[i] + delta) / x;
 
-               if (y < val)
+               if(y < val)
                {
                   enterId = solver()->coId(i);
                   val     = y;
@@ -255,13 +259,13 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
-            if (lcb[i] > -infinity)
+            if(lcb[i] > -infinity)
             {
                Real y = (lcb[i] - cvec[i] - delta) / x;
 
-               if (y < val)
+               if(y < val)
                {
                   enterId = solver()->coId(i);
                   val     = y;
@@ -270,14 +274,15 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
             }
          }
       }
-      if (cnum >= 0)
+
+      if(cnum >= 0)
       {
          i   = cidx.index(cnum);
          x   = cupd[i];
          val = (x > epsilon) ? ucb[i] : lcb[i];
          val = (val - cvec[i]) / x;
       }
-      else if (pnum >= 0)
+      else if(pnum >= 0)
       {
          i   = pidx.index(pnum);
          x   = pupd[i];
@@ -287,18 +292,18 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
    }
    else
    {
-      for( j = 0; j < pidx.size(); ++j )
+      for(j = 0; j < pidx.size(); ++j)
       {
          i = pidx.index(j);
          x = pupd[i];
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
-            if (lpb[i] > -infinity)
+            if(lpb[i] > -infinity)
             {
                Real y = (lpb[i] - pvec[i] - delta) / x;
 
-               if (y > val)
+               if(y > val)
                {
                   enterId = solver()->id(i);
                   val     = y;
@@ -306,13 +311,13 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
-            if (upb[i] < infinity)
+            if(upb[i] < infinity)
             {
                Real y = (upb[i] - pvec[i] + delta) / x;
 
-               if (y > val)
+               if(y > val)
                {
                   enterId = solver()->id(i);
                   val     = y;
@@ -321,18 +326,19 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
             }
          }
       }
-      for( j = 0; j < cidx.size(); ++j )
+
+      for(j = 0; j < cidx.size(); ++j)
       {
          i = cidx.index(j);
          x = cupd[i];
 
-         if (x > epsilon)
+         if(x > epsilon)
          {
-            if (lcb[i] > -infinity)
+            if(lcb[i] > -infinity)
             {
                Real y = (lcb[i] - cvec[i] - delta) / x;
 
-               if (y > val)
+               if(y > val)
                {
                   enterId = solver()->coId(i);
                   val     = y;
@@ -340,13 +346,13 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
                }
             }
          }
-         else if (x < -epsilon)
+         else if(x < -epsilon)
          {
-            if (ucb[i] < infinity)
+            if(ucb[i] < infinity)
             {
                Real y = (ucb[i] - cvec[i] + delta) / x;
 
-               if (y > val)
+               if(y > val)
                {
                   enterId = solver()->coId(i);
                   val     = y;
@@ -355,14 +361,15 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
             }
          }
       }
-      if (cnum >= 0)
+
+      if(cnum >= 0)
       {
          i   = cidx.index(cnum);
          x   = cupd[i];
          val = (x < epsilon) ? ucb[i] : lcb[i];
          val = (val - cvec[i]) / x;
       }
-      else if (pnum >= 0)
+      else if(pnum >= 0)
       {
          i   = pidx.index(pnum);
          x   = pupd[i];
@@ -371,22 +378,25 @@ SPxId SPxDefaultRT::selectEnter(Real& max, int, bool)
       }
    }
 
-   if (enterId.isValid() && solver()->isBasic(enterId))
+   if(enterId.isValid() && solver()->isBasic(enterId))
    {
-      MSG_DEBUG( std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
-                        << std::endl; )
-      if (cnum >= 0)
+      MSG_DEBUG(std::cout << "DDEFRT01 isValid() && isBasic(): max=" << max
+                << std::endl;)
+
+      if(cnum >= 0)
          solver()->coPvec().delta().clearNum(cnum);
-      else if( pnum >= 0 )
+      else if(pnum >= 0)
          solver()->pVec().delta().clearNum(pnum);
+
       return SPxDefaultRT::selectEnter(max, 0, false);
    }
 
    MSG_DEBUG(
-      if( !enterId.isValid() )
-         std::cout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;
+
+      if(!enterId.isValid())
+      std::cout << "DDEFRT02 !isValid(): max=" << max << ", x=" << x << std::endl;
    )
-   max = val;
+      max = val;
 
    return enterId;
 }

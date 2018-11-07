@@ -71,12 +71,12 @@ protected:
    public:
       /// constructor
       IdxCompare()
-      : elements(0)
+         : elements(0)
       {}
 
       const IdxElement*  elements;
 
-      Real operator() (
+      Real operator()(
          IdxElement      a,
          IdxElement      b
       ) const
@@ -219,7 +219,7 @@ public:
    /**@name Extension */
    //@{
    /// \p n vectors have been added to loaded LP.
-   virtual void addedVecs (int /*n*/)
+   virtual void addedVecs(int /*n*/)
    {}
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int /*n*/)
@@ -274,7 +274,7 @@ public:
    {}
 
    /// assignment operator
-   SPxPricer& operator=( const SPxPricer& rhs)
+   SPxPricer& operator=(const SPxPricer& rhs)
    {
       if(this != &rhs)
       {

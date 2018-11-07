@@ -77,8 +77,9 @@ public:
       memsize = (d > 0) ? d : 4;
 
       spx_alloc(mem, memsize);
-      for( int i = 0; i < memsize; i++ )
-         new (&(mem[i])) R();
+
+      for(int i = 0; i < memsize; i++)
+         new(&(mem[i])) R();
 
       VectorBase<R>::val = mem;
       VectorBase<R>::dimen = d;
@@ -97,10 +98,11 @@ public:
 
       spx_alloc(mem, memsize);
 
-      for( int i = 0; i < VectorBase<R>::dimen; i++ )
-         new (&(mem[i])) R(old[i]);
-      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
-         new (&(mem[i])) R();
+      for(int i = 0; i < VectorBase<R>::dimen; i++)
+         new(&(mem[i])) R(old[i]);
+
+      for(int i = VectorBase<R>::dimen; i < memsize; i++)
+         new(&(mem[i])) R();
 
       VectorBase<R>::val = mem;
 
@@ -120,10 +122,11 @@ public:
 
       spx_alloc(mem, memsize);
 
-      for( int i = 0; i < VectorBase<R>::dimen; i++ )
-         new (&(mem[i])) R(old[i]);
-      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
-         new (&(mem[i])) R();
+      for(int i = 0; i < VectorBase<R>::dimen; i++)
+         new(&(mem[i])) R(old[i]);
+
+      for(int i = VectorBase<R>::dimen; i < memsize; i++)
+         new(&(mem[i])) R();
 
       VectorBase<R>::val = mem;
 
@@ -141,10 +144,11 @@ public:
 
       spx_alloc(mem, memsize);
 
-      for( int i = 0; i < VectorBase<R>::dimen; i++ )
-         new (&(mem[i])) R(old[i]);
-      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
-         new (&(mem[i])) R();
+      for(int i = 0; i < VectorBase<R>::dimen; i++)
+         new(&(mem[i])) R(old[i]);
+
+      for(int i = VectorBase<R>::dimen; i < memsize; i++)
+         new(&(mem[i])) R();
 
       VectorBase<R>::val = mem;
 
@@ -154,9 +158,9 @@ public:
    /// Assignment operator.
    DVectorBase<R>& operator=(const VectorBase<R>& vec)
    {
-      if( (VectorBase<R>*)this != &vec )
+      if((VectorBase<R>*)this != &vec)
       {
-         if( vec.dim() != VectorBase<R>::dim() )
+         if(vec.dim() != VectorBase<R>::dim())
             reDim(vec.dim());
 
          VectorBase<R>::operator=(vec);
@@ -171,9 +175,9 @@ public:
    template < class S >
    DVectorBase<R>& operator=(const VectorBase<S>& vec)
    {
-      if( (VectorBase<S>*)this != &vec )
+      if((VectorBase<S>*)this != &vec)
       {
-         if( vec.dim() != VectorBase<R>::dim() )
+         if(vec.dim() != VectorBase<R>::dim())
             reDim(vec.dim());
 
          VectorBase<R>::operator=(vec);
@@ -187,9 +191,9 @@ public:
    /// Assignment operator.
    DVectorBase<R>& operator=(const DVectorBase<R>& vec)
    {
-      if( this != &vec )
+      if(this != &vec)
       {
-         if( vec.dim() != VectorBase<R>::dim() )
+         if(vec.dim() != VectorBase<R>::dim())
             reDim(vec.dim());
 
          VectorBase<R>::operator=(vec);
@@ -204,9 +208,9 @@ public:
    template < class S >
    DVectorBase<R>& operator=(const DVectorBase<S>& vec)
    {
-      if( this != (const DVectorBase<R>*)&vec )
+      if(this != (const DVectorBase<R>*)&vec)
       {
-         if( vec.dim() != VectorBase<R>::dim() )
+         if(vec.dim() != VectorBase<R>::dim())
             reDim(vec.dim());
 
          VectorBase<R>::operator=(vec);
@@ -224,9 +228,9 @@ public:
    /// Destructor.
    virtual ~DVectorBase<R>()
    {
-      if( mem != 0 )
+      if(mem != 0)
       {
-         for( int i = memsize-1; i >= 0; i-- )
+         for(int i = memsize - 1; i >= 0; i--)
             mem[i].~R();
 
          spx_free(mem);
@@ -246,16 +250,16 @@ public:
    }
 
    /// Resets \ref soplex::DVectorBase "DVectorBase"'s dimension to \p newdim.
-   void reDim(int newdim, const bool setZero = true )
+   void reDim(int newdim, const bool setZero = true)
    {
       assert(memsize >= 0);
 
-      if( newdim > memsize )
+      if(newdim > memsize)
          reSize(int(newdim + 0.2 * memsize));
 
-      if( setZero )
+      if(setZero)
       {
-         for( int i = VectorBase<R>::dimen; i < newdim; i++ )
+         for(int i = VectorBase<R>::dimen; i < newdim; i++)
             mem[i] = 0;
       }
 
@@ -273,15 +277,16 @@ public:
 
       /* call copy constructor for first elements */
       int i;
-      for( i = 0; i < VectorBase<R>::dim(); i++ )
-         new (&(newmem[i])) R(mem[i]);
+
+      for(i = 0; i < VectorBase<R>::dim(); i++)
+         new(&(newmem[i])) R(mem[i]);
 
       /* call default constructor for remaining elements */
-      for( ; i < newsize; i++ )
-         new (&(newmem[i])) R();
+      for(; i < newsize; i++)
+         new(&(newmem[i])) R();
 
       /* free old memory */
-      for( i = memsize-1; i >= 0; i-- )
+      for(i = memsize - 1; i >= 0; i--)
          mem[i].~R();
 
       spx_free(mem);
@@ -302,7 +307,8 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( VectorBase<R>::val != mem || VectorBase<R>::dimen > memsize || VectorBase<R>::dimen < 0 )
+
+      if(VectorBase<R>::val != mem || VectorBase<R>::dimen > memsize || VectorBase<R>::dimen < 0)
          return MSGinconsistent("DVectorBase");
 
       return VectorBase<R>::isConsistent();
@@ -354,7 +360,7 @@ template<>
 inline
 DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
    : VectorBase<Real>(0, 0)
-   , mem( 0 )
+   , mem(0)
 {
    dimen = old.dim();
    memsize = dimen;

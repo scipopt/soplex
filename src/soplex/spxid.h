@@ -118,21 +118,22 @@ public:
    /// assignment operator
    SPxId& operator=(const SPxId& id)
    {
-      if (this != &id)
-         DataKey::operator= ( id );
+      if(this != &id)
+         DataKey::operator= (id);
+
       return *this;
    }
    /// assignment operator
    SPxId& operator=(const SPxColId& cid)
    {
-      DataKey::operator= ( cid );
+      DataKey::operator= (cid);
       info = COL_ID;
       return *this;
    }
    /// assignment operator
    SPxId& operator=(const SPxRowId& rid)
    {
-      DataKey::operator= ( rid );
+      DataKey::operator= (rid);
       info = ROW_ID;
       return *this;
    }

@@ -42,7 +42,8 @@
 #define GZSTREAM_NAMESPACE gzstream
 
 #ifdef GZSTREAM_NAMESPACE
-namespace GZSTREAM_NAMESPACE {
+namespace GZSTREAM_NAMESPACE
+{
 #endif
 
 // ----------------------------------------------------------------------------
@@ -65,7 +66,7 @@ private:
    /**@name Types */
    //@{
    ///
-   static const int bufferSize = 47+256;   ///< size of data buff
+   static const int bufferSize = 47 + 256; ///< size of data buff
    // totals 512 bytes under g++ for igzstream at the end.
    //@}
 
@@ -96,10 +97,10 @@ public:
       , opened(0)
       , mode(0)
    {
-      setp( buffer, buffer + (bufferSize-1));
-      setg( buffer + 4,     // beginning of putback area
-            buffer + 4,     // read position
-            buffer + 4);    // end position
+      setp(buffer, buffer + (bufferSize - 1));
+      setg(buffer + 4,      // beginning of putback area
+           buffer + 4,     // read position
+           buffer + 4);    // end position
       // ASSERT: both input & output capabilities will not be used together
    }
    /// destructor
@@ -118,11 +119,11 @@ public:
       return opened;
    }
    ///
-   gzstreambuf* open( const char* name, int open_mode );
+   gzstreambuf* open(const char* name, int open_mode);
    ///
    gzstreambuf* close();
    ///
-   virtual int     overflow( int c = EOF );
+   virtual int     overflow(int c = EOF);
    ///
    virtual int     underflow();
    ///
@@ -160,7 +161,7 @@ public:
       init(&buf);
    }
    /// full constructor
-   gzstreambase( const char* _name, int _open_mode );
+   gzstreambase(const char* _name, int _open_mode);
    /// destructor
    ~gzstreambase();
    //@}
@@ -169,7 +170,7 @@ public:
    /**@name Interface */
    //@{
    ///
-   void open( const char* _name, int _open_mode );
+   void open(const char* _name, int _open_mode);
    ///
    void close();
    ///
@@ -204,13 +205,13 @@ public:
    //@{
    /// default constructor
    igzstream()
-      : std::istream( &buf)
+      : std::istream(&buf)
    {}
    /// full constructor
-   igzstream( const char*  _name,
-              int          _open_mode = std::ios::in )
-      : std::istream( &buf )
-      , gzstreambase( _name, _open_mode )
+   igzstream(const char*  _name,
+             int          _open_mode = std::ios::in)
+      : std::istream(&buf)
+      , gzstreambase(_name, _open_mode)
    {}
    //@}
 
@@ -223,10 +224,10 @@ public:
       return gzstreambase::rdbuf();
    }
    ///
-   void open( const char*  _name,
-              int          _open_mode = std::ios::in )
+   void open(const char*  _name,
+             int          _open_mode = std::ios::in)
    {
-       gzstreambase::open( _name, _open_mode );
+      gzstreambase::open(_name, _open_mode);
    }
    //@}
 };
@@ -249,14 +250,14 @@ public:
    //@{
    /// default constructor
    ogzstream()
-      : std::ostream( &buf)
+      : std::ostream(&buf)
    {}
    /// full constructor
    explicit
-   ogzstream( const char* _name,
-              int         _open_mode = std::ios::out )
-      : gzstreambase( _name, _open_mode )
-      , std::ostream( &buf)
+   ogzstream(const char* _name,
+             int         _open_mode = std::ios::out)
+      : gzstreambase(_name, _open_mode)
+      , std::ostream(&buf)
    {}
    //@}
 
@@ -269,10 +270,10 @@ public:
       return gzstreambase::rdbuf();
    }
    ///
-   void open( const char*  _name,
-              int          _open_mode = std::ios::out )
+   void open(const char*  _name,
+             int          _open_mode = std::ios::out)
    {
-      gzstreambase::open( _name, _open_mode );
+      gzstreambase::open(_name, _open_mode);
    }
 };
 

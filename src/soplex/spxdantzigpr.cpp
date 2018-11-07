@@ -28,7 +28,7 @@ int SPxDantzigPR::selectLeave()
 {
    assert(thesolver != 0);
 
-   if( thesolver->sparsePricingLeave )
+   if(thesolver->sparsePricingLeave)
       return selectLeaveSparse();
 
    //    const Real* up  = thesolver->ubBound();
@@ -41,16 +41,17 @@ int SPxDantzigPR::selectLeave()
    {
       Real x = thesolver->fTest()[i];
 
-      if (x < -theeps)
+      if(x < -theeps)
       {
          // x *= EQ_PREF * (1 + (up[i] == low[i]));
-         if (x < best)
+         if(x < best)
          {
             n    = i;
             best = x;
          }
       }
    }
+
    return n;
 }
 
@@ -67,9 +68,10 @@ int SPxDantzigPR::selectLeaveSparse()
    {
       index = thesolver->infeasibilities.index(i);
       x = thesolver->fTest()[index];
-      if (x < -theeps)
+
+      if(x < -theeps)
       {
-         if (x < best)
+         if(x < best)
          {
             n    = index;
             best = x;
@@ -82,6 +84,7 @@ int SPxDantzigPR::selectLeaveSparse()
          thesolver->isInfeasible[index] = 0;
       }
    }
+
    return n;
 }
 
@@ -107,34 +110,36 @@ SPxId SPxDantzigPR::selectEnterX()
 
    best = -theeps;
    bestCo = -theeps;
-   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best,enterId) : selectEnterDenseDim(best,enterId);
-   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo,enterId) : selectEnterDenseCoDim(bestCo,enterId);
+   enterId = (thesolver->sparsePricingEnter) ? selectEnterSparseDim(best,
+             enterId) : selectEnterDenseDim(best, enterId);
+   enterIdCo = (thesolver->sparsePricingEnterCo) ? selectEnterSparseCoDim(bestCo,
+               enterId) : selectEnterDenseCoDim(bestCo, enterId);
 
    // prefer slack indices to reduce nonzeros in basis matrix
-   if( enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()) )
+   if(enterId.isValid() && (best > SPARSITY_TRADEOFF * bestCo || !enterIdCo.isValid()))
       return enterId;
    else
       return enterIdCo;
 }
 
 
-SPxId SPxDantzigPR::selectEnterSparseDim(Real& best,SPxId& enterId)
+SPxId SPxDantzigPR::selectEnterSparseDim(Real& best, SPxId& enterId)
 {
    assert(thesolver != 0);
 
    int idx;
    Real x;
 
-   for (int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
+   for(int i = thesolver->infeasibilities.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilities.index(i);
       x = thesolver->coTest()[idx];
 
-      if (x < -theeps)
+      if(x < -theeps)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
-         if (x < best)
+         if(x < best)
          {
             enterId = thesolver->coId(idx);
             best = x;
@@ -148,26 +153,27 @@ SPxId SPxDantzigPR::selectEnterSparseDim(Real& best,SPxId& enterId)
          thesolver->isInfeasible[idx] = 0;
       }
    }
+
    return enterId;
 }
 
-SPxId SPxDantzigPR::selectEnterSparseCoDim(Real& best,SPxId& enterId)
+SPxId SPxDantzigPR::selectEnterSparseCoDim(Real& best, SPxId& enterId)
 {
    assert(thesolver != 0);
 
    int idx;
    Real x;
 
-   for (int i = thesolver->infeasibilitiesCo.size() - 1; i >= 0; --i)
+   for(int i = thesolver->infeasibilitiesCo.size() - 1; i >= 0; --i)
    {
       idx = thesolver->infeasibilitiesCo.index(i);
       x = thesolver->test()[idx];
 
-      if (x < -theeps)
+      if(x < -theeps)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
-         if (x < best)
+         if(x < best)
          {
             enterId = thesolver->id(idx);
             best = x;
@@ -180,54 +186,57 @@ SPxId SPxDantzigPR::selectEnterSparseCoDim(Real& best,SPxId& enterId)
          thesolver->isInfeasibleCo[idx] = 0;
       }
    }
+
    return enterId;
 }
 
-SPxId SPxDantzigPR::selectEnterDenseDim(Real& best,SPxId& enterId)
+SPxId SPxDantzigPR::selectEnterDenseDim(Real& best, SPxId& enterId)
 {
    assert(thesolver != 0);
 
    Real x;
 
-   for (int i = thesolver->dim() - 1; i >= 0; --i)
+   for(int i = thesolver->dim() - 1; i >= 0; --i)
    {
       x = thesolver->coTest()[i];
 
-      if (x < -theeps)
+      if(x < -theeps)
       {
          // x *= EQ_PREF * (1 + (ds.coStatus(i) == SPxBasis::Desc::P_FREE
          //                || ds.coStatus(i) == SPxBasis::Desc::D_FREE));
-         if (x < best)
+         if(x < best)
          {
             enterId   = thesolver->coId(i);
             best = x;
          }
       }
    }
+
    return enterId;
 }
 
-SPxId SPxDantzigPR::selectEnterDenseCoDim(Real& best,SPxId& enterId)
+SPxId SPxDantzigPR::selectEnterDenseCoDim(Real& best, SPxId& enterId)
 {
    assert(thesolver != 0);
 
    Real x;
 
-   for (int i = thesolver->coDim() - 1; i >= 0; --i)
+   for(int i = thesolver->coDim() - 1; i >= 0; --i)
    {
       x = thesolver->test()[i];
 
-      if (x < -theeps)
+      if(x < -theeps)
       {
          // x *= EQ_PREF * (1 + (ds.status(i) == SPxBasis::Desc::P_FREE
          //                || ds.status(i) == SPxBasis::Desc::D_FREE));
-         if (x < best)
+         if(x < best)
          {
             enterId   = thesolver->id(i);
             best = x;
          }
       }
    }
+
    return enterId;
 }
 

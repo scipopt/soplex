@@ -28,14 +28,14 @@ namespace soplex
 void SPxSolver::addedRows(int n)
 {
 
-   if( n > 0 )
+   if(n > 0)
    {
       SPxLP::addedRows(n);
 
       unInit();
       reDim();
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
          SPxBasis::addedRows(n);
    }
 
@@ -45,14 +45,14 @@ void SPxSolver::addedRows(int n)
 void SPxSolver::addedCols(int n)
 {
 
-   if( n > 0 )
+   if(n > 0)
    {
       SPxLP::addedCols(n);
 
       unInit();
       reDim();
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
          SPxBasis::addedCols(n);
    }
 
@@ -66,18 +66,21 @@ void SPxSolver::doRemoveRow(int i)
 
    unInit();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedRow(i);
-      switch (SPxBasis::status())
+
+      switch(SPxBasis::status())
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
          setBasisStatus(SPxBasis::REGULAR);
          break;
+
       case SPxBasis::OPTIMAL:
          setBasisStatus(SPxBasis::PRIMAL);
          break;
+
       default:
          break;
       }
@@ -91,18 +94,21 @@ void SPxSolver::doRemoveRows(int perm[])
 
    unInit();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedRows(perm);
-      switch (SPxBasis::status())
+
+      switch(SPxBasis::status())
       {
       case SPxBasis::DUAL:
       case SPxBasis::INFEASIBLE:
          setBasisStatus(SPxBasis::REGULAR);
          break;
+
       case SPxBasis::OPTIMAL:
          setBasisStatus(SPxBasis::PRIMAL);
          break;
+
       default:
          break;
       }
@@ -117,18 +123,21 @@ void SPxSolver::doRemoveCol(int i)
 
    unInit();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedCol(i);
-      switch (SPxBasis::status())
+
+      switch(SPxBasis::status())
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
          setBasisStatus(SPxBasis::REGULAR);
          break;
+
       case SPxBasis::OPTIMAL:
          setBasisStatus(SPxBasis::DUAL);
          break;
+
       default:
          break;
       }
@@ -143,18 +152,21 @@ void SPxSolver::doRemoveCols(int perm[])
 
    unInit();
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       removedCols(perm);
-      switch (SPxBasis::status())
+
+      switch(SPxBasis::status())
       {
       case SPxBasis::PRIMAL:
       case SPxBasis::UNBOUNDED:
          setBasisStatus(SPxBasis::REGULAR);
          break;
+
       case SPxBasis::OPTIMAL:
          setBasisStatus(SPxBasis::DUAL);
          break;
+
       default:
          break;
       }
@@ -240,73 +252,88 @@ void SPxSolver::changeLowerStatus(int i, Real newLower, Real oldLower)
    Real                    currUpper = upper(i);
    Real                    objChange = 0.0;
 
-   MSG_DEBUG( std::cout << "DCHANG01 changeLowerStatus(): col " << i
-                     << "[" << newLower << ":" << currUpper << "] " << stat; )
+   MSG_DEBUG(std::cout << "DCHANG01 changeLowerStatus(): col " << i
+             << "[" << newLower << ":" << currUpper << "] " << stat;)
 
-   switch (stat)
+   switch(stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newLower <= -infinity)
+      if(newLower <= -infinity)
       {
-         if (currUpper >= infinity)
+         if(currUpper >= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = -theLCbound[i] * oldLower;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_UPPER;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = (theUCbound[i] * currUpper) - (theLCbound[i] * oldLower);
          }
       }
-      else if( EQ(newLower, currUpper) )
+      else if(EQ(newLower, currUpper))
       {
          stat = SPxBasis::Desc::P_FIXED;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = maxObj(i) * (newLower - oldLower);
       }
-      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
+      else if(m_nonbasicValueUpToDate && rep() == COLUMN)
          objChange = theLCbound[i] * (newLower - oldLower);
+
       break;
+
    case SPxBasis::Desc::P_ON_UPPER:
-      if( EQ(newLower, currUpper) )
+      if(EQ(newLower, currUpper))
          stat = SPxBasis::Desc::P_FIXED;
+
       break;
+
    case SPxBasis::Desc::P_FREE:
-      if (newLower > -infinity)
+      if(newLower > -infinity)
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = theLCbound[i] * newLower;
       }
+
       break;
+
    case SPxBasis::Desc::P_FIXED:
-      if( NE(newLower, currUpper) )
+      if(NE(newLower, currUpper))
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         if( isInitialized() )
+
+         if(isInitialized())
             theUCbound[i] = maxObj(i);
       }
+
       break;
+
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
-      if( rep() == ROW && theShift > 0.0 )
+      if(rep() == ROW && theShift > 0.0)
          forceRecompNonbasicValue();
+
       stat = dualColStatus(i);
       break;
+
    default:
       throw SPxInternalCodeException("XCHANG01 This should never happen.");
    }
 
-   MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
+   MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
-   if( rep() == COLUMN )
+   if(rep() == COLUMN)
       updateNonbasicValue(objChange);
 }
 
@@ -317,9 +344,9 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
 
    SPxLP::changeLower(newLower, scale);
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = 0; i < newLower.dim(); ++i)
+      for(int i = 0; i < newLower.dim(); ++i)
          changeLowerStatus(i, lower(i));
 
       unInit();
@@ -328,14 +355,14 @@ void SPxSolver::changeLower(const Vector& newLower, bool scale)
 
 void SPxSolver::changeLower(int i, const Real& newLower, bool scale)
 {
-   if( newLower != (scale ? lowerUnscaled(i) : lower(i)) )
+   if(newLower != (scale ? lowerUnscaled(i) : lower(i)))
    {
       Real oldLower = lower(i);
       // This has to be done before calling changeLowerStatus() because that is calling
       // basis.dualColStatus() which calls lower() and needs the changed value.
       SPxLP::changeLower(i, newLower, scale);
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
          changeLowerStatus(i, lower(i), oldLower);
          unInit();
@@ -349,72 +376,88 @@ void SPxSolver::changeUpperStatus(int i, Real newUpper, Real oldUpper)
    Real                    currLower = lower(i);
    Real                    objChange = 0.0;
 
-   MSG_DEBUG( std::cout << "DCHANG02 changeUpperStatus(): col " << i
-                     << "[" << currLower << ":" << newUpper << "] " << stat; )
+   MSG_DEBUG(std::cout << "DCHANG02 changeUpperStatus(): col " << i
+             << "[" << currLower << ":" << newUpper << "] " << stat;)
 
-   switch (stat)
+   switch(stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newUpper == currLower)
+      if(newUpper == currLower)
          stat = SPxBasis::Desc::P_FIXED;
+
       break;
+
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newUpper >= infinity)
+      if(newUpper >= infinity)
       {
-         if (currLower <= -infinity)
+         if(currLower <= -infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = -theUCbound[i] * oldUpper;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_LOWER;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = (theLCbound[i] * currLower) - (theUCbound[i] * oldUpper);
          }
       }
-      else if (EQ(newUpper, currLower))
+      else if(EQ(newUpper, currLower))
       {
          stat = SPxBasis::Desc::P_FIXED;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = maxObj(i) * (newUpper - oldUpper);
       }
-      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
+      else if(m_nonbasicValueUpToDate && rep() == COLUMN)
          objChange = theUCbound[i] * (newUpper - oldUpper);
+
       break;
+
    case SPxBasis::Desc::P_FREE:
-      if (newUpper < infinity)
+      if(newUpper < infinity)
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = theUCbound[i] * newUpper;
       }
+
       break;
+
    case SPxBasis::Desc::P_FIXED:
-      if( NE(newUpper, currLower) )
+      if(NE(newUpper, currLower))
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         if( isInitialized() )
+
+         if(isInitialized())
             theLCbound[i] = maxObj(i);
       }
+
       break;
+
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
-      if( rep() == ROW && theShift > 0.0 )
+      if(rep() == ROW && theShift > 0.0)
          forceRecompNonbasicValue();
+
       stat = dualColStatus(i);
       break;
+
    default:
       throw SPxInternalCodeException("XCHANG02 This should never happen.");
    }
-   MSG_DEBUG( std::cout << " -> " << stat << std::endl; );
+
+   MSG_DEBUG(std::cout << " -> " << stat << std::endl;);
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
-   if( rep() == COLUMN )
+   if(rep() == COLUMN)
       updateNonbasicValue(objChange);
 }
 
@@ -425,9 +468,9 @@ void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
 
    SPxLP::changeUpper(newUpper, scale);
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = 0; i < newUpper.dim(); ++i)
+      for(int i = 0; i < newUpper.dim(); ++i)
          changeUpperStatus(i, upper(i));
 
       unInit();
@@ -436,12 +479,12 @@ void SPxSolver::changeUpper(const Vector& newUpper, bool scale)
 
 void SPxSolver::changeUpper(int i, const Real& newUpper, bool scale)
 {
-   if( newUpper != (scale ? upperUnscaled(i) : upper(i)) )
+   if(newUpper != (scale ? upperUnscaled(i) : upper(i)))
    {
       Real oldUpper = upper(i);
       SPxLP::changeUpper(i, newUpper, scale);
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
          changeUpperStatus(i, upper(i), oldUpper);
          unInit();
@@ -467,71 +510,88 @@ void SPxSolver::changeLhsStatus(int i, Real newLhs, Real oldLhs)
    Real                    currRhs   = rhs(i);
    Real                    objChange = 0.0;
 
-   MSG_DEBUG( std::cout << "DCHANG03 changeLhsStatus()  : row " << i
-                     << ": " << stat; )
-   switch (stat)
+   MSG_DEBUG(std::cout << "DCHANG03 changeLhsStatus()  : row " << i
+             << ": " << stat;)
+
+   switch(stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
-      if (newLhs <= -infinity)
+      if(newLhs <= -infinity)
       {
-         if (currRhs >= infinity)
+         if(currRhs >= infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = -theURbound[i] * oldLhs;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_UPPER;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = (theLRbound[i] * currRhs) - (theURbound[i] * oldLhs);
          }
       }
-      else if( EQ(newLhs, currRhs) )
+      else if(EQ(newLhs, currRhs))
       {
          stat = SPxBasis::Desc::P_FIXED;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = maxRowObj(i) * (newLhs - oldLhs);
       }
-      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
+      else if(m_nonbasicValueUpToDate && rep() == COLUMN)
          objChange = theURbound[i] * (newLhs - oldLhs);
+
       break;
+
    case SPxBasis::Desc::P_ON_UPPER:
-      if( EQ(newLhs, currRhs) )
+      if(EQ(newLhs, currRhs))
          stat = SPxBasis::Desc::P_FIXED;
+
       break;
+
    case SPxBasis::Desc::P_FREE:
-      if (newLhs > -infinity)
+      if(newLhs > -infinity)
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = theURbound[i] * newLhs;
       }
+
       break;
+
    case SPxBasis::Desc::P_FIXED:
-      if( NE(newLhs, currRhs) )
+      if(NE(newLhs, currRhs))
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         if( isInitialized() )
+
+         if(isInitialized())
             theLRbound[i] = maxRowObj(i);
       }
+
       break;
+
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
-      if( rep() == ROW && theShift > 0.0 )
+      if(rep() == ROW && theShift > 0.0)
          forceRecompNonbasicValue();
+
       stat = dualRowStatus(i);
       break;
+
    default:
       throw SPxInternalCodeException("XCHANG03 This should never happen.");
    }
-   MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
+
+   MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
-   if( rep() == COLUMN )
+   if(rep() == COLUMN)
       updateNonbasicValue(objChange);
 }
 
@@ -542,9 +602,9 @@ void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
 
    SPxLP::changeLhs(newLhs, scale);
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = 0; i < nRows(); ++i)
+      for(int i = 0; i < nRows(); ++i)
          changeLhsStatus(i, lhs(i));
 
       unInit();
@@ -553,12 +613,12 @@ void SPxSolver::changeLhs(const Vector& newLhs, bool scale)
 
 void SPxSolver::changeLhs(int i, const Real& newLhs, bool scale)
 {
-   if( newLhs != (scale ? lhsUnscaled(i) : lhs(i)) )
+   if(newLhs != (scale ? lhsUnscaled(i) : lhs(i)))
    {
       Real oldLhs = lhs(i);
       SPxLP::changeLhs(i, newLhs, scale);
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
          changeLhsStatus(i, lhs(i), oldLhs);
          unInit();
@@ -572,71 +632,88 @@ void SPxSolver::changeRhsStatus(int i, Real newRhs, Real oldRhs)
    Real                    currLhs   = lhs(i);
    Real                    objChange = 0.0;
 
-   MSG_DEBUG( std::cout << "DCHANG04 changeRhsStatus()  : row " << i
-                     << ": " << stat; )
-   switch (stat)
+   MSG_DEBUG(std::cout << "DCHANG04 changeRhsStatus()  : row " << i
+             << ": " << stat;)
+
+   switch(stat)
    {
    case SPxBasis::Desc::P_ON_UPPER:
-      if (newRhs >= infinity)
+      if(newRhs >= infinity)
       {
-         if (currLhs <= -infinity)
+         if(currLhs <= -infinity)
          {
             stat = SPxBasis::Desc::P_FREE;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = -theLRbound[i] * oldRhs;
          }
          else
          {
             stat = SPxBasis::Desc::P_ON_LOWER;
-            if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+            if(m_nonbasicValueUpToDate && rep() == COLUMN)
                objChange = (theURbound[i] * currLhs) - (theLRbound[i] * oldRhs);
          }
       }
-      else if( EQ(newRhs, currLhs) )
+      else if(EQ(newRhs, currLhs))
       {
          stat = SPxBasis::Desc::P_FIXED;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = maxRowObj(i) * (newRhs - oldRhs);
       }
-      else if( m_nonbasicValueUpToDate && rep() == COLUMN )
+      else if(m_nonbasicValueUpToDate && rep() == COLUMN)
          objChange = theLRbound[i] * (newRhs - oldRhs);
+
       break;
+
    case SPxBasis::Desc::P_ON_LOWER:
-      if( EQ(newRhs, currLhs) )
+      if(EQ(newRhs, currLhs))
          stat = SPxBasis::Desc::P_FIXED;
+
       break;
+
    case SPxBasis::Desc::P_FREE:
-      if (newRhs < infinity)
+      if(newRhs < infinity)
       {
          stat = SPxBasis::Desc::P_ON_UPPER;
-         if( m_nonbasicValueUpToDate && rep() == COLUMN )
+
+         if(m_nonbasicValueUpToDate && rep() == COLUMN)
             objChange = theLRbound[i] * newRhs;
       }
+
       break;
+
    case SPxBasis::Desc::P_FIXED:
-      if( NE(newRhs, currLhs) )
+      if(NE(newRhs, currLhs))
       {
          stat = SPxBasis::Desc::P_ON_LOWER;
-         if( isInitialized() )
+
+         if(isInitialized())
             theURbound[i] = maxRowObj(i);
       }
+
       break;
+
    case SPxBasis::Desc::D_FREE:
    case SPxBasis::Desc::D_ON_UPPER:
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
    case SPxBasis::Desc::D_UNDEFINED:
-      if( rep() == ROW && theShift > 0.0 )
+      if(rep() == ROW && theShift > 0.0)
          forceRecompNonbasicValue();
+
       stat = dualRowStatus(i);
       break;
+
    default:
       throw SPxInternalCodeException("XCHANG04 This should never happen.");
    }
-   MSG_DEBUG( std::cout << " -> " << stat << std::endl; )
+
+   MSG_DEBUG(std::cout << " -> " << stat << std::endl;)
 
    // we only need to update the nonbasic value in column representation (see nonbasicValue() for comparison/explanation)
-   if( rep() == COLUMN )
+   if(rep() == COLUMN)
       updateNonbasicValue(objChange);
 }
 
@@ -648,22 +725,23 @@ void SPxSolver::changeRhs(const Vector& newRhs, bool scale)
 
    SPxLP::changeRhs(newRhs, scale);
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = 0; i < nRows(); ++i)
+      for(int i = 0; i < nRows(); ++i)
          changeRhsStatus(i, rhs(i));
+
       unInit();
    }
 }
 
 void SPxSolver::changeRhs(int i, const Real& newRhs, bool scale)
 {
-   if( newRhs != (scale ? rhsUnscaled(i) : rhs(i)) )
+   if(newRhs != (scale ? rhsUnscaled(i) : rhs(i)))
    {
       Real oldRhs = rhs(i);
       SPxLP::changeRhs(i, newRhs, scale);
 
-      if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
       {
          changeRhsStatus(i, rhs(i), oldRhs);
          unInit();
@@ -678,13 +756,15 @@ void SPxSolver::changeRange(const Vector& newLhs, const Vector& newRhs, bool sca
 
    SPxLP::changeLhs(newLhs, scale);
    SPxLP::changeRhs(newRhs, scale);
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
-      for (int i = nRows() - 1; i >= 0; --i)
+      for(int i = nRows() - 1; i >= 0; --i)
       {
          changeLhsStatus(i, lhs(i));
          changeRhsStatus(i, rhs(i));
       }
+
       unInit();
    }
 }
@@ -697,7 +777,7 @@ void SPxSolver::changeRange(int i, const Real& newLhs, const Real& newRhs, bool 
    SPxLP::changeLhs(i, newLhs, scale);
    SPxLP::changeRhs(i, newRhs, scale);
 
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
    {
       changeLhsStatus(i, lhs(i), oldLhs);
       changeRhsStatus(i, rhs(i), oldRhs);
@@ -710,34 +790,40 @@ void SPxSolver::changeRow(int i, const LPRow& newRow, bool scale)
    forceRecompNonbasicValue();
 
    SPxLP::changeRow(i, newRow, scale);
-   if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
-      SPxBasis::changedRow( i );
+
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      SPxBasis::changedRow(i);
+
    unInit();
 }
 
 void SPxSolver::changeCol(int i, const LPCol& newCol, bool scale)
 {
-   if( i < 0 )
+   if(i < 0)
       return;
 
    forceRecompNonbasicValue();
 
    SPxLP::changeCol(i, newCol, scale);
-   if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
-      SPxBasis::changedCol( i );
+
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      SPxBasis::changedCol(i);
+
    unInit();
 }
 
 void SPxSolver::changeElement(int i, int j, const Real& val, bool scale)
 {
-   if( i < 0 || j < 0 )
+   if(i < 0 || j < 0)
       return;
 
    forceRecompNonbasicValue();
 
    SPxLP::changeElement(i, j, val, scale);
-   if ( SPxBasis::status() > SPxBasis::NO_PROBLEM )
-      SPxBasis::changedElement( i, j );
+
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
+      SPxBasis::changedElement(i, j);
+
    unInit();
 }
 

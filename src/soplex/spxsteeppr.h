@@ -50,7 +50,8 @@ public:
        values, or #DEFAULT for starting with multipliers set to 1. The
        latter is the default.
    */
-   enum Setup {
+   enum Setup
+   {
       EXACT,   ///< starting with exactly computed values
       DEFAULT  ///< starting with multipliers set to 1
    };
@@ -85,7 +86,7 @@ private:
 
    //-------------------------------------
    /// prepare data structures for hyper sparse pricing
-   int buildBestPriceVectorLeave( Real feastol );
+   int buildBestPriceVectorLeave(Real feastol);
    /// implementation of full pricing
    int selectLeaveX(Real tol);
    /// implementation of sparse pricing in the leaving Simplex
@@ -118,16 +119,16 @@ public:
    ///
    SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
       : SPxPricer(name)
-      , workVec (0)
-      , workRhs (0)
+      , workVec(0)
+      , workRhs(0)
       , pi_p(1.0)
-      , setup (mode)
+      , setup(mode)
       , refined(false)
    {
       assert(isConsistent());
    }
    /// copy constructor
-   SPxSteepPR( const SPxSteepPR& old)
+   SPxSteepPR(const SPxSteepPR& old)
       : SPxPricer(old)
       , workVec(old.workVec)
       , workRhs(old.workRhs)
@@ -138,7 +139,7 @@ public:
       assert(isConsistent());
    }
    /// assignment operator
-   SPxSteepPR& operator=( const SPxSteepPR& rhs)
+   SPxSteepPR& operator=(const SPxSteepPR& rhs)
    {
       if(this != &rhs)
       {
@@ -184,7 +185,7 @@ public:
    ///
    virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.
-   virtual void addedVecs (int n);
+   virtual void addedVecs(int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
    /// \p the i'th vector has been removed from the loaded LP.

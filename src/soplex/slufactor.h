@@ -72,7 +72,8 @@ protected:
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current \ref soplex::SLUFactor::UpdateType "UpdateType".
    SSVector   eta;           ///<
-   SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
+   SSVector
+   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Real       lastThreshold; ///< pivoting threshold of last factorization
    //@}
 
@@ -127,10 +128,10 @@ public:
    /// sets minimum Markowitz threshold.
    void setMarkowitz(Real m)
    {
-      if( m < 0.01 )
+      if(m < 0.01)
          m = 0.01;
 
-      if( m > 0.99 )
+      if(m > 0.99)
          m = 0.99;
 
       minThreshold = m;
@@ -188,14 +189,14 @@ public:
    /**@name Solve */
    //@{
    /// Solves \f$Ax=b\f$.
-   void solveRight (Vector& x, const Vector& b);
+   void solveRight(Vector& x, const Vector& b);
    void solveRight(SSVector& x, const SSVector& b)
    {
       x.unSetup();
       solveRight((Vector&) x, (const Vector&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveRight (SSVector& x, const SVector& b);
+   void solveRight(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$.
    void solveRight4update(SSVector& x, const SVector& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.

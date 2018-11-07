@@ -75,7 +75,7 @@ protected:
        loops are started at \p start and incremented by \p incr.
     */
    int maxDelta(Real& val, Real& maxabs, UpdateVector& update,
-      const Vector& lowBound, const Vector& upBound, int start, int incr) const;
+                const Vector& lowBound, const Vector& upBound, int start, int incr) const;
 
    ///
    int maxDelta(Real& val, Real& maxabs);
@@ -92,7 +92,7 @@ protected:
        loops are started at \p start and incremented by \p incr.
    */
    int minDelta(Real& val, Real& maxabs, UpdateVector& update,
-      const Vector& lowBound, const Vector& upBound, int start, int incr) const;
+                const Vector& lowBound, const Vector& upBound, int start, int incr) const;
 
    ///
    int minDelta(Real& val, Real& maxabs);
@@ -108,13 +108,13 @@ protected:
        incremented by \p incr.
    */
    int maxSelect(Real& val, Real& stab, Real& best, Real& bestDelta,
-      Real max, const UpdateVector& upd, const Vector& low,
-      const Vector& up, int start = 0, int incr = 1) const;
+                 Real max, const UpdateVector& upd, const Vector& low,
+                 const Vector& up, int start = 0, int incr = 1) const;
    ///
    int maxSelect(Real& val, Real& stab, Real& bestDelta, Real max);
    ///
    SPxId maxSelect(int& nr, Real& val, Real& stab,
-      Real& bestDelta, Real max);
+                   Real& bestDelta, Real max);
 
    /// selects stable index for minimizing ratio test.
    /** Select from all update values \p val > \p max the one with the largest
@@ -124,14 +124,14 @@ protected:
        incremented by \p incr.
    */
    int minSelect(Real& val, Real& stab, Real& best, Real& bestDelta,
-      Real max, const UpdateVector& upd, const Vector& low,
-      const Vector& up, int start = 0, int incr = 1) const;
+                 Real max, const UpdateVector& upd, const Vector& low,
+                 const Vector& up, int start = 0, int incr = 1) const;
    ///
    int minSelect(Real& val, Real& stab,
-      Real& bestDelta, Real max);
+                 Real& bestDelta, Real max);
    ///
    SPxId minSelect(int& nr, Real& val, Real& stab,
-      Real& bestDelta, Real max);
+                   Real& bestDelta, Real max);
 
    /// tests for stop after phase 1.
    /** Tests whether a shortcut after phase 1 is feasible for the
@@ -185,7 +185,7 @@ public:
       , iscoid(false)
    {}
    /// assignment operator
-   SPxFastRT& operator=( const SPxFastRT& rhs)
+   SPxFastRT& operator=(const SPxFastRT& rhs)
    {
       if(this != &rhs)
       {
@@ -230,8 +230,9 @@ public:
    ///
    virtual void setDelta(Real newDelta)
    {
-      if( newDelta <= DEFAULT_EPS_ZERO )
+      if(newDelta <= DEFAULT_EPS_ZERO)
          newDelta = DEFAULT_EPS_ZERO;
+
       delta = newDelta;
       fastDelta = newDelta;
    }

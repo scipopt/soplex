@@ -51,7 +51,7 @@ static void updateScale(
 
    *pscprev -= *psccurr;
 
-   if( isZero(fac) )
+   if(isZero(fac))
       (*pscprev).clear();
    else
       *pscprev *= fac;
@@ -86,7 +86,7 @@ static void updateScaleFinal(
 
    *pscprev -= *psccurr;
 
-   if( isZero(fac) )
+   if(isZero(fac))
       (*pscprev).clear();
    else
       *pscprev *= fac;
@@ -109,7 +109,7 @@ static inline void updateRes(
 {
    assert(qcurr != 0.0);
 
-   if( isZero(eprev) )
+   if(isZero(eprev))
       resvec.clear();
    else
       resvec *= eprev;
@@ -134,7 +134,7 @@ static void initConstVecs(
 
    const int nvec = vecset->num();
 
-   for( int k = 0; k < nvec; ++k )
+   for(int k = 0; k < nvec; ++k)
    {
       Real logsum = 0.0;
       int nnz = 0;
@@ -142,11 +142,11 @@ static void initConstVecs(
       const SVector& lpvec = (*vecset)[k];
       const int size = lpvec.size();
 
-      for( int i = 0; i < size; ++i )
+      for(int i = 0; i < size; ++i)
       {
          const Real a = lpvec.value(i);
 
-         if( !isZero(a) )
+         if(!isZero(a))
          {
             logsum += log2(double(spxAbs(a))); // todo spxLog2?
             nnz++;
@@ -154,7 +154,8 @@ static void initConstVecs(
       }
 
       Real nnzinv;
-      if( nnz > 0)
+
+      if(nnz > 0)
       {
          nnzinv = 1.0 / nnz;
       }
@@ -171,11 +172,12 @@ static void initConstVecs(
       /* create new vector for facset */
       SVector& vecnew = (*(facset.create(nnz)));
 
-      for( int i = 0; i < size; ++i )
+      for(int i = 0; i < size; ++i)
       {
-         if( !isZero(lpvec.value(i)) )
+         if(!isZero(lpvec.value(i)))
             vecnew.add(lpvec.index(i), nnzinv);
       }
+
       vecnew.sort();
    }
 
@@ -222,7 +224,8 @@ void SPxLeastSqSC::setIntParam(int param, const char* name)
 
 void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
 {
-   MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
+   MSG_INFO1((*spxout), (*spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "")
+             << std::endl;)
 
    setup(lp);
 
@@ -272,12 +275,12 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    SSVector* rsccurr = &rowscale1;
    SSVector* rscprev = &rowscale2;
 
-   MSG_INFO2( (*spxout), (*spxout) << "before scaling:"
-      << " min= " << lp.minAbsNzo()
-      << " max= " << lp.maxAbsNzo()
-      << " col-ratio= " << maxColRatio(lp)
-      << " row-ratio= " << maxRowRatio(lp)
-      << std::endl; )
+   MSG_INFO2((*spxout), (*spxout) << "before scaling:"
+             << " min= " << lp.minAbsNzo()
+             << " max= " << lp.maxAbsNzo()
+             << " col-ratio= " << maxColRatio(lp)
+             << " row-ratio= " << maxRowRatio(lp)
+             << std::endl;)
 
    /* initialize scalars, vectors and matrices */
 
@@ -314,15 +317,15 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    int k;
 
    /* conjugate gradient loop */
-   for( k = 0; k < maxrounds; ++k )
+   for(k = 0; k < maxrounds; ++k)
    {
       const Real sprev = scurr;
 
       // is k even?
-      if( (k % 2) == 0 )
+      if((k % 2) == 0)
       {
          // not in first iteration?
-         if( k != 0 ) // true, then update row scaling factor vector
+         if(k != 0)   // true, then update row scaling factor vector
             updateScale(rownnzinv, resnrows, tmprows, rsccurr, rscprev, qcurr, qprev, eprev[1], eprev[2]);
 
          updateRes(facncols, resncols, resnrows, tmprows, eprev[0], qcurr);
@@ -338,7 +341,7 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
       }
 
       // shift eprev entries one to the right
-      for( unsigned l = 2; l > 0; --l)
+      for(unsigned l = 2; l > 0; --l)
          eprev[l] = eprev[l - 1];
 
       eprev[0] = (qcurr * scurr) / sprev;
@@ -348,12 +351,12 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
       qprev = tmp;
 
       // termination criterion met?
-      if( scurr < smax )
+      if(scurr < smax)
          break;
    }
 
    // is k even?
-   if( (k % 2) == 0 )
+   if((k % 2) == 0)
    {
       // update column scaling factor vector
       updateScaleFinal(colnnzinv, resncols, tmpcols, csccurr, cscprev, qprev, eprev[1], eprev[2]);
@@ -372,28 +375,28 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    DataArray<int>& colscaleExp = *m_activeColscaleExp;
    DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
 
-   for( k = 0; k < nrows; ++k )
-      rowscaleExp[k] = -int( rowscale[k] + ((rowscale[k] >= 0.0)? (+0.5) : (-0.5)) );
+   for(k = 0; k < nrows; ++k)
+      rowscaleExp[k] = -int(rowscale[k] + ((rowscale[k] >= 0.0) ? (+0.5) : (-0.5)));
 
-   for( k = 0; k < ncols; ++k )
-      colscaleExp[k] = -int( colscale[k] + ((colscale[k] >= 0.0)? (+0.5) : (-0.5)) );
+   for(k = 0; k < ncols; ++k)
+      colscaleExp[k] = -int(colscale[k] + ((colscale[k] >= 0.0) ? (+0.5) : (-0.5)));
 
    // scale
    applyScaling(lp);
 
-   MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
-      << " max= " << maxAbsRowscale()
-      << std::endl
-      << "Col scaling min= " << minAbsColscale()
-      << " max= " << maxAbsColscale()
-      << std::endl; )
+   MSG_INFO3((*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
+             << " max= " << maxAbsRowscale()
+             << std::endl
+             << "Col scaling min= " << minAbsColscale()
+             << " max= " << maxAbsColscale()
+             << std::endl;)
 
-   MSG_INFO2( (*spxout), (*spxout) << "after scaling: "
-      << " min= " << lp.minAbsNzo(false)
-      << " max= " << lp.maxAbsNzo(false)
-      << " col-ratio= " << maxColRatio(lp)
-      << " row-ratio= " << maxRowRatio(lp)
-      << std::endl; )
+   MSG_INFO2((*spxout), (*spxout) << "after scaling: "
+             << " min= " << lp.minAbsNzo(false)
+             << " max= " << lp.maxAbsNzo(false)
+             << " col-ratio= " << maxColRatio(lp)
+             << " row-ratio= " << maxRowRatio(lp)
+             << std::endl;)
 }
 
 } // namespace soplex

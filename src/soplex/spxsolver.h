@@ -256,7 +256,8 @@ private:
 
    Real           m_pricingViol;             ///< maximal feasibility violation of current solution
    bool           m_pricingViolUpToDate;     ///< true, if the stored violation is up to date
-   Real           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
+   Real
+   m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
    bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
 
    Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
@@ -267,14 +268,22 @@ private:
    int            m_numCycle;    ///< actual number of degenerate steps so far.
    bool           initialized;   ///< true, if all vectors are setup.
 
-   SSVector*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-   SSVector*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-   SSVector*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-   SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-   SSVector*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-   SSVector*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-   SSVector*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-   SSVector*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*
+   solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*
+   solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*
+   solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*
+   solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*
+   coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*
+   coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+   SSVector*
+   coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+   SSVector*
+   coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
    bool           freePricer;        ///< true iff thepricer should be freed inside of object
    bool           freeRatioTester;   ///< true iff theratiotester should be freed inside of object
@@ -294,19 +303,25 @@ private:
    bool           instableEnter;
    Real           instableEnterVal;
 
-   bool           recomputedVectors;      ///< flag to perform clean up step to reduce numerical errors only once
+   bool
+   recomputedVectors;      ///< flag to perform clean up step to reduce numerical errors only once
 
    int            displayLine;
    int            displayFreq;
    Real           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
 
-   bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
+   bool
+   getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
    bool           computeDegeneracy;
-   int            degenCompIterOffset;    ///< the number of iterations performed before the degeneracy level is computed
-   int            decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
+   int
+   degenCompIterOffset;    ///< the number of iterations performed before the degeneracy level is computed
+   int
+   decompIterationLimit;   ///< the maximum number of iterations before the decomposition simplex is aborted.
 
-   bool           fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
-   int            printCondition;         ///< printing the current condition number in the log (0 - off, 1 - estimate,exact, 2 - exact)";ratio estimate , 3 - sum estimate, 4 - product estimate)
+   bool
+   fullPerturbation;       ///< whether to perturb the entire problem or just the bounds relevant for the current pivot
+   int
+   printCondition;         ///< printing the current condition number in the log (0 - off, 1 - estimate,exact, 2 - exact)";ratio estimate , 3 - sum estimate, 4 - product estimate)
 
    //@}
 
@@ -421,8 +436,10 @@ public:
     *  the i-th entry equals false, if the i-th basic variable is not infeasible
     *  the i-th entry equals true, if the i-th basic variable is infeasible
     */
-   DataArray<int> isInfeasible;           ///< 0: index not violated, 1: index violated, 2: index violated and among candidate list
-   DataArray<int> isInfeasibleCo;         ///< 0: index not violated, 1: index violated, 2: index violated and among candidate list
+   DataArray<int>
+   isInfeasible;           ///< 0: index not violated, 1: index violated, 2: index violated and among candidate list
+   DataArray<int>
+   isInfeasibleCo;         ///< 0: index not violated, 1: index violated, 2: index violated and among candidate list
 
    /// These values enable or disable sparse pricing
    bool     sparsePricingLeave;        ///< true if sparsePricing is turned on in the leaving Simplex
@@ -442,7 +459,8 @@ public:
 
    SPxOut* spxout;                     ///< message handler
 
-   DataArray<int> integerVariables;    ///< supplementary variable information, 0: continous variable, 1: integer variable
+   DataArray<int>
+   integerVariables;    ///< supplementary variable information, 0: continous variable, 1: integer variable
 
    //-----------------------------
    void setOutstream(SPxOut& newOutstream)
@@ -452,19 +470,19 @@ public:
    }
 
    /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
-   void setNonzeroFactor( Real f )
+   void setNonzeroFactor(Real f)
    {
       SPxBasis::nonzeroFactor = f;
    }
 
    /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
-   void setFillFactor( Real f )
+   void setFillFactor(Real f)
    {
       SPxBasis::fillFactor = f;
    }
 
    /// set refactor threshold for memory growth in current factor update compared to the last factorization
-   void setMemFactor( Real f )
+   void setMemFactor(Real f)
    {
       SPxBasis::memFactor = f;
    }
@@ -540,7 +558,7 @@ public:
    //@{
    /// read LP from input stream.
    virtual bool read(std::istream& in, NameSet* rowNames = 0,
-      NameSet* colNames = 0, DIdxSet* intVars = 0);
+                     NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// copy LP.
    virtual void loadLP(const SPxLP& LP, bool initSlackBasis = true);
@@ -556,9 +574,9 @@ public:
    virtual void loadBasis(const SPxBasis::Desc&);
 
    /// initialize #ROW or #COLUMN representation.
-   void initRep (Representation p_rep);
+   void initRep(Representation p_rep);
    /// switch to #ROW or #COLUMN representation if not already used.
-   void setRep (Representation p_rep);
+   void setRep(Representation p_rep);
    /// set \ref soplex::SPxSolver::LEAVE "LEAVE" or \ref soplex::SPxSolver::ENTER "ENTER" algorithm.
    void setType(Type tp);
    /// set \ref soplex::SPxSolver::FULL "FULL" or \ref soplex::SPxSolver::PARTIAL "PARTIAL" pricing.
@@ -580,14 +598,14 @@ public:
     *  variables.
     */
    virtual bool readBasisFile(const char* filename,
-      const NameSet* rowNames, const NameSet* colNames);
+                              const NameSet* rowNames, const NameSet* colNames);
 
    /** Write basis to \p filename in MPS format. If \p rowNames and \p
     *  colNames are \c NULL, default names are used for the constraints and
     *  variables.
     */
    virtual bool writeBasisFile(const char* filename,
-      const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat = false) const;
+                               const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat = false) const;
 
    /** Write current LP, basis, and parameter settings.
     *  LP is written in MPS format to "\p filename".mps, basis is written in "\p filename".bas, and parameters
@@ -595,7 +613,7 @@ public:
     *  the constraints and variables.
     */
    virtual bool writeState(const char* filename,
-      const NameSet* rowNames = NULL, const NameSet* colNames = NULL, const bool cpxFormat = false) const;
+                           const NameSet* rowNames = NULL, const NameSet* colNames = NULL, const bool cpxFormat = false) const;
 
    //@}
 
@@ -678,7 +696,7 @@ public:
     *
     *  @throw SPxStatusException if no problem loaded
     */
-   virtual Status getSlacks (Vector& vector) const;
+   virtual Status getSlacks(Vector& vector) const;
 
    /// get current solution vector for dual variables.
    /** This method returns the Status of the basis.
@@ -706,7 +724,7 @@ public:
     *
     *  @throw SPxStatusException if no problem loaded
     */
-   virtual Status getDual (Vector& vector) const;
+   virtual Status getDual(Vector& vector) const;
 
    /// get vector of reduced costs.
    /** This method returns the Status of the basis.
@@ -721,15 +739,15 @@ public:
     *
     *  @throw SPxStatusException if no problem loaded
     */
-   virtual Status getRedCost (Vector& vector) const;
+   virtual Status getRedCost(Vector& vector) const;
 
    /// get primal ray in case of unboundedness.
    ///  @throw SPxStatusException if no problem loaded
-   virtual Status getPrimalray (Vector& vector) const;
+   virtual Status getPrimalray(Vector& vector) const;
 
    /// get dual farkas proof of infeasibility.
    ///  @throw SPxStatusException if no problem loaded
-   virtual Status getDualfarkas (Vector& vector) const;
+   virtual Status getDualfarkas(Vector& vector) const;
 
    /// print display line of flying table
    virtual void printDisplayLine(const bool force = false, const bool forceHead = false);
@@ -750,7 +768,7 @@ public:
     *  returns 0, if the LP has been solved to optimality (i.e. no
     *  further pricing succeeds and no shift is present).
     */
-   virtual bool terminate ();
+   virtual bool terminate();
    //@}
 
    //-----------------------------
@@ -985,7 +1003,8 @@ public:
    ///
    virtual void changeBounds(int i, const Real& newLower, const Real& newUpper, bool scale = false);
    ///
-   virtual void changeBounds(SPxColId p_id, const Real& p_newLower, const Real& p_newUpper, bool scale = false)
+   virtual void changeBounds(SPxColId p_id, const Real& p_newLower, const Real& p_newUpper,
+                             bool scale = false)
    {
       changeBounds(number(p_id), p_newLower, p_newUpper, scale);
    }
@@ -1016,7 +1035,8 @@ public:
    ///
    virtual void changeRange(int i, const Real& newLhs, const Real& newRhs, bool scale = false);
    ///
-   virtual void changeRange(SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs, bool scale = false)
+   virtual void changeRange(SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs,
+                            bool scale = false)
    {
       changeRange(number(p_id), p_newLhs, p_newRhs, scale);
    }
@@ -1074,7 +1094,7 @@ public:
     */
    SPxId id(int i) const
    {
-      if (rep() == ROW)
+      if(rep() == ROW)
       {
          SPxRowId rid = SPxLP::rId(i);
          return SPxId(rid);
@@ -1093,7 +1113,7 @@ public:
     */
    SPxId coId(int i) const
    {
-      if (rep() == ROW)
+      if(rep() == ROW)
       {
          SPxColId cid = SPxLP::cId(i);
          return SPxId(cid);
@@ -1141,16 +1161,16 @@ public:
    {
       assert(rid.isValid());
       return (rep() == ROW)
-         ? (*thevectors)[number(rid)]
-         : static_cast<const SVector&>(unitVecs[number(rid)]);
+             ? (*thevectors)[number(rid)]
+             : static_cast<const SVector&>(unitVecs[number(rid)]);
    }
    ///
    const SVector& vector(const SPxColId& cid) const
    {
       assert(cid.isValid());
       return (rep() == COLUMN)
-         ? (*thevectors)[number(cid)]
-         : static_cast<const SVector&>(unitVecs[number(cid)]);
+             ? (*thevectors)[number(cid)]
+             : static_cast<const SVector&>(unitVecs[number(cid)]);
    }
 
    /// vector associated to \p p_id.
@@ -1167,8 +1187,8 @@ public:
       assert(p_id.isValid());
 
       return p_id.isSPxRowId()
-         ? vector(SPxRowId(p_id))
-         : vector(SPxColId(p_id));
+             ? vector(SPxRowId(p_id))
+             : vector(SPxColId(p_id));
    }
 
    /// \p i 'th covector of LP.
@@ -1184,16 +1204,16 @@ public:
    {
       assert(rid.isValid());
       return (rep() == COLUMN)
-         ? (*thecovectors)[number(rid)]
-         : static_cast<const SVector&>(unitVecs[number(rid)]);
+             ? (*thecovectors)[number(rid)]
+             : static_cast<const SVector&>(unitVecs[number(rid)]);
    }
    ///
    const SVector& coVector(const SPxColId& cid) const
    {
       assert(cid.isValid());
       return (rep() == ROW)
-         ? (*thecovectors)[number(cid)]
-         : static_cast<const SVector&>(unitVecs[number(cid)]);
+             ? (*thecovectors)[number(cid)]
+             : static_cast<const SVector&>(unitVecs[number(cid)]);
    }
    /// coVector associated to \p p_id.
    /**@return a reference to the covector of the loaded LP
@@ -1206,8 +1226,8 @@ public:
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-         ? coVector(SPxRowId(p_id))
-         : coVector(SPxColId(p_id));
+             ? coVector(SPxRowId(p_id))
+             : coVector(SPxColId(p_id));
    }
    /// return \p i 'th unit vector.
    const SVector& unitVector(int i) const
@@ -1247,8 +1267,8 @@ public:
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-         ? isBasic(SPxRowId(p_id))
-         : isBasic(SPxColId(p_id));
+             ? isBasic(SPxRowId(p_id))
+             : isBasic(SPxColId(p_id));
    }
 
    /// is the \p rid 'th vector basic ?
@@ -1633,12 +1653,12 @@ private:
       int start = 0, int incr = 1);
    ///
    Real perturbMin(const UpdateVector& uvec,
-      Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr);
+                   Vector& low, Vector& up, Real eps, Real delta,
+                   const SPxBasis::Desc::Status* stat, int start, int incr);
    ///
    Real perturbMax(const UpdateVector& uvec,
-      Vector& low, Vector& up, Real eps, Real delta,
-      const SPxBasis::Desc::Status* stat, int start, int incr);
+                   Vector& low, Vector& up, Real eps, Real delta,
+                   const SPxBasis::Desc::Status* stat, int start, int incr);
    //@}
 
    //------------------------------------
@@ -1874,32 +1894,32 @@ protected:
    {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
-         ? &vector(SPxRowId(p_id)) : &vector(SPxColId(p_id));
+             ? &vector(SPxRowId(p_id)) : &vector(SPxColId(p_id));
    }
    ///
    virtual void getLeaveVals(int i,
-      SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
-      Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
+                             SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
+                             Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
    ///
    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
-      Real& enterBound, Real& newUBbound,
-      Real& newLBbound, Real& newCoPrhs, Real& objChange);
+                              Real& enterBound, Real& newUBbound,
+                              Real& newLBbound, Real& newCoPrhs, Real& objChange);
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
-      Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-      Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
+                             Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
+                             Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
    ///
    virtual void getEnterVals2(int leaveIdx,
-      Real enterMax, Real& leaveBound, Real& objChange);
+                              Real enterMax, Real& leaveBound, Real& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
-      Real leaveVal, const SVector& vec, Real& objChange);
+                              Real leaveVal, const SVector& vec, Real& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
-      Real enterTest, SPxBasis::Desc::Status enterStat);
+                            Real enterTest, SPxBasis::Desc::Status enterStat);
    ///
    virtual void rejectLeave(int leaveNum, SPxId leaveId,
-      SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
+                            SPxBasis::Desc::Status leaveStat, const SVector* newVec = 0);
    ///
    virtual void setupPupdate(void);
    ///
@@ -1982,34 +2002,35 @@ public:
    }
    /// get all results of last solve.
    Status
-   getResult( Real* value = 0, Vector* primal = 0,
-              Vector* slacks = 0, Vector* dual = 0,
-              Vector* reduCost = 0);
+   getResult(Real* value = 0, Vector* primal = 0,
+             Vector* slacks = 0, Vector* dual = 0,
+             Vector* reduCost = 0);
 
 protected:
 
    /**@todo put the following basis methods near the variable status methods!*/
    /// converts basis status to VarStatus
-   VarStatus basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const;
+   VarStatus basisStatusToVarStatus(SPxBasis::Desc::Status stat) const;
 
    /// converts VarStatus to basis status for rows
-   SPxBasis::Desc::Status varStatusToBasisStatusRow( int row, VarStatus stat )
-      const;
+   SPxBasis::Desc::Status varStatusToBasisStatusRow(int row, VarStatus stat)
+   const;
 
    /// converts VarStatus to basis status for columns
-   SPxBasis::Desc::Status varStatusToBasisStatusCol( int col, VarStatus stat )
-      const;
+   SPxBasis::Desc::Status varStatusToBasisStatusCol(int col, VarStatus stat)
+   const;
 
 public:
 
    /// gets basis status for a single row
-   VarStatus getBasisRowStatus( int row ) const;
+   VarStatus getBasisRowStatus(int row) const;
 
    /// gets basis status for a single column
-   VarStatus getBasisColStatus( int col ) const;
+   VarStatus getBasisColStatus(int col) const;
 
    /// get current basis, and return solver status.
-   Status getBasis(VarStatus rows[], VarStatus cols[], const int rowsSize = -1, const int colsSize = -1) const;
+   Status getBasis(VarStatus rows[], VarStatus cols[], const int rowsSize = -1,
+                   const int colsSize = -1) const;
 
    /// gets basis status
    SPxBasis::SPxStatus getBasisStatus() const
@@ -2024,15 +2045,16 @@ public:
    void setBasis(const VarStatus rows[], const VarStatus cols[]);
 
    /// set the lp solver's basis status.
-   void setBasisStatus( SPxBasis::SPxStatus stat )
+   void setBasisStatus(SPxBasis::SPxStatus stat)
    {
-      if( m_status == OPTIMAL )
+      if(m_status == OPTIMAL)
          m_status = UNKNOWN;
-      SPxBasis::setStatus( stat );
+
+      SPxBasis::setStatus(stat);
    }
 
    /// setting the solver status external from the solve loop.
-   void setSolverStatus( SPxSolver::Status stat )
+   void setSolverStatus(SPxSolver::Status stat)
    {
       m_status = stat;
    }
@@ -2188,7 +2210,8 @@ public:
    {
       std::stringstream s;
       s << basis().statistics()
-        << "Solution time      : " << std::setw(10) << std::fixed << std::setprecision(2) << time() << std::endl
+        << "Solution time      : " << std::setw(10) << std::fixed << std::setprecision(
+           2) << time() << std::endl
         << "Iterations         : " << std::setw(10) << iterations() << std::endl;
 
       return s.str();
@@ -2197,7 +2220,7 @@ public:
    /// returns whether a basis needs to be found for the improved dual simplex
    DecompStatus getDecompStatus() const
    {
-      if( getStartingDecompBasis )
+      if(getStartingDecompBasis)
          return FINDSTARTBASIS;
       else
          return DONTFINDSTARTBASIS;
@@ -2263,9 +2286,9 @@ public:
    //@{
    /// default constructor.
    explicit
-   SPxSolver( Type            type  = LEAVE,
-              Representation  rep   = ROW,
-              Timer::TYPE     ttype = Timer::USER_TIME);
+   SPxSolver(Type            type  = LEAVE,
+             Representation  rep   = ROW,
+             Timer::TYPE     ttype = Timer::USER_TIME);
    // virtual destructor
    virtual ~SPxSolver();
    //@}
@@ -2294,20 +2317,20 @@ public:
 //
 
 /// Pretty-printing of variable status.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::VarStatus& status );
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::VarStatus& status);
 
 /// Pretty-printing of solver status.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Status& status );
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::Status& status);
 
 /// Pretty-printing of algorithm.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Type& status );
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::Type& status);
 
 /// Pretty-printing of representation.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Representation& status );
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::Representation& status);
 
 
 } // namespace soplex
