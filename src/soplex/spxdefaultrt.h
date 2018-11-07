@@ -39,7 +39,7 @@ namespace soplex
 
    See SPxRatioTester for a class documentation.
 */
-  template <class R>
+template <class R>
 class SPxDefaultRT : public SPxRatioTester<R>
 {
 public:
@@ -56,7 +56,7 @@ public:
       : SPxRatioTester<R>(old)
    {}
    /// assignment operator
-   SPxDefaultRT& operator=( const SPxDefaultRT& rhs)
+   SPxDefaultRT& operator=(const SPxDefaultRT& rhs)
    {
       if(this != &rhs)
       {

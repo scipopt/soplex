@@ -22,160 +22,161 @@
 namespace soplex
 {
 
-  template <>
-  void SPxSolverBase<Real>::qualConstraintViolation(Real& maxviol, Real& sumviol) const
-  {
-    maxviol = 0.0;
-    sumviol = 0.0;
+template <>
+void SPxSolverBase<Real>::qualConstraintViolation(Real& maxviol, Real& sumviol) const
+{
+   maxviol = 0.0;
+   sumviol = 0.0;
 
-    DVector solu( this->nCols() );
+   DVector solu(this->nCols());
 
-    getPrimalSol( solu );
+   getPrimalSol(solu);
 
-    for( int row = 0; row < this->nRows(); ++row )
+   for(int row = 0; row < this->nRows(); ++row)
+   {
+      const SVector& rowvec = this->rowVector(row);
+
+      Real val = 0.0;
+
+      for(int col = 0; col < rowvec.size(); ++col)
+         val += rowvec.value(col) * solu[rowvec.index(col)];
+
+      Real viol = 0.0;
+
+      assert(lhs(row) <= rhs(row) + (100 * epsilon()));
+
+      if(val < this->lhs(row))
+         viol = spxAbs(val - this->lhs(row));
+      else if(val > this->rhs(row))
+         viol = spxAbs(val - this->rhs(row));
+
+      if(viol > maxviol)
+         maxviol = viol;
+
+      sumviol += viol;
+   }
+}
+
+template <>
+void SPxSolverBase<Real>::qualBoundViolation(
+   Real& maxviol, Real& sumviol) const
+{
+   maxviol = 0.0;
+   sumviol = 0.0;
+
+   DVector solu(this->nCols());
+
+   getPrimalSol(solu);
+
+   for(int col = 0; col < this->nCols(); ++col)
+   {
+      assert(lower(col) <= upper(col) + (100 * epsilon()));
+
+      Real viol = 0.0;
+
+      if(solu[col] < this->lower(col))
+         viol = spxAbs(solu[col] - this->lower(col));
+      else if(solu[col] > this->upper(col))
+         viol = spxAbs(solu[col] - this->upper(col));
+
+      if(viol > maxviol)
+         maxviol = viol;
+
+      sumviol += viol;
+   }
+}
+
+template <>
+void SPxSolverBase<Real>::qualSlackViolation(Real& maxviol, Real& sumviol) const
+{
+   maxviol = 0.0;
+   sumviol = 0.0;
+
+   DVector solu(this->nCols());
+   DVector slacks(this->nRows());
+
+   getPrimalSol(solu);
+   getSlacks(slacks);
+
+   for(int row = 0; row < this->nRows(); ++row)
+   {
+      const SVector& rowvec = this->rowVector(row);
+
+      Real val = 0.0;
+
+      for(int col = 0; col < rowvec.size(); ++col)
+         val += rowvec.value(col) * solu[rowvec.index(col)];
+
+      Real viol = spxAbs(val - slacks[row]);
+
+      if(viol > maxviol)
+         maxviol = viol;
+
+      sumviol += viol;
+   }
+}
+
+template <>
+void SPxSolverBase<Real>::qualRedCostViolation(Real& maxviol, Real& sumviol) const
+{
+   maxviol = 0.0;
+   sumviol = 0.0;
+
+   int i;
+
+   // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
+   //         redcost = c_N - yA_N
+   // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
+   // DVector y( this->nRows() );
+   // basis().coSolve( x, spx->unitVector( i ) );
+   // DVector rdcost( this->nCols() );
+   if(type() == ENTER)
+   {
+      for(i = 0; i < dim(); ++i)
       {
-        const SVector& rowvec = this->rowVector( row );
+         Real x = coTest()[i];
 
-        Real val = 0.0;
+         if(x < 0.0)
+         {
+            sumviol -= x;
 
-        for( int col = 0; col < rowvec.size(); ++col )
-          val += rowvec.value( col ) * solu[rowvec.index( col )];
-
-        Real viol = 0.0;
-
-        assert(lhs( row ) <= rhs( row ) + (100 * epsilon()));
-
-        if (val < this->lhs( row ))
-          viol = spxAbs(val - this->lhs( row ));
-        else
-          if (val > this->rhs( row ))
-            viol = spxAbs(val - this->rhs( row ));
-
-        if (viol > maxviol)
-          maxviol = viol;
-
-        sumviol += viol;
+            if(x < maxviol)
+               maxviol = x;
+         }
       }
-  }
 
-  template <>
-  void SPxSolverBase<Real>::qualBoundViolation(
-                                        Real& maxviol, Real& sumviol) const
-  {
-    maxviol = 0.0;
-    sumviol = 0.0;
-
-    DVector solu( this->nCols() );
-
-    getPrimalSol( solu );
-
-    for( int col = 0; col < this->nCols(); ++col )
+      for(i = 0; i < coDim(); ++i)
       {
-        assert(lower( col ) <= upper( col ) + (100 * epsilon()));
+         Real x = test()[i];
 
-        Real viol = 0.0;
+         if(x < 0.0)
+         {
+            sumviol -= x;
 
-        if (solu[col] < this->lower( col ))
-          viol = spxAbs( solu[col] - this->lower( col ));
-        else
-          if (solu[col] > this->upper( col ))
-            viol = spxAbs( solu[col] - this->upper( col ));
-
-        if (viol > maxviol)
-          maxviol = viol;
-
-        sumviol += viol;
+            if(x < maxviol)
+               maxviol = x;
+         }
       }
-  }
+   }
+   else
+   {
+      assert(type() == LEAVE);
 
-  template <>
-  void SPxSolverBase<Real>::qualSlackViolation(Real& maxviol, Real& sumviol) const
-  {
-    maxviol = 0.0;
-    sumviol = 0.0;
-
-    DVector solu( this->nCols() );
-    DVector slacks( this->nRows() );
-
-    getPrimalSol( solu );
-    getSlacks( slacks );
-
-    for( int row = 0; row < this->nRows(); ++row )
+      for(i = 0; i < dim(); ++i)
       {
-        const SVector& rowvec = this->rowVector( row );
+         Real x = fTest()[i];
 
-        Real val = 0.0;
+         if(x < 0.0)
+         {
+            sumviol -= x;
 
-        for( int col = 0; col < rowvec.size(); ++col )
-          val += rowvec.value( col ) * solu[rowvec.index( col )];
-
-        Real viol = spxAbs(val - slacks[row]);
-
-        if (viol > maxviol)
-          maxviol = viol;
-
-        sumviol += viol;
+            if(x < maxviol)
+               maxviol = x;
+         }
       }
-  }
+   }
 
-  template <>
-  void SPxSolverBase<Real>::qualRedCostViolation(Real& maxviol, Real& sumviol) const
-  {
-    maxviol = 0.0;
-    sumviol = 0.0;
-
-    int i;
-    // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
-    //         redcost = c_N - yA_N
-    // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
-    // DVector y( this->nRows() );
-    // basis().coSolve( x, spx->unitVector( i ) );
-    // DVector rdcost( this->nCols() );
-    if (type() == ENTER)
-      {
-        for(i = 0; i < dim(); ++i)
-          {
-            Real x = coTest()[i];
-
-            if (x < 0.0)
-              {
-                sumviol -= x;
-
-                if (x < maxviol)
-                  maxviol = x;
-              }
-          }
-        for(i = 0; i < coDim(); ++i)
-          {
-            Real x = test()[i];
-
-            if (x < 0.0)
-              {
-                sumviol -= x;
-
-                if (x < maxviol)
-                  maxviol = x;
-              }
-          }
-      }
-    else
-      {
-        assert(type() == LEAVE);
-
-        for(i = 0; i < dim(); ++i)
-          {
-            Real x = fTest()[i];
-
-            if (x < 0.0)
-              {
-                sumviol -= x;
-
-                if (x < maxviol)
-                  maxviol = x;
-              }
-          }
-      }
-    maxviol *= -1;
-  }
+   maxviol *= -1;
+}
 
 } // namespace soplex

@@ -98,9 +98,9 @@ public:
    /// destructor
    virtual ~SPxOut();
    /// copy constructor
-   SPxOut( const SPxOut& );
+   SPxOut(const SPxOut&);
    /// assignment operator
-   SPxOut& operator=( const SPxOut& );
+   SPxOut& operator=(const SPxOut&);
    //@}
 
    //-----------------------------------
@@ -108,14 +108,14 @@ public:
    //@{
    ///
    virtual void
-   setVerbosity( const Verbosity& v )
+   setVerbosity(const Verbosity& v)
    {
       m_verbosity = v;
    }
    ///
    inline Verbosity
    getVerbosity()
-      const
+   const
    {
       return m_verbosity;
    }
@@ -131,7 +131,7 @@ public:
       return getCurrentStream().good();
    }
    ///
-   inline bool operator ! () const
+   inline bool operator !() const
    {
       return ! getCurrentStream();
    }
@@ -147,34 +147,34 @@ public:
    //@{
    /// Sets the stream for the specified verbosity level.
    virtual void
-   setStream( const Verbosity& verbosity,
-               std::ostream&   stream )
+   setStream(const Verbosity& verbosity,
+             std::ostream&   stream)
    {
       m_streams[ verbosity ] = &stream;
    }
    /// Returns the stream for the specified verbosity level.
    inline std::ostream&
-   getStream( const Verbosity& verbosity )
-      const
+   getStream(const Verbosity& verbosity)
+   const
    {
       return *(m_streams[ verbosity ]);
    }
    /// Returns the stream for the current verbosity.
    inline std::ostream&
    getCurrentStream()
-      const
+   const
    {
-      return getStream( getVerbosity() );
+      return getStream(getVerbosity());
    }
 
    /// Sets the precision of the stream to 16 and the floatfield to scientifix.
-   static inline void setScientific( std::ostream& stream, int precision = 8 )
+   static inline void setScientific(std::ostream& stream, int precision = 8)
    {
       stream << std::setprecision(precision) << std::scientific;
    }
 
    /// Sets the precision of the stream to 8 and the floatfield to fixed.
-   static inline void setFixed( std::ostream& stream, int precision = 8 )
+   static inline void setFixed(std::ostream& stream, int precision = 8)
    {
       stream << std::setprecision(precision) << std::fixed;
    }
@@ -192,144 +192,144 @@ private:
    //@}
 };
 
-   // ---------------------------------------------------------
-   //    Manipulators
-   // ---------------------------------------------------------
+// ---------------------------------------------------------
+//    Manipulators
+// ---------------------------------------------------------
 
 
-   //-------------------------------------------
-   /**@name Verbosity manipulator
-       Manipulators are implemented in a similar way as done for @c setw(),
-       @c setprecision(), etc. in the standard library file iomanip. For
-       instance, the non-member function \ref verb() "verb(v)" returns a
-       struct struct_Severity which contains only the verbosity level.
-       Calling
-       @code
-            SPxOut spxout;
-            spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
-       @endcode
-       passes such a struct to the output operator defined below, which
-       extracts the verbosity level from the struct and passes it to the
-       member function SPxOut::setVerbosity().
-   */
-   //@{
-   /// manipulator to be used in an output statement
-   inline SPxOut::struct_Verbosity
-   verb( const SPxOut::Verbosity&  v )
-   {
-      SPxOut::struct_Verbosity verbosity;
-      verbosity.v_ = v;
-      return verbosity;
-   }
+//-------------------------------------------
+/**@name Verbosity manipulator
+    Manipulators are implemented in a similar way as done for @c setw(),
+    @c setprecision(), etc. in the standard library file iomanip. For
+    instance, the non-member function \ref verb() "verb(v)" returns a
+    struct struct_Severity which contains only the verbosity level.
+    Calling
+    @code
+         SPxOut spxout;
+         spxout << verb( SPxOut::ERROR ) << "This is an error!" << std::endl;
+    @endcode
+    passes such a struct to the output operator defined below, which
+    extracts the verbosity level from the struct and passes it to the
+    member function SPxOut::setVerbosity().
+*/
+//@{
+/// manipulator to be used in an output statement
+inline SPxOut::struct_Verbosity
+verb(const SPxOut::Verbosity&  v)
+{
+   SPxOut::struct_Verbosity verbosity;
+   verbosity.v_ = v;
+   return verbosity;
+}
 
-   /// output operator with verbosity level struct
-   inline SPxOut&
-   operator<< ( SPxOut& stream,
-                const SPxOut::struct_Verbosity&  verbosity )
-   {
-      stream.setVerbosity( verbosity.v_ );
-      return stream;
-   }
-   //@}
+/// output operator with verbosity level struct
+inline SPxOut&
+operator<< (SPxOut& stream,
+            const SPxOut::struct_Verbosity&  verbosity)
+{
+   stream.setVerbosity(verbosity.v_);
+   return stream;
+}
+//@}
 
-   //--------------------------------------------------------
-   /**@name Output of standard manipulators and other types
-    *
-    * We have to define an output operator for many kinds of numeric
-    * types here because they can all be more or less casted into each
-    * other. When using only a template type, it is not clear what the
-    * compiler makes out of it (according to lint).
-    */
-   //@{
-   ///
-   /// Passes instances of type \p Type to the current stream.
-   inline SPxOut& operator<< ( SPxOut& _spxout, long t )
-   {
-    _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+//--------------------------------------------------------
+/**@name Output of standard manipulators and other types
+ *
+ * We have to define an output operator for many kinds of numeric
+ * types here because they can all be more or less casted into each
+ * other. When using only a template type, it is not clear what the
+ * compiler makes out of it (according to lint).
+ */
+//@{
+///
+/// Passes instances of type \p Type to the current stream.
+inline SPxOut& operator<< (SPxOut& _spxout, long t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, unsigned long t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, unsigned long t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, bool t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, bool t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, short t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, short t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, unsigned short t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, unsigned short t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, int t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, int t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, unsigned int t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, unsigned int t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, double t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, double t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, float t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, float t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, long double t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, long double t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   inline SPxOut& operator<< ( SPxOut& _spxout, const void * t )
-   {
-     _spxout.getCurrentStream() << t;
-     return _spxout;
-   }
+inline SPxOut& operator<< (SPxOut& _spxout, const void* t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
 
-   /// Passes standard manipulators without arguments, like @c std::endl
-   /// or @c std::ios::right to the current stream.
-   inline SPxOut&
-   operator<< ( SPxOut&       _spxout,
-                std::ostream& (*manip)( std::ostream& ) )
-   {
-     _spxout.getCurrentStream() << manip;
-     return _spxout;
-   }
+/// Passes standard manipulators without arguments, like @c std::endl
+/// or @c std::ios::right to the current stream.
+inline SPxOut&
+operator<< (SPxOut&       _spxout,
+            std::ostream & (*manip)(std::ostream&))
+{
+   _spxout.getCurrentStream() << manip;
+   return _spxout;
+}
 
-   //lint -e{818} (pointer could be made const; this is ok.)
-   /// Passes everything else to the current stream. In particular,
-   /// this includes structs corresponding to manipulators with arguments,
-   /// such as the struct @c _Setw for the @c setw() manipulator.
-   template <typename T>
-   inline SPxOut& operator<< ( SPxOut& _spxout, T  t )
-     {
-       _spxout.getCurrentStream() << t;
-       return _spxout;
-     }
-   //@}
+//lint -e{818} (pointer could be made const; this is ok.)
+/// Passes everything else to the current stream. In particular,
+/// this includes structs corresponding to manipulators with arguments,
+/// such as the struct @c _Setw for the @c setw() manipulator.
+template <typename T>
+inline SPxOut& operator<< (SPxOut& _spxout, T  t)
+{
+   _spxout.getCurrentStream() << t;
+   return _spxout;
+}
+//@}
 
 }  // namespace soplex
 

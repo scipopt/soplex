@@ -37,7 +37,7 @@ namespace soplex
    See SPxRatioTester for a class documentation.
 */
 /**@todo HarrisRT leads to cycling in dcmulti.sub.lp */
-  template <class R>
+template <class R>
 class SPxHarrisRT : public SPxRatioTester<R>
 {
 private:
@@ -59,7 +59,7 @@ private:
       const Real* low,      ///< lower bounds for \p vec
       const Real* up,       ///< upper bounds for \p vec
       Real epsilon          ///< what is 0?
-      ) const;
+   ) const;
 
    ///
    int minDelta(
@@ -72,7 +72,7 @@ private:
       const Real* low,      ///< lower bounds for \p vec
       const Real* up,       ///< upper bounds for \p vec
       Real epsilon          ///< what is 0?
-      ) const;
+   ) const;
    //@}
 
 public:
@@ -89,7 +89,7 @@ public:
       : SPxRatioTester<R>(old)
    {}
    /// assignment operator
-   SPxHarrisRT& operator=( const SPxHarrisRT& rhs)
+   SPxHarrisRT& operator=(const SPxHarrisRT& rhs)
    {
       if(this != &rhs)
       {

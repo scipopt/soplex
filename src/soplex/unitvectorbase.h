@@ -68,7 +68,7 @@ public:
    /* ARGSUSED n */
    R value(int n) const
    {
-      assert( n == 0 );
+      assert(n == 0);
       return 1;
    }
    //@}
@@ -96,12 +96,13 @@ public:
    /// assignment
    UnitVectorBase<R>& operator=(const UnitVectorBase<R>& rhs)
    {
-      if ( this != &rhs )
+      if(this != &rhs)
       {
          themem = rhs.themem;
 
          assert(isConsistent());
       }
+
       return *this;
    }
    /// destructor
@@ -116,11 +117,14 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if (mem() != &themem)
+
+      if(mem() != &themem)
          return MSGinconsistent("UnitVectorBase");
-      if (size() != 1)
+
+      if(size() != 1)
          return MSGinconsistent("UnitVectorBase");
-      if (max() != 1)
+
+      if(max() != 1)
          return MSGinconsistent("UnitVectorBase");
 
       return SVectorBase<R>::isConsistent();

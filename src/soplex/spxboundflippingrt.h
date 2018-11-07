@@ -48,7 +48,7 @@ struct Compare;
 
    See SPxRatioTester for a class documentation.
 */
- template <class R>
+template <class R>
 class SPxBoundFlippingRT : public SPxFastRT<R>
 {
 private:
@@ -86,10 +86,10 @@ private:
 
       const Breakpoint*  entry;
 
-      Real operator() (
+      Real operator()(
          Breakpoint      i,
          Breakpoint      j
-         ) const
+      ) const
       {
          return i.val - j.val;
       }
@@ -101,11 +101,14 @@ private:
    //@{
    bool                  enableBoundFlips;   /**< enable or disable long steps in BoundFlippingRT */
    bool                  enableRowBoundFlips;/**< enable bound flips also for row representation */
-   Real                  flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
+   Real
+   flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
    int                   relax_count;        /**< count rounds of ratio test */
    DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
-   SSVector              updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
-   SSVector              updPrimVec;         /**< allocation of memory for additional solution vector */
+   SSVector
+   updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
+   SSVector
+   updPrimVec;         /**< allocation of memory for additional solution vector */
    //@}
 
    /** store all available pivots/breakpoints in an array (positive pivot search direction) */
@@ -119,7 +122,7 @@ private:
       const Real*        upp,                /**< pointer to upper bound/rhs of current vector */
       const Real*        low,                /**< pointer to lower bound/lhs of current vector */
       BreakpointSource   src                 /**< type of vector (pVec or coPvec)*/
-      );
+   );
 
    /** store all available pivots/breakpoints in an array (negative pivot search direction) */
    void collectBreakpointsMin(
@@ -132,7 +135,7 @@ private:
       const Real*        upp,                /**< pointer to upper bound/rhs of current vector */
       const Real*        low,                /**< pointer to lower bound/lhs of current vector */
       BreakpointSource   src                 /**< type of vector (pVec or coPvec)*/
-      );
+   );
 
    /** get values for entering index and perform shifts if necessary */
    bool getData(
@@ -147,7 +150,7 @@ private:
       const Real*        upp,
       BreakpointSource   src,
       Real               max
-      );
+   );
 
    /** get values for leaving index and perform shifts if necessary */
    bool getData(
@@ -162,18 +165,18 @@ private:
       const Real*        upp,
       BreakpointSource   src,
       Real               max
-      );
+   );
 
    /** perform necessary bound flips to restore dual feasibility */
    void flipAndUpdate(
       int&               usedBp              /**< number of bounds that should be flipped */
-      );
+   );
 
    /** comparison method for breakpoints */
    static bool isSmaller(
       Breakpoint         x,
       Breakpoint         y
-      )
+   )
    {
       return (spxAbs(x.val) < spxAbs(y.val));
    };
@@ -206,7 +209,7 @@ public:
       , updPrimVec(0)
    {}
    /// assignment operator
-   SPxBoundFlippingRT& operator=( const SPxBoundFlippingRT& rhs)
+   SPxBoundFlippingRT& operator=(const SPxBoundFlippingRT& rhs)
    {
       if(this != &rhs)
       {
@@ -237,13 +240,13 @@ public:
       Real&              val,
       Real               enterTest,
       bool               polish = false
-      );
+   );
    ///
    virtual SPxId selectEnter(
       Real&              val,
       int                leaveIdx,
       bool               polish = false
-      );
+   );
 
    void useBoundFlips(bool bf)
    {

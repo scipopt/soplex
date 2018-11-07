@@ -140,13 +140,13 @@ public:
    }
 
    /// returns successor of \p elem or 0, if \p elem is the last element.
-   T* next(const T *elem) const
+   T* next(const T* elem) const
    {
       return (elem == last()) ? 0 : elem->next();
    }
 
    /// returns predecessor of \p elem or 0, if \p elem is the first element.
-   T* prev(const T *elem) const
+   T* prev(const T* elem) const
    {
       return (elem == first()) ? 0 : elem->prev();
    }
@@ -157,36 +157,39 @@ public:
    /**@name Extension */
    //@{
    /// appends \p elem to end of list.
-   void append (T* elem)
+   void append(T* elem)
    {
-      if (last())
+      if(last())
       {
          last()->next() = elem;
          elem->prev() = last();
       }
       else
          this->the_first = elem;
+
       this->the_last = elem;
    }
 
    /// prepends \p elem at beginnig of list.
    void prepend(T* elem)
    {
-      if (first())
+      if(first())
       {
          elem->next() = first();
          first()->prev() = elem;
       }
       else
          this->the_last = elem;
+
       this->the_first = elem;
    }
 
    /// inserts \p elem after \p after.
-   void insert (T* elem, T* after)
+   void insert(T* elem, T* after)
    {
       assert(find(after));
-      if (after == last())
+
+      if(after == last())
          append(elem);
       else
       {
@@ -197,9 +200,9 @@ public:
    }
 
    /// appends \p list to end of list.
-   void append (IdList<T>& list)
+   void append(IdList<T>& list)
    {
-      if (list.first())
+      if(list.first())
       {
          append(list.first());
          this->the_last = list.last();
@@ -209,7 +212,7 @@ public:
    /// prepends \p list at beginnig of list.
    void prepend(IdList<T>& list)
    {
-      if (list.first())
+      if(list.first())
       {
          prepend(list.last());
          this->the_first = list.the_first;
@@ -217,15 +220,17 @@ public:
    }
 
    /// inserts \p list after \p after.
-   void insert (IdList<T>& list, T* after)
+   void insert(IdList<T>& list, T* after)
    {
       assert(find(after));
-      if (list.first())
+
+      if(list.first())
       {
          list.last()->next() = after->next();
          list.first()->prev() = after;
          after->next() = list.first();
-         if (after == last())
+
+         if(after == last())
             this->the_last = list.last();
          else
             list.last()->next()->prev() = list.last();
@@ -245,13 +250,14 @@ public:
    /// removes \p elem from list.
    void remove(T* elem)
    {
-      if (elem == first())
+      if(elem == first())
       {
          this->the_first = next(elem);
-         if (first() == 0)
+
+         if(first() == 0)
             this->the_last = 0;
       }
-      else if (elem == last())
+      else if(elem == last())
          this->the_last = elem->prev();
       else
       {
@@ -263,25 +269,28 @@ public:
    /// removes sublist \p list.
    void remove(IdList<T>& list)
    {
-      if (first() != 0 && list.first() != 0)
+      if(first() != 0 && list.first() != 0)
       {
          assert(find(list.first()));
          assert(find(list.last()));
-         if (first() == list.first())
+
+         if(first() == list.first())
          {
-            if (last() == list.last())
+            if(last() == list.last())
                this->the_first = this->the_last = 0;
             else
                this->the_first = list.last()->next();
          }
-         else if (last() == list.last())
+         else if(last() == list.last())
             this->the_last = list.last()->prev();
          else
          {
             T* after = first();
-            for (; after->next() != list.first(); after = after->next())
-              ;
-            if (last() == list.last())
+
+            for(; after->next() != list.first(); after = after->next())
+               ;
+
+            if(last() == list.last())
                this->the_last = after;
             else
                after->next() = list.last()->next();
@@ -300,14 +309,15 @@ public:
    */
    void move(ptrdiff_t delta)
    {
-      if (this->the_first)
+      if(this->the_first)
       {
          T* elem;
          IsList<T>::move(delta);
-         for (elem = last(); elem; elem = prev(elem))
-            if (elem != first())
+
+         for(elem = last(); elem; elem = prev(elem))
+            if(elem != first())
                elem->prev() = reinterpret_cast<T*>(
-                  reinterpret_cast<char*>(elem->prev()) + delta);
+                                 reinterpret_cast<char*>(elem->prev()) + delta);
       }
    }
 
@@ -317,14 +327,16 @@ public:
 #ifdef ENABLE_CONSISTENCY_CHECKS
       const T* my_first = first();
       const T* my_last  = last();
-      for (const T * it = my_first; it; it = next(it))
+
+      for(const T* it = my_first; it; it = next(it))
       {
-         if (it != my_first && it->prev()->next() != it)
+         if(it != my_first && it->prev()->next() != it)
             return MSGinconsistent("IdList");
 
-         if (it != my_last && it->next()->prev() != it)
+         if(it != my_last && it->next()->prev() != it)
             return MSGinconsistent("IdList");
       }
+
       return IsList<T>::isConsistent();
 #else
       return true;

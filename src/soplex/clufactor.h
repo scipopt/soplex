@@ -99,8 +99,8 @@ protected:
       void clear();         ///< clears the structure
 
    private:
-      Temp( const Temp& );             ///< blocked copy constructor
-      Temp& operator= ( const Temp& ); ///< blocked assignment operator
+      Temp(const Temp&);               ///< blocked copy constructor
+      Temp& operator= (const Temp&);   ///< blocked assignment operator
    };
 
    /// Data structures for saving the row and column permutations.
@@ -137,16 +137,16 @@ protected:
          Dring list;         /*!< \brief Double linked ringlist of vector
                                 indices in the order they appear
                                 in the column file                  */
-         Dring *elem;        ///< %Array of ring elements.
+         Dring* elem;        ///< %Array of ring elements.
          int size;           ///< size of array idx
          int used;           ///< used entries of array idx
-         int *idx;           ///< hold row indices of nonzeros
-         Real *val;          /*!< \brief hold nonzero values: this is only initialized
+         int* idx;           ///< hold row indices of nonzeros
+         Real* val;          /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
                                 updates.                            */
-         int *start;         ///< starting positions in val and idx
-         int *len;           ///< used nonzeros per column vector
-         int *max;           /*!< \brief maximum available nonzeros per colunn:
+         int* start;         ///< starting positions in val and idx
+         int* len;           ///< used nonzeros per column vector
+         int* max;           /*!< \brief maximum available nonzeros per colunn:
                                start[i] + max[i] == start[elem[i].next->idx]
                                len[i] <= max[i].                    */
       } col;
@@ -157,24 +157,24 @@ protected:
    struct L
    {
       int  size;           ///< size of arrays val and idx
-      Real *val;           ///< values of L vectors
-      int  *idx;           ///< indices of L vectors
+      Real* val;           ///< values of L vectors
+      int*  idx;           ///< indices of L vectors
       int  startSize;      ///< size of array start
       int  firstUpdate;    ///< number of first update L vector
       int  firstUnused;    ///< number of first unused L vector
-      int  *start;         ///< starting positions in val and idx
-      int  *row;           ///< column indices of L vectors
+      int*  start;         ///< starting positions in val and idx
+      int*  row;           ///< column indices of L vectors
       int  updateType;     ///< type of updates to be used.
 
       /* The following arrays have length |firstUpdate|, since they keep
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-      Real *rval;          ///< values of rows of L
-      int  *ridx;          ///< indices of rows of L
-      int  *rbeg;          ///< start of rows in rval and ridx
-      int  *rorig;         ///< original row permutation
-      int  *rperm;         ///< original row permutation
+      Real* rval;          ///< values of rows of L
+      int*  ridx;          ///< indices of rows of L
+      int*  rbeg;          ///< start of rows in rval and ridx
+      int*  rorig;         ///< original row permutation
+      int*  rperm;         ///< original row permutation
    };
    //@}
 
@@ -261,18 +261,18 @@ private:
    void vSolveLright(Real* vec, int* ridx, int& rn, Real eps);
    ///
    void vSolveLright2(Real* vec, int* ridx, int& rn, Real eps,
-      Real* vec2, int* ridx2, int& rn2, Real eps2);
+                      Real* vec2, int* ridx2, int& rn2, Real eps2);
    ///
    void vSolveLright3(Real* vec, int* ridx, int& rn, Real eps,
-      Real* vec2, int* ridx2, int& rn2, Real eps2,
-      Real* vec3, int* ridx3, int& rn3, Real eps3);
+                      Real* vec2, int* ridx2, int& rn2, Real eps2,
+                      Real* vec3, int* ridx3, int& rn3, Real eps3);
    ///
    int vSolveUright(Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps);
    ///
    void vSolveUrightNoNZ(Real* vec, Real* rhs, int* ridx, int rn, Real eps);
    ///
    int vSolveUright2(Real* vec, int* vidx, Real* rhs, int* ridx, int rn, Real eps,
-      Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2);
+                     Real* vec2, Real* rhs2, int* ridx2, int rn2, Real eps2);
    ///
    int vSolveUpdateRight(Real* vec, int* ridx, int n, Real eps);
    ///
@@ -302,7 +302,7 @@ private:
    ///
    void initPerm();
    ///
-   void initFactorMatrix(const SVector** vec, const Real eps );
+   void initFactorMatrix(const SVector** vec, const Real eps);
    ///
    void minLMem(int size);
    ///
@@ -360,12 +360,12 @@ protected:
    void solveLright(Real* vec);
    ///
    int  solveRight4update(Real* vec, int* nonz, Real eps, Real* rhs,
-      Real* forest, int* forestNum, int* forestIdx);
+                          Real* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight(Real* vec, Real* rhs);
    ///
    int  solveRight2update(Real* vec1, Real* vec2, Real* rhs1,
-      Real* rhs2, int* nonz, Real eps, Real* forest, int* forestNum, int* forestIdx);
+                          Real* rhs2, int* nonz, Real eps, Real* forest, int* forestNum, int* forestIdx);
    ///
    void solveRight2(Real* vec1, Real* vec2, Real* rhs1, Real* rhs2);
    ///
@@ -377,16 +377,16 @@ protected:
 
    ///
    int vSolveRight4update(Real eps,
-      Real* vec, int* idx,               /* result       */
-      Real* rhs, int* ridx, int rn,      /* rhs & Forest */
-      Real* forest, int* forestNum, int* forestIdx);
+                          Real* vec, int* idx,               /* result       */
+                          Real* rhs, int* ridx, int rn,      /* rhs & Forest */
+                          Real* forest, int* forestNum, int* forestIdx);
    ///
    int vSolveRight4update2(Real eps,
-      Real* vec, int* idx,              /* result1 */
-      Real* rhs, int* ridx, int rn,     /* rhs1    */
-      Real* vec2, Real eps2,            /* result2 */
-      Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
-      Real* forest, int* forestNum, int* forestIdx);
+                           Real* vec, int* idx,              /* result1 */
+                           Real* rhs, int* ridx, int rn,     /* rhs1    */
+                           Real* vec2, Real eps2,            /* result2 */
+                           Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
+                           Real* forest, int* forestNum, int* forestIdx);
    /// sparse version of above method
    void vSolveRight4update2sparse(
       Real eps, Real* vec, int* idx,    /* result1 */
@@ -396,13 +396,13 @@ protected:
       Real* forest, int* forestNum, int* forestIdx);
    ///
    int vSolveRight4update3(Real eps,
-      Real* vec, int* idx,              /* result1 */
-      Real* rhs, int* ridx, int rn,     /* rhs1    */
-      Real* vec2, Real eps2,            /* result2 */
-      Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
-      Real* vec3, Real eps3,            /* result3 */
-      Real* rhs3, int* ridx3, int rn3,  /* rhs3    */
-      Real* forest, int* forestNum, int* forestIdx);
+                           Real* vec, int* idx,              /* result1 */
+                           Real* rhs, int* ridx, int rn,     /* rhs1    */
+                           Real* vec2, Real eps2,            /* result2 */
+                           Real* rhs2, int* ridx2, int rn2,  /* rhs2    */
+                           Real* vec3, Real eps3,            /* result3 */
+                           Real* rhs3, int* ridx3, int rn3,  /* rhs3    */
+                           Real* forest, int* forestNum, int* forestIdx);
    /// sparse version of above method
    void vSolveRight4update3sparse(
       Real eps, Real* vec, int* idx,    /* result1 */
@@ -414,21 +414,21 @@ protected:
       Real* forest, int* forestNum, int* forestIdx);
    ///
    void vSolveRightNoNZ(Real* vec, Real eps,    /* result */
-      Real* rhs, int* ridx, int rn);            /* rhs    */
+                        Real* rhs, int* ridx, int rn);            /* rhs    */
    ///
    int vSolveLeft(Real eps,
-      Real* vec, int* idx,                      /* result */
-      Real* rhs, int* ridx, int rn);            /* rhs    */
+                  Real* vec, int* idx,                      /* result */
+                  Real* rhs, int* ridx, int rn);            /* rhs    */
    ///
    void vSolveLeftNoNZ(Real eps,
-      Real* vec,                           /* result */
-      Real* rhs, int* ridx, int rn);       /* rhs    */
+                       Real* vec,                           /* result */
+                       Real* rhs, int* ridx, int rn);       /* rhs    */
    ///
    int vSolveLeft2(Real eps,
-      Real* vec, int* idx,                     /* result */
-      Real* rhs, int* ridx, int rn,            /* rhs    */
-      Real* vec2,                              /* result2 */
-      Real* rhs2, int* ridx2, int rn2);        /* rhs2    */
+                   Real* vec, int* idx,                     /* result */
+                   Real* rhs, int* ridx, int rn,            /* rhs    */
+                   Real* vec2,                              /* result2 */
+                   Real* rhs2, int* ridx2, int rn2);        /* rhs2    */
    /// sparse version of solving 2 systems of equations
    void vSolveLeft2sparse(Real eps,
                           Real* vec, int* idx,                     /* result */
@@ -452,7 +452,7 @@ protected:
                           Real* vec3, int* idx3,                   /* result2 */
                           Real* rhs3, int* ridx3, int& rn3);       /* rhs2    */
 
-   void forestUpdate(int col, Real* work, int num, int *nonz);
+   void forestUpdate(int col, Real* work, int num, int* nonz);
 
    void update(int p_col, Real* p_work, const int* p_idx, int num);
    void updateNoClear(int p_col, const Real* p_work, const int* p_idx, int num);

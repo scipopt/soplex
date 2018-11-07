@@ -101,7 +101,8 @@ public:
    /// compute a single scaling vector , e.g. of a newly added row
    virtual int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
 
-   virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
+   virtual int computeScaleExp(const SVectorBase<Rational>& vec,
+                               const DataArray<int>& oldScaleExp) const;
 
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
@@ -112,11 +113,12 @@ public:
    /**@name Construction / destruction */
    //@{
    /// constructor
-   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true, SPxOut* spxout = NULL);
+   explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true,
+                      SPxOut* spxout = NULL);
    /// copy constructor
-   SPxScaler(const SPxScaler& );
+   SPxScaler(const SPxScaler&);
    /// assignment operator
-   SPxScaler& operator=(const SPxScaler& );
+   SPxScaler& operator=(const SPxScaler&);
    /// destructor.
    virtual ~SPxScaler();
    /// clone function for polymorphism

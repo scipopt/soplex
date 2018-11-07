@@ -39,7 +39,7 @@ DIdxSet::DIdxSet(const IdxSet& old)
    len = (len < 1) ? 1 : len;
    spx_alloc(idx, len);
 
-   IdxSet::operator= ( old );
+   IdxSet::operator= (old);
 }
 
 DIdxSet::DIdxSet(const DIdxSet& old)
@@ -49,7 +49,7 @@ DIdxSet::DIdxSet(const DIdxSet& old)
    len = (len < 1) ? 1 : len;
    spx_alloc(idx, len);
 
-   IdxSet::operator= ( old );
+   IdxSet::operator= (old);
 }
 
 DIdxSet::DIdxSet(int n)

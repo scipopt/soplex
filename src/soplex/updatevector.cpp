@@ -20,7 +20,7 @@ namespace soplex
 
 UpdateVector& UpdateVector::operator=(const UpdateVector& rhs)
 {
-   if (this != &rhs)
+   if(this != &rhs)
    {
       theval   = rhs.theval;
       thedelta = rhs.thedelta;
@@ -28,11 +28,12 @@ UpdateVector& UpdateVector::operator=(const UpdateVector& rhs)
 
       assert(UpdateVector::isConsistent());
    }
+
    return *this;
 }
 
-UpdateVector::UpdateVector( const UpdateVector& base)
-   : DVector( base )
+UpdateVector::UpdateVector(const UpdateVector& base)
+   : DVector(base)
    , theval(base.theval)
    , thedelta(base.thedelta)
 {
@@ -42,7 +43,8 @@ UpdateVector::UpdateVector( const UpdateVector& base)
 bool UpdateVector::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (dim() != thedelta.dim())
+
+   if(dim() != thedelta.dim())
       return MSGinconsistent("UpdateVector");
 
    return DVector::isConsistent() && thedelta.isConsistent();
