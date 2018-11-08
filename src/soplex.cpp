@@ -899,55 +899,6 @@ namespace soplex
 
 
 
-  /// returns vector of col \p i, ignoring scaling
-  template <>
-  const SVectorReal& SoPlexBase<Real>::colVectorRealInternal(int i) const
-  {
-    assert(_realLP != 0);
-    return _realLP->colVector(i);
-  }
-
-
-
-  /// gets vector of col \p i
-  template <>
-  void SoPlexBase<Real>::getColVectorReal(int i, DSVectorReal& col) const
-  {
-    assert(_realLP);
-    _realLP->getColVectorUnscaled(i, col);
-  }
-
-
-
-  /// returns upper bound vector
-  template <>
-  const VectorReal& SoPlexBase<Real>::upperRealInternal() const
-  {
-    assert(_realLP != 0);
-    return _realLP->upper();
-  }
-
-
-
-  /// returns upper bound of column \p i
-  template <>
-  Real SoPlexBase<Real>::upperReal(int i) const
-  {
-    assert(_realLP != 0);
-    return _realLP->upperUnscaled(i);
-  }
-
-
-
-  /// gets upper bound vector
-  template <>
-  void SoPlexBase<Real>::getUpperReal(DVectorReal& upper) const
-  {
-    assert(_realLP != 0);
-    return _realLP->getUpperUnscaled(upper);
-  }
-
-
 
   /// returns lower bound vector
   template <>
