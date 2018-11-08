@@ -416,3 +416,34 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
     return *this;
 }
+
+/// returns smallest non-zero element in absolute value
+template <class R>
+Real SoPlexBase<R>::minAbsNonzeroReal() const
+{
+  assert(_realLP != 0);
+  return _realLP->minAbsNzo();
+}
+
+
+/// returns biggest non-zero element in absolute value
+template <class R>
+Real SoPlexBase<R>::maxAbsNonzeroReal() const
+{
+  assert(_realLP != 0);
+  return _realLP->maxAbsNzo();
+}
+
+
+/// returns (unscaled) coefficient
+template <class R>
+Real SoPlexBase<R>::coefReal(int row, int col) const
+{
+  if( _realLP->isScaled() )
+    {
+      assert(_scaler);
+      return _scaler->getCoefUnscaled(*_realLP, row, col);
+    }
+  else
+    return colVectorRealInternal(col)[row];
+}

@@ -897,40 +897,6 @@ namespace soplex
   }
 
 
-  /// returns smallest non-zero element in absolute value
-  template <>
-  Real SoPlexBase<Real>::minAbsNonzeroReal() const
-  {
-    assert(_realLP != 0);
-    return _realLP->minAbsNzo();
-  }
-
-
-
-  /// returns biggest non-zero element in absolute value
-  template <>
-  Real SoPlexBase<Real>::maxAbsNonzeroReal() const
-  {
-    assert(_realLP != 0);
-    return _realLP->maxAbsNzo();
-  }
-
-
-
-  /// returns (unscaled) coefficient
-  template <>
-  Real SoPlexBase<Real>::coefReal(int row, int col) const
-  {
-    if( _realLP->isScaled() )
-      {
-        assert(_scaler);
-        return _scaler->getCoefUnscaled(*_realLP, row, col);
-      }
-    else
-      return colVectorRealInternal(col)[row];
-  }
-
-
 
   /// returns vector of row \p i, ignoring scaling
   template <>
