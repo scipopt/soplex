@@ -138,16 +138,16 @@ public:
    Real coefReal(int row, int col) const;
 
    /// returns vector of row \p i, ignoring scaling
-   const SVectorReal& rowVectorRealInternal(int i) const;
+  const SVectorBase<R>& rowVectorRealInternal(int i) const;
 
    /// gets vector of row \p i
-   void getRowVectorReal(int i, DSVectorReal& row) const;
+  void getRowVectorReal(int i, DSVectorBase<R>& row) const;
 
    /// returns right-hand side vector, ignoring scaling
-   const VectorReal& rhsRealInternal() const;
+  const VectorBase<R>& rhsRealInternal() const;
 
    /// gets right-hand side vector
-   void getRhsReal(DVectorReal& rhs) const;
+  void getRhsReal(DVectorBase<R>& rhs) const;
 
    /// returns right-hand side of row \p i
    Real rhsReal(int i) const;

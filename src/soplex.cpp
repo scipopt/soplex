@@ -898,63 +898,6 @@ namespace soplex
 
 
 
-  /// returns vector of row \p i, ignoring scaling
-  template <>
-  const SVectorReal& SoPlexBase<Real>::rowVectorRealInternal(int i) const
-  {
-    assert(_realLP != 0);
-    return _realLP->rowVector(i);
-  }
-
-
-
-  /// gets vector of row \p i
-  template <>
-  void SoPlexBase<Real>::getRowVectorReal(int i, DSVectorReal& row) const
-  {
-    assert(_realLP);
-
-    if( _realLP->isScaled() )
-      {
-        assert(_scaler);
-        row.setMax(_realLP->rowVector(i).size());
-        _scaler->getRowUnscaled(*_realLP, i, row);
-      }
-    else
-      row = _realLP->rowVector(i);
-  }
-
-
-
-  /// returns right-hand side vector, ignoring scaling
-  template <>
-  const VectorReal& SoPlexBase<Real>::rhsRealInternal() const
-  {
-    assert(_realLP != 0);
-    return _realLP->rhs();
-  }
-
-
-
-  /// gets right-hand side vector
-  template <>
-  void SoPlexBase<Real>::getRhsReal(DVectorReal& rhs) const
-  {
-    assert(_realLP);
-    _realLP->getRhsUnscaled(rhs);
-  }
-
-
-
-  /// returns right-hand side of row \p i
-  template <>
-  Real SoPlexBase<Real>::rhsReal(int i) const
-  {
-    assert(_realLP != 0);
-    return _realLP->rhsUnscaled(i);
-  }
-
-
 
   /// returns left-hand side vector, ignoring scaling
   template <>

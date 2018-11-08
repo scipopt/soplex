@@ -447,3 +447,56 @@ Real SoPlexBase<R>::coefReal(int row, int col) const
   else
     return colVectorRealInternal(col)[row];
 }
+
+/// returns vector of row \p i, ignoring scaling
+template <class R>
+const SVectorBase<R>& SoPlexBase<R>::rowVectorRealInternal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->rowVector(i);
+}
+
+/// gets vector of row \p i
+template <class R>
+void SoPlexBase<R>::getRowVectorReal(int i, DSVectorBase<R>& row) const
+{
+  assert(_realLP);
+
+  if( _realLP->isScaled() )
+    {
+      assert(_scaler);
+      row.setMax(_realLP->rowVector(i).size());
+      _scaler->getRowUnscaled(*_realLP, i, row);
+    }
+  else
+    row = _realLP->rowVector(i);
+}
+
+
+/// returns right-hand side vector, ignoring scaling
+template <class R>
+const VectorBase<R>& SoPlexBase<R>::rhsRealInternal() const
+{
+  assert(_realLP != 0);
+  return _realLP->rhs();
+}
+
+
+
+/// gets right-hand side vector
+template <class R>
+void SoPlexBase<R>::getRhsReal(DVectorBase<R>& rhs) const
+{
+  assert(_realLP);
+  _realLP->getRhsUnscaled(rhs);
+}
+
+
+
+/// returns right-hand side of row \p i
+template <class R>
+Real SoPlexBase<R>::rhsReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->rhsUnscaled(i);
+}
