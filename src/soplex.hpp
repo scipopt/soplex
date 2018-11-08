@@ -306,115 +306,115 @@ bool SoPlexBase<R>::getRedCostViolation(R& maxviol, R& sumviol)
 template <class R>
 SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 {
-    if( this != &rhs )
-      {
-        // copy message handler
-        spxout = rhs.spxout;
+  if( this != &rhs )
+    {
+      // copy message handler
+      spxout = rhs.spxout;
 
-        // copy statistics
-        *_statistics = *(rhs._statistics);
+      // copy statistics
+      *_statistics = *(rhs._statistics);
 
-        // copy settings
-        *_currentSettings = *(rhs._currentSettings);
+      // copy settings
+      *_currentSettings = *(rhs._currentSettings);
 
-        // copy solver components
-        _solver = rhs._solver;
-        _slufactor = rhs._slufactor;
-        _simplifierMainSM = rhs._simplifierMainSM;
-        _scalerUniequi = rhs._scalerUniequi;
-        _scalerBiequi = rhs._scalerBiequi;
-        _scalerGeo1 = rhs._scalerGeo1;
-        _scalerGeo8 = rhs._scalerGeo8;
-        _scalerGeoequi = rhs._scalerGeoequi;
-        _scalerLeastsq = rhs._scalerLeastsq;
-        _starterWeight = rhs._starterWeight;
-        _starterSum = rhs._starterSum;
-        _starterVector = rhs._starterVector;
-        _pricerAuto = rhs._pricerAuto;
-        _pricerDantzig = rhs._pricerDantzig;
-        _pricerParMult = rhs._pricerParMult;
-        _pricerDevex = rhs._pricerDevex;
-        _pricerQuickSteep = rhs._pricerQuickSteep;
-        _pricerSteep = rhs._pricerSteep;
-        _ratiotesterTextbook = rhs._ratiotesterTextbook;
-        _ratiotesterHarris = rhs._ratiotesterHarris;
-        _ratiotesterFast = rhs._ratiotesterFast;
-        _ratiotesterBoundFlipping = rhs._ratiotesterBoundFlipping;
+      // copy solver components
+      _solver = rhs._solver;
+      _slufactor = rhs._slufactor;
+      _simplifierMainSM = rhs._simplifierMainSM;
+      _scalerUniequi = rhs._scalerUniequi;
+      _scalerBiequi = rhs._scalerBiequi;
+      _scalerGeo1 = rhs._scalerGeo1;
+      _scalerGeo8 = rhs._scalerGeo8;
+      _scalerGeoequi = rhs._scalerGeoequi;
+      _scalerLeastsq = rhs._scalerLeastsq;
+      _starterWeight = rhs._starterWeight;
+      _starterSum = rhs._starterSum;
+      _starterVector = rhs._starterVector;
+      _pricerAuto = rhs._pricerAuto;
+      _pricerDantzig = rhs._pricerDantzig;
+      _pricerParMult = rhs._pricerParMult;
+      _pricerDevex = rhs._pricerDevex;
+      _pricerQuickSteep = rhs._pricerQuickSteep;
+      _pricerSteep = rhs._pricerSteep;
+      _ratiotesterTextbook = rhs._ratiotesterTextbook;
+      _ratiotesterHarris = rhs._ratiotesterHarris;
+      _ratiotesterFast = rhs._ratiotesterFast;
+      _ratiotesterBoundFlipping = rhs._ratiotesterBoundFlipping;
 
-        // copy solution data
-        _status = rhs._status;
-        _lastSolveMode = rhs._lastSolveMode;
-        _basisStatusRows = rhs._basisStatusRows;
-        _basisStatusCols = rhs._basisStatusCols;
+      // copy solution data
+      _status = rhs._status;
+      _lastSolveMode = rhs._lastSolveMode;
+      _basisStatusRows = rhs._basisStatusRows;
+      _basisStatusCols = rhs._basisStatusCols;
 
-        if( rhs._hasSolReal )
-          _solReal = rhs._solReal;
+      if( rhs._hasSolReal )
+        _solReal = rhs._solReal;
 
-        if( rhs._hasSolRational )
-          _solRational = rhs._solRational;
+      if( rhs._hasSolRational )
+        _solRational = rhs._solRational;
 
-        // set message handlers in members
-        _solver.setOutstream(spxout);
-        _scalerUniequi.setOutstream(spxout);
-        _scalerBiequi.setOutstream(spxout);
-        _scalerGeo1.setOutstream(spxout);
-        _scalerGeo8.setOutstream(spxout);
-        _scalerGeoequi.setOutstream(spxout);
-        _scalerLeastsq.setOutstream(spxout);
+      // set message handlers in members
+      _solver.setOutstream(spxout);
+      _scalerUniequi.setOutstream(spxout);
+      _scalerBiequi.setOutstream(spxout);
+      _scalerGeo1.setOutstream(spxout);
+      _scalerGeo8.setOutstream(spxout);
+      _scalerGeoequi.setOutstream(spxout);
+      _scalerLeastsq.setOutstream(spxout);
 
-        // transfer the lu solver
-        _solver.setBasisSolver(&_slufactor);
+      // transfer the lu solver
+      _solver.setBasisSolver(&_slufactor);
 
-        // initialize pointers for simplifier, scaler, and starter
-        setIntParam(SoPlexBase<R>::SIMPLIFIER, intParam(SoPlexBase<R>::SIMPLIFIER), true);
-        setIntParam(SoPlexBase<R>::SCALER, intParam(SoPlexBase<R>::SCALER), true);
-        setIntParam(SoPlexBase<R>::STARTER, intParam(SoPlexBase<R>::STARTER), true);
+      // initialize pointers for simplifier, scaler, and starter
+      setIntParam(SoPlexBase<R>::SIMPLIFIER, intParam(SoPlexBase<R>::SIMPLIFIER), true);
+      setIntParam(SoPlexBase<R>::SCALER, intParam(SoPlexBase<R>::SCALER), true);
+      setIntParam(SoPlexBase<R>::STARTER, intParam(SoPlexBase<R>::STARTER), true);
 
-        // copy real LP if different from the LP in the solver
-        if( rhs._realLP != &(rhs._solver) )
-          {
-            _realLP = 0;
-            spx_alloc(_realLP);
+      // copy real LP if different from the LP in the solver
+      if( rhs._realLP != &(rhs._solver) )
+        {
+          _realLP = 0;
+          spx_alloc(_realLP);
           _realLP = new (_realLP) SPxLPBase<R>(*(rhs._realLP));
-          }
-        else
-          _realLP = &_solver;
+        }
+      else
+        _realLP = &_solver;
 
-        // copy rational LP
-        if( rhs._rationalLP == 0 )
-          {
-            assert(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
-            _rationalLP = 0;
-          }
-        else
-          {
-            assert(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL);
-            _rationalLP = 0;
-            spx_alloc(_rationalLP);
+      // copy rational LP
+      if( rhs._rationalLP == 0 )
+        {
+          assert(intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
+          _rationalLP = 0;
+        }
+      else
+        {
+          assert(intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL);
+          _rationalLP = 0;
+          spx_alloc(_rationalLP);
           _rationalLP = new (_rationalLP) SPxLPRational(*rhs._rationalLP);
-          }
+        }
 
-        // copy rational factorization
-        if( rhs._rationalLUSolver.status() == SLinSolverRational::OK )
-          _rationalLUSolver = rhs._rationalLUSolver;
+      // copy rational factorization
+      if( rhs._rationalLUSolver.status() == SLinSolverRational::OK )
+        _rationalLUSolver = rhs._rationalLUSolver;
 
-        // copy boolean flags
-        _isRealLPLoaded = rhs._isRealLPLoaded;
-        _isRealLPScaled = rhs._isRealLPScaled;
-        _hasSolReal = rhs._hasSolReal;
-        _hasSolRational = rhs._hasSolRational;
-        _hasBasis = rhs._hasBasis;
-        _applyPolishing = rhs._applyPolishing;
+      // copy boolean flags
+      _isRealLPLoaded = rhs._isRealLPLoaded;
+      _isRealLPScaled = rhs._isRealLPScaled;
+      _hasSolReal = rhs._hasSolReal;
+      _hasSolRational = rhs._hasSolRational;
+      _hasBasis = rhs._hasBasis;
+      _applyPolishing = rhs._applyPolishing;
 
-        // rational constants do not need to be assigned
-        _rationalPosone = 1;
-        _rationalNegone = -1;
-        _rationalZero = 0;
-      }
+      // rational constants do not need to be assigned
+      _rationalPosone = 1;
+      _rationalNegone = -1;
+      _rationalZero = 0;
+    }
 
-    assert(_isConsistent());
+  assert(_isConsistent());
 
-    return *this;
+  return *this;
 }
 
 /// returns smallest non-zero element in absolute value
@@ -742,3 +742,314 @@ const SVectorRational& SoPlexBase<R>::rowVectorRational(int i) const
   assert(_rationalLP != 0);
   return _rationalLP->rowVector(i);
 }
+
+/// returns right-hand side vector
+template <class R>
+const VectorRational& SoPlexBase<R>::rhsRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->rhs();
+}
+
+
+
+/// returns right-hand side of row \p i
+template <class R>
+const Rational& SoPlexBase<R>::rhsRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->rhs(i);
+}
+
+
+/// returns left-hand side vector
+template <class R>
+const VectorRational& SoPlexBase<R>::lhsRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->lhs();
+}
+
+
+
+/// returns left-hand side of row \p i
+template <class R>
+const Rational& SoPlexBase<R>::lhsRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->lhs(i);
+}
+
+
+
+/// returns inequality type of row \p i
+template <class R>
+LPRowRational::Type SoPlexBase<R>::rowTypeRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->rowType(i);
+}
+
+
+
+/// gets column \p i
+template <class R>
+void SoPlexBase<R>::getColRational(int i, LPColRational& lpcol) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->getCol(i, lpcol);
+}
+
+
+
+/// gets columns \p start, ..., \p end
+template <class R>
+void SoPlexBase<R>::getColsRational(int start, int end, LPColSetRational& lpcolset) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->getCols(start, end, lpcolset);
+}
+
+
+/// returns vector of column \p i
+template <class R>
+const SVectorRational& SoPlexBase<R>::colVectorRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->colVector(i);
+}
+
+
+
+/// returns upper bound vector
+template <class R>
+const VectorRational& SoPlexBase<R>::upperRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->upper();
+}
+
+
+
+/// returns upper bound of column \p i
+template <class R>
+const Rational& SoPlexBase<R>::upperRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->upper(i);
+}
+
+
+
+/// returns lower bound vector
+template <class R>
+const VectorRational& SoPlexBase<R>::lowerRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->lower();
+}
+
+/// returns lower bound of column \p i
+template <class R>
+const Rational& SoPlexBase<R>::lowerRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->lower(i);
+}
+
+
+
+/// gets objective function vector
+template <class R>
+void SoPlexBase<R>::getObjRational(VectorRational& obj) const
+{
+  assert(_rationalLP != 0);
+  _rationalLP->getObj(obj);
+}
+
+
+
+/// gets objective value of column \p i
+template <class R>
+void SoPlexBase<R>::getObjRational(int i, Rational& obj) const
+{
+  obj = maxObjRational(i);
+  if( intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE )
+    obj *= -1;
+}
+
+
+
+/// returns objective value of column \p i
+template <class R>
+Rational SoPlexBase<R>::objRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->obj(i);
+}
+
+
+
+/// returns objective function vector after transformation to a maximization problem; since this is how it is stored
+/// internally, this is generally faster
+template <class R>
+const VectorRational& SoPlexBase<R>::maxObjRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->maxObj();
+}
+
+
+
+/// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
+/// stored internally, this is generally faster
+template <class R>
+const Rational& SoPlexBase<R>::maxObjRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->maxObj(i);
+}
+
+
+
+/// adds a single row
+template <class R>
+void SoPlexBase<R>::addRowReal(const LPRowReal& lprow)
+{
+  assert(_realLP != 0);
+
+  _addRowReal(lprow);
+
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+    {
+      _rationalLP->addRow(lprow);
+      _completeRangeTypesRational();
+    }
+
+  _invalidateSolution();
+}
+
+
+
+/// adds multiple rows
+template <class R>
+void SoPlexBase<R>::addRowsReal(const LPRowSetReal& lprowset)
+{
+  assert(_realLP != 0);
+
+  _addRowsReal(lprowset);
+
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+    {
+      _rationalLP->addRows(lprowset);
+      _completeRangeTypesRational();
+    }
+
+  _invalidateSolution();
+}
+
+
+
+/// adds a single column
+template <class R>
+void SoPlexBase<R>::addColReal(const LPColReal& lpcol)
+{
+  assert(_realLP != 0);
+
+  _addColReal(lpcol);
+
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+    {
+      _rationalLP->addCol(lpcol);
+      _completeRangeTypesRational();
+    }
+
+  _invalidateSolution();
+}
+
+
+
+/// adds multiple columns
+template <class R>
+void SoPlexBase<R>::addColsReal(const LPColSetReal& lpcolset)
+{
+  assert(_realLP != 0);
+
+  _addColsReal(lpcolset);
+
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+    {
+      _rationalLP->addCols(lpcolset);
+      _completeRangeTypesRational();
+    }
+
+  _invalidateSolution();
+}
+
+
+
+/// replaces row \p i with \p lprow
+template <class R>
+void SoPlexBase<R>::changeRowReal(int i, const LPRowReal& lprow)
+{
+  assert(_realLP != 0);
+
+  _changeRowReal(i, lprow);
+
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+    {
+      _rationalLP->changeRow(i, lprow);
+      _rowTypes[i] = _rangeTypeReal(lprow.lhs(), lprow.rhs());
+      _completeRangeTypesRational();
+    }
+
+  _invalidateSolution();
+}
+#ifdef SOPLEX_WITH_GMP
+  /// adds a single column
+  template <class R>
+  void SoPlexBase<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper)
+  {
+    assert(_rationalLP != 0);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+      return;
+
+    _rationalLP->addCol(obj, lower, colValues, colIndices, colSize, upper);
+    int i = numColsRational() - 1;
+    _completeRangeTypesRational();
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _addColReal(Real(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+                  R(lowerRational(i)), DSVectorBase<R>(_rationalLP->colVector(i)), R(upperRational(i)));
+
+    _invalidateSolution();
+  }
+
+
+
+  /// adds a set of columns
+  template <class R>
+  void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper)
+  {
+    assert(_rationalLP != 0);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+      return;
+
+    _rationalLP->addCols(obj, lower, colValues, colIndices, colStarts, colLengths, numCols, numValues, upper);
+    _completeRangeTypesRational();
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        LPColSetReal lpcolset;
+        for( int i = numColsRational() - numCols; i < numColsRational(); i++ )
+          lpcolset.add(Real(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+                       R(lowerRational(i)), DSVectorBase<R>(_rationalLP->colVector(i)), R(upperRational(i)));
+        _addColsReal(lpcolset);
+      }
+
+    _invalidateSolution();
+  }
+#endif
+
