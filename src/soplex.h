@@ -153,10 +153,10 @@ public:
    Real rhsReal(int i) const;
 
    /// returns left-hand side vector, ignoring scaling
-   const VectorReal& lhsRealInternal() const;
+   const VectorBase<R>& lhsRealInternal() const;
 
    /// gets left-hand side vector
-   void getLhsReal(DVectorReal& lhs) const;
+   void getLhsReal(DVectorBase<R>& lhs) const;
 
    /// returns left-hand side of row \p i
    Real lhsReal(int i) const;
@@ -165,38 +165,38 @@ public:
    LPRowReal::Type rowTypeReal(int i) const;
 
    /// returns vector of col \p i, ignoring scaling
-   const SVectorReal& colVectorRealInternal(int i) const;
+   const SVectorBase<R>& colVectorRealInternal(int i) const;
 
    /// gets vector of col \p i
-   void getColVectorReal(int i, DSVectorReal& col) const;
+   void getColVectorReal(int i, DSVectorBase<R>& col) const;
 
    /// returns upper bound vector
-   const VectorReal& upperRealInternal() const;
+   const VectorBase<R>& upperRealInternal() const;
 
    /// returns upper bound of column \p i
    Real upperReal(int i) const;
 
    /// gets upper bound vector
-   void getUpperReal(DVectorReal& upper) const;
+   void getUpperReal(DVectorBase<R>& upper) const;
 
    /// returns lower bound vector
-   const VectorReal& lowerRealInternal() const;
+   const VectorBase<R>& lowerRealInternal() const;
 
    /// returns lower bound of column \p i
    Real lowerReal(int i) const;
 
    /// gets lower bound vector
-   void getLowerReal(DVectorReal& lower) const;
+   void getLowerReal(DVectorBase<R>& lower) const;
 
    /// gets objective function vector
-   void getObjReal(VectorReal& obj) const;
+   void getObjReal(VectorBase<R>& obj) const;
 
    /// returns objective value of column \p i
    Real objReal(int i) const;
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
-   const VectorReal& maxObjRealInternal() const;
+   const VectorBase<R>& maxObjRealInternal() const;
 
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
@@ -310,19 +310,19 @@ public:
    void changeRowReal(int i, const LPRowReal& lprow);
 
    /// changes left-hand side vector for constraints to \p lhs
-   void changeLhsReal(const VectorReal& lhs);
+   void changeLhsReal(const VectorBase<R>& lhs);
 
    /// changes left-hand side of row \p i to \p lhs
    void changeLhsReal(int i, const Real& lhs);
 
    /// changes right-hand side vector to \p rhs
-   void changeRhsReal(const VectorReal& rhs);
+   void changeRhsReal(const VectorBase<R>& rhs);
 
    /// changes right-hand side of row \p i to \p rhs
    void changeRhsReal(int i, const Real& rhs);
 
    /// changes left- and right-hand side vectors
-   void changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
+   void changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs);
 
    /// changes left- and right-hand side of row \p i
    void changeRangeReal(int i, const Real& lhs, const Real& rhs);
@@ -331,25 +331,25 @@ public:
    void changeColReal(int i, const LPColReal& lpcol);
 
    /// changes vector of lower bounds to \p lower
-   void changeLowerReal(const VectorReal& lower);
+   void changeLowerReal(const VectorBase<R>& lower);
 
    /// changes lower bound of column i to \p lower
    void changeLowerReal(int i, const Real& lower);
 
    /// changes vector of upper bounds to \p upper
-   void changeUpperReal(const VectorReal& upper);
+   void changeUpperReal(const VectorBase<R>& upper);
 
    /// changes \p i 'th upper bound to \p upper
    void changeUpperReal(int i, const Real& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper
-   void changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
+   void changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper
    void changeBoundsReal(int i, const Real& lower, const Real& upper);
 
    /// changes objective function vector to \p obj
-   void changeObjReal(const VectorReal& obj);
+   void changeObjReal(const VectorBase<R>& obj);
 
    /// changes objective coefficient of column i to \p obj
    void changeObjReal(int i, const Real& obj);
@@ -620,7 +620,7 @@ public:
    bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
-   bool getSlacksReal(VectorReal& vector);
+   bool getSlacksReal(VectorBase<R>& vector);
 
    /// gets the primal ray if available; returns true on success
    bool getPrimalRay(VectorBase<R>& vector);
@@ -1607,11 +1607,11 @@ private:
    bool _isRealLPScaled;
    bool _applyPolishing;
 
-   DVectorReal _manualLower;
-   DVectorReal _manualUpper;
-   DVectorReal _manualLhs;
-   DVectorReal _manualRhs;
-   DVectorReal _manualObj;
+   DVectorBase<R> _manualLower;
+   DVectorBase<R> _manualUpper;
+   DVectorBase<R> _manualLhs;
+   DVectorBase<R> _manualRhs;
+   DVectorBase<R> _manualObj;
    SPxLPReal _manualRealLP;
 
    //@}
@@ -1887,7 +1887,7 @@ private:
    void _addRowReal(const LPRowReal& lprow);
 
    /// adds a single row to the real LP and adjusts basis
-   void _addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
+   void _addRowReal(Real lhs, const SVectorBase<R>& lprow, Real rhs);
 
    /// adds multiple rows to the real LP and adjusts basis
    void _addRowsReal(const LPRowSetReal& lprowset);
@@ -1896,7 +1896,7 @@ private:
    void _addColReal(const LPColReal& lpcol);
 
    /// adds a single column to the real LP and adjusts basis
-   void _addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
+   void _addColReal(Real obj, Real lower, const SVectorBase<R>& lpcol, Real upper);
 
    /// adds multiple columns to the real LP and adjusts basis
    void _addColsReal(const LPColSetReal& lpcolset);
@@ -1905,19 +1905,19 @@ private:
    void _changeRowReal(int i, const LPRowReal& lprow);
 
    /// changes left-hand side vector for constraints to \p lhs and adjusts basis
-   void _changeLhsReal(const VectorReal& lhs);
+   void _changeLhsReal(const VectorBase<R>& lhs);
 
    /// changes left-hand side of row \p i to \p lhs and adjusts basis
    void _changeLhsReal(int i, const Real& lhs);
 
    /// changes right-hand side vector to \p rhs and adjusts basis
-   void _changeRhsReal(const VectorReal& rhs);
+   void _changeRhsReal(const VectorBase<R>& rhs);
 
    /// changes right-hand side of row \p i to \p rhs and adjusts basis
    void _changeRhsReal(int i, const Real& rhs);
 
    /// changes left- and right-hand side vectors and adjusts basis
-   void _changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
+   void _changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs);
 
    /// changes left- and right-hand side of row \p i and adjusts basis
    void _changeRangeReal(int i, const Real& lhs, const Real& rhs);
@@ -1926,19 +1926,19 @@ private:
    void _changeColReal(int i, const LPColReal& lpcol);
 
    /// changes vector of lower bounds to \p lower and adjusts basis
-   void _changeLowerReal(const VectorReal& lower);
+   void _changeLowerReal(const VectorBase<R>& lower);
 
    /// changes lower bound of column i to \p lower and adjusts basis
    void _changeLowerReal(int i, const Real& lower);
 
    /// changes vector of upper bounds to \p upper and adjusts basis
-   void _changeUpperReal(const VectorReal& upper);
+   void _changeUpperReal(const VectorBase<R>& upper);
 
    /// changes \p i 'th upper bound to \p upper and adjusts basis
    void _changeUpperReal(int i, const Real& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
-   void _changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
+   void _changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
    void _changeBoundsReal(int i, const Real& lower, const Real& upper);
@@ -2125,12 +2125,12 @@ private:
    void _computeInfeasBox(SolRational& sol, bool transformed);
 
    /// solves real LP during iterative refinement
-   typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorReal& primal, VectorReal& dual,
+   typename SPxSolverBase<R>::Status _solveRealForRational(bool fromscratch, VectorBase<R>& primal, VectorBase<R>& dual,
                                            DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
                                            DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// solves real LP with recovery mechanism
-   typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
+   typename SPxSolverBase<R>::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorBase<R>& primal, VectorBase<R>& dual,
                                       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusRows,
                                       DataArray< typename SPxSolverBase<R>::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
 
@@ -2330,6 +2330,7 @@ private:
 
   // A header file containing all the general templated functions
   #include "soplex.hpp"
+  #include "soplex/solverational.hpp"
 
 }
 #endif // _SOPLEX_H_
