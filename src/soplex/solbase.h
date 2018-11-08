@@ -78,7 +78,7 @@ public:
    /// gets the primal unbounded ray if available; returns true on success
    bool getPrimalRay(VectorBase<R>& vector) const
    {
-      if( _hasPrimalRay )
+      if(_hasPrimalRay)
          vector = _primalRay;
 
       return _hasPrimalRay;
@@ -115,7 +115,7 @@ public:
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkas(VectorBase<R>& vector) const
    {
-      if( _hasDualFarkas )
+      if(_hasDualFarkas)
          vector = _dualFarkas;
 
       return _hasDualFarkas;
@@ -126,10 +126,10 @@ public:
    {
       int size = 0;
 
-      if( _isPrimalFeasible )
+      if(_isPrimalFeasible)
          size += totalSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
 
-      if( _hasPrimalRay )
+      if(_hasPrimalRay)
          size += totalSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
 
       return size;
@@ -140,10 +140,10 @@ public:
    {
       int size = 0;
 
-      if( _isDualFeasible )
+      if(_isDualFeasible)
          size += totalSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
 
-      if( _hasDualFarkas )
+      if(_hasDualFarkas)
          size += totalSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
 
       return size;
@@ -154,10 +154,10 @@ public:
    {
       int size = 0;
 
-      if( _isPrimalFeasible )
+      if(_isPrimalFeasible)
          size += dlcmSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
 
-      if( _hasPrimalRay )
+      if(_hasPrimalRay)
          size += dlcmSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
 
       return size;
@@ -168,10 +168,10 @@ public:
    {
       int size = 0;
 
-      if( _isDualFeasible )
+      if(_isDualFeasible)
          size += dlcmSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
 
-      if( _hasDualFarkas )
+      if(_hasDualFarkas)
          size += dlcmSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
 
       return size;
@@ -182,10 +182,10 @@ public:
    {
       int size = 0;
 
-      if( _isPrimalFeasible )
+      if(_isPrimalFeasible)
          size += dmaxSizeRational(_primal.get_const_ptr(), _primal.dim(), base);
 
-      if( _hasPrimalRay )
+      if(_hasPrimalRay)
          size += dmaxSizeRational(_primalRay.get_const_ptr(), _primalRay.dim(), base);
 
       return size;
@@ -196,10 +196,10 @@ public:
    {
       int size = 0;
 
-      if( _isDualFeasible )
+      if(_isDualFeasible)
          size += dmaxSizeRational(_dual.get_const_ptr(), _dual.dim(), base);
 
-      if( _hasDualFarkas )
+      if(_hasDualFarkas)
          size += dmaxSizeRational(_dualFarkas.get_const_ptr(), _dualFarkas.dim(), base);
 
       return size;
@@ -224,10 +224,10 @@ private:
 
    R _objVal;
 
-   unsigned int _isPrimalFeasible:1;
-   unsigned int _hasPrimalRay:1;
-   unsigned int _isDualFeasible:1;
-   unsigned int _hasDualFarkas:1;
+   unsigned int _isPrimalFeasible: 1;
+   unsigned int _hasPrimalRay: 1;
+   unsigned int _isDualFeasible: 1;
+   unsigned int _hasDualFarkas: 1;
 
    /// default constructor only for friends
    SolBase<R>()
@@ -239,7 +239,7 @@ private:
    /// assignment operator only for friends
    SolBase<R>& operator=(const SolBase<R>& sol)
    {
-      if( this != &sol )
+      if(this != &sol)
       {
 
          _isPrimalFeasible = sol._isPrimalFeasible;
@@ -248,7 +248,8 @@ private:
          _objVal = sol._objVal;
 
          _hasPrimalRay = sol._hasPrimalRay;
-         if( _hasPrimalRay )
+
+         if(_hasPrimalRay)
             _primalRay = sol._primalRay;
 
          _isDualFeasible = sol._isDualFeasible;
@@ -256,7 +257,8 @@ private:
          _redCost = sol._redCost;
 
          _hasDualFarkas = sol._hasDualFarkas;
-         if( _hasDualFarkas )
+
+         if(_hasDualFarkas)
             _dualFarkas = sol._dualFarkas;
       }
 
@@ -267,7 +269,7 @@ private:
    template < class S >
    SolBase<R>& operator=(const SolBase<S>& sol)
    {
-      if( (SolBase<S>*)this != &sol )
+      if((SolBase<S>*)this != &sol)
       {
 
          _isPrimalFeasible = sol._isPrimalFeasible;
@@ -276,7 +278,8 @@ private:
          _objVal = R(sol._objVal);
 
          _hasPrimalRay = sol._hasPrimalRay;
-         if( _hasPrimalRay )
+
+         if(_hasPrimalRay)
             _primalRay = sol._primalRay;
 
          _isDualFeasible = sol._isDualFeasible;
@@ -284,7 +287,8 @@ private:
          _redCost = sol._redCost;
 
          _hasDualFarkas = sol._hasDualFarkas;
-         if( _hasDualFarkas )
+
+         if(_hasDualFarkas)
             _dualFarkas = sol._dualFarkas;
       }
 

@@ -22,8 +22,8 @@ int IdxSet::dim() const
 {
    int ddim = -1;
 
-   for (int i = 0; i < size(); i++)
-      if (ddim < idx[i])
+   for(int i = 0; i < size(); i++)
+      if(ddim < idx[i])
          ddim = idx[i];
 
    return ddim;
@@ -32,7 +32,7 @@ int IdxSet::dim() const
 int IdxSet::pos(int i) const
 {
    for(int n = 0; n < size(); n++)
-      if (idx[n] == i)
+      if(idx[n] == i)
          return n;
 
    return -1;
@@ -41,8 +41,10 @@ int IdxSet::pos(int i) const
 void IdxSet::add(int n, const int i[])
 {
    assert(n >= 0 && size() + n <= max());
-   for (int j = 0; j < n; j++)
+
+   for(int j = 0; j < n; j++)
       idx[size() + j] = i[j];
+
    add(n);
 }
 
@@ -61,29 +63,31 @@ void IdxSet::remove(int n, int m)
       --cpy;
       idx[n + cpy] = idx[num];
    }
-   while (cpy > 0);
+   while(cpy > 0);
+
    num = newnum;
 }
 
 IdxSet& IdxSet::operator=(const IdxSet& rhs)
 {
-   if (this != &rhs)
+   if(this != &rhs)
    {
-      if (idx != 0 && max() < rhs.size())
+      if(idx != 0 && max() < rhs.size())
       {
-         if (freeArray)
+         if(freeArray)
             spx_free(idx);
+
          idx = 0;
       }
 
-      if (idx == 0)
+      if(idx == 0)
       {
          len = rhs.size();
          spx_alloc(idx, len);
          freeArray = true;
       }
 
-      for (num = 0; num < rhs.size(); ++num)
+      for(num = 0; num < rhs.size(); ++num)
          idx[num] = rhs.idx[num];
    }
 
@@ -100,7 +104,7 @@ IdxSet::IdxSet(const IdxSet& old)
 {
    spx_alloc(idx, len);
 
-   for (num = 0; num < old.num; num++)
+   for(num = 0; num < old.num; num++)
       idx[num] = old.idx[num];
 
    freeArray = true;
@@ -115,18 +119,19 @@ bool IdxSet::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
    int i, j;
 
-   if (len > 0 && idx == 0)
+   if(len > 0 && idx == 0)
       return MSGinconsistent("IdxSet");
 
-   for (i = 0; i < size(); ++i)
+   for(i = 0; i < size(); ++i)
    {
-      if (index(i) < 0)
+      if(index(i) < 0)
          return MSGinconsistent("IdxSet");
 
-      for (j = 0; j < i; j++)
-         if (index(i) == index(j))
+      for(j = 0; j < i; j++)
+         if(index(i) == index(j))
             return MSGinconsistent("IdxSet");
    }
+
 #endif
 
    return true;

@@ -35,7 +35,7 @@ void SPxSolver::setPrimalBounds()
    theUCbound = SPxLP::upper();
    theLCbound = SPxLP::lower();
 
-   if (rep() == ROW)
+   if(rep() == ROW)
    {
       theURbound = rhs();
       theLRbound = lhs();
@@ -79,17 +79,19 @@ void SPxSolver::clearDualBounds(
    Real&                  lw) const
 {
 
-   switch (stat)
+   switch(stat)
    {
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
    case SPxBasis::Desc::D_FREE :
       upp = infinity;
       lw  = -infinity;
       break;
+
    case SPxBasis::Desc::P_ON_UPPER :
    case SPxBasis::Desc::D_ON_LOWER :
       upp = infinity;
       break;
+
    case SPxBasis::Desc::P_ON_LOWER :
    case SPxBasis::Desc::D_ON_UPPER :
       lw  = -infinity;
@@ -166,20 +168,24 @@ void SPxSolver::setEnterBound4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
-   switch (desc().rowStatus(n))
+
+   switch(desc().rowStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = theURbound[n];
       break;
+
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = theLRbound[n];
       theUBbound[i] = infinity;
       break;
+
    case SPxBasis::Desc::P_FIXED:
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
+
    default:
       theUBbound[i] = theURbound[n];
       theLBbound[i] = theLRbound[n];
@@ -191,20 +197,24 @@ void SPxSolver::setEnterBound4Col(int i, int n)
 {
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
-   switch (desc().colStatus(n))
+
+   switch(desc().colStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = theUCbound[n];
       break;
+
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = theLCbound[n];
       theUBbound[i] = infinity;
       break;
+
    case SPxBasis::Desc::P_FIXED:
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
+
    default:
       theUBbound[i] = theUCbound[n];
       theLBbound[i] = theLCbound[n];
@@ -215,11 +225,11 @@ void SPxSolver::setEnterBound4Col(int i, int n)
 void SPxSolver::setEnterBounds()
 {
 
-   for (int i = 0; i < dim(); ++i)
+   for(int i = 0; i < dim(); ++i)
    {
       SPxId base_id = baseId(i);
 
-      if (base_id.isSPxRowId())
+      if(base_id.isSPxRowId())
          setEnterBound4Row(i, number(SPxRowId(base_id)));
       else
          setEnterBound4Col(i, number(SPxColId(base_id)));
@@ -236,20 +246,24 @@ void SPxSolver::setLeaveBound4Row(int i, int n)
 {
    assert(baseId(i).isSPxRowId());
    assert(number(SPxRowId(baseId(i))) == n);
-   switch (desc().rowStatus(n))
+
+   switch(desc().rowStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = -maxRowObj(n);
       break;
+
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = -maxRowObj(n);
       theUBbound[i] = infinity;
       break;
+
    case SPxBasis::Desc::P_ON_UPPER + SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
+
    case SPxBasis::Desc::P_FREE :
       theLBbound[i] = -maxRowObj(n);
       theUBbound[i] = -maxRowObj(n);
@@ -269,20 +283,23 @@ void SPxSolver::setLeaveBound4Col(int i, int n)
    assert(baseId(i).isSPxColId());
    assert(number(SPxColId(baseId(i))) == n);
 
-   switch (desc().colStatus(n))
+   switch(desc().colStatus(n))
    {
    case SPxBasis::Desc::P_ON_LOWER :
       theLBbound[i] = -infinity;
       theUBbound[i] = 0;
       break;
+
    case SPxBasis::Desc::P_ON_UPPER :
       theLBbound[i] = 0;
       theUBbound[i] = infinity;
       break;
+
    case SPxBasis::Desc::P_FIXED :
       theLBbound[i] = -infinity;
       theUBbound[i] = infinity;
       break;
+
    case SPxBasis::Desc::P_FREE :
       theLBbound[i] = theUBbound[i] = 0;
       break;
@@ -297,11 +314,11 @@ void SPxSolver::setLeaveBound4Col(int i, int n)
 void SPxSolver::setLeaveBounds()
 {
 
-   for (int i = 0; i < dim(); ++i)
+   for(int i = 0; i < dim(); ++i)
    {
       SPxId base_id = baseId(i);
 
-      if (base_id.isSPxRowId())
+      if(base_id.isSPxRowId())
          setLeaveBound4Row(i, number(SPxRowId(base_id)));
       else
          setLeaveBound4Col(i, number(SPxColId(base_id)));
@@ -311,37 +328,40 @@ void SPxSolver::setLeaveBounds()
 void SPxSolver::testBounds() const
 {
 
-   if (type() == ENTER)
+   if(type() == ENTER)
    {
       Real viol_max = (1 + iterCount) * entertol();
       int nlinesprinted = 0;
       int m = dim();
 
-      for(int i = 0; i < m; ++i )
+      for(int i = 0; i < m; ++i)
       {
          // Minor bound violations happen frequently, so print these
          // warnings only with verbose level INFO2 and higher.
-         if ((*theFvec)[i] > theUBbound[i] + viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
+         if((*theFvec)[i] > theUBbound[i] + viol_max)   //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND01 Invalid upper enter bound " << i
-                            << " Fvec: " << (*theFvec)[i]
-                            << " UBbound: " << theUBbound[i]
-                            << " tolerance: " << viol_max
-                            << " violation: " << (*theFvec)[i] - theUBbound[i] << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << "WBOUND01 Invalid upper enter bound " << i
+                      << " Fvec: " << (*theFvec)[i]
+                      << " UBbound: " << theUBbound[i]
+                      << " tolerance: " << viol_max
+                      << " violation: " << (*theFvec)[i] - theUBbound[i] << std::endl;)
             nlinesprinted++;
          }
-         if ((*theFvec)[i] < theLBbound[i] - viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
+
+         if((*theFvec)[i] < theLBbound[i] - viol_max)   //@ &&  theUBbound[i] != theLBbound[i])
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND02 Invalid lower enter bound " << i
-                            << " Fvec: " << (*theFvec)[i]
-                            << " LBbound: " << theLBbound[i]
-                            << " tolerance: " << viol_max
-                            << " violation: " << theLBbound[i] - (*theFvec)[i] << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << "WBOUND02 Invalid lower enter bound " << i
+                      << " Fvec: " << (*theFvec)[i]
+                      << " LBbound: " << theLBbound[i]
+                      << " tolerance: " << viol_max
+                      << " violation: " << theLBbound[i] - (*theFvec)[i] << std::endl;)
             nlinesprinted++;
          }
-         if( nlinesprinted >= 3 )
+
+         if(nlinesprinted >= 3)
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl );
+            MSG_INFO2((*spxout), (*spxout) <<
+                      "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl);
             break;
          }
       }
@@ -353,57 +373,64 @@ void SPxSolver::testBounds() const
       int m = dim();
       int n = coDim();
 
-      for(int i = 0; i < m; ++i )
+      for(int i = 0; i < m; ++i)
       {
-         if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
+         if((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max)  // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND03 Invalid upper cobound " << i
-                            << " CoPvec: " << (*theCoPvec)[i]
-                            << " CoUbound: " << (*theCoUbound)[i]
-                            << " tolerance: " << viol_max
-                            << " violation: " << (*theCoPvec)[i] - (*theCoUbound)[i] << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << "WBOUND03 Invalid upper cobound " << i
+                      << " CoPvec: " << (*theCoPvec)[i]
+                      << " CoUbound: " << (*theCoUbound)[i]
+                      << " tolerance: " << viol_max
+                      << " violation: " << (*theCoPvec)[i] - (*theCoUbound)[i] << std::endl;)
             nlinesprinted++;
          }
-         if ((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
+
+         if((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max)  // && (*theCoUbound)[i] != (*theCoLbound)[i])
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND04 Invalid lower cobound " << i
-                            << " CoPvec: " << (*theCoPvec )[i]
-                            << " CoLbound: " << (*theCoLbound)[i]
-                            << " tolerance: " << viol_max
-                            << " violation: " << (*theCoLbound)[i] - (*theCoPvec)[i] << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << "WBOUND04 Invalid lower cobound " << i
+                      << " CoPvec: " << (*theCoPvec)[i]
+                      << " CoLbound: " << (*theCoLbound)[i]
+                      << " tolerance: " << viol_max
+                      << " violation: " << (*theCoLbound)[i] - (*theCoPvec)[i] << std::endl;)
             nlinesprinted++;
          }
-         if( nlinesprinted >= 3 )
+
+         if(nlinesprinted >= 3)
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl );
+            MSG_INFO2((*spxout), (*spxout) <<
+                      "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl);
             break;
          }
       }
 
       nlinesprinted = 0;
-      for(int i = 0; i < n; ++i )
+
+      for(int i = 0; i < n; ++i)
       {
-         if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
+         if((*thePvec)[i] > (*theUbound)[i] + viol_max)   // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND05 Invalid upper bound " << i
-                            << " Pvec: " << (*thePvec)[i]
-                            << " Ubound: " << (*theUbound)[i]
-                            << " tolerance: " << viol_max
-                            << " violation: " << (*thePvec)[i] - (*theUbound)[i] << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << "WBOUND05 Invalid upper bound " << i
+                      << " Pvec: " << (*thePvec)[i]
+                      << " Ubound: " << (*theUbound)[i]
+                      << " tolerance: " << viol_max
+                      << " violation: " << (*thePvec)[i] - (*theUbound)[i] << std::endl;)
             nlinesprinted++;
          }
-         if ((*thePvec)[i] < (*theLbound)[i] - viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
+
+         if((*thePvec)[i] < (*theLbound)[i] - viol_max)   // &&  (*theUbound)[i] != (*theLbound)[i])
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND06 Invalid lower bound " << i
-                            << " Pvec: " << (*thePvec)[i]
-                            << " Lbound: " << (*theLbound)[i]
-                            << " tolerance: " << viol_max
-                            << " violation: " << (*theLbound)[i] - (*thePvec)[i] << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << "WBOUND06 Invalid lower bound " << i
+                      << " Pvec: " << (*thePvec)[i]
+                      << " Lbound: " << (*theLbound)[i]
+                      << " tolerance: " << viol_max
+                      << " violation: " << (*theLbound)[i] - (*thePvec)[i] << std::endl;)
             nlinesprinted++;
          }
-         if( nlinesprinted >= 3 )
+
+         if(nlinesprinted >= 3)
          {
-            MSG_INFO2( (*spxout), (*spxout) << "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl );
+            MSG_INFO2((*spxout), (*spxout) <<
+                      "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl);
             break;
          }
       }

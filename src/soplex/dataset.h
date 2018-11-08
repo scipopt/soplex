@@ -95,7 +95,7 @@ protected:
    {
       DATA data;       ///< data element
       int  info;       ///< element number. info \f$\in\f$ [0,thesize-1]
-                       ///< iff element is used
+      ///< iff element is used
    }* theitem;         ///< array of elements in the DataSet
    //@}
 
@@ -146,7 +146,7 @@ public:
       assert(n         >= 0);
       assert(num() + n <= max());
 
-      for (int i = 0; i < n; ++i)
+      for(int i = 0; i < n; ++i)
          add(newkey[i], item[i]);
    }
 
@@ -156,25 +156,25 @@ public:
       assert(n         >= 0);
       assert(num() + n <= max());
 
-      for (int i = 0; i < n; ++i)
+      for(int i = 0; i < n; ++i)
          add(items[i]);
    }
 
    /// adds several new items.
-   void add(DataKey newkey[], const DataSet < DATA > & set)
+   void add(DataKey newkey[], const DataSet < DATA >& set)
    {
       assert(num() + set.num() <= max());
 
-      for (int i = 0; i < set.num(); ++i)
+      for(int i = 0; i < set.num(); ++i)
          add(newkey[i], set[i]);
    }
 
    /// adds all elements of \p set.
-   void add(const DataSet < DATA > & set)
+   void add(const DataSet < DATA >& set)
    {
       assert(num() + set.num() <= max());
 
-      for (int i = 0; i < set.num(); ++i)
+      for(int i = 0; i < set.num(); ++i)
          add(set[i]);
    }
 
@@ -185,7 +185,7 @@ public:
    {
       assert(num() < max());
 
-      if (firstfree != -themax - 1)
+      if(firstfree != -themax - 1)
       {
          newkey.idx = -firstfree - 1;
          firstfree = theitem[newkey.idx].info;
@@ -228,21 +228,22 @@ public:
    /// removes the \p removenum 'th element.
    void remove(int removenum)
    {
-      if (has(removenum))
+      if(has(removenum))
       {
          int idx = thekey[removenum].idx;
 
          theitem[idx].info = firstfree;
          firstfree = -idx - 1;
 
-         while (-firstfree == thesize)
+         while(-firstfree == thesize)
          {
             firstfree = theitem[ -firstfree - 1].info;
             --thesize;
          }
 
          --thenum;
-         if (removenum != thenum)
+
+         if(removenum != thenum)
          {
             thekey[removenum] = thekey[thenum];
             theitem[thekey[removenum].idx].info = removenum;
@@ -264,25 +265,28 @@ public:
    void remove(int perm[])
    {
       int k, j, first = -1;
+
       // setup permutation and remove items
-      for (k = j = 0; k < num(); ++k)
+      for(k = j = 0; k < num(); ++k)
       {
-         if (perm[k] >= 0)      // j has not been removed ...
+         if(perm[k] >= 0)       // j has not been removed ...
             perm[k] = j++;
          else
          {
             int idx = thekey[k].idx;
             theitem[idx].info = firstfree;
             firstfree = -idx - 1;
-            if (first < 0)
+
+            if(first < 0)
                first = k;
          }
       }
-      if (first >= 0)        // move remaining items
+
+      if(first >= 0)         // move remaining items
       {
-         for (k = first, j = num(); k < j; ++k)
+         for(k = first, j = num(); k < j; ++k)
          {
-            if (perm[k] >= 0)
+            if(perm[k] >= 0)
             {
                thekey[perm[k]] = thekey[k];
                theitem[thekey[k].idx].info = perm[k];
@@ -295,33 +299,39 @@ public:
    }
 
    /// remove \p n elements given by \p keys and \p perm.
-   void remove(const DataKey *keys, int n, int* perm)
+   void remove(const DataKey* keys, int n, int* perm)
    {
       assert(perm != 0);
-      for (int i = num() - 1; i >= 0; --i)
+
+      for(int i = num() - 1; i >= 0; --i)
          perm[i] = i;
-      while (--n >= 0)
+
+      while(--n >= 0)
          perm[number(keys[n])] = -1;
+
       remove(perm);
    }
    /// remove \p n elements given by \p keys.
-   void remove(const DataKey *keys, int n)
+   void remove(const DataKey* keys, int n)
    {
       DataArray<int> perm(num());
       remove(keys, n, perm.get_ptr());
    }
    /// remove \p n elements given by \p nums and \p perm.
-   void remove(const int *nums, int n, int* perm)
+   void remove(const int* nums, int n, int* perm)
    {
       assert(perm != 0);
-      for (int i = num() - 1; i >= 0; --i)
+
+      for(int i = num() - 1; i >= 0; --i)
          perm[i] = i;
-      while (--n >= 0)
+
+      while(--n >= 0)
          perm[nums[n]] = -1;
+
       remove(perm);
    }
    /// remove \p n elements with numbers \p nums.
-   void remove(const int *nums, int n)
+   void remove(const int* nums, int n)
    {
       DataArray<int> perm(num());
       remove(nums, n, perm.get_ptr());
@@ -410,8 +420,9 @@ public:
    /// if it doesn't exist.
    int number(const DataKey& k) const
    {
-      if( k.idx < 0 || k.idx >= size() )
+      if(k.idx < 0 || k.idx >= size())
          throw SPxException("Invalid index");
+
       return theitem[k.idx].info;
    }
 
@@ -421,8 +432,10 @@ public:
    int number(const DATA* item) const
    {
       ptrdiff_t idx = reinterpret_cast<const struct Item*>(item) - theitem;
-      if( idx < 0 || idx >= size() )
+
+      if(idx < 0 || idx >= size())
          throw SPxException("Invalid index");
+
       return theitem[idx].info;
    }
 
@@ -442,6 +455,7 @@ public:
    bool has(const DATA* item) const
    {
       int n;
+
       try
       {
          n = number(item);
@@ -450,6 +464,7 @@ public:
       {
          return false;
       }
+
       return n >= 0;
    }
    //@}
@@ -467,12 +482,14 @@ public:
     */
    ptrdiff_t reMax(int newmax = 0)
    {
-      struct Item * old_theitem = theitem;
+      struct Item* old_theitem = theitem;
       newmax = (newmax < size()) ? size() : newmax;
 
       int* lastfree = &firstfree;
-      while (*lastfree != -themax - 1)
+
+      while(*lastfree != -themax - 1)
          lastfree = &(theitem[ -1 - *lastfree].info);
+
       *lastfree = -newmax - 1;
 
       themax = newmax;
@@ -480,28 +497,30 @@ public:
       spx_realloc(thekey,  themax);
 
       return reinterpret_cast<char*>(theitem)
-         - reinterpret_cast<char*>(old_theitem);
+             - reinterpret_cast<char*>(old_theitem);
    }
 
    /// consistency check.
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if (theitem == 0 || thekey == 0)
+
+      if(theitem == 0 || thekey == 0)
          return MSGinconsistent("DataSet");
 
-      if (thesize > themax || thenum > themax || thenum > thesize)
+      if(thesize > themax || thenum > themax || thenum > thesize)
          return MSGinconsistent("DataSet");
 
-      if (thesize == thenum && firstfree != -themax - 1)
+      if(thesize == thenum && firstfree != -themax - 1)
          return MSGinconsistent("DataSet");
 
-      if (thesize != thenum && firstfree == -themax - 1)
+      if(thesize != thenum && firstfree == -themax - 1)
          return MSGinconsistent("DataSet");
 
-      for (int i = 0; i < thenum; ++i)
-         if (theitem[thekey[i].idx].info != i)
+      for(int i = 0; i < thenum; ++i)
+         if(theitem[thekey[i].idx].info != i)
             return MSGinconsistent("DataSet");
+
 #endif
 
       return true;
@@ -514,11 +533,11 @@ public:
    /// default constructor.
    explicit
    DataSet(int pmax = 8)
-      : theitem( 0 )
-      , thekey ( 0 )
-      , themax ( pmax < 1 ? 8 : pmax )
-      , thesize( 0 )
-      , thenum ( 0 )
+      : theitem(0)
+      , thekey(0)
+      , themax(pmax < 1 ? 8 : pmax)
+      , thesize(0)
+      , thenum(0)
 
    {
       firstfree = -themax - 1;
@@ -540,17 +559,18 @@ public:
 
    /// copy constructor.
    DataSet(const DataSet& old)
-      : theitem( 0 )
-      , thekey ( 0 )
-      , themax ( old.themax )
-      , thesize( old.thesize )
-      , thenum ( old.thenum )
+      : theitem(0)
+      , thekey(0)
+      , themax(old.themax)
+      , thesize(old.thesize)
+      , thenum(old.thenum)
    {
       firstfree = (old.firstfree == -old.themax - 1)
-         ? -themax - 1
-         : old.firstfree;
+                  ? -themax - 1
+                  : old.firstfree;
 
       spx_alloc(theitem, themax);
+
       try
       {
          spx_alloc(thekey, themax);
@@ -573,39 +593,42 @@ public:
     *  assignment all DataKeys from the lvalue are valid for the rvalue as
     *  well. They refer to a copy of the corresponding data elements.
     */
-   DataSet < DATA > & operator=(const DataSet < DATA > & rhs)
+   DataSet < DATA >& operator=(const DataSet < DATA >& rhs)
    {
-      if (this != &rhs)
+      if(this != &rhs)
       {
          int i;
 
-         if (rhs.size() > max())
+         if(rhs.size() > max())
             reMax(rhs.size());
 
          clear();
 
-         for (i = 0; i < rhs.size(); ++i)
+         for(i = 0; i < rhs.size(); ++i)
             memcpy(&theitem[i], &rhs.theitem[i], sizeof(*theitem));
 
-         for (i = 0; i < rhs.num(); ++i)
+         for(i = 0; i < rhs.num(); ++i)
             thekey[i] = rhs.thekey[i];
 
-         if (rhs.firstfree == -rhs.themax - 1)
+         if(rhs.firstfree == -rhs.themax - 1)
             firstfree = -themax - 1;
          else
          {
             firstfree = rhs.firstfree;
             i = rhs.firstfree;
 
-            while (rhs.theitem[ -i - 1].info != -rhs.themax - 1)
+            while(rhs.theitem[ -i - 1].info != -rhs.themax - 1)
                i = rhs.theitem[ -i - 1].info;
+
             theitem[ -i - 1].info = -themax - 1;
          }
+
          thenum = rhs.thenum;
          thesize = rhs.thesize;
 
          assert(isConsistent());
       }
+
       return *this;
    }
 
@@ -614,6 +637,7 @@ public:
    {
       if(theitem)
          spx_free(theitem);
+
       if(thekey)
          spx_free(thekey);
    }

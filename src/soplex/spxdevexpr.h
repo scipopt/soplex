@@ -99,13 +99,13 @@ public:
       , refined(false)
    {}
    /// copy constructor
-   SPxDevexPR( const SPxDevexPR& old)
+   SPxDevexPR(const SPxDevexPR& old)
       : SPxPricer(old)
       , last(old.last)
       , refined(false)
    {}
    /// assignment operator
-   SPxDevexPR& operator=( const SPxDevexPR& rhs)
+   SPxDevexPR& operator=(const SPxDevexPR& rhs)
    {
       if(this != &rhs)
       {
@@ -143,7 +143,7 @@ public:
    ///
    virtual void entered4(SPxId id, int n);
    /// \p n vectors have been added to loaded LP.
-   virtual void addedVecs (int n);
+   virtual void addedVecs(int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
    //@}

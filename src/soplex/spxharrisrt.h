@@ -58,7 +58,7 @@ private:
       const Real* low,      ///< lower bounds for \p vec
       const Real* up,       ///< upper bounds for \p vec
       Real epsilon          ///< what is 0?
-      ) const;
+   ) const;
 
    ///
    int minDelta(
@@ -71,7 +71,7 @@ private:
       const Real* low,      ///< lower bounds for \p vec
       const Real* up,       ///< upper bounds for \p vec
       Real epsilon          ///< what is 0?
-      ) const;
+   ) const;
    //@}
 
 public:
@@ -88,7 +88,7 @@ public:
       : SPxRatioTester(old)
    {}
    /// assignment operator
-   SPxHarrisRT& operator=( const SPxHarrisRT& rhs)
+   SPxHarrisRT& operator=(const SPxHarrisRT& rhs)
    {
       if(this != &rhs)
       {

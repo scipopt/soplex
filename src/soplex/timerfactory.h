@@ -44,35 +44,41 @@ public:
    static Timer* createTimer(Timer::TYPE ttype)
    {
       Timer* timer = 0;
-      switch( ttype )
+
+      switch(ttype)
       {
       case Timer::OFF:
          spx_alloc(timer, sizeof(NoTimer));
-         timer = new (timer) NoTimer();
+         timer = new(timer) NoTimer();
          break;
+
       case Timer::USER_TIME:
          spx_alloc(timer, sizeof(UserTimer));
-         timer = new (timer) UserTimer();
+         timer = new(timer) UserTimer();
          break;
+
       case Timer::WALLCLOCK_TIME:
          spx_alloc(timer, sizeof(WallclockTimer));
-         timer = new (timer) WallclockTimer();
+         timer = new(timer) WallclockTimer();
          break;
+
       default:
-         MSG_ERROR( std::cerr << "wrong timer specified" << std::endl; )
+         MSG_ERROR(std::cerr << "wrong timer specified" << std::endl;)
       }
+
       return timer;
    }
 
    static Timer* switchTimer(Timer* timer, Timer::TYPE ttype)
    {
       // check whether the type is different from the current one
-      if( ttype != timer->type() )
+      if(ttype != timer->type())
       {
          // @todo transfer the old times
          spx_free(timer);
          timer = createTimer(ttype);
       }
+
       return timer;
    }
 

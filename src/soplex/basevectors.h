@@ -59,7 +59,7 @@ VectorBase<R>& VectorBase<R>::operator=(const SVectorBase<S>& vec)
 {
    clear();
 
-   for( int i = 0; i < vec.size(); ++i )
+   for(int i = 0; i < vec.size(); ++i)
    {
       assert(vec.index(i) < dim());
       val[vec.index(i)] = vec.value(i);
@@ -79,7 +79,7 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::assign(const SVectorBase<S>& vec)
 {
-   for( int i = vec.size() - 1; i >= 0; --i )
+   for(int i = vec.size() - 1; i >= 0; --i)
    {
       assert(vec.index(i) < dim());
       val[vec.index(i)] = vec.value(i);
@@ -101,7 +101,7 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::operator=(const SSVectorBase<S>& vec)
 {
-   if( vec.isSetup() )
+   if(vec.isSetup())
    {
       clear();
       assign(vec);
@@ -123,7 +123,7 @@ VectorBase<R>& VectorBase<R>::assign(const SSVectorBase<S>& vec)
 {
    assert(vec.dim() <= dim());
 
-   if (vec.isSetup())
+   if(vec.isSetup())
    {
       const int* idx = vec.indexMem();
 
@@ -147,7 +147,7 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::operator+=(const SVectorBase<S>& vec)
 {
-   for( int i = vec.size() - 1; i >= 0; --i )
+   for(int i = vec.size() - 1; i >= 0; --i)
    {
       assert(vec.index(i) >= 0);
       assert(vec.index(i) < dim());
@@ -167,14 +167,14 @@ VectorBase<R>& VectorBase<R>::operator+=(const SSVectorBase<S>& vec)
 {
    assert(dim() == vec.dim());
 
-   if ( vec.isSetup() )
+   if(vec.isSetup())
    {
-      for( int i = vec.size() - 1; i >= 0 ; --i )
+      for(int i = vec.size() - 1; i >= 0 ; --i)
          val[vec.index(i)] += vec.value(i);
    }
    else
    {
-      for( int i = dim() - 1; i >= 0; --i )
+      for(int i = dim() - 1; i >= 0; --i)
          val[i] += vec[i];
    }
 
@@ -189,7 +189,7 @@ template < class S >
 inline
 VectorBase<R>& VectorBase<R>::operator-=(const SVectorBase<S>& vec)
 {
-   for( int i = vec.size() - 1; i >= 0; --i )
+   for(int i = vec.size() - 1; i >= 0; --i)
    {
       assert(vec.index(i) >= 0);
       assert(vec.index(i) < dim());
@@ -209,14 +209,14 @@ VectorBase<R>& VectorBase<R>::operator-=(const SSVectorBase<S>& vec)
 {
    assert(dim() == vec.dim());
 
-   if ( vec.isSetup() )
+   if(vec.isSetup())
    {
-      for( int i = vec.size() - 1; i >= 0; --i )
+      for(int i = vec.size() - 1; i >= 0; --i)
          val[vec.index(i)] -= vec.value(i);
    }
    else
    {
-      for( int i = dim() - 1; i >= 0; --i )
+      for(int i = dim() - 1; i >= 0; --i)
          val[i] -= vec[i];
    }
 
@@ -234,7 +234,7 @@ R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 
    R x(0);
 
-   for( int i = vec.size() - 1; i >= 0; --i )
+   for(int i = vec.size() - 1; i >= 0; --i)
       x += val[vec.index(i)] * vec.value(i);
 
    return x;
@@ -249,13 +249,13 @@ R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
 {
    assert(dim() == vec.dim());
 
-   if( vec.isSetup() )
+   if(vec.isSetup())
    {
       const int* idx = vec.indexMem();
 
       R x(0);
 
-      for( int i = vec.size() - 1; i >= 0; --i )
+      for(int i = vec.size() - 1; i >= 0; --i)
       {
          x += val[*idx] * vec.val[*idx];
          idx++;
@@ -275,7 +275,7 @@ template < class S, class T >
 inline
 VectorBase<R>& VectorBase<R>::multAdd(const S& x, const SVectorBase<T>& vec)
 {
-   for( int i = vec.size() - 1; i >= 0; --i )
+   for(int i = vec.size() - 1; i >= 0; --i)
    {
       assert(vec.index(i) < dim());
       val[vec.index(i)] += x * vec.value(i);
@@ -292,7 +292,7 @@ template < class S, class T >
 inline
 VectorBase<R>& VectorBase<R>::multSub(const S& x, const SVectorBase<T>& vec)
 {
-   for( int i = vec.size() - 1; i >= 0; --i )
+   for(int i = vec.size() - 1; i >= 0; --i)
    {
       assert(vec.index(i) < dim());
       val[vec.index(i)] -= x * vec.value(i);
@@ -311,18 +311,18 @@ VectorBase<R>& VectorBase<R>::multAdd(const S& x, const SSVectorBase<T>& vec)
 {
    assert(vec.dim() <= dim());
 
-   if( vec.isSetup() )
+   if(vec.isSetup())
    {
       const int* idx = vec.indexMem();
 
-      for( int i = vec.size() - 1; i>= 0; --i )
+      for(int i = vec.size() - 1; i >= 0; --i)
          val[idx[i]] += x * vec[idx[i]];
    }
    else
    {
       assert(vec.dim() == dim());
 
-      for( int i = dim() - 1; i >= 0; --i )
+      for(int i = dim() - 1; i >= 0; --i)
          val[i] += x * vec.val[i];
    }
 
@@ -345,7 +345,7 @@ DVectorBase<R>& DVectorBase<R>::operator=(const SVectorBase<S>& vec)
 {
    // dim() of SVector is not the actual dimension, rather the largest index plus 1
    // avoiding the reDim() saves unnecessary clearing of values
-   if( vec.dim() > VectorBase<R>::dim() )
+   if(vec.dim() > VectorBase<R>::dim())
       reDim(vec.dim());
 
    VectorBase<R>::operator=(vec);
@@ -371,7 +371,7 @@ SSVectorBase<R>& SSVectorBase<R>::operator+=(const SVectorBase<S>& vec)
 {
    VectorBase<R>::operator+=(vec);
 
-   if( isSetup() )
+   if(isSetup())
    {
       setupStatus = false;
       setup();
@@ -390,7 +390,7 @@ SSVectorBase<R>& SSVectorBase<R>::operator-=(const SVectorBase<S>& vec)
 {
    VectorBase<R>::operator-=(vec);
 
-   if( isSetup() )
+   if(isSetup())
    {
       setupStatus = false;
       setup();
@@ -408,21 +408,22 @@ template < class S, class T >
 inline
 SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 {
-   if( isSetup() )
+   if(isSetup())
    {
       R* v = VectorBase<R>::val;
       R x;
       bool adjust = false;
       int j;
 
-      for( int i = vec.size() - 1; i >= 0; --i )
+      for(int i = vec.size() - 1; i >= 0; --i)
       {
          j = vec.index(i);
 
-         if( v[j] != 0 )
+         if(v[j] != 0)
          {
             x = v[j] + xx * vec.value(i);
-            if( isNotZero(x, epsilon) )
+
+            if(isNotZero(x, epsilon))
                v[j] = x;
             else
             {
@@ -433,7 +434,8 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          else
          {
             x = xx * vec.value(i);
-            if( isNotZero(x, epsilon) )
+
+            if(isNotZero(x, epsilon))
             {
                v[j] = x;
                addIdx(j);
@@ -441,16 +443,17 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
          }
       }
 
-      if( adjust )
+      if(adjust)
       {
          int* iptr = idx;
          int* iiptr = idx;
          int* endptr = idx + num;
 
-         for( ; iptr < endptr; ++iptr )
+         for(; iptr < endptr; ++iptr)
          {
             x = v[*iptr];
-            if( isNotZero(x, epsilon) )
+
+            if(isNotZero(x, epsilon))
                *iiptr++ = *iptr;
             else
                v[*iptr] = 0;
@@ -472,7 +475,8 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 template < class R >
 template < class S, class T >
 inline
-SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x, const SSVectorBase<T>& y)
+SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x,
+      const SSVectorBase<T>& y)
 {
    assert(dim() == x.dim());
    assert(x.dim() == y.dim());
@@ -488,20 +492,20 @@ SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x
    int m = y.size() - 1;
 
    /* both x and y non-zero vectors? */
-   if( m >= 0 && n >= 0 )
+   if(m >= 0 && n >= 0)
    {
       int xi = x.index(i);
       int yj = y.index(j);
 
-      while( i < n && j < m )
+      while(i < n && j < m)
       {
-         if( xi == yj )
+         if(xi == yj)
          {
             VectorBase<R>::val[xi] = R(x.val[xi]) * R(y.val[xi]);
             xi = x.index(++i);
             yj = y.index(++j);
          }
-         else if( xi < yj )
+         else if(xi < yj)
             xi = x.index(++i);
          else
             yj = y.index(++j);
@@ -509,13 +513,13 @@ SSVectorBase<R>& SSVectorBase<R>::assignPWproduct4setup(const SSVectorBase<S>& x
 
       /* check (possible) remaining indices */
 
-      while( i < n && xi != yj )
+      while(i < n && xi != yj)
          xi = x.index(++i);
 
-      while( j < m && xi != yj )
+      while(j < m && xi != yj)
          yj = y.index(++j);
 
-      if( xi == yj )
+      if(xi == yj)
          VectorBase<R>::val[xi] = R(x.val[xi]) * R(y.val[xi]);
    }
 
@@ -540,11 +544,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 
    clear();
 
-   for( int i = dim() - 1; i >= 0; --i )
+   for(int i = dim() - 1; i >= 0; --i)
    {
       y = A[i] * x;
 
-      if( isNotZero(y, epsilon) )
+      if(isNotZero(y, epsilon))
       {
          VectorBase<R>::val[i] = y;
          IdxSet::addIdx(i);
@@ -563,18 +567,19 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product(const SSVectorBase<S>& x, const
 template < class R >
 template < class S, class T >
 inline
-SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A, const SSVectorBase<T>& x)
+SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
+      const SSVectorBase<T>& x)
 {
    assert(A.num() == x.dim());
    assert(x.isSetup());
    clear();
 
-   if( x.size() == 1 )
+   if(x.size() == 1)
    {
       assign2product1(A, x);
       setupStatus = true;
    }
-   else if( isSetup() && (double(x.size()) * A.memSize() <= shortProductFactor * dim() * A.num()) )
+   else if(isSetup() && (double(x.size()) * A.memSize() <= shortProductFactor * dim() * A.num()))
    {
       assign2productShort(A, x);
       setupStatus = true;
@@ -607,12 +612,13 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
    const SVectorBase<S>& Ai = A[nzidx];
 
    // compute A[nzidx] * nzval:
-   if( isZero(nzval, epsilon) || Ai.size() == 0 )
+   if(isZero(nzval, epsilon) || Ai.size() == 0)
       clear();    // this := zero vector
    else
    {
       num = Ai.size();
-      for( int j = num - 1; j >= 0; --j )
+
+      for(int j = num - 1; j >= 0; --j)
       {
          const Nonzero<S>& Aij = Ai.element(j);
          idx[j] = Aij.idx;
@@ -631,11 +637,12 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
 template < class R >
 template < class S, class T >
 inline
-SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, const SSVectorBase<T>& x)
+SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A,
+      const SSVectorBase<T>& x)
 {
    assert(x.isSetup());
 
-   if( x.size() == 0 ) // x can be setup but have size 0 => this := zero vector
+   if(x.size() == 0)   // x can be setup but have size 0 => this := zero vector
    {
       clear();
       return *this;
@@ -650,14 +657,15 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    int Aisize;
 
    num = A0.size();
-   if( isZero(x0, epsilon) || num == 0 )
+
+   if(isZero(x0, epsilon) || num == 0)
    {
       // A[0] == 0 or x[0] == 0 => this := zero vector
       clear();
    }
    else
    {
-      for( int j = 0; j < num; ++j )
+      for(int j = 0; j < num; ++j)
       {
          const Nonzero<S>& elt = A0.element(j);
          const R product = x0 * elt.val;
@@ -667,13 +675,13 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
          VectorBase<R>::val[elt.idx] = product;
 
          // count only non-zero values; not 'isNotZero(product, epsilon)'
-         if( product != 0 )
+         if(product != 0)
             ++nonzero_idx;
       }
    }
 
    // Compute the other x[i] * A[i] and add them to the existing vector.
-   for( int i = 1; i < xsize; ++i )
+   for(int i = 1; i < xsize; ++i)
    {
       curidx = x.idx[i];
       const T xi     = x.val[curidx];
@@ -681,10 +689,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
 
       // If A[i] == 0 or x[i] == 0, do nothing.
       Aisize = Ai.size();
-      if ( isNotZero(xi, epsilon) || Aisize == 0 )
+
+      if(isNotZero(xi, epsilon) || Aisize == 0)
       {
          // Compute x[i] * A[i] and add it to the existing vector.
-         for( int j = 0; j < Aisize; ++j )
+         for(int j = 0; j < Aisize; ++j)
          {
             const Nonzero<S>& elt = Ai.element(j);
             idx[nonzero_idx] = elt.idx;
@@ -694,7 +703,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
             // It will be used now (either by a new nonzero or by a SOPLEX_VECTOR_MARKER),
             // so increase the counter. If oldval != 0, we just
             // change an existing NZ-element, so don't increase the counter.
-            if( oldval == 0 )
+            if(oldval == 0)
                ++nonzero_idx;
 
             // Add the current product x[i] * A[i][j]; if oldval was
@@ -704,7 +713,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
             // If the new value is exactly 0, mark the index as used
             // by setting a value which is nearly 0; otherwise, store
             // the value. Values below epsilon will be removed later.
-            if( oldval == 0 )
+            if(oldval == 0)
                VectorBase<R>::val[elt.idx] = SOPLEX_VECTOR_MARKER;
             else
                VectorBase<R>::val[elt.idx] = oldval;
@@ -716,11 +725,11 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    // zeroing all values which are nearly 0, and setting #num# appropriately.
    int nz_counter = 0;
 
-   for( int i = 0; i < nonzero_idx; ++i )
+   for(int i = 0; i < nonzero_idx; ++i)
    {
       curidx = idx[i];
 
-      if( isZero( VectorBase<R>::val[curidx], epsilon ) )
+      if(isZero(VectorBase<R>::val[curidx], epsilon))
          VectorBase<R>::val[curidx] = 0;
       else
       {
@@ -742,11 +751,12 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
 template < class R >
 template < class S, class T >
 inline
-SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, const SSVectorBase<T>& x)
+SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A,
+      const SSVectorBase<T>& x)
 {
    assert(x.isSetup());
 
-   if( x.size() == 0 ) // x can be setup but have size 0 => this := zero vector
+   if(x.size() == 0)   // x can be setup but have size 0 => this := zero vector
    {
       clear();
       return *this;
@@ -756,24 +766,24 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productFull(const SVSetBase<S>& A, cons
    int xsize = x.size();
    int Aisize;
 
-   for( int i = 0; i < xsize; ++i )
+   for(int i = 0; i < xsize; ++i)
    {
       const int curidx = x.idx[i];
       const T xi = x.val[curidx];
       const SVectorBase<S>& Ai = A[curidx];
       Aisize = Ai.size();
 
-      if( A_is_zero && Aisize > 0 )
+      if(A_is_zero && Aisize > 0)
          A_is_zero = false;
 
-      for( int j = 0; j < Aisize; ++j )
+      for(int j = 0; j < Aisize; ++j)
       {
          const Nonzero<S>& elt = Ai.element(j);
          VectorBase<R>::val[elt.idx] += xi * elt.val;
       }
    }
 
-   if( A_is_zero )
+   if(A_is_zero)
       clear(); // case x != 0 but A == 0
 
    return *this;
@@ -787,11 +797,12 @@ template < class S, class T >
 inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, SSVectorBase<T>& x)
 {
-   if( x.isSetup() )
+   if(x.isSetup())
       return assign2product4setup(A, x);
 
-   if( x.dim() == 0 )
-   { // x == 0 => this := zero vector
+   if(x.dim() == 0)
+   {
+      // x == 0 => this := zero vector
       clear();
       x.num = 0;
    }
@@ -801,21 +812,21 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
       int nzcount = 0;
       int end = x.dim();
 
-      for( int i = 0; i < end; ++i )
+      for(int i = 0; i < end; ++i)
       {
          // advance to the next element != 0
          T& xval = x.val[i];
 
-         if( xval != 0 )
+         if(xval != 0)
          {
             // If x[i] is really nonzero, compute A[i] * x[i] and adapt x.idx,
             // otherwise set x[i] to 0.
-            if( isNotZero(xval, epsilon) )
+            if(isNotZero(xval, epsilon))
             {
                const SVectorBase<S>& Ai = A[i];
                x.idx[ nzcount++ ] = i;
 
-               for( int j = Ai.size() - 1; j >= 0; --j )
+               for(int j = Ai.size() - 1; j >= 0; --j)
                {
                   const Nonzero<S>& elt = Ai.element(j);
                   VectorBase<R>::val[elt.idx] += xval * elt.val;
@@ -850,12 +861,12 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
    int s = rhs.size();
    num = 0;
 
-   for( int i = 0; i < s; ++i )
+   for(int i = 0; i < s; ++i)
    {
       int k = rhs.index(i);
       S v = rhs.value(i);
 
-      if( isZero(v, epsilon) )
+      if(isZero(v, epsilon))
          VectorBase<R>::val[k] = 0;
       else
       {
@@ -884,12 +895,12 @@ SSVectorBase<Rational>& SSVectorBase<Rational>::assign(const SVectorBase<Rationa
    int s = rhs.size();
    num = 0;
 
-   for( int i = 0; i < s; ++i )
+   for(int i = 0; i < s; ++i)
    {
       int k = rhs.index(i);
       const Rational& v = rhs.value(i);
 
-      if( v == 0 )
+      if(v == 0)
          VectorBase<Rational>::val[k] = 0;
       else
       {
@@ -933,13 +944,13 @@ inline
 SVectorBase<R>& SVectorBase<R>::operator=(const VectorBase<S>& vec)
 {
    int n = 0;
-   Nonzero<R> *e = m_elem;
+   Nonzero<R>* e = m_elem;
 
    clear();
 
-   for( int i = vec.dim() - 1; i >= 0; --i )
+   for(int i = vec.dim() - 1; i >= 0; --i)
    {
-      if( vec[i] != 0 )
+      if(vec[i] != 0)
       {
          assert(n < max());
 
@@ -964,13 +975,13 @@ inline
 SVectorBase<Real>& SVectorBase<Real>::operator=(const VectorBase<S>& vec)
 {
    int n = 0;
-   Nonzero<Real> *e = m_elem;
+   Nonzero<Real>* e = m_elem;
 
    clear();
 
-   for( int i = vec.dim() - 1; i >= 0; --i )
+   for(int i = vec.dim() - 1; i >= 0; --i)
    {
-      if( vec[i] != 0 )
+      if(vec[i] != 0)
       {
          assert(n < max());
 
@@ -1000,12 +1011,13 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
    int nnz = 0;
    int idx;
 
-   Nonzero<R> *e = m_elem;
+   Nonzero<R>* e = m_elem;
 
-   for( int i = 0; i < nnz; ++i )
+   for(int i = 0; i < nnz; ++i)
    {
       idx = sv.index(i);
-      if( sv.value(idx) != 0.0 )
+
+      if(sv.value(idx) != 0.0)
       {
          e->idx = idx;
          e->val = sv[idx];
@@ -1013,6 +1025,7 @@ SVectorBase<R>& SVectorBase<R>::operator=(const SSVectorBase<S>& sv)
          ++nnz;
       }
    }
+
    set_size(nnz);
 
    return *this;
@@ -1028,7 +1041,7 @@ R SVectorBase<R>::operator*(const VectorBase<R>& w) const
    R x = 0;
    Nonzero<R>* e = m_elem;
 
-   for( int i = size() - 1; i >= 0; --i )
+   for(int i = size() - 1; i >= 0; --i)
    {
       x += e->val * w[e->idx];
       e++;
@@ -1126,7 +1139,7 @@ std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
 
    s << '(';
 
-   for( i = 0; i < vec.dim() - 1; ++i )
+   for(i = 0; i < vec.dim() - 1; ++i)
       s << vec[i] << ", ";
 
    s << vec[i] << ')';
@@ -1143,7 +1156,7 @@ DVectorBase<R> operator-(const VectorBase<R>& vec)
 {
    DVectorBase<R> res(vec.dim());
 
-   for( int i = 0; i < res.dim(); ++i )
+   for(int i = 0; i < res.dim(); ++i)
       res[i] = -vec[i];
 
    return res;
@@ -1160,7 +1173,7 @@ DVectorBase<R> operator+(const VectorBase<R>& v, const VectorBase<R>& w)
 
    DVectorBase<R> res(v.dim());
 
-   for( int i = 0; i < res.dim(); ++i )
+   for(int i = 0; i < res.dim(); ++i)
       res[i] = v[i] + w[i];
 
    return res;
@@ -1201,7 +1214,7 @@ DVectorBase<R> operator-(const VectorBase<R>& v, const VectorBase<R>& w)
 
    DVectorBase<R> res(v.dim());
 
-   for( int i = 0; i < res.dim(); ++i )
+   for(int i = 0; i < res.dim(); ++i)
       res[i] = v[i] - w[i];
 
    return res;
@@ -1230,7 +1243,7 @@ DVectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
 {
    DVectorBase<R> res(w.dim());
 
-   for( int i = 0; i < res.dim(); ++i )
+   for(int i = 0; i < res.dim(); ++i)
       res[i] = -w[i];
 
    res += v;
@@ -1247,7 +1260,7 @@ DVectorBase<R> operator*(const VectorBase<R>& v, R x)
 {
    DVectorBase<R> res(v.dim());
 
-   for( int i = 0; i < res.dim(); ++i )
+   for(int i = 0; i < res.dim(); ++i)
       res[i] = x * v[i];
 
    return res;
@@ -1272,7 +1285,7 @@ DSVectorBase<R> operator*(const SVectorBase<R>& v, R x)
 {
    DSVectorBase<R> res(v.size());
 
-   for( int i = 0; i < v.size(); ++i )
+   for(int i = 0; i < v.size(); ++i)
       res.add(v.index(i), v.value(i) * x);
 
    return res;
@@ -1299,13 +1312,13 @@ std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)
    R val;
    int i = 0;
 
-   while( s.get(c).good() )
+   while(s.get(c).good())
    {
-      if( c != ' ' && c != '\t' && c != '\n' )
+      if(c != ' ' && c != '\t' && c != '\n')
          break;
    }
 
-   if( c != '(' )
+   if(c != '(')
       s.putback(c);
    else
    {
@@ -1313,24 +1326,26 @@ std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)
       {
          s >> val;
 
-         if( i >= vec.dim() - 1 )
+         if(i >= vec.dim() - 1)
             vec.reDim(i + 16);
+
          vec[i++] = val;
 
-         while( s.get(c).good() )
+         while(s.get(c).good())
          {
-            if( c != ' ' && c != '\t' && c != '\n' )
+            if(c != ' ' && c != '\t' && c != '\n')
                break;
          }
 
-         if( c != ',' )
+         if(c != ',')
          {
-            if (c != ')')
+            if(c != ')')
                s.putback(c);
+
             break;
          }
       }
-      while( s.good() );
+      while(s.good());
    }
 
    vec.reDim(i);
@@ -1345,11 +1360,11 @@ template < class R >
 inline
 std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
 {
-   for( int i = 0, j = 0; i < v.size(); ++i )
+   for(int i = 0, j = 0; i < v.size(); ++i)
    {
-      if( j )
+      if(j)
       {
-         if( v.value(i) < 0 )
+         if(v.value(i) < 0)
             os << " - " << -v.value(i);
          else
             os << " + " << v.value(i);
@@ -1360,7 +1375,7 @@ std::ostream& operator<<(std::ostream& os, const SVectorBase<R>& v)
       os << " x" << v.index(i);
       j = 1;
 
-      if( (i + 1) % 4 == 0 )
+      if((i + 1) % 4 == 0)
          os << "\n\t";
    }
 
@@ -1374,7 +1389,7 @@ template < class R >
 inline
 std::ostream& operator<<(std::ostream& os, const SVSetBase<R>& s)
 {
-   for( int i = 0; i < s.num(); ++i )
+   for(int i = 0; i < s.num(); ++i)
       os << s[i] << "\n";
 
    return os;

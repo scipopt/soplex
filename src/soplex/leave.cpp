@@ -47,17 +47,17 @@ void SPxSolver::computeFtest()
    m_pricingViolCo = 0;
    infeasibilities.clear();
    int ninfeasibilities = 0;
-   int sparsitythreshold = (int) (sparsePricingFactor * dim());
+   int sparsitythreshold = (int)(sparsePricingFactor * dim());
 
-   for( int i = 0; i < dim(); ++i )
+   for(int i = 0; i < dim(); ++i)
    {
       theCoTest[i] = ((*theFvec)[i] > theUBbound[i])
-         ? theUBbound[i] - (*theFvec)[i]
-         : (*theFvec)[i] - theLBbound[i];
+                     ? theUBbound[i] - (*theFvec)[i]
+                     : (*theFvec)[i] - theLBbound[i];
 
-      if( remainingRoundsLeave == 0 )
+      if(remainingRoundsLeave == 0)
       {
-         if( theCoTest[i] < -theeps )
+         if(theCoTest[i] < -theeps)
          {
             m_pricingViol -= theCoTest[i];
             infeasibilities.addIdx(i);
@@ -66,38 +66,40 @@ void SPxSolver::computeFtest()
          }
          else
             isInfeasible[i] = SPxPricer::NOT_VIOLATED;
-         if( ninfeasibilities > sparsitythreshold )
+
+         if(ninfeasibilities > sparsitythreshold)
          {
-            MSG_INFO2( (*spxout), (*spxout) << " --- using dense pricing"
-                              << std::endl; )
+            MSG_INFO2((*spxout), (*spxout) << " --- using dense pricing"
+                      << std::endl;)
             remainingRoundsLeave = DENSEROUNDS;
             sparsePricingLeave = false;
             ninfeasibilities = 0;
          }
       }
-      else if( theCoTest[i] < -theeps )
-            m_pricingViol -= theCoTest[i];
+      else if(theCoTest[i] < -theeps)
+         m_pricingViol -= theCoTest[i];
    }
 
-   if( ninfeasibilities == 0 && !sparsePricingLeave )
+   if(ninfeasibilities == 0 && !sparsePricingLeave)
    {
       --remainingRoundsLeave;
    }
-   else if( ninfeasibilities <= sparsitythreshold && !sparsePricingLeave )
+   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingLeave)
    {
-      MSG_INFO2( (*spxout),
-         std::streamsize prec = spxout->precision();
-         if( hyperPricingLeave )
-            (*spxout) << " --- using hypersparse pricing, ";
-         else
-            (*spxout) << " --- using sparse pricing, ";
-         (*spxout) << "sparsity: "
-                << std::setw(6) << std::fixed << std::setprecision(4)
-                << (Real) ninfeasibilities/dim()
-                << std::scientific << std::setprecision(int(prec))
-                << std::endl;
-      )
-      sparsePricingLeave = true;
+      MSG_INFO2((*spxout),
+                std::streamsize prec = spxout->precision();
+
+                if(hyperPricingLeave)
+                (*spxout) << " --- using hypersparse pricing, ";
+                else
+                   (*spxout) << " --- using sparse pricing, ";
+                   (*spxout) << "sparsity: "
+                   << std::setw(6) << std::fixed << std::setprecision(4)
+                   << (Real) ninfeasibilities / dim()
+                   << std::scientific << std::setprecision(int(prec))
+                   << std::endl;
+                  )
+            sparsePricingLeave = true;
    }
 }
 
@@ -111,65 +113,74 @@ void SPxSolver::updateFtest()
 
    updateViols.clear();
    Real theeps = entertol();
-   for (int j = idx.size() - 1; j >= 0; --j)
+
+   for(int j = idx.size() - 1; j >= 0; --j)
    {
       int i = idx.index(j);
 
-      if( m_pricingViolUpToDate && ftest[i] < -theeps )
+      if(m_pricingViolUpToDate && ftest[i] < -theeps)
          m_pricingViol += ftest[i];
 
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
-         ? theUBbound[i] - (*theFvec)[i]
-         : (*theFvec)[i] - theLBbound[i];
+                 ? theUBbound[i] - (*theFvec)[i]
+                 : (*theFvec)[i] - theLBbound[i];
 
 
-      if( sparsePricingLeave && ftest[i] < -theeps )
+      if(sparsePricingLeave && ftest[i] < -theeps)
       {
          assert(remainingRoundsLeave == 0);
-         if( m_pricingViolUpToDate )
+
+         if(m_pricingViolUpToDate)
             m_pricingViol -= ftest[i];
-         if( isInfeasible[i] == SPxPricer::NOT_VIOLATED )
+
+         if(isInfeasible[i] == SPxPricer::NOT_VIOLATED)
          {
             // this can cause problems - we cannot keep on adding indeces to infeasibilities,
             // because they are not deleted in hyper mode...
-//             if( !hyperPricingLeave )
+            //             if( !hyperPricingLeave )
             infeasibilities.addIdx(i);
             isInfeasible[i] = SPxPricer::VIOLATED;
          }
-         if( hyperPricingLeave )
+
+         if(hyperPricingLeave)
             updateViols.addIdx(i);
       }
-      else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+      else if(m_pricingViolUpToDate && ftest[i] < -theeps)
          m_pricingViol -= ftest[i];
 
    }
+
    // if boundflips were performed, we need to update these indices as well
-   if( boundflips > 0 )
+   if(boundflips > 0)
    {
       Real eps = epsilon();
-      for( int j = 0; j < solveVector3->size(); ++j )
+
+      for(int j = 0; j < solveVector3->size(); ++j)
       {
-         if( spxAbs(solveVector3->value(j)) > eps )
+         if(spxAbs(solveVector3->value(j)) > eps)
          {
             int i = solveVector3->index(j);
 
-            if( m_pricingViolUpToDate && ftest[i] < -theeps )
+            if(m_pricingViolUpToDate && ftest[i] < -theeps)
                m_pricingViol += ftest[i];
 
-            ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] : (*theFvec)[i] - theLBbound[i];
+            ftest[i] = ((*theFvec)[i] > theUBbound[i]) ? theUBbound[i] - (*theFvec)[i] :
+                       (*theFvec)[i] - theLBbound[i];
 
-            if( sparsePricingLeave && ftest[i] < -theeps )
+            if(sparsePricingLeave && ftest[i] < -theeps)
             {
                assert(remainingRoundsLeave == 0);
-               if( m_pricingViolUpToDate )
+
+               if(m_pricingViolUpToDate)
                   m_pricingViol -= ftest[i];
-               if( !isInfeasible[i] )
+
+               if(!isInfeasible[i])
                {
                   infeasibilities.addIdx(i);
                   isInfeasible[i] = true;
                }
             }
-            else if( m_pricingViolUpToDate && ftest[i] < -theeps )
+            else if(m_pricingViolUpToDate && ftest[i] < -theeps)
                m_pricingViol -= ftest[i];
          }
       }
@@ -193,56 +204,66 @@ void SPxSolver::getLeaveVals(
    SPxBasis::Desc& ds = desc();
    leaveId = baseId(leaveIdx);
 
-   if (leaveId.isSPxRowId())
+   if(leaveId.isSPxRowId())
    {
       leaveNum = number(SPxRowId(leaveId));
       leaveStat = ds.rowStatus(leaveNum);
 
       assert(isBasic(leaveStat));
-      switch (leaveStat)
+
+      switch(leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
-         assert( rep() == ROW );
+         assert(rep() == ROW);
          ds.rowStatus(leaveNum) = dualRowStatus(leaveNum);
          leavebound = 0;
          leaveMax = -infinity;
          break;
+
       case SPxBasis::Desc::P_ON_LOWER :
-         assert( rep() == ROW );
+         assert(rep() == ROW);
          ds.rowStatus(leaveNum) = dualRowStatus(leaveNum);
          leavebound = 0;
          leaveMax = infinity;
          break;
+
       case SPxBasis::Desc::P_FREE :
-         assert( rep() == ROW );
+         assert(rep() == ROW);
          throw SPxInternalCodeException("XLEAVE01 This should never happen.");
+
       case SPxBasis::Desc::D_FREE :
-         assert( rep() == COLUMN );
+         assert(rep() == COLUMN);
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
          assert(lhs(leaveNum) == rhs(leaveNum));
          leavebound = -rhs(leaveNum);
-         if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
+
+         if((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
             leaveMax = infinity;
          else
             leaveMax = -infinity;
+
          break;
+
       case SPxBasis::Desc::D_ON_LOWER :
-         assert( rep() == COLUMN );
+         assert(rep() == COLUMN);
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          leavebound = -rhs(leaveNum);                // slack !!
          leaveMax = infinity;
          objChange += theLRbound[leaveNum] * rhs(leaveNum);
          break;
+
       case SPxBasis::Desc::D_ON_UPPER :
-         assert( rep() == COLUMN );
+         assert(rep() == COLUMN);
          ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          leavebound = -lhs(leaveNum);                // slack !!
          leaveMax = -infinity;
          objChange += theURbound[leaveNum] * lhs(leaveNum);
          break;
+
       case SPxBasis::Desc::D_ON_BOTH :
-         assert( rep() == COLUMN );
-         if ((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
+         assert(rep() == COLUMN);
+
+         if((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
          {
             ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
             theLRbound[leaveNum] = -infinity;
@@ -258,16 +279,18 @@ void SPxSolver::getLeaveVals(
             leaveMax = infinity;
             objChange += theLRbound[leaveNum] * rhs(leaveNum);
          }
+
          break;
 
       default:
          throw SPxInternalCodeException("XLEAVE02 This should never happen.");
       }
-      MSG_DEBUG( std::cout << "DLEAVE51 SPxSolver::getLeaveVals() : row " << leaveNum
-                        << ": " << leaveStat
-                        << " -> " << ds.rowStatus(leaveNum)
-                        << " objChange: " << objChange
-                        << std::endl; )
+
+      MSG_DEBUG(std::cout << "DLEAVE51 SPxSolver::getLeaveVals() : row " << leaveNum
+                << ": " << leaveStat
+                << " -> " << ds.rowStatus(leaveNum)
+                << " objChange: " << objChange
+                << std::endl;)
    }
 
    else
@@ -277,24 +300,28 @@ void SPxSolver::getLeaveVals(
       leaveStat = ds.colStatus(leaveNum);
 
       assert(isBasic(leaveStat));
-      switch (leaveStat)
+
+      switch(leaveStat)
       {
       case SPxBasis::Desc::P_ON_UPPER :
-         assert( rep() == ROW );
+         assert(rep() == ROW);
          ds.colStatus(leaveNum) = dualColStatus(leaveNum);
          leavebound = 0;
          leaveMax = -infinity;
          break;
+
       case SPxBasis::Desc::P_ON_LOWER :
-         assert( rep() == ROW );
+         assert(rep() == ROW);
          ds.colStatus(leaveNum) = dualColStatus(leaveNum);
          leavebound = 0;
          leaveMax = infinity;
          break;
+
       case SPxBasis::Desc::P_FREE :
-         assert( rep() == ROW );
+         assert(rep() == ROW);
          ds.colStatus(leaveNum) = dualColStatus(leaveNum);
-         if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
+
+         if((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
          {
             leavebound = theLBbound[leaveIdx];
             leaveMax = -infinity;
@@ -304,36 +331,43 @@ void SPxSolver::getLeaveVals(
             leavebound = theUBbound[leaveIdx];
             leaveMax = infinity;
          }
+
          break;
 
       case SPxBasis::Desc::D_FREE :
-         assert( rep() == COLUMN );
+         assert(rep() == COLUMN);
          assert(SPxLP::upper(leaveNum) == SPxLP::lower(leaveNum));
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_FIXED;
          leavebound = SPxLP::upper(leaveNum);
          objChange += maxObj(leaveNum) * leavebound;
-         if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
+
+         if((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
             leaveMax = infinity;
          else
             leaveMax = -infinity;
+
          break;
+
       case SPxBasis::Desc::D_ON_LOWER :
-         assert( rep() == COLUMN );
+         assert(rep() == COLUMN);
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
          leavebound = SPxLP::upper(leaveNum);
          objChange += theUCbound[leaveNum] * leavebound;
          leaveMax = -infinity;
          break;
+
       case SPxBasis::Desc::D_ON_UPPER :
-         assert( rep() == COLUMN );
+         assert(rep() == COLUMN);
          ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          leavebound = SPxLP::lower(leaveNum);
          objChange += theLCbound[leaveNum] * leavebound;
          leaveMax = infinity;
          break;
+
       case SPxBasis::Desc::D_ON_BOTH :
-         assert( rep() == COLUMN );
-         if ((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
+         assert(rep() == COLUMN);
+
+         if((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
          {
             leaveMax = -infinity;
             leavebound = SPxLP::upper(leaveNum);
@@ -349,15 +383,18 @@ void SPxSolver::getLeaveVals(
             theUCbound[leaveNum] = infinity;
             ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
          }
+
          break;
+
       default:
          throw SPxInternalCodeException("XLEAVE03 This should never happen.");
       }
-      MSG_DEBUG( std::cout << "DLEAVE52 SPxSolver::getLeaveVals() : col " << leaveNum
-                        << ": " << leaveStat
-                        << " -> " << ds.colStatus(leaveNum)
-                        << " objChange: " << objChange
-                        << std::endl; )
+
+      MSG_DEBUG(std::cout << "DLEAVE52 SPxSolver::getLeaveVals() : col " << leaveNum
+                << ": " << leaveStat
+                << " -> " << ds.colStatus(leaveNum)
+                << " objChange: " << objChange
+                << std::endl;)
    }
 }
 
@@ -374,23 +411,27 @@ void SPxSolver::getLeaveVals2(
    SPxBasis::Desc& ds = desc();
 
    enterBound = 0;
-   if (enterId.isSPxRowId())
+
+   if(enterId.isSPxRowId())
    {
       int idx = number(SPxRowId(enterId));
       SPxBasis::Desc::Status enterStat = ds.rowStatus(idx);
 
-      switch (enterStat)
+      switch(enterStat)
       {
       case SPxBasis::Desc::D_FREE :
          assert(rep() == ROW);
-         if (thePvec->delta()[idx] * leaveMax < 0)
+
+         if(thePvec->delta()[idx] * leaveMax < 0)
             newCoPrhs = theLRbound[idx];
          else
             newCoPrhs = theURbound[idx];
+
          newUBbound = infinity;
          newLBbound = -infinity;
          ds.rowStatus(idx) = SPxBasis::Desc::P_FIXED;
          break;
+
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == ROW);
          newUBbound = 0;
@@ -398,6 +439,7 @@ void SPxSolver::getLeaveVals2(
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          newCoPrhs = theLRbound[idx];
          break;
+
       case SPxBasis::Desc::D_ON_LOWER :
          assert(rep() == ROW);
          newUBbound = infinity;
@@ -405,9 +447,11 @@ void SPxSolver::getLeaveVals2(
          ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          newCoPrhs = theURbound[idx];
          break;
+
       case SPxBasis::Desc::D_ON_BOTH :
          assert(rep() == ROW);
-         if (leaveMax * thePvec->delta()[idx] < 0)
+
+         if(leaveMax * thePvec->delta()[idx] < 0)
          {
             newUBbound = 0;
             newLBbound = -infinity;
@@ -421,36 +465,43 @@ void SPxSolver::getLeaveVals2(
             ds.rowStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
             newCoPrhs = theURbound[idx];
          }
+
          break;
 
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == COLUMN);
          ds.rowStatus(idx) = dualRowStatus(idx);
-         if (lhs(idx) > -infinity)
+
+         if(lhs(idx) > -infinity)
             theURbound[idx] = theLRbound[idx];
+
          newCoPrhs = theLRbound[idx];        // slack !!
          newUBbound = -lhs(idx);
          newLBbound = -rhs(idx);
          enterBound = -rhs(idx);
          objChange -= newCoPrhs * rhs(idx);
          break;
+
       case SPxBasis::Desc::P_ON_LOWER :
          assert(rep() == COLUMN);
          ds.rowStatus(idx) = dualRowStatus(idx);
-         if (rhs(idx) < infinity)
+
+         if(rhs(idx) < infinity)
             theLRbound[idx] = theURbound[idx];
+
          newCoPrhs = theURbound[idx];        // slack !!
          newLBbound = -rhs(idx);
          newUBbound = -lhs(idx);
          enterBound = -lhs(idx);
          objChange -= newCoPrhs * lhs(idx);
          break;
+
       case SPxBasis::Desc::P_FREE :
          assert(rep() == COLUMN);
 #if 1
          throw SPxInternalCodeException("XLEAVE04 This should never happen.");
 #else
-         MSG_ERROR( std::cerr << "ELEAVE53 ERROR: not yet debugged!" << std::endl; )
+         MSG_ERROR(std::cerr << "ELEAVE53 ERROR: not yet debugged!" << std::endl;)
          ds.rowStatus(idx) = dualRowStatus(idx);
          newCoPrhs = theURbound[idx];        // slack !!
          newUBbound = infinity;
@@ -458,23 +509,25 @@ void SPxSolver::getLeaveVals2(
          enterBound = 0;
 #endif
          break;
+
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == COLUMN);
-         MSG_ERROR( std::cerr << "ELEAVE54 "
-                           << "ERROR! Tried to put a fixed row variable into the basis: "
-                           << "idx="   << idx
-                           << ", lhs=" << lhs(idx)
-                           << ", rhs=" << rhs(idx) << std::endl; )
+         MSG_ERROR(std::cerr << "ELEAVE54 "
+                   << "ERROR! Tried to put a fixed row variable into the basis: "
+                   << "idx="   << idx
+                   << ", lhs=" << lhs(idx)
+                   << ", rhs=" << rhs(idx) << std::endl;)
          throw SPxInternalCodeException("XLEAVE05 This should never happen.");
 
       default:
          throw SPxInternalCodeException("XLEAVE06 This should never happen.");
       }
-      MSG_DEBUG( std::cout << "DLEAVE55 SPxSolver::getLeaveVals2(): row " << idx
-                        << ": " << enterStat
-                        << " -> " << ds.rowStatus(idx)
-                        << " objChange: " << objChange
-                        << std::endl; )
+
+      MSG_DEBUG(std::cout << "DLEAVE55 SPxSolver::getLeaveVals2(): row " << idx
+                << ": " << enterStat
+                << " -> " << ds.rowStatus(idx)
+                << " objChange: " << objChange
+                << std::endl;)
    }
 
    else
@@ -483,7 +536,7 @@ void SPxSolver::getLeaveVals2(
       int idx = number(SPxColId(enterId));
       SPxBasis::Desc::Status enterStat = ds.colStatus(idx);
 
-      switch (enterStat)
+      switch(enterStat)
       {
       case SPxBasis::Desc::D_ON_UPPER :
          assert(rep() == ROW);
@@ -492,6 +545,7 @@ void SPxSolver::getLeaveVals2(
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_LOWER;
          newCoPrhs = theLCbound[idx];
          break;
+
       case SPxBasis::Desc::D_ON_LOWER :
          assert(rep() == ROW);
          newUBbound = infinity;
@@ -499,6 +553,7 @@ void SPxSolver::getLeaveVals2(
          ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
          newCoPrhs = theUCbound[idx];
          break;
+
       case SPxBasis::Desc::D_FREE :
          assert(rep() == ROW);
          newUBbound = infinity;
@@ -506,9 +561,11 @@ void SPxSolver::getLeaveVals2(
          newCoPrhs = theLCbound[idx];
          ds.colStatus(idx) = SPxBasis::Desc::P_FIXED;
          break;
+
       case SPxBasis::Desc::D_ON_BOTH :
          assert(rep() == ROW);
-         if (leaveMax * theCoPvec->delta()[idx] < 0)
+
+         if(leaveMax * theCoPvec->delta()[idx] < 0)
          {
             newUBbound = 0;
             newLBbound = -infinity;
@@ -522,58 +579,69 @@ void SPxSolver::getLeaveVals2(
             ds.colStatus(idx) = SPxBasis::Desc::P_ON_UPPER;
             newCoPrhs = theUCbound[idx];
          }
+
          break;
 
       case SPxBasis::Desc::P_ON_UPPER :
          assert(rep() == COLUMN);
          ds.colStatus(idx) = dualColStatus(idx);
-         if (SPxLP::lower(idx) > -infinity)
+
+         if(SPxLP::lower(idx) > -infinity)
             theLCbound[idx] = theUCbound[idx];
+
          newCoPrhs = theUCbound[idx];
          newUBbound = SPxLP::upper(idx);
          newLBbound = SPxLP::lower(idx);
          enterBound = SPxLP::upper(idx);
          objChange -= newCoPrhs * enterBound;
          break;
+
       case SPxBasis::Desc::P_ON_LOWER :
          assert(rep() == COLUMN);
          ds.colStatus(idx) = dualColStatus(idx);
-         if (SPxLP::upper(idx) < infinity)
+
+         if(SPxLP::upper(idx) < infinity)
             theUCbound[idx] = theLCbound[idx];
+
          newCoPrhs = theLCbound[idx];
          newUBbound = SPxLP::upper(idx);
          newLBbound = SPxLP::lower(idx);
          enterBound = SPxLP::lower(idx);
          objChange -= newCoPrhs * enterBound;
          break;
+
       case SPxBasis::Desc::P_FREE :
          assert(rep() == COLUMN);
          ds.colStatus(idx) = dualColStatus(idx);
-         if (thePvec->delta()[idx] * leaveMax > 0)
+
+         if(thePvec->delta()[idx] * leaveMax > 0)
             newCoPrhs = theUCbound[idx];
          else
             newCoPrhs = theLCbound[idx];
+
          newUBbound = SPxLP::upper(idx);
          newLBbound = SPxLP::lower(idx);
          enterBound = 0;
          break;
+
       case SPxBasis::Desc::P_FIXED :
          assert(rep() == COLUMN);
-         MSG_ERROR( std::cerr << "ELEAVE56 "
-                           << "ERROR! Tried to put a fixed column variable into the basis. "
-                           << "idx="     << idx
-                           << ", lower=" << lower(idx)
-                           << ", upper=" << upper(idx) << std::endl; )
+         MSG_ERROR(std::cerr << "ELEAVE56 "
+                   << "ERROR! Tried to put a fixed column variable into the basis. "
+                   << "idx="     << idx
+                   << ", lower=" << lower(idx)
+                   << ", upper=" << upper(idx) << std::endl;)
          throw SPxInternalCodeException("XLEAVE07 This should never happen.");
+
       default:
          throw SPxInternalCodeException("XLEAVE08 This should never happen.");
       }
 
-      MSG_DEBUG( std::cout << "DLEAVE57 SPxSolver::getLeaveVals2(): col " << idx
-                        << ": " << enterStat
-                        << " -> " << ds.colStatus(idx)
-                        << " objChange: " << objChange
-                        << std::endl; )
+      MSG_DEBUG(std::cout << "DLEAVE57 SPxSolver::getLeaveVals2(): col " << idx
+                << ": " << enterStat
+                << " -> " << ds.colStatus(idx)
+                << " objChange: " << objChange
+                << std::endl;)
    }
 
 }
@@ -586,34 +654,37 @@ void SPxSolver::rejectLeave(
 )
 {
    SPxBasis::Desc& ds = desc();
-   if (leaveId.isSPxRowId())
-   {
-      MSG_DEBUG( std::cout << "DLEAVE58 rejectLeave()  : row " << leaveNum
-                        << ": " << ds.rowStatus(leaveNum)
-                        << " -> " << leaveStat << std::endl; )
 
-      if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
+   if(leaveId.isSPxRowId())
+   {
+      MSG_DEBUG(std::cout << "DLEAVE58 rejectLeave()  : row " << leaveNum
+                << ": " << ds.rowStatus(leaveNum)
+                << " -> " << leaveStat << std::endl;)
+
+      if(leaveStat == SPxBasis::Desc::D_ON_BOTH)
       {
-         if (ds.rowStatus(leaveNum) == SPxBasis::Desc::P_ON_LOWER)
+         if(ds.rowStatus(leaveNum) == SPxBasis::Desc::P_ON_LOWER)
             theLRbound[leaveNum] = theURbound[leaveNum];
          else
             theURbound[leaveNum] = theLRbound[leaveNum];
       }
+
       ds.rowStatus(leaveNum) = leaveStat;
    }
    else
    {
-      MSG_DEBUG( std::cout << "DLEAVE59 rejectLeave()  : col " << leaveNum
-                        << ": " << ds.colStatus(leaveNum)
-                        << " -> " << leaveStat << std::endl; )
+      MSG_DEBUG(std::cout << "DLEAVE59 rejectLeave()  : col " << leaveNum
+                << ": " << ds.colStatus(leaveNum)
+                << " -> " << leaveStat << std::endl;)
 
-      if (leaveStat == SPxBasis::Desc::D_ON_BOTH)
+      if(leaveStat == SPxBasis::Desc::D_ON_BOTH)
       {
-         if (ds.colStatus(leaveNum) == SPxBasis::Desc::P_ON_UPPER)
+         if(ds.colStatus(leaveNum) == SPxBasis::Desc::P_ON_UPPER)
             theLCbound[leaveNum] = theUCbound[leaveNum];
          else
             theUCbound[leaveNum] = theLCbound[leaveNum];
       }
+
       ds.colStatus(leaveNum) = leaveStat;
    }
 }
@@ -626,7 +697,7 @@ void SPxSolver::computePrimalray4Row(Real direction)
    primalRay.clear();
    primalRay.setMax(coPvec().delta().size());
 
-   for( int i = 0; i < coPvec().delta().size(); ++i )
+   for(int i = 0; i < coPvec().delta().size(); ++i)
       primalRay.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
 }
 
@@ -637,7 +708,7 @@ void SPxSolver::computeDualfarkas4Col(Real direction)
    dualFarkas.clear();
    dualFarkas.setMax(coPvec().delta().size());
 
-   for( int i = 0; i < coPvec().delta().size(); ++i )
+   for(int i = 0; i < coPvec().delta().size(); ++i)
       dualFarkas.add(coPvec().delta().index(i), sign * coPvec().delta().value(i));
 }
 
@@ -655,10 +726,11 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
        is to be accomplished.
        When using steepest edge pricing this solve is already performed by the pricer
     */
-   if (theCoPvec->delta().isSetup() && theCoPvec->delta().size() == 0)
+   if(theCoPvec->delta().isSetup() && theCoPvec->delta().size() == 0)
    {
       coSolve(theCoPvec->delta(), unitVecs[leaveIdx]);
    }
+
 #ifdef ENABLE_ADDITIONAL_CHECKS
    else
    {
@@ -666,14 +738,17 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       tmp.clear();
       coSolve(tmp, unitVecs[leaveIdx]);
       tmp -= theCoPvec->delta();
-      if (tmp.length() > leavetol()) {
+
+      if(tmp.length() > leavetol())
+      {
          // This happens very frequently and does usually not hurt, so print
          // these warnings only with verbose level INFO2 and higher.
-         MSG_INFO2( (*spxout), (*spxout) << "WLEAVE60 iteration=" << basis().iteration()
-                              << ": coPvec.delta error = " << tmp.length()
-                              << std::endl; )
+         MSG_INFO2((*spxout), (*spxout) << "WLEAVE60 iteration=" << basis().iteration()
+                   << ": coPvec.delta error = " << tmp.length()
+                   << std::endl;)
       }
    }
+
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
    setupPupdate();
@@ -691,25 +766,29 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
 
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum, objChange);
 
-   if (!polish && m_numCycle > m_maxCycle)
+   if(!polish && m_numCycle > m_maxCycle)
    {
-      if (leaveMax > 0)
+      if(leaveMax > 0)
          perturbMaxLeave();
       else
          perturbMinLeave();
+
       //@ m_numCycle /= 2;
       // perturbation invalidates the currently stored nonbasic value
       forceRecompNonbasicValue();
    }
+
    //@ testBounds();
 
    Real enterVal = leaveMax;
    boundflips = 0;
    Real oldShift = theShift;
    SPxId enterId = theratiotester->selectEnter(enterVal, leaveIdx, polish);
-   if (NE(theShift, oldShift))
+
+   if(NE(theShift, oldShift))
    {
-      MSG_DEBUG( std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest" << std::endl; )
+      MSG_DEBUG(std::cout << "DLEAVE71 trigger recomputation of nonbasic value due to shifts in ratiotest"
+                << std::endl;)
       forceRecompNonbasicValue();
    }
 
@@ -722,7 +801,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
        No variable could be selected to enter the basis and even the leaving
        variable is unbounded.
     */
-   if (!enterId.isValid())
+   if(!enterId.isValid())
    {
       /* the following line originally was below in "rejecting leave" case;
          we need it in the unbounded/infeasible case, too, to have the
@@ -731,14 +810,14 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       change(-1, none, 0);
       objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-      if (polish)
+      if(polish)
          return false;
 
-      if (NE(enterVal, leaveMax))
+      if(NE(enterVal, leaveMax))
       {
-         MSG_DEBUG( std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
-                           << ", theCoTest=" << theCoTest[leaveIdx] << ")"
-                           << std::endl; )
+         MSG_DEBUG(std::cout << "DLEAVE61 rejecting leave A (leaveIdx=" << leaveIdx
+                   << ", theCoTest=" << theCoTest[leaveIdx] << ")"
+                   << std::endl;)
 
          /* In the LEAVE algorithm, when for a selected leaving variable we find only
             an instable entering variable, then the basis change is not conducted.
@@ -752,7 +831,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
             enterVal != leaveMax is the case that selectEnter has found only an instable entering
             variable. We store this leaving variable for later -- if we are not already in the
             instable case: then we continue and conclude unboundedness/infeasibility */
-         if (!instable)
+         if(!instable)
          {
             instableLeaveNum = leaveIdx;
 
@@ -764,19 +843,20 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          }
       }
 
-      if (lastUpdate() > 1)
+      if(lastUpdate() > 1)
       {
-         MSG_INFO3( (*spxout), (*spxout) << "ILEAVE01 factorization triggered in "
-                              << "leave() for feasibility test" << std::endl; )
+         MSG_INFO3((*spxout), (*spxout) << "ILEAVE01 factorization triggered in "
+                   << "leave() for feasibility test" << std::endl;)
+
          try
          {
             factorize();
          }
-         catch( const SPxStatusException& E )
+         catch(const SPxStatusException& E)
          {
             // don't exit immediately but handle the singularity correctly
             assert(SPxBasis::status() == SPxBasis::SINGULAR);
-            MSG_INFO3( (*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
+            MSG_INFO3((*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl;)
          }
 
          /* after a factorization, the leaving column/row might not be infeasible or suboptimal anymore, hence we do
@@ -786,9 +866,9 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
       }
 
       /* do not exit with status infeasible or unbounded if there is only a very small violation */
-      if( !recomputedVectors && spxAbs(enterVal) < leavetol() )
+      if(!recomputedVectors && spxAbs(enterVal) < leavetol())
       {
-         MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
+         MSG_INFO3((*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl;)
 
          computeFrhs();
          SPxBasis::solve(*theFvec, *theFrhs);
@@ -800,10 +880,10 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          return true;
       }
 
-      MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
-                           << "in leave()" << std::endl; )
+      MSG_INFO3((*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
+                << "in leave()" << std::endl;)
 
-      if (rep() != COLUMN)
+      if(rep() != COLUMN)
       {
          computePrimalray4Row(enterVal);
          setBasisStatus(SPxBasis::UNBOUNDED);
@@ -813,6 +893,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          computeDualfarkas4Col(enterVal);
          setBasisStatus(SPxBasis::INFEASIBLE);
       }
+
       return false;
    }
    else
@@ -821,11 +902,12 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
         If an entering variable has been found, a regular basis update is to
         be performed.
       */
-      if (enterId != baseId(leaveIdx))
+      if(enterId != baseId(leaveIdx))
       {
          const SVector& newVector = *enterVector(enterId);
+
          // update feasibility vectors
-         if( solveVector2 != NULL && solveVector3 != NULL )
+         if(solveVector2 != NULL && solveVector3 != NULL)
          {
             assert(solveVector2->isConsistent());
             assert(solveVector2rhs->isSetup());
@@ -841,10 +923,11 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            MSG_DEBUG( std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
+            MSG_DEBUG(std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl;
+                     )
             totalboundflips += boundflips;
          }
-         else if( solveVector2 != NULL )
+         else if(solveVector2 != NULL)
          {
             assert(solveVector2->isConsistent());
             assert(solveVector2rhs->isSetup());
@@ -854,7 +937,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
                                    newVector,
                                    *solveVector2rhs);
          }
-         else if( solveVector3 != NULL )
+         else if(solveVector3 != NULL)
          {
             assert(solveVector3->isConsistent());
             assert(solveVector3rhs->isSetup());
@@ -866,43 +949,46 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
 
             // perform update of basic solution
             primVec -= (*solveVector3);
-            MSG_DEBUG( std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl; )
+            MSG_DEBUG(std::cout << "ILBFRT02 breakpoints passed / bounds flipped = " << boundflips << std::endl;
+                     )
             totalboundflips += boundflips;
          }
          else
-            SPxBasis::solve4update (theFvec->delta(), newVector);
+            SPxBasis::solve4update(theFvec->delta(), newVector);
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
          {
             SSVector tmp(dim(), epsilon());
             SPxBasis::solve(tmp, newVector);
             tmp -= fVec().delta();
-            if (tmp.length() > entertol()) {
+
+            if(tmp.length() > entertol())
+            {
                // This happens very frequently and does usually not hurt, so print
                // these warnings only with verbose level INFO2 and higher.
-               MSG_INFO2( (*spxout), (*spxout) << "WLEAVE62\t(" << tmp.length() << ")\n"; )
-                  }
+               MSG_INFO2((*spxout), (*spxout) << "WLEAVE62\t(" << tmp.length() << ")\n";)
+            }
          }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
 
-         if (spxAbs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
+         if(spxAbs(theFvec->delta()[leaveIdx]) < reject_leave_tol)
          {
-            if (instable)
+            if(instable)
             {
                /* We are in the case that for all leaving variables only instable entering
                   variables were found: Thus, above we already accepted such an instable
                   entering variable. Now even this seems to be impossible, thus we conclude
                   unboundedness/infeasibility. */
-               MSG_INFO3( (*spxout), (*spxout) << "ILEAVE03 unboundedness/infeasibility found "
-                  << "in leave()" << std::endl; )
+               MSG_INFO3((*spxout), (*spxout) << "ILEAVE03 unboundedness/infeasibility found "
+                         << "in leave()" << std::endl;)
 
                rejectLeave(leaveNum, leaveId, leaveStat);
                change(-1, none, 0);
                objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
                /**@todo if shift() is not zero we must not conclude unboundedness */
-               if (rep() == ROW)
+               if(rep() == ROW)
                {
                   computePrimalray4Row(enterVal);
                   setBasisStatus(SPxBasis::UNBOUNDED);
@@ -922,9 +1008,9 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
                change(-1, none, 0);
                objChange = 0.0; // the nonbasicValue is not supposed to be updated in this case
 
-               MSG_DEBUG( std::cout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
-                  << ", theCoTest=" << theCoTest[leaveIdx]
-                  << ")" << std::endl; )
+               MSG_DEBUG(std::cout << "DLEAVE63 rejecting leave B (leaveIdx=" << leaveIdx
+                         << ", theCoTest=" << theCoTest[leaveIdx]
+                         << ")" << std::endl;)
 
                // Note: These changes do not survive a refactorization
                theCoTest[leaveIdx] *= 0.01;
@@ -934,7 +1020,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          }
 
          //      process leaving variable
-         if (leavebound > epsilon() || leavebound < -epsilon())
+         if(leavebound > epsilon() || leavebound < -epsilon())
             theFrhs->multAdd(-leavebound, baseVec(leaveIdx));
 
          //      process entering variable
@@ -947,7 +1033,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          {
             getLeaveVals2(leaveMax, enterId, enterBound, newUBbound, newLBbound, newCoPrhs, objChange);
          }
-         catch( const SPxException& F )
+         catch(const SPxException& F)
          {
             rejectLeave(leaveNum, leaveId, leaveStat);
             change(-1, none, 0);
@@ -959,18 +1045,19 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          theLBbound[leaveIdx] = newLBbound;
          (*theCoPrhs)[leaveIdx] = newCoPrhs;
 
-         if (enterBound > epsilon() || enterBound < -epsilon())
+         if(enterBound > epsilon() || enterBound < -epsilon())
             theFrhs->multAdd(enterBound, newVector);
 
          // update pricing vectors
          theCoPvec->value() = enterVal;
          thePvec->value() = enterVal;
-         if (enterVal > epsilon() || enterVal < -epsilon())
+
+         if(enterVal > epsilon() || enterVal < -epsilon())
             doPupdate();
 
          // update feasibility vector
          theFvec->value() = -((*theFvec)[leaveIdx] - leavebound)
-            / theFvec->delta()[leaveIdx];
+                            / theFvec->delta()[leaveIdx];
          theFvec->update();
          (*theFvec)[leaveIdx] = enterBound - theFvec->value();
          updateFtest();
@@ -998,9 +1085,9 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
 
          change(leaveIdx, none, 0);
 
-         if (leaveStat == SPxBasis::Desc::P_ON_UPPER)
+         if(leaveStat == SPxBasis::Desc::P_ON_UPPER)
          {
-            if (leaveId.isSPxRowId())
+            if(leaveId.isSPxRowId())
             {
                ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
                (*theCoPrhs)[leaveIdx] = theLRbound[leaveNum];
@@ -1010,13 +1097,15 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
                ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_LOWER;
                (*theCoPrhs)[leaveIdx] = theLCbound[leaveNum];
             }
+
             theUBbound[leaveIdx] = 0;
             theLBbound[leaveIdx] = -infinity;
          }
          else
          {
-            assert( leaveStat == SPxBasis::Desc::P_ON_LOWER );
-            if (leaveId.isSPxRowId())
+            assert(leaveStat == SPxBasis::Desc::P_ON_LOWER);
+
+            if(leaveId.isSPxRowId())
             {
                ds.rowStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
                (*theCoPrhs)[leaveIdx] = theURbound[leaveNum];
@@ -1026,6 +1115,7 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
                ds.colStatus(leaveNum) = SPxBasis::Desc::P_ON_UPPER;
                (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
             }
+
             theUBbound[leaveIdx] = infinity;
             theLBbound[leaveIdx] = 0;
          }
@@ -1033,7 +1123,8 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          // update copricing vector
          theCoPvec->value() = enterVal;
          thePvec->value() = enterVal;
-         if (enterVal > epsilon() || enterVal < -epsilon())
+
+         if(enterVal > epsilon() || enterVal < -epsilon())
             doPupdate();
 
          // update feasibility vectors
@@ -1043,15 +1134,16 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          theCoTest[leaveIdx] *= -1;
       }
 
-      if ((leaveMax > entertol() && enterVal <= entertol()) || (leaveMax < -entertol() && enterVal >= -entertol()))
+      if((leaveMax > entertol() && enterVal <= entertol()) || (leaveMax < -entertol()
+            && enterVal >= -entertol()))
       {
-         if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
-            && leaveStat != SPxBasis::Desc::P_FREE
-            && leaveStat != SPxBasis::Desc::D_FREE)
-            {
+         if((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
+               && leaveStat != SPxBasis::Desc::P_FREE
+               && leaveStat != SPxBasis::Desc::D_FREE)
+         {
             m_numCycle++;
-               leaveCycles++;
-            }
+            leaveCycles++;
+         }
       }
       else
          m_numCycle /= 2;
@@ -1061,16 +1153,17 @@ bool SPxSolver::leave(int leaveIdx, bool polish)
          DVector tmp = fVec();
          multBaseWith(tmp);
          tmp -= fRhs();
-         if (tmp.length() > entertol())
+
+         if(tmp.length() > entertol())
          {
             // This happens very frequently and does usually not hurt, so print
             // these warnings only with verbose level INFO2 and higher.
-            MSG_INFO2( (*spxout), (*spxout) << "WLEAVE64\t" << basis().iteration()
-               << ": fVec error = " << tmp.length() << std::endl; )
-               SPxBasis::solve(tmp, fRhs());
+            MSG_INFO2((*spxout), (*spxout) << "WLEAVE64\t" << basis().iteration()
+                      << ": fVec error = " << tmp.length() << std::endl;)
+            SPxBasis::solve(tmp, fRhs());
             tmp -= fVec();
-            MSG_INFO2( (*spxout), (*spxout) << "WLEAVE65\t(" << tmp.length() << ")\n"; )
-               }
+            MSG_INFO2((*spxout), (*spxout) << "WLEAVE65\t(" << tmp.length() << ")\n";)
+         }
       }
 #endif  // ENABLE_ADDITIONAL_CHECKS
 

@@ -407,10 +407,13 @@ public:
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single row
-   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs);
+   void addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
+                       const int rowSize, const mpq_t* rhs);
 
    /// adds a set of rows
-   void addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs);
+   void addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices,
+                        const int* rowStarts, const int* rowLengths, const int numRows, const int numValues,
+                        const mpq_t* rhs);
 #endif
 
    /// adds multiple rows
@@ -421,10 +424,13 @@ public:
 
 #ifdef SOPLEX_WITH_GMP
    /// adds a single column
-   void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int colSize, const mpq_t* upper);
+   void addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
+                       const int* colIndices, const int colSize, const mpq_t* upper);
 
    /// adds a set of columns
-   void addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues, const int* colIndices, const int* colStarts, const int* colLengths, const int numCols, const int numValues, const mpq_t* upper);
+   void addColsRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
+                        const int* colIndices, const int* colStarts, const int* colLengths, const int numCols,
+                        const int numValues, const mpq_t* upper);
 #endif
 
    /// adds multiple columns
@@ -598,7 +604,7 @@ public:
    /// sets the status to OPTIMAL in case the LP has been solved with unscaled violations
    bool ignoreUnscaledViolations()
    {
-      if( _status == SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS )
+      if(_status == SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS)
       {
          _status = SPxSolver::OPTIMAL;
          return true;
@@ -764,7 +770,8 @@ public:
    /// @param inds indices of result vector (NULL if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
+   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL,
+                               bool unscale = true);
 
    /// computes column \p c of basis inverse; returns true on success
    /// @param c which column of the basis inverse is computed
@@ -772,7 +779,8 @@ public:
    /// @param inds indices of result vector (NULL if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
+   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL,
+                               bool unscale = true);
 
    /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
    bool getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale = true);
@@ -849,22 +857,26 @@ public:
 
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
    /// integer variables if desired; returns true on success
-   bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+   bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
+                 DIdxSet* intVars = 0);
 
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+                      const DIdxSet* intvars = 0, const bool unscale = true) const;
 
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+   bool writeFileRational(const char* filename, const NameSet* rowNames = 0,
+                          const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
    /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
    /// the variables contained in it are marked as integer; returns true on success
-   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
+   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0,
+                          const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
@@ -872,15 +884,18 @@ public:
 
    /// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
    /// returns true on success
-   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
+   bool writeBasisFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+                       const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
+   void writeStateReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0,
+                       const bool cpxFormat = false) const;
 
    /// writes internal LP, basis information, and parameter settings; if \p rowNames and \p colNames are \c NULL,
    /// default names are used
-   void writeStateRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const bool cpxFormat = false) const;
+   void writeStateRational(const char* filename, const NameSet* rowNames = 0,
+                           const NameSet* colNames = 0, const bool cpxFormat = false) const;
 
    //@}
 
@@ -1131,7 +1146,7 @@ public:
       /// geometric mean scaling on rows and columns, max 8 rounds
       SCALER_GEO8 = 4,
 
-       /// least square scaling
+      /// least square scaling
       SCALER_LEASTSQ = 5,
 
       /// geometric mean scaling (max 8 rounds) followed by equilibrium scaling (rows and columns)
@@ -1372,7 +1387,8 @@ public:
    class Settings
    {
    public:
-      static struct BoolParam {
+      static struct BoolParam
+      {
          /// constructor
          BoolParam();
          /// array of names for boolean parameters
@@ -1383,10 +1399,11 @@ public:
          bool defaultValue[SoPlex::BOOLPARAM_COUNT];
       } boolParam;
 
-      static struct IntParam {
+      static struct IntParam
+      {
          /// constructor
          IntParam();
-          /// array of names for integer parameters
+         /// array of names for integer parameters
          std::string name[SoPlex::INTPARAM_COUNT];
          /// array of descriptions for integer parameters
          std::string description[SoPlex::INTPARAM_COUNT];
@@ -1398,7 +1415,8 @@ public:
          int upper[SoPlex::INTPARAM_COUNT];
       } intParam;
 
-      static struct RealParam {
+      static struct RealParam
+      {
          /// constructor
          RealParam();
          /// array of names for real parameters
@@ -1414,7 +1432,8 @@ public:
       } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
-      static struct RationalParam {
+      static struct RationalParam
+      {
          /// constructor
          RationalParam();
          /// array of names for rational parameters
@@ -1538,7 +1557,8 @@ public:
    /// checks if real LP and rational LP are in sync; dimensions will always be compared,
    /// vector and matrix values only if the respective parameter is set to true.
    /// If quiet is set to true the function will only display which vectors are different.
-   bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false, const bool quiet = false) const;
+   bool areLPsInSync(const bool checkVecVals = true, const bool checkMatVals = false,
+                     const bool quiet = false) const;
 
    /// set the random seeds of the solver instance
    void setRandomSeed(unsigned int seed);
@@ -1602,14 +1622,15 @@ private:
    SPxFastRT _ratiotesterFast;
    SPxBoundFlippingRT _ratiotesterBoundFlipping;
 
-   SPxLPReal* _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
+   SPxLPReal*
+   _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
    SPxLPReal* _decompLP; // used to store the original LP for the decomposition dual simplex
    SPxSimplifier* _simplifier;
    SPxScaler* _scaler;
    SPxStarter* _starter;
 
-   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions 
-                         // are performed on the original LP.
+   bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
+   // are performed on the original LP.
    bool _isRealLPScaled;
    bool _applyPolishing;
 
@@ -1704,10 +1725,10 @@ private:
 
       const RowViolation*  entry;
 
-      Real operator() (
+      Real operator()(
          RowViolation      i,
          RowViolation      j
-         ) const
+      ) const
       {
          return i.violation - j.violation;
       }
@@ -1735,9 +1756,9 @@ private:
    };
 
    SPxSolver _compSolver; // adding a solver to contain the complementary problem. It is too confusing to switch
-                          // the LP for the reduced and complementary problem in the one solver variable. The reduced
-                          // problem will be stored in _solver and the complementary problem will be stored in
-                          // _compSolver.
+   // the LP for the reduced and complementary problem in the one solver variable. The reduced
+   // problem will be stored in _solver and the complementary problem will be stored in
+   // _compSolver.
    SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
    SPxBasis _decompTransBasis;   // the basis required for the transformation to form the reduced problem
@@ -1752,22 +1773,33 @@ private:
    int* _decompRowStatus;
    int* _decompColStatus;
    int* _decompCompProbColIDsIdx;   // the index to _decompPrimalColIDs for a given original col.
-   DataArray < SPxRowId > _decompReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
-   DataArray < SPxRowId > _decompReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
-   DataArray < SPxColId > _decompReducedProbColIDs;   // the col IDs for the related cols in the reduced problem
+   DataArray < SPxRowId >
+   _decompReducedProbRowIDs;   // the row IDs for the related rows in the reduced problem
+   DataArray < SPxRowId >
+   _decompReducedProbColRowIDs;// the row IDs for the related cols in the reduced problem
+   DataArray < SPxColId >
+   _decompReducedProbColIDs;   // the col IDs for the related cols in the reduced problem
    DataArray < SPxRowId > _decompPrimalRowIDs;        // the primal row IDs from the original problem
    DataArray < SPxColId > _decompPrimalColIDs;        // the primal col IDs from the original problem
-   DataArray < SPxRowId > _decompElimPrimalRowIDs;    // the primal row IDs eliminated in the complementary problem
-   DataArray < SPxRowId > _decompDualRowIDs;          // the dual row IDs from the complementary problem
-   DataArray < SPxColId > _decompDualColIDs;          // the dual col IDs from the complementary problem
+   DataArray < SPxRowId >
+   _decompElimPrimalRowIDs;    // the primal row IDs eliminated in the complementary problem
+   DataArray < SPxRowId >
+   _decompDualRowIDs;          // the dual row IDs from the complementary problem
+   DataArray < SPxColId >
+   _decompDualColIDs;          // the dual col IDs from the complementary problem
    DataArray < SPxColId > _decompFixedVarDualIDs;     // the column ids related to the fixed variables.
-   DataArray < SPxColId > _decompVarBoundDualIDs;     // the column ids related to the variable bound constraints.
+   DataArray < SPxColId >
+   _decompVarBoundDualIDs;     // the column ids related to the variable bound constraints.
 
-   DataArray < SPxColId > _decompCompPrimalFixedVarIDs;  // the column ids related to the fixed variables in the complementary primal.
-   DataArray < SPxColId > _decompCompPrimalVarBoundIDs;  // the column ids related to the variable bound constraints in the complementary primal.
+   DataArray < SPxColId >
+   _decompCompPrimalFixedVarIDs;  // the column ids related to the fixed variables in the complementary primal.
+   DataArray < SPxColId >
+   _decompCompPrimalVarBoundIDs;  // the column ids related to the variable bound constraints in the complementary primal.
 
-   DataArray < SPxRowId > _decompCompPrimalRowIDs;        // the primal row IDs from the complementary problem
-   DataArray < SPxColId > _decompCompPrimalColIDs;        // the primal col IDs from the complementary problem
+   DataArray < SPxRowId >
+   _decompCompPrimalRowIDs;        // the primal row IDs from the complementary problem
+   DataArray < SPxColId >
+   _decompCompPrimalColIDs;        // the primal col IDs from the complementary problem
 
    int _nDecompViolBounds;       // the number of violated bound constraints
    int _nDecompViolRows;         // the number of violated rows
@@ -1776,7 +1808,7 @@ private:
 
 
    int* _fixedOrigVars;    // the original variables that are at their bounds in the reduced problem.
-                           // 1: fixed to upper, -1: fixed to lower, 0: unfixed.
+   // 1: fixed to upper, -1: fixed to lower, 0: unfixed.
    int _nPrimalRows;       // the number of original problem rows included in the complementary problem
    int _nPrimalCols;       // the number of original problem columns included in the complementary problem
    int _nElimPrimalRows;   // the number of primal rows from the original problem eliminated from the complementary prob
@@ -2004,11 +2036,13 @@ private:
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileReal(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+   bool _readFileReal(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
+                      DIdxSet* intVars = 0);
 
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
+   bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0,
+                          DIdxSet* intVars = 0);
 
    /// completes range type arrays after adding columns and/or rows
    void _completeRangeTypesRational();
@@ -2048,22 +2082,24 @@ private:
 
    /// solves current problem with iterative refinement and recovery mechanism
    void _performOptIRStable(SolRational& sol,
-      bool acceptUnbounded,
-      bool acceptInfeasible,
-      int minRounds,
-      bool& primalFeasible,
-      bool& dualFeasible,
-      bool& infeasible,
-      bool& unbounded,
-      bool& stopped,
-      bool& stoppedIter,
-      bool& error);
+                            bool acceptUnbounded,
+                            bool acceptInfeasible,
+                            int minRounds,
+                            bool& primalFeasible,
+                            bool& dualFeasible,
+                            bool& infeasible,
+                            bool& unbounded,
+                            bool& stopped,
+                            bool& stoppedIter,
+                            bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing unboundedness
-   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped, bool& stoppedIter, bool& error);
+   void _performUnboundedIRStable(SolRational& sol, bool& hasUnboundedRay, bool& stopped,
+                                  bool& stoppedIter, bool& error);
 
    /// performs iterative refinement on the auxiliary problem for testing feasibility
-   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& stoppedIter, bool& error);
+   void _performFeasIRStable(SolRational& sol, bool& withDualFarkas, bool& stopped, bool& stoppedIter,
+                             bool& error);
 
    /// reduces matrix coefficient in absolute value by the lifting procedure of Thiele et al. 2013
    void _lift();
@@ -2139,18 +2175,24 @@ private:
                                            DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis);
 
    /// solves real LP with recovery mechanism
-   SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal, VectorReal& dual,
+   SPxSolver::Status _solveRealStable(bool acceptUnbounded, bool acceptInfeasible, VectorReal& primal,
+                                      VectorReal& dual,
                                       DataArray< SPxSolver::VarStatus >& basisStatusRows,
-                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis, const bool forceNoSimplifier = false);
+                                      DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& returnedBasis,
+                                      const bool forceNoSimplifier = false);
 
    /// computes rational inverse of basis matrix as defined by _rationalLUSolverBind
    void _computeBasisInverseRational();
 
    /// factorizes rational basis matrix in column representation
-   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter, bool& error, bool& optimal);
+   void _factorizeColumnRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows,
+                                 DataArray< SPxSolver::VarStatus >& basisStatusCols, bool& stoppedTime, bool& stoppedIter,
+                                 bool& error, bool& optimal);
 
    /// attempts rational reconstruction of primal-dual solution
-   bool _reconstructSolutionRational(SolRational& sol, DataArray< SPxSolver::VarStatus >& basisStatusRows, DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
+   bool _reconstructSolutionRational(SolRational& sol,
+                                     DataArray< SPxSolver::VarStatus >& basisStatusRows,
+                                     DataArray< SPxSolver::VarStatus >& basisStatusCols, const Rational& denomBoundSquared);
    //@}
 
 
@@ -2209,28 +2251,33 @@ private:
    void _formDecompComplementaryProblem();
 
    /// simplifies the problem and solves
-   void _decompSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
+   void _decompSimplifyAndSolve(SPxSolver& solver, SLUFactor& sluFactor, bool fromScratch,
+                                bool applyPreprocessing);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _decompResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
+   void _decompResolveWithoutPreprocessing(SPxSolver& solver, SLUFactor& sluFactor,
+                                           SPxSimplifier::Result result);
 
    /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
    void _getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
-         int* nnonposind, bool& stop);
+                                      int* nnonposind, bool& stop);
 
    /// retrieves the compatible columns from the constraint matrix
-   void _getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
-      int nnonposind, int* ncompatind, bool formRedProb, bool& stop);
+   void _getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval,
+                              int* colsforremoval,
+                              int nnonposind, int* ncompatind, bool formRedProb, bool& stop);
 
    /// computes the reduced problem objective coefficients
    void _computeReducedProbObjCoeff(bool& stop);
 
    /// computes the compatible bound constraints and adds them to the reduced problem
-   void _getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind, int* ncompatboundcons,
-         int nnonposind, bool& stop);
+   void _getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind,
+                                int* ncompatboundcons,
+                                int nnonposind, bool& stop);
 
    /// computes the rows to remove from the complementary problem
-   void _getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval, int* nrowsforremoval,
+   void _getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval,
+         int* nrowsforremoval,
          int nnonposind);
 
    /// removing rows from the complementary problem.
@@ -2240,14 +2287,16 @@ private:
    void _evaluateSolutionDecomp(SPxSolver& solver, SLUFactor& sluFactor, SPxSimplifier::Result result);
 
    /// update the reduced problem with additional columns and rows
-   void _updateDecompReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
-      DVector compDualVector);
+   void _updateDecompReducedProblem(Real objVal, DVector dualVector, DVector redcostVector,
+                                    DVector compPrimalVector,
+                                    DVector compDualVector);
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
    void _updateDecompReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
-   void _findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
+   void _findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows,
+                          int& nviolatedrows);
 
    /// update the dual complementary problem with additional columns and rows
    void _updateDecompComplementaryDualProblem(bool origObj);
@@ -2297,8 +2346,9 @@ private:
    /// returns the expected sign of the dual variables for the original problem
    DualSign getOrigProbDualVariableSign(int rowNumber);
 
-   /// prints a display line of the flying table for the DBDS 
-   void printDecompDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
+   /// prints a display line of the flying table for the DBDS
+   void printDecompDisplayLine(SPxSolver& solver, const SPxOut::Verbosity origVerb, bool force,
+                               bool forceHead);
 
    /// stores the problem statistics of the original problem
    void getOriginalProblemStatistics();
@@ -2319,11 +2369,12 @@ private:
    bool decompTerminate(Real timeLimit);
 
    /// function to build a basis for the original problem as given by the solution to the reduced problem
-   void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat);
+   void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames,
+                                   bool cpxFormat);
 
    /// function to retrieve the original problem row basis status from the reduced and complementary problems
    void getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
-      DataArray< SPxSolver::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
+                                         DataArray< SPxSolver::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows);
 
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);

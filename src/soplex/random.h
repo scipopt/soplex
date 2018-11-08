@@ -76,7 +76,7 @@ private:
       uint64_t t;
 
       /* linear congruential */
-      lin_seed = (uint32_t) (lin_seed * RSTEP + RADD);
+      lin_seed = (uint32_t)(lin_seed * RSTEP + RADD);
 
       /* Xorshift */
       xor_seed ^= (xor_seed << 13);
@@ -85,7 +85,7 @@ private:
 
       /* Multiply-with-carry */
       t = UINT64_C(698769069) * mwc_seed + cst_seed;
-      cst_seed = (uint32_t) (t >> 32);
+      cst_seed = (uint32_t)(t >> 32);
       mwc_seed = (uint32_t) t;
 
       return (lin_seed + xor_seed + mwc_seed) / (Real)UINT32_MAX;
@@ -106,7 +106,7 @@ public:
       /* we multiply minimum and maximum separately by randnumber in order to avoid overflow if they are more than
        * std::numeric_limits<Real>::max() apart
        */
-      return minimum*(1.0 - randnumber) + maximum*randnumber;
+      return minimum * (1.0 - randnumber) + maximum * randnumber;
    }
 
    /// returns the initial seed shift

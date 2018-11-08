@@ -29,22 +29,23 @@ namespace soplex
 {
 
 bool SPxSolver::read(std::istream& in, NameSet* rowNames,
-                  NameSet* colNames, DIdxSet* intVars)
+                     NameSet* colNames, DIdxSet* intVars)
 {
-   if( initialized )
+   if(initialized)
    {
       clear();
       unInit();
 
-      if (thepricer)
+      if(thepricer)
          thepricer->clear();
 
-      if (theratiotester)
+      if(theratiotester)
          theratiotester->clear();
    }
 
    unLoad();
-   if (!SPxLP::read(in, rowNames, colNames, intVars))
+
+   if(!SPxLP::read(in, rowNames, colNames, intVars))
       return false;
 
    theLP = this;
@@ -59,9 +60,11 @@ void SPxSolver::reLoad()
    unLoad();
    theLP = this;
    m_status = SPxSolver::UNKNOWN;
-   if (thepricer)
+
+   if(thepricer)
       thepricer->clear();
-   if (theratiotester)
+
+   if(theratiotester)
       theratiotester->clear();
 }
 
@@ -71,10 +74,13 @@ void SPxSolver::loadLP(const SPxLP& lp, bool initSlackBasis)
    unInit();
    unLoad();
    resetClockStats();
-   if (thepricer)
+
+   if(thepricer)
       thepricer->clear();
-   if (theratiotester)
+
+   if(theratiotester)
       theratiotester->clear();
+
    SPxLP::operator=(lp);
    reDim();
    SPxBasis::load(this, initSlackBasis);
@@ -92,10 +98,12 @@ void SPxSolver::setBasisSolver(SLinSolver* slu, const bool destroy)
 void SPxSolver::loadBasis(const SPxBasis::Desc& p_desc)
 {
    unInit();
-   if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
+
+   if(SPxBasis::status() == SPxBasis::NO_PROBLEM)
    {
       SPxBasis::load(this, false);
    }
+
    setBasisStatus(SPxBasis::REGULAR);
    SPxBasis::loadDesc(p_desc);
 }
@@ -111,17 +119,19 @@ void SPxSolver::setPricer(SPxPricer* x, const bool destroy)
       thepricer = 0;
    }
 
-   if (x != 0 && x != thepricer)
+   if(x != 0 && x != thepricer)
    {
       setPricing(FULL);
-      if (isInitialized())
+
+      if(isInitialized())
          x->load(this);
       else
          x->clear();
    }
 
-   if (thepricer && thepricer != x)
+   if(thepricer && thepricer != x)
       thepricer->clear();
+
    thepricer = x;
 
    freePricer = destroy;
@@ -140,9 +150,9 @@ void SPxSolver::setTester(SPxRatioTester* x, const bool destroy)
    theratiotester = x;
 
    // set the solver pointer inside the ratiotester
-   if( theratiotester != 0 )
+   if(theratiotester != 0)
    {
-      if( isInitialized() )
+      if(isInitialized())
          theratiotester->load(this);
       else
          theratiotester->clear();
@@ -161,6 +171,7 @@ void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
       delete thestarter;
       thestarter = 0;
    }
+
    thestarter = x;
 
    freeStarter = destroy;
@@ -169,17 +180,17 @@ void SPxSolver::setStarter(SPxStarter* x, const bool destroy)
 void SPxSolver::setType(Type tp)
 {
 
-   if (theType != tp)
+   if(theType != tp)
    {
       theType = tp;
 
       forceRecompNonbasicValue();
 
       unInit();
-      MSG_INFO3( (*spxout), (*spxout) << "Switching to "
-                        << static_cast<const char*>((tp == LEAVE)
-                           ? "leaving" : "entering")
-                        << " algorithm" << std::endl; )
+      MSG_INFO3((*spxout), (*spxout) << "Switching to "
+                << static_cast<const char*>((tp == LEAVE)
+                                            ? "leaving" : "entering")
+                << " algorithm" << std::endl;)
    }
 }
 
@@ -191,7 +202,7 @@ void SPxSolver::initRep(Representation p_rep)
 
    theRep = p_rep;
 
-   if (theRep == COLUMN)
+   if(theRep == COLUMN)
    {
       thevectors   = colSet();
       thecovectors = rowSet();
@@ -225,6 +236,7 @@ void SPxSolver::initRep(Representation p_rep)
       theCoUbound  = &theUCbound;
       theCoLbound  = &theLCbound;
    }
+
    unInit();
    reDim();
 
@@ -234,17 +246,18 @@ void SPxSolver::initRep(Representation p_rep)
    setOpttol(tmpopttol);
 
    SPxBasis::setRep();
-   if (SPxBasis::status() > SPxBasis::NO_PROBLEM)
+
+   if(SPxBasis::status() > SPxBasis::NO_PROBLEM)
       SPxBasis::loadDesc(desc());
 
-   if (thepricer && thepricer->solver() == this)
+   if(thepricer && thepricer->solver() == this)
       thepricer->setRep(p_rep);
 }
 
 void SPxSolver::setRep(Representation p_rep)
 {
 
-   if (p_rep != theRep)
+   if(p_rep != theRep)
       initRep(p_rep);
 }
 
@@ -254,9 +267,9 @@ void SPxSolver::reinitializeVecs()
 
    initialized = true;
 
-   if (type() == ENTER)
+   if(type() == ENTER)
    {
-      if (rep() == COLUMN)
+      if(rep() == COLUMN)
          setPrimalBounds();
       else
          setDualRowBounds();
@@ -266,7 +279,7 @@ void SPxSolver::reinitializeVecs()
    }
    else
    {
-      if (rep() == ROW)
+      if(rep() == ROW)
          setPrimalBounds();
       else
          setDualColBounds();
@@ -283,7 +296,7 @@ void SPxSolver::reinitializeVecs()
    theShift  = 0.0;
    lastShift = 0.0;
 
-   if (type() == ENTER)
+   if(type() == ENTER)
    {
       computeCoTest();
       computeTest();
@@ -292,6 +305,7 @@ void SPxSolver::reinitializeVecs()
    {
       computeFtest();
    }
+
    assert((testBounds(), 1));
 }
 
@@ -308,36 +322,39 @@ void SPxSolver::init()
    assert(thepricer      != 0);
    assert(theratiotester != 0);
 
-   if (!initialized)
+   if(!initialized)
    {
       initialized = true;
       clearUpdateVecs();
       reDim();
-      if (SPxBasis::status() <= SPxBasis::NO_PROBLEM || solver() != this)
+
+      if(SPxBasis::status() <= SPxBasis::NO_PROBLEM || solver() != this)
          SPxBasis::load(this);
+
       initialized = false;
    }
-   if (!matrixIsSetup)
+
+   if(!matrixIsSetup)
       SPxBasis::loadDesc(desc());
 
    // Inna/Tobi: don't "upgrade" a singular basis to a regular one
-   if( SPxBasis::status() == SPxBasis::SINGULAR )
+   if(SPxBasis::status() == SPxBasis::SINGULAR)
       return;
 
    // catch pathological case for LPs with zero constraints
-   if( dim() == 0 )
+   if(dim() == 0)
    {
       factorized = true;
    }
 
    // we better factorize explicitly before solving
-   if( !factorized )
+   if(!factorized)
    {
       try
       {
          SPxBasis::factorize();
       }
-      catch( const SPxException& )
+      catch(const SPxException&)
       {
          // reload inital slack basis in case the factorization failed
          assert(SPxBasis::status() <= SPxBasis::SINGULAR);
@@ -349,9 +366,9 @@ void SPxSolver::init()
 
    m_numCycle = 0;
 
-   if (type() == ENTER)
+   if(type() == ENTER)
    {
-      if (rep() == COLUMN)
+      if(rep() == COLUMN)
       {
          setPrimalBounds();
          setBasisStatus(SPxBasis::PRIMAL);
@@ -361,6 +378,7 @@ void SPxSolver::init()
          setDualRowBounds();
          setBasisStatus(SPxBasis::DUAL);
       }
+
       setEnterBounds();
       computeEnterCoPrhs();
       // prepare support vectors for sparse pricing
@@ -372,7 +390,7 @@ void SPxSolver::init()
    }
    else
    {
-      if (rep() == ROW)
+      if(rep() == ROW)
       {
          setPrimalBounds();
          setBasisStatus(SPxBasis::PRIMAL);
@@ -382,6 +400,7 @@ void SPxSolver::init()
          setDualColBounds();
          setBasisStatus(SPxBasis::DUAL);
       }
+
       setLeaveBounds();
       computeLeaveCoPrhs();
       // prepare support vectors for sparse pricing
@@ -397,7 +416,7 @@ void SPxSolver::init()
 
    theShift = 0.0;
 
-   if (type() == ENTER)
+   if(type() == ENTER)
    {
       shiftFvec();
       lastShift = theShift + entertol();
@@ -413,7 +432,7 @@ void SPxSolver::init()
       computeFtest();
    }
 
-   if (!initialized)
+   if(!initialized)
    {
       // if(thepricer->solver() != this)
       thepricer->load(this);
@@ -426,7 +445,8 @@ void SPxSolver::init()
 void SPxSolver::setPricing(Pricing pr)
 {
    thePricing = pr;
-   if (initialized && type() == ENTER)
+
+   if(initialized && type() == ENTER)
    {
       computePvec();
       computeCoTest();
@@ -436,7 +456,7 @@ void SPxSolver::setPricing(Pricing pr)
 
 void SPxSolver::setDecompStatus(DecompStatus decomp_stat)
 {
-   if( decomp_stat == FINDSTARTBASIS )
+   if(decomp_stat == FINDSTARTBASIS)
       getStartingDecompBasis = true;
    else
       getStartingDecompBasis = false;
@@ -451,15 +471,15 @@ void SPxSolver::reDim()
 
    int newsize = SPxLP::nCols() > SPxLP::nRows() ? SPxLP::nCols() : SPxLP::nRows();
 
-   if (newsize > unitVecs.size())
+   if(newsize > unitVecs.size())
    {
       unitVecs.reSize(newsize);
 
-      while (newsize-- > 0)
+      while(newsize-- > 0)
          unitVecs[newsize] = UnitVector(newsize);
    }
 
-   if (isInitialized())
+   if(isInitialized())
    {
       theFrhs->reDim(dim());
       theFvec->reDim(dim());
@@ -500,8 +520,9 @@ void SPxSolver::clear()
    unInit();
    SPxLP::clear();
    setBasisStatus(SPxBasis::NO_PROBLEM);
+
    // clear the basis only when theLP is present, because LP data (nrows, ncols) is used in reDim()
-   if( theLP != 0 )
+   if(theLP != 0)
       SPxBasis::reDim();
 
    infeasibilities.clear();
@@ -536,29 +557,30 @@ void SPxSolver::clearUpdateVecs(void)
 void SPxSolver::factorize()
 {
 
-   MSG_INFO3( (*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl; )
+   MSG_INFO3((*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl;)
 
    try
    {
       SPxBasis::factorize();
    }
-   catch( const SPxStatusException& )
+   catch(const SPxStatusException&)
    {
       assert(SPxBasis::status() == SPxBasis::SINGULAR);
       m_status = SINGULAR;
       std::stringstream s;
-      s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol() << ")";
+      s << "Basis is singular (numerical troubles, feastol = " << feastol() << ", opttol = " << opttol()
+        << ")";
       throw SPxStatusException(s.str());
    }
 
-   if( !initialized )
+   if(!initialized)
    {
       init();  // not sure if init() is neccessary here
       // we must not go on here because not all vectors (e.g. fVec) may be set up correctly
       return;
    }
 
-   if (SPxBasis::status() >= SPxBasis::REGULAR)
+   if(SPxBasis::status() >= SPxBasis::REGULAR)
    {
 #ifndef NDEBUG
       DVector ftmp(fVec());
@@ -566,43 +588,49 @@ void SPxSolver::factorize()
       DVector ctmp(coPvec());
 #endif  // NDEBUG
 
-      if (type() == LEAVE)
+      if(type() == LEAVE)
       {
          /* we have to recompute theFrhs, because roundoff errors can occur during updating, especially when
           * columns/rows with large bounds are present
           */
          computeFrhs();
-         SPxBasis::solve (*theFvec, *theFrhs);
+         SPxBasis::solve(*theFvec, *theFrhs);
          SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
 
 #ifndef NDEBUG
          ftmp -= fVec();
          ptmp -= pVec();
          ctmp -= coPvec();
-         if (ftmp.length() > DEFAULT_BND_VIOL)
+
+         if(ftmp.length() > DEFAULT_BND_VIOL)
          {
-            MSG_DEBUG( std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
+            MSG_DEBUG(std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl;)
             ftmp = fVec();
             multBaseWith(ftmp);
             ftmp -= fRhs();
-            if (ftmp.length() > DEFAULT_BND_VIOL)
-               MSG_INFO1( (*spxout), (*spxout) << "ESOLVE29 " << iteration() << ": fVec error = "
-                                 << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
-         }
-         if (ctmp.length() > DEFAULT_BND_VIOL)
+
+            if(ftmp.length() > DEFAULT_BND_VIOL)
+               MSG_INFO1((*spxout), (*spxout) << "ESOLVE29 " << iteration() << ": fVec error = "
+                         << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl;)
+            }
+
+         if(ctmp.length() > DEFAULT_BND_VIOL)
          {
-            MSG_DEBUG( std::cout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl; )
+            MSG_DEBUG(std::cout << "DSOLVE23 coPvec: " << ctmp.length() << std::endl;)
             ctmp = coPvec();
             multWithBase(ctmp);
             ctmp -= coPrhs();
-            if (ctmp.length() > DEFAULT_BND_VIOL)
-               MSG_INFO1( (*spxout), (*spxout) << "ESOLVE30 " << iteration() << ": coPvec error = "
-                                 << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
-         }
-         if (ptmp.length() > DEFAULT_BND_VIOL)
+
+            if(ctmp.length() > DEFAULT_BND_VIOL)
+               MSG_INFO1((*spxout), (*spxout) << "ESOLVE30 " << iteration() << ": coPvec error = "
+                         << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl;)
+            }
+
+         if(ptmp.length() > DEFAULT_BND_VIOL)
          {
-            MSG_DEBUG( std::cout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl; )
+            MSG_DEBUG(std::cout << "DSOLVE24 pVec:   " << ptmp.length() << std::endl;)
          }
+
 #endif  // NDEBUG
 
          computeFtest();
@@ -614,11 +642,11 @@ void SPxSolver::factorize()
          SPxBasis::coSolve(*theCoPvec, *theCoPrhs);
          computeCoTest();
 
-         if (pricing() == FULL)
+         if(pricing() == FULL)
          {
             /* to save time only recompute the row activities (in row rep) when we are already nearly optimal to
              * avoid missing any violations from previous updates */
-            if( rep() == ROW && m_pricingViolCo < entertol() && m_pricingViol < entertol() )
+            if(rep() == ROW && m_pricingViolCo < entertol() && m_pricingViol < entertol())
                computePvec();
 
             /* was deactivated, but this leads to warnings in testVecs() */
@@ -628,9 +656,11 @@ void SPxSolver::factorize()
    }
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
+
    /* moved this test after the computation of fTest and coTest below, since these vectors might not be set up at top, e.g. for an initial basis */
-   if (SPxBasis::status() > SPxBasis::SINGULAR)
+   if(SPxBasis::status() > SPxBasis::SINGULAR)
       testVecs();
+
 #endif
 }
 
@@ -642,16 +672,16 @@ Real SPxSolver::maxInfeas() const
 {
    Real inf = 0.0;
 
-   if (type() == ENTER)
+   if(type() == ENTER)
    {
-      if( m_pricingViolUpToDate && m_pricingViolCoUpToDate )
+      if(m_pricingViolUpToDate && m_pricingViolCoUpToDate)
          inf = m_pricingViol + m_pricingViolCo;
 
-      for (int i = 0; i < dim(); i++)
+      for(int i = 0; i < dim(); i++)
       {
-         if ((*theFvec)[i] > theUBbound[i])
+         if((*theFvec)[i] > theUBbound[i])
             inf = MAXIMUM(inf, (*theFvec)[i] - theUBbound[i]);
-         else if ((*theFvec)[i] < theLBbound[i])
+         else if((*theFvec)[i] < theLBbound[i])
             inf = MAXIMUM(inf, theLBbound[i] - (*theFvec)[i]);
       }
    }
@@ -659,21 +689,22 @@ Real SPxSolver::maxInfeas() const
    {
       assert(type() == LEAVE);
 
-      if( m_pricingViolUpToDate )
+      if(m_pricingViolUpToDate)
          inf = m_pricingViol;
 
-      for (int i = 0; i < dim(); i++)
+      for(int i = 0; i < dim(); i++)
       {
-         if ((*theCoPvec)[i] > (*theCoUbound)[i])
+         if((*theCoPvec)[i] > (*theCoUbound)[i])
             inf = MAXIMUM(inf, (*theCoPvec)[i] - (*theCoUbound)[i]);
-         else if ((*theCoPvec)[i] < (*theCoLbound)[i])
+         else if((*theCoPvec)[i] < (*theCoLbound)[i])
             inf = MAXIMUM(inf, (*theCoLbound)[i] - (*theCoPvec)[i]);
       }
-      for (int i = 0; i < coDim(); i++)
+
+      for(int i = 0; i < coDim(); i++)
       {
-         if ((*thePvec)[i] > (*theUbound)[i])
+         if((*thePvec)[i] > (*theUbound)[i])
             inf = MAXIMUM(inf, (*thePvec)[i] - (*theUbound)[i]);
-         else if ((*thePvec)[i] < (*theLbound)[i])
+         else if((*thePvec)[i] < (*theLbound)[i])
             inf = MAXIMUM(inf, (*theLbound)[i] - (*thePvec)[i]);
       }
    }
@@ -687,13 +718,14 @@ bool SPxSolver::noViols(Real tol) const
 {
    assert(tol >= 0.0);
 
-   if( type() == ENTER )
+   if(type() == ENTER)
    {
-      for( int i = 0; i < dim(); i++ )
+      for(int i = 0; i < dim(); i++)
       {
-         if( (*theFvec)[i] - theUBbound[i] > tol )
+         if((*theFvec)[i] - theUBbound[i] > tol)
             return false;
-         if( theLBbound[i] - (*theFvec)[i] > tol )
+
+         if(theLBbound[i] - (*theFvec)[i] > tol)
             return false;
       }
    }
@@ -701,21 +733,25 @@ bool SPxSolver::noViols(Real tol) const
    {
       assert(type() == LEAVE);
 
-      for( int i = 0; i < dim(); i++ )
+      for(int i = 0; i < dim(); i++)
       {
-         if( (*theCoPvec)[i] - (*theCoUbound)[i] > tol )
+         if((*theCoPvec)[i] - (*theCoUbound)[i] > tol)
             return false;
-         if( (*theCoLbound)[i] - (*theCoPvec)[i] > tol )
+
+         if((*theCoLbound)[i] - (*theCoPvec)[i] > tol)
             return false;
       }
-      for (int i = 0; i < coDim(); i++)
+
+      for(int i = 0; i < coDim(); i++)
       {
-         if( (*thePvec)[i] - (*theUbound)[i] > tol )
+         if((*thePvec)[i] - (*theUbound)[i] > tol)
             return false;
-         if( (*theLbound)[i] - (*thePvec)[i] > tol )
+
+         if((*theLbound)[i] - (*thePvec)[i] > tol)
             return false;
       }
    }
+
    return true;
 }
 
@@ -726,47 +762,56 @@ Real SPxSolver::nonbasicValue()
    const SPxBasis::Desc& ds = desc();
 
 #ifndef ENABLE_ADDITIONAL_CHECKS
+
    // if the value is available we don't need to recompute it
-   if ( m_nonbasicValueUpToDate )
+   if(m_nonbasicValueUpToDate)
       return m_nonbasicValue;
+
 #endif
 
-   if (rep() == COLUMN)
+   if(rep() == COLUMN)
    {
-      if (type() == LEAVE)
+      if(type() == LEAVE)
       {
-         for (i = nCols() - 1; i >= 0; --i)
+         for(i = nCols() - 1; i >= 0; --i)
          {
-            switch (ds.colStatus(i))
+            switch(ds.colStatus(i))
             {
             case SPxBasis::Desc::P_ON_UPPER :
                val += theUCbound[i] * SPxLP::upper(i);
                //@ val += maxObj(i) * SPxLP::upper(i);
                break;
+
             case SPxBasis::Desc::P_ON_LOWER :
                val += theLCbound[i] * SPxLP::lower(i);
                //@ val += maxObj(i) * SPxLP::lower(i);
                break;
+
             case SPxBasis::Desc::P_FIXED :
                val += maxObj(i) * SPxLP::lower(i);
                break;
+
             default:
                break;
             }
          }
-         for (i = nRows() - 1; i >= 0; --i)
+
+         for(i = nRows() - 1; i >= 0; --i)
          {
-            switch (ds.rowStatus(i))
+            switch(ds.rowStatus(i))
             {
             case SPxBasis::Desc::P_ON_UPPER :
                val += theLRbound[i] * SPxLP::rhs(i);
                break;
+
             case SPxBasis::Desc::P_ON_LOWER :
                val += theURbound[i] * SPxLP::lhs(i);
                break;
+
             case SPxBasis::Desc::P_FIXED :
                val += maxRowObj(i) * SPxLP::lhs(i);
                break;
+
             default:
                break;
             }
@@ -775,37 +820,45 @@ Real SPxSolver::nonbasicValue()
       else
       {
          assert(type() == ENTER);
-         for (i = nCols() - 1; i >= 0; --i)
+
+         for(i = nCols() - 1; i >= 0; --i)
          {
-            switch (ds.colStatus(i))
+            switch(ds.colStatus(i))
             {
             case SPxBasis::Desc::P_ON_UPPER :
                val += maxObj(i) * theUCbound[i];
                break;
+
             case SPxBasis::Desc::P_ON_LOWER :
                val += maxObj(i) * theLCbound[i];
                break;
+
             case SPxBasis::Desc::P_FIXED :
                assert(EQ(theLCbound[i], theUCbound[i]));
                val += maxObj(i) * theLCbound[i];
                break;
+
             default:
                break;
             }
          }
-         for (i = nRows() - 1; i >= 0; --i)
+
+         for(i = nRows() - 1; i >= 0; --i)
          {
-            switch (ds.rowStatus(i))
+            switch(ds.rowStatus(i))
             {
             case SPxBasis::Desc::P_ON_UPPER :
                val += maxRowObj(i) * theLRbound[i];
                break;
+
             case SPxBasis::Desc::P_ON_LOWER :
                val += maxRowObj(i) * theURbound[i];
                break;
+
             case SPxBasis::Desc::P_FIXED :
                val += maxRowObj(i) * theURbound[i];
                break;
+
             default:
                break;
             }
@@ -816,38 +869,46 @@ Real SPxSolver::nonbasicValue()
    {
       assert(rep() == ROW);
       assert(type() == ENTER);
-      for (i = nCols() - 1; i >= 0; --i)
+
+      for(i = nCols() - 1; i >= 0; --i)
       {
-         switch (ds.colStatus(i))
+         switch(ds.colStatus(i))
          {
          case SPxBasis::Desc::D_ON_UPPER :
             val += theUCbound[i] * lower(i);
             break;
+
          case SPxBasis::Desc::D_ON_LOWER :
             val += theLCbound[i] * upper(i);
             break;
+
          case SPxBasis::Desc::D_ON_BOTH :
             val += theLCbound[i] * upper(i);
             val += theUCbound[i] * lower(i);
             break;
+
          default:
             break;
          }
       }
-      for (i = nRows() - 1; i >= 0; --i)
+
+      for(i = nRows() - 1; i >= 0; --i)
       {
-         switch (ds.rowStatus(i))
+         switch(ds.rowStatus(i))
          {
          case SPxBasis::Desc::D_ON_UPPER :
             val += theURbound[i] * lhs(i);
             break;
+
          case SPxBasis::Desc::D_ON_LOWER :
             val += theLRbound[i] * rhs(i);
             break;
+
          case SPxBasis::Desc::D_ON_BOTH :
             val += theLRbound[i] * rhs(i);
             val += theURbound[i] * lhs(i);
             break;
+
          default:
             break;
          }
@@ -855,16 +916,18 @@ Real SPxSolver::nonbasicValue()
    }
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
-   if( m_nonbasicValueUpToDate && NE(m_nonbasicValue, val) )
+
+   if(m_nonbasicValueUpToDate && NE(m_nonbasicValue, val))
    {
-      MSG_ERROR( std::cerr << "stored nonbasic value: " << m_nonbasicValue
-                 << ", correct nonbasic value: " << val
-                 << ", violation: " << val - m_nonbasicValue << std::endl; )
+      MSG_ERROR(std::cerr << "stored nonbasic value: " << m_nonbasicValue
+                << ", correct nonbasic value: " << val
+                << ", violation: " << val - m_nonbasicValue << std::endl;)
       assert(EQrel(m_nonbasicValue, val, 1e-12));
    }
+
 #endif
 
-   if( !m_nonbasicValueUpToDate )
+   if(!m_nonbasicValueUpToDate)
    {
       m_nonbasicValue = val;
       m_nonbasicValueUpToDate = true;
@@ -880,12 +943,12 @@ Real SPxSolver::value()
    Real x;
 
    // calling value() without having a suitable status is an error.
-   if (!isInitialized())
+   if(!isInitialized())
       return infinity;
 
-   if (rep() == ROW)
+   if(rep() == ROW)
    {
-      if (type() == LEAVE)
+      if(type() == LEAVE)
          x = SPxLP::spxSense() * (coPvec() * fRhs()); // the contribution of maxRowObj() is missing
       else
          x = SPxLP::spxSense() * (nonbasicValue() + (coPvec() * fRhs()));
@@ -898,16 +961,16 @@ Real SPxSolver::value()
 
 bool SPxSolver::updateNonbasicValue(Real objChange)
 {
-   if( m_nonbasicValueUpToDate )
+   if(m_nonbasicValueUpToDate)
       m_nonbasicValue += objChange;
 
-   MSG_DEBUG( std::cout
-      << "Iteration: " << iteration()
-      << ": updated objValue: " << objChange
-      << ", new value: " << m_nonbasicValue
-      << ", correct value: " << nonbasicValue()
-      << std::endl;
-   )
+   MSG_DEBUG(std::cout
+             << "Iteration: " << iteration()
+             << ": updated objValue: " << objChange
+             << ", new value: " << m_nonbasicValue
+             << ", correct value: " << nonbasicValue()
+             << std::endl;
+            )
 
    return m_nonbasicValueUpToDate;
 }
@@ -917,10 +980,10 @@ bool SPxSolver::updateNonbasicValue(Real objChange)
 void SPxSolver::setFeastol(Real d)
 {
 
-   if( d <= 0.0 )
+   if(d <= 0.0)
       throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
 
-   if( theRep == COLUMN )
+   if(theRep == COLUMN)
       m_entertol = d;
    else
       m_leavetol = d;
@@ -929,10 +992,10 @@ void SPxSolver::setFeastol(Real d)
 void SPxSolver::setOpttol(Real d)
 {
 
-   if( d <= 0.0 )
+   if(d <= 0.0)
       throw SPxInterfaceException("XSOLVE31 Cannot set opttol less than or equal to zero.");
 
-   if( theRep == COLUMN )
+   if(theRep == COLUMN)
       m_leavetol = d;
    else
       m_entertol = d;
@@ -941,7 +1004,7 @@ void SPxSolver::setOpttol(Real d)
 void SPxSolver::setDelta(Real d)
 {
 
-   if( d <= 0.0 )
+   if(d <= 0.0)
       throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
 
    m_entertol = d;
@@ -952,7 +1015,8 @@ void SPxSolver::hyperPricing(bool h)
 {
    hyperPricingEnter = h;
    hyperPricingLeave = h;
-   if( h )
+
+   if(h)
    {
       updateViols.setMax(dim());
       updateViolsCo.setMax(coDim());
@@ -963,15 +1027,15 @@ SPxSolver::SPxSolver(
    Type            p_type,
    Representation  p_rep,
    Timer::TYPE     ttype)
-   : theType (p_type)
+   : theType(p_type)
    , thePricing(FULL)
    , theRep(p_rep)
    , polishObj(POLISH_OFF)
    , theTime(0)
    , timerType(ttype)
    , theCumulativeTime(0.0)
-   , maxIters (-1)
-   , maxTime (infinity)
+   , maxIters(-1)
+   , maxTime(infinity)
    , nClckSkipsLeft(0)
    , nCallsToTimelim(0)
    , objLimit(infinity)
@@ -982,32 +1046,32 @@ SPxSolver::SPxSolver(
    , m_pricingViolUpToDate(false)
    , m_pricingViolCo(0.0)
    , m_pricingViolCoUpToDate(false)
-   , theShift (0)
+   , theShift(0)
    , m_maxCycle(100)
    , m_numCycle(0)
-   , initialized (false)
-   , solveVector2 (0)
-   , solveVector3 (0)
+   , initialized(false)
+   , solveVector2(0)
+   , solveVector3(0)
    , coSolveVector2(0)
    , coSolveVector3(0)
-   , freePricer (false)
-   , freeRatioTester (false)
-   , freeStarter (false)
-   , displayLine (0)
-   , displayFreq (200)
+   , freePricer(false)
+   , freeRatioTester(false)
+   , freeStarter(false)
+   , displayLine(0)
+   , displayFreq(200)
    , sparsePricingFactor(SPARSITYFACTOR)
    , getStartingDecompBasis(false)
    , computeDegeneracy(false)
    , degenCompIterOffset(0)
    , fullPerturbation(false)
    , printCondition(0)
-   , unitVecs (0)
-   , primVec (0, Param::epsilon())
-   , dualVec (0, Param::epsilon())
-   , addVec (0, Param::epsilon())
-   , thepricer (0)
-   , theratiotester (0)
-   , thestarter (0)
+   , unitVecs(0)
+   , primVec(0, Param::epsilon())
+   , dualVec(0, Param::epsilon())
+   , addVec(0, Param::epsilon())
+   , thepricer(0)
+   , theratiotester(0)
+   , thestarter(0)
    , boundrange(0.0)
    , siderange(0.0)
    , objrange(0.0)
@@ -1163,7 +1227,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
       spxout = base.spxout;
       integerVariables = base.integerVariables;
 
-      if (base.theRep == COLUMN)
+      if(base.theRep == COLUMN)
       {
          thevectors   = colSet();
          thecovectors = rowSet();
@@ -1210,6 +1274,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
          delete thepricer;
          thepricer = 0;
       }
+
       if(base.thepricer == 0)
       {
          thepricer = 0;
@@ -1228,6 +1293,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
          delete theratiotester;
          theratiotester = 0;
       }
+
       if(base.theratiotester == 0)
       {
          theratiotester = 0;
@@ -1246,6 +1312,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
          delete thestarter;
          thestarter = 0;
       }
+
       if(base.thestarter == 0)
       {
          thestarter = 0;
@@ -1265,7 +1332,7 @@ SPxSolver& SPxSolver::operator=(const SPxSolver& base)
 
 
 SPxSolver::SPxSolver(const SPxSolver& base)
-   : SPxLP (base)
+   : SPxLP(base)
    , SPxBasis(base)
    , theType(base.theType)
    , thePricing(base.thePricing)
@@ -1292,9 +1359,9 @@ SPxSolver::SPxSolver(const SPxSolver& base)
    , m_maxCycle(base.m_maxCycle)
    , m_numCycle(base.m_numCycle)
    , initialized(base.initialized)
-   , solveVector2 (0)
+   , solveVector2(0)
    , solveVector2rhs(base.solveVector2rhs)
-   , solveVector3 (0)
+   , solveVector3(0)
    , solveVector3rhs(base.solveVector3rhs)
    , coSolveVector2(0)
    , coSolveVector2rhs(base.coSolveVector2rhs)
@@ -1366,7 +1433,7 @@ SPxSolver::SPxSolver(const SPxSolver& base)
 {
    theTime = TimerFactory::createTimer(timerType);
 
-   if (base.theRep == COLUMN)
+   if(base.theRep == COLUMN)
    {
       thevectors   = colSet();
       thecovectors = rowSet();
@@ -1446,87 +1513,97 @@ SPxSolver::SPxSolver(const SPxSolver& base)
 bool SPxSolver::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   if (epsilon() < 0)
+
+   if(epsilon() < 0)
       return MSGinconsistent("SPxSolver");
 
-   if (primVec.delta().getEpsilon() != dualVec.delta().getEpsilon())
+   if(primVec.delta().getEpsilon() != dualVec.delta().getEpsilon())
       return MSGinconsistent("SPxSolver");
 
-   if (dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
+   if(dualVec.delta().getEpsilon() != addVec.delta().getEpsilon())
       return MSGinconsistent("SPxSolver");
 
-   if (unitVecs.size() < SPxLP::nCols() || unitVecs.size() < SPxLP::nRows())
+   if(unitVecs.size() < SPxLP::nCols() || unitVecs.size() < SPxLP::nRows())
       return MSGinconsistent("SPxSolver");
 
-   if (initialized)
+   if(initialized)
    {
-      if (theFrhs->dim() != dim())
-         return MSGinconsistent("SPxSolver");
-      if (theFvec->dim() != dim())
+      if(theFrhs->dim() != dim())
          return MSGinconsistent("SPxSolver");
 
-      if (theCoPrhs->dim() != dim())
-         return MSGinconsistent("SPxSolver");
-      if (thePvec->dim() != coDim())
-         return MSGinconsistent("SPxSolver");
-      if (theCoPvec->dim() != dim())
+      if(theFvec->dim() != dim())
          return MSGinconsistent("SPxSolver");
 
-      if (theTest.dim() != coDim())
-         return MSGinconsistent("SPxSolver");
-      if (theCoTest.dim() != dim())
+      if(theCoPrhs->dim() != dim())
          return MSGinconsistent("SPxSolver");
 
-      if (theURbound.dim() != SPxLP::nRows())
+      if(thePvec->dim() != coDim())
          return MSGinconsistent("SPxSolver");
-      if (theLRbound.dim() != SPxLP::nRows())
+
+      if(theCoPvec->dim() != dim())
          return MSGinconsistent("SPxSolver");
-      if (theUCbound.dim() != SPxLP::nCols())
+
+      if(theTest.dim() != coDim())
          return MSGinconsistent("SPxSolver");
-      if (theLCbound.dim() != SPxLP::nCols())
+
+      if(theCoTest.dim() != dim())
          return MSGinconsistent("SPxSolver");
-      if (theUBbound.dim() != dim())
+
+      if(theURbound.dim() != SPxLP::nRows())
          return MSGinconsistent("SPxSolver");
-      if (theLBbound.dim() != dim())
+
+      if(theLRbound.dim() != SPxLP::nRows())
+         return MSGinconsistent("SPxSolver");
+
+      if(theUCbound.dim() != SPxLP::nCols())
+         return MSGinconsistent("SPxSolver");
+
+      if(theLCbound.dim() != SPxLP::nCols())
+         return MSGinconsistent("SPxSolver");
+
+      if(theUBbound.dim() != dim())
+         return MSGinconsistent("SPxSolver");
+
+      if(theLBbound.dim() != dim())
          return MSGinconsistent("SPxSolver");
    }
 
-   if (rep() == COLUMN)
+   if(rep() == COLUMN)
    {
       if(thecovectors !=
-         reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
-         || thevectors !=
-         reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
-         || theFrhs != &primRhs ||
-         theFvec != &primVec ||
-         theCoPrhs != &dualRhs ||
-         theCoPvec != &dualVec ||
-         thePvec != &addVec ||
-         theRPvec != theCoPvec ||
-         theCPvec != thePvec ||
-         theUbound != &theUCbound ||
-         theLbound != &theLCbound ||
-         theCoUbound != &theURbound ||
-         theCoLbound != &theLRbound)
+            reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
+            || thevectors !=
+            reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
+            || theFrhs != &primRhs ||
+            theFvec != &primVec ||
+            theCoPrhs != &dualRhs ||
+            theCoPvec != &dualVec ||
+            thePvec != &addVec ||
+            theRPvec != theCoPvec ||
+            theCPvec != thePvec ||
+            theUbound != &theUCbound ||
+            theLbound != &theLCbound ||
+            theCoUbound != &theURbound ||
+            theCoLbound != &theLRbound)
          return MSGinconsistent("SPxSolver");
    }
    else
    {
-      if (thecovectors
-         != reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
-         || thevectors
-         != reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
-         || theFrhs != &dualRhs ||
-         theFvec != &dualVec ||
-         theCoPrhs != &primRhs ||
-         theCoPvec != &primVec ||
-         thePvec != &addVec ||
-         theRPvec != thePvec ||
-         theCPvec != theCoPvec ||
-         theUbound != &theURbound ||
-         theLbound != &theLRbound ||
-         theCoUbound != &theUCbound ||
-         theCoLbound != &theLCbound)
+      if(thecovectors
+            != reinterpret_cast<const SVSet*>(static_cast<const LPColSet*>(this))
+            || thevectors
+            != reinterpret_cast<const SVSet*>(static_cast<const LPRowSet*>(this))
+            || theFrhs != &dualRhs ||
+            theFvec != &dualVec ||
+            theCoPrhs != &primRhs ||
+            theCoPvec != &primVec ||
+            thePvec != &addVec ||
+            theRPvec != thePvec ||
+            theCPvec != theCoPvec ||
+            theUbound != &theURbound ||
+            theLbound != &theLRbound ||
+            theCoUbound != &theUCbound ||
+            theCoLbound != &theLCbound)
          return MSGinconsistent("SPxSolver");
    }
 
@@ -1543,7 +1620,7 @@ bool SPxSolver::isConsistent() const
           && theUCbound.isConsistent()
           && theLCbound.isConsistent()
           && SPxBasis::isConsistent()
-         ;
+          ;
 #else
    return true;
 #endif
@@ -1552,8 +1629,9 @@ bool SPxSolver::isConsistent() const
 
 void SPxSolver::setTerminationTime(Real p_time)
 {
-   if( p_time < 0.0 )
+   if(p_time < 0.0)
       p_time = 0.0;
+
    maxTime = p_time;
 }
 
@@ -1564,8 +1642,9 @@ Real SPxSolver::terminationTime() const
 
 void SPxSolver::setTerminationIter(int p_iteration)
 {
-   if( p_iteration < 0 )
+   if(p_iteration < 0)
       p_iteration = -1;
+
    maxIters = p_iteration;
 }
 
@@ -1581,15 +1660,15 @@ bool SPxSolver::isTimeLimitReached(const bool forceCheck)
    ++nCallsToTimelim;
 
    // check if a time limit is actually set
-   if( maxTime >= infinity )
+   if(maxTime >= infinity)
       return false;
 
    // check if the expensive system call to update the time should be skipped again
-   if( forceCheck || nCallsToTimelim < NINITCALLS ||  nClckSkipsLeft <= 0 )
+   if(forceCheck || nCallsToTimelim < NINITCALLS ||  nClckSkipsLeft <= 0)
    {
       Real currtime = time();
 
-      if( currtime >= maxTime )
+      if(currtime >= maxTime)
          return true;
 
       // determine the number of times the clock can be skipped again.
@@ -1597,8 +1676,9 @@ bool SPxSolver::isTimeLimitReached(const bool forceCheck)
       Real avgtimeinterval = (currtime + cumulativeTime()) / (Real)(nCallsToTimelim);
 
       // it would not be safe to skip the clock so many times since we are approaching the time limit
-      if( SAFETYFACTOR * (maxTime - currtime) / (avgtimeinterval + 1e-6) < nClckSkips )
+      if(SAFETYFACTOR * (maxTime - currtime) / (avgtimeinterval + 1e-6) < nClckSkips)
          nClckSkips = 0;
+
       nClckSkipsLeft = nClckSkips;
    }
    else
@@ -1625,24 +1705,28 @@ Real SPxSolver::terminationValue() const
 }
 
 SPxSolver::VarStatus
-SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
+SPxSolver::basisStatusToVarStatus(SPxBasis::Desc::Status stat) const
 {
    VarStatus vstat;
 
-   switch( stat )
+   switch(stat)
    {
    case SPxBasis::Desc::P_ON_LOWER:
       vstat = ON_LOWER;
       break;
+
    case SPxBasis::Desc::P_ON_UPPER:
       vstat = ON_UPPER;
       break;
+
    case SPxBasis::Desc::P_FIXED:
       vstat = FIXED;
       break;
+
    case SPxBasis::Desc::P_FREE:
       vstat = ZERO;
       break;
+
    case SPxBasis::Desc::D_ON_UPPER:
    case SPxBasis::Desc::D_ON_LOWER:
    case SPxBasis::Desc::D_ON_BOTH:
@@ -1650,151 +1734,171 @@ SPxSolver::basisStatusToVarStatus( SPxBasis::Desc::Status stat ) const
    case SPxBasis::Desc::D_FREE:
       vstat = BASIC;
       break;
+
    default:
-      MSG_ERROR( std::cerr << "ESOLVE26 ERROR: unknown basis status (" << stat << ")"
-                        << std::endl; )
+      MSG_ERROR(std::cerr << "ESOLVE26 ERROR: unknown basis status (" << stat << ")"
+                << std::endl;)
       throw SPxInternalCodeException("XSOLVE22 This should never happen.");
    }
+
    return vstat;
 }
 
 SPxBasis::Desc::Status
-SPxSolver::varStatusToBasisStatusRow( int row, SPxSolver::VarStatus stat ) const
+SPxSolver::varStatusToBasisStatusRow(int row, SPxSolver::VarStatus stat) const
 {
    SPxBasis::Desc::Status rstat;
 
-   switch( stat )
+   switch(stat)
    {
    case FIXED :
       assert(EQ(rhs(row), lhs(row), feastol()));
       rstat = SPxBasis::Desc::P_FIXED;
       break;
+
    case ON_UPPER :
       assert(rhs(row) < infinity);
       rstat = lhs(row) < rhs(row)
-         ? SPxBasis::Desc::P_ON_UPPER
-         : SPxBasis::Desc::P_FIXED;
+              ? SPxBasis::Desc::P_ON_UPPER
+              : SPxBasis::Desc::P_FIXED;
       break;
+
    case ON_LOWER :
       assert(lhs(row) > -infinity);
       rstat = lhs(row) < rhs(row)
-         ? SPxBasis::Desc::P_ON_LOWER
-         : SPxBasis::Desc::P_FIXED;
+              ? SPxBasis::Desc::P_ON_LOWER
+              : SPxBasis::Desc::P_FIXED;
       break;
+
    case ZERO :
+
       /* A 'free' row (i.e., infinite lower & upper bounds) does not really make sense. The user
        * might (think to) know better, e.g., when temporarily turning off a row. We therefore apply
        * the same adjustment as in the column case in varStatusToBasisStatusCol(). */
-      if (lhs(row) <= -infinity && rhs(row) >= infinity)
+      if(lhs(row) <= -infinity && rhs(row) >= infinity)
          rstat = SPxBasis::Desc::P_FREE;
       else
       {
-         if ( lhs(row) == rhs(row) )
+         if(lhs(row) == rhs(row))
          {
-            assert( rhs(row) < infinity );
+            assert(rhs(row) < infinity);
             rstat = SPxBasis::Desc::P_FIXED;
          }
          else
          {
-            if ( lhs(row) > -infinity )
+            if(lhs(row) > -infinity)
                rstat = SPxBasis::Desc::P_ON_LOWER;
             else
             {
-               assert( rhs(row) < infinity );
+               assert(rhs(row) < infinity);
                rstat = SPxBasis::Desc::P_ON_UPPER;
             }
          }
       }
+
       break;
+
    case BASIC :
       rstat = dualRowStatus(row);
       break;
+
    default:
-      MSG_ERROR( std::cerr << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")"
-                        << std::endl; )
+      MSG_ERROR(std::cerr << "ESOLVE27 ERROR: unknown VarStatus (" << int(stat) << ")"
+                << std::endl;)
       throw SPxInternalCodeException("XSOLVE23 This should never happen.");
    }
+
    return rstat;
 }
 
 SPxBasis::Desc::Status
-SPxSolver::varStatusToBasisStatusCol( int col, SPxSolver::VarStatus stat ) const
+SPxSolver::varStatusToBasisStatusCol(int col, SPxSolver::VarStatus stat) const
 {
    SPxBasis::Desc::Status cstat;
 
-   switch( stat )
+   switch(stat)
    {
    case FIXED :
-      if (upper(col) == lower(col))
+      if(upper(col) == lower(col))
          cstat = SPxBasis::Desc::P_FIXED;
-      else if (maxObj(col) > 0.0)
+      else if(maxObj(col) > 0.0)
          cstat = SPxBasis::Desc::P_ON_UPPER;
       else
          cstat = SPxBasis::Desc::P_ON_LOWER;
+
       break;
+
    case ON_UPPER :
       assert(upper(col) < infinity);
       cstat = lower(col) < upper(col)
-         ? SPxBasis::Desc::P_ON_UPPER
-         : SPxBasis::Desc::P_FIXED;
+              ? SPxBasis::Desc::P_ON_UPPER
+              : SPxBasis::Desc::P_FIXED;
       break;
+
    case ON_LOWER :
       assert(lower(col) > -infinity);
       cstat = lower(col) < upper(col)
-         ? SPxBasis::Desc::P_ON_LOWER
-         : SPxBasis::Desc::P_FIXED;
+              ? SPxBasis::Desc::P_ON_LOWER
+              : SPxBasis::Desc::P_FIXED;
       break;
+
    case ZERO :
+
       /* In this case the upper and lower bounds on the variable should be infinite. The bounds
        * might, however, have changed and we try to recover from this by changing the status to
        * 'resonable' settings. A solve has to find the correct values afterwards. Note that the
        * approach below is consistent with changesoplex.cpp (e.g., changeUpperStatus() and
        * changeLowerStatus() ). */
-      if (lower(col) <= -infinity && upper(col) >= infinity)
+      if(lower(col) <= -infinity && upper(col) >= infinity)
          cstat = SPxBasis::Desc::P_FREE;
       else
       {
-         if ( lower(col) == upper(col) )
+         if(lower(col) == upper(col))
          {
-            assert( upper(col) < infinity );
+            assert(upper(col) < infinity);
             cstat = SPxBasis::Desc::P_FIXED;
          }
          else
          {
-            if ( lower(col) > -infinity )
+            if(lower(col) > -infinity)
                cstat = SPxBasis::Desc::P_ON_LOWER;
             else
             {
-               assert( upper(col) < infinity );
+               assert(upper(col) < infinity);
                cstat = SPxBasis::Desc::P_ON_UPPER;
             }
          }
       }
+
       break;
+
    case BASIC :
       cstat = dualColStatus(col);
       break;
+
    default:
-      MSG_ERROR( std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
-                        << std::endl; )
+      MSG_ERROR(std::cerr << "ESOLVE28 ERROR: unknown VarStatus (" << int(stat) << ")"
+                << std::endl;)
       throw SPxInternalCodeException("XSOLVE24 This should never happen.");
    }
+
    return cstat;
 }
 
-SPxSolver::VarStatus SPxSolver::getBasisRowStatus( int row ) const
+SPxSolver::VarStatus SPxSolver::getBasisRowStatus(int row) const
 {
-   assert( 0 <= row && row < nRows() );
-   return basisStatusToVarStatus( desc().rowStatus( row ) );
+   assert(0 <= row && row < nRows());
+   return basisStatusToVarStatus(desc().rowStatus(row));
 }
 
-SPxSolver::VarStatus SPxSolver::getBasisColStatus( int col ) const
+SPxSolver::VarStatus SPxSolver::getBasisColStatus(int col) const
 {
-   assert( 0 <= col && col < nCols() );
-   return basisStatusToVarStatus( desc().colStatus( col ) );
+   assert(0 <= col && col < nCols());
+   return basisStatusToVarStatus(desc().colStatus(col));
 }
 
-SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[], const int rowsSize, const int colsSize) const
+SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[], const int rowsSize,
+                                      const int colsSize) const
 {
    const SPxBasis::Desc& d = desc();
    int i;
@@ -1802,13 +1906,13 @@ SPxSolver::Status SPxSolver::getBasis(VarStatus row[], VarStatus col[], const in
    assert(rowsSize < 0 || rowsSize >= nRows());
    assert(colsSize < 0 || colsSize >= nCols());
 
-   if (col)
-      for (i = nCols() - 1; i >= 0; --i)
-         col[i] = basisStatusToVarStatus( d.colStatus(i) );
+   if(col)
+      for(i = nCols() - 1; i >= 0; --i)
+         col[i] = basisStatusToVarStatus(d.colStatus(i));
 
-   if (row)
-      for (i = nRows() - 1; i >= 0; --i)
-         row[i] = basisStatusToVarStatus( d.rowStatus(i) );
+   if(row)
+      for(i = nRows() - 1; i >= 0; --i)
+         row[i] = basisStatusToVarStatus(d.rowStatus(i));
 
    return status();
 }
@@ -1818,49 +1922,50 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
 
    int basisdim;
 
-   if ( p_rows.size() != nRows() || p_cols.size() != nCols() )
+   if(p_rows.size() != nRows() || p_cols.size() != nCols())
       return false;
 
    basisdim = 0;
-   for ( int row = nRows()-1; row >= 0; --row )
+
+   for(int row = nRows() - 1; row >= 0; --row)
    {
-      if ( p_rows[row] == UNDEFINED )
-            return false;
+      if(p_rows[row] == UNDEFINED)
+         return false;
       // row is basic
-      else if ( p_rows[row] == BASIC )
+      else if(p_rows[row] == BASIC)
       {
          basisdim++;
       }
       // row is nonbasic
       else
       {
-         if ( (p_rows[row] == FIXED && lhs(row) != rhs(row))
-              || (p_rows[row] == ON_UPPER && rhs(row) >= infinity)
-              || (p_rows[row] == ON_LOWER && lhs(row) <= -infinity) )
+         if((p_rows[row] == FIXED && lhs(row) != rhs(row))
+               || (p_rows[row] == ON_UPPER && rhs(row) >= infinity)
+               || (p_rows[row] == ON_LOWER && lhs(row) <= -infinity))
             return false;
       }
    }
 
-   for ( int col = nCols()-1; col >= 0; --col )
+   for(int col = nCols() - 1; col >= 0; --col)
    {
-      if ( p_cols[col] == UNDEFINED )
-            return false;
+      if(p_cols[col] == UNDEFINED)
+         return false;
       // col is basic
-      else if ( p_cols[col] == BASIC )
+      else if(p_cols[col] == BASIC)
       {
          basisdim++;
       }
       // col is nonbasic
       else
       {
-         if ( (p_cols[col] == FIXED && lower(col) != upper(col))
-              || (p_cols[col] == ON_UPPER && upper(col) >= infinity)
-              || (p_cols[col] == ON_LOWER && lower(col) <= -infinity) )
+         if((p_cols[col] == FIXED && lower(col) != upper(col))
+               || (p_cols[col] == ON_UPPER && upper(col) >= infinity)
+               || (p_cols[col] == ON_LOWER && lower(col) <= -infinity))
             return false;
       }
    }
 
-   if ( basisdim != dim() )
+   if(basisdim != dim())
       return false;
 
    // basis valid
@@ -1869,17 +1974,17 @@ bool SPxSolver::isBasisValid(DataArray<VarStatus> p_rows, DataArray<VarStatus> p
 
 void SPxSolver::setBasis(const VarStatus p_rows[], const VarStatus p_cols[])
 {
-   if (SPxBasis::status() == SPxBasis::NO_PROBLEM)
+   if(SPxBasis::status() == SPxBasis::NO_PROBLEM)
       SPxBasis::load(this, false);
 
    SPxBasis::Desc ds = desc();
    int i;
 
    for(i = 0; i < nRows(); i++)
-      ds.rowStatus(i) = varStatusToBasisStatusRow( i, p_rows[i] );
+      ds.rowStatus(i) = varStatusToBasisStatusRow(i, p_rows[i]);
 
    for(i = 0; i < nCols(); i++)
-      ds.colStatus(i) = varStatusToBasisStatusCol( i, p_cols[i] );
+      ds.colStatus(i) = varStatusToBasisStatusCol(i, p_cols[i]);
 
    loadBasis(ds);
    forceRecompNonbasicValue();
@@ -1896,55 +2001,58 @@ Real SPxSolver::getDegeneracyLevel(Vector degenvec)
 
    // iterating over all columns in the basis matrix
    // this identifies the basis indices and those that have a zero dual multiplier (rows) or zero reduced cost (cols).
-   if( rep() == ROW )
+   if(rep() == ROW)
    {
-      for( int i = 0; i < nCols(); ++i ) // @todo Check the use of numColsReal for the reduced problem.
+      for(int i = 0; i < nCols(); ++i)   // @todo Check the use of numColsReal for the reduced problem.
       {
          // degeneracy in the dual simplex exists if there are rows with a zero dual multiplier or columns with a zero
          // reduced costs. This requirement is regardless of the objective sense.
-         if( isZero(degenvec[i], feastol()) )
+         if(isZero(degenvec[i], feastol()))
             numDegenerate++;
       }
 
-      if( type() == ENTER )   // dual simplex
-         degeneracyLevel = Real(numDegenerate)/nCols();
+      if(type() == ENTER)     // dual simplex
+         degeneracyLevel = Real(numDegenerate) / nCols();
       else                    // primal simplex
       {
          assert(type() == LEAVE);
-         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate - (nCols() - nRows())) : 0.0;
-         degeneracyLevel = degenVars/nRows();
+         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate -
+                          (nCols() - nRows())) : 0.0;
+         degeneracyLevel = degenVars / nRows();
       }
    }
    else
    {
       assert(rep() == COLUMN);
 
-      for( int i = 0; i < nCols(); i++ )
+      for(int i = 0; i < nCols(); i++)
       {
-         if( type() == LEAVE )   // dual simplex
+         if(type() == LEAVE)     // dual simplex
          {
-            if( isZero(maxObj()[i] - degenvec[i], feastol()) )
+            if(isZero(maxObj()[i] - degenvec[i], feastol()))
                numDegenerate++;
          }
          else                    // primal simplex
          {
-            assert( type() == ENTER );
-            if( isZero(degenvec[i], feastol()) )
+            assert(type() == ENTER);
+
+            if(isZero(degenvec[i], feastol()))
                numDegenerate++;
          }
       }
 
 
-      if( type() == LEAVE )   // dual simplex
+      if(type() == LEAVE)     // dual simplex
       {
          Real degenVars = nRows() > numDegenerate ? Real(nRows() - numDegenerate) : 0.0;
-         degeneracyLevel = degenVars/nCols();
+         degeneracyLevel = degenVars / nCols();
       }
       else                    // primal simplex
       {
          assert(type() == ENTER);
-         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate - (nCols() - nRows())) : 0.0;
-         degeneracyLevel = degenVars/nRows();
+         Real degenVars = (numDegenerate > (nCols() - nRows())) ? Real(numDegenerate -
+                          (nCols() - nRows())) : 0.0;
+         degeneracyLevel = degenVars / nRows();
       }
    }
 
@@ -1956,16 +2064,16 @@ void SPxSolver::getNdualNorms(int& nnormsRow, int& nnormsCol) const
    nnormsRow = 0;
    nnormsCol = 0;
 
-   if( weightsAreSetup )
+   if(weightsAreSetup)
    {
-      if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN )
+      if(type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
       {
          nnormsRow = coWeights.dim();
          nnormsCol = 0;
 
          assert(nnormsRow == dim());
       }
-      else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW )
+      else if(type() == SPxSolver::ENTER && rep() == SPxSolver::ROW)
       {
          nnormsRow = weights.dim();
          nnormsCol = coWeights.dim();
@@ -1981,20 +2089,20 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
    nnormsRow = 0;
    nnormsCol = 0;
 
-   if( !weightsAreSetup )
+   if(!weightsAreSetup)
       return false;
 
-   if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN )
+   if(type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
    {
       nnormsCol = 0;
       nnormsRow = coWeights.dim();
 
       assert(nnormsRow == dim());
 
-      for( int i = 0; i < nnormsRow; ++i)
+      for(int i = 0; i < nnormsRow; ++i)
          norms[i] = coWeights[i];
    }
-   else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW )
+   else if(type() == SPxSolver::ENTER && rep() == SPxSolver::ROW)
    {
       nnormsRow = weights.dim();
       nnormsCol = coWeights.dim();
@@ -2002,10 +2110,10 @@ bool SPxSolver::getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const
       assert(nnormsCol == dim());
       assert(nnormsRow == coDim());
 
-      for( int i = 0; i < nnormsRow; ++i )
+      for(int i = 0; i < nnormsRow; ++i)
          norms[i] = weights[i];
 
-      for( int i = 0; i < nnormsCol; ++i )
+      for(int i = 0; i < nnormsCol; ++i)
          norms[nnormsRow + i] = coWeights[i];
    }
    else
@@ -2018,28 +2126,34 @@ bool SPxSolver::setDualNorms(int nnormsRow, int nnormsCol, Real* norms)
 {
    weightsAreSetup = false;
 
-   if( type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
+   if(type() == SPxSolver::LEAVE && rep() == SPxSolver::COLUMN)
    {
       coWeights.reDim(dim(), false);
       assert(coWeights.dim() >= nnormsRow);
-      for( int i = 0; i < nnormsRow; ++i )
+
+      for(int i = 0; i < nnormsRow; ++i)
          coWeights[i] = norms[i];
+
       weightsAreSetup = true;
    }
-   else if( type() == SPxSolver::ENTER && rep() == SPxSolver::ROW)
+   else if(type() == SPxSolver::ENTER && rep() == SPxSolver::ROW)
    {
       weights.reDim(coDim(), false);
       coWeights.reDim(dim(), false);
       assert(weights.dim() >= nnormsRow);
       assert(coWeights.dim() >= nnormsCol);
-      for( int i = 0; i < nnormsRow; ++i )
+
+      for(int i = 0; i < nnormsRow; ++i)
          weights[i] = norms[i];
-      for( int i = 0; i < nnormsCol; ++i )
+
+      for(int i = 0; i < nnormsCol; ++i)
          coWeights[i] = norms[nnormsRow + i];
+
       weightsAreSetup = true;
    }
    else
       return false;
+
    return true;
 }
 
@@ -2048,7 +2162,8 @@ void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
    assert(ncols == nCols() || (ncols == 0 && intInfo == NULL));
 
    integerVariables.reSize(ncols);
-   for( int i = 0; i < ncols; ++i )
+
+   for(int i = 0; i < ncols; ++i)
    {
       integerVariables[i] = intInfo[i];
    }
@@ -2061,135 +2176,166 @@ void SPxSolver::setIntegralityInformation(int ncols, int* intInfo)
 //
 
 // Pretty-printing of variable status.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::VarStatus& status )
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::VarStatus& status)
 {
-   switch( status )
-      {
-      case SPxSolver::BASIC:
-         os << "BASIC";
-         break;
-      case SPxSolver::FIXED:
-         os << "FIXED";
-         break;
-      case SPxSolver::ON_LOWER:
-         os << "ON_LOWER";
-         break;
-      case SPxSolver::ON_UPPER:
-         os << "ON_UPPER";
-         break;
-      case SPxSolver::ZERO:
-         os << "ZERO";
-         break;
-      case SPxSolver::UNDEFINED:
-         os << "UNDEFINED";
-         break;
-      default:
-         os << "?invalid?";
-         break;
-      }
+   switch(status)
+   {
+   case SPxSolver::BASIC:
+      os << "BASIC";
+      break;
+
+   case SPxSolver::FIXED:
+      os << "FIXED";
+      break;
+
+   case SPxSolver::ON_LOWER:
+      os << "ON_LOWER";
+      break;
+
+   case SPxSolver::ON_UPPER:
+      os << "ON_UPPER";
+      break;
+
+   case SPxSolver::ZERO:
+      os << "ZERO";
+      break;
+
+   case SPxSolver::UNDEFINED:
+      os << "UNDEFINED";
+      break;
+
+   default:
+      os << "?invalid?";
+      break;
+   }
+
    return os;
 }
 
 // Pretty-printing of solver status.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Status& status )
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::Status& status)
 {
-   switch ( status )
-      {
-      case SPxSolver::ERROR:
-         os << "ERROR";
-         break;
-      case SPxSolver::NO_RATIOTESTER:
-         os << "NO_RATIOTESTER";
-         break;
-      case SPxSolver::NO_PRICER:
-         os << "NO_PRICER";
-         break;
-      case SPxSolver::NO_SOLVER:
-         os << "NO_SOLVER";
-         break;
-      case SPxSolver::NOT_INIT:
-         os << "NOT_INIT";
-         break;
-      case SPxSolver::ABORT_CYCLING:
-         os << "ABORT_CYCLING";
-         break;
-      case SPxSolver::ABORT_TIME:
-         os << "ABORT_TIME";
-         break;
-      case SPxSolver::ABORT_ITER:
-         os << "ABORT_ITER";
-         break;
-      case SPxSolver::ABORT_VALUE:
-         os << "ABORT_VALUE";
-         break;
-      case SPxSolver::SINGULAR:
-         os << "SINGULAR";
-         break;
-      case SPxSolver::NO_PROBLEM:
-         os << "NO_PROBLEM";
-         break;
-      case SPxSolver::REGULAR:
-         os << "REGULAR";
-         break;
-      case SPxSolver::RUNNING:
-         os << "RUNNING";
-         break;
-      case SPxSolver::UNKNOWN:
-         os << "UNKNOWN";
-         break;
-      case SPxSolver::OPTIMAL:
-         os << "OPTIMAL";
-         break;
-      case SPxSolver::UNBOUNDED:
-         os << "UNBOUNDED";
-         break;
-      case SPxSolver::INFEASIBLE:
-         os << "INFEASIBLE";
-         break;
-      default:
-         os << "?other?";
-         break;
-      }
+   switch(status)
+   {
+   case SPxSolver::ERROR:
+      os << "ERROR";
+      break;
+
+   case SPxSolver::NO_RATIOTESTER:
+      os << "NO_RATIOTESTER";
+      break;
+
+   case SPxSolver::NO_PRICER:
+      os << "NO_PRICER";
+      break;
+
+   case SPxSolver::NO_SOLVER:
+      os << "NO_SOLVER";
+      break;
+
+   case SPxSolver::NOT_INIT:
+      os << "NOT_INIT";
+      break;
+
+   case SPxSolver::ABORT_CYCLING:
+      os << "ABORT_CYCLING";
+      break;
+
+   case SPxSolver::ABORT_TIME:
+      os << "ABORT_TIME";
+      break;
+
+   case SPxSolver::ABORT_ITER:
+      os << "ABORT_ITER";
+      break;
+
+   case SPxSolver::ABORT_VALUE:
+      os << "ABORT_VALUE";
+      break;
+
+   case SPxSolver::SINGULAR:
+      os << "SINGULAR";
+      break;
+
+   case SPxSolver::NO_PROBLEM:
+      os << "NO_PROBLEM";
+      break;
+
+   case SPxSolver::REGULAR:
+      os << "REGULAR";
+      break;
+
+   case SPxSolver::RUNNING:
+      os << "RUNNING";
+      break;
+
+   case SPxSolver::UNKNOWN:
+      os << "UNKNOWN";
+      break;
+
+   case SPxSolver::OPTIMAL:
+      os << "OPTIMAL";
+      break;
+
+   case SPxSolver::UNBOUNDED:
+      os << "UNBOUNDED";
+      break;
+
+   case SPxSolver::INFEASIBLE:
+      os << "INFEASIBLE";
+      break;
+
+   default:
+      os << "?other?";
+      break;
+   }
+
    return os;
 }
 
 // Pretty-printing of algorithm.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Type& status )
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::Type& status)
 {
-   switch ( status )
-      {
-      case SPxSolver::ENTER:
-         os << "ENTER";
-         break;
-      case SPxSolver::LEAVE:
-         os << "LEAVE";
-         break;
-      default:
-         os << "?other?";
-         break;
-      }
+   switch(status)
+   {
+   case SPxSolver::ENTER:
+      os << "ENTER";
+      break;
+
+   case SPxSolver::LEAVE:
+      os << "LEAVE";
+      break;
+
+   default:
+      os << "?other?";
+      break;
+   }
+
    return os;
 }
 
 // Pretty-printing of representation.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxSolver::Representation& status )
+std::ostream& operator<<(std::ostream& os,
+                         const SPxSolver::Representation& status)
 {
-   switch ( status )
-      {
-      case SPxSolver::ROW:
-         os << "ROW";
-         break;
-      case SPxSolver::COLUMN:
-         os << "COLUMN";
-         break;
-      default:
-         os << "?other?";
-         break;
-      }
+   switch(status)
+   {
+   case SPxSolver::ROW:
+      os << "ROW";
+      break;
+
+   case SPxSolver::COLUMN:
+      os << "COLUMN";
+      break;
+
+   default:
+      os << "?other?";
+      break;
+   }
+
    return os;
 }
 

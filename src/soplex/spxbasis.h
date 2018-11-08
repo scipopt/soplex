@@ -138,14 +138,14 @@ public:
 
           \f[
           \begin{array}{lcl}
- l_c \le x_c \le u_c   & \mbox{Status}(x_i)  & l_r \le a^T x \le u_r \\
- \hline
- x_c = u_c < \infty    & \mbox{P\_ON\_UPPER} & a^T x = u_r < \infty  \\
- x_c = l_c > -\infty   & \mbox{P\_ON\_LOWER} & a^T x = l_r > -\infty \\
- -\infty < l_c = x_c = u_c < \infty
+      l_c \le x_c \le u_c   & \mbox{Status}(x_i)  & l_r \le a^T x \le u_r \\
+      \hline
+      x_c = u_c < \infty    & \mbox{P\_ON\_UPPER} & a^T x = u_r < \infty  \\
+      x_c = l_c > -\infty   & \mbox{P\_ON\_LOWER} & a^T x = l_r > -\infty \\
+      -\infty < l_c = x_c = u_c < \infty
                        & \mbox{P\_FIXED}     &
                                -\infty < l_r = a^T x = u_r < \infty  \\
- -\infty = l_i < x_i=0 < u_i = \infty
+      -\infty = l_i < x_i=0 < u_i = \infty
                        & \mbox{P\_FREE}      &
                            -\infty = l_r < a^T x = 0 < u_r = \infty  \\
           \end{array}
@@ -199,18 +199,18 @@ public:
       friend class SPxBasis;
       friend std::ostream& operator<<(std::ostream& os, const Status& stat);
 
-private:
+   private:
 
       //------------------------------------
       //**@name Data */
       //@{
       DataArray < Status > rowstat;   ///< status of rows.
       DataArray < Status > colstat;   ///< status of columns.
-      DataArray < Status > * stat;    ///< basis' status.
-      DataArray < Status > * costat;  ///< cobasis' status.
+      DataArray < Status >* stat;     ///< basis' status.
+      DataArray < Status >* costat;   ///< cobasis' status.
       //@}
 
-public:
+   public:
 
       //------------------------------------
       //**@name Access / modification */
@@ -431,23 +431,24 @@ public:
    void setStatus(SPxStatus stat)
    {
 
-      if( thestatus != stat )
+      if(thestatus != stat)
       {
 #ifdef SOPLEX_DEBUG
-         MSG_DEBUG( std::cout << "DBSTAT01 SPxBasis::setStatus(): status: "
-                    << int(thestatus) << " (" << thestatus << ") -> "
-                    << int(stat) << " (" << stat << ")" << std::endl; )
+         MSG_DEBUG(std::cout << "DBSTAT01 SPxBasis::setStatus(): status: "
+                   << int(thestatus) << " (" << thestatus << ") -> "
+                   << int(stat) << " (" << stat << ")" << std::endl;)
 #endif
 
          thestatus = stat;
-         if( stat == NO_PROBLEM )
+
+         if(stat == NO_PROBLEM)
             invalidate();
       }
    }
 
    // TODO control factorization frequency dynamically
    /// change maximum number of iterations until a refactorization is performed
-   void setMaxUpdates( int maxUp )
+   void setMaxUpdates(int maxUp)
    {
       assert(maxUp >= 0);
       maxUpdates = maxUp;
@@ -490,8 +491,8 @@ public:
    Desc::Status dualStatus(const SPxId& id) const
    {
       return id.isSPxRowId()
-         ? dualStatus(SPxRowId(id))
-         : dualStatus(SPxColId(id));
+             ? dualStatus(SPxRowId(id))
+             : dualStatus(SPxColId(id));
    }
    //@}
 
@@ -513,7 +514,7 @@ public:
    /// returns the \p i'th basic vector.
    const SVector& baseVec(int i) const
    {
-      assert( matrixIsSetup );
+      assert(matrixIsSetup);
       return *matrix[i];
    }
 
@@ -630,25 +631,29 @@ public:
    ///
    void solve(Vector& x, const Vector& rhs)
    {
-      if( rhs.dim() == 0 )
+      if(rhs.dim() == 0)
       {
          x.clear();
          return;
       }
-      if (!factorized)
+
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveRight(x, rhs);
    }
    ///
    void solve(SSVector& x, const SVector& rhs)
    {
-      if( rhs.size() == 0 )
+      if(rhs.size() == 0)
       {
          x.clear();
          return;
       }
-      if (!factorized)
+
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveRight(x, rhs);
    }
    /// solves linear system with basis matrix.
@@ -663,35 +668,40 @@ public:
     */
    void solve4update(SSVector& x, const SVector& rhs)
    {
-      if( rhs.size() == 0 )
+      if(rhs.size() == 0)
       {
          x.clear();
          return;
       }
-      if (!factorized)
+
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveRight4update(x, rhs);
    }
    /// solves two systems in one call.
    void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
    /// solves two systems in one call using only sparse data structures
    void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solve2right4update(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call.
    void solve4update(SSVector& x, Vector& y, Vector& y2,
                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
@@ -700,8 +710,9 @@ public:
    void solve4update(SSVector& x, SSVector& y, SSVector& y2,
                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       assert(rhsy.isSetup());
       assert(rhsy2.isSetup());
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
@@ -718,53 +729,62 @@ public:
     */
    void coSolve(Vector& x, const Vector& rhs)
    {
-      if( rhs.dim() == 0 )
+      if(rhs.dim() == 0)
       {
          x.clear();
          return;
       }
-      if (!factorized)
+
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveLeft(x, rhs);
    }
    /// Sparse version of coSolve
    void coSolve(SSVector& x, const SVector& rhs)
    {
-      if( rhs.size() == 0 )
+      if(rhs.size() == 0)
       {
          x.clear();
          return;
       }
-      if (!factorized)
+
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveLeft(x, rhs);
    }
    /// solves two systems in one call.
    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    /// Sparse version of solving two systems in one call.
    void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveLeft(x, y, rhsx, rhsy);
    }
    /// solves three systems in one call. May be improved by using just one pass through the basis.
    void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
    }
    /// Sparse version of solving three systems in one call.
-   void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
+   void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy,
+                SSVector& rhsz)
    {
-      if (!factorized)
+      if(!factorized)
          SPxBasis::factorize();
+
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
    }
    //@}
@@ -826,19 +846,19 @@ public:
        SLinSolver implementation class.
     */
    virtual void change(int i, SPxId& id,
-      const SVector* enterVec, const SSVector* eta = 0);
+                       const SVector* enterVec, const SSVector* eta = 0);
 
    /** Load basis from \p in in MPS format. If \p rowNames and \p colNames
     *  are \c NULL, default names are used for the constraints and variables.
     */
    virtual bool readBasis(std::istream& in,
-      const NameSet* rowNames, const NameSet* colNames);
+                          const NameSet* rowNames, const NameSet* colNames);
 
    /** Write basis to \p os in MPS format. If \p rowNames and \p colNames are
     *  \c NULL, default names are used for the constraints and variables.
     */
    virtual void writeBasis(std::ostream& os,
-      const NameSet* rownames, const NameSet* colnames, const bool cpxFormat = false) const;
+                           const NameSet* rownames, const NameSet* colnames, const bool cpxFormat = false) const;
 
    virtual void printMatrix() const;
 
@@ -974,8 +994,8 @@ protected:
 //
 
 /// Pretty-printing of basis status.
-std::ostream& operator<<( std::ostream& os,
-                          const SPxBasis::SPxStatus& status );
+std::ostream& operator<<(std::ostream& os,
+                         const SPxBasis::SPxStatus& status);
 
 
 } // namespace soplex

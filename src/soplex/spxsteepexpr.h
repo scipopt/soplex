@@ -52,13 +52,13 @@ public:
       assert(isConsistent());
    }
    /// copy constructor
-   SPxSteepExPR( const SPxSteepExPR& old)
+   SPxSteepExPR(const SPxSteepExPR& old)
       : SPxSteepPR(old)
    {
       assert(isConsistent());
    }
    /// assignment operator
-   SPxSteepExPR& operator=( const SPxSteepExPR& rhs)
+   SPxSteepExPR& operator=(const SPxSteepExPR& rhs)
    {
       if(this != &rhs)
       {

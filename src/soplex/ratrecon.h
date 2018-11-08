@@ -29,10 +29,11 @@
 
 namespace soplex
 {
-   /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0);
+/** reconstruct a rational vector */
+bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared,
+                       const DIdxSet* indexSet = 0);
 
-   /** reconstruct a rational solution */
-   bool reconstructSol(SolRational& solution);
+/** reconstruct a rational solution */
+bool reconstructSol(SolRational& solution);
 } // namespace soplex
 #endif // _RATRECON_H_

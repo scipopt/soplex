@@ -63,20 +63,21 @@ public:
       , steep()
    {}
    /// copy constructor
-   SPxAutoPR(const SPxAutoPR& old )
+   SPxAutoPR(const SPxAutoPR& old)
       : SPxPricer(old)
       , switchIters(old.switchIters)
       , devex(old.devex)
       , steep(old.steep)
    {
       assert(old.activepricer == &old.devex || old.activepricer == &old.steep);
-      if( old.activepricer == &old.devex )
+
+      if(old.activepricer == &old.devex)
          activepricer = &devex;
       else
          activepricer = &steep;
    }
    /// assignment operator
-   SPxAutoPR& operator=( const SPxAutoPR& rhs)
+   SPxAutoPR& operator=(const SPxAutoPR& rhs)
    {
       if(this != &rhs)
       {
@@ -86,7 +87,8 @@ public:
          steep = rhs.steep;
 
          assert(rhs.activepricer == &rhs.devex || rhs.activepricer == &rhs.steep);
-         if( rhs.activepricer == &rhs.devex )
+
+         if(rhs.activepricer == &rhs.devex)
             activepricer = &devex;
          else
             activepricer = &steep;

@@ -59,11 +59,11 @@ public:
       : m_name(name)
    {}
    /// copy constructor
-   SPxStarter( const SPxStarter& old)
+   SPxStarter(const SPxStarter& old)
       : m_name(old.m_name)
    {}
    /// assignment operator
-   SPxStarter& operator=( const SPxStarter& rhs)
+   SPxStarter& operator=(const SPxStarter& rhs)
    {
       if(this != &rhs)
       {

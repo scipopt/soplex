@@ -109,7 +109,7 @@ public:
    /// Changes the non-zero epsilon, invalidating the setup. */
    void setEpsilon(R eps)
    {
-      if( eps != epsilon )
+      if(eps != epsilon)
       {
          epsilon = eps;
          setupStatus = false;
@@ -131,18 +131,18 @@ public:
    /// Initializes nonzero indices for elements with absolute values above #epsilon and sets all other elements to 0.
    void setup()
    {
-      if( !isSetup() )
+      if(!isSetup())
       {
          IdxSet::clear();
 
          int d = dim();
          num = 0;
 
-         for( int i = 0; i < d; ++i )
+         for(int i = 0; i < d; ++i)
          {
-            if( VectorBase<R>::val[i] != R(0) )
+            if(VectorBase<R>::val[i] != R(0))
             {
-               if( spxAbs(VectorBase<R>::val[i]) <= epsilon )
+               if(spxAbs(VectorBase<R>::val[i]) <= epsilon)
                   VectorBase<R>::val[i] = R(0);
                else
                {
@@ -220,16 +220,16 @@ public:
       assert(i >= 0);
       assert(i < DVectorBase<R>::dim());
 
-      if( isSetup() )
+      if(isSetup())
       {
          int n = pos(i);
 
-         if( n < 0 )
+         if(n < 0)
          {
-            if( spxAbs(x) > epsilon )
+            if(spxAbs(x) > epsilon)
                IdxSet::add(1, &i);
          }
-         else if( x == R(0) )
+         else if(x == R(0))
             clearNum(n);
       }
 
@@ -252,11 +252,11 @@ public:
    /// Clears element \p i.
    void clearIdx(int i)
    {
-      if( isSetup() )
+      if(isSetup())
       {
          int n = pos(i);
 
-         if( n >= 0 )
+         if(n >= 0)
             remove(n);
       }
 
@@ -340,11 +340,12 @@ public:
    {
       VectorBase<S>::operator+=(vec);
 
-      if (isSetup())
+      if(isSetup())
       {
          setupStatus = false;
          setup();
       }
+
       return *this;
    }
 
@@ -357,10 +358,11 @@ public:
    SSVectorBase<R>& operator+=(const SSVectorBase<S>& vec)
    {
       assert(vec.isSetup());
-      for( int i = vec.size() - 1; i >= 0; --i )
+
+      for(int i = vec.size() - 1; i >= 0; --i)
          VectorBase<R>::val[vec.index(i)] += vec.value(i);
 
-      if( isSetup() )
+      if(isSetup())
       {
          setupStatus = false;
          setup();
@@ -375,7 +377,7 @@ public:
    {
       VectorBase<R>::operator-=(vec);
 
-      if( isSetup() )
+      if(isSetup())
       {
          setupStatus = false;
          setup();
@@ -392,15 +394,15 @@ public:
    template < class S >
    SSVectorBase<R>& operator-=(const SSVectorBase<S>& vec)
    {
-      if( vec.isSetup() )
+      if(vec.isSetup())
       {
-         for( int i = vec.size() - 1; i >= 0; --i )
+         for(int i = vec.size() - 1; i >= 0; --i)
             VectorBase<R>::val[vec.index(i)] -= vec.value(i);
       }
       else
          VectorBase<R>::operator-=(VectorBase<S>(vec));
 
-      if( isSetup() )
+      if(isSetup())
       {
          setupStatus = false;
          setup();
@@ -416,7 +418,7 @@ public:
       assert(isSetup());
       assert(x != S(0));
 
-      for( int i = size() - 1; i >= 0; --i )
+      for(int i = size() - 1; i >= 0; --i)
          VectorBase<R>::val[index(i)] *= x;
 
       assert(isConsistent());
@@ -435,20 +437,20 @@ public:
       int j = w.size() - 1;
 
       // both *this and w non-zero vectors?
-      if( i >= 0 && j >= 0 )
+      if(i >= 0 && j >= 0)
       {
          int vi = index(i);
          int wj = w.index(j);
 
-         while( i != 0 && j != 0 )
+         while(i != 0 && j != 0)
          {
-            if( vi == wj )
+            if(vi == wj)
             {
                x += VectorBase<R>::val[vi] * R(w.val[wj]);
                vi = index(--i);
                wj = w.index(--j);
             }
-            else if( vi > wj )
+            else if(vi > wj)
                vi = index(--i);
             else
                wj = w.index(--j);
@@ -456,13 +458,13 @@ public:
 
          /* check remaining indices */
 
-         while( i != 0 && vi != wj )
+         while(i != 0 && vi != wj)
             vi = index(--i);
 
-         while( j != 0 && vi != wj )
+         while(j != 0 && vi != wj)
             wj = w.index(--j);
 
-         if( vi == wj )
+         if(vi == wj)
             x += VectorBase<R>::val[vi] * R(w.val[wj]);
       }
 
@@ -480,7 +482,7 @@ public:
    {
       VectorBase<R>::multAdd(x, vec);
 
-      if( isSetup() )
+      if(isSetup())
       {
          setupStatus = false;
          setup();
@@ -510,15 +512,15 @@ public:
    /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
    {
-      if( isSetup() )
+      if(isSetup())
       {
          R maxabs = 0;
 
-         for( int i = 0; i < num; ++i )
+         for(int i = 0; i < num; ++i)
          {
             R x = spxAbs(VectorBase<R>::val[idx[i]]);
 
-            if( x > maxabs )
+            if(x > maxabs)
                maxabs = x;
          }
 
@@ -533,9 +535,9 @@ public:
    {
       R x = 0;
 
-      if( isSetup() )
+      if(isSetup())
       {
-         for( int i = 0; i < num; ++i )
+         for(int i = 0; i < num; ++i)
             x += VectorBase<R>::val[idx[i]] * VectorBase<R>::val[idx[i]];
       }
       else
@@ -565,9 +567,9 @@ public:
    /// Resets dimension to \p newdim.
    void reDim(int newdim)
    {
-      for( int i = IdxSet::size() - 1; i >= 0; --i )
+      for(int i = IdxSet::size() - 1; i >= 0; --i)
       {
-         if( index(i) >= newdim )
+         if(index(i) >= newdim)
             remove(i);
       }
 
@@ -599,9 +601,9 @@ public:
    /// Clears vector.
    void clear()
    {
-      if( isSetup() )
+      if(isSetup())
       {
-         for( int i = 0; i < num; ++i )
+         for(int i = 0; i < num; ++i)
             VectorBase<R>::val[idx[i]] = 0;
       }
       else
@@ -617,24 +619,25 @@ public:
    bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-      if( VectorBase<R>::dim() > IdxSet::max() )
+
+      if(VectorBase<R>::dim() > IdxSet::max())
          return MSGinconsistent("SSVectorBase");
 
-      if( VectorBase<R>::dim() < IdxSet::dim() )
+      if(VectorBase<R>::dim() < IdxSet::dim())
          return MSGinconsistent("SSVectorBase");
 
-      if( isSetup() )
+      if(isSetup())
       {
-         for( int i = 0; i < VectorBase<R>::dim(); ++i )
+         for(int i = 0; i < VectorBase<R>::dim(); ++i)
          {
             int j = pos(i);
 
-            if( j < 0 && spxAbs(VectorBase<R>::val[i]) > 0 )
+            if(j < 0 && spxAbs(VectorBase<R>::val[i]) > 0)
             {
-               MSG_ERROR( std::cerr << "ESSVEC01 i = " << i
-                  << "\tidx = " << j
-                  << "\tval = " << std::setprecision(16) << VectorBase<R>::val[i]
-                  << std::endl; )
+               MSG_ERROR(std::cerr << "ESSVEC01 i = " << i
+                         << "\tidx = " << j
+                         << "\tval = " << std::setprecision(16) << VectorBase<R>::val[i]
+                         << std::endl;)
 
                return MSGinconsistent("SSVectorBase");
             }
@@ -722,11 +725,11 @@ public:
       setMax(rhs.max());
       DVectorBase<R>::reDim(rhs.dim());
 
-      if( rhs.isSetup() )
+      if(rhs.isSetup())
       {
          IdxSet::operator=(rhs);
 
-         for( int i = size() - 1; i >= 0; --i )
+         for(int i = size() - 1; i >= 0; --i)
          {
             int j  = index(i);
             VectorBase<R>::val[j] = rhs.val[j];
@@ -737,11 +740,11 @@ public:
          int d = rhs.dim();
          num = 0;
 
-         for( int i = 0; i < d; ++i )
+         for(int i = 0; i < d; ++i)
          {
-            if( rhs.val[i] != 0 )
+            if(rhs.val[i] != 0)
             {
-               if( spxAbs(rhs.val[i]) > epsilon )
+               if(spxAbs(rhs.val[i]) > epsilon)
                {
                   rhs.idx[num] = i;
                   idx[num] = i;
@@ -773,18 +776,18 @@ public:
    {
       assert(rhs.isConsistent());
 
-      if( this != &rhs )
+      if(this != &rhs)
       {
          clear();
          epsilon = rhs.epsilon;
          setMax(rhs.max());
          DVectorBase<R>::reDim(rhs.dim());
 
-         if( rhs.isSetup() )
+         if(rhs.isSetup())
          {
             IdxSet::operator=(rhs);
 
-            for( int i = size() - 1; i >= 0; --i )
+            for(int i = size() - 1; i >= 0; --i)
             {
                int j = index(i);
                VectorBase<R>::val[j] = rhs.val[j];
@@ -795,9 +798,9 @@ public:
             int d = rhs.dim();
             num = 0;
 
-            for( int i = 0; i < d; ++i )
+            for(int i = 0; i < d; ++i)
             {
-               if( spxAbs(rhs.val[i]) > epsilon )
+               if(spxAbs(rhs.val[i]) > epsilon)
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
@@ -819,18 +822,18 @@ public:
    {
       assert(rhs.isConsistent());
 
-      if( this != &rhs )
+      if(this != &rhs)
       {
          clear();
          epsilon = rhs.epsilon;
          setMax(rhs.max());
          DVectorBase<R>::reDim(rhs.dim());
 
-         if( rhs.isSetup() )
+         if(rhs.isSetup())
          {
             IdxSet::operator=(rhs);
 
-            for( int i = size() - 1; i >= 0; --i )
+            for(int i = size() - 1; i >= 0; --i)
             {
                int j = index(i);
                VectorBase<R>::val[j] = rhs.val[j];
@@ -840,9 +843,9 @@ public:
          {
             num = 0;
 
-            for( int i = 0; i < rhs.dim(); ++i )
+            for(int i = 0; i < rhs.dim(); ++i)
             {
-               if( spxAbs(rhs.val[i]) > epsilon )
+               if(spxAbs(rhs.val[i]) > epsilon)
                {
                   VectorBase<R>::val[i] = rhs.val[i];
                   idx[num] = i;
@@ -878,7 +881,7 @@ public:
    /// destructor
    ~SSVectorBase<R>()
    {
-      if( idx )
+      if(idx)
          spx_free(idx);
    }
 
