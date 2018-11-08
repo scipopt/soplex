@@ -899,46 +899,6 @@ namespace soplex
 
 
 
-  /// returns left-hand side vector, ignoring scaling
-  template <>
-  const VectorReal& SoPlexBase<Real>::lhsRealInternal() const
-  {
-    assert(_realLP != 0);
-    return _realLP->lhs();
-  }
-
-
-
-  /// gets left-hand side vector
-  template <>
-  void SoPlexBase<Real>::getLhsReal(DVectorReal& lhs) const
-  {
-    assert(_realLP);
-    _realLP->getLhsUnscaled(lhs);
-  }
-
-
-
-  /// returns left-hand side of row \p i
-  template <>
-  Real SoPlexBase<Real>::lhsReal(int i) const
-  {
-    assert(_realLP != 0);
-    return _realLP->lhsUnscaled(i);
-  }
-
-
-
-  /// returns inequality type of row \p i
-  template <>
-  LPRowReal::Type SoPlexBase<Real>::rowTypeReal(int i) const
-  {
-    assert(_realLP != 0);
-    return _realLP->rowType(i);
-  }
-
-
-
   /// returns vector of col \p i, ignoring scaling
   template <>
   const SVectorReal& SoPlexBase<Real>::colVectorRealInternal(int i) const

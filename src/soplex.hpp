@@ -500,3 +500,36 @@ Real SoPlexBase<R>::rhsReal(int i) const
   assert(_realLP != 0);
   return _realLP->rhsUnscaled(i);
 }
+
+/// returns left-hand side vector, ignoring scaling
+template <class R>
+const VectorBase<R>& SoPlexBase<R>::lhsRealInternal() const
+{
+  assert(_realLP != 0);
+  return _realLP->lhs();
+}
+
+/// gets left-hand side vector
+template <class R>
+void SoPlexBase<R>::getLhsReal(DVectorBase<R>& lhs) const
+{
+  assert(_realLP);
+  _realLP->getLhsUnscaled(lhs);
+}
+
+/// returns left-hand side of row \p i
+template <class R>
+Real SoPlexBase<R>::lhsReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->lhsUnscaled(i);
+}
+
+
+/// returns inequality type of row \p i
+template <class R>
+LPRowReal::Type SoPlexBase<R>::rowTypeReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->rowType(i);
+}
