@@ -896,61 +896,6 @@ namespace soplex
     return numCols();
   }
 
-  /// returns number of nonzeros
-  template <>
-  int SoPlexBase<Real>::numNonzerosRational() const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->nNzos();
-  }
-
-  /// returns smallest non-zero element in absolute value
-  template <>
-  Rational SoPlexBase<Real>::minAbsNonzeroRational() const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->minAbsNzo();
-  }
-
-
-
-  /// returns biggest non-zero element in absolute value
-  template <>
-  Rational SoPlexBase<Real>::maxAbsNonzeroRational() const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->maxAbsNzo();
-  }
-
-
-
-  /// gets row \p i
-  template <>
-  void SoPlexBase<Real>::getRowRational(int i, LPRowRational& lprow) const
-  {
-    assert(_rationalLP != 0);
-    _rationalLP->getRow(i, lprow);
-  }
-
-
-
-  /// gets rows \p start, ..., \p end.
-  template <>
-  void SoPlexBase<Real>::getRowsRational(int start, int end, LPRowSetRational& lprowset) const
-  {
-    assert(_rationalLP != 0);
-    _rationalLP->getRows(start, end, lprowset);
-  }
-
-
-
-  /// returns vector of row \p i
-  template <>
-  const SVectorRational& SoPlexBase<Real>::rowVectorRational(int i) const
-  {
-    assert(_rationalLP != 0);
-    return _rationalLP->rowVector(i);
-  }
 
 
 

@@ -691,3 +691,54 @@ int SoPlexBase<R>::numColsRational() const
   assert(_rationalLP != 0);
   return _rationalLP->nCols();
 }
+
+/// returns number of nonzeros
+template <class R>
+int SoPlexBase<R>::numNonzerosRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->nNzos();
+}
+
+/// returns smallest non-zero element in absolute value
+template <class R>
+Rational SoPlexBase<R>::minAbsNonzeroRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->minAbsNzo();
+}
+
+/// returns biggest non-zero element in absolute value
+template <class R>
+Rational SoPlexBase<R>::maxAbsNonzeroRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->maxAbsNzo();
+}
+
+/// gets row \p i
+template <class R>
+void SoPlexBase<R>::getRowRational(int i, LPRowRational& lprow) const
+{
+  assert(_rationalLP != 0);
+  _rationalLP->getRow(i, lprow);
+}
+
+
+/// gets rows \p start, ..., \p end.
+template <class R>
+void SoPlexBase<R>::getRowsRational(int start, int end, LPRowSetRational& lprowset) const
+{
+  assert(_rationalLP != 0);
+  _rationalLP->getRows(start, end, lprowset);
+}
+
+
+
+/// returns vector of row \p i
+template <class R>
+const SVectorRational& SoPlexBase<R>::rowVectorRational(int i) const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->rowVector(i);
+}
