@@ -47,7 +47,7 @@ namespace soplex
 template <class T>
 inline void spx_alloc(T& p, int n = 1)
 {
-   assert(p == 0);
+   assert(p == nullptr);
    assert(n >= 0);
 
    if (n == 0)
@@ -62,7 +62,7 @@ inline void spx_alloc(T& p, int n = 1)
       throw(SPxMemoryException("Error allocating memory"));
    }
 
-   if (0 == p)
+   if (nullptr == p)
    {
       std::cerr << "EMALLC01 malloc: Out of memory - cannot allocate "
                 << sizeof(*p) * (unsigned int) n << " bytes" << std::endl;
