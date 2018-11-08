@@ -1053,3 +1053,618 @@ void SoPlexBase<R>::changeRowReal(int i, const LPRowReal& lprow)
   }
 #endif
 
+
+  /// changes left-hand side vector for constraints to \p lhs
+  template <class R>
+  void SoPlexBase<R>::changeLhsReal(const VectorBase<R>& lhs)
+  {
+    assert(_realLP != 0);
+
+    _changeLhsReal(lhs);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeLhs(DVectorRational(lhs));
+        for( int i = 0; i < numRowsRational(); i++ )
+          _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes left-hand side of row \p i to \p lhs
+  template <class R>
+  void SoPlexBase<R>::changeLhsReal(int i, const R& lhs)
+  {
+    assert(_realLP != 0);
+
+    _changeLhsReal(i, lhs);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeLhs(i, lhs);
+        _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes right-hand side vector to \p rhs
+  template <class R>
+  void SoPlexBase<R>::changeRhsReal(const VectorBase<R>& rhs)
+  {
+    assert(_realLP != 0);
+
+    _changeRhsReal(rhs);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeRhs(DVectorRational(rhs));
+        for( int i = 0; i < numRowsRational(); i++ )
+          _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes right-hand side of row \p i to \p rhs
+  template <class R>
+  void SoPlexBase<R>::changeRhsReal(int i, const R& rhs)
+  {
+    assert(_realLP != 0);
+
+    _changeRhsReal(i, rhs);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeRhs(i, rhs);
+        _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+  /// changes left- and right-hand side vectors
+  template <class R>
+  void SoPlexBase<R>::changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs)
+  {
+    assert(_realLP != 0);
+
+    _changeRangeReal(lhs, rhs);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeRange(DVectorRational(lhs), DVectorRational(rhs));
+        for( int i = 0; i < numRowsRational(); i++ )
+          _rowTypes[i] = _rangeTypeReal(lhs[i], rhs[i]);
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes left- and right-hand side of row \p i
+  template <class R>
+  void SoPlexBase<R>::changeRangeReal(int i, const R& lhs, const R& rhs)
+  {
+    assert(_realLP != 0);
+
+    _changeRangeReal(i,lhs, rhs);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeRange(i, lhs, rhs);
+        _rowTypes[i] = _rangeTypeReal(lhs, rhs);
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// replaces column \p i with \p lpcol
+  template <class R>
+  void SoPlexBase<R>::changeColReal(int i, const LPColReal& lpcol)
+  {
+    assert(_realLP != 0);
+
+    _changeColReal(i, lpcol);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeCol(i, lpcol);
+        _colTypes[i] = _rangeTypeReal(lpcol.lower(), lpcol.upper());
+        _completeRangeTypesRational();
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes vector of lower bounds to \p lower
+  template <class R>
+  void SoPlexBase<R>::changeLowerReal(const VectorBase<R>& lower)
+  {
+    assert(_realLP != 0);
+
+    _changeLowerReal(lower);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeLower(DVectorRational(lower));
+        for( int i = 0; i < numColsRational(); i++ )
+          _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
+
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes lower bound of column i to \p lower
+  template <class R>
+  void SoPlexBase<R>::changeLowerReal(int i, const R& lower)
+  {
+    assert(_realLP != 0);
+
+    _changeLowerReal(i, lower);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeLower(i, lower);
+        _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes vector of upper bounds to \p upper
+  template <class R>
+  void SoPlexBase<R>::changeUpperReal(const VectorBase<R>& upper)
+  {
+    assert(_realLP != 0);
+
+    _changeUpperReal(upper);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeUpper(DVectorRational(upper));
+        for( int i = 0; i < numColsRational(); i++ )
+          _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes \p i 'th upper bound to \p upper
+  template <class R>
+  void SoPlexBase<R>::changeUpperReal(int i, const R& upper)
+  {
+    assert(_realLP != 0);
+
+    _changeUpperReal(i, upper);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeUpper(i, upper);
+        _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes vectors of column bounds to \p lower and \p upper
+  template <class R>
+  void SoPlexBase<R>::changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper)
+  {
+    assert(_realLP != 0);
+
+    _changeBoundsReal(lower, upper);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeBounds(DVectorRational(lower), DVectorRational(upper));
+        for( int i = 0; i < numColsRational(); i++ )
+          _colTypes[i] = _rangeTypeReal(lower[i], upper[i]);
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes bounds of column \p i to \p lower and \p upper
+  template <class R>
+  void SoPlexBase<R>::changeBoundsReal(int i, const R& lower, const R& upper)
+  {
+    assert(_realLP != 0);
+
+    _changeBoundsReal(i, lower, upper);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->changeBounds(i, lower, upper);
+        _colTypes[i] = _rangeTypeReal(lower, upper);
+      }
+    _invalidateSolution();
+  }
+
+
+  /// changes objective function vector to \p obj
+  template <class R>
+  void SoPlexBase<R>::changeObjReal(const VectorBase<R>& obj)
+  {
+    assert(_realLP != 0);
+
+    bool scale = _realLP->isScaled();
+    _realLP->changeObj(obj, scale);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _rationalLP->changeObj(DVectorRational(obj));
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes objective coefficient of column i to \p obj
+  template <class R>
+  void SoPlexBase<R>::changeObjReal(int i, const R& obj)
+  {
+    assert(_realLP != 0);
+
+    bool scale = _realLP->isScaled();
+    _realLP->changeObj(i, obj, scale);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _rationalLP->changeObj(i, obj);
+
+    _invalidateSolution();
+  }
+
+
+
+  /// changes matrix entry in row \p i and column \p j to \p val
+  template <class R>
+  void SoPlexBase<R>::changeElementReal(int i, int j, const R& val)
+  {
+    assert(_realLP != 0);
+
+    _changeElementReal(i, j, val);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _rationalLP->changeElement(i, j, val);
+
+    _invalidateSolution();
+  }
+
+
+
+  /// removes row \p i
+  template <class R>
+  void SoPlexBase<R>::removeRowReal(int i)
+  {
+    assert(_realLP != 0);
+
+    _removeRowReal(i);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->removeRow(i);
+        // only swap elements if not the last one was removed
+        if( i < _rationalLP->nRows() )
+          {
+            _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
+            assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+          }
+        _rowTypes.reSize(_rationalLP->nRows());
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+  /// new index where row \p i has been moved to; note that \p perm must point to an array of size at least
+  /// #numRows()
+  template <class R>
+  void SoPlexBase<R>::removeRowsReal(int perm[])
+  {
+    assert(_realLP != 0);
+
+    const int oldsize = numRows();
+    _removeRowsReal(perm);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->removeRows(perm);
+        for( int i = 0; i < oldsize; i++ )
+          {
+            if( perm[i] >= 0 )
+              _rowTypes[perm[i]] = _rowTypes[i];
+          }
+        _rowTypes.reSize(_rationalLP->nRows());
+        for( int i = 0; i < numRowsRational(); i++ )
+          {
+            assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
+          }
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRows() may be passed
+  /// as buffer memory
+  template <class R>
+  void SoPlexBase<R>::removeRowsReal(int idx[], int n, int perm[])
+  {
+    if( perm == 0 )
+      {
+        DataArray< int > p(numRows());
+        _idxToPerm(idx, n, p.get_ptr(), numRows());
+        SoPlexBase<R>::removeRowsReal(p.get_ptr());
+      }
+    else
+      {
+        _idxToPerm(idx, n, perm, numRows());
+        SoPlexBase<R>::removeRowsReal(perm);
+      }
+  }
+
+
+
+  /// removes rows \p start to \p end including both; an array \p perm of size #numRows() may be passed as buffer
+  /// memory
+  template <class R>
+  void SoPlexBase<R>::removeRowRangeReal(int start, int end, int perm[])
+  {
+    if( perm == 0 )
+      {
+        DataArray< int > p(numRows());
+        _rangeToPerm(start, end, p.get_ptr(), numRows());
+        SoPlexBase<R>::removeRowsReal(p.get_ptr());
+      }
+    else
+      {
+        _rangeToPerm(start, end, perm, numRows());
+        SoPlexBase<R>::removeRowsReal(perm);
+      }
+  }
+
+
+
+  /// removes column i
+  template <class R>
+  void SoPlexBase<R>::removeColReal(int i)
+  {
+    assert(_realLP != 0);
+
+    _removeColReal(i);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->removeCol(i);
+        // only swap elements if not the last one was removed
+        if( i < _rationalLP->nCols() )
+          {
+            _colTypes[i] = _colTypes[_rationalLP->nCols()];
+            assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+          }
+        _colTypes.reSize(_rationalLP->nCols());
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+  /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
+  /// #numColsReal()
+  template <class R>
+  void SoPlexBase<R>::removeColsReal(int perm[])
+  {
+    assert(_realLP != 0);
+
+    const int oldsize = numCols();
+    _removeColsReal(perm);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->removeCols(perm);
+        for( int i = 0; i < oldsize; i++ )
+          {
+            if( perm[i] >= 0 )
+              _colTypes[perm[i]] = _colTypes[i];
+          }
+        _colTypes.reSize(_rationalLP->nCols());
+        for( int i = 0; i < numColsRational(); i++ )
+          {
+            assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
+          }
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsReal() may be
+  /// passed as buffer memory
+  template <class R>
+  void SoPlexBase<R>::removeColsReal(int idx[], int n, int perm[])
+  {
+    if( perm == 0 )
+      {
+        DataArray< int > p(numCols());
+        _idxToPerm(idx, n, p.get_ptr(), numCols());
+        SoPlexBase<R>::removeColsReal(p.get_ptr());
+      }
+    else
+      {
+        _idxToPerm(idx, n, perm, numCols());
+        SoPlexBase<R>::removeColsReal(perm);
+      }
+  }
+
+
+
+  /// removes columns \p start to \p end including both; an array \p perm of size #numCols() may be passed as
+  /// buffer memory
+  template <class R>
+  void SoPlexBase<R>::removeColRangeReal(int start, int end, int perm[])
+  {
+    if( perm == 0 )
+      {
+        DataArray< int > p(numCols());
+        _rangeToPerm(start, end, p.get_ptr(), numCols());
+        SoPlexBase<R>::removeColsReal(p.get_ptr());
+      }
+    else
+      {
+        _rangeToPerm(start, end, perm, numCols());
+        SoPlexBase<R>::removeColsReal(perm);
+      }
+  }
+
+
+
+  /// clears the LP
+  template <class R>
+  void SoPlexBase<R>::clearLPReal()
+  {
+    assert(_realLP != 0);
+
+    _realLP->clear();
+    _hasBasis = false;
+    _rationalLUSolver.clear();
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        _rationalLP->clear();
+        _rowTypes.clear();
+        _colTypes.clear();
+      }
+
+    _invalidateSolution();
+  }
+
+
+
+  /// synchronizes R LP with rational LP, i.e., copies (rounded) rational LP into R LP, if sync mode is manual
+  template <class R>
+  void SoPlexBase<R>::syncLPReal()
+  {
+    assert(_isConsistent());
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_MANUAL )
+      _syncLPReal();
+  }
+
+
+
+  /// adds a single row
+  template <class R>
+  void SoPlexBase<R>::addRowRational(const LPRowRational& lprow)
+  {
+    assert(_rationalLP != 0);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+      return;
+
+    _rationalLP->addRow(lprow);
+    _completeRangeTypesRational();
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _addRowReal(lprow);
+
+    _invalidateSolution();
+  }
+
+
+
+#ifdef SOPLEX_WITH_GMP
+  /// adds a single row
+  template <class R>
+  void SoPlexBase<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int rowSize, const mpq_t* rhs)
+  {
+    assert(_rationalLP != 0);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+      return;
+
+    _rationalLP->addRow(lhs, rowValues, rowIndices, rowSize, rhs);
+    _completeRangeTypesRational();
+
+    int i = numRowsRational() - 1;
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _addRowReal(Real(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
+
+    _invalidateSolution();
+  }
+
+
+
+  /// adds a set of rows
+  template <class R>
+  void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, const int* rowIndices, const int* rowStarts, const int* rowLengths, const int numRows, const int numValues, const mpq_t* rhs)
+  {
+    assert(_rationalLP != 0);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+      return;
+
+    _rationalLP->addRows(lhs, rowValues, rowIndices, rowStarts, rowLengths, numRows, numValues, rhs);
+    _completeRangeTypesRational();
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      {
+        LPRowSetReal lprowset;
+        for( int i = numRowsRational() - numRows; i < numRowsRational(); i++ )
+          lprowset.add(Real(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
+        _addRowsReal(lprowset);
+      }
+
+    _invalidateSolution();
+  }
+#endif
+
+
+
+  /// adds multiple rows
+  template <class R>
+  void SoPlexBase<R>::addRowsRational(const LPRowSetRational& lprowset)
+  {
+    assert(_rationalLP != 0);
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+      return;
+
+    _rationalLP->addRows(lprowset);
+    _completeRangeTypesRational();
+
+    if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
+      _addRowsReal(lprowset);
+
+    _invalidateSolution();
+  }
+
