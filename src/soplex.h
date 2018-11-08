@@ -129,13 +129,13 @@ public:
    int numNonzerosRational() const;
 
    /// returns smallest non-zero element in absolute value
-   Real minAbsNonzeroReal() const;
+   R minAbsNonzeroReal() const;
 
    /// returns biggest non-zero element in absolute value
-   Real maxAbsNonzeroReal() const;
+   R maxAbsNonzeroReal() const;
 
    /// returns (unscaled) coefficient
-   Real coefReal(int row, int col) const;
+   R coefReal(int row, int col) const;
 
    /// returns vector of row \p i, ignoring scaling
   const SVectorBase<R>& rowVectorRealInternal(int i) const;
@@ -150,7 +150,7 @@ public:
   void getRhsReal(DVectorBase<R>& rhs) const;
 
    /// returns right-hand side of row \p i
-   Real rhsReal(int i) const;
+   R rhsReal(int i) const;
 
    /// returns left-hand side vector, ignoring scaling
    const VectorBase<R>& lhsRealInternal() const;
@@ -159,7 +159,7 @@ public:
    void getLhsReal(DVectorBase<R>& lhs) const;
 
    /// returns left-hand side of row \p i
-   Real lhsReal(int i) const;
+   R lhsReal(int i) const;
 
    /// returns inequality type of row \p i
    LPRowReal::Type rowTypeReal(int i) const;
@@ -174,7 +174,7 @@ public:
    const VectorBase<R>& upperRealInternal() const;
 
    /// returns upper bound of column \p i
-   Real upperReal(int i) const;
+   R upperReal(int i) const;
 
    /// gets upper bound vector
    void getUpperReal(DVectorBase<R>& upper) const;
@@ -183,7 +183,7 @@ public:
    const VectorBase<R>& lowerRealInternal() const;
 
    /// returns lower bound of column \p i
-   Real lowerReal(int i) const;
+   R lowerReal(int i) const;
 
    /// gets lower bound vector
    void getLowerReal(DVectorBase<R>& lower) const;
@@ -192,7 +192,7 @@ public:
    void getObjReal(VectorBase<R>& obj) const;
 
    /// returns objective value of column \p i
-   Real objReal(int i) const;
+   R objReal(int i) const;
 
    /// returns objective function vector after transformation to a maximization problem; since this is how it is stored
    /// internally, this is generally faster
@@ -200,16 +200,16 @@ public:
 
    /// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
    /// stored internally, this is generally faster
-   Real maxObjReal(int i) const;
+   R maxObjReal(int i) const;
 
    /// gets number of available dual norms
    void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
 
    /// gets steepest edge norms and returns false if they are not available
-   bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+   bool getDualNorms(int& nnormsRow, int& nnormsCol, R* norms) const;
 
    /// sets steepest edge norms and returns false if that's not possible
-   bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
+   bool setDualNorms(int nnormsRow, int nnormsCol, R* norms);
 
    /// pass integrality information about the variables to the solver
    void setIntegralityInformation(int ncols, int* intInfo);
@@ -313,19 +313,19 @@ public:
    void changeLhsReal(const VectorBase<R>& lhs);
 
    /// changes left-hand side of row \p i to \p lhs
-   void changeLhsReal(int i, const Real& lhs);
+   void changeLhsReal(int i, const R& lhs);
 
    /// changes right-hand side vector to \p rhs
    void changeRhsReal(const VectorBase<R>& rhs);
 
    /// changes right-hand side of row \p i to \p rhs
-   void changeRhsReal(int i, const Real& rhs);
+   void changeRhsReal(int i, const R& rhs);
 
    /// changes left- and right-hand side vectors
    void changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs);
 
    /// changes left- and right-hand side of row \p i
-   void changeRangeReal(int i, const Real& lhs, const Real& rhs);
+   void changeRangeReal(int i, const R& lhs, const R& rhs);
 
    /// replaces column \p i with \p lpcol
    void changeColReal(int i, const LPColReal& lpcol);
@@ -334,28 +334,28 @@ public:
    void changeLowerReal(const VectorBase<R>& lower);
 
    /// changes lower bound of column i to \p lower
-   void changeLowerReal(int i, const Real& lower);
+   void changeLowerReal(int i, const R& lower);
 
    /// changes vector of upper bounds to \p upper
    void changeUpperReal(const VectorBase<R>& upper);
 
    /// changes \p i 'th upper bound to \p upper
-   void changeUpperReal(int i, const Real& upper);
+   void changeUpperReal(int i, const R& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper
    void changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper
-   void changeBoundsReal(int i, const Real& lower, const Real& upper);
+   void changeBoundsReal(int i, const R& lower, const R& upper);
 
    /// changes objective function vector to \p obj
    void changeObjReal(const VectorBase<R>& obj);
 
    /// changes objective coefficient of column i to \p obj
-   void changeObjReal(int i, const Real& obj);
+   void changeObjReal(int i, const R& obj);
 
    /// changes matrix entry in row \p i and column \p j to \p val
-   void changeElementReal(int i, int j, const Real& val);
+   void changeElementReal(int i, int j, const R& val);
 
    /// removes row \p i
    void removeRowReal(int i);
@@ -612,7 +612,7 @@ public:
    //@{
 
    /// returns the objective value if a primal solution is available
-   Real objValueReal();
+   R objValueReal();
 
    /// gets the primal solution vector if available; returns true on success
    bool getPrimal(VectorBase<R>& vector);
@@ -751,7 +751,7 @@ public:
    /// @param inds indices of result vector (NULL if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseRowReal(int r, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
+   bool getBasisInverseRowReal(int r, R* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes column \p c of basis inverse; returns true on success
    /// @param c which column of the basis inverse is computed
@@ -759,10 +759,10 @@ public:
    /// @param inds indices of result vector (NULL if not to be used)
    /// @param ninds number of nonzeros in result vector
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool getBasisInverseColReal(int c, Real* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
+   bool getBasisInverseColReal(int c, R* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
-   bool getBasisInverseTimesVecReal(Real* rhs, Real* sol, bool unscale = true);
+   bool getBasisInverseTimesVecReal(Real* rhs, R* sol, bool unscale = true);
 
    /// multiply with basis matrix; B * \p vec (inplace)
    /// @param vec (dense) vector to be multiplied with
@@ -808,7 +808,7 @@ public:
    int numIterations() const;
 
    /// time spent in last call to solve
-   Real solveTime() const;
+   R solveTime() const;
 
    /// statistical information in form of a string
    std::string statisticString() const;
@@ -839,7 +839,7 @@ public:
    bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// Templated write function
-   /// Real
+   /// R
    /// writes real LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
@@ -1399,11 +1399,11 @@ public:
          /// array of descriptions for real parameters
          std::string description[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of default values for real parameters
-         Real defaultValue[SoPlexBase<R>::REALPARAM_COUNT];
+         R defaultValue[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of lower bounds for real parameter values
-         Real lower[SoPlexBase<R>::REALPARAM_COUNT];
+         R lower[SoPlexBase<R>::REALPARAM_COUNT];
          /// array of upper bounds for real parameter values
-         Real upper[SoPlexBase<R>::REALPARAM_COUNT];
+         R upper[SoPlexBase<R>::REALPARAM_COUNT];
       } realParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1430,7 +1430,7 @@ public:
       int _intParamValues[SoPlexBase<R>::INTPARAM_COUNT];
 
       /// array of current real parameter values
-      Real _realParamValues[SoPlexBase<R>::REALPARAM_COUNT];
+      R _realParamValues[SoPlexBase<R>::REALPARAM_COUNT];
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
       /// array of current rational parameter values
@@ -1456,7 +1456,7 @@ public:
    int intParam(const IntParam param) const;
 
    /// returns real parameter value
-   Real realParam(const RealParam param) const;
+   R realParam(const RealParam param) const;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// returns rational parameter value
@@ -1473,7 +1473,7 @@ public:
    bool setIntParam(const IntParam param, const int value, const bool init = true);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const Real value, const bool init = true);
+   bool setRealParam(const RealParam param, const R value, const bool init = true);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success
@@ -1680,7 +1680,7 @@ private:
     */
    struct RowViolation
    {
-      Real               violation;          /**< the violation of the row */
+      R               violation;          /**< the violation of the row */
       int                idx;                /**< index of corresponding row */
    };
 
@@ -1698,7 +1698,7 @@ private:
 
       const RowViolation*  entry;
 
-      Real operator() (
+      R operator() (
          RowViolation      i,
          RowViolation      j
          ) const
@@ -1794,8 +1794,8 @@ private:
    int numProbRows;
    int numProbCols;
    int nNonzeros;
-   Real minAbsNonzero;
-   Real maxAbsNonzero;
+   R minAbsNonzero;
+   R maxAbsNonzero;
 
    int origCountLower;
    int origCountUpper;
@@ -1863,7 +1863,7 @@ private:
    bool _isSolveStopped(bool& stoppedTime, bool& stoppedIter) const;
 
    /// determines RangeType from real bounds
-   RangeType _rangeTypeReal(const Real& lower, const Real& upper) const;
+   RangeType _rangeTypeReal(const R& lower, const R& upper) const;
 
    /// determines RangeType from rational bounds
    RangeType _rangeTypeRational(const Rational& lower, const Rational& upper) const;
@@ -1887,7 +1887,7 @@ private:
    void _addRowReal(const LPRowReal& lprow);
 
    /// adds a single row to the real LP and adjusts basis
-   void _addRowReal(Real lhs, const SVectorBase<R>& lprow, Real rhs);
+   void _addRowReal(Real lhs, const SVectorBase<R>& lprow, R rhs);
 
    /// adds multiple rows to the real LP and adjusts basis
    void _addRowsReal(const LPRowSetReal& lprowset);
@@ -1896,7 +1896,7 @@ private:
    void _addColReal(const LPColReal& lpcol);
 
    /// adds a single column to the real LP and adjusts basis
-   void _addColReal(Real obj, Real lower, const SVectorBase<R>& lpcol, Real upper);
+   void _addColReal(Real obj, R lower, const SVectorBase<R>& lpcol, R upper);
 
    /// adds multiple columns to the real LP and adjusts basis
    void _addColsReal(const LPColSetReal& lpcolset);
@@ -1908,19 +1908,19 @@ private:
    void _changeLhsReal(const VectorBase<R>& lhs);
 
    /// changes left-hand side of row \p i to \p lhs and adjusts basis
-   void _changeLhsReal(int i, const Real& lhs);
+   void _changeLhsReal(int i, const R& lhs);
 
    /// changes right-hand side vector to \p rhs and adjusts basis
    void _changeRhsReal(const VectorBase<R>& rhs);
 
    /// changes right-hand side of row \p i to \p rhs and adjusts basis
-   void _changeRhsReal(int i, const Real& rhs);
+   void _changeRhsReal(int i, const R& rhs);
 
    /// changes left- and right-hand side vectors and adjusts basis
    void _changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R>& rhs);
 
    /// changes left- and right-hand side of row \p i and adjusts basis
-   void _changeRangeReal(int i, const Real& lhs, const Real& rhs);
+   void _changeRangeReal(int i, const R& lhs, const R& rhs);
 
    /// replaces column \p i with \p lpcol and adjusts basis
    void _changeColReal(int i, const LPColReal& lpcol);
@@ -1929,22 +1929,22 @@ private:
    void _changeLowerReal(const VectorBase<R>& lower);
 
    /// changes lower bound of column i to \p lower and adjusts basis
-   void _changeLowerReal(int i, const Real& lower);
+   void _changeLowerReal(int i, const R& lower);
 
    /// changes vector of upper bounds to \p upper and adjusts basis
    void _changeUpperReal(const VectorBase<R>& upper);
 
    /// changes \p i 'th upper bound to \p upper and adjusts basis
-   void _changeUpperReal(int i, const Real& upper);
+   void _changeUpperReal(int i, const R& upper);
 
    /// changes vectors of column bounds to \p lower and \p upper and adjusts basis
    void _changeBoundsReal(const VectorBase<R>& lower, const VectorBase<R>& upper);
 
    /// changes bounds of column \p i to \p lower and \p upper and adjusts basis
-   void _changeBoundsReal(int i, const Real& lower, const Real& upper);
+   void _changeBoundsReal(int i, const R& lower, const R& upper);
 
    /// changes matrix entry in row \p i and column \p j to \p val and adjusts basis
-   void _changeElementReal(int i, int j, const Real& val);
+   void _changeElementReal(int i, int j, const R& val);
 
    /// removes row \p i and adjusts basis
    void _removeRowReal(int i);
@@ -2301,13 +2301,13 @@ private:
    void printOriginalProblemStatistics(std::ostream& os);
 
    /// gets the coefficient of the slack variable in the primal complementary problem
-   Real getCompSlackVarCoeff(int primalRowNum);
+   R getCompSlackVarCoeff(int primalRowNum);
 
    /// gets violation of bounds; returns true on success
-   bool getDecompBoundViolation(Real& maxviol, Real& sumviol);
+   bool getDecompBoundViolation(Real& maxviol, R& sumviol);
 
    /// gets violation of constraints; returns true on success
-   bool getDecompRowViolation(Real& maxviol, Real& sumviol);
+   bool getDecompRowViolation(Real& maxviol, R& sumviol);
 
    /// function call to terminate the decomposition simplex
    bool decompTerminate(Real timeLimit);

@@ -419,7 +419,7 @@ SoPlexBase<R>& SoPlexBase<R>::operator=(const SoPlexBase<R>& rhs)
 
 /// returns smallest non-zero element in absolute value
 template <class R>
-Real SoPlexBase<R>::minAbsNonzeroReal() const
+R SoPlexBase<R>::minAbsNonzeroReal() const
 {
   assert(_realLP != 0);
   return _realLP->minAbsNzo();
@@ -428,7 +428,7 @@ Real SoPlexBase<R>::minAbsNonzeroReal() const
 
 /// returns biggest non-zero element in absolute value
 template <class R>
-Real SoPlexBase<R>::maxAbsNonzeroReal() const
+R SoPlexBase<R>::maxAbsNonzeroReal() const
 {
   assert(_realLP != 0);
   return _realLP->maxAbsNzo();
@@ -437,7 +437,7 @@ Real SoPlexBase<R>::maxAbsNonzeroReal() const
 
 /// returns (unscaled) coefficient
 template <class R>
-Real SoPlexBase<R>::coefReal(int row, int col) const
+R SoPlexBase<R>::coefReal(int row, int col) const
 {
   if( _realLP->isScaled() )
     {
@@ -495,7 +495,7 @@ void SoPlexBase<R>::getRhsReal(DVectorBase<R>& rhs) const
 
 /// returns right-hand side of row \p i
 template <class R>
-Real SoPlexBase<R>::rhsReal(int i) const
+R SoPlexBase<R>::rhsReal(int i) const
 {
   assert(_realLP != 0);
   return _realLP->rhsUnscaled(i);
@@ -519,7 +519,7 @@ void SoPlexBase<R>::getLhsReal(DVectorBase<R>& lhs) const
 
 /// returns left-hand side of row \p i
 template <class R>
-Real SoPlexBase<R>::lhsReal(int i) const
+R SoPlexBase<R>::lhsReal(int i) const
 {
   assert(_realLP != 0);
   return _realLP->lhsUnscaled(i);
@@ -532,4 +532,162 @@ LPRowReal::Type SoPlexBase<R>::rowTypeReal(int i) const
 {
   assert(_realLP != 0);
   return _realLP->rowType(i);
+}
+
+/// returns vector of col \p i, ignoring scaling
+template <class R>
+const SVectorBase<R>& SoPlexBase<R>::colVectorRealInternal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->colVector(i);
+}
+
+/// gets vector of col \p i
+template <class R>
+void SoPlexBase<R>::getColVectorReal(int i, DSVectorBase<R>& col) const
+{
+  assert(_realLP);
+  _realLP->getColVectorUnscaled(i, col);
+}
+
+
+/// returns upper bound vector
+template <class R>
+const VectorBase<R>& SoPlexBase<R>::upperRealInternal() const
+{
+  assert(_realLP != 0);
+  return _realLP->upper();
+}
+
+
+/// returns upper bound of column \p i
+template <class R>
+R SoPlexBase<R>::upperReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->upperUnscaled(i);
+}
+
+
+/// gets upper bound vector
+template <class R>
+void SoPlexBase<R>::getUpperReal(DVectorBase<R>& upper) const
+{
+  assert(_realLP != 0);
+  return _realLP->getUpperUnscaled(upper);
+}
+
+
+/// returns lower bound vector
+template <class R>
+const VectorBase<R>& SoPlexBase<R>::lowerRealInternal() const
+{
+  assert(_realLP != 0);
+  return _realLP->lower();
+}
+
+
+
+/// returns lower bound of column \p i
+template <class R>
+R SoPlexBase<R>::lowerReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->lowerUnscaled(i);
+}
+
+
+/// gets lower bound vector
+template <class R>
+void SoPlexBase<R>::getLowerReal(DVectorBase<R>& lower) const
+{
+  assert(_realLP != 0);
+  return _realLP->getLowerUnscaled(lower);
+}
+
+
+/// gets objective function vector
+template <class R>
+void SoPlexBase<R>::getObjReal(VectorBase<R>& obj) const
+{
+  assert(_realLP != 0);
+  _realLP->getObjUnscaled(obj);
+}
+
+
+/// returns objective value of column \p i
+template <class R>
+R SoPlexBase<R>::objReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->objUnscaled(i);
+}
+
+
+/// returns objective function vector after transformation to a maximization problem; since this is how it is stored
+/// internally, this is generally faster
+template <class R>
+const VectorBase<R>& SoPlexBase<R>::maxObjRealInternal() const
+{
+  assert(_realLP != 0);
+  return _realLP->maxObj();
+}
+
+
+/// returns objective value of column \p i after transformation to a maximization problem; since this is how it is
+/// stored internally, this is generally faster
+template <class R>
+R SoPlexBase<R>::maxObjReal(int i) const
+{
+  assert(_realLP != 0);
+  return _realLP->maxObjUnscaled(i);
+}
+
+
+/// gets number of available dual norms
+template <class R>
+void SoPlexBase<R>::getNdualNorms(int& nnormsRow, int& nnormsCol) const
+{
+  _solver.getNdualNorms(nnormsRow, nnormsCol);
+}
+
+
+/// gets steepest edge norms and returns false if they are not available
+template <class R>
+bool SoPlexBase<R>::getDualNorms(int& nnormsRow, int& nnormsCol, R* norms) const
+{
+  return _solver.getDualNorms(nnormsRow, nnormsCol, norms);
+}
+
+
+/// sets steepest edge norms and returns false if that's not possible
+template <class R>
+bool SoPlexBase<R>::setDualNorms(int nnormsRow, int nnormsCol, R* norms)
+{
+  return _solver.setDualNorms(nnormsRow, nnormsCol, norms);
+}
+
+
+/// pass integrality information about the variables to the solver
+template <class R>
+void SoPlexBase<R>::setIntegralityInformation( int ncols, int* intInfo)
+{
+  assert(ncols == _solver.nCols() || (ncols == 0 && intInfo == NULL));
+  _solver.setIntegralityInformation(ncols, intInfo);
+}
+
+
+template <class R>
+int SoPlexBase<R>::numRowsRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->nRows();
+}
+
+/// returns number of columns
+template <class R>
+int SoPlexBase<R>::numColsRational() const
+{
+  assert(_rationalLP != 0);
+  return _rationalLP->nCols();
 }
