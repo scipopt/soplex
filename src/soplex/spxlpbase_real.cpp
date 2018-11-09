@@ -1187,6 +1187,10 @@ bool SPxLPBase<Real>::readLPF(
                      pre_sign = val;
                }
 
+               /* non-finite coefficients are not allowed in the objective */
+               if(LPFisInfinity(pos))
+                  goto syntax_error;
+
                have_value = true;
                val = LPFreadValue(pos, spxout) * pre_sign;
             }
@@ -1219,8 +1223,16 @@ bool SPxLPBase<Real>::readLPF(
                      pre_sign = val;
                }
 
+               if(LPFisInfinity(pos))
+               {
+                  /* non-finite coefficients are not allowed */
+                  if(sense == 0)
+                     goto syntax_error;
+                  val = LPFreadInfinity(pos) * pre_sign;
+               }
+               else
+                  val = LPFreadValue(pos, spxout) * pre_sign;
                have_value = true;
-               val = LPFreadValue(pos, spxout) * pre_sign;
 
                if(sense != 0)
                {
