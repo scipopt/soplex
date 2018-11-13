@@ -235,6 +235,7 @@ namespace soplex
   template <>
   SoPlexBase<Real>::Settings::Settings();
 
+
   template <>
   SoPlexBase<Real>::Settings::BoolParam::BoolParam() {
     // should lifting be used to reduce range of nonzero matrix coefficients?
@@ -898,337 +899,8 @@ namespace soplex
 
 
 
-
-  /// changes objective function vector to \p obj
-  template <>
-  void SoPlexBase<Real>::changeObjRational(const VectorRational& obj)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->changeObj(obj);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _realLP->changeObj(DVectorReal(obj));
-
-    _invalidateSolution();
-  }
-
-
-
-  /// changes objective coefficient of column i to \p obj
-  template <>
-  void SoPlexBase<Real>::changeObjRational(int i, const Rational& obj)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->changeObj(i, obj);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _realLP->changeObj(i, Real(obj));
-
-    _invalidateSolution();
-  }
-
-
-
-#ifdef SOPLEX_WITH_GMP
-  /// changes objective coefficient of column i to \p obj
-  template <>
-  void SoPlexBase<Real>::changeObjRational(int i, const mpq_t* obj)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->changeObj(i, obj);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _realLP->changeObj(i, Real(objRational(i)));
-
-    _invalidateSolution();
-  }
-#endif
-
-
-
-  /// changes matrix entry in row \p i and column \p j to \p val
-  template <>
-  void SoPlexBase<Real>::changeElementRational(int i, int j, const Rational& val)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->changeElement(i, j, val);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _changeElementReal(i, j, Real(val));
-
-    _invalidateSolution();
-  }
-
-
-#ifdef SOPLEX_WITH_GMP
-  /// changes matrix entry in row \p i and column \p j to \p val
-  template <>
-  void SoPlexBase<Real>::changeElementRational(int i, int j, const mpq_t* val)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->changeElement(i, j, val);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _changeElementReal(i, j, mpq_get_d(*val));
-
-    _invalidateSolution();
-  }
-#endif
-
-
-  /// removes row \p i
-  template <>
-  void SoPlexBase<Real>::removeRowRational(int i)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->removeRow(i);
-    // only swap elements if not the last one was removed
-    if( i < _rationalLP->nRows() )
-      {
-        _rowTypes[i] = _rowTypes[_rationalLP->nRows()];
-        assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
-      }
-    _rowTypes.reSize(_rationalLP->nRows());
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _removeRowReal(i);
-
-    _invalidateSolution();
-  }
-
-
-
-  /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
-  /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numRowsRational()
-  template <>
-  void SoPlexBase<Real>::removeRowsRational(int perm[])
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    const int oldsize = numRowsRational();
-    _rationalLP->removeRows(perm);
-    for( int i = 0; i < oldsize; i++ )
-      {
-        if( perm[i] >= 0 )
-          _rowTypes[perm[i]] = _rowTypes[i];
-      }
-    _rowTypes.reSize(_rationalLP->nRows());
-    for( int i = 0; i < numRowsRational(); i++ )
-      {
-        assert(_rowTypes[i] == _rangeTypeRational(lhsRational(i), rhsRational(i)));
-      }
-
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _removeRowsReal(perm);
-
-    _invalidateSolution();
-  }
-
-
-
-  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
-  /// passed as buffer memory
-  template <>
-  void SoPlexBase<Real>::removeRowsRational(int idx[], int n, int perm[])
-  {
-    if( perm == 0 )
-      {
-        DataArray< int > p(numRowsRational());
-        _idxToPerm(idx, n, p.get_ptr(), numRowsRational());
-        SoPlexBase<Real>::removeRowsRational(p.get_ptr());
-      }
-    else
-      {
-        _idxToPerm(idx, n, perm, numRowsRational());
-        SoPlexBase<Real>::removeRowsRational(perm);
-      }
-  }
-
-
-
-  /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
-  /// buffer memory
-  template <>
-  void SoPlexBase<Real>::removeRowRangeRational(int start, int end, int perm[])
-  {
-    if( perm == 0 )
-      {
-        DataArray< int > p(numRowsRational());
-        _rangeToPerm(start, end, p.get_ptr(), numRowsRational());
-        SoPlexBase<Real>::removeRowsRational(p.get_ptr());
-      }
-    else
-      {
-        _rangeToPerm(start, end, perm, numRowsRational());
-        SoPlexBase<Real>::removeRowsRational(perm);
-      }
-  }
-
-
-
-  /// removes column i
-  template <>
-  void SoPlexBase<Real>::removeColRational(int i)
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->removeCol(i);
-    // only swap elements if not the last one was removed
-    if( i < _rationalLP->nCols() )
-      {
-        _colTypes[i] = _colTypes[_rationalLP->nCols()];
-        assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
-      }
-    _colTypes.reSize(_rationalLP->nCols());
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _removeColReal(i);
-
-    _invalidateSolution();
-  }
-
-
-
-  /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
-  /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numColsRational()
-  template <>
-  void SoPlexBase<Real>::removeColsRational(int perm[])
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    const int oldsize = numColsRational();
-    _rationalLP->removeCols(perm);
-    for( int i = 0; i < oldsize; i++ )
-      {
-        if( perm[i] >= 0 )
-          _colTypes[perm[i]] = _colTypes[i];
-      }
-    _colTypes.reSize(_rationalLP->nCols());
-    for( int i = 0; i < numColsRational(); i++ )
-      {
-        assert(_colTypes[i] == _rangeTypeRational(lowerRational(i), upperRational(i)));
-      }
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      _removeColsReal(perm);
-
-    _invalidateSolution();
-  }
-
-
-
-  /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
-  /// passed as buffer memory
-  template <>
-  void SoPlexBase<Real>::removeColsRational(int idx[], int n, int perm[])
-  {
-    if( perm == 0 )
-      {
-        DataArray< int > p(numColsRational());
-        _idxToPerm(idx, n, p.get_ptr(), numColsRational());
-        SoPlexBase<Real>::removeColsRational(p.get_ptr());
-      }
-    else
-      {
-        _idxToPerm(idx, n, perm, numColsRational());
-        SoPlexBase<Real>::removeColsRational(perm);
-      }
-  }
-
-
-
-  /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
-  /// buffer memory
-  template <>
-  void SoPlexBase<Real>::removeColRangeRational(int start, int end, int perm[])
-  {
-    if( perm == 0 )
-      {
-        DataArray< int > p(numColsRational());
-        _rangeToPerm(start, end, p.get_ptr(), numColsRational());
-        SoPlexBase<Real>::removeColsRational(p.get_ptr());
-      }
-    else
-      {
-        _rangeToPerm(start, end, perm, numColsRational());
-        SoPlexBase<Real>::removeColsRational(perm);
-      }
-  }
-
-
-
-  /// clears the LP
-  template <>
-  void SoPlexBase<Real>::clearLPRational()
-  {
-    assert(_rationalLP != 0);
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      return;
-
-    _rationalLP->clear();
-    _rationalLUSolver.clear();
-    _rowTypes.clear();
-    _colTypes.clear();
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_AUTO )
-      {
-        _realLP->clear();
-        _hasBasis = false;
-      }
-
-    _invalidateSolution();
-  }
-
-
-
-  /// synchronizes rational LP with real LP, i.e., copies real LP to rational LP, if sync mode is manual
-  template <>
-  void SoPlexBase<Real>::syncLPRational()
-  {
-    assert(_isConsistent());
-
-    if( intParam(SoPlexBase<Real>::SYNCMODE) == SYNCMODE_MANUAL )
-      _syncLPRational();
-  }
-
   /// solves the LP
+  /// Real specialization of the optimize function
   template <>
   typename SPxSolverBase<Real>::Status SoPlexBase<Real>::optimize()
   {
@@ -1322,13 +994,6 @@ namespace soplex
     return status();
   }
 
-  /// returns the current solver status
-  template <>
-  typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const
-  {
-    return _status;
-  }
-
   /// Is stored primal solution feasible?
   template <>
   bool SoPlexBase<Real>::isPrimalFeasible() const
@@ -1374,27 +1039,6 @@ namespace soplex
     return (_hasSolReal && _solReal.hasDualFarkas()) || (_hasSolRational && _solRational.hasDualFarkas());
   }
 
-
-
-  /// returns the objective value if a primal or dual solution is available
-  template <>
-  Real SoPlexBase<Real>::objValueReal()
-  {
-    assert(OBJSENSE_MAXIMIZE == 1);
-    assert(OBJSENSE_MINIMIZE == -1);
-
-    if( status() == SPxSolverBase<Real>::UNBOUNDED )
-      return realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
-    else if( status() == SPxSolverBase<Real>::INFEASIBLE )
-      return -realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
-    else if( hasPrimal() || hasDual() )
-      {
-        _syncRealSolution();
-        return _solReal._objVal;
-      }
-    else
-      return 0.0;
-  }
 
 
   template <>
@@ -1461,14 +1105,14 @@ namespace soplex
     assert(OBJSENSE_MAXIMIZE == 1);
     assert(OBJSENSE_MINIMIZE == -1);
 
-    if( status() == SPxSolverBase<Real>::UNBOUNDED )
+    if( this->status() == SPxSolverBase<Real>::UNBOUNDED )
       {
         if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
           return _rationalPosInfty;
         else
           return _rationalNegInfty;
       }
-    else if( status() == SPxSolverBase<Real>::INFEASIBLE )
+    else if( this->status() == SPxSolverBase<Real>::INFEASIBLE )
       {
         if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
           return _rationalNegInfty;
@@ -2068,26 +1712,6 @@ namespace soplex
 	bool SoPlexBase<Real>::hasBasis() const
   {
     return _hasBasis;
-  }
-
-  /// returns the current basis status
-  template <>
-  typename SPxBasisBase<Real>::SPxStatus SoPlexBase<Real>::basisStatus() const
-  {
-    if( !hasBasis() )
-      return SPxBasisBase<Real>::NO_PROBLEM;
-    else if( status() == SPxSolverBase<Real>::OPTIMAL || status() == SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS )
-      return SPxBasisBase<Real>::OPTIMAL;
-    else if( status() == SPxSolverBase<Real>::UNBOUNDED )
-      return SPxBasisBase<Real>::UNBOUNDED;
-    else if( status() == SPxSolverBase<Real>::INFEASIBLE )
-      return SPxBasisBase<Real>::INFEASIBLE;
-    else if( hasPrimal() )
-      return SPxBasisBase<Real>::PRIMAL;
-    else if( hasDual() )
-      return SPxBasisBase<Real>::DUAL;
-    else
-      return SPxBasisBase<Real>::REGULAR;
   }
 
 
@@ -5040,8 +4664,8 @@ namespace soplex
   {
     printStatus(os, _status);
     SPxOut::setFixed(os, 2);
-    os << "Solving time (sec)  : " << _statistics->solvingTime->time() << "\n"
-       << "Iterations          : " << _statistics->iterations << "\n";
+    os << "Solving time (sec)  : " << this->_statistics->solvingTime->time() << "\n"
+       << "Iterations          : " << this->_statistics->iterations << "\n";
     SPxOut::setScientific(os);
     os << "Objective value     : " << objValueReal() << "\n";
   }
