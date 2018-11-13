@@ -1305,7 +1305,7 @@ void SoPlexBase<R>::_performOptIRStable(
             if( _colTypes[c] == RANGETYPE_FIXED )
               continue;
 
-            const SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
+            const typename SPxSolverBase<R>::VarStatus& basisStatusCol = _basisStatusCols[c];
             assert(basisStatusCol != SPxSolverBase<R>::FIXED);
 
             if( ((maximizing && basisStatusCol != SPxSolverBase<R>::ON_LOWER) || (!maximizing && basisStatusCol != SPxSolverBase<R>::ON_UPPER))
@@ -1341,7 +1341,7 @@ void SoPlexBase<R>::_performOptIRStable(
             if( _rowTypes[r] == RANGETYPE_FIXED )
               continue;
 
-            const SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
+            const typename SPxSolverBase<R>::VarStatus& basisStatusRow = _basisStatusRows[r];
             assert(basisStatusRow != SPxSolverBase<R>::FIXED);
 
             Rational val = (-dualScale * sol._dual[r]) - Rational(dualReal[r]);

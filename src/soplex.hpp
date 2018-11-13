@@ -2135,10 +2135,10 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
 
 
 
-  /// changes objective function vector to \p obj
-  template <class R>
-  void SoPlexBase<R>::changeObjRational(const VectorRational& obj)
-  {
+/// changes objective function vector to \p obj
+template <class R>
+void SoPlexBase<R>::changeObjRational(const VectorRational& obj)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2150,14 +2150,14 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _realLP->changeObj(DVectorBase<R>(obj));
 
     _invalidateSolution();
-  }
+}
 
 
 
-  /// changes objective coefficient of column i to \p obj
-  template <class R>
-  void SoPlexBase<R>::changeObjRational(int i, const Rational& obj)
-  {
+/// changes objective coefficient of column i to \p obj
+template <class R>
+void SoPlexBase<R>::changeObjRational(int i, const Rational& obj)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2169,15 +2169,15 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _realLP->changeObj(i, R(obj));
 
     _invalidateSolution();
-  }
+}
 
 
 
 #ifdef SOPLEX_WITH_GMP
-  /// changes objective coefficient of column i to \p obj
-  template <class R>
-  void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
-  {
+/// changes objective coefficient of column i to \p obj
+template <class R>
+void SoPlexBase<R>::changeObjRational(int i, const mpq_t* obj)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2189,15 +2189,15 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _realLP->changeObj(i, R(objRational(i)));
 
     _invalidateSolution();
-  }
+}
 #endif
 
 
 
-  /// changes matrix entry in row \p i and column \p j to \p val
-  template <class R>
-  void SoPlexBase<R>::changeElementRational(int i, int j, const Rational& val)
-  {
+/// changes matrix entry in row \p i and column \p j to \p val
+template <class R>
+void SoPlexBase<R>::changeElementRational(int i, int j, const Rational& val)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2209,14 +2209,14 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _changeElementReal(i, j, R(val));
 
     _invalidateSolution();
-  }
+}
 
 
 #ifdef SOPLEX_WITH_GMP
-  /// changes matrix entry in row \p i and column \p j to \p val
-  template <class R>
-  void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
-  {
+/// changes matrix entry in row \p i and column \p j to \p val
+template <class R>
+void SoPlexBase<R>::changeElementRational(int i, int j, const mpq_t* val)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2228,14 +2228,14 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _changeElementReal(i, j, mpq_get_d(*val));
 
     _invalidateSolution();
-  }
+}
 #endif
 
 
-  /// removes row \p i
-  template <class R>
-  void SoPlexBase<R>::removeRowRational(int i)
-  {
+/// removes row \p i
+template <class R>
+void SoPlexBase<R>::removeRowRational(int i)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2254,16 +2254,16 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _removeRowReal(i);
 
     _invalidateSolution();
-  }
+}
 
 
 
-  /// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
-  /// index where row \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numRowsRational()
-  template <class R>
-  void SoPlexBase<R>::removeRowsRational(int perm[])
-  {
+/// removes all rows with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the new
+/// index where row \p i has been moved to; note that \p perm must point to an array of size at least
+/// #numRowsRational()
+template <class R>
+void SoPlexBase<R>::removeRowsRational(int perm[])
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2287,15 +2287,15 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _removeRowsReal(perm);
 
     _invalidateSolution();
-  }
+}
 
 
 
-  /// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
-  /// passed as buffer memory
-  template <class R>
-  void SoPlexBase<R>::removeRowsRational(int idx[], int n, int perm[])
-  {
+/// remove all rows with indices in array \p idx of size \p n; an array \p perm of size #numRowsRational() may be
+/// passed as buffer memory
+template <class R>
+void SoPlexBase<R>::removeRowsRational(int idx[], int n, int perm[])
+{
     if( perm == 0 )
       {
         DataArray< int > p(numRowsRational());
@@ -2307,15 +2307,15 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
         _idxToPerm(idx, n, perm, numRowsRational());
         SoPlexBase<R>::removeRowsRational(perm);
       }
-  }
+}
 
 
 
-  /// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
-  /// buffer memory
-  template <class R>
-  void SoPlexBase<R>::removeRowRangeRational(int start, int end, int perm[])
-  {
+/// removes rows \p start to \p end including both; an array \p perm of size #numRowsRational() may be passed as
+/// buffer memory
+template <class R>
+void SoPlexBase<R>::removeRowRangeRational(int start, int end, int perm[])
+{
     if( perm == 0 )
       {
         DataArray< int > p(numRowsRational());
@@ -2327,14 +2327,14 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
         _rangeToPerm(start, end, perm, numRowsRational());
         SoPlexBase<R>::removeRowsRational(perm);
       }
-  }
+}
 
 
 
-  /// removes column i
-  template <class R>
-  void SoPlexBase<R>::removeColRational(int i)
-  {
+/// removes column i
+template <class R>
+void SoPlexBase<R>::removeColRational(int i)
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2353,16 +2353,16 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _removeColReal(i);
 
     _invalidateSolution();
-  }
+}
 
 
 
-  /// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
-  /// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
-  /// #numColsRational()
-  template <class R>
-  void SoPlexBase<R>::removeColsRational(int perm[])
-  {
+/// removes all columns with an index \p i such that \p perm[i] < 0; upon completion, \p perm[i] >= 0 indicates the
+/// new index where column \p i has been moved to; note that \p perm must point to an array of size at least
+/// #numColsRational()
+template <class R>
+void SoPlexBase<R>::removeColsRational(int perm[])
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2385,15 +2385,15 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       _removeColsReal(perm);
 
     _invalidateSolution();
-  }
+}
 
 
 
-  /// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
-  /// passed as buffer memory
-  template <class R>
-  void SoPlexBase<R>::removeColsRational(int idx[], int n, int perm[])
-  {
+/// remove all columns with indices in array \p idx of size \p n; an array \p perm of size #numColsRational() may be
+/// passed as buffer memory
+template <class R>
+void SoPlexBase<R>::removeColsRational(int idx[], int n, int perm[])
+{
     if( perm == 0 )
       {
         DataArray< int > p(numColsRational());
@@ -2405,15 +2405,15 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
         _idxToPerm(idx, n, perm, numColsRational());
         SoPlexBase<R>::removeColsRational(perm);
       }
-  }
+}
 
 
 
-  /// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
-  /// buffer memory
-  template <class R>
-  void SoPlexBase<R>::removeColRangeRational(int start, int end, int perm[])
-  {
+/// removes columns \p start to \p end including both; an array \p perm of size #numColsRational() may be passed as
+/// buffer memory
+template <class R>
+void SoPlexBase<R>::removeColRangeRational(int start, int end, int perm[])
+{
     if( perm == 0 )
       {
         DataArray< int > p(numColsRational());
@@ -2425,14 +2425,14 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
         _rangeToPerm(start, end, perm, numColsRational());
         SoPlexBase<R>::removeColsRational(perm);
       }
-  }
+}
 
 
 
-  /// clears the LP
-  template <class R>
-  void SoPlexBase<R>::clearLPRational()
-  {
+/// clears the LP
+template <class R>
+void SoPlexBase<R>::clearLPRational()
+{
     assert(_rationalLP != 0);
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
@@ -2450,31 +2450,31 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       }
 
     _invalidateSolution();
-  }
+}
 
 
 
-  /// synchronizes rational LP with R LP, i.e., copies R LP to rational LP, if sync mode is manual
-  template <class R>
-  void SoPlexBase<R>::syncLPRational()
-  {
+/// synchronizes rational LP with R LP, i.e., copies R LP to rational LP, if sync mode is manual
+template <class R>
+void SoPlexBase<R>::syncLPRational()
+{
     assert(_isConsistent());
 
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_MANUAL )
       _syncLPRational();
-  }
+}
 
-  /// returns the current solver status
-  template <class R>
-  typename SPxSolverBase<R>::Status SoPlexBase<R>::status() const
-  {
+/// returns the current solver status
+template <class R>
+typename SPxSolverBase<R>::Status SoPlexBase<R>::status() const
+{
     return _status;
-  }
+}
 
-  /// returns the current basis status
-  template <class R>
-  typename SPxBasisBase<R>::SPxStatus SoPlexBase<R>::basisStatus() const
-  {
+/// returns the current basis status
+template <class R>
+typename SPxBasisBase<R>::SPxStatus SoPlexBase<R>::basisStatus() const
+{
     if( !hasBasis() )
       return SPxBasisBase<R>::NO_PROBLEM;
     else if( status() == SPxSolverBase<R>::OPTIMAL || status() == SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS )
@@ -2489,13 +2489,13 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       return SPxBasisBase<R>::DUAL;
     else
       return SPxBasisBase<R>::REGULAR;
-  }
+}
 
 
-  /// returns the objective value if a primal or dual solution is available
-  template <class R>
-  R SoPlexBase<R>::objValueReal()
-  {
+/// returns the objective value if a primal or dual solution is available
+template <class R>
+R SoPlexBase<R>::objValueReal()
+{
     assert(OBJSENSE_MAXIMIZE == 1);
     assert(OBJSENSE_MINIMIZE == -1);
 
@@ -2510,5 +2510,36 @@ void SoPlexBase<R>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t*
       }
     else
       return 0.0;
+}
+
+
+/// returns the objective value if a primal or dual solution is available
+template <class R>
+Rational SoPlexBase<R>::objValueRational()
+{
+  assert(OBJSENSE_MAXIMIZE == 1);
+  assert(OBJSENSE_MINIMIZE == -1);
+
+  if( this->status() == SPxSolverBase<R>::UNBOUNDED )
+    {
+      if( intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MAXIMIZE )
+        return _rationalPosInfty;
+      else
+        return _rationalNegInfty;
   }
+  else if( this->status() == SPxSolverBase<R>::INFEASIBLE )
+    {
+      if( intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MAXIMIZE )
+        return _rationalNegInfty;
+      else
+        return _rationalPosInfty;
+    }
+  else if( hasPrimal() || hasDual() )
+    {
+      _syncRationalSolution();
+      return _solRational._objVal;
+    }
+  else
+    return _rationalZero;
+}
 

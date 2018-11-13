@@ -1098,37 +1098,6 @@ namespace soplex
 
 
 
-  /// returns the objective value if a primal or dual solution is available
-  template <>
-  Rational SoPlexBase<Real>::objValueRational()
-  {
-    assert(OBJSENSE_MAXIMIZE == 1);
-    assert(OBJSENSE_MINIMIZE == -1);
-
-    if( this->status() == SPxSolverBase<Real>::UNBOUNDED )
-      {
-        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
-          return _rationalPosInfty;
-        else
-          return _rationalNegInfty;
-      }
-    else if( this->status() == SPxSolverBase<Real>::INFEASIBLE )
-      {
-        if( intParam(SoPlexBase<Real>::OBJSENSE) == OBJSENSE_MAXIMIZE )
-          return _rationalNegInfty;
-        else
-          return _rationalPosInfty;
-      }
-    else if( hasPrimal() || hasDual() )
-      {
-        _syncRationalSolution();
-        return _solRational._objVal;
-      }
-    else
-      return _rationalZero;
-  }
-
-
   /// gets the primal solution vector if available; returns true on success
   template <>
 	bool SoPlexBase<Real>::getPrimalRational(VectorBase<Rational>& vector)
