@@ -2976,3 +2976,1185 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
   return true;
 }
 
+
+  /// get size of primal solution
+  template <class R>
+  int SoPlexBase<R>::totalSizePrimalRational(const int base)
+  {
+    if( hasPrimal() || hasPrimalRay() )
+      {
+        _syncRationalSolution();
+        return _solRational.totalSizePrimal(base);
+      }
+    else
+      return 0;
+  }
+
+
+
+  /// get size of dual solution
+  template <class R>
+  int SoPlexBase<R>::totalSizeDualRational(const int base)
+  {
+    if( hasDual() || hasDualFarkas() )
+      {
+        _syncRationalSolution();
+        return _solRational.totalSizeDual(base);
+      }
+    else
+      return 0;
+  }
+
+
+
+  /// get size of least common multiple of denominators in primal solution
+  template <class R>
+  int SoPlexBase<R>::dlcmSizePrimalRational(const int base)
+  {
+    if( hasPrimal() || hasPrimalRay() )
+      {
+        _syncRationalSolution();
+        return _solRational.dlcmSizePrimal(base);
+      }
+    else
+      return 0;
+  }
+
+
+
+  /// get size of least common multiple of denominators in dual solution
+  template <class R>
+  int SoPlexBase<R>::dlcmSizeDualRational(const int base)
+  {
+    if( hasDual() || hasDualFarkas() )
+      {
+        _syncRationalSolution();
+        return _solRational.dlcmSizeDual(base);
+      }
+    else
+      return 0;
+  }
+
+
+
+  /// get size of largest denominator in primal solution
+  template <class R>
+  int SoPlexBase<R>::dmaxSizePrimalRational(const int base)
+  {
+    if( hasPrimal() || hasPrimalRay() )
+      {
+        _syncRationalSolution();
+        return _solRational.dmaxSizePrimal(base);
+      }
+    else
+      return 0;
+  }
+
+
+
+  /// get size of largest denominator in dual solution
+  template <class R>
+	int SoPlexBase<R>::dmaxSizeDualRational(const int base)
+  {
+    if( hasDual() || hasDualFarkas() )
+      {
+        _syncRationalSolution();
+        return _solRational.dmaxSizeDual(base);
+      }
+    else
+      return 0;
+  }
+
+  /// is an advanced starting basis available?
+  template <class R>
+	bool SoPlexBase<R>::hasBasis() const
+  {
+    return _hasBasis;
+  }
+
+
+
+  /// returns basis status for a single row
+  template <class R>
+  typename SPxSolverBase<R>::VarStatus SoPlexBase<R>::basisRowStatus(int row) const
+  {
+    assert(row >= 0);
+    assert(row < numRows());
+
+    // if no basis is available, return slack basis; if index is out of range, return basic status as for a newly
+    // added row
+    if( !hasBasis() || row < 0 || row >= numRows() )
+      return SPxSolverBase<R>::BASIC;
+    // if the real LP is loaded, ask solver
+    else if( _isRealLPLoaded )
+      {
+        return _solver.getBasisRowStatus(row);
+      }
+    // if the real LP is not loaded, the basis is stored in the basis arrays of this class
+    else
+      {
+        assert(row < _basisStatusRows.size());
+        return _basisStatusRows[row];
+      }
+  }
+
+
+
+  /// returns basis status for a single column
+  template <class R>
+  typename SPxSolverBase<R>::VarStatus SoPlexBase<R>::basisColStatus(int col) const
+  {
+    assert(col >= 0);
+    assert(col < numCols());
+
+    // if index is out of range, return nonbasic status as for a newly added unbounded column
+    if( col < 0 || col >= numCols() )
+      {
+        return SPxSolverBase<R>::ZERO;
+      }
+    // if no basis is available, return slack basis
+    else if( !hasBasis() )
+      {
+        if( lowerReal(col) > -realParam(SoPlexBase<R>::INFTY) )
+          return SPxSolverBase<R>::ON_LOWER;
+        else if( upperReal(col) < realParam(SoPlexBase<R>::INFTY) )
+          return SPxSolverBase<R>::ON_UPPER;
+        else
+          return SPxSolverBase<R>::ZERO;
+      }
+    // if the real LP is loaded, ask solver
+    else if( _isRealLPLoaded )
+      {
+        return _solver.getBasisColStatus(col);
+      }
+    // if the real LP is not loaded, the basis is stored in the basis arrays of this class
+    else
+      {
+        assert(col < _basisStatusCols.size());
+        return _basisStatusCols[col];
+      }
+  }
+
+
+
+  /// gets current basis
+  template <class R>
+  void SoPlexBase<R>::getBasis(typename SPxSolverBase<R>::VarStatus rows[], typename SPxSolverBase<R>::VarStatus cols[]) const
+  {
+    // if no basis is available, return slack basis
+    if( !hasBasis() )
+      {
+        for( int i = numRows() - 1; i >= 0; i-- )
+          rows[i] = SPxSolverBase<R>::BASIC;
+
+        for( int i = numCols() - 1; i >= 0; i-- )
+          {
+            if( lowerReal(i) > -realParam(SoPlexBase<R>::INFTY) )
+              cols[i] = SPxSolverBase<R>::ON_LOWER;
+            else if( upperReal(i) < realParam(SoPlexBase<R>::INFTY) )
+              cols[i] = SPxSolverBase<R>::ON_UPPER;
+            else
+              cols[i] = SPxSolverBase<R>::ZERO;
+          }
+      }
+    // if the real LP is loaded, ask solver
+    else if( _isRealLPLoaded )
+      {
+        (void)_solver.getBasis(rows, cols);
+      }
+    // if the real LP is not loaded, the basis is stored in the basis arrays of this class
+    else
+      {
+        assert(numRows() == _basisStatusRows.size());
+        assert(numCols() == _basisStatusCols.size());
+
+        for( int i = numRows() - 1; i >= 0; i-- )
+          rows[i] = _basisStatusRows[i];
+
+        for( int i = numCols() - 1; i >= 0; i-- )
+          cols[i] = _basisStatusCols[i];
+      }
+  }
+
+
+
+  /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+  template <class R>
+  void SoPlexBase<R>::getBasisInd(int* bind) const
+  {
+    // if no basis is available, return slack basis
+    if( !hasBasis() )
+      {
+        for( int i = 0; i < numRows(); ++i )
+          bind[i] = -1 - i;
+      }
+    // if the real LP is not loaded, the basis is stored in the basis arrays of this class
+    else if( !_isRealLPLoaded )
+      {
+        int k = 0;
+
+        assert(numRows() == _basisStatusRows.size());
+        assert(numCols() == _basisStatusCols.size());
+
+        for( int i = 0; i < numRows(); ++i )
+          {
+            if( _basisStatusRows[i] == SPxSolverBase<R>::BASIC )
+              {
+                bind[k] = -1 - i;
+                k++;
+              }
+          }
+
+        for( int j = 0; j < numCols(); ++j )
+          {
+            if( _basisStatusCols[j] == SPxSolverBase<R>::BASIC )
+              {
+                bind[k] = j;
+                k++;
+              }
+          }
+
+        assert(k == numRows());
+      }
+    // if the real LP is loaded, the basis is stored in the solver and we need to distinguish between column and row
+    // representation; ask the solver itself which representation it has, since the REPRESENTATION parameter of this
+    // class might be set to automatic
+    else if( _solver.rep() == SPxSolverBase<R>::COLUMN )
+      {
+        for( int i = 0; i < numRows(); ++i )
+          {
+            SPxId id = _solver.basis().baseId(i);
+            bind[i] = (id.isSPxColId() ? _solver.number(id) : - 1 - _solver.number(id));
+          }
+      }
+    // for row representation, return the complement of the row basis; for this, we need to loop through all rows and columns
+    else
+      {
+        assert(_solver.rep() == SPxSolverBase<R>::ROW);
+
+        int k = 0;
+
+        for( int i = 0; i < numRows(); ++i )
+          {
+            if( !_solver.isRowBasic(i) )
+              {
+                bind[k] = -1 - i;
+                k++;
+              }
+          }
+
+        for( int j = 0; j < numCols(); ++j )
+          {
+            if( !_solver.isColBasic(j) )
+            {
+               bind[k] = j;
+               k++;
+            }
+         }
+
+         assert(k == numRows());
+      }
+   }
+
+
+   /** compute one of several matrix metrics based on the diagonal of the LU factorization
+    *  type = 0: max/min ratio
+    *  type = 1: trace of U (sum of diagonal elements)
+    *  type = 2: determinant (product of diagonal elements)
+    */
+  template <class R>
+  bool SoPlexBase<R>::getBasisMetric(R& condition, int type)
+   {
+      _ensureRealLPLoaded();
+      if( !_isRealLPLoaded )
+         return false;
+
+    if( _solver.basis().status() == SPxBasisBase<R>::NO_PROBLEM )
+      {
+      return false;
+      }
+
+      condition = _solver.getBasisMetric(type);
+
+    return true;
+  }
+
+  /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getEstimatedCondition(R& condition)
+  {
+    _ensureRealLPLoaded();
+    if( !_isRealLPLoaded )
+      return false;
+
+    if( _solver.basis().status() == SPxBasisBase<R>::NO_PROBLEM )
+      return false;
+
+    condition = _solver.basis().getEstimatedCondition();
+
+    return true;
+  }
+
+  /// computes the exact condition number for the current basis matrix using the power method; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getExactCondition(R& condition)
+  {
+    _ensureRealLPLoaded();
+    if( !_isRealLPLoaded )
+      return false;
+
+    if( _solver.basis().status() == SPxBasisBase<R>::NO_PROBLEM )
+      return false;
+
+    condition = _solver.basis().getExactCondition();
+
+    return true;
+  }
+
+  /// computes row r of basis inverse; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds, bool unscale)
+  {
+    assert(r >= 0);
+    assert(r < numRows());
+    assert(coef != 0);
+
+    if( !hasBasis() || r < 0 || r >= numRows() )
+      return false;
+
+    _ensureRealLPLoaded();
+
+    if( !_isRealLPLoaded )
+      return false;
+
+    // we need to distinguish between column and row representation; ask the solver itself which representation it
+    // has, since the REPRESENTATION parameter of this class might be set to automatic
+    if( _solver.rep() == SPxSolverBase<R>::COLUMN )
+      {
+        int idx;
+        SSVectorBase<R> x(numRows());
+        try
+          {
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+              {
+                /* for information on the unscaling procedure see spxscaler.h */
+
+                int scaleExp;
+                DSVector rhs(_solver.unitVector(r));
+
+                if( _solver.basis().baseId(r).isSPxColId() )
+                  scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
+                else
+                  scaleExp = - _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(r)));
+
+                rhs *= spxLdexp(1.0, scaleExp);
+
+                _solver.basis().coSolve(x, rhs);
+                x.setup();
+                int size = x.size();
+
+                for( int i = 0; i < size; i++ )
+                  {
+                    scaleExp = _scaler->getRowScaleExp(x.index(i));
+                    x.scaleValue(x.index(i), scaleExp);
+                  }
+              }
+            else
+              {
+                _solver.basis().coSolve(x, _solver.unitVector(r));
+              }
+          }
+        catch( const SPxException& E )
+          {
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+          }
+        // copy sparse data to dense result vector based on coef array
+        if( ninds != 0 && inds != 0 )
+          {
+            // during solving SoPlexBase may have destroyed the sparsity structure so we need to restore it
+            x.setup();
+            *ninds = x.size();
+            for( int i = 0; i < *ninds; ++i )
+              {
+                idx = x.index(i);
+                coef[idx] = x[idx];
+                // set sparsity pattern of coef array
+                inds[i] = idx;
+              }
+          }
+        else
+          {
+            VectorBase<R> y(numRows(), coef);
+            y = x;
+            if( ninds != NULL )
+              *ninds = -1;
+          }
+      }
+    else
+      {
+        assert(_solver.rep() == SPxSolverBase<R>::ROW);
+
+        // @todo should rhs be a reference?
+        DSVector rhs(numCols());
+        SSVector y(numCols());
+        int* bind = 0;
+        int index;
+
+        // get ordering of column basis matrix
+        spx_alloc(bind, numRows());
+        getBasisInd(bind);
+
+        // get vector corresponding to requested index r
+        index = bind[r];
+
+        // r corresponds to a row vector
+        if( index < 0 )
+          {
+            // transform index to actual row index
+            index = -index - 1;
+
+            // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index >= 0);
+            assert(index < numRows());
+            assert(!_solver.isRowBasic(index));
+
+            // get row vector
+            rhs = _solver.rowVector(index);
+            rhs *= -1.0;
+
+            if( unscale && _solver.isScaled() )
+              {
+                for( int i = 0; i < rhs.size(); ++i)
+                  rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(index));
+              }
+          }
+        // r corresponds to a column vector
+        else
+          {
+            // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index < numCols());
+            assert(!_solver.isColBasic(index));
+
+            // get unit vector
+            rhs = UnitVectorReal(index);
+
+            if( unscale && _solver.isScaled() )
+              rhs *= spxLdexp(1.0, _scaler->getColScaleExp(index));
+          }
+
+        // solve system "y B = rhs", where B is the row basis matrix
+        try
+          {
+            _solver.basis().solve(y, rhs);
+          }
+        catch( const SPxException& E )
+          {
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+          }
+
+        // initialize result vector x as zero
+        memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
+
+        // add nonzero entries
+        for( int i = 0; i < numCols(); ++i )
+          {
+            SPxId id = _solver.basis().baseId(i);
+
+            if( id.isSPxRowId() )
+              {
+                assert(_solver.number(id) >= 0);
+                assert(_solver.number(id) < numRows());
+                assert(bind[r] >= 0 || _solver.number(id) != index);
+
+                int rowindex = _solver.number(id);
+                coef[rowindex] = y[i];
+
+                if( unscale && _solver.isScaled() )
+                  coef[rowindex] = spxLdexp(y[i], _scaler->getRowScaleExp(rowindex));
+              }
+          }
+
+        // if r corresponds to a row vector, we have to add a 1 at position r
+        if( bind[r] < 0 )
+          {
+            assert(coef[index] == 0.0);
+            coef[index] = 1.0;
+          }
+
+        // @todo implement returning of sparsity information like in column wise case
+        if( ninds != NULL)
+          *ninds = -1;
+
+        // free memory
+        spx_free(bind);
+      }
+
+    return true;
+  }
+
+
+
+  /// computes column c of basis inverse; returns true on success
+  /// @todo does not work correctly for the row representation
+  template <class R>
+	bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds, bool unscale)
+  {
+    assert(c >= 0);
+    assert(c < numRows());
+    assert(coef != 0);
+
+    if( !hasBasis() || c < 0 || c >= numRows() )
+      return false;
+
+    _ensureRealLPLoaded();
+
+    if( !_isRealLPLoaded )
+      return false;
+
+    // we need to distinguish between column and row representation; ask the solver itself which representation it
+    // has, since the REPRESENTATION parameter of this class might be set to automatic
+    if( _solver.rep() == SPxSolverBase<R>::COLUMN )
+      {
+        int idx;
+        SSVectorBase<R> x(numRows());
+        try
+          {
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+              {
+                /* for information on the unscaling procedure see spxscaler.h */
+
+                int scaleExp =_scaler->getRowScaleExp(c);
+                DSVector rhs(_solver.unitVector(c));
+                rhs *= spxLdexp(1.0, scaleExp);
+
+                _solver.basis().solve(x, rhs);
+
+                x.setup();
+                int size = x.size();
+
+                for( int i = 0; i < size; i++ )
+                  {
+                    if( _solver.basis().baseId(x.index(i)).isSPxColId() )
+                      {
+                        idx = _solver.number(_solver.basis().baseId(x.index(i)));
+                        scaleExp = _scaler->getColScaleExp(idx);
+                        x.scaleValue(x.index(i), scaleExp);
+                      }
+                    else
+                      {
+                        idx = _solver.number(_solver.basis().baseId(x.index(i)));
+                        scaleExp = - _scaler->getRowScaleExp(idx);
+                        x.scaleValue(x.index(i), scaleExp);
+                      }
+                  }
+              }
+            else
+              {
+                _solver.basis().solve(x, _solver.unitVector(c));
+              }
+          }
+        catch( const SPxException& E )
+          {
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+          }
+        // copy sparse data to dense result vector based on coef array
+        if( ninds != 0 && inds != 0 )
+          {
+            // SoPlexBase may have destroyed the sparsity structure so we need to restore it
+            x.setup();
+            *ninds = x.size();
+            for( int i = 0; i < *ninds; ++i )
+              {
+                idx = x.index(i);
+                coef[idx] = x[idx];
+                // set sparsity pattern of coef array
+                inds[i] = idx;
+              }
+          }
+        else
+          {
+            VectorBase<R> y(numRows(), coef);
+            y = x;
+            if( ninds != 0 )
+              *ninds = -1;
+          }
+      }
+    else
+      {
+        assert(_solver.rep() == SPxSolverBase<R>::ROW);
+
+        // @todo should rhs be a reference?
+        DSVectorBase<R> rhs(numCols());
+        SSVectorBase<R> y(numCols());
+        int* bind = 0;
+        int index;
+
+        // get ordering of column basis matrix
+        spx_alloc(bind, numRows());
+        getBasisInd(bind);
+
+        // get vector corresponding to requested index c
+        index = bind[c];
+
+        // c corresponds to a row vector
+        if( index < 0 )
+          {
+            // transform index to actual row index
+            index = -index - 1;
+
+            // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index >= 0);
+            assert(index < numRows());
+            assert(!_solver.isRowBasic(index));
+
+            // get row vector
+            rhs = _solver.rowVector(index);
+            rhs *= -1.0;
+          }
+        // c corresponds to a column vector
+        else
+          {
+            // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+            assert(index < numCols());
+            assert(!_solver.isColBasic(index));
+
+            // get unit vector
+            rhs = UnitVectorReal(index);
+          }
+
+        // solve system "y B = rhs", where B is the row basis matrix
+        try
+          {
+            /* unscaling required? */
+            if( unscale && _solver.isScaled() )
+              {
+                int size = rhs.size();
+                int scaleExp;
+
+                for( int i = 0; i < size; i++ )
+                  {
+                    scaleExp = _scaler->getColScaleExp(i);
+                    rhs.value(i) *= spxLdexp(1.0, scaleExp);
+                  }
+
+                _solver.basis().coSolve(y, rhs);
+
+                int rowIdx;
+                size = y.size();
+
+                for( int i = 0; i < size; i++ )
+                  {
+                    assert(_solver.basis().baseId(y.index(i)).isSPxRowId());
+                    rowIdx = _solver.basis().baseId(y.index(i)).getIdx();
+                    scaleExp = _scaler->getRowScaleExp(rowIdx);
+                    y.setValue(i, y.value(i) * spxLdexp(1.0, scaleExp));
+                  }
+              }
+            else
+              {
+                _solver.basis().coSolve(y, rhs);
+              }
+          }
+        catch( const SPxException& E )
+          {
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while computing basis inverse row.\n" );
+            return false;
+          }
+
+        // initialize result vector x as zero
+        memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
+
+        // add nonzero entries
+        for( int i = 0; i < numCols(); ++i )
+          {
+            SPxId id = _solver.basis().baseId(i);
+
+            if( id.isSPxRowId() )
+              {
+                assert(_solver.number(id) >= 0);
+                assert(_solver.number(id) < numRows());
+                assert(bind[c] >= 0 || _solver.number(id) != index);
+
+                coef[_solver.number(id)] = y[i];
+              }
+          }
+
+        // if c corresponds to a row vector, we have to add a 1 at position c
+        if( bind[c] < 0 )
+          {
+            assert(coef[index] == 0.0);
+            coef[index] = 1.0;
+          }
+
+        // @todo implement returning of sparsity information like in column wise case
+        if( ninds != NULL)
+          *ninds = -1;
+
+        // free memory
+        spx_free(bind);
+      }
+
+    return true;
+  }
+
+
+
+  /// computes dense solution of basis matrix B * sol = rhs; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getBasisInverseTimesVecReal(Real* rhs, R* sol, bool unscale)
+  {
+    VectorBase<R> v(numRows(), rhs);
+    VectorBase<R> x(numRows(), sol);
+
+    if( !hasBasis() )
+      return false;
+
+    _ensureRealLPLoaded();
+
+    if( !_isRealLPLoaded )
+      return false;
+
+    // we need to distinguish between column and row representation; ask the solver itself which representation it
+    // has, since the REPRESENTATION parameter of this class might be set to automatic; in the column case we can use
+    // the existing factorization
+    if( _solver.rep() == SPxSolverBase<R>::COLUMN )
+      {
+        // solve system "x = B^-1 * v"
+        try
+          {
+            /* unscaling required? */
+            if( unscale && _solver.isScaled())
+              {
+                /* for information on the unscaling procedure see spxscaler.h */
+                int scaleExp;
+                int idx;
+
+                for( int i = 0; i < v.dim(); ++i)
+                  {
+                    if( isNotZero(v[i]) )
+                      {
+                        scaleExp =_scaler->getRowScaleExp(i);
+                        v[i] = spxLdexp(v[i], scaleExp);
+                      }
+                  }
+
+                _solver.basis().solve(x, v);
+
+                for( int i = 0; i < x.dim(); i++ )
+                  {
+                    if( isNotZero(x[i]) )
+                      {
+                        idx = _solver.number(_solver.basis().baseId(i));
+                        if( _solver.basis().baseId(i).isSPxColId() )
+                          scaleExp = _scaler->getColScaleExp(idx);
+                        else
+                          scaleExp = - _scaler->getRowScaleExp(idx);
+                        x[i] = spxLdexp(x[i], scaleExp);
+                      }
+                  }
+              }
+            else
+              {
+                _solver.basis().solve(x, v);
+              }
+          }
+        catch( const SPxException& E )
+          {
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
+            return false;
+          }
+      }
+    else
+      {
+        assert(_solver.rep() == SPxSolverBase<R>::ROW);
+
+        DSVectorBase<R> rowrhs(numCols());
+        SSVectorBase<R> y(numCols());
+        int* bind = 0;
+
+        bool adaptScaling = unscale && _realLP->isScaled();
+        int scaleExp;
+        int idx;
+
+        // get ordering of column basis matrix
+        spx_alloc(bind, numRows());
+        getBasisInd(bind);
+
+        // fill right-hand side for row-based system
+        for( int i = 0; i < numCols(); ++i )
+          {
+            SPxId id = _solver.basis().baseId(i);
+
+            if( id.isSPxRowId() )
+              {
+                assert(_solver.number(id) >= 0);
+                assert(_solver.number(id) < numRows());
+
+                if( adaptScaling )
+                  {
+                    idx = _solver.number(id);
+                    scaleExp = _scaler->getRowScaleExp(idx);
+                    rowrhs.add(i, spxLdexp(v[idx], scaleExp));
+                  }
+                else
+                  rowrhs.add(i, v[_solver.number(id)]);
+              }
+            else
+              {
+                assert(rowrhs[i] == 0.0);
+              }
+          }
+
+        // solve system "B y = rowrhs", where B is the row basis matrix
+        try
+          {
+            _solver.basis().coSolve(y, rowrhs);
+          }
+        catch( const SPxException& E )
+          {
+            MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while solving with basis matrix.\n" );
+            return false;
+          }
+
+        // fill result w.r.t. order given by bind
+        for( int i = 0; i < numRows(); ++i )
+          {
+            int index;
+
+            index = bind[i];
+
+            if( index < 0 )
+              {
+                index = -index-1;
+
+                // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                assert(index >= 0);
+                assert(index < numRows());
+                assert(!_solver.isRowBasic(index));
+
+                x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numCols(), y.get_ptr()));
+
+                if( adaptScaling )
+                  {
+                    scaleExp = -_scaler->getRowScaleExp(index);
+                    x[i] = spxLdexp(x[i], scaleExp);
+                  }
+              }
+            else
+              {
+                // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                assert(index >= 0);
+                assert(index < numCols());
+                assert(!_solver.isColBasic(index));
+
+                if( adaptScaling )
+                  {
+                    scaleExp = _scaler->getColScaleExp(index);
+                    x[i] = spxLdexp(y[index], scaleExp);
+                  }
+                else
+                  x[i] = y[index];
+              }
+          }
+
+        // free memory
+        spx_free(bind);
+      }
+    return true;
+  }
+
+
+
+  /// multiply with basis matrix; B * vec (inplace)
+  template <class R>
+	bool SoPlexBase<R>::multBasis(Real* vec, bool unscale)
+  {
+    if( !hasBasis() )
+      return false;
+
+    _ensureRealLPLoaded();
+
+    if( !_isRealLPLoaded )
+      return false;
+
+    if( _solver.rep() == SPxSolverBase<R>::COLUMN )
+      {
+        int basisdim = numRows();
+
+        // create Vector from input values
+        Vector x(basisdim, vec);
+
+        if( unscale && _solver.isScaled() )
+          {
+            /* for information on the unscaling procedure see spxscaler.h */
+
+            int scaleExp;
+            for( int i = 0; i < basisdim; ++i)
+              {
+                if( isNotZero(vec[i]) )
+                  {
+                    if( _solver.basis().baseId(i).isSPxColId() )
+                      scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
+                    else
+                      scaleExp = _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(i)));
+
+                    vec[i] = spxLdexp(vec[i], scaleExp);
+                  }
+              }
+            _solver.basis().multBaseWith(x);
+            for( int i = 0; i < basisdim; ++i)
+              {
+                scaleExp = _scaler->getRowScaleExp(i);
+                vec[i] = spxLdexp(vec[i], -scaleExp);
+              }
+          }
+        else
+          _solver.basis().multBaseWith(x);
+      }
+    else
+      {
+        int colbasisdim = numRows();
+
+        DSVector y(colbasisdim);
+
+        y.clear();
+
+        // create Vector from input values
+        Vector x(colbasisdim, vec);
+
+        int* bind = 0;
+        int index;
+
+        // get ordering of column basis matrix
+        spx_alloc(bind, colbasisdim);
+        getBasisInd(bind);
+
+        // temporarily create the column basis and multiply every column with x
+        for( int i = 0; i < colbasisdim; ++i)
+          {
+            if( isNotZero(x[i]) )
+              {
+                // get vector corresponding to requested index i
+                index = bind[i];
+                // r corresponds to a row vector
+                if( index < 0 )
+                  {
+                    // transform index to actual row index
+                    index = -index - 1;
+
+                    // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                    assert(index >= 0);
+                    assert(index < numRows());
+                    assert(!_solver.isRowBasic(index));
+
+                    y.add(x[i] * UnitVectorReal(index));
+                  }
+                // r corresponds to a column vector
+                else
+                  {
+                    // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                    assert(index < numCols());
+                    assert(!_solver.isColBasic(index));
+
+                    if( unscale && _solver.isScaled() )
+                      {
+                        DSVector col;
+                        _solver.getColVectorUnscaled(index, col);
+                        y.add(x[i] * col);
+                      }
+
+                    y.add(x[i] * _solver.colVector(index));
+                  }
+              }
+          }
+        spx_free(bind);
+        x = y;
+      }
+
+    return true;
+  }
+
+
+
+  /// multiply with transpose of basis matrix; vec * B^T (inplace)
+  template <class R>
+	bool SoPlexBase<R>::multBasisTranspose(Real* vec, bool unscale)
+  {
+    if( !hasBasis() )
+      return false;
+
+    _ensureRealLPLoaded();
+
+    if( !_isRealLPLoaded )
+      return false;
+
+    if( _solver.rep() == SPxSolverBase<R>::COLUMN )
+      {
+        int basisdim = numRows();
+
+        // create Vector from input values
+        Vector x(basisdim, vec);
+
+        if( unscale && _solver.isScaled() )
+          {
+            /* for information on the unscaling procedure see spxscaler.h */
+
+            int scaleExp;
+            for( int i = 0; i < basisdim; ++i)
+              {
+                if( isNotZero(vec[i]) )
+                  {
+                    scaleExp = - _scaler->getRowScaleExp(i);
+                    vec[i] = spxLdexp(vec[i], scaleExp);
+                  }
+              }
+            _solver.basis().multWithBase(x);
+            for( int i = 0; i < basisdim; ++i)
+              {
+                if( isNotZero(vec[i]) )
+                  {
+                    if( _solver.basis().baseId(i).isSPxColId() )
+                      scaleExp = - _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(i)));
+                    else
+                      scaleExp = _scaler->getRowScaleExp(_solver.number(_solver.basis().baseId(i)));
+
+                    vec[i] = spxLdexp(vec[i], scaleExp);
+                  }
+              }
+          }
+        else
+          _solver.basis().multWithBase(x);
+      }
+    else
+      {
+        int colbasisdim = numRows();
+
+        DSVector y(colbasisdim);
+
+        // create Vector from input values
+        Vector x(colbasisdim, vec);
+
+        int* bind = 0;
+        int index;
+
+        // get ordering of column basis matrix
+        spx_alloc(bind, colbasisdim);
+        getBasisInd(bind);
+
+        // temporarily create the column basis and multiply every column with x
+        for( int i = 0; i < colbasisdim; ++i)
+          {
+            // get vector corresponding to requested index i
+            index = bind[i];
+            // r corresponds to a row vector
+            if( index < 0 )
+              {
+                // transform index to actual row index
+                index = -index - 1;
+
+                // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                assert(index >= 0);
+                assert(index < numRows());
+                assert(!_solver.isRowBasic(index));
+
+                y.add(i, x * UnitVectorReal(index));
+              }
+            // r corresponds to a column vector
+            else
+              {
+                // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
+                assert(index < numCols());
+                assert(!_solver.isColBasic(index));
+
+                if( unscale && _solver.isScaled() )
+                  {
+                    DSVector col;
+                    _solver.getColVectorUnscaled(index, col);
+                    y.add(i, x * col);
+                  }
+                else
+                  y.add(i, x * _solver.colVector(index));
+              }
+          }
+        spx_free(bind);
+        x = y;
+      }
+
+    return true;
+  }
+
+
+
+  /// compute rational basis inverse; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::computeBasisInverseRational()
+  {
+    if( !hasBasis() )
+      {
+        _rationalLUSolver.clear();
+        assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED);
+        return false;
+      }
+
+    if( _rationalLUSolver.status() == SLinSolverRational::UNLOADED
+        || _rationalLUSolver.status() == SLinSolverRational::TIME )
+      {
+        _rationalLUSolverBind.reSize(numRowsRational());
+        getBasisInd(_rationalLUSolverBind.get_ptr());
+        _computeBasisInverseRational();
+      }
+
+    if( _rationalLUSolver.status() == SLinSolverRational::OK )
+      return true;
+
+    return false;
+  }
+
+
+
+  /// gets an array of indices for the columns of the rational basis matrix; bind[i] >= 0 means that the i-th column of
+  /// the basis matrix contains variable bind[i]; bind[i] < 0 means that the i-th column of the basis matrix contains
+  /// the slack variable for row -bind[i]-1; performs rational factorization if not available; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getBasisIndRational(DataArray<int>& bind)
+  {
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      computeBasisInverseRational();
+
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      return false;
+
+    bind = _rationalLUSolverBind;
+    assert(bind.size() == numRowsRational());
+    return true;
+  }
+
+
+
+  /// computes row r of basis inverse; performs rational factorization if not available; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getBasisInverseRowRational(const int r, SSVectorRational& vec)
+  {
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      computeBasisInverseRational();
+
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      return false;
+
+    try
+      {
+        vec.reDim(numRowsRational());
+        _rationalLUSolver.solveLeft(vec, *_unitVectorRational(r));
+      }
+    catch( const SPxException& E )
+      {
+        MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while computing rational basis inverse row.\n" );
+        return false;
+      }
+    return true;
+  }

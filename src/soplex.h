@@ -737,13 +737,13 @@ public:
     *  type = 1: trace of U (sum of diagonal elements)
     *  type = 2: determinant (product of diagonal elements)
     */
-   bool getBasisMetric(Real& metric, int type = 0);
+   bool getBasisMetric(R& metric, int type = 0);
 
    /// computes an estimated condition number for the current basis matrix using the power method; returns true on success
-   bool getEstimatedCondition(Real& condition);
+   bool getEstimatedCondition(R& condition);
 
    /// computes the exact condition number for the current basis matrix using the power method; returns true on success
-   bool getExactCondition(Real& condition);
+   bool getExactCondition(R& condition);
 
    /// computes row \p r of basis inverse; returns true on success
    /// @param r which row of the basis inverse is computed
@@ -2304,10 +2304,10 @@ private:
    R getCompSlackVarCoeff(int primalRowNum);
 
    /// gets violation of bounds; returns true on success
-   bool getDecompBoundViolation(Real& maxviol, R& sumviol);
+   bool getDecompBoundViolation(R& maxviol, R& sumviol);
 
    /// gets violation of constraints; returns true on success
-   bool getDecompRowViolation(Real& maxviol, R& sumviol);
+   bool getDecompRowViolation(R& maxviol, R& sumviol);
 
    /// function call to terminate the decomposition simplex
    bool decompTerminate(Real timeLimit);
