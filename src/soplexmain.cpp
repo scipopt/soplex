@@ -27,6 +27,7 @@
 
 #include "soplex.h"
 #include "soplex/validation.h"
+#include "soplex/statistics.h"
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
@@ -93,6 +94,7 @@ void printUsage(const char* const argv[], int idx)
              << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
 #else
              << "  <lpfile>               linear program as .mps or .lp file\n\n"
+
 #endif
              << usage;
 }
