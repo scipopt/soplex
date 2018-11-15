@@ -36,29 +36,29 @@
 
 namespace soplex
 {
-  template <>
-  int SoPlexBase<Real>::intParam(const IntParam param) const;
+  // template <>
+  // int SoPlexBase<Real>::intParam(const IntParam param) const;
+
+  // // template <>
+	// // bool SoPlexBase<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
 
   // template <>
-	// bool SoPlexBase<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
-
-  template <>
-  typename SoPlexBase<Real>::Settings& SoPlexBase<Real>::Settings::operator=(const Settings& settings);
-
-  template <>
-  const SVectorReal& SoPlexBase<Real>::colVectorRealInternal(int i) const;
-
-  template <>
-  const Rational& SoPlexBase<Real>::maxObjRational(int i) const;
-
-  template <>
-  typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisRowStatus(int row) const;
-
-  template <>
-  typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisColStatus(int col) const;
+  // typename SoPlexBase<Real>::Settings& SoPlexBase<Real>::Settings::operator=(const Settings& settings);
 
   // template <>
-	// bool SoPlexBase<Real>::setSettings(const Settings& newSettings, const bool init);
+  // const SVectorReal& SoPlexBase<Real>::colVectorRealInternal(int i) const;
+
+  // template <>
+  // const Rational& SoPlexBase<Real>::maxObjRational(int i) const;
+
+  // template <>
+  // typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisRowStatus(int row) const;
+
+  // template <>
+  // typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisColStatus(int col) const;
+
+  // // template <>
+	// // bool SoPlexBase<Real>::setSettings(const Settings& newSettings, const bool init);
 
   template <>
 	bool SoPlexBase<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const;
@@ -66,157 +66,157 @@ namespace soplex
   template <>
   void SoPlexBase<Real>::printShortStatistics(std::ostream& os);
 
-  // template <>
-  // void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolverBase<Real>::Status stat);
+  // // template <>
+  // // void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolverBase<Real>::Status stat);
+
+  // // template <>
+  // // void SoPlexBase<Real>::setRandomSeed(unsigned int seed);
 
   // template <>
-  // void SoPlexBase<Real>::setRandomSeed(unsigned int seed);
-
-  template <>
-  void SoPlexBase<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
-
-  template <>
-  void SoPlexBase<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const;
-
-  template <>
-	bool SoPlexBase<Real>::_isConsistent() const;
+  // void SoPlexBase<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
 
   // template <>
-  // typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
-
-  template <>
-  void SoPlexBase<Real>::_addRowReal(const LPRowReal& lprow);
-
-  template <>
-	bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const bool init);
-
-  template <>
-  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const;
-
-  template <>
-  void SoPlexBase<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
-
-  template <>
-  void SoPlexBase<Real>::_addRowsReal(const LPRowSetReal& lprowset);
-
-  template <>
-  void SoPlexBase<Real>::_addColReal(const LPColReal& lpcol);
-
-  template <>
-  void SoPlexBase<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
-
-  template <>
-  void SoPlexBase<Real>::_addColsReal(const LPColSetReal& lpcolset);
-
-  template <>
-  void SoPlexBase<Real>::_changeRowReal(int i, const LPRowReal& lprow);
-
-  template <>
-  void SoPlexBase<Real>::_changeLhsReal(const VectorReal& lhs);
-
-  template <>
-  void SoPlexBase<Real>::_changeLhsReal(int i, const Real& lhs);
-
-  template <>
-  void SoPlexBase<Real>::_changeRhsReal(const VectorReal& rhs);
-
-  template <>
-  void SoPlexBase<Real>::_changeRhsReal(int i, const Real& rhs);
-
-  template <>
-  void SoPlexBase<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
-
-  template <>
-  void SoPlexBase<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs);
-
-  template <>
-  void SoPlexBase<Real>::_changeColReal(int i, const LPColReal& lpcol);
-
-  template <>
-  void SoPlexBase<Real>::_changeLowerReal(const VectorReal& lower);
-
-  template <>
-  void SoPlexBase<Real>::_changeLowerReal(int i, const Real& lower);
-
-  template <>
-  void SoPlexBase<Real>::_changeUpperReal(const VectorReal& upper);
-
-  template <>
-  void SoPlexBase<Real>::_changeUpperReal(int i, const Real& upper);
-
-  template <>
-  void SoPlexBase<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
-
-  template <>
-  void SoPlexBase<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper);
-
-  template <>
-  void SoPlexBase<Real>::_changeElementReal(int i, int j, const Real& val);
-
-  template <>
-  void SoPlexBase<Real>::_removeRowReal(int i);
-
-  template <>
-  void SoPlexBase<Real>::_removeRowsReal(int perm[]);
-
-  template <>
-  void SoPlexBase<Real>::_removeColReal(int i);
-
-  template <>
-  void SoPlexBase<Real>::_removeColsReal(int perm[]);
-
-  template <>
-  void SoPlexBase<Real>::_invalidateSolution();
-
-  template <>
-  void SoPlexBase<Real>::_ensureRationalLP();
-
-  template <>
-  void SoPlexBase<Real>::_ensureRealLPLoaded();
-
-  template <>
-	bool SoPlexBase<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
-
-  template <>
-  void SoPlexBase<Real>::_completeRangeTypesRational();
-
-  template <>
-  void SoPlexBase<Real>::_recomputeRangeTypesRational();
-
-  template <>
-  void SoPlexBase<Real>::_syncLPReal(bool time);
+  // void SoPlexBase<Real>::_rangeToPerm(int start, int end, int* perm, int permSize) const;
 
   // template <>
-  // void SoPlexBase<Real>::_syncLPRational(bool time);
+	// bool SoPlexBase<Real>::_isConsistent() const;
 
-  template <>
-  void SoPlexBase<Real>::_syncRealSolution();
+  // // template <>
+  // // typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
 
-  template <>
-  void SoPlexBase<Real>::_syncRationalSolution();
+  // template <>
+  // void SoPlexBase<Real>::_addRowReal(const LPRowReal& lprow);
 
-  template <>
-  const UnitVectorRational* SoPlexBase<Real>::_unitVectorRational(const int i);
+  // template <>
+	// bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const bool init);
 
-  template <>
-	bool SoPlexBase<Real>::_parseSettingsLine(char* line, const int lineNumber);
+  // template <>
+  // typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeRational(const Rational& lower, const Rational& upper) const;
 
-  template <>
-	bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
+  // template <>
+  // void SoPlexBase<Real>::_addRowReal(Real lhs, const SVectorReal& lprow, Real rhs);
 
-  template <>
-	bool SoPlexBase<Real>::boolParam(const BoolParam param) const;
+  // template <>
+  // void SoPlexBase<Real>::_addRowsReal(const LPRowSetReal& lprowset);
+
+  // template <>
+  // void SoPlexBase<Real>::_addColReal(const LPColReal& lpcol);
+
+  // template <>
+  // void SoPlexBase<Real>::_addColReal(Real obj, Real lower, const SVectorReal& lpcol, Real upper);
+
+  // template <>
+  // void SoPlexBase<Real>::_addColsReal(const LPColSetReal& lpcolset);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeRowReal(int i, const LPRowReal& lprow);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeLhsReal(const VectorReal& lhs);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeLhsReal(int i, const Real& lhs);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeRhsReal(const VectorReal& rhs);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeRhsReal(int i, const Real& rhs);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeRangeReal(const VectorReal& lhs, const VectorReal& rhs);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeRangeReal(int i, const Real& lhs, const Real& rhs);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeColReal(int i, const LPColReal& lpcol);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeLowerReal(const VectorReal& lower);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeLowerReal(int i, const Real& lower);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeUpperReal(const VectorReal& upper);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeUpperReal(int i, const Real& upper);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeBoundsReal(const VectorReal& lower, const VectorReal& upper);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeBoundsReal(int i, const Real& lower, const Real& upper);
+
+  // template <>
+  // void SoPlexBase<Real>::_changeElementReal(int i, int j, const Real& val);
+
+  // template <>
+  // void SoPlexBase<Real>::_removeRowReal(int i);
+
+  // template <>
+  // void SoPlexBase<Real>::_removeRowsReal(int perm[]);
+
+  // template <>
+  // void SoPlexBase<Real>::_removeColReal(int i);
+
+  // template <>
+  // void SoPlexBase<Real>::_removeColsReal(int perm[]);
+
+  // template <>
+  // void SoPlexBase<Real>::_invalidateSolution();
+
+  // template <>
+  // void SoPlexBase<Real>::_ensureRationalLP();
+
+  // template <>
+  // void SoPlexBase<Real>::_ensureRealLPLoaded();
+
+  // template <>
+	// bool SoPlexBase<Real>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
+
+  // template <>
+  // void SoPlexBase<Real>::_completeRangeTypesRational();
+
+  // template <>
+  // void SoPlexBase<Real>::_recomputeRangeTypesRational();
+
+  // template <>
+  // void SoPlexBase<Real>::_syncLPReal(bool time);
+
+  // // template <>
+  // // void SoPlexBase<Real>::_syncLPRational(bool time);
+
+  // template <>
+  // void SoPlexBase<Real>::_syncRealSolution();
+
+  // template <>
+  // void SoPlexBase<Real>::_syncRationalSolution();
+
+  // template <>
+  // const UnitVectorRational* SoPlexBase<Real>::_unitVectorRational(const int i);
+
+  // template <>
+	// bool SoPlexBase<Real>::_parseSettingsLine(char* line, const int lineNumber);
+
+  // template <>
+	// bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars);
+
+  // template <>
+	// bool SoPlexBase<Real>::boolParam(const BoolParam param) const;
 
   template <>
   SoPlexBase<Real>::Settings::BoolParam::BoolParam();
   template <>
   typename SoPlexBase<Real>::Settings::BoolParam SoPlexBase<Real>::Settings::boolParam = BoolParam();
 
-  template <>
-  typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const;
+  // template <>
+  // typename SPxSolverBase<Real>::Status SoPlexBase<Real>::status() const;
 
-  template <>
-	bool SoPlexBase<Real>::hasBasis() const;
+  // template <>
+	// bool SoPlexBase<Real>::hasBasis() const;
 
   template <>
   typename SoPlexBase<Real>::Settings::IntParam SoPlexBase<Real>::Settings::intParam = IntParam();
