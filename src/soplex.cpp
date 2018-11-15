@@ -42,8 +42,8 @@ namespace soplex
   template <>
   int SoPlexBase<Real>::intParam(const IntParam param) const;
 
-  template <>
-	bool SoPlexBase<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
+  // template <>
+	// bool SoPlexBase<Real>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const;
 
   template <>
   typename SoPlexBase<Real>::Settings& SoPlexBase<Real>::Settings::operator=(const Settings& settings);
@@ -60,8 +60,8 @@ namespace soplex
   template <>
   typename SPxSolverBase<Real>::VarStatus SoPlexBase<Real>::basisColStatus(int col) const;
 
-  template <>
-	bool SoPlexBase<Real>::setSettings(const Settings& newSettings, const bool init);
+  // template <>
+	// bool SoPlexBase<Real>::setSettings(const Settings& newSettings, const bool init);
 
   template <>
 	bool SoPlexBase<Real>::saveSettingsFile(const char* filename, const bool onlyChanged) const;
@@ -69,11 +69,11 @@ namespace soplex
   template <>
   void SoPlexBase<Real>::printShortStatistics(std::ostream& os);
 
-  template <>
-  void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolverBase<Real>::Status stat);
+  // template <>
+  // void SoPlexBase<Real>::printStatus(std::ostream& os, typename SPxSolverBase<Real>::Status stat);
 
-  template <>
-  void SoPlexBase<Real>::setRandomSeed(unsigned int seed);
+  // template <>
+  // void SoPlexBase<Real>::setRandomSeed(unsigned int seed);
 
   template <>
   void SoPlexBase<Real>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const;
@@ -84,8 +84,8 @@ namespace soplex
   template <>
 	bool SoPlexBase<Real>::_isConsistent() const;
 
-  template <>
-  typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
+  // template <>
+  // typename SoPlexBase<Real>::RangeType SoPlexBase<Real>::_rangeTypeReal(const Real& lower, const Real& upper) const;
 
   template <>
   void SoPlexBase<Real>::_addRowReal(const LPRowReal& lprow);
