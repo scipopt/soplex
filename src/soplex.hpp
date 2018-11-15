@@ -2543,3 +2543,436 @@ Rational SoPlexBase<R>::objValueRational()
     return _rationalZero;
 }
 
+/// Is stored primal solution feasible?
+template <class R>
+bool SoPlexBase<R>::isPrimalFeasible() const
+{
+  return (_hasSolReal && _solReal.isPrimalFeasible()) || (_hasSolRational && _solRational.isPrimalFeasible());
+}
+
+
+/// is a primal feasible solution available?
+template <class R>
+bool SoPlexBase<R>::hasPrimal() const
+{
+  return _hasSolReal || _hasSolRational;
+}
+
+/// is a primal unbounded ray available?
+template <class R>
+bool SoPlexBase<R>::hasPrimalRay() const
+{
+  return (_hasSolReal && _solReal.hasPrimalRay()) || (_hasSolRational && _solRational.hasPrimalRay());
+}
+
+
+/// is stored dual solution feasible?
+template <class R>
+bool SoPlexBase<R>::isDualFeasible() const
+{
+  return (_hasSolReal && _solReal.isDualFeasible()) || (_hasSolRational && _solRational.isDualFeasible());
+
+}
+
+/// is a dual feasible solution available?
+template <class R>
+bool SoPlexBase<R>::hasDual() const
+{
+  return _hasSolReal || _hasSolRational;
+}
+
+/// is Farkas proof of infeasibility available?
+template <class R>
+bool SoPlexBase<R>::hasDualFarkas() const
+{
+  return (_hasSolReal && _solReal.hasDualFarkas()) || (_hasSolRational && _solRational.hasDualFarkas());
+}
+
+/// gets the vector of slack values if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getSlacksReal(VectorBase<R>& vector)
+{
+  if( hasPrimal() && vector.dim() >= numRows() )
+    {
+      _syncRealSolution();
+      _solReal.getSlacks(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+/// gets the primal solution vector if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getPrimalRational(VectorBase<Rational>& vector)
+{
+  if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational() )
+    {
+      _syncRationalSolution();
+      _solRational.getPrimalSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+/// gets the vector of slack values if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getSlacksRational(VectorRational& vector)
+{
+  if( _rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational() )
+    {
+      _syncRationalSolution();
+      _solRational.getSlacks(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+template <class R>
+bool SoPlexBase<R>::getPrimalRayRational(VectorBase<Rational>& vector)
+{
+  if( _rationalLP != 0 && hasPrimalRay() && vector.dim() >= numColsRational() )
+    {
+      _syncRationalSolution();
+      _solRational.getPrimalRaySol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+
+/// gets the dual solution vector if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getDualRational(VectorBase<Rational>& vector)
+{
+  if( _rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational() )
+    {
+      _syncRationalSolution();
+      _solRational.getDualSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+
+/// gets the vector of reduced cost values if available; returns true on success
+template <class R>
+bool SoPlexBase<R>::getRedCostRational(VectorRational& vector)
+{
+  if( _rationalLP != 0 && hasDual() && vector.dim() >= numColsRational() )
+    {
+      _syncRationalSolution();
+      _solRational.getRedCostSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+/// gets the Farkas proof if LP is infeasible; returns true on success
+template <class R>
+bool SoPlexBase<R>::getDualFarkasRational(VectorBase<Rational>& vector)
+{
+  if( _rationalLP != 0 && hasDualFarkas() && vector.dim() >= numRowsRational() )
+    {
+      _syncRationalSolution();
+      _solRational.getDualFarkasSol(vector);
+      return true;
+    }
+  else
+    return false;
+}
+
+
+
+/// gets violation of bounds; returns true on success
+template <class R>
+bool SoPlexBase<R>::getBoundViolationRational(Rational& maxviol, Rational& sumviol)
+{
+  if( !isPrimalFeasible() )
+    return false;
+
+  // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    _syncLPRational(false);
+
+  _syncRationalSolution();
+  VectorRational& primal = _solRational._primal;
+  assert(primal.dim() == numColsRational());
+
+  maxviol = 0;
+  sumviol = 0;
+
+  for( int i = numColsRational() - 1; i >= 0; i-- )
+    {
+      Rational viol = lowerRational(i) - primal[i];
+      if( viol > 0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            {
+              maxviol = viol;
+              MSG_DEBUG( std::cout << "increased bound violation for column " << i << ": " << rationalToString(viol)
+                         << " lower: " << rationalToString(lowerRational(i))
+                         << ", primal: " << rationalToString(primal[i]) << "\n" );
+            }
+        }
+
+      viol = primal[i] - upperRational(i);
+      if( viol > 0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            {
+              maxviol = viol;
+              MSG_DEBUG( std::cout << "increased bound violation for column " << i << ": " << rationalToString(viol)
+                         << " upper: " << rationalToString(upperRational(i))
+                         << ", primal: " << rationalToString(primal[i]) << "\n" );
+            }
+        }
+    }
+
+  return true;
+}
+
+
+
+/// gets violation of constraints; returns true on success
+template <class R>
+bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol)
+{
+  if( !isPrimalFeasible() )
+    return false;
+
+  // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    _syncLPRational(false);
+
+  _syncRationalSolution();
+  VectorRational& primal = _solRational._primal;
+  assert(primal.dim() == numColsRational());
+
+  DVectorRational activity(numRowsRational());
+  _rationalLP->computePrimalActivity(primal, activity);
+  maxviol = 0;
+  sumviol = 0;
+
+  for( int i = numRowsRational() - 1; i >= 0; i-- )
+    {
+      Rational viol = lhsRational(i) - activity[i];
+      if( viol > 0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            {
+              maxviol = viol;
+              MSG_DEBUG( std::cout << "increased constraint violation for row " << i << ": " << rationalToString(viol)
+                         << " lhs: " << rationalToString(lhsRational(i))
+                         << ", activity: " << rationalToString(activity[i]) << "\n" );
+            }
+        }
+
+      viol = activity[i] - rhsRational(i);
+      if( viol > 0 )
+        {
+          sumviol += viol;
+          if( viol > maxviol )
+            {
+              maxviol = viol;
+              MSG_DEBUG( std::cout << "increased constraint violation for row " << i << ": " << rationalToString(viol)
+                         << " rhs: " << rationalToString(rhsRational(i))
+                         << ", activity: " << rationalToString(activity[i]) << "\n" );
+            }
+        }
+    }
+
+  return true;
+}
+
+
+
+/// gets violation of reduced costs; returns true on success
+template <class R>
+bool SoPlexBase<R>::getRedCostViolationRational(Rational& maxviol, Rational& sumviol)
+{
+  if( !isPrimalFeasible() || !isDualFeasible() )
+    return false;
+
+  // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    _syncLPRational(false);
+
+  _syncRationalSolution();
+  VectorRational& redcost = _solRational._redCost;
+  assert(redcost.dim() == numColsRational());
+
+  maxviol = 0;
+  sumviol = 0;
+
+  for( int c = numCols() - 1; c >= 0; c-- )
+    {
+      assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::UNDEFINED);
+
+      if( _colTypes[c] == RANGETYPE_FIXED )
+        {
+          assert(lowerRational(c) == upperRational(c));
+          continue;
+        }
+
+      assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_LOWER || _solRational._primal[c] == lowerRational(c));
+      assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::ON_UPPER || _solRational._primal[c] == upperRational(c));
+      assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED || _solRational._primal[c] == lowerRational(c));
+      assert(!_hasBasis || basisColStatus(c) != SPxSolverBase<R>::FIXED || _solRational._primal[c] == upperRational(c));
+
+      if( intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        {
+          if( _solRational._primal[c] != upperRational(c) && redcost[c] < 0 )
+            {
+              sumviol += -redcost[c];
+              if( redcost[c] < -maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(-redcost[c]) << "\n" );
+                  maxviol = -redcost[c];
+                }
+            }
+          if( _solRational._primal[c] != lowerRational(c) && redcost[c] > 0 )
+            {
+              sumviol += redcost[c];
+              if( redcost[c] > maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(redcost[c]) << "\n" );
+                  maxviol = redcost[c];
+                }
+            }
+        }
+      else
+        {
+          if( _solRational._primal[c] != upperRational(c) && redcost[c] > 0 )
+            {
+              sumviol += redcost[c];
+              if( redcost[c] > maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on upper bound: " << rationalToString(redcost[c]) << "\n" );
+                  maxviol = redcost[c];
+                }
+            }
+          if( _solRational._primal[c] != lowerRational(c) && redcost[c] < 0 )
+            {
+              sumviol += -redcost[c];
+              if( redcost[c] < -maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased reduced cost violation for column " << c << " not on lower bound: " << rationalToString(-redcost[c]) << "\n" );
+                  maxviol = -redcost[c];
+                }
+            }
+        }
+    }
+
+  return true;
+}
+
+
+
+/// gets violation of dual multipliers; returns true on success
+template <class R>
+bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumviol)
+{
+  if( !isDualFeasible() || !isPrimalFeasible() )
+    return false;
+
+  // if we have to synchronize, we do not measure time, because this would affect the solving statistics
+  if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    _syncLPRational(false);
+
+  _syncRationalSolution();
+  VectorRational& dual = _solRational._dual;
+  assert(dual.dim() == numRowsRational());
+
+  maxviol = 0;
+  sumviol = 0;
+
+  for( int r = numRows() - 1; r >= 0; r-- )
+    {
+      assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::UNDEFINED);
+
+      if( _rowTypes[r] == RANGETYPE_FIXED )
+        {
+          assert(lhsRational(r) == rhsRational(r));
+          continue;
+        }
+
+      assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_LOWER || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+      assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::ON_UPPER || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+      assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED || _solRational._slacks[r] <= lhsRational(r) + _rationalFeastol);
+      assert(!_hasBasis || basisRowStatus(r) != SPxSolverBase<R>::FIXED || _solRational._slacks[r] >= rhsRational(r) - _rationalFeastol);
+
+      if( intParam(SoPlexBase<R>::OBJSENSE) == OBJSENSE_MINIMIZE )
+        {
+          if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] < 0 )
+            {
+              sumviol += -dual[r];
+              if( dual[r] < -maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(-dual[r])
+                             << " (slack = " << rationalToString(_solRational._slacks[r])
+                             << ", status = " << basisRowStatus(r)
+                             << ", lhs = " << rationalToString(lhsRational(r))
+                             << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
+                  maxviol = -dual[r];
+                }
+            }
+          if( _solRational._slacks[r] > lhsRational(r) + _rationalFeastol && dual[r] > 0 )
+            {
+              sumviol += dual[r];
+              if( dual[r] > maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(dual[r])
+                             << " (slack = " << rationalToString(_solRational._slacks[r])
+                             << ", status = " << basisRowStatus(r)
+                             << ", lhs = " << rationalToString(lhsRational(r))
+                             << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
+                  maxviol = dual[r];
+                }
+            }
+        }
+      else
+        {
+          if( _solRational._slacks[r] < rhsRational(r) - _rationalFeastol && dual[r] > 0 )
+            {
+              sumviol += dual[r];
+              if( dual[r] > maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on upper bound: " << rationalToString(dual[r])
+                             << " (slack = " << rationalToString(_solRational._slacks[r])
+                             << ", status = " << basisRowStatus(r)
+                             << ", lhs = " << rationalToString(lhsRational(r))
+                             << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
+                  maxviol = dual[r];
+                }
+            }
+          if( _solRational._slacks[r] > lhsRational(r) + _rationalFeastol && dual[r] < 0 )
+            {
+              sumviol += -dual[r];
+              if( dual[r] < -maxviol )
+                {
+                  MSG_DEBUG( std::cout << "increased dual violation for row " << r << " not on lower bound: " << rationalToString(-dual[r])
+                             << " (slack = " << rationalToString(_solRational._slacks[r])
+                             << ", status = " << basisRowStatus(r)
+                             << ", lhs = " << rationalToString(lhsRational(r))
+                             << ", rhs = " << rationalToString(rhsRational(r)) << ")\n" );
+                  maxviol = -dual[r];
+                }
+            }
+        }
+    }
+
+  return true;
+}
+
