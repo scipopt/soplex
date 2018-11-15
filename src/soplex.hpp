@@ -17,6 +17,9 @@
  * @brief General templated functions for SoPlex
  */
 
+/// default setting for LU refactorization interval
+#define DEFAULT_REFACTOR_INTERVAL 200
+
 
 /// returns number of columns
 template <class R>
@@ -4158,3 +4161,1434 @@ bool SoPlexBase<R>::getDualViolationRational(Rational& maxviol, Rational& sumvio
       }
     return true;
   }
+
+  /// computes column c of basis inverse; performs rational factorization if not available; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::getBasisInverseColRational(const int c, SSVectorRational& vec)
+  {
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      computeBasisInverseRational();
+
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      return false;
+
+    try
+      {
+        vec.reDim(numRowsRational());
+        _rationalLUSolver.solveRight(vec, *_unitVectorRational(c));
+      }
+    catch( const SPxException& E )
+      {
+        MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while computing rational basis inverse column.\n" );
+        return false;
+      }
+    return true;
+  }
+
+
+
+  /// computes solution of basis matrix B * sol = rhs; performs rational factorization if not available; returns true
+  /// on success
+  template <class R>
+	bool SoPlexBase<R>::getBasisInverseTimesVecRational(const SVectorRational& rhs, SSVectorRational& sol)
+  {
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      computeBasisInverseRational();
+
+    if( _rationalLUSolver.status() != SLinSolverRational::OK )
+      return false;
+
+    try
+      {
+        sol.reDim(numRowsRational());
+        _rationalLUSolver.solveRight(sol, rhs);
+      }
+    catch( const SPxException& E )
+      {
+        MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> during right solve with rational basis inverse.\n" );
+        return false;
+      }
+    return true;
+  }
+
+
+
+  /// sets starting basis via arrays of statuses
+  template <class R>
+  void SoPlexBase<R>::setBasis(const typename SPxSolverBase<R>::VarStatus rows[], const typename SPxSolverBase<R>::VarStatus cols[])
+  {
+    _rationalLUSolver.clear();
+
+    if( _isRealLPLoaded )
+      {
+        assert(numRows() == _solver.nRows());
+        assert(numCols() == _solver.nCols());
+
+        _solver.setBasis(rows, cols);
+        _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
+      }
+    else
+      {
+        _basisStatusRows.reSize(numRows());
+        _basisStatusCols.reSize(numCols());
+
+        for( int i = numRows() - 1; i >= 0; i-- )
+          _basisStatusRows[i] = rows[i];
+
+        for( int j = numCols() - 1; j >= 0; j-- )
+          _basisStatusCols[j] = cols[j];
+
+        _hasBasis = true;
+      }
+  }
+
+
+
+  /// clears starting basis
+  template <class R>
+  void SoPlexBase<R>::clearBasis()
+  {
+    _solver.reLoad();
+    _status = _solver.status();
+    _hasBasis = false;
+    _rationalLUSolver.clear();
+  }
+
+
+
+  /// number of iterations since last call to solve
+  template <class R>
+	int SoPlexBase<R>::numIterations() const
+  {
+    return _statistics->iterations;
+  }
+
+
+
+  /// time spent in last call to solve
+  template <class R>
+  R SoPlexBase<R>::solveTime() const
+  {
+    return _statistics->solvingTime->time();
+  }
+
+
+
+  /// statistical information in form of a string
+  template <class R>
+  std::string SoPlexBase<R>::statisticString() const
+  {
+    std::stringstream s;
+    s  << "Factorizations     : " << std::setw(10) << _statistics->luFactorizationsReal << std::endl
+       << "  Time spent       : " << std::setw(10) << std::fixed << std::setprecision(2) << _statistics->luFactorizationTimeReal << std::endl
+       << "Solves             : " << std::setw(10) << _statistics->luSolvesReal << std::endl
+       << "  Time spent       : " << std::setw(10) << _statistics->luSolveTimeReal << std::endl
+       << "Solution time      : " << std::setw(10) << std::fixed << std::setprecision(2) << solveTime() << std::endl
+       << "Iterations         : " << std::setw(10) << numIterations() << std::endl;
+
+    return s.str();
+  }
+
+
+
+  /// name of starter
+  template <class R>
+  const char* SoPlexBase<R>::getStarterName()
+  {
+    if( _starter )
+      return _starter->getName();
+    else
+      return "none";
+  }
+
+
+
+  /// name of simplifier
+  template <class R>
+  const char* SoPlexBase<R>::getSimplifierName()
+  {
+    if( _simplifier )
+      return _simplifier->getName();
+    else
+      return "none";
+  }
+
+
+
+  /// name of scaling method after simplifier
+  template <class R>
+  const char* SoPlexBase<R>::getScalerName()
+  {
+    if( _scaler )
+      return _scaler->getName();
+    else
+      return "none";
+  }
+
+
+
+  /// name of currently loaded pricer
+  template <class R>
+  const char* SoPlexBase<R>::getPricerName()
+  {
+    return _solver.pricer()->getName();
+  }
+
+
+
+  /// name of currently loaded ratiotester
+  template <class R>
+  const char* SoPlexBase<R>::getRatiotesterName()
+  {
+    return _solver.ratiotester()->getName();
+  }
+
+
+  /// returns boolean parameter value
+  template <class R>
+	bool SoPlexBase<R>::boolParam(const BoolParam param) const
+  {
+    assert(param >= 0);
+    assert(param < SoPlexBase<R>::BOOLPARAM_COUNT);
+    return _currentSettings->_boolParamValues[param];
+  }
+
+  /// returns integer parameter value
+  template <class R>
+	int SoPlexBase<R>::intParam(const IntParam param) const
+  {
+    assert(param >= 0);
+    assert(param < INTPARAM_COUNT);
+    return _currentSettings->_intParamValues[param];
+  }
+
+  /// returns real parameter value
+  template <class R>
+  R SoPlexBase<R>::realParam(const RealParam param) const
+  {
+    assert(param >= 0);
+    assert(param < REALPARAM_COUNT);
+    return _currentSettings->_realParamValues[param];
+  }
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+  /// returns rational parameter value
+  Rational SoPlexBase<R>::rationalParam(const RationalParam param) const
+  {
+    assert(param >= 0);
+    assert(param < RATIONALPARAM_COUNT);
+    return _currentSettings->_rationalParamValues[param];
+  }
+#endif
+
+
+
+  /// returns current parameter settings
+  template <class R>
+  const typename SoPlexBase<R>::Settings& SoPlexBase<R>::settings() const
+  {
+    return *_currentSettings;
+  }
+
+
+
+  /// sets boolean parameter value; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::setBoolParam(const BoolParam param, const bool value, const bool init)
+  {
+    assert(param >= 0);
+    assert(param < SoPlexBase<R>::BOOLPARAM_COUNT);
+    assert(init || _isConsistent());
+
+    if( !init && value == boolParam(param) )
+      return true;
+
+    switch( param )
+      {
+      case LIFTING:
+        break;
+      case EQTRANS:
+        break;
+      case TESTDUALINF:
+        break;
+      case RATFAC:
+        break;
+      case USEDECOMPDUALSIMPLEX:
+        break;
+      case COMPUTEDEGEN:
+        break;
+      case USECOMPDUAL:
+        break;
+      case EXPLICITVIOL:
+        break;
+      case ACCEPTCYCLING:
+        break;
+      case RATREC:
+        break;
+      case POWERSCALING:
+        break;
+      case RATFACJUMP:
+        break;
+      case ROWBOUNDFLIPS:
+        _ratiotesterBoundFlipping.useBoundFlipsRow(value);
+        break;
+      case PERSISTENTSCALING:
+        break;
+      case FULLPERTURBATION:
+        _solver.useFullPerturbation(value);
+        break;
+      case ENSURERAY:
+        break;
+      default:
+        return false;
+      }
+
+    _currentSettings->_boolParamValues[param] = value;
+    return true;
+  }
+
+  /// sets integer parameter value; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const bool init)
+  {
+    assert(param >= 0);
+    assert(param < INTPARAM_COUNT);
+    assert(init || _isConsistent());
+
+    if( !init && value == intParam(param) )
+      return true;
+
+    // check for a valid parameter value wrt bounds
+    if( value < _currentSettings->intParam.lower[param] || value > _currentSettings->intParam.upper[param] )
+      return false;
+
+    switch( param )
+      {
+        // objective sense
+      case SoPlexBase<R>::OBJSENSE:
+        if( value != SoPlexBase<R>::OBJSENSE_MAXIMIZE && value != SoPlexBase<R>::OBJSENSE_MINIMIZE )
+          return false;
+        _realLP->changeSense(value == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? SPxLPBase<R>::MAXIMIZE : SPxLPBase<R>::MINIMIZE);
+        if( _rationalLP != 0 )
+          _rationalLP->changeSense(value == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? SPxLPRational::MAXIMIZE : SPxLPRational::MINIMIZE);
+        _invalidateSolution();
+        break;
+
+        // type of computational form, i.e., column or row representation
+      case SoPlexBase<R>::REPRESENTATION:
+        if( value != SoPlexBase<R>::REPRESENTATION_COLUMN && value != SoPlexBase<R>::REPRESENTATION_ROW && value != SoPlexBase<R>::REPRESENTATION_AUTO )
+          return false;
+        break;
+
+        // type of algorithm, i.e., primal or dual
+      case SoPlexBase<R>::ALGORITHM:
+        // decide upon entering/leaving at solve time depending on representation
+        break;
+
+        // type of LU update
+      case SoPlexBase<R>::FACTOR_UPDATE_TYPE:
+        if( value != SoPlexBase<R>::FACTOR_UPDATE_TYPE_ETA && value != SoPlexBase<R>::FACTOR_UPDATE_TYPE_FT )
+          return false;
+        _slufactor.setUtype(value == SoPlexBase<R>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
+        break;
+
+        // maximum number of updates before fresh factorization
+      case SoPlexBase<R>::FACTOR_UPDATE_MAX:
+        if( value == 0 )
+          _solver.basis().setMaxUpdates(DEFAULT_REFACTOR_INTERVAL);
+        else
+          _solver.basis().setMaxUpdates(value);
+        break;
+
+        // iteration limit (-1 if unlimited)
+      case SoPlexBase<R>::ITERLIMIT:
+        break;
+
+        // refinement limit (-1 if unlimited)
+      case SoPlexBase<R>::REFLIMIT:
+        break;
+
+        // stalling refinement limit (-1 if unlimited)
+      case SoPlexBase<R>::STALLREFLIMIT:
+        break;
+
+        // display frequency
+      case SoPlexBase<R>::DISPLAYFREQ:
+        _solver.setDisplayFreq(value);
+        break;
+
+        // verbosity level
+      case SoPlexBase<R>::VERBOSITY:
+        switch(value)
+          {
+          case 0:
+            spxout.setVerbosity(SPxOut::ERROR);
+            break;
+          case 1:
+            spxout.setVerbosity(SPxOut::WARNING);
+            break;
+          case 2:
+            spxout.setVerbosity(SPxOut::DEBUG);
+            break;
+          case 3:
+            spxout.setVerbosity(SPxOut::INFO1);
+            break;
+          case 4:
+            spxout.setVerbosity(SPxOut::INFO2);
+            break;
+          case 5:
+            spxout.setVerbosity(SPxOut::INFO3);
+            break;
+          }
+        break;
+
+        // type of simplifier
+      case SoPlexBase<R>::SIMPLIFIER:
+        switch( value )
+          {
+          case SIMPLIFIER_OFF:
+            _simplifier = 0;
+            break;
+          case SIMPLIFIER_AUTO:
+            _simplifier = &_simplifierMainSM;
+            assert(_simplifier != 0);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of scaler
+      case SoPlexBase<R>::SCALER:
+        switch( value )
+          {
+          case SCALER_OFF:
+            _scaler = 0;
+            break;
+          case SCALER_UNIEQUI:
+            _scaler = &_scalerUniequi;
+            break;
+          case SCALER_BIEQUI:
+            _scaler = &_scalerBiequi;
+            break;
+          case SCALER_GEO1:
+            _scaler = &_scalerGeo1;
+            break;
+          case SCALER_GEO8:
+            _scaler = &_scalerGeo8;
+            break;
+          case SCALER_LEASTSQ:
+            _scaler = &_scalerLeastsq;
+            break;
+          case SCALER_GEOEQUI:
+            _scaler = &_scalerGeoequi;
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of starter used to create crash basis
+      case SoPlexBase<R>::STARTER:
+        switch( value )
+          {
+          case STARTER_OFF:
+            _starter = 0;
+            break;
+          case STARTER_WEIGHT:
+            _starter = &_starterWeight;
+            break;
+          case STARTER_SUM:
+            _starter = &_starterSum;
+            break;
+          case STARTER_VECTOR:
+            _starter = &_starterVector;
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of pricer
+      case SoPlexBase<R>::PRICER:
+        switch( value )
+          {
+          case PRICER_AUTO:
+            _solver.setPricer(&_pricerAuto);
+            break;
+          case PRICER_DANTZIG:
+            _solver.setPricer(&_pricerDantzig);
+            break;
+          case PRICER_PARMULT:
+            _solver.setPricer(&_pricerParMult);
+            break;
+          case PRICER_DEVEX:
+            _solver.setPricer(&_pricerDevex);
+            break;
+          case PRICER_QUICKSTEEP:
+            _solver.setPricer(&_pricerQuickSteep);
+            break;
+          case PRICER_STEEP:
+            _solver.setPricer(&_pricerSteep);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for synchronizing real and rational LP
+      case SoPlexBase<R>::SYNCMODE:
+        switch( value )
+          {
+          case SYNCMODE_ONLYREAL:
+            if( _rationalLP != 0 )
+              {
+                _rationalLP->~SPxLPRational();
+                spx_free(_rationalLP);
+              }
+            break;
+          case SYNCMODE_AUTO:
+            if( intParam(param) == SYNCMODE_ONLYREAL )
+              _syncLPRational();
+            break;
+          case SYNCMODE_MANUAL:
+            _ensureRationalLP();
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for reading LP files; nothing to do but change the value if valid
+      case SoPlexBase<R>::READMODE:
+        switch( value )
+          {
+          case READMODE_REAL:
+          case READMODE_RATIONAL:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for iterative refinement strategy; nothing to do but change the value if valid
+      case SoPlexBase<R>::SOLVEMODE:
+        switch( value )
+          {
+          case SOLVEMODE_REAL:
+          case SOLVEMODE_AUTO:
+          case SOLVEMODE_RATIONAL:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode for a posteriori feasibility checks; nothing to do but change the value if valid
+      case SoPlexBase<R>::CHECKMODE:
+        switch( value )
+          {
+          case CHECKMODE_REAL:
+          case CHECKMODE_AUTO:
+          case CHECKMODE_RATIONAL:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of ratio test
+      case SoPlexBase<R>::RATIOTESTER:
+        switch( value )
+          {
+          case RATIOTESTER_TEXTBOOK:
+            _solver.setTester(&_ratiotesterTextbook);
+            break;
+          case RATIOTESTER_HARRIS:
+            _solver.setTester(&_ratiotesterHarris);
+            break;
+          case RATIOTESTER_FAST:
+            _solver.setTester(&_ratiotesterFast);
+            break;
+          case RATIOTESTER_BOUNDFLIPPING:
+            _solver.setTester(&_ratiotesterBoundFlipping);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // type of timer
+      case SoPlexBase<R>::TIMER:
+        switch( value )
+          {
+          case TIMER_OFF:
+            _solver.setTiming( Timer::OFF);
+            break;
+          case TIMER_CPU:
+            _solver.setTiming( Timer::USER_TIME );
+            break;
+          case TIMER_WALLCLOCK:
+            _solver.setTiming( Timer::WALLCLOCK_TIME);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // mode of hyper pricing
+      case SoPlexBase<R>::HYPER_PRICING:
+        switch( value )
+          {
+          case HYPER_PRICING_OFF:
+          case HYPER_PRICING_AUTO:
+          case HYPER_PRICING_ON:
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // minimum number of stalling refinements since last pivot to trigger rational factorization
+      case SoPlexBase<R>::RATFAC_MINSTALLS:
+        break;
+
+        // maximum number of conjugate gradient iterations in least square scaling
+      case SoPlexBase<R>::LEASTSQ_MAXROUNDS:
+        if( _scaler )
+          _scaler->setIntParam(value);
+        break;
+
+        // mode of solution polishing
+      case SoPlexBase<R>::SOLUTION_POLISHING:
+        switch( value )
+          {
+          case POLISHING_OFF:
+            _solver.setSolutionPolishing(SPxSolverBase<R>::POLISH_OFF);
+            break;
+          case POLISHING_INTEGRALITY:
+            _solver.setSolutionPolishing(SPxSolverBase<R>::POLISH_INTEGRALITY);
+            break;
+          case POLISHING_FRACTIONALITY:
+            _solver.setSolutionPolishing(SPxSolverBase<R>::POLISH_FRACTIONALITY);
+            break;
+          default:
+            return false;
+          }
+        break;
+
+        // the decomposition based simplex parameter settings
+      case DECOMP_ITERLIMIT:
+        break;
+      case DECOMP_MAXADDEDROWS:
+        break;
+      case DECOMP_DISPLAYFREQ:
+        break;
+      case DECOMP_VERBOSITY:
+        break;
+
+        // printing of condition n
+      case PRINTBASISMETRIC:
+        _solver.setMetricInformation  (value);
+        break;
+
+      default:
+        return false;
+      }
+
+    _currentSettings->_intParamValues[param] = value;
+    return true;
+  }
+
+  /// sets real parameter value; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const bool init)
+  {
+    assert(param >= 0);
+    assert(param < REALPARAM_COUNT);
+    assert(init || _isConsistent());
+
+    if( !init && value == realParam(param) )
+      return true;
+
+    if( value < _currentSettings->realParam.lower[param] || value > _currentSettings->realParam.upper[param] )
+      return false;
+
+    // required to set a different feastol or opttol
+    Real tmp_value = value;
+
+    switch( param )
+      {
+        // primal feasibility tolerance; passed to the floating point solver only when calling solve()
+      case SoPlexBase<R>::FEASTOL:
+#ifndef SOPLEX_WITH_GMP
+        if( value < DEFAULT_EPS_PIVOT )
+          {
+            MSG_WARNING( spxout, spxout << "Cannot set feasibility tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
+            tmp_value = DEFAULT_EPS_PIVOT;
+            _rationalFeastol = DEFAULT_EPS_PIVOT;
+            break;
+          }
+#endif
+        _rationalFeastol = value;
+        break;
+
+        // dual feasibility tolerance; passed to the floating point solver only when calling solve()
+      case SoPlexBase<R>::OPTTOL:
+#ifndef SOPLEX_WITH_GMP
+        if( value < DEFAULT_EPS_PIVOT )
+          {
+            MSG_WARNING( spxout, spxout << "Cannot set optimality tolerance to small value " << value << " without GMP - using " << DEFAULT_EPS_PIVOT << ".\n");
+            tmp_value = DEFAULT_EPS_PIVOT;
+            _rationalOpttol = DEFAULT_EPS_PIVOT;
+            break;
+          }
+#endif
+        _rationalOpttol = value;
+        break;
+
+        // general zero tolerance
+      case SoPlexBase<R>::EPSILON_ZERO:
+        Param::setEpsilon(value);
+        break;
+
+        // zero tolerance used in factorization
+      case SoPlexBase<R>::EPSILON_FACTORIZATION:
+        Param::setEpsilonFactorization(value);
+        break;
+
+        // zero tolerance used in update of the factorization
+      case SoPlexBase<R>::EPSILON_UPDATE:
+        Param::setEpsilonUpdate(value);
+        break;
+
+        // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
+      case SoPlexBase<R>::EPSILON_PIVOT:
+        Param::setEpsilonPivot(value);
+        break;
+
+        // infinity threshold
+      case SoPlexBase<R>::INFTY:
+        _rationalPosInfty = value;
+        _rationalNegInfty = -value;
+        if( intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL )
+          _recomputeRangeTypesRational();
+        break;
+
+        // time limit in seconds (INFTY if unlimited)
+      case SoPlexBase<R>::TIMELIMIT:
+        break;
+
+        // lower limit on objective value is set in solveReal()
+      case SoPlexBase<R>::OBJLIMIT_LOWER:
+        break;
+
+        // upper limit on objective value is set in solveReal()
+      case SoPlexBase<R>::OBJLIMIT_UPPER:
+        break;
+
+        // working tolerance for feasibility in floating-point solver
+      case SoPlexBase<R>::FPFEASTOL:
+        break;
+
+        // working tolerance for optimality in floating-point solver
+      case SoPlexBase<R>::FPOPTTOL:
+        break;
+
+        // maximum increase of scaling factors between refinements
+      case SoPlexBase<R>::MAXSCALEINCR:
+        _rationalMaxscaleincr = value;
+        break;
+
+        // lower threshold in lifting (nonzero matrix coefficients with smaller absolute value will be reformulated)
+      case SoPlexBase<R>::LIFTMINVAL:
+        break;
+
+        // upper threshold in lifting (nonzero matrix coefficients with larger absolute value will be reformulated)
+      case SoPlexBase<R>::LIFTMAXVAL:
+        break;
+
+        // threshold for sparse pricing
+      case SoPlexBase<R>::SPARSITY_THRESHOLD:
+        break;
+
+        // threshold on number of rows vs. number of columns for switching from column to row representations in auto mode
+      case SoPlexBase<R>::REPRESENTATION_SWITCH:
+        break;
+
+        // geometric frequency at which to apply rational reconstruction
+      case SoPlexBase<R>::RATREC_FREQ:
+        break;
+
+        // minimal reduction (sum of removed rows/cols) to continue simplification
+      case SoPlexBase<R>::MINRED:
+        break;
+
+      case SoPlexBase<R>::REFAC_BASIS_NNZ:
+        break;
+
+      case SoPlexBase<R>::REFAC_UPDATE_FILL:
+        break;
+
+      case SoPlexBase<R>::REFAC_MEM_FACTOR:
+        break;
+
+        // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
+      case SoPlexBase<R>::LEASTSQ_ACRCY:
+        if( _scaler )
+          _scaler->setRealParam(value);
+        break;
+
+        // objective offset
+      case SoPlexBase<R>::OBJ_OFFSET:
+        if( _realLP )
+          _realLP->changeObjOffset(value);
+        if( _rationalLP )
+          _rationalLP->changeObjOffset(value);
+        break;
+
+      default:
+        return false;
+      }
+
+    _currentSettings->_realParamValues[param] = tmp_value;
+    return true;
+  }
+
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+  /// sets rational parameter value; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::setRationalParam(const RationalParam param, const Rational value, const bool init)
+  {
+    assert(param >= 0);
+    assert(param < RATIONALPARAM_COUNT);
+    assert(init || _isConsistent());
+
+    if( !init && value == rationalParam(param) )
+      return true;
+
+    if( value < _currentSettings->rationalParam.lower[param] || value > _currentSettings->rationalParam.upper[param] )
+      return false;
+
+    switch( param )
+      {
+      default:
+        // currently, there are no rational-valued parameters
+        return false;
+      }
+
+    _currentSettings->_rationalParamValues[param] = value;
+    return true;
+  }
+#endif
+
+
+
+  /// sets parameter settings; returns true on success
+  template <class R>
+	bool SoPlexBase<R>::setSettings(const Settings& newSettings, const bool init)
+  {
+    assert(init || _isConsistent());
+
+    bool success = true;
+
+    *_currentSettings = newSettings;
+
+    for( int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++ )
+      success &= setBoolParam((BoolParam)i, _currentSettings->_boolParamValues[i], init);
+
+    for( int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; i++ )
+      success &= setIntParam((IntParam)i, _currentSettings->_intParamValues[i], init);
+
+    for( int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; i++ )
+      success &= setRealParam((RealParam)i, _currentSettings->_realParamValues[i], init);
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+    for( int i = 0; i < SoPlexBase<R>::RATIONALPARAM_COUNT; i++ )
+      success &= setRationalParam((RationalParam)i, _currentSettings->_rationalParamValues[i], init);
+#endif
+
+    assert(_isConsistent());
+
+    return success;
+  }
+
+  /// resets default parameter settings
+  template <class R>
+  void SoPlexBase<R>::resetSettings(const bool quiet, const bool init)
+  {
+    for( int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++ )
+      setBoolParam((BoolParam)i, _currentSettings->boolParam.defaultValue[i], init);
+
+    for( int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; i++ )
+      setIntParam((IntParam)i, _currentSettings->intParam.defaultValue[i], init);
+
+    for( int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; i++ )
+      setRealParam((RealParam)i, _currentSettings->realParam.defaultValue[i], init);
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+    for( int i = 0; i < SoPlexBase<R>::RATIONALPARAM_COUNT; i++ )
+      success &= setRationalParam((RationalParam)i, _currentSettings->rationalParam.defaultValue[i], init);
+#endif
+  }
+
+  /// print non-default parameter values
+  template <class R>
+  void SoPlexBase<R>::printUserSettings()
+  {
+    bool printedValue = false;
+
+    SPxOut::setFixed(spxout.getCurrentStream());
+
+    for( int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++ )
+      {
+        if( _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
+          continue;
+
+        spxout << "bool:" << _currentSettings->boolParam.name[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
+        printedValue = true;
+      }
+
+    for( int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; i++ )
+      {
+        if( _currentSettings->_intParamValues[i] == _currentSettings->intParam.defaultValue[i] )
+          continue;
+
+        spxout << "int:" << _currentSettings->intParam.name[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
+        printedValue = true;
+      }
+
+    SPxOut::setScientific(spxout.getCurrentStream());
+
+    for( int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; i++ )
+      {
+        if( _currentSettings->_realParamValues[i] == _currentSettings->realParam.defaultValue[i] )
+          continue;
+
+        spxout << "real:" << _currentSettings->realParam.name[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
+        printedValue = true;
+      }
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+    for( int i = 0; i < SoPlexBase<R>::RATIONALPARAM_COUNT; i++ )
+      {
+        if( _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
+          continue;
+
+        spxout << "rational:" << _currentSettings->rationalParam.name[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
+        printedValue = true;
+      }
+#endif
+
+    if( _solver.random.getSeed() != DEFAULT_RANDOM_SEED )
+      {
+        spxout << "uint:random_seed = " << _solver.random.getSeed() << "\n";
+        printedValue = true;
+      }
+
+    if( printedValue )
+      spxout << std::endl;
+  }
+
+  /// prints status
+  template <class R>
+  void SoPlexBase<R>::printStatus(std::ostream& os, typename SPxSolverBase<R>::Status stat)
+  {
+    os << "SoPlex status       : ";
+
+    switch( stat )
+      {
+      case SPxSolverBase<R>::ERROR:
+        os << "error [unspecified]";
+        break;
+      case SPxSolverBase<R>::NO_RATIOTESTER:
+        os << "error [no ratiotester loaded]";
+        break;
+      case SPxSolverBase<R>::NO_PRICER:
+        os << "error [no pricer loaded]";
+        break;
+      case SPxSolverBase<R>::NO_SOLVER:
+        os << "error [no linear solver loaded]";
+        break;
+      case SPxSolverBase<R>::NOT_INIT:
+        os << "error [not initialized]";
+        break;
+      case SPxSolverBase<R>::ABORT_CYCLING:
+        os << "solving aborted [cycling]";
+        break;
+      case SPxSolverBase<R>::ABORT_TIME:
+        os << "solving aborted [time limit reached]";
+        break;
+      case SPxSolverBase<R>::ABORT_ITER:
+        os << "solving aborted [iteration limit reached]";
+        break;
+      case SPxSolverBase<R>::ABORT_VALUE:
+        os << "solving aborted [objective limit reached]";
+        break;
+      case SPxSolverBase<R>::NO_PROBLEM:
+        os << "no problem loaded";
+        break;
+      case SPxSolverBase<R>::REGULAR:
+        os << "basis is regular";
+        break;
+      case SPxSolverBase<R>::SINGULAR:
+        os << "basis is singular";
+        break;
+      case SPxSolverBase<R>::OPTIMAL:
+        os << "problem is solved [optimal]";
+        break;
+      case SPxSolverBase<R>::UNBOUNDED:
+        os << "problem is solved [unbounded]";
+        break;
+      case SPxSolverBase<R>::INFEASIBLE:
+        os << "problem is solved [infeasible]";
+        break;
+      case SPxSolverBase<R>::INForUNBD:
+        os << "problem is solved [infeasible or unbounded]";
+        break;
+      case SPxSolverBase<R>::OPTIMAL_UNSCALED_VIOLATIONS:
+         os << "problem is solved [optimal with unscaled violations]";
+         break;
+      default:
+      case SPxSolverBase<R>::UNKNOWN:
+        os << "unknown";
+        break;
+      }
+
+    os << "\n";
+  }
+
+
+  /// prints version and compilation options
+  template <class R>
+  void SoPlexBase<R>::printVersion() const
+  {
+    // do not use preprocessor directives within the MSG_INFO1 macro
+#if (SOPLEX_SUBVERSION > 0)
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+               << "." << (SOPLEX_VERSION % 100)/10
+               << "." << SOPLEX_VERSION % 10
+               << "." << SOPLEX_SUBVERSION );
+#else
+    MSG_INFO1( spxout, spxout << "SoPlex version " << SOPLEX_VERSION/100
+               << "." << (SOPLEX_VERSION % 100)/10
+               << "." << SOPLEX_VERSION % 10 );
+#endif
+
+#ifndef NDEBUG
+    MSG_INFO1( spxout, spxout << " [mode: debug]" );
+#else
+    MSG_INFO1( spxout, spxout << " [mode: optimized]" );
+#endif
+
+    MSG_INFO1( spxout, spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
+
+#ifdef SOPLEX_WITH_GMP
+#ifdef mpir_version
+    MSG_INFO1( spxout, spxout << " [rational: MPIR " << mpir_version << "]" );
+#else
+    MSG_INFO1( spxout, spxout << " [rational: GMP " << gmp_version << "]" );
+#endif
+#else
+    MSG_INFO1( spxout, spxout << " [rational: long double]" );
+#endif
+
+    MSG_INFO1( spxout, spxout << " [githash: " << getGitHash() << "]\n" );
+  }
+
+
+  /// checks if real LP and rational LP are in sync; dimensions will always be compared,
+  /// vector and matrix values only if the respective parameter is set to true.
+  /// If quiet is set to true the function will only display which vectors are different.
+  template <class R>
+	bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVals, const bool quiet) const
+  {
+    bool result = true;
+    bool nRowsMatch = true;
+    bool nColsMatch = true;
+    bool rhsDimMatch = true;
+    bool lhsDimMatch = true;
+    bool maxObjDimMatch = true;
+    bool upperDimMatch = true;
+    bool lowerDimMatch = true;
+
+    // compare number of Rows
+    if( _realLP->nRows() != _rationalLP->nRows() )
+      {
+        MSG_INFO1( spxout, spxout << "The number of Rows in the Real LP does not match the one in the Rational LP."
+                   << " Real LP: " << _realLP->nRows() << "  Rational LP: " << _rationalLP->nRows() << std::endl);
+        result = false;
+        nRowsMatch = false;
+      }
+
+    // compare number of Columns
+    if( _realLP->nCols() != _rationalLP->nCols() )
+      {
+        MSG_INFO1( spxout, spxout << "The number of Columns in the Real LP does not match the one in the Rational LP."
+                   << " Real LP: " << _realLP->nCols() << "  Rational LP: " << _rationalLP->nCols() << std::endl);
+        result = false;
+        nColsMatch = false;
+      }
+
+    // compare number of nonZeros
+    if( _realLP->nNzos() != _rationalLP->nNzos() )
+      {
+        MSG_INFO1( spxout, spxout << "The number of nonZeros in the Real LP does not match the one in the Rational LP."
+                   << " Real LP: " << _realLP->nNzos() << "  Rational LP: " << _rationalLP->nNzos() << std::endl);
+        result = false;
+      }
+
+    // compare the dimensions of the right hand side vectors
+    if( _realLP->rhs().dim() != _rationalLP->rhs().dim() )
+      {
+        MSG_INFO1( spxout, spxout << "The dimension of the right hand side vector of the Real LP does not match the one of the Rational LP."
+                   << " Real LP: " << _realLP->rhs().dim() << "  Rational LP: " << _rationalLP->rhs().dim() << std::endl);
+        result = false;
+        rhsDimMatch = false;
+
+      }
+
+    // compare the dimensions of the left hand side vectors
+    if( _realLP->lhs().dim() != _rationalLP->lhs().dim() )
+      {
+        MSG_INFO1( spxout, spxout << "The dimension of the left hand side vector of the Real LP does not match the one of the Rational LP."
+                   << " Real LP: " << _realLP->lhs().dim() << "  Rational LP: " << _rationalLP->lhs().dim() << std::endl);
+        result = false;
+        lhsDimMatch = false;
+      }
+
+    // compare the dimensions of the objective function vectors
+    if( _realLP->maxObj().dim() != _rationalLP->maxObj().dim() )
+      {
+        MSG_INFO1( spxout, spxout << "The dimension of the objective function vector of the Real LP does not match the one of the Rational LP."
+                   << " Real LP: " << _realLP->maxObj().dim() << "  Rational LP: " << _rationalLP->maxObj().dim() << std::endl);
+        result = false;
+        maxObjDimMatch = false;
+      }
+
+    // compare the sense
+    if( (int)_realLP->spxSense() != (int)_rationalLP->spxSense() )
+      {
+        MSG_INFO1( spxout, spxout << "The objective function sense of the Real LP does not match the one of the Rational LP."
+                   << " Real LP: " << (_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? "MIN" : "MAX")
+                   << "  Rational LP: " << (_rationalLP->spxSense() == SPxLPRational::MINIMIZE ? "MIN" : "MAX") << std::endl);
+        result = false;
+      }
+
+    // compare the dimensions of upper bound vectors
+    if( _realLP->upper().dim() != _rationalLP->upper().dim() )
+      {
+        MSG_INFO1( spxout, spxout << "The dimension of the upper bound vector of the Real LP does not match the one of the Rational LP."
+                   << " Real LP: " << _realLP->upper().dim() << "  Rational LP: " << _rationalLP->upper().dim() << std::endl);
+        result = false;
+        upperDimMatch = false;
+      }
+
+    // compare the dimensions of the objective function vectors
+    if( _realLP->lower().dim() != _rationalLP->lower().dim() )
+      {
+        MSG_INFO1( spxout, spxout << "The dimension of the lower bound vector of the Real LP does not match the one of the Rational LP."
+                   << " Real LP: " << _realLP->lower().dim() << "  Rational LP: " << _rationalLP->lower().dim() << std::endl);
+        result = false;
+        lowerDimMatch = false;
+      }
+
+    // compares the values of the rhs, lhs, maxObj, upper, lower vectors
+    if( checkVecVals )
+      {
+        bool rhsValMatch = true;
+        bool lhsValMatch = true;
+        bool maxObjValMatch = true;
+        bool upperValMatch = true;
+        bool lowerValMatch = true;
+
+        // compares the values of the right hand side vectors
+        if( rhsDimMatch )
+          {
+            for( int i = 0; i < _realLP->rhs().dim(); i++ )
+              {
+                if( (GE(_realLP->rhs()[i], realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->rhs()[i] >= _rationalPosInfty))
+                    || (LT(_realLP->rhs()[i], realParam(SoPlexBase<R>::INFTY)) && _rationalLP->rhs()[i] < _rationalPosInfty
+                        && !_rationalLP->rhs()[i].isAdjacentTo((double)_realLP->rhs()[i])) )
+                  {
+                    if( !quiet )
+                      {
+                        MSG_INFO1( spxout, spxout << "Entries number " << i << " of the right hand side vectors don't match."
+                                   << " Real LP: " << _realLP->rhs()[i] << "  Rational LP: " << _rationalLP->rhs()[i] << std::endl);
+                      }
+                    rhsValMatch = false;
+                    result = false;
+                  }
+              }
+
+            if( !rhsValMatch && quiet )
+              {
+                MSG_INFO1( spxout, spxout << "The values of the right hand side vectors don't match." << std::endl );
+              }
+          }
+
+        // compares the values of the left hand side vectors
+        if( lhsDimMatch )
+          {
+            for( int i = 0; i < _realLP->lhs().dim(); i++ )
+              {
+                if( (LE(_realLP->lhs()[i], -realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->lhs()[i] <= _rationalNegInfty))
+                    || (GT(_realLP->lhs()[i], -realParam(SoPlexBase<R>::INFTY)) && _rationalLP->lhs()[i] > _rationalNegInfty
+                        && !_rationalLP->lhs()[i].isAdjacentTo((double)_realLP->lhs()[i])) )
+                  {
+                    if( !quiet )
+                      {
+                        MSG_INFO1( spxout, spxout << "Entries number " << i << " of the left hand side vectors don't match."
+                                   << " Real LP: " << _realLP->lhs()[i] << "  Rational LP: " << _rationalLP->lhs()[i] << std::endl);
+                      }
+                    lhsValMatch = false;
+                    result = false;
+                  }
+              }
+
+            if( !lhsValMatch && quiet )
+              {
+                MSG_INFO1( spxout, spxout << "The values of the left hand side vectors don't match." << std::endl );
+              }
+          }
+
+        // compares the values of the objective function vectors
+        if( maxObjDimMatch )
+          {
+            for( int i = 0; i < _realLP->maxObj().dim(); i++ )
+              {
+                if( !_rationalLP->maxObj()[i].isAdjacentTo((double)_realLP->maxObj()[i]) )
+                  {
+                    if( !quiet )
+                      {
+                        MSG_INFO1( spxout, spxout << "Entries number " << i << " of the objective function vectors don't match."
+                                   << " Real LP: " << _realLP->maxObj()[i] << "  Rational LP: " << _rationalLP->maxObj()[i] << std::endl);
+                      }
+                    maxObjValMatch = false;
+                    result = false;
+                  }
+              }
+
+            if( !maxObjValMatch && quiet )
+              {
+                MSG_INFO1( spxout, spxout << "The values of the objective function vectors don't match." << std::endl );
+              }
+          }
+
+        // compares the values of the upper bound vectors
+        if( upperDimMatch )
+          {
+            for( int i = 0; i < _realLP->upper().dim(); i++ )
+              {
+                if( (GE(_realLP->upper()[i], realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->upper()[i] >= _rationalPosInfty))
+                    || (LT(_realLP->upper()[i], realParam(SoPlexBase<R>::INFTY)) && _rationalLP->upper()[i] < _rationalPosInfty
+                        && !_rationalLP->upper()[i].isAdjacentTo((double)_realLP->upper()[i])) )
+                  {
+                    if( !quiet )
+                      {
+                        MSG_INFO1( spxout, spxout << "Entries number " << i << " of the upper bound vectors don't match."
+                                   << " Real LP: " << _realLP->upper()[i] << "  Rational LP: " << _rationalLP->upper()[i] << std::endl);
+                      }
+                    upperValMatch = false;
+                    result = false;
+                  }
+              }
+
+            if( !upperValMatch && quiet )
+              {
+                MSG_INFO1( spxout, spxout << "The values of the upper bound vectors don't match." << std::endl );
+              }
+          }
+
+        // compares the values of the lower bound vectors
+        if( lowerDimMatch )
+          {
+            for( int i = 0; i < _realLP->lower().dim(); i++ )
+              {
+                if( (LE(_realLP->lower()[i], -realParam(SoPlexBase<R>::INFTY)) != (_rationalLP->lower()[i] <= _rationalNegInfty))
+                    || (GT(_realLP->lower()[i], -realParam(SoPlexBase<R>::INFTY)) && _rationalLP->lower()[i] > _rationalNegInfty
+                        && !_rationalLP->lower()[i].isAdjacentTo((double)_realLP->lower()[i])) )
+                  {
+                    if( !quiet )
+                      {
+                        MSG_INFO1( spxout, spxout << "Entries number " << i << " of the lower bound vectors don't match."
+                                   << " Real LP: " << _realLP->lower()[i] << "  Rational LP: " << _rationalLP->lower()[i] << std::endl);
+                      }
+                    lowerValMatch = false;
+                    result = false;
+                  }
+              }
+
+            if( !lowerValMatch && quiet )
+              {
+                MSG_INFO1( spxout, spxout << "The values of the lower bound vectors don't match." << std::endl );
+              }
+          }
+      }
+
+    // compare the values of the matrix
+    if( checkMatVals && nRowsMatch && nColsMatch )
+      {
+        bool matrixValMatch = true;
+
+        for( int i = 0; i < _realLP->nCols() ; i++ )
+          {
+            for( int j = 0;j < _realLP->nRows() ; j++ )
+              {
+                if( !_rationalLP->colVector(i)[j].isAdjacentTo((double)_realLP->colVector(i)[j]) )
+                  {
+                    if( !quiet )
+                      {
+                        MSG_INFO1( spxout, spxout << "Entries number " << j << " of column number " << i << " don't match."
+                                   << " Real LP: " << _realLP->colVector(i)[j] << "  Rational LP: " << _rationalLP->colVector(i)[j] << std::endl);
+                      }
+                    matrixValMatch = false;
+                    result = false;
+                  }
+              }
+          }
+
+        if( !matrixValMatch && quiet )
+          {
+            MSG_INFO1( spxout, spxout << "The values of the matrices don't match." << std::endl );
+          }
+      }
+
+    return result;
+  }
+
+
+
+  /// set the random seed of the solver instance
+  template <class R>
+  void SoPlexBase<R>::setRandomSeed(unsigned int seed)
+  {
+    _solver.random.setSeed(seed);
+  }
+
+
+
+  /// returns the current random seed of the solver instance or the one stored in the settings
+  template <class R>
+  unsigned int  SoPlexBase<R>::randomSeed() const
+  {
+    return _solver.random.getSeed();
+  }
+
+
+
+  /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
+  template <class R>
+  void SoPlexBase<R>::_ensureDSVectorRationalMemory(DSVectorRational& vec, const int newmax) const
+  {
+    assert(newmax > vec.size());
+    if( vec.size() >= vec.max() )
+      vec.setMax(newmax);
+  }
+
+
+
+  /// creates a permutation for removing rows/columns from an array of indices
+  template <class R>
+  void SoPlexBase<R>::_idxToPerm(int* idx, int idxSize, int* perm, int permSize) const
+  {
+    assert(idx != 0);
+    assert(idxSize >= 0);
+    assert(perm != 0);
+    assert(permSize >= 0);
+
+    for( int i = 0; i < permSize; i++ )
+      perm[i] = i;
+
+    for( int i = 0; i < idxSize; i++ )
+      {
+        assert(idx[i] >= 0);
+        assert(idx[i] < permSize);
+        perm[idx[i]] = -1;
+      }
+  }
+
+
+
+  /// creates a permutation for removing rows/columns from a range of indices
+  template <class R>
+  void SoPlexBase<R>::_rangeToPerm(int start, int end, int* perm, int permSize) const
+  {
+    assert(perm != 0);
+    assert(permSize >= 0);
+
+    for( int i = 0; i < permSize; i++ )
+      perm[i] = (i < start || i > end) ? i : -1;
+  }
+
+
+
+  /// checks consistency
+  template <class R>
+	bool SoPlexBase<R>::_isConsistent() const
+  {
+    assert(_statistics != 0);
+    assert(_currentSettings != 0);
+
+    assert(_realLP != 0);
+    assert(_rationalLP != 0 || intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL);
+
+    assert(_realLP != &_solver || _isRealLPLoaded);
+    assert(_realLP == &_solver || !_isRealLPLoaded);
+
+    assert(!_hasBasis || _isRealLPLoaded || _basisStatusRows.size() == numRows());
+    assert(!_hasBasis || _isRealLPLoaded || _basisStatusCols.size() == numCols());
+    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _hasBasis);
+    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == _rationalLUSolverBind.size());
+    assert(_rationalLUSolver.status() == SLinSolverRational::UNLOADED || _rationalLUSolver.dim() == numRowsRational());
+
+    assert(_rationalLP == 0 || _colTypes.size() == numColsRational());
+    assert(_rationalLP == 0 || _rowTypes.size() == numRowsRational());
+
+    return true;
+  }
+
+
+
+  /// should solving process be stopped?
+  template <class R>
+	bool SoPlexBase<R>::_isSolveStopped(bool& stoppedTime, bool& stoppedIter) const
+  {
+    assert(_statistics != 0);
+
+    stoppedTime = (realParam(TIMELIMIT) < realParam(INFTY) && _statistics->solvingTime->time() >= realParam(TIMELIMIT));
+    stoppedIter = (intParam(ITERLIMIT) >= 0 && _statistics->iterations >= intParam(ITERLIMIT))
+      || (intParam(REFLIMIT) >= 0 && _statistics->refinements >= intParam(REFLIMIT))
+      || (intParam(STALLREFLIMIT) >= 0 && _statistics->stallRefinements >= intParam(STALLREFLIMIT));
+
+    return stoppedTime || stoppedIter;
+  }
+
+
+
+  /// determines RangeType from real bounds
+  template <class R>
+  typename SoPlexBase<R>::RangeType SoPlexBase<R>::_rangeTypeReal(const R& lower, const R& upper) const
+  {
+    assert(lower <= upper);
+
+    if( lower <= -infinity )
+      {
+        if( upper >= infinity )
+          return RANGETYPE_FREE;
+        else
+          return RANGETYPE_UPPER;
+      }
+    else
+      {
+        if( upper >= infinity )
+          return RANGETYPE_LOWER;
+        else if( lower == upper )
+          return RANGETYPE_FIXED;
+        else
+          return RANGETYPE_BOXED;
+      }
+  }
+
+
