@@ -60,6 +60,9 @@
 
 #include "soplex/sol.h"
 
+// For multiple precision
+#include <boost/multiprecision/mpfr.hpp>
+
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim

@@ -380,6 +380,10 @@ GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
 
+# MPF library
+# @todo this needs to be implemented properly
+LDFLAGS	+= -lmpfr
+
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
 ifeq ($(ZLIB_LDFLAGS),)
