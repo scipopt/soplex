@@ -464,6 +464,9 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 }
 
 
+template <class R>
+int runSoPlex(int argc, char* argv[]);
+
 
 /// runs SoPlexBase command line
 int main(int argc, char* argv[])
@@ -472,10 +475,21 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
-   SoPlexBase<Real>* soplex = nullptr;
+  //@todo need to implement the mpf part properly The arguments should be parsed
+  // and the right template of runSoplex should be called
+
+  return runSoPlex<boost::multiprecision::mpfr_float_100>();
+  return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
+
+}
+
+template <class R>
+int runSoPlex(int argc, char* argv[])
+{
+  SoPlexBase<R>* soplex = nullptr;
 
    Timer* readingTime = nullptr;
-   Validation<Real>* validation = nullptr;
+  Validation<R>* validation = nullptr;
    int optidx;
 
    const char* lpfilename = nullptr;
@@ -504,14 +518,14 @@ int main(int argc, char* argv[])
       readingTime = TimerFactory::createTimer(Timer::USER_TIME);
       soplex = nullptr;
       spx_alloc(soplex);
-      new (soplex) SoPlexBase<Real>();
+      new (soplex) SoPlexBase<R>();
 
       soplex->printVersion();
       MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
 
       validation = nullptr;
       spx_alloc(validation);
-      new (validation) Validation<Real>();
+      new (validation) Validation<R>();
 
       // no options were given
       if( argc <= 1 )
@@ -957,7 +971,7 @@ int main(int argc, char* argv[])
       printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
 
       if( checkSol )
-        checkSolution<Real>(*soplex); // The type needs to get fixed here
+        checkSolution<R>(*soplex); // The type needs to get fixed here
 
       if( displayStatistics )
       {
@@ -994,10 +1008,10 @@ int main(int argc, char* argv[])
       goto TERMINATE_FREESTRINGS;
    }
 
-TERMINATE_FREESTRINGS:
+ TERMINATE_FREESTRINGS:
    freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
 
-TERMINATE:
+ TERMINATE:
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
    // spx_alloc() and freed here; disabling the list memory is crucial
@@ -1021,3 +1035,4 @@ TERMINATE:
 
    return returnValue;
 }
+
