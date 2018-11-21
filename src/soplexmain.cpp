@@ -478,7 +478,7 @@ int main(int argc, char* argv[])
   //@todo need to implement the mpf part properly The arguments should be parsed
   // and the right template of runSoplex should be called
 
-  return runSoPlex<boost::multiprecision::mpfr_float_100>();
+  return runSoPlex<boost::multiprecision::mpfr_float_100>(argc, argv);
   return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }
