@@ -263,8 +263,9 @@ void checkSolution<Real>(SoPlexBase<Real>& soplex)
   MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
 }
 
+template <class R>
 static
-void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
+void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownames, bool real = true, bool rational = false)
 {
    int printprec;
    int printwidth;
@@ -273,7 +274,7 @@ void printPrimalSolution(SoPlexBase<Real>& soplex, NameSet& colnames, NameSet& r
 
    if( real )
    {
-     DVectorBase<Real> primal(soplex.numCols());
+     DVectorBase<R> primal(soplex.numCols());
       if( soplex.getPrimalRay(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
