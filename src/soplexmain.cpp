@@ -364,7 +364,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( real )
    {
-      DVector dual(soplex.numRows());
+      DVectorBase<R> dual(soplex.numRows());
       if( soplex.getDualFarkas(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
@@ -397,7 +397,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(1) << std::scientific << Param::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
 
-         DVector redcost(soplex.numCols());
+           DVectorBase<R> redcost(soplex.numCols());
          if( soplex.getRedCost(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
@@ -480,7 +480,7 @@ int main(int argc, char* argv[])
   // and the right template of runSoplex should be called
 
   return runSoPlex<boost::multiprecision::mpfr_float_100>(argc, argv);
-  return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
+  // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }
 

@@ -1825,7 +1825,7 @@ private:
    DataArray<typename SPxSolverBase<R>::VarStatus > _basisStatusRows;
    DataArray<typename  SPxSolverBase<R>::VarStatus > _basisStatusCols;
 
-   SolReal _solReal;
+   SolBase<R> _solReal;
    SolRational _solRational;
    SolRational _workSol;
 
