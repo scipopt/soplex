@@ -1476,7 +1476,7 @@ public:
    bool setIntParam(const IntParam param, const int value, const bool init = true);
 
    /// sets real parameter value; returns true on success
-   bool setRealParam(const RealParam param, const R value, const bool init = true);
+   bool setRealParam(const RealParam param, const Real value, const bool init = true);
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
    /// sets rational parameter value; returns true on success

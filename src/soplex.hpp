@@ -4805,7 +4805,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
 /// sets real parameter value; returns true on success
 template <class R>
-bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const bool init)
+bool SoPlexBase<R>::setRealParam(const RealParam param, const Real value, const bool init)
 {
     assert(param >= 0);
     assert(param < REALPARAM_COUNT);

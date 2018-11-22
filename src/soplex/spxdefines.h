@@ -415,7 +415,8 @@ inline bool isZero(Real a, Real eps = Param::epsilon())
 }
 
 /// returns \c true iff |a| > eps
-inline bool isNotZero(Real a, Real eps = Param::epsilon())
+template <class R>
+inline bool isNotZero(R a, Real eps = Param::epsilon())
 {
    return spxAbs(a) > eps;
 }
