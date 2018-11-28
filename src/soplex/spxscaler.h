@@ -59,13 +59,13 @@ class SPxLPBase;
    A basis \f$ B' = [(A',I)P]_{[1:m][1:m] }\f$ (with P being a permutation matrix)
    for the scaled problem corresponds to the basis
    \f$ B = R^{-1} [(A',I)P]_{[1:m][1:m]} [P^{T} \tilde{C}^{-1} P]_{[1:m][1:m] } \f$. In
-   this equation, \f$ \tilde{C} \f$is of the form
+   this equation, \f$ \tilde{C} \f$ is of the form
 
    \f[
     \begin{array}{cc}
          C & 0 \\
          O & R^{-1}
-   \end{array}$
+   \end{array}
     \f]
 
    Note that in SoPlex only scaling factors \f$ 2^k, k \in \mathbb{Z} \f$ are used.
