@@ -40,6 +40,8 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <cstdlib>
+
 namespace soplex
 {
 #define SOPLEX_VERSION         400
@@ -291,8 +293,20 @@ public:
    //@}
 };
 
+  // A generic version of spxAbs. It would be nice if we could replace spxAbs
+  // with std::abs. Currently there are different versions of spxAbs under
+  // compile time #if. It's better to make this an overloaded function. Even
+  // better, replace it by std::abs since types from boost/multiprecision would
+  // need no extra modification.
+  template <class R>
+  R spxAbs(R a)
+  {
+    return abs(a);
+  }
+
 #ifdef WITH_LONG_DOUBLE
 /// returns |a|
+template <>
 inline Real spxAbs(Real a)
 {
    return fabsl(a);
@@ -323,6 +337,7 @@ inline Real spxFrexp(Real y, int* exp)
 }
 #else
 /// returns |a|
+template <>
 inline Real spxAbs(Real a)
 {
    return fabs(a);
