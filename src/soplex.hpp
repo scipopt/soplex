@@ -6682,7 +6682,7 @@ void SoPlexBase<R>::_syncRealSolution()
 {
   if( _hasSolRational && !_hasSolReal )
     {
-      _solReal = _solRational;
+      _solReal.copyFromRational(_solRational);
       _hasSolReal = true;
     }
 }
