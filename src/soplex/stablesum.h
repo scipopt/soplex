@@ -20,26 +20,26 @@
 
 namespace soplex {
 
-template <typename REAL>
+template <typename T>
 class StableSum
 {
-   typename std::remove_const<REAL>::type sum = 0;
+   typename std::remove_const<T>::type sum = 0;
 
  public:
    StableSum() = default;
-   StableSum( const REAL& init ) : sum( init ) {}
+   StableSum( const T& init ) : sum( init ) {}
 
-   void operator+=( const REAL& input )
+   void operator+=( const T& input )
    {
       sum += input;
    }
 
-   void operator-=( const REAL& input )
+   void operator-=( const T& input )
    {
       sum -= input;
    }
 
-   operator typename std::remove_const<REAL>::type() const
+   operator typename std::remove_const<T>::type() const
    {
       return sum;
    }
