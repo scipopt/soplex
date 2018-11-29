@@ -4530,4 +4530,6 @@ bool SoPlexBase<R>::_reconstructSolutionRational(SolRational& sol,
 
    return success;
 }
+
+template class SoPlexBase<Real>;
 } // namespace soplex
