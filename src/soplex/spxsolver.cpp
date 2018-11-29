@@ -758,7 +758,7 @@ bool SPxSolver::noViols(Real tol) const
 Real SPxSolver::nonbasicValue()
 {
    int i;
-   Real val = 0;
+   StableSum<Real> val;
    const SPxBasis::Desc& ds = desc();
 
 #ifndef ENABLE_ADDITIONAL_CHECKS

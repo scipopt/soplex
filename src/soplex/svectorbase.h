@@ -22,6 +22,7 @@
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -548,7 +549,7 @@ public:
    template < class S >
    R operator*(const SVectorBase<S>& w) const
    {
-      R x = 0;
+      StableSum<R> x;
       int n = size();
       int m = w.size();
 
@@ -837,12 +838,12 @@ template <>
 template < class S >
 Real SVectorBase<Real>::operator*(const SVectorBase<S>& w) const
 {
-   Real x = 0;
+   StableSum<Real> x;
    int n = size();
    int m = w.size();
 
    if(n == 0 || m == 0)
-      return x;
+      return Real(0);
 
    int i = 0;
    int j = 0;
