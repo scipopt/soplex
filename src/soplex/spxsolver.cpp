@@ -819,7 +819,7 @@ void SPxSolverBase<Real>::setType(Type tp)
    Real SPxSolverBase<Real>::nonbasicValue()
    {
       int i;
-      Real val = 0;
+      StableSum<Real> val;
       const typename SPxBasisBase<Real>::Desc& ds = this->desc();
 
 #ifndef ENABLE_ADDITIONAL_CHECKS

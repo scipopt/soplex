@@ -20,6 +20,7 @@
 #include "soplex/cring.h"
 #include "soplex/spxalloc.h"
 #include "soplex/exceptions.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -3327,15 +3328,15 @@ void CLUFactor::solveLright(Real* vec)
 
       for(; i < end; ++i)
       {
-         x = 0;
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
+         StableSum<Real> tmp(-vec[lrow[i]]);
          for(j = lbeg[i + 1]; j > k; --j)
-            x += vec[*idx++] * (*val++);
+            tmp += vec[*idx++] * (*val++);
 
-         vec[lrow[i]] -= x;
+         vec[lrow[i]] = -tmp;
 
          MSG_DEBUG(std::cout << "y" << lrow[i] << "=" << vec[lrow[i]] << std::endl;)
       }
@@ -3404,21 +3405,20 @@ void CLUFactor::solveLright2(Real* vec1, Real* vec2)
 
       for(; i < end; ++i)
       {
-         x1 = 0;
-         x2 = 0;
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
+         StableSum<Real> tmp1(-vec1[lrow[i]]);
+         StableSum<Real> tmp2(-vec2[lrow[i]]);
          for(j = lbeg[i + 1]; j > k; --j)
          {
-            x1 += vec1[*idx] * (*val);
-            x2 += vec2[*idx++] * (*val++);
+            tmp1 += vec1[*idx] * (*val);
+            tmp2 += vec2[*idx++] * (*val++);
          }
 
-         vec1[lrow[i]] -= x1;
-
-         vec2[lrow[i]] -= x2;
+         vec1[lrow[i]] = -tmp1;
+         vec2[lrow[i]] = -tmp2;
       }
    }
 }
@@ -4020,7 +4020,6 @@ int CLUFactor::solveLleftEps(Real* vec, int* nonz, Real eps)
 void CLUFactor::solveUpdateLeft(Real* vec)
 {
    int i, j, k, end;
-   Real x;
    Real* lval, *val;
    int* lrow, *lidx, *idx;
    int* lbeg;
@@ -4039,19 +4038,18 @@ void CLUFactor::solveUpdateLeft(Real* vec)
       k = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
-      x = 0;
+      StableSum<Real> tmp(-vec[lrow[i]]);
 
       for(j = lbeg[i + 1]; j > k; --j)
-         x += vec[*idx++] * (*val++);
+         tmp += vec[*idx++] * (*val++);
 
-      vec[lrow[i]] -= x;
+      vec[lrow[i]] = -tmp;
    }
 }
 
 void CLUFactor::solveUpdateLeft2(Real* vec1, Real* vec2)
 {
    int i, j, k, end;
-   Real x1, x2;
    Real* lval, *val;
    int* lrow, *lidx, *idx;
    int* lbeg;
@@ -4070,25 +4068,24 @@ void CLUFactor::solveUpdateLeft2(Real* vec1, Real* vec2)
       k = lbeg[i];
       val = &lval[k];
       idx = &lidx[k];
-      x1 = 0;
-      x2 = 0;
 
+      StableSum<Real> tmp1(-vec1[lrow[i]]);
+      StableSum<Real> tmp2(-vec2[lrow[i]]);
       for(j = lbeg[i + 1]; j > k; --j)
       {
-         x1 += vec1[*idx] * (*val);
-         x2 += vec2[*idx++] * (*val++);
+         tmp1 += vec1[*idx] * (*val);
+         tmp2 += vec2[*idx++] * (*val++);
       }
 
-      vec1[lrow[i]] -= x1;
-
-      vec2[lrow[i]] -= x2;
+      vec1[lrow[i]] = -tmp1;
+      vec2[lrow[i]] = -tmp2;
    }
 }
 
 int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
 {
    int i, j, k, end;
-   Real x, y;
+   Real y;
    Real* lval, *val;
    int* lrow, *lidx, *idx;
    int* lbeg;
@@ -4108,21 +4105,20 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
       assert(k >= 0 && k < l.size);
       val = &lval[k];
       idx = &lidx[k];
-      x = 0;
-
-      for(j = lbeg[i + 1]; j > k; --j)
-      {
-         assert(*idx >= 0 && *idx < thedim);
-         x += vec[*idx++] * (*val++);
-      }
 
       k = lrow[i];
 
       y = vec[k];
+      StableSum<Real> tmp(-y);
+      for(j = lbeg[i + 1]; j > k; --j)
+      {
+         assert(*idx >= 0 && *idx < thedim);
+         tmp += vec[*idx++] * (*val++);
+      }
 
       if(y == 0)
       {
-         y = -x;
+         y = -tmp;
 
          if(isNotZero(y, eps))
          {
@@ -4132,7 +4128,7 @@ int CLUFactor::solveUpdateLeft(Real eps, Real* vec, int* nonz, int n)
       }
       else
       {
-         y -= x;
+         y = -tmp;
          vec[k] = (y != 0) ? y : SOPLEX_FACTOR_MARKER;
       }
    }
@@ -4669,18 +4665,19 @@ void CLUFactor::vSolveLright(Real* vec, int* ridx, int& rn, Real eps)
 
       for(; i < end; ++i)
       {
-         x = 0.0;
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
+         StableSum<Real> tmp;
          for(j = lbeg[i + 1]; j > k; --j)
          {
             assert(*idx >= 0 && *idx < thedim);
-            x += vec[*idx++] * (*val++);
+            tmp += vec[*idx++] * (*val++);
          }
 
          j = lrow[i];
+         x = tmp;
 
          if(isNotZero(x, eps))
             updateSolutionVectorLright(x, j, vec[j], ridx, rn);
@@ -4769,17 +4766,22 @@ void CLUFactor::vSolveLright2(
 
       for(; i < end; ++i)
       {
-         x = x2 = 0.0;
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
+         StableSum<Real> tmp1;
+         StableSum<Real> tmp2;
+
          for(j = lbeg[i + 1]; j > k; --j)
          {
             assert(*idx >= 0 && *idx < thedim);
-            x += vec[*idx] * (*val);
-            x2 += vec2[*idx++] * (*val++);
+            tmp1 += vec[*idx] * (*val);
+            tmp2 += vec2[*idx++] * (*val++);
          }
+
+         x = tmp1;
+         x2 = tmp2;
 
          j = lrow[i];
 
@@ -4931,18 +4933,23 @@ void CLUFactor::vSolveLright3(
 
       for(; i < end; ++i)
       {
-         x = x2 = x3 = 0;
          k = lbeg[i];
          idx = &(lidx[k]);
          val = &(lval[k]);
 
+         StableSum<Real> tmp1;
+         StableSum<Real> tmp2;
+         StableSum<Real> tmp3;
          for(j = lbeg[i + 1]; j > k; --j)
          {
             assert(*idx >= 0 && *idx < thedim);
-            x += vec[*idx] * (*val);
-            x2 += vec2[*idx] * (*val);
-            x3 += vec3[*idx++] * (*val++);
+            tmp1 += vec[*idx] * (*val);
+            tmp2 += vec2[*idx] * (*val);
+            tmp3 += vec3[*idx++] * (*val++);
          }
+         x = tmp1;
+         x2 = tmp2;
+         x3 = tmp3;
 
          j = lrow[i];
 
