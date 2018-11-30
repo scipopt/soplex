@@ -701,10 +701,12 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
       _unscaleSolutionReal(*_realLP, true);
 
    // compute the original objective function value
-   _solReal._objVal = realParam(SoPlexBase<R>::OBJ_OFFSET);
+   StableSum<Real> objVal(realParam(SoPlexBase<R>::OBJ_OFFSET));
 
    for(int i = 0; i < numCols(); ++i)
-      _solReal._objVal += _solReal._primal[i] * objReal(i);
+      objVal += _solReal._primal[i] * objReal(i);
+
+   _solReal._objVal = objVal;
 
    // store the unsimplified basis
    _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),
