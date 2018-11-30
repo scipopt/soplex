@@ -4,6 +4,8 @@ next Release
 interface & parameters:
 - new parameter 'int:printbasismetric' to replace 'printcondition'
 	(-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
+- new parameter 'real:min_markowitz' to limit the Markowitz stability threshold
+   (range 0.0001 to 0.9999, high values sacrifice performance for stability)
 - Templated SoPlex, SPxSolver, and SPxBasis.
 - Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
   SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility

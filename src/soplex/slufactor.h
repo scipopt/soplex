@@ -128,11 +128,11 @@ public:
    /// sets minimum Markowitz threshold.
    void setMarkowitz(Real m)
    {
-      if(m < 0.01)
-         m = 0.01;
+      if(m < 0.0001)
+         m = 0.0001;
 
-      if(m > 0.99)
-         m = 0.99;
+      if(m > 0.9999)
+         m = 0.9999;
 
       minThreshold = m;
       lastThreshold = m;

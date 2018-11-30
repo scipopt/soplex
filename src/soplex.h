@@ -1366,8 +1366,11 @@ public:
       /// objective offset
       OBJ_OFFSET = 23,
 
+      /// minimal Markowitz threshold to control sparsity/stability in LU factorization
+      MIN_MARKOWITZ = 24,
+
       /// number of real parameters
-      REALPARAM_COUNT = 24
+      REALPARAM_COUNT = 25
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
