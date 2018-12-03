@@ -1972,7 +1972,6 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualSol(Vector& p_v
          case SPxBasis::Desc::D_ON_LOWER:
          case SPxBasis::Desc::D_ON_BOTH:
          case SPxBasis::Desc::D_UNDEFINED:
-            // assert(isZero((*theCoPvec)[i], 1e-9));
             p_vector[i] = 0;
             break;
 
@@ -2034,7 +2033,6 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getRedCostSol(Vector& 
          case SPxBasis::Desc::D_ON_LOWER:
          case SPxBasis::Desc::D_ON_BOTH:
          case SPxBasis::Desc::D_UNDEFINED:
-            // assert(EQ(maxObj()[i], (*thePvec)[i], 1e-9));
             p_vector[i] = 0;
             break;
 
