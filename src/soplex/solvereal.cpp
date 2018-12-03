@@ -186,16 +186,17 @@ void SoPlex::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
       break;
 
    case SPxSolver::ABORT_CYCLING:
-
-      // if preprocessing was applied, try to run again without to avoid cycling
-      if(!_isRealLPLoaded)
+      // if preprocessing or scaling was applied, try to run again without to avoid cycling
+      if(!_isRealLPLoaded || _isRealLPScaled)
       {
          MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
                    std::endl;)
-         _preprocessAndSolveReal(false);
+         // store and unsimplify sub-optimal solution and basis, may trigger re-solve
+         _storeSolutionReal(true);
          return;
       }
-      else if(_solReal.isPrimalFeasible() && _solReal.isDualFeasible())
+
+      if(_solReal.isPrimalFeasible() || _solReal.isDualFeasible())
          _status = SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS;
 
       break;
