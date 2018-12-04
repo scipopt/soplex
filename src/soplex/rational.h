@@ -27,8 +27,11 @@
 #include "soplex/spxdefines.h"
 #include "soplex/idlist.h"
 
+
 // @todo #if else
 #include "boost/multiprecision/number.hpp"
+#include "boost/multiprecision/mpfr.hpp"
+
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
@@ -126,6 +129,15 @@ namespace soplex
       /// assignment operator from mpq_t
       Rational& operator=(const mpq_t &q);
 #endif
+
+     // assignment operator from boost multiprecision number The operator should
+     // convert the boost number to mpq_t
+
+     // @todo The function is not implemented in the #else part, is this
+     // important? Only important if someone doesn't have gmp library, but
+     // boost.
+     template <typename T>
+     Rational& operator=(const boost::multiprecision::number<T> &q);
 
       //@}
 

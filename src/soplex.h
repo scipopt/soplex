@@ -63,6 +63,9 @@
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
 
+// An alias for boost multiprecision
+namespace mpf = boost::multiprecision;
+
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim

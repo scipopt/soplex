@@ -114,8 +114,19 @@ public:
       {
          assert(dim() == vec.dim());
 
+         // A lambda function to do the assigment Rvec = SVec.
+         auto copyStoR = [] (R& Rvec, const S& SVec)
+                         {
+                           Rvec = (R) SVec; // Should use the operator= of class
+                                            // R, and SVec gets casted. Example,
+                                            // Rational gets casted to double,
+                                            // number<T> etc.
+                         };
+
+
          for( int i = 0; i < dimen; i++ )
-            val[i] = vec[i];
+           copyStoR(val[i], vec[i]);
+           // val[i] = vec[i];
 
          assert(isConsistent());
       }

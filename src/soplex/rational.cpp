@@ -33,6 +33,7 @@
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
+#include "gmpxx.h"
 #endif
 
 /// use mpq_sgn instead of mpq_equal to compare rationals with zero
@@ -315,6 +316,20 @@ public:
       mpq_set(this->privatevalue, q);
       return *this;
    }
+
+  // The back end for Rational operator=.
+  // @todo Have proper #if else
+  template <typename T>
+  Private& operator=(const boost::multiprecision::number<T>& q)
+  {
+    // Construct a new boost number type with mpq_t as the backend from the
+    // number. Hopefully, the boost library would do this. Now, the backend()
+    // function of tmp_num will return a number of type mpq_t.
+    boost::multiprecision::number<mpq_class> tmp_num(q);
+    mpq_class tmp_mpz = tmp_num; // tmp_num gets casted.
+    mpq_set(this->privatevalue, tmp_mpz.get_mpq_t());
+    return *this;
+  }
 
    /// previous Private element
    Private*& prev()
@@ -632,6 +647,16 @@ Rational& Rational::operator=(const double &r)
    *(this->dpointer) = r;
    return *this;
 }
+
+// Assignment operator from boost number. Other assignment operator works in the
+// following way: Instead of
+template <typename T>
+Rational& Rational::operator=(const boost::multiprecision::number<T> &r)
+{
+  *(this->dpointer) = r;
+  return *this;
+}
+
 
 
 
