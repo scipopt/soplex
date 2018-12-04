@@ -27,6 +27,9 @@
 #include "soplex/spxdefines.h"
 #include "soplex/idlist.h"
 
+// @todo #if else
+#include "boost/multiprecision/number.hpp"
+
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
 #endif
@@ -132,6 +135,9 @@ namespace soplex
 
       operator double() const;
       operator long double() const;
+     // Operator to typecast Rational to one of the Boost Number types
+     // @todo needs #if else.
+     template <typename T> operator boost::multiprecision::number<T>() const;
 
 #ifdef SOPLEX_WITH_GMP
       /// provides read-only access to underlying mpq_t
