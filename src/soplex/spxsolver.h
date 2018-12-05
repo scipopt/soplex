@@ -268,6 +268,7 @@ private:
    Real
    m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
    bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
+   int            m_numViol;     ///< number of violations of current solution
 
    Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
    Real           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
