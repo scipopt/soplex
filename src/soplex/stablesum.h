@@ -57,7 +57,7 @@ class StableSum<double>
 
    void operator+=( double input )
    {
-#if _MSC_VER || __INTEL_COMPILER
+#ifdef _MSC_VER || __INTEL_COMPILER
       #pragma float_control( precise, on )
 #endif
 
