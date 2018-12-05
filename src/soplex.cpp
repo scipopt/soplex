@@ -724,67 +724,6 @@ namespace soplex
   SoPlexBase<R>::Settings::RationalParam::RationalParam() {}
 #endif
 
-  /// default constructor
-  template <>
-  SoPlexBase<Real>::SoPlexBase()
-    : _statistics(0)
-    , _currentSettings(0)
-    , _scalerUniequi(false)
-    , _scalerBiequi(true)
-    , _scalerGeo1(false, 1)
-    , _scalerGeo8(false, 8)
-    , _scalerGeoequi(true)
-    , _scalerLeastsq()
-    , _simplifier(0)
-    , _scaler(0)
-    , _starter(0)
-    , _rationalLP(0)
-    , _unitMatrixRational(0)
-    , _status(SPxSolverBase<Real>::UNKNOWN)
-    , _hasBasis(false)
-    , _hasSolReal(false)
-    , _hasSolRational(false)
-    , _rationalPosone(1)
-    , _rationalNegone(-1)
-    , _rationalZero(0)
-  {
-    // transfer message handler
-    _solver.setOutstream(spxout);
-    _scalerUniequi.setOutstream(spxout);
-    _scalerBiequi.setOutstream(spxout);
-    _scalerGeo1.setOutstream(spxout);
-    _scalerGeo8.setOutstream(spxout);
-    _scalerGeoequi.setOutstream(spxout);
-    _scalerLeastsq.setOutstream(spxout);
-
-    // give lu factorization to solver
-    _solver.setBasisSolver(&_slufactor);
-
-    // the real LP is initially stored in the solver; the rational LP is constructed, when the parameter SYNCMODE is
-    // initialized in setSettings() below
-    _realLP = &_solver;
-    _isRealLPLoaded = true;
-    _isRealLPScaled = false;
-    _applyPolishing = false;
-    _optimizeCalls = 0;
-    _unscaleCalls = 0;
-    _realLP->setOutstream(spxout);
-    _currentProb = DECOMP_ORIG;
-
-    // initialize statistics
-    spx_alloc(_statistics);
-    _statistics = new (_statistics) Statistics();
-
-    // initialize parameter settings to default
-    spx_alloc(_currentSettings);
-    _currentSettings = new (_currentSettings) Settings();
-    setSettings(*_currentSettings, true);
-
-    _lastSolveMode = intParam(SoPlexBase<Real>::SOLVEMODE);
-
-    assert(_isConsistent());
-  }
-
 
   template <>
   SoPlexBase<Real>::Settings::Settings()

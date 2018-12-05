@@ -457,7 +457,7 @@ namespace soplex
     void setOutstream(SPxOut& newOutstream)
     {
       spxout = &newOutstream;
-      SPxLP::spxout = &newOutstream;
+      SPxLPBase<R>::spxout = &newOutstream;
     }
 
     /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
