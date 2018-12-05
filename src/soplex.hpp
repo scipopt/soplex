@@ -4818,7 +4818,7 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const boo
       return false;
 
     // required to set a different feastol or opttol
-    Real tmp_value = value;
+    R tmp_value = value;
 
     switch( param )
       {

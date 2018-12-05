@@ -281,7 +281,8 @@ public:
    ///
    static Real epsilonFactorization();
    ///
-   static void setEpsilonFactorization(Real eps);
+   template <class R>
+   static void setEpsilonFactorization(R eps);
    ///
    static Real epsilonUpdate();
    ///
@@ -508,6 +509,9 @@ inline int spxSnprintf(
    }
    return n;
 }
+
+// For the templated functions
+#include "spxdefines.hpp"
 
 } // namespace soplex
 #endif // _SPXDEFINES_H_

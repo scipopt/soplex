@@ -57,11 +57,6 @@ Real Param::epsilonFactorization()
    return s_epsilon_factorization;
 }
 
-void Param::setEpsilonFactorization(Real eps)
-{
-   s_epsilon_factorization = eps;
-}
-
 Real Param::epsilonUpdate()
 {
    return s_epsilon_update;
