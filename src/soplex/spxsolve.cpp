@@ -434,8 +434,8 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::solve()
                      forceRecompNonbasicValue();
 
                      MSG_INFO2((*spxout), (*spxout) << " --- checking feasibility and optimality\n")
-                     computeTest();
                      computeCoTest();
+                     computeTest();
 
                      // is the solution good enough ?
                      // max three times reduced
@@ -1624,7 +1624,7 @@ void SPxSolverBase<Real>::printDisplayLine(const bool force, const bool forceHea
              if(forceHead || displayLine % (displayFreq * 30) == 0)
 {
    (*spxout)
-            << "type |   time |   iters | facts |    shift | violation |     obj value ";
+            << "type |   time |   iters | facts |    shift | viol sum | viol num | obj value ";
 
       if(printBasisMetric >= 0)
          (*spxout) << " | basis metric";
@@ -1639,8 +1639,9 @@ void SPxSolverBase<Real>::printDisplayLine(const bool force, const bool forceHea
       (*spxout) << std::scientific << std::setprecision(2);
       (*spxout) << std::setw(8) << this->iteration() << " | "
                 << std::setw(5) << slinSolver()->getFactorCount() << " | "
-                << shift() << " |  "
+                << shift() << " | "
                 << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
+                << std::setw(8) << MAXIMUM(0, m_numViol) << " | "
                 << std::setprecision(8) << value();
 
       if(getStartingDecompBasis && rep() == SPxSolverBase<Real>::ROW)
@@ -1706,12 +1707,12 @@ bool SPxSolverBase<Real>::terminate()
                         << fr.length() << std::endl;)
 #endif
 
-            if(this->updateCount > 1)
-            {
-               MSG_INFO3((*spxout), (*spxout) << " --- terminate triggers refactorization"
-                         << std::endl;)
-               factorize();
-            }
+      if(this->updateCount > 1)
+      {
+         MSG_INFO3((*spxout), (*spxout) << " --- terminate triggers refactorization"
+                     << std::endl;)
+         factorize();
+      }
 
       SPxBasisBase<Real>::coSolve(*theCoPvec, *theCoPrhs);
       SPxBasisBase<Real>::solve(*theFvec, *theFrhs);
@@ -1721,7 +1722,10 @@ bool SPxSolverBase<Real>::terminate()
          computePvec();
 
          if(type() == ENTER)
+         {
+            computeCoTest();
             computeTest();
+         }
       }
 
       if(shift() > 0.0)

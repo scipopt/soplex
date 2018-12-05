@@ -2,6 +2,7 @@ next Release
 ============
 
 interface & parameters:
+- show number of violations in log to improve understanding of solving progress
 - new parameter 'int:printbasismetric' to replace 'printcondition'
 	(-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
 - new parameter 'real:min_markowitz' to limit the Markowitz stability threshold
