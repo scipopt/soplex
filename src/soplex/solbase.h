@@ -279,6 +279,10 @@ namespace soplex
 	      _primal = sol._primal;
 	      _slacks = sol._slacks;
 
+        // @todo Converting between Rational and boost type. The boost number
+        // doesn't have a constructor that accepts Rational. But I've defined a
+        // cast between Rational and boost::number<T>. Need to make sure if the
+        // following line actually works. No compilation errors!
 	      _objVal = R(sol._objVal);
 
 	      _hasPrimalRay = sol._hasPrimalRay;
@@ -297,50 +301,8 @@ namespace soplex
 	  return *this;
 	}
 
-      // Created to copy Rational into boost
-      void copyFromRational(const SolBase<Rational> &sol);
     };
 
-  template <>
-  void SolBase<Real>::copyFromRational(const SolBase<Rational> &sol)
-  {
-    // For Real, there is an existing method, i.e., operator=, that already
-    // implements this. Hence calling it.
-    this->operator=(sol);
-  }
-
-  // Method to make assignment from Rational to Boost floats work. The existing
-  // definition doesn't seem to work. Boost doesn't have a constructor that
-  // accepts Rational class.
-  template <class R>
-  void SolBase<R>::copyFromRational(const SolBase<Rational> &sol)
-  {
-    _isPrimalFeasible = sol._isPrimalFeasible;
-    _primal = sol._primal;
-    _slacks = sol._slacks;
-
-    // Temporary variable so that _objValue can be constructed
-    boost::multiprecision::mpq_rational tmp(*(sol._objVal.getMpqPtr()));
-
-    _objVal = R(tmp);
-
-    _hasPrimalRay = sol._hasPrimalRay;
-    if( _hasPrimalRay )
-      {
-        _primalRay = sol._primalRay;
-      }
-
-    _isDualFeasible = sol._isDualFeasible;
-    _dual = sol._dual;
-    _redCost = sol._redCost;
-
-    _hasDualFarkas = sol._hasDualFarkas;
-    if( _hasDualFarkas )
-      {
-        _dualFarkas = sol._dualFarkas;
-      }
-
-  }
 } // namespace soplex
 
 /* reset the SOPLEX_DEBUG flag to its original value */

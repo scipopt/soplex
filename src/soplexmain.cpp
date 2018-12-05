@@ -29,6 +29,9 @@
 #include "soplex/validation.h"
 #include "soplex/statistics.h"
 
+// @todo #if, else
+#include "boost/multiprecision/number.hpp"
+
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
 #include "soplex/EGlib.h"
