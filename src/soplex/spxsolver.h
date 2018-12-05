@@ -767,7 +767,7 @@ namespace soplex
     //@{
     /// values \f$|x| < \epsilon\f$ are considered to be 0.
     /** if you want another value for epsilon, use
-     * \ref soplex::Param::setEpsilon() "Param::setEpsilon()".
+     * \ref soplex::Param<R>::setEpsilon() "Param<R>::setEpsilon()".
      */
     Real epsilon() const
     {

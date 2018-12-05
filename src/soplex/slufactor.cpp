@@ -726,7 +726,7 @@ void SLUFactor::clear()
    l.firstUnused = 0;
    thedim        = 0;
 
-   epsilon       = Param::epsilonFactorization();
+   epsilon       = Param<R>::epsilonFactorization();
    usetup        = false;
    maxabs        = 1;
    initMaxabs    = 1;

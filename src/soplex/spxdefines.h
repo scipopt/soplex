@@ -252,6 +252,7 @@ typedef double Real;
 
 THREADLOCAL extern const Real infinity;
 
+template <class R>
 class Param
 {
 private:
@@ -281,7 +282,6 @@ public:
    ///
    static Real epsilonFactorization();
    ///
-   template <class R>
    static void setEpsilonFactorization(R eps);
    ///
    static Real epsilonUpdate();
@@ -389,86 +389,99 @@ inline Real relDiff(Real a, Real b)
 }
 
 /// returns \c true iff |a-b| <= eps
-inline bool EQ(Real a, Real b, Real eps = Param::epsilon())
+  template <class R>
+  inline bool EQ(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return spxAbs(a - b) <= eps;
 }
 
 /// returns \c true iff |a-b| > eps
-inline bool NE(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool NE(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return spxAbs(a - b) > eps;
 }
 
 /// returns \c true iff a < b + eps
-inline bool LT(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool LT(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return (a - b) < -eps;
 }
 
 /// returns \c true iff a <= b + eps
-inline bool LE(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool LE(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return (a - b) < eps;
 }
 
 /// returns \c true iff a > b + eps
-inline bool GT(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool GT(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return (a - b) > eps;
 }
 
 /// returns \c true iff a >= b + eps
-inline bool GE(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool GE(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return (a - b) > -eps;
 }
 
 /// returns \c true iff |a| <= eps
-inline bool isZero(Real a, Real eps = Param::epsilon())
+template <class R>
+inline bool isZero(Real a, Real eps = Param<R>::epsilon())
 {
    return spxAbs(a) <= eps;
 }
 
 /// returns \c true iff |a| > eps
 template <class R>
-inline bool isNotZero(R a, Real eps = Param::epsilon())
+inline bool isNotZero(R a, Real eps = Param<R>::epsilon())
 {
    return spxAbs(a) > eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| <= eps
-inline bool EQrel(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool EQrel(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return spxAbs(relDiff(a, b)) <= eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| > eps
-inline bool NErel(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool NErel(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return spxAbs(relDiff(a, b)) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= -eps
-inline bool LTrel(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool LTrel(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return relDiff(a, b) <= -eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= eps
-inline bool LErel(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool LErel(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return relDiff(a, b) <= eps;
 }
 
 /// returns \c true iff relDiff(a,b) > eps
-inline bool GTrel(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool GTrel(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return relDiff(a, b) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) > -eps
-inline bool GErel(Real a, Real b, Real eps = Param::epsilon())
+template <class R>
+inline bool GErel(Real a, Real b, Real eps = Param<R>::epsilon())
 {
    return relDiff(a, b) > -eps;
 }

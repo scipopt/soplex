@@ -4852,22 +4852,22 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const boo
 
         // general zero tolerance
       case SoPlexBase<R>::EPSILON_ZERO:
-        Param::setEpsilon(value);
+        Param<R>::setEpsilon(value);
         break;
 
         // zero tolerance used in factorization
       case SoPlexBase<R>::EPSILON_FACTORIZATION:
-        Param::setEpsilonFactorization(value);
+        Param<R>::setEpsilonFactorization(value);
         break;
 
         // zero tolerance used in update of the factorization
       case SoPlexBase<R>::EPSILON_UPDATE:
-        Param::setEpsilonUpdate(value);
+        Param<R>::setEpsilonUpdate(value);
         break;
 
         // pivot zero tolerance used in factorization (declare numerical singularity for small LU pivots)
       case SoPlexBase<R>::EPSILON_PIVOT:
-        Param::setEpsilonPivot(value);
+        Param<R>::setEpsilonPivot(value);
         break;
 
         // infinity threshold

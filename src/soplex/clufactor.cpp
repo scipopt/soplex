@@ -274,12 +274,12 @@ void CLUFactor::setPivot( const int p_stage,
    row.perm[p_row]   = p_stage;
    col.perm[p_col]   = p_stage;
    diag[p_row]       = REAL( 1.0 ) / val;
-   if( spxAbs(val) < Param::epsilonPivot() )
+   if( spxAbs(val) < Param<Real>::epsilonPivot() )
    {
 #ifndef NDEBUG
       MSG_ERROR( std::cerr
                  << "LU pivot element is almost zero (< "
-                 << Param::epsilonPivot()
+                 << Param<Real>::epsilonPivot()
                  << ") - Basis is numerically singular"
                  << std::endl;
       )
@@ -789,7 +789,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
          x = p_work[i];
          p_work[i] = 0.0;
 
-         if ( isNotZero( x, Param::epsilonUpdate() ) )
+         if ( isNotZero( x, Param<Real>::epsilonUpdate() ) )
          {
             if ( spxAbs( x ) > l_maxabs )
                l_maxabs = spxAbs( x );
@@ -843,7 +843,7 @@ void CLUFactor::forestUpdate( int p_col, Real* p_work, int num, int *nonz )
          x = p_work[i];
          p_work[i] = 0.0;
 
-         if ( isNotZero( x, Param::epsilonUpdate() ) )
+         if ( isNotZero( x, Param<Real>::epsilonUpdate() ) )
          {
             if ( spxAbs( x ) > l_maxabs )
                l_maxabs = spxAbs( x );

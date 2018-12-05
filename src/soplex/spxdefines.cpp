@@ -25,10 +25,10 @@ namespace soplex
 
 THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
-THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+THREADLOCAL Real Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
+THREADLOCAL Real Param<R>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+THREADLOCAL Real Param<R>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+THREADLOCAL Real Param<R>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 bool msginconsistent(const char* name, const char* file, int line)
 {
@@ -42,37 +42,37 @@ bool msginconsistent(const char* name, const char* file, int line)
    return 0;
 }
 
-Real Param::epsilon()
+Real Param<R>::epsilon()
 {
    return s_epsilon;
 }
 
-void Param::setEpsilon(Real eps)
+void Param<R>::setEpsilon(Real eps)
 {
    s_epsilon = eps;
 }
 
-Real Param::epsilonFactorization()
+Real Param<R>::epsilonFactorization()
 {
    return s_epsilon_factorization;
 }
 
-Real Param::epsilonUpdate()
+Real Param<R>::epsilonUpdate()
 {
    return s_epsilon_update;
 }
 
-void Param::setEpsilonUpdate(Real eps)
+void Param<R>::setEpsilonUpdate(Real eps)
 {
    s_epsilon_update = eps;
 }
 
-Real Param::epsilonPivot()
+Real Param<R>::epsilonPivot()
 {
    return s_epsilon_pivot;
 }
 
-void Param::setEpsilonPivot(Real eps)
+void Param<R>::setEpsilonPivot(Real eps)
 {
    s_epsilon_pivot = eps;
 }
