@@ -1934,7 +1934,6 @@ SPxSolver::Status SPxSolver::getDual(Vector& p_vector) const
          case SPxBasis::Desc::D_ON_LOWER:
          case SPxBasis::Desc::D_ON_BOTH:
          case SPxBasis::Desc::D_UNDEFINED:
-            // assert(isZero((*theCoPvec)[i], 1e-9));
             p_vector[i] = 0;
             break;
 
@@ -1995,7 +1994,6 @@ SPxSolver::Status SPxSolver::getRedCost(Vector& p_vector) const
          case SPxBasis::Desc::D_ON_LOWER:
          case SPxBasis::Desc::D_ON_BOTH:
          case SPxBasis::Desc::D_UNDEFINED:
-            // assert(EQ(maxObj()[i], (*thePvec)[i], 1e-9));
             p_vector[i] = 0;
             break;
 
