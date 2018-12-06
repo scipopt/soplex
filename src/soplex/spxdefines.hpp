@@ -17,6 +17,18 @@
  * @brief General templated functions for SoPlex
  */
 
+// Defining the static members of the Param class
+// THREADLOCAL is a #define to thread_local. (Is it really needed?)
+template <class R>
+THREADLOCAL Real Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
+template <class R>
+THREADLOCAL Real Param<R>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+template <class R>
+THREADLOCAL Real Param<R>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+template <class R>
+THREADLOCAL Real Param<R>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+
+
 template <class R>
 void Param<R>::setEpsilonFactorization(R eps)
 {
@@ -26,49 +38,49 @@ void Param<R>::setEpsilonFactorization(R eps)
 
 /// returns \c true iff |a-b| <= eps
   template <class R>
-  inline bool EQ(Real a, R b, R eps = Param<R>::epsilon())
+  inline bool EQ(R a, R b, R eps = Param<R>::epsilon())
 {
    return spxAbs(a - b) <= eps;
 }
 
 /// returns \c true iff |a-b| > eps
 template <class R>
-inline bool NE(Real a, R b, R eps = Param<R>::epsilon())
+inline bool NE(R a, R b, R eps = Param<R>::epsilon())
 {
    return spxAbs(a - b) > eps;
 }
 
 /// returns \c true iff a < b + eps
 template <class R>
-inline bool LT(Real a, R b, R eps = Param<R>::epsilon())
+inline bool LT(R a, R b, R eps = Param<R>::epsilon())
 {
    return (a - b) < -eps;
 }
 
 /// returns \c true iff a <= b + eps
 template <class R>
-inline bool LE(Real a, R b, R eps = Param<R>::epsilon())
+inline bool LE(R a, R b, R eps = Param<R>::epsilon())
 {
    return (a - b) < eps;
 }
 
 /// returns \c true iff a > b + eps
 template <class R>
-inline bool GT(Real a, R b, R eps = Param<R>::epsilon())
+inline bool GT(R a, R b, R eps = Param<R>::epsilon())
 {
    return (a - b) > eps;
 }
 
 /// returns \c true iff a >= b + eps
 template <class R>
-inline bool GE(Real a, R b, R eps = Param<R>::epsilon())
+inline bool GE(R a, R b, R eps = Param<R>::epsilon())
 {
    return (a - b) > -eps;
 }
 
 /// returns \c true iff |a| <= eps
 template <class R>
-inline bool isZero(Real a, R eps = Param<R>::epsilon())
+inline bool isZero(R a, R eps = Param<R>::epsilon())
 {
    return spxAbs(a) <= eps;
 }
@@ -82,43 +94,85 @@ inline bool isNotZero(R a, R eps = Param<R>::epsilon())
 
 /// returns \c true iff |relDiff(a,b)| <= eps
 template <class R>
-inline bool EQrel(Real a, R b, R eps = Param<R>::epsilon())
+inline bool EQrel(R a, R b, R eps = Param<R>::epsilon())
 {
    return spxAbs(relDiff(a, b)) <= eps;
 }
 
 /// returns \c true iff |relDiff(a,b)| > eps
 template <class R>
-inline bool NErel(Real a, R b, R eps = Param<R>::epsilon())
+inline bool NErel(R a, R b, R eps = Param<R>::epsilon())
 {
    return spxAbs(relDiff(a, b)) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= -eps
 template <class R>
-inline bool LTrel(Real a, R b, R eps = Param<R>::epsilon())
+inline bool LTrel(R a, R b, R eps = Param<R>::epsilon())
 {
    return relDiff(a, b) <= -eps;
 }
 
 /// returns \c true iff relDiff(a,b) <= eps
 template <class R>
-inline bool LErel(Real a, R b, R eps = Param<R>::epsilon())
+inline bool LErel(R a, R b, R eps = Param<R>::epsilon())
 {
    return relDiff(a, b) <= eps;
 }
 
 /// returns \c true iff relDiff(a,b) > eps
 template <class R>
-inline bool GTrel(Real a, R b, R eps = Param<R>::epsilon())
+inline bool GTrel(R a, R b, R eps = Param<R>::epsilon())
 {
    return relDiff(a, b) > eps;
 }
 
 /// returns \c true iff relDiff(a,b) > -eps
 template <class R>
-inline bool GErel(Real a, R b, R eps = Param<R>::epsilon())
+inline bool GErel(R a, R b, R eps = Param<R>::epsilon())
 {
    return relDiff(a, b) > -eps;
 }
 
+// Templated functions, originally from spxdefines.cpp
+template <class R>
+ R Param<R>::epsilon()
+{
+   return s_epsilon;
+}
+
+template <class R>
+void Param<R>::setEpsilon(R eps)
+{
+   s_epsilon = eps;
+}
+
+template <class R>
+ R Param<R>::epsilonFactorization()
+{
+   return s_epsilon_factorization;
+}
+
+template <class R>
+ R Param<R>::epsilonUpdate()
+{
+   return s_epsilon_update;
+}
+
+template <class R>
+void Param<R>::setEpsilonUpdate(R eps)
+{
+   s_epsilon_update = eps;
+}
+
+template <class R>
+ R Param<R>::epsilonPivot()
+{
+   return s_epsilon_pivot;
+}
+
+template <class R>
+void Param<R>::setEpsilonPivot(R eps)
+{
+   s_epsilon_pivot = eps;
+}

@@ -25,11 +25,6 @@ namespace soplex
 
 THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-THREADLOCAL Real Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
-THREADLOCAL Real Param<R>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-THREADLOCAL Real Param<R>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-THREADLOCAL Real Param<R>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-
 bool msginconsistent(const char* name, const char* file, int line)
 {
    assert(name != 0);
@@ -40,41 +35,6 @@ bool msginconsistent(const char* name, const char* file, int line)
    << "Inconsistency detected in " << name << std::endl; )
 
    return 0;
-}
-
-Real Param<R>::epsilon()
-{
-   return s_epsilon;
-}
-
-void Param<R>::setEpsilon(Real eps)
-{
-   s_epsilon = eps;
-}
-
-Real Param<R>::epsilonFactorization()
-{
-   return s_epsilon_factorization;
-}
-
-Real Param<R>::epsilonUpdate()
-{
-   return s_epsilon_update;
-}
-
-void Param<R>::setEpsilonUpdate(Real eps)
-{
-   s_epsilon_update = eps;
-}
-
-Real Param<R>::epsilonPivot()
-{
-   return s_epsilon_pivot;
-}
-
-void Param<R>::setEpsilonPivot(Real eps)
-{
-   s_epsilon_pivot = eps;
 }
 
 } // namespace soplex

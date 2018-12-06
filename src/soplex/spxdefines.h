@@ -276,21 +276,21 @@ public:
    /**@name Access / modification */
    //@{
    ///
-   static Real epsilon();
+   static R epsilon();
    ///
-   static void setEpsilon(Real eps);
+   static void setEpsilon(R eps);
    ///
-   static Real epsilonFactorization();
+   static R epsilonFactorization();
    ///
    static void setEpsilonFactorization(R eps);
    ///
-   static Real epsilonUpdate();
+   static R epsilonUpdate();
    ///
-   static void setEpsilonUpdate(Real eps);
+   static void setEpsilonUpdate(R eps);
    ///
-   static Real epsilonPivot();
+   static R epsilonPivot();
    ///
-   static void setEpsilonPivot(Real eps);
+   static void setEpsilonPivot(R eps);
    //@}
 };
 
