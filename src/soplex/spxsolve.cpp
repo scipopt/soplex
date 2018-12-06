@@ -1182,7 +1182,7 @@ namespace soplex
                   if( rowstatus[i] ==  SPxBasisBase<Real>::Desc::P_ON_LOWER || rowstatus[i] == SPxBasisBase<Real>::Desc::P_ON_UPPER )
                     {
                       // only consider rows with zero dual multiplier to preserve optimality
-                      if( EQrel((*theCoPvec)[i], 0) )
+                      if( EQrel((*theCoPvec)[i], (Real) 0) )
                         slackcandidates.addIdx(i);
                     }
                 }
@@ -1196,7 +1196,7 @@ namespace soplex
                       if( colstatus[i] == SPxBasisBase<Real>::Desc::P_ON_LOWER || colstatus[i] ==  SPxBasisBase<Real>::Desc::P_ON_UPPER )
                         {
                           // only consider continuous variables with zero dual multiplier to preserve optimality
-                          if( EQrel(this->maxObj(i) - (*thePvec)[i], 0) && integerVariables[i] == 0 )
+                          if( EQrel(this->maxObj(i) - (*thePvec)[i], (Real) 0) && integerVariables[i] == 0 )
                             continuousvars.addIdx(i);
                         }
                     }
@@ -1266,7 +1266,7 @@ namespace soplex
                   if( colstatus[i] == SPxBasisBase<Real>::Desc::P_ON_LOWER || colstatus[i] == SPxBasisBase<Real>::Desc::P_ON_UPPER )
                     {
                       // only consider variables with zero reduced costs to preserve optimality
-                      if( EQrel(this->maxObj(i) - (*thePvec)[i], 0) )
+                      if( EQrel(this->maxObj(i) - (*thePvec)[i], (Real) 0) )
                         candidates.addIdx(i);
                     }
                 }
@@ -1342,7 +1342,7 @@ namespace soplex
 
                   if( stat == SPxBasisBase<Real>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<Real>::Desc::P_ON_UPPER )
                     {
-                      if( EQrel((*theFvec)[i], 0) )
+                      if( EQrel((*theFvec)[i], (Real) 0) )
                         basiccandidates.addIdx(i);
                     }
                 }
@@ -1399,7 +1399,7 @@ namespace soplex
 
                   if( stat == SPxBasisBase<Real>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<Real>::Desc::P_ON_UPPER )
                     {
-                      if( EQrel((*theFvec)[i], 0) )
+                      if( EQrel((*theFvec)[i], (Real) 0) )
                         basiccandidates.addIdx(i);
                     }
                 }

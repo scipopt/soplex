@@ -141,22 +141,6 @@ namespace soplex
   bool SoPlexBase<Real>::decompTerminate(Real timeLimit);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   /// solves LP using the decomposition dual simplex
   template <>
   void SoPlexBase<Real>::_solveDecompositionDualSimplex()
@@ -1279,8 +1263,8 @@ namespace soplex
 
             // updating the ratio
             SoPlexBase<Real>::DualSign varSign = getExpectedDualVariableSign(solverRowNum);
-            if( varSign == SoPlexBase<Real>::IS_FREE || (varSign == SoPlexBase<Real>::IS_POS && LE(compProbPrimal, 0, feastol)) ||
-                (varSign == SoPlexBase<Real>::IS_NEG && GE(compProbPrimal, 0, feastol)) )
+            if( varSign == SoPlexBase<Real>::IS_FREE || (varSign == SoPlexBase<Real>::IS_POS && LE(compProbPrimal, (Real)0, feastol)) ||
+                (varSign == SoPlexBase<Real>::IS_NEG && GE(compProbPrimal, (Real)0, feastol)) )
               {
                 dualRatio = infinity;
               }
@@ -1363,8 +1347,8 @@ namespace soplex
 
             // add row to the reduced problem if the computed dual is of the correct sign for a feasible dual solution
             if( ratioTest && ((varSign == SoPlexBase<Real>::IS_FREE && !isZero(compProbPrimal, feastol)) ||
-                              (varSign == SoPlexBase<Real>::IS_POS && GT(compProbPrimal*maxDualRatio, 0, feastol)) ||
-                              (varSign == SoPlexBase<Real>::IS_NEG && LT(compProbPrimal*maxDualRatio, 0, feastol))) )
+                              (varSign == SoPlexBase<Real>::IS_POS && GT(compProbPrimal*maxDualRatio, (Real) 0, feastol)) ||
+                              (varSign == SoPlexBase<Real>::IS_NEG && LT(compProbPrimal*maxDualRatio, (Real) 0, feastol))) )
               {
                 //this set of statements are required to add rows to the reduced problem. This will add a row for every
                 //violated constraint. I only want to add a row for the most violated constraint. That is why the row
@@ -1655,7 +1639,7 @@ namespace soplex
 
 
             // checking the violation of the row.
-            if( LT(compProbViol, 0, feastol) )
+            if( LT(compProbViol, (Real) 0, feastol) )
               {
                 if( !_decompReducedProbRows[rownumber] )
                   {
@@ -3489,14 +3473,14 @@ namespace soplex
             if( _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_ON_UPPER &&
                 _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_FIXED )
               {
-                if( GT(feasVec[i], 0, feastol) )
+                if( GT(feasVec[i], (Real) 0, feastol) )
                   return false;
               }
 
             if( _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_ON_LOWER &&
                 _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_FIXED )
               {
-                if( LT(feasVec[i], 0, feastol) )
+                if( LT(feasVec[i], (Real) 0, feastol) )
                   return false;
               }
 
@@ -3507,14 +3491,14 @@ namespace soplex
             if( _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_ON_UPPER &&
                 _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_FIXED )
               {
-                if( GT(feasVec[i], 0, feastol) )
+                if( GT(feasVec[i], (Real) 0, feastol) )
                   return false;
               }
 
             if( _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_ON_LOWER &&
                 _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_FIXED )
               {
-                if( LT(feasVec[i], 0, feastol) )
+                if( LT(feasVec[i], (Real) 0, feastol) )
                   return false;
               }
           }
