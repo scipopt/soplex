@@ -3182,7 +3182,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                     IdxCompare compare;
                     SPxQuicksort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
 
-                    FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = 0;
+                    FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = nullptr;
                     spx_alloc(FreeZeroObjVariablePSptr);
                     m_hist.append(new (FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(lp, j, unconstrained_below, col_idx_sorted));
 

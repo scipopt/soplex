@@ -4873,7 +4873,12 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const boo
         // infinity threshold
       case SoPlexBase<R>::INFTY:
         _rationalPosInfty = value;
-        _rationalNegInfty = -value;
+        // boost is treating -value as an expression and not just a number<T> So
+        // doing -val won't work since Rational doesn't have an operator= that
+        // accepts boost expressions. 0-value is a simple fix.
+
+        // @todo Write the operator= for Rational to accept boost expressions.
+        _rationalNegInfty = 0-value;
         if( intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL )
           _recomputeRangeTypesRational();
         break;
