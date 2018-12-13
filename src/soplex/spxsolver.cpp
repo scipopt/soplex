@@ -53,31 +53,6 @@ namespace soplex
   void SPxSolverBase<Real>::setOpttol(Real d);
 
   template <>
-  bool SPxSolverBase<Real>::read(std::istream& in, NameSet* rowNames,
-                          NameSet* colNames, DIdxSet* intVars)
-  {
-    if( initialized )
-      {
-        clear();
-        unInit();
-
-        if (thepricer)
-          thepricer->clear();
-
-        if (theratiotester)
-          theratiotester->clear();
-      }
-
-    this->unLoad();
-    if (!SPxLP::read(in, rowNames, colNames, intVars))
-      return false;
-
-    this->theLP = this;
-
-    return true;
-  }
-
-  template <>
   void SPxSolverBase<Real>::reLoad()
   {
     forceRecompNonbasicValue();

@@ -2337,5 +2337,6 @@ namespace soplex
   /* For Backwards compatibility */
   typedef SPxSolverBase<Real> SPxSolver;
 
+  #include "spxsolver.hpp"
 } // namespace soplex
 #endif // _SPXSOLVER_H_

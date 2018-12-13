@@ -6888,7 +6888,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
               int value;
               value = std::stoi(paramValueString);
 
-              if( setIntParam((SoPlex::IntParam)param, value, false) )
+              if( setIntParam((SoPlexBase<R>::IntParam)param, value, false) )
                 break;
               else
                 {
@@ -6924,7 +6924,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
               value = std::stod(paramValueString);
 #endif
 #endif
-              if( setRealParam((SoPlex::RealParam)param, value) )
+              if( setRealParam((SoPlexBase<R>::RealParam)param, value) )
                 break;
               else
                 {
@@ -6996,9 +6996,9 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
   return false;
 }
 
-  /// default constructor
-  template <class R>
-  SoPlexBase<R>::SoPlexBase()
+/// default constructor
+template <class R>
+SoPlexBase<R>::SoPlexBase()
     : _statistics(0)
     , _currentSettings(0)
     , _scalerUniequi(false)
@@ -7019,7 +7019,7 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
     , _rationalPosone(1)
     , _rationalNegone(-1)
     , _rationalZero(0)
-  {
+{
     // transfer message handler
     _solver.setOutstream(spxout);
     _scalerUniequi.setOutstream(spxout);
@@ -7055,5 +7055,415 @@ bool SoPlexBase<R>::_parseSettingsLine(char* line, const int lineNumber)
     _lastSolveMode = intParam(SoPlexBase<R>::SOLVEMODE);
 
     assert(_isConsistent());
+}
+
+
+
+/// reads settings file; returns true on success
+template <class R>
+bool SoPlexBase<R>::loadSettingsFile(const char* filename)
+{
+  assert(filename != 0);
+
+  // start timing
+  _statistics->readingTime->start();
+
+  MSG_INFO1( spxout, spxout << "Loading settings file <" << filename << "> . . .\n" );
+
+  // open file
+  spxifstream file(filename);
+
+  if( !file )
+    {
+      MSG_INFO1( spxout, spxout << "Error opening settings file.\n" );
+      return false;
+    }
+
+  // read file
+  char line[SET_MAX_LINE_LEN];
+  int lineNumber = 0;
+  bool readError = false;
+  bool parseError = false;
+
+  while( !readError && !parseError)
+    {
+      lineNumber++;
+      readError = !file.getline(line, sizeof(line));
+      if( !readError )
+        parseError = !_parseSettingsLine(line, lineNumber);
+    }
+  readError = readError && !file.eof();
+
+  if( readError && strlen(line) == SET_MAX_LINE_LEN - 1 )
+    {
+      MSG_INFO1( spxout, spxout << "Error reading settings file: line " << lineNumber << " in settings file exceeds " << SET_MAX_LINE_LEN - 2 << " characters.\n" );
+    }
+  else if( readError )
+    {
+      MSG_INFO1( spxout, spxout << "Error reading settings file: line " << lineNumber << ".\n" );
+    }
+
+  // stop timing
+  _statistics->readingTime->stop();
+
+  return !readError;
+}
+
+
+/// parses one setting string and returns true on success
+template <class R>
+bool SoPlexBase<R>::parseSettingsString(char* string)
+{
+  assert(string != 0);
+  if( string == 0 )
+    {
+      return false;
+    }
+
+  char parseString[SET_MAX_LINE_LEN];
+  spxSnprintf(parseString, SET_MAX_LINE_LEN-1, "%s", string);
+
+  char* line = parseString;
+
+  // find the start of the parameter type
+  while( *line == ' ' || *line == '\t' || *line == '\r' )
+    line++;
+  if( *line == '\0' || *line == '\n' || *line == '#' )
+    return true;
+  char* paramTypeString = line;
+
+  // find the end of the parameter type
+  while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != ':' )
+    line++;
+  if( *line == ':' )
+    {
+      *line = '\0';
+      line++;
+    }
+  else
+    {
+      *line = '\0';
+      line++;
+
+      // search for the ':' char in the line
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+        line++;
+      if( *line != ':' )
+        {
+          MSG_INFO1( spxout, spxout << "Error parsing setting string: no ':' separating parameter type and name.\n" );
+          return false;
+        }
+      line++;
+    }
+
+  // find the start of the parameter name
+  while( *line == ' ' || *line == '\t' || *line == '\r' )
+    line++;
+  if( *line == '\0' || *line == '\n' || *line == '#' )
+    {
+      MSG_INFO1( spxout, spxout << "Error parsing setting string: no parameter name.\n");
+      return false;
+    }
+  char* paramName = line;
+
+  // find the end of the parameter name
+  while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' && *line != '=' )
+    line++;
+  if( *line == '=' )
+    {
+      *line = '\0';
+      line++;
+    }
+  else
+    {
+      *line = '\0';
+      line++;
+
+      // search for the '=' char in the line
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+        line++;
+      if( *line != '=' )
+        {
+          MSG_INFO1( spxout, spxout << "Error parsing setting string: no '=' after parameter name.\n" );
+          return false;
+        }
+      line++;
+    }
+
+  // find the start of the parameter value string
+  while( *line == ' ' || *line == '\t' || *line == '\r' )
+    line++;
+  if( *line == '\0' || *line == '\n' || *line == '#' )
+    {
+      MSG_INFO1( spxout, spxout << "Error parsing setting string: no parameter value.\n");
+      return false;
+    }
+  char* paramValueString = line;
+
+  // find the end of the parameter value string
+  while( *line != ' ' && *line != '\t' && *line != '\r' && *line != '\n' && *line != '#' && *line != '\0' )
+    line++;
+  if( *line != '\0' )
+    {
+      // check, if the rest of the line is clean
+      *line = '\0';
+      line++;
+      while( *line == ' ' || *line == '\t' || *line == '\r' )
+        line++;
+      if( *line != '\0' && *line != '\n' && *line != '#' )
+        {
+          MSG_INFO1( spxout, spxout << "Error parsing setting string: additional character '" << *line << "' after parameter value.\n" );
+          return false;
+        }
+    }
+
+  // check whether we have a bool parameter
+  if( strncmp(paramTypeString, "bool", 4) == 0 )
+    {
+      for( int param = 0; ; param++ )
+        {
+          if( param >= BOOLPARAM_COUNT )
+            {
+              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+              return false;
+            }
+          else if( strncmp(paramName, _currentSettings->boolParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+              if( strncasecmp(paramValueString, "true", 4) == 0
+                  || strncasecmp(paramValueString, "TRUE", 4) == 0
+                  || strncasecmp(paramValueString, "t", 4) == 0
+                  || strncasecmp(paramValueString, "T", 4) == 0
+                  || strtol(paramValueString, NULL, 4) == 1 )
+                {
+                  setBoolParam((BoolParam)param, true);
+                  break;
+                }
+              else if( strncasecmp(paramValueString, "false", 5) == 0
+                       || strncasecmp(paramValueString, "FALSE", 5) == 0
+                       || strncasecmp(paramValueString, "f", 5) == 0
+                       || strncasecmp(paramValueString, "F", 5) == 0
+                       || strtol(paramValueString, NULL, 5) == 0 )
+                {
+                  setBoolParam((BoolParam)param, false);
+                  break;
+                }
+              else
+                {
+                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for bool parameter <" << paramName << ">.\n" );
+                  return false;
+                }
   }
+        }
+
+      return true;
+    }
+
+  // check whether we have an integer parameter
+  if( strncmp(paramTypeString, "int", 3) == 0 )
+    {
+      for( int param = 0; ; param++ )
+        {
+          if( param >= INTPARAM_COUNT )
+            {
+              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+              return false;
+            }
+          else if( strncmp(paramName, _currentSettings->intParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+              int value;
+              value = std::stoi(paramValueString);
+
+              if(  setIntParam((SoPlex::IntParam)param, value, false) )
+                break;
+              else
+                {
+                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for int parameter <" << paramName << ">.\n" );
+                  return false;
+                }
+            }
+        }
+
+      return true;
+    }
+
+  // check whether we have a R parameter
+  if( strncmp(paramTypeString, "real", 4) == 0 )
+    {
+      for( int param = 0; ; param++ )
+        {
+          if( param >= REALPARAM_COUNT )
+            {
+              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+              return false;
+            }
+          else if( strncmp(paramName, _currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+              R value;
+#ifdef WITH_LONG_DOUBLE
+              value = std::stold(paramValueString);
+#else
+#ifdef WITH_FLOAT
+              value = std::stof(paramValueString);
+#else
+              value = std::stod(paramValueString);
+#endif
+#endif
+
+              if( setRealParam((SoPlexBase<R>::RealParam)param, value) )
+                break;
+              else
+                {
+                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for R parameter <" << paramName << ">.\n" );
+                  return false;
+                }
+            }
+        }
+
+      return true;
+    }
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+  // check whether we have a rational parameter
+  if( strncmp(paramTypeString, "rational", 8) == 0 )
+    {
+      for( int param = 0; ; param++ )
+        {
+          if( param >= RATIONALPARAM_COUNT )
+            {
+              MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
+              return false;
+            }
+          else if( strncmp(paramName, _currentSettings->rationalParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+            {
+              Rational value;
+
+              if( readStringRational(paramValueString, value) && setRationalParam((RationalParam)param, value) )
+                break;
+              else
+                {
+                  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid value <" << paramValueString << "> for rational parameter <" << paramName << ">.\n" );
+                  return false;
+                }
+            }
+        }
+
+      return true;
+    }
+#endif
+
+  // check whether we have the random seed
+  if( strncmp(paramTypeString, "uint", 4) == 0 )
+    {
+      if( strncmp(paramName, "random_seed", 11) == 0 )
+        {
+          unsigned int value;
+          unsigned long parseval;
+
+          parseval = std::stoul(paramValueString);
+          if( parseval > UINT_MAX )
+            {
+              value = UINT_MAX;
+              MSG_WARNING(spxout, spxout << "Converting number greater than UINT_MAX to uint.\n");
+            }
+          else
+            value = (unsigned int) parseval;
+
+          setRandomSeed(value);
+          return true;
+        }
+
+      MSG_INFO1( spxout, spxout << "Error parsing setting string for uint parameter <random_seed>.\n" );
+      return false;
+    }
+
+  MSG_INFO1( spxout, spxout << "Error parsing setting string: invalid parameter type <" << paramTypeString << "> for parameter <" << paramName << ">.\n" );
+
+  return false;
+}
+
+
+
+/// writes settings file; returns true on success
+template <class R>
+bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged) const
+{
+  assert(filename != 0);
+
+  std::ofstream file(filename);
+  SPxOut::setScientific(file, 16);
+
+  if( !file.good() )
+    return false;
+
+  file.setf(std::ios::left);
+
+  SPxOut::setFixed(file);
+
+  file << "# SoPlexBase version " << SOPLEX_VERSION / 100 << "." << (SOPLEX_VERSION / 10) % 10 << "." << SOPLEX_VERSION % 10;
+#if SOPLEX_SUBVERSION > 0
+  file << "." << SOPLEX_SUBVERSION;
+#endif
+  file << "\n";
+
+  for( int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; i++ )
+    {
+      if( onlyChanged && _currentSettings->_boolParamValues[i] == _currentSettings->boolParam.defaultValue[i] )
+        continue;
+
+      file << "\n";
+      file << "# " << _currentSettings->boolParam.description[i] << "\n";
+      file << "# range {true, false}, default " << (_currentSettings->boolParam.defaultValue[i] ? "true\n" : "false\n");
+      file << "bool:" << _currentSettings->boolParam.name[i] << " = " << (_currentSettings->_boolParamValues[i] ? "true\n" : "false\n");
+    }
+
+  for( int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; i++ )
+    {
+      if( onlyChanged && _currentSettings->_intParamValues[i] == _currentSettings->intParam.defaultValue[i] )
+        continue;
+
+      file << "\n";
+      file << "# " << _currentSettings->intParam.description[i] << "\n";
+      file << "# range [" << _currentSettings->intParam.lower[i] << "," << _currentSettings->intParam.upper[i]
+           << "], default " << _currentSettings->intParam.defaultValue[i] << "\n";
+      file << "int:" << _currentSettings->intParam.name[i] << " = " << _currentSettings->_intParamValues[i] << "\n";
+    }
+
+  SPxOut::setScientific(file);
+
+  for( int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; i++ )
+    {
+      if( onlyChanged && _currentSettings->_realParamValues[i] == _currentSettings->realParam.defaultValue[i] )
+        continue;
+
+      file << "\n";
+      file << "# " << _currentSettings->realParam.description[i] << "\n";
+      file << "# range [" << _currentSettings->realParam.lower[i] << "," << _currentSettings->realParam.upper[i]
+           << "], default " << _currentSettings->realParam.defaultValue[i] << "\n";
+      file << "real:" << _currentSettings->realParam.name[i] << " = " << _currentSettings->_realParamValues[i] << "\n";
+    }
+
+#ifdef SOPLEX_WITH_RATIONALPARAM
+  for( int i = 0; i < SoPlexBase<R>::RATIONALPARAM_COUNT; i++ )
+    {
+      if( onlyChanged && _currentSettings->_rationalParamValues[i] == _currentSettings->rationalParam.defaultValue[i] )
+        continue;
+
+      file << "\n";
+      file << "# " << _currentSettings->rationalParam.description[i] << "\n";
+      file << "# range [" << _currentSettings->rationalParam.lower[i] << "," << _currentSettings->rationalParam.upper[i]
+           << "], default " << _currentSettings->rationalParam.defaultValue[i] << "\n";
+      file << "rational:" << _currentSettings->rationalParam.name[i] << " = " << _currentSettings->_rationalParamValues[i] << "\n";
+    }
+#endif
+
+  if( !onlyChanged || _solver.random.getSeed() != DEFAULT_RANDOM_SEED )
+    {
+      file << "\n";
+      file << "# initial random seed used for perturbation\n";
+      file << "# range [0, " << UINT_MAX << "], default "<< DEFAULT_RANDOM_SEED << "\n";
+      file << "uint:random_seed = " << _solver.random.getSeed() << "\n";
+    }
+
+  return true;
+}
 

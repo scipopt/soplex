@@ -21,45 +21,6 @@
 
 namespace soplex {
 
-  /// updates the external solution used for validation
-  template <>
-  bool Validation<Real>::updateExternalSolution(char* solution)
-  {
-    validate = true;
-    validatesolution = solution;
-
-    if( strncmp(solution, "+infinity", 9 ) == 0 )
-      return true;
-    else if ( strncmp(solution, "-infinity", 9) == 0 )
-      return true;
-    else
-      {
-        char* tailptr;
-        strtod(solution, &tailptr);
-        if (*tailptr) {
-          //conversion failed because the input wasn't a number
-          return false;
-        }
-      }
-    return true;
-  }
-
-
-
-  /// updates the tolerance used for validation
-  template <>
-  bool Validation<Real>::updateValidationTolerance(char* tolerance)
-  {
-    char* tailptr;
-    validatetolerance = strtod(tolerance, &tailptr);
-    if (*tailptr) {
-      //conversion failed because the input wasn't a number
-      return false;
-    }
-    return true;
-  }
-
-
 
   /// validates the soplex solution using the external solution
   template <>

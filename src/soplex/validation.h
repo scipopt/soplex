@@ -62,6 +62,8 @@ namespace soplex {
       void validateSolveReal(SoPlexBase<R>& soplex);
     };
 
+  // For general templated functions
+  #include "validation.hpp"
 } /* namespace soplex */
 
 #endif /* SRC_VALIDATION_H_ */
