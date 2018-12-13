@@ -6,6 +6,7 @@ fixed bugs:
 - use center value when fixing variables with slightly different bounds
 - MPS reader: print error message and terminate in case of duplicate column names or not column-wise ordering
 - LP reader: fix reading of infinite bounds and right-hand sides
+- avoid unsuccessful termination when cycling and rather return sub-optimal solution
 - return clean solution values according to optimal basis (e.g. reduced cost 0 for basic variables)
 
 
