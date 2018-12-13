@@ -1922,7 +1922,26 @@ SPxSolver::Status SPxSolver::getDual(Vector& p_vector) const
       }
    }
    else
-      p_vector = coPvec();
+   {
+      const SPxBasis::Desc& ds = desc();
+
+      for(int i = 0; i < nRows(); ++i)
+      {
+         switch(ds.rowStatus(i))
+         {
+         case SPxBasis::Desc::D_FREE:
+         case SPxBasis::Desc::D_ON_UPPER:
+         case SPxBasis::Desc::D_ON_LOWER:
+         case SPxBasis::Desc::D_ON_BOTH:
+         case SPxBasis::Desc::D_UNDEFINED:
+            p_vector[i] = 0;
+            break;
+
+         default:
+            p_vector[i] = (*theCoPvec)[i];
+         }
+      }
+   }
 
    p_vector *= Real(spxSense());
 
@@ -1964,8 +1983,24 @@ SPxSolver::Status SPxSolver::getRedCost(Vector& p_vector) const
    }
    else
    {
-      p_vector = maxObj();
-      p_vector -= pVec();
+      const SPxBasis::Desc& ds = desc();
+
+      for(int i = 0; i < nCols(); ++i)
+      {
+         switch(ds.colStatus(i))
+         {
+         case SPxBasis::Desc::D_FREE:
+         case SPxBasis::Desc::D_ON_UPPER:
+         case SPxBasis::Desc::D_ON_LOWER:
+         case SPxBasis::Desc::D_ON_BOTH:
+         case SPxBasis::Desc::D_UNDEFINED:
+            p_vector[i] = 0;
+            break;
+
+         default:
+            p_vector[i] = maxObj()[i] - (*thePvec)[i];
+         }
+      }
 
       if(spxSense() == SPxLP::MINIMIZE)
          p_vector *= -1.0;
