@@ -33,6 +33,7 @@
 #include "soplex/random.h"
 #include "soplex/unitvector.h"
 #include "soplex/updatevector.h"
+#include "soplex/stablesum.h"
 
 #define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
 #define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
@@ -1899,21 +1900,21 @@ protected:
    ///
    virtual void getLeaveVals(int i,
                              SPxBasis::Desc::Status& leaveStat, SPxId& leaveId,
-                             Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
+                             Real& leaveMax, Real& leavebound, int& leaveNum, StableSum<Real>& objChange);
    ///
    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
                               Real& enterBound, Real& newUBbound,
-                              Real& newLBbound, Real& newCoPrhs, Real& objChange);
+                              Real& newLBbound, Real& newCoPrhs, StableSum<Real>& objChange);
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
                              Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-                             Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, Real& objChange);
+                             Real& enterPric, SPxBasis::Desc::Status& enterStat, Real& enterRO, StableSum<Real>& objChange);
    ///
    virtual void getEnterVals2(int leaveIdx,
-                              Real enterMax, Real& leaveBound, Real& objChange);
+                              Real enterMax, Real& leaveBound, StableSum<Real>& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, SPxBasis::Desc::Status enterStat,
-                              Real leaveVal, const SVector& vec, Real& objChange);
+                              Real leaveVal, const SVector& vec, StableSum<Real>& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
                             Real enterTest, SPxBasis::Desc::Status enterStat);

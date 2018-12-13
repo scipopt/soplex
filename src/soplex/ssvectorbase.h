@@ -26,6 +26,7 @@
 #include "soplex/dvectorbase.h"
 #include "soplex/idxset.h"
 #include "soplex/spxalloc.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -432,7 +433,7 @@ public:
    {
       setup();
 
-      R x = R(0);
+      StableSum<R> x;
       int i = size() - 1;
       int j = w.size() - 1;
 

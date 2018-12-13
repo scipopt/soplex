@@ -22,6 +22,7 @@
 #include "soplex/spxpricer.h"
 #include "soplex/spxout.h"
 #include "soplex/exceptions.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -447,7 +448,7 @@ void SPxSolver::getEnterVals
    Real& enterPric,
    SPxBasis::Desc::Status& enterStat,
    Real& enterRO,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    int enterIdx;
@@ -766,7 +767,7 @@ void SPxSolver::getEnterVals2
    int leaveIdx,
    Real enterMax,
    Real& leavebound,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    int idx;
@@ -1084,7 +1085,7 @@ SPxSolver::ungetEnterVal(
    SPxBasis::Desc::Status enterStat,
    Real leaveVal,
    const SVector& vec,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    assert(rep() == COLUMN);
@@ -1215,7 +1216,7 @@ bool SPxSolver::enter(SPxId& enterId, bool polish)
    Real enterPric;      // priced value of entering variable
    SPxBasis::Desc::Status enterStat;      // status of entering variable
    Real enterRO;        // rhs/obj of entering variable
-   Real objChange = 0.0;
+   StableSum<Real> objChange;
    const SVector* enterVec = enterVector(enterId);
 
    bool instable = instableEnter;
