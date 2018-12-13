@@ -276,14 +276,14 @@ namespace soplex
     int            m_numCycle;    ///< actual number of degenerate steps so far.
     bool           initialized;   ///< true, if all vectors are setup.
 
-    SSVectorVectorBase<R>*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVectorVectorBase<R>*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVectorVectorBase<R>*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-    SSVectorVectorBase*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-    SSVectorVectorBase*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVectorVectorBase*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVectorVectorBase*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-    SSVectorVectorBase*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorBase<R>*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorBase<R>*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorBase<R>*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorBase<R>*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorBase<R>*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorBase<R>*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorBase<R>*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorBase<R>*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
     bool           freePricer;        ///< true iff thepricer should be freed inside of object
     bool           freeRatioTester;   ///< true iff theratiotester should be freed inside of object

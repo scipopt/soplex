@@ -480,10 +480,12 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
+   // mpfr_flot_50 with expression template turned off
+   using mpfr_float_50_eto = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off>;
+
   //@todo need to implement the mpf part properly The arguments should be parsed
   // and the right template of runSoplex should be called
-
-   return runSoPlex<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off> >(argc, argv);
+   return runSoPlex<mpfr_float_50_eto>(argc, argv);
   // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }
