@@ -1068,7 +1068,7 @@ namespace soplex
     // run the simplex method if problem has not been solved by the simplifier
     if( result == SPxSimplifier<Real>::OKAY )
       {
-        if( _scaler != 0 )
+        if( _scaler != nullptr )
           _scaler->scale(solver);
 
         bool _hadBasis = _hasBasis;

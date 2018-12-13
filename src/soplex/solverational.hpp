@@ -52,7 +52,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
         }
 
       // apply scaling after the simplification
-      if( _scaler != 0 && simplificationStatus == SPxSimplifier<R>::OKAY )
+      if( _scaler != nullptr && simplificationStatus == SPxSimplifier<R>::OKAY )
         _scaler->scale(_solver, false);
 
       // run the simplex method if problem has not been solved by the simplifier
