@@ -4877,8 +4877,10 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const boo
         // doing -val won't work since Rational doesn't have an operator= that
         // accepts boost expressions. 0-value is a simple fix.
 
-        // @todo Write the operator= for Rational to accept boost expressions.
-        _rationalNegInfty = 0-value;
+        // @todo Implement expression template?
+        // A work around to avoid expression template
+        _rationalNegInfty = value;
+        _rationalNegInfty = -_rationalNegInfty;
         if( intParam(SoPlexBase<R>::SYNCMODE) != SYNCMODE_ONLYREAL )
           _recomputeRangeTypesRational();
         break;
