@@ -1331,7 +1331,7 @@ private:
    void trivialHeuristic(SPxLP& lp);
 
    /// checks a solution for feasibility
-   bool checkSolution(SPxLP& lp, DVector sol);
+  bool checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol);
 
    /// tightens variable bounds by propagating the pseudo objective function value.
    void propagatePseudoobj(SPxLP& lp);
@@ -1644,5 +1644,7 @@ private:
    //@}
 };
 
+  // For including general templated functions
+  #include "spxmainsm.hpp"
 } // namespace soplex
 #endif // _SPXMAINSM_H_

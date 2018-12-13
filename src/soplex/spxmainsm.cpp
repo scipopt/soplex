@@ -66,7 +66,7 @@ namespace soplex
 {
 
   template <>
-  bool SPxMainSM<Real>::checkSolution(SPxLP& lp, DVector sol);
+  bool SPxMainSM<Real>::checkSolution(SPxLPBase<Real>& lp, DVectorBase<Real> sol);
 
   template <>
   void SPxMainSM<Real>::fixColumn(SPxLP& lp, int j, bool correctIdx);
@@ -1944,26 +1944,6 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
   }
 
 
-  /// checks a solution for feasibility
-  template <>
-  bool SPxMainSM<Real>::checkSolution(SPxLP& lp, DVector sol)
-  {
-    for(int i = lp.nRows()-1; i >= 0; --i)
-      {
-        const SVector& row = lp.rowVector(i);
-        Real activity = 0;
-
-        for(int k = 0; k < row.size(); k++)
-          activity += row.value(k)*sol[row.index(k)];
-
-        if(!GE(activity, lp.lhs(i), feastol()) || !LE(activity, lp.rhs(i), feastol()))
-          return false;
-      }
-
-    return true;
-  }
-
-
 
   /// tightens variable bounds by propagating the pseudo objective function value.
   template <>
@@ -3176,7 +3156,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                                << " with zero objective (" << lp.maxObj(j)
                                << ")" << std::endl; )
 
-                      SVector col_idx_sorted(col);
+                    SVectorBase<Real> col_idx_sorted(col);
 
                     // sort col elements by increasing idx
                     IdxCompare compare;
