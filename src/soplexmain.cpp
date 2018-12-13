@@ -31,6 +31,7 @@
 
 // @todo #if, else
 #include "boost/multiprecision/number.hpp"
+#include <boost/multiprecision/mpfr.hpp>
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
@@ -482,7 +483,7 @@ int main(int argc, char* argv[])
   //@todo need to implement the mpf part properly The arguments should be parsed
   // and the right template of runSoplex should be called
 
-  return runSoPlex<boost::multiprecision::mpfr_float_100>(argc, argv);
+   return runSoPlex<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off> >(argc, argv);
   // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }

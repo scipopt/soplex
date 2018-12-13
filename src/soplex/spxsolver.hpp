@@ -42,3 +42,29 @@ bool SPxSolverBase<R>::read(std::istream& in, NameSet* rowNames,
   return true;
 }
 
+
+template <class R>
+void SPxSolverBase<R>::setFeastol(R d)
+{
+
+  if( d <= 0.0 )
+    throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
+
+  if( theRep == COLUMN )
+    m_entertol = d;
+  else
+    m_leavetol = d;
+}
+
+
+template <class R>
+void SPxSolverBase<R>::setDelta(R d)
+{
+
+      if( d <= 0.0 )
+        throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
+
+      m_entertol = d;
+      m_leavetol = d;
+}
+

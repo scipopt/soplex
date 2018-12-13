@@ -7753,7 +7753,7 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
       }
     // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
     else if( intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
-                                                                  && GE(realParam(SoPlexBase<R>::FEASTOL), 1e-9) && GE(realParam(SoPlexBase<R>::OPTTOL), 1e-9)) )
+                                                                      && GE(realParam(SoPlexBase<R>::FEASTOL), R(1e-9)) && GE(realParam(SoPlexBase<R>::OPTTOL), R(1e-9))) )
       {
         // ensure that tolerances are reasonable for the floating-point solver
         if( realParam(SoPlexBase<R>::FEASTOL) < _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL] )

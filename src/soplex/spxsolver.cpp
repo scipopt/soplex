@@ -950,20 +950,6 @@ namespace soplex
     }
 
 
-
-    template <>
-      void SPxSolverBase<Real>::setFeastol(Real d)
-    {
-
-      if( d <= 0.0 )
-        throw SPxInterfaceException("XSOLVE30 Cannot set feastol less than or equal to zero.");
-
-      if( theRep == COLUMN )
-        m_entertol = d;
-      else
-        m_leavetol = d;
-    }
-
     template <>
       void SPxSolverBase<Real>::setOpttol(Real d)
     {
@@ -976,18 +962,6 @@ namespace soplex
       else
         m_entertol = d;
     }
-
-    template <>
-      void SPxSolverBase<Real>::setDelta(Real d)
-    {
-
-      if( d <= 0.0 )
-        throw SPxInterfaceException("XSOLVE32 Cannot set delta less than or equal to zero.");
-
-      m_entertol = d;
-      m_leavetol = d;
-    }
-
     template <>
       void SPxSolverBase<Real>::hyperPricing(bool h)
     {

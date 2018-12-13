@@ -812,11 +812,11 @@ namespace soplex
       return m_entertol > m_leavetol ? m_entertol : m_leavetol;
     }
     /// set parameter \p feastol.
-    void setFeastol(Real d);
+    void setFeastol(R d);
     /// set parameter \p opttol.
-    void setOpttol(Real d);
+    void setOpttol(R d);
     /// set parameter \p delta, i.e., set \p feastol and \p opttol to same value.
-    void setDelta(Real d);
+    void setDelta(R d);
     /// set timing type
     void setTiming(Timer::TYPE ttype)
     {
