@@ -67,22 +67,6 @@ namespace soplex
   }
 
   template <>
-  void SPxSolverBase<Real>::loadLP(const SPxLP& lp, bool initSlackBasis)
-  {
-    clear();
-    unInit();
-    this->unLoad();
-    resetClockStats();
-    if (thepricer)
-      thepricer->clear();
-    if (theratiotester)
-      theratiotester->clear();
-    SPxLP::operator=(lp);
-    reDim();
-    SPxBasisBase<Real>::load(this, initSlackBasis);
-  }
-
-  template <>
   void SPxSolverBase<Real>::setBasisSolver(SLinSolver* slu, const bool destroy)
   {
     // we need to set the outstream before we load the solver to ensure that the basis

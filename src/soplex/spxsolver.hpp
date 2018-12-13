@@ -68,3 +68,19 @@ void SPxSolverBase<R>::setDelta(R d)
       m_leavetol = d;
 }
 
+template <class R>
+void SPxSolverBase<R>::loadLP(const SPxLPBase<R>& lp, bool initSlackBasis)
+{
+  clear();
+  unInit();
+  this->unLoad();
+  resetClockStats();
+  if (thepricer)
+    thepricer->clear();
+  if (theratiotester)
+    theratiotester->clear();
+  SPxLPBase<R>::operator=(lp);
+  reDim();
+  SPxBasisBase<R>::load(this, initSlackBasis);
+}
+

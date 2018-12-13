@@ -263,27 +263,27 @@ namespace soplex
     Real           m_nonbasicValue;         ///< nonbasic part of current objective value
     bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
 
-    Real           m_pricingViol;             ///< maximal feasibility violation of current solution
+    R           m_pricingViol;             ///< maximal feasibility violation of current solution
     bool           m_pricingViolUpToDate;     ///< true, if the stored violation is up to date
-    Real           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
+    R           m_pricingViolCo;           ///< maximal feasibility violation of current solution in coDim
     bool           m_pricingViolCoUpToDate;   ///< true, if the stored violation in coDim is up to date
 
-    Real           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
-    Real           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
-    Real           theShift;      ///< sum of all shifts applied to any bound.
-    Real           lastShift;     ///< for forcing feasibility.
+    R           m_entertol;    ///< feasibility tolerance maintained during entering algorithm
+    R           m_leavetol;    ///< feasibility tolerance maintained during leaving algorithm
+    R           theShift;      ///< sum of all shifts applied to any bound.
+    R           lastShift;     ///< for forcing feasibility.
     int            m_maxCycle;    ///< maximum steps before cycling is detected.
     int            m_numCycle;    ///< actual number of degenerate steps so far.
     bool           initialized;   ///< true, if all vectors are setup.
 
-    SSVector*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVector*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVector*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-    SSVector*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-    SSVector*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVector*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
-    SSVector*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
-    SSVector*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorVectorBase<R>*      solveVector2;      ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorVectorBase<R>*      solveVector2rhs;   ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorVectorBase<R>*      solveVector3;      ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorVectorBase*      solveVector3rhs;   ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorVectorBase*      coSolveVector2;    ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorVectorBase*      coSolveVector2rhs; ///< when 2 systems are to be solved at a time; typically for speepest edge weights
+    SSVectorVectorBase*      coSolveVector3;    ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
+    SSVectorVectorBase*      coSolveVector3rhs; ///< when 3 systems are to be solved at a time; typically reserved for bound flipping ratio test (basic solution will be modified!)
 
     bool           freePricer;        ///< true iff thepricer should be freed inside of object
     bool           freeRatioTester;   ///< true iff theratiotester should be freed inside of object
@@ -552,7 +552,7 @@ namespace soplex
                       NameSet* colNames = 0, DIdxSet* intVars = 0);
 
     /// copy LP.
-    virtual void loadLP(const SPxLP& LP, bool initSlackBasis = true);
+    virtual void loadLP(const SPxLPBase<R>& LP, bool initSlackBasis = true);
     /// setup linear solver to use. If \p destroy is true, \p slusolver will be freed in destructor.
     virtual void setBasisSolver(SLinSolver* slu, const bool destroy = false);
     /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.
