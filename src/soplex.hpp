@@ -4943,8 +4943,9 @@ bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const boo
 
         // accuracy of conjugate gradient method in least squares scaling (higher value leads to more iterations)
       case SoPlexBase<R>::LEASTSQ_ACRCY:
-        if( _scaler )
-          _scaler->setRealParam(value);
+          // @todo uncomment this later
+        // if( _scaler )
+          // _scaler->setRealParam(value);
         break;
 
         // objective offset

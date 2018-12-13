@@ -1777,9 +1777,11 @@ namespace soplex
       thesense = sns;
     }
 
-    virtual void changeObjOffset(const R& o)
+    template <typename T>
+    void changeObjOffset(const T& o)
     {
-      offset = o;
+      offset = o;               // Converts o into type R. Example Rational into
+                                // Real
     }
 
     /// Computes activity of the rows for a given primal vector; activity does not need to be zero

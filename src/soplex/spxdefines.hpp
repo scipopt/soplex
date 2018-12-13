@@ -20,13 +20,13 @@
 // Defining the static members of the Param class
 // THREADLOCAL is a #define to thread_local. (Is it really needed?)
 template <class R>
-THREADLOCAL Real Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
+THREADLOCAL R Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
 template <class R>
-THREADLOCAL Real Param<R>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+THREADLOCAL R Param<R>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 template <class R>
-THREADLOCAL Real Param<R>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+THREADLOCAL R Param<R>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 template <class R>
-THREADLOCAL Real Param<R>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+THREADLOCAL R Param<R>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 
 template <class R>
@@ -138,7 +138,7 @@ inline bool GErel(R a, R b, R eps = Param<R>::epsilon())
 template <class R>
  R Param<R>::epsilon()
 {
-   return s_epsilon;
+  return R(s_epsilon);
 }
 
 template <class R>
@@ -162,7 +162,7 @@ template <class R>
 template <class R>
 void Param<R>::setEpsilonUpdate(R eps)
 {
-   s_epsilon_update = eps;
+  s_epsilon_update = R(eps);
 }
 
 template <class R>

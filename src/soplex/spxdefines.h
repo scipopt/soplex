@@ -261,13 +261,13 @@ private:
    /**@name Data */
    //@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   THREADLOCAL static Real s_epsilon;
+   THREADLOCAL static R s_epsilon;
    /// epsilon for factorization
-   THREADLOCAL static Real s_epsilon_factorization;
+   THREADLOCAL static R s_epsilon_factorization;
    /// epsilon for factorization update
-   THREADLOCAL static Real s_epsilon_update;
+   THREADLOCAL static R s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   THREADLOCAL static Real s_epsilon_pivot;
+   THREADLOCAL static R s_epsilon_pivot;
    //@}
 
 public:

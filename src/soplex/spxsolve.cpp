@@ -1911,7 +1911,6 @@ namespace soplex
     return status();
   }
 
-  /// #typename #temp
   template <>
   typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getSlacks (Vector& p_vector) const
   {
