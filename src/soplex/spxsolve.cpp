@@ -1960,7 +1960,26 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualSol(Vector& p_v
       }
    }
    else
-      p_vector = coPvec();
+   {
+      const SPxBasis::Desc& ds = desc();
+
+      for(int i = 0; i < nRows(); ++i)
+      {
+         switch(ds.rowStatus(i))
+         {
+         case SPxBasis::Desc::D_FREE:
+         case SPxBasis::Desc::D_ON_UPPER:
+         case SPxBasis::Desc::D_ON_LOWER:
+         case SPxBasis::Desc::D_ON_BOTH:
+         case SPxBasis::Desc::D_UNDEFINED:
+            p_vector[i] = 0;
+            break;
+
+         default:
+            p_vector[i] = (*theCoPvec)[i];
+         }
+      }
+   }
 
    p_vector *= Real(this->spxSense());
 
@@ -2003,8 +2022,24 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getRedCostSol(Vector& 
    }
    else
    {
-      p_vector = this->maxObj();
-      p_vector -= pVec();
+      const SPxBasis::Desc& ds = desc();
+
+      for(int i = 0; i < nCols(); ++i)
+      {
+         switch(ds.colStatus(i))
+         {
+         case SPxBasis::Desc::D_FREE:
+         case SPxBasis::Desc::D_ON_UPPER:
+         case SPxBasis::Desc::D_ON_LOWER:
+         case SPxBasis::Desc::D_ON_BOTH:
+         case SPxBasis::Desc::D_UNDEFINED:
+            p_vector[i] = 0;
+            break;
+
+         default:
+            p_vector[i] = this->maxObj()[i] - (*thePvec)[i];
+         }
+      }
 
       if(this->spxSense() == SPxLP::MINIMIZE)
          p_vector *= -1.0;

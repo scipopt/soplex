@@ -2510,12 +2510,12 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
       z2 = 0.0;
 
    // determine which side has to be used for the bounds comparison below
-   if(GT(aik * aij, 0.0, epsZero()))
+   if(aik * aij > 0.0)
    {
       new_lo_k = (upper_j >=  infinity) ? -infinity : z1 * scale1 / aik;
       new_up_k = (lower_j <= -infinity) ?  infinity : z2 * scale2 / aik;
    }
-   else if(LT(aik * aij, 0.0, epsZero()))
+   else if(aik * aij < 0.0)
    {
       new_lo_k = (lower_j <= -infinity) ? -infinity : z2 * scale2 / aik;
       new_up_k = (upper_j >=  infinity) ?  infinity : z1 * scale1 / aik;
@@ -3525,12 +3525,12 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyCols(SPxLP& lp, bo
             if(isZero(z2, epsZero()))
                z2 = 0.0;
 
-            if(GT(aij * aik, 0.0, epsZero()))
+            if(aij * aik > 0.0)
             {
                lo = (lp.upper(j) >=  infinity) ? -infinity : z1 * scale1 / aik;
                up = (lp.lower(j) <= -infinity) ?  infinity : z2 * scale2 / aik;
             }
-            else if(LT(aij * aik, 0.0, epsZero()))
+            else if(aij * aik < 0.0)
             {
                lo = (lp.lower(j) <= -infinity) ? -infinity : z2 * scale2 / aik;
                up = (lp.upper(j) >=  infinity) ?  infinity : z1 * scale1 / aik;

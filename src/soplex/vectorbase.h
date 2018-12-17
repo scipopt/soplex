@@ -24,6 +24,7 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -338,7 +339,7 @@ public:
    {
       assert(vec.dim() == dimen);
 
-      R x = 0.0;
+      StableSum<R> x;
 
       for(int i = 0; i < dimen; i++)
          x += val[i] * vec.val[i];
