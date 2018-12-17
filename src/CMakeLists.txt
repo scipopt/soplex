@@ -141,6 +141,7 @@ set(headers
     soplex/spxweightst.h
     soplex/ssvectorbase.h
     soplex/ssvector.h
+    soplex/stablesum.h
     soplex/statistics.h
     soplex/svectorbase.h
     soplex/svector.h
