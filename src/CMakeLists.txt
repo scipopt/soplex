@@ -158,17 +158,27 @@ set(headers
     soplex/vector.h
     soplex/wallclocktimer.h)
 
+if(NOT BUILD_SHARED_LIBS)
     # create soplex library with pic
     add_library(libsoplex-pic STATIC ${sources})
     set_target_properties(libsoplex-pic PROPERTIES
-    POSITION_INDEPENDENT_CODE on
-    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
-    SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
-add_dependencies(libsoplex-pic soplex_update_githash)
-target_link_libraries(libsoplex-pic ${libs})
+        POSITION_INDEPENDENT_CODE on
+        VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
+        SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
+    add_dependencies(libsoplex-pic soplex_update_githash)
+    target_link_libraries(libsoplex-pic ${libs})
+    set_target_properties(libsoplex-pic PROPERTIES
+        OUTPUT_NAME "soplex-pic"
+        MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    install(TARGETS libsoplex-pic EXPORT soplex-targets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+    export(TARGETS libsoplex-pic
+        FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
+endif()
 
 # create soplex library without pic
-add_library(libsoplex STATIC ${sources})
+add_library(libsoplex ${sources})
 set_target_properties(libsoplex PROPERTIES
     VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}.${SOPLEX_VERSION_SUB}
     SOVERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR})
@@ -193,24 +203,26 @@ set_target_properties(soplex PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/l
 set_target_properties(libsoplex PROPERTIES
     OUTPUT_NAME "soplex"
     MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set_target_properties(libsoplex-pic PROPERTIES
-    OUTPUT_NAME "soplex-pic"
-    MACOSX_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # install the header files of soplex
 install(FILES ${headers} DESTINATION include/soplex)
 install(FILES soplex.h DESTINATION include)
 
 # install the binary and the library to appropriate lcoations and add them to an export group
-install(TARGETS soplex libsoplex libsoplex-pic EXPORT soplex-targets
+install(TARGETS soplex libsoplex EXPORT soplex-targets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
 
 # Add library targets to the build-tree export set
-export(TARGETS libsoplex libsoplex-pic
-  FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
+if(NOT BUILD_SHARED_LIBS)
+    export(TARGETS libsoplex libsoplex-pic
+        FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
+else()
+    export(TARGETS libsoplex
+        FILE "${CMAKE_BINARY_DIR}/soplex-targets.cmake")
+endif()
 
 #configure the config file for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
