@@ -2342,8 +2342,5 @@ namespace soplex
   // For general templated functions
   #include "spxsolver.hpp"
 
-  // May not be the best idea to put this here.
-  #include "soplex/changesoplex.hpp"
-
 } // namespace soplex
 #endif // _SPXSOLVER_H_

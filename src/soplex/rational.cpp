@@ -721,11 +721,11 @@ Rational::operator long double() const
 // Operator to typecast Rational to one of the Boost Number types
 // @todo needs #if else.
 template <typename T>
-Rational::operator boost::multiprecision::number<T>() const
+Rational::operator boost::multiprecision::number<T,  boost::multiprecision::et_off>() const
 {
   // Constructs a boost::multiprecision::number<T> with value
   // this->pointer->privatevalue
-  return boost::multiprecision::number<T>(this->dpointer->privatevalue);
+  return boost::multiprecision::number<T, boost::multiprecision::et_off>(this->dpointer->privatevalue);
   // @todo may need to work with edge cases like the other codes?
 }
 
