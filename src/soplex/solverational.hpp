@@ -1488,3 +1488,328 @@ void SoPlexBase<R>::_performOptIRStable(
   // stop rational solving time
   _statistics->rationalTime->stop();
 }
+
+   /// solves rational LP
+  template <class R>
+  void SoPlexBase<R>::_optimizeRational()
+   {
+      bool hasUnboundedRay = false;
+      bool infeasibilityNotCertified = false;
+      bool unboundednessNotCertified = false;
+
+      // start timing
+      _statistics->solvingTime->start();
+      _statistics->preprocessingTime->start();
+
+      // remember that last solve was rational
+      _lastSolveMode = SOLVEMODE_RATIONAL;
+
+      // ensure that the solver has the original problemo
+      if( !_isRealLPLoaded )
+      {
+         assert(_realLP != &_solver);
+
+         _solver.loadLP(*_realLP);
+         spx_free(_realLP);
+         _realLP = &_solver;
+         _isRealLPLoaded = true;
+      }
+      // during the rational solve, we always store basis information in the basis arrays
+      else if( _hasBasis )
+      {
+         _basisStatusRows.reSize(numRows());
+         _basisStatusCols.reSize(numCols());
+         _solver.getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), _basisStatusRows.size(), _basisStatusCols.size());
+      }
+
+      // store objective, bounds, and sides of R LP in case they will be modified during iterative refinement
+      _storeLPReal();
+
+      // deactivate objective limit in floating-point solver
+      if( realParam(SoPlexBase<R>::OBJLIMIT_LOWER) > -realParam(SoPlexBase<R>::INFTY) || realParam(SoPlexBase<R>::OBJLIMIT_UPPER) < realParam(SoPlexBase<R>::INFTY) )
+      {
+         MSG_INFO2( spxout, spxout << "Deactivating objective limit.\n" );
+      }
+
+      _solver.setTerminationValue(realParam(SoPlexBase<R>::INFTY));
+
+      _statistics->preprocessingTime->stop();
+
+      // apply lifting to reduce range of nonzero matrix coefficients
+      if( boolParam(SoPlexBase<R>::LIFTING) )
+         _lift();
+
+      // force column representation
+      ///@todo implement row objectives with row representation
+      int oldRepresentation = intParam(SoPlexBase<R>::REPRESENTATION);
+      setIntParam(SoPlexBase<R>::REPRESENTATION, SoPlexBase<R>::REPRESENTATION_COLUMN);
+
+      // force ratio test (avoid bound flipping)
+      int oldRatiotester = intParam(SoPlexBase<R>::RATIOTESTER);
+      setIntParam(SoPlexBase<R>::RATIOTESTER, SoPlexBase<R>::RATIOTESTER_FAST);
+
+      ///@todo implement handling of row objectives in Cplex interface
+#ifdef SOPLEX_WITH_CPX
+      int oldEqtrans = boolParam(SoPlexBase<R>::EQTRANS);
+      setBoolParam(SoPlexBase<R>::EQTRANS, true);
+#endif
+
+      // introduce slack variables to transform inequality constraints into equations
+      if( boolParam(SoPlexBase<R>::EQTRANS) )
+         _transformEquality();
+
+      _storedBasis = false;
+
+      bool stoppedTime;
+      bool stoppedIter;
+      do
+      {
+         bool primalFeasible = false;
+         bool dualFeasible = false;
+         bool infeasible = false;
+         bool unbounded = false;
+         bool error = false;
+         stoppedTime = false;
+         stoppedIter = false;
+
+         // solve problem with iterative refinement and recovery mechanism
+         _performOptIRStable(_solRational, !unboundednessNotCertified, !infeasibilityNotCertified, 0,
+            primalFeasible, dualFeasible, infeasible, unbounded, stoppedTime, stoppedIter, error);
+
+         // case: an unrecoverable error occured
+         if( error )
+         {
+            _status = SPxSolverBase<R>::ERROR;
+            break;
+         }
+         // case: stopped due to some limit
+         else if( stoppedTime )
+         {
+            _status = SPxSolverBase<R>::ABORT_TIME;
+            break;
+         }
+         else if(  stoppedIter )
+         {
+            _status = SPxSolverBase<R>::ABORT_ITER;
+            break;
+         }
+         // case: unboundedness detected for the first time
+         else if( unbounded && !unboundednessNotCertified )
+         {
+            SolRational solUnbounded;
+
+            _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stoppedTime, stoppedIter, error);
+
+            assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
+            assert(!solUnbounded.hasPrimalRay() || hasUnboundedRay);
+
+            if( error )
+            {
+               MSG_INFO1( spxout, spxout << "Error while testing for unboundedness.\n" );
+               _status = SPxSolverBase<R>::ERROR;
+               break;
+            }
+
+            if( hasUnboundedRay )
+            {
+               MSG_INFO1( spxout, spxout << "Dual infeasible.  Primal unbounded ray available.\n" );
+            }
+            else
+            {
+               MSG_INFO1( spxout, spxout << "Dual feasible.  Rejecting primal unboundedness.\n" );
+            }
+
+            unboundednessNotCertified = !hasUnboundedRay;
+
+            if( stoppedTime )
+            {
+               _status = SPxSolverBase<R>::ABORT_TIME;
+               break;
+            }
+            else if( stoppedIter )
+            {
+               _status = SPxSolverBase<R>::ABORT_ITER;
+               break;
+            }
+
+            _performFeasIRStable(_solRational, infeasible, stoppedTime, stoppedIter, error);
+
+            ///@todo this should be stored already earlier, possible switch use solRational above and solFeas here
+            if( hasUnboundedRay )
+            {
+               _solRational._primalRay = solUnbounded._primalRay;
+               _solRational._hasPrimalRay = true;
+            }
+
+            if( error )
+            {
+               MSG_INFO1( spxout, spxout << "Error while testing for feasibility.\n" );
+               _status = SPxSolverBase<R>::ERROR;
+               break;
+            }
+            else if( stoppedTime )
+            {
+               _status = SPxSolverBase<R>::ABORT_TIME;
+               break;
+            }
+            else if( stoppedIter )
+            {
+               _status = SPxSolverBase<R>::ABORT_ITER;
+               break;
+            }
+            else if( infeasible )
+            {
+               MSG_INFO1( spxout, spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
+               _status = SPxSolverBase<R>::INFEASIBLE;
+               break;
+            }
+            else if( hasUnboundedRay )
+            {
+               MSG_INFO1( spxout, spxout << "Primal feasible and unbounded.\n" );
+               _status = SPxSolverBase<R>::UNBOUNDED;
+               break;
+            }
+            else
+            {
+               MSG_INFO1( spxout, spxout << "Primal feasible and bounded.\n" );
+               continue;
+            }
+         }
+         // case: infeasibility detected
+         else if( infeasible && !infeasibilityNotCertified )
+         {
+            _storeBasis();
+
+            _performFeasIRStable(_solRational, infeasible, stoppedTime, stoppedIter, error);
+
+            if( error )
+            {
+               MSG_INFO1( spxout, spxout << "Error while testing for infeasibility.\n" );
+               _status = SPxSolverBase<R>::ERROR;
+               _restoreBasis();
+               break;
+            }
+
+            infeasibilityNotCertified = !infeasible;
+
+            if( stoppedTime )
+            {
+               _status = SPxSolverBase<R>::ABORT_TIME;
+               _restoreBasis();
+               break;
+            }
+            else if( stoppedIter )
+            {
+               _status = SPxSolverBase<R>::ABORT_ITER;
+               _restoreBasis();
+               break;
+            }
+
+            if( infeasible && boolParam(SoPlexBase<R>::TESTDUALINF) )
+            {
+               SolRational solUnbounded;
+
+               _performUnboundedIRStable(solUnbounded, hasUnboundedRay, stoppedTime, stoppedIter, error);
+
+               assert(!hasUnboundedRay || solUnbounded.hasPrimalRay());
+               assert(!solUnbounded.hasPrimalRay() || hasUnboundedRay);
+
+               if( error )
+               {
+                  MSG_INFO1( spxout, spxout << "Error while testing for dual infeasibility.\n" );
+                  _status = SPxSolverBase<R>::ERROR;
+                  _restoreBasis();
+                  break;
+               }
+
+               if( hasUnboundedRay )
+               {
+                  MSG_INFO1( spxout, spxout << "Dual infeasible.  Primal unbounded ray available.\n" );
+                  _solRational._primalRay = solUnbounded._primalRay;
+                  _solRational._hasPrimalRay = true;
+               }
+               else if( solUnbounded._isDualFeasible )
+               {
+                  MSG_INFO1( spxout, spxout << "Dual feasible.  Storing dual multipliers.\n" );
+                  _solRational._dual = solUnbounded._dual;
+                  _solRational._redCost = solUnbounded._redCost;
+                  _solRational._isDualFeasible = true;
+               }
+               else
+               {
+                  assert(false);
+                  MSG_INFO1( spxout, spxout << "Not dual infeasible.\n" );
+               }
+            }
+
+            _restoreBasis();
+
+            if( infeasible )
+            {
+               MSG_INFO1( spxout, spxout << "Primal infeasible.  Dual Farkas ray available.\n" );
+               _status = SPxSolverBase<R>::INFEASIBLE;
+               break;
+            }
+            else if( hasUnboundedRay )
+            {
+               MSG_INFO1( spxout, spxout << "Primal feasible and unbounded.\n" );
+               _status = SPxSolverBase<R>::UNBOUNDED;
+               break;
+            }
+            else
+            {
+               MSG_INFO1( spxout, spxout << "Primal feasible.  Optimizing again.\n" );
+               continue;
+            }
+         }
+         else if( primalFeasible && dualFeasible )
+         {
+            MSG_INFO1( spxout, spxout << "Solved to optimality.\n" );
+            _status = SPxSolverBase<R>::OPTIMAL;
+            break;
+         }
+         else
+         {
+            MSG_INFO1( spxout, spxout << "Terminating without success.\n" );
+            break;
+         }
+      }
+      while( !_isSolveStopped(stoppedTime, stoppedIter) );
+
+      ///@todo set status to ABORT_VALUE if optimal solution exceeds objective limit
+
+      if( _status == SPxSolverBase<R>::OPTIMAL || _status == SPxSolverBase<R>::INFEASIBLE || _status == SPxSolverBase<R>::UNBOUNDED )
+         _hasSolRational = true;
+
+      // restore original problem
+      if( boolParam(SoPlexBase<R>::EQTRANS) )
+         _untransformEquality(_solRational);
+
+#ifdef SOPLEX_WITH_CPX
+      setBoolParam(SoPlexBase<R>::EQTRANS, oldEqtrans);
+#endif
+
+      // reset representation and ratio test
+      setIntParam(SoPlexBase<R>::REPRESENTATION, oldRepresentation);
+      setIntParam(SoPlexBase<R>::RATIOTESTER, oldRatiotester);
+
+      // undo lifting
+      if( boolParam(SoPlexBase<R>::LIFTING) )
+         _project(_solRational);
+
+      // restore objective, bounds, and sides of R LP in case they have been modified during iterative refinement
+      _restoreLPReal();
+
+      // since the R LP is loaded in the solver, we need to also pass the basis information to the solver if
+      // available
+      if( _hasBasis )
+      {
+         assert(_isRealLPLoaded);
+         _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
+         _hasBasis = (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
+      }
+
+      // stop timing
+      _statistics->solvingTime->stop();
+   }
+
