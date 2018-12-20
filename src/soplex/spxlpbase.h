@@ -2703,7 +2703,11 @@ namespace soplex
     //@}
 };
 
+  // For the general templated functions
+#include "spxlpbase_real.hpp"
 
+  // @todo the following declarations may be redundant now because of above
+  // #include. But I do not know why they were added.
 // Declaration of Real specializations found in spxlpbase_real.cpp
 
 template <>

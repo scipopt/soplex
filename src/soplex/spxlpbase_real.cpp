@@ -408,17 +408,6 @@ namespace soplex
       vec = DVector(LPColSetBase<Real>::lower());
   }
 
-  /// Returns unscaled lower bound of column \p i.
-  template<>
-  Real SPxLPBase<Real>::lowerUnscaled(int i) const
-  {
-    assert(i >= 0 && i < nCols());
-    if( _isScaled )
-      return lp_scaler->lowerUnscaled(*this, i);
-    else
-      return LPColSetBase<Real>::lower(i);
-  }
-
   /// Returns unscaled lower bound of column with identifier \p id.
   template<>
   Real SPxLPBase<Real>::lowerUnscaled(const SPxColId& id) const
