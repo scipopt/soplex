@@ -42,6 +42,8 @@
 
 #include <cstdlib>
 
+#include "boost/multiprecision/number.hpp"
+
 namespace soplex
 {
 #define SOPLEX_VERSION         400
@@ -331,11 +333,13 @@ inline Real spxLdexp(Real x, int exp)
    return ldexpl(x,exp);
 }
 
-// returns x and exp such that y = x * 2^exp
-inline Real spxFrexp(Real y, int* exp)
-{
-   return frexpl(y, exp);
-}
+// @todo is the following needed?
+// // returns x and exp such that y = x * 2^exp
+// inline Real spxFrexp(Real y, int* exp)
+// {
+//    return frexpl(y, exp);
+// }
+
 #else
 /// returns |a|
 template <>
@@ -360,17 +364,6 @@ inline Real spxNextafter(Real x, Real y)
 #endif
 }
 
-/// returns x * 2^exp
-inline Real spxLdexp(Real x, int exp)
-{
-   return ldexp(x,exp);
-}
-
-// returns x and exp such that y = x * 2^exp
-inline Real spxFrexp(Real y, int* exp)
-{
-   return frexp(y, exp);
-}
 #endif
 
 /// returns max(|a|,|b|)

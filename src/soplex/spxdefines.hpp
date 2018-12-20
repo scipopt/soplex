@@ -37,8 +37,8 @@ void Param<R>::setEpsilonFactorization(R eps)
 
 
 /// returns \c true iff |a-b| <= eps
-  template <class R>
-  inline bool EQ(R a, R b, R eps = Param<R>::epsilon())
+template <class R>
+inline bool EQ(R a, R b, R eps = Param<R>::epsilon())
 {
    return spxAbs(a - b) <= eps;
 }
@@ -136,7 +136,7 @@ inline bool GErel(R a, R b, R eps = Param<R>::epsilon())
 
 // Templated functions, originally from spxdefines.cpp
 template <class R>
- R Param<R>::epsilon()
+R Param<R>::epsilon()
 {
   return R(s_epsilon);
 }
@@ -148,13 +148,13 @@ void Param<R>::setEpsilon(R eps)
 }
 
 template <class R>
- R Param<R>::epsilonFactorization()
+R Param<R>::epsilonFactorization()
 {
    return s_epsilon_factorization;
 }
 
 template <class R>
- R Param<R>::epsilonUpdate()
+R Param<R>::epsilonUpdate()
 {
    return s_epsilon_update;
 }
@@ -166,7 +166,7 @@ void Param<R>::setEpsilonUpdate(R eps)
 }
 
 template <class R>
- R Param<R>::epsilonPivot()
+R Param<R>::epsilonPivot()
 {
    return s_epsilon_pivot;
 }
@@ -175,4 +175,28 @@ template <class R>
 void Param<R>::setEpsilonPivot(R eps)
 {
    s_epsilon_pivot = eps;
+}
+
+/// returns x * 2^exp
+template <class R>
+R spxLdexp(R x, int exp);
+
+template <>
+Real spxLdexp(Real x, int exp)
+{
+  return ldexp(x,exp);
+}
+
+template <typename T>
+boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T> x, int exp)
+{
+  return ldexp(x,exp);
+}
+
+
+// returns x and exp such that y = x * 2^exp
+template <class R>
+inline R spxFrexp(R y, int* exp)
+{
+  return frexp(y, exp);
 }

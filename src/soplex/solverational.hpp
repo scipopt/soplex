@@ -941,7 +941,7 @@ void SoPlexBase<R>::_performOptIRStable(
                   if( _modLower[c] <= _rationalNegInfty )
                     _solver.changeLower(c, -realParam(SoPlexBase<R>::INFTY));
                   else
-                    _solver.changeLower(c, R(_modLower[c]));
+                    _solver.changeLower(c, static_cast<R>(_modLower[c]));
                 }
               if( _upperFinite(_colTypes[c]) )
                 {

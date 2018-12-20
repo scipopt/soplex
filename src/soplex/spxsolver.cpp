@@ -1623,11 +1623,6 @@ namespace soplex
      *       value in case of bound violations (shifting) but in this case it
      *       is quite difficult to determine if we already reached the limit.
      */
-    template <>
-      void SPxSolverBase<Real>::setTerminationValue(Real p_value)
-    {
-      objLimit = p_value;
-    }
 
     template <>
       Real SPxSolverBase<Real>::terminationValue() const

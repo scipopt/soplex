@@ -34,6 +34,8 @@
 #include "soplex/unitvector.h"
 #include "soplex/updatevector.h"
 
+#include "soplex/spxlpbase.h"
+
 #define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
 #define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
 #define SPARSITYFACTOR           0.6      /**< percentage of infeasibilities that is considered sparse */
@@ -257,7 +259,7 @@ namespace soplex
     Real           maxTime;     ///< maximum allowed time.
     int            nClckSkipsLeft; ///< remaining number of times the clock can be safely skipped
     long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
-    Real           objLimit;    ///< objective value limit.
+    R           objLimit;    ///< objective value limit.
     Status         m_status;    ///< status of algorithm.
 
     Real           m_nonbasicValue;         ///< nonbasic part of current objective value
@@ -975,7 +977,7 @@ namespace soplex
     ///
     virtual void changeLower(const Vector& newLower, bool scale = false);
     ///
-    virtual void changeLower(int i, const Real& newLower, bool scale = false);
+    virtual void changeLower(int i, const R& newLower, bool scale = false);
     ///
     using SPxLPBase<R>::changeLower;
     virtual void changeLower(SPxColId p_id, const Real& p_newLower, bool scale = false)
@@ -1993,7 +1995,7 @@ namespace soplex
     /// return iteration limit.
     virtual int terminationIter() const;
     /// set objective limit.
-    virtual void setTerminationValue(Real value = infinity);
+    virtual void setTerminationValue(R value = infinity);
     /// return objective limit.
     virtual Real terminationValue() const;
     /// get objective value of current solution.
@@ -2337,6 +2339,11 @@ namespace soplex
   /* For Backwards compatibility */
   typedef SPxSolverBase<Real> SPxSolver;
 
+  // For general templated functions
   #include "spxsolver.hpp"
+
+  // May not be the best idea to put this here.
+  #include "soplex/changesoplex.hpp"
+
 } // namespace soplex
 #endif // _SPXSOLVER_H_
