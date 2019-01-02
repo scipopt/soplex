@@ -319,8 +319,8 @@ public:
 
   // The back end for Rational operator=.
   // @todo Have proper #if else
-  template <typename T>
-  Private& operator=(const boost::multiprecision::number<T>& q)
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Private& operator=(const boost::multiprecision::number<T, eto>& q)
   {
     // Construct a new boost number type with mpq_t as the backend from the
     // number. Hopefully, the boost library would do this. Now, the backend()
@@ -720,8 +720,8 @@ Rational::operator long double() const
 
 // Operator to typecast Rational to one of the Boost Number types
 // @todo needs #if else.
-template <typename T>
-Rational::operator boost::multiprecision::number<T,  boost::multiprecision::et_off>() const
+template <typename T, boost::multiprecision::expression_template_option eto>
+Rational::operator boost::multiprecision::number<T,  eto>() const
 {
   // Constructs a boost::multiprecision::number<T> with value
   // this->pointer->privatevalue

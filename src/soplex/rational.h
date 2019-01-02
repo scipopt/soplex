@@ -149,7 +149,7 @@ namespace soplex
       operator long double() const;
      // Operator to typecast Rational to one of the Boost Number types
      // @todo needs #if else.
-     template <typename T> operator boost::multiprecision::number<T, boost::multiprecision::et_off>() const;
+     template <typename T, boost::multiprecision::expression_template_option eto> operator boost::multiprecision::number<T, eto>() const;
 
 #ifdef SOPLEX_WITH_GMP
       /// provides read-only access to underlying mpq_t
