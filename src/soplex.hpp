@@ -4566,7 +4566,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
       switch( value )
         {
         case SCALER_OFF:
-          _scaler = 0;
+          _scaler = nullptr;
           break;
         case SCALER_UNIEQUI:
           _scaler = &_scalerUniequi;
@@ -7008,7 +7008,7 @@ SoPlexBase<R>::SoPlexBase()
   , _scalerGeoequi(true)
   , _scalerLeastsq()
   , _simplifier(0)
-  , _scaler(0)
+  , _scaler(nullptr)
   , _starter(0)
   , _rationalLP(0)
   , _unitMatrixRational(0)

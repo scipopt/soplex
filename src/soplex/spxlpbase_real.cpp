@@ -146,7 +146,7 @@ namespace soplex
 
     if( unscaled && _isScaled )
       {
-        assert(lp_scaler != 0);
+        assert(lp_scaler != nullptr);
 
         for( int i = 0; i < nCols(); ++i )
           {
@@ -179,7 +179,7 @@ namespace soplex
 
     if( unscaled && _isScaled )
       {
-        assert(lp_scaler != 0);
+        assert(lp_scaler != nullptr);
 
         for( int i = 0; i < nCols(); ++i )
           {

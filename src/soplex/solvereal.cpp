@@ -314,8 +314,8 @@ namespace soplex
   template <class R>
   void SoPlexBase<R>::_resolveWithoutPreprocessing(typename SPxSimplifier<R>::Result simplificationStatus)
    {
-      assert(!_isRealLPLoaded || _scaler != 0);
-      assert(_simplifier != 0 || _scaler != 0);
+      assert(!_isRealLPLoaded || _scaler != nullptr);
+      assert(_simplifier != 0 || _scaler != nullptr);
       assert(_status == SPxSolverBase<R>::INFEASIBLE || _status == SPxSolverBase<R>::INForUNBD || _status == SPxSolverBase<R>::UNBOUNDED);
 
       // if simplifier was active, then we unsimplify to get the basis
@@ -366,7 +366,7 @@ namespace soplex
          }
       }
       // if the original problem is not in the solver because of scaling, we also need to store the basis
-      else if( _scaler != 0 )
+      else if( _scaler != nullptr )
       {
          _basisStatusRows.reSize(numRows());
          _basisStatusCols.reSize(numCols());

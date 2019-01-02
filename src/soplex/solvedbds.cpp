@@ -996,7 +996,7 @@ namespace soplex
       }
 
     /* store original lp */
-    applyPreprocessing = (_scaler != NULL || _simplifier != NULL);
+    applyPreprocessing = (_scaler != nullptr || _simplifier != NULL);
 
     // @TODO The use of _isRealLPLoaded is not correct. An additional parameter would be useful for this algorithm.
     // Maybe a parameter _isDecompLPLoaded?
@@ -1133,7 +1133,7 @@ namespace soplex
   template <>
   void SoPlexBase<Real>::_decompResolveWithoutPreprocessing(SPxSolverBase<Real>& solver, SLUFactor& sluFactor, typename SPxSimplifier<Real>::Result result)
   {
-    assert(_simplifier != 0 || _scaler != 0);
+    assert(_simplifier != 0 || _scaler != nullptr);
     assert(result == SPxSimplifier<Real>::VANISHED
            || (result == SPxSimplifier<Real>::OKAY
                && (solver.status() == SPxSolverBase<Real>::OPTIMAL
@@ -1198,7 +1198,7 @@ namespace soplex
           }
       }
     // if the original problem is not in the solver because of scaling, we also need to store the basis
-    else if( _scaler != 0 )
+    else if( _scaler != nullptr )
       {
         _basisStatusRows.reSize(numRows());
         _basisStatusCols.reSize(numCols());

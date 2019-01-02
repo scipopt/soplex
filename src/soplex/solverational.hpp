@@ -26,14 +26,14 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
 
   // if preprocessing is applied, we need to restore the original LP at the end
   SPxLPRational* rationalLP = 0;
-  if( _simplifier != 0 || _scaler != 0 )
+  if( _simplifier != 0 || _scaler != nullptr )
     {
       spx_alloc(rationalLP);
       rationalLP = new (rationalLP) SPxLPRational(_solver);
     }
 
   // if preprocessing is applied, the basis may change, hence invalidate the rational basis factorization; if no
-  if( _simplifier != 0 || _scaler != 0 )
+  if( _simplifier != 0 || _scaler != nullptr )
     _rationalLUSolver.clear();
 
   // stop timing
@@ -107,7 +107,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                       _solver.getRedCostSol(tmpRedCost);
 
                       // unscale vectors
-                      if( _scaler != 0 )
+                      if( _scaler != nullptr )
                         {
                           _scaler->unscalePrimal(_solver, tmpPrimal);
                           _scaler->unscaleSlacks(_solver, tmpSlacks);
@@ -140,7 +140,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   _solver.getDualSol(dual);
 
                   // unscale vectors
-                  if( _scaler != 0 )
+                  if( _scaler != nullptr )
                     {
                       _scaler->unscalePrimal(_solver, primal);
                       _scaler->unscaleDual(_solver, dual);
@@ -161,7 +161,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   _solver.getDualSol(dual);
 
                   // unscale vectors
-                  if( _scaler != 0 )
+                  if( _scaler != nullptr )
                     {
                       _scaler->unscalePrimal(_solver, primal);
                       _scaler->unscaleDual(_solver, dual);
@@ -191,7 +191,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
               _solver.getDualfarkas(dual);
 
               // unscale vectors
-              if( _scaler != 0 )
+              if( _scaler != nullptr )
                 _scaler->unscaleDual(_solver, dual);
 
               // if the original problem is not in the solver because of scaling, we also need to store the basis
@@ -215,7 +215,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
     }
 
   // restore original LP if necessary
-  if( _simplifier != 0 || _scaler != 0 )
+  if( _simplifier != 0 || _scaler != nullptr )
     {
       assert(rationalLP != 0);
       _solver.loadLP((SPxLPBase<R>)(*rationalLP));
