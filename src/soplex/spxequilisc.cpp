@@ -67,7 +67,7 @@ static Real maxPrescaledRatio(const SPxLP& lp, const std::vector<Real>& coScalev
    return pmax;
 }
 
-
+  template <class R>
 void SPxEquiliSC::computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp)
 {
    assert(vecset != nullptr);

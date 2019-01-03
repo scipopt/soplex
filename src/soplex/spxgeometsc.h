@@ -32,7 +32,8 @@ namespace soplex
    This SPxScaler implementation performs geometric mean scaling of the
    LPs rows and columns.
 */
-class SPxGeometSC : public SPxScaler
+  template <class R>
+  class SPxGeometSC : public SPxScaler<R>
 {
 protected:
 
@@ -60,7 +61,7 @@ public:
    virtual ~SPxGeometSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler* clone() const override
+  inline virtual SPxScaler<R>* clone() const override
    {
       return new SPxGeometSC(*this);
    }

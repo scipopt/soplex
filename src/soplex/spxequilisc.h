@@ -32,7 +32,8 @@ namespace soplex
    This SPxScaler implementation performs equilibrium scaling of the
    LPs rows and columns.
 */
-class SPxEquiliSC : public SPxScaler
+  template <class R>
+  class SPxEquiliSC : public SPxScaler<R>
 {
 public:
    /// compute equilibrium scaling vector rounded to power of two
@@ -57,9 +58,9 @@ public:
    virtual ~SPxEquiliSC()
    {}
    /// clone function for polymorphism
-   inline virtual SPxScaler* clone() const override
+  inline virtual SPxScaler<R>* clone() const override
    {
-      return new SPxEquiliSC(*this);
+     return new SPxEquiliSC<R>(*this);
    }
    //@}
 

@@ -73,6 +73,7 @@ class SPxLPBase;
 
 */
 
+  template <class R>
 class SPxScaler
 {
 protected:
@@ -106,7 +107,9 @@ public:
    /// applies m_colscale and m_rowscale to the \p lp.
    virtual void applyScaling(SPxLPBase<Real>& lp);
 
-   friend std::ostream& operator<<(std::ostream& s, const SPxScaler& sc);
+
+  template <class T>
+  friend std::ostream& operator<<(std::ostream& s, const SPxScaler<T>& sc);
 
    //-------------------------------------
    /**@name Construction / destruction */

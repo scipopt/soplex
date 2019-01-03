@@ -1582,12 +1582,12 @@ private:
    SPxSolverBase<R> _solver;
    SLUFactor _slufactor;
    SPxMainSM<R> _simplifierMainSM;
-   SPxEquiliSC _scalerUniequi;
-   SPxEquiliSC _scalerBiequi;
-   SPxGeometSC _scalerGeo1;
-   SPxGeometSC _scalerGeo8;
-   SPxGeometSC _scalerGeoequi;
-   SPxLeastSqSC _scalerLeastsq;
+  SPxEquiliSC<R> _scalerUniequi;
+  SPxEquiliSC<R> _scalerBiequi;
+  SPxGeometSC<R> _scalerGeo1;
+  SPxGeometSC<R> _scalerGeo8;
+  SPxGeometSC<R> _scalerGeoequi;
+  SPxLeastSqSC<R> _scalerLeastsq;
    SPxWeightST<R> _starterWeight;
    SPxSumST<R> _starterSum;
    SPxVectorST<R> _starterVector;
@@ -1605,7 +1605,7 @@ private:
    SPxLPBase<R>* _realLP; // the real LP is also used as the original LP for the decomposition dual simplex
    SPxLPBase<R>* _decompLP; // used to store the original LP for the decomposition dual simplex
    SPxSimplifier<R>* _simplifier;
-   SPxScaler* _scaler;
+  SPxScaler<R>* _scaler;
    SPxStarter<R>* _starter;
 
    bool _isRealLPLoaded; // true indicates that the original LP is loaded in the _solver variable, hence all actions
@@ -1618,7 +1618,7 @@ private:
    DVectorBase<R> _manualLhs;
    DVectorBase<R> _manualRhs;
    DVectorBase<R> _manualObj;
-   SPxLPReal _manualRealLP;
+   SPxLPBase<R> _manualRealLP;
 
    //@}
 

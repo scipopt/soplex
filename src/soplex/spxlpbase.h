@@ -47,6 +47,7 @@
 
 namespace soplex
 {
+  // Declarations to fix errors of the form "SPxMainSM is not a type"
   template <class R>
     class SPxSolverBase;
   template <class R>
@@ -55,6 +56,16 @@ namespace soplex
     class SPxLPBase;
   template <class R>
     class SPxBasisBase;
+
+  template <class R>
+  class SPxEquiliSC;
+  template <class R>
+  class SPxLeastSqSC;
+  template <class R>
+  class SPxGeometSC;
+  template <class R>
+  class SPxMainSM;
+
 
   /**@brief   Saving LPs in a form suitable for SoPlex.
    * @ingroup Algo
@@ -88,10 +99,10 @@ namespace soplex
   {
     template <class S> friend class SPxLPBase;
     friend SPxBasisBase<R>;
-    friend class SPxScaler;
-    friend class SPxEquiliSC;
-    friend class SPxLeastSqSC;
-    friend class SPxGeometSC;
+    friend SPxScaler<R>;
+    friend SPxEquiliSC<R>;
+    friend SPxLeastSqSC<R>;
+    friend SPxGeometSC<R>;
     friend SPxMainSM<R>;
 
   public:
@@ -118,7 +129,7 @@ namespace soplex
     SPxSense thesense;                ///< optimization sense.
     R offset;                         ///< offset computed, e.g., in simplification step
     bool _isScaled;                   ///< true, if scaling has been performed
-    SPxScaler* lp_scaler;             ///< points to the scaler if the lp has been scaled, to 0 otherwise
+    SPxScaler<R>* lp_scaler;             ///< points to the scaler if the lp has been scaled, to nullptr otherwise
 
     //@}
 
@@ -1110,7 +1121,7 @@ namespace soplex
       thesense = MAXIMIZE;
       offset = 0;
       _isScaled = false;
-      lp_scaler = 0;
+      lp_scaler = nullptr;
       LPColSetBase<R>::scaleExp.clear();
       LPRowSetBase<R>::scaleExp.clear();
     }
@@ -2690,8 +2701,9 @@ namespace soplex
             thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
             offset = R(old.offset);
             _isScaled = old._isScaled;
-            lp_scaler = old.lp_scaler; // The scalar classes cannot be a
-                                       // template because of this.
+            // lp_scaler = old.lp_scaler; // The scalar classes cannot be a
+            //                            // template because of this.
+            lp_scaler = nullptr; // @todo A temporary fix. Need to re-thing
             spxout = old.spxout;
 
             assert(isConsistent());
