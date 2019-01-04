@@ -71,7 +71,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp, bool persistent = true) override;
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = true) override;
    //@}
 
 };

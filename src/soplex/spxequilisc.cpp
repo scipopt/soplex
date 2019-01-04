@@ -128,6 +128,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<Re
    }
 }
 
+  template <class R>
 void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale, const std::vector<Real>& preColscale,
       DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp)
 {
@@ -149,15 +150,17 @@ void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std
    }
 }
 
-
+  template <class R>
 SPxEquiliSC<R>::SPxEquiliSC(bool doBoth)
-   : SPxScaler(makename(doBoth), false, doBoth)
+  : SPxScaler<R>(makename(doBoth), false, doBoth)
 {}
 
+  template <class R>
 SPxEquiliSC<R>::SPxEquiliSC(const SPxEquiliSC<R>& old)
-   : SPxScaler(old)
+  : SPxScaler<R>(old)
 {}
 
+  template <class R>
 SPxEquiliSC<R>& SPxEquiliSC::operator=(const SPxEquiliSC<R>& rhs)
 {
    if(this != &rhs)
@@ -168,7 +171,7 @@ SPxEquiliSC<R>& SPxEquiliSC::operator=(const SPxEquiliSC<R>& rhs)
    return *this;
 }
 
-
+  template <class R>
 void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
 {
 

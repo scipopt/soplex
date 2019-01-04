@@ -116,7 +116,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<Real>& lp, bool persistent)
 
    MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << (postequilibration ? " with post-equilibration" : "") << std::endl; )
 
-   setup(lp);
+   this->setup(lp);
 
    /* We want to do that direction first, with the lower ratio.
     * See SPxEquiliSC::scale() for a reasoning.

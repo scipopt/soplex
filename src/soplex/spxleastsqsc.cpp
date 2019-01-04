@@ -225,7 +225,7 @@ void SPxLeastSqSC<R>::setIntParam(int param, const char* name)
 }
 
 template <class R>
-void SPxLeastSqSC<R>::scale(SPxLP& lp,  bool persistent)
+void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 {
    MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
 
