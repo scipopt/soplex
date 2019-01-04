@@ -189,38 +189,43 @@ static const char* makename()
    return "Least squares";
 }
 
-SPxLeastSqSC::SPxLeastSqSC()
-   : SPxScaler(makename(), false, false)
+  template <class R>
+  SPxLeastSqSC<R>::SPxLeastSqSC()
+    : SPxScaler<R>(makename(), false, false)
 {}
 
-SPxLeastSqSC::SPxLeastSqSC(const SPxLeastSqSC& old)
-   : SPxScaler(old), acrcydivisor(old.acrcydivisor), maxrounds(old.maxrounds)
+  template <class R>
+  SPxLeastSqSC<R>::SPxLeastSqSC(const SPxLeastSqSC<R>& old)
+    : SPxScaler<R>(old), acrcydivisor(old.acrcydivisor), maxrounds(old.maxrounds)
 {}
 
-SPxLeastSqSC& SPxLeastSqSC::operator=(const SPxLeastSqSC& rhs)
+  template <class R>
+  SPxLeastSqSC<R>& SPxLeastSqSC<R>::operator=(const SPxLeastSqSC<R>& rhs)
 {
    if(this != &rhs)
    {
-      SPxScaler::operator=(rhs);
+     SPxScaler<R>::operator=(rhs);
    }
 
    return *this;
 }
 
-
-void SPxLeastSqSC::setRealParam(Real param, const char* name)
+  template <class R>
+void SPxLeastSqSC<R>::setRealParam(Real param, const char* name)
 {
    assert(param >= 1.0);
    acrcydivisor = param;
 }
 
-void SPxLeastSqSC::setIntParam(int param, const char* name)
+  template <class R>
+void SPxLeastSqSC<R>::setIntParam(int param, const char* name)
 {
    assert(param >= 0);
    maxrounds = param;
 }
 
-void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
+template <class R>
+void SPxLeastSqSC<R>::scale(SPxLP& lp,  bool persistent)
 {
    MSG_INFO1( (*spxout), (*spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
 

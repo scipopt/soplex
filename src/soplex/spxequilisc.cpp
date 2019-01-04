@@ -68,7 +68,7 @@ static Real maxPrescaledRatio(const SPxLP& lp, const std::vector<Real>& coScalev
 }
 
   template <class R>
-void SPxEquiliSC::computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp)
+  void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp)
 {
    assert(vecset != nullptr);
 
@@ -97,7 +97,8 @@ void SPxEquiliSC::computeEquiExpVec(const SVSet* vecset, const DataArray<int>& c
    }
 }
 
-void SPxEquiliSC::computeEquiExpVec(const SVSet* vecset, const std::vector<Real>& coScaleVal, DataArray<int>& scaleExp)
+  template <class R>
+void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<Real>& coScaleVal, DataArray<int>& scaleExp)
 {
    assert(vecset != nullptr);
 
@@ -127,7 +128,7 @@ void SPxEquiliSC::computeEquiExpVec(const SVSet* vecset, const std::vector<Real>
    }
 }
 
-void SPxEquiliSC::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale, const std::vector<Real>& preColscale,
+void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale, const std::vector<Real>& preColscale,
       DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp)
 {
    const Real colratio = maxPrescaledRatio(lp, preRowscale, false);
@@ -135,7 +136,7 @@ void SPxEquiliSC::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::v
 
    const bool colFirst = colratio < rowratio;
 
-   // see SPxEquiliSC::scale for reason behind this branch
+   // see SPxEquiliSC<R>::scale for reason behind this branch
    if( colFirst )
    {
       computeEquiExpVec(lp.colSet(), preRowscale, colscaleExp);
@@ -149,15 +150,15 @@ void SPxEquiliSC::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::v
 }
 
 
-SPxEquiliSC::SPxEquiliSC(bool doBoth)
+SPxEquiliSC<R>::SPxEquiliSC(bool doBoth)
    : SPxScaler(makename(doBoth), false, doBoth)
 {}
 
-SPxEquiliSC::SPxEquiliSC(const SPxEquiliSC& old)
+SPxEquiliSC<R>::SPxEquiliSC(const SPxEquiliSC<R>& old)
    : SPxScaler(old)
 {}
 
-SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
+SPxEquiliSC<R>& SPxEquiliSC::operator=(const SPxEquiliSC<R>& rhs)
 {
    if(this != &rhs)
    {
@@ -168,7 +169,7 @@ SPxEquiliSC& SPxEquiliSC::operator=(const SPxEquiliSC& rhs)
 }
 
 
-void SPxEquiliSC::scale(SPxLP& lp, bool persistent)
+void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Equilibrium scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )

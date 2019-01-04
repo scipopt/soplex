@@ -73,9 +73,9 @@ static Real computeScalingVec(
    return pmax;
 }
 
-
-SPxGeometSC::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real goodEnough)
-   : SPxScaler("Geometric")
+  template <class R>
+SPxGeometSC<R>::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real goodEnough)
+  : SPxScaler<R>("Geometric")
    , postequilibration(equilibrate)
    , m_maxIterations(maxIters)
    , m_minImprovement(minImpr)
@@ -86,8 +86,9 @@ SPxGeometSC::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real good
    assert(goodEnough >= 0.0);
 }
 
-SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
-   : SPxScaler(old)
+  template <class R>
+SPxGeometSC<R>::SPxGeometSC(const SPxGeometSC<R>& old)
+  : SPxScaler<R>(old)
    , postequilibration(old.postequilibration)
    , m_maxIterations(old.m_maxIterations)
    , m_minImprovement(old.m_minImprovement)
@@ -98,17 +99,19 @@ SPxGeometSC::SPxGeometSC(const SPxGeometSC& old)
    assert(m_goodEnoughRatio >= 0.0);
 }
 
-SPxGeometSC& SPxGeometSC::operator=(const SPxGeometSC& rhs)
+  template <class R>
+SPxGeometSC<R>& SPxGeometSC<R>::operator=(const SPxGeometSC<R>& rhs)
 {
    if (this != &rhs)
    {
-      SPxScaler::operator=(rhs);
+     SPxScaler<R>::operator=(rhs);
    }
 
    return *this;
 }
 
-void SPxGeometSC::scale(SPxLPBase<Real>& lp, bool persistent)
+  template <class R>
+void SPxGeometSC<R>::scale(SPxLPBase<Real>& lp, bool persistent)
 {
 
    MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << (postequilibration ? " with post-equilibration" : "") << std::endl; )
