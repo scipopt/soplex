@@ -304,7 +304,7 @@ namespace soplex
 
                 if (colfb[i] != coufb[i])
                   {
-                    MSG_WARNING( (*spxout), (*spxout) << "WSVECS04 Frhs2[" << i << "]: " << static_cast<int>(stat) << " "
+                    MSG_WARNING( (*this->spxout), (*this->spxout) << "WSVECS04 Frhs2[" << i << "]: " << static_cast<int>(stat) << " "
                                  << colfb[i] << " " << coufb[i]
                                  << " shouldn't be" << std::endl; )
                       if( isZero(colfb[i]) || isZero(coufb[i]) )

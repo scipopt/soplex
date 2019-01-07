@@ -72,7 +72,7 @@ namespace soplex
       {
         newpricertol = thepricer->epsilon() / 10.0;
 
-        MSG_INFO3( (*spxout), (*spxout) << "Precision not reached: Pricer tolerance = "
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "Precision not reached: Pricer tolerance = "
                    << thepricer->epsilon()
                    << " new tolerance = " << newpricertol
                    << std::endl
@@ -232,8 +232,8 @@ namespace soplex
     thepricer->setType(type());
     theratiotester->setType(type());
 
-    MSG_INFO3( (*spxout),
-               (*spxout) << "starting value = " << value() << std::endl
+    MSG_INFO3( (*this->spxout),
+               (*this->spxout) << "starting value = " << value() << std::endl
                << "starting shift = " << shift() << std::endl;
                )
 
@@ -327,7 +327,7 @@ namespace soplex
                            that this is due to the scaling of the test values. Thus, we use
                            instableEnterId and SPxFastRT<Real>::selectEnter shall accept even an instable
                            leaving variable. */
-                        MSG_INFO3( (*spxout), (*spxout) << " --- trying instable enter iteration" << std::endl; )
+                        MSG_INFO3( (*this->spxout), (*this->spxout) << " --- trying instable enter iteration" << std::endl; )
 
                           enterId = instableEnterId;
                         instableEnter = true;
@@ -415,7 +415,7 @@ namespace soplex
 
                             forceRecompNonbasicValue();
 
-                            MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
+                            MSG_INFO2( (*this->spxout), (*this->spxout) << " --- checking feasibility and optimality\n")
                               computeTest();
                             computeCoTest();
 
@@ -430,12 +430,12 @@ namespace soplex
 
                                 thepricer->setEpsilon(newpricertol);
 
-                                MSG_INFO2( (*spxout), (*spxout) << " --- setting pricer tolerance to "
+                                MSG_INFO2( (*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
                                            << thepricer->epsilon()
                                            << std::endl; )
                                   }
                           }
-                        MSG_INFO3( (*spxout), (*spxout) << " --- solve(enter) triggers refactorization" << std::endl; )
+                        MSG_INFO3( (*this->spxout), (*this->spxout) << " --- solve(enter) triggers refactorization" << std::endl; )
 
                           // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                           // create cycling, so it is performed only a limited number of times per ENTER round
@@ -446,7 +446,7 @@ namespace soplex
                               // if the factorization was found out to be singular, we have to quit
                               if( SPxBasisBase<Real>::status() < SPxBasisBase<Real>::REGULAR )
                                 {
-                                  MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << std::endl; )
+                                  MSG_INFO1( (*this->spxout), (*this->spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << std::endl; )
                                     stop = true;
                                   break;
                                 }
@@ -469,7 +469,7 @@ namespace soplex
                     /* check if we have iterations left */
                     if (maxIters >= 0 && iterations() >= maxIters)
                       {
-                        MSG_INFO2( (*spxout), (*spxout) << " --- maximum number of iterations (" << maxIters
+                        MSG_INFO2( (*this->spxout), (*this->spxout) << " --- maximum number of iterations (" << maxIters
                                    << ") reached" << std::endl; )
                           m_status = ABORT_ITER;
                         stop = true;
@@ -492,7 +492,7 @@ namespace soplex
                         enterCycleCount++;
                         if( enterCycleCount > MAXCYCLES )
                           {
-                            MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to cycling in "
+                            MSG_INFO2( (*this->spxout), (*this->spxout) << " --- abort solving due to cycling in "
                                        << "entering algorithm" << std::endl; );
                             m_status = ABORT_CYCLING;
                             stop = true;
@@ -516,7 +516,7 @@ namespace soplex
                             if( stallNumRecovers < MAXSTALLRECOVERS )
                               {
                                 /* try to recover by unshifting/switching algorithm up to MAXSTALLRECOVERS times (just a number picked) */
-                                MSG_INFO3( (*spxout), (*spxout) << " --- stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
+                                MSG_INFO3( (*this->spxout), (*this->spxout) << " --- stalling detected - trying to recover by switching to LEAVING algorithm." << std::endl; )
 
                                   ++stallNumRecovers;
                                 break;
@@ -524,7 +524,7 @@ namespace soplex
                             else
                               {
                                 /* giving up */
-                                MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to stalling in entering algorithm." << std::endl; );
+                                MSG_INFO2( (*this->spxout), (*this->spxout) << " --- abort solving due to stalling in entering algorithm." << std::endl; );
 
                                 m_status = ABORT_CYCLING;
                                 stop = true;
@@ -543,8 +543,8 @@ namespace soplex
                   }
                 while (!stop);
 
-                MSG_INFO3( (*spxout),
-                           (*spxout) << " --- enter finished. iteration: " << this->iteration()
+                MSG_INFO3( (*this->spxout),
+                           (*this->spxout) << " --- enter finished. iteration: " << this->iteration()
                            << ", value: " << value()
                            << ", shift: " << shift()
                            << ", epsilon: " << epsilon()
@@ -570,8 +570,8 @@ namespace soplex
 
                           Real maxinfeas = maxInfeas();
 
-                          MSG_INFO3( (*spxout),
-                                     (*spxout) << " --- maxInfeas: " << maxinfeas
+                          MSG_INFO3( (*this->spxout),
+                                     (*this->spxout) << " --- maxInfeas: " << maxinfeas
                                      << ", shift: " << shift()
                                      << ", entertol: " << entertol() << std::endl;
                                      )
@@ -591,7 +591,7 @@ namespace soplex
                   if( MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 )
                   {
                      SPxOut::setScientific(spxout->getCurrentStream(), 0);
-                     MSG_INFO1( (*spxout), (*spxout) << " --- termination despite violations (numerical difficulties,"
+                     MSG_INFO1( (*this->spxout), (*this->spxout) << " --- termination despite violations (numerical difficulties,"
                            << " bound range = " << boundrange
                            << ", side range = " << siderange
                            << ", obj range = " << objrange
@@ -668,8 +668,8 @@ namespace soplex
                            that this is due to the scaling of theCoTest[...]. Thus, we use
                            instableLeaveNum and SPxFastRT<Real>::selectEnter shall accept even an instable
                            entering variable. */
-                        MSG_INFO3( (*spxout),
-                                   (*spxout) << " --- trying instable leave iteration" << std::endl;
+                        MSG_INFO3( (*this->spxout),
+                                   (*this->spxout) << " --- trying instable leave iteration" << std::endl;
                                    )
 
                           leaveNum = instableLeaveNum;
@@ -718,7 +718,7 @@ namespace soplex
 
                             forceRecompNonbasicValue();
 
-                            MSG_INFO2( (*spxout), (*spxout) << " --- checking feasibility and optimality\n")
+                            MSG_INFO2( (*this->spxout), (*this->spxout) << " --- checking feasibility and optimality\n")
                               computeFtest();
 
                             // is the solution good enough ?
@@ -732,12 +732,12 @@ namespace soplex
 
                                 thepricer->setEpsilon(newpricertol);
 
-                                MSG_INFO2( (*spxout), (*spxout) << " --- setting pricer tolerance to "
+                                MSG_INFO2( (*this->spxout), (*this->spxout) << " --- setting pricer tolerance to "
                                            << thepricer->epsilon()
                                            << std::endl; );
                               }
                           }
-                        MSG_INFO3( (*spxout), (*spxout) << " --- solve(leave) triggers refactorization" << std::endl; )
+                        MSG_INFO3( (*this->spxout), (*this->spxout) << " --- solve(leave) triggers refactorization" << std::endl; )
 
                           // if the factorization is not fresh, we better refactorize and call the pricer again; however, this can
                           // create cycling, so it is performed only a limited number of times per LEAVE round
@@ -748,7 +748,7 @@ namespace soplex
                               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
                               if (SPxBasisBase<Real>::status() < SPxBasisBase<Real>::REGULAR)
                                 {
-                                  MSG_INFO1( (*spxout), (*spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << std::endl; )
+                                  MSG_INFO1( (*this->spxout), (*this->spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << std::endl; )
                                     stop = true;
                                   break;
                                 }
@@ -771,7 +771,7 @@ namespace soplex
                     /* check if we have iterations left */
                     if (maxIters >= 0 && iterations() >= maxIters)
                       {
-                        MSG_INFO2( (*spxout), (*spxout) << " --- maximum number of iterations (" << maxIters
+                        MSG_INFO2( (*this->spxout), (*this->spxout) << " --- maximum number of iterations (" << maxIters
                                    << ") reached" << std::endl; )
                           m_status = ABORT_ITER;
                         stop = true;
@@ -794,7 +794,7 @@ namespace soplex
                         leaveCycleCount++;
                         if( leaveCycleCount > MAXCYCLES )
                           {
-                            MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to cycling in leaving algorithm" << std::endl; );
+                            MSG_INFO2( (*this->spxout), (*this->spxout) << " --- abort solving due to cycling in leaving algorithm" << std::endl; );
                             m_status = ABORT_CYCLING;
                             stop = true;
                           }
@@ -817,7 +817,7 @@ namespace soplex
                             if( stallNumRecovers < MAXSTALLRECOVERS )
                               {
                                 /* try to recover by switching algorithm up to MAXSTALLRECOVERS times */
-                                MSG_INFO3( (*spxout), (*spxout) << " --- stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
+                                MSG_INFO3( (*this->spxout), (*this->spxout) << " --- stalling detected - trying to recover by switching to ENTERING algorithm." << std::endl; )
 
                                   ++stallNumRecovers;
                                 break;
@@ -825,7 +825,7 @@ namespace soplex
                             else
                               {
                                 /* giving up */
-                                MSG_INFO2( (*spxout), (*spxout) << " --- abort solving due to stalling in leaving algorithm" << std::endl; );
+                                MSG_INFO2( (*this->spxout), (*this->spxout) << " --- abort solving due to stalling in leaving algorithm" << std::endl; );
 
                                 m_status = ABORT_CYCLING;
                                 stop = true;
@@ -844,8 +844,8 @@ namespace soplex
                   }
                 while (!stop);
 
-                MSG_INFO3( (*spxout),
-                           (*spxout) << " --- leave finished. iteration: " << this->iteration()
+                MSG_INFO3( (*this->spxout),
+                           (*this->spxout) << " --- leave finished. iteration: " << this->iteration()
                            << ", value: " << value()
                            << ", shift: " << shift()
                            << ", epsilon: " << epsilon()
@@ -872,8 +872,8 @@ namespace soplex
                               m_status = ABORT_CYCLING;
                               throw SPxStatusException("XSOLVE13 Abort solving due to cycling");
                             }
-                          MSG_INFO3( (*spxout),
-                                     (*spxout) << " --- maxInfeas: " << maxInfeas()
+                          MSG_INFO3( (*this->spxout),
+                                     (*this->spxout) << " --- maxInfeas: " << maxInfeas()
                                      << ", shift: " << shift()
                                      << ", leavetol: " << leavetol()
                                      << ", cycle count: " << cycleCount << std::endl;
@@ -893,8 +893,8 @@ namespace soplex
 
                           Real maxinfeas = maxInfeas();
 
-                          MSG_INFO3( (*spxout),
-                                     (*spxout) << " --- maxInfeas: " << maxinfeas
+                          MSG_INFO3( (*this->spxout),
+                                     (*this->spxout) << " --- maxInfeas: " << maxinfeas
                                      << ", shift: " << shift()
                                      << ", leavetol: " << leavetol() << std::endl;
                                      )
@@ -917,7 +917,7 @@ namespace soplex
                   if( MAXIMUM(MAXIMUM(boundrange, siderange), objrange) >= 1e9 )
                   {
                      SPxOut::setScientific(spxout->getCurrentStream(), 0);
-                     MSG_INFO1( (*spxout), (*spxout) << " --- termination despite violations (numerical difficulties,"
+                     MSG_INFO1( (*this->spxout), (*this->spxout) << " --- termination despite violations (numerical difficulties,"
                            << " bound range = " << boundrange
                            << ", side range = " << siderange
                            << ", obj range = " << objrange
@@ -955,13 +955,13 @@ namespace soplex
                   {
                     m_entertol = 0.01 * m_entertol;
 
-                    MSG_INFO2( (*spxout), (*spxout) << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
+                    MSG_INFO2( (*this->spxout), (*this->spxout) << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_entertol << std::endl; )
                       }
                 else
                   {
                     m_leavetol = 0.01 * m_leavetol;
 
-                    MSG_INFO2( (*spxout), (*spxout) << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
+                    MSG_INFO2( (*this->spxout), (*this->spxout) << " --- basis singular: reloading basis and solving with tighter ratio test tolerance " << m_leavetol << std::endl; )
                       }
 
                 // load original basis
@@ -979,7 +979,7 @@ namespace soplex
                   }
                 catch( const SPxException& Ex )
                   {
-                    MSG_INFO2( (*spxout), (*spxout) << " --- reloaded basis singular, resetting original tolerances" << std::endl; )
+                    MSG_INFO2( (*this->spxout), (*this->spxout) << " --- reloaded basis singular, resetting original tolerances" << std::endl; )
 
                       if( tightenedtype == ENTER )
                         m_entertol = 100.0 * m_entertol;
@@ -1040,15 +1040,15 @@ namespace soplex
         throw SPxStatusException("XSOLVE05 Status is still RUNNING when it shouldn't be");
       }
 
-    MSG_INFO3( (*spxout),
-               (*spxout) << "Finished solving (status=" << static_cast<int>(status())
+    MSG_INFO3( (*this->spxout),
+               (*this->spxout) << "Finished solving (status=" << static_cast<int>(status())
                << ", iters=" << this->iterCount
                << ", leave=" << leaveCount
                << ", enter=" << enterCount
                << ", flips=" << totalboundflips;
                if( status() == OPTIMAL )
-                 (*spxout) << ", objValue=" << value();
-               (*spxout) << ")" << std::endl;
+                 (*this->spxout) << ", objValue=" << value();
+               (*this->spxout) << ")" << std::endl;
                )
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
@@ -1073,7 +1073,7 @@ namespace soplex
                 {
                   // Minor rhs violations happen frequently, so print these
                   // warnings only with verbose level INFO2 and higher.
-                  MSG_INFO2( (*spxout), (*spxout) << "WSOLVE88 Warning! Constraint " << row
+                  MSG_INFO2( (*this->spxout), (*this->spxout) << "WSOLVE88 Warning! Constraint " << row
                              << " is violated by solution" << std::endl
                              << "   lhs:" << lhs( row )
                              << " <= val:" << val
@@ -1089,7 +1089,7 @@ namespace soplex
 
                         assert( c < nRows() );
 
-                        MSG_WARNING( (*spxout), (*spxout) << "WSOLVE90 basis idx:" << c
+                        MSG_WARNING( (*this->spxout), (*this->spxout) << "WSOLVE90 basis idx:" << c
                                      << " fVec:" << fVec()[c]
                                      << " fRhs:" << fRhs()[c]
                                      << " fTest:" << fTest()[c] << std::endl; )
@@ -1103,7 +1103,7 @@ namespace soplex
                 {
                   // Minor bound violations happen frequently, so print these
                   // warnings only with verbose level INFO2 and higher.
-                  MSG_INFO2( (*spxout), (*spxout) << "WSOLVE91 Warning! Bound for column " << col
+                  MSG_INFO2( (*this->spxout), (*this->spxout) << "WSOLVE91 Warning! Bound for column " << col
                              << " is violated by solution" << std::endl
                              << "   lower:" << lower( col )
                              << " <= val:" << sol[col]
@@ -1117,7 +1117,7 @@ namespace soplex
                             break;
 
                         assert( c < nRows() );
-                        MSG_WARNING( (*spxout), (*spxout) << "WSOLVE92 basis idx:" << c
+                        MSG_WARNING( (*this->spxout), (*this->spxout) << "WSOLVE92 basis idx:" << c
                                      << " fVec:" << fVec()[c]
                                      << " fRhs:" << fRhs()[c]
                                      << " fTest:" << fTest()[c] << std::endl; )
@@ -1156,7 +1156,7 @@ namespace soplex
     SPxId polishId;
     bool success = false;
 
-    MSG_INFO2( (*spxout), (*spxout) << " --- perform solution polishing" << std::endl; )
+    MSG_INFO2( (*this->spxout), (*this->spxout) << " --- perform solution polishing" << std::endl; )
 
       if( rep() == COLUMN )
         {
@@ -1436,8 +1436,8 @@ namespace soplex
             }
         }
 
-    MSG_INFO1( (*spxout),
-               (*spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
+    MSG_INFO1( (*this->spxout),
+               (*this->spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
 
       setStatus(SPxBasisBase<Real>::OPTIMAL);
   }
@@ -1456,19 +1456,19 @@ namespace soplex
     tmp -= *theCoPrhs;
     if (tmp.length() > leavetol())
       {
-        MSG_INFO3( (*spxout), (*spxout) << "ISOLVE93 " << this->iteration() << ":\tcoP error = \t"
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE93 " << this->iteration() << ":\tcoP error = \t"
                    << tmp.length() << std::endl; )
 
           tmp.clear();
         SPxBasisBase<Real>::coSolve(tmp, *theCoPrhs);
         this->multWithBase(tmp);
         tmp -= *theCoPrhs;
-        MSG_INFO3( (*spxout), (*spxout) << "ISOLVE94\t\t" << tmp.length() << std::endl; )
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE94\t\t" << tmp.length() << std::endl; )
 
           tmp.clear();
         SPxBasisBase<Real>::coSolve(tmp, *theCoPrhs);
         tmp -= *theCoPvec;
-        MSG_INFO3( (*spxout), (*spxout) << "ISOLVE95\t\t" << tmp.length() << std::endl; )
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE95\t\t" << tmp.length() << std::endl; )
           }
 
     tmp = *theFvec;
@@ -1476,13 +1476,13 @@ namespace soplex
     tmp -= *theFrhs;
     if (tmp.length() > entertol())
       {
-        MSG_INFO3( (*spxout), (*spxout) << "ISOLVE96 " << this->iteration() << ":\t  F error = \t"
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE96 " << this->iteration() << ":\t  F error = \t"
                    << tmp.length() << std::endl; )
 
           tmp.clear();
         SPxBasisBase<Real>::solve(tmp, *theFrhs);
         tmp -= *theFvec;
-        MSG_INFO3( (*spxout), (*spxout) << "ISOLVE97\t\t" << tmp.length() << std::endl; )
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE97\t\t" << tmp.length() << std::endl; )
           }
 
     if (type() == ENTER)
@@ -1492,7 +1492,7 @@ namespace soplex
             if (theCoTest[i] < -leavetol() && isCoBasic(i))
               {
                 /// @todo Error message "this shalt not be": shalt this be an assert (also below)?
-                MSG_INFO1( (*spxout), (*spxout) << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
+                MSG_INFO1( (*this->spxout), (*this->spxout) << "ESOLVE98 testVecs: theCoTest: this shalt not be!"
                            << std::endl
                            << "  i=" << i
                            << ", theCoTest[i]=" << theCoTest[i]
@@ -1504,7 +1504,7 @@ namespace soplex
           {
             if (theTest[i] < -leavetol() && isBasic(i))
               {
-                MSG_INFO1( (*spxout), (*spxout) << "ESOLVE99 testVecs: theTest: this shalt not be!"
+                MSG_INFO1( (*this->spxout), (*this->spxout) << "ESOLVE99 testVecs: theTest: this shalt not be!"
                            << std::endl
                            << "  i=" << i
                            << ", theTest[i]=" << theTest[i]
@@ -1519,35 +1519,35 @@ namespace soplex
   template <>
   void SPxSolverBase<Real>::printDisplayLine(const bool force, const bool forceHead)
   {
-    MSG_INFO1( (*spxout),
+    MSG_INFO1( (*this->spxout),
                if( forceHead || displayLine % (displayFreq*30) == 0 )
                  {
-                   (*spxout) << "type |   time |   iters | facts |    shift | violation |     obj value ";
+                   (*this->spxout) << "type |   time |   iters | facts |    shift | violation |     obj value ";
          if( printBasisMetric >= 0 )
-            (*spxout) << " | basis metric";
-                   (*spxout) << std::endl;
+            (*this->spxout) << " | basis metric";
+                   (*this->spxout) << std::endl;
                  }
                if( (force || (displayLine % displayFreq == 0)) && !forceHead )
                  {
-                   (type() == LEAVE) ? (*spxout) << "  L  |" : (*spxout) << "  E  |";
-                   (*spxout) << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
-                   (*spxout) << std::scientific << std::setprecision(2);
-                   (*spxout) << std::setw(8) << this->iteration() << " | "
+                   (type() == LEAVE) ? (*this->spxout) << "  L  |" : (*this->spxout) << "  E  |";
+                   (*this->spxout) << std::fixed << std::setw(7) << std::setprecision(1) << time() << " |";
+                   (*this->spxout) << std::scientific << std::setprecision(2);
+                   (*this->spxout) << std::setw(8) << this->iteration() << " | "
                              << std::setw(5) << slinSolver()->getFactorCount() << " | "
                              << shift() << " |  "
                              << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
                              << std::setprecision(8) << value();
                    if( getStartingDecompBasis && rep() == SPxSolverBase<Real>::ROW )
-                     (*spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
+                     (*this->spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          if( printBasisMetric == 0 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
+            (*this->spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
          if( printBasisMetric == 1 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(1);
+            (*this->spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(1);
          if( printBasisMetric == 2 )
-            (*spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(2);
+            (*this->spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(2);
          if( printBasisMetric == 3 )
-                     (*spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
-                   (*spxout) << std::endl;
+                     (*this->spxout) << " | " << std::scientific << std::setprecision(2) << basis().getEstimatedCondition();
+                   (*this->spxout) << std::endl;
                  }
                displayLine++;
                );
@@ -1584,16 +1584,16 @@ namespace soplex
         cr -= *theCoPrhs;
         fr -= *theFrhs;
         if (cr.length() > leavetol())
-          MSG_WARNING( (*spxout), (*spxout) << "WSOLVE50 unexpected change of coPrhs "
+          MSG_WARNING( (*this->spxout), (*this->spxout) << "WSOLVE50 unexpected change of coPrhs "
                        << cr.length() << std::endl; )
             if (fr.length() > entertol())
-              MSG_WARNING( (*spxout), (*spxout) << "WSOLVE51 unexpected change of   Frhs "
+              MSG_WARNING( (*this->spxout), (*this->spxout) << "WSOLVE51 unexpected change of   Frhs "
                            << fr.length() << std::endl; )
 #endif
 
                 if (this->updateCount > 1)
                   {
-                    MSG_INFO3( (*spxout), (*spxout) << " --- terminate triggers refactorization"
+                    MSG_INFO3( (*this->spxout), (*this->spxout) << " --- terminate triggers refactorization"
                                << std::endl; )
                       factorize();
                   }
@@ -1621,7 +1621,7 @@ namespace soplex
 
     if ( isTimeLimitReached() )
       {
-        MSG_INFO2( (*spxout), (*spxout) << " --- timelimit (" << maxTime
+        MSG_INFO2( (*this->spxout), (*this->spxout) << " --- timelimit (" << maxTime
                    << ") reached" << std::endl; )
           m_status = ABORT_TIME;
         return true;
@@ -1653,10 +1653,10 @@ namespace soplex
             // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
             if( this->spxSense() * value() <= this->spxSense() * objLimit )
               {
-                MSG_INFO2( (*spxout), (*spxout) << " --- objective value limit (" << objLimit
+                MSG_INFO2( (*this->spxout), (*this->spxout) << " --- objective value limit (" << objLimit
                            << ") reached" << std::endl; )
                   MSG_DEBUG(
-                            (*spxout) << " --- objective value limit reached" << std::endl
+                            (*this->spxout) << " --- objective value limit reached" << std::endl
                             << " (value: " << value()
                             << ", limit: " << objLimit << ")" << std::endl
                             << " (spxSense: " << int(spxSense())

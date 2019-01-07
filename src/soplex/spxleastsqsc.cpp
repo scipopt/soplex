@@ -227,7 +227,7 @@ void SPxLeastSqSC<R>::setIntParam(int param, const char* name)
 template <class R>
 void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 {
-   MSG_INFO1( (this->spxout), (this->spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
+   MSG_INFO1( (*this->spxout), (*this->spxout) << "Least squares LP scaling" << (persistent ? " (persistent)" : "") << std::endl; )
 
    setup(lp);
 
@@ -277,7 +277,7 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    SSVector* rsccurr = &rowscale1;
    SSVector* rscprev = &rowscale2;
 
-   MSG_INFO2( (this->spxout), (this->spxout) << "before scaling:"
+   MSG_INFO2( (*this->spxout), (*this->spxout) << "before scaling:"
       << " min= " << lp.minAbsNzo()
       << " max= " << lp.maxAbsNzo()
       << " col-ratio= " << maxColRatio(lp)
@@ -386,14 +386,14 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    // scale
    applyScaling(lp);
 
-   MSG_INFO3( (*spxout), (*spxout) << "Row scaling min= " << minAbsRowscale()
+   MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << minAbsRowscale()
       << " max= " << maxAbsRowscale()
       << std::endl
       << "Col scaling min= " << minAbsColscale()
       << " max= " << maxAbsColscale()
       << std::endl; )
 
-   MSG_INFO2( (*spxout), (*spxout) << "after scaling: "
+   MSG_INFO2( (*this->spxout), (*this->spxout) << "after scaling: "
       << " min= " << lp.minAbsNzo(false)
       << " max= " << lp.maxAbsNzo(false)
       << " col-ratio= " << maxColRatio(lp)

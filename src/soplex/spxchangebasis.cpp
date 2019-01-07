@@ -37,7 +37,7 @@ namespace soplex
 
     if (theLP->dim() != matrix.size())
       {
-        MSG_INFO3( (*spxout), (*spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ICHBAS02 basis redimensioning invalidates factorization"
                    << std::endl; )
 
           matrix.reSize (theLP->dim());
@@ -405,7 +405,7 @@ namespace soplex
   {
     if( factorized || matrixIsSetup )
       {
-        MSG_INFO3( (*spxout), (*spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ICHBAS09 explicit invalidation of factorization" << std::endl; )
           }
 
     factorized    = false;
@@ -421,7 +421,7 @@ namespace soplex
   {
     assert(!factorized);
 
-    MSG_INFO3( (*spxout), (*spxout) << "ICHBAS10 setup slack basis" << std::endl; )
+    MSG_INFO3( (*this->spxout), (*this->spxout) << "ICHBAS10 setup slack basis" << std::endl; )
 
       if (theLP->rep() == SPxSolverBase<Real>::COLUMN)
         {

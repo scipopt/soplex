@@ -1673,7 +1673,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
                       row.remove(row_j);
                     col.remove(i);
 
-                    MSG_DEBUG( (*spxout) << "IMAISM04 aij=" << aij
+                    MSG_DEBUG( (*this->spxout) << "IMAISM04 aij=" << aij
                                << " removed, absBnd=" << absBnd
                                << std::endl; )
                       ++remNzos;
@@ -2217,7 +2217,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
 
    assert(isNotZero(aij, epsZero()) && isNotZero(aik, epsZero()));
 
-   MSG_DEBUG( (*spxout) << "IMAISM22 row " << i << ": doubleton equation -> "
+   MSG_DEBUG( (*this->spxout) << "IMAISM22 row " << i << ": doubleton equation -> "
       << aij << " x_" << j << " + " << aik << " x_" << k << " = " << rhs; )
 
    // determine which variable can be aggregated without requiring bound tightening of the other variable
@@ -2303,7 +2303,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
    Real aggr_coef = - (aik / aij);
    Real aggr_const = rhs / aij;
 
-   MSG_DEBUG( (*spxout) << " removed, replacing x_" << j << " with "
+   MSG_DEBUG( (*this->spxout) << " removed, replacing x_" << j << " with "
       << aggr_const << " + " << aggr_coef << " * x_" << k << std::endl; )
 
    // replace all occurrences of x_j
@@ -4933,7 +4933,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     while(again && m_result == this->OKAY)
       {
       nrounds++;
-      MSG_INFO3((*spxout), (*spxout) << "Round " << nrounds << ":" << std::endl; )
+      MSG_INFO3((*this->spxout), (*this->spxout) << "Round " << nrounds << ":" << std::endl; )
         again = false;
 
 #if ROWS

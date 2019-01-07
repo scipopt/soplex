@@ -332,7 +332,7 @@ namespace soplex
             // warnings only with verbose level INFO2 and higher.
             if ((*theFvec)[i] > theUBbound[i] + viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND01 Invalid upper enter bound " << i
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND01 Invalid upper enter bound " << i
                            << " Fvec: " << (*theFvec)[i]
                            << " UBbound: " << theUBbound[i]
                            << " tolerance: " << viol_max
@@ -341,7 +341,7 @@ namespace soplex
               }
             if ((*theFvec)[i] < theLBbound[i] - viol_max)  //@ &&  theUBbound[i] != theLBbound[i])
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND02 Invalid lower enter bound " << i
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND02 Invalid lower enter bound " << i
                            << " Fvec: " << (*theFvec)[i]
                            << " LBbound: " << theLBbound[i]
                            << " tolerance: " << viol_max
@@ -350,7 +350,7 @@ namespace soplex
               }
             if( nlinesprinted >= 3 )
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl );
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND10 suppressing further warnings of type WBOUND{01,02} in this round" << std::endl );
                 break;
               }
           }
@@ -366,7 +366,7 @@ namespace soplex
           {
             if ((*theCoPvec)[i] > (*theCoUbound)[i] + viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND03 Invalid upper cobound " << i
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND03 Invalid upper cobound " << i
                            << " CoPvec: " << (*theCoPvec)[i]
                            << " CoUbound: " << (*theCoUbound)[i]
                            << " tolerance: " << viol_max
@@ -375,7 +375,7 @@ namespace soplex
               }
             if ((*theCoPvec)[i] < (*theCoLbound)[i] - viol_max) // && (*theCoUbound)[i] != (*theCoLbound)[i])
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND04 Invalid lower cobound " << i
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND04 Invalid lower cobound " << i
                            << " CoPvec: " << (*theCoPvec )[i]
                            << " CoLbound: " << (*theCoLbound)[i]
                            << " tolerance: " << viol_max
@@ -384,7 +384,7 @@ namespace soplex
               }
             if( nlinesprinted >= 3 )
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl );
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND11 suppressing further warnings of type WBOUND{03,04} in this round" << std::endl );
                 break;
               }
           }
@@ -394,7 +394,7 @@ namespace soplex
           {
             if ((*thePvec)[i] > (*theUbound)[i] + viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND05 Invalid upper bound " << i
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND05 Invalid upper bound " << i
                            << " Pvec: " << (*thePvec)[i]
                            << " Ubound: " << (*theUbound)[i]
                            << " tolerance: " << viol_max
@@ -403,7 +403,7 @@ namespace soplex
               }
             if ((*thePvec)[i] < (*theLbound)[i] - viol_max)  // &&  (*theUbound)[i] != (*theLbound)[i])
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND06 Invalid lower bound " << i
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND06 Invalid lower bound " << i
                            << " Pvec: " << (*thePvec)[i]
                            << " Lbound: " << (*theLbound)[i]
                            << " tolerance: " << viol_max
@@ -412,7 +412,7 @@ namespace soplex
               }
             if( nlinesprinted >= 3 )
               {
-                MSG_INFO2( (*spxout), (*spxout) << "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl );
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WBOUND12 suppressing further warnings of type WBOUND{05,06} in this round" << std::endl );
                 break;
               }
           }

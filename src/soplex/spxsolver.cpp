@@ -180,7 +180,7 @@ namespace soplex
             factorized = false;
             m_numCycle = 0;
 #endif
-            MSG_INFO3( (*spxout), (*spxout) << "Switching to "
+            MSG_INFO3( (*this->spxout), (*this->spxout) << "Switching to "
                        << static_cast<const char*>((tp == LEAVE)
                                                    ? "leaving" : "entering")
                        << " algorithm" << std::endl; )
@@ -552,7 +552,7 @@ namespace soplex
       void SPxSolverBase<Real>::factorize()
     {
 
-      MSG_INFO3( (*spxout), (*spxout) << " --- refactorizing basis matrix" << std::endl; )
+      MSG_INFO3( (*this->spxout), (*this->spxout) << " --- refactorizing basis matrix" << std::endl; )
 
         try
           {
@@ -602,7 +602,7 @@ namespace soplex
                   multBaseWith(ftmp);
                   ftmp -= fRhs();
                   if (ftmp.length() > DEFAULT_BND_VIOL)
-                    MSG_INFO1( (*spxout), (*spxout) << "ESOLVE29 " << iteration() << ": fVec error = "
+                    MSG_INFO1( (*this->spxout), (*this->spxout) << "ESOLVE29 " << iteration() << ": fVec error = "
                                << ftmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
                       }
               if (ctmp.length() > DEFAULT_BND_VIOL)
@@ -612,7 +612,7 @@ namespace soplex
                   multWithBase(ctmp);
                   ctmp -= coPrhs();
                   if (ctmp.length() > DEFAULT_BND_VIOL)
-                    MSG_INFO1( (*spxout), (*spxout) << "ESOLVE30 " << iteration() << ": coPvec error = "
+                    MSG_INFO1( (*this->spxout), (*this->spxout) << "ESOLVE30 " << iteration() << ": coPvec error = "
                                << ctmp.length() << " exceeding DEFAULT_BND_VIOL = " << DEFAULT_BND_VIOL << std::endl; )
                       }
               if (ptmp.length() > DEFAULT_BND_VIOL)

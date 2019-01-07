@@ -1367,7 +1367,7 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
       // we relax the stability requirement
       minStability /= 2.0;
 
-      MSG_INFO3( (*spxout), (*spxout) << "ISLUFA01 refactorizing with increased Markowitz threshold: "
+      MSG_INFO3( (*this->spxout), (*this->spxout) << "ISLUFA01 refactorizing with increased Markowitz threshold: "
                         << lastThreshold << std::endl; )
    }
    MSG_DEBUG( std::cout << "DSLUFA02 threshold = " << lastThreshold

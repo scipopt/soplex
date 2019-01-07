@@ -69,7 +69,7 @@ namespace soplex
               isInfeasible[i] = SPxPricer<Real>::NOT_VIOLATED;
             if( ninfeasibilities > sparsitythreshold )
               {
-                MSG_INFO2( (*spxout), (*spxout) << " --- using dense pricing"
+                MSG_INFO2( (*this->spxout), (*this->spxout) << " --- using dense pricing"
                            << std::endl; )
                   remainingRoundsLeave = DENSEROUNDS;
                 sparsePricingLeave = false;
@@ -86,13 +86,13 @@ namespace soplex
       }
     else if( ninfeasibilities <= sparsitythreshold && !sparsePricingLeave )
       {
-        MSG_INFO2( (*spxout),
+        MSG_INFO2( (*this->spxout),
                    std::streamsize prec = spxout->precision();
                    if( hyperPricingLeave )
-                     (*spxout) << " --- using hypersparse pricing, ";
+                     (*this->spxout) << " --- using hypersparse pricing, ";
                    else
-                     (*spxout) << " --- using sparse pricing, ";
-                   (*spxout) << "sparsity: "
+                     (*this->spxout) << " --- using sparse pricing, ";
+                   (*this->spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
                    << (Real) ninfeasibilities/dim()
                    << std::scientific << std::setprecision(int(prec))
@@ -677,7 +677,7 @@ namespace soplex
         if (tmp.length() > leavetol()) {
           // This happens very frequently and does usually not hurt, so print
           // these warnings only with verbose level INFO2 and higher.
-          MSG_INFO2( (*spxout), (*spxout) << "WLEAVE60 iteration=" << basis().iteration()
+          MSG_INFO2( (*this->spxout), (*this->spxout) << "WLEAVE60 iteration=" << basis().iteration()
                      << ": coPvec.delta error = " << tmp.length()
                      << std::endl; )
             }
@@ -774,7 +774,7 @@ namespace soplex
 
         if (this->lastUpdate() > 1)
           {
-            MSG_INFO3( (*spxout), (*spxout) << "ILEAVE01 factorization triggered in "
+            MSG_INFO3( (*this->spxout), (*this->spxout) << "ILEAVE01 factorization triggered in "
                        << "leave() for feasibility test" << std::endl; )
               try
                 {
@@ -784,7 +784,7 @@ namespace soplex
                 {
                   // don't exit immediately but handle the singularity correctly
                   assert(SPxBasisBase<Real>::status() == SPxBasisBase<Real>::SINGULAR);
-                  MSG_INFO3( (*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
+                  MSG_INFO3( (*this->spxout), (*this->spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
                     }
 
             /* after a factorization, the leaving column/row might not be infeasible or suboptimal anymore, hence we do
@@ -796,7 +796,7 @@ namespace soplex
         /* do not exit with status infeasible or unbounded if there is only a very small violation */
       if( !recomputedVectors && spxAbs(enterVal) < leavetol() )
           {
-            MSG_INFO3( (*spxout), (*spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
+            MSG_INFO3( (*this->spxout), (*this->spxout) << "ILEAVE11 clean up step to reduce numerical errors" << std::endl; )
 
               computeFrhs();
             SPxBasisBase<Real>::solve(*theFvec, *theFrhs);
@@ -808,7 +808,7 @@ namespace soplex
             return true;
           }
 
-        MSG_INFO3( (*spxout), (*spxout) << "ILEAVE02 unboundedness/infeasibility found "
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "ILEAVE02 unboundedness/infeasibility found "
                    << "in leave()" << std::endl; )
 
           if (rep() != COLUMN)
@@ -888,7 +888,7 @@ namespace soplex
               if (tmp.length() > entertol()) {
                 // This happens very frequently and does usually not hurt, so print
                 // these warnings only with verbose level INFO2 and higher.
-                MSG_INFO2( (*spxout), (*spxout) << "WLEAVE62\t(" << tmp.length() << ")\n"; )
+                MSG_INFO2( (*this->spxout), (*this->spxout) << "WLEAVE62\t(" << tmp.length() << ")\n"; )
                   }
             }
 #endif  // ENABLE_ADDITIONAL_CHECKS
@@ -902,7 +902,7 @@ namespace soplex
                        variables were found: Thus, above we already accepted such an instable
                        entering variable. Now even this seems to be impossible, thus we conclude
                        unboundedness/infeasibility. */
-                    MSG_INFO3( (*spxout), (*spxout) << "ILEAVE03 unboundedness/infeasibility found "
+                    MSG_INFO3( (*this->spxout), (*this->spxout) << "ILEAVE03 unboundedness/infeasibility found "
                                << "in leave()" << std::endl; )
 
                       rejectLeave(leaveNum, leaveId, leaveStat);
@@ -1073,11 +1073,11 @@ namespace soplex
             {
               // This happens very frequently and does usually not hurt, so print
               // these warnings only with verbose level INFO2 and higher.
-              MSG_INFO2( (*spxout), (*spxout) << "WLEAVE64\t" << basis().iteration()
+              MSG_INFO2( (*this->spxout), (*this->spxout) << "WLEAVE64\t" << basis().iteration()
                          << ": fVec error = " << tmp.length() << std::endl; )
                 SPxBasisBase<Real>::solve(tmp, fRhs());
               tmp -= fVec();
-              MSG_INFO2( (*spxout), (*spxout) << "WLEAVE65\t(" << tmp.length() << ")\n"; )
+              MSG_INFO2( (*this->spxout), (*this->spxout) << "WLEAVE65\t(" << tmp.length() << ")\n"; )
                 }
         }
 #endif  // ENABLE_ADDITIONAL_CHECKS

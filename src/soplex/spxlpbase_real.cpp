@@ -35,12 +35,12 @@ namespace soplex
   template<>
   void SPxLPBase<Real>::unscaleLP()
   {
-    MSG_INFO3( (*spxout), (*spxout) << "remove persistent scaling of LP" << std::endl; )
+    MSG_INFO3( (*this->spxout), (*this->spxout) << "remove persistent scaling of LP" << std::endl; )
 
       if( lp_scaler )
         lp_scaler->unscale(*this);
       else
-        MSG_INFO3( (*spxout), (*spxout) << "no LP scaler available" << std::endl; )
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "no LP scaler available" << std::endl; )
           }
 
   template<>
@@ -664,7 +664,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
 
     if( has_emptyexponent )
       {
-        MSG_WARNING( (*spxout), (*spxout) << "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n"; )
+        MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n"; )
           }
 
     if( !has_digits )
@@ -719,7 +719,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         // We only add the name if we got an empty column.
         if( emptycol == 0 )
-          MSG_WARNING( (*spxout), (*spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
+          MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
           else
             {
               colidx = colnames->num();
@@ -1243,7 +1243,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
 
                                   assert(cnames->has(colidx));
 
-                                  MSG_WARNING( (*spxout), (*spxout) << "WLPFRD10 Duplicate index "
+                                  MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD10 Duplicate index "
                                                << (*cnames)[colidx]
                                                << " in line " << lineno
                                                << std::endl; )
@@ -1289,7 +1289,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
 
                   if( (colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0 )
                     {
-                      MSG_WARNING( (*spxout), (*spxout) << "WLPFRD11 in Bounds section line "
+                      MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD11 in Bounds section line "
                                    << lineno << " ignored" << std::endl; )
                         *pos = '\0';
                       continue;
@@ -1348,7 +1348,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
                 case INTEGERS:
                   if( (colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0 )
                     {
-                      MSG_WARNING( (*spxout), (*spxout) << "WLPFRD12 in Binary/General section line " << lineno << " ignored" << std::endl; )
+                      MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno << " ignored" << std::endl; )
                         }
                   else
                     {
@@ -1391,7 +1391,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
   syntax_error:
     if( finished )
       {
-        MSG_INFO2( (*spxout), (*spxout) << "Finished reading " << lineno << " lines" << std::endl; )
+        MSG_INFO2( (*this->spxout), (*this->spxout) << "Finished reading " << lineno << " lines" << std::endl; )
           }
     else
       MSG_ERROR( std::cerr << "ELPFRD15 Syntax error in line " << lineno << std::endl; )
@@ -1422,7 +1422,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
         // Sometimes the name is omitted.
         mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
-        MSG_INFO2( (*spxout), (*spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl; )
+        MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl; )
 
           // This has to be a new section
           if( !mps.readLine() || (mps.field0() == 0) )
@@ -1520,7 +1520,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         if( mps.field0() != 0 )
           {
-            MSG_INFO2( (*spxout), (*spxout) << "IMPSRD02 Objective name : " << mps.objName() << std::endl; )
+            MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD02 Objective name : " << mps.objName() << std::endl; )
 
               if( strcmp(mps.field0(), "COLUMNS") )
                 break;
@@ -1687,7 +1687,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         if( mps.field0() != 0 )
           {
-            MSG_INFO2( (*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl; );
+            MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl; );
 
             if( !strcmp(mps.field0(), "RANGES") )
               mps.setSection(MPSInput::RANGES);
@@ -1716,7 +1716,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
               {
                 assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
             spxSnprintf(addname, MPSInput::MAX_LINE_LEN, "%s", mps.field1());
-                MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
+                MSG_INFO3( (*this->spxout), (*this->spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
               }
           }
         else
@@ -1770,7 +1770,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         if( mps.field0() != 0 )
           {
-            MSG_INFO2( (*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl; );
+            MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD04 Range name     : " << rngname << std::endl; );
 
             if( !strcmp(mps.field0(), "BOUNDS") )
               mps.setSection(MPSInput::BOUNDS);
@@ -1881,7 +1881,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         if( mps.field0() != 0 )
           {
-            MSG_INFO2( (*spxout), (*spxout) << "IMPSRD05 Bound name     : " << bndname << std::endl; )
+            MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD05 Bound name     : " << bndname << std::endl; )
 
               if( strcmp(mps.field0(), "ENDATA") )
                 break;
@@ -2094,7 +2094,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Real>::MINIMIZE : SPxLPBase<Real>::MAXIMIZE);
 
-        MSG_INFO2( (*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
+        MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
 
         added2Set(
                   *(reinterpret_cast<SVSetBase<Real>*>(static_cast<LPRowSetBase<Real>*>(this))),
@@ -2669,7 +2669,7 @@ static void MPSwriteRecord(
     // Output warning when writing a maximisation problem
     if( spxSense() == SPxLPBase<Real>::MAXIMIZE )
       {
-        MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
+        MSG_WARNING( (*this->spxout), (*this->spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
       }
   }
 

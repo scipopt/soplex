@@ -2665,9 +2665,11 @@ namespace soplex
       , thesense(old.thesense == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE)
       , offset(old.offset)
       , _isScaled(old._isScaled)
-      , lp_scaler(old.lp_scaler)
+      // , lp_scaler(old.lp_scaler) // old code, now that the Scaler is a
+      // template, this assignment does not make sense.
       , spxout(old.spxout)
       {
+        lp_scaler = nullptr;
         assert(isConsistent());
       }
 

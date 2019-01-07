@@ -119,7 +119,7 @@ namespace soplex
     assert(theLP != 0);
     assert(theLP->dim() == matrix.size());
 
-    MSG_INFO3( (*spxout), (*spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; )
+    MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS01 loadMatrixVecs() invalidates factorization" << std::endl; )
 
       int i;
     nzCount = 0;
@@ -225,7 +225,7 @@ namespace soplex
     int   j;
     bool consistent = true;
 
-    MSG_INFO3( (*spxout), (*spxout) << "IBASIS02 loading of Basis invalidates factorization" << std::endl; )
+    MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS02 loading of Basis invalidates factorization" << std::endl; )
 
       lastin      = none;
     lastout     = none;
@@ -376,7 +376,7 @@ namespace soplex
 
     setOutstream(*p_solver->spxout);
 
-    MSG_INFO3( (*spxout), (*spxout) << "IBASIS03 loading of Solver invalidates factorization"
+    MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS03 loading of Solver invalidates factorization"
 	       << std::endl; )
 
       if(freeSlinSolver)
@@ -810,7 +810,7 @@ namespace soplex
 	// too much memory growth ?
 	  else if (Real(factor->memory()) > 1000 + factor->dim() + lastMem * memFactor)
 	    {
-	      MSG_INFO3( (*spxout), (*spxout) << "IBASIS04 memory growth factor triggers refactorization"
+	      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS04 memory growth factor triggers refactorization"
 			 << " memory= " << factor->memory()
 			 << " lastMem= " << lastMem
 			 << " memFactor= " << memFactor
@@ -821,7 +821,7 @@ namespace soplex
 	// relative fill too high ?
 	  else if (Real(factor->memory()) > lastFill * Real(nzCount))
 	    {
-	      MSG_INFO3( (*spxout), (*spxout) << "IBASIS04 fill factor triggers refactorization"
+	      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS04 fill factor triggers refactorization"
 			 << " memory= " << factor->memory()
 			 << " nzCount= " << nzCount
 			 << " lastFill= " << lastFill
@@ -832,7 +832,7 @@ namespace soplex
 	// absolute fill in basis matrix too high ?
 	  else if (nzCount > lastNzCount)
 	    {
-	      MSG_INFO3( (*spxout), (*spxout) << "IBASIS05 nonzero factor triggers refactorization"
+	      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS05 nonzero factor triggers refactorization"
 			 << " nzCount= " << nzCount
 			 << " lastNzCount= " << lastNzCount
 			 << " nonzeroFactor= " << nonzeroFactor
@@ -842,7 +842,7 @@ namespace soplex
 	// too many updates ?
 	  else if (updateCount >= maxUpdates)
 	    {
-	      MSG_INFO3( (*spxout), (*spxout) << "IBASIS06 update count triggers refactorization"
+	      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS06 update count triggers refactorization"
 			 << " updateCount= " << updateCount
 			 << " maxUpdates= " << maxUpdates
 			 << std::endl; )
@@ -863,7 +863,7 @@ namespace soplex
 		}
 	      catch( ... )
 		{
-		  MSG_INFO3( (*spxout), (*spxout) << "IBASIS13 problems updating factorization; refactorizing basis"
+		  MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS13 problems updating factorization; refactorizing basis"
 			     << std::endl; )
 
 #ifdef MEASUREUPDATETIME
@@ -891,7 +891,7 @@ namespace soplex
 		  // we have to invalidate the basis to have the statuses correct
 		  catch( const SPxException& F )
 		    {
-		      MSG_INFO3( (*spxout), (*spxout) << "IBASIS14 problems updating factorization; invalidating factorization"
+		      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS14 problems updating factorization; invalidating factorization"
 				 << std::endl; )
 
 #ifdef MEASUREUPDATETIME
@@ -907,7 +907,7 @@ namespace soplex
 
 	      if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
 		{
-		  MSG_INFO3( (*spxout), (*spxout) << "IBASIS07 stability triggers refactorization"
+		  MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS07 stability triggers refactorization"
 			     << " stability= " << factor->stability()
 			     << " minStab= " << minStab
 			     << std::endl; )

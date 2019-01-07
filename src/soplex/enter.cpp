@@ -142,7 +142,7 @@ namespace soplex
                   isInfeasibleCo[i] = SPxPricer<Real>::NOT_VIOLATED;
                 if( ninfeasibilities > sparsitythreshold)
                   {
-                    MSG_INFO2( (*spxout), (*spxout) << " --- using dense pricing"
+                    MSG_INFO2( (*this->spxout), (*this->spxout) << " --- using dense pricing"
                                << std::endl; )
                       remainingRoundsEnterCo = DENSEROUNDS;
                     sparsePricingEnterCo = false;
@@ -157,13 +157,13 @@ namespace soplex
       --remainingRoundsEnterCo;
     else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnterCo )
       {
-        MSG_INFO2( (*spxout),
+        MSG_INFO2( (*this->spxout),
                    std::streamsize prec = spxout->precision();
                    if( hyperPricingEnter )
-                     (*spxout) << " --- using hypersparse pricing, ";
+                     (*this->spxout) << " --- using hypersparse pricing, ";
                    else
-                     (*spxout) << " --- using sparse pricing, ";
-                   (*spxout) << "sparsity: "
+                     (*this->spxout) << " --- using sparse pricing, ";
+                   (*this->spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
                    << (Real) ninfeasibilities/coDim()
                    << std::scientific << std::setprecision(int(prec))
@@ -269,7 +269,7 @@ namespace soplex
                   isInfeasible[i] = SPxPricer<Real>::NOT_VIOLATED;
                 if( ninfeasibilities > sparsitythreshold )
                   {
-                    MSG_INFO2( (*spxout), (*spxout) << " --- using dense pricing"
+                    MSG_INFO2( (*this->spxout), (*this->spxout) << " --- using dense pricing"
                                << std::endl; )
                       remainingRoundsEnter = DENSEROUNDS;
                     sparsePricingEnter = false;
@@ -284,13 +284,13 @@ namespace soplex
       --remainingRoundsEnter;
     else if( ninfeasibilities <= sparsitythreshold && !sparsePricingEnter )
       {
-        MSG_INFO2( (*spxout),
+        MSG_INFO2( (*this->spxout),
                    std::streamsize prec = spxout->precision();
                    if( hyperPricingEnter )
-                     (*spxout) << " --- using hypersparse pricing, ";
+                     (*this->spxout) << " --- using hypersparse pricing, ";
                    else
-                     (*spxout) << " --- using sparse pricing, ";
-                   (*spxout) << "sparsity: "
+                     (*this->spxout) << " --- using sparse pricing, ";
+                   (*this->spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
                    << (Real) ninfeasibilities/dim()
                    << std::scientific << std::setprecision(int(prec))
@@ -1156,7 +1156,7 @@ namespace soplex
         if (tmp.length() > entertol()) {
           // This happens frequently and does usually not hurt, so print these
           // warnings only with verbose level INFO2 and higher.
-          MSG_INFO2( (*spxout), (*spxout) << "WENTER09 fVec updated error = "
+          MSG_INFO2( (*this->spxout), (*this->spxout) << "WENTER09 fVec updated error = "
                      << tmp.length() << std::endl; )
             }
       }
@@ -1379,7 +1379,7 @@ namespace soplex
 
         else if (this->lastUpdate() > 1)
           {
-            MSG_INFO3( (*spxout), (*spxout) << "IENTER01 factorization triggered in "
+            MSG_INFO3( (*this->spxout), (*this->spxout) << "IENTER01 factorization triggered in "
                        << "enter() for feasibility test" << std::endl; )
               try
                 {
@@ -1389,7 +1389,7 @@ namespace soplex
                 {
                   // don't exit immediately but handle the singularity correctly
                   assert(SPxBasisBase<Real>::status() == SPxBasisBase<Real>::SINGULAR);
-                  MSG_INFO3( (*spxout), (*spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
+                  MSG_INFO3( (*this->spxout), (*this->spxout) << "Caught exception in factorization: " << E.what() << std::endl; )
                     }
 
             /* after a factorization, the entering column/row might not be infeasible or suboptimal anymore, hence we do
@@ -1403,7 +1403,7 @@ namespace soplex
          */
         else if (spxAbs(enterTest) < entertol())
           {
-            MSG_INFO3( (*spxout), (*spxout) << "IENTER11 clean up step to reduce numerical errors" << std::endl; )
+            MSG_INFO3( (*this->spxout), (*this->spxout) << "IENTER11 clean up step to reduce numerical errors" << std::endl; )
 
               SPxBasisBase<Real>::coSolve(*theCoPvec, *theCoPrhs);
             computePvec();
@@ -1413,7 +1413,7 @@ namespace soplex
             return false;
           }
 
-        MSG_INFO3( (*spxout), (*spxout) << "IENTER02 unboundedness/infeasibility found in "
+        MSG_INFO3( (*this->spxout), (*this->spxout) << "IENTER02 unboundedness/infeasibility found in "
                    << "enter()" << std::endl; )
 
           if (rep() == ROW)

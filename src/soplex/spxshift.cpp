@@ -506,7 +506,7 @@ namespace soplex
   template <>
   void SPxSolverBase<Real>::unShift(void)
   {
-    MSG_INFO3( (*spxout), (*spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
+    MSG_INFO3( (*this->spxout), (*this->spxout) << "DSHIFT07 = " << "unshifting ..." << std::endl; );
 
     if (isInitialized())
       {
