@@ -111,10 +111,10 @@ SPxGeometSC<R>& SPxGeometSC<R>::operator=(const SPxGeometSC<R>& rhs)
 }
 
   template <class R>
-void SPxGeometSC<R>::scale(SPxLPBase<Real>& lp, bool persistent)
+void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 {
 
-   MSG_INFO1( (*spxout), (*spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << (postequilibration ? " with post-equilibration" : "") << std::endl; )
+   MSG_INFO1( (this->spxout), (this->spxout) << "Geometric scaling LP" << (persistent ? " (persistent)" : "") << (postequilibration ? " with post-equilibration" : "") << std::endl; )
 
    this->setup(lp);
 
@@ -140,7 +140,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<Real>& lp, bool persistent)
      p1start = colratio;
    }
 
-   MSG_INFO2( (*spxout), (*spxout) << "before scaling:"
+   MSG_INFO2( (this->spxout), (this->spxout) << "before scaling:"
                         << " min= " << lp.minAbsNzo()
                         << " max= " << lp.maxAbsNzo()
                         << " col-ratio= " << colratio
