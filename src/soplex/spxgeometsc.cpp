@@ -26,12 +26,13 @@
 namespace soplex
 {
 
-static Real computeScalingVec(
-      const SVSet*             vecset,
-      const std::vector<Real>& coScaleval,
-      std::vector<Real>&       scaleval)
+  template <class R>
+static R computeScalingVec(
+                           const SVSetBase<R>*             vecset,
+      const std::vector<R>& coScaleval,
+      std::vector<R>&       scaleval)
 {
-   Real pmax = 0.0;
+   R pmax = 0.0;
 
    assert(scaleval.size() == unsigned(vecset->num()));
 
@@ -119,7 +120,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
    this->setup(lp);
 
    /* We want to do that direction first, with the lower ratio.
-    * See SPxEquiliSC::scale() for a reasoning.
+    * See SPxEquiliSC<R>::scale() for a reasoning.
     */
    const Real colratio = maxColRatio(lp);
    const Real rowratio = maxRowRatio(lp);

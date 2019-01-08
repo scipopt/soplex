@@ -161,11 +161,11 @@ SPxEquiliSC<R>::SPxEquiliSC(const SPxEquiliSC<R>& old)
 {}
 
   template <class R>
-SPxEquiliSC<R>& SPxEquiliSC::operator=(const SPxEquiliSC<R>& rhs)
+  SPxEquiliSC<R>& SPxEquiliSC<R>::operator=(const SPxEquiliSC<R>& rhs)
 {
    if(this != &rhs)
    {
-      SPxScaler::operator=(rhs);
+     SPxScaler<R>::operator=(rhs);
    }
 
    return *this;
