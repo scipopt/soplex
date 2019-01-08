@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -45,7 +45,7 @@ namespace soplex
 #define SOPLEX_VERSION         400
 #define SOPLEX_SUBVERSION        3
 #define SOPLEX_APIVERSION        9
-#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2018 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
+#define SOPLEX_COPYRIGHT       "Copyright (c) 1996-2019 Konrad-Zuse-Zentrum fuer Informationstechnik Berlin (ZIB)"
 
 /*-----------------------------------------------------------------------------
  * Assertion Macros etc.
