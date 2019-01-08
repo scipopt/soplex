@@ -79,11 +79,13 @@ namespace soplex
   assert(SPxScaler<R>::isConsistent());
 }
 
+  template <class R>
 SPxScaler<R>::~SPxScaler()
 {
    m_name = 0;
 }
 
+  template <class R>
 SPxScaler<R>& SPxScaler<R>::operator=(const SPxScaler<R>& rhs)
 {
    if (this != &rhs)

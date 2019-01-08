@@ -664,7 +664,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
 
     if( has_emptyexponent )
       {
-        MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n"; )
+        MSG_WARNING( (*spxout), (*spxout) << "WLPFRD01 Warning: found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n"; )
           }
 
     if( !has_digits )
@@ -719,7 +719,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
       {
         // We only add the name if we got an empty column.
         if( emptycol == 0 )
-          MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
+          MSG_WARNING( (*spxout), (*spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
           else
             {
               colidx = colnames->num();

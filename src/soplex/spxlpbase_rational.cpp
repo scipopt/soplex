@@ -284,7 +284,7 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
       if( has_dot || has_exponent || has_emptydivisor ||
          (*s == '.') ||(*s == '+') || (*s == '-') || (tolower(*s) == 'e') )
       {
-         MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD03 Warning: In line " << lineno << ": malformed rational value in LP file\n";)
+         MSG_WARNING( (*spxout), (*spxout) << "WLPFRD03 Warning: In line " << lineno << ": malformed rational value in LP file\n";)
       }
    }
 
@@ -293,7 +293,7 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 
    if( has_emptyexponent )
    {
-      MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD01 Warning: In line " << lineno << ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "WLPFRD01 Warning: In line " << lineno << ": found empty exponent in LP file - check for forbidden variable names with initial 'e' or 'E'\n" );
    }
 
    if( !has_digits )
@@ -306,7 +306,7 @@ static Rational LPFreadValue(char*& pos, SPxOut* spxout, const int lineno = -1)
 
       if( !value.readString(tmp) )
       {
-         MSG_WARNING( (*this->spxout), (*this->spxout) <<"WLPFRD04 Warning: In line " << lineno << ": malformed rational value in LP file\n" );
+         MSG_WARNING( (*spxout), (*spxout) <<"WLPFRD04 Warning: In line " << lineno << ": malformed rational value in LP file\n" );
       }
    }
    pos += s - pos;
@@ -351,7 +351,7 @@ static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<Rational>&
    {
       // We only add the name if we got an empty column.
       if( emptycol == 0 )
-         MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
+         MSG_WARNING( (*spxout), (*spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
       else
       {
          colidx = colnames->num();
@@ -1057,7 +1057,7 @@ static void MPSreadName(MPSInput& mps, SPxOut* spxout)
       // Sometimes the name is omitted.
       mps.setProbName((mps.field1() == 0) ? "_MPS_" : mps.field1());
 
-      MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl; )
+      MSG_INFO2( (*spxout), (*spxout) << "IMPSRD01 Problem name   : " << mps.probName() << std::endl; )
 
       // This has to be a new section
       if( !mps.readLine() || (mps.field0() == 0) )
@@ -1155,7 +1155,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rn
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD02 Objective name : " << mps.objName() << std::endl; )
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD02 Objective name : " << mps.objName() << std::endl; )
 
          if( strcmp(mps.field0(), "COLUMNS") )
             break;
@@ -1273,7 +1273,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
       if( !val.readString(mps.field3()) )
       {
-         MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD01 Warning: malformed rational value in MPS file\n" );
+         MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD01 Warning: malformed rational value in MPS file\n" );
       }
 
 
@@ -1293,7 +1293,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
 
          if( !val.readString(mps.field5()) )
          {
-            MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD02 Warning: malformed rational value in MPS file\n" );
+            MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD02 Warning: malformed rational value in MPS file\n" );
          }
 
          if( !strcmp(mps.field4(), mps.objName()) )
@@ -1325,7 +1325,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl; );
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD03 RHS name       : " << rhsname  << std::endl; );
 
          if( !strcmp(mps.field0(), "RANGES") )
             mps.setSection(MPSInput::RANGES);
@@ -1354,7 +1354,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          {
             assert(strlen(mps.field1()) < MPSInput::MAX_LINE_LEN);
             spxSnprintf(addname, MPSInput::MAX_LINE_LEN, "%s", mps.field1());
-            MSG_INFO3( (*this->spxout), (*this->spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
+            MSG_INFO3( (*spxout), (*spxout) << "IMPSRD07 RHS ignored    : " << addname << std::endl );
          }
       }
       else
@@ -1365,7 +1365,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
          {
             if( !val.readString(mps.field3()) )
             {
-               MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD03 Warning: malformed rational value in MPS file\n" );
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD03 Warning: malformed rational value in MPS file\n" );
             }
 
             // LE or EQ
@@ -1384,7 +1384,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             {
                if( !val.readString(mps.field5()) )
                {
-                  MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD04 Warning: malformed rational value in MPS file\n" );
+                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD04 Warning: malformed rational value in MPS file\n" );
                }
 
                // LE or EQ
@@ -1414,7 +1414,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD04 Range name     : " << rngname << std::endl; );
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD04 Range name     : " << rngname << std::endl; );
 
          if( !strcmp(mps.field0(), "BOUNDS") )
             mps.setSection(MPSInput::BOUNDS);
@@ -1455,7 +1455,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
          {
             if( !val.readString(mps.field3()) )
             {
-               MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD05 Warning: malformed rational value in MPS file\n" );
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD05 Warning: malformed rational value in MPS file\n" );
             }
 
             // EQ
@@ -1493,7 +1493,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             {
                if( !val.readString(mps.field5()) )
                {
-                  MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD06 Warning: malformed rational value in MPS file\n" );
+                  MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD06 Warning: malformed rational value in MPS file\n" );
                }
 
                // EQ
@@ -1543,7 +1543,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
    {
       if( mps.field0() != 0 )
       {
-         MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD05 Bound name     : " << bndname << std::endl; )
+         MSG_INFO2( (*spxout), (*spxout) << "IMPSRD05 Bound name     : " << bndname << std::endl; )
 
          if( strcmp(mps.field0(), "ENDATA") )
             break;
@@ -1593,7 +1593,7 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
                val = infinity;
             else if( !val.readString(mps.field4()) )
             {
-               MSG_WARNING( (*this->spxout), (*this->spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file line " << mps.lineno() << ": " << mps.field4() << "\n" );
+               MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file line " << mps.lineno() << ": " << mps.field4() << "\n" );
                mps.syntaxError();
                return;
             }
@@ -1760,7 +1760,7 @@ bool SPxLPBase<Rational>::readMPS(
    {
       changeSense(mps.objSense() == MPSInput::MINIMIZE ? SPxLPBase<Rational>::MINIMIZE : SPxLPBase<Rational>::MAXIMIZE);
 
-      MSG_INFO2( (*this->spxout), (*this->spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
+      MSG_INFO2( (*spxout), (*spxout) << "IMPSRD06 Objective sense: " << ((mps.objSense() == MPSInput::MINIMIZE) ? "Minimize\n" : "Maximize\n") );
 
       added2Set(
          *(reinterpret_cast<SVSetBase<Rational>*>(static_cast<LPRowSetBase<Rational>*>(this))),
@@ -1883,7 +1883,7 @@ static void LPFwriteSVector(
             p_output << "\n\t";
             if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
             {
-               MSG_WARNING( (*this->spxout), (*this->spxout) << "XLPSWR01 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+               MSG_WARNING( (*spxout), (*spxout) << "XLPSWR01 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
             }
             pos = p_output.tellp();
          }
@@ -1952,7 +1952,7 @@ static void LPFwriteRow(
       p_output << "\n\t";
       if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
       {
-         MSG_WARNING( (*this->spxout), (*this->spxout) << "XLPSWR02 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+         MSG_WARNING( (*spxout), (*spxout) << "XLPSWR02 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
       }
       pos = p_output.tellp();
    }
@@ -1972,7 +1972,7 @@ static void LPFwriteRow(
 
    if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
    {
-      MSG_WARNING( (*this->spxout), (*this->spxout) << "XLPSWR03 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "XLPSWR03 Warning: MAX_LINE_WRITE_LEN possibly exceeded when writing LP file\n" );
    }
 }
 
@@ -2071,7 +2071,7 @@ static void LPFwriteBounds(
       // check if max line length exceeded
       if( (long long)(p_output.tellp()) - pos  >  MAX_LINE_WRITE_LEN )
       {
-         MSG_WARNING( (*this->spxout), (*this->spxout) << "XLPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing LP file\n" );
+         MSG_WARNING( (*spxout), (*spxout) << "XLPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing LP file\n" );
       }
       pos = p_output.tellp();
    }
@@ -2160,7 +2160,7 @@ static void MPSwriteRecord(
    // Warning if line is too long
    if( (long long)(os.tellp()) - pos > MAX_LINE_WRITE_LEN )
    {
-      MSG_WARNING( (*this->spxout), (*this->spxout) << "XMPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing MPS file\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "XMPSWR04 Warning: MAX_LINE_WRITE_LEN exceeded when writing MPS file\n" );
    }
 }
 
@@ -2396,7 +2396,7 @@ void SPxLPBase<Rational>::writeMPS(
    // Output warning when writing a maximisation problem
    if( spxSense() == SPxLPBase<Rational>::MAXIMIZE )
    {
-      MSG_WARNING( (*this->spxout), (*this->spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
+      MSG_WARNING( (*spxout), (*spxout) << "XMPSWR03 Warning: objective function inverted when writing maximization problem in MPS file format\n" );
    }
 }
 

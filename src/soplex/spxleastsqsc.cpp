@@ -374,8 +374,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    const SSVector& rowscale = *rsccurr;
    const SSVector& colscale = *csccurr;
 
-   DataArray<int>& colscaleExp = *m_activeColscaleExp;
-   DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
+   DataArray<int>& colscaleExp = *this->m_activeColscaleExp;
+   DataArray<int>& rowscaleExp = *this->m_activeRowscaleExp;
 
    for( k = 0; k < nrows; ++k )
       rowscaleExp[k] = -int( rowscale[k] + ((rowscale[k] >= 0.0)? (+0.5) : (-0.5)) );
@@ -386,11 +386,11 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    // scale
    applyScaling(lp);
 
-   MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << minAbsRowscale()
-      << " max= " << maxAbsRowscale()
+   MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
+      << " max= " << this->maxAbsRowscale()
       << std::endl
-      << "Col scaling min= " << minAbsColscale()
-      << " max= " << maxAbsColscale()
+      << "Col scaling min= " << this->minAbsColscale()
+      << " max= " << this->maxAbsColscale()
       << std::endl; )
 
    MSG_INFO2( (*this->spxout), (*this->spxout) << "after scaling: "

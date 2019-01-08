@@ -211,8 +211,8 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
    }
    else
    {
-      DataArray<int>& colscaleExp = *m_activeColscaleExp;
-      DataArray<int>& rowscaleExp = *m_activeRowscaleExp;
+      DataArray<int>& colscaleExp = *this->m_activeColscaleExp;
+      DataArray<int>& rowscaleExp = *this->m_activeRowscaleExp;
 
       if( postequilibration )
       {
@@ -221,21 +221,21 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
             std::fill(rowscale.begin(), rowscale.end(), 1.0);
             std::fill(colscale.begin(), colscale.end(), 1.0);
          }
-         SPxEquiliSC::computePostequiExpVecs(lp, rowscale, colscale, rowscaleExp, colscaleExp);
+         SPxEquiliSC<R>::computePostequiExpVecs(lp, rowscale, colscale, rowscaleExp, colscaleExp);
       }
       else
       {
-         computeExpVec(colscale, colscaleExp);
-         computeExpVec(rowscale, rowscaleExp);
+         this->computeExpVec(colscale, colscaleExp);
+         this->computeExpVec(rowscale, rowscaleExp);
       }
 
       applyScaling(lp);
 
-      MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << minAbsRowscale()
-                           << " max= " << maxAbsRowscale()
+      MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
+                           << " max= " << this->maxAbsRowscale()
                            << std::endl
-                           << "IGEOSC06 Col scaling min= " << minAbsColscale()
-                           << " max= " << maxAbsColscale()
+                           << "IGEOSC06 Col scaling min= " << this->minAbsColscale()
+                           << " max= " << this->maxAbsColscale()
                            << std::endl; )
 
       MSG_INFO2( (*this->spxout), (*this->spxout) << "after scaling: "
