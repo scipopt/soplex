@@ -236,7 +236,7 @@ void SPxScaler<R>::applyScaling(SPxLPBase<Real>& lp)
 
 /// unscale SPxLP
 template <class R>
-void SPxScaler<R>::unscale(SPxLPBase<Real>& lp)
+void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
 {
    assert(lp.isScaled());
 
@@ -309,7 +309,7 @@ int SPxScaler<R>::getRowScaleExp(int i) const
 
 /// gets unscaled column \p i
 template <class R>
-void SPxScaler<R>::getColUnscaled(const SPxLP& lp, int i, DSVector& vec) const
+void SPxScaler<R>::getColUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const
 {
    assert(lp.isScaled());
    assert(i < lp.nCols());

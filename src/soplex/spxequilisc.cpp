@@ -177,7 +177,7 @@ void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
 
    MSG_INFO1( (*this->spxout), (*this->spxout) << "Equilibrium scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
 
-   setup(lp);
+   this->setup(lp);
 
    /* We want to do the direction first, which has a lower maximal ratio,
     * since the lowest value in the scaled matrix is bounded from below by
@@ -199,8 +199,8 @@ void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
     *            1    1          1    1
     *
     */
-   Real colratio = maxColRatio(lp);
-   Real rowratio = maxRowRatio(lp);
+   Real colratio = this->maxColRatio(lp);
+   Real rowratio = this->maxRowRatio(lp);
 
    bool colFirst = colratio < rowratio;
 
@@ -213,34 +213,34 @@ void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
 
    if (colFirst)
    {
-      computeEquiExpVec(lp.colSet(), *m_activeRowscaleExp, *m_activeColscaleExp);
+      computeEquiExpVec(lp.colSet(), *this->m_activeRowscaleExp, *this->m_activeColscaleExp);
 
-      if (m_doBoth)
-         computeEquiExpVec(lp.rowSet(), *m_activeColscaleExp, *m_activeRowscaleExp);
+      if (this->m_doBoth)
+         computeEquiExpVec(lp.rowSet(), *this->m_activeColscaleExp, *this->m_activeRowscaleExp);
    }
    else
    {
-      computeEquiExpVec(lp.rowSet(), *m_activeColscaleExp, *m_activeRowscaleExp);
+      computeEquiExpVec(lp.rowSet(), *this->m_activeColscaleExp, *this->m_activeRowscaleExp);
 
-      if (m_doBoth)
-         computeEquiExpVec(lp.colSet(), *m_activeRowscaleExp, *m_activeColscaleExp);
+      if (this->m_doBoth)
+         computeEquiExpVec(lp.colSet(), *this->m_activeRowscaleExp, *this->m_activeColscaleExp);
    }
 
    /* scale */
-   applyScaling(lp);
+   this->applyScaling(lp);
 
-   MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << minAbsRowscale()
-                        << " max= " << maxAbsRowscale()
+   MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
+                        << " max= " << this->maxAbsRowscale()
                         << std::endl
-                        << "Col scaling min= " << minAbsColscale()
-                        << " max= " << maxAbsColscale()
+                        << "Col scaling min= " << this->minAbsColscale()
+                        << " max= " << this->maxAbsColscale()
                         << std::endl; )
 
    MSG_INFO2( (*this->spxout), (*this->spxout) << "after scaling: "
                         << " min= " << lp.minAbsNzo(false)
                         << " max= " << lp.maxAbsNzo(false)
-                        << " col-ratio= " << maxColRatio(lp)
-                        << " row-ratio= " << maxRowRatio(lp)
+                        << " col-ratio= " << this->maxColRatio(lp)
+                        << " row-ratio= " << this->maxRowRatio(lp)
                         << std::endl; )
 
 }

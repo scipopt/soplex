@@ -124,11 +124,12 @@ static inline void updateRes(
 
 
 /* initialize constant vectors and matrices */
+  template <class R>
 static void initConstVecs(
-   const SVSet* vecset,
-   SVSet& facset,
-   SSVector& veclogs,
-   SSVector& vecnnzinv)
+                          const SVSetBase<R>* vecset,
+                          SVSetBase<R>& facset,
+                          SSVectorBase<R>& veclogs,
+                          SSVectorBase<R>& vecnnzinv)
 {
    assert(vecset != NULL);
 
