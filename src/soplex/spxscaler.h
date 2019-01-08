@@ -94,18 +94,19 @@ protected:
    //@{
 
    /// clear and setup scaling arrays in the LP
-   virtual void setup(SPxLPBase<Real>& lp);
+   virtual void setup(SPxLPBase<R>& lp);
    //@}
 
 public:
 
    /// compute a single scaling vector , e.g. of a newly added row
-   virtual int computeScaleExp(const SVector& vec, const DataArray<int>& oldScaleExp) const;
+   virtual int computeScaleExp(const SVectorBase<R>& vec, const DataArray<int>& oldScaleExp) const;
 
-   virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
+  // The following is now redundant because of the above function.
+   // virtual int computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const;
 
    /// applies m_colscale and m_rowscale to the \p lp.
-   virtual void applyScaling(SPxLPBase<Real>& lp);
+   virtual void applyScaling(SPxLPBase<R>& lp);
 
 
   template <class T>
@@ -140,8 +141,8 @@ public:
    {
       spxout = &newOutstream;
    }
-   /// set real parameter
-   virtual void setRealParam(Real param, const char* name = "realparam");
+   /// set R parameter
+   virtual void setRealParam(R param, const char* name = "realparam");
    /// set int parameter
    virtual void setIntParam(int param, const char* name = "intparam");
    //@}
@@ -160,37 +161,37 @@ public:
    /// gets unscaled column \p i
   virtual void getColUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const;
    /// returns maximum absolute value of unscaled column \p i
-   virtual Real getColMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R getColMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns minumum absolute value of unscaled column \p i
-   virtual Real getColMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R getColMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns unscaled upper bound \p i
-   virtual Real upperUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R upperUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns unscaled upper bound vector of \p lp
   virtual void getUpperUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled lower bound \p i
-   virtual Real lowerUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R lowerUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// gets unscaled lower bound vector
   virtual void getLowerUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled objective function coefficient of \p i
-   virtual Real maxObjUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R maxObjUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// gets unscaled objective function
   virtual void getMaxObjUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled row \p i
   virtual void getRowUnscaled(const SPxLPBase<R>& lp, int i, DSVectorBase<R>& vec) const;
    /// returns maximum absolute value of unscaled row \p i
-   virtual Real getRowMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R getRowMaxAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns minimum absolute value of unscaled row \p i
-   virtual Real getRowMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R getRowMinAbsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns unscaled right hand side \p i
-   virtual Real rhsUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R rhsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// gets unscaled right hand side vector
    virtual void getRhsUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled left hand side \p i of \p lp
-   virtual Real lhsUnscaled(const SPxLPBase<R>& lp, int i) const;
+   virtual R lhsUnscaled(const SPxLPBase<R>& lp, int i) const;
    /// returns unscaled left hand side vector of \p lp
    virtual void getLhsUnscaled(const SPxLPBase<R>& lp, VectorBase<R>& vec) const;
    /// returns unscaled coefficient of \p lp
-   virtual Real getCoefUnscaled(const SPxLPBase<R>& lp, int row, int col) const;
+   virtual R getCoefUnscaled(const SPxLPBase<R>& lp, int row, int col) const;
    /// unscale dense primal solution vector given in \p x.
    virtual void unscalePrimal(const SPxLPBase<R>& lp, VectorBase<R>& x) const;
    /// unscale dense slack vector given in \p s.
@@ -204,31 +205,31 @@ public:
    /// unscale dual ray given in \p ray.
    virtual void unscaleDualray(const SPxLPBase<R>& lp, VectorBase<R>& ray) const;
    /// apply scaling to objective function vector \p origObj.
-   virtual void scaleObj(const SPxLPBase<R>& lp, VectorReal& origObj) const;
+   virtual void scaleObj(const SPxLPBase<R>& lp, VectorBase<R>& origObj) const;
    /// returns scaled objective function coefficient \p origObj.
-   virtual Real scaleObj(const SPxLPBase<R>& lp, int i, Real origObj) const;
+   virtual R scaleObj(const SPxLPBase<R>& lp, int i, R origObj) const;
    /// returns scaled LP element in \p row and \p col.
-   virtual Real scaleElement(const SPxLPBase<R>& lp, int row, int col, Real val) const;
+   virtual R scaleElement(const SPxLPBase<R>& lp, int row, int col, R val) const;
    /// returns scaled lower bound of column \p col.
-   virtual Real scaleLower(const SPxLPBase<R>& lp, int col, Real lower) const;
+   virtual R scaleLower(const SPxLPBase<R>& lp, int col, R lower) const;
    /// returns scaled upper bound of column \p col.
-   virtual Real scaleUpper(const SPxLPBase<R>& lp, int col, Real upper) const;
+   virtual R scaleUpper(const SPxLPBase<R>& lp, int col, R upper) const;
    /// returns scaled left hand side of row \p row.
-   virtual Real scaleLhs(const SPxLPBase<R>& lp, int row, Real lhs) const;
+   virtual R scaleLhs(const SPxLPBase<R>& lp, int row, R lhs) const;
    /// returns scaled right hand side of row \p row.
-   virtual Real scaleRhs(const SPxLPBase<R>& lp, int row, Real rhs) const;
+   virtual R scaleRhs(const SPxLPBase<R>& lp, int row, R rhs) const;
    /// absolute smallest column scaling factor
-   virtual Real minAbsColscale() const;
+   virtual R minAbsColscale() const;
    /// absolute biggest column scaling factor
-   virtual Real maxAbsColscale() const;
+   virtual R maxAbsColscale() const;
    /// absolute smallest row scaling factor
-   virtual Real minAbsRowscale() const;
+   virtual R minAbsRowscale() const;
    /// absolute biggest row scaling factor
-   virtual Real maxAbsRowscale() const;
+   virtual R maxAbsRowscale() const;
    /// maximum ratio between absolute biggest and smallest element in any column.
-   virtual Real maxColRatio(const SPxLPBase<R>& lp) const;
+   virtual R maxColRatio(const SPxLPBase<R>& lp) const;
    /// maximum ratio between absolute biggest and smallest element in any row.
-   virtual Real maxRowRatio(const SPxLPBase<R>& lp) const;
+   virtual R maxRowRatio(const SPxLPBase<R>& lp) const;
    /// round vector entries to power of 2
    void computeExpVec(const std::vector<R>& vec, DataArray<int>& vecExp);
    //@}

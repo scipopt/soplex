@@ -21,23 +21,23 @@
 template <class R>
 bool Validation<R>::updateExternalSolution(char* solution)
 {
-    validate = true;
-    validatesolution = solution;
+  validate = true;
+  validatesolution = solution;
 
-    if( strncmp(solution, "+infinity", 9 ) == 0 )
-      return true;
-    else if ( strncmp(solution, "-infinity", 9) == 0 )
-      return true;
-    else
-      {
-        char* tailptr;
-        strtod(solution, &tailptr);
-        if (*tailptr) {
-          //conversion failed because the input wasn't a number
-          return false;
-        }
-      }
+  if( strncmp(solution, "+infinity", 9 ) == 0 )
     return true;
+  else if ( strncmp(solution, "-infinity", 9) == 0 )
+    return true;
+  else
+    {
+      char* tailptr;
+      strtod(solution, &tailptr);
+      if (*tailptr) {
+        //conversion failed because the input wasn't a number
+        return false;
+      }
+    }
+  return true;
 }
 
 
@@ -46,12 +46,12 @@ bool Validation<R>::updateExternalSolution(char* solution)
 template <class R>
 bool Validation<R>::updateValidationTolerance(char* tolerance)
 {
-    char* tailptr;
-    validatetolerance = strtod(tolerance, &tailptr);
-    if (*tailptr) {
-      //conversion failed because the input wasn't a number
-      return false;
-    }
-    return true;
+  char* tailptr;
+  validatetolerance = strtod(tolerance, &tailptr);
+  if (*tailptr) {
+    //conversion failed because the input wasn't a number
+    return false;
+  }
+  return true;
 }
 

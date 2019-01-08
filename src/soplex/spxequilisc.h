@@ -40,10 +40,10 @@ public:
    static void computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp);
 
    /// compute equilibrium scaling vector rounded to power of two
-   static void computeEquiExpVec(const SVSet* vecset, const std::vector<Real>& coScaleVal, DataArray<int>& scaleExp);
+   static void computeEquiExpVec(const SVSet* vecset, const std::vector<R>& coScaleVal, DataArray<int>& scaleExp);
 
-   /// compute equilibrium scaling rounded to power of 2 for existing Real scaling factors (preRowscale, preColscale)
-   static void computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale, const std::vector<Real>& preColscale,
+   /// compute equilibrium scaling rounded to power of 2 for existing R scaling factors (preRowscale, preColscale)
+   static void computePostequiExpVecs(const SPxLPBase<R>& lp, const std::vector<R>& preRowscale, const std::vector<R>& preColscale,
          DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
    //-------------------------------------
    /**@name Construction / destruction */
@@ -68,7 +68,7 @@ public:
    /**@name Scaling */
    //@{
    /// Scale the loaded SPxLP.
-   virtual void scale(SPxLPBase<Real>& lp, bool persistent = false) override;
+   virtual void scale(SPxLPBase<R>& lp, bool persistent = false) override;
    //@}
 };
 } // namespace soplex

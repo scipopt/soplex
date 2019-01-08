@@ -32,21 +32,22 @@ static const char* makename(bool doBoth)
 }
 
 /// maximum ratio between absolute biggest and smallest element in any scaled row/column.
-static Real maxPrescaledRatio(const SPxLP& lp, const std::vector<Real>& coScaleval, bool rowRatio)
+  template <class R>
+static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScaleval, bool rowRatio)
 {
-   Real pmax = 0.0;
+   R pmax = 0.0;
    const int n = rowRatio ? lp.nRows() : lp.nCols();
 
    for( int i = 0; i < n; ++i )
    {
       const SVector& vec = rowRatio ? lp.rowVector(i) : lp.colVector(i);
-      Real mini = infinity;
-      Real maxi = 0.0;
+      R mini = infinity;
+      R maxi = 0.0;
 
       for( int j = 0; j < vec.size(); ++j )
       {
          assert(vec.index(j) >= 0);
-         const Real x = spxAbs(vec.value(j)) * coScaleval[unsigned(vec.index(j))];
+         const R x = spxAbs(vec.value(j)) * coScaleval[unsigned(vec.index(j))];
 
          if( isZero(x) )
             continue;
@@ -59,7 +60,7 @@ static Real maxPrescaledRatio(const SPxLP& lp, const std::vector<Real>& coScalev
       if( mini == infinity )
          continue;
 
-      const Real p = maxi / mini;
+      const R p = maxi / mini;
 
       if( p > pmax )
          pmax = p;
@@ -76,11 +77,11 @@ static Real maxPrescaledRatio(const SPxLP& lp, const std::vector<Real>& coScalev
    {
       const SVector& vec = (*vecset)[i];
 
-      Real maxi = 0.0;
+      R maxi = 0.0;
 
       for( int j = 0; j < vec.size(); ++j )
       {
-         const Real x = spxAbs(spxLdexp(vec.value(j), coScaleExp[vec.index(j)]));
+         const R x = spxAbs(spxLdexp(vec.value(j), coScaleExp[vec.index(j)]));
 
          if( GT(x, maxi) )
             maxi = x;
@@ -98,7 +99,7 @@ static Real maxPrescaledRatio(const SPxLP& lp, const std::vector<Real>& coScalev
 }
 
   template <class R>
-void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<Real>& coScaleVal, DataArray<int>& scaleExp)
+void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<R>& coScaleVal, DataArray<int>& scaleExp)
 {
    assert(vecset != nullptr);
 
@@ -106,12 +107,12 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<Re
    {
       const SVector& vec = (*vecset)[i];
 
-      Real maxi = 0.0;
+      R maxi = 0.0;
 
       for( int j = 0; j < vec.size(); ++j )
       {
          assert(vec.index(j) >= 0);
-         const Real x = spxAbs(vec.value(j) * coScaleVal[unsigned(vec.index(j))]);
+         const R x = spxAbs(vec.value(j) * coScaleVal[unsigned(vec.index(j))]);
 
          if( GT(x, maxi) )
             maxi = x;
@@ -129,11 +130,11 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<Re
 }
 
   template <class R>
-void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<Real>& lp, const std::vector<Real>& preRowscale, const std::vector<Real>& preColscale,
+void SPxEquiliSC<R>::computePostequiExpVecs(const SPxLPBase<R>& lp, const std::vector<R>& preRowscale, const std::vector<R>& preColscale,
       DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp)
 {
-   const Real colratio = maxPrescaledRatio(lp, preRowscale, false);
-   const Real rowratio = maxPrescaledRatio(lp, preColscale, true);
+   const R colratio = maxPrescaledRatio(lp, preRowscale, false);
+   const R rowratio = maxPrescaledRatio(lp, preColscale, true);
 
    const bool colFirst = colratio < rowratio;
 
@@ -172,7 +173,7 @@ SPxEquiliSC<R>::SPxEquiliSC(const SPxEquiliSC<R>& old)
 }
 
   template <class R>
-void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
+void SPxEquiliSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
 {
 
    MSG_INFO1( (*this->spxout), (*this->spxout) << "Equilibrium scaling LP" << (persistent ? " (persistent)" : "") << std::endl; )
@@ -199,8 +200,8 @@ void SPxEquiliSC<R>::scale(SPxLP& lp, bool persistent)
     *            1    1          1    1
     *
     */
-   Real colratio = this->maxColRatio(lp);
-   Real rowratio = this->maxRowRatio(lp);
+   R colratio = this->maxColRatio(lp);
+   R rowratio = this->maxRowRatio(lp);
 
    bool colFirst = colratio < rowratio;
 
