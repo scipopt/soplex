@@ -92,10 +92,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   bool vanished = simplificationStatus == SPxSimplifier<R>::VANISHED;
 
                   // get solution vectors for transformed problem
-                  DVectorReal tmpPrimal(vanished ? 0 : _solver.nCols());
-                  DVectorReal tmpSlacks(vanished ? 0 : _solver.nRows());
-                  DVectorReal tmpDual(vanished ? 0 : _solver.nRows());
-                  DVectorReal tmpRedCost(vanished ? 0 : _solver.nCols());
+                  DVectorBase<R> tmpPrimal(vanished ? 0 : _solver.nCols());
+                  DVectorBase<R> tmpSlacks(vanished ? 0 : _solver.nRows());
+                  DVectorBase<R> tmpDual(vanished ? 0 : _solver.nRows());
+                  DVectorBase<R> tmpRedCost(vanished ? 0 : _solver.nCols());
 
                   if( !vanished )
                     {
