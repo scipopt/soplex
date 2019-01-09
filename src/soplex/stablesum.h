@@ -23,10 +23,10 @@ namespace soplex {
 template <typename T>
 class StableSum
 {
-   typename std::remove_const<T>::type sum = typename std::remove_const<T>::type{0};
+   typename std::remove_const<T>::type sum;
 
  public:
-   StableSum() = default;
+   StableSum() : sum( 0 ) {}
    StableSum( const T& init ) : sum( init ) {}
 
    void operator+=( const T& input )
