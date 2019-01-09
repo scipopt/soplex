@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2018 Konrad-Zuse-Zentrum                            */
+/*                  1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -232,7 +232,7 @@ R VectorBase<R>::operator*(const SVectorBase<R>& vec) const
 {
    assert(dim() >= vec.dim());
 
-   R x(0);
+   StableSum<R> x;
 
    for(int i = vec.size() - 1; i >= 0; --i)
       x += val[vec.index(i)] * vec.value(i);
@@ -253,7 +253,7 @@ R VectorBase<R>::operator*(const SSVectorBase<R>& vec) const
    {
       const int* idx = vec.indexMem();
 
-      R x(0);
+      StableSum<R> x;
 
       for(int i = vec.size() - 1; i >= 0; --i)
       {
@@ -1038,7 +1038,7 @@ template < class R >
 inline
 R SVectorBase<R>::operator*(const VectorBase<R>& w) const
 {
-   R x = 0;
+   StableSum<R> x;
    Nonzero<R>* e = m_elem;
 
    for(int i = size() - 1; i >= 0; --i)

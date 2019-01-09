@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -24,6 +24,7 @@
 #include "soplex/spxratiotester.h"
 #include "soplex/spxout.h"
 #include "soplex/exceptions.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -204,7 +205,7 @@ void SPxSolverBase<Real>::getLeaveVals(
    Real& leaveMax,
    Real& leavebound,
    int& leaveNum,
-   Real& objChange)
+   StableSum<Real>& objChange)
 {
    typename SPxBasisBase<Real>::Desc& ds = this->desc();
    leaveId = this->baseId(leaveIdx);
@@ -411,7 +412,7 @@ void SPxSolverBase<Real>::getLeaveVals2(
    Real& newUBbound,
    Real& newLBbound,
    Real& newCoPrhs,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    typename SPxBasisBase<Real>::Desc& ds = this->desc();
@@ -772,7 +773,7 @@ bool SPxSolverBase<Real>::leave(int leaveIdx, bool polish)
    Real leaveMax;       // maximium lambda of leaving var
    Real leavebound;     // current fVec value of leaving var
    int  leaveNum;       // number of leaveId in bounds
-   Real objChange = 0.0; // amount of change in the objective function
+   StableSum<Real> objChange; // amount of change in the objective function
 
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum, objChange);
 

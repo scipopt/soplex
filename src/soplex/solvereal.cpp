@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -197,16 +197,17 @@ void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Resul
       break;
 
    case SPxSolverBase<Real>::ABORT_CYCLING:
-
-      // if preprocessing was applied, try to run again without to avoid cycling
-      if(!_isRealLPLoaded)
+      // if preprocessing or scaling was applied, try to run again without to avoid cycling
+      if(!_isRealLPLoaded || _isRealLPScaled)
       {
          MSG_INFO1(spxout, spxout << "encountered cycling - trying to solve again without simplifying" <<
                    std::endl;)
-         _preprocessAndSolveReal(false);
+         // store and unsimplify sub-optimal solution and basis, may trigger re-solve
+         _storeSolutionReal(true);
          return;
       }
-      else if(_solReal.isPrimalFeasible() && _solReal.isDualFeasible())
+
+      if(_solReal.isPrimalFeasible() || _solReal.isDualFeasible())
          _status = SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS;
 
       break;
@@ -701,10 +702,12 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
       _unscaleSolutionReal(*_realLP, true);
 
    // compute the original objective function value
-   _solReal._objVal = realParam(SoPlexBase<R>::OBJ_OFFSET);
+   StableSum<Real> objVal(realParam(SoPlexBase<R>::OBJ_OFFSET));
 
    for(int i = 0; i < numCols(); ++i)
-      _solReal._objVal += _solReal._primal[i] * objReal(i);
+      objVal += _solReal._primal[i] * objReal(i);
+
+   _solReal._objVal = objVal;
 
    // store the unsimplified basis
    _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(),

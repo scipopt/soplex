@@ -4,7 +4,7 @@
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
 /*    Copyright (C) 1996      Roland Wunderling                              */
-/*                  1996-2018 Konrad-Zuse-Zentrum                            */
+/*                  1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -24,6 +24,7 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -338,7 +339,7 @@ public:
    {
       assert(vec.dim() == dimen);
 
-      R x = 0.0;
+      StableSum<R> x;
 
       for(int i = 0; i < dimen; i++)
          x += val[i] * vec.val[i];

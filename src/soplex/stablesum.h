@@ -13,35 +13,72 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxfileio.h
- * @brief declaration of types for file output
- *
- * This is to make the use of compressed input files transparent
- * when programming.
- *
- * @todo maybe rename this file (it is unrelated to spxfileio.cpp)
- */
-#ifndef _SPXFILEIO_H_
-#define _SPXFILEIO_H_
+#ifndef _SOPLEX_STABLE_SUM_H_
+#define _SOPLEX_STABLE_SUM_H_
 
-#include <iostream>
-#include <fstream>
+#include <type_traits>
 
-/*-----------------------------------------------------------------------------
- * compressed file support
- *-----------------------------------------------------------------------------
- */
-#ifdef SOPLEX_WITH_ZLIB
-#include "soplex/gzstream.h"
-#endif // WITH_GSZSTREAM
+namespace soplex {
 
-namespace soplex
+template <typename T>
+class StableSum
 {
-#ifdef SOPLEX_WITH_ZLIB
-typedef gzstream::igzstream spxifstream;
-#else
-typedef std::ifstream spxifstream;
-#endif // SOPLEX_WITH_ZLIB
+   typename std::remove_const<T>::type sum = 0;
 
-} // namespace soplex
-#endif // _SPXFILEIO_H_
+ public:
+   StableSum() = default;
+   StableSum( const T& init ) : sum( init ) {}
+
+   void operator+=( const T& input )
+   {
+      sum += input;
+   }
+
+   void operator-=( const T& input )
+   {
+      sum -= input;
+   }
+
+   operator typename std::remove_const<T>::type() const
+   {
+      return sum;
+   }
+};
+
+template <>
+class StableSum<double>
+{
+   double sum = 0;
+   double c = 0;
+
+ public:
+   StableSum() = default;
+   StableSum( double init ) : sum( init ), c( 0 ) {}
+
+   void operator+=( double input )
+   {
+#if defined(_MSC_VER) || defined(__INTEL_COMPILER)
+      #pragma float_control( precise, on )
+#endif
+
+      double t = sum + input;
+      double z = t - sum;
+      double y = ( sum - ( t - z ) ) + ( input - z );
+      c += y;
+
+      sum = t;
+   }
+
+   void operator-=( double input )
+   {
+      (*this) += -input;
+   }
+
+   operator double() const
+   {
+      return sum + c;
+   }
+};
+}
+
+#endif

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -22,6 +22,7 @@
 #include "soplex/spxpricer.h"
 #include "soplex/spxout.h"
 #include "soplex/exceptions.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -461,7 +462,7 @@ void SPxSolverBase<Real>::getEnterVals
    Real& enterPric,
    typename SPxBasisBase<Real>::Desc::Status& enterStat,
    Real& enterRO,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    int enterIdx;
@@ -781,7 +782,7 @@ void SPxSolverBase<Real>::getEnterVals2
    int leaveIdx,
    Real enterMax,
    Real& leavebound,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    int idx;
@@ -1099,7 +1100,7 @@ SPxSolverBase<Real>::ungetEnterVal(
    typename SPxBasisBase<Real>::Desc::Status enterStat,
    Real leaveVal,
    const SVector& vec,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    assert(rep() == COLUMN);
@@ -1231,7 +1232,7 @@ bool SPxSolverBase<Real>::enter(SPxId& enterId, bool polish)
    Real enterPric;      // priced value of entering variable
    typename SPxBasisBase<Real>::Desc::Status enterStat;      // status of entering variable
    Real enterRO;        // rhs/obj of entering variable
-   Real objChange = 0.0;
+   StableSum<Real> objChange;
    const SVector* enterVec = enterVector(enterId);
 
    bool instable = instableEnter;

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -33,6 +33,7 @@
 #include "soplex/random.h"
 #include "soplex/unitvector.h"
 #include "soplex/updatevector.h"
+#include "soplex/stablesum.h"
 
 #define HYPERPRICINGTHRESHOLD    5000     /**< do (auto) hyper pricing only if problem size (cols+rows) is larger than HYPERPRICINGTHRESHOLD */
 #define HYPERPRICINGSIZE         100      /**< size of initial candidate list for hyper pricing */
@@ -1921,21 +1922,21 @@ protected:
    ///
    virtual void getLeaveVals(int i,
                              typename SPxBasisBase<R>::Desc::Status& leaveStat, SPxId& leaveId,
-                             Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
+                             Real& leaveMax, Real& leavebound, int& leaveNum, StableSum<Real>& objChange);
    ///
    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
                               Real& enterBound, Real& newUBbound,
-                              Real& newLBbound, Real& newCoPrhs, Real& objChange);
+                              Real& newLBbound, Real& newCoPrhs, StableSum<Real>& objChange);
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
                              Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-                             Real& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, Real& enterRO, Real& objChange);
+                             Real& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, Real& enterRO, StableSum<Real>& objChange);
    ///
    virtual void getEnterVals2(int leaveIdx,
-                              Real enterMax, Real& leaveBound, Real& objChange);
+                              Real enterMax, Real& leaveBound, StableSum<Real>& objChange);
    ///
    virtual void ungetEnterVal(SPxId enterId, typename SPxBasisBase<R>::Desc::Status enterStat,
-                              Real leaveVal, const SVector& vec, Real& objChange);
+                              Real leaveVal, const SVector& vec, StableSum<Real>& objChange);
    ///
    virtual void rejectEnter(SPxId enterId,
                             Real enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);
@@ -2076,7 +2077,7 @@ public:
    }
 
    /// setting the solver status external from the solve loop.
-   void setSolverStatus(SPxSolverBase<R>::Status stat)
+   void setSolverStatus(typename SPxSolverBase<R>::Status stat)
    {
       m_status = stat;
    }
