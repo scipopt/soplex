@@ -1,5 +1,5 @@
-next Bugfix Release
-===================
+09 January 2019 - Release 4.0.1
+===============================
 
 fixed bugs:
 - correct objective function update in aggregation simplifier
@@ -8,7 +8,10 @@ fixed bugs:
 - LP reader: fix reading of infinite bounds and right-hand sides
 - avoid unsuccessful termination when cycling and rather return sub-optimal solution
 - return clean solution values according to optimal basis (e.g. reduced cost 0 for basic variables)
+- avoid numerical inaccuracies with a more careful summation implementation for crucial sums
 
+code quality:
+- format code to have a uniform style (see definition in astylecfg)
 
 13 June 2018 - Release 4.0.0
 ============================
