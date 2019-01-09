@@ -65,63 +65,56 @@
 namespace soplex
 {
 
-  template <>
-  bool SPxMainSM<Real>::checkSolution(SPxLPBase<Real>& lp, DVectorBase<Real> sol);
-
-  template <>
-  void SPxMainSM<Real>::fixColumn(SPxLP& lp, int j, bool correctIdx);
-
-
-  template <>
-  bool SPxMainSM<Real>::PostStep::checkBasisDim(DataArray<typename SPxSolverBase<Real>::VarStatus> rows,
-                                             DataArray<typename SPxSolverBase<Real>::VarStatus> cols) const
+  template <class R>
+  bool SPxMainSM<R>::PostStep::checkBasisDim(DataArray<typename SPxSolverBase<R>::VarStatus> rows,
+                                             DataArray<typename SPxSolverBase<R>::VarStatus> cols) const
   {
     int numBasis = 0;
     for(int rs = 0; rs < nRows; ++rs)
       {
-        if(rows[rs] == SPxSolverBase<Real>::BASIC)
+        if(rows[rs] == SPxSolverBase<R>::BASIC)
           numBasis++;
       }
 
     for(int cs = 0; cs < nCols; ++cs)
       {
-        if(cols[cs] == SPxSolverBase<Real>::BASIC)
+        if(cols[cs] == SPxSolverBase<R>::BASIC)
           numBasis++;
       }
     assert(numBasis == nRows);
     return numBasis == nRows;
   }
 
-  template <>
-  void SPxMainSM<Real>::RowObjPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
-                                       DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                       DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::RowObjPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+                                       DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                       DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     assert(isZero(s[m_i], 1e-9));
     s[m_i] = -x[m_j];
 
-    assert(rStatus[m_i] != SPxSolverBase<Real>::UNDEFINED);
-    assert(cStatus[m_j] != SPxSolverBase<Real>::UNDEFINED);
-    assert(rStatus[m_i] != SPxSolverBase<Real>::BASIC || cStatus[m_j] != SPxSolverBase<Real>::BASIC);
+    assert(rStatus[m_i] != SPxSolverBase<R>::UNDEFINED);
+    assert(cStatus[m_j] != SPxSolverBase<R>::UNDEFINED);
+    assert(rStatus[m_i] != SPxSolverBase<R>::BASIC || cStatus[m_j] != SPxSolverBase<R>::BASIC);
 
     MSG_DEBUG( std::cout << "RowObjPS: removing slack column " << m_j << " (" << cStatus[m_j] << ") for row " << m_i << " (" << rStatus[m_i] << ").\n" );
 
-    if( rStatus[m_i] != SPxSolverBase<Real>::BASIC )
+    if( rStatus[m_i] != SPxSolverBase<R>::BASIC )
       {
         switch( cStatus[m_j] )
           {
-          case SPxSolverBase<Real>::ON_UPPER:
-            rStatus[m_i] = SPxSolverBase<Real>::ON_LOWER;
+          case SPxSolverBase<R>::ON_UPPER:
+            rStatus[m_i] = SPxSolverBase<R>::ON_LOWER;
             break;
-          case SPxSolverBase<Real>::ON_LOWER:
-            rStatus[m_i] = SPxSolverBase<Real>::ON_UPPER;
+          case SPxSolverBase<R>::ON_LOWER:
+            rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
             break;
           default:
             rStatus[m_i] = cStatus[m_j];
           }
 
         // otherwise checkBasisDim() may fail
-        cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+        cStatus[m_j] = SPxSolverBase<R>::ZERO;
       }
 
 #ifdef CHECK_BASIC_DIM
@@ -133,10 +126,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::FreeConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector&,
-                                               DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                               DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::FreeConstraintPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+                                               DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                               DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the row:
     s[m_old_i] = s[m_i];
@@ -144,7 +137,7 @@ namespace soplex
     rStatus[m_old_i] = rStatus[m_i];
 
     // primal:
-    Real slack = 0.0;
+    R slack = 0.0;
 
     for (int k = 0; k < m_row.size(); ++k)
       slack += m_row.value(k) * x[m_row.index(k)];
@@ -155,7 +148,7 @@ namespace soplex
     y[m_i] = m_row_obj;
 
     // basis:
-    rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+    rStatus[m_i] = SPxSolverBase<R>::BASIC;
 
 #ifdef CHECK_BASIC_DIM
     if (!checkBasisDim(rStatus, cStatus))
@@ -165,10 +158,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::EmptyConstraintPS::execute(DVector&, DVector& y, DVector& s, DVector&,
-                                                DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::EmptyConstraintPS::execute(DVectorBase<R>&, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+                                                DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the row:
     s[m_old_i] = s[m_i];
@@ -182,7 +175,7 @@ namespace soplex
     y[m_i] = m_row_obj;
 
     // basis:
-    rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+    rStatus[m_i] = SPxSolverBase<R>::BASIC;
 
 #ifdef CHECK_BASIC_DIM
     if (!checkBasisDim(rStatus, cStatus))
@@ -192,23 +185,23 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                             DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                             DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::RowSingletonPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                             DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                             DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the row:
     s[m_old_i] = s[m_i];
     y[m_old_i] = y[m_i];
     rStatus[m_old_i] = rStatus[m_i];
 
-    Real aij = m_col[m_i];
+    R aij = m_col[m_i];
 
     // primal:
     s[m_i] = aij * x[m_j];
 
     // dual & basis:
-    Real val = m_obj;
+    R val = m_obj;
 
     for(int k = 0; k < m_col.size(); ++k)
       {
@@ -216,16 +209,16 @@ namespace soplex
           val -= m_col.value(k) * y[m_col.index(k)];
       }
 
-    Real newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
-    Real newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
+    R newLo = (aij > 0) ? m_lhs/aij : m_rhs/aij;  // implicit lhs
+    R newUp = (aij > 0) ? m_rhs/aij : m_lhs/aij;  // implicit rhs
 
     switch(cStatus[m_j])
       {
-      case SPxSolverBase<Real>::FIXED:
+      case SPxSolverBase<R>::FIXED:
         if(newLo <= m_oldLo && newUp >= m_oldUp)
           {
             // this row is totally redundant, has not changed bound of xj
-            rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+            rStatus[m_i] = SPxSolverBase<R>::BASIC;
             y[m_i] = m_row_obj;
           }
         else if(EQrel(newLo, newUp, this->eps()))
@@ -236,7 +229,7 @@ namespace soplex
             if(EQrel(m_oldLo, m_oldUp, this->eps()))
               {
                 // xj has been fixed in other row
-                rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+                rStatus[m_i] = SPxSolverBase<R>::BASIC;
                 y[m_i] = m_row_obj;
               }
             else if((EQrel(m_oldLo, x[m_j], this->eps()) && r[m_j] <= -this->eps())
@@ -244,8 +237,8 @@ namespace soplex
                     || (!EQrel(m_oldLo, x[m_j], this->eps()) && !(EQrel(m_oldUp, x[m_j], this->eps()))))
               {
                 // if x_j on lower but reduced cost is negative, or x_j on upper but reduced cost is positive, or x_j not on bound: basic
-                rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 y[m_i] = val / aij;
                 r[m_j] = 0.0;
               }
@@ -254,8 +247,8 @@ namespace soplex
                 // set x_j on one of the bound
                 assert(EQrel(m_oldLo, x[m_j], this->eps()) || EQrel(m_oldUp, x[m_j], this->eps()));
 
-                cStatus[m_j] = EQrel(m_oldLo, x[m_j], this->eps()) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
-                rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = EQrel(m_oldLo, x[m_j], this->eps()) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
+                rStatus[m_i] = SPxSolverBase<R>::BASIC;
                 y[m_i] = m_row_obj;
                 r[m_j] = val;
               }
@@ -268,8 +261,8 @@ namespace soplex
                 // the reduced cost is positive, xj should in the basic
                 assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
 
-                rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 y[m_i] = val / aij;
                 r[m_j] = 0.0;
               }
@@ -277,8 +270,8 @@ namespace soplex
               {
                 assert(EQrel(m_oldUp, x[m_j], this->eps()));
 
-                cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
-                rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
+                rStatus[m_i] = SPxSolverBase<R>::BASIC;
                 y[m_i] = m_row_obj;
                 r[m_j] = val;
               }
@@ -291,8 +284,8 @@ namespace soplex
                 // the reduced cost is negative, xj should in the basic
                 assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
 
-                rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 y[m_i] = val / aij;
                 r[m_j] = 0.0;
               }
@@ -300,8 +293,8 @@ namespace soplex
               {
                 assert(EQrel(m_oldLo, x[m_j], this->eps()));
 
-                cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
-                rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
+                rStatus[m_i] = SPxSolverBase<R>::BASIC;
                 y[m_i] = m_row_obj;
                 r[m_j] = val;
               }
@@ -309,19 +302,19 @@ namespace soplex
         else
           {
             // the variable is set to FIXED by other constraints, i.e., this singleton row is redundant
-            rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+            rStatus[m_i] = SPxSolverBase<R>::BASIC;
             y[m_i] = m_row_obj;
           }
         break;
-      case SPxSolverBase<Real>::BASIC:
-        rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+      case SPxSolverBase<R>::BASIC:
+        rStatus[m_i] = SPxSolverBase<R>::BASIC;
         y[m_i] = m_row_obj;
         r[m_j] = 0.0;
         break;
-      case SPxSolverBase<Real>::ON_LOWER:
+      case SPxSolverBase<R>::ON_LOWER:
         if(EQrel(m_oldLo, x[m_j], this->eps())) // xj may stay on lower
           {
-            rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+            rStatus[m_i] = SPxSolverBase<R>::BASIC;
             y[m_i] = m_row_obj;
             r[m_j] = val;
           }
@@ -329,16 +322,16 @@ namespace soplex
           {
             assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
 
-            cStatus[m_j] = SPxSolverBase<Real>::BASIC;
-            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+            cStatus[m_j] = SPxSolverBase<R>::BASIC;
+            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
             y[m_i] = val / aij;
             r[m_j] = 0.0;
           }
         break;
-      case SPxSolverBase<Real>::ON_UPPER:
+      case SPxSolverBase<R>::ON_UPPER:
         if(EQrel(m_oldUp, x[m_j], this->eps())) // xj may stay on upper
           {
-            rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+            rStatus[m_i] = SPxSolverBase<R>::BASIC;
             y[m_i] = m_row_obj;
             r[m_j] = val;
           }
@@ -346,14 +339,14 @@ namespace soplex
           {
             assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
 
-            cStatus[m_j] = SPxSolverBase<Real>::BASIC;
-            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+            cStatus[m_j] = SPxSolverBase<R>::BASIC;
+            rStatus[m_i] = (EQrel(m_lhs, x[m_j]*aij, this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
             y[m_i] = val / aij;
             r[m_j] = 0.0;
           }
         break;
-      case SPxSolverBase<Real>::ZERO:
-        rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+      case SPxSolverBase<R>::ZERO:
+        rStatus[m_i] = SPxSolverBase<R>::BASIC;
         y[m_i] = m_row_obj;
         r[m_j] = val;
         break;
@@ -369,10 +362,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::ForceConstraintPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                                DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::ForceConstraintPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                                DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the row:
     s[m_old_i] = s[m_i];
@@ -384,26 +377,26 @@ namespace soplex
 
     // basis:
     int cBasisCandidate = -1;
-    Real maxViolation = -1.0;
+    R maxViolation = -1.0;
     int bas_k = -1;
 
     for(int k = 0; k < m_row.size(); ++k)
       {
         int  cIdx  = m_row.index(k);
-        Real aij   = m_row.value(k);
-        Real oldLo = m_oldLowers[k];
-        Real oldUp = m_oldUppers[k];
+        R aij   = m_row.value(k);
+        R oldLo = m_oldLowers[k];
+        R oldUp = m_oldUppers[k];
 
         switch(cStatus[cIdx])
           {
-          case SPxSolverBase<Real>::FIXED:
+          case SPxSolverBase<R>::FIXED:
             if(m_fixed[k])
               {
                 assert(EQrel(oldLo, x[cIdx], this->eps()) || EQrel(oldUp, x[cIdx], this->eps()));
 
-                Real violation = spxAbs(r[cIdx]/aij);
+                R violation = spxAbs(r[cIdx]/aij);
 
-                cStatus[cIdx] = EQrel(oldLo, x[cIdx], this->eps()) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[cIdx] = EQrel(oldLo, x[cIdx], this->eps()) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
 
                 if( violation > maxViolation && ( (EQrel(oldLo, x[cIdx], this->eps()) && r[cIdx] < -this->eps()) || (EQrel(oldUp, x[cIdx], this->eps()) && r[cIdx] > this->eps()) ) )
                   {
@@ -413,9 +406,9 @@ namespace soplex
                   }
               } // do nothing, if the old bounds are equal, i.e. variable has been not fixed in this row
             break;
-          case SPxSolverBase<Real>::ON_LOWER:
-          case SPxSolverBase<Real>::ON_UPPER:
-          case SPxSolverBase<Real>::BASIC:
+          case SPxSolverBase<R>::ON_LOWER:
+          case SPxSolverBase<R>::ON_UPPER:
+          case SPxSolverBase<R>::BASIC:
             break;
           default:
             break;
@@ -429,11 +422,11 @@ namespace soplex
         assert(bas_k >= 0);
         assert(cBasisCandidate == m_row.index(bas_k));
 
-        cStatus[cBasisCandidate] = SPxSolverBase<Real>::BASIC;
-        rStatus[m_i] = (EQrel(m_lRhs, m_lhs, this->eps())) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+        cStatus[cBasisCandidate] = SPxSolverBase<R>::BASIC;
+        rStatus[m_i] = (EQrel(m_lRhs, m_lhs, this->eps())) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
 
-        Real aij = m_row.value(bas_k);
-        Real multiplier = r[cBasisCandidate]/aij;
+        R aij = m_row.value(bas_k);
+        R multiplier = r[cBasisCandidate]/aij;
         r[cBasisCandidate] = 0.0;
 
         for(int k = 0; k < m_row.size(); ++k)  // update the reduced cost
@@ -446,7 +439,7 @@ namespace soplex
           }
 
         // compute the value of new dual variable (because we have a new row)
-        Real val = m_objs[bas_k];
+        R val = m_objs[bas_k];
         DSVector basis_col = m_cols[bas_k];
 
         for(int k = 0; k < basis_col.size(); ++k)
@@ -459,7 +452,7 @@ namespace soplex
       }
     else // slack in the basis
       {
-        rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+        rStatus[m_i] = SPxSolverBase<R>::BASIC;
         y[m_i] = m_rowobj;
       }
 
@@ -471,10 +464,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::FixVariablePS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                            DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                            DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::FixVariablePS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                            DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                            DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // update the index mapping; if m_correctIdx is false, we assume that this has happened already
     if(m_correctIdx)
@@ -491,7 +484,7 @@ namespace soplex
       s[m_col.index(k)] += m_col.value(k) * x[m_j];
 
     // dual:
-    Real val = m_obj;
+    R val = m_obj;
 
     for(int k = 0; k < m_col.size(); ++k)
       val -= m_col.value(k) * y[m_col.index(k)];
@@ -503,13 +496,13 @@ namespace soplex
       {
         assert(EQrel(m_lower, m_val));
 
-        cStatus[m_j] = SPxSolverBase<Real>::FIXED;
+        cStatus[m_j] = SPxSolverBase<R>::FIXED;
       }
     else
       {
         assert(EQrel(m_val, m_lower) || EQrel(m_val, m_upper) || m_val == 0.0);
 
-        cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolverBase<Real>::ON_LOWER : (EQrel(m_val, m_upper) ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ZERO);
+        cStatus[m_j] = EQrel(m_val, m_lower) ? SPxSolverBase<R>::ON_LOWER : (EQrel(m_val, m_upper) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO);
       }
 
 #ifdef CHECK_BASIC_DIM
@@ -523,19 +516,19 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::FixBoundsPS::execute(DVector&, DVector&, DVector&, DVector&,
-                                          DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                          DataArray<typename SPxSolverBase<Real>::VarStatus>&, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::FixBoundsPS::execute(DVectorBase<R>&, DVectorBase<R>&, DVectorBase<R>&, DVectorBase<R>&,
+                                          DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                          DataArray<typename SPxSolverBase<R>::VarStatus>&, bool isOptimal) const
   {
     // basis:
     cStatus[m_j] = m_status;
   }
 
-  template <>
-  void SPxMainSM<Real>::FreeZeroObjVariablePS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                                    DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                    DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::FreeZeroObjVariablePS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                                    DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                    DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the column and corresponding rows:
     x[m_old_j] = x[m_j];
@@ -559,11 +552,11 @@ namespace soplex
 
     if (m_loFree)
       {
-        Real minRowUp = infinity;
+        R minRowUp = infinity;
 
         for(int k = 0; k < m_rows.size(); ++k)
           {
-            Real           val = 0.0;
+            R           val = 0.0;
             const SVector& row = m_rows[k];
 
             for(int l = 0; l < row.size(); ++l)
@@ -572,17 +565,17 @@ namespace soplex
                   val += row.value(l) * x[row.index(l)];
               }
 
-            Real scale = maxAbs(m_lRhs[k], val);
+            R scale = maxAbs(m_lRhs[k], val);
 
             if (scale < 1.0)
               scale = 1.0;
 
-            Real z = (m_lRhs[k] / scale) - (val / scale);
+            R z = (m_lRhs[k] / scale) - (val / scale);
 
             if (isZero(z))
               z = 0.0;
 
-            Real up = z * scale / row[m_j];
+            R up = z * scale / row[m_j];
             slack.add(k, val);
 
             if (up < minRowUp)
@@ -602,11 +595,11 @@ namespace soplex
       }
     else
       {
-        Real maxRowLo = -infinity;
+        R maxRowLo = -infinity;
 
         for(int k = 0; k < m_rows.size(); ++k)
           {
-            Real val = 0.0;
+            R val = 0.0;
             const SVector& row = m_rows[k];
 
             for(int l = 0; l < row.size(); ++l)
@@ -615,17 +608,17 @@ namespace soplex
                   val += row.value(l) * x[row.index(l)];
               }
 
-            Real scale = maxAbs(m_lRhs[k], val);
+            R scale = maxAbs(m_lRhs[k], val);
 
             if (scale < 1.0)
               scale = 1.0;
 
-            Real z = (m_lRhs[k] / scale) - (val / scale);
+            R z = (m_lRhs[k] / scale) - (val / scale);
 
             if (isZero(z))
               z = 0.0;
 
-            Real lo = z * scale / row[m_j];
+            R lo = z * scale / row[m_j];
             slack.add(k, val);
 
             if (lo > maxRowLo)
@@ -660,23 +653,23 @@ namespace soplex
     for(int k = 0; k < m_col.size(); ++k)
       {
         if (k != domIdx)
-          rStatus[m_col.index(k)] = SPxSolverBase<Real>::BASIC;
+          rStatus[m_col.index(k)] = SPxSolverBase<R>::BASIC;
 
         else
           {
-            cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+            cStatus[m_j] = SPxSolverBase<R>::BASIC;
             if (m_loFree)
-              rStatus[m_col.index(k)] = (m_col.value(k) > 0) ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ON_LOWER;
+              rStatus[m_col.index(k)] = (m_col.value(k) > 0) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ON_LOWER;
             else
-              rStatus[m_col.index(k)] = (m_col.value(k) > 0) ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+              rStatus[m_col.index(k)] = (m_col.value(k) > 0) ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
           }
       }
     if (domIdx == -1)
       {
         if (m_loFree)
-          cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+          cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
         else
-          cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+          cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
       }
 
 #ifdef CHECK_BASIC_DIM
@@ -687,10 +680,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::ZeroObjColSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                                    DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                    DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::ZeroObjColSingletonPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                                    DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                    DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the column and corresponding rows:
     x[m_old_j] = x[m_j];
@@ -698,7 +691,7 @@ namespace soplex
     cStatus[m_old_j] = cStatus[m_j];
 
     // primal & basis:
-    Real aij = m_row[m_j];
+    R aij = m_row[m_j];
 
     if (isZero(s[m_i], 1e-6))
       s[m_i] = 0.0;
@@ -706,24 +699,24 @@ namespace soplex
       // this is a fix for a highly ill conditioned instance that is "solved" in presolving (ilaser0 from MINLP, mittelmann)
       throw SPxException("Simplifier: infinite activities - aborting unsimplification");
 
-    Real scale1 = maxAbs(m_lhs, s[m_i]);
-    Real scale2 = maxAbs(m_rhs, s[m_i]);
+    R scale1 = maxAbs(m_lhs, s[m_i]);
+    R scale2 = maxAbs(m_rhs, s[m_i]);
 
     if (scale1 < 1.0)
       scale1 = 1.0;
     if (scale2 < 1.0)
       scale2 = 1.0;
 
-    Real z1 = (m_lhs / scale1) - (s[m_i] / scale1);
-    Real z2 = (m_rhs / scale2) - (s[m_i] / scale2);
+    R z1 = (m_lhs / scale1) - (s[m_i] / scale1);
+    R z2 = (m_rhs / scale2) - (s[m_i] / scale2);
 
     if (isZero(z1))
       z1 = 0.0;
     if (isZero(z2))
       z2 = 0.0;
 
-    Real lo = (aij > 0) ? z1 * scale1 / aij : z2 * scale2 / aij;
-    Real up = (aij > 0) ? z2 * scale2 / aij : z1 * scale1 / aij;
+    R lo = (aij > 0) ? z1 * scale1 / aij : z2 * scale2 / aij;
+    R up = (aij > 0) ? z2 * scale2 / aij : z1 * scale1 / aij;
 
     if (isZero(lo, this->eps()))
       lo = 0.0;
@@ -733,96 +726,96 @@ namespace soplex
     assert(LErel(lo, up));
     ASSERT_WARN( "WMAISM01", isNotZero(aij, 1.0 / infinity) );
 
-    if (rStatus[m_i] == SPxSolverBase<Real>::ON_LOWER)
+    if (rStatus[m_i] == SPxSolverBase<R>::ON_LOWER)
       {
       if ( m_lower <= -infinity && m_upper >= infinity )
       {
          x[m_j] = 0.0;
-         cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+         cStatus[m_j] = SPxSolverBase<R>::ZERO;
       }
       else if ( m_lower == m_upper )
           {
             x[m_j]       = m_lower;
-            cStatus[m_j] = SPxSolverBase<Real>::FIXED;
+            cStatus[m_j] = SPxSolverBase<R>::FIXED;
           }
         else if (aij > 0)
           {
             x[m_j]       = m_upper;
-            cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+            cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
           }
         else if (aij < 0)
           {
             x[m_j]       = m_lower;
-            cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+            cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
           }
         else
           throw SPxInternalCodeException("XMAISM01 This should never happen.");
       }
-    else if (rStatus[m_i] == SPxSolverBase<Real>::ON_UPPER)
+    else if (rStatus[m_i] == SPxSolverBase<R>::ON_UPPER)
       {
       if ( m_lower <= -infinity && m_upper >= infinity )
       {
          x[m_j] = 0.0;
-         cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+         cStatus[m_j] = SPxSolverBase<R>::ZERO;
       }
       else if ( m_lower == m_upper )
           {
             x[m_j]       = m_lower;
-            cStatus[m_j] = SPxSolverBase<Real>::FIXED;
+            cStatus[m_j] = SPxSolverBase<R>::FIXED;
           }
         else if (aij > 0)
           {
             x[m_j]       = m_lower;
-            cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+            cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
           }
         else if (aij < 0)
           {
             x[m_j]       = m_upper;
-            cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+            cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
           }
         else
           throw SPxInternalCodeException("XMAISM02 This should never happen.");
       }
-    else if (rStatus[m_i] == SPxSolverBase<Real>::FIXED)
+    else if (rStatus[m_i] == SPxSolverBase<R>::FIXED)
    {
       if ( m_lower <= -infinity && m_upper >= infinity )
       {
          x[m_j] = 0.0;
-         cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+         cStatus[m_j] = SPxSolverBase<R>::ZERO;
       }
       else
       {
         assert(EQrel(m_lower, m_upper));
 
         x[m_j]        = m_lower;
-         cStatus[m_j]  = SPxSolverBase<Real>::FIXED;
+         cStatus[m_j]  = SPxSolverBase<R>::FIXED;
       }
    }
-   else if (rStatus[m_i] == SPxSolverBase<Real>::BASIC)
+   else if (rStatus[m_i] == SPxSolverBase<R>::BASIC)
       {
-      if (GErel(m_lower, lo, eps()) && m_lower > -infinity)
+      if (GErel(m_lower, lo, this->eps()) && m_lower > -infinity)
           {
             x[m_j]       = m_lower;
-         cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+         cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
           }
       else if (LErel(m_upper, up, eps()) && m_upper < infinity)
           {
             x[m_j]       = m_upper;
-         cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+         cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
           }
         else if (lo > -infinity)
           {
             // make m_i non-basic and m_j basic
             x[m_j]       = lo;
-            cStatus[m_j] = SPxSolverBase<Real>::BASIC;
-            rStatus[m_i] = (aij > 0 ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER);
+            cStatus[m_j] = SPxSolverBase<R>::BASIC;
+            rStatus[m_i] = (aij > 0 ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER);
           }
         else if (up < infinity)
           {
             // make m_i non-basic and m_j basic
             x[m_j]       = up;
-            cStatus[m_j] = SPxSolverBase<Real>::BASIC;
-            rStatus[m_i] = (aij > 0 ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ON_LOWER);
+            cStatus[m_j] = SPxSolverBase<R>::BASIC;
+            rStatus[m_i] = (aij > 0 ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ON_LOWER);
           }
         else
           throw SPxInternalCodeException("XMAISM03 This should never happen.");
@@ -835,7 +828,7 @@ namespace soplex
     // dual:
     r[m_j] = -1.0 * aij * y[m_i];
 
-    assert(!isOptimal || (cStatus[m_j] != SPxSolverBase<Real>::BASIC || isZero(r[m_j], this->eps())));
+    assert(!isOptimal || (cStatus[m_j] != SPxSolverBase<R>::BASIC || isZero(r[m_j], this->eps())));
 
 #ifdef CHECK_BASIC_DIM
     if (!checkBasisDim(rStatus, cStatus))
@@ -845,10 +838,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::FreeColSingletonPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                                 DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                 DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::FreeColSingletonPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
 
     // correcting the change of idx by deletion of the row:
@@ -862,8 +855,8 @@ namespace soplex
     cStatus[m_old_j] = cStatus[m_j];
 
     // primal:
-    Real val = 0.0;
-    Real aij = m_row[m_j];
+    R val = 0.0;
+    R aij = m_row[m_j];
 
     for(int k = 0; k < m_row.size(); ++k)
       {
@@ -871,12 +864,12 @@ namespace soplex
           val += m_row.value(k) * x[m_row.index(k)];
       }
 
-    Real scale = maxAbs(m_lRhs, val);
+    R scale = maxAbs(m_lRhs, val);
 
     if (scale < 1.0)
       scale = 1.0;
 
-    Real z = (m_lRhs / scale) - (val / scale);
+    R z = (m_lRhs / scale) - (val / scale);
 
     if (isZero(z))
       z = 0.0;
@@ -889,14 +882,14 @@ namespace soplex
     r[m_j] = 0.0;
 
     // basis:
-    cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+    cStatus[m_j] = SPxSolverBase<R>::BASIC;
 
     if (m_eqCons)
-      rStatus[m_i] = SPxSolverBase<Real>::FIXED;
+      rStatus[m_i] = SPxSolverBase<R>::FIXED;
     else if (m_onLhs)
-      rStatus[m_i] = SPxSolverBase<Real>::ON_LOWER;
+      rStatus[m_i] = SPxSolverBase<R>::ON_LOWER;
     else
-      rStatus[m_i] = SPxSolverBase<Real>::ON_UPPER;
+      rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
     if (!checkBasisDim(rStatus, cStatus))
@@ -906,21 +899,21 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::DoubletonEquationPS::execute(DVector& x, DVector& y, DVector&, DVector& r,
-                                                  DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                  DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::DoubletonEquationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>&, DVectorBase<R>& r,
+                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // dual:
-    if ((cStatus[m_k]  != SPxSolverBase<Real>::BASIC) &&
-        ((cStatus[m_k] == SPxSolverBase<Real>::ON_LOWER && m_strictLo) ||
-         (cStatus[m_k] == SPxSolverBase<Real>::ON_UPPER && m_strictUp) ||
-         (cStatus[m_k] == SPxSolverBase<Real>::FIXED    &&
+    if ((cStatus[m_k]  != SPxSolverBase<R>::BASIC) &&
+        ((cStatus[m_k] == SPxSolverBase<R>::ON_LOWER && m_strictLo) ||
+         (cStatus[m_k] == SPxSolverBase<R>::ON_UPPER && m_strictUp) ||
+         (cStatus[m_k] == SPxSolverBase<R>::FIXED    &&
           (( m_maxSense && ((r[m_j] > 0 && m_strictUp) || (r[m_j] < 0 && m_strictLo))) ||
            (!m_maxSense && ((r[m_j] > 0 && m_strictLo) || (r[m_j] < 0 && m_strictUp)))))))
       {
-        Real val  = m_kObj;
-        Real aik  = m_col[m_i];
+        R val  = m_kObj;
+        R aik  = m_col[m_i];
 
         for(int _k = 0; _k < m_col.size(); ++_k)
           {
@@ -937,16 +930,16 @@ namespace soplex
 
         // basis:
         if( m_jFixed)
-          cStatus[m_j] = SPxSolverBase<Real>::FIXED;
+          cStatus[m_j] = SPxSolverBase<R>::FIXED;
         else
           {
-            if( GT(r[m_j], (Real) 0) || (isZero(r[m_j]) && EQ(x[m_j], m_Lo_j)) )
-              cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+            if( GT(r[m_j], (R) 0) || (isZero(r[m_j]) && EQ(x[m_j], m_Lo_j)) )
+              cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
             else
-              cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+              cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
           }
 
-        cStatus[m_k] = SPxSolverBase<Real>::BASIC;
+        cStatus[m_k] = SPxSolverBase<R>::BASIC;
       }
 
 #ifdef CHECK_BASIC_DIM
@@ -957,10 +950,10 @@ namespace soplex
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::DuplicateRowsPS::execute(DVector&, DVector& y, DVector& s, DVector&,
-                                              DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                              DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::DuplicateRowsPS::execute(DVectorBase<R>&, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+                                              DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                              DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // correcting the change of idx by deletion of the duplicated rows:
     if(m_isLast)
@@ -992,18 +985,18 @@ namespace soplex
       {
         int i = m_scale.index(k);
 
-        if (rStatus[m_i] == SPxSolverBase<Real>::BASIC || (haveSetBasis && i!=m_i))
+        if (rStatus[m_i] == SPxSolverBase<R>::BASIC || (haveSetBasis && i!=m_i))
           // if the row with tightest lower and upper bound in the basic, every duplicate row should in basic
           // or basis status of row m_i has been set, this row should be in basis
           {
             y[i]       = m_rowObj.value(k);
-            rStatus[i] = SPxSolverBase<Real>::BASIC;
+            rStatus[i] = SPxSolverBase<R>::BASIC;
             continue;
           }
 
         ASSERT_WARN( "WMAISM02", isNotZero(m_scale.value(k)) );
 
-        if (rStatus[m_i] == SPxSolverBase<Real>::FIXED && (i == m_maxLhsIdx || i == m_minRhsIdx))
+        if (rStatus[m_i] == SPxSolverBase<R>::FIXED && (i == m_maxLhsIdx || i == m_minRhsIdx))
           {
             // this row leads to the tightest lower or upper bound, slack should not be in the basis
             y[i]   = y[m_i] * m_scale.value(k);
@@ -1011,49 +1004,49 @@ namespace soplex
 
             if(m_isLhsEqualRhs[k])
               {
-                rStatus[i] = SPxSolverBase<Real>::FIXED;
+                rStatus[i] = SPxSolverBase<R>::FIXED;
               }
             else if(i == m_maxLhsIdx)
               {
-                rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+                rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
               }
             else
               {
                 assert(i == m_minRhsIdx);
 
-                rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ON_LOWER;
+                rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ON_LOWER;
               }
             if (i != m_i)
-              rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+              rStatus[m_i] = SPxSolverBase<R>::BASIC;
             haveSetBasis = true;
           }
-        else if (i == m_maxLhsIdx && rStatus[m_i] == SPxSolverBase<Real>::ON_LOWER)
+        else if (i == m_maxLhsIdx && rStatus[m_i] == SPxSolverBase<R>::ON_LOWER)
           {
             // this row leads to the tightest lower bound, slack should not be in the basis
             y[i]   = y[m_i] * m_scale.value(k);
             y[m_i] = m_i_rowObj;
 
-            rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<Real>::ON_LOWER : SPxSolverBase<Real>::ON_UPPER;
+            rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER;
             if (i != m_i)
-              rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+              rStatus[m_i] = SPxSolverBase<R>::BASIC;
             haveSetBasis = true;
           }
-        else if (i == m_minRhsIdx && rStatus[m_i] == SPxSolverBase<Real>::ON_UPPER)
+        else if (i == m_minRhsIdx && rStatus[m_i] == SPxSolverBase<R>::ON_UPPER)
           {
             // this row leads to the tightest upper bound, slack should not be in the basis
             y[i]   = y[m_i] * m_scale.value(k);
             y[m_i] = m_i_rowObj;
 
-            rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<Real>::ON_UPPER : SPxSolverBase<Real>::ON_LOWER;
+            rStatus[i] = m_scale.value(k)*m_scale.value(0) > 0 ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ON_LOWER;
             if (i != m_i)
-              rStatus[m_i] = SPxSolverBase<Real>::BASIC;
+              rStatus[m_i] = SPxSolverBase<R>::BASIC;
             haveSetBasis = true;
           }
         else if (i != m_i)
           {
             // this row does not lead to the tightest lower or upper bound, slack should be in the basis
             y[i]       = m_rowObj.value(k);
-            rStatus[i] = SPxSolverBase<Real>::BASIC;
+            rStatus[i] = SPxSolverBase<R>::BASIC;
           }
       }
 
@@ -1067,13 +1060,13 @@ namespace soplex
     // nothing to do for the reduced cost values
   }
 
-  template <>
-  void SPxMainSM<Real>::DuplicateColsPS::execute(DVector& x,
-                                              DVector&,
-                                              DVector&,
-                                              DVector& r,
-                                              DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                              DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::DuplicateColsPS::execute(DVectorBase<R>& x,
+                                              DVectorBase<R>&,
+                                              DVectorBase<R>&,
+                                              DVectorBase<R>& r,
+                                              DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                              DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
 
     if(m_isFirst)
@@ -1108,43 +1101,43 @@ namespace soplex
     // primal & basis:
     ASSERT_WARN( "WMAISM03", isNotZero(m_scale) );
 
-    if (cStatus[m_k] == SPxSolverBase<Real>::ON_LOWER)
+    if (cStatus[m_k] == SPxSolverBase<R>::ON_LOWER)
       {
         x[m_k] = m_loK;
 
         if (m_scale > 0)
           {
             x[m_j]       = m_loJ;
-            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
           }
         else
           {
             x[m_j]       = m_upJ;
-            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
           }
       }
-    else if (cStatus[m_k] == SPxSolverBase<Real>::ON_UPPER)
+    else if (cStatus[m_k] == SPxSolverBase<R>::ON_UPPER)
       {
         x[m_k] = m_upK;
 
         if (m_scale > 0)
           {
             x[m_j]       = m_upJ;
-            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
           }
         else
           {
             x[m_j]       = m_loJ;
-            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+            cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
           }
       }
-    else if (cStatus[m_k] == SPxSolverBase<Real>::FIXED)
+    else if (cStatus[m_k] == SPxSolverBase<R>::FIXED)
       {
         // => x[m_k] and x[m_j] are also fixed before the corresponding preprocessing step
         x[m_j]       = m_loJ;
-        cStatus[m_j] = SPxSolverBase<Real>::FIXED;
+        cStatus[m_j] = SPxSolverBase<R>::FIXED;
       }
-    else if (cStatus[m_k] == SPxSolverBase<Real>::ZERO)
+    else if (cStatus[m_k] == SPxSolverBase<R>::ZERO)
       {
         /* we only aggregate duplicate columns if 0 is contained in their bounds, so we can handle this case properly */
         assert(isZero(x[m_k]));
@@ -1154,40 +1147,40 @@ namespace soplex
         assert(GErel(m_upK, 0.0));
 
         if (isZero(m_loK) && isZero(m_upK) && m_loK == m_upK)
-          cStatus[m_k] = SPxSolverBase<Real>::FIXED;
+          cStatus[m_k] = SPxSolverBase<R>::FIXED;
         else if (isZero(m_loK))
-          cStatus[m_k] = SPxSolverBase<Real>::ON_LOWER;
+          cStatus[m_k] = SPxSolverBase<R>::ON_LOWER;
         else if (isZero(m_upK))
-          cStatus[m_k] = SPxSolverBase<Real>::ON_UPPER;
+          cStatus[m_k] = SPxSolverBase<R>::ON_UPPER;
         else if (LErel(m_loK, 0.0) && GErel(m_upK, 0.0))
-          cStatus[m_k] = SPxSolverBase<Real>::ZERO;
+          cStatus[m_k] = SPxSolverBase<R>::ZERO;
         else
           throw SPxInternalCodeException("XMAISM05 This should never happen.");
 
         x[m_j] = 0.0;
         if (isZero(m_loJ) && isZero(m_upJ) && m_loJ == m_upJ)
-          cStatus[m_j] = SPxSolverBase<Real>::FIXED;
+          cStatus[m_j] = SPxSolverBase<R>::FIXED;
         else if (isZero(m_loJ))
-          cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+          cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
         else if (isZero(m_upJ))
-          cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+          cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
         else if (LErel(m_loJ, 0.0) && GErel(m_upJ, 0.0))
-          cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+          cStatus[m_j] = SPxSolverBase<R>::ZERO;
         else
           throw SPxInternalCodeException("XMAISM06 This should never happen.");
       }
-    else if (cStatus[m_k] == SPxSolverBase<Real>::BASIC)
+    else if (cStatus[m_k] == SPxSolverBase<R>::BASIC)
       {
-        Real scale1 = maxAbs(x[m_k], m_loK);
-        Real scale2 = maxAbs(x[m_k], m_upK);
+        R scale1 = maxAbs(x[m_k], m_loK);
+        R scale2 = maxAbs(x[m_k], m_upK);
 
         if (scale1 < 1.0)
           scale1 = 1.0;
         if (scale2 < 1.0)
           scale2 = 1.0;
 
-        Real z1 = (x[m_k] / scale1) - (m_loK / scale1);
-        Real z2 = (x[m_k] / scale2) - (m_upK / scale2);
+        R z1 = (x[m_k] / scale1) - (m_loK / scale1);
+        R z2 = (x[m_k] / scale2) - (m_upK / scale2);
 
         if (isZero(z1))
           z1 = 0.0;
@@ -1196,7 +1189,7 @@ namespace soplex
 
         if( m_loJ <= -infinity && m_upJ >= infinity && m_loK <= -infinity && m_upK >= infinity )
           {
-            cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+            cStatus[m_j] = SPxSolverBase<R>::ZERO;
             x[m_j] = 0.0;
           }
         else if( m_scale > 0.0 )
@@ -1204,40 +1197,40 @@ namespace soplex
             if( GErel(x[m_k], m_upK + m_scale * m_upJ) )
               {
                 assert(m_upJ < infinity);
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
             else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
               {
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
             else if( GErel(x[m_k], m_upK + m_scale * m_loJ) && m_upK < infinity )
               {
-                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_k] = m_upK;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 x[m_j] = z2 * scale2 / m_scale;
               }
             else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
               {
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
             else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loK > -infinity )
               {
-                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_k] = m_loK;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 x[m_j] = z1 * scale1 / m_scale;
               }
             else if( LTrel(x[m_k], m_loK + m_scale * m_loJ) )
               {
                 assert(m_loJ > -infinity);
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
@@ -1253,40 +1246,40 @@ namespace soplex
             if( GErel(x[m_k], m_upK + m_scale * m_loJ) )
               {
                 assert(m_loJ > -infinity);
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
             else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
               {
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
             else if( GErel(x[m_k], m_upK + m_scale * m_upJ) && m_upK < infinity )
               {
-                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_k] = m_upK;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 x[m_j] = z2 * scale2 / m_scale;
               }
             else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
               {
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
             else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_loK > -infinity )
               {
-                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_LOWER;
+                cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_k] = m_loK;
-                cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+                cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 x[m_j] = z1 * scale1 / m_scale;
               }
             else if( LTrel(x[m_k], m_loK + m_scale * m_upJ) )
               {
                 assert(m_upJ < infinity);
-                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<Real>::FIXED : SPxSolverBase<Real>::ON_UPPER;
+                cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
@@ -1301,10 +1294,10 @@ namespace soplex
     r[m_j] = m_scale * r[m_k];
   }
 
-template <>
-void SPxMainSM<Real>::AggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                                 DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                 DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+template <class R>
+void SPxMainSM<R>::AggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
    // correcting the change of idx by deletion of the row:
    s[m_old_i] = s[m_i];
@@ -1317,8 +1310,8 @@ void SPxMainSM<Real>::AggregationPS::execute(DVector& x, DVector& y, DVector& s,
    cStatus[m_old_j] = cStatus[m_j];
 
    // primal:
-   Real val = 0.0;
-   Real aij = m_row[m_j];
+   R val = 0.0;
+   R aij = m_row[m_j];
    int active_idx = -1;
 
    assert(m_row.size() == 2);
@@ -1333,12 +1326,12 @@ void SPxMainSM<Real>::AggregationPS::execute(DVector& x, DVector& y, DVector& s,
 
    assert(active_idx >= 0);
 
-   Real scale = maxAbs(m_rhs, val);
+   R scale = maxAbs(m_rhs, val);
 
    if (scale < 1.0)
       scale = 1.0;
 
-   Real z = (m_rhs / scale) - (val / scale);
+   R z = (m_rhs / scale) - (val / scale);
 
    if (isZero(z))
       z = 0.0;
@@ -1346,13 +1339,13 @@ void SPxMainSM<Real>::AggregationPS::execute(DVector& x, DVector& y, DVector& s,
    x[m_j] = z * scale / aij;
    s[m_i] = 0.0;
 
-   if( isOptimal && (LT(x[m_j], m_lower, eps()) || GT(x[m_j], m_upper, eps())) )
+   if( isOptimal && (LT(x[m_j], m_lower, eps()) || GT(x[m_j], m_upper, this->eps())) )
    {
       MSG_ERROR( std::cerr << "EMAISM: numerical violation after disaggregating variable" << std::endl; )
    }
 
    // dual:
-   Real dualVal = 0.0;
+   R dualVal = 0.0;
 
    for(int k = 0; k < m_col.size(); ++k)
    {
@@ -1366,31 +1359,31 @@ void SPxMainSM<Real>::AggregationPS::execute(DVector& x, DVector& y, DVector& s,
    r[m_j] = 0.0;
 
    // basis:
-   if( ((cStatus[active_idx] == SPxSolverBase<Real>::ON_UPPER || cStatus[active_idx] == SPxSolverBase<Real>::FIXED)
+   if( ((cStatus[active_idx] == SPxSolverBase<R>::ON_UPPER || cStatus[active_idx] == SPxSolverBase<R>::FIXED)
          && NE(x[active_idx], m_oldupper, eps())) ||
-         ((cStatus[active_idx] == SPxSolverBase<Real>::ON_LOWER || cStatus[active_idx] == SPxSolverBase<Real>::FIXED)
+         ((cStatus[active_idx] == SPxSolverBase<R>::ON_LOWER || cStatus[active_idx] == SPxSolverBase<R>::FIXED)
          && NE(x[active_idx], m_oldlower, eps()))  )
    {
-      cStatus[active_idx] = SPxSolverBase<Real>::BASIC;
+      cStatus[active_idx] = SPxSolverBase<R>::BASIC;
       r[active_idx] = 0.0;
       assert(NE(m_upper, m_lower));
       if( EQ(x[m_j], m_upper, eps()) )
-         cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+         cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
       else if( EQ(x[m_j], m_lower, eps()) )
-         cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+         cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
       else if( m_upper >= infinity && m_lower <= -infinity )
-         cStatus[m_j] = SPxSolverBase<Real>::ZERO;
+         cStatus[m_j] = SPxSolverBase<R>::ZERO;
       else
          throw SPxInternalCodeException("XMAISM unexpected basis status in aggregation unsimplifier.");
    }
    else
   {
-      cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+      cStatus[m_j] = SPxSolverBase<R>::BASIC;
    }
 
    // sides may not be equal and we always only consider the rhs during aggregation, so set ON_UPPER
    // (in theory and with exact arithmetic setting it to FIXED would be correct)
-   rStatus[m_i] = SPxSolverBase<Real>::ON_UPPER;
+   rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
    if (!checkBasisDim(rStatus, cStatus))
@@ -1400,10 +1393,10 @@ void SPxMainSM<Real>::AggregationPS::execute(DVector& x, DVector& y, DVector& s,
 #endif
 }
 
-template <>
-void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVector& s, DVector& r,
-                                                  DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                                  DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+template <class R>
+void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
 
     // correcting the change of idx by deletion of the row:
@@ -1417,8 +1410,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
     cStatus[m_old_j] = cStatus[m_j];
 
     // primal:
-    Real val = 0.0;
-    Real aij = m_row[m_j];
+    R val = 0.0;
+    R aij = m_row[m_j];
 
     for(int k = 0; k < m_row.size(); ++k)
       {
@@ -1426,12 +1419,12 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
           val += m_row.value(k) * x[m_row.index(k)];
       }
 
-    Real scale = maxAbs(m_const, val);
+    R scale = maxAbs(m_const, val);
 
     if (scale < 1.0)
       scale = 1.0;
 
-    Real z = (m_const / scale) - (val / scale);
+    R z = (m_const / scale) - (val / scale);
 
     if (isZero(z))
       z = 0.0;
@@ -1445,7 +1438,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 #endif
 
     // dual:
-    Real dualVal = 0.0;
+    R dualVal = 0.0;
 
     for(int k = 0; k < m_col.size(); ++k)
       {
@@ -1459,14 +1452,14 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
     r[m_j] = 0.0;
 
     // basis:
-    cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+    cStatus[m_j] = SPxSolverBase<R>::BASIC;
 
     if (m_eqCons)
-      rStatus[m_i] = SPxSolverBase<Real>::FIXED;
+      rStatus[m_i] = SPxSolverBase<R>::FIXED;
     else if (m_onLhs)
-      rStatus[m_i] = SPxSolverBase<Real>::ON_LOWER;
+      rStatus[m_i] = SPxSolverBase<R>::ON_LOWER;
     else
-      rStatus[m_i] = SPxSolverBase<Real>::ON_UPPER;
+      rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
     if (!checkBasisDim(rStatus, cStatus))
@@ -1476,31 +1469,31 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::TightenBoundsPS::execute(DVector& x, DVector&, DVector&, DVector&,
-                                              DataArray<typename SPxSolverBase<Real>::VarStatus>& cStatus,
-                                              DataArray<typename SPxSolverBase<Real>::VarStatus>& rStatus, bool isOptimal) const
+  template <class R>
+  void SPxMainSM<R>::TightenBoundsPS::execute(DVectorBase<R>& x, DVectorBase<R>&, DVectorBase<R>&, DVectorBase<R>&,
+                                              DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
+                                              DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
     // basis:
     switch(cStatus[m_j])
       {
-      case SPxSolverBase<Real>::FIXED:
+      case SPxSolverBase<R>::FIXED:
         if(LT(x[m_j], m_origupper, this->eps()) && GT(x[m_j], m_origlower, this->eps()))
-          cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+          cStatus[m_j] = SPxSolverBase<R>::BASIC;
         else if(LT(x[m_j], m_origupper, this->eps()))
-          cStatus[m_j] = SPxSolverBase<Real>::ON_LOWER;
+          cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
         else if(GT(x[m_j], m_origlower, this->eps()))
-          cStatus[m_j] = SPxSolverBase<Real>::ON_UPPER;
+          cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
 
         break;
-      case SPxSolverBase<Real>::ON_LOWER:
+      case SPxSolverBase<R>::ON_LOWER:
         if(GT(x[m_j], m_origlower, this->eps()))
-          cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+          cStatus[m_j] = SPxSolverBase<R>::BASIC;
 
         break;
-      case SPxSolverBase<Real>::ON_UPPER:
+      case SPxSolverBase<R>::ON_UPPER:
         if(LT(x[m_j], m_origupper, this->eps()))
-          cStatus[m_j] = SPxSolverBase<Real>::BASIC;
+          cStatus[m_j] = SPxSolverBase<R>::BASIC;
 
         break;
       default:
@@ -1515,8 +1508,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 #endif
   }
 
-  template <>
-  void SPxMainSM<Real>::handleRowObjectives(SPxLP& lp)
+  template <class R>
+  void SPxMainSM<R>::handleRowObjectives(SPxLPBase<R>& lp)
   {
     for( int i = lp.nRows() - 1; i >= 0; --i )
       {
@@ -1533,8 +1526,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
       }
   }
 
-  template <>
-  void SPxMainSM<Real>::handleExtremes(SPxLP& lp)
+  template <class R>
+  void SPxMainSM<R>::handleExtremes(SPxLPBase<R>& lp)
   {
 
     // This method handles extreme value of the given LP by
@@ -1542,8 +1535,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
     // 1. setting numbers of very small absolute values to zero and
     // 2. setting numbers of very large absolute values to -infinity or +infinity, respectively.
 
-    Real maxVal  = infinity / 5.0;
-    Real tol = feastol() * 1e-2;
+    R maxVal  = infinity / 5.0;
+    R tol = feastol() * 1e-2;
     tol = (tol < epsZero()) ? epsZero() : tol;
     int  remRows = 0;
     int  remNzos = 0;
@@ -1554,7 +1547,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
     for(int i = lp.nRows()-1; i >= 0; --i)
       {
         // lhs
-        Real lhs = lp.lhs(i);
+        R lhs = lp.lhs(i);
 
         if (lhs != 0.0 && isZero(lhs, epsZero()))
           {
@@ -1573,7 +1566,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
           }
 
         // rhs
-        Real rhs = lp.rhs(i);
+        R rhs = lp.rhs(i);
 
         if (rhs != 0.0 && isZero(rhs, epsZero()))
           {
@@ -1607,7 +1600,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
     for(int j = 0; j < lp.nCols(); ++j)
       {
         // lower bound
-        Real lo = lp.lower(j);
+        R lo = lp.lower(j);
 
         if (lo != 0.0 && isZero(lo, epsZero()))
           {
@@ -1626,7 +1619,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
           }
 
         // upper bound
-        Real up = lp.upper(j);
+        R up = lp.upper(j);
 
         if (up != 0.0 && isZero(up, epsZero()))
           {
@@ -1650,7 +1643,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
             lo = spxAbs(lo);
             up = spxAbs(up);
 
-            Real absBnd = (lo > up) ? lo : up;
+            R absBnd = (lo > up) ? lo : up;
 
             if (absBnd < 1.0)
               absBnd = 1.0;
@@ -1661,7 +1654,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 
             while(i < col.size())
               {
-                Real aij = spxAbs(col.value(i));
+                R aij = spxAbs(col.value(i));
 
                 if (isZero(aij * absBnd, tol))
                   {
@@ -1695,7 +1688,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
           }
 
         // objective
-        Real obj = lp.obj(j);
+        R obj = lp.obj(j);
 
         if (obj != 0.0 && isZero(obj, epsZero()))
           {
@@ -1732,8 +1725,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
   }
 
   /// computes the minimum and maximum residual activity for a given variable
-  template <>
-  void SPxMainSM<Real>::computeMinMaxResidualActivity(SPxLP& lp, int rowNumber, int colNumber, Real& minAct, Real& maxAct)
+  template <class R>
+  void SPxMainSM<R>::computeMinMaxResidualActivity(SPxLPBase<R>& lp, int rowNumber, int colNumber, R& minAct, R& maxAct)
   {
     const SVector& row = lp.rowVector(rowNumber);
     bool minNegInfinite = false;
@@ -1791,8 +1784,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 
 
   /// calculate min/max value for the multi aggregated variables
-  template <>
-  void SPxMainSM<Real>::computeMinMaxValues(SPxLP& lp, Real side, Real val, Real minRes, Real maxRes, Real& minVal, Real& maxVal)
+  template <class R>
+  void SPxMainSM<R>::computeMinMaxValues(SPxLPBase<R>& lp, R side, R val, R minRes, R maxRes, R& minVal, R& maxVal)
   {
     minVal = 0;
     maxVal = 0;
@@ -1825,25 +1818,25 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 
 
   /// tries to find good lower bound solutions by applying some trivial heuristics
-  template <>
-  void SPxMainSM<Real>::trivialHeuristic(SPxLP& lp)
+  template <class R>
+  void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
   {
-    DVector         zerosol(lp.nCols());  // the zero solution vector
-    DVector         lowersol(lp.nCols()); // the lower bound solution vector
-    DVector         uppersol(lp.nCols()); // the upper bound solution vector
-    DVector         locksol(lp.nCols());  // the locks solution vector
+    DVectorBase<R>         zerosol(lp.nCols());  // the zero solution vector
+    DVectorBase<R>         lowersol(lp.nCols()); // the lower bound solution vector
+    DVectorBase<R>         uppersol(lp.nCols()); // the upper bound solution vector
+    DVectorBase<R>         locksol(lp.nCols());  // the locks solution vector
 
-    DVector         upLocks(lp.nCols());
-    DVector         downLocks(lp.nCols());
+    DVectorBase<R>         upLocks(lp.nCols());
+    DVectorBase<R>         downLocks(lp.nCols());
 
-    Real            zeroObj = this->m_objoffset;
-    Real            lowerObj = this->m_objoffset;
-    Real            upperObj = this->m_objoffset;
-    Real            lockObj = this->m_objoffset;
+    R            zeroObj = this->m_objoffset;
+    R            lowerObj = this->m_objoffset;
+    R            upperObj = this->m_objoffset;
+    R            lockObj = this->m_objoffset;
 
     bool            zerovalid = true;
 
-    Real largeValue = infinity;
+    R largeValue = infinity;
     if(LT(1.0/feastol(), infinity))
       largeValue = 1.0/feastol();
 
@@ -1858,7 +1851,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
         const SVector& col = lp.colVector(j);
         for(int k = 0; k < col.size(); ++k)
           {
-            Real aij = col.value(k);
+            R aij = col.value(k);
 
             ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
 
@@ -1883,8 +1876,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
               }
           }
 
-        Real lower = lp.lower(j);
-        Real upper = lp.upper(j);
+        R lower = lp.lower(j);
+        R upper = lp.upper(j);
 
         if(LE(lower, -infinity))
           lower = MINIMUM(-largeValue, upper);
@@ -1946,14 +1939,14 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 
 
   /// tightens variable bounds by propagating the pseudo objective function value.
-  template <>
-  void SPxMainSM<Real>::propagatePseudoobj(SPxLP& lp)
+  template <class R>
+  void SPxMainSM<R>::propagatePseudoobj(SPxLPBase<R>& lp)
   {
-    Real pseudoObj = this->m_objoffset;
+    R pseudoObj = this->m_objoffset;
 
     for( int j = lp.nCols()-1; j >= 0; --j )
       {
-        Real val = lp.maxObj(j);
+        R val = lp.maxObj(j);
         if( val < 0 )
           {
             if( lp.lower(j) <= -infinity )
@@ -1975,14 +1968,14 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 
         for(int j = lp.nCols()-1; j >= 0; --j)
           {
-            Real objval = lp.maxObj(j);
+            R objval = lp.maxObj(j);
 
             if(EQ(objval, 0.0))
               continue;
 
             if(objval < 0.0)
               {
-                Real newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
+                R newbound = lp.lower(j) + (m_cutoffbound - m_pseudoobj) / objval;
 
                 if(LT(newbound, lp.upper(j)))
                   {
@@ -1994,7 +1987,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
               }
             else if(objval > 0.0)
               {
-                Real newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
+                R newbound = lp.upper(j) + (m_cutoffbound - m_pseudoobj) / objval;
                 if(GT(newbound, lp.lower(j)))
                   {
                     TightenBoundsPS* TightenBoundsPSptr = 0;
@@ -2009,8 +2002,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 
 
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::removeEmpty(SPxLP& lp)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::removeEmpty(SPxLPBase<R>& lp)
   {
 
     // This method removes empty rows and columns from the LP.
@@ -2057,7 +2050,7 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
                        << " lower=" << lp.lower(j)
                        << " upper=" << lp.upper(j); )
 
-              Real val;
+              R val;
 
             if (GT(lp.maxObj(j), 0.0, epsZero()))
               {
@@ -2118,15 +2111,15 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
     return this->OKAY;
   }
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::removeRowSingleton(SPxLP& lp, const SVector& row, int& i)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::removeRowSingleton(SPxLPBase<R>& lp, const SVector& row, int& i)
   {
     assert(row.size() == 1);
 
-    Real aij = row.value(0);
+    R aij = row.value(0);
     int  j   = row.index(0);
-    Real lo  = -infinity;
-    Real up  =  infinity;
+    R lo  = -infinity;
+    R up  =  infinity;
 
     MSG_DEBUG( (*this->spxout) << "IMAISM22 row " << i
                << ": singleton -> val=" << aij
@@ -2165,8 +2158,8 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
       bool stricterUp = false;
     bool stricterLo = false;
 
-    Real oldLo = lp.lower(j);
-    Real oldUp = lp.upper(j);
+    R oldLo = lp.lower(j);
+    R oldUp = lp.upper(j);
 
     if (LTrel(up, lp.upper(j), feastol()))
       {
@@ -2193,23 +2186,23 @@ void SPxMainSM<Real>::MultiAggregationPS::execute(DVector& x, DVector& y, DVecto
 }
 
 /// aggregate variable x_j to x_j = (rhs - aik * x_k) / aij from row i: aij * x_j + aik * x_k = rhs
-template <>
-typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, const SVector& row, int& i)
+template <class R>
+typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp, const SVector& row, int& i)
 {
    assert(row.size() == 2);
    assert(EQrel(lp.lhs(i), lp.rhs(i), feastol()));
 
-   Real rhs = lp.rhs(i);
+   R rhs = lp.rhs(i);
    assert(rhs < infinity && rhs > -infinity);
 
    int j = row.index(0);
    int k = row.index(1);
-   Real aij = row.value(0);
-   Real aik = row.value(1);
-   Real lower_j = lp.lower(j);
-   Real upper_j = lp.upper(j);
-   Real lower_k = lp.lower(k);
-   Real upper_k = lp.upper(k);
+   R aij = row.value(0);
+   R aik = row.value(1);
+   R lower_j = lp.lower(j);
+   R upper_j = lp.upper(j);
+   R lower_k = lp.lower(k);
+   R upper_k = lp.upper(k);
 
    // fixed variables should be removed by simplifyCols()
    if( EQrel(lower_j, upper_j, feastol()) || EQrel(lower_k, upper_k, feastol()) )
@@ -2221,10 +2214,10 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
       << aij << " x_" << j << " + " << aik << " x_" << k << " = " << rhs; )
 
    // determine which variable can be aggregated without requiring bound tightening of the other variable
-   Real new_lo_j;
-   Real new_up_j;
-   Real new_lo_k;
-   Real new_up_k;
+   R new_lo_j;
+   R new_up_j;
+   R new_lo_k;
+   R new_up_k;
    if( aij * aik < 0.0 )
    {
       // orientation persists
@@ -2283,9 +2276,9 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
    if( flip_jk )
    {
       int _j = j;
-      Real _aij = aij;
-      Real _lower_j = lower_j;
-      Real _upper_j = upper_j;
+      R _aij = aij;
+      R _lower_j = lower_j;
+      R _upper_j = upper_j;
       j = k;
       k = _j;
       aij = aik;
@@ -2300,8 +2293,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
    const SVector& col_k = lp.colVector(k);
 
    // aggregation coefficients (x_j = aggr_coef * x_k + aggr_const)
-   Real aggr_coef = - (aik / aij);
-   Real aggr_const = rhs / aij;
+   R aggr_coef = - (aik / aij);
+   R aggr_const = rhs / aij;
 
    MSG_DEBUG( (*this->spxout) << " removed, replacing x_" << j << " with "
       << aggr_const << " + " << aggr_coef << " * x_" << k << std::endl; )
@@ -2310,15 +2303,15 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
    for( int r = 0; r < col_j.size(); ++r )
    {
       int row_r = col_j.index(r);
-      Real arj = col_j.value(r);
+      R arj = col_j.value(r);
 
       // skip row i
       if( row_r == i )
          continue;
 
       // adapt sides of row r
-      Real lhs_r = lp.lhs(row_r);
-      Real rhs_r = lp.rhs(row_r);
+      R lhs_r = lp.lhs(row_r);
+      R rhs_r = lp.rhs(row_r);
       if( lhs_r > -infinity )
       {
          lp.changeLhs(row_r, lhs_r - aggr_const * arj);
@@ -2330,13 +2323,13 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
          m_chgLRhs++;
       }
 
-      Real newcoef = aggr_coef * arj;
+      R newcoef = aggr_coef * arj;
       int pos_rk = col_k.pos(row_r);
 
       // check whether x_k is also present in row r and get its coefficient
       if( pos_rk >= 0 )
       {
-         Real ark = col_k.value(pos_rk);
+         R ark = col_k.value(pos_rk);
          newcoef += ark;
          m_remNzos++;
       }
@@ -2346,25 +2339,25 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
    }
 
    // adapt objective function
-   Real obj_j = lp.obj(j);
+   R obj_j = lp.obj(j);
    if( isNotZero(obj_j, epsZero()) )
    {
       addObjoffset(aggr_const * obj_j);
-      Real obj_k = lp.obj(k);
+      R obj_k = lp.obj(k);
       lp.changeObj(k, obj_k + aggr_coef * obj_j);
    }
 
    // adapt bounds of x_k
-   Real scale1 = maxAbs(rhs, aij * upper_j);
-   Real scale2 = maxAbs(rhs, aij * lower_j);
+   R scale1 = maxAbs(rhs, aij * upper_j);
+   R scale2 = maxAbs(rhs, aij * lower_j);
 
    if( scale1 < 1.0 )
       scale1 = 1.0;
    if( scale2 < 1.0 )
       scale2 = 1.0;
 
-   Real z1 = (rhs / scale1) - (aij * upper_j / scale1);
-   Real z2 = (rhs / scale2) - (aij * lower_j / scale2);
+   R z1 = (rhs / scale1) - (aij * upper_j / scale1);
+   R z2 = (rhs / scale2) - (aij * lower_j / scale2);
 
    // just some rounding
    if( isZero(z1, epsZero()) )
@@ -2387,8 +2380,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
       throw SPxInternalCodeException("XMAISM12 This should never happen.");
 
    // change bounds of x_k if the new ones are tighter
-   Real oldlower_k = lower_k;
-   Real oldupper_k = upper_k;
+   R oldlower_k = lower_k;
+   R oldupper_k = upper_k;
    if( GT(new_lo_k, lower_k, epsZero()) )
    {
       lp.changeLower(k, new_lo_k);
@@ -2417,8 +2410,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::aggregateVars(SPxLP& lp, c
    return OKAY;
 }
 
-template <>
-typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bool& again)
+template <class R>
+typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, bool& again)
 {
 
     // This method simplifies the rows of the LP.
@@ -2453,14 +2446,14 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
 
         // compute bounds on constraint value
-        Real lhsBnd = 0.0; // minimal activity (finite summands)
-        Real rhsBnd = 0.0; // maximal activity (finite summands)
+        R lhsBnd = 0.0; // minimal activity (finite summands)
+        R rhsBnd = 0.0; // maximal activity (finite summands)
         int  lhsCnt = 0; // number of -infinity summands in minimal activity
         int  rhsCnt = 0; // number of +infinity summands in maximal activity
 
         for(int k = 0; k < row.size(); ++k)
           {
-            Real aij = row.value(k);
+            R aij = row.value(k);
             int  j   = row.index(k);
 
             if( !isNotZero(aij, 1.0 / infinity) )
@@ -2500,7 +2493,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
           {
             for(int k = 0; k < row.size(); ++k)
               {
-                Real aij = row.value(k);
+                R aij = row.value(k);
                 int  j   = row.index(k);
 
                 redundantLower = false;
@@ -2512,15 +2505,15 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                   {
                     if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param<Real>::epsilon())
+                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        Real lo    = -infinity;
-                        Real scale = maxAbs(lp.lhs(i), rhsBnd);
+                        R lo    = -infinity;
+                        R scale = maxAbs(lp.lhs(i), rhsBnd);
 
                         if (scale < 1.0)
                           scale = 1.0;
 
-                        Real z = (lp.lhs(i) / scale) - (rhsBnd / scale);
+                        R z = (lp.lhs(i) / scale) - (rhsBnd / scale);
 
                         if (isZero(z, epsZero()))
                           z = 0.0;
@@ -2549,15 +2542,15 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                       }
                     if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param<Real>::epsilon())
+                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        Real up    = infinity;
-                        Real scale = maxAbs(lp.rhs(i), lhsBnd);
+                        R up    = infinity;
+                        R scale = maxAbs(lp.rhs(i), lhsBnd);
 
                         if (scale < 1.0)
                           scale = 1.0;
 
-                        Real z = (lp.rhs(i) / scale) - (lhsBnd / scale);
+                        R z = (lp.rhs(i) / scale) - (lhsBnd / scale);
 
                         if (isZero(z, epsZero()))
                           z = 0.0;
@@ -2616,15 +2609,15 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                   {
                     if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param<Real>::epsilon())
+                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        Real up    = infinity;
-                        Real scale = maxAbs(lp.lhs(i), rhsBnd);
+                        R up    = infinity;
+                        R scale = maxAbs(lp.lhs(i), rhsBnd);
 
                         if (scale < 1.0)
                           scale = 1.0;
 
-                        Real z = (lp.lhs(i) / scale) - (rhsBnd / scale);
+                        R z = (lp.lhs(i) / scale) - (rhsBnd / scale);
 
                         if (isZero(z, epsZero()))
                           z = 0.0;
@@ -2652,15 +2645,15 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                       }
                     if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param<Real>::epsilon())
+                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        Real lo    = -infinity;
-                        Real scale = maxAbs(lp.rhs(i), lhsBnd);
+                        R lo    = -infinity;
+                        R scale = maxAbs(lp.rhs(i), lhsBnd);
 
                         if (scale < 1.0)
                           scale = 1.0;
 
-                        Real z = (lp.rhs(i) / scale) - (lhsBnd / scale);
+                        R z = (lp.rhs(i) / scale) - (lhsBnd / scale);
 
                         if (isZero(z, epsZero()))
                           z = 0.0;
@@ -2860,12 +2853,12 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                        << std::endl; )
 
               DataArray<bool> fixedCol(row.size());
-            DataArray<Real> lowers(row.size());
-            DataArray<Real> uppers(row.size());
+            DataArray<R> lowers(row.size());
+            DataArray<R> uppers(row.size());
 
             for(int k = 0; k < row.size(); ++k)
               {
-                Real aij = row.value(k);
+                R aij = row.value(k);
                 int  j   = row.index(k);
 
                 fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), m_epsilon));
@@ -2903,12 +2896,12 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                        << std::endl; )
 
               DataArray<bool> fixedCol(row.size());
-            DataArray<Real> lowers(row.size());
-            DataArray<Real> uppers(row.size());
+            DataArray<R> lowers(row.size());
+            DataArray<R> uppers(row.size());
 
             for(int k = 0; k < row.size(); ++k)
               {
-                Real aij   = row.value(k);
+                R aij   = row.value(k);
                 int  j     = row.index(k);
 
                 fixedCol[k] = !(EQrel(lp.upper(j), lp.lower(j), m_epsilon));
@@ -2964,8 +2957,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     return this->OKAY;
   }
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyCols(SPxLP& lp, bool& again)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyCols(SPxLPBase<R>& lp, bool& again)
   {
 
     // This method simplifies the columns of the LP.
@@ -3012,7 +3005,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                        << " lower=" << lp.lower(j)
                        << " upper=" << lp.upper(j); )
 
-              Real val;
+              R val;
 
             if (GT(lp.maxObj(j), 0.0, epsZero()))
               {
@@ -3156,7 +3149,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                                << " with zero objective (" << lp.maxObj(j)
                                << ")" << std::endl; )
 
-                    SVectorBase<Real> col_idx_sorted(col);
+                    SVectorBase<R> col_idx_sorted(col);
 
                     // sort col elements by increasing idx
                     IdxCompare compare;
@@ -3215,7 +3208,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
         // handle column singletons
         if (col.size() == 1)
           {
-            Real aij = col.value(0);
+            R aij = col.value(0);
             int  i   = col.index(0);
 
             // 4. column singleton with zero objective
@@ -3226,8 +3219,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                            << ": singleton in row " << i
                            << " with zero objective"; )
 
-                  Real lhs = -infinity;
-                Real rhs = +infinity;
+                  R lhs = -infinity;
+                R rhs = +infinity;
 
                 if (GT(aij, 0.0, epsZero()))
                   {
@@ -3298,11 +3291,11 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                            << ": singleton in row " << i
                            << " with doubleton equation ->"; )
 
-                  Real lhs = lp.lhs(i);
+                  R lhs = lp.lhs(i);
 
                 const SVector& row = lp.rowVector(i);
 
-                Real aik;
+                R aik;
                 int  k;
 
                 if (row.index(0) == j)
@@ -3320,20 +3313,20 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
                 ASSERT_WARN( "WMAISM39", isNotZero(aik, 1.0 / infinity) );
 
-                Real lo, up;
-                Real oldLower = lp.lower(k);
-                Real oldUpper = lp.upper(k);
+                R lo, up;
+                R oldLower = lp.lower(k);
+                R oldUpper = lp.upper(k);
 
-                Real scale1 = maxAbs(lhs, aij * lp.upper(j));
-                Real scale2 = maxAbs(lhs, aij * lp.lower(j));
+                R scale1 = maxAbs(lhs, aij * lp.upper(j));
+                R scale2 = maxAbs(lhs, aij * lp.lower(j));
 
                 if (scale1 < 1.0)
                   scale1 = 1.0;
                 if (scale2 < 1.0)
                   scale2 = 1.0;
 
-                Real z1 = (lhs / scale1) - (aij * lp.upper(j) / scale1);
-                Real z2 = (lhs / scale2) - (aij * lp.lower(j) / scale2);
+                R z1 = (lhs / scale1) - (aij * lp.upper(j) / scale1);
+                R z2 = (lhs / scale2) - (aij * lp.lower(j) / scale2);
 
                 if (isZero(z1, epsZero()))
                   z1 = 0.0;
@@ -3393,7 +3386,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
             if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
               {
 #if FREE_COL_SINGLETON
-                Real slackVal = lp.lhs(i);
+                R slackVal = lp.lhs(i);
 
                 // constraint i is an inequality constraint -> transform into equation type
                 if (NErel(lp.lhs(i), lp.rhs(i), feastol()))
@@ -3406,9 +3399,9 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                         continue;
 
                     // introduce slack variable to obtain equality constraint
-                    Real sMaxObj = lp.maxObj(j) / aij; // after substituting variable j in objective
-                    Real sLo     = lp.lhs(i);
-                    Real sUp     = lp.rhs(i);
+                    R sMaxObj = lp.maxObj(j) / aij; // after substituting variable j in objective
+                    R sLo     = lp.lhs(i);
+                    R sUp     = lp.rhs(i);
 
                     if (GT(sMaxObj, 0.0, epsZero()))
                       {
@@ -3456,7 +3449,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
                     if (k != j)
                       {
-                        Real new_obj = lp.obj(k) - (lp.obj(j) * row.value(h) / aij);
+                        R new_obj = lp.obj(k) - (lp.obj(j) * row.value(h) / aij);
                         lp.changeObj(k, new_obj);
                       }
                   }
@@ -3494,8 +3487,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     return this->OKAY;
   }
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyDual(SPxLP& lp, bool& again)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyDual(SPxLPBase<R>& lp, bool& again)
   {
 
     // This method simplifies LP using the following dual structures:
@@ -3513,10 +3506,10 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     int oldCols = lp.nCols();
 
     DataArray<bool> colSingleton(lp.nCols());
-    DVector         dualVarLo(lp.nRows());
-    DVector         dualVarUp(lp.nRows());
-    DVector         dualConsLo(lp.nCols());
-    DVector         dualConsUp(lp.nCols());
+    DVectorBase<R>         dualVarLo(lp.nRows());
+    DVectorBase<R>         dualVarUp(lp.nRows());
+    DVectorBase<R>         dualConsLo(lp.nCols());
+    DVectorBase<R>         dualConsUp(lp.nCols());
 
     // init
     for(int i = lp.nRows()-1; i >= 0; --i)
@@ -3551,11 +3544,11 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
         if (lp.colVector(j).size() == 1)
           {
             int  i   = lp.colVector(j).index(0);
-            Real aij = lp.colVector(j).value(0);
+            R aij = lp.colVector(j).value(0);
 
             ASSERT_WARN( "WMAISM44", isNotZero(aij, 1.0 / infinity) );
 
-            Real bound = lp.maxObj(j) / aij;
+            R bound = lp.maxObj(j) / aij;
 
             if (aij > 0)
               {
@@ -3587,7 +3580,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
             if (dualConsLo[j] <= -infinity && dualConsUp[j] >= infinity)
               break;
 
-            Real aij = col.value(k);
+            R aij = col.value(k);
             int  i   = col.index(k);
 
             ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
@@ -3633,7 +3626,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
               return this->DUAL_INFEASIBLE;
           }
 
-        Real obj = lp.maxObj(j);
+        R obj = lp.maxObj(j);
 
         // 1. dominated column
         // Is the problem really unbounded in the cases below ??? Or is only dual infeasibility be shown
@@ -3753,8 +3746,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
 
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::multiaggregation(SPxLP& lp, bool& again)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::multiaggregation(SPxLPBase<R>& lp, bool& again)
   {
     // this simplifier eliminates rows and columns by performing multi aggregations as identified by the constraint
     // activities.
@@ -3765,8 +3758,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     int oldRows = lp.nRows();
     int oldCols = lp.nCols();
 
-    DVector upLocks(lp.nCols());
-    DVector downLocks(lp.nCols());
+    DVectorBase<R> upLocks(lp.nCols());
+    DVectorBase<R> downLocks(lp.nCols());
 
     for(int j = lp.nCols()-1; j >= 0; --j)
       {
@@ -3780,7 +3773,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
         const SVector& col = lp.colVector(j);
         for(int k = 0; k < col.size(); ++k)
           {
-            Real aij = col.value(k);
+            R aij = col.value(k);
 
             ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
 
@@ -3808,8 +3801,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
         // multi-aggregate column
         if (upLocks[j] == 1 || downLocks[j] == 1)
           {
-            Real lower = lp.lower(j);
-            Real upper = lp.upper(j);
+            R lower = lp.lower(j);
+            R upper = lp.upper(j);
             int maxOtherLocks;
             int bestpos = -1;
             bool bestislhs = true;
@@ -3817,14 +3810,14 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
             for(int k = 0; k < col.size(); ++k)
               {
                 int rowNumber;
-                Real lhs;
-                Real rhs;
+                R lhs;
+                R rhs;
                 bool lhsExists;
                 bool rhsExists;
                 bool aggLhs;
                 bool aggRhs;
 
-                Real val = col.value(k);
+                R val = col.value(k);
 
                 rowNumber = col.index(k);
                 lhs = lp.lhs(rowNumber);
@@ -3854,8 +3847,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
                 if (aggLhs || aggRhs)
                   {
-                    Real minRes = 0;   // this is the minimum value that the aggregation can attain
-                    Real maxRes = 0;   // this is the maximum value that the aggregation can attain
+                    R minRes = 0;   // this is the minimum value that the aggregation can attain
+                    R maxRes = 0;   // this is the maximum value that the aggregation can attain
 
                     // computing the minimum and maximum residuals if variable j is set to zero.
                     computeMinMaxResidualActivity(lp, rowNumber, j, minRes, maxRes);
@@ -3863,8 +3856,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                     // we will try to aggregate to the lhs
                     if (aggLhs)
                       {
-                        Real minVal;
-                        Real maxVal;
+                        R minVal;
+                        R maxVal;
 
                         // computing the values of the upper and lower bounds for the aggregated variables
                         computeMinMaxValues(lp, lhs, val, minRes, maxRes, minVal, maxVal);
@@ -3884,8 +3877,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                     // we will try to aggregate to the rhs
                     if (aggRhs)
                       {
-                        Real minVal;
-                        Real maxVal;
+                        R minVal;
+                        R maxVal;
 
                         // computing the values of the upper and lower bounds for the aggregated variables
                         computeMinMaxValues(lp, rhs, val, minRes, maxRes, minVal, maxVal);
@@ -3908,8 +3901,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
               {
                 const SVector& bestRow = lp.rowVector(bestpos);
                 // aggregating the variable and applying the fixings to the all other constraints
-                Real aggConstant = (bestislhs ? lp.lhs(bestpos) : lp.rhs(bestpos));   // this is the lhs or rhs of the aggregated row
-                Real aggAij = bestRow[j];                                   // this is the coefficient of the deleted col
+                R aggConstant = (bestislhs ? lp.lhs(bestpos) : lp.rhs(bestpos));   // this is the lhs or rhs of the aggregated row
+                R aggAij = bestRow[j];                                   // this is the coefficient of the deleted col
 
                 MSG_DEBUG(
                           (*this->spxout) << "IMAISM51 col " << j
@@ -3927,9 +3920,9 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                     if(col.index(k) != bestpos)
                       {
                         int rowNumber = col.index(k);
-                        DVector updateRow(lp.nCols());
-                        Real updateRhs = lp.rhs(col.index(k));
-                        Real updateLhs = lp.lhs(col.index(k));
+                        DVectorBase<R> updateRow(lp.nCols());
+                        R updateRhs = lp.rhs(col.index(k));
+                        R updateLhs = lp.lhs(col.index(k));
 
                         updateRow = lp.rowVector(col.index(k));
 
@@ -3996,8 +3989,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
 
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::duplicateRows(SPxLP& lp, bool& again)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateRows(SPxLPBase<R>& lp, bool& again)
   {
 
     // This method simplifies the LP by removing duplicate rows
@@ -4012,7 +4005,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     int oldRows = lp.nRows();
 
     // remove empty rows and columns
-    typename SPxSimplifier<Real>::Result ret = removeEmpty(lp);
+    typename SPxSimplifier<R>::Result ret = removeEmpty(lp);
     if (ret != this->OKAY)
       return ret;
 
@@ -4043,7 +4036,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
     DataArray<int>    pClass(lp.nRows());           // class of parallel rows
     DataArray<int>    classSize(lp.nRows());        // size of each class
-    DataArray<Real>   scale(lp.nRows());            // scaling factor for each row
+    DataArray<R>   scale(lp.nRows());            // scaling factor for each row
     int*              idxMem = 0;
 
     try
@@ -4071,7 +4064,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
         idxSet.addIdx(i);
       }
 
-    Real oldVal = 0.0;
+    R oldVal = 0.0;
 
     // main loop
     for(int j = 0; j < lp.nCols(); ++j)
@@ -4080,7 +4073,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
         for(int k = 0; k < col.size(); ++k)
           {
-            Real aij = col.value(k);
+            R aij = col.value(k);
             int  i   = col.index(k);
 
             if (scale[i] == 0.0)
@@ -4185,8 +4178,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
     // store rhs and lhs changes for combined update
     bool doChangeRanges = false;
-    DVector newLhsVec(lp.lhs());
-    DVector newRhsVec(lp.rhs());
+    DVectorBase<R> newLhsVec(lp.lhs());
+    DVectorBase<R> newRhsVec(lp.rhs());
 
     for(int k = 0; k < lp.nRows(); ++k)
       {
@@ -4201,8 +4194,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
             int  rowIdx    = -1;
             int  maxLhsIdx = -1;
             int  minRhsIdx = -1;
-            Real maxLhs    = -infinity;
-            Real minRhs    = +infinity;
+            R maxLhs    = -infinity;
+            R minRhs    = +infinity;
 
             DataArray<bool> isLhsEqualRhs(m_dupRows[k].size());
 
@@ -4222,8 +4215,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                   }
                 else
                   {
-                    Real scaledLhs, scaledRhs;
-                    Real factor = scale[rowIdx] / scale[i];
+                    R scaledLhs, scaledRhs;
+                    R factor = scale[rowIdx] / scale[i];
 
                     if (factor > 0)
                       {
@@ -4252,8 +4245,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
             if (rowIdx != -1)
               {
-                Real newLhs = (maxLhs > lp.lhs(rowIdx)) ? maxLhs : lp.lhs(rowIdx);
-                Real newRhs = (minRhs < lp.rhs(rowIdx)) ? minRhs : lp.rhs(rowIdx);
+                R newLhs = (maxLhs > lp.lhs(rowIdx)) ? maxLhs : lp.lhs(rowIdx);
+                R newRhs = (minRhs < lp.rhs(rowIdx)) ? minRhs : lp.rhs(rowIdx);
 
                 if(k == idxLastDupRows)
                   {
@@ -4351,8 +4344,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     return this->OKAY;
   }
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::duplicateCols(SPxLP& lp, bool& again)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::duplicateCols(SPxLPBase<R>& lp, bool& again)
   {
 
     // This method simplifies the LP by removing duplicate columns
@@ -4362,7 +4355,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     int remNzos = 0;
 
     // remove empty rows and columns
-    typename SPxSimplifier<Real>::Result ret = removeEmpty(lp);
+    typename SPxSimplifier<R>::Result ret = removeEmpty(lp);
     if (ret != this->OKAY)
       return ret;
 
@@ -4371,7 +4364,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
     DataArray<int>    pClass(lp.nCols());          // class of parallel columns
     DataArray<int>    classSize(lp.nCols());       // size of each class
-    DataArray<Real>   scale(lp.nCols());           // scaling factor for each column
+    DataArray<R>   scale(lp.nCols());           // scaling factor for each column
     int*              idxMem = 0;
 
     try
@@ -4399,7 +4392,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
         idxSet.addIdx(j);
       }
 
-    Real oldVal = 0.0;
+    R oldVal = 0.0;
 
     // main loop
     for(int i = 0; i < lp.nRows(); ++i)
@@ -4408,7 +4401,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
         for(int k = 0; k < row.size(); ++k)
           {
-            Real aij = row.value(k);
+            R aij = row.value(k);
             int  j   = row.index(k);
 
             if (scale[j] == 0.0)
@@ -4498,12 +4491,12 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
                     if (l != m && !remCol[j1] && !remCol[j2])
                       {
-                        Real cj1 = lp.maxObj(j1);
-                        Real cj2 = lp.maxObj(j2);
+                        R cj1 = lp.maxObj(j1);
+                        R cj2 = lp.maxObj(j2);
 
                         // A.j1 = factor * A.j2
-                        Real factor = scale[j1] / scale[j2];
-                        Real objDif = cj1 - cj2 * scale[j1] / scale[j2];
+                        R factor = scale[j1] / scale[j2];
+                        R objDif = cj1 - cj2 * scale[j1] / scale[j2];
 
                         ASSERT_WARN( "WMAISM59", isNotZero(factor, epsZero()) );
 
@@ -4728,16 +4721,16 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     return this->OKAY;
   }
 
-  template <>
-  void SPxMainSM<Real>::fixColumn(SPxLP& lp, int j, bool correctIdx)
+  template <class R>
+  void SPxMainSM<R>::fixColumn(SPxLPBase<R>& lp, int j, bool correctIdx)
   {
 
     assert(EQrel(lp.lower(j), lp.upper(j), feastol()));
 
-    Real lo            = lp.lower(j);
-   Real up            = lp.upper(j);
+    R lo            = lp.lower(j);
+   R up            = lp.upper(j);
     const SVector& col = lp.colVector(j);
-   Real mid           = lo;
+   R mid           = lo;
 
    // use the center value between slightly different bounds to improve numerics
    if( NE(lo, up) )
@@ -4760,13 +4753,13 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
 
               if (lp.rhs(i) < infinity)
                 {
-            Real y     = mid * col.value(k);
-                  Real scale = maxAbs(lp.rhs(i), y);
+            R y     = mid * col.value(k);
+                  R scale = maxAbs(lp.rhs(i), y);
 
                   if (scale < 1.0)
                     scale = 1.0;
 
-                  Real rhs = (lp.rhs(i) / scale) - (y / scale);
+                  R rhs = (lp.rhs(i) / scale) - (y / scale);
 
                   if (isZero(rhs, epsZero()))
                     rhs = 0.0;
@@ -4783,13 +4776,13 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
                 }
               if (lp.lhs(i) > -infinity)
                 {
-            Real y     = mid * col.value(k);
-                  Real scale = maxAbs(lp.lhs(i), y);
+            R y     = mid * col.value(k);
+                  R scale = maxAbs(lp.lhs(i), y);
 
                   if (scale < 1.0)
                     scale = 1.0;
 
-                  Real lhs = (lp.lhs(i) / scale) - (y / scale);
+                  R lhs = (lp.lhs(i) / scale) - (y / scale);
 
                   if (isZero(lhs, epsZero()))
                     lhs = 0.0;
@@ -4813,8 +4806,8 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     m_hist.append(new (FixVariablePSptr) FixVariablePS(lp, *this, j, lp.lower(j), correctIdx));
   }
 
-  template <>
-  typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplify(SPxLP& lp, Real eps, Real ftol, Real otol, bool keepbounds)
+  template <class R>
+  typename SPxSimplifier<R>::Result SPxMainSM<R>::simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol, bool keepbounds)
   {
     // transfer message handler
     this->spxout = lp.spxout;
@@ -5065,9 +5058,9 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     return m_result;
   }
 
-  template <>
-  void SPxMainSM<Real>::unsimplify(const Vector& x, const Vector& y, const Vector& s, const Vector& r,
-                                const typename SPxSolverBase<Real>::VarStatus rows[], const typename SPxSolverBase<Real>::VarStatus cols[], bool isOptimal)
+  template <class R>
+  void SPxMainSM<R>::unsimplify(const VectorBase<R>& x, const VectorBase<R>& y, const VectorBase<R>& s, const VectorBase<R>& r,
+                                const typename SPxSolverBase<R>::VarStatus rows[], const typename SPxSolverBase<R>::VarStatus cols[], bool isOptimal)
   {
     MSG_INFO1( (*this->spxout), (*this->spxout) << " --- unsimplifying solution and basis" << std::endl; )
       assert(x.dim() <= m_prim.dim());
@@ -5081,12 +5074,12 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     for(int j = 0; j < x.dim(); ++j)
       {
         m_prim[j] = isZero(x[j], epsZero()) ? 0.0 : x[j];
-        m_redCost[j] = isZero(r[j], epsZero()) ? 0.0 : (m_thesense == SPxLP::MAXIMIZE ? -r[j] : r[j]);
+        m_redCost[j] = isZero(r[j], epsZero()) ? 0.0 : (m_thesense == SPxLPBase<R>::MAXIMIZE ? -r[j] : r[j]);
         m_cBasisStat[j] = cols[j];
       }
     for(int i = 0; i < y.dim(); ++i)
       {
-        m_dual[i] = isZero(y[i], epsZero()) ? 0.0 : (m_thesense == SPxLP::MAXIMIZE ? -y[i] : y[i]);
+        m_dual[i] = isZero(y[i], epsZero()) ? 0.0 : (m_thesense == SPxLPBase<R>::MAXIMIZE ? -y[i] : y[i]);
         m_slack[i] = isZero(s[i], epsZero()) ? 0.0 : s[i];
         m_rBasisStat[i] = rows[i];
       }
@@ -5112,7 +5105,7 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
       }
 
     // for maximization problems, we have to switch signs of dual and reduced cost values back
-    if(m_thesense == SPxLP::MAXIMIZE)
+    if(m_thesense == SPxLPBase<R>::MAXIMIZE)
       {
         for(int j = 0; j < m_redCost.dim(); ++j)
           m_redCost[j] = -m_redCost[j];
@@ -5134,13 +5127,13 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
     int numBasis = 0;
     for(int rs = 0; rs < m_rBasisStat.size(); ++rs)
       {
-        if(m_rBasisStat[rs] == SPxSolverBase<Real>::BASIC)
+        if(m_rBasisStat[rs] == SPxSolverBase<R>::BASIC)
           numBasis ++;
       }
 
     for(int cs = 0; cs < m_cBasisStat.size(); ++cs)
       {
-        if(m_cBasisStat[cs] == SPxSolverBase<Real>::BASIC)
+        if(m_cBasisStat[cs] == SPxSolverBase<R>::BASIC)
           numBasis ++;
       }
 
@@ -5160,19 +5153,19 @@ typename SPxSimplifier<Real>::Result SPxMainSM<Real>::simplifyRows(SPxLP& lp, bo
   {
     switch( status )
       {
-      case SPxSimplifier<Real>::OKAY:
+      case SPxSimplifier<R>::OKAY:
         os << "SUCCESS";
         break;
-      case SPxSimplifier<Real>::INFEASIBLE:
+      case SPxSimplifier<R>::INFEASIBLE:
         os << "INFEASIBLE";
         break;
-      case SPxSimplifier<Real>::DUAL_INFEASIBLE:
+      case SPxSimplifier<R>::DUAL_INFEASIBLE:
         os << "DUAL_INFEASIBLE";
         break;
-      case SPxSimplifier<Real>::UNBOUNDED:
+      case SPxSimplifier<R>::UNBOUNDED:
         os << "UNBOUNDED";
         break;
-      case SPxSimplifier<Real>::VANISHED:
+      case SPxSimplifier<R>::VANISHED:
         os << "VANISHED";
         break;
       default:
