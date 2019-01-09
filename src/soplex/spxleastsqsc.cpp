@@ -29,23 +29,24 @@
 namespace soplex
 {
 
-/* update scaling vector */
+/* update scaling VectorBase<R> */
+  template <class R>
 static void updateScale(
-   const SSVector vecnnzeroes,
-   const SSVector resnvec,
+   const SSVectorBase<R> vecnnzeroes,
+   const SSVectorBase<R> resnvec,
    SSVector& tmpvec,
    SSVector*& psccurr,
    SSVector*& pscprev,
-   Real qcurr,
-   Real qprev,
-   Real eprev1,
-   Real eprev2)
+   R qcurr,
+   R qprev,
+   R eprev1,
+   R eprev2)
 {
    assert(psccurr != NULL);
    assert(pscprev != NULL);
    assert(qcurr * qprev != 0.0);
 
-   Real fac = -(eprev1 * eprev2);
+   R fac = -(eprev1 * eprev2);
 
    SSVector* pssv;
 
@@ -67,22 +68,23 @@ static void updateScale(
    pscprev = pssv;
 }
 
-/* update scaling vector after main loop */
+/* update scaling VectorBase<R> after main loop */
+  template <class R>
 static void updateScaleFinal(
-   const SSVector vecnnzeroes,
-   const SSVector resnvec,
+   const SSVectorBase<R> vecnnzeroes,
+   const SSVectorBase<R> resnvec,
    SSVector& tmpvec,
    SSVector*& psccurr,
    SSVector*& pscprev,
-   Real q,
-   Real eprev1,
-   Real eprev2)
+   R q,
+   R eprev1,
+   R eprev2)
 {
    assert(q != 0);
    assert(psccurr != NULL);
    assert(pscprev != NULL);
 
-   Real fac = -(eprev1 * eprev2);
+   R fac = -(eprev1 * eprev2);
 
    *pscprev -= *psccurr;
 
@@ -98,14 +100,15 @@ static void updateScaleFinal(
    psccurr = pscprev;
 }
 
-/* update residual vector */
+/* update residual VectorBase<R> */
+  template <class R>
 static inline void updateRes(
-   const SVSet facset,
-   const SSVector resvecprev,
-   SSVector& resvec,
-   SSVector& tmpvec,
-   Real eprev,
-   Real qcurr)
+   const SVSetBase<R> facset,
+   const SSVectorBase<R> resvecprev,
+   SSVectorBase<R>& resvec,
+   SSVectorBase<R>& tmpvec,
+   R eprev,
+   R qcurr)
 {
    assert(qcurr != 0.0);
 
@@ -137,7 +140,7 @@ static void initConstVecs(
 
    for( int k = 0; k < nvec; ++k )
    {
-      Real logsum = 0.0;
+      R logsum = 0.0;
       int nnz = 0;
       // get kth row or column of LP
       const SVector& lpvec = (*vecset)[k];
@@ -145,7 +148,7 @@ static void initConstVecs(
 
       for( int i = 0; i < size; ++i )
       {
-         const Real a = lpvec.value(i);
+         const R a = lpvec.value(i);
 
          if( !isZero(a) )
          {
@@ -154,7 +157,7 @@ static void initConstVecs(
          }
       }
 
-      Real nnzinv;
+      R nnzinv;
       if( nnz > 0)
       {
          nnzinv = 1.0 / nnz;
@@ -169,7 +172,7 @@ static void initConstVecs(
       veclogs.add(k, logsum);
       vecnnzinv.add(k, nnzinv);
 
-      /* create new vector for facset */
+      /* create new VectorBase<R> for facset */
       SVector& vecnew = (*(facset.create(nnz)));
 
       for( int i = 0; i < size; ++i )
@@ -212,7 +215,7 @@ static const char* makename()
 }
 
   template <class R>
-void SPxLeastSqSC<R>::setRealParam(Real param, const char* name)
+void SPxLeastSqSC<R>::setRealParam(R param, const char* name)
 {
    assert(param >= 1.0);
    acrcydivisor = param;
@@ -241,38 +244,38 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
     * facnrows equals E^T M^(-1)
     * facncols equals E N^(-1)
     * */
-   SVSet facnrows(nrows, nrows, 1.1, 1.2);
-   SVSet facncols(ncols, ncols, 1.1, 1.2);
+   SVSetBase<R> facnrows(nrows, nrows, 1.1, 1.2);
+   SVSetBase<R> facncols(ncols, ncols, 1.1, 1.2);
 
    /* column scaling factor vectors */
-   SSVector colscale1(ncols);
-   SSVector colscale2(ncols);
+   SSVectorBase<R> colscale1(ncols);
+   SSVectorBase<R> colscale2(ncols);
 
    /* row scaling factor vectors */
-   SSVector rowscale1(nrows);
-   SSVector rowscale2(nrows);
+   SSVectorBase<R> rowscale1(nrows);
+   SSVectorBase<R> rowscale2(nrows);
 
    /* residual vectors */
-   SSVector resnrows(nrows);
-   SSVector resncols(ncols);
+   SSVectorBase<R> resnrows(nrows);
+   SSVectorBase<R> resncols(ncols);
 
    /* vectors to store temporary values */
-   SSVector tmprows(nrows);
-   SSVector tmpcols(ncols);
+   SSVectorBase<R> tmprows(nrows);
+   SSVectorBase<R> tmpcols(ncols);
 
    /* vectors storing the row and column sums (respectively) of logarithms of
     *(absolute values of) non-zero elements of left hand matrix of LP
     */
-   SSVector rowlogs(nrows);
-   SSVector collogs(ncols);
+   SSVectorBase<R> rowlogs(nrows);
+   SSVectorBase<R> collogs(ncols);
 
    /* vectors storing the inverted number of non-zeros in each row and column
     *(respectively) of left hand matrix of LP
     */
-   SSVector rownnzinv(nrows);
-   SSVector colnnzinv(ncols);
+   SSVectorBase<R> rownnzinv(nrows);
+   SSVectorBase<R> colnnzinv(ncols);
 
-   /* vector pointers */
+   /* VectorBase<R> pointers */
    SSVector* csccurr = &colscale1;
    SSVector* cscprev = &colscale2;
    SSVector* rsccurr = &rowscale1;
@@ -289,9 +292,9 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 
    assert(acrcydivisor > 0.0);
 
-   const Real smax = lpnnz / acrcydivisor;
-   Real qcurr = 1.0;
-   Real qprev = 0.0;
+   const R smax = lpnnz / acrcydivisor;
+   R qcurr = 1.0;
+   R qprev = 0.0;
 
    std::array<Real, 3> eprev;
    eprev.fill(0.0);
@@ -306,7 +309,7 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    assert(colscale1.isSetup());
    assert(colscale2.isSetup());
 
-   // compute first residual vector r0
+   // compute first residual VectorBase<R> r0
    resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs);
 
    resncols.setup();
@@ -315,14 +318,14 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    rowscale1.assignPWproduct4setup(rownnzinv, rowlogs);
    rowscale2 = rowscale1;
 
-   Real scurr = resncols * tmpcols.assignPWproduct4setup(colnnzinv, resncols);
+   R scurr = resncols * tmpcols.assignPWproduct4setup(colnnzinv, resncols);
 
    int k;
 
    /* conjugate gradient loop */
    for( k = 0; k < maxrounds; ++k )
    {
-      const Real sprev = scurr;
+      const R sprev = scurr;
 
       // is k even?
       if( (k % 2) == 0 )
@@ -349,7 +352,7 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 
       eprev[0] = (qcurr * scurr) / sprev;
 
-      const Real tmp = qcurr;
+      const R tmp = qcurr;
       qcurr = 1.0 - eprev[0];
       qprev = tmp;
 
@@ -372,8 +375,8 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
 
    /* compute actual scaling factors */
 
-   const SSVector& rowscale = *rsccurr;
-   const SSVector& colscale = *csccurr;
+   const SSVectorBase<R>& rowscale = *rsccurr;
+   const SSVectorBase<R>& colscale = *csccurr;
 
    DataArray<int>& colscaleExp = *this->m_activeColscaleExp;
    DataArray<int>& rowscaleExp = *this->m_activeRowscaleExp;

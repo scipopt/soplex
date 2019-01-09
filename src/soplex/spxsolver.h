@@ -798,7 +798,7 @@ namespace soplex
       return theRep == COLUMN ? m_entertol : m_leavetol;
     }
     /// allowed optimality, i.e., dual feasibility tolerance.
-    Real opttol() const
+    R opttol() const
     {
       assert(m_entertol > 0.0);
       assert(m_leavetol > 0.0);
