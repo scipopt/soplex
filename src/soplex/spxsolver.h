@@ -672,7 +672,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if not initialized
      */
-    virtual Status getPrimalSol(Vector& vector) const;
+    virtual Status getPrimalSol(VectorBase<R>& vector) const;
 
     /// get VectorBase<R> of slack variables.
     /** This method returns the Status of the basis.
@@ -689,7 +689,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getSlacks (Vector& vector) const;
+    virtual Status getSlacks (VectorBase<R>& vector) const;
 
     /// get current solution VectorBase<R> for dual variables.
     /** This method returns the Status of the basis.
@@ -717,7 +717,7 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getDualSol(Vector& vector) const;
+    virtual Status getDualSol(VectorBase<R>& vector) const;
 
     /// get VectorBase<R> of reduced costs.
     /** This method returns the Status of the basis.
@@ -732,15 +732,15 @@ namespace soplex
      *
      *  @throw SPxStatusException if no problem loaded
      */
-    virtual Status getRedCostSol(Vector& vector) const;
+    virtual Status getRedCostSol(VectorBase<R>& vector) const;
 
     /// get primal ray in case of unboundedness.
     ///  @throw SPxStatusException if no problem loaded
-    virtual Status getPrimalray(Vector& vector) const;
+    virtual Status getPrimalray(VectorBase<R>& vector) const;
 
     /// get dual farkas proof of infeasibility.
     ///  @throw SPxStatusException if no problem loaded
-    virtual Status getDualfarkas(Vector& vector) const;
+    virtual Status getDualfarkas(VectorBase<R>& vector) const;
 
     /// print display line of flying table
     virtual void printDisplayLine(const bool force = false, const bool forceHead = false);
@@ -902,13 +902,13 @@ namespace soplex
     ///
     void localAddCols(int start);
     ///
-    void setPrimal(Vector& p_vector);
+    void setPrimal(VectorBase<R>& p_vector);
     ///
-    void setSlacks(Vector& p_vector);
+    void setSlacks(VectorBase<R>& p_vector);
     ///
-    void setDual(Vector& p_vector);
+    void setDual(VectorBase<R>& p_vector);
     ///
-    void setRedCost(Vector& p_vector);
+    void setRedCost(VectorBase<R>& p_vector);
     //@}
 
   protected:
@@ -1871,7 +1871,7 @@ namespace soplex
     ///
     virtual void computeFrhs1(const VectorBase<R>&, const VectorBase<R>&);
     ///
-    void computeFrhs2(Vector&, VectorBase<R>&);
+    void computeFrhs2(VectorBase<R>&, VectorBase<R>&);
     /// compute \ref soplex::SPxSolverBase<R>::theCoPrhs "theCoPrhs" for entering Simplex.
     virtual void computeEnterCoPrhs();
     ///
@@ -2178,24 +2178,24 @@ namespace soplex
     }
 
     /// copy lower bound VectorBase<R> to \p p_low.
-    void getLower(Vector& p_low) const
+    void getLower(VectorBase<R>& p_low) const
     {
       p_low = SPxLPBase<R>::lower();
     }
     /// copy upper bound VectorBase<R> to \p p_up.
-    void getUpper(Vector& p_up) const
+    void getUpper(VectorBase<R>& p_up) const
     {
       p_up = SPxLPBase<R>::upper();
     }
 
     /// copy lhs value VectorBase<R> to \p p_lhs.
-    void getLhs(Vector& p_lhs) const
+    void getLhs(VectorBase<R>& p_lhs) const
     {
       p_lhs = SPxLPBase<R>::lhs();
     }
 
     /// copy rhs value VectorBase<R> to \p p_rhs.
-    void getRhs(Vector& p_rhs) const
+    void getRhs(VectorBase<R>& p_rhs) const
     {
       p_rhs = SPxLPBase<R>::rhs();
     }
@@ -2342,6 +2342,7 @@ namespace soplex
   // For general templated functions, that the linker needs to properly see.
   #include "spxsolver.hpp"
   #include "changesoplex.hpp"
+  #include "spxsolve.hpp"
 
 } // namespace soplex
 #endif // _SPXSOLVER_H_

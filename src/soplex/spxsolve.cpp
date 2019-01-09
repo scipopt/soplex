@@ -1731,57 +1731,7 @@ namespace soplex
   }
 
   template <class R>
-  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getPrimalSol(Vector& p_vector) const
-  {
-
-    if (!isInitialized())
-      {
-        /* exit if presolving/simplifier cleared the problem */
-        if (status() == NO_PROBLEM)
-          return status();
-        throw SPxStatusException("XSOLVE06 Not Initialized");
-      }
-    if (rep() == ROW)
-      p_vector = coPvec();
-    else
-      {
-        const typename SPxBasisBase<R>::Desc& ds = this->desc();
-
-        for (int i = 0; i < this->nCols(); ++i)
-          {
-            switch (ds.colStatus(i))
-              {
-              case SPxBasisBase<R>::Desc::P_ON_LOWER :
-                p_vector[i] = SPxLPBase<R>::lower(i);
-                break;
-              case SPxBasisBase<R>::Desc::P_ON_UPPER :
-              case SPxBasisBase<R>::Desc::P_FIXED :
-                p_vector[i] = SPxLPBase<R>::upper(i);
-                break;
-              case SPxBasisBase<R>::Desc::P_FREE :
-                p_vector[i] = 0;
-                break;
-              case SPxBasisBase<R>::Desc::D_FREE :
-              case SPxBasisBase<R>::Desc::D_ON_UPPER :
-              case SPxBasisBase<R>::Desc::D_ON_LOWER :
-              case SPxBasisBase<R>::Desc::D_ON_BOTH :
-              case SPxBasisBase<R>::Desc::D_UNDEFINED :
-                break;
-              default:
-                throw SPxInternalCodeException("XSOLVE07 This should never happen.");
-              }
-          }
-        for (int j = 0; j < dim(); ++j)
-          {
-            if (this->baseId(j).isSPxColId())
-              p_vector[ this->number(SPxColId(this->baseId(j))) ] = fVec()[j];
-          }
-      }
-    return status();
-  }
-
-  template <class R>
-  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualSol(Vector& p_vector) const
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualSol(VectorBase<R>& p_vector) const
   {
 
     assert(isInitialized());
@@ -1813,7 +1763,7 @@ namespace soplex
   }
 
   template <class R>
-  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(Vector& p_vector) const
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(VectorBase<R>& p_vector) const
   {
 
     assert(isInitialized());
@@ -1857,7 +1807,7 @@ namespace soplex
   }
 
   template <class R>
-  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getPrimalray(Vector& p_vector) const
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getPrimalray(VectorBase<R>& p_vector) const
   {
 
     assert(isInitialized());
@@ -1876,7 +1826,7 @@ namespace soplex
   }
 
   template <class R>
-  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualfarkas(Vector& p_vector) const
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualfarkas(VectorBase<R>& p_vector) const
   {
 
     assert(isInitialized());
@@ -1895,7 +1845,7 @@ namespace soplex
   }
 
   template <class R>
-  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getSlacks (Vector& p_vector) const
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getSlacks (VectorBase<R>& p_vector) const
   {
 
     assert(isInitialized());
@@ -1947,7 +1897,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxSolverBase<R>::setPrimal(Vector& p_vector)
+  void SPxSolverBase<R>::setPrimal(VectorBase<R>& p_vector)
   {
 
     if (!isInitialized())
@@ -1968,7 +1918,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxSolverBase<R>::setDual(Vector& p_vector)
+  void SPxSolverBase<R>::setDual(VectorBase<R>& p_vector)
   {
 
     assert(isInitialized());
@@ -2000,7 +1950,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxSolverBase<R>::setRedCost(Vector& p_vector)
+  void SPxSolverBase<R>::setRedCost(VectorBase<R>& p_vector)
   {
 
     assert(isInitialized());
@@ -2035,7 +1985,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxSolverBase<R>::setSlacks(Vector& p_vector)
+  void SPxSolverBase<R>::setSlacks(VectorBase<R>& p_vector)
   {
 
     assert(isInitialized());

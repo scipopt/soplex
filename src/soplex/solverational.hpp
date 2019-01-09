@@ -946,7 +946,7 @@ void SoPlexBase<R>::_performOptIRStable(
               if( _upperFinite(_colTypes[c]) )
                 {
                   if( _modUpper[c] >= _rationalPosInfty )
-                    _solver.changeUpper(c, RealParam(SoPlexBase<R>::INFTY));
+                    _solver.changeUpper(c, realParam(SoPlexBase<R>::INFTY));
                   else
                     _solver.changeUpper(c, R(_modUpper[c]));
                 }
@@ -970,7 +970,7 @@ void SoPlexBase<R>::_performOptIRStable(
                 {
                   _modUpper[c] *= primalScale;
                   if( _modUpper[c] >= _rationalPosInfty )
-                    _solver.changeUpper(c, RealParam(SoPlexBase<R>::INFTY));
+                    _solver.changeUpper(c, realParam(SoPlexBase<R>::INFTY));
                   else
                     _solver.changeUpper(c, R(_modUpper[c]));
                 }
@@ -993,7 +993,7 @@ void SoPlexBase<R>::_performOptIRStable(
               if( _upperFinite(_rowTypes[r]) )
                 {
                   if( _modRhs[r] >= _rationalPosInfty )
-                    _solver.changeRhs(r, RealParam(SoPlexBase<R>::INFTY));
+                    _solver.changeRhs(r, realParam(SoPlexBase<R>::INFTY));
                   else
                     _solver.changeRhs(r, R(_modRhs[r]));
                 }
@@ -1015,7 +1015,7 @@ void SoPlexBase<R>::_performOptIRStable(
                 {
                   _modRhs[r] *= primalScale;
                   if( _modRhs[r] >= _rationalPosInfty )
-                    _solver.changeRhs(r, RealParam(SoPlexBase<R>::INFTY));
+                    _solver.changeRhs(r, realParam(SoPlexBase<R>::INFTY));
                   else
                     _solver.changeRhs(r, R(_modRhs[r]));
                 }
@@ -1059,7 +1059,7 @@ void SoPlexBase<R>::_performOptIRStable(
       for( int c = numColsRational() - 1; c >= 0; c-- )
         {
           if( _modObj[c] >= _rationalPosInfty )
-            _solver.changeObj(c, RealParam(SoPlexBase<R>::INFTY));
+            _solver.changeObj(c, realParam(SoPlexBase<R>::INFTY));
           else if( _modObj[c] <= _rationalNegInfty )
             _solver.changeObj(c, -realParam(SoPlexBase<R>::INFTY));
           else
@@ -1077,7 +1077,7 @@ void SoPlexBase<R>::_performOptIRStable(
               if( newRowObj >= _rationalPosInfty )
                 _solver.changeRowObj(r, -realParam(SoPlexBase<R>::INFTY));
               else if( newRowObj <= _rationalNegInfty )
-                _solver.changeRowObj(r, RealParam(SoPlexBase<R>::INFTY));
+                _solver.changeRowObj(r, realParam(SoPlexBase<R>::INFTY));
               else
                 _solver.changeRowObj(r, -Real(newRowObj));
             }
