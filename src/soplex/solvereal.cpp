@@ -186,6 +186,7 @@ void SoPlex::_evaluateSolutionReal(SPxSimplifier::Result simplificationStatus)
       break;
 
    case SPxSolver::ABORT_CYCLING:
+
       // if preprocessing or scaling was applied, try to run again without to avoid cycling
       if(!_isRealLPLoaded || _isRealLPScaled)
       {

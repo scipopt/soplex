@@ -1228,10 +1228,12 @@ bool SPxLPBase<Real>::readLPF(
                   /* non-finite coefficients are not allowed */
                   if(sense == 0)
                      goto syntax_error;
+
                   val = LPFreadInfinity(pos) * pre_sign;
                }
                else
                   val = LPFreadValue(pos, spxout) * pre_sign;
+
                have_value = true;
 
                if(sense != 0)
