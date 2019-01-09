@@ -2339,8 +2339,9 @@ namespace soplex
   /* For Backwards compatibility */
   typedef SPxSolverBase<Real> SPxSolver;
 
-  // For general templated functions
+  // For general templated functions, that the linker needs to properly see.
   #include "spxsolver.hpp"
+  #include "changesoplex.hpp"
 
 } // namespace soplex
 #endif // _SPXSOLVER_H_
