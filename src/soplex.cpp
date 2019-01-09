@@ -212,6 +212,9 @@ template <>
 bool SoPlexBase<Real>::_parseSettingsLine(char* line, const int lineNumber);
 
 template <>
+void SoPlexBase<Real>::setTimings(const Timer::TYPE ttype);
+
+template <>
 bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames,
       DIdxSet* intVars);
 
@@ -565,6 +568,13 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<Real>::PRINTBASISMETRIC] = -1;
    upper[SoPlexBase<Real>::PRINTBASISMETRIC] = 3;
    defaultValue[SoPlexBase<Real>::PRINTBASISMETRIC] = -1;
+
+   /// measure time spent in solving steps, e.g. factorization time
+   name[SoPlexBase<Real>::STATTIMER] = "STATTIMER";
+   description[SoPlexBase<Real>::STATTIMER] = "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
+   lower[SoPlexBase<Real>::STATTIMER] = 0;
+   upper[SoPlexBase<Real>::STATTIMER] = 2;
+   defaultValue[SoPlexBase<Real>::STATTIMER] = 1;
 }
 
 template <class R>
@@ -6755,6 +6765,10 @@ bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const 
       _solver.setMetricInformation(value);
       break;
 
+   case STATTIMER:
+      setTimings((Timer::TYPE) value);
+      break;
+
    default:
       return false;
    }
@@ -7543,8 +7557,20 @@ bool SoPlexBase<Real>::parseSettingsString(char* string)
    return false;
 }
 
-
-
+/// set statistic timers to a certain type, used to turn off statistic time measurement
+template <>
+void SoPlexBase<Real>::setTimings(const Timer::TYPE ttype)
+{
+   _slufactor.changeTimer(ttype);
+   _statistics->readingTime = TimerFactory::switchTimer(_statistics->readingTime, ttype);
+   _statistics->simplexTime = TimerFactory::switchTimer(_statistics->simplexTime, ttype);
+   _statistics->syncTime = TimerFactory::switchTimer(_statistics->syncTime, ttype);
+   _statistics->solvingTime = TimerFactory::switchTimer(_statistics->solvingTime, ttype);
+   _statistics->preprocessingTime = TimerFactory::switchTimer(_statistics->preprocessingTime, ttype);
+   _statistics->rationalTime = TimerFactory::switchTimer(_statistics->rationalTime, ttype);
+   _statistics->transformTime = TimerFactory::switchTimer(_statistics->transformTime, ttype);
+   _statistics->reconstructionTime = TimerFactory::switchTimer(_statistics->reconstructionTime, ttype);
+}
 
 /// prints solution statistics
 template <>

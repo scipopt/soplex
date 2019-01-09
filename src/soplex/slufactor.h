@@ -277,6 +277,12 @@ public:
       factorCount = 0;
       solveCount = 0;
    }
+   void changeTimer(const Timer::TYPE ttype)
+   {
+      solveTime = TimerFactory::switchTimer(solveTime, ttype);
+      factorTime = TimerFactory::switchTimer(factorTime, ttype);
+      timerType = ttype;
+   }
    /// prints the LU factorization to stdout.
    void dump() const;
 

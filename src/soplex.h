@@ -1045,8 +1045,11 @@ public:
       /// print condition number during the solve
       PRINTBASISMETRIC = 28,
 
+      /// type of timer for statistics
+      STATTIMER = 29,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 29
+      INTPARAM_COUNT = 30
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1528,6 +1531,9 @@ public:
 
    //**@name Statistics */
    //@{
+
+   /// set statistic timers to a certain type
+   void setTimings(const Timer::TYPE ttype);
 
    /// prints solution statistics
    void printSolutionStatistics(std::ostream& os);
