@@ -254,15 +254,15 @@ namespace soplex
     SolutionPolish polishObj;   ///< objective of solution polishing
     Timer*         theTime;     ///< time spent in last call to method solve()
     Timer::TYPE    timerType;   ///< type of timer (user or wallclock)
-    Real           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
+    R           theCumulativeTime; ///< cumulative time spent in all calls to method solve()
     int            maxIters;    ///< maximum allowed iterations.
-    Real           maxTime;     ///< maximum allowed time.
+    R           maxTime;     ///< maximum allowed time.
     int            nClckSkipsLeft; ///< remaining number of times the clock can be safely skipped
     long           nCallsToTimelim; /// < the number of calls to the method isTimeLimitReached()
     R           objLimit;    ///< objective value limit.
     Status         m_status;    ///< status of algorithm.
 
-    Real           m_nonbasicValue;         ///< nonbasic part of current objective value
+    R           m_nonbasicValue;         ///< nonbasic part of current objective value
     bool           m_nonbasicValueUpToDate; ///< true, if the stored objValue is up to date
 
     R           m_pricingViol;             ///< maximal feasibility violation of current solution
@@ -296,20 +296,20 @@ namespace soplex
        (see spxsolve.cpp and leave.cpp) */
     int            instableLeaveNum;
     bool           instableLeave;
-    Real           instableLeaveVal;
+    R           instableLeaveVal;
 
     /* Store the id of an entering row or column if only an instable pivot has been found.
        instableEnter == true iff this instable basis change should be performed.
        (see spxsolve.cpp and enter.cpp) */
     SPxId          instableEnterId;
     bool           instableEnter;
-    Real           instableEnterVal;
+    R           instableEnterVal;
 
    bool           recomputedVectors;      ///< flag to perform clean up step to reduce numerical errors only once
 
     int            displayLine;
     int            displayFreq;
-    Real           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
+    R           sparsePricingFactor;    ///< enable sparse pricing when viols < factor * dim()
 
     bool           getStartingDecompBasis; ///< flag to indicate whether the simplex is solved to get the starting improved dual simplex basis
     bool           computeDegeneracy;
@@ -330,34 +330,34 @@ namespace soplex
     const SVSet*   thevectors;   ///< the LP vectors according to representation
     const SVSet*   thecovectors; ///< the LP coVectors according to representation
 
-    DVector        primRhs;     ///< rhs vector for computing the primal vector
+    DVectorBase<R>        primRhs;     ///< rhs VectorBase<R> for computing the primal vector
     UpdateVector   primVec;     ///< primal vector
-    DVector        dualRhs;     ///< rhs vector for computing the dual vector
+    DVectorBase<R>        dualRhs;     ///< rhs VectorBase<R> for computing the dual vector
     UpdateVector   dualVec;     ///< dual vector
     UpdateVector   addVec;      ///< storage for thePvec = &addVec
 
-    DVector        theURbound;  ///< Upper Row    Feasibility bound
-    DVector        theLRbound;  ///< Lower Row    Feasibility bound
-    DVector        theUCbound;  ///< Upper Column Feasibility bound
-    DVector        theLCbound;  ///< Lower Column Feasibility bound
+    DVectorBase<R>        theURbound;  ///< Upper Row    Feasibility bound
+    DVectorBase<R>        theLRbound;  ///< Lower Row    Feasibility bound
+    DVectorBase<R>        theUCbound;  ///< Upper Column Feasibility bound
+    DVectorBase<R>        theLCbound;  ///< Lower Column Feasibility bound
 
     /** In entering Simplex algorithm, the ratio test must ensure that all
      *  \em basic variables remain within their feasibility bounds. To give fast
      *  acces to them, the bounds of basic variables are copied into the
      *  following two vectors.
      */
-    DVector        theUBbound;  ///< Upper Basic Feasibility bound
-    DVector        theLBbound;  ///< Lower Basic Feasibility bound
+    DVectorBase<R>        theUBbound;  ///< Upper Basic Feasibility bound
+    DVectorBase<R>        theLBbound;  ///< Lower Basic Feasibility bound
 
     /** The values of the rhs corresponding to the current basis.*/
     DVector*       theFrhs;
     /** The values of all basis variables. */
     UpdateVector*  theFvec;
 
-    /* The Copricing rhs and vector */
+    /* The Copricing rhs and VectorBase<R> */
     DVector*       theCoPrhs;
     UpdateVector*  theCoPvec;
-    /** The pricing vector */
+    /** The pricing VectorBase<R> */
     UpdateVector*  thePvec;
 
     UpdateVector*  theRPvec;    ///< row pricing vector
@@ -371,8 +371,8 @@ namespace soplex
     DVector*       theCoLbound;    ///< Lower bound for covars
 
     // The following vectors serve for the virtualization of testing vectors
-    DVector        theCoTest;
-    DVector        theTest;
+    DVectorBase<R>        theCoTest;
+    DVectorBase<R>        theTest;
 
     DSVector       primalRay;      ///< stores primal ray in case of unboundedness
     DSVector       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
@@ -389,23 +389,23 @@ namespace soplex
     int            leaveCycles;      ///< the number of degenerate steps during the leaving algorithm
     int            enterDegenCand;   ///< the number of degenerate candidates in the entering algorithm
     int            leaveDegenCand;   ///< the number of degenerate candidates in the leaving algorithm
-    Real           primalDegenSum;   ///< the sum of the primal degeneracy percentage
-    Real           dualDegenSum;     ///< the sum of the dual degeneracy percentage
+    R           primalDegenSum;   ///< the sum of the primal degeneracy percentage
+    R           dualDegenSum;     ///< the sum of the dual degeneracy percentage
 
     SPxPricer<R>*      thepricer;
     SPxRatioTester<R>* theratiotester;
     SPxStarter<R>*     thestarter;
 
-   Real           boundrange;       ///< absolute range of all bounds in the problem
-   Real           siderange;        ///< absolute range of all side in the problem
-   Real           objrange;         ///< absolute range of all objective coefficients in the problem
+   R           boundrange;       ///< absolute range of all bounds in the problem
+   R           siderange;        ///< absolute range of all side in the problem
+   R           objrange;         ///< absolute range of all objective coefficients in the problem
     //@}
 
     //-----------------------------
     /**@name Precision */
     //@{
     /// is the solution precise enough, or should we increase delta() ?
-    virtual bool precisionReached(Real& newpricertol) const;
+    virtual bool precisionReached(R& newpricertol) const;
 
    /// determine ranges of problem values for bounds, sides and objective to assess numerical difficulties
    void calculateProblemRanges();
@@ -416,8 +416,8 @@ namespace soplex
     /// The random number generator used throughout the whole computation. Its seed can be modified.
     Random random;
 
-    /** For the leaving Simplex algorithm this vector contains the indices of infeasible basic variables;
-     *  for the entering Simplex algorithm this vector contains the indices of infeasible slack variables.
+    /** For the leaving Simplex algorithm this VectorBase<R> contains the indices of infeasible basic variables;
+     *  for the entering Simplex algorithm this VectorBase<R> contains the indices of infeasible slack variables.
      */
     DIdxSet infeasibilities;
     /**For the entering Simplex algorithm these vectors contains the indices of infeasible basic variables.
@@ -447,8 +447,8 @@ namespace soplex
     int      remainingRoundsEnterCo;
 
     /// dual pricing norms
-    DVector     weights;                ///< store dual norms
-    DVector     coWeights;              ///< store dual norms
+    DVectorBase<R>     weights;                ///< store dual norms
+    DVectorBase<R>     coWeights;              ///< store dual norms
     bool        weightsAreSetup;        ///< are the dual norms already set up?
 
     SPxOut* spxout;                     ///< message handler
@@ -463,19 +463,19 @@ namespace soplex
     }
 
     /// set refactor threshold for nonzeros in last factorized basis matrix compared to updated basis matrix
-    void setNonzeroFactor( Real f )
+    void setNonzeroFactor( R f )
     {
       SPxBasisBase<R>::nonzeroFactor = f;
     }
 
     /// set refactor threshold for fill-in in current factor update compared to fill-in in last factorization
-    void setFillFactor( Real f )
+    void setFillFactor( R f )
     {
       SPxBasisBase<R>::fillFactor = f;
     }
 
     /// set refactor threshold for memory growth in current factor update compared to the last factorization
-    void setMemFactor( Real f )
+    void setMemFactor( R f )
     {
       SPxBasisBase<R>::memFactor = f;
     }
@@ -649,12 +649,12 @@ namespace soplex
     /**@return Objective value of the current solution vector
      *         (see #getPrimalSol()).
      */
-    virtual Real value();
+    virtual R value();
 
     // update nonbasic part of the objective value by the given amount
     /**@return whether nonbasic part of objective is reliable
      */
-    bool updateNonbasicValue(Real objChange);
+    bool updateNonbasicValue(R objChange);
 
     // trigger a recomputation of the nonbasic part of the objective value
     void forceRecompNonbasicValue()
@@ -663,39 +663,39 @@ namespace soplex
       m_nonbasicValueUpToDate = false;
     }
 
-    /// get solution vector for primal variables.
+    /// get solution VectorBase<R> for primal variables.
     /** This method returns the Status of the basis.
      *  If it is #REGULAR or better,
-     *  the primal solution vector of the current basis will be copied
-     *  to the argument \p vector. Hence, \p vector must be of dimension
+     *  the primal solution VectorBase<R> of the current basis will be copied
+     *  to the argument \p vector. Hence, \p VectorBase<R> must be of dimension
      *  #nCols().
      *
      *  @throw SPxStatusException if not initialized
      */
     virtual Status getPrimalSol(Vector& vector) const;
 
-    /// get vector of slack variables.
+    /// get VectorBase<R> of slack variables.
     /** This method returns the Status of the basis.
      *  If it is #REGULAR or better,
      *  the slack variables of the current basis will be copied
-     *  to the argument \p vector. Hence, \p vector must be of dimension
+     *  to the argument \p vector. Hence, \p VectorBase<R> must be of dimension
      *  #nRows().
      *
      *  @warning Because SPxSolverBase supports range constraints as its
      *     default, slack variables are defined in a nonstandard way:
-     *     Let \em x be the current solution vector and \em A the constraint
-     *     matrix. Then the vector of slack variables is defined as
+     *     Let \em x be the current solution VectorBase<R> and \em A the constraint
+     *     matrix. Then the VectorBase<R> of slack variables is defined as
      *     \f$s = Ax\f$.
      *
      *  @throw SPxStatusException if no problem loaded
      */
     virtual Status getSlacks (Vector& vector) const;
 
-    /// get current solution vector for dual variables.
+    /// get current solution VectorBase<R> for dual variables.
     /** This method returns the Status of the basis.
      *  If it is #REGULAR or better,
-     *  the vector of dual variables of the current basis will be copied
-     *  to the argument \p vector. Hence, \p vector must be of dimension
+     *  the VectorBase<R> of dual variables of the current basis will be copied
+     *  to the argument \p vector. Hence, \p VectorBase<R> must be of dimension
      *  #nRows().
      *
      *  @warning Even though mathematically, each range constraint would
@@ -719,14 +719,14 @@ namespace soplex
      */
     virtual Status getDualSol(Vector& vector) const;
 
-    /// get vector of reduced costs.
+    /// get VectorBase<R> of reduced costs.
     /** This method returns the Status of the basis.
      *  If it is #REGULAR or better,
-     *  the vector of reduced costs of the current basis will be copied
-     *  to the argument \p vector. Hence, \p vector must be of dimension
+     *  the VectorBase<R> of reduced costs of the current basis will be copied
+     *  to the argument \p vector. Hence, \p VectorBase<R> must be of dimension
      *  #nCols().
      *
-     *  Let \em d denote the vector of dual variables, as defined above,
+     *  Let \em d denote the VectorBase<R> of dual variables, as defined above,
      *  and \em A the LPs constraint matrix. Then the reduced cost vector
      *  \em r is defined as \f$r^T = c^T - d^TA\f$.
      *
@@ -771,26 +771,26 @@ namespace soplex
     /** if you want another value for epsilon, use
      * \ref soplex::Param<R>::setEpsilon() "Param<R>::setEpsilon()".
      */
-    Real epsilon() const
+    R epsilon() const
     {
       return primVec.delta().getEpsilon();
     }
     /// feasibility tolerance maintained by ratio test during ENTER algorithm.
-    Real entertol() const
+    R entertol() const
     {
       assert(m_entertol > 0.0);
 
       return m_entertol;
     }
     /// feasibility tolerance maintained by ratio test during LEAVE algorithm.
-    Real leavetol() const
+    R leavetol() const
     {
       assert(m_leavetol > 0.0);
 
       return m_leavetol;
     }
     /// allowed primal feasibility tolerance.
-    Real feastol() const
+    R feastol() const
     {
       assert(m_entertol > 0.0);
       assert(m_leavetol > 0.0);
@@ -806,7 +806,7 @@ namespace soplex
       return theRep == COLUMN ? m_leavetol : m_entertol;
     }
     /// guaranteed primal and dual bound violation for optimal solution, returning the maximum of feastol() and opttol(), i.e., the less tight tolerance.
-    Real delta() const
+    R delta() const
     {
       assert(m_entertol > 0.0);
       assert(m_leavetol > 0.0);
@@ -851,7 +851,7 @@ namespace soplex
     }
 
     // enable sparse pricing when viols < fac * dim()
-    void setSparsePricingFactor(Real fac)
+    void setSparsePricingFactor(R fac)
     {
       sparsePricingFactor = fac;
     }
@@ -885,7 +885,7 @@ namespace soplex
       fullPerturbation = full;
     }
 
-   virtual Real getBasisMetric(int type)
+   virtual R getBasisMetric(int type)
     {
       return basis().getMatrixMetric(type);
     }
@@ -937,106 +937,106 @@ namespace soplex
     /// \p scale determines whether the new data needs to be scaled according to the existing LP (persistent scaling)
     //@{
     ///
-    virtual void changeObj(const Vector& newObj, bool scale = false);
+    virtual void changeObj(const VectorBase<R>& newObj, bool scale = false);
     ///
-    virtual void changeObj(int i, const Real& newVal, bool scale = false);
+    virtual void changeObj(int i, const R& newVal, bool scale = false);
     ///
     using SPxLPBase<R>::changeObj; /// overloading a virtual function
-    virtual void changeObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
+    virtual void changeObj(SPxColId p_id, const R& p_newVal, bool scale = false)
     {
       changeObj(this->number(p_id), p_newVal, scale);
     }
     ///
-    virtual void changeMaxObj(const Vector& newObj, bool scale = false);
+    virtual void changeMaxObj(const VectorBase<R>& newObj, bool scale = false);
     ///
-    virtual void changeMaxObj(int i, const Real& newVal, bool scale = false);
+    virtual void changeMaxObj(int i, const R& newVal, bool scale = false);
     ///
     using SPxLPBase<R>::changeMaxObj; /// overloading a virtual function
-    virtual void changeMaxObj(SPxColId p_id, const Real& p_newVal, bool scale = false)
+    virtual void changeMaxObj(SPxColId p_id, const R& p_newVal, bool scale = false)
     {
       changeMaxObj(this->number(p_id), p_newVal, scale);
     }
     ///
-    virtual void changeRowObj(const Vector& newObj, bool scale = false);
+    virtual void changeRowObj(const VectorBase<R>& newObj, bool scale = false);
     ///
-    virtual void changeRowObj(int i, const Real& newVal, bool scale = false);
+    virtual void changeRowObj(int i, const R& newVal, bool scale = false);
     ///
     using SPxLPBase<R>::changeRowObj;
-    virtual void changeRowObj(SPxRowId p_id, const Real& p_newVal, bool scale = false)
+    virtual void changeRowObj(SPxRowId p_id, const R& p_newVal, bool scale = false)
     {
       changeRowObj(this->number(p_id), p_newVal);
     }
     ///
     virtual void clearRowObjs()
     {
-      SPxLP::clearRowObjs();
+      SPxLPBase<R>::clearRowObjs();
       unInit();
     }
     ///
-    virtual void changeLowerStatus(int i, Real newLower, Real oldLower = 0.0);
+    virtual void changeLowerStatus(int i, R newLower, R oldLower = 0.0);
     ///
-    virtual void changeLower(const Vector& newLower, bool scale = false);
+    virtual void changeLower(const VectorBase<R>& newLower, bool scale = false);
     ///
     virtual void changeLower(int i, const R& newLower, bool scale = false);
     ///
     using SPxLPBase<R>::changeLower;
-    virtual void changeLower(SPxColId p_id, const Real& p_newLower, bool scale = false)
+    virtual void changeLower(SPxColId p_id, const R& p_newLower, bool scale = false)
     {
       changeLower(this->number(p_id), p_newLower, scale);
     }
     ///
-    virtual void changeUpperStatus(int i, Real newUpper, Real oldLower = 0.0);
+    virtual void changeUpperStatus(int i, R newUpper, R oldLower = 0.0);
     ///
-    virtual void changeUpper(const Vector& newUpper, bool scale = false);
+    virtual void changeUpper(const VectorBase<R>& newUpper, bool scale = false);
     ///
-    virtual void changeUpper(int i, const Real& newUpper, bool scale = false);
+    virtual void changeUpper(int i, const R& newUpper, bool scale = false);
     ///
     using SPxLPBase<R>::changeUpper; /// overloading virtual function
-    virtual void changeUpper(SPxColId p_id, const Real& p_newUpper, bool scale = false)
+    virtual void changeUpper(SPxColId p_id, const R& p_newUpper, bool scale = false)
     {
       changeUpper(this->number(p_id), p_newUpper, scale);
     }
     ///
-    virtual void changeBounds(const Vector& newLower, const Vector& newUpper, bool scale = false);
+    virtual void changeBounds(const VectorBase<R>& newLower, const VectorBase<R>& newUpper, bool scale = false);
     ///
-    virtual void changeBounds(int i, const Real& newLower, const Real& newUpper, bool scale = false);
+    virtual void changeBounds(int i, const R& newLower, const R& newUpper, bool scale = false);
     ///
     using SPxLPBase<R>::changeBounds;
-    virtual void changeBounds(SPxColId p_id, const Real& p_newLower, const Real& p_newUpper, bool scale = false)
+    virtual void changeBounds(SPxColId p_id, const R& p_newLower, const R& p_newUpper, bool scale = false)
     {
       changeBounds(this->number(p_id), p_newLower, p_newUpper, scale);
     }
     ///
-    virtual void changeLhsStatus(int i, Real newLhs, Real oldLhs = 0.0);
+    virtual void changeLhsStatus(int i, R newLhs, R oldLhs = 0.0);
     ///
-    virtual void changeLhs(const Vector& newLhs, bool scale = false);
+    virtual void changeLhs(const VectorBase<R>& newLhs, bool scale = false);
     ///
-    virtual void changeLhs(int i, const Real& newLhs, bool scale = false);
+    virtual void changeLhs(int i, const R& newLhs, bool scale = false);
     ///
     using SPxLPBase<R>::changeLhs;
-    virtual void changeLhs(SPxRowId p_id, const Real& p_newLhs, bool scale = false)
+    virtual void changeLhs(SPxRowId p_id, const R& p_newLhs, bool scale = false)
     {
       changeLhs(this->number(p_id), p_newLhs, scale);
     }
     ///
-    virtual void changeRhsStatus(int i, Real newRhs, Real oldRhs = 0.0);
+    virtual void changeRhsStatus(int i, R newRhs, R oldRhs = 0.0);
     ///
-    virtual void changeRhs(const Vector& newRhs, bool scale = false);
+    virtual void changeRhs(const VectorBase<R>& newRhs, bool scale = false);
     ///
-    virtual void changeRhs(int i, const Real& newRhs, bool scale = false);
+    virtual void changeRhs(int i, const R& newRhs, bool scale = false);
     ///
     using SPxLPBase<R>::changeRhs;
-    virtual void changeRhs(SPxRowId p_id, const Real& p_newRhs, bool scale = false)
+    virtual void changeRhs(SPxRowId p_id, const R& p_newRhs, bool scale = false)
     {
       changeRhs(this->number(p_id), p_newRhs, scale);
     }
     ///
-    virtual void changeRange(const Vector& newLhs, const Vector& newRhs, bool scale = false);
+    virtual void changeRange(const VectorBase<R>& newLhs, const VectorBase<R>& newRhs, bool scale = false);
     ///
-    virtual void changeRange(int i, const Real& newLhs, const Real& newRhs, bool scale = false);
+    virtual void changeRange(int i, const R& newLhs, const R& newRhs, bool scale = false);
     ///
     using SPxLPBase<R>::changeRange;
-    virtual void changeRange(SPxRowId p_id, const Real& p_newLhs, const Real& p_newRhs, bool scale = false)
+    virtual void changeRange(SPxRowId p_id, const R& p_newLhs, const R& p_newRhs, bool scale = false)
     {
       changeRange(this->number(p_id), p_newLhs, p_newRhs, scale);
     }
@@ -1057,10 +1057,10 @@ namespace soplex
       changeCol(this->number(p_id), p_newCol, scale);
     }
     ///
-    virtual void changeElement(int i, int j, const Real& val, bool scale = false);
+    virtual void changeElement(int i, int j, const R& val, bool scale = false);
     ///
     using SPxLPBase<R>::changeElement;
-    virtual void changeElement(SPxRowId rid, SPxColId cid, const Real& val, bool scale = false)
+    virtual void changeElement(SPxRowId rid, SPxColId cid, const R& val, bool scale = false)
     {
       changeElement(this->number(rid), this->number(cid), val, scale);
     }
@@ -1099,12 +1099,12 @@ namespace soplex
     {
       if (rep() == ROW)
         {
-          SPxRowId rid = SPxLP::rId(i);
+          SPxRowId rid = SPxLPBase<R>::rId(i);
           return SPxId(rid);
         }
       else
         {
-          SPxColId cid = SPxLP::cId(i);
+          SPxColId cid = SPxLPBase<R>::cId(i);
           return SPxId(cid);
         }
     }
@@ -1118,12 +1118,12 @@ namespace soplex
     {
       if (rep() == ROW)
         {
-          SPxColId cid = SPxLP::cId(i);
+          SPxColId cid = SPxLPBase<R>::cId(i);
           return SPxId(cid);
         }
       else
         {
-          SPxRowId rid = SPxLP::rId(i);
+          SPxRowId rid = SPxLPBase<R>::rId(i);
           return SPxId(rid);
         }
     }
@@ -1151,7 +1151,7 @@ namespace soplex
     /**@name Vectors and Covectors */
     //@{
     /// \p i 'th vector.
-    /**@return a reference to the \p i 'th, 0 <= i < #coDim(), vector of
+    /**@return a reference to the \p i 'th, 0 <= i < #coDim(), VectorBase<R> of
      *         the loaded LP (with respect to the chosen representation).
      */
     const SVector& vector(int i) const
@@ -1176,11 +1176,11 @@ namespace soplex
         : static_cast<const SVector&>(unitVecs[this->number(cid)]);
     }
 
-    /// vector associated to \p p_id.
-    /**@return Returns a reference to the vector of the loaded LP corresponding
+    /// VectorBase<R> associated to \p p_id.
+    /**@return Returns a reference to the VectorBase<R> of the loaded LP corresponding
      *  to \p id (with respect to the chosen representation). If \p p_id is
-     *  an id, a vector of the constraint matrix is returned, otherwise
-     *  the corresponding unit vector (of the slack variable or bound
+     *  an id, a VectorBase<R> of the constraint matrix is returned, otherwise
+     *  the corresponding unit VectorBase<R> (of the slack variable or bound
      *  inequality) is returned.
      *  @todo The implementation does not exactly look like it will do
      *        what is promised in the describtion.
@@ -1222,7 +1222,7 @@ namespace soplex
     /**@return a reference to the covector of the loaded LP
      *  corresponding to \p p_id (with respect to the chosen
      *  representation). If \p p_id is a coid, a covector of the constraint
-     *  matrix is returned, otherwise the corresponding unit vector is
+     *  matrix is returned, otherwise the corresponding unit VectorBase<R> is
      *  returned.
      */
     const SVector& coVector(const SPxId& p_id) const
@@ -1244,7 +1244,7 @@ namespace soplex
      *  The Simplex basis assigns a \ref soplex::SPxBasisBase<R>::Desc::Status
      *  "Status" to each variable and covariable. Depending on the
      *  representation, the status indicates that the corresponding
-     *  vector is in the basis matrix or not.
+     *  VectorBase<R> is in the basis matrix or not.
      */
     //@{
     /// Status of \p i 'th variable.
@@ -1265,7 +1265,7 @@ namespace soplex
       return (stat * rep() > 0);
     }
 
-    /// is the \p p_id 'th vector basic ?
+    /// is the \p p_id 'th VectorBase<R> basic ?
     bool isBasic(const SPxId& p_id) const
     {
       assert(p_id.isValid());
@@ -1274,31 +1274,31 @@ namespace soplex
         : isBasic(SPxColId(p_id));
     }
 
-    /// is the \p rid 'th vector basic ?
+    /// is the \p rid 'th VectorBase<R> basic ?
     bool isBasic(const SPxRowId& rid) const
     {
       return isBasic(this->desc().rowStatus(this->number(rid)));
     }
 
-    /// is the \p cid 'th vector basic ?
+    /// is the \p cid 'th VectorBase<R> basic ?
     bool isBasic(const SPxColId& cid) const
     {
       return isBasic(this->desc().colStatus(this->number(cid)));
     }
 
-    /// is the \p i 'th row vector basic ?
+    /// is the \p i 'th row VectorBase<R> basic ?
     bool isRowBasic(int i) const
     {
       return isBasic(this->desc().rowStatus(i));
     }
 
-    /// is the \p i 'th column vector basic ?
+    /// is the \p i 'th column VectorBase<R> basic ?
     bool isColBasic(int i) const
     {
       return isBasic(this->desc().colStatus(i));
     }
 
-    /// is the \p i 'th vector basic ?
+    /// is the \p i 'th VectorBase<R> basic ?
     bool isBasic(int i) const
     {
       return isBasic(this->desc().status(i));
@@ -1314,7 +1314,7 @@ namespace soplex
     /// feasibility vector.
     /** This method return the \em feasibility vector. If it satisfies its
      *  bound, the basis is called feasible (independently of the chosen
-     *  representation). The feasibility vector has dimension #dim().
+     *  representation). The feasibility VectorBase<R> has dimension #dim().
      *
      *  For the entering Simplex, #fVec is kept within its bounds. In
      *  contrast to this, the pricing of the leaving Simplex selects an
@@ -1324,21 +1324,21 @@ namespace soplex
       {
         return *theFvec;
       }
-    /// right-hand side vector for \ref soplex::SPxSolverBase<R>::fVec "fVec"
-    /** The feasibility vector is computed by solving a linear system with the
-     *  basis matrix. The right-hand side vector of this system is referred
-     *  to as \em feasibility, \em right-hand \em side \em vector #fRhs().
+    /// right-hand side VectorBase<R> for \ref soplex::SPxSolverBase<R>::fVec "fVec"
+    /** The feasibility VectorBase<R> is computed by solving a linear system with the
+     *  basis matrix. The right-hand side VectorBase<R> of this system is referred
+     *  to as \em feasibility, \em right-hand \em side \em VectorBase<R> #fRhs().
      *
-     *  For a row basis, #fRhs() is the objective vector (ignoring shifts).
+     *  For a row basis, #fRhs() is the objective VectorBase<R> (ignoring shifts).
      *  For a column basis, it is the sum of all nonbasic vectors scaled by
      *  the factor of their bound.
      */
-    const Vector& fRhs() const
+    const VectorBase<R>& fRhs() const
     {
       return *theFrhs;
     }
     /// upper bound for \ref soplex::SPxSolverBase<R>::fVec "fVec".
-    const Vector& ubBound() const
+    const VectorBase<R>& ubBound() const
     {
       return theUBbound;
     }
@@ -1346,17 +1346,17 @@ namespace soplex
     /** This method returns the upper bound for the feasibility vector.
      *  It may only be called for the #ENTER%ing Simplex.
      *
-     *  For the #ENTER%ing Simplex algorithms, the feasibility vector is
+     *  For the #ENTER%ing Simplex algorithms, the feasibility VectorBase<R> is
      *  maintained to fullfill its bounds. As #fVec itself, also its
      *  bounds depend on the chosen representation. Further, they may
      *  need to be shifted (see below).
      */
-    Vector& ubBound()
+    VectorBase<R>& ubBound()
       {
         return theUBbound;
       }
     /// lower bound for \ref soplex::SPxSolverBase<R>::fVec "fVec".
-    const Vector& lbBound() const
+    const VectorBase<R>& lbBound() const
     {
       return theLBbound;
     }
@@ -1364,12 +1364,12 @@ namespace soplex
     /** This method returns the lower bound for the feasibility vector.
      *  It may only be called for the #ENTER%ing Simplex.
      *
-     *  For the #ENTER%ing Simplex algorithms, the feasibility vector is
+     *  For the #ENTER%ing Simplex algorithms, the feasibility VectorBase<R> is
      *  maintained to fullfill its bounds. As #fVec itself, also its
      *  bound depend on the chosen representation. Further, they may
      *  need to be shifted (see below).
      */
-    Vector& lbBound()
+    VectorBase<R>& lbBound()
       {
         return theLBbound;
       }
@@ -1378,18 +1378,18 @@ namespace soplex
     /** For the leaving Simplex algorithm, pricing involves selecting a
      *  variable from #fVec that violates its bounds that is to leave
      *  the basis. When a SPxPricer is called to select such a
-     *  leaving variable, #fTest() contains the vector of violations:
+     *  leaving variable, #fTest() contains the VectorBase<R> of violations:
      *  For #fTest()[i] < 0, the \c i 'th basic variable violates one of
      *  its bounds by the given value. Otherwise no bound is violated.
      */
-    const Vector& fTest() const
+    const VectorBase<R>& fTest() const
     {
       assert(type() == LEAVE);
       return theCoTest;
     }
 
     /// copricing vector.
-    /** The copricing vector #coPvec along with the pricing vector
+    /** The copricing VectorBase<R> #coPvec along with the pricing vector
      *  #pVec are used for pricing in the #ENTER%ing Simplex algorithm,
      *  i.e. one variable is selected, that violates its bounds. In
      *  contrast to this, the #LEAVE%ing Simplex algorithm keeps both
@@ -1400,21 +1400,21 @@ namespace soplex
         return *theCoPvec;
       }
 
-    /// Right-hand side vector for \ref soplex::SPxSolverBase<R>::coPvec "coPvec".
-    /** The vector #coPvec is computed by solving a linear system with the
+    /// Right-hand side VectorBase<R> for \ref soplex::SPxSolverBase<R>::coPvec "coPvec".
+    /** The VectorBase<R> #coPvec is computed by solving a linear system with the
      *  basis matrix and #coPrhs as the right-hand side vector. For
      *  column basis representation, #coPrhs is build up of the
-     *  objective vector elements of all basic variables. For a row
+     *  objective VectorBase<R> elements of all basic variables. For a row
      *  basis, it consists of the tight bounds of all basic
      *  constraints.
      */
-    const Vector& coPrhs() const
+    const VectorBase<R>& coPrhs() const
     {
       return *theCoPrhs;
     }
 
     ///
-    const Vector& ucBound() const
+    const VectorBase<R>& ucBound() const
     {
       assert(theType == LEAVE);
       return *theCoUbound;
@@ -1428,14 +1428,14 @@ namespace soplex
      *  on the chosen representation. Further, they may need to be
      *  shifted (see below).
      */
-    Vector& ucBound()
+    VectorBase<R>& ucBound()
       {
         assert(theType == LEAVE);
         return *theCoUbound;
       }
 
     ///
-    const Vector& lcBound() const
+    const VectorBase<R>& lcBound() const
     {
       assert(theType == LEAVE);
       return *theCoLbound;
@@ -1449,7 +1449,7 @@ namespace soplex
      *  on the chosen representation. Further, they may need to be
      *  shifted (see below).
      */
-    Vector& lcBound()
+    VectorBase<R>& lcBound()
       {
         assert(theType == LEAVE);
         return *theCoLbound;
@@ -1462,17 +1462,17 @@ namespace soplex
      *  value. That is, if #coTest()[i] < 0, the \p i 'th element of #coPvec()
      *  is violated by -#coTest()[i].
      */
-    const Vector& coTest() const
+    const VectorBase<R>& coTest() const
     {
       assert(type() == ENTER);
       return theCoTest;
     }
     /// pricing vector.
-    /** The pricing vector #pVec is the product of #coPvec with the
+    /** The pricing VectorBase<R> #pVec is the product of #coPvec with the
      *  constraint matrix. As #coPvec, also #pVec is maintained within
      *  its bound for the leaving Simplex algorithm, while the bounds
      *  are tested for the entering Simplex. #pVec is of dimension
-     *  #coDim(). Vector #pVec() is only up to date for #LEAVE%ing
+     *  #coDim(). VectorBase<R> #pVec() is only up to date for #LEAVE%ing
      *  Simplex or #FULL pricing in #ENTER%ing Simplex.
      */
     UpdateVector& pVec() const
@@ -1480,7 +1480,7 @@ namespace soplex
         return *thePvec;
       }
     ///
-    const Vector& upBound() const
+    const VectorBase<R>& upBound() const
     {
       assert(theType == LEAVE);
       return *theUbound;
@@ -1494,14 +1494,14 @@ namespace soplex
      *  on the chosen representation. Further, they may need to be
      *  shifted (see below).
      */
-    Vector& upBound()
+    VectorBase<R>& upBound()
       {
         assert(theType == LEAVE);
         return *theUbound;
       }
 
     ///
-    const Vector& lpBound() const
+    const VectorBase<R>& lpBound() const
     {
       assert(theType == LEAVE);
       return *theLbound;
@@ -1515,7 +1515,7 @@ namespace soplex
      *  on the chosen representation. Further, they may need to be
      *  shifted (see below).
      */
-    Vector& lpBound()
+    VectorBase<R>& lpBound()
       {
         assert(theType == LEAVE);
         return *theLbound;
@@ -1523,24 +1523,24 @@ namespace soplex
 
     /// Violations of \ref soplex::SPxSolverBase<R>::pVec "pVec".
     /** In entering Simplex pricing selects checks vectors #coPvec()
-     *  and #pVec() for violation of its bounds. Vector #test()
+     *  and #pVec() for violation of its bounds. VectorBase<R> #test()
      *  contains the violations for #pVec(), i.e., if #test()[i] < 0,
      *  the i'th element of #pVec() is violated by #test()[i].
-     *  Vector #test() is only up to date for #FULL pricing.
+     *  VectorBase<R> #test() is only up to date for #FULL pricing.
      */
-    const Vector& test() const
+    const VectorBase<R>& test() const
     {
       assert(type() == ENTER);
       return theTest;
     }
 
     /// compute and return \ref soplex::SPxSolverBase<R>::pVec() "pVec()"[i].
-    Real computePvec(int i);
+    R computePvec(int i);
     /// compute entire \ref soplex::SPxSolverBase<R>::pVec() "pVec()".
     void computePvec();
     /// compute and return \ref soplex::SPxSolverBase<R>::test() "test()"[i] in \ref soplex::SPxSolverBase<R>::ENTER "ENTER"ing Simplex.
-    Real computeTest(int i);
-    /// compute test vector in \ref soplex::SPxSolverBase<R>::ENTER "ENTER"ing Simplex.
+    R computeTest(int i);
+    /// compute test VectorBase<R> in \ref soplex::SPxSolverBase<R>::ENTER "ENTER"ing Simplex.
     void computeTest();
 
     //------------------------------------
@@ -1548,7 +1548,7 @@ namespace soplex
      *  The task of the ratio test (implemented in SPxRatioTester classes)
      *  is to select a variable for the basis update, such that the basis
      *  remains priced (i.e. both, the pricing and copricing vectors satisfy
-     *  their bounds) or feasible (i.e. the feasibility vector satisfies its
+     *  their bounds) or feasible (i.e. the feasibility VectorBase<R> satisfies its
      *  bounds). However, this can lead to numerically instable basis matrices
      *  or -- after accumulation of various errors -- even to a singular basis
      *  matrix.
@@ -1573,7 +1573,7 @@ namespace soplex
     void shiftPvec();
 
    /// shift \p i 'th \ref soplex::SPxSolver::ubBound "ubBound" to \p to.
-    void shiftUBbound(int i, Real to)
+    void shiftUBbound(int i, R to)
     {
       assert(theType == ENTER);
       // use maximum to not count tightened bounds in case of equality shifts
@@ -1581,7 +1581,7 @@ namespace soplex
       theUBbound[i] = to;
     }
    /// shift \p i 'th \ref soplex::SPxSolver::lbBound "lbBound" to \p to.
-    void shiftLBbound(int i, Real to)
+    void shiftLBbound(int i, R to)
     {
       assert(theType == ENTER);
       // use maximum to not count tightened bounds in case of equality shifts
@@ -1589,7 +1589,7 @@ namespace soplex
       theLBbound[i] = to;
     }
    /// shift \p i 'th \ref soplex::SPxSolver::upBound "upBound" to \p to.
-    void shiftUPbound(int i, Real to)
+    void shiftUPbound(int i, R to)
     {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
@@ -1597,7 +1597,7 @@ namespace soplex
       (*theUbound)[i] = to;
     }
    /// shift \p i 'th \ref soplex::SPxSolver::lpBound "lpBound" to \p to.
-    void shiftLPbound(int i, Real to)
+    void shiftLPbound(int i, R to)
     {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
@@ -1605,7 +1605,7 @@ namespace soplex
       (*theLbound)[i] = to;
     }
    /// shift \p i 'th \ref soplex::SPxSolver::ucBound "ucBound" to \p to.
-    void shiftUCbound(int i, Real to)
+    void shiftUCbound(int i, R to)
     {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
@@ -1613,7 +1613,7 @@ namespace soplex
       (*theCoUbound)[i] = to;
     }
    /// shift \p i 'th \ref soplex::SPxSolver::lcBound "lcBound" to \p to.
-    void shiftLCbound(int i, Real to)
+    void shiftLCbound(int i, R to)
     {
       assert(theType == LEAVE);
       // use maximum to not count tightened bounds in case of equality shifts
@@ -1624,7 +1624,7 @@ namespace soplex
     void testBounds() const;
 
     /// total current shift amount.
-    virtual Real shift() const
+    virtual R shift() const
     {
       return theShift;
     }
@@ -1632,13 +1632,13 @@ namespace soplex
     virtual void unShift(void);
 
     /// get violation of constraints.
-    virtual void qualConstraintViolation(Real& maxviol, Real& sumviol) const;
+    virtual void qualConstraintViolation(R& maxviol, R& sumviol) const;
     /// get violations of bounds.
-    virtual void qualBoundViolation(Real& maxviol, Real& sumviol) const;
+    virtual void qualBoundViolation(R& maxviol, R& sumviol) const;
     /// get the residuum |Ax-b|.
-    virtual void qualSlackViolation(Real& maxviol, Real& sumviol) const;
+    virtual void qualSlackViolation(R& maxviol, R& sumviol) const;
     /// get violation of optimality criterion.
-    virtual void qualRedCostViolation(Real& maxviol, Real& sumviol) const;
+    virtual void qualRedCostViolation(R& maxviol, R& sumviol) const;
     //@}
 
   private:
@@ -1648,19 +1648,19 @@ namespace soplex
     //@{
     ///
     void perturbMin(
-                    const UpdateVector& vec, Vector& low, Vector& up, Real eps, Real delta,
+                    const UpdateVector& vec, VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     int start = 0, int incr = 1);
     ///
     void perturbMax(
-                    const UpdateVector& vec, Vector& low, Vector& up, Real eps, Real delta,
+                    const UpdateVector& vec, VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     int start = 0, int incr = 1);
     ///
-    Real perturbMin(const UpdateVector& uvec,
-                    Vector& low, Vector& up, Real eps, Real delta,
+    R perturbMin(const UpdateVector& uvec,
+                    VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
     ///
-    Real perturbMax(const UpdateVector& uvec,
-                    Vector& low, Vector& up, Real eps, Real delta,
+    R perturbMax(const UpdateVector& uvec,
+                    VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
     //@}
 
@@ -1684,7 +1684,7 @@ namespace soplex
     //@{
   public:
     /// Setup vectors to be solved within Simplex loop.
-    /** Load vector \p y to be #solve%d with the basis matrix during the
+    /** Load VectorBase<R> \p y to be #solve%d with the basis matrix during the
      *  #LEAVE Simplex. The system will be solved after #SPxSolverBase%'s call
      *  to SPxRatioTester.  The system will be solved along with
      *  another system. Solving two linear system at a time has
@@ -1698,7 +1698,7 @@ namespace soplex
       solveVector2rhs = p_rhs;
     }
     /// Setup vectors to be solved within Simplex loop.
-    /** Load a second additional vector \p y2 to be #solve%d with the
+    /** Load a second additional VectorBase<R> \p y2 to be #solve%d with the
      *  basis matrix during the #LEAVE Simplex. The system will be
      *  solved after #SPxSolverBase%'s call to SPxRatioTester.
      *  The system will be solved along with at least one
@@ -1712,7 +1712,7 @@ namespace soplex
       solveVector3rhs = p_rhs2;
     }
     /// Setup vectors to be cosolved within Simplex loop.
-    /** Load vector \p y to be #coSolve%d with the basis matrix during
+    /** Load VectorBase<R> \p y to be #coSolve%d with the basis matrix during
      *  the #ENTER Simplex. The system will be solved after #SPxSolverBase%'s
      *  call to SPxRatioTester.  The system will be solved along
      *  with another system. Solving two linear system at a time has
@@ -1726,7 +1726,7 @@ namespace soplex
       coSolveVector2rhs = p_rhs;
     }
     /// Setup vectors to be cosolved within Simplex loop.
-    /** Load a second vector \p z to be #coSolve%d with the basis matrix during
+    /** Load a second VectorBase<R> \p z to be #coSolve%d with the basis matrix during
      *  the #ENTER Simplex. The system will be solved after #SPxSolverBase%'s
      *  call to SPxRatioTester. The system will be solved along
      *  with two other systems.
@@ -1745,12 +1745,12 @@ namespace soplex
      *  basis, this must be checked before terminating with an optimal
      *  solution.
      */
-    virtual Real maxInfeas() const;
+    virtual R maxInfeas() const;
 
     /// check for violations above tol and immediately return false w/o checking the remaining values
     /** This method is useful for verifying whether an objective limit can be used as termination criterion
      */
-    virtual bool noViols(Real tol) const;
+    virtual bool noViols(R tol) const;
 
     /// Return current basis.
     /**@note The basis can be used to solve linear systems or use
@@ -1797,14 +1797,14 @@ namespace soplex
     bool enter(SPxId& id, bool polish = false);
 
     /// test coVector \p i with status \p stat.
-    Real coTest(int i, typename SPxBasisBase<R>::Desc::Status stat) const;
+    R coTest(int i, typename SPxBasisBase<R>::Desc::Status stat) const;
     /// compute coTest vector.
     void computeCoTest();
     /// recompute coTest vector.
     void updateCoTest();
 
-    /// test vector \p i with status \p stat.
-    Real test(int i, typename SPxBasisBase<R>::Desc::Status stat) const;
+    /// test VectorBase<R> \p i with status \p stat.
+    R test(int i, typename SPxBasisBase<R>::Desc::Status stat) const;
     /// recompute test vector.
     void updateTest();
 
@@ -1864,14 +1864,14 @@ namespace soplex
     virtual void reinitializeVecs();
     /// reset dimensions of vectors according to loaded LP.
     virtual void reDim();
-    /// compute feasibility vector from scratch.
+    /// compute feasibility VectorBase<R> from scratch.
     void computeFrhs();
     ///
     virtual void computeFrhsXtra();
     ///
-    virtual void computeFrhs1(const Vector&, const Vector&);
+    virtual void computeFrhs1(const VectorBase<R>&, const VectorBase<R>&);
     ///
-    void computeFrhs2(Vector&, Vector&);
+    void computeFrhs2(Vector&, VectorBase<R>&);
     /// compute \ref soplex::SPxSolverBase<R>::theCoPrhs "theCoPrhs" for entering Simplex.
     virtual void computeEnterCoPrhs();
     ///
@@ -1890,7 +1890,7 @@ namespace soplex
      *  the objective value resulting form nonbasic variables for #COLUMN
      *  Representation.
      */
-    Real nonbasicValue();
+    R nonbasicValue();
 
     /// Get pointer to the \p id 'th vector
     virtual const SVector* enterVector(const SPxId& p_id)
@@ -1902,24 +1902,24 @@ namespace soplex
     ///
     virtual void getLeaveVals(int i,
                               typename SPxBasisBase<R>::Desc::Status& leaveStat, SPxId& leaveId,
-                              Real& leaveMax, Real& leavebound, int& leaveNum, Real& objChange);
+                              R& leaveMax, R& leavebound, int& leaveNum, R& objChange);
     ///
-    virtual void getLeaveVals2(Real leaveMax, SPxId enterId,
-                               Real& enterBound, Real& newUBbound,
-                               Real& newLBbound, Real& newCoPrhs, Real& objChange);
+    virtual void getLeaveVals2(R leaveMax, SPxId enterId,
+                               R& enterBound, R& newUBbound,
+                               R& newLBbound, R& newCoPrhs, R& objChange);
     ///
-    virtual void getEnterVals(SPxId id, Real& enterTest,
-                              Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-                              Real& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, Real& enterRO, Real& objChange);
+    virtual void getEnterVals(SPxId id, R& enterTest,
+                              R& enterUB, R& enterLB, R& enterVal, R& enterMax,
+                              R& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, R& enterRO, R& objChange);
     ///
     virtual void getEnterVals2(int leaveIdx,
-                               Real enterMax, Real& leaveBound, Real& objChange);
+                               R enterMax, R& leaveBound, R& objChange);
     ///
     virtual void ungetEnterVal(SPxId enterId, typename SPxBasisBase<R>::Desc::Status enterStat,
-                               Real leaveVal, const SVector& vec, Real& objChange);
+                               R leaveVal, const SVector& vec, R& objChange);
     ///
     virtual void rejectEnter(SPxId enterId,
-                             Real enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);
+                             R enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);
     ///
     virtual void rejectLeave(int leaveNum, SPxId leaveId,
                              typename SPxBasisBase<R>::Desc::Status leaveStat, const SVector* newVec = 0);
@@ -1945,7 +1945,7 @@ namespace soplex
      */
     //@{
     ///
-    void clearDualBounds(typename SPxBasisBase<R>::Desc::Status, Real&, Real&) const;
+    void clearDualBounds(typename SPxBasisBase<R>::Desc::Status, R&, R&) const;
     ///
     void setDualColBounds();
     ///
@@ -1972,13 +1972,13 @@ namespace soplex
      */
     //@{
     ///
-    void computePrimalray4Col(Real direction, SPxId enterId);
+    void computePrimalray4Col(R direction, SPxId enterId);
     ///
-    void computePrimalray4Row(Real direction);
+    void computePrimalray4Row(R direction);
     ///
-    void computeDualfarkas4Col(Real direction);
+    void computeDualfarkas4Col(R direction);
     ///
-    void computeDualfarkas4Row(Real direction, SPxId enterId);
+    void computeDualfarkas4Row(R direction, SPxId enterId);
     //@}
 
   public:
@@ -1987,9 +1987,9 @@ namespace soplex
     /** Limits and status inquiry */
     //@{
     /// set time limit.
-    virtual void setTerminationTime(Real time = infinity);
+    virtual void setTerminationTime(R time = infinity);
     /// return time limit.
-    virtual Real terminationTime() const;
+    virtual R terminationTime() const;
     /// set iteration limit.
     virtual void setTerminationIter(int iteration = -1);
     /// return iteration limit.
@@ -1997,15 +1997,15 @@ namespace soplex
     /// set objective limit.
     virtual void setTerminationValue(R value = infinity);
     /// return objective limit.
-    virtual Real terminationValue() const;
+    virtual R terminationValue() const;
     /// get objective value of current solution.
-    virtual Real objValue()
+    virtual R objValue()
     {
       return value();
     }
     /// get all results of last solve.
     Status
-      getResult( Real* value = 0, Vector* primal = 0,
+      getResult( R* value = 0, Vector* primal = 0,
                  Vector* slacks = 0, Vector* dual = 0,
                  Vector* reduCost = 0);
 
@@ -2062,16 +2062,16 @@ namespace soplex
 
     /// get level of dual degeneracy
     // this function is used for the improved dual simplex
-    Real getDegeneracyLevel(Vector degenvec);
+    R getDegeneracyLevel(Vector degenvec);
 
     /// get number of dual norms
     void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
 
     /// get dual norms
-    bool getDualNorms(int& nnormsRow, int& nnormsCol, Real* norms) const;
+    bool getDualNorms(int& nnormsRow, int& nnormsCol, R* norms) const;
 
     /// set dual norms
-    bool setDualNorms(int nnormsRow, int nnormsCol, Real* norms);
+    bool setDualNorms(int nnormsRow, int nnormsCol, R* norms);
 
     /// pass integrality information about the variables to the solver
     void setIntegralityInformation(int ncols, int* intInfo);
@@ -2101,13 +2101,13 @@ namespace soplex
     }
 
     /// get the sum of dual degeneracy
-    Real sumDualDegeneracy()
+    R sumDualDegeneracy()
     {
       return dualDegenSum;
     }
 
     /// get the sum of primal degeneracy
-    Real sumPrimalDegeneracy()
+    R sumPrimalDegeneracy()
     {
       return primalDegenSum;
     }
@@ -2138,7 +2138,7 @@ namespace soplex
     }
 
     /// time spent in last call to method solve().
-    Real time() const
+    R time() const
     {
       return theTime->time();
     }
@@ -2148,13 +2148,13 @@ namespace soplex
     bool isTimeLimitReached(const bool forceCheck = false);
 
     /// the maximum runtime
-    Real getMaxTime()
+    R getMaxTime()
     {
       return maxTime;
     }
 
     /// cumulative time spent in all calls to method solve().
-    Real cumulativeTime() const
+    R cumulativeTime() const
     {
       return theCumulativeTime;
     }
@@ -2177,27 +2177,27 @@ namespace soplex
       return *this->lpcolset();
     }
 
-    /// copy lower bound vector to \p p_low.
+    /// copy lower bound VectorBase<R> to \p p_low.
     void getLower(Vector& p_low) const
     {
-      p_low = SPxLP::lower();
+      p_low = SPxLPBase<R>::lower();
     }
-    /// copy upper bound vector to \p p_up.
+    /// copy upper bound VectorBase<R> to \p p_up.
     void getUpper(Vector& p_up) const
     {
-      p_up = SPxLP::upper();
+      p_up = SPxLPBase<R>::upper();
     }
 
-    /// copy lhs value vector to \p p_lhs.
+    /// copy lhs value VectorBase<R> to \p p_lhs.
     void getLhs(Vector& p_lhs) const
     {
-      p_lhs = SPxLP::lhs();
+      p_lhs = SPxLPBase<R>::lhs();
     }
 
-    /// copy rhs value vector to \p p_rhs.
+    /// copy rhs value VectorBase<R> to \p p_rhs.
     void getRhs(Vector& p_rhs) const
     {
-      p_rhs = SPxLP::rhs();
+      p_rhs = SPxLPBase<R>::rhs();
     }
 
     /// optimization sense.

@@ -33,33 +33,16 @@
 namespace soplex
 {
 
-  /// Declaration of type to avoid the 'specialization after instantiation' error
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::status() const;
-
-  template <>
-  bool SPxSolverBase<Real>::terminate();
-
-  template <>
-  void SPxSolverBase<Real>::printDisplayLine(const bool force, const bool forceHead);
-
-  template <>
-  void SPxSolverBase<Real>::performSolutionPolishing();
-
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalSol(Vector& p_vector) const;
-
-
   /**@todo check separately for ENTER and LEAVE algorithm */
-  template <>
-  bool SPxSolverBase<Real>::precisionReached(Real& newpricertol) const
+  template <class R>
+  bool SPxSolverBase<R>::precisionReached(R& newpricertol) const
   {
-    Real maxViolRedCost;
-    Real sumViolRedCost;
-    Real maxViolBounds;
-    Real sumViolBounds;
-    Real maxViolConst;
-    Real sumViolConst;
+    R maxViolRedCost;
+    R sumViolRedCost;
+    R maxViolBounds;
+    R sumViolBounds;
+    R maxViolConst;
+    R sumViolConst;
 
     qualRedCostViolation(maxViolRedCost, sumViolRedCost);
     qualBoundViolation(maxViolBounds, sumViolBounds);
@@ -88,23 +71,23 @@ namespace soplex
     return reached;
 }
 
-  template <>
-  void SPxSolverBase<Real>::calculateProblemRanges()
+  template <class R>
+  void SPxSolverBase<R>::calculateProblemRanges()
 {
    // only collect absolute values
-   Real minobj = infinity;
-   Real maxobj = 0.0;
-   Real minbound = infinity;
-   Real maxbound = 0.0;
-   Real minside = infinity;
-   Real maxside = 0.0;
+   R minobj = infinity;
+   R maxobj = 0.0;
+   R minbound = infinity;
+   R maxbound = 0.0;
+   R minside = infinity;
+   R maxside = 0.0;
 
    // get min and max absolute values of bounds and objective
-   for( int j = 0; j < nCols(); ++j )
+   for( int j = 0; j < this->nCols(); ++j )
    {
-      Real abslow = spxAbs(lower(j));
-      Real absupp = spxAbs(lower(j));
-      Real absobj = spxAbs(obj(j));
+      R abslow = spxAbs(this->lower(j));
+      R absupp = spxAbs(this->lower(j));
+      R absobj = spxAbs(this->obj(j));
 
       if( abslow < infinity )
       {
@@ -123,10 +106,10 @@ namespace soplex
    }
 
    // get min and max absoute values of sides
-   for( int i = 0; i < nRows(); ++i )
+   for( int i = 0; i < this->nRows(); ++i )
    {
-      Real abslhs = spxAbs(lhs(i));
-      Real absrhs = spxAbs(rhs(i));
+      R abslhs = spxAbs(this->lhs(i));
+      R absrhs = spxAbs(this->rhs(i));
 
       if(  abslhs > infinity )
       {
@@ -146,24 +129,24 @@ namespace soplex
    objrange = maxobj - minobj;
 }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::solve()
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::solve()
   {
 
     SPxId enterId;
     int   leaveNum;
     int   loopCount = 0;
-    Real  minShift = infinity;
+    R  minShift = infinity;
     int   cycleCount = 0;
     bool  priced = false;
-    Real  lastDelta = 1;
+    R  lastDelta = 1;
 
    /* allow clean up step only once */
    recomputedVectors = false;
 
     /* store the last (primal or dual) feasible objective value to recover/abort in case of stalling */
-    Real  stallRefValue;
-    Real  stallRefShift;
+    R  stallRefValue;
+    R  stallRefShift;
     int   stallRefIter;
     int   stallNumRecovers;
 
@@ -198,8 +181,8 @@ namespace soplex
     if (!isInitialized())
       {
         /*
-          if(SPxBasisBase<Real>::status() <= NO_PROBLEM)
-          SPxBasisBase<Real>::load(this);
+          if(SPxBasisBase<R>::status() <= NO_PROBLEM)
+          SPxBasisBase<R>::load(this);
         */
         /**@todo != REGULAR is not enough. Also OPTIMAL/DUAL/PRIMAL should
          * be tested and acted accordingly.
@@ -212,7 +195,7 @@ namespace soplex
         // Inna/Tobi: init might fail, if the basis is singular
         if( !isInitialized() )
           {
-            assert(SPxBasisBase<Real>::status() == SPxBasisBase<Real>::SINGULAR);
+            assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::SINGULAR);
             m_status = UNKNOWN;
             return status();
           }
@@ -221,7 +204,7 @@ namespace soplex
     //setType(type());
 
     if (!this->matrixIsSetup)
-      SPxBasisBase<Real>::load(this);
+      SPxBasisBase<R>::load(this);
 
     //factorized = false;
 
@@ -237,8 +220,8 @@ namespace soplex
                << "starting shift = " << shift() << std::endl;
                )
 
-      if (SPxBasisBase<Real>::status() == SPxBasisBase<Real>::OPTIMAL)
-        setBasisStatus(SPxBasisBase<Real>::REGULAR);
+      if (SPxBasisBase<R>::status() == SPxBasisBase<R>::OPTIMAL)
+        setBasisStatus(SPxBasisBase<R>::REGULAR);
 
     m_status   = RUNNING;
     bool stop  = terminate();
@@ -256,12 +239,12 @@ namespace soplex
     stallNumRecovers = 0;
 
     /* if we run into a singular basis, we will retry from regulardesc with tighter tolerance in the ratio test */
-    typename SPxSolverBase<Real>::Type tightenedtype = type();
+    typename SPxSolverBase<R>::Type tightenedtype = type();
     bool tightened = false;
 
     while (!stop)
       {
-        const typename SPxBasisBase<Real>::Desc regulardesc = this->desc();
+        const typename SPxBasisBase<R>::Desc regulardesc = this->desc();
 
         // we need to reset these pointers to avoid unnecessary/wrong solves in leave() or enter()
         solveVector2 = 0;
@@ -293,8 +276,8 @@ namespace soplex
                 /* in the entering algorithm, entertol() should be maintained by the ratio test and leavetol() should be
                  * reached by the pricer
                  */
-                Real maxpricertol = leavetol();
-                Real minpricertol = 0.01 * maxpricertol;
+                R maxpricertol = leavetol();
+                R minpricertol = 0.01 * maxpricertol;
 
                 thepricer->setEpsilon(maxpricertol);
                 priced = false;
@@ -325,7 +308,7 @@ namespace soplex
                       {
                         /* no entering variable was found, but because of valid instableEnterId we know
                            that this is due to the scaling of the test values. Thus, we use
-                           instableEnterId and SPxFastRT<Real>::selectEnter shall accept even an instable
+                           instableEnterId and SPxFastRT<R>::selectEnter shall accept even an instable
                            leaving variable. */
                         MSG_INFO3( (*this->spxout), (*this->spxout) << " --- trying instable enter iteration" << std::endl; )
 
@@ -339,10 +322,10 @@ namespace soplex
                             if( rep() == COLUMN )
                               {
                                 theTest[idx] = instableEnterVal;
-                                if( sparsePricingEnterCo && isInfeasibleCo[idx] == SPxPricer<Real>::NOT_VIOLATED )
+                                if( sparsePricingEnterCo && isInfeasibleCo[idx] == SPxPricer<R>::NOT_VIOLATED )
                                   {
                                     infeasibilitiesCo.addIdx(idx);
-                                    isInfeasibleCo[idx] = SPxPricer<Real>::VIOLATED;
+                                    isInfeasibleCo[idx] = SPxPricer<R>::VIOLATED;
                                   }
                                 if( hyperPricingEnter )
                                   updateViolsCo.addIdx(idx);
@@ -350,10 +333,10 @@ namespace soplex
                             else
                               {
                                 theCoTest[idx] = instableEnterVal;
-                                if( sparsePricingEnter && isInfeasible[idx] == SPxPricer<Real>::NOT_VIOLATED )
+                                if( sparsePricingEnter && isInfeasible[idx] == SPxPricer<R>::NOT_VIOLATED )
                                   {
                                     infeasibilities.addIdx(idx);
-                                    isInfeasible[idx] = SPxPricer<Real>::VIOLATED;
+                                    isInfeasible[idx] = SPxPricer<R>::VIOLATED;
                                   }
                                 if( hyperPricingEnter )
                                   updateViols.addIdx(idx);
@@ -365,10 +348,10 @@ namespace soplex
                             if( rep() == COLUMN )
                               {
                                 theCoTest[idx] = instableEnterVal;
-                                if( sparsePricingEnter && isInfeasible[idx] == SPxPricer<Real>::NOT_VIOLATED )
+                                if( sparsePricingEnter && isInfeasible[idx] == SPxPricer<R>::NOT_VIOLATED )
                                   {
                                     infeasibilities.addIdx(idx);
-                                    isInfeasible[idx] = SPxPricer<Real>::VIOLATED;
+                                    isInfeasible[idx] = SPxPricer<R>::VIOLATED;
                                   }
                                 if( hyperPricingEnter )
                                   updateViols.addIdx(idx);
@@ -376,10 +359,10 @@ namespace soplex
                             else
                               {
                                 theTest[idx] = instableEnterVal;
-                                if( sparsePricingEnterCo && isInfeasibleCo[idx] == SPxPricer<Real>::NOT_VIOLATED )
+                                if( sparsePricingEnterCo && isInfeasibleCo[idx] == SPxPricer<R>::NOT_VIOLATED )
                                   {
                                     infeasibilitiesCo.addIdx(idx);
-                                    isInfeasibleCo[idx] = SPxPricer<Real>::VIOLATED;
+                                    isInfeasibleCo[idx] = SPxPricer<R>::VIOLATED;
                                   }
                                 if( hyperPricingEnter )
                                   updateViolsCo.addIdx(idx);
@@ -395,11 +378,11 @@ namespace soplex
                       {
                         // we are not infeasible and have no shift
                         if (  shift() <= epsilon()
-                              && ( SPxBasisBase<Real>::status() == SPxBasisBase<Real>::REGULAR
-                                   || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL
-                                   || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::PRIMAL))
+                              && ( SPxBasisBase<R>::status() == SPxBasisBase<R>::REGULAR
+                                   || SPxBasisBase<R>::status() == SPxBasisBase<R>::DUAL
+                                   || SPxBasisBase<R>::status() == SPxBasisBase<R>::PRIMAL))
                           {
-                            Real newpricertol = minpricertol;
+                            R newpricertol = minpricertol;
 
                             // refactorize to eliminate accumulated errors from LU updates
                             if( this->lastUpdate() > 0 )
@@ -407,10 +390,10 @@ namespace soplex
 
                             // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
                             computeFrhs();
-                            SPxBasisBase<Real>::solve(*theFvec, *theFrhs);
+                            SPxBasisBase<R>::solve(*theFvec, *theFrhs);
 
                             computeEnterCoPrhs();
-                            SPxBasisBase<Real>::coSolve(*theCoPvec, *theCoPrhs);
+                            SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
                             computePvec();
 
                             forceRecompNonbasicValue();
@@ -444,9 +427,9 @@ namespace soplex
                               factorize();
 
                               // if the factorization was found out to be singular, we have to quit
-                              if( SPxBasisBase<Real>::status() < SPxBasisBase<Real>::REGULAR )
+                              if( SPxBasisBase<R>::status() < SPxBasisBase<R>::REGULAR )
                                 {
-                                  MSG_INFO1( (*this->spxout), (*this->spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << std::endl; )
+                                  MSG_INFO1( (*this->spxout), (*this->spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << std::endl; )
                                     stop = true;
                                   break;
                                 }
@@ -487,7 +470,7 @@ namespace soplex
                      */
                     if( this->lastEntered().isValid() )
                       enterCycleCount = 0;
-                    else if( basis().status() != SPxBasisBase<Real>::INFEASIBLE && basis().status() != SPxBasisBase<Real>::UNBOUNDED )
+                    else if( basis().status() != SPxBasisBase<R>::INFEASIBLE && basis().status() != SPxBasisBase<R>::UNBOUNDED )
                       {
                         enterCycleCount++;
                         if( enterCycleCount > MAXCYCLES )
@@ -509,7 +492,7 @@ namespace soplex
                       }
 
                     /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-                    if( (this->iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasisBase<Real>::INFEASIBLE )
+                    if( (this->iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasisBase<R>::INFEASIBLE )
                       {
                         if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                           {
@@ -552,7 +535,7 @@ namespace soplex
                            << ", opttol: " << opttol()
                            << std::endl
                            << "ISOLVE56 stop: " << stop
-                           << ", basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << " (" << static_cast<int>(SPxBasisBase<Real>::status()) << ")"
+                           << ", basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << " (" << static_cast<int>(SPxBasisBase<R>::status()) << ")"
                            << ", solver status: " << static_cast<int>(m_status) << " (" << static_cast<int>(m_status) << ")" << std::endl;
                            )
 
@@ -568,7 +551,7 @@ namespace soplex
                           // factorize();
                           unShift();
 
-                          Real maxinfeas = maxInfeas();
+                          R maxinfeas = maxInfeas();
 
                           MSG_INFO3( (*this->spxout),
                                      (*this->spxout) << " --- maxInfeas: " << maxinfeas
@@ -578,7 +561,7 @@ namespace soplex
 
                             if (priced && maxinfeas + shift() <= entertol())
                               {
-                                setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                                setBasisStatus(SPxBasisBase<R>::OPTIMAL);
                                 m_status = OPTIMAL;
                                 break;
                               }
@@ -596,7 +579,7 @@ namespace soplex
                            << ", side range = " << siderange
                            << ", obj range = " << objrange
                            << ")" << std::endl; )
-                       setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                       setBasisStatus(SPxBasisBase<R>::OPTIMAL);
                      m_status = OPTIMAL;
                      break;
                   }
@@ -634,8 +617,8 @@ namespace soplex
                 /* in the leaving algorithm, leavetol() should be maintained by the ratio test and entertol() should be reached
                  * by the pricer
                  */
-                Real maxpricertol = entertol();
-                Real minpricertol = 0.01 * maxpricertol;
+                R maxpricertol = entertol();
+                R minpricertol = 0.01 * maxpricertol;
 
                 thepricer->setEpsilon(maxpricertol);
                 priced = false;
@@ -666,7 +649,7 @@ namespace soplex
                       {
                         /* no leaving variable was found, but because of instableLeaveNum >= 0 we know
                            that this is due to the scaling of theCoTest[...]. Thus, we use
-                           instableLeaveNum and SPxFastRT<Real>::selectEnter shall accept even an instable
+                           instableLeaveNum and SPxFastRT<R>::selectEnter shall accept even an instable
                            entering variable. */
                         MSG_INFO3( (*this->spxout),
                                    (*this->spxout) << " --- trying instable leave iteration" << std::endl;
@@ -680,10 +663,10 @@ namespace soplex
 
                         if ( sparsePricingLeave )
                           {
-                            if ( isInfeasible[instableLeaveNum] == SPxPricer<Real>::NOT_VIOLATED )
+                            if ( isInfeasible[instableLeaveNum] == SPxPricer<R>::NOT_VIOLATED )
                               {
                                 infeasibilities.addIdx(instableLeaveNum);
-                                isInfeasible[instableLeaveNum] = SPxPricer<Real>::VIOLATED;
+                                isInfeasible[instableLeaveNum] = SPxPricer<R>::VIOLATED;
                               }
                             if( hyperPricingLeave )
                               updateViols.addIdx(instableLeaveNum);
@@ -698,11 +681,11 @@ namespace soplex
                       {
                         // we are not infeasible and have no shift
                         if (  shift() <= epsilon()
-                              && (  SPxBasisBase<Real>::status() == SPxBasisBase<Real>::REGULAR
-                                    || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL
-                                    || SPxBasisBase<Real>::status() == SPxBasisBase<Real>::PRIMAL))
+                              && (  SPxBasisBase<R>::status() == SPxBasisBase<R>::REGULAR
+                                    || SPxBasisBase<R>::status() == SPxBasisBase<R>::DUAL
+                                    || SPxBasisBase<R>::status() == SPxBasisBase<R>::PRIMAL))
                           {
-                            Real newpricertol = minpricertol;
+                            R newpricertol = minpricertol;
 
                             // refactorize to eliminate accumulated errors from LU updates
                             if( this->lastUpdate() > 0 )
@@ -710,10 +693,10 @@ namespace soplex
 
                             // recompute Fvec, Pvec and CoPvec to get a more precise solution and obj value
                             computeFrhs();
-                            SPxBasisBase<Real>::solve(*theFvec, *theFrhs);
+                            SPxBasisBase<R>::solve(*theFvec, *theFrhs);
 
                             computeLeaveCoPrhs();
-                            SPxBasisBase<Real>::coSolve(*theCoPvec, *theCoPrhs);
+                            SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
                             computePvec();
 
                             forceRecompNonbasicValue();
@@ -746,9 +729,9 @@ namespace soplex
                               factorize();
 
                               // Inna/Tobi: if the factorization was found out to be singular, we have to quit
-                              if (SPxBasisBase<Real>::status() < SPxBasisBase<Real>::REGULAR)
+                              if (SPxBasisBase<R>::status() < SPxBasisBase<R>::REGULAR)
                                 {
-                                  MSG_INFO1( (*this->spxout), (*this->spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << std::endl; )
+                                  MSG_INFO1( (*this->spxout), (*this->spxout) << "Something wrong with factorization, Basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << std::endl; )
                                     stop = true;
                                   break;
                                 }
@@ -789,7 +772,7 @@ namespace soplex
                      */
                     if( this->lastIndex() >= 0 )
                       leaveCycleCount = 0;
-                    else if( basis().status() != SPxBasisBase<Real>::INFEASIBLE && basis().status() != SPxBasisBase<Real>::UNBOUNDED )
+                    else if( basis().status() != SPxBasisBase<R>::INFEASIBLE && basis().status() != SPxBasisBase<R>::UNBOUNDED )
                       {
                         leaveCycleCount++;
                         if( leaveCycleCount > MAXCYCLES )
@@ -810,7 +793,7 @@ namespace soplex
                       }
 
                     /* check every MAXSTALLS iterations whether shift and objective value have not changed */
-                    if( (this->iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasisBase<Real>::INFEASIBLE )
+                    if( (this->iteration() - stallRefIter) % MAXSTALLS == 0 && basis().status() != SPxBasisBase<R>::INFEASIBLE )
                       {
                         if( spxAbs(value() - stallRefValue) <= epsilon() && spxAbs(shift() - stallRefShift) <= epsilon() )
                           {
@@ -853,7 +836,7 @@ namespace soplex
                            << ", opttol: " << opttol()
                            << std::endl
                            << "ISOLVE57 stop: " << stop
-                           << ", basis status: " << static_cast<int>(SPxBasisBase<Real>::status()) << " (" << static_cast<int>(SPxBasisBase<Real>::status()) << ")"
+                           << ", basis status: " << static_cast<int>(SPxBasisBase<R>::status()) << " (" << static_cast<int>(SPxBasisBase<R>::status()) << ")"
                            << ", solver status: " << static_cast<int>(m_status) << " (" << static_cast<int>(m_status) << ")" << std::endl;
                            )
 
@@ -891,7 +874,7 @@ namespace soplex
                           // factorize();
                           unShift();
 
-                          Real maxinfeas = maxInfeas();
+                          R maxinfeas = maxInfeas();
 
                           MSG_INFO3( (*this->spxout),
                                      (*this->spxout) << " --- maxInfeas: " << maxinfeas
@@ -904,7 +887,7 @@ namespace soplex
                             // continue.
                if (priced && maxinfeas + shift() <= leavetol())
                               {
-                 setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                 setBasisStatus(SPxBasisBase<R>::OPTIMAL);
                   m_status = OPTIMAL;
                   break;
                               }
@@ -922,7 +905,7 @@ namespace soplex
                            << ", side range = " << siderange
                            << ", obj range = " << objrange
                            << ")" << std::endl; )
-                       setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+                       setBasisStatus(SPxBasisBase<R>::OPTIMAL);
                                 m_status = OPTIMAL;
                                 break;
                               }
@@ -1056,8 +1039,8 @@ namespace soplex
       if( status() == OPTIMAL )
         {
           int     c;
-          Real    val;
-          DVector sol( nCols() );
+          R    val;
+          DVectorBase<R> sol( nCols() );
 
           getPrimalSol( sol );
 
@@ -1128,7 +1111,7 @@ namespace soplex
 #endif  // ENABLE_ADDITIONAL_CHECKS
 
 
-    primalCount = ( rep() == SPxSolverBase<Real>::COLUMN )
+    primalCount = ( rep() == SPxSolverBase<R>::COLUMN )
       ? enterCount
       : leaveCount;
 
@@ -1138,8 +1121,8 @@ namespace soplex
     return status();
   }
 
-  template <>
-  void SPxSolverBase<Real>::performSolutionPolishing()
+  template <class R>
+  void SPxSolverBase<R>::performSolutionPolishing()
   {
     // catch rare case that the iteration limit is exactly reached at optimality
     bool stop = (maxIters >= 0 && iterations() >= maxIters && !isTimeLimitReached());
@@ -1149,10 +1132,10 @@ namespace soplex
       return;
 
     int nSuccessfulPivots;
-    const typename SPxBasisBase<Real>::Desc& ds = this->desc();
-    const typename SPxBasisBase<Real>::Desc::Status* rowstatus = ds.rowStatus();
-    const typename SPxBasisBase<Real>::Desc::Status* colstatus = ds.colStatus();
-    typename SPxBasisBase<Real>::Desc::Status stat;
+    const typename SPxBasisBase<R>::Desc& ds = this->desc();
+    const typename SPxBasisBase<R>::Desc::Status* rowstatus = ds.rowStatus();
+    const typename SPxBasisBase<R>::Desc::Status* colstatus = ds.colStatus();
+    typename SPxBasisBase<R>::Desc::Status stat;
     SPxId polishId;
     bool success = false;
 
@@ -1164,9 +1147,9 @@ namespace soplex
           init();
 #ifndef NDEBUG
       // allow a small relative deviation from the original values
-      Real alloweddeviation = entertol();
-      Real origval = value();
-      Real origshift = shift();
+      R alloweddeviation = entertol();
+      R origval = value();
+      R origshift = shift();
 #endif
           instableEnter = false;
           theratiotester->setType(type());
@@ -1179,10 +1162,10 @@ namespace soplex
               for( int i = 0; i < this->nRows(); ++i )
                 {
                   // only check nonbasic rows, skip equations
-                  if( rowstatus[i] ==  SPxBasisBase<Real>::Desc::P_ON_LOWER || rowstatus[i] == SPxBasisBase<Real>::Desc::P_ON_UPPER )
+                  if( rowstatus[i] ==  SPxBasisBase<R>::Desc::P_ON_LOWER || rowstatus[i] == SPxBasisBase<R>::Desc::P_ON_UPPER )
                     {
                       // only consider rows with zero dual multiplier to preserve optimality
-                      if( EQrel((*theCoPvec)[i], (Real) 0) )
+                      if( EQrel((*theCoPvec)[i], (R) 0) )
                         slackcandidates.addIdx(i);
                     }
                 }
@@ -1193,10 +1176,10 @@ namespace soplex
                   for( int i = 0; i < this->nCols(); ++i )
                     {
                       // skip fixed variables
-                      if( colstatus[i] == SPxBasisBase<Real>::Desc::P_ON_LOWER || colstatus[i] ==  SPxBasisBase<Real>::Desc::P_ON_UPPER )
+                      if( colstatus[i] == SPxBasisBase<R>::Desc::P_ON_LOWER || colstatus[i] ==  SPxBasisBase<R>::Desc::P_ON_UPPER )
                         {
                           // only consider continuous variables with zero dual multiplier to preserve optimality
-                          if( EQrel(this->maxObj(i) - (*thePvec)[i], (Real) 0) && integerVariables[i] == 0 )
+                          if( EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0) && integerVariables[i] == 0 )
                             continuousvars.addIdx(i);
                         }
                     }
@@ -1263,10 +1246,10 @@ namespace soplex
               // identify nonbasic variables, i.e. columns, that may be moved into the basis
               for( int i = 0; i < this->nCols() && !stop; ++i )
                 {
-                  if( colstatus[i] == SPxBasisBase<Real>::Desc::P_ON_LOWER || colstatus[i] == SPxBasisBase<Real>::Desc::P_ON_UPPER )
+                  if( colstatus[i] == SPxBasisBase<R>::Desc::P_ON_LOWER || colstatus[i] == SPxBasisBase<R>::Desc::P_ON_UPPER )
                     {
                       // only consider variables with zero reduced costs to preserve optimality
-                      if( EQrel(this->maxObj(i) - (*thePvec)[i], (Real) 0) )
+                      if( EQrel(this->maxObj(i) - (*thePvec)[i], (R) 0) )
                         candidates.addIdx(i);
                     }
                 }
@@ -1309,15 +1292,15 @@ namespace soplex
           init();
 #ifndef NDEBUG
       // allow a small relative deviation from the original values
-      Real alloweddeviation = leavetol();
-      Real origval = value();
-      Real origshift = shift();
+      R alloweddeviation = leavetol();
+      R origval = value();
+      R origshift = shift();
 #endif
           instableLeave = false;
           theratiotester->setType(type());
           bool useIntegrality = false;
 
-      if( integerVariables.size() == nCols() )
+          if( integerVariables.size() == this->nCols() )
             useIntegrality = true;
 
           // in ROW rep: pivot slack out of the basis
@@ -1340,9 +1323,9 @@ namespace soplex
                       stat = ds.colStatus(this->number(polishId));
                     }
 
-                  if( stat == SPxBasisBase<Real>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<Real>::Desc::P_ON_UPPER )
+                  if( stat == SPxBasisBase<R>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<R>::Desc::P_ON_UPPER )
                     {
-                      if( EQrel((*theFvec)[i], (Real) 0) )
+                      if( EQrel((*theFvec)[i], (R) 0) )
                         basiccandidates.addIdx(i);
                     }
                 }
@@ -1397,9 +1380,9 @@ namespace soplex
                       stat = ds.colStatus(i);
                     }
 
-                  if( stat == SPxBasisBase<Real>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<Real>::Desc::P_ON_UPPER )
+                  if( stat == SPxBasisBase<R>::Desc::P_ON_LOWER || stat ==  SPxBasisBase<R>::Desc::P_ON_UPPER )
                     {
-                      if( EQrel((*theFvec)[i], (Real) 0) )
+                      if( EQrel((*theFvec)[i], (R) 0) )
                         basiccandidates.addIdx(i);
                     }
                 }
@@ -1439,17 +1422,17 @@ namespace soplex
     MSG_INFO1( (*this->spxout),
                (*this->spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
 
-      setStatus(SPxBasisBase<Real>::OPTIMAL);
+      setStatus(SPxBasisBase<R>::OPTIMAL);
   }
 
 
-  template <>
-  void SPxSolverBase<Real>::testVecs()
+  template <class R>
+  void SPxSolverBase<R>::testVecs()
   {
 
-    assert(SPxBasisBase<Real>::status() > SPxBasisBase<Real>::SINGULAR);
+    assert(SPxBasisBase<R>::status() > SPxBasisBase<R>::SINGULAR);
 
-    DVector tmp(dim());
+    DVectorBase<R> tmp(dim());
 
     tmp = *theCoPvec;
     this->multWithBase(tmp);
@@ -1460,13 +1443,13 @@ namespace soplex
                    << tmp.length() << std::endl; )
 
           tmp.clear();
-        SPxBasisBase<Real>::coSolve(tmp, *theCoPrhs);
+        SPxBasisBase<R>::coSolve(tmp, *theCoPrhs);
         this->multWithBase(tmp);
         tmp -= *theCoPrhs;
         MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE94\t\t" << tmp.length() << std::endl; )
 
           tmp.clear();
-        SPxBasisBase<Real>::coSolve(tmp, *theCoPrhs);
+        SPxBasisBase<R>::coSolve(tmp, *theCoPrhs);
         tmp -= *theCoPvec;
         MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE95\t\t" << tmp.length() << std::endl; )
           }
@@ -1480,7 +1463,7 @@ namespace soplex
                    << tmp.length() << std::endl; )
 
           tmp.clear();
-        SPxBasisBase<Real>::solve(tmp, *theFrhs);
+        SPxBasisBase<R>::solve(tmp, *theFrhs);
         tmp -= *theFvec;
         MSG_INFO3( (*this->spxout), (*this->spxout) << "ISOLVE97\t\t" << tmp.length() << std::endl; )
           }
@@ -1516,8 +1499,8 @@ namespace soplex
 
 
   /// print display line of flying table
-  template <>
-  void SPxSolverBase<Real>::printDisplayLine(const bool force, const bool forceHead)
+  template <class R>
+  void SPxSolverBase<R>::printDisplayLine(const bool force, const bool forceHead)
   {
     MSG_INFO1( (*this->spxout),
                if( forceHead || displayLine % (displayFreq*30) == 0 )
@@ -1537,7 +1520,7 @@ namespace soplex
                              << shift() << " |  "
                              << MAXIMUM(0.0, m_pricingViol + m_pricingViolCo) << " | "
                              << std::setprecision(8) << value();
-                   if( getStartingDecompBasis && rep() == SPxSolverBase<Real>::ROW )
+                   if( getStartingDecompBasis && rep() == SPxSolverBase<R>::ROW )
                      (*this->spxout) << " (" << std::fixed << std::setprecision(2) << getDegeneracyLevel(fVec()) <<")";
          if( printBasisMetric == 0 )
             (*this->spxout) << " | " << std::scientific << std::setprecision(2) << getBasisMetric(0);
@@ -1554,11 +1537,11 @@ namespace soplex
   }
 
 
-  template <>
-  bool SPxSolverBase<Real>::terminate()
+  template <class R>
+  bool SPxSolverBase<R>::terminate()
   {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-    if (SPxBasisBase<Real>::status() > SPxBasisBase<Real>::SINGULAR)
+    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::SINGULAR)
       testVecs();
 #endif
 
@@ -1569,8 +1552,8 @@ namespace soplex
     if (this->iteration() > 10 && this->iteration() % redo == 0)
       {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-        DVector cr(*theCoPrhs);
-        DVector fr(*theFrhs);
+        DVectorBase<R> cr(*theCoPrhs);
+        DVectorBase<R> fr(*theFrhs);
 #endif
 
         if (type() == ENTER)
@@ -1597,8 +1580,8 @@ namespace soplex
                                << std::endl; )
                       factorize();
                   }
-        SPxBasisBase<Real>::coSolve(*theCoPvec, *theCoPrhs);
-        SPxBasisBase<Real>::solve (*theFvec, *theFrhs);
+        SPxBasisBase<R>::coSolve(*theCoPvec, *theCoPrhs);
+        SPxBasisBase<R>::solve (*theFvec, *theFrhs);
 
         if (pricing() == FULL)
           {
@@ -1612,8 +1595,8 @@ namespace soplex
       }
 
     // check time limit and objective limit only for non-terminal bases
-    if( SPxBasisBase<Real>::status() >= SPxBasisBase<Real>::OPTIMAL  ||
-        SPxBasisBase<Real>::status() <= SPxBasisBase<Real>::SINGULAR )
+    if( SPxBasisBase<R>::status() >= SPxBasisBase<R>::OPTIMAL  ||
+        SPxBasisBase<R>::status() <= SPxBasisBase<R>::SINGULAR )
       {
         m_status = UNKNOWN;
         return true;
@@ -1674,7 +1657,7 @@ namespace soplex
 
     if( getComputeDegeneracy() && this->iteration() > this->prevIteration() )
       {
-        DVector degenvec(this->nCols());
+        DVectorBase<R> degenvec(this->nCols());
         if( rep() == ROW )
           {
             if( type() == ENTER )   // dual simplex
@@ -1703,21 +1686,21 @@ namespace soplex
     // if the flag getStartingDecompBasis is set to true the simplex will terminate when a dual basis is found
     if( getStartingDecompBasis )
       {
-        Real iterationFrac = 0.6;
-        if( type() == ENTER && SPxBasisBase<Real>::status() == SPxBasisBase<Real>::DUAL &&
+        R iterationFrac = 0.6;
+        if( type() == ENTER && SPxBasisBase<R>::status() == SPxBasisBase<R>::DUAL &&
             this->iteration() - this->lastDegenCheck() > getDegenCompOffset()/*iteration() % 10 == 0*/ )
           {
             this->iterDegenCheck = this->iterCount;
 
-            if( SPxBasisBase<Real>::status() >= SPxBasisBase<Real>::OPTIMAL )
+            if( SPxBasisBase<R>::status() >= SPxBasisBase<R>::OPTIMAL )
               {
                 m_status = RUNNING;
                 return true;
               }
 
-            Real degeneracyLevel = 0;
-            Real degeneracyLB = 0.1;
-            Real degeneracyUB = 0.9;
+            R degeneracyLevel = 0;
+            R degeneracyLB = 0.1;
+            R degeneracyUB = 0.9;
             degeneracyLevel = getDegeneracyLevel(fVec());
             if( (degeneracyLevel < degeneracyUB && degeneracyLevel > degeneracyLB) && this->iteration() > this->nRows()*0.2 )
               {
@@ -1747,8 +1730,8 @@ namespace soplex
     return false;
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalSol(Vector& p_vector) const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getPrimalSol(Vector& p_vector) const
   {
 
     if (!isInitialized())
@@ -1762,27 +1745,27 @@ namespace soplex
       p_vector = coPvec();
     else
       {
-        const typename SPxBasisBase<Real>::Desc& ds = this->desc();
+        const typename SPxBasisBase<R>::Desc& ds = this->desc();
 
         for (int i = 0; i < this->nCols(); ++i)
           {
             switch (ds.colStatus(i))
               {
-              case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-                p_vector[i] = SPxLP::lower(i);
+              case SPxBasisBase<R>::Desc::P_ON_LOWER :
+                p_vector[i] = SPxLPBase<R>::lower(i);
                 break;
-              case SPxBasisBase<Real>::Desc::P_ON_UPPER :
-              case SPxBasisBase<Real>::Desc::P_FIXED :
-                p_vector[i] = SPxLP::upper(i);
+              case SPxBasisBase<R>::Desc::P_ON_UPPER :
+              case SPxBasisBase<R>::Desc::P_FIXED :
+                p_vector[i] = SPxLPBase<R>::upper(i);
                 break;
-              case SPxBasisBase<Real>::Desc::P_FREE :
+              case SPxBasisBase<R>::Desc::P_FREE :
                 p_vector[i] = 0;
                 break;
-              case SPxBasisBase<Real>::Desc::D_FREE :
-              case SPxBasisBase<Real>::Desc::D_ON_UPPER :
-              case SPxBasisBase<Real>::Desc::D_ON_LOWER :
-              case SPxBasisBase<Real>::Desc::D_ON_BOTH :
-              case SPxBasisBase<Real>::Desc::D_UNDEFINED :
+              case SPxBasisBase<R>::Desc::D_FREE :
+              case SPxBasisBase<R>::Desc::D_ON_UPPER :
+              case SPxBasisBase<R>::Desc::D_ON_LOWER :
+              case SPxBasisBase<R>::Desc::D_ON_BOTH :
+              case SPxBasisBase<R>::Desc::D_UNDEFINED :
                 break;
               default:
                 throw SPxInternalCodeException("XSOLVE07 This should never happen.");
@@ -1797,8 +1780,8 @@ namespace soplex
     return status();
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualSol(Vector& p_vector) const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualSol(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1829,8 +1812,8 @@ namespace soplex
     return status();
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getRedCostSol(Vector& p_vector) const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getRedCostSol(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1845,7 +1828,7 @@ namespace soplex
       {
         int i;
         p_vector.clear();
-        if (this->spxSense() == SPxLP::MINIMIZE)
+        if (this->spxSense() == SPxLPBase<R>::MINIMIZE)
           {
             for (i = dim() - 1; i >= 0; --i)
               {
@@ -1866,15 +1849,15 @@ namespace soplex
       {
         p_vector = this->maxObj();
         p_vector -= pVec();
-        if (this->spxSense() == SPxLP::MINIMIZE)
+        if (this->spxSense() == SPxLPBase<R>::MINIMIZE)
           p_vector *= -1.0;
       }
 
     return status();
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getPrimalray(Vector& p_vector) const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getPrimalray(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1885,15 +1868,15 @@ namespace soplex
         // return NOT_INIT;
       }
 
-    assert(SPxBasisBase<Real>::status() == SPxBasisBase<Real>::UNBOUNDED);
+    assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::UNBOUNDED);
     p_vector.clear();
     p_vector = primalRay;
 
     return status();
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getDualfarkas(Vector& p_vector) const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getDualfarkas(Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1904,15 +1887,15 @@ namespace soplex
         // return NOT_INIT;
       }
 
-    assert(SPxBasisBase<Real>::status() == SPxBasisBase<Real>::INFEASIBLE);
+    assert(SPxBasisBase<R>::status() == SPxBasisBase<R>::INFEASIBLE);
     p_vector.clear();
     p_vector = dualFarkas;
 
     return status();
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getSlacks (Vector& p_vector) const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getSlacks (Vector& p_vector) const
   {
 
     assert(isInitialized());
@@ -1926,26 +1909,26 @@ namespace soplex
     if (rep() == COLUMN)
       {
         int i;
-        const typename SPxBasisBase<Real>::Desc& ds = this->desc();
+        const typename SPxBasisBase<R>::Desc& ds = this->desc();
         for (i = this->nRows() - 1; i >= 0; --i)
           {
             switch (ds.rowStatus(i))
               {
-              case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+              case SPxBasisBase<R>::Desc::P_ON_LOWER :
                 p_vector[i] = this->lhs(i);
                 break;
-              case SPxBasisBase<Real>::Desc::P_ON_UPPER :
-              case SPxBasisBase<Real>::Desc::P_FIXED :
+              case SPxBasisBase<R>::Desc::P_ON_UPPER :
+              case SPxBasisBase<R>::Desc::P_FIXED :
                 p_vector[i] = this->rhs(i);
                 break;
-              case SPxBasisBase<Real>::Desc::P_FREE :
+              case SPxBasisBase<R>::Desc::P_FREE :
                 p_vector[i] = 0;
                 break;
-              case SPxBasisBase<Real>::Desc::D_FREE :
-              case SPxBasisBase<Real>::Desc::D_ON_UPPER :
-              case SPxBasisBase<Real>::Desc::D_ON_LOWER :
-              case SPxBasisBase<Real>::Desc::D_ON_BOTH :
-              case SPxBasisBase<Real>::Desc::D_UNDEFINED :
+              case SPxBasisBase<R>::Desc::D_FREE :
+              case SPxBasisBase<R>::Desc::D_ON_UPPER :
+              case SPxBasisBase<R>::Desc::D_ON_LOWER :
+              case SPxBasisBase<R>::Desc::D_ON_BOTH :
+              case SPxBasisBase<R>::Desc::D_UNDEFINED :
                 break;
               default:
                 throw SPxInternalCodeException("XSOLVE12 This should never happen.");
@@ -1963,8 +1946,8 @@ namespace soplex
     return status();
   }
 
-  template <>
-  void SPxSolverBase<Real>::setPrimal(Vector& p_vector)
+  template <class R>
+  void SPxSolverBase<R>::setPrimal(Vector& p_vector)
   {
 
     if (!isInitialized())
@@ -1984,8 +1967,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSolverBase<Real>::setDual(Vector& p_vector)
+  template <class R>
+  void SPxSolverBase<R>::setDual(Vector& p_vector)
   {
 
     assert(isInitialized());
@@ -2001,7 +1984,7 @@ namespace soplex
           {
             if (this->baseId(i).isSPxRowId())
               {
-                if (this->spxSense() == SPxLP::MAXIMIZE)
+                if (this->spxSense() == SPxLPBase<R>::MAXIMIZE)
                   fVec()[i] = p_vector[ this->number(SPxRowId(this->baseId(i))) ];
                 else
                   fVec()[i] = -p_vector[ this->number(SPxRowId(this->baseId(i))) ];
@@ -2011,13 +1994,13 @@ namespace soplex
     else
       {
         coPvec() = p_vector;
-        if (this->spxSense() == SPxLP::MINIMIZE)
+        if (this->spxSense() == SPxLPBase<R>::MINIMIZE)
           coPvec() *= -1.0;
       }
   }
 
-  template <>
-  void SPxSolverBase<Real>::setRedCost(Vector& p_vector)
+  template <class R>
+  void SPxSolverBase<R>::setRedCost(Vector& p_vector)
   {
 
     assert(isInitialized());
@@ -2033,7 +2016,7 @@ namespace soplex
           {
             if (this->baseId(i).isSPxColId())
               {
-                if (this->spxSense() == SPxLP::MINIMIZE)
+                if (this->spxSense() == SPxLPBase<R>::MINIMIZE)
                   fVec()[i] = -p_vector[ this->number(SPxColId(this->baseId(i))) ];
                 else
                   fVec()[i] = p_vector[ this->number(SPxColId(this->baseId(i))) ];
@@ -2044,15 +2027,15 @@ namespace soplex
       {
         pVec() = this->maxObj();
 
-        if (this->spxSense() == SPxLP::MINIMIZE)
+        if (this->spxSense() == SPxLPBase<R>::MINIMIZE)
           pVec() += p_vector;
         else
           pVec() -= p_vector;
       }
   }
 
-  template <>
-  void SPxSolverBase<Real>::setSlacks(Vector& p_vector)
+  template <class R>
+  void SPxSolverBase<R>::setSlacks(Vector& p_vector)
   {
 
     assert(isInitialized());
@@ -2074,27 +2057,27 @@ namespace soplex
       pVec() = p_vector;
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::status() const
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::status() const
   {
     switch( m_status )
       {
       case UNKNOWN :
-        switch (SPxBasisBase<Real>::status())
+        switch (SPxBasisBase<R>::status())
           {
-          case SPxBasisBase<Real>::NO_PROBLEM :
+          case SPxBasisBase<R>::NO_PROBLEM :
             return NO_PROBLEM;
-          case SPxBasisBase<Real>::SINGULAR :
+          case SPxBasisBase<R>::SINGULAR :
             return SINGULAR;
-          case SPxBasisBase<Real>::REGULAR :
-          case SPxBasisBase<Real>::DUAL :
-          case SPxBasisBase<Real>::PRIMAL :
+          case SPxBasisBase<R>::REGULAR :
+          case SPxBasisBase<R>::DUAL :
+          case SPxBasisBase<R>::PRIMAL :
             return UNKNOWN;
-          case SPxBasisBase<Real>::OPTIMAL :
+          case SPxBasisBase<R>::OPTIMAL :
             return OPTIMAL;
-          case SPxBasisBase<Real>::UNBOUNDED :
+          case SPxBasisBase<R>::UNBOUNDED :
             return UNBOUNDED;
-          case SPxBasisBase<Real>::INFEASIBLE :
+          case SPxBasisBase<R>::INFEASIBLE :
             return INFEASIBLE;
           default:
             return ERROR;
@@ -2102,7 +2085,7 @@ namespace soplex
       case SINGULAR :
         return m_status;
       case OPTIMAL :
-        assert( SPxBasisBase<Real>::status() == SPxBasisBase<Real>::OPTIMAL );
+        assert( SPxBasisBase<R>::status() == SPxBasisBase<R>::OPTIMAL );
         /*lint -fallthrough*/
       case ABORT_EXDECOMP :
       case ABORT_DECOMP :
@@ -2123,9 +2106,9 @@ namespace soplex
       }
   }
 
-  template <>
-  typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::getResult(
-                                                        Real* p_value,
+  template <class R>
+  typename SPxSolverBase<R>::Status SPxSolverBase<R>::getResult(
+                                                        R* p_value,
                                                         Vector* p_primal,
                                                         Vector* p_slacks,
                                                         Vector* p_dual,
