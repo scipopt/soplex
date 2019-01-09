@@ -28,7 +28,7 @@ class StableSum
    typename std::remove_const<T>::type sum;
 
  public:
-   StableSum() = default;
+   StableSum() : sum( 0 ) {}
    StableSum( const T& init ) : sum( init ) {}
 
    void operator+=( const T& input )
