@@ -337,7 +337,7 @@ namespace soplex
        contains the SPxId%s of the basis vectors, and #matrix the pointers to
        the vectors themselfes. Method #loadMatrixVecs() serves for loading
        #matrix according to the SPxId%s stored in #theBaseId. This method must
-       be called whenever the vector pointers may have
+       be called whenever the VectorBase<R> pointers may have
        changed due to manipulations of the LP.
     */
     //@{
@@ -359,7 +359,7 @@ namespace soplex
     bool factorized;
 
     /// number of updates before refactorization.
-    /** When a vector of the basis matrix is exchanged by a call to method
+    /** When a VectorBase<R> of the basis matrix is exchanged by a call to method
         #change(), the LU factorization of the matrix is updated
         accordingly. However, after atmost #maxUpdates updates of the
         factorization, it is recomputed in order to regain numerical
@@ -372,16 +372,16 @@ namespace soplex
         #nonzeroFactor times the number of nonzeros in B, the
         basis matrix is refactorized.
     */
-    Real   nonzeroFactor;
+    R   nonzeroFactor;
 
     /// allowed increase in relative fill before refactorization
-    /** When the real relative fill is bigger than fillFactor times lastFill
+    /** When the R relative fill is bigger than fillFactor times lastFill
      *  the Basis will be refactorized.
      */
-    Real   fillFactor;
+    R   fillFactor;
 
     /// allowed total increase in memory consumption before refactorization
-    Real   memFactor;
+    R   memFactor;
 
     /* Rank-1-updates to the basis may be performed via method #change(). In
        this case, the factorization is updated, and the following members are
@@ -394,7 +394,7 @@ namespace soplex
     int    totalUpdateCount; ///< number of updates
     int    nzCount;       ///< number of nonzeros in basis matrix
     int    lastMem;       ///< memory needed after last fresh factorization
-    Real   lastFill;      ///< fill ratio that occured during last factorization
+    R   lastFill;      ///< fill ratio that occured during last factorization
     int    lastNzCount;   ///< number of nonzeros in basis matrix after last fresh factorization
 
     Timer* theTime;  ///< time spent in updates
@@ -403,7 +403,7 @@ namespace soplex
     SPxId  lastin;        ///< lastEntered(): variable entered the base last
     SPxId  lastout;       ///< lastLeft(): variable left the base last
     int    lastidx;       ///< lastIndex(): basis index where last update was done
-    Real   minStab;       ///< minimum stability
+    R   minStab;       ///< minimum stability
     //@}
 
   private:
@@ -519,13 +519,13 @@ namespace soplex
       return *matrix[i];
     }
 
-    /// returns SPxId of last vector included to the basis.
+    /// returns SPxId of last VectorBase<R> included to the basis.
     inline SPxId lastEntered() const
     {
       return lastin;
     }
 
-    /// returns SPxId of last vector that left the basis.
+    /// returns SPxId of last VectorBase<R> that left the basis.
     inline SPxId lastLeft() const
     {
       return lastout;
@@ -578,12 +578,12 @@ namespace soplex
         - \f$x \leftarrow x^TB\f$  in the rowwise case.
 
         Both can be seen uniformly as multiplying the basis matrix \p B with
-        a vector \p x aligned the same way as the \em vectors of \p B.
+        a VectorBase<R> \p x aligned the same way as the \em vectors of \p B.
     */
-    Vector& multBaseWith(Vector& x) const;
+    VectorBase<R>& multBaseWith(VectorBase<R>& x) const;
 
     /// Basis-vector product
-    void multBaseWith(SSVector& x, SSVector& result) const;
+    void multBaseWith(SSVector& x, SSVectorBase<R>& result) const;
 
     /// Vector-basis product.
     /** Depending on the representation, for a #SPxBasisBase B,
@@ -592,27 +592,27 @@ namespace soplex
         - \f$x \leftarrow Bx\f$    in the rowwise case.
 
         Both can be seen uniformly as multiplying the basis matrix \p B with
-        a vector \p x aligned the same way as the \em covectors of \p B.
+        a VectorBase<R> \p x aligned the same way as the \em covectors of \p B.
     */
-    Vector& multWithBase(Vector& x) const;
+    VectorBase<R>& multWithBase(VectorBase<R>& x) const;
 
     /// Vector-basis product
-    void multWithBase(SSVector& x, SSVector& result) const;
+    void multWithBase(SSVector& x, SSVectorBase<R>& result) const;
 
     /* compute an estimated condition number for the current basis matrix
      * by computing estimates of the norms of B and B^-1 using the power method.
      * maxiters and tolerance control the accuracy of the estimate.
      */
-    Real condition(int maxiters = 10, Real tolerance = 1e-6);
+    R condition(int maxiters = 10, R tolerance = 1e-6);
 
     /* wrapper to compute an estimate of the condition number of the current basis matrix */
-    Real getEstimatedCondition()
+    R getEstimatedCondition()
     {
       return condition(20, 1e-6);
     }
 
     /* wrapper to compute the exact condition number of the current basis matrix */
-    Real getExactCondition()
+    R getExactCondition()
     {
       return condition(1000, 1e-9);
     }
@@ -622,15 +622,15 @@ namespace soplex
      * type = 1: trace of U (sum of diagonal elements)
     *  type = 2: determinant (product of diagonal elements)
      */
-   Real getMatrixMetric(int type = 0);
+   R getMatrixMetric(int type = 0);
 
     /// returns the stability of the basis matrix.
-    Real stability() const
+    R stability() const
     {
       return factor->stability();
     }
     ///
-    void solve(Vector& x, const Vector& rhs)
+    void solve(VectorBase<R>& x, const VectorBase<R>& rhs)
     {
       if( rhs.dim() == 0 )
         {
@@ -660,7 +660,7 @@ namespace soplex
         - \f$x \leftarrow rhs^TB^{-1}\f$     in the rowwise case.
 
         Both can be seen uniformly as solving a linear system with the basis
-        matrix \p B and a right handside vector \p x aligned the same way as
+        matrix \p B and a right handside VectorBase<R> \p x aligned the same way as
         the \em vectors of \p B.
     */
     void solve4update(SSVector& x, const SVector& rhs)
@@ -675,22 +675,22 @@ namespace soplex
       factor->solveRight4update(x, rhs);
     }
     /// solves two systems in one call.
-    void solve4update(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
+    void solve4update(SSVector& x, VectorBase<R>& y, const SVector& rhsx, SSVectorBase<R>& rhsy)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
     }
     /// solves two systems in one call using only sparse data structures
-    void solve4update(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
+    void solve4update(SSVector& x, SSVectorBase<R>& y, const SVector& rhsx, SSVectorBase<R>& rhsy)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solve2right4update(x, y, rhsx, rhsy);
     }
     /// solves three systems in one call.
-    void solve4update(SSVector& x, Vector& y, Vector& y2,
-                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
+    void solve4update(SSVector& x, VectorBase<R>& y, VectorBase<R>& y2,
+                      const SVector& rhsx, SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsy2)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
@@ -699,8 +699,8 @@ namespace soplex
       factor->solve3right4update(x, y, y2, rhsx, rhsy, rhsy2);
     }
     /// solves three systems in one call using only sparse data structures
-    void solve4update(SSVector& x, SSVector& y, SSVector& y2,
-                      const SVector& rhsx, SSVector& rhsy, SSVector& rhsy2)
+    void solve4update(SSVector& x, SSVectorBase<R>& y, SSVectorBase<R>& y2,
+                      const SVector& rhsx, SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsy2)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
@@ -715,10 +715,10 @@ namespace soplex
         - \f$x \leftarrow B^{-1}rhs\f$       in the rowwise case.
 
         Both can be seen uniformly as solving a linear system with the basis
-        matrix \p B and a right handside vector \p x aligned the same way as
+        matrix \p B and a right handside VectorBase<R> \p x aligned the same way as
         the \em covectors of \p B.
     */
-    void coSolve(Vector& x, const Vector& rhs)
+    void coSolve(VectorBase<R>& x, const VectorBase<R>& rhs)
     {
       if( rhs.dim() == 0 )
         {
@@ -742,28 +742,28 @@ namespace soplex
       factor->solveLeft(x, rhs);
     }
     /// solves two systems in one call.
-    void coSolve(SSVector& x, Vector& y, const SVector& rhsx, SSVector& rhsy)
+    void coSolve(SSVector& x, VectorBase<R>& y, const SVector& rhsx, SSVectorBase<R>& rhsy)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
     /// Sparse version of solving two systems in one call.
-    void coSolve(SSVector& x, SSVector& y, const SVector& rhsx, SSVector& rhsy)
+    void coSolve(SSVector& x, SSVectorBase<R>& y, const SVector& rhsx, SSVectorBase<R>& rhsy)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, rhsx, rhsy);
     }
     /// solves three systems in one call. May be improved by using just one pass through the basis.
-    void coSolve(SSVector& x, Vector& y, Vector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
+    void coSolve(SSVector& x, VectorBase<R>& y, VectorBase<R>& z, const SVector& rhsx, SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsz)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
     }
     /// Sparse version of solving three systems in one call.
-    void coSolve(SSVector& x, SSVector& y, SSVector& z, const SVector& rhsx, SSVector& rhsy, SSVector& rhsz)
+    void coSolve(SSVector& x, SSVectorBase<R>& y, SSVectorBase<R>& z, const SVector& rhsx, SSVectorBase<R>& rhsy, SSVectorBase<R>& rhsz)
     {
       if (!factorized)
         SPxBasisBase<R>::factorize();
@@ -802,7 +802,7 @@ namespace soplex
     /**@name Miscellaneous */
     //@{
     /// performs basis update.
-    /** Changes the \p i 'th vector of the basis with the vector associated to
+    /** Changes the \p i 'th VectorBase<R> of the basis with the VectorBase<R> associated to
         \p id. This includes:
         - updating the factorization, or recomputing it from scratch by
         calling   \ref soplex::SPxSolverBase<R>::factorize()   "factorize()",
@@ -816,12 +816,12 @@ namespace soplex
         cannot know about how to set up the status of the involved variables
         correctly.
 
-        A vector \p enterVec may be passed for a fast ETA update of the LU
+        A VectorBase<R> \p enterVec may be passed for a fast ETA update of the LU
         factorization associated to the basis. It must be initialized with
-        the solution vector \f$x\f$ of the right linear system \f$Bx = b\f$
-        with the entering vector as right-hand side vector \f$b\f$, where \f$B\f$
+        the solution VectorBase<R> \f$x\f$ of the right linear system \f$Bx = b\f$
+        with the entering VectorBase<R> as right-hand side VectorBase<R> \f$b\f$, where \f$B\f$
         denotes the basis matrix. This can be computed using method #solve().
-        When using FAST updates, a vector \p eta may be passed for
+        When using FAST updates, a VectorBase<R> \p eta may be passed for
         improved performance. It must be initialized by a call to
         factor->solveRightUpdate() as described in SLinSolver. The
         implementation hidden behind FAST updates depends on the
@@ -898,7 +898,7 @@ namespace soplex
     bool isConsistent() const;
 
     /// time spent in updates
-    Real getTotalUpdateTime() const
+    R getTotalUpdateTime() const
     {
       return theTime->time();
     }
