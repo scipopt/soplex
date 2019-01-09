@@ -71,7 +71,7 @@ void SPxSolverBase<R>::doRemoveRow(int i)
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      removedRow(i);
+      this->removedRow(i);
       switch (SPxBasisBase<R>::status())
       {
       case SPxBasisBase<R>::DUAL:
@@ -97,7 +97,7 @@ void SPxSolverBase<R>::doRemoveRows(int perm[])
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      removedRows(perm);
+      this->removedRows(perm);
       switch (SPxBasisBase<R>::status())
       {
       case SPxBasisBase<R>::DUAL:
@@ -124,7 +124,7 @@ void SPxSolverBase<R>::doRemoveCol(int i)
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      removedCol(i);
+      this->removedCol(i);
       switch (SPxBasisBase<R>::status())
       {
       case SPxBasisBase<R>::PRIMAL:
@@ -151,7 +151,7 @@ void SPxSolverBase<R>::doRemoveCols(int perm[])
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      removedCols(perm);
+      this->removedCols(perm);
       switch (SPxBasisBase<R>::status())
       {
       case SPxBasisBase<R>::PRIMAL:
@@ -249,8 +249,8 @@ void SPxSolverBase<R>::changeRowObj(int i, const R& newVal, bool scale)
   template <class R>
 void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
 {
-   SPxBasisBase<R>::Desc::Status& stat      = desc().colStatus(i);
-   R                    currUpper = upper(i);
+  typename SPxBasisBase<R>::Desc::Status& stat      = this->desc().colStatus(i);
+  R                    currUpper = this->upper(i);
    R                    objChange = 0.0;
 
    MSG_DEBUG( std::cout << "DCHANG01 changeLowerStatus(): col " << i
@@ -278,7 +278,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
-            objChange = maxObj(i) * (newLower - oldLower);
+           objChange = this->maxObj(i) * (newLower - oldLower);
       }
       else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theLCbound[i] * (newLower - oldLower);
@@ -300,7 +300,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
          if( isInitialized() )
-            theUCbound[i] = maxObj(i);
+           theUCbound[i] = this->maxObj(i);
       }
       break;
    case SPxBasisBase<R>::Desc::D_FREE:
@@ -310,7 +310,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
    case SPxBasisBase<R>::Desc::D_UNDEFINED:
       if( rep() == ROW && theShift > 0.0 )
          forceRecompNonbasicValue();
-      stat = dualColStatus(i);
+      stat = this->dualColStatus(i);
       break;
    default:
       throw SPxInternalCodeException("XCHANG01 This should never happen.");
@@ -334,7 +334,7 @@ void SPxSolverBase<R>::changeLower(const VectorBase<R>& newLower, bool scale)
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
       for (int i = 0; i < newLower.dim(); ++i)
-         changeLowerStatus(i, lower(i));
+        changeLowerStatus(i, this->lower(i));
 
       unInit();
    }
@@ -344,8 +344,8 @@ void SPxSolverBase<R>::changeLower(const VectorBase<R>& newLower, bool scale)
   template <class R>
 void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
 {
-   SPxBasisBase<R>::Desc::Status& stat      = desc().colStatus(i);
-   R                    currLower = lower(i);
+  typename SPxBasisBase<R>::Desc::Status& stat      = this->desc().colStatus(i);
+   R                    currLower = this->lower(i);
    R                    objChange = 0.0;
 
    MSG_DEBUG( std::cout << "DCHANG02 changeUpperStatus(): col " << i
@@ -377,7 +377,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
-            objChange = maxObj(i) * (newUpper - oldUpper);
+           objChange = this->maxObj(i) * (newUpper - oldUpper);
       }
       else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theUCbound[i] * (newUpper - oldUpper);
@@ -395,7 +395,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
          if( isInitialized() )
-            theLCbound[i] = maxObj(i);
+           theLCbound[i] = this->maxObj(i);
       }
       break;
    case SPxBasisBase<R>::Desc::D_FREE:
@@ -405,7 +405,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
    case SPxBasisBase<R>::Desc::D_UNDEFINED:
       if( rep() == ROW && theShift > 0.0 )
          forceRecompNonbasicValue();
-      stat = dualColStatus(i);
+      stat = this->dualColStatus(i);
       break;
    default:
       throw SPxInternalCodeException("XCHANG02 This should never happen.");
@@ -428,7 +428,7 @@ void SPxSolverBase<R>::changeUpper(const VectorBase<R>& newUpper, bool scale)
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
       for (int i = 0; i < newUpper.dim(); ++i)
-         changeUpperStatus(i, upper(i));
+        changeUpperStatus(i, this->upper(i));
 
       unInit();
    }
@@ -437,14 +437,14 @@ void SPxSolverBase<R>::changeUpper(const VectorBase<R>& newUpper, bool scale)
   template <class R>
 void SPxSolverBase<R>::changeUpper(int i, const R& newUpper, bool scale)
 {
-   if( newUpper != (scale ? upperUnscaled(i) : upper(i)) )
+  if( newUpper != (scale ? this->upperUnscaled(i) : this->upper(i)) )
    {
-      R oldUpper = upper(i);
+     R oldUpper = this->upper(i);
       SPxLPBase<R>::changeUpper(i, newUpper, scale);
 
       if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
       {
-         changeUpperStatus(i, upper(i), oldUpper);
+        changeUpperStatus(i, this->upper(i), oldUpper);
          unInit();
       }
    }
@@ -467,8 +467,8 @@ void SPxSolverBase<R>::changeBounds(int i, const R& newLower, const R& newUpper,
   template <class R>
 void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
 {
-   SPxBasisBase<R>::Desc::Status& stat      = desc().rowStatus(i);
-   R                    currRhs   = rhs(i);
+  typename SPxBasisBase<R>::Desc::Status& stat      = this->desc().rowStatus(i);
+   R                    currRhs   = this->rhs(i);
    R                    objChange = 0.0;
 
    MSG_DEBUG( std::cout << "DCHANG03 changeLhsStatus()  : row " << i
@@ -495,7 +495,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
-            objChange = maxRowObj(i) * (newLhs - oldLhs);
+           objChange = this->maxRowObj(i) * (newLhs - oldLhs);
       }
       else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theURbound[i] * (newLhs - oldLhs);
@@ -517,7 +517,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
          if( isInitialized() )
-            theLRbound[i] = maxRowObj(i);
+           theLRbound[i] = this->maxRowObj(i);
       }
       break;
    case SPxBasisBase<R>::Desc::D_FREE:
@@ -527,7 +527,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
    case SPxBasisBase<R>::Desc::D_UNDEFINED:
       if( rep() == ROW && theShift > 0.0 )
          forceRecompNonbasicValue();
-      stat = dualRowStatus(i);
+      stat = this->dualRowStatus(i);
       break;
    default:
       throw SPxInternalCodeException("XCHANG03 This should never happen.");
@@ -549,8 +549,8 @@ void SPxSolverBase<R>::changeLhs(const VectorBase<R>& newLhs, bool scale)
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      for (int i = 0; i < nRows(); ++i)
-         changeLhsStatus(i, lhs(i));
+     for (int i = 0; i < this->nRows(); ++i)
+       changeLhsStatus(i, this->lhs(i));
 
       unInit();
    }
@@ -559,14 +559,14 @@ void SPxSolverBase<R>::changeLhs(const VectorBase<R>& newLhs, bool scale)
   template <class R>
 void SPxSolverBase<R>::changeLhs(int i, const R& newLhs, bool scale)
 {
-   if( newLhs != (scale ? lhsUnscaled(i) : lhs(i)) )
+  if( newLhs != (scale ? this->lhsUnscaled(i) : this->lhs(i)) )
    {
-      R oldLhs = lhs(i);
+     R oldLhs = this->lhs(i);
       SPxLPBase<R>::changeLhs(i, newLhs, scale);
 
       if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
       {
-         changeLhsStatus(i, lhs(i), oldLhs);
+        changeLhsStatus(i, this->lhs(i), oldLhs);
          unInit();
       }
    }
@@ -575,8 +575,8 @@ void SPxSolverBase<R>::changeLhs(int i, const R& newLhs, bool scale)
   template <class R>
 void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
 {
-   SPxBasisBase<R>::Desc::Status& stat      = desc().rowStatus(i);
-   R                    currLhs   = lhs(i);
+  typename SPxBasisBase<R>::Desc::Status& stat      = this->desc().rowStatus(i);
+   R                    currLhs   = this->lhs(i);
    R                    objChange = 0.0;
 
    MSG_DEBUG( std::cout << "DCHANG04 changeRhsStatus()  : row " << i
@@ -603,7 +603,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
       {
          stat = SPxBasisBase<R>::Desc::P_FIXED;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
-            objChange = maxRowObj(i) * (newRhs - oldRhs);
+           objChange = this->maxRowObj(i) * (newRhs - oldRhs);
       }
       else if( m_nonbasicValueUpToDate && rep() == COLUMN )
          objChange = theLRbound[i] * (newRhs - oldRhs);
@@ -625,7 +625,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
          if( isInitialized() )
-            theURbound[i] = maxRowObj(i);
+           theURbound[i] = this->maxRowObj(i);
       }
       break;
    case SPxBasisBase<R>::Desc::D_FREE:
@@ -635,7 +635,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
    case SPxBasisBase<R>::Desc::D_UNDEFINED:
       if( rep() == ROW && theShift > 0.0 )
          forceRecompNonbasicValue();
-      stat = dualRowStatus(i);
+      stat = this->dualRowStatus(i);
       break;
    default:
       throw SPxInternalCodeException("XCHANG04 This should never happen.");
@@ -658,8 +658,8 @@ void SPxSolverBase<R>::changeRhs(const VectorBase<R>& newRhs, bool scale)
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      for (int i = 0; i < nRows(); ++i)
-         changeRhsStatus(i, rhs(i));
+     for (int i = 0; i < this->nRows(); ++i)
+       changeRhsStatus(i, this->rhs(i));
       unInit();
    }
 }
@@ -667,14 +667,14 @@ void SPxSolverBase<R>::changeRhs(const VectorBase<R>& newRhs, bool scale)
   template <class R>
 void SPxSolverBase<R>::changeRhs(int i, const R& newRhs, bool scale)
 {
-   if( newRhs != (scale ? rhsUnscaled(i) : rhs(i)) )
+  if( newRhs != (scale ? this->rhsUnscaled(i) : this->rhs(i)) )
    {
-      R oldRhs = rhs(i);
+     R oldRhs = this->rhs(i);
       SPxLPBase<R>::changeRhs(i, newRhs, scale);
 
       if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
       {
-         changeRhsStatus(i, rhs(i), oldRhs);
+        changeRhsStatus(i, this->rhs(i), oldRhs);
          unInit();
       }
    }
@@ -690,10 +690,10 @@ void SPxSolverBase<R>::changeRange(const VectorBase<R>& newLhs, const VectorBase
    SPxLPBase<R>::changeRhs(newRhs, scale);
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      for (int i = nRows() - 1; i >= 0; --i)
+     for (int i = this->nRows() - 1; i >= 0; --i)
       {
-         changeLhsStatus(i, lhs(i));
-         changeRhsStatus(i, rhs(i));
+        changeLhsStatus(i, this->lhs(i));
+        changeRhsStatus(i, this->rhs(i));
       }
       unInit();
    }
@@ -702,16 +702,16 @@ void SPxSolverBase<R>::changeRange(const VectorBase<R>& newLhs, const VectorBase
   template <class R>
 void SPxSolverBase<R>::changeRange(int i, const R& newLhs, const R& newRhs, bool scale)
 {
-   R oldLhs = lhs(i);
-   R oldRhs = rhs(i);
+  R oldLhs = this->lhs(i);
+  R oldRhs = this->rhs(i);
 
    SPxLPBase<R>::changeLhs(i, newLhs, scale);
    SPxLPBase<R>::changeRhs(i, newRhs, scale);
 
    if (SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
    {
-      changeLhsStatus(i, lhs(i), oldLhs);
-      changeRhsStatus(i, rhs(i), oldRhs);
+     changeLhsStatus(i, this->lhs(i), oldLhs);
+     changeRhsStatus(i, this->rhs(i), oldRhs);
       unInit();
    }
 }
@@ -756,7 +756,7 @@ void SPxSolverBase<R>::changeElement(int i, int j, const R& val, bool scale)
 }
 
   template <class R>
-void SPxSolverBase<R>::changeSense(SPxSense sns)
+  void SPxSolverBase<R>::changeSense(typename SPxLPBase<R>::SPxSense sns)
 {
 
    SPxLPBase<R>::changeSense(sns);
