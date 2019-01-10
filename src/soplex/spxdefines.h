@@ -327,12 +327,12 @@ inline Real spxNextafter(Real x, Real y)
    return nextafterl(x,y);
 }
 
-  // @todo: what is happening here?
-// /// returns x * 2^exp
-// inline Real spxLdexp(Real x, int exp)
-// {
-//    return ldexpl(x,exp);
-// }
+
+/// returns x * 2^exp
+inline Real spxLdexp(Real x, int exp)
+{
+   return ldexpl(x,exp);
+}
 
 // @todo is the following needed?
 // // returns x and exp such that y = x * 2^exp

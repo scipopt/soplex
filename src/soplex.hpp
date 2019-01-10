@@ -7286,7 +7286,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
       return true;
     }
 
-  // check whether we have a R parameter
+  // check whether we have a Real parameter
   if( strncmp(paramTypeString, "real", 4) == 0 )
     {
       for( int param = 0; ; param++ )

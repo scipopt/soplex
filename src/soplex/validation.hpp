@@ -55,3 +55,85 @@ bool Validation<R>::updateValidationTolerance(char* tolerance)
   return true;
 }
 
+
+  /// validates the soplex solution using the external solution
+  template <class R>
+  void Validation<R>::validateSolveReal(SoPlexBase<R>& soplex)
+  {
+    bool passedValidation = true;
+    std::string reason = "";
+    R objViolation = 0.0;
+    R maxBoundViolation = 0.0;
+    R maxRowViolation = 0.0;
+    R maxRedCostViolation = 0.0;
+    R maxDualViolation = 0.0;
+    R sumBoundViolation = 0.0;
+    R sumRowViolation = 0.0;
+    R sumRedCostViolation = 0.0;
+    R sumDualViolation = 0.0;
+    R sol;
+
+    std::ostream& os = soplex.spxout.getStream(SPxOut::INFO1);
+
+    if( strncmp(validatesolution, "+infinity", 9 ) == 0 )
+      sol =  soplex.realParam(SoPlexBase<R>::INFTY);
+    else if ( strncmp(validatesolution, "-infinity", 9) == 0 )
+      sol =  -soplex.realParam(SoPlexBase<R>::INFTY);
+    else
+      {
+        sol = atof(validatesolution);
+      }
+
+    objViolation = spxAbs(sol - soplex.objValueReal());
+   // skip check in case presolving detected infeasibility/unboundedness
+   if( SPxSolverBase<R>::INForUNBD == soplex.status() &&
+       (sol == soplex.realParam(SoPlexBase<R>::INFTY) || sol == -soplex.realParam(SoPlexBase<R>::INFTY)) )
+      objViolation = 0.0;
+   if( ! EQ(objViolation, R(0.0), validatetolerance) )
+      {
+        passedValidation = false;
+        reason += "Objective Violation; ";
+      }
+    if( SPxSolverBase<R>::OPTIMAL == soplex.status() )
+      {
+        soplex.getBoundViolation(maxBoundViolation, sumBoundViolation);
+        soplex.getRowViolation(maxRowViolation, sumRowViolation);
+        soplex.getRedCostViolation(maxRedCostViolation, sumRedCostViolation);
+        soplex.getDualViolation(maxDualViolation, sumDualViolation);
+        if( ! LE(maxBoundViolation, validatetolerance) )
+          {
+            passedValidation = false;
+            reason += "Bound Violation; ";
+          }
+        if( ! LE(maxRowViolation, validatetolerance) )
+          {
+            passedValidation = false;
+            reason += "Row Violation; ";
+          }
+        if( ! LE(maxRedCostViolation, validatetolerance) )
+          {
+            passedValidation = false;
+            reason += "Reduced Cost Violation; ";
+          }
+        if( ! LE(maxDualViolation, validatetolerance) )
+          {
+            passedValidation = false;
+            reason += "Dual Violation; ";
+          }
+      }
+
+    os << "\n";
+    os << "Validation          :";
+    if(passedValidation)
+      os << " Success\n";
+    else
+      {
+        reason[reason.length()-2] = ']';
+        os << " Fail [" + reason + "\n";
+      }
+    os << "   Objective        : " << std::scientific << std::setprecision(8) << objViolation << std::fixed << "\n";
+    os << "   Bound            : " << std::scientific << std::setprecision(8) << maxBoundViolation << std::fixed << "\n";
+    os << "   Row              : " << std::scientific << std::setprecision(8) << maxRowViolation << std::fixed << "\n";
+    os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
+    os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
+  }

@@ -36,7 +36,7 @@ namespace soplex {
       char*          validatesolution;
 
       /// tolerance used for validation
-      double         validatetolerance;
+      R         validatetolerance;
 
       /// default constructor
       Validation()
