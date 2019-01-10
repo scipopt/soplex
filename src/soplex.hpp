@@ -116,7 +116,7 @@ bool SoPlexBase<R>::getBoundViolation(R& maxviol, R& sumviol)
     return false;
 
   _syncRealSolution();
-  VectorReal& primal = _solReal._primal;
+  VectorBase<R>& primal = _solReal._primal;
   assert(primal.dim() == numCols());
 
   maxviol = 0.0;
@@ -124,9 +124,9 @@ bool SoPlexBase<R>::getBoundViolation(R& maxviol, R& sumviol)
 
   for( int i = numCols() - 1; i >= 0; i-- )
     {
-      Real lower = _realLP->lowerUnscaled(i);
-      Real upper = _realLP->upperUnscaled(i);
-      Real viol = lower - primal[i];
+      R lower = _realLP->lowerUnscaled(i);
+      R upper = _realLP->upperUnscaled(i);
+      R viol = lower - primal[i];
       if( viol > 0.0 )
         {
           sumviol += viol;
@@ -168,20 +168,20 @@ bool SoPlexBase<R>::getRowViolation(R& maxviol, R& sumviol)
     return false;
 
   _syncRealSolution();
-  VectorReal& primal = _solReal._primal;
+  VectorBase<R>& primal = _solReal._primal;
   assert(primal.dim() == numCols());
 
-  DVectorReal activity(numRows());
+  DVectorBase<R> activity(numRows());
   _realLP->computePrimalActivity(primal, activity, true);
   maxviol = 0.0;
   sumviol = 0.0;
 
   for( int i = numRows() - 1; i >= 0; i-- )
     {
-      Real lhs = _realLP->lhsUnscaled(i);
-      Real rhs = _realLP->rhsUnscaled(i);
+      R lhs = _realLP->lhsUnscaled(i);
+      R rhs = _realLP->rhsUnscaled(i);
 
-      Real viol = lhs - activity[i];
+      R viol = lhs - activity[i];
       if( viol > 0.0 )
         {
           sumviol += viol;
@@ -7469,356 +7469,490 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
 
 
 
-  /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
-  /// integer variables if desired; returns true on success
+/// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
+/// integer variables if desired; returns true on success
 
-  template <class R>
-  bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
-  {
-    bool success = false;
-    if( intParam(SoPlexBase<R>::READMODE) == READMODE_REAL )
-      success = _readFileReal(filename, rowNames, colNames, intVars);
-    else
-      success = _readFileRational(filename, rowNames, colNames, intVars);
+template <class R>
+bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+{
+  bool success = false;
+  if( intParam(SoPlexBase<R>::READMODE) == READMODE_REAL )
+    success = _readFileReal(filename, rowNames, colNames, intVars);
+  else
+    success = _readFileRational(filename, rowNames, colNames, intVars);
 
-    // storing the row and column names for use in the DBDS print basis methods
-    _rowNames = rowNames;
-    _colNames = colNames;
+  // storing the row and column names for use in the DBDS print basis methods
+  _rowNames = rowNames;
+  _colNames = colNames;
 
-    return success;
-  }
-
-
-
-  /// writes R LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
-  /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
-  /// marked as integer; returns true on success
-  template <class R>
-	bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
-  {
-    ///@todo implement return value
-    if( unscale && _realLP->isScaled() )
-      {
-        MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
-          SPxLPBase<R>* origLP;
-        origLP = 0;
-        spx_alloc(origLP);
-        origLP = new (origLP) SPxLPBase<R>(*_realLP);
-        origLP->unscaleLP();
-        origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
-        origLP->~SPxLPBase<R>();
-        spx_free(origLP);
-      }
-    else
-      _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
-
-    return true;
-  }
-
-
-  /// writes the dual of the R LP to file; LP or MPS format is chosen from the extension in \p filename;
-  /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
-  /// the variables contained in it are marked as integer; returns true on success
-  template <class R>
-	bool SoPlexBase<R>::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
-  {
-    SPxLPBase<R> dualLP;
-    _realLP->buildDualProblem(dualLP);
-    dualLP.setOutstream(spxout);
-
-    // swap colnames and rownames
-    dualLP.writeFileLPBase(filename, colNames, rowNames);
-    return true;
-  }
+  return success;
+}
 
 
 
-  /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
-  /// default names are assumed; returns true on success
-  template <class R>
-  bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
-  {
-    clearBasis();
-    /// @todo can't we just remove the else code?
+/// writes R LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
+/// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
+/// marked as integer; returns true on success
+template <class R>
+bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+{
+  ///@todo implement return value
+  if( unscale && _realLP->isScaled() )
+    {
+      MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
+        SPxLPBase<R>* origLP;
+      origLP = 0;
+      spx_alloc(origLP);
+      origLP = new (origLP) SPxLPBase<R>(*_realLP);
+      origLP->unscaleLP();
+      origLP->writeFileLPBase(filename, rowNames, colNames, intVars);
+      origLP->~SPxLPBase<R>();
+      spx_free(origLP);
+    }
+  else
+    _realLP->writeFileLPBase(filename, rowNames, colNames, intVars);
+
+  return true;
+}
+
+
+/// writes the dual of the R LP to file; LP or MPS format is chosen from the extension in \p filename;
+/// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
+/// the variables contained in it are marked as integer; returns true on success
+template <class R>
+bool SoPlexBase<R>::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+{
+  SPxLPBase<R> dualLP;
+  _realLP->buildDualProblem(dualLP);
+  dualLP.setOutstream(spxout);
+
+  // swap colnames and rownames
+  dualLP.writeFileLPBase(filename, colNames, rowNames);
+  return true;
+}
+
+
+
+/// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
+/// default names are assumed; returns true on success
+template <class R>
+bool SoPlexBase<R>::readBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames)
+{
+  clearBasis();
+  /// @todo can't we just remove the else code?
 #if 1
-    assert(filename != 0);
-    assert(_realLP != 0);
+  assert(filename != 0);
+  assert(_realLP != 0);
 
-    // start timing
-    _statistics->readingTime->start();
+  // start timing
+  _statistics->readingTime->start();
 
-    // read
-    if( !_isRealLPLoaded )
-      {
-        assert(_realLP != &_solver);
+  // read
+  if( !_isRealLPLoaded )
+    {
+      assert(_realLP != &_solver);
 
-        _solver.loadLP(*_realLP);
-        _realLP->~SPxLPBase<R>();
-        spx_free(_realLP);
-        _realLP = &_solver;
-        _isRealLPLoaded = true;
-      }
-    _hasBasis = _solver.readBasisFile(filename, rowNames, colNames);
-    assert(_hasBasis == (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM));
+      _solver.loadLP(*_realLP);
+      _realLP->~SPxLPBase<R>();
+      spx_free(_realLP);
+      _realLP = &_solver;
+      _isRealLPLoaded = true;
+    }
+  _hasBasis = _solver.readBasisFile(filename, rowNames, colNames);
+  assert(_hasBasis == (_solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM));
 
-    // stop timing
-    _statistics->readingTime->stop();
-
-    return _hasBasis;
-#else
-    // this is alternative code for reading bases without the SPxSolverBase class
-    assert(filename != 0);
-
-    // start timing
-    _statistics->readingTime->start();
-
-    // read
-    spxifstream file(filename);
-
-    if( !file )
-      return false;
-
-    // get problem size
-    int numRows = numRows();
-    int numCols = numCols();
-
-    // prepare column names
-    const NameSet* colNamesPtr = colNames;
-    NameSet* tmpColNames = 0;
-    if( colNames == 0 )
-      {
-        std::stringstream name;
-
-        spx_alloc(tmpColNames);
-        tmpColNames = new (tmpColNames) NameSet();
-        tmpColNames->reMax(numCols);
-
-        for( int j = 0; j < numCols; ++j )
-          {
-            name << "x" << j;
-            tmpColNames->add(name.str().c_str());
-          }
-
-        colNamesPtr = tmpColNames;
-      }
-
-    // prepare row names
-    const NameSet* rowNamesPtr = rowNames;
-    NameSet* tmpRowNames = 0;
-    if( rowNamesPtr == 0 )
-      {
-        std::stringstream name;
-
-        spx_alloc(tmpRowNames);
-        tmpRowNames = new (tmpRowNames) NameSet();
-        tmpRowNames->reMax(numRows);
-
-        for( int i = 0; i < numRows; ++i )
-          {
-            name << "C" << i;
-            tmpRowNames->add(name.str().c_str());
-          }
-
-        rowNamesPtr = tmpRowNames;
-      }
-
-    // initialize with default slack basis
-    _basisStatusRows.reSize(numRows);
-    _basisStatusCols.reSize(numCols);
-
-    for( int i = 0; i < numRows; i++ )
-      _basisStatusRows[i] = SPxSolverBase<R>::BASIC;
-
-    for( int i = 0; i < numCols; i++ )
-      {
-        if( lowerRealInternal(i) == upperRealInternal(i) )
-          _basisStatusCols[i] = SPxSolverBase<R>::FIXED;
-        else if( lowerRealInternal(i) <= double(-realParam(SoPlexBase<R>::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlexBase<R>::INFTY)) )
-          _basisStatusCols[i] = SPxSolverBase<R>::ZERO;
-        else if( lowerRealInternal(i) <= double(-realParam(SoPlexBase<R>::INFTY)) )
-          _basisStatusCols[i] = SPxSolverBase<R>::ON_UPPER;
-        else
-          _basisStatusCols[i] = SPxSolverBase<R>::ON_LOWER;
-      }
-
-    // read basis
-    MPSInput mps(file);
-    if( mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME") )
-      {
-        while( mps.readLine() )
-          {
-            int c = -1;
-            int r = -1;
-
-            if( mps.field0() != 0 && !strcmp(mps.field0(), "ENDATA") )
-              {
-                mps.setSection(MPSInput::ENDATA);
-                break;
-              }
-
-            if( mps.field1() == 0 || mps.field2() == 0 )
-              break;
-
-            if( (c = colNamesPtr->number(mps.field2())) < 0 )
-              break;
-
-            if( *mps.field1() == 'X' )
-              {
-                if( mps.field3() == 0 || (r = rowNamesPtr->number(mps.field3())) < 0 )
-                  break;
-              }
-
-            if( !strcmp(mps.field1(), "XU") )
-              {
-                _basisStatusCols[c] = SPxSolverBase<R>::BASIC;
-                if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_LOWER )
-                  _basisStatusRows[r] = SPxSolverBase<R>::ON_LOWER;
-                else if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_FIXED )
-                  _basisStatusRows[r] = SPxSolverBase<R>::FIXED;
-                else
-                  _basisStatusRows[r] = SPxSolverBase<R>::ON_UPPER;
-              }
-            else if( !strcmp(mps.field1(), "XL") )
-              {
-                _basisStatusCols[c] = SPxSolverBase<R>::BASIC;
-                if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_UPPER )
-                  _basisStatusRows[r] = SPxSolverBase<R>::ON_UPPER;
-                else if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_FIXED )
-                  _basisStatusRows[r] = SPxSolverBase<R>::FIXED;
-                else
-                  _basisStatusRows[r] = SPxSolverBase<R>::ON_LOWER;
-              }
-            else if( !strcmp(mps.field1(), "UL") )
-              {
-                _basisStatusCols[c] = SPxSolverBase<R>::ON_UPPER;
-              }
-            else if( !strcmp(mps.field1(), "LL") )
-              {
-                _basisStatusCols[c] = SPxSolverBase<R>::ON_LOWER;
-              }
-            else
-              {
-                mps.syntaxError();
-                break;
-              }
-          }
-      }
-
-    if( rowNames == 0 )
-      {
-        tmpRowNames->~NameSet();
-        spx_free(tmpRowNames);
-      }
-
-    if( colNames == 0 )
-      {
-        tmpColNames->~NameSet();
-        spx_free(tmpColNames);
-      }
-
-    _hasBasis = !mps.hasError();
-
-    // stop timing
+  // stop timing
   _statistics->readingTime->stop();
 
-    return _hasBasis;
+  return _hasBasis;
+#else
+  // this is alternative code for reading bases without the SPxSolverBase class
+  assert(filename != 0);
+
+  // start timing
+  _statistics->readingTime->start();
+
+  // read
+  spxifstream file(filename);
+
+  if( !file )
+    return false;
+
+  // get problem size
+  int numRows = numRows();
+  int numCols = numCols();
+
+  // prepare column names
+  const NameSet* colNamesPtr = colNames;
+  NameSet* tmpColNames = 0;
+  if( colNames == 0 )
+    {
+      std::stringstream name;
+
+      spx_alloc(tmpColNames);
+      tmpColNames = new (tmpColNames) NameSet();
+      tmpColNames->reMax(numCols);
+
+      for( int j = 0; j < numCols; ++j )
+        {
+          name << "x" << j;
+          tmpColNames->add(name.str().c_str());
+        }
+
+      colNamesPtr = tmpColNames;
+    }
+
+  // prepare row names
+  const NameSet* rowNamesPtr = rowNames;
+  NameSet* tmpRowNames = 0;
+  if( rowNamesPtr == 0 )
+    {
+      std::stringstream name;
+
+      spx_alloc(tmpRowNames);
+      tmpRowNames = new (tmpRowNames) NameSet();
+      tmpRowNames->reMax(numRows);
+
+      for( int i = 0; i < numRows; ++i )
+        {
+          name << "C" << i;
+          tmpRowNames->add(name.str().c_str());
+        }
+
+      rowNamesPtr = tmpRowNames;
+    }
+
+  // initialize with default slack basis
+  _basisStatusRows.reSize(numRows);
+  _basisStatusCols.reSize(numCols);
+
+  for( int i = 0; i < numRows; i++ )
+    _basisStatusRows[i] = SPxSolverBase<R>::BASIC;
+
+  for( int i = 0; i < numCols; i++ )
+    {
+      if( lowerRealInternal(i) == upperRealInternal(i) )
+        _basisStatusCols[i] = SPxSolverBase<R>::FIXED;
+      else if( lowerRealInternal(i) <= double(-realParam(SoPlexBase<R>::INFTY)) && upperRealInternal(i) >= double(realParam(SoPlexBase<R>::INFTY)) )
+        _basisStatusCols[i] = SPxSolverBase<R>::ZERO;
+      else if( lowerRealInternal(i) <= double(-realParam(SoPlexBase<R>::INFTY)) )
+        _basisStatusCols[i] = SPxSolverBase<R>::ON_UPPER;
+      else
+        _basisStatusCols[i] = SPxSolverBase<R>::ON_LOWER;
+    }
+
+  // read basis
+  MPSInput mps(file);
+  if( mps.readLine() && (mps.field0() != 0) && !strcmp(mps.field0(), "NAME") )
+    {
+      while( mps.readLine() )
+        {
+          int c = -1;
+          int r = -1;
+
+          if( mps.field0() != 0 && !strcmp(mps.field0(), "ENDATA") )
+            {
+              mps.setSection(MPSInput::ENDATA);
+              break;
+            }
+
+          if( mps.field1() == 0 || mps.field2() == 0 )
+            break;
+
+          if( (c = colNamesPtr->number(mps.field2())) < 0 )
+            break;
+
+          if( *mps.field1() == 'X' )
+            {
+              if( mps.field3() == 0 || (r = rowNamesPtr->number(mps.field3())) < 0 )
+                break;
+            }
+
+          if( !strcmp(mps.field1(), "XU") )
+            {
+              _basisStatusCols[c] = SPxSolverBase<R>::BASIC;
+              if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_LOWER )
+                _basisStatusRows[r] = SPxSolverBase<R>::ON_LOWER;
+              else if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_FIXED )
+                _basisStatusRows[r] = SPxSolverBase<R>::FIXED;
+              else
+                _basisStatusRows[r] = SPxSolverBase<R>::ON_UPPER;
+            }
+          else if( !strcmp(mps.field1(), "XL") )
+            {
+              _basisStatusCols[c] = SPxSolverBase<R>::BASIC;
+              if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_UPPER )
+                _basisStatusRows[r] = SPxSolverBase<R>::ON_UPPER;
+              else if( _rowTypes[r] == SoPlexBase<R>::RANGETYPE_FIXED )
+                _basisStatusRows[r] = SPxSolverBase<R>::FIXED;
+              else
+                _basisStatusRows[r] = SPxSolverBase<R>::ON_LOWER;
+            }
+          else if( !strcmp(mps.field1(), "UL") )
+            {
+              _basisStatusCols[c] = SPxSolverBase<R>::ON_UPPER;
+            }
+          else if( !strcmp(mps.field1(), "LL") )
+            {
+              _basisStatusCols[c] = SPxSolverBase<R>::ON_LOWER;
+            }
+          else
+            {
+              mps.syntaxError();
+              break;
+            }
+        }
+    }
+
+  if( rowNames == 0 )
+    {
+      tmpRowNames->~NameSet();
+      spx_free(tmpRowNames);
+    }
+
+  if( colNames == 0 )
+    {
+      tmpColNames->~NameSet();
+      spx_free(tmpColNames);
+    }
+
+  _hasBasis = !mps.hasError();
+
+  // stop timing
+  _statistics->readingTime->stop();
+
+  return _hasBasis;
 #endif
 }
 
 
-  /// solves the LP
-  /// R specialization of the optimize function
-  template <class R>
-  typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
-  {
-    assert(_isConsistent());
+/// solves the LP
+/// R specialization of the optimize function
+template <class R>
+typename SPxSolverBase<R>::Status SoPlexBase<R>::optimize()
+{
+  assert(_isConsistent());
 
-    // clear statistics
-    _statistics->clearSolvingData();
+  // clear statistics
+  _statistics->clearSolvingData();
 
-    // the solution is no longer valid
-    _invalidateSolution();
+  // the solution is no longer valid
+  _invalidateSolution();
 
-    // if the decomposition based dual simplex flag is set to true
-    if ( boolParam(SoPlexBase<R>::USEDECOMPDUALSIMPLEX) )
-      {
-        setIntParam(SoPlexBase<R>::SOLVEMODE, SOLVEMODE_REAL);
-        setIntParam(SoPlexBase<R>::REPRESENTATION, REPRESENTATION_ROW);
-        setIntParam(SoPlexBase<R>::ALGORITHM, ALGORITHM_DUAL);
-        //setBoolParam(SoPlexBase<R>::PERSISTENTSCALING, false);
+  // if the decomposition based dual simplex flag is set to true
+  if ( boolParam(SoPlexBase<R>::USEDECOMPDUALSIMPLEX) )
+    {
+      setIntParam(SoPlexBase<R>::SOLVEMODE, SOLVEMODE_REAL);
+      setIntParam(SoPlexBase<R>::REPRESENTATION, REPRESENTATION_ROW);
+      setIntParam(SoPlexBase<R>::ALGORITHM, ALGORITHM_DUAL);
+      //setBoolParam(SoPlexBase<R>::PERSISTENTSCALING, false);
 
-        _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
+      _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-        _solveDecompositionDualSimplex();
-      }
-    // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
-    else if( intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
-                                                                      && GE(realParam(SoPlexBase<R>::FEASTOL), R(1e-9)) && GE(realParam(SoPlexBase<R>::OPTTOL), R(1e-9))) )
-      {
-        // ensure that tolerances are reasonable for the floating-point solver
-        if( realParam(SoPlexBase<R>::FEASTOL) < _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL] )
-          {
-            MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with feasibility tolerance below "
-                         << _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL] << " - relaxing tolerance\n");
-            _solver.setFeastol(_currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL]);
-          }
-        else
-          _solver.setFeastol(realParam(SoPlexBase<R>::FEASTOL));
+      _solveDecompositionDualSimplex();
+    }
+  // decide whether to solve the rational LP with iterative refinement or call the standard floating-point solver
+  else if( intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_REAL || (intParam(SoPlexBase<R>::SOLVEMODE) == SOLVEMODE_AUTO
+                                                                    && GE(realParam(SoPlexBase<R>::FEASTOL), R(1e-9)) && GE(realParam(SoPlexBase<R>::OPTTOL), R(1e-9))) )
+    {
+      // ensure that tolerances are reasonable for the floating-point solver
+      if( realParam(SoPlexBase<R>::FEASTOL) < _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL] )
+        {
+          MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with feasibility tolerance below "
+                       << _currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL] << " - relaxing tolerance\n");
+          _solver.setFeastol(_currentSettings->realParam.lower[SoPlexBase<R>::FPFEASTOL]);
+        }
+      else
+        _solver.setFeastol(realParam(SoPlexBase<R>::FEASTOL));
 
-        if( realParam(SoPlexBase<R>::OPTTOL) < _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL] )
-          {
-            MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with optimality tolerance below "
-                         << _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL] << " - relaxing tolerance\n");
-            _solver.setOpttol(_currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL]);
-          }
-        else
-          _solver.setOpttol(realParam(SoPlexBase<R>::OPTTOL));
+      if( realParam(SoPlexBase<R>::OPTTOL) < _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL] )
+        {
+          MSG_WARNING( spxout, spxout << "Cannot call floating-point solver with optimality tolerance below "
+                       << _currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL] << " - relaxing tolerance\n");
+          _solver.setOpttol(_currentSettings->realParam.lower[SoPlexBase<R>::FPOPTTOL]);
+        }
+      else
+        _solver.setOpttol(realParam(SoPlexBase<R>::OPTTOL));
 
-        _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
+      _solver.setComputeDegenFlag(boolParam(COMPUTEDEGEN));
 
-        _optimize();
+      _optimize();
 #ifdef SOPLEX_DEBUG // this check will remove scaling of the realLP
-        _checkBasisScaling();
+      _checkBasisScaling();
 #endif
-      }
-    else if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
-      {
-        _syncLPRational();
-        _optimizeRational();
-      }
-    else if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_MANUAL )
-      {
+    }
+  else if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
+    {
+      _syncLPRational();
+      _optimizeRational();
+    }
+  else if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_MANUAL )
+    {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-        assert(areLPsInSync(true, true, false));
+      assert(areLPsInSync(true, true, false));
 #else
-        assert(areLPsInSync(true, false, false));
+      assert(areLPsInSync(true, false, false));
 #endif
 
-        _optimizeRational();
+      _optimizeRational();
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
-        assert(areLPsInSync(true, true, false));
+      assert(areLPsInSync(true, true, false));
 #else
-        assert(areLPsInSync(true, false, false));
+      assert(areLPsInSync(true, false, false));
 #endif
-      }
-    else
-      {
+    }
+  else
+    {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-        assert(areLPsInSync(true, true, false));
+      assert(areLPsInSync(true, true, false));
 #else
-        assert(areLPsInSync(true, false, false));
+      assert(areLPsInSync(true, false, false));
 #endif
 
-        _optimizeRational();
-      }
+      _optimizeRational();
+    }
 
-    MSG_INFO1( spxout, spxout << "\n";
-               printShortStatistics(spxout.getStream(SPxOut::INFO1));
-               spxout << "\n" );
-
-
-    return status();
-  }
+  MSG_INFO1( spxout, spxout << "\n";
+             printShortStatistics(spxout.getStream(SPxOut::INFO1));
+             spxout << "\n" );
 
 
+  return status();
+}
+
+
+// @todo: temporary fix. Needs to be looked later
+/// prints complete statistics
+template <class R>
+void SoPlexBase<R>::printStatistics(std::ostream& os)
+{
+  SPxOut::setFixed(os, 2);
+
+  printStatus(os, _status);
+
+  os << "Original problem    : \n";
+  if ( boolParam(SoPlexBase<R>::USEDECOMPDUALSIMPLEX) )
+    printOriginalProblemStatistics(os);
+  else
+    {
+      if( intParam(SoPlexBase<R>::READMODE) == READMODE_REAL )
+        _realLP->printProblemStatistics(os);
+      else
+        _rationalLP->printProblemStatistics(os);
+    }
+
+  os << "Objective sense     : " << (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE ? "minimize\n" : "maximize\n");
+  printSolutionStatistics(os);
+  printSolvingStatistics(os);
+}
+
+// @todo temporary fix. Need to think about precision later
+/// prints short statistics
+template <class R>
+void SoPlexBase<R>::printShortStatistics(std::ostream& os)
+{
+  printStatus(os, _status);
+  SPxOut::setFixed(os, 2);
+  os << "Solving time (sec)  : " << this->_statistics->solvingTime->time() << "\n"
+     << "Iterations          : " << this->_statistics->iterations << "\n";
+  SPxOut::setScientific(os);
+  os << "Objective value     : " << objValueReal() << "\n";
+}
+// @todo: temporary fix need to worry about precision
+/// writes basis information to \p filename; if \p rowNames and \p colNames are \c NULL, default names are used;
+/// returns true on success
+template <class R>
+bool SoPlexBase<R>::writeBasisFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const bool cpxFormat) const
+{
+  assert(filename != 0);
+
+  if( _isRealLPLoaded )
+    return _solver.writeBasisFile(filename, rowNames, colNames, cpxFormat);
+  else
+    {
+      std::ofstream file(filename);
+      if( !file.good() )
+        return false;
+
+      file.setf(std::ios::left);
+      file << "NAME  " << filename << "\n";
+
+      // do not write basis if there is none
+      if( !_hasBasis )
+        {
+          file << "ENDATA\n";
+          return true;
+        }
+
+      // start writing
+      int numRows = _basisStatusRows.size();
+      int numCols = _basisStatusCols.size();
+      int row = 0;
+
+      for( int col = 0; col < numCols; col++ )
+        {
+          assert(_basisStatusCols[col] != SPxSolverBase<R>::UNDEFINED);
+
+          if( _basisStatusCols[col] == SPxSolverBase<R>::BASIC )
+            {
+              // find nonbasic row
+              for( ; row < numRows; row++ )
+                {
+                  assert(_basisStatusRows[row] != SPxSolverBase<R>::UNDEFINED);
+                  if( _basisStatusRows[row] != SPxSolverBase<R>::BASIC )
+                    break;
+                }
+
+              assert(row != numRows);
+
+              if( _basisStatusRows[row] == SPxSolverBase<R>::ON_UPPER && (!cpxFormat || _rowTypes[row] == SoPlexBase<R>::RANGETYPE_BOXED) )
+                file << " XU ";
+              else
+                file << " XL ";
+
+              file << std::setw(8);
+              if( colNames != 0 && colNames->has(col) )
+                file << (*colNames)[col];
+              else
+                file << "x" << col;
+
+              file << "       ";
+              if( rowNames != 0 && rowNames->has(row) )
+                file << (*rowNames)[row];
+              else
+                file << "C" << row;
+
+              file << "\n";
+              row++;
+            }
+          else
+            {
+              if( _basisStatusCols[col] == SPxSolverBase<R>::ON_UPPER )
+                {
+                  file << " UL ";
+
+                  file << std::setw(8);
+                  if( colNames != 0 && colNames->has(col) )
+                    file << (*colNames)[col];
+                  else
+                    file << "x" << col;
+
+                  file << "\n";
+                }
+            }
+        }
+
+      file << "ENDATA\n";
+
+#ifndef NDEBUG
+      // check that the remaining rows are basic
+      for( ; row < numRows; row++ )
+        {
+          assert(_basisStatusRows[row] == SPxSolverBase<R>::BASIC);
+        }
+#endif
+
+      return true;
+    }
+}

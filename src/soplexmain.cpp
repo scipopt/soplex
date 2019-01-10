@@ -136,23 +136,31 @@ void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 
 /// performs external feasibility check with real type
 ///@todo implement external check; currently we use the internal methods for convenience
+
+template <class R>
 static
-void checkSolutionReal(SoPlexBase<Real>& soplex)
+void checkSolutionReal(SoPlexBase<R>& soplex)
 {
    if( soplex.hasPrimal() )
    {
-      Real boundviol;
-      Real rowviol;
-      Real sumviol;
+      R boundviol;
+      R rowviol;
+      R sumviol;
 
       if( soplex.getBoundViolation(boundviol, sumviol) && soplex.getRowViolation(rowviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
-            Real maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::FEASTOL));
+            R maxviol = boundviol > rowviol ? boundviol : rowviol;
+            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
-                          << std::setprecision(8) << std::fixed << ").\n"
+                          << std::setprecision(8) << std::fixed << ").\n" // @todo:
+                                                                          // need
+                                                                          // to
+                                                                          // figure
+                                                                          // out
+                                                                          // precision
+                                                                          // later
             );
       }
       else
@@ -167,15 +175,15 @@ void checkSolutionReal(SoPlexBase<Real>& soplex)
 
    if( soplex.hasDual() )
    {
-      Real redcostviol;
-      Real dualviol;
-      Real sumviol;
+      R redcostviol;
+      R dualviol;
+      R sumviol;
 
       if( soplex.getRedCostViolation(redcostviol, sumviol) && soplex.getDualViolation(dualviol, sumviol) )
       {
          MSG_INFO1( soplex.spxout,
-            Real maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::OPTTOL));
+            R maxviol = redcostviol > dualviol ? redcostviol : dualviol;
+            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
                           << std::setprecision(8) << std::fixed << ").\n"
@@ -194,8 +202,8 @@ void checkSolutionReal(SoPlexBase<Real>& soplex)
 
 /// performs external feasibility check with rational type
 ///@todo implement external check; currently we use the internal methods for convenience
-static
-void checkSolutionRational(SoPlexBase<Real>& soplex)
+template <class R>
+static void checkSolutionRational(SoPlexBase<R>& soplex)
 {
   if( soplex.hasPrimal() )
    {
@@ -207,7 +215,7 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = boundviol > rowviol ? boundviol : rowviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::FEASTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -231,7 +239,7 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
       {
          MSG_INFO1( soplex.spxout,
             Rational maxviol = redcostviol > dualviol ? redcostviol : dualviol;
-            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<Real>::OPTTOL));
+            bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::OPTTOL));
             soplex.spxout << "Dual solution " << (feasible ? "feasible" : "infeasible") << " in original problem (max. violation = " << rationalToString(maxviol) << ").\n"
             );
       }
@@ -250,12 +258,12 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
 template <class R>
 void checkSolution(SoPlexBase<R>& soplex);
 
-template <>
-void checkSolution<Real>(SoPlexBase<Real>& soplex)
+template <class R>
+void checkSolution(SoPlexBase<R>& soplex)
 {
-  if( soplex.intParam(SoPlexBase<Real>::CHECKMODE) == SoPlexBase<Real>::CHECKMODE_RATIONAL
-      || (soplex.intParam(SoPlexBase<Real>::CHECKMODE) == SoPlexBase<Real>::CHECKMODE_AUTO
-          && soplex.intParam(SoPlexBase<Real>::READMODE) == SoPlexBase<Real>::READMODE_RATIONAL) )
+  if( soplex.intParam(SoPlexBase<R>::CHECKMODE) == SoPlexBase<R>::CHECKMODE_RATIONAL
+      || (soplex.intParam(SoPlexBase<R>::CHECKMODE) == SoPlexBase<R>::CHECKMODE_AUTO
+          && soplex.intParam(SoPlexBase<R>::READMODE) == SoPlexBase<R>::READMODE_RATIONAL) )
     {
       checkSolutionRational(soplex);
     }
