@@ -1708,7 +1708,7 @@ namespace soplex
 
       if( val != R(0) )
         {
-          Real newVal;
+          R newVal;
 
           if( scale )
             {
@@ -2575,7 +2575,16 @@ namespace soplex
       // insert new elements to row file
       for( i = oldColNumber; i < nCols(); ++i )
         {
-          LPColSetBase<R>::maxObj_w(i) *= thesense;
+          // @todo: Is there a better way to write the following if, else?
+          if(thesense == MAXIMIZE)
+            {
+              LPColSetBase<R>::maxObj_w(i) *= 1;
+            }
+          else                  // thesense is MINIMIZE = -1
+            {
+              LPColSetBase<R>::maxObj_w(i) *= -1;
+            }
+
           SVectorBase<R>& vec = colVector_w(i);
           int newColScaleExp = 0;
 

@@ -42,7 +42,8 @@ public:
    template < class S >
    Nonzero<R>& operator=(const Nonzero<S>& vec)
    {
-      val = vec.val;
+     // todo: is the cast really necessary? Previous code worked without a cast
+     val = (R) vec.val;
       idx = vec.idx;
       return *this;
    }

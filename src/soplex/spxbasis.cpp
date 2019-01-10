@@ -34,14 +34,14 @@ namespace soplex
   template <class R> typename SPxBasisBase<R>::Desc::Status
   SPxBasisBase<R>::dualStatus(const SPxColId& id) const
   {
-    return dualColStatus(static_cast<SPxLP*>(theLP)->number(id));
+    return dualColStatus(static_cast<SPxLPBase<R>*>(theLP)->number(id));
   }
 
   template <class R>
   typename SPxBasisBase<R>::Desc::Status
   SPxBasisBase<R>::dualStatus(const SPxRowId& id) const
   {
-    return dualRowStatus((static_cast<SPxLP*>(theLP))->number(id));
+    return dualRowStatus((static_cast<SPxLPBase<R>*>(theLP))->number(id));
   }
 
   template <class R>
@@ -185,13 +185,14 @@ namespace soplex
     return true;
   }
 
-  template <class R>
+
   /*
     Loading a #Desc# into the basis can be done more efficiently, by
     explicitely programming both cases, for the rowwise and for the columnwise
     representation. This implementation hides this distinction in the use of
     methods #isBasic()# and #vector()#.
   */
+  template <class R>
   void SPxBasisBase<R>::loadDesc(const Desc& ds)
   {
     assert(status() > NO_PROBLEM);
@@ -495,9 +496,9 @@ namespace soplex
 	    if (!strcmp(mps.field1(), "XU"))
 	      {
 		l_desc.colstat[c] = dualColStatus(c);
-		if( theLP->LPRowSet::type(r) == LPRow::GREATER_EQUAL )
+		if( theLP->LPRowSet::type(r) == LPRowBase<R>::GREATER_EQUAL )
 		  l_desc.rowstat[r] = Desc::P_ON_LOWER;
-		else if( theLP->LPRowSet::type(r) == LPRow::EQUAL )
+		else if( theLP->LPRowSet::type(r) == LPRowBase<R>::EQUAL )
 		  l_desc.rowstat[r] = Desc::P_FIXED;
 		else
 		  l_desc.rowstat[r] = Desc::P_ON_UPPER;
@@ -505,9 +506,9 @@ namespace soplex
 	    else if (!strcmp(mps.field1(), "XL"))
 	      {
 		l_desc.colstat[c] = dualColStatus(c);
-		if( theLP->LPRowSet::type(r) == LPRow::LESS_EQUAL )
+		if( theLP->LPRowSet::type(r) == LPRowBase<R>::LESS_EQUAL )
 		  l_desc.rowstat[r] = Desc::P_ON_UPPER;
-		else if( theLP->LPRowSet::type(r) == LPRow::EQUAL )
+		else if( theLP->LPRowSet::type(r) == LPRowBase<R>::EQUAL )
 		  l_desc.rowstat[r] = Desc::P_FIXED;
 		else
 		  l_desc.rowstat[r] = Desc::P_ON_LOWER;
@@ -563,8 +564,9 @@ namespace soplex
    *
    * @todo put this in a common file and unify accross different formats (mps, lp, basis).
    */
+  template <class R>
   static const char* getRowName(
-				const SPxLP*   lp,
+				const SPxLPBase<R>*   lp,
 				int            idx,
 				const NameSet* rnames,
 				char*          buf)
@@ -652,7 +654,7 @@ namespace soplex
 
 	    assert( row != theLP->nRows() );
 
-	    if( thedesc.rowStatus( row ) == Desc::P_ON_UPPER && (!cpxFormat || theLP->LPRowSet::type(row) == LPRow::RANGE) )
+	    if( thedesc.rowStatus( row ) == Desc::P_ON_UPPER && (!cpxFormat || theLP->LPRowSet::type(row) == LPRowBase<R>::RANGE) )
 	      os << " XU ";
 	    else
 	      os << " XL ";
