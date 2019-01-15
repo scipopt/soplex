@@ -75,7 +75,7 @@ protected:
        of \p update.delta() is computed and returned in \p maxabs. Internally all
        loops are started at \p start and incremented by \p incr.
     */
-   int maxDelta(Real& val, Real& maxabs, UpdateVector& update,
+   int maxDelta(Real& val, Real& maxabs, UpdateVector<R>& update,
       const Vector& lowBound, const Vector& upBound, int start, int incr) const;
 
    ///
@@ -92,7 +92,7 @@ protected:
        of \p update.delta() is computed and returned in \p maxabs. Internally all
        loops are started at \p start and incremented by \p incr.
    */
-   int minDelta(Real& val, Real& maxabs, UpdateVector& update,
+   int minDelta(Real& val, Real& maxabs, UpdateVector<R>& update,
       const Vector& lowBound, const Vector& upBound, int start, int incr) const;
 
    ///
@@ -109,7 +109,7 @@ protected:
        incremented by \p incr.
    */
    int maxSelect(Real& val, Real& stab, Real& best, Real& bestDelta,
-      Real max, const UpdateVector& upd, const Vector& low,
+      Real max, const UpdateVector<R>& upd, const Vector& low,
       const Vector& up, int start = 0, int incr = 1) const;
    ///
    int maxSelect(Real& val, Real& stab, Real& bestDelta, Real max);
@@ -125,7 +125,7 @@ protected:
        incremented by \p incr.
    */
    int minSelect(Real& val, Real& stab, Real& best, Real& bestDelta,
-      Real max, const UpdateVector& upd, const Vector& low,
+      Real max, const UpdateVector<R>& upd, const Vector& low,
       const Vector& up, int start = 0, int incr = 1) const;
    ///
    int minSelect(Real& val, Real& stab,

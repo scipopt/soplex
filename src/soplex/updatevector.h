@@ -14,7 +14,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  updatevector.h
- * @brief Dense vector with semi-sparse vector for updates
+ * @brief Dense VectorBase<R> with semi-sparse VectorBase<R> for updates
  */
 
 #ifndef _UPDATEVECTOR_H_
@@ -30,35 +30,36 @@
 namespace soplex
 {
 
-/**@brief   Dense vector with semi-sparse vector for updates
+/**@brief   Dense VectorBase<R> with semi-sparse VectorBase<R> for updates
    @ingroup Algebra
 
     In many algorithms vectors are updated in every iteration, by
-    adding a multiple of another vector to it, i.e., given a vector \c
-    x, a scalar \f$\alpha\f$ and another vector \f$\delta\f$, the
+    adding a multiple of another VectorBase<R> to it, i.e., given a VectorBase<R> \c
+    x, a scalar \f$\alpha\f$ and another VectorBase<R> \f$\delta\f$, the
     update to \c x constists of substituting it by \f$x \leftarrow x +
     \alpha\cdot\delta\f$.
 
     While the update itself can easily be expressed with methods of
     the class Vector, it is often desirable to save the last update
-    vector \f$\delta\f$ and value \f$\alpha\f$. This is provided by
+    VectorBase<R> \f$\delta\f$ and value \f$\alpha\f$. This is provided by
     class UpdateVector.
 
-    UpdateVectors are derived from DVector and provide additional
+    UpdateVectors are derived from DVectorBase<R> and provide additional
     methods for saving and setting the multiplicator \f$\alpha\f$ and
-    the update vector \f$\delta\f$. Further, it allows for efficient
+    the update VectorBase<R> \f$\delta\f$. Further, it allows for efficient
     sparse updates, by providing an IdxSet idx() containing the
     nonzero indices of \f$\delta\f$.
 */
-class UpdateVector : public DVector
+  template <class R>
+  class UpdateVector : public DVectorBase<R>
 {
 private:
 
    //------------------------------------
    /**@name Data */
    //@{
-   Real     theval;      ///< update multiplicator
-   SSVector thedelta;    ///< update vector
+   R     theval;      ///< update multiplicator
+   SSVectorBase<R> thedelta;    ///< update vector
    //@}
 
 public:
@@ -68,68 +69,68 @@ public:
    //@{
    /// default constructor.
    explicit
-   UpdateVector(int p_dim /*=0*/, Real p_eps /*=1e-16*/)
-      : DVector (p_dim)
+   UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
+      : DVectorBase<R> (p_dim)
       , theval (0)
       , thedelta(p_dim, p_eps)
    {
       assert(isConsistent());
    }
    ///
-   ~UpdateVector()
+   ~UpdateVector<R>()
    {}
    /// copy constructor
-   UpdateVector( const UpdateVector& );
+   UpdateVector<R>( const UpdateVector<R>& );
    /// assignment from DVector
-   UpdateVector& operator=(const DVector& rhs)
+   UpdateVector<R>& operator=(const DVectorBase<R>& rhs)
    {
       if ( this != & rhs )
-         DVector::operator=(rhs);
+        DVectorBase<R>::operator=(rhs);
 
       assert(isConsistent());
 
       return *this;
    }
    /// assignment from Vector
-   UpdateVector& operator=(const Vector& rhs)
+   UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
       if ( this != & rhs )
-         DVector::operator=(rhs);
+        DVectorBase<R>::operator=(rhs);
 
       assert(isConsistent());
 
       return *this;
    }
    /// assignment
-   UpdateVector& operator=(const UpdateVector& rhs);
+   UpdateVector<R>& operator=(const UpdateVector<R>& rhs);
    //@}
 
    //------------------------------------
    /**@name Access */
    //@{
    /// update multiplicator \f$\alpha\f$, writeable
-   Real& value()
+   R& value()
    {
       return theval;
    }
    /// update multiplicator \f$\alpha\f$
-   Real value() const
+   R value() const
    {
       return theval;
    }
 
-   /// update vector \f$\delta\f$, writeable
-   SSVector& delta()
+   /// update VectorBase<R> \f$\delta\f$, writeable
+   SSVectorBase<R>& delta()
    {
       return thedelta;
    }
-   /// update vector \f$\delta\f$
-   const SSVector& delta() const
+   /// update VectorBase<R> \f$\delta\f$
+   const SSVectorBase<R>& delta() const
    {
       return thedelta;
    }
 
-   /// nonzero indices of update vector \f$\delta\f$
+   /// nonzero indices of update VectorBase<R> \f$\delta\f$
    const IdxSet& idx() const
    {
       return thedelta.indices();
@@ -140,7 +141,7 @@ public:
    /**@name Modification */
    //@{
    /// Perform the update
-   /**  Add \c value() * \c delta() to the UpdateVector. Only the indices
+   /**  Add \c value() * \c delta() to the UpdateVector<R>. Only the indices
     *  in idx() are affected. For all other indices, delta() is asumed
     *  to be 0.
     */
@@ -149,10 +150,10 @@ public:
       multAdd(theval, thedelta);
    }
 
-   /// clear vector and update vector
+   /// clear VectorBase<R> and update vector
    void clear()
    {
-      DVector::clear();
+     DVectorBase<R>::clear();
       clearUpdate();
    }
 
@@ -166,7 +167,7 @@ public:
    /// reset dimension
    void reDim(int newdim)
    {
-      DVector::reDim(newdim);
+     DVectorBase<R>::reDim(newdim);
       thedelta.reDim(newdim);
    }
    //@}

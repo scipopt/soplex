@@ -110,7 +110,7 @@ namespace soplex
   int SPxFastRT<Real>::maxDelta(
                              Real& val,                                /* on return: maximum step length */
                              Real& maxabs,                             /* on return: maximum absolute value in upd vector */
-                             UpdateVector& update,
+                             UpdateVector<R>& update,
                              const Vector& lowBound,
                              const Vector& upBound,
                              int start,
@@ -266,7 +266,7 @@ namespace soplex
   int SPxFastRT<Real>::minDelta(
                              Real& val,
                              Real& maxabs,
-                             UpdateVector& update,
+                             UpdateVector<R>& update,
                              const Vector& lowBound,
                              const Vector& upBound,
                              int start,
@@ -506,7 +506,7 @@ namespace soplex
                               Real& best,
                               Real& bestDelta,
                               Real max,
-                              const UpdateVector& update,
+                              const UpdateVector<R>& update,
                               const Vector& lowBound,
                               const Vector& upBound,
                               int start,
@@ -586,7 +586,7 @@ namespace soplex
                               Real& best,
                               Real& bestDelta,
                               Real max,
-                              const UpdateVector& update,
+                              const UpdateVector<R>& update,
                               const Vector& lowBound,
                               const Vector& upBound,
                               int start,
@@ -799,7 +799,7 @@ namespace soplex
   template <>
   bool SPxFastRT<Real>::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
   {
-    UpdateVector& vec = this->thesolver->fVec();
+    UpdateVector<R>& vec = this->thesolver->fVec();
     Vector& low = this->thesolver->lbBound();
     Vector& up = this->thesolver->ubBound();
 
@@ -840,7 +840,7 @@ namespace soplex
   template <>
   bool SPxFastRT<Real>::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
   {
-    UpdateVector& vec = this->thesolver->fVec();
+    UpdateVector<R>& vec = this->thesolver->fVec();
     Vector& low = this->thesolver->lbBound();
     Vector& up = this->thesolver->ubBound();
 
@@ -1052,11 +1052,11 @@ namespace soplex
     Vector* up;
     Vector* low;
 
-    UpdateVector& pvec = this->thesolver->pVec();
+    UpdateVector<R>& pvec = this->thesolver->pVec();
     SSVector& pupd = this->thesolver->pVec().delta();
     Vector& upb = this->thesolver->upBound();
     Vector& lpb = this->thesolver->lpBound();
-    UpdateVector& cvec = this->thesolver->coPvec();
+    UpdateVector<R>& cvec = this->thesolver->coPvec();
     SSVector& cupd = this->thesolver->coPvec().delta();
     Vector& ucb = this->thesolver->ucBound();
     Vector& lcb = this->thesolver->lcBound();
@@ -1153,11 +1153,11 @@ namespace soplex
     Vector* up;
     Vector* low;
 
-    UpdateVector& pvec = this->thesolver->pVec();
+    UpdateVector<R>& pvec = this->thesolver->pVec();
     SSVector& pupd = this->thesolver->pVec().delta();
     Vector& upb = this->thesolver->upBound();
     Vector& lpb = this->thesolver->lpBound();
-    UpdateVector& cvec = this->thesolver->coPvec();
+    UpdateVector<R>& cvec = this->thesolver->coPvec();
     SSVector& cupd = this->thesolver->coPvec().delta();
     Vector& ucb = this->thesolver->ucBound();
     Vector& lcb = this->thesolver->lcBound();

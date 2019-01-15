@@ -327,14 +327,14 @@ namespace soplex
     /**@name Protected data */
     //@{
     Array < UnitVector > unitVecs; ///< array of unit vectors
-    const SVSet*   thevectors;   ///< the LP vectors according to representation
-    const SVSet*   thecovectors; ///< the LP coVectors according to representation
+    const SVSetBase<R>*   thevectors;   ///< the LP vectors according to representation
+    const SVSetBase<R>*   thecovectors; ///< the LP coVectors according to representation
 
     DVectorBase<R>        primRhs;     ///< rhs VectorBase<R> for computing the primal vector
-    UpdateVector   primVec;     ///< primal vector
+    UpdateVector<R>   primVec;     ///< primal vector
     DVectorBase<R>        dualRhs;     ///< rhs VectorBase<R> for computing the dual vector
-    UpdateVector   dualVec;     ///< dual vector
-    UpdateVector   addVec;      ///< storage for thePvec = &addVec
+    UpdateVector<R>   dualVec;     ///< dual vector
+    UpdateVector<R>   addVec;      ///< storage for thePvec = &addVec
 
     DVectorBase<R>        theURbound;  ///< Upper Row    Feasibility bound
     DVectorBase<R>        theLRbound;  ///< Lower Row    Feasibility bound
@@ -350,32 +350,32 @@ namespace soplex
     DVectorBase<R>        theLBbound;  ///< Lower Basic Feasibility bound
 
     /** The values of the rhs corresponding to the current basis.*/
-    DVector*       theFrhs;
+    DVectorBase<R>*       theFrhs;
     /** The values of all basis variables. */
-    UpdateVector*  theFvec;
+    UpdateVector<R>*  theFvec;
 
     /* The Copricing rhs and VectorBase<R> */
-    DVector*       theCoPrhs;
-    UpdateVector*  theCoPvec;
+    DVectorBase<R>*       theCoPrhs;
+    UpdateVector<R>*  theCoPvec;
     /** The pricing VectorBase<R> */
-    UpdateVector*  thePvec;
+    UpdateVector<R>*  thePvec;
 
-    UpdateVector*  theRPvec;    ///< row pricing vector
-    UpdateVector*  theCPvec;    ///< column pricing vector
+    UpdateVector<R>*  theRPvec;    ///< row pricing vector
+    UpdateVector<R>*  theCPvec;    ///< column pricing vector
 
     // The following vectors serve for the virtualization of shift bounds
     //@todo In prinziple this schould be references.
-    DVector*       theUbound;      ///< Upper bound for vars
-    DVector*       theLbound;      ///< Lower bound for vars
-    DVector*       theCoUbound;    ///< Upper bound for covars
-    DVector*       theCoLbound;    ///< Lower bound for covars
+    DVectorBase<R>*       theUbound;      ///< Upper bound for vars
+    DVectorBase<R>*       theLbound;      ///< Lower bound for vars
+    DVectorBase<R>*       theCoUbound;    ///< Upper bound for covars
+    DVectorBase<R>*       theCoLbound;    ///< Lower bound for covars
 
     // The following vectors serve for the virtualization of testing vectors
     DVectorBase<R>        theCoTest;
     DVectorBase<R>        theTest;
 
-    DSVector       primalRay;      ///< stores primal ray in case of unboundedness
-    DSVector       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
+    DSVectorBase<R>       primalRay;      ///< stores primal ray in case of unboundedness
+    DSVectorBase<R>       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
 
     int            leaveCount;    ///< number of LEAVE iterations
     int            enterCount;    ///< number of ENTER iterations
@@ -1320,7 +1320,7 @@ namespace soplex
      *  contrast to this, the pricing of the leaving Simplex selects an
      *  element of #fVec, that violates its bounds.
      */
-    UpdateVector& fVec() const
+    UpdateVector<R>& fVec() const
       {
         return *theFvec;
       }
@@ -1395,7 +1395,7 @@ namespace soplex
      *  contrast to this, the #LEAVE%ing Simplex algorithm keeps both
      *  vectors within their bounds.
      */
-    UpdateVector& coPvec() const
+    UpdateVector<R>& coPvec() const
       {
         return *theCoPvec;
       }
@@ -1475,7 +1475,7 @@ namespace soplex
      *  #coDim(). VectorBase<R> #pVec() is only up to date for #LEAVE%ing
      *  Simplex or #FULL pricing in #ENTER%ing Simplex.
      */
-    UpdateVector& pVec() const
+    UpdateVector<R>& pVec() const
       {
         return *thePvec;
       }
@@ -1648,18 +1648,18 @@ namespace soplex
     //@{
     ///
     void perturbMin(
-                    const UpdateVector& vec, VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
+                    const UpdateVector<R>& vec, VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     int start = 0, int incr = 1);
     ///
     void perturbMax(
-                    const UpdateVector& vec, VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
+                    const UpdateVector<R>& vec, VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     int start = 0, int incr = 1);
     ///
-    R perturbMin(const UpdateVector& uvec,
+    R perturbMin(const UpdateVector<R>& uvec,
                     VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
     ///
-    R perturbMax(const UpdateVector& uvec,
+    R perturbMax(const UpdateVector<R>& uvec,
                     VectorBase<R>& low, VectorBase<R>& up, R eps, R delta,
                     const typename SPxBasisBase<R>::Desc::Status* stat, int start, int incr);
     //@}

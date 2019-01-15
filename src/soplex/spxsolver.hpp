@@ -107,3 +107,115 @@ void SPxSolverBase<R>::changeLower(int i, const R& newLower, bool scale)
         }
     }
 }
+template <class R>
+SPxSolverBase<R>::SPxSolverBase(
+                                Type            p_type,
+                                Representation  p_rep,
+                                Timer::TYPE     ttype)
+  : theType (p_type)
+  , thePricing(FULL)
+  , theRep(p_rep)
+  , polishObj(POLISH_OFF)
+  , theTime(0)
+  , timerType(ttype)
+  , theCumulativeTime(0.0)
+  , maxIters (-1)
+  , maxTime (infinity)
+  , nClckSkipsLeft(0)
+  , nCallsToTimelim(0)
+  , objLimit(infinity)
+  , m_status(UNKNOWN)
+  , m_nonbasicValue(0.0)
+  , m_nonbasicValueUpToDate(false)
+  , m_pricingViol(0.0)
+  , m_pricingViolUpToDate(false)
+  , m_pricingViolCo(0.0)
+  , m_pricingViolCoUpToDate(false)
+  , theShift (0)
+  , m_maxCycle(100)
+  , m_numCycle(0)
+  , initialized (false)
+  , solveVector2 (0)
+  , solveVector3 (0)
+  , coSolveVector2(0)
+  , coSolveVector3(0)
+  , freePricer (false)
+  , freeRatioTester (false)
+  , freeStarter (false)
+  , displayLine (0)
+  , displayFreq (200)
+  , sparsePricingFactor(SPARSITYFACTOR)
+  , getStartingDecompBasis(false)
+  , computeDegeneracy(false)
+  , degenCompIterOffset(0)
+  , fullPerturbation(false)
+  , printBasisMetric(0)
+  , unitVecs (0)
+  , primVec (0, Param<R>::epsilon())
+  , dualVec (0, Param<R>::epsilon())
+  , addVec (0, Param<R>::epsilon())
+  , thepricer (0)
+  , theratiotester (0)
+  , thestarter (0)
+  , boundrange(0.0)
+  , siderange(0.0)
+  , objrange(0.0)
+  , infeasibilities(0)
+  , infeasibilitiesCo(0)
+  , isInfeasible(0)
+  , isInfeasibleCo(0)
+  , sparsePricingLeave(false)
+  , sparsePricingEnter(false)
+  , sparsePricingEnterCo(false)
+  , hyperPricingLeave(true)
+  , hyperPricingEnter(true)
+  , remainingRoundsLeave(0)
+  , remainingRoundsEnter(0)
+  , remainingRoundsEnterCo(0)
+  , weights(0)
+  , coWeights(0)
+  , weightsAreSetup(false)
+  , integerVariables(nullptr)
+{
+  theTime = TimerFactory::createTimer(timerType);
+
+  setDelta(DEFAULT_BND_VIOL);
+
+  this->theLP = this;
+  initRep(p_rep);
+
+  // info: SPxBasisBase is not consistent in this moment.
+  //assert(SPxSolverBase<R>::isConsistent());
+}
+
+template <class R>
+SPxSolverBase<R>::~SPxSolverBase()
+{
+  assert(!freePricer || thepricer != 0);
+  assert(!freeRatioTester || theratiotester != 0);
+  assert(!freeStarter || thestarter != 0);
+
+  if(freePricer)
+    {
+      delete thepricer;
+      thepricer = 0;
+    }
+
+  if(freeRatioTester)
+    {
+      delete theratiotester;
+      theratiotester = 0;
+    }
+
+  if(freeStarter)
+    {
+      delete thestarter;
+      thestarter = 0;
+    }
+
+  // free timer
+  assert(theTime);
+  theTime->~Timer();
+  spx_free(theTime);
+}
+

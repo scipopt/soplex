@@ -151,7 +151,7 @@ namespace soplex
   // -----------------------------------------------------------------
   template <>
   void SPxSolverBase<Real>::perturbMin(
-                                const UpdateVector& uvec,
+                                const UpdateVector<R>& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
                                 Real eps,
@@ -230,7 +230,7 @@ namespace soplex
   // -----------------------------------------------------------------
   template <>
   void SPxSolverBase<Real>::perturbMax(
-                                const UpdateVector& uvec,
+                                const UpdateVector<R>& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
                                 Real eps,
@@ -328,7 +328,7 @@ namespace soplex
 
   template <>
   Real SPxSolverBase<Real>::perturbMin(
-                                const UpdateVector& uvec,
+                                const UpdateVector<R>& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
                                 Real eps,
@@ -402,7 +402,7 @@ namespace soplex
 
   template <>
   Real SPxSolverBase<Real>::perturbMax(
-                                const UpdateVector& uvec,
+                                const UpdateVector<R>& uvec,
                                 Vector& p_low,
                                 Vector& p_up,
                                 Real eps,
