@@ -175,7 +175,7 @@ SPxSolverBase<R>::SPxSolverBase(
   , weights(0)
   , coWeights(0)
   , weightsAreSetup(false)
-  , integerVariables(nullptr)
+  , integerVariables(0)
 {
   theTime = TimerFactory::createTimer(timerType);
 

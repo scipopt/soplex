@@ -147,7 +147,7 @@ public:
     */
    void update()
    {
-      multAdd(theval, thedelta);
+      this->multAdd(theval, thedelta);
    }
 
    /// clear VectorBase<R> and update vector

@@ -30,7 +30,7 @@
   The algorithms operates in two phases. In a first phase, the maximum value
   |val| is determined, when infeasibility within |delta| is allowed. In the second
   phase, between all variables with value < |val| the one is selected which
-  has the largest update vector component. However, this may not
+  has the largest update VectorBase<R> component. However, this may not
   always yield an improvement. In that case, we shift the variable towards
   infeasibility and retry. This avoids cycling in the shifted LP.
 */
@@ -45,12 +45,10 @@ namespace soplex
 #define DELTA_SHIFT     1e-5
 #define EPSILON         1e-10
 
-  template <>
-  void SPxFastRT<Real>::setType(typename SPxSolverBase<Real>::Type type);
 
 
-  template <>
-  void SPxFastRT<Real>::resetTols()
+  template <class R>
+  void SPxFastRT<R>::resetTols()
   {
     // epsilon = thesolver->epsilon();
     epsilon = EPSILON;
@@ -60,8 +58,8 @@ namespace soplex
     */
   }
 
-  template <>
-  void SPxFastRT<Real>::tighten()
+  template <class R>
+  void SPxFastRT<R>::tighten()
   {
     /*
       if((delta > 1.99 * DELTA_SHIFT  &&  thesolver->theShift < 1e-4) ||
@@ -83,16 +81,16 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxFastRT<Real>::relax()
+  template <class R>
+  void SPxFastRT<R>::relax()
   {
     minStab *= 0.95;
     fastDelta += 3 * DELTA_SHIFT;
     // delta   += 2 * (thesolver->theShift > delta) * DELTA_SHIFT;
   }
 
-  template <>
-  Real SPxFastRT<Real>::minStability(Real maxabs)
+  template <class R>
+  R SPxFastRT<R>::minStability(R maxabs)
   {
     if (maxabs < 1000.0)
       return minStab;
@@ -106,27 +104,27 @@ namespace soplex
    * epsilon, u < infinity): If u - vec[i] <= 0, vec[i] violates the upper bound. In the Harris ratio
    * test, we would compute (u - vec[i] + delta)/upd[i]. The code computes instead delta/upd[i].
    */
-  template <>
-  int SPxFastRT<Real>::maxDelta(
-                             Real& val,                                /* on return: maximum step length */
-                             Real& maxabs,                             /* on return: maximum absolute value in upd vector */
+  template <class R>
+  int SPxFastRT<R>::maxDelta(
+                             R& val,                                /* on return: maximum step length */
+                             R& maxabs,                             /* on return: maximum absolute value in upd VectorBase<R> */
                              UpdateVector<R>& update,
-                             const Vector& lowBound,
-                             const Vector& upBound,
+                             const VectorBase<R>& lowBound,
+                             const VectorBase<R>& upBound,
                              int start,
                              int incr) const
   {
     int i, sel;
-    Real x, y, max;
-    Real u, l;
-    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
+    R x, y, max;
+    R u, l;
+    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
 
-    Real mabs = maxabs;
+    R mabs = maxabs;
 
-    const Real* up = upBound.get_const_ptr();
-    const Real* low = lowBound.get_const_ptr();
-    const Real* vec = update.get_const_ptr();
-    const Real* upd = update.delta().values();
+    const R* up = upBound.get_const_ptr();
+    const R* low = lowBound.get_const_ptr();
+    const R* vec = update.get_const_ptr();
+    const R* upd = update.delta().values();
     const int* idx = update.delta().indexMem();
 
     sel = -1;
@@ -189,10 +187,10 @@ namespace soplex
       }
     else
       {
-        /* In this case, the indices of the semi-sparse vector update.delta() are not set up and are filled below. */
+        /* In this case, the indices of the semi-sparse VectorBase<R> update.delta() are not set up and are filled below. */
         int* l_idx = update.delta().altIndexMem();
-        Real* uval = update.delta().altValues();
-        const Real* uend = uval + update.dim();
+        R* uval = update.delta().altValues();
+        const R* uend = uval + update.dim();
         assert( uval == upd );
 
         for (i = 0; uval < uend; ++uval, ++i)
@@ -262,27 +260,27 @@ namespace soplex
   }
 
   /* See maxDelta() */
-  template <>
-  int SPxFastRT<Real>::minDelta(
-                             Real& val,
-                             Real& maxabs,
+  template <class R>
+  int SPxFastRT<R>::minDelta(
+                             R& val,
+                             R& maxabs,
                              UpdateVector<R>& update,
-                             const Vector& lowBound,
-                             const Vector& upBound,
+                             const VectorBase<R>& lowBound,
+                             const VectorBase<R>& upBound,
                              int start,
                              int incr) const
   {
     int i, sel;
-    Real x, y, max;
-    Real u, l;
-    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
+    R x, y, max;
+    R u, l;
+    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
 
-    Real mabs = maxabs;
+    R mabs = maxabs;
 
-    const Real* up = upBound.get_const_ptr();
-    const Real* low = lowBound.get_const_ptr();
-    const Real* vec = update.get_const_ptr();
-    const Real* upd = update.delta().values();
+    const R* up = upBound.get_const_ptr();
+    const R* low = lowBound.get_const_ptr();
+    const R* vec = update.get_const_ptr();
+    const R* upd = update.delta().values();
     const int* idx = update.delta().indexMem();
 
     sel = -1;
@@ -344,10 +342,10 @@ namespace soplex
       }
     else
       {
-        /* In this case, the indices of the semi-sparse vector update.delta() are not set up and are filled below. */
+        /* In this case, the indices of the semi-sparse VectorBase<R> update.delta() are not set up and are filled below. */
         int* l_idx = update.delta().altIndexMem();
-        Real* uval = update.delta().altValues();
-        const Real* uend = uval + update.dim();
+        R* uval = update.delta().altValues();
+        const R* uend = uval + update.dim();
         assert( uval == upd );
 
         for (i = 0; uval < uend; ++uval, ++i)
@@ -418,31 +416,31 @@ namespace soplex
     return sel;
   }
 
-  template <>
-  int SPxFastRT<Real>::maxDelta(
-                             Real& val,
-                             Real& maxabs)
+  template <class R>
+  int SPxFastRT<R>::maxDelta(
+                             R& val,
+                             R& maxabs)
   {
-    assert(m_type == SPxSolverBase<Real>::ENTER);
+    assert(this->m_type == SPxSolverBase<R>::ENTER);
     return maxDelta(val, maxabs,
                     this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(), 0, 1);
   }
 
-  template <>
-  int SPxFastRT<Real>::minDelta(
-                             Real& val,
-                             Real& maxabs)
+  template <class R>
+  int SPxFastRT<R>::minDelta(
+                             R& val,
+                             R& maxabs)
   {
-    assert(m_type == SPxSolverBase<Real>::ENTER);
+    assert(this->m_type == SPxSolverBase<R>::ENTER);
     return minDelta(val, maxabs,
                     this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(), 0, 1);
   }
 
-  template <>
-  SPxId SPxFastRT<Real>::maxDelta(
+  template <class R>
+  SPxId SPxFastRT<R>::maxDelta(
                                int& nr,
-                               Real& max,                                /* on return: maximum step length */
-                               Real& maxabs)                             /* on return: maximum absolute value in delta vector */
+                               R& max,                                /* on return: maximum step length */
+                               R& maxabs)                             /* on return: maximum absolute value in delta VectorBase<R> */
   {
     /* The following cause side effects on coPvec and pVec - both changes may be needed later in
        maxSelect(). We can therefore not move the first function after the (indp >= 0) check. */
@@ -467,11 +465,11 @@ namespace soplex
     return SPxId();
   }
 
-  template <>
-  SPxId SPxFastRT<Real>::minDelta(
+  template <class R>
+  SPxId SPxFastRT<R>::minDelta(
                                int& nr,
-                               Real& max,
-                               Real& maxabs)
+                               R& max,
+                               R& maxabs)
   {
     /* The following cause side effects on coPvec and pVec - both changes may be needed later in
        minSelect(). We can therefore not move the first function after the (indp >= 0) check. */
@@ -499,27 +497,27 @@ namespace soplex
   /* \p best returns the minimum update value such that the corresponding value of \p upd.delta() is
    * at least \p stab and the update value is smaller than \p max. If no valid update value has been
    * found \p bestDelta returns the slack to the bound corresponding to the index used for \p best. */
-  template <>
-  int SPxFastRT<Real>::minSelect(
-                              Real& val,
-                              Real& stab,
-                              Real& best,
-                              Real& bestDelta,
-                              Real max,
+  template <class R>
+  int SPxFastRT<R>::minSelect(
+                              R& val,
+                              R& stab,
+                              R& best,
+                              R& bestDelta,
+                              R max,
                               const UpdateVector<R>& update,
-                              const Vector& lowBound,
-                              const Vector& upBound,
+                              const VectorBase<R>& lowBound,
+                              const VectorBase<R>& upBound,
                               int start,
                               int incr) const
   {
     int i;
-    Real x, y;
-    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
+    R x, y;
+    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
 
-    const Real* up = upBound.get_const_ptr();
-    const Real* low = lowBound.get_const_ptr();
-    const Real* vec = update.get_const_ptr();
-    const Real* upd = update.delta().values();
+    const R* up = upBound.get_const_ptr();
+    const R* low = lowBound.get_const_ptr();
+    const R* vec = update.get_const_ptr();
+    const R* upd = update.delta().values();
     const int* idx = update.delta().indexMem();
     const int* last = idx + update.delta().size();
 
@@ -579,27 +577,27 @@ namespace soplex
   }
 
   /* See minSelect() */
-  template <>
-  int SPxFastRT<Real>::maxSelect(
-                              Real& val,
-                              Real& stab,
-                              Real& best,
-                              Real& bestDelta,
-                              Real max,
+  template <class R>
+  int SPxFastRT<R>::maxSelect(
+                              R& val,
+                              R& stab,
+                              R& best,
+                              R& bestDelta,
+                              R max,
                               const UpdateVector<R>& update,
-                              const Vector& lowBound,
-                              const Vector& upBound,
+                              const VectorBase<R>& lowBound,
+                              const VectorBase<R>& upBound,
                               int start,
                               int incr) const
   {
     int i;
-    Real x, y;
-    bool leaving = this->m_type == SPxSolverBase<Real>::LEAVE;
+    R x, y;
+    bool leaving = this->m_type == SPxSolverBase<R>::LEAVE;
 
-    const Real* up = upBound.get_const_ptr();
-    const Real* low = lowBound.get_const_ptr();
-    const Real* vec = update.get_const_ptr();
-    const Real* upd = update.delta().values();
+    const R* up = upBound.get_const_ptr();
+    const R* low = lowBound.get_const_ptr();
+    const R* vec = update.get_const_ptr();
+    const R* upd = update.delta().values();
     const int* idx = update.delta().indexMem();
     const int* last = idx + update.delta().size();
 
@@ -658,31 +656,31 @@ namespace soplex
     return nr;
   }
 
-  template <>
-  int SPxFastRT<Real>::maxSelect(
-                              Real& val,
-                              Real& stab,
-                              Real& bestDelta,
-                              Real max)
+  template <class R>
+  int SPxFastRT<R>::maxSelect(
+                              R& val,
+                              R& stab,
+                              R& bestDelta,
+                              R max)
   {
-    Real best = -infinity;
+    R best = -infinity;
     bestDelta = 0.0;
-    assert(m_type == SPxSolverBase<Real>::ENTER);
+    assert(this->m_type == SPxSolverBase<R>::ENTER);
     return maxSelect(val, stab, best, bestDelta, max,
                      this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(),  0, 1);
   }
 
-  template <>
-  SPxId SPxFastRT<Real>::maxSelect(
+  template <class R>
+  SPxId SPxFastRT<R>::maxSelect(
                                 int& nr,
-                                Real& val,
-                                Real& stab,
-                                Real& bestDelta,
-                                Real max
+                                R& val,
+                                R& stab,
+                                R& bestDelta,
+                                R max
                                 )
   {
     int indp, indc;
-    Real best = -infinity;
+    R best = -infinity;
     bestDelta = 0.0;
     iscoid = true;
     indc = maxSelect(val, stab, best, bestDelta, max,
@@ -705,29 +703,29 @@ namespace soplex
     return SPxId();
   }
 
-  template <>
-  int SPxFastRT<Real>::minSelect(
-                              Real& val,
-                              Real& stab,
-                              Real& bestDelta,
-                              Real max)
+  template <class R>
+  int SPxFastRT<R>::minSelect(
+                              R& val,
+                              R& stab,
+                              R& bestDelta,
+                              R max)
   {
-    Real best = infinity;
+    R best = infinity;
     bestDelta = 0.0;
-    assert(m_type == SPxSolverBase<Real>::ENTER);
+    assert(this->m_type == SPxSolverBase<R>::ENTER);
     return minSelect(val, stab, best, bestDelta, max,
                      this->thesolver->fVec(), this->thesolver->lbBound(), this->thesolver->ubBound(), 0, 1);
   }
 
-  template <>
-  SPxId SPxFastRT<Real>::minSelect(
+  template <class R>
+  SPxId SPxFastRT<R>::minSelect(
                                 int& nr,
-                                Real& val,
-                                Real& stab,
-                                Real& bestDelta,
-                                Real max)
+                                R& val,
+                                R& stab,
+                                R& bestDelta,
+                                R max)
   {
-    Real best = infinity;
+    R best = infinity;
     bestDelta = 0.0;
     iscoid = true;
     int indc = minSelect(val, stab, best, bestDelta, max,
@@ -750,8 +748,8 @@ namespace soplex
     return SPxId();
   }
 
-  template <>
-  bool SPxFastRT<Real>::maxShortLeave(Real& sel, int leave, Real maxabs)
+  template <class R>
+  bool SPxFastRT<R>::maxShortLeave(R& sel, int leave, R maxabs)
   {
     assert(leave >= 0);
     assert(maxabs >= 0);
@@ -773,8 +771,8 @@ namespace soplex
     return false;
   }
 
-  template <>
-  bool SPxFastRT<Real>::minShortLeave(Real& sel, int leave, Real maxabs)
+  template <class R>
+  bool SPxFastRT<R>::minShortLeave(R& sel, int leave, R maxabs)
   {
     assert(leave >= 0);
     assert(maxabs >= 0);
@@ -796,25 +794,25 @@ namespace soplex
     return false;
   }
 
-  template <>
-  bool SPxFastRT<Real>::maxReLeave(Real& sel, int leave, Real maxabs, bool polish)
+  template <class R>
+  bool SPxFastRT<R>::maxReLeave(R& sel, int leave, R maxabs, bool polish)
   {
     UpdateVector<R>& vec = this->thesolver->fVec();
-    Vector& low = this->thesolver->lbBound();
-    Vector& up = this->thesolver->ubBound();
+    VectorBase<R>& low = this->thesolver->lbBound();
+    VectorBase<R>& up = this->thesolver->ubBound();
 
     if (leave < 0)
       return true;
 
     if (up[leave] > low[leave])
       {
-        Real x = vec.delta()[leave];
+        R x = vec.delta()[leave];
 
         if (sel < -fastDelta / maxabs)
           {
             sel = 0.0;
          // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
-            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
+            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<R>::Desc::D_ON_BOTH )
               {
                 if (x < 0.0)
                   this->thesolver->shiftLBbound(leave, vec[leave]);
@@ -837,24 +835,24 @@ namespace soplex
     return false;
   }
 
-  template <>
-  bool SPxFastRT<Real>::minReLeave(Real& sel, int leave, Real maxabs, bool polish)
+  template <class R>
+  bool SPxFastRT<R>::minReLeave(R& sel, int leave, R maxabs, bool polish)
   {
     UpdateVector<R>& vec = this->thesolver->fVec();
-    Vector& low = this->thesolver->lbBound();
-    Vector& up = this->thesolver->ubBound();
+    VectorBase<R>& low = this->thesolver->lbBound();
+    VectorBase<R>& up = this->thesolver->ubBound();
 
     if (leave < 0)
       return true;
 
     if (up[leave] > low[leave])
       {
-        Real x = vec.delta()[leave];
+        R x = vec.delta()[leave];
 
         if (sel > fastDelta / maxabs)
           {
             sel = 0.0;
-            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<Real>::Desc::D_ON_BOTH )
+            if( !polish && this->thesolver->dualStatus(this->thesolver->baseId(leave)) != SPxBasisBase<R>::Desc::D_ON_BOTH )
          // prevent shifts in polishing mode to avoid a final cleanup step (i.e. simplex type switch)
               {
                 if (x > 0.0)
@@ -878,19 +876,19 @@ namespace soplex
     return false;
   }
 
-  template <>
-  int SPxFastRT<Real>::selectLeave(Real& val, Real, bool polish)
+  template <class R>
+  int SPxFastRT<R>::selectLeave(R& val, Real, bool polish)
   {
-    Real maxabs, max, sel;
+    R maxabs, max, sel;
     int leave = -1;
     int cnt = 0;
 
-    assert( m_type == SPxSolverBase<Real>::ENTER );
+    assert(this->m_type == SPxSolverBase<R>::ENTER);
 
     // force instable pivot iff true (see explanation in enter.cpp and spxsolve.cpp)
     bool instable = this->solver()->instableEnter;
-    Real lowstab = LOWSTAB;
-    assert(!instable || solver()->instableEnterId.isValid());
+    R lowstab = LOWSTAB;
+    assert(!instable || this->solver()->instableEnterId.isValid());
 
     resetTols();
 
@@ -904,7 +902,7 @@ namespace soplex
             leave = maxDelta(max, maxabs);
 
             assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) ||
-                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
+                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
             if( max == val || leave == -1 )
               {
@@ -915,7 +913,7 @@ namespace soplex
             if (!maxShortLeave(sel, leave, maxabs))
               {
                 // phase 2:
-                Real stab, bestDelta;
+                R stab, bestDelta;
 
                 stab = 100.0 * minStability(maxabs);
 
@@ -945,7 +943,7 @@ namespace soplex
             leave = minDelta(max, maxabs);
 
             assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) ||
-                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
+                   this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
             if( max == val || leave == -1 )
               {
@@ -956,7 +954,7 @@ namespace soplex
             if (!minShortLeave(sel, leave, maxabs))
               {
                 // phase 2:
-                Real stab, bestDelta;
+                R stab, bestDelta;
 
                 stab = 100.0 * minStability(maxabs);
 
@@ -966,7 +964,7 @@ namespace soplex
                 else
                   leave = minSelect(sel, stab, bestDelta, max);
 
-                assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
+                assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
                 if (bestDelta < DELTA_SHIFT*TRIES)
                   cnt++;
@@ -1001,10 +999,10 @@ namespace soplex
 
       if( polish && leave >= 0 )
         {
-          assert( this->thesolver->rep() == SPxSolverBase<Real>::COLUMN );
+          assert( this->thesolver->rep() == SPxSolverBase<R>::COLUMN );
           SPxId leaveId = this->thesolver->baseId(leave);
           // decide whether the chosen leave index contributes to the polishing objective
-          if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_INTEGRALITY )
+          if( this->thesolver->polishObj == SPxSolverBase<R>::POLISH_INTEGRALITY )
             {
               // only allow (integer) variables to leave the basis
               if( leaveId.isSPxRowId() )
@@ -1015,7 +1013,7 @@ namespace soplex
                     return -1;
                 }
             }
-          else if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_FRACTIONALITY )
+          else if( this->thesolver->polishObj == SPxSolverBase<R>::POLISH_FRACTIONALITY )
             {
               // only allow slacks and continuous variables to leave the basis
               if( this->thesolver->integerVariables.size() == this->thesolver->nCols() )
@@ -1035,31 +1033,31 @@ namespace soplex
           tighten();
       }
 
-    assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<Real>::Desc::P_FIXED);
+    assert(leave < 0 || !(this->thesolver->baseId(leave).isSPxColId()) || this->thesolver->desc().colStatus(this->thesolver->number(SPxColId(this->thesolver->baseId(leave)))) != SPxBasisBase<R>::Desc::P_FIXED);
 
     return leave;
   }
 
 
-  template <>
-  bool SPxFastRT<Real>::maxReEnter(Real& sel,
-                                Real maxabs,
+  template <class R>
+  bool SPxFastRT<R>::maxReEnter(R& sel,
+                                R maxabs,
                                 const SPxId& id,
                                    int nr,
                                    bool polish)
 {
-    Real x, d;
+    R x, d;
     Vector* up;
     Vector* low;
 
     UpdateVector<R>& pvec = this->thesolver->pVec();
-    SSVector& pupd = this->thesolver->pVec().delta();
-    Vector& upb = this->thesolver->upBound();
-    Vector& lpb = this->thesolver->lpBound();
+    SSVectorBase<R>& pupd = this->thesolver->pVec().delta();
+    VectorBase<R>& upb = this->thesolver->upBound();
+    VectorBase<R>& lpb = this->thesolver->lpBound();
     UpdateVector<R>& cvec = this->thesolver->coPvec();
-    SSVector& cupd = this->thesolver->coPvec().delta();
-    Vector& ucb = this->thesolver->ucBound();
-    Vector& lcb = this->thesolver->lcBound();
+    SSVectorBase<R>& cupd = this->thesolver->coPvec().delta();
+    VectorBase<R>& ucb = this->thesolver->ucBound();
+    VectorBase<R>& lcb = this->thesolver->lcBound();
 
     if (this->thesolver->isCoId(id))
       {
@@ -1141,26 +1139,26 @@ namespace soplex
     return false;
   }
 
-  template <>
-  bool SPxFastRT<Real>::minReEnter(
-                                Real& sel,
-                                Real maxabs,
+  template <class R>
+  bool SPxFastRT<R>::minReEnter(
+                                R& sel,
+                                R maxabs,
                                 const SPxId& id,
    int nr,
    bool polish)
 {
-    Real x, d;
+    R x, d;
     Vector* up;
     Vector* low;
 
     UpdateVector<R>& pvec = this->thesolver->pVec();
-    SSVector& pupd = this->thesolver->pVec().delta();
-    Vector& upb = this->thesolver->upBound();
-    Vector& lpb = this->thesolver->lpBound();
+    SSVectorBase<R>& pupd = this->thesolver->pVec().delta();
+    VectorBase<R>& upb = this->thesolver->upBound();
+    VectorBase<R>& lpb = this->thesolver->lpBound();
     UpdateVector<R>& cvec = this->thesolver->coPvec();
-    SSVector& cupd = this->thesolver->coPvec().delta();
-    Vector& ucb = this->thesolver->ucBound();
-    Vector& lcb = this->thesolver->lcBound();
+    SSVectorBase<R>& cupd = this->thesolver->coPvec().delta();
+    VectorBase<R>& ucb = this->thesolver->ucBound();
+    VectorBase<R>& lcb = this->thesolver->lcBound();
 
     if (this->thesolver->isCoId(id))
       {
@@ -1240,18 +1238,18 @@ namespace soplex
     return false;
   }
 
-  template <>
-  bool SPxFastRT<Real>::shortEnter(
+  template <class R>
+  bool SPxFastRT<R>::shortEnter(
                                 const SPxId& enterId,
                                 int nr,
-                                Real max,
-                                Real maxabs) const
+                                R max,
+                                R maxabs) const
   {
     if (this->thesolver->isCoId(enterId))
       {
         if (max != 0.0)
           {
-            Real x = this->thesolver->coPvec().delta()[nr];
+            R x = this->thesolver->coPvec().delta()[nr];
             if (x < maxabs * SHORT && -x < maxabs * SHORT)
               return false;
           }
@@ -1261,7 +1259,7 @@ namespace soplex
       {
         if (max != 0.0)
           {
-            Real x = this->thesolver->pVec().delta()[nr];
+            R x = this->thesolver->pVec().delta()[nr];
             if (x < maxabs * SHORT && -x < maxabs * SHORT)
               return false;
           }
@@ -1271,20 +1269,20 @@ namespace soplex
     return false;
   }
 
-  template <>
-  SPxId SPxFastRT<Real>::selectEnter(Real& val, int, bool polish)
+  template <class R>
+  SPxId SPxFastRT<R>::selectEnter(R& val, int, bool polish)
   {
     SPxId enterId;
-    Real max, sel;
-    Real maxabs = 0.0;
+    R max, sel;
+    R maxabs = 0.0;
     int nr;
     int cnt = 0;
 
-    assert( m_type == SPxSolverBase<Real>::LEAVE );
+    assert( this->m_type == SPxSolverBase<R>::LEAVE );
 
     // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
     bool instable = this->solver()->instableLeave;
-    Real lowstab = LOWSTAB;
+    R lowstab = LOWSTAB;
     assert(!instable || this->solver()->instableLeaveNum >= 0);
 
     resetTols();
@@ -1306,7 +1304,7 @@ namespace soplex
 
             if (!shortEnter(enterId, nr, max, maxabs))
               {
-                Real bestDelta, stab;
+                R bestDelta, stab;
 
                 stab = minStability(maxabs);
 
@@ -1345,7 +1343,7 @@ namespace soplex
 
             if (!shortEnter(enterId, nr, max, maxabs))
               {
-                Real bestDelta, stab;
+                R bestDelta, stab;
 
                 stab = minStability(maxabs);
 
@@ -1375,7 +1373,7 @@ namespace soplex
                 {
                   assert(!enterId.isValid() || !this->solver()->isBasic(enterId));
 
-                  Real x;
+                  R x;
                   if (this->thesolver->isCoId(enterId))
                     x = this->thesolver->coPvec().delta()[ this->thesolver->number(enterId) ];
                   else
@@ -1390,9 +1388,9 @@ namespace soplex
 
       if( polish && enterId.isValid() )
         {
-          assert( this->thesolver->rep() == SPxSolverBase<Real>::ROW );
+          assert( this->thesolver->rep() == SPxSolverBase<R>::ROW );
           // decide whether the chosen entering index contributes to the polishing objective
-          if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_INTEGRALITY )
+          if( this->thesolver->polishObj == SPxSolverBase<R>::POLISH_INTEGRALITY )
             {
               // only allow (integer) variables to enter the basis
               if( enterId.isSPxRowId() )
@@ -1400,7 +1398,7 @@ namespace soplex
               else if( this->thesolver->integerVariables.size() == this->thesolver->nCols() && this->thesolver->integerVariables[this->thesolver->number(enterId)] == 0)
                 return SPxId();
             }
-          else if( this->thesolver->polishObj == SPxSolverBase<Real>::POLISH_FRACTIONALITY )
+          else if( this->thesolver->polishObj == SPxSolverBase<R>::POLISH_FRACTIONALITY )
             {
               // only allow slacks and continuous variables to enter the basis
               if( this->thesolver->integerVariables.size() == this->thesolver->nCols() )
@@ -1426,15 +1424,15 @@ namespace soplex
     return enterId;
   }
 
-  template <>
-  void SPxFastRT<Real>::load(SPxSolverBase<Real>* spx)
+  template <class R>
+  void SPxFastRT<R>::load(SPxSolverBase<R>* spx)
   {
     this->thesolver = spx;
     setType(spx->type());
   }
 
-  template <>
-  void SPxFastRT<Real>::setType(typename SPxSolverBase<Real>::Type type)
+  template <class R>
+  void SPxFastRT<R>::setType(typename SPxSolverBase<R>::Type type)
   {
     this->m_type = type;
 
