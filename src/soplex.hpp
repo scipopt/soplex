@@ -7296,7 +7296,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
               MSG_INFO1( spxout, spxout << "Error parsing setting string: unknown parameter name <" << paramName << ">.\n" );
               return false;
             }
-          else if( strncmp(paramName, _currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
+          else if( strncmp(paramName, SoPlexBase<R>::_currentSettings->realParam.name[param].c_str(), SET_MAX_LINE_LEN) == 0 )
             {
               R value;
 #ifdef WITH_LONG_DOUBLE
