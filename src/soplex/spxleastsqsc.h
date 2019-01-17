@@ -24,6 +24,7 @@
 #include "soplex/spxscaler.h"
 #include "soplex/spxlp.h"
 
+
 namespace soplex
 {
 
@@ -79,4 +80,9 @@ protected:
 
 };
 } // namespace soplex
+
+// For the general templated files
+#include "spxleastsqsc.hpp"
+
 #endif // _SPXLEASTSQSC_H_
+

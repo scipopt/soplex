@@ -13,12 +13,12 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxleastsqsc.cpp
+/**@file  spxleastsqsc.hpp
  * @brief LP least squares scaling.
  */
-#include <cmath>
+
 #include <assert.h>
-#include "soplex/spxleastsqsc.h"
+#include <cmath>
 #include "soplex/spxout.h"
 #include "soplex/basevectors.h"
 #include "soplex/svsetbase.h"
@@ -34,9 +34,9 @@ namespace soplex
 static void updateScale(
    const SSVectorBase<R> vecnnzeroes,
    const SSVectorBase<R> resnvec,
-   SSVector& tmpvec,
-   SSVector*& psccurr,
-   SSVector*& pscprev,
+   SSVectorBase<R>& tmpvec,
+   SSVectorBase<R>*& psccurr,
+   SSVectorBase<R>*& pscprev,
    R qcurr,
    R qprev,
    R eprev1,
@@ -48,7 +48,7 @@ static void updateScale(
 
    R fac = -(eprev1 * eprev2);
 
-   SSVector* pssv;
+   SSVectorBase<R>* pssv;
 
    *pscprev -= *psccurr;
 
@@ -73,9 +73,9 @@ static void updateScale(
 static void updateScaleFinal(
    const SSVectorBase<R> vecnnzeroes,
    const SSVectorBase<R> resnvec,
-   SSVector& tmpvec,
-   SSVector*& psccurr,
-   SSVector*& pscprev,
+   SSVectorBase<R>& tmpvec,
+   SSVectorBase<R>*& psccurr,
+   SSVectorBase<R>*& pscprev,
    R q,
    R eprev1,
    R eprev2)
@@ -276,10 +276,10 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    SSVectorBase<R> colnnzinv(ncols);
 
    /* VectorBase<R> pointers */
-   SSVector* csccurr = &colscale1;
-   SSVector* cscprev = &colscale2;
-   SSVector* rsccurr = &rowscale1;
-   SSVector* rscprev = &rowscale2;
+   SSVectorBase<R>* csccurr = &colscale1;
+   SSVectorBase<R>* cscprev = &colscale2;
+   SSVectorBase<R>* rsccurr = &rowscale1;
+   SSVectorBase<R>* rscprev = &rowscale2;
 
    MSG_INFO2( (*this->spxout), (*this->spxout) << "before scaling:"
       << " min= " << lp.minAbsNzo()
@@ -296,7 +296,7 @@ void SPxLeastSqSC<R>::scale(SPxLPBase<R>& lp,  bool persistent)
    R qcurr = 1.0;
    R qprev = 0.0;
 
-   std::array<Real, 3> eprev;
+   std::array<R, 3> eprev;
    eprev.fill(0.0);
 
    initConstVecs(lp.rowSet(), facnrows, rowlogs, rownnzinv);

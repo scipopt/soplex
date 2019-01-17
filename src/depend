@@ -581,7 +581,7 @@ $(LIBOBJDIR)/spxequilisc.o: src/soplex/spxequilisc.cpp src/soplex/spxequilisc.h 
  src/soplex/spxharrisrt.h src/soplex/spxfastrt.h \
  src/soplex/spxboundflippingrt.h src/soplex/spxfastrt.h src/soplex/sol.h \
  src/soplex/solbase.h
-$(LIBOBJDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.cpp src/soplex/spxleastsqsc.h \
+$(LIBOBJDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.h \
  src/soplex/spxsolver.h src/soplex/spxdefines.h src/soplex/timer.h \
  src/soplex/timerfactory.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h src/soplex/notimer.h src/soplex/usertimer.h \
@@ -1748,7 +1748,7 @@ $(LIBOBJSUBDIR)/spxequilisc.o: src/soplex/spxequilisc.cpp src/soplex/spxequilisc
  src/soplex/spxharrisrt.h src/soplex/spxfastrt.h \
  src/soplex/spxboundflippingrt.h src/soplex/spxfastrt.h src/soplex/sol.h \
  src/soplex/solbase.h
-$(LIBOBJSUBDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.cpp src/soplex/spxleastsqsc.h \
+$(LIBOBJSUBDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.h \
  src/soplex/spxsolver.h src/soplex/spxdefines.h src/soplex/timer.h \
  src/soplex/timerfactory.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h src/soplex/notimer.h src/soplex/usertimer.h \
