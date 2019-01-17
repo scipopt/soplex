@@ -33,7 +33,6 @@ set(sources
     soplex/spxfileio.cpp
     soplex/spxgeometsc.cpp
     soplex/spxgithash.cpp
-    soplex/spxharrisrt.cpp
     soplex/spxhybridpr.cpp
     soplex/spxid.cpp
     soplex/spxleastsqsc.cpp

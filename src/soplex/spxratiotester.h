@@ -52,7 +52,7 @@ namespace soplex
       /// internal storage of type
       typename SPxSolverBase<R>::Type m_type;
       /// allowed bound violation
-      Real delta;
+      R delta;
       //@}
 
     public:
@@ -86,7 +86,7 @@ namespace soplex
       }
 
       /// set allowed bound violation
-      virtual void setDelta( Real newDelta )
+      virtual void setDelta( R newDelta )
       {
         if( newDelta <= DEFAULT_EPS_ZERO )
           delta = DEFAULT_EPS_ZERO;
@@ -95,7 +95,7 @@ namespace soplex
       }
 
       /// get allowed bound violation
-      virtual Real getDelta()
+      virtual R getDelta()
       {
         return delta;
       }
@@ -113,18 +113,18 @@ namespace soplex
           \ref SPxSolverBase<R>::lbBound() "lbBound()" and
           \ref SPxSolverBase<R>::ubBound() "ubBound()" within
           \ref SPxSolverBase<R>::entertol() "entertol()".
-          fVec().delta() is the vector by
+          fVec().delta() is the VectorBase<R> by
           which fVec() will be updated in this simplex step. Its nonzero
           indices are stored in sorted order in fVec().idx().
 
           If \p val > 0, \p val is the maximum allowed update value for fVec(),
           otherwise the minimum. Method #selectLeave() must chose \p val of the
           same sign as passed, such that updating fVec() by \p val yields a
-          new vector that satisfies all basic bounds (within entertol). The
+          new VectorBase<R> that satisfies all basic bounds (within entertol). The
           returned index, must be the index of an element of fVec(), that
           reaches one of its bounds with this update.
       */
-      virtual int selectLeave(Real& val, Real enterTest, bool polish = false) = 0;
+      virtual int selectLeave(R& val, R enterTest, bool polish = false) = 0;
 
       /// selects variable Id to enter the basis.
       /** Method #selectEnter() is called by the loaded SoPlex solver, when
@@ -148,12 +148,12 @@ namespace soplex
           If \p val > 0, \p val is the maximum allowed update value for pVec()
           and coPvec(), otherwise the minimum. Method #selectEnter() must
           chose \p val of the same sign as passed, such that updating pVec()
-          and coPvec() by \p val yields a new vector that satisfies all basic
+          and coPvec() by \p val yields a new VectorBase<R> that satisfies all basic
           bounds (within leavetol). The returned Id must be the Id of an
           element of pVec() or coPvec(), that reaches one of its bounds
           with this update.
       */
-      virtual SPxId selectEnter(Real& val, int leaveIdx, bool polish = false) = 0;
+      virtual SPxId selectEnter(R& val, int leaveIdx, bool polish = false) = 0;
 
       /// sets Simplex type.
       /** Informs pricer about (a change of) the loaded SoPlex's Type. In

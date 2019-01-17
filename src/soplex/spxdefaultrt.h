@@ -79,9 +79,9 @@ public:
    /**@name Select enter/leave */
    //@{
    ///
-   virtual int selectLeave(Real& val, Real, bool);
+   virtual int selectLeave(R& val, R, bool);
    ///
-   virtual SPxId selectEnter(Real& val, int, bool);
+   virtual SPxId selectEnter(R& val, int, bool);
 };
 
 } // namespace soplex

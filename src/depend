@@ -659,7 +659,7 @@ $(LIBOBJDIR)/spxgeometsc.o: src/soplex/spxgeometsc.cpp src/soplex/spxgeometsc.h 
  src/soplex/gzstream.h src/soplex/spxequilisc.h
 $(LIBOBJDIR)/spxgithash.o: src/soplex/spxgithash.cpp src/soplex/spxgithash.h \
  src/soplex/git_hash.cpp
-$(LIBOBJDIR)/spxharrisrt.o: src/soplex/spxharrisrt.cpp src/soplex/spxdefines.h \
+$(LIBOBJDIR)/spxharrisrt.o: src/soplex/spxdefines.h \
  src/soplex/spxharrisrt.h src/soplex/spxratiotester.h \
  src/soplex/spxsolver.h src/soplex/timer.h src/soplex/timerfactory.h \
  src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \
@@ -1826,7 +1826,7 @@ $(LIBOBJSUBDIR)/spxgeometsc.o: src/soplex/spxgeometsc.cpp src/soplex/spxgeometsc
  src/soplex/gzstream.h src/soplex/spxequilisc.h
 $(LIBOBJSUBDIR)/spxgithash.o: src/soplex/spxgithash.cpp src/soplex/spxgithash.h \
  src/soplex/git_hash.cpp
-$(LIBOBJSUBDIR)/spxharrisrt.o: src/soplex/spxharrisrt.cpp src/soplex/spxdefines.h \
+$(LIBOBJSUBDIR)/spxharrisrt.o: src/soplex/spxdefines.h \
  src/soplex/spxharrisrt.h src/soplex/spxratiotester.h \
  src/soplex/spxsolver.h src/soplex/timer.h src/soplex/timerfactory.h \
  src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \

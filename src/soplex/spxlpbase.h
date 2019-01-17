@@ -2709,7 +2709,7 @@ namespace soplex
           {
             // The value of old.lp_scaler has to be nullptr
             // Refer to issue #161 in soplex gitlab
-            assert(old.lp_scaler == nullptr)
+            assert(old.lp_scaler == nullptr);
 
             LPRowSetBase<R>::operator=(old);
             LPColSetBase<R>::operator=(old);
