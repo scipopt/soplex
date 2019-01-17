@@ -242,4 +242,8 @@ public:
    //@}
 };
 } // namespace soplex
+
+// General templated definitions
+#include "spxscaler.hpp"
+
 #endif // _SPXSCALER_H_
