@@ -2,6 +2,7 @@ Release 7.1.4
 ==================
 
 fixed bugs:
+- correct use of float_control pragma in stablesum implementation
 
 miscellaneous:
 
