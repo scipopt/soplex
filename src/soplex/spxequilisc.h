@@ -72,4 +72,7 @@ public:
    //@}
 };
 } // namespace soplex
+
+#include "spxequilisc.hpp"
+
 #endif // _SPXEQUILISC_H_
