@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxequilisc.cpp
+/**@file  spxequilisc.hpp
  * @brief Equilibrium row/column scaling.
  */
 #include <assert.h>
@@ -40,7 +40,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
 
    for( int i = 0; i < n; ++i )
    {
-      const SVector& vec = rowRatio ? lp.rowVector(i) : lp.colVector(i);
+     const SVectorBase<R>& vec = rowRatio ? lp.rowVector(i) : lp.colVector(i);
       R mini = infinity;
       R maxi = 0.0;
 
@@ -75,7 +75,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
 
    for( int i = 0; i < vecset->num(); ++i )
    {
-      const SVector& vec = (*vecset)[i];
+     const SVectorBase<R>& vec = (*vecset)[i];
 
       R maxi = 0.0;
 
@@ -105,7 +105,7 @@ void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<R>
 
    for( int i = 0; i < vecset->num(); ++i )
    {
-      const SVector& vec = (*vecset)[i];
+     const SVectorBase<R>& vec = (*vecset)[i];
 
       R maxi = 0.0;
 

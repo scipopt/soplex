@@ -28,7 +28,6 @@ set(sources
     soplex/spxdefines.cpp
     soplex/spxdesc.cpp
     soplex/spxdevexpr.cpp
-    soplex/spxequilisc.cpp
     soplex/spxfastrt.cpp
     soplex/spxfileio.cpp
     soplex/spxgeometsc.cpp
