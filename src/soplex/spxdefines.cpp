@@ -19,6 +19,7 @@
 #include "assert.h"
 #include "soplex/spxdefines.h"
 #include "soplex/spxout.h"
+#include "soplex/rational.h"
 
 namespace soplex
 {
@@ -36,5 +37,41 @@ bool msginconsistent(const char* name, const char* file, int line)
 
    return 0;
 }
+
+  template <class >
+  inline Rational spxFrexp(Rational y, int* exp)
+  {
+    // This should never be called.
+    // Refer to issue 164 in soplex gitlab
+    assert(true);
+
+    return 0;
+  }
+
+  template <>
+  inline Real spxFrexp(Real y, int* exp)
+  {
+    return frexp(y, exp);
+  }
+
+  // @todo: fix this definition
+  // template <class T>
+  // inline boost::multiprecision::number<T> spxFrexp(boost::multiprecision::number<T> y, int* exp)
+  // {
+  //   return frexp(y, exp);
+  // }
+
+  // @todo: write a boost version of the following function. Check whether this
+  // function gets called from the Scalers, if not, we can have a general
+  // version of the function in spxdefines.hpp
+  template <>
+  inline Real spxLdexp(Real x, int exp)
+  {
+    return ldexp(x,exp);
+  }
+
+
+
+
 
 } // namespace soplex

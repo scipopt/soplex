@@ -181,11 +181,6 @@ void Param<R>::setEpsilonPivot(R eps)
 template <class R>
 inline R spxLdexp(R x, int exp);
 
-template <>
-inline Real spxLdexp(Real x, int exp)
-{
-  return ldexp(x,exp);
-}
 
 template <typename T>
 inline boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T> x, int exp)
@@ -196,8 +191,5 @@ inline boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T
 
 // returns x and exp such that y = x * 2^exp
 template <class R>
-inline R spxFrexp(R y, int* exp)
-{
-  return frexp(y, exp);
-}
+inline R spxFrexp(R y, int* exp);
 
