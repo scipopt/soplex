@@ -148,17 +148,6 @@ void SPxScaler<R>::setup(SPxLPBase<R>& lp)
    lp.lp_scaler = this;
 }
 
-  // @todo move this function to a cpp file
-  template <>
-  int SPxScaler<Rational>::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const
-  {
-    // This should never be called.
-    // Refer to issue 164 in soplex gitlab
-    assert(true);
-
-    return 0;
-  }
-
 
   template <class R>
 int SPxScaler<R>::computeScaleExp(const SVectorBase<R>& vec, const DataArray<int>& oldScaleExp) const
