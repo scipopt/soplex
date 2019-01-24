@@ -1026,7 +1026,7 @@ void SoPlexBase<R>::addColRational(const mpq_t* obj, const mpq_t* lower, const m
   _completeRangeTypesRational();
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _addColReal(Real(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+    _addColReal(R(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
                 R(lowerRational(i)), DSVectorBase<R>(_rationalLP->colVector(i)), R(upperRational(i)));
 
   _invalidateSolution();
@@ -1050,7 +1050,7 @@ void SoPlexBase<R>::addColsRational(const mpq_t* obj, const mpq_t* lower, const 
     {
       LPColSetReal lpcolset;
       for( int i = numColsRational() - numCols; i < numColsRational(); i++ )
-        lpcolset.add(Real(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
+        lpcolset.add(R(maxObjRational(i)) * (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE ? 1.0 : -1.0),
                      R(lowerRational(i)), DSVectorBase<R>(_rationalLP->colVector(i)), R(upperRational(i)));
       _addColsReal(lpcolset);
     }
@@ -1623,7 +1623,7 @@ void SoPlexBase<R>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues, con
 
   int i = numRowsRational() - 1;
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _addRowReal(Real(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
+    _addRowReal(R(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
 
   _invalidateSolution();
 }
@@ -1646,7 +1646,7 @@ void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, co
     {
       LPRowSetReal lprowset;
       for( int i = numRowsRational() - numRows; i < numRowsRational(); i++ )
-        lprowset.add(Real(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
+        lprowset.add(R(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
       _addRowsReal(lprowset);
     }
 
@@ -3347,7 +3347,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
               /* for information on the unscaling procedure see spxscaler.h */
 
               int scaleExp;
-              DSVector rhs(_solver.unitVector(r));
+              DSVectorBase<R> rhs(_solver.unitVector(r));
 
               if( _solver.basis().baseId(r).isSPxColId() )
                 scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
@@ -3403,8 +3403,8 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
       assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
       // @todo should rhs be a reference?
-      DSVector rhs(numCols());
-      SSVector y(numCols());
+      DSVectorBase<R> rhs(numCols());
+      SSVectorBase<R>  y(numCols());
       int* bind = 0;
       int index;
 
@@ -3462,7 +3462,7 @@ bool SoPlexBase<R>::getBasisInverseRowReal(int r, R* coef, int* inds, int* ninds
         }
 
       // initialize result vector x as zero
-      memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
+      memset(coef, 0, (unsigned int)numRows() * sizeof(R));
 
       // add nonzero entries
       for( int i = 0; i < numCols(); ++i )
@@ -3534,7 +3534,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
               /* for information on the unscaling procedure see spxscaler.h */
 
               int scaleExp =_scaler->getRowScaleExp(c);
-              DSVector rhs(_solver.unitVector(c));
+              DSVectorBase<R> rhs(_solver.unitVector(c));
               rhs *= spxLdexp(1.0, scaleExp);
 
               _solver.basis().solve(x, rhs);
@@ -3673,7 +3673,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
         }
 
       // initialize result vector x as zero
-      memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
+      memset(coef, 0, (unsigned int)numRows() * sizeof(R));
 
       // add nonzero entries
       for( int i = 0; i < numCols(); ++i )
@@ -3712,7 +3712,7 @@ bool SoPlexBase<R>::getBasisInverseColReal(int c, R* coef, int* inds, int* ninds
 
 /// computes dense solution of basis matrix B * sol = rhs; returns true on success
 template <class R>
-bool SoPlexBase<R>::getBasisInverseTimesVecReal(Real* rhs, R* sol, bool unscale)
+bool SoPlexBase<R>::getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale)
 {
   VectorBase<R> v(numRows(), rhs);
   VectorBase<R> x(numRows(), sol);
@@ -3843,7 +3843,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(Real* rhs, R* sol, bool unscale)
               assert(index < numRows());
               assert(!_solver.isRowBasic(index));
 
-              x[i] = v[index] - (rowVectorRealInternal(index) * Vector(numCols(), y.get_ptr()));
+              x[i] = v[index] - (rowVectorRealInternal(index) * VectorBase<R>(numCols(), y.get_ptr()));
 
               if( adaptScaling )
                 {
@@ -3878,7 +3878,7 @@ bool SoPlexBase<R>::getBasisInverseTimesVecReal(Real* rhs, R* sol, bool unscale)
 
 /// multiply with basis matrix; B * vec (inplace)
 template <class R>
-bool SoPlexBase<R>::multBasis(Real* vec, bool unscale)
+bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
 {
   if( !hasBasis() )
     return false;
@@ -3892,8 +3892,8 @@ bool SoPlexBase<R>::multBasis(Real* vec, bool unscale)
     {
       int basisdim = numRows();
 
-      // create Vector from input values
-      Vector x(basisdim, vec);
+      // create VectorBase<R> from input values
+      VectorBase<R> x(basisdim, vec);
 
       if( unscale && _solver.isScaled() )
         {
@@ -3926,12 +3926,12 @@ bool SoPlexBase<R>::multBasis(Real* vec, bool unscale)
     {
       int colbasisdim = numRows();
 
-      DSVector y(colbasisdim);
+      DSVectorBase<R> y(colbasisdim);
 
       y.clear();
 
-      // create Vector from input values
-      Vector x(colbasisdim, vec);
+      // create VectorBase<R> from input values
+      VectorBase<R> x(colbasisdim, vec);
 
       int* bind = 0;
       int index;
@@ -3969,7 +3969,7 @@ bool SoPlexBase<R>::multBasis(Real* vec, bool unscale)
 
                   if( unscale && _solver.isScaled() )
                     {
-                      DSVector col;
+                      DSVectorBase<R> col;
                       _solver.getColVectorUnscaled(index, col);
                       y.add(x[i] * col);
                     }
@@ -4003,8 +4003,8 @@ bool SoPlexBase<R>::multBasisTranspose(Real* vec, bool unscale)
     {
       int basisdim = numRows();
 
-      // create Vector from input values
-      Vector x(basisdim, vec);
+      // create VectorBase<R> from input values
+      VectorBase<R> x(basisdim, vec);
 
       if( unscale && _solver.isScaled() )
         {
@@ -4040,10 +4040,10 @@ bool SoPlexBase<R>::multBasisTranspose(Real* vec, bool unscale)
     {
       int colbasisdim = numRows();
 
-      DSVector y(colbasisdim);
+      DSVectorBase<R> y(colbasisdim);
 
-      // create Vector from input values
-      Vector x(colbasisdim, vec);
+      // create VectorBase<R> from input values
+      VectorBase<R> x(colbasisdim, vec);
 
       int* bind = 0;
       int index;
@@ -4079,7 +4079,7 @@ bool SoPlexBase<R>::multBasisTranspose(Real* vec, bool unscale)
 
               if( unscale && _solver.isScaled() )
                 {
-                  DSVector col;
+                  DSVectorBase<R> col;
                   _solver.getColVectorUnscaled(index, col);
                   y.add(i, x * col);
                 }
@@ -4367,7 +4367,7 @@ int SoPlexBase<R>::intParam(const IntParam param) const
 
 /// returns real parameter value
 template <class R>
-R SoPlexBase<R>::realParam(const RealParam param) const
+R SoPlexBase<R>::realParam(const RParam param) const
 {
   assert(param >= 0);
   assert(param < REALPARAM_COUNT);
@@ -4805,7 +4805,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
 /// sets real parameter value; returns true on success
 template <class R>
-bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const bool init)
+bool SoPlexBase<R>::setRealParam(const RParam param, const R value, const bool init)
 {
   assert(param >= 0);
   assert(param < REALPARAM_COUNT);
@@ -5193,7 +5193,7 @@ void SoPlexBase<R>::printVersion() const
   MSG_INFO1( spxout, spxout << " [mode: optimized]" );
 #endif
 
-  MSG_INFO1( spxout, spxout << " [precision: " << (int)sizeof(Real) << " byte]" );
+  MSG_INFO1( spxout, spxout << " [precision: " << (int)sizeof(R) << " byte]" );
 
 #ifdef SOPLEX_WITH_GMP
 #ifdef mpir_version
@@ -5227,8 +5227,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare number of Rows
   if( _realLP->nRows() != _rationalLP->nRows() )
     {
-      MSG_INFO1( spxout, spxout << "The number of Rows in the Real LP does not match the one in the Rational LP."
-                 << " Real LP: " << _realLP->nRows() << "  Rational LP: " << _rationalLP->nRows() << std::endl);
+      MSG_INFO1( spxout, spxout << "The number of Rows in the R LP does not match the one in the Rational LP."
+                 << " R LP: " << _realLP->nRows() << "  Rational LP: " << _rationalLP->nRows() << std::endl);
       result = false;
       nRowsMatch = false;
     }
@@ -5236,8 +5236,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare number of Columns
   if( _realLP->nCols() != _rationalLP->nCols() )
     {
-      MSG_INFO1( spxout, spxout << "The number of Columns in the Real LP does not match the one in the Rational LP."
-                 << " Real LP: " << _realLP->nCols() << "  Rational LP: " << _rationalLP->nCols() << std::endl);
+      MSG_INFO1( spxout, spxout << "The number of Columns in the R LP does not match the one in the Rational LP."
+                 << " R LP: " << _realLP->nCols() << "  Rational LP: " << _rationalLP->nCols() << std::endl);
       result = false;
       nColsMatch = false;
     }
@@ -5245,16 +5245,16 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare number of nonZeros
   if( _realLP->nNzos() != _rationalLP->nNzos() )
     {
-      MSG_INFO1( spxout, spxout << "The number of nonZeros in the Real LP does not match the one in the Rational LP."
-                 << " Real LP: " << _realLP->nNzos() << "  Rational LP: " << _rationalLP->nNzos() << std::endl);
+      MSG_INFO1( spxout, spxout << "The number of nonZeros in the R LP does not match the one in the Rational LP."
+                 << " R LP: " << _realLP->nNzos() << "  Rational LP: " << _rationalLP->nNzos() << std::endl);
       result = false;
     }
 
   // compare the dimensions of the right hand side vectors
   if( _realLP->rhs().dim() != _rationalLP->rhs().dim() )
     {
-      MSG_INFO1( spxout, spxout << "The dimension of the right hand side vector of the Real LP does not match the one of the Rational LP."
-                 << " Real LP: " << _realLP->rhs().dim() << "  Rational LP: " << _rationalLP->rhs().dim() << std::endl);
+      MSG_INFO1( spxout, spxout << "The dimension of the right hand side vector of the R LP does not match the one of the Rational LP."
+                 << " R LP: " << _realLP->rhs().dim() << "  Rational LP: " << _rationalLP->rhs().dim() << std::endl);
       result = false;
       rhsDimMatch = false;
 
@@ -5263,8 +5263,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare the dimensions of the left hand side vectors
   if( _realLP->lhs().dim() != _rationalLP->lhs().dim() )
     {
-      MSG_INFO1( spxout, spxout << "The dimension of the left hand side vector of the Real LP does not match the one of the Rational LP."
-                 << " Real LP: " << _realLP->lhs().dim() << "  Rational LP: " << _rationalLP->lhs().dim() << std::endl);
+      MSG_INFO1( spxout, spxout << "The dimension of the left hand side vector of the R LP does not match the one of the Rational LP."
+                 << " R LP: " << _realLP->lhs().dim() << "  Rational LP: " << _rationalLP->lhs().dim() << std::endl);
       result = false;
       lhsDimMatch = false;
     }
@@ -5272,8 +5272,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare the dimensions of the objective function vectors
   if( _realLP->maxObj().dim() != _rationalLP->maxObj().dim() )
     {
-      MSG_INFO1( spxout, spxout << "The dimension of the objective function vector of the Real LP does not match the one of the Rational LP."
-                 << " Real LP: " << _realLP->maxObj().dim() << "  Rational LP: " << _rationalLP->maxObj().dim() << std::endl);
+      MSG_INFO1( spxout, spxout << "The dimension of the objective function vector of the R LP does not match the one of the Rational LP."
+                 << " R LP: " << _realLP->maxObj().dim() << "  Rational LP: " << _rationalLP->maxObj().dim() << std::endl);
       result = false;
       maxObjDimMatch = false;
     }
@@ -5281,8 +5281,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare the sense
   if( (int)_realLP->spxSense() != (int)_rationalLP->spxSense() )
     {
-      MSG_INFO1( spxout, spxout << "The objective function sense of the Real LP does not match the one of the Rational LP."
-                 << " Real LP: " << (_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? "MIN" : "MAX")
+      MSG_INFO1( spxout, spxout << "The objective function sense of the R LP does not match the one of the Rational LP."
+                 << " R LP: " << (_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? "MIN" : "MAX")
                  << "  Rational LP: " << (_rationalLP->spxSense() == SPxLPRational::MINIMIZE ? "MIN" : "MAX") << std::endl);
       result = false;
     }
@@ -5290,8 +5290,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare the dimensions of upper bound vectors
   if( _realLP->upper().dim() != _rationalLP->upper().dim() )
     {
-      MSG_INFO1( spxout, spxout << "The dimension of the upper bound vector of the Real LP does not match the one of the Rational LP."
-                 << " Real LP: " << _realLP->upper().dim() << "  Rational LP: " << _rationalLP->upper().dim() << std::endl);
+      MSG_INFO1( spxout, spxout << "The dimension of the upper bound vector of the R LP does not match the one of the Rational LP."
+                 << " R LP: " << _realLP->upper().dim() << "  Rational LP: " << _rationalLP->upper().dim() << std::endl);
       result = false;
       upperDimMatch = false;
     }
@@ -5299,8 +5299,8 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   // compare the dimensions of the objective function vectors
   if( _realLP->lower().dim() != _rationalLP->lower().dim() )
     {
-      MSG_INFO1( spxout, spxout << "The dimension of the lower bound vector of the Real LP does not match the one of the Rational LP."
-                 << " Real LP: " << _realLP->lower().dim() << "  Rational LP: " << _rationalLP->lower().dim() << std::endl);
+      MSG_INFO1( spxout, spxout << "The dimension of the lower bound vector of the R LP does not match the one of the Rational LP."
+                 << " R LP: " << _realLP->lower().dim() << "  Rational LP: " << _rationalLP->lower().dim() << std::endl);
       result = false;
       lowerDimMatch = false;
     }
@@ -5326,7 +5326,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   if( !quiet )
                     {
                       MSG_INFO1( spxout, spxout << "Entries number " << i << " of the right hand side vectors don't match."
-                                 << " Real LP: " << _realLP->rhs()[i] << "  Rational LP: " << _rationalLP->rhs()[i] << std::endl);
+                                 << " R LP: " << _realLP->rhs()[i] << "  Rational LP: " << _rationalLP->rhs()[i] << std::endl);
                     }
                   rhsValMatch = false;
                   result = false;
@@ -5351,7 +5351,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   if( !quiet )
                     {
                       MSG_INFO1( spxout, spxout << "Entries number " << i << " of the left hand side vectors don't match."
-                                 << " Real LP: " << _realLP->lhs()[i] << "  Rational LP: " << _rationalLP->lhs()[i] << std::endl);
+                                 << " R LP: " << _realLP->lhs()[i] << "  Rational LP: " << _rationalLP->lhs()[i] << std::endl);
                     }
                   lhsValMatch = false;
                   result = false;
@@ -5374,7 +5374,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   if( !quiet )
                     {
                       MSG_INFO1( spxout, spxout << "Entries number " << i << " of the objective function vectors don't match."
-                                 << " Real LP: " << _realLP->maxObj()[i] << "  Rational LP: " << _rationalLP->maxObj()[i] << std::endl);
+                                 << " R LP: " << _realLP->maxObj()[i] << "  Rational LP: " << _rationalLP->maxObj()[i] << std::endl);
                     }
                   maxObjValMatch = false;
                   result = false;
@@ -5399,7 +5399,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   if( !quiet )
                     {
                       MSG_INFO1( spxout, spxout << "Entries number " << i << " of the upper bound vectors don't match."
-                                 << " Real LP: " << _realLP->upper()[i] << "  Rational LP: " << _rationalLP->upper()[i] << std::endl);
+                                 << " R LP: " << _realLP->upper()[i] << "  Rational LP: " << _rationalLP->upper()[i] << std::endl);
                     }
                   upperValMatch = false;
                   result = false;
@@ -5424,7 +5424,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   if( !quiet )
                     {
                       MSG_INFO1( spxout, spxout << "Entries number " << i << " of the lower bound vectors don't match."
-                                 << " Real LP: " << _realLP->lower()[i] << "  Rational LP: " << _rationalLP->lower()[i] << std::endl);
+                                 << " R LP: " << _realLP->lower()[i] << "  Rational LP: " << _rationalLP->lower()[i] << std::endl);
                     }
                   lowerValMatch = false;
                   result = false;
@@ -5452,7 +5452,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
                   if( !quiet )
                     {
                       MSG_INFO1( spxout, spxout << "Entries number " << j << " of column number " << i << " don't match."
-                                 << " Real LP: " << _realLP->colVector(i)[j] << "  Rational LP: " << _rationalLP->colVector(i)[j] << std::endl);
+                                 << " R LP: " << _realLP->colVector(i)[j] << "  Rational LP: " << _rationalLP->colVector(i)[j] << std::endl);
                     }
                   matrixValMatch = false;
                   result = false;
@@ -5683,7 +5683,7 @@ void SoPlexBase<R>::_addRowReal(const LPRowReal& lprow)
 
 /// adds a single row to the R LP and adjusts basis
 template <class R>
-void SoPlexBase<R>::_addRowReal(Real lhs, const SVectorBase<R>& lprow, R rhs)
+void SoPlexBase<R>::_addRowReal(R lhs, const SVectorBase<R>& lprow, R rhs)
 {
   assert(_realLP != 0);
 
@@ -5746,7 +5746,7 @@ void SoPlexBase<R>::_addColReal(const LPColReal& lpcol)
 
 /// adds a single column to the R LP and adjusts basis
 template <class R>
-void SoPlexBase<R>::_addColReal(Real obj, R lower, const SVectorBase<R>& lpcol, R upper)
+void SoPlexBase<R>::_addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R upper)
 {
   assert(_realLP != 0);
 
@@ -6001,7 +6001,7 @@ void SoPlexBase<R>::_changeLowerReal(const VectorBase<R>& lower)
       for( int i = numCols() - 1; i >= 0; i-- )
         {
           if( _basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER && lower[i] <= -realParam(SoPlexBase<R>::INFTY) )
-            _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
+            _basisStatusCols[i] = (upperR(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
         }
     }
 }
@@ -6688,7 +6688,7 @@ void SoPlexBase<R>::_syncLPRational(bool time)
 template <class R>
 void SoPlexBase<R>::_syncRealSolution()
 {
-  if( _hasSolRational && !_hasSolReal )
+  if( _hasSolRational && !_hasSolR )
     {
       _solReal = _solRational;
       _hasSolReal = true;
@@ -7286,7 +7286,7 @@ bool SoPlexBase<R>::parseSettingsString(char* string)
       return true;
     }
 
-  // check whether we have a Real parameter
+  // check whether we have a R parameter
   if( strncmp(paramTypeString, "real", 4) == 0 )
     {
       for( int param = 0; ; param++ )

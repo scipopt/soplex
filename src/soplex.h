@@ -308,7 +308,7 @@ public:
    void addRowsReal(const LPRowSetReal& lprowset);
 
    /// adds a single column
-   void addColReal(const LPCol& lpcol);
+   void addColReal(const LPColSetBase<R>& lpcol);
 
    /// adds multiple columns
    void addColsReal(const LPColSetReal& lpcolset);
@@ -623,7 +623,7 @@ public:
 
    /// gets the primal solution vector if available; returns true on success
    bool getPrimal(VectorBase<R>& vector);
-   bool getPrimalReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getPrimalReal(VectorBase<R>& vector); /* For SCIP compatibility */
    bool getPrimalRational(VectorRational& vector);
 
    /// gets the vector of slack values if available; returns true on success
@@ -631,22 +631,22 @@ public:
 
    /// gets the primal ray if available; returns true on success
    bool getPrimalRay(VectorBase<R>& vector);
-   bool getPrimalRayReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getPrimalRayReal(VectorBase<R>& vector); /* For SCIP compatibility */
    bool getPrimalRayRational(VectorRational& vector);
 
    /// gets the dual solution vector if available; returns true on success
    bool getDual(VectorBase<R>& vector);
-   bool getDualReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getDualReal(VectorBase<R>& vector); /* For SCIP compatibility */
    bool getDualRational(VectorRational& vector);
 
    /// gets the vector of reduced cost values if available; returns true on success
    bool getRedCost(VectorBase<R>& vector);
-   bool getRedCostReal(VectorBase<Real>& vector); /* For SCIP compatibility */
+   bool getRedCostReal(VectorBase<R>& vector); /* For SCIP compatibility */
    bool getRedCostRational(VectorRational& vector);
 
    /// gets the Farkas proof if available; returns true on success
    bool getDualFarkas(VectorBase<R>& vector);
-   bool getDualFarkasReal(VectorBase<Real>& vector);
+   bool getDualFarkasReal(VectorBase<R>& vector);
    bool getDualFarkasRational(VectorRational& vector);
 
    /// gets violation of bounds; returns true on success
@@ -769,17 +769,17 @@ public:
    bool getBasisInverseColReal(int c, R* coef, int* inds = NULL, int* ninds = NULL, bool unscale = true);
 
    /// computes dense solution of basis matrix B * \p sol = \p rhs; returns true on success
-   bool getBasisInverseTimesVecReal(Real* rhs, R* sol, bool unscale = true);
+   bool getBasisInverseTimesVecReal(R* rhs, R* sol, bool unscale = true);
 
    /// multiply with basis matrix; B * \p vec (inplace)
    /// @param vec (dense) vector to be multiplied with
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool multBasis(Real* vec, bool unscale = true);
+   bool multBasis(R* vec, bool unscale = true);
 
    /// multiply with transpose of basis matrix; \p vec * B^T (inplace)
    /// @param vec (dense) vector to be multiplied with
    /// @param unscale determines whether the result should be unscaled according to the original LP data
-   bool multBasisTranspose(Real* vec, bool unscale = true);
+   bool multBasisTranspose(R* vec, bool unscale = true);
 
    /// compute rational basis inverse; returns true on success
    bool computeBasisInverseRational();
@@ -1743,9 +1743,9 @@ private:
 
    SPxBasisBase<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
-   DVector _transformedObj;       // the objective coefficients of the transformed problem
-   DVector _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
-   LPRowSet _transformedRows;    // a set of the original rows that have been transformed using the original basis.
+   DVectorBase<R> _transformedObj;       // the objective coefficients of the transformed problem
+   DVectorBase<R> _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
+   LPRowSetBase<R> _transformedRows;    // a set of the original rows that have been transformed using the original basis.
    SPxColId _compSlackColId;     // column id of the primal complementary problem slack column.
    SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
    bool* _decompReducedProbRows;    // flag to indicate the inclusion of a row in the reduced problem.
@@ -1894,7 +1894,7 @@ private:
    void _addRowReal(const LPRowReal& lprow);
 
    /// adds a single row to the real LP and adjusts basis
-   void _addRowReal(Real lhs, const SVectorBase<R>& lprow, R rhs);
+   void _addRowReal(R lhs, const SVectorBase<R>& lprow, R rhs);
 
    /// adds multiple rows to the real LP and adjusts basis
    void _addRowsReal(const LPRowSetReal& lprowset);
@@ -1903,7 +1903,7 @@ private:
    void _addColReal(const LPColReal& lpcol);
 
    /// adds a single column to the real LP and adjusts basis
-   void _addColReal(Real obj, R lower, const SVectorBase<R>& lpcol, R upper);
+   void _addColReal(R obj, R lower, const SVectorBase<R>& lpcol, R upper);
 
    /// adds multiple columns to the real LP and adjusts basis
    void _addColsReal(const LPColSetReal& lpcolset);
@@ -2180,13 +2180,13 @@ private:
    void _storeSolutionRealFromPresol();
 
    /// unscales stored solution to remove internal or external scaling of LP
-   void _unscaleSolutionReal(SPxLPReal& LP, bool persistent = true);
+   void _unscaleSolutionReal(SPxLPBase<R>& LP, bool persistent = true);
 
    /// load original LP and possibly setup a slack basis
    void _loadRealLP(bool initBasis);
 
    /// check scaling of LP
-   void _checkScaling(SPxLPReal* origLP) const;
+   void _checkScaling(SPxLPBase<R>* origLP) const;
 
    /// check correctness of (un)scaled basis matrix operations
    void _checkBasisScaling();
@@ -2216,18 +2216,18 @@ private:
    void _decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
-   void _getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
+   void _getZeroDualMultiplierIndices(VectorBase<R> feasVector, int* nonposind, int* colsforremoval,
          int* nnonposind, bool& stop);
 
    /// retrieves the compatible columns from the constraint matrix
-   void _getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
+   void _getCompatibleColumns(VectorBase<R> feasVector, int* nonposind, int* compatind, int* rowsforremoval, int* colsforremoval,
       int nnonposind, int* ncompatind, bool formRedProb, bool& stop);
 
    /// computes the reduced problem objective coefficients
    void _computeReducedProbObjCoeff(bool& stop);
 
    /// computes the compatible bound constraints and adds them to the reduced problem
-   void _getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind, int* ncompatboundcons,
+   void _getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* compatboundcons, int* nonposind, int* ncompatboundcons,
          int nnonposind, bool& stop);
 
    /// computes the rows to remove from the complementary problem
@@ -2241,14 +2241,14 @@ private:
    void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// update the reduced problem with additional columns and rows
-   void _updateDecompReducedProblem(Real objVal, DVector dualVector, DVector redcostVector, DVector compPrimalVector,
-      DVector compDualVector);
+   void _updateDecompReducedProblem(R objVal, DVectorBase<R> dualVector, DVectorBase<R> redcostVector, DVectorBase<R> compPrimalVector,
+      DVectorBase<R> compDualVector);
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
    void _updateDecompReducedProblemViol(bool allrows);
 
    /// builds the update rows with those violated in the complmentary problem
-   void _findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
+   void _findViolatedRows(R compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
 
    /// update the dual complementary problem with additional columns and rows
    void _updateDecompComplementaryDualProblem(bool origObj);
@@ -2257,7 +2257,7 @@ private:
    void _updateDecompComplementaryPrimalProblem(bool origObj);
 
    /// checking the optimality of the original problem.
-   void _checkOriginalProblemOptimality(Vector primalVector, bool printViol);
+   void _checkOriginalProblemOptimality(VectorBase<R> primalVector, bool printViol);
 
    /// updating the slack column coefficients to adjust for equality constraints
    void _updateComplementaryDualSlackColCoeff();
@@ -2290,7 +2290,7 @@ private:
    int getOrigVarFixedDirection(int colNum);
 
    /// checks the dual feasibility of the current basis
-   bool checkBasisDualFeasibility(Vector feasVec);
+   bool checkBasisDualFeasibility(VectorBase<R> feasVec);
 
    /// returns the expected sign of the dual variables for the reduced problem
    DualSign getExpectedDualVariableSign(int rowNumber);
@@ -2317,7 +2317,7 @@ private:
    bool getDecompRowViolation(R& maxviol, R& sumviol);
 
    /// function call to terminate the decomposition simplex
-   bool decompTerminate(Real timeLimit);
+   bool decompTerminate(R timeLimit);
 
    /// function to build a basis for the original problem as given by the solution to the reduced problem
    void _writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat);
@@ -2334,10 +2334,12 @@ private:
 
   /* Backwards compatibility */
   typedef SoPlexBase<Real> SoPlex;
-
   // A header file containing all the general templated functions
-  #include "soplex.hpp"
+
   #include "soplex/solverational.hpp"
 
-}
+} // namespace soplex
+
+// General templated function
+#include "soplex.hpp"
 #endif // _SOPLEX_H_
