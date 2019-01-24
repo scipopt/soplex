@@ -32,6 +32,19 @@
 namespace soplex
 {
 
+  /// Is \p c a \c space, \c tab, \c nl or \c cr ?
+  static inline bool LPFisSpace(int c)
+  {
+    return (c == ' ') || (c == '\t') || (c == '\n') || (c == '\r');
+  }
+
+  /// Is there a number at the beginning of \p s ?
+  static bool LPFisValue(const char* s)
+  {
+    return ((*s >= '0') && (*s <= '9')) || (*s == '+') || (*s == '-') || (*s == '.');
+  }
+
+
   template <class R>
   void SPxLPBase<R>::unscaleLP()
   {
@@ -427,150 +440,14 @@ namespace soplex
     return lowerUnscaled(number(id));
   }
 
-  /// Changes objective vector to \p newObj.
-  template <class R>
-  void SPxLPBase<R>::changeMaxObj(const VectorBase<R>& newObj, bool scale)
-  {
-    assert(maxObj().dim() == newObj.dim());
-    if( scale )
-      {
-        assert(_isScaled);
-        assert(lp_scaler);
-        LPColSetBase<R>::maxObj_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newObj);
-      }
-    else
-      LPColSetBase<R>::maxObj_w() = newObj;
-    assert(isConsistent());
-  }
-
-  /// Changes vector of lower bounds to \p newLower.
-  template <class R>
-  void SPxLPBase<R>::changeLower(const VectorBase<R>& newLower, bool scale)
-  {
-    assert(lower().dim() == newLower.dim());
-    if( scale )
-      {
-        assert(_isScaled);
-        assert(lp_scaler);
-        LPColSetBase<R>::lower_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newLower, true);
-      }
-    else
-      LPColSetBase<R>::lower_w() = newLower;
-    assert(isConsistent());
-  }
 
 
-  /// Changes vector of upper bounds to \p newUpper.
-  template <class R>
-  void SPxLPBase<R>::changeUpper(const VectorBase<R>& newUpper, bool scale)
-  {
-    assert(upper().dim() == newUpper.dim());
-    if( scale )
-      {
-        assert(_isScaled);
-        assert(lp_scaler);
-        LPColSetBase<R>::upper_w().scaleAssign(LPColSetBase<R>::scaleExp.get_const_ptr(), newUpper, true);
-      }
-    else
-      LPColSetBase<R>::upper_w() = newUpper;
-    assert(isConsistent());
-  }
-
-  /// Changes left hand side vector for constraints to \p newLhs.
-  template <class R>
-  void SPxLPBase<R>::changeLhs(const VectorBase<R>& newLhs, bool scale)
-  {
-    assert(lhs().dim() == newLhs.dim());
-    if( scale )
-      {
-        assert(_isScaled);
-        assert(lp_scaler);
-        LPRowSetBase<R>::lhs_w().scaleAssign(LPRowSetBase<R>::scaleExp.get_const_ptr(), newLhs);
-      }
-    else
-      LPRowSetBase<R>::lhs_w() = newLhs;
-    assert(isConsistent());
-  }
-
-  /// Changes right hand side vector for constraints to \p newRhs.
-  template <class R>
-  void SPxLPBase<R>::changeRhs(const VectorBase<R>& newRhs, bool scale)
-  {
-    assert(rhs().dim() == newRhs.dim());
-    if( scale )
-      {
-        assert(_isScaled);
-        assert(lp_scaler);
-        LPRowSetBase<R>::rhs_w().scaleAssign(LPRowSetBase<R>::scaleExp.get_const_ptr(), newRhs);
-      }
-    else
-      LPRowSetBase<R>::rhs_w() = newRhs;
-    assert(isConsistent());
-}
-
-/// Changes LP element (\p i, \p j) to \p val. \p scale determines whether the new data should be scaled
-template <class R>
-void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
-{
-   if (i < 0 || j < 0)
-      return;
-
-   SVectorBase<R> &row = rowVector_w(i);
-   SVectorBase<R> &col = colVector_w(j);
-
-   if( isNotZero(val) )
-   {
-      R newVal;
-
-      if (scale)
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         newVal = lp_scaler->scaleElement(*this, i, j, val);
-      }
-      else
-         newVal = val;
-
-      if (row.pos(j) >= 0 && col.pos(i) >= 0)
-      {
-         row.value(row.pos(j)) = newVal;
-         col.value(col.pos(i)) = newVal;
-      }
-      else
-      {
-         LPRowSetBase<R>::add2(i, 1, &j, &newVal);
-         LPColSetBase<R>::add2(j, 1, &i, &newVal);
-      }
-  }
-   else if (row.pos(j) >= 0 && col.pos(i) >= 0)
-   {
-      row.remove(row.pos(j));
-      col.remove(col.pos(i));
-   }
-
-   assert(isConsistent());
-}
 
   // ---------------------------------------------------------------------------------------------------------------------
   //  Specialization for reading LP format
   // ---------------------------------------------------------------------------------------------------------------------
 
 #define LPF_MAX_LINE_LEN  8192     ///< maximum length of a line (8190 + \\n + \\0)
-
-  /// Is \p c a \c space, \c tab, \c nl or \c cr ?
-  static inline bool LPFisSpace(int c)
-  {
-    return (c == ' ') || (c == '\t') || (c == '\n') || (c == '\r');
-  }
-
-
-
-  /// Is there a number at the beginning of \p s ?
-  static bool LPFisValue(const char* s)
-  {
-    return ((*s >= '0') && (*s <= '9')) || (*s == '+') || (*s == '-') || (*s == '.');
-  }
-
 
 
   /// Is there a possible column name at the beginning of \p s ?
@@ -619,6 +496,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
   /** If only a sign is encountered, the number is assumed to be \c sign * 1.0.  This routine will not catch malformatted
    *  numbers like .e10 !
    */
+  template <class R>
   static R LPFreadValue(char*& pos, SPxOut* spxout)
   {
     assert(LPFisValue(pos));
@@ -707,6 +585,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
    *  is added to \p colset. \p pos is advanced behind the name.
    *  @return The Index of the named column.
    */
+  template <class R>
   static int LPFreadColName(char*& pos, NameSet* colnames, LPColSetBase<R>& colset, const LPColBase<R>* emptycol, SPxOut* spxout)
   {
     assert(LPFisColName(pos));
@@ -873,7 +752,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
   }
 
 
-
+  template <class R>
   static R LPFreadInfinity(char*& pos)
   {
     assert(LPFisInfinity(pos));
@@ -1152,7 +1031,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
                             pre_sign = val;
                         }
                       have_value = true;
-                      val = LPFreadValue(pos, spxout) * pre_sign;
+                      val = LPFreadValue<R>(pos, spxout) * pre_sign;
                     }
                   if( *pos == '\0' )
                     continue;
@@ -1182,7 +1061,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
                         }
 
                       have_value = true;
-                      val = LPFreadValue(pos, spxout) * pre_sign;
+                      val = LPFreadValue<R>(pos, spxout) * pre_sign;
 
                       if( sense != 0 )
                         {
@@ -1286,7 +1165,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
                   if( LPFisValue(pos) )
                     {
-                      val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, spxout);
+                      val = LPFisInfinity(pos) ? LPFreadInfinity<R>(pos) : LPFreadValue<R>(pos, spxout);
 
                       if( !LPFisSense(pos) )
                         goto syntax_error;
@@ -1335,7 +1214,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
                       if( !LPFisValue(pos) )
                         goto syntax_error;
 
-                      val = LPFisInfinity(pos) ? LPFreadInfinity(pos) : LPFreadValue(pos, spxout);
+                      val = LPFisInfinity(pos) ? LPFreadInfinity<R>(pos) : LPFreadValue<R>(pos, spxout);
 
                       if( sense == '<' )
                         cset.upper_w(colidx) = val;
@@ -1523,6 +1402,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   /// Process ROWS section.
+  template <class R>
   static void MPSreadRows(MPSInput& mps, LPRowSetBase<R>& rset, NameSet& rnames, SPxOut* spxout)
   {
     LPRowBase<R> row;
@@ -1587,6 +1467,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   /// Process COLUMNS section.
+  template <class R>
   static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSet&  rnames, LPColSetBase<R>& cset, NameSet& cnames, DIdxSet* intvars)
   {
     R val;
@@ -1687,6 +1568,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   /// Process RHS section.
+  template <class R>
   static void MPSreadRhs(MPSInput& mps, LPRowSetBase<R>& rset, const NameSet& rnames, SPxOut* spxout)
   {
     char rhsname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1771,6 +1653,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   /// Process RANGES section.
+  template <class R>
   static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<R>& rset, const NameSet& rnames, SPxOut* spxout)
   {
     char rngname[MPSInput::MAX_LINE_LEN] = { '\0' };
@@ -1881,6 +1764,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   /// Process BOUNDS section.
+  template <class R>
   static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& cnames, DIdxSet* intvars, SPxOut* spxout)
   {
     DIdxSet oldbinvars;
@@ -2138,6 +2022,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
   // ---------------------------------------------------------------------------------------------------------------------
 
   // get the name of a row or construct one
+  template <class R>
   static const char* LPFgetRowName(
                                    const SPxLPBase<R>& p_lp,
                                    int                    p_idx,
@@ -2166,6 +2051,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   // get the name of a column or construct one
+  template <class R>
   static const char* getColName(
                                 const SPxLPBase<R>& p_lp,
                                 int                    p_idx,
@@ -2194,6 +2080,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
   // write an SVectorBase<R>
 #define NUM_ENTRIES_PER_LINE 5
+  template <class R>
   static void LPFwriteSVector(
                               const SPxLPBase<R>&   p_lp,       ///< the LP
                               std::ostream&            p_output,   ///< output stream
@@ -2234,6 +2121,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   // write the objective
+  template <class R>
   static void LPFwriteObjective(
                                 const SPxLPBase<R>& p_lp,       ///< the LP
                                 std::ostream&          p_output,   ///< output stream
@@ -2257,6 +2145,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   // write non-ranged rows
+  template <class R>
   static void LPFwriteRow(
                           const SPxLPBase<R>&   p_lp,       ///< the LP
                           std::ostream&            p_output,   ///< output stream
@@ -2285,6 +2174,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   // write all rows
+  template <class R>
   static void LPFwriteRows(
                            const SPxLPBase<R>& p_lp,       ///< the LP
                            std::ostream&          p_output,   ///< output stream
@@ -2323,6 +2213,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
   // write the variable bounds
   // (the default bounds 0 <= x <= infinity are not written)
+  template <class R>
   static void LPFwriteBounds(
                              const SPxLPBase<R>&   p_lp,       ///< the LP to write
                              std::ostream&            p_output,   ///< output stream
@@ -2374,6 +2265,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
 
 
   // write the generals section
+  template <class R>
   static void LPFwriteGenerals(
                                const SPxLPBase<R>&   p_lp,         ///< the LP to write
                                std::ostream&            p_output,     ///< output stream
@@ -2421,6 +2313,7 @@ void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
   // Specialization for writing MPS format
   // ---------------------------------------------------------------------------------------------------------------------
 
+  template <class R>
 static void MPSwriteRecord(
    std::ostream&  os,
    const char*    indicator,
@@ -2453,6 +2346,7 @@ static void MPSwriteRecord(
 
 
 
+  template <class R>
   static R MPSgetRHS(R left, R right)
   {
     R rhsval;
@@ -2468,7 +2362,7 @@ static void MPSwriteRecord(
   }
 
 
-
+  template <class R>
   static const char* MPSgetRowName(
                                    const SPxLPBase<R>& lp,
                                    int                   idx,
@@ -2541,7 +2435,7 @@ static void MPSwriteRecord(
         MPSwriteRecord(p_output, indicator, MPSgetRowName(*this, i, p_rnames, name));
       }
 
-    MPSwriteRecord(p_output, "N", "MINIMIZE");
+    MPSwriteRecord<R>(p_output, "N", "MINIMIZE");
 
     // --- COLUMNS Section ---
     p_output << "COLUMNS" << std::endl;
@@ -2689,7 +2583,7 @@ static void MPSwriteRecord(
   /// Building the dual problem from a given LP
   /// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
   ///       dualCols must have the identical size to the primal rows.
-  template < >
+  template <class R>
   void SPxLPBase<R>::buildDualProblem(SPxLPBase<R>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[],
                                          SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols)
   {
@@ -2980,6 +2874,6 @@ static void MPSwriteRecord(
   //  Explicit instantiation
   // ---------------------------------------------------------------------------------------------------------------------
 
-  template class SPxLPBase < R >;
+  template class SPxLPBase < Real >;
 
 } // namespace soplex

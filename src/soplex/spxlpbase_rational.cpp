@@ -151,13 +151,6 @@ Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 
 #define LPF_MAX_LINE_LEN  8192     ///< maximum length of a line (8190 + \\n + \\0)
 
-/// Is \p c a \c space, \c tab, \c nl or \c cr ?
-static inline bool LPFisSpace(int c)
-{
-   return (c == ' ') || (c == '\t') || (c == '\n') || (c == '\r');
-}
-
-
 
 /// Is there a number at the beginning of \p s ?
 static bool LPFisValue(const char* s)

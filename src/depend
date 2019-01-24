@@ -583,6 +583,21 @@ $(LIBOBJDIR)/spxlpbase_rational.o: src/soplex/spxlpbase_rational.cpp \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
  src/soplex/dvector.h src/soplex/mpsinput.h
+$(LIBOBJDIR)/spxlpbase_real.o: src/soplex/spxlpbase_real.cpp src/soplex/spxdefines.h \
+ src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/rational.h \
+ src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
+ src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
+ src/soplex/exceptions.h src/soplex/ssvectorbase.h src/soplex/idxset.h \
+ src/soplex/svectorbase.h src/soplex/dsvectorbase.h \
+ src/soplex/unitvectorbase.h src/soplex/svsetbase.h \
+ src/soplex/classarray.h src/soplex/dataset.h src/soplex/dataarray.h \
+ src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
+ src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
+ src/soplex/lpcolsetbase.h src/soplex/nameset.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
+ src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
+ src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
+ src/soplex/dvector.h src/soplex/mpsinput.h
 $(LIBOBJDIR)/spxmainsm.o: src/soplex/spxmainsm.cpp src/soplex/spxmainsm.h \
  src/soplex/spxdefines.h src/soplex/spxsimplifier.h \
  src/soplex/timerfactory.h src/soplex/spxalloc.h src/soplex/spxout.h \
@@ -1608,6 +1623,21 @@ $(LIBOBJSUBDIR)/spxlpbase_rational.o: src/soplex/spxlpbase_rational.cpp \
  src/soplex/vectorbase.h src/soplex/dvectorbase.h src/soplex/spxalloc.h \
  src/soplex/spxout.h src/soplex/exceptions.h src/soplex/ssvectorbase.h \
  src/soplex/idxset.h src/soplex/svectorbase.h src/soplex/dsvectorbase.h \
+ src/soplex/unitvectorbase.h src/soplex/svsetbase.h \
+ src/soplex/classarray.h src/soplex/dataset.h src/soplex/dataarray.h \
+ src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
+ src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
+ src/soplex/lpcolsetbase.h src/soplex/nameset.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
+ src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
+ src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
+ src/soplex/dvector.h src/soplex/mpsinput.h
+$(LIBOBJSUBDIR)/spxlpbase_real.o: src/soplex/spxlpbase_real.cpp src/soplex/spxdefines.h \
+ src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/rational.h \
+ src/soplex/idlist.h src/soplex/islist.h src/soplex/vectorbase.h \
+ src/soplex/dvectorbase.h src/soplex/spxalloc.h src/soplex/spxout.h \
+ src/soplex/exceptions.h src/soplex/ssvectorbase.h src/soplex/idxset.h \
+ src/soplex/svectorbase.h src/soplex/dsvectorbase.h \
  src/soplex/unitvectorbase.h src/soplex/svsetbase.h \
  src/soplex/classarray.h src/soplex/dataset.h src/soplex/dataarray.h \
  src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
