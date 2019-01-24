@@ -80,7 +80,7 @@ namespace soplex
    *  \f]
    *  suitable for solving with SoPlex. This includes:
    *  - SVSetBase%s for both columns and rows
-   *  - objective Vector
+   *  - objective VectorBase<R>
    *  - upper and lower bound Vectors for variables (\f$l_c\f$ and \f$u_c\f$)
    *  - upper and lower bound Vectors for inequalities (\f$l_r\f$ and \f$u_r\f$)
    *
@@ -90,7 +90,7 @@ namespace soplex
    *
    *  Further, equality constraints are modeled by \f$l_r = u_r\f$.  Analogously, fixed variables have \f$l_c = u_c\f$.
    *
-   *  #SPxLPBase%s are saved as an SVSet, both for columns and rows. Note that this is redundant but eases the access.
+   *  #SPxLPBase%s are saved as an SVSetBase<R> , both for columns and rows. Note that this is redundant but eases the access.
    */
 
 
@@ -231,7 +231,7 @@ namespace soplex
     }
 
     /// Gets unscaled row vector of row \p i.
-    void getRowVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+    void getRowVectorUnscaled(int i, DSVectorBase<R>& vec) const;
 
     /// Returns right hand side vector.
     const VectorBase<R>& rhs() const
@@ -259,7 +259,7 @@ namespace soplex
     }
 
     /// Gets unscaled right hand side vector.
-    void getRhsUnscaled(VectorBase<Real>& vec) const;
+    void getRhsUnscaled(VectorBase<R>& vec) const;
 
     /// Returns unscaled right hand side of row number \p i.
     R rhsUnscaled(int i) const;
@@ -330,7 +330,7 @@ namespace soplex
     }
 
     /// Returns unscaled left hand side vector.
-    void getLhsUnscaled(VectorBase<Real>& vec) const;
+    void getLhsUnscaled(VectorBase<R>& vec) const;
 
     /// Returns unscaled left hand side of row number \p i.
     R lhsUnscaled(int i) const;
@@ -338,7 +338,7 @@ namespace soplex
     /// Returns left hand side of row with identifier \p id.
     R lhsUnscaled(const SPxRowId& id) const;
 
-    /// Returns the inequality type of the \p i'th LPRow.
+    /// Returns the inequality type of the \p i'th LPRowBase<R>.
     typename LPRowBase<R>::Type rowType(int i) const
     {
       return LPRowSetBase<R>::type(i);
@@ -400,13 +400,13 @@ namespace soplex
     }
 
     /// Gets column vector of column \p i.
-    void getColVectorUnscaled(int i, DSVectorBase<Real>& vec) const;
+    void getColVectorUnscaled(int i, DSVectorBase<R>& vec) const;
 
     /// Gets column vector of column with identifier \p id.
-    void getColVectorUnscaled(const SPxColId& id, DSVectorBase<Real>& vec) const;
+    void getColVectorUnscaled(const SPxColId& id, DSVectorBase<R>& vec) const;
 
     /// Gets unscaled objective vector.
-    void getObjUnscaled(VectorBase<Real>& pobj) const;
+    void getObjUnscaled(VectorBase<R>& pobj) const;
 
     /// Gets objective vector.
     void getObj(VectorBase<R>& pobj) const
@@ -462,7 +462,7 @@ namespace soplex
     }
 
     /// Returns unscaled objective vector for maximization problem.
-    void maxObjUnscaled(VectorBase<Real>& vec) const;
+    void maxObjUnscaled(VectorBase<R>& vec) const;
 
     /// Returns unscaled objective value of column \p i for maximization problem.
     R maxObjUnscaled(int i) const;
@@ -489,7 +489,7 @@ namespace soplex
     }
 
     /// Gets unscaled upper bound vector
-    void getUpperUnscaled(DVector& vec) const;
+    void getUpperUnscaled(DVectorBase<R>& vec) const;
 
     /// Returns unscaled upper bound of column \p i.
     R upperUnscaled(int i) const;
@@ -516,7 +516,7 @@ namespace soplex
     }
 
     /// Gets unscaled lower bound vector.
-    void getLowerUnscaled(DVector& vec) const;
+    void getLowerUnscaled(DVectorBase<R>& vec) const;
 
     /// Returns unscaled lower bound of column \p i.
     R lowerUnscaled(int i) const;
@@ -935,7 +935,7 @@ namespace soplex
 
     /// Removes multiple rows.
     /** This method removes all LPRowBase%s from the SPxLPBase with an index \p i such that \p perm[i] < 0. Upon
-     *  completion, \p perm[i] >= 0 indicates the new index where the \p i'th LPRow has been moved to due to this
+     *  completion, \p perm[i] >= 0 indicates the new index where the \p i'th LPRowBase<R> has been moved to due to this
      *  removal. Note that \p perm must point to an array of at least #nRows() ints.
      */
     virtual void removeRows(int perm[])
@@ -1292,11 +1292,11 @@ namespace soplex
          << "                rhs : " << countRhs << "\n"
          << "               free : " << countFreeRow << "\n"
          << "  Nonzeros          : " << nNzos() << "\n"
-         << "         per column : " << Real(nNzos()) / Real(nCols()) << "\n"
-         << "            per row : " << Real(nNzos()) / Real(nRows()) << "\n"
-         << "           sparsity : " << Real(nNzos()) / Real(nCols()) / Real(nRows()) << "\n"
-         << "    min. abs. value : " << Real(minAbsNzo()) << "\n"
-         << "    max. abs. value : " << Real(maxAbsNzo()) << "\n";
+         << "         per column : " << R(nNzos()) / R(nCols()) << "\n"
+         << "            per row : " << R(nNzos()) / R(nRows()) << "\n"
+         << "           sparsity : " << R(nNzos()) / R(nCols()) / R(nRows()) << "\n"
+         << "    min. abs. value : " << R(minAbsNzo()) << "\n"
+         << "    max. abs. value : " << R(maxAbsNzo()) << "\n";
     }
 
     //@}
@@ -1792,7 +1792,7 @@ namespace soplex
     void changeObjOffset(const T& o)
     {
       offset = o;               // Converts o into type R. Example Rational into
-                                // Real
+                                // R
     }
 
     /// Computes activity of the rows for a given primal vector; activity does not need to be zero
@@ -2175,7 +2175,7 @@ namespace soplex
     /**@name Private helpers */
     //@{
 
-    /// Returns the LP as an LPRowSet.
+    /// Returns the LP as an LPRowBase<R>Set.
     SVectorBase<R>& colVector_w(int i)
       {
         return LPColSetBase<R>::colVector_w(i);
@@ -2730,12 +2730,9 @@ namespace soplex
     //@}
 };
 
-  // For the general templated functions
-#include "spxlpbase_real.hpp"
-
   // @todo the following declarations may be redundant now because of above
   // #include. But I do not know why they were added.
-// Declaration of Real specializations found in spxlpbase_real.cpp
+// Declaration of R specializations found in spxlpbase_real.hpp
 
 template <>
 void SPxLPBase<Real>::unscaleLP();
@@ -2798,7 +2795,7 @@ template <>
 Real SPxLPBase<Real>::maxObjUnscaled(const SPxColId& id) const;
 
 template <>
-void SPxLPBase<Real>::getUpperUnscaled(DVector& vec) const;
+void SPxLPBase<Real>::getUpperUnscaled(DVectorBase<Real>& vec) const;
 
 template <>
 Real SPxLPBase<Real>::upperUnscaled(int i) const;
@@ -2807,7 +2804,7 @@ template <>
 Real SPxLPBase<Real>::upperUnscaled(const SPxColId& id) const;
 
 template <>
-void SPxLPBase<Real>::getLowerUnscaled(DVector& vec) const;
+void SPxLPBase<Real>::getLowerUnscaled(DVectorBase<Real>& vec) const;
 
 template <>
 Real SPxLPBase<Real>::lowerUnscaled(int i) const;
@@ -2846,6 +2843,9 @@ template <>
 void SPxLPBase<Real>::buildDualProblem(SPxLPBase<Real>& dualLP, SPxRowId primalRowIds[], SPxColId primalColIds[], SPxRowId dualRowIds[], SPxColId dualColIds[], int* nprimalrows, int* nprimalcols, int* ndualrows, int* ndualcols);
 
 } // namespace soplex
+
+  // For the general templated functions
+#include "spxlpbase_real.hpp"
 
 /* reset the SOPLEX_DEBUG flag to its original value */
 #undef SOPLEX_DEBUG
