@@ -1422,7 +1422,7 @@ namespace soplex
     MSG_INFO1( (*this->spxout),
                (*this->spxout) << " --- finished solution polishing (" << polishCount << " pivots)" << std::endl; )
 
-      setStatus(SPxBasisBase<R>::OPTIMAL);
+      this->setStatus(SPxBasisBase<R>::OPTIMAL);
   }
 
 

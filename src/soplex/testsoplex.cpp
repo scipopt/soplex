@@ -23,7 +23,7 @@ namespace soplex
 {
    /// check scaling of LP
   template <class R>
-   void SoPlexBase<R>::_checkScaling(SPxLPReal* origLP) const
+  void SoPlexBase<R>::_checkScaling(SPxLPBase<R>* origLP) const
    {
       MSG_INFO1( spxout, spxout << "DEBUG: checking correctness of scaled LP" << std::endl; )
       assert(_realLP->nCols() == origLP->nCols());
@@ -37,7 +37,7 @@ namespace soplex
          assert(EQ(origLP->lhs(i), _realLP->lhsUnscaled(i)));
          assert(EQ(origLP->rhs(i), _realLP->rhsUnscaled(i)));
 
-         DSVectorReal row;
+         DSVectorBase<R> row;
          _realLP->getRowVectorUnscaled(i, row);
 
          assert(origLP->rowVector(i).size() == row.size());
@@ -61,7 +61,7 @@ namespace soplex
          assert(EQ(origLP->upper(i), _realLP->upperUnscaled(i)));
          assert(EQ(origLP->obj(i), _realLP->objUnscaled(i)));
 
-         DSVectorReal col;
+         DSVectorBase<R> col;
          _realLP->getColVectorUnscaled(i, col);
 
          assert(origLP->colVector(i).size() == col.size());
@@ -95,8 +95,8 @@ namespace soplex
       }
 
       assert(&_solver == _realLP);
-      DVector** binvcol = 0;
-      DVector** binvrow = 0;
+      DVectorBase<R>** binvcol = 0;
+      DVectorBase<R>** binvrow = 0;
       int* inds = 0;
       int basisdim = _solver.nRows(); // do all operations with regard to the column basis
       bool colrep = (_solver.rep() == SPxSolverBase<R>::COLUMN);
@@ -110,7 +110,7 @@ namespace soplex
          // collect columns of the basis inverse
          for( int i = 0; i < basisdim; ++i)
          {
-            binvcol[i] = new DVector(basisdim);
+            binvcol[i] = new DVectorBase<R>(basisdim);
             binvcol[i]->clear();
             assert(getBasisInverseColReal(i, binvcol[i]->get_ptr(), 0, 0, true));
          }
@@ -119,7 +119,7 @@ namespace soplex
       // collect rows of the basis inverse
       for( int i = 0; i < basisdim; ++i)
       {
-         binvrow[i] = new DVector(basisdim);
+         binvrow[i] = new DVectorBase<R>(basisdim);
          binvrow[i]->clear();
          assert(getBasisInverseRowReal(i, binvrow[i]->get_ptr(), 0, 0, true));
       }
@@ -130,12 +130,12 @@ namespace soplex
          // multiply with (unscaled) basis matrix and check result (should be unitvecs)
          for( int i = 0; i < basisdim; ++i)
          {
-            DVector result(*binvcol[i]);
+            DVectorBase<R> result(*binvcol[i]);
             assert(multBasis(result.get_ptr(), true));
-            Real sumerror = 0.0;
+            R sumerror = 0.0;
             for( int j = 0; j < basisdim; ++j)
             {
-               Real error = 0.0;
+               R error = 0.0;
                if( j != i )
                   error = spxAbs(result[j]);
                else
@@ -151,12 +151,12 @@ namespace soplex
       MSG_INFO1( spxout, spxout << "DEBUG: checking rows for identity after multiplying with basis matrix\n";)
       for( int i = 0; i < basisdim; ++i)
       {
-         DVector result(*binvrow[i]);
+         DVectorBase<R> result(*binvrow[i]);
          assert(multBasisTranspose(result.get_ptr(), true));
-         Real sumerror = 0.0;
+         R sumerror = 0.0;
          for( int j = 0; j < basisdim; ++j)
          {
-            Real error = 0.0;
+            R error = 0.0;
             if( j != i )
                error = spxAbs(result[j]);
             else
@@ -176,8 +176,8 @@ namespace soplex
 //         _solver.setBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
 //         _solver.solve();
 
-         DVector** binvcol2 = 0;
-         DVector** binvrow2 = 0;
+         DVectorBase<R>** binvcol2 = 0;
+         DVectorBase<R>** binvrow2 = 0;
          spx_alloc(binvcol2, basisdim);
          spx_alloc(binvrow2, basisdim);
 
@@ -187,7 +187,7 @@ namespace soplex
             // collect columns of the basis inverse
             for( int i = 0; i < basisdim; ++i)
             {
-               binvcol2[i] = new DVector(basisdim);
+               binvcol2[i] = new DVectorBase<R>(basisdim);
                binvcol2[i]->clear();
                assert(getBasisInverseColReal(i, binvcol2[i]->get_ptr(), 0, 0, false));
             }
@@ -197,7 +197,7 @@ namespace soplex
          // collect rows of the basis inverse
          for( int i = 0; i < basisdim; ++i)
          {
-            binvrow2[i] = new DVector(basisdim);
+            binvrow2[i] = new DVectorBase<R>(basisdim);
             binvrow2[i]->clear();
             assert(getBasisInverseRowReal(i, binvrow2[i]->get_ptr(), 0, 0, false));
          }
@@ -205,7 +205,7 @@ namespace soplex
          MSG_INFO1( spxout, spxout << "DEBUG: checking rows and columns of scaled/unscaled inverted of basis matrix\n";)
          for( int i = 0; i < basisdim; ++i)
          {
-            Real sumerror = 0.0;
+            R sumerror = 0.0;
             for( int j = 0; j < basisdim; ++j)
             {
                if( colrep )

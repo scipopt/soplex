@@ -1049,10 +1049,10 @@ namespace soplex
       changeRow(this->number(p_id), p_newRow, scale);
     }
     ///
-    virtual void changeCol(int i, const LPColSetBase<R>& newCol, bool scale = false);
+    virtual void changeCol(int i, const LPColBase<R>& newCol, bool scale = false);
     ///
     using SPxLPBase<R>::changeCol;
-    virtual void changeCol(SPxColId p_id, const LPColSetBase<R>& p_newCol, bool scale = false)
+    virtual void changeCol(SPxColId p_id, const LPColBase<R>& p_newCol, bool scale = false)
     {
       changeCol(this->number(p_id), p_newCol, scale);
     }

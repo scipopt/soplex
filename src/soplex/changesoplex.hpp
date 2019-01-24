@@ -728,7 +728,7 @@ void SPxSolverBase<R>::changeRow(int i, const LPRowBase<R>& newRow, bool scale)
 }
 
   template <class R>
-void SPxSolverBase<R>::changeCol(int i, const LPColSetBase<R>& newCol, bool scale)
+void SPxSolverBase<R>::changeCol(int i, const LPColBase<R>& newCol, bool scale)
 {
    if( i < 0 )
       return;
