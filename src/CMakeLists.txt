@@ -1,7 +1,6 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
-    soplex/changesoplex.cpp
     soplex/clufactor.cpp
     soplex/clufactor_rational.cpp
     soplex/didxset.cpp

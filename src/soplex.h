@@ -58,6 +58,7 @@
 #include "soplex/spxfastrt.h"
 #include "soplex/spxboundflippingrt.h"
 
+#include "soplex/solbase.h"
 #include "soplex/sol.h"
 
 // For multiple precision

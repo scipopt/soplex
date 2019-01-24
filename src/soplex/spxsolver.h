@@ -74,7 +74,7 @@ namespace soplex
      - preprocessing of the LP using class SPxSimplifier
      - termination criteria by overriding
 
-     SPxSolverBase is derived from SPxLP that is used to store the LP to be solved.
+     SPxSolverBase is derived from SPxLPBase<R> that is used to store the LP to be solved.
      Hence, the LPs solved with SPxSolverBase have the general format
 
      \f[
@@ -85,7 +85,7 @@ namespace soplex
      \end{array}
      \f]
 
-     Also, SPxLP provide all manipulation methods for the LP. They allow
+     Also, SPxLPBase<R> provide all manipulation methods for the LP. They allow
      SPxSolverBase to be used within cutting plane algorithms.
   */
 
@@ -1041,18 +1041,18 @@ namespace soplex
       changeRange(this->number(p_id), p_newLhs, p_newRhs, scale);
     }
     ///
-    virtual void changeRow(int i, const LPRow& newRow, bool scale = false);
+    virtual void changeRow(int i, const LPRowBase<R>& newRow, bool scale = false);
     ///
     using SPxLPBase<R>::changeRow;
-    virtual void changeRow(SPxRowId p_id, const LPRow& p_newRow, bool scale = false)
+    virtual void changeRow(SPxRowId p_id, const LPRowBase<R>& p_newRow, bool scale = false)
     {
       changeRow(this->number(p_id), p_newRow, scale);
     }
     ///
-    virtual void changeCol(int i, const LPCol& newCol, bool scale = false);
+    virtual void changeCol(int i, const LPColSetBase<R>& newCol, bool scale = false);
     ///
     using SPxLPBase<R>::changeCol;
-    virtual void changeCol(SPxColId p_id, const LPCol& p_newCol, bool scale = false)
+    virtual void changeCol(SPxColId p_id, const LPColSetBase<R>& p_newCol, bool scale = false)
     {
       changeCol(this->number(p_id), p_newCol, scale);
     }
@@ -1085,7 +1085,7 @@ namespace soplex
 
     //------------------------------------
     /**@name Variables and Covariables
-     *  Class SPxLP introduces \ref soplex::SPxId "SPxIds" to identify
+     *  Class SPxLPBase<R> introduces \ref soplex::SPxId "SPxIds" to identify
      *  row or column data of an LP. SPxSolverBase uses this concept to
      *  access data with respect to the chosen representation.
      */
@@ -1154,26 +1154,26 @@ namespace soplex
     /**@return a reference to the \p i 'th, 0 <= i < #coDim(), VectorBase<R> of
      *         the loaded LP (with respect to the chosen representation).
      */
-    const SVector& vector(int i) const
+    const SVectorBase<R>& vector(int i) const
     {
       return (*thevectors)[i];
     }
 
     ///
-    const SVector& vector(const SPxRowId& rid) const
+    const SVectorBase<R>& vector(const SPxRowId& rid) const
     {
       assert(rid.isValid());
       return (rep() == ROW)
         ? (*thevectors)[this->number(rid)]
-        : static_cast<const SVector&>(unitVecs[this->number(rid)]);
+        : static_cast<const SVectorBase<R>&>(unitVecs[this->number(rid)]);
     }
     ///
-    const SVector& vector(const SPxColId& cid) const
+    const SVectorBase<R>& vector(const SPxColId& cid) const
     {
       assert(cid.isValid());
       return (rep() == COLUMN)
         ? (*thevectors)[this->number(cid)]
-        : static_cast<const SVector&>(unitVecs[this->number(cid)]);
+        : static_cast<const SVectorBase<R>&>(unitVecs[this->number(cid)]);
     }
 
     /// VectorBase<R> associated to \p p_id.
@@ -1185,7 +1185,7 @@ namespace soplex
      *  @todo The implementation does not exactly look like it will do
      *        what is promised in the describtion.
      */
-    const SVector& vector(const SPxId& p_id) const
+    const SVectorBase<R>& vector(const SPxId& p_id) const
     {
       assert(p_id.isValid());
 
@@ -1198,25 +1198,25 @@ namespace soplex
     /**@return a reference to the \p i 'th, 0 <= i < #dim(), covector of
      *  the loaded LP (with respect to the chosen representation).
      */
-    const SVector& coVector(int i) const
+    const SVectorBase<R>& coVector(int i) const
     {
       return (*thecovectors)[i];
     }
     ///
-    const SVector& coVector(const SPxRowId& rid) const
+    const SVectorBase<R>& coVector(const SPxRowId& rid) const
     {
       assert(rid.isValid());
       return (rep() == COLUMN)
         ? (*thecovectors)[this->number(rid)]
-        : static_cast<const SVector&>(unitVecs[this->number(rid)]);
+        : static_cast<const SVectorBase<R>&>(unitVecs[this->number(rid)]);
     }
     ///
-    const SVector& coVector(const SPxColId& cid) const
+    const SVectorBase<R>& coVector(const SPxColId& cid) const
     {
       assert(cid.isValid());
       return (rep() == ROW)
         ? (*thecovectors)[this->number(cid)]
-        : static_cast<const SVector&>(unitVecs[this->number(cid)]);
+        : static_cast<const SVectorBase<R>&>(unitVecs[this->number(cid)]);
     }
     /// coVector associated to \p p_id.
     /**@return a reference to the covector of the loaded LP
@@ -1225,7 +1225,7 @@ namespace soplex
      *  matrix is returned, otherwise the corresponding unit VectorBase<R> is
      *  returned.
      */
-    const SVector& coVector(const SPxId& p_id) const
+    const SVectorBase<R>& coVector(const SPxId& p_id) const
     {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
@@ -1233,7 +1233,7 @@ namespace soplex
         : coVector(SPxColId(p_id));
     }
     /// return \p i 'th unit vector.
-    const SVector& unitVector(int i) const
+    const SVectorBase<R>& unitVector(int i) const
     {
       return unitVecs[i];
     }
@@ -1691,7 +1691,7 @@ namespace soplex
      *  performance advantages over solving the two linear systems
      *  seperately.
      */
-    void setup4solve(SSVector* p_y, SSVector* p_rhs)
+    void setup4solve(SSVectorBase<R> * p_y, SSVectorBase<R> * p_rhs)
     {
       assert(type() == LEAVE);
       solveVector2    = p_y;
@@ -1705,7 +1705,7 @@ namespace soplex
      *  other system. Solving several linear system at a time has
      *  performance advantages over solving them seperately.
      */
-    void setup4solve2(SSVector* p_y2, SSVector* p_rhs2)
+    void setup4solve2(SSVectorBase<R> * p_y2, SSVectorBase<R> * p_rhs2)
     {
       assert(type() == LEAVE);
       solveVector3    = p_y2;
@@ -1719,7 +1719,7 @@ namespace soplex
      *  performance advantages over solving the two linear systems
      *  seperately.
      */
-    void setup4coSolve(SSVector* p_y, SSVector* p_rhs)
+    void setup4coSolve(SSVectorBase<R> * p_y, SSVectorBase<R> * p_rhs)
     {
       assert(type() == ENTER);
       coSolveVector2    = p_y;
@@ -1731,7 +1731,7 @@ namespace soplex
      *  call to SPxRatioTester. The system will be solved along
      *  with two other systems.
      */
-    void setup4coSolve2(SSVector* p_z, SSVector* p_rhs)
+    void setup4coSolve2(SSVectorBase<R> * p_z, SSVectorBase<R> * p_rhs)
     {
       assert(type() == ENTER);
       coSolveVector3    = p_z;
@@ -1893,7 +1893,7 @@ namespace soplex
     R nonbasicValue();
 
     /// Get pointer to the \p id 'th vector
-    virtual const SVector* enterVector(const SPxId& p_id)
+    virtual const SVectorBase<R>* enterVector(const SPxId& p_id)
     {
       assert(p_id.isValid());
       return p_id.isSPxRowId()
@@ -1916,13 +1916,13 @@ namespace soplex
                                R enterMax, R& leaveBound, R& objChange);
     ///
     virtual void ungetEnterVal(SPxId enterId, typename SPxBasisBase<R>::Desc::Status enterStat,
-                               R leaveVal, const SVector& vec, R& objChange);
+                               R leaveVal, const SVectorBase<R>& vec, R& objChange);
     ///
     virtual void rejectEnter(SPxId enterId,
                              R enterTest, typename SPxBasisBase<R>::Desc::Status enterStat);
     ///
     virtual void rejectLeave(int leaveNum, SPxId leaveId,
-                             typename SPxBasisBase<R>::Desc::Status leaveStat, const SVector* newVec = 0);
+                             typename SPxBasisBase<R>::Desc::Status leaveStat, const SVectorBase<R>* newVec = 0);
     ///
     virtual void setupPupdate(void);
     ///
@@ -2005,9 +2005,9 @@ namespace soplex
     }
     /// get all results of last solve.
     Status
-      getResult( R* value = 0, Vector* primal = 0,
-                 Vector* slacks = 0, Vector* dual = 0,
-                 Vector* reduCost = 0);
+      getResult( R* value = 0, VectorBase<R>* primal = 0,
+                 VectorBase<R>* slacks = 0, VectorBase<R>* dual = 0,
+                 VectorBase<R>* reduCost = 0);
 
   protected:
 
@@ -2062,7 +2062,7 @@ namespace soplex
 
     /// get level of dual degeneracy
     // this function is used for the improved dual simplex
-    R getDegeneracyLevel(Vector degenvec);
+    R getDegeneracyLevel(VectorBase<R> degenvec);
 
     /// get number of dual norms
     void getNdualNorms(int& nnormsRow, int& nnormsCol) const;
@@ -2166,7 +2166,7 @@ namespace soplex
     }
 
     /// return const lp's rows if available.
-    const LPRowSet& rows() const
+    const LPRowSetBase<R>& rows() const
     {
       return *this->lprowset();
     }
@@ -2340,9 +2340,12 @@ namespace soplex
   typedef SPxSolverBase<Real> SPxSolver;
 
   // For general templated functions, that the linker needs to properly see.
-  #include "spxsolver.hpp"
-  #include "changesoplex.hpp"
   #include "spxsolve.hpp"
 
 } // namespace soplex
+
+  // For general templated functions
+#include "spxsolver.hpp"
+#include "changesoplex.hpp"
+
 #endif // _SPXSOLVER_H_
