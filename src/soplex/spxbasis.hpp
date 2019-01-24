@@ -496,9 +496,9 @@ namespace soplex
 	    if (!strcmp(mps.field1(), "XU"))
 	      {
 		l_desc.colstat[c] = dualColStatus(c);
-		if( theLP->LPRowSet::type(r) == LPRowBase<R>::GREATER_EQUAL )
+		if( theLP->LPRowSetBase<R>::type(r) == LPRowBase<R>::GREATER_EQUAL )
 		  l_desc.rowstat[r] = Desc::P_ON_LOWER;
-		else if( theLP->LPRowSet::type(r) == LPRowBase<R>::EQUAL )
+		else if( theLP->LPRowSetBase<R>::type(r) == LPRowBase<R>::EQUAL )
 		  l_desc.rowstat[r] = Desc::P_FIXED;
 		else
 		  l_desc.rowstat[r] = Desc::P_ON_UPPER;
@@ -506,9 +506,9 @@ namespace soplex
 	    else if (!strcmp(mps.field1(), "XL"))
 	      {
 		l_desc.colstat[c] = dualColStatus(c);
-		if( theLP->LPRowSet::type(r) == LPRowBase<R>::LESS_EQUAL )
+		if( theLP->LPRowSetBase<R>::type(r) == LPRowBase<R>::LESS_EQUAL )
 		  l_desc.rowstat[r] = Desc::P_ON_UPPER;
-		else if( theLP->LPRowSet::type(r) == LPRowBase<R>::EQUAL )
+		else if( theLP->LPRowSetBase<R>::type(r) == LPRowBase<R>::EQUAL )
 		  l_desc.rowstat[r] = Desc::P_FIXED;
 		else
 		  l_desc.rowstat[r] = Desc::P_ON_LOWER;
@@ -654,7 +654,7 @@ namespace soplex
 
 	    assert( row != theLP->nRows() );
 
-	    if( thedesc.rowStatus( row ) == Desc::P_ON_UPPER && (!cpxFormat || theLP->LPRowSet::type(row) == LPRowBase<R>::RANGE) )
+	    if( thedesc.rowStatus( row ) == Desc::P_ON_UPPER && (!cpxFormat || theLP->LPRowSetBase<R>::type(row) == LPRowBase<R>::RANGE) )
 	      os << " XU ";
 	    else
 	      os << " XL ";
@@ -751,8 +751,8 @@ namespace soplex
   void SPxBasisBase<R>::change(
 			   int i,
 			   SPxId& id,
-			   const SVector* enterVec,
-			   const SSVector* eta)
+			   const SVectorBase<R>* enterVec,
+			   const SSVectorBase<R> * eta)
   {
 
     assert(matrixIsSetup);
@@ -790,7 +790,7 @@ namespace soplex
 	    factorize();
 
 	// too much memory growth ?
-	  else if (Real(factor->memory()) > 1000 + factor->dim() + lastMem * memFactor)
+	  else if (R(factor->memory()) > 1000 + factor->dim() + lastMem * memFactor)
 	    {
 	      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS04 memory growth factor triggers refactorization"
 			 << " memory= " << factor->memory()
@@ -801,7 +801,7 @@ namespace soplex
 	    }
 
 	// relative fill too high ?
-	  else if (Real(factor->memory()) > lastFill * Real(nzCount))
+	  else if (R(factor->memory()) > lastFill * R(nzCount))
 	    {
 	      MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS04 fill factor triggers refactorization"
 			 << " memory= " << factor->memory()
@@ -944,8 +944,8 @@ namespace soplex
     // get nonzero count of factorization
     lastMem    = factor->memory();
     // compute fill ratio between factorization and basis matrix (multiplied with tolerance)
-    lastFill   = fillFactor * Real(lastMem) / Real(nzCount > 0 ? nzCount : 1);
-    lastNzCount = int(nonzeroFactor * Real(nzCount > 0 ? nzCount : 1));
+    lastFill   = fillFactor * R(lastMem) / R(nzCount > 0 ? nzCount : 1);
+    lastNzCount = int(nonzeroFactor * R(nzCount > 0 ? nzCount : 1));
 
     if (status() == SINGULAR)
       {
@@ -974,7 +974,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxBasisBase<R>::multWithBase(SSVector& x, SSVectorBase<R>& result) const
+  void SPxBasisBase<R>::multWithBase(SSVectorBase<R> & x, SSVectorBase<R>& result) const
   {
     assert(status() > SINGULAR);
     assert(theLP->dim() == x.dim());
@@ -994,7 +994,6 @@ namespace soplex
   }
 
   template <class R>
-
   VectorBase<R>& SPxBasisBase<R>::multBaseWith(VectorBase<R>& x) const
   {
     assert(status() > SINGULAR);
@@ -1019,7 +1018,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxBasisBase<R>::multBaseWith(SSVector& x, SSVectorBase<R>& result) const
+  void SPxBasisBase<R>::multBaseWith(SSVectorBase<R> & x, SSVectorBase<R>& result) const
   {
     assert(status() > SINGULAR);
     assert(theLP->dim() == x.dim());

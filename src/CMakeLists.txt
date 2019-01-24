@@ -18,7 +18,6 @@ set(sources
     soplex/solverational.cpp
     soplex/solvereal.cpp
     soplex/spxautopr.cpp
-    soplex/spxbasis.cpp
     soplex/spxboundflippingrt.cpp
     soplex/spxbounds.cpp
     soplex/spxchangebasis.cpp

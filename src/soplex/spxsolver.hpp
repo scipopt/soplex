@@ -615,7 +615,7 @@ namespace soplex
                 {
                   MSG_DEBUG( std::cout << "DSOLVE21 fVec:   " << ftmp.length() << std::endl; )
                     ftmp = fVec();
-                  multBaseWith(ftmp);
+                  this->multBaseWith(ftmp);
                   ftmp -= fRhs();
                   if (ftmp.length() > DEFAULT_BND_VIOL)
                     MSG_INFO1( (*spxout), (*spxout) << "ESOLVE29 " << this->iteration() << ": fVec error = "
