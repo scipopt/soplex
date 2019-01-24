@@ -15,7 +15,6 @@ set(sources
     soplex/slufactor.cpp
     soplex/slufactor_rational.cpp
     soplex/solvedbds.cpp
-    soplex/solverational.cpp
     soplex/solvereal.cpp
     soplex/spxautopr.cpp
     soplex/spxboundflippingrt.cpp

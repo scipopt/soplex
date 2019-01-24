@@ -2336,10 +2336,9 @@ private:
   typedef SoPlexBase<Real> SoPlex;
   // A header file containing all the general templated functions
 
-  #include "soplex/solverational.hpp"
-
 } // namespace soplex
 
 // General templated function
 #include "soplex.hpp"
+#include "soplex/solverational.hpp"
 #endif // _SOPLEX_H_
