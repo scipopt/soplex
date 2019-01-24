@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  spxgeometsc.cpp
+/**@file  spxgeometsc.hpp
  * @brief Geometric mean row/column scaling.
  */
 #include <assert.h>
@@ -38,14 +38,14 @@ static R computeScalingVec(
 
    for( int i = 0; i < vecset->num(); ++i )
    {
-      const SVector& vec = (*vecset)[i];
+      const SVectorBase<R>& vec = (*vecset)[i];
 
-      Real maxi = 0.0;
-      Real mini = infinity;
+      R maxi = 0.0;
+      R mini = infinity;
 
       for( int j = 0; j < vec.size(); ++j )
       {
-         const Real x = spxAbs(vec.value(j) * coScaleval[unsigned(vec.index(j))]);
+         const R x = spxAbs(vec.value(j) * coScaleval[unsigned(vec.index(j))]);
 
          if (!isZero(x))
          {
@@ -66,7 +66,7 @@ static R computeScalingVec(
 
       scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);
 
-      const Real p = maxi / mini;
+      const R p = maxi / mini;
 
       if (p > pmax)
          pmax = p;
@@ -75,7 +75,7 @@ static R computeScalingVec(
 }
 
   template <class R>
-SPxGeometSC<R>::SPxGeometSC(bool equilibrate, int maxIters, Real minImpr, Real goodEnough)
+SPxGeometSC<R>::SPxGeometSC(bool equilibrate, int maxIters, R minImpr, R goodEnough)
   : SPxScaler<R>("Geometric")
    , postequilibration(equilibrate)
    , m_maxIterations(maxIters)
@@ -122,13 +122,13 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
    /* We want to do that direction first, with the lower ratio.
     * See SPxEquiliSC<R>::scale() for a reasoning.
     */
-   const Real colratio = maxColRatio(lp);
-   const Real rowratio = maxRowRatio(lp);
+   const R colratio = this->maxColRatio(lp);
+   const R rowratio = this->maxRowRatio(lp);
 
    const bool colFirst = colratio < rowratio;
 
-   Real p0start;
-   Real p1start;
+   R p0start;
+   R p1start;
 
    if( colFirst )
    {
@@ -164,16 +164,16 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
       MSG_INFO2( (*this->spxout), (*this->spxout) << " ... but will still perform equilibrium scaling" << std::endl; )
    }
 
-   std::vector<Real> rowscale(unsigned(lp.nRows()), 1.0);
-   std::vector<Real> colscale(unsigned(lp.nCols()), 1.0);
+   std::vector<R> rowscale(unsigned(lp.nRows()), 1.0);
+   std::vector<R> colscale(unsigned(lp.nCols()), 1.0);
 
-   Real p0 = 0.0;
-   Real p1 = 0.0;
+   R p0 = 0.0;
+   R p1 = 0.0;
 
    if( geoscale )
    {
-      Real p0prev = p0start;
-      Real p1prev = p1start;
+      R p0prev = p0start;
+      R p1prev = p1start;
 
       // we make at most maxIterations.
       for( int count = 0; count < m_maxIterations; count++ )
@@ -230,7 +230,7 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
          this->computeExpVec(rowscale, rowscaleExp);
       }
 
-      applyScaling(lp);
+      this->applyScaling(lp);
 
       MSG_INFO3( (*this->spxout), (*this->spxout) << "Row scaling min= " << this->minAbsRowscale()
                            << " max= " << this->maxAbsRowscale()
@@ -242,8 +242,8 @@ void SPxGeometSC<R>::scale(SPxLPBase<R>& lp, bool persistent)
       MSG_INFO2( (*this->spxout), (*this->spxout) << "after scaling: "
                            << " min= " << lp.minAbsNzo(false)
                            << " max= " << lp.maxAbsNzo(false)
-                           << " col-ratio= " << maxColRatio(lp)
-                           << " row-ratio= " << maxRowRatio(lp)
+                           << " col-ratio= " << this->maxColRatio(lp)
+                           << " row-ratio= " << this->maxRowRatio(lp)
                            << std::endl; )
    }
 }

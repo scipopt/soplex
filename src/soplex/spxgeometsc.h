@@ -42,8 +42,8 @@ protected:
    //@{
    const bool postequilibration;  ///< equilibrate after geometric scaling?
    const int  m_maxIterations;    ///< maximum number of scaling iterations.
-   const Real m_minImprovement;   ///< improvement necessary to carry on. (Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value)
-   const Real m_goodEnoughRatio;  ///< no scaling needed if ratio is less than this.
+   const R m_minImprovement;   ///< improvement necessary to carry on. (Bixby said Fourer said in MP 23, 274 ff. that 0.9 is a good value)
+   const R m_goodEnoughRatio;  ///< no scaling needed if ratio is less than this.
    //@}
 
 public:
@@ -52,7 +52,7 @@ public:
    /**@name Construction / destruction */
    //@{
    /// default constructor (this scaler makes no use of inherited members m_colFirst and m_doBoth)
-   explicit SPxGeometSC(bool equilibrate = false, int maxIters = 8, Real minImpr = 0.85, Real goodEnough = 1e3);
+   explicit SPxGeometSC(bool equilibrate = false, int maxIters = 8, R minImpr = 0.85, R goodEnough = 1e3);
    /// copy constructor
    SPxGeometSC(const SPxGeometSC& old);
    /// assignment operator
@@ -70,10 +70,13 @@ public:
    //-------------------------------------
    /**@name Scaling */
    //@{
-   /// Scale the loaded SPxLP.
+   /// Scale the loaded SPxLPBase<R>.
    virtual void scale(SPxLPBase<R>& lp, bool persistent = true) override;
    //@}
 
 };
 } // namespace soplex
+
+#include "spxgeometsc.hpp"
+
 #endif // _SPXGEOMETSC_H_
