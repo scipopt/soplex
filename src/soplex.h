@@ -308,13 +308,13 @@ public:
    void addRowsReal(const LPRowSetReal& lprowset);
 
    /// adds a single column
-   void addColReal(const LPColSetBase<R>& lpcol);
+   void addColReal(const LPColBase<R>& lpcol);
 
    /// adds multiple columns
-   void addColsReal(const LPColSetReal& lpcolset);
+  void addColsReal(const LPColSetBase<R>& lpcolset);
 
    /// replaces row \p i with \p lprow
-   void changeRowReal(int i, const LPRowReal& lprow);
+  void changeRowReal(int i, const LPRowBase<R>& lprow);
 
    /// changes left-hand side vector for constraints to \p lhs
    void changeLhsReal(const VectorBase<R>& lhs);

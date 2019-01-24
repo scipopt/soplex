@@ -23,6 +23,8 @@
 /// default setting for LU refactorization interval
 #define DEFAULT_REFACTOR_INTERVAL 200
 
+namespace soplex
+{
 
 /// returns number of columns
 template <class R>
@@ -958,7 +960,7 @@ void SoPlexBase<R>::addRowsReal(const LPRowSetReal& lprowset)
 
 /// adds a single column
 template <class R>
-void SoPlexBase<R>::addColReal(const LPColReal& lpcol)
+void SoPlexBase<R>::addColReal(const LPColBase<R>& lpcol)
 {
   assert(_realLP != 0);
 
@@ -977,7 +979,7 @@ void SoPlexBase<R>::addColReal(const LPColReal& lpcol)
 
 /// adds multiple columns
 template <class R>
-void SoPlexBase<R>::addColsReal(const LPColSetReal& lpcolset)
+void SoPlexBase<R>::addColsReal(const LPColSetBase<R>& lpcolset)
 {
   assert(_realLP != 0);
 
@@ -996,7 +998,7 @@ void SoPlexBase<R>::addColsReal(const LPColSetReal& lpcolset)
 
 /// replaces row \p i with \p lprow
 template <class R>
-void SoPlexBase<R>::changeRowReal(int i, const LPRowReal& lprow)
+void SoPlexBase<R>::changeRowReal(int i, const LPRowBase<R>& lprow)
 {
   assert(_realLP != 0);
 
@@ -3989,7 +3991,7 @@ bool SoPlexBase<R>::multBasis(R* vec, bool unscale)
 
 /// multiply with transpose of basis matrix; vec * B^T (inplace)
 template <class R>
-bool SoPlexBase<R>::multBasisTranspose(Real* vec, bool unscale)
+bool SoPlexBase<R>::multBasisTranspose(R* vec, bool unscale)
 {
   if( !hasBasis() )
     return false;
@@ -4367,7 +4369,7 @@ int SoPlexBase<R>::intParam(const IntParam param) const
 
 /// returns real parameter value
 template <class R>
-R SoPlexBase<R>::realParam(const RParam param) const
+R SoPlexBase<R>::realParam(const RealParam param) const
 {
   assert(param >= 0);
   assert(param < REALPARAM_COUNT);
@@ -4805,7 +4807,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
 
 /// sets real parameter value; returns true on success
 template <class R>
-bool SoPlexBase<R>::setRealParam(const RParam param, const R value, const bool init)
+bool SoPlexBase<R>::setRealParam(const RealParam param, const R value, const bool init)
 {
   assert(param >= 0);
   assert(param < REALPARAM_COUNT);
@@ -6001,7 +6003,7 @@ void SoPlexBase<R>::_changeLowerReal(const VectorBase<R>& lower)
       for( int i = numCols() - 1; i >= 0; i-- )
         {
           if( _basisStatusCols[i] == SPxSolverBase<R>::ON_LOWER && lower[i] <= -realParam(SoPlexBase<R>::INFTY) )
-            _basisStatusCols[i] = (upperR(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
+            _basisStatusCols[i] = (upperReal(i) < realParam(SoPlexBase<R>::INFTY)) ? SPxSolverBase<R>::ON_UPPER : SPxSolverBase<R>::ZERO;
         }
     }
 }
@@ -7956,3 +7958,5 @@ bool SoPlexBase<R>::writeBasisFile(const char* filename, const NameSet* rowNames
       return true;
     }
 }
+
+} // namespace soplex
