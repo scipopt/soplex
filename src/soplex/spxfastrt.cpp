@@ -885,7 +885,7 @@ namespace soplex
 
     assert(this->m_type == SPxSolverBase<R>::ENTER);
 
-    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.cpp)
+    // force instable pivot iff true (see explanation in enter.cpp and spxsolve.hpp)
     bool instable = this->solver()->instableEnter;
     R lowstab = LOWSTAB;
     assert(!instable || this->solver()->instableEnterId.isValid());
@@ -917,7 +917,7 @@ namespace soplex
 
                 stab = 100.0 * minStability(maxabs);
 
-                // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.cpp)
+                // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.hpp)
                 if (instable)
                   leave = maxSelect(sel, lowstab, bestDelta, max);
                 else
@@ -958,7 +958,7 @@ namespace soplex
 
                 stab = 100.0 * minStability(maxabs);
 
-                // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.cpp)
+                // force instable pivot iff instable is true (see explanation in enter.cpp and spxsolve.hpp)
                 if (instable)
                   leave = minSelect(sel, lowstab, bestDelta, max);
                 else
@@ -1280,7 +1280,7 @@ namespace soplex
 
     assert( this->m_type == SPxSolverBase<R>::LEAVE );
 
-    // force instable pivot iff true (see explanation in leave.cpp and spxsolve.cpp)
+    // force instable pivot iff true (see explanation in leave.cpp and spxsolve.hpp)
     bool instable = this->solver()->instableLeave;
     R lowstab = LOWSTAB;
     assert(!instable || this->solver()->instableLeaveNum >= 0);
@@ -1308,7 +1308,7 @@ namespace soplex
 
                 stab = minStability(maxabs);
 
-                // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
+                // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.hpp)
                 if (instable)
                   {
                     enterId = maxSelect(nr, sel, lowstab, bestDelta, max);
@@ -1347,7 +1347,7 @@ namespace soplex
 
                 stab = minStability(maxabs);
 
-                // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.cpp)
+                // force instable pivot iff instable is true (see explanation in leave.cpp and spxsolve.hpp)
                 if (instable)
                   {
                     enterId = minSelect(nr, sel, lowstab, bestDelta, max);

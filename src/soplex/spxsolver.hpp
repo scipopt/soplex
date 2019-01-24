@@ -18,7 +18,7 @@
 #include <sstream>
 
 #include "soplex/spxdefines.h"
-#include "soplex.h"
+// #include "soplex.h"
 #include "soplex/spxpricer.h"
 #include "soplex/spxratiotester.h"
 #include "soplex/spxstarter.h"

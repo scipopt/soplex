@@ -6690,7 +6690,7 @@ void SoPlexBase<R>::_syncLPRational(bool time)
 template <class R>
 void SoPlexBase<R>::_syncRealSolution()
 {
-  if( _hasSolRational && !_hasSolR )
+  if( _hasSolRational && !_hasSolReal )
     {
       _solReal = _solRational;
       _hasSolReal = true;

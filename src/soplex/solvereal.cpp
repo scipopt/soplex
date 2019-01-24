@@ -670,7 +670,7 @@ namespace soplex
 
    /// unscales stored solution to remove internal or external scaling of LP
   template <class R>
-  void SoPlexBase<R>::_unscaleSolutionReal(SPxLPReal& LP, bool persistent)
+  void SoPlexBase<R>::_unscaleSolutionReal(SPxLPBase<R>& LP, bool persistent)
    {
       MSG_INFO1( spxout, spxout << " --- unscaling " << (persistent ? "external" : "internal") <<" solution" << std::endl; )
       assert(_scaler);

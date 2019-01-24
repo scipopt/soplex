@@ -293,14 +293,14 @@ namespace soplex
 
     /* Store the index of a leaving variable if only an instable entering variable has been found.
        instableLeave == true iff this instable basis change should be performed.
-       (see spxsolve.cpp and leave.cpp) */
+       (see spxsolve.hpp and leave.cpp) */
     int            instableLeaveNum;
     bool           instableLeave;
     R           instableLeaveVal;
 
     /* Store the id of an entering row or column if only an instable pivot has been found.
        instableEnter == true iff this instable basis change should be performed.
-       (see spxsolve.cpp and enter.cpp) */
+       (see spxsolve.hpp and enter.cpp) */
     SPxId          instableEnterId;
     bool           instableEnter;
     R           instableEnterVal;
@@ -2339,13 +2339,11 @@ namespace soplex
   /* For Backwards compatibility */
   typedef SPxSolverBase<Real> SPxSolver;
 
-  // For general templated functions, that the linker needs to properly see.
-  #include "spxsolve.hpp"
-
 } // namespace soplex
 
   // For general templated functions
 #include "spxsolver.hpp"
 #include "changesoplex.hpp"
+#include "spxsolve.hpp"
 
 #endif // _SPXSOLVER_H_
