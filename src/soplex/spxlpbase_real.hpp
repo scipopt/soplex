@@ -45,6 +45,12 @@ namespace soplex
   }
 
 
+  /// Is there a comparison operator at the beginning of \p s ?
+  static bool LPFisSense(const char* s)
+  {
+    return (*s == '<') || (*s == '>') || (*s == '=');
+  }
+
   template <class R>
   void SPxLPBase<R>::unscaleLP()
   {
@@ -461,15 +467,6 @@ namespace soplex
       || ((*s >= 'a') && (*s <= 'z'))
       || (strchr("!\"#$%&()/,;?@_'`{}|~", *s) != 0);
   }
-
-
-
-  /// Is there a comparison operator at the beginning of \p s ?
-  static bool LPFisSense(const char* s)
-  {
-    return (*s == '<') || (*s == '>') || (*s == '=');
-  }
-
 
 
   static bool LPFisInfinity(const char* s)
