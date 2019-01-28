@@ -2730,6 +2730,10 @@ namespace soplex
     //@}
 };
 
+  // Need to prevent specialization after instantiation errors
+  template <>
+  void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale);
+
   // @todo the following declarations may be redundant now because of above
   // #include. But I do not know why they were added.
 // Declaration of R specializations found in spxlpbase_real.hpp

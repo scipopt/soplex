@@ -605,8 +605,10 @@ namespace soplex
     if( (colidx = colnames->number(name)) < 0 )
       {
         // We only add the name if we got an empty column.
-        if( emptycol == 0 )
+        if( emptycol == nullptr )
+          {
           MSG_WARNING( (*spxout), (*spxout) << "WLPFRD02 Unknown variable \"" << name << "\" "; )
+              }
           else
             {
               colidx = colnames->num();
@@ -1174,7 +1176,7 @@ namespace soplex
                   if( !LPFisColName(pos) )
                     goto syntax_error;
 
-                  if( (colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0 )
+                  if( (colidx = LPFreadColName(pos, cnames, cset, nullptr, spxout)) < 0 )
                     {
                       MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD11 in Bounds section line "
                                    << lineno << " ignored" << std::endl; )
