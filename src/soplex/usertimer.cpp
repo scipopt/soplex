@@ -63,7 +63,7 @@ void UserTimer::updateTicks() const
    if(int(ret) == -1)
       now.tms_utime = now.tms_stime = ret = 0;
 
-   uTicks = long(now.tms_utime);
+   uTicks = now.tms_utime;
 
 #endif  /* !(_WIN32 || _WIN64) */
 }
