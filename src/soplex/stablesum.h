@@ -16,6 +16,8 @@
 #ifndef _SOPLEX_STABLE_SUM_H_
 #define _SOPLEX_STABLE_SUM_H_
 
+// #define CHECK_STABLESUM  // double check the stable sum computation
+
 #include <type_traits>
 
 namespace soplex
@@ -51,6 +53,9 @@ class StableSum<double>
 {
    double sum = 0;
    double c = 0;
+#ifdef CHECK_STABLESUM
+   double checksum = 0;
+#endif
 
 public:
    StableSum() = default;
@@ -61,7 +66,9 @@ public:
 #if defined(_MSC_VER) || defined(__INTEL_COMPILER)
 #pragma float_control( precise, on )
 #endif
-
+#ifdef CHECK_STABLESUM
+      checksum += input;
+#endif
       double t = sum + input;
       double z = t - sum;
       double y = (sum - (t - z)) + (input - z);
@@ -77,6 +84,12 @@ public:
 
    operator double() const
    {
+#ifdef CHECK_STABLESUM
+      if(spxAbs(checksum - (sum + c)) >= 1e-6)
+         printf("stablesum viol: %g, rel: %g, checksum: %g\n", spxAbs(checksum - (sum + c)),
+            spxAbs(checksum - (sum + c))/MAXIMUM(1.0, MAXIMUM(spxAbs(checksum), spxAbs(sum+c))), checksum);
+      assert(spxAbs(checksum - (sum + c)) < 1e-6);
+#endif
       return sum + c;
    }
 };
