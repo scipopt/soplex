@@ -39,8 +39,8 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   mutable long uAccount;      ///< user time
-   mutable long uTicks;        ///< user ticks
+   mutable clock_t uAccount;      ///< user time
+   mutable clock_t uTicks;        ///< user ticks
 
    mutable Real lasttime;
    //@}
@@ -49,7 +49,7 @@ private:
    /**@name Internal helpers */
    //@{
    /// convert ticks to secounds.
-   Real ticks2sec(long ticks) const
+   Real ticks2sec(clock_t ticks) const
    {
       return (Real(ticks) * 1000.0 / Real(ticks_per_sec)) / 1000.0;
    }
