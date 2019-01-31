@@ -82,10 +82,14 @@ namespace soplex
     MSG_INFO3( (*this->spxout), (*this->spxout) << "remove persistent scaling of LP" << std::endl; )
 
       if( lp_scaler )
+        {
         lp_scaler->unscale(*this);
+        }
       else
+        {
         MSG_INFO3( (*this->spxout), (*this->spxout) << "no LP scaler available" << std::endl; )
           }
+  }
 
   template <class R>
   void SPxLPBase<R>::computePrimalActivity(const VectorBase<R>& primal, VectorBase<R>& activity, const bool unscaled) const

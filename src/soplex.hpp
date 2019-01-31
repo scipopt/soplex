@@ -7503,7 +7503,7 @@ bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames, con
     {
       MSG_INFO3( spxout, spxout << "copy LP to write unscaled original problem" << std::endl; )
         SPxLPBase<R>* origLP;
-      origLP = 0;
+      origLP = nullptr;
       spx_alloc(origLP);
       origLP = new (origLP) SPxLPBase<R>(*_realLP);
       origLP->unscaleLP();

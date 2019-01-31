@@ -1255,7 +1255,7 @@ $(LIBOBJSUBDIR)/slufactor_rational.o: src/soplex/slufactor_rational.cpp \
  src/soplex/slinsolver_rational.h src/soplex/svector.h \
  src/soplex/ssvector.h src/soplex/dsvector.h src/soplex/didxset.h \
  src/soplex/clufactor_rational.h src/soplex/cring.h
-$(LIBOBJSUBDIR)/solverational.o: src/soplex/solverational.cpp src/soplex.h \
+$(LIBOBJSUBDIR)/solverational.o: src/soplex.h \
  src/soplex/spxgithash.h src/soplex/spxdefines.h src/soplex/basevectors.h \
  src/soplex/spxdefines.h src/soplex/rational.h src/soplex/idlist.h \
  src/soplex/islist.h src/soplex/vectorbase.h src/soplex/dvectorbase.h \
