@@ -31,6 +31,31 @@
 
 namespace soplex
 {
+  // For reference to functions inside spxlpbase_rational.cpp
+  template <>
+  void SPxLPBase<Rational>::writeMPS(
+                                     std::ostream&  p_output,          ///< output stream.
+                                     const NameSet* p_rnames,          ///< row names.
+                                     const NameSet* p_cnames,          ///< column names.
+                                     const DIdxSet* p_intvars          ///< integer variables.
+                                     ) const;
+
+  template <>
+  bool SPxLPBase<Rational>::readLPF(
+                                    std::istream& p_input,                ///< input stream.
+                                    NameSet*      p_rnames,               ///< row names.
+                                    NameSet*      p_cnames,               ///< column names.
+                                    DIdxSet*      p_intvars);              ///< integer variables.
+
+  template <>
+  void SPxLPBase<Rational>::writeLPF(
+                                     std::ostream&  p_output,          ///< output stream
+                                     const NameSet* p_rnames,          ///< row names
+                                     const NameSet* p_cnames,          ///< column names
+                                     const DIdxSet* p_intvars          ///< integer variables
+                                     ) const;
+
+
 
   /// Is \p c a \c space, \c tab, \c nl or \c cr ?
   static inline bool LPFisSpace(int c)
@@ -762,7 +787,6 @@ namespace soplex
 
     return sense * infinity;
   }
-
 
 
   /// Read LP in "CPLEX LP File Format".

@@ -180,7 +180,7 @@ void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
 
    if( isNotZero(val) )
    {
-      R newVal;
+      Real newVal;
 
       if (scale)
       {
