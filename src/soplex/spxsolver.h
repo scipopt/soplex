@@ -300,7 +300,7 @@ namespace soplex
 
     /* Store the id of an entering row or column if only an instable pivot has been found.
        instableEnter == true iff this instable basis change should be performed.
-       (see spxsolve.hpp and enter.cpp) */
+       (see spxsolve.hpp and enter.hpp) */
     SPxId          instableEnterId;
     bool           instableEnter;
     R           instableEnterVal;
@@ -2346,5 +2346,6 @@ namespace soplex
 #include "changesoplex.hpp"
 #include "spxsolve.hpp"
 #include "leave.hpp"
+#include "enter.hpp"
 
 #endif // _SPXSOLVER_H_

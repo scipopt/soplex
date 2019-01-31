@@ -4,7 +4,6 @@ set(sources
     soplex/clufactor.cpp
     soplex/clufactor_rational.cpp
     soplex/didxset.cpp
-    soplex/enter.cpp
     soplex/gzstream.cpp
     soplex/idxset.cpp
     soplex/mpsinput.cpp
