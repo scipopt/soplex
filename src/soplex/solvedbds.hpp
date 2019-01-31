@@ -40,119 +40,18 @@
 namespace soplex
 {
 
-  template <>
-  void SoPlexBase<Real>::_updateDecompReducedProblem(Real objValue, DVector dualVector, DVector redcostVector,
-                                                 DVector compPrimalVector, DVector compDualVector);
-
-  template <>
-  void SoPlexBase<Real>::_decompSimplifyAndSolve(SPxSolverBase<Real>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
-
-  template <>
-  void SoPlexBase<Real>::_formDecompComplementaryProblem();
-
-  template <>
-  void SoPlexBase<Real>::_formDecompReducedProblem(bool& stop);
-
-  template <>
-  void SoPlexBase<Real>::_createDecompReducedAndComplementaryProblems();
-
-  template <>
-  void SoPlexBase<Real>::_findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows);
-
-  template <>
-  void SoPlexBase<Real>::_updateDecompReducedProblemViol(bool allrows);
-
-  template <>
-  void SoPlexBase<Real>::_getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
-                                                   int* nnonposind, bool& stop);
-
-  template <>
-  void SoPlexBase<Real>::_getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval,
-                                           int* colsforremoval, int nnonposind, int* ncompatind, bool formRedProb, bool& stop);
-
-  template <>
-  void SoPlexBase<Real>::_updateDecompComplementaryPrimalProblem(bool origObj);
-
-  template <>
-  void SoPlexBase<Real>::_computeReducedProbObjCoeff(bool& stop);
-
-  template <>
-  void SoPlexBase<Real>::_getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind,
-                                             int* ncompatboundcons, int nnonposind, bool& stop);
-
-  template <>
-  void SoPlexBase<Real>::_deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
-
-  template <>
-  void SoPlexBase<Real>::_updateDecompComplementaryDualProblem(bool origObj);
-
-  template <>
-  void SoPlexBase<Real>::_checkOriginalProblemOptimality(Vector primalVector, bool printViol);
-
-  template <>
-  void SoPlexBase<Real>::_updateComplementaryDualSlackColCoeff();
-
-  template <>
-  void SoPlexBase<Real>::_identifyComplementaryPrimalFixedPrimalVars(int* currFixedVars);
-
-  template <>
-  void SoPlexBase<Real>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars);
-
-  template <>
-  int SoPlexBase<Real>::getOrigVarFixedDirection(int colNum);
-
-  template <>
-  void SoPlexBase<Real>::_evaluateSolutionDecomp(SPxSolverBase<Real>& solver, SLUFactor& sluFactor, typename SPxSimplifier<Real>::Result result);
-
-  template <>
-  bool SoPlexBase<Real>::checkBasisDualFeasibility(Vector feasVec);
-
-  template <>
-  void SoPlexBase<Real>::_identifyComplementaryDualFixedPrimalVars(int* currFixedVars);
-
-  template <>
-  void SoPlexBase<Real>::_removeComplementaryDualFixedPrimalVars(int* currFixedVars);
-
-  template <>
-  void SoPlexBase<Real>::_updateComplementaryDualFixedPrimalVars(int* currFixedVars);
-
-  template <>
-  typename SoPlexBase<Real>::DualSign SoPlexBase<Real>::getExpectedDualVariableSign(int rowNumber);
-
-  template <>
-  typename SoPlexBase<Real>::DualSign SoPlexBase<Real>::getOrigProbDualVariableSign(int rowNumber);
-
-  template <>
-  void SoPlexBase<Real>::printDecompDisplayLine(SPxSolverBase<Real>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead);
-
-  template <>
-  void SoPlexBase<Real>::getOriginalProblemStatistics();
-
-  template <>
-  Real SoPlexBase<Real>::getCompSlackVarCoeff(int primalRowNum);
-
-  template <>
-  bool SoPlexBase<Real>::getDecompBoundViolation(Real& maxviol, Real& sumviol);
-
-  template <>
-  bool SoPlexBase<Real>::getDecompRowViolation(Real& maxviol, Real& sumviol);
-
-  template <>
-  bool SoPlexBase<Real>::decompTerminate(Real timeLimit);
-
-
   /// solves LP using the decomposition dual simplex
-  template <>
-  void SoPlexBase<Real>::_solveDecompositionDualSimplex()
+  template <class R>
+  void SoPlexBase<R>::_solveDecompositionDualSimplex()
   {
-    assert(_solver.rep() == SPxSolverBase<Real>::ROW);
-    assert(_solver.type() == SPxSolverBase<Real>::LEAVE);
+    assert(_solver.rep() == SPxSolverBase<R>::ROW);
+    assert(_solver.type() == SPxSolverBase<R>::LEAVE);
 
     // flag to indicate that the algorithm must terminate
     bool stop = false;
 
     // setting the initial status of the reduced problem
-    _statistics->redProbStatus = SPxSolverBase<Real>::NO_PROBLEM;
+    _statistics->redProbStatus = SPxSolverBase<R>::NO_PROBLEM;
 
     // start timing
     _statistics->solvingTime->start();
@@ -166,23 +65,23 @@ namespace soplex
     // setting the sense to maximise. This is to make all matrix operations more consistent.
     // @todo if the objective sense is changed, the output of the current objective value is the negative of the
     // actual value. This needs to be corrected in future versions.
-    if( intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE )
+    if( intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE )
       {
-        assert(_solver.spxSense() == SPxLPBase<Real>::MINIMIZE);
+        assert(_solver.spxSense() == SPxLPBase<R>::MINIMIZE);
 
         _solver.changeObj(_solver.maxObj());
-        _solver.changeSense(SPxLPBase<Real>::MAXIMIZE);
+        _solver.changeSense(SPxLPBase<R>::MAXIMIZE);
       }
 
     // it is necessary to solve the initial problem to find a starting basis
-    _solver.setDecompStatus(SPxSolverBase<Real>::FINDSTARTBASIS);
+    _solver.setDecompStatus(SPxSolverBase<R>::FINDSTARTBASIS);
 
     // setting the decomposition iteration limit to the parameter setting
-    _solver.setDecompIterationLimit(intParam(SoPlexBase<Real>::DECOMP_ITERLIMIT));
+    _solver.setDecompIterationLimit(intParam(SoPlexBase<R>::DECOMP_ITERLIMIT));
 
     // variables used in the initialisation phase of the decomposition solve.
     int numDegenCheck = 0;
-    Real degeneracyLevel = 0;
+    R degeneracyLevel = 0;
     _decompFeasVector.reDim(_solver.nCols());
     bool initSolveFromScratch = true;
 
@@ -192,8 +91,8 @@ namespace soplex
     /************************/
 
     // arrays to store the basis status for the rows and columns at the interruption of the original problem solve.
-    DataArray< typename SPxSolverBase<Real>::VarStatus > basisStatusRows;
-    DataArray< typename SPxSolverBase<Real>::VarStatus > basisStatusCols;
+    DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusRows;
+    DataArray< typename SPxSolverBase<R>::VarStatus > basisStatusCols;
     // since the original LP may have been shifted, the dual multiplier will not be correct for the original LP. This
     // loop will recheck the degeneracy level and compute the proper dual multipliers.
     do
@@ -203,25 +102,25 @@ namespace soplex
         initSolveFromScratch = false;
 
         // checking whether the initialisation must terminate and the original problem is solved using the dual simplex.
-        if( _solver.type() == SPxSolverBase<Real>::LEAVE || _solver.status() >= SPxSolverBase<Real>::OPTIMAL
-            || _solver.status() == SPxSolverBase<Real>::ABORT_EXDECOMP || numDegenCheck > MAX_DEGENCHECK )
+        if( _solver.type() == SPxSolverBase<R>::LEAVE || _solver.status() >= SPxSolverBase<R>::OPTIMAL
+            || _solver.status() == SPxSolverBase<R>::ABORT_EXDECOMP || numDegenCheck > MAX_DEGENCHECK )
           {
             // decomposition is deemed not useful. Solving the original problem using regular SoPlexBase.
 
             // returning the sense to minimise
-            if( intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE )
+            if( intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE )
               {
-                assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+                assert(_solver.spxSense() == SPxLPBase<R>::MAXIMIZE);
 
                 _solver.changeObj(-(_solver.maxObj()));
-                _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+                _solver.changeSense(SPxLPBase<R>::MINIMIZE);
               }
 
             // switching off the starting basis check. This is only required to initialise the decomposition simplex.
-            _solver.setDecompStatus(SPxSolverBase<Real>::DONTFINDSTARTBASIS);
+            _solver.setDecompStatus(SPxSolverBase<R>::DONTFINDSTARTBASIS);
 
             // the basis is not computed correctly is the problem was unfeasible or unbounded.
-            if( _solver.status() == SPxSolverBase<Real>::UNBOUNDED || _solver.status() == SPxSolverBase<Real>::INFEASIBLE )
+            if( _solver.status() == SPxSolverBase<R>::UNBOUNDED || _solver.status() == SPxSolverBase<R>::INFEASIBLE )
               _hasBasis = false;
 
 
@@ -241,8 +140,8 @@ namespace soplex
             _statistics->solvingTime->stop();
             return;
           }
-        else if( _solver.status() == SPxSolverBase<Real>::ABORT_TIME || _solver.status() == SPxSolverBase<Real>::ABORT_ITER
-                 || _solver.status() == SPxSolverBase<Real>::ABORT_VALUE )
+        else if( _solver.status() == SPxSolverBase<R>::ABORT_TIME || _solver.status() == SPxSolverBase<R>::ABORT_ITER
+                 || _solver.status() == SPxSolverBase<R>::ABORT_VALUE )
           {
             // This cleans up the problem is an abort is reached.
 
@@ -257,12 +156,12 @@ namespace soplex
               }
 
             // returning the sense to minimise
-            if( intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE )
+            if( intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE )
               {
-                assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+                assert(_solver.spxSense() == SPxLPBase<R>::MAXIMIZE);
 
                 _solver.changeObj(-(_solver.maxObj()));
-                _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+                _solver.changeSense(SPxLPBase<R>::MINIMIZE);
               }
 
             // resolving the problem to set up all of the solution vectors. This is required because data from the
@@ -287,7 +186,7 @@ namespace soplex
       } while( (degeneracyLevel > 0.9 || degeneracyLevel < 0.1) || !checkBasisDualFeasibility(_decompFeasVector) );
 
     // decomposition simplex will commence, so the start basis does not need to be found
-    _solver.setDecompStatus(SPxSolverBase<Real>::DONTFINDSTARTBASIS);
+    _solver.setDecompStatus(SPxSolverBase<R>::DONTFINDSTARTBASIS);
 
     // if the original problem has a basis, this will be stored
     if( _hasBasis )
@@ -324,7 +223,7 @@ namespace soplex
 
     // setting the verbosity level
     const SPxOut::Verbosity orig_verbosity = spxout.getVerbosity();
-    const SPxOut::Verbosity decomp_verbosity = (SPxOut::Verbosity)intParam(SoPlexBase<Real>::DECOMP_VERBOSITY);
+    const SPxOut::Verbosity decomp_verbosity = (SPxOut::Verbosity)intParam(SoPlexBase<R>::DECOMP_VERBOSITY);
     if( decomp_verbosity < orig_verbosity )
       spxout.setVerbosity( decomp_verbosity );
 
@@ -340,7 +239,7 @@ namespace soplex
     bool hasRedBasis = false;
     bool redProbError = false;
     bool noRedprobIter = false;
-    bool explicitviol = boolParam(SoPlexBase<Real>::EXPLICITVIOL);
+    bool explicitviol = boolParam(SoPlexBase<R>::EXPLICITVIOL);
     int algIterCount = 0;
 
 
@@ -349,7 +248,7 @@ namespace soplex
       {
         MSG_INFO1( spxout, spxout << "==== Error constructing the reduced problem ====" << std::endl );
         redProbError = true;
-        _statistics->redProbStatus = SPxSolverBase<Real>::NOT_INIT;
+        _statistics->redProbStatus = SPxSolverBase<R>::NOT_INIT;
       }
 
     // the main solving loop of the decomposition simplex.
@@ -374,7 +273,7 @@ namespace soplex
         // solving the reduced problem
         _decompSimplifyAndSolve(_solver, _slufactor, !algIterCount, !algIterCount);
 
-        stop = decompTerminate(realParam(SoPlexBase<Real>::TIMELIMIT));  // checking whether the algorithm should terminate
+        stop = decompTerminate(realParam(SoPlexBase<R>::TIMELIMIT));  // checking whether the algorithm should terminate
 
         // updating the algorithm iterations statistics
         _statistics->callsReducedProb++;
@@ -388,11 +287,11 @@ namespace soplex
         // It is expected that infeasibility and unboundedness will be found in the initialisation solve. If this is
         // not the case and the reduced problem is infeasible or unbounded the decomposition simplex will terminate.
         // If the decomposition simplex terminates, then the original problem will be solved using the stored basis.
-        if( _solver.status() != SPxSolverBase<Real>::OPTIMAL )
+        if( _solver.status() != SPxSolverBase<R>::OPTIMAL )
           {
-            if( _solver.status() == SPxSolverBase<Real>::UNBOUNDED )
+            if( _solver.status() == SPxSolverBase<R>::UNBOUNDED )
               MSG_INFO2(spxout, spxout << "Unbounded reduced problem." << std::endl );
-            if( _solver.status() == SPxSolverBase<Real>::INFEASIBLE )
+            if( _solver.status() == SPxSolverBase<R>::INFEASIBLE )
               MSG_INFO2(spxout, spxout << "Infeasible reduced problem." << std::endl );
 
             MSG_INFO2(spxout, spxout << "Reduced problem status: " << static_cast<int>(_solver.status()) << std::endl );
@@ -416,8 +315,8 @@ namespace soplex
         printDecompDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
 
         // get the dual solutions from the reduced problem
-        DVector reducedLPDualVector(_solver.nRows());
-        DVector reducedLPRedcostVector(_solver.nCols());
+        DVectorBase<R> reducedLPDualVector(_solver.nRows());
+        DVectorBase<R> reducedLPRedcostVector(_solver.nCols());
         _solver.getDualSol(reducedLPDualVector);
         _solver.getRedCostSol(reducedLPRedcostVector);
 
@@ -429,7 +328,7 @@ namespace soplex
           _formDecompComplementaryProblem();
         else
           {
-            if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
+            if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
               _updateDecompComplementaryDualProblem(false);
             else
               _updateDecompComplementaryPrimalProblem(false);
@@ -464,17 +363,17 @@ namespace soplex
         // Check whether the complementary problem is solved with a non-negative objective function, is infeasible or
         // unbounded. If true, then stop the algorithm.
         if( !explicitviol && (GE(_compSolver.objValue(), 0.0, 1e-20)
-                              || _compSolver.status() == SPxSolverBase<Real>::INFEASIBLE
-                              || _compSolver.status() == SPxSolverBase<Real>::UNBOUNDED) )
+                              || _compSolver.status() == SPxSolverBase<R>::INFEASIBLE
+                              || _compSolver.status() == SPxSolverBase<R>::UNBOUNDED) )
           {
             _statistics->compProbStatus = _compSolver.status();
             _statistics->finalCompObj = _compSolver.objValue();
-            if( _compSolver.status() == SPxSolverBase<Real>::UNBOUNDED )
+            if( _compSolver.status() == SPxSolverBase<R>::UNBOUNDED )
               MSG_INFO2(spxout, spxout << "Unbounded complementary problem." << std::endl );
-            if( _compSolver.status() == SPxSolverBase<Real>::INFEASIBLE )
+            if( _compSolver.status() == SPxSolverBase<R>::INFEASIBLE )
               MSG_INFO2(spxout, spxout << "Infeasible complementary problem." << std::endl );
 
-            if( _compSolver.status() == SPxSolverBase<Real>::INFEASIBLE || _compSolver.status() == SPxSolverBase<Real>::UNBOUNDED )
+            if( _compSolver.status() == SPxSolverBase<R>::INFEASIBLE || _compSolver.status() == SPxSolverBase<R>::UNBOUNDED )
               explicitviol = true;
 
             stop = true;
@@ -483,11 +382,11 @@ namespace soplex
         if( !stop && !explicitviol )
           {
             // get the primal solutions from the complementary problem
-            DVector compLPPrimalVector(_compSolver.nCols());
+            DVectorBase<R> compLPPrimalVector(_compSolver.nCols());
             _compSolver.getPrimalSol(compLPPrimalVector);
 
             // get the dual solutions from the complementary problem
-            DVector compLPDualVector(_compSolver.nRows());
+            DVectorBase<R> compLPDualVector(_compSolver.nRows());
             _compSolver.getDualSol(compLPDualVector);
 
             // updating the reduced problem
@@ -496,12 +395,12 @@ namespace soplex
           }
         // if the complementary problem is infeasible or unbounded, it is possible that the algorithm can continue.
         // a check of the original problem is required to determine whether there are any violations.
-        else if( _compSolver.status() == SPxSolverBase<Real>::INFEASIBLE
-                 || _compSolver.status() == SPxSolverBase<Real>::UNBOUNDED
+        else if( _compSolver.status() == SPxSolverBase<R>::INFEASIBLE
+                 || _compSolver.status() == SPxSolverBase<R>::UNBOUNDED
                  || explicitviol )
           {
             // getting the primal vector from the reduced problem
-            DVector reducedLPPrimalVector(_solver.nCols());
+            DVectorBase<R> reducedLPPrimalVector(_solver.nCols());
             _solver.getPrimalSol(reducedLPPrimalVector);
 
             // checking the optimality of the reduced problem solution with the original problem
@@ -533,7 +432,7 @@ namespace soplex
       {
 #ifndef NDEBUG
         // computing the solution for the original variables
-        DVector reducedLPPrimalVector(_solver.nCols());
+        DVectorBase<R> reducedLPPrimalVector(_solver.nCols());
         _solver.getPrimalSol(reducedLPPrimalVector);
 
         // checking the optimality of the reduced problem solution with the original problem
@@ -547,7 +446,7 @@ namespace soplex
         // This is only used for debugging
 #ifdef PERFORM_COMPPROB_CHECK
         // solving the complementary problem with the original objective function
-        if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
+        if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
           _setComplementaryDualOriginalObjective();
         else
           _setComplementaryPrimalOriginalObjective();
@@ -558,9 +457,9 @@ namespace soplex
         // the basis has to be set to false
         _hasBasis = false;
 
-        if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
+        if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
           {
-            SPxLPReal compDualLP;
+            SPxLPBase<R> compDualLP;
             _compSolver.buildDualProblem(compDualLP, _decompPrimalRowIDs.get_ptr(), _decompPrimalColIDs.get_ptr(),
                                          _decompDualRowIDs.get_ptr(), _decompDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
 
@@ -572,13 +471,13 @@ namespace soplex
         _solReal._hasPrimal = true;
         _hasSolReal = true;
         // get the primal solutions from the reduced problem
-        DVector testPrimalVector(_compSolver.nCols());
+        DVectorBase<R> testPrimalVector(_compSolver.nCols());
         _compSolver.getPrimalSol(testPrimalVector);
         _solReal._primal.reDim(_compSolver.nCols());
         _solReal._primal = testPrimalVector;
 
-        Real maxviol = 0;
-        Real sumviol = 0;
+        R maxviol = 0;
+        R sumviol = 0;
 
         // Since the original objective value has now been installed in the complementary problem, the solution will be
         // a solution to the original problem.
@@ -642,12 +541,12 @@ namespace soplex
         _isRealLPLoaded = true;
 
         // returning the sense to minimise
-        if( intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE )
+        if( intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE )
           {
-            assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+            assert(_solver.spxSense() == SPxLPBase<R>::MAXIMIZE);
 
             _solver.changeObj(-(_solver.maxObj()));
-            _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+            _solver.changeSense(SPxLPBase<R>::MINIMIZE);
 
             // Need to add commands to multiply the objective solution values by -1
           }
@@ -660,18 +559,18 @@ namespace soplex
         // resolving the problem to update the real lp and solve with the correct objective.
         // the realLP is updated with the current solver. This is to resolve the problem to get the correct solution
         // values
-        _realLP->~SPxLPReal();
+        _realLP->~SPxLPBase<R>();
         spx_free(_realLP);
         _realLP = &_solver;
         _isRealLPLoaded = true;
 
         // returning the sense to minimise
-        if( intParam(SoPlexBase<Real>::OBJSENSE) == SoPlexBase<Real>::OBJSENSE_MINIMIZE )
+        if( intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE )
           {
-            assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+            assert(_solver.spxSense() == SPxLPBase<R>::MAXIMIZE);
 
             _solver.changeObj(-(_solver.maxObj()));
-            _solver.changeSense(SPxLPBase<Real>::MINIMIZE);
+            _solver.changeSense(SPxLPBase<R>::MINIMIZE);
 
             // Need to add commands to multiply the objective solution values by -1
           }
@@ -686,15 +585,15 @@ namespace soplex
 
 
   /// creating copies of the original problem that will be manipulated to form the reduced and complementary problems
-  template <>
-  void SoPlexBase<Real>::_createDecompReducedAndComplementaryProblems()
+  template <class R>
+  void SoPlexBase<R>::_createDecompReducedAndComplementaryProblems()
   {
     // the reduced problem is formed from the current problem
     // So, we copy the _solver to the _realLP and work on the _solver
     // NOTE: there is no need to preprocess because we always have a starting basis.
     _realLP = 0;
     spx_alloc(_realLP);
-    _realLP = new (_realLP) SPxLPReal(_solver);
+    _realLP = new (_realLP) SPxLPBase<R>(_solver);
 
     // allocating memory for the reduced problem rows and cols flag array
     _decompReducedProbRows = 0;
@@ -720,8 +619,8 @@ namespace soplex
 
 
   /// forms the reduced problem
-  template <>
-  void SoPlexBase<Real>::_formDecompReducedProblem(bool& stop)
+  template <class R>
+  void SoPlexBase<R>::_formDecompReducedProblem(bool& stop)
   {
     MSG_INFO2( spxout, spxout << "Forming the Reduced problem" << std::endl );
     int* nonposind = 0;
@@ -743,7 +642,7 @@ namespace soplex
     // the _decompLP is used as a helper LP object. This is used so that _realLP can still hold the original problem.
     _decompLP = 0;
     spx_alloc(_decompLP);
-    _decompLP = new (_decompLP) SPxLPReal(_solver);
+    _decompLP = new (_decompLP) SPxLPBase<R>(_solver);
 
     // retreiving the basis information
     _basisStatusRows.reSize(numRows());
@@ -770,7 +669,7 @@ namespace soplex
     int ncompatboundcons = 0;
     spx_alloc(compatboundcons, numCols());
 
-    LPRowSet boundcons;
+    LPRowSetBase<R> boundcons;
 
     // identifying the compatible bound constraints
     if( !stop )
@@ -810,15 +709,15 @@ namespace soplex
     spx_free(colsforremoval);
     spx_free(nonposind);
 
-    _decompLP->~SPxLPReal();
+    _decompLP->~SPxLPBase<R>();
     spx_free(_decompLP);
   }
 
 
 
   /// forms the complementary problem
-  template <>
-  void SoPlexBase<Real>::_formDecompComplementaryProblem()
+  template <class R>
+  void SoPlexBase<R>::_formDecompComplementaryProblem()
   {
     // delete rows and columns from the LP to form the reduced problem
     _nElimPrimalRows = 0;
@@ -840,7 +739,7 @@ namespace soplex
     DataArray< SPxRowId > rangedRowIds(numRows());
     _deleteAndUpdateRowsComplementaryProblem(rangedRowIds.get_ptr(), naddedrows);
 
-    if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )   // if we use the dual formulation of the complementary problem, we must
+    if( boolParam(SoPlexBase<R>::USECOMPDUAL) )   // if we use the dual formulation of the complementary problem, we must
       // perform the transformation
       {
         // initialising the arrays to store the row id's from the primal and the col id's from the dual
@@ -854,7 +753,7 @@ namespace soplex
         _nDualCols = 0;
 
         // convert complementary problem to dual problem
-        SPxLPReal compDualLP;
+        SPxLPBase<R> compDualLP;
         _compSolver.buildDualProblem(compDualLP, _decompPrimalRowIDs.get_ptr(), _decompPrimalColIDs.get_ptr(),
                                      _decompDualRowIDs.get_ptr(), _decompDualColIDs.get_ptr(), &_nPrimalRows, &_nPrimalCols, &_nDualRows, &_nDualCols);
         compDualLP.setOutstream(spxout);
@@ -920,7 +819,7 @@ namespace soplex
             _nPrimalRows++;
             _nCompPrimalRows++;
 
-            if( _realLP->rowType(i) == LPRowBase<Real>::RANGE || _realLP->rowType(i) == LPRowBase<Real>::EQUAL )
+            if( _realLP->rowType(i) == LPRowBase<R>::RANGE || _realLP->rowType(i) == LPRowBase<R>::EQUAL )
               {
                 assert(EQ(_compSolver.lhs(rangedRowIds[addedrangedrows]), _realLP->lhs(i)));
                 assert(LE(_compSolver.rhs(rangedRowIds[addedrangedrows]), infinity));
@@ -957,16 +856,16 @@ namespace soplex
 
 
   /// simplifies the problem and solves
-  template <>
-  void SoPlexBase<Real>::_decompSimplifyAndSolve(SPxSolverBase<Real>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing)
+  template <class R>
+  void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing)
   {
-    if( realParam(SoPlexBase<Real>::TIMELIMIT) < realParam(SoPlexBase<Real>::INFTY) )
-      solver.setTerminationTime(realParam(SoPlexBase<Real>::TIMELIMIT) - _statistics->solvingTime->time());
+    if( realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY) )
+      solver.setTerminationTime(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
 
-    solver.changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
+    solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
     _statistics->preprocessingTime->start();
 
-    typename SPxSimplifier<Real>::Result result = SPxSimplifier<Real>::OKAY;
+    typename SPxSimplifier<R>::Result result = SPxSimplifier<R>::OKAY;
 
     /* delete starting basis if solving from scratch */
     if ( fromScratch )
@@ -980,19 +879,19 @@ namespace soplex
             MSG_ERROR( spxout << "Caught exception <" << E.what() << "> during simplify and solve.\n" );
           }
       }
-    //assert(!fromScratch || solver.status() == SPxSolverBase<Real>::NO_PROBLEM);
+    //assert(!fromScratch || solver.status() == SPxSolverBase<R>::NO_PROBLEM);
 
     if( applyPreprocessing )
       {
         _enableSimplifierAndScaler();
-        solver.setTerminationValue(realParam(SoPlexBase<Real>::INFTY));
+        solver.setTerminationValue(realParam(SoPlexBase<R>::INFTY));
       }
     else
       {
         _disableSimplifierAndScaler();
         ///@todo implement for both objective senses
-        solver.setTerminationValue(solver.spxSense() == SPxLPBase<Real>::MINIMIZE
-                                   ? realParam(SoPlexBase<Real>::OBJLIMIT_UPPER) : realParam(SoPlexBase<Real>::INFTY));
+        solver.setTerminationValue(solver.spxSense() == SPxLPBase<R>::MINIMIZE
+                                   ? realParam(SoPlexBase<R>::OBJLIMIT_UPPER) : realParam(SoPlexBase<R>::INFTY));
       }
 
     /* store original lp */
@@ -1010,7 +909,7 @@ namespace soplex
           {
             _decompLP = 0;
             spx_alloc(_decompLP);
-            _decompLP = new (_decompLP) SPxLPReal(solver);
+            _decompLP = new (_decompLP) SPxLPBase<R>(solver);
             _isRealLPLoaded = false;
           }
         else
@@ -1038,7 +937,7 @@ namespace soplex
         // memory-efficient to keep only the problem in the solver
         if( !applyPreprocessing )
           {
-            _decompLP->~SPxLPReal();
+            _decompLP->~SPxLPBase<R>();
             spx_free(_decompLP);
             _decompLP = &solver;
             _isRealLPLoaded = true;
@@ -1047,7 +946,7 @@ namespace soplex
           {
             _decompLP = 0;
             spx_alloc(_decompLP);
-            _decompLP = new (_decompLP) SPxLPReal(solver);
+            _decompLP = new (_decompLP) SPxLPBase<R>(solver);
           }
       }
 
@@ -1058,15 +957,15 @@ namespace soplex
     // apply problem simplification
     if( _simplifier != 0 )
       {
-        result = _simplifier->simplify(solver, realParam(SoPlexBase<Real>::EPSILON_ZERO), realParam(SoPlexBase<Real>::FEASTOL),
-                                       realParam(SoPlexBase<Real>::OPTTOL));
-        solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<Real>::OBJ_OFFSET));
+        result = _simplifier->simplify(solver, realParam(SoPlexBase<R>::EPSILON_ZERO), realParam(SoPlexBase<R>::FEASTOL),
+                                       realParam(SoPlexBase<R>::OPTTOL));
+        solver.changeObjOffset(_simplifier->getObjoffset() + realParam(SoPlexBase<R>::OBJ_OFFSET));
       }
 
     _statistics->preprocessingTime->stop();
 
     // run the simplex method if problem has not been solved by the simplifier
-    if( result == SPxSimplifier<Real>::OKAY )
+    if( result == SPxSimplifier<R>::OKAY )
       {
         if( _scaler != nullptr )
           _scaler->scale(solver);
@@ -1081,12 +980,12 @@ namespace soplex
         catch( const SPxException& E )
           {
             MSG_ERROR( std::cerr << "Caught exception <" << E.what() << "> while solving real LP.\n" );
-            _status = SPxSolverBase<Real>::ERROR;
+            _status = SPxSolverBase<R>::ERROR;
           }
         catch( ... )
           {
             MSG_ERROR( std::cerr << "Caught unknown exception while solving real LP.\n" );
-            _status = SPxSolverBase<Real>::ERROR;
+            _status = SPxSolverBase<R>::ERROR;
           }
         _statistics->simplexTime->stop();
 
@@ -1130,28 +1029,28 @@ namespace soplex
 
 
   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-  template <>
-  void SoPlexBase<Real>::_decompResolveWithoutPreprocessing(SPxSolverBase<Real>& solver, SLUFactor& sluFactor, typename SPxSimplifier<Real>::Result result)
+  template <class R>
+  void SoPlexBase<R>::_decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result)
   {
     assert(_simplifier != 0 || _scaler != nullptr);
-    assert(result == SPxSimplifier<Real>::VANISHED
-           || (result == SPxSimplifier<Real>::OKAY
-               && (solver.status() == SPxSolverBase<Real>::OPTIMAL
-                   || solver.status() == SPxSolverBase<Real>::ABORT_DECOMP
-                   || solver.status() == SPxSolverBase<Real>::ABORT_EXDECOMP )));
+    assert(result == SPxSimplifier<R>::VANISHED
+           || (result == SPxSimplifier<R>::OKAY
+               && (solver.status() == SPxSolverBase<R>::OPTIMAL
+                   || solver.status() == SPxSolverBase<R>::ABORT_DECOMP
+                   || solver.status() == SPxSolverBase<R>::ABORT_EXDECOMP )));
 
     // if simplifier is active and LP is solved in presolving or to optimality, then we unsimplify to get the basis
     if( _simplifier != 0 )
       {
         assert(!_simplifier->isUnsimplified());
 
-        bool vanished = result == SPxSimplifier<Real>::VANISHED;
+        bool vanished = result == SPxSimplifier<R>::VANISHED;
 
         // get solution vectors for transformed problem
-        DVectorReal primal(vanished ? 0 : solver.nCols());
-        DVectorReal slacks(vanished ? 0 : solver.nRows());
-        DVectorReal dual(vanished ? 0 : solver.nRows());
-        DVectorReal redCost(vanished ? 0 : solver.nCols());
+        DVectorBase<R> primal(vanished ? 0 : solver.nCols());
+        DVectorBase<R> slacks(vanished ? 0 : solver.nRows());
+        DVectorBase<R> dual(vanished ? 0 : solver.nRows());
+        DVectorBase<R> redCost(vanished ? 0 : solver.nCols());
 
         assert(!_isRealLPLoaded);
         _basisStatusRows.reSize(_decompLP->nRows());
@@ -1161,7 +1060,7 @@ namespace soplex
 
         if( !vanished )
           {
-            assert(solver.status() == SPxSolverBase<Real>::OPTIMAL || solver.status() == SPxSolverBase<Real>::ABORT_DECOMP || solver.status() == SPxSolverBase<Real>::ABORT_EXDECOMP);
+            assert(solver.status() == SPxSolverBase<R>::OPTIMAL || solver.status() == SPxSolverBase<R>::ABORT_DECOMP || solver.status() == SPxSolverBase<R>::ABORT_EXDECOMP);
 
             solver.getPrimalSol(primal);
             solver.getSlacks(slacks);
@@ -1183,7 +1082,7 @@ namespace soplex
 
         try
           {
-            _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), solver.status() == SPxSolverBase<Real>::OPTIMAL);
+            _simplifier->unsimplify(primal, dual, slacks, redCost, _basisStatusRows.get_ptr(), _basisStatusCols.get_ptr(), solver.status() == SPxSolverBase<R>::OPTIMAL);
             _simplifier->getBasis(_basisStatusRows.get_ptr(), _basisStatusCols.get_ptr());
             _hasBasis = true;
           }
@@ -1194,7 +1093,7 @@ namespace soplex
         catch( ... )
           {
             MSG_ERROR( spxout << "Caught unknown exception during unsimplification. Resolving without simplifier and scaler.\n" );
-            _status = SPxSolverBase<Real>::ERROR;
+            _status = SPxSolverBase<R>::ERROR;
           }
       }
     // if the original problem is not in the solver because of scaling, we also need to store the basis
@@ -1216,21 +1115,21 @@ namespace soplex
 
 
   /// updates the reduced problem with additional rows using the solution to the complementary problem
-  template <>
-  void SoPlexBase<Real>::_updateDecompReducedProblem(Real objValue, DVector dualVector, DVector redcostVector,
-                                                 DVector compPrimalVector, DVector compDualVector)
+  template <class R>
+  void SoPlexBase<R>::_updateDecompReducedProblem(R objValue, DVectorBase<R> dualVector, DVectorBase<R> redcostVector,
+                                                 DVectorBase<R> compPrimalVector, DVectorBase<R> compDualVector)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
-    Real maxDualRatio = infinity;
+    R maxDualRatio = infinity;
 
-    bool usecompdual = boolParam(SoPlexBase<Real>::USECOMPDUAL);
+    bool usecompdual = boolParam(SoPlexBase<R>::USECOMPDUAL);
 
     for( int i = 0; i < _nPrimalRows; i++ )
       {
-        Real reducedProbDual = 0;
-        Real compProbPrimal = 0;
-        Real dualRatio = 0;
+        R reducedProbDual = 0;
+        R compProbPrimal = 0;
+        R dualRatio = 0;
         int rownumber = _realLP->number(SPxRowId(_decompPrimalRowIDs[i]));
         if( _decompReducedProbRows[rownumber] && _solver.isBasic(_decompReducedProbRowIDs[rownumber]) )
           {
@@ -1262,9 +1161,9 @@ namespace soplex
 
 
             // updating the ratio
-            SoPlexBase<Real>::DualSign varSign = getExpectedDualVariableSign(solverRowNum);
-            if( varSign == SoPlexBase<Real>::IS_FREE || (varSign == SoPlexBase<Real>::IS_POS && LE(compProbPrimal, (Real)0, feastol)) ||
-                (varSign == SoPlexBase<Real>::IS_NEG && GE(compProbPrimal, (Real)0, feastol)) )
+            SoPlexBase<R>::DualSign varSign = getExpectedDualVariableSign(solverRowNum);
+            if( varSign == SoPlexBase<R>::IS_FREE || (varSign == SoPlexBase<R>::IS_POS && LE(compProbPrimal, (R)0, feastol)) ||
+                (varSign == SoPlexBase<R>::IS_NEG && GE(compProbPrimal, (R)0, feastol)) )
               {
                 dualRatio = infinity;
               }
@@ -1290,12 +1189,12 @@ namespace soplex
     if( maxDualRatio > 1.0 )
       maxDualRatio = 1.0;
 
-    DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
+    DVectorBase<R> compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
 
     // Retrieving the reduced costs for each original problem row.
     _compSolver.getRedCostSol(compProbRedcost);
 
-    LPRowSet updaterows;
+    LPRowSetBase<R> updaterows;
 
 
     // Identifying the violated rows
@@ -1311,10 +1210,10 @@ namespace soplex
     //ratioTest = false;
     for( int i = 0; i < _nPrimalRows; i++ )
       {
-        LPRowReal origlprow;
-        DSVectorBase<Real> rowtoaddVec(_realLP->nCols());
-        Real compProbPrimal = 0;
-        Real compRowRedcost = 0;
+        LPRowBase<R> origlprow;
+        DSVectorBase<R> rowtoaddVec(_realLP->nCols());
+        R compProbPrimal = 0;
+        R compRowRedcost = 0;
         int rownumber = _realLP->number(SPxRowId(_decompPrimalRowIDs[i]));
         if( !_decompReducedProbRows[_realLP->number(SPxRowId(_decompPrimalRowIDs[i]))] )
           {
@@ -1343,12 +1242,12 @@ namespace soplex
                 compRowRedcost += compProbRedcost[compRowNumber];
               }
 
-            SoPlexBase<Real>::DualSign varSign = getOrigProbDualVariableSign(rownumber);
+            SoPlexBase<R>::DualSign varSign = getOrigProbDualVariableSign(rownumber);
 
             // add row to the reduced problem if the computed dual is of the correct sign for a feasible dual solution
-            if( ratioTest && ((varSign == SoPlexBase<Real>::IS_FREE && !isZero(compProbPrimal, feastol)) ||
-                              (varSign == SoPlexBase<Real>::IS_POS && GT(compProbPrimal*maxDualRatio, (Real) 0, feastol)) ||
-                              (varSign == SoPlexBase<Real>::IS_NEG && LT(compProbPrimal*maxDualRatio, (Real) 0, feastol))) )
+            if( ratioTest && ((varSign == SoPlexBase<R>::IS_FREE && !isZero(compProbPrimal, feastol)) ||
+                              (varSign == SoPlexBase<R>::IS_POS && GT(compProbPrimal*maxDualRatio, (R) 0, feastol)) ||
+                              (varSign == SoPlexBase<R>::IS_NEG && LT(compProbPrimal*maxDualRatio, (R) 0, feastol))) )
               {
                 //this set of statements are required to add rows to the reduced problem. This will add a row for every
                 //violated constraint. I only want to add a row for the most violated constraint. That is why the row
@@ -1378,7 +1277,7 @@ namespace soplex
       }
 
     int sorted = 0;
-    int sortsize = MINIMUM(intParam(SoPlexBase<Real>::DECOMP_MAXADDEDROWS), nviolatedrows);
+    int sortsize = MINIMUM(intParam(SoPlexBase<R>::DECOMP_MAXADDEDROWS), nviolatedrows);
 
     // only sorting if the sort size is less than the number of violated rows.
     if( sortsize > 0 && sortsize < nviolatedrows )
@@ -1412,19 +1311,19 @@ namespace soplex
   /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
   // TODO: Allow for the case that no rows are added. This should terminate the algorithm.
   // TODO: Check to make sure that only rows added to the problem do not currently exist in the reduced problem.
-  template <>
-  void SoPlexBase<Real>::_updateDecompReducedProblemViol(bool allrows)
+  template <class R>
+  void SoPlexBase<R>::_updateDecompReducedProblemViol(bool allrows)
   {
 #ifdef NO_TOL
-    Real feastol = 0.0;
+    R feastol = 0.0;
 #else
 #ifdef USE_FEASTOL
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 #else
-    Real feastol = realParam(SoPlexBase<Real>::EPSILON_ZERO);
+    R feastol = realParam(SoPlexBase<R>::EPSILON_ZERO);
 #endif
 #endif
-    LPRowSet updaterows;
+    LPRowSetBase<R> updaterows;
 
     int* newrowidx = 0;
     int nnewrowidx = 0;
@@ -1432,14 +1331,14 @@ namespace soplex
 
     int rowNumber;
     int bestrow = -1;
-    Real bestrownorm = infinity;
-    Real percenttoadd = 1;
+    R bestrownorm = infinity;
+    R percenttoadd = 1;
 
-    int nrowstoadd = MINIMUM(intParam(SoPlexBase<Real>::DECOMP_MAXADDEDROWS), _nDecompViolRows);
+    int nrowstoadd = MINIMUM(intParam(SoPlexBase<R>::DECOMP_MAXADDEDROWS), _nDecompViolRows);
     if( allrows )
       nrowstoadd = _nDecompViolRows;   // adding all violated rows
 
-    SSVector y(_solver.nCols());
+    SSVectorBase<R>  y(_solver.nCols());
     y.unSetup();
 
     // identifying the rows not included in the reduced problem that are violated by the current solution.
@@ -1449,7 +1348,7 @@ namespace soplex
 
         if( !allrows )
           {
-            Real norm = 0;
+            R norm = 0;
 
             // the rhs of this calculation are the rows of the constraint matrix
             // so we are solving y B = A_{i,.}
@@ -1493,7 +1392,7 @@ namespace soplex
 
 
             // adding the violated row
-            if( isZero(norm, feastol) && LT(nnewrowidx/Real(numRows()), percenttoadd) )
+            if( isZero(norm, feastol) && LT(nnewrowidx/R(numRows()), percenttoadd) )
               {
                 updaterows.add(_transformedRows.lhs(rowNumber), _transformedRows.rowVector(rowNumber),
                                _transformedRows.rhs(rowNumber));
@@ -1562,16 +1461,16 @@ namespace soplex
   /// builds the update rows with those violated in the complmentary problem
   // A row is violated in the constraint matrix Ax <= b, if b - A_{i}x < 0
   // To aid the computation, all violations are translated to <= constraints
-  template <>
-  void SoPlexBase<Real>::_findViolatedRows(Real compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows)
+  template <class R>
+  void SoPlexBase<R>::_findViolatedRows(R compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
-    DVector compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
-    DVector compProbPrimal(_compSolver.nCols());    // the primal vector of the complementary problem
-    DVector compProbActivity(_compSolver.nRows());  // the activity vector of the complementary problem
-    Real compProbSlackVal = 0;
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
+    DVectorBase<R> compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
+    DVectorBase<R> compProbPrimal(_compSolver.nCols());    // the primal vector of the complementary problem
+    DVectorBase<R> compProbActivity(_compSolver.nRows());  // the activity vector of the complementary problem
+    R compProbSlackVal = 0;
 
-    if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
+    if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
       {
         // Retrieving the slacks for each row.
         _compSolver.getRedCostSol(compProbRedcost);
@@ -1588,17 +1487,17 @@ namespace soplex
     // scanning all rows of the complementary problem for violations.
     for( int i = 0; i < _nPrimalRows; i++ )
       {
-        LPRowReal origlprow;
-        DSVectorBase<Real> rowtoaddVec(_realLP->nCols());
-        Real compProbViol = 0;
-        Real compSlackCoeff = 0;
+        LPRowBase<R> origlprow;
+        DSVectorBase<R> rowtoaddVec(_realLP->nCols());
+        R compProbViol = 0;
+        R compSlackCoeff = 0;
         int rownumber = _realLP->number(SPxRowId(_decompPrimalRowIDs[i]));
         int comprownum = _compSolver.number(SPxRowId(_decompPrimalRowIDs[i]));
 
         if( !_decompReducedProbRows[rownumber] )
           {
             // retreiving the violation of the complementary problem primal constraints
-            if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
+            if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
               {
                 compSlackCoeff = getCompSlackVarCoeff(i);
                 compProbViol = compProbRedcost[_compSolver.number(SPxColId(_decompDualColIDs[i]))]; // this is b - Ax
@@ -1608,7 +1507,7 @@ namespace soplex
               }
             else
               {
-                Real viol = _compSolver.rhs(comprownum) - (compProbActivity[comprownum] + compProbSlackVal);
+                R viol = _compSolver.rhs(comprownum) - (compProbActivity[comprownum] + compProbSlackVal);
                 if( viol < 0.0 )
                   compProbViol = viol;
 
@@ -1622,12 +1521,12 @@ namespace soplex
             // If one inequality of the range violates the bounds, then we will add the row.
 
             // the translation of the complementary primal problem to the dual some rows resulted in two columns.
-            if( boolParam(SoPlexBase<Real>::USECOMPDUAL) && i < _nPrimalRows - 1 &&
+            if( boolParam(SoPlexBase<R>::USECOMPDUAL) && i < _nPrimalRows - 1 &&
                 _realLP->number(SPxRowId(_decompPrimalRowIDs[i])) == _realLP->number(SPxRowId(_decompPrimalRowIDs[i + 1])) )
               {
                 i++;
                 compSlackCoeff = getCompSlackVarCoeff(i);
-                Real tempViol = compProbRedcost[_compSolver.number(SPxColId(_decompDualColIDs[i]))]; // this is b - Ax
+                R tempViol = compProbRedcost[_compSolver.number(SPxColId(_decompDualColIDs[i]))]; // this is b - Ax
                 tempViol += compObjValue*compSlackCoeff;
                 tempViol *= compSlackCoeff;
 
@@ -1639,7 +1538,7 @@ namespace soplex
 
 
             // checking the violation of the row.
-            if( LT(compProbViol, (Real) 0, feastol) )
+            if( LT(compProbViol, (R) 0, feastol) )
               {
                 if( !_decompReducedProbRows[rownumber] )
                   {
@@ -1659,19 +1558,19 @@ namespace soplex
   /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
   // This function assumes that the basis is in the row form.
   // @todo extend this to the case when the basis is in the column form.
-  template <>
-  void SoPlexBase<Real>::_getZeroDualMultiplierIndices(Vector feasVector, int* nonposind, int* colsforremoval,
+  template <class R>
+  void SoPlexBase<R>::_getZeroDualMultiplierIndices(VectorBase<R> feasVector, int* nonposind, int* colsforremoval,
                                                    int* nnonposind, bool& stop)
   {
-    assert(_solver.rep() == SPxSolverBase<Real>::ROW);
+    assert(_solver.rep() == SPxSolverBase<R>::ROW);
 
 #ifdef NO_TOL
-    Real feastol = 0.0;
+    R feastol = 0.0;
 #else
 #ifdef USE_FEASTOL
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 #else
-    Real feastol = realParam(SoPlexBase<Real>::EPSILON_ZERO);
+    R feastol = realParam(SoPlexBase<R>::EPSILON_ZERO);
 #endif
 #endif
 
@@ -1728,7 +1627,7 @@ namespace soplex
           }
       }
 
-    stop = decompTerminate(realParam(SoPlexBase<Real>::TIMELIMIT)*TIMELIMIT_FRAC);
+    stop = decompTerminate(realParam(SoPlexBase<R>::TIMELIMIT)*TIMELIMIT_FRAC);
   }
 
 
@@ -1736,22 +1635,22 @@ namespace soplex
   /// retrieves the compatible columns from the constraint matrix
   // This function also updates the constraint matrix of the reduced problem. It is efficient to perform this in the
   // following function because the required linear algebra has been performed.
-  template <>
-  void SoPlexBase<Real>::_getCompatibleColumns(Vector feasVector, int* nonposind, int* compatind, int* rowsforremoval,
+  template <class R>
+  void SoPlexBase<R>::_getCompatibleColumns(VectorBase<R> feasVector, int* nonposind, int* compatind, int* rowsforremoval,
                                            int* colsforremoval, int nnonposind, int* ncompatind, bool formRedProb, bool& stop)
   {
 #ifdef NO_TOL
-    Real feastol = 0.0;
+    R feastol = 0.0;
 #else
 #ifdef USE_FEASTOL
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 #else
-    Real feastol = realParam(SoPlexBase<Real>::EPSILON_ZERO);
+    R feastol = realParam(SoPlexBase<R>::EPSILON_ZERO);
 #endif
 #endif
 
     bool compatible;
-    SSVector y(_solver.nCols());
+    SSVectorBase<R>  y(_solver.nCols());
     y.unSetup();
 
     *ncompatind  = 0;
@@ -1826,8 +1725,8 @@ namespace soplex
         assert(!activerows[i] || compatible);
 
         // changing the matrix coefficients
-        DSVector newRowVector;
-        LPRowReal rowtoupdate;
+        DSVectorBase<R> newRowVector;
+        LPRowBase<R> rowtoupdate;
 
         if( y.isSetup() )
           {
@@ -1882,7 +1781,7 @@ namespace soplex
           }
 
         // determine whether the reduced problem setup should be terminated
-        stop = decompTerminate(realParam(SoPlexBase<Real>::TIMELIMIT)*TIMELIMIT_FRAC);
+        stop = decompTerminate(realParam(SoPlexBase<R>::TIMELIMIT)*TIMELIMIT_FRAC);
 
         if( stop )
           break;
@@ -1897,20 +1796,20 @@ namespace soplex
 
 
   /// computes the reduced problem objective coefficients
-  template <>
-  void SoPlexBase<Real>::_computeReducedProbObjCoeff(bool& stop)
+  template <class R>
+  void SoPlexBase<R>::_computeReducedProbObjCoeff(bool& stop)
   {
 #ifdef NO_TOL
-    Real feastol = 0.0;
+    R feastol = 0.0;
 #else
 #ifdef USE_FEASTOL
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 #else
-    Real feastol = realParam(SoPlexBase<Real>::EPSILON_ZERO);
+    R feastol = realParam(SoPlexBase<R>::EPSILON_ZERO);
 #endif
 #endif
 
-    SSVector y(numCols());
+    SSVectorBase<R>  y(numCols());
     y.unSetup();
 
     // the rhs of this calculation is the original objective coefficient vector
@@ -1956,7 +1855,7 @@ namespace soplex
 #endif
 
     // determine whether the reduced problem setup should be terminated
-    stop = decompTerminate(realParam(SoPlexBase<Real>::TIMELIMIT)*TIMELIMIT_FRAC);
+    stop = decompTerminate(realParam(SoPlexBase<R>::TIMELIMIT)*TIMELIMIT_FRAC);
   }
 
 
@@ -1964,22 +1863,22 @@ namespace soplex
   /// computes the compatible bound constraints and adds them to the reduced problem
   // NOTE: No columns are getting removed from the reduced problem. Only the bound constraints are being removed.
   // So in the reduced problem, all variables are free unless the bound constraints are selected as compatible.
-  template <>
-  void SoPlexBase<Real>::_getCompatibleBoundCons(LPRowSet& boundcons, int* compatboundcons, int* nonposind,
+  template <class R>
+  void SoPlexBase<R>::_getCompatibleBoundCons(LPRowSetBase<R>& boundcons, int* compatboundcons, int* nonposind,
                                              int* ncompatboundcons, int nnonposind, bool& stop)
   {
 #ifdef NO_TOL
-    Real feastol = 0.0;
+    R feastol = 0.0;
 #else
 #ifdef USE_FEASTOL
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 #else
-    Real feastol = realParam(SoPlexBase<Real>::EPSILON_ZERO);
+    R feastol = realParam(SoPlexBase<R>::EPSILON_ZERO);
 #endif
 #endif
 
     bool compatible;
-    SSVector y(numCols());
+    SSVectorBase<R>  y(numCols());
     y.unSetup();
 
     _decompReducedProbColRowIDs.reSize(numCols());
@@ -2020,8 +1919,8 @@ namespace soplex
           }
 
         // changing the matrix coefficients
-        DSVector newRowVector;
-        LPRowReal rowtoupdate;
+        DSVectorBase<R> newRowVector;
+        LPRowBase<R> rowtoupdate;
 
 #ifndef NO_TRANSFORM
         if( y.isSetup() )
@@ -2054,8 +1953,8 @@ namespace soplex
         // Otherwise the bound is removed and the variables are free.
         if( compatible )
           {
-            Real lhs = -infinity;
-            Real rhs = infinity;
+            R lhs = -infinity;
+            R rhs = infinity;
             if( GT(_solver.lower(i), -infinity) )
               lhs = _solver.lower(i);
 
@@ -2074,7 +1973,7 @@ namespace soplex
           }
 
         // determine whether the reduced problem setup should be terminated
-        stop = decompTerminate(realParam(SoPlexBase<Real>::TIMELIMIT)*TIMELIMIT_FRAC);
+        stop = decompTerminate(realParam(SoPlexBase<R>::TIMELIMIT)*TIMELIMIT_FRAC);
 
         if( stop )
           break;
@@ -2085,8 +1984,8 @@ namespace soplex
 
 
   /// computes the rows to remove from the complementary problem
-  template <>
-  void SoPlexBase<Real>::_getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval,
+  template <class R>
+  void SoPlexBase<R>::_getRowsForRemovalComplementaryProblem(int* nonposind, int* bind, int* rowsforremoval,
                                                             int* nrowsforremoval, int nnonposind)
   {
     *nrowsforremoval = 0;
@@ -2106,16 +2005,16 @@ namespace soplex
   /// removing rows from the complementary problem.
   // the rows that are removed from decompCompLP are the rows from the reduced problem that have a non-positive dual
   // multiplier in the optimal solution.
-  template <>
-  void SoPlexBase<Real>::_deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows)
+  template <class R>
+  void SoPlexBase<R>::_deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows)
   {
-    DSVector slackColCoeff;
+    DSVectorBase<R> slackColCoeff;
 
     // setting the objective coefficients of the original variables to zero
-    DVector newObjCoeff(numCols());
+    DVectorBase<R> newObjCoeff(numCols());
     for( int i = 0; i < numCols(); i++ )
       {
-        _compSolver.changeBounds(_realLP->cId(i), Real(-infinity), Real(infinity));
+        _compSolver.changeBounds(_realLP->cId(i), R(-infinity), R(infinity));
         newObjCoeff[i] = 0;
       }
 
@@ -2123,7 +2022,7 @@ namespace soplex
 
     // adding the slack column to the complementary problem
     SPxColId* addedcolid = 0;
-    if( boolParam(SoPlexBase<Real>::USECOMPDUAL) )
+    if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
       {
         spx_alloc(addedcolid, 1);
         LPColSetReal compSlackCol;
@@ -2133,15 +2032,15 @@ namespace soplex
       }
     else
       {
-        LPRowSet addrangedrows;    // the row set of ranged and equality rows that must be added to the complementary problem.
+        LPRowSetBase<R> addrangedrows;    // the row set of ranged and equality rows that must be added to the complementary problem.
         naddedrows = 0;
         // finding all of the ranged and equality rows and creating two <= constraints.
         for( int i = 0; i < numRows(); i++ )
           {
-            if( _realLP->rowType(i) == LPRowBase<Real>::RANGE || _realLP->rowType(i) == LPRowBase<Real>::EQUAL )
+            if( _realLP->rowType(i) == LPRowBase<R>::RANGE || _realLP->rowType(i) == LPRowBase<R>::EQUAL )
               {
                 assert(GT(_compSolver.lhs(i), -infinity) && LT(_compSolver.rhs(i), infinity));
-                assert(_compSolver.rowType(i) == LPRowBase<Real>::RANGE || _compSolver.rowType(i) == LPRowBase<Real>::EQUAL);
+                assert(_compSolver.rowType(i) == LPRowBase<R>::RANGE || _compSolver.rowType(i) == LPRowBase<R>::EQUAL);
 
                 _compSolver.changeLhs(i, -infinity);
                 addrangedrows.add(_realLP->lhs(i), _realLP->rowVector(i), infinity);
@@ -2179,17 +2078,17 @@ namespace soplex
   /// update the dual complementary problem with additional columns and rows
   // Given the solution to the updated reduced problem, the complementary problem will be updated with modifications to
   // the constraints and the removal of variables
-  template <>
-  void SoPlexBase<Real>::_updateDecompComplementaryDualProblem(bool origObj)
+  template <class R>
+  void SoPlexBase<R>::_updateDecompComplementaryDualProblem(bool origObj)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
     int prevNumCols = _compSolver.nCols(); // number of columns in the previous formulation of the complementary prob
     int prevNumRows = _compSolver.nRows();
     int prevPrimalRowIds = _nPrimalRows;
     int prevDualColIds = _nDualCols;
 
-    LPColSetBase<Real> addElimCols(_nElimPrimalRows);  // columns previously eliminated from the
+    LPColSetBase<R> addElimCols(_nElimPrimalRows);  // columns previously eliminated from the
     // complementary problem that must be added
     int numElimColsAdded = 0;
     int currnumrows = prevNumRows;
@@ -2204,19 +2103,19 @@ namespace soplex
         assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
 
         // checking for the basic rows in the reduced problem
-        if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER ||
-            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER ||
-            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED ||
-            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_FREE ||
-            (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+        if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER ||
+            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
+            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED ||
+            _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE ||
+            (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
              LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) ||
-            (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
              LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
           {
-            LPRowReal origlprow;
-            DSVectorBase<Real> coltoaddVec(_realLP->nCols());
+            LPRowBase<R> origlprow;
+            DSVectorBase<R> coltoaddVec(_realLP->nCols());
 
-            LPRowSet additionalrows;
+            LPRowSetBase<R> additionalrows;
             int nnewrows = 0;
 
             _realLP->getRow(rowNumber, origlprow);
@@ -2259,10 +2158,10 @@ namespace soplex
 
 
 
-            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER ||
-                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED ||
-                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_FREE ||
-                (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER ||
+                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED ||
+                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE ||
+                (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                  LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
               {
                 assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), infinity));
@@ -2283,8 +2182,8 @@ namespace soplex
 
                 numElimColsAdded++;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER ||
-                     (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
+                     (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                       LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
               {
                 // this assert should stay, but there is an issue with the status and the dual vector
@@ -2320,7 +2219,7 @@ namespace soplex
     // looping over all rows from the original problem that were originally contained in the complementary problem.
     // The basic rows will be set as free variables, the non-basic rows will be eliminated from the complementary
     // problem.
-    DSVector slackRowCoeff(_compSolver.nCols());
+    DSVectorBase<R> slackRowCoeff(_compSolver.nCols());
 
     int* colsforremoval = 0;
     int ncolsforremoval = 0;
@@ -2349,7 +2248,7 @@ namespace soplex
                 assert(_decompPrimalRowIDs[i].idx == _decompPrimalRowIDs[i+1].idx);
 
 #ifdef KEEP_ALL_ROWS_IN_COMP_PROB // 22.06.2015
-                if( _realLP->rowType(_decompPrimalRowIDs[i]) == LPRowBase<Real>::RANGE )
+                if( _realLP->rowType(_decompPrimalRowIDs[i]) == LPRowBase<R>::RANGE )
                   {
                     _compSolver.changeObj(_decompDualColIDs[i + 1], 0.0);
                     _compSolver.changeBounds(_decompDualColIDs[i + 1], 0.0, 0.0);
@@ -2371,25 +2270,25 @@ namespace soplex
 
             int solverRowNum = _solver.number(_decompReducedProbRowIDs[rowNumber]);
             assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
-            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER ||
-                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED ||
-                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_FREE ||
-                (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER ||
+                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED ||
+                _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE ||
+                (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                  LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
               {
                 //assert(GT(dualVector[solverRowNum], 0.0));
                 _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
                 _compSolver.changeBounds(_decompDualColIDs[i], -infinity, infinity);
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER ||
-                     (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
+                     (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                       LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
               {
                 //assert(LT(dualVector[solverRowNum], 0.0));
                 _compSolver.changeObj(_decompDualColIDs[i], _realLP->lhs(SPxRowId(_decompPrimalRowIDs[i])));
                 _compSolver.changeBounds(_decompDualColIDs[i], -infinity, infinity);
               }
-            else //if ( _solver.basis().desc().rowStatus(solverRowNum) != SPxBasisBase<Real>::Desc::D_FREE )
+            else //if ( _solver.basis().desc().rowStatus(solverRowNum) != SPxBasisBase<R>::Desc::D_FREE )
               {
                 //assert(isZero(dualVector[solverRowNum], 0.0));
 
@@ -2397,7 +2296,7 @@ namespace soplex
 #ifdef KEEP_ALL_ROWS_IN_COMP_PROB
                 switch( _realLP->rowType(_decompPrimalRowIDs[i]) )
                   {
-                  case LPRowBase<Real>::RANGE:
+                  case LPRowBase<R>::RANGE:
                     assert(_realLP->number(SPxColId(_decompPrimalRowIDs[i])) ==
                            _realLP->number(SPxColId(_decompPrimalRowIDs[i+1])));
                     assert(_compSolver.obj(_compSolver.number(SPxColId(_decompDualColIDs[i]))) !=
@@ -2410,11 +2309,11 @@ namespace soplex
 
                     i++;
                     break;
-                  case LPRowBase<Real>::GREATER_EQUAL:
+                  case LPRowBase<R>::GREATER_EQUAL:
                     _compSolver.changeObj(_decompDualColIDs[i], _realLP->lhs(_decompPrimalRowIDs[i]));
                     _compSolver.changeBounds(_decompDualColIDs[i], -infinity, 0.0);
                     break;
-                  case LPRowBase<Real>::LESS_EQUAL:
+                  case LPRowBase<R>::LESS_EQUAL:
                     _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(_decompPrimalRowIDs[i]));
                     _compSolver.changeBounds(_decompDualColIDs[i], 0.0, infinity);
                     break;
@@ -2449,7 +2348,7 @@ namespace soplex
           {
             switch( _realLP->rowType(_decompPrimalRowIDs[i]) )
               {
-              case LPRowBase<Real>::RANGE:
+              case LPRowBase<R>::RANGE:
                 assert(_realLP->number(SPxColId(_decompPrimalRowIDs[i])) ==
                        _realLP->number(SPxColId(_decompPrimalRowIDs[i+1])));
                 assert(_compSolver.obj(_compSolver.number(SPxColId(_decompDualColIDs[i]))) !=
@@ -2469,7 +2368,7 @@ namespace soplex
 
                 i++;
                 break;
-              case LPRowBase<Real>::EQUAL:
+              case LPRowBase<R>::EQUAL:
                 assert(_realLP->number(SPxColId(_decompPrimalRowIDs[i])) ==
                        _realLP->number(SPxColId(_decompPrimalRowIDs[i+1])));
 
@@ -2478,10 +2377,10 @@ namespace soplex
 
                 i++;
                 break;
-              case LPRowBase<Real>::GREATER_EQUAL:
+              case LPRowBase<R>::GREATER_EQUAL:
                 slackRowCoeff.add(_compSolver.number(SPxColId(_decompDualColIDs[i])), -SLACKCOEFF);
                 break;
-              case LPRowBase<Real>::LESS_EQUAL:
+              case LPRowBase<R>::LESS_EQUAL:
                 slackRowCoeff.add(_compSolver.number(SPxColId(_decompDualColIDs[i])), SLACKCOEFF);
                 break;
               default:
@@ -2521,8 +2420,8 @@ namespace soplex
       }
 
     // updating the slack column in the complementary problem
-    Real lhs = 1.0;
-    Real rhs = 1.0;
+    R lhs = 1.0;
+    R rhs = 1.0;
 
     // it is possible that all rows are included in the reduced problem. In this case, the slack row will be empty. To
     // avoid infeasibility, the lhs and rhs are set to 0.
@@ -2531,7 +2430,7 @@ namespace soplex
         lhs = 0.0;
         rhs = 0.0;
       }
-    LPRowBase<Real> compSlackRow(lhs, slackRowCoeff, rhs);
+    LPRowBase<R> compSlackRow(lhs, slackRowCoeff, rhs);
     _compSolver.changeRow(_compSlackDualRowId, compSlackRow);
 
 
@@ -2562,17 +2461,17 @@ namespace soplex
   /// update the primal complementary problem with additional columns and rows
   // Given the solution to the updated reduced problem, the complementary problem will be updated with modifications to
   // the constraints and the removal of variables
-  template <>
-  void SoPlexBase<Real>::_updateDecompComplementaryPrimalProblem(bool origObj)
+  template <class R>
+  void SoPlexBase<R>::_updateDecompComplementaryPrimalProblem(bool origObj)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
     int prevNumRows = _compSolver.nRows();
     int prevPrimalRowIds = _nPrimalRows;
 
     assert(_nPrimalRows == _nCompPrimalRows);
 
-    LPRowSetBase<Real> addElimRows(_nElimPrimalRows);  // rows previously eliminated from the
+    LPRowSetBase<R> addElimRows(_nElimPrimalRows);  // rows previously eliminated from the
     // complementary problem that must be added
     int numElimRowsAdded = 0;
     // looping over all rows from the original LP that were eliminated during the formation of the complementary
@@ -2586,16 +2485,16 @@ namespace soplex
         assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
 
         // checking the rows that are basic in the reduced problem that should be added to the complementary problem
-        if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER
-            || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER
-            || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED
-            || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_FREE
-            || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+        if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER
+            || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER
+            || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED
+            || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE
+            || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                 EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol))
-            || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                 EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
           {
-            LPRowReal origlprow;
+            LPRowBase<R> origlprow;
             _realLP->getRow(rowNumber, origlprow);
 
             // NOTE: 11.02.2016 I am assuming that all columns from the original problem are contained in the
@@ -2603,10 +2502,10 @@ namespace soplex
             // _deleteAndUpdateRowsComplementaryProblem function, I am feeling confident that all columns remain.
 
 
-            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER
-                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED
-                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_FREE
-                || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER
+                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED
+                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE
+                || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                     EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
               {
                 assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), infinity));
@@ -2629,8 +2528,8 @@ namespace soplex
 
                 numElimRowsAdded++;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER
-                     || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER
+                     || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                          EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
               {
                 assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), -infinity));
@@ -2673,7 +2572,7 @@ namespace soplex
     // looping over all rows from the original problem that were originally contained in the complementary problem.
     // The basic rows will be set as equalities, the non-basic rows will be eliminated from the complementary
     // problem.
-    DSVector slackColCoeff(_compSolver.nRows());
+    DSVectorBase<R> slackColCoeff(_compSolver.nRows());
 
     int* rowsforremoval = 0;
     int nrowsforremoval = 0;
@@ -2694,25 +2593,25 @@ namespace soplex
 
             int solverRowNum = _solver.number(_decompReducedProbRowIDs[rowNumber]);
             assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
-            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER
-                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED
-                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_FREE
-                || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER
+                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED
+                || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE
+                || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                     EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
               {
                 _compSolver.changeLhs(_decompCompPrimalRowIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
                 // need to also update the RHS because a ranged row could have previously been fixed to LOWER
                 _compSolver.changeRhs(_decompCompPrimalRowIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER
-                     || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER
+                     || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                          EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
               {
                 _compSolver.changeRhs(_decompCompPrimalRowIDs[i], _realLP->lhs(SPxRowId(_decompPrimalRowIDs[i])));
                 // need to also update the LHS because a ranged row could have previously been fixed to UPPER
                 _compSolver.changeLhs(_decompCompPrimalRowIDs[i], _realLP->lhs(SPxRowId(_decompPrimalRowIDs[i])));
               }
-            else //if ( _solver.basis().desc().rowStatus(solverRowNum) != SPxBasisBase<Real>::Desc::D_FREE )
+            else //if ( _solver.basis().desc().rowStatus(solverRowNum) != SPxBasisBase<R>::Desc::D_FREE )
               {
                 rowsforremoval[nrowsforremoval] = _compSolver.number(SPxRowId(_decompCompPrimalRowIDs[i]));
                 nrowsforremoval++;
@@ -2735,16 +2634,16 @@ namespace soplex
           {
             switch( _compSolver.rowType(_decompCompPrimalRowIDs[i]) )
               {
-              case LPRowBase<Real>::RANGE:
+              case LPRowBase<R>::RANGE:
                 assert(false);
                 break;
-              case LPRowBase<Real>::EQUAL:
+              case LPRowBase<R>::EQUAL:
                 assert(false);
                 break;
-              case LPRowBase<Real>::LESS_EQUAL:
+              case LPRowBase<R>::LESS_EQUAL:
                 slackColCoeff.add(_compSolver.number(SPxRowId(_decompCompPrimalRowIDs[i])), -SLACKCOEFF);
                 break;
-              case LPRowBase<Real>::GREATER_EQUAL:
+              case LPRowBase<R>::GREATER_EQUAL:
                 slackColCoeff.add(_compSolver.number(SPxRowId(_decompCompPrimalRowIDs[i])), SLACKCOEFF);
                 break;
               default:
@@ -2775,7 +2674,7 @@ namespace soplex
       }
 
     // updating the slack column in the complementary problem
-    LPColBase<Real> compSlackCol(-1, slackColCoeff, infinity, 0.0);
+    LPColBase<R> compSlackCol(-1, slackColCoeff, infinity, 0.0);
     _compSolver.changeCol(_compSlackColId, compSlackCol);
 
 
@@ -2805,10 +2704,10 @@ namespace soplex
   // this function is called if the complementary problem is solved with a non-negative objective value. This implies
   // that the rows currently included in the reduced problem are sufficient to identify the optimal solution to the
   // original problem.
-  template <>
-  void SoPlexBase<Real>::_checkOriginalProblemOptimality(Vector primalVector, bool printViol)
+  template <class R>
+  void SoPlexBase<R>::_checkOriginalProblemOptimality(VectorBase<R> primalVector, bool printViol)
   {
-    SSVector x(_solver.nCols());
+    SSVectorBase<R>  x(_solver.nCols());
     x.unSetup();
 
     // multiplying the solution vector of the reduced problem with the transformed basis to identify the original
@@ -2823,8 +2722,8 @@ namespace soplex
 
 
     // checking the objective function values of the reduced problem and the original problem.
-    Real redObjVal = 0;
-    Real objectiveVal = 0;
+    R redObjVal = 0;
+    R objectiveVal = 0;
     for( int i = 0; i < _solver.nCols(); i++ )
       {
         redObjVal += _solver.maxObj(i)*primalVector[i];
@@ -2843,8 +2742,8 @@ namespace soplex
     _solReal._primal.reDim(_solver.nCols());
     _solReal._primal = x;
 
-    Real maxviol = 0;
-    Real sumviol = 0;
+    R maxviol = 0;
+    R sumviol = 0;
 
     // checking the bound violations
     if( getDecompBoundViolation(maxviol, sumviol) )
@@ -2875,8 +2774,8 @@ namespace soplex
 
 
   /// updating the slack column coefficients to adjust for equality constraints
-  template <>
-  void SoPlexBase<Real>::_updateComplementaryDualSlackColCoeff()
+  template <class R>
+  void SoPlexBase<R>::_updateComplementaryDualSlackColCoeff()
   {
     // the slack column for the equality constraints is not handled correctly in the dual conversion. Hence, it is
     // necessary to change the equality coefficients of the dual row related to the slack column.
@@ -2885,13 +2784,13 @@ namespace soplex
         int rowNumber = _realLP->number(SPxRowId(_decompPrimalRowIDs[i]));
         if( !_decompReducedProbRows[rowNumber] )
           {
-            if( _realLP->rowType(_decompPrimalRowIDs[i]) == LPRowBase<Real>::EQUAL )
+            if( _realLP->rowType(_decompPrimalRowIDs[i]) == LPRowBase<R>::EQUAL )
               {
                 assert(_realLP->lhs(_decompPrimalRowIDs[i]) == _realLP->rhs(_decompPrimalRowIDs[i]));
                 _compSolver.changeLower(_decompDualColIDs[i], 0.0);   // setting the lower bound of the dual column to zero.
 
-                LPColBase<Real> addEqualityCol(-_realLP->rhs(_decompPrimalRowIDs[i]),
-                                               Real(-1.0)*_compSolver.colVector(_decompDualColIDs[i]), infinity, 0.0);    // adding a new column to the dual
+                LPColBase<R> addEqualityCol(-_realLP->rhs(_decompPrimalRowIDs[i]),
+                                               R(-1.0)*_compSolver.colVector(_decompDualColIDs[i]), infinity, 0.0);    // adding a new column to the dual
 
                 SPxColId newDualCol;
                 _compSolver.addCol(newDualCol, addEqualityCol);
@@ -2913,10 +2812,10 @@ namespace soplex
 
 
   /// identify the dual columns related to the fixed variables
-  template <>
-  void SoPlexBase<Real>::_identifyComplementaryDualFixedPrimalVars(int* currFixedVars)
+  template <class R>
+  void SoPlexBase<R>::_identifyComplementaryDualFixedPrimalVars(int* currFixedVars)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
     int numFixedVar = 0;
     for( int i = 0; i < _realLP->nCols(); i++ )
@@ -2928,10 +2827,10 @@ namespace soplex
         int rowNumber = _solver.number(_decompReducedProbColRowIDs[i]);
         if( _decompReducedProbColRowIDs[i].isValid() )
           {
-            if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_UPPER ||
-                _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_LOWER ||
-                _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_FIXED ||
-                _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::D_FREE )
+            if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_UPPER ||
+                _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
+                _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_FIXED ||
+                _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_FREE )
               {
                 // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
                 currFixedVars[i] = getOrigVarFixedDirection(i);
@@ -2941,10 +2840,10 @@ namespace soplex
             else
               {
                 // the dual flags do not imply anything about the primal status of the rows.
-                if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+                if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                     EQ(_solver.rhs(rowNumber) - _solver.pVec()[rowNumber], 0.0, feastol) )
                   currFixedVars[i] = 1;
-                else if(  _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+                else if(  _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                           EQ(_solver.pVec()[rowNumber] - _solver.lhs(rowNumber), 0.0, feastol) )
                   currFixedVars[i] = -1;
               }
@@ -2958,8 +2857,8 @@ namespace soplex
 
 
   /// removing the dual columns related to the fixed variables
-  template <>
-  void SoPlexBase<Real>::_removeComplementaryDualFixedPrimalVars(int* currFixedVars)
+  template <class R>
+  void SoPlexBase<R>::_removeComplementaryDualFixedPrimalVars(int* currFixedVars)
   {
     SPxColId tempId;
     int ncolsforremoval = 0;
@@ -3022,12 +2921,12 @@ namespace soplex
 
 
   /// updating the dual columns related to the fixed primal variables.
-  template <>
-  void SoPlexBase<Real>::_updateComplementaryDualFixedPrimalVars(int* currFixedVars)
+  template <class R>
+  void SoPlexBase<R>::_updateComplementaryDualFixedPrimalVars(int* currFixedVars)
   {
-    DSVectorBase<Real> col(1);
-    LPColSetBase<Real> boundConsCols;
-    LPColSetBase<Real> fixedVarsDualCols(_nPrimalCols);
+    DSVectorBase<R> col(1);
+    LPColSetBase<R> boundConsCols;
+    LPColSetBase<R> fixedVarsDualCols(_nPrimalCols);
     int numFixedVars = 0;
     // the solution to the reduced problem results in a number of variables at their bounds. If such variables exist
     // it is necessary to include a dual column to the complementary problem related to a variable fixing. This is
@@ -3054,7 +2953,7 @@ namespace soplex
 
                 assert(_realLP->lower(i) == _solver.lhs(_decompReducedProbColRowIDs[i]));
                 assert(_realLP->upper(i) == _solver.rhs(_decompReducedProbColRowIDs[i]));
-                Real colObjCoeff = 0;
+                R colObjCoeff = 0;
                 if( currFixedVars[i] == -1 )
                   colObjCoeff = _solver.lhs(_decompReducedProbColRowIDs[i]);
                 else
@@ -3077,7 +2976,7 @@ namespace soplex
                   {
                     if( !isRedProbCol )
                       col.add(_compSolver.number(SPxRowId(_compSlackDualRowId)), -SLACKCOEFF);
-                    boundConsCols.add(_realLP->lower(i), Real(-infinity), col, 0.0);
+                    boundConsCols.add(_realLP->lower(i), R(-infinity), col, 0.0);
 
                     if( !isRedProbCol )
                       col.remove(col.size() - 1);
@@ -3090,7 +2989,7 @@ namespace soplex
                   {
                     if( !isRedProbCol )
                       col.add(_compSolver.number(SPxRowId(_compSlackDualRowId)), SLACKCOEFF);
-                    boundConsCols.add(_realLP->upper(i), 0.0, col, Real(infinity));
+                    boundConsCols.add(_realLP->upper(i), 0.0, col, R(infinity));
 
                     if( !isRedProbCol )
                       col.remove(col.size() - 1);
@@ -3161,8 +3060,8 @@ namespace soplex
 
 
   /// identify the dual columns related to the fixed variables
-  template <>
-  void SoPlexBase<Real>::_identifyComplementaryPrimalFixedPrimalVars(int* currFixedVars)
+  template <class R>
+  void SoPlexBase<R>::_identifyComplementaryPrimalFixedPrimalVars(int* currFixedVars)
   {
     int numFixedVar = 0;
     for( int i = 0; i < _realLP->nCols(); i++ )
@@ -3173,9 +3072,9 @@ namespace soplex
 
         int rowNumber = _solver.number(_decompReducedProbColRowIDs[i]);
         if( _decompReducedProbColRowIDs[i].isValid() &&
-            (_solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_UPPER ||
-             _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_LOWER ||
-             _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_FIXED) )
+            (_solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_UPPER ||
+             _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
+             _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_FIXED) )
           {
             // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
             currFixedVars[i] = getOrigVarFixedDirection(i);
@@ -3191,8 +3090,8 @@ namespace soplex
 
 
   /// updating the dual columns related to the fixed primal variables.
-  template <>
-  void SoPlexBase<Real>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars)
+  template <class R>
+  void SoPlexBase<R>::_updateComplementaryPrimalFixedPrimalVars(int* currFixedVars)
   {
     int numFixedVars = 0;
     // NOTE: this loop only goes over the primal columns that are included in the complementary problem, i.e. the
@@ -3230,8 +3129,8 @@ namespace soplex
 
 
   /// updating the complementary dual problem with the original objective function
-  template <>
-  void SoPlexBase<Real>::_setComplementaryDualOriginalObjective()
+  template <class R>
+  void SoPlexBase<R>::_setComplementaryDualOriginalObjective()
   {
     for( int i = 0; i < _realLP->nCols(); i++ )
       {
@@ -3301,8 +3200,8 @@ namespace soplex
 
 
   /// updating the complementary primal problem with the original objective function
-  template <>
-  void SoPlexBase<Real>::_setComplementaryPrimalOriginalObjective()
+  template <class R>
+  void SoPlexBase<R>::_setComplementaryPrimalOriginalObjective()
   {
     // the comp solver has not removed any columns. Only the slack variables have been added.
     assert(_realLP->nCols() == _compSolver.nCols() - 1);
@@ -3320,22 +3219,22 @@ namespace soplex
 
 
   /// determining which bound the primal variables will be fixed to.
-  template <>
-  int SoPlexBase<Real>::getOrigVarFixedDirection(int colNum)
+  template <class R>
+  int SoPlexBase<R>::getOrigVarFixedDirection(int colNum)
   {
     if( !_decompReducedProbColRowIDs[colNum].isValid() )
       return 0;
 
     int rowNumber = _solver.number(_decompReducedProbColRowIDs[colNum]);
     // setting the value of the _fixedOrigVars array to indicate which variables are at their bounds.
-    if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_UPPER ||
-        _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_FIXED ||
-        _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::D_FREE )
+    if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_UPPER ||
+        _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_FIXED ||
+        _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_FREE )
       {
         assert(_solver.rhs(rowNumber) < infinity);
         return 1;
       }
-    else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_LOWER )
+    else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_LOWER )
       {
         assert(_solver.lhs(rowNumber) > -infinity);
         return -1;
@@ -3350,19 +3249,19 @@ namespace soplex
   /// checks result of the solving process and solves again without preprocessing if necessary
   // @todo need to evaluate the solution to ensure that it is solved to optimality and then we are able to perform the
   // next steps in the algorithm.
-  template <>
-  void SoPlexBase<Real>::_evaluateSolutionDecomp(SPxSolverBase<Real>& solver, SLUFactor& sluFactor, typename SPxSimplifier<Real>::Result result)
+  template <class R>
+  void SoPlexBase<R>::_evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result)
   {
-    typename SPxSolverBase<Real>::Status solverStat = SPxSolverBase<Real>::UNKNOWN;
-    if( result == SPxSimplifier<Real>::INFEASIBLE )
-      solverStat = SPxSolverBase<Real>::INFEASIBLE;
-    else if( result == SPxSimplifier<Real>::DUAL_INFEASIBLE )
-      solverStat = SPxSolverBase<Real>::INForUNBD;
-    else if( result == SPxSimplifier<Real>::UNBOUNDED )
-      solverStat = SPxSolverBase<Real>::UNBOUNDED;
-    else if( result == SPxSimplifier<Real>::VANISHED )
-      solverStat = SPxSolverBase<Real>::OPTIMAL;
-    else if( result == SPxSimplifier<Real>::OKAY )
+    typename SPxSolverBase<R>::Status solverStat = SPxSolverBase<R>::UNKNOWN;
+    if( result == SPxSimplifier<R>::INFEASIBLE )
+      solverStat = SPxSolverBase<R>::INFEASIBLE;
+    else if( result == SPxSimplifier<R>::DUAL_INFEASIBLE )
+      solverStat = SPxSolverBase<R>::INForUNBD;
+    else if( result == SPxSimplifier<R>::UNBOUNDED )
+      solverStat = SPxSolverBase<R>::UNBOUNDED;
+    else if( result == SPxSimplifier<R>::VANISHED )
+      solverStat = SPxSolverBase<R>::OPTIMAL;
+    else if( result == SPxSimplifier<R>::OKAY )
       solverStat = solver.status();
 
     // updating the status of SoPlexBase if the problem solved is the reduced problem.
@@ -3372,10 +3271,10 @@ namespace soplex
     // process result
     switch( solverStat )
       {
-      case SPxSolverBase<Real>::OPTIMAL:
+      case SPxSolverBase<R>::OPTIMAL:
         if( !_isRealLPLoaded )
           {
-            solver.changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
+            solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
             _decompResolveWithoutPreprocessing(solver, sluFactor, result);
             // Need to solve the complementary problem
             return;
@@ -3385,40 +3284,40 @@ namespace soplex
 
         break;
 
-      case SPxSolverBase<Real>::UNBOUNDED:
-      case SPxSolverBase<Real>::INFEASIBLE:
-      case SPxSolverBase<Real>::INForUNBD:
+      case SPxSolverBase<R>::UNBOUNDED:
+      case SPxSolverBase<R>::INFEASIBLE:
+      case SPxSolverBase<R>::INForUNBD:
         // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
         if( !_isRealLPLoaded )
           {
-            solver.changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
+            solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
             _decompSimplifyAndSolve(solver, sluFactor, false, false);
             return;
           }
         else
-          _hasBasis = (solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
+          _hasBasis = (solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
         break;
 
-      case SPxSolverBase<Real>::ABORT_DECOMP:
-      case SPxSolverBase<Real>::ABORT_EXDECOMP:
+      case SPxSolverBase<R>::ABORT_DECOMP:
+      case SPxSolverBase<R>::ABORT_EXDECOMP:
         // in the initialisation of the decomposition simplex, we want to keep the current basis.
         if( !_isRealLPLoaded )
           {
-            solver.changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
+            solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
             _decompResolveWithoutPreprocessing(solver, sluFactor, result);
             //_decompSimplifyAndSolve(solver, sluFactor, false, false);
             return;
           }
         else
-          _hasBasis = (solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
+          _hasBasis = (solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM);
         break;
 
-      case SPxSolverBase<Real>::SINGULAR:
-      case SPxSolverBase<Real>::ABORT_CYCLING:
+      case SPxSolverBase<R>::SINGULAR:
+      case SPxSolverBase<R>::ABORT_CYCLING:
         // in case of infeasibility or unboundedness, we currently can not unsimplify, but have to solve the original LP again
         if( !_isRealLPLoaded )
           {
-            solver.changeObjOffset(realParam(SoPlexBase<Real>::OBJ_OFFSET));
+            solver.changeObjOffset(realParam(SoPlexBase<R>::OBJ_OFFSET));
             _decompSimplifyAndSolve(solver, sluFactor, false, false);
             return;
           }
@@ -3426,14 +3325,14 @@ namespace soplex
 
 
         // else fallthrough
-      case SPxSolverBase<Real>::ABORT_TIME:
-      case SPxSolverBase<Real>::ABORT_ITER:
-      case SPxSolverBase<Real>::ABORT_VALUE:
-      case SPxSolverBase<Real>::REGULAR:
-      case SPxSolverBase<Real>::RUNNING:
+      case SPxSolverBase<R>::ABORT_TIME:
+      case SPxSolverBase<R>::ABORT_ITER:
+      case SPxSolverBase<R>::ABORT_VALUE:
+      case SPxSolverBase<R>::REGULAR:
+      case SPxSolverBase<R>::RUNNING:
         // store regular basis if there is no simplifier and the original problem is not in the solver because of
         // scaling; non-optimal bases should currently not be unsimplified
-        if( _simplifier == 0 && solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM )
+        if( _simplifier == 0 && solver.basis().status() > SPxBasisBase<R>::NO_PROBLEM )
           {
             _basisStatusRows.reSize(_decompLP->nRows());
             _basisStatusCols.reSize(_decompLP->nCols());
@@ -3457,30 +3356,30 @@ namespace soplex
 
 
   /// checks the dual feasibility of the current basis
-  template <>
-  bool SoPlexBase<Real>::checkBasisDualFeasibility(Vector feasVec)
+  template <class R>
+  bool SoPlexBase<R>::checkBasisDualFeasibility(VectorBase<R> feasVec)
   {
-    assert(_solver.rep() == SPxSolverBase<Real>::ROW);
-    assert(_solver.spxSense() == SPxLPBase<Real>::MAXIMIZE);
+    assert(_solver.rep() == SPxSolverBase<R>::ROW);
+    assert(_solver.spxSense() == SPxLPBase<R>::MAXIMIZE);
 
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
     // iterating through all elements in the basis to determine whether the dual feasibility is satisfied.
     for( int i = 0; i < _solver.nCols(); i++ )
       {
         if( _solver.basis().baseId(i).isSPxRowId() ) // find the row id's for rows in the basis
           {
             int rownumber = _solver.number(_solver.basis().baseId(i));
-            if( _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_ON_UPPER &&
-                _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_FIXED )
+            if( _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<R>::Desc::P_ON_UPPER &&
+                _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<R>::Desc::P_FIXED )
               {
-                if( GT(feasVec[i], (Real) 0, feastol) )
+                if( GT(feasVec[i], (R) 0, feastol) )
                   return false;
               }
 
-            if( _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_ON_LOWER &&
-                _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<Real>::Desc::P_FIXED )
+            if( _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<R>::Desc::P_ON_LOWER &&
+                _solver.basis().desc().rowStatus(rownumber) != SPxBasisBase<R>::Desc::P_FIXED )
               {
-                if( LT(feasVec[i], (Real) 0, feastol) )
+                if( LT(feasVec[i], (R) 0, feastol) )
                   return false;
               }
 
@@ -3488,17 +3387,17 @@ namespace soplex
         else if( _solver.basis().baseId(i).isSPxColId() )  // get the column id's for the columns in the basis
           {
             int colnumber = _solver.number(_solver.basis().baseId(i));
-            if( _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_ON_UPPER &&
-                _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_FIXED )
+            if( _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<R>::Desc::P_ON_UPPER &&
+                _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<R>::Desc::P_FIXED )
               {
-                if( GT(feasVec[i], (Real) 0, feastol) )
+                if( GT(feasVec[i], (R) 0, feastol) )
                   return false;
               }
 
-            if( _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_ON_LOWER &&
-                _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<Real>::Desc::P_FIXED )
+            if( _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<R>::Desc::P_ON_LOWER &&
+                _solver.basis().desc().colStatus(colnumber) != SPxBasisBase<R>::Desc::P_FIXED )
               {
-                if( LT(feasVec[i], (Real) 0, feastol) )
+                if( LT(feasVec[i], (R) 0, feastol) )
                   return false;
               }
           }
@@ -3510,40 +3409,40 @@ namespace soplex
 
 
   /// returns the expected sign of the dual variables for the reduced problem
-  template <>
-  typename SoPlexBase<Real>::DualSign SoPlexBase<Real>::getExpectedDualVariableSign(int rowNumber)
+  template <class R>
+  typename SoPlexBase<R>::DualSign SoPlexBase<R>::getExpectedDualVariableSign(int rowNumber)
   {
     if( _solver.isRowBasic(rowNumber) )
       {
-        if( _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<Real>::Desc::P_ON_UPPER &&
-            _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<Real>::Desc::P_FIXED )
-          return SoPlexBase<Real>::IS_NEG;
+        if( _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<R>::Desc::P_ON_UPPER &&
+            _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<R>::Desc::P_FIXED )
+          return SoPlexBase<R>::IS_NEG;
 
-        if( _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<Real>::Desc::P_ON_LOWER &&
-            _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<Real>::Desc::P_FIXED )
-          return SoPlexBase<Real>::IS_POS;
+        if( _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<R>::Desc::P_ON_LOWER &&
+            _solver.basis().desc().rowStatus(rowNumber) != SPxBasisBase<R>::Desc::P_FIXED )
+          return SoPlexBase<R>::IS_POS;
       }
 
-    return SoPlexBase<Real>::IS_FREE;
+    return SoPlexBase<R>::IS_FREE;
   }
 
 
 
   /// returns the expected sign of the dual variables for the original problem
-  template <>
-  typename SoPlexBase<Real>::DualSign SoPlexBase<Real>::getOrigProbDualVariableSign(int rowNumber)
+  template <class R>
+  typename SoPlexBase<R>::DualSign SoPlexBase<R>::getOrigProbDualVariableSign(int rowNumber)
   {
-    if( _realLP->rowType(rowNumber) == LPRowBase<Real>::LESS_EQUAL )
+    if( _realLP->rowType(rowNumber) == LPRowBase<R>::LESS_EQUAL )
       return IS_POS;
 
-    if( _realLP->rowType(rowNumber) == LPRowBase<Real>::GREATER_EQUAL )
+    if( _realLP->rowType(rowNumber) == LPRowBase<R>::GREATER_EQUAL )
       return IS_NEG;
 
-    if( _realLP->rowType(rowNumber) == LPRowBase<Real>::EQUAL )
+    if( _realLP->rowType(rowNumber) == LPRowBase<R>::EQUAL )
       return IS_FREE;
 
     // this final statement needs to be checked.
-    if( _realLP->rowType(rowNumber) == LPRowBase<Real>::RANGE )
+    if( _realLP->rowType(rowNumber) == LPRowBase<R>::RANGE )
       return IS_FREE;
 
     return IS_FREE;
@@ -3551,14 +3450,14 @@ namespace soplex
 
 
   /// print display line of flying table
-  template <>
-  void SoPlexBase<Real>::printDecompDisplayLine(SPxSolverBase<Real>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead)
+  template <class R>
+  void SoPlexBase<R>::printDecompDisplayLine(SPxSolverBase<R>& solver, const SPxOut::Verbosity origVerb, bool force, bool forceHead)
   {
     // setting the verbosity level
     const SPxOut::Verbosity currVerb = spxout.getVerbosity();
     spxout.setVerbosity( origVerb );
 
-    int displayFreq = intParam(SoPlexBase<Real>::DECOMP_DISPLAYFREQ);
+    int displayFreq = intParam(SoPlexBase<R>::DECOMP_DISPLAYFREQ);
 
     MSG_INFO1( spxout,
                if( forceHead || (_decompDisplayLine % (displayFreq*30) == 0) )
@@ -3567,8 +3466,8 @@ namespace soplex
                  }
                if( force || (_decompDisplayLine % displayFreq == 0) )
                  {
-                   Real currentTime = _statistics->solvingTime->time();
-                   (solver.type() == SPxSolverBase<Real>::LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
+                   R currentTime = _statistics->solvingTime->time();
+                   (solver.type() == SPxSolverBase<R>::LEAVE) ? spxout << "  L  |" : spxout << "  E  |";
                    spxout << std::fixed << std::setw(7) << std::setprecision(1) << currentTime << " |";
                    spxout << std::scientific << std::setprecision(2);
                    spxout << std::setw(8) << _statistics->iterations << " | ";
@@ -3594,8 +3493,8 @@ namespace soplex
 
 
   /// stores the problem statistics of the original problem
-  template <>
-  void SoPlexBase<Real>::getOriginalProblemStatistics()
+  template <class R>
+  void SoPlexBase<R>::getOriginalProblemStatistics()
   {
     numProbRows = _realLP->nRows();
     numProbCols = _realLP->nCols();
@@ -3673,8 +3572,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SoPlexBase<Real>::printOriginalProblemStatistics(std::ostream& os)
+  template <class R>
+  void SoPlexBase<R>::printOriginalProblemStatistics(std::ostream& os)
   {
     os << "  Columns           : " << numProbCols << "\n"
        << "              boxed : " << origCountBoxed << "\n"
@@ -3688,25 +3587,25 @@ namespace soplex
        << "                rhs : " << origCountRhs << "\n"
        << "               free : " << origCountFreeRow << "\n"
        << "  Nonzeros          : " << nNonzeros << "\n"
-       << "         per column : " << Real(nNonzeros) / Real(numProbCols) << "\n"
-       << "            per row : " << Real(nNonzeros) / Real(numProbRows) << "\n"
-       << "           sparsity : " << Real(nNonzeros) / Real(numProbCols) / Real(numProbRows) << "\n"
-       << "    min. abs. value : " << Real(minAbsNonzero) << "\n"
-       << "    max. abs. value : " << Real(maxAbsNonzero) << "\n";
+       << "         per column : " << R(nNonzeros) / R(numProbCols) << "\n"
+       << "            per row : " << R(nNonzeros) / R(numProbRows) << "\n"
+       << "           sparsity : " << R(nNonzeros) / R(numProbCols) / R(numProbRows) << "\n"
+       << "    min. abs. value : " << R(minAbsNonzero) << "\n"
+       << "    max. abs. value : " << R(maxAbsNonzero) << "\n";
   }
 
 
 
   /// gets the coefficient of the slack variable in the primal complementary problem
-  template <>
-  Real SoPlexBase<Real>::getCompSlackVarCoeff(int primalRowNum)
+  template <class R>
+  R SoPlexBase<R>::getCompSlackVarCoeff(int primalRowNum)
   {
     int indDir = 1;
     switch( _realLP->rowType(_decompPrimalRowIDs[primalRowNum]) )
       {
         // NOTE: check the sign of the slackCoeff for the Range constraints. This will depend on the method of
         // dual conversion.
-      case LPRowBase<Real>::RANGE:
+      case LPRowBase<R>::RANGE:
         assert((primalRowNum < _nPrimalRows - 1 && _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum])) ==
                 _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum+1]))) ||
                (primalRowNum > 0 && _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum-1])) ==
@@ -3725,16 +3624,16 @@ namespace soplex
 
         break;
 
-      case LPRowBase<Real>::GREATER_EQUAL:
+      case LPRowBase<R>::GREATER_EQUAL:
         return -SLACKCOEFF;
         break;
-      case LPRowBase<Real>::EQUAL:
+      case LPRowBase<R>::EQUAL:
         assert((primalRowNum < _nPrimalRows - 1 && _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum])) ==
                 _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum+1]))) ||
                (primalRowNum > 0 && _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum-1])) ==
                 _realLP->number(SPxColId(_decompPrimalRowIDs[primalRowNum]))));
         // FALLTHROUGH
-      case LPRowBase<Real>::LESS_EQUAL:
+      case LPRowBase<R>::LESS_EQUAL:
         return SLACKCOEFF;
         break;
       default:
@@ -3745,12 +3644,12 @@ namespace soplex
 
 
   /// gets violation of bounds; returns true on success
-  template <>
-  bool SoPlexBase<Real>::getDecompBoundViolation(Real& maxviol, Real& sumviol)
+  template <class R>
+  bool SoPlexBase<R>::getDecompBoundViolation(R& maxviol, R& sumviol)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
-    VectorReal& primal = _solReal._primal;
+    VectorBase<R>& primal = _solReal._primal;
     assert(primal.dim() == _realLP->nCols());
 
     _nDecompViolBounds = 0;
@@ -3763,9 +3662,9 @@ namespace soplex
 
     for( int i = _realLP->nCols() - 1; i >= 0; i-- )
       {
-        Real currviol = 0.0;
+        R currviol = 0.0;
 
-        Real viol = _realLP->lower(i) - primal[i];
+        R viol = _realLP->lower(i) - primal[i];
 
         isViol = false;
         isMaxViol = false;
@@ -3824,15 +3723,15 @@ namespace soplex
 
 
   /// gets violation of constraints; returns true on success
-  template <>
-  bool SoPlexBase<Real>::getDecompRowViolation(Real& maxviol, Real& sumviol)
+  template <class R>
+  bool SoPlexBase<R>::getDecompRowViolation(R& maxviol, R& sumviol)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
-    VectorReal& primal = _solReal._primal;
+    VectorBase<R>& primal = _solReal._primal;
     assert(primal.dim() == _realLP->nCols());
 
-    DVectorReal activity(_realLP->nRows());
+    DVectorBase<R> activity(_realLP->nRows());
     _realLP->computePrimalActivity(primal, activity);
 
     _nDecompViolRows = 0;
@@ -3845,12 +3744,12 @@ namespace soplex
 
     for( int i = _realLP->nRows() - 1; i >= 0; i-- )
       {
-        Real currviol = 0.0;
+        R currviol = 0.0;
 
         isViol = false;
         isMaxViol = false;
 
-        Real viol = _realLP->lhs(i) - activity[i];
+        R viol = _realLP->lhs(i) - activity[i];
         if( viol > 0.0 )
           {
             sumviol += viol;
@@ -3905,21 +3804,21 @@ namespace soplex
 
 
   /// function call to terminate the decomposition simplex
-  template <>
-  bool SoPlexBase<Real>::decompTerminate(Real timeLimit)
+  template <class R>
+  bool SoPlexBase<R>::decompTerminate(R timeLimit)
   {
-    Real maxTime = timeLimit;
+    R maxTime = timeLimit;
 
     // check if a time limit is actually set
     if( maxTime < 0 || maxTime >= infinity )
       return false;
 
-    Real currentTime = _statistics->solvingTime->time();
+    R currentTime = _statistics->solvingTime->time();
     if ( currentTime >= maxTime )
       {
         MSG_INFO2( spxout, spxout << " --- timelimit (" << _solver.getMaxTime()
                    << ") reached" << std::endl; )
-          _solver.setSolverStatus(SPxSolverBase<Real>::ABORT_TIME);
+          _solver.setSolverStatus(SPxSolverBase<R>::ABORT_TIME);
         return true;
       }
 
@@ -3929,11 +3828,11 @@ namespace soplex
 
 
   /// function to retrieve the original problem row basis status from the reduced and complementary problems
-  template <>
-  void SoPlexBase<Real>::getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
-                                                      DataArray< typename SPxSolverBase<Real>::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows)
+  template <class R>
+  void SoPlexBase<R>::getOriginalProblemBasisRowStatus(DataArray< int >& degenerateRowNums,
+                                                      DataArray< typename SPxSolverBase<R>::VarStatus >& degenerateRowStatus, int& nDegenerateRows, int& nNonBasicRows)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
     int basicRow = 0;
 
     // looping over all rows not contained in the complementary problem
@@ -3943,29 +3842,29 @@ namespace soplex
 
         int solverRowNum = _solver.number(_decompReducedProbRowIDs[rowNumber]);
         assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
-        if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER ) /*||
-                                                                                                   (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+        if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER ) /*||
+                                                                                                   (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                                                                                                    EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )*/
           {
-            _basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_UPPER;
+            _basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_UPPER;
           }
-        else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER ) /*||
-                                                                                                        (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+        else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ) /*||
+                                                                                                        (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                                                                                                         EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )*/
           {
-            _basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_LOWER;
+            _basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_LOWER;
           }
-        else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED )
+        else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED )
           {
-            _basisStatusRows[rowNumber] = SPxSolverBase<Real>::FIXED;
+            _basisStatusRows[rowNumber] = SPxSolverBase<R>::FIXED;
           }
-        else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FREE )
+        else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FREE )
           {
-            _basisStatusRows[rowNumber] = SPxSolverBase<Real>::ZERO;
+            _basisStatusRows[rowNumber] = SPxSolverBase<R>::ZERO;
           }
         else
           {
-            _basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+            _basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
             basicRow++;
           }
       }
@@ -3978,51 +3877,51 @@ namespace soplex
           {
             int solverRowNum = _solver.number(_decompReducedProbRowIDs[rowNumber]);
             assert(solverRowNum >= 0 && solverRowNum < _solver.nRows());
-            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_UPPER )
+            if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_UPPER )
               {
-                _basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_UPPER;
+                _basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_UPPER;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                      EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol) )
               {
                 // if a row is non basic, but is at its bound then the row number and status is stored
                 degenerateRowNums[nDegenerateRows] = rowNumber;
-                degenerateRowStatus[nDegenerateRows] = SPxSolverBase<Real>::ON_UPPER;
+                degenerateRowStatus[nDegenerateRows] = SPxSolverBase<R>::ON_UPPER;
                 nDegenerateRows++;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_ON_LOWER )
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER )
               {
-                _basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_LOWER;
+                _basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_LOWER;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                      EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol) )
               {
                 // if a row is non basic, but is at its bound then the row number and status is stored
                 degenerateRowNums[nDegenerateRows] = rowNumber;
-                degenerateRowStatus[nDegenerateRows] = SPxSolverBase<Real>::ON_LOWER;
+                degenerateRowStatus[nDegenerateRows] = SPxSolverBase<R>::ON_LOWER;
                 nDegenerateRows++;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FIXED )
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED )
               {
-                _basisStatusRows[rowNumber] = SPxSolverBase<Real>::FIXED;
+                _basisStatusRows[rowNumber] = SPxSolverBase<R>::FIXED;
               }
-            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<Real>::Desc::P_FREE )
+            else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FREE )
               {
-                _basisStatusRows[rowNumber] = SPxSolverBase<Real>::ZERO;
+                _basisStatusRows[rowNumber] = SPxSolverBase<R>::ZERO;
               }
             else
               {
-                _basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+                _basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
                 basicRow++;
               }
           }
         else
           {
-            _basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+            _basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
             basicRow++;
             switch( _realLP->rowType(_decompPrimalRowIDs[i]) )
               {
-              case LPRowBase<Real>::RANGE:
+              case LPRowBase<R>::RANGE:
                 //assert(_realLP->number(SPxColId(_decompPrimalRowIDs[i])) ==
                 //_realLP->number(SPxColId(_decompPrimalRowIDs[i+1])));
                 //assert(_compSolver.obj(_compSolver.number(SPxColId(_decompDualColIDs[i]))) !=
@@ -4034,72 +3933,72 @@ namespace soplex
                 //_compSolver.obj(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))))
                 //{
                 //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                //SPxBasisBase<Real>::Desc::D_ON_LOWER )
+                //SPxBasisBase<R>::Desc::D_ON_LOWER )
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_LOWER;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_LOWER;
                 //}
                 //else if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))) ==
-                //SPxBasisBase<Real>::Desc::D_ON_UPPER )
+                //SPxBasisBase<R>::Desc::D_ON_UPPER )
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_UPPER;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_UPPER;
                 //}
                 //else
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
                 //basicRow++;
                 //}
                 //}
                 //else
                 //{
                 //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                //SPxBasisBase<Real>::Desc::D_ON_UPPER )
+                //SPxBasisBase<R>::Desc::D_ON_UPPER )
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_UPPER;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_UPPER;
                 //}
                 //else if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))) ==
-                //SPxBasisBase<Real>::Desc::D_ON_LOWER )
+                //SPxBasisBase<R>::Desc::D_ON_LOWER )
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_LOWER;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_LOWER;
                 //}
                 //else
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
                 //basicRow++;
                 //}
                 //}
 
                 i++;
                 break;
-              case LPRowBase<Real>::EQUAL:
+              case LPRowBase<R>::EQUAL:
                 //assert(_realLP->number(SPxColId(_decompPrimalRowIDs[i])) ==
                 //_realLP->number(SPxColId(_decompPrimalRowIDs[i+1])));
 
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::FIXED;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::FIXED;
 
                 i++;
                 break;
-              case LPRowBase<Real>::GREATER_EQUAL:
+              case LPRowBase<R>::GREATER_EQUAL:
                 //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                //SPxBasisBase<Real>::Desc::D_ON_LOWER )
+                //SPxBasisBase<R>::Desc::D_ON_LOWER )
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_LOWER;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_LOWER;
                 //}
                 //else
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
                 //basicRow++;
                 //}
 
                 break;
-              case LPRowBase<Real>::LESS_EQUAL:
+              case LPRowBase<R>::LESS_EQUAL:
                 //if( _compSolver.basis().desc().rowStatus(_compSolver.number(SPxColId(_decompDualColIDs[i]))) ==
-                //SPxBasisBase<Real>::Desc::D_ON_UPPER )
+                //SPxBasisBase<R>::Desc::D_ON_UPPER )
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::ON_UPPER;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::ON_UPPER;
                 //}
                 //else
                 //{
-                //_basisStatusRows[rowNumber] = SPxSolverBase<Real>::BASIC;
+                //_basisStatusRows[rowNumber] = SPxSolverBase<R>::BASIC;
                 //basicRow++;
                 //}
 
@@ -4120,10 +4019,10 @@ namespace soplex
   // all columns are currently in the reduced problem, so it is only necessary to retrieve the status from there.
   // However, a transformation of the columns has been made, so it is only possible to retrieve the status from the
   // variable bound constraints.
-  template <>
-  void SoPlexBase<Real>::getOriginalProblemBasisColStatus(int& nNonBasicCols)
+  template <class R>
+  void SoPlexBase<R>::getOriginalProblemBasisColStatus(int& nNonBasicCols)
   {
-    Real feastol = realParam(SoPlexBase<Real>::FEASTOL);
+    R feastol = realParam(SoPlexBase<R>::FEASTOL);
     int basicCol = 0;
     int numZeroDual = 0;
 
@@ -4136,29 +4035,29 @@ namespace soplex
         int rowNumber = _solver.number(_decompReducedProbColRowIDs[i]);
         if( _decompReducedProbColRowIDs[i].isValid() )
           {
-            if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_UPPER ) /*||
-                                                                                                    (_solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::D_ON_LOWER &&
+            if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_UPPER ) /*||
+                                                                                                    (_solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                                                                                                     EQ(_solver.rhs(rowNumber) - _solver.pVec()[rowNumber], 0.0, feastol)) )*/
               {
-                _basisStatusCols[i] = SPxSolverBase<Real>::ON_UPPER;
+                _basisStatusCols[i] = SPxSolverBase<R>::ON_UPPER;
               }
-            else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_ON_LOWER ) /*||
-                                                                                                         (_solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::D_ON_UPPER &&
+            else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_LOWER ) /*||
+                                                                                                         (_solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
                                                                                                          EQ(_solver.pVec()[rowNumber] - _solver.lhs(rowNumber), 0.0, feastol)) )*/
               {
-                _basisStatusCols[i] = SPxSolverBase<Real>::ON_LOWER;
+                _basisStatusCols[i] = SPxSolverBase<R>::ON_LOWER;
               }
-            else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_FIXED )
+            else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_FIXED )
               {
-                _basisStatusCols[i] = SPxSolverBase<Real>::FIXED;
+                _basisStatusCols[i] = SPxSolverBase<R>::FIXED;
               }
-            else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<Real>::Desc::P_FREE )
+            else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_FREE )
               {
-                _basisStatusCols[i] = SPxSolverBase<Real>::ZERO;
+                _basisStatusCols[i] = SPxSolverBase<R>::ZERO;
               }
             else
               {
-                _basisStatusCols[i] = SPxSolverBase<Real>::BASIC;
+                _basisStatusCols[i] = SPxSolverBase<R>::BASIC;
                 basicCol++;
               }
           }
@@ -4176,8 +4075,8 @@ namespace soplex
 
 
   /// function to build a basis for the original problem as given by the solution to the reduced problem
-  template <>
-  void SoPlexBase<Real>::_writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat)
+  template <class R>
+  void SoPlexBase<R>::_writeOriginalProblemBasis(const char* filename, NameSet* rowNames, NameSet* colNames, bool cpxFormat)
   {
     int numrows = _realLP->nRows();
     int numcols = _realLP->nCols();
@@ -4185,7 +4084,7 @@ namespace soplex
     int nNonBasicCols = 0;
     int nDegenerateRows = 0;
     DataArray< int > degenerateRowNums;   // array to store the orig prob row number of degenerate rows
-    DataArray< typename SPxSolverBase<Real>::VarStatus > degenerateRowStatus;  // possible status for the degenerate rows in the orig prob
+    DataArray< typename SPxSolverBase<R>::VarStatus > degenerateRowStatus;  // possible status for the degenerate rows in the orig prob
 
     // setting the basis status rows and columns to size of the original problem
     _basisStatusRows.reSize(numrows);
@@ -4212,7 +4111,7 @@ namespace soplex
             degenRowsSetNonBasic++;
           }
         else
-          _basisStatusRows[degenerateRowNums[i]] = SPxSolverBase<Real>::BASIC;
+          _basisStatusRows[degenerateRowNums[i]] = SPxSolverBase<R>::BASIC;
       }
 
     // writing the basis file for the original problem

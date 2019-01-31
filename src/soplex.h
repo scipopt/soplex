@@ -61,6 +61,8 @@
 #include "soplex/solbase.h"
 #include "soplex/sol.h"
 
+#include "soplex/spxlpbase.h"
+
 // For multiple precision
 #include <boost/multiprecision/mpfr.hpp>
 
@@ -2340,5 +2342,7 @@ private:
 
 // General templated function
 #include "soplex.hpp"
+// @todo should the following be actually here?
 #include "soplex/solverational.hpp"
+#include "soplex/solvedbds.hpp"
 #endif // _SOPLEX_H_
