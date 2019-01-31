@@ -877,7 +877,7 @@ namespace soplex
   }
 
   template <class R>
-  int SPxFastRT<R>::selectLeave(R& val, Real, bool polish)
+  int SPxFastRT<R>::selectLeave(R& val, R, bool polish)
   {
     R maxabs, max, sel;
     int leave = -1;
@@ -1047,8 +1047,8 @@ namespace soplex
                                    bool polish)
 {
     R x, d;
-    Vector* up;
-    Vector* low;
+    VectorBase<R>* up;
+    VectorBase<R>* low;
 
     UpdateVector<R>& pvec = this->thesolver->pVec();
     SSVectorBase<R>& pupd = this->thesolver->pVec().delta();
@@ -1148,8 +1148,8 @@ namespace soplex
    bool polish)
 {
     R x, d;
-    Vector* up;
-    Vector* low;
+    VectorBase<R>* up;
+    VectorBase<R>* low;
 
     UpdateVector<R>& pvec = this->thesolver->pVec();
     SSVectorBase<R>& pupd = this->thesolver->pVec().delta();

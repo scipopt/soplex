@@ -27,7 +27,7 @@
 
 namespace soplex
 {
-  static const Real reject_leave_tol = 1e-10; // = LOWSTAB as defined in spxfastrt.cpp
+  static const Real reject_leave_tol = 1e-10; // = LOWSTAB as defined in spxfastrt.hpp
 
   /*
     Vector |fTest| gives the feasibility test of all basic variables. For its

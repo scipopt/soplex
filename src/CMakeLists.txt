@@ -24,7 +24,6 @@ set(sources
     soplex/spxdefines.cpp
     soplex/spxdesc.cpp
     soplex/spxdevexpr.cpp
-    soplex/spxfastrt.cpp
     soplex/spxfileio.cpp
     soplex/spxgithash.cpp
     soplex/spxhybridpr.cpp

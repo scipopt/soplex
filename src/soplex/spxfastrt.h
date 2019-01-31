@@ -223,7 +223,7 @@ public:
    ///
    virtual void load(SPxSolverBase<R>* solver);
    ///
-   virtual int selectLeave(R& val, Real, bool polish = false);
+   virtual int selectLeave(R& val, R, bool polish = false);
    ///
    virtual SPxId selectEnter(R& val, int, bool polish = false);
    ///
@@ -244,4 +244,7 @@ public:
    //@}
 };
 } // namespace soplex
+
+#include "spxfastrt.hpp"
+
 #endif // _SPXFASTRT_H_

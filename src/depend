@@ -479,7 +479,7 @@ $(LIBOBJDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.h \
  src/soplex/lprow.h src/soplex/lpcol.h src/soplex/spxbasis.h \
  src/soplex/ssvector.h src/soplex/slinsolver.h src/soplex/array.h \
  src/soplex/random.h src/soplex/unitvector.h src/soplex/updatevector.h
-$(LIBOBJDIR)/spxfastrt.o: src/soplex/spxfastrt.cpp src/soplex/spxdefines.h \
+$(LIBOBJDIR)/spxfastrt.o: src/soplex/spxdefines.h \
  src/soplex/spxfastrt.h src/soplex/spxratiotester.h \
  src/soplex/spxsolver.h src/soplex/timer.h src/soplex/timerfactory.h \
  src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \
@@ -1528,7 +1528,7 @@ $(LIBOBJSUBDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.h \
  src/soplex/lprow.h src/soplex/lpcol.h src/soplex/spxbasis.h \
  src/soplex/ssvector.h src/soplex/slinsolver.h src/soplex/array.h \
  src/soplex/random.h src/soplex/unitvector.h src/soplex/updatevector.h
-$(LIBOBJSUBDIR)/spxfastrt.o: src/soplex/spxfastrt.cpp src/soplex/spxdefines.h \
+$(LIBOBJSUBDIR)/spxfastrt.o: src/soplex/spxdefines.h \
  src/soplex/spxfastrt.h src/soplex/spxratiotester.h \
  src/soplex/spxsolver.h src/soplex/timer.h src/soplex/timerfactory.h \
  src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \
