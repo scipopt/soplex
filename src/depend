@@ -129,7 +129,7 @@ $(LIBOBJDIR)/gzstream.o: src/soplex/gzstream.cpp src/soplex/gzstream.h
 $(LIBOBJDIR)/idxset.o: src/soplex/idxset.cpp src/soplex/idxset.h \
  src/soplex/spxdefines.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h
-$(LIBOBJDIR)/leave.o: src/soplex/leave.cpp src/soplex/spxdefines.h \
+$(LIBOBJDIR)/leave.o: src/soplex/spxdefines.h \
  src/soplex/spxpricer.h src/soplex/spxsolver.h src/soplex/timer.h \
  src/soplex/timerfactory.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h src/soplex/notimer.h src/soplex/usertimer.h \
@@ -1137,7 +1137,7 @@ $(LIBOBJSUBDIR)/gzstream.o: src/soplex/gzstream.cpp src/soplex/gzstream.h
 $(LIBOBJSUBDIR)/idxset.o: src/soplex/idxset.cpp src/soplex/idxset.h \
  src/soplex/spxdefines.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h
-$(LIBOBJSUBDIR)/leave.o: src/soplex/leave.cpp src/soplex/spxdefines.h \
+$(LIBOBJSUBDIR)/leave.o: src/soplex/spxdefines.h \
  src/soplex/spxpricer.h src/soplex/spxsolver.h src/soplex/timer.h \
  src/soplex/timerfactory.h src/soplex/spxalloc.h src/soplex/spxout.h \
  src/soplex/exceptions.h src/soplex/notimer.h src/soplex/usertimer.h \

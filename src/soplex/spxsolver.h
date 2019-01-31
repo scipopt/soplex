@@ -293,7 +293,7 @@ namespace soplex
 
     /* Store the index of a leaving variable if only an instable entering variable has been found.
        instableLeave == true iff this instable basis change should be performed.
-       (see spxsolve.hpp and leave.cpp) */
+       (see spxsolve.hpp and leave.hpp) */
     int            instableLeaveNum;
     bool           instableLeave;
     R           instableLeaveVal;
@@ -2345,5 +2345,6 @@ namespace soplex
 #include "spxsolver.hpp"
 #include "changesoplex.hpp"
 #include "spxsolve.hpp"
+#include "leave.hpp"
 
 #endif // _SPXSOLVER_H_

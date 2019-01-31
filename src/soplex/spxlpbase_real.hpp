@@ -2901,6 +2901,6 @@ static void MPSwriteRecord(
   //  Explicit instantiation
   // ---------------------------------------------------------------------------------------------------------------------
 
-  template class SPxLPBase < Real >;
+  // template class SPxLPBase < Real >;
 
 } // namespace soplex

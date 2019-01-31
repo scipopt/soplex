@@ -7,7 +7,6 @@ set(sources
     soplex/enter.cpp
     soplex/gzstream.cpp
     soplex/idxset.cpp
-    soplex/leave.cpp
     soplex/mpsinput.cpp
     soplex/nameset.cpp
     soplex/rational.cpp
