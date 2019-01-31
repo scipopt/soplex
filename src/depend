@@ -679,7 +679,7 @@ $(LIBOBJDIR)/spxshift.o: src/soplex/spxshift.cpp src/soplex/spxdefines.h \
  src/soplex/lprow.h src/soplex/lpcol.h src/soplex/spxbasis.h \
  src/soplex/ssvector.h src/soplex/slinsolver.h src/soplex/array.h \
  src/soplex/random.h src/soplex/unitvector.h src/soplex/updatevector.h
-$(LIBOBJDIR)/spxsolver.o: src/soplex/spxsolver.cpp src/soplex/spxdefines.h \
+$(LIBOBJDIR)/spxsolver.o: src/soplex/spxdefines.h \
  src/soplex.h src/soplex/spxgithash.h src/soplex/spxdefines.h \
  src/soplex/basevectors.h src/soplex/rational.h src/soplex/idlist.h \
  src/soplex/islist.h src/soplex/vectorbase.h src/soplex/dvectorbase.h \
@@ -1707,7 +1707,7 @@ $(LIBOBJSUBDIR)/spxshift.o: src/soplex/spxshift.cpp src/soplex/spxdefines.h \
  src/soplex/lprow.h src/soplex/lpcol.h src/soplex/spxbasis.h \
  src/soplex/ssvector.h src/soplex/slinsolver.h src/soplex/array.h \
  src/soplex/random.h src/soplex/unitvector.h src/soplex/updatevector.h
-$(LIBOBJSUBDIR)/spxsolver.o: src/soplex/spxsolver.cpp src/soplex/spxdefines.h \
+$(LIBOBJSUBDIR)/spxsolver.o: src/soplex/spxdefines.h \
  src/soplex.h src/soplex/spxgithash.h src/soplex/spxdefines.h \
  src/soplex/basevectors.h src/soplex/rational.h src/soplex/idlist.h \
  src/soplex/islist.h src/soplex/vectorbase.h src/soplex/dvectorbase.h \

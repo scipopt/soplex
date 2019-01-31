@@ -668,7 +668,7 @@ namespace soplex
             break;
           case SPxBasisBase<R>::Desc::D_FREE:
             assert( rep() == ROW );
-            assert(rhs(enterIdx) == this->lhs(enterIdx));
+            assert(this->rhs(enterIdx) == this->lhs(enterIdx));
             enterUB = infinity;
             enterLB = -infinity;
             enterVal = 0;
