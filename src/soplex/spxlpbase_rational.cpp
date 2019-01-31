@@ -2111,7 +2111,7 @@ void SPxLPBase<Rational>::writeLPF(
 // Specialization for writing MPS format
 // ---------------------------------------------------------------------------------------------------------------------
 
-
+// A problem here.
 static void MPSwriteRecord(
    std::ostream&  os,
    const char*    indicator,
@@ -2130,7 +2130,7 @@ static void MPSwriteRecord(
    spxSnprintf(buf, sizeof(buf), " %-2.2s %-8.8s", (indicator == 0) ? "" : indicator, (name == 0)      ? "" : name);
    os << buf;
 
-   if( name1 != 0 )
+   if( name1 != nullptr )
    {
       spxSnprintf(buf, sizeof(buf), " %-8.8s ", name1);
       os << buf << value1;

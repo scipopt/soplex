@@ -71,18 +71,32 @@ bool msginconsistent(const char* name, const char* file, int line)
   }
 
 
-  template <>
-  inline bool NE(Rational a, Rational b, Rational eps)
-  {
-    // This function should never be called. The function exist to prevent an
-    // instantiation error.
+  // template <>
+  // inline bool NE(Rational a, Rational b, Rational eps = 0)
+  // {
+  //   // This function should never be called. The function exist to prevent an
+  //   // instantiation error.
 
-    // @todo: maybe there is a better way around this?
+  //   // @todo: maybe there is a better way around this?
 
-    assert(true);
+  //   assert(true);
 
-    return false;
-  }
+  //   return false;
+  // }
+
+  // // @todo get rid of this
+  // template <>
+  // inline bool NE(Rational a, double b, Rational eps = 0)
+  // {
+  //   // This function should never be called. The function exist to prevent an
+  //   // instantiation error.
+
+  //   // @todo: maybe there is a better way around this?
+
+  //   assert(true);
+
+  //   return false;
+  // }
 
 
 
