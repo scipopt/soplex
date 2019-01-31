@@ -2041,7 +2041,7 @@ private:
    //@}
 
 
-   //**@name Private solving methods implemented in solverational.cpp */
+   //**@name Private solving methods implemented in solverational.hpp */
    //@{
 
    /// solves current problem with iterative refinement and recovery mechanism

@@ -67,7 +67,7 @@ private:
     */
    struct Breakpoint
    {
-      Real               val;                /**< breakpoint value (step length) */
+      R               val;                /**< breakpoint value (step length) */
       int                idx;                /**< index of corresponding row/column */
       BreakpointSource   src;                /**< origin of breakpoint, i.e. vector which was searched */
    };
@@ -86,7 +86,7 @@ private:
 
       const Breakpoint*  entry;
 
-      Real operator() (
+      R operator() (
          Breakpoint      i,
          Breakpoint      j
          ) const
@@ -101,11 +101,11 @@ private:
    //@{
    bool                  enableBoundFlips;   /**< enable or disable long steps in BoundFlippingRT */
    bool                  enableRowBoundFlips;/**< enable bound flips also for row representation */
-   Real                  flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
+   R                  flipPotential;      /**< tracks bound flip history and decides which ratio test to use */
    int                   relax_count;        /**< count rounds of ratio test */
    DataArray<Breakpoint> breakpoints;        /**< array of breakpoints */
-   SSVector              updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
-   SSVector              updPrimVec;         /**< allocation of memory for additional solution vector */
+   SSVectorBase<R>               updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
+   SSVectorBase<R>               updPrimVec;         /**< allocation of memory for additional solution vector */
    //@}
 
    /** store all available pivots/breakpoints in an array (positive pivot search direction) */
@@ -114,10 +114,10 @@ private:
       int&               minIdx,             /**< index to current minimal breakpoint */
       const int*         idx,                /**< pointer to indices of current vector */
       int                nnz,                /**< number of nonzeros in current vector */
-      const Real*        upd,                /**< pointer to update values of current vector */
-      const Real*        vec,                /**< pointer to values of current vector */
-      const Real*        upp,                /**< pointer to upper bound/rhs of current vector */
-      const Real*        low,                /**< pointer to lower bound/lhs of current vector */
+      const R*        upd,                /**< pointer to update values of current vector */
+      const R*        vec,                /**< pointer to values of current vector */
+      const R*        upp,                /**< pointer to upper bound/rhs of current vector */
+      const R*        low,                /**< pointer to lower bound/lhs of current vector */
       BreakpointSource   src                 /**< type of vector (pVec or coPvec)*/
       );
 
@@ -127,41 +127,41 @@ private:
       int&               minIdx,             /**< index to current minimal breakpoint */
       const int*         idx,                /**< pointer to indices of current vector */
       int                nnz,                /**< number of nonzeros in current vector */
-      const Real*        upd,                /**< pointer to update values of current vector */
-      const Real*        vec,                /**< pointer to values of current vector */
-      const Real*        upp,                /**< pointer to upper bound/rhs of current vector */
-      const Real*        low,                /**< pointer to lower bound/lhs of current vector */
+      const R*        upd,                /**< pointer to update values of current vector */
+      const R*        vec,                /**< pointer to values of current vector */
+      const R*        upp,                /**< pointer to upper bound/rhs of current vector */
+      const R*        low,                /**< pointer to lower bound/lhs of current vector */
       BreakpointSource   src                 /**< type of vector (pVec or coPvec)*/
       );
 
    /** get values for entering index and perform shifts if necessary */
    bool getData(
-      Real&              val,
+      R&              val,
       SPxId&             enterId,
       int                idx,
-      Real               stab,
-      Real               degeneps,
-      const Real*        upd,
-      const Real*        vec,
-      const Real*        low,
-      const Real*        upp,
+      R               stab,
+      R               degeneps,
+      const R*        upd,
+      const R*        vec,
+      const R*        low,
+      const R*        upp,
       BreakpointSource   src,
-      Real               max
+      R               max
       );
 
    /** get values for leaving index and perform shifts if necessary */
    bool getData(
-      Real&              val,
+      R&              val,
       int&             leaveIdx,
       int                idx,
-      Real               stab,
-      Real               degeneps,
-      const Real*        upd,
-      const Real*        vec,
-      const Real*        low,
-      const Real*        upp,
+      R               stab,
+      R               degeneps,
+      const R*        upd,
+      const R*        vec,
+      const R*        low,
+      const R*        upp,
       BreakpointSource   src,
-      Real               max
+      R               max
       );
 
    /** perform necessary bound flips to restore dual feasibility */
@@ -234,13 +234,13 @@ public:
    //@{
    ///
    virtual int selectLeave(
-      Real&              val,
-      Real               enterTest,
+      R&              val,
+      R               enterTest,
       bool               polish = false
       );
    ///
    virtual SPxId selectEnter(
-      Real&              val,
+      R&              val,
       int                leaveIdx,
       bool               polish = false
       );
@@ -258,4 +258,7 @@ public:
 };
 
 } // namespace soplex
+
+#include "spxboundflippingrt.hpp"
+
 #endif // _SPXBOUNDFLIPPINGRT_H_
