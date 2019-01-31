@@ -19,6 +19,9 @@
 
 // Defining the static members of the Param class
 // THREADLOCAL is a #define to thread_local. (Is it really needed?)
+
+namespace soplex
+{
 template <class R>
 THREADLOCAL R Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
 template <class R>
@@ -178,18 +181,15 @@ void Param<R>::setEpsilonPivot(R eps)
 }
 
 // returns x * 2^exp
-template <class R>
-inline R spxLdexp(R x, int exp);
-
-
 template <typename T>
-inline boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T> x, int exp)
-{
-  return ldexp(x,exp);
-}
+T spxLdexp(T x, int exp);
 
+// // Instantiation for Real
+// template <>
+// Real spxLdexp(Real x, int exp);
 
 // returns x and exp such that y = x * 2^exp
-template <class R>
-inline R spxFrexp(R y, int* exp);
+template <typename T>
+T spxFrexp(T y, int* exp);
 
+} // namespace soplex

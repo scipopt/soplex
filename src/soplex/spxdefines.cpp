@@ -38,18 +38,8 @@ bool msginconsistent(const char* name, const char* file, int line)
    return 0;
 }
 
-  template <class >
-  inline Rational spxFrexp(Rational y, int* exp)
-  {
-    // This should never be called.
-    // Refer to issue 164 in soplex gitlab
-    assert(true);
-
-    return 0;
-  }
-
   template <>
-  inline Real spxFrexp(Real y, int* exp)
+  Real spxFrexp(Real y, int* exp)
   {
     return frexp(y, exp);
   }
@@ -65,38 +55,16 @@ bool msginconsistent(const char* name, const char* file, int line)
   // function gets called from the Scalers, if not, we can have a general
   // version of the function in spxdefines.hpp
   template <>
-  inline Real spxLdexp(Real x, int exp)
+  Real spxLdexp(Real x, int exp)
   {
     return ldexp(x,exp);
   }
 
-
-  // template <>
-  // inline bool NE(Rational a, Rational b, Rational eps = 0)
-  // {
-  //   // This function should never be called. The function exist to prevent an
-  //   // instantiation error.
-
-  //   // @todo: maybe there is a better way around this?
-
-  //   assert(true);
-
-  //   return false;
-  // }
-
-  // // @todo get rid of this
-  // template <>
-  // inline bool NE(Rational a, double b, Rational eps = 0)
-  // {
-  //   // This function should never be called. The function exist to prevent an
-  //   // instantiation error.
-
-  //   // @todo: maybe there is a better way around this?
-
-  //   assert(true);
-
-  //   return false;
-  // }
+  template <typename T>
+  boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T> x, int exp)
+  {
+    return ldexp(x,exp);
+  }
 
 
 

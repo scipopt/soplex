@@ -419,8 +419,10 @@ inline int spxSnprintf(
    return n;
 }
 
+
+} // namespace soplex
+
 // For the templated functions
 #include "spxdefines.hpp"
 
-} // namespace soplex
 #endif // _SPXDEFINES_H_
