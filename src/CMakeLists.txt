@@ -45,7 +45,6 @@ set(sources
     soplex/spxwritestate.cpp
     soplex/statistics.cpp
     soplex/testsoplex.cpp
-    soplex/updatevector.cpp
     soplex/usertimer.cpp
     soplex/validation.cpp
     soplex/wallclocktimer.cpp

@@ -40,7 +40,7 @@ namespace soplex
     \alpha\cdot\delta\f$.
 
     While the update itself can easily be expressed with methods of
-    the class Vector, it is often desirable to save the last update
+    the class VectorBase<R>, it is often desirable to save the last update
     VectorBase<R> \f$\delta\f$ and value \f$\alpha\f$. This is provided by
     class UpdateVector.
 
@@ -81,7 +81,7 @@ public:
    {}
    /// copy constructor
    UpdateVector<R>( const UpdateVector<R>& );
-   /// assignment from DVector
+   /// assignment from DVectorBase<R>
    UpdateVector<R>& operator=(const DVectorBase<R>& rhs)
    {
       if ( this != & rhs )
@@ -91,7 +91,7 @@ public:
 
       return *this;
    }
-   /// assignment from Vector
+   /// assignment from VectorBase<R>
    UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
       if ( this != & rhs )

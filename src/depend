@@ -996,7 +996,7 @@ $(LIBOBJDIR)/validation.o: src/soplex/validation.cpp src/soplex/validation.h \
  src/soplex/solbase.h
 $(LIBOBJDIR)/wallclocktimer.o: src/soplex/wallclocktimer.cpp src/soplex/spxdefines.h \
  src/soplex/wallclocktimer.h src/soplex/timer.h
-$(LIBOBJDIR)/updatevector.o: src/soplex/updatevector.cpp src/soplex/updatevector.h \
+$(LIBOBJDIR)/updatevector.o: src/soplex/updatevector.h \
  src/soplex/spxdefines.h src/soplex/dvector.h src/soplex/basevectors.h \
  src/soplex/rational.h src/soplex/idlist.h src/soplex/islist.h \
  src/soplex/vectorbase.h src/soplex/dvectorbase.h src/soplex/spxalloc.h \
@@ -2045,7 +2045,7 @@ $(LIBOBJSUBDIR)/validation.o: src/soplex/validation.cpp src/soplex/validation.h 
  src/soplex/solbase.h
 $(LIBOBJSUBDIR)/wallclocktimer.o: src/soplex/wallclocktimer.cpp src/soplex/spxdefines.h \
  src/soplex/wallclocktimer.h src/soplex/timer.h
-$(LIBOBJSUBDIR)/updatevector.o: src/soplex/updatevector.cpp src/soplex/updatevector.h \
+$(LIBOBJSUBDIR)/updatevector.o: src/soplex/updatevector.h \
  src/soplex/spxdefines.h src/soplex/dvector.h src/soplex/basevectors.h \
  src/soplex/rational.h src/soplex/idlist.h src/soplex/islist.h \
  src/soplex/vectorbase.h src/soplex/dvectorbase.h src/soplex/spxalloc.h \
