@@ -536,7 +536,7 @@ R SoPlexBase<R>::lhsReal(int i) const
 
 /// returns inequality type of row \p i
 template <class R>
-LPRowReal::Type SoPlexBase<R>::rowTypeReal(int i) const
+typename LPRowBase<R>::Type SoPlexBase<R>::rowTypeReal(int i) const
 {
   assert(_realLP != 0);
   return _realLP->rowType(i);
@@ -922,7 +922,7 @@ const Rational& SoPlexBase<R>::maxObjRational(int i) const
 
 /// adds a single row
 template <class R>
-void SoPlexBase<R>::addRowReal(const LPRowReal& lprow)
+void SoPlexBase<R>::addRowReal(const LPRowBase<R>& lprow)
 {
   assert(_realLP != 0);
 
@@ -941,7 +941,7 @@ void SoPlexBase<R>::addRowReal(const LPRowReal& lprow)
 
 /// adds multiple rows
 template <class R>
-void SoPlexBase<R>::addRowsReal(const LPRowSetReal& lprowset)
+void SoPlexBase<R>::addRowsReal(const LPRowSetBase<R>& lprowset)
 {
   assert(_realLP != 0);
 
@@ -1646,7 +1646,7 @@ void SoPlexBase<R>::addRowsRational(const mpq_t* lhs, const mpq_t* rowValues, co
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      LPRowSetReal lprowset;
+      LPRowSetBase<R> lprowset;
       for( int i = numRowsRational() - numRows; i < numRowsRational(); i++ )
         lprowset.add(R(lhsRational(i)), DSVectorBase<R>(_rationalLP->rowVector(i)), R(rhsRational(i)));
       _addRowsReal(lprowset);
@@ -5666,7 +5666,7 @@ bool SoPlexBase<R>::_upperFinite(const RangeType& rangeType) const
 
 /// adds a single row to the R LP and adjusts basis
 template <class R>
-void SoPlexBase<R>::_addRowReal(const LPRowReal& lprow)
+void SoPlexBase<R>::_addRowReal(const LPRowBase<R>& lprow)
 {
   assert(_realLP != 0);
 
@@ -5704,7 +5704,7 @@ void SoPlexBase<R>::_addRowReal(R lhs, const SVectorBase<R>& lprow, R rhs)
 
 /// adds multiple rows to the R LP and adjusts basis
 template <class R>
-void SoPlexBase<R>::_addRowsReal(const LPRowSetReal& lprowset)
+void SoPlexBase<R>::_addRowsReal(const LPRowSetBase<R>& lprowset)
 {
   assert(_realLP != 0);
 
@@ -5795,7 +5795,7 @@ void SoPlexBase<R>::_addColsReal(const LPColSetReal& lpcolset)
 
 /// replaces row \p i with \p lprow and adjusts basis
 template <class R>
-void SoPlexBase<R>::_changeRowReal(int i, const LPRowReal& lprow)
+void SoPlexBase<R>::_changeRowReal(int i, const LPRowBase<R>& lprow)
 {
   assert(_realLP != 0);
 

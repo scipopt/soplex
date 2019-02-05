@@ -171,7 +171,7 @@ public:
    R lhsReal(int i) const;
 
    /// returns inequality type of row \p i
-   LPRowReal::Type rowTypeReal(int i) const;
+  typename LPRowBase<R>::Type rowTypeReal(int i) const;
 
    /// returns vector of col \p i, ignoring scaling
    const SVectorBase<R>& colVectorRealInternal(int i) const;
@@ -304,10 +304,10 @@ public:
    //@{
 
    /// adds a single row
-   void addRowReal(const LPRowReal& lprow);
+  void addRowReal(const LPRowBase<R>& lprow);
 
    /// adds multiple rows
-   void addRowsReal(const LPRowSetReal& lprowset);
+  void addRowsReal(const LPRowSetBase<R>& lprowset);
 
    /// adds a single column
    void addColReal(const LPColBase<R>& lpcol);
@@ -1893,13 +1893,13 @@ private:
    //@{
 
    /// adds a single row to the real LP and adjusts basis
-   void _addRowReal(const LPRowReal& lprow);
+  void _addRowReal(const LPRowBase<R>& lprow);
 
    /// adds a single row to the real LP and adjusts basis
    void _addRowReal(R lhs, const SVectorBase<R>& lprow, R rhs);
 
    /// adds multiple rows to the real LP and adjusts basis
-   void _addRowsReal(const LPRowSetReal& lprowset);
+  void _addRowsReal(const LPRowSetBase<R>& lprowset);
 
    /// adds a single column to the real LP and adjusts basis
    void _addColReal(const LPColReal& lpcol);
@@ -1911,7 +1911,7 @@ private:
    void _addColsReal(const LPColSetReal& lpcolset);
 
    /// replaces row \p i with \p lprow and adjusts basis
-   void _changeRowReal(int i, const LPRowReal& lprow);
+  void _changeRowReal(int i, const LPRowBase<R>& lprow);
 
    /// changes left-hand side vector for constraints to \p lhs and adjusts basis
    void _changeLhsReal(const VectorBase<R>& lhs);
