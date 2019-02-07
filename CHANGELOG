@@ -57,6 +57,8 @@ fixed bugs:
 - return clean solution values according to optimal basis (e.g. reduced cost 0 for basic variables)
 - avoid unsuccessful termination when cycling and rather return sub-optimal solution
 
+code quality:
+- hide symbols in library to avoid symbol collisions and reduce library size
 
 13 June 2018 - Release 4.0.0
 ============================
