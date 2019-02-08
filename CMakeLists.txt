@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.3.0)
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
@@ -48,6 +48,10 @@ set(CMAKE_MACOSX_RPATH ON)
 
 # use C++11 standard
 set(CMAKE_CXX_STANDARD 11)
+
+# set function visibility default to hidden
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 # create a target for updating the current git hash
 file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "
