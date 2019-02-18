@@ -3,6 +3,10 @@ Bugfix
 
 fixed bugs:
 - resolve compiler warning about data loss during implicit type conversion for timers
+- return correct basis status when aborting a solve early
+
+code quality:
+- merge SoPlex::hasDual() and SoPlex::hasPrimal() into SoPlex::hasSol() and mark old methods deprecated
 
 09 January 2019 - Release 4.0.1
 ===============================
