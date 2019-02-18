@@ -3366,12 +3366,14 @@ bool SoPlexBase<Real>::isPrimalFeasible() const
 }
 
 
-/// is a primal feasible solution available?
+/// is a solution available (not necessarily feasible)?
 template <>
-bool SoPlexBase<Real>::hasPrimal() const
+bool SoPlexBase<Real>::hasSol() const
 {
    return _hasSolReal || _hasSolRational;
 }
+
+
 
 /// is a primal unbounded ray available?
 template <>
@@ -3379,6 +3381,7 @@ bool SoPlexBase<Real>::hasPrimalRay() const
 {
    return (_hasSolReal && _solReal.hasPrimalRay()) || (_hasSolRational && _solRational.hasPrimalRay());
 }
+
 
 
 /// is stored dual solution feasible?
@@ -3390,12 +3393,7 @@ bool SoPlexBase<Real>::isDualFeasible() const
 
 }
 
-/// is a dual feasible solution available?
-template <>
-bool SoPlexBase<Real>::hasDual() const
-{
-   return _hasSolReal || _hasSolRational;
-}
+
 
 /// is Farkas proof of infeasibility available?
 template <>
@@ -3418,7 +3416,7 @@ Real SoPlexBase<Real>::objValueReal()
       return realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
    else if(status() == SPxSolverBase<Real>::INFEASIBLE)
       return -realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRealSolution();
       return _solReal._objVal;
@@ -3433,7 +3431,7 @@ Real SoPlexBase<Real>::objValueReal()
 template <>
 bool SoPlexBase<Real>::getPrimal(VectorBase<Real>& vector)
 {
-   if(hasPrimal() && vector.dim() >= numCols())
+   if(hasSol() && vector.dim() >= numCols())
    {
       _syncRealSolution();
       _solReal.getPrimalSol(vector);
@@ -3455,7 +3453,7 @@ bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
 template <>
 bool SoPlexBase<Real>::getSlacksReal(VectorReal& vector)
 {
-   if(hasPrimal() && vector.dim() >= numRows())
+   if(hasSol() && vector.dim() >= numRows())
    {
       _syncRealSolution();
       _solReal.getSlacks(vector);
@@ -3493,7 +3491,7 @@ bool SoPlexBase<Real>::getPrimalRayReal(VectorBase<Real>& vector)
 template <>
 bool SoPlexBase<Real>::getDual(VectorBase<Real>& vector)
 {
-   if(hasDual() && vector.dim() >= numRows())
+   if(hasSol() && vector.dim() >= numRows())
    {
       _syncRealSolution();
       _solReal.getDualSol(vector);
@@ -3515,7 +3513,7 @@ bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP
 template <>
 bool SoPlexBase<Real>::getRedCost(VectorBase<Real>& vector)
 {
-   if(hasDual() && vector.dim() >= numCols())
+   if(hasSol() && vector.dim() >= numCols())
    {
       _syncRealSolution();
       _solReal.getRedCostSol(vector);
@@ -3797,7 +3795,7 @@ Rational SoPlexBase<Real>::objValueRational()
       else
          return _rationalPosInfty;
    }
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRationalSolution();
       return _solRational._objVal;
@@ -3811,7 +3809,7 @@ Rational SoPlexBase<Real>::objValueRational()
 template <>
 bool SoPlexBase<Real>::getPrimalRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getPrimalSol(vector);
@@ -3825,7 +3823,7 @@ bool SoPlexBase<Real>::getPrimalRational(VectorBase<Rational>& vector)
 template <>
 bool SoPlexBase<Real>::getSlacksRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getSlacks(vector);
@@ -3854,7 +3852,7 @@ bool SoPlexBase<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
 template <>
 bool SoPlexBase<Real>::getDualRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getDualSol(vector);
@@ -3870,7 +3868,7 @@ bool SoPlexBase<Real>::getDualRational(VectorBase<Rational>& vector)
 template <>
 bool SoPlexBase<Real>::getRedCostRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getRedCostSol(vector);
@@ -4229,7 +4227,7 @@ bool SoPlexBase<Real>::getPrimalRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4249,7 +4247,7 @@ bool SoPlexBase<Real>::getSlacksRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4291,7 +4289,7 @@ bool SoPlexBase<Real>::getDualRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4312,7 +4310,7 @@ bool SoPlexBase<Real>::getRedCostRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4353,7 +4351,7 @@ bool SoPlexBase<Real>::getDualFarkasRational(mpq_t* vector, const int size)
 template <>
 int SoPlexBase<Real>::totalSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.totalSizePrimal(base);
@@ -4368,7 +4366,7 @@ int SoPlexBase<Real>::totalSizePrimalRational(const int base)
 template <>
 int SoPlexBase<Real>::totalSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.totalSizeDual(base);
@@ -4383,7 +4381,7 @@ int SoPlexBase<Real>::totalSizeDualRational(const int base)
 template <>
 int SoPlexBase<Real>::dlcmSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizePrimal(base);
@@ -4398,7 +4396,7 @@ int SoPlexBase<Real>::dlcmSizePrimalRational(const int base)
 template <>
 int SoPlexBase<Real>::dlcmSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizeDual(base);
@@ -4413,7 +4411,7 @@ int SoPlexBase<Real>::dlcmSizeDualRational(const int base)
 template <>
 int SoPlexBase<Real>::dmaxSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizePrimal(base);
@@ -4428,7 +4426,7 @@ int SoPlexBase<Real>::dmaxSizePrimalRational(const int base)
 template <>
 int SoPlexBase<Real>::dmaxSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizeDual(base);
@@ -4450,19 +4448,8 @@ typename SPxBasisBase<Real>::SPxStatus SoPlexBase<Real>::basisStatus() const
 {
    if(!hasBasis())
       return SPxBasisBase<Real>::NO_PROBLEM;
-   else if(status() == SPxSolverBase<Real>::OPTIMAL
-           || status() == SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS)
-      return SPxBasisBase<Real>::OPTIMAL;
-   else if(status() == SPxSolverBase<Real>::UNBOUNDED)
-      return SPxBasisBase<Real>::UNBOUNDED;
-   else if(status() == SPxSolverBase<Real>::INFEASIBLE)
-      return SPxBasisBase<Real>::INFEASIBLE;
-   else if(hasPrimal())
-      return SPxBasisBase<Real>::PRIMAL;
-   else if(hasDual())
-      return SPxBasisBase<Real>::DUAL;
    else
-      return SPxBasisBase<Real>::REGULAR;
+      return _solver.getBasisStatus();
 }
 
 

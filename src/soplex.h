@@ -585,17 +585,26 @@ public:
    /// is stored primal solution feasible?
    bool isPrimalFeasible() const;
 
-   /// is a primal feasible solution available?
-   bool hasPrimal() const;
+   /// is a solution available (not neccessarily feasible)?
+   bool hasSol() const;
+
+   /// deprecated: use #hasSol() instead
+   bool hasPrimal() const
+   {
+      return hasSol();
+   }
+
+   /// deprecated: use #hasSol() instead
+   bool hasDual() const
+   {
+      return hasSol();
+   }
 
    /// is a primal unbounded ray available?
    bool hasPrimalRay() const;
 
    /// is stored dual solution feasible?
    bool isDualFeasible() const;
-
-   /// is a dual feasible solution available?
-   bool hasDual() const;
 
    /// is Farkas proof of infeasibility available?
    bool hasDualFarkas() const;
