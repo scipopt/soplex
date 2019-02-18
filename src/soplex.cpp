@@ -3011,8 +3011,8 @@ bool SoPlex::isPrimalFeasible() const
 
 
 
-/// is a primal feasible solution available?
-bool SoPlex::hasPrimal() const
+/// is a solution available (not necessarily feasible)?
+bool SoPlex::hasSol() const
 {
    return _hasSolReal || _hasSolRational;
 }
@@ -3036,14 +3036,6 @@ bool SoPlex::isDualFeasible() const
 
 
 
-/// is a dual feasible solution available?
-bool SoPlex::hasDual() const
-{
-   return _hasSolReal || _hasSolRational;
-}
-
-
-
 /// is Farkas proof of infeasibility available?
 bool SoPlex::hasDualFarkas() const
 {
@@ -3063,7 +3055,7 @@ Real SoPlex::objValueReal()
       return realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE);
    else if(status() == SPxSolver::INFEASIBLE)
       return -realParam(SoPlex::INFTY) * intParam(SoPlex::OBJSENSE);
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRealSolution();
       return _solReal._objVal;
@@ -3077,7 +3069,7 @@ Real SoPlex::objValueReal()
 /// gets the primal solution vector if available; returns true on success
 bool SoPlex::getPrimalReal(VectorReal& vector)
 {
-   if(hasPrimal() && vector.dim() >= numColsReal())
+   if(hasSol() && vector.dim() >= numColsReal())
    {
       _syncRealSolution();
       _solReal.getPrimal(vector);
@@ -3092,7 +3084,7 @@ bool SoPlex::getPrimalReal(VectorReal& vector)
 /// gets the vector of slack values if available; returns true on success
 bool SoPlex::getSlacksReal(VectorReal& vector)
 {
-   if(hasPrimal() && vector.dim() >= numRowsReal())
+   if(hasSol() && vector.dim() >= numRowsReal())
    {
       _syncRealSolution();
       _solReal.getSlacks(vector);
@@ -3122,7 +3114,7 @@ bool SoPlex::getPrimalRayReal(VectorReal& vector)
 /// gets the dual solution vector if available; returns true on success
 bool SoPlex::getDualReal(VectorReal& vector)
 {
-   if(hasDual() && vector.dim() >= numRowsReal())
+   if(hasSol() && vector.dim() >= numRowsReal())
    {
       _syncRealSolution();
       _solReal.getDual(vector);
@@ -3137,7 +3129,7 @@ bool SoPlex::getDualReal(VectorReal& vector)
 /// gets the vector of reduced cost values if available; returns true on success
 bool SoPlex::getRedCostReal(VectorReal& vector)
 {
-   if(hasDual() && vector.dim() >= numColsReal())
+   if(hasSol() && vector.dim() >= numColsReal())
    {
       _syncRealSolution();
       _solReal.getRedCost(vector);
@@ -3393,7 +3385,7 @@ Rational SoPlex::objValueRational()
       else
          return _rationalPosInfty;
    }
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRationalSolution();
       return _solRational._objVal;
@@ -3407,7 +3399,7 @@ Rational SoPlex::objValueRational()
 /// gets the primal solution vector if available; returns true on success
 bool SoPlex::getPrimalRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getPrimal(vector);
@@ -3422,7 +3414,7 @@ bool SoPlex::getPrimalRational(VectorRational& vector)
 /// gets the vector of slack values if available; returns true on success
 bool SoPlex::getSlacksRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getSlacks(vector);
@@ -3452,7 +3444,7 @@ bool SoPlex::getPrimalRayRational(VectorRational& vector)
 /// gets the dual solution vector if available; returns true on success
 bool SoPlex::getDualRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getDual(vector);
@@ -3467,7 +3459,7 @@ bool SoPlex::getDualRational(VectorRational& vector)
 /// gets the vector of reduced cost values if available; returns true on success
 bool SoPlex::getRedCostRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getRedCost(vector);
@@ -3822,7 +3814,7 @@ bool SoPlex::getPrimalRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -3841,7 +3833,7 @@ bool SoPlex::getSlacksRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -3881,7 +3873,7 @@ bool SoPlex::getDualRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -3901,7 +3893,7 @@ bool SoPlex::getRedCostRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -3940,7 +3932,7 @@ bool SoPlex::getDualFarkasRational(mpq_t* vector, const int size)
 /// get size of primal solution
 int SoPlex::totalSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.totalSizePrimal(base);
@@ -3954,7 +3946,7 @@ int SoPlex::totalSizePrimalRational(const int base)
 /// get size of dual solution
 int SoPlex::totalSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.totalSizeDual(base);
@@ -3968,7 +3960,7 @@ int SoPlex::totalSizeDualRational(const int base)
 /// get size of least common multiple of denominators in primal solution
 int SoPlex::dlcmSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizePrimal(base);
@@ -3982,7 +3974,7 @@ int SoPlex::dlcmSizePrimalRational(const int base)
 /// get size of least common multiple of denominators in dual solution
 int SoPlex::dlcmSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizeDual(base);
@@ -3996,7 +3988,7 @@ int SoPlex::dlcmSizeDualRational(const int base)
 /// get size of largest denominator in primal solution
 int SoPlex::dmaxSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizePrimal(base);
@@ -4010,7 +4002,7 @@ int SoPlex::dmaxSizePrimalRational(const int base)
 /// get size of largest denominator in dual solution
 int SoPlex::dmaxSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizeDual(base);
@@ -4034,18 +4026,8 @@ SPxBasis::SPxStatus SoPlex::basisStatus() const
 {
    if(!hasBasis())
       return SPxBasis::NO_PROBLEM;
-   else if(status() == SPxSolver::OPTIMAL || status() == SPxSolver::OPTIMAL_UNSCALED_VIOLATIONS)
-      return SPxBasis::OPTIMAL;
-   else if(status() == SPxSolver::UNBOUNDED)
-      return SPxBasis::UNBOUNDED;
-   else if(status() == SPxSolver::INFEASIBLE)
-      return SPxBasis::INFEASIBLE;
-   else if(hasPrimal())
-      return SPxBasis::PRIMAL;
-   else if(hasDual())
-      return SPxBasis::DUAL;
    else
-      return SPxBasis::REGULAR;
+      return _solver.getBasisStatus();
 }
 
 

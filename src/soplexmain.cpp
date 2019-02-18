@@ -137,7 +137,7 @@ void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
 static
 void checkSolutionReal(SoPlex& soplex)
 {
-   if(soplex.hasPrimal())
+   if(soplex.hasSol())
    {
       Real boundviol;
       Real rowviol;
@@ -163,7 +163,7 @@ void checkSolutionReal(SoPlex& soplex)
       MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
    }
 
-   if(soplex.hasDual())
+   if(soplex.hasSol())
    {
       Real redcostviol;
       Real dualviol;
@@ -196,7 +196,7 @@ void checkSolutionReal(SoPlex& soplex)
 static
 void checkSolutionRational(SoPlex& soplex)
 {
-   if(soplex.hasPrimal())
+   if(soplex.hasSol())
    {
       Rational boundviol;
       Rational rowviol;
@@ -222,7 +222,7 @@ void checkSolutionRational(SoPlex& soplex)
       MSG_INFO1(soplex.spxout, soplex.spxout << "No primal solution available.\n");
    }
 
-   if(soplex.hasDual())
+   if(soplex.hasSol())
    {
       Rational redcostviol;
       Rational dualviol;
