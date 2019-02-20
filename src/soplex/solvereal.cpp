@@ -716,6 +716,7 @@ void SoPlexBase<R>::_storeSolutionRealFromPresol()
    _hasSolReal = true;
    _solReal._isPrimalFeasible = true;
    _solReal._isDualFeasible = true;
+   _solver.setBasisStatus(SPxBasis::OPTIMAL);
 
    // check solution for violations and solve again if necessary
    _verifySolutionReal();
