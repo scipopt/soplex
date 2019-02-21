@@ -2343,8 +2343,8 @@ namespace soplex
 
   // For general templated functions
 #include "spxsolver.hpp"
-#include "changesoplex.hpp"
 #include "spxsolve.hpp"
+#include "changesoplex.hpp"
 #include "leave.hpp"
 #include "enter.hpp"
 
