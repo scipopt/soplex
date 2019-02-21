@@ -340,6 +340,23 @@ void SPxSolverBase<R>::changeLower(const VectorBase<R>& newLower, bool scale)
    }
 }
 
+template <class R>
+void SPxSolverBase<R>::changeLower(int i, const R& newLower, bool scale)
+{
+  if(newLower != (scale ? this->lowerUnscaled(i) : this->lower(i)))
+    {
+      R oldLower = this->lower(i);
+      // This has to be done before calling changeLowerStatus() because that is calling
+      // basis.dualColStatus() which calls lower() and needs the changed value.
+      SPxLPBase<R>::changeLower(i, newLower, scale);
+
+      if(SPxBasisBase<R>::status() > SPxBasisBase<R>::NO_PROBLEM)
+        {
+          changeLowerStatus(i, this->lower(i), oldLower);
+          unInit();
+        }
+    }
+}
 
   template <class R>
 void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
