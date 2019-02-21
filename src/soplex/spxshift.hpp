@@ -203,7 +203,7 @@ namespace soplex
             l = p_low[i];
 
             // do not permute these bounds! c.f. with computeFrhs2() in spxvecs.cpp
-            if( dualStatus(this->baseId(i)) == SPxBasisBase<R>::Desc::D_ON_BOTH )
+            if( this->dualStatus(this->baseId(i)) == SPxBasisBase<R>::Desc::D_ON_BOTH )
               {
                 continue;
               }
@@ -281,7 +281,7 @@ namespace soplex
             l = p_low[i];
 
             // do not permute these bounds! c.f. computeFrhs2() in spxvecs.cpp
-            if( dualStatus(this->baseId(i)) == SPxBasisBase<R>::Desc::D_ON_BOTH )
+            if( this->dualStatus(this->baseId(i)) == SPxBasisBase<R>::Desc::D_ON_BOTH )
               {
                 continue;
               }
