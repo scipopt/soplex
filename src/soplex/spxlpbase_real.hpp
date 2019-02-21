@@ -1204,7 +1204,7 @@ namespace soplex
                   if( !LPFisColName(pos) )
                     goto syntax_error;
 
-                  if( (colidx = LPFreadColName(pos, cnames, cset, nullptr, spxout)) < 0 )
+                  if( (colidx = LPFreadColName<R>(pos, cnames, cset, nullptr, spxout)) < 0 )
                     {
                       MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD11 in Bounds section line "
                                    << lineno << " ignored" << std::endl; )
@@ -1263,7 +1263,7 @@ namespace soplex
                   break;
                 case BINARIES:
                 case INTEGERS:
-                  if( (colidx = LPFreadColName(pos, cnames, cset, 0, spxout)) < 0 )
+                  if( (colidx = LPFreadColName<R>(pos, cnames, cset, 0, spxout)) < 0 )
                     {
                       MSG_WARNING( (*this->spxout), (*this->spxout) << "WLPFRD12 in Binary/General section line " << lineno << " ignored" << std::endl; )
                         }
@@ -2459,7 +2459,7 @@ static void MPSwriteRecord(
         else
           throw SPxInternalCodeException("XMPSWR02 This should never happen.");
 
-        MPSwriteRecord(p_output, indicator, MPSgetRowName(*this, i, p_rnames, name));
+        MPSwriteRecord<R>(p_output, indicator, MPSgetRowName(*this, i, p_rnames, name));
       }
 
     MPSwriteRecord<R>(p_output, "N", "MINIMIZE");
@@ -2569,7 +2569,7 @@ static void MPSwriteRecord(
 
         if( (lower(i) <= -infinity) && (upper(i) >= infinity) )
           {
-            MPSwriteRecord(p_output, "FR", "BOUND", getColName(*this, i, p_cnames, name1));
+            MPSwriteRecord<R>(p_output, "FR", "BOUND", getColName(*this, i, p_cnames, name1));
             continue;
           }
 
@@ -2578,7 +2578,7 @@ static void MPSwriteRecord(
             if( lower(i) > -infinity )
               MPSwriteRecord(p_output, "LO", "BOUND", getColName(*this, i, p_cnames, name1), lower(i));
             else
-              MPSwriteRecord(p_output, "MI", "BOUND", getColName(*this, i, p_cnames, name1));
+              MPSwriteRecord<R>(p_output, "MI", "BOUND", getColName(*this, i, p_cnames, name1));
           }
 
         if( has_intvars && (p_intvars->pos(i) >= 0) )
