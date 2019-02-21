@@ -112,7 +112,7 @@ public:
    /**@name Leave / enter */
    //@{
    ///
-   virtual int selectLeave(R& val, Real, bool);
+   virtual int selectLeave(R& val, R, bool);
    ///
    virtual SPxId selectEnter(R& val, int, bool);
    //@}
@@ -120,4 +120,8 @@ public:
 };
 
 } // namespace soplex
+// For the general template
+#include "spxharrisrt.hpp"
+
+
 #endif // _SPXHARRISRT_H_

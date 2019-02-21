@@ -151,7 +151,7 @@ namespace soplex
      infeasibility and retry. This avoids cycling in the shifted LP.
   */
   template <class R>
-  int SPxHarrisRT<R>::selectLeave(R& val, Real, bool)
+  int SPxHarrisRT<R>::selectLeave(R& val, R, bool)
   {
     int i, j;
     R stab, x, y;
@@ -754,6 +754,3 @@ namespace soplex
     return enterId;
   }
 } // namespace soplex
-
-// For the general template
-#include "spxharrisrt.hpp"
