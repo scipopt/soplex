@@ -31,7 +31,6 @@ set(sources
     soplex/spxout.cpp
     soplex/spxparmultpr.cpp
     soplex/spxquality.cpp
-    soplex/spxshift.cpp
     soplex/spxstarter.cpp
     soplex/spxsteeppr.cpp
     soplex/spxsumst.cpp

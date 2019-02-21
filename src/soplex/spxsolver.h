@@ -2347,5 +2347,6 @@ namespace soplex
 #include "changesoplex.hpp"
 #include "leave.hpp"
 #include "enter.hpp"
+#include "spxshift.hpp"
 
 #endif // _SPXSOLVER_H_
