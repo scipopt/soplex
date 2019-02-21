@@ -27,7 +27,6 @@ set(sources
     soplex/spxid.cpp
     soplex/spxlpbase_rational.cpp
     soplex/spxlpbase_real.cpp
-    soplex/spxmainsm.cpp
     soplex/spxout.cpp
     soplex/spxparmultpr.cpp
     soplex/spxquality.cpp

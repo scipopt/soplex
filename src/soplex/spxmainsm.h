@@ -181,7 +181,7 @@ private:
    private:
       int m_i;
       int m_old_i;
-      DSVector  m_row;
+      DSVectorBase<R>  m_row;
       R m_row_obj;
 
    public:
@@ -286,7 +286,7 @@ private:
       const bool m_strictUp;
       const bool m_maxSense;
       const R m_obj;
-      DSVector   m_col;
+      DSVectorBase<R>   m_col;
       const R m_newLo;
       const R m_newUp;
       const R m_oldLo;
@@ -363,10 +363,10 @@ private:
       const int       m_i;
       const int       m_old_i;
       const R      m_lRhs;
-      DSVector        m_row;
+      DSVectorBase<R>        m_row;
       DataArray<R> m_objs;
       DataArray<bool> m_fixed;
-      Array<DSVector> m_cols;
+      Array<DSVectorBase<R>> m_cols;
       const bool      m_lhsFixed;
       const bool      m_maxSense;
       DataArray<R> m_oldLowers;
@@ -457,7 +457,7 @@ private:
       const R m_lower;
       const R m_upper;
       const bool m_correctIdx; /// does the index mapping have to be updated in postsolving?
-      DSVector   m_col;
+      DSVectorBase<R>   m_col;
 
    public:
       ///
@@ -575,10 +575,10 @@ private:
       const int       m_old_j;
       const int       m_old_i;
       const R      m_bnd;
-      DSVector        m_col;
-      DSVector        m_lRhs;
-      DSVector        m_rowObj;
-      Array<DSVector> m_rows;
+      DSVectorBase<R>        m_col;
+      DSVectorBase<R>        m_lRhs;
+      DSVectorBase<R>        m_rowObj;
+      Array<DSVectorBase<R>> m_rows;
       const bool      m_loFree;
 
    public:
@@ -662,7 +662,7 @@ private:
       const R m_rhs;
       const R m_lower;
       const R m_upper;
-      DSVector   m_row;
+      DSVectorBase<R>   m_row;
 
     public:
       ///
@@ -726,7 +726,7 @@ private:
       const R m_lRhs;
       const bool m_onLhs;
       const bool m_eqCons;
-      DSVector   m_row;
+      DSVectorBase<R>   m_row;
 
    public:
       ///
@@ -805,7 +805,7 @@ private:
       const R m_Up_j;
       const R m_lhs;
       const R m_rhs;
-      DSVector   m_col;
+      DSVectorBase<R>   m_col;
 
    public:
       ///
@@ -892,15 +892,15 @@ private:
       const bool      m_isLast;
       const bool      m_fixed;
       const int       m_nCols;
-      DSVector        m_scale;
-      DSVector        m_rowObj;
+      DSVectorBase<R>        m_scale;
+      DSVectorBase<R>        m_rowObj;
       DataArray<int>  m_rIdxLocalOld;
       DataArray<int>  m_perm;
       DataArray<bool> m_isLhsEqualRhs;
 
    public:
       DuplicateRowsPS(const SPxLPBase<R>& lp, int _i,
-                      int maxLhsIdx, int minRhsIdx, const DSVector& dupRows,
+                      int maxLhsIdx, int minRhsIdx, const DSVectorBase<R>& dupRows,
                       const DataArray<R> scale, const DataArray<int> perm, const DataArray<bool> isLhsEqualRhs,
                       bool isTheLast, bool isFixedRow, bool isFirst = false)
          : PostStep("DuplicateRows", lp.nRows(), lp.nCols())
@@ -1054,8 +1054,8 @@ private:
       const R m_oldupper;
       const R m_oldlower;
       const R m_rhs;
-      DSVector   m_row;
-      DSVector   m_col;
+      DSVectorBase<R>   m_row;
+      DSVectorBase<R>   m_col;
 
    public:
       ///
@@ -1133,8 +1133,8 @@ private:
       const R m_const;
       const bool m_onLhs;
       const bool m_eqCons;
-      DSVector   m_row;
-      DSVector   m_col;
+      DSVectorBase<R>   m_row;
+      DSVectorBase<R>   m_col;
 
    public:
       ///
@@ -1284,19 +1284,19 @@ private:
    //**@name Data */
    //@{
    ///
-   DVectorBase<R>                         m_prim;       ///< unsimplified primal solution vector.
-   DVectorBase<R>                         m_slack;      ///< unsimplified slack vector.
-   DVectorBase<R>                         m_dual;       ///< unsimplified dual solution vector.
-   DVectorBase<R>                         m_redCost;    ///< unsimplified reduced cost vector.
+   DVectorBase<R>                         m_prim;       ///< unsimplified primal solution VectorBase<R>.
+   DVectorBase<R>                         m_slack;      ///< unsimplified slack VectorBase<R>.
+   DVectorBase<R>                         m_dual;       ///< unsimplified dual solution VectorBase<R>.
+   DVectorBase<R>                         m_redCost;    ///< unsimplified reduced cost VectorBase<R>.
    DataArray<typename SPxSolverBase<R>::VarStatus> m_cBasisStat; ///< basis status of columns.
    DataArray<typename SPxSolverBase<R>::VarStatus> m_rBasisStat; ///< basis status of rows.
    DataArray<int>                  m_cIdx;       ///< column index VectorBase<R> in original LP.
    DataArray<int>                  m_rIdx;       ///< row index VectorBase<R> in original LP.
    DataArray<PostStep*>            m_hist;       ///< VectorBase<R> of presolve history.
-   Array<DSVector>                 m_classSetRows; ///< stores parallel classes with non-zero colum entry
-   Array<DSVector>                 m_classSetCols; ///< stores parallel classes with non-zero row entry
-   Array<DSVector>                 m_dupRows;    ///< arrange duplicate rows using bucket sort w.r.t. their pClass values
-   Array<DSVector>                 m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
+   Array<DSVectorBase<R>>                 m_classSetRows; ///< stores parallel classes with non-zero colum entry
+   Array<DSVectorBase<R>>                 m_classSetCols; ///< stores parallel classes with non-zero row entry
+   Array<DSVectorBase<R>>                 m_dupRows;    ///< arrange duplicate rows using bucket sort w.r.t. their pClass values
+   Array<DSVectorBase<R>>                 m_dupCols;    ///< arrange duplicate columns w.r.t. their pClass values
    bool                            m_postsolved; ///< status of postsolving.
    R                            m_epsilon;    ///< epsilon zero.
    R                            m_feastol;    ///< primal feasibility tolerance.
@@ -1340,10 +1340,10 @@ private:
    typename SPxSimplifier<R>::Result removeEmpty(SPxLPBase<R>& lp);
 
    /// remove row singletons.
-   typename SPxSimplifier<R>::Result removeRowSingleton(SPxLPBase<R>& lp, const SVector& row, int& i);
+   typename SPxSimplifier<R>::Result removeRowSingleton(SPxLPBase<R>& lp, const SVectorBase<R>& row, int& i);
 
    /// aggregate two variables that appear in an equation.
-   typename SPxSimplifier<R>::Result aggregateVars(SPxLPBase<R>& lp, const SVector& row, int& i);
+   typename SPxSimplifier<R>::Result aggregateVars(SPxLPBase<R>& lp, const SVectorBase<R>& row, int& i);
 
    /// performs simplification steps on the rows of the LP.
   typename SPxSimplifier<R>::Result simplifyRows(SPxLPBase<R>& lp, bool& again);
@@ -1531,12 +1531,12 @@ public:
    //------------------------------------
    //**@name LP simplification */
    //@{
-   /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
+   /// simplify SPxLPBase<R> \p lp with identical primal and dual feasibility tolerance.
    virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R delta)
    {
       return simplify(lp, eps, delta, delta);
    }
-   /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
+   /// simplify SPxLPBase<R> \p lp with independent primal and dual feasibility tolerance.
    virtual typename SPxSimplifier<R>::Result simplify(SPxLPBase<R>& lp, R eps, R ftol, R otol, bool keepbounds = false);
 
    /// reconstructs an optimal solution for the unsimplified LP.
@@ -1609,13 +1609,13 @@ private:
    //------------------------------------
    //**@name Types */
    //@{
-   /// comparator for class SVector::Element: compare nonzeros according to value
+   /// comparator for class SVectorBase<R>::Element: compare nonzeros according to value
    struct ElementCompare
    {
    public:
       ElementCompare() {}
 
-      int operator()(const SVector::Element& e1, const SVector::Element& e2) const
+      int operator()(const typename SVectorBase<R>::Element& e1, const typename SVectorBase<R>::Element& e2) const
       {
 	 if (EQ(e1.val, e2.val))
             return 0;
@@ -1625,13 +1625,13 @@ private:
 	    return 1;
       }
    };
-   /// comparator for class SVector::Element: compare nonzeros according to index
+   /// comparator for class SVectorBase<R>::Element: compare nonzeros according to index
    struct IdxCompare
    {
    public:
       IdxCompare() {}
 
-      int operator()(const SVector::Element& e1, const SVector::Element& e2) const
+      int operator()(const typename SVectorBase<R>::Element& e1, const typename SVectorBase<R>::Element& e2) const
       {
 	 if (EQ(e1.idx, e2.idx))
             return 0;
@@ -1644,7 +1644,9 @@ private:
    //@}
 };
 
-  // For including general templated functions
-  #include "spxmainsm.hpp"
 } // namespace soplex
+
+// For including general templated functions
+#include "spxmainsm.hpp"
+
 #endif // _SPXMAINSM_H_
