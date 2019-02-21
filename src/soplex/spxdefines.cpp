@@ -60,6 +60,15 @@ bool msginconsistent(const char* name, const char* file, int line)
     return ldexp(x,exp);
   }
 
+  template <>
+  Rational spxLdexp(Rational x, int exp)
+  {
+    // This call shouldn't happen. This is a dummy function to deal with the
+    // Rational Scalar issue.
+    assert(true);
+    return 0;
+  }
+
   template <typename T>
   boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T> x, int exp)
   {
