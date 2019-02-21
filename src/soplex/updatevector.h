@@ -182,4 +182,8 @@ public:
 
 
 } // namespace soplex
+
+// General templated functions
+#include "soplex/updatevector.hpp"
+
 #endif // _UPDATEVECTOR_H_

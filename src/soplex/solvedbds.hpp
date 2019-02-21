@@ -591,14 +591,14 @@ namespace soplex
     // the reduced problem is formed from the current problem
     // So, we copy the _solver to the _realLP and work on the _solver
     // NOTE: there is no need to preprocess because we always have a starting basis.
-    _realLP = 0;
+    _realLP = nullptr;
     spx_alloc(_realLP);
     _realLP = new (_realLP) SPxLPBase<R>(_solver);
 
     // allocating memory for the reduced problem rows and cols flag array
-    _decompReducedProbRows = 0;
+    _decompReducedProbRows = nullptr;
     spx_alloc(_decompReducedProbRows, numRows());
-    _decompReducedProbCols = 0;
+    _decompReducedProbCols = nullptr;
     spx_alloc(_decompReducedProbCols, numCols());
 
     // the complementary problem is formulated with all incompatible rows and those from the reduced problem that have
@@ -608,8 +608,8 @@ namespace soplex
     _compSolver.setBasisSolver(&_compSlufactor);
 
     // allocating memory for the violated bounds and rows arrays
-    _decompViolatedBounds = 0;
-    _decompViolatedRows = 0;
+    _decompViolatedBounds = nullptr;
+    _decompViolatedRows = nullptr;
     spx_alloc(_decompViolatedBounds, numCols());
     spx_alloc(_decompViolatedRows, numRows());
     _nDecompViolBounds = 0;
