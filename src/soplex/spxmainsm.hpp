@@ -118,7 +118,7 @@ namespace soplex
       }
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         assert(false);
         throw SPxInternalCodeException("XMAISM15 Dimension doesn't match after this step.");
@@ -151,7 +151,7 @@ namespace soplex
     rStatus[m_i] = SPxSolverBase<R>::BASIC;
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM15 Dimension doesn't match after this step.");
       }
@@ -178,7 +178,7 @@ namespace soplex
     rStatus[m_i] = SPxSolverBase<R>::BASIC;
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM16 Dimension doesn't match after this step.");
       }
@@ -355,7 +355,7 @@ namespace soplex
       }
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM17 Dimension doesn't match after this step.");
       }
@@ -457,7 +457,7 @@ namespace soplex
       }
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM18 Dimension doesn't match after this step.");
       }
@@ -508,7 +508,7 @@ namespace soplex
 #ifdef CHECK_BASIC_DIM
     if(m_correctIdx)
       {
-        if (!checkBasisDim(rStatus, cStatus))
+        if (!this->checkBasisDim(rStatus, cStatus))
           {
             throw SPxInternalCodeException("XMAISM19 Dimension doesn't match after this step.");
           }
@@ -673,7 +673,7 @@ namespace soplex
       }
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM20 Dimension doesn't match after this step.");
       }
@@ -831,7 +831,7 @@ namespace soplex
     assert(!isOptimal || (cStatus[m_j] != SPxSolverBase<R>::BASIC || isZero(r[m_j], this->eps())));
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM21 Dimension doesn't match after this step.");
       }
@@ -892,7 +892,7 @@ namespace soplex
       rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
       }
@@ -943,7 +943,7 @@ namespace soplex
       }
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM23 Dimension doesn't match after this step.");
       }
@@ -1051,7 +1051,7 @@ namespace soplex
       }
 
 #ifdef CHECK_BASIC_DIM
-    if(m_isFirst && !checkBasisDim(rStatus, cStatus))
+    if(m_isFirst && !this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM24 Dimension doesn't match after this step.");
       }
@@ -1072,7 +1072,7 @@ namespace soplex
     if(m_isFirst)
       {
 #ifdef CHECK_BASIC_DIM
-        if (!checkBasisDim(rStatus, cStatus))
+        if (!this->checkBasisDim(rStatus, cStatus))
           {
             throw SPxInternalCodeException("XMAISM25 Dimension doesn't match after this step.");
           }
@@ -1386,7 +1386,7 @@ void SPxMainSM<R>::AggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, 
    rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
-   if (!checkBasisDim(rStatus, cStatus))
+   if (!this->checkBasisDim(rStatus, cStatus))
    {
       throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
    }
@@ -1462,7 +1462,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
       rStatus[m_i] = SPxSolverBase<R>::ON_UPPER;
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
       }
@@ -1501,7 +1501,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
       }
 
 #ifdef CHECK_BASIC_DIM
-    if (!checkBasisDim(rStatus, cStatus))
+    if (!this->checkBasisDim(rStatus, cStatus))
       {
         throw SPxInternalCodeException("XMAISM22 Dimension doesn't match after this step.");
       }
