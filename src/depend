@@ -78,17 +78,6 @@ $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/spxharrisrt.h src/soplex/spxfastrt.h \
  src/soplex/spxboundflippingrt.h src/soplex/spxfastrt.h src/soplex/sol.h \
  src/soplex/solbase.h
-$(LIBOBJDIR)/clufactor.o: src/soplex/clufactor.cpp src/soplex/spxdefines.h \
- src/soplex/clufactor.h src/soplex/slinsolver.h src/soplex/svector.h \
- src/soplex/basevectors.h src/soplex/rational.h src/soplex/idlist.h \
- src/soplex/islist.h src/soplex/vectorbase.h src/soplex/dvectorbase.h \
- src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \
- src/soplex/ssvectorbase.h src/soplex/idxset.h src/soplex/svectorbase.h \
- src/soplex/dsvectorbase.h src/soplex/unitvectorbase.h \
- src/soplex/svsetbase.h src/soplex/classarray.h src/soplex/dataset.h \
- src/soplex/dataarray.h src/soplex/datakey.h src/soplex/ssvector.h \
- src/soplex/dsvector.h src/soplex/dvector.h src/soplex/vector.h \
- src/soplex/didxset.h src/soplex/timer.h src/soplex/cring.h
 $(LIBOBJDIR)/clufactor_rational.o: src/soplex/clufactor_rational.cpp \
  src/soplex/spxdefines.h src/soplex/clufactor_rational.h \
  src/soplex/slinsolver_rational.h src/soplex/svector.h \
@@ -1023,17 +1012,6 @@ $(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/spxboundflippingrt.h src/soplex/spxfastrt.h src/soplex/sol.h \
  src/soplex/solbase.h src/soplex/spxfileio.h src/soplex/statistics.h \
  src/soplex.h src/soplex/mpsinput.h
-$(LIBOBJSUBDIR)/clufactor.o: src/soplex/clufactor.cpp src/soplex/spxdefines.h \
- src/soplex/clufactor.h src/soplex/slinsolver.h src/soplex/svector.h \
- src/soplex/basevectors.h src/soplex/rational.h src/soplex/idlist.h \
- src/soplex/islist.h src/soplex/vectorbase.h src/soplex/dvectorbase.h \
- src/soplex/spxalloc.h src/soplex/spxout.h src/soplex/exceptions.h \
- src/soplex/ssvectorbase.h src/soplex/idxset.h src/soplex/svectorbase.h \
- src/soplex/dsvectorbase.h src/soplex/unitvectorbase.h \
- src/soplex/svsetbase.h src/soplex/classarray.h src/soplex/dataset.h \
- src/soplex/dataarray.h src/soplex/datakey.h src/soplex/ssvector.h \
- src/soplex/dsvector.h src/soplex/dvector.h src/soplex/vector.h \
- src/soplex/didxset.h src/soplex/timer.h src/soplex/cring.h
 $(LIBOBJSUBDIR)/clufactor_rational.o: src/soplex/clufactor_rational.cpp \
  src/soplex/spxdefines.h src/soplex/clufactor_rational.h \
  src/soplex/slinsolver_rational.h src/soplex/svector.h \
