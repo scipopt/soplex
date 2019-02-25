@@ -38,33 +38,36 @@ namespace soplex
 {
 #define MINSTABILITY    REAL(4e-2)
 
-void SLUFactor::solveRight(Vector& x, const Vector& b) //const
+  template <class R>
+void SLUFactor<R>::solveRight(Vector& x, const Vector& b) //const
 {
 
-   solveTime->start();
+   this->solveTime->start();
 
-   vec = b;
+   this->vec = b;
    x.clear();
-   CLUFactor::solveRight(x.get_ptr(), vec.get_ptr());
+   CLUFactor<R>::solveRight(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
    solveTime->stop();
 }
 
-void SLUFactor::solveRight(SSVector& x, const SVector& b) //const
+  template <class R>
+void SLUFactor<R>::solveRight(SSVector& x, const SVector& b) //const
 {
 
    solveTime->start();
 
    vec.assign(b);
    x.clear();
-   CLUFactor::solveRight(x.altValues(), vec.get_ptr());
+   CLUFactor<R>::solveRight(x.altValues(), vec.get_ptr());
 
    solveCount++;
    solveTime->stop();
 }
 
-void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
+  template <class R>
+void SLUFactor<R>::solveRight4update(SSVector& x, const SVector& b)
 {
 
    solveTime->start();
@@ -76,9 +79,9 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    x.clear();
    ssvec = b;
    n = ssvec.size();
-   if (l.updateType == ETA)
+   if (this->l.updateType == ETA)
    {
-      m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.altValues(), ssvec.altIndexMem(), n, 0, 0, 0);
       x.setSize(m);
       //x.forceSetup();
@@ -88,7 +91,7 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    else
    {
       forest.clear();
-      m = vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.altValues(), ssvec.altIndexMem(), n,
          forest.altValues(), &f, forest.altIndexMem());
       forest.setSize(f);
@@ -104,7 +107,8 @@ void SLUFactor::solveRight4update(SSVector& x, const SVector& b)
    solveTime->stop();
 }
 
-void SLUFactor::solve2right4update(
+  template <class R>
+void SLUFactor<R>::solve2right4update(
    SSVector&      x,
    Vector&        y,
    const SVector& b,
@@ -127,10 +131,10 @@ void SLUFactor::solve2right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if (this->l.updateType == ETA)
    {
       n = ssvec.size();
-      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize, 0, 0, 0);
       x.setSize(m);
@@ -142,7 +146,7 @@ void SLUFactor::solve2right4update(
    {
       forest.clear();
       n = ssvec.size();
-      m = vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      m = this->vSolveRight4update2(x.getEpsilon(), x.altValues(), x.altIndexMem(),
          ssvec.get_ptr(), sidx, n, y.get_ptr(),
          rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
          forest.altValues(), &f, forest.altIndexMem());
@@ -159,7 +163,8 @@ void SLUFactor::solve2right4update(
    solveTime->stop();
 }
 
-void SLUFactor::solve2right4update(
+  template <class R>
+void SLUFactor<R>::solve2right4update(
    SSVector&      x,
    SSVector&      y,
    const SVector& b,
@@ -181,10 +186,10 @@ void SLUFactor::solve2right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if (this->l.updateType == ETA)
    {
       n = ssvec.size();
-      vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
                                 ssvec.get_ptr(), sidx, n,
                                 y.getEpsilon(), y.altValues(), y.altIndexMem(),
                                 rhs.altValues(), ridx, rsize,
@@ -200,7 +205,7 @@ void SLUFactor::solve2right4update(
    {
       forest.clear();
       n = ssvec.size();
-      vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update2sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
                                 ssvec.get_ptr(), sidx, n,
                                 y.getEpsilon(), y.altValues(), y.altIndexMem(),
                                 rhs.altValues(), ridx, rsize,
@@ -221,7 +226,8 @@ void SLUFactor::solve2right4update(
 }
 
 
-void SLUFactor::solve3right4update(
+template <class R>
+void SLUFactor<R>::solve3right4update(
    SSVector&      x,
    Vector&        y,
    Vector&        y2,
@@ -249,10 +255,10 @@ void SLUFactor::solve3right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if (this->l.updateType == ETA)
    {
       n = ssvec.size();
-      m = vSolveRight4update3(x.getEpsilon(),
+      m = this->vSolveRight4update3(x.getEpsilon(),
          x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
          y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
          y2.get_ptr(), rhs2.getEpsilon(),rhs2.altValues(), ridx2, rsize2,
@@ -266,7 +272,7 @@ void SLUFactor::solve3right4update(
    {
       forest.clear();
       n = ssvec.size();
-      m = vSolveRight4update3(x.getEpsilon(),
+      m = this->vSolveRight4update3(x.getEpsilon(),
          x.altValues(), x.altIndexMem(), ssvec.get_ptr(), sidx, n,
          y.get_ptr(), rhs.getEpsilon(), rhs.altValues(), ridx, rsize,
          y2.get_ptr(), rhs2.getEpsilon(),rhs2.altValues(), ridx2, rsize2,
@@ -285,7 +291,8 @@ void SLUFactor::solve3right4update(
    solveTime->stop();
 }
 
-void SLUFactor::solve3right4update(
+template <class R>
+void SLUFactor<R>::solve3right4update(
    SSVector&      x,
    SSVector&      y,
    SSVector&      y2,
@@ -311,10 +318,10 @@ void SLUFactor::solve3right4update(
    usetup = true;
    ssvec = b;
 
-   if (l.updateType == ETA)
+   if (this->l.updateType == ETA)
    {
       n = ssvec.size();
-      vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
                                 ssvec.get_ptr(), sidx, n,
                                 y.getEpsilon(), y.altValues(), y.altIndexMem(),
                                 rhs.altValues(), ridx, rsize,
@@ -334,7 +341,7 @@ void SLUFactor::solve3right4update(
    {
       forest.clear();
       n = ssvec.size();
-      vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+      this->vSolveRight4update3sparse(x.getEpsilon(), x.altValues(), x.altIndexMem(),
                                 ssvec.get_ptr(), sidx, n,
                                 y.getEpsilon(), y.altValues(), y.altIndexMem(),
                                 rhs.altValues(), ridx, rsize,
@@ -361,20 +368,22 @@ void SLUFactor::solve3right4update(
 }
 
 
-void SLUFactor::solveLeft(Vector& x, const Vector& b) //const
+template <class R>
+void SLUFactor<R>::solveLeft(Vector& x, const Vector& b) //const
 {
 
    solveTime->start();
 
    vec = b;
    x.clear();
-   CLUFactor::solveLeft(x.get_ptr(), vec.get_ptr());
+   CLUFactor<R>::solveLeft(x.get_ptr(), vec.get_ptr());
 
    solveCount++;
    solveTime->stop();
 }
 
-void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
+template <class R>
+void SLUFactor<R>::solveLeft(SSVector& x, const SVector& b) //const
 {
 
    solveTime->start();
@@ -385,7 +394,7 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
 
    x.clear();
    int sz = ssvec.size(); // see .altValues()
-   int n = vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
+   int n = this->vSolveLeft(x.getEpsilon(), x.altValues(), x.altIndexMem(),
       ssvec.altValues(), ssvec.altIndexMem(), sz);
 
    if (n > 0)
@@ -403,7 +412,8 @@ void SLUFactor::solveLeft(SSVector& x, const SVector& b) //const
    solveTime->stop();
 }
 
-void SLUFactor::solveLeft(
+template <class R>
+void SLUFactor<R>::solveLeft(
    SSVector&      x,
    Vector&        y,
    const SVector& rhs1,
@@ -422,7 +432,7 @@ void SLUFactor::solveLeft(
    y.clear();
    ssvec.assign(rhs1);
    n = ssvec.size(); // see altValues();
-   n = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
+   n = this->vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
       y.get_ptr(), rhs2.altValues(), ridx, rn);
 
    // this will unsetup x
@@ -438,7 +448,8 @@ void SLUFactor::solveLeft(
    solveTime->stop();
 }
 
-void SLUFactor::solveLeft(
+template <class R>
+void SLUFactor<R>::solveLeft(
    SSVector&      x,
    SSVector&      y,
    const SVector& rhs1,
@@ -458,7 +469,7 @@ void SLUFactor::solveLeft(
    n2 = rhs2.size();
    if( n2 < 10 )
    {
-      vSolveLeft2sparse(x.getEpsilon(),
+     this->vSolveLeft2sparse(x.getEpsilon(),
                         x.altValues(), x.altIndexMem(),
                         svec, sidx, n1,
                         y.altValues(), y.altIndexMem(),
@@ -469,7 +480,7 @@ void SLUFactor::solveLeft(
    }
    else
    {
-      n1 = vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n1,
+     n1 = this->vSolveLeft2(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n1,
             y.altValues(), rhs2.altValues(), rhs2.altIndexMem(), n2);
 //      y.setup();
    }
@@ -488,7 +499,8 @@ void SLUFactor::solveLeft(
 }
 
 
-void SLUFactor::solveLeft(
+template <class R>
+void SLUFactor<R>::solveLeft(
    SSVector&      x,
    Vector&        y,
    Vector&        z,
@@ -511,7 +523,7 @@ void SLUFactor::solveLeft(
    n2 = rhs2.size();
    n3 = rhs3.size();
 
-   n = vSolveLeft3(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
+   n = this->vSolveLeft3(x.getEpsilon(), x.altValues(), x.altIndexMem(), svec, sidx, n,
                    y.get_ptr(), rhs2.altValues(), rhs2.altIndexMem(), n2,
                    z.get_ptr(), rhs3.altValues(), rhs3.altIndexMem(), n3);
 
@@ -527,7 +539,8 @@ void SLUFactor::solveLeft(
    solveTime->stop();
 }
 
-void SLUFactor::solveLeft(
+template <class R>
+void SLUFactor<R>::solveLeft(
    SSVector&      x,
    SSVector&      y,
    SSVector&      z,
@@ -549,7 +562,7 @@ void SLUFactor::solveLeft(
    n1 = ssvec.size(); // see altValues();
    n2 = rhs2.size();
    n3 = rhs3.size();
-   vSolveLeft3sparse(x.getEpsilon(),
+   this->vSolveLeft3sparse(x.getEpsilon(),
                      x.altValues(), x.altIndexMem(),
                      svec, sidx, n1,
                      y.altValues(), y.altIndexMem(),
@@ -575,19 +588,21 @@ void SLUFactor::solveLeft(
 }
 
 
-Real SLUFactor::stability() const
+template <class R>
+Real SLUFactor<R>::stability() const
 {
    if (status() != OK)
       return 0;
 
-   if (maxabs < initMaxabs)
+   if (this->maxabs < this->initMaxabs)
       return 1;
 
-   assert(maxabs != 0.0);
-   return initMaxabs / maxabs;
+   assert(this->maxabs != 0.0);
+   return this->initMaxabs / this->maxabs;
 }
 
-Real SLUFactor::matrixMetric(int type) const
+template <class R>
+Real SLUFactor<R>::matrixMetric(int type) const
 {
    Real result = 0.0;
 
@@ -600,7 +615,7 @@ Real SLUFactor::matrixMetric(int type) const
    // compute condition estimate by ratio of max/min of elements on the diagonal
    case 0:
    {
-      Real mindiag = spxAbs(diag[0]);
+     Real mindiag = spxAbs(this->diag[0]);
       Real maxdiag = spxAbs(diag[0]);
 
       for( int i = 1; i < dim(); ++i)
@@ -618,13 +633,13 @@ Real SLUFactor::matrixMetric(int type) const
    case 1:
       result = 0.0;
       for( int i = 0; i < dim(); ++i)
-         result += 1.0/diag[i];
+        result += 1.0/this->diag[i];
       break;
    // compute determinant (product of all diagonal elements of U)
    case 2:
       result = 1.0;
       for( int i = 0; i < dim(); ++i)
-         result *= diag[i];
+        result *= this->diag[i];
       result = 1.0/result;
       break;
    }
@@ -632,7 +647,8 @@ Real SLUFactor::matrixMetric(int type) const
    return result;
 }
 
-std::string SLUFactor::statistics() const
+template <class R>
+std::string SLUFactor<R>::statistics() const
 {
    std::stringstream s;
    s  << "Factorizations     : " << std::setw(10) << getFactorCount() << std::endl
@@ -643,16 +659,18 @@ std::string SLUFactor::statistics() const
    return s.str();
 }
 
-void SLUFactor::changeEta(int idx, SSVector& et)
+template <class R>
+void SLUFactor<R>::changeEta(int idx, SSVector& et)
 {
 
    int es = et.size(); // see altValues()
-   update(idx, et.altValues(), et.altIndexMem(), es);
+   this->update(idx, et.altValues(), et.altIndexMem(), es);
    et.setSize(0);
    et.forceSetup();
 }
 
-SLUFactor::Status SLUFactor::change(
+template <class R>
+typename SLUFactor<R>::Status SLUFactor<R>::change(
    int             idx,
    const SVector&  subst,
    const SSVector* e)
@@ -685,17 +703,17 @@ SLUFactor::Status SLUFactor::change(
    }
    else if (e != 0)                                   // ETA updates
    {
-      l.updateType = ETA;
-      updateNoClear(idx, e->values(), e->indexMem(), e->size());
+     this->l.updateType = ETA;
+     this->updateNoClear(idx, e->values(), e->indexMem(), e->size());
       l.updateType = uptype;
    }
-   else if (l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
+   else if (this->l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
    {
       assert(0);  // probably this part is never called.
                   // forestUpdate() with the last parameter set to NULL should fail.
       forest = subst;
-      CLUFactor::solveLright(forest.altValues());
-      forestUpdate(idx, forest.altValues(), 0, 0);
+      CLUFactor<R>::solveLright(forest.altValues());
+      this->forestUpdate(idx, forest.altValues(), 0, 0);
       forest.setSize(0);
       forest.forceSetup();
    }
@@ -704,7 +722,7 @@ SLUFactor::Status SLUFactor::change(
       assert(l.updateType == ETA);
       vec = subst;
       eta.clear();
-      CLUFactor::solveRight(eta.altValues(), vec.get_ptr());
+      CLUFactor<R>::solveRight(eta.altValues(), vec.get_ptr());
       changeEta(idx, eta);
    }
    usetup = false;
@@ -715,33 +733,34 @@ SLUFactor::Status SLUFactor::change(
    return status();
 }
 
-void SLUFactor::clear()
+template <class R>
+void SLUFactor<R>::clear()
 {
 
-   rowMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
-   colMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
-   lMemMult      = 1;          /* factor of minimum Memory * #of nonzeros */
+  this->rowMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
+   this->colMemMult    = 5;          /* factor of minimum Memory * #of nonzeros */
+   this->lMemMult      = 1;          /* factor of minimum Memory * #of nonzeros */
 
-   l.firstUpdate = 0;
-   l.firstUnused = 0;
-   thedim        = 0;
+   this->l.firstUpdate = 0;
+   this->l.firstUnused = 0;
+   this->thedim        = 0;
 
    epsilon       = Param<Real>::epsilonFactorization();
    usetup        = false;
-   maxabs        = 1;
-   initMaxabs    = 1;
+   this->maxabs        = 1;
+   this->initMaxabs    = 1;
    lastThreshold = minThreshold;
    minStability  = MINSTABILITY;
-   stat          = UNLOADED;
+   this->stat          = UNLOADED;
 
    vec.clear();
    eta.clear();
    ssvec.clear();
    forest.clear();
 
-   u.row.size    = 100;
-   u.col.size    = 100;
-   l.size        = 100;
+   this->u.row.size    = 100;
+   this->u.col.size    = 100;
+   this->l.size        = 100;
    l.startSize   = 100;
 
    if (l.rval)
@@ -755,11 +774,11 @@ void SLUFactor::clear()
    if(l.rperm)
       spx_free(l.rperm);
 
-   if(u.row.val)
+   if(this->u.row.val)
       spx_free(u.row.val);
-   if(u.row.idx)
+   if(this->u.row.idx)
       spx_free(u.row.idx);
-   if(u.col.idx)
+   if(this->u.col.idx)
       spx_free(u.col.idx);
    if(l.val)
       spx_free(l.val);
@@ -774,7 +793,7 @@ void SLUFactor::clear()
    // G clean up if anything goes wrong here
    try
    {
-      spx_alloc(u.row.val, u.row.size);
+     spx_alloc(this->u.row.val, u.row.size);
       spx_alloc(u.row.idx, u.row.size);
       spx_alloc(u.col.idx, u.col.size);
 
@@ -794,12 +813,13 @@ void SLUFactor::clear()
  *  If this is initialised, freeAll() has to be called before.
  *  Class objects from SLUFactor are not copied here.
  */
-void SLUFactor::assign(const SLUFactor& old)
+template <class R>
+void SLUFactor<R>::assign(const SLUFactor& old)
 {
    spxout = old.spxout;
 
    solveTime = TimerFactory::createTimer(old.solveTime->type());
-   factorTime = TimerFactory::createTimer(old.factorTime->type());
+   this->factorTime = TimerFactory::createTimer(old.factorTime->type());
 
    // slufactor
    uptype        = old.uptype;
@@ -809,33 +829,33 @@ void SLUFactor::assign(const SLUFactor& old)
    lastThreshold = old.lastThreshold;
 
    // clufactor
-   stat          = old.stat;
-   thedim        = old.thedim;
-   nzCnt         = old.nzCnt;
-   initMaxabs    = old.initMaxabs;
-   maxabs        = old.maxabs;
-   rowMemMult    = old.rowMemMult;
-   colMemMult    = old.colMemMult;
-   lMemMult      = old.lMemMult;
+   this->stat          = old.stat;
+   this->thedim        = old.thedim;
+   this->nzCnt         = old.nzCnt;
+   this->initMaxabs    = old.initMaxabs;
+   this->maxabs        = old.maxabs;
+   this->rowMemMult    = old.rowMemMult;
+   this->colMemMult    = old.colMemMult;
+   this->lMemMult      = old.lMemMult;
 
-   spx_alloc(row.perm, thedim);
-   spx_alloc(row.orig, thedim);
-   spx_alloc(col.perm, thedim);
-   spx_alloc(col.orig, thedim);
-   spx_alloc(diag,     thedim);
+   spx_alloc(this->row.perm, this->thedim);
+   spx_alloc(this->row.orig, this->thedim);
+   spx_alloc(this->col.perm, thedim);
+   spx_alloc(this->col.orig, thedim);
+   spx_alloc(this->diag,     thedim);
 
-   memcpy(row.perm, old.row.perm, (unsigned int)thedim * sizeof(*row.perm));
+   memcpy(this->row.perm, old.row.perm, (unsigned int)thedim * sizeof(*this->row.perm));
    memcpy(row.orig, old.row.orig, (unsigned int)thedim * sizeof(*row.orig));
-   memcpy(col.perm, old.col.perm, (unsigned int)thedim * sizeof(*col.perm));
+   memcpy(this->col.perm, old.col.perm, (unsigned int)thedim * sizeof(*col.perm));
    memcpy(col.orig, old.col.orig, (unsigned int)thedim * sizeof(*col.orig));
-   memcpy(diag,     old.diag,     (unsigned int)thedim * sizeof(*diag));
+   memcpy(this->diag,     old.diag,     (unsigned int)thedim * sizeof(*diag));
 
-   work = vec.get_ptr();
+   this->work = vec.get_ptr();
 
    /* setup U
     */
-   u.row.size = old.u.row.size;
-   u.row.used = old.u.row.used;
+   this->u.row.size = old.u.row.size;
+   this->u.row.used = old.u.row.used;
 
    spx_alloc(u.row.elem,  thedim);
    spx_alloc(u.row.val,   u.row.size);
@@ -852,7 +872,7 @@ void SLUFactor::assign(const SLUFactor& old)
    memcpy(u.row.max,   old.u.row.max,   (unsigned int)(thedim + 1) * sizeof(*u.row.max));
 
    // need to make row list ok ?
-   if (thedim > 0 && stat == OK)
+   if (thedim > 0 && this->stat == OK)
    {
       u.row.list.idx = old.u.row.list.idx; // .idx neu
 
@@ -991,7 +1011,8 @@ void SLUFactor::assign(const SLUFactor& old)
 
 }
 
-SLUFactor& SLUFactor::operator=(const SLUFactor& old)
+template <class R>
+SLUFactor& SLUFactor<R>::operator=(const SLUFactor& old)
 {
 
    if (this != &old)
@@ -1020,7 +1041,8 @@ SLUFactor& SLUFactor::operator=(const SLUFactor& old)
    return *this;
 }
 
-SLUFactor::SLUFactor()
+template <class R>
+SLUFactor<R>::SLUFactor()
    : vec (1)
    , ssvec (1)
    , usetup (false)
@@ -1123,7 +1145,7 @@ SLUFactor::SLUFactor()
    l.rorig = 0;
    l.rperm = 0;
 
-   SLUFactor::clear(); // clear() is virtual
+   SLUFactor<R>::clear(); // clear() is virtual
 
    factorCount = 0;
    solveCount  = 0;
@@ -1152,10 +1174,11 @@ SLUFactor::SLUFactor()
    assert(l.start != 0);
    assert(l.row   != 0);
 
-   assert(SLUFactor::isConsistent());
+   assert(SLUFactor<R>::isConsistent());
 }
 
-SLUFactor::SLUFactor(const SLUFactor& old)
+template <class R>
+SLUFactor<R>::SLUFactor(const SLUFactor& old)
    : SLinSolver( old )
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
@@ -1204,10 +1227,11 @@ SLUFactor::SLUFactor(const SLUFactor& old)
       freeAll();
       throw x;
    }
-   assert(SLUFactor::isConsistent());
+   assert(SLUFactor<R>::isConsistent());
 }
 
-void SLUFactor::freeAll()
+template <class R>
+void SLUFactor<R>::freeAll()
 {
 
    if(row.perm) spx_free(row.perm);
@@ -1241,7 +1265,8 @@ void SLUFactor::freeAll()
    if(l.rperm) spx_free(l.rperm);
 }
 
-SLUFactor::~SLUFactor()
+template <class R>
+SLUFactor<R>::~SLUFactor()
 {
    freeAll();
 
@@ -1267,7 +1292,8 @@ static Real betterThreshold(Real th)
    return th;
 }
 
-SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
+template <class R>
+SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
 {
    assert(dm     >= 0);
    assert(matrix != 0);
@@ -1399,17 +1425,19 @@ SLUFactor::Status SLUFactor::load(const SVector* matrix[], int dm)
 }
 
 
-bool SLUFactor::isConsistent() const
+template <class R>
+bool SLUFactor<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-   return CLUFactor::isConsistent();
+   return CLUFactor<R>::isConsistent();
 #else
    return true;
 #endif
 }
 
-void SLUFactor::dump() const
+template <class R>
+void SLUFactor<R>::dump() const
 {
-   CLUFactor::dump();
+   CLUFactor<R>::dump();
 }
 } // namespace soplex

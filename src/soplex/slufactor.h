@@ -38,7 +38,8 @@ namespace soplex
  * This class implements a SLinSolver interface by using the sparse LU
  * factorization implemented in CLUFactor.
  */
-class SLUFactor : public SLinSolver, protected CLUFactor
+  template <class R>
+  class SLUFactor : public SLinSolver, protected CLUFactor<R>
 {
 public:
 
@@ -155,22 +156,22 @@ public:
    ///
    int dim() const
    {
-      return thedim;
+      return this->thedim;
    }
    ///
    int memory() const
    {
-      return nzCnt + l.start[l.firstUnused];
+      return this->nzCnt + this->l.start[this->l.firstUnused];
    }
    ///
    const char* getName() const
    {
-      return (uptype == SLUFactor::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
+     return (uptype == SLUFactor<R>::ETA) ? "SLU-Eta" : "SLU-Forest-Tomlin";
    }
    ///
    Status status() const
    {
-      return Status(stat);
+      return Status(this->stat);
    }
    ///
    Real stability() const;
@@ -241,17 +242,17 @@ public:
    /// time spent in factorizations
    Real getFactorTime() const
    {
-      return factorTime->time();
+      return this->factorTime->time();
    }
    /// reset FactorTime
    void resetFactorTime()
    {
-      factorTime->reset();
+      this->factorTime->reset();
    }
    /// number of factorizations performed
    int getFactorCount() const
    {
-      return factorCount;
+      return this->factorCount;
    }
    /// time spent in solves
    Real getSolveTime() const
@@ -271,9 +272,9 @@ public:
    /// reset timers and counters
    void resetCounters()
    {
-      factorTime->reset();
+      this->factorTime->reset();
       solveTime->reset();
-      factorCount = 0;
+      this->factorCount = 0;
       solveCount = 0;
    }
    /// prints the LU factorization to stdout.
@@ -289,9 +290,9 @@ public:
    /// default constructor.
    SLUFactor();
    /// assignment operator.
-   SLUFactor& operator=(const SLUFactor& old);
+  SLUFactor<R>& operator=(const SLUFactor<R>& old);
    /// copy constructor.
-   SLUFactor(const SLUFactor& old);
+  SLUFactor(const SLUFactor<R>& old);
    /// destructor.
    virtual ~SLUFactor();
    /// clone function for polymorphism
@@ -307,7 +308,7 @@ private:
    /**@name Private helpers */
    //@{
    /// used to implement the assignment operator
-   void assign(const SLUFactor& old);
+  void assign(const SLUFactor<R>& old);
    //@}
 };
 

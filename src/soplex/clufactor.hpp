@@ -204,7 +204,8 @@ static int deQueueMin( int* heap, int* size )
 }
 
 /************************************************************/
-CLUFactor::Temp::Temp()
+  template <class R>
+  CLUFactor<R>::Temp::Temp()
       : s_mark( 0 )
       , s_max( 0 )
       , s_cact( 0 )
@@ -215,7 +216,8 @@ CLUFactor::Temp::Temp()
       , pivot_rowNZ( 0 )
 {}
 
-void CLUFactor::Temp::init( int p_dim )
+  template <class R>
+  void CLUFactor<R>::Temp::init( int p_dim )
 {
    spx_realloc( s_max,  p_dim );
    spx_realloc( s_cact, p_dim );
@@ -223,37 +225,40 @@ void CLUFactor::Temp::init( int p_dim )
    stage = 0;
 }
 
-void CLUFactor::Temp::clear()
+  template <class R>
+  void CLUFactor<R>::Temp::clear()
 {
-   if ( s_mark != 0 )
+   if ( s_mark != nullptr )
       spx_free( s_mark );
 
-   if ( s_cact != 0 )
+   if ( s_cact != nullptr )
       spx_free( s_cact );
 
-   if ( s_max != 0 )
+   if ( s_max != nullptr )
       spx_free( s_max );
 
-   if ( pivot_col != 0 )
+   if ( pivot_col != nullptr )
       spx_free( pivot_col );
 
-   if ( pivot_colNZ != 0 )
+   if ( pivot_colNZ != nullptr )
       spx_free( pivot_colNZ );
 
-   if ( pivot_row != 0 )
+   if ( pivot_row != nullptr )
       spx_free( pivot_row );
 
-   if ( pivot_rowNZ != 0 )
+   if ( pivot_rowNZ != nullptr )
       spx_free( pivot_rowNZ );
 }
 
-CLUFactor::Temp::~Temp()
+  template <class R>
+  CLUFactor<R>::Temp::~Temp()
 {
    clear();
 }
 
 /************************************************************/
-void CLUFactor::initPerm()
+  template <class R>
+  void CLUFactor<R>::initPerm()
 {
 
    for ( int i = 0; i < thedim; ++i )
@@ -262,7 +267,8 @@ void CLUFactor::initPerm()
 
 /*****************************************************************************/
 
-void CLUFactor::setPivot( const int p_stage,
+  template <class R>
+  void CLUFactor<R>::setPivot( const int p_stage,
                           const int p_col,
                           const int p_row,
                           const R val )
@@ -296,7 +302,8 @@ void CLUFactor::setPivot( const int p_stage,
 /*
  *      Perform garbage collection on row file
  */
-void CLUFactor::packRows()
+template <class R>
+void CLUFactor<R>::packRows()
 {
    int n, i, j, l_row;
    Dring *ring, *list;
@@ -354,7 +361,8 @@ terminatePackRows:
 /*
  *      Perform garbage collection on column file
  */
-void CLUFactor::forestPackColumns()
+template <class R>
+void CLUFactor<R>::forestPackColumns()
 {
    int n, i, j, colno;
    Dring *ring, *list;
@@ -409,7 +417,8 @@ terminatePackColumns :
 /*
  *      Make row of fac large enough to hold len nonzeros.
  */
-void CLUFactor::remaxRow( int p_row, int len )
+template <class R>
+void CLUFactor<R>::remaxRow( int p_row, int len )
 {
    assert( u.row.max[p_row] < len );
 
@@ -487,7 +496,8 @@ void CLUFactor::remaxRow( int p_row, int len )
 /*
  *      Perform garbage collection on column file
  */
-void CLUFactor::packColumns()
+template <class R>
+void CLUFactor<R>::packColumns()
 {
    int n, i, j, l_col;
    Dring *ring, *list;
@@ -538,7 +548,8 @@ terminatePackColumns :
 /*
  *      Make column col of fac large enough to hold len nonzeros.
  */
-void CLUFactor::remaxCol( int p_col, int len )
+template <class R>
+void CLUFactor<R>::remaxCol( int p_col, int len )
 {
    assert( u.col.max[p_col] < len );
 
@@ -606,8 +617,8 @@ void CLUFactor::remaxCol( int p_col, int len )
 
 /*
  *      Make column col of fac large enough to hold len nonzeros.
- */
-void CLUFactor::forestReMaxCol( int p_col, int len )
+ */template <class R>
+void CLUFactor<R>::forestReMaxCol( int p_col, int len )
 {
    assert( u.col.max[p_col] < len );
 
@@ -705,8 +716,8 @@ void CLUFactor::forestReMaxCol( int p_col, int len )
  *         row instead of misusing p_work. I think that should be as efficient and
  *         much cleaner.
  */
-
-void CLUFactor::forestUpdate( int p_col, R* p_work, int num, int *nonz )
+template <class R>
+void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
 {
    int i, j, k, h, m, n;
    int ll, c, r, rowno;
@@ -1272,7 +1283,8 @@ void CLUFactor::forestUpdate( int p_col, R* p_work, int num, int *nonz )
    stat = SLinSolver::OK;
 }
 
-void CLUFactor::update( int p_col, R* p_work, const int* p_idx, int num )
+template <class R>
+void CLUFactor<R>::update( int p_col, R* p_work, const int* p_idx, int num )
 {
    int ll, i, j;
    int* lidx;
@@ -1316,7 +1328,8 @@ void CLUFactor::update( int p_col, R* p_work, const int* p_idx, int num )
    stat = SLinSolver::OK;
 }
 
-void CLUFactor::updateNoClear(
+template <class R>
+void CLUFactor<R>::updateNoClear(
    int p_col,
    const R* p_work,
    const int* p_idx,
@@ -1386,7 +1399,8 @@ void CLUFactor::updateNoClear(
  *      Initialize row and column file of working matrix and
  *      mark column singletons.
  */
-void CLUFactor::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
+template <class R>
+void CLUFactor<R>::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
 {
 
    R x;
@@ -1613,8 +1627,8 @@ void CLUFactor::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
 /*
  *      Remove column singletons
  */
-
-void CLUFactor::colSingletons()
+template <class R>
+void CLUFactor<R>::colSingletons()
 {
    int i, j, k, n;
    int len;
@@ -1707,7 +1721,8 @@ void CLUFactor::colSingletons()
 /*
  *      Remove row singletons
  */
-void CLUFactor::rowSingletons()
+template <class R>
+void CLUFactor<R>::rowSingletons()
 {
    R pval;
    int i, j, k, ll, r;
@@ -1802,12 +1817,13 @@ void CLUFactor::rowSingletons()
  *      and required entries of arrays max and mark
  */
 
-void CLUFactor::initFactorRings()
+template <class R>
+void CLUFactor<R>::initFactorRings()
 {
    int i;
    int *rperm = row.perm;
    int *cperm = col.perm;
-   CLUFactor::Pring *ring;
+   CLUFactor<R>::Pring *ring;
 
    assert( thedim >= 0 );
    spx_alloc( temp.pivot_col,   thedim + 1 );
@@ -1855,7 +1871,8 @@ void CLUFactor::initFactorRings()
    }
 }
 
-void CLUFactor::freeFactorRings( void )
+template <class R>
+void CLUFactor<R>::freeFactorRings( void )
 {
 
    if ( temp.pivot_col )
@@ -1876,14 +1893,15 @@ void CLUFactor::freeFactorRings( void )
  *      Eliminate all row singletons from nucleus.
  *      A row singleton may well be column singleton at the same time!
  */
-void CLUFactor::eliminateRowSingletons()
+template <class R>
+void CLUFactor<R>::eliminateRowSingletons()
 {
    int i, j, k, ll, r;
    int len, lk;
    int pcol, prow;
    R pval;
    int *idx;
-   CLUFactor::Pring *sing;
+   CLUFactor<R>::Pring *sing;
 
    for ( sing = temp.pivot_rowNZ[1].prev; sing != &( temp.pivot_rowNZ[1] ); sing = sing->prev )
    {
@@ -1997,11 +2015,12 @@ void CLUFactor::eliminateRowSingletons()
  *      Eliminate all column singletons from nucleus.
  *      A column singleton must not be row singleton at the same time!
  */
-void CLUFactor::eliminateColSingletons()
+template <class R>
+void CLUFactor<R>::eliminateColSingletons()
 {
    int i, j, k, m, c;
    int pcol, prow;
-   CLUFactor::Pring *sing;
+   CLUFactor<R>::Pring *sing;
 
    for ( sing = temp.pivot_colNZ[1].prev;
          sing != &( temp.pivot_colNZ[1] );
@@ -2074,7 +2093,8 @@ void CLUFactor::eliminateColSingletons()
 /*
  * No singletons available: Select pivot elements.
  */
-void CLUFactor::selectPivots( R threshold )
+template <class R>
+void CLUFactor<R>::selectPivots( R threshold )
 {
    int ii;
    int i;
@@ -2248,7 +2268,7 @@ void CLUFactor::selectPivots( R threshold )
       {
          /*  Initialize selected pivot element
           */
-         CLUFactor::Pring *pr;
+         CLUFactor<R>::Pring *pr;
          temp.pivot_row[rw].pos = ii - u.row.start[rw];
          temp.pivot_row[rw].mkwtz = mkwtz = ( mkwtz - 1 ) * ( count - 1 );
          // ??? mkwtz originally was long,
@@ -2294,7 +2314,8 @@ void CLUFactor::selectPivots( R threshold )
 /*
  *      Perform L and update loop for row r
  */
-int CLUFactor::updateRow( int r,
+template <class R>
+int CLUFactor<R>::updateRow( int r,
                           int lv,
                           int prow,
                           int pcol,
@@ -2430,7 +2451,8 @@ int CLUFactor::updateRow( int r,
 /*
  *      Eliminate pivot element
  */
-void CLUFactor::eliminatePivot( int prow, int pos, R eps )
+template <class R>
+void CLUFactor<R>::eliminatePivot( int prow, int pos, R eps )
 {
    int i, j, k, m = -1;
    int lv = -1;  // This value should never be used.
@@ -2526,11 +2548,12 @@ void CLUFactor::eliminatePivot( int prow, int pos, R eps )
 /*
  *      Factorize nucleus.
  */
-void CLUFactor::eliminateNucleus( const R eps,
+template <class R>
+void CLUFactor<R>::eliminateNucleus( const R eps,
                                   const R threshold )
 {
    int r, c;
-   CLUFactor::Pring *pivot;
+   CLUFactor<R>::Pring *pivot;
 
    if ( stat == SLinSolver::SINGULAR )
       return;
@@ -2602,7 +2625,8 @@ void CLUFactor::eliminateNucleus( const R eps,
 
 /*****************************************************************************/
 
-int CLUFactor::setupColVals()
+template <class R>
+int CLUFactor<R>::setupColVals()
 {
    int i;
    int n = thedim;
@@ -2657,7 +2681,8 @@ int CLUFactor::setupColVals()
 /*****************************************************************************/
 
 #ifdef WITH_L_ROWS
-void CLUFactor::setupRowVals()
+template <class R>
+void CLUFactor<R>::setupRowVals()
 {
    int   i, j, k, m;
    int   vecs, mem;
@@ -2768,7 +2793,8 @@ void CLUFactor::setupRowVals()
 
 /*****************************************************************************/
 
-void CLUFactor::factor( const SVectorBase<R>** vec,         ///< Array of column VectorBase<R> pointers
+template <class R>
+void CLUFactor<R>::factor( const SVectorBase<R>** vec,         ///< Array of column VectorBase<R> pointers
                         R            threshold,    ///< pivoting threshold
                         R            eps )         ///< epsilon for zero detection
 {
@@ -2825,7 +2851,8 @@ TERMINATE:
    factorCount++;
 }
 
-void CLUFactor::dump() const
+template <class R>
+void CLUFactor<R>::dump() const
 {
    int i, j, k;
 
@@ -2871,7 +2898,8 @@ void CLUFactor::dump() const
 /*
  *      Ensure that row memory is at least size.
  */
-void CLUFactor::minRowMem( int size )
+template <class R>
+void CLUFactor<R>::minRowMem( int size )
 {
 
    if ( u.row.size < size )
@@ -2886,7 +2914,8 @@ void CLUFactor::minRowMem( int size )
 /*
  *      Ensure that column memory is at least size.
  */
-void CLUFactor::minColMem( int size )
+template <class R>
+void CLUFactor<R>::minColMem( int size )
 {
 
    if ( u.col.size < size )
@@ -2896,7 +2925,8 @@ void CLUFactor::minColMem( int size )
    }
 }
 
-void CLUFactor::forestMinColMem( int size )
+template <class R>
+void CLUFactor<R>::forestMinColMem( int size )
 {
 
    if ( u.col.size < size )
@@ -2907,7 +2937,8 @@ void CLUFactor::forestMinColMem( int size )
    }
 }
 
-void CLUFactor::minLMem( int size )
+template <class R>
+void CLUFactor<R>::minLMem( int size )
 {
 
    if ( size > l.size )
@@ -2919,7 +2950,8 @@ void CLUFactor::minLMem( int size )
 }
 
 
-int CLUFactor::makeLvec( int p_len, int p_row )
+template <class R>
+int CLUFactor<R>::makeLvec( int p_len, int p_row )
 {
 
    if ( l.firstUnused >= l.startSize )
@@ -2947,12 +2979,13 @@ int CLUFactor::makeLvec( int p_len, int p_row )
 
 /*****************************************************************************/
 
-bool CLUFactor::isConsistent() const
+template <class R>
+bool CLUFactor<R>::isConsistent() const
 {
 #ifdef ENABLE_CONSISTENCY_CHECKS
    int              i, j, k, ll;
    Dring            *ring;
-   CLUFactor::Pring *pring;
+   CLUFactor<R>::Pring *pring;
 
    /*  Consistency only relevant for R factorizations
     */
@@ -3084,7 +3117,8 @@ bool CLUFactor::isConsistent() const
    return true;
 }
 
-void CLUFactor::solveUright( R* wrk, R* vec ) const
+template <class R>
+void CLUFactor<R>::solveUright( R* wrk, R* vec ) const
 {
 
    for ( int i = thedim - 1; i >= 0; i-- )
@@ -3104,7 +3138,8 @@ void CLUFactor::solveUright( R* wrk, R* vec ) const
    }
 }
 
-int CLUFactor::solveUrightEps( R* vec, int* nonz, R eps, R* rhs )
+template <class R>
+int CLUFactor<R>::solveUrightEps( R* vec, int* nonz, R eps, R* rhs )
 {
    int i, j, r, c, n;
    int *rorig, *corig;
@@ -3147,7 +3182,8 @@ int CLUFactor::solveUrightEps( R* vec, int* nonz, R eps, R* rhs )
    return n;
 }
 
-void CLUFactor::solveUright2(
+template <class R>
+void CLUFactor<R>::solveUright2(
    R* p_work1, R* vec1, R* p_work2, R* vec2 )
 {
    int i, j, r, c;
@@ -3210,7 +3246,8 @@ void CLUFactor::solveUright2(
    }
 }
 
-int CLUFactor::solveUright2eps(
+template <class R>
+int CLUFactor<R>::solveUright2eps(
    R* p_work1, R* vec1, R* p_work2, R* vec2,
    int* nonz, R eps )
 {
@@ -3292,7 +3329,8 @@ int CLUFactor::solveUright2eps(
    return n;
 }
 
-void CLUFactor::solveLright( R* vec )
+template <class R>
+void CLUFactor<R>::solveLright( R* vec )
 {
    int i, j, k;
    int end;
@@ -3351,7 +3389,8 @@ void CLUFactor::solveLright( R* vec )
    }
 }
 
-void CLUFactor::solveLright2( R* vec1, R* vec2 )
+template <class R>
+void CLUFactor<R>::solveLright2( R* vec1, R* vec2 )
 {
    int i, j, k;
    int end;
@@ -3432,7 +3471,8 @@ void CLUFactor::solveLright2( R* vec1, R* vec2 )
    }
 }
 
-void CLUFactor::solveUpdateRight( R* vec )
+template <class R>
+void CLUFactor<R>::solveUpdateRight( R* vec )
 {
    int i, j, k;
    int end;
@@ -3464,7 +3504,8 @@ void CLUFactor::solveUpdateRight( R* vec )
    }
 }
 
-void CLUFactor::solveUpdateRight2( R* vec1, R* vec2 )
+template <class R>
+void CLUFactor<R>::solveUpdateRight2( R* vec1, R* vec2 )
 {
    int i, j, k;
    int end;
@@ -3525,7 +3566,8 @@ void CLUFactor::solveUpdateRight2( R* vec1, R* vec2 )
    }
 }
 
-int CLUFactor::solveRight4update( R* vec, int* nonz, R eps,
+template <class R>
+int CLUFactor<R>::solveRight4update( R* vec, int* nonz, R eps,
                                   R* rhs, R* forest, int* forestNum, int* forestIdx )
 {
    solveLright( rhs );
@@ -3554,7 +3596,8 @@ int CLUFactor::solveRight4update( R* vec, int* nonz, R eps,
       return solveUrightEps( vec, nonz, eps, rhs );
 }
 
-void CLUFactor::solveRight( R* vec, R* rhs )
+template <class R>
+void CLUFactor<R>::solveRight( R* vec, R* rhs )
 {
    solveLright( rhs );
    solveUright( vec, rhs );
@@ -3563,7 +3606,8 @@ void CLUFactor::solveRight( R* vec, R* rhs )
       solveUpdateRight( vec );
 }
 
-int CLUFactor::solveRight2update( R* vec1,
+template <class R>
+int CLUFactor<R>::solveRight2update( R* vec1,
                                   R* vec2,
                                   R* rhs1,
                                   R* rhs2,
@@ -3599,7 +3643,8 @@ int CLUFactor::solveRight2update( R* vec1,
       return solveUright2eps( vec1, rhs1, vec2, rhs2, nonz, eps );
 }
 
-void CLUFactor::solveRight2(
+template <class R>
+void CLUFactor<R>::solveRight2(
    R* vec1,
    R* vec2,
    R* rhs1,
@@ -3617,7 +3662,8 @@ void CLUFactor::solveRight2(
 }
 
 /*****************************************************************************/
-void CLUFactor::solveUleft( R* p_work, R* vec )
+template <class R>
+void CLUFactor<R>::solveUleft( R* p_work, R* vec )
 {
    for ( int i = 0; i < thedim; ++i )
    {
@@ -3651,7 +3697,8 @@ void CLUFactor::solveUleft( R* p_work, R* vec )
    }
 }
 
-void CLUFactor::solveUleft2(
+template <class R>
+void CLUFactor<R>::solveUleft2(
    R* p_work1, R* vec1, R* p_work2, R* vec2 )
 {
    R x1;
@@ -3720,7 +3767,8 @@ void CLUFactor::solveUleft2(
    }
 }
 
-int CLUFactor::solveLleft2forest(
+template <class R>
+int CLUFactor<R>::solveLleft2forest(
    R* vec1,
    int* /* nonz */,
    R* vec2,
@@ -3787,7 +3835,8 @@ int CLUFactor::solveLleft2forest(
    return 0;
 }
 
-void CLUFactor::solveLleft2(
+template <class R>
+void CLUFactor<R>::solveLleft2(
    R* vec1,
    int* /* nonz */,
    R* vec2,
@@ -3890,7 +3939,8 @@ void CLUFactor::solveLleft2(
 #endif
 }
 
-int CLUFactor::solveLleftForest( R* vec, int* /* nonz */, R /* eps */ )
+template <class R>
+int CLUFactor<R>::solveLleftForest( R* vec, int* /* nonz */, R /* eps */ )
 {
    int i, j, k, end;
    R x;
@@ -3920,7 +3970,8 @@ int CLUFactor::solveLleftForest( R* vec, int* /* nonz */, R /* eps */ )
    return 0;
 }
 
-void CLUFactor::solveLleft( R* vec ) const
+template <class R>
+void CLUFactor<R>::solveLleft( R* vec ) const
 {
 
 #ifndef WITH_L_ROWS
@@ -3966,7 +4017,8 @@ void CLUFactor::solveLleft( R* vec ) const
 #endif // WITH_L_ROWS
 }
 
-int CLUFactor::solveLleftEps( R* vec, int* nonz, R eps )
+template <class R>
+int CLUFactor<R>::solveLleftEps( R* vec, int* nonz, R eps )
 {
    int i, j, k, n;
    int r;
@@ -4030,7 +4082,8 @@ int CLUFactor::solveLleftEps( R* vec, int* nonz, R eps )
    return n;
 }
 
-void CLUFactor::solveUpdateLeft( R* vec )
+template <class R>
+void CLUFactor<R>::solveUpdateLeft( R* vec )
 {
    int i, j, k, end;
    R x;
@@ -4061,7 +4114,8 @@ void CLUFactor::solveUpdateLeft( R* vec )
    }
 }
 
-void CLUFactor::solveUpdateLeft2( R* vec1, R* vec2 )
+template <class R>
+void CLUFactor<R>::solveUpdateLeft2( R* vec1, R* vec2 )
 {
    int i, j, k, end;
    R x1, x2;
@@ -4098,7 +4152,8 @@ void CLUFactor::solveUpdateLeft2( R* vec1, R* vec2 )
    }
 }
 
-int CLUFactor::solveUpdateLeft( R eps, R* vec, int* nonz, int n )
+template <class R>
+int CLUFactor<R>::solveUpdateLeft( R eps, R* vec, int* nonz, int n )
 {
    int i, j, k, end;
    R x, y;
@@ -4153,7 +4208,8 @@ int CLUFactor::solveUpdateLeft( R eps, R* vec, int* nonz, int n )
    return n;
 }
 
-void CLUFactor::solveLeft( R* vec, R* rhs )
+template <class R>
+void CLUFactor<R>::solveLeft( R* vec, R* rhs )
 {
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
@@ -4171,7 +4227,8 @@ void CLUFactor::solveLeft( R* vec, R* rhs )
    }
 }
 
-int CLUFactor::solveLeftEps( R* vec, R* rhs, int* nonz, R eps )
+template <class R>
+int CLUFactor<R>::solveLeftEps( R* vec, R* rhs, int* nonz, R eps )
 {
 
    if ( !l.updateType )          /* no Forest-Tomlin Updates */
@@ -4188,7 +4245,8 @@ int CLUFactor::solveLeftEps( R* vec, R* rhs, int* nonz, R eps )
    }
 }
 
-int CLUFactor::solveLeft2(
+template <class R>
+int CLUFactor<R>::solveLeft2(
    R* vec1,
    int* nonz,
    R* vec2,
@@ -4213,7 +4271,8 @@ int CLUFactor::solveLeft2(
    }
 }
 
-int CLUFactor::solveUleft( R eps,
+template <class R>
+int CLUFactor<R>::solveUleft( R eps,
                            R* vec, int* vecidx,
                            R* rhs, int* rhsidx, int rhsn )
 {
@@ -4293,7 +4352,8 @@ int CLUFactor::solveUleft( R eps,
 }
 
 
-void CLUFactor::solveUleftNoNZ( R eps, R* vec,
+template <class R>
+void CLUFactor<R>::solveUleftNoNZ( R eps, R* vec,
                                 R* rhs, int* rhsidx, int rhsn )
 {
    R x, y;
@@ -4367,7 +4427,8 @@ void CLUFactor::solveUleftNoNZ( R eps, R* vec,
 }
 
 
-int CLUFactor::solveLleftForest( R eps, R* vec, int* nonz, int n )
+template <class R>
+int CLUFactor<R>::solveLleftForest( R eps, R* vec, int* nonz, int n )
 {
    int i, j, k, end;
    R x, y;
@@ -4420,7 +4481,8 @@ int CLUFactor::solveLleftForest( R eps, R* vec, int* nonz, int n )
 }
 
 
-void CLUFactor::solveLleftForestNoNZ( R* vec )
+template <class R>
+void CLUFactor<R>::solveLleftForestNoNZ( R* vec )
 {
    int i, j, k, end;
    R x;
@@ -4453,7 +4515,8 @@ void CLUFactor::solveLleftForestNoNZ( R* vec )
 }
 
 
-int CLUFactor::solveLleft( R eps, R* vec, int* nonz, int rn )
+template <class R>
+int CLUFactor<R>::solveLleft( R eps, R* vec, int* nonz, int rn )
 {
    int i, j, k, n;
    int r;
@@ -4551,7 +4614,8 @@ int CLUFactor::solveLleft( R eps, R* vec, int* nonz, int rn )
 }
 
 
-void CLUFactor::solveLleftNoNZ( R* vec )
+template <class R>
+void CLUFactor<R>::solveLleftNoNZ( R* vec )
 {
    int i, j, k;
    int r;
@@ -4616,7 +4680,8 @@ void CLUFactor::solveLleftNoNZ( R* vec )
 #endif
 }
 
-void inline CLUFactor::updateSolutionVectorLright(R change, int j, R& vec, int* idx, int& nnz)
+template <class R>
+void inline CLUFactor<R>::updateSolutionVectorLright(R change, int j, R& vec, int* idx, int& nnz)
 {
    // create a new entry in #ridx
    if( vec == 0.0 )
@@ -4633,7 +4698,8 @@ void inline CLUFactor::updateSolutionVectorLright(R change, int j, R& vec, int* 
 
 // solve Lz = b, inplace, using and preserving sparisity structure in the rhs and solution VectorBase<R>
 // arrays #vec and #ridx must be large enough to hold #thedim entries!
-void CLUFactor::vSolveLright( R* vec, int* ridx, int& rn, R eps )
+template <class R>
+void CLUFactor<R>::vSolveLright( R* vec, int* ridx, int& rn, R eps )
 {
    int i, j, k, n;
    int end;
@@ -4699,7 +4765,8 @@ void CLUFactor::vSolveLright( R* vec, int* ridx, int& rn, R eps )
 
 // solve with L for two right hand sides
 // see above methods for documentation
-void CLUFactor::vSolveLright2(
+template <class R>
+void CLUFactor<R>::vSolveLright2(
    R* vec, int* ridx, int& rn, R eps,
    R* vec2, int* ridx2, int& rn2, R eps2 )
 {
@@ -4803,7 +4870,8 @@ void CLUFactor::vSolveLright2(
 
 // solve with L for three right hand sides
 // see above methods for documentation
-void CLUFactor::vSolveLright3(
+template <class R>
+void CLUFactor<R>::vSolveLright3(
    R* vec, int* ridx, int& rn, R eps,
    R* vec2, int* ridx2, int& rn2, R eps2,
    R* vec3, int* ridx3, int& rn3, R eps3 )
@@ -4967,7 +5035,8 @@ void CLUFactor::vSolveLright3(
    }
 }
 
-int CLUFactor::vSolveUright( R* vec, int* vidx,
+template <class R>
+int CLUFactor<R>::vSolveUright( R* vec, int* vidx,
                              R* rhs, int* ridx, int rn, R eps )
 {
    int i, j, k, r, c, n;
@@ -5073,8 +5142,8 @@ int CLUFactor::vSolveUright( R* vec, int* vidx,
    return n;
 }
 
-
-void CLUFactor::vSolveUrightNoNZ( R* vec,
+template <class R>
+void CLUFactor<R>::vSolveUrightNoNZ( R* vec,
                                   R* rhs, int* ridx, int rn, R eps )
 {
    int i, j, k, r, c;
@@ -5177,7 +5246,8 @@ void CLUFactor::vSolveUrightNoNZ( R* vec,
 }
 
 
-int CLUFactor::vSolveUright2(
+template <class R>
+int CLUFactor<R>::vSolveUright2(
    R* vec, int* vidx, R* rhs, int* ridx, int rn, R eps,
    R* vec2, R* rhs2, int* ridx2, int rn2, R eps2 )
 {
@@ -5422,7 +5492,8 @@ int CLUFactor::vSolveUright2(
    return n;
 }
 
-int CLUFactor::vSolveUpdateRight( R* vec, int* ridx, int n, R eps )
+template <class R>
+int CLUFactor<R>::vSolveUpdateRight( R* vec, int* ridx, int n, R eps )
 {
    int i, j, k;
    int end;
@@ -5466,7 +5537,8 @@ int CLUFactor::vSolveUpdateRight( R* vec, int* ridx, int n, R eps )
    return n;
 }
 
-void CLUFactor::vSolveUpdateRightNoNZ( R* vec, R /*eps*/ )
+template <class R>
+void CLUFactor<R>::vSolveUpdateRightNoNZ( R* vec, R /*eps*/ )
 {
    int i, j, k;
    int end;
@@ -5504,7 +5576,8 @@ void CLUFactor::vSolveUpdateRightNoNZ( R* vec, R /*eps*/ )
 }
 
 
-int CLUFactor::vSolveRight4update( R eps,
+template <class R>
+int CLUFactor<R>::vSolveRight4update( R eps,
                                    R* vec, int* idx,                       /* result */
                                    R* rhs, int* ridx, int rn,              /* rhs    */
                                    R* forest, int* forestNum, int* forestIdx )
@@ -5572,7 +5645,8 @@ int CLUFactor::vSolveRight4update( R eps,
    return rn;
 }
 
-int CLUFactor::vSolveRight4update2( R eps,
+template <class R>
+int CLUFactor<R>::vSolveRight4update2( R eps,
                                     R* vec, int* idx,                  /* result1 */
                                     R* rhs, int* ridx, int rn,         /* rhs1    */
                                     R* vec2, R eps2,              /* result2 */
@@ -5693,7 +5767,8 @@ int CLUFactor::vSolveRight4update2( R eps,
    return rn;
 }
 
-void CLUFactor::vSolveRight4update2sparse( R eps, R* vec, int* idx,        /* result1 */
+template <class R>
+void CLUFactor<R>::vSolveRight4update2sparse( R eps, R* vec, int* idx,        /* result1 */
                                            R* rhs, int* ridx, int& rn,        /* rhs1    */
                                            R eps2, R* vec2, int* idx2,     /* result2 */
                                            R* rhs2, int* ridx2, int& rn2,     /* rhs2    */
@@ -5773,7 +5848,8 @@ void CLUFactor::vSolveRight4update2sparse( R eps, R* vec, int* idx,        /* re
 }
 
 
-int CLUFactor::vSolveRight4update3( R eps,
+template <class R>
+int CLUFactor<R>::vSolveRight4update3( R eps,
                                     R* vec, int* idx,                 /* result1 */
                                     R* rhs, int* ridx, int rn,        /* rhs1    */
                                     R* vec2, R eps2,               /* result2 */
@@ -5923,7 +5999,8 @@ int CLUFactor::vSolveRight4update3( R eps,
    return rn;
 }
 
-void CLUFactor::vSolveRight4update3sparse( R eps, R* vec, int* idx,        /* result1 */
+template <class R>
+void CLUFactor<R>::vSolveRight4update3sparse( R eps, R* vec, int* idx,        /* result1 */
                                            R* rhs, int* ridx, int& rn,        /* rhs1    */
                                            R eps2, R* vec2, int* idx2,     /* result2 */
                                            R* rhs2, int* ridx2, int& rn2,     /* rhs2    */
@@ -6019,7 +6096,8 @@ void CLUFactor::vSolveRight4update3sparse( R eps, R* vec, int* idx,        /* re
    }
 }
 
-void CLUFactor::vSolveRightNoNZ(
+template <class R>
+void CLUFactor<R>::vSolveRightNoNZ(
    R* vec, R eps,             /* result */
    R* rhs, int* ridx, int rn )   /* rhs    */
 {
@@ -6072,7 +6150,8 @@ void CLUFactor::vSolveRightNoNZ(
       vSolveUpdateRightNoNZ( vec, eps );
 }
 
-int CLUFactor::vSolveLeft( R eps,
+template <class R>
+int CLUFactor<R>::vSolveLeft( R eps,
                            R* vec, int* idx,                       /* result */
                            R* rhs, int* ridx, int rn )           /* rhs    */
 {
@@ -6100,7 +6179,8 @@ int CLUFactor::vSolveLeft( R eps,
       return solveLleft( eps, vec, idx, rn );
 }
 
-int CLUFactor::vSolveLeft2( R eps,
+template <class R>
+int CLUFactor<R>::vSolveLeft2( R eps,
                             R* vec, int* idx,                      /* result */
                             R* rhs, int* ridx, int rn,             /* rhs    */
                             R* vec2,                               /* result2 */
@@ -6129,7 +6209,8 @@ int CLUFactor::vSolveLeft2( R eps,
    return rn;
 }
 
-void CLUFactor::vSolveLeft2sparse( R eps,
+template <class R>
+void CLUFactor<R>::vSolveLeft2sparse( R eps,
                                    R* vec, int* idx,                      /* result */
                                    R* rhs, int* ridx, int& rn,            /* rhs    */
                                    R* vec2, int* idx2,                    /* result2 */
@@ -6156,7 +6237,8 @@ void CLUFactor::vSolveLeft2sparse( R eps,
 }
 
 
-int CLUFactor::vSolveLeft3( R eps,
+template <class R>
+int CLUFactor<R>::vSolveLeft3( R eps,
                             R* vec, int* idx,                      /* result */
                             R* rhs, int* ridx, int rn,             /* rhs    */
                             R* vec2,                               /* result2 */
@@ -6192,7 +6274,8 @@ int CLUFactor::vSolveLeft3( R eps,
    return rn;
 }
 
-void CLUFactor::vSolveLeft3sparse( R eps,
+template <class R>
+void CLUFactor<R>::vSolveLeft3sparse( R eps,
                                    R* vec, int* idx,                      /* result */
                                    R* rhs, int* ridx, int& rn,            /* rhs    */
                                    R* vec2, int* idx2,                    /* result2 */
@@ -6224,8 +6307,8 @@ void CLUFactor::vSolveLeft3sparse( R eps,
    rn3 = solveLleft( eps, vec3, idx3, rn3 );
 }
 
-
-void CLUFactor::vSolveLeftNoNZ( R eps,
+template <class R>
+void CLUFactor<R>::vSolveLeftNoNZ( R eps,
                                 R* vec2,                            /* result2 */
                                 R* rhs2, int* ridx2, int rn2 )    /* rhs2    */
 {
