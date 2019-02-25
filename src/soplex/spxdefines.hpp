@@ -22,14 +22,18 @@
 
 namespace soplex
 {
-template <class R>
-THREADLOCAL R Param<R>::s_epsilon               = DEFAULT_EPS_ZERO;
-template <class R>
-THREADLOCAL R Param<R>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-template <class R>
-THREADLOCAL R Param<R>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-template <class R>
-THREADLOCAL R Param<R>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+
+  template <>
+THREADLOCAL Real Param<Real>::s_epsilon               = DEFAULT_EPS_ZERO;
+
+  template <>
+THREADLOCAL Real Param<Real>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+
+  template <>
+THREADLOCAL Real Param<Real>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+
+  template <>
+THREADLOCAL Real Param<Real>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 
 template <class R>
