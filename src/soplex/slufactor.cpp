@@ -1042,7 +1042,7 @@ SLUFactor<R>& SLUFactor<R>::operator=(const SLUFactor<R>& old)
 }
 
 template <class R>
-typename SLUFactor<R>::SLUFactor()
+SLUFactor<R>::SLUFactor()
    : vec (1)
    , ssvec (1)
    , usetup (false)
@@ -1123,15 +1123,15 @@ typename SLUFactor<R>::SLUFactor()
 
       this->l.size = 1;
 
-      spx_alloc(this->l.val, l.size);
-      spx_alloc(this->l.idx, l.size);
+      spx_alloc(this->l.val, this->l.size);
+      spx_alloc(this->l.idx, this->lsize);
 
-      l.startSize   = 1;
-      l.firstUpdate = 0;
-      l.firstUnused = 0;
+      this->lstartSize   = 1;
+      this->lfirstUpdate = 0;
+      this->lfirstUnused = 0;
 
-      spx_alloc(this->l.start, l.startSize);
-      spx_alloc(this->l.row,   l.startSize);
+      spx_alloc(this->l.start, this->lstartSize);
+      spx_alloc(this->l.row,   this->lstartSize);
    }
    catch(const SPxMemoryException& x)
    {
@@ -1141,9 +1141,9 @@ typename SLUFactor<R>::SLUFactor()
 
    this->l.rval  = 0;
    this->l.ridx  = 0;
-   l.rbeg  = 0;
-   l.rorig = 0;
-   l.rperm = 0;
+   this->lrbeg  = 0;
+   this->lrorig = 0;
+   this->lrperm = 0;
 
    SLUFactor<R>::clear(); // clear() is virtual
 
@@ -1178,7 +1178,7 @@ typename SLUFactor<R>::SLUFactor()
 }
 
 template <class R>
-typename SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
+SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    : SLinSolver( old )
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
@@ -1206,13 +1206,13 @@ typename SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->u.col.val   = 0;
    this->l.val       = 0;
    this->l.idx       = 0;
-   l.start     = 0;
-   l.row       = 0;
-   l.rval      = 0;
-   l.ridx      = 0;
-   l.rbeg      = 0;
-   l.rorig     = 0;
-   l.rperm     = 0;
+   this->lstart     = 0;
+   this->lrow       = 0;
+   this->lrval      = 0;
+   this->lridx      = 0;
+   this->lrbeg      = 0;
+   this->lrorig     = 0;
+   this->lrperm     = 0;
 
    solveCount = 0;
    solveTime = TimerFactory::createTimer(timerType);
@@ -1335,10 +1335,10 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm
       spx_realloc(this->u.col.max,   this->thedim + 1);
       spx_realloc(this->u.col.start, this->thedim + 1);
 
-      l.startSize = this->thedim + MAXUPDATES;
+      this->l.startSize = this->thedim + MAXUPDATES;
 
-      spx_realloc(this->l.row,   l.startSize);
-      spx_realloc(this->l.start, l.startSize);
+      spx_realloc(this->l.row,   this->lstartSize);
+      spx_realloc(this->l.start, this->lstartSize);
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
    // order to favour sparsity

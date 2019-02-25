@@ -639,7 +639,7 @@ namespace soplex
         }
       if (!factorized)
         SPxBasisBase<R>::factorize();
-      factor->solveRight(x, rhs);
+      this->factor->solveRight(x, rhs);
     }
     ///
     void solve(SSVectorBase<R> & x, const SVectorBase<R>& rhs)
