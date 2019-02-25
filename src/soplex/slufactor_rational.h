@@ -71,7 +71,7 @@ protected:
    /**@name Protected data */
    //@{
    bool       usetup;             ///< TRUE iff update vector has been setup
-   UpdateType uptype;             ///< the current \ref soplex::SLUFactor::UpdateType "UpdateType".
+   UpdateType uptype;             ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
    SSVectorRational   eta;        ///<
    SSVectorRational   forest;     ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Rational       lastThreshold;  ///< pivoting threshold of last factorization

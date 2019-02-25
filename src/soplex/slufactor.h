@@ -46,7 +46,7 @@ public:
    //--------------------------------
    /**@name Types */
    //@{
-   /// Specifies how to perform \ref soplex::SLUFactor::change "change" method.
+   /// Specifies how to perform \ref soplex::SLUFactor<R>::change "change" method.
    enum UpdateType
    {
       ETA = 0,       ///<
@@ -71,7 +71,7 @@ protected:
    /**@name Protected data */
    //@{
    bool       usetup;        ///< TRUE iff update vector has been setup
-   UpdateType uptype;        ///< the current \ref soplex::SLUFactor::UpdateType "UpdateType".
+   UpdateType uptype;        ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
    SSVector   eta;           ///<
    SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
    Real       lastThreshold; ///< pivoting threshold of last factorization
@@ -288,17 +288,17 @@ public:
    /**@name Constructors / Destructors */
    //@{
    /// default constructor.
-   SLUFactor();
+   SLUFactor<R>();
    /// assignment operator.
   SLUFactor<R>& operator=(const SLUFactor<R>& old);
    /// copy constructor.
-  SLUFactor(const SLUFactor<R>& old);
+  SLUFactor<R>(const SLUFactor<R>& old);
    /// destructor.
-   virtual ~SLUFactor();
+   virtual ~SLUFactor<R>();
    /// clone function for polymorphism
    inline virtual SLinSolver* clone() const
    {
-      return new SLUFactor(*this);
+      return new SLUFactor<R>(*this);
    }
    //@}
 

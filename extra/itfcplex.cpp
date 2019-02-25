@@ -33,7 +33,7 @@ using namespace soplex;
 
 class SPxCPlex : public SoPlex
 {
-   SLUFactor    m_slu;
+   SLUFactor<Real>    m_slu;
    SPxSteepPR   m_price;
    SPxFastRT    m_ratio;
    bool         m_verbose;

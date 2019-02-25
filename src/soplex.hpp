@@ -4494,7 +4494,7 @@ bool SoPlexBase<R>::setIntParam(const IntParam param, const int value, const boo
     case SoPlexBase<R>::FACTOR_UPDATE_TYPE:
       if( value != SoPlexBase<R>::FACTOR_UPDATE_TYPE_ETA && value != SoPlexBase<R>::FACTOR_UPDATE_TYPE_FT )
         return false;
-      _slufactor.setUtype(value == SoPlexBase<R>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor::ETA : SLUFactor::FOREST_TOMLIN);
+      _slufactor.setUtype(value == SoPlexBase<R>::FACTOR_UPDATE_TYPE_ETA ? SLUFactor<R>::ETA : SLUFactor<R>::FOREST_TOMLIN);
       break;
 
       // maximum number of updates before fresh factorization

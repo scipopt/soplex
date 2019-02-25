@@ -67,7 +67,7 @@ public:
       Parts of the default settings are also realized in the constructor below.
    */
    //@{
-   static const SLUFactor::UpdateType update = SLUFactor::FOREST_TOMLIN;
+   static const SLUFactor<Real>::UpdateType update = SLUFactor<Real>::FOREST_TOMLIN;
    static const Real delta;
    static const Real timelimit;
    static const Real epsilon;
@@ -81,7 +81,7 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   SLUFactor _solver;              ///< sparse LU factorization
+   SLUFactor<Real> _solver;              ///< sparse LU factorization
    SPxSteepPR _pricer;             ///< steepest edge pricer
    SPxFastRT _ratiotester;         ///< Harris fast ratio tester
    //@}
@@ -120,7 +120,7 @@ public:
 //
 // Define static members of "TestSolver".
 //
-const SLUFactor::UpdateType TestSolver::update;
+const SLUFactor<Real>::UpdateType TestSolver::update;
 const Real TestSolver::delta = DEFAULT_BND_VIOL;
 const Real TestSolver::timelimit = -1.0;
 const Real TestSolver::epsilon = DEFAULT_EPS_ZERO;

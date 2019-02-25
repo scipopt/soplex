@@ -83,7 +83,7 @@ namespace mpf = boost::multiprecision;
 
 ///@todo interface rational reconstruction code for rational vectors
 ///@todo integrate rational reconstruction into IR loop
-///@todo templatize SPxSolver and necessary components (SLUFactor, pricer, ratiotester)
+///@todo templatize SPxSolver and necessary components (SLUFactor<R>, pricer, ratiotester)
 ///@todo integrate rational SPxSolver and distinguish between original and transformed rational LP
 ///@todo rational scalers
 ///@todo rational simplifier
@@ -1583,7 +1583,7 @@ private:
    //@{
 
    SPxSolverBase<R> _solver;
-   SLUFactor _slufactor;
+  SLUFactor<R> _slufactor;
    SPxMainSM<R> _simplifierMainSM;
   SPxEquiliSC<R> _scalerUniequi;
   SPxEquiliSC<R> _scalerBiequi;
@@ -1741,7 +1741,7 @@ private:
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
                           // problem will be stored in _solver and the complementary problem will be stored in
                           // _compSolver.
-   SLUFactor _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
+  SLUFactor<R> _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
 
    SPxBasisBase<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
@@ -2212,10 +2212,10 @@ private:
    void _formDecompComplementaryProblem();
 
    /// simplifies the problem and solves
-   void _decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing);
+   void _decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, bool fromScratch, bool applyPreprocessing);
 
    /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
-   void _decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
+   void _decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// identifies the columns of the row-form basis that correspond to rows with zero dual multipliers.
    void _getZeroDualMultiplierIndices(VectorBase<R> feasVector, int* nonposind, int* colsforremoval,
@@ -2240,7 +2240,7 @@ private:
    void _deleteAndUpdateRowsComplementaryProblem(SPxRowId rangedRowIds[], int& naddedrows);
 
    /// evaluates the solution of the reduced problem for the DBDS
-   void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result);
+   void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// update the reduced problem with additional columns and rows
    void _updateDecompReducedProblem(R objVal, DVectorBase<R> dualVector, DVectorBase<R> redcostVector, DVectorBase<R> compPrimalVector,

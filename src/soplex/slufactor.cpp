@@ -616,11 +616,11 @@ Real SLUFactor<R>::matrixMetric(int type) const
    case 0:
    {
      Real mindiag = spxAbs(this->diag[0]);
-      Real maxdiag = spxAbs(diag[0]);
+      Real maxdiag = spxAbs(this->diag[0]);
 
       for( int i = 1; i < dim(); ++i)
       {
-         Real absdiag = spxAbs(diag[i]);
+        Real absdiag = spxAbs(this->diag[i]);
          if( absdiag < mindiag )
             mindiag = absdiag;
          else if( absdiag > maxdiag )
@@ -683,7 +683,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
 
    if (usetup)
    {
-      if (l.updateType == FOREST_TOMLIN)              // FOREST_TOMLIN updates
+      if (this->l.updateType == FOREST_TOMLIN)              // FOREST_TOMLIN updates
       {
          // BH 2005-08-19: The size of a SSVector is the size of the
          // index set, i.e.  the number of nonzeros which is only
@@ -691,13 +691,13 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
          // SSVector::altValues() calls unSetup() the size needs to be
          // stored before the following call.
          int fsize = forest.size(); // see altValues()
-         forestUpdate(idx, forest.altValues(), fsize, forest.altIndexMem());
+         this->forestUpdate(idx, forest.altValues(), fsize, forest.altIndexMem());
          forest.setSize(0);
          forest.forceSetup();
       }
       else
       {
-         assert(l.updateType == ETA);
+        assert(this->l.updateType == ETA);
          changeEta(idx, eta);
       }
    }
@@ -705,7 +705,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
    {
      this->l.updateType = ETA;
      this->updateNoClear(idx, e->values(), e->indexMem(), e->size());
-      l.updateType = uptype;
+      this->l.updateType = uptype;
    }
    else if (this->l.updateType == FOREST_TOMLIN)            // FOREST_TOMLIN updates
    {
@@ -719,7 +719,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
    }
    else                                               // ETA updates
    {
-      assert(l.updateType == ETA);
+      assert(this->l.updateType == ETA);
       vec = subst;
       eta.clear();
       CLUFactor<R>::solveRight(eta.altValues(), vec.get_ptr());
@@ -761,46 +761,46 @@ void SLUFactor<R>::clear()
    this->u.row.size    = 100;
    this->u.col.size    = 100;
    this->l.size        = 100;
-   l.startSize   = 100;
+   this->l.startSize   = 100;
 
-   if (l.rval)
-      spx_free(l.rval);
-   if(l.ridx)
-      spx_free(l.ridx);
-   if(l.rbeg)
-      spx_free(l.rbeg);
-   if(l.rorig)
-      spx_free(l.rorig);
-   if(l.rperm)
-      spx_free(l.rperm);
+   if (this->l.rval)
+     spx_free(this->l.rval);
+   if(this->l.ridx)
+     spx_free(this->l.ridx);
+   if(this->l.rbeg)
+     spx_free(this->l.rbeg);
+   if(this->l.rorig)
+     spx_free(this->l.rorig);
+   if(this->l.rperm)
+     spx_free(this->l.rperm);
 
    if(this->u.row.val)
-      spx_free(u.row.val);
+     spx_free(this->u.row.val);
    if(this->u.row.idx)
-      spx_free(u.row.idx);
+     spx_free(this->u.row.idx);
    if(this->u.col.idx)
-      spx_free(u.col.idx);
-   if(l.val)
-      spx_free(l.val);
-   if(l.idx)
-      spx_free(l.idx);
-   if(l.start)
-      spx_free(l.start);
-   if(l.row)
-      spx_free(l.row);
+     spx_free(this->u.col.idx);
+   if(this->l.val)
+     spx_free(this->l.val);
+   if(this->l.idx)
+     spx_free(this->l.idx);
+   if(this->l.start)
+     spx_free(this->l.start);
+   if(this->l.row)
+     spx_free(this->l.row);
 
-   // G clear() is used in constructor of SLUFactor so we have to
+   // G clear() is used in constructor of SLUFactor<R> so we have to
    // G clean up if anything goes wrong here
    try
    {
-     spx_alloc(this->u.row.val, u.row.size);
-      spx_alloc(u.row.idx, u.row.size);
-      spx_alloc(u.col.idx, u.col.size);
+     spx_alloc(this->u.row.val, this->u.row.size);
+     spx_alloc(this->u.row.idx, this->u.row.size);
+     spx_alloc(this->u.col.idx, this->u.col.size);
 
-      spx_alloc(l.val,   l.size);
-      spx_alloc(l.idx,   l.size);
-      spx_alloc(l.start, l.startSize);
-      spx_alloc(l.row,   l.startSize);
+      spx_alloc(this->l.val,   this->l.size);
+      spx_alloc(this->l.idx,   this->l.size);
+      spx_alloc(this->l.start, this->l.startSize);
+      spx_alloc(this->l.row,   this->l.startSize);
    }
    catch(const SPxMemoryException& x)
    {
@@ -811,10 +811,10 @@ void SLUFactor<R>::clear()
 
 /** assignment used to implement operator=() and copy constructor.
  *  If this is initialised, freeAll() has to be called before.
- *  Class objects from SLUFactor are not copied here.
+ *  Class objects from SLUFactor<R> are not copied here.
  */
 template <class R>
-void SLUFactor<R>::assign(const SLUFactor& old)
+void SLUFactor<R>::assign(const SLUFactor<R>& old)
 {
    spxout = old.spxout;
 
@@ -840,15 +840,15 @@ void SLUFactor<R>::assign(const SLUFactor& old)
 
    spx_alloc(this->row.perm, this->thedim);
    spx_alloc(this->row.orig, this->thedim);
-   spx_alloc(this->col.perm, thedim);
-   spx_alloc(this->col.orig, thedim);
-   spx_alloc(this->diag,     thedim);
+   spx_alloc(this->col.perm, this->thedim);
+   spx_alloc(this->col.orig, this->thedim);
+   spx_alloc(this->diag,     this->thedim);
 
-   memcpy(this->row.perm, old.row.perm, (unsigned int)thedim * sizeof(*this->row.perm));
-   memcpy(row.orig, old.row.orig, (unsigned int)thedim * sizeof(*row.orig));
-   memcpy(this->col.perm, old.col.perm, (unsigned int)thedim * sizeof(*col.perm));
-   memcpy(col.orig, old.col.orig, (unsigned int)thedim * sizeof(*col.orig));
-   memcpy(this->diag,     old.diag,     (unsigned int)thedim * sizeof(*diag));
+   memcpy(this->row.perm, old.row.perm, (unsigned int)this->thedim * sizeof(*this->row.perm));
+   memcpy(this->row.orig, old.row.orig, (unsigned int)this->thedim * sizeof(*this->row.orig));
+   memcpy(this->col.perm, old.col.perm, (unsigned int)this->thedim * sizeof(*this->col.perm));
+   memcpy(this->col.orig, old.col.orig, (unsigned int)this->thedim * sizeof(*this->col.orig));
+   memcpy(this->diag,     old.diag,     (unsigned int)this->thedim * sizeof(*this->diag));
 
    this->work = vec.get_ptr();
 
@@ -857,46 +857,46 @@ void SLUFactor<R>::assign(const SLUFactor& old)
    this->u.row.size = old.u.row.size;
    this->u.row.used = old.u.row.used;
 
-   spx_alloc(u.row.elem,  thedim);
-   spx_alloc(u.row.val,   u.row.size);
-   spx_alloc(u.row.idx,   u.row.size);
-   spx_alloc(u.row.start, thedim + 1);
-   spx_alloc(u.row.len,   thedim + 1);
-   spx_alloc(u.row.max,   thedim + 1);
+   spx_alloc(this->u.row.elem,  this->thedim);
+   spx_alloc(this->u.row.val,   this->u.row.size);
+   spx_alloc(this->u.row.idx,   this->u.row.size);
+   spx_alloc(this->u.row.start, this->thedim + 1);
+   spx_alloc(this->u.row.len,   this->thedim + 1);
+   spx_alloc(this->u.row.max,   this->thedim + 1);
 
-   memcpy(u.row.elem,  old.u.row.elem,  (unsigned int)thedim       * sizeof(*u.row.elem));
-   memcpy(u.row.val,   old.u.row.val,   (unsigned int)u.row.size   * sizeof(*u.row.val));
-   memcpy(u.row.idx,   old.u.row.idx,   (unsigned int)u.row.size   * sizeof(*u.row.idx));
-   memcpy(u.row.start, old.u.row.start, (unsigned int)(thedim + 1) * sizeof(*u.row.start));
-   memcpy(u.row.len,   old.u.row.len,   (unsigned int)(thedim + 1) * sizeof(*u.row.len));
-   memcpy(u.row.max,   old.u.row.max,   (unsigned int)(thedim + 1) * sizeof(*u.row.max));
+   memcpy(this->u.row.elem,  old.u.row.elem,  (unsigned int)this->thedim       * sizeof(*this->u.row.elem));
+   memcpy(this->u.row.val,   old.u.row.val,   (unsigned int)this->u.row.size   * sizeof(*this->u.row.val));
+   memcpy(this->u.row.idx,   old.u.row.idx,   (unsigned int)this->u.row.size   * sizeof(*this->u.row.idx));
+   memcpy(this->u.row.start, old.u.row.start, (unsigned int)(this->thedim + 1) * sizeof(*this->u.row.start));
+   memcpy(this->u.row.len,   old.u.row.len,   (unsigned int)(this->thedim + 1) * sizeof(*this->u.row.len));
+   memcpy(this->u.row.max,   old.u.row.max,   (unsigned int)(this->thedim + 1) * sizeof(*this->u.row.max));
 
    // need to make row list ok ?
-   if (thedim > 0 && this->stat == OK)
+   if (this->thedim > 0 && this->stat == OK)
    {
-      u.row.list.idx = old.u.row.list.idx; // .idx neu
+     this->u.row.list.idx = old.u.row.list.idx; // .idx neu
 
-      const Dring* oring = &old.u.row.list;
-      Dring*       ring  = &u.row.list;
+      const typename CLUFactor<R>::Dring* oring = &old.u.row.list;
+      typename CLUFactor<R>::Dring*       ring  = &this->u.row.list;
 
-      while(oring->next != &old.u.row.list)
+      while(this->oring->next != &old.u.row.list)
       {
-         ring->next       = &u.row.elem[oring->next->idx];
+        this->ring->next       = &this->u.row.elem[this->oring->next->idx];
          ring->next->prev = ring;
-         oring            = oring->next;
+         this->oring            = this->oring->next;
          ring             = ring->next;
       }
-      ring->next       = &u.row.list;
+      this->ring->next       = &this->u.row.list;
       ring->next->prev = ring;
    }
 
-   u.col.size = old.u.col.size;
-   u.col.used = old.u.col.used;
+   this->u.col.size = old.u.col.size;
+   this->u.col.used = old.u.col.used;
 
-   spx_alloc(u.col.elem,  thedim);
+   spx_alloc(u.col.elem,  this->thedim);
    spx_alloc(u.col.idx,   u.col.size);
-   spx_alloc(u.col.start, thedim + 1);
-   spx_alloc(u.col.len,   thedim + 1);
+   spx_alloc(u.col.start, this->thedim + 1);
+   spx_alloc(u.col.len,   this->thedim + 1);
    spx_alloc(u.col.max,   thedim + 1);
 
    if (old.u.col.val != 0)
@@ -914,41 +914,41 @@ void SLUFactor<R>::assign(const SLUFactor& old)
    memcpy(u.col.max,   old.u.col.max,   (unsigned int)(thedim + 1) * sizeof(*u.col.max));
 
    // need to make col list ok
-   if (thedim > 0 && stat == OK)
+   if (thedim > 0 && this->stat == OK)
    {
       u.col.list.idx = old.u.col.list.idx; // .idx neu
 
-      const Dring* oring = &old.u.col.list;
-      Dring*       ring  = &u.col.list;
+      const typename CLUFactor<R>::Dring* oring = &old.u.col.list;
+      typename CLUFactor<R>::Dring*       ring  = &u.col.list;
 
-      while(oring->next != &old.u.col.list)
+      while(this->oring->next != &old.u.col.list)
       {
          ring->next       = &u.col.elem[oring->next->idx];
          ring->next->prev = ring;
          oring            = oring->next;
          ring             = ring->next;
       }
-      ring->next       = &u.col.list;
+      this->ring->next       = &u.col.list;
       ring->next->prev = ring;
    }
 
    /* Setup L
     */
-   l.size        = old.l.size;
-   l.startSize   = old.l.startSize;
-   l.firstUpdate = old.l.firstUpdate;
-   l.firstUnused = old.l.firstUnused;
-   l.updateType  = old.l.updateType;
+   this->l.size        = old.l.size;
+   this->l.startSize   = old.l.startSize;
+   this->l.firstUpdate = old.l.firstUpdate;
+   this->l.firstUnused = old.l.firstUnused;
+   this->l.updateType  = old.l.updateType;
 
-   spx_alloc(l.val,   l.size);
-   spx_alloc(l.idx,   l.size);
-   spx_alloc(l.start, l.startSize);
-   spx_alloc(l.row,   l.startSize);
+   spx_alloc(this->l.val,   this->l.size);
+   spx_alloc(this->l.idx,   this->l.size);
+   spx_alloc(this->l.start, this->l.startSize);
+   spx_alloc(this->l.row,   this->l.startSize);
 
-   memcpy(l.val,   old.l.val,   (unsigned int)l.size      * sizeof(*l.val));
-   memcpy(l.idx,   old.l.idx,   (unsigned int)l.size      * sizeof(*l.idx));
-   memcpy(l.start, old.l.start, (unsigned int)l.startSize * sizeof(*l.start));
-   memcpy(l.row,   old.l.row,   (unsigned int)l.startSize * sizeof(*l.row));
+   memcpy(this->l.val,   old.l.val,   (unsigned int)this->l.size      * sizeof(*this->l.val));
+   memcpy(this->l.idx,   old.l.idx,   (unsigned int)this->l.size      * sizeof(*this->l.idx));
+   memcpy(this->l.start, old.l.start, (unsigned int)this->l.startSize * sizeof(*this->l.start));
+   memcpy(this->l.row,   old.l.row,   (unsigned int)this->l.startSize * sizeof(*this->l.row));
 
    if (old.l.rval != 0)
    {
@@ -957,7 +957,7 @@ void SLUFactor<R>::assign(const SLUFactor& old)
       assert(old.l.rorig != 0);
       assert(old.l.rperm != 0);
 
-      int memsize = l.start[l.firstUpdate];
+      int memsize = this->l.start[l.firstUpdate];
 
       spx_alloc(l.rval,  memsize);
       spx_alloc(l.ridx,  memsize);
@@ -978,18 +978,18 @@ void SLUFactor<R>::assign(const SLUFactor& old)
       assert(old.l.rorig == 0);
       assert(old.l.rperm == 0);
 
-      l.rval  = 0;
-      l.ridx  = 0;
-      l.rbeg  = 0;
-      l.rorig = 0;
-      l.rperm = 0;
+      this->l.rval  = 0;
+      this->l.ridx  = 0;
+      this->l.rbeg  = 0;
+      this->l.rorig = 0;
+      this->l.rperm = 0;
    }
 
-   assert(row.perm != 0);
-   assert(row.orig != 0);
-   assert(col.perm != 0);
-   assert(col.orig != 0);
-   assert(diag     != 0);
+   assert(this->row.perm != 0);
+   assert(this->row.orig != 0);
+   assert(this->col.perm != 0);
+   assert(this->col.orig != 0);
+   assert(this->diag     != 0);
 
    assert(u.row.elem  != 0);
    assert(u.row.val   != 0);
@@ -1012,7 +1012,7 @@ void SLUFactor<R>::assign(const SLUFactor& old)
 }
 
 template <class R>
-SLUFactor& SLUFactor<R>::operator=(const SLUFactor& old)
+SLUFactor<R>& SLUFactor<R>::operator=(const SLUFactor<R>& old)
 {
 
    if (this != &old)
@@ -1042,7 +1042,7 @@ SLUFactor& SLUFactor<R>::operator=(const SLUFactor& old)
 }
 
 template <class R>
-SLUFactor<R>::SLUFactor()
+SLUFactor<R>::SLUFactor<R>()
    : vec (1)
    , ssvec (1)
    , usetup (false)
@@ -1052,78 +1052,78 @@ SLUFactor<R>::SLUFactor()
    , minThreshold (0.01)
    , timerType(Timer::USER_TIME)
 {
-   row.perm    = 0;
-   row.orig    = 0;
-   col.perm    = 0;
-   col.orig    = 0;
-   diag        = 0;
-   u.row.elem  = 0;
-   u.row.val   = 0;
-   u.row.idx   = 0;
-   u.row.start = 0;
-   u.row.len   = 0;
-   u.row.max   = 0;
-   u.col.elem  = 0;
-   u.col.idx   = 0;
-   u.col.start = 0;
-   u.col.len   = 0;
-   u.col.max   = 0;
-   u.col.val   = 0;
-   l.val       = 0;
-   l.idx       = 0;
-   l.start     = 0;
-   l.row       = 0;
-   l.rval      = 0;
-   l.ridx      = 0;
-   l.rbeg      = 0;
-   l.rorig     = 0;
-   l.rperm     = 0;
+   this->row.perm    = 0;
+   this->row.orig    = 0;
+   this->col.perm    = 0;
+   this->col.orig    = 0;
+   this->diag        = 0;
+   this->u.row.elem  = 0;
+   this->u.row.val   = 0;
+   this->u.row.idx   = 0;
+   this->u.row.start = 0;
+   this->u.row.len   = 0;
+   this->u.row.max   = 0;
+   this->u.col.elem  = 0;
+   this->u.col.idx   = 0;
+   this->u.col.start = 0;
+   this->u.col.len   = 0;
+   this->u.col.max   = 0;
+   this->u.col.val   = 0;
+   this->l.val       = 0;
+   this->l.idx       = 0;
+   this->l.start     = 0;
+   this->l.row       = 0;
+   this->l.rval      = 0;
+   this->l.ridx      = 0;
+   this->l.rbeg      = 0;
+   this->l.rorig     = 0;
+   this->l.rperm     = 0;
 
-   nzCnt  = 0;
-   thedim = 0;
+   this->nzCnt  = 0;
+   this->thedim = 0;
    try
    {
       solveTime = TimerFactory::createTimer(timerType);
-      factorTime = TimerFactory::createTimer(timerType);
-      spx_alloc(row.perm, thedim);
-      spx_alloc(row.orig, thedim);
-      spx_alloc(col.perm, thedim);
-      spx_alloc(col.orig, thedim);
-      spx_alloc(diag,     thedim);
+      this->factorTime = TimerFactory::createTimer(timerType);
+      spx_alloc(this->row.perm, this->thedim);
+      spx_alloc(this->row.orig, this->thedim);
+      spx_alloc(this->col.perm, this->thedim);
+      spx_alloc(this->col.orig, this->thedim);
+      spx_alloc(this->diag,     this->thedim);
 
-      work = vec.get_ptr();
+      this->work = vec.get_ptr();
 
-      u.row.size = 1;
-      u.row.used = 0;
-      spx_alloc(u.row.elem,  thedim);
-      spx_alloc(u.row.val,   u.row.size);
-      spx_alloc(u.row.idx,   u.row.size);
-      spx_alloc(u.row.start, thedim + 1);
-      spx_alloc(u.row.len,   thedim + 1);
-      spx_alloc(u.row.max,   thedim + 1);
+      this->u.row.size = 1;
+      this->u.row.used = 0;
+      spx_alloc(this->u.row.elem,  this->thedim);
+      spx_alloc(this->u.row.val,   this->u.row.size);
+      spx_alloc(this->u.row.idx,   this->u.row.size);
+      spx_alloc(this->u.row.start, this->thedim + 1);
+      spx_alloc(this->u.row.len,   this->thedim + 1);
+      spx_alloc(this->u.row.max,   this->thedim + 1);
 
-      u.row.list.idx      = thedim;
-      u.row.start[thedim] = 0;
-      u.row.max  [thedim] = 0;
-      u.row.len  [thedim] = 0;
+      this->u.row.list.idx      = this->thedim;
+      this->u.row.start[this->thedim] = 0;
+      this->u.row.max  [thedim] = 0;
+      this->u.row.len  [thedim] = 0;
 
-      u.col.size = 1;
-      u.col.used = 0;
-      spx_alloc(u.col.elem,  thedim);
-      spx_alloc(u.col.idx,   u.col.size);
-      spx_alloc(u.col.start, thedim + 1);
-      spx_alloc(u.col.len,   thedim + 1);
-      spx_alloc(u.col.max,   thedim + 1);
-      u.col.val = 0;
+      this->u.col.size = 1;
+      this->u.col.used = 0;
+      spx_alloc(this->u.col.elem,  thedim);
+      spx_alloc(this->u.col.idx,   this->u.col.size);
+      spx_alloc(this->u.col.start, thedim + 1);
+      spx_alloc(this->u.col.len,   thedim + 1);
+      spx_alloc(this->u.col.max,   thedim + 1);
+      this->u.col.val = 0;
 
-      u.col.list.idx      = thedim;
-      u.col.start[thedim] = 0;
-      u.col.max[thedim]   = 0;
-      u.col.len[thedim]   = 0;
+      this->u.col.list.idx      = thedim;
+      this->u.col.start[thedim] = 0;
+      this->u.col.max[thedim]   = 0;
+      this->u.col.len[thedim]   = 0;
 
-      l.size = 1;
+      this->l.size = 1;
 
-      spx_alloc(l.val, l.size);
+      spx_alloc(this->l.val, l.size);
       spx_alloc(l.idx, l.size);
 
       l.startSize   = 1;
@@ -1139,35 +1139,35 @@ SLUFactor<R>::SLUFactor()
       throw x;
    }
 
-   l.rval  = 0;
-   l.ridx  = 0;
+   this->l.rval  = 0;
+   this->l.ridx  = 0;
    l.rbeg  = 0;
    l.rorig = 0;
    l.rperm = 0;
 
    SLUFactor<R>::clear(); // clear() is virtual
 
-   factorCount = 0;
+   this->factorCount = 0;
    solveCount  = 0;
+   assert(this->row.perm != 0);
 
-   assert(row.perm != 0);
-   assert(row.orig != 0);
-   assert(col.perm != 0);
-   assert(col.orig != 0);
-   assert(diag     != 0);
+   assert(this->row.orig != 0);
+   assert(this->col.perm != 0);
+   assert(this->col.orig != 0);
+   assert(this->diag     != 0);
 
-   assert(u.row.elem  != 0);
-   assert(u.row.val   != 0);
-   assert(u.row.idx   != 0);
-   assert(u.row.start != 0);
-   assert(u.row.len   != 0);
-   assert(u.row.max   != 0);
+   assert(this->u.row.elem  != 0);
+   assert(this->u.row.val   != 0);
+   assert(this->u.row.idx   != 0);
+   assert(this->u.row.start != 0);
+   assert(this->u.row.len   != 0);
+   assert(this->u.row.max   != 0);
 
-   assert(u.col.elem  != 0);
-   assert(u.col.idx   != 0);
-   assert(u.col.start != 0);
-   assert(u.col.len   != 0);
-   assert(u.col.max   != 0);
+   assert(this->u.col.elem  != 0);
+   assert(this->u.col.idx   != 0);
+   assert(this->u.col.start != 0);
+   assert(this->u.col.len   != 0);
+   assert(this->u.col.max   != 0);
 
    assert(l.val   != 0);
    assert(l.idx   != 0);
@@ -1178,7 +1178,7 @@ SLUFactor<R>::SLUFactor()
 }
 
 template <class R>
-SLUFactor<R>::SLUFactor(const SLUFactor& old)
+SLUFactor<R>::SLUFactor<R>(const SLUFactor<R>& old)
    : SLinSolver( old )
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
@@ -1187,25 +1187,25 @@ SLUFactor<R>::SLUFactor(const SLUFactor& old)
    , forest(old.forest)
    , timerType(old.timerType)
 {
-   row.perm    = 0;
-   row.orig    = 0;
-   col.perm    = 0;
-   col.orig    = 0;
-   diag        = 0;
-   u.row.elem  = 0;
-   u.row.val   = 0;
-   u.row.idx   = 0;
-   u.row.start = 0;
-   u.row.len   = 0;
-   u.row.max   = 0;
-   u.col.elem  = 0;
-   u.col.idx   = 0;
-   u.col.start = 0;
-   u.col.len   = 0;
-   u.col.max   = 0;
-   u.col.val   = 0;
-   l.val       = 0;
-   l.idx       = 0;
+   this->row.perm    = 0;
+   this->row.orig    = 0;
+   this->col.perm    = 0;
+   this->col.orig    = 0;
+   this->diag        = 0;
+   this->u.row.elem  = 0;
+   this->u.row.val   = 0;
+   this->u.row.idx   = 0;
+   this->u.row.start = 0;
+   this->u.row.len   = 0;
+   this->u.row.max   = 0;
+   this->u.col.elem  = 0;
+   this->u.col.idx   = 0;
+   this->u.col.start = 0;
+   this->u.col.len   = 0;
+   this->u.col.max   = 0;
+   this->u.col.val   = 0;
+   this->l.val       = 0;
+   this->l.idx       = 0;
    l.start     = 0;
    l.row       = 0;
    l.rval      = 0;
@@ -1216,7 +1216,7 @@ SLUFactor<R>::SLUFactor(const SLUFactor& old)
 
    solveCount = 0;
    solveTime = TimerFactory::createTimer(timerType);
-   factorTime = TimerFactory::createTimer(timerType);
+   this->factorTime = TimerFactory::createTimer(timerType);
 
    try
    {
@@ -1234,46 +1234,46 @@ template <class R>
 void SLUFactor<R>::freeAll()
 {
 
-   if(row.perm) spx_free(row.perm);
-   if(row.orig) spx_free(row.orig);
-   if(col.perm) spx_free(col.perm);
-   if(col.orig) spx_free(col.orig);
-   if(u.row.elem) spx_free(u.row.elem);
-   if(u.row.val) spx_free(u.row.val);
-   if(u.row.idx) spx_free(u.row.idx);
-   if(u.row.start) spx_free(u.row.start);
-   if(u.row.len) spx_free(u.row.len);
-   if(u.row.max) spx_free(u.row.max);
-   if(u.col.elem) spx_free(u.col.elem);
-   if(u.col.idx) spx_free(u.col.idx);
-   if(u.col.start) spx_free(u.col.start);
-   if(u.col.len) spx_free(u.col.len);
-   if(u.col.max) spx_free(u.col.max);
-   if(l.val) spx_free(l.val);
-   if(l.idx) spx_free(l.idx);
-   if(l.start) spx_free(l.start);
-   if(l.row) spx_free(l.row);
+  if(this->row.perm) spx_free(this->row.perm);
+  if(this->row.orig) spx_free(this->row.orig);
+  if(this->col.perm) spx_free(this->col.perm);
+  if(this->col.orig) spx_free(this->col.orig);
+  if(this->u.row.elem) spx_free(this->u.row.elem);
+  if(this->u.row.val) spx_free(this->u.row.val);
+  if(this->u.row.idx) spx_free(this->u.row.idx);
+  if(this->u.row.start) spx_free(this->u.row.start);
+  if(this->u.row.len) spx_free(this->u.row.len);
+  if(this->u.row.max) spx_free(this->u.row.max);
+  if(this->u.col.elem) spx_free(this->u.col.elem);
+  if(this->u.col.idx) spx_free(this->u.col.idx);
+  if(this->u.col.start) spx_free(this->u.col.start);
+  if(this->u.col.len) spx_free(this->u.col.len);
+  if(this->u.col.max) spx_free(this->u.col.max);
+  if(this->l.val) spx_free(this->l.val);
+  if(this->l.idx) spx_free(this->l.idx);
+  if(this->l.start) spx_free(this->l.start);
+  if(this->l.row) spx_free(this->l.row);
 
- if(diag) spx_free(diag);
+  if(this->diag) spx_free(this->diag);
 
- if (u.col.val) spx_free(u.col.val);
+  if (this->u.col.val) spx_free(this->u.col.val);
 
-   if (l.rval) spx_free(l.rval);
-   if(l.ridx) spx_free(l.ridx);
-   if(l.rbeg) spx_free(l.rbeg);
-   if(l.rorig) spx_free(l.rorig);
-   if(l.rperm) spx_free(l.rperm);
+  if (this->l.rval) spx_free(this->l.rval);
+  if(this->l.ridx) spx_free(this->l.ridx);
+  if(this->l.rbeg) spx_free(this->l.rbeg);
+  if(this->l.rorig) spx_free(this->l.rorig);
+  if(this->l.rperm) spx_free(this->l.rperm);
 }
 
 template <class R>
-SLUFactor<R>::~SLUFactor()
+SLUFactor<R>::~SLUFactor<R>()
 {
    freeAll();
 
    solveTime->~Timer();
-   factorTime->~Timer();
+   this->factorTime->~Timer();
    spx_free(solveTime);
-   spx_free(factorTime);
+   spx_free(this->factorTime);
 }
 
 static Real betterThreshold(Real th)
@@ -1293,22 +1293,22 @@ static Real betterThreshold(Real th)
 }
 
 template <class R>
-SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
+typename SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
 {
    assert(dm     >= 0);
    assert(matrix != 0);
 
    Real lastStability = stability();
 
-   initDR(u.row.list);
-   initDR(u.col.list);
+   initDR(this->u.row.list);
+   initDR(this->u.col.list);
 
    usetup        = false;
    l.updateType  = uptype;
    l.firstUpdate = 0;
    l.firstUnused = 0;
 
-   if (dm != thedim)
+   if (dm != this->thedim)
    {
       clear();
 
@@ -1317,13 +1317,13 @@ SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
       ssvec.reDim(thedim);
       eta.reDim(thedim);
       forest.reDim(thedim);
-      work = vec.get_ptr();
+      this->work = vec.get_ptr();
 
-      spx_realloc(row.perm, thedim);
+      spx_realloc(this->row.perm, thedim);
       spx_realloc(row.orig, thedim);
-      spx_realloc(col.perm, thedim);
+      spx_realloc(this->col.perm, thedim);
       spx_realloc(col.orig, thedim);
-      spx_realloc(diag,     thedim);
+      spx_realloc(this->diag,     thedim);
 
       spx_realloc(u.row.elem,  thedim);
       spx_realloc(u.row.len,   thedim + 1);
@@ -1360,7 +1360,7 @@ SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
       minStability  = 2 * MINSTABILITY;
    }
 
-   u.row.list.idx      = thedim;
+   u.row.list.idx      = this->thedim;
    u.row.start[thedim] = 0;
    u.row.max[thedim]   = 0;
    u.row.len[thedim]   = 0;
@@ -1375,8 +1375,8 @@ SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
       ///@todo if the factorization fails with stat = SINGULAR, distinuish between proven singularity (e.g., because of
       ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
       ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
-      stat = OK;
-      factor(matrix, lastThreshold, epsilon);
+     this->stat = OK;
+     this->factor(matrix, lastThreshold, epsilon);
 
       // finish if the factorization is stable
       if (stability() >= minStability)
@@ -1421,7 +1421,7 @@ SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
    )
 
    assert(isConsistent());
-   return Status(stat);
+   return Status(this->stat);
 }
 
 

@@ -857,7 +857,7 @@ namespace soplex
 
   /// simplifies the problem and solves
   template <class R>
-  void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor& sluFactor, bool fromScratch, bool applyPreprocessing)
+  void SoPlexBase<R>::_decompSimplifyAndSolve(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, bool fromScratch, bool applyPreprocessing)
   {
     if( realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY) )
       solver.setTerminationTime(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
@@ -1030,7 +1030,7 @@ namespace soplex
 
   /// loads original problem into solver and solves again after it has been solved to optimality with preprocessing
   template <class R>
-  void SoPlexBase<R>::_decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result)
+  void SoPlexBase<R>::_decompResolveWithoutPreprocessing(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, typename SPxSimplifier<R>::Result result)
   {
     assert(_simplifier != 0 || _scaler != nullptr);
     assert(result == SPxSimplifier<R>::VANISHED
@@ -3250,7 +3250,7 @@ namespace soplex
   // @todo need to evaluate the solution to ensure that it is solved to optimality and then we are able to perform the
   // next steps in the algorithm.
   template <class R>
-  void SoPlexBase<R>::_evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor& sluFactor, typename SPxSimplifier<R>::Result result)
+  void SoPlexBase<R>::_evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, typename SPxSimplifier<R>::Result result)
   {
     typename SPxSolverBase<R>::Status solverStat = SPxSolverBase<R>::UNKNOWN;
     if( result == SPxSimplifier<R>::INFEASIBLE )
