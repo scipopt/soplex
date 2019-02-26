@@ -556,7 +556,7 @@ namespace soplex
     /// copy LP.
     virtual void loadLP(const SPxLPBase<R>& LP, bool initSlackBasis = true);
     /// setup linear solver to use. If \p destroy is true, \p slusolver will be freed in destructor.
-    virtual void setBasisSolver(SLinSolver* slu, const bool destroy = false);
+    virtual void setBasisSolver(SLinSolver<R>* slu, const bool destroy = false);
     /// setup pricer to use. If \p destroy is true, \p pricer will be freed in destructor.
     virtual void setPricer(SPxPricer<R>* pricer, const bool destroy = false);
     /// setup ratio-tester to use. If \p destroy is true, \p tester will be freed in destructor.
@@ -1773,7 +1773,7 @@ namespace soplex
       return thepricer;
     }
     /// return loaded SLinSolver.
-    const SLinSolver* slinSolver() const
+    const SLinSolver<R>* slinSolver() const
     {
       return SPxBasisBase<R>::factor;
     }

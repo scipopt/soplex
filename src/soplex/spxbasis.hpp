@@ -350,7 +350,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxBasisBase<R>::loadBasisSolver(SLinSolver* p_solver, const bool destroy)
+  void SPxBasisBase<R>::loadBasisSolver(SLinSolver<R>* p_solver, const bool destroy)
   {
     assert(!freeSlinSolver || factor != 0);
 

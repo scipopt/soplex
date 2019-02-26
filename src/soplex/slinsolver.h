@@ -208,7 +208,7 @@ public:
    virtual ~SLinSolver()
    {}
    /// clone function for polymorphism
-   virtual SLinSolver* clone() const = 0;
+   virtual SLinSolver<R>* clone() const = 0;
    //@}
 
    /// message handler

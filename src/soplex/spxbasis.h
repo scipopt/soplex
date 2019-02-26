@@ -354,7 +354,7 @@ namespace soplex
        The factorization of the matrix is stored in #factor if #factorized != 0.
        Otherwise #factor is undefined.
     */
-    SLinSolver* factor;
+    SLinSolver<R>* factor;
     /// \c true iff \ref soplex::SPxBasisBase<R>::factor "factor" = \ref soplex::SPxBasisBase<R>::matrix "matrix" \f$^{-1}\f$.
     bool factorized;
 
@@ -863,7 +863,7 @@ namespace soplex
     /// sets up linear solver to use.
     /** If destroy is true, solver will be freed inside this object, e.g. in the destructor.
      */
-    virtual void loadBasisSolver(SLinSolver* solver, const bool destroy = false);
+    virtual void loadBasisSolver(SLinSolver<R>* solver, const bool destroy = false);
 
     /// loads the LP \p lp to the basis.
     /** This involves resetting all counters to 0 and setting up a regular

@@ -39,7 +39,7 @@ namespace soplex
  * factorization implemented in CLUFactor.
  */
   template <class R>
-  class SLUFactor : public SLinSolver, protected CLUFactor<R>
+  class SLUFactor : public SLinSolver<R>, protected CLUFactor<R>
 {
 public:
 
@@ -53,7 +53,7 @@ public:
       FOREST_TOMLIN  ///<
    };
    /// for convenience
-   typedef SLinSolver<R>::Status Status;
+  using Status = typename SLinSolver<R>::Status;
    //@}
 
 private:
@@ -240,7 +240,8 @@ public:
    /**@name Miscellaneous */
    //@{
    /// time spent in factorizations
-   R getFactorTime() const
+  // @todo fix the return type from of the type form Real to a cpp time
+   Real getFactorTime() const
    {
       return this->factorTime->time();
    }
@@ -255,7 +256,8 @@ public:
       return this->factorCount;
    }
    /// time spent in solves
-   R getSolveTime() const
+  // @todo fix the return type of time to a cpp time type
+   Real getSolveTime() const
    {
       return solveTime->time();
    }
@@ -296,7 +298,7 @@ public:
    /// destructor.
    virtual ~SLUFactor<R>();
    /// clone function for polymorphism
-   inline virtual SLinSolver* clone() const
+   inline virtual SLinSolver<R>* clone() const
    {
       return new SLUFactor<R>(*this);
    }

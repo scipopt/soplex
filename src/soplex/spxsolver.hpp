@@ -83,7 +83,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxSolverBase<R>::setBasisSolver(SLinSolver* slu, const bool destroy)
+  void SPxSolverBase<R>::setBasisSolver(SLinSolver<R>* slu, const bool destroy)
   {
     // we need to set the outstream before we load the solver to ensure that the basis
     // can be initialized with this pointer in loadSolver()
