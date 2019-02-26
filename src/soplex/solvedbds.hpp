@@ -362,7 +362,7 @@ namespace soplex
 
         // Check whether the complementary problem is solved with a non-negative objective function, is infeasible or
         // unbounded. If true, then stop the algorithm.
-        if( !explicitviol && (GE(_compSolver.objValue(), 0.0, 1e-20)
+        if( !explicitviol && (GE(_compSolver.objValue(), R(0.0), R(1e-20))
                               || _compSolver.status() == SPxSolverBase<R>::INFEASIBLE
                               || _compSolver.status() == SPxSolverBase<R>::UNBOUNDED) )
           {
