@@ -152,7 +152,6 @@ void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Resul
    {
    case SPxSolverBase<Real>::OPTIMAL:
       _storeSolutionReal(!_isRealLPLoaded || _isRealLPScaled);
-
       // apply polishing on original problem
       if(_applyPolishing)
       {
@@ -218,6 +217,9 @@ void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Resul
    case SPxSolverBase<Real>::ABORT_VALUE:
    case SPxSolverBase<Real>::REGULAR:
    case SPxSolverBase<Real>::RUNNING:
+      // If we aborted the solve for some reason and there is still a shift, ensure that the basis status is correct
+      if(_solver.shift() > _solver.epsilon() )
+         _solver.setBasisStatus(SPxBasisBase<Real>::REGULAR);
       _storeSolutionReal(false);
       break;
 
