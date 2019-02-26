@@ -53,7 +53,7 @@ public:
       FOREST_TOMLIN  ///<
    };
    /// for convenience
-   typedef SLinSolver::Status Status;
+   typedef SLinSolver<R>::Status Status;
    //@}
 
 private:

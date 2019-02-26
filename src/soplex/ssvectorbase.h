@@ -95,7 +95,7 @@ public:
     */
    //@{
 
-   /// Only used in slufactor.cpp.
+   /// Only used in slufactor.hpp.
    R* get_ptr()
    {
       return DVectorBase<R>::get_ptr();

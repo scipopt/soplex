@@ -887,7 +887,7 @@ namespace soplex
 
 	      assert(minStab > 0.0);
 
-	      if (factor->status() != SLinSolver::OK || factor->stability() < minStab)
+	      if (factor->status() != SLinSolver<R>::OK || factor->stability() < minStab)
 		{
 		  MSG_INFO3( (*this->spxout), (*this->spxout) << "IBASIS07 stability triggers refactorization"
 			     << " stability= " << factor->stability()
@@ -916,7 +916,7 @@ namespace soplex
 
     switch(factor->load(matrix.get_ptr(), matrix.size()))
       {
-      case SLinSolver::OK :
+      case SLinSolver<R>::OK :
 	if (status() == SINGULAR)
 	  setStatus(REGULAR);
 
@@ -931,7 +931,7 @@ namespace soplex
 	if (minStab > 1e-6)
 	  minStab *= 0.1;
 	break;
-      case SLinSolver::SINGULAR :
+      case SLinSolver<R>::SINGULAR :
 	setStatus(SINGULAR);
 	factorized = false;
 	break;

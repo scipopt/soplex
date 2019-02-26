@@ -13,7 +13,7 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file slufactor.cpp
+/**@file slufactor.hpp
  * @todo SLUfactor seems to be partly an wrapper for CLUFactor (was C).
  *       This should be properly integrated and demangled.
  * @todo Does is make sense, to call x.clear() when next x.altValues()

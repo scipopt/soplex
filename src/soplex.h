@@ -1741,7 +1741,7 @@ private:
                           // the LP for the reduced and complementary problem in the one solver variable. The reduced
                           // problem will be stored in _solver and the complementary problem will be stored in
                           // _compSolver.
-  SLUFactor<R> _compSlufactor; // I don't know whether this is necessary, but it is a test for now.
+  SLUFactor<R> _compSlufactor;
 
    SPxBasisBase<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
