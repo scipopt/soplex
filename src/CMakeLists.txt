@@ -9,7 +9,6 @@ set(sources
     soplex/nameset.cpp
     soplex/rational.cpp
     soplex/ratrecon.cpp
-    soplex/slufactor.cpp
     soplex/slufactor_rational.cpp
     soplex/solvereal.cpp
     soplex/spxautopr.cpp

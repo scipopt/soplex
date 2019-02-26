@@ -36,10 +36,10 @@
 
 namespace soplex
 {
-#define MINSTABILITY    REAL(4e-2)
+#define MINSTABILITY    R(4e-2)
 
   template <class R>
-void SLUFactor<R>::solveRight(Vector& x, const Vector& b) //const
+void SLUFactor<R>::solveRight(VectorBase<R>& x, const VectorBase<R>& b) //const
 {
 
    this->solveTime->start();
@@ -53,7 +53,7 @@ void SLUFactor<R>::solveRight(Vector& x, const Vector& b) //const
 }
 
   template <class R>
-void SLUFactor<R>::solveRight(SSVector& x, const SVector& b) //const
+void SLUFactor<R>::solveRight(SSVectorBase<R> & x, const SVectorBase<R>& b) //const
 {
 
    solveTime->start();
@@ -67,7 +67,7 @@ void SLUFactor<R>::solveRight(SSVector& x, const SVector& b) //const
 }
 
   template <class R>
-void SLUFactor<R>::solveRight4update(SSVector& x, const SVector& b)
+void SLUFactor<R>::solveRight4update(SSVectorBase<R> & x, const SVectorBase<R>& b)
 {
 
    solveTime->start();
@@ -109,10 +109,10 @@ void SLUFactor<R>::solveRight4update(SSVector& x, const SVector& b)
 
   template <class R>
 void SLUFactor<R>::solve2right4update(
-   SSVector&      x,
-   Vector&        y,
-   const SVector& b,
-   SSVector&      rhs)
+   SSVectorBase<R> &      x,
+   VectorBase<R>&        y,
+   const SVectorBase<R>& b,
+   SSVectorBase<R> &      rhs)
 {
 
    solveTime->start();
@@ -165,10 +165,10 @@ void SLUFactor<R>::solve2right4update(
 
   template <class R>
 void SLUFactor<R>::solve2right4update(
-   SSVector&      x,
-   SSVector&      y,
-   const SVector& b,
-   SSVector&      rhs)
+   SSVectorBase<R> &      x,
+   SSVectorBase<R> &      y,
+   const SVectorBase<R>& b,
+   SSVectorBase<R> &      rhs)
 {
 
    solveTime->start();
@@ -228,12 +228,12 @@ void SLUFactor<R>::solve2right4update(
 
 template <class R>
 void SLUFactor<R>::solve3right4update(
-   SSVector&      x,
-   Vector&        y,
-   Vector&        y2,
-   const SVector& b,
-   SSVector&      rhs,
-   SSVector&      rhs2)
+   SSVectorBase<R> &      x,
+   VectorBase<R>&        y,
+   VectorBase<R>&        y2,
+   const SVectorBase<R>& b,
+   SSVectorBase<R> &      rhs,
+   SSVectorBase<R> &      rhs2)
 {
 
    solveTime->start();
@@ -293,12 +293,12 @@ void SLUFactor<R>::solve3right4update(
 
 template <class R>
 void SLUFactor<R>::solve3right4update(
-   SSVector&      x,
-   SSVector&      y,
-   SSVector&      y2,
-   const SVector& b,
-   SSVector&      rhs,
-   SSVector&      rhs2)
+   SSVectorBase<R> &      x,
+   SSVectorBase<R> &      y,
+   SSVectorBase<R> &      y2,
+   const SVectorBase<R>& b,
+   SSVectorBase<R> &      rhs,
+   SSVectorBase<R> &      rhs2)
 {
    solveTime->start();
 
@@ -369,7 +369,7 @@ void SLUFactor<R>::solve3right4update(
 
 
 template <class R>
-void SLUFactor<R>::solveLeft(Vector& x, const Vector& b) //const
+void SLUFactor<R>::solveLeft(VectorBase<R>& x, const VectorBase<R>& b) //const
 {
 
    solveTime->start();
@@ -383,7 +383,7 @@ void SLUFactor<R>::solveLeft(Vector& x, const Vector& b) //const
 }
 
 template <class R>
-void SLUFactor<R>::solveLeft(SSVector& x, const SVector& b) //const
+void SLUFactor<R>::solveLeft(SSVectorBase<R> & x, const SVectorBase<R>& b) //const
 {
 
    solveTime->start();
@@ -414,16 +414,16 @@ void SLUFactor<R>::solveLeft(SSVector& x, const SVector& b) //const
 
 template <class R>
 void SLUFactor<R>::solveLeft(
-   SSVector&      x,
-   Vector&        y,
-   const SVector& rhs1,
-   SSVector&      rhs2) //const
+   SSVectorBase<R> &      x,
+   VectorBase<R>&        y,
+   const SVectorBase<R>& rhs1,
+   SSVectorBase<R> &      rhs2) //const
 {
 
    solveTime->start();
 
    int   n;
-   Real* svec = ssvec.altValues();
+   R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
    int   rn   = rhs2.size();
    int*  ridx = rhs2.altIndexMem();
@@ -450,16 +450,16 @@ void SLUFactor<R>::solveLeft(
 
 template <class R>
 void SLUFactor<R>::solveLeft(
-   SSVector&      x,
-   SSVector&      y,
-   const SVector& rhs1,
-   SSVector&      rhs2) //const
+   SSVectorBase<R> &      x,
+   SSVectorBase<R> &      y,
+   const SVectorBase<R>& rhs1,
+   SSVectorBase<R> &      rhs2) //const
 {
 
    solveTime->start();
 
    int   n1, n2;
-   Real* svec = ssvec.altValues();
+   R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
 
    x.clear();
@@ -501,18 +501,18 @@ void SLUFactor<R>::solveLeft(
 
 template <class R>
 void SLUFactor<R>::solveLeft(
-   SSVector&      x,
-   Vector&        y,
-   Vector&        z,
-   const SVector& rhs1,
-   SSVector&      rhs2,
-   SSVector&      rhs3)
+   SSVectorBase<R> &      x,
+   VectorBase<R>&        y,
+   VectorBase<R>&        z,
+   const SVectorBase<R>& rhs1,
+   SSVectorBase<R> &      rhs2,
+   SSVectorBase<R> &      rhs3)
 {
 
    solveTime->start();
 
    int   n, n2, n3;
-   Real* svec = ssvec.altValues();
+   R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
 
    x.clear();
@@ -541,18 +541,18 @@ void SLUFactor<R>::solveLeft(
 
 template <class R>
 void SLUFactor<R>::solveLeft(
-   SSVector&      x,
-   SSVector&      y,
-   SSVector&      z,
-   const SVector& rhs1,
-   SSVector&      rhs2,
-   SSVector&      rhs3)
+   SSVectorBase<R> &      x,
+   SSVectorBase<R> &      y,
+   SSVectorBase<R> &      z,
+   const SVectorBase<R>& rhs1,
+   SSVectorBase<R> &      rhs2,
+   SSVectorBase<R> &      rhs3)
 {
 
    solveTime->start();
 
    int   n1, n2, n3;
-   Real* svec = ssvec.altValues();
+   R* svec = ssvec.altValues();
    int*  sidx = ssvec.altIndexMem();
 
    x.clear();
@@ -589,7 +589,7 @@ void SLUFactor<R>::solveLeft(
 
 
 template <class R>
-Real SLUFactor<R>::stability() const
+R SLUFactor<R>::stability() const
 {
    if (status() != OK)
       return 0;
@@ -602,9 +602,9 @@ Real SLUFactor<R>::stability() const
 }
 
 template <class R>
-Real SLUFactor<R>::matrixMetric(int type) const
+R SLUFactor<R>::matrixMetric(int type) const
 {
-   Real result = 0.0;
+   R result = 0.0;
 
    // catch corner case of empty matrix
    if( dim() == 0 )
@@ -615,12 +615,12 @@ Real SLUFactor<R>::matrixMetric(int type) const
    // compute condition estimate by ratio of max/min of elements on the diagonal
    case 0:
    {
-     Real mindiag = spxAbs(this->diag[0]);
-      Real maxdiag = spxAbs(this->diag[0]);
+     R mindiag = spxAbs(this->diag[0]);
+      R maxdiag = spxAbs(this->diag[0]);
 
       for( int i = 1; i < dim(); ++i)
       {
-        Real absdiag = spxAbs(this->diag[i]);
+        R absdiag = spxAbs(this->diag[i]);
          if( absdiag < mindiag )
             mindiag = absdiag;
          else if( absdiag > maxdiag )
@@ -660,7 +660,7 @@ std::string SLUFactor<R>::statistics() const
 }
 
 template <class R>
-void SLUFactor<R>::changeEta(int idx, SSVector& et)
+void SLUFactor<R>::changeEta(int idx, SSVectorBase<R> & et)
 {
 
    int es = et.size(); // see altValues()
@@ -672,23 +672,23 @@ void SLUFactor<R>::changeEta(int idx, SSVector& et)
 template <class R>
 typename SLUFactor<R>::Status SLUFactor<R>::change(
    int             idx,
-   const SVector&  subst,
-   const SSVector* e)
+   const SVectorBase<R>&  subst,
+   const SSVectorBase<R> * e)
 {
 
-   // BH 2005-08-23: The boolean usetup indicates that an "update vector"
-   // has been set up. I suppose that SSVector forest is this
-   // update vector, which is set up by solveRight4update() and
+   // BH 2005-08-23: The boolean usetup indicates that an "update VectorBase<R>"
+   // has been set up. I suppose that SSVectorBase<R>  forest is this
+   // update VectorBase<R>, which is set up by solveRight4update() and
    // solve2right4update() in order to optimize the basis update.
 
    if (usetup)
    {
       if (this->l.updateType == FOREST_TOMLIN)              // FOREST_TOMLIN updates
       {
-         // BH 2005-08-19: The size of a SSVector is the size of the
+         // BH 2005-08-19: The size of a SSVectorBase<R>  is the size of the
          // index set, i.e.  the number of nonzeros which is only
-         // defined if the SSVector is set up.  Since
-         // SSVector::altValues() calls unSetup() the size needs to be
+         // defined if the SSVectorBase<R>  is set up.  Since
+         // SSVectorBase<R> ::altValues() calls unSetup() the size needs to be
          // stored before the following call.
          int fsize = forest.size(); // see altValues()
          this->forestUpdate(idx, forest.altValues(), fsize, forest.altIndexMem());
@@ -745,7 +745,7 @@ void SLUFactor<R>::clear()
    this->l.firstUnused = 0;
    this->thedim        = 0;
 
-   epsilon       = Param<Real>::epsilonFactorization();
+   epsilon       = Param<R>::epsilonFactorization();
    usetup        = false;
    this->maxabs        = 1;
    this->initMaxabs    = 1;
@@ -1276,29 +1276,29 @@ SLUFactor<R>::~SLUFactor<R>()
    spx_free(this->factorTime);
 }
 
-static Real betterThreshold(Real th)
+static R betterThreshold(R th)
 {
-   assert(th < REAL(1.0));
+   assert(th < R(1.0));
 
-   if (LT(th, REAL(0.1)))
-      th *= REAL(10.0);
-   else if (LT(th, REAL(0.9)))
-      th = (th + REAL(1.0)) / REAL(2.0);
-   else if (LT(th, REAL(0.999)))
-      th = REAL(0.99999);
+   if (LT(th, R(0.1)))
+      th *= R(10.0);
+   else if (LT(th, R(0.9)))
+      th = (th + R(1.0)) / R(2.0);
+   else if (LT(th, R(0.999)))
+      th = R(0.99999);
 
-   assert(th < REAL(1.0));
+   assert(th < R(1.0));
 
    return th;
 }
 
 template <class R>
-typename SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm)
+typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[], int dm)
 {
    assert(dm     >= 0);
    assert(matrix != 0);
 
-   Real lastStability = stability();
+   R lastStability = stability();
 
    initDR(this->u.row.list);
    initDR(this->u.col.list);
@@ -1346,8 +1346,8 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm
    {
       // we reset lastThreshold to its previous value in the sequence minThreshold, betterThreshold(minThreshold),
       // betterThreshold(betterThreshold(minThreshold)), ...
-      Real last   = minThreshold;
-      Real better = betterThreshold(last);
+      R last   = minThreshold;
+      R better = betterThreshold(last);
       while (better < lastThreshold)
       {
          last   = better;
@@ -1383,7 +1383,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVector* matrix[], int dm
          break;
 
       // otherwise, we increase the Markowitz threshold
-      Real x = lastThreshold;
+      R x = lastThreshold;
       lastThreshold = betterThreshold(lastThreshold);
 
       // until it doesn't change anymore at its maximum value

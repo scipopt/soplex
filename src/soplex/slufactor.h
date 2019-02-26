@@ -61,8 +61,8 @@ private:
    //--------------------------------
    /**@name Private data */
    //@{
-   DVector    vec;           ///< Temporary vector
-   SSVector   ssvec;         ///< Temporary semi-sparse vector
+   DVectorBase<R>    vec;           ///< Temporary VectorBase<R>
+   SSVectorBase<R>    ssvec;         ///< Temporary semi-sparse VectorBase<R>
    //@}
 
 protected:
@@ -72,20 +72,20 @@ protected:
    //@{
    bool       usetup;        ///< TRUE iff update vector has been setup
    UpdateType uptype;        ///< the current \ref soplex::SLUFactor<R>::UpdateType "UpdateType".
-   SSVector   eta;           ///<
-   SSVector   forest;        ///< ? Update vector set up by solveRight4update() and solve2right4update()
-   Real       lastThreshold; ///< pivoting threshold of last factorization
+   SSVectorBase<R>    eta;           ///<
+   SSVectorBase<R>    forest;        ///< ? Update VectorBase<R> set up by solveRight4update() and solve2right4update()
+   R       lastThreshold; ///< pivoting threshold of last factorization
    //@}
 
    //--------------------------------
    /**@name Control Parameters */
    //@{
    /// minimum threshold to use.
-   Real minThreshold;
+   R minThreshold;
    /// minimum stability to achieve by setting threshold.
-   Real minStability;
+   R minStability;
    /// |x| < epsililon is considered to be 0.
-   Real epsilon;
+   R epsilon;
    /// Time spent in solves
    Timer* solveTime;
    Timer::TYPE timerType;
@@ -101,7 +101,7 @@ protected:
    ///
    void freeAll();
    ///
-   void changeEta(int idx, SSVector& eta);
+   void changeEta(int idx, SSVectorBase<R> & eta);
    //@}
 
 
@@ -126,7 +126,7 @@ public:
    }
 
    /// sets minimum Markowitz threshold.
-   void setMarkowitz(Real m)
+   void setMarkowitz(R m)
    {
       if( m < 0.01 )
          m = 0.01;
@@ -139,7 +139,7 @@ public:
    }
 
    /// returns Markowitz threshold.
-   Real markowitz()
+   R markowitz()
    {
       return lastThreshold;
    }
@@ -174,17 +174,17 @@ public:
       return Status(this->stat);
    }
    ///
-   Real stability() const;
+   R stability() const;
    /** return one of several matrix metrics based on the diagonal of U
     * 0: condition number estimate by ratio of min/max
     * 1: trace (sum of diagonal elements)
     * 2: determinant (product of diagonal elements)
     */
-   Real matrixMetric(int type = 0) const;
+   R matrixMetric(int type = 0) const;
    ///
    std::string statistics() const;
    ///
-   Status load(const SVector* vec[], int dim);
+   Status load(const SVectorBase<R>* vec[], int dim);
    //@}
 
 public:
@@ -193,54 +193,54 @@ public:
    /**@name Solve */
    //@{
    /// Solves \f$Ax=b\f$.
-   void solveRight (Vector& x, const Vector& b);
-   void solveRight(SSVector& x, const SSVector& b)
+   void solveRight (VectorBase<R>& x, const VectorBase<R>& b);
+   void solveRight(SSVectorBase<R> & x, const SSVectorBase<R> & b)
    {
       x.unSetup();
-      solveRight((Vector&) x, (const Vector&) b);
+      solveRight((VectorBase<R>&) x, (const VectorBase<R>&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveRight (SSVector& x, const SVector& b);
+   void solveRight (SSVectorBase<R> & x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$.
-   void solveRight4update(SSVector& x, const SVector& b);
+   void solveRight4update(SSVectorBase<R> & x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solve2right4update(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   void solve2right4update(SSVectorBase<R> & x, VectorBase<R>& y, const SVectorBase<R>& b, SSVectorBase<R> & d);
    /// Sparse version of solving two systems of equations
-   void solve2right4update(SSVector& x, SSVector& y, const SVector& b, SSVector& d);
+   void solve2right4update(SSVectorBase<R> & x, SSVectorBase<R> & y, const SVectorBase<R>& b, SSVectorBase<R> & d);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solve3right4update(SSVector& x, Vector& y, Vector& z,
-                           const SVector& b, SSVector& d, SSVector& e);
+   void solve3right4update(SSVectorBase<R> & x, VectorBase<R>& y, VectorBase<R>& z,
+                           const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
    /// sparse version of solving three systems of equations
-   void solve3right4update(SSVector& x, SSVector& y, SSVector& z,
-                           const SVector& b, SSVector& d, SSVector& e);
+   void solve3right4update(SSVectorBase<R> & x, SSVectorBase<R> & y, SSVectorBase<R> & z,
+                           const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
    /// sparse version of solving one system of equations with transposed basis matrix
-   void solveLeft(Vector& x, const Vector& b);
-   void solveLeft(SSVector& x, const SSVector& b)
+   void solveLeft(VectorBase<R>& x, const VectorBase<R>& b);
+   void solveLeft(SSVectorBase<R> & x, const SSVectorBase<R> & b)
    {
       x.unSetup();
-      solveLeft((Vector&) x, (const Vector&) b);
+      solveLeft((VectorBase<R>&) x, (const VectorBase<R>&) b);
    }
    /// Solves \f$Ax=b\f$.
-   void solveLeft(SSVector& x, const SVector& b);
+   void solveLeft(SSVectorBase<R> & x, const SVectorBase<R>& b);
    /// Solves \f$Ax=b\f$ and \f$Ay=d\f$.
-   void solveLeft(SSVector& x, Vector& y, const SVector& b, SSVector& d);
+   void solveLeft(SSVectorBase<R> & x, VectorBase<R>& y, const SVectorBase<R>& b, SSVectorBase<R> & d);
    /// sparse version of solving two systems of equations with transposed basis matrix
-   void solveLeft(SSVector& x, SSVector& two, const SVector& b, SSVector& rhs2);
+   void solveLeft(SSVectorBase<R> & x, SSVectorBase<R> & two, const SVectorBase<R>& b, SSVectorBase<R> & rhs2);
    /// Solves \f$Ax=b\f$, \f$Ay=d\f$ and \f$Az=e\f$.
-   void solveLeft(SSVector& x, Vector& y, Vector& z,
-                  const SVector& b, SSVector& d, SSVector& e);
+   void solveLeft(SSVectorBase<R> & x, VectorBase<R>& y, VectorBase<R>& z,
+                  const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
    /// sparse version of solving three systems of equations with transposed basis matrix
-   void solveLeft(SSVector& x, SSVector& y, SSVector& z,
-                  const SVector& b, SSVector& d, SSVector& e);
+   void solveLeft(SSVectorBase<R> & x, SSVectorBase<R> & y, SSVectorBase<R> & z,
+                  const SVectorBase<R>& b, SSVectorBase<R> & d, SSVectorBase<R> & e);
    ///
-   Status change(int idx, const SVector& subst, const SSVector* eta = 0);
+   Status change(int idx, const SVectorBase<R>& subst, const SSVectorBase<R> * eta = 0);
    //@}
 
    //--------------------------------
    /**@name Miscellaneous */
    //@{
    /// time spent in factorizations
-   Real getFactorTime() const
+   R getFactorTime() const
    {
       return this->factorTime->time();
    }
@@ -255,7 +255,7 @@ public:
       return this->factorCount;
    }
    /// time spent in solves
-   Real getSolveTime() const
+   R getSolveTime() const
    {
       return solveTime->time();
    }

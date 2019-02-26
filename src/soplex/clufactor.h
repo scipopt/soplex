@@ -182,7 +182,7 @@ protected:
    //----------------------------------------
    /**@name Protected data */
    //@{
-   SLinSolver::Status stat;   ///< Status indicator.
+   SLinSolver<R>::Status stat;   ///< Status indicator.
 
    int     thedim;            ///< dimension of factorized matrix
    int     nzCnt;             ///< number of nonzeros in U

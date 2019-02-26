@@ -291,7 +291,7 @@ static int deQueueMin( int* heap, int* size )
                  << std::endl;
       )
 #endif
-      stat = SLinSolver::SINGULAR;
+      stat = SLinSolver<R>::SINGULAR;
    }
 
    if ( spxAbs( diag[p_row] ) > maxabs )
@@ -1052,7 +1052,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
           */
          if ( i != r )
          {
-            stat = SLinSolver::SINGULAR;
+            stat = SLinSolver<R>::SINGULAR;
             throw SPxStatusException( "XFORE01 The loaded matrix is singular" );
          }
 
@@ -1185,7 +1185,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
 
          if ( x == 0.0 )
          {
-            stat = SLinSolver::SINGULAR;
+            stat = SLinSolver<R>::SINGULAR;
             throw SPxStatusException( "XFORE02 The loaded matrix is singular" );
             //            return;
          }
@@ -1272,7 +1272,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
       }
       else /* r < c */
       {
-         stat = SLinSolver::SINGULAR;
+         stat = SLinSolver<R>::SINGULAR;
          throw SPxStatusException( "XFORE03 The loaded matrix is singular" );
          //      return;
       }
@@ -1280,7 +1280,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
    maxabs = l_maxabs;
 
    assert( isConsistent() );
-   stat = SLinSolver::OK;
+   stat = SLinSolver<R>::OK;
 }
 
 template <class R>
@@ -1325,7 +1325,7 @@ void CLUFactor<R>::update( int p_col, R* p_work, const int* p_idx, int num )
          maxabs = spxAbs( x );
    }
 
-   stat = SLinSolver::OK;
+   stat = SLinSolver<R>::OK;
 }
 
 template <class R>
@@ -1370,7 +1370,7 @@ void CLUFactor<R>::updateNoClear(
          maxabs = spxAbs( x );
    }
 
-   stat = SLinSolver::OK;
+   stat = SLinSolver<R>::OK;
 }
 
 /*****************************************************************************/
@@ -1439,7 +1439,7 @@ void CLUFactor<R>::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
       else
          if ( k == 0 )
          {
-            stat = SLinSolver::SINGULAR;
+            stat = SLinSolver<R>::SINGULAR;
             return;
          }
    }
@@ -1534,7 +1534,7 @@ void CLUFactor<R>::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
       /* basis is singular due to empty column */
       if ( nnonzeros == 0 )
       {
-         stat = SLinSolver::SINGULAR;
+         stat = SLinSolver<R>::SINGULAR;
          return;
       }
 
@@ -1554,7 +1554,7 @@ void CLUFactor<R>::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
             /* basis is singular due to two linearly dependent column singletons */
             if ( row.perm[psv->index( j )] >= 0 )
             {
-               stat = SLinSolver::SINGULAR;
+               stat = SLinSolver<R>::SINGULAR;
                return;
             }
 
@@ -1681,7 +1681,7 @@ void CLUFactor<R>::colSingletons()
 
             if ( rperm[newrow] >= 0 )
             {
-               stat = SLinSolver::SINGULAR;
+               stat = SLinSolver<R>::SINGULAR;
                return;
             }
 
@@ -1707,7 +1707,7 @@ void CLUFactor<R>::colSingletons()
          else
             if ( n == 0 )
             {
-               stat = SLinSolver::SINGULAR;
+               stat = SLinSolver<R>::SINGULAR;
                return;
             }
       }
@@ -1802,7 +1802,7 @@ void CLUFactor<R>::rowSingletons()
             else
                if ( ll == 0 )
                {
-                  stat = SLinSolver::SINGULAR;
+                  stat = SLinSolver<R>::SINGULAR;
                   return;
                }
          }
@@ -1843,7 +1843,7 @@ void CLUFactor<R>::initFactorRings()
       {
          if ( u.row.len[i] <= 0 )
          {
-            stat = SLinSolver::SINGULAR;
+            stat = SLinSolver<R>::SINGULAR;
             return;
          }
 
@@ -1858,7 +1858,7 @@ void CLUFactor<R>::initFactorRings()
       {
          if ( temp.s_cact[i] <= 0 )
          {
-            stat = SLinSolver::SINGULAR;
+            stat = SLinSolver<R>::SINGULAR;
             return;
          }
 
@@ -2555,7 +2555,7 @@ void CLUFactor<R>::eliminateNucleus( const R eps,
    int r, c;
    CLUFactor<R>::Pring *pivot;
 
-   if ( stat == SLinSolver::SINGULAR )
+   if ( stat == SLinSolver<R>::SINGULAR )
       return;
 
    temp.pivots.mkwtz = -1;
@@ -2601,7 +2601,7 @@ void CLUFactor<R>::eliminateNucleus( const R eps,
       if ( temp.pivot_rowNZ->next != temp.pivot_rowNZ ||
             temp.pivot_colNZ->next != temp.pivot_colNZ )
       {
-         stat = SLinSolver::SINGULAR;
+         stat = SLinSolver<R>::SINGULAR;
          return;
       }
    }
@@ -2801,7 +2801,7 @@ void CLUFactor<R>::factor( const SVectorBase<R>** vec,         ///< Array of col
 
    factorTime->start();
 
-   stat = SLinSolver::OK;
+   stat = SLinSolver<R>::OK;
 
    l.start[0]    = 0;
    l.firstUpdate = 0;
@@ -2819,12 +2819,12 @@ void CLUFactor<R>::factor( const SVectorBase<R>** vec,         ///< Array of col
 
    colSingletons();
 
-   if ( stat != SLinSolver::OK )
+   if ( stat != SLinSolver<R>::OK )
       goto TERMINATE;
 
    rowSingletons();
 
-   if ( stat != SLinSolver::OK )
+   if ( stat != SLinSolver<R>::OK )
       goto TERMINATE;
 
    if ( temp.stage < thedim )
@@ -2838,7 +2838,7 @@ TERMINATE:
 
    l.firstUpdate = l.firstUnused;
 
-   if ( stat == SLinSolver::OK )
+   if ( stat == SLinSolver<R>::OK )
    {
 #ifdef WITH_L_ROWS
       setupRowVals();
