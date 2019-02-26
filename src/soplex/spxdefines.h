@@ -316,9 +316,10 @@ inline Real spxAbs(Real a)
 }
 
 /// returns square root
-inline Real spxSqrt(Real a)
+template <class R>
+inline R spxSqrt(R a)
 {
-   return sqrtl(a);
+  return std::sqrt(a);
 }
 
 // returns the next representable value after x in the direction of y

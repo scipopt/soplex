@@ -5284,7 +5284,7 @@ bool SoPlexBase<R>::areLPsInSync(const bool checkVecVals, const bool checkMatVal
   if( (int)_realLP->spxSense() != (int)_rationalLP->spxSense() )
     {
       MSG_INFO1( spxout, spxout << "The objective function sense of the R LP does not match the one of the Rational LP."
-                 << " R LP: " << (_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? "MIN" : "MAX")
+                 << " Real LP: " << (_realLP->spxSense() == SPxLPBase<R>::MINIMIZE ? "MIN" : "MAX")
                  << "  Rational LP: " << (_rationalLP->spxSense() == SPxLPRational::MINIMIZE ? "MIN" : "MAX") << std::endl);
       result = false;
     }

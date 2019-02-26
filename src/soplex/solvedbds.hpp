@@ -823,8 +823,8 @@ namespace soplex
               {
                 assert(EQ(_compSolver.lhs(rangedRowIds[addedrangedrows]), _realLP->lhs(i)));
                 assert(LE(_compSolver.rhs(rangedRowIds[addedrangedrows]), infinity));
-                assert(LE(_compSolver.lhs(i), -infinity));
-                assert(LT(_compSolver.rhs(i), infinity));
+                assert(LE(_compSolver.lhs(i), R(-infinity)));
+                assert(LT(_compSolver.rhs(i), R(infinity)));
 
                 _decompPrimalRowIDs[_nPrimalRows] = _realLP->rId(i);
                 _decompCompPrimalRowIDs[_nCompPrimalRows] = rangedRowIds[addedrangedrows];
@@ -1143,7 +1143,7 @@ namespace soplex
               compProbPrimal = compDualVector[_compSolver.number(SPxRowId(_decompCompPrimalRowIDs[i]))];
 
             // the variable in the basis is degenerate.
-            if( EQ(reducedProbDual, 0.0, feastol) )
+            if( EQ(reducedProbDual, R(0.0), feastol) )
               {
                 MSG_WARNING( spxout,
                              spxout << "WIMDSM01: reduced problem dual value is very close to zero." << std::endl; );
@@ -2108,9 +2108,9 @@ namespace soplex
             _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED ||
             _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE ||
             (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-             LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) ||
+             LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) ||
             (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-             LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
+             LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)) )
           {
             LPRowBase<R> origlprow;
             DSVectorBase<R> coltoaddVec(_realLP->nCols());
@@ -2162,9 +2162,9 @@ namespace soplex
                 _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED ||
                 _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE ||
                 (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-                 LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
+                 LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) )
               {
-                assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), infinity));
+                assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(infinity)));
                 addElimCols.add(_realLP->rhs(_decompElimPrimalRowIDs[i]), -infinity, coltoaddVec, infinity);
 
                 if( _nPrimalRows >= _decompPrimalRowIDs.size() )
@@ -2184,11 +2184,11 @@ namespace soplex
               }
             else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
                      (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-                      LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
+                      LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)) )
               {
                 // this assert should stay, but there is an issue with the status and the dual vector
                 //assert(LT(dualVector[_solver.number(_decompReducedProbRowIDs[rowNumber])], 0.0));
-                assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), -infinity));
+                assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity)));
                 addElimCols.add(_realLP->lhs(_decompElimPrimalRowIDs[i]), -infinity, coltoaddVec, infinity);
 
                 _decompPrimalRowIDs[_nPrimalRows] = _decompElimPrimalRowIDs[i];
@@ -2274,7 +2274,7 @@ namespace soplex
                 _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED ||
                 _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE ||
                 (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-                 LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
+                 LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) )
               {
                 //assert(GT(dualVector[solverRowNum], 0.0));
                 _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
@@ -2282,7 +2282,7 @@ namespace soplex
               }
             else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
                      (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-                      LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
+                      LE(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)) )
               {
                 //assert(LT(dualVector[solverRowNum], 0.0));
                 _compSolver.changeObj(_decompDualColIDs[i], _realLP->lhs(SPxRowId(_decompPrimalRowIDs[i])));
@@ -2490,9 +2490,9 @@ namespace soplex
             || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED
             || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE
             || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-                EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol))
+                EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol))
             || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-                EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
+                EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)) )
           {
             LPRowBase<R> origlprow;
             _realLP->getRow(rowNumber, origlprow);
@@ -2506,7 +2506,7 @@ namespace soplex
                 || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED
                 || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE
                 || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-                    EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
+                    EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) )
               {
                 assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), infinity));
 
@@ -2530,9 +2530,9 @@ namespace soplex
               }
             else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER
                      || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-                         EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
+                         EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)) )
               {
-                assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), -infinity));
+                assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity)));
 
                 if( _nPrimalRows >= _decompPrimalRowIDs.size() )
                   {
@@ -2597,7 +2597,7 @@ namespace soplex
                 || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_FIXED
                 || _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_FREE
                 || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-                    EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], 0.0, feastol)) )
+                    EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) )
               {
                 _compSolver.changeLhs(_decompCompPrimalRowIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
                 // need to also update the RHS because a ranged row could have previously been fixed to LOWER
@@ -2605,7 +2605,7 @@ namespace soplex
               }
             else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER
                      || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-                         EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), 0.0, feastol)) )
+                         EQ(_solver.pVec()[solverRowNum] - _solver.lhs(solverRowNum), R(0.0), feastol)) )
               {
                 _compSolver.changeRhs(_decompCompPrimalRowIDs[i], _realLP->lhs(SPxRowId(_decompPrimalRowIDs[i])));
                 // need to also update the LHS because a ranged row could have previously been fixed to UPPER
