@@ -25,7 +25,6 @@ set(sources
     soplex/spxparmultpr.cpp
     soplex/spxquality.cpp
     soplex/spxstarter.cpp
-    soplex/spxsteeppr.cpp
     soplex/spxsumst.cpp
     soplex/spxvecs.cpp
     soplex/spxvectorst.cpp

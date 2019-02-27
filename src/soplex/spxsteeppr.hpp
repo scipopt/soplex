@@ -27,54 +27,54 @@
 
 namespace soplex
 {
-  template <>
-  void SPxSteepPR<Real>::setupWeights(typename SPxSolverBase<Real>::Type type);
+  template <class R>
+  void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type);
 
-  template <>
-  int SPxSteepPR<Real>::selectLeaveX(Real tol);
+  template <class R>
+  int SPxSteepPR<R>::selectLeaveX(R tol);
 
-  template <>
-  bool SPxSteepPR<Real>::isConsistent() const;
+  template <class R>
+  bool SPxSteepPR<R>::isConsistent() const;
 
-  template <>
-  int SPxSteepPR<Real>::selectLeaveSparse(Real tol);
+  template <class R>
+  int SPxSteepPR<R>::selectLeaveSparse(R tol);
 
-  template <>
-  int SPxSteepPR<Real>::selectLeaveHyper(Real tol);
+  template <class R>
+  int SPxSteepPR<R>::selectLeaveHyper(R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterX(Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterX(R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterHyperDim(Real& best, Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterHyperCoDim(Real& best, Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterSparseDim(Real& best, Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterSparseDim(R& best, R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterSparseCoDim(Real& best, Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterSparseCoDim(R& best, R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterDenseDim(Real& best, Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterDenseDim(R& best, R tol);
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterDenseCoDim(Real& best, Real tol);
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterDenseCoDim(R& best, R tol);
 
 
 
   // #define EQ_PREF 1000
 
-  template <>
-  void SPxSteepPR<Real>::clear()
+  template <class R>
+  void SPxSteepPR<R>::clear()
   {
     this->thesolver = 0;
   }
 
-  template <>
-  void SPxSteepPR<Real>::load(SPxSolverBase<Real>* base)
+  template <class R>
+  void SPxSteepPR<R>::load(SPxSolverBase<R>* base)
   {
     this->thesolver = base;
 
@@ -87,8 +87,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSteepPR<Real>::setType(typename SPxSolverBase<Real>::Type type)
+  template <class R>
+  void SPxSteepPR<R>::setType(typename SPxSolverBase<R>::Type type)
   {
     workRhs.setEpsilon(this->thesolver->epsilon());
 
@@ -101,7 +101,7 @@ namespace soplex
     bestPrices.setMax(this->thesolver->dim());
     prices.reMax(this->thesolver->dim());
 
-    if( type == SPxSolverBase<Real>::ENTER )
+    if( type == SPxSolverBase<R>::ENTER )
       {
         bestPricesCo.clear();
         bestPricesCo.setMax(this->thesolver->coDim());
@@ -109,18 +109,18 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSteepPR<Real>::setupWeights(typename SPxSolverBase<Real>::Type type)
+  template <class R>
+  void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type)
   {
     int i;
     int endDim = 0;
     int endCoDim = 0;
-    DVector& weights = this->thesolver->weights;
-    DVector& coWeights = this->thesolver->coWeights;
+    DVectorBase<R>& weights = this->thesolver->weights;
+    DVectorBase<R>& coWeights = this->thesolver->coWeights;
 
     if( setup == DEFAULT )
       {
-        if( type == SPxSolverBase<Real>::ENTER )
+        if( type == SPxSolverBase<R>::ENTER )
           {
             if( this->thesolver->weightsAreSetup )
               {
@@ -144,7 +144,7 @@ namespace soplex
           }
         else
           {
-            assert(type == SPxSolverBase<Real>::LEAVE);
+            assert(type == SPxSolverBase<R>::LEAVE);
 
             if( this->thesolver->weightsAreSetup )
               {
@@ -164,7 +164,7 @@ namespace soplex
       {
         MSG_INFO1( (*this->thesolver->spxout), (*this->thesolver->spxout) << " --- initializing steepest edge multipliers" << std::endl; )
 
-          if (type == SPxSolverBase<Real>::ENTER)
+          if (type == SPxSolverBase<R>::ENTER)
             {
               coWeights.reDim(this->thesolver->dim(), false);
               for (i = this->thesolver->dim() - 1; i >= endDim; --i)
@@ -175,9 +175,9 @@ namespace soplex
             }
           else
             {
-              assert(type == SPxSolverBase<Real>::LEAVE);
+              assert(type == SPxSolverBase<R>::LEAVE);
               coWeights.reDim(this->thesolver->dim(), false);
-              SSVector tmp(this->thesolver->dim(), this->thesolver->epsilon());
+              SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
               for( i = this->thesolver->dim() - 1; i >= endDim && !this->thesolver->isTimeLimitReached(); --i )
                 {
                   this->thesolver->basis().coSolve(tmp, this->thesolver->unitVector(i));
@@ -188,12 +188,12 @@ namespace soplex
     this->thesolver->weightsAreSetup = true;
   }
 
-  template <>
-  void SPxSteepPR<Real>::setRep(typename SPxSolverBase<Real>::Representation)
+  template <class R>
+  void SPxSteepPR<R>::setRep(typename SPxSolverBase<R>::Representation)
   {
     if (workVec.dim() != this->thesolver->dim())
       {
-        DVector tmp = this->thesolver->weights;
+        DVectorBase<R> tmp = this->thesolver->weights;
         this->thesolver->weights = this->thesolver->coWeights;
         this->thesolver->coWeights = tmp;
 
@@ -202,19 +202,19 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSteepPR<Real>::left4(int n, SPxId id)
+  template <class R>
+  void SPxSteepPR<R>::left4(int n, SPxId id)
   {
-    assert(this->thesolver->type() == SPxSolverBase<Real>::LEAVE);
+    assert(this->thesolver->type() == SPxSolverBase<R>::LEAVE);
 
     if (id.isValid())
       {
-        Real        delta         = 0.1 + 1.0 / this->thesolver->basis().iteration();
-        Real*       coWeights_ptr = this->thesolver->coWeights.get_ptr();
-        const Real* workVec_ptr   = workVec.get_const_ptr();
-        const Real* rhoVec        = this->thesolver->fVec().delta().values();
-        Real        rhov_1        = 1.0 / rhoVec[n];
-        Real        beta_q        = this->thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
+        R        delta         = 0.1 + 1.0 / this->thesolver->basis().iteration();
+        R*       coWeights_ptr = this->thesolver->coWeights.get_ptr();
+        const R* workVec_ptr   = workVec.get_const_ptr();
+        const R* rhoVec        = this->thesolver->fVec().delta().values();
+        R        rhov_1        = 1.0 / rhoVec[n];
+        R        beta_q        = this->thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
 #ifndef NDEBUG
         if (spxAbs(rhoVec[n]) < theeps * 0.5)
@@ -241,7 +241,7 @@ namespace soplex
       }
   }
 
-  Real inline computePrice(Real viol, Real weight, Real tol)
+  R inline computePrice(R viol, R weight, R tol)
   {
     if( weight < tol )
       return viol * viol / tol;
@@ -249,15 +249,15 @@ namespace soplex
       return viol * viol / weight;
   }
 
-  template <>
-  int SPxSteepPR<Real>::buildBestPriceVectorLeave( Real feastol )
+  template <class R>
+  int SPxSteepPR<R>::buildBestPriceVectorLeave( R feastol )
   {
     int idx;
     int nsorted;
-    Real x;
-    const Real* fTest = this->thesolver->fTest().get_const_ptr();
-    const Real* cpen = this->thesolver->coWeights.get_const_ptr();
-    typename SPxPricer<Real>::IdxElement price;
+    R x;
+    const R* fTest = this->thesolver->fTest().get_const_ptr();
+    const R* cpen = this->thesolver->coWeights.get_const_ptr();
+    typename SPxPricer<R>::IdxElement price;
     prices.clear();
     bestPrices.clear();
 
@@ -294,8 +294,8 @@ namespace soplex
   }
 
 
-  template <>
-  int SPxSteepPR<Real>::selectLeave()
+  template <class R>
+  int SPxSteepPR<R>::selectLeave()
   {
     assert(isConsistent());
 
@@ -339,13 +339,13 @@ namespace soplex
     return retid;
   }
 
-  template <>
-  int SPxSteepPR<Real>::selectLeaveX(Real tol)
+  template <class R>
+  int SPxSteepPR<R>::selectLeaveX(R tol)
   {
-    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
-    const Real* fTest         = this->thesolver->fTest().get_const_ptr();
-    Real best = R(-infinity);
-    Real x;
+    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
+    const R* fTest         = this->thesolver->fTest().get_const_ptr();
+    R best = R(-infinity);
+    R x;
     int lastIdx = -1;
 
     for (int i = this->thesolver->dim() - 1; i >= 0; --i)
@@ -367,13 +367,13 @@ namespace soplex
     return lastIdx;
   }
 
-  template <>
-  int SPxSteepPR<Real>::selectLeaveSparse(Real tol)
+  template <class R>
+  int SPxSteepPR<R>::selectLeaveSparse(R tol)
   {
-    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
-    const Real* fTest         = this->thesolver->fTest().get_const_ptr();
-    Real best = R(-infinity);
-    Real x;
+    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
+    const R* fTest         = this->thesolver->fTest().get_const_ptr();
+    R best = R(-infinity);
+    R x;
     int lastIdx = -1;
     int idx;
 
@@ -403,14 +403,14 @@ namespace soplex
     return lastIdx;
   }
 
-  template <>
-  int SPxSteepPR<Real>::selectLeaveHyper(Real tol)
+  template <class R>
+  int SPxSteepPR<R>::selectLeaveHyper(R tol)
   {
-    const Real* coPen = this->thesolver->coWeights.get_const_ptr();
-    const Real* fTest = this->thesolver->fTest().get_const_ptr();
-    Real leastBest = R(infinity);
-    Real best = R(-infinity);
-    Real x;
+    const R* coPen = this->thesolver->coWeights.get_const_ptr();
+    const R* fTest = this->thesolver->fTest().get_const_ptr();
+    R leastBest = R(infinity);
+    R best = R(-infinity);
+    R x;
     int bestIdx = -1;
     int idx = 0;
 
@@ -475,24 +475,24 @@ namespace soplex
 
   /* Entering Simplex
    */
-  template <>
-  void SPxSteepPR<Real>::entered4(SPxId /* id */, int n)
+  template <class R>
+  void SPxSteepPR<R>::entered4(SPxId /* id */, int n)
   {
-    assert(this->thesolver->type() == SPxSolverBase<Real>::ENTER);
+    assert(this->thesolver->type() == SPxSolverBase<R>::ENTER);
 
     if (n >= 0 && n < this->thesolver->dim())
       {
-        Real delta = 2 + 1.0 / this->thesolver->basis().iteration();
-        Real* coWeights_ptr = this->thesolver->coWeights.get_ptr();
-        Real* weights_ptr = this->thesolver->weights.get_ptr();
-        const Real* workVec_ptr = workVec.get_const_ptr();
-        const Real* pVec = this->thesolver->pVec().delta().values();
+        R delta = 2 + 1.0 / this->thesolver->basis().iteration();
+        R* coWeights_ptr = this->thesolver->coWeights.get_ptr();
+        R* weights_ptr = this->thesolver->weights.get_ptr();
+        const R* workVec_ptr = workVec.get_const_ptr();
+        const R* pVec = this->thesolver->pVec().delta().values();
         const IdxSet& pIdx = this->thesolver->pVec().idx();
-        const Real* coPvec = this->thesolver->coPvec().delta().values();
+        const R* coPvec = this->thesolver->coPvec().delta().values();
         const IdxSet& coPidx = this->thesolver->coPvec().idx();
-        Real xi_p = 1 / this->thesolver->fVec().delta()[n];
+        R xi_p = 1 / this->thesolver->fVec().delta()[n];
         int i, j;
-        Real xi_ip;
+        R xi_ip;
 
         assert(this->thesolver->fVec().delta()[n] > this->thesolver->epsilon()
                || this->thesolver->fVec().delta()[n] < -this->thesolver->epsilon());
@@ -540,15 +540,15 @@ namespace soplex
   }
 
 
-  template <>
-  SPxId SPxSteepPR<Real>::buildBestPriceVectorEnterDim( Real& best, Real feastol )
+  template <class R>
+  SPxId SPxSteepPR<R>::buildBestPriceVectorEnterDim( R& best, R feastol )
   {
-    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
-    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
+    const R* coTest        = this->thesolver->coTest().get_const_ptr();
+    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
     int idx;
     int nsorted;
-    Real x;
-    typename SPxPricer<Real>::IdxElement price;
+    R x;
+    typename SPxPricer<R>::IdxElement price;
 
     prices.clear();
     bestPrices.clear();
@@ -594,15 +594,15 @@ namespace soplex
   }
 
 
-  template <>
-  SPxId SPxSteepPR<Real>::buildBestPriceVectorEnterCoDim( Real& best, Real feastol )
+  template <class R>
+  SPxId SPxSteepPR<R>::buildBestPriceVectorEnterCoDim( R& best, R feastol )
   {
-    const Real* test        = this->thesolver->test().get_const_ptr();
-    const Real* weights_ptr = this->thesolver->weights.get_const_ptr();
+    const R* test        = this->thesolver->test().get_const_ptr();
+    const R* weights_ptr = this->thesolver->weights.get_const_ptr();
     int idx;
     int nsorted;
-    Real x;
-    typename SPxPricer<Real>::IdxElement price;
+    R x;
+    typename SPxPricer<R>::IdxElement price;
 
     pricesCo.clear();
     bestPricesCo.clear();
@@ -648,8 +648,8 @@ namespace soplex
   }
 
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnter()
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnter()
   {
     assert(thesolver != 0);
     SPxId enterId;
@@ -667,7 +667,7 @@ namespace soplex
 
     if (enterId.isValid())
       {
-        SSVector& delta = this->thesolver->fVec().delta();
+        SSVectorBase<R> & delta = this->thesolver->fVec().delta();
 
         this->thesolver->basis().solve4update(delta, this->thesolver->vector(enterId));
 
@@ -679,13 +679,13 @@ namespace soplex
     return enterId;
   }
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterX(Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterX(R tol)
   {
     SPxId enterId;
     SPxId enterCoId;
-    Real best;
-    Real bestCo;
+    R best;
+    R bestCo;
 
     best = R(-infinity);
     bestCo = R(-infinity);
@@ -716,14 +716,14 @@ namespace soplex
   }
 
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterHyperDim(Real& best, Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol)
   {
-    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
-    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
+    const R* coTest        = this->thesolver->coTest().get_const_ptr();
+    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
 
-    Real leastBest = R(infinity);
-    Real x;
+    R leastBest = R(infinity);
+    R x;
     int enterIdx = -1;
     int idx;
 
@@ -794,14 +794,14 @@ namespace soplex
   }
 
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterHyperCoDim(Real& best, Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol)
   {
-    const Real* test        = this->thesolver->test().get_const_ptr();
-    const Real* weights_ptr = this->thesolver->weights.get_const_ptr();
+    const R* test        = this->thesolver->test().get_const_ptr();
+    const R* weights_ptr = this->thesolver->weights.get_const_ptr();
 
-    Real leastBest = R(infinity);
-    Real x;
+    R leastBest = R(infinity);
+    R x;
     int enterIdx = -1;
     int idx;
 
@@ -872,15 +872,15 @@ namespace soplex
   }
 
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterSparseDim(Real& best, Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterSparseDim(R& best, R tol)
   {
     SPxId enterId;
-    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
-    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
+    const R* coTest        = this->thesolver->coTest().get_const_ptr();
+    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
 
     int idx;
-    Real x;
+    R x;
 
     for (int i = this->thesolver->infeasibilities.size() -1; i >= 0; --i)
       {
@@ -905,15 +905,15 @@ namespace soplex
     return enterId;
   }
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterSparseCoDim(Real& best, Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterSparseCoDim(R& best, R tol)
   {
     SPxId enterId;
-    const Real* test          = this->thesolver->test().get_const_ptr();
-    const Real* weights_ptr   = this->thesolver->weights.get_const_ptr();
+    const R* test          = this->thesolver->test().get_const_ptr();
+    const R* weights_ptr   = this->thesolver->weights.get_const_ptr();
 
     int idx;
-    Real x;
+    R x;
 
     for (int i = this->thesolver->infeasibilitiesCo.size() -1; i >= 0; --i)
       {
@@ -938,14 +938,14 @@ namespace soplex
     return enterId;
   }
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterDenseDim(Real& best, Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterDenseDim(R& best, R tol)
   {
     SPxId enterId;
-    const Real* coTest        = this->thesolver->coTest().get_const_ptr();
-    const Real* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
+    const R* coTest        = this->thesolver->coTest().get_const_ptr();
+    const R* coWeights_ptr = this->thesolver->coWeights.get_const_ptr();
 
-    Real x;
+    R x;
 
     for (int i = 0, end = this->thesolver->dim(); i < end; ++i)
       {
@@ -963,14 +963,14 @@ namespace soplex
     return enterId;
   }
 
-  template <>
-  SPxId SPxSteepPR<Real>::selectEnterDenseCoDim(Real& best, Real tol)
+  template <class R>
+  SPxId SPxSteepPR<R>::selectEnterDenseCoDim(R& best, R tol)
   {
     SPxId enterId;
-    const Real* test          = this->thesolver->test().get_const_ptr();
-    const Real* weights_ptr   = this->thesolver->weights.get_const_ptr();
+    const R* test          = this->thesolver->test().get_const_ptr();
+    const R* weights_ptr   = this->thesolver->weights.get_const_ptr();
 
-    Real x;
+    R x;
 
     for(int i = 0, end = this->thesolver->coDim(); i < end; ++i)
       {
@@ -989,24 +989,24 @@ namespace soplex
   }
 
 
-  template <>
-  void SPxSteepPR<Real>::addedVecs(int n)
+  template <class R>
+  void SPxSteepPR<R>::addedVecs(int n)
   {
-    DVector& weights = this->thesolver->weights;
+    DVectorBase<R>& weights = this->thesolver->weights;
     n = weights.dim();
     weights.reDim(this->thesolver->coDim());
 
-    if (this->thesolver->type() == SPxSolverBase<Real>::ENTER)
+    if (this->thesolver->type() == SPxSolverBase<R>::ENTER)
       {
         for (; n < weights.dim(); ++n)
           weights[n] = 2;
       }
   }
 
-  template <>
-  void SPxSteepPR<Real>::addedCoVecs(int n)
+  template <class R>
+  void SPxSteepPR<R>::addedCoVecs(int n)
   {
-    DVector& coWeights = this->thesolver->coWeights;
+    DVectorBase<R>& coWeights = this->thesolver->coWeights;
     n = coWeights.dim();
     workVec.reDim (this->thesolver->dim());
     coWeights.reDim (this->thesolver->dim());
@@ -1014,21 +1014,21 @@ namespace soplex
       coWeights[n] = 1;
   }
 
-  template <>
-  void SPxSteepPR<Real>::removedVec(int i)
+  template <class R>
+  void SPxSteepPR<R>::removedVec(int i)
   {
     assert(thesolver != 0);
-    DVector& weights = this->thesolver->weights;
+    DVectorBase<R>& weights = this->thesolver->weights;
     weights[i] = weights[weights.dim()];
     weights.reDim(this->thesolver->coDim());
   }
 
-  template <>
-  void SPxSteepPR<Real>::removedVecs(const int perm[])
+  template <class R>
+  void SPxSteepPR<R>::removedVecs(const int perm[])
   {
     assert(thesolver != 0);
-    DVector& weights = this->thesolver->weights;
-    if (this->thesolver->type() == SPxSolverBase<Real>::ENTER)
+    DVectorBase<R>& weights = this->thesolver->weights;
+    if (this->thesolver->type() == SPxSolverBase<R>::ENTER)
       {
         int i;
         int j = weights.dim();
@@ -1041,20 +1041,20 @@ namespace soplex
     weights.reDim(this->thesolver->coDim());
   }
 
-  template <>
-  void SPxSteepPR<Real>::removedCoVec(int i)
+  template <class R>
+  void SPxSteepPR<R>::removedCoVec(int i)
   {
     assert(thesolver != 0);
-    DVector& coWeights = this->thesolver->coWeights;
+    DVectorBase<R>& coWeights = this->thesolver->coWeights;
     coWeights[i] = coWeights[coWeights.dim()];
     coWeights.reDim(this->thesolver->dim());
   }
 
-  template <>
-  void SPxSteepPR<Real>::removedCoVecs(const int perm[])
+  template <class R>
+  void SPxSteepPR<R>::removedCoVecs(const int perm[])
   {
     assert(thesolver != 0);
-    DVector& coWeights = this->thesolver->coWeights;
+    DVectorBase<R>& coWeights = this->thesolver->coWeights;
     int i;
     int j = coWeights.dim();
     for (i = 0; i < j; ++i)
@@ -1065,17 +1065,17 @@ namespace soplex
     coWeights.reDim(this->thesolver->dim());
   }
 
-  template <>
-  bool SPxSteepPR<Real>::isConsistent() const
+  template <class R>
+  bool SPxSteepPR<R>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-    DVector& w = this->thesolver->weights;
-    DVector& coW = this->thesolver->coWeights;
-    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<Real>::LEAVE && setup == EXACT)
+    DVectorBase<R>& w = this->thesolver->weights;
+    DVectorBase<R>& coW = this->thesolver->coWeights;
+    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
       {
         int i;
-        SSVector tmp(this->thesolver->dim(), this->thesolver->epsilon());
-        Real x;
+        SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
+        R x;
         for (i = this->thesolver->dim() - 1; i >= 0; --i)
           {
             this->thesolver->basis().coSolve(tmp, this->thesolver->unitVector(i));
@@ -1087,7 +1087,7 @@ namespace soplex
           }
       }
 
-    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<Real>::ENTER)
+    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::ENTER)
       {
         int i;
         for (i = this->thesolver->dim() - 1; i >= 0; --i)

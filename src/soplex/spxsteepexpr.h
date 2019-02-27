@@ -82,4 +82,7 @@ public:
 };
 
 } // namespace soplex
+
+#include "spxsteeppr.hpp"
+
 #endif // _SPXSTEEPPR_H_
