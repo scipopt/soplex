@@ -217,6 +217,7 @@ namespace soplex
     reDim();
   }
 
+  template <class R>
   static typename SPxBasisBase<R>::Desc::Status
   primalColStatus(int i, const SPxLPBase<R>* theLP)
   {

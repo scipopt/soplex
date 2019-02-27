@@ -695,7 +695,7 @@ namespace soplex
 
     if (isZero(s[m_i], 1e-6))
       s[m_i] = 0.0;
-    else if (s[m_i] >= soplex::R(infinity))
+    else if (s[m_i] >= R(infinity))
       // this is a fix for a highly ill conditioned instance that is "solved" in presolving (ilaser0 from MINLP, mittelmann)
       throw SPxException("Simplifier: infinite activities - aborting unsimplification");
 
