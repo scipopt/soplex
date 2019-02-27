@@ -96,8 +96,8 @@ namespace soplex
                                    << std::endl; )
                           throw SPxInternalCodeException("XSVECS01 This should never happen.");
                       }
-                    assert(x < infinity);
-                    assert(x > -infinity);
+                    assert(x < R(infinity));
+                    assert(x > R(-infinity));
                     (*theFrhs)[i] += x;     // slack !
                   }
               }
@@ -144,12 +144,12 @@ namespace soplex
                       break;
 
                       default:
-                        assert(this->lhs(i) <= -infinity && this->rhs(i) >= infinity);
+                        assert(this->lhs(i) <= R(-infinity) && this->rhs(i) >= R(infinity));
                         x = 0.0;
                         break;
                       }
-                    assert(x < infinity);
-                    assert(x > -infinity);
+                    assert(x < R(infinity));
+                    assert(x > R(-infinity));
                     // assert(x == 0.0);
 
                     if (x != 0.0)
@@ -197,8 +197,8 @@ namespace soplex
                            << std::endl; )
                   throw SPxInternalCodeException("XSVECS02 This should never happen.");
               }
-            assert(x < infinity);
-            assert(x > -infinity);
+            assert(x < R(infinity));
+            assert(x > R(-infinity));
 
             if (x != 0.0)
               theFrhs->multAdd(-x, vector(i));
@@ -256,8 +256,8 @@ namespace soplex
                            << std::endl; )
                   throw SPxInternalCodeException("XSVECS04 This should never happen.");
               }
-            assert(x < infinity);
-            assert(x > -infinity);
+            assert(x < R(infinity));
+            assert(x > R(-infinity));
 
             if (x != 0.0)
               theFrhs->multAdd(-x, vector(i));
@@ -325,8 +325,8 @@ namespace soplex
                            << std::endl; )
                   throw SPxInternalCodeException("XSVECS05 This should never happen.");
               }
-            assert(x < infinity);
-            assert(x > -infinity);
+            assert(x < R(infinity));
+            assert(x > R(-infinity));
 
             (*theFrhs)[i] -= x; // This is a slack, so no need to multiply a vector.
           }
@@ -362,17 +362,17 @@ namespace soplex
       {
         // rowwise representation:
       case SPxBasisBase<Real>::Desc::P_FIXED :
-        assert(this->lhs(n) > -infinity);
+        assert(this->lhs(n) > R(-infinity));
         assert(EQ(this->rhs(n), this->lhs(n)));
         //lint -fallthrough
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         assert(rep() == ROW);
-        assert(this->rhs(n) < infinity);
+        assert(this->rhs(n) < R(infinity));
         (*theCoPrhs)[i] = this->rhs(n);
         break;
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
         assert(rep() == ROW);
-        assert(this->lhs(n) > -infinity);
+        assert(this->lhs(n) > R(-infinity));
         (*theCoPrhs)[i] = this->lhs(n);
         break;
 
@@ -394,16 +394,16 @@ namespace soplex
         // rowwise representation:
       case SPxBasisBase<Real>::Desc::P_FIXED :
         assert(EQ(SPxLP::upper(n), SPxLP::lower(n)));
-        assert(SPxLP::lower(n) > -infinity);
+        assert(SPxLP::lower(n) > R(-infinity));
         //lint -fallthrough
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         assert(rep() == ROW);
-        assert(SPxLP::upper(n) < infinity);
+        assert(SPxLP::upper(n) < R(infinity));
         (*theCoPrhs)[i] = SPxLP::upper(n);
         break;
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
         assert(rep() == ROW);
-        assert(SPxLP::lower(n) > -infinity);
+        assert(SPxLP::lower(n) > R(-infinity));
         (*theCoPrhs)[i] = SPxLP::lower(n);
         break;
 
@@ -447,18 +447,18 @@ namespace soplex
       {
       case SPxBasisBase<Real>::Desc::D_ON_BOTH :
       case SPxBasisBase<Real>::Desc::P_FIXED :
-        assert(theLRbound[n] > -infinity);
+        assert(theLRbound[n] > R(-infinity));
         assert(EQ(theURbound[n], theLRbound[n]));
         //lint -fallthrough
       case SPxBasisBase<Real>::Desc::D_ON_UPPER :
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
-        assert(theURbound[n] < infinity);
+        assert(theURbound[n] < R(infinity));
         (*theCoPrhs)[i] = theURbound[n];
         break;
 
       case SPxBasisBase<Real>::Desc::D_ON_LOWER :
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        assert(theLRbound[n] > -infinity);
+        assert(theLRbound[n] > R(-infinity));
         (*theCoPrhs)[i] = theLRbound[n];
         break;
 
@@ -478,17 +478,17 @@ namespace soplex
       case SPxBasisBase<Real>::Desc::D_UNDEFINED :
       case SPxBasisBase<Real>::Desc::D_ON_BOTH :
       case SPxBasisBase<Real>::Desc::P_FIXED :
-        assert(theLCbound[n] > -infinity);
+        assert(theLCbound[n] > R(-infinity));
         assert(EQ(theUCbound[n], theLCbound[n]));
         //lint -fallthrough
       case SPxBasisBase<Real>::Desc::D_ON_LOWER :
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
-        assert(theUCbound[n] < infinity);
+        assert(theUCbound[n] < R(infinity));
         (*theCoPrhs)[i] = theUCbound[n];
         break;
       case SPxBasisBase<Real>::Desc::D_ON_UPPER :
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        assert(theLCbound[n] > -infinity);
+        assert(theLCbound[n] > R(-infinity));
         (*theCoPrhs)[i] = theLCbound[n];
         break;
 

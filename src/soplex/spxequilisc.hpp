@@ -41,7 +41,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
    for( int i = 0; i < n; ++i )
    {
      const SVectorBase<R>& vec = rowRatio ? lp.rowVector(i) : lp.colVector(i);
-      R mini = infinity;
+      R mini = R(infinity);
       R maxi = 0.0;
 
       for( int j = 0; j < vec.size(); ++j )
@@ -57,7 +57,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
             maxi = x;
       }
 
-      if( mini == infinity )
+      if( mini == R(infinity) )
          continue;
 
       const R p = maxi / mini;

@@ -100,7 +100,7 @@ template < class S >
  *  <TR><TD>\c *     </TD><TD>skalar product</TD>
  *      <TD>\c x = \c a \c * \c b </TD></TR>
  *  <TR><TD>\c *=    </TD><TD>scaling       </TD><TD>\c a \c *= \c x </TD></TR>
- *  <TR><TD>maxAbs() </TD><TD>infinity norm </TD>
+ *  <TR><TD>maxAbs() </TD><TD>R(infinity) norm </TD>
  *      <TD>\c a.maxAbs() == \f$\|a\|_{\infty}\f$ </TD></TR>
  *  <TR><TD>length() </TD><TD>eucledian norm</TD>
  *      <TD>\c a.length() == \f$\sqrt{a^2}\f$ </TD></TR>
@@ -462,7 +462,7 @@ public:
    /**@name Arithmetic operations */
    //@{
 
-   /// Maximum absolute value, i.e., infinity norm.
+   /// Maximum absolute value, i.e., R(infinity) norm.
    R maxAbs() const
    {
       R maxi = 0;
@@ -481,7 +481,7 @@ public:
    /// Minimum absolute value.
    R minAbs() const
    {
-      R mini = infinity;
+      R mini = R(infinity);
 
       for( int i = size() - 1; i >= 0; --i )
       {
@@ -495,9 +495,9 @@ public:
    }
 
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
-   Real length() const
+   R length() const
    {
-      return spxSqrt((Real)length2());
+     return std::sqrt(R(length2()));
    }
 
    /// Squared norm.

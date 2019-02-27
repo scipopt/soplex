@@ -1594,7 +1594,8 @@ void SoPlexBase<R>::_performOptIRStable(
       SVectorRational liftingRowVector(2, liftingRowMem);
 
       // search each column for large nonzeros entries
-      const Rational maxValue = realParam(SoPlexBase<R>::LIFTMAXVAL);
+      // @todo: rethink about the static_cast
+      const Rational maxValue = static_cast<Rational>(realParam(SoPlexBase<R>::LIFTMAXVAL));
 
       for( int i = 0; i < numColsRational(); i++ )
       {
@@ -1661,7 +1662,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // search each column for small nonzeros entries
-      const Rational minValue = realParam(SoPlexBase<R>::LIFTMINVAL);
+      const Rational minValue = Rational(realParam(SoPlexBase<R>::LIFTMINVAL));
 
       for( int i = 0; i < numColsRational(); i++ )
       {
@@ -1788,7 +1789,7 @@ void SoPlexBase<R>::_performOptIRStable(
       ///@todo if we know the mapping between original and lifting columns, we simply need to add the reduced cost of
       ///      the lifting column to the reduced cost of the original column; this is not implemented now, because for
       ///      optimal solutions the reduced costs of the lifting columns are zero
-      const Rational maxValue = realParam(SoPlexBase<R>::LIFTMAXVAL);
+      const Rational maxValue = Rational(realParam(SoPlexBase<R>::LIFTMAXVAL));
 
       for( int i = _beforeLiftCols; i < numColsRational() && sol._isDualFeasible; i++ )
       {
@@ -1894,7 +1895,7 @@ void SoPlexBase<R>::_performOptIRStable(
             {
                if( _basisStatusRows[i] == SPxSolverBase<R>::FIXED && _solver.lhs(i) != _solver.rhs(i) )
                {
-                  assert(_solver.rhs(i) == spxNextafter(_solver.lhs(i), infinity));
+                 assert(_solver.rhs(i) == spxNextafter(_solver.lhs(i), R(infinity)));
                   if( _hasSolRational && _solRational.isDualFeasible()
                      && ((intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MAXIMIZE && _solRational._dual[i] > 0)
                         || (intParam(SoPlexBase<R>::OBJSENSE) == SoPlexBase<R>::OBJSENSE_MINIMIZE && _solRational._dual[i] < 0)) )

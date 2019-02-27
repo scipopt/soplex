@@ -76,16 +76,16 @@ namespace soplex
       {
         int n = base.number(SPxRowId(id));
 
-        if (base.rhs(n) >= infinity)
+        if (base.rhs(n) >= R(infinity))
           {
-            if (base.lhs(n) <= -infinity)
+            if (base.lhs(n) <= R(-infinity))
               desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_FREE;
             else
               desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
           }
         else
           {
-            if (base.lhs(n) <= -infinity)
+            if (base.lhs(n) <= R(-infinity))
               desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
             else if (base.lhs(n) >= base.rhs(n) - base.epsilon())
               desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_FIXED;
@@ -98,16 +98,16 @@ namespace soplex
     else
       {
         int n = base.number(SPxColId(id));
-        if (base.SPxLP::upper(n) >= infinity)
+        if (base.SPxLP::upper(n) >= R(infinity))
           {
-            if (base.SPxLP::lower(n) <= -infinity)
+            if (base.SPxLP::lower(n) <= R(-infinity))
               desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_FREE;
             else
               desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
           }
         else
           {
-            if (base.SPxLP::lower(n) <= -infinity)
+            if (base.SPxLP::lower(n) <= R(-infinity))
               desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
             else if (base.SPxLP::lower(n) >= base.SPxLP::upper(n) - base.epsilon())
               desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_FIXED;
@@ -399,13 +399,13 @@ namespace soplex
     for (i = pvec.dim() - 1; i >= 0; --i)
       {
         if (desc.colStatus(i) == SPxBasisBase<Real>::Desc::P_ON_UPPER
-            && base.lower(i) > -infinity && pvec[i] > base.maxObj(i))
+            && base.lower(i) > R(-infinity) && pvec[i] > base.maxObj(i))
           {
             changed = 1;
             desc.colStatus(i) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
           }
         else if (desc.colStatus(i) == SPxBasisBase<Real>::Desc::P_ON_LOWER
-                 && base.upper(i) < infinity && pvec[i] < base.maxObj(i))
+                 && base.upper(i) < R(infinity) && pvec[i] < base.maxObj(i))
           {
             changed = 1;
             desc.colStatus(i) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
@@ -442,18 +442,18 @@ namespace soplex
     // find absolut biggest entry in bounds and left-/right hand side
     for (i = 0; i < base.nCols(); i++)
       {
-        if ((up[i] < infinity) && (spxAbs(up[i]) > maxabs))
+        if ((up[i] < R(infinity)) && (spxAbs(up[i]) > maxabs))
           maxabs = spxAbs(up[i]);
 
-        if ((low[i] > -infinity) && (spxAbs(low[i]) > maxabs))
+        if ((low[i] > R(-infinity)) && (spxAbs(low[i]) > maxabs))
           maxabs = spxAbs(low[i]);
       }
     for (i = 0; i < base.nRows(); i++)
       {
-        if ((rhs[i] < infinity) && (spxAbs(rhs[i]) > maxabs))
+        if ((rhs[i] < R(infinity)) && (spxAbs(rhs[i]) > maxabs))
           maxabs = spxAbs(rhs[i]);
 
-        if ((lhs[i] > -infinity) && (spxAbs(lhs[i]) > maxabs))
+        if ((lhs[i] > R(-infinity)) && (spxAbs(lhs[i]) > maxabs))
           maxabs = spxAbs(lhs[i]);
       }
 
@@ -487,11 +487,11 @@ namespace soplex
             Real u = bx * up [i]; // this is at most 1, probably a lot smaller
             Real l = bx * low[i]; // this is at most 1, probably a lot smaller
 
-            if (up[i] < infinity)
+            if (up[i] < R(infinity))
               {
                 if (spxAbs(low[i] - up[i]) < eps)
                   colWeight[i] = c_fixed + n + spxAbs(x);
-                else if (low[i] > -infinity)
+                else if (low[i] > R(-infinity))
                   {
                     colWeight[i] = c_dbl_bounded + l - u + n;
 
@@ -517,7 +517,7 @@ namespace soplex
               }
             else
               {
-                if (low[i] > -infinity)
+                if (low[i] > R(-infinity))
                   {
                     colWeight[i] = c_bounded + l + n - x;
                     colUp[i]     = false;
@@ -531,13 +531,13 @@ namespace soplex
 
         for (i = base.nRows() - 1; i >= 0; i--)
           {
-            if (rhs[i] < infinity)
+            if (rhs[i] < R(infinity))
               {
                 if (spxAbs(lhs[i] - rhs[i]) < eps)
                   {
                     rowWeight[i] = r_fixed;
                   }
-                else if (lhs[i] > -infinity)
+                else if (lhs[i] > R(-infinity))
                   {
                     Real u = bx * rhs[i];
                     Real l = bx * lhs[i];
@@ -553,7 +553,7 @@ namespace soplex
               }
             else
               {
-                if (lhs[i] > -infinity)
+                if (lhs[i] > R(-infinity))
                   {
                     rowWeight[i] = r_bounded + bx * lhs[i];
                     rowRight[i]  = false;
@@ -588,11 +588,11 @@ namespace soplex
             Real u = bx  * up [i];
             Real l = bx  * low[i];
 
-            if (up[i] < infinity)
+            if (up[i] < R(infinity))
               {
                 if (spxAbs(low[i] - up[i]) < eps)
                   colWeight[i] = c_fixed + n + spxAbs(x);
-                else if (low[i] > -infinity)
+                else if (low[i] > R(-infinity))
                   {
                     if (x > 0)
                       {
@@ -613,7 +613,7 @@ namespace soplex
               }
             else
               {
-                if (low[i] > -infinity)
+                if (low[i] > R(-infinity))
                   {
                     colWeight[i] = c_bounded - x + l + n;
                     colUp[i]     = false;
@@ -631,11 +631,11 @@ namespace soplex
             Real l    = bx * len1 * lhs[i];
             Real x    = ax * len1 * (obj * base.rowVector(i));
 
-            if (rhs[i] < infinity)
+            if (rhs[i] < R(infinity))
               {
                 if (spxAbs(lhs[i] - rhs[i]) < eps)
                   rowWeight[i] = r_fixed + n + spxAbs(x);
-                else if (lhs[i] > -infinity)
+                else if (lhs[i] > R(-infinity))
                   {
                     if (x > 0)
                       {
@@ -656,7 +656,7 @@ namespace soplex
               }
             else
               {
-                if (lhs[i] > -infinity)
+                if (lhs[i] > R(-infinity))
                   {
                     rowWeight[i] = r_bounded + l + n - x;
                     rowRight[i]  = false;

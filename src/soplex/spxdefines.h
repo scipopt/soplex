@@ -155,6 +155,29 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 
+  // Returns the square root
+  template <typename T>
+  boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+  {
+    return boost::multiprecision::sqrt(a);
+  }
+
+  // the nextafter function
+  template <typename T>
+  boost::multiprecision::number<T> spxNextafter(boost::multiprecision::number<T> x, boost::multiprecision::number<T> y)
+  {
+    // @todo: Why don't I have to namespace the following?
+    return nextafter(x,y);
+  }
+
+
+  // Apparently needs c++14
+  // auto spxSqrt(auto a)
+  // {
+  //   return std::sqrt(a);
+  // }
+
+
 #ifdef WITH_LONG_DOUBLE
 
 
@@ -195,7 +218,7 @@ typedef float Real;
 
 #ifndef REAL
 #define REAL(x)  x
-#define REAL_FORMAT "f"
+p#define REAL_FORMAT "f"
 #endif
 /// default allowed bound violation
 #ifndef DEFAULT_BND_VIOL
@@ -216,6 +239,11 @@ typedef float Real;
 #endif
 #define DEFAULT_INFINITY   1e100
 
+  /// returns square root
+  inline Real spxSqrt(Real a)
+  {
+    return std::sqrt(a);
+  }
 
 #else
 
@@ -316,13 +344,20 @@ inline Real spxAbs(Real a)
 }
 
 /// returns square root
-template <class R>
-inline R spxSqrt(R a)
+inline Real spxSqrt(Real a)
 {
   return std::sqrt(a);
 }
 
+// Returns the square root
+template <typename T>
+boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
+{
+  return boost::multiprecision::sqrt(a);
+}
+
 // returns the next representable value after x in the direction of y
+
 inline Real spxNextafter(Real x, Real y)
 {
    return nextafterl(x,y);
@@ -350,11 +385,11 @@ inline Real spxAbs(Real a)
    return fabs(a);
 }
 
-/// returns square root
-inline Real spxSqrt(Real a)
-{
-   return sqrt(a);
-}
+// /// returns square root
+// inline Real spxSqrt(Real a)
+// {
+//    return sqrt(a);
+// }
 
 // returns the next representable value after x in the direction of y
 inline Real spxNextafter(Real x, Real y)

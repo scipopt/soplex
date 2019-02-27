@@ -528,7 +528,7 @@ private:
             m_status = SPxSolverBase<R>::ON_LOWER;
          else if (EQrel(val, lp.upper(j), this->eps()))
             m_status = SPxSolverBase<R>::ON_UPPER;
-         else if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
+         else if (lp.lower(j) <= R(-infinity) && lp.upper(j) >= R(infinity))
             m_status = SPxSolverBase<R>::ZERO;
          else
          {
@@ -1317,7 +1317,7 @@ private:
    /// handle row objectives
    void handleRowObjectives(SPxLPBase<R>& lp);
 
-   /// handles extreme values by setting them to zero or infinity.
+   /// handles extreme values by setting them to zero or R(infinity).
    void handleExtremes(SPxLPBase<R>& lp);
 
    /// computes the minimum and maximum residual activity for a given row and column. If colNumber is set to -1, then
@@ -1425,8 +1425,8 @@ public:
       , m_keepbounds(false)
       , m_addedcols(0)
      , m_result(this->OKAY)
-      , m_cutoffbound(-infinity)
-      , m_pseudoobj(-infinity)
+      , m_cutoffbound(R(-infinity))
+      , m_pseudoobj(R(-infinity))
    {}
    /// copy constructor.
    SPxMainSM(const SPxMainSM& old)

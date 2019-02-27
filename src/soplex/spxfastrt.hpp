@@ -101,7 +101,7 @@ namespace soplex
    * Ph.D. thesis page 57 as follows: It uses \f$\delta_i = d_i - s_i - \delta\f$ if \f$d_i > s_i\f$.
    *
    * This change leads to the following behavior of the source code. Consider the first case (x >
-   * epsilon, u < infinity): If u - vec[i] <= 0, vec[i] violates the upper bound. In the Harris ratio
+   * epsilon, u < R(infinity)): If u - vec[i] <= 0, vec[i] violates the upper bound. In the Harris ratio
    * test, we would compute (u - vec[i] + delta)/upd[i]. The code computes instead delta/upd[i].
    */
   template <class R>
@@ -148,7 +148,7 @@ namespace soplex
                 // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
                 mabs = (x > mabs) ? x : mabs;
                 u = up[i];
-                if (u < infinity)
+                if (u < R(infinity))
                   {
                     y = u - vec[i];
                     if (y <= 0)
@@ -168,7 +168,7 @@ namespace soplex
                 // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
                 mabs = (-x > mabs) ? -x : mabs;
                 l = low[i];
-                if (l > -infinity)
+                if (l > R(-infinity))
                   {
                     y = l - vec[i];
                     if ( y >= 0 )
@@ -214,7 +214,7 @@ namespace soplex
                   {
                     mabs = (x > mabs) ? x : mabs;
                     u = up[i];
-                    if (u < infinity)
+                    if (u < R(infinity))
                       {
                         y = u - vec[i];
                         if (y <= 0)
@@ -233,7 +233,7 @@ namespace soplex
                   {
                     mabs = (-x > mabs) ? -x : mabs;
                     l = low[i];
-                    if (l > -infinity)
+                    if (l > R(-infinity))
                       {
                         y = l - vec[i];
                         if ( y >= 0 )
@@ -303,7 +303,7 @@ namespace soplex
                 // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
                 mabs = (x > mabs) ? x : mabs;
                 l = low[i];
-                if (l > -infinity)
+                if (l > R(-infinity))
                   {
                     y = l - vec[i];
                     if ( y >= 0 )
@@ -323,7 +323,7 @@ namespace soplex
                 // @todo check wether mabs should be computed only over bounded vars, i.e., in the if block below
                 mabs = (-x > mabs) ? -x : mabs;
                 u = up[i];
-                if (u < infinity)
+                if (u < R(infinity))
                   {
                     y = u - vec[i];
                     if (y <= 0)
@@ -370,7 +370,7 @@ namespace soplex
                   {
                     mabs = (x > mabs) ? x : mabs;
                     l = low[i];
-                    if (l > -infinity)
+                    if (l > R(-infinity))
                       {
                         y = l - vec[i];
                         if ( y >= 0 )
@@ -389,7 +389,7 @@ namespace soplex
                   {
                     mabs = (-x > mabs) ? -x : mabs;
                     u = up[i];
-                    if (u < infinity)
+                    if (u < R(infinity))
                       {
                         y = u - vec[i];
                         if (y <= 0)
@@ -663,7 +663,7 @@ namespace soplex
                               R& bestDelta,
                               R max)
   {
-    R best = -infinity;
+    R best = R(-infinity);
     bestDelta = 0.0;
     assert(this->m_type == SPxSolverBase<R>::ENTER);
     return maxSelect(val, stab, best, bestDelta, max,
@@ -680,7 +680,7 @@ namespace soplex
                                 )
   {
     int indp, indc;
-    R best = -infinity;
+    R best = R(-infinity);
     bestDelta = 0.0;
     iscoid = true;
     indc = maxSelect(val, stab, best, bestDelta, max,
@@ -710,7 +710,7 @@ namespace soplex
                               R& bestDelta,
                               R max)
   {
-    R best = infinity;
+    R best = R(infinity);
     bestDelta = 0.0;
     assert(this->m_type == SPxSolverBase<R>::ENTER);
     return minSelect(val, stab, best, bestDelta, max,
@@ -725,7 +725,7 @@ namespace soplex
                                 R& bestDelta,
                                 R max)
   {
-    R best = infinity;
+    R best = R(infinity);
     bestDelta = 0.0;
     iscoid = true;
     int indc = minSelect(val, stab, best, bestDelta, max,

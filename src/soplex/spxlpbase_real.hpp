@@ -223,7 +223,7 @@ namespace soplex
   template <class R>
   R SPxLPBase<R>::minAbsNzo(bool unscaled) const
   {
-    R mini = infinity;
+    R mini = R(infinity);
 
     if( unscaled && _isScaled )
       {
@@ -789,7 +789,7 @@ namespace soplex
 
     (void) LPFhasKeyword(++pos, "inf[inity]");
 
-    return sense * infinity;
+    return sense * R(infinity);
   }
 
 
@@ -1094,13 +1094,13 @@ namespace soplex
                         {
                           if( sense == '<' )
                             {
-                              row.setLhs(-infinity);
+                              row.setLhs(R(-infinity));
                               row.setRhs(val);
                             }
                           else if( sense == '>' )
                             {
                               row.setLhs(val);
-                              row.setRhs(infinity);
+                              row.setRhs(R(infinity));
                             }
                           else
                             {
@@ -1228,8 +1228,8 @@ namespace soplex
 
                   if( LPFisFree(pos) )
                     {
-                      cset.lower_w(colidx) = -infinity;
-                      cset.upper_w(colidx) =  infinity;
+                      cset.lower_w(colidx) = R(-infinity);
+                      cset.upper_w(colidx) =  R(infinity);
                       other = true;
                       pos += 4;  // set position after the word "free"
                     }
@@ -1467,14 +1467,14 @@ namespace soplex
               {
               case 'G':
                 row.setLhs(0.0);
-                row.setRhs(infinity);
+                row.setRhs(R(infinity));
                 break;
               case 'E':
                 row.setLhs(0.0);
                 row.setRhs(0.0);
                 break;
               case 'L':
-                row.setLhs(-infinity);
+                row.setLhs(R(-infinity));
                 row.setRhs(0.0);
                 break;
               default:
@@ -1545,7 +1545,7 @@ namespace soplex
             vec.clear();
             col.setObj(0.0);
             col.setLower(0.0);
-            col.setUpper(infinity);
+            col.setUpper(R(infinity));
 
             if( mps.isInteger() )
               {
@@ -1648,10 +1648,10 @@ namespace soplex
                 val = atof(mps.field3());
 
                 // LE or EQ
-                if( rset.rhs(idx) < infinity )
+                if( rset.rhs(idx) < R(infinity) )
                   rset.rhs_w(idx) = val;
                 // GE or EQ
-                if( rset.lhs(idx) > -infinity )
+                if( rset.lhs(idx) > R(-infinity) )
                   rset.lhs_w(idx) = val;
               }
 
@@ -1664,10 +1664,10 @@ namespace soplex
                     val = atof(mps.field5());
 
                     // LE or EQ
-                    if( rset.rhs(idx) < infinity )
+                    if( rset.rhs(idx) < R(infinity) )
                       rset.rhs_w(idx) = val;
                     // GE or EQ
-                    if( rset.lhs(idx) > -infinity )
+                    if( rset.lhs(idx) > R(-infinity) )
                       rset.lhs_w(idx) = val;
                   }
               }
@@ -1733,7 +1733,7 @@ namespace soplex
                 val = atof(mps.field3());
 
                 // EQ
-                if( (rset.lhs(idx) > -infinity) && (rset.rhs_w(idx) <  infinity) )
+                if( (rset.lhs(idx) > R(-infinity)) && (rset.rhs_w(idx) <  R(infinity)) )
                   {
                     assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -1745,7 +1745,7 @@ namespace soplex
                 else
                   {
                     // GE
-                    if( rset.lhs(idx) > -infinity )
+                    if( rset.lhs(idx) > R(-infinity) )
                       rset.rhs_w(idx)  = rset.lhs(idx) + spxAbs(val);
                     // LE
                     else
@@ -1762,7 +1762,7 @@ namespace soplex
                     val = atof(mps.field5());
 
                     // EQ
-                    if( (rset.lhs(idx) > -infinity) && (rset.rhs(idx) <  infinity) )
+                    if( (rset.lhs(idx) > R(-infinity)) && (rset.rhs(idx) <  R(infinity)) )
                       {
                         assert(rset.lhs(idx) == rset.rhs(idx));
 
@@ -1774,7 +1774,7 @@ namespace soplex
                     else
                       {
                         // GE
-                        if( rset.lhs(idx) > -infinity )
+                        if( rset.lhs(idx) > R(-infinity) )
                           rset.rhs_w(idx)  = rset.lhs(idx) + spxAbs(val);
                         // LE
                         else
@@ -1848,9 +1848,9 @@ namespace soplex
                 if( mps.field4() == 0 )
                   val = 0.0;
                 else if( !strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf") )
-                  val = -infinity;
+                  val = R(-infinity);
                 else if( !strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf") || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf") )
-                  val = infinity;
+                  val = R(infinity);
                 else
                   val = atof(mps.field4());
 
@@ -1861,10 +1861,10 @@ namespace soplex
                       intvars->addIdx(idx);
 
                     // if the variable has appeared in the MARKER section of the COLUMNS section then its default bounds were
-                    // set to 0,1; the first time it is declared integer we need to change to default bounds 0,infinity
+                    // set to 0,1; the first time it is declared integer we need to change to default bounds 0,R(infinity)
                     if( oldbinvars.pos(idx) < 0 )
                       {
-                        cset.upper_w(idx) = infinity;
+                        cset.upper_w(idx) = R(infinity);
                         oldbinvars.addIdx(idx);
                       }
                   }
@@ -1885,15 +1885,15 @@ namespace soplex
                       }
                     else
                       {
-                        cset.lower_w(idx) = -infinity;
-                        cset.upper_w(idx) = infinity;
+                        cset.lower_w(idx) = R(-infinity);
+                        cset.upper_w(idx) = R(infinity);
                       }
                     break;
                   case 'M':
-                    cset.lower_w(idx) = -infinity;
+                    cset.lower_w(idx) = R(-infinity);
                     break;
                   case 'P':
-                    cset.upper_w(idx) = infinity;
+                    cset.upper_w(idx) = R(infinity);
                     break;
                     // Ilog extension (Binary)
                   case 'B':
@@ -2187,11 +2187,11 @@ namespace soplex
 
     if( p_lhs == p_rhs )
       p_output << " = " << p_rhs;
-    else if( p_lhs <= -infinity )
+    else if( p_lhs <= R(-infinity) )
       p_output << " <= " << p_rhs;
     else
       {
-        assert(p_rhs >= infinity);
+        assert(p_rhs >= R(infinity));
         p_output << " >= " << p_lhs;
       }
 
@@ -2219,14 +2219,14 @@ namespace soplex
         const R lhs = p_lp.lhs(i);
         const R rhs = p_lp.rhs(i);
 
-        if( lhs > -infinity && rhs < infinity && lhs != rhs )
+        if( lhs > R(-infinity) && rhs < R(infinity) && lhs != rhs )
           {
             // ranged row -> write two non-ranged rows
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_1 : ";
-            LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, infinity);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, R(infinity));
 
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_2 : ";
-            LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -infinity, rhs);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), R(-infinity), rhs);
           }
         else
           {
@@ -2239,7 +2239,7 @@ namespace soplex
 
 
   // write the variable bounds
-  // (the default bounds 0 <= x <= infinity are not written)
+  // (the default bounds 0 <= x <= R(infinity) are not written)
   template <class R>
   static void LPFwriteBounds(
                              const SPxLPBase<R>&   p_lp,       ///< the LP to write
@@ -2261,9 +2261,9 @@ namespace soplex
           {
             p_output << "  "   << getColName(p_lp, j, p_cnames, name) << " = "  << upper << '\n';
           }
-        else if( lower > -infinity )
+        else if( lower > R(-infinity) )
           {
-            if( upper < infinity )
+            if( upper < R(infinity) )
               {
                 // range bound
                 if( lower != 0 )
@@ -2279,7 +2279,7 @@ namespace soplex
                        << getColName(p_lp, j, p_cnames, name)
                        << '\n';
           }
-        else if( upper < infinity )
+        else if( upper < R(infinity) )
           p_output << "   -Inf <= "
                    << getColName(p_lp, j, p_cnames, name)
                    << " <= " << upper << '\n';
@@ -2378,9 +2378,9 @@ static void MPSwriteRecord(
   {
     R rhsval;
 
-    if( left > -infinity ) /// This includes ranges
+    if( left > R(-infinity) ) /// This includes ranges
       rhsval = left;
-    else if( right <  infinity )
+    else if( right <  R(infinity) )
       rhsval = right;
     else
       throw SPxInternalCodeException("XMPSWR01 This should never happen.");
@@ -2447,14 +2447,14 @@ static void MPSwriteRecord(
       {
         if( lhs(i) == rhs(i) )
           indicator = "E";
-        else if( (lhs(i) > -infinity) && (rhs(i) < infinity) )
+        else if( (lhs(i) > R(-infinity)) && (rhs(i) < R(infinity)) )
           {
             indicator = "E";
             has_ranges = true;
           }
-        else if( lhs(i) > -infinity )
+        else if( lhs(i) > R(-infinity) )
           indicator = "G";
-        else if( rhs(i) <  infinity )
+        else if( rhs(i) <  R(infinity) )
           indicator = "L";
         else
           throw SPxInternalCodeException("XMPSWR02 This should never happen.");
@@ -2545,7 +2545,7 @@ static void MPSwriteRecord(
 
         for( i = 0; i < nRows(); i++ )
           {
-            if( (lhs(i) > -infinity) && (rhs(i) < infinity) )
+            if( (lhs(i) > R(-infinity)) && (rhs(i) < R(infinity)) )
               MPSwriteRecord(p_output, "", "RANGE", MPSgetRowName(*this, i, p_rnames, name1), rhs(i) - lhs(i));
           }
       }
@@ -2567,7 +2567,7 @@ static void MPSwriteRecord(
             continue;
           }
 
-        if( (lower(i) <= -infinity) && (upper(i) >= infinity) )
+        if( (lower(i) <= R(-infinity)) && (upper(i) >= R(infinity)) )
           {
             MPSwriteRecord<R>(p_output, "FR", "BOUND", getColName(*this, i, p_cnames, name1));
             continue;
@@ -2575,7 +2575,7 @@ static void MPSwriteRecord(
 
         if( lower(i) != 0.0 )
           {
-            if( lower(i) > -infinity )
+            if( lower(i) > R(-infinity) )
               MPSwriteRecord(p_output, "LO", "BOUND", getColName(*this, i, p_cnames, name1), lower(i));
             else
               MPSwriteRecord<R>(p_output, "MI", "BOUND", getColName(*this, i, p_cnames, name1));
@@ -2584,13 +2584,13 @@ static void MPSwriteRecord(
         if( has_intvars && (p_intvars->pos(i) >= 0) )
           {
             // Integer variables have default upper bound 1.0, but we should write
-            // it nevertheless since CPLEX seems to assume infinity otherwise.
+            // it nevertheless since CPLEX seems to assume R(infinity) otherwise.
             MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
           }
         else
           {
-            // Continous variables have default upper bound infinity
-            if( upper(i) < infinity )
+            // Continous variables have default upper bound R(infinity)
+            if( upper(i) < R(infinity) )
               MPSwriteRecord(p_output, "UP", "BOUND", getColName(*this, i, p_cnames, name1), upper(i));
           }
       }
@@ -2675,19 +2675,19 @@ static void MPSwriteRecord(
       {
         primalColIds[primalcolsidx] = cId(i);
         primalcolsidx++;
-        if( lower(i) <= -infinity && upper(i) >= infinity ) // unrestricted variables
+        if( lower(i) <= R(-infinity) && upper(i) >= R(infinity) ) // unrestricted variables
           {
             dualrows.create(0, obj(i), obj(i));
             numAddedRows++;
           }
-        else if( lower(i) <= -infinity ) // no lower bound is set, indicating a <= 0 variable
+        else if( lower(i) <= R(-infinity) ) // no lower bound is set, indicating a <= 0 variable
           {
             if( isZero(upper(i)) ) // standard bound variable
               {
                 if( spxSense() == MINIMIZE )
-                  dualrows.create(0, obj(i), infinity);
+                  dualrows.create(0, obj(i), R(infinity));
                 else
-                  dualrows.create(0, -infinity, obj(i));
+                  dualrows.create(0, R(-infinity), obj(i));
               }
             else // additional upper bound on the variable
               {
@@ -2695,12 +2695,12 @@ static void MPSwriteRecord(
                 if( spxSense() == MINIMIZE )
                   {
                     dualrows.create(0, obj(i), obj(i));
-                    dualcols.add(upper(i), -infinity, col, 0.0);
+                    dualcols.add(upper(i), R(-infinity), col, 0.0);
                   }
                 else
                   {
                     dualrows.create(0, obj(i), obj(i));
-                    dualcols.add(upper(i), 0.0, col, infinity);
+                    dualcols.add(upper(i), 0.0, col, R(infinity));
                   }
                 col.clear();
 
@@ -2708,14 +2708,14 @@ static void MPSwriteRecord(
               }
             numAddedRows++;
           }
-        else if( upper(i) >= infinity ) // no upper bound set, indicating a >= 0 variable
+        else if( upper(i) >= R(infinity) ) // no upper bound set, indicating a >= 0 variable
           {
             if( isZero(lower(i)) ) // standard bound variable
               {
                 if( spxSense() == MINIMIZE )
-                  dualrows.create(0, -infinity, obj(i));
+                  dualrows.create(0, R(-infinity), obj(i));
                 else
-                  dualrows.create(0, obj(i), infinity);
+                  dualrows.create(0, obj(i), R(infinity));
               }
             else // additional lower bound on the variable
               {
@@ -2723,12 +2723,12 @@ static void MPSwriteRecord(
                 if( spxSense() == MINIMIZE )
                   {
                     dualrows.create(0, obj(i), obj(i));
-                    dualcols.add(lower(i), 0.0, col, infinity);
+                    dualcols.add(lower(i), 0.0, col, R(infinity));
                   }
                 else
                   {
                     dualrows.create(0, obj(i), obj(i));
-                    dualcols.add(lower(i), -infinity, col, 0.0);
+                    dualcols.add(lower(i), R(-infinity), col, 0.0);
                   }
                 col.clear();
 
@@ -2743,13 +2743,13 @@ static void MPSwriteRecord(
                 col.add(numAddedRows, 1.0);
                 if( spxSense() == MINIMIZE )
                   {
-                    dualrows.create(0, -infinity, obj(i));
-                    dualcols.add(upper(i), -infinity, col, 0.0);
+                    dualrows.create(0, R(-infinity), obj(i));
+                    dualcols.add(upper(i), R(-infinity), col, 0.0);
                   }
                 else
                   {
-                    dualrows.create(0, obj(i), infinity);
-                    dualcols.add(upper(i), 0.0, col, infinity);
+                    dualrows.create(0, obj(i), R(infinity));
+                    dualcols.add(upper(i), 0.0, col, R(infinity));
                   }
                 col.clear();
 
@@ -2760,13 +2760,13 @@ static void MPSwriteRecord(
                 col.add(numAddedRows, 1.0);
                 if( spxSense() == MINIMIZE )
                   {
-                    dualrows.create(0, obj(i), infinity);
-                    dualcols.add(lower(i), 0.0, col, infinity);
+                    dualrows.create(0, obj(i), R(infinity));
+                    dualcols.add(lower(i), 0.0, col, R(infinity));
                   }
                 else
                   {
-                    dualrows.create(0, -infinity, obj(i));
-                    dualcols.add(lower(i), -infinity, col, 0.0);
+                    dualrows.create(0, R(-infinity), obj(i));
+                    dualcols.add(lower(i), R(-infinity), col, 0.0);
                   }
                 col.clear();
 
@@ -2779,13 +2779,13 @@ static void MPSwriteRecord(
                 col.add(numAddedRows, 1.0);
                 if( spxSense() == MINIMIZE )
                   {
-                    dualcols.add(lower(i), 0.0, col, infinity);
-                    dualcols.add(upper(i), -infinity, col, 0.0);
+                    dualcols.add(lower(i), 0.0, col, R(infinity));
+                    dualcols.add(upper(i), R(-infinity), col, 0.0);
                   }
                 else
                   {
-                    dualcols.add(lower(i), -infinity, col, 0.0);
-                    dualcols.add(upper(i), 0.0, col, infinity);
+                    dualcols.add(lower(i), R(-infinity), col, 0.0);
+                    dualcols.add(upper(i), 0.0, col, R(infinity));
                   }
                 col.clear();
 
@@ -2800,8 +2800,8 @@ static void MPSwriteRecord(
             dualrows.create(0, obj(i), obj(i));
 
             col.add(numAddedRows, 1.0);
-            dualcols.add(lower(i), 0, col, infinity);
-            dualcols.add(lower(i), -infinity, col, 0);
+            dualcols.add(lower(i), 0, col, R(infinity));
+            dualcols.add(lower(i), R(-infinity), col, 0);
             col.clear();
 
             numVarBoundCols += 2;
@@ -2827,55 +2827,55 @@ static void MPSwriteRecord(
         switch( rowType(i) )
           {
           case LPRowBase<R>::RANGE: // range constraint, requires the addition of two dual variables
-            assert(lhs(i) > -infinity);
-            assert(rhs(i) < infinity);
+            assert(lhs(i) > R(-infinity));
+            assert(rhs(i) < R(infinity));
             if( spxSense() == MINIMIZE )
               {
                 primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
                 primalrowsidx++;
-                dualcols.add(lhs(i), 0.0, rowVector(i), infinity);
+                dualcols.add(lhs(i), 0.0, rowVector(i), R(infinity));
 
                 primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
                 primalrowsidx++;
-                dualcols.add(rhs(i), -infinity, rowVector(i), 0.0);
+                dualcols.add(rhs(i), R(-infinity), rowVector(i), 0.0);
               }
             else
               {
                 primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
                 primalrowsidx++;
-                dualcols.add(lhs(i), -infinity, rowVector(i), 0.0);
+                dualcols.add(lhs(i), R(-infinity), rowVector(i), 0.0);
 
                 primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
                 primalrowsidx++;
-                dualcols.add(rhs(i), 0.0, rowVector(i), infinity);
+                dualcols.add(rhs(i), 0.0, rowVector(i), R(infinity));
               }
             break;
 
           case LPRowBase<R>::GREATER_EQUAL: // >= constraint
-            assert( lhs(i) > -infinity );
+            assert( lhs(i) > R(-infinity) );
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
             if( spxSense() == MINIMIZE )
-              dualcols.add(lhs(i), 0.0, rowVector(i), infinity);
+              dualcols.add(lhs(i), 0.0, rowVector(i), R(infinity));
             else
-              dualcols.add(lhs(i), -infinity, rowVector(i), 0.0);
+              dualcols.add(lhs(i), R(-infinity), rowVector(i), 0.0);
             break;
 
           case LPRowBase<R>::LESS_EQUAL: // <= constriant
-            assert( rhs(i) < infinity );
+            assert( rhs(i) < R(infinity) );
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
             if( spxSense() == MINIMIZE )
-              dualcols.add(rhs(i), -infinity, rowVector(i), 0.0);
+              dualcols.add(rhs(i), R(-infinity), rowVector(i), 0.0);
             else
-              dualcols.add(rhs(i), 0.0, rowVector(i), infinity);
+              dualcols.add(rhs(i), 0.0, rowVector(i), R(infinity));
             break;
 
           case LPRowBase<R>::EQUAL: // Equality constraint
             assert( EQ(lhs(i), rhs(i)) );
             primalRowIds[primalrowsidx] = rId(i); // setting the rowid for the primal row
             primalrowsidx++;
-            dualcols.add(rhs(i), -infinity, rowVector(i), infinity);
+            dualcols.add(rhs(i), R(-infinity), rowVector(i), R(infinity));
             break;
 
           default:

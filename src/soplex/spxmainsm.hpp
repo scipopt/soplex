@@ -552,7 +552,7 @@ namespace soplex
 
     if (m_loFree)
       {
-        R minRowUp = infinity;
+        R minRowUp = R(infinity);
 
         for(int k = 0; k < m_rows.size(); ++k)
           {
@@ -595,7 +595,7 @@ namespace soplex
       }
     else
       {
-        R maxRowLo = -infinity;
+        R maxRowLo = R(-infinity);
 
         for(int k = 0; k < m_rows.size(); ++k)
           {
@@ -695,7 +695,7 @@ namespace soplex
 
     if (isZero(s[m_i], 1e-6))
       s[m_i] = 0.0;
-    else if (s[m_i] >= soplex::infinity)
+    else if (s[m_i] >= soplex::R(infinity))
       // this is a fix for a highly ill conditioned instance that is "solved" in presolving (ilaser0 from MINLP, mittelmann)
       throw SPxException("Simplifier: infinite activities - aborting unsimplification");
 
@@ -724,11 +724,11 @@ namespace soplex
       up = 0.0;
 
     assert(LErel(lo, up));
-    ASSERT_WARN( "WMAISM01", isNotZero(aij, 1.0 / infinity) );
+    ASSERT_WARN( "WMAISM01", isNotZero(aij, 1.0 / R(infinity)) );
 
     if (rStatus[m_i] == SPxSolverBase<R>::ON_LOWER)
       {
-      if ( m_lower <= -infinity && m_upper >= infinity )
+      if ( m_lower <= R(-infinity) && m_upper >= R(infinity) )
       {
          x[m_j] = 0.0;
          cStatus[m_j] = SPxSolverBase<R>::ZERO;
@@ -753,7 +753,7 @@ namespace soplex
       }
     else if (rStatus[m_i] == SPxSolverBase<R>::ON_UPPER)
       {
-      if ( m_lower <= -infinity && m_upper >= infinity )
+      if ( m_lower <= R(-infinity) && m_upper >= R(infinity) )
       {
          x[m_j] = 0.0;
          cStatus[m_j] = SPxSolverBase<R>::ZERO;
@@ -778,7 +778,7 @@ namespace soplex
       }
     else if (rStatus[m_i] == SPxSolverBase<R>::FIXED)
    {
-      if ( m_lower <= -infinity && m_upper >= infinity )
+      if ( m_lower <= R(-infinity) && m_upper >= R(infinity) )
       {
          x[m_j] = 0.0;
          cStatus[m_j] = SPxSolverBase<R>::ZERO;
@@ -793,24 +793,24 @@ namespace soplex
    }
    else if (rStatus[m_i] == SPxSolverBase<R>::BASIC)
       {
-      if (GErel(m_lower, lo, this->eps()) && m_lower > -infinity)
+      if (GErel(m_lower, lo, this->eps()) && m_lower > R(-infinity))
           {
             x[m_j]       = m_lower;
          cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
           }
-      else if (LErel(m_upper, up, this->eps()) && m_upper < infinity)
+      else if (LErel(m_upper, up, this->eps()) && m_upper < R(infinity))
           {
             x[m_j]       = m_upper;
          cStatus[m_j] = (m_lower == m_upper) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
           }
-        else if (lo > -infinity)
+        else if (lo > R(-infinity))
           {
             // make m_i non-basic and m_j basic
             x[m_j]       = lo;
             cStatus[m_j] = SPxSolverBase<R>::BASIC;
             rStatus[m_i] = (aij > 0 ? SPxSolverBase<R>::ON_LOWER : SPxSolverBase<R>::ON_UPPER);
           }
-        else if (up < infinity)
+        else if (up < R(infinity))
           {
             // make m_i non-basic and m_j basic
             x[m_j]       = up;
@@ -1187,7 +1187,7 @@ namespace soplex
         if (isZero(z2))
           z2 = 0.0;
 
-        if( m_loJ <= -infinity && m_upJ >= infinity && m_loK <= -infinity && m_upK >= infinity )
+        if( m_loJ <= R(-infinity) && m_upJ >= R(infinity) && m_loK <= R(-infinity) && m_upK >= R(infinity) )
           {
             cStatus[m_j] = SPxSolverBase<R>::ZERO;
             x[m_j] = 0.0;
@@ -1196,31 +1196,31 @@ namespace soplex
           {
             if( GErel(x[m_k], m_upK + m_scale * m_upJ) )
               {
-                assert(m_upJ < infinity);
+                assert(m_upJ < R(infinity));
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
-            else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
+            else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < R(infinity) )
               {
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
-            else if( GErel(x[m_k], m_upK + m_scale * m_loJ) && m_upK < infinity )
+            else if( GErel(x[m_k], m_upK + m_scale * m_loJ) && m_upK < R(infinity) )
               {
                 cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_k] = m_upK;
                 cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 x[m_j] = z2 * scale2 / m_scale;
               }
-            else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
+            else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > R(-infinity) )
               {
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
-            else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loK > -infinity )
+            else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loK > R(-infinity) )
               {
                 cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_k] = m_loK;
@@ -1229,7 +1229,7 @@ namespace soplex
               }
             else if( LTrel(x[m_k], m_loK + m_scale * m_loJ) )
               {
-                assert(m_loJ > -infinity);
+                assert(m_loJ > R(-infinity));
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
@@ -1245,31 +1245,31 @@ namespace soplex
 
             if( GErel(x[m_k], m_upK + m_scale * m_loJ) )
               {
-                assert(m_loJ > -infinity);
+                assert(m_loJ > R(-infinity));
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
-            else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > -infinity )
+            else if( GErel(x[m_k], m_loK + m_scale * m_loJ) && m_loJ > R(-infinity) )
               {
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_j] = m_loJ;
                 x[m_k] -= m_scale * x[m_j];
               }
-            else if( GErel(x[m_k], m_upK + m_scale * m_upJ) && m_upK < infinity )
+            else if( GErel(x[m_k], m_upK + m_scale * m_upJ) && m_upK < R(infinity) )
               {
                 cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_k] = m_upK;
                 cStatus[m_j] = SPxSolverBase<R>::BASIC;
                 x[m_j] = z2 * scale2 / m_scale;
               }
-            else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < infinity )
+            else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_upJ < R(infinity) )
               {
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
               }
-            else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_loK > -infinity )
+            else if( GErel(x[m_k], m_loK + m_scale * m_upJ) && m_loK > R(-infinity) )
               {
                 cStatus[m_k] = (m_loK == m_upK) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_LOWER;
                 x[m_k] = m_loK;
@@ -1278,7 +1278,7 @@ namespace soplex
               }
             else if( LTrel(x[m_k], m_loK + m_scale * m_upJ) )
               {
-                assert(m_upJ < infinity);
+                assert(m_upJ < R(infinity));
                 cStatus[m_j] = (m_loJ == m_upJ) ? SPxSolverBase<R>::FIXED : SPxSolverBase<R>::ON_UPPER;
                 x[m_j] = m_upJ;
                 x[m_k] -= m_scale * x[m_j];
@@ -1371,7 +1371,7 @@ void SPxMainSM<R>::AggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, 
          cStatus[m_j] = SPxSolverBase<R>::ON_UPPER;
       else if( EQ(x[m_j], m_lower, this->eps()) )
          cStatus[m_j] = SPxSolverBase<R>::ON_LOWER;
-      else if( m_upper >= infinity && m_lower <= -infinity )
+      else if( m_upper >= R(infinity) && m_lower <= R(-infinity) )
          cStatus[m_j] = SPxSolverBase<R>::ZERO;
       else
          throw SPxInternalCodeException("XMAISM unexpected basis status in aggregation unsimplifier.");
@@ -1533,9 +1533,9 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
     // This method handles extreme value of the given LP by
     //
     // 1. setting numbers of very small absolute values to zero and
-    // 2. setting numbers of very large absolute values to -infinity or +infinity, respectively.
+    // 2. setting numbers of very large absolute values to R(-infinity) or +R(infinity), respectively.
 
-    R maxVal  = infinity / 5.0;
+    R maxVal  = R(infinity) / 5.0;
     R tol = feastol() * 1e-2;
     tol = (tol < this->epsZero()) ? this->epsZero() : tol;
     int  remRows = 0;
@@ -1554,14 +1554,14 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             lp.changeLhs(i, 0.0);
             ++chgLRhs;
           }
-        else if (lhs > -infinity && lhs < -maxVal)
+        else if (lhs > R(-infinity) && lhs < -maxVal)
           {
-            lp.changeLhs(i, -infinity);
+            lp.changeLhs(i, R(-infinity));
             ++chgLRhs;
           }
-        else if (lhs <  infinity && lhs >  maxVal)
+        else if (lhs <  R(infinity) && lhs >  maxVal)
           {
-            lp.changeLhs(i,  infinity);
+            lp.changeLhs(i,  R(infinity));
             ++chgLRhs;
           }
 
@@ -1573,18 +1573,18 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             lp.changeRhs(i, 0.0);
             ++chgLRhs;
           }
-        else if (rhs > -infinity && rhs < -maxVal)
+        else if (rhs > R(-infinity) && rhs < -maxVal)
           {
-            lp.changeRhs(i, -infinity);
+            lp.changeRhs(i, R(-infinity));
             ++chgLRhs;
           }
-        else if (rhs <  infinity && rhs >  maxVal)
+        else if (rhs <  R(infinity) && rhs >  maxVal)
           {
-            lp.changeRhs(i,  infinity);
+            lp.changeRhs(i,  R(infinity));
             ++chgLRhs;
           }
 
-        if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
+        if (lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
           {
             FreeConstraintPS* FreeConstraintPSptr = 0;
             spx_alloc(FreeConstraintPSptr);
@@ -1607,14 +1607,14 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             lp.changeLower(j, 0.0);
             ++chgBnds;
           }
-        else if (lo > -infinity && lo < -maxVal)
+        else if (lo > R(-infinity) && lo < -maxVal)
           {
-            lp.changeLower(j, -infinity);
+            lp.changeLower(j, R(-infinity));
             ++chgBnds;
           }
-        else if (lo <  infinity && lo >  maxVal)
+        else if (lo <  R(infinity) && lo >  maxVal)
           {
-            lp.changeLower(j,  infinity);
+            lp.changeLower(j,  R(infinity));
             ++chgBnds;
           }
 
@@ -1626,14 +1626,14 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             lp.changeUpper(j, 0.0);
             ++chgBnds;
           }
-        else if (up > -infinity && up < -maxVal)
+        else if (up > R(-infinity) && up < -maxVal)
           {
-            lp.changeUpper(j, -infinity);
+            lp.changeUpper(j, R(-infinity));
             ++chgBnds;
           }
-        else if (up <  infinity && up >  maxVal)
+        else if (up <  R(infinity) && up >  maxVal)
           {
-            lp.changeUpper(j,  infinity);
+            lp.changeUpper(j,  R(infinity));
             ++chgBnds;
           }
 
@@ -1695,14 +1695,14 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             lp.changeObj(j, 0.0);
             ++objCnt;
           }
-        else if (obj > -infinity && obj < -maxVal)
+        else if (obj > R(-infinity) && obj < -maxVal)
           {
-            lp.changeObj(j, -infinity);
+            lp.changeObj(j, R(-infinity));
             ++objCnt;
           }
-        else if (obj <  infinity && obj >  maxVal)
+        else if (obj <  R(infinity) && obj >  maxVal)
           {
-            lp.changeObj(j,  infinity);
+            lp.changeObj(j,  R(infinity));
             ++objCnt;
           }
       }
@@ -1742,14 +1742,14 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             // computing the minimum activity of the aggregated variables
             if (GT(row.value(l), 0.0))
               {
-                if (LE(lp.lower(row.index(l)), -infinity))
+                if (LE(lp.lower(row.index(l)), R(-infinity)))
                   minNegInfinite = true;
                 else
                   minAct += row.value(l)*lp.lower(row.index(l));
               }
             else if (LT(row.value(l), 0.0))
               {
-                if (GE(lp.upper(row.index(l)), infinity))
+                if (GE(lp.upper(row.index(l)), R(infinity)))
                   minNegInfinite = true;
                 else
                   minAct += row.value(l)*lp.upper(row.index(l));
@@ -1758,14 +1758,14 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             // computing the maximum activity of the aggregated variables
             if (GT(row.value(l), 0.0))
               {
-                if (GE(lp.upper(row.index(l)), infinity))
+                if (GE(lp.upper(row.index(l)), R(infinity)))
                   maxInfinite = true;
                 else
                   maxAct += row.value(l)*lp.upper(row.index(l));
               }
             else if (LT(row.value(l), 0.0))
               {
-                if (LE(lp.lower(row.index(l)), -infinity))
+                if (LE(lp.lower(row.index(l)), R(-infinity)))
                   maxInfinite = true;
                 else
                   maxAct += row.value(l)*lp.lower(row.index(l));
@@ -1775,11 +1775,11 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
     // if an infinite value exists for the minimum activity, then that it taken
     if (minNegInfinite)
-      minAct = -infinity;
+      minAct = R(-infinity);
 
     // if an -infinite value exists for the maximum activity, then that value is taken
     if (maxInfinite)
-      maxAct = infinity;
+      maxAct = R(infinity);
   }
 
 
@@ -1792,25 +1792,25 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
     if(LT(val, 0.0))
       {
-        if(LE(minRes, -infinity))
-          minVal = -infinity;
+        if(LE(minRes, R(-infinity)))
+          minVal = R(-infinity);
         else
           minVal = (side - minRes)/val;
 
-        if(GE(maxRes, infinity))
-          maxVal = infinity;
+        if(GE(maxRes, R(infinity)))
+          maxVal = R(infinity);
         else
           maxVal = (side - maxRes)/val;
       }
     else if(GT(val, 0.0))
       {
-        if(GE(maxRes, infinity))
-          minVal = -infinity;
+        if(GE(maxRes, R(infinity)))
+          minVal = R(-infinity);
         else
           minVal = (side - maxRes)/val;
 
-        if(LE(minRes, -infinity))
-          maxVal = infinity;
+        if(LE(minRes, R(-infinity)))
+          maxVal = R(infinity);
         else
           maxVal = (side - minRes)/val;
       }
@@ -1836,8 +1836,8 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
     bool            zerovalid = true;
 
-    R largeValue = infinity;
-    if(LT(1.0/feastol(), infinity))
+    R largeValue = R(infinity);
+    if(LT(1.0/feastol(), R(infinity)))
       largeValue = 1.0/feastol();
 
 
@@ -1853,21 +1853,21 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
           {
             R aij = col.value(k);
 
-            ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
+            ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / R(infinity)) );
 
-            if(GT(lp.lhs(col.index(k)), -infinity) && LT(lp.rhs(col.index(k)), infinity))
+            if(GT(lp.lhs(col.index(k)), R(-infinity)) && LT(lp.rhs(col.index(k)), R(infinity)))
               {
                 upLocks[j]++;
                 downLocks[j]++;
               }
-            else if (GT(lp.lhs(col.index(k)), -infinity))
+            else if (GT(lp.lhs(col.index(k)), R(-infinity)))
               {
                 if(aij > 0)
                   downLocks[j]++;
                 else if (aij < 0)
                   upLocks[j]++;
               }
-            else if (LT(lp.rhs(col.index(k)), infinity))
+            else if (LT(lp.rhs(col.index(k)), R(infinity)))
               {
                 if(aij > 0)
                   upLocks[j]++;
@@ -1879,9 +1879,9 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
         R lower = lp.lower(j);
         R upper = lp.upper(j);
 
-        if(LE(lower, -infinity))
+        if(LE(lower, R(-infinity)))
           lower = MINIMUM(-largeValue, upper);
-        if(GE(upper, infinity))
+        if(GE(upper, R(infinity)))
           upper = MAXIMUM(lp.lower(j), largeValue);
 
         if(zerovalid)
@@ -1969,19 +1969,19 @@ bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
         R val = lp.maxObj(j);
         if( val < 0 )
           {
-            if( lp.lower(j) <= -infinity )
+            if( lp.lower(j) <= R(-infinity) )
               return;
             pseudoObj += val*lp.lower(j);
           }
         else if( val > 0 )
           {
-            if( lp.upper(j) >= -infinity )
+            if( lp.upper(j) >= R(-infinity) )
               return;
             pseudoObj += val*lp.upper(j);
           }
       }
 
-    if( GT(m_cutoffbound, -infinity) && LT(m_cutoffbound, infinity) )
+    if( GT(m_cutoffbound, R(-infinity)) && LT(m_cutoffbound, R(infinity)) )
       {
         if(pseudoObj > m_pseudoobj)
           m_pseudoobj = pseudoObj;
@@ -2074,7 +2074,7 @@ bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
 
             if (GT(lp.maxObj(j), 0.0, this->epsZero()))
               {
-                if (lp.upper(j) >= infinity)
+                if (lp.upper(j) >= R(infinity))
                   {
                     MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
                       return this->UNBOUNDED;
@@ -2083,7 +2083,7 @@ bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
               }
             else if (LT(lp.maxObj(j), 0.0, this->epsZero()))
               {
-                if (lp.lower(j) <= -infinity)
+                if (lp.lower(j) <= R(-infinity))
                   {
                     MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
                       return this->UNBOUNDED;
@@ -2094,9 +2094,9 @@ bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
               {
                 ASSERT_WARN( "WMAISM09", isZero(lp.maxObj(j), this->epsZero()) );
                 // any value within the bounds is ok
-                if (lp.lower(j) > -infinity)
+                if (lp.lower(j) > R(-infinity))
                   val = lp.lower(j);
-                else if (lp.upper(j) < infinity)
+                else if (lp.upper(j) < R(infinity))
                   val = lp.upper(j);
                 else
                   val = 0.0;
@@ -2138,8 +2138,8 @@ bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
 
     R aij = row.value(0);
     int  j   = row.index(0);
-    R lo  = -infinity;
-    R up  =  infinity;
+    R lo  = R(-infinity);
+    R up  =  R(infinity);
 
     MSG_DEBUG( (*this->spxout) << "IMAISM22 row " << i
                << ": singleton -> val=" << aij
@@ -2148,13 +2148,13 @@ bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
 
       if (GT(aij, 0.0, this->epsZero()))           // aij > 0
         {
-          lo = (lp.lhs(i) <= -infinity) ? -infinity : lp.lhs(i) / aij;
-          up = (lp.rhs(i) >=  infinity) ?  infinity : lp.rhs(i) / aij;
+          lo = (lp.lhs(i) <= R(-infinity)) ? R(-infinity) : lp.lhs(i) / aij;
+          up = (lp.rhs(i) >=  R(infinity)) ?  R(infinity) : lp.rhs(i) / aij;
         }
       else if (LT(aij, 0.0, this->epsZero()))      // aij < 0
         {
-          lo = (lp.rhs(i) >=  infinity) ? -infinity : lp.rhs(i) / aij;
-          up = (lp.lhs(i) <= -infinity) ?  infinity : lp.lhs(i) / aij;
+          lo = (lp.rhs(i) >=  R(infinity)) ? R(-infinity) : lp.rhs(i) / aij;
+          up = (lp.lhs(i) <= R(-infinity)) ?  R(infinity) : lp.lhs(i) / aij;
         }
       else if (LT(lp.rhs(i), 0.0, feastol()) || GT(lp.lhs(i), 0.0, feastol()))
         {
@@ -2213,7 +2213,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp, 
    assert(EQrel(lp.lhs(i), lp.rhs(i), feastol()));
 
    R rhs = lp.rhs(i);
-   assert(rhs < infinity && rhs > -infinity);
+   assert(rhs < R(infinity) && rhs > R(-infinity));
 
    int j = row.index(0);
    int k = row.index(1);
@@ -2241,29 +2241,29 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp, 
    if( aij * aik < 0.0 )
    {
       // orientation persists
-      new_lo_j = (upper_k >=  infinity) ? -infinity : (rhs - aik * upper_k) / aij;
-      new_up_j = (lower_k <= -infinity) ?  infinity : (rhs - aik * lower_k) / aij;
-      new_lo_k = (upper_j >=  infinity) ? -infinity : (rhs - aij * upper_j) / aik;
-      new_up_k = (lower_j <= -infinity) ?  infinity : (rhs - aij * lower_j) / aik;
+      new_lo_j = (upper_k >=  R(infinity)) ? R(-infinity) : (rhs - aik * upper_k) / aij;
+      new_up_j = (lower_k <= R(-infinity)) ?  R(infinity) : (rhs - aik * lower_k) / aij;
+      new_lo_k = (upper_j >=  R(infinity)) ? R(-infinity) : (rhs - aij * upper_j) / aik;
+      new_up_k = (lower_j <= R(-infinity)) ?  R(infinity) : (rhs - aij * lower_j) / aik;
   }
    else if( aij * aik > 0.0 )
    {
       // orientation is reversed
-      new_lo_j = (lower_k <= -infinity) ? -infinity : (rhs - aik * lower_k) / aij;
-      new_up_j = (upper_k >=  infinity) ?  infinity : (rhs - aik * upper_k) / aij;
-      new_lo_k = (lower_j <= -infinity) ? -infinity : (rhs - aij * lower_j) / aik;
-      new_up_k = (upper_j >=  infinity) ?  infinity : (rhs - aij * upper_j) / aik;
+      new_lo_j = (lower_k <= R(-infinity)) ? R(-infinity) : (rhs - aik * lower_k) / aij;
+      new_up_j = (upper_k >=  R(infinity)) ?  R(infinity) : (rhs - aik * upper_k) / aij;
+      new_lo_k = (lower_j <= R(-infinity)) ? R(-infinity) : (rhs - aij * lower_j) / aik;
+      new_up_k = (upper_j >=  R(infinity)) ?  R(infinity) : (rhs - aij * upper_j) / aik;
    }
    else
       throw SPxInternalCodeException("XMAISM12 This should never happen.");
 
    bool flip_jk = false;
-   if( new_lo_j <= -infinity && new_up_j >= infinity )
+   if( new_lo_j <= R(-infinity) && new_up_j >= R(infinity) )
    {
       // no bound tightening on x_j when x_k is aggregated
       flip_jk = true;
    }
-   else if( new_lo_k <= -infinity && new_up_k >= infinity )
+   else if( new_lo_k <= R(-infinity) && new_up_k >= R(infinity) )
    {
       // no bound tightening on x_k when x_j is aggregated
       flip_jk = false;
@@ -2332,12 +2332,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp, 
       // adapt sides of row r
       R lhs_r = lp.lhs(row_r);
       R rhs_r = lp.rhs(row_r);
-      if( lhs_r > -infinity )
+      if( lhs_r > R(-infinity) )
       {
          lp.changeLhs(row_r, lhs_r - aggr_const * arj);
          this->m_chgLRhs++;
       }
-      if( rhs_r < infinity )
+      if( rhs_r < R(infinity) )
       {
          lp.changeRhs(row_r, rhs_r - aggr_const * arj);
          this->m_chgLRhs++;
@@ -2388,13 +2388,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::aggregateVars(SPxLPBase<R>& lp, 
    // determine which side has to be used for the bounds comparison below
    if( GT(aik * aij, 0.0, this->epsZero()) )
    {
-      new_lo_k = (upper_j >=  infinity) ? -infinity : z1 * scale1 / aik;
-      new_up_k = (lower_j <= -infinity) ?  infinity : z2 * scale2 / aik;
+      new_lo_k = (upper_j >=  R(infinity)) ? R(-infinity) : z1 * scale1 / aik;
+      new_up_k = (lower_j <= R(-infinity)) ?  R(infinity) : z2 * scale2 / aik;
    }
    else if( LT(aik * aij, 0.0, this->epsZero()) )
    {
-      new_lo_k = (lower_j <= -infinity) ? -infinity : z2 * scale2 / aik;
-      new_up_k = (upper_j >=  infinity) ?  infinity : z1 * scale1 / aik;
+      new_lo_k = (lower_j <= R(-infinity)) ? R(-infinity) : z2 * scale2 / aik;
+      new_up_k = (upper_j >=  R(infinity)) ?  R(infinity) : z1 * scale1 / aik;
    }
    else
       throw SPxInternalCodeException("XMAISM12 This should never happen.");
@@ -2468,39 +2468,39 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
         // compute bounds on constraint value
         R lhsBnd = 0.0; // minimal activity (finite summands)
         R rhsBnd = 0.0; // maximal activity (finite summands)
-        int  lhsCnt = 0; // number of -infinity summands in minimal activity
-        int  rhsCnt = 0; // number of +infinity summands in maximal activity
+        int  lhsCnt = 0; // number of R(-infinity) summands in minimal activity
+        int  rhsCnt = 0; // number of +R(infinity) summands in maximal activity
 
         for(int k = 0; k < row.size(); ++k)
           {
             R aij = row.value(k);
             int  j   = row.index(k);
 
-            if( !isNotZero(aij, 1.0 / infinity) )
+            if( !isNotZero(aij, 1.0 / R(infinity)) )
               {
                 MSG_WARNING( (*this->spxout), (*this->spxout) << "Warning: tiny nonzero coefficient " << aij << " in row " << i << "\n" );
               }
 
             if (aij > 0.0)
               {
-                if (lp.lower(j) <= -infinity)
+                if (lp.lower(j) <= R(-infinity))
                   ++lhsCnt;
                 else
                   lhsBnd += aij * lp.lower(j);
 
-                if (lp.upper(j) >= infinity)
+                if (lp.upper(j) >= R(infinity))
                   ++rhsCnt;
                 else
                   rhsBnd += aij * lp.upper(j);
               }
             else if (aij < 0.0)
               {
-                if (lp.lower(j) <= -infinity)
+                if (lp.lower(j) <= R(-infinity))
                   ++rhsCnt;
                 else
                   rhsBnd += aij * lp.lower(j);
 
-                if (lp.upper(j) >= infinity)
+                if (lp.upper(j) >= R(infinity))
                   ++lhsCnt;
                 else
                   lhsBnd += aij * lp.upper(j);
@@ -2519,15 +2519,15 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 redundantLower = false;
                 redundantUpper = false;
 
-                ASSERT_WARN( "WMAISM12", isNotZero(aij, 1.0 / infinity) );
+                ASSERT_WARN( "WMAISM12", isNotZero(aij, 1.0 / R(infinity)) );
 
                 if (aij > 0.0)
                   {
-                    if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
+                    if (lp.lhs(i) > R(-infinity) && lp.lower(j) > R(-infinity) && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
                         && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        R lo    = -infinity;
+                        R lo    = R(-infinity);
                         R scale = maxAbs(lp.lhs(i), rhsBnd);
 
                         if (scale < 1.0)
@@ -2538,11 +2538,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                         if (isZero(z, this->epsZero()))
                           z = 0.0;
 
-                        assert(rhsCnt > 0 || lp.upper(j) < infinity);
+                        assert(rhsCnt > 0 || lp.upper(j) < R(infinity));
 
                         if (rhsCnt == 0)
                           lo = lp.upper(j) + z * scale / aij;
-                        else if (lp.upper(j) >= infinity)
+                        else if (lp.upper(j) >= R(infinity))
                           lo = z * scale / aij;
 
                         if (isZero(lo, this->epsZero()))
@@ -2560,11 +2560,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                           }
 
                       }
-                    if (lp.rhs(i) < infinity && lp.upper(j) < infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
+                    if (lp.rhs(i) < R(infinity) && lp.upper(j) < R(infinity) && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
                         && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        R up    = infinity;
+                        R up    = R(infinity);
                         R scale = maxAbs(lp.rhs(i), lhsBnd);
 
                         if (scale < 1.0)
@@ -2575,11 +2575,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                         if (isZero(z, this->epsZero()))
                           z = 0.0;
 
-                        assert(lhsCnt > 0 || lp.lower(j) > -infinity);
+                        assert(lhsCnt > 0 || lp.lower(j) > R(-infinity));
 
                         if (lhsCnt == 0)
                           up = lp.lower(j) + z * scale / aij;
-                        else if (lp.lower(j) <= -infinity)
+                        else if (lp.lower(j) <= R(-infinity))
                           up = z * scale / aij;
 
                         if (isZero(up, this->epsZero()))
@@ -2599,12 +2599,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                     if (redundantLower)
                       {
                         // no upper bound on x_j OR redundant upper bound
-                        if ((lp.upper(j) >= infinity) || redundantUpper || (!m_keepbounds))
+                        if ((lp.upper(j) >= R(infinity)) || redundantUpper || (!m_keepbounds))
                           {
                             ++lhsCnt;
                             lhsBnd -= aij * lp.lower(j);
 
-                            lp.changeLower(j, -infinity);
+                            lp.changeLower(j, R(-infinity));
                             ++chgBnds;
                           }
                         else
@@ -2613,12 +2613,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                     if (redundantUpper)
                       {
                         // no lower bound on x_j OR redundant lower bound
-                        if ((lp.lower(j) <= -infinity) || redundantLower || (!m_keepbounds))
+                        if ((lp.lower(j) <= R(-infinity)) || redundantLower || (!m_keepbounds))
                           {
                             ++rhsCnt;
                             rhsBnd -= aij * lp.upper(j);
 
-                            lp.changeUpper(j, infinity);
+                            lp.changeUpper(j, R(infinity));
                             ++chgBnds;
                           }
                         else
@@ -2627,11 +2627,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                   }
                 else if (aij < 0.0)
                   {
-                    if (lp.lhs(i) > -infinity && lp.upper(j) < infinity && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
+                    if (lp.lhs(i) > R(-infinity) && lp.upper(j) < R(infinity) && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
                         && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        R up    = infinity;
+                        R up    = R(infinity);
                         R scale = maxAbs(lp.lhs(i), rhsBnd);
 
                         if (scale < 1.0)
@@ -2642,11 +2642,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                         if (isZero(z, this->epsZero()))
                           z = 0.0;
 
-                        assert(rhsCnt > 0 || lp.lower(j) > -infinity);
+                        assert(rhsCnt > 0 || lp.lower(j) > R(-infinity));
 
                         if (rhsCnt == 0)
                           up = lp.lower(j) + z * scale / aij;
-                        else if (lp.lower(j) <= -infinity)
+                        else if (lp.lower(j) <= R(-infinity))
                           up = z * scale / aij;
 
                         if (isZero(up, this->epsZero()))
@@ -2663,11 +2663,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                               redundantUpper = true;
                           }
                       }
-                    if (lp.rhs(i) < infinity && lp.lower(j) > -infinity && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
+                    if (lp.rhs(i) < R(infinity) && lp.lower(j) > R(-infinity) && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
                         && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, 1.0)) > Param<R>::epsilon())
                       {
-                        R lo    = -infinity;
+                        R lo    = R(-infinity);
                         R scale = maxAbs(lp.rhs(i), lhsBnd);
 
                         if (scale < 1.0)
@@ -2678,11 +2678,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                         if (isZero(z, this->epsZero()))
                           z = 0.0;
 
-                        assert(lhsCnt > 0 || lp.upper(j) < infinity);
+                        assert(lhsCnt > 0 || lp.upper(j) < R(infinity));
 
                         if (lhsCnt == 0)
                           lo = lp.upper(j) + z * scale / aij;
-                        else if (lp.upper(j) >= infinity)
+                        else if (lp.upper(j) >= R(infinity))
                           lo = z * scale / aij;
 
                         if (isZero(lo, this->epsZero()))
@@ -2702,12 +2702,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                     if (redundantUpper)
                       {
                         // no lower bound on x_j OR redundant lower bound
-                        if ((lp.lower(j) <= -infinity) || redundantLower || (!m_keepbounds))
+                        if ((lp.lower(j) <= R(-infinity)) || redundantLower || (!m_keepbounds))
                           {
                             ++lhsCnt;
                             lhsBnd -= aij * lp.upper(j);
 
-                            lp.changeUpper(j, infinity);
+                            lp.changeUpper(j, R(infinity));
                             ++chgBnds;
                           }
                         else
@@ -2716,12 +2716,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                     if (redundantLower)
                       {
                         // no upper bound on x_j OR redundant upper bound
-                        if ((lp.upper(j) >= infinity) || redundantUpper || (!m_keepbounds))
+                        if ((lp.upper(j) >= R(infinity)) || redundantUpper || (!m_keepbounds))
                           {
                             ++rhsCnt;
                             rhsBnd -= aij * lp.lower(j);
 
-                            lp.changeLower(j, -infinity);
+                            lp.changeLower(j, R(-infinity));
                             ++chgBnds;
                           }
                         else
@@ -2738,7 +2738,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
         redundantRhs = false;
 
         // 2. detect implied free constraints
-        if (lp.lhs(i) > -infinity && lhsCnt == 0 && GErel(lhsBnd, lp.lhs(i), feastol()))
+        if (lp.lhs(i) > R(-infinity) && lhsCnt == 0 && GErel(lhsBnd, lp.lhs(i), feastol()))
           {
             MSG_DEBUG( (*this->spxout) << "IMAISM17 row " << i
                        << ": redundant lhs -> lhsBnd=" << lhsBnd
@@ -2747,7 +2747,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
               redundantLhs = true;
           }
-        if (lp.rhs(i) <  infinity && rhsCnt == 0 && LErel(rhsBnd, lp.rhs(i), feastol()))
+        if (lp.rhs(i) <  R(infinity) && rhsCnt == 0 && LErel(rhsBnd, lp.rhs(i), feastol()))
           {
             MSG_DEBUG( (*this->spxout) << "IMAISM18 row " << i
                        << ": redundant rhs -> rhsBnd=" << rhsBnd
@@ -2759,9 +2759,9 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
         if (redundantLhs)
           {
             // no rhs for constraint i OR redundant rhs
-            if ((lp.rhs(i) >= infinity) || redundantRhs || (!m_keepbounds))
+            if ((lp.rhs(i) >= R(infinity)) || redundantRhs || (!m_keepbounds))
               {
-                lp.changeLhs(i, -infinity);
+                lp.changeLhs(i, R(-infinity));
                 ++chgLRhs;
               }
             else
@@ -2770,9 +2770,9 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
         if (redundantRhs)
           {
             // no lhs for constraint i OR redundant lhs
-            if ((lp.lhs(i) <= -infinity) || redundantLhs || (!m_keepbounds))
+            if ((lp.lhs(i) <= R(-infinity)) || redundantLhs || (!m_keepbounds))
               {
-                lp.changeRhs(i, infinity);
+                lp.changeRhs(i, R(infinity));
                 ++chgLRhs;
               }
             else
@@ -2796,7 +2796,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
 #if FREE_CONSTRAINT
         // 4. unconstrained constraint
-        if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
+        if (lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
           {
             MSG_DEBUG( (*this->spxout) << "IMAISM20 row " << i
                        << ": unconstrained -> removed" << std::endl; )
@@ -2886,7 +2886,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 lowers[k] = lp.lower(j);
                 uppers[k] = lp.upper(j);
 
-                ASSERT_WARN( "WMAISM25", isNotZero(aij, 1.0 /infinity) );
+                ASSERT_WARN( "WMAISM25", isNotZero(aij, 1.0 /R(infinity)) );
 
                 if (aij > 0.0)
                   lp.changeLower(j, lp.upper(j));
@@ -2929,7 +2929,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 lowers[k] = lp.lower(j);
                 uppers[k] = lp.upper(j);
 
-                ASSERT_WARN( "WMAISM27", isNotZero(aij, 1.0 / infinity) );
+                ASSERT_WARN( "WMAISM27", isNotZero(aij, 1.0 / R(infinity)) );
 
                 if (aij > 0.0)
                   lp.changeUpper(j, lp.lower(j));
@@ -3029,7 +3029,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
             if (GT(lp.maxObj(j), 0.0, this->epsZero()))
               {
-                if (lp.upper(j) >= infinity)
+                if (lp.upper(j) >= R(infinity))
                   {
                     MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
                       return this->UNBOUNDED;
@@ -3038,7 +3038,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
               }
             else if (LT(lp.maxObj(j), 0.0, this->epsZero()))
               {
-                if (lp.lower(j) <= -infinity)
+                if (lp.lower(j) <= R(-infinity))
                   {
                     MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
                       return this->UNBOUNDED;
@@ -3049,9 +3049,9 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
               {
                 assert(isZero(lp.maxObj(j), this->epsZero()));
                 // any value within the bounds is ok
-                if (lp.lower(j) > -infinity)
+                if (lp.lower(j) > R(-infinity))
                   val = lp.lower(j);
-                else if (lp.upper(j) < infinity)
+                else if (lp.upper(j) < R(infinity))
                   val = lp.upper(j);
                 else
                   val = 0.0;
@@ -3089,22 +3089,22 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 int i = col.index(k);
 
                 // warn since this unhandled case may slip through unnoticed otherwise
-                ASSERT_WARN( "WMAISM31", isNotZero(col.value(k), 1.0 / infinity) );
+                ASSERT_WARN( "WMAISM31", isNotZero(col.value(k), 1.0 / R(infinity)) );
 
                 if (col.value(k) > 0.0)
                   {
-                    if (lp.rhs(i) <  infinity)
+                    if (lp.rhs(i) <  R(infinity))
                       upFree = false;
 
-                    if (lp.lhs(i) > -infinity)
+                    if (lp.lhs(i) > R(-infinity))
                       loFree = false;
                   }
                 else if (col.value(k) < 0.0)
                   {
-                    if (lp.rhs(i) <  infinity)
+                    if (lp.rhs(i) <  R(infinity))
                       loFree = false;
 
-                    if (lp.lhs(i) > -infinity)
+                    if (lp.lhs(i) > R(-infinity))
                       upFree = false;
                   }
               }
@@ -3119,7 +3119,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                            << ": x" << j
                            << " unconstrained above ->"; )
 
-                  if (lp.upper(j) >= infinity)
+                  if (lp.upper(j) >= R(infinity))
                     {
                       MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
 
@@ -3140,7 +3140,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                            << ": x" << j
                            << " unconstrained below ->"; )
 
-                  if (lp.lower(j) <= -infinity)
+                  if (lp.lower(j) <= R(-infinity))
                     {
                       MSG_DEBUG( (*this->spxout) << " unbounded" << std::endl; )
 
@@ -3157,8 +3157,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             else if (isZero(lp.maxObj(j), this->epsZero()))
               {
 #if FREE_ZERO_OBJ_VARIABLE
-                bool unconstrained_below = loFree && lp.lower(j) <= -infinity;
-                bool unconstrained_above = upFree && lp.upper(j) >= infinity;
+                bool unconstrained_below = loFree && lp.lower(j) <= R(-infinity);
+                bool unconstrained_above = upFree && lp.upper(j) >= R(infinity);
 
                 if (unconstrained_below || unconstrained_above)
                   {
@@ -3239,21 +3239,21 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                            << ": singleton in row " << i
                            << " with zero objective"; )
 
-                  R lhs = -infinity;
-                R rhs = +infinity;
+                  R lhs = R(-infinity);
+                R rhs = +R(infinity);
 
                 if (GT(aij, 0.0, this->epsZero()))
                   {
-                    if (lp.lhs(i) > -infinity && lp.upper(j) <  infinity)
+                    if (lp.lhs(i) > R(-infinity) && lp.upper(j) <  R(infinity))
                       lhs = lp.lhs(i) - aij * lp.upper(j);
-                    if (lp.rhs(i) <  infinity && lp.lower(j) > -infinity)
+                    if (lp.rhs(i) <  R(infinity) && lp.lower(j) > R(-infinity))
                       rhs = lp.rhs(i) - aij * lp.lower(j);
                   }
                 else if (LT(aij, 0.0, this->epsZero()))
                   {
-                    if (lp.lhs(i) > -infinity && lp.lower(j) > -infinity)
+                    if (lp.lhs(i) > R(-infinity) && lp.lower(j) > R(-infinity))
                       lhs = lp.lhs(i) - aij * lp.lower(j);
-                    if (lp.rhs(i) <  infinity && lp.upper(j) <  infinity)
+                    if (lp.rhs(i) <  R(infinity) && lp.upper(j) <  R(infinity))
                       rhs = lp.rhs(i) - aij * lp.upper(j);
                   }
                 else
@@ -3285,7 +3285,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                 ++m_stat[ZOBJ_SINGLETON_COL];
 
-                if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
+                if (lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
                   {
                     FreeConstraintPS* FreeConstraintPSptr = 0;
                     spx_alloc(FreeConstraintPSptr);
@@ -3304,7 +3304,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             // 5. not free column singleton combined with doubleton equation
             else if (EQrel(lp.lhs(i), lp.rhs(i), feastol())             &&
                      lp.rowVector(i).size() == 2                         &&
-                     (lp.lower(j) > -infinity || lp.upper(j) < infinity))
+                     (lp.lower(j) > R(-infinity) || lp.upper(j) < R(infinity)))
               {
 #if DOUBLETON_EQUATION
                 MSG_DEBUG( (*this->spxout) << "IMAISM38 col " << j
@@ -3331,7 +3331,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 else
                   throw SPxInternalCodeException("XMAISM11 This should never happen.");
 
-                ASSERT_WARN( "WMAISM39", isNotZero(aik, 1.0 / infinity) );
+                ASSERT_WARN( "WMAISM39", isNotZero(aik, 1.0 / R(infinity)) );
 
                 R lo, up;
                 R oldLower = lp.lower(k);
@@ -3355,13 +3355,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                 if (GT(aij * aik, 0.0, this->epsZero()))
                   {
-                    lo = (lp.upper(j) >=  infinity) ? -infinity : z1 * scale1 / aik;
-                    up = (lp.lower(j) <= -infinity) ?  infinity : z2 * scale2 / aik;
+                    lo = (lp.upper(j) >=  R(infinity)) ? R(-infinity) : z1 * scale1 / aik;
+                    up = (lp.lower(j) <= R(-infinity)) ?  R(infinity) : z2 * scale2 / aik;
                   }
                 else if (LT(aij * aik, 0.0, this->epsZero()))
                   {
-                    lo = (lp.lower(j) <= -infinity) ? -infinity : z2 * scale2 / aik;
-                    up = (lp.upper(j) >=  infinity) ?  infinity : z1 * scale1 / aik;
+                    lo = (lp.lower(j) <= R(-infinity)) ? R(-infinity) : z2 * scale2 / aik;
+                    up = (lp.upper(j) >=  R(infinity)) ?  R(infinity) : z1 * scale1 / aik;
                   }
                 else
                   throw SPxInternalCodeException("XMAISM12 This should never happen.");
@@ -3391,19 +3391,19 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 spx_alloc(DoubletonEquationPSptr);
                 m_hist.append(new (DoubletonEquationPSptr) DoubletonEquationPS(lp, j, k, i, oldLower, oldUpper));
 
-                if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+                if (lp.lower(j) > R(-infinity) && lp.upper(j) < R(infinity))
                   chgBnds += 2;
                 else
                   ++chgBnds;
 
-                lp.changeBounds(j, -infinity, infinity);
+                lp.changeBounds(j, R(-infinity), R(infinity));
 
                 ++m_stat[DOUBLETON_ROW];
 #endif
               }
 
             // 6. (implied) free column singleton
-            if (lp.lower(j) <= -infinity && lp.upper(j) >= infinity)
+            if (lp.lower(j) <= R(-infinity) && lp.upper(j) >= R(infinity))
               {
 #if FREE_COL_SINGLETON
                 R slackVal = lp.lhs(i);
@@ -3415,7 +3415,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                                << ": free singleton in inequality constraint" << std::endl; )
 
                       // do nothing if constraint i is unconstrained
-                      if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
+                      if (lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
                         continue;
 
                     // introduce slack variable to obtain equality constraint
@@ -3425,7 +3425,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                     if (GT(sMaxObj, 0.0, this->epsZero()))
                       {
-                        if (sUp >= infinity)
+                        if (sUp >= R(infinity))
                           {
                             MSG_DEBUG( (*this->spxout) << " -> problem unbounded" << std::endl; )
                               return this->UNBOUNDED;
@@ -3434,7 +3434,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                       }
                     else if (LT(sMaxObj, 0.0, this->epsZero()))
                       {
-                        if (sLo <= -infinity)
+                        if (sLo <= R(-infinity))
                           {
                             MSG_DEBUG( (*this->spxout) << " -> problem unbounded" << std::endl; )
                               return this->UNBOUNDED;
@@ -3445,9 +3445,9 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                       {
                         assert(isZero(sMaxObj, this->epsZero()));
                         // any value within the bounds is ok
-                        if (sLo > -infinity)
+                        if (sLo > R(-infinity))
                           slackVal = sLo;
-                        else if (sUp < infinity)
+                        else if (sUp < R(infinity))
                           slackVal = sUp;
                         else
                           throw SPxInternalCodeException("XMAISM13 This should never happen.");
@@ -3535,7 +3535,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
     for(int i = lp.nRows()-1; i >= 0; --i)
       {
         // check for unconstrained constraints
-        if (lp.lhs(i) <= -infinity && lp.rhs(i) >= infinity)
+        if (lp.lhs(i) <= R(-infinity) && lp.rhs(i) >= R(infinity))
           {
             MSG_DEBUG( (*this->spxout) << "IMAISM43 row " << i
                        << ": unconstrained" << std::endl; )
@@ -3554,8 +3554,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
           }
 
         // corresponds to maximization sense
-        dualVarLo[i] = (lp.lhs(i) <= -infinity) ? 0.0 : -infinity;
-        dualVarUp[i] = (lp.rhs(i) >=  infinity) ? 0.0 :  infinity;
+        dualVarLo[i] = (lp.lhs(i) <= R(-infinity)) ? 0.0 : R(-infinity);
+        dualVarUp[i] = (lp.rhs(i) >=  R(infinity)) ? 0.0 :  R(infinity);
       }
 
     // compute bounds on the dual variables using column singletons
@@ -3566,22 +3566,22 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             int  i   = lp.colVector(j).index(0);
             R aij = lp.colVector(j).value(0);
 
-            ASSERT_WARN( "WMAISM44", isNotZero(aij, 1.0 / infinity) );
+            ASSERT_WARN( "WMAISM44", isNotZero(aij, 1.0 / R(infinity)) );
 
             R bound = lp.maxObj(j) / aij;
 
             if (aij > 0)
               {
-                if (lp.lower(j) <= -infinity && bound < dualVarUp[i])
+                if (lp.lower(j) <= R(-infinity) && bound < dualVarUp[i])
                   dualVarUp[i] = bound;
-                if (lp.upper(j) >=  infinity && bound > dualVarLo[i])
+                if (lp.upper(j) >=  R(infinity) && bound > dualVarLo[i])
                   dualVarLo[i] = bound;
               }
             else if (aij < 0)
               {
-                if (lp.lower(j) <= -infinity && bound > dualVarLo[i])
+                if (lp.lower(j) <= R(-infinity) && bound > dualVarLo[i])
                   dualVarLo[i] = bound;
-                if (lp.upper(j) >=  infinity && bound < dualVarUp[i])
+                if (lp.upper(j) >=  R(infinity) && bound < dualVarUp[i])
                   dualVarUp[i] = bound;
               }
           }
@@ -3597,35 +3597,35 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
         for(int k = 0; k < col.size(); ++k)
           {
-            if (dualConsLo[j] <= -infinity && dualConsUp[j] >= infinity)
+            if (dualConsLo[j] <= R(-infinity) && dualConsUp[j] >= R(infinity))
               break;
 
             R aij = col.value(k);
             int  i   = col.index(k);
 
-            ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
+            ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / R(infinity)) );
 
             if (aij > 0)
               {
-                if (dualVarLo[i] <= -infinity)
-                  dualConsLo[j] = -infinity;
+                if (dualVarLo[i] <= R(-infinity))
+                  dualConsLo[j] = R(-infinity);
                 else
                   dualConsLo[j] += aij * dualVarLo[i];
 
-                if (dualVarUp[i] >= infinity)
-                  dualConsUp[j] = infinity;
+                if (dualVarUp[i] >= R(infinity))
+                  dualConsUp[j] = R(infinity);
                 else
                   dualConsUp[j] += aij * dualVarUp[i];
               }
             else if (aij < 0)
               {
-                if (dualVarLo[i] <= -infinity)
-                  dualConsUp[j] = infinity;
+                if (dualVarLo[i] <= R(-infinity))
+                  dualConsUp[j] = R(infinity);
                 else
                   dualConsUp[j] += aij * dualVarLo[i];
 
-                if (dualVarUp[i] >= infinity)
-                  dualConsLo[j] = -infinity;
+                if (dualVarUp[i] >= R(infinity))
+                  dualConsLo[j] = R(-infinity);
                 else
                   dualConsLo[j] += aij * dualVarUp[i];
               }
@@ -3657,7 +3657,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                        << ": dominated -> maxObj=" << obj
                        << " dual rhs bound=" << dualConsUp[j] << std::endl; )
 
-              if (lp.upper(j) >= infinity)
+              if (lp.upper(j) >= R(infinity))
                 {
                   MSG_INFO2( (*this->spxout), (*this->spxout) << " unbounded" << std::endl; )
                     return this->UNBOUNDED;
@@ -3680,7 +3680,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                        << ": dominated -> maxObj=" << obj
                        << " dual lhs bound=" << dualConsLo[j] << std::endl; )
 
-              if (lp.lower(j) <= -infinity)
+              if (lp.lower(j) <= R(-infinity))
                 {
                   MSG_INFO2( (*this->spxout), (*this->spxout) << " unbounded" << std::endl; )
                     return this->UNBOUNDED;
@@ -3698,7 +3698,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
           }
 
         // 2. weakly dominated column (no postsolving)
-        else if (lp.upper(j) < infinity && EQrel(obj, dualConsUp[j], opttol()))
+        else if (lp.upper(j) < R(infinity) && EQrel(obj, dualConsUp[j], opttol()))
           {
 #if WEAKLY_DOMINATED_COLUMN
             MSG_DEBUG( (*this->spxout) << "IMAISM49 col " << j
@@ -3713,7 +3713,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             ++m_stat[WEAKLY_DOMINATED_COL];
 #endif
           }
-        else if (lp.lower(j) > -infinity && EQrel(obj, dualConsLo[j], opttol()))
+        else if (lp.lower(j) > R(-infinity) && EQrel(obj, dualConsLo[j], opttol()))
           {
 #if WEAKLY_DOMINATED_COLUMN
             MSG_DEBUG( (*this->spxout) << "IMAISM50 col " << j
@@ -3795,21 +3795,21 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
           {
             R aij = col.value(k);
 
-            ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / infinity) );
+            ASSERT_WARN( "WMAISM45", isNotZero(aij, 1.0 / R(infinity)) );
 
-            if(GT(lp.lhs(col.index(k)), -infinity) && LT(lp.rhs(col.index(k)), infinity))
+            if(GT(lp.lhs(col.index(k)), R(-infinity)) && LT(lp.rhs(col.index(k)), R(infinity)))
               {
                 upLocks[j]++;
                 downLocks[j]++;
               }
-            else if (GT(lp.lhs(col.index(k)), -infinity))
+            else if (GT(lp.lhs(col.index(k)), R(-infinity)))
               {
                 if(aij > 0)
                   downLocks[j]++;
                 else if (aij < 0)
                   upLocks[j]++;
               }
-            else if (LT(lp.rhs(col.index(k)), infinity))
+            else if (LT(lp.rhs(col.index(k)), R(infinity)))
               {
                 if(aij > 0)
                   upLocks[j]++;
@@ -3846,8 +3846,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 if( EQ(lhs, rhs, feastol()) )
                   continue;
 
-                lhsExists = GT(lhs, -infinity);
-                rhsExists = LT(rhs, infinity);
+                lhsExists = GT(lhs, R(-infinity));
+                rhsExists = LT(rhs, R(infinity));
 
                 if (lp.rowVector(rowNumber).size() <= 2)
                   maxOtherLocks = INT_MAX;
@@ -3885,8 +3885,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                         assert(LE(minVal, maxVal));
 
                         // if the bounds of the aggregation and the original variable are equivalent, then we can reduce
-                        if ((minVal > -infinity && GT(minVal, lower, feastol()))
-                            && (maxVal < infinity && LT(maxVal, upper, feastol())))
+                        if ((minVal > R(-infinity) && GT(minVal, lower, feastol()))
+                            && (maxVal < R(infinity) && LT(maxVal, upper, feastol())))
                           {
                             bestpos = col.index(k);
                             bestislhs = true;
@@ -3905,8 +3905,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                         assert(LE(minVal, maxVal));
 
-                        if ((minVal > -infinity && GT(minVal, lower, feastol()))
-                            && (maxVal < infinity && LT(maxVal, upper, feastol())))
+                        if ((minVal > R(-infinity) && GT(minVal, lower, feastol()))
+                            && (maxVal < R(infinity) && LT(maxVal, upper, feastol())))
                           {
                             bestpos = col.index(k);
                             bestislhs = false;
@@ -3959,10 +3959,10 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                               }
                           }
 
-                        // NOTE: I don't know whether we should change the LHS and RHS if they are currently at infinity
-                        if(LT(lp.rhs(rowNumber), infinity))
+                        // NOTE: I don't know whether we should change the LHS and RHS if they are currently at R(infinity)
+                        if(LT(lp.rhs(rowNumber), R(infinity)))
                           lp.changeRhs(rowNumber, updateRhs - updateRow[j]*aggConstant/aggAij);
-                        if(GT(lp.lhs(rowNumber), -infinity))
+                        if(GT(lp.lhs(rowNumber), R(-infinity)))
                           lp.changeLhs(rowNumber, updateLhs - updateRow[j]*aggConstant/aggAij);
 
                         assert(LE(lp.lhs(rowNumber), lp.rhs(rowNumber)));
@@ -4214,8 +4214,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             int  rowIdx    = -1;
             int  maxLhsIdx = -1;
             int  minRhsIdx = -1;
-            R maxLhs    = -infinity;
-            R minRhs    = +infinity;
+            R maxLhs    = R(-infinity);
+            R minRhs    = +R(infinity);
 
             DataArray<bool> isLhsEqualRhs(m_dupRows[k].size());
 
@@ -4225,7 +4225,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 int i = m_dupRows[k].index(l);
                 isLhsEqualRhs[l] = (lp.lhs(i) == lp.rhs(i));
 
-                ASSERT_WARN( "WMAISM54", isNotZero(scale[i], 1.0 / infinity) );
+                ASSERT_WARN( "WMAISM54", isNotZero(scale[i], 1.0 / R(infinity)) );
 
                 if (rowIdx == -1)
                   {
@@ -4240,13 +4240,13 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                     if (factor > 0)
                       {
-                        scaledLhs = (lp.lhs(i) <= -infinity) ? -infinity : lp.lhs(i) * factor;
-                        scaledRhs = (lp.rhs(i) >=  infinity) ?  infinity : lp.rhs(i) * factor;
+                        scaledLhs = (lp.lhs(i) <= R(-infinity)) ? R(-infinity) : lp.lhs(i) * factor;
+                        scaledRhs = (lp.rhs(i) >=  R(infinity)) ?  R(infinity) : lp.rhs(i) * factor;
                       }
                     else
                       {
-                        scaledLhs = (lp.rhs(i) >=  infinity) ? -infinity : lp.rhs(i) * factor;
-                        scaledRhs = (lp.lhs(i) <= -infinity) ?  infinity : lp.lhs(i) * factor;
+                        scaledLhs = (lp.rhs(i) >=  R(infinity)) ? R(-infinity) : lp.rhs(i) * factor;
+                        scaledRhs = (lp.lhs(i) <= R(-infinity)) ?  R(infinity) : lp.lhs(i) * factor;
                       }
                     if (scaledLhs > maxLhs)
                       {
@@ -4537,25 +4537,25 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                                 // update bounds of remaining column j2 (new column j2')
                                 if (factor > 0)
                                   {
-                                    if (lp.lower(j2) <= -infinity || lp.lower(j1) <= -infinity)
-                                      lp.changeLower(j2, -infinity);
+                                    if (lp.lower(j2) <= R(-infinity) || lp.lower(j1) <= R(-infinity))
+                                      lp.changeLower(j2, R(-infinity));
                                     else
                                       lp.changeLower(j2, lp.lower(j2) + factor * lp.lower(j1));
 
-                                    if (lp.upper(j2) >= infinity || lp.upper(j1) >= infinity)
-                                      lp.changeUpper(j2, infinity);
+                                    if (lp.upper(j2) >= R(infinity) || lp.upper(j1) >= R(infinity))
+                                      lp.changeUpper(j2, R(infinity));
                                     else
                                       lp.changeUpper(j2, lp.upper(j2) + factor * lp.upper(j1));
                                   }
                                 else if (factor < 0)
                                   {
-                                    if (lp.lower(j2) <= -infinity || lp.upper(j1) >= infinity)
-                                      lp.changeLower(j2, -infinity);
+                                    if (lp.lower(j2) <= R(-infinity) || lp.upper(j1) >= R(infinity))
+                                      lp.changeLower(j2, R(-infinity));
                                     else
                                       lp.changeLower(j2, lp.lower(j2) + factor * lp.upper(j1));
 
-                                    if (lp.upper(j2) >= infinity || lp.lower(j1) <= -infinity)
-                                      lp.changeUpper(j2, infinity);
+                                    if (lp.upper(j2) >= R(infinity) || lp.lower(j1) <= R(-infinity))
+                                      lp.changeUpper(j2, R(infinity));
                                     else
                                       lp.changeUpper(j2, lp.upper(j2) + factor * lp.lower(j1));
                                   }
@@ -4579,11 +4579,11 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                           {
                             // case 2: objectives not duplicate
                             // considered for maximization sense
-                            if (lp.lower(j2) <= -infinity)
+                            if (lp.lower(j2) <= R(-infinity))
                               {
                                 if (factor > 0 && objDif > 0)
                                   {
-                                    if (lp.upper(j1) >= infinity)
+                                    if (lp.upper(j1) >= R(infinity))
                                       {
                                         MSG_DEBUG( (*this->spxout) << "IMAISM75 LP unbounded" << std::endl; )
                                           return this->UNBOUNDED;
@@ -4601,7 +4601,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                                   }
                                 else if (factor < 0 && objDif < 0)
                                   {
-                                    if (lp.lower(j1) <= -infinity)
+                                    if (lp.lower(j1) <= R(-infinity))
                                       {
                                         MSG_DEBUG( (*this->spxout) << "IMAISM76 LP unbounded" << std::endl; )
                                           return this->UNBOUNDED;
@@ -4618,12 +4618,12 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                                     lp.changeUpper(j1, lp.lower(j1));
                                   }
                               }
-                            else if (lp.upper(j2) >= infinity)
+                            else if (lp.upper(j2) >= R(infinity))
                               {
                                 // fix j1 at upper bound
                                 if (factor < 0 && objDif > 0)
                                   {
-                                    if (lp.upper(j1) >= infinity)
+                                    if (lp.upper(j1) >= R(infinity))
                                       {
                                         MSG_DEBUG( (*this->spxout) << "IMAISM77 LP unbounded" << std::endl; )
                                           return this->UNBOUNDED;
@@ -4643,7 +4643,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                                 // fix j1 at lower bound
                                 else if (factor > 0 && objDif < 0)
                                   {
-                                    if (lp.lower(j1) <= -infinity)
+                                    if (lp.lower(j1) <= R(-infinity))
                                       {
                                         MSG_DEBUG( (*this->spxout) << "IMAISM78 LP unbounded" << std::endl; )
                                           return this->UNBOUNDED;
@@ -4756,8 +4756,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
    if( NE(lo, up) )
       mid = (up + lo)/2.0;
 
-   assert(LT(lo, infinity) && GT(lo, -infinity));
-   assert(LT(up, infinity) && GT(up, -infinity));
+   assert(LT(lo, R(infinity)) && GT(lo, R(-infinity)));
+   assert(LT(up, R(infinity)) && GT(up, R(-infinity)));
 
     MSG_DEBUG( (*this->spxout) << "IMAISM66 fix variable x" << j
                      << ": lower=" << lo
@@ -4771,7 +4771,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
             {
               int i = col.index(k);
 
-              if (lp.rhs(i) < infinity)
+              if (lp.rhs(i) < R(infinity))
                 {
             R y     = mid * col.value(k);
                   R scale = maxAbs(lp.rhs(i), y);
@@ -4794,7 +4794,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                     lp.changeRhs(i, rhs);
       }
-              if (lp.lhs(i) > -infinity)
+              if (lp.lhs(i) > R(-infinity))
                 {
             R y     = mid * col.value(k);
                   R scale = maxAbs(lp.lhs(i), y);
@@ -4838,8 +4838,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
     this->m_timeUsed->start();
 
     this->m_objoffset = 0.0;
-    m_cutoffbound = -infinity;
-    m_pseudoobj = -infinity;
+    m_cutoffbound = R(-infinity);
+    m_pseudoobj = R(-infinity);
 
     this->m_remRows = 0;
     this->m_remCols = 0;
@@ -4888,7 +4888,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
       for( int i = 0; i < lp.nRows(); ++i )
       {
-         if( lp.lhs(i) > -infinity && lp.rhs(i) < infinity )
+         if( lp.lhs(i) > R(-infinity) && lp.rhs(i) < R(infinity) )
          {
             if( EQ(lp.lhs(i), lp.rhs(i)) )
                ++numEqualities;
@@ -4897,7 +4897,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
          }
       }
                for(int j = 0; j < lp.nCols(); ++j)
-                 if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+                 if (lp.lower(j) > R(-infinity) && lp.upper(j) < R(infinity))
                    ++numBoxedCols;
 
                (*this->spxout) << "LP has "
@@ -4937,7 +4937,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
     for(int j = 0; j < lp.nCols(); ++j)
       m_cIdx[j] = j;
 
-    // round extreme values (set all values smaller than this->eps to zero and all values bigger than infinity/5 to infinity)
+    // round extreme values (set all values smaller than this->eps to zero and all values bigger than R(infinity)/5 to R(infinity))
 #if EXTREMES
     handleExtremes(lp);
 #endif
@@ -5028,7 +5028,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
       for( int i = 0; i < lp.nRows(); ++i )
       {
-         if( lp.lhs(i) > -infinity && lp.rhs(i) < infinity )
+         if( lp.lhs(i) > R(-infinity) && lp.rhs(i) < R(infinity) )
          {
             if( EQ(lp.lhs(i), lp.rhs(i)) )
                ++numEqualities;
@@ -5037,7 +5037,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
          }
       }
                      for(int j = 0; j < lp.nCols(); ++j)
-                       if (lp.lower(j) > -infinity && lp.upper(j) < infinity)
+                       if (lp.lower(j) > R(-infinity) && lp.upper(j) < R(infinity))
                          ++numBoxedCols;
 
                      (*this->spxout) << "Reduced LP has "

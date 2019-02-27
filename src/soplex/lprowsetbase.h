@@ -226,9 +226,9 @@ public:
    /// Returns the inequalitiy type of the \p i 'th LPRowBase.
    typename LPRowBase<R>::Type type(int i) const
    {
-      if( rhs(i) >= double(infinity) )
+      if( rhs(i) >= double(R(infinity)) )
          return LPRowBase<R>::GREATER_EQUAL;
-      if( lhs(i) <= double(-infinity) )
+      if( lhs(i) <= double(R(-infinity)) )
          return LPRowBase<R>::LESS_EQUAL;
       if( lhs(i) == rhs(i) )
          return LPRowBase<R>::EQUAL;
@@ -248,16 +248,16 @@ public:
       switch( t )
       {
       case LPRowBase<R>::LESS_EQUAL:
-         lhs_w(i) = -infinity;
+         lhs_w(i) = R(-infinity);
          break;
       case LPRowBase<R>::EQUAL:
-         if( lhs_w(i) > -infinity )
+         if( lhs_w(i) > R(-infinity) )
             rhs_w(i) = lhs(i);
          else
             lhs_w(i) = rhs(i);
          break;
       case LPRowBase<R>::GREATER_EQUAL:
-         rhs_w(i) = infinity;
+         rhs_w(i) = R(infinity);
          break;
       case LPRowBase<R>::RANGE:
          MSG_ERROR( std::cerr << "EROWST01 RANGE not supported in LPRowSet::setType()" << std::endl );
@@ -270,11 +270,11 @@ public:
    /// Returns the value of the \p i'th LPRowBase.
    const R& value(int i) const
    {
-      if( rhs(i) < infinity )
+      if( rhs(i) < R(infinity) )
          return rhs(i);
       else
       {
-         assert(lhs(i) > -infinity);
+         assert(lhs(i) > R(-infinity));
          return lhs(i);
       }
    }

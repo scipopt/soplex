@@ -71,14 +71,14 @@ namespace soplex
           {
             themax = (x > themax) ? x : themax;
             x = (up[i] - vec[i] + this->delta) / x;
-            if (x < theval && up[i] < infinity)
+            if (x < theval && up[i] < R(infinity))
               theval = x;
           }
         else if (x < -epsilon)
           {
             themax = (-x > themax) ? -x : themax;
             x = (low[i] - vec[i] - this->delta) / x;
-            if (x < theval && low[i] > -infinity)
+            if (x < theval && low[i] > R(-infinity))
               theval = x;
           }
       }
@@ -123,14 +123,14 @@ namespace soplex
           {
             themax = (x > themax) ? x : themax;
             x = (low[i] - vec[i] - this->delta) / x;
-            if (x > theval && low[i] > -infinity)
+            if (x > theval && low[i] > R(-infinity))
               theval = x;
           }
         else if (x < -epsilon)
           {
             themax = (-x > themax) ? -x : themax;
             x = (up[i] - vec[i] + this->delta) / x;
-            if (x > theval && up[i] < infinity)
+            if (x > theval && up[i] < R(infinity))
               theval = x;
           }
       }
@@ -200,7 +200,7 @@ namespace soplex
 
         // phase 2:
         stab = 0;
-        sel = -infinity;
+        sel = R(-infinity);
         useeps = maxabs * epsilon * 0.001;
         if (useeps < epsilon)
           useeps = epsilon;
@@ -265,7 +265,7 @@ namespace soplex
 
         // phase 2:
         stab = 0;
-        sel = infinity;
+        sel = R(infinity);
         useeps = maxabs * epsilon * 0.001;
         if (useeps < epsilon)
           useeps = epsilon;
@@ -399,7 +399,7 @@ namespace soplex
 
             // phase 2:
             stab = 0;
-            sel = -infinity;
+            sel = R(-infinity);
             ruseeps = rmaxabs * 0.001 * epsilon;
             if (ruseeps < epsilon)
               ruseeps = epsilon;
@@ -596,7 +596,7 @@ namespace soplex
 
             // phase 2:
             stab = 0;
-            sel = infinity;
+            sel = R(infinity);
             ruseeps = rmaxabs * epsilon * 0.001;
             cuseeps = cmaxabs * epsilon * 0.001;
             for (j = pupd.size() - 1; j >= 0; --j)

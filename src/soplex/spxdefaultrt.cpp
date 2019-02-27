@@ -66,7 +66,7 @@ namespace soplex
 
             if (x > epsilon)
               {
-                if (ub[i] < infinity)
+                if (ub[i] < R(infinity))
                   {
                     Real y = (ub[i] - vec[i] + this->delta) / x;
 
@@ -79,7 +79,7 @@ namespace soplex
               }
             else if (x < -epsilon)
               {
-                if (lb[i] > -infinity)
+                if (lb[i] > R(-infinity))
                   {
                     Real y = (lb[i] - vec[i] - this->delta) / x;
 
@@ -122,7 +122,7 @@ namespace soplex
 
             if (x < -epsilon)
               {
-                if (ub[i] < infinity)
+                if (ub[i] < R(infinity))
                   {
                     Real y = (ub[i] - vec[i] + this->delta) / x;
 
@@ -135,7 +135,7 @@ namespace soplex
               }
             else if (x > epsilon)
               {
-                if (lb[i] > -infinity)
+                if (lb[i] > R(-infinity))
                   {
                     Real y = (lb[i] - vec[i] - this->delta) / x;
 
@@ -211,7 +211,7 @@ namespace soplex
 
             if (x > epsilon)
               {
-                if (upb[i] < infinity)
+                if (upb[i] < R(infinity))
                   {
                     Real y = (upb[i] - pvec[i] + this->delta) / x;
 
@@ -225,7 +225,7 @@ namespace soplex
               }
             else if (x < -epsilon)
               {
-                if (lpb[i] > -infinity)
+                if (lpb[i] > R(-infinity))
                   {
                     Real y = (lpb[i] - pvec[i] - this->delta) / x;
 
@@ -245,7 +245,7 @@ namespace soplex
 
             if (x > epsilon)
               {
-                if (ucb[i] < infinity)
+                if (ucb[i] < R(infinity))
                   {
                     Real y = (ucb[i] - cvec[i] + this->delta) / x;
 
@@ -259,7 +259,7 @@ namespace soplex
               }
             else if (x < -epsilon)
               {
-                if (lcb[i] > -infinity)
+                if (lcb[i] > R(-infinity))
                   {
                     Real y = (lcb[i] - cvec[i] - this->delta) / x;
 
@@ -296,7 +296,7 @@ namespace soplex
 
             if (x > epsilon)
               {
-                if (lpb[i] > -infinity)
+                if (lpb[i] > R(-infinity))
                   {
                     Real y = (lpb[i] - pvec[i] - this->delta) / x;
 
@@ -310,7 +310,7 @@ namespace soplex
               }
             else if (x < -epsilon)
               {
-                if (upb[i] < infinity)
+                if (upb[i] < R(infinity))
                   {
                     Real y = (upb[i] - pvec[i] + this->delta) / x;
 
@@ -330,7 +330,7 @@ namespace soplex
 
             if (x > epsilon)
               {
-                if (lcb[i] > -infinity)
+                if (lcb[i] > R(-infinity))
                   {
                     Real y = (lcb[i] - cvec[i] - this->delta) / x;
 
@@ -344,7 +344,7 @@ namespace soplex
               }
             else if (x < -epsilon)
               {
-                if (ucb[i] < infinity)
+                if (ucb[i] < R(infinity))
                   {
                     Real y = (ucb[i] - cvec[i] + this->delta) / x;
 

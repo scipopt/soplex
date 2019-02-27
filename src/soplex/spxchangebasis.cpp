@@ -222,9 +222,9 @@ namespace soplex
   {
     assert(theLP != 0);
 
-    if (theLP->upper(i) < infinity)
+    if (theLP->upper(i) < R(infinity))
       {
-        if (theLP->lower(i) > -infinity)
+        if (theLP->lower(i) > R(-infinity))
           {
             if (theLP->lower(i) == theLP->SPxLP::upper(i))
               return SPxBasisBase<Real>::Desc::P_FIXED;
@@ -246,7 +246,7 @@ namespace soplex
         else
           return SPxBasisBase<Real>::Desc::P_ON_UPPER;
       }
-    else if (theLP->lower(i) > -infinity)
+    else if (theLP->lower(i) > R(-infinity))
       return SPxBasisBase<Real>::Desc::P_ON_LOWER;
     else
       return SPxBasisBase<Real>::Desc::P_FREE;

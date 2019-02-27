@@ -5586,16 +5586,16 @@ typename SoPlexBase<R>::RangeType SoPlexBase<R>::_rangeTypeReal(const R& lower, 
 {
   assert(lower <= upper);
 
-  if( lower <= -infinity )
+  if( lower <= R(-infinity) )
     {
-      if( upper >= infinity )
+      if( upper >= R(infinity) )
         return RANGETYPE_FREE;
       else
         return RANGETYPE_UPPER;
     }
   else
     {
-      if( upper >= infinity )
+      if( upper >= R(infinity) )
         return RANGETYPE_LOWER;
       else if( lower == upper )
         return RANGETYPE_FIXED;

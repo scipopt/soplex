@@ -75,11 +75,11 @@ namespace soplex
   void SPxSolverBase<R>::calculateProblemRanges()
 {
    // only collect absolute values
-   R minobj = infinity;
+   R minobj = R(infinity);
    R maxobj = 0.0;
-   R minbound = infinity;
+   R minbound = R(infinity);
    R maxbound = 0.0;
-   R minside = infinity;
+   R minside = R(infinity);
    R maxside = 0.0;
 
    // get min and max absolute values of bounds and objective
@@ -89,13 +89,13 @@ namespace soplex
       R absupp = spxAbs(this->lower(j));
       R absobj = spxAbs(this->obj(j));
 
-      if( abslow < infinity )
+      if( abslow < R(infinity) )
       {
          minbound = MINIMUM(minbound, abslow);
          maxbound = MAXIMUM(maxbound, abslow);
       }
 
-      if( absupp < infinity)
+      if( absupp < R(infinity))
       {
          minbound = MINIMUM(minbound, absupp);
          maxbound = MAXIMUM(maxbound, absupp);
@@ -111,13 +111,13 @@ namespace soplex
       R abslhs = spxAbs(this->lhs(i));
       R absrhs = spxAbs(this->rhs(i));
 
-      if(  abslhs > infinity )
+      if(  abslhs > R(infinity) )
       {
          minside = MINIMUM(minside, abslhs);
          maxside = MAXIMUM(maxside, abslhs);
   }
 
-      if(  absrhs < infinity )
+      if(  absrhs < R(infinity) )
       {
          minside = MINIMUM(minside, absrhs);
          maxside = MAXIMUM(maxside, absrhs);
@@ -136,7 +136,7 @@ namespace soplex
     SPxId enterId;
     int   leaveNum;
     int   loopCount = 0;
-    R  minShift = infinity;
+    R  minShift = R(infinity);
     int   cycleCount = 0;
     bool  priced = false;
     R  lastDelta = 1;
@@ -1611,7 +1611,7 @@ namespace soplex
       }
 
     // objLimit is set and we are running DUAL:
-    // - objLimit is set if objLimit < infinity
+    // - objLimit is set if objLimit < R(infinity)
     // - DUAL is running if rep() * type() > 0 == DUAL (-1 == PRIMAL)
     //
     // In this case we have given a objective value limit, e.g, through a
@@ -1624,7 +1624,7 @@ namespace soplex
     // - MAXIMIZATION Problem
     //   We want stop the solving process if
     //   objLimit >= current objective value of the DUAL LP
-    if( objLimit < infinity && type() * rep() > 0 )
+    if( objLimit < R(infinity) && type() * rep() > 0 )
       {
         // We have no bound shifts; therefore, we can trust the current
         // objective value.
@@ -1807,7 +1807,8 @@ namespace soplex
     else
       p_vector = coPvec();
 
-    p_vector *= R(this->spxSense());
+    // @todo how do we convert an enum to a boost number? Is the following okay?
+    p_vector *= Real(this->spxSense());
 
     return status();
   }

@@ -1987,7 +1987,7 @@ namespace soplex
     /** Limits and status inquiry */
     //@{
     /// set time limit.
-    virtual void setTerminationTime(R time = infinity);
+    virtual void setTerminationTime(R time = R(infinity));
     /// return time limit.
     virtual R terminationTime() const;
     /// set iteration limit.
@@ -1995,7 +1995,7 @@ namespace soplex
     /// return iteration limit.
     virtual int terminationIter() const;
     /// set objective limit.
-    virtual void setTerminationValue(R value = infinity);
+    virtual void setTerminationValue(R value = R(infinity));
     /// return objective limit.
     virtual R terminationValue() const;
     /// get objective value of current solution.

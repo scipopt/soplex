@@ -3640,7 +3640,7 @@ void CLUFactorRational::solveUleft( Rational* p_work, Rational* vec )
          for ( int m = u.row.start[r]; m < end; m++ )
          {
             //            ASSERT_WARN( "WSOLVE05", spxAbs( u.row.val[m] ) < 1e40 );
-            //            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < infinity );
+            //            ASSERT_WARN( "WSOLVE06", spxAbs( vec[u.row.idx[m]] ) < R(infinity) );
             vec[u.row.idx[m]] -= x * u.row.val[m];
             //            ASSERT_WARN( "WSOLVE07", spxAbs( vec[u.row.idx[m]] ) < 1e40 );
          }

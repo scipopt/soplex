@@ -507,7 +507,7 @@ public:
    template < class S, class T >
    SSVectorBase<R>& assign2productAndSetup(const SVSetBase<S>& A, SSVectorBase<T>& x);
 
-   /// Maximum absolute value, i.e., infinity norm.
+   /// Maximum absolute value, i.e., R(infinity) norm.
    R maxAbs() const
    {
       if( isSetup() )
@@ -545,9 +545,9 @@ public:
    }
 
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
-   Real length() const
+   R length() const
    {
-      return spxSqrt((Real)length2());
+     return std::sqrt(R(length2()));
    }
 
    //@}

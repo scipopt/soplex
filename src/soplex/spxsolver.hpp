@@ -917,7 +917,7 @@ namespace soplex
 
       // calling value() without having a suitable status is an error.
       if (!isInitialized())
-        return infinity;
+        return R(infinity);
 
       if (rep() == ROW)
         {
@@ -1013,10 +1013,10 @@ namespace soplex
       , timerType(ttype)
       , theCumulativeTime(0.0)
       , maxIters (-1)
-      , maxTime (infinity)
+      , maxTime (R(infinity))
       , nClckSkipsLeft(0)
       , nCallsToTimelim(0)
-      , objLimit(infinity)
+      , objLimit(R(infinity))
       , m_status(UNKNOWN)
       , m_nonbasicValue(0.0)
       , m_nonbasicValueUpToDate(false)
@@ -1632,7 +1632,7 @@ namespace soplex
       ++nCallsToTimelim;
 
       // check if a time limit is actually set
-      if( maxTime >= infinity )
+      if( maxTime >= R(infinity) )
         return false;
 
       // check if the expensive system call to update the time should be skipped again
@@ -1725,13 +1725,13 @@ namespace soplex
           rstat = SPxBasisBase<R>::Desc::P_FIXED;
           break;
         case ON_UPPER :
-          assert(this->rhs(row) < infinity);
+          assert(this->rhs(row) < R(infinity));
           rstat = this->lhs(row) < this->rhs(row)
             ? SPxBasisBase<R>::Desc::P_ON_UPPER
             : SPxBasisBase<R>::Desc::P_FIXED;
           break;
         case ON_LOWER :
-          assert(this->lhs(row) > -infinity);
+          assert(this->lhs(row) > R(-infinity));
           rstat = this->lhs(row) < this->rhs(row)
             ? SPxBasisBase<R>::Desc::P_ON_LOWER
             : SPxBasisBase<R>::Desc::P_FIXED;
@@ -1740,22 +1740,22 @@ namespace soplex
           /* A 'free' row (i.e., infinite lower & upper bounds) does not really make sense. The user
            * might (think to) know better, e.g., when temporarily turning off a row. We therefore apply
            * the same adjustment as in the column case in varStatusToBasisStatusCol(). */
-          if (this->lhs(row) <= -infinity && this->rhs(row) >= infinity)
+          if (this->lhs(row) <= R(-infinity) && this->rhs(row) >= R(infinity))
             rstat = SPxBasisBase<R>::Desc::P_FREE;
           else
             {
               if ( this->lhs(row) == this->rhs(row) )
                 {
-                  assert( this->rhs(row) < infinity );
+                  assert( this->rhs(row) < R(infinity) );
                   rstat = SPxBasisBase<R>::Desc::P_FIXED;
                 }
               else
                 {
-                  if ( this->lhs(row) > -infinity )
+                  if ( this->lhs(row) > R(-infinity) )
                     rstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
                   else
                     {
-                      assert( this->rhs(row) < infinity );
+                      assert( this->rhs(row) < R(infinity) );
                       rstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
                     }
                 }
@@ -1789,13 +1789,13 @@ namespace soplex
             cstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
           break;
         case ON_UPPER :
-          assert(this->upper(col) < infinity);
+          assert(this->upper(col) < R(infinity));
           cstat = this->lower(col) < this->upper(col)
             ? SPxBasisBase<R>::Desc::P_ON_UPPER
             : SPxBasisBase<R>::Desc::P_FIXED;
           break;
         case ON_LOWER :
-          assert(this->lower(col) > -infinity);
+          assert(this->lower(col) > R(-infinity));
           cstat = this->lower(col) < this->upper(col)
             ? SPxBasisBase<R>::Desc::P_ON_LOWER
             : SPxBasisBase<R>::Desc::P_FIXED;
@@ -1806,22 +1806,22 @@ namespace soplex
            * 'resonable' settings. A solve has to find the correct values afterwards. Note that the
            * approach below is consistent with changesoplex.cpp (e.g., changeUpperStatus() and
            * changeLowerStatus() ). */
-          if (this->lower(col) <= -infinity && this->upper(col) >= infinity)
+          if (this->lower(col) <= R(-infinity) && this->upper(col) >= R(infinity))
             cstat = SPxBasisBase<R>::Desc::P_FREE;
           else
             {
               if ( this->lower(col) == this->upper(col) )
                 {
-                  assert( this->upper(col) < infinity );
+                  assert( this->upper(col) < R(infinity) );
                   cstat = SPxBasisBase<R>::Desc::P_FIXED;
                 }
               else
                 {
-                  if ( this->lower(col) > -infinity )
+                  if ( this->lower(col) > R(-infinity) )
                     cstat = SPxBasisBase<R>::Desc::P_ON_LOWER;
                   else
                     {
-                      assert( this->upper(col) < infinity );
+                      assert( this->upper(col) < R(infinity) );
                       cstat = SPxBasisBase<R>::Desc::P_ON_UPPER;
                     }
                 }
@@ -1895,8 +1895,8 @@ namespace soplex
           else
             {
               if ( (p_rows[row] == FIXED && this->lhs(row) != this->rhs(row))
-                   || (p_rows[row] == ON_UPPER && this->rhs(row) >= infinity)
-                   || (p_rows[row] == ON_LOWER && this->lhs(row) <= -infinity) )
+                   || (p_rows[row] == ON_UPPER && this->rhs(row) >= R(infinity))
+                   || (p_rows[row] == ON_LOWER && this->lhs(row) <= R(-infinity)) )
                 return false;
             }
         }
@@ -1914,8 +1914,8 @@ namespace soplex
           else
             {
               if ( (p_cols[col] == FIXED && this->lower(col) != this->upper(col))
-                   || (p_cols[col] == ON_UPPER && this->upper(col) >= infinity)
-                   || (p_cols[col] == ON_LOWER && this->lower(col) <= -infinity) )
+                   || (p_cols[col] == ON_UPPER && this->upper(col) >= R(infinity))
+                   || (p_cols[col] == ON_LOWER && this->lower(col) <= R(-infinity)) )
                 return false;
             }
         }

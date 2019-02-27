@@ -19,6 +19,8 @@
 #include "soplex/statistics.h"
 #include "soplex/sorter.h"
 
+#include "soplex/spxdefines.h"
+
 //#define NO_TOL
 #define USE_FEASTOL
 //#define NO_TRANSFORM
@@ -822,7 +824,7 @@ namespace soplex
             if( _realLP->rowType(i) == LPRowBase<R>::RANGE || _realLP->rowType(i) == LPRowBase<R>::EQUAL )
               {
                 assert(EQ(_compSolver.lhs(rangedRowIds[addedrangedrows]), _realLP->lhs(i)));
-                assert(LE(_compSolver.rhs(rangedRowIds[addedrangedrows]), infinity));
+                assert(LE(_compSolver.rhs(rangedRowIds[addedrangedrows]), R(infinity)));
                 assert(LE(_compSolver.lhs(i), R(-infinity)));
                 assert(LT(_compSolver.rhs(i), R(infinity)));
 
@@ -1121,7 +1123,7 @@ namespace soplex
   {
     R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
-    R maxDualRatio = infinity;
+    R maxDualRatio = R(infinity);
 
     bool usecompdual = boolParam(SoPlexBase<R>::USECOMPDUAL);
 
@@ -1165,7 +1167,7 @@ namespace soplex
             if( varSign == SoPlexBase<R>::IS_FREE || (varSign == SoPlexBase<R>::IS_POS && LE(compProbPrimal, (R)0, feastol)) ||
                 (varSign == SoPlexBase<R>::IS_NEG && GE(compProbPrimal, (R)0, feastol)) )
               {
-                dualRatio = infinity;
+                dualRatio = R(infinity);
               }
             else
               {
@@ -1331,7 +1333,7 @@ namespace soplex
 
     int rowNumber;
     int bestrow = -1;
-    R bestrownorm = infinity;
+    R bestrownorm = R(infinity);
     R percenttoadd = 1;
 
     int nrowstoadd = MINIMUM(intParam(SoPlexBase<R>::DECOMP_MAXADDEDROWS), _nDecompViolRows);
@@ -1383,7 +1385,7 @@ namespace soplex
 
             // the best row is based upon the row norm
             // the best row is added if no violated row is found
-            norm = spxSqrt(norm);
+            norm = soplex::spxSqrt(norm);
             if( LT(norm, bestrownorm) )
               {
                 bestrow = rowNumber;
@@ -1891,8 +1893,8 @@ namespace soplex
 
         // setting all variables to free variables.
         // Bound constraints will only be added to the variables with compatible bound constraints.
-        _decompLP->changeUpper(i, infinity);
-        _decompLP->changeLower(i, -infinity);
+        _decompLP->changeUpper(i, R(infinity));
+        _decompLP->changeLower(i, R(-infinity));
 
         // the rhs of this calculation are the unit vectors of the bound constraints
         // so we are solving y B = I_{i,.}
@@ -1953,15 +1955,15 @@ namespace soplex
         // Otherwise the bound is removed and the variables are free.
         if( compatible )
           {
-            R lhs = -infinity;
-            R rhs = infinity;
-            if( GT(_solver.lower(i), -infinity) )
+            R lhs = R(-infinity);
+            R rhs = R(infinity);
+            if( GT(_solver.lower(i), R(-infinity)) )
               lhs = _solver.lower(i);
 
-            if( LT(_solver.upper(i), infinity) )
+            if( LT(_solver.upper(i), R(infinity)) )
               rhs = _solver.upper(i);
 
-            if( GT(lhs, -infinity) || LT(rhs, infinity) )
+            if( GT(lhs, R(-infinity)) || LT(rhs, R(infinity)) )
               {
                 compatboundcons[(*ncompatboundcons)] = i;
                 (*ncompatboundcons)++;
@@ -2026,7 +2028,7 @@ namespace soplex
       {
         spx_alloc(addedcolid, 1);
         LPColSetReal compSlackCol;
-        compSlackCol.add(1.0, -infinity, slackColCoeff, infinity);
+        compSlackCol.add(1.0, R(-infinity), slackColCoeff, R(infinity));
         _compSolver.addCols(addedcolid, compSlackCol);
         _compSlackColId = addedcolid[0];
       }
@@ -2039,11 +2041,11 @@ namespace soplex
           {
             if( _realLP->rowType(i) == LPRowBase<R>::RANGE || _realLP->rowType(i) == LPRowBase<R>::EQUAL )
               {
-                assert(GT(_compSolver.lhs(i), -infinity) && LT(_compSolver.rhs(i), infinity));
+                assert(GT(_compSolver.lhs(i), R(-infinity)) && LT(_compSolver.rhs(i), R(infinity)));
                 assert(_compSolver.rowType(i) == LPRowBase<R>::RANGE || _compSolver.rowType(i) == LPRowBase<R>::EQUAL);
 
-                _compSolver.changeLhs(i, -infinity);
-                addrangedrows.add(_realLP->lhs(i), _realLP->rowVector(i), infinity);
+                _compSolver.changeLhs(i, R(-infinity));
+                addrangedrows.add(_realLP->lhs(i), _realLP->rowVector(i), R(infinity));
                 naddedrows++;
               }
           }
@@ -2063,7 +2065,7 @@ namespace soplex
         // adding the slack column
         spx_alloc(addedcolid, 1);
         LPColSetReal compSlackCol;
-        compSlackCol.add(-1.0, 0.0, slackColCoeff, infinity);
+        compSlackCol.add(-1.0, 0.0, slackColCoeff, R(infinity));
 
         _compSolver.addCols(addedcolid, compSlackCol);
         _compSlackColId = addedcolid[0];
@@ -2165,7 +2167,7 @@ namespace soplex
                  LE(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) )
               {
                 assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(infinity)));
-                addElimCols.add(_realLP->rhs(_decompElimPrimalRowIDs[i]), -infinity, coltoaddVec, infinity);
+                addElimCols.add(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(-infinity), coltoaddVec, R(infinity));
 
                 if( _nPrimalRows >= _decompPrimalRowIDs.size() )
                   {
@@ -2189,7 +2191,7 @@ namespace soplex
                 // this assert should stay, but there is an issue with the status and the dual vector
                 //assert(LT(dualVector[_solver.number(_decompReducedProbRowIDs[rowNumber])], 0.0));
                 assert(GT(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity)));
-                addElimCols.add(_realLP->lhs(_decompElimPrimalRowIDs[i]), -infinity, coltoaddVec, infinity);
+                addElimCols.add(_realLP->lhs(_decompElimPrimalRowIDs[i]), R(-infinity), coltoaddVec, R(infinity));
 
                 _decompPrimalRowIDs[_nPrimalRows] = _decompElimPrimalRowIDs[i];
                 _nPrimalRows++;
@@ -2278,7 +2280,7 @@ namespace soplex
               {
                 //assert(GT(dualVector[solverRowNum], 0.0));
                 _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(SPxRowId(_decompPrimalRowIDs[i])));
-                _compSolver.changeBounds(_decompDualColIDs[i], -infinity, infinity);
+                _compSolver.changeBounds(_decompDualColIDs[i], R(-infinity), R(infinity));
               }
             else if( _solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::P_ON_LOWER ||
                      (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
@@ -2286,7 +2288,7 @@ namespace soplex
               {
                 //assert(LT(dualVector[solverRowNum], 0.0));
                 _compSolver.changeObj(_decompDualColIDs[i], _realLP->lhs(SPxRowId(_decompPrimalRowIDs[i])));
-                _compSolver.changeBounds(_decompDualColIDs[i], -infinity, infinity);
+                _compSolver.changeBounds(_decompDualColIDs[i], R(-infinity), R(infinity));
               }
             else //if ( _solver.basis().desc().rowStatus(solverRowNum) != SPxBasisBase<R>::Desc::D_FREE )
               {
@@ -2303,19 +2305,19 @@ namespace soplex
                            _compSolver.obj(_compSolver.number(SPxColId(_decompDualColIDs[i + 1]))));
 
                     _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(_decompPrimalRowIDs[i]));
-                    _compSolver.changeBounds(_decompDualColIDs[i], 0.0, infinity);
+                    _compSolver.changeBounds(_decompDualColIDs[i], 0.0, R(infinity));
                     _compSolver.changeObj(_decompDualColIDs[i + 1], _realLP->lhs(_decompPrimalRowIDs[i]));
-                    _compSolver.changeBounds(_decompDualColIDs[i + 1], -infinity, 0.0);
+                    _compSolver.changeBounds(_decompDualColIDs[i + 1], R(-infinity), 0.0);
 
                     i++;
                     break;
                   case LPRowBase<R>::GREATER_EQUAL:
                     _compSolver.changeObj(_decompDualColIDs[i], _realLP->lhs(_decompPrimalRowIDs[i]));
-                    _compSolver.changeBounds(_decompDualColIDs[i], -infinity, 0.0);
+                    _compSolver.changeBounds(_decompDualColIDs[i], R(-infinity), 0.0);
                     break;
                   case LPRowBase<R>::LESS_EQUAL:
                     _compSolver.changeObj(_decompDualColIDs[i], _realLP->rhs(_decompPrimalRowIDs[i]));
-                    _compSolver.changeBounds(_decompDualColIDs[i], 0.0, infinity);
+                    _compSolver.changeBounds(_decompDualColIDs[i], 0.0, R(infinity));
                     break;
                   default:
                     throw SPxInternalCodeException("XDECOMPSL01 This should never happen.");
@@ -2508,7 +2510,7 @@ namespace soplex
                 || (_solver.basis().desc().rowStatus(solverRowNum) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
                     EQ(_solver.rhs(solverRowNum) - _solver.pVec()[solverRowNum], R(0.0), feastol)) )
               {
-                assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), infinity));
+                assert(LT(_realLP->rhs(_decompElimPrimalRowIDs[i]), R(infinity)));
 
                 if( _nPrimalRows >= _decompPrimalRowIDs.size() )
                   {
@@ -2674,7 +2676,7 @@ namespace soplex
       }
 
     // updating the slack column in the complementary problem
-    LPColBase<R> compSlackCol(-1, slackColCoeff, infinity, 0.0);
+    LPColBase<R> compSlackCol(-1, slackColCoeff, R(infinity), 0.0);
     _compSolver.changeCol(_compSlackColId, compSlackCol);
 
 
@@ -2790,7 +2792,7 @@ namespace soplex
                 _compSolver.changeLower(_decompDualColIDs[i], 0.0);   // setting the lower bound of the dual column to zero.
 
                 LPColBase<R> addEqualityCol(-_realLP->rhs(_decompPrimalRowIDs[i]),
-                                               R(-1.0)*_compSolver.colVector(_decompDualColIDs[i]), infinity, 0.0);    // adding a new column to the dual
+                                               R(-1.0)*_compSolver.colVector(_decompDualColIDs[i]), R(infinity), 0.0);    // adding a new column to the dual
 
                 SPxColId newDualCol;
                 _compSolver.addCol(newDualCol, addEqualityCol);
@@ -2885,10 +2887,10 @@ namespace soplex
             else //if( false && !_decompReducedProbColRowIDs[i].isValid() ) // we want to remove all valid columns
               // in the current implementation, the only columns not included in the reduced problem are free columns.
               {
-                assert((LE(_realLP->lower(i), -infinity) && GE(_realLP->upper(i), infinity)) ||
+                assert((LE(_realLP->lower(i), R(-infinity)) && GE(_realLP->upper(i), R(infinity))) ||
                        _compSolver.number(SPxColId(_decompVarBoundDualIDs[i*2])) >= 0);
                 int varcount = 0;
-                if( GT(_realLP->lower(i), -infinity) )
+                if( GT(_realLP->lower(i), R(-infinity)) )
                   {
                     colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_decompVarBoundDualIDs[i*2 + varcount]));
                     ncolsforremoval++;
@@ -2897,7 +2899,7 @@ namespace soplex
                     varcount++;
                   }
 
-                if( LT(_realLP->upper(i), infinity) )
+                if( LT(_realLP->upper(i), R(infinity)) )
                   {
                     colsforremoval[ncolsforremoval] = _compSolver.number(SPxColId(_decompVarBoundDualIDs[i*2 + varcount]));
                     ncolsforremoval++;
@@ -2959,7 +2961,7 @@ namespace soplex
                 else
                   colObjCoeff = _solver.rhs(_decompReducedProbColRowIDs[i]);
 
-                fixedVarsDualCols.add(colObjCoeff, -infinity, col, infinity);
+                fixedVarsDualCols.add(colObjCoeff, R(-infinity), col, R(infinity));
                 numFixedVars++;
               }
             // 09.02.15 I think that the else should only be entered if the column does not exist in the reduced
@@ -2972,7 +2974,7 @@ namespace soplex
               {
                 bool isRedProbCol = _decompReducedProbColRowIDs[i].isValid();
                 // 29.04.15 in the current implementation only free variables are not included in the reduced problem
-                if( GT(_realLP->lower(i), -infinity) )
+                if( GT(_realLP->lower(i), R(-infinity)) )
                   {
                     if( !isRedProbCol )
                       col.add(_compSolver.number(SPxRowId(_compSlackDualRowId)), -SLACKCOEFF);
@@ -2985,7 +2987,7 @@ namespace soplex
                     numBoundConsCols++;
                   }
 
-                if( LT(_realLP->upper(i), infinity) )
+                if( LT(_realLP->upper(i), R(infinity)) )
                   {
                     if( !isRedProbCol )
                       col.add(_compSolver.number(SPxRowId(_compSlackDualRowId)), SLACKCOEFF);
@@ -3118,7 +3120,7 @@ namespace soplex
               }
             else
               {
-                _compSolver.changeBounds(colNumber, -infinity, infinity);
+                _compSolver.changeBounds(colNumber, R(-infinity), R(infinity));
               }
           }
 
@@ -3140,28 +3142,28 @@ namespace soplex
         if( _decompCompProbColIDsIdx[i] != -1 )
           {
             // In the dual conversion, when a variable has a non-standard bound it is converted to a free variable.
-            if( LE(_realLP->lower(i), -infinity) && GE(_realLP->upper(i), infinity) )
+            if( LE(_realLP->lower(i), R(-infinity)) && GE(_realLP->upper(i), R(infinity)) )
               {
                 // unrestricted variable
                 _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
                 _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
                 assert(LE(_compSolver.lhs(compRowNumber), _compSolver.rhs(compRowNumber)));
               }
-            else if( LE(_realLP->lower(i), -infinity) )
+            else if( LE(_realLP->lower(i), R(-infinity)) )
               {
                 // variable with a finite upper bound
                 _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
                 if( isZero(_realLP->upper(i)) )
-                  _compSolver.changeLhs(compRowNumber, -infinity);
+                  _compSolver.changeLhs(compRowNumber, R(-infinity));
                 else
                   _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
               }
-            else if( GE(_realLP->upper(i), infinity) )
+            else if( GE(_realLP->upper(i), R(infinity)) )
               {
                 // variable with a finite lower bound
                 _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
                 if( isZero(_realLP->upper(i)) )
-                  _compSolver.changeRhs(compRowNumber, infinity);
+                  _compSolver.changeRhs(compRowNumber, R(infinity));
                 else
                   _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
               }
@@ -3171,11 +3173,11 @@ namespace soplex
                 if( isZero(_realLP->upper(i)) )
                   {
                     _compSolver.changeLhs(compRowNumber, _realLP->obj(i));
-                    _compSolver.changeRhs(compRowNumber, infinity);
+                    _compSolver.changeRhs(compRowNumber, R(infinity));
                   }
                 else if( isZero(_realLP->upper(i)) )
                   {
-                    _compSolver.changeLhs(compRowNumber, -infinity);
+                    _compSolver.changeLhs(compRowNumber, R(-infinity));
                     _compSolver.changeRhs(compRowNumber, _realLP->obj(i));
                   }
                 else
@@ -3231,12 +3233,12 @@ namespace soplex
         _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_FIXED ||
         _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_FREE )
       {
-        assert(_solver.rhs(rowNumber) < infinity);
+        assert(_solver.rhs(rowNumber) < R(infinity));
         return 1;
       }
     else if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::P_ON_LOWER )
       {
-        assert(_solver.lhs(rowNumber) > -infinity);
+        assert(_solver.lhs(rowNumber) > R(-infinity));
         return -1;
       }
 
@@ -3517,13 +3519,13 @@ namespace soplex
         bool hasLower = false;
         bool hasUpper = false;
 
-        if( _realLP->lower(i) > -infinity )
+        if( _realLP->lower(i) > R(-infinity) )
           {
             origCountLower++;
             hasLower = true;
           }
 
-        if( _realLP->upper(i) < infinity )
+        if( _realLP->upper(i) < R(infinity) )
           {
             origCountUpper++;
             hasUpper = true;
@@ -3545,13 +3547,13 @@ namespace soplex
         bool hasRhs = false;
         bool hasLhs = false;
 
-        if( _realLP->lhs(i) > -infinity )
+        if( _realLP->lhs(i) > R(-infinity) )
           {
             origCountLhs++;
             hasLhs = true;
           }
 
-        if( _realLP->rhs(i) < infinity )
+        if( _realLP->rhs(i) < R(infinity) )
           {
             origCountRhs++;
             hasRhs = true;
@@ -3810,7 +3812,7 @@ namespace soplex
     R maxTime = timeLimit;
 
     // check if a time limit is actually set
-    if( maxTime < 0 || maxTime >= infinity )
+    if( maxTime < 0 || maxTime >= R(infinity) )
       return false;
 
     R currentTime = _statistics->solvingTime->time();

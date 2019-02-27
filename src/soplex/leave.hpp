@@ -208,13 +208,13 @@ namespace soplex
             assert( rep() == ROW );
             ds.rowStatus(leaveNum) = this->dualRowStatus(leaveNum);
             leavebound = 0;
-            leaveMax = -infinity;
+            leaveMax = R(-infinity);
             break;
           case SPxBasisBase<R>::Desc::P_ON_LOWER :
             assert( rep() == ROW );
             ds.rowStatus(leaveNum) = this->dualRowStatus(leaveNum);
             leavebound = 0;
-            leaveMax = infinity;
+            leaveMax = R(infinity);
             break;
           case SPxBasisBase<R>::Desc::P_FREE :
             assert( rep() == ROW );
@@ -225,22 +225,22 @@ namespace soplex
             assert(this->lhs(leaveNum) == this->rhs(leaveNum));
             leavebound = -this->rhs(leaveNum);
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
-              leaveMax = infinity;
+              leaveMax = R(infinity);
             else
-              leaveMax = -infinity;
+              leaveMax = R(-infinity);
             break;
           case SPxBasisBase<R>::Desc::D_ON_LOWER :
             assert( rep() == COLUMN );
             ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             leavebound = -this->rhs(leaveNum);                // slack !!
-            leaveMax = infinity;
+            leaveMax = R(infinity);
             objChange += theLRbound[leaveNum] * this->rhs(leaveNum);
             break;
           case SPxBasisBase<R>::Desc::D_ON_UPPER :
             assert( rep() == COLUMN );
             ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
             leavebound = -this->lhs(leaveNum);                // slack !!
-            leaveMax = -infinity;
+            leaveMax = R(-infinity);
             objChange += theURbound[leaveNum] * this->lhs(leaveNum);
             break;
           case SPxBasisBase<R>::Desc::D_ON_BOTH :
@@ -248,17 +248,17 @@ namespace soplex
             if ((*theFvec)[leaveIdx] > theLBbound[leaveIdx])
               {
                 ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-                theLRbound[leaveNum] = -infinity;
+                theLRbound[leaveNum] = R(-infinity);
                 leavebound = -this->lhs(leaveNum);            // slack !!
-                leaveMax = -infinity;
+                leaveMax = R(-infinity);
                 objChange += theURbound[leaveNum] * this->lhs(leaveNum);
               }
             else
               {
                 ds.rowStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
-                theURbound[leaveNum] = infinity;
+                theURbound[leaveNum] = R(infinity);
                 leavebound = -this->rhs(leaveNum);            // slack !!
-                leaveMax = infinity;
+                leaveMax = R(infinity);
                 objChange += theLRbound[leaveNum] * this->rhs(leaveNum);
               }
             break;
@@ -286,13 +286,13 @@ namespace soplex
             assert( rep() == ROW );
             ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
             leavebound = 0;
-            leaveMax = -infinity;
+            leaveMax = R(-infinity);
             break;
           case SPxBasisBase<R>::Desc::P_ON_LOWER :
             assert( rep() == ROW );
             ds.colStatus(leaveNum) = this->dualColStatus(leaveNum);
             leavebound = 0;
-            leaveMax = infinity;
+            leaveMax = R(infinity);
             break;
           case SPxBasisBase<R>::Desc::P_FREE :
             assert( rep() == ROW );
@@ -300,12 +300,12 @@ namespace soplex
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
               {
                 leavebound = theLBbound[leaveIdx];
-                leaveMax = -infinity;
+                leaveMax = R(-infinity);
               }
             else
               {
                 leavebound = theUBbound[leaveIdx];
-                leaveMax = infinity;
+                leaveMax = R(infinity);
               }
             break;
 
@@ -316,40 +316,40 @@ namespace soplex
             leavebound = SPxLPBase<R>::upper(leaveNum);
             objChange += this->maxObj(leaveNum) * leavebound;
             if ((*theFvec)[leaveIdx] < theLBbound[leaveIdx])
-              leaveMax = infinity;
+              leaveMax = R(infinity);
             else
-              leaveMax = -infinity;
+              leaveMax = R(-infinity);
             break;
           case SPxBasisBase<R>::Desc::D_ON_LOWER :
             assert( rep() == COLUMN );
             ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             leavebound = SPxLPBase<R>::upper(leaveNum);
             objChange += theUCbound[leaveNum] * leavebound;
-            leaveMax = -infinity;
+            leaveMax = R(-infinity);
             break;
           case SPxBasisBase<R>::Desc::D_ON_UPPER :
             assert( rep() == COLUMN );
             ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
             leavebound = SPxLPBase<R>::lower(leaveNum);
             objChange += theLCbound[leaveNum] * leavebound;
-            leaveMax = infinity;
+            leaveMax = R(infinity);
             break;
           case SPxBasisBase<R>::Desc::D_ON_BOTH :
             assert( rep() == COLUMN );
             if ((*theFvec)[leaveIdx] > theUBbound[leaveIdx])
               {
-                leaveMax = -infinity;
+                leaveMax = R(-infinity);
                 leavebound = SPxLPBase<R>::upper(leaveNum);
                 objChange += theUCbound[leaveNum] * leavebound;
-                theLCbound[leaveNum] = -infinity;
+                theLCbound[leaveNum] = R(-infinity);
                 ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
               }
             else
               {
-                leaveMax = infinity;
+                leaveMax = R(infinity);
                 leavebound = SPxLPBase<R>::lower(leaveNum);
                 objChange += theLCbound[leaveNum] * leavebound;
-                theUCbound[leaveNum] = infinity;
+                theUCbound[leaveNum] = R(infinity);
                 ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_LOWER;
               }
             break;
@@ -391,20 +391,20 @@ namespace soplex
               newCoPrhs = theLRbound[idx];
             else
               newCoPrhs = theURbound[idx];
-            newUBbound = infinity;
-            newLBbound = -infinity;
+            newUBbound = R(infinity);
+            newLBbound = R(-infinity);
             ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_FIXED;
             break;
           case SPxBasisBase<R>::Desc::D_ON_UPPER :
             assert(rep() == ROW);
             newUBbound = 0;
-            newLBbound = -infinity;
+            newLBbound = R(-infinity);
             ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
             newCoPrhs = theLRbound[idx];
             break;
           case SPxBasisBase<R>::Desc::D_ON_LOWER :
             assert(rep() == ROW);
-            newUBbound = infinity;
+            newUBbound = R(infinity);
             newLBbound = 0;
             ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             newCoPrhs = theURbound[idx];
@@ -414,13 +414,13 @@ namespace soplex
             if (leaveMax * thePvec->delta()[idx] < 0)
               {
                 newUBbound = 0;
-                newLBbound = -infinity;
+                newLBbound = R(-infinity);
                 ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
                 newCoPrhs = theLRbound[idx];
               }
             else
               {
-                newUBbound = infinity;
+                newUBbound = R(infinity);
                 newLBbound = 0;
                 ds.rowStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                 newCoPrhs = theURbound[idx];
@@ -430,7 +430,7 @@ namespace soplex
           case SPxBasisBase<R>::Desc::P_ON_UPPER :
             assert(rep() == COLUMN);
             ds.rowStatus(idx) = this->dualRowStatus(idx);
-            if (this->lhs(idx) > -infinity)
+            if (this->lhs(idx) > R(-infinity))
               theURbound[idx] = theLRbound[idx];
             newCoPrhs = theLRbound[idx];        // slack !!
             newUBbound = -this->lhs(idx);
@@ -441,7 +441,7 @@ namespace soplex
           case SPxBasisBase<R>::Desc::P_ON_LOWER :
             assert(rep() == COLUMN);
             ds.rowStatus(idx) = this->dualRowStatus(idx);
-            if (this->rhs(idx) < infinity)
+            if (this->rhs(idx) < R(infinity))
               theLRbound[idx] = theURbound[idx];
             newCoPrhs = theURbound[idx];        // slack !!
             newLBbound = -this->rhs(idx);
@@ -457,8 +457,8 @@ namespace soplex
             MSG_ERROR( std::cerr << "ELEAVE53 ERROR: not yet debugged!" << std::endl; )
               ds.rowStatus(idx) = this->dualRowStatus(idx);
             newCoPrhs = theURbound[idx];        // slack !!
-            newUBbound = infinity;
-            newLBbound = -infinity;
+            newUBbound = R(infinity);
+            newLBbound = R(-infinity);
             enterBound = 0;
 #endif
             break;
@@ -492,21 +492,21 @@ namespace soplex
           case SPxBasisBase<R>::Desc::D_ON_UPPER :
             assert(rep() == ROW);
             newUBbound = 0;
-            newLBbound = -infinity;
+            newLBbound = R(-infinity);
             ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
             newCoPrhs = theLCbound[idx];
             break;
           case SPxBasisBase<R>::Desc::D_ON_LOWER :
             assert(rep() == ROW);
-            newUBbound = infinity;
+            newUBbound = R(infinity);
             newLBbound = 0;
             ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             newCoPrhs = theUCbound[idx];
             break;
           case SPxBasisBase<R>::Desc::D_FREE :
             assert(rep() == ROW);
-            newUBbound = infinity;
-            newLBbound = -infinity;
+            newUBbound = R(infinity);
+            newLBbound = R(-infinity);
             newCoPrhs = theLCbound[idx];
             ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_FIXED;
             break;
@@ -515,13 +515,13 @@ namespace soplex
             if (leaveMax * theCoPvec->delta()[idx] < 0)
               {
                 newUBbound = 0;
-                newLBbound = -infinity;
+                newLBbound = R(-infinity);
                 ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
                 newCoPrhs = theLCbound[idx];
               }
             else
               {
-                newUBbound = infinity;
+                newUBbound = R(infinity);
                 newLBbound = 0;
                 ds.colStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                 newCoPrhs = theUCbound[idx];
@@ -531,7 +531,7 @@ namespace soplex
           case SPxBasisBase<R>::Desc::P_ON_UPPER :
             assert(rep() == COLUMN);
             ds.colStatus(idx) = this->dualColStatus(idx);
-            if (SPxLPBase<R>::lower(idx) > -infinity)
+            if (SPxLPBase<R>::lower(idx) > R(-infinity))
               theLCbound[idx] = theUCbound[idx];
             newCoPrhs = theUCbound[idx];
             newUBbound = SPxLPBase<R>::upper(idx);
@@ -542,7 +542,7 @@ namespace soplex
           case SPxBasisBase<R>::Desc::P_ON_LOWER :
             assert(rep() == COLUMN);
             ds.colStatus(idx) = this->dualColStatus(idx);
-            if (SPxLPBase<R>::upper(idx) < infinity)
+            if (SPxLPBase<R>::upper(idx) < R(infinity))
               theUCbound[idx] = theLCbound[idx];
             newCoPrhs = theLCbound[idx];
             newUBbound = SPxLPBase<R>::upper(idx);
@@ -1019,7 +1019,7 @@ namespace soplex
                     (*theCoPrhs)[leaveIdx] = theLCbound[leaveNum];
                   }
                 theUBbound[leaveIdx] = 0;
-                theLBbound[leaveIdx] = -infinity;
+                theLBbound[leaveIdx] = R(-infinity);
               }
             else
               {
@@ -1034,7 +1034,7 @@ namespace soplex
                     ds.colStatus(leaveNum) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                     (*theCoPrhs)[leaveIdx] = theUCbound[leaveNum];
                   }
-                theUBbound[leaveIdx] = infinity;
+                theUBbound[leaveIdx] = R(infinity);
                 theLBbound[leaveIdx] = 0;
               }
 
@@ -1053,7 +1053,7 @@ namespace soplex
 
         if ((leaveMax > entertol() && enterVal <= entertol()) || (leaveMax < -entertol() && enterVal >= -entertol()))
           {
-            if ((theUBbound[leaveIdx] < infinity || theLBbound[leaveIdx] > -infinity)
+            if ((theUBbound[leaveIdx] < R(infinity) || theLBbound[leaveIdx] > R(-infinity))
                 && leaveStat != SPxBasisBase<R>::Desc::P_FREE
                 && leaveStat != SPxBasisBase<R>::Desc::D_FREE)
               {

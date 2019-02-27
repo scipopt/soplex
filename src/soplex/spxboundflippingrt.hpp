@@ -75,17 +75,17 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
             case SPxBasisBase<R>::Desc::P_ON_UPPER :
                ds.status(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
                range = lower - upper;
-               assert((*this->thesolver->theLbound)[idx] == -infinity);
+               assert((*this->thesolver->theLbound)[idx] == R(-infinity));
                (*this->thesolver->theLbound)[idx] = (*this->thesolver->theUbound)[idx];
-               (*this->thesolver->theUbound)[idx] = infinity;
+               (*this->thesolver->theUbound)[idx] = R(infinity);
                objChange = range * (*this->thesolver->theLbound)[idx];
                break;
             case SPxBasisBase<R>::Desc::P_ON_LOWER :
                ds.status(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                range = upper - lower;
-               assert((*this->thesolver->theUbound)[idx] == infinity);
+               assert((*this->thesolver->theUbound)[idx] == R(infinity));
                (*this->thesolver->theUbound)[idx] = (*this->thesolver->theLbound)[idx];
-               (*this->thesolver->theLbound)[idx] = -infinity;
+               (*this->thesolver->theLbound)[idx] = R(-infinity);
                objChange = range * (*this->thesolver->theUbound)[idx];
                break;
             default :
@@ -125,17 +125,17 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
             case SPxBasisBase<R>::Desc::P_ON_UPPER :
                ds.coStatus(idx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
                range = lower - upper;
-               assert((*this->thesolver->theCoUbound)[idx] == infinity);
+               assert((*this->thesolver->theCoUbound)[idx] == R(infinity));
                (*this->thesolver->theCoUbound)[idx] = -(*this->thesolver->theCoLbound)[idx];
-               (*this->thesolver->theCoLbound)[idx] = -infinity;
+               (*this->thesolver->theCoLbound)[idx] = R(-infinity);
                objChange = range * (*this->thesolver->theCoUbound)[idx];
                break;
             case SPxBasisBase<R>::Desc::P_ON_LOWER :
                ds.coStatus(idx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                range = upper - lower;
-               assert((*this->thesolver->theCoLbound)[idx] == -infinity);
+               assert((*this->thesolver->theCoLbound)[idx] == R(-infinity));
                (*this->thesolver->theCoLbound)[idx] = -(*this->thesolver->theCoUbound)[idx];
-               (*this->thesolver->theCoUbound)[idx] = infinity;
+               (*this->thesolver->theCoUbound)[idx] = R(infinity);
                objChange = range * (*this->thesolver->theCoLbound)[idx];
                break;
             default :
@@ -181,16 +181,16 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
                case SPxBasisBase<R>::Desc::P_ON_UPPER :
                   ds.rowStatus(IdNumber) = SPxBasisBase<R>::Desc::P_ON_LOWER;
                   range = upper - lower;
-                  assert(this->thesolver->theUBbound[idx] == infinity);
+                  assert(this->thesolver->theUBbound[idx] == R(infinity));
                   this->thesolver->theUBbound[idx] = -this->thesolver->theLBbound[idx];
-                  this->thesolver->theLBbound[idx] = -infinity;
+                  this->thesolver->theLBbound[idx] = R(-infinity);
                   break;
                case SPxBasisBase<R>::Desc::P_ON_LOWER :
                   ds.rowStatus(IdNumber) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                   range = lower - upper;
-                  assert(this->thesolver->theLBbound[idx] == -infinity);
+                  assert(this->thesolver->theLBbound[idx] == R(-infinity));
                   this->thesolver->theLBbound[idx] = -this->thesolver->theUBbound[idx];
-                  this->thesolver->theUBbound[idx] = infinity;
+                  this->thesolver->theUBbound[idx] = R(infinity);
                   break;
                default :
                   ++skipped;
@@ -217,16 +217,16 @@ void SPxBoundFlippingRT<R>::flipAndUpdate(
                case SPxBasisBase<R>::Desc::P_ON_UPPER :
                   ds.colStatus(IdNumber) = SPxBasisBase<R>::Desc::P_ON_LOWER;
                   range = upper - lower;
-                  assert(this->thesolver->theUBbound[idx] == infinity);
+                  assert(this->thesolver->theUBbound[idx] == R(infinity));
                   this->thesolver->theUBbound[idx] = -this->thesolver->theLBbound[idx];
-                  this->thesolver->theLBbound[idx] = -infinity;
+                  this->thesolver->theLBbound[idx] = R(-infinity);
                   break;
                case SPxBasisBase<R>::Desc::P_ON_LOWER :
                   ds.colStatus(IdNumber) = SPxBasisBase<R>::Desc::P_ON_UPPER;
                   range = lower - upper;
-                  assert(this->thesolver->theLBbound[idx] == -infinity);
+                  assert(this->thesolver->theLBbound[idx] == R(-infinity));
                   this->thesolver->theLBbound[idx] = -this->thesolver->theUBbound[idx];
-                  this->thesolver->theUBbound[idx] = infinity;
+                  this->thesolver->theUBbound[idx] = R(infinity);
                   break;
                default :
                   ++skipped;
@@ -292,7 +292,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
    R curVal;
    const int* last;
 
-   minVal = ( nBp == 0 ) ? infinity : breakpoints[minIdx].val;
+   minVal = ( nBp == 0 ) ? R(infinity) : breakpoints[minIdx].val;
 
    last = idx + nnz;
    for( ; idx < last; ++idx )
@@ -301,7 +301,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
       R x = upd[i];
       if( x > this->epsilon )
       {
-         if( upp[i] < infinity )
+         if( upp[i] < R(infinity) )
          {
             R y = upp[i] - vec[i];
             curVal = (y <= 0) ? this->fastDelta / x : (y + this->fastDelta) / x;
@@ -322,7 +322,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMax(
       }
       else if( x < -this->epsilon )
       {
-         if (low[i] > -infinity)
+         if (low[i] > R(-infinity))
          {
             R y = low[i] - vec[i];
             curVal = (y >= 0) ? -this->fastDelta / x : (y - this->fastDelta) / x;
@@ -366,7 +366,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
    R curVal;
    const int* last;
 
-   minVal = ( nBp == 0 ) ? infinity : breakpoints[minIdx].val;
+   minVal = ( nBp == 0 ) ? R(infinity) : breakpoints[minIdx].val;
 
    last = idx + nnz;
 
@@ -376,7 +376,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
       R x = upd[i];
       if( x > this->epsilon )
       {
-         if( low[i] > -infinity )
+         if( low[i] > R(-infinity) )
          {
             R y = low[i] - vec[i];
 
@@ -398,7 +398,7 @@ void SPxBoundFlippingRT<R>::collectBreakpointsMin(
       }
       else if( x < -this->epsilon )
       {
-         if (upp[i] < infinity)
+         if (upp[i] < R(infinity))
          {
             R y = upp[i] - vec[i];
             curVal = (y <= 0) ? -this->fastDelta / x : -(y + this->fastDelta) / x;

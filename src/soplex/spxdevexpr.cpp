@@ -334,7 +334,7 @@ namespace soplex
       }
 
     // make sure we do not skip potential candidates due to a high leastBest value
-    if( leastBest == infinity )
+    if( leastBest == R(infinity) )
       {
         assert(bestPrices.size() == 0);
         leastBest = 0;
@@ -570,7 +570,7 @@ namespace soplex
   {
     const Real* cTest = this->thesolver->coTest().get_const_ptr();
     const Real* cpen = this->thesolver->coWeights.get_const_ptr();
-    Real leastBest = infinity;
+    Real leastBest = R(infinity);
     Real x;
     int enterIdx = -1;
     int idx;
@@ -600,7 +600,7 @@ namespace soplex
       }
 
     // make sure we do not skip potential candidates due to a high leastBest value
-    if( leastBest == infinity )
+    if( leastBest == R(infinity) )
       {
         assert(bestPrices.size() == 0);
         leastBest = 0;
@@ -648,7 +648,7 @@ namespace soplex
   {
     const Real* test = this->thesolver->test().get_const_ptr();
     const Real* pen = this->thesolver->weights.get_const_ptr();
-    Real leastBest = infinity;
+    Real leastBest = R(infinity);
     Real x;
     int enterIdx = -1;
     int idx;
@@ -677,7 +677,7 @@ namespace soplex
           }
       }
     // make sure we do not skip potential candidates due to a high leastBest value
-    if( leastBest == infinity )
+    if( leastBest == R(infinity) )
       {
         assert(bestPricesCo.size() == 0);
         leastBest = 0;

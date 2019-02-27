@@ -204,10 +204,10 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
 
       lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), exp2);
 
-      if( lp.rhs(i) < infinity )
+      if( lp.rhs(i) < R(infinity) )
          lp.rhs_w(i) = spxLdexp(lp.rhs_w(i), exp2);
 
-      if( lp.lhs(i) > -infinity )
+      if( lp.lhs(i) > R(-infinity) )
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), exp2);
 
       MSG_DEBUG( std::cout << "DEBUG: rowscaleExp(" << i << "): " << exp2 << std::endl; )
@@ -227,10 +227,10 @@ void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), exp2);
 
-      if( lp.upper(i) < infinity )
+      if( lp.upper(i) < R(infinity) )
          lp.upper_w(i) = spxLdexp(lp.upper_w(i), -exp2);
 
-      if( lp.lower(i) > -infinity )
+      if( lp.lower(i) > R(-infinity) )
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), -exp2);
 
       MSG_DEBUG( std::cout << "DEBUG: colscaleExp(" << i << "): " << exp2 << std::endl; )
@@ -264,10 +264,10 @@ void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
 
       lp.maxRowObj_w(i) = spxLdexp(lp.maxRowObj(i), -exp2);
 
-      if( lp.rhs(i) < infinity )
+      if( lp.rhs(i) < R(infinity) )
          lp.rhs_w(i) = spxLdexp(lp.rhs_w(i), -exp2);
 
-      if( lp.lhs(i) > -infinity )
+      if( lp.lhs(i) > R(-infinity) )
          lp.lhs_w(i) = spxLdexp(lp.lhs_w(i), -exp2);
    }
 
@@ -286,10 +286,10 @@ void SPxScaler<R>::unscale(SPxLPBase<R>& lp)
 
       lp.maxObj_w(i) = spxLdexp(lp.maxObj_w(i), -exp2);
 
-      if( lp.upper(i) < infinity )
+      if( lp.upper(i) < R(infinity) )
          lp.upper_w(i) = spxLdexp(lp.upper_w(i), exp2);
 
-      if( lp.lower(i) > -infinity )
+      if( lp.lower(i) > R(-infinity) )
          lp.lower_w(i) = spxLdexp(lp.lower_w(i), exp2);
    }
 
@@ -376,7 +376,7 @@ template <class R>
    DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVectorBase<R>& colVec = lp.LPColSetBase<R>::colVector(i);
 
-   R min = infinity;
+   R min = R(infinity);
    int exp1;
    int exp2 = colscaleExp[i];
 
@@ -400,7 +400,7 @@ template <class R>
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   if( lp.LPColSetBase<R>::upper(i) < infinity )
+   if( lp.LPColSetBase<R>::upper(i) < R(infinity) )
    {
       const DataArray < int >& colscaleExp = lp.LPColSetBase<R>::scaleExp;
       return spxLdexp(lp.LPColSetBase<R>::upper(i) , colscaleExp[i]);
@@ -432,7 +432,7 @@ template <class R>
    assert(i < lp.nCols());
    assert(i >= 0);
 
-   if( lp.LPColSetBase<R>::lower(i) > -infinity )
+   if( lp.LPColSetBase<R>::lower(i) > R(-infinity) )
    {
       const DataArray < int >& colscaleExp = lp.LPColSetBase<R>::scaleExp;
       return spxLdexp(lp.LPColSetBase<R>::lower(i), colscaleExp[i]);
@@ -543,7 +543,7 @@ template <class R>
    DataArray < int >& rowscaleExp = *m_activeRowscaleExp;
    const SVectorBase<R>& rowVec = lp.LPRowSetBase<R>::rowVector(i);
 
-   R min = infinity;
+   R min = R(infinity);
 
    int exp1;
    int exp2 = rowscaleExp[i];
@@ -568,7 +568,7 @@ template <class R>
    assert(i < lp.nRows());
    assert(i >= 0);
 
-   if( lp.LPRowSetBase<R>::rhs(i) < infinity )
+   if( lp.LPRowSetBase<R>::rhs(i) < R(infinity) )
    {
       const DataArray < int >& rowscaleExp = lp.LPRowSetBase<R>::scaleExp;
       return spxLdexp(lp.LPRowSetBase<R>::rhs(i) , -rowscaleExp[i]);
@@ -601,7 +601,7 @@ template <class R>
    assert(i < lp.nRows());
    assert(i >= 0);
 
-   if( lp.LPRowSetBase<R>::lhs(i) > -infinity )
+   if( lp.LPRowSetBase<R>::lhs(i) > R(-infinity) )
    {
       const DataArray < int >& rowscaleExp = lp.LPRowSetBase<R>::scaleExp;
       return spxLdexp(lp.LPRowSetBase<R>::lhs(i) , -rowscaleExp[i]);
@@ -809,7 +809,7 @@ template <class R>
 {
    const DataArray < int >& colscaleExp = *m_activeColscaleExp;
 
-   R mini = infinity;
+   R mini = R(infinity);
 
    for( int i = 0; i < colscaleExp.size(); ++i )
       if( spxAbs(spxLdexp(1.0, colscaleExp[i])) < mini )
@@ -874,7 +874,7 @@ template <class R>
    for(int i = 0; i < lp.nCols(); ++i )
    {
       const SVectorBase<R>& vec  = lp.colVector(i);
-      R           mini = infinity;
+      R           mini = R(infinity);
       R           maxi = 0.0;
 
       for(int j = 0; j < vec.size(); ++j)
@@ -889,7 +889,7 @@ template <class R>
             maxi = x;
       }
 
-      if( mini == infinity )
+      if( mini == R(infinity) )
          continue;
 
       R p = maxi / mini;
@@ -913,7 +913,7 @@ template <class R>
    for(int i = 0; i < lp.nRows(); ++i )
    {
       const SVectorBase<R>& vec  = lp.rowVector(i);
-      R           mini = infinity;
+      R           mini = R(infinity);
       R           maxi = 0.0;
 
       for(int j = 0; j < vec.size(); ++j)
@@ -928,7 +928,7 @@ template <class R>
             maxi = x;
       }
 
-      if( mini == infinity )
+      if( mini == R(infinity) )
          continue;
 
       R p = maxi / mini;

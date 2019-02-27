@@ -113,7 +113,7 @@ namespace soplex
   {
     const Real* test = this->thesolver->fTest().get_const_ptr();
     Real type = 1 - 2 * (this->thesolver->rep() == SPxSolverBase<Real>::COLUMN ? 1 : 0);
-    Real best = type * infinity;
+    Real best = type * R(infinity);
     int lastIdx = -1;
     Real x;
     int i;
@@ -143,7 +143,7 @@ namespace soplex
     const Vector& cTest = (this->solver()->rep() == SPxSolverBase<Real>::ROW)
       ? this->solver()->coTest() : this->solver()->test();
     const typename SPxBasisBase<Real>::Desc& ds = this->solver()->basis().desc();
-    Real best = infinity;
+    Real best = R(infinity);
     SPxId lastId;
     Real x;
     int i;

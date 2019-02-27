@@ -1225,13 +1225,13 @@ namespace soplex
           bool hasLower = false;
           bool hasUpper = false;
 
-          if( lower(i) > -infinity )
+          if( lower(i) > R(-infinity) )
             {
               countLower++;
               hasLower = true;
             }
 
-          if( upper(i) < infinity )
+          if( upper(i) < R(infinity) )
             {
               countUpper++;
               hasUpper = true;
@@ -1253,13 +1253,13 @@ namespace soplex
           bool hasRhs = false;
           bool hasLhs = false;
 
-          if( lhs(i) > -infinity )
+          if( lhs(i) > R(-infinity) )
             {
               countLhs++;
               hasLhs = true;
             }
 
-          if( rhs(i) < infinity )
+          if( rhs(i) < R(infinity) )
             {
               countRhs++;
               hasRhs = true;
@@ -1386,7 +1386,7 @@ namespace soplex
     /// changes \p i 'th lower bound to \p newLower. \p scale determines whether the new data should be scaled
     virtual void changeLower(int i, const R& newLower, bool scale = false)
     {
-      if( scale && newLower > -infinity)
+      if( scale && newLower > R(-infinity))
         {
           assert(_isScaled);
           assert(lp_scaler);
@@ -1423,7 +1423,7 @@ namespace soplex
     /// Changes \p i 'th upper bound to \p newUpper. \p scale determines whether the new data should be scaled
     virtual void changeUpper(int i, const R& newUpper, bool scale = false)
     {
-      if( scale && newUpper < infinity )
+      if( scale && newUpper < R(infinity) )
         {
           assert(_isScaled);
           assert(lp_scaler);
@@ -1491,7 +1491,7 @@ namespace soplex
     /// Changes \p i 'th left hand side value to \p newLhs. \p scale determines whether the new data should be scaled
     virtual void changeLhs(int i, const R& newLhs, bool scale = false)
     {
-      if( scale && newLhs > -infinity )
+      if( scale && newLhs > R(-infinity) )
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -1528,7 +1528,7 @@ namespace soplex
     /// Changes \p i 'th right hand side value to \p newRhs. \p scale determines whether the new data should be scaled
     virtual void changeRhs(int i, const R& newRhs, bool scale = false)
     {
-      if( scale && newRhs < infinity )
+      if( scale && newRhs < R(infinity) )
       {
          assert(_isScaled);
          assert(lp_scaler);
@@ -2205,9 +2205,9 @@ namespace soplex
         {
           newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
-          if( rhs(idx) < infinity )
+          if( rhs(idx) < R(infinity) )
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
-          if( lhs(idx) > -infinity )
+          if( lhs(idx) > R(-infinity) )
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
           maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
@@ -2258,9 +2258,9 @@ namespace soplex
         {
           newRowScaleExp = lp_scaler->computeScaleExp(rowVec, colscaleExp);
 
-          if( rhs(idx) < infinity )
+          if( rhs(idx) < R(infinity) )
             rhs_w(idx) = spxLdexp(rhs_w(idx), newRowScaleExp);
-          if( lhs(idx) > -infinity )
+          if( lhs(idx) > R(-infinity) )
             lhs_w(idx) = spxLdexp(lhs_w(idx), newRowScaleExp);
 
           maxRowObj_w(idx) = spxLdexp(maxRowObj_w(idx), newRowScaleExp);
@@ -2366,9 +2366,9 @@ namespace soplex
             {
               newRowScaleExp = lp_scaler->computeScaleExp(vec, colscaleExp);
 
-              if( rhs(i) < infinity )
+              if( rhs(i) < R(infinity) )
                 rhs_w(i) = spxLdexp(rhs_w(i), newRowScaleExp);
-              if( lhs(i) > -infinity )
+              if( lhs(i) > R(-infinity) )
                 lhs_w(i) = spxLdexp(lhs_w(i), newRowScaleExp);
 
               maxRowObj_w(i) = spxLdexp(maxRowObj_w(i), newRowScaleExp);
@@ -2425,9 +2425,9 @@ namespace soplex
         {
           newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
-          if( upper(idx) < infinity )
+          if( upper(idx) < R(infinity) )
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
-          if( lower(idx) > -infinity )
+          if( lower(idx) > R(-infinity) )
             lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
 
           maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
@@ -2480,9 +2480,9 @@ namespace soplex
         {
           newColScaleExp = lp_scaler->computeScaleExp(colVec, rowscaleExp);
 
-          if( upper(idx) < infinity )
+          if( upper(idx) < R(infinity) )
             upper_w(idx) = spxLdexp(upper_w(idx), - newColScaleExp);
-          if( lower(idx) > -infinity )
+          if( lower(idx) > R(-infinity) )
             lower_w(idx) = spxLdexp(lower_w(idx), - newColScaleExp);
 
           maxObj_w(idx) = spxLdexp(maxObj_w(idx), newColScaleExp);
@@ -2595,9 +2595,9 @@ namespace soplex
             {
               newColScaleExp = lp_scaler->computeScaleExp(vec, rowscaleExp);
 
-              if( upper(i) < infinity )
+              if( upper(i) < R(infinity) )
                 upper_w(i) = spxLdexp(upper_w(i), - newColScaleExp);
-              if( lower(i) > -infinity )
+              if( lower(i) > R(-infinity) )
                 lower_w(i) = spxLdexp(lower_w(i), - newColScaleExp);
 
               maxObj_w(i) = spxLdexp(maxObj_w(i), newColScaleExp);

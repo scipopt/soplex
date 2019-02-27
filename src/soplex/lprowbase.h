@@ -31,7 +31,7 @@ namespace soplex
  *
  *  Class LPRowBase provides constraints for linear programs in the form \f[ l \le a^Tx \le r, \f] where \em a is a
  *  DSVector. \em l is referred to as %left hand side, \em r as %right hand side and \em a as \em row \em vector or the
- *  constraint vector. \em l and \em r may also take values \f$\pm\f$ #infinity.  This static member is predefined, but
+ *  constraint vector. \em l and \em r may also take values \f$\pm\f$ #R(infinity).  This static member is predefined, but
  *  may be overridden to meet the needs of the LP solver to be used.
  *
  *  LPRowBases allow to specify regular inequalities of the form \f[ a^Tx \sim \alpha, \f] where \f$\sim\f$ can take any
@@ -85,7 +85,7 @@ public:
 
    /// Constructs LPRowBase with a vector ready to hold \p defDim nonzeros.
    explicit LPRowBase<R>(int defDim = 0)
-      : left(0), right(infinity), object(0), vec(defDim)
+      : left(0), right(R(infinity)), object(0), vec(defDim)
    {
       assert(isConsistent());
    }
@@ -119,7 +119,7 @@ public:
       switch( p_type )
       {
       case LESS_EQUAL:
-         left = -infinity;
+         left = R(-infinity);
          right = p_value;
          break;
       case EQUAL:
@@ -128,7 +128,7 @@ public:
          break;
       case GREATER_EQUAL:
          left = p_value;
-         right = infinity;
+         right = R(infinity);
          break;
       default:
          throw SPxInternalCodeException("XLPROW03 This should never happen.");
@@ -150,10 +150,10 @@ public:
    /// Gets type of row.
    Type type() const
    {
-      if( rhs() >= infinity )
+      if( rhs() >= R(infinity) )
          return GREATER_EQUAL;
 
-      if( lhs() <= -infinity )
+      if( lhs() <= R(-infinity) )
          return LESS_EQUAL;
 
       if( lhs() == rhs() )
@@ -168,16 +168,16 @@ public:
       switch( p_type )
       {
       case LESS_EQUAL:
-         left = -infinity;
+         left = R(-infinity);
          break;
       case EQUAL:
-         if( lhs() > -infinity )
+         if( lhs() > R(-infinity) )
             right = lhs();
          else
             left = rhs();
          break;
       case GREATER_EQUAL:
-         right = infinity;
+         right = R(infinity);
          break;
       case RANGE:
          MSG_ERROR( std::cerr << "ELPROW01 RANGE not supported in LPRow::setType()"
@@ -196,7 +196,7 @@ public:
    {
       assert(type() != RANGE);
 
-      return (rhs() < infinity) ? rhs() : lhs();
+      return (rhs() < R(infinity)) ? rhs() : lhs();
    }
 
    /// Left-hand side value.

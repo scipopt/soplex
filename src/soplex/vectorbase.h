@@ -25,6 +25,8 @@
 #include <math.h>
 #include <iostream>
 
+#include "soplex/spxdefines.h"
+
 namespace soplex
 {
 template < class R > class SVectorBase;
@@ -405,9 +407,9 @@ public:
    }
 
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
-   Real length() const
+   R length() const
    {
-      return spxSqrt((Real)length2());
+     return std::sqrt(R(length2()));
    }
 
    /// Squared norm.

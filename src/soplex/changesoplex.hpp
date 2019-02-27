@@ -259,9 +259,9 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
    switch (stat)
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER:
-      if (newLower <= -infinity)
+      if (newLower <= R(-infinity))
       {
-         if (currUpper >= infinity)
+         if (currUpper >= R(infinity))
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
             if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -288,7 +288,7 @@ void SPxSolverBase<R>::changeLowerStatus(int i, R newLower, R oldLower)
          stat = SPxBasisBase<R>::Desc::P_FIXED;
       break;
    case SPxBasisBase<R>::Desc::P_FREE:
-      if (newLower > -infinity)
+      if (newLower > R(-infinity))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -375,9 +375,9 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
          stat = SPxBasisBase<R>::Desc::P_FIXED;
       break;
    case SPxBasisBase<R>::Desc::P_ON_UPPER:
-      if (newUpper >= infinity)
+      if (newUpper >= R(infinity))
       {
-         if (currLower <= -infinity)
+         if (currLower <= R(-infinity))
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
             if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -400,7 +400,7 @@ void SPxSolverBase<R>::changeUpperStatus(int i, R newUpper, R oldUpper)
          objChange = theUCbound[i] * (newUpper - oldUpper);
       break;
    case SPxBasisBase<R>::Desc::P_FREE:
-      if (newUpper < infinity)
+      if (newUpper < R(infinity))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -493,9 +493,9 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
    switch (stat)
    {
    case SPxBasisBase<R>::Desc::P_ON_LOWER:
-      if (newLhs <= -infinity)
+      if (newLhs <= R(-infinity))
       {
-         if (currRhs >= infinity)
+         if (currRhs >= R(infinity))
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
             if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -522,7 +522,7 @@ void SPxSolverBase<R>::changeLhsStatus(int i, R newLhs, R oldLhs)
          stat = SPxBasisBase<R>::Desc::P_FIXED;
       break;
    case SPxBasisBase<R>::Desc::P_FREE:
-      if (newLhs > -infinity)
+      if (newLhs > R(-infinity))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_LOWER;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -601,9 +601,9 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
    switch (stat)
    {
    case SPxBasisBase<R>::Desc::P_ON_UPPER:
-      if (newRhs >= infinity)
+      if (newRhs >= R(infinity))
       {
-         if (currLhs <= -infinity)
+         if (currLhs <= R(-infinity))
          {
             stat = SPxBasisBase<R>::Desc::P_FREE;
             if( m_nonbasicValueUpToDate && rep() == COLUMN )
@@ -630,7 +630,7 @@ void SPxSolverBase<R>::changeRhsStatus(int i, R newRhs, R oldRhs)
          stat = SPxBasisBase<R>::Desc::P_FIXED;
       break;
    case SPxBasisBase<R>::Desc::P_FREE:
-      if (newRhs < infinity)
+      if (newRhs < R(infinity))
       {
          stat = SPxBasisBase<R>::Desc::P_ON_UPPER;
          if( m_nonbasicValueUpToDate && rep() == COLUMN )

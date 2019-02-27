@@ -466,7 +466,7 @@ namespace soplex
             enterPric = (*thePvec)[enterIdx];
             enterRO = this->maxObj(enterIdx);
             objChange -= enterVal * enterRO;
-            if( enterLB <= -infinity )
+            if( enterLB <= R(-infinity) )
               ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_LOWER;
             else if( EQ( enterLB, enterUB ) )
               ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -482,7 +482,7 @@ namespace soplex
             enterPric = (*thePvec)[enterIdx];
             enterRO = this->maxObj(enterIdx);
             objChange -= enterVal * enterRO;
-            if( enterUB >= infinity )
+            if( enterUB >= R(infinity) )
               ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_UPPER;
             else if( EQ( enterLB, enterUB ) )
               ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -497,16 +497,16 @@ namespace soplex
             enterPric = (*thePvec)[enterIdx];
             enterRO = this->maxObj(enterIdx);
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::D_UNDEFINED;
-            enterMax = (enterRO - enterPric > 0) ? infinity : -infinity;
+            enterMax = (enterRO - enterPric > 0) ? R(infinity) : R(-infinity);
             break;
 
             // dual/rowwise cases:
           case SPxBasisBase<R>::Desc::D_ON_UPPER :
             assert( rep() == ROW );
-            assert(theUCbound[enterIdx] < infinity);
+            assert(theUCbound[enterIdx] < R(infinity));
             enterUB = theUCbound[enterIdx];
-            enterLB = -infinity;
-            enterMax = -infinity;
+            enterLB = R(-infinity);
+            enterMax = R(-infinity);
             enterVal = enterUB;
             enterPric = (*theCoPvec)[enterIdx];
             enterRO = SPxLPBase<R>::lower(enterIdx);
@@ -515,10 +515,10 @@ namespace soplex
             break;
           case SPxBasisBase<R>::Desc::D_ON_LOWER :
             assert( rep() == ROW );
-            assert(theLCbound[enterIdx] > -infinity);
+            assert(theLCbound[enterIdx] > R(-infinity));
             enterLB = theLCbound[enterIdx];
-            enterUB = infinity;
-            enterMax = infinity;
+            enterUB = R(infinity);
+            enterMax = R(infinity);
             enterVal = enterLB;
             enterPric = (*theCoPvec)[enterIdx];
             enterRO = SPxLPBase<R>::upper(enterIdx);
@@ -528,15 +528,15 @@ namespace soplex
           case SPxBasisBase<R>::Desc::D_FREE:
             assert( rep() == ROW );
             assert(SPxLPBase<R>::lower(enterIdx) == SPxLPBase<R>::upper(enterIdx));
-            enterUB = infinity;
-            enterLB = -infinity;
+            enterUB = R(infinity);
+            enterLB = R(-infinity);
             enterVal = 0;
             enterRO = SPxLPBase<R>::upper(enterIdx);
             enterPric = (*theCoPvec)[enterIdx];
             if (enterPric > enterRO)
-              enterMax = infinity;
+              enterMax = R(infinity);
             else
-              enterMax = -infinity;
+              enterMax = R(-infinity);
             ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::P_FIXED;
             break;
           case SPxBasisBase<R>::Desc::D_ON_BOTH :
@@ -545,8 +545,8 @@ namespace soplex
             if (enterPric > SPxLPBase<R>::upper(enterIdx))
               {
                 enterLB = theLCbound[enterIdx];
-                enterUB = infinity;
-                enterMax = infinity;
+                enterUB = R(infinity);
+                enterMax = R(infinity);
                 enterVal = enterLB;
                 enterRO = SPxLPBase<R>::upper(enterIdx);
                 ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
@@ -556,8 +556,8 @@ namespace soplex
                 enterUB = theUCbound[enterIdx];
                 enterVal = enterUB;
                 enterRO = SPxLPBase<R>::lower(enterIdx);
-                enterLB = -infinity;
-                enterMax = -infinity;
+                enterLB = R(-infinity);
+                enterMax = R(-infinity);
                 ds.colStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
               }
             objChange -= theLCbound[enterIdx] * SPxLPBase<R>::upper(enterIdx);
@@ -606,7 +606,7 @@ namespace soplex
             enterPric = (*theCoPvec)[enterIdx];
             enterRO = this->maxRowObj(enterIdx);
             objChange -= enterRO * enterVal;
-            if( enterUB >= infinity )
+            if( enterUB >= R(infinity) )
               ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_LOWER;
             else if( EQ( enterLB, enterUB ) )
               ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -622,7 +622,7 @@ namespace soplex
             enterPric = (*theCoPvec)[enterIdx];
             enterRO = this->maxRowObj(enterIdx);
             objChange -= enterRO * enterVal;
-            if( enterLB <= -infinity )
+            if( enterLB <= R(-infinity) )
               ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_ON_UPPER;
             else if( EQ( enterLB, enterUB ) )
               ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::D_FREE;
@@ -644,11 +644,11 @@ namespace soplex
             // dual/rowwise cases:
           case SPxBasisBase<R>::Desc::D_ON_UPPER :
             assert( rep() == ROW );
-            assert(theURbound[enterIdx] < infinity);
+            assert(theURbound[enterIdx] < R(infinity));
             enterUB = theURbound[enterIdx];
-            enterLB = -infinity;
+            enterLB = R(-infinity);
             enterVal = enterUB;
-            enterMax = -infinity;
+            enterMax = R(-infinity);
             enterPric = (*thePvec)[enterIdx];
             enterRO = this->lhs(enterIdx);
             objChange -= enterRO * enterVal;
@@ -656,11 +656,11 @@ namespace soplex
             break;
           case SPxBasisBase<R>::Desc::D_ON_LOWER :
             assert( rep() == ROW );
-            assert(theLRbound[enterIdx] > -infinity);
+            assert(theLRbound[enterIdx] > R(-infinity));
             enterLB = theLRbound[enterIdx];
-            enterUB = infinity;
+            enterUB = R(infinity);
             enterVal = enterLB;
-            enterMax = infinity;
+            enterMax = R(infinity);
             enterPric = (*thePvec)[enterIdx];
             enterRO = this->rhs(enterIdx);
             objChange -= enterRO * enterVal;
@@ -669,12 +669,12 @@ namespace soplex
           case SPxBasisBase<R>::Desc::D_FREE:
             assert( rep() == ROW );
             assert(this->rhs(enterIdx) == this->lhs(enterIdx));
-            enterUB = infinity;
-            enterLB = -infinity;
+            enterUB = R(infinity);
+            enterLB = R(-infinity);
             enterVal = 0;
             enterPric = (*thePvec)[enterIdx];
             enterRO = this->rhs(enterIdx);
-            enterMax = (enterPric > enterRO) ? infinity : -infinity;
+            enterMax = (enterPric > enterRO) ? R(infinity) : R(-infinity);
             ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::P_FIXED;
             break;
           case SPxBasisBase<R>::Desc::D_ON_BOTH :
@@ -684,8 +684,8 @@ namespace soplex
               {
                 enterLB = theLRbound[enterIdx];
                 enterVal = enterLB;
-                enterUB = infinity;
-                enterMax = infinity;
+                enterUB = R(infinity);
+                enterMax = R(infinity);
                 enterRO = this->rhs(enterIdx);
                 ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_UPPER;
               }
@@ -693,8 +693,8 @@ namespace soplex
               {
                 enterUB = theURbound[enterIdx];
                 enterVal = enterUB;
-                enterLB = -infinity;
-                enterMax = -infinity;
+                enterLB = R(-infinity);
+                enterMax = R(-infinity);
                 enterRO = this->lhs(enterIdx);
                 ds.rowStatus(enterIdx) = SPxBasisBase<R>::Desc::P_ON_LOWER;
               }
@@ -1343,7 +1343,7 @@ namespace soplex
         happen in primal/columnwise case with upper and lower bounds on
         variables.
     */
-    else if (!polish && leaveVal < infinity && leaveVal > -infinity)
+    else if (!polish && leaveVal < R(infinity) && leaveVal > R(-infinity))
       {
         assert(rep() == COLUMN);
         assert(leaveVal == -enterMax);

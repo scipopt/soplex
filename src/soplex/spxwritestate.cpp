@@ -79,7 +79,7 @@ namespace soplex
     ofs << "real:feastol = " << feastol() << std::endl;
     ofs << "real:opttol = " << opttol() << std::endl;
     ofs << "real:epsilon_zero = " << epsilon() << std::endl;
-    ofs << "real:infty = " << infinity << std::endl;
+    ofs << "real:infty = " << R(infinity) << std::endl;
     ofs << "uint:random_seed = " << random.getSeed() << std::endl;
     ofs.close();
 

@@ -41,7 +41,7 @@ static R computeScalingVec(
       const SVectorBase<R>& vec = (*vecset)[i];
 
       R maxi = 0.0;
-      R mini = infinity;
+      R mini = R(infinity);
 
       for( int j = 0; j < vec.size(); ++j )
       {
@@ -56,15 +56,15 @@ static R computeScalingVec(
          }
       }
       // empty rows/cols are possible
-      if (mini == infinity || maxi == 0.0)
+      if (mini == R(infinity) || maxi == 0.0)
       {
          mini = 1.0;
          maxi = 1.0;
       }
-      assert(mini < infinity);
+      assert(mini < R(infinity));
       assert(maxi > 0.0);
 
-      scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);
+      scaleval[unsigned(i)] = 1.0 / std::sqrt(mini * maxi);
 
       const R p = maxi / mini;
 

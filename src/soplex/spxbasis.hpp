@@ -50,9 +50,9 @@ namespace soplex
   {
     assert(theLP != 0);
 
-    if (theLP->rhs(i) < infinity)
+    if (theLP->rhs(i) < R(infinity))
       {
-	if (theLP->lhs(i) > -infinity)
+	if (theLP->lhs(i) > R(-infinity))
 	  {
 	    if (theLP->lhs(i) == theLP->rhs(i))
 	      return Desc::D_FREE;
@@ -62,7 +62,7 @@ namespace soplex
 	else
 	  return Desc::D_ON_LOWER;
       }
-    else if (theLP->lhs(i) > -infinity)
+    else if (theLP->lhs(i) > R(-infinity))
       return Desc::D_ON_UPPER;
     else
       return Desc::D_UNDEFINED;
@@ -74,9 +74,9 @@ namespace soplex
   {
     assert(theLP != 0);
 
-    if (theLP->SPxLPBase<R>::upper(i) < infinity)
+    if (theLP->SPxLPBase<R>::upper(i) < R(infinity))
       {
-	if (theLP->SPxLPBase<R>::lower(i) > -infinity)
+	if (theLP->SPxLPBase<R>::lower(i) > R(-infinity))
 	  {
 	    if (theLP->SPxLPBase<R>::lower(i) == theLP->SPxLPBase<R>::upper(i))
 	      return Desc::D_FREE;
@@ -86,7 +86,7 @@ namespace soplex
 	else
 	  return Desc::D_ON_LOWER;
       }
-    else if (theLP->SPxLPBase<R>::lower(i) > -infinity)
+    else if (theLP->SPxLPBase<R>::lower(i) > R(-infinity))
       return Desc::D_ON_UPPER;
     else
       return Desc::D_UNDEFINED;
@@ -143,8 +143,8 @@ namespace soplex
 	  {
 	    basisdim++;
 	    if ( (ds.rowstat[row] == Desc::P_FIXED && theLP->SPxLPBase<R>::lhs(row) != theLP->SPxLPBase<R>::rhs(row))
-		 || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::rhs(row) >= infinity)
-		 || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= -infinity) )
+		 || (ds.rowstat[row] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::rhs(row) >= R(infinity))
+		 || (ds.rowstat[row] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lhs(row) <= R(-infinity)) )
 	      {
 		MSG_DEBUG( std::cout << "IBASIS22 Nonbasic row with incorrect status: lhs=" << theLP->SPxLPBase<R>::lhs(row) << ", rhs=" << theLP->SPxLPBase<R>::rhs(row) << ", stat=" << ds.rowstat[row] << "\n");
 		return false;
@@ -166,8 +166,8 @@ namespace soplex
 	  {
 	    basisdim++;
 	    if ( (ds.colstat[col] == Desc::P_FIXED && theLP->SPxLPBase<R>::lower(col) != theLP->SPxLPBase<R>::upper(col))
-		 || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::upper(col) >= infinity)
-		 || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= -infinity) )
+		 || (ds.colstat[col] == Desc::P_ON_UPPER && theLP->SPxLPBase<R>::upper(col) >= R(infinity))
+		 || (ds.colstat[col] == Desc::P_ON_LOWER && theLP->SPxLPBase<R>::lower(col) <= R(-infinity)) )
 	      {
             MSG_DEBUG( std::cout << "IBASIS24 Nonbasic column " << col << " with incorrect status: lower=" << theLP->SPxLPBase<R>::lower(col) << ", upper=" << theLP->SPxLPBase<R>::upper(col) << ", stat=" << ds.colstat[col] << "\n");
 		return false;
@@ -231,9 +231,9 @@ namespace soplex
 	  thedesc.rowStatus(i) = dualRowStatus(i);
 	else if (thedesc.rowStatus(i) == SPxBasisBase<R>::Desc::P_FIXED && theLP->SPxLPBase<R>::lhs(i) != theLP->SPxLPBase<R>::rhs(i))
 	  {
-	    if (theLP->SPxLPBase<R>::lhs(i) > -infinity && theLP->SPxLPBase<R>::maxRowObj(i) < 0.0)
+	    if (theLP->SPxLPBase<R>::lhs(i) > R(-infinity) && theLP->SPxLPBase<R>::maxRowObj(i) < 0.0)
 	      thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
-	    else if (theLP->SPxLPBase<R>::rhs(i) < infinity)
+	    else if (theLP->SPxLPBase<R>::rhs(i) < R(infinity))
 	      thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
 	    else
 	      thedesc.rowStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
@@ -267,9 +267,9 @@ namespace soplex
 	  thedesc.colStatus(i) = dualColStatus(i);
 	else if (thedesc.colStatus(i) == SPxBasisBase<R>::Desc::P_FIXED && theLP->SPxLPBase<R>::lower(i) != theLP->SPxLPBase<R>::upper(i))
 	  {
-	    if (theLP->SPxLPBase<R>::lower(i) <= -infinity && theLP->SPxLPBase<R>::upper(i) >= infinity)
+	    if (theLP->SPxLPBase<R>::lower(i) <= R(-infinity) && theLP->SPxLPBase<R>::upper(i) >= R(infinity))
 	      thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_FREE;
-	    else if (theLP->SPxLPBase<R>::upper(i) >= infinity || (theLP->SPxLPBase<R>::lower(i) > -infinity && theLP->SPxLPBase<R>::maxObj(i) < 0.0))
+	    else if (theLP->SPxLPBase<R>::upper(i) >= R(infinity) || (theLP->SPxLPBase<R>::lower(i) > R(-infinity) && theLP->SPxLPBase<R>::maxObj(i) < 0.0))
 	      thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
 	    else
 	      thedesc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
@@ -461,9 +461,9 @@ namespace soplex
       {
 	if (theLP->SPxLPBase<R>::lower(i) == theLP->SPxLPBase<R>::upper(i))
 	  l_desc.colstat[i] = Desc::P_FIXED;
-	else if (theLP->SPxLPBase<R>::lower(i) <= -infinity && theLP->SPxLPBase<R>::upper(i) >= infinity)
+	else if (theLP->SPxLPBase<R>::lower(i) <= R(-infinity) && theLP->SPxLPBase<R>::upper(i) >= R(infinity))
 	  l_desc.colstat[i] = Desc::P_FREE;
-	else if (theLP->SPxLPBase<R>::lower(i) <= -infinity)
+	else if (theLP->SPxLPBase<R>::lower(i) <= R(-infinity))
 	  l_desc.colstat[i] = Desc::P_ON_UPPER;
 	else
 	  l_desc.colstat[i] = Desc::P_ON_LOWER;
@@ -681,8 +681,8 @@ namespace soplex
 		/* Default is all non-basic variables on lower bound (if finite) or at zero (if free).
 		 * nothing to do in this case.
 		 */
-		assert(theLP->lower(col) <= -infinity || thedesc.colStatus(col) == Desc::P_ON_LOWER || thedesc.colStatus(col) == Desc::P_FIXED);
-		assert(theLP->lower(col) > -infinity || theLP->upper(col) < infinity || thedesc.colStatus(col) == Desc::P_FREE);
+		assert(theLP->lower(col) <= R(-infinity) || thedesc.colStatus(col) == Desc::P_ON_LOWER || thedesc.colStatus(col) == Desc::P_FIXED);
+		assert(theLP->lower(col) > R(-infinity) || theLP->upper(col) < R(infinity) || thedesc.colStatus(col) == Desc::P_FREE);
 	      }
 	  }
       }
@@ -1143,7 +1143,7 @@ namespace soplex
 template <class R>
  R SPxBasisBase<R>::getMatrixMetric(int type)
 {
-   R metric = infinity;
+   R metric = R(infinity);
 
     if( factorized )
       metric = factor->matrixMetric(type);

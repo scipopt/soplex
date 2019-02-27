@@ -85,16 +85,16 @@ namespace soplex
       {
       case SPxBasisBase<Real>::Desc::P_ON_UPPER + SPxBasisBase<Real>::Desc::P_ON_LOWER :
       case SPxBasisBase<Real>::Desc::D_FREE :
-        upp = infinity;
-        lw  = -infinity;
+        upp = R(infinity);
+        lw  = R(-infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
       case SPxBasisBase<Real>::Desc::D_ON_LOWER :
-        upp = infinity;
+        upp = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
       case SPxBasisBase<Real>::Desc::D_ON_UPPER :
-        lw  = -infinity;
+        lw  = R(-infinity);
         break;
 
       default:
@@ -174,16 +174,16 @@ namespace soplex
     switch (this->desc().rowStatus(n))
       {
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        theLBbound[i] = -infinity;
+        theLBbound[i] = R(-infinity);
         theUBbound[i] = theURbound[n];
         break;
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = theLRbound[n];
-        theUBbound[i] = infinity;
+        theUBbound[i] = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_FIXED:
-        theLBbound[i] = -infinity;
-        theUBbound[i] = infinity;
+        theLBbound[i] = R(-infinity);
+        theUBbound[i] = R(infinity);
         break;
       default:
         theUBbound[i] = theURbound[n];
@@ -200,16 +200,16 @@ namespace soplex
     switch (this->desc().colStatus(n))
       {
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        theLBbound[i] = -infinity;
+        theLBbound[i] = R(-infinity);
         theUBbound[i] = theUCbound[n];
         break;
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = theLCbound[n];
-        theUBbound[i] = infinity;
+        theUBbound[i] = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_FIXED:
-        theLBbound[i] = -infinity;
-        theUBbound[i] = infinity;
+        theLBbound[i] = R(-infinity);
+        theUBbound[i] = R(infinity);
         break;
       default:
         theUBbound[i] = theUCbound[n];
@@ -246,16 +246,16 @@ namespace soplex
     switch (this->desc().rowStatus(n))
       {
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        theLBbound[i] = -infinity;
+        theLBbound[i] = R(-infinity);
         theUBbound[i] = -this->maxRowObj(n);
         break;
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = -this->maxRowObj(n);
-        theUBbound[i] = infinity;
+        theUBbound[i] = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_ON_UPPER + SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        theLBbound[i] = -infinity;
-        theUBbound[i] = infinity;
+        theLBbound[i] = R(-infinity);
+        theUBbound[i] = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_FREE :
         theLBbound[i] = -this->maxRowObj(n);
@@ -279,16 +279,16 @@ namespace soplex
     switch (this->desc().colStatus(n))
       {
       case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-        theLBbound[i] = -infinity;
+        theLBbound[i] = R(-infinity);
         theUBbound[i] = 0;
         break;
       case SPxBasisBase<Real>::Desc::P_ON_UPPER :
         theLBbound[i] = 0;
-        theUBbound[i] = infinity;
+        theUBbound[i] = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_FIXED :
-        theLBbound[i] = -infinity;
-        theUBbound[i] = infinity;
+        theLBbound[i] = R(-infinity);
+        theUBbound[i] = R(infinity);
         break;
       case SPxBasisBase<Real>::Desc::P_FREE :
         theLBbound[i] = theUBbound[i] = 0;
