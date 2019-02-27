@@ -169,8 +169,8 @@ namespace soplex
   template <class R>
   void SPxSolverBase<R>::setEnterBound4Row(int i, int n)
   {
-    assert(baseId(i).isSPxRowId());
-    assert(number(SPxRowId(baseId(i))) == n);
+    assert(this->baseId(i).isSPxRowId());
+    assert(this->number(SPxRowId(this->baseId(i))) == n);
     switch (this->desc().rowStatus(n))
       {
       case SPxBasisBase<R>::Desc::P_ON_LOWER :
@@ -195,8 +195,8 @@ namespace soplex
   template <class R>
   void SPxSolverBase<R>::setEnterBound4Col(int i, int n)
   {
-    assert(baseId(i).isSPxColId());
-    assert(number(SPxColId(baseId(i))) == n);
+    assert(this->baseId(i).isSPxColId());
+    assert(this->number(SPxColId(this->baseId(i))) == n);
     switch (this->desc().colStatus(n))
       {
       case SPxBasisBase<R>::Desc::P_ON_LOWER :
@@ -241,8 +241,8 @@ namespace soplex
   template <class R>
   void SPxSolverBase<R>::setLeaveBound4Row(int i, int n)
   {
-    assert(baseId(i).isSPxRowId());
-    assert(this->number(SPxRowId(baseId(i))) == n);
+    assert(this->baseId(i).isSPxRowId());
+    assert(this->number(SPxRowId(this->baseId(i))) == n);
     switch (this->desc().rowStatus(n))
       {
       case SPxBasisBase<R>::Desc::P_ON_LOWER :
@@ -273,8 +273,8 @@ namespace soplex
   void SPxSolverBase<R>::setLeaveBound4Col(int i, int n)
   {
 
-    assert(baseId(i).isSPxColId());
-    assert(this->number(SPxColId(baseId(i))) == n);
+    assert(this->baseId(i).isSPxColId());
+    assert(this->number(SPxColId(this->baseId(i))) == n);
 
     switch (this->desc().colStatus(n))
       {

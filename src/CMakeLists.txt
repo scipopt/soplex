@@ -12,7 +12,6 @@ set(sources
     soplex/slufactor_rational.cpp
     soplex/solvereal.cpp
     soplex/spxautopr.cpp
-    soplex/spxchangebasis.cpp
     soplex/spxdantzigpr.cpp
     soplex/spxdefaultrt.cpp
     soplex/spxdefines.cpp

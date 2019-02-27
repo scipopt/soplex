@@ -22,13 +22,13 @@
 
 namespace soplex
 {
-  template <>
-  void SPxBasisBase<Real>::reDim()
+  template <class R>
+  void SPxBasisBase<R>::reDim()
   {
 
     assert(theLP != 0);
 
-    MSG_DEBUG( std::cout << "DCHBAS01 SPxBasisBase<Real>::reDim():"
+    MSG_DEBUG( std::cout << "DCHBAS01 SPxBasisBase<R>::reDim():"
                << " matrixIsSetup=" << matrixIsSetup
                << " fatorized=" << factorized
                << std::endl; )
@@ -46,7 +46,7 @@ namespace soplex
         factorized    = false;
       }
 
-    MSG_DEBUG( std::cout << "DCHBAS03 SPxBasisBase<Real>::reDim(): -->"
+    MSG_DEBUG( std::cout << "DCHBAS03 SPxBasisBase<R>::reDim(): -->"
                << " matrixIsSetup=" << matrixIsSetup
                << " fatorized=" << factorized
                << std::endl; )
@@ -56,8 +56,8 @@ namespace soplex
   }
 
   /* adapt basis and basis descriptor to added rows */
-  template <>
-  void SPxBasisBase<Real>::addedRows(int n)
+  template <class R>
+  void SPxBasisBase<R>::addedRows(int n)
   {
     assert(theLP != 0);
 
@@ -65,7 +65,7 @@ namespace soplex
       {
         reDim();
 
-        if (theLP->rep() == SPxSolverBase<Real>::COLUMN)
+        if (theLP->rep() == SPxSolverBase<R>::COLUMN)
           {
             /* after adding rows in column representation, reDim() should set these bools to false. */
             assert( !matrixIsSetup && !factorized );
@@ -73,12 +73,12 @@ namespace soplex
             for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
               {
                 thedesc.rowStatus(i) = dualRowStatus(i);
-                baseId(i) = theLP->SPxLP::rId(i);
+                baseId(i) = theLP->SPxLPBase<R>::rId(i);
               }
           }
         else
           {
-            assert(theLP->rep() == SPxSolverBase<Real>::ROW);
+            assert(theLP->rep() == SPxSolverBase<R>::ROW);
 
             for (int i = theLP->nRows() - n; i < theLP->nRows(); ++i)
               thedesc.rowStatus(i) = dualRowStatus(i);
@@ -86,8 +86,8 @@ namespace soplex
 
         /* If matrix was set up, load new basis vectors to the matrix.
          * In the row case, the basis is not effected by adding rows. However,
-         * since @c matrix stores references to the rows in the LP (SPxLP), a realloc
-         * in SPxLP (e.g. due to space requirements) might invalidate these references.
+         * since @c matrix stores references to the rows in the LP (SPxLPBase<R>), a realloc
+         * in SPxLPBase<R> (e.g. due to space requirements) might invalidate these references.
          * We therefore have to "reload" the matrix if it is set up. Note that reDim()
          * leaves @c matrixIsSetup untouched if only row have been added, since the basis
          * matrix already has the correct size. */
@@ -117,14 +117,14 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxBasisBase<Real>::removedRow(int i)
+  template <class R>
+  void SPxBasisBase<R>::removedRow(int i)
   {
 
     assert(status() >  NO_PROBLEM);
     assert(theLP    != 0);
 
-    if (theLP->rep() == SPxSolverBase<Real>::ROW)
+    if (theLP->rep() == SPxSolverBase<R>::ROW)
       {
         if (theLP->isBasic(thedesc.rowStatus(i)))
           {
@@ -136,7 +136,7 @@ namespace soplex
       }
     else
       {
-        assert(theLP->rep() == SPxSolverBase<Real>::COLUMN);
+        assert(theLP->rep() == SPxSolverBase<R>::COLUMN);
         factorized = false;
         if (!theLP->isBasic(thedesc.rowStatus(i)))
           {
@@ -164,8 +164,8 @@ namespace soplex
     reDim();
   }
 
-  template <>
-  void SPxBasisBase<Real>::removedRows(const int perm[])
+  template <class R>
+  void SPxBasisBase<R>::removedRows(const int perm[])
   {
     assert(status() > NO_PROBLEM);
     assert(theLP != 0);
@@ -173,7 +173,7 @@ namespace soplex
     int i;
     int n = thedesc.nRows();
 
-    if (theLP->rep() == SPxSolverBase<Real>::ROW)
+    if (theLP->rep() == SPxSolverBase<R>::ROW)
       {
         for (i = 0; i < n; ++i)
           {
@@ -195,7 +195,7 @@ namespace soplex
       }
     else
       {
-        assert(theLP->rep() == SPxSolverBase<Real>::COLUMN);
+        assert(theLP->rep() == SPxSolverBase<R>::COLUMN);
 
         factorized    = false;
         matrixIsSetup = false;
@@ -217,8 +217,8 @@ namespace soplex
     reDim();
   }
 
-  static typename SPxBasisBase<Real>::Desc::Status
-  primalColStatus(int i, const SPxLP* theLP)
+  static typename SPxBasisBase<R>::Desc::Status
+  primalColStatus(int i, const SPxLPBase<R>* theLP)
   {
     assert(theLP != 0);
 
@@ -226,36 +226,36 @@ namespace soplex
       {
         if (theLP->lower(i) > R(-infinity))
           {
-            if (theLP->lower(i) == theLP->SPxLP::upper(i))
-              return SPxBasisBase<Real>::Desc::P_FIXED;
+            if (theLP->lower(i) == theLP->SPxLPBase<R>::upper(i))
+              return SPxBasisBase<R>::Desc::P_FIXED;
             /*
               else
               return (-theLP->lower(i) < theLP->upper(i))
-              ? SPxBasisBase<Real>::Desc::P_ON_LOWER
-              : SPxBasisBase<Real>::Desc::P_ON_UPPER;
+              ? SPxBasisBase<R>::Desc::P_ON_LOWER
+              : SPxBasisBase<R>::Desc::P_ON_UPPER;
             */
             else if (theLP->maxObj(i) == 0)
               return (-theLP->lower(i) < theLP->upper(i))
-                ? SPxBasisBase<Real>::Desc::P_ON_LOWER
-                : SPxBasisBase<Real>::Desc::P_ON_UPPER;
+                ? SPxBasisBase<R>::Desc::P_ON_LOWER
+                : SPxBasisBase<R>::Desc::P_ON_UPPER;
             else
               return (theLP->maxObj(i) < 0)
-                ? SPxBasisBase<Real>::Desc::P_ON_LOWER
-                : SPxBasisBase<Real>::Desc::P_ON_UPPER;
+                ? SPxBasisBase<R>::Desc::P_ON_LOWER
+                : SPxBasisBase<R>::Desc::P_ON_UPPER;
           }
         else
-          return SPxBasisBase<Real>::Desc::P_ON_UPPER;
+          return SPxBasisBase<R>::Desc::P_ON_UPPER;
       }
     else if (theLP->lower(i) > R(-infinity))
-      return SPxBasisBase<Real>::Desc::P_ON_LOWER;
+      return SPxBasisBase<R>::Desc::P_ON_LOWER;
     else
-      return SPxBasisBase<Real>::Desc::P_FREE;
+      return SPxBasisBase<R>::Desc::P_FREE;
   }
 
 
   /* adapt basis and basis descriptor to added columns */
-  template <>
-  void SPxBasisBase<Real>::addedCols(int n)
+  template <class R>
+  void SPxBasisBase<R>::addedCols(int n)
   {
     assert(theLP != 0);
 
@@ -263,7 +263,7 @@ namespace soplex
       {
         reDim();
 
-        if (theLP->rep() == SPxSolverBase<Real>::ROW)
+        if (theLP->rep() == SPxSolverBase<R>::ROW)
           {
             /* after adding columns in row representation, reDim() should set these bools to false. */
             assert( !matrixIsSetup && !factorized );
@@ -271,12 +271,12 @@ namespace soplex
             for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
               {
                 thedesc.colStatus(i) = primalColStatus(i, theLP);
-                baseId(i) = theLP->SPxLP::cId(i);
+                baseId(i) = theLP->SPxLPBase<R>::cId(i);
               }
           }
         else
           {
-            assert(theLP->rep() == SPxSolverBase<Real>::COLUMN);
+            assert(theLP->rep() == SPxSolverBase<R>::COLUMN);
 
             for (int i = theLP->nCols() - n; i < theLP->nCols(); ++i)
               thedesc.colStatus(i) = primalColStatus(i, theLP);
@@ -284,8 +284,8 @@ namespace soplex
 
         /* If matrix was set up, load new basis vectors to the matrix
          * In the column case, the basis is not effected by adding columns. However,
-         * since @c matrix stores references to the columns in the LP (SPxLP), a realloc
-         * in SPxLP (e.g. due to space requirements) might invalidate these references.
+         * since @c matrix stores references to the columns in the LP (SPxLPBase<R>), a realloc
+         * in SPxLPBase<R> (e.g. due to space requirements) might invalidate these references.
          * We therefore have to "reload" the matrix if it is set up. Note that reDim()
          * leaves @c matrixIsSetup untouched if only columns have been added, since the
          * basis matrix already has the correct size. */
@@ -314,20 +314,20 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxBasisBase<Real>::removedCol(int i)
+  template <class R>
+  void SPxBasisBase<R>::removedCol(int i)
   {
     assert(status() > NO_PROBLEM);
     assert(theLP != 0);
 
-    if (theLP->rep() == SPxSolverBase<Real>::COLUMN)
+    if (theLP->rep() == SPxSolverBase<R>::COLUMN)
       {
         if (theLP->isBasic(thedesc.colStatus(i)))
           setStatus(NO_PROBLEM);
       }
     else
       {
-        assert(theLP->rep() == SPxSolverBase<Real>::ROW);
+        assert(theLP->rep() == SPxSolverBase<R>::ROW);
         factorized = false;
         if (!theLP->isBasic(thedesc.colStatus(i)))
           setStatus(NO_PROBLEM);
@@ -352,8 +352,8 @@ namespace soplex
     reDim();
   }
 
-  template <>
-  void SPxBasisBase<Real>::removedCols(const int perm[])
+  template <class R>
+  void SPxBasisBase<R>::removedCols(const int perm[])
   {
     assert(status() > NO_PROBLEM);
     assert(theLP != 0);
@@ -361,7 +361,7 @@ namespace soplex
     int i;
     int n = thedesc.nCols();
 
-    if (theLP->rep() == SPxSolverBase<Real>::COLUMN)
+    if (theLP->rep() == SPxSolverBase<R>::COLUMN)
       {
         for (i = 0; i < n; ++i)
           {
@@ -376,7 +376,7 @@ namespace soplex
       }
     else
       {
-        assert(theLP->rep() == SPxSolverBase<Real>::ROW);
+        assert(theLP->rep() == SPxSolverBase<R>::ROW);
         factorized = matrixIsSetup = false;
         for (i = 0; i < n; ++i)
           {
@@ -400,8 +400,8 @@ namespace soplex
   /**
    * mark the basis as not factorized
    */
-  template <>
-  void SPxBasisBase<Real>::invalidate()
+  template <class R>
+  void SPxBasisBase<R>::invalidate()
   {
     if( factorized || matrixIsSetup )
       {
@@ -414,21 +414,21 @@ namespace soplex
 
   /**
    * Create the initial slack basis descriptor and set up the basis matrix accordingly.
-   * This code has been adapted from SPxBasisBase<Real>::addedRows() and SPxBasisBase<Real>::addedCols().
+   * This code has been adapted from SPxBasisBase<R>::addedRows() and SPxBasisBase<R>::addedCols().
    */
-  template <>
-  void SPxBasisBase<Real>::restoreInitialBasis()
+  template <class R>
+  void SPxBasisBase<R>::restoreInitialBasis()
   {
     assert(!factorized);
 
     MSG_INFO3( (*this->spxout), (*this->spxout) << "ICHBAS10 setup slack basis" << std::endl; )
 
-      if (theLP->rep() == SPxSolverBase<Real>::COLUMN)
+      if (theLP->rep() == SPxSolverBase<R>::COLUMN)
         {
           for (int i = 0; i < theLP->nRows(); ++i)
             {
               thedesc.rowStatus(i) = dualRowStatus(i);
-              baseId(i) = theLP->SPxLP::rId(i);
+              baseId(i) = theLP->SPxLPBase<R>::rId(i);
             }
 
           for (int i = 0; i < theLP->nCols(); ++i)
@@ -436,7 +436,7 @@ namespace soplex
         }
       else
         {
-          assert(theLP->rep() == SPxSolverBase<Real>::ROW);
+          assert(theLP->rep() == SPxSolverBase<R>::ROW);
 
           for (int i = 0; i < theLP->nRows(); ++i)
             thedesc.rowStatus(i) = dualRowStatus(i);
@@ -444,7 +444,7 @@ namespace soplex
           for (int i = 0; i < theLP->nCols(); ++i)
             {
               thedesc.colStatus(i) = primalColStatus(i, theLP);
-              baseId(i) = theLP->SPxLP::cId(i);
+              baseId(i) = theLP->SPxLPBase<R>::cId(i);
             }
         }
 
@@ -470,8 +470,8 @@ namespace soplex
 
   /**@todo is this correctly implemented?
    */
-  template <>
-  void SPxBasisBase<Real>::changedRow(int /*row*/)
+  template <class R>
+  void SPxBasisBase<R>::changedRow(int /*row*/)
   {
     invalidate();
     restoreInitialBasis();
@@ -479,8 +479,8 @@ namespace soplex
 
   /**@todo is this correctly implemented?
    */
-  template <>
-  void SPxBasisBase<Real>::changedCol(int /*col*/)
+  template <class R>
+  void SPxBasisBase<R>::changedCol(int /*col*/)
   {
     invalidate();
     restoreInitialBasis();
@@ -488,8 +488,8 @@ namespace soplex
 
   /**@todo is this correctly implemented?
    */
-  template <>
-  void SPxBasisBase<Real>::changedElement(int /*row*/, int /*col*/)
+  template <class R>
+  void SPxBasisBase<R>::changedElement(int /*row*/, int /*col*/)
   {
     invalidate();
     restoreInitialBasis();

@@ -1752,7 +1752,7 @@ bool Rational::isNextTo(const double& d)
    else
    {
       b = x;
-      a = (double)spxNextafter(double, double(-infinity));
+      a = (double)spxNextafter(b, double(-infinity));
    }
 
    // check if d equals the closer end of the intervall

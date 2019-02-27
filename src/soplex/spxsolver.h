@@ -2349,5 +2349,6 @@ namespace soplex
 #include "enter.hpp"
 #include "spxshift.hpp"
 #include "spxbounds.hpp"
+#include "spxchangebasis.hpp"
 
 #endif // _SPXSOLVER_H_
