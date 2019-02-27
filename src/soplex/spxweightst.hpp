@@ -30,12 +30,12 @@ namespace soplex
 
   // Signatures of functions to prevent the specialization after instantiation error
 
-  template <>
-  void SPxWeightST<Real>::setupWeights(SPxSolverBase<Real>& base);
+  template <class R>
+  void SPxWeightST<R>::setupWeights(SPxSolverBase<R>& base);
 
 
-  template <>
-  bool SPxWeightST<Real>::isConsistent() const
+  template <class R>
+  bool SPxWeightST<R>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     return rowWeight.isConsistent()
@@ -66,10 +66,10 @@ namespace soplex
     The following two functions set the status of |id| to primal or dual,
     respectively.
   */
-  template <>
-  void SPxWeightST<Real>::setPrimalStatus(
-                                       typename SPxBasisBase<Real>::Desc& desc,
-                                       const SPxSolverBase<Real>& base,
+  template <class R>
+  void SPxWeightST<R>::setPrimalStatus(
+                                       typename SPxBasisBase<R>::Desc& desc,
+                                       const SPxSolverBase<R>& base,
                                        const SPxId& id)
   {
     if (id.isSPxRowId())
@@ -79,50 +79,50 @@ namespace soplex
         if (base.rhs(n) >= R(infinity))
           {
             if (base.lhs(n) <= R(-infinity))
-              desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_FREE;
+              desc.rowStatus(n) = SPxBasisBase<R>::Desc::P_FREE;
             else
-              desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
+              desc.rowStatus(n) = SPxBasisBase<R>::Desc::P_ON_LOWER;
           }
         else
           {
             if (base.lhs(n) <= R(-infinity))
-              desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
+              desc.rowStatus(n) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             else if (base.lhs(n) >= base.rhs(n) - base.epsilon())
-              desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_FIXED;
+              desc.rowStatus(n) = SPxBasisBase<R>::Desc::P_FIXED;
             else if (rowRight[n])
-              desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
+              desc.rowStatus(n) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             else
-              desc.rowStatus(n) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
+              desc.rowStatus(n) = SPxBasisBase<R>::Desc::P_ON_LOWER;
           }
       }
     else
       {
         int n = base.number(SPxColId(id));
-        if (base.SPxLP::upper(n) >= R(infinity))
+        if (base.SPxLPBase<R>::upper(n) >= R(infinity))
           {
-            if (base.SPxLP::lower(n) <= R(-infinity))
-              desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_FREE;
+            if (base.SPxLPBase<R>::lower(n) <= R(-infinity))
+              desc.colStatus(n) = SPxBasisBase<R>::Desc::P_FREE;
             else
-              desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
+              desc.colStatus(n) = SPxBasisBase<R>::Desc::P_ON_LOWER;
           }
         else
           {
-            if (base.SPxLP::lower(n) <= R(-infinity))
-              desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
-            else if (base.SPxLP::lower(n) >= base.SPxLP::upper(n) - base.epsilon())
-              desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_FIXED;
+            if (base.SPxLPBase<R>::lower(n) <= R(-infinity))
+              desc.colStatus(n) = SPxBasisBase<R>::Desc::P_ON_UPPER;
+            else if (base.SPxLPBase<R>::lower(n) >= base.SPxLPBase<R>::upper(n) - base.epsilon())
+              desc.colStatus(n) = SPxBasisBase<R>::Desc::P_FIXED;
             else if (colUp[n])
-              desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
+              desc.colStatus(n) = SPxBasisBase<R>::Desc::P_ON_UPPER;
             else
-              desc.colStatus(n) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
+              desc.colStatus(n) = SPxBasisBase<R>::Desc::P_ON_LOWER;
           }
       }
   }
 
   // ----------------------------------------------------------------
   static void setDualStatus(
-                            typename SPxBasisBase<Real>::Desc& desc,
-                            const SPxSolverBase<Real>& base,
+                            typename SPxBasisBase<R>::Desc& desc,
+                            const SPxSolverBase<R>& base,
                             const SPxId& id)
   {
     if (id.isSPxRowId())
@@ -145,10 +145,10 @@ namespace soplex
     /// constructor
     Compare() : weight( 0 ) {}
     //   const SPxSolverBase* base;     ///< the solver
-    const Real*      weight;   ///< the weights to compare
+    const R*      weight;   ///< the weights to compare
 
     /// compares the weights
-    Real operator()(int i1, int i2) const
+    R operator()(int i1, int i2) const
     {
       return weight[i1] - weight[i2];
     }
@@ -164,9 +164,9 @@ namespace soplex
   */
   static void initPrefs(
                         DataArray<SPxId>&      pref,
-                        const SPxSolverBase<Real>&       base,
-                        const DataArray<Real>& rowWeight,
-                        const DataArray<Real>& colWeight)
+                        const SPxSolverBase<R>&       base,
+                        const DataArray<R>& rowWeight,
+                        const DataArray<R>& colWeight)
   {
     DataArray<int> row(base.nRows());
     DataArray<int> col(base.nCols());
@@ -219,8 +219,8 @@ namespace soplex
   }
 
   // ----------------------------------------------------------------
-  template <>
-  void SPxWeightST<Real>::generate(SPxSolverBase<Real>& base)
+  template <class R>
+  void SPxWeightST<R>::generate(SPxSolverBase<R>& base)
   {
     SPxId tmpId;
 
@@ -230,7 +230,7 @@ namespace soplex
     rowRight.reSize (base.nRows());
     colUp.reSize (base.nCols());
 
-    if (base.rep() == SPxSolverBase<Real>::COLUMN)
+    if (base.rep() == SPxSolverBase<R>::COLUMN)
       {
         weight   = &colWeight;
         coWeight = &rowWeight;
@@ -245,7 +245,7 @@ namespace soplex
 
     setupWeights(base);
 
-    typename SPxBasisBase<Real>::Desc desc(base);
+    typename SPxBasisBase<R>::Desc desc(base);
     //   desc.reSize(base.nRows(), base.nCols());
 
     DataArray < SPxId > pref(base.nRows() + base.nCols());
@@ -259,7 +259,7 @@ namespace soplex
     for(i = 0; i < base.dim(); ++i)
       forbidden[i] = 0;
 
-    if (base.rep() == SPxSolverBase<Real>::COLUMN)
+    if (base.rep() == SPxSolverBase<R>::COLUMN)
       {
         // in COLUMN rep we scan from beginning to end
         i      = 0;
@@ -273,12 +273,12 @@ namespace soplex
       }
 
     int  dim = base.dim();
-    Real maxEntry = 0;
+    R maxEntry = 0;
 
     for (; i >= 0 && i < pref.size(); i += stepi)
       {
         tmpId              = pref[i];
-        const SVector& vec = base.vector(tmpId);
+        const SVectorBase<R>& vec = base.vector(tmpId);
         sel                = -1;
 
         // column or row singleton ?
@@ -302,7 +302,7 @@ namespace soplex
             // find a stable index with a sparse row/column
             for (j = vec.size(); --j >= 0;)
               {
-                Real x = vec.value(j);
+                R x = vec.value(j);
                 int  k = vec.index(j);
                 int  nRowEntries = base.coVector(k).size();
 
@@ -327,14 +327,14 @@ namespace soplex
               forbidden[sel] = 2;
 
             // put current column/row into basis
-            if (base.rep() == SPxSolverBase<Real>::COLUMN)
+            if (base.rep() == SPxSolverBase<R>::COLUMN)
               setDualStatus(desc, base, pref[i]);
             else
               setPrimalStatus(desc, base, pref[i]);
 
             for (j = vec.size(); --j >= 0;)
               {
-                Real x = vec.value(j);
+                R x = vec.value(j);
                 int  k = vec.index(j);
 
                 if (!forbidden[k] && (x > EPS * maxEntry || -x > EPS * maxEntry))
@@ -347,7 +347,7 @@ namespace soplex
             if (--dim == 0)
               {
                 //@ for(++i; i < pref.size(); ++i)
-                if (base.rep() == SPxSolverBase<Real>::COLUMN)
+                if (base.rep() == SPxSolverBase<R>::COLUMN)
                   {
                     // set all remaining indeces to nonbasic status
                     for (i += stepi; i >= 0 && i < pref.size(); i += stepi)
@@ -375,7 +375,7 @@ namespace soplex
               }
           }
         // sel == -1
-        else if (base.rep() == SPxSolverBase<Real>::COLUMN)
+        else if (base.rep() == SPxSolverBase<R>::COLUMN)
           setPrimalStatus(desc, base, pref[i]);
         else
           setDualStatus(desc, base, pref[i]);
@@ -395,20 +395,20 @@ namespace soplex
     base.init();
 
     int changed = 0;
-    const Vector& pvec = base.pVec();
+    const VectorBase<R>& pvec = base.pVec();
     for (i = pvec.dim() - 1; i >= 0; --i)
       {
-        if (desc.colStatus(i) == SPxBasisBase<Real>::Desc::P_ON_UPPER
+        if (desc.colStatus(i) == SPxBasisBase<R>::Desc::P_ON_UPPER
             && base.lower(i) > R(-infinity) && pvec[i] > base.maxObj(i))
           {
             changed = 1;
-            desc.colStatus(i) = SPxBasisBase<Real>::Desc::P_ON_LOWER;
+            desc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_LOWER;
           }
-        else if (desc.colStatus(i) == SPxBasisBase<Real>::Desc::P_ON_LOWER
+        else if (desc.colStatus(i) == SPxBasisBase<R>::Desc::P_ON_LOWER
                  && base.upper(i) < R(infinity) && pvec[i] < base.maxObj(i))
           {
             changed = 1;
-            desc.colStatus(i) = SPxBasisBase<Real>::Desc::P_ON_UPPER;
+            desc.colStatus(i) = SPxBasisBase<R>::Desc::P_ON_UPPER;
           }
       }
 
@@ -426,18 +426,18 @@ namespace soplex
 
   /* Computation of Weights
    */
-  template <>
-  void SPxWeightST<Real>::setupWeights(SPxSolverBase<Real>& base)
+  template <class R>
+  void SPxWeightST<R>::setupWeights(SPxSolverBase<R>& base)
   {
-    const Vector& obj  = base.maxObj();
-    const Vector& low  = base.lower();
-    const Vector& up   = base.upper();
-    const Vector& rhs  = base.rhs();
-    const Vector& lhs  = base.lhs();
+    const VectorBase<R>& obj  = base.maxObj();
+    const VectorBase<R>& low  = base.lower();
+    const VectorBase<R>& up   = base.upper();
+    const VectorBase<R>& rhs  = base.rhs();
+    const VectorBase<R>& lhs  = base.lhs();
     int    i;
 
-    Real eps    = base.epsilon();
-    Real maxabs = 1.0;
+    R eps    = base.epsilon();
+    R maxabs = 1.0;
 
     // find absolut biggest entry in bounds and left-/right hand side
     for (i = 0; i < base.nCols(); i++)
@@ -468,24 +468,24 @@ namespace soplex
      */
     if (base.rep() * base.type() > 0)            // primal simplex
       {
-        const Real ax            = 1e-3 / obj.maxAbs();
-        const Real bx            = 1.0 / maxabs;
-        const Real nne           = ax / base.nRows();  // 1e-4 * ax;
-        const Real c_fixed       = 1e+5;
-        const Real r_fixed       = 0; // TK20010103: was 1e+4 (maros-r7)
-        const Real c_dbl_bounded = 1e+1;
-        const Real r_dbl_bounded = 0;
-        const Real c_bounded     = 1e+1;
-        const Real r_bounded     = 0;
-        const Real c_free        = -1e+4;
-        const Real r_free        = -1e+5;
+        const R ax            = 1e-3 / obj.maxAbs();
+        const R bx            = 1.0 / maxabs;
+        const R nne           = ax / base.nRows();  // 1e-4 * ax;
+        const R c_fixed       = 1e+5;
+        const R r_fixed       = 0; // TK20010103: was 1e+4 (maros-r7)
+        const R c_dbl_bounded = 1e+1;
+        const R r_dbl_bounded = 0;
+        const R c_bounded     = 1e+1;
+        const R r_bounded     = 0;
+        const R c_free        = -1e+4;
+        const R r_free        = -1e+5;
 
         for (i = base.nCols() - 1; i >= 0; i--)
           {
-            Real n = nne * (base.colVector(i).size() - 1); // very small value that is zero for col singletons
-            Real x = ax * obj[i]; // this is at most 1e-3, probably a lot smaller
-            Real u = bx * up [i]; // this is at most 1, probably a lot smaller
-            Real l = bx * low[i]; // this is at most 1, probably a lot smaller
+            R n = nne * (base.colVector(i).size() - 1); // very small value that is zero for col singletons
+            R x = ax * obj[i]; // this is at most 1e-3, probably a lot smaller
+            R u = bx * up [i]; // this is at most 1, probably a lot smaller
+            R l = bx * low[i]; // this is at most 1, probably a lot smaller
 
             if (up[i] < R(infinity))
               {
@@ -539,8 +539,8 @@ namespace soplex
                   }
                 else if (lhs[i] > R(-infinity))
                   {
-                    Real u = bx * rhs[i];
-                    Real l = bx * lhs[i];
+                    R u = bx * rhs[i];
+                    R l = bx * lhs[i];
 
                     rowWeight[i] = r_dbl_bounded + l - u;
                     rowRight[i]  = spxAbs(u) < spxAbs(l);
@@ -569,24 +569,24 @@ namespace soplex
       {
         assert(base.rep() * base.type() < 0);           // dual simplex
 
-        const Real ax            = 1.0  / obj.maxAbs();
-        const Real bx            = 1e-2 / maxabs;
-        const Real nne           = 1e-4 * bx;
-        const Real c_fixed       = 1e+5;
-        const Real r_fixed       = 1e+4;
-        const Real c_dbl_bounded = 1;
-        const Real r_dbl_bounded = 0;
-        const Real c_bounded     = 0;
-        const Real r_bounded     = 0;
-        const Real c_free        = -1e+4;
-        const Real r_free        = -1e+5;
+        const R ax            = 1.0  / obj.maxAbs();
+        const R bx            = 1e-2 / maxabs;
+        const R nne           = 1e-4 * bx;
+        const R c_fixed       = 1e+5;
+        const R r_fixed       = 1e+4;
+        const R c_dbl_bounded = 1;
+        const R r_dbl_bounded = 0;
+        const R c_bounded     = 0;
+        const R r_bounded     = 0;
+        const R c_free        = -1e+4;
+        const R r_free        = -1e+5;
 
         for (i = base.nCols() - 1; i >= 0; i--)
           {
-            Real n = nne * (base.colVector(i).size() - 1);
-            Real x = ax  * obj[i];
-            Real u = bx  * up [i];
-            Real l = bx  * low[i];
+            R n = nne * (base.colVector(i).size() - 1);
+            R x = ax  * obj[i];
+            R u = bx  * up [i];
+            R l = bx  * low[i];
 
             if (up[i] < R(infinity))
               {
@@ -625,11 +625,11 @@ namespace soplex
 
         for (i = base.nRows() - 1; i >= 0; i--)
           {
-            const Real len1 = 1; // (base.rowVector(i).length() + base.epsilon());
-            Real n    = 0;  // nne * (base.rowVector(i).size() - 1);
-            Real u    = bx * len1 * rhs[i];
-            Real l    = bx * len1 * lhs[i];
-            Real x    = ax * len1 * (obj * base.rowVector(i));
+            const R len1 = 1; // (base.rowVector(i).length() + base.epsilon());
+            R n    = 0;  // nne * (base.rowVector(i).size() - 1);
+            R u    = bx * len1 * rhs[i];
+            R l    = bx * len1 * lhs[i];
+            R x    = ax * len1 * (obj * base.rowVector(i));
 
             if (rhs[i] < R(infinity))
               {

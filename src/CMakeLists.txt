@@ -27,8 +27,6 @@ set(sources
     soplex/spxstarter.cpp
     soplex/spxsumst.cpp
     soplex/spxvectorst.cpp
-    soplex/spxweightpr.cpp
-    soplex/spxweightst.cpp
     soplex/spxwritestate.cpp
     soplex/statistics.cpp
     soplex/testsoplex.cpp

@@ -64,9 +64,9 @@ private:
    ///
    DataArray < int > forbidden;
    ///
-   DataArray < Real > * weight;
+   DataArray < R > * weight;
    ///
-   DataArray < Real > * coWeight;
+   DataArray < R > * coWeight;
    //@}
 
    //-----------------------------------
@@ -82,9 +82,9 @@ protected:
    /**@name Protected data */
    //@{
    /// weight value for LP rows.
-   DataArray < Real > rowWeight;
+   DataArray < R > rowWeight;
    /// weight value for LP columns.
-   DataArray < Real > colWeight;
+   DataArray < R > colWeight;
    /// set variable to rhs?.
    DataArray < bool > rowRight;
    /// set primal variable to upper bound.
@@ -202,4 +202,8 @@ public:
 };
 
 } // namespace soplex
+
+// For general templated functions
+#include "spxweightst.hpp"
+
 #endif // _SPXWEIGHTST_H_
