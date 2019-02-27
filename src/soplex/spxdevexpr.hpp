@@ -107,14 +107,16 @@ namespace soplex
       }
   }
 
+  // A namespace to avoid collision with other pricers
+  namespace devexpr{
   template <class R>
-  R inline computePrice(R viol, R weight, R tol)
+  R computePrice(R viol, R weight, R tol)
   {
     if( weight < tol )
       return viol * viol / tol;
     else
       return viol * viol / weight;
-  }
+  }}
 
   template <class R>
   int SPxDevexPR<R>::buildBestPriceVectorLeave( R feastol )
@@ -139,7 +141,7 @@ namespace soplex
           {
             this->thesolver->isInfeasible[idx] = this->VIOLATED;
             price.idx = idx;
-            price.val = computePrice(fTesti, cpen[idx], feastol);
+            price.val = devexpr::computePrice(fTesti, cpen[idx], feastol);
             prices.append(price);
           }
       }
@@ -208,7 +210,7 @@ namespace soplex
       {
         if (fTest[start] < -feastol)
           {
-            x = computePrice(fTest[start], cpen[start], feastol);
+            x = devexpr::computePrice(fTest[start], cpen[start], feastol);
             if (x > best)
               {
                 best = x;
@@ -237,7 +239,7 @@ namespace soplex
         x = fTest[idx];
         if (x < -feastol)
           {
-            x = computePrice(x, cpen[idx], feastol);
+            x = devexpr::computePrice(x, cpen[idx], feastol);
             if (x > best)
               {
                 best = x;
@@ -274,7 +276,7 @@ namespace soplex
         x = fTest[idx];
         if( x < -feastol )
           {
-            x = computePrice(x, cpen[idx], feastol);
+            x = devexpr::computePrice(x, cpen[idx], feastol);
             if( x > best )
               {
                 best = x;
@@ -308,7 +310,7 @@ namespace soplex
           {
             x = fTest[idx];
             assert(x < -feastol);
-            x = computePrice(x, cpen[idx], feastol);
+            x = devexpr::computePrice(x, cpen[idx], feastol);
             if( x > leastBest )
               {
                 if( x > best )
@@ -383,7 +385,7 @@ namespace soplex
           {
             this->thesolver->isInfeasible[idx] = this->VIOLATED;
             price.idx = idx;
-            price.val = computePrice(x, cpen[idx], feastol);
+            price.val = devexpr::computePrice(x, cpen[idx], feastol);
             prices.append(price);
           }
         else
@@ -434,7 +436,7 @@ namespace soplex
           {
             this->thesolver->isInfeasibleCo[idx] = this->VIOLATED;
             price.idx = idx;
-            price.val = computePrice(x, pen[idx], feastol);
+            price.val = devexpr::computePrice(x, pen[idx], feastol);
             pricesCo.append(price);
           }
         else
@@ -541,7 +543,7 @@ namespace soplex
         x = cTest[idx];
         if( x < -feastol )
           {
-            x = computePrice(x, cpen[idx], feastol);
+            x = devexpr::computePrice(x, cpen[idx], feastol);
             if( x > best )
               {
                 best = x;
@@ -575,7 +577,7 @@ namespace soplex
             x = cTest[idx];
             if( x < -feastol )
               {
-                x = computePrice(x, cpen[idx], feastol);
+                x = devexpr::computePrice(x, cpen[idx], feastol);
                 if(x > leastBest)
                   {
                     if( x > best )
@@ -619,7 +621,7 @@ namespace soplex
         x = test[idx];
         if( x < -feastol )
           {
-            x = computePrice(x, pen[idx], feastol);
+            x = devexpr::computePrice(x, pen[idx], feastol);
             if( x > best )
               {
                 best = x;
@@ -652,7 +654,7 @@ namespace soplex
             x = test[idx];
             if( x < -feastol )
               {
-                x = computePrice(x, pen[idx], feastol);
+                x = devexpr::computePrice(x, pen[idx], feastol);
                 if( x > leastBest )
                   {
                     if( x > best )
@@ -696,7 +698,7 @@ namespace soplex
         x = cTest[idx];
         if( x < -feastol )
           {
-            x = computePrice(x, cpen[idx], feastol);
+            x = devexpr::computePrice(x, cpen[idx], feastol);
             if (x > best)
               {
                 best = x;
@@ -733,7 +735,7 @@ namespace soplex
         x = test[idx];
         if (x < -feastol)
           {
-            x = computePrice(x, pen[idx], feastol);
+            x = devexpr::computePrice(x, pen[idx], feastol);
             if (x > best)
               {
                 best = x;
@@ -770,7 +772,7 @@ namespace soplex
         x = cTest[start];
         if( x < -feastol )
           {
-            x = computePrice(x, cpen[start], feastol);
+            x = devexpr::computePrice(x, cpen[start], feastol);
             if (x > best)
               {
                 best = x;
@@ -801,7 +803,7 @@ namespace soplex
         x = test[start];
         if (test[start] < -feastol)
           {
-            x = computePrice(x, pen[start], feastol);
+            x = devexpr::computePrice(x, pen[start], feastol);
             if (x > best)
               {
                 best = x;

@@ -27,44 +27,6 @@
 
 namespace soplex
 {
-  template <class R>
-  void SPxSteepPR<R>::setupWeights(typename SPxSolverBase<R>::Type type);
-
-  template <class R>
-  int SPxSteepPR<R>::selectLeaveX(R tol);
-
-  template <class R>
-  bool SPxSteepPR<R>::isConsistent() const;
-
-  template <class R>
-  int SPxSteepPR<R>::selectLeaveSparse(R tol);
-
-  template <class R>
-  int SPxSteepPR<R>::selectLeaveHyper(R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterX(R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterHyperDim(R& best, R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterHyperCoDim(R& best, R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterSparseDim(R& best, R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterSparseCoDim(R& best, R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterDenseDim(R& best, R tol);
-
-  template <class R>
-  SPxId SPxSteepPR<R>::selectEnterDenseCoDim(R& best, R tol);
-
-
-
   // #define EQ_PREF 1000
 
   template <class R>
@@ -217,10 +179,10 @@ namespace soplex
         R        beta_q        = this->thesolver->coPvec().delta().length2() * rhov_1 * rhov_1;
 
 #ifndef NDEBUG
-        if (spxAbs(rhoVec[n]) < theeps * 0.5)
+        if (spxAbs(rhoVec[n]) < this->theeps * 0.5)
           {
             MSG_INFO3( (*this->thesolver->spxout), (*this->thesolver->spxout) << "WSTEEP04: rhoVec = "
-                       << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*theeps << std::endl; )
+                       << rhoVec[n] << " with smaller absolute value than 0.5*theeps = " << 0.5*this->theeps << std::endl; )
               }
 #endif
 
@@ -241,12 +203,16 @@ namespace soplex
       }
   }
 
-  R inline computePrice(R viol, R weight, R tol)
+
+  namespace steeppr{
+  template <class R>
+  R computePrice(R viol, R weight, R tol)
   {
     if( weight < tol )
       return viol * viol / tol;
     else
       return viol * viol / weight;
+  }
   }
 
   template <class R>
@@ -270,7 +236,7 @@ namespace soplex
           {
             // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
             this->thesolver->isInfeasible[idx] = this->VIOLATED;
-            price.val = computePrice(x, cpen[idx], feastol);
+            price.val = steeppr::computePrice(x, cpen[idx], feastol);
             price.idx = idx;
             prices.append(price);
           }
@@ -354,7 +320,7 @@ namespace soplex
 
         if (x < -tol)
           {
-            x = computePrice(x, coWeights_ptr[i], tol);
+            x = steeppr::computePrice(x, coWeights_ptr[i], tol);
 
             if (x > best)
               {
@@ -384,7 +350,7 @@ namespace soplex
 
         if (x < -tol)
           {
-            x = computePrice(x, coWeights_ptr[idx], tol);
+            x = steeppr::computePrice(x, coWeights_ptr[idx], tol);
 
             if (x > best)
               {
@@ -422,7 +388,7 @@ namespace soplex
         if( x < -tol )
           {
             assert(this->thesolver->isInfeasible[idx] == this->VIOLATED || this->thesolver->isInfeasible[idx] == this->VIOLATED_AND_CHECKED);
-            x = computePrice(x, coPen[idx], tol);
+            x = steeppr::computePrice(x, coPen[idx], tol);
 
             if( x > best )
               {
@@ -455,7 +421,7 @@ namespace soplex
           {
             x = fTest[idx];
             assert(x < -tol);
-            x = computePrice(x, coPen[idx], tol);
+            x = steeppr::computePrice(x, coPen[idx], tol);
 
             if( x > leastBest )
               {
@@ -562,7 +528,7 @@ namespace soplex
           {
             // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
             this->thesolver->isInfeasible[idx] = this->VIOLATED;
-            price.val = computePrice(x, coWeights_ptr[idx], feastol);
+            price.val = steeppr::computePrice(x, coWeights_ptr[idx], feastol);
             price.idx = idx;
             prices.append(price);
           }
@@ -615,8 +581,8 @@ namespace soplex
         if ( x < -feastol)
           {
             // it might happen that we call the pricer with a tighter tolerance than what was used when computing the violations
-            thesolver->isInfeasibleCo[idx] = this->VIOLATED;
-            price.val = computePrice(x, weights_ptr[idx], feastol);
+            this->thesolver->isInfeasibleCo[idx] = this->VIOLATED;
+            price.val = steeppr::computePrice(x, weights_ptr[idx], feastol);
             price.idx = idx;
             pricesCo.append(price);
           }
@@ -651,7 +617,7 @@ namespace soplex
   template <class R>
   SPxId SPxSteepPR<R>::selectEnter()
   {
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     SPxId enterId;
 
     enterId = selectEnterX(this->theeps);
@@ -734,7 +700,7 @@ namespace soplex
         x = coTest[idx];
         if( x < -tol )
           {
-            x = computePrice(x, coWeights_ptr[idx], tol);
+            x = steeppr::computePrice(x, coWeights_ptr[idx], tol);
             if( x > best )
               {
                 best = x;
@@ -767,7 +733,7 @@ namespace soplex
             x = coTest[idx];
             if( x < -tol )
               {
-                x = computePrice(x, coWeights_ptr[idx], tol);
+                x = steeppr::computePrice(x, coWeights_ptr[idx], tol);
                 if( x > leastBest )
                   {
                     if (x > best)
@@ -812,7 +778,7 @@ namespace soplex
         x = test[idx];
         if( x < -tol )
           {
-            x = computePrice(x, weights_ptr[idx], tol);
+            x = steeppr::computePrice(x, weights_ptr[idx], tol);
             if( x > best )
               {
                 best = x;
@@ -845,7 +811,7 @@ namespace soplex
             x = test[idx];
             if( x < -tol )
               {
-                x = computePrice(x, weights_ptr[idx], tol);
+                x = steeppr::computePrice(x, weights_ptr[idx], tol);
                 if( x > leastBest )
                   {
                     if (x > best)
@@ -889,7 +855,7 @@ namespace soplex
 
         if (x < -tol)
           {
-            x = computePrice(x, coWeights_ptr[idx], tol);
+            x = steeppr::computePrice(x, coWeights_ptr[idx], tol);
             if (x > best)
               {
                 best = x;
@@ -922,7 +888,7 @@ namespace soplex
 
         if (x < -tol)
           {
-            x = computePrice(x, weights_ptr[idx], tol);
+            x = steeppr::computePrice(x, weights_ptr[idx], tol);
             if (x > best)
               {
                 best   = x;
@@ -952,7 +918,7 @@ namespace soplex
         x = coTest[i];
         if (x < -tol)
           {
-            x = computePrice(x, coWeights_ptr[i], tol);
+            x = steeppr::computePrice(x, coWeights_ptr[i], tol);
             if (x > best)
               {
                 best = x;
@@ -977,7 +943,7 @@ namespace soplex
         x = test[i];
         if (x < -tol)
           {
-            x = computePrice(x, weights_ptr[i], tol);
+            x = steeppr::computePrice(x, weights_ptr[i], tol);
             if (x > best)
               {
                 best   = x;
@@ -1017,7 +983,7 @@ namespace soplex
   template <class R>
   void SPxSteepPR<R>::removedVec(int i)
   {
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     DVectorBase<R>& weights = this->thesolver->weights;
     weights[i] = weights[weights.dim()];
     weights.reDim(this->thesolver->coDim());
@@ -1026,7 +992,7 @@ namespace soplex
   template <class R>
   void SPxSteepPR<R>::removedVecs(const int perm[])
   {
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     DVectorBase<R>& weights = this->thesolver->weights;
     if (this->thesolver->type() == SPxSolverBase<R>::ENTER)
       {
@@ -1044,7 +1010,7 @@ namespace soplex
   template <class R>
   void SPxSteepPR<R>::removedCoVec(int i)
   {
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     DVectorBase<R>& coWeights = this->thesolver->coWeights;
     coWeights[i] = coWeights[coWeights.dim()];
     coWeights.reDim(this->thesolver->dim());
@@ -1053,7 +1019,7 @@ namespace soplex
   template <class R>
   void SPxSteepPR<R>::removedCoVecs(const int perm[])
   {
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     DVectorBase<R>& coWeights = this->thesolver->coWeights;
     int i;
     int j = coWeights.dim();
@@ -1071,7 +1037,7 @@ namespace soplex
 #ifdef ENABLE_CONSISTENCY_CHECKS
     DVectorBase<R>& w = this->thesolver->weights;
     DVectorBase<R>& coW = this->thesolver->coWeights;
-    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
+    if (this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
       {
         int i;
         SSVectorBase<R>  tmp(this->thesolver->dim(), this->thesolver->epsilon());
@@ -1087,7 +1053,7 @@ namespace soplex
           }
       }
 
-    if (thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::ENTER)
+    if (this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::ENTER)
       {
         int i;
         for (i = this->thesolver->dim() - 1; i >= 0; --i)
