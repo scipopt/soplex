@@ -1929,7 +1929,7 @@ static void LPFwriteRow(
    LPFwriteSVector(p_lp, p_output, p_cnames, p_svec, spxout);
 
    long long sidelen;
-   sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(R(-infinity))) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
+   sidelen = (p_lhs == p_rhs || R(p_lhs) <= R(-infinity)) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
 
    // insert a line break if max line length is in danger of being exceeded
    if( (long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN )
@@ -1945,11 +1945,11 @@ static void LPFwriteRow(
    // write bound value
    if( p_lhs == p_rhs )
       p_output << " = " << p_rhs;
-   else if( double(p_lhs) <= double(R(-infinity)) )
+   else if( R(p_lhs) <= R(-infinity) )
       p_output << " <= " << p_rhs;
    else
    {
-      assert(double(p_rhs) >= double(R(infinity)));
+      assert(R(p_rhs) >= R(infinity));
       p_output << " >= " << p_lhs;
    }
 
@@ -1982,7 +1982,7 @@ static void LPFwriteRows(
       const Rational lhs = p_lp.lhs(i);
       const Rational rhs = p_lp.rhs(i);
 
-      if( double(lhs) > -double(R(infinity)) && double(rhs) < double(R(infinity)) && lhs != rhs )
+      if( R(lhs) > R(-infinity) && R(rhs) < R(infinity) && lhs != rhs )
       {
          // ranged row -> write two non-ranged rows
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_1 : ";
@@ -2027,9 +2027,9 @@ static void LPFwriteBounds(
       {
          p_output << "  "   << getColName(p_lp, j, p_cnames, name) << " = "  << upper << '\n';
       }
-      else if( double(lower) > -double(R(infinity)) )
+      else if( R(lower) > R(-infinity) )
       {
-         if( double(upper) < double(R(infinity)) )
+         if( R(upper) < R(infinity) )
          {
             // range bound
             if( lower != 0 )
@@ -2045,7 +2045,7 @@ static void LPFwriteBounds(
                      << getColName(p_lp, j, p_cnames, name)
                      << '\n';
       }
-      else if( double(upper) < double(R(infinity)) )
+      else if( R(upper) < R(infinity) )
          p_output << "   -Inf <= "
                   << getColName(p_lp, j, p_cnames, name)
                   << " <= " << upper << '\n';
@@ -2155,9 +2155,9 @@ static Rational MPSgetRHS(Rational left, Rational right)
 {
    Rational rhsval;
 
-   if( double(left) > -double(R(infinity)) ) /// This includes ranges
+   if( R(left) > R(-infinity) ) /// This includes ranges
       rhsval = left;
-   else if( double(right) <  double(R(infinity)) )
+   else if( R(right) <  R(infinity) )
       rhsval = right;
    else
       throw SPxInternalCodeException("XMPSWR01 This should never happen.");
@@ -2223,14 +2223,14 @@ void SPxLPBase<Rational>::writeMPS(
    {
       if( lhs(i) == rhs(i) )
          indicator = "E";
-      else if( (double(lhs(i)) > -double(R(infinity))) && (double(rhs(i)) < double(R(infinity))) )
+      else if( (R(lhs(i)) > R(-infinity)) && (R(rhs(i)) < R(infinity)) )
       {
          indicator = "E";
          has_ranges = true;
       }
-      else if( double(lhs(i)) > -double(R(infinity)) )
+      else if( R(lhs(i)) > R(-infinity) )
          indicator = "G";
-      else if( double(rhs(i)) <  double(R(infinity)) )
+      else if( R(rhs(i)) <  R(infinity) )
          indicator = "L";
       else
          throw SPxInternalCodeException("XMPSWR02 This should never happen.");
@@ -2321,7 +2321,7 @@ void SPxLPBase<Rational>::writeMPS(
 
       for( i = 0; i < nRows(); i++ )
       {
-         if( (double(lhs(i)) > -double(R(infinity))) && (double(rhs(i)) < double(R(infinity))) )
+         if( (R(lhs(i)) > R(-infinity)) && (R(rhs(i)) < R(infinity)) )
          {
             Rational range = rhs(i);
             range -= lhs(i);
@@ -2347,7 +2347,7 @@ void SPxLPBase<Rational>::writeMPS(
          continue;
       }
 
-      if( (double(lower(i)) <= double(R(-infinity))) && (double(upper(i)) >= double(R(infinity))) )
+      if( (R(lower(i)) <= R(-infinity)) && (R(upper(i)) >= R(infinity)) )
       {
          MPSwriteRecord(p_output, "FR", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
          continue;
@@ -2355,7 +2355,7 @@ void SPxLPBase<Rational>::writeMPS(
 
       if( lower(i) != 0 )
       {
-         if( double(lower(i)) > -double(R(infinity)) )
+         if( R(lower(i)) > R(-infinity) )
             MPSwriteRecord(p_output, "LO", "BOUND", spxout, getColName(*this, i, p_cnames, name1), lower(i));
          else
             MPSwriteRecord(p_output, "MI", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
@@ -2370,7 +2370,7 @@ void SPxLPBase<Rational>::writeMPS(
       else
       {
          // Continous variables have default upper bound R(infinity)
-         if( double(upper(i)) < double(R(infinity)) )
+         if( R(upper(i)) < R(infinity) )
             MPSwriteRecord(p_output, "UP", "BOUND", spxout, getColName(*this, i, p_cnames, name1), upper(i));
       }
    }

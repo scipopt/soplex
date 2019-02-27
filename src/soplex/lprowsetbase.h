@@ -226,9 +226,9 @@ public:
    /// Returns the inequalitiy type of the \p i 'th LPRowBase.
    typename LPRowBase<R>::Type type(int i) const
    {
-      if( rhs(i) >= double(R(infinity)) )
+      if( rhs(i) >= R(infinity) )
          return LPRowBase<R>::GREATER_EQUAL;
-      if( lhs(i) <= double(R(-infinity)) )
+      if( lhs(i) <= R(-infinity) )
          return LPRowBase<R>::LESS_EQUAL;
       if( lhs(i) == rhs(i) )
          return LPRowBase<R>::EQUAL;
