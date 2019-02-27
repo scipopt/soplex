@@ -37,21 +37,21 @@ namespace soplex
    * basis selected to leave the basis. -1 indicates that no variable could be
    * selected. Otherwise, parameter \p val contains the chosen fVec.value().
    */
-  template <>
-  int SPxDefaultRT<Real>::selectLeave(Real& val, Real, bool)
+  template <class R>
+  int SPxDefaultRT<R>::selectLeave(R& val, R, bool)
   {
     this->solver()->fVec().delta().setup();
 
-    const Real*   vec = this->solver()->fVec().get_const_ptr();
-    const Real*   upd = this->solver()->fVec().delta().values();
+    const R*   vec = this->solver()->fVec().get_const_ptr();
+    const R*   upd = this->solver()->fVec().delta().values();
     const IdxSet& idx = this->solver()->fVec().idx();
-    const Real*   ub  = this->solver()->ubBound().get_const_ptr();
-    const Real*   lb  = this->solver()->lbBound().get_const_ptr();
+    const R*   ub  = this->solver()->ubBound().get_const_ptr();
+    const R*   lb  = this->solver()->lbBound().get_const_ptr();
 
-    Real epsilon = this->solver()->epsilon();
+    R epsilon = this->solver()->epsilon();
     int  leave   = -1;
 
-    Real x;
+    R x;
     int  i;
     int  j;
 
@@ -68,7 +68,7 @@ namespace soplex
               {
                 if (ub[i] < R(infinity))
                   {
-                    Real y = (ub[i] - vec[i] + this->delta) / x;
+                    R y = (ub[i] - vec[i] + this->delta) / x;
 
                     if (y < val)
                       {
@@ -81,7 +81,7 @@ namespace soplex
               {
                 if (lb[i] > R(-infinity))
                   {
-                    Real y = (lb[i] - vec[i] - this->delta) / x;
+                    R y = (lb[i] - vec[i] - this->delta) / x;
 
                     if (y < val)
                       {
@@ -124,7 +124,7 @@ namespace soplex
               {
                 if (ub[i] < R(infinity))
                   {
-                    Real y = (ub[i] - vec[i] + this->delta) / x;
+                    R y = (ub[i] - vec[i] + this->delta) / x;
 
                     if (y > val)
                       {
@@ -137,7 +137,7 @@ namespace soplex
               {
                 if (lb[i] > R(-infinity))
                   {
-                    Real y = (lb[i] - vec[i] - this->delta) / x;
+                    R y = (lb[i] - vec[i] - this->delta) / x;
 
                     if (y > val)
                       {
@@ -173,33 +173,33 @@ namespace soplex
      Here comes the ratio test. It is assumed that theCoPvec.this->delta() and
      theCoPvec.idx() have been setup correctly!
   */
-  template <>
-  SPxId SPxDefaultRT<Real>::selectEnter(Real& max, int, bool)
+  template <class R>
+  SPxId SPxDefaultRT<R>::selectEnter(R& max, int, bool)
   {
     this->solver()->coPvec().delta().setup();
     this->solver()->pVec().delta().setup();
 
-    const Real*   pvec = this->solver()->pVec().get_const_ptr();
-    const Real*   pupd = this->solver()->pVec().delta().values();
+    const R*   pvec = this->solver()->pVec().get_const_ptr();
+    const R*   pupd = this->solver()->pVec().delta().values();
     const IdxSet& pidx = this->solver()->pVec().idx();
-    const Real*   lpb  = this->solver()->lpBound().get_const_ptr();
-    const Real*   upb  = this->solver()->upBound().get_const_ptr();
+    const R*   lpb  = this->solver()->lpBound().get_const_ptr();
+    const R*   upb  = this->solver()->upBound().get_const_ptr();
 
-    const Real*   cvec = this->solver()->coPvec().get_const_ptr();
-    const Real*   cupd = this->solver()->coPvec().delta().values();
+    const R*   cvec = this->solver()->coPvec().get_const_ptr();
+    const R*   cupd = this->solver()->coPvec().delta().values();
     const IdxSet& cidx = this->solver()->coPvec().idx();
-    const Real*   lcb  = this->solver()->lcBound().get_const_ptr();
-    const Real*   ucb  = this->solver()->ucBound().get_const_ptr();
+    const R*   lcb  = this->solver()->lcBound().get_const_ptr();
+    const R*   ucb  = this->solver()->ucBound().get_const_ptr();
 
-    Real epsilon = this->solver()->epsilon();
-    Real val     = max;
+    R epsilon = this->solver()->epsilon();
+    R val     = max;
     int  pnum    = -1;
     int  cnum    = -1;
 
     SPxId enterId;
     int   i;
     int   j;
-    Real  x;
+    R  x;
 
     // PARALLEL the j loops could be parallelized
     if (val > 0)
@@ -213,7 +213,7 @@ namespace soplex
               {
                 if (upb[i] < R(infinity))
                   {
-                    Real y = (upb[i] - pvec[i] + this->delta) / x;
+                    R y = (upb[i] - pvec[i] + this->delta) / x;
 
                     if (y < val)
                       {
@@ -227,7 +227,7 @@ namespace soplex
               {
                 if (lpb[i] > R(-infinity))
                   {
-                    Real y = (lpb[i] - pvec[i] - this->delta) / x;
+                    R y = (lpb[i] - pvec[i] - this->delta) / x;
 
                     if (y < val)
                       {
@@ -247,7 +247,7 @@ namespace soplex
               {
                 if (ucb[i] < R(infinity))
                   {
-                    Real y = (ucb[i] - cvec[i] + this->delta) / x;
+                    R y = (ucb[i] - cvec[i] + this->delta) / x;
 
                     if (y < val)
                       {
@@ -261,7 +261,7 @@ namespace soplex
               {
                 if (lcb[i] > R(-infinity))
                   {
-                    Real y = (lcb[i] - cvec[i] - this->delta) / x;
+                    R y = (lcb[i] - cvec[i] - this->delta) / x;
 
                     if (y < val)
                       {
@@ -298,7 +298,7 @@ namespace soplex
               {
                 if (lpb[i] > R(-infinity))
                   {
-                    Real y = (lpb[i] - pvec[i] - this->delta) / x;
+                    R y = (lpb[i] - pvec[i] - this->delta) / x;
 
                     if (y > val)
                       {
@@ -312,7 +312,7 @@ namespace soplex
               {
                 if (upb[i] < R(infinity))
                   {
-                    Real y = (upb[i] - pvec[i] + this->delta) / x;
+                    R y = (upb[i] - pvec[i] + this->delta) / x;
 
                     if (y > val)
                       {
@@ -332,7 +332,7 @@ namespace soplex
               {
                 if (lcb[i] > R(-infinity))
                   {
-                    Real y = (lcb[i] - cvec[i] - this->delta) / x;
+                    R y = (lcb[i] - cvec[i] - this->delta) / x;
 
                     if (y > val)
                       {
@@ -346,7 +346,7 @@ namespace soplex
               {
                 if (ucb[i] < R(infinity))
                   {
-                    Real y = (ucb[i] - cvec[i] + this->delta) / x;
+                    R y = (ucb[i] - cvec[i] + this->delta) / x;
 
                     if (y > val)
                       {
@@ -381,7 +381,7 @@ namespace soplex
             this->solver()->coPvec().delta().clearNum(cnum);
           else if( pnum >= 0 )
             this->solver()->pVec().delta().clearNum(pnum);
-        return SPxDefaultRT<Real>::selectEnter(max, 0, false);
+        return SPxDefaultRT<R>::selectEnter(max, 0, false);
       }
 
     MSG_DEBUG(

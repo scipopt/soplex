@@ -13,7 +13,6 @@ set(sources
     soplex/solvereal.cpp
     soplex/spxautopr.cpp
     soplex/spxdantzigpr.cpp
-    soplex/spxdefaultrt.cpp
     soplex/spxdefines.cpp
     soplex/spxdesc.cpp
     soplex/spxfileio.cpp

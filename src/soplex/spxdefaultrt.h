@@ -85,4 +85,7 @@ public:
 };
 
 } // namespace soplex
+
+#include "spxdefaultrt.hpp"
+
 #endif // _SPXDEFAULTRT_H_
