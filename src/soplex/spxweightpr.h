@@ -47,17 +47,17 @@ namespace soplex
       /**@name Data */
       //@{
       /// column penalties
-      DVector cPenalty;
+      DVectorBase<R> cPenalty;
       /// row penalties
-      DVector rPenalty;
+      DVectorBase<R> rPenalty;
       /// penalties for leaving alg
-      DVector leavePenalty;
+      DVectorBase<R> leavePenalty;
       ///
-      const Real* penalty;
+      const R* penalty;
       ///
-      const Real* coPenalty;
+      const R* coPenalty;
       /// length of objective vector.
-      Real objlength;
+      R objlength;
       //@}
 
       //-------------------------------------
@@ -175,4 +175,8 @@ namespace soplex
       //@}
     };
 } // namespace soplex
+
+// For general templated functions
+#include "spxweightpr.hpp"
+
 #endif // _SPXWEIGHTPR_H_

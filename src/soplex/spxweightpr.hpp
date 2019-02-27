@@ -21,16 +21,16 @@
 
 namespace soplex
 {
-  template <>
-  void SPxWeightPR<Real>::computeLeavePenalty(int start, int end);
+  template <class R>
+  void SPxWeightPR<R>::computeLeavePenalty(int start, int end);
 
-  template <>
-  bool SPxWeightPR<Real>::isConsistent() const;
+  template <class R>
+  bool SPxWeightPR<R>::isConsistent() const;
 
-  template <>
-  void SPxWeightPR<Real>::setRep(typename SPxSolverBase<Real>::Representation rep)
+  template <class R>
+  void SPxWeightPR<R>::setRep(typename SPxSolverBase<R>::Representation rep)
   {
-    if (rep == SPxSolverBase<Real>::ROW)
+    if (rep == SPxSolverBase<R>::ROW)
       {
         penalty = rPenalty.get_const_ptr();
         coPenalty = cPenalty.get_const_ptr();
@@ -42,20 +42,20 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::setType(typename SPxSolverBase<Real>::Type tp)
+  template <class R>
+  void SPxWeightPR<R>::setType(typename SPxSolverBase<R>::Type tp)
   {
-    if (this->thesolver && tp == SPxSolverBase<Real>::LEAVE)
+    if (this->thesolver && tp == SPxSolverBase<R>::LEAVE)
       {
         leavePenalty.reDim( this->thesolver->dim() );
         computeLeavePenalty( 0, this->thesolver->dim() );
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::computeLeavePenalty(int start, int end)
+  template <class R>
+  void SPxWeightPR<R>::computeLeavePenalty(int start, int end)
   {
-    const SPxBasisBase<Real>& basis = this->solver()->basis();
+    const SPxBasisBase<R>& basis = this->solver()->basis();
 
     for (int i = start; i < end; ++i)
       {
@@ -67,8 +67,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::computeRP(int start, int end)
+  template <class R>
+  void SPxWeightPR<R>::computeRP(int start, int end)
   {
     for (int i = start; i < end; ++i)
       {
@@ -85,8 +85,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::computeCP(int start, int end)
+  template <class R>
+  void SPxWeightPR<R>::computeCP(int start, int end)
   {
     for (int i = start; i < end; ++i)
       {
@@ -95,8 +95,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::load(SPxSolverBase<Real>* base)
+  template <class R>
+  void SPxWeightPR<R>::load(SPxSolverBase<R>* base)
   {
     this->thesolver = base;
 
@@ -108,14 +108,14 @@ namespace soplex
     computeRP(0, base->nRows());
   }
 
-  template <>
-  int SPxWeightPR<Real>::selectLeave()
+  template <class R>
+  int SPxWeightPR<R>::selectLeave()
   {
-    const Real* test = this->thesolver->fTest().get_const_ptr();
-    Real type = 1 - 2 * (this->thesolver->rep() == SPxSolverBase<Real>::COLUMN ? 1 : 0);
-    Real best = type * R(infinity);
+    const R* test = this->thesolver->fTest().get_const_ptr();
+    R type = 1 - 2 * (this->thesolver->rep() == SPxSolverBase<R>::COLUMN ? 1 : 0);
+    R best = type * R(infinity);
     int lastIdx = -1;
-    Real x;
+    R x;
     int i;
 
     for (i = this->solver()->dim() - 1; i >= 0; --i)
@@ -135,17 +135,17 @@ namespace soplex
     return lastIdx;
   }
 
-  template <>
-  SPxId SPxWeightPR<Real>::selectEnter()
+  template <class R>
+  SPxId SPxWeightPR<R>::selectEnter()
   {
-    const Vector& rTest = (this->solver()->rep() == SPxSolverBase<Real>::ROW)
+    const VectorBase<R>& rTest = (this->solver()->rep() == SPxSolverBase<R>::ROW)
       ? this->solver()->test() : this->solver()->coTest();
-    const Vector& cTest = (this->solver()->rep() == SPxSolverBase<Real>::ROW)
+    const VectorBase<R>& cTest = (this->solver()->rep() == SPxSolverBase<R>::ROW)
       ? this->solver()->coTest() : this->solver()->test();
-    const typename SPxBasisBase<Real>::Desc& ds = this->solver()->basis().desc();
-    Real best = R(infinity);
+    const typename SPxBasisBase<R>::Desc& ds = this->solver()->basis().desc();
+    R best = R(infinity);
     SPxId lastId;
-    Real x;
+    R x;
     int i;
 
     for (i = this->solver()->nRows() - 1; i >= 0; --i)
@@ -156,25 +156,25 @@ namespace soplex
             x *= -x;
             switch (ds.rowStatus(i))
               {
-              case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-              case SPxBasisBase<Real>::Desc::D_ON_LOWER :
+              case SPxBasisBase<R>::Desc::P_ON_LOWER :
+              case SPxBasisBase<R>::Desc::D_ON_LOWER :
                 x *= 1 + rPenalty[i];
                 break;
-              case SPxBasisBase<Real>::Desc::P_ON_UPPER :
-              case SPxBasisBase<Real>::Desc::D_ON_UPPER :
+              case SPxBasisBase<R>::Desc::P_ON_UPPER :
+              case SPxBasisBase<R>::Desc::D_ON_UPPER :
                 x *= 1 - rPenalty[i];
                 break;
-              case SPxBasisBase<Real>::Desc::P_FREE :
-              case SPxBasisBase<Real>::Desc::D_FREE :
+              case SPxBasisBase<R>::Desc::P_FREE :
+              case SPxBasisBase<R>::Desc::D_FREE :
                 return SPxId(this->solver()->rId(i));
-              case SPxBasisBase<Real>::Desc::D_ON_BOTH :
+              case SPxBasisBase<R>::Desc::D_ON_BOTH :
                 if (this->solver()->pVec()[i] > this->solver()->upBound()[i])
                   x *= 1 + rPenalty[i];
                 else
                   x *= 1 - rPenalty[i];
                 break;
-              case SPxBasisBase<Real>::Desc::D_UNDEFINED :
-              case SPxBasisBase<Real>::Desc::P_FIXED :
+              case SPxBasisBase<R>::Desc::D_UNDEFINED :
+              case SPxBasisBase<R>::Desc::P_FIXED :
               default:
                 throw SPxInternalCodeException("XWGTPR01 This should never happen.");
               }
@@ -194,25 +194,25 @@ namespace soplex
             x *= -x;
             switch (ds.colStatus(i))
               {
-              case SPxBasisBase<Real>::Desc::P_ON_LOWER :
-              case SPxBasisBase<Real>::Desc::D_ON_LOWER :
+              case SPxBasisBase<R>::Desc::P_ON_LOWER :
+              case SPxBasisBase<R>::Desc::D_ON_LOWER :
                 x *= 1 + cPenalty[i];
                 break;
-              case SPxBasisBase<Real>::Desc::P_ON_UPPER :
-              case SPxBasisBase<Real>::Desc::D_ON_UPPER :
+              case SPxBasisBase<R>::Desc::P_ON_UPPER :
+              case SPxBasisBase<R>::Desc::D_ON_UPPER :
                 x *= 1 - cPenalty[i];
                 break;
-              case SPxBasisBase<Real>::Desc::P_FREE :
-              case SPxBasisBase<Real>::Desc::D_FREE :
+              case SPxBasisBase<R>::Desc::P_FREE :
+              case SPxBasisBase<R>::Desc::D_FREE :
                 return SPxId(this->solver()->cId(i));
-              case SPxBasisBase<Real>::Desc::D_ON_BOTH :
+              case SPxBasisBase<R>::Desc::D_ON_BOTH :
                 if (this->solver()->coPvec()[i] > this->solver()->ucBound()[i])
                   x *= 1 + cPenalty[i];
                 else
                   x *= 1 - cPenalty[i];
                 break;
-              case SPxBasisBase<Real>::Desc::P_FIXED :
-              case SPxBasisBase<Real>::Desc::D_UNDEFINED :
+              case SPxBasisBase<R>::Desc::P_FIXED :
+              case SPxBasisBase<R>::Desc::D_UNDEFINED :
               default:
                 throw SPxInternalCodeException("XWGTPR02 This should never happen.");
               }
@@ -227,10 +227,10 @@ namespace soplex
     return lastId;
   }
 
-  template <>
-  void SPxWeightPR<Real>::addedVecs(int)
+  template <class R>
+  void SPxWeightPR<R>::addedVecs(int)
   {
-    if (this->solver()->rep() == SPxSolverBase<Real>::ROW)
+    if (this->solver()->rep() == SPxSolverBase<R>::ROW)
       {
         int start = rPenalty.dim();
         rPenalty.reDim(this->solver()->nRows());
@@ -242,7 +242,7 @@ namespace soplex
         cPenalty.reDim(this->solver()->nCols());
         computeCP(start, this->solver()->nCols());
       }
-    if (this->solver()->type() == SPxSolverBase<Real>::LEAVE)
+    if (this->solver()->type() == SPxSolverBase<R>::LEAVE)
       {
         int start = leavePenalty.dim();
         leavePenalty.reDim( this->solver()->dim() );
@@ -250,10 +250,10 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::addedCoVecs(int)
+  template <class R>
+  void SPxWeightPR<R>::addedCoVecs(int)
   {
-    if (this->solver()->rep() == SPxSolverBase<Real>::COLUMN)
+    if (this->solver()->rep() == SPxSolverBase<R>::COLUMN)
       {
         int start = rPenalty.dim();
         rPenalty.reDim(this->solver()->nRows());
@@ -265,7 +265,7 @@ namespace soplex
         cPenalty.reDim(this->solver()->nCols());
         computeCP(start, this->solver()->nCols());
       }
-    if (this->solver()->type() == SPxSolverBase<Real>::LEAVE)
+    if (this->solver()->type() == SPxSolverBase<R>::LEAVE)
       {
         int start = leavePenalty.dim();
         leavePenalty.reDim( this->solver()->dim() );
@@ -273,12 +273,12 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::removedVec(int i)
+  template <class R>
+  void SPxWeightPR<R>::removedVec(int i)
   {
     assert(this->solver() != 0);
 
-    if (this->solver()->rep() == SPxSolverBase<Real>::ROW)
+    if (this->solver()->rep() == SPxSolverBase<R>::ROW)
       {
         rPenalty[i] = rPenalty[rPenalty.dim()];
         rPenalty.reDim(this->solver()->nRows());
@@ -290,12 +290,12 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::removedVecs(const int perm[])
+  template <class R>
+  void SPxWeightPR<R>::removedVecs(const int perm[])
   {
     assert(this->solver() != 0);
 
-    if (this->solver()->rep() == SPxSolverBase<Real>::ROW)
+    if (this->solver()->rep() == SPxSolverBase<R>::ROW)
       {
         int j = rPenalty.dim();
         for (int i = 0; i < j; ++i)
@@ -317,12 +317,12 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::removedCoVec(int i)
+  template <class R>
+  void SPxWeightPR<R>::removedCoVec(int i)
   {
     assert(this->solver() != 0);
 
-    if (this->solver()->rep() == SPxSolverBase<Real>::COLUMN)
+    if (this->solver()->rep() == SPxSolverBase<R>::COLUMN)
       {
         rPenalty[i] = rPenalty[rPenalty.dim()];
         rPenalty.reDim(this->solver()->nRows());
@@ -334,12 +334,12 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxWeightPR<Real>::removedCoVecs(const int perm[])
+  template <class R>
+  void SPxWeightPR<R>::removedCoVecs(const int perm[])
   {
     assert(this->solver() != 0);
 
-    if (this->solver()->rep() == SPxSolverBase<Real>::COLUMN)
+    if (this->solver()->rep() == SPxSolverBase<R>::COLUMN)
       {
         int j = rPenalty.dim();
         for (int i = 0; i < j; ++i)
@@ -361,8 +361,8 @@ namespace soplex
       }
   }
 
-  template <>
-  bool SPxWeightPR<Real>::isConsistent() const
+  template <class R>
+  bool SPxWeightPR<R>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     if (this->solver() != 0)
