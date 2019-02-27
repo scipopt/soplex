@@ -3159,7 +3159,7 @@ bool SoPlex::getDualFarkasReal(VectorReal& vector)
 /// gets violation of bounds; returns true on success
 bool SoPlex::getBoundViolationReal(Real& maxviol, Real& sumviol)
 {
-   if(!isPrimalFeasible())
+   if(!hasSol())
       return false;
 
    _syncRealSolution();
@@ -3202,7 +3202,7 @@ bool SoPlex::getBoundViolationReal(Real& maxviol, Real& sumviol)
 /// gets violation of constraints; returns true on success
 bool SoPlex::getRowViolationReal(Real& maxviol, Real& sumviol)
 {
-   if(!isPrimalFeasible())
+   if(!hasSol())
       return false;
 
    _syncRealSolution();
@@ -3248,7 +3248,7 @@ bool SoPlex::getRowViolationReal(Real& maxviol, Real& sumviol)
 /// gets violation of reduced costs; returns true on success
 bool SoPlex::getRedCostViolationReal(Real& maxviol, Real& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasSol() || !hasBasis())
       return false;
 
    _syncRealSolution();
@@ -3308,7 +3308,7 @@ bool SoPlex::getRedCostViolationReal(Real& maxviol, Real& sumviol)
 /// gets violation of dual multipliers; returns true on success
 bool SoPlex::getDualViolationReal(Real& maxviol, Real& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasSol() || !hasBasis())
       return false;
 
    _syncRealSolution();

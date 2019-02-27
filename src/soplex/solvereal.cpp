@@ -408,12 +408,6 @@ void SoPlex::_verifySolutionReal()
 {
    assert(_hasSolReal);
 
-   if(!_solReal._isPrimalFeasible && !_solReal._isDualFeasible)
-   {
-      _hasSolReal = false;
-      return;
-   }
-
    MSG_INFO1(spxout, spxout << " --- verifying computed solution" << std::endl;)
 
    Real sumviol = 0;
@@ -422,17 +416,11 @@ void SoPlex::_verifySolutionReal()
    Real dualviol = 0;
    Real redcostviol = 0;
 
-   if(_solReal._isPrimalFeasible)
-   {
-      (void) getBoundViolationReal(boundviol, sumviol);
-      (void) getRowViolationReal(rowviol, sumviol);
-   }
+   (void) getBoundViolationReal(boundviol, sumviol);
+   (void) getRowViolationReal(rowviol, sumviol);
 
-   if(_solReal._isDualFeasible)
-   {
-      (void) getDualViolationReal(dualviol, sumviol);
-      (void) getRedCostViolationReal(redcostviol, sumviol);
-   }
+   (void) getDualViolationReal(dualviol, sumviol);
+   (void) getRedCostViolationReal(redcostviol, sumviol);
 
    if(boundviol >= _solver.feastol() || rowviol >= _solver.feastol() || dualviol >= _solver.opttol()
          || redcostviol >= _solver.opttol())
