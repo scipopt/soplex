@@ -1376,7 +1376,7 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
                if( double(rset.rhs(idx)) < double(infinity) )
                   rset.rhs_w(idx) = val;
                // GE or EQ
-               if( double(rset.lhs(idx)) > double(-infinity)) )
+               if( double(rset.lhs(idx)) > double(-infinity) )
                   rset.lhs_w(idx) = val;
             }
          }
@@ -1444,11 +1444,11 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             }
 
             // EQ
-            if( (double(rset.lhs(idx)) > double(-infinity)) && (double(rset.rhs_w(idx)) < double(infinity)) )
+            if( (double(rset.lhs(idx)) > -double(infinity)) && (double(rset.rhs_w(idx)) < double(infinity)) )
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
-               if( R(val) >= 0 )
+               if( double(val) >= 0 )
                   rset.rhs_w(idx) += val;
                else
                   rset.lhs_w(idx) += val;
@@ -1456,7 +1456,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             else
             {
                // GE
-               if( R(rset.lhs(idx)) > -R(infinity) )
+               if( double(rset.lhs(idx)) > -double(infinity) )
                {
                   rset.rhs_w(idx) = rset.lhs(idx);
                   rset.rhs_w(idx) += spxAbs(val);
@@ -1482,11 +1482,11 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                }
 
                // EQ
-               if( (R(rset.lhs(idx)) > R(-infinity)) && (R(rset.rhs(idx)) <  R(infinity)) )
+               if( (double(rset.lhs(idx)) > -double(infinity)) && (double(rset.rhs(idx)) <  double(infinity)) )
                {
                   assert(rset.lhs(idx) == rset.rhs(idx));
 
-                  if( R(val) >= 0 )
+                  if( double(val) >= 0 )
                      rset.rhs_w(idx) += val;
                   else
                      rset.lhs_w(idx) += val;
@@ -1494,7 +1494,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
                else
                {
                   // GE
-                  if( R(rset.lhs(idx)) > R(-infinity) )
+                  if( double(rset.lhs(idx)) > -double(infinity) )
                   {
                      rset.rhs_w(idx) = rset.lhs(idx);
                      rset.rhs_w(idx) += spxAbs(val);
@@ -1573,9 +1573,9 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
             if( mps.field4() == 0 )
                val = 0;
             else if( !strcmp(mps.field4(), "-Inf") || !strcmp(mps.field4(), "-inf") )
-               val = R(-infinity);
+               val = -infinity;
             else if( !strcmp(mps.field4(), "Inf") || !strcmp(mps.field4(), "inf") || !strcmp(mps.field4(), "+Inf") || !strcmp(mps.field4(), "+inf") )
-               val = R(infinity);
+               val = infinity;
             else if( !val.readString(mps.field4()) )
             {
                MSG_WARNING( (*spxout), (*spxout) <<"WMPSRD07 Warning: malformed rational value in MPS file line " << mps.lineno() << ": " << mps.field4() << "\n" );
@@ -1590,10 +1590,10 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
                   intvars->addIdx(idx);
 
                // if the variable has appeared in the MARKER section of the COLUMNS section then its default bounds were
-               // set to 0,1; the first time it is declared integer we need to change to default bounds 0,R(infinity)
+               // set to 0,1; the first time it is declared integer we need to change to default bounds 0,infinity
                if( oldbinvars.pos(idx) < 0 )
                {
-                  cset.upper_w(idx) = R(infinity);
+                  cset.upper_w(idx) = infinity;
                   oldbinvars.addIdx(idx);
                }
             }
@@ -1614,15 +1614,15 @@ static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const Nam
                }
                else
                {
-                  cset.lower_w(idx) = R(-infinity);
-                  cset.upper_w(idx) = R(infinity);
+                  cset.lower_w(idx) = -infinity;
+                  cset.upper_w(idx) = infinity;
                }
                break;
             case 'M':
-               cset.lower_w(idx) = R(-infinity);
+               cset.lower_w(idx) = -infinity;
                break;
             case 'P':
-               cset.upper_w(idx) = R(infinity);
+               cset.upper_w(idx) = infinity;
                break;
                // Ilog extension (Binary)
             case 'B':
@@ -1929,7 +1929,7 @@ static void LPFwriteRow(
    LPFwriteSVector(p_lp, p_output, p_cnames, p_svec, spxout);
 
    long long sidelen;
-   sidelen = (p_lhs == p_rhs || R(p_lhs) <= R(-infinity)) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
+   sidelen = (p_lhs == p_rhs || double(p_lhs) <= double(-infinity)) ? (long long)rationalToString(p_rhs, false).length() : (long long)rationalToString(p_lhs, false).length();
 
    // insert a line break if max line length is in danger of being exceeded
    if( (long long)(p_output.tellp()) - pos + sidelen + (long long)100 > MAX_LINE_WRITE_LEN )
@@ -1945,11 +1945,11 @@ static void LPFwriteRow(
    // write bound value
    if( p_lhs == p_rhs )
       p_output << " = " << p_rhs;
-   else if( R(p_lhs) <= R(-infinity) )
+   else if( double(p_lhs) <= double(-infinity) )
       p_output << " <= " << p_rhs;
    else
    {
-      assert(R(p_rhs) >= R(infinity));
+      assert(double(p_rhs) >= double(infinity));
       p_output << " >= " << p_lhs;
    }
 
@@ -1982,14 +1982,14 @@ static void LPFwriteRows(
       const Rational lhs = p_lp.lhs(i);
       const Rational rhs = p_lp.rhs(i);
 
-      if( R(lhs) > R(-infinity) && R(rhs) < R(infinity) && lhs != rhs )
+      if( double(lhs) > -double(infinity) && double(rhs) < double(infinity) && lhs != rhs )
       {
          // ranged row -> write two non-ranged rows
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_1 : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, R(infinity), spxout);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), lhs, infinity, spxout);
 
          p_output << " " << LPFgetRowName(p_lp, i, p_rnames, name, i) << "_2 : ";
-         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), R(-infinity), rhs, spxout);
+         LPFwriteRow(p_lp, p_output, p_cnames, p_lp.rowVector(i), -infinity, rhs, spxout);
       }
       else
       {
@@ -2002,7 +2002,7 @@ static void LPFwriteRows(
 
 
 // write the variable bounds
-// (the default bounds 0 <= x <= R(infinity) are not written)
+// (the default bounds 0 <= x <= infinity are not written)
 static void LPFwriteBounds(
    const SPxLPBase<Rational>&   p_lp,       ///< the LP to write
    std::ostream&            p_output,   ///< output stream
@@ -2027,9 +2027,9 @@ static void LPFwriteBounds(
       {
          p_output << "  "   << getColName(p_lp, j, p_cnames, name) << " = "  << upper << '\n';
       }
-      else if( R(lower) > R(-infinity) )
+      else if( double(lower) > -double(infinity) )
       {
-         if( R(upper) < R(infinity) )
+         if( double(upper) < double(infinity) )
          {
             // range bound
             if( lower != 0 )
@@ -2045,7 +2045,7 @@ static void LPFwriteBounds(
                      << getColName(p_lp, j, p_cnames, name)
                      << '\n';
       }
-      else if( R(upper) < R(infinity) )
+      else if( double(upper) < double(infinity) )
          p_output << "   -Inf <= "
                   << getColName(p_lp, j, p_cnames, name)
                   << " <= " << upper << '\n';
@@ -2155,9 +2155,9 @@ static Rational MPSgetRHS(Rational left, Rational right)
 {
    Rational rhsval;
 
-   if( R(left) > R(-infinity) ) /// This includes ranges
+   if( double(left) > -double(infinity) ) /// This includes ranges
       rhsval = left;
-   else if( R(right) <  R(infinity) )
+   else if( double(right) <  double(infinity) )
       rhsval = right;
    else
       throw SPxInternalCodeException("XMPSWR01 This should never happen.");
@@ -2223,14 +2223,14 @@ void SPxLPBase<Rational>::writeMPS(
    {
       if( lhs(i) == rhs(i) )
          indicator = "E";
-      else if( (R(lhs(i)) > R(-infinity)) && (R(rhs(i)) < R(infinity)) )
+      else if( (double(lhs(i)) > -double(infinity)) && (double(rhs(i)) < double(infinity)) )
       {
          indicator = "E";
          has_ranges = true;
       }
-      else if( R(lhs(i)) > R(-infinity) )
+      else if( double(lhs(i)) > -double(infinity) )
          indicator = "G";
-      else if( R(rhs(i)) <  R(infinity) )
+      else if( double(rhs(i)) <  double(infinity) )
          indicator = "L";
       else
          throw SPxInternalCodeException("XMPSWR02 This should never happen.");
@@ -2321,7 +2321,7 @@ void SPxLPBase<Rational>::writeMPS(
 
       for( i = 0; i < nRows(); i++ )
       {
-         if( (R(lhs(i)) > R(-infinity)) && (R(rhs(i)) < R(infinity)) )
+         if( (double(lhs(i)) > -double(infinity)) && (double(rhs(i)) < double(infinity)) )
          {
             Rational range = rhs(i);
             range -= lhs(i);
@@ -2347,7 +2347,7 @@ void SPxLPBase<Rational>::writeMPS(
          continue;
       }
 
-      if( (R(lower(i)) <= R(-infinity)) && (R(upper(i)) >= R(infinity)) )
+      if( (double(lower(i)) <= double(-infinity)) && (double(upper(i)) >= double(infinity)) )
       {
          MPSwriteRecord(p_output, "FR", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
          continue;
@@ -2355,7 +2355,7 @@ void SPxLPBase<Rational>::writeMPS(
 
       if( lower(i) != 0 )
       {
-         if( R(lower(i)) > R(-infinity) )
+         if( double(lower(i)) > -double(infinity) )
             MPSwriteRecord(p_output, "LO", "BOUND", spxout, getColName(*this, i, p_cnames, name1), lower(i));
          else
             MPSwriteRecord(p_output, "MI", "BOUND", spxout, getColName(*this, i, p_cnames, name1));
@@ -2364,13 +2364,13 @@ void SPxLPBase<Rational>::writeMPS(
       if( has_intvars && (p_intvars->pos(i) >= 0) )
       {
          // Integer variables have default upper bound 1, but we should write
-         // it nevertheless since CPLEX seems to assume R(infinity) otherwise.
+         // it nevertheless since CPLEX seems to assume infinity otherwise.
          MPSwriteRecord(p_output, "UP", "BOUND", spxout, getColName(*this, i, p_cnames, name1), upper(i));
       }
       else
       {
-         // Continous variables have default upper bound R(infinity)
-         if( R(upper(i)) < R(infinity) )
+         // Continous variables have default upper bound infinity
+         if( double(upper(i)) < double(infinity) )
             MPSwriteRecord(p_output, "UP", "BOUND", spxout, getColName(*this, i, p_cnames, name1), upper(i));
       }
    }
