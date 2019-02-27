@@ -4766,7 +4766,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                << std::endl; )
 
       if (isNotZero(lo, this->epsZero()))
-      {
+        {
           for(int k = 0; k < col.size(); ++k)
             {
               int i = col.index(k);
@@ -4793,7 +4793,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                              << std::endl; )
 
                     lp.changeRhs(i, rhs);
-      }
+                }
               if (lp.lhs(i) > R(-infinity))
                 {
             R y     = mid * col.value(k);

@@ -83,12 +83,12 @@ namespace soplex
 
       if( lp_scaler )
         {
-        lp_scaler->unscale(*this);
+          lp_scaler->unscale(*this);
         }
       else
         {
-        MSG_INFO3( (*this->spxout), (*this->spxout) << "no LP scaler available" << std::endl; )
-          }
+          MSG_INFO3( (*this->spxout), (*this->spxout) << "no LP scaler available" << std::endl; )
+            }
   }
 
   template <class R>

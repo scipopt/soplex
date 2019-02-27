@@ -130,7 +130,7 @@ Rational SPxLPBase<Rational>::maxAbsNzo(bool /* unscaled */) const
 template<>
 Rational SPxLPBase<Rational>::minAbsNzo(bool /* unscaled */) const
 {
-   Rational mini = R(infinity);
+   Rational mini = infinity;
 
    for( int i = 0; i < nCols(); ++i )
    {
@@ -488,7 +488,7 @@ static Rational LPFreadInfinity(char*& pos)
 
    (void) LPFhasKeyword(++pos, "inf[inity]");
 
-   sense *= Rational(R(infinity));
+   sense *= Rational(infinity);
    return sense;
 }
 
@@ -797,13 +797,13 @@ bool SPxLPBase<Rational>::readLPF(
                {
                   if( sense == '<' )
                   {
-                     row.setLhs(R(-infinity));
+                     row.setLhs(-infinity);
                      row.setRhs(val);
                   }
                   else if( sense == '>' )
                   {
                      row.setLhs(val);
-                     row.setRhs(R(infinity));
+                     row.setRhs(infinity);
                   }
                   else
                   {
@@ -931,8 +931,8 @@ bool SPxLPBase<Rational>::readLPF(
 
             if( LPFisFree(pos) )
             {
-               cset.lower_w(colidx) = R(-infinity);
-               cset.upper_w(colidx) =  R(infinity);
+               cset.lower_w(colidx) = -infinity;
+               cset.upper_w(colidx) =  infinity;
                other = true;
                pos += 4;  // set position after the word "free"
             }
@@ -1166,14 +1166,14 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rn
          {
          case 'G':
             row.setLhs(0);
-            row.setRhs(R(infinity));
+            row.setRhs(infinity);
             break;
          case 'E':
             row.setLhs(0);
             row.setRhs(0);
             break;
          case 'L':
-            row.setLhs(R(-infinity));
+            row.setLhs(-infinity);
             row.setRhs(0);
             break;
          default:
@@ -1242,7 +1242,7 @@ static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const
          vec.clear();
          col.setObj(0);
          col.setLower(0);
-         col.setUpper(R(infinity));
+         col.setUpper(infinity);
 
          if( mps.isInteger() )
          {
@@ -1354,10 +1354,10 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
             }
 
             // LE or EQ
-            if( R(rset.rhs(idx)) < R(infinity) )
+            if( double(rset.rhs(idx)) < double(infinity) )
                rset.rhs_w(idx) = val;
             // GE or EQ
-            if( R(rset.lhs(idx)) > R(-infinity) )
+            if( double(rset.lhs(idx)) > double(-infinity) )
                rset.lhs_w(idx) = val;
          }
 
@@ -1373,10 +1373,10 @@ static void MPSreadRhs(MPSInput& mps, LPRowSetBase<Rational>& rset, const NameSe
                }
 
                // LE or EQ
-               if( R(rset.rhs(idx)) < R(infinity) )
+               if( double(rset.rhs(idx)) < double(infinity) )
                   rset.rhs_w(idx) = val;
                // GE or EQ
-               if( R(rset.lhs(idx)) > R(-infinity)) )
+               if( double(rset.lhs(idx)) > double(-infinity)) )
                   rset.lhs_w(idx) = val;
             }
          }
@@ -1444,7 +1444,7 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
             }
 
             // EQ
-            if( (R(rset.lhs(idx)) > R(-infinity)) && (R(rset.rhs_w(idx)) < R(infinity)) )
+            if( (double(rset.lhs(idx)) > double(-infinity)) && (double(rset.rhs_w(idx)) < double(infinity)) )
             {
                assert(rset.lhs(idx) == rset.rhs(idx));
 
