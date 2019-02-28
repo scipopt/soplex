@@ -22,28 +22,28 @@
 namespace soplex
 {
 
-  template <>
-  void SPxVectorST<Real>::setupWeights(SPxSolverBase<Real>& base)
+  template <class R>
+  void SPxVectorST<R>::setupWeights(SPxSolverBase<R>& base)
   {
     if (state == PVEC)
       {
         if (vec.dim() != base.nCols())
           {
-            SPxWeightST<Real>::setupWeights(base);
+            SPxWeightST<R>::setupWeights(base);
             return;
           }
 
-        const Vector& obj = base.maxObj();
-        Real eps = base.epsilon();
-        Real bias = 10000 * eps;
-        Real x, y;
+        const VectorBase<R>& obj = base.maxObj();
+        R eps = base.epsilon();
+        R bias = 10000 * eps;
+        R x, y;
         int i;
 
         MSG_DEBUG( std::cout << "DVECST01 colWeight[]: "; )
           for (i = base.nCols(); i--;)
             {
-              x = vec[i] - base.SPxLP::lower(i);
-              y = base.SPxLP::upper(i) - vec[i];
+              x = vec[i] - base.SPxLPBase<R>::lower(i);
+              y = base.SPxLPBase<R>::upper(i) - vec[i];
               if (x < y)
                 {
                   this->colWeight[i] = -x - bias * obj[i];
@@ -61,7 +61,7 @@ namespace soplex
           MSG_DEBUG( std::cout << "DVECST02 rowWeight[]: "; )
           for (i = base.nRows(); i--;)
             {
-              const SVector& row = base.rowVector(i);
+              const SVectorBase<R>& row = base.rowVector(i);
               y = vec * row;
               x = (y - base.lhs(i));
               y = (base.rhs(i) - y);
@@ -84,18 +84,18 @@ namespace soplex
       {
         if (vec.dim() != base.nRows())
           {
-            SPxWeightST<Real>::setupWeights(base);
+            SPxWeightST<R>::setupWeights(base);
             return;
           }
 
-        Real x, y, len;
+        R x, y, len;
         int i, j;
         for (i = base.nRows(); i--;)
           this->rowWeight[i] += spxAbs(vec[i]);
 
         for (i = base.nCols(); i--;)
           {
-            const SVector& col = base.colVector(i);
+            const SVectorBase<R>& col = base.colVector(i);
             for (y = len = 0, j = col.size(); j--;)
               {
                 x = col.value(j);
@@ -107,6 +107,6 @@ namespace soplex
           }
       }
     else
-      SPxWeightST<Real>::setupWeights(base);
+      SPxWeightST<R>::setupWeights(base);
   }
 } // namespace soplex
