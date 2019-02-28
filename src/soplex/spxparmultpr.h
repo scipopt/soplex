@@ -58,7 +58,7 @@ private:
       ///
       SPxId id;
       ///
-      Real test;
+      R test;
    };
    //@}
 
@@ -145,4 +145,6 @@ public:
 };
 
 } // namespace soplex
+
+#include "spxparmultpr.hpp"
 #endif // _SPXPARMULTPRR_H_
