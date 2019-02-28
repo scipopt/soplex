@@ -55,7 +55,7 @@ class SPxHybridPR : public SPxPricer<R>
    /// the currently used pricer
    SPxPricer<R>*   thepricer;
    /// factor between dim and coDim of the problem to decide about the pricer
-   Real hybridFactor;
+   R hybridFactor;
    //@}
 
 public:
@@ -64,7 +64,7 @@ public:
    /**@name Access / modification */
    //@{
    /// sets the epsilon
-   virtual void setEpsilon(Real eps);
+   virtual void setEpsilon(R eps);
    /// sets the solver
    virtual void load(SPxSolverBase<R>* solver);
    /// clears all pricers and unselects the current pricer
@@ -170,4 +170,7 @@ public:
 };
 
 } // namespace soplex
+
+// For general templated functions
+#include "spxhybrid.hpp"
 #endif // _SPXHYBRIDPR_H_

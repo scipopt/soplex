@@ -16,7 +16,6 @@ set(sources
     soplex/spxdesc.cpp
     soplex/spxfileio.cpp
     soplex/spxgithash.cpp
-    soplex/spxhybridpr.cpp
     soplex/spxid.cpp
     soplex/spxlpbase_rational.cpp
     soplex/spxlpbase_real.cpp

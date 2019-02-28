@@ -23,10 +23,6 @@ namespace soplex
 {
 
   template <class R>
-  void SPxAutoPR<R>::setType(typename SPxSolverBase<R>::Type tp);
-
-
-  template <class R>
   void SPxAutoPR<R>::load(SPxSolverBase<R>* p_solver)
   {
     steep.load(p_solver);
