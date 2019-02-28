@@ -211,8 +211,6 @@ void SoPlexBase<Real>::_evaluateSolutionReal(typename SPxSimplifier<Real>::Resul
       if(_solReal.isPrimalFeasible() || _solReal.isDualFeasible())
          _status = SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS;
 
-      break;
-
    // FALLTHROUGH
    case SPxSolverBase<Real>::ABORT_TIME:
    case SPxSolverBase<Real>::ABORT_ITER:
