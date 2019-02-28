@@ -18,7 +18,6 @@ set(sources
     soplex/spxlpbase_real.cpp
     soplex/spxout.cpp
     soplex/spxparmultpr.cpp
-    soplex/spxquality.cpp
     soplex/usertimer.cpp
     soplex/validation.cpp
     soplex/wallclocktimer.cpp

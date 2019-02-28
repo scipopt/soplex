@@ -22,28 +22,28 @@
 namespace soplex
 {
 
-  template <>
-  void SPxSolverBase<Real>::qualConstraintViolation(Real& maxviol, Real& sumviol) const
+  template <class R>
+  void SPxSolverBase<R>::qualConstraintViolation(R& maxviol, R& sumviol) const
   {
     maxviol = 0.0;
     sumviol = 0.0;
 
-    DVector solu( this->nCols() );
+    DVectorBase<R> solu( this->nCols() );
 
     getPrimalSol( solu );
 
     for( int row = 0; row < this->nRows(); ++row )
       {
-        const SVector& rowvec = this->rowVector( row );
+        const SVectorBase<R>& rowvec = this->rowVector( row );
 
-        Real val = 0.0;
+        R val = 0.0;
 
         for( int col = 0; col < rowvec.size(); ++col )
           val += rowvec.value( col ) * solu[rowvec.index( col )];
 
-        Real viol = 0.0;
+        R viol = 0.0;
 
-        assert(lhs( row ) <= rhs( row ) + (100 * epsilon()));
+        assert(this->lhs( row ) <= this->rhs( row ) + (100 * epsilon()));
 
         if (val < this->lhs( row ))
           viol = spxAbs(val - this->lhs( row ));
@@ -58,22 +58,22 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSolverBase<Real>::qualBoundViolation(
-                                        Real& maxviol, Real& sumviol) const
+  template <class R>
+  void SPxSolverBase<R>::qualBoundViolation(
+                                        R& maxviol, R& sumviol) const
   {
     maxviol = 0.0;
     sumviol = 0.0;
 
-    DVector solu( this->nCols() );
+    DVectorBase<R> solu( this->nCols() );
 
     getPrimalSol( solu );
 
     for( int col = 0; col < this->nCols(); ++col )
       {
-        assert(lower( col ) <= upper( col ) + (100 * epsilon()));
+        assert(this->lower( col ) <= this->upper( col ) + (100 * epsilon()));
 
-        Real viol = 0.0;
+        R viol = 0.0;
 
         if (solu[col] < this->lower( col ))
           viol = spxAbs( solu[col] - this->lower( col ));
@@ -88,28 +88,28 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSolverBase<Real>::qualSlackViolation(Real& maxviol, Real& sumviol) const
+  template <class R>
+  void SPxSolverBase<R>::qualSlackViolation(R& maxviol, R& sumviol) const
   {
     maxviol = 0.0;
     sumviol = 0.0;
 
-    DVector solu( this->nCols() );
-    DVector slacks( this->nRows() );
+    DVectorBase<R> solu( this->nCols() );
+    DVectorBase<R> slacks( this->nRows() );
 
     getPrimalSol( solu );
     getSlacks( slacks );
 
     for( int row = 0; row < this->nRows(); ++row )
       {
-        const SVector& rowvec = this->rowVector( row );
+        const SVectorBase<R>& rowvec = this->rowVector( row );
 
-        Real val = 0.0;
+        R val = 0.0;
 
         for( int col = 0; col < rowvec.size(); ++col )
           val += rowvec.value( col ) * solu[rowvec.index( col )];
 
-        Real viol = spxAbs(val - slacks[row]);
+        R viol = spxAbs(val - slacks[row]);
 
         if (viol > maxviol)
           maxviol = viol;
@@ -118,8 +118,8 @@ namespace soplex
       }
   }
 
-  template <>
-  void SPxSolverBase<Real>::qualRedCostViolation(Real& maxviol, Real& sumviol) const
+  template <class R>
+  void SPxSolverBase<R>::qualRedCostViolation(R& maxviol, R& sumviol) const
   {
     maxviol = 0.0;
     sumviol = 0.0;
@@ -128,14 +128,14 @@ namespace soplex
     // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
     //         redcost = c_N - yA_N
     // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
-    // DVector y( this->nRows() );
+    // DVectorBase<R> y( this->nRows() );
     // basis().coSolve( x, spx->unitVector( i ) );
-    // DVector rdcost( this->nCols() );
+    // DVectorBase<R> rdcost( this->nCols() );
     if (type() == ENTER)
       {
         for(i = 0; i < dim(); ++i)
           {
-            Real x = coTest()[i];
+            R x = coTest()[i];
 
             if (x < 0.0)
               {
@@ -147,7 +147,7 @@ namespace soplex
           }
         for(i = 0; i < coDim(); ++i)
           {
-            Real x = test()[i];
+            R x = test()[i];
 
             if (x < 0.0)
               {
@@ -164,7 +164,7 @@ namespace soplex
 
         for(i = 0; i < dim(); ++i)
           {
-            Real x = fTest()[i];
+            R x = fTest()[i];
 
             if (x < 0.0)
               {
