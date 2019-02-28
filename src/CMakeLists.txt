@@ -27,7 +27,6 @@ set(sources
     soplex/spxstarter.cpp
     soplex/spxsumst.cpp
     soplex/spxvectorst.cpp
-    soplex/spxwritestate.cpp
     soplex/statistics.cpp
     soplex/testsoplex.cpp
     soplex/usertimer.cpp

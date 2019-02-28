@@ -13,7 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-//#define TEST 1
 
 #include <assert.h>
 #include <iostream>
@@ -27,11 +26,6 @@ namespace soplex
 {
 #define EPS     1e-6
 #define STABLE  1e-3    // the sparsest row/column may only have a pivot of size STABLE*maxEntry
-
-  // Signatures of functions to prevent the specialization after instantiation error
-
-  template <class R>
-  void SPxWeightST<R>::setupWeights(SPxSolverBase<R>& base);
 
 
   template <class R>
@@ -120,6 +114,7 @@ namespace soplex
   }
 
   // ----------------------------------------------------------------
+  template <class R>
   static void setDualStatus(
                             typename SPxBasisBase<R>::Desc& desc,
                             const SPxSolverBase<R>& base,
@@ -145,10 +140,11 @@ namespace soplex
     /// constructor
     Compare() : weight( 0 ) {}
     //   const SPxSolverBase* base;     ///< the solver
-    const R*      weight;   ///< the weights to compare
+    // @todo this should be general, right?
+    const Real*      weight;   ///< the weights to compare
 
     /// compares the weights
-    R operator()(int i1, int i2) const
+    Real operator()(int i1, int i2) const
     {
       return weight[i1] - weight[i2];
     }
@@ -162,6 +158,7 @@ namespace soplex
      we sort the rows, then the columns.  Finally we perform a mergesort
      of both.
   */
+  template <class R>
   static void initPrefs(
                         DataArray<SPxId>&      pref,
                         const SPxSolverBase<R>&       base,

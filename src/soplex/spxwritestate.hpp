@@ -28,8 +28,9 @@
 
 namespace soplex
 {
-  template <>
-  bool SPxSolverBase<Real>::writeState(
+  // @todo: need to work on the precision of the output stream
+  template <class R>
+  bool SPxSolverBase<R>::writeState(
                                 const char*    filename,
                                 const NameSet* rowNames,
                                 const NameSet* colNames,
@@ -52,7 +53,7 @@ namespace soplex
         << "." << SOPLEX_SUBVERSION << std::endl << std::endl;
     ofs << "# run SoPlex as follows:" << std::endl;
     ofs << "# bin/soplex --loadset=spxcheck.set --readbas=spxcheck.bas spxcheck.mps\n" << std::endl;
-    ofs << "int:representation = " << ( rep() == SPxSolverBase<Real>::COLUMN ? "1" : "2" ) << std::endl;
+    ofs << "int:representation = " << ( rep() == SPxSolverBase<R>::COLUMN ? "1" : "2" ) << std::endl;
     ofs << "int:factor_update_max = " << basis().getMaxUpdates() << std::endl;
     ofs << "int:pricer = ";
     if (!strcmp(pricer()->getName(), "Auto"))
@@ -79,7 +80,7 @@ namespace soplex
     ofs << "real:feastol = " << feastol() << std::endl;
     ofs << "real:opttol = " << opttol() << std::endl;
     ofs << "real:epsilon_zero = " << epsilon() << std::endl;
-    ofs << "real:infty = " << R(infinity) << std::endl;
+    ofs << "real:infty = " << infinity << std::endl;
     ofs << "uint:random_seed = " << random.getSeed() << std::endl;
     ofs.close();
 
