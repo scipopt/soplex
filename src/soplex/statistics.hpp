@@ -21,16 +21,9 @@
 
 namespace soplex
 {
-  /// definition of signature to prevent the specialization after instantiation error
-  template <>
-  void SoPlexBase<Real>::Statistics::clearSolvingData();
-  template <>
-  void SoPlexBase<Real>::Statistics::clearAllData();
-
-
   /// default constructor
-  template <>
-  SoPlexBase<Real>::Statistics::Statistics(Timer::TYPE ttype)
+  template <class R>
+  SoPlexBase<R>::Statistics::Statistics(Timer::TYPE ttype)
   {
     timerType = ttype;
     readingTime = TimerFactory::createTimer(timerType);
@@ -45,8 +38,8 @@ namespace soplex
   }
 
   /// copy constructor
-  template <>
-  SoPlexBase<Real>::Statistics::Statistics(const Statistics& base)
+  template <class R>
+  SoPlexBase<R>::Statistics::Statistics(const Statistics& base)
   {
     timerType = base.timerType;
     readingTime = TimerFactory::createTimer(timerType);
@@ -61,8 +54,8 @@ namespace soplex
   }
 
   /// assignment operator
-  template <>
-  typename SoPlexBase<Real>::Statistics& SoPlexBase<Real>::Statistics::operator=(const Statistics &rhs)
+  template <class R>
+  typename SoPlexBase<R>::Statistics& SoPlexBase<R>::Statistics::operator=(const Statistics &rhs)
   {
     *readingTime = *(rhs.readingTime);
     *solvingTime = *(rhs.solvingTime);
@@ -95,16 +88,16 @@ namespace soplex
   }
 
   /// clears all statistics
-  template <>
-  void SoPlexBase<Real>::Statistics::clearAllData()
+  template <class R>
+  void SoPlexBase<R>::Statistics::clearAllData()
   {
     readingTime->reset();
     clearSolvingData();
   }
 
   /// clears statistics on solving process
-  template <>
-  void SoPlexBase<Real>::Statistics::clearSolvingData()
+  template <class R>
+  void SoPlexBase<R>::Statistics::clearSolvingData()
   {
     solvingTime->reset();
     preprocessingTime->reset();
@@ -156,15 +149,15 @@ namespace soplex
   }
 
   /// prints statistics
-  template <>
-  void SoPlexBase<Real>::Statistics::print(std::ostream& os)
+  template <class R>
+  void SoPlexBase<R>::Statistics::print(std::ostream& os)
   {
-    Real solTime = solvingTime->time();
-    Real totTime = readingTime->time() + solTime;
-    Real otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() - simplexTime->time() - rationalTime->time();
+    R solTime = solvingTime->time();
+    R totTime = readingTime->time() + solTime;
+    R otherTime = solTime - syncTime->time() - transformTime->time() - preprocessingTime->time() - simplexTime->time() - rationalTime->time();
 
-    Real avgPrimalDegeneracy = iterationsPrimal > 0 ? sumPrimalDegen / iterationsPrimal : 0.0;
-    Real avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?
+    R avgPrimalDegeneracy = iterationsPrimal > 0 ? sumPrimalDegen / iterationsPrimal : 0.0;
+    R avgDualDegeneracy = (iterations - iterationsPrimal) > 0 ?
       (sumDualDegen / (iterations - iterationsPrimal)) : 0.0;
 
     SPxOut::setFixed(os, 2);

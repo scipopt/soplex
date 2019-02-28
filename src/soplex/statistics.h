@@ -141,4 +141,8 @@ namespace soplex
       //@}
    };
 } // namespace soplex
+
+// For general templated files
+#include "statistics.hpp"
+
 #endif // _STATISTICS_H_
