@@ -11,7 +11,6 @@ set(sources
     soplex/ratrecon.cpp
     soplex/slufactor_rational.cpp
     soplex/solvereal.cpp
-    soplex/spxautopr.cpp
     soplex/spxdantzigpr.cpp
     soplex/spxdefines.cpp
     soplex/spxdesc.cpp

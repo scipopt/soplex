@@ -113,7 +113,7 @@ public:
    /// clear the data
    void clear();
    /// set epsilon of internal pricers
-   void setEpsilon(Real eps);
+   void setEpsilon(R eps);
    /// set the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
@@ -131,4 +131,8 @@ public:
    //@}
 };
 } // namespace soplex
+
+// For general templated functions
+#include "spxautopr.hpp"
+
 #endif // _SPXAUTOPR_H_
