@@ -57,14 +57,14 @@ namespace soplex
 
       SPxSolverBase<R>*  thesolver; //@todo The template type should be identified? Do I have to defined two of them?
       /// violation bound
-      Real        theeps;
+      R        theeps;
       //@}
 
 
       struct IdxElement
       {
         int idx;
-        Real val;
+        R val;
       };
 
       /// Compare class to sort idx/val pairs, used for hypersparse pricing leaving
@@ -78,7 +78,7 @@ namespace soplex
 
         const IdxElement*  elements;
 
-        Real operator() (
+        R operator() (
                          IdxElement      a,
                          IdxElement      b
                          ) const
@@ -129,7 +129,7 @@ namespace soplex
       }
 
       /// returns violation bound \ref soplex::SPxPricer::theeps "theeps".
-      virtual Real epsilon() const
+      virtual R epsilon() const
       {
         return theeps;
       }
@@ -137,7 +137,7 @@ namespace soplex
       /// sets violation bound.
       /** Inequality violations are accepted, if their size is less than \p eps.
        */
-      virtual void setEpsilon(Real eps)
+      virtual void setEpsilon(R eps)
       {
         assert(eps >= 0.0);
 
