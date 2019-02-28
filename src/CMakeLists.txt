@@ -19,7 +19,6 @@ set(sources
     soplex/spxout.cpp
     soplex/spxparmultpr.cpp
     soplex/spxquality.cpp
-    soplex/spxstarter.cpp
     soplex/usertimer.cpp
     soplex/validation.cpp
     soplex/wallclocktimer.cpp
