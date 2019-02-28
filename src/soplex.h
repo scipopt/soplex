@@ -2345,5 +2345,6 @@ private:
 #include "soplex/solverational.hpp"
 #include "soplex/solvedbds.hpp"
 #include "soplex/testsoplex.hpp"
+#include "soplex/solvereal.hpp"
 
 #endif // _SOPLEX_H_

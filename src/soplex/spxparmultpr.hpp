@@ -60,7 +60,7 @@ namespace soplex
     int best = -1;
     //    const SPxBasisBase<R>::Desc& ds   = this->thesolver->basis().desc();
 
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     int lastlast = -1;
 
     if (this->thesolver->pricing() == SPxSolverBase<R>::PARTIAL)
@@ -184,7 +184,7 @@ namespace soplex
     //    const R* up  = this->thesolver->ubBound();
     //    const R* low = this->thesolver->lbBound();
 
-    assert(thesolver != 0);
+    assert(this->thesolver != 0);
     n = -1;
     for (i = this->thesolver->dim() - 1; i >= 0; --i)
       {

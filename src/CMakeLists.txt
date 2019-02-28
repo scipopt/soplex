@@ -10,7 +10,6 @@ set(sources
     soplex/rational.cpp
     soplex/ratrecon.cpp
     soplex/slufactor_rational.cpp
-    soplex/solvereal.cpp
     soplex/spxdefines.cpp
     soplex/spxgithash.cpp
     soplex/spxid.cpp
