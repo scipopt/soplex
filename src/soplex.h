@@ -2342,7 +2342,8 @@ private:
 
 // General templated function
 #include "soplex.hpp"
-// @todo should the following be actually here?
 #include "soplex/solverational.hpp"
 #include "soplex/solvedbds.hpp"
+#include "soplex/testsoplex.hpp"
+
 #endif // _SOPLEX_H_

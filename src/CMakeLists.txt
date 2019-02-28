@@ -23,7 +23,6 @@ set(sources
     soplex/spxsumst.cpp
     soplex/spxvectorst.cpp
     soplex/statistics.cpp
-    soplex/testsoplex.cpp
     soplex/usertimer.cpp
     soplex/validation.cpp
     soplex/wallclocktimer.cpp
