@@ -14,10 +14,12 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /**@file  validation.hpp
- * @brief General templated functions for SoPlex
+ * @brief Validation object for soplex solutions
  */
 
 /// updates the external solution used for validation
+namespace soplex{
+
 template <class R>
 bool Validation<R>::updateExternalSolution(char* solution)
 {
@@ -137,3 +139,5 @@ bool Validation<R>::updateValidationTolerance(char* tolerance)
     os << "   Reduced Cost     : " << std::scientific << std::setprecision(8) << maxRedCostViolation << std::fixed << "\n";
     os << "   Dual             : " << std::scientific << std::setprecision(8) << maxDualViolation << std::fixed << "\n";
   }
+
+} // namespace soplex
