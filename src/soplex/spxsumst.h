@@ -87,4 +87,6 @@ public:
 };
 
 } // namespace soplex
+
+#include "spxsumst.hpp"
 #endif // _SPXSUMST_H_

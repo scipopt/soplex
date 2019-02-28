@@ -20,7 +20,6 @@ set(sources
     soplex/spxparmultpr.cpp
     soplex/spxquality.cpp
     soplex/spxstarter.cpp
-    soplex/spxsumst.cpp
     soplex/spxvectorst.cpp
     soplex/usertimer.cpp
     soplex/validation.cpp

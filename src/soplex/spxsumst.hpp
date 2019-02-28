@@ -22,13 +22,13 @@
 namespace soplex
 {
 
-  template <>
-  void SPxSumST<Real>::setupWeights(SPxSolverBase<Real>& base)
+  template <class R>
+  void SPxSumST<R>::setupWeights(SPxSolverBase<R>& base)
   {
     int count;
     int i;
-    Real x;
-    DVector work, delta, rowLen;
+    R x;
+    DVectorBase<R> work, delta, rowLen;
 
     assert(base.nRows() > 0);
     assert(base.nCols() > 0);
@@ -37,11 +37,11 @@ namespace soplex
     work.reDim(base.nCols(), true);
     delta.reDim(base.nCols(), true);
 
-    Real* wrk = work.get_ptr();
-    const Real* lhs = base.lhs().get_const_ptr();
-    const Real* rhs = base.rhs().get_const_ptr();
-    const Real* up = base.upper().get_const_ptr();
-    const Real* low = base.lower().get_const_ptr();
+    R* wrk = work.get_ptr();
+    const R* lhs = base.lhs().get_const_ptr();
+    const R* rhs = base.rhs().get_const_ptr();
+    const R* up = base.upper().get_const_ptr();
+    const R* low = base.lower().get_const_ptr();
 
     for (i = base.nRows(); --i >= 0;)
       {
@@ -79,6 +79,6 @@ namespace soplex
       }
 
     this->primal(work);
-    SPxVectorST<Real>::setupWeights(base);
+    SPxVectorST<R>::setupWeights(base);
   }
 } // namespace soplex
