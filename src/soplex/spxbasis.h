@@ -988,6 +988,7 @@ namespace soplex
 
 // General templated definitions
 #include "spxbasis.hpp"
+#include "spxdesc.hpp"
 
 /* reset the SOPLEX_DEBUG flag to its original value */
 #undef SOPLEX_DEBUG

@@ -12,7 +12,6 @@ set(sources
     soplex/slufactor_rational.cpp
     soplex/solvereal.cpp
     soplex/spxdefines.cpp
-    soplex/spxdesc.cpp
     soplex/spxfileio.cpp
     soplex/spxgithash.cpp
     soplex/spxid.cpp

@@ -21,26 +21,20 @@
 
 namespace soplex
 {
-  /// Signature defined to avoid the specialization after instantiation error
-  template <>
-  void SPxBasisBase<Real>::Desc::reSize(int rowDim, int colDim);
 
-  template <>
-  bool SPxBasisBase<Real>::Desc::isConsistent() const;
-
-  template <>
-  SPxBasisBase<Real>::Desc::Desc(const SPxSolverBase<Real>& base)
+  template <class R>
+  SPxBasisBase<R>::Desc::Desc(const SPxSolverBase<R>& base)
   {
     reSize(base.nRows(), base.nCols());
 
-    if (base.rep() == SPxSolverBase<Real>::ROW)
+    if (base.rep() == SPxSolverBase<R>::ROW)
       {
         stat   = &rowstat;
         costat = &colstat;
       }
     else
       {
-        assert(base.rep() == SPxSolverBase<Real>::COLUMN);
+        assert(base.rep() == SPxSolverBase<R>::COLUMN);
 
         stat   = &colstat;
         costat = &rowstat;
@@ -49,8 +43,8 @@ namespace soplex
     assert(Desc::isConsistent());
   }
 
-  template <>
-  SPxBasisBase<Real>::Desc::Desc(const Desc& old)
+  template <class R>
+  SPxBasisBase<R>::Desc::Desc(const Desc& old)
     : rowstat(old.rowstat)
     , colstat(old.colstat)
   {
@@ -72,8 +66,8 @@ namespace soplex
     assert(Desc::isConsistent());
   }
 
-  template <>
-  typename SPxBasisBase<Real>::Desc& SPxBasisBase<Real>::Desc::operator=(const SPxBasisBase<Real>::Desc& rhs)
+  template <class R>
+  typename SPxBasisBase<R>::Desc& SPxBasisBase<R>::Desc::operator=(const SPxBasisBase<R>::Desc& rhs)
   {
     if (this != &rhs)
       {
@@ -100,8 +94,8 @@ namespace soplex
     return *this;
   }
 
-  template <>
-  void SPxBasisBase<Real>::Desc::reSize(int rowDim, int colDim)
+  template <class R>
+  void SPxBasisBase<R>::Desc::reSize(int rowDim, int colDim)
   {
 
     assert(rowDim >= 0);
@@ -120,8 +114,8 @@ namespace soplex
       colstat[i] = D_UNDEFINED;
   }
 
-  template <>
-  void SPxBasisBase<Real>::Desc::dump() const
+  template <class R>
+  void SPxBasisBase<R>::Desc::dump() const
   {
     int i;
 
@@ -138,8 +132,8 @@ namespace soplex
     std::cout << std::endl;
   }
 
-  template <>
-  bool SPxBasisBase<Real>::Desc::isConsistent() const
+  template <class R>
+  bool SPxBasisBase<R>::Desc::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
     return rowstat.isConsistent() && colstat.isConsistent();
@@ -149,37 +143,37 @@ namespace soplex
   }
 
   template <class R>
-  std::ostream& operator<<(std::ostream& os, const typename SPxBasisBase<Real>::Desc::Status& stat)
+  std::ostream& operator<<(std::ostream& os, const typename SPxBasisBase<R>::Desc::Status& stat)
   {
     char text;
 
     switch(stat)
       {
-      case SPxBasisBase<Real>::Desc::P_ON_LOWER :
+      case SPxBasisBase<R>::Desc::P_ON_LOWER :
         text = 'L';
         break;
-      case SPxBasisBase<Real>::Desc::P_ON_UPPER :
+      case SPxBasisBase<R>::Desc::P_ON_UPPER :
         text = 'U';
         break;
-      case SPxBasisBase<Real>::Desc::P_FREE :
+      case SPxBasisBase<R>::Desc::P_FREE :
         text = 'F';
         break;
-      case SPxBasisBase<Real>::Desc::P_FIXED :
+      case SPxBasisBase<R>::Desc::P_FIXED :
         text = 'X';
         break;
-      case SPxBasisBase<Real>::Desc::D_FREE :
+      case SPxBasisBase<R>::Desc::D_FREE :
         text = 'f';
         break;
-      case SPxBasisBase<Real>::Desc::D_ON_UPPER :
+      case SPxBasisBase<R>::Desc::D_ON_UPPER :
         text = 'u';
         break;
-      case SPxBasisBase<Real>::Desc::D_ON_LOWER :
+      case SPxBasisBase<R>::Desc::D_ON_LOWER :
         text = 'l';
         break;
-      case SPxBasisBase<Real>::Desc::D_ON_BOTH :
+      case SPxBasisBase<R>::Desc::D_ON_BOTH :
         text = 'x';
         break;
-      case SPxBasisBase<Real>::Desc::D_UNDEFINED :
+      case SPxBasisBase<R>::Desc::D_UNDEFINED :
         text = '.';
         break;
       default :
