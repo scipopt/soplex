@@ -172,5 +172,5 @@ public:
 } // namespace soplex
 
 // For general templated functions
-#include "spxhybrid.hpp"
+#include "spxhybridpr.hpp"
 #endif // _SPXHYBRIDPR_H_
