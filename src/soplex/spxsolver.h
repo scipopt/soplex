@@ -2352,5 +2352,6 @@ namespace soplex
 #include "spxchangebasis.hpp"
 #include "spxvecs.hpp"
 #include "spxwritestate.hpp"
+#include "spxfileio.hpp"
 
 #endif // _SPXSOLVER_H_
