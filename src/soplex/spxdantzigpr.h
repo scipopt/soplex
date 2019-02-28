@@ -42,10 +42,10 @@ private:
    int                   selectLeaveSparse();/**< sparse pricing method for leaving Simplex */
 
    SPxId                 selectEnterX();                                /**< choose the best entering index among columns and rows but prefer sparsity */
-   SPxId                 selectEnterSparseDim(Real& best,SPxId& id);    /**< sparse pricing method for entering Simplex (slack variables)*/
-   SPxId                 selectEnterSparseCoDim(Real& best, SPxId& id); /**< sparse pricing method for entering Simplex */
-   SPxId                 selectEnterDenseDim(Real& best, SPxId& id);    /**< selectEnter() in dense case (slack variables) */
-   SPxId                 selectEnterDenseCoDim(Real& best,SPxId& id);   /**< selectEnter() in dense case */
+   SPxId                 selectEnterSparseDim(R& best,SPxId& id);    /**< sparse pricing method for entering Simplex (slack variables)*/
+   SPxId                 selectEnterSparseCoDim(R& best, SPxId& id); /**< sparse pricing method for entering Simplex */
+   SPxId                 selectEnterDenseDim(R& best, SPxId& id);    /**< selectEnter() in dense case (slack variables) */
+   SPxId                 selectEnterDenseCoDim(R& best,SPxId& id);   /**< selectEnter() in dense case */
 public:
 
    //-------------------------------------
@@ -90,4 +90,8 @@ public:
    //@}
 };
 } // namespace soplex
+
+// For general tempalted functions
+#include "spxdantzigpr.hpp"
+
 #endif // _SPXDEFAULTPRR_H_
