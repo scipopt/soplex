@@ -326,7 +326,7 @@ namespace soplex
     //-----------------------------
     /**@name Protected data */
     //@{
-    Array < UnitVector > unitVecs; ///< array of unit vectors
+    Array < UnitVectorBase<R> > unitVecs; ///< array of unit vectors
     const SVSetBase<R>*   thevectors;   ///< the LP vectors according to representation
     const SVSetBase<R>*   thecovectors; ///< the LP coVectors according to representation
 

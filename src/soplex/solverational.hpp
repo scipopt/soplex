@@ -3560,7 +3560,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
       // load and factorize rational basis matrix
       if( realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY) )
-         _rationalLUSolver.setTimeLimit(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
+        _rationalLUSolver.setTimeLimit((double)realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
       else
          _rationalLUSolver.setTimeLimit(-1.0);
       _rationalLUSolver.load(matrix.get_ptr(), matrixdim);

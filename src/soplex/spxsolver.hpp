@@ -484,7 +484,7 @@ namespace soplex
           unitVecs.reSize(newsize);
 
           while (newsize-- > 0)
-            unitVecs[newsize] = UnitVector(newsize);
+            unitVecs[newsize] = UnitVectorBase<R>(newsize);
         }
 
       if (isInitialized())

@@ -43,7 +43,12 @@ namespace soplex
             MSG_DEBUG( std::cout << "DSHIFT08 theUBbound[" << i << "] violated by " << (*theFvec)[i] - theUBbound[i] - allow << std::endl );
 
             if (theUBbound[i] != theLBbound[i])
-              shiftUBbound(i, (*theFvec)[i] + random.next(minrandom, maxrandom));
+              {
+                // @todo get rid of the double casting. The current one is only
+                // a hack. In the future we might have to generate random
+                // numbers from a boost multiprecision library.
+                shiftUBbound(i, (*theFvec)[i] + random.next((double)minrandom, (double)maxrandom));
+              }
             else
               {
                 shiftUBbound(i, (*theFvec)[i]);
@@ -99,7 +104,7 @@ namespace soplex
         if ((*theCoUbound)[i] + allow <= (*theCoPvec)[i] && tmp)
           {
             if ((*theCoUbound)[i] != (*theCoLbound)[i])
-              shiftUCbound(i, (*theCoPvec)[i] + random.next(minrandom,maxrandom));
+              shiftUCbound(i, (*theCoPvec)[i] + random.next((double)minrandom, (double)maxrandom));
             else
               {
                 shiftUCbound(i, (*theCoPvec)[i]);
@@ -109,7 +114,7 @@ namespace soplex
         else if ((*theCoLbound)[i] - allow >= (*theCoPvec)[i] && tmp)
           {
             if ((*theCoUbound)[i] != (*theCoLbound)[i])
-              shiftLCbound(i, (*theCoPvec)[i] - random.next(minrandom,maxrandom));
+              shiftLCbound(i, (*theCoPvec)[i] - random.next((double)minrandom, (double)maxrandom));
             else
               {
                 shiftLCbound(i, (*theCoPvec)[i]);
@@ -124,7 +129,7 @@ namespace soplex
         if ((*theUbound)[i] + allow <= (*thePvec)[i] && tmp)
           {
             if ((*theUbound)[i] != (*theLbound)[i])
-              shiftUPbound(i, (*thePvec)[i] + random.next(minrandom,maxrandom));
+              shiftUPbound(i, (*thePvec)[i] + random.next((double)minrandom, (double)maxrandom));
             else
               {
                 shiftUPbound(i, (*thePvec)[i]);
@@ -134,7 +139,7 @@ namespace soplex
         else if ((*theLbound)[i] - allow >= (*thePvec)[i] && tmp)
           {
             if ((*theUbound)[i] != (*theLbound)[i])
-              shiftLPbound(i, (*thePvec)[i] - random.next(minrandom,maxrandom));
+              shiftLPbound(i, (*thePvec)[i] - random.next((double)minrandom, (double)maxrandom));
             else
               {
                 shiftLPbound(i, (*thePvec)[i]);
@@ -180,12 +185,12 @@ namespace soplex
 
             if( LT(u, R(infinity)) && NE(l, u) && u <= x + eps )
               {
-                p_up[i] = x + random.next(minrandom,maxrandom);
+                p_up[i] = x + random.next((double) minrandom, (double)maxrandom);
                 theShift += p_up[i] - u;
               }
             if( GT(l, R(-infinity)) && NE(l, u) && l >= x - eps )
               {
-                p_low[i] = x - random.next(minrandom,maxrandom);
+                p_low[i] = x - random.next((double)minrandom, (double)maxrandom);
                 theShift -= p_low[i] - l;
               }
           }
@@ -212,7 +217,7 @@ namespace soplex
               {
                 if( LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps )
                   {
-                    p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+                    p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                     theShift += p_up[i] - u;
                   }
               }
@@ -220,7 +225,7 @@ namespace soplex
               {
                 if( GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps )
                   {
-                    p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+                    p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                     theShift -= p_low[i] - l;
                   }
               }
@@ -258,12 +263,12 @@ namespace soplex
 
             if( LT(u, R(infinity)) && NE(l, u) && u <= x + eps )
               {
-                p_up[i] = x + random.next(minrandom,maxrandom);
+                p_up[i] = x + random.next((double)minrandom, (double)maxrandom);
                 theShift += p_up[i] - u;
               }
             if( GT(l, R(-infinity)) && NE(l, u) && l >= x - eps )
               {
-                p_low[i] = x - random.next(minrandom,maxrandom);
+                p_low[i] = x - random.next((double)minrandom, (double)maxrandom);
                 theShift -= p_low[i] - l;
               }
           }
@@ -290,7 +295,7 @@ namespace soplex
               {
                 if( LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps )
                   {
-                    p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+                    p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                     theShift += p_up[i] - u;
                   }
               }
@@ -298,7 +303,7 @@ namespace soplex
               {
                 if( GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps )
                   {
-                    p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+                    p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                     theShift -= p_low[i] - l;
                   }
               }
@@ -358,12 +363,12 @@ namespace soplex
 
             if( LT(u, R(infinity)) && NE(l, u) && u <= x + eps && rep() * stat[i] < 0 )
               {
-                p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+                p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                 l_theShift += p_up[i] - u;
               }
             if( GT(l, R(-infinity)) && NE(l, u) && l >= x - eps && rep() * stat[i] < 0 )
               {
-                p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+                p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                 l_theShift -= p_low[i] - l;
               }
           }
@@ -383,7 +388,7 @@ namespace soplex
               {
                 if( LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps && rep() * stat[i] < 0 )
                   {
-                    p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+                    p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                     l_theShift += p_up[i] - u;
                   }
               }
@@ -391,7 +396,7 @@ namespace soplex
               {
                 if( GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps && rep() * stat[i] < 0 )
                   {
-                    p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+                    p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                     l_theShift -= p_low[i] - l;
                   }
               }
@@ -432,12 +437,12 @@ namespace soplex
 
             if( LT(u, R(infinity)) && NE(l, u) && u <= x + eps && rep() * stat[i] < 0 )
               {
-                p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+                p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                 l_theShift += p_up[i] - u;
               }
             if( GT(l, R(-infinity)) && NE(l, u) && l >= x - eps && rep() * stat[i] < 0 )
               {
-                p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+                p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                 l_theShift -= p_low[i] - l;
               }
           }
@@ -457,7 +462,7 @@ namespace soplex
               {
                 if( LT(u, R(infinity)) && NE(l, u) && vec[i] >= u - eps && rep() * stat[i] < 0 )
                   {
-                    p_up[i] = vec[i] + random.next(minrandom,maxrandom);
+                    p_up[i] = vec[i] + random.next((double)minrandom, (double)maxrandom);
                     l_theShift += p_up[i] - u;
                   }
               }
@@ -465,7 +470,7 @@ namespace soplex
               {
                 if( GT(l, R(-infinity)) && NE(l, u) && vec[i] <= l + eps && rep() * stat[i] < 0 )
                   {
-                    p_low[i] = vec[i] - random.next(minrandom,maxrandom);
+                    p_low[i] = vec[i] - random.next((double)minrandom, (double)maxrandom);
                     l_theShift -= p_low[i] - l;
                   }
               }
