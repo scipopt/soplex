@@ -155,7 +155,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 
-  // Returns the square root
+  // Overloaded function to return the square-root
   template <typename T>
   boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
   {
@@ -166,8 +166,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
   template <typename T>
   boost::multiprecision::number<T> spxNextafter(boost::multiprecision::number<T> x, boost::multiprecision::number<T> y)
   {
-    // @todo: Why don't I have to namespace the following?
-    return nextafter(x,y);
+    return boost::math::nextafter(x,y);
   }
 
 
@@ -385,11 +384,11 @@ inline Real spxAbs(Real a)
    return fabs(a);
 }
 
-// /// returns square root
-// inline Real spxSqrt(Real a)
-// {
-//    return sqrt(a);
-// }
+/// returns square root
+inline Real spxSqrt(Real a)
+{
+  return std::sqrt(a);
+}
 
 // returns the next representable value after x in the direction of y
 inline Real spxNextafter(Real x, Real y)

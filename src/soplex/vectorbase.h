@@ -409,7 +409,7 @@ public:
    /// Floating point approximation of euclidian norm (without any approximation guarantee).
    R length() const
    {
-     return std::sqrt(R(length2()));
+     return spxSqrt(length2());
    }
 
    /// Squared norm.
