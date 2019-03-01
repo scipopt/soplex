@@ -2027,8 +2027,8 @@ namespace soplex
     if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
       {
         spx_alloc(addedcolid, 1);
-        LPColSetReal compSlackCol;
-        compSlackCol.add(1.0, R(-infinity), slackColCoeff, R(infinity));
+        LPColSetBase<R> compSlackCol;
+        compSlackCol.add(R(1.0), R(-infinity), slackColCoeff, R(infinity));
         _compSolver.addCols(addedcolid, compSlackCol);
         _compSlackColId = addedcolid[0];
       }
@@ -2064,8 +2064,8 @@ namespace soplex
 
         // adding the slack column
         spx_alloc(addedcolid, 1);
-        LPColSetReal compSlackCol;
-        compSlackCol.add(-1.0, 0.0, slackColCoeff, R(infinity));
+        LPColSetBase<R> compSlackCol;
+        compSlackCol.add(R(-1.0), R(0.0), slackColCoeff, R(infinity));
 
         _compSolver.addCols(addedcolid, compSlackCol);
         _compSlackColId = addedcolid[0];
@@ -2843,10 +2843,10 @@ namespace soplex
               {
                 // the dual flags do not imply anything about the primal status of the rows.
                 if( _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_ON_LOWER &&
-                    EQ(_solver.rhs(rowNumber) - _solver.pVec()[rowNumber], 0.0, feastol) )
+                    EQ(_solver.rhs(rowNumber) - _solver.pVec()[rowNumber], R(0.0), feastol) )
                   currFixedVars[i] = 1;
                 else if(  _solver.basis().desc().rowStatus(rowNumber) == SPxBasisBase<R>::Desc::D_ON_UPPER &&
-                          EQ(_solver.pVec()[rowNumber] - _solver.lhs(rowNumber), 0.0, feastol) )
+                          EQ(_solver.pVec()[rowNumber] - _solver.lhs(rowNumber), R(0.0), feastol) )
                   currFixedVars[i] = -1;
               }
           }
@@ -3684,7 +3684,7 @@ namespace soplex
               currviol = viol;
           }
 
-        if( GT(viol, 0.0, feastol) )
+        if( GT(viol, R(0.0), feastol) )
           isViol = true;
 
         viol = primal[i] - _realLP->upper(i);
@@ -3701,7 +3701,7 @@ namespace soplex
               currviol = viol;
           }
 
-        if( GT(viol, 0.0, feastol) )
+        if( GT(viol, R(0.0), feastol) )
           isViol = true;
 
         if( isViol )
@@ -3765,7 +3765,7 @@ namespace soplex
               currviol = viol;
           }
 
-        if( GT(viol, 0.0, feastol) )
+        if( GT(viol, R(0.0), feastol) )
           isViol = true;
 
         viol = activity[i] - _realLP->rhs(i);
@@ -3782,7 +3782,7 @@ namespace soplex
               currviol = viol;
           }
 
-        if( GT(viol, 0.0, feastol) )
+        if( GT(viol, R(0.0), feastol) )
           isViol = true;
 
         if( isViol )

@@ -1051,10 +1051,10 @@ namespace soplex
                        */
                       if( have_value )
                         {
-                          if( NE(spxAbs(val), 1.0) )
+                          if( NE(spxAbs(val), R(1.0)) )
                             goto syntax_error;
 
-                          if( EQ(val, -1.0) )
+                          if( EQ(val, R(-1.0)) )
                             pre_sign = val;
                         }
                       have_value = true;
@@ -1080,10 +1080,10 @@ namespace soplex
                        */
                       if( have_value )
                         {
-                          if( NE(spxAbs(val), 1.0) )
+                          if( NE(spxAbs(val), R(1.0)) )
                             goto syntax_error;
 
-                          if( EQ(val, -1.0) )
+                          if( EQ(val, R(-1.0)) )
                             pre_sign = val;
                         }
 

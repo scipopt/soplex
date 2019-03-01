@@ -3354,7 +3354,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
   while( true )
     {
-      assert(!increasedMarkowitz || GE(_slufactor.markowitz(), 0.9));
+      assert(!increasedMarkowitz || GE(_slufactor.markowitz(), R(0.9)));
 
       result = _solveRealForRational(fromScratch, primal, dual, basisStatusRows, basisStatusCols, returnedBasis);
 
@@ -3729,7 +3729,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
       // solve for primal solution
       if( realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY) )
-         _rationalLUSolver.setTimeLimit(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
+        _rationalLUSolver.setTimeLimit(Real(realParam(SoPlexBase<R>::TIMELIMIT)) - _statistics->solvingTime->time());
       else
          _rationalLUSolver.setTimeLimit(-1.0);
       _rationalLUSolver.solveRight(basicPrimal, basicPrimalRhs);
@@ -3809,7 +3809,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
 
       // solve for dual solution
       if( realParam(SoPlexBase<R>::TIMELIMIT) < realParam(SoPlexBase<R>::INFTY) )
-         _rationalLUSolver.setTimeLimit(realParam(SoPlexBase<R>::TIMELIMIT) - _statistics->solvingTime->time());
+        _rationalLUSolver.setTimeLimit(Real(realParam(SoPlexBase<R>::TIMELIMIT)) - _statistics->solvingTime->time());
       else
          _rationalLUSolver.setTimeLimit(-1.0);
       _rationalLUSolver.solveLeft(basicDual, basicDualRhs);

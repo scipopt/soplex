@@ -1634,7 +1634,7 @@ namespace soplex
         if( shift() < epsilon() && noViols(opttol() - shift()) )
           {
             // SPxSense::MINIMIZE == -1, so we have sign = 1 on minimizing
-            if( this->spxSense() * value() <= this->spxSense() * objLimit )
+            if( int(this->spxSense()) * value() <= int(this->spxSense()) * objLimit )
               {
                 MSG_INFO2( (*this->spxout), (*this->spxout) << " --- objective value limit (" << objLimit
                            << ") reached" << std::endl; )

@@ -922,12 +922,12 @@ namespace soplex
       if (rep() == ROW)
         {
           if (type() == LEAVE)
-            x = SPxLPBase<R>::spxSense() * (coPvec() * fRhs()); // the contribution of maxRowObj() is missing
+            x = int(SPxLPBase<R>::spxSense()) * (coPvec() * fRhs()); // the contribution of maxRowObj() is missing
           else
-            x = SPxLPBase<R>::spxSense() * (nonbasicValue() + (coPvec() * fRhs()));
+            x = int(SPxLPBase<R>::spxSense()) * (nonbasicValue() + (coPvec() * fRhs()));
         }
       else
-        x = SPxLPBase<R>::spxSense() * (nonbasicValue() + fVec() * coPrhs());
+        x = int(SPxLPBase<R>::spxSense()) * (nonbasicValue() + fVec() * coPrhs());
 
       return x + this->objOffset();
     }
