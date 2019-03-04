@@ -315,4 +315,6 @@ private:
 };
 
 } // namespace soplex
+
+#include "slufactor.hpp"
 #endif // _SLUFACTOR_H_

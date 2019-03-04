@@ -591,7 +591,7 @@ void SLUFactor<R>::solveLeft(
 template <class R>
 R SLUFactor<R>::stability() const
 {
-   if (status() != OK)
+   if (status() != this->OK)
       return 0;
 
    if (this->maxabs < this->initMaxabs)
@@ -751,7 +751,7 @@ void SLUFactor<R>::clear()
    this->initMaxabs    = 1;
    lastThreshold = minThreshold;
    minStability  = MINSTABILITY;
-   this->stat          = UNLOADED;
+   this->stat          = this->UNLOADED;
 
    vec.clear();
    eta.clear();
@@ -816,7 +816,7 @@ void SLUFactor<R>::clear()
 template <class R>
 void SLUFactor<R>::assign(const SLUFactor<R>& old)
 {
-   spxout = old.spxout;
+   this->spxout = old.spxout;
 
    solveTime = TimerFactory::createTimer(old.solveTime->type());
    this->factorTime = TimerFactory::createTimer(old.factorTime->type());
@@ -872,21 +872,21 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    memcpy(this->u.row.max,   old.u.row.max,   (unsigned int)(this->thedim + 1) * sizeof(*this->u.row.max));
 
    // need to make row list ok ?
-   if (this->thedim > 0 && this->stat == OK)
+   if (this->thedim > 0 && this->stat == this->OK)
    {
      this->u.row.list.idx = old.u.row.list.idx; // .idx neu
 
       const typename CLUFactor<R>::Dring* oring = &old.u.row.list;
       typename CLUFactor<R>::Dring*       ring  = &this->u.row.list;
 
-      while(this->oring->next != &old.u.row.list)
+      while(oring->next != &old.u.row.list)
       {
-        this->ring->next       = &this->u.row.elem[this->oring->next->idx];
+        ring->next       = &this->u.row.elem[oring->next->idx];
          ring->next->prev = ring;
-         this->oring            = this->oring->next;
+         oring            = oring->next;
          ring             = ring->next;
       }
-      this->ring->next       = &this->u.row.list;
+      ring->next       = &this->u.row.list;
       ring->next->prev = ring;
    }
 
@@ -914,21 +914,21 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    memcpy(this->u.col.max,   old.u.col.max,   (unsigned int)(this->thedim + 1) * sizeof(*this->u.col.max));
 
    // need to make col list ok
-   if (this->thedim > 0 && this->stat == OK)
+   if (this->thedim > 0 && this->stat == this->OK)
    {
      this->u.col.list.idx = old.u.col.list.idx; // .idx neu
 
       const typename CLUFactor<R>::Dring* oring = &old.u.col.list;
       typename CLUFactor<R>::Dring*       ring  = &this->u.col.list;
 
-      while(this->oring->next != &old.u.col.list)
+      while(oring->next != &old.u.col.list)
       {
          ring->next       = &this->u.col.elem[oring->next->idx];
          ring->next->prev = ring;
          oring            = oring->next;
          ring             = ring->next;
       }
-      this->ring->next       = &this->u.col.list;
+      ring->next       = &this->u.col.list;
       ring->next->prev = ring;
    }
 
@@ -1124,14 +1124,14 @@ SLUFactor<R>::SLUFactor()
       this->l.size = 1;
 
       spx_alloc(this->l.val, this->l.size);
-      spx_alloc(this->l.idx, this->lsize);
+      spx_alloc(this->l.idx, this->l.size);
 
-      this->lstartSize   = 1;
-      this->lfirstUpdate = 0;
-      this->lfirstUnused = 0;
+      this->l.startSize   = 1;
+      this->l.firstUpdate = 0;
+      this->l.firstUnused = 0;
 
-      spx_alloc(this->l.start, this->lstartSize);
-      spx_alloc(this->l.row,   this->lstartSize);
+      spx_alloc(this->l.start, this->l.startSize);
+      spx_alloc(this->l.row,   this->l.startSize);
    }
    catch(const SPxMemoryException& x)
    {
@@ -1141,9 +1141,9 @@ SLUFactor<R>::SLUFactor()
 
    this->l.rval  = 0;
    this->l.ridx  = 0;
-   this->lrbeg  = 0;
-   this->lrorig = 0;
-   this->lrperm = 0;
+   this->l.rbeg  = 0;
+   this->l.rorig = 0;
+   this->l.rperm = 0;
 
    SLUFactor<R>::clear(); // clear() is virtual
 
@@ -1179,7 +1179,7 @@ SLUFactor<R>::SLUFactor()
 
 template <class R>
 SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
-   : SLinSolver( old )
+  : SLinSolver<R>( old )
    , vec(1)     // we don't need to copy it, because they are temporary vectors
    , ssvec(1)   // we don't need to copy it, because they are temporary vectors
    , usetup(old.usetup)
@@ -1206,13 +1206,13 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->u.col.val   = 0;
    this->l.val       = 0;
    this->l.idx       = 0;
-   this->lstart     = 0;
-   this->lrow       = 0;
-   this->lrval      = 0;
-   this->lridx      = 0;
-   this->lrbeg      = 0;
-   this->lrorig     = 0;
-   this->lrperm     = 0;
+   this->l.start     = 0;
+   this->l.row       = 0;
+   this->l.rval      = 0;
+   this->l.ridx      = 0;
+   this->l.rbeg      = 0;
+   this->l.rorig     = 0;
+   this->l.rperm     = 0;
 
    solveCount = 0;
    solveTime = TimerFactory::createTimer(timerType);
@@ -1276,6 +1276,7 @@ SLUFactor<R>::~SLUFactor<R>()
    spx_free(this->factorTime);
 }
 
+template <class R>
 static R betterThreshold(R th)
 {
    assert(th < R(1.0));
@@ -1337,8 +1338,8 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
 
       this->l.startSize = this->thedim + MAXUPDATES;
 
-      spx_realloc(this->l.row,   this->lstartSize);
-      spx_realloc(this->l.start, this->lstartSize);
+      spx_realloc(this->l.row,   this->l.startSize);
+      spx_realloc(this->l.start, this->l.startSize);
    }
    // the last factorization was reasonably stable, so we decrease the Markowitz threshold (stored in lastThreshold) in
    // order to favour sparsity
@@ -1375,7 +1376,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       ///@todo if the factorization fails with stat = SINGULAR, distinuish between proven singularity (e.g., because of
       ///an empty column) and singularity due to numerics, that could be avoided by changing minStability and
       ///lastThreshold; in the first case, we want to abort, otherwise change the numerics
-     this->stat = OK;
+     this->stat = this->OK;
      this->factor(matrix, lastThreshold, epsilon);
 
       // finish if the factorization is stable
