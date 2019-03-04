@@ -60,7 +60,7 @@ namespace soplex
             MSG_DEBUG( std::cout << "DSHIFT08 theLBbound[" << i << "] violated by " << theLBbound[i] - (*theFvec)[i] - allow << std::endl );
 
             if (theUBbound[i] != theLBbound[i])
-              shiftLBbound(i, (*theFvec)[i] - random.next(minrandom, maxrandom));
+              shiftLBbound(i, (*theFvec)[i] - random.next((double)minrandom, (double)maxrandom));
             else
               {
                 shiftLBbound(i, (*theFvec)[i]);

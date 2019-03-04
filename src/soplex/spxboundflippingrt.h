@@ -29,7 +29,6 @@
 
 namespace soplex
 {
-struct Compare;
 
 /**@brief   Bound flipping ratio test ("long step dual") for SoPlex.
    @ingroup Algo

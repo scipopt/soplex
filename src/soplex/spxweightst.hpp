@@ -134,6 +134,7 @@ namespace soplex
   // ----------------------------------------------------------------
 
   /// Compare class for row weights, used for sorting.
+  template <typename T>
   struct Compare
   {
   public:
@@ -141,10 +142,10 @@ namespace soplex
     Compare() : weight( 0 ) {}
     //   const SPxSolverBase* base;     ///< the solver
     // @todo this should be general, right?
-    const Real*      weight;   ///< the weights to compare
+    const T*      weight;   ///< the weights to compare
 
     /// compares the weights
-    Real operator()(int i1, int i2) const
+    T operator()(int i1, int i2) const
     {
       return weight[i1] - weight[i2];
     }
@@ -171,7 +172,7 @@ namespace soplex
     int j;
     int k;
 
-    Compare compare;
+    Compare<R> compare;
     //   compare.base = &base;
 
     for(i = 0; i < base.nRows(); ++i)

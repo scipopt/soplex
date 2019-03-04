@@ -143,7 +143,7 @@ static void initConstVecs(
       R logsum = 0.0;
       int nnz = 0;
       // get kth row or column of LP
-      const SVector& lpvec = (*vecset)[k];
+      const SVectorBase<R>& lpvec = (*vecset)[k];
       const int size = lpvec.size();
 
       for( int i = 0; i < size; ++i )
@@ -173,7 +173,7 @@ static void initConstVecs(
       vecnnzinv.add(k, nnzinv);
 
       /* create new VectorBase<R> for facset */
-      SVector& vecnew = (*(facset.create(nnz)));
+      SVectorBase<R>& vecnew = (*(facset.create(nnz)));
 
       for( int i = 0; i < size; ++i )
       {

@@ -411,10 +411,27 @@ inline Real maxAbs(Real a, Real b)
    return absa > absb ? absa : absb;
 }
 
+/// returns max(|a|,|b|)
+template <typename T>
+inline boost::multiprecision::number<T> maxAbs(boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
+{
+  const Real absa = spxAbs(a);
+  const Real absb = spxAbs(b);
+
+  return absa > absb ? absa : absb;
+}
+
+
 /// returns (a-b) / max(|a|,|b|,1.0)
 inline Real relDiff(Real a, Real b)
 {
    return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
+}
+
+template <typename T>
+inline boost::multiprecision::number<T> relDiff(boost::multiprecision::number<T> a, boost::multiprecision::number<T> b)
+{
+  return (a - b) / (maxAbs(a, b) > 1.0 ? maxAbs(a, b) : 1.0);
 }
 
 /// safe version of snprintf

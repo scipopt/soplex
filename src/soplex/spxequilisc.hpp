@@ -69,7 +69,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
 }
 
   template <class R>
-  void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp)
+  void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const DataArray<int>& coScaleExp, DataArray<int>& scaleExp)
 {
    assert(vecset != nullptr);
 
@@ -99,7 +99,7 @@ static R maxPrescaledRatio(const SPxLPBase<R>& lp, const std::vector<R>& coScale
 }
 
   template <class R>
-void SPxEquiliSC<R>::computeEquiExpVec(const SVSet* vecset, const std::vector<R>& coScaleVal, DataArray<int>& scaleExp)
+  void SPxEquiliSC<R>::computeEquiExpVec(const SVSetBase<R>* vecset, const std::vector<R>& coScaleVal, DataArray<int>& scaleExp)
 {
    assert(vecset != nullptr);
 
