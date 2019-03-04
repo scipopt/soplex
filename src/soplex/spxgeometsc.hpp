@@ -64,7 +64,7 @@ static R computeScalingVec(
       assert(mini < R(infinity));
       assert(maxi > 0.0);
 
-      scaleval[unsigned(i)] = 1.0 / std::sqrt(mini * maxi);
+      scaleval[unsigned(i)] = 1.0 / spxSqrt(mini * maxi);
 
       const R p = maxi / mini;
 
