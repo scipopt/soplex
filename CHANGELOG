@@ -50,6 +50,17 @@ interface & parameters:
   `SoPlexBase<R>`.
 
 fixed bugs:
+- resolve compiler warning about data loss during implicit type conversion for timers
+- return correct basis status when aborting a solve early
+- ensure basis status is set correctly when aborting a solve early
+
+code quality:
+- merge SoPlex::hasDual() and SoPlex::hasPrimal() into SoPlex::hasSol() and mark old methods deprecated
+
+09 January 2019 - Release 4.0.1
+===============================
+
+fixed bugs:
 - correct objective function update in aggregation simplifier
 - use center value when fixing variables with slightly different bounds
 - MPS reader: print error message and terminate in case of duplicate column names or not column-wise ordering
