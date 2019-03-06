@@ -157,6 +157,13 @@ extern bool msginconsistent(const char* name, const char* file, int line);
  *-----------------------------------------------------------------------------
  */
 
+  // Overloaded spxLdexp
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T, eto> x, int exp)
+  {
+    return boost::multiprecision::ldexp(x,exp);
+  }
+
   // Overloaded function to return the square-root
   template <typename T>
   boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)

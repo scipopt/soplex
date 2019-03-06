@@ -123,11 +123,6 @@ namespace soplex
     return 0;
   }
 
-  template <typename T>
-  boost::multiprecision::number<T> spxLdexp(boost::multiprecision::number<T> x, int exp)
-  {
-    return ldexp(x,exp);
-  }
 
 
 
