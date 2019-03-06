@@ -35,6 +35,7 @@
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
+#include "gmpxx.h"              // For mpq_class
 #endif
 
 
@@ -136,8 +137,8 @@ namespace soplex
      // @todo The function is not implemented in the #else part, is this
      // important? Only important if someone doesn't have gmp library, but
      // boost.
-     template <typename T>
-     Rational& operator=(const boost::multiprecision::number<T> &q);
+     template <typename T, boost::multiprecision::expression_template_option eto>
+     Rational& operator=(const boost::multiprecision::number<T, eto> &q);
 
       //@}
 
@@ -572,6 +573,285 @@ namespace soplex
 
    /// Size of largest denominator in rational vector.
    int dmaxSizeRational(const Rational* vector, const int length, const int base = 2);
+
+#ifdef SOPLEX_WITH_GMP
+  /// Defines the "Pimpl"-class Private
+class Rational::Private
+{
+public:
+
+   mpq_t privatevalue;  ///< actual value of the Rational object
+   Private* theprev;    ///< pointer to the previous element in the list
+   Private* thenext;    ///< pointer to the next element in the list
+
+   /// default constructor
+   Private()
+      : theprev(0)
+      , thenext(0)
+   {
+      mpq_init(privatevalue);
+   }
+
+   /// copy constructor
+   Private(const Private& p)
+      : theprev(0)
+      , thenext(0)
+   {
+      // a newly constructed element is not in any list, even if the original element (p) is; hence we initialize
+      // theprev and thenext to zero
+      mpq_init(privatevalue);
+      mpq_set(this->privatevalue, p.privatevalue);
+   }
+
+   /// constructor from long double
+   Private(const long double& r)
+      : theprev(0)
+      , thenext(0)
+   {
+      mpq_init(privatevalue);
+      if( r == (long double)(1.0) )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      else if( r == (long double)(-1.0) )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( r == (long double)(0.0) )
+      {
+         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+      else
+         mpq_set_d(privatevalue, double(r));
+   }
+
+   /// constructor from double
+   Private(const double& r)
+      : theprev(0)
+      , thenext(0)
+   {
+      mpq_init(privatevalue);
+      if( r == 1.0 )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      else if( r == -1.0 )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( r == 0.0 )
+      {
+         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+      else
+         mpq_set_d(privatevalue, r);
+   }
+
+   /// constructor from int
+   Private(const int& i)
+      : theprev(0)
+      , thenext(0)
+   {
+      mpq_init(privatevalue);
+      if( i == 1 )
+         mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      else if( i == -1 )
+         mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      else if( i == 0 )
+      {
+         assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+      else
+         mpq_set_si(privatevalue, i, 1);
+   }
+
+   /// constructor from mpq_t
+   Private(const mpq_t& q)
+      : theprev(0)
+      , thenext(0)
+   {
+      mpq_init(privatevalue);
+      mpq_set(privatevalue, q);
+   }
+
+   /// destructor
+   ~Private()
+   {
+      mpq_clear(privatevalue);
+   }
+
+   /// assignment operator
+   Private& operator=(const Private& p)
+   {
+#ifdef SOPLEX_PERFALT_4
+      if( mpq_equal(this->privatevalue, p.privatevalue) != 0 )
+         return *this;
+#endif
+
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set(this->privatevalue, p.privatevalue);
+      return *this;
+   }
+
+   /// assignment operator from long double
+   Private& operator=(const long double& r)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      if( r == (long double)(0.0) )
+      {
+#ifdef SOPLEX_PERFALT_5a
+#ifdef SOPLEX_PERFALT_1
+         if( mpq_sgn(privatevalue) != 0 )
+#else
+         if( mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0 )
+#endif
+#endif
+            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      }
+      else if( r == (long double)(1.0) )
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      }
+      else if( r == (long double)(-1.0) )
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      }
+      else
+         mpq_set_d(this->privatevalue, double(r));
+
+      return *this;
+   }
+
+   /// assignment operator from double
+   Private& operator=(const double& r)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      if( r == 0.0 )
+      {
+#ifdef SOPLEX_PERFALT_5a
+#ifdef SOPLEX_PERFALT_1
+         if( mpq_sgn(privatevalue) != 0 )
+#else
+         if( mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0 )
+#endif
+#endif
+            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      }
+      else if( r == 1.0 )
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      }
+      else if( r == -1.0 )
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      }
+      else
+         mpq_set_d(privatevalue, r);
+
+      return *this;
+   }
+
+   /// assignment operator from int
+   Private& operator=(const int& i)
+   {
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      if( i == 0 )
+      {
+#ifdef SOPLEX_PERFALT_5a
+#ifdef SOPLEX_PERFALT_1
+         if( mpq_sgn(privatevalue) != 0 )
+#else
+         if( mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) == 0 )
+#endif
+#endif
+            mpq_set(privatevalue, Rational::ZERO.dpointer->privatevalue);
+      }
+      else if( i == 1 )
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::POSONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+      }
+      else if( i == -1 )
+      {
+#ifdef SOPLEX_PERFALT_5b
+         if( mpq_equal(privatevalue, Rational::NEGONE.dpointer->privatevalue) == 0 )
+#endif
+            mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+      }
+      else
+         mpq_set_si(privatevalue, i, 1);
+
+      return *this;
+   }
+
+   /// assignment operator from mpq_t
+   Private& operator=(const mpq_t& q)
+   {
+#ifdef SOPLEX_PERFALT_4
+   if( mpq_equal(this->privatevalue, q) != 0 )
+      return *this;
+#endif
+
+      // we only assign the value; the position in the list, i.e., theprev and thenext, must not be modified
+      mpq_set(this->privatevalue, q);
+      return *this;
+   }
+
+  // The back end for Rational operator=.
+  // @todo Have proper #if else
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Private& operator=(const boost::multiprecision::number<T, eto>& q)
+  {
+    // Construct a new boost number type with mpq_t as the backend from the
+    // number. Hopefully, the boost library would do this. Now, the backend()
+    // function of tmp_num will return a number of type mpq_t.
+    boost::multiprecision::number<mpq_class> tmp_num(q);
+    mpq_class tmp_mpz = tmp_num; // tmp_num gets casted.
+    mpq_set(this->privatevalue, tmp_mpz.get_mpq_t());
+    return *this;
+  }
+
+   /// previous Private element
+   Private*& prev()
+   {
+      return theprev;
+   }
+
+   /// previous Private element
+   Private* const& prev() const
+   {
+      return theprev;
+   }
+
+   /// next Private element
+   Private*& next()
+   {
+      return thenext;
+   }
+
+   /// next Private element
+   Private* const& next() const
+   {
+      return thenext;
+   }
+};
+#endif  // SOPLEX_WITH_GMP
+
+
+  // Assignment operator from boost number. Uses the API for the Private class
+  // to do this.
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Rational& Rational::operator=(const boost::multiprecision::number<T, eto> &r)
+  {
+    *(this->dpointer) = r;
+    return *this;
+  }
 
    //@}
 
