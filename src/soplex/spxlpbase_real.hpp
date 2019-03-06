@@ -2895,12 +2895,48 @@ static void MPSwriteRecord(
     (*ndualcols) = primalrowsidx;
   }
 
+  /// Changes LP element (\p i, \p j) to \p val. \p scale determines whether the new data should be scaled
+  // template <class R>
+  // void SPxLPBase<R>::changeElement(int i, int j, const R &val, bool scale)
+  // {
+  //   if (i < 0 || j < 0)
+  //     return;
 
+  //   SVectorBase<R> &row = rowVector_w(i);
+  //   SVectorBase<R> &col = colVector_w(j);
 
-  // ---------------------------------------------------------------------------------------------------------------------
-  //  Explicit instantiation
-  // ---------------------------------------------------------------------------------------------------------------------
+  //   if( isNotZero(val) )
+  //     {
+  //       R newVal;
 
-  // template class SPxLPBase < Real >;
+  //       if (scale)
+  //         {
+  //           assert(_isScaled);
+  //           assert(lp_scaler);
+  //           newVal = lp_scaler->scaleElement(*this, i, j, val);
+  //         }
+  //       else
+  //         newVal = val;
+
+  //       if (row.pos(j) >= 0 && col.pos(i) >= 0)
+  //         {
+  //           row.value(row.pos(j)) = newVal;
+  //           col.value(col.pos(i)) = newVal;
+  //         }
+  //       else
+  //         {
+  //           LPRowSetBase<R>::add2(i, 1, &j, &newVal);
+  //           LPColSetBase<R>::add2(j, 1, &i, &newVal);
+  //         }
+  //     }
+  //   else if (row.pos(j) >= 0 && col.pos(i) >= 0)
+  //     {
+  //       row.remove(row.pos(j));
+  //       col.remove(col.pos(i));
+  //     }
+
+  //   assert(isConsistent());
+  // }
+
 
 } // namespace soplex

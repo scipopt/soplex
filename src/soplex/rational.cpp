@@ -443,17 +443,6 @@ Rational::operator long double() const
    return (long double)mpq_get_d(this->dpointer->privatevalue);
 }
 
-// Operator to typecast Rational to one of the Boost Number types
-// @todo needs #if else.
-template <typename T, boost::multiprecision::expression_template_option eto>
-Rational::operator boost::multiprecision::number<T,  eto>() const
-{
-  // Constructs a boost::multiprecision::number<T> with value
-  // this->pointer->privatevalue
-  return boost::multiprecision::number<T, boost::multiprecision::et_off>(this->dpointer->privatevalue);
-  // @todo may need to work with edge cases like the other codes?
-}
-
 
 
 /// provides read-only access to underlying mpq_t

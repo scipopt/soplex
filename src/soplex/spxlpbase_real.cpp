@@ -168,49 +168,8 @@ void SPxLPBase<Real>::changeRhs(const VectorBase<Real>& newRhs, bool scale)
     LPRowSetBase<Real>::rhs_w() = newRhs;
   assert(isConsistent());
 }
-/// Changes LP element (\p i, \p j) to \p val. \p scale determines whether the new data should be scaled
-template <>
-void SPxLPBase<Real>::changeElement(int i, int j, const Real &val, bool scale)
-{
-   if (i < 0 || j < 0)
-      return;
 
-   SVectorBase<Real> &row = rowVector_w(i);
-   SVectorBase<Real> &col = colVector_w(j);
-
-   if( isNotZero(val) )
-   {
-      Real newVal;
-
-      if (scale)
-      {
-         assert(_isScaled);
-         assert(lp_scaler);
-         newVal = lp_scaler->scaleElement(*this, i, j, val);
-      }
-      else
-         newVal = val;
-
-      if (row.pos(j) >= 0 && col.pos(i) >= 0)
-      {
-         row.value(row.pos(j)) = newVal;
-         col.value(col.pos(i)) = newVal;
-      }
-      else
-      {
-         LPRowSetBase<Real>::add2(i, 1, &j, &newVal);
-         LPColSetBase<Real>::add2(j, 1, &i, &newVal);
-      }
-  }
-   else if (row.pos(j) >= 0 && col.pos(i) >= 0)
-   {
-      row.remove(row.pos(j));
-      col.remove(col.pos(i));
-   }
-
-   assert(isConsistent());
-}
-
+  // @todo: fix this file and remove unnecessary functions.
 /// Changes LP element (\p i, \p j) to \p val. \p scale determines whether the new data should be scaled
 template <>
 void SPxLPBase<mpfr_float_50_eto>::changeElement(int i, int j, const mpfr_float_50_eto &val, bool scale)
