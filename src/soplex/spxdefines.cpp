@@ -21,13 +21,67 @@
 #include "soplex/spxout.h"
 #include "soplex/rational.h"
 
+#include "boost/multiprecision/number.hpp"
+
 namespace soplex
 {
 
-THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
+  THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-bool msginconsistent(const char* name, const char* file, int line)
-{
+  template <>
+  THREADLOCAL Real Param<Real>::s_epsilon               = DEFAULT_EPS_ZERO;
+
+  template <>
+  THREADLOCAL Real Param<Real>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+
+  template <>
+  THREADLOCAL Real Param<Real>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+
+  template <>
+  THREADLOCAL Real Param<Real>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+
+  template <>
+  THREADLOCAL Rational Param<Rational>::s_epsilon               = DEFAULT_EPS_ZERO;
+
+  template <>
+  THREADLOCAL Rational Param<Rational>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+
+  template <>
+  THREADLOCAL Rational Param<Rational>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+
+  template <>
+  THREADLOCAL Rational Param<Rational>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+
+  template <>
+  THREADLOCAL int Param<int>::s_epsilon               = 0;
+
+  template <>
+  THREADLOCAL int Param<int>::s_epsilon_factorization = 0;
+
+  template <>
+  THREADLOCAL int Param<int>::s_epsilon_update        = 0;
+
+  template <>
+  THREADLOCAL int Param<int>::s_epsilon_pivot         = 0;
+
+  using mpfr_float = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off>;
+
+  template <>
+  THREADLOCAL  mpfr_float Param<mpfr_float >::s_epsilon               = DEFAULT_EPS_ZERO;
+
+  template <>
+  THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+
+  template <>
+  THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+
+  template <>
+  THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+
+
+
+  bool msginconsistent(const char* name, const char* file, int line)
+  {
    assert(name != 0);
    assert(file != 0);
    assert(line >= 0);
@@ -36,7 +90,7 @@ bool msginconsistent(const char* name, const char* file, int line)
    << "Inconsistency detected in " << name << std::endl; )
 
    return 0;
-}
+  }
 
   template <>
   Real spxFrexp(Real y, int* exp)

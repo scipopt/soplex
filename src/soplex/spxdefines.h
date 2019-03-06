@@ -146,7 +146,9 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define THREADLOCAL
 #else
-#define THREADLOCAL thread_local
+  // @todo temporary fix
+// #define THREADLOCAL thread_local
+#define THREADLOCAL
 #endif
 #endif
 
