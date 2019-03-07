@@ -105,7 +105,7 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	=	-lgmpxx -lgmp
+GMP_LDFLAGS	=	-lgmpxx -lgmp -lmpfr
 GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)
@@ -379,10 +379,6 @@ else
 GMP_LDFLAGS	=
 GMP_CPPFLAGS	=
 endif
-
-# MPF library
-# @todo this needs to be implemented properly
-LDFLAGS	+= -lmpfr
 
 ZLIBDEP		:=	$(SRCDIR)/depend.zlib
 ZLIBSRC		:=	$(shell cat $(ZLIBDEP))
