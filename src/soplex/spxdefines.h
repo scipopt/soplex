@@ -46,6 +46,16 @@
 
 namespace soplex
 {
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
+  {
+    using namespace std;
+    using namespace boost::math::tools;
+
+    return frexp(y, exp);
+  }
+
+
 #define SOPLEX_VERSION         400
 #define SOPLEX_SUBVERSION        3
 #define SOPLEX_APIVERSION        8
@@ -172,10 +182,19 @@ extern bool msginconsistent(const char* name, const char* file, int line);
   }
 
   // the nextafter function
-  template <typename T>
-  boost::multiprecision::number<T> spxNextafter(boost::multiprecision::number<T> x, boost::multiprecision::number<T> y)
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  boost::multiprecision::number<T, eto> spxNextafter(boost::multiprecision::number<T, eto> x, boost::multiprecision::number<T, eto> y)
   {
-    return boost::math::nextafter(x,y);
+    using namespace std;
+    using namespace boost::math;
+
+    // Turns out that nextafter is not supported in the mpfr library? The mpfr
+    // library does a different function named nextabove. Probably a
+    // replacement? I've made an issue about this.
+   // return nextafter(x,y);
+
+    // @todo Temporarily, I'm returning 0
+    return 0;
   }
 
 
@@ -363,6 +382,7 @@ boost::multiprecision::number<T> spxSqrt(boost::multiprecision::number<T> a)
 {
   return boost::multiprecision::sqrt(a);
 }
+
 
 // returns the next representable value after x in the direction of y
 
