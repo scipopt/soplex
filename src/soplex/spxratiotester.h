@@ -76,7 +76,7 @@ namespace soplex
       /// unloads LP.
       virtual void clear()
       {
-        thesolver = 0;
+        thesolver = nullptr;
       }
 
       /// returns loaded LP solver.
@@ -196,8 +196,8 @@ namespace soplex
       /// destructor.
       virtual ~SPxRatioTester()
         {
-          thesolver = 0;
-          m_name    = 0;
+          thesolver = nullptr;
+          m_name    = nullptr;
         }
       /// clone function for polymorphism
       virtual SPxRatioTester* clone() const = 0;
