@@ -398,7 +398,7 @@ SLUFactorRational::Status SLUFactorRational::change(
                   // forestUpdate() with the last parameter set to NULL should fail.
       forest = subst;
       CLUFactorRational::solveLright(forest.altValues());
-      forestUpdate(idx, forest.altValues(), 0, 0);
+      forestUpdate(idx, forest.altValues(), 0, nullptr);
       forest.setSize(0);
       forest.forceSetup();
    }

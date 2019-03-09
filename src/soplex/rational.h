@@ -856,7 +856,7 @@ public:
   {
     // Constructs a boost::multiprecision::number<T> with value
     // this->pointer->privatevalue
-    return boost::multiprecision::number<T, boost::multiprecision::et_off>(this->dpointer->privatevalue);
+    return boost::multiprecision::number<T, eto>(this->dpointer->privatevalue);
     // @todo may need to work with edge cases like the other codes?
   }
 

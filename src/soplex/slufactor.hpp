@@ -713,7 +713,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::change(
                   // forestUpdate() with the last parameter set to NULL should fail.
       forest = subst;
       CLUFactor<R>::solveLright(forest.altValues());
-      this->forestUpdate(idx, forest.altValues(), 0, 0);
+      this->forestUpdate(idx, forest.altValues(), 0, nullptr);
       forest.setSize(0);
       forest.forceSetup();
    }
