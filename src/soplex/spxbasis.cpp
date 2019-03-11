@@ -1335,7 +1335,6 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , lastMem(old.lastMem)
    , lastFill(old.lastFill)
    , lastNzCount(old.lastNzCount)
-   , theTime(old.theTime)
    , timerType(old.timerType)
    , lastin(old.lastin)
    , lastout(old.lastout)
@@ -1345,6 +1344,7 @@ SPxBasis::SPxBasis(const SPxBasis& old)
    , thedesc(old.thedesc)
    , spxout(old.spxout)
 {
+   theTime = TimerFactory::createTimer(old.theTime->type());
 
    this->factor = old.factor->clone();
    freeSlinSolver = true;
