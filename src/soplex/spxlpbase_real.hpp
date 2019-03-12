@@ -1927,8 +1927,8 @@ namespace soplex
    *
    *  @return true if the file was read correctly.
    */
-const int Init_Cols = 10000 ///< initialy allocated columns.
-const int Init_NZos = 100000 ///< initialy allocated non zeros.
+  const int Init_Cols = 10000; ///< initialy allocated columns.
+  const int Init_NZos = 100000; ///< initialy allocated non zeros.
   template <class R>
   bool SPxLPBase<R>::readMPS(
                                 std::istream& p_input,           ///< input stream.

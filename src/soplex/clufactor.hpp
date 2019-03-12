@@ -1542,7 +1542,7 @@ void CLUFactor<R>::initFactorMatrix( const SVectorBase<R>** vec, const R eps )
       else
          if ( nnonzeros == 1 )
          {
-            int j;
+            int j = 0;
 
             /* find nonzero */
 
