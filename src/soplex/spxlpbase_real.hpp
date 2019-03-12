@@ -1927,8 +1927,8 @@ namespace soplex
    *
    *  @return true if the file was read correctly.
    */
-#define INIT_COLS 10000 ///< initialy allocated columns.
-#define INIT_NZOS 100000 ///< initialy allocated non zeros.
+const int Init_Cols = 10000 ///< initialy allocated columns.
+const int Init_NZos = 100000 ///< initialy allocated non zeros.
   template <class R>
   bool SPxLPBase<R>::readMPS(
                                 std::istream& p_input,           ///< input stream.
@@ -1977,8 +1977,8 @@ namespace soplex
 
     SPxLPBase<R>::clear(); // clear the LP.
 
-    cset.memRemax(INIT_NZOS);
-    cset.reMax(INIT_COLS);
+    cset.memRemax(Init_NZos);
+    cset.reMax(Init_Cols);
 
     MPSInput mps(p_input);
 
