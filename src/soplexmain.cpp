@@ -31,7 +31,9 @@
 
 // @todo #if, else
 #include "boost/multiprecision/number.hpp"
-#include <boost/multiprecision/mpfr.hpp>
+#include "boost/multiprecision/mpfr.hpp"
+#include "boost/multiprecision/cpp_bin_float.hpp"
+#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
@@ -488,13 +490,26 @@ int main(int argc, char* argv[])
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
 
+   using namespace boost::multiprecision;
+
    // mpfr_flot_50 with expression template turned off
-   using mpfr_float_50_eto = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off>;
+   using mpfr_float_50_eto = number<mpfr_float_backend<50>, et_off>;
+
+   using mpfr_debug = number<debug_adaptor<mpfr_float_backend<50> >, et_off >;
+
+   // The following won't compile. Because there is no conversion between mpq_t
+   // Rational and cpp_float. Perhaps we need to change the Rational class
+
+   // using cpp_float_50_eto = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<50>, boost::multiprecision::et_off>;
+
+   // using cpp_float = boost::multiprecision::number<boost::multiprecision::cpp_
 
   //@todo need to implement the mpf part properly The arguments should be parsed
   // and the right template of runSoplex should be called
 
-   return runSoPlex<mpfr_float_50_eto>(argc, argv);
+   return runSoPlex<mpfr_debug>(argc, argv);
+   // return runSoPlex<mpfr_float_50_eto>(argc, argv);
+   // return runSoPlex<cpp_float_50_eto >(argc, argv);
   // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }
