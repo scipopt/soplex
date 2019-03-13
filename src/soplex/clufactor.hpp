@@ -2705,8 +2705,11 @@ void CLUFactor<R>::setupRowVals()
    beg   = l.start;
    mem   = beg[vecs];
 
-   if ( l.rval )
-      spx_free( l.rval );
+   if (!l.rval.empty())
+     {
+       l.rval.clear();
+     }
+
 
    if ( l.ridx )
       spx_free( l.ridx );
@@ -2720,7 +2723,7 @@ void CLUFactor<R>::setupRowVals()
    if ( l.rperm )
       spx_free( l.rperm );
 
-   spx_alloc( l.rval, mem );
+   l.rval.reserve(mem);
 
    spx_alloc( l.ridx, mem );
 
@@ -2732,7 +2735,7 @@ void CLUFactor<R>::setupRowVals()
 
    l_ridx = l.ridx;
 
-   l_rval = l.rval;
+   l_rval = l.rval.data();
 
    l_rbeg = l.rbeg;
 
@@ -3712,7 +3715,7 @@ void CLUFactor<R>::solveUleft2(
    corig = col.orig;
 
    ridx = u.row.idx;
-   rval = u.row.val;
+   rval = u.row.val.data();
    rlen = u.row.len;
    rbeg = u.row.start;
 
@@ -3852,7 +3855,7 @@ void CLUFactor<R>::solveLleft2(
    int *rorig;
 
    ridx  = l.ridx;
-   rval  = l.rval;
+   rval  = l.rval.data();
    rbeg  = l.rbeg;
    rorig = l.rorig;
 
@@ -4029,7 +4032,7 @@ int CLUFactor<R>::solveLleftEps( R* vec, int* nonz, R eps )
    int* rorig;
 
    ridx = l.ridx;
-   rval = l.rval;
+   rval = l.rval.data();
    rbeg = l.rbeg;
    rorig = l.rorig;
    n = 0;
@@ -4528,7 +4531,7 @@ int CLUFactor<R>::solveLleft( R eps, R* vec, int* nonz, int rn )
    int *last;
 
    ridx  = l.ridx;
-   rval  = l.rval;
+   rval  = l.rval.data();
    rbeg  = l.rbeg;
    rorig = l.rorig;
    rperm = l.rperm;
@@ -4626,7 +4629,7 @@ void CLUFactor<R>::solveLleftNoNZ( R* vec )
    int* rorig;
 
    ridx = l.ridx;
-   rval = l.rval;
+   rval = l.rval.data();
    rbeg = l.rbeg;
    rorig = l.rorig;
 

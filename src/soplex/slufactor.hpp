@@ -763,8 +763,6 @@ void SLUFactor<R>::clear()
    this->l.size        = 100;
    this->l.startSize   = 100;
 
-   if (this->l.rval)
-     spx_free(this->l.rval);
    if(this->l.ridx)
      spx_free(this->l.ridx);
    if(this->l.rbeg)
@@ -953,7 +951,7 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    memcpy(this->l.start, old.l.start, (unsigned int)this->l.startSize * sizeof(*this->l.start));
    memcpy(this->l.row,   old.l.row,   (unsigned int)this->l.startSize * sizeof(*this->l.row));
 
-   if (old.l.rval != 0)
+   if (!this->l.rval.empty())
    {
       assert(old.l.ridx  != 0);
       assert(old.l.rbeg  != 0);
@@ -962,13 +960,13 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
 
       int memsize = this->l.start[this->l.firstUpdate];
 
-      spx_alloc(this->l.rval,  memsize);
+      this->l.rval.reserve(memsize);
       spx_alloc(this->l.ridx,  memsize);
       spx_alloc(this->l.rbeg,  this->thedim + 1);
       spx_alloc(this->l.rorig, this->thedim);
       spx_alloc(this->l.rperm, this->thedim);
 
-      memcpy(this->l.rval,  old.l.rval,  (unsigned int)memsize     * sizeof(*this->l.rval));
+      this->l.rval = old.l.rval;
       memcpy(this->l.ridx,  old.l.ridx,  (unsigned int)memsize     * sizeof(*this->l.ridx));
       memcpy(this->l.rbeg,  old.l.rbeg, (unsigned int)(this->thedim + 1) * sizeof(*this->l.rbeg));
       memcpy(this->l.rorig, old.l.rorig, (unsigned int)this->thedim      * sizeof(*this->l.rorig));
@@ -981,7 +979,6 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
       assert(old.l.rorig == 0);
       assert(old.l.rperm == 0);
 
-      this->l.rval  = 0;
       this->l.ridx  = 0;
       this->l.rbeg  = 0;
       this->l.rorig = 0;
@@ -1074,7 +1071,6 @@ SLUFactor<R>::SLUFactor()
    this->l.idx       = 0;
    this->l.start     = 0;
    this->l.row       = 0;
-   this->l.rval      = 0;
    this->l.ridx      = 0;
    this->l.rbeg      = 0;
    this->l.rorig     = 0;
@@ -1142,7 +1138,6 @@ SLUFactor<R>::SLUFactor()
       throw x;
    }
 
-   this->l.rval  = 0;
    this->l.ridx  = 0;
    this->l.rbeg  = 0;
    this->l.rorig = 0;
@@ -1209,7 +1204,6 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->l.idx       = 0;
    this->l.start     = 0;
    this->l.row       = 0;
-   this->l.rval      = 0;
    this->l.ridx      = 0;
    this->l.rbeg      = 0;
    this->l.rorig     = 0;
@@ -1258,7 +1252,6 @@ void SLUFactor<R>::freeAll()
 
   if (this->u.col.val) spx_free(this->u.col.val);
 
-  if (this->l.rval) spx_free(this->l.rval);
   if(this->l.ridx) spx_free(this->l.ridx);
   if(this->l.rbeg) spx_free(this->l.rbeg);
   if(this->l.rorig) spx_free(this->l.rorig);

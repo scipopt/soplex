@@ -173,7 +173,7 @@ protected:
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-      R *rval;          ///< values of rows of L
+     std::vector<R> rval;          ///< values of rows of L
       int  *ridx;          ///< indices of rows of L
       int  *rbeg;          ///< start of rows in rval and ridx
       int  *rorig;         ///< original row permutation
