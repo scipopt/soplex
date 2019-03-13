@@ -842,13 +842,16 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    spx_alloc(this->row.orig, this->thedim);
    spx_alloc(this->col.perm, this->thedim);
    spx_alloc(this->col.orig, this->thedim);
-   spx_alloc(this->diag,     this->thedim);
+   // spx_alloc(this->diag,     this->thedim);
+   // The following is optional.
+   this->diag.reserve(this->thedim);
 
    memcpy(this->row.perm, old.row.perm, (unsigned int)this->thedim * sizeof(*this->row.perm));
    memcpy(this->row.orig, old.row.orig, (unsigned int)this->thedim * sizeof(*this->row.orig));
    memcpy(this->col.perm, old.col.perm, (unsigned int)this->thedim * sizeof(*this->col.perm));
    memcpy(this->col.orig, old.col.orig, (unsigned int)this->thedim * sizeof(*this->col.orig));
-   memcpy(this->diag,     old.diag,     (unsigned int)this->thedim * sizeof(*this->diag));
+
+   this->diag = old.diag;
 
    this->work = vec.get_ptr();
 
@@ -989,7 +992,6 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    assert(this->row.orig != 0);
    assert(this->col.perm != 0);
    assert(this->col.orig != 0);
-   assert(this->diag     != 0);
 
    assert(this->u.row.elem  != 0);
    assert(this->u.row.val   != 0);
@@ -1056,7 +1058,6 @@ SLUFactor<R>::SLUFactor()
    this->row.orig    = 0;
    this->col.perm    = 0;
    this->col.orig    = 0;
-   this->diag        = 0;
    this->u.row.elem  = 0;
    this->u.row.val   = 0;
    this->u.row.idx   = 0;
@@ -1089,7 +1090,9 @@ SLUFactor<R>::SLUFactor()
       spx_alloc(this->row.orig, this->thedim);
       spx_alloc(this->col.perm, this->thedim);
       spx_alloc(this->col.orig, this->thedim);
-      spx_alloc(this->diag,     this->thedim);
+
+      // Reserve memory
+      this->diag.reserve(this->thedim);
 
       this->work = vec.get_ptr();
 
@@ -1154,7 +1157,6 @@ SLUFactor<R>::SLUFactor()
    assert(this->row.orig != 0);
    assert(this->col.perm != 0);
    assert(this->col.orig != 0);
-   assert(this->diag     != 0);
 
    assert(this->u.row.elem  != 0);
    assert(this->u.row.val   != 0);
@@ -1191,7 +1193,6 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->row.orig    = 0;
    this->col.perm    = 0;
    this->col.orig    = 0;
-   this->diag        = 0;
    this->u.row.elem  = 0;
    this->u.row.val   = 0;
    this->u.row.idx   = 0;
@@ -1254,7 +1255,6 @@ void SLUFactor<R>::freeAll()
   if(this->l.start) spx_free(this->l.start);
   if(this->l.row) spx_free(this->l.row);
 
-  if(this->diag) spx_free(this->diag);
 
   if (this->u.col.val) spx_free(this->u.col.val);
 
@@ -1324,7 +1324,7 @@ typename SLUFactor<R>::Status SLUFactor<R>::load(const SVectorBase<R>* matrix[],
       spx_realloc(this->row.orig, this->thedim);
       spx_realloc(this->col.perm, this->thedim);
       spx_realloc(this->col.orig, this->thedim);
-      spx_realloc(this->diag,     this->thedim);
+      this->diag.resize(this->thedim);
 
       spx_realloc(this->u.row.elem,  this->thedim);
       spx_realloc(this->u.row.len,   this->thedim + 1);

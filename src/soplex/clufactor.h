@@ -24,6 +24,8 @@
 #include "soplex/timer.h"
 #include "soplex/svector.h"
 
+#include "vector"
+
 #define WITH_L_ROWS 1
 
 namespace soplex
@@ -197,7 +199,7 @@ protected:
    Perm    col;               ///< column permutation matrices
 
    L       l;                 ///< L matrix
-   R*   diag;              ///< Array of pivot elements
+   std::vector<R>   diag;              ///< Array of pivot elements
    U       u;                 ///< U matrix
 
    R*   work;              ///< Working array: must always be left as 0!
