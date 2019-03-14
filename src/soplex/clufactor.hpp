@@ -207,7 +207,6 @@ static int deQueueMin( int* heap, int* size )
   template <class R>
   CLUFactor<R>::Temp::Temp()
       : s_mark( 0 )
-      , s_max( 0 )
       , s_cact( 0 )
       , stage( 0 )
       , pivot_col( 0 )
@@ -219,7 +218,7 @@ static int deQueueMin( int* heap, int* size )
   template <class R>
   void CLUFactor<R>::Temp::init( int p_dim )
 {
-   spx_realloc( s_max,  p_dim );
+   s_max.resize(p_dim);
    spx_realloc( s_cact, p_dim );
    spx_realloc( s_mark, p_dim );
    stage = 0;
@@ -234,8 +233,8 @@ static int deQueueMin( int* heap, int* size )
    if ( s_cact != nullptr )
       spx_free( s_cact );
 
-   if ( s_max != nullptr )
-      spx_free( s_max );
+   if (!s_max.empty())
+     s_max.clear();
 
    if ( pivot_col != nullptr )
       spx_free( pivot_col );

@@ -87,7 +87,7 @@ protected:
    {
    public:
       int*    s_mark;       ///< marker
-      R*   s_max;        ///< maximum absolute value per row (or -1)
+     std::vector<R>   s_max;        ///< maximum absolute value per row (or -1)
       int*    s_cact;       ///< lengths of columns of active submatrix
       int     stage;        ///< stage of the structure
       Pring   pivots;       ///< ring of selected pivot rows
