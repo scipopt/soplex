@@ -309,7 +309,7 @@ void CLUFactor<R>::packRows()
    Dring *ring, *list;
 
    int *l_ridx = u.row.idx;
-   R *l_rval = u.row.val;
+   R *l_rval = u.row.val.data();
    int *l_rlen = u.row.len;
    int *l_rmax = u.row.max;
    int *l_rbeg = u.row.start;
@@ -367,7 +367,7 @@ void CLUFactor<R>::forestPackColumns()
    int n, i, j, colno;
    Dring *ring, *list;
 
-   R *cval = u.col.val;
+   R *cval = u.col.val.data();
    int *cidx = u.col.idx;
    int *clen = u.col.len;
    int *cmax = u.col.max;
@@ -478,7 +478,7 @@ void CLUFactor<R>::remaxRow( int p_row, int len )
       init2DR( u.row.elem[p_row], *ring );
 
       idx = u.row.idx;
-      val = u.row.val;
+      val = u.row.val.data();
 
       for ( ; i < k; ++i, ++j )
       {
@@ -675,7 +675,7 @@ void CLUFactor<R>::forestReMaxCol( int p_col, int len )
       init2DR( u.col.elem[p_col], *ring );
 
       idx = u.col.idx;
-      val = u.col.val;
+      val = u.col.val.data();
 
       for ( ; i < k; ++i )
       {
@@ -733,7 +733,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
    int *clen = u.col.len;
    int *cbeg = u.col.start;
 
-   R *rval = u.row.val;
+   R *rval = u.row.val.data();
    int *ridx = u.row.idx;
    int *rmax = u.row.max;
    int *rlen = u.row.len;
@@ -789,7 +789,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
 
       cidx = u.col.idx;
 
-      cval = u.col.val;
+      cval = u.col.val.data();
 
       k = cbeg[p_col];
 
@@ -817,7 +817,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
             if ( rmax[i] <= rlen[i] )
             {
                remaxRow( i, rlen[i] + 1 );
-               rval = u.row.val;
+               rval = u.row.val.data();
                ridx = u.row.idx;
             }
 
@@ -845,7 +845,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
        *      reMaxCol(fac, col, dim);
        */
       cidx = u.col.idx;
-      cval = u.col.val;
+      cval = u.col.val.data();
       k = cbeg[p_col];
       j = k + cmax[p_col];
       r = 0;
@@ -866,7 +866,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
                clen[p_col] = k - cbeg[p_col];
                forestReMaxCol( p_col, dim - i );
                cidx = u.col.idx;
-               cval = u.col.val;
+               cval = u.col.val.data();
                k = cbeg[p_col];
                j = k + cmax[p_col];
                k += clen[p_col];
@@ -882,7 +882,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
             if ( rmax[i] <= rlen[i] )
             {
                remaxRow( i, rlen[i] + 1 );
-               rval = u.row.val;
+               rval = u.row.val.data();
                ridx = u.row.idx;
             }
 
@@ -984,7 +984,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
           */
          ll = makeLvec( r - c, rowno );
 
-         lval = l.val;
+         lval = l.val.data();
 
          lidx = l.idx;
 
@@ -1070,7 +1070,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
          {
             rlen[rowno] = 0;
             remaxRow( rowno, num );
-            rval = u.row.val;
+            rval = u.row.val.data();
             ridx = u.row.idx;
          }
 
@@ -1108,7 +1108,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
                {
                   forestReMaxCol( j, clen[j] + 1 );
                   cidx = u.col.idx;
-                  cval = u.col.val;
+                  cval = u.col.val.data();
                }
 
                cval[cbeg[j] + clen[j]] = x;
@@ -1142,7 +1142,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
           */
          ll = makeLvec( r - c, rowno );
 
-         lval = l.val;
+         lval = l.val.data();
 
          lidx = l.idx;
 
@@ -1208,7 +1208,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
          {
             rlen[rowno] = 0;
             remaxRow( rowno, n );
-            rval = u.row.val;
+            rval = u.row.val.data();
             ridx = u.row.idx;
          }
 
@@ -1240,7 +1240,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
                {
                   forestReMaxCol( j, clen[j] + 1 );
                   cidx = u.col.idx;
-                  cval = u.col.val;
+                  cval = u.col.val.data();
                }
 
                cval[cbeg[j] + clen[j]] = x;
@@ -1297,7 +1297,7 @@ void CLUFactor<R>::update( int p_col, R* p_work, const int* p_idx, int num )
 
    ll = makeLvec( num, p_col );
    //   ll = fac->makeLvec(num, col);
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
 
    for ( i = num - 1; ( j = p_idx[i] ) != p_col; --i )
@@ -1344,7 +1344,7 @@ void CLUFactor<R>::updateNoClear(
    rezi = 1 / p_work[p_col];
    ll = makeLvec( num, p_col );
    //ll = fac->makeLvec(num, col);
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
 
    for ( i = num - 1; ( j = p_idx[i] ) != p_col; --i )
@@ -2631,11 +2631,10 @@ int CLUFactor<R>::setupColVals()
    int i;
    int n = thedim;
 
-   if ( u.col.val != 0 )
-      spx_free( u.col.val );
+   if (!u.col.val.empty())
+     u.col.val.clear();
 
-   // if we would know the old size of u.col.val, this could be a realloc.
-   spx_alloc( u.col.val, u.col.size );
+   u.col.val.reserve(u.col.size);
 
    for ( i = 0; i < thedim; i++ )
       u.col.len[i] = 0;
@@ -2701,7 +2700,7 @@ void CLUFactor<R>::setupRowVals()
    vecs  = l.firstUpdate;
    l_row = l.row;
    idx   = l.idx;
-   val   = l.val;
+   val   = l.val.data();
    beg   = l.start;
    mem   = beg[vecs];
 
@@ -2908,7 +2907,7 @@ void CLUFactor<R>::minRowMem( int size )
    if ( u.row.size < size )
    {
       u.row.size = size;
-      spx_realloc( u.row.val, size );
+      u.row.val.resize(size);
       spx_realloc( u.row.idx, size );
    }
 }
@@ -2936,7 +2935,7 @@ void CLUFactor<R>::forestMinColMem( int size )
    {
       u.col.size = size;
       spx_realloc( u.col.idx, size );
-      spx_realloc( u.col.val, size );
+      u.col.val.resize(size);
    }
 }
 
@@ -2947,7 +2946,7 @@ void CLUFactor<R>::minLMem( int size )
    if ( size > l.size )
    {
       l.size = int( 0.2 * l.size + size );
-      spx_realloc( l.val, l.size );
+      l.val.resize(l.size);
       spx_realloc( l.idx, l.size );
    }
 }
@@ -3157,7 +3156,7 @@ int CLUFactor<R>::solveUrightEps( R* vec, int* nonz, R eps, R* rhs )
    corig = col.orig;
 
    cidx = u.col.idx;
-   cval = u.col.val;
+   cval = u.col.val.data();
    clen = u.col.len;
    cbeg = u.col.start;
 
@@ -3202,7 +3201,7 @@ void CLUFactor<R>::solveUright2(
    corig = col.orig;
 
    cidx = u.col.idx;
-   cval = u.col.val;
+   cval = u.col.val.data();
    clen = u.col.len;
    cbeg = u.col.start;
 
@@ -3268,7 +3267,7 @@ int CLUFactor<R>::solveUright2eps(
    corig = col.orig;
 
    cidx = u.col.idx;
-   cval = u.col.val;
+   cval = u.col.val.data();
    clen = u.col.len;
    cbeg = u.col.start;
 
@@ -3342,7 +3341,7 @@ void CLUFactor<R>::solveLright( R* vec )
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -3403,7 +3402,7 @@ void CLUFactor<R>::solveLright2( R* vec1, R* vec2 )
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -3486,7 +3485,7 @@ void CLUFactor<R>::solveUpdateRight( R* vec )
 
    assert( !l.updateType );             /* no Forest-Tomlin Updates */
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -3522,7 +3521,7 @@ void CLUFactor<R>::solveUpdateRight2( R* vec1, R* vec2 )
 
    assert( !l.updateType );             /* no Forest-Tomlin Updates */
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -3786,7 +3785,7 @@ int CLUFactor<R>::solveLleft2forest(
    int *lidx, *idx, *lrow;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -3860,7 +3859,7 @@ void CLUFactor<R>::solveLleft2(
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
-   R*   lval  = l.val;
+   R*   lval  = l.val.data();
    int*    lidx  = l.idx;
    int*    lrow  = l.row;
    int*    lbeg  = l.start;
@@ -3950,7 +3949,7 @@ int CLUFactor<R>::solveLleftForest( R* vec, int* /* nonz */, R /* eps */ )
    R *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -3980,7 +3979,7 @@ void CLUFactor<R>::solveLleft( R* vec ) const
 #ifndef WITH_L_ROWS
    int*  idx;
    R* val;
-   R* lval  = l.val;
+   R* lval  = l.val.data();
    int*  lidx  = l.idx;
    int*  lrow  = l.row;
    int*  lbeg  = l.start;
@@ -4037,7 +4036,7 @@ int CLUFactor<R>::solveLleftEps( R* vec, int* nonz, R eps )
    rorig = l.rorig;
    n = 0;
 #ifndef WITH_L_ROWS
-   R* lval = l.val;
+   R* lval = l.val.data();
    int*  lidx = l.idx;
    int*  lrow = l.row;
    int*  lbeg = l.start;
@@ -4094,7 +4093,7 @@ void CLUFactor<R>::solveUpdateLeft( R* vec )
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4126,7 +4125,7 @@ void CLUFactor<R>::solveUpdateLeft2( R* vec1, R* vec2 )
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4166,7 +4165,7 @@ int CLUFactor<R>::solveUpdateLeft( R eps, R* vec, int* nonz, int n )
 
    assert( !l.updateType );             /* no Forest-Tomlin Updates! */
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4297,7 +4296,7 @@ int CLUFactor<R>::solveUleft( R eps,
 
    ridx = u.row.idx;
 
-   rval = u.row.val;
+   rval = u.row.val.data();
 
    rlen = u.row.len;
 
@@ -4377,7 +4376,7 @@ void CLUFactor<R>::solveUleftNoNZ( R eps, R* vec,
 
    ridx = u.row.idx;
 
-   rval = u.row.val;
+   rval = u.row.val.data();
 
    rlen = u.row.len;
 
@@ -4438,7 +4437,7 @@ int CLUFactor<R>::solveLleftForest( R eps, R* vec, int* nonz, int n )
    R *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4492,7 +4491,7 @@ void CLUFactor<R>::solveLleftForestNoNZ( R* vec )
    R *val, *lval;
    int *idx, *lidx, *lrow, *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4540,7 +4539,7 @@ int CLUFactor<R>::solveLleft( R eps, R* vec, int* nonz, int rn )
    i = l.firstUpdate - 1;
 #ifndef WITH_L_ROWS
 #pragma warn "Not yet implemented, define WITH_L_ROWS"
-   R*   lval = l.val;
+   R*   lval = l.val.data();
    int*    lidx = l.idx;
    int*    lrow = l.row;
    int*    lbeg = l.start;
@@ -4634,7 +4633,7 @@ void CLUFactor<R>::solveLleftNoNZ( R* vec )
    rorig = l.rorig;
 
 #ifndef WITH_L_ROWS
-   R* lval = l.val;
+   R* lval = l.val.data();
    int*    lidx = l.idx;
    int*    lrow = l.row;
    int*    lbeg = l.start;
@@ -4711,7 +4710,7 @@ void CLUFactor<R>::vSolveLright( R* vec, int* ridx, int& rn, R eps )
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4780,7 +4779,7 @@ void CLUFactor<R>::vSolveLright2(
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -4886,7 +4885,7 @@ void CLUFactor<R>::vSolveLright3(
    int *lrow, *lidx, *idx;
    int *lbeg;
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -5057,7 +5056,7 @@ int CLUFactor<R>::vSolveUright( R* vec, int* vidx,
    rperm = row.perm;
 
    cidx = u.col.idx;
-   cval = u.col.val;
+   cval = u.col.val.data();
    clen = u.col.len;
    cbeg = u.col.start;
 
@@ -5164,7 +5163,7 @@ void CLUFactor<R>::vSolveUrightNoNZ( R* vec,
    rperm = row.perm;
 
    cidx = u.col.idx;
-   cval = u.col.val;
+   cval = u.col.val.data();
    clen = u.col.len;
    cbeg = u.col.start;
 
@@ -5270,7 +5269,7 @@ int CLUFactor<R>::vSolveUright2(
    rperm = row.perm;
 
    cidx = u.col.idx;
-   cval = u.col.val;
+   cval = u.col.val.data();
    clen = u.col.len;
    cbeg = u.col.start;
 
@@ -5507,7 +5506,7 @@ int CLUFactor<R>::vSolveUpdateRight( R* vec, int* ridx, int n, R eps )
 
    assert( !l.updateType );             /* no Forest-Tomlin Updates */
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;
@@ -5552,7 +5551,7 @@ void CLUFactor<R>::vSolveUpdateRightNoNZ( R* vec, R /*eps*/ )
 
    assert( !l.updateType );             /* no Forest-Tomlin Updates */
 
-   lval = l.val;
+   lval = l.val.data();
    lidx = l.idx;
    lrow = l.row;
    lbeg = l.start;

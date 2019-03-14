@@ -125,7 +125,7 @@ protected:
          Dring* elem;        ///< %Array of ring elements.
          int    size;        ///< size of arrays val and idx
          int    used;        ///< used entries of arrays idx and val
-         R*  val;         ///< hold nonzero values
+        std::vector<R>  val;         ///< hold nonzero values
          int*   idx;         ///< hold column indices of nonzeros
          int*   start;       ///< starting positions in val and idx
          int*   len;         ///< used nonzeros per row vectors
@@ -144,7 +144,7 @@ protected:
          int size;           ///< size of array idx
          int used;           ///< used entries of array idx
          int *idx;           ///< hold row indices of nonzeros
-         R *val;          /*!< \brief hold nonzero values: this is only initialized
+        std::vector<R> val;          /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
                                 updates.                            */
          int *start;         ///< starting positions in val and idx
@@ -160,7 +160,7 @@ protected:
    struct L
    {
       int  size;           ///< size of arrays val and idx
-      R *val;           ///< values of L vectors
+     std::vector<R> val;           ///< values of L vectors
       int  *idx;           ///< indices of L vectors
       int  startSize;      ///< size of array start
       int  firstUpdate;    ///< number of first update L VectorBase<R>

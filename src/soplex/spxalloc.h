@@ -47,7 +47,7 @@ namespace soplex
 template <class T>
 inline void spx_alloc(T& p, int n = 1)
 {
-   assert(p == nullptr);
+   assert(p == 0);
    assert(n >= 0);
 
    if (n == 0)

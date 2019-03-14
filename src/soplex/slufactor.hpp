@@ -772,14 +772,14 @@ void SLUFactor<R>::clear()
    if(this->l.rperm)
      spx_free(this->l.rperm);
 
-   if(this->u.row.val)
-     spx_free(this->u.row.val);
+   if(!this->u.row.val.empty())
+     this->u.row.val.clear();
    if(this->u.row.idx)
      spx_free(this->u.row.idx);
    if(this->u.col.idx)
      spx_free(this->u.col.idx);
-   if(this->l.val)
-     spx_free(this->l.val);
+   if(this->l.val.empty())
+     this->l.val.clear();
    if(this->l.idx)
      spx_free(this->l.idx);
    if(this->l.start)
@@ -791,11 +791,11 @@ void SLUFactor<R>::clear()
    // G clean up if anything goes wrong here
    try
    {
-     spx_alloc(this->u.row.val, this->u.row.size);
+     this->u.row.val.reserve(this->u.row.size);
      spx_alloc(this->u.row.idx, this->u.row.size);
      spx_alloc(this->u.col.idx, this->u.col.size);
 
-      spx_alloc(this->l.val,   this->l.size);
+     this->l.val.reserve(this->l.size);
       spx_alloc(this->l.idx,   this->l.size);
       spx_alloc(this->l.start, this->l.startSize);
       spx_alloc(this->l.row,   this->l.startSize);
@@ -859,14 +859,14 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    this->u.row.used = old.u.row.used;
 
    spx_alloc(this->u.row.elem,  this->thedim);
-   spx_alloc(this->u.row.val,   this->u.row.size);
+   this->u.row.val.reserve(this->u.row.size);
    spx_alloc(this->u.row.idx,   this->u.row.size);
    spx_alloc(this->u.row.start, this->thedim + 1);
    spx_alloc(this->u.row.len,   this->thedim + 1);
    spx_alloc(this->u.row.max,   this->thedim + 1);
 
    memcpy(this->u.row.elem,  old.u.row.elem,  (unsigned int)this->thedim       * sizeof(*this->u.row.elem));
-   memcpy(this->u.row.val,   old.u.row.val,   (unsigned int)this->u.row.size   * sizeof(*this->u.row.val));
+   this->u.row.val = old.u.row.val;
    memcpy(this->u.row.idx,   old.u.row.idx,   (unsigned int)this->u.row.size   * sizeof(*this->u.row.idx));
    memcpy(this->u.row.start, old.u.row.start, (unsigned int)(this->thedim + 1) * sizeof(*this->u.row.start));
    memcpy(this->u.row.len,   old.u.row.len,   (unsigned int)(this->thedim + 1) * sizeof(*this->u.row.len));
@@ -900,13 +900,15 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    spx_alloc(this->u.col.len,   this->thedim + 1);
    spx_alloc(this->u.col.max,   this->thedim + 1);
 
-   if (old.u.col.val != 0)
+   if (!old.u.col.val.empty())
    {
-      spx_alloc(this->u.col.val, this->u.col.size);
-      memcpy(this->u.col.val, old.u.col.val, (unsigned int)this->u.col.size * sizeof(*this->u.col.val));
+      this->u.col.val.reserve(this->u.col.size);
+      this->u.col.val = old.u.col.val;
    }
    else
-      this->u.col.val = 0;
+     {
+       this->u.col.val.clear();
+     }
 
    memcpy(this->u.col.elem,  old.u.col.elem,  (unsigned int)this->thedim       * sizeof(*this->u.col.elem));
    memcpy(this->u.col.idx,   old.u.col.idx,   (unsigned int)this->u.col.size   * sizeof(*this->u.col.idx));
@@ -941,12 +943,12 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    this->l.firstUnused = old.l.firstUnused;
    this->l.updateType  = old.l.updateType;
 
-   spx_alloc(this->l.val,   this->l.size);
+   this->l.val.reserve(this->l.size);
    spx_alloc(this->l.idx,   this->l.size);
    spx_alloc(this->l.start, this->l.startSize);
    spx_alloc(this->l.row,   this->l.startSize);
 
-   memcpy(this->l.val,   old.l.val,   (unsigned int)this->l.size      * sizeof(*this->l.val));
+   this->l.val = old.l.val;
    memcpy(this->l.idx,   old.l.idx,   (unsigned int)this->l.size      * sizeof(*this->l.idx));
    memcpy(this->l.start, old.l.start, (unsigned int)this->l.startSize * sizeof(*this->l.start));
    memcpy(this->l.row,   old.l.row,   (unsigned int)this->l.startSize * sizeof(*this->l.row));
@@ -991,7 +993,6 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    assert(this->col.orig != 0);
 
    assert(this->u.row.elem  != 0);
-   assert(this->u.row.val   != 0);
    assert(this->u.row.idx   != 0);
    assert(this->u.row.start != 0);
    assert(this->u.row.len   != 0);
@@ -1003,7 +1004,6 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    assert(this->u.col.len   != 0);
    assert(this->u.col.max   != 0);
 
-   assert(this->l.val   != 0);
    assert(this->l.idx   != 0);
    assert(this->l.start != 0);
    assert(this->l.row   != 0);
@@ -1056,7 +1056,6 @@ SLUFactor<R>::SLUFactor()
    this->col.perm    = 0;
    this->col.orig    = 0;
    this->u.row.elem  = 0;
-   this->u.row.val   = 0;
    this->u.row.idx   = 0;
    this->u.row.start = 0;
    this->u.row.len   = 0;
@@ -1066,8 +1065,6 @@ SLUFactor<R>::SLUFactor()
    this->u.col.start = 0;
    this->u.col.len   = 0;
    this->u.col.max   = 0;
-   this->u.col.val   = 0;
-   this->l.val       = 0;
    this->l.idx       = 0;
    this->l.start     = 0;
    this->l.row       = 0;
@@ -1095,7 +1092,7 @@ SLUFactor<R>::SLUFactor()
       this->u.row.size = 1;
       this->u.row.used = 0;
       spx_alloc(this->u.row.elem,  this->thedim);
-      spx_alloc(this->u.row.val,   this->u.row.size);
+      this->u.row.val.reserve(this->u.row.size);
       spx_alloc(this->u.row.idx,   this->u.row.size);
       spx_alloc(this->u.row.start, this->thedim + 1);
       spx_alloc(this->u.row.len,   this->thedim + 1);
@@ -1113,7 +1110,6 @@ SLUFactor<R>::SLUFactor()
       spx_alloc(this->u.col.start, this->thedim + 1);
       spx_alloc(this->u.col.len,   this->thedim + 1);
       spx_alloc(this->u.col.max,   this->thedim + 1);
-      this->u.col.val = 0;
 
       this->u.col.list.idx      = this->thedim;
       this->u.col.start[this->thedim] = 0;
@@ -1122,7 +1118,7 @@ SLUFactor<R>::SLUFactor()
 
       this->l.size = 1;
 
-      spx_alloc(this->l.val, this->l.size);
+      this->l.val.reserve(this->l.size);
       spx_alloc(this->l.idx, this->l.size);
 
       this->l.startSize   = 1;
@@ -1154,7 +1150,6 @@ SLUFactor<R>::SLUFactor()
    assert(this->col.orig != 0);
 
    assert(this->u.row.elem  != 0);
-   assert(this->u.row.val   != 0);
    assert(this->u.row.idx   != 0);
    assert(this->u.row.start != 0);
    assert(this->u.row.len   != 0);
@@ -1166,7 +1161,6 @@ SLUFactor<R>::SLUFactor()
    assert(this->u.col.len   != 0);
    assert(this->u.col.max   != 0);
 
-   assert(this->l.val   != 0);
    assert(this->l.idx   != 0);
    assert(this->l.start != 0);
    assert(this->l.row   != 0);
@@ -1189,7 +1183,7 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->col.perm    = 0;
    this->col.orig    = 0;
    this->u.row.elem  = 0;
-   this->u.row.val   = 0;
+   this->u.row.val.empty();
    this->u.row.idx   = 0;
    this->u.row.start = 0;
    this->u.row.len   = 0;
@@ -1199,8 +1193,6 @@ SLUFactor<R>::SLUFactor(const SLUFactor<R>& old)
    this->u.col.start = 0;
    this->u.col.len   = 0;
    this->u.col.max   = 0;
-   this->u.col.val   = 0;
-   this->l.val       = 0;
    this->l.idx       = 0;
    this->l.start     = 0;
    this->l.row       = 0;
@@ -1234,7 +1226,7 @@ void SLUFactor<R>::freeAll()
   if(this->col.perm) spx_free(this->col.perm);
   if(this->col.orig) spx_free(this->col.orig);
   if(this->u.row.elem) spx_free(this->u.row.elem);
-  if(this->u.row.val) spx_free(this->u.row.val);
+  if(!this->u.row.val.empty()) this->u.row.val.clear();
   if(this->u.row.idx) spx_free(this->u.row.idx);
   if(this->u.row.start) spx_free(this->u.row.start);
   if(this->u.row.len) spx_free(this->u.row.len);
@@ -1244,13 +1236,13 @@ void SLUFactor<R>::freeAll()
   if(this->u.col.start) spx_free(this->u.col.start);
   if(this->u.col.len) spx_free(this->u.col.len);
   if(this->u.col.max) spx_free(this->u.col.max);
-  if(this->l.val) spx_free(this->l.val);
+  if(!this->l.val.empty()) this->l.val.clear();
   if(this->l.idx) spx_free(this->l.idx);
   if(this->l.start) spx_free(this->l.start);
   if(this->l.row) spx_free(this->l.row);
 
 
-  if (this->u.col.val) spx_free(this->u.col.val);
+  if(!this->u.col.val.empty()) this->u.col.val.clear();
 
   if(this->l.ridx) spx_free(this->l.ridx);
   if(this->l.rbeg) spx_free(this->l.rbeg);
