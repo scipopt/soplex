@@ -210,62 +210,22 @@ LIBHEADER	=	soplex/array.h \
 LIBOBJ		= 				soplex/clufactor.o \
 				soplex/clufactor_rational.o \
 				soplex/didxset.o \
-				soplex/enter.o \
 				soplex/gzstream.o \
 				soplex/idxset.o \
-				soplex/leave.o \
 				soplex/mpsinput.o \
 				soplex/nameset.o \
 				soplex/rational.o \
 				soplex/ratrecon.o \
-				soplex/slufactor.o \
-				soplex/solvedbds.o \
 				soplex/slufactor_rational.o \
-				soplex/solverational.o \
-				soplex/solvereal.o \
-				soplex/spxautopr.o \
-				soplex/spxbasis.o \
-				soplex/spxboundflippingrt.o \
-				soplex/spxbounds.o \
-				soplex/spxchangebasis.o \
-				soplex/spxdantzigpr.o \
-				soplex/spxdefaultrt.o \
 				soplex/spxdefines.o \
-				soplex/spxdesc.o \
-				soplex/spxdevexpr.o \
-				soplex/spxequilisc.o \
-				soplex/spxleastsqsc.o \
-				soplex/spxfastrt.o \
-				soplex/spxfileio.o \
-				soplex/spxgeometsc.o \
 				soplex/spxgithash.o \
-				soplex/spxharrisrt.o \
-				soplex/spxhybridpr.o \
 				soplex/spxid.o \
 				soplex/spxlpbase_rational.o \
 				soplex/spxlpbase_real.o \
-				soplex/spxmainsm.o \
 				soplex/spxout.o \
-				soplex/spxparmultpr.o \
-				soplex/spxquality.o \
 				soplex/spxscaler.o \
-				soplex/spxshift.o \
-				soplex/spxsolve.o \
-				soplex/spxsolver.o \
-				soplex/spxstarter.o \
-				soplex/spxsteeppr.o \
-				soplex/spxsumst.o \
-				soplex/spxvecs.o \
-				soplex/spxvectorst.o \
-				soplex/spxweightpr.o \
-				soplex/spxweightst.o \
-				soplex/spxwritestate.o \
-				soplex/statistics.o \
 				soplex/usertimer.o \
-				soplex/validation.o \
 				soplex/wallclocktimer.o \
-				soplex/updatevector.o \
-				soplex/testsoplex.o \
 				soplex.o
 BINOBJ		=	soplexmain.o
 EXAMPLEOBJ	=	example.o
