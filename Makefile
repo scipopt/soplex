@@ -207,8 +207,7 @@ LIBHEADER	=	soplex/array.h \
 				soplex/vector.h \
 				soplex/wallclocktimer.h \
 				soplex.h
-LIBOBJ		= 	soplex/changesoplex.o \
-				soplex/clufactor.o \
+LIBOBJ		= 				soplex/clufactor.o \
 				soplex/clufactor_rational.o \
 				soplex/didxset.o \
 				soplex/enter.o \
