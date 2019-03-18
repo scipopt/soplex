@@ -24,6 +24,7 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
+#include "vector"
 
 #include "soplex/spxdefines.h"
 
@@ -86,7 +87,7 @@ protected:
 
    /// Values of vector.
    /** The memory block pointed to by val must at least have size dimen * sizeof(R). */
-   R* val;
+  std::vector<R> val;
 
    //@}
 
@@ -100,9 +101,8 @@ public:
    /** There is no default constructor since the storage for a VectorBase must be provided externally.  Storage must be
     *  passed as a memory block val at construction. It must be large enough to fit at least dimen values.
     */
-   VectorBase<R>(int p_dimen, R* p_val)
+   VectorBase<R>(int p_dimen)
       : dimen(p_dimen)
-      , val(p_val)
    {
       assert(dimen >= 0);
       assert(isConsistent());
@@ -143,8 +143,7 @@ public:
       {
          assert(dim() == vec.dim());
 
-         for( int i = 0; i < dimen; i++ )
-            val[i] = vec[i];
+         val = vec.val;
 
          assert(isConsistent());
       }
@@ -456,7 +455,7 @@ public:
     */
    R* get_ptr()
    {
-      return val;
+     return val.data();
    }
 
    /// Conversion to C-style pointer.
@@ -465,7 +464,7 @@ public:
     */
    const R* get_const_ptr() const
    {
-      return val;
+     return val.data();
    }
 
    /// Consistency check.
@@ -485,36 +484,40 @@ public:
 
 
 
-/// Assignment operator (specialization for Real).
+  // @todo: this is probably not possible.
+// /// Assignment operator (specialization for Real).
+// template <>
+// inline
+// VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
+// {
+//    if( this != &vec )
+//    {
+//       assert(dim() == vec.dim());
+
+//       // todo: use std::copy?
+//       memcpy(val, vec.val, (unsigned int)dimen*sizeof(Real));
+
+//       assert(isConsistent());
+//    }
+//    return *this;
+// }
+
+
+
+/// Assignment operator (specialization for Real and R).
 template <>
+template <class R>
 inline
-VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Real>& vec)
-{
-   if( this != &vec )
-   {
-      assert(dim() == vec.dim());
-
-      memcpy(val, vec.val, (unsigned int)dimen*sizeof(Real));
-
-      assert(isConsistent());
-   }
-   return *this;
-}
-
-
-
-/// Assignment operator (specialization for Real).
-template <>
-template <>
-inline
-VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Rational>& vec)
+VectorBase<R>& VectorBase<R>::operator=(const VectorBase<Rational>& vec)
 {
    if( (VectorBase<Rational>*)this != &vec )
    {
       assert(dim() == vec.dim());
 
       for( int i = 0; i < dimen; i++ )
-         val[i] = Real(vec[i]);
+        {
+          val[i] = R(vec[i]);
+        }
 
       assert(isConsistent());
    }
@@ -524,14 +527,14 @@ VectorBase<Real>& VectorBase<Real>::operator=(const VectorBase<Rational>& vec)
 
 
 
-/// Set vector to 0 (specialization for Real).
-template<>
-inline
-void VectorBase<Real>::clear()
-{
-   if( dimen > 0 )
-      memset(val, 0, (unsigned int)dimen * sizeof(Real));
-}
+// /// Set vector to 0 (specialization for Real).
+// template<>
+// inline
+// void VectorBase<Real>::clear()
+// {
+//    if( dimen > 0 )
+//       memset(val, 0, (unsigned int)dimen * sizeof(Real));
+// }
 
 
 
