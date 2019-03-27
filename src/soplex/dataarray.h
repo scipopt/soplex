@@ -27,6 +27,8 @@
 #include "soplex/spxdefines.h"
 #include "soplex/spxalloc.h"
 
+#include "vector"
+
 namespace soplex
 {
 /**@brief   Safe arrays of data objects.
@@ -59,13 +61,13 @@ namespace soplex
 
    @see Array, \ref DataObjects "Data Objects"
 */
-template < class T >
+template <typename T>
 class DataArray
 {
 private:
    int thesize;           ///< number of used elements in array data
    int themax;            ///< the length of array data and
-   T*  data;              ///< the array of elements
+  std::vector<T>  data;              ///< the array of elements
 
 protected:
    /** When a DataArray is reSize()%d to more than max() elements, the
@@ -83,14 +85,15 @@ public:
    {
       assert(n >= 0);
       assert(n < thesize);
-      return data[n];
+      return data.at(n);
    }
+
    /// reference \p n 'th const element.
    const T& operator[](int n) const
    {
       assert(n >= 0);
       assert(n < thesize);
-      return data[n];
+      return data.at(n);
    }
 
    /// reference last element.
@@ -109,12 +112,12 @@ public:
    /// get a C pointer to the data.
    T* get_ptr()
    {
-      return data;
+     return data.data();
    }
    /// get a const C pointer to the data.
    const T* get_const_ptr() const
    {
-      return data;
+     return data.data();
    }
 
    /// append element \p t.
@@ -138,29 +141,12 @@ public:
       insert(thesize, t);
    }
 
-   /// insert \p n uninitialized elements before \p i 'th element.
-   void insert(int i, int n)
-   {
-      int j = thesize;
-
-      assert(i >= 0);
-      assert(n >= 0);
-
-      reSize(thesize + n);
-
-      /// move \p n elements in memory from insert position \p i to the back
-      if( j > i )
-         memmove(&(data[i+n]), &(data[i]), (unsigned int) (j - i) * sizeof(T));
-   }
-
    /// insert \p n elements with value \p t before \p i 'the element.
    void insert(int i, int n, const T& t)
    {
       if (n > 0)
       {
-         insert(i, n);
-         for( int j = 0; j < n; j++ )
-            data[i + j] = t;
+        data.insert(data.begin() + i - 1, n, t);
       }
    }
 
@@ -169,8 +155,9 @@ public:
    {
       if (n > 0)
       {
-         insert(i, n);
-         memcpy(&(data[i]), t, (unsigned int) n * sizeof(T));
+        // Inserts the elements of t (using legacy iterators, i.e., pointers)
+        // before data's i th position.
+        data.insert(data.begin() + i - 1, t, t + n);
       }
    }
 
@@ -179,8 +166,7 @@ public:
    {
       if (t.size())
       {
-         insert(i, t.size());
-         memcpy(&(data[i]), t.data, (unsigned int)t.size() * sizeof(T));
+        data.insert(data.begin() + i - 1, t.data.begin(), t.data.end());
       }
    }
 
@@ -188,12 +174,11 @@ public:
    void remove(int n = 0, int m = 1)
    {
       assert(n < size() && n >= 0);
-      /* use memmove instead of memcopy because the destination and the source might overlap */
-      if (n + m < size())
-         memmove(&(data[n]), &(data[n + m]), (unsigned int)(size() - (n + m)) * sizeof(T));
-      else
-         m = size() - n;
-      thesize -= m;
+
+      // TODO: This one removes exactly m elements. Verify if this was what was
+      // originally wanted.
+      data.erase(data.begin() + n, data.begin() + n + m);
+
    }
    /// remove \p m last elements.
    void removeLast(int m = 1)
@@ -265,11 +250,13 @@ public:
       if (thesize <= 0)
       {
          /* no data needs to be copied so do a clean free and alloc */
-         spx_free(data);
-         spx_alloc(data, themax);
+         data.clear();
+         data.reserve(themax);
       }
       else
-         spx_realloc(data, themax);
+        {
+          data.resize(themax);
+        }
    }
    /// assignment operator
    DataArray& operator=(const DataArray& rhs)
@@ -277,7 +264,7 @@ public:
       if (this != &rhs)
       {
          reSize(rhs.size());
-         memcpy(data, rhs.data, (unsigned int) size() * sizeof(T));
+         data = rhs.data;
 
          assert(isConsistent());
       }
@@ -306,12 +293,14 @@ public:
       , data (0)
       , memFactor (old.memFactor)
    {
-      spx_alloc(data, max());
+      data.reserve(max());
 
       assert(thesize >= 0);
 
       if (thesize)
-         memcpy(data, old.data, (unsigned int)thesize * sizeof(T));
+        {
+          data = old.data;
+        }
 
       assert(isConsistent());
    }
@@ -335,7 +324,7 @@ public:
       else
          themax = (thesize == 0) ? 1 : thesize;
 
-      spx_alloc(data, themax);
+      data.reserve(themax);
 
       assert(isConsistent());
    }
@@ -343,10 +332,42 @@ public:
    /// destructor
    ~DataArray()
    {
-      if(data)
-         spx_free(data);
+     ;
    }
 };
+
+  // A hack to avoid the the std::vector<bool> problem
+  //
+  // Problem: std::vector<bool> behaves differently from other other vectors. It
+  // is more memory efficient by packing several bool bits into one byte. Thus
+  // the reference operator '&' doesn't really work. The current code has uses
+  // references (?) The compiler complains that '&operator[]' cannot be
+  // instantiated for T = bool.
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
+  // These functions are not supposed to be called.
+  template <>
+  inline bool& DataArray<bool>::operator[](int n)
+  {
+    assert(n >= 0);
+    assert(n < thesize);
+    assert(true);               // This function should never be called. See
+                                // comments above.
+  }
+
+  /// reference \p n 'th const element.
+  template <>
+  inline const bool& DataArray<bool>::operator[](int n) const
+  {
+    assert(n >= 0);
+    assert(n < thesize);
+    assert(true);               // this function should never get called. See
+                                // comments above
+  }
+
+#pragma GCC diagnostic pop
 
 } // namespace soplex
 #endif // _DATAARRAY_H_
