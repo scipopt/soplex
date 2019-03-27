@@ -984,7 +984,7 @@ void SoPlexBase<R>::_performOptIRStable(
         {
           Rational newRowObj;
           if( _rowTypes[r] == RANGETYPE_FIXED )
-            _solver.changeRowObj(r, 0.0);
+            _solver.changeRowObj(r, R(0.0));
           else
             {
               newRowObj = sol._dual[r];
@@ -1953,7 +1953,7 @@ void SoPlexBase<R>::_performOptIRStable(
                _rationalLP->changeRhs(i, _rationalZero);
             assert(_rationalLP->lhs(i) == 0);
             assert(_rationalLP->rhs(i) == 0);
-            _realLP->changeRange(i, 0.0, 0.0);
+            _realLP->changeRange(i, R(0.0), R(0.0));
             _colTypes.append(_switchRangeType(_rowTypes[i]));
             _rowTypes[i] = RANGETYPE_FIXED;
          }
@@ -2163,8 +2163,8 @@ void SoPlexBase<R>::_performOptIRStable(
          assert((lhsRational(r) > _rationalNegInfty) == _lowerFinite(_rowTypes[r]));
          if( _lowerFinite(_rowTypes[r]) )
          {
-            _rationalLP->changeLhs(r, 0);
-            _realLP->changeLhs(r, 0.0);
+           _rationalLP->changeLhs(r, Rational(0));
+           _realLP->changeLhs(r, R(0.0));
          }
          else if( _realLP->lhs(r) > -realParam(SoPlexBase<R>::INFTY) )
             _realLP->changeLhs(r, -realParam(SoPlexBase<R>::INFTY));
@@ -2172,8 +2172,8 @@ void SoPlexBase<R>::_performOptIRStable(
          assert((rhsRational(r) < _rationalPosInfty) == _upperFinite(_rowTypes[r]));
          if( _upperFinite(_rowTypes[r]) )
          {
-            _rationalLP->changeRhs(r, 0);
-            _realLP->changeRhs(r, 0.0);
+           _rationalLP->changeRhs(r, Rational(0));
+           _realLP->changeRhs(r, R(0.0));
          }
          else if( _realLP->rhs(r) < realParam(SoPlexBase<R>::INFTY) )
             _realLP->changeRhs(r, realParam(SoPlexBase<R>::INFTY));
@@ -2192,8 +2192,8 @@ void SoPlexBase<R>::_performOptIRStable(
       assert(numColsRational() == numOrigCols + 1);
 
       // set objective coefficient and bounds for auxiliary variable
-      _rationalLP->changeMaxObj(numOrigCols, 1);
-      _realLP->changeMaxObj(numOrigCols, 1.0);
+      _rationalLP->changeMaxObj(numOrigCols, Rational(1));
+      _realLP->changeMaxObj(numOrigCols, R(1.0));
 
       _rationalLP->changeBounds(numOrigCols, _rationalNegInfty, 1);
       _realLP->changeBounds(numOrigCols, -realParam(SoPlexBase<R>::INFTY), 1.0);
@@ -2202,14 +2202,14 @@ void SoPlexBase<R>::_performOptIRStable(
       // set objective coefficients to zero and adjust bounds for problem variables
       for( int c = numColsRational() - 2; c >= 0; c-- )
       {
-         _rationalLP->changeObj(c, 0);
-         _realLP->changeObj(c, 0.0);
+        _rationalLP->changeObj(c, Rational(0));
+        _realLP->changeObj(c, R(0.0));
 
          assert((lowerRational(c) > _rationalNegInfty) == _lowerFinite(_colTypes[c]));
          if( _lowerFinite(_colTypes[c]) )
          {
-            _rationalLP->changeLower(c, 0);
-            _realLP->changeLower(c, 0.0);
+           _rationalLP->changeLower(c, Rational(0));
+           _realLP->changeLower(c, R(0.0));
          }
          else if( _realLP->lower(c) > -realParam(SoPlexBase<R>::INFTY) )
             _realLP->changeLower(c, -realParam(SoPlexBase<R>::INFTY));
@@ -2217,8 +2217,8 @@ void SoPlexBase<R>::_performOptIRStable(
          assert((upperRational(c) < _rationalPosInfty) == _upperFinite(_colTypes[c]));
          if( _upperFinite(_colTypes[c]) )
          {
-            _rationalLP->changeUpper(c, 0);
-            _realLP->changeUpper(c, 0.0);
+           _rationalLP->changeUpper(c, Rational(0));
+           _realLP->changeUpper(c, R(0.0));
          }
          else if( _realLP->upper(c) < realParam(SoPlexBase<R>::INFTY) )
             _realLP->changeUpper(c, realParam(SoPlexBase<R>::INFTY));
@@ -2446,8 +2446,8 @@ void SoPlexBase<R>::_performOptIRStable(
       Rational shiftValue2;
       for( int c = numColsRational() - 1; c >= 0; c-- )
       {
-         _rationalLP->changeMaxObj(c, 0);
-         _realLP->changeMaxObj(c, 0.0);
+        _rationalLP->changeMaxObj(c, Rational(0));
+        _realLP->changeMaxObj(c, R(0.0));
 
          if( lowerRational(c) > 0 )
          {
@@ -2498,13 +2498,13 @@ void SoPlexBase<R>::_performOptIRStable(
             }
             else if( _realLP->upper(c) < realParam(SoPlexBase<R>::INFTY) )
             {
-               _rationalLP->changeLower(c, 0);
+              _rationalLP->changeLower(c, Rational(0));
                _realLP->changeBounds(c, 0.0, realParam(SoPlexBase<R>::INFTY));
             }
             else
             {
-               _rationalLP->changeLower(c, 0);
-               _realLP->changeLower(c, 0.0);
+              _rationalLP->changeLower(c, Rational(0));
+              _realLP->changeLower(c, R(0.0));
             }
          }
          else if( upperRational(c) < 0 )
@@ -2556,13 +2556,13 @@ void SoPlexBase<R>::_performOptIRStable(
             }
             else if( _realLP->lower(c) > -realParam(SoPlexBase<R>::INFTY) )
             {
-               _rationalLP->changeUpper(c, 0);
+              _rationalLP->changeUpper(c, Rational(0));
                _realLP->changeBounds(c, -realParam(SoPlexBase<R>::INFTY), 0.0);
             }
             else
             {
-               _rationalLP->changeUpper(c, 0);
-               _realLP->changeUpper(c, 0.0);
+              _rationalLP->changeUpper(c, Rational(0));
+              _realLP->changeUpper(c, R(0.0));
             }
          }
          else
@@ -2595,8 +2595,8 @@ void SoPlexBase<R>::_performOptIRStable(
             }
             else
             {
-               _rationalLP->changeLhs(r, 0);
-               _realLP->changeLhs(r, 0.0);
+              _rationalLP->changeLhs(r, Rational(0));
+              _realLP->changeLhs(r, R(0.0));
                if( _realLP->rhs(r) < realParam(SoPlexBase<R>::INFTY) )
                   _realLP->changeRhs(r, realParam(SoPlexBase<R>::INFTY));
             }
@@ -2612,8 +2612,8 @@ void SoPlexBase<R>::_performOptIRStable(
             }
             else
             {
-               _rationalLP->changeRhs(r, 0);
-               _realLP->changeRhs(r, 0.0);
+              _rationalLP->changeRhs(r, Rational(0));
+              _realLP->changeRhs(r, R(0.0));
                if( _realLP->lhs(r) > -realParam(SoPlexBase<R>::INFTY) )
                   _realLP->changeLhs(r, -realParam(SoPlexBase<R>::INFTY));
             }

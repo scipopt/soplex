@@ -2676,7 +2676,7 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 
   for( int i = 0; i < rhsSize; i++ )
     {
-      _rationalLP->changeRhs(i, rhs[i]);
+      _rationalLP->changeRhs(i, Rational(rhs[i]));
       _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
     }
 

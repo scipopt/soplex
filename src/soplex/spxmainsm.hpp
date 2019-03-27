@@ -1519,8 +1519,8 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
             spx_alloc(RowObjPSptr);
             m_hist.append(new (RowObjPSptr) RowObjPS(lp, i, lp.nCols()));
             lp.addCol(lp.rowObj(i), -lp.rhs(i), UnitVectorBase<R>(i), -lp.lhs(i));
-            lp.changeRange(i, 0.0, 0.0);
-            lp.changeRowObj(i, 0.0);
+            lp.changeRange(i, R(0.0), R(0.0));
+            lp.changeRowObj(i, R(0.0));
             m_addedcols++;
           }
       }
@@ -1551,7 +1551,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
         if (lhs != 0.0 && isZero(lhs, this->epsZero()))
           {
-            lp.changeLhs(i, 0.0);
+            lp.changeLhs(i, R(0.0));
             ++chgLRhs;
           }
         else if (lhs > R(-infinity) && lhs < -maxVal)
@@ -1570,7 +1570,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
         if (rhs != 0.0 && isZero(rhs, this->epsZero()))
           {
-            lp.changeRhs(i, 0.0);
+            lp.changeRhs(i, R(0.0));
             ++chgLRhs;
           }
         else if (rhs > R(-infinity) && rhs < -maxVal)
@@ -1604,7 +1604,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
         if (lo != 0.0 && isZero(lo, this->epsZero()))
           {
-            lp.changeLower(j, 0.0);
+            lp.changeLower(j, R(0.0));
             ++chgBnds;
           }
         else if (lo > R(-infinity) && lo < -maxVal)
@@ -1623,7 +1623,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
         if (up != 0.0 && isZero(up, this->epsZero()))
           {
-            lp.changeUpper(j, 0.0);
+            lp.changeUpper(j, R(0.0));
             ++chgBnds;
           }
         else if (up > R(-infinity) && up < -maxVal)
@@ -1692,7 +1692,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
         if (obj != 0.0 && isZero(obj, this->epsZero()))
           {
-            lp.changeObj(j, 0.0);
+            lp.changeObj(j, R(0.0));
             ++objCnt;
           }
         else if (obj > R(-infinity) && obj < -maxVal)
