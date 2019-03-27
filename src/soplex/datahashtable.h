@@ -140,7 +140,7 @@ public:
    {
       int i = index(h);
 
-      return (i >= 0) ? &m_elem[i].info : 0;
+      return (i >= 0) ? &m_elem[i].info : nullptr;
    }
    /// references \a Info of \a HashItem \p h.
    /** Index operator for accessing the \a Info associated to

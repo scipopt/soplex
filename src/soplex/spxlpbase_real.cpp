@@ -213,4 +213,4 @@ void SPxLPBase<mpfr_float_50_eto>::changeElement(int i, int j, const mpfr_float_
    assert(isConsistent());
 }
 
-}
+} // namespace soplex
