@@ -21,6 +21,7 @@ include(CPack)
 
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
+option(MPFR "Use MPFR" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
@@ -103,6 +104,14 @@ if(GMP_FOUND)
     add_definitions(-DSOPLEX_WITH_GMP)
     include_directories(${GMP_INCLUDE_DIRS})
     set(libs ${libs} ${GMP_LIBRARIES})
+  endif()
+
+if(MPFR)
+  find_package(MPFR)
+  if(MPFR_FOUND)
+    include_directories(${MPFR_INCLUDE_DIRS})
+    set(libs ${libs} ${MPFR_LIBRARIES})
+  endif()
 endif()
 
 # enable all warnings and explicitly switch on colored output for ninja
