@@ -59,7 +59,7 @@ private:
    int memsize;
 
    /// Array of values.
-   R* mem;
+  std::vector<R> mem;
 
    //@}
 
@@ -71,14 +71,11 @@ public:
 
    /// Default constructor. \p d is the initial dimension.
    explicit DVectorBase<R>(int d = 0)
-      : VectorBase<R>(0, 0)
-      , mem(0)
+     : VectorBase<R>(0)
    {
       memsize = (d > 0) ? d : 4;
 
-      spx_alloc(mem, memsize);
-      for( int i = 0; i < memsize; i++ )
-         new (&(mem[i])) R();
+      mem.reserve(memsize);
 
       VectorBase<R>::val = mem;
       VectorBase<R>::dimen = d;
@@ -89,18 +86,12 @@ public:
    /// Copy constructor.
    template < class S >
    explicit DVectorBase<R>(const VectorBase<S>& old)
-      : VectorBase<R>(0, 0)
-      , mem(0)
+     : VectorBase<R>(0)
    {
       VectorBase<R>::dimen = old.dim();
       memsize = VectorBase<R>::dimen;
 
-      spx_alloc(mem, memsize);
-
-      for( int i = 0; i < VectorBase<R>::dimen; i++ )
-         new (&(mem[i])) R(old[i]);
-      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
-         new (&(mem[i])) R();
+      mem.reserve(memsize);
 
       VectorBase<R>::val = mem;
 
@@ -112,18 +103,12 @@ public:
     *  could use the more general one with S = R and generates a shallow copy constructor.
     */
    DVectorBase<R>(const DVectorBase<R>& old)
-      : VectorBase<R>(0, 0)
-      , mem(0)
+     : VectorBase<R>(0)
    {
       VectorBase<R>::dimen = old.dim();
       memsize = old.memsize;
 
-      spx_alloc(mem, memsize);
-
-      for( int i = 0; i < VectorBase<R>::dimen; i++ )
-         new (&(mem[i])) R(old[i]);
-      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
-         new (&(mem[i])) R();
+      mem.reserve(memsize);
 
       VectorBase<R>::val = mem;
 
@@ -133,18 +118,12 @@ public:
    /// Copy constructor.
    template < class S >
    DVectorBase<R>(const DVectorBase<S>& old)
-      : VectorBase<R>(0, 0)
-      , mem(0)
+     : VectorBase<R>(0)
    {
       VectorBase<R>::dimen = old.dim();
       memsize = old.memsize;
 
-      spx_alloc(mem, memsize);
-
-      for( int i = 0; i < VectorBase<R>::dimen; i++ )
-         new (&(mem[i])) R(old[i]);
-      for( int i = VectorBase<R>::dimen; i < memsize; i++ )
-         new (&(mem[i])) R();
+      mem.reserve(memsize);
 
       VectorBase<R>::val = mem;
 
@@ -224,13 +203,7 @@ public:
    /// Destructor.
    virtual ~DVectorBase<R>()
    {
-      if( mem != 0 )
-      {
-         for( int i = memsize-1; i >= 0; i-- )
-            mem[i].~R();
-
-         spx_free(mem);
-      }
+     ;
    }
 
    //@}
@@ -267,29 +240,7 @@ public:
    {
       assert(newsize > VectorBase<R>::dim());
 
-      /* allocate new memory */
-      R* newmem = 0;
-      spx_alloc(newmem, newsize);
-
-      /* call copy constructor for first elements */
-      int i;
-      for( i = 0; i < VectorBase<R>::dim(); i++ )
-         new (&(newmem[i])) R(mem[i]);
-
-      /* call default constructor for remaining elements */
-      for( ; i < newsize; i++ )
-         new (&(newmem[i])) R();
-
-      /* free old memory */
-      for( i = memsize-1; i >= 0; i-- )
-         mem[i].~R();
-
-      spx_free(mem);
-
-      /* assign new memory */
-      mem = newmem;
-      memsize = newsize;
-      VectorBase<R>::val = mem;
+      mem.resize(newsize);
    }
 
    //@}
@@ -316,16 +267,15 @@ public:
 
 
 
-/// Resets \ref soplex::DVectorBase "DVectorBase"'s memory size to \p newsize (specialization for Real).
+// Resets \ref soplex::DVectorBase "DVectorBase"'s memory size to \p newsize (specialization for Real).
 template<>
 inline
 void DVectorBase<Real>::reSize(int newsize)
 {
    assert(newsize >= dim());
 
-   spx_realloc(mem, newsize);
+   mem.resize(newsize);
 
-   val = mem;
    memsize = newsize;
 }
 
@@ -335,12 +285,10 @@ void DVectorBase<Real>::reSize(int newsize)
 template<>
 inline
 DVectorBase<Real>::DVectorBase(int d)
-   : VectorBase<Real>(0, 0)
-   , mem(0)
+   : VectorBase<Real>(0)
 {
    memsize = (d > 0) ? d : 4;
-   spx_alloc(mem, memsize);
-   val = mem;
+   mem.reserve(memsize);
    dimen = d;
 
    assert(DVectorBase<Real>::isConsistent());
@@ -353,14 +301,12 @@ template<>
 template<>
 inline
 DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
-   : VectorBase<Real>(0, 0)
-   , mem( 0 )
+  : VectorBase<Real>(0)
 {
    dimen = old.dim();
    memsize = dimen;
-   spx_alloc(mem, memsize);
-   val = mem;
-   *this = old;
+
+   mem = old.val;
 
    assert(DVectorBase<Real>::isConsistent());
 }
@@ -371,14 +317,11 @@ DVectorBase<Real>::DVectorBase(const VectorBase<Real>& old)
 template<>
 inline
 DVectorBase<Real>::DVectorBase(const DVectorBase<Real>& old)
-   : VectorBase<Real>(0, 0)
-   , mem(0)
+  : VectorBase<Real>(0)
 {
    dimen = old.dim();
    memsize = old.memsize;
-   spx_alloc(mem, memsize);
-   val = mem;
-   *this = old;
+   mem = old.mem;
 
    assert(DVectorBase<Real>::isConsistent());
 }
