@@ -410,7 +410,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 {
    if( isSetup() )
    {
-      R* v = VectorBase<R>::val;
+     R* v = VectorBase<R>::val.data();
       R x;
       bool adjust = false;
       int j;

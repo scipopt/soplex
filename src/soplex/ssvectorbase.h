@@ -298,7 +298,7 @@ public:
    /// Returns array values.
    const R* values() const
    {
-      return VectorBase<R>::val;
+     return VectorBase<R>::val.data();
    }
 
    /// Returns indices.
@@ -318,7 +318,7 @@ public:
    R* altValues()
    {
       unSetup();
-      return VectorBase<R>::val;
+      return VectorBase<R>::val.data();
    }
 
    /// Returns indices.

@@ -76,6 +76,9 @@ template < class R > class SSVectorBase;
 template < class R >
 class VectorBase
 {
+  template <typename S>
+  friend class DVectorBase;     // To get access to val member
+  // Probably not the best way.
 protected:
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -116,18 +119,11 @@ public:
       {
          assert(dim() == vec.dim());
 
-         // A lambda function to do the assigment Rvec = SVec.
-         auto copyStoR = [] (R& Rvec, const S& SVec)
-                         {
-                           Rvec = (R) SVec; // Should use the operator= of class
-                                            // R, and SVec gets casted. Example,
-                                            // Rational gets casted to double,
-                                            // number<T> etc.
-                         };
-
 
          for( int i = 0; i < dimen; i++ )
-           copyStoR(val[i], vec[i]);
+           {
+             val[i] = R(vec[i]);
+           }
            // val[i] = vec[i];
 
          assert(isConsistent());
@@ -502,30 +498,7 @@ public:
 //    return *this;
 // }
 
-
-
-/// Assignment operator (specialization for Real and R).
-template <>
-template <class R>
-inline
-VectorBase<R>& VectorBase<R>::operator=(const VectorBase<Rational>& vec)
-{
-   if( (VectorBase<Rational>*)this != &vec )
-   {
-      assert(dim() == vec.dim());
-
-      for( int i = 0; i < dimen; i++ )
-        {
-          val[i] = R(vec[i]);
-        }
-
-      assert(isConsistent());
-   }
-
-   return *this;
-}
-
-
+  // @todo: clean this up
 
 // /// Set vector to 0 (specialization for Real).
 // template<>
