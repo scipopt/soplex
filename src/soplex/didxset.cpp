@@ -21,7 +21,6 @@ namespace soplex
 
 void DIdxSet::setMax(int newmax)
 {
-   assert(idx   != 0);
    assert(max() >  0);
 
    len = (newmax < size()) ? size() : newmax;
@@ -29,7 +28,7 @@ void DIdxSet::setMax(int newmax)
 
    assert(len > 0);
 
-   spx_realloc(idx, len);
+   idx.resize(len);
 }
 
 DIdxSet::DIdxSet(const IdxSet& old)
@@ -37,7 +36,7 @@ DIdxSet::DIdxSet(const IdxSet& old)
 {
    len = old.size();
    len = (len < 1) ? 1 : len;
-   spx_alloc(idx, len);
+   idx.reserve(len);
 
    IdxSet::operator= ( old );
 }
@@ -47,7 +46,7 @@ DIdxSet::DIdxSet(const DIdxSet& old)
 {
    len = old.size();
    len = (len < 1) ? 1 : len;
-   spx_alloc(idx, len);
+   idx.reserve(len);
 
    IdxSet::operator= ( old );
 }
@@ -56,12 +55,11 @@ DIdxSet::DIdxSet(int n)
    : IdxSet()
 {
    len = (n < 1) ? 1 : n;
-   spx_alloc(idx, len);
+   idx.reserve(len);
 }
 
 DIdxSet::~DIdxSet()
 {
-   if(idx)
-      spx_free(idx);
+  ;
 }
 } // namespace soplex
