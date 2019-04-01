@@ -85,7 +85,7 @@ public:
    {
       assert(n >= 0);
       assert(n < thesize);
-      return data.at(n);
+      return data[n];
    }
 
    /// reference \p n 'th const element.
@@ -93,7 +93,17 @@ public:
    {
       assert(n >= 0);
       assert(n < thesize);
-      return data.at(n);
+      return data[n];
+      // return data.at(n); The data.at won't work because of the following
+      // reason.
+      //
+      // 1. data.at checks if n < data.size(). size is 0 at the beginning. 2.
+      // The old alloc pointers worked by allocating a block of memory, then
+      // leaving it to a different function to do the assignment. I haven't
+      // changed this style of code right now, but I think ideally this isn't
+      // how std::vector should be used. The same comment applies to the
+      // previous non-const function too.
+
    }
 
    /// reference last element.
