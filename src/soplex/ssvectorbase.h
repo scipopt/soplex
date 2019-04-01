@@ -557,7 +557,7 @@ public:
    /// Dimension of VectorBase.
    int dim() const
    {
-      return VectorBase<R>::dimen;
+     return VectorBase<R>::dim();
    }
 
    /// Resets dimension to \p newdim.

@@ -91,16 +91,7 @@ public:
 
       return *this;
    }
-   /// assignment from VectorBase<R>
-   UpdateVector<R>& operator=(const VectorBase<R>& rhs)
-   {
-      if ( this != & rhs )
-        VectorBase<R>::operator=(rhs);
 
-      assert(isConsistent());
-
-      return *this;
-   }
    /// assignment
    UpdateVector<R>& operator=(const UpdateVector<R>& rhs);
    //@}

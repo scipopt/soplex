@@ -99,6 +99,14 @@ public:
    /** There is no default constructor since the storage for a VectorBase must be provided externally.  Storage must be
     *  passed as a memory block val at construction. It must be large enough to fit at least dimen values.
     */
+
+  // Default constructor
+  VectorBase<R>()
+  {
+    // Default constructor
+    ;
+  }
+
    VectorBase<R>(int p_dimen)
    {
       val.reserve(p_dimen);
@@ -129,7 +137,7 @@ public:
       if( this != &vec )
       {
 
-        val.reserve(vec.val);
+        val.reserve(vec.dim());
 
          val = vec.val;
 
@@ -474,7 +482,7 @@ public:
   // This used to be VectorBase's way of having std::vector's capacity. This
   // represents the maximum number of elements the std::vector can have without,
   // needing any more resizing. Bigger than size, mostly.
-  int memSize() const
+  std::size_t memSize() const
   {
     return val.capacity();
   }
