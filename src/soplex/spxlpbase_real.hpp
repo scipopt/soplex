@@ -419,12 +419,12 @@ namespace soplex
 
   /// Returns unscaled upper bound vector
   template <class R>
-  void SPxLPBase<R>::getUpperUnscaled(DVectorBase<R>& vec) const
+  void SPxLPBase<R>::getUpperUnscaled(VectorBase<R>& vec) const
   {
     if( _isScaled )
       lp_scaler->getUpperUnscaled(*this, vec);
     else
-      vec = DVectorBase<R>(LPColSetBase<R>::upper());
+      vec = VectorBase<R>(LPColSetBase<R>::upper());
   }
 
   /// Returns unscaled upper bound of column \p i.
@@ -448,12 +448,12 @@ namespace soplex
 
   /// Returns unscaled lower bound vector.
   template <class R>
-  void SPxLPBase<R>::getLowerUnscaled(DVectorBase<R>& vec) const
+  void SPxLPBase<R>::getLowerUnscaled(VectorBase<R>& vec) const
   {
     if( _isScaled )
       lp_scaler->getLowerUnscaled(*this, vec);
     else
-      vec = DVectorBase<R>(LPColSetBase<R>::lower());
+      vec = VectorBase<R>(LPColSetBase<R>::lower());
   }
 
   /// Returns unscaled lower bound of column \p i.

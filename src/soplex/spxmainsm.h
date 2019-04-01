@@ -113,10 +113,10 @@ private:
       virtual PostStep* clone() const = 0;
       /// executes the postsolving.
       virtual void execute(
-        DVectorBase<R>& x,                                 //*< Primal solution VectorBase<R> */
-        DVectorBase<R>& y,                                 //*< Dual solution VectorBase<R> */
-        DVectorBase<R>& s,                                 //*< VectorBase<R> of slacks */
-        DVectorBase<R>& r,                                 //*< Reduced cost VectorBase<R> */
+        VectorBase<R>& x,                                 //*< Primal solution VectorBase<R> */
+        VectorBase<R>& y,                                 //*< Dual solution VectorBase<R> */
+        VectorBase<R>& s,                                 //*< VectorBase<R> of slacks */
+        VectorBase<R>& r,                                 //*< Reduced cost VectorBase<R> */
         DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis,    //*< Basis status of column basis */
         DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis,    //*< Basis status of row basis */
         bool isOptimal
@@ -164,7 +164,7 @@ private:
          return *this;
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
@@ -215,7 +215,7 @@ private:
          return *this;
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
@@ -262,7 +262,7 @@ private:
          return *this;
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
       /// clone function for polymorphism
       inline virtual PostStep* clone() const
@@ -350,7 +350,7 @@ private:
          return new RowSingletonPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -440,7 +440,7 @@ private:
          return new ForceConstraintPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -503,7 +503,7 @@ private:
          return new FixVariablePS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -560,7 +560,7 @@ private:
          return new (FixBoundsPSptr) FixBoundsPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -645,7 +645,7 @@ private:
          return new (FreeZeroObjVariablePSptr) FreeZeroObjVariablePS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -708,7 +708,7 @@ private:
          return new (ZeroObjColSingletonPSptr) ZeroObjColSingletonPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -777,7 +777,7 @@ private:
          return new (FreeColSingletonPSptr) FreeColSingletonPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -873,7 +873,7 @@ private:
          return new (DoubletonEquationPSptr) DoubletonEquationPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -968,7 +968,7 @@ private:
          spx_alloc(DuplicateRowsPSptr);
          return new (DuplicateRowsPSptr) DuplicateRowsPS(*this);
       }
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -1034,7 +1034,7 @@ private:
          spx_alloc(DuplicateColsPSptr);
          return new (DuplicateColsPSptr) DuplicateColsPS(*this);
       }
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -1112,7 +1112,7 @@ private:
          return new (AggregationPSptr) AggregationPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
@@ -1192,7 +1192,7 @@ private:
          return new (MultiAggregationPSptr) MultiAggregationPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
 
@@ -1235,7 +1235,7 @@ private:
          return new (TightenBoundsPSptr) TightenBoundsPS(*this);
       }
       ///
-      virtual void execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+      virtual void execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                            DataArray<typename SPxSolverBase<R>::VarStatus>& cBasis, DataArray<typename SPxSolverBase<R>::VarStatus>& rBasis, bool isOptimal) const;
    };
    // friends
@@ -1284,10 +1284,10 @@ private:
    //**@name Data */
    //@{
    ///
-   DVectorBase<R>                         m_prim;       ///< unsimplified primal solution VectorBase<R>.
-   DVectorBase<R>                         m_slack;      ///< unsimplified slack VectorBase<R>.
-   DVectorBase<R>                         m_dual;       ///< unsimplified dual solution VectorBase<R>.
-   DVectorBase<R>                         m_redCost;    ///< unsimplified reduced cost VectorBase<R>.
+   VectorBase<R>                         m_prim;       ///< unsimplified primal solution VectorBase<R>.
+   VectorBase<R>                         m_slack;      ///< unsimplified slack VectorBase<R>.
+   VectorBase<R>                         m_dual;       ///< unsimplified dual solution VectorBase<R>.
+   VectorBase<R>                         m_redCost;    ///< unsimplified reduced cost VectorBase<R>.
    DataArray<typename SPxSolverBase<R>::VarStatus> m_cBasisStat; ///< basis status of columns.
    DataArray<typename SPxSolverBase<R>::VarStatus> m_rBasisStat; ///< basis status of rows.
    DataArray<int>                  m_cIdx;       ///< column index VectorBase<R> in original LP.
@@ -1331,7 +1331,7 @@ private:
    void trivialHeuristic(SPxLPBase<R>& lp);
 
    /// checks a solution for feasibility
-  bool checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol);
+  bool checkSolution(SPxLPBase<R>& lp, VectorBase<R> sol);
 
    /// tightens variable bounds by propagating the pseudo objective function value.
    void propagatePseudoobj(SPxLPBase<R>& lp);

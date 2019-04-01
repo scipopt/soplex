@@ -28,7 +28,7 @@ namespace soplex
     maxviol = 0.0;
     sumviol = 0.0;
 
-    DVectorBase<R> solu( this->nCols() );
+    VectorBase<R> solu( this->nCols() );
 
     getPrimalSol( solu );
 
@@ -65,7 +65,7 @@ namespace soplex
     maxviol = 0.0;
     sumviol = 0.0;
 
-    DVectorBase<R> solu( this->nCols() );
+    VectorBase<R> solu( this->nCols() );
 
     getPrimalSol( solu );
 
@@ -94,8 +94,8 @@ namespace soplex
     maxviol = 0.0;
     sumviol = 0.0;
 
-    DVectorBase<R> solu( this->nCols() );
-    DVectorBase<R> slacks( this->nRows() );
+    VectorBase<R> solu( this->nCols() );
+    VectorBase<R> slacks( this->nRows() );
 
     getPrimalSol( solu );
     getSlacks( slacks );
@@ -128,9 +128,9 @@ namespace soplex
     // TODO:   y = c_B * B^-1  => coSolve(y, c_B)
     //         redcost = c_N - yA_N
     // solve system "x = e_i^T * B^-1" to get i'th row of B^-1
-    // DVectorBase<R> y( this->nRows() );
+    // VectorBase<R> y( this->nRows() );
     // basis().coSolve( x, spx->unitVector( i ) );
-    // DVectorBase<R> rdcost( this->nCols() );
+    // VectorBase<R> rdcost( this->nCols() );
     if (type() == ENTER)
       {
         for(i = 0; i < dim(); ++i)

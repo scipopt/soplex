@@ -156,7 +156,7 @@ public:
   const VectorBase<R>& rhsRealInternal() const;
 
    /// gets right-hand side vector
-  void getRhsReal(DVectorBase<R>& rhs) const;
+  void getRhsReal(VectorBase<R>& rhs) const;
 
    /// returns right-hand side of row \p i
    R rhsReal(int i) const;
@@ -165,7 +165,7 @@ public:
    const VectorBase<R>& lhsRealInternal() const;
 
    /// gets left-hand side vector
-   void getLhsReal(DVectorBase<R>& lhs) const;
+   void getLhsReal(VectorBase<R>& lhs) const;
 
    /// returns left-hand side of row \p i
    R lhsReal(int i) const;
@@ -186,7 +186,7 @@ public:
    R upperReal(int i) const;
 
    /// gets upper bound vector
-   void getUpperReal(DVectorBase<R>& upper) const;
+   void getUpperReal(VectorBase<R>& upper) const;
 
    /// returns lower bound vector
    const VectorBase<R>& lowerRealInternal() const;
@@ -195,7 +195,7 @@ public:
    R lowerReal(int i) const;
 
    /// gets lower bound vector
-   void getLowerReal(DVectorBase<R>& lower) const;
+   void getLowerReal(VectorBase<R>& lower) const;
 
    /// gets objective function vector
    void getObjReal(VectorBase<R>& obj) const;
@@ -1616,11 +1616,11 @@ private:
    bool _isRealLPScaled;
    bool _applyPolishing;
 
-   DVectorBase<R> _manualLower;
-   DVectorBase<R> _manualUpper;
-   DVectorBase<R> _manualLhs;
-   DVectorBase<R> _manualRhs;
-   DVectorBase<R> _manualObj;
+   VectorBase<R> _manualLower;
+   VectorBase<R> _manualUpper;
+   VectorBase<R> _manualLhs;
+   VectorBase<R> _manualRhs;
+   VectorBase<R> _manualObj;
    SPxLPBase<R> _manualRealLP;
 
    //@}
@@ -1634,21 +1634,21 @@ private:
    DataArray<int> _rationalLUSolverBind;
 
    LPColSetRational _slackCols;
-   DVectorRational _unboundedLower;
-   DVectorRational _unboundedUpper;
-   DVectorRational _unboundedLhs;
-   DVectorRational _unboundedRhs;
+   VectorRational _unboundedLower;
+   VectorRational _unboundedUpper;
+   VectorRational _unboundedLhs;
+   VectorRational _unboundedRhs;
    DSVectorRational _tauColVector;
-   DVectorRational _feasObj;
-   DVectorRational _feasLhs;
-   DVectorRational _feasRhs;
-   DVectorRational _feasLower;
-   DVectorRational _feasUpper;
-   DVectorRational _modLower;
-   DVectorRational _modUpper;
-   DVectorRational _modLhs;
-   DVectorRational _modRhs;
-   DVectorRational _modObj;
+   VectorRational _feasObj;
+   VectorRational _feasLhs;
+   VectorRational _feasRhs;
+   VectorRational _feasLower;
+   VectorRational _feasUpper;
+   VectorRational _modLower;
+   VectorRational _modUpper;
+   VectorRational _modLhs;
+   VectorRational _modRhs;
+   VectorRational _modObj;
    DSVectorRational _primalDualDiff;
    DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusRows;
    DataArray< typename SPxSolverBase<R>::VarStatus > _storedBasisStatusCols;
@@ -1745,8 +1745,8 @@ private:
 
    SPxBasisBase<R> _decompTransBasis;   // the basis required for the transformation to form the reduced problem
 
-   DVectorBase<R> _transformedObj;       // the objective coefficients of the transformed problem
-   DVectorBase<R> _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
+   VectorBase<R> _transformedObj;       // the objective coefficients of the transformed problem
+   VectorBase<R> _decompFeasVector;       // feasibility vector calculated using unshifted bounds.
    LPRowSetBase<R> _transformedRows;    // a set of the original rows that have been transformed using the original basis.
    SPxColId _compSlackColId;     // column id of the primal complementary problem slack column.
    SPxRowId _compSlackDualRowId; // row id in the dual of complementary problem related to the slack column.
@@ -2243,8 +2243,8 @@ private:
    void _evaluateSolutionDecomp(SPxSolverBase<R>& solver, SLUFactor<R>& sluFactor, typename SPxSimplifier<R>::Result result);
 
    /// update the reduced problem with additional columns and rows
-   void _updateDecompReducedProblem(R objVal, DVectorBase<R> dualVector, DVectorBase<R> redcostVector, DVectorBase<R> compPrimalVector,
-      DVectorBase<R> compDualVector);
+   void _updateDecompReducedProblem(R objVal, VectorBase<R> dualVector, VectorBase<R> redcostVector, VectorBase<R> compPrimalVector,
+      VectorBase<R> compDualVector);
 
    /// update the reduced problem with additional columns and rows based upon the violated original bounds and rows
    void _updateDecompReducedProblemViol(bool allrows);

@@ -86,7 +86,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::RowObjPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+  void SPxMainSM<R>::RowObjPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>&,
                                        DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                        DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -127,7 +127,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::FreeConstraintPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+  void SPxMainSM<R>::FreeConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>&,
                                                DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -159,7 +159,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::EmptyConstraintPS::execute(DVectorBase<R>&, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+  void SPxMainSM<R>::EmptyConstraintPS::execute(VectorBase<R>&, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>&,
                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -186,7 +186,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::RowSingletonPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+  void SPxMainSM<R>::RowSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                              DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                              DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -363,7 +363,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::ForceConstraintPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+  void SPxMainSM<R>::ForceConstraintPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                 DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -465,7 +465,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::FixVariablePS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+  void SPxMainSM<R>::FixVariablePS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                             DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                             DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -517,7 +517,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::FixBoundsPS::execute(DVectorBase<R>&, DVectorBase<R>&, DVectorBase<R>&, DVectorBase<R>&,
+  void SPxMainSM<R>::FixBoundsPS::execute(VectorBase<R>&, VectorBase<R>&, VectorBase<R>&, VectorBase<R>&,
                                           DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                           DataArray<typename SPxSolverBase<R>::VarStatus>&, bool isOptimal) const
   {
@@ -526,7 +526,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::FreeZeroObjVariablePS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+  void SPxMainSM<R>::FreeZeroObjVariablePS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                                     DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                     DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -681,7 +681,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::ZeroObjColSingletonPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+  void SPxMainSM<R>::ZeroObjColSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                                     DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                     DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -839,7 +839,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::FreeColSingletonPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+  void SPxMainSM<R>::FreeColSingletonPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -900,7 +900,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::DoubletonEquationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>&, DVectorBase<R>& r,
+  void SPxMainSM<R>::DoubletonEquationPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>&, VectorBase<R>& r,
                                                   DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                   DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -951,7 +951,7 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::DuplicateRowsPS::execute(DVectorBase<R>&, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>&,
+  void SPxMainSM<R>::DuplicateRowsPS::execute(VectorBase<R>&, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>&,
                                               DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                               DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -1061,10 +1061,10 @@ namespace soplex
   }
 
   template <class R>
-  void SPxMainSM<R>::DuplicateColsPS::execute(DVectorBase<R>& x,
-                                              DVectorBase<R>&,
-                                              DVectorBase<R>&,
-                                              DVectorBase<R>& r,
+  void SPxMainSM<R>::DuplicateColsPS::execute(VectorBase<R>& x,
+                                              VectorBase<R>&,
+                                              VectorBase<R>&,
+                                              VectorBase<R>& r,
                                               DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                               DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -1295,7 +1295,7 @@ namespace soplex
   }
 
 template <class R>
-void SPxMainSM<R>::AggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+void SPxMainSM<R>::AggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                  DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
@@ -1394,7 +1394,7 @@ void SPxMainSM<R>::AggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, 
 }
 
 template <class R>
-void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>& y, DVectorBase<R>& s, DVectorBase<R>& r,
+void SPxMainSM<R>::MultiAggregationPS::execute(VectorBase<R>& x, VectorBase<R>& y, VectorBase<R>& s, VectorBase<R>& r,
                                                   DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                                   DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
 {
@@ -1470,7 +1470,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
   }
 
   template <class R>
-  void SPxMainSM<R>::TightenBoundsPS::execute(DVectorBase<R>& x, DVectorBase<R>&, DVectorBase<R>&, DVectorBase<R>&,
+  void SPxMainSM<R>::TightenBoundsPS::execute(VectorBase<R>& x, VectorBase<R>&, VectorBase<R>&, VectorBase<R>&,
                                               DataArray<typename SPxSolverBase<R>::VarStatus>& cStatus,
                                               DataArray<typename SPxSolverBase<R>::VarStatus>& rStatus, bool isOptimal) const
   {
@@ -1821,13 +1821,13 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
   template <class R>
   void SPxMainSM<R>::trivialHeuristic(SPxLPBase<R>& lp)
   {
-    DVectorBase<R>         zerosol(lp.nCols());  // the zero solution VectorBase<R>
-    DVectorBase<R>         lowersol(lp.nCols()); // the lower bound solution VectorBase<R>
-    DVectorBase<R>         uppersol(lp.nCols()); // the upper bound solution VectorBase<R>
-    DVectorBase<R>         locksol(lp.nCols());  // the locks solution VectorBase<R>
+    VectorBase<R>         zerosol(lp.nCols());  // the zero solution VectorBase<R>
+    VectorBase<R>         lowersol(lp.nCols()); // the lower bound solution VectorBase<R>
+    VectorBase<R>         uppersol(lp.nCols()); // the upper bound solution VectorBase<R>
+    VectorBase<R>         locksol(lp.nCols());  // the locks solution VectorBase<R>
 
-    DVectorBase<R>         upLocks(lp.nCols());
-    DVectorBase<R>         downLocks(lp.nCols());
+    VectorBase<R>         upLocks(lp.nCols());
+    VectorBase<R>         downLocks(lp.nCols());
 
     R            zeroObj = this->m_objoffset;
     R            lowerObj = this->m_objoffset;
@@ -1940,7 +1940,7 @@ void SPxMainSM<R>::MultiAggregationPS::execute(DVectorBase<R>& x, DVectorBase<R>
 
 /// checks a solution for feasibility
 template <class R>
-bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, DVectorBase<R> sol)
+bool SPxMainSM<R>::checkSolution(SPxLPBase<R>& lp, VectorBase<R> sol)
 {
   for(int i = lp.nRows()-1; i >= 0; --i)
     {
@@ -3526,10 +3526,10 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
     int oldCols = lp.nCols();
 
     DataArray<bool> colSingleton(lp.nCols());
-    DVectorBase<R>         dualVarLo(lp.nRows());
-    DVectorBase<R>         dualVarUp(lp.nRows());
-    DVectorBase<R>         dualConsLo(lp.nCols());
-    DVectorBase<R>         dualConsUp(lp.nCols());
+    VectorBase<R>         dualVarLo(lp.nRows());
+    VectorBase<R>         dualVarUp(lp.nRows());
+    VectorBase<R>         dualConsLo(lp.nCols());
+    VectorBase<R>         dualConsUp(lp.nCols());
 
     // init
     for(int i = lp.nRows()-1; i >= 0; --i)
@@ -3778,8 +3778,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
     int oldRows = lp.nRows();
     int oldCols = lp.nCols();
 
-    DVectorBase<R> upLocks(lp.nCols());
-    DVectorBase<R> downLocks(lp.nCols());
+    VectorBase<R> upLocks(lp.nCols());
+    VectorBase<R> downLocks(lp.nCols());
 
     for(int j = lp.nCols()-1; j >= 0; --j)
       {
@@ -3940,7 +3940,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                     if(col.index(k) != bestpos)
                       {
                         int rowNumber = col.index(k);
-                        DVectorBase<R> updateRow(lp.nCols());
+                        VectorBase<R> updateRow(lp.nCols());
                         R updateRhs = lp.rhs(col.index(k));
                         R updateLhs = lp.lhs(col.index(k));
 
@@ -4198,8 +4198,8 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
     // store rhs and lhs changes for combined update
     bool doChangeRanges = false;
-    DVectorBase<R> newLhsVec(lp.lhs());
-    DVectorBase<R> newRhsVec(lp.rhs());
+    VectorBase<R> newLhsVec(lp.lhs());
+    VectorBase<R> newRhsVec(lp.rhs());
 
     for(int k = 0; k < lp.nRows(); ++k)
       {

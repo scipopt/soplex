@@ -28,7 +28,7 @@ namespace soplex
     int count;
     int i;
     R x;
-    DVectorBase<R> work, delta, rowLen;
+    VectorBase<R> work, delta, rowLen;
 
     assert(base.nRows() > 0);
     assert(base.nCols() > 0);

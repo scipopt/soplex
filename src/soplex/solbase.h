@@ -220,12 +220,12 @@ namespace soplex
       }
 
     private:
-      DVectorBase<R> _primal;
-      DVectorBase<R> _slacks;
-      DVectorBase<R> _primalRay;
-      DVectorBase<R> _dual;
-      DVectorBase<R> _redCost;
-      DVectorBase<R> _dualFarkas;
+      VectorBase<R> _primal;
+      VectorBase<R> _slacks;
+      VectorBase<R> _primalRay;
+      VectorBase<R> _dual;
+      VectorBase<R> _redCost;
+      VectorBase<R> _dualFarkas;
 
       R _objVal;
 

@@ -1013,7 +1013,7 @@ namespace soplex
   VectorBase<R>& primal = _solReal._primal;
   assert(primal.dim() == numCols());
 
-  DVectorBase<R> activity(numRows());
+  VectorBase<R> activity(numRows());
   _realLP->computePrimalActivity(primal, activity, true);
   maxviol = 0.0;
   sumviol = 0.0;
@@ -1333,7 +1333,7 @@ const VectorBase<R>& SoPlexBase<R>::rhsRealInternal() const
 
 /// gets right-hand side vector
 template <class R>
-void SoPlexBase<R>::getRhsReal(DVectorBase<R>& rhs) const
+void SoPlexBase<R>::getRhsReal(VectorBase<R>& rhs) const
 {
   assert(_realLP);
   _realLP->getRhsUnscaled(rhs);
@@ -1359,7 +1359,7 @@ const VectorBase<R>& SoPlexBase<R>::lhsRealInternal() const
 
 /// gets left-hand side vector
 template <class R>
-void SoPlexBase<R>::getLhsReal(DVectorBase<R>& lhs) const
+void SoPlexBase<R>::getLhsReal(VectorBase<R>& lhs) const
 {
   assert(_realLP);
   _realLP->getLhsUnscaled(lhs);
@@ -1419,7 +1419,7 @@ R SoPlexBase<R>::upperReal(int i) const
 
 /// gets upper bound vector
 template <class R>
-void SoPlexBase<R>::getUpperReal(DVectorBase<R>& upper) const
+void SoPlexBase<R>::getUpperReal(VectorBase<R>& upper) const
 {
   assert(_realLP != 0);
   return _realLP->getUpperUnscaled(upper);
@@ -1447,7 +1447,7 @@ R SoPlexBase<R>::lowerReal(int i) const
 
 /// gets lower bound vector
 template <class R>
-void SoPlexBase<R>::getLowerReal(DVectorBase<R>& lower) const
+void SoPlexBase<R>::getLowerReal(VectorBase<R>& lower) const
 {
   assert(_realLP != 0);
   return _realLP->getLowerUnscaled(lower);
@@ -1912,7 +1912,7 @@ void SoPlexBase<R>::changeLhsReal(const VectorBase<R>& lhs)
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      _rationalLP->changeLhs(DVectorRational(lhs));
+      _rationalLP->changeLhs(VectorRational(lhs));
       for( int i = 0; i < numRowsRational(); i++ )
         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
     }
@@ -1951,7 +1951,7 @@ void SoPlexBase<R>::changeRhsReal(const VectorBase<R>& rhs)
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      _rationalLP->changeRhs(DVectorRational(rhs));
+      _rationalLP->changeRhs(VectorRational(rhs));
       for( int i = 0; i < numRowsRational(); i++ )
         _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), _rationalLP->rhs(i));
     }
@@ -1989,7 +1989,7 @@ void SoPlexBase<R>::changeRangeReal(const VectorBase<R>& lhs, const VectorBase<R
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      _rationalLP->changeRange(DVectorRational(lhs), DVectorRational(rhs));
+      _rationalLP->changeRange(VectorRational(lhs), VectorRational(rhs));
       for( int i = 0; i < numRowsRational(); i++ )
         _rowTypes[i] = _rangeTypeReal(lhs[i], rhs[i]);
     }
@@ -2048,7 +2048,7 @@ void SoPlexBase<R>::changeLowerReal(const VectorBase<R>& lower)
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      _rationalLP->changeLower(DVectorRational(lower));
+      _rationalLP->changeLower(VectorRational(lower));
       for( int i = 0; i < numColsRational(); i++ )
         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
     }
@@ -2088,7 +2088,7 @@ void SoPlexBase<R>::changeUpperReal(const VectorBase<R>& upper)
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      _rationalLP->changeUpper(DVectorRational(upper));
+      _rationalLP->changeUpper(VectorRational(upper));
       for( int i = 0; i < numColsRational(); i++ )
         _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), _rationalLP->upper(i));
     }
@@ -2127,7 +2127,7 @@ void SoPlexBase<R>::changeBoundsReal(const VectorBase<R>& lower, const VectorBas
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
     {
-      _rationalLP->changeBounds(DVectorRational(lower), DVectorRational(upper));
+      _rationalLP->changeBounds(VectorRational(lower), VectorRational(upper));
       for( int i = 0; i < numColsRational(); i++ )
         _colTypes[i] = _rangeTypeReal(lower[i], upper[i]);
     }
@@ -2164,7 +2164,7 @@ void SoPlexBase<R>::changeObjReal(const VectorBase<R>& obj)
   _realLP->changeObj(obj, scale);
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _rationalLP->changeObj(DVectorRational(obj));
+    _rationalLP->changeObj(VectorRational(obj));
 
   _invalidateSolution();
 }
@@ -2594,7 +2594,7 @@ void SoPlexBase<R>::changeLhsRational(const VectorRational& lhs)
     _rowTypes[i] = _rangeTypeRational(lhs[i], _rationalLP->rhs(i));
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeLhsReal(DVectorBase<R>(lhs));
+    _changeLhsReal(VectorBase<R>(lhs));
 
   _invalidateSolution();
 }
@@ -2657,7 +2657,7 @@ void SoPlexBase<R>::changeRhsRational(const VectorRational& rhs)
     _rowTypes[i] = _rangeTypeRational(_rationalLP->lhs(i), rhs[i]);
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeRhsReal(DVectorBase<R>(rhs));
+    _changeRhsReal(VectorBase<R>(rhs));
 
   _invalidateSolution();
 }
@@ -2681,7 +2681,7 @@ void SoPlexBase<R>::changeRhsRational(const mpq_t* rhs, int rhsSize)
     }
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeRhsReal(DVectorBase<R>(rhsRational()));
+    _changeRhsReal(VectorBase<R>(rhsRational()));
 
   _invalidateSolution();
 }
@@ -2723,7 +2723,7 @@ void SoPlexBase<R>::changeRangeRational(const VectorRational& lhs, const VectorR
     _rowTypes[i] = _rangeTypeRational(lhs[i], rhs[i]);
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeRangeReal(DVectorBase<R>(lhs), DVectorBase<R>(rhs));
+    _changeRangeReal(VectorBase<R>(lhs), VectorBase<R>(rhs));
 
   _invalidateSolution();
 }
@@ -2807,7 +2807,7 @@ void SoPlexBase<R>::changeLowerRational(const VectorRational& lower)
     _colTypes[i] = _rangeTypeRational(lower[i], _rationalLP->upper(i));
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeLowerReal(DVectorBase<R>(lower));
+    _changeLowerReal(VectorBase<R>(lower));
 
   _invalidateSolution();
 }
@@ -2870,7 +2870,7 @@ void SoPlexBase<R>::changeUpperRational(const VectorRational& upper)
     _colTypes[i] = _rangeTypeRational(_rationalLP->lower(i), upper[i]);
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeUpperReal(DVectorBase<R>(upper));
+    _changeUpperReal(VectorBase<R>(upper));
 
   _invalidateSolution();
 }
@@ -2934,7 +2934,7 @@ void SoPlexBase<R>::changeBoundsRational(const VectorRational& lower, const Vect
     _colTypes[i] = _rangeTypeRational(lower[i], upper[i]);
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _changeBoundsReal(DVectorBase<R>(lower), DVectorBase<R>(upper));
+    _changeBoundsReal(VectorBase<R>(lower), VectorBase<R>(upper));
 
   _invalidateSolution();
 }
@@ -2995,7 +2995,7 @@ void SoPlexBase<R>::changeObjRational(const VectorRational& obj)
   _rationalLP->changeObj(obj);
 
   if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_AUTO )
-    _realLP->changeObj(DVectorBase<R>(obj));
+    _realLP->changeObj(VectorBase<R>(obj));
 
   _invalidateSolution();
 }
@@ -3607,7 +3607,7 @@ bool SoPlexBase<R>::getRowViolationRational(Rational& maxviol, Rational& sumviol
   VectorRational& primal = _solRational._primal;
   assert(primal.dim() == numColsRational());
 
-  DVectorRational activity(numRowsRational());
+  VectorRational activity(numRowsRational());
   _rationalLP->computePrimalActivity(primal, activity);
   maxviol = 0;
   sumviol = 0;

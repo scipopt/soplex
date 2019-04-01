@@ -44,14 +44,14 @@ namespace soplex
     VectorBase<R> \f$\delta\f$ and value \f$\alpha\f$. This is provided by
     class UpdateVector.
 
-    UpdateVectors are derived from DVectorBase<R> and provide additional
+    UpdateVectors are derived from VectorBase<R> and provide additional
     methods for saving and setting the multiplicator \f$\alpha\f$ and
     the update VectorBase<R> \f$\delta\f$. Further, it allows for efficient
     sparse updates, by providing an IdxSet idx() containing the
     nonzero indices of \f$\delta\f$.
 */
   template <class R>
-  class UpdateVector : public DVectorBase<R>
+  class UpdateVector : public VectorBase<R>
 {
 private:
 
@@ -70,7 +70,7 @@ public:
    /// default constructor.
    explicit
    UpdateVector<R>(int p_dim /*=0*/, R p_eps /*=1e-16*/)
-      : DVectorBase<R> (p_dim)
+      : VectorBase<R> (p_dim)
       , theval (0)
       , thedelta(p_dim, p_eps)
    {
@@ -81,11 +81,11 @@ public:
    {}
    /// copy constructor
    UpdateVector<R>( const UpdateVector<R>& );
-   /// assignment from DVectorBase<R>
-   UpdateVector<R>& operator=(const DVectorBase<R>& rhs)
+   /// assignment from VectorBase<R>
+   UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
       if ( this != & rhs )
-        DVectorBase<R>::operator=(rhs);
+        VectorBase<R>::operator=(rhs);
 
       assert(isConsistent());
 
@@ -95,7 +95,7 @@ public:
    UpdateVector<R>& operator=(const VectorBase<R>& rhs)
    {
       if ( this != & rhs )
-        DVectorBase<R>::operator=(rhs);
+        VectorBase<R>::operator=(rhs);
 
       assert(isConsistent());
 
@@ -153,7 +153,7 @@ public:
    /// clear VectorBase<R> and update vector
    void clear()
    {
-     DVectorBase<R>::clear();
+     VectorBase<R>::clear();
       clearUpdate();
    }
 
@@ -167,7 +167,7 @@ public:
    /// reset dimension
    void reDim(int newdim)
    {
-     DVectorBase<R>::reDim(newdim);
+     VectorBase<R>::reDim(newdim);
       thedelta.reDim(newdim);
    }
    //@}

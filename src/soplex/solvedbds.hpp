@@ -317,8 +317,8 @@ namespace soplex
         printDecompDisplayLine(_solver, orig_verbosity, !algIterCount, !algIterCount);
 
         // get the dual solutions from the reduced problem
-        DVectorBase<R> reducedLPDualVector(_solver.nRows());
-        DVectorBase<R> reducedLPRedcostVector(_solver.nCols());
+        VectorBase<R> reducedLPDualVector(_solver.nRows());
+        VectorBase<R> reducedLPRedcostVector(_solver.nCols());
         _solver.getDualSol(reducedLPDualVector);
         _solver.getRedCostSol(reducedLPRedcostVector);
 
@@ -384,11 +384,11 @@ namespace soplex
         if( !stop && !explicitviol )
           {
             // get the primal solutions from the complementary problem
-            DVectorBase<R> compLPPrimalVector(_compSolver.nCols());
+            VectorBase<R> compLPPrimalVector(_compSolver.nCols());
             _compSolver.getPrimalSol(compLPPrimalVector);
 
             // get the dual solutions from the complementary problem
-            DVectorBase<R> compLPDualVector(_compSolver.nRows());
+            VectorBase<R> compLPDualVector(_compSolver.nRows());
             _compSolver.getDualSol(compLPDualVector);
 
             // updating the reduced problem
@@ -402,7 +402,7 @@ namespace soplex
                  || explicitviol )
           {
             // getting the primal vector from the reduced problem
-            DVectorBase<R> reducedLPPrimalVector(_solver.nCols());
+            VectorBase<R> reducedLPPrimalVector(_solver.nCols());
             _solver.getPrimalSol(reducedLPPrimalVector);
 
             // checking the optimality of the reduced problem solution with the original problem
@@ -434,7 +434,7 @@ namespace soplex
       {
 #ifndef NDEBUG
         // computing the solution for the original variables
-        DVectorBase<R> reducedLPPrimalVector(_solver.nCols());
+        VectorBase<R> reducedLPPrimalVector(_solver.nCols());
         _solver.getPrimalSol(reducedLPPrimalVector);
 
         // checking the optimality of the reduced problem solution with the original problem
@@ -473,7 +473,7 @@ namespace soplex
         _solReal._hasPrimal = true;
         _hasSolReal = true;
         // get the primal solutions from the reduced problem
-        DVectorBase<R> testPrimalVector(_compSolver.nCols());
+        VectorBase<R> testPrimalVector(_compSolver.nCols());
         _compSolver.getPrimalSol(testPrimalVector);
         _solReal._primal.reDim(_compSolver.nCols());
         _solReal._primal = testPrimalVector;
@@ -1049,10 +1049,10 @@ namespace soplex
         bool vanished = result == SPxSimplifier<R>::VANISHED;
 
         // get solution vectors for transformed problem
-        DVectorBase<R> primal(vanished ? 0 : solver.nCols());
-        DVectorBase<R> slacks(vanished ? 0 : solver.nRows());
-        DVectorBase<R> dual(vanished ? 0 : solver.nRows());
-        DVectorBase<R> redCost(vanished ? 0 : solver.nCols());
+        VectorBase<R> primal(vanished ? 0 : solver.nCols());
+        VectorBase<R> slacks(vanished ? 0 : solver.nRows());
+        VectorBase<R> dual(vanished ? 0 : solver.nRows());
+        VectorBase<R> redCost(vanished ? 0 : solver.nCols());
 
         assert(!_isRealLPLoaded);
         _basisStatusRows.reSize(_decompLP->nRows());
@@ -1118,8 +1118,8 @@ namespace soplex
 
   /// updates the reduced problem with additional rows using the solution to the complementary problem
   template <class R>
-  void SoPlexBase<R>::_updateDecompReducedProblem(R objValue, DVectorBase<R> dualVector, DVectorBase<R> redcostVector,
-                                                 DVectorBase<R> compPrimalVector, DVectorBase<R> compDualVector)
+  void SoPlexBase<R>::_updateDecompReducedProblem(R objValue, VectorBase<R> dualVector, VectorBase<R> redcostVector,
+                                                 VectorBase<R> compPrimalVector, VectorBase<R> compDualVector)
   {
     R feastol = realParam(SoPlexBase<R>::FEASTOL);
 
@@ -1191,7 +1191,7 @@ namespace soplex
     if( maxDualRatio > 1.0 )
       maxDualRatio = 1.0;
 
-    DVectorBase<R> compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
+    VectorBase<R> compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
 
     // Retrieving the reduced costs for each original problem row.
     _compSolver.getRedCostSol(compProbRedcost);
@@ -1467,9 +1467,9 @@ namespace soplex
   void SoPlexBase<R>::_findViolatedRows(R compObjValue, DataArray<RowViolation>& violatedrows, int& nviolatedrows)
   {
     R feastol = realParam(SoPlexBase<R>::FEASTOL);
-    DVectorBase<R> compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
-    DVectorBase<R> compProbPrimal(_compSolver.nCols());    // the primal vector of the complementary problem
-    DVectorBase<R> compProbActivity(_compSolver.nRows());  // the activity vector of the complementary problem
+    VectorBase<R> compProbRedcost(_compSolver.nCols());   // the reduced costs of the complementary problem
+    VectorBase<R> compProbPrimal(_compSolver.nCols());    // the primal vector of the complementary problem
+    VectorBase<R> compProbActivity(_compSolver.nRows());  // the activity vector of the complementary problem
     R compProbSlackVal = 0;
 
     if( boolParam(SoPlexBase<R>::USECOMPDUAL) )
@@ -2013,7 +2013,7 @@ namespace soplex
     DSVectorBase<R> slackColCoeff;
 
     // setting the objective coefficients of the original variables to zero
-    DVectorBase<R> newObjCoeff(numCols());
+    VectorBase<R> newObjCoeff(numCols());
     for( int i = 0; i < numCols(); i++ )
       {
         _compSolver.changeBounds(_realLP->cId(i), R(-infinity), R(infinity));
@@ -3733,7 +3733,7 @@ namespace soplex
     VectorBase<R>& primal = _solReal._primal;
     assert(primal.dim() == _realLP->nCols());
 
-    DVectorBase<R> activity(_realLP->nRows());
+    VectorBase<R> activity(_realLP->nRows());
     _realLP->computePrimalActivity(primal, activity);
 
     _nDecompViolRows = 0;

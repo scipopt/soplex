@@ -960,7 +960,7 @@ namespace soplex
     assert(theLP->dim() == x.dim());
 
     int i;
-    DVectorBase<R> tmp(x);
+    VectorBase<R> tmp(x);
 
     if (!matrixIsSetup)
       (const_cast<SPxBasisBase<R>*>(this))->loadDesc(thedesc);
@@ -1000,7 +1000,7 @@ namespace soplex
     assert(theLP->dim() == x.dim());
 
     int i;
-    DVectorBase<R> tmp(x);
+    VectorBase<R> tmp(x);
 
     if (!matrixIsSetup)
       (const_cast<SPxBasisBase<R>*>(this))->loadDesc(thedesc);

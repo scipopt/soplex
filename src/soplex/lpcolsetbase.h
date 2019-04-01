@@ -50,9 +50,9 @@ private:
    /**@name Data */
    //@{
 
-   DVectorBase<R> low;     ///< vector of lower bounds.
-   DVectorBase<R> up;      ///< vector of upper bounds.
-   DVectorBase<R> object;  ///< vector of objective coefficients.
+   VectorBase<R> low;     ///< vector of lower bounds.
+   VectorBase<R> up;      ///< vector of upper bounds.
+   VectorBase<R> object;  ///< vector of objective coefficients.
 
    //@}
 

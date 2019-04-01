@@ -87,7 +87,7 @@ protected:
    {
    public:
       int*    s_mark;       ///< marker
-      DVectorRational s_max;     ///< maximum absolute value per row (or -1)
+      VectorRational s_max;     ///< maximum absolute value per row (or -1)
       int*    s_cact;       ///< lengths of columns of active submatrix
       int     stage;        ///< stage of the structure
       Pring   pivots;       ///< ring of selected pivot rows
@@ -124,7 +124,7 @@ protected:
                                in the row file                      */
          Dring* elem;        ///< %Array of ring elements.
          int    used;        ///< used entries of arrays idx and val
-         DVectorRational val;      ///< hold nonzero values
+         VectorRational val;      ///< hold nonzero values
          int*   idx;         ///< array of length val.dim() to hold column indices of nonzeros in val
          int*   start;       ///< starting positions in val and idx
          int*   len;         ///< used nonzeros per row vectors
@@ -143,7 +143,7 @@ protected:
          int    size;        ///< size of array idx
          int    used;        ///< used entries of array idx
          int*   idx;         ///< hold row indices of nonzeros
-         DVectorRational val;      /*!< \brief hold nonzero values: this is only initialized
+         VectorRational val;      /*!< \brief hold nonzero values: this is only initialized
                                 in the end of the factorization with DEFAULT
                                 updates.                            */
          int*   start;       ///< starting positions in val and idx
@@ -158,7 +158,7 @@ protected:
    /// Data structures for saving the working matrix and L factor.
    struct L
    {
-      DVectorRational val;  ///< values of L vectors
+      VectorRational val;  ///< values of L vectors
       int*   idx;           ///< array of size val.dim() storing indices of L vectors
       int    startSize;     ///< size of array start
       int    firstUpdate;   ///< number of first update L vector
@@ -171,7 +171,7 @@ protected:
        * rows of the L-vectors occuring during the factorization (without
        * updates), only:
        */
-      DVectorRational rval; ///< values of rows of L
+      VectorRational rval; ///< values of rows of L
       int*   ridx;          ///< indices of rows of L
       int*   rbeg;          ///< start of rows in rval and ridx
       int*   rorig;         ///< original row permutation
@@ -197,7 +197,7 @@ protected:
    Perm    col;               ///< column permutation matrices
 
    L       l;                 ///< L matrix
-   DVectorRational diag;      ///< Array of pivot elements
+   VectorRational diag;      ///< Array of pivot elements
    U       u;                 ///< U matrix
 
    Rational*   work;          ///< Working array: must always be left as 0!

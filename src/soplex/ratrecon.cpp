@@ -290,7 +290,7 @@ namespace soplex
    bool reconstructSol(SolRational& solution)
    {
 #if 0
-      DVectorRational buffer;
+      VectorRational buffer;
 
       if( solution.hasPrimal() )
       {

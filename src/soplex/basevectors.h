@@ -331,30 +331,6 @@ VectorBase<R>& VectorBase<R>::multAdd(const S& x, const SSVectorBase<T>& vec)
 
 
 
-// ---------------------------------------------------------------------------------------------------------------------
-//  Methods of DVectorBase
-// ---------------------------------------------------------------------------------------------------------------------
-
-
-
-/// Assignment operator.
-template < class R >
-template < class S >
-inline
-DVectorBase<R>& DVectorBase<R>::operator=(const SVectorBase<S>& vec)
-{
-   // dim() of SVector is not the actual dimension, rather the largest index plus 1
-   // avoiding the reDim() saves unnecessary clearing of values
-   if( vec.dim() > VectorBase<R>::dim() )
-      reDim(vec.dim());
-
-   VectorBase<R>::operator=(vec);
-
-   assert(isConsistent());
-
-   return *this;
-}
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1136,99 +1112,13 @@ std::ostream& operator<<(std::ostream& s, const VectorBase<R>& vec)
 
 
 
-/// Negation.
-template < class R >
-inline
-DVectorBase<R> operator-(const VectorBase<R>& vec)
-{
-   DVectorBase<R> res(vec.dim());
-
-   for( int i = 0; i < res.dim(); ++i )
-      res[i] = -vec[i];
-
-   return res;
-}
-
-
-
-/// Addition.
-template < class R >
-inline
-DVectorBase<R> operator+(const VectorBase<R>& v, const VectorBase<R>& w)
-{
-   assert(v.dim() == w.dim());
-
-   DVectorBase<R> res(v.dim());
-
-   for( int i = 0; i < res.dim(); ++i )
-      res[i] = v[i] + w[i];
-
-   return res;
-}
-
-
-
-/// Addition.
-template < class R >
-inline
-DVectorBase<R> operator+(const VectorBase<R>& v, const SVectorBase<R>& w)
-{
-   DVectorBase<R> res(v);
-
-   res += w;
-
-   return res;
-}
-
-
-
-/// Addition.
-template < class R >
-inline
-DVectorBase<R> operator+(const SVectorBase<R>& v, const VectorBase<R>& w)
-{
-   return w + v;
-}
-
-
-
+// TODO: Look into this. Should this exist?
 /// Subtraction.
 template < class R >
 inline
-DVectorBase<R> operator-(const VectorBase<R>& v, const VectorBase<R>& w)
+VectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
 {
-   assert(v.dim() == w.dim());
-
-   DVectorBase<R> res(v.dim());
-
-   for( int i = 0; i < res.dim(); ++i )
-      res[i] = v[i] - w[i];
-
-   return res;
-}
-
-
-
-/// Subtraction.
-template < class R >
-inline
-DVectorBase<R> operator-(const VectorBase<R>& v, const SVectorBase<R>& w)
-{
-   DVectorBase<R> res(v);
-
-   res -= w;
-
-   return res;
-}
-
-
-
-/// Subtraction.
-template < class R >
-inline
-DVectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
-{
-   DVectorBase<R> res(w.dim());
+   VectorBase<R> res(w.dim());
 
    for( int i = 0; i < res.dim(); ++i )
       res[i] = -w[i];
@@ -1238,30 +1128,6 @@ DVectorBase<R> operator-(const SVectorBase<R>& v, const VectorBase<R>& w)
    return res;
 }
 
-
-
-/// Scaling.
-template < class R >
-inline
-DVectorBase<R> operator*(const VectorBase<R>& v, R x)
-{
-   DVectorBase<R> res(v.dim());
-
-   for( int i = 0; i < res.dim(); ++i )
-      res[i] = x * v[i];
-
-   return res;
-}
-
-
-
-/// Scaling.
-template < class R >
-inline
-DVectorBase<R> operator*(R x, const VectorBase<R>& v)
-{
-   return v * x;
-}
 
 
 
@@ -1290,10 +1156,10 @@ DSVectorBase<R> operator*(R x, const SVectorBase<R>& v)
 
 
 
-/// Input operator.
+// TODO: Look into how this may be rewritten
 template < class R >
 inline
-std::istream& operator>>(std::istream& s, DVectorBase<R>& vec)
+std::istream& operator>>(std::istream& s, VectorBase<R>& vec)
 {
    char c;
    R val;

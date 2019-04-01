@@ -61,7 +61,7 @@ private:
    //--------------------------------
    /**@name Private data */
    //@{
-   DVectorBase<R>    vec;           ///< Temporary VectorBase<R>
+   VectorBase<R>    vec;           ///< Temporary VectorBase<R>
    SSVectorBase<R>    ssvec;         ///< Temporary semi-sparse VectorBase<R>
    //@}
 

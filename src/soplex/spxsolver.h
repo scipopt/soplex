@@ -330,32 +330,32 @@ namespace soplex
     const SVSetBase<R>*   thevectors;   ///< the LP vectors according to representation
     const SVSetBase<R>*   thecovectors; ///< the LP coVectors according to representation
 
-    DVectorBase<R>        primRhs;     ///< rhs VectorBase<R> for computing the primal vector
+    VectorBase<R>        primRhs;     ///< rhs VectorBase<R> for computing the primal vector
     UpdateVector<R>   primVec;     ///< primal vector
-    DVectorBase<R>        dualRhs;     ///< rhs VectorBase<R> for computing the dual vector
+    VectorBase<R>        dualRhs;     ///< rhs VectorBase<R> for computing the dual vector
     UpdateVector<R>   dualVec;     ///< dual vector
     UpdateVector<R>   addVec;      ///< storage for thePvec = &addVec
 
-    DVectorBase<R>        theURbound;  ///< Upper Row    Feasibility bound
-    DVectorBase<R>        theLRbound;  ///< Lower Row    Feasibility bound
-    DVectorBase<R>        theUCbound;  ///< Upper Column Feasibility bound
-    DVectorBase<R>        theLCbound;  ///< Lower Column Feasibility bound
+    VectorBase<R>        theURbound;  ///< Upper Row    Feasibility bound
+    VectorBase<R>        theLRbound;  ///< Lower Row    Feasibility bound
+    VectorBase<R>        theUCbound;  ///< Upper Column Feasibility bound
+    VectorBase<R>        theLCbound;  ///< Lower Column Feasibility bound
 
     /** In entering Simplex algorithm, the ratio test must ensure that all
      *  \em basic variables remain within their feasibility bounds. To give fast
      *  acces to them, the bounds of basic variables are copied into the
      *  following two vectors.
      */
-    DVectorBase<R>        theUBbound;  ///< Upper Basic Feasibility bound
-    DVectorBase<R>        theLBbound;  ///< Lower Basic Feasibility bound
+    VectorBase<R>        theUBbound;  ///< Upper Basic Feasibility bound
+    VectorBase<R>        theLBbound;  ///< Lower Basic Feasibility bound
 
     /** The values of the rhs corresponding to the current basis.*/
-    DVectorBase<R>*       theFrhs;
+    VectorBase<R>*       theFrhs;
     /** The values of all basis variables. */
     UpdateVector<R>*  theFvec;
 
     /* The Copricing rhs and VectorBase<R> */
-    DVectorBase<R>*       theCoPrhs;
+    VectorBase<R>*       theCoPrhs;
     UpdateVector<R>*  theCoPvec;
     /** The pricing VectorBase<R> */
     UpdateVector<R>*  thePvec;
@@ -365,14 +365,14 @@ namespace soplex
 
     // The following vectors serve for the virtualization of shift bounds
     //@todo In prinziple this schould be references.
-    DVectorBase<R>*       theUbound;      ///< Upper bound for vars
-    DVectorBase<R>*       theLbound;      ///< Lower bound for vars
-    DVectorBase<R>*       theCoUbound;    ///< Upper bound for covars
-    DVectorBase<R>*       theCoLbound;    ///< Lower bound for covars
+    VectorBase<R>*       theUbound;      ///< Upper bound for vars
+    VectorBase<R>*       theLbound;      ///< Lower bound for vars
+    VectorBase<R>*       theCoUbound;    ///< Upper bound for covars
+    VectorBase<R>*       theCoLbound;    ///< Lower bound for covars
 
     // The following vectors serve for the virtualization of testing vectors
-    DVectorBase<R>        theCoTest;
-    DVectorBase<R>        theTest;
+    VectorBase<R>        theCoTest;
+    VectorBase<R>        theTest;
 
     DSVectorBase<R>       primalRay;      ///< stores primal ray in case of unboundedness
     DSVectorBase<R>       dualFarkas;     ///< stores dual farkas proof in case of infeasibility
@@ -447,8 +447,8 @@ namespace soplex
     int      remainingRoundsEnterCo;
 
     /// dual pricing norms
-    DVectorBase<R>     weights;                ///< store dual norms
-    DVectorBase<R>     coWeights;              ///< store dual norms
+    VectorBase<R>     weights;                ///< store dual norms
+    VectorBase<R>     coWeights;              ///< store dual norms
     bool        weightsAreSetup;        ///< are the dual norms already set up?
 
     SPxOut* spxout;                     ///< message handler

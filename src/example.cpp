@@ -51,8 +51,8 @@ int main()
 
    /* solve LP */
    SPxSolver::Status stat;
-   DVector prim(2);
-   DVector dual(1);
+   Vector prim(2);
+   Vector dual(1);
    stat = mysoplex.optimize();
 
    /* get solution */

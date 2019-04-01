@@ -1148,9 +1148,9 @@ namespace soplex
       {
         // BH 2005-11-29: This code block seems to check the assertion
         //   || Base * theFvec->delta() - enterVec ||_2 <= entertol()
-        DVectorBase<R> tmp(dim());
-        // BH 2005-11-15: This cast is necessary since SSVectorBase<R>  inherits protected from DVectorBase<R>.
-        tmp = reinterpret_cast<DVectorBase<R>&>(theFvec->delta());
+        VectorBase<R> tmp(dim());
+        // BH 2005-11-15: This cast is necessary since SSVectorBase<R>  inherits protected from VectorBase<R>.
+        tmp = reinterpret_cast<VectorBase<R>&>(theFvec->delta());
         multBaseWith(tmp);
         tmp -= *enterVec;
         if (tmp.length() > entertol()) {

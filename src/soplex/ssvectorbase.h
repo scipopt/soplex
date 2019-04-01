@@ -35,19 +35,18 @@ template < class R > class SVSetBase;
 /**@brief   Semi sparse vector.
  * @ingroup Algebra
  *
- *  This class implements semi-sparse vectors.  Such are #DVectorBase%s where the indices of its nonzero elements can be
+ *  This class implements semi-sparse vectors.  Such are #VectorBase%s where the indices of its nonzero elements can be
  *  stored in an extra IdxSet.  Only elements with absolute value > #epsilon are considered to be nonzero.  Since really
  *  storing the nonzeros is not always convenient, an SSVectorBase provides two different stati: setup and not setup.
  *  An SSVectorBase being setup means that the nonzero indices are available, otherwise an SSVectorBase is just an
- *  ordinary DVectorBase with an empty IdxSet.  Note that due to arithmetic operation, zeros can slip in, i.e., it is
+ *  ordinary VectorBase with an empty IdxSet.  Note that due to arithmetic operation, zeros can slip in, i.e., it is
  *  only guaranteed that at least every non-zero is in the IdxSet.
  */
 template < class R >
-class SSVectorBase : public DVectorBase<R>, protected IdxSet
+class SSVectorBase : public VectorBase<R>, protected IdxSet
 {
 private:
 
-   friend class DVectorBase<R>;
    friend class VectorBase<R>;
    template < class S > friend class DSVectorBase;
 
@@ -97,7 +96,7 @@ public:
    /// Only used in slufactor.hpp.
    R* get_ptr()
    {
-      return DVectorBase<R>::get_ptr();
+      return VectorBase<R>::get_ptr();
    }
    /// Returns the non-zero epsilon used.
    R getEpsilon() const
@@ -217,7 +216,7 @@ public:
    void setValue(int i, R x)
    {
       assert(i >= 0);
-      assert(i < DVectorBase<R>::dim());
+      assert(i < VectorBase<R>::dim());
 
       if( isSetup() )
       {
@@ -241,7 +240,7 @@ public:
    void scaleValue(int i, int scaleExp)
    {
       assert(i >= 0);
-      assert(i < DVectorBase<R>::dim());
+      assert(i < VectorBase<R>::dim());
 
       VectorBase<R>::val[i] = spxLdexp(VectorBase<R>::val[i], scaleExp);
 
@@ -570,8 +569,8 @@ public:
             remove(i);
       }
 
-      DVectorBase<R>::reDim(newdim);
-      setMax(DVectorBase<R>::memSize() + 1);
+      VectorBase<R>::reDim(newdim);
+      setMax(VectorBase<R>::memSize() + 1);
 
       assert(isConsistent());
    }
@@ -589,10 +588,10 @@ public:
    /// Resets memory consumption to \p newsize.
    void reMem(int newsize)
    {
-      DVectorBase<R>::reSize(newsize);
+      VectorBase<R>::reSize(newsize);
       assert(isConsistent());
 
-      setMax(DVectorBase<R>::memSize() + 1);
+      setMax(VectorBase<R>::memSize() + 1);
    }
 
    /// Clears vector.
@@ -640,7 +639,7 @@ public:
          }
       }
 
-      return DVectorBase<R>::isConsistent() && IdxSet::isConsistent();
+      return VectorBase<R>::isConsistent() && IdxSet::isConsistent();
 #else
       return true;
 #endif
@@ -654,7 +653,7 @@ public:
 
    /// Default constructor.
   explicit SSVectorBase<R>(int p_dim, R p_eps = Param<R>::epsilon())
-      : DVectorBase<R>(p_dim)
+      : VectorBase<R>(p_dim)
       , IdxSet()
       , setupStatus(true)
       , epsilon(p_eps)
@@ -669,7 +668,7 @@ public:
    /// Copy constructor.
    template < class S >
    SSVectorBase<R>(const SSVectorBase<S>& vec)
-      : DVectorBase<R>(vec)
+      : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(vec.setupStatus)
       , epsilon(vec.epsilon)
@@ -686,7 +685,7 @@ public:
     *  could use the more general one with S = R and generates a shallow copy constructor.
     */
    SSVectorBase<R>(const SSVectorBase<R>& vec)
-      : DVectorBase<R>(vec)
+      : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(vec.setupStatus)
       , epsilon(vec.epsilon)
@@ -701,7 +700,7 @@ public:
    /// Constructs nonsetup copy of \p vec.
    template < class S >
    explicit SSVectorBase<R>(const VectorBase<S>& vec, R eps = Param<R>::epsilon())
-      : DVectorBase<R>(vec)
+      : VectorBase<R>(vec)
       , IdxSet()
       , setupStatus(false)
       , epsilon(eps)
@@ -719,7 +718,7 @@ public:
       clear();
       epsilon = rhs.epsilon;
       setMax(rhs.max());
-      DVectorBase<R>::reDim(rhs.dim());
+      VectorBase<R>::reDim(rhs.dim());
 
       if( rhs.isSetup() )
       {
@@ -777,7 +776,7 @@ public:
          clear();
          epsilon = rhs.epsilon;
          setMax(rhs.max());
-         DVectorBase<R>::reDim(rhs.dim());
+         VectorBase<R>::reDim(rhs.dim());
 
          if( rhs.isSetup() )
          {
@@ -823,7 +822,7 @@ public:
          clear();
          epsilon = rhs.epsilon;
          setMax(rhs.max());
-         DVectorBase<R>::reDim(rhs.dim());
+         VectorBase<R>::reDim(rhs.dim());
 
          if( rhs.isSetup() )
          {

@@ -319,10 +319,10 @@ namespace soplex
          assert(simplificationStatus == SPxSimplifier<R>::OKAY);
 
          // get temporary solution vectors for transformed problem
-         DVectorBase<R> primal(_solver.nCols());
-         DVectorBase<R> slacks(_solver.nRows());
-         DVectorBase<R> dual(_solver.nRows());
-         DVectorBase<R> redCost(_solver.nCols());
+         VectorBase<R> primal(_solver.nCols());
+         VectorBase<R> slacks(_solver.nRows());
+         VectorBase<R> dual(_solver.nRows());
+         VectorBase<R> redCost(_solver.nCols());
 
          _basisStatusRows.reSize(numRows());
          _basisStatusCols.reSize(numCols());

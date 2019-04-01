@@ -469,9 +469,9 @@ public:
 
 
 
-  // Functions from DVectorBase
+  // Functions from VectorBase
 
-  // This used to be DVectorBase's way of having std::vector's capacity. This
+  // This used to be VectorBase's way of having std::vector's capacity. This
   // represents the maximum number of elements the std::vector can have without,
   // needing any more resizing. Bigger than size, mostly.
   int memSize() const
@@ -488,7 +488,7 @@ public:
         //
         // TODO: Is this important after the change of raw pointers to
         // std::vector. This is just a waste of operations, I think.
-        mem.insert(val.end(), newdim - VectorBase<R>::dim(), 0);
+        val.insert(val.end(), newdim - VectorBase<R>::dim(), 0);
       }
     else
       {

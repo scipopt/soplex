@@ -25,7 +25,7 @@ UpdateVector<R>& UpdateVector<R>::operator=(const UpdateVector<R>& rhs)
    {
       theval   = rhs.theval;
       thedelta = rhs.thedelta;
-      DVectorBase<R>::operator=(rhs);
+      VectorBase<R>::operator=(rhs);
 
       assert(UpdateVector<R>::isConsistent());
    }
@@ -34,7 +34,7 @@ UpdateVector<R>& UpdateVector<R>::operator=(const UpdateVector<R>& rhs)
 
   template <class R>
 UpdateVector<R>::UpdateVector( const UpdateVector<R>& base)
-   : DVectorBase<R>( base )
+   : VectorBase<R>( base )
    , theval(base.theval)
    , thedelta(base.thedelta)
 {
@@ -48,7 +48,7 @@ bool UpdateVector<R>::isConsistent() const
    if (dim() != thedelta.dim())
       return MSGinconsistent("UpdateVector");
 
-   return DVectorBase<R>::isConsistent() && thedelta.isConsistent();
+   return VectorBase<R>::isConsistent() && thedelta.isConsistent();
 #else
    return true;
 #endif

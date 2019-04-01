@@ -288,7 +288,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
 
    if( real )
    {
-     DVectorBase<R> primal(soplex.numCols());
+     VectorBase<R> primal(soplex.numCols());
       if( soplex.getPrimalRay(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
@@ -330,7 +330,7 @@ void printPrimalSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rown
    }
    if( rational )
    {
-     DVectorRational primal(soplex.numCols());
+     VectorRational primal(soplex.numCols());
       if( soplex.getPrimalRayRational(primal) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nPrimal ray (name, value):\n"; )
@@ -378,7 +378,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( real )
    {
-      DVectorBase<R> dual(soplex.numRows());
+      VectorBase<R> dual(soplex.numRows());
       if( soplex.getDualFarkas(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
@@ -411,7 +411,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
                      << std::setprecision(1) << std::scientific << Param<R>::epsilon()
                      << std::setprecision(8) << std::fixed << ")." << std::endl; )
 
-           DVectorBase<R> redcost(soplex.numCols());
+           VectorBase<R> redcost(soplex.numCols());
          if( soplex.getRedCost(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )
@@ -435,7 +435,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 
    if( rational )
    {
-      DVectorRational dual(soplex.numRows());
+      VectorRational dual(soplex.numRows());
       if( soplex.getDualFarkasRational(dual) )
       {
          MSG_INFO1( soplex.spxout, soplex.spxout << "\nDual ray (name, value):\n"; )
@@ -461,7 +461,7 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
          }
          MSG_INFO1( soplex.spxout, soplex.spxout << "All other dual values are zero." << std::endl; )
 
-         DVectorRational redcost(soplex.numCols());
+         VectorRational redcost(soplex.numCols());
          if( soplex.getRedCostRational(redcost) )
          {
             MSG_INFO1( soplex.spxout, soplex.spxout << "\nReduced costs (name, value):\n"; )

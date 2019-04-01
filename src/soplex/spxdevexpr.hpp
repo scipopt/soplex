@@ -50,8 +50,8 @@ namespace soplex
     int coWeightSize = 0;
     int weightSize = 0;
 
-    DVectorBase<R>& weights = this->thesolver->weights;
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
 
     if( tp == SPxSolverBase<R>::ENTER )
       {
@@ -332,7 +332,7 @@ namespace soplex
   template <class R>
   void SPxDevexPR<R>::left4(int n, SPxId id)
   {
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
     if (id.isValid())
       {
         int i, j;
@@ -827,8 +827,8 @@ namespace soplex
   template <class R>
   void SPxDevexPR<R>::entered4(SPxId /*id*/, int n)
   {
-    DVectorBase<R>& weights = this->thesolver->weights;
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
 
     if (n >= 0 && n < this->thesolver->dim())
       {
@@ -872,7 +872,7 @@ namespace soplex
   void SPxDevexPR<R>::addedVecs (int n)
   {
     int initval = (this->thesolver->type() == SPxSolverBase<R>::ENTER) ? 2 : 1;
-    DVectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& weights = this->thesolver->weights;
     n = weights.dim();
     weights.reDim (this->thesolver->coDim());
     for( int i = weights.dim()-1; i >= n; --i )
@@ -883,7 +883,7 @@ namespace soplex
   void SPxDevexPR<R>::addedCoVecs(int n)
   {
     int initval = (this->thesolver->type() == SPxSolverBase<R>::ENTER) ? 2 : 1;
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
     n = coWeights.dim();
     coWeights.reDim(this->thesolver->dim());
     for( int i = coWeights.dim()-1; i >= n; --i )

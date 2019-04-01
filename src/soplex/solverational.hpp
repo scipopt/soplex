@@ -389,8 +389,8 @@ void SoPlexBase<R>::_performOptIRStable(
   _modRhs.reDim(numRowsRational(), false);
   _modObj.reDim(numColsRational(), false);
 
-  DVectorBase<R> primalReal(numColsRational());
-  DVectorBase<R> dualReal(numRowsRational());
+  VectorBase<R> primalReal(numColsRational());
+  VectorBase<R> dualReal(numRowsRational());
 
   Rational boundsViolation;
   Rational sideViolation;
@@ -1192,7 +1192,7 @@ void SoPlexBase<R>::_performOptIRStable(
 #ifndef NDEBUG
 #ifdef SOPLEX_WITH_GMP
           {
-            DVectorRational activity(numRowsRational());
+            VectorRational activity(numRowsRational());
             _rationalLP->computePrimalActivity(sol._primal, activity);
             assert(sol._slacks == activity);
           }
@@ -1209,10 +1209,10 @@ void SoPlexBase<R>::_performOptIRStable(
 #ifndef NDEBUG
       {
         // compute reduced cost violation
-        DVectorRational debugRedCost(numColsRational());
-        debugRedCost = DVectorRational(_realLP->maxObj());
+        VectorRational debugRedCost(numColsRational());
+        debugRedCost = VectorRational(_realLP->maxObj());
         debugRedCost *= -1;
-        _rationalLP->subDualActivity(DVectorRational(dualReal), debugRedCost);
+        _rationalLP->subDualActivity(VectorRational(dualReal), debugRedCost);
 
         Rational debugRedCostViolation = 0;
         for( int c = numColsRational() - 1; c >= 0; c-- )
@@ -1352,7 +1352,7 @@ void SoPlexBase<R>::_performOptIRStable(
           _rationalLP->addDualActivity(_primalDualDiff, sol._redCost);
 #ifndef NDEBUG
           {
-            DVectorRational activity(_rationalLP->maxObj());
+            VectorRational activity(_rationalLP->maxObj());
             activity *= -1;
             _rationalLP->subDualActivity(sol._dual, activity);
           }
@@ -2830,7 +2830,7 @@ void SoPlexBase<R>::_performOptIRStable(
 #ifdef SOPLEX_WITH_GMP
       if( sol._isPrimalFeasible)
       {
-         DVectorRational activity(numRowsRational());
+         VectorRational activity(numRowsRational());
          _rationalLP->computePrimalActivity(sol._primal, activity);
          assert(sol._slacks == activity);
       }
@@ -3187,10 +3187,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealForRational(bool from
                   bool vanished = simplificationStatus == SPxSimplifier<R>::VANISHED;
 
                   // get solution vectors for transformed problem
-                  DVectorBase<R> tmpPrimal(vanished ? 0 : _solver.nCols());
-                  DVectorBase<R> tmpSlacks(vanished ? 0 : _solver.nRows());
-                  DVectorBase<R> tmpDual(vanished ? 0 : _solver.nRows());
-                  DVectorBase<R> tmpRedCost(vanished ? 0 : _solver.nCols());
+                  VectorBase<R> tmpPrimal(vanished ? 0 : _solver.nCols());
+                  VectorBase<R> tmpSlacks(vanished ? 0 : _solver.nRows());
+                  VectorBase<R> tmpDual(vanished ? 0 : _solver.nRows());
+                  VectorBase<R> tmpRedCost(vanished ? 0 : _solver.nCols());
 
                   if( !vanished )
                     {
@@ -3617,10 +3617,10 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
       if( loadMatrix )
          _rationalLUSolverBind.reSize(matrixdim);
 
-      DVectorRational& basicPrimalRhs = _workSol._slacks;
-      DVectorRational& basicDualRhs = _workSol._redCost;
-      DVectorRational& basicPrimal = _workSol._primal;
-      DVectorRational& basicDual = _workSol._dual;
+      VectorRational& basicPrimalRhs = _workSol._slacks;
+      VectorRational& basicDualRhs = _workSol._redCost;
+      VectorRational& basicPrimal = _workSol._primal;
+      VectorRational& basicDual = _workSol._dual;
 
       Rational violation;
       Rational primalViolation;

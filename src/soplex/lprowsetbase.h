@@ -51,9 +51,9 @@ private:
    /**@name Data */
    //@{
 
-   DVectorBase<R> left;    ///< vector of left hand sides (lower bounds) of LPRowBase%s.
-   DVectorBase<R> right;   ///< vector of right hand sides (upper bounds) of LPRowBase%s.
-   DVectorBase<R> object;  ///< vector of objective coefficients.
+   VectorBase<R> left;    ///< vector of left hand sides (lower bounds) of LPRowBase%s.
+   VectorBase<R> right;   ///< vector of right hand sides (upper bounds) of LPRowBase%s.
+   VectorBase<R> object;  ///< vector of objective coefficients.
 
    //@}
 

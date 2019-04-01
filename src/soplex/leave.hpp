@@ -1066,7 +1066,7 @@ namespace soplex
 
 #ifdef ENABLE_ADDITIONAL_CHECKS
         {
-          DVectorBase<R> tmp = fVec();
+          VectorBase<R> tmp = fVec();
           multBaseWith(tmp);
           tmp -= fRhs();
           if (tmp.length() > entertol())

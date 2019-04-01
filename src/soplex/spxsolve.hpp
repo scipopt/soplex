@@ -1040,7 +1040,7 @@ namespace soplex
         {
           int     c;
           R    val;
-          DVectorBase<R> sol( nCols() );
+          VectorBase<R> sol( nCols() );
 
           getPrimalSol( sol );
 
@@ -1432,7 +1432,7 @@ namespace soplex
 
     assert(SPxBasisBase<R>::status() > SPxBasisBase<R>::SINGULAR);
 
-    DVectorBase<R> tmp(dim());
+    VectorBase<R> tmp(dim());
 
     tmp = *theCoPvec;
     this->multWithBase(tmp);
@@ -1552,8 +1552,8 @@ namespace soplex
     if (this->iteration() > 10 && this->iteration() % redo == 0)
       {
 #ifdef ENABLE_ADDITIONAL_CHECKS
-        DVectorBase<R> cr(*theCoPrhs);
-        DVectorBase<R> fr(*theFrhs);
+        VectorBase<R> cr(*theCoPrhs);
+        VectorBase<R> fr(*theFrhs);
 #endif
 
         if (type() == ENTER)
@@ -1657,7 +1657,7 @@ namespace soplex
 
     if( getComputeDegeneracy() && this->iteration() > this->prevIteration() )
       {
-        DVectorBase<R> degenvec(this->nCols());
+        VectorBase<R> degenvec(this->nCols());
         if( rep() == ROW )
           {
             if( type() == ENTER )   // dual simplex

@@ -593,9 +593,9 @@ namespace soplex
       if (SPxBasisBase<R>::status() >= SPxBasisBase<R>::REGULAR)
         {
 #ifndef NDEBUG
-          DVectorBase<R> ftmp(fVec());
-          DVectorBase<R> ptmp(pVec());
-          DVectorBase<R> ctmp(coPvec());
+          VectorBase<R> ftmp(fVec());
+          VectorBase<R> ptmp(pVec());
+          VectorBase<R> ctmp(coPvec());
 #endif  // NDEBUG
 
           if (type() == LEAVE)

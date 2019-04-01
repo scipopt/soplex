@@ -57,7 +57,7 @@ private:
    /**@name Data */
    //@{
    /// the current (approximate) primal or dual vector
-   DVectorBase<R> vec;
+   VectorBase<R> vec;
    //@}
 
 protected:

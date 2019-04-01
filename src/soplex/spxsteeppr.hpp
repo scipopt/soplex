@@ -77,8 +77,8 @@ namespace soplex
     int i;
     int endDim = 0;
     int endCoDim = 0;
-    DVectorBase<R>& weights = this->thesolver->weights;
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
 
     if( setup == DEFAULT )
       {
@@ -155,7 +155,7 @@ namespace soplex
   {
     if (workVec.dim() != this->thesolver->dim())
       {
-        DVectorBase<R> tmp = this->thesolver->weights;
+        VectorBase<R> tmp = this->thesolver->weights;
         this->thesolver->weights = this->thesolver->coWeights;
         this->thesolver->coWeights = tmp;
 
@@ -958,7 +958,7 @@ namespace soplex
   template <class R>
   void SPxSteepPR<R>::addedVecs(int n)
   {
-    DVectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& weights = this->thesolver->weights;
     n = weights.dim();
     weights.reDim(this->thesolver->coDim());
 
@@ -972,7 +972,7 @@ namespace soplex
   template <class R>
   void SPxSteepPR<R>::addedCoVecs(int n)
   {
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
     n = coWeights.dim();
     workVec.reDim (this->thesolver->dim());
     coWeights.reDim (this->thesolver->dim());
@@ -984,7 +984,7 @@ namespace soplex
   void SPxSteepPR<R>::removedVec(int i)
   {
     assert(this->thesolver != 0);
-    DVectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& weights = this->thesolver->weights;
     weights[i] = weights[weights.dim()];
     weights.reDim(this->thesolver->coDim());
   }
@@ -993,7 +993,7 @@ namespace soplex
   void SPxSteepPR<R>::removedVecs(const int perm[])
   {
     assert(this->thesolver != 0);
-    DVectorBase<R>& weights = this->thesolver->weights;
+    VectorBase<R>& weights = this->thesolver->weights;
     if (this->thesolver->type() == SPxSolverBase<R>::ENTER)
       {
         int i;
@@ -1011,7 +1011,7 @@ namespace soplex
   void SPxSteepPR<R>::removedCoVec(int i)
   {
     assert(this->thesolver != 0);
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
     coWeights[i] = coWeights[coWeights.dim()];
     coWeights.reDim(this->thesolver->dim());
   }
@@ -1020,7 +1020,7 @@ namespace soplex
   void SPxSteepPR<R>::removedCoVecs(const int perm[])
   {
     assert(this->thesolver != 0);
-    DVectorBase<R>& coWeights = this->thesolver->coWeights;
+    VectorBase<R>& coWeights = this->thesolver->coWeights;
     int i;
     int j = coWeights.dim();
     for (i = 0; i < j; ++i)
@@ -1035,8 +1035,8 @@ namespace soplex
   bool SPxSteepPR<R>::isConsistent() const
   {
 #ifdef ENABLE_CONSISTENCY_CHECKS
-    DVectorBase<R>& w = this->thesolver->weights;
-    DVectorBase<R>& coW = this->thesolver->coWeights;
+    VectorBase<R>& w = this->thesolver->weights;
+    VectorBase<R>& coW = this->thesolver->coWeights;
     if (this->thesolver != 0 && this->thesolver->type() == SPxSolverBase<R>::LEAVE && setup == EXACT)
       {
         int i;

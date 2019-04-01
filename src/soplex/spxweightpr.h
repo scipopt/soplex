@@ -47,11 +47,11 @@ namespace soplex
       /**@name Data */
       //@{
       /// column penalties
-      DVectorBase<R> cPenalty;
+      VectorBase<R> cPenalty;
       /// row penalties
-      DVectorBase<R> rPenalty;
+      VectorBase<R> rPenalty;
       /// penalties for leaving alg
-      DVectorBase<R> leavePenalty;
+      VectorBase<R> leavePenalty;
       ///
       const R* penalty;
       ///

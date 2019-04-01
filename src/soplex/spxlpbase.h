@@ -489,7 +489,7 @@ namespace soplex
     }
 
     /// Gets unscaled upper bound vector
-    void getUpperUnscaled(DVectorBase<R>& vec) const;
+    void getUpperUnscaled(VectorBase<R>& vec) const;
 
     /// Returns unscaled upper bound of column \p i.
     R upperUnscaled(int i) const;
@@ -516,7 +516,7 @@ namespace soplex
     }
 
     /// Gets unscaled lower bound vector.
-    void getLowerUnscaled(DVectorBase<R>& vec) const;
+    void getLowerUnscaled(VectorBase<R>& vec) const;
 
     /// Returns unscaled lower bound of column \p i.
     R lowerUnscaled(int i) const;

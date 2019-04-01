@@ -665,7 +665,7 @@ private:
   /**@name Cached information derived from the SOPLEX model */
   //@{
   /// Pointer to objective Vector
-  mutable soplex::DVector *obj_;
+  mutable soplex::Vector *obj_;
 
   /// Pointer to dense vector of row sense indicators
   mutable char    *rowsense_;
@@ -677,16 +677,16 @@ private:
   mutable double  *rowrange_;
   
   /// Pointer to primal solution vector
-  mutable soplex::DVector *colsol_;
+  mutable soplex::Vector *colsol_;
   
   /// Pointer to dual solution vector
-  mutable soplex::DVector *rowsol_;
+  mutable soplex::Vector *rowsol_;
 
   /// Pointer to reduced cost vector
-  mutable soplex::DVector *redcost_;
+  mutable soplex::Vector *redcost_;
 
   /// Pointer to row activity (slack) vector
-  mutable soplex::DVector *rowact_;
+  mutable soplex::Vector *rowact_;
 
   /// Pointer to row-wise copy of problem matrix coefficients.
   mutable OsiPackedMatrix *matrixByRow_;  
