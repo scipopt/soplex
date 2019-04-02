@@ -1230,8 +1230,6 @@ SLUFactor::SLUFactor(const SLUFactor& old)
    l.rperm     = 0;
 
    solveCount = 0;
-   solveTime = TimerFactory::createTimer(timerType);
-   factorTime = TimerFactory::createTimer(timerType);
 
    try
    {
@@ -1326,16 +1324,23 @@ void SLUFactor::freeAll()
 
    if(l.rperm)
       spx_free(l.rperm);
+
+   if(solveTime)
+   {
+      solveTime->~Timer();
+      spx_free(solveTime);
+   }
+
+   if(factorTime)
+   {
+      factorTime->~Timer();
+      spx_free(factorTime);
+   }
 }
 
 SLUFactor::~SLUFactor()
 {
    freeAll();
-
-   solveTime->~Timer();
-   factorTime->~Timer();
-   spx_free(solveTime);
-   spx_free(factorTime);
 }
 
 static Real betterThreshold(Real th)
