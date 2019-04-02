@@ -1363,6 +1363,7 @@ SPxBasis::~SPxBasis()
       factor = 0;
    }
 
+   theTime->~Timer();
    spx_free(theTime);
 }
 
