@@ -174,11 +174,16 @@ for idx, outline in enumerate(outlines):
         stats = True
 
     if stats:
-        if outline.startswith('SoPlex status') and not instances[instancename]['status'] == 'fail':
+        if outline.startswith('SoPlex status'):
             if outline.find('time limit') >= 0:
                 instances[instancename]['status'] = 'timeout'
             else:
-                instances[instancename]['status'] = outline.split()[-1].strip('[]')
+                checkstat = instances[instancename]['status']
+                reportstat = outline.split()[-1].strip('[]')
+                if reportstat == 'optimal' and checkstat == 'fail':
+                    instances[instancename]['status'] = checkstat
+                else:
+                    instances[instancename]['status'] = reportstat
 
         elif outline.startswith('Solution'):
             instances[instancename]['value'] = fracttofloat(outlines[idx+1].split()[-1])

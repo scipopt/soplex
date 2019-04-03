@@ -1707,12 +1707,12 @@ bool SPxSolverBase<Real>::terminate()
                         << fr.length() << std::endl;)
 #endif
 
-      if(this->updateCount > 1)
-      {
-         MSG_INFO3((*spxout), (*spxout) << " --- terminate triggers refactorization"
-                     << std::endl;)
-         factorize();
-      }
+            if(this->updateCount > 1)
+            {
+               MSG_INFO3((*spxout), (*spxout) << " --- terminate triggers refactorization"
+                         << std::endl;)
+               factorize();
+            }
 
       SPxBasisBase<Real>::coSolve(*theCoPvec, *theCoPrhs);
       SPxBasisBase<Real>::solve(*theFvec, *theFrhs);

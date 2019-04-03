@@ -3559,7 +3559,7 @@ bool SoPlexBase<Real>::getDualFarkasReal(VectorBase<Real>& vector)
 template <>
 bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isPrimalFeasible())
+   if(!hasSol())
       return false;
 
    _syncRealSolution();
@@ -3603,7 +3603,7 @@ bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
 template <>
 bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isPrimalFeasible())
+   if(!hasSol())
       return false;
 
    _syncRealSolution();
@@ -3648,7 +3648,7 @@ bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
 template <>
 bool SoPlexBase<Real>::getRedCostViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasSol() || !hasBasis())
       return false;
 
    _syncRealSolution();
@@ -3713,7 +3713,7 @@ bool SoPlexBase<Real>::getRedCostViolation(Real& maxviol, Real& sumviol)
 template <>
 bool SoPlexBase<Real>::getDualViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasSol() || !hasBasis())
       return false;
 
    _syncRealSolution();

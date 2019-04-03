@@ -20,23 +20,24 @@
 
 #include <type_traits>
 
-namespace soplex {
+namespace soplex
+{
 
 template <typename T>
 class StableSum
 {
-   typename std::remove_const<T>::type sum = 0;
+   typename std::remove_const<T>::type sum;
 
- public:
-   StableSum() = default;
-   StableSum( const T& init ) : sum( init ) {}
+public:
+   StableSum() : sum(0) {}
+   StableSum(const T& init) : sum(init) {}
 
-   void operator+=( const T& input )
+   void operator+=(const T& input)
    {
       sum += input;
    }
 
-   void operator-=( const T& input )
+   void operator-=(const T& input)
    {
       sum -= input;
    }
@@ -56,27 +57,27 @@ class StableSum<double>
    double checksum = 0;
 #endif
 
- public:
+public:
    StableSum() = default;
-   StableSum( double init ) : sum( init ), c( 0 ) {}
+   StableSum(double init) : sum(init), c(0) {}
 
-   void operator+=( double input )
+   void operator+=(double input)
    {
 #if defined(_MSC_VER) || defined(__INTEL_COMPILER)
-      #pragma float_control( precise, on )
+#pragma float_control( precise, on )
 #endif
 #ifdef CHECK_STABLESUM
       checksum += input;
 #endif
       double t = sum + input;
       double z = t - sum;
-      double y = ( sum - ( t - z ) ) + ( input - z );
+      double y = (sum - (t - z)) + (input - z);
       c += y;
 
       sum = t;
    }
 
-   void operator-=( double input )
+   void operator-=(double input)
    {
       (*this) += -input;
    }
@@ -84,9 +85,11 @@ class StableSum<double>
    operator double() const
    {
 #ifdef CHECK_STABLESUM
+
       if(spxAbs(checksum - (sum + c)) >= 1e-6)
          printf("stablesum viol: %g, rel: %g, checksum: %g\n", spxAbs(checksum - (sum + c)),
-            spxAbs(checksum - (sum + c))/MAXIMUM(1.0, MAXIMUM(spxAbs(checksum), spxAbs(sum+c))), checksum);
+                spxAbs(checksum - (sum + c)) / MAXIMUM(1.0, MAXIMUM(spxAbs(checksum), spxAbs(sum + c))), checksum);
+
       assert(spxAbs(checksum - (sum + c)) < 1e-6);
 #endif
       return sum + c;
