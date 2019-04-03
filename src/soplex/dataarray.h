@@ -133,22 +133,22 @@ public:
    /// append element \p t.
    void append(const T& t)
    {
-      insert(thesize, 1, &t);
+     data.push_back(t);
    }
    /// append \p n elements with value \p t.
    void append(int n, const T& t)
    {
-      insert(thesize, n, t);
+     data.insert(data.end(), n, t);
    }
    /// append \p n elements from \p t.
    void append(int n, const T t[])
    {
-      insert(thesize, n, t);
+     data.insert(data.end(), t, t+n);
    }
    /// append all elements from \p t.
    void append(const DataArray<T>& t)
    {
-      insert(thesize, t);
+     data.insert(data.end(), t.data.begin(), t.data.end());
    }
 
    /// insert \p n elements with value \p t before \p i 'the element.
@@ -199,6 +199,7 @@ public:
    /// remove all elements.
    void clear()
    {
+     data.clear();
       thesize = 0;
    }
 
