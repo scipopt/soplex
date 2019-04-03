@@ -2634,6 +2634,7 @@ int CLUFactor<R>::setupColVals()
      u.col.val.clear();
 
    u.col.val.reserve(u.col.size);
+   u.col.val.insert(u.col.val.begin(), u.col.size, 0);
 
    for ( i = 0; i < thedim; i++ )
       u.col.len[i] = 0;
@@ -2722,6 +2723,8 @@ void CLUFactor<R>::setupRowVals()
       spx_free( l.rperm );
 
    l.rval.reserve(mem);
+   // Insert mem number of zeros.
+   l.rval.insert(l.rval.begin(), mem, 0);
 
    spx_alloc( l.ridx, mem );
 

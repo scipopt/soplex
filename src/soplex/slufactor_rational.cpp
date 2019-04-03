@@ -876,7 +876,6 @@ void SLUFactorRational::freeAll()
    if(col.perm) spx_free(col.perm);
    if(col.orig) spx_free(col.orig);
    if(u.row.elem) spx_free(u.row.elem);
-   u.row.val.reDim(0);
    if(u.row.idx) spx_free(u.row.idx);
    if(u.row.start) spx_free(u.row.start);
    if(u.row.len) spx_free(u.row.len);
@@ -890,11 +889,6 @@ void SLUFactorRational::freeAll()
    if(l.start) spx_free(l.start);
    if(l.row) spx_free(l.row);
 
-   diag.reDim(0);
-   u.col.val.reDim(0);
-   l.val.reDim(0);
-
-   l.rval.reDim(0);
    if(l.ridx) spx_free(l.ridx);
    if(l.rbeg) spx_free(l.rbeg);
    if(l.rorig) spx_free(l.rorig);
