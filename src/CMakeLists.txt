@@ -34,8 +34,6 @@ set(headers
     soplex/didxset.h
     soplex/dsvectorbase.h
     soplex/dsvector.h
-    soplex/dvectorbase.h
-    soplex/dvector.h
     soplex/exceptions.h
     soplex/gzstream.h
     soplex/idlist.h

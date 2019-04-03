@@ -23,7 +23,6 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/timerfactory.h"
-#include "soplex/dvector.h"
 #include "soplex/slinsolver.h"
 #include "soplex/clufactor.h"
 

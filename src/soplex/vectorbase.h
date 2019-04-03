@@ -78,6 +78,12 @@ template < class R >
 class VectorBase
 {
 
+  // VectorBase is a friend of VectorBase of different template type. This is so
+  // that we can conversions.
+  template <typename S>
+  friend class VectorBase;
+
+
 protected:
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -112,6 +118,15 @@ public:
       val.reserve(p_dimen);
    }
 
+  // Constructing an element (usually involving casting Real to Rational and
+  // vice versa.)
+  template <typename S>
+  VectorBase<R>(const VectorBase<S>& vec)
+  {
+    this->operator=(vec);
+  }
+
+
    /// Assignment operator.
   // Supports assignment from a Rational vector to Real and vice versa
    template < class S >
@@ -124,7 +139,7 @@ public:
 
         for(auto v: vec.val)
            {
-            val.push_back(R(*v));
+            val.push_back(R(v));
            }
       }
 
@@ -513,6 +528,52 @@ public:
     assert(newsize > VectorBase<R>::dim());
 
     val.resize(newsize);
+  }
+
+
+  // For operations such as vec1 - vec2
+  const VectorBase<R> operator-(const VectorBase<R>& vec) const
+  {
+    assert(vec.dim() == val.size());
+    VectorBase<R> res(vec.dim());
+
+    auto dimen = val.size();
+
+    for(decltype(dimen) i = 0; i < dimen; i++)
+      {
+        res.val.push_back(val[i] - vec[i]);
+      }
+
+    return res;
+  }
+
+  // Addition
+  const VectorBase<R> operator+(const VectorBase<R>& v) const
+  {
+    assert(v.dim() == val.size());
+    VectorBase<R> res(val.size());
+
+    auto dimen = val.size();
+
+    for(decltype(dimen) i = 0; i < dimen; i++)
+      {
+        res.vec.push_back(val[i] + v[i]);
+      }
+
+    return res;
+  }
+
+  // The negation operator. e.g. -vec1;
+   friend VectorBase<R> operator-(const VectorBase<R>& vec)
+  {
+    VectorBase<R> res(vec.dim());
+
+    for(auto v: vec.val)
+      {
+        res.val.push_back(-(v));
+      }
+
+    return res;
   }
 
 

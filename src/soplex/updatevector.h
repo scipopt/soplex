@@ -24,7 +24,6 @@
 
 
 #include "soplex/spxdefines.h"
-#include "soplex/dvector.h"
 #include "soplex/ssvector.h"
 
 namespace soplex

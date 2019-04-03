@@ -24,7 +24,6 @@
 #include "soplex/spxscaler.h"
 #include "soplex/spxlp.h"
 #include "soplex/dsvector.h"
-#include "soplex/dvector.h"
 #include <limits>
 
 namespace soplex

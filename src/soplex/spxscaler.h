@@ -27,7 +27,6 @@
 #include "soplex/svector.h"
 #include "soplex/svset.h"
 #include "soplex/dsvector.h"
-#include "soplex/dvector.h"
 #include <vector>
 
 namespace soplex

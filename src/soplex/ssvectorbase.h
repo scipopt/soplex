@@ -23,7 +23,7 @@
 #include <assert.h>
 
 #include "soplex/spxdefines.h"
-#include "soplex/dvectorbase.h"
+#include "soplex/vectorbase.h"
 #include "soplex/idxset.h"
 #include "soplex/spxalloc.h"
 

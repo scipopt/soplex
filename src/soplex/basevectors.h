@@ -29,7 +29,6 @@
 #include "soplex/spxdefines.h"
 #include "soplex/rational.h"
 #include "soplex/vectorbase.h"
-#include "soplex/dvectorbase.h"
 #include "soplex/ssvectorbase.h"
 #include "soplex/svectorbase.h"
 #include "soplex/dsvectorbase.h"

@@ -23,7 +23,6 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/timerfactory.h"
-#include "soplex/dvector.h"
 #include "soplex/slinsolver_rational.h"
 #include "soplex/clufactor_rational.h"
 #include "soplex/rational.h"

@@ -22,7 +22,6 @@
 #include "soplex/spxdefines.h"
 #include "soplex/spxbasis.h"
 #include "soplex/didxset.h"
-#include "soplex/dvector.h"
 #include "soplex/spxsolver.h"
 #include "soplex/mpsinput.h"
 #include "soplex/spxout.h"
