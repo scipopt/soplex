@@ -1930,7 +1930,8 @@ protected:
    ///
    virtual void getEnterVals(SPxId id, Real& enterTest,
                              Real& enterUB, Real& enterLB, Real& enterVal, Real& enterMax,
-                             Real& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, Real& enterRO, StableSum<Real>& objChange);
+                             Real& enterPric, typename SPxBasisBase<R>::Desc::Status& enterStat, Real& enterRO,
+                             StableSum<Real>& objChange);
    ///
    virtual void getEnterVals2(int leaveIdx,
                               Real enterMax, Real& leaveBound, StableSum<Real>& objChange);
