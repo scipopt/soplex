@@ -515,7 +515,7 @@ public:
       }
     else
       {
-        val.resize(newdim);
+        val.reserve(newdim);
       }
 
   }
@@ -527,7 +527,10 @@ public:
   {
     assert(newsize > VectorBase<R>::dim());
 
-    val.resize(newsize);
+    // Problem: This is not a conventional resize for std::vector. This only
+    // updates the capacity, i.e., by pushing elements to the vector after this,
+    // there will not be any (internal) resizes.
+    val.reserve(newsize);
   }
 
 
