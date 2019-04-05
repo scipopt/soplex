@@ -95,14 +95,14 @@ public:
    Timer* reconstructionTime; ///< time for rational reconstructions
    Timer::TYPE timerType; ///< type of timer (user or wallclock)
 
-   Real multTimeSparse; ///< time for computing A*x (setupPupdate(), PRICE step)
-   Real multTimeFull; ///< time for computing A*x (setupPupdate(), PRICE step)
-   Real multTimeRepwise; ///< time for computing A*x (setupPupdate(), PRICE step)
-   Real multTimeUnsetup; ///< time for computing A*x (setupPupdate(), PRICE step)
-   int multSparseCalls; ///< number of products A*x (setupPupdate(), PRICE step)
-   int multFullCalls; ///< number of products A*x (setupPupdate(), PRICE step)
-   int multRepwiseCalls; ///< number of products A*x (setupPupdate(), PRICE step)
-   int multUnsetupCalls; ///< number of products A*x (setupPupdate(), PRICE step)
+   Real multTimeSparse; ///< time for computing A*x exploiting sparsity (setupPupdate(), PRICE step)
+   Real multTimeFull; ///< time for computing A*x ignoring sparsity (setupPupdate(), PRICE step)
+   Real multTimeRepwise; ///< time for computing A*x columnwise (setupPupdate(), PRICE step)
+   Real multTimeUnsetup; ///< time for computing A*x w/o sparsity information (setupPupdate(), PRICE step)
+   int multSparseCalls; ///< number of products A*x exploiting sparsity (setupPupdate(), PRICE step)
+   int multFullCalls; ///< number of products A*x ignoring sparsity (setupPupdate(), PRICE step)
+   int multRepwiseCalls; ///< number of products A*x columnwise (setupPupdate(), PRICE step)
+   int multUnsetupCalls; ///< number of products A*x w/o sparsity information (setupPupdate(), PRICE step)
 
    Real luFactorizationTimeReal; ///< time for factorizing bases matrices in real precision
    Real luSolveTimeReal; ///< time for solving linear systems in real precision
