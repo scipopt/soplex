@@ -115,7 +115,7 @@ public:
 
    VectorBase<R>(int p_dimen)
    {
-      val.reserve(p_dimen);
+      val.resize(p_dimen);
    }
 
   // Constructing an element (usually involving casting Real to Rational and
@@ -505,7 +505,7 @@ public:
   /// Resets \ref soplex::VectorBase "VectorBase"'s dimension to \p newdim.
   void reDim(int newdim, const bool setZero = true )
   {
-    if( setZero )
+        if(setZero && newdim > dim())
       {
         // Inserts 0 to the rest of the vectors.
         //
@@ -515,7 +515,7 @@ public:
       }
     else
       {
-        val.reserve(newdim);
+            val.resize(newdim);
       }
 
   }
