@@ -3173,7 +3173,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
 
                     // sort col elements by increasing idx
                     IdxCompare compare;
-                    SPxQuicksort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
+                    spxSort(col_idx_sorted.mem(), col_idx_sorted.size(), compare);
 
                     FreeZeroObjVariablePS* FreeZeroObjVariablePSptr = nullptr;
                     spx_alloc(FreeZeroObjVariablePSptr);
@@ -4115,7 +4115,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 ElementCompare compare;
 
                 if (m_classSetRows[k].size() > 1)
-                  SPxQuicksort(m_classSetRows[k].mem(), m_classSetRows[k].size(), compare);
+                  spxSort(m_classSetRows[k].mem(), m_classSetRows[k].size(), compare);
 
                 // use new index first
                 int classIdx = idxSet.index(0);
@@ -4443,7 +4443,9 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                 ElementCompare compare;
 
                 if (m_classSetCols[k].size() > 1)
-                  SPxQuicksort(m_classSetCols[k].mem(), m_classSetCols[k].size(), compare);
+                  {
+                    spxSort(m_classSetCols[k].mem(), m_classSetCols[k].size(), compare);
+                  }
 
                 // use new index first
                 int classIdx = idxSet.index(0);
