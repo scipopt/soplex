@@ -75,11 +75,11 @@ typename SoPlexBase<Real>::Statistics& SoPlexBase<Real>::Statistics::operator=
    timerType = rhs.timerType;
    multTimeSparse = rhs.multTimeSparse;
    multTimeFull = rhs.multTimeFull;
-   multTimeRepwise = rhs.multTimeRepwise;
+   multTimeColwise = rhs.multTimeColwise;
    multTimeUnsetup = rhs.multTimeUnsetup;
    multSparseCalls = rhs.multSparseCalls;
    multFullCalls = rhs.multFullCalls;
-   multRepwiseCalls = rhs.multRepwiseCalls;
+   multColwiseCalls = rhs.multColwiseCalls;
    multUnsetupCalls = rhs.multUnsetupCalls;
    luFactorizationTimeReal = rhs.luFactorizationTimeReal;
    luSolveTimeReal = rhs.luSolveTimeReal;
@@ -123,11 +123,11 @@ void SoPlexBase<Real>::Statistics::clearSolvingData()
    reconstructionTime->reset();
    multTimeSparse = 0.0;
    multTimeFull = 0.0;
-   multTimeRepwise = 0.0;
+   multTimeColwise = 0.0;
    multTimeUnsetup = 0.0;
    multSparseCalls = 0;
    multFullCalls = 0;
-   multRepwiseCalls = 0;
+   multColwiseCalls = 0;
    multUnsetupCalls = 0;
    luFactorizationTimeReal = 0.0;
    luSolveTimeReal = 0.0;
@@ -284,14 +284,14 @@ void SoPlexBase<Real>::Statistics::print(std::ostream& os)
 
    os << "\n            calls   : " << multFullCalls;
    os << " (" << 100 * (multFullCalls / (0.01 + iterations)) << "% of iterations)";
-   os << "\n  Repwise   time    : " << multTimeRepwise;
+   os << "\n  Colwise   time    : " << multTimeColwise;
 
    if(solTime > 0)
-      os << " (" << 100 * (multTimeRepwise / solTime) << "% of solving time)";
+      os << " (" << 100 * (multTimeColwise / solTime) << "% of solving time)";
 
-   os << "\n            calls   : " << multRepwiseCalls;
-   os << " (" << 100 * (multRepwiseCalls / (0.01 + iterations)) << "% of iterations)";
-   os << "\n  Unsetup   time    : " << multTimeUnsetup;
+   os << "\n            calls   : " << multColwiseCalls;
+   os << " (" << 100 * (multColwiseCalls / (0.01 + iterations)) << "% of iterations)";
+   os << "\n  Dense     time    : " << multTimeUnsetup;
 
    if(solTime > 0)
       os << " (" << 100 * (multTimeUnsetup / solTime) << "% of solving time)";

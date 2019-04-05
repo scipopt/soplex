@@ -259,7 +259,7 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::solve()
    dualDegenSum = 0;
    multSparseCalls = 0;
    multFullCalls = 0;
-   multRepwiseCalls = 0;
+   multColwiseCalls = 0;
    multUnsetupCalls = 0;
    stallNumRecovers = 0;
 

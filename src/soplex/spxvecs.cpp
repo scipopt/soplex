@@ -571,10 +571,10 @@ void SPxSolverBase<Real>::setupPupdate(void)
                                 multSparseCalls, multFullCalls);
       else
       {
-         multTimeRepwise->start();
+         multTimeColwise->start();
          p.assign2product(c, *thevectors);
-         multTimeRepwise->stop();
-         ++multRepwiseCalls;
+         multTimeColwise->stop();
+         ++multColwiseCalls;
       }
    }
    else
