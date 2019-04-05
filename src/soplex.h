@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -585,17 +585,26 @@ public:
    /// is stored primal solution feasible?
    bool isPrimalFeasible() const;
 
-   /// is a primal feasible solution available?
-   bool hasPrimal() const;
+   /// is a solution available (not neccessarily feasible)?
+   bool hasSol() const;
+
+   /// deprecated: use #hasSol() instead
+   bool hasPrimal() const
+   {
+      return hasSol();
+   }
+
+   /// deprecated: use #hasSol() instead
+   bool hasDual() const
+   {
+      return hasSol();
+   }
 
    /// is a primal unbounded ray available?
    bool hasPrimalRay() const;
 
    /// is stored dual solution feasible?
    bool isDualFeasible() const;
-
-   /// is a dual feasible solution available?
-   bool hasDual() const;
 
    /// is Farkas proof of infeasibility available?
    bool hasDualFarkas() const;
@@ -1045,8 +1054,11 @@ public:
       /// print condition number during the solve
       PRINTBASISMETRIC = 28,
 
+      /// type of timer for statistics
+      STATTIMER = 29,
+
       /// number of integer parameters
-      INTPARAM_COUNT = 29
+      INTPARAM_COUNT = 30
    } IntParam;
 
    /// values for parameter OBJSENSE
@@ -1366,8 +1378,11 @@ public:
       /// objective offset
       OBJ_OFFSET = 23,
 
+      /// minimal Markowitz threshold to control sparsity/stability in LU factorization
+      MIN_MARKOWITZ = 24,
+
       /// number of real parameters
-      REALPARAM_COUNT = 24
+      REALPARAM_COUNT = 25
    } RealParam;
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -1525,6 +1540,9 @@ public:
 
    //**@name Statistics */
    //@{
+
+   /// set statistic timers to a certain type
+   void setTimings(const Timer::TYPE ttype);
 
    /// prints solution statistics
    void printSolutionStatistics(std::ostream& os);

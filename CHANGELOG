@@ -2,8 +2,13 @@ next Release
 ============
 
 interface & parameters:
+- show number of violations in log to improve understanding of solving progress
 - new parameter 'int:printbasismetric' to replace 'printcondition'
 	(-1: off, 0: condition estimate, 1: trace, 2: determinant, 3: condition)
+- new parameter 'real:min_markowitz' to limit the Markowitz stability threshold
+   (range 0.0001 to 0.9999, high values sacrifice performance for stability)
+- new parameter 'int:stattimer' to control time measurement for statistics during solving
+  (0: off, 1: user time, 2: wallclock time)
 - Templated SoPlex, SPxSolver, and SPxBasis.
 - Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
   SPxSolverBase<R>, SPxBasisBase<R> respectively for backwards compatibility
@@ -45,10 +50,26 @@ interface & parameters:
   `SoPlexBase<R>`.
 
 fixed bugs:
+- resolve compiler warning about data loss during implicit type conversion for timers
+- return correct basis status when aborting a solve early
+- ensure basis status is set correctly when aborting a solve early
+
+code quality:
+- merge SoPlex::hasDual() and SoPlex::hasPrimal() into SoPlex::hasSol() and mark old methods deprecated
+
+09 January 2019 - Release 4.0.1
+===============================
+
+fixed bugs:
 - correct objective function update in aggregation simplifier
 - use center value when fixing variables with slightly different bounds
 - MPS reader: print error message and terminate in case of duplicate column names or not column-wise ordering
+- LP reader: fix reading of infinite bounds and right-hand sides
+- return clean solution values according to optimal basis (e.g. reduced cost 0 for basic variables)
+- avoid unsuccessful termination when cycling and rather return sub-optimal solution
 
+code quality:
+- hide symbols in library to avoid symbol collisions and reduce library size
 
 13 June 2018 - Release 4.0.0
 ============================

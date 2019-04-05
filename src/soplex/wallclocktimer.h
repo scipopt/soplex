@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -33,8 +33,8 @@ private:
    //------------------------------------
    /**@name Data */
    //@{
-   mutable long sec;           ///< seconds
-   mutable long usec;          ///< microseconds
+   mutable time_t sec;           ///< seconds
+   mutable time_t usec;          ///< microseconds
 
    mutable Real lasttime;
    //@}
@@ -43,7 +43,7 @@ private:
    /**@name Internal helpers */
    //@{
    /// convert wallclock time to secounds.
-   Real wall2sec(long s, long us) const
+   Real wall2sec(time_t s, time_t us) const
    {
       return (Real)s + 0.000001 * (Real)us;
    }

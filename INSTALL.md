@@ -53,7 +53,6 @@ list run `cmake <path/to/SoPlex> -LH`:
 | CMAKE_BUILD_TYPE     | Release, Debug, ...          | OPT=[opt, dbg]         | |
 | GMP                  | on, off                      | GMP=[true, false]      | |
 | CMAKE_INSTALL_PREFIX | \<path\>                     | INSTALLDIR=\<path\>    | |
-| SHARED               | on, off                      | SHARED=[true, false]   | |
 | GMP_DIR              | \<path/to/GMP\>              | --                     | |
 | ..._DIR              | \<custom/path/to/package\>   | --                     | |
 | COVERAGE             | on, off                      | --                     | |

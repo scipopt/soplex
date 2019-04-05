@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -24,6 +24,7 @@
 #include "soplex/spxratiotester.h"
 #include "soplex/spxout.h"
 #include "soplex/exceptions.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -46,8 +47,8 @@ void SPxSolverBase<Real>::computeFtest()
    m_pricingViolCoUpToDate = true;
    m_pricingViol = 0;
    m_pricingViolCo = 0;
+   m_numViol = 0;
    infeasibilities.clear();
-   int ninfeasibilities = 0;
    int sparsitythreshold = (int)(sparsePricingFactor * dim());
 
    for(int i = 0; i < dim(); ++i)
@@ -63,29 +64,32 @@ void SPxSolverBase<Real>::computeFtest()
             m_pricingViol -= theCoTest[i];
             infeasibilities.addIdx(i);
             isInfeasible[i] = SPxPricer<Real>::VIOLATED;
-            ++ninfeasibilities;
+            ++m_numViol;
          }
          else
             isInfeasible[i] = SPxPricer<Real>::NOT_VIOLATED;
 
-         if(ninfeasibilities > sparsitythreshold)
+         if(infeasibilities.size() > sparsitythreshold)
          {
             MSG_INFO2((*spxout), (*spxout) << " --- using dense pricing"
                       << std::endl;)
             remainingRoundsLeave = DENSEROUNDS;
             sparsePricingLeave = false;
-            ninfeasibilities = 0;
+            infeasibilities.clear();
          }
       }
       else if(theCoTest[i] < -theeps)
+      {
          m_pricingViol -= theCoTest[i];
+         m_numViol++;
+      }
    }
 
-   if(ninfeasibilities == 0 && !sparsePricingLeave)
+   if(infeasibilities.size() == 0 && !sparsePricingLeave)
    {
       --remainingRoundsLeave;
    }
-   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingLeave)
+   else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingLeave)
    {
       MSG_INFO2((*spxout),
                 std::streamsize prec = spxout->precision();
@@ -96,7 +100,7 @@ void SPxSolverBase<Real>::computeFtest()
                    (*spxout) << " --- using sparse pricing, ";
                    (*spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (Real) ninfeasibilities / dim()
+                   << (Real) m_numViol / dim()
                    << std::scientific << std::setprecision(int(prec))
                    << std::endl;
                   )
@@ -121,12 +125,12 @@ void SPxSolverBase<Real>::updateFtest()
       int i = idx.index(j);
 
       if(m_pricingViolUpToDate && ftest[i] < -theeps)
+         // violation was present before this iteration
          m_pricingViol += ftest[i];
 
       ftest[i] = ((*theFvec)[i] > theUBbound[i])
                  ? theUBbound[i] - (*theFvec)[i]
                  : (*theFvec)[i] - theLBbound[i];
-
 
       if(sparsePricingLeave && ftest[i] < -theeps)
       {
@@ -149,7 +153,6 @@ void SPxSolverBase<Real>::updateFtest()
       }
       else if(m_pricingViolUpToDate && ftest[i] < -theeps)
          m_pricingViol -= ftest[i];
-
    }
 
    // if boundflips were performed, we need to update these indices as well
@@ -202,7 +205,7 @@ void SPxSolverBase<Real>::getLeaveVals(
    Real& leaveMax,
    Real& leavebound,
    int& leaveNum,
-   Real& objChange)
+   StableSum<Real>& objChange)
 {
    typename SPxBasisBase<Real>::Desc& ds = this->desc();
    leaveId = this->baseId(leaveIdx);
@@ -409,7 +412,7 @@ void SPxSolverBase<Real>::getLeaveVals2(
    Real& newUBbound,
    Real& newLBbound,
    Real& newCoPrhs,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    typename SPxBasisBase<Real>::Desc& ds = this->desc();
@@ -770,7 +773,7 @@ bool SPxSolverBase<Real>::leave(int leaveIdx, bool polish)
    Real leaveMax;       // maximium lambda of leaving var
    Real leavebound;     // current fVec value of leaving var
    int  leaveNum;       // number of leaveId in bounds
-   Real objChange = 0.0; // amount of change in the objective function
+   StableSum<Real> objChange; // amount of change in the objective function
 
    getLeaveVals(leaveIdx, leaveStat, leaveId, leaveMax, leavebound, leaveNum, objChange);
 

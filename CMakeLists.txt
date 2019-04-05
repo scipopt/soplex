@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.3.0)
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS_RELEASE}")
@@ -8,9 +8,9 @@ project(SOPLEX
 
 set(SOPLEX_VERSION_MAJOR 4)
 set(SOPLEX_VERSION_MINOR 0)
-set(SOPLEX_VERSION_PATCH 0)
-set(SOPLEX_VERSION_SUB 2)
-set(SOPLEX_VERSION_API 7)
+set(SOPLEX_VERSION_PATCH 1)
+set(SOPLEX_VERSION_SUB 3)
+set(SOPLEX_VERSION_API 10)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_VERSION_MAJOR "${SOPLEX_VERSION_MAJOR}")
@@ -21,6 +21,7 @@ include(CPack)
 
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
+option(STATIC_GMP "Prefer static GMP lib" OFF)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
@@ -47,6 +48,10 @@ set(CMAKE_MACOSX_RPATH ON)
 
 # use C++11 standard
 set(CMAKE_CXX_STANDARD 11)
+
+# set function visibility default to hidden
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 # create a target for updating the current git hash
 file(WRITE ${CMAKE_BINARY_DIR}/soplex_update_githash.cmake "

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -128,11 +128,11 @@ public:
    /// sets minimum Markowitz threshold.
    void setMarkowitz(Real m)
    {
-      if(m < 0.01)
-         m = 0.01;
+      if(m < 0.0001)
+         m = 0.0001;
 
-      if(m > 0.99)
-         m = 0.99;
+      if(m > 0.9999)
+         m = 0.9999;
 
       minThreshold = m;
       lastThreshold = m;
@@ -276,6 +276,12 @@ public:
       solveTime->reset();
       factorCount = 0;
       solveCount = 0;
+   }
+   void changeTimer(const Timer::TYPE ttype)
+   {
+      solveTime = TimerFactory::switchTimer(solveTime, ttype);
+      factorTime = TimerFactory::switchTimer(factorTime, ttype);
+      timerType = ttype;
    }
    /// prints the LU factorization to stdout.
    void dump() const;

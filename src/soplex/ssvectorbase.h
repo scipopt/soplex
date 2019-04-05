@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -27,6 +27,7 @@
 #include "soplex/idxset.h"
 #include "soplex/spxalloc.h"
 #include "soplex/timer.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -433,7 +434,7 @@ public:
    {
       setup();
 
-      R x = R(0);
+      StableSum<R> x;
       int i = size() - 1;
       int j = w.size() - 1;
 

@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -22,6 +22,7 @@
 #include "soplex/spxpricer.h"
 #include "soplex/spxout.h"
 #include "soplex/exceptions.h"
+#include "soplex/stablesum.h"
 
 namespace soplex
 {
@@ -109,13 +110,12 @@ Real SPxSolverBase<Real>::test(int i, typename SPxBasisBase<Real>::Desc::Status 
 template <>
 void SPxSolverBase<Real>::computeTest()
 {
-
    const typename SPxBasisBase<Real>::Desc& ds = this->desc();
    Real pricingTol = leavetol();
    m_pricingViolCoUpToDate = true;
    m_pricingViolCo = 0;
+
    infeasibilitiesCo.clear();
-   int ninfeasibilities = 0;
    int sparsitythreshold = (int)(sparsePricingFactor * coDim());
 
    for(int i = 0; i < coDim(); ++i)
@@ -142,28 +142,31 @@ void SPxSolverBase<Real>::computeTest()
                m_pricingViolCo -= theTest[i];
                infeasibilitiesCo.addIdx(i);
                isInfeasibleCo[i] = SPxPricer<Real>::VIOLATED;
-               ++ninfeasibilities;
+               ++m_numViol;
             }
             else
                isInfeasibleCo[i] = SPxPricer<Real>::NOT_VIOLATED;
 
-            if(ninfeasibilities > sparsitythreshold)
+            if(infeasibilitiesCo.size() > sparsitythreshold)
             {
                MSG_INFO2((*spxout), (*spxout) << " --- using dense pricing"
                          << std::endl;)
                remainingRoundsEnterCo = DENSEROUNDS;
                sparsePricingEnterCo = false;
-               ninfeasibilities = 0;
+               infeasibilitiesCo.clear();
             }
          }
          else if(theTest[i] < -pricingTol)
+         {
             m_pricingViolCo -= theTest[i];
+            ++m_numViol;
+         }
       }
    }
 
-   if(ninfeasibilities == 0 && !sparsePricingEnterCo)
+   if(infeasibilitiesCo.size() == 0 && !sparsePricingEnterCo)
       --remainingRoundsEnterCo;
-   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingEnterCo)
+   else if(infeasibilitiesCo.size() <= sparsitythreshold && !sparsePricingEnterCo)
    {
       MSG_INFO2((*spxout),
                 std::streamsize prec = spxout->precision();
@@ -174,7 +177,7 @@ void SPxSolverBase<Real>::computeTest()
                    (*spxout) << " --- using sparse pricing, ";
                    (*spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (Real) ninfeasibilities / coDim()
+                   << (Real) infeasibilitiesCo.size() / coDim()
                    << std::scientific << std::setprecision(int(prec))
                    << std::endl;
                   )
@@ -252,8 +255,8 @@ void SPxSolverBase<Real>::computeCoTest()
    Real pricingTol = leavetol();
    m_pricingViolUpToDate = true;
    m_pricingViol = 0;
+   m_numViol = 0;
    infeasibilities.clear();
-   int ninfeasibilities = 0;
    int sparsitythreshold = (int)(sparsePricingFactor * dim());
    const typename SPxBasisBase<Real>::Desc& ds = this->desc();
 
@@ -280,28 +283,31 @@ void SPxSolverBase<Real>::computeCoTest()
                m_pricingViol -= theCoTest[i];
                infeasibilities.addIdx(i);
                isInfeasible[i] = SPxPricer<Real>::VIOLATED;
-               ++ninfeasibilities;
+               ++m_numViol;
             }
             else
                isInfeasible[i] = SPxPricer<Real>::NOT_VIOLATED;
 
-            if(ninfeasibilities > sparsitythreshold)
+            if(infeasibilities.size() > sparsitythreshold)
             {
                MSG_INFO2((*spxout), (*spxout) << " --- using dense pricing"
                          << std::endl;)
                remainingRoundsEnter = DENSEROUNDS;
                sparsePricingEnter = false;
-               ninfeasibilities = 0;
+               infeasibilities.clear();
             }
          }
          else if(theCoTest[i] < -pricingTol)
+         {
             m_pricingViol -= theCoTest[i];
+            m_numViol++;
+         }
       }
    }
 
-   if(ninfeasibilities == 0 && !sparsePricingEnter)
+   if(infeasibilities.size() == 0 && !sparsePricingEnter)
       --remainingRoundsEnter;
-   else if(ninfeasibilities <= sparsitythreshold && !sparsePricingEnter)
+   else if(infeasibilities.size() <= sparsitythreshold && !sparsePricingEnter)
    {
       MSG_INFO2((*spxout),
                 std::streamsize prec = spxout->precision();
@@ -312,7 +318,7 @@ void SPxSolverBase<Real>::computeCoTest()
                    (*spxout) << " --- using sparse pricing, ";
                    (*spxout) << "sparsity: "
                    << std::setw(6) << std::fixed << std::setprecision(4)
-                   << (Real) ninfeasibilities / dim()
+                   << (Real) infeasibilities.size() / dim()
                    << std::scientific << std::setprecision(int(prec))
                    << std::endl;
                   )
@@ -456,7 +462,7 @@ void SPxSolverBase<Real>::getEnterVals
    Real& enterPric,
    typename SPxBasisBase<Real>::Desc::Status& enterStat,
    Real& enterRO,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    int enterIdx;
@@ -776,7 +782,7 @@ void SPxSolverBase<Real>::getEnterVals2
    int leaveIdx,
    Real enterMax,
    Real& leavebound,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    int idx;
@@ -1094,7 +1100,7 @@ SPxSolverBase<Real>::ungetEnterVal(
    typename SPxBasisBase<Real>::Desc::Status enterStat,
    Real leaveVal,
    const SVector& vec,
-   Real& objChange
+   StableSum<Real>& objChange
 )
 {
    assert(rep() == COLUMN);
@@ -1226,7 +1232,7 @@ bool SPxSolverBase<Real>::enter(SPxId& enterId, bool polish)
    Real enterPric;      // priced value of entering variable
    typename SPxBasisBase<Real>::Desc::Status enterStat;      // status of entering variable
    Real enterRO;        // rhs/obj of entering variable
-   Real objChange = 0.0;
+   StableSum<Real> objChange;
    const SVector* enterVec = enterVector(enterId);
 
    bool instable = instableEnter;

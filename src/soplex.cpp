@@ -3,7 +3,7 @@
 /*                  This file is part of the class library                   */
 /*       SoPlex --- the Sequential object-oriented simPlex.                  */
 /*                                                                           */
-/*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            */
+/*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            */
 /*                            fuer Informationstechnik Berlin                */
 /*                                                                           */
 /*  SoPlex is distributed under the terms of the ZIB Academic Licence.       */
@@ -210,6 +210,9 @@ const UnitVectorRational* SoPlexBase<Real>::_unitVectorRational(const int i);
 
 template <>
 bool SoPlexBase<Real>::_parseSettingsLine(char* line, const int lineNumber);
+
+template <>
+void SoPlexBase<Real>::setTimings(const Timer::TYPE ttype);
 
 template <>
 bool SoPlexBase<Real>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames,
@@ -565,6 +568,13 @@ SoPlexBase<R>::Settings::IntParam::IntParam()
    lower[SoPlexBase<Real>::PRINTBASISMETRIC] = -1;
    upper[SoPlexBase<Real>::PRINTBASISMETRIC] = 3;
    defaultValue[SoPlexBase<Real>::PRINTBASISMETRIC] = -1;
+
+   /// measure time spent in solving steps, e.g. factorization time
+   name[SoPlexBase<Real>::STATTIMER] = "STATTIMER";
+   description[SoPlexBase<Real>::STATTIMER] = "measure for statistics, e.g. factorization time (0 - off, 1 - user time, 2 - wallclock time)";
+   lower[SoPlexBase<Real>::STATTIMER] = 0;
+   upper[SoPlexBase<Real>::STATTIMER] = 2;
+   defaultValue[SoPlexBase<Real>::STATTIMER] = 1;
 }
 
 template <class R>
@@ -755,6 +765,13 @@ SoPlexBase<R>::Settings::RealParam::RealParam()
    lower[SoPlexBase<R>::OBJ_OFFSET] = -DEFAULT_INFINITY;
    upper[SoPlexBase<R>::OBJ_OFFSET] = DEFAULT_INFINITY;
    defaultValue[SoPlexBase<R>::OBJ_OFFSET] = 0.0;
+
+   // minimal Markowitz threshold to control sparsity/stability in LU factorization
+   name[SoPlexBase<R>::MIN_MARKOWITZ] = "min_markowitz";
+   description[SoPlexBase<R>::MIN_MARKOWITZ] = "minimal Markowitz threshold in LU factorization";
+   lower[SoPlexBase<R>::MIN_MARKOWITZ] = 0.0001;
+   upper[SoPlexBase<R>::MIN_MARKOWITZ] = 0.9999;
+   defaultValue[SoPlexBase<R>::MIN_MARKOWITZ] = 0.01;
 }
 
 #ifdef SOPLEX_WITH_RATIONALPARAM
@@ -3349,12 +3366,14 @@ bool SoPlexBase<Real>::isPrimalFeasible() const
 }
 
 
-/// is a primal feasible solution available?
+/// is a solution available (not necessarily feasible)?
 template <>
-bool SoPlexBase<Real>::hasPrimal() const
+bool SoPlexBase<Real>::hasSol() const
 {
    return _hasSolReal || _hasSolRational;
 }
+
+
 
 /// is a primal unbounded ray available?
 template <>
@@ -3362,6 +3381,7 @@ bool SoPlexBase<Real>::hasPrimalRay() const
 {
    return (_hasSolReal && _solReal.hasPrimalRay()) || (_hasSolRational && _solRational.hasPrimalRay());
 }
+
 
 
 /// is stored dual solution feasible?
@@ -3373,12 +3393,7 @@ bool SoPlexBase<Real>::isDualFeasible() const
 
 }
 
-/// is a dual feasible solution available?
-template <>
-bool SoPlexBase<Real>::hasDual() const
-{
-   return _hasSolReal || _hasSolRational;
-}
+
 
 /// is Farkas proof of infeasibility available?
 template <>
@@ -3401,7 +3416,7 @@ Real SoPlexBase<Real>::objValueReal()
       return realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
    else if(status() == SPxSolverBase<Real>::INFEASIBLE)
       return -realParam(SoPlexBase<Real>::INFTY) * intParam(SoPlexBase<Real>::OBJSENSE);
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRealSolution();
       return _solReal._objVal;
@@ -3416,7 +3431,7 @@ Real SoPlexBase<Real>::objValueReal()
 template <>
 bool SoPlexBase<Real>::getPrimal(VectorBase<Real>& vector)
 {
-   if(hasPrimal() && vector.dim() >= numCols())
+   if(hasSol() && vector.dim() >= numCols())
    {
       _syncRealSolution();
       _solReal.getPrimalSol(vector);
@@ -3438,7 +3453,7 @@ bool SoPlexBase<Real>::getPrimalReal(VectorBase<Real>& vector)
 template <>
 bool SoPlexBase<Real>::getSlacksReal(VectorReal& vector)
 {
-   if(hasPrimal() && vector.dim() >= numRows())
+   if(hasSol() && vector.dim() >= numRows())
    {
       _syncRealSolution();
       _solReal.getSlacks(vector);
@@ -3476,7 +3491,7 @@ bool SoPlexBase<Real>::getPrimalRayReal(VectorBase<Real>& vector)
 template <>
 bool SoPlexBase<Real>::getDual(VectorBase<Real>& vector)
 {
-   if(hasDual() && vector.dim() >= numRows())
+   if(hasSol() && vector.dim() >= numRows())
    {
       _syncRealSolution();
       _solReal.getDualSol(vector);
@@ -3498,7 +3513,7 @@ bool SoPlexBase<Real>::getDualReal(VectorBase<Real>& vector) // For SCIP
 template <>
 bool SoPlexBase<Real>::getRedCost(VectorBase<Real>& vector)
 {
-   if(hasDual() && vector.dim() >= numCols())
+   if(hasSol() && vector.dim() >= numCols())
    {
       _syncRealSolution();
       _solReal.getRedCostSol(vector);
@@ -3544,7 +3559,7 @@ bool SoPlexBase<Real>::getDualFarkasReal(VectorBase<Real>& vector)
 template <>
 bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isPrimalFeasible())
+   if(!hasSol())
       return false;
 
    _syncRealSolution();
@@ -3588,7 +3603,7 @@ bool SoPlexBase<Real>::getBoundViolation(Real& maxviol, Real& sumviol)
 template <>
 bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isPrimalFeasible())
+   if(!hasSol())
       return false;
 
    _syncRealSolution();
@@ -3633,7 +3648,7 @@ bool SoPlexBase<Real>::getRowViolation(Real& maxviol, Real& sumviol)
 template <>
 bool SoPlexBase<Real>::getRedCostViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasSol() || !hasBasis())
       return false;
 
    _syncRealSolution();
@@ -3698,7 +3713,7 @@ bool SoPlexBase<Real>::getRedCostViolation(Real& maxviol, Real& sumviol)
 template <>
 bool SoPlexBase<Real>::getDualViolation(Real& maxviol, Real& sumviol)
 {
-   if(!isDualFeasible() || !hasBasis())
+   if(!hasSol() || !hasBasis())
       return false;
 
    _syncRealSolution();
@@ -3780,7 +3795,7 @@ Rational SoPlexBase<Real>::objValueRational()
       else
          return _rationalPosInfty;
    }
-   else if(hasPrimal() || hasDual())
+   else if(hasSol())
    {
       _syncRationalSolution();
       return _solRational._objVal;
@@ -3794,7 +3809,7 @@ Rational SoPlexBase<Real>::objValueRational()
 template <>
 bool SoPlexBase<Real>::getPrimalRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getPrimalSol(vector);
@@ -3808,7 +3823,7 @@ bool SoPlexBase<Real>::getPrimalRational(VectorBase<Rational>& vector)
 template <>
 bool SoPlexBase<Real>::getSlacksRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasPrimal() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getSlacks(vector);
@@ -3837,7 +3852,7 @@ bool SoPlexBase<Real>::getPrimalRayRational(VectorBase<Rational>& vector)
 template <>
 bool SoPlexBase<Real>::getDualRational(VectorBase<Rational>& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numRowsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numRowsRational())
    {
       _syncRationalSolution();
       _solRational.getDualSol(vector);
@@ -3853,7 +3868,7 @@ bool SoPlexBase<Real>::getDualRational(VectorBase<Rational>& vector)
 template <>
 bool SoPlexBase<Real>::getRedCostRational(VectorRational& vector)
 {
-   if(_rationalLP != 0 && hasDual() && vector.dim() >= numColsRational())
+   if(_rationalLP != 0 && hasSol() && vector.dim() >= numColsRational())
    {
       _syncRationalSolution();
       _solRational.getRedCostSol(vector);
@@ -4212,7 +4227,7 @@ bool SoPlexBase<Real>::getPrimalRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4232,7 +4247,7 @@ bool SoPlexBase<Real>::getSlacksRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasPrimal())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4274,7 +4289,7 @@ bool SoPlexBase<Real>::getDualRational(mpq_t* vector, const int size)
 {
    assert(size >= numRowsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4295,7 +4310,7 @@ bool SoPlexBase<Real>::getRedCostRational(mpq_t* vector, const int size)
 {
    assert(size >= numColsRational());
 
-   if(hasDual())
+   if(hasSol())
    {
       _syncRationalSolution();
 
@@ -4336,7 +4351,7 @@ bool SoPlexBase<Real>::getDualFarkasRational(mpq_t* vector, const int size)
 template <>
 int SoPlexBase<Real>::totalSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.totalSizePrimal(base);
@@ -4351,7 +4366,7 @@ int SoPlexBase<Real>::totalSizePrimalRational(const int base)
 template <>
 int SoPlexBase<Real>::totalSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.totalSizeDual(base);
@@ -4366,7 +4381,7 @@ int SoPlexBase<Real>::totalSizeDualRational(const int base)
 template <>
 int SoPlexBase<Real>::dlcmSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizePrimal(base);
@@ -4381,7 +4396,7 @@ int SoPlexBase<Real>::dlcmSizePrimalRational(const int base)
 template <>
 int SoPlexBase<Real>::dlcmSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dlcmSizeDual(base);
@@ -4396,7 +4411,7 @@ int SoPlexBase<Real>::dlcmSizeDualRational(const int base)
 template <>
 int SoPlexBase<Real>::dmaxSizePrimalRational(const int base)
 {
-   if(hasPrimal() || hasPrimalRay())
+   if(hasSol() || hasPrimalRay())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizePrimal(base);
@@ -4411,7 +4426,7 @@ int SoPlexBase<Real>::dmaxSizePrimalRational(const int base)
 template <>
 int SoPlexBase<Real>::dmaxSizeDualRational(const int base)
 {
-   if(hasDual() || hasDualFarkas())
+   if(hasSol() || hasDualFarkas())
    {
       _syncRationalSolution();
       return _solRational.dmaxSizeDual(base);
@@ -4433,19 +4448,8 @@ typename SPxBasisBase<Real>::SPxStatus SoPlexBase<Real>::basisStatus() const
 {
    if(!hasBasis())
       return SPxBasisBase<Real>::NO_PROBLEM;
-   else if(status() == SPxSolverBase<Real>::OPTIMAL
-           || status() == SPxSolverBase<Real>::OPTIMAL_UNSCALED_VIOLATIONS)
-      return SPxBasisBase<Real>::OPTIMAL;
-   else if(status() == SPxSolverBase<Real>::UNBOUNDED)
-      return SPxBasisBase<Real>::UNBOUNDED;
-   else if(status() == SPxSolverBase<Real>::INFEASIBLE)
-      return SPxBasisBase<Real>::INFEASIBLE;
-   else if(hasPrimal())
-      return SPxBasisBase<Real>::PRIMAL;
-   else if(hasDual())
-      return SPxBasisBase<Real>::DUAL;
    else
-      return SPxBasisBase<Real>::REGULAR;
+      return _solver.getBasisStatus();
 }
 
 
@@ -6748,6 +6752,10 @@ bool SoPlexBase<Real>::setIntParam(const IntParam param, const int value, const 
       _solver.setMetricInformation(value);
       break;
 
+   case STATTIMER:
+      setTimings((Timer::TYPE) value);
+      break;
+
    default:
       return false;
    }
@@ -6911,6 +6919,10 @@ bool SoPlexBase<Real>::setRealParam(const RealParam param, const Real value, con
       if(_rationalLP)
          _rationalLP->changeObjOffset(value);
 
+      break;
+
+   case SoPlexBase<Real>::MIN_MARKOWITZ:
+      _slufactor.setMarkowitz(value);
       break;
 
    default:
@@ -7532,8 +7544,20 @@ bool SoPlexBase<Real>::parseSettingsString(char* string)
    return false;
 }
 
-
-
+/// set statistic timers to a certain type, used to turn off statistic time measurement
+template <>
+void SoPlexBase<Real>::setTimings(const Timer::TYPE ttype)
+{
+   _slufactor.changeTimer(ttype);
+   _statistics->readingTime = TimerFactory::switchTimer(_statistics->readingTime, ttype);
+   _statistics->simplexTime = TimerFactory::switchTimer(_statistics->simplexTime, ttype);
+   _statistics->syncTime = TimerFactory::switchTimer(_statistics->syncTime, ttype);
+   _statistics->solvingTime = TimerFactory::switchTimer(_statistics->solvingTime, ttype);
+   _statistics->preprocessingTime = TimerFactory::switchTimer(_statistics->preprocessingTime, ttype);
+   _statistics->rationalTime = TimerFactory::switchTimer(_statistics->rationalTime, ttype);
+   _statistics->transformTime = TimerFactory::switchTimer(_statistics->transformTime, ttype);
+   _statistics->reconstructionTime = TimerFactory::switchTimer(_statistics->reconstructionTime, ttype);
+}
 
 /// prints solution statistics
 template <>

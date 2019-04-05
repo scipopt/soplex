@@ -3,7 +3,7 @@
 #*                  This file is part of the class library                   *#
 #*       SoPlex --- the Sequential object-oriented simPlex.                  *#
 #*                                                                           *#
-#*    Copyright (C) 1996-2018 Konrad-Zuse-Zentrum                            *#
+#*    Copyright (C) 1996-2019 Konrad-Zuse-Zentrum                            *#
 #*                            fuer Informationstechnik Berlin                *#
 #*                                                                           *#
 #*  SoPlex is distributed under the terms of the ZIB Academic Licence.       *#
@@ -43,7 +43,7 @@ include make/make.detecthost
 # default settings
 #-----------------------------------------------------------------------------
 
-VERSION		:=	4.0.0.3
+VERSION		:=	4.0.1.3
 SPXGITHASH	=
 
 VERBOSE		=	false
@@ -191,6 +191,7 @@ LIBHEADER	=	soplex/array.h \
 				soplex/spxweightst.h \
 				soplex/ssvectorbase.h \
 				soplex/ssvector.h \
+				soplex/stablesum.h \
 				soplex/statistics.h \
 				soplex/svectorbase.h \
 				soplex/svector.h \
