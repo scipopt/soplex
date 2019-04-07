@@ -653,7 +653,7 @@ private:
   soplex::SPxSolver spxsolver_;
 
   /// indices of integer variables
-  soplex::DIdxSet   spxintvars_;
+  soplex::IdxSet   spxintvars_;
 
   /// Hotstart information
   soplex::SoPlex::VarStatus *hotStartCStat_;

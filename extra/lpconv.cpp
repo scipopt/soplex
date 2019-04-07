@@ -164,7 +164,7 @@ static void read_latte(
    spxifstream& ifile,
    NameSet& rownames,
    NameSet& colnames,
-   DIdxSet& intvars)
+   IdxSet& intvars)
 {
    int rows;
    int cols;
@@ -326,7 +326,7 @@ int main(int argc, char **argv)
    SPxLP       lp;
    NameSet     rownames;
    NameSet     colnames;
-   DIdxSet     intvars;
+   IdxSet     intvars;
 
    spxifstream ifile(inpfile);
 

@@ -516,7 +516,7 @@ bool SPxLPBase<Rational>::readLPF(
    std::istream& p_input,                ///< input stream.
    NameSet*      p_rnames,               ///< row names.
    NameSet*      p_cnames,               ///< column names.
-   DIdxSet*      p_intvars)              ///< integer variables.
+   IdxSet*      p_intvars)              ///< integer variables.
 {
    enum
    {
@@ -1193,7 +1193,7 @@ static void MPSreadRows(MPSInput& mps, LPRowSetBase<Rational>& rset, NameSet& rn
 
 
 /// Process COLUMNS section.
-static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const NameSet&  rnames, LPColSetBase<Rational>& cset, NameSet& cnames, DIdxSet* intvars, SPxOut* spxout)
+static void MPSreadCols(MPSInput& mps, const LPRowSetBase<Rational>& rset, const NameSet&  rnames, LPColSetBase<Rational>& cset, NameSet& cnames, IdxSet* intvars, SPxOut* spxout)
 {
    Rational val;
    int idx;
@@ -1517,9 +1517,9 @@ static void MPSreadRanges(MPSInput& mps,  LPRowSetBase<Rational>& rset, const Na
 
 
 /// Process BOUNDS section.
-static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const NameSet& cnames, DIdxSet* intvars, SPxOut* spxout)
+static void MPSreadBounds(MPSInput& mps, LPColSetBase<Rational>& cset, const NameSet& cnames, IdxSet* intvars, SPxOut* spxout)
 {
-   DIdxSet oldbinvars;
+   IdxSet oldbinvars;
    char bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
    int  idx;
    Rational val;
@@ -1663,7 +1663,7 @@ bool SPxLPBase<Rational>::readMPS(
    std::istream& p_input,           ///< input stream.
    NameSet*      p_rnames,          ///< row names.
    NameSet*      p_cnames,          ///< column names.
-   DIdxSet*      p_intvars)         ///< integer variables.
+   IdxSet*      p_intvars)         ///< integer variables.
 {
    LPRowSetBase<Rational>& rset = *this;
    LPColSetBase<Rational>& cset = *this;
@@ -2069,7 +2069,7 @@ static void LPFwriteGenerals(
    const SPxLPBase<Rational>&   p_lp,         ///< the LP to write
    std::ostream&            p_output,     ///< output stream
    const NameSet*           p_cnames,     ///< column names
-   const DIdxSet*           p_intvars     ///< integer variables
+   const IdxSet*           p_intvars     ///< integer variables
    )
 {
 
@@ -2093,7 +2093,7 @@ void SPxLPBase<Rational>::writeLPF(
    std::ostream&  p_output,          ///< output stream
    const NameSet* p_rnames,          ///< row names
    const NameSet* p_cnames,          ///< column names
-   const DIdxSet* p_intvars          ///< integer variables
+   const IdxSet* p_intvars          ///< integer variables
    ) const
 {
 
@@ -2201,7 +2201,7 @@ void SPxLPBase<Rational>::writeMPS(
    std::ostream&  p_output,          ///< output stream.
    const NameSet* p_rnames,          ///< row names.
    const NameSet* p_cnames,          ///< column names.
-   const DIdxSet* p_intvars          ///< integer variables.
+   const IdxSet* p_intvars          ///< integer variables.
    ) const
 {
 

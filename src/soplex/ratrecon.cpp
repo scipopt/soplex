@@ -48,7 +48,7 @@ namespace soplex
     *  success and false if more accuracy is required: specifically if componentwise rational reconstruction does not
     *  produce such a vector
     */
-   static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0)
+   static int Reconstruct(VectorRational& resvec, mpz_t* xnum, mpz_t denom, int dim, const Rational& denomBoundSquared, const IdxSet* indexSet = 0)
    {
       bool rval = true;
       int done = 0;
@@ -222,7 +222,7 @@ namespace soplex
 
 
    /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet)
+   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const IdxSet* indexSet)
    {
 #ifdef SOPLEX_WITH_GMP
       mpz_t* xnum = 0; /* numerator of input vector */

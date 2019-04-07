@@ -25,12 +25,12 @@
 #include "soplex/rational.h"
 #include "soplex/sol.h"
 #include "soplex/basevectors.h"
-#include "soplex/didxset.h"
+#include "soplex/idxset.h"
 
 namespace soplex
 {
    /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0);
+   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const IdxSet* indexSet = 0);
 
    /** reconstruct a rational solution */
    bool reconstructSol(SolRational& solution);

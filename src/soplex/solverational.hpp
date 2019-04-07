@@ -3996,7 +3996,7 @@ typename SPxSolverBase<R>::Status SoPlexBase<R>::_solveRealStable(bool acceptUnb
             {
       bool success;
       bool isSolBasic;
-      DIdxSet basicIndices(numColsRational());
+      IdxSet basicIndices(numColsRational());
 
       success = false;
       isSolBasic = true;

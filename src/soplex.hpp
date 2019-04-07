@@ -795,7 +795,7 @@ namespace soplex
 
   // Alias for writeFile; SCIP
   template <class R>
-	bool SoPlexBase<R>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+	bool SoPlexBase<R>::writeFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const IdxSet* intVars, const bool unscale) const
   {
     return writeFile(filename, rowNames, colNames, intVars, unscale);
   }
@@ -805,7 +805,7 @@ namespace soplex
   /// marked as integer; returns true on success
   /// Here unscale is just a junk variable that is used to match the type with the real write function
   template <class R>
-	bool SoPlexBase<R>::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+	bool SoPlexBase<R>::writeFileRational(const char* filename, const NameSet* rowNames, const NameSet* colNames, const IdxSet* intVars) const
   {
     if( intParam(SoPlexBase<R>::SYNCMODE) == SYNCMODE_ONLYREAL )
       return false;
@@ -7351,7 +7351,7 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics()
 /// reads R LP in LP or MPS format from file and returns true on success; gets row names, column names, and
 /// integer variables if desired
 template <class R>
-bool SoPlexBase<R>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+bool SoPlexBase<R>::_readFileReal(const char* filename, NameSet* rowNames, NameSet* colNames, IdxSet* intVars)
 {
   assert(_realLP != 0);
 
@@ -7393,7 +7393,7 @@ bool SoPlexBase<R>::_readFileReal(const char* filename, NameSet* rowNames, NameS
 /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
 /// integer variables if desired
 template <class R>
-bool SoPlexBase<R>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+bool SoPlexBase<R>::_readFileRational(const char* filename, NameSet* rowNames, NameSet* colNames, IdxSet* intVars)
 {
   // clear statistics
   _statistics->clearAllData();
@@ -8315,7 +8315,7 @@ bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChange
 /// integer variables if desired; returns true on success
 
 template <class R>
-bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, DIdxSet* intVars)
+bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* colNames, IdxSet* intVars)
 {
   bool success = false;
   if( intParam(SoPlexBase<R>::READMODE) == READMODE_REAL )
@@ -8336,7 +8336,7 @@ bool SoPlexBase<R>::readFile(const char* filename, NameSet* rowNames, NameSet* c
 /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
 /// marked as integer; returns true on success
 template <class R>
-bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars, const bool unscale) const
+bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames, const NameSet* colNames, const IdxSet* intVars, const bool unscale) const
 {
   ///@todo implement return value
   if( unscale && _realLP->isScaled() )
@@ -8362,7 +8362,7 @@ bool SoPlexBase<R>::writeFile(const char* filename, const NameSet* rowNames, con
 /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
 /// the variables contained in it are marked as integer; returns true on success
 template <class R>
-bool SoPlexBase<R>::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* intVars) const
+bool SoPlexBase<R>::writeDualFileReal(const char* filename, const NameSet* rowNames, const NameSet* colNames, const IdxSet* intVars) const
 {
   SPxLPBase<R> dualLP;
   _realLP->buildDualProblem(dualLP);

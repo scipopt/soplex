@@ -90,7 +90,7 @@ int main(int argc, char **argv)
    SPxLP       lp;
    NameSet     rownames;
    NameSet     colnames;
-   DIdxSet     intvars;
+   IdxSet     intvars;
 
    if (!lp.readFile(inpfile, &rownames, &colnames, &intvars))
    {
