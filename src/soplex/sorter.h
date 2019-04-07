@@ -68,6 +68,13 @@ namespace soplex
                        }
                    };
 
+    // All elements must be sorted
+    if(size + start >= end - 1)
+      {
+        spxSort(keys, end, auxCmpr, start);
+        return (end - 1);
+      }
+
     std::partial_sort(keys + start, keys + size, keys + end, auxCmpr);
     // This might be a drawback of using std::partial_sort. The original
     // algorithm may have a better return value that is greater than size.
