@@ -65,18 +65,7 @@ template <typename T>
 class DataArray
 {
 private:
-   int thesize;           ///< number of used elements in array data
-   int themax;            ///< the length of array data and
   std::vector<T>  data;              ///< the array of elements
-
-protected:
-   /** When a DataArray is reSize()%d to more than max() elements, the
-       new value for max() is not just set to the new size but rather to
-       \p memFactor * \p size. This makes #reSize%ing perform better in codes
-       where a DataArray is extended often by a small number of elements
-       only.
-    */
-   Real memFactor;     ///< memory extension factor.
 
 public:
 
@@ -84,7 +73,6 @@ public:
    T& operator[](int n)
    {
       assert(n >= 0);
-      assert(n < thesize);
       return data[n];
    }
 
@@ -92,7 +80,6 @@ public:
    const T& operator[](int n) const
    {
       assert(n >= 0);
-      assert(n < thesize);
       return data[n];
       // return data.at(n); The data.at won't work because of the following
       // reason.
@@ -109,14 +96,12 @@ public:
    /// reference last element.
    T& last()
    {
-      assert(thesize > 0);
-      return data[thesize -1];
+      return data.back();
    }
    /// reference last const element.
    const T& last() const
    {
-      assert(thesize > 0);
-      return data[thesize -1];
+     return data.back();
    }
 
    /// get a C pointer to the data.
@@ -194,19 +179,19 @@ public:
    void removeLast(int m = 1)
    {
       assert(m <= size() && m >= 0);
-      thesize -= m;
+      // Erase the last m elements
+      data.erase(data.end() - m, data.end());
    }
    /// remove all elements.
    void clear()
    {
      data.clear();
-      thesize = 0;
    }
 
    /// return nr. of elements.
    int size() const
    {
-      return thesize;
+     return data.size();
    }
 
    /// reset size to \p newsize.
@@ -218,13 +203,17 @@ public:
     */
    void reSize(int newsize)
    {
-      assert(memFactor >= 1);
-      if (newsize > themax)
-         reMax(int(memFactor * newsize), newsize);
+     if (newsize > data.capacity())
+         reMax(newsize, newsize);
       else if (newsize < 0)
-         thesize = 0;
+        {
+          // TODO: verify if this is the right thing to do here.
+          data.clear();
+        }
       else
-         thesize = newsize;
+        {
+          // nothing happens
+        }
    }
 
    /// return maximum number of elements.
@@ -234,7 +223,7 @@ public:
     */
    int max() const
    {
-      return themax;
+     return data.capacity();
    }
 
    /// reset maximum number of elements.
@@ -250,15 +239,15 @@ public:
    void reMax(int newMax = 1, int newSize = -1)
    {
       if (newSize >= 0)
-         thesize = newSize;
+        {;}
       if (newMax < newSize)
          newMax = newSize;
       if (newMax < 1)
          newMax = 1;
-      if (newMax == themax)
+      if (newMax == data.capacity())
          return;
-      themax = newMax;
-      if (thesize <= 0)
+      int themax = newMax;
+      if (newSize <= 0)
       {
          /* no data needs to be copied so do a clean free and alloc */
          data.clear();
@@ -285,36 +274,15 @@ public:
    /// consistency check
    bool isConsistent() const
    {
-#ifdef ENABLE_CONSISTENCY_CHECKS
-      if (  (data == 0)
-         || (themax < 1)
-         || (themax < thesize)
-         || (thesize < 0)
-         || (memFactor < 1.0))
-         return MSGinconsistent("DataArray");
-#endif
-
       return true;
    }
 
    /// copy constructor
    DataArray(const DataArray& old)
-      : thesize(old.thesize)
-      , themax (old.themax)
-      , data (0)
-      , memFactor (old.memFactor)
    {
       data.reserve(max());
-
-      assert(thesize >= 0);
-
-      if (thesize)
-        {
           data = old.data;
         }
-
-      assert(isConsistent());
-   }
 
    /// default constructor.
    /** The constructor allocates an Array containing \p size uninitialized
@@ -326,18 +294,22 @@ public:
        @param p_fac  value for memFactor.
     */
    explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
-      : data (0)
-      , memFactor(p_fac)
    {
-      thesize = (p_size < 0) ? 0 : p_size;
-      if (p_max > thesize)
+     // Old code when this used to be spx_alloced
+     auto thesize = (p_size < 0) ? 0 : p_size;
+     decltype(thesize) themax = 0;
+
+     if(p_max > thesize)
          themax = p_max;
       else
          themax = (thesize == 0) ? 1 : thesize;
 
-      data.reserve(themax);
 
-      assert(isConsistent());
+     // p_size number of uninitialized elements
+     data.reserve(p_max);
+     data.resize(p_size);
+     // The underlying array will have at least p_max number of elements,
+     // though.
    }
 
    /// destructor
@@ -363,7 +335,6 @@ public:
   inline bool& DataArray<bool>::operator[](int n)
   {
     assert(n >= 0);
-    assert(n < thesize);
     assert(true);               // This function should never be called. See
                                 // comments above.
   }
@@ -373,7 +344,6 @@ public:
   inline const bool& DataArray<bool>::operator[](int n) const
   {
     assert(n >= 0);
-    assert(n < thesize);
     assert(true);               // this function should never get called. See
                                 // comments above
   }
