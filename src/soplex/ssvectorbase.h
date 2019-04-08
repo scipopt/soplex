@@ -66,8 +66,9 @@ private:
       assert(newmax != 0);
       assert(newmax >= IdxSet::size());
 
-      len = newmax;
-      idx.resize(len);
+      // TODO: Check whether it should be reserve or resize? According to old
+      // code it should be a reserve.
+      idx.reserve(newmax);
    }
 
    //@}
@@ -134,7 +135,7 @@ public:
          IdxSet::clear();
 
          int d = dim();
-         num = 0;
+         idx.clear();
 
          for( int i = 0; i < d; ++i )
          {
@@ -144,8 +145,7 @@ public:
                   VectorBase<R>::val[i] = R(0);
                else
                {
-                  idx[num] = i;
-                  num++;
+                 idx.push_back(i);
                }
             }
          }
@@ -512,13 +512,15 @@ public:
       {
          R maxabs = 0;
 
-         for( int i = 0; i < num; ++i )
+         for(auto i: idx)
          {
-            R x = spxAbs(VectorBase<R>::val[idx[i]]);
+             R x = spxAbs(VectorBase<R>::val[i]);
 
-            if( x > maxabs )
+             if(x > maxabs)
+               {
                maxabs = x;
          }
+           }
 
          return maxabs;
       }
@@ -533,8 +535,10 @@ public:
 
       if( isSetup() )
       {
-         for( int i = 0; i < num; ++i )
-            x += VectorBase<R>::val[idx[i]] * VectorBase<R>::val[idx[i]];
+        for(auto id: idx)
+          {
+            x += VectorBase<R>::val[id] * VectorBase<R>::val[id];
+          }
       }
       else
          x = VectorBase<R>::length2();
@@ -582,7 +586,7 @@ public:
       assert(n <= IdxSet::max());
 
       unSetup();
-      num = n;
+      idx.resize(n);
    }
 
    /// Resets memory consumption to \p newsize.
@@ -599,8 +603,10 @@ public:
    {
       if( isSetup() )
       {
-         for( int i = 0; i < num; ++i )
-            VectorBase<R>::val[idx[i]] = 0;
+         for(auto id: idx)
+           {
+             VectorBase<R>::val[id] = 0;
+           }
       }
       else
          VectorBase<R>::clear();
@@ -658,8 +664,9 @@ public:
       , setupStatus(true)
       , epsilon(p_eps)
    {
-      len = (p_dim < 1) ? 1 : p_dim;
+      auto len = (p_dim < 1) ? 1 : p_dim;
       idx.reserve(len);
+      freeArray = false;
       VectorBase<R>::clear();
 
       assert(isConsistent());
@@ -669,12 +676,12 @@ public:
    template < class S >
    SSVectorBase<R>(const SSVectorBase<S>& vec)
       : VectorBase<R>(vec)
-      , IdxSet()
       , setupStatus(vec.setupStatus)
       , epsilon(vec.epsilon)
    {
-      len = (vec.dim() < 1) ? 1 : vec.dim();
+      auto len = (vec.dim() < 1) ? 1 : vec.dim();
       idx.reserve(len);
+      freeArray = false;
       IdxSet::operator=(vec);
 
       assert(isConsistent());
@@ -690,8 +697,10 @@ public:
       , setupStatus(vec.setupStatus)
       , epsilon(vec.epsilon)
    {
-      len = (vec.dim() < 1) ? 1 : vec.dim();
+      auto len = (vec.dim() < 1) ? 1 : vec.dim();
       idx.reserve(len);
+      freeArray = false;
+
       IdxSet::operator=(vec);
 
       assert(isConsistent());
@@ -701,13 +710,12 @@ public:
    template < class S >
    explicit SSVectorBase<R>(const VectorBase<S>& vec, R eps = Param<R>::epsilon())
       : VectorBase<R>(vec)
-      , IdxSet()
       , setupStatus(false)
       , epsilon(eps)
    {
-      len = (vec.dim() < 1) ? 1 : vec.dim();
+      auto len = (vec.dim() < 1) ? 1 : vec.dim();
       idx.reserve(len);
-
+      freeArray = false
       assert(isConsistent());
    }
 
@@ -733,7 +741,7 @@ public:
       else
       {
          int d = rhs.dim();
-         num = 0;
+         auto num = 0;
 
          for( int i = 0; i < d; ++i )
          {
@@ -751,7 +759,7 @@ public:
             }
          }
 
-         rhs.num = num;
+         rhs.idx.resize(num);
          rhs.setupStatus = true;
       }
 
@@ -791,15 +799,12 @@ public:
          else
          {
             int d = rhs.dim();
-            num = 0;
-
             for( int i = 0; i < d; ++i )
             {
                if( spxAbs(rhs.val[i]) > epsilon )
                {
                   VectorBase<R>::val[i] = rhs.val[i];
-                  idx[num] = i;
-                  num++;
+                  idx.push_back(i);
                }
             }
          }
@@ -836,7 +841,7 @@ public:
          }
          else
          {
-            num = 0;
+            auto num = 0;
 
             for( int i = 0; i < rhs.dim(); ++i )
             {
