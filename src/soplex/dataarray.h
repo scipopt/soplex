@@ -207,12 +207,11 @@ public:
          reMax(newsize, newsize);
       else if (newsize < 0)
         {
-          // TODO: verify if this is the right thing to do here.
           data.clear();
         }
       else
         {
-          // nothing happens
+          data.resize(newsize);
         }
    }
 
@@ -239,7 +238,9 @@ public:
    void reMax(int newMax = 1, int newSize = -1)
    {
       if (newSize >= 0)
-        {;}
+        {
+          data.resize(newSize);
+        }
       if (newMax < newSize)
          newMax = newSize;
       if (newMax < 1)
@@ -255,7 +256,7 @@ public:
       }
       else
         {
-          data.resize(themax);
+          data.reserve(themax);
         }
    }
    /// assignment operator

@@ -36,7 +36,7 @@ int SPxScaler<Rational>::computeScaleExp(const SVectorBase<Rational>& vec, const
   // This should never be called.
   // Refer to issue 164 in soplex gitlab
   // @todo: maybe throw an exception?
-  assert(true);
+  assert(false);
 
   return 0;
 }
