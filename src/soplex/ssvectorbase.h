@@ -63,11 +63,12 @@ private:
    /// Allocates enough space to accommodate \p newmax values.
    void setMax(int newmax)
    {
+      assert(idx != 0);
       assert(newmax != 0);
       assert(newmax >= IdxSet::size());
 
       len = newmax;
-      idx.resize(len);
+      spx_realloc(idx, len);
    }
 
    //@}
@@ -225,7 +226,7 @@ public:
          if( n < 0 )
          {
             if( spxAbs(x) > epsilon )
-              IdxSet::add(1, (const int*) &i);
+               IdxSet::add(1, &i);
          }
          else if( x == R(0) )
             clearNum(n);
@@ -290,7 +291,7 @@ public:
    /// Returns array indices.
    const int* indexMem() const
    {
-      return idx.data();
+      return idx;
    }
 
    /// Returns array values.
@@ -309,7 +310,7 @@ public:
    int* altIndexMem()
    {
       unSetup();
-      return idx.data();
+      return idx;
    }
 
    /// Returns array values.
@@ -659,7 +660,7 @@ public:
       , epsilon(p_eps)
    {
       len = (p_dim < 1) ? 1 : p_dim;
-      idx.reserve(len);
+      spx_alloc(idx, len);
       VectorBase<R>::clear();
 
       assert(isConsistent());
@@ -674,7 +675,7 @@ public:
       , epsilon(vec.epsilon)
    {
       len = (vec.dim() < 1) ? 1 : vec.dim();
-      idx.reserve(len);
+      spx_alloc(idx, len);
       IdxSet::operator=(vec);
 
       assert(isConsistent());
@@ -691,7 +692,7 @@ public:
       , epsilon(vec.epsilon)
    {
       len = (vec.dim() < 1) ? 1 : vec.dim();
-      idx.reserve(len);
+      spx_alloc(idx, len);
       IdxSet::operator=(vec);
 
       assert(isConsistent());
@@ -706,7 +707,7 @@ public:
       , epsilon(eps)
    {
       len = (vec.dim() < 1) ? 1 : vec.dim();
-      idx.reserve(len);
+      spx_alloc(idx, len);
 
       assert(isConsistent());
    }
@@ -876,7 +877,8 @@ public:
    /// destructor
    ~SSVectorBase<R>()
    {
-     ;
+      if( idx )
+         spx_free(idx);
    }
 
    //@}

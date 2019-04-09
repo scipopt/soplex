@@ -38,10 +38,11 @@ int IdxSet::pos(int i) const
    return -1;
 }
 
-  void IdxSet::add(int n, const std::vector<int> i)
+void IdxSet::add(int n, const int i[])
 {
    assert(n >= 0 && size() + n <= max());
-   idx.insert(idx.end(), i.begin(), i.begin() + n);
+   for (int j = 0; j < n; j++)
+      idx[size() + j] = i[j];
    add(n);
 }
 
@@ -68,15 +69,17 @@ IdxSet& IdxSet::operator=(const IdxSet& rhs)
 {
    if (this != &rhs)
    {
-     if (!idx.empty() && max() < rhs.size())
+      if (idx != 0 && max() < rhs.size())
       {
-         idx.clear();
+         if (freeArray)
+            spx_free(idx);
+         idx = 0;
       }
 
-     if (idx.empty())
+      if (idx == 0)
       {
          len = rhs.size();
-         idx.reserve(len);
+         spx_alloc(idx, len);
          freeArray = true;
       }
 
@@ -95,7 +98,7 @@ IdxSet::IdxSet(const IdxSet& old)
    : len(old.len)
    , idx(0)
 {
-   idx.reserve(len);
+   spx_alloc(idx, len);
 
    for (num = 0; num < old.num; num++)
       idx[num] = old.idx[num];
@@ -112,7 +115,7 @@ bool IdxSet::isConsistent() const
 #ifdef ENABLE_CONSISTENCY_CHECKS
    int i, j;
 
-   if (len > 0 && idx.empty())
+   if (len > 0 && idx == 0)
       return MSGinconsistent("IdxSet");
 
    for (i = 0; i < size(); ++i)

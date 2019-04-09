@@ -68,8 +68,7 @@ public:
    {
       if (max() - size() < n)
          setMax(size() + n);
-      idx.insert(idx.end(), i, i+n);
-      add(n);
+      IdxSet::add(n, i);
    }
 
    /// adds index \p i to the index set

@@ -418,9 +418,9 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
 
       if( adjust )
       {
-        std::vector<int>::iterator iptr = idx.begin();
-        std::vector<int>::iterator iiptr = idx.begin();
-        std::vector<int>::iterator endptr = idx.begin() + num;
+         int* iptr = idx;
+         int* iiptr = idx;
+         int* endptr = idx + num;
 
          for( ; iptr < endptr; ++iptr )
          {
@@ -431,7 +431,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
                v[*iptr] = 0;
          }
 
-         num = std::distance(idx.begin(), iiptr);
+         num = int(iiptr - idx);
       }
    }
    else

@@ -62,7 +62,7 @@ protected:
    //@{
    int  num;           ///< number of used indices
    int  len;           ///< length of array \ref soplex::IdxSet::idx "idx"
-  std::vector<int> idx;           ///< array of indices
+   int* idx;           ///< array of indices
    bool freeArray;     ///< true iff \ref soplex::IdxSet::idx "idx" should be freed inside of this object
    //@}
 
@@ -78,7 +78,7 @@ public:
        indices in \p imem.
     */
    IdxSet(int n, int imem[], int l = 0)
-      : num(l), len(n), freeArray(false)
+      : num(l), len(n), idx(imem), freeArray(false)
    {
       assert(isConsistent());
    }
@@ -89,7 +89,7 @@ public:
        the default constructor.
    */
    IdxSet()
-      : num(0), len(0), freeArray(false)
+      : num(0), len(0), idx(0), freeArray(false)
    {
       assert(isConsistent());
    }
@@ -97,7 +97,8 @@ public:
    /// destructor.
    virtual ~IdxSet()
    {
-     ;
+      if(freeArray)
+         spx_free(idx);
    }
 
    /// assignment operator.
@@ -116,7 +117,7 @@ public:
    /// access \p n 'th index.
    int index(int n) const
    {
-     assert(n >= 0 && n < size() && !idx.empty());
+      assert(n >= 0 && n < size() && idx != 0);
       return idx[n];
    }
    /// returns the number of used indices.
@@ -158,14 +159,7 @@ public:
    }
 
    /// appends \p n indices in \p i.
-  void add(int n, const std::vector<int> i);
-
-  void add(int n, const int *i)
-  {
-    assert(n >= 0 && size() + n <= max());
-    idx.insert(idx.end(), i, i+n);
-    add(n);
-  }
+   void add(int n, const int i[]);
 
    /// appends index \p i.
    void addIdx(int i)
