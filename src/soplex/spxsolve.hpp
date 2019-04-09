@@ -1155,8 +1155,8 @@ namespace soplex
           theratiotester->setType(type());
           if( polishObj == POLISH_INTEGRALITY )
             {
-              IdxSet slackcandidates(this->nRows());
-              IdxSet continuousvars(this->nCols());
+              DIdxSet slackcandidates(this->nRows());
+              DIdxSet continuousvars(this->nCols());
 
               // collect nonbasic slack variables that could be made basic
               for( int i = 0; i < this->nRows(); ++i )
@@ -1241,7 +1241,7 @@ namespace soplex
           else
             {
               assert(polishObj == POLISH_FRACTIONALITY);
-              IdxSet candidates(dim());
+              DIdxSet candidates(dim());
 
               // identify nonbasic variables, i.e. columns, that may be moved into the basis
               for( int i = 0; i < this->nCols() && !stop; ++i )
@@ -1306,7 +1306,7 @@ namespace soplex
           // in ROW rep: pivot slack out of the basis
           if( polishObj == POLISH_INTEGRALITY )
             {
-              IdxSet basiccandidates(dim());
+              DIdxSet basiccandidates(dim());
 
               // collect basic candidates that may be moved out of the basis
               for( int i = 0; i < dim(); ++i )
@@ -1364,7 +1364,7 @@ namespace soplex
           else
             {
               assert(polishObj == POLISH_FRACTIONALITY);
-              IdxSet basiccandidates(dim());
+              DIdxSet basiccandidates(dim());
 
               // collect basic (integer) variables, that may be moved out of the basis
               for( int i = 0; i < dim(); ++i )

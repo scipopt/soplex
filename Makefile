@@ -124,6 +124,7 @@ LIBHEADER	=	soplex/array.h \
 				soplex/datahashtable.h \
 				soplex/datakey.h \
 				soplex/dataset.h \
+				soplex/didxset.h \
 				soplex/dsvectorbase.h \
 				soplex/dsvector.h \
 				soplex/dvectorbase.h \
@@ -208,6 +209,7 @@ LIBHEADER	=	soplex/array.h \
 				soplex.h
 LIBOBJ		= 				soplex/clufactor.o \
 				soplex/clufactor_rational.o \
+				soplex/didxset.o \
 				soplex/gzstream.o \
 				soplex/idxset.o \
 				soplex/mpsinput.o \

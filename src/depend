@@ -12,7 +12,7 @@ $(BINOBJDIR)/soplexmain.o: src/soplexmain.cpp src/soplex.h src/soplex/spxgithash
  src/soplex/basevectors.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -52,7 +52,7 @@ $(BINOBJDIR)/example.o: src/example.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/basevectors.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -89,8 +89,8 @@ $(LIBOBJDIR)/clufactor_rational.o: src/soplex/clufactor_rational.cpp \
  src/soplex/svsetbase.h src/soplex/classarray.h src/soplex/dataset.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/ssvector.h \
  src/soplex/dsvector.h  src/soplex/vector.h \
- src/soplex/idxset.h src/soplex/timer.h src/soplex/cring.h
-$(LIBOBJDIR)/didxset.o: src/soplex/didxset.cpp src/soplex/idxset.h \
+ src/soplex/didxset.h src/soplex/timer.h src/soplex/cring.h
+$(LIBOBJDIR)/didxset.o: src/soplex/didxset.cpp src/soplex/didxset.h \
  src/soplex/idxset.h src/soplex/spxdefines.h src/soplex/spxalloc.h \
  src/soplex/spxout.h src/soplex/exceptions.h
 $(LIBOBJDIR)/gzstream.o: src/soplex/gzstream.cpp src/soplex/gzstream.h
@@ -110,7 +110,7 @@ $(LIBOBJDIR)/leave.o: src/soplex/spxdefines.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -141,7 +141,7 @@ $(LIBOBJDIR)/ratrecon.o: src/soplex/ratrecon.cpp src/soplex/spxdefines.h \
  src/soplex/wallclocktimer.h src/soplex/spxlp.h src/soplex/spxlpbase.h \
  src/soplex/spxid.h src/soplex/lprowbase.h src/soplex/lpcolbase.h \
  src/soplex/lprowsetbase.h src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -162,7 +162,7 @@ $(LIBOBJDIR)/solvedbds.o: src/soplex.h \
  src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -200,7 +200,7 @@ $(LIBOBJDIR)/slufactor_rational.o: src/soplex/slufactor_rational.cpp \
  src/soplex/svsetbase.h src/soplex/classarray.h src/soplex/dataset.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/vector.h \
  src/soplex/slinsolver_rational.h src/soplex/svector.h \
- src/soplex/ssvector.h src/soplex/dsvector.h src/soplex/idxset.h \
+ src/soplex/ssvector.h src/soplex/dsvector.h src/soplex/didxset.h \
  src/soplex/clufactor_rational.h src/soplex/cring.h
 $(LIBOBJDIR)/spxboundflippingrt.o:  \
  src/soplex/spxdefines.h src/soplex/spxboundflippingrt.h \
@@ -216,7 +216,7 @@ $(LIBOBJDIR)/spxboundflippingrt.o:  \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -239,7 +239,7 @@ $(LIBOBJDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -260,7 +260,7 @@ $(LIBOBJDIR)/spxfastrt.o: src/soplex/spxdefines.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -283,7 +283,7 @@ $(LIBOBJDIR)/spxharrisrt.o: src/soplex/spxdefines.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -303,7 +303,7 @@ $(LIBOBJDIR)/spxlpbase_rational.o: src/soplex/spxlpbase_rational.cpp \
  src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/mpsinput.h
@@ -318,7 +318,7 @@ $(LIBOBJDIR)/spxlpbase_real.o: src/soplex/spxlpbase_real.cpp src/soplex/spxdefin
  src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/mpsinput.h
@@ -337,7 +337,7 @@ $(LIBOBJDIR)/spxscaler.o: src/soplex/spxscaler.cpp src/soplex/spxscaler.h \
  src/soplex/spxlpbase.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/lprowset.h src/soplex/lpcolset.h \
  src/soplex/lprow.h src/soplex/lpcol.h
 $(LIBOBJDIR)/spxsolver.o: src/soplex/spxdefines.h \
@@ -354,7 +354,7 @@ $(LIBOBJDIR)/spxsolver.o: src/soplex/spxdefines.h \
  src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -397,7 +397,7 @@ $(LIBOBJDIR)/validation.o: src/soplex/validation.cpp src/soplex/validation.h \
  src/soplex/basevectors.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -448,7 +448,7 @@ $(LIBOBJDIR)/soplex.o: src/soplex.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/basevectors.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -486,8 +486,8 @@ $(LIBOBJSUBDIR)/clufactor_rational.o: src/soplex/clufactor_rational.cpp \
  src/soplex/svsetbase.h src/soplex/classarray.h src/soplex/dataset.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/ssvector.h \
  src/soplex/dsvector.h  src/soplex/vector.h \
- src/soplex/idxset.h src/soplex/timer.h src/soplex/cring.h
-$(LIBOBJSUBDIR)/didxset.o: src/soplex/didxset.cpp src/soplex/idxset.h \
+ src/soplex/didxset.h src/soplex/timer.h src/soplex/cring.h
+$(LIBOBJSUBDIR)/didxset.o: src/soplex/didxset.cpp src/soplex/didxset.h \
  src/soplex/idxset.h src/soplex/spxdefines.h src/soplex/spxalloc.h \
  src/soplex/spxout.h src/soplex/exceptions.h
 $(LIBOBJSUBDIR)/gzstream.o: src/soplex/gzstream.cpp src/soplex/gzstream.h
@@ -507,7 +507,7 @@ $(LIBOBJSUBDIR)/leave.o: src/soplex/spxdefines.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -538,7 +538,7 @@ $(LIBOBJSUBDIR)/ratrecon.o: src/soplex/ratrecon.cpp src/soplex/spxdefines.h \
  src/soplex/wallclocktimer.h src/soplex/spxlp.h src/soplex/spxlpbase.h \
  src/soplex/spxid.h src/soplex/lprowbase.h src/soplex/lpcolbase.h \
  src/soplex/lprowsetbase.h src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -559,7 +559,7 @@ $(LIBOBJSUBDIR)/solvedbds.o: src/soplex.h \
  src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -597,7 +597,7 @@ $(LIBOBJSUBDIR)/slufactor_rational.o: src/soplex/slufactor_rational.cpp \
  src/soplex/svsetbase.h src/soplex/classarray.h src/soplex/dataset.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/vector.h \
  src/soplex/slinsolver_rational.h src/soplex/svector.h \
- src/soplex/ssvector.h src/soplex/dsvector.h src/soplex/idxset.h \
+ src/soplex/ssvector.h src/soplex/dsvector.h src/soplex/didxset.h \
  src/soplex/clufactor_rational.h src/soplex/cring.h
 $(LIBOBJSUBDIR)/solverational.o: src/soplex.h \
  src/soplex/spxgithash.h src/soplex/spxdefines.h src/soplex/basevectors.h \
@@ -613,7 +613,7 @@ $(LIBOBJSUBDIR)/solverational.o: src/soplex.h \
  src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -654,7 +654,7 @@ $(LIBOBJSUBDIR)/spxboundflippingrt.o:  \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -677,7 +677,7 @@ $(LIBOBJSUBDIR)/spxleastsqsc.o: src/soplex/spxleastsqsc.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -698,7 +698,7 @@ $(LIBOBJSUBDIR)/spxfastrt.o: src/soplex/spxdefines.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -721,7 +721,7 @@ $(LIBOBJSUBDIR)/spxharrisrt.o: src/soplex/spxdefines.h \
  src/soplex/dataarray.h src/soplex/datakey.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -741,7 +741,7 @@ $(LIBOBJSUBDIR)/spxlpbase_rational.o: src/soplex/spxlpbase_rational.cpp \
  src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/mpsinput.h
@@ -756,7 +756,7 @@ $(LIBOBJSUBDIR)/spxlpbase_real.o: src/soplex/spxlpbase_real.cpp src/soplex/spxde
  src/soplex/datakey.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/mpsinput.h
@@ -775,7 +775,7 @@ $(LIBOBJSUBDIR)/spxscaler.o: src/soplex/spxscaler.cpp src/soplex/spxscaler.h \
  src/soplex/spxlpbase.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/lprowset.h src/soplex/lpcolset.h \
  src/soplex/lprow.h src/soplex/lpcol.h
 $(LIBOBJSUBDIR)/spxsolver.o: src/soplex/spxdefines.h \
@@ -792,7 +792,7 @@ $(LIBOBJSUBDIR)/spxsolver.o: src/soplex/spxdefines.h \
  src/soplex/spxlpbase.h src/soplex/basevectors.h src/soplex/spxid.h \
  src/soplex/lprowbase.h src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -835,7 +835,7 @@ $(LIBOBJSUBDIR)/validation.o: src/soplex/validation.cpp src/soplex/validation.h 
  src/soplex/basevectors.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \
@@ -886,7 +886,7 @@ $(LIBOBJSUBDIR)/soplex.o: src/soplex.cpp src/soplex.h src/soplex/spxgithash.h \
  src/soplex/basevectors.h src/soplex/spxid.h src/soplex/lprowbase.h \
  src/soplex/lpcolbase.h src/soplex/lprowsetbase.h \
  src/soplex/lpcolsetbase.h src/soplex/nameset.h \
- src/soplex/datahashtable.h src/soplex/idxset.h src/soplex/spxfileio.h \
+ src/soplex/datahashtable.h src/soplex/didxset.h src/soplex/spxfileio.h \
  src/soplex/gzstream.h src/soplex/spxscaler.h src/soplex/vector.h \
  src/soplex/svector.h src/soplex/svset.h src/soplex/dsvector.h \
   src/soplex/lprowset.h src/soplex/lpcolset.h \

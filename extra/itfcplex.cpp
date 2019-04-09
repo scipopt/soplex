@@ -27,7 +27,7 @@
 #include "spxfastrt.h"
 #include "spxweightst.h"
 #include "nameset.h"
-#include "idxset.h"
+#include "didxset.h"
 
 using namespace soplex;
 
@@ -40,7 +40,7 @@ class SPxCPlex : public SoPlex
    char*        m_probname;
    NameSet      m_colnames;
    NameSet      m_rownames;
-   IdxSet      m_intvars;
+   DIdxSet      m_intvars;
 
 public:
     void factorize( )

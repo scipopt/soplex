@@ -13,26 +13,53 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/**@file  ratrecon.h
- * @brief Rational reconstruction of solution vector
- */
-
-
-#ifndef _RATRECON_H_
-#define _RATRECON_H_
-
-#include "soplex/spxdefines.h"
-#include "soplex/rational.h"
-#include "soplex/sol.h"
-#include "soplex/basevectors.h"
 #include "soplex/didxset.h"
+#include "soplex/spxalloc.h"
 
 namespace soplex
 {
-   /** reconstruct a rational vector */
-   bool reconstructVector(VectorRational& input, const Rational& denomBoundSquared, const DIdxSet* indexSet = 0);
 
-   /** reconstruct a rational solution */
-   bool reconstructSol(SolRational& solution);
+void DIdxSet::setMax(int newmax)
+{
+   assert(max() >  0);
+
+   len = (newmax < size()) ? size() : newmax;
+   len = (len < 1) ? 1 : len;
+
+   assert(len > 0);
+
+   idx.resize(len);
+}
+
+DIdxSet::DIdxSet(const IdxSet& old)
+   : IdxSet()
+{
+   len = old.size();
+   len = (len < 1) ? 1 : len;
+   idx.reserve(len);
+
+   IdxSet::operator= ( old );
+}
+
+DIdxSet::DIdxSet(const DIdxSet& old)
+   : IdxSet()
+{
+   len = old.size();
+   len = (len < 1) ? 1 : len;
+   idx.reserve(len);
+
+   IdxSet::operator= ( old );
+}
+
+DIdxSet::DIdxSet(int n)
+   : IdxSet()
+{
+   len = (n < 1) ? 1 : n;
+   idx.reserve(len);
+}
+
+DIdxSet::~DIdxSet()
+{
+  ;
+}
 } // namespace soplex
-#endif // _RATRECON_H_

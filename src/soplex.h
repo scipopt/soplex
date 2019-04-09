@@ -845,7 +845,7 @@ public:
 
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
    /// integer variables if desired; returns true on success
-   bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars = 0);
+   bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// Templated write function
    /// R
@@ -856,17 +856,17 @@ public:
    /// writes rational LP to file; LP or MPS format is chosen from the extension in \p filename; if \p rowNames and \p
    /// colNames are \c NULL, default names are used; if \p intVars is not \c NULL, the variables contained in it are
    /// marked as integer; returns true on success
-   bool writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const IdxSet* intvars = 0, const bool unscale = true) const;
+   bool writeFile(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
 
-   bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const IdxSet* intvars = 0) const;
+   bool writeFileRational(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
    /* For SCIP compatibility */
-   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const IdxSet* intvars = 0, const bool unscale = true) const;
+   bool writeFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0, const bool unscale = true) const;
 
    /// writes the dual of the real LP to file; LP or MPS format is chosen from the extension in \p filename;
    /// if \p rowNames and \p colNames are \c NULL, default names are used; if \p intVars is not \c NULL,
    /// the variables contained in it are marked as integer; returns true on success
-   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const IdxSet* intvars = 0) const;
+   bool writeDualFileReal(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* intvars = 0) const;
 
    /// reads basis information from \p filename and returns true on success; if \p rowNames and \p colNames are \c NULL,
    /// default names are assumed; returns true on success
@@ -2007,11 +2007,11 @@ private:
 
    /// reads real LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileReal(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars = 0);
+   bool _readFileReal(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// reads rational LP in LP or MPS format from file and returns true on success; gets row names, column names, and
    /// integer variables if desired
-   bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars = 0);
+   bool _readFileRational(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
    /// completes range type arrays after adding columns and/or rows
    void _completeRangeTypesRational();

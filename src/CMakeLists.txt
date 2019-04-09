@@ -2,6 +2,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(sources
     soplex/clufactor_rational.cpp
+    soplex/didxset.cpp
     soplex/gzstream.cpp
     soplex/idxset.cpp
     soplex/mpsinput.cpp
@@ -30,6 +31,7 @@ set(headers
     soplex/datahashtable.h
     soplex/datakey.h
     soplex/dataset.h
+    soplex/didxset.h
     soplex/dsvectorbase.h
     soplex/dsvector.h
     soplex/exceptions.h

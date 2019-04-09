@@ -73,9 +73,9 @@ private:
    /// temporary array of precomputed pricing values
    DataArray<typename SPxPricer<R>::IdxElement> pricesCo;
    /// array of best pricing candidates
-   IdxSet bestPrices;
+   DIdxSet bestPrices;
    /// array of best pricing candidates
-   IdxSet bestPricesCo;
+   DIdxSet bestPricesCo;
    ///
    R pi_p;
    /// setup type.

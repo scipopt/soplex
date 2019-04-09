@@ -37,7 +37,7 @@ namespace soplex
                                      std::ostream&  p_output,          ///< output stream.
                                      const NameSet* p_rnames,          ///< row names.
                                      const NameSet* p_cnames,          ///< column names.
-                                     const IdxSet* p_intvars          ///< integer variables.
+                                     const DIdxSet* p_intvars          ///< integer variables.
                                      ) const;
 
   template <>
@@ -45,14 +45,14 @@ namespace soplex
                                     std::istream& p_input,                ///< input stream.
                                     NameSet*      p_rnames,               ///< row names.
                                     NameSet*      p_cnames,               ///< column names.
-                                    IdxSet*      p_intvars);              ///< integer variables.
+                                    DIdxSet*      p_intvars);              ///< integer variables.
 
   template <>
   void SPxLPBase<Rational>::writeLPF(
                                      std::ostream&  p_output,          ///< output stream
                                      const NameSet* p_rnames,          ///< row names
                                      const NameSet* p_cnames,          ///< column names
-                                     const IdxSet* p_intvars          ///< integer variables
+                                     const DIdxSet* p_intvars          ///< integer variables
                                      ) const;
 
 
@@ -815,7 +815,7 @@ namespace soplex
                                 std::istream& p_input,                ///< input stream.
                                 NameSet*      p_rnames,               ///< row names.
                                 NameSet*      p_cnames,               ///< column names.
-                                IdxSet*      p_intvars)              ///< integer variables.
+                                DIdxSet*      p_intvars)              ///< integer variables.
   {
     enum
     {
@@ -1495,7 +1495,7 @@ namespace soplex
 
   /// Process COLUMNS section.
   template <class R>
-  static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSet&  rnames, LPColSetBase<R>& cset, NameSet& cnames, IdxSet* intvars)
+  static void MPSreadCols(MPSInput& mps, const LPRowSetBase<R>& rset, const NameSet&  rnames, LPColSetBase<R>& cset, NameSet& cnames, DIdxSet* intvars)
   {
     R val;
     int idx;
@@ -1792,9 +1792,9 @@ namespace soplex
 
   /// Process BOUNDS section.
   template <class R>
-  static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& cnames, IdxSet* intvars, SPxOut* spxout)
+  static void MPSreadBounds(MPSInput& mps, LPColSetBase<R>& cset, const NameSet& cnames, DIdxSet* intvars, SPxOut* spxout)
   {
-    IdxSet oldbinvars;
+    DIdxSet oldbinvars;
     char bndname[MPSInput::MAX_LINE_LEN] = { '\0' };
     int  idx;
     R val;
@@ -1934,7 +1934,7 @@ namespace soplex
                                 std::istream& p_input,           ///< input stream.
                                 NameSet*      p_rnames,          ///< row names.
                                 NameSet*      p_cnames,          ///< column names.
-                                IdxSet*      p_intvars)         ///< integer variables.
+                                DIdxSet*      p_intvars)         ///< integer variables.
   {
     LPRowSetBase<R>& rset = *this;
     LPColSetBase<R>& cset = *this;
@@ -2297,7 +2297,7 @@ namespace soplex
                                const SPxLPBase<R>&   p_lp,         ///< the LP to write
                                std::ostream&            p_output,     ///< output stream
                                const NameSet*           p_cnames,     ///< column names
-                               const IdxSet*           p_intvars     ///< integer variables
+                               const DIdxSet*           p_intvars     ///< integer variables
                                )
   {
 
@@ -2321,7 +2321,7 @@ namespace soplex
                                  std::ostream&  p_output,          ///< output stream
                                  const NameSet* p_rnames,          ///< row names
                                  const NameSet* p_cnames,          ///< column names
-                                 const IdxSet* p_intvars          ///< integer variables
+                                 const DIdxSet* p_intvars          ///< integer variables
                                  ) const
   {
     SPxOut::setScientific(p_output, 16);
@@ -2424,7 +2424,7 @@ static void MPSwriteRecord(
                                  std::ostream&  p_output,          ///< output stream.
                                  const NameSet* p_rnames,          ///< row names.
                                  const NameSet* p_cnames,          ///< column names.
-                                 const IdxSet* p_intvars          ///< integer variables.
+                                 const DIdxSet* p_intvars          ///< integer variables.
                                  ) const
   {
 

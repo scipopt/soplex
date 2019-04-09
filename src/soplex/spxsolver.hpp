@@ -29,7 +29,7 @@ namespace soplex
 {
   template <class R>
   bool SPxSolverBase<R>::read(std::istream& in, NameSet* rowNames,
-                          NameSet* colNames, IdxSet* intVars)
+                          NameSet* colNames, DIdxSet* intVars)
   {
     if( initialized )
       {

@@ -40,7 +40,7 @@
 #include "soplex/lprowsetbase.h"
 #include "soplex/lpcolsetbase.h"
 #include "soplex/nameset.h"
-#include "soplex/idxset.h"
+#include "soplex/didxset.h"
 #include "soplex/spxfileio.h"
 #include "soplex/spxscaler.h"
 
@@ -1133,10 +1133,10 @@ namespace soplex
     //@{
 
     /// Reads LP in LP format from input stream \p in.
-    virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars = 0);
+    virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
     /// Reads an LP in MPS format from input stream \p in.
-    virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars = 0);
+    virtual bool readMPS(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0);
 
     /// Reads LP in LP or MPS format from input stream \p in.
     /**@param in       input stream.
@@ -1149,7 +1149,7 @@ namespace soplex
      *                 file.  Maybe 0 if the information is not needed.
      * @todo Make sure the Id's in the NameSet%s are the same as in the LP.
      */
-    virtual bool read(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars  = 0)
+    virtual bool read(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars  = 0)
     {
       bool ok;
       char c;
@@ -1169,7 +1169,7 @@ namespace soplex
     }
 
     /// Reads LP from a file.
-    virtual bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, IdxSet* intVars = 0)
+    virtual bool readFile(const char* filename, NameSet* rowNames = 0, NameSet* colNames = 0, DIdxSet* intVars = 0)
     {
 
       spxifstream file(filename);
@@ -1184,13 +1184,13 @@ namespace soplex
      *  constraints and variables. If \p intVars is not \c NULL, the variables contained in it are marked as integer in
      *  the output.
      */
-    virtual void writeLPF(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const IdxSet* p_intvars = 0) const;
+    virtual void writeLPF(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const;
 
     /// Writes a file in MPS format to \p out.
-    virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const IdxSet* p_intvars = 0) const;
+    virtual void writeMPS(std::ostream&  out, const NameSet* rowNames, const NameSet* colNames, const DIdxSet* p_intvars = 0) const;
 
     /// Write loaded LP to \p filename.
-    virtual void writeFileLPBase(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const IdxSet* p_intvars = 0) const
+    virtual void writeFileLPBase(const char* filename, const NameSet* rowNames = 0, const NameSet* colNames = 0, const DIdxSet* p_intvars = 0) const
     {
 
       std::ofstream tmp(filename);

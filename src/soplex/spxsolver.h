@@ -419,14 +419,14 @@ namespace soplex
     /** For the leaving Simplex algorithm this VectorBase<R> contains the indices of infeasible basic variables;
      *  for the entering Simplex algorithm this VectorBase<R> contains the indices of infeasible slack variables.
      */
-    IdxSet infeasibilities;
+    DIdxSet infeasibilities;
     /**For the entering Simplex algorithm these vectors contains the indices of infeasible basic variables.
      */
-    IdxSet infeasibilitiesCo;
+    DIdxSet infeasibilitiesCo;
 
     /// store indices that were changed in the previous iteration and must be checked in hyper pricing
-    IdxSet updateViols;
-    IdxSet updateViolsCo;
+    DIdxSet updateViols;
+    DIdxSet updateViolsCo;
 
     /** Binary vectors to store whether basic indices are infeasible
      *  the i-th entry equals false, if the i-th basic variable is not infeasible
@@ -551,7 +551,7 @@ namespace soplex
     //@{
     /// read LP from input stream.
     virtual bool read(std::istream& in, NameSet* rowNames = 0,
-                      NameSet* colNames = 0, IdxSet* intVars = 0);
+                      NameSet* colNames = 0, DIdxSet* intVars = 0);
 
     /// copy LP.
     virtual void loadLP(const SPxLPBase<R>& LP, bool initSlackBasis = true);
