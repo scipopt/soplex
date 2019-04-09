@@ -38,7 +38,6 @@ int IdxSet::pos(int i) const
    return -1;
 }
 
-  // Add n elements from an std::vector
   void IdxSet::add(int n, const std::vector<int> i)
 {
    assert(n >= 0 && size() + n <= max());
@@ -49,28 +48,84 @@ int IdxSet::pos(int i) const
 void IdxSet::remove(int n, int m)
 {
    assert(n <= m && m < size() && n >= 0);
+   ++m;
 
-   // erase(i, j) does an erase of the range [i, j)
-   idx.erase(idx.begin() + n, idx.begin() + m + 1);
+   int cpy = m - n;
+   int newnum = num - cpy;
+   cpy = (size() - m >= cpy) ? cpy : size() - m;
+
+   do
+   {
+      --num;
+      --cpy;
+      idx[n + cpy] = idx[num];
+   }
+   while (cpy > 0);
+   num = newnum;
 }
 
 IdxSet& IdxSet::operator=(const IdxSet& rhs)
 {
    if (this != &rhs)
    {
-     if(idx.empty())
+     if (!idx.empty() && max() < rhs.size())
       {
+         idx.clear();
+      }
+
+     if (idx.empty())
+      {
+         len = rhs.size();
+         idx.reserve(len);
          freeArray = true;
       }
 
-     idx = rhs.idx;
+      for (num = 0; num < rhs.size(); ++num)
+         idx[num] = rhs.idx[num];
    }
+
+   assert(size() == rhs.size());
+   assert(size() <= max());
+   assert(isConsistent());
 
    return *this;
 }
 
+IdxSet::IdxSet(const IdxSet& old)
+   : len(old.len)
+   , idx(0)
+{
+   idx.reserve(len);
+
+   for (num = 0; num < old.num; num++)
+      idx[num] = old.idx[num];
+
+   freeArray = true;
+
+   assert(size() == old.size());
+   assert(size() <= max());
+   assert(isConsistent());
+}
+
 bool IdxSet::isConsistent() const
 {
+#ifdef ENABLE_CONSISTENCY_CHECKS
+   int i, j;
+
+   if (len > 0 && idx.empty())
+      return MSGinconsistent("IdxSet");
+
+   for (i = 0; i < size(); ++i)
+   {
+      if (index(i) < 0)
+         return MSGinconsistent("IdxSet");
+
+      for (j = 0; j < i; j++)
+         if (index(i) == index(j))
+            return MSGinconsistent("IdxSet");
+   }
+#endif
+
    return true;
 }
 } // namespace soplex

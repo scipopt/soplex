@@ -50,7 +50,7 @@ namespace soplex
 
    An IdxSet cannot be extended to fit more than max() elements. If
    necessary, the user must explicitely provide the IdxSet with a
-   suitable memory. Alternatively, one can use \ref IdxSet "IdxSets"
+   suitable memory. Alternatively, one can use \ref DIdxSet "DIdxSets"
    which provide the required memory managemant.
 */
 class IdxSet
@@ -60,6 +60,8 @@ protected:
    //---------------------------------------
    /**@name Data */
    //@{
+   int  num;           ///< number of used indices
+   int  len;           ///< length of array \ref soplex::IdxSet::idx "idx"
   std::vector<int> idx;           ///< array of indices
    bool freeArray;     ///< true iff \ref soplex::IdxSet::idx "idx" should be freed inside of this object
    //@}
@@ -76,7 +78,7 @@ public:
        indices in \p imem.
     */
    IdxSet(int n, int imem[], int l = 0)
-      : freeArray(false)
+      : num(l), len(n), freeArray(false)
    {
       assert(isConsistent());
    }
@@ -86,11 +88,11 @@ public:
        space. You cannot store any indices in an #IdxSet created with
        the default constructor.
    */
-   // IdxSet()
-   //    : freeArray(false)
-   // {
-   //    assert(isConsistent());
-   // }
+   IdxSet()
+      : num(0), len(0), freeArray(false)
+   {
+      assert(isConsistent());
+   }
 
    /// destructor.
    virtual ~IdxSet()
@@ -104,6 +106,8 @@ public:
        enough index memory.
     */
    IdxSet& operator=(const IdxSet& set);
+   /// copy constructor.
+   IdxSet(const IdxSet&);
    //@}
 
    //---------------------------------------
@@ -118,12 +122,12 @@ public:
    /// returns the number of used indices.
    int size() const
    {
-     return idx.size();
+      return num;
    }
    /// returns the maximal number of indices which can be stored in IdxSet.
    int max() const
    {
-     return idx.capacity();
+      return len;
    }
 
    /// returns the maximal index.
@@ -143,29 +147,31 @@ public:
    /// appends \p n uninitialized indices.
    void add(int n)
    {
-      idx.resize(idx.size() + n);
+      assert(n >= 0 && n + size() <= max());
+      num += n;
    }
 
    /// appends all indices of \p set.
    void add(const IdxSet& set)
    {
-     idx.insert(idx.end(), set.idx.begin(), set.idx.end());
+      add(set.size(), set.idx);
    }
 
    /// appends \p n indices in \p i.
   void add(int n, const std::vector<int> i);
 
-  // Add n elements from a array
   void add(int n, const int *i)
   {
     assert(n >= 0 && size() + n <= max());
     idx.insert(idx.end(), i, i+n);
+    add(n);
   }
 
    /// appends index \p i.
    void addIdx(int i)
    {
-      idx.push_back(i);
+      assert(size() < max());
+      idx[num++] = i;
    }
    /// removes indices at position numbers \p n through \p m.
    void remove(int n, int m);
@@ -173,18 +179,17 @@ public:
    /// removes \p n 'th index.
    void remove(int n)
    {
+//      /**@todo Shouldn't this be an assert instead of an if (see add()) */
+//      if (n < size() && n >= 0)
+//         idx[n] = idx[--num];
       assert(n >= 0 && n < size());
-      // The value of the nth element is set of the last element
-      idx[n] = idx.back();
-      // The last element is removed. We do this, since the order of elements in
-      // idx doesn't matter and this is more efficient (?)
-      idx.erase(idx.end()-1);
+      idx[n] = idx[--num];
    }
 
    /// removes all indices.
    void clear()
    {
-     idx.clear();
+      num = 0;
    }
    //@}
 
@@ -194,34 +199,6 @@ public:
    /// consistency check.
    bool isConsistent() const;
    //@}
-
-  // Functions from old DIdxSet
-
-  void setMax(int newmax = 1)
-  {
-    if(newmax > idx.capacity())
-      {
-        idx.reserve(newmax);
-      }
-  }
-
-  // copy constructor
-  explicit IdxSet(const IdxSet& old)
-  {
-    idx.reserve(old.idx.size());
-    // Calling the = operator of std::vector
-    idx = old.idx;
-
-    freeArray = true;
-  }
-
-  // constructor
-  explicit IdxSet(int n = 8)
-  {
-    idx.reserve(n);
-    freeArray = false;
-  }
-
 };
 
 } // namespace soplex

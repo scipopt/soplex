@@ -420,7 +420,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
       {
         std::vector<int>::iterator iptr = idx.begin();
         std::vector<int>::iterator iiptr = idx.begin();
-        std::vector<int>::iterator endptr = idx.end();
+        std::vector<int>::iterator endptr = idx.begin() + num;
 
          for( ; iptr < endptr; ++iptr )
          {
@@ -431,7 +431,7 @@ SSVectorBase<R>& SSVectorBase<R>::multAdd(S xx, const SVectorBase<T>& vec)
                v[*iptr] = 0;
          }
 
-         idx.resize(std::distance(idx.begin(), iiptr));
+         num = std::distance(idx.begin(), iiptr);
       }
    }
    else
@@ -586,9 +586,8 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product1(const SVSetBase<S>& A, const S
       clear();    // this := zero vector
    else
    {
-     idx.resize(Ai.size());
-     auto num = Ai.size();
-     for(decltype(num) j = num - 1; j >= 0; --j )
+      num = Ai.size();
+      for( int j = num - 1; j >= 0; --j )
       {
          const Nonzero<S>& Aij = Ai.element(j);
          idx[j] = Aij.idx;
@@ -625,7 +624,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    int xsize = x.size();
    int Aisize;
 
-   auto num = A0.size();
+   num = A0.size();
    if( isZero(x0, epsilon) || num == 0 )
    {
       // A[0] == 0 or x[0] == 0 => this := zero vector
@@ -633,7 +632,6 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productShort(const SVSetBase<S>& A, con
    }
    else
    {
-     idx.resize(num);
       for( int j = 0; j < num; ++j )
       {
          const Nonzero<S>& elt = A0.element(j);
@@ -770,6 +768,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
    if( x.dim() == 0 )
    { // x == 0 => this := zero vector
       clear();
+      x.num = 0;
    }
    else
    {
@@ -802,7 +801,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, 
          }
       }
 
-      x.idx.resize(nzcount);
+      x.num = nzcount;
       setupStatus = false;
    }
 
@@ -824,7 +823,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
    assert(rhs.dim() <= VectorBase<R>::dim());
 
    int s = rhs.size();
-   idx.clear();
+   num = 0;
 
    for( int i = 0; i < s; ++i )
    {
@@ -836,7 +835,7 @@ SSVectorBase<R>& SSVectorBase<R>::assign(const SVectorBase<S>& rhs)
       else
       {
          VectorBase<R>::val[k] = v;
-         idx.push_back(k);
+         idx[num++] = k;
       }
    }
 
@@ -858,7 +857,8 @@ SSVectorBase<Rational>& SSVectorBase<Rational>::assign(const SVectorBase<Rationa
    assert(rhs.dim() <= VectorBase<Rational>::dim());
 
    int s = rhs.size();
-   idx.clear();
+   num = 0;
+
    for( int i = 0; i < s; ++i )
    {
       int k = rhs.index(i);
@@ -869,7 +869,7 @@ SSVectorBase<Rational>& SSVectorBase<Rational>::assign(const SVectorBase<Rationa
       else
       {
          VectorBase<Rational>::val[k] = v;
-         idx.push_back(k);
+         idx[num++] = k;
       }
    }
 
