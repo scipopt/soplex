@@ -36,7 +36,7 @@ namespace soplex
     // behaves differently. if compare(a, b) < 0, then a should appear before b.
     // = 0, then order doesn't matter and if > 0, then a should appear after b.
     // The auxiliary function does this translation.
-    auto auxCmpr = [compare](T a, T b)
+    auto auxCmpr = [compare](T& a, T& b)
                    {
                      if(compare(a, b) <= 0)
                        {
