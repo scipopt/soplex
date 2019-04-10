@@ -27,7 +27,7 @@
 #include "soplex/spxdefines.h"
 #include "soplex/spxalloc.h"
 
-#include "vector"
+#include <boost/container/vector.hpp>
 
 namespace soplex
 {
@@ -65,7 +65,10 @@ template <typename T>
 class DataArray
 {
 private:
-  std::vector<T>  data;              ///< the array of elements
+  // A boost container vector is used instead of std::vector. This is because
+  // std::vector<bool> is not consistent with the rest of the std::vectors<T>.
+  // Namely, the current code needs the operator[] for DataArray<bool>.
+  boost::container::vector<T>  data;              ///< the array of elements
 
 public:
 
@@ -290,11 +293,10 @@ public:
        elements. The internal array is allocated to have \p max nonzeros,
        and the memory extension factor is set to \p fac.
 
-       @param p_size number of unitialised elements.
+       @param p_size number of uninitialised elements.
        @param p_max  maximum number of elements the array can hold.
-       @param p_fac  value for memFactor.
     */
-   explicit DataArray(int p_size = 0, int p_max = 0, Real p_fac = 1.2)
+   explicit DataArray(int p_size = 0, int p_max = 0)
    {
      // Old code when this used to be spx_alloced
      auto thesize = (p_size < 0) ? 0 : p_size;
@@ -306,7 +308,11 @@ public:
          themax = (thesize == 0) ? 1 : thesize;
 
 
-     // p_size number of uninitialized elements
+     // p_size number of uninitialized elements.
+     //
+     // That is, the operator[] is valid on for 0...(p_size -1) whereas, even
+     // though the internal array can handle 0...(p_max -1) elements, the
+     // operator[] on beyond (p_size -1) would give an exception.
      data.reserve(p_max);
      data.resize(p_size);
      // The underlying array will have at least p_max number of elements,
@@ -318,38 +324,17 @@ public:
    {
      ;
    }
+
+  void push_back(const T& val)
+  {
+    data.push_back(val);
+  }
+
+  void push_back(T&& val)
+  {
+    data.push_back(val);
+  }
 };
-
-  // A hack to avoid the the std::vector<bool> problem
-  //
-  // Problem: std::vector<bool> behaves differently from other other vectors. It
-  // is more memory efficient by packing several bool bits into one byte. Thus
-  // the reference operator '&' doesn't really work. The current code has uses
-  // references (?) The compiler complains that '&operator[]' cannot be
-  // instantiated for T = bool.
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-
-  // These functions are not supposed to be called.
-  template <>
-  inline bool& DataArray<bool>::operator[](int n)
-  {
-    assert(n >= 0);
-    assert(true);               // This function should never be called. See
-                                // comments above.
-  }
-
-  /// reference \p n 'th const element.
-  template <>
-  inline const bool& DataArray<bool>::operator[](int n) const
-  {
-    assert(n >= 0);
-    assert(true);               // this function should never get called. See
-                                // comments above
-  }
-
-#pragma GCC diagnostic pop
 
 } // namespace soplex
 #endif // _DATAARRAY_H_
