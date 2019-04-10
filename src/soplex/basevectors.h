@@ -35,6 +35,7 @@
 #include "soplex/dsvectorbase.h"
 #include "soplex/unitvectorbase.h"
 #include "soplex/svsetbase.h"
+#include "soplex/timer.h"
 
 #define SOPLEX_VECTOR_MARKER   1e-100
 
@@ -568,7 +569,10 @@ template < class R >
 template < class S, class T >
 inline
 SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
-      const SSVectorBase<T>& x)
+      const SSVectorBase<T>& x,
+      Timer* timeSparse, Timer* timeFull,
+      int& nCallsSparse, int& nCallsFull
+                                                      )
 {
    assert(A.num() == x.dim());
    assert(x.isSetup());
@@ -576,18 +580,42 @@ SSVectorBase<R>& SSVectorBase<R>::assign2product4setup(const SVSetBase<S>& A,
 
    if(x.size() == 1)
    {
+      if(timeSparse != 0)
+         timeSparse->start();
+
       assign2product1(A, x);
       setupStatus = true;
+
+      if(timeSparse != 0)
+         timeSparse->stop();
+
+      ++nCallsSparse;
    }
    else if(isSetup() && (double(x.size()) * A.memSize() <= shortProductFactor * dim() * A.num()))
    {
+      if(timeSparse != 0)
+         timeSparse->start();
+
       assign2productShort(A, x);
       setupStatus = true;
+
+      if(timeSparse != 0)
+         timeSparse->stop();
+
+      ++nCallsSparse;
    }
    else
    {
+      if(timeFull != 0)
+         timeFull->start();
+
       assign2productFull(A, x);
       setupStatus = false;
+
+      if(timeFull != 0)
+         timeFull->stop();
+
+      ++nCallsFull;
    }
 
    assert(isConsistent());
@@ -797,8 +825,7 @@ template < class S, class T >
 inline
 SSVectorBase<R>& SSVectorBase<R>::assign2productAndSetup(const SVSetBase<S>& A, SSVectorBase<T>& x)
 {
-   if(x.isSetup())
-      return assign2product4setup(A, x);
+   assert(!x.isSetup());
 
    if(x.dim() == 0)
    {

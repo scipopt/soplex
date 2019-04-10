@@ -1159,9 +1159,18 @@ void SPxSolverBase<Real>::setType(Type tp)
       , weights(0)
       , coWeights(0)
       , weightsAreSetup(false)
+      , multSparseCalls(0)
+      , multFullCalls(0)
+      , multColwiseCalls(0)
+      , multUnsetupCalls(0)
       , integerVariables(0)
    {
       theTime = TimerFactory::createTimer(timerType);
+
+      multTimeSparse = TimerFactory::createTimer(timerType);
+      multTimeFull = TimerFactory::createTimer(timerType);
+      multTimeColwise = TimerFactory::createTimer(timerType);
+      multTimeUnsetup = TimerFactory::createTimer(timerType);
 
       setDelta(DEFAULT_BND_VIOL);
 
@@ -1197,10 +1206,22 @@ void SPxSolverBase<Real>::setType(Type tp)
          thestarter = 0;
       }
 
-      // free timer
+      // free timers
       assert(theTime);
+      assert(multTimeSparse);
+      assert(multTimeFull);
+      assert(multTimeColwise);
+      assert(multTimeUnsetup);
       theTime->~Timer();
+      multTimeSparse->~Timer();
+      multTimeFull->~Timer();
+      multTimeColwise->~Timer();
+      multTimeUnsetup->~Timer();
       spx_free(theTime);
+      spx_free(multTimeSparse);
+      spx_free(multTimeFull);
+      spx_free(multTimeColwise);
+      spx_free(multTimeUnsetup);
    }
 
 
@@ -1296,6 +1317,10 @@ void SPxSolverBase<Real>::setType(Type tp)
          weights = base.weights;
          coWeights = base.coWeights;
          weightsAreSetup = base.weightsAreSetup;
+         multSparseCalls = base.multSparseCalls;
+         multFullCalls = base.multFullCalls;
+         multColwiseCalls = base.multColwiseCalls;
+         multUnsetupCalls = base.multUnsetupCalls;
          spxout = base.spxout;
          integerVariables = base.integerVariables;
 
@@ -1502,10 +1527,18 @@ void SPxSolverBase<Real>::setType(Type tp)
       , weights(base.weights)
       , coWeights(base.coWeights)
       , weightsAreSetup(base.weightsAreSetup)
+      , multSparseCalls(base.multSparseCalls)
+      , multFullCalls(base.multFullCalls)
+      , multColwiseCalls(base.multColwiseCalls)
+      , multUnsetupCalls(base.multUnsetupCalls)
       , spxout(base.spxout)
       , integerVariables(base.integerVariables)
    {
       theTime = TimerFactory::createTimer(timerType);
+      multTimeSparse = TimerFactory::createTimer(timerType);
+      multTimeFull = TimerFactory::createTimer(timerType);
+      multTimeColwise = TimerFactory::createTimer(timerType);
+      multTimeUnsetup = TimerFactory::createTimer(timerType);
 
       if(base.theRep == COLUMN)
       {

@@ -9219,6 +9219,14 @@ void SoPlexBase<Real>::_solveRealLPAndRecordStatistics()
    _statistics->iterationsFromBasis += _hadBasis ? _solver.iterations() : 0;
    _statistics->iterationsPolish += _solver.polishIterations();
    _statistics->boundflips += _solver.boundFlips();
+   _statistics->multTimeSparse += _solver.multTimeSparse->time();
+   _statistics->multTimeFull += _solver.multTimeFull->time();
+   _statistics->multTimeColwise += _solver.multTimeColwise->time();
+   _statistics->multTimeUnsetup += _solver.multTimeUnsetup->time();
+   _statistics->multSparseCalls += _solver.multSparseCalls;
+   _statistics->multFullCalls += _solver.multFullCalls;
+   _statistics->multColwiseCalls += _solver.multColwiseCalls;
+   _statistics->multUnsetupCalls += _solver.multUnsetupCalls;
    _statistics->luFactorizationTimeReal += _slufactor.getFactorTime();
    _statistics->luSolveTimeReal += _slufactor.getSolveTime();
    _statistics->luFactorizationsReal += _slufactor.getFactorCount();

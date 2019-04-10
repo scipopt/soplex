@@ -114,7 +114,9 @@ static inline void updateRes(
    else
       resvec *= eprev;
 
-   tmpvec.assign2product4setup(facset, resvecprev);
+   int dummy1 = 0;
+   int dummy2 = 0;
+   tmpvec.assign2product4setup(facset, resvecprev, 0, 0, dummy1, dummy2);
    tmpvec.setup();
    resvec += tmpvec;
 
@@ -304,7 +306,9 @@ void SPxLeastSqSC::scale(SPxLP& lp,  bool persistent)
    assert(colscale2.isSetup());
 
    // compute first residual vector r0
-   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs);
+   int dummy1 = 0;
+   int dummy2 = 0;
+   resncols = collogs - tmpcols.assign2product4setup(facnrows, rowlogs, 0, 0, dummy1, dummy2);
 
    resncols.setup();
    resnrows.setup();

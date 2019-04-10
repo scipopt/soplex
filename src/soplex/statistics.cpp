@@ -27,7 +27,6 @@ void SoPlexBase<Real>::Statistics::clearSolvingData();
 template <>
 void SoPlexBase<Real>::Statistics::clearAllData();
 
-
 /// default constructor
 template <>
 SoPlexBase<Real>::Statistics::Statistics(Timer::TYPE ttype)
@@ -74,6 +73,14 @@ typename SoPlexBase<Real>::Statistics& SoPlexBase<Real>::Statistics::operator=
    *rationalTime = *(rhs.rationalTime);
    *reconstructionTime = *(rhs.reconstructionTime);
    timerType = rhs.timerType;
+   multTimeSparse = rhs.multTimeSparse;
+   multTimeFull = rhs.multTimeFull;
+   multTimeColwise = rhs.multTimeColwise;
+   multTimeUnsetup = rhs.multTimeUnsetup;
+   multSparseCalls = rhs.multSparseCalls;
+   multFullCalls = rhs.multFullCalls;
+   multColwiseCalls = rhs.multColwiseCalls;
+   multUnsetupCalls = rhs.multUnsetupCalls;
    luFactorizationTimeReal = rhs.luFactorizationTimeReal;
    luSolveTimeReal = rhs.luSolveTimeReal;
    luFactorizationTimeRational = rhs.luFactorizationTimeRational;
@@ -114,6 +121,14 @@ void SoPlexBase<Real>::Statistics::clearSolvingData()
    transformTime->reset();
    rationalTime->reset();
    reconstructionTime->reset();
+   multTimeSparse = 0.0;
+   multTimeFull = 0.0;
+   multTimeColwise = 0.0;
+   multTimeUnsetup = 0.0;
+   multSparseCalls = 0;
+   multFullCalls = 0;
+   multColwiseCalls = 0;
+   multUnsetupCalls = 0;
    luFactorizationTimeReal = 0.0;
    luSolveTimeReal = 0.0;
    luFactorizationTimeRational = 0.0;
@@ -253,6 +268,37 @@ void SoPlexBase<Real>::Statistics::print(std::ostream& os)
       os << "-\n";
 
    os << "  Solve time        : " << luSolveTimeReal << "\n";
+
+   os << "Matrix-Vector ops   : \n"
+      << "  Sparse    time    : " << multTimeSparse;
+
+   if(solTime > 0)
+      os << " (" << 100 * (multTimeSparse / solTime) << "% of solving time)";
+
+   os << "\n            calls   : " << multSparseCalls;
+   os << " (" << 100 * (multSparseCalls / (0.01 + iterations)) << "% of iterations)";
+   os << "\n  Full      time    : " << multTimeFull;
+
+   if(solTime > 0)
+      os << " (" << 100 * (multTimeFull / solTime) << "% of solving time)";
+
+   os << "\n            calls   : " << multFullCalls;
+   os << " (" << 100 * (multFullCalls / (0.01 + iterations)) << "% of iterations)";
+   os << "\n  Colwise   time    : " << multTimeColwise;
+
+   if(solTime > 0)
+      os << " (" << 100 * (multTimeColwise / solTime) << "% of solving time)";
+
+   os << "\n            calls   : " << multColwiseCalls;
+   os << " (" << 100 * (multColwiseCalls / (0.01 + iterations)) << "% of iterations)";
+   os << "\n  Dense     time    : " << multTimeUnsetup;
+
+   if(solTime > 0)
+      os << " (" << 100 * (multTimeUnsetup / solTime) << "% of solving time)";
+
+   os << "\n            calls   : " << multUnsetupCalls;
+   os << " (" << 100 * (multUnsetupCalls / (0.01 + iterations)) << "% of iterations)";
+   os << "\n";
 
    os << "Rat. factorizations : " << luFactorizationsRational << "\n"
       << "  Rat. factor. time : " << luFactorizationTimeRational << "\n"

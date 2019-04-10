@@ -257,7 +257,10 @@ typename SPxSolverBase<Real>::Status SPxSolverBase<Real>::solve()
    leaveCycles = 0;
    primalDegenSum = 0;
    dualDegenSum = 0;
-
+   multSparseCalls = 0;
+   multFullCalls = 0;
+   multColwiseCalls = 0;
+   multUnsetupCalls = 0;
    stallNumRecovers = 0;
 
    /* if we run into a singular basis, we will retry from regulardesc with tighter tolerance in the ratio test */
