@@ -7314,12 +7314,12 @@ void SoPlexBase<R>::_solveRealLPAndRecordStatistics()
     }
   catch( const SPxException& E )
     {
-      MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while solving R LP.\n" );
+      MSG_INFO1( spxout, spxout << "Caught exception <" << E.what() << "> while solving Real LP.\n" );
       _status = SPxSolverBase<R>::ERROR;
     }
   catch( ... )
     {
-      MSG_INFO1( spxout, spxout << "Caught unknown exception while solving R LP.\n" );
+      MSG_INFO1( spxout, spxout << "Caught unknown exception while solving Real LP.\n" );
       _status = SPxSolverBase<R>::ERROR;
     }
   _statistics->simplexTime->stop();

@@ -135,7 +135,7 @@ namespace soplex
   {
     // This call shouldn't happen. This is a dummy function to deal with the
     // Rational Scalar issue.
-    assert(true);
+    assert(false);
     return 0;
   }
 
