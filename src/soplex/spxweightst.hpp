@@ -180,14 +180,14 @@ namespace soplex
 
     compare.weight = rowWeight.get_const_ptr();
 
-    spxSort(row.get_ptr(), row.size(), compare); // Sort rows
+    SPxQuicksort(row.get_ptr(), row.size(), compare); // Sort rows
 
     for(i = 0; i < base.nCols(); ++i)
       col[i] = i;
 
     compare.weight = colWeight.get_const_ptr();
 
-    spxSort(col.get_ptr(), col.size(), compare); // Sort column
+    SPxQuicksort(col.get_ptr(), col.size(), compare); // Sort column
 
     i = 0;
     j = 0;

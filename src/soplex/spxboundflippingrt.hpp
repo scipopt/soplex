@@ -668,7 +668,7 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
       // sort breakpoints only partially to save time
       if( npassedBp > sorted )
       {
-         sorted = spxSortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       int i = breakpoints[npassedBp].idx;
       // compute new slope
@@ -737,7 +737,7 @@ SPxId SPxBoundFlippingRT<R>::selectEnter(
       // get next breakpoints in increasing order
       if( stableBp > sorted )
       {
-         sorted = spxSortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       int idx = breakpoints[stableBp].idx;
       if( breakpoints[stableBp].src == PVEC )
@@ -1008,7 +1008,7 @@ int SPxBoundFlippingRT<R>::selectLeave(
       // sort breakpoints only partially to save time
       if( npassedBp > sorted )
       {
-         sorted = spxSortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       assert( breakpoints[npassedBp].src == FVEC );
       int breakpointidx = breakpoints[npassedBp].idx;
@@ -1065,7 +1065,7 @@ int SPxBoundFlippingRT<R>::selectLeave(
       // get next breakpoints in increasing order
       if( stableBp > sorted )
       {
-         sorted = spxSortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
+         sorted = SPxQuicksortPart(breakpoints.get_ptr(), compare, sorted + 1, nBp, sortsize);
       }
       int breakpointidx = breakpoints[stableBp].idx;
       assert( breakpoints[stableBp].src == FVEC );

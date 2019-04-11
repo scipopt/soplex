@@ -1283,7 +1283,7 @@ namespace soplex
 
     // only sorting if the sort size is less than the number of violated rows.
     if( sortsize > 0 && sortsize < nviolatedrows )
-      sorted = spxSortPart(violatedrows.get_ptr(), compare, sorted + 1, nviolatedrows, sortsize);
+      sorted = SPxQuicksortPart(violatedrows.get_ptr(), compare, sorted + 1, nviolatedrows, sortsize);
 
     // adding the violated rows.
     for( int i = 0; i < sortsize; i++ )
