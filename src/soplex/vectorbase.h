@@ -538,7 +538,8 @@ public:
   const VectorBase<R> operator-(const VectorBase<R>& vec) const
   {
     assert(vec.dim() == val.size());
-    VectorBase<R> res(vec.dim());
+    VectorBase<R> res;
+    res.val.reserve(val.size());
 
     auto dimen = val.size();
 
@@ -554,13 +555,14 @@ public:
   const VectorBase<R> operator+(const VectorBase<R>& v) const
   {
     assert(v.dim() == val.size());
-    VectorBase<R> res(val.size());
+    VectorBase<R> res;
+    res.val.reserve(val.size());
 
     auto dimen = val.size();
 
     for(decltype(dimen) i = 0; i < dimen; i++)
       {
-        res.vec.push_back(val[i] + v[i]);
+        res.val.push_back(val[i] + v[i]);
       }
 
     return res;
@@ -569,7 +571,9 @@ public:
   // The negation operator. e.g. -vec1;
    friend VectorBase<R> operator-(const VectorBase<R>& vec)
   {
-    VectorBase<R> res(vec.dim());
+    VectorBase<R> res;
+
+    res.val.reserve(vec.val.size());
 
     for(auto v: vec.val)
       {
