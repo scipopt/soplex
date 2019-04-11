@@ -194,16 +194,9 @@ extern bool msginconsistent(const char* name, const char* file, int line);
    // return nextafter(x,y);
 
     // @todo Temporarily, I'm returning 0
+    assert(false);
     return 0;
   }
-
-
-  // Apparently needs c++14
-  // auto spxSqrt(auto a)
-  // {
-  //   return std::sqrt(a);
-  // }
-
 
 #ifdef WITH_LONG_DOUBLE
 
