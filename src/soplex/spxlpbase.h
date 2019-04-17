@@ -2714,7 +2714,7 @@ namespace soplex
             LPRowSetBase<R>::operator=(old);
             LPColSetBase<R>::operator=(old);
             thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
-            offset = R(old.offset);
+            offset = old.offset;
             _isScaled = old._isScaled;
             // lp_scaler = old.lp_scaler; // The scalar classes cannot be a
             //                            // template because of this.

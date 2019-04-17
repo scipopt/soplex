@@ -26,12 +26,12 @@
 
 #include "soplex/spxdefines.h"
 #include "soplex/idlist.h"
-
+#include "soplex/spxalloc.h"
 
 // @todo #if else
 #include "boost/multiprecision/number.hpp"
 #include "boost/multiprecision/mpfr.hpp"
-
+#include "boost/multiprecision/gmp.hpp"
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
@@ -93,6 +93,38 @@ namespace soplex
       ///constructor from int
       Rational(const int& i);
 
+     // Construction from a boost number
+     template <typename T, boost::multiprecision::expression_template_option eto>
+     Rational(const boost::multiprecision::number<T, eto>& r)
+     {
+       if( Rational::useListMem )
+         {
+           dpointer = unusedPrivateList.last();
+
+           if( dpointer != 0 )
+             {
+               assert(unusedPrivateList.first() != 0);
+               unusedPrivateList.remove(dpointer);
+               *dpointer = r;
+             }
+           else
+             {
+               assert(unusedPrivateList.first() == 0);
+               spx_alloc(dpointer);
+               new (dpointer) Private(r);
+             }
+         }
+       else
+         {
+           assert(unusedPrivateList.length() == 0);
+           dpointer = 0;
+           spx_alloc(dpointer);
+           new (dpointer) Private(r);
+         }
+
+       assert(dpointer != 0);
+     }
+
 #ifdef SOPLEX_WITH_GMP
       /// constructor from mpq_t
       Rational(const mpq_t& q);
@@ -134,9 +166,8 @@ namespace soplex
      // assignment operator from boost multiprecision number The operator should
      // convert the boost number to mpq_t
 
-     // @todo The function is not implemented in the #else part, is this
-     // important? Only important if someone doesn't have gmp library, but
-     // boost.
+     // Note that this is not implemented in the else part of the Rational class
+     // (where the underlying datatype is double, instead of mpq)
      template <typename T, boost::multiprecision::expression_template_option eto>
      Rational& operator=(const boost::multiprecision::number<T, eto> &q);
 
@@ -148,8 +179,10 @@ namespace soplex
 
       operator double() const;
       operator long double() const;
-     // Operator to typecast Rational to one of the Boost Number types
-     // @todo needs #if else.
+     // Operator to construct a boost number from a soplex Rational.
+     //
+     // This makes a line like 'number<T> num = number<T>(r);' work, where r is
+     // a Rational object.
      template <typename T, boost::multiprecision::expression_template_option eto>
      operator boost::multiprecision::number<T, eto>() const;
 
@@ -639,6 +672,30 @@ public:
          mpq_set_d(privatevalue, r);
    }
 
+  /// constructor from double
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Private(const boost::multiprecision::number<T, eto>& r)
+    : theprev(0)
+    , thenext(0)
+  {
+    mpq_init(privatevalue);
+    if( r == 1.0 )
+      mpq_set(privatevalue, Rational::POSONE.dpointer->privatevalue);
+    else if( r == -1.0 )
+      mpq_set(privatevalue, Rational::NEGONE.dpointer->privatevalue);
+    else if( r == 0.0 )
+      {
+        assert(mpq_equal(privatevalue, Rational::ZERO.dpointer->privatevalue) != 0);
+      }
+    else
+      {
+        mpq_class tmp_mpz = r.template convert_to<mpq_class>(); // r gets converted
+
+        mpq_set(privatevalue, tmp_mpz.get_mpq_t());
+
+      }
+  }
+
    /// constructor from int
    Private(const int& i)
       : theprev(0)
@@ -804,12 +861,13 @@ public:
    }
 
   // The back end for Rational operator=.
-  // @todo Maybe there is a better way to do this?
+  // TODO: Maybe there is a better way to do this?
+  // I need to probably worry about the if else conditions and special values.
   template <typename T, boost::multiprecision::expression_template_option eto>
   Private& operator=(const boost::multiprecision::number<T, eto>& q)
   {
-    mpq_class tmp_mpz = (mpq_class)q; // tmp_num gets casted.
-    mpq_set(this->privatevalue, tmp_mpz.get_mpq_t());
+    boost::multiprecision::backends::gmp_rational r = q.template convert_to<boost::multiprecision::backends::gmp_rational>();
+    mpq_set(this->privatevalue, r.data());
     return *this;
   }
 
@@ -850,14 +908,13 @@ public:
   }
 
   // Operator to typecast Rational to one of the Boost Number types
-  // @todo needs #if else.
   template <typename T, boost::multiprecision::expression_template_option eto>
   Rational::operator boost::multiprecision::number<T,  eto>() const
   {
     // Constructs a boost::multiprecision::number<T> with value
     // this->pointer->privatevalue
     return boost::multiprecision::number<T, eto>(this->dpointer->privatevalue);
-    // @todo may need to work with edge cases like the other codes?
+    // TODO: may need to work with edge cases like the other codes?
   }
 
 
