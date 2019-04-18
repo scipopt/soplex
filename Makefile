@@ -250,7 +250,7 @@ GCCWARN		=	-pedantic -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 			-Wcast-qual \
 			-Wmissing-declarations \
 			-Wno-unused-parameter -Wno-strict-overflow -Wno-long-long \
-			-Wno-class-memaccess
+			-Wno-class-memaccess -Wno-sign-compare
 #			-Wold-style-cast
 #			-Weffc++
 

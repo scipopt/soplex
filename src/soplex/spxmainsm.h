@@ -1633,7 +1633,7 @@ private:
 
       int operator()(const typename SVectorBase<R>::Element& e1, const typename SVectorBase<R>::Element& e2) const
       {
-	 if (EQ(e1.idx, e2.idx))
+        if (EQ(e1.idx, e2.idx))
             return 0;
          if (e1.idx < e2.idx)
 	    return -1;
