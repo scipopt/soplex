@@ -1594,7 +1594,8 @@ void SoPlexBase<R>::_performOptIRStable(
       SVectorRational liftingRowVector(2, liftingRowMem);
 
       // search each column for large nonzeros entries
-      const Rational maxValue = realParam(SoPlexBase<R>::LIFTMAXVAL);
+      // @todo: rethink about the static_cast
+      const Rational maxValue = static_cast<Rational>(realParam(SoPlexBase<R>::LIFTMAXVAL));
 
       for( int i = 0; i < numColsRational(); i++ )
       {
