@@ -29,72 +29,92 @@ namespace soplex
 
   THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
-  template <>
-  THREADLOCAL Real Param<Real>::s_epsilon               = DEFAULT_EPS_ZERO;
+  THREADLOCAL Real Param::s_epsilon               = DEFAULT_EPS_ZERO;
 
-  template <>
-  THREADLOCAL Real Param<Real>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+  THREADLOCAL Real Param::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 
-  template <>
-  THREADLOCAL Real Param<Real>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+  THREADLOCAL Real Param::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 
-  template <>
-  THREADLOCAL Real Param<Real>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-
-  template <>
-  THREADLOCAL Rational Param<Rational>::s_epsilon               = DEFAULT_EPS_ZERO;
-
-  template <>
-  THREADLOCAL Rational Param<Rational>::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-
-  template <>
-  THREADLOCAL Rational Param<Rational>::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-
-  template <>
-  THREADLOCAL Rational Param<Rational>::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-
-  template <>
-  THREADLOCAL int Param<int>::s_epsilon               = 0;
-
-  template <>
-  THREADLOCAL int Param<int>::s_epsilon_factorization = 0;
-
-  template <>
-  THREADLOCAL int Param<int>::s_epsilon_update        = 0;
-
-  template <>
-  THREADLOCAL int Param<int>::s_epsilon_pivot         = 0;
+  THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
   using mpfr_float = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off>;
   using mpfr_debug = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<50> >, boost::multiprecision::et_off>;
 
-  // @todo: have this in the hpp file?
-  template <>
-  THREADLOCAL  mpfr_float Param<mpfr_float >::s_epsilon               = DEFAULT_EPS_ZERO;
+  // // @todo: have this in the hpp file?
+  // template <>
+  // THREADLOCAL  mpfr_float Param<mpfr_float >::s_epsilon               = DEFAULT_EPS_ZERO;
 
-  template <>
-  THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+  // template <>
+  // THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
 
-  template <>
-  THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+  // template <>
+  // THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
 
-  template <>
-  THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-
-
-  template <>
-  THREADLOCAL  mpfr_debug Param<mpfr_debug >::s_epsilon               = DEFAULT_EPS_ZERO;
-
-  template <>
-  THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-
-  template <>
-  THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-
-  template <>
-  THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+  // template <>
+  // THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 
+  // template <>
+  // THREADLOCAL  mpfr_debug Param<mpfr_debug >::s_epsilon               = DEFAULT_EPS_ZERO;
+
+  // template <>
+  // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
+
+  // template <>
+  // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
+
+  // template <>
+  // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
+
+  // Definitions of the Param
+
+  // Overloaded EQ function
+  inline bool EQ(int a, int b)
+  {
+    return (a == b);
+  }
+
+
+  void Param::setEpsilonFactorization(Real eps)
+  {
+    s_epsilon_factorization = eps;
+  }
+
+  Real Param::epsilon()
+  {
+    return (s_epsilon);
+  }
+
+  void Param::setEpsilon(Real eps)
+  {
+    s_epsilon = eps;
+  }
+
+
+  Real Param::epsilonFactorization()
+  {
+    return s_epsilon_factorization;
+  }
+
+  Real Param::epsilonUpdate()
+  {
+    return s_epsilon_update;
+  }
+
+  void Param::setEpsilonUpdate(Real eps)
+  {
+    s_epsilon_update = eps;
+  }
+
+  Real Param::epsilonPivot()
+  {
+    return s_epsilon_pivot;
+  }
+
+  void Param::setEpsilonPivot(Real eps)
+  {
+    s_epsilon_pivot = eps;
+  }
 
   bool msginconsistent(const char* name, const char* file, int line)
   {
@@ -124,13 +144,11 @@ namespace soplex
   // @todo: write a boost version of the following function. Check whether this
   // function gets called from the Scalers, if not, we can have a general
   // version of the function in spxdefines.hpp
-  template <>
   Real spxLdexp(Real x, int exp)
   {
     return ldexp(x,exp);
   }
 
-  template <>
   Rational spxLdexp(Rational x, int exp)
   {
     // This call shouldn't happen. This is a dummy function to deal with the

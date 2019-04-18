@@ -280,12 +280,12 @@ static int deQueueMin( int* heap, int* size )
    row.perm[p_row]   = p_stage;
    col.perm[p_col]   = p_stage;
    diag[p_row]       = R( 1.0 ) / val;
-   if( spxAbs(val) < Param<R>::epsilonPivot() )
+   if( spxAbs(val) < Param::epsilonPivot() )
    {
 #ifndef NDEBUG
       MSG_ERROR( std::cerr
                  << "LU pivot element is almost zero (< "
-                 << Param<R>::epsilonPivot()
+                 << Param::epsilonPivot()
                  << ") - Basis is numerically singular"
                  << std::endl;
       )
@@ -800,7 +800,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
          x = p_work[i];
          p_work[i] = 0.0;
 
-         if ( isNotZero( x, Param<R>::epsilonUpdate() ) )
+         if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
             if ( spxAbs( x ) > l_maxabs )
                l_maxabs = spxAbs( x );
@@ -854,7 +854,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
          x = p_work[i];
          p_work[i] = 0.0;
 
-         if ( isNotZero( x, Param<R>::epsilonUpdate() ) )
+         if ( isNotZero( x, Param::epsilonUpdate() ) )
          {
             if ( spxAbs( x ) > l_maxabs )
                l_maxabs = spxAbs( x );

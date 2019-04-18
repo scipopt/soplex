@@ -2525,7 +2525,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                   {
                     if (lp.lhs(i) > R(-infinity) && lp.lower(j) > R(-infinity) && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > Param<R>::epsilon())
+                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > Param::epsilon())
                       {
                         R lo    = R(-infinity);
                         R scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -2562,7 +2562,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                       }
                     if (lp.rhs(i) < R(infinity) && lp.upper(j) < R(infinity) && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > Param<R>::epsilon())
+                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > Param::epsilon())
                       {
                         R up    = R(infinity);
                         R scale = maxAbs(lp.rhs(i), lhsBnd);
@@ -2629,7 +2629,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                   {
                     if (lp.lhs(i) > R(-infinity) && lp.upper(j) < R(infinity) && rhsCnt <= 1 && NErel(lp.lhs(i), rhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > Param<R>::epsilon())
+                        && spxAbs(lp.lhs(i) / maxAbs(rhsBnd, R(1.0))) > Param::epsilon())
                       {
                         R up    = R(infinity);
                         R scale = maxAbs(lp.lhs(i), rhsBnd);
@@ -2665,7 +2665,7 @@ typename SPxSimplifier<R>::Result SPxMainSM<R>::simplifyRows(SPxLPBase<R>& lp, b
                       }
                     if (lp.rhs(i) < R(infinity) && lp.lower(j) > R(-infinity) && lhsCnt <= 1 && NErel(lp.rhs(i), lhsBnd, feastol())
                         // do not perform if strongly different orders of magnitude occur
-                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > Param<R>::epsilon())
+                        && spxAbs(lp.rhs(i) / maxAbs(lhsBnd, R(1.0))) > Param::epsilon())
                       {
                         R lo    = R(-infinity);
                         R scale = maxAbs(lp.rhs(i), lhsBnd);

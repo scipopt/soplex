@@ -302,7 +302,6 @@ typedef double Real;
 
 THREADLOCAL extern const Real infinity;
 
-template <class R>
 class Param
 {
 private:
@@ -311,13 +310,13 @@ private:
    /**@name Data */
    //@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
-   THREADLOCAL static R s_epsilon;
+   THREADLOCAL static Real s_epsilon;
    /// epsilon for factorization
-   THREADLOCAL static R s_epsilon_factorization;
+   THREADLOCAL static Real s_epsilon_factorization;
    /// epsilon for factorization update
-   THREADLOCAL static R s_epsilon_update;
+   THREADLOCAL static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
-   THREADLOCAL static R s_epsilon_pivot;
+   THREADLOCAL static Real s_epsilon_pivot;
    //@}
 
 public:
@@ -326,21 +325,21 @@ public:
    /**@name Access / modification */
    //@{
    ///
-   static R epsilon();
+   static Real epsilon();
    ///
-   static void setEpsilon(R eps);
+   static void setEpsilon(Real eps);
    ///
-   static R epsilonFactorization();
+   static Real epsilonFactorization();
    ///
-   static void setEpsilonFactorization(R eps);
+   static void setEpsilonFactorization(Real eps);
    ///
-   static R epsilonUpdate();
+   static Real epsilonUpdate();
    ///
-   static void setEpsilonUpdate(R eps);
+   static void setEpsilonUpdate(Real eps);
    ///
-   static R epsilonPivot();
+   static Real epsilonPivot();
    ///
-   static void setEpsilonPivot(R eps);
+   static void setEpsilonPivot(Real eps);
    //@}
 };
 
