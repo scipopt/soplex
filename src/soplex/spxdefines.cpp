@@ -26,6 +26,11 @@
 
 namespace soplex
 {
+  // Overloaded EQ function
+  bool EQ(int a, int b)
+  {
+    return (a == b);
+  }
 
   THREADLOCAL const Real infinity                 = DEFAULT_INFINITY;
 
@@ -67,12 +72,6 @@ namespace soplex
   // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
   // Definitions of the Param
-
-  // Overloaded EQ function
-  inline bool EQ(int a, int b)
-  {
-    return (a == b);
-  }
 
 
   void Param::setEpsilonFactorization(Real eps)

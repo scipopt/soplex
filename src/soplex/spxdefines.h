@@ -46,6 +46,11 @@
 
 namespace soplex
 {
+
+  // Overloaded EQ function
+  bool EQ(int a, int b);
+
+  // wrapped frexp function
   template <typename T, boost::multiprecision::expression_template_option eto>
   boost::multiprecision::number<T, eto> spxFrexp(boost::multiprecision::number<T, eto> y, int* exp)
   {

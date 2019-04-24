@@ -36,9 +36,6 @@ namespace soplex
 // THREADLOCAL R Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
 
-  // Overloaded EQ function
-  inline bool EQ(int a, int b);
-
 /// returns \c true iff |a-b| <= eps
 template <class R>
 inline bool EQ(R a, R b, R eps = Param::epsilon())
