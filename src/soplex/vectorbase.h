@@ -113,7 +113,7 @@ public:
     ;
   }
 
-   VectorBase<R>(int p_dimen)
+  explicit VectorBase<R>(int p_dimen)
    {
       val.resize(p_dimen);
    }
@@ -137,7 +137,7 @@ public:
         val.clear();
         val.reserve(vec.val.size());
 
-        for(auto v: vec.val)
+        for(auto& v: vec.val)
            {
             val.push_back(R(v));
            }
@@ -170,7 +170,7 @@ public:
          assert(dim() == vec.dim());
 
          auto dimen = dim();
-         for(decltype(dimen) i = 0 ; i < dim(); i++ )
+         for(decltype(dimen) i = 0 ; i < dimen; i++ )
             val[i] = spxLdexp(vec[i], scaleExp);
 
          assert(isConsistent());
@@ -186,16 +186,16 @@ public:
       {
          assert(dim() == vec.dim());
 
-         if( negateExp)
+         if(negateExp)
          {
            auto dimen = dim();
-           for(decltype(dimen) i = 0; i < dimen; i++ )
+           for(decltype(dimen) i = 0; i < dimen; i++)
                val[i] = spxLdexp(vec[i], -scaleExp[i]);
          }
          else
          {
            auto dimen = dim();
-           for(decltype(dimen) i = 0; i < dimen; i++ )
+           for(decltype(dimen) i = 0; i < dimen; i++)
                val[i] = spxLdexp(vec[i], scaleExp[i]);
          }
 
@@ -273,21 +273,8 @@ public:
   // TODO: is this set to zero actually useful? Can't I just do a val.clear()?
    void clear()
    {
-      if( dim() > 0 )
-      {
-        val.reserve(dim());
-        if(val.empty())
-          {
-            // insert dimen number of zeros.
-            val.insert(val.begin(), dim(), 0);
-          }
-        else
-          {
-            auto dimen = dim();
-            for(decltype(dimen) i = 0; i < dimen; i++ )
-            val[i] = 0;
-      }
-   }
+     for(auto &v: val)
+       v = 0;
    }
 
    /// Addition.
@@ -388,7 +375,7 @@ public:
 
       auto maxReference = std::max_element(val.begin(), val.end(), absCmpr);
 
-      R maxi = *maxReference;
+      R maxi = spxAbs(*maxReference);
 
       assert(maxi >= 0.0);
 
@@ -400,7 +387,7 @@ public:
    {
       assert(dim() > 0);
 
-      // A helper function for the std::max_element. Because we compare the absolute value.
+      // A helper function for the std::min_element. Because we compare the absolute value.
       auto absCmpr = [](R a, R b)
       {
                        return (spxAbs(a) < spxAbs(b));
@@ -408,7 +395,7 @@ public:
 
       auto minReference = std::min_element(val.begin(), val.end(), absCmpr);
 
-      R mini = *minReference;
+      R mini = spxAbs(*minReference);
 
       assert(mini >= 0.0);
 
@@ -575,7 +562,7 @@ public:
 
     res.val.reserve(vec.val.size());
 
-    for(auto v: vec.val)
+    for(auto& v: vec.val)
       {
         res.val.push_back(-(v));
       }
@@ -602,7 +589,8 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
    x *= vec.val[0];
 
    auto dimen = dim();
-   for( int i = 1; i < dimen && i < vec.dim(); i++ )
+   auto vDimen = vec.dim();
+   for(decltype(dimen) i = 1; i < dimen && i < vDimen; i++)
       x.addProduct(val[i], vec.val[i]);
 
    return x;
