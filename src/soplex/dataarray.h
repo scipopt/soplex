@@ -192,7 +192,7 @@ public:
    }
 
    /// return nr. of elements.
-   int size() const
+  decltype(data.size()) size() const
    {
      return data.size();
    }
@@ -204,7 +204,7 @@ public:
        also memory will be reallocated.
        @param newsize the new number of elements the array can hold.
     */
-   void reSize(int newsize)
+  void reSize(decltype(data.size()) newsize)
    {
      if (newsize > data.capacity())
          reMax(newsize, newsize);
@@ -223,7 +223,7 @@ public:
        elements, up to max() elements could be added without need to
        reallocated free store.
     */
-   int max() const
+  auto max() const -> decltype(data.capacity())
    {
      return data.capacity();
    }
@@ -296,18 +296,8 @@ public:
        @param p_size number of uninitialised elements.
        @param p_max  maximum number of elements the array can hold.
     */
-   explicit DataArray(int p_size = 0, int p_max = 0)
+  explicit DataArray(decltype(data.size()) p_size = 0, decltype(data.size()) p_max = 0)
    {
-     // Old code when this used to be spx_alloced
-     auto thesize = (p_size < 0) ? 0 : p_size;
-     decltype(thesize) themax = 0;
-
-     if(p_max > thesize)
-         themax = p_max;
-      else
-         themax = (thesize == 0) ? 1 : thesize;
-
-
      // p_size number of uninitialized elements.
      //
      // That is, the operator[] is valid on for 0...(p_size -1) whereas, even

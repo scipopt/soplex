@@ -281,13 +281,13 @@ public:
    template < class S >
    VectorBase<R>& operator+=(const VectorBase<S>& vec)
    {
-      assert(dim() == vec.dim());
+     assert(dim() == vec.dim());
 
-      auto dimen = dim();
-      for(decltype(dimen) i = 0; i < dimen; i++ )
-         val[i] += vec[i];
+     auto dimen = dim();
+     for(decltype(dimen) i = 0; i < dimen; i++ )
+       val[i] += vec[i];
 
-      return *this;
+     return *this;
    }
 
    /// Addition.
@@ -371,7 +371,7 @@ public:
       auto absCmpr = [](R a, R b)
       {
                        return (spxAbs(a) < spxAbs(b));
-                     };
+      };
 
       auto maxReference = std::max_element(val.begin(), val.end(), absCmpr);
 
@@ -591,7 +591,7 @@ Rational VectorBase<Rational>::operator*(const VectorBase<Rational>& vec) const
    auto dimen = dim();
    auto vDimen = vec.dim();
    for(decltype(dimen) i = 1; i < dimen && i < vDimen; i++)
-      x.addProduct(val[i], vec.val[i]);
+     x.addProduct(val[i], vec.val[i]);
 
    return x;
 }
