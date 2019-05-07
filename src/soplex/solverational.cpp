@@ -806,11 +806,15 @@ void SoPlexBase<R>::_performOptIRStable(
          bestViolation = maxViolation;
 
       // decide whether to perform rational reconstruction and/or factorization
+      bool forcebasic    = boolParam(SoPlexBase<R>::FORCEBASIC);
       bool performRatfac = boolParam(SoPlexBase<R>::RATFAC)
                            && lastStallRefinements >= intParam(SoPlexBase<R>::RATFAC_MINSTALLS) && _hasBasis
                            && factorSolNewBasis;
       bool performRatrec = boolParam(SoPlexBase<R>::RATREC)
                            && (_statistics->refinements >= nextRatrecRefinement || performRatfac);
+
+      // if we want to force the solutotion to be basic we need to turn rational factorization on
+      performRatfac = performRatfac || forcebasic;
 
       // attempt rational reconstruction
       errorCorrection *= errorCorrectionFactor;
@@ -827,7 +831,8 @@ void SoPlexBase<R>::_performOptIRStable(
             MSG_INFO1(spxout, spxout << "Tolerances reached.\n");
             primalFeasible = true;
             dualFeasible = true;
-            break;
+            if( _hasBasis || !forcebasic )
+               break;
          }
 
          nextRatrecRefinement = int(_statistics->refinements * realParam(SoPlexBase<R>::RATREC_FREQ)) + 1;
@@ -836,7 +841,7 @@ void SoPlexBase<R>::_performOptIRStable(
       }
 
       // solve basis systems exactly
-      if(performRatfac && maxViolation > 0)
+      if((performRatfac && maxViolation > 0) || (!_hasBasis && forcebasic))
       {
          MSG_INFO1(spxout, spxout << "Performing rational factorization . . .\n");
 

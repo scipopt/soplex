@@ -960,8 +960,11 @@ public:
       /// re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?
       ENSURERAY = 15,
 
+      /// try to enforce that the optimal solution is a basic solutiong
+      FORCEBASIC = 16,
+
       /// number of boolean parameters
-      BOOLPARAM_COUNT = 16
+      BOOLPARAM_COUNT = 17
    } BoolParam;
 
    /// integer parameters
