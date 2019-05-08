@@ -1409,6 +1409,7 @@ SPxBasisBase<Real>::~SPxBasisBase<Real>()
       factor = 0;
    }
 
+   theTime->~Timer();
    spx_free(theTime);
 }
 

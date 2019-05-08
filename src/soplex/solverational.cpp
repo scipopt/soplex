@@ -345,6 +345,21 @@ void SoPlexBase<Real>::_optimizeRational()
       assert(_isRealLPLoaded);
       _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = (_solver.basis().status() > SPxBasisBase<Real>::NO_PROBLEM);
+      // since setBasis always sets the basis status to regular, we need to set it manually here
+      switch(_status)
+      {
+         case SPxSolverBase<Real>::OPTIMAL:
+           _solver.setBasisStatus(SPxBasisBase<Real>::OPTIMAL);
+           break;
+         case SPxSolverBase<Real>::INFEASIBLE:
+            _solver.setBasisStatus(SPxBasisBase<Real>::INFEASIBLE);
+            break;
+         case SPxSolverBase<Real>::UNBOUNDED:
+            _solver.setBasisStatus(SPxBasisBase<Real>::UNBOUNDED);
+            break;
+         default:
+            break;
+      }
    }
 
    // stop timing
