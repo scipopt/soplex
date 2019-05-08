@@ -338,6 +338,12 @@ SoPlexBase<Real>::Settings::BoolParam::BoolParam()
    description[SoPlexBase<Real>::ENSURERAY] =
       "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?";
    defaultValue[SoPlexBase<Real>::ENSURERAY] = false;
+
+   /// try to enforce that the optimal solution is a basic solutiong
+   name[SoPlexBase<Real>::FORCEBASIC] = "forcebasic";
+   description[SoPlexBase<Real>::FORCEBASIC] =
+      "try to enforce that the optimal solution is a basic solutiong";
+   defaultValue[SoPlexBase<Real>::FORCEBASIC] = false;
 }
 
 template <class R>
@@ -6325,6 +6331,9 @@ bool SoPlexBase<Real>::setBoolParam(const BoolParam param, const bool value, con
       break;
 
    case ENSURERAY:
+      break;
+
+   case FORCEBASIC:
       break;
 
    default:
