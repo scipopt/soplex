@@ -171,7 +171,7 @@ public:
 
       assert(m_used < m_elem.size());
 
-      int i;
+      decltype(m_elem.size()) i;
 
       for(i = (*m_hashfun)(&h) % m_elem.size();
           m_elem[i].stat == Elem::USED;
@@ -459,8 +459,8 @@ private:
 
       assert(m_elem.size() > 0);
 
-      int i = (*m_hashfun)(&h) % m_elem.size();
-      int j = i;
+      auto i = (*m_hashfun)(&h) % m_elem.size();
+      auto j = i;
 
       while(m_elem[i].stat != Elem::FREE)
       {

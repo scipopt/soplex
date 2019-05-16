@@ -73,14 +73,14 @@ private:
 public:
 
    /// reference \p n 'th element.
-   T& operator[](int n)
+  T& operator[](decltype(data.size()) n)
    {
       assert(n >= 0);
       return data[n];
    }
 
    /// reference \p n 'th const element.
-   const T& operator[](int n) const
+  const T& operator[](decltype(data.size()) n) const
    {
       assert(n >= 0);
       return data[n];

@@ -238,7 +238,7 @@ public:
    //@{
 
    /// Dimension of vector.
-   int dim() const
+  auto dim() const -> decltype(val.size())
    {
      return val.size();
    }
