@@ -230,7 +230,7 @@ namespace soplex
          // if simplifier is turned on
          if( copyLP )
          {
-            _realLP = 0;
+            _realLP = nullptr;
             spx_alloc(_realLP);
             _realLP = new (_realLP) SPxLPBase<R>(_solver);
             _isRealLPLoaded = false;

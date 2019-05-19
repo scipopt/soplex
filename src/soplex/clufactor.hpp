@@ -2633,7 +2633,7 @@ int CLUFactor<R>::setupColVals()
    if (!u.col.val.empty())
      u.col.val.clear();
 
-   u.col.val.reserve(u.col.size);
+   u.col.val.reserve(u.col.size); // small performance improvement before the insertion
    u.col.val.insert(u.col.val.begin(), u.col.size, 0);
 
    for ( i = 0; i < thedim; i++ )
@@ -2722,7 +2722,7 @@ void CLUFactor<R>::setupRowVals()
    if ( l.rperm )
       spx_free( l.rperm );
 
-   l.rval.reserve(mem);
+   l.rval.reserve(mem);         // small performance improvement before the insertion
    // Insert mem number of zeros.
    l.rval.insert(l.rval.begin(), mem, 0);
 

@@ -255,11 +255,11 @@ public:
       {
          /* no data needs to be copied so do a clean free and alloc */
          data.clear();
-         data.reserve(themax);
+         data.resize(themax);
       }
       else
         {
-          data.reserve(themax);
+          data.resize(themax);
         }
    }
    /// assignment operator
