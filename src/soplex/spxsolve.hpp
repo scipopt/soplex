@@ -1807,7 +1807,6 @@ namespace soplex
     else
       p_vector = coPvec();
 
-    // @todo how do we convert an enum to a boost number? Is the following okay?
     p_vector *= Real(this->spxSense());
 
     return status();

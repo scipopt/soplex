@@ -36,7 +36,7 @@ namespace soplex
   {
     steep.clear();
     devex.clear();
-    this->thesolver = 0;
+    this->thesolver = nullptr;
   }
 
   template <class R>

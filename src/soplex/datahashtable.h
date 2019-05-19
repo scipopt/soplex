@@ -375,7 +375,7 @@ private:
     */
    int autoHashSize() const
    {
-      int oldsize = m_elem.size();
+      auto oldsize = m_elem.size();
 
       int left = 0;
       int right = nprimes - 1;
