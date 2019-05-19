@@ -791,11 +791,11 @@ void SLUFactor<R>::clear()
    // G clean up if anything goes wrong here
    try
    {
-     this->u.row.val.reserve(this->u.row.size);
+     this->u.row.val.resize(this->u.row.size);
      spx_alloc(this->u.row.idx, this->u.row.size);
      spx_alloc(this->u.col.idx, this->u.col.size);
 
-     this->l.val.reserve(this->l.size);
+     this->l.val.resize(this->l.size);
       spx_alloc(this->l.idx,   this->l.size);
       spx_alloc(this->l.start, this->l.startSize);
       spx_alloc(this->l.row,   this->l.startSize);
@@ -841,8 +841,7 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    spx_alloc(this->col.perm, this->thedim);
    spx_alloc(this->col.orig, this->thedim);
    // spx_alloc(this->diag,     this->thedim);
-   // The following is optional.
-   this->diag.reserve(this->thedim);
+   this->diag.reserve(this->thedim); // small performance improvement before copying
 
    memcpy(this->row.perm, old.row.perm, (unsigned int)this->thedim * sizeof(*this->row.perm));
    memcpy(this->row.orig, old.row.orig, (unsigned int)this->thedim * sizeof(*this->row.orig));
@@ -859,7 +858,7 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    this->u.row.used = old.u.row.used;
 
    spx_alloc(this->u.row.elem,  this->thedim);
-   this->u.row.val.reserve(this->u.row.size);
+   this->u.row.val.reserve(this->u.row.size); // small performance improvement
    spx_alloc(this->u.row.idx,   this->u.row.size);
    spx_alloc(this->u.row.start, this->thedim + 1);
    spx_alloc(this->u.row.len,   this->thedim + 1);
@@ -902,7 +901,7 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
 
    if (!old.u.col.val.empty())
    {
-      this->u.col.val.reserve(this->u.col.size);
+      this->u.col.val.reserve(this->u.col.size); // small performance improvement before copying
       this->u.col.val = old.u.col.val;
    }
    else
@@ -943,7 +942,7 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
    this->l.firstUnused = old.l.firstUnused;
    this->l.updateType  = old.l.updateType;
 
-   this->l.val.reserve(this->l.size);
+   this->l.val.reserve(this->l.size); // small performance improvement for copying
    spx_alloc(this->l.idx,   this->l.size);
    spx_alloc(this->l.start, this->l.startSize);
    spx_alloc(this->l.row,   this->l.startSize);
@@ -962,7 +961,7 @@ void SLUFactor<R>::assign(const SLUFactor<R>& old)
 
       int memsize = this->l.start[this->l.firstUpdate];
 
-      this->l.rval.reserve(memsize);
+      this->l.rval.reserve(memsize); // small performance improvement for copying
       spx_alloc(this->l.ridx,  memsize);
       spx_alloc(this->l.rbeg,  this->thedim + 1);
       spx_alloc(this->l.rorig, this->thedim);
@@ -1084,15 +1083,14 @@ SLUFactor<R>::SLUFactor()
       spx_alloc(this->col.perm, this->thedim);
       spx_alloc(this->col.orig, this->thedim);
 
-      // Reserve memory
-      this->diag.reserve(this->thedim);
+      this->diag.resize(this->thedim);
 
       this->work = vec.get_ptr();
 
       this->u.row.size = 1;
       this->u.row.used = 0;
       spx_alloc(this->u.row.elem,  this->thedim);
-      this->u.row.val.reserve(this->u.row.size);
+      this->u.row.val.resize(this->u.row.size);
       spx_alloc(this->u.row.idx,   this->u.row.size);
       spx_alloc(this->u.row.start, this->thedim + 1);
       spx_alloc(this->u.row.len,   this->thedim + 1);
@@ -1118,7 +1116,7 @@ SLUFactor<R>::SLUFactor()
 
       this->l.size = 1;
 
-      this->l.val.reserve(this->l.size);
+      this->l.val.resize(this->l.size);
       spx_alloc(this->l.idx, this->l.size);
 
       this->l.startSize   = 1;
