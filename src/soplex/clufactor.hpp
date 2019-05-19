@@ -800,7 +800,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
          x = p_work[i];
          p_work[i] = 0.0;
 
-         if ( isNotZero( x, Param::epsilonUpdate() ) )
+         if (isNotZero( x, R(Param::epsilonUpdate())))
          {
             if ( spxAbs( x ) > l_maxabs )
                l_maxabs = spxAbs( x );
@@ -854,7 +854,7 @@ void CLUFactor<R>::forestUpdate( int p_col, R* p_work, int num, int *nonz )
          x = p_work[i];
          p_work[i] = 0.0;
 
-         if ( isNotZero( x, Param::epsilonUpdate() ) )
+         if (isNotZero(x, R(Param::epsilonUpdate())))
          {
             if ( spxAbs( x ) > l_maxabs )
                l_maxabs = spxAbs( x );
