@@ -36,7 +36,6 @@
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
-#include "gmpxx.h"              // For mpq_class
 #endif
 
 

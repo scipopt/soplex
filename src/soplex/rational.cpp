@@ -33,7 +33,6 @@
 
 #ifdef SOPLEX_WITH_GMP
 #include "gmp.h"
-#include "gmpxx.h"
 #endif
 
 /// use mpq_sgn instead of mpq_equal to compare rationals with zero

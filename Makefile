@@ -105,7 +105,7 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	=	-lgmpxx -lgmp -lmpfr
+GMP_LDFLAGS	= -lgmp -lmpfr
 GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)
