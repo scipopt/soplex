@@ -508,9 +508,9 @@ int main(int argc, char* argv[])
   // and the right template of runSoplex should be called
 
    // return runSoPlex<mpfr_debug>(argc, argv);
-   return runSoPlex<mpfr_float_50_eto>(argc, argv); 
+   return runSoPlex<mpfr_float_50_eto>(argc, argv);
    // return runSoPlex<cpp_float_50_eto >(argc, argv);
-  return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
+  // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }
 

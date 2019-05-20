@@ -28,9 +28,10 @@
 #include "soplex/idlist.h"
 
 
-// @todo #if else
+#include "soplex/spxalloc.h"
 #include "boost/multiprecision/number.hpp"
 #include "boost/multiprecision/mpfr.hpp"
+#include "boost/multiprecision/gmp.hpp"
 
 
 #ifdef SOPLEX_WITH_GMP
@@ -97,6 +98,38 @@ namespace soplex
       /// constructor from mpq_t
       Rational(const mpq_t& q);
 #endif
+
+     template <typename T, boost::multiprecision::expression_template_option eto>
+     Rational(const boost::multiprecision::number<T, eto>& q)
+     {
+       if( Rational::useListMem )
+         {
+           dpointer = unusedPrivateList.last();
+
+           if( dpointer != nullptr )
+             {
+               assert(unusedPrivateList.first() != 0);
+               unusedPrivateList.remove(dpointer);
+               *dpointer = q;
+             }
+           else
+             {
+               assert(unusedPrivateList.first() == 0);
+               spx_alloc(dpointer);
+               new (dpointer) Private(q);
+             }
+         }
+       else
+         {
+           assert(unusedPrivateList.length() == 0);
+           dpointer = 0;
+           spx_alloc(dpointer);
+           new (dpointer) Private(q);
+         }
+
+       assert(dpointer != 0);
+
+     }
 
       /// destructor
       ~Rational();
@@ -666,6 +699,18 @@ public:
       mpq_set(privatevalue, q);
    }
 
+  /// constructor from boost number
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Private(const boost::multiprecision::number<T, eto>& q)
+    : theprev(0)
+    , thenext(0)
+  {
+    boost::multiprecision::mpq_rational tmp{q};
+    mpq_init(privatevalue);
+    mpq_set(privatevalue, tmp.backend().data());
+  }
+
+
    /// destructor
    ~Private()
    {
@@ -808,8 +853,8 @@ public:
   template <typename T, boost::multiprecision::expression_template_option eto>
   Private& operator=(const boost::multiprecision::number<T, eto>& q)
   {
-    mpq_class tmp_mpz = (mpq_class)q; // tmp_num gets casted.
-    mpq_set(this->privatevalue, tmp_mpz.get_mpq_t());
+    boost::multiprecision::mpq_rational tmp{q};
+    mpq_set(this->privatevalue, tmp.backend().data());
     return *this;
   }
 
