@@ -3348,7 +3348,7 @@ R SoPlexBase<R>::objValueReal()
   assert(OBJSENSE_MINIMIZE == -1);
 
   if( status() == SPxSolverBase<R>::UNBOUNDED )
-    return RealParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
+    return realParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
   else if( status() == SPxSolverBase<R>::INFEASIBLE )
     return -realParam(SoPlexBase<R>::INFTY) * intParam(SoPlexBase<R>::OBJSENSE);
   else if( hasPrimal() || hasDual() )
