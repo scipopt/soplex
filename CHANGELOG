@@ -38,6 +38,25 @@ interface & parameters:
   5. `getPrimalReal`
 
 - Renamed `int numNonzeros` to `nNonzeros`
+- Moved definitions of generic functions from a `.cpp` file to corresponding `.hpp` file
+- New features for Rational class:
+  1. Constructor from `boost::multiprecision::number<T>`.
+  2. Conversion from Rational to `boost::multiprecision::number<T>`, provided that boost can handle `mpq_t` to `T` conversion.
+- Changes to `VectorBase<T>`
+  1. `VectorBase<T>` is now a wrapper of `std::vector<T>`
+  2. The class can handle the additional functionality `DVectorBase<T>`, e.g., `memSize()`, `reSize()`, `scaleAssign(,,).`
+  3. internal member `int dimen` removed. `val.size()` or `VectorBase<R>::dim()` is a replacement.
+  4. Replaced calls to memcpy and memmove with `std::copy().` Former functions are not compatible with `boost::multiprecision::number`.
+- Removed DVectorBase. Replaced by VectorBase.
+- DataArray is now a wrapper around `std::vector.`
+- The following internal objects of the CLUFactor class was changed from a raw pointer to a std::vector
+  1. `u.col.val`, `u.row.val`
+  2. `l.val`, `l.rval`
+  3. `diag`
+  4. `s_max`
+- Replaced several instances of "`spx_alloc` an object, then `spx_realloc` the object" with using `std::vector`. Because `realloc` is not guaranteed to work on objects with non-trivial copy constructors, in particular, with `boost::multiprecision::number.`
+- SoPlex can now do multiprecision solve, i.e., `SoPlex<R>` with `R = boost::multiprecision::number<T>` will work.
+
 
 fixed bugs:
 - correct objective function update in aggregation simplifier

@@ -493,9 +493,9 @@ int main(int argc, char* argv[])
    using namespace boost::multiprecision;
 
    // mpfr_flot_50 with expression template turned off
-   using mpfr_float_50_eto = number<mpfr_float_backend<50>, et_off>;
+   using mpfr_float_100_eto = number<mpfr_float_backend<100>, et_off>;
 
-   using mpfr_debug = number<debug_adaptor<mpfr_float_backend<50> >, et_off >;
+   using mpfr_debug = number<debug_adaptor<mpfr_float_backend<100> >, et_off >;
 
    // The following won't compile. Because there is no conversion between mpq_t
    // Rational and cpp_float. Perhaps we need to change the Rational class
@@ -508,9 +508,8 @@ int main(int argc, char* argv[])
   // and the right template of runSoplex should be called
 
    // return runSoPlex<mpfr_debug>(argc, argv);
-   return runSoPlex<mpfr_float_50_eto>(argc, argv);
-   // return runSoPlex<cpp_float_50_eto >(argc, argv);
-  // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
+   // return runSoPlex<mpfr_float_100_eto>(argc, argv);
+  return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
 }
 
