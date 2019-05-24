@@ -29,7 +29,6 @@ namespace soplex
  */
 #define SOPLEX_FACTOR_MARKER     1e-100
 
-  // @todo: fix the values of the constants.
 static const Real verySparseFactor = 0.001;
 static const Real verySparseFactor4right = 0.2;
 static const Real verySparseFactor4left  = 0.1;

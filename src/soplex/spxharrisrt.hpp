@@ -13,13 +13,6 @@
 /*                                                                           */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// @todo remove the comments
-// #include <assert.h>
-// #include <iostream>
-
-// #include "soplex/spxdefines.h"
-// #include "soplex/spxharrisrt.h"
-
 namespace soplex
 {
   /**@todo suspicious: *max is not set, but it is used

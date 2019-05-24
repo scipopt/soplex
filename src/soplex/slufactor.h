@@ -239,7 +239,7 @@ public:
    /**@name Miscellaneous */
    //@{
    /// time spent in factorizations
-  // @todo fix the return type from of the type form Real to a cpp time
+  // @todo fix the return type from of the type form Real to a cpp time (Refactoring) TODO
    Real getFactorTime() const
    {
       return this->factorTime->time();
@@ -255,7 +255,7 @@ public:
       return this->factorCount;
    }
    /// time spent in solves
-  // @todo fix the return type of time to a cpp time type
+  // @todo fix the return type of time to a cpp time type TODO
    Real getSolveTime() const
    {
       return solveTime->time();

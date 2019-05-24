@@ -166,9 +166,7 @@ namespace soplex
      // assignment operator from boost multiprecision number The operator should
      // convert the boost number to mpq_t
 
-     // @todo The function is not implemented in the #else part, is this
-     // important? Only important if someone doesn't have gmp library, but
-     // boost.
+     // Note: the function is only implemented in the #if part
      template <typename T, boost::multiprecision::expression_template_option eto>
      Rational& operator=(const boost::multiprecision::number<T, eto> &q);
 
@@ -181,7 +179,6 @@ namespace soplex
       operator double() const;
       operator long double() const;
      // Operator to typecast Rational to one of the Boost Number types
-     // @todo needs #if else.
      template <typename T, boost::multiprecision::expression_template_option eto>
      operator boost::multiprecision::number<T, eto>() const;
 
@@ -848,10 +845,11 @@ public:
    }
 
   // The back end for Rational operator=.
-  // @todo Maybe there is a better way to do this?
   template <typename T, boost::multiprecision::expression_template_option eto>
   Private& operator=(const boost::multiprecision::number<T, eto>& q)
   {
+    // mpq_rational is used as an intermediate to convert the mpf float to
+    // mpq_t.
     boost::multiprecision::mpq_rational tmp{q};
     mpq_set(this->privatevalue, tmp.backend().data());
     return *this;
@@ -894,7 +892,6 @@ public:
   }
 
   // Operator to typecast Rational to one of the Boost Number types
-  // @todo needs #if else.
   template <typename T, boost::multiprecision::expression_template_option eto>
   Rational::operator boost::multiprecision::number<T,  eto>() const
   {
@@ -902,6 +899,7 @@ public:
     // this->pointer->privatevalue
     return boost::multiprecision::number<T, eto>(this->dpointer->privatevalue);
     // @todo may need to work with edge cases like the other codes?
+    // TODO look into this
   }
 
 

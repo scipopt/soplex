@@ -1476,37 +1476,6 @@ bool Rational::isNextTo(const double& d)
    return result;
 }
 
-// @todo: fix the following function
-// /// checks if d is the closest possible double
-// template <typename T>
-// bool Rational::isNextTo(const boost::multiprecision::number<T>& d)
-// {
-//   // get intervall [a,b] of doubles that the Rational is in
-//   using mpf = boost::multiprecision;
-//   mpf x = mpq_get_d(this->dpointer->privatevalue);
-//   mpf a;
-//   mpf b;
-
-//   if( Rational(x) < *this )
-//     {
-//       a = x;
-//       b = (mpf::number<T>)spxNextafter(a, mpf::number<T>(infinity));
-//     }
-//   else
-//     {
-//       b = x;
-//       a = (mpf::number<T>)spxNextafter(double, mpf::number<T>(-infinity));
-//     }
-
-//   // check if d equals the closer end of the intervall
-//   bool result = (spxAbs(*this - a) < spxAbs(*this - b))
-//     ? (d == a)
-//     : (d == b);
-
-//   return result;
-// }
-
-
 /// checks if d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
 bool Rational::isAdjacentTo(const double& d) const
 {

@@ -2716,9 +2716,9 @@ namespace soplex
             thesense = (old.thesense) == SPxLPBase<S>::MINIMIZE ? SPxLPBase<R>::MINIMIZE : SPxLPBase<R>::MAXIMIZE;
             offset = R(old.offset);
             _isScaled = old._isScaled;
-            // lp_scaler = old.lp_scaler; // The scalar classes cannot be a
-            //                            // template because of this.
-            lp_scaler = nullptr; // @todo A temporary fix. Need to re-thing
+
+            // this may have un-intended consequences in the future
+            lp_scaler = nullptr;
             spxout = old.spxout;
 
             assert(isConsistent());

@@ -28,7 +28,6 @@
 
 namespace soplex
 {
-  // @todo: need to work on the precision of the output stream
   template <class R>
   bool SPxSolverBase<R>::writeState(
                                 const char*    filename,

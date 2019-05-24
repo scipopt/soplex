@@ -141,7 +141,6 @@ namespace soplex
     /// constructor
     Compare() : weight( 0 ) {}
     //   const SPxSolverBase* base;     ///< the solver
-    // @todo this should be general, right?
     const T*      weight;   ///< the weights to compare
 
     /// compares the weights

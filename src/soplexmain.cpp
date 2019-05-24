@@ -29,10 +29,8 @@
 #include "soplex/validation.h"
 #include "soplex/statistics.h"
 
-// @todo #if, else
 #include "boost/multiprecision/number.hpp"
 #include "boost/multiprecision/mpfr.hpp"
-#include "boost/multiprecision/cpp_bin_float.hpp"
 #include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
 
 #ifdef SOPLEX_WITH_EGLIB
@@ -156,14 +154,7 @@ void checkSolutionReal(SoPlexBase<R>& soplex)
             bool feasible = (maxviol <= soplex.realParam(SoPlexBase<R>::FEASTOL));
             soplex.spxout << "Primal solution " << (feasible ? "feasible" : "infeasible")
                           << " in original problem (max. violation = " << std::scientific << maxviol
-                          << std::setprecision(8) << std::fixed << ").\n" // @todo:
-                                                                          // need
-                                                                          // to
-                                                                          // figure
-                                                                          // out
-                                                                          // precision
-                                                                          // later
-            );
+                          << std::setprecision(8) << std::fixed << ").\n");
       }
       else
       {

@@ -42,38 +42,6 @@ namespace soplex
 
   THREADLOCAL Real Param::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
 
-  using mpfr_float = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off>;
-  using mpfr_debug = boost::multiprecision::number<boost::multiprecision::debug_adaptor<boost::multiprecision::mpfr_float_backend<50> >, boost::multiprecision::et_off>;
-
-  // // @todo: have this in the hpp file?
-  // template <>
-  // THREADLOCAL  mpfr_float Param<mpfr_float >::s_epsilon               = DEFAULT_EPS_ZERO;
-
-  // template <>
-  // THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-
-  // template <>
-  // THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-
-  // template <>
-  // THREADLOCAL mpfr_float Param<mpfr_float >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-
-
-  // template <>
-  // THREADLOCAL  mpfr_debug Param<mpfr_debug >::s_epsilon               = DEFAULT_EPS_ZERO;
-
-  // template <>
-  // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_factorization = DEFAULT_EPS_FACTOR;
-
-  // template <>
-  // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_update        = DEFAULT_EPS_UPDATE;
-
-  // template <>
-  // THREADLOCAL mpfr_debug Param<mpfr_debug >::s_epsilon_pivot         = DEFAULT_EPS_PIVOT;
-
-  // Definitions of the Param
-
-
   void Param::setEpsilonFactorization(Real eps)
   {
     s_epsilon_factorization = eps;
@@ -132,13 +100,6 @@ namespace soplex
   {
     return frexp(y, exp);
   }
-
-  // @todo: fix this definition
-  // template <class T>
-  // inline boost::multiprecision::number<T> spxFrexp(boost::multiprecision::number<T> y, int* exp)
-  // {
-  //   return frexp(y, exp);
-  // }
 
   // @todo: write a boost version of the following function. Check whether this
   // function gets called from the Scalers, if not, we can have a general

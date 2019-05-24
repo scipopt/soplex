@@ -173,13 +173,6 @@ int SPxScaler<R>::computeScaleExp(const SVectorBase<R>& vec, const DataArray<int
    }
 }
 
-  // @todo is commenting the following code okay?
-//   template <class R>
-// int SPxScaler<R>::computeScaleExp(const SVectorBase<Rational>& vec, const DataArray<int>& oldScaleExp) const
-// {
-//    return 0;
-// }
-
   template <class R>
 void SPxScaler<R>::applyScaling(SPxLPBase<R>& lp)
 {

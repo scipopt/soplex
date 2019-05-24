@@ -44,9 +44,9 @@ namespace soplex
 
             if (theUBbound[i] != theLBbound[i])
               {
-                // @todo get rid of the double casting. The current one is only
-                // a hack. In the future we might have to generate random
-                // numbers from a boost multiprecision library.
+                // since minrandom and maxrandom are of the order 10 different,
+                // we currently doesn't care about higher precision random
+                // numbers. Hence the cast to double.
                 shiftUBbound(i, (*theFvec)[i] + random.next((double)minrandom, (double)maxrandom));
               }
             else

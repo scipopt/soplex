@@ -29,7 +29,6 @@
 #include "soplex/exceptions.h"
 #include "soplex/spxscaler.h"
 
-// @todo #if, else
 #include "boost/multiprecision/number.hpp"
 #include <boost/multiprecision/mpfr.hpp>
 
@@ -37,7 +36,6 @@ namespace soplex{
 
 using mpfr_float_50_eto = boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<50>, boost::multiprecision::et_off>;
 
-// @todo write boost
 /// Changes objective vector to \p newObj.
 template <>
 void SPxLPBase<Real>::changeMaxObj(const VectorBase<Real>& newObj, bool scale)
@@ -54,22 +52,6 @@ void SPxLPBase<Real>::changeMaxObj(const VectorBase<Real>& newObj, bool scale)
   assert(isConsistent());
 }
 
-  // @todo: uncomment this
-// template <>
-// void SPxLPBase<mpfr_float_50_eto>::changeMaxObj(const VectorBase<mpfr_float_50_eto>& newObj, bool scale)
-// {
-//   assert(maxObj().dim() == newObj.dim());
-//   if( scale )
-//     {
-//       assert(_isScaled);
-//       assert(lp_scaler);
-//       LPColSetBase<mpfr_float_50_eto>::maxObj_w().scaleAssign(LPColSetBase<mpfr_float_50_eto>::scaleExp.get_const_ptr(), newObj);
-//     }
-//   else
-//     LPColSetBase<mpfr_float_50_eto>::maxObj_w() = newObj;
-//   assert(isConsistent());
-// }
-
 /// Changes vector of lower bounds to \p newLower.
 template <>
 void SPxLPBase<Real>::changeLower(const VectorBase<Real>& newLower, bool scale)
@@ -85,22 +67,6 @@ void SPxLPBase<Real>::changeLower(const VectorBase<Real>& newLower, bool scale)
     LPColSetBase<Real>::lower_w() = newLower;
   assert(isConsistent());
 }
-
-// template <>
-// void SPxLPBase<mpfr_float_50_eto>::changeLower(const VectorBase<mpfr_float_50_eto>& newLower, bool scale)
-// {
-//   assert(lower().dim() == newLower.dim());
-//   if( scale )
-//     {
-//       assert(_isScaled);
-//       assert(lp_scaler);
-//       LPColSetBase<mpfr_float_50_eto>::lower_w().scaleAssign(LPColSetBase<mpfr_float_50_eto>::scaleExp.get_const_ptr(), newLower, true);
-//     }
-//   else
-//     LPColSetBase<mpfr_float_50_eto>::lower_w() = newLower;
-//   assert(isConsistent());
-// }
-
 
 /// Changes vector of upper bounds to \p newUpper.
 template <>
@@ -119,21 +85,6 @@ void SPxLPBase<Real>::changeUpper(const VectorBase<Real>& newUpper, bool scale)
 }
 
 
-// /// Changes vector of upper bounds to \p newUpper.
-// template <>
-// void SPxLPBase<mpfr_float_50_eto>::changeUpper(const VectorBase<mpfr_float_50_eto>& newUpper, bool scale)
-// {
-//   assert(upper().dim() == newUpper.dim());
-//   if( scale )
-//     {
-//       assert(_isScaled);
-//       assert(lp_scaler);
-//       LPColSetBase<mpfr_float_50_eto>::upper_w().scaleAssign(LPColSetBase<mpfr_float_50_eto>::scaleExp.get_const_ptr(), newUpper, true);
-//     }
-//   else
-//     LPColSetBase<mpfr_float_50_eto>::upper_w() = newUpper;
-//   assert(isConsistent());
-// }
 
 // @todo; the boost version of the following function
 /// Changes left hand side vector for constraints to \p newLhs.

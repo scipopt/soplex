@@ -161,9 +161,7 @@ extern bool msginconsistent(const char* name, const char* file, int line);
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define THREADLOCAL
 #else
-  // @todo temporary fix
-// #define THREADLOCAL thread_local
-#define THREADLOCAL
+#define THREADLOCAL thread_local
 #endif
 #endif
 
@@ -394,13 +392,6 @@ inline Real spxLdexp(Real x, int exp)
 {
    return ldexpl(x,exp);
 }
-
-// @todo is the following needed?
-// // returns x and exp such that y = x * 2^exp
-// inline Real spxFrexp(Real y, int* exp)
-// {
-//    return frexpl(y, exp);
-// }
 
 #else
 /// returns |a|
