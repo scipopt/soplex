@@ -110,6 +110,7 @@ set(headers
     soplex/validation.h
     soplex/vectorbase.h
     soplex/vector.h
+    soplex/dvector.h
     soplex/wallclocktimer.h)
 
     # create soplex library with pic
