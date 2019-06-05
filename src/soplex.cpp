@@ -36,26 +36,5 @@
 
 namespace soplex
 {
-
-  // template <class R>
-	// bool SoPlexBase<R>::saveSettingsFile(const char* filename, const bool onlyChanged) const;
-
-  // template <class R>
-  // void SoPlexBase<R>::printShortStatistics(std::ostream& os);
-
-  // template <class R>
-  // SoPlexBase<R>::Settings::BoolParam::BoolParam();
-
-
-  // template <class R>
-  // R SoPlexBase<R>::realParam(const RealParam param) const;
-
-  // template <class R>
-  // SoPlexBase<R>::Settings::Settings();
-
-
-
-
-
-
+  
 } // namespace soplex

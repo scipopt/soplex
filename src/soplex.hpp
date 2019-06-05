@@ -565,11 +565,11 @@ namespace soplex
   SoPlexBase<R>::SoPlexBase(const SoPlexBase<R>& rhs)
   {
     // allocate memory as in default constructor
-    _statistics = 0;
+    _statistics = nullptr;
     spx_alloc(_statistics);
     _statistics = new (_statistics) Statistics();
 
-    _currentSettings = 0;
+    _currentSettings = nullptr;
     spx_alloc(_currentSettings);
     _currentSettings = new (_currentSettings) Settings();
 
@@ -594,7 +594,7 @@ namespace soplex
     spx_free(_statistics);
 
     // free real LP if different from the LP in the solver
-    assert(_realLP != 0);
+    assert(_realLP != nullptr);
     if( _realLP != &_solver )
       {
         _realLP->~SPxLPBase<R>();
@@ -602,16 +602,17 @@ namespace soplex
       }
 
     // free rational LP
-    if( _rationalLP != 0 )
+    if( _rationalLP != nullptr )
       {
         _rationalLP->~SPxLPRational();
         spx_free(_rationalLP);
       }
 
     // free unit vectors
-    for( int i = 0; i < _unitMatrixRational.size(); i++ )
+    auto uMatSize = _unitMatrixRational.size();
+    for(decltype(uMatSize) i = 0; i < uMatSize; i++)
       {
-        if( _unitMatrixRational[i] != 0 )
+        if( _unitMatrixRational[i] != nullptr)
           {
             _unitMatrixRational[i]->~UnitVectorRational();
             spx_free(_unitMatrixRational[i]);
