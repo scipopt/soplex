@@ -98,37 +98,9 @@ namespace soplex
       Rational(const mpq_t& q);
 #endif
 
+     // constructor from boost number
      template <typename T, boost::multiprecision::expression_template_option eto>
-     Rational(const boost::multiprecision::number<T, eto>& q)
-     {
-       if( Rational::useListMem )
-         {
-           dpointer = unusedPrivateList.last();
-
-           if( dpointer != nullptr )
-             {
-               assert(unusedPrivateList.first() != 0);
-               unusedPrivateList.remove(dpointer);
-               *dpointer = q;
-             }
-           else
-             {
-               assert(unusedPrivateList.first() == 0);
-               spx_alloc(dpointer);
-               new (dpointer) Private(q);
-             }
-         }
-       else
-         {
-           assert(unusedPrivateList.length() == 0);
-           dpointer = 0;
-           spx_alloc(dpointer);
-           new (dpointer) Private(q);
-         }
-
-       assert(dpointer != 0);
-
-     }
+     Rational(const boost::multiprecision::number<T, eto>& q);
 
       /// destructor
       ~Rational();
@@ -901,6 +873,45 @@ public:
     // @todo may need to work with edge cases like the other codes?
     // TODO look into this
   }
+
+  // Constructor from boost number. Code is exactly same as that of construction
+  // of Rational from mpq_t, basically a wrapper around the assignment operator
+  // (=) of the Private class; calls the boost number assignment operator.
+  template <typename T, boost::multiprecision::expression_template_option eto>
+  Rational::Rational(const boost::multiprecision::number<T, eto>& q)
+  {
+
+    // TODO Figure out why SCIP complains about the static variable problem
+    // (that useListMem doesn't exist)
+    if( Rational::useListMem )
+      {
+        dpointer = unusedPrivateList.last();
+
+        if( dpointer != nullptr )
+          {
+            assert(unusedPrivateList.first() != 0);
+            unusedPrivateList.remove(dpointer);
+            *dpointer = q;
+          }
+        else
+          {
+            assert(unusedPrivateList.first() == 0);
+            spx_alloc(dpointer);
+            new (dpointer) Private(q);
+          }
+      }
+    else
+      {
+        assert(unusedPrivateList.length() == 0);
+        dpointer = 0;
+        spx_alloc(dpointer);
+        new (dpointer) Private(q);
+      }
+
+    assert(dpointer != 0);
+
+  }
+
 
 
 
