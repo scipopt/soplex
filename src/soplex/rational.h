@@ -851,8 +851,10 @@ public:
       return thenext;
    }
 };
-#endif  // SOPLEX_WITH_GMP
 
+
+  // Definitions related to boost number and SoPlex Rational. This is still
+  // inside the #ifdef SOPLEX_WITH_GMP
 
   // Assignment operator from boost number. Uses the API for the Private class
   // to do this.
@@ -912,7 +914,7 @@ public:
 
   }
 
-
+#endif  // SOPLEX_WITH_GMP
 
 
    //@}
