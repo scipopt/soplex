@@ -28,6 +28,8 @@
 #include "soplex.h"
 #include "soplex/validation.h"
 
+#include "boost/program_options.hpp"
+
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
 #include "soplex/EGlib.h"

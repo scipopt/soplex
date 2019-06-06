@@ -105,7 +105,8 @@ LDFLAGS		=
 ARFLAGS		=	cr
 DFLAGS		=	-MM
 
-GMP_LDFLAGS	=	-lgmp
+# TODO need to move the -lboost argument to the correct variable. This would work though
+GMP_LDFLAGS	= -lgmp -lmpfr -lboost_program_options
 GMP_CPPFLAGS	=
 
 SOPLEXDIR	=	$(realpath .)

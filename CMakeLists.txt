@@ -110,6 +110,18 @@ if(GMP_FOUND)
     set(libs ${libs} ${GMP_LIBRARIES})
 endif()
 
+# Made with: https://stackoverflow.com/a/3917033/4223038
+if(BOOST)
+  # TODO There is also an optional argument that can be used to specify the
+  # minimum version of boost required. This may be useful for the multiprecision library
+  find_package(BOOST 1.67.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
+  if(BOOST_FOUND)
+    include_directories(${BOOST_INCLUDE_DIRS}) # TODO Does this even make sense?
+    set(libs ${libs} ${BOOST_LIBRARIES})       # Where are these variables defined? Same for the MPFR
+  endif()
+endif()
+
+
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-strict-overflow")
