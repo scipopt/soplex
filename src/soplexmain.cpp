@@ -709,9 +709,41 @@ int runSoPlex(const po::variables_map& vm)
           soplex->setIntParam(soplex->VERBOSITY, vm["verbosity"].as<int>());
         }
 
-      // For the boolean variables printPrimal, printPrimalRational etc, they
-      // will automatically get the values when the vm.notify() function gets
-      // called
+      // -x : print primal solution
+      if(vm.count("printprimal"))
+        {
+          printPrimal = true;
+        }
+
+      // -X : print primal solution with rationals
+      if(vm.count("printratsol"))
+        {
+          printPrimalRational = true;
+        }
+
+      // -y : print dual multipliers
+      if(vm.count("printdualmult"))
+        {
+          printDual = true;
+        }
+
+      // -Y : print dual multipliers with rationals
+      if(vm.count("printdualmultrational"))
+        {
+          printDualRational = true;
+        }
+
+      // -q : display detailed statistics
+      if(vm.count("dispstat"))
+        {
+          displayStatistics = true;
+        }
+
+      // -c : perform final check of optimal solution in original problem
+      if(vm.count("checkfinal"))
+        {
+          checkSol = true;
+        }
 
       // TODO what's the deal with the following code from the above stuff? case If --help or -h is called, then
 
