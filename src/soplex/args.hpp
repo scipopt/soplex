@@ -132,6 +132,7 @@ refinement, 3 - multi precision solve)")
   }
 
 
+  // TODO Maybe I can have this function inside the soplexmain.cpp. And the args function would return a variables_map. I call the runSoPlex function with the variables map.
 template <class R>
 int runSoPlex(const po::variables_map& vm)
 {
@@ -469,7 +470,7 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // save settings files
-      if( savesetname != nullptr )
+      if(!savesetname.empty())
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
          if( !soplex->saveSettingsFile(savesetname, false) )
@@ -477,7 +478,7 @@ int runSoPlex(const po::variables_map& vm)
             MSG_ERROR( std::cerr << "Error writing parameters to file <" << savesetname << ">\n" );
          }
       }
-      if( diffsetname != nullptr )
+      if(!diffsetname.empty())
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
          if( !soplex->saveSettingsFile(diffsetname, true) )
@@ -487,9 +488,9 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // no LP file given: exit after saving settings
-      if( lpfilename == nullptr )
+      if(!lpfilename.empty())
       {
-         if( loadsetname != nullptr || savesetname != nullptr || diffsetname != nullptr )
+        if(!loadsetname.empty() || !savesetname.empty() || !diffsetname.empty())
          {
             MSG_INFO1( soplex->spxout, soplex->spxout << "\n" );
          }
@@ -520,9 +521,9 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // write LP if specified
-      if( writefilename != nullptr )
+      if(!writefilename.empty())
       {
-         if( !soplex->writeFile(writefilename, &rownames, &colnames) )
+        if( !soplex->writeFile(writefilename.c_str(), &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while writing file <" << writefilename << ">.\n\n" );
             returnValue = 1;
@@ -535,9 +536,9 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // write dual LP if specified
-      if( writedualfilename != nullptr )
+      if(!writedualfilename.empty())
       {
-         if( !soplex->writeDualFileReal(writedualfilename, &rownames, &colnames) )
+        if( !soplex->writeDualFileReal(writedualfilename.c_str(), &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while writing dual file <" << writedualfilename << ">.\n\n" );
             returnValue = 1;
@@ -550,10 +551,10 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // read basis file if specified
-      if( readbasname != nullptr )
+      if(!readbasname.empty())
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Reading basis file <" << readbasname << "> . . . " );
-         if( !soplex->readBasisFile(readbasname, &rownames, &colnames) )
+         if( !soplex->readBasisFile(readbasname.c_str(), &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while reading file <" << readbasname << ">.\n" );
             returnValue = 1;
@@ -593,13 +594,13 @@ int runSoPlex(const po::variables_map& vm)
          validation->validateSolveReal(*soplex);
 
       // write basis file if specified
-      if( writebasname != nullptr )
+      if(!writebasname.empty())
       {
          if( !soplex->hasBasis() )
          {
             MSG_WARNING( soplex->spxout, soplex->spxout << "No basis information available.  Could not write file <" << writebasname << ">\n\n" );
          }
-         else if( !soplex->writeBasisFile(writebasname, &rownames, &colnames) )
+         else if( !soplex->writeBasisFile(writebasname.c_str(), &rownames, &colnames) )
          {
             MSG_ERROR( std::cerr << "Error while writing file <" << writebasname << ">.\n\n" );
             returnValue = 1;
@@ -611,15 +612,12 @@ int runSoPlex(const po::variables_map& vm)
          }
       }
    }
-   catch( const SPxException& x )
+   catch( const SPxException& x ) // There could be an exception from boost?
    {
       MSG_ERROR( std::cerr << "Exception caught: " << x.what() << "\n" );
       returnValue = 1;
       goto TERMINATE_FREESTRINGS;
    }
-
- TERMINATE_FREESTRINGS:
-   freeStrings(readbasname, writebasname, loadsetname, savesetname, diffsetname);
 
  TERMINATE:
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
