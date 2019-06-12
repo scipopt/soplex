@@ -1,15 +1,42 @@
 // Contains the list of all arguments
+#include <initializer_list>
+#include <algorithm>
+#include <iterator>
+#include <boost/bind.hpp>
+#include <boost/program_options/errors.hpp>
 
 namespace soplex
 {
   namespace po = boost::program_options;
 
+  // Checks if value is between [min, max] and if not throws an exception
+  template <typename T>
+  auto checkRange(const T& val, const T& min, const T& max)
+  {
+    if(val < min || val > max)
+      {
+        // TODO Maybe I should write the name?
+        throw po::validation_error::invalid_option_value;
+      }
+  }
+
+  // Checks if the element val is in the initializer_list
+  template <typename T>
+  auto in(const T& val, std::initializer_list<T> list)
+  {
+    auto lEnd = std::cend(list);
+    auto iter = std::find(val, std::cbegin(list), lEnd);
+
+    if(iter == lEnd)
+      {
+        throw po::validation_error::invalid_option_value;
+      }
+  }
+
+
   // Parses the command line arguments
   auto parseArgs(int argc, char* argv[])
   {
-
-    int verbosity;
-    int readmode, solvemode, s, g, p, r;
 
     // Define all the options
     po::options_description generic("generic options");
@@ -21,15 +48,15 @@ namespace soplex
     // print something like readbas=<basfile>?
     po::options_description general("general options");
     general.add_options()
-      ("readbas", po::value<std::vector<std::string> >(),  "read starting basis from file")
-      ("writebas", po::value<std::vector<std::string> >(), "write terminal basis to file")
-      ("writefile", po::value<std::vector<std::string> >(), "write LP to file in LP or MPS format depending on extension")
-      ("writedual", po::value<std::vector<std::string> >(),  "write the dual LP to a file in LP or MPS formal depending on extension")
+      ("readbas", po::value<std::vector<std::string>>(),  "read starting basis from file")
+      ("writebas", po::value<std::vector<std::string>>(), "write terminal basis to file")
+      ("writefile", po::value<std::vector<std::string>>(), "write LP to file in LP or MPS format depending on extension")
+      ("writedual", po::value<std::vector<std::string>>(),  "write the dual LP to a file in LP or MPS formal depending on extension")
       ("<type>:<name>=<val>", "change parameter value using syntax of settings file entries") // TODO: How do I deal with this?
-      ("loadset", po::value<std::vector<std::string> >(), "load parameters from settings file (overruled by command line parameters") // TODO: How do I deal with overruled?
-      ("saveset", po::value<std::vector<std::string> >(), "save parameters to settings file")
-      ("diffset", po::value<std::vector<std::string> >(), "save modified parameters to settings file")
-      ("extsol", po::value<std::vector<std::string> >(), "external solution for soplex to use for validation");
+      ("loadset", po::value<std::vector<std::string>>(), "load parameters from settings file (overruled by command line parameters") // TODO: How do I deal with overruled?
+      ("saveset", po::value<std::vector<std::string>>(), "save parameters to settings file")
+      ("diffset", po::value<std::vector<std::string>>(), "save modified parameters to settings file")
+      ("extsol", po::value<std::vector<std::string>>(), "external solution for soplex to use for validation");
 
     po::options_description lt("limits and tolerances");
     lt.add_options()
@@ -43,22 +70,29 @@ namespace soplex
 
     po::options_description algo("algorithmic settings (default in brackets)");
     algo.add_options()
-      ("readmode", po::value<int>(&readmode)->default_value(0), "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
-      ("solvemode", po::value<int>(&solvemode)->default_value(1), "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative
+      ("readmode", po::value<int>()->default_value(0)->notifier(boost::bind(in<int>, _1, {0, 1})),
+       "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
+      ("solvemode", po::value<int>()->default_value(1)->notifier(boost::bind(in<int>, _1, {0, 1, 2, 3})),
+       "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative
 refinement, 3 - multi precision solve)")
-      ("simplifier,s", po::value<int>(&s)->default_value(1), "choose simplifier/presolver (0 - off, 1 - auto)")
-      ("scaler,g", po::value<int>(&g)->default_value(2),  "choose scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)")
-      ("pricer,p", po::value<int>(&p)->default_value(0), "choose pricing (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)")
-      ("ratiotester,r", po::value<int>(&r)->default_value(3), "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
+      ("simplifier,s", po::value<int>()->default_value(1)->notifier(boost::bind(in<int>, _1, {0, 1, 2, 3})),
+       "choose simplifier/presolver (0 - off, 1 - auto)")
+      ("scaler,g", po::value<int>()->default_value(2)->notifier(boost::bind(in<int>, _1, {0, 1, 2, 3, 4, 5, 6})),
+       "choose scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)")
+      ("pricer,p", po::value<int>()->default_value(0)->notifier(boost::bind(int<int>, _1, {0, 1, 2, 3, 4, 5})),
+       "choose pricing (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)")
+      ("ratiotester,r", po::value<int>()->default_value(3)->notifier(boost::bind(int<int>, _1, {0, 1, 2, 3}))
+       "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
     po::options_description display("display options");
     display.add_options()
-      ("verbosity,v", po::value<int>(&verbosity)->default_value(3), "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the default
+      ("verbosity,v", po::value<int>()->default_value(3)->notifier(boost::bind(in<int>, _1, {0, 3, 5}))
+       "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the default
       ("printprimal,x",  "print primal solution")
       ("printdualmult,y", "print dual multipliers")
       ("printratsol,X", "print primal solution in rational numbers")
       ("printdualmultrational,Y", "print dual multipliers in rational numbers")
-      ("detstat,q", "display detailed statistics")
+      ("dispstat,q", "display detailed statistics")
       ("checkfinal,c", "perform final check of optimal solution in original problem");
 
     // These are parameters corresponding to the boolParam in SoPlex<R>::Settings
@@ -69,7 +103,7 @@ refinement, 3 - multi precision solve)")
     param.add_options()
       ("bool:lifting", po::value<bool>()->default_value(false), "should lifting be used to reduce range of nonzero matrix coefficients?")
       ("bool:eqtrans", po::value<bool>()->default_value(false), "should LP be transformed to equality form before a rational solve?")
-      ("testdualinf", po::value<bool>()->default_value(false), "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?");
+      ("bool:testdualinf", po::value<bool>()->default_value(false), "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?");
 
     po::options_description mpf("Multiprecision float solve");
     mpf.add_options()
@@ -95,9 +129,12 @@ refinement, 3 - multi precision solve)")
             return 0;
           }
 
-        // Relevant: https://stackoverflow.com/a/5517755/4223038
-        // This will make sure that all the required options are given, If not
-        // boost should (throw?) print an appropriate error
+        // Relevant: https://stackoverflow.com/a/5517755/4223038 This will make
+        // sure that all the required options are given, If not boost should
+        // (throw?) print an appropriate error. Also the notifier function while
+        // making the argument makes sure that a condition is met, such as
+        // whether the value given is in a certain range or inside an
+        // initializer_list
         po::notify(vm);
 
         switch(solvemode)
