@@ -48,6 +48,10 @@ namespace soplex
 
     int solvemode = 1;
 
+
+    po::positional_options_description p;
+    p.add("lpfile", -1);
+
     // Define all the options
     po::options_description generic("generic options");
     generic.add_options()
@@ -128,7 +132,7 @@ namespace soplex
         // type can be casted into the value we need.
         po::variables_map vm;
         // TODO: Maybe replace the parse_command_line with the other function?
-        po::store(po::parse_command_line(argc, argv, allOpt), vm);
+        po::store(po::command_line_parser(argc, argv).options(allOpt).positional(p).run(), vm);
 
 
         // If help is an option, print the help message and quit

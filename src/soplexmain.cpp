@@ -54,6 +54,7 @@ int main(int argc, char* argv[]);
 static
 void printUsage(const char* const argv[], int idx)
 {
+  // TODO: Get rid of this! yay
    const char* usage =
       "general options:\n"
       "  --readbas=<basfile>    read starting basis from file\n"
@@ -105,6 +106,7 @@ void printUsage(const char* const argv[], int idx)
              << usage;
 }
 
+// TODO: Get rid of this
 // cleans up C strings
 static
 void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
@@ -581,7 +583,7 @@ int runSoPlex(const po::variables_map& vm)
 
    // TODO: Figure out how to deal with lpfilename; it was mentioned in the documentation
 
-
+   readIntoString(lpfilename, "lpfile"); // TODO Somehow it doesn't get to this point
    readIntoString(readbasname, "readbas");
    readIntoString(writebasname, "writebas");
    readIntoString(writefilename, "writefile");
