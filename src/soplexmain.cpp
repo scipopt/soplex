@@ -508,11 +508,6 @@ void printDualSolution(SoPlexBase<R>& soplex, NameSet& colnames, NameSet& rownam
 }
 
 
-// Runs SoPlex with parsed boost variables map
-template <class R>
-int runSoPlex(const po::variables_map& vm);
-
-
 /// runs SoPlexBase command line
 int main(int argc, char* argv[])
 {
@@ -547,6 +542,8 @@ int main(int argc, char* argv[])
 }
 
 
+namespace soplex{
+
 // Runs SoPlex with the parsed boost variables map
 template <class R>
 int runSoPlex(const po::variables_map& vm)
@@ -577,7 +574,8 @@ int runSoPlex(const po::variables_map& vm)
                                var = vm[str].as<std::string>();
                                // TODO Did I use the spxSnprintf correctly?
                                // Maybe the + 1 is wrong. Check out the syntax later
-                               spxSnprintf(var, var.size() + 1, "%s", filename);
+                               // spxSnprintf(var, var.size() + 1, "%s", filename);
+                               // TODO Fix this
                              }
                          };
 
@@ -637,7 +635,10 @@ int runSoPlex(const po::variables_map& vm)
 
           // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
           // the rational LP is kept after reading
-          else if( soplex->intParam(soplex->READMODE) == soplex->READMODE_RATIONAL
+
+          // TODO: Look at this if statement. It used to be an else if
+
+          if( soplex->intParam(soplex->READMODE) == soplex->READMODE_RATIONAL
                    && soplex->intParam(soplex->SOLVEMODE) != soplex->SOLVEMODE_REAL )
             {
               soplex->setIntParam(soplex->SYNCMODE, soplex->SYNCMODE_AUTO);
@@ -650,7 +651,7 @@ int runSoPlex(const po::variables_map& vm)
         {
           auto input = vm["extsol"].as<std::string>();
 
-          validation.updateExternalSolution(input.c_str());
+          validation->updateExternalSolution(input.c_str());
         }
 
       // TODO: Code for --type:name=<val>: How am I supposed to handle this?
@@ -664,7 +665,7 @@ int runSoPlex(const po::variables_map& vm)
       // -i<n> : set iteration limit to <n>
       if(vm.count("iterlimit"))
         {
-          soplex->setRealParam(soplex->ITERLIMIT, vm["iterlimit"].as<int>());
+          soplex->setIntParam(soplex->ITERLIMIT, vm["iterlimit"].as<int>());
         }
 
       // -f<eps> : set primal feasibility tolerance to <eps>
@@ -682,7 +683,8 @@ int runSoPlex(const po::variables_map& vm)
       // l<eps> : set validation tolerance to <eps>
       if(vm.count("valtol"))
         {
-          validation->updateValidationTolerance();
+          auto str = vm["valtol"].as<std::string>();
+          validation->updateValidationTolerance(str.c_str());
         }
 
       // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
@@ -694,7 +696,7 @@ int runSoPlex(const po::variables_map& vm)
       // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares, 6 - geometric-equilibrium)
       if(vm.count("scaler"))
         {
-          soplex->setIntParam(soplex->PRICER, vm["scaler"]);
+          soplex->setIntParam(soplex->PRICER, vm["scaler"].as<int>());
         }
 
       // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
@@ -1003,7 +1005,8 @@ int runSoPlex(const po::variables_map& vm)
         if( lpfilename.empty() && savesetname.empty() && diffsetname.empty())
       {
         // TODO: The printUsage should be different, also the GOTO macro
-         printUsage(argv, 0);
+        // TODO fix the printUsage stuff
+         // printUsage(argv, 0);
          returnValue = 1;
          goto TERMINATE_FREESTRINGS;
       }
@@ -1020,7 +1023,7 @@ int runSoPlex(const po::variables_map& vm)
       if(!savesetname.empty())
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
-         if( !soplex->saveSettingsFile(savesetname, false) )
+         if( !soplex->saveSettingsFile(savesetname.c_str(), false) )
          {
             MSG_ERROR( std::cerr << "Error writing parameters to file <" << savesetname << ">\n" );
          }
@@ -1028,7 +1031,7 @@ int runSoPlex(const po::variables_map& vm)
       if(!diffsetname.empty())
       {
          MSG_INFO1( soplex->spxout, soplex->spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
-         if( !soplex->saveSettingsFile(diffsetname, true) )
+         if( !soplex->saveSettingsFile(diffsetname.c_str(), true) )
          {
             MSG_ERROR( std::cerr << "Error writing modified parameters to file <" << diffsetname << ">\n" );
          }
@@ -1060,7 +1063,7 @@ int runSoPlex(const po::variables_map& vm)
          << (soplex->intParam(soplex->READMODE) == soplex->READMODE_REAL ? "(real)" : "(rational)")
          << " LP file <" << lpfilename << "> . . .\n" );
 
-      if( !soplex->readFile(lpfilename, &rownames, &colnames) )
+      if( !soplex->readFile(lpfilename.c_str(), &rownames, &colnames) )
       {
          MSG_ERROR( std::cerr << "Error while reading file <" << lpfilename << ">.\n" );
          returnValue = 1;
@@ -1166,6 +1169,8 @@ int runSoPlex(const po::variables_map& vm)
       goto TERMINATE_FREESTRINGS;
    }
 
+ TERMINATE_FREESTRINGS:
+
  TERMINATE:
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
@@ -1190,6 +1195,5 @@ int runSoPlex(const po::variables_map& vm)
 
    return returnValue;
 }
-
-
+}
 

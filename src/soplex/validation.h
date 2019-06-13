@@ -33,8 +33,8 @@ public:
    /// should the soplex solution be validated?
    bool           validate;
 
-   /// external solution used for validation
-   char*          validatesolution;
+  /// external solution used for validation
+  const char*          validatesolution;
 
    /// tolerance used for validation
    double         validatetolerance;
@@ -53,11 +53,11 @@ public:
       ;
    }
 
-   /// updates the external solution used for validation
-   bool updateExternalSolution(char* solution);
+      /// updates the external solution used for validation
+      bool updateExternalSolution(const char* solution);
 
-   /// updates the tolerance used for validation
-   bool updateValidationTolerance(char* tolerance);
+      /// updates the tolerance used for validation
+      bool updateValidationTolerance(const char* tolerance);
 
    /// validates the soplex solution using the external solution
    void validateSolveReal(SoPlexBase<R>& soplex);
