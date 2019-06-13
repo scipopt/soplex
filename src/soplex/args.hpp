@@ -3,31 +3,39 @@
 #include <algorithm>
 #include <iterator>
 #include <boost/bind.hpp>
+#include <boost/program_options.hpp>
 #include <boost/program_options/errors.hpp>
+
+namespace po = boost::program_options;
 
 namespace soplex
 {
-  namespace po = boost::program_options;
+
+  // Runs SoPlex with parsed boost variables map
+  template <class R>
+  int runSoPlex(const po::variables_map& vm);
+
 
   // Checks if value is between [min, max] and if not throws an exception
   template <typename T>
-  auto checkRange(const T& val, const T& min, const T& max)
+  void checkRange(const T& val, const T& min, const T& max)
   {
     if(val < min || val > max)
       {
         // TODO Maybe I should write the name?
-        throw po::validation_error::invalid_option_value;
+        // throw po::validation_error::invalid_option_value;
+        // Figure this out
       }
   }
 
   // Checks if the element val is in the initializer_list
   template <typename T>
-  auto in(const T& val, std::initializer_list<T> list)
+  void in(const T& val, std::initializer_list<T> list)
   {
-    auto lEnd = std::cend(list);
-    auto iter = std::find(val, std::cbegin(list), lEnd);
+    auto lEnd = list.cend();
+    auto iter = std::find(val, list.cbegin(), lEnd);
 
-    if(iter == lEnd)
+    if(iter == lEnd)            // meaning that val is not in the list
       {
         throw po::validation_error::invalid_option_value;
       }
@@ -35,8 +43,10 @@ namespace soplex
 
 
   // Parses the command line arguments
-  auto parseArgs(int argc, char* argv[])
+  auto parseArgs(int argc, char* argv[]) -> int
   {
+
+    int solvemode = 1;
 
     // Define all the options
     po::options_description generic("generic options");
@@ -70,23 +80,22 @@ namespace soplex
 
     po::options_description algo("algorithmic settings (default in brackets)");
     algo.add_options()
-      ("readmode", po::value<int>()->default_value(0)->notifier(boost::bind(in<int>, _1, {0, 1})),
+      ("readmode", po::value<int>()->default_value(0)->notifier(boost::bind(&checkRange<int>, _1, 0, 1)),
        "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
-      ("solvemode", po::value<int>()->default_value(1)->notifier(boost::bind(in<int>, _1, {0, 1, 2, 3})),
-       "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative
-refinement, 3 - multi precision solve)")
-      ("simplifier,s", po::value<int>()->default_value(1)->notifier(boost::bind(in<int>, _1, {0, 1, 2, 3})),
+      ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(boost::bind(&checkRange<int>, _1, 0, 3)),
+       "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)")
+      ("simplifier,s", po::value<int>()->default_value(1)->notifier(boost::bind(&checkRange<int>, _1, 0, 3)),
        "choose simplifier/presolver (0 - off, 1 - auto)")
-      ("scaler,g", po::value<int>()->default_value(2)->notifier(boost::bind(in<int>, _1, {0, 1, 2, 3, 4, 5, 6})),
+      ("scaler,g", po::value<int>()->default_value(2)->notifier(boost::bind(&checkRange<int>, _1, 0, 6)),
        "choose scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)")
-      ("pricer,p", po::value<int>()->default_value(0)->notifier(boost::bind(int<int>, _1, {0, 1, 2, 3, 4, 5})),
+      ("pricer,p", po::value<int>()->default_value(0)->notifier(boost::bind(&checkRange<int>, _1, 0, 5)),
        "choose pricing (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)")
-      ("ratiotester,r", po::value<int>()->default_value(3)->notifier(boost::bind(int<int>, _1, {0, 1, 2, 3}))
+      ("ratiotester,r", po::value<int>()->default_value(3)->notifier(boost::bind(&checkRange<int>, _1, 0, 3)),
        "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
     po::options_description display("display options");
     display.add_options()
-      ("verbosity,v", po::value<int>()->default_value(3)->notifier(boost::bind(in<int>, _1, {0, 3, 5}))
+      ("verbosity,v", po::value<int>()->default_value(3)->notifier(boost::bind(&checkRange<int>, _1, 0, 5)), // TODO: Figure this out
        "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the default
       ("printprimal,x",  "print primal solution")
       ("printdualmult,y", "print dual multipliers")
@@ -100,7 +109,7 @@ refinement, 3 - multi precision solve)")
     // SoPlex Object. In the old SoPlex, half of the parsing happened outside
     // SoPlex and the rest inside the SoPlex.
     po::options_description boolParam("bool Parameters");
-    param.add_options()
+    boolParam.add_options()
       ("bool:lifting", po::value<bool>()->default_value(false), "should lifting be used to reduce range of nonzero matrix coefficients?")
       ("bool:eqtrans", po::value<bool>()->default_value(false), "should LP be transformed to equality form before a rational solve?")
       ("bool:testdualinf", po::value<bool>()->default_value(false), "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?");
@@ -108,7 +117,7 @@ refinement, 3 - multi precision solve)")
     po::options_description mpf("Multiprecision float solve");
     mpf.add_options()
       ("mpf", "Run templated multi-precision SoPlex") // This is redundant; there is the solvemode param
-      ("precision", po::value<unsigned int>()->default_value(), "Minimum precision of mpf float");
+      ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float");
 
     po::options_description allOpt("Allowed options");
     allOpt.add(generic).add(general).add(lt).add(algo).add(display);
@@ -155,6 +164,7 @@ refinement, 3 - multi precision solve)")
       }
     catch(std::exception& e)
       {
+        // TODO: How does SoPlex Handle the std::cerr?
         std::cerr<<"error: "<<e.what()<<"\n\n";
         // print the help message
         std::cout<<allOpt<<"\n";
@@ -168,6 +178,7 @@ refinement, 3 - multi precision solve)")
     return 0;
 
   }
+
 
 
 }
