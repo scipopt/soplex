@@ -22,6 +22,8 @@ include(CPack)
 option(ZLIB "Use ZLIB" ON)
 option(GMP "Use GMP" ON)
 option(STATIC_GMP "Prefer static GMP lib" OFF)
+option(MPFR "Use MPFR" ON)
+option(Boost "Use Boost" ON)
 option(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS "Export all symbols into the DLL" ON)
 option(MT "use static runtime libraries for Visual Studio compiler" OFF)
 option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
@@ -111,10 +113,11 @@ if(GMP_FOUND)
 endif()
 
 # Made with: https://stackoverflow.com/a/3917033/4223038
-if(BOOST)
-  # TODO There is also an optional argument that can be used to specify the
-  # minimum version of boost required. This may be useful for the multiprecision library
-  find_package(BOOST 1.67.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
+if(Boost)
+  # Technically the version 1.70.0 is not needed for program_option, but for the
+  # multiprecision, but it's header only, this is one way to guarantee that the
+  # user has the right version.
+  find_package(Boost 1.70.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
   if(BOOST_FOUND)
     include_directories(${BOOST_INCLUDE_DIRS}) # TODO Does this even make sense?
     set(libs ${libs} ${BOOST_LIBRARIES})       # Where are these variables defined? Same for the MPFR
@@ -124,7 +127,7 @@ endif()
 
 # enable all warnings and explicitly switch on colored output for ninja
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wno-strict-overflow")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -lboost_program_options -Wall -Wno-strict-overflow")
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
     endif()
