@@ -574,16 +574,10 @@ int runSoPlex(const po::variables_map& vm)
                            if(vm.count(str))
                              {
                                var = vm[str].as<std::string>();
-                               // TODO Did I use the spxSnprintf correctly?
-                               // Maybe the + 1 is wrong. Check out the syntax later
-                               // spxSnprintf(var, var.size() + 1, "%s", filename);
-                               // TODO Fix this
                              }
                          };
 
-   // TODO: Figure out how to deal with lpfilename; it was mentioned in the documentation
-
-   readIntoString(lpfilename, "lpfile"); // TODO Somehow it doesn't get to this point
+   readIntoString(lpfilename, "lpfile");
    readIntoString(readbasname, "readbas");
    readIntoString(writebasname, "writebas");
    readIntoString(writefilename, "writefile");
@@ -591,9 +585,6 @@ int runSoPlex(const po::variables_map& vm)
    readIntoString(loadsetname, "loadset");
    readIntoString(savesetname, "saveset");
    readIntoString(diffsetname, "diffset");
-
-   // TODO: What about extsol?
-
 
    try
    {
@@ -1040,7 +1031,7 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // no LP file given: exit after saving settings
-      if(!lpfilename.empty())
+      if(lpfilename.empty())
       {
         if(!loadsetname.empty() || !savesetname.empty() || !diffsetname.empty())
          {
