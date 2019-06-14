@@ -704,7 +704,7 @@ int runSoPlex(const po::variables_map& vm)
       // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
       if(vm.count("ratiotester"))
         {
-          soplex->setIntParam(soplex->RATIOTESTER, vm["rationtester"].as<int>());
+          soplex->setIntParam(soplex->RATIOTESTER, vm["ratiotester"].as<int>());
         }
 
       // -v<level> : set verbosity to <level> (0 - error, 3 - normal, 5 - high)

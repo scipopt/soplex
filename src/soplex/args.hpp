@@ -62,15 +62,16 @@ namespace soplex
     // print something like readbas=<basfile>?
     po::options_description general("general options");
     general.add_options()
-      ("readbas", po::value<std::vector<std::string>>(),  "read starting basis from file")
-      ("writebas", po::value<std::vector<std::string>>(), "write terminal basis to file")
-      ("writefile", po::value<std::vector<std::string>>(), "write LP to file in LP or MPS format depending on extension")
-      ("writedual", po::value<std::vector<std::string>>(),  "write the dual LP to a file in LP or MPS formal depending on extension")
+      ("lpfile", po::value<std::string>(), "the lp file")
+      ("readbas", po::value<std::string>(),  "read starting basis from file")
+      ("writebas", po::value<std::string>(), "write terminal basis to file")
+      ("writefile", po::value<std::string>(), "write LP to file in LP or MPS format depending on extension")
+      ("writedual", po::value<std::string>(),  "write the dual LP to a file in LP or MPS formal depending on extension")
       ("<type>:<name>=<val>", "change parameter value using syntax of settings file entries") // TODO: How do I deal with this?
-      ("loadset", po::value<std::vector<std::string>>(), "load parameters from settings file (overruled by command line parameters") // TODO: How do I deal with overruled?
-      ("saveset", po::value<std::vector<std::string>>(), "save parameters to settings file")
-      ("diffset", po::value<std::vector<std::string>>(), "save modified parameters to settings file")
-      ("extsol", po::value<std::vector<std::string>>(), "external solution for soplex to use for validation");
+      ("loadset", po::value<std::string>(), "load parameters from settings file (overruled by command line parameters") // TODO: How do I deal with overruled?
+      ("saveset", po::value<std::string>(), "save parameters to settings file")
+      ("diffset", po::value<std::string>(), "save modified parameters to settings file")
+      ("extsol", po::value<std::string>(), "external solution for soplex to use for validation");
 
     po::options_description lt("limits and tolerances");
     lt.add_options()
