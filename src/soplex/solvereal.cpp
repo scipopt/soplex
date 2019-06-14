@@ -543,6 +543,8 @@ void SoPlex::_storeSolutionReal(bool verify)
       assert(_simplifier->result() == SPxSimplifier::OKAY);
       assert(_realLP != &_solver);
 
+      SPxBasis::SPxStatus simplifiedBasisStatus = _solver.getBasisStatus();
+
       try
       {
          // pass solution data of transformed problem to simplifier
@@ -571,13 +573,16 @@ void SoPlex::_storeSolutionReal(bool verify)
       // load original problem but don't setup a slack basis
       _loadRealLP(false);
 
+
       assert(_realLP == &_solver);
 
+      // reset basis status
+      _solver.setBasisStatus(simplifiedBasisStatus);
+
+      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       // load unsimplified basis into solver
       assert(_basisStatusRows.size() == numRowsReal());
       assert(_basisStatusCols.size() == numColsReal());
-      _solver.setBasisStatus(SPxBasis::REGULAR);
-      _solver.setBasis(_basisStatusRows.get_const_ptr(), _basisStatusCols.get_const_ptr());
       _hasBasis = true;
    }
    // load realLP into the solver again (internal scaling was applied)
