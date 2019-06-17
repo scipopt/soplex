@@ -2,49 +2,62 @@
 #include <initializer_list>
 #include <algorithm>
 #include <iterator>
-#include <boost/bind.hpp>
+#include <fstream>
+#include <initializer_list>
 #include <boost/program_options.hpp>
 #include <boost/program_options/errors.hpp>
+#include <boost/exception/diagnostic_information.hpp>
 
 namespace po = boost::program_options;
 
 namespace soplex
 {
 
-  // Runs SoPlex with parsed boost variables map
+  // Runs SoPlex with parsed boost variables map, defined in soplexmain
   template <class R>
   int runSoPlex(const po::variables_map& vm);
 
 
-  // Checks if value is between [min, max] and if not throws an exception
-  template <typename T>
-  void checkRange(const T& val, const T& min, const T& max)
-  {
-    if(val < min || val > max)
-      {
-        // TODO Maybe I should write the name?
-        // throw po::validation_error::invalid_option_value;
-        // Figure this out
-      }
-  }
-
-  // Checks if the element val is in the initializer_list
-  template <typename T>
-  void in(const T& val, std::initializer_list<T> list)
-  {
-    auto lEnd = list.cend();
-    auto iter = std::find(val, list.cbegin(), lEnd);
-
-    if(iter == lEnd)            // meaning that val is not in the list
-      {
-        throw po::validation_error::invalid_option_value;
-      }
-  }
 
 
   // Parses the command line arguments
   auto parseArgs(int argc, char* argv[]) -> int
   {
+
+    // Two helper functions to check if a command line argument lies in a range
+    // or in a list of values. Throws an exception if it doesn't. The functions
+    // return another function/lambda Will be used during the vm.notify()
+
+    // Checks if the val lies in [min, max]
+    // todo If we have c++14, we can replace all the "int" with auto or use a template
+    auto checkRange = [](const int& min, const int& max, const std::string& str)
+                      {
+                        return [&min, &max, &str](const int& val)
+  {
+    if(val < min || val > max)
+      {
+                                     throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
+  }
+                               };
+                      };
+
+
+    // Checks whether a value is inside a list and if not, it throws an error
+    // todo If we have c++14, we can replace all the "int" with auto or use a template
+    auto in = [](const std::initializer_list<int>& list, const std::string& str)
+  {
+                return [&list, &str](const int& val)
+                       {
+                         auto lEnd = list.end();
+                         auto iter = std::find(list.begin(), list.end(), val);
+
+    if(iter == lEnd)            // meaning that val is not in the list
+      {
+                             throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
+  }
+                       };
+              };
+
 
     int solvemode = 1;
 
@@ -85,22 +98,22 @@ namespace soplex
 
     po::options_description algo("algorithmic settings (default in brackets)");
     algo.add_options()
-      ("readmode", po::value<int>()->default_value(0)->notifier(boost::bind(&checkRange<int>, _1, 0, 1)),
+      ("readmode", po::value<int>()->default_value(0)->notifier(checkRange(0, 1, "readmode")),
        "choose reading mode for <lpfile> (0 - floating-point, 1 - rational)")
-      ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(boost::bind(&checkRange<int>, _1, 0, 3)),
+      ("solvemode", po::value<int>(&solvemode)->default_value(1)->notifier(checkRange(0, 3, "solvemode")),
        "choose solving mode (0 - floating-point solve, 1 - auto, 2 - force iterative refinement, 3 - multi precision solve)")
-      ("simplifier,s", po::value<int>()->default_value(1)->notifier(boost::bind(&checkRange<int>, _1, 0, 3)),
+      ("simplifier,s", po::value<int>()->default_value(1)->notifier(checkRange(0, 3, "simplifier")),
        "choose simplifier/presolver (0 - off, 1 - auto)")
-      ("scaler,g", po::value<int>()->default_value(2)->notifier(boost::bind(&checkRange<int>, _1, 0, 6)),
+      ("scaler,g", po::value<int>()->default_value(2)->notifier(checkRange(0, 6, "scaler")),
        "choose scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)")
-      ("pricer,p", po::value<int>()->default_value(0)->notifier(boost::bind(&checkRange<int>, _1, 0, 5)),
+      ("pricer,p", po::value<int>()->default_value(0)->notifier(checkRange(0, 5, "pricer")),
        "choose pricing (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)")
-      ("ratiotester,r", po::value<int>()->default_value(3)->notifier(boost::bind(&checkRange<int>, _1, 0, 3)),
+      ("ratiotester,r", po::value<int>()->default_value(3)->notifier(checkRange(0, 3, "ratiotester")),
        "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
     po::options_description display("display options");
     display.add_options()
-      ("verbosity,v", po::value<int>()->default_value(3)->notifier(boost::bind(&checkRange<int>, _1, 0, 5)), // TODO: Figure this out
+      ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 3, 5}, "verbosity")), // TODO: Figure this out, needs to be replaced by a set or an initializer list
        "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the default
       ("printprimal,x",  "print primal solution")
       ("printdualmult,y", "print dual multipliers")
@@ -167,7 +180,7 @@ namespace soplex
           }
 
       }
-    catch(std::exception& e)
+    catch(po::error& e)
       {
         // TODO: How does SoPlex Handle the std::cerr?
         std::cerr<<"error: "<<e.what()<<"\n\n";
@@ -177,13 +190,20 @@ namespace soplex
       }
     catch(...)
       {
-        std::cerr<<"Exception of unknown type\n";
+        std::cerr<<"Unhandled exception\n"<<boost::current_exception_diagnostic_information()<<"\n";
+        return 0;
       }
 
     return 0;
 
   }
 
+  // TODO Look into this
+  // Checks whether a file exists
+  bool fileExists(const std::string& str) // Maybe throw an exception
+  {
+    return static_cast<bool>(std::ifstream(str));
+  }
 
 
 }
