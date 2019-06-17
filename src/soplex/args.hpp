@@ -33,11 +33,11 @@ namespace soplex
     auto checkRange = [](const int& min, const int& max, const std::string& str)
                       {
                         return [&min, &max, &str](const int& val)
-  {
-    if(val < min || val > max)
-      {
+                               {
+                                 if(val < min || val > max)
+                                   {
                                      throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
-  }
+                                   }
                                };
                       };
 
@@ -45,16 +45,16 @@ namespace soplex
     // Checks whether a value is inside a list and if not, it throws an error
     // todo If we have c++14, we can replace all the "int" with auto or use a template
     auto in = [](const std::initializer_list<int>& list, const std::string& str)
-  {
+              {
                 return [&list, &str](const int& val)
                        {
                          auto lEnd = list.end();
                          auto iter = std::find(list.begin(), list.end(), val);
 
-    if(iter == lEnd)            // meaning that val is not in the list
-      {
+                         if(iter == lEnd)            // meaning that val is not in the list
+                           {
                              throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
-  }
+                           }
                        };
               };
 
