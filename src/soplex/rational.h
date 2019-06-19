@@ -118,22 +118,18 @@ public:
 
    /// assignment operator from int
    Rational& operator=(const int& i);
-
-#ifdef SOPLEX_WITH_GMP
-   /// assignment operator from mpq_t
-   Rational& operator=(const mpq_t& q);
-#endif
-
    //@}
 
-
-   //**@name Typecasts */
-   //@{
-
-   operator double() const;
-   operator long double() const;
-
 #ifdef SOPLEX_WITH_GMP
+   /// @name GMP Only methods
+   ///
+   /// Methods of the Rational class that are only available if SoPlex is compiled with "-DGMP=on"
+   ///
+   ///@{
+
+   /// assignment operator from mpq_t
+   Rational& operator=(const mpq_t& q);
+
    /// provides read-only access to underlying mpq_t
    const mpq_t* getMpqPtr() const;
 
@@ -145,8 +141,16 @@ public:
 
    /// provides write access to underlying mpq_t; use with care
    mpq_t& getMpqRef_w() const;
+   ///@} // end of RationalWithGMP
 #endif
-   //@}
+
+   ///@name Typecasts
+   ///@{
+
+   operator double() const;
+   operator long double() const;
+
+   ///@}
 
 
    //**@name Arithmetic operators */
