@@ -149,7 +149,35 @@ namespace soplex
     po::options_description intParam("Integer parameters");
     intParam.add_options()
       ("int:objsense", po::value<int>()->default_value(1)->notifier(in({-1, 1}, "int:objsense")), "objective sense (-1 - minimize, +1 - maximize)")
-      ("int:representation", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:representation"), "type of computational form (0 - auto, 1 - column representation, 2 - row representation)");
+      ("int:representation", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:representation"), "type of computational form (0 - auto, 1 - column representation, 2 - row representation)"))
+      ("int:algorithm", po::value<int>()->default_value(1)->notifier(checkRange(0, 1, "int:algorithm")), "type of algorithm (0 - primal, 1 - dual)")
+      ("int:factor_update_type", po::value<int>()->default_value(1)->notifier(checkRange(0, 1, "int:factor_update_type")), "type of LU update (0 - eta update, 1 - Forrest-Tomlin update)")
+      ("int:factor_update_max", po::value<int>()->default_value(0)->notifier(checkRange(0, INT_MAX, "int:factor_update_max")), "maximum number of LU updates without fresh factorization (0 - auto)")
+      ("int:iterlimit", po::value<int>()->default_value(-1)->notifier(checkRange(-1, INT_MAX, "int:iterlimit")), "iteration limit (-1 - no limit)")
+      ("int:reflimit", po::value<int>()->default_value(-1)->notifier(checkRange(-1, INT_MAX, "int:reflimit")), "refinement limit (-1 - no limit)")
+      ("int:stallreflimit", po::value<int>()->default_value(-1)->notifier(checkRange(-1, INT_MAX, "int:stallreflimit")), "stalling refinement limit (-1 - no limit)")
+      ("int:displayfreq", po::value<int>()->default_value(200)->notifier(checkRange(1, INT_MAX, "int:displayfreq")), "display frequency")
+      ("int:verbosity", po::value<int>()->default_value(3)->notifier(checkRange(0, 5, "int:verbosity")), "verbosity level (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full)")
+      ("int:simplifier", po::value<int>()->default_value(1)->notifier(checkRange(0, 1, "int:simplifier")), "simplifier (0 - off, 1 - auto)")
+      ("int:scaler", po::value<int>()->default_value(2)->notifier(checkRange(0, 6, "int:scaler")), "scaling (0 - off, 1 - uni-equilibrium, 2 - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)")
+      ("int:starter", po::value<int>()->default_value(0)->notifier(checkRange(0, 3, "int:starter")), "crash basis generated when starting from scratch (0 - none, 1 - weight, 2 - sum, 3 - vector)")
+      ("int:pricer", po::value<int>()->default_value(0)->notifier(checkRange(0, 5, "int:pricer")), "pricing method (0 - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)")
+      ("int:ratiotester", po::value<int>()->default_value(3)->notifier(checkRange(0, 3, "int:ratiotester")), "method for ratio test (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)")
+      ("int:syncmode", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:syncmode")), "mode for synchronizing real and rational LP (0 - store only real LP, 1 - auto, 2 - manual)")
+      ("int:readmode", po::value<int>()->default_value(0)->notifier(checkRange(0, 1, "int:readmode")), "mode for reading LP files (0 - floating-point, 1 - rational)")
+      ("int:solvemode", po::value<int>()->default_value(1)->notifier(checkRange(0, 2, "int:solvemode")), "mode for iterative refinement strategy (0 - floating-point solve, 1 - auto, 2 - exact rational solve)")
+      ("int:checkmode", po::value<int>()->default_value(1)->notifier(checkRange(0, 2, "int:checkmode")), "mode for a posteriori feasibility checks (0 - floating-point check, 1 - auto, 2 - exact rational check)")
+      ("int:timer", po::value<int>()->default_value(1)->notifier(checkRange(0, 2, "int:timer")), "type of timer (1 - cputime, aka. usertime, 2 - wallclock time, 0 - no timing)")
+      ("int:hyperpricing", po::value<int>()->default_value(1)->notifier(checkRange(0, 2, "int:hyperpricing")), "mode for hyper sparse pricing (0 - off, 1 - auto, 2 - always)")
+      ("int:ratfac_minstalls", po::value<int>()->default_value(2)->notifier(checkRange(0, INT_MAX, "int:ratfac_minstalls")), "minimum number of stalling refinements since last pivot to trigger rational factorization")
+      ("int:leastsq_maxrounds", po::value<int>()->default_value(50)->notifier(checkRange(0, INT_MAX, "int:leastsq_maxrounds")), "maximum number of conjugate gradient iterations in least square scaling")
+      ("int:solution_polishing", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:solution_polishing")), "mode for solution polishing (0 - off, 1 - max basic slack, 2 - min basic slack)")
+      ("int:decomp_iterlimit", po::value<int>()->default_value(100)->notifier(checkRange(1, INT_MAX, "int:decomp_iterlimit")), "the number of iterations before the decomposition simplex initialisation solve is terminated")
+      ("int:decomp_maxaddedrows", po::value<int>()->default_value(500)->notifier(checkRange(1, INT_MAX, "int:decomp_maxaddedrows")), "maximum number of rows that are added to the reduced problem when using the decomposition based simplex")
+      ("int:decomp_displayfreq", po::value<int>()->default_value(50)->notifier(checkRange(1, INT_MAX, "int:decomp_displayfreq")), "the frequency that the decomposition based simplex status output is displayed.")
+      ("int:decomp_verbosity", po::value<int>()->default_value(0)->notifier(checkRange(1, 5, "int:decomp_verbosity")), "the verbosity of decomposition based simplex (0 - error, 1 - warning, 2 - debug, 3 - normal, 4 - high, 5 - full).")
+      ("int:printbasismetric", po::value<int>()->default_value(-1)->notifier(checkRange(-1, 3, "int:printbasismetric")), "print basis metric during the solve (-1 - off, 0 - condition estimate , 1 - trace, 2 - determinant, 3 - condition)");
+
 
 
     po::options_description mpf("Multiprecision float solve");
@@ -157,73 +185,73 @@ namespace soplex
       ("mpf", "Run templated multi-precision SoPlex") // This is redundant; there is the solvemode param
       ("precision", po::value<unsigned int>()->default_value(100)->notifier(check, "Minimum precision of mpf float");
 
-    po::options_description allOpt("Allowed options");
-    allOpt.add(generic).add(general).add(lt).add(algo).add(display);
+       po::options_description allOpt("Allowed options");
+       allOpt.add(generic).add(general).add(lt).add(algo).add(display);
 
-    try
+       try
+         {
+           // A hash map that takes a string to a boost::any type. The boost:any
+           // type can be casted into the value we need.
+           po::variables_map vm;
+           // TODO: Maybe replace the parse_command_line with the other function?
+           po::store(po::command_line_parser(argc, argv).options(allOpt).positional(p).run(), vm);
+
+
+           // If help is an option, print the help message and quit
+           if(vm.count("help"))
+             {
+               std::cout<<allOpt<<"\n";
+               return 0;
+             }
+
+           // Relevant: https://stackoverflow.com/a/5517755/4223038 This will make
+           // sure that all the required options are given, If not boost should
+           // (throw?) print an appropriate error. Also the notifier function while
+           // making the argument makes sure that a condition is met, such as
+           // whether the value given is in a certain range or inside an
+           // initializer_list
+           po::notify(vm);
+
+           switch(solvemode)
+             {
+             case 0:                 // floating point
+             case 1:                 // auto
+             case 2:                 // iterative refinement
+               runSoPlex<Real>(vm);
+               break;
+             case 3:                 // soplex mpf
+               std::cout<<"You are now running on mpf\n"; // TODO: mpf
+               break;
+             default:
+               std::cout<<"Wrong value for the solve mode\n\n"<<allOpt<<"\n";
+               return 0;
+             }
+
+         }
+       catch(po::error& e)
+         {
+           // TODO: How does SoPlex Handle the std::cerr?
+           std::cerr<<"error: "<<e.what()<<"\n\n";
+           // print the help message
+           std::cout<<allOpt<<"\n";
+           return 1;
+         }
+       catch(...)
+         {
+           std::cerr<<"Unhandled exception\n"<<boost::current_exception_diagnostic_information()<<"\n";
+           return 0;
+         }
+
+       return 0;
+
+       }
+
+      // TODO Look into this
+      // Checks whether a file exists
+      bool fileExists(const std::string& str) // Maybe throw an exception
       {
-        // A hash map that takes a string to a boost::any type. The boost:any
-        // type can be casted into the value we need.
-        po::variables_map vm;
-        // TODO: Maybe replace the parse_command_line with the other function?
-        po::store(po::command_line_parser(argc, argv).options(allOpt).positional(p).run(), vm);
-
-
-        // If help is an option, print the help message and quit
-        if(vm.count("help"))
-          {
-            std::cout<<allOpt<<"\n";
-            return 0;
-          }
-
-        // Relevant: https://stackoverflow.com/a/5517755/4223038 This will make
-        // sure that all the required options are given, If not boost should
-        // (throw?) print an appropriate error. Also the notifier function while
-        // making the argument makes sure that a condition is met, such as
-        // whether the value given is in a certain range or inside an
-        // initializer_list
-        po::notify(vm);
-
-        switch(solvemode)
-          {
-          case 0:                 // floating point
-          case 1:                 // auto
-          case 2:                 // iterative refinement
-            runSoPlex<Real>(vm);
-            break;
-          case 3:                 // soplex mpf
-            std::cout<<"You are now running on mpf\n"; // TODO: mpf
-            break;
-          default:
-            std::cout<<"Wrong value for the solve mode\n\n"<<allOpt<<"\n";
-            return 0;
-          }
-
-      }
-    catch(po::error& e)
-      {
-        // TODO: How does SoPlex Handle the std::cerr?
-        std::cerr<<"error: "<<e.what()<<"\n\n";
-        // print the help message
-        std::cout<<allOpt<<"\n";
-        return 1;
-      }
-    catch(...)
-      {
-        std::cerr<<"Unhandled exception\n"<<boost::current_exception_diagnostic_information()<<"\n";
-        return 0;
+        return static_cast<bool>(std::ifstream(str));
       }
 
-    return 0;
 
   }
-
-  // TODO Look into this
-  // Checks whether a file exists
-  bool fileExists(const std::string& str) // Maybe throw an exception
-  {
-    return static_cast<bool>(std::ifstream(str));
-  }
-
-
-}
