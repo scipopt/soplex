@@ -43,7 +43,8 @@ namespace soplex
 
 
     // Checks whether a value is inside a list and if not, it throws an error
-    // todo If we have c++14, we can replace all the "int" with auto or use a template
+    // todo If we have c++14, we can replace all the "int" with auto or use a
+    // template, also std::cend() and std::cbegin()
     auto in = [](const std::initializer_list<int>& list, const std::string& str)
               {
                 return [&list, &str](const int& val)
@@ -75,7 +76,7 @@ namespace soplex
     // print something like readbas=<basfile>?
     po::options_description general("general options");
     general.add_options()
-      ("lpfile", po::value<std::string>(), "the lp file")
+      ("lpfile", po::value<std::string>()->required(), "the lp file, specifying \"--lpfile\" is optional")
       ("readbas", po::value<std::string>(),  "read starting basis from file")
       ("writebas", po::value<std::string>(), "write terminal basis to file")
       ("writefile", po::value<std::string>(), "write LP to file in LP or MPS format depending on extension")
