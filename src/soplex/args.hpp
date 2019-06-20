@@ -131,12 +131,31 @@ namespace soplex
     boolParam.add_options()
       ("bool:lifting", po::value<bool>()->default_value(false), "should lifting be used to reduce range of nonzero matrix coefficients?")
       ("bool:eqtrans", po::value<bool>()->default_value(false), "should LP be transformed to equality form before a rational solve?")
-      ("bool:testdualinf", po::value<bool>()->default_value(false), "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?");
+      ("bool:testdualinf", po::value<bool>()->default_value(false), "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?")
+      ("bool:ratfac", po::value<bool>()->default_value(false), "should dual infeasibility be tested in order to try to return a dual solution even if primal infeasible?")
+      ("bool:decompositiondualsimplex", po::value<bool>()->default_value(false), "should the decomposition based dual simplex be used to solve the LP?")
+      ("bool:computedegen", po::value<bool>()->default_value(false), "should the degeneracy be computed for each basis?")
+      ("bool:usecompdual", po::value<bool>()->default_value(false), "should the dual of the complementary problem be used in the decomposition simplex?")
+      ("bool:explicitviol", po::value<bool>()->default_value(false), "Should violations of the original problem be explicitly computed in the decomposition simplex?")
+      ("bool:acceptcycling", po::value<bool>()->default_value(false), "should cycling solutions be accepted during iterative refinement?")
+      ("bool:ratrec", po::value<bool>()->default_value(true), "apply rational reconstruction after each iterative refinement?")
+      ("bool:powerscaling", po::value<bool>()->default_value(true), "round scaling factors for iterative refinement to powers of two?")
+      ("bool:ratfacjump", po::value<bool>()->default_value(false), "continue iterative refinement with exact basic solution if not optimal?")
+      ("bool:rowboundflips", po::value<bool>()->default_value(false), "use bound flipping also for row representation?")
+      ("bool:persistentscaling", po::value<bool>()->default_value(true), "should persistent scaling be used?")
+      ("bool:fullperturbation", po::value<bool>()->default_value(false), "should perturbation be applied to the entire problem?")
+      ("bool:ensureray", po::value<bool>()->default_value(false), "re-optimize the original problem to get a proof (ray) of infeasibility/unboundedness?");
+
+    po::options_description intParam("Integer parameters");
+    intParam.add_options()
+      ("int:objsense", po::value<int>()->default_value(1)->notifier(in({-1, 1}, "int:objsense")), "objective sense (-1 - minimize, +1 - maximize)")
+      ("int:representation", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:representation"), "type of computational form (0 - auto, 1 - column representation, 2 - row representation)");
+
 
     po::options_description mpf("Multiprecision float solve");
     mpf.add_options()
       ("mpf", "Run templated multi-precision SoPlex") // This is redundant; there is the solvemode param
-      ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float");
+      ("precision", po::value<unsigned int>()->default_value(100)->notifier(check, "Minimum precision of mpf float");
 
     po::options_description allOpt("Allowed options");
     allOpt.add(generic).add(general).add(lt).add(algo).add(display);
