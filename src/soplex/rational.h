@@ -87,7 +87,7 @@ public:
    Rational(const int& i);
 
 #ifdef SOPLEX_WITH_GMP
-   /// constructor from mpq_t
+   /// constructor from mpq_t (GMP only)
    Rational(const mpq_t& q);
 #endif
 
