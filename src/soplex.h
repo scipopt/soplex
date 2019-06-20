@@ -1889,7 +1889,7 @@ private:
 
    ///@}
 
-   //**@name Miscellaneous */
+   ///**@name Miscellaneous */
    ///@{
 
    int  _optimizeCalls;

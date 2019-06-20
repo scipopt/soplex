@@ -47,7 +47,7 @@ private:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    Real  last;           ///< penalty, selected at last iteration.
    DataArray<typename SPxPricer<R>::IdxElement>
    prices;   ///< temporary array of precomputed pricing values
@@ -60,7 +60,7 @@ private:
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// set entering/leaving algorithm
    void setupWeights(typename SPxSolverBase<R>::Type);
    /// build up vector of pricing values for later use
@@ -88,13 +88,13 @@ private:
    SPxId selectEnterHyperDim(Real& best, Real feastol);
    /// implementation of hyper sparse pricing in the entering Simplex
    SPxId selectEnterHyperCoDim(Real& best, Real feastol);
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxDevexPR()
       : SPxPricer<R>("Devex")
@@ -126,11 +126,11 @@ public:
    {
       return new SPxDevexPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
@@ -149,14 +149,14 @@ public:
    virtual void addedVecs(int n);
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int n);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

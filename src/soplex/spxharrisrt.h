@@ -44,7 +44,7 @@ private:
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    ///
    Real degenerateEps() const;
 
@@ -73,13 +73,13 @@ private:
       const Real* up,       ///< upper bounds for \p vec
       Real epsilon          ///< what is 0?
    ) const;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxHarrisRT()
       : SPxRatioTester<R>("Harris")
@@ -106,16 +106,16 @@ public:
    {
       return new SPxHarrisRT(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Leave / enter */
-   //@{
+   ///@{
    ///
    virtual int selectLeave(Real& val, Real, bool);
    ///
    virtual SPxId selectEnter(Real& val, int, bool);
-   //@}
+   ///@}
 
 };
 

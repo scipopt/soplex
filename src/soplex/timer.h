@@ -79,7 +79,7 @@ protected:
 
    //------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// status of the timer
    enum
    {
@@ -88,13 +88,13 @@ protected:
       RUNNING                  ///< running
    } status;                   ///< timer status
 
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Timers */
-   //@{
+   ///@{
    /// types of timers
    typedef enum
    {
@@ -102,11 +102,11 @@ public:
       USER_TIME = 1,
       WALLCLOCK_TIME = 2
    } TYPE;
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    Timer()
       : status(RESET)
@@ -123,11 +123,11 @@ public:
    }
    virtual ~Timer()
    {}
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Control */
-   //@{
+   ///@{
    /// initialize timer, set timing accounts to zero.
    virtual void reset() = 0;
 
@@ -139,11 +139,11 @@ public:
 
    /// return type of timer
    virtual TYPE type() = 0;
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// return accounted time.
    /// get accounted user, system, or real time when ticks were updated last
    void getLastTimes(Real* userTime, Real* systemTime, Real* realTime) const;
@@ -158,7 +158,7 @@ public:
    /// return accounted real time without rechecking the clock
    Real realTimeLast() const;
 
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _TIMER_H_

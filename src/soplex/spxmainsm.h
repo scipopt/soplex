@@ -1275,8 +1275,8 @@ private:
 
 private:
    //------------------------------------
-   //**@name Types */
-   //@{
+   ///**@name Types */
+   ///@{
    /// Different simplification steps.
    enum SimpleStep
    {
@@ -1298,11 +1298,11 @@ private:
       AGGREGATION          = 15,
       MULTI_AGG            = 16
    };
-   //@}
+   ///@}
 
    //------------------------------------
-   //**@name Data */
-   //@{
+   ///**@name Data */
+   ///@{
    ///
    DVector                         m_prim;       ///< unsimplified primal solution vector.
    DVector                         m_slack;      ///< unsimplified slack vector.
@@ -1331,12 +1331,12 @@ private:
    typename SPxSimplifier<R>::Result m_result;     ///< result of the simplification.
    Real                            m_cutoffbound;  ///< the cutoff bound that is found by heuristics
    Real                            m_pseudoobj;    ///< the pseudo objective function value
-   //@}
+   ///@}
 
 private:
    //------------------------------------
-   //**@name Private helpers */
-   //@{
+   ///**@name Private helpers */
+   ///@{
    /// handle row objectives
    void handleRowObjectives(SPxLP& lp);
 
@@ -1413,7 +1413,7 @@ private:
    {
       return m_cIdx[j];
    }
-   //@}
+   ///@}
 
 protected:
 
@@ -1436,8 +1436,8 @@ protected:
 public:
 
    //------------------------------------
-   //**@name Constructors / destructors */
-   //@{
+   ///**@name Constructors / destructors */
+   ///@{
    /// default constructor.
    SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
       : SPxSimplifier<R>("MainSM", ttype)
@@ -1552,11 +1552,11 @@ public:
    {
       return new SPxMainSM(*this);
    }
-   //@}
+   ///@}
 
    //------------------------------------
-   //**@name LP simplification */
-   //@{
+   ///**@name LP simplification */
+   ///@{
    /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual typename SPxSimplifier<R>::Result simplify(SPxLP& lp, Real eps, Real delta)
    {
@@ -1632,12 +1632,12 @@ public:
       for(int j = 0; j < m_cBasisStat.size(); ++j)
          cols[j] = m_cBasisStat[j];
    }
-   //@}
+   ///@}
 
 private:
    //------------------------------------
-   //**@name Types */
-   //@{
+   ///**@name Types */
+   ///@{
    /// comparator for class SVector::Element: compare nonzeros according to value
    struct ElementCompare
    {
@@ -1672,7 +1672,7 @@ private:
             return 1;
       }
    };
-   //@}
+   ///@}
 };
 
 } // namespace soplex

@@ -47,16 +47,16 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Memory.
    Nonzero<R>* theelem;
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
 
    /// Allocate memory for \p n nonzeros.
    void allocMem(int n)
@@ -81,13 +81,13 @@ private:
       }
    }
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction, assignment, and destruction */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** Creates a DSVectorBase ready to hold \p n nonzeros. However, the memory is automatically enlarged, if more
@@ -207,11 +207,11 @@ public:
       }
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
 
    /// Append nonzeros of \p sv.
    template < class S >
@@ -283,11 +283,11 @@ public:
       SVectorBase<R>::set_size(siz);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Consistency check.
    bool isConsistent() const
@@ -302,7 +302,7 @@ public:
       return true;
    }
 
-   //@}
+   ///@}
 };
 
 

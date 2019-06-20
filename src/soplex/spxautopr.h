@@ -55,7 +55,7 @@ public:
 
    //-------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor
    SPxAutoPR()
       : SPxPricer<R>("Auto")
@@ -106,11 +106,11 @@ public:
    {
       return new SPxAutoPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// set max number of iterations before switching pricers
    void setSwitchIters(int iters);
    /// clear the data
@@ -131,7 +131,7 @@ public:
    virtual void left4(int n, SPxId id);
    ///
    virtual void entered4(SPxId id, int n);
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _SPXAUTOPR_H_

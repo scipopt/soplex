@@ -45,7 +45,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    ///
    SPxSteepExPR()
       : SPxSteepPR<R>("SteepEx", SPxSteepPR<R>::EXACT)
@@ -78,7 +78,7 @@ public:
    {
       return new SPxSteepExPR(*this);
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

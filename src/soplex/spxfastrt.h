@@ -44,7 +44,7 @@ class SPxFastRT : public SPxRatioTester<R>
 protected:
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// parameter for computing minimum stability requirement
    Real minStab;
    /// |value| < epsilon is considered 0.
@@ -53,11 +53,11 @@ protected:
    Real fastDelta;
    /// flag used in methods minSelect/maxSelect to retrieve correct basis status
    bool iscoid;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// resets tolerances (epsilon).
    void resetTols();
    /// relaxes stability requirements.
@@ -162,13 +162,13 @@ protected:
    /// Tests and returns whether a shortcut after phase 1 is feasible for the
    /// selected enter pivot.
    bool shortEnter(const SPxId& enterId, int nr, Real max, Real maxabs) const;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxFastRT()
       : SPxRatioTester<R>("Fast")
@@ -215,11 +215,11 @@ public:
    {
       return new SPxFastRT(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    ///
    virtual void load(SPxSolverBase<R>* solver);
    ///
@@ -242,7 +242,7 @@ public:
    {
       return fastDelta;
    }
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _SPXFASTRT_H_

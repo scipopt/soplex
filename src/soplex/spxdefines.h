@@ -256,7 +256,7 @@ private:
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// default allowed additive zero: 1.0 + EPS_ZERO == 1.0
    THREADLOCAL static Real s_epsilon;
    /// epsilon for factorization
@@ -265,13 +265,13 @@ private:
    THREADLOCAL static Real s_epsilon_update;
    /// epsilon for pivot zero tolerance in factorization
    THREADLOCAL static Real s_epsilon_pivot;
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    ///
    static Real epsilon();
    ///
@@ -288,7 +288,7 @@ public:
    static Real epsilonPivot();
    ///
    static void setEpsilonPivot(Real eps);
-   //@}
+   ///@}
 };
 
 #ifdef WITH_LONG_DOUBLE

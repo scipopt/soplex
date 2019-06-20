@@ -48,13 +48,13 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    DVectorBase<R> low;     ///< vector of lower bounds.
    DVectorBase<R> up;      ///< vector of upper bounds.
    DVectorBase<R> object;  ///< vector of objective coefficients.
 
-   //@}
+   ///@}
 
 protected:
 
@@ -62,7 +62,7 @@ protected:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
 
    /// Returns the complete SVSetBase.
    const SVSetBase<R>* colSet() const
@@ -70,13 +70,13 @@ protected:
       return this;
    }
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Inquiry */
-   //@{
+   ///@{
 
    /// Returns the number of LPColBase%s currently in LPColSetBase.
    int num() const
@@ -240,7 +240,7 @@ public:
       return SVSetBase<R>::has(k);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Extension
@@ -249,7 +249,7 @@ public:
     *  DataKey(s). See DataSet for a more detailed description. All extension methods are designed to automatically
     *  reallocate memory if required.
     */
-   //@{
+   ///@{
 
    ///
    void add(const LPColBase<R>& pcol)
@@ -415,7 +415,7 @@ public:
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
 
-   //@}
+   ///@}
 
 
    // ------------------------------------------------------------------------------------------------------------------
@@ -424,7 +424,7 @@ public:
     *  See DataSet for a description of the renumbering of the remaining LPColBase%s in a LPColSetBase after the call of
     *  a removal method.
     */
-   //@{
+   ///@{
 
    /// Removes \p i 'th LPColBase.
    void remove(int i)
@@ -511,13 +511,13 @@ public:
       scaleExp.clear();
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Memory Management
     *  See SVSet for a description of the memory management methods.
    */
-   //@{
+   ///@{
 
    /// Reallocates memory to be able to store \p newmax LPColBase%s.
    void reMax(int newmax = 0)
@@ -553,11 +553,11 @@ public:
       SVSetBase<R>::memPack();
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
 
    /// Checks consistency.
    bool isConsistent() const
@@ -579,11 +579,11 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** The user can specify the initial maximum number of columns \p max and the initial maximum number of nonzero
@@ -659,7 +659,7 @@ public:
    virtual ~LPColSetBase<R>()
    {}
 
-   //@}
+   ///@}
 };
 
 } // namespace soplex

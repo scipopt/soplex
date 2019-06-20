@@ -37,7 +37,7 @@ public:
 
    //-----------------------------------
    /**@name Types */
-   //@{
+   ///@{
    ///
 
    enum Section
@@ -55,13 +55,13 @@ public:
 
    enum { MAX_LINE_LEN = 256 };
 
-   //@}
+   ///@}
 
 private:
 
    //-----------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    ///
    Section         m_section;
    /// the input stream from which the file is read
@@ -98,13 +98,13 @@ private:
    int             m_ignored;
    /// Maximal number of ignored entries for which a warning will be issued.
    static const int m_max_ignore = 1000;
-   //@}
+   ///@}
 
 public:
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    ///
    explicit
    MPSInput(std::istream& p_input)
@@ -131,11 +131,11 @@ public:
       // not point to anything that has to be freed.
       m_f0 = m_f1 = m_f2 = m_f3 = m_f4 = m_f5 = 0;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Access */
-   //@{
+   ///@{
    ///
    Section         section()   const
    {
@@ -201,11 +201,11 @@ public:
    {
       return m_is_integer;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    ///
    void setSection(Section p_section)
    {
@@ -228,11 +228,11 @@ public:
    {
       m_objsense = sense;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Warnings and Errors */
-   //@{
+   ///@{
    ///
    void syntaxError()
    {
@@ -259,17 +259,17 @@ public:
                       << "ignored entries will be given." << std::endl;)
          }
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Helpers */
-   //@{
+   ///@{
    /// reads an MPS format data line and parse the fields.
    bool readLine();
    /// Inserts \p name as field 1 and shifts all other fields up.
    void insertName(const char* name,
                    bool second = false);
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _MPSINPUT_H_

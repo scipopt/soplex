@@ -60,27 +60,27 @@ private:
 
    //-----------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    ///
    DataArray < int > forbidden;
    ///
    DataArray < Real >* weight;
    ///
    DataArray < Real >* coWeight;
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    ///
    void setPrimalStatus(typename SPxBasisBase<R>::Desc&, const SPxSolverBase<R>&, const SPxId&);
-   //@}
+   ///@}
 
 protected:
 
    //-----------------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    /// weight value for LP rows.
    DataArray < Real > rowWeight;
    /// weight value for LP columns.
@@ -89,24 +89,24 @@ protected:
    DataArray < bool > rowRight;
    /// set primal variable to upper bound.
    DataArray < bool > colUp;
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    /// sets up variable weights.
    /** This method is called in order to setup the weights for all
        variables. It has been declared \c virtual in order to allow for
        derived classes to compute other weight values.
    */
    virtual void setupWeights(SPxSolverBase<R>& base);
-   //@}
+   ///@}
 
 public:
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor.
    SPxWeightST()
       : SPxStarter<R>("Weight")
@@ -183,21 +183,21 @@ public:
    {
       return new SPxWeightST(*this);
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Generation of a start basis */
-   //@{
+   ///@{
    /// generates start basis for loaded basis.
    void generate(SPxSolverBase<R>& base);
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    /// consistency check.
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 
 };
 

@@ -39,7 +39,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor (this scaler makes no use of inherited member m_colFirst)
    explicit SPxLeastSqSC();
    /// copy constructor
@@ -54,20 +54,20 @@ public:
    {
       return new SPxLeastSqSC(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// set real param (conjugate gradient accuracy)
    virtual void setRealParam(Real param, const char* name);
    /// set int param (maximal conjugate gradient rounds)
    virtual void setIntParam(int param, const char* name);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Scaling */
-   //@{
+   ///@{
    /// Scale the loaded SPxLP.
    virtual void scale(SPxLP& lp, bool persistent = true);
 

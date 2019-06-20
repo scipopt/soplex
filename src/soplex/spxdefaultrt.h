@@ -46,7 +46,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxDefaultRT()
       : SPxRatioTester<R>("Default")
@@ -73,11 +73,11 @@ public:
    {
       return new SPxDefaultRT(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Select enter/leave */
-   //@{
+   ///@{
    ///
    virtual int selectLeave(Real& val, Real, bool);
    ///

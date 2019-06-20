@@ -49,18 +49,18 @@ public:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /* This was originally implemented as bitfield "signed int info: 2; signed int idx: (8 * sizeof(int) - 2);",
       however, this seems to trigger a bug with old versions of GCC/glibc on 32bit machines. */
    int info;                                  ///< user information to store values -1, 0, +1
    int idx;                                   ///< (locally) unique key index
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// Default constructor. Constructs an invalid DataKey.
    DataKey()
       : info(0), idx(-1)
@@ -88,11 +88,11 @@ public:
       : info(old.info)
       , idx(old.idx)
    {}
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// gets the index number (\ref soplex::DataKey::idx "idx") of the DataKey.
    inline int getIdx() const
    {
@@ -114,7 +114,7 @@ public:
       idx  = -1;
       info = 0;
    }
-   //@}
+   ///@}
 
 };
 
