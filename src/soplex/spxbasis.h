@@ -106,7 +106,7 @@ public:
    public:
 
       //------------------------------------
-      ///**@name Status */
+      ///@name Status
       ///@{
       /// Status of a variable.
       /** A basis is described by assigning a Status to all of the LP
@@ -202,7 +202,7 @@ public:
    private:
 
       //------------------------------------
-      ///**@name Data */
+      ///@name Data
       ///@{
       DataArray < Status > rowstat;   ///< status of rows.
       DataArray < Status > colstat;   ///< status of columns.
@@ -213,7 +213,7 @@ public:
    public:
 
       //------------------------------------
-      ///**@name Access / modification */
+      ///@name Access / modification
       ///@{
       /// returns number of columns.
       int nCols() const
@@ -300,7 +300,7 @@ public:
       ///@}
 
       //------------------------------------
-      ///**@name Debugging */
+      ///@name Debugging
       ///@{
       /// Prints out status.
       void dump() const;
@@ -310,7 +310,7 @@ public:
       ///@}
 
       //------------------------------------
-      ///**@name Construction / destruction */
+      ///@name Construction / destruction
       ///@{
       /// default constructor
       Desc()
@@ -329,7 +329,7 @@ public:
 protected:
 
    //------------------------------------
-   ///**@name Protected data
+   ///@name Protected data
    /**
       For storing the basis matrix we keep two arrays: Array #theBaseId
       contains the SPxId%s of the basis vectors, and #matrix the pointers to
@@ -407,7 +407,7 @@ protected:
 private:
 
    //------------------------------------
-   ///**@name Private data */
+   ///@name Private data
    ///@{
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
@@ -419,7 +419,7 @@ private:
 public:
 
    //------------------------------------------------
-   /**@name Status and Descriptor related Methods */
+   ///@name Status and Descriptor related Methods
    ///@{
    /// returns current SPxStatus.
    SPxStatus status() const
@@ -498,7 +498,7 @@ public:
 
 
    //-----------------------------------
-   /**@name Inquiry Methods */
+   ///@name Inquiry Methods
    ///@{
    ///
    inline SPxId& baseId(int i)
@@ -568,7 +568,7 @@ public:
    ///@}
 
    //-----------------------------------
-   /**@name Linear Algebra */
+   ///@name Linear Algebra
    ///@{
    /// Basis-vector product.
    /** Depending on the representation, for an SPxBasis B,
@@ -791,9 +791,8 @@ public:
 
 
    //------------------------------------
-   /**@name Modification notification.
-       These methods must be called after the loaded LP has been modified.
-    */
+   ///@name Modification notification.
+   /// These methods must be called after the loaded LP has been modified.
    ///@{
    /// inform SPxBasis, that \p n new rows had been added.
    void addedRows(int n);
@@ -817,7 +816,7 @@ public:
 
 
    //--------------------------------
-   /**@name Miscellaneous */
+   ///@name Miscellaneous
    ///@{
    /// performs basis update.
    /** Changes the \p i 'th vector of the basis with the vector associated to
@@ -947,7 +946,7 @@ public:
    ///@}
 
    //--------------------------------------
-   /**@name Constructors / Destructors */
+   ///@name Constructors / Destructors
    ///@{
    /// default constructor.
    SPxBasis(Timer::TYPE ttype = Timer::USER_TIME);
@@ -963,7 +962,7 @@ public:
 protected:
 
    //--------------------------------------
-   /**@name Protected helpers */
+   ///@name Protected helpers
    ///@{
    /// loads \ref soplex::SPxBasis::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis::theBaseId "theBaseId".
    /** This method must  be called whenever there is a chance, that the vector

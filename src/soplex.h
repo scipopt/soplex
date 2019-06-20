@@ -90,7 +90,7 @@ class SoPlex
 {
 public:
 
-   ///**@name Construction and destruction */
+   ///@name Construction and destruction
    ///@{
 
    /// default constructor
@@ -108,7 +108,7 @@ public:
    ///@}
 
 
-   ///**@name Access to the real LP */
+   ///@name Access to the real LP
    ///@{
 
    /// returns number of rows
@@ -209,7 +209,7 @@ public:
    ///@}
 
 
-   ///**@name Access to the rational LP */
+   ///@name Access to the rational LP
    ///@{
 
    /// returns number of rows
@@ -292,7 +292,7 @@ public:
    ///@}
 
 
-   ///**@name Modification of the real LP */
+   ///@name Modification of the real LP
    ///@{
 
    /// adds a single row
@@ -399,7 +399,7 @@ public:
    ///@}
 
 
-   ///**@name Modification of the rational LP */
+   ///@name Modification of the rational LP
    ///@{
 
    /// adds a single row
@@ -568,7 +568,7 @@ public:
    ///@}
 
 
-   ///**@name Solving and general solution query */
+   ///@name Solving and general solution query
    ///@{
 
    /// optimize the given LP
@@ -624,7 +624,7 @@ public:
    ///@}
 
 
-   ///**@name Query for the real solution data */
+   ///@name Query for the real solution data
    ///@{
 
    /// returns the objective value if a primal solution is available
@@ -663,7 +663,7 @@ public:
    ///@}
 
 
-   ///**@name Query for the rational solution data */
+   ///@name Query for the rational solution data
    ///@{
 
    /// returns the objective value if a primal solution is available
@@ -740,7 +740,7 @@ public:
    ///@}
 
 
-   ///**@name Access and modification of basis information */
+   ///@name Access and modification of basis information
    ///@{
 
    /// is an advanced starting basis available?
@@ -831,7 +831,7 @@ public:
    ///@}
 
 
-   ///**@name Statistical information */
+   ///@name Statistical information
    ///@{
 
    /// number of iterations since last call to solve
@@ -861,7 +861,7 @@ public:
    ///@}
 
 
-   ///**@name File I/O */
+   ///@name File I/O
    ///@{
 
    /// reads LP file in LP or MPS format according to READMODE parameter; gets row names, column names, and
@@ -909,7 +909,7 @@ public:
    ///@}
 
 
-   ///**@name Parameters */
+   ///@name Parameters
    ///@{
 
    /// boolean parameters
@@ -1536,7 +1536,7 @@ public:
    ///@}
 
 
-   ///**@name Statistics */
+   ///@name Statistics
    ///@{
 
    /// prints solution statistics
@@ -1557,7 +1557,7 @@ public:
    ///@}
 
 
-   ///**@name Miscellaneous */
+   ///@name Miscellaneous
    ///@{
 
    /// prints version and compilation options
@@ -1579,7 +1579,7 @@ public:
 
 private:
 
-   ///**@name Statistics on solving process */
+   ///@name Statistics on solving process
    ///@{
 
    /// class of statistics
@@ -1591,7 +1591,7 @@ private:
    ///@}
 
 
-   ///**@name Parameter settings */
+   ///@name Parameter settings
    ///@{
 
    Settings* _currentSettings;
@@ -1605,7 +1605,7 @@ private:
    ///@}
 
 
-   ///**@name Data for the real LP */
+   ///@name Data for the real LP
    ///@{
 
    SPxSolver _solver;
@@ -1653,7 +1653,7 @@ private:
    ///@}
 
 
-   ///**@name Data for the rational LP */
+   ///@name Data for the rational LP
    ///@{
 
    SPxLPRational* _rationalLP;
@@ -1709,7 +1709,7 @@ private:
    ///@}
 
 
-   ///**@name Data for the Decomposition Based Dual Simplex */
+   ///@name Data for the Decomposition Based Dual Simplex
    ///@{
 
    /** row violation structure
@@ -1860,7 +1860,7 @@ private:
    ///@}
 
 
-   ///**@name Solution data */
+   ///@name Solution data
    ///@{
 
    SPxSolver::Status _status;
@@ -1879,7 +1879,7 @@ private:
 
    ///@}
 
-   ///**@name Miscellaneous */
+   ///@name Miscellaneous
    ///@{
 
    int  _optimizeCalls;
@@ -1891,7 +1891,7 @@ private:
 
    ///@}
 
-   ///**@name Constant helper methods */
+   ///@name Constant helper methods
    ///@{
 
    /// extends sparse vector to hold newmax entries if and only if it holds no more free entries
@@ -1927,7 +1927,7 @@ private:
    ///@}
 
 
-   ///**@name Non-constant helper methods */
+   ///@name Non-constant helper methods
    ///@{
 
    /// adds a single row to the real LP and adjusts basis
@@ -2083,7 +2083,7 @@ private:
    ///@}
 
 
-   ///**@name Private solving methods implemented in solverational.cpp */
+   ///@name Private solving methods implemented in solverational.cpp
    ///@{
 
    /// solves rational LP
@@ -2205,7 +2205,7 @@ private:
    ///@}
 
 
-   ///**@name Private solving methods implemented in solvereal.cpp */
+   ///@name Private solving methods implemented in solvereal.cpp
    ///@{
 
    /// solves real LP

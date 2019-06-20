@@ -56,7 +56,7 @@ private:
    /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
    Rational(const int& i, const bool& dummy);
 
-   ///**@name Static variables for special rational values */
+   ///@name Static variables for special rational values
    ///@{
 
    static const Rational ZERO;
@@ -68,7 +68,7 @@ private:
 
 public:
 
-   ///**@name Construction and destruction */
+   ///@name Construction and destruction
    ///@{
 
    /// default constructor
@@ -153,7 +153,7 @@ public:
    ///@}
 
 
-   ///**@name Arithmetic operators */
+   ///@name Arithmetic operators
    ///@{
 
    /// addition operator
@@ -249,7 +249,7 @@ public:
    ///@}
 
 
-   ///**@name Methods for checking exactness of doubles  */
+   ///@name Methods for checking exactness of doubles
    ///@{
 
    /// checks if \p d is the closest number that can be represented by double
@@ -261,7 +261,7 @@ public:
    ///@}
 
 
-   ///**@name Methods for querying size */
+   ///@name Methods for querying size
    ///@{
 
    /// Size in specified base (bit size for base 2)
@@ -270,7 +270,7 @@ public:
    ///@}
 
 
-   ///**@name Static methods  */
+   ///@name Static methods
    ///@{
 
    /// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
@@ -279,7 +279,7 @@ public:
    ///@}
 
 
-   ///**@name Conversion from and to String */
+   ///@name Conversion from and to String
    ///@{
 
    /// read Rational from string
@@ -292,7 +292,7 @@ public:
    ///@}
 
 
-   ///**@name Friends */
+   ///@name Friends
    ///@{
 
    friend int compareRational(const Rational& r, const Rational& s);
@@ -363,7 +363,7 @@ public:
 };
 
 
-///**@name Parsing and printing */
+///@name Parsing and printing
 ///@{
 
 /// convert rational number to string
@@ -378,7 +378,7 @@ std::ostream& operator<<(std::ostream& os, const Rational& r);
 ///@}
 
 
-///**@name Relational operators */
+///@name Relational operators
 ///@{
 
 /// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
@@ -513,7 +513,7 @@ bool operator>=(const int& r, const Rational& s);
 ///@}
 
 
-///**@name Non-member arithmetic operators and functions */
+///@name Non-member arithmetic operators and functions
 ///@{
 
 /// addition operator for double and Rational
