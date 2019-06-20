@@ -2319,7 +2319,7 @@ void SoPlexBase<Real>::addRowRational(const LPRowRational& lprow)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// adds a single row
+/// adds a single row (GMP only method)
 template <>
 void SoPlexBase<Real>::addRowRational(const mpq_t* lhs, const mpq_t* rowValues,
                                       const int* rowIndices, const int rowSize, const mpq_t* rhs)
@@ -2414,6 +2414,7 @@ void SoPlexBase<Real>::addColRational(const LPColRational& lpcol)
 
 #ifdef SOPLEX_WITH_GMP
 /// adds a single column
+/// adds a single column (GMP only method)
 template <>
 void SoPlexBase<Real>::addColRational(const mpq_t* obj, const mpq_t* lower, const mpq_t* colValues,
                                       const int* colIndices, const int colSize, const mpq_t* upper)
@@ -2554,7 +2555,7 @@ void SoPlexBase<Real>::changeLhsRational(int i, const Rational& lhs)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes left-hand side of row \p i to \p lhs
+/// changes left-hand side of row \p i to \p lhs (GMP only method)
 template <>
 void SoPlexBase<Real>::changeLhsRational(int i, const mpq_t* lhs)
 {
@@ -2598,7 +2599,7 @@ void SoPlexBase<Real>::changeRhsRational(const VectorRational& rhs)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes right-hand side vector to \p rhs
+/// changes right-hand side vector to \p rhs (GMP only method)
 template <>
 void SoPlexBase<Real>::changeRhsRational(const mpq_t* rhs, int rhsSize)
 {
@@ -2685,7 +2686,7 @@ void SoPlexBase<Real>::changeRangeRational(int i, const Rational& lhs, const Rat
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes left-hand side of row \p i to \p lhs
+/// changes left-hand side of row \p i to \p lhs (GMP only method)
 template <>
 void SoPlexBase<Real>::changeRangeRational(int i, const mpq_t* lhs, const mpq_t* rhs)
 {
@@ -2770,7 +2771,7 @@ void SoPlexBase<Real>::changeLowerRational(int i, const Rational& lower)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes lower bound of column i to \p lower
+/// changes lower bound of column i to \p lower (GMP only method)
 template <>
 void SoPlexBase<Real>::changeLowerRational(int i, const mpq_t* lower)
 {
@@ -2834,7 +2835,7 @@ void SoPlexBase<Real>::changeUpperRational(int i, const Rational& upper)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes upper bound of column i to \p upper
+/// changes upper bound of column i to \p upper (GMP only method)
 template <>
 void SoPlexBase<Real>::changeUpperRational(int i, const mpq_t* upper)
 {
@@ -2899,7 +2900,7 @@ void SoPlexBase<Real>::changeBoundsRational(int i, const Rational& lower, const 
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes bounds of column \p i to \p lower and \p upper
+/// changes bounds of column \p i to \p lower and \p upper (GMP only method)
 template <>
 void SoPlexBase<Real>::changeBoundsRational(int i, const mpq_t* lower, const mpq_t* upper)
 {
@@ -2959,7 +2960,7 @@ void SoPlexBase<Real>::changeObjRational(int i, const Rational& obj)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes objective coefficient of column i to \p obj
+/// changes objective coefficient of column i to \p obj (GMP only method)
 template <>
 void SoPlexBase<Real>::changeObjRational(int i, const mpq_t* obj)
 {
@@ -2998,7 +2999,7 @@ void SoPlexBase<Real>::changeElementRational(int i, int j, const Rational& val)
 
 
 #ifdef SOPLEX_WITH_GMP
-/// changes matrix entry in row \p i and column \p j to \p val
+/// changes matrix entry in row \p i and column \p j to \p val (GMP only method)
 template <>
 void SoPlexBase<Real>::changeElementRational(int i, int j, const mpq_t* val)
 {
@@ -4227,7 +4228,7 @@ bool SoPlexBase<Real>::getDualViolationRational(Rational& maxviol, Rational& sum
 
 
 #ifdef SOPLEX_WITH_GMP
-/// gets the primal solution vector if available; returns true on success
+/// gets the primal solution vector if available; returns true on success (GMP only method)
 template <>
 bool SoPlexBase<Real>::getPrimalRational(mpq_t* vector, const int size)
 {
@@ -4792,7 +4793,7 @@ bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int*
    {
       assert(_solver.rep() == SPxSolverBase<Real>::ROW);
 
-      // @todo should rhs be a reference?
+      /// @todo should rhs be a reference?
       DSVector rhs(numCols());
       SSVector y(numCols());
       int* bind = 0;
@@ -4881,7 +4882,7 @@ bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int*
          coef[index] = 1.0;
       }
 
-      // @todo implement returning of sparsity information like in column wise case
+      /// @todo implement returning of sparsity information like in column wise case
       if(ninds != NULL)
          *ninds = -1;
 
@@ -4991,7 +4992,7 @@ bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int*
    {
       assert(_solver.rep() == SPxSolverBase<Real>::ROW);
 
-      // @todo should rhs be a reference?
+      /// @todo should rhs be a reference?
       DSVectorReal rhs(numCols());
       SSVectorReal y(numCols());
       int* bind = 0;
@@ -5095,7 +5096,7 @@ bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int*
          coef[index] = 1.0;
       }
 
-      // @todo implement returning of sparsity information like in column wise case
+      /// @todo implement returning of sparsity information like in column wise case
       if(ninds != NULL)
          *ninds = -1;
 
