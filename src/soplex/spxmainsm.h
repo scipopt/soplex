@@ -1275,7 +1275,7 @@ private:
 
 private:
    //------------------------------------
-   ///**@name Types */
+   ///@name Types
    ///@{
    /// Different simplification steps.
    enum SimpleStep
@@ -1301,7 +1301,7 @@ private:
    ///@}
 
    //------------------------------------
-   ///**@name Data */
+   ///@name Data
    ///@{
    ///
    DVector                         m_prim;       ///< unsimplified primal solution vector.
@@ -1335,7 +1335,7 @@ private:
 
 private:
    //------------------------------------
-   ///**@name Private helpers */
+   ///@name Private helpers
    ///@{
    /// handle row objectives
    void handleRowObjectives(SPxLP& lp);
@@ -1436,7 +1436,7 @@ protected:
 public:
 
    //------------------------------------
-   ///**@name Constructors / destructors */
+   ///@name Constructors / destructors
    ///@{
    /// default constructor.
    SPxMainSM(Timer::TYPE ttype = Timer::USER_TIME)
@@ -1555,7 +1555,7 @@ public:
    ///@}
 
    //------------------------------------
-   ///**@name LP simplification */
+   ///@name LP simplification
    ///@{
    /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual typename SPxSimplifier<R>::Result simplify(SPxLP& lp, Real eps, Real delta)
@@ -1636,7 +1636,7 @@ public:
 
 private:
    //------------------------------------
-   ///**@name Types */
+   ///@name Types
    ///@{
    /// comparator for class SVector::Element: compare nonzeros according to value
    struct ElementCompare

@@ -36,7 +36,7 @@ class SoPlexBase<R>::Statistics
 
 public:
 
-   ///**@name Construction, resetting, printing */
+   ///@name Construction, resetting, printing
    ///@{
 
    /// default constructor
@@ -82,7 +82,7 @@ public:
    ///@}
 
 
-   ///**@name Data */
+   ///@name Data
    ///@{
 
    Timer* readingTime; ///< reading time not included in solving time
