@@ -35,8 +35,8 @@ class SoPlex::Statistics
 
 public:
 
-   //**@name Construction, resetting, printing */
-   //@{
+   ///**@name Construction, resetting, printing */
+   ///@{
 
    /// default constructor
    Statistics(Timer::TYPE ttype = Timer::USER_TIME);
@@ -78,11 +78,11 @@ public:
    /// prints statistics
    void print(std::ostream& os);
 
-   //@}
+   ///@}
 
 
-   //**@name Data */
-   //@{
+   ///**@name Data */
+   ///@{
 
    Timer* readingTime; ///< reading time not included in solving time
    Timer* solvingTime; ///< solving time
@@ -137,7 +137,7 @@ public:
    // Numerics
    Real finalBasisCondition;  ///< condition number estimate of the optimal basis matrix
 
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _STATISTICS_H_

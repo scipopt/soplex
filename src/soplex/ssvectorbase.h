@@ -54,7 +54,7 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Is the SSVectorBase set up?
    bool setupStatus;
@@ -73,7 +73,7 @@ private:
       spx_realloc(idx, len);
    }
 
-   //@}
+   ///@}
 
 public:
 
@@ -94,7 +94,7 @@ public:
     *  - forceSetup(): This method sets the status to ``setup'' without verifying that the IdxSet correctly contains all
     *                  nonzero indices. It may be used when the nonzero indices have been computed externally.
     */
-   //@{
+   ///@{
 
    /// Only used in slufactor.cpp.
    R* get_ptr()
@@ -165,11 +165,11 @@ public:
       setupStatus = true;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Methods for setup SSVectorBases */
-   //@{
+   ///@{
 
    /// Returns index of the \p n 'th nonzero element.
    int index(int n) const
@@ -278,11 +278,11 @@ public:
       assert(isConsistent());
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Methods independent of the Status */
-   //@{
+   ///@{
 
    /// Returns \p i 'th value.
    R operator[](int i) const
@@ -329,11 +329,11 @@ public:
       return *this;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Arithmetic operations */
-   //@{
+   ///@{
 
    /// Addition.
    template < class S >
@@ -553,11 +553,11 @@ public:
       return spxSqrt((Real)length2());
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
 
    /// Dimension of VectorBase.
    int dim() const
@@ -651,11 +651,11 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
 
    /// Default constructor.
    explicit SSVectorBase<R>(int p_dim, R p_eps = Param::epsilon())
@@ -886,13 +886,13 @@ public:
          spx_free(idx);
    }
 
-   //@}
+   ///@}
 
 private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
 
    /// Assignment helper.
    template < class S, class T >
@@ -906,7 +906,7 @@ private:
    template < class S, class T >
    SSVectorBase<R>& assign2productFull(const SVSetBase<S>& A, const SSVectorBase<T>& x);
 
-   //@}
+   ///@}
 };
 
 } // namespace soplex

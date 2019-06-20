@@ -50,20 +50,20 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    R up;                   ///< upper bound
    R low;                  ///< lower bound
    R object;               ///< objective value
    DSVectorBase<R> vec;    ///< the column vector
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** Construct LPColBase with a column vector ready for taking \p defDim nonzeros.
@@ -103,11 +103,11 @@ public:
    ~LPColBase()
    {}
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
 
    /// Gets objective value.
    R obj() const
@@ -156,11 +156,11 @@ public:
       vec = p_vec;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
 
    /// Checks consistency.
    bool isConsistent() const
@@ -172,7 +172,7 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _LPCOLBASE_H_

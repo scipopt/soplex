@@ -49,14 +49,14 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// name of the pricer
    const char* m_name;
    /// the solver
    SPxSolver*  thesolver;
    /// violation bound
    Real        theeps;
-   //@}
+   ///@}
 
 
    struct IdxElement
@@ -99,7 +99,7 @@ public:
 
    //-------------------------------------
    /**@name Initialization */
-   //@{
+   ///@{
    /// get name of pricer.
    virtual const char* getName() const
    {
@@ -159,11 +159,11 @@ public:
    */
    virtual void setRep(SPxSolver::Representation)
    {}
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Pivoting */
-   //@{
+   ///@{
    /// returns selected index to leave basis.
    /** Selects the index of a vector to leave the basis. The selected index
        i, say, must be in the range 0 <= i < solver()->dim() and its
@@ -212,23 +212,23 @@ public:
     */
    virtual void entered4(SPxId /*id*/, int /*n*/)
    {}
-   //@}
+   ///@}
 
 
    //-------------------------------------
    /**@name Extension */
-   //@{
+   ///@{
    /// \p n vectors have been added to loaded LP.
    virtual void addedVecs(int /*n*/)
    {}
    /// \p n covectors have been added to loaded LP.
    virtual void addedCoVecs(int /*n*/)
    {}
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Shrinking */
-   //@{
+   ///@{
    /// vector \p i was removed from loaded LP.
    virtual void removedVec(int /*i*/)
    {}
@@ -241,11 +241,11 @@ public:
    /// covectors given by \p perm have been removed from loaded LP.
    virtual void removedCoVecs(const int* /*perm*/)
    {}
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    virtual bool isConsistent() const
    {
 #ifdef ENABLE_CONSISTENCY_CHECKS
@@ -254,11 +254,11 @@ public:
       return true;
 #endif
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// constructor
    explicit SPxPricer(const char* p_name)
       : m_name(p_name)
@@ -296,7 +296,7 @@ public:
 
    /// clone function for polymorphism
    virtual SPxPricer* clone()  const  = 0;
-   //@}
+   ///@}
 
 };
 

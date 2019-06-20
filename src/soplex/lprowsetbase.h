@@ -49,13 +49,13 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    DVectorBase<R> left;    ///< vector of left hand sides (lower bounds) of LPRowBase%s.
    DVectorBase<R> right;   ///< vector of right hand sides (upper bounds) of LPRowBase%s.
    DVectorBase<R> object;  ///< vector of objective coefficients.
 
-   //@}
+   ///@}
 
 protected:
 
@@ -63,7 +63,7 @@ protected:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Helpers */
-   //@{
+   ///@{
 
    /// Returns the complete SVSet.
    const SVSetBase<R>* rowSet() const
@@ -71,13 +71,13 @@ protected:
       return this;
    }
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
 
    /// Returns the number of LPRowBase%s in LPRowSetBase.
    int num() const
@@ -313,7 +313,7 @@ public:
       return SVSetBase<R>::has(k);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Extension
@@ -322,7 +322,7 @@ public:
     *  DataKey(s). See DataSet for a more detailed description. All extension methods will automatically rearrange or
     *  allocate more memory if required.
    */
-   //@{
+   ///@{
 
    ///
    void add(const LPRowBase<R>& row)
@@ -503,7 +503,7 @@ public:
       return *SVSetBase<R>::create(newkey, nonzeros);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Shrinking
@@ -511,7 +511,7 @@ public:
     *  See DataSet for a description of the renumbering of the remaining LPRowBase%s in a LPRowSetBase after the call of
     *  a removal method.
     */
-   //@{
+   ///@{
 
    /// Removes \p i 'th LPRowBase.
    void remove(int i)
@@ -599,7 +599,7 @@ public:
       scaleExp.clear();
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Memory Management
@@ -607,7 +607,7 @@ public:
     *  For a description of the memory management methods, see the documentation of SVSet, which has been used for
     *  implementating LPRowSetBase.
     */
-   //@{
+   ///@{
 
    /// Reallocates memory to be able to store \p newmax LPRowBase%s.
    void reMax(int newmax = 0)
@@ -643,7 +643,7 @@ public:
       SVSetBase<R>::memPack();
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Consistency check */
@@ -670,11 +670,11 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction / Destruction */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** The user can specify the initial maximum number of rows \p max and the initial maximum number of nonzero entries
@@ -750,7 +750,7 @@ public:
    virtual ~LPRowSetBase<R>()
    {}
 
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _LPROWSETBASE_H_

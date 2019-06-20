@@ -46,7 +46,7 @@ public:
 
    //---------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// status flags of the SLinSolver class.
    enum Status
    {
@@ -63,11 +63,11 @@ public:
       /// An error has occurred.
       ERROR    = 8
    };
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// returns the name of the SLinSolver.
    virtual const char* getName() const = 0;
 
@@ -114,7 +114,7 @@ public:
 
    /// get number of factorizations
    virtual int getFactorCount() const = 0;
-   //@}
+   ///@}
 
 
    /**@name Solving linear systems
@@ -135,7 +135,7 @@ public:
       The result vector(s) are allways given as the first parameter(s). Two
       types of result vectors are supported, Vector and SSVector.
    */
-   //@{
+   ///@{
    /// Solves \f$Ax=b\f$.
    virtual void solveRight(Vector& x, const Vector& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
@@ -193,12 +193,12 @@ public:
    /// sparse version of solving three systems of equations with transposed basis matrix
    virtual void solveLeft(SSVector& x, SSVector& y, SSVector& z,
                           const SVector& b, SSVector& d, SSVector& e) = 0;
-   //@}
+   ///@}
 
 
    //---------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor
    SLinSolver()
       : spxout(0)
@@ -208,7 +208,7 @@ public:
    {}
    /// clone function for polymorphism
    virtual SLinSolver* clone() const = 0;
-   //@}
+   ///@}
 
    /// message handler
    SPxOut* spxout;

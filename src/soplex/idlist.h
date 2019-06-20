@@ -53,16 +53,16 @@ class IdElement : public T
 {
    //--------------------------
    /**@name Data */
-   //@{
+   ///@{
    IdElement<T>* theprev;   ///< pointer to previous element in the IdList
    IdElement<T>* thenext;   ///< pointer to next element in the IdList
-   //@}
+   ///@}
 
 public:
 
    //---------------------------------------
    /**@name Successors and predecessors */
-   //@{
+   ///@{
    /// returns the next element in the IdList (writeable).
    IdElement<T>*& next()
    {
@@ -84,11 +84,11 @@ public:
    {
       return theprev;
    }
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor.
    IdElement()
       : theprev(0)
@@ -126,7 +126,7 @@ public:
 
    //---------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// returns first element in list.
    T* first() const
    {
@@ -150,12 +150,12 @@ public:
    {
       return (elem == first()) ? 0 : elem->prev();
    }
-   //@}
+   ///@}
 
 
    //---------------------------------------
    /**@name Extension */
-   //@{
+   ///@{
    /// appends \p elem to end of list.
    void append(T* elem)
    {
@@ -236,11 +236,11 @@ public:
             list.last()->next()->prev() = list.last();
       }
    }
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Removal */
-   //@{
+   ///@{
    /// removes element following \p after.
    void remove_next(T* after)
    {
@@ -297,11 +297,11 @@ public:
          }
       }
    }
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// adjusts list pointers to a new memory address.
    /** When all elements have been moved in memory (e.g. because of
        reallocation) with a fixed offset \p delta, the list will be reset
@@ -342,11 +342,11 @@ public:
       return true;
 #endif
    }
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    /** The default constructor may also be used to construct a sublist, by
        providing a \p first and a \p last element. Element \p last must be a
@@ -358,7 +358,7 @@ public:
    {
       assert(isConsistent());
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

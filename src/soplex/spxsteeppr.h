@@ -44,7 +44,7 @@ public:
 
    //-------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// How to setup the direction multipliers.
    /** Possible settings are #EXACT for starting with exactly computed
        values, or #DEFAULT for starting with multipliers set to 1. The
@@ -55,7 +55,7 @@ public:
       EXACT,   ///< starting with exactly computed values
       DEFAULT  ///< starting with multipliers set to 1
    };
-   //@}
+   ///@}
    /// setup steepest edge weights
    void setupWeights(SPxSolver::Type type);
 
@@ -63,7 +63,7 @@ private:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// working vector
    SSVector workVec;
    /// working vector
@@ -82,7 +82,7 @@ private:
    Setup setup;
    /// has a refinement step already been tried?
    bool refined;
-   //@}
+   ///@}
 
    //-------------------------------------
    /// prepare data structures for hyper sparse pricing
@@ -115,7 +115,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    ///
    SPxSteepPR(const char* name = "Steep", Setup mode = DEFAULT)
       : SPxPricer(name)
@@ -163,11 +163,11 @@ public:
    {
       return new SPxSteepPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the solver
    virtual void load(SPxSolver* base);
    /// clear solver and preferences
@@ -196,14 +196,14 @@ public:
    virtual void removedVecs(const int perm[]);
    /// \p n covectors have been removed from loaded LP.
    virtual void removedCoVecs(const int perm[]);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    ///
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

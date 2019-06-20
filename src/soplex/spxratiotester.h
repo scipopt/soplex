@@ -43,7 +43,7 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// the solver
    SPxSolver*  thesolver;
    /// name of the ratio tester
@@ -52,13 +52,13 @@ protected:
    SPxSolver::Type m_type;
    /// allowed bound violation
    Real delta;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// get name of ratio tester.
    virtual const char* getName() const
    {
@@ -98,11 +98,11 @@ public:
    {
       return delta;
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Entering / leaving */
-   //@{
+   ///@{
    /// selects index to leave the basis.
    /** Method #selectLeave() is called by the loaded SoPlex solver when
        computing the entering simplex algorithm. Its task is to select and
@@ -160,11 +160,11 @@ public:
    */
    virtual void setType(SPxSolver::Type)
    {}
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    explicit SPxRatioTester(const char* name)
       : thesolver(0)
@@ -200,7 +200,7 @@ public:
    }
    /// clone function for polymorphism
    virtual SPxRatioTester* clone() const = 0;
-   //@}
+   ///@}
 
 };
 

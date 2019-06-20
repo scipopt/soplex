@@ -47,32 +47,32 @@ private:
 
    //-------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// specifies whether to work on the primal, the dual, or not at all.
    enum { NONE, PVEC, DVEC } state;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// the current (approximate) primal or dual vector
    DVector vec;
-   //@}
+   ///@}
 
 protected:
 
    //-------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    /// sets up variable weights.
    void setupWeights(SPxSolver& base);
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor.
    SPxVectorST()
       : state(NONE)
@@ -109,11 +109,11 @@ public:
    {
       return new SPxVectorST(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    /// sets up primal solution vector.
    void primal(const Vector& v)
    {
@@ -126,7 +126,7 @@ public:
       vec = v;
       state = DVEC;
    }
-   //@}
+   ///@}
 
 };
 

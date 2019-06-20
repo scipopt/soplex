@@ -59,17 +59,17 @@ private:
 
    //--------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    uint32_t seedshift;  ///< initial shift for random seeds.
    uint32_t lin_seed;   ///< random seed for linear congruential RNS.
    uint32_t xor_seed;   ///< random seed for XOR-shift RNS.
    uint32_t mwc_seed;   ///< random seed Multiple-with-carry RNS.
    uint32_t cst_seed;   ///< random seed shifted for mwc_seed.
-   //@}
+   ///@}
 
    //--------------------------------------
    /**@name Helpers */
-   //@{
+   ///@{
    /// executes KISS random number generator and returns a pseudo random Real value in [0,1].
    Real next_random()
    {
@@ -91,13 +91,13 @@ private:
       return (lin_seed + xor_seed + mwc_seed) / (Real)UINT32_MAX;
    }
 
-   //@}
+   ///@}
 
 public:
 
    //--------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// returns next random number.
    Real next(Real minimum = 0.0, Real maximum = 1.0)
    {
@@ -115,11 +115,11 @@ public:
       return seedshift;
    }
 
-   //@}
+   ///@}
 
    //--------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    /// initialize all seeds of the random number generator.
    void setSeed(uint32_t initshift)
    {
@@ -139,12 +139,12 @@ public:
       (void) next_random();
    }
 
-   //@}
+   ///@}
 
 
    //--------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor.
    /** Constructs a new (pseudo) Random variable using \p randomseed as seed for the random
        variable's sequence.
@@ -158,7 +158,7 @@ public:
    /// destructor
    ~Random()
    {}
-   //@}
+   ///@}
 };
 
 } // namespace soplex

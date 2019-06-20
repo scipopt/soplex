@@ -45,7 +45,7 @@ public:
 
    //-----------------------------------
    /**@name Adding */
-   //@{
+   ///@{
    /// adds \p n uninitialized indices.
    void add(int n)
    {
@@ -90,11 +90,11 @@ public:
     *  only.
     */
    void setMax(int newmax = 1);
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor. \p n gives the initial size of the index space.
    explicit DIdxSet(int n = 8);
 
@@ -128,7 +128,7 @@ public:
    }
    /// destructor.
    virtual ~DIdxSet();
-   //@}
+   ///@}
 };
 
 } // namespace soplex

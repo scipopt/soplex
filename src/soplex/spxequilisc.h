@@ -49,7 +49,7 @@ public:
                                       DataArray<int>& rowscaleExp, DataArray<int>& colscaleExp);
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor (this scaler makes no use of inherited member m_colFirst)
    explicit SPxEquiliSC(bool doBoth = true);
    /// copy constructor
@@ -64,14 +64,14 @@ public:
    {
       return new SPxEquiliSC(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Scaling */
-   //@{
+   ///@{
    /// Scale the loaded SPxLP.
    virtual void scale(SPxLPBase<Real>& lp, bool persistent = false) override;
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _SPXEQUILISC_H_

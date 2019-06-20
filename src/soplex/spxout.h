@@ -67,7 +67,7 @@ public:
 
    //-----------------------------------
    /**@name Output control types */
-   //@{
+   ///@{
    /// Verbosity level
    typedef enum
    {
@@ -88,11 +88,11 @@ public:
       /// verbosity level
       Verbosity v_;
    };
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    SPxOut();
    /// destructor
@@ -101,11 +101,11 @@ public:
    SPxOut(const SPxOut&);
    /// assignment operator
    SPxOut& operator=(const SPxOut&);
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Verbosity */
-   //@{
+   ///@{
    ///
    virtual void
    setVerbosity(const Verbosity& v)
@@ -120,11 +120,11 @@ public:
       return m_verbosity;
    }
 
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Wrappers for the current stream */
-   //@{
+   ///@{
    ///
    inline bool good() const
    {
@@ -140,11 +140,11 @@ public:
    {
       return getCurrentStream().precision();
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Getting / setting streams */
-   //@{
+   ///@{
    /// Sets the stream for the specified verbosity level.
    virtual void
    setStream(const Verbosity& verbosity,
@@ -178,18 +178,18 @@ public:
    {
       stream << std::setprecision(precision) << std::fixed;
    }
-   //@}
+   ///@}
 
 private:
 
    //-----------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    /// verbosity level
    Verbosity               m_verbosity;
    /// array of pointers to internal streams, indexed by verbosity level
    std::ostream**          m_streams;
-   //@}
+   ///@}
 };
 
 // ---------------------------------------------------------
@@ -212,7 +212,7 @@ private:
     extracts the verbosity level from the struct and passes it to the
     member function SPxOut::setVerbosity().
 */
-//@{
+///@{
 /// manipulator to be used in an output statement
 inline SPxOut::struct_Verbosity
 verb(const SPxOut::Verbosity&  v)
@@ -230,7 +230,7 @@ operator<< (SPxOut& stream,
    stream.setVerbosity(verbosity.v_);
    return stream;
 }
-//@}
+///@}
 
 //--------------------------------------------------------
 /**@name Output of standard manipulators and other types
@@ -240,7 +240,7 @@ operator<< (SPxOut& stream,
  * other. When using only a template type, it is not clear what the
  * compiler makes out of it (according to lint).
  */
-//@{
+///@{
 ///
 #define PASS_TO_CURRENT_OSTREAM( t ) \
       _spxout.getCurrentStream() << t; \
@@ -283,7 +283,7 @@ operator<< (SPxOut& _spxout, T  t)
 {
    PASS_TO_CURRENT_OSTREAM(t)
 }
-//@}
+///@}
 
 }  // namespace soplex
 
