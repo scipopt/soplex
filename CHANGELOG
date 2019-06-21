@@ -57,6 +57,7 @@ fixed bugs:
 - return correct basis status when aborting a solve early
 - ensure basis status is set correctly when aborting a solve early
 - fix memory leak when copying SoPlex
+- correct getBasisInverseCol for row representation
 
 code quality:
 - merge SoPlex::hasDual() and SoPlex::hasPrimal() into SoPlex::hasSol() and mark old methods deprecated
