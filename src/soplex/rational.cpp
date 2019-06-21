@@ -61,13 +61,13 @@ namespace soplex
 
 #ifdef SOPLEX_WITH_GMP
 
-/// rational zero
+/// rational zero (GMP only)
 const Rational Rational::ZERO(0, true);
 
-/// rational plus one
+/// rational plus one (GMP only)
 const Rational Rational::POSONE(1, true);
 
-/// rational minus one
+/// rational minus one (GMP only)
 const Rational Rational::NEGONE(-1, true);
 
 /// list of unused Private objects; note that this cannot be used if SOPLEX_WITH_GMP is not defined, since then the

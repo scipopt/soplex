@@ -59,18 +59,18 @@ protected:
 
    //---------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    int  num;           ///< number of used indices
    int  len;           ///< length of array \ref soplex::IdxSet::idx "idx"
    int* idx;           ///< array of indices
    bool freeArray;     ///< true iff \ref soplex::IdxSet::idx "idx" should be freed inside of this object
-   //@}
+   ///@}
 
 public:
 
    //---------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor.
    /** The constructur receives the index memory \p imem to use for saving
        its indices. This must be large enough to fit \p n indices. \p l can
@@ -109,11 +109,11 @@ public:
    IdxSet& operator=(const IdxSet& set);
    /// copy constructor.
    IdxSet(const IdxSet&);
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// access \p n 'th index.
    int index(int n) const
    {
@@ -140,11 +140,11 @@ public:
        index(pos(\p i)) == \p i holds.
     */
    int pos(int i) const;
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    /// appends \p n uninitialized indices.
    void add(int n)
    {
@@ -185,14 +185,14 @@ public:
    {
       num = 0;
    }
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// consistency check.
    bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

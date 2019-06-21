@@ -45,7 +45,7 @@ private:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// column penalties
    DVector cPenalty;
    /// row penalties
@@ -58,24 +58,24 @@ private:
    const Real* coPenalty;
    /// length of objective vector.
    Real objlength;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
    /// compute leave penalties.
    void computeLeavePenalty(int start, int end);
    /// compute weights for columns.
    void computeCP(int start, int end);
    /// compute weights for rows.
    void computeRP(int start, int end);
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxWeightPR()
       : SPxPricer<R>("Weight")
@@ -141,11 +141,11 @@ public:
    {
       return new SPxWeightPR(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the solver
    virtual void load(SPxSolverBase<R>* base);
    /// set entering/leaving algorithm
@@ -168,14 +168,14 @@ public:
    virtual void removedVecs(const int perm[]);
    /// \p n covectors have been removed from the loaded LP.
    virtual void removedCoVecs(const int perm[]);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// checks for consistency
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _SPXWEIGHTPR_H_

@@ -56,20 +56,20 @@ private:
    /// constructor for Rational::{ZERO, POSONE, NEGONE} that does not use these numbers
    Rational(const int& i, const bool& dummy);
 
-   //**@name Static variables for special rational values */
-   //@{
+   ///@name Static variables for special rational values
+   ///@{
 
    static const Rational ZERO;
    static const Rational POSONE;
    static const Rational NEGONE;
 
-   //@}
+   ///@}
 #endif
 
 public:
 
-   //**@name Construction and destruction */
-   //@{
+   ///@name Construction and destruction
+   ///@{
 
    /// default constructor
    Rational();
@@ -87,7 +87,7 @@ public:
    Rational(const int& i);
 
 #ifdef SOPLEX_WITH_GMP
-   /// constructor from mpq_t
+   /// constructor from mpq_t (GMP only)
    Rational(const mpq_t& q);
 #endif
 
@@ -118,22 +118,18 @@ public:
 
    /// assignment operator from int
    Rational& operator=(const int& i);
+   ///@}
 
 #ifdef SOPLEX_WITH_GMP
+   /// @name GMP Only methods
+   ///
+   /// Methods of the Rational class that are only available if SoPlex is compiled with "-DGMP=on"
+   ///
+   ///@{
+
    /// assignment operator from mpq_t
    Rational& operator=(const mpq_t& q);
-#endif
 
-   //@}
-
-
-   //**@name Typecasts */
-   //@{
-
-   operator double() const;
-   operator long double() const;
-
-#ifdef SOPLEX_WITH_GMP
    /// provides read-only access to underlying mpq_t
    const mpq_t* getMpqPtr() const;
 
@@ -145,12 +141,20 @@ public:
 
    /// provides write access to underlying mpq_t; use with care
    mpq_t& getMpqRef_w() const;
+   ///@} // end of RationalWithGMP
 #endif
-   //@}
+
+   ///@name Typecasts
+   ///@{
+
+   operator double() const;
+   operator long double() const;
+
+   ///@}
 
 
-   //**@name Arithmetic operators */
-   //@{
+   ///@name Arithmetic operators
+   ///@{
 
    /// addition operator
    Rational operator+(const Rational& r) const;
@@ -242,11 +246,11 @@ public:
    /// round up to next power of two
    Rational& powRound();
 
-   //@}
+   ///@}
 
 
-   //**@name Methods for checking exactness of doubles  */
-   //@{
+   ///@name Methods for checking exactness of doubles
+   ///@{
 
    /// checks if \p d is the closest number that can be represented by double
    bool isNextTo(const double& d);
@@ -254,29 +258,29 @@ public:
    /// checks if \p d is exactly equal to the Rational and if not, if it is one of the two adjacent doubles
    bool isAdjacentTo(const double& d) const;
 
-   //@}
+   ///@}
 
 
-   //**@name Methods for querying size */
-   //@{
+   ///@name Methods for querying size
+   ///@{
 
    /// Size in specified base (bit size for base 2)
    int sizeInBase(const int base = 2) const;
 
-   //@}
+   ///@}
 
 
-   //**@name Static methods  */
-   //@{
+   ///@name Static methods
+   ///@{
 
    /// returns precision of Rational implementation, i.e., number of bits used to store Rational numbers (INT_MAX if exact)
    static int precision();
 
-   //@}
+   ///@}
 
 
-   //**@name Conversion from and to String */
-   //@{
+   ///@name Conversion from and to String
+   ///@{
 
    /// read Rational from string
    bool readString(const char* s);
@@ -285,11 +289,11 @@ public:
    friend bool readStringRational(const char* s, Rational& value);
    friend std::ostream& operator<<(std::ostream& os, const Rational& q);
 
-   //@}
+   ///@}
 
 
-   //**@name Friends */
-   //@{
+   ///@name Friends
+   ///@{
 
    friend int compareRational(const Rational& r, const Rational& s);
    friend bool operator!=(const Rational& r, const Rational& s);
@@ -355,12 +359,12 @@ public:
    friend int sign(const Rational& r);
    friend Rational operator-(const Rational& q);
 
-   //@}
+   ///@}
 };
 
 
-//**@name Parsing and printing */
-//@{
+///@name Parsing and printing
+///@{
 
 /// convert rational number to string
 std::string rationalToString(const Rational& r, const int precision = 32);
@@ -371,11 +375,11 @@ bool readStringRational(const char* s, Rational& value);
 /// print Rational
 std::ostream& operator<<(std::ostream& os, const Rational& r);
 
-//@}
+///@}
 
 
-//**@name Relational operators */
-//@{
+///@name Relational operators
+///@{
 
 /// comparison operator returning a positive value if r > s, zero if r = s, and a negative value if r < s
 int compareRational(const Rational& r, const Rational& s);
@@ -506,11 +510,11 @@ bool operator>(const int& r, const Rational& s);
 /// greater than or equal to operator for int and Rational
 bool operator>=(const int& r, const Rational& s);
 
-//@}
+///@}
 
 
-//**@name Non-member arithmetic operators and functions */
-//@{
+///@name Non-member arithmetic operators and functions
+///@{
 
 /// addition operator for double and Rational
 Rational operator+(const double& d, const Rational& r);
@@ -554,7 +558,7 @@ int dlcmSizeRational(const Rational* vector, const int length, const int base = 
 /// Size of largest denominator in rational vector.
 int dmaxSizeRational(const Rational* vector, const int length, const int base = 2);
 
-//@}
+///@}
 
 } // namespace soplex
 

@@ -46,7 +46,7 @@ public:
 
    //---------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// status flags of the SLinSolverRational class.
    enum Status
    {
@@ -65,11 +65,11 @@ public:
       /// The time limit has been hit
       TIME     = 16
    };
-   //@}
+   ///@}
 
    //---------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// returns the name of the SLinSolverRational.
    virtual const char* getName() const = 0;
 
@@ -113,7 +113,7 @@ public:
 
    /// get number of factorizations
    virtual int getFactorCount() const = 0;
-   //@}
+   ///@}
 
 
    /**@name Solving linear systems
@@ -134,7 +134,7 @@ public:
       The result vector(s) are allways given as the first parameter(s). Two
       types of result vectors are supported, VectorRational and SSVectorRational.
    */
-   //@{
+   ///@{
    /// Solves \f$Ax=b\f$.
    virtual void solveRight(VectorRational& x, const VectorRational& b) /* const */ = 0;
    /// Solves \f$Ax=b\f$.
@@ -170,12 +170,12 @@ public:
    /// solves \f$x^TA=b^T\f$, \f$y^TA=d^T\f$ and \f$z^TA=e^T\f$
    virtual void solveLeft(SSVectorRational& x, VectorRational& y, VectorRational& z,
                           const SVectorRational& b, SSVectorRational& d, SSVectorRational& e) = 0;
-   //@}
+   ///@}
 
 
    //---------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor
    SLinSolverRational()
    {}
@@ -184,7 +184,7 @@ public:
    {}
    /// clone function for polymorphism
    virtual SLinSolverRational* clone() const = 0;
-   //@}
+   ///@}
 
 
 

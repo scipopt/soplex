@@ -45,16 +45,16 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// name of the starter
    const char* m_name;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// constructor
    explicit SPxStarter(const char* name)
       : m_name(name)
@@ -80,40 +80,40 @@ public:
    }
    /// clone function for polymorphism
    virtual SPxStarter* clone()const = 0;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// get name of starter.
    virtual const char* getName() const
    {
       return m_name;
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Starting */
-   //@{
+   ///@{
    /// generates start basis for loaded basis.
    virtual void generate(SPxSolverBase<R>& base) = 0;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Misc */
-   //@{
+   ///@{
    /// checks consistency.
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 
 private:
 
    //------------------------------------
    /**@name Blocked */
-   //@{
+   ///@{
    /// we have no default constructor.
    SPxStarter();
-   //@}
+   ///@}
 
 };
 } // namespace soplex

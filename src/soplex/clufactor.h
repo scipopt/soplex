@@ -40,7 +40,7 @@ public:
 
    //----------------------------------------
    /**@name Public types */
-   //@{
+   ///@{
    /** Doubly linked ring structure for garbage collection of column or
     *  row file in working matrix.
     */
@@ -72,13 +72,13 @@ public:
       Pring(const Pring&);             ///< blocked copy constructor
       Pring& operator= (const Pring&); ///< blocked assignment operator
    };
-   //@}
+   ///@}
 
 protected:
 
    //----------------------------------------
    /**@name Protected types */
-   //@{
+   ///@{
    /// Temporary data structures.
    class Temp
    {
@@ -176,11 +176,11 @@ protected:
       int*  rorig;         ///< original row permutation
       int*  rperm;         ///< original row permutation
    };
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Protected data */
-   //@{
+   ///@{
    SLinSolver::Status stat;   ///< Status indicator.
 
    int     thedim;            ///< dimension of factorized matrix
@@ -203,15 +203,15 @@ protected:
 
    Timer*  factorTime;        ///< Time spent in factorizations
    int     factorCount;       ///< Number of factorizations
-   //@}
+   ///@}
 
 private:
 
    //----------------------------------------
    /**@name Private data */
-   //@{
+   ///@{
    Temp    temp;              ///< Temporary storage
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Solving
@@ -222,7 +222,7 @@ private:
       "Eps" in the end consider elements smaller then the passed epsilon
       as zero.
    */
-   //@{
+   ///@{
    ///
    void solveUright(Real* wrk, Real* vec) const;
    ///
@@ -349,13 +349,13 @@ private:
    void remaxRow(int p_row, int len);
    ///
    int makeLvec(int p_len, int p_row);
-   //@}
+   ///@}
 
 protected:
 
    //----------------------------------------
    /**@name Solver methods */
-   //@{
+   ///@{
    ///
    void solveLright(Real* vec);
    ///
@@ -461,17 +461,17 @@ protected:
    void factor(const SVector** vec,   ///< Array of column vector pointers
                Real threshold,    ///< pivoting threshold
                Real eps);         ///< epsilon for zero detection
-   //@}
+   ///@}
 
    //----------------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    ///
    void dump() const;
 
    ///
    bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 } // namespace soplex

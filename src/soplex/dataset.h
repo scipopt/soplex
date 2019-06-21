@@ -89,7 +89,7 @@ protected:
 
    //-----------------------------------
    /**@name Types */
-   //@{
+   ///@{
    ///
    struct Item
    {
@@ -97,17 +97,17 @@ protected:
       int  info;       ///< element number. info \f$\in\f$ [0,thesize-1]
       ///< iff element is used
    }* theitem;         ///< array of elements in the DataSet
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Data */
-   //@{
+   ///@{
    DataKey* thekey;    ///< DataKey::idx's of elements
    int themax;         ///< length of arrays theitem and thekey
    int thesize;        ///< highest used element in theitem
    int thenum;         ///< number of elements in DataSet
    int firstfree;      ///< first unused element in theitem
-   //@}
+   ///@}
 
 public:
 
@@ -118,7 +118,7 @@ public:
     *  elements are provided with two signatures, one of them having a
     *  parameter for returning the assigned DataKey(s).
     */
-   //@{
+   ///@{
    /// adds an element.
    void add(DataKey& newkey, const DATA& item)
    {
@@ -207,7 +207,7 @@ public:
       DataKey tmp;
       return create(tmp);
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Shrinkage
@@ -224,7 +224,7 @@ public:
     * simple renumbering of the elements: The last element in the set
     * (i.e., element num()-1) is moved to the index of the removed element.
     */
-   //@{
+   ///@{
    /// removes the \p removenum 'th element.
    void remove(int removenum)
    {
@@ -344,7 +344,7 @@ public:
       thenum = 0;
       firstfree = -themax - 1;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Access
@@ -353,7 +353,7 @@ public:
     * DataSet. If this is not known afore, it is the programmers
     * responsability to ensure this using the inquiry methods below.
     */
-   //@{
+   ///@{
    ///
    DATA& operator[](int n)
    {
@@ -379,11 +379,11 @@ public:
       assert(k.idx < thesize);
       return theitem[k.idx].data;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Inquiry */
-   //@{
+   ///@{
    /// returns maximum number of elements that would fit into DataSet.
    int max() const
    {
@@ -467,11 +467,11 @@ public:
 
       return n >= 0;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
    /// resets max() to \p newmax.
    /** This method will not succeed if \p newmax < size(), in which case
     *  \p newmax == size() will be taken. As generally this method involves
@@ -525,11 +525,11 @@ public:
 
       return true;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
    /// default constructor.
    explicit
    DataSet(int pmax = 8)
@@ -641,7 +641,7 @@ public:
       if(thekey)
          spx_free(thekey);
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

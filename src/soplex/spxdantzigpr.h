@@ -55,7 +55,7 @@ public:
 
    //-------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor
    SPxDantzigPR()
       : SPxPricer<R>("Dantzig")
@@ -82,17 +82,17 @@ public:
    {
       return new SPxDantzigPR(*this);
    }
-   //@}
+   ///@}
 
 
    //-------------------------------------
    /**@name Select enter/leave */
-   //@{
+   ///@{
    ///
    virtual int selectLeave();
    ///
    virtual SPxId selectEnter();
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _SPXDEFAULTPRR_H_

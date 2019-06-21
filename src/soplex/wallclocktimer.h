@@ -32,29 +32,29 @@ private:
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    mutable time_t sec;           ///< seconds
    mutable time_t usec;          ///< microseconds
 
    mutable Real lasttime;
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Internal helpers */
-   //@{
+   ///@{
    /// convert wallclock time to secounds.
    Real wall2sec(time_t s, time_t us) const
    {
       return (Real)s + 0.000001 * (Real)us;
    }
 
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    WallclockTimer()
       : Timer(), sec(0), usec(0), lasttime(0.0)
@@ -74,11 +74,11 @@ public:
 
    virtual ~WallclockTimer()
    {}
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Control */
-   //@{
+   ///@{
    /// initialize timer, set timing accounts to zero.
    virtual void reset()
    {
@@ -98,16 +98,16 @@ public:
    {
       return WALLCLOCK_TIME;
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    virtual Real time() const;
 
    virtual Real lastTime() const;
 
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _WALLCLOCK_TIMER_H_
