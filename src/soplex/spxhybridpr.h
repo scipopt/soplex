@@ -44,7 +44,7 @@ class SPxHybridPR : public SPxPricer
 {
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    /// steepest edge pricer
    SPxSteepPR   steep;
    /// partial multiple pricer
@@ -55,13 +55,13 @@ class SPxHybridPR : public SPxPricer
    SPxPricer*   thepricer;
    /// factor between dim and coDim of the problem to decide about the pricer
    Real hybridFactor;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// sets the epsilon
    virtual void setEpsilon(Real eps);
    /// sets the solver
@@ -84,18 +84,18 @@ public:
    virtual void addedVecs(int n);
    /// calls addedCoVecs(n) on all pricers
    virtual void addedCoVecs(int n);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxHybridPR()
       : SPxPricer("Hybrid")
@@ -166,7 +166,7 @@ public:
    {
       return new SPxHybridPR(*this);
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

@@ -52,7 +52,7 @@ class SPxBoundFlippingRT : public SPxFastRT
 {
 private:
    /**@name substructures */
-   //@{
+   ///@{
    /** enumerator to remember which vector we have been searching to find a breakpoint
     */
    enum BreakpointSource
@@ -93,11 +93,11 @@ private:
          return i.val - j.val;
       }
    };
-   //@}
+   ///@}
 
    /**@name Data
     */
-   //@{
+   ///@{
    bool                  enableBoundFlips;   /**< enable or disable long steps in BoundFlippingRT */
    bool                  enableRowBoundFlips;/**< enable bound flips also for row representation */
    Real
@@ -108,7 +108,7 @@ private:
    updPrimRhs;         /**< right hand side vector of additional system to be solved after the ratio test */
    SSVector
    updPrimVec;         /**< allocation of memory for additional solution vector */
-   //@}
+   ///@}
 
    /** store all available pivots/breakpoints in an array (positive pivot search direction) */
    void collectBreakpointsMax(
@@ -184,7 +184,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    SPxBoundFlippingRT()
       : SPxFastRT("Bound Flipping")
@@ -229,11 +229,11 @@ public:
    {
       return new SPxBoundFlippingRT(*this);
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Select enter/leave */
-   //@{
+   ///@{
    ///
    virtual int selectLeave(
       Real&              val,
@@ -256,7 +256,7 @@ public:
    {
       enableRowBoundFlips = bf;
    }
-   //@}
+   ///@}
 };
 
 } // namespace soplex

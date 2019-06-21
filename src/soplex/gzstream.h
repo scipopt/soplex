@@ -64,33 +64,33 @@ private:
 
    //------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    ///
    static const int bufferSize = 47 + 256; ///< size of data buff
    // totals 512 bytes under g++ for igzstream at the end.
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    gzFile           file;               ///< file handle for compressed file
    char             buffer[bufferSize]; ///< data buffer
    char             opened;             ///< open/close state of stream
    unsigned int     mode;               ///< I/O mode
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Internal helpers */
-   //@{
+   ///@{
    ///
    int flush_buffer();
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    gzstreambuf()
       : file(0)
@@ -108,11 +108,11 @@ public:
    {
       close();
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Interface */
-   //@{
+   ///@{
    ///
    int is_open()
    {
@@ -128,7 +128,7 @@ public:
    virtual int     underflow();
    ///
    virtual int     sync();
-   //@}
+   ///@}
 };
 
 // ----------------------------------------------------------------------------
@@ -145,16 +145,16 @@ protected:
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    ///
    gzstreambuf buf;
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    gzstreambase()
    {
@@ -164,11 +164,11 @@ public:
    gzstreambase(const char* _name, int _open_mode);
    /// destructor
    ~gzstreambase();
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Interface */
-   //@{
+   ///@{
    ///
    void open(const char* _name, int _open_mode);
    ///
@@ -178,7 +178,7 @@ public:
    {
       return &buf;
    }
-   //@}
+   ///@}
 };
 
 // ----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    igzstream()
       : std::istream(&buf)
@@ -213,11 +213,11 @@ public:
       : std::istream(&buf)
       , gzstreambase(_name, _open_mode)
    {}
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Interface */
-   //@{
+   ///@{
    ///
    gzstreambuf* rdbuf()
    {
@@ -229,7 +229,7 @@ public:
    {
       gzstreambase::open(_name, _open_mode);
    }
-   //@}
+   ///@}
 };
 
 // ----------------------------------------------------------------------------
@@ -247,7 +247,7 @@ public:
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor
    ogzstream()
       : std::ostream(&buf)
@@ -259,11 +259,11 @@ public:
       : gzstreambase(_name, _open_mode)
       , std::ostream(&buf)
    {}
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Interface */
-   //@{
+   ///@{
    ///
    gzstreambuf* rdbuf()
    {

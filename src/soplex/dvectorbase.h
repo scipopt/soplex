@@ -53,7 +53,7 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Length of array of values \ref soplex::DVectorBase::mem "mem"
    int memsize;
@@ -61,13 +61,13 @@ private:
    /// Array of values.
    R* mem;
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction, destruction, and assignment */
-   //@{
+   ///@{
 
    /// Default constructor. \p d is the initial dimension.
    explicit DVectorBase<R>(int d = 0)
@@ -237,11 +237,11 @@ public:
       }
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access and modification */
-   //@{
+   ///@{
 
    /// Returns \ref soplex::DVectorBase "DVectorBase"'s memory size.
    int memSize() const
@@ -297,11 +297,11 @@ public:
       VectorBase<R>::val = mem;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Consistency check.
    bool isConsistent() const
@@ -317,7 +317,7 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 };
 
 

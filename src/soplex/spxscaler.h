@@ -79,22 +79,22 @@ protected:
 
    //-------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    const char*        m_name;      ///< Name of the scaler
    DataArray < int >* m_activeColscaleExp; ///< pointer to currently active column scaling factors
    DataArray < int >* m_activeRowscaleExp; ///< pointer to currently active row scaling factors
    bool               m_colFirst;  ///< do column scaling first
    bool               m_doBoth;    ///< do columns and rows
    SPxOut*            spxout;      ///< message handler
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
 
    /// clear and setup scaling arrays in the LP
    virtual void setup(SPxLPBase<Real>& lp);
-   //@}
+   ///@}
 
 public:
 
@@ -111,7 +111,7 @@ public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// constructor
    explicit SPxScaler(const char* name, bool colFirst = false, bool doBoth = true,
                       SPxOut* spxout = NULL);
@@ -123,11 +123,11 @@ public:
    virtual ~SPxScaler();
    /// clone function for polymorphism
    virtual SPxScaler* clone() const = 0;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// get name of scaler
    virtual const char* getName() const;
    /// set scaling order
@@ -143,11 +143,11 @@ public:
    virtual void setRealParam(Real param, const char* name = "realparam");
    /// set int parameter
    virtual void setIntParam(int param, const char* name = "intparam");
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Scaling */
-   //@{
+   ///@{
    /// scale SPxLP.
    virtual void scale(SPxLPBase<Real>& lp, bool persistent = true) = 0;
    /// unscale SPxLP
@@ -230,14 +230,14 @@ public:
    virtual Real maxRowRatio(const SPxLPBase<Real>& lp) const;
    /// round vector entries to power of 2
    void computeExpVec(const std::vector<Real>& vec, DataArray<int>& vecExp);
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Debugging */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const;
-   //@}
+   ///@}
 };
 } // namespace soplex
 #endif // _SPXSCALER_H_

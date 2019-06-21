@@ -106,8 +106,8 @@ public:
    public:
 
       //------------------------------------
-      //**@name Status */
-      //@{
+      ///@name Status
+      ///@{
       /// Status of a variable.
       /** A basis is described by assigning a Status to all of the LP
           variables and covariables. This assignment is maintained by the
@@ -194,7 +194,7 @@ public:
          D_ON_BOTH   = D_ON_LOWER + D_ON_UPPER,  ///< dual variable has two bounds
          D_UNDEFINED = 8    ///< primal or dual variable is undefined
       };
-      //@}
+      ///@}
 
       friend class SPxBasis;
       friend std::ostream& operator<<(std::ostream& os, const Status& stat);
@@ -202,19 +202,19 @@ public:
    private:
 
       //------------------------------------
-      //**@name Data */
-      //@{
+      ///@name Data
+      ///@{
       DataArray < Status > rowstat;   ///< status of rows.
       DataArray < Status > colstat;   ///< status of columns.
       DataArray < Status >* stat;     ///< basis' status.
       DataArray < Status >* costat;   ///< cobasis' status.
-      //@}
+      ///@}
 
    public:
 
       //------------------------------------
-      //**@name Access / modification */
-      //@{
+      ///@name Access / modification
+      ///@{
       /// returns number of columns.
       int nCols() const
       {
@@ -297,21 +297,21 @@ public:
       }
       /// resets dimensions.
       void reSize(int rowDim, int colDim);
-      //@}
+      ///@}
 
       //------------------------------------
-      //**@name Debugging */
-      //@{
+      ///@name Debugging
+      ///@{
       /// Prints out status.
       void dump() const;
 
       /// consistency check.
       bool isConsistent() const;
-      //@}
+      ///@}
 
       //------------------------------------
-      //**@name Construction / destruction */
-      //@{
+      ///@name Construction / destruction
+      ///@{
       /// default constructor
       Desc()
          : stat(0)
@@ -323,13 +323,13 @@ public:
       Desc(const Desc& old);
       /// assignment operator
       Desc& operator=(const Desc& rhs);
-      //@}
+      ///@}
    };
 
 protected:
 
    //------------------------------------
-   //**@name Protected data
+   ///@name Protected data
    /**
       For storing the basis matrix we keep two arrays: Array #theBaseId
       contains the SPxId%s of the basis vectors, and #matrix the pointers to
@@ -338,7 +338,7 @@ protected:
       be called whenever the vector pointers may have
       changed due to manipulations of the LP.
    */
-   //@{
+   ///@{
    /// the LP
    SPxSolver* theLP;
    /// SPxId%s of basic vectors.
@@ -402,25 +402,25 @@ protected:
    SPxId  lastout;       ///< lastLeft(): variable left the base last
    int    lastidx;       ///< lastIndex(): basis index where last update was done
    Real   minStab;       ///< minimum stability
-   //@}
+   ///@}
 
 private:
 
    //------------------------------------
-   //**@name Private data */
-   //@{
+   ///@name Private data
+   ///@{
    SPxStatus thestatus;      ///< current status of the basis.
    Desc      thedesc;        ///< the basis' Descriptor
    bool      freeSlinSolver; ///< true iff factor should be freed inside of this object
    SPxOut*   spxout;         ///< message handler
 
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------------------
-   /**@name Status and Descriptor related Methods */
-   //@{
+   ///@name Status and Descriptor related Methods
+   ///@{
    /// returns current SPxStatus.
    SPxStatus status() const
    {
@@ -494,12 +494,12 @@ public:
              ? dualStatus(SPxRowId(id))
              : dualStatus(SPxColId(id));
    }
-   //@}
+   ///@}
 
 
    //-----------------------------------
-   /**@name Inquiry Methods */
-   //@{
+   ///@name Inquiry Methods
+   ///@{
    ///
    inline SPxId& baseId(int i)
    {
@@ -565,11 +565,11 @@ public:
    {
       return theLP;
    }
-   //@}
+   ///@}
 
    //-----------------------------------
-   /**@name Linear Algebra */
-   //@{
+   ///@name Linear Algebra
+   ///@{
    /// Basis-vector product.
    /** Depending on the representation, for an SPxBasis B,
        B.multBaseWith(x) computes
@@ -787,14 +787,13 @@ public:
 
       factor->solveLeft(x, y, z, rhsx, rhsy, rhsz);
    }
-   //@}
+   ///@}
 
 
    //------------------------------------
-   /**@name Modification notification.
-       These methods must be called after the loaded LP has been modified.
-    */
-   //@{
+   ///@name Modification notification.
+   /// These methods must be called after the loaded LP has been modified.
+   ///@{
    /// inform SPxBasis, that \p n new rows had been added.
    void addedRows(int n);
    /// inform SPxBasis that row \p i had been removed.
@@ -813,12 +812,12 @@ public:
    void changedCol(int);
    /// inform SPxBasis that a matrix entry had been changed.
    void changedElement(int, int);
-   //@}
+   ///@}
 
 
    //--------------------------------
-   /**@name Miscellaneous */
-   //@{
+   ///@name Miscellaneous
+   ///@{
    /// performs basis update.
    /** Changes the \p i 'th vector of the basis with the vector associated to
        \p id. This includes:
@@ -944,11 +943,11 @@ public:
    {
       spxout = &newOutstream;
    }
-   //@}
+   ///@}
 
    //--------------------------------------
-   /**@name Constructors / Destructors */
-   //@{
+   ///@name Constructors / Destructors
+   ///@{
    /// default constructor.
    SPxBasis(Timer::TYPE ttype = Timer::USER_TIME);
    /// copy constructor
@@ -957,14 +956,14 @@ public:
    SPxBasis& operator=(const SPxBasis& rhs);
    /// destructor.
    virtual ~SPxBasis();
-   //@}
+   ///@}
 
 
 protected:
 
    //--------------------------------------
-   /**@name Protected helpers */
-   //@{
+   ///@name Protected helpers
+   ///@{
    /// loads \ref soplex::SPxBasis::matrix "matrix" according to the SPxId%s stored in \ref soplex::SPxBasis::theBaseId "theBaseId".
    /** This method must  be called whenever there is a chance, that the vector
        pointers may have changed due to manipulations of the LP.
@@ -984,7 +983,7 @@ protected:
 
    /// sets descriptor representation according to loaded LP.
    void setRep();
-   //@}
+   ///@}
 
 };
 

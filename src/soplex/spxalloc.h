@@ -38,7 +38,7 @@ namespace soplex
  * We use templates to get the types right, otherwise casts would have
  * been neccessary.
  */
-//@{
+///@{
 /**@brief Allocate memory.
  * @param p some pointer
  * @param n the number of elements \p p will point to.
@@ -115,7 +115,7 @@ inline void spx_free(T& p)
    p = 0;
 }
 
-//@}
+///@}
 } // namespace soplex
 
 

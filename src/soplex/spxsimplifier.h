@@ -44,7 +44,7 @@ protected:
 
    //-------------------------------------
    /**@name Protected Data */
-   //@{
+   ///@{
    /// name of the simplifier
    const char* m_name;
    /// user time used for simplification
@@ -70,13 +70,13 @@ protected:
    Real        m_minReduction;
    /// message handler
    SPxOut*     spxout;
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// Result of the simplification.
    enum Result
    {
@@ -86,11 +86,11 @@ public:
       UNBOUNDED       =  3,  ///< primal unboundedness was detected
       VANISHED        =  4   ///< the problem was so much simplified that it vanished
    };
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// constructor
    explicit SPxSimplifier(const char* p_name, Timer::TYPE ttype = Timer::USER_TIME)
       : m_name(p_name)
@@ -162,11 +162,11 @@ public:
    }
    /// clone function for polymorphism
    virtual SPxSimplifier* clone() const = 0;
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Access / modfication */
-   //@{
+   ///@{
    /// get name of simplifier.
    virtual const char* getName() const
    {
@@ -176,11 +176,11 @@ public:
    {
       return m_timeUsed->time();
    }
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Simplifying / unsimplifying */
-   //@{
+   ///@{
    /// simplify SPxLP \p lp with identical primal and dual feasibility tolerance.
    virtual Result simplify(SPxLP& lp, Real eps, Real delta) = 0;
    /// simplify SPxLP \p lp with independent primal and dual feasibility tolerance.
@@ -236,17 +236,17 @@ public:
       m_minReduction = minRed;
    }
 
-   //@}
+   ///@}
 
    //-------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    /// consistency check
    virtual bool isConsistent() const
    {
       return true;
    }
-   //@}
+   ///@}
 
 };
 

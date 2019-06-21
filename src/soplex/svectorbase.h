@@ -133,13 +133,13 @@ private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    Nonzero<R>* m_elem;
    int memsize;
    int memused;
 
-   //@}
+   ///@}
 
 public:
 
@@ -147,7 +147,7 @@ public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access */
-   //@{
+   ///@{
 
    /// Number of used indices.
    int size() const
@@ -465,11 +465,11 @@ public:
       }
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Arithmetic operations */
-   //@{
+   ///@{
 
    /// Maximum absolute value, i.e., infinity norm.
    R maxAbs() const
@@ -598,11 +598,11 @@ public:
       return x;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructions, destruction, and assignment */
-   //@{
+   ///@{
 
    /// Default constructor.
    /** The constructor expects one memory block where to store the nonzero elements. This must be passed to the
@@ -756,11 +756,11 @@ public:
    template < class S >
    SVectorBase<R>& operator=(const SSVectorBase<S>& sv);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Memory */
-   //@{
+   ///@{
 
    /// get pointer to internal memory.
    Nonzero<R>* mem() const
@@ -793,11 +793,11 @@ public:
       set_max(n);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Consistency check.
    bool isConsistent() const
@@ -828,7 +828,7 @@ public:
       return true;
    }
 
-   //@}
+   ///@}
 };
 
 

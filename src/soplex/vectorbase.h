@@ -78,7 +78,7 @@ protected:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    /// Dimension of vector.
    int dimen;
@@ -87,13 +87,13 @@ protected:
    /** The memory block pointed to by val must at least have size dimen * sizeof(R). */
    R* val;
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction and assignment */
-   //@{
+   ///@{
 
    /// Constructor.
    /** There is no default constructor since the storage for a VectorBase must be provided externally.  Storage must be
@@ -207,11 +207,11 @@ public:
    template < class S >
    VectorBase<R>& assign(const SSVectorBase<S>& vec);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Access */
-   //@{
+   ///@{
 
    /// Dimension of vector.
    int dim() const
@@ -252,11 +252,11 @@ public:
       return true;
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Arithmetic operations */
-   //@{
+   ///@{
 
    /// Set vector to 0.
    void clear()
@@ -431,11 +431,11 @@ public:
    template < class S, class T >
    VectorBase<R>& multAdd(const S& x, const SSVectorBase<T>& vec);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Utilities */
-   //@{
+   ///@{
 
    /// Conversion to C-style pointer.
    /** This function serves for using a VectorBase in an C-style function. It returns a pointer to the first value of
@@ -470,7 +470,7 @@ public:
       return true;
    }
 
-   //@}
+   ///@}
 
 };
 

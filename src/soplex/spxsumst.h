@@ -40,16 +40,16 @@ protected:
 
    //-------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
    /// sets up variable weights.
    void setupWeights(SPxSolver& base);
-   //@}
+   ///@}
 
 public:
 
    //-------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor.
    SPxSumST()
    {
@@ -81,7 +81,7 @@ public:
    {
       return new SPxSumST(*this);
    }
-   //@}
+   ///@}
 
 };
 

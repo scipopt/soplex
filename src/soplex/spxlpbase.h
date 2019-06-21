@@ -91,7 +91,7 @@ public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Types */
-   //@{
+   ///@{
 
    /// Optimization sense.
    enum SPxSense
@@ -100,13 +100,13 @@ public:
       MINIMIZE = -1
    };
 
-   //@}
+   ///@}
 
 private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Data */
-   //@{
+   ///@{
 
    SPxSense thesense;                ///< optimization sense.
    R offset;                         ///< offset computed, e.g., in simplification step
@@ -114,7 +114,7 @@ private:
    SPxScaler*
    lp_scaler;             ///< points to the scaler if the lp has been scaled, to 0 otherwise
 
-   //@}
+   ///@}
 
 public:
 
@@ -134,7 +134,7 @@ public:
    void unscaleLP();
 
    /**@name Inquiry */
-   //@{
+   ///@{
 
    /// Returns true if and only if the LP is scaled
    bool isScaled() const
@@ -575,11 +575,11 @@ public:
       return SPxColId(LPColSetBase<R>::key(n));
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Extension */
-   //@{
+   ///@{
 
    ///
    virtual void addRow(const LPRowBase<R>& row, bool scale = false)
@@ -923,11 +923,11 @@ public:
          id[j] = cId(i);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Shrinking */
-   //@{
+   ///@{
 
    /// Removes \p i 'th row.
    virtual void removeRow(int i)
@@ -1143,11 +1143,11 @@ public:
       LPRowSetBase<R>::scaleExp.clear();
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name IO */
-   //@{
+   ///@{
 
    /// Reads LP in LP format from input stream \p in.
    virtual bool readLPF(std::istream& in, NameSet* rowNames = 0, NameSet* colNames = 0,
@@ -1325,11 +1325,11 @@ public:
          << "    max. abs. value : " << Real(maxAbsNzo()) << "\n";
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Manipulation */
-   //@{
+   ///@{
 
    /// Changes objective vector to \p newObj. \p scale determines whether the new data should be scaled
    virtual void changeObj(const VectorBase<R>& newObj, bool scale = false)
@@ -1914,11 +1914,11 @@ public:
       }
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Construction of dual problem */
-   //@{
+   ///@{
 
    /// Building the dual problem from a given LP
    /// @note primalRows must be as large as the number of unranged primal rows + 2 * the number of ranged primal rows.
@@ -1928,11 +1928,11 @@ public:
                                  SPxRowId dualRowIds[] = 0, SPxColId dualColIds[] = 0, int* nprimalrows = 0, int* nprimalcols = 0,
                                  int* ndualrows = 0, int* ndualcols = 0);
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Miscellaneous */
-   //@{
+   ///@{
 
    /// Consistency check.
    bool isConsistent() const
@@ -1979,13 +1979,13 @@ public:
 #endif
    }
 
-   //@}
+   ///@}
 
 protected:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected write access */
-   //@{
+   ///@{
 
    /// Returns right hand side of row \p i.
    R& rhs_w(int i)
@@ -2023,11 +2023,11 @@ protected:
       return LPColSetBase<R>::lower_w(i);
    }
 
-   //@}
+   ///@}
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Protected helpers */
-   //@{
+   ///@{
 
    /// Returns the LP as an LPRowSetBase.
    const LPRowSetBase<R>* lprowset() const
@@ -2226,14 +2226,14 @@ protected:
       }
    }
 
-   //@}
+   ///@}
 
 
 private:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Private helpers */
-   //@{
+   ///@{
 
    /// Returns the LP as an LPRowSet.
    SVectorBase<R>& colVector_w(int i)
@@ -2709,13 +2709,13 @@ private:
       addedRows(nRows() - oldRowNumber);
    }
 
-   //@}
+   ///@}
 
 public:
 
    // ------------------------------------------------------------------------------------------------------------------
    /**@name Constructors / Destructors */
-   //@{
+   ///@{
 
    /// Default constructor.
    SPxLPBase<R>()
@@ -2796,7 +2796,7 @@ public:
       return *this;
    }
 
-   //@}
+   ///@}
 };
 
 

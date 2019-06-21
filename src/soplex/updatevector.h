@@ -56,16 +56,16 @@ private:
 
    //------------------------------------
    /**@name Data */
-   //@{
+   ///@{
    Real     theval;      ///< update multiplicator
    SSVector thedelta;    ///< update vector
-   //@}
+   ///@}
 
 public:
 
    //------------------------------------
    /**@name Constructors / destructors */
-   //@{
+   ///@{
    /// default constructor.
    explicit
    UpdateVector(int p_dim /*=0*/, Real p_eps /*=1e-16*/)
@@ -102,11 +102,11 @@ public:
    }
    /// assignment
    UpdateVector& operator=(const UpdateVector& rhs);
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Access */
-   //@{
+   ///@{
    /// update multiplicator \f$\alpha\f$, writeable
    Real& value()
    {
@@ -134,11 +134,11 @@ public:
    {
       return thedelta.indices();
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Modification */
-   //@{
+   ///@{
    /// Perform the update
    /**  Add \c value() * \c delta() to the UpdateVector. Only the indices
     *  in idx() are affected. For all other indices, delta() is asumed
@@ -169,14 +169,14 @@ public:
       DVector::reDim(newdim);
       thedelta.reDim(newdim);
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Consistency check */
-   //@{
+   ///@{
    ///
    bool isConsistent() const;
-   //@}
+   ///@}
 };
 
 

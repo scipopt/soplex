@@ -90,7 +90,7 @@ public:
 
    //--------------------------------
    /**@name Types */
-   //@{
+   ///@{
    /// type of the id.
    enum Type
    {
@@ -98,11 +98,11 @@ public:
       INVALID = 0,    ///< invalid id.
       COL_ID  = 1     ///< column identifier.
    };
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Construction / destruction */
-   //@{
+   ///@{
    /// default constructor. Constructs an invalid id.
    SPxId()
       : DataKey(INVALID, -1)
@@ -137,11 +137,11 @@ public:
       info = ROW_ID;
       return *this;
    }
-   //@}
+   ///@}
 
    //--------------------------------
    /**@name Access / modification */
-   //@{
+   ///@{
    /// returns the type of the id.
    inline Type type() const
    {
@@ -167,11 +167,11 @@ public:
    {
       return info > 0;
    }
-   //@}
+   ///@}
 
    //------------------------------------
    /**@name Comparison of Ids */
-   //@{
+   ///@{
    /// equality operator.
    int operator==(const SPxId& id) const
    {
@@ -187,7 +187,7 @@ public:
    {
       return getIdx() < id.getIdx();
    }
-   //@}
+   ///@}
 };
 
 
