@@ -149,7 +149,7 @@ namespace soplex
     po::options_description intParam("Integer parameters");
     intParam.add_options()
       ("int:objsense", po::value<int>()->default_value(1)->notifier(in({-1, 1}, "int:objsense")), "objective sense (-1 - minimize, +1 - maximize)")
-      ("int:representation", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:representation"), "type of computational form (0 - auto, 1 - column representation, 2 - row representation)"))
+      ("int:representation", po::value<int>()->default_value(0)->notifier(checkRange(0, 2, "int:representation")), "type of computational form (0 - auto, 1 - column representation, 2 - row representation)")
       ("int:algorithm", po::value<int>()->default_value(1)->notifier(checkRange(0, 1, "int:algorithm")), "type of algorithm (0 - primal, 1 - dual)")
       ("int:factor_update_type", po::value<int>()->default_value(1)->notifier(checkRange(0, 1, "int:factor_update_type")), "type of LU update (0 - eta update, 1 - Forrest-Tomlin update)")
       ("int:factor_update_max", po::value<int>()->default_value(0)->notifier(checkRange(0, INT_MAX, "int:factor_update_max")), "maximum number of LU updates without fresh factorization (0 - auto)")
@@ -183,7 +183,7 @@ namespace soplex
     po::options_description mpf("Multiprecision float solve");
     mpf.add_options()
       ("mpf", "Run templated multi-precision SoPlex") // This is redundant; there is the solvemode param
-      ("precision", po::value<unsigned int>()->default_value(100)->notifier(check, "Minimum precision of mpf float");
+      ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float");
 
        po::options_description allOpt("Allowed options");
        allOpt.add(generic).add(general).add(lt).add(algo).add(display);

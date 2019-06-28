@@ -689,8 +689,14 @@ int runSoPlex(const po::variables_map& vm)
       // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares, 6 - geometric-equilibrium)
       if(vm.count("scaler"))
         {
-          soplex->setIntParam(soplex->PRICER, vm["scaler"].as<int>());
+          soplex->setIntParam(soplex->SCALER, vm["scaler"].as<int>());
         }
+
+      // -p<value> : choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
+      if(vm.count("pricer"))
+     {
+       soplex->setIntParam(soplex->PRICER, vm["pricer"].as<int>());
+     }
 
       // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
       if(vm.count("ratiotester"))
