@@ -60,6 +60,16 @@
 
 #include "soplex/sol.h"
 
+#include "soplex/spxlpbase.h"
+
+// For multiple precision
+#include <boost/multiprecision/mpfr.hpp>
+#include <boost/any.hpp>
+#include <boost/program_options.hpp>
+
+// An alias for boost multiprecision
+namespace mpf = boost::multiprecision;
+
 #define DEFAULT_RANDOM_SEED   0   // used to suppress output when the seed was not changed
 
 ///@todo implement automatic rep switch, based on row/col dim
@@ -1535,7 +1545,7 @@ public:
    bool loadSettingsFile(const char* filename);
 
    /// parses one setting string and returns true on success; note that string is modified
-   bool parseSettingsString(char* line);
+  bool parseSettingsString(const std::string str, boost::any val);
 
    ///@}
 
@@ -2402,7 +2412,12 @@ private:
    /// function to retrieve the column status for the original problem basis from the reduced and complementary problems
    void getOriginalProblemBasisColStatus(int& nNonBasicCols);
 
-   ///@}
+   //@}
+
+  // For argument parsing
+   template <class S>
+   friend int runSoPlex(const boost::program_options::variables_map& vm);
+
 };
 
 /* Backwards compatibility */

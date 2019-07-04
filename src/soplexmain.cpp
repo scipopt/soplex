@@ -746,6 +746,42 @@ int runSoPlex(const po::variables_map& vm)
           checkSol = true;
         }
 
+      // We do a ranged for loop for every element in intParam, which is more or
+      // less like a std::map, i.e., has a key and value. The value should
+      // indicate it has been called. Usually it should be because more elements
+      // have a default. This is then sent to parseSettingsString(const char*
+      // str) function which was already defined and should do the trick if the
+      // argument is like --int:whatever=num. But keyval.first would in our case
+      // be int:whatever
+
+      for(int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; ++i)
+        {
+          const auto elem = vm.find(soplex->_currentSettings->intParam.name[i]);
+          if(elem != vm.end())
+            {
+              soplex->parseSettingsString(elem->first, elem->second);
+            }
+        }
+
+      for(int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; ++i)
+        {
+          const auto elem = vm.find(soplex->_currentSettings->realParam.name[i]);
+          if(elem != vm.end())
+            {
+              soplex->parseSettingsString(elem->first, elem->second);
+            }
+        }
+
+      for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
+        {
+          const auto elem = vm.find(soplex->_currentSettings->boolParam.name[i]);
+          if(elem != vm.end())
+            {
+              soplex->parseSettingsString(elem->first, elem->second);
+            }
+        }
+
+
       // TODO what's the deal with the following code from the above stuff? case If --help or -h is called, then
 
       // 'h' : if( !soplex->saveSettingsFile(0, false) ) { MSG_ERROR( std::cerr
