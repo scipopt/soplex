@@ -215,7 +215,7 @@ namespace soplex
   ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float");
 
   po::options_description allOpt("Allowed options");
-  allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(realParam).add(boolParam).add(rationalParam);
+  allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(realParam).add(boolParam);
 
   // This will contain a subsection of the options, i.e., without intParam, realParam, boolParam and rationalParam
   po::options_description liteOpt("Allowed options");
@@ -236,6 +236,7 @@ namespace soplex
           std::cout<<liteOpt<<"\n";
           return 0;
         }
+
       if(vm.count("allparam"))
         {
           std::cout<<allOpt<<"\n";
@@ -271,7 +272,7 @@ namespace soplex
       // TODO: How does SoPlex Handle the std::cerr?
       std::cerr<<"error: "<<e.what()<<"\n\n";
       // print the help message
-      std::cout<<allOpt<<"\n";
+      std::cout<<liteOpt<<"\n";
       return 1;
     }
   catch(...)
