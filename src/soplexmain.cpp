@@ -675,28 +675,28 @@ int runSoPlex(const po::variables_map& vm)
 
       for(int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; ++i)
         {
-          const auto elem = vm.find("int:" + soplex->_currentSettings->intParam.name[i]);
-          if(elem != vm.end())
+          const auto str = "int:" + soplex->_currentSettings->intParam.name[i];
+          if(vm.count(str))
             {
-              soplex->parseSettingsString(elem->first, elem->second);
+              soplex->parseSettingsString(str, vm[str].value());
             }
         }
 
       for(int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; ++i)
         {
-          const auto elem = vm.find("real:" + soplex->_currentSettings->realParam.name[i]);
-          if(elem != vm.end())
+          const auto str = "real:" + soplex->_currentSettings->realParam.name[i];
+          if(vm.count(str))
             {
-              soplex->parseSettingsString(elem->first, elem->second);
+              soplex->parseSettingsString(str, vm[str].value());
             }
         }
 
       for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
         {
-          const auto elem = vm.find("bool:" + soplex->_currentSettings->boolParam.name[i]);
-          if(elem != vm.end())
+          const auto str = "int:" + soplex->_currentSettings->boolParam.name[i];
+          if(vm.count(str))
             {
-              soplex->parseSettingsString(elem->first, elem->second);
+              soplex->parseSettingsString(str, vm[str].value());
             }
         }
       // I didn't write the loop for rationalParams, because currently there are
