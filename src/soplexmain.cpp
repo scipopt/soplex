@@ -525,12 +525,49 @@ int runSoPlex(const po::variables_map& vm)
       spx_alloc(validation);
       new (validation) Validation<R>();
 
-
       // TODO: Read the settings file first. Remember that command line
       // arguments are meant to override the settings file. This would work,
       // because the stuff from settings will be done now? What about the
       // readbasis etc from before? TODO If settings provide readbasis then,
       // we'll have a problem.
+
+      // We do a ranged for loop for every element in array intParam.
+      // Afterwards, we do a search for it in the variables map, which is like a
+      // std::map. I think the count part may be redundant because in the
+      // args.hpp in the options_description::add_options(), I'm already
+      // specifying the default value. But the soplex::settings object already
+      // has this default value; one of them is redundant. The
+      // variables_map::value() will return a boost::any object.
+
+      for(int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; ++i)
+        {
+          const auto str = "int:" + soplex->_currentSettings->intParam.name[i];
+          if(vm.count(str))
+            {
+              soplex->parseSettingsString(str, vm[str].value());
+            }
+        }
+
+      for(int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; ++i)
+        {
+          const auto str = "real:" + soplex->_currentSettings->realParam.name[i];
+          if(vm.count(str))
+            {
+              soplex->parseSettingsString(str, vm[str].value());
+            }
+        }
+
+      for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
+        {
+          const auto str = "int:" + soplex->_currentSettings->boolParam.name[i];
+          if(vm.count(str))
+            {
+              soplex->parseSettingsString(str, vm[str].value());
+            }
+        }
+      // I didn't write the loop for rationalParams, because currently there are
+      // no rationalParams.
+
 
       if(vm.count("readmode"))
         {
@@ -667,40 +704,6 @@ int runSoPlex(const po::variables_map& vm)
           checkSol = true;
         }
 
-      // We do a ranged for loop for every element in array intParam.
-      // Afterwards, we do a search for it in the variables map, which is like a
-      // std::map. Checks if it there, and if yes, it returns a iterator to a
-      // std::pair<std::string argument, boost::any value>
-      // The other loops are similar.
-
-      for(int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; ++i)
-        {
-          const auto str = "int:" + soplex->_currentSettings->intParam.name[i];
-          if(vm.count(str))
-            {
-              soplex->parseSettingsString(str, vm[str].value());
-            }
-        }
-
-      for(int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; ++i)
-        {
-          const auto str = "real:" + soplex->_currentSettings->realParam.name[i];
-          if(vm.count(str))
-            {
-              soplex->parseSettingsString(str, vm[str].value());
-            }
-        }
-
-      for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
-        {
-          const auto str = "int:" + soplex->_currentSettings->boolParam.name[i];
-          if(vm.count(str))
-            {
-              soplex->parseSettingsString(str, vm[str].value());
-            }
-        }
-      // I didn't write the loop for rationalParams, because currently there are
-      // no rationalParams.
 
 
       // TODO what's the deal with the following code from the above stuff? case If --help or -h is called, then
