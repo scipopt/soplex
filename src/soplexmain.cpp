@@ -54,92 +54,15 @@ int main(int argc, char* argv[]);
 static
 void printUsage(const char* const argv[], int idx)
 {
-  // TODO: Get rid of this! yay
-   const char* usage =
-      "general options:\n"
-      "  --readbas=<basfile>    read starting basis from file\n"
-      "  --writebas=<basfile>   write terminal basis to file\n"
-      "  --writefile=<lpfile>   write LP to file in LP or MPS format depending on extension\n"
-      "  --writedual=<lpfile>   write the dual LP to a file in LP or MPS formal depending on extension\n"
-      "  --<type>:<name>=<val>  change parameter value using syntax of settings file entries\n"
-      "  --loadset=<setfile>    load parameters from settings file (overruled by command line parameters)\n"
-      "  --saveset=<setfile>    save parameters to settings file\n"
-      "  --diffset=<setfile>    save modified parameters to settings file\n"
-      "  --extsol=<value>       external solution for soplex to use for validation\n"
-      "\n"
-      "limits and tolerances:\n"
-      "  -t<s>                  set time limit to <s> seconds\n"
-      "  -i<n>                  set iteration limit to <n>\n"
-      "  -f<eps>                set primal feasibility tolerance to <eps>\n"
-      "  -o<eps>                set dual feasibility (optimality) tolerance to <eps>\n"
-      "  -l<eps>                set validation tolerance to <eps>\n"
-      "\n"
-      "algorithmic settings (* indicates default):\n"
-      "  --readmode=<value>     choose reading mode for <lpfile> (0* - floating-point, 1 - rational)\n"
-      "  --solvemode=<value>    choose solving mode (0 - floating-point solve, 1* - auto, 2 - force iterative refinement)\n"
-      "  -s<value>              choose simplifier/presolver (0 - off, 1* - auto)\n"
-      "  -g<value>              choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric, 5 - least squares, 6 - geometric-equilibrium)\n"
-      "  -p<value>              choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)\n"
-      "  -r<value>              choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3* - boundflipping)\n"
-      "\n"
-      "display options:\n"
-      "  -v<level>              set verbosity to <level> (0 - error, 3 - normal, 5 - high)\n"
-      "  -x                     print primal solution\n"
-      "  -y                     print dual multipliers\n"
-      "  -X                     print primal solution in rational numbers\n"
-      "  -Y                     print dual multipliers in rational numbers\n"
-      "  -q                     display detailed statistics\n"
-      "  -c                     perform final check of optimal solution in original problem\n"
-      "\n";
 
-   if(idx <= 0)
-      std::cerr << "missing input file\n\n";
-   else
-      std::cerr << "invalid option \"" << argv[idx] << "\"\n\n";
+  // TODO: How is this supposed to work?
+// #ifdef SOPLEX_WITH_ZLIB
+//              << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
+// #else
+//              << "  <lpfile>               linear program as .mps or .lp file\n\n"
 
-   std::cerr << "usage: " << argv[0] << " " << "[options] <lpfile>\n"
-#ifdef SOPLEX_WITH_ZLIB
-             << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
-#else
-             << "  <lpfile>               linear program as .mps or .lp file\n\n"
-#endif
-             << usage;
-}
-
-// TODO: Get rid of this
-// cleans up C strings
-static
-void freeStrings(char*& s1, char*& s2, char*& s3, char*& s4, char*& s5)
-{
-   if(s1 != 0)
-   {
-      delete [] s1;
-      s1 = 0;
-   }
-
-   if(s2 != 0)
-   {
-      delete [] s2;
-      s2 = 0;
-   }
-
-   if(s3 != 0)
-   {
-      delete [] s3;
-      s3 = 0;
-   }
-
-   if(s4 != 0)
-   {
-      delete [] s4;
-      s4 = 0;
-   }
-
-   if(s5 != 0)
-   {
-      delete [] s5;
-      s5 = 0;
-   }
+// #endif
+//              << usage;
 }
 
 /// performs external feasibility check with real type
@@ -260,10 +183,8 @@ void checkSolutionRational(SoPlexBase<Real>& soplex)
 
 /// performs external feasibility check according to check mode
 template <class R>
-void checkSolution(SoPlexBase<R>& soplex);
 
-template <>
-void checkSolution<Real>(SoPlexBase<Real>& soplex)
+void checkSolution(SoPlexBase<R>& soplex)
 {
    if(soplex.intParam(SoPlexBase<Real>::CHECKMODE) == SoPlexBase<Real>::CHECKMODE_RATIONAL
          || (soplex.intParam(SoPlexBase<Real>::CHECKMODE) == SoPlexBase<Real>::CHECKMODE_AUTO
@@ -746,17 +667,15 @@ int runSoPlex(const po::variables_map& vm)
           checkSol = true;
         }
 
-      // We do a ranged for loop for every element in intParam, which is more or
-      // less like a std::map, i.e., has a key and value. The value should
-      // indicate it has been called. Usually it should be because more elements
-      // have a default. This is then sent to parseSettingsString(const char*
-      // str) function which was already defined and should do the trick if the
-      // argument is like --int:whatever=num. But keyval.first would in our case
-      // be int:whatever
+      // We do a ranged for loop for every element in array intParam.
+      // Afterwards, we do a search for it in the variables map, which is like a
+      // std::map. Checks if it there, and if yes, it returns a iterator to a
+      // std::pair<std::string argument, boost::any value>
+      // The other loops are similar.
 
       for(int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; ++i)
         {
-          const auto elem = vm.find(soplex->_currentSettings->intParam.name[i]);
+          const auto elem = vm.find("int:" + soplex->_currentSettings->intParam.name[i]);
           if(elem != vm.end())
             {
               soplex->parseSettingsString(elem->first, elem->second);
@@ -765,7 +684,7 @@ int runSoPlex(const po::variables_map& vm)
 
       for(int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; ++i)
         {
-          const auto elem = vm.find(soplex->_currentSettings->realParam.name[i]);
+          const auto elem = vm.find("real:" + soplex->_currentSettings->realParam.name[i]);
           if(elem != vm.end())
             {
               soplex->parseSettingsString(elem->first, elem->second);
@@ -774,12 +693,14 @@ int runSoPlex(const po::variables_map& vm)
 
       for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
         {
-          const auto elem = vm.find(soplex->_currentSettings->boolParam.name[i]);
+          const auto elem = vm.find("bool:" + soplex->_currentSettings->boolParam.name[i]);
           if(elem != vm.end())
             {
               soplex->parseSettingsString(elem->first, elem->second);
             }
         }
+      // I didn't write the loop for rationalParams, because currently there are
+      // no rationalParams.
 
 
       // TODO what's the deal with the following code from the above stuff? case If --help or -h is called, then
