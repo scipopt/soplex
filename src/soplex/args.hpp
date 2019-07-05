@@ -6,6 +6,7 @@
 #include <initializer_list>
 #include <functional>
 #include <boost/program_options.hpp>
+#include <boost/program_options/config.hpp> // For parse_config_file
 #include <boost/program_options/errors.hpp>
 #include <boost/exception/diagnostic_information.hpp>
 
@@ -249,6 +250,28 @@ namespace soplex
         {
           std::cout<<allOpt<<"\n";
           return 0;
+        }
+
+      if(vm.count("loadset"))
+        {
+          std::ifstream file(vm["loadset"].as<std::string>());
+
+          // According to the documentation if vm already has non-default values
+          // it won't get replaced. This means the following:
+          //
+          // 1. soplex usually gets called by `./soplex --loadset=whatever.set
+          // lpfile` So, one doesn't have to worry about losing the lpfile
+          // information during the second call of store.
+          //
+          // 2. soplex is configured to run so that if you give additional
+          // params and a settings file, like `./soplex --scaler=5
+          // --loadset=whatever.set lpfile`, then the value of scaler must be 5
+          // even if settings file has a different value for it.
+          //
+          // Both these problems won't occur.
+
+          po::store(po::parse_config_file(file, allOpt), vm);
+
         }
 
       // Relevant: https://stackoverflow.com/a/5517755/4223038 This will make
