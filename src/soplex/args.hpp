@@ -69,6 +69,7 @@ namespace soplex
 
 
     int solvemode = 1;
+    unsigned int precision = 100;
 
 
     po::positional_options_description p;
@@ -221,15 +222,15 @@ namespace soplex
 
   po::options_description mpf("Multiprecision float solve");
   mpf.add_options()
-    ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float")
+    ("precision", po::value<unsigned int>(&precision)->default_value(100u), "Minimum precision (number of decimal digits) of mpf float")
     ("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
 
   po::options_description allOpt("Allowed options");
-  allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(realParam).add(boolParam);
+  allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf).add(intParam).add(realParam).add(boolParam);
 
   // This will contain a subsection of the options, i.e., without intParam, realParam, boolParam and rationalParam
   po::options_description liteOpt("Allowed options");
-  liteOpt.add(generic).add(general).add(lt).add(algo).add(display);
+  liteOpt.add(generic).add(general).add(lt).add(algo).add(display).add(mpf);
 
   try
     {
@@ -283,9 +284,6 @@ namespace soplex
       // whether the value given is in a certain range or inside an
       // initializer_list
       po::notify(vm);
-
-      // This is the number of decimal digits! Not the number of bits
-      const unsigned int precision = vm["precision"].as<unsigned int>();
 
       switch(solvemode)
         {
