@@ -136,7 +136,7 @@ namespace soplex
                                                                      // default
       ("printprimal,x",  "print primal solution")
       ("printdualmult,y", "print dual multipliers")
-      ("printratsol,X", "print primal solution in rational numbers")
+      ("printprimratsol,X", "print primal solution in rational numbers")
       ("printdualmultrational,Y", "print dual multipliers in rational numbers")
       ("dispstat,q", "display detailed statistics")
       ("checkfinal,c", "perform final check of optimal solution in original problem");

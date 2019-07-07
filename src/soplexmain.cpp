@@ -568,11 +568,6 @@ int runSoPlex(const po::variables_map& vm)
 
       if(vm.count("readmode"))
         {
-          // TODO how do we deal with the return value? I think the function
-          // should thrown an exception if the value doesn't fit in the required
-          // range.
-          // TODO https://stackoverflow.com/q/25548090/4223038
-          // The above stackoverflow link talks about the problem
           soplex->setIntParam(soplex->READMODE, vm["readmode"].as<int>());
         }
 
@@ -602,7 +597,7 @@ int runSoPlex(const po::variables_map& vm)
           validation->updateExternalSolution(input.c_str());
         }
 
-      // TODO: Code for --type:name=<val>: How am I supposed to handle this?
+      // settings file format arguments are handled at the beginning.
 
       // -t<s> : set time limit to <s> seconds
       if(vm.count("time"))
@@ -672,7 +667,7 @@ int runSoPlex(const po::variables_map& vm)
         }
 
       // -X : print primal solution with rationals
-      if(vm.count("printratsol"))
+      if(vm.count("printprimratsol"))
         {
           printPrimalRational = true;
         }
@@ -708,259 +703,6 @@ int runSoPlex(const po::variables_map& vm)
           // 2. It has to be displayed after the soplex intro banner
           MSG_INFO1(soplex->spxout, soplex->spxout << "Loading settings file <" << filename << "> . . .\n");
         }
-
-
-
-      // TODO what's the deal with the following code from the above stuff? case If --help or -h is called, then
-
-      // 'h' : if( !soplex->saveSettingsFile(0, false) ) { MSG_ERROR( std::cerr
-      // << "Error printing parameters\n" ); }
-
-
-      // // read arguments from command line
-      // for( optidx = 1; optidx < argc; optidx++ )
-      // {
-      //    char* option = argv[optidx];
-
-      //    // we reached <lpfile>
-      //    if( option[0] != '-' )
-      //    {
-      //       lpfilename = argv[optidx];
-      //       continue;
-      //    }
-
-      //    // option string must start with '-', must contain at least two characters, and exactly two characters if and
-      //    // only if it is -x, -y, -q, or -c
-      //    if( option[0] != '-' || option[1] == '\0'
-      //       || ((option[2] == '\0') != (option[1] == 'x' || option[1] == 'X' || option[1] == 'y' || option[1] == 'Y' || option[1] == 'q' || option[1] == 'c')) )
-      //    {
-      //       printUsage(argv, optidx);
-      //       returnValue = 1;
-      //       goto TERMINATE_FREESTRINGS;
-      //    }
-
-      //    switch( option[1] )
-      //    {
-      //    case '-' :
-      //       {
-      //          option = &option[2];
-      //          // This needs to be treated specially
-      //          // --loadset=<setfile> : load parameters from settings file
-      //          else if( strncmp(option, "loadset=", 8) == 0 )
-      //          {
-      //             if( loadsetname == nullptr )
-      //             {
-      //                char* filename = &option[8];
-      //                loadsetname = new char[strlen(filename) + 1];
-      //                spxSnprintf(loadsetname, strlen(filename) + 1, "%s", filename);
-      //                if( !soplex->loadSettingsFile(loadsetname) )
-      //                {
-      //                   printUsage(argv, optidx);
-      //                   returnValue = 1;
-      //                   goto TERMINATE_FREESTRINGS;
-      //                }
-      //                else
-      //                {
-      //                   // we need to start parsing again because some command line parameters might have been overwritten
-      //                   optidx = 0;
-      //                }
-      //             }
-      //          }
-      //          // --readmode=<value> : choose reading mode for <lpfile> (0* - floating-point, 1 - rational)
-      //          else if( strncmp(option, "readmode=", 9) == 0 )
-      //          {
-      //             if( !soplex->setIntParam(soplex->READMODE, option[9] - '0') )
-      //             {
-      //                printUsage(argv, optidx);
-      //                returnValue = 1;
-      //                goto TERMINATE_FREESTRINGS;
-      //             }
-      //          }
-      //          // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
-      //          else if( strncmp(option, "solvemode=", 10) == 0 )
-      //          {
-      //             if( !soplex->setIntParam(soplex->SOLVEMODE, option[10] - '0') )
-      //             {
-      //                printUsage(argv, optidx);
-      //                returnValue = 1;
-      //                goto TERMINATE_FREESTRINGS;
-      //             }
-      //             // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
-      //             // the rational LP is kept after reading
-      //             else if( soplex->intParam(soplex->READMODE) == soplex->READMODE_RATIONAL
-      //                && soplex->intParam(soplex->SOLVEMODE) != soplex->SOLVEMODE_REAL )
-      //             {
-      //                soplex->setIntParam(soplex->SYNCMODE, soplex->SYNCMODE_AUTO);
-      //             }
-      //          }
-      //          // --extsol=<value> : external solution for soplex to use for validation
-      //          else if( strncmp(option, "extsol=", 7) == 0 )
-      //          {
-      //             char* input = &option[7];
-      //              if( !validation->updateExternalSolution(input) )
-      //             {
-      //                printUsage(argv, optidx);
-      //                returnValue = 1;
-      //                goto TERMINATE_FREESTRINGS;
-      //             }
-      //          }
-      //          // --<type>:<name>=<val> :  change parameter value using syntax of settings file entries
-      //          else if( !soplex->parseSettingsString(option) )
-      //          {
-      //             printUsage(argv, optidx);
-      //             returnValue = 1;
-      //             goto TERMINATE_FREESTRINGS;
-      //          }
-      //          break;
-      //       }
-
-      //    case 't' :
-      //       // -t<s> : set time limit to <s> seconds
-      //      if( !soplex->setRealParam(soplex->TIMELIMIT, atoi(&option[2])) )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'i' :
-      //       // -i<n> : set iteration limit to <n>
-      //      if( !soplex->setIntParam(soplex->ITERLIMIT, atoi(&option[2])) )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'f' :
-      //       // -f<eps> : set primal feasibility tolerance to <eps>
-      //      if( !soplex->setRealParam(soplex->FEASTOL, atof(&option[2])) )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'o' :
-      //       // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
-      //      if( !soplex->setRealParam(soplex->OPTTOL, atof(&option[2])) )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'l' :
-      //       // l<eps> : set validation tolerance to <eps>
-      //       if( !validation->updateValidationTolerance(&option[2]) )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 's' :
-      //       // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
-      //      if( !soplex->setIntParam(soplex->SIMPLIFIER, option[2] - '0') )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'g' :
-      //       // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares, 6 - geometric-equilibrium)
-      //       if( !soplex->setIntParam(soplex->SCALER, option[2] - '0') )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'p' :
-      //       // -p<value> : choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
-      //       if( !soplex->setIntParam(soplex->PRICER, option[2] - '0') )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'r' :
-      //       // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
-      //       if( !soplex->setIntParam(soplex->RATIOTESTER, option[2] - '0') )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'v' :
-      //       // -v<level> : set verbosity to <level> (0 - error, 3 - normal, 5 - high)
-      //       if( !soplex->setIntParam(soplex->VERBOSITY, option[2] - '0') )
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //       break;
-
-      //    case 'x' :
-      //       // -x : print primal solution
-      //       printPrimal = true;
-      //       break;
-
-      //    case 'X' :
-      //       // -X : print primal solution with rationals
-      //       printPrimalRational = true;
-      //       break;
-
-      //    case 'y' :
-      //       // -y : print dual multipliers
-      //       printDual = true;
-      //       break;
-
-      //    case 'Y' :
-      //       // -Y : print dual multipliers with rationals
-      //       printDualRational = true;
-      //       break;
-
-      //    case 'q' :
-      //       // -q : display detailed statistics
-      //       displayStatistics = true;
-      //       break;
-
-      //    case 'c' :
-      //       // -c : perform final check of optimal solution in original problem
-      //       checkSol = true;
-      //       break;
-
-      //    case 'h' :
-      //       // -h : display all parameters
-      //       if( !soplex->saveSettingsFile(0, false) )
-      //       {
-      //          MSG_ERROR( std::cerr << "Error printing parameters\n" );
-      //       }
-      //       break;
-
-      //       //lint -fallthrough
-      //    default :
-      //       {
-      //          printUsage(argv, optidx);
-      //          returnValue = 1;
-      //          goto TERMINATE_FREESTRINGS;
-      //       }
-      //    }
-      // }
 
       MSG_INFO1( soplex->spxout, soplex->printUserSettings(); )
 
