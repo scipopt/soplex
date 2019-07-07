@@ -257,7 +257,8 @@ namespace soplex
 
       if(vm.count("loadset"))
         {
-          std::ifstream file(vm["loadset"].as<std::string>());
+          const auto fname = vm["loadset"].as<std::string>();
+          std::ifstream file(fname);
 
           // According to the documentation if vm already has non-default values
           // it won't get replaced. This means the following:
@@ -273,6 +274,10 @@ namespace soplex
           //
           // Both these problems won't occur.
 
+          // Printing "Loading settings file..." happens inside the runSoPlex
+          // function. A downside is that the reading time of the settings file
+          // won't be part of the statistics. Hopefully this is okay since
+          // settings files are small.
           po::store(po::parse_config_file(file, allOpt), vm);
 
         }

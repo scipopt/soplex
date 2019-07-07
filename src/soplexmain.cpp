@@ -701,6 +701,14 @@ int runSoPlex(const po::variables_map& vm)
           checkSol = true;
         }
 
+      if(vm.count("loadset"))
+        {
+          // This is more of a hack. The actual reading happens inside args.hpp
+          // This is here because 1. the spxout object is not available there.
+          // 2. It has to be displayed after the soplex intro banner
+          MSG_INFO1(soplex->spxout, soplex->spxout << "Loading settings file <" << filename << "> . . .\n");
+        }
+
 
 
       // TODO what's the deal with the following code from the above stuff? case If --help or -h is called, then
