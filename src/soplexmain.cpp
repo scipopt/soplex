@@ -441,9 +441,6 @@ int main(int argc, char* argv[])
    using namespace boost::multiprecision;
 
    // mpfr_flot_50 with expression template turned off
-   using mpfr_float_100_eto = number<mpfr_float_backend<100>, et_off>;
-
-   using mpfr_debug = number<debug_adaptor<mpfr_float_backend<100> >, et_off >;
 
    // The following won't compile. Because there is no conversion between mpq_t
    // Rational and cpp_float. Perhaps we need to change the Rational class

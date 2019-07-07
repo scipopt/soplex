@@ -21,22 +21,23 @@ namespace soplex
   template <class R>
   int runSoPlex(const po::variables_map& vm);
 
-  namespace args{
-  // Checks if the val lies in [min, max] todo If we have c++14, we can replace
-  // all the "int" with auto or use a template and put this inside the
-  // parseArgs. This also means that we can get rid of the ugly std::function part
-  template <typename T>
-  auto checkRange (const T& min, const T& max, const std::string& str) -> std::function<void(T)>
-                    {
-                      return [&min, &max, &str](const T& val)
-                             {
-                               if(val < min || val > max)
-                                 {
-                                   std::cout<<min<<" "<<max<<"; "<<val<<" "<<str<<std::endl;
-                                   throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
-                                 }
-                             };
-                    };
+  namespace args
+  {
+    // Returns a function that checks if the val lies in [min, max] TODO: If we
+    // have c++14, we can replace all the "int" with auto or use a template and
+    // put this inside the parseArgs. This also means that we can get rid of the
+    // ugly std::function part
+    template <typename T>
+    auto checkRange (const T& min, const T& max, const std::string& str) -> std::function<void(T)>
+    {
+      return [&min, &max, &str](const T& val)
+             {
+               if(val < min || val > max)
+                 {
+                   throw po::validation_error(po::validation_error::invalid_option_value, str, std::to_string(val));
+                 }
+             };
+    }
   } // namespace args ends here
 
 
@@ -49,9 +50,9 @@ namespace soplex
     // return another function/lambda Will be used during the vm.notify()
 
 
-    // Checks whether a value is inside a list and if not, it throws an error
-    // todo If we have c++14, we can replace all the "int" with auto or use a
-    // template, also std::cend() and std::cbegin()
+    // Returns a function that checks whether a value is inside a list and if
+    // not, it throws an error TODO: If we have c++14, we can replace all the
+    // "int" with auto or use a template, also std::cend() and std::cbegin()
     auto in = [](const std::initializer_list<int>& list, const std::string& str)
               {
                 return [&list, &str](const int& val)
@@ -73,6 +74,7 @@ namespace soplex
     po::positional_options_description p;
     p.add("lpfile", -1);
 
+    // Define all the options
     po::options_description generic("generic options");
     po::options_description algo("algorithmic settings (default in brackets)");
     po::options_description lt("limits and tolerances");
@@ -85,7 +87,6 @@ namespace soplex
     po::options_description rationalParam("Rational parameters");
 
 
-    // Define all the options
     generic.add_options()
       ("help,h", "help")
       ("allparam", "Displays complete set of parameters available (e.g., intParams, realParams boolParams))")
@@ -100,7 +101,7 @@ namespace soplex
       ("writefile", po::value<std::string>(), "write LP to file in LP or MPS format depending on extension")
       ("writedual", po::value<std::string>(),  "write the dual LP to a file in LP or MPS formal depending on extension")
       ("<type>:<name>=<val>", "change parameter value using syntax of settings file entries") // TODO: How do I deal with this?
-      ("loadset", po::value<std::string>(), "load parameters from settings file (overruled by command line parameters") // TODO: How do I deal with overruled?
+      ("loadset", po::value<std::string>(), "load parameters from settings file (overruled by command line parameters")
       ("saveset", po::value<std::string>(), "save parameters to settings file")
       ("diffset", po::value<std::string>(), "save modified parameters to settings file")
       ("extsol", po::value<std::string>(), "external solution for soplex to use for validation");
@@ -129,8 +130,9 @@ namespace soplex
        "choose ratio tester (0 - textbook, 1 - harris, 2 - fast, 3 - boundflipping)");
 
     display.add_options()
-      ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 3, 5}, "verbosity")), // TODO: Figure this out, needs to be replaced by a set or an initializer list
-       "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the default
+      ("verbosity,v", po::value<int>()->default_value(3)->notifier(in({0, 3, 5}, "verbosity")),
+       "set verbosity to <level> (0 - error, 3 - normal, 5 - high)") // fix the
+                                                                     // default
       ("printprimal,x",  "print primal solution")
       ("printdualmult,y", "print dual multipliers")
       ("printratsol,X", "print primal solution in rational numbers")
@@ -219,8 +221,8 @@ namespace soplex
 
   po::options_description mpf("Multiprecision float solve");
   mpf.add_options()
-  ("mpf", "Run templated multi-precision SoPlex") // This is redundant; there is the solvemode param
-  ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float");
+    ("precision", po::value<unsigned int>()->default_value(100), "Minimum precision of mpf float")
+    ("mpfdebug", "Run templated multi-precision SoPlex with boost debug adaptor");
 
   po::options_description allOpt("Allowed options");
   allOpt.add(generic).add(general).add(lt).add(algo).add(display).add(intParam).add(realParam).add(boolParam);
@@ -276,11 +278,14 @@ namespace soplex
 
       // Relevant: https://stackoverflow.com/a/5517755/4223038 This will make
       // sure that all the required options are given, If not boost should
-      // (throw?) print an appropriate error. Also the notifier function while
+      // (throw) print an appropriate error. Also the notifier function while
       // making the argument makes sure that a condition is met, such as
       // whether the value given is in a certain range or inside an
       // initializer_list
       po::notify(vm);
+
+      // This is the number of decimal digits! Not the number of bits
+      const unsigned int precision = vm["precision"].as<unsigned int>();
 
       switch(solvemode)
         {
@@ -290,17 +295,38 @@ namespace soplex
           runSoPlex<Real>(vm);
           break;
         case 3:                 // soplex mpf
-          std::cout<<"You are now running on mpf\n"; // TODO: mpf
+          using namespace boost::multiprecision;
+
+
+          // et_off means the expression templates options is turned off. TODO:
+          // The documentation also mentions about static vs dynamic memory
+          // allocation for the mpfr types. Is it relevant here? I probably also
+          // need to have the mpfr_float_eto in the global soplex namespace
+          using mpfr_float_eto = number<mpfr_float_backend<0>, et_off>;
+          using mpfr_debug = number<debug_adaptor<mpfr_float_backend<0>>, et_off>;
+
+          if(!vm.count("mpfdebug"))
+            {
+              mpfr_float_eto::default_precision(precision);
+              runSoPlex<mpfr_float_eto>(vm);
+            }
+          else
+            {
+              mpfr_debug::default_precision(precision);
+              runSoPlex<mpfr_debug>(vm);
+            }
+
           break;
         default:
-          std::cout<<"Wrong value for the solve mode\n\n"<<allOpt<<"\n";
+          std::cerr<<"Wrong value for the solve mode\n\n"<<allOpt<<"\n";
           return 0;
         }
 
     }
   catch(po::error& e)
     {
-      // TODO: How does SoPlex Handle the std::cerr?
+      // I think the whole verbosity thing won't apply here. So just a direct
+      // call to std::cerr should be okay
       std::cerr<<"error: "<<e.what()<<"\n\n";
       // print the help message
       std::cout<<liteOpt<<"\n";
