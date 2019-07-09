@@ -260,6 +260,11 @@ namespace soplex
           const auto fname = vm["loadset"].as<std::string>();
           std::ifstream file(fname);
 
+          if(file.fail())
+            {
+              BOOST_THROW_EXCEPTION(std::runtime_error("The settings file: " + fname + " does not exist"));
+            }
+
           // According to the documentation if vm already has non-default values
           // it won't get replaced. This means the following:
           //
@@ -337,7 +342,7 @@ namespace soplex
     }
   catch(...)
     {
-      std::cerr<<"Unhandled exception\n"<<boost::current_exception_diagnostic_information()<<"\n";
+      std::cerr<<"Generic exception: "<<boost::current_exception_diagnostic_information()<<"\n";
       return 0;
     }
 

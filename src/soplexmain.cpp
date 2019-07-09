@@ -468,13 +468,14 @@ int main(int argc, char* argv[])
 namespace soplex{
 
 // Runs SoPlex with the parsed boost variables map
-template <class R>
-int runSoPlex(const po::variables_map& vm)
-{
-  SoPlexBase<R>* soplex = nullptr;
+  template <class R>
+  int runSoPlex(const po::variables_map& vm)
+  {
+    SoPlexBase<R> soplex;
+    Validation<R> validation;
 
    Timer* readingTime = nullptr;
-  Validation<R>* validation = nullptr;
+
    int optidx;
 
    // Stores different names
@@ -514,16 +515,9 @@ int runSoPlex(const po::variables_map& vm)
 
       // create default timer (CPU time)
       readingTime = TimerFactory::createTimer(Timer::USER_TIME);
-      soplex = nullptr;
-      spx_alloc(soplex);
-      new (soplex) SoPlexBase<R>();
 
-      soplex->printVersion();
-      MSG_INFO1( soplex->spxout, soplex->spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
-
-      validation = nullptr;
-      spx_alloc(validation);
-      new (validation) Validation<R>();
+        soplex.printVersion();
+        MSG_INFO1( soplex.spxout, soplex.spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
 
       // TODO: Read the settings file first. Remember that command line
       // arguments are meant to override the settings file. This would work,
@@ -541,28 +535,28 @@ int runSoPlex(const po::variables_map& vm)
 
       for(int i = 0; i < SoPlexBase<R>::INTPARAM_COUNT; ++i)
         {
-          const auto str = "int:" + soplex->_currentSettings->intParam.name[i];
+            const auto str = "int:" + soplex._currentSettings->intParam.name[i];
           if(vm.count(str))
             {
-              soplex->parseSettingsString(str, vm[str].value());
+                soplex.parseSettingsString(str, vm[str].value());
             }
         }
 
       for(int i = 0; i < SoPlexBase<R>::REALPARAM_COUNT; ++i)
         {
-          const auto str = "real:" + soplex->_currentSettings->realParam.name[i];
+            const auto str = "real:" + soplex._currentSettings->realParam.name[i];
           if(vm.count(str))
             {
-              soplex->parseSettingsString(str, vm[str].value());
+                soplex.parseSettingsString(str, vm[str].value());
             }
         }
 
       for(int i = 0; i < SoPlexBase<R>::BOOLPARAM_COUNT; ++i)
         {
-          const auto str = "int:" + soplex->_currentSettings->boolParam.name[i];
+            const auto str = "int:" + soplex._currentSettings->boolParam.name[i];
           if(vm.count(str))
             {
-              soplex->parseSettingsString(str, vm[str].value());
+                soplex.parseSettingsString(str, vm[str].value());
             }
         }
       // I didn't write the loop for rationalParams, because currently there are
@@ -571,23 +565,23 @@ int runSoPlex(const po::variables_map& vm)
 
       if(vm.count("readmode"))
         {
-          soplex->setIntParam(soplex->READMODE, vm["readmode"].as<int>());
+            soplex.setIntParam(soplex.READMODE, vm["readmode"].as<int>());
         }
 
       // --solvemode=<value> : choose solving mode (0* - floating-point solve, 1 - auto, 2 - force iterative refinement)
       if(vm.count("solvemode"))
         {
-          soplex->setIntParam(soplex->SOLVEMODE, vm["solvemode"].as<int>());
+            soplex.setIntParam(soplex.SOLVEMODE, vm["solvemode"].as<int>());
 
           // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
           // the rational LP is kept after reading
 
           // TODO: Look at this if statement. It used to be an else if
 
-          if( soplex->intParam(soplex->READMODE) == soplex->READMODE_RATIONAL
-                   && soplex->intParam(soplex->SOLVEMODE) != soplex->SOLVEMODE_REAL )
+            if( soplex.intParam(soplex.READMODE) == soplex.READMODE_RATIONAL
+                && soplex.intParam(soplex.SOLVEMODE) != soplex.SOLVEMODE_REAL )
             {
-              soplex->setIntParam(soplex->SYNCMODE, soplex->SYNCMODE_AUTO);
+                soplex.setIntParam(soplex.SYNCMODE, soplex.SYNCMODE_AUTO);
             }
 
         }
@@ -597,7 +591,7 @@ int runSoPlex(const po::variables_map& vm)
         {
           auto input = vm["extsol"].as<std::string>();
 
-          validation->updateExternalSolution(input.c_str());
+            validation.updateExternalSolution(input.c_str());
         }
 
       // settings file format arguments are handled at the beginning.
@@ -605,62 +599,62 @@ int runSoPlex(const po::variables_map& vm)
       // -t<s> : set time limit to <s> seconds
       if(vm.count("time"))
         {
-          soplex->setRealParam(soplex->TIMELIMIT, vm["time"].as<int>());
+            soplex.setRealParam(soplex.TIMELIMIT, vm["time"].as<int>());
         }
 
       // -i<n> : set iteration limit to <n>
       if(vm.count("iterlimit"))
         {
-          soplex->setIntParam(soplex->ITERLIMIT, vm["iterlimit"].as<int>());
+            soplex.setIntParam(soplex.ITERLIMIT, vm["iterlimit"].as<int>());
         }
 
       // -f<eps> : set primal feasibility tolerance to <eps>
       if(vm.count("primfeastol"))
         {
-          soplex->setRealParam(soplex->FEASTOL, vm["primfeastol"].as<double>());
+            soplex.setRealParam(soplex.FEASTOL, vm["primfeastol"].as<double>());
         }
 
       // -o<eps> : set dual feasibility (optimality) tolerance to <eps>
       if(vm.count("dualfeastol"))
         {
-          soplex->setRealParam(soplex->OPTTOL, vm["dualfeastol"].as<double>());
+            soplex.setRealParam(soplex.OPTTOL, vm["dualfeastol"].as<double>());
         }
 
       // l<eps> : set validation tolerance to <eps>
       if(vm.count("valtol"))
         {
           auto str = vm["valtol"].as<std::string>();
-          validation->updateValidationTolerance(str.c_str());
+            validation.updateValidationTolerance(str.c_str());
         }
 
       // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
       if(vm.count("simplifier"))
         {
-          soplex->setIntParam(soplex->SIMPLIFIER, vm["simplifier"].as<int>());
+            soplex.setIntParam(soplex.SIMPLIFIER, vm["simplifier"].as<int>());
         }
 
       // -g<value> : choose scaling (0 - off, 1 - uni-equilibrium, 2* - bi-equilibrium, 3 - geometric, 4 - iterated geometric,  5 - least squares, 6 - geometric-equilibrium)
       if(vm.count("scaler"))
         {
-          soplex->setIntParam(soplex->SCALER, vm["scaler"].as<int>());
+            soplex.setIntParam(soplex.SCALER, vm["scaler"].as<int>());
         }
 
       // -p<value> : choose pricing (0* - auto, 1 - dantzig, 2 - parmult, 3 - devex, 4 - quicksteep, 5 - steep)
       if(vm.count("pricer"))
      {
-       soplex->setIntParam(soplex->PRICER, vm["pricer"].as<int>());
+            soplex.setIntParam(soplex.PRICER, vm["pricer"].as<int>());
      }
 
       // -r<value> : choose ratio tester (0 - textbook, 1 - harris, 2* - fast, 3 - boundflipping)
       if(vm.count("ratiotester"))
         {
-          soplex->setIntParam(soplex->RATIOTESTER, vm["ratiotester"].as<int>());
+            soplex.setIntParam(soplex.RATIOTESTER, vm["ratiotester"].as<int>());
         }
 
       // -v<level> : set verbosity to <level> (0 - error, 3 - normal, 5 - high)
       if(vm.count("verbosity"))
         {
-          soplex->setIntParam(soplex->VERBOSITY, vm["verbosity"].as<int>());
+            soplex.setIntParam(soplex.VERBOSITY, vm["verbosity"].as<int>());
         }
 
       // -x : print primal solution
@@ -704,10 +698,10 @@ int runSoPlex(const po::variables_map& vm)
           // This is more of a hack. The actual reading happens inside args.hpp
           // This is here because 1. the spxout object is not available there.
           // 2. It has to be displayed after the soplex intro banner
-          MSG_INFO1(soplex->spxout, soplex->spxout << "Loading settings file <" << filename << "> . . .\n");
+            MSG_INFO1(soplex.spxout, soplex.spxout << "Loading settings file <" << vm["loadset"].as<std::string>() << "> . . .\n");
         }
 
-      MSG_INFO1( soplex->spxout, soplex->printUserSettings(); );
+        MSG_INFO1( soplex.spxout, soplex.printUserSettings(); );
 
       // TODO: How is the following code supposed to work?
       // no LP file was given and no settings files are written
@@ -717,7 +711,7 @@ int runSoPlex(const po::variables_map& vm)
       }
 
       // ensure that syncmode is not manual
-      if( soplex->intParam(soplex->SYNCMODE) == soplex->SYNCMODE_MANUAL )
+        if( soplex.intParam(soplex.SYNCMODE) == soplex.SYNCMODE_MANUAL )
       {
         BOOST_THROW_EXCEPTION(std::invalid_argument("Error: manual synchronization is invalid on command line.  Change parameter int:syncmode"));
       }
@@ -725,16 +719,16 @@ int runSoPlex(const po::variables_map& vm)
       // save settings files
       if(!savesetname.empty())
       {
-         MSG_INFO1( soplex->spxout, soplex->spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
-         if( !soplex->saveSettingsFile(savesetname.c_str(), false) )
+            MSG_INFO1( soplex.spxout, soplex.spxout << "Saving parameters to settings file <" << savesetname << "> . . .\n" );
+            if( !soplex.saveSettingsFile(savesetname.c_str(), false) )
          {
             MSG_ERROR( std::cerr << "Error writing parameters to file <" << savesetname << ">\n" );
          }
       }
       if(!diffsetname.empty())
       {
-         MSG_INFO1( soplex->spxout, soplex->spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
-         if( !soplex->saveSettingsFile(diffsetname.c_str(), true) )
+            MSG_INFO1( soplex.spxout, soplex.spxout << "Saving modified parameters to settings file <" << diffsetname << "> . . .\n" );
+            if( !soplex.saveSettingsFile(diffsetname.c_str(), true) )
          {
             MSG_ERROR( std::cerr << "Error writing modified parameters to file <" << diffsetname << ">\n" );
          }
@@ -745,7 +739,7 @@ int runSoPlex(const po::variables_map& vm)
       {
         if(!loadsetname.empty() || !savesetname.empty() || !diffsetname.empty())
          {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "\n" );
+                MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
          }
 
         BOOST_THROW_EXCEPTION(std::invalid_argument("No lipfile, settings file, save settings file or diff settings file"));
@@ -756,18 +750,18 @@ int runSoPlex(const po::variables_map& vm)
 
       // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
       // the rational LP is kept after reading
-      if( soplex->intParam(soplex->READMODE) == soplex->READMODE_RATIONAL
-         && soplex->intParam(soplex->SOLVEMODE) != soplex->SOLVEMODE_REAL )
+        if( soplex.intParam(soplex.READMODE) == soplex.READMODE_RATIONAL
+            && soplex.intParam(soplex.SOLVEMODE) != soplex.SOLVEMODE_REAL )
       {
-         soplex->setIntParam(soplex->SYNCMODE, soplex->SYNCMODE_AUTO);
+            soplex.setIntParam(soplex.SYNCMODE, soplex.SYNCMODE_AUTO);
       }
 
       // read LP from input file
-      MSG_INFO1( soplex->spxout, soplex->spxout << "Reading "
-         << (soplex->intParam(soplex->READMODE) == soplex->READMODE_REAL ? "(real)" : "(rational)")
+        MSG_INFO1( soplex.spxout, soplex.spxout << "Reading "
+                   << (soplex.intParam(soplex.READMODE) == soplex.READMODE_REAL ? "(real)" : "(rational)")
          << " LP file <" << lpfilename << "> . . .\n" );
 
-      if( !soplex->readFile(lpfilename.c_str(), &rownames, &colnames) )
+        if( !soplex.readFile(lpfilename.c_str(), &rownames, &colnames) )
       {
          BOOST_THROW_EXCEPTION(std::logic_error("Error while reading lpfile: " + lpfilename ));
       }
@@ -775,34 +769,34 @@ int runSoPlex(const po::variables_map& vm)
       // write LP if specified
       if(!writefilename.empty())
       {
-        if( !soplex->writeFile(writefilename.c_str(), &rownames, &colnames) )
+            if( !soplex.writeFile(writefilename.c_str(), &rownames, &colnames) )
          {
             BOOST_THROW_EXCEPTION(std::runtime_error("Error in writing to file: " + writefilename));
          }
          else
          {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "Written LP to file <" << writefilename << ">.\n\n" );
+                MSG_INFO1( soplex.spxout, soplex.spxout << "Written LP to file <" << writefilename << ">.\n\n" );
          }
       }
 
       // write dual LP if specified
       if(!writedualfilename.empty())
       {
-        if( !soplex->writeDualFileReal(writedualfilename.c_str(), &rownames, &colnames) )
+            if( !soplex.writeDualFileReal(writedualfilename.c_str(), &rownames, &colnames) )
          {
             BOOST_THROW_EXCEPTION(std::runtime_error("Error while writing dual file: " + writedualfilename));
          }
          else
          {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "Written dual LP to file <" << writedualfilename << ">.\n\n" );
+                MSG_INFO1( soplex.spxout, soplex.spxout << "Written dual LP to file <" << writedualfilename << ">.\n\n" );
          }
       }
 
       // read basis file if specified
       if(!readbasname.empty())
       {
-         MSG_INFO1( soplex->spxout, soplex->spxout << "Reading basis file <" << readbasname << "> . . . " );
-         if( !soplex->readBasisFile(readbasname.c_str(), &rownames, &colnames) )
+            MSG_INFO1( soplex.spxout, soplex.spxout << "Reading basis file <" << readbasname << "> . . . " );
+            if( !soplex.readBasisFile(readbasname.c_str(), &rownames, &colnames) )
          {
            BOOST_THROW_EXCEPTION(std::runtime_error("Error while reading file: " + readbasname));
          }
@@ -810,49 +804,49 @@ int runSoPlex(const po::variables_map& vm)
 
       readingTime->stop();
 
-      MSG_INFO1( soplex->spxout,
-         std::streamsize prec = soplex->spxout.precision();
-         soplex->spxout << "Reading took "
+        MSG_INFO1( soplex.spxout,
+                   std::streamsize prec = soplex.spxout.precision();
+                   soplex.spxout << "Reading took "
          << std::fixed << std::setprecision(2) << readingTime->time()
          << std::scientific << std::setprecision(int(prec))
          << " seconds.\n\n" );
 
-      MSG_INFO1( soplex->spxout, soplex->spxout << "LP has " << soplex->numRows() << " rows "
-                 << soplex->numCols() << " columns and " << soplex->numNonzeros() << " nonzeros.\n\n" );
+        MSG_INFO1( soplex.spxout, soplex.spxout << "LP has " << soplex.numRows() << " rows "
+                   << soplex.numCols() << " columns and " << soplex.numNonzeros() << " nonzeros.\n\n" );
 
       // solve the LP
-      soplex->optimize();
+        soplex.optimize();
 
       // print solution, check solution, and display statistics
-      printPrimalSolution(*soplex, colnames, rownames, printPrimal, printPrimalRational);
-      printDualSolution(*soplex, colnames, rownames, printDual, printDualRational);
+        printPrimalSolution(soplex, colnames, rownames, printPrimal, printPrimalRational);
+        printDualSolution(soplex, colnames, rownames, printDual, printDualRational);
 
       if( checkSol )
-        checkSolution<R>(*soplex); // The type needs to get fixed here
+          checkSolution<R>(soplex); // The type needs to get fixed here
 
       if( displayStatistics )
       {
-         MSG_INFO1( soplex->spxout, soplex->spxout << "Statistics\n==========\n\n" );
-         soplex->printStatistics(soplex->spxout.getStream(SPxOut::INFO1));
+            MSG_INFO1( soplex.spxout, soplex.spxout << "Statistics\n==========\n\n" );
+            soplex.printStatistics(soplex.spxout.getStream(SPxOut::INFO1));
       }
 
-      if(validation->validate)
-         validation->validateSolveReal(*soplex);
+        if(validation.validate)
+          validation.validateSolveReal(soplex);
 
       // write basis file if specified
       if(!writebasname.empty())
       {
-         if( !soplex->hasBasis() )
+            if( !soplex.hasBasis() )
          {
-            MSG_WARNING( soplex->spxout, soplex->spxout << "No basis information available.  Could not write file <" << writebasname << ">\n\n" );
+                MSG_WARNING( soplex.spxout, soplex.spxout << "No basis information available.  Could not write file <" << writebasname << ">\n\n" );
          }
-         else if( !soplex->writeBasisFile(writebasname.c_str(), &rownames, &colnames) )
+            else if( !soplex.writeBasisFile(writebasname.c_str(), &rownames, &colnames) )
          {
             BOOST_THROW_EXCEPTION(std::runtime_error("Error while writing file: " + writebasname));
          }
          else
          {
-            MSG_INFO1( soplex->spxout, soplex->spxout << "Written basis information to file <" << writebasname << ">.\n\n" );
+                MSG_INFO1( soplex.spxout, soplex.spxout << "Written basis information to file <" << writebasname << ">.\n\n" );
          }
       }
    }
@@ -863,7 +857,7 @@ int runSoPlex(const po::variables_map& vm)
    }
    catch(...)
      {
-       std::cout<<"Generic exception:"<<boost::current_exception_diagnostic_information()<<"\n";
+        std::cout<<"Generic exception: "<<boost::current_exception_diagnostic_information()<<"\n";
        returnValue = 1;
      }
 
@@ -880,7 +874,7 @@ int runSoPlex(const po::variables_map& vm)
  }
 
    return returnValue;
-}
+  }
 
 } // namespace soplex ends here
 // TODO: Is this required?
