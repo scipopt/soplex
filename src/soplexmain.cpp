@@ -30,11 +30,14 @@
 #include "soplex/statistics.h"
 #include "soplex/args.hpp"      // For argument parsing
 
-#include "boost/multiprecision/number.hpp"
-#include "boost/multiprecision/mpfr.hpp"
-#include "boost/multiprecision/debug_adaptor.hpp" // For debuging mpf numbers
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/mpfr.hpp>
+#include <boost/multiprecision/debug_adaptor.hpp> // For debuging mpf numbers
 
-#include "boost/program_options.hpp"
+#include <boost/program_options.hpp>
+#include <exception>
+#include <boost/exception/diagnostic_information.hpp>
+#include <boost/exception/exception.hpp>
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
@@ -704,25 +707,19 @@ int runSoPlex(const po::variables_map& vm)
           MSG_INFO1(soplex->spxout, soplex->spxout << "Loading settings file <" << filename << "> . . .\n");
         }
 
-      MSG_INFO1( soplex->spxout, soplex->printUserSettings(); )
+      MSG_INFO1( soplex->spxout, soplex->printUserSettings(); );
 
-        // TODO: How is the following code supposed to work?
+      // TODO: How is the following code supposed to work?
       // no LP file was given and no settings files are written
-        if( lpfilename.empty() && savesetname.empty() && diffsetname.empty())
+      if( lpfilename.empty() && savesetname.empty() && diffsetname.empty())
       {
-        // TODO: The printUsage should be different, also the GOTO macro
-        // TODO fix the printUsage stuff
-         // printUsage(argv, 0);
-         returnValue = 1;
-         goto TERMINATE_FREESTRINGS;
+        BOOST_THROW_EXCEPTION(std::invalid_argument("Empty lpfilename, save setings name and diff settings name"));
       }
 
       // ensure that syncmode is not manual
       if( soplex->intParam(soplex->SYNCMODE) == soplex->SYNCMODE_MANUAL )
       {
-         MSG_ERROR( std::cerr << "Error: manual synchronization is invalid on command line.  Change parameter int:syncmode.\n" );
-         returnValue = 1;
-         goto TERMINATE_FREESTRINGS;
+        BOOST_THROW_EXCEPTION(std::invalid_argument("Error: manual synchronization is invalid on command line.  Change parameter int:syncmode"));
       }
 
       // save settings files
@@ -750,7 +747,8 @@ int runSoPlex(const po::variables_map& vm)
          {
             MSG_INFO1( soplex->spxout, soplex->spxout << "\n" );
          }
-         goto TERMINATE_FREESTRINGS;
+
+        BOOST_THROW_EXCEPTION(std::invalid_argument("No lipfile, settings file, save settings file or diff settings file"));
       }
 
       // measure time for reading LP file and basis file
@@ -771,9 +769,7 @@ int runSoPlex(const po::variables_map& vm)
 
       if( !soplex->readFile(lpfilename.c_str(), &rownames, &colnames) )
       {
-         MSG_ERROR( std::cerr << "Error while reading file <" << lpfilename << ">.\n" );
-         returnValue = 1;
-         goto TERMINATE_FREESTRINGS;
+         BOOST_THROW_EXCEPTION(std::logic_error("Error while reading lpfile: " + lpfilename ));
       }
 
       // write LP if specified
@@ -781,9 +777,7 @@ int runSoPlex(const po::variables_map& vm)
       {
         if( !soplex->writeFile(writefilename.c_str(), &rownames, &colnames) )
          {
-            MSG_ERROR( std::cerr << "Error while writing file <" << writefilename << ">.\n\n" );
-            returnValue = 1;
-            goto TERMINATE_FREESTRINGS;
+            BOOST_THROW_EXCEPTION(std::runtime_error("Error in writing to file: " + writefilename));
          }
          else
          {
@@ -796,9 +790,7 @@ int runSoPlex(const po::variables_map& vm)
       {
         if( !soplex->writeDualFileReal(writedualfilename.c_str(), &rownames, &colnames) )
          {
-            MSG_ERROR( std::cerr << "Error while writing dual file <" << writedualfilename << ">.\n\n" );
-            returnValue = 1;
-            goto TERMINATE_FREESTRINGS;
+            BOOST_THROW_EXCEPTION(std::runtime_error("Error while writing dual file: " + writedualfilename));
          }
          else
          {
@@ -812,9 +804,7 @@ int runSoPlex(const po::variables_map& vm)
          MSG_INFO1( soplex->spxout, soplex->spxout << "Reading basis file <" << readbasname << "> . . . " );
          if( !soplex->readBasisFile(readbasname.c_str(), &rownames, &colnames) )
          {
-            MSG_ERROR( std::cerr << "Error while reading file <" << readbasname << ">.\n" );
-            returnValue = 1;
-            goto TERMINATE_FREESTRINGS;
+           BOOST_THROW_EXCEPTION(std::runtime_error("Error while reading file: " + readbasname));
          }
       }
 
@@ -858,9 +848,7 @@ int runSoPlex(const po::variables_map& vm)
          }
          else if( !soplex->writeBasisFile(writebasname.c_str(), &rownames, &colnames) )
          {
-            MSG_ERROR( std::cerr << "Error while writing file <" << writebasname << ">.\n\n" );
-            returnValue = 1;
-            goto TERMINATE_FREESTRINGS;
+            BOOST_THROW_EXCEPTION(std::runtime_error("Error while writing file: " + writebasname));
          }
          else
          {
@@ -872,25 +860,17 @@ int runSoPlex(const po::variables_map& vm)
    {
       MSG_ERROR( std::cerr << "Exception caught: " << x.what() << "\n" );
       returnValue = 1;
-      goto TERMINATE_FREESTRINGS;
    }
+   catch(...)
+     {
+       std::cout<<"Generic exception:"<<boost::current_exception_diagnostic_information()<<"\n";
+       returnValue = 1;
+     }
 
- TERMINATE_FREESTRINGS:
 
- TERMINATE:
    // because EGlpNumClear() calls mpq_clear() for all mpq_t variables, we need to destroy all objects of class Rational
    // beforehand; hence all Rational objects and all data that uses Rational objects must be allocated dynamically via
    // spx_alloc() and freed here; disabling the list memory is crucial
- if( nullptr != soplex )
- {
-    soplex->~SoPlexBase();
-    spx_free(soplex);
- }
- if( nullptr != validation )
- {
-    validation->~Validation();
-    spx_free(validation);
- }
  Rational::disableListMem();
  EGlpNumClear();
  if( nullptr != readingTime )
@@ -901,5 +881,7 @@ int runSoPlex(const po::variables_map& vm)
 
    return returnValue;
 }
-}
+
+} // namespace soplex ends here
+// TODO: Is this required?
 
