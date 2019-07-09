@@ -30,7 +30,9 @@ namespace soplex
     template <typename T>
     auto checkRange (const T& min, const T& max, const std::string& str) -> std::function<void(T)>
     {
-      return [&min, &max, &str](const T& val)
+      // interesting remark: If you do &str instead of str below, there will be
+      // a bug. Relevant? https://stackoverflow.com/a/21443273/4223038
+      return [&min, &max, str](const T& val)
              {
                if(val < min || val > max)
                  {
@@ -55,7 +57,7 @@ namespace soplex
     // "int" with auto or use a template, also std::cend() and std::cbegin()
     auto in = [](const std::initializer_list<int>& list, const std::string& str)
               {
-                return [&list, &str](const int& val)
+                return [&list, str](const int& val)
                        {
                          const auto lEnd = list.end();
                          const auto iter = std::find(list.begin(), list.end(), val);
@@ -141,10 +143,10 @@ namespace soplex
       ("dispstat,q", "display detailed statistics")
       ("checkfinal,c", "perform final check of optimal solution in original problem");
 
-    // These are parameters corresponding to the boolParam in SoPlex<R>::Settings
-    // class. Ideally I want the parsing of arguments to finish before creating a
-    // SoPlex Object. In the old SoPlex, half of the parsing happened outside
-    // SoPlex and the rest inside the SoPlex.
+    // These are parameters corresponding to the boolParam in
+    // SoPlex<R>::Settings class. This doesn't have a notify function that
+    // checks for the range because the boost can deal with it. It accepts the
+    // parameters yes/no, on/off, 1/0 and true/false!
     boolParam.add_options()
       ("bool:lifting", po::value<bool>()->default_value(false), "should lifting be used to reduce range of nonzero matrix coefficients?")
       ("bool:eqtrans", po::value<bool>()->default_value(false), "should LP be transformed to equality form before a rational solve?")
@@ -335,7 +337,7 @@ namespace soplex
     {
       // I think the whole verbosity thing won't apply here. So just a direct
       // call to std::cerr should be okay
-      std::cerr<<"error: "<<e.what()<<"\n\n";
+      std::cerr<<"Error in argument parsing: "<<e.what()<<"\n\n";
       // print the help message
       std::cout<<liteOpt<<"\n";
       return 1;
@@ -348,13 +350,5 @@ namespace soplex
 
   return 0;
 }
-
-// TODO Look into this
-// Checks whether a file exists
-bool fileExists(const std::string& str) // Maybe throw an exception
-{
-  return static_cast<bool>(std::ifstream(str));
-}
-
 
 } // namespace soplex ends here
