@@ -10,7 +10,7 @@ interface & parameters:
 - new parameter 'int:stattimer' to control time measurement for statistics during solving
   (0: off, 1: user time, 2: wallclock time)
 - new parameter 'bool:forcebasic', determines whether optimal solution has to be basic when performing
-  rational solve with iterative refinement, triggers rational factorization if reconstruction optimal 
+  rational solve with iterative refinement, triggers rational factorization if reconstruction optimal
   but not basic
 - Templated SoPlex, SPxSolver, and SPxBasis.
 - Renamed SoPlex<R>, SPxSolver<R>, and SPxBasis<R> to SoPlexBase<R>,
@@ -51,6 +51,9 @@ interface & parameters:
 - Renamed `SPxSolverBase<R>::getDualfarkas` to `SPxSolverBase<R>::getDualFarkas`
   (for consistency.) Note that there is a method with the same name in
   `SoPlexBase<R>`.
+
+10 July 2019 - Release 4.0.2
+============================
 
 fixed bugs:
 - resolve compiler warning about data loss during implicit type conversion for timers
