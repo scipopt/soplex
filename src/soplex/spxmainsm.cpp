@@ -346,7 +346,7 @@ void SPxMainSM<Real>::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s
       }
       else // if reduced costs are negative or old lower bound not equal to xj, we need to change xj into the basis
       {
-         assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+         assert(!isOptimal || EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
 
          cStatus[m_j] = SPxSolverBase<Real>::BASIC;
          rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,
@@ -366,7 +366,7 @@ void SPxMainSM<Real>::RowSingletonPS::execute(DVector& x, DVector& y, DVector& s
       }
       else // if reduced costs are positive or old upper bound not equal to xj, we need to change xj into the basis
       {
-         assert(EQrel(m_rhs, x[m_j]*aij, this->eps()) || EQrel(m_lhs, x[m_j]*aij, this->eps()));
+         assert(!isOptimal || EQrel(m_rhs, x[m_j]*aij, eps()) || EQrel(m_lhs, x[m_j]*aij, eps()));
 
          cStatus[m_j] = SPxSolverBase<Real>::BASIC;
          rStatus[m_i] = (EQrel(m_lhs, x[m_j] * aij,

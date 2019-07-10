@@ -43,7 +43,7 @@ void SPxSolverBase<Real>::qualConstraintViolation(Real& maxviol, Real& sumviol) 
 
       Real viol = 0.0;
 
-      assert(lhs(row) <= rhs(row) + (100 * epsilon()));
+      assert(lhs(row) <= rhs(row) + 1e-9);
 
       if(val < this->lhs(row))
          viol = spxAbs(val - this->lhs(row));
@@ -70,7 +70,7 @@ void SPxSolverBase<Real>::qualBoundViolation(
 
    for(int col = 0; col < this->nCols(); ++col)
    {
-      assert(lower(col) <= upper(col) + (100 * epsilon()));
+      assert(lower(col) <= upper(col) + 1e-9);
 
       Real viol = 0.0;
 

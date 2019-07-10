@@ -4567,6 +4567,7 @@ void SoPlexBase<Real>::getBasis(typename SPxSolverBase<Real>::VarStatus rows[],
 
 
 /// returns the indices of the basic columns and rows; basic column n gives value n, basic row m gives value -1-m
+/// note: the order of the indices might not coincide with the actual order when using ROW representation
 template <>
 void SoPlexBase<Real>::getBasisInd(int* bind) const
 {
@@ -4736,6 +4737,7 @@ bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int*
             int scaleExp;
             DSVector rhs(_solver.unitVector(r));
 
+            // apply scaling \tilde{C} to rhs
             if(_solver.basis().baseId(r).isSPxColId())
                scaleExp = _scaler->getColScaleExp(_solver.number(_solver.basis().baseId(r)));
             else
@@ -4747,6 +4749,7 @@ bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int*
             x.setup();
             int size = x.size();
 
+            //apply scaling R to solution vector
             for(int i = 0; i < size; i++)
             {
                scaleExp = _scaler->getRowScaleExp(x.index(i));
@@ -4806,7 +4809,7 @@ bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int*
       // get vector corresponding to requested index r
       index = bind[r];
 
-      // r corresponds to a row vector
+      // r corresponds to a basic row
       if(index < 0)
       {
          // transform index to actual row index
@@ -4827,7 +4830,7 @@ bool SoPlexBase<Real>::getBasisInverseRowReal(int r, Real* coef, int* inds, int*
                rhs.value(i) = spxLdexp(rhs.value(i), -_scaler->getRowScaleExp(index));
          }
       }
-      // r corresponds to a column vector
+      // r corresponds to a basic column
       else
       {
          // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
@@ -4993,107 +4996,118 @@ bool SoPlexBase<Real>::getBasisInverseColReal(int c, Real* coef, int* inds, int*
       assert(_solver.rep() == SPxSolverBase<Real>::ROW);
 
       /// @todo should rhs be a reference?
-      DSVectorReal rhs(numCols());
-      SSVectorReal y(numCols());
       int* bind = 0;
       int index;
 
-      // get ordering of column basis matrix
+      // get indices of column basis matrix (not in correct order!)
       spx_alloc(bind, numRows());
       getBasisInd(bind);
 
-      // get vector corresponding to requested index c
       index = bind[c];
-
-      // c corresponds to a row vector
-      if(index < 0)
-      {
-         // transform index to actual row index
-         index = -index - 1;
-
-         // should be a valid row index and in the column basis matrix, i.e., not basic w.r.t. row representation
-         assert(index >= 0);
-         assert(index < numRows());
-         assert(!_solver.isRowBasic(index));
-
-         // get row vector
-         rhs = _solver.rowVector(index);
-         rhs *= -1.0;
-      }
-      // c corresponds to a column vector
-      else
-      {
-         // should be a valid column index and in the column basis matrix, i.e., not basic w.r.t. row representation
-         assert(index < numCols());
-         assert(!_solver.isColBasic(index));
-
-         // get unit vector
-         rhs = UnitVectorReal(index);
-      }
-
-      // solve system "y B = rhs", where B is the row basis matrix
-      try
-      {
-         /* unscaling required? */
-         if(unscale && _solver.isScaled())
-         {
-            int size = rhs.size();
-            int scaleExp;
-
-            for(int i = 0; i < size; i++)
-            {
-               scaleExp = _scaler->getColScaleExp(i);
-               rhs.value(i) *= spxLdexp(1.0, scaleExp);
-            }
-
-            _solver.basis().coSolve(y, rhs);
-
-            int rowIdx;
-            size = y.size();
-
-            for(int i = 0; i < size; i++)
-            {
-               assert(_solver.basis().baseId(y.index(i)).isSPxRowId());
-               rowIdx = _solver.basis().baseId(y.index(i)).getIdx();
-               scaleExp = _scaler->getRowScaleExp(rowIdx);
-               y.setValue(i, y.value(i) * spxLdexp(1.0, scaleExp));
-            }
-         }
-         else
-         {
-            _solver.basis().coSolve(y, rhs);
-         }
-      }
-      catch(const SPxException& E)
-      {
-         MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
-                   "> while computing basis inverse row.\n");
-         return false;
-      }
+      // index = c >= numColsReal() ? 0 : c;
 
       // initialize result vector x as zero
       memset(coef, 0, (unsigned int)numRows() * sizeof(Real));
 
-      // add nonzero entries
-      for(int i = 0; i < numCols(); ++i)
+      if(!_solver.isRowBasic(c))
       {
-         SPxId id = _solver.basis().baseId(i);
-
-         if(id.isSPxRowId())
+         // this column of B^-1 is just a unit column
+         for(int i = 0; i < numRows(); i++)
          {
-            assert(_solver.number(id) >= 0);
-            assert(_solver.number(id) < numRows());
-            assert(bind[c] >= 0 || _solver.number(id) != index);
-
-            coef[_solver.number(id)] = y[i];
+            if(bind[i] < 0 && -bind[i]-1 == c)
+               coef[i] = 1.0;
          }
       }
-
-      // if c corresponds to a row vector, we have to add a 1 at position c
-      if(bind[c] < 0)
+      else
       {
-         assert(coef[index] == 0.0);
-         coef[index] = 1.0;
+         SSVectorReal x(numCols());
+
+         for(int k = 0; k < numCols(); k++)
+         {
+            if(c == _solver.number(_solver.basis().baseId(k)) && _solver.basis().baseId(k).isSPxRowId())
+            {
+               index = k;
+               break;
+            }
+         }
+
+         try
+         {
+            if(unscale && _solver.isScaled())
+            {
+               int scaleExp = -_scaler->getRowScaleExp(index);
+               DSVectorReal rhs(1);
+               rhs.add(index, spxLdexp(1.0, scaleExp));
+               _solver.basis().coSolve(x, rhs);
+               x.setup();
+               int size = x.size();
+
+               // apply scaling based on \tilde{C}
+               for(int i = 0; i < size; i++)
+               {
+                  int idx = bind[x.index(i)];
+                  if(idx < 0)
+                  {
+                     idx = -idx - 1;
+                     scaleExp = _scaler->getRowScaleExp(idx);
+                  }
+                  else
+                     scaleExp = - _scaler->getColScaleExp(idx);
+
+                  spxLdexp(x.value(i), scaleExp);
+               }
+            }
+            else
+            {
+               _solver.basis().coSolve(x, _solver.unitVector(index));
+            }
+         }
+         catch(const SPxException& E)
+         {
+            MSG_INFO1(spxout, spxout << "Caught exception <" << E.what() <<
+                      "> while computing basis inverse column.\n");
+            return false;
+         }
+
+         // add nonzero entries into result vector
+         for(int i = 0; i < numRows(); i++)
+         {
+            int idx = bind[i];
+
+            if(idx < 0)
+            {
+               // convert to proper row index
+               idx = - idx - 1;
+               // should be a valid row index, basic in the column basis
+               assert(idx >= 0);
+               assert(idx < numRows());
+               assert(!_solver.isRowBasic(idx));
+
+               if(unscale && _solver.isScaled())
+               {
+                  DSVector r_unscaled(numCols());
+                  _solver.getRowVectorUnscaled(idx, r_unscaled);
+                  coef[i] = - (r_unscaled * x);
+               }
+               else
+                  coef[i] = - (_solver.rowVector(idx) * x);
+
+               if(unscale && _solver.isScaled())
+                  coef[i] = spxLdexp(coef[i], _scaler->getRowScaleExp(idx));
+            }
+            else
+            {
+               // should be a valid column index, basic in the column basis
+               assert(idx >= 0);
+               assert(idx < numCols());
+               assert(!_solver.isColBasic(idx));
+
+               if(unscale && _solver.isScaled())
+                  coef[i] = spxLdexp(x[idx], _scaler->getColScaleExp(idx));
+               else
+                  coef[i] = x[idx];
+            }
+         }
       }
 
       /// @todo implement returning of sparsity information like in column wise case

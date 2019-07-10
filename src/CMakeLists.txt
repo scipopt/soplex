@@ -217,6 +217,14 @@ set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src")
 configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
   "${CMAKE_BINARY_DIR}/soplex-config.cmake" @ONLY)
 
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+${CMAKE_BINARY_DIR}/soplex-config-version.cmake
+    VERSION ${SOPLEX_VERSION_MAJOR}.${SOPLEX_VERSION_MINOR}.${SOPLEX_VERSION_PATCH}
+    COMPATIBILITY SameMajorVersion
+    )
+
+
 #configure the config file for the install
 set(CONF_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
 configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
@@ -225,4 +233,6 @@ configure_file(${PROJECT_SOURCE_DIR}/soplex-config.cmake.in
 # install the targets of the soplex export group and the config file so that other projects
 # can link easily against soplex
 install(EXPORT soplex-targets FILE soplex-targets.cmake DESTINATION lib/cmake/soplex)
-install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake" DESTINATION lib/cmake/soplex)
+install(FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/soplex-config.cmake"
+	           ${CMAKE_BINARY_DIR}/soplex-config-version.cmake
+	     DESTINATION lib/cmake/soplex)
