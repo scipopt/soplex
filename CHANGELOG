@@ -1,5 +1,5 @@
-Bugfix
-======
+10 July 2019 - Release 4.0.2
+============================
 
 fixed bugs:
 - resolve compiler warning about data loss during implicit type conversion for timers
