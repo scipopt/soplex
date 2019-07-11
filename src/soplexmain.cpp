@@ -25,11 +25,6 @@
 #include <iomanip>
 #include <fstream>
 
-#include "soplex.h"
-#include "soplex/validation.h"
-#include "soplex/statistics.h"
-#include "soplex/args.hpp"      // For argument parsing
-
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp> // For debuging mpf numbers
@@ -38,6 +33,11 @@
 #include <exception>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/exception/exception.hpp>
+
+#include "soplex.h"
+#include "soplex/validation.h"
+#include "soplex/statistics.h"
+#include "soplex/args.hpp"      // For argument parsing
 
 #ifdef SOPLEX_WITH_EGLIB
 extern "C" {
