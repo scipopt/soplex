@@ -701,6 +701,12 @@ namespace soplex{
             MSG_INFO1(soplex.spxout, soplex.spxout << "Loading settings file <" << vm["loadset"].as<std::string>() << "> . . .\n");
         }
 
+        // For random seed
+        if(vm.count("uint:random_seed"))
+          {
+            soplex.setRandomSeed(vm["uint:random_seed"].as<unsigned int>());
+          }
+
         MSG_INFO1( soplex.spxout, soplex.printUserSettings(); );
 
       // TODO: How is the following code supposed to work?

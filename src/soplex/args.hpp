@@ -104,6 +104,7 @@ namespace soplex
       ("writefile", po::value<std::string>(), "write LP to file in LP or MPS format depending on extension")
       ("writedual", po::value<std::string>(),  "write the dual LP to a file in LP or MPS formal depending on extension")
       ("<type>:<name>=<val>", "change parameter value using syntax of settings file entries") // TODO: How do I deal with this?
+      ("uint:random_seed", po::value<unsigned int>(), "set the random seed")
       ("loadset", po::value<std::string>(), "load parameters from settings file (overruled by command line parameters")
       ("saveset", po::value<std::string>(), "save parameters to settings file")
       ("diffset", po::value<std::string>(), "save modified parameters to settings file")
