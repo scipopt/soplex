@@ -1318,11 +1318,14 @@ if(WIN32)
     INTERFACE_COMPILE_DEFINITIONS "BOOST_ALL_NO_LIB")
 endif()
 
-cmake_policy(GET CMP0074 _Boost_CMP0074)
-if(NOT "x${_Boost_CMP0074}x" STREQUAL "xNEWx")
-  _Boost_CHECK_SPELLING(Boost_ROOT)
-endif()
-unset(_Boost_CMP0074)
+# TODO cmake 3.12 is needed for this code to run. A bit strange that there is a
+# cmake error instead of a warning.
+
+# cmake_policy(GET CMP0074 _Boost_CMP0074)
+# if(NOT "x${_Boost_CMP0074}x" STREQUAL "xNEWx")
+#   _Boost_CHECK_SPELLING(Boost_ROOT)
+# endif()
+# unset(_Boost_CMP0074)
 _Boost_CHECK_SPELLING(Boost_LIBRARYDIR)
 _Boost_CHECK_SPELLING(Boost_INCLUDEDIR)
 
