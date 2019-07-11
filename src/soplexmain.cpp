@@ -769,7 +769,7 @@ namespace soplex{
 
         if( !soplex.readFile(lpfilename.c_str(), &rownames, &colnames) )
       {
-         BOOST_THROW_EXCEPTION(std::logic_error("Error while reading lpfile: " + lpfilename ));
+            BOOST_THROW_EXCEPTION(std::runtime_error("Error while reading lpfile: " + lpfilename ));
       }
 
       // write LP if specified
