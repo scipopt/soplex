@@ -103,8 +103,11 @@ namespace soplex
       ("writebas", po::value<std::string>(), "write terminal basis to file")
       ("writefile", po::value<std::string>(), "write LP to file in LP or MPS format depending on extension")
       ("writedual", po::value<std::string>(),  "write the dual LP to a file in LP or MPS formal depending on extension")
-      ("<type>:<name>=<val>", "change parameter value using syntax of settings file entries") // TODO: How do I deal with this?
+      ("<type>:<name>=<val>", "change parameter value using syntax of settings file entries")
+      // this is more of a hack. It won't be used. The only purpose of the above
+      // argument is to print the thing.
       ("uint:random_seed", po::value<unsigned int>(), "set the random seed")
+      // uint:random_seed used to be parsed inside parseSettingsString().
       ("loadset", po::value<std::string>(), "load parameters from settings file (overruled by command line parameters")
       ("saveset", po::value<std::string>(), "save parameters to settings file")
       ("diffset", po::value<std::string>(), "save modified parameters to settings file")
@@ -240,7 +243,6 @@ namespace soplex
       // A hash map that takes a string to a boost::any type. The boost:any
       // type can be casted into the value we need.
       po::variables_map vm;
-      // TODO: Maybe replace the parse_command_line with the other function?
       po::store(po::command_line_parser(argc, argv).options(allOpt).positional(p).run(), vm);
 
 

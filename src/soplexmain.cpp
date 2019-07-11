@@ -58,7 +58,13 @@ static
 void printUsage(const char* const argv[], int idx)
 {
 
-  // TODO: How is this supposed to work?
+  // This function is never called
+
+  // TODO: How is this supposed to work? I'm leaving it like this because I
+  // don't know when SOPLEX_WITH_ZLIB is supposed to be called. Printing
+  // arguments are now inside parseArgs in args.hpp.
+
+
 // #ifdef SOPLEX_WITH_ZLIB
 //              << "  <lpfile>               linear program as .mps[.gz] or .lp[.gz] file\n\n"
 // #else
@@ -440,25 +446,6 @@ int main(int argc, char* argv[])
    ///@todo the EGlib version info should be printed after the SoPlexBase version info
    // initialize EGlib's GMP memory management before any rational numbers are created
    EGlpNumStart();
-
-   using namespace boost::multiprecision;
-
-   // mpfr_flot_50 with expression template turned off
-
-   // The following won't compile. Because there is no conversion between mpq_t
-   // Rational and cpp_float. Perhaps we need to change the Rational class
-
-   // using cpp_float_50_eto = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<50>, boost::multiprecision::et_off>;
-
-   // using cpp_float = boost::multiprecision::number<boost::multiprecision::cpp_
-
-  //@todo need to implement the mpf part properly The arguments should be parsed
-  // and the right template of runSoplex should be called
-
-
-   // return runSoPlex<mpfr_debug>(argc, argv);
-   // return runSoPlex<mpfr_float_100_eto>(argc, argv);
-  // return (runSoPlex<Real>(argc, argv)); // For the Real SoPlex
 
    return parseArgs(argc, argv);
 
