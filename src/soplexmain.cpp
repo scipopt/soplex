@@ -465,11 +465,9 @@ int main(int argc, char* argv[])
 }
 
 
-namespace soplex{
-
 // Runs SoPlex with the parsed boost variables map
   template <class R>
-  int runSoPlex(const po::variables_map& vm)
+  int soplex::runSoPlex(const po::variables_map& vm)
   {
     SoPlexBase<R> soplex;
     Validation<R> validation;
@@ -532,8 +530,6 @@ namespace soplex{
 
           // if the LP is parsed rationally and might be solved rationally, we choose automatic syncmode such that
           // the rational LP is kept after reading
-
-          // TODO: Look at this if statement. It used to be an else if
 
             if( soplex.intParam(soplex.READMODE) == soplex.READMODE_RATIONAL
                 && soplex.intParam(soplex.SOLVEMODE) != soplex.SOLVEMODE_REAL )
@@ -887,7 +883,4 @@ namespace soplex{
 
    return returnValue;
   }
-
-} // namespace soplex ends here
-// TODO: Is this required?
 
