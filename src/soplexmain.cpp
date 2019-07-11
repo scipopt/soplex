@@ -591,7 +591,7 @@ namespace soplex{
         {
           auto input = vm["extsol"].as<std::string>();
 
-            validation.updateExternalSolution(input.c_str());
+            validation.updateExternalSolution(input);
         }
 
       // settings file format arguments are handled at the beginning.
@@ -624,7 +624,7 @@ namespace soplex{
       if(vm.count("valtol"))
         {
           auto str = vm["valtol"].as<std::string>();
-            validation.updateValidationTolerance(str.c_str());
+            validation.updateValidationTolerance(str);
         }
 
       // -s<value> : choose simplifier/presolver (0 - off, 1* - auto)
