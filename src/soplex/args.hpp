@@ -24,7 +24,7 @@ namespace soplex
   namespace args
   {
     // Returns a function that checks if the val lies in [min, max] TODO: If we
-    // have c++14, we can replace all the "int" with auto or use a template and
+    // have c++14/c++17, we can replace all the T with auto or use a template and
     // put this inside the parseArgs. This also means that we can get rid of the
     // ugly std::function part
     template <typename T>
@@ -74,6 +74,8 @@ namespace soplex
     unsigned int precision = 100;
 
 
+    // a special case for working with ./soplex file.mps, i.e., without
+    // explicitly doing ./soplex --lpfile=file.mps
     po::positional_options_description p;
     p.add("lpfile", -1);
 

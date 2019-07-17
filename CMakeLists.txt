@@ -121,10 +121,10 @@ if(Boost)
   # TODO: The value of boost version should be decided in the future. It would
   # be nice to check if the version is at least 1.70.0 and issue a warning if it
   # isn't.
-  find_package(Boost 1.58.0 COMPONENTS program_options) # Refer to comments in cmake/Modules/FindBoost.cmake
+  find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED) # Refer to comments in cmake/Modules/FindBoost.cmake
   if(BOOST_FOUND)
-    include_directories(${BOOST_INCLUDE_DIRS}) # TODO Does this even make sense?
-    set(libs ${libs} ${BOOST_LIBRARIES})       # Where are these variables defined? Same for the MPFR
+    include_directories(${BOOST_INCLUDE_DIRS})
+    set(libs ${libs} ${BOOST_LIBRARIES})
   endif()
 endif()
 
