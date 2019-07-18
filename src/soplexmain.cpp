@@ -24,6 +24,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <memory>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/mpfr.hpp>
@@ -438,13 +439,10 @@ int soplex::runSoPlex(const po::variables_map& vm)
   SoPlexBase<R> soplex;
   Validation<R> validation;
 
-  Timer* readingTime = nullptr;
-
-  int optidx;
-
   // Stores different names
   std::string lpfilename, readbasname, writebasname, writefilename, writedualfilename, loadsetname, savesetname, diffsetname;
 
+  // Will be used inside as conditions for if statements
   bool printPrimal = false;
   bool printPrimalRational = false;
   bool printDual = false;
@@ -477,8 +475,14 @@ int soplex::runSoPlex(const po::variables_map& vm)
       NameSet rownames;
       NameSet colnames;
 
+      // A smart pointer for the readingTime. With a custom deleter too.
       // create default timer (CPU time)
-      readingTime = TimerFactory::createTimer(Timer::USER_TIME);
+      std::unique_ptr<Timer, std::function<void(Timer*)>> readingTime(TimerFactory::createTimer(Timer::USER_TIME), [](Timer* ptr)
+                                                                                      {
+                                                                                        // custom deleter
+                                                                                        ptr->~Timer();
+                                                                                        spx_free(ptr);
+                                                                                      });
 
       soplex.printVersion();
       MSG_INFO1( soplex.spxout, soplex.spxout << SOPLEX_COPYRIGHT << std::endl << std::endl );
@@ -716,7 +720,7 @@ int soplex::runSoPlex(const po::variables_map& vm)
               MSG_INFO1( soplex.spxout, soplex.spxout << "\n" );
             }
 
-          BOOST_THROW_EXCEPTION(std::invalid_argument("No lipfile, settings file, save settings file or diff settings file"));
+          BOOST_THROW_EXCEPTION(std::invalid_argument("No lpfile, settings file, save settings file or diff settings file"));
         }
 
       // measure time for reading LP file and basis file
@@ -841,11 +845,6 @@ int soplex::runSoPlex(const po::variables_map& vm)
   // spx_alloc() and freed here; disabling the list memory is crucial
   Rational::disableListMem();
   EGlpNumClear();
-  if( nullptr != readingTime )
-    {
-      readingTime->~Timer();
-      spx_free(readingTime);
-    }
 
   return returnValue;
 }
