@@ -28,11 +28,13 @@ namespace soplex
     // put this inside the parseArgs. This also means that we can get rid of the
     // ugly std::function part
     template <typename T>
-    auto checkRange (const T& min, const T& max, const std::string& str) -> std::function<void(T)>
+    auto checkRange(const T& min, const T& max, const std::string& str) -> std::function<void(T)>
     {
-      // interesting remark: If you do &str instead of str below, there will be
-      // a bug. Relevant? https://stackoverflow.com/a/21443273/4223038
-      return [&min, &max, str](const T& val)
+      // interesting remark: If you do &min, &max, &str instead of str below,
+      // there will be a bug in some cases. Seems like the code is not
+      // guaranteed to work according to the standard? Relevant SO:
+      // https://stackoverflow.com/a/21443273/4223038
+      return [min, max, str](const T& val)
              {
                if(val < min || val > max)
                  {
@@ -55,9 +57,11 @@ namespace soplex
     // Returns a function that checks whether a value is inside a list and if
     // not, it throws an error TODO: If we have c++14, we can replace all the
     // "int" with auto or use a template, also std::cend() and std::cbegin()
+    // Also refer to comments on checkRange. Using &list instead of list in the
+    // lambda may cause issues.
     auto in = [](const std::initializer_list<int>& list, const std::string& str)
               {
-                return [&list, str](const int& val)
+                return [list, str](const int& val)
                        {
                          const auto lEnd = list.end();
                          const auto iter = std::find(list.begin(), list.end(), val);
