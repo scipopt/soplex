@@ -177,7 +177,7 @@ target_link_libraries(libsoplex ${libs})
 
 # create soplex binary using library without pic
 add_executable(soplex soplexmain.cpp)
-target_link_libraries(soplex libsoplex ${BOOST_LIBRARIES})
+target_link_libraries(soplex libsoplex LINK_PUBLIC ${Boost_LIBRARIES})
 
 if(CMAKE_BUILD_TYPE EQUAL "Debug")
     find_package(Sanitizers)
