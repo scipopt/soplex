@@ -122,9 +122,9 @@ namespace soplex
     lt.add_options()
       ("time,t", po::value<int>(), "set time limit to n seconds")
       ("iterlimit,i", po::value<int>(), "set iteration limit to n")
-      ("primfeastol,f", po::value<double>(), "set primal feasibility tolerance to double") // fix
-      ("dualfeastol,o", po::value<double>(),"set dual feasibility (optimality) tolerance to") // vix
-      ("valtol,l", po::value<double>(), "set validation tolerance to whatever"); // fix
+      ("primfeastol,f", po::value<double>(), "set primal feasibility tolerance to double")
+      ("dualfeastol,o", po::value<double>(),"set dual feasibility (optimality) tolerance to")
+      ("valtol,l", po::value<double>(), "set validation tolerance to whatever");
 
     // Variables will contain value specified by user or the default
 
